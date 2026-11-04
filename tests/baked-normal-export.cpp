@@ -9,8 +9,13 @@ Mesh mirrored_fan(){
  Mesh m;m.positions={{0,0,0},{.1f,0,0},{0,.1f,0},{-.1f,0,0},{0,-.1f,0}};
  m.normals.assign(5,{0,0,1});m.uv={{{.5f,.5f}},{{.9f,.5f}},{{.5f,.9f}},{{.5f,.1f}},{{.1f,.5f}}};m.indices={0,1,2,0,3,4};m.uv_pins={1,0,0,0,0};return m;
 }
-Scene baked_fan(bool skin,bool morph){
+Scene baked_fan(bool skin,bool morph,bool curved=false){
  Scene s;const auto target=s.active().id;auto mesh=mirrored_fan();s.active().name="Mirrored tangent islands";s.active().mesh_active=true;s.active().painted=std::make_shared<PaintedMesh>(mesh,64);
+ if(curved){
+  mesh.positions[1].z=.015f;mesh.positions[2].z=-.01f;mesh.positions[3].z=.01f;mesh.positions[4].z=-.015f;
+  mesh.normals={normalized(Vec3{.1f,.1f,1}),normalized(Vec3{-.6f,.2f,1}),normalized(Vec3{.3f,.7f,1}),normalized(Vec3{.6f,-.4f,1}),normalized(Vec3{-.3f,-.8f,1})};
+  s.active().painted=std::make_shared<PaintedMesh>(mesh,64);
+ }
  if(skin||morph){DeformationState d(mesh);
   if(skin){d.skeleton=Skeleton{{{"root",-1,{},.2f},{"tip",0,{},.1f}}};d.skeleton->bones[1].rest.translation={0,.025f,0};d.skin=SkinWeights{};for(size_t i=0;i<mesh.positions.size();++i)d.skin->vertices.push_back(i%2?VertexWeights{{1,1}}:VertexWeights{{0,.7f},{1,.3f}});}
   if(morph){d.morphs=MorphSet(mesh);auto positions=mesh.positions;constexpr float angle=.4f;for(auto &p:positions)p={std::cos(angle)*p.x-std::sin(angle)*p.y,std::sin(angle)*p.x+std::cos(angle)*p.y,p.z};d.morphs->set_target(mesh,"In-plane rotation",positions);d.morph_weights={0};}
@@ -27,7 +32,7 @@ Vec3 vector(std::array<float,4> a){return {a[0],a[1],a[2]};}
 }
 int main(int argc,char **argv)try{
  const auto out=std::filesystem::path(argc>1?argv[1]:"baked-normal-export");std::filesystem::create_directories(out);
- for(int variant=0;variant<4;++variant){auto scene=baked_fan(variant&1,variant&2);const auto before=scene.encode();const auto source=scene.object(2).painted;const auto paint=scene.active().painted;const auto deformation=scene.active().deformation;
+ for(int variant=0;variant<8;++variant){auto scene=baked_fan(variant&1,variant&2,variant&4);const auto before=scene.encode();const auto source=scene.object(2).painted;const auto paint=scene.active().painted;const auto deformation=scene.active().deformation;
   NativeAuthoringExport owner;owner.scene=std::make_shared<const Scene>(scene.snapshot());owner.allow_portable_fallback=true;owner.scope=NativeAuthoringExport::Scope::WholeScene;
   const auto file=out/("fan-"+std::to_string(variant)+".glb");export_glb_authoring(owner,file);
   require_cage(scene.encode()==before&&scene.object(2).painted==source&&scene.active().painted==paint&&scene.active().deformation==deformation,"Actual tangent export preserves complete native source, current data and immutable owners");
@@ -41,6 +46,7 @@ int main(int argc,char **argv)try{
     "Real canonical normal texture remains bound to UV0 at unit strength alongside explicit tangents");
   const auto p=attribute(primitive.attributes,primitive.attributes_count,cgltf_attribute_type_position),n=attribute(primitive.attributes,primitive.attributes_count,cgltf_attribute_type_normal),t=attribute(primitive.attributes,primitive.attributes_count,cgltf_attribute_type_tangent);
   require_cage(p&&n&&t&&p->count==6&&t->count==6&&primitive.indices->count==6,"Shared vertex is split into two genuine tangent handedness domains");
+  if(variant&4)continue; // Analytic planar oracle above remains separate from the curved image consumer.
   std::array<bool,2> origin_signs{};
   for(size_t c=0;c<6;++c){auto v=cgltf_accessor_read_index(primitive.indices,c);auto P=read(p,v),N=read(n,v),T=read(t,v);const size_t original=scene.active().painted->mesh().indices[c];
    const Vec3 expected=c<3?Vec3{1,0,0}:Vec3{0,1,0};const float sign=c<3?1.f:-1.f;
