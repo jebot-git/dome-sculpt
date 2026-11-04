@@ -30,8 +30,12 @@ std::vector<uint8_t> bytes(const std::filesystem::path &p){std::ifstream f(p,std
 }
 int main(int argc,char **argv)try{
  if(argc<2||argc>3)return 2;const std::filesystem::path out=argv[1];std::filesystem::create_directories(out);
+ if(argc==3&&std::string_view(argv[2])!="--expect-refusal"&&std::string_view(argv[2])!="--hardware")return 2;
  const bool negative=argc==3&&std::string_view(argv[2])=="--expect-refusal";
- NativeGraphics graphics;Fbo fbo;SurfaceRenderer renderer;prepared_normal_consumer::Renderer independent;
+ NativeGraphics graphics;const std::string device=reinterpret_cast<const char*>(glGetString(GL_RENDERER));std::cout<<"GPU "<<device<<std::endl;
+ const bool hardware=device.find("Intel")!=std::string::npos&&device.find("Arc")!=std::string::npos&&device.find("A770")!=std::string::npos&&device.find("llvmpipe")==std::string::npos;
+ check(argc<3||std::string_view(argv[2])!="--hardware"||hardware,"Strict native paint skin hardware consumer requires actual Intel Arc A770");
+ Fbo fbo;SurfaceRenderer renderer;prepared_normal_consumer::Renderer independent;
  for(bool posed:{false,true}){
   auto scene=skinned_native32(posed);const auto before=scene.encode();Document d;d.replace(scene);
   const auto path=out/(posed?"posed.glb":"rest.glb");
@@ -57,5 +61,6 @@ int main(int argc,char **argv)try{
   auto native=out/(posed?"posed.dsculpt":"rest.dsculpt");d.save_async(native).get();check(Scene::load(native).encode()==before,"Following Save/reopen preserves exact native paint and deformation owners");
   std::cout<<"NATIVE32_SKIN posed="<<posed<<" corners="<<corners<<" max="<<maximum<<" image_error="<<image_error<<" wrong_missing_ibm="<<wrong_maximum<<'\n';
  }
+ if(!negative){auto scene=skinned_native32(false);auto state=*scene.active().deformation;const auto &mesh=scene.active().painted->mesh();state.morphs=MorphSet(mesh);auto positions=mesh.positions;positions[0].z+=.1f;state.morphs->set_target(mesh,"Actual curved key",positions);state.morph_weights={.35f};scene.set_deformation(scene.active().id,std::move(state));const auto before=scene.encode();Document d;d.replace(scene);auto dir=out/"refusal";std::filesystem::create_directories(dir);auto file=dir/"morph.glb";{std::ofstream f(file);f<<"prior output";}std::string reason;try{d.export_asset(file).get();}catch(const std::exception &e){reason=e.what();}check(reason.find("complete shading adapter")!=std::string::npos,"Actual curved native paint morph retains its genuine unadapted shading refusal");const auto sentinel=bytes(file);check(std::string(sentinel.begin(),sentinel.end())=="prior output"&&d.copy_scene().encode()==before,"Morph refusal preserves exact prior output and complete skin/morph/paint graph");auto save=dir/"following.dsculpt";d.save_async(save).get();check(Scene::load(save).encode()==before,"Following native Save succeeds and retains all unsupported-but-editable morph data");}
  std::cout<<"PASS "<<checks<<" native paint skin export checks\n";return 0;
 }catch(const std::exception &e){std::cerr<<"FAIL "<<e.what()<<'\n';return 1;}
