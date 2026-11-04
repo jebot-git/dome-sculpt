@@ -3,6 +3,7 @@
 #include "canonical-normal-owner.hpp"
 
 namespace dome::detail {
+class CanonicalNormalUv;
 struct BakedNormalFieldOptions {
   size_t max_working_bytes=256*1024*1024;
   size_t max_retained_bytes=128*1024*1024;
@@ -33,6 +34,9 @@ public:
   bool intrinsic_baseline() const noexcept {return intrinsic_baseline_;}
   size_t retained_bytes() const noexcept {return retained_bytes_;}
   void validate() const;
+  std::shared_ptr<const NormalSamplingDomain> sampling_domain(
+      const std::shared_ptr<const CanonicalNormalUv> &,
+      const std::function<bool()> &cancelled={}) const;
 private:
   friend class BakedNormalArchive;
   std::shared_ptr<const BakedNormalField> replace_planes(const Image &,const Image &,

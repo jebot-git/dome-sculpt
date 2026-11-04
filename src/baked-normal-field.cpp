@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "baked-normal-field.hpp"
+#include "canonical-normal-uv.hpp"
 namespace dome::detail {
 namespace {
 // Include conservative Image/control-block/container bookkeeping in addition
@@ -120,5 +121,21 @@ std::shared_ptr<const BakedNormalField> BakedNormalField::from_intrinsic(
   result->origin_=std::move(origin);result->pbr_=candidate.projection->pbr;result->mtoon_=candidate.projection->mtoon;
   result->coverage_.assign(pixels,255);result->retained_bytes_=node_bytes+pixels*9;result->intrinsic_baseline_=true;
   result->self_=result;result->validate();stop(o);return result;
+}
+} // namespace dome::detail
+
+namespace dome::detail {
+std::shared_ptr<const NormalSamplingDomain> BakedNormalField::sampling_domain(
+    const std::shared_ptr<const CanonicalNormalUv> &uv,const std::function<bool()> &cancelled) const {
+  if(cancelled&&cancelled())throw std::runtime_error("Converted normal sampling cancelled");
+  validate();
+  if(!uv||!uv->valid_owner(uv)||uv->origin()!=origin_)
+    throw std::invalid_argument("Normal sampling requires the exact field conversion owner");
+  uv->validate_current(*uv->mesh(),cancelled);
+  auto domain=std::make_shared<NormalSamplingDomain>();
+  domain->resolution=resolution();domain->coordinates=uv->coordinates();domain->indices=uv->mesh()->indices;
+  domain->resolved_pbr=pbr_;domain->resolved_mtoon=mtoon_;
+  domain->validate(cancelled);
+  return domain;
 }
 } // namespace dome::detail
