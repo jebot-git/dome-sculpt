@@ -15,7 +15,7 @@ extern "C" ShapeKeyResult mirror_wrap(Scene&,uint64_t,const ShapeKeyEdit&,const 
 extern "C" ShapeKeyResult mirror_wrap(Scene &s,uint64_t id,const ShapeKeyEdit &edit,const std::function<bool()> &cancelled){if(edit.action==ShapeKeyAction::Mirror){seen_plane=edit.mirror_plane;seen_tolerance=edit.mirror_tolerance;seen_method=int(edit.mirror_frames);seen_target=edit.target;++calls;}return mirror_real(s,id,edit,cancelled);}
 namespace {
 Scene fixture(){
- const float p=.07f;Mesh m;m.positions={{p-.3f,-.2f,0},{p-.1f,-.2f,0},{p-.2f,.2f,0},{p+.3f,-.2f,0},{p+.1f,-.2f,0},{p+.2f,.2f,0}};m.indices={0,1,2,3,5,4};m.normals.assign(6,{0,0,1});m.uv={{{.05f,.05f}},{{.45f,.05f}},{{.25f,.95f}},{{.55f,.05f}},{{.95f,.05f}},{{.75f,.95f}}};
+ const float p=.07f;Mesh m;m.positions={{p-.3f,-.2f,0},{p-.1f,-.2f,0},{p-.2f,.2f,0},{p+.3f,-.2f,0},{p+.1f,-.2f,0},{p+.2f,.2f,0}};m.indices={0,1,2,3,5,4};m.normals.assign(6,{0,0,1});m.uv={{{.0625f,.0625f}},{{.4375f,.0625f}},{{.25f,.9375f}},{{.9375f,.0625f}},{{.5625f,.0625f}},{{.75f,.9375f}}};
  Scene s;auto &o=s.active();o.mesh_active=true;o.painted=std::make_shared<PaintedMesh>(m,64);o.transform.position={.2f,.3f,.1f};o.transform.scale=1.3f;
  PaintSettings ink;ink.color={.2f,.7f,.3f,.7f};Brush b;b.from=b.to={p-.2f,0,0};b.normal={0,0,1};b.radius=.09f;o.painted->begin_stroke();o.painted->stamp(b,ink);check(o.painted->end_stroke(),"Actual fixture owns nontrivial sparse painting");
  ShapeKeyEdit edit;edit.name="左 eye";author_shapekey(s,o.id,edit);edit.action=ShapeKeyAction::Replace;edit.target=0;edit.positions=m.positions;edit.positions[0]+=Vec3{.015f,0,.04f};author_shapekey(s,s.active().id,edit);edit={};edit.name="Other key";author_shapekey(s,s.active().id,edit);s.validate();return s;
