@@ -10,14 +10,16 @@
 namespace {
 std::vector<uint8_t> bytes(const std::filesystem::path &p){std::ifstream f(p,std::ios::binary);return {std::istreambuf_iterator<char>(f),{}};}
 Scene plain(){Scene scene;scene.active().visible=false;const auto id=scene.add("Native physical paint",Volume{});scene.select(id);auto &o=scene.active();o.mesh_active=true;o.painted=std::make_shared<PaintedMesh>(quad(),64);o.material.unlit=false;o.material.color={.7f,.8f,.6f,1};return scene;}
-void ink(Scene &scene){auto &o=scene.active();o.material.emissive={8,.016f,.16f};o.painted=o.painted->snapshot();auto &p=*o.painted;p.add_layer("Float partial mask");PaintSettings s;s.front_only=false;s.channel=PaintChannel::Emission;s.emission_units=PaintEmissionUnits::Physical;s.emission={12,.002f,3};Brush b;b.from=b.to={-.02f,.015f,0};b.normal={0,0,1};b.radius=.19f;b.strength=.73f;p.begin_stroke();p.stamp(b,s);check(p.end_stroke(),"Actual native/retained physical brush changes float detail");p.layer_properties("Float partial mask",true,.63f);s.channel=PaintChannel::Mask;s.mask=.4f;b.radius=.1f;p.begin_stroke();p.stamp(b,s);check(p.end_stroke(),"Physical float detail uses the actual editable common mask");p.add_layer("Hidden high radiance");s.channel=PaintChannel::Emission;s.emission={10000,10000,10000};p.begin_stroke();p.stamp(b,s);p.end_stroke();p.layer_properties("Hidden high radiance",false,1);}
+void ink(Scene &scene){auto &o=scene.active();o.material.emissive={8,.016f,.16f};o.painted=o.painted->snapshot();auto &p=*o.painted;p.add_layer("Float partial mask");PaintSettings s;s.front_only=false;s.channel=PaintChannel::Emission;s.emission_units=PaintEmissionUnits::Physical;s.emission={12,.002f,3};Brush b;b.from=b.to={-.02f,.015f,0};b.normal={0,0,1};
+ const auto &mesh=p.mesh();for(size_t f=0;f<mesh.indices.size()/3;++f)if(mesh.normals.at(mesh.indices[f*3]).z>.9f){b.from=b.to=(mesh.positions.at(mesh.indices[f*3])+mesh.positions.at(mesh.indices[f*3+1])+mesh.positions.at(mesh.indices[f*3+2]))/3;break;}
+ b.radius=.19f;b.strength=.73f;p.begin_stroke();p.stamp(b,s);check(p.end_stroke(),"Actual native/retained physical brush changes float detail");p.layer_properties("Float partial mask",true,.63f);s.channel=PaintChannel::Mask;s.mask=.4f;b.radius=.1f;p.begin_stroke();p.stamp(b,s);check(p.end_stroke(),"Physical float detail uses the actual editable common mask");p.add_layer("Hidden high radiance");s.channel=PaintChannel::Emission;s.emission={10000,10000,10000};p.begin_stroke();p.stamp(b,s);p.end_stroke();p.layer_properties("Hidden high radiance",false,1);}
 }
 int main(int argc,char **argv)try{
  if(argc!=2)return 2;const std::filesystem::path out=argv[1];std::filesystem::create_directories(out);
  for(int kind=0;kind<3;++kind){
   std::cout<<"STAGE kind="<<kind<<" prepare"<<std::endl;
   auto scene=kind==1?joint::transfer(joint::prepare(false,Material::AlphaMode::Opaque)):plain();
-  if(kind==2){auto &o=scene.active();o.mesh_active=false;o.material.emissive={8,.016f,.16f};}else ink(scene);
+  if(kind==2){auto &o=scene.active();o.mesh_active=false;o.material.emissive={8,.016f,.16f};Brush sphere;sphere.radius=.3f;sphere.blend=0;o.volume->begin_stroke();o.volume->stamp(sphere);check(o.volume->end_stroke(),"Native constant test uses a genuine sculpted SDF surface");}else ink(scene);
   const auto exact=scene.encode();const auto paint=scene.active().painted;const auto binding=scene.active().material_bindings;
   NativeAuthoringExport options{std::make_shared<const Scene>(scene.snapshot()),NativeAuthoringExport::Scope::WholeScene,{},true};
   const auto capture=detail::NativeAuthoringCapture::create(options,{});
@@ -29,8 +31,12 @@ int main(int argc,char **argv)try{
     auto lin=[](double v){return v<=.04045?v/12.92:std::pow((v+.055)/1.055,2.4);};
     // Independent coefficient/coverage equation at actual texel centres. No
     // generated source image or colour receipt is used as normal authority.
-    for(size_t at=0;at<field.image.rgba.size()/4;++at){auto q=detail::sample_overlay_values(*packet,(float(at%field.image.width)+.5f)/field.image.width,(float(at/field.image.width)+.5f)/field.image.height,true);
-      for(size_t k=0;k<3;++k){const double expected=scene.active().material.emissive[k]*(1-q[3][3])+q[2][k]+q[4][k];const double actual=lin(field.image.rgba[at*4+k]/255.)*field.factor[k]*field.strength;max_error=std::max(max_error,std::abs(expected-actual));nonzero+=expected>0;}}
+    for(size_t at=0;at<field.image.rgba.size()/4;++at){const auto owner=packet->padding()->at(at);std::array<double,3> legacy{},physical{};double coverage=0;
+      if(owner>=0){const size_t x=size_t(owner)%field.image.width,y=size_t(owner)/field.image.width;
+        if(auto baked=paint->baked()){coverage=baked->coverage.at(size_t(owner))/255.;for(size_t k=0;k<3;++k)legacy[k]=lin(baked->maps.emission.rgba.at(size_t(owner)*4+k)/255.)*coverage;}
+        for(const auto &layer:paint->layers())if(layer.visible&&layer.opacity>0){const auto &common=paint->pixel(layer.id,x,y);const auto e=paint->emission_pixel(layer.id,x,y);const double a=double(layer.opacity)*common.data[13]/255.*e.coverage;
+          for(size_t k=0;k<3;++k){legacy[k]=legacy[k]*(1-a)+e.legacy[k]*a;physical[k]=physical[k]*(1-a)+e.physical[k]*a;}coverage=coverage*(1-a)+a;}}
+      for(size_t k=0;k<3;++k){const double expected=scene.active().material.emissive[k]*(1-coverage)+legacy[k]+physical[k];const double actual=lin(field.image.rgba[at*4+k]/255.)*field.factor[k]*field.strength;max_error=std::max(max_error,std::abs(expected-actual));nonzero+=expected>0;}}
     check(nonzero>100&&max_error<=field.maximum_absolute_error+1e-5,"Actual physical radiance/factor/strength obeys its measured texel quantization bound");
     if(kind==1)check(compiled.surfaces.front().paint_sampling_attachment==paint->paint_sampling_attachment(),"Retained emission preserves genuine paint coordinates separately from authored UV0 and normal authority");
   }else check(!field.image.width&&field.factor[0]*field.strength==8,"Native constant radiance needs no invented UV/image authority");
