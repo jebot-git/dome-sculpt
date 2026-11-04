@@ -3,7 +3,10 @@
 #include "paint-overlay-packet.hpp"
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "emission-export.hpp"
+#include "emission-control-scale.hpp"
+#include "emission-source-info.hpp"
 #include "dome/document.hpp"
+#include "native-paint-sampling.hpp"
 #include "dome/scene-file.hpp"
 #include "dome/native-authoring.hpp"
 #include "dome/source-uv-bake.hpp"
@@ -28,6 +31,7 @@
 #include "dome/frame-clock.hpp"
 #include "normal-frame-runtime.hpp"
 #include "paint-source-admission.hpp"
+#include "emission-authority.hpp"
 #include "export-corner-coordinates.hpp"
 #include "dome/paint-sampling.hpp"
 #include "dome/normal-preview.hpp"
@@ -203,7 +207,13 @@ bool Document::pending_locked() const {
 }
 bool Document::reject_texture_paint_locked() {
   const auto &o=scene_.active();
-  if(!o.mesh_active || !o.painted || !detail::paint_requires_editable_atlas(*o.painted))return false;
+  if(!o.mesh_active || !o.painted)return false;
+  const bool raw_physical=o.painted->surface_diagnostics().policy==PaintUvPolicy::SourceAuthored &&
+      !o.painted->source_sampling_prepared() &&
+      (detail::hdr_emission(o.material.emissive)||o.painted->has_physical_emission()||
+       (o.material_bindings&&detail::physical_emission(*o.material_bindings))||
+       (state_.paint.channel==PaintChannel::Emission&&state_.paint.emission_units==PaintEmissionUnits::Physical));
+  if(!raw_physical&&!detail::paint_requires_editable_atlas(*o.painted))return false;
   Transaction transaction(*this);
   state_.message=detail::editable_texture_atlas_notice;
   state_.error.clear();publish_locked(false,false);transaction.commit(false);
@@ -497,19 +507,36 @@ void Document::select_object(uint64_t id) {
 void Document::object_properties(uint64_t id, std::string name, bool visible,
                                  bool locked, CanvasTransform transform,
                                  Material material,AssetSource expected) {
+  object_properties(id,std::move(name),visible,locked,transform,std::move(material),expected,{});
+}
+void Document::object_properties(uint64_t id, std::string name, bool visible,
+                                 bool locked, CanvasTransform transform,
+                                 Material material,AssetSource expected,
+                                 std::optional<std::array<float,3>> emission_override) {
+  if(emission_override)for(float v:*emission_override)if(!std::isfinite(v)||v<0||v>maximum_native_emission)
+    throw std::invalid_argument("Absolute emission must remain within the native linear radiance bound");
   material.validate();
   validate_transform(transform);
   std::lock_guard lock(model_mutex_);
   AuthorityTransition authority(*this);require_authority_locked(expected);
   if((expected.generation&&expected.generation!=state_.generation)||(expected.revision&&expected.revision!=state_.revision)||(expected.object&&expected.object!=id))throw std::logic_error("Object properties changed; reopen the editor");
   const auto &old=scene_.object(id);
-  const bool visibility_only=old.name==name && old.locked==locked && detail::same_transform(old.transform,transform) && detail::same_material(old.material,material);
-  const bool lock_only=old.name==name && old.visible==visible && detail::same_transform(old.transform,transform) && detail::same_material(old.material,material) && (!state_.isolate_held || !state_.held_object || id==state_.held_object);
+  if(emission_override&&(!old.material_bindings||!old.material_bindings->physical_emission))
+    throw std::logic_error("The absolute emission source changed; reopen object properties");
+  const bool emission_changed=emission_override&&*emission_override!=*old.material_bindings->physical_emission;
+  const bool visibility_only=!emission_changed && old.name==name && old.locked==locked && detail::same_transform(old.transform,transform) && detail::same_material(old.material,material);
+  const bool lock_only=!emission_changed && old.name==name && old.visible==visible && detail::same_transform(old.transform,transform) && detail::same_material(old.material,material) && (!state_.isolate_held || !state_.held_object || id==state_.held_object);
   if(!visibility_only && !lock_only)require_object_editable_locked(id);
   if(state_.held_object==id && (!visible || locked)){invalidate_object_authority_locked();state_.held_object=0;}
   finish_locked();
+  auto emission_binding=scene_.object(id).material_bindings;
+  if(emission_changed){
+    auto binding=std::make_shared<SourceMaterialBindings>(*emission_binding);
+    binding->physical_emission=emission_override;binding->validate();emission_binding=std::move(binding);
+  }
   Scene before = scene_;
   auto &o = scene_.object(id);
+  o.material_bindings=std::move(emission_binding);
   o.name = std::move(name);
   o.visible = visible;
   o.locked = locked;
@@ -584,6 +611,7 @@ void Document::publish_locked(bool force,bool checkpoint) {
     view->paint_sampling_available=uv_paint_retention_available_locked();
     view->paint_sampling_required=bool(source.painted&&source.painted->paint_sampling_domain());
     view->retain_paint_sampling=uv_paint_retention_requested_locked();
+    view->can_restore_paint_source=detail::native_paint_source_restorable(source);
     view->committing = uv_accept_pending_;
     view->solving = uv_solving_;
     if (view->solving) { view->can_undo = view->can_redo = false; view->valid = false; }
@@ -1456,11 +1484,11 @@ void Document::process_locked(const SpatialFrame &incoming) {
     // live page so toggles and Fill can be followed by Resume without losing it.
     if (!state_.retopology && !state_.cut && !sculpt_mask_command(*c) && !import_command(*c) && !projection_command(*c) && !preview_command(*c) && !rig_fit_command(*c) &&
         !(input_.menu_page()==15 && *c==SpatialCommand::CancelWork) &&
-        input_.menu_page()!=24 && input_.menu_page()!=18 && input_.menu_page()!=20 && input_.menu_page()!=19 && input_.menu_page()!=22 && !state_.polygon) finish_locked();
+        input_.menu_page()!=30 && input_.menu_page()!=24 && input_.menu_page()!=18 && input_.menu_page()!=20 && input_.menu_page()!=19 && input_.menu_page()!=22 && !state_.polygon) finish_locked();
     auto command_publication=published_.load();
     command_locked(*c);
     import_published=(import_command(*c)||projection_command(*c)||rig_fit_command(*c))&&published_.load()!=command_publication;
-    if((command_page==20)||(command_page==24&&*c!=SpatialCommand::ShapeSculpt)){input_.retain_page(command_page,command_owner,command_sector);publish_locked(false,false);}
+    if((command_page==30)||(command_page==20)||(command_page==24&&*c!=SpatialCommand::ShapeSculpt)){input_.retain_page(command_page,command_owner,command_sector);publish_locked(false,false);}
   }
 
   if (f.hands[0].undo || f.hands[1].undo) {
@@ -2534,8 +2562,21 @@ void Document::control_event_locked(VrControlEvent event) {
       c.components = 4;
       c.value = state_.paint.color;
       break;
+    case VrParameter::EmissionSource: {
+      c.title="No associated original emission";c.components=0;
+      if(auto info=detail::emission_source_info(o)){c.title="Retained original emission";for(size_t k=0;k<3;++k)c.value[k]=info->factor[k];c.value[3]=info->strength;}
+      break;
+    }
+    case VrParameter::InkEmissionUnits:
+      c.title="Brush units / relative normalizes";c.value[0]=state_.paint.emission_units==PaintEmissionUnits::Physical?1:0;break;
+    case VrParameter::MaterialEmission: {
+      c.title=o.material.unlit?"Unlit material ignores emission":o.material_bindings&&o.material_bindings->physical_emission?"Absolute background radiance":"Material emission / linear radiance";
+      c.components=3;c.maximum=maximum_native_emission;const auto &value=o.material_bindings&&o.material_bindings->physical_emission?*o.material_bindings->physical_emission:o.material.emissive;
+      for(size_t k=0;k<3;++k)c.value[k]=value[k];break;
+    }
     case VrParameter::InkEmission:
-      c.title = "Emission color";
+      c.title = state_.paint.emission_units==PaintEmissionUnits::Physical?"Physical brush / linear radiance":"Material-relative emission brush";
+      c.maximum=state_.paint.emission_units==PaintEmissionUnits::Physical?maximum_native_emission:1;
       c.components = 3;
       for (int i = 0; i < 3; ++i)
         c.value[i] = state_.paint.emission[i];
@@ -2619,7 +2660,7 @@ void Document::control_event_locked(VrControlEvent event) {
         apply_uv_action_locked(UvAction::Move, event.value, event.second);
       else if (event.type == VrControlEventType::UvCommand &&
                event.component >= 0 &&
-               event.component <= int(UvAction::RetainPaint))
+               event.component <= int(UvAction::RestorePaintSource))
         apply_uv_action_locked(UvAction(event.component), event.value, event.second);
       state_.error.clear();
     } catch (const std::exception &e) {
@@ -2647,11 +2688,11 @@ void Document::control_event_locked(VrControlEvent event) {
   float value = c.value[event.component];
   if (event.type == VrControlEventType::Absolute) {
     float t = std::clamp(event.value, 0.f, 1.f);
-    value = c.parameter==VrParameter::BakeDistances ? float(bake_distance_from_unit(t)) : c.logarithmic ? std::exp(std::log(c.minimum) +
+    value = c.parameter==VrParameter::BakeDistances ? float(bake_distance_from_unit(t)) : detail::emission_control_scale(c)?detail::emission_control_value(t,c.maximum):c.logarithmic ? std::exp(std::log(c.minimum) +
                                      t * std::log(c.maximum / c.minimum))
                           : c.minimum + t * (c.maximum - c.minimum);
   } else
-    value = c.parameter==VrParameter::BakeDistances ? float(bake_distance_step(value,event.value*.69314718056)) : c.logarithmic ? value * std::exp(event.value * .69314718056f)
+    value = c.parameter==VrParameter::BakeDistances ? float(bake_distance_step(value,event.value*.69314718056)) : detail::emission_control_scale(c)?detail::emission_control_value(std::clamp(detail::emission_control_fraction(value,c.maximum)+event.value*.5f,0.f,1.f),c.maximum):c.logarithmic ? value * std::exp(event.value * .69314718056f)
                           : value + event.value * .5f * (c.maximum - c.minimum);
   value = std::clamp(value, c.minimum, c.maximum);
   if (value == c.value[event.component])
@@ -2744,6 +2785,16 @@ void Document::control_event_locked(VrControlEvent event) {
   case VrParameter::InkColor:
     state_.paint.color[event.component] = value;
     break;
+  case VrParameter::InkEmissionUnits: {
+    state_.paint.emission_units=value>=.5f?PaintEmissionUnits::Physical:PaintEmissionUnits::MaterialRelative;
+    if(state_.paint.emission_units==PaintEmissionUnits::MaterialRelative){const auto peak=*std::max_element(state_.paint.emission.begin(),state_.paint.emission.end());if(peak>1)for(auto &v:state_.paint.emission)v/=peak;}
+    break;
+  }
+  case VrParameter::MaterialEmission: {
+    if(o.material_bindings&&o.material_bindings->physical_emission){auto binding=std::make_shared<SourceMaterialBindings>(*o.material_bindings);binding->physical_emission=std::array<float,3>{c.value[0],c.value[1],c.value[2]};binding->validate();o.material_bindings=std::move(binding);control_changed_=o.material_bindings->physical_emission!=before.material_bindings->physical_emission;}
+    else{o.material.emissive[event.component]=value;control_changed_=o.material.emissive!=before.material.emissive;}
+    scene_changed=true;break;
+  }
   case VrParameter::InkEmission:
     state_.paint.emission[event.component] = value;
     break;
@@ -2815,6 +2866,7 @@ void Document::control_event_locked(VrControlEvent event) {
 }
 
 bool Document::command_enabled_locked(SpatialCommand command) const {
+  if(command>=SpatialCommand::EmissionRelative&&command<=SpatialCommand::EmissionBlack)return !control_before_&&!action_active_locked()&&!state_.asset_busy&&!state_.recovery_busy&&object_editable_locked(scene_.active().id);
   if(editable_export_command(command))return command_enabled_locked(SpatialCommand::Export);
   if(rig_fit_command(command))return rig_fit_command_enabled_locked(command);
   if(projection_command(command))return projection_command_enabled_locked(command);
@@ -3023,6 +3075,13 @@ void Document::sculpt_command(SpatialCommand command) {
   if(published_.load()==publication)publish_locked();
 }
 void Document::command_locked(SpatialCommand command) {
+  if(command>=SpatialCommand::EmissionRelative&&command<=SpatialCommand::EmissionBlack){
+    if(!command_enabled_locked(command))return;
+    if(command==SpatialCommand::EmissionBlack)state_.paint.emission={};
+    else if(command==SpatialCommand::EmissionPhysical)state_.paint.emission_units=PaintEmissionUnits::Physical;
+    else{const auto peak=*std::max_element(state_.paint.emission.begin(),state_.paint.emission.end());if(peak>1)for(auto &v:state_.paint.emission)v/=peak;state_.paint.emission_units=PaintEmissionUnits::MaterialRelative;}
+    return;
+  }
   if(editable_export_command(command)){
     if(!command_enabled_locked(command))return;
     file_locked(true,command==SpatialCommand::ExportEditable256?AssetExportFormat::EditableGlb256:

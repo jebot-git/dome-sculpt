@@ -8,6 +8,30 @@ inline const nlohmann::json &material_archive_base_version(const nlohmann::json 
   if(!input.is_object()||!input.contains("version")||!input.at("version").is_number_integer())
     throw std::invalid_argument("Invalid material archive version");
   const auto &wire=input.at("version");
+  if(wire==17){
+    if(!input.contains("base_version")||!input.at("base_version").is_number_integer()||input.at("base_version").get<int64_t>()<1||input.at("base_version").get<int64_t>()>10)
+      throw std::invalid_argument("Combined material17 requires its real historical base layout");
+    for(const char *field:{"physical_emission","explicit_mirror","canonical_normals","native_paint_sampling","layered_normals","retained_canonical_uv"})
+      if(!input.contains(field)||!input.at(field).is_boolean())throw std::invalid_argument("Combined material17 has incomplete capability flags");
+    if(!input.at("native_paint_sampling").get<bool>()||(!input.at("layered_normals").get<bool>()&&!input.at("canonical_normals").get<bool>())||
+       (input.at("retained_canonical_uv").get<bool>()&&!input.at("layered_normals").get<bool>())||
+       (input.at("explicit_mirror").get<bool>()&&input.at("base_version")!=10))
+      throw std::invalid_argument("Combined material17 requires genuine native paint and canonical ownership");
+    if(!input.contains("native_paints")||!input.at("native_paints").is_array()||input.at("native_paints").empty()||input.at("native_paints").size()>128)
+      throw std::invalid_argument("Combined material17 requires its bounded native paint owners");
+    if(input.contains("canonical_conversions")!=input.at("canonical_normals").get<bool>()||
+       (input.at("canonical_normals").get<bool>()&&(!input.at("canonical_conversions").is_array()||input.at("canonical_conversions").empty()||input.at("canonical_conversions").size()>256)))
+      throw std::invalid_argument("Combined material17 canonical pool differs from its capability");
+    return input.at("base_version");
+  }
+  if(wire==14){
+    if(!input.contains("base_version")||!input.at("base_version").is_number_integer()||input.at("base_version").get<int64_t>()<1||input.at("base_version").get<int64_t>()>10)throw std::invalid_argument("Native paint material14 requires its actual historical base1..10");
+    for(const char *field:{"physical_emission","explicit_mirror","canonical_normals","native_paint_sampling"})if(!input.contains(field)||!input.at(field).is_boolean())throw std::invalid_argument("Native paint material14 capability flags are incomplete");
+    if(!input.at("native_paint_sampling").get<bool>()||input.at("canonical_normals").get<bool>()||input.contains("canonical_conversions")||input.contains("layered_normals")||input.contains("retained_canonical_uv"))throw std::invalid_argument("Native paint14 requires its exact independent native sampling capability");
+    if(!input.contains("native_paints")||!input.at("native_paints").is_array()||input.at("native_paints").empty()||input.at("native_paints").size()>128)throw std::invalid_argument("Native paint14 lacks its actual bounded owning table");
+    return input.at("base_version");
+  }
+  if(input.contains("native_paint_sampling")||input.contains("native_paints"))throw std::invalid_argument("Native paint capability requires material14 or composed17");
   if(wire==16){
     if(!input.contains("retained_canonical_uv")||input.at("retained_canonical_uv")!=true)throw std::invalid_argument("Material16 requires explicit retained canonical UV capability");
   }else if(input.contains("retained_canonical_uv"))throw std::invalid_argument("Retained canonical UV capability requires material16");
@@ -56,14 +80,15 @@ inline const nlohmann::json &material_archive_base_version(const nlohmann::json 
   return wire;
 }
 inline bool physical_material_archive(const nlohmann::json &input){
-  material_archive_base_version(input);return input.at("version")==11||((input.at("version")==12||input.at("version")==13||(input.at("version")==15||input.at("version")==16))&&input.at("physical_emission").get<bool>());
+  material_archive_base_version(input);return input.at("version")==11||((input.at("version")==12||input.at("version")==13||input.at("version")==14||(input.at("version")==15||input.at("version")==16||input.at("version")==17))&&input.at("physical_emission").get<bool>());
 }
 inline bool explicit_mirror_material_archive(const nlohmann::json &input){
-  material_archive_base_version(input);return input.at("version")==12||((input.at("version")==13||(input.at("version")==15||input.at("version")==16))&&input.at("explicit_mirror").get<bool>());
+  material_archive_base_version(input);return input.at("version")==12||((input.at("version")==13||input.at("version")==14||(input.at("version")==15||input.at("version")==16||input.at("version")==17))&&input.at("explicit_mirror").get<bool>());
 }
-inline bool canonical_material_archive(const nlohmann::json &input){material_archive_base_version(input);return input.at("version")==13||((input.at("version")==15||input.at("version")==16)&&input.at("canonical_normals").get<bool>());}
-inline bool canonical_uv_material_archive(const nlohmann::json &input){material_archive_base_version(input);return input.at("version")==16;}
-inline bool layered_material_archive(const nlohmann::json &input){material_archive_base_version(input);return (input.at("version")==15||input.at("version")==16);}
+inline bool canonical_material_archive(const nlohmann::json &input){material_archive_base_version(input);return input.at("version")==13||((input.at("version")==15||input.at("version")==16||input.at("version")==17)&&input.at("canonical_normals").get<bool>());}
+inline bool canonical_uv_material_archive(const nlohmann::json &input){material_archive_base_version(input);return input.at("version")==16||(input.at("version")==17&&input.at("retained_canonical_uv").get<bool>());}
+inline bool layered_material_archive(const nlohmann::json &input){material_archive_base_version(input);return input.at("version")==15||input.at("version")==16||(input.at("version")==17&&input.at("layered_normals").get<bool>());}
+inline bool native_paint_material_archive(const nlohmann::json &input){material_archive_base_version(input);return input.at("version")==14||input.at("version")==17;}
 inline const nlohmann::json &normal_preparation_base_version(const nlohmann::json &p,const nlohmann::json &archive){
   if(!p.is_object()||!p.contains("version")||!p.at("version").is_number_integer())throw std::invalid_argument("Invalid normal preparation version");
   if(p.at("version")==7){

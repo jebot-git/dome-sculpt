@@ -181,6 +181,9 @@ struct PaintedMesh::CompositeCache {
   uint64_t preview_token=0;
   bool source_eligible=false;
   std::shared_ptr<const TextureMaps> source_preview;
+  uint64_t native_emission_token=0;
+  CompositeFactors native_emission_factors{};
+  std::weak_ptr<const TextureMaps> native_emission_preview;
 };
 PaintCompositeCacheStats paint_composite_cache_stats(){
   auto &cache=composite_retention();std::lock_guard lock(cache.mutex);
@@ -874,6 +877,16 @@ std::shared_ptr<const detail::PaintOverlayPacket> detail::PaintOverlayFactory::c
   }
   paint_compute::checkpoint(cancelled);return packet;
 }
+std::shared_ptr<const detail::PaintOverlayPacket> detail::PaintOverlayFactory::capture_native_emission(
+    const PaintedMesh &paint,const std::function<bool()> &cancelled) {
+  if(paint.source_sampling_prepared()||paint.surface_diagnostics().policy==PaintUvPolicy::SourceAuthored)
+    throw std::invalid_argument("Native emission packet cannot impersonate original source sampling");
+  if(paint.paint_sampling_domain()&&!paint.valid_paint_sampling_attachment())
+    throw std::invalid_argument("Native emission lost its exact writable geometry attachment");
+  auto packet=std::const_pointer_cast<PaintOverlayPacket>(capture(paint,cancelled));
+  packet->native_geometry_=paint.mesh_owner();packet->native_domain_=paint.paint_sampling_domain();
+  return packet;
+}
 std::shared_ptr<const detail::PaintOverlayPacket> detail::PaintOverlayFactory::pack_source_maps(
     const std::shared_ptr<const PaintOverlayPacket> &packet,std::shared_ptr<const PaintSourceMaps> packed,
     std::span<const uint32_t> vertices,const std::function<bool()> &cancelled) {
@@ -1233,6 +1246,51 @@ bool PaintedMesh::redo() {
   ++revision_;
   return true;
 }
+bool detail::EmissionExportAccess::requires_preview(const PaintedMesh &paint,const Material &material,
+    const SourceMaterialBindings *binding) {
+  return !paint.source_sampling_prepared()&&paint.surface_diagnostics().policy!=PaintUvPolicy::SourceAuthored&&
+    (paint.has_physical_emission()||std::any_of(material.emissive.begin(),material.emissive.end(),[](float v){return v>1;})||
+     (binding&&(binding->physical_emission||(!binding->native_paint_sampling&&std::any_of(binding->native_reference.emission.begin(),binding->native_reference.emission.end(),[](float v){return v>1;})))));
+}
+std::shared_ptr<const TextureMaps> detail::EmissionExportAccess::preview(const PaintedMesh &paint,const Material &material,
+    const std::function<bool()> &cancelled) {
+  paint_compute::checkpoint(cancelled);material.validate();
+  const CompositeFactors factors{material.color,material.emissive,material.metallic,material.roughness};
+  auto &cache=*paint.composite_cache_;
+  {std::lock_guard lock(cache.mutex);
+    if(cache.native_emission_token==paint.composite_token_&&cache.native_emission_factors==factors)
+      if(auto previous=cache.native_emission_preview.lock()){
+        // A retained/rebound grid may preserve its visible value token while
+        // changing the exact native geometry attachment carried by the packet.
+        auto same=[](const auto &a,const auto &b){return a==b&&!a.owner_before(b)&&!b.owner_before(a);};
+        if(previous->overlay&&same(previous->overlay->native_geometry(),paint.mesh_owner())&&
+           same(previous->overlay->native_domain(),paint.paint_sampling_domain()))return previous;
+      }
+  }
+  // Deep normal replay may legitimately visit a before-Paint that shares this
+  // metadata cache. Build without holding its mutex, then publish completed maps.
+  auto packet=PaintOverlayFactory::capture_native_emission(paint,cancelled);
+  const bool legacy=!overlay_uses_float_emission(*packet)&&
+    std::all_of(material.emissive.begin(),material.emissive.end(),[](float value){return value<=1;});
+  std::shared_ptr<PaintedMesh> detached;auto safe=material;
+  if(legacy){
+    // Invisible float metadata must not reinterpret existing visible legacy
+    // filtering/quantization. Keep that genuine composite as well as the real
+    // packet; the renderer still selects float for an absolute/HDR context.
+    auto fresh=std::make_shared<PaintedMesh::CompositeCache>();const auto token=next_composite_token();
+    detached=paint.snapshot();detached->composite_cache_=std::move(fresh);detached->composite_token_=token;
+    for(auto &layer:detached->layers_)layer.emission_tiles.clear();
+  }else{detached=without_emission(paint);safe.emissive={};}
+  auto maps=std::make_shared<TextureMaps>(*detached->composite(safe,cancelled));
+  maps->overlay=std::move(packet);
+  // The existing compositor refuses unresolved alternate original coordinates.
+  // Do not silently reinterpret those coordinates as the native writable grid.
+  paint_compute::checkpoint(cancelled);
+  {std::lock_guard lock(cache.mutex);
+    cache.native_emission_token=paint.composite_token_;cache.native_emission_factors=factors;cache.native_emission_preview=maps;
+  }
+  return maps;
+}
 std::shared_ptr<PaintedMesh> detail::EmissionExportAccess::without_emission(const PaintedMesh &paint) {
   // An altered temporary may never publish maps under the original's visual
   // content identity, including actual physical zero/hidden contributions.
@@ -1294,7 +1352,7 @@ struct SourcePaintSamplingAccess {
       throw std::invalid_argument("Writable paint rebind differs from exact REST geometry");}
     auto result=paint.snapshot();result->surface_=surface;result->sampling_attachment_=std::move(attachment);stop();return result;
   }
-  static std::shared_ptr<PaintedMesh> retain(const PaintedMesh &before,Mesh authored,
+  template<class Geometry> static std::shared_ptr<PaintedMesh> retain(const PaintedMesh &before,Geometry &&authored,
       std::shared_ptr<const PaintSamplingDomain> domain,const PaintSamplingLimits &limits){
     auto stop=[&]{if(limits.cancelled&&limits.cancelled())throw std::runtime_error("Writable paint-grid attachment cancelled");};stop();
     if(before.in_stroke()||!domain||!before.valid_paint_sampling_attachment())
@@ -1323,7 +1381,7 @@ struct SourcePaintSamplingAccess {
     if(owned>limits.max_working_bytes||raster_bytes>limits.max_working_bytes-owned||grid_bytes>limits.max_working_bytes-owned-raster_bytes)
       throw std::length_error("Writable paint domain/raster/grid exceed the combined working budget");
     auto options=before.surface_->options;options.cancelled=limits.cancelled;
-    auto surface=std::make_shared<PaintedMesh::SurfaceMap>(std::move(authored),before.resolution(),options,std::move(domain),limits);
+    auto surface=std::make_shared<PaintedMesh::SurfaceMap>(std::forward<Geometry>(authored),before.resolution(),options,std::move(domain),limits);
     auto result=before.snapshot();result->surface_=std::move(surface);result->seal_paint_sampling_attachment();
     // Paint values, their one grid, and every image/projection owner are exact.
     // Sampling geometry lives outside TextureMaps, so this stage needs neither
@@ -1335,6 +1393,13 @@ struct SourcePaintSamplingAccess {
 std::shared_ptr<PaintedMesh> retain_paint_grid(const PaintedMesh &before,Mesh authored,
     std::shared_ptr<const PaintSamplingDomain> domain,const PaintSamplingLimits &limits){
   return SourcePaintSamplingAccess::retain(before,std::move(authored),std::move(domain),limits);
+}
+std::shared_ptr<PaintedMesh> retain_paint_grid_borrowed(const PaintedMesh &before,const Mesh &authored,
+    std::shared_ptr<const PaintSamplingDomain> domain,const PaintSamplingLimits &limits){
+  const size_t bytes=authored.positions.size()*(2*sizeof(Vec3)+sizeof(std::array<float,2>))+authored.indices.size()*sizeof(uint32_t)+authored.uv_pins.size()+authored.uv_seams.size();
+  if(bytes>=limits.max_working_bytes)throw std::length_error("Borrowed writable geometry exhausts working budget before allocation");
+  auto budget=limits;budget.max_working_bytes-=bytes;budget.max_basis_bytes=std::min(budget.max_basis_bytes,budget.max_working_bytes);
+  return SourcePaintSamplingAccess::retain(before,authored,std::move(domain),budget);
 }
 std::shared_ptr<PaintedMesh> adopt_retained_paint_normal(const PaintedMesh &paint,const SourceNormalSampling &proof,
     const PaintSamplingLimits &limits){return SourcePaintSamplingAccess::normal(paint,proof,limits);}
@@ -2019,6 +2084,8 @@ std::shared_ptr<PaintedMesh> PaintedMesh::from_maps(Mesh mesh,
 std::shared_ptr<const TextureMaps> PaintedMesh::preview(const Material &material) const {return preview(material,{});}
 std::shared_ptr<const TextureMaps> PaintedMesh::preview(const Material &material,const std::function<bool()> &cancelled) const {
   paint_compute::checkpoint(cancelled);material.validate();
+  if(detail::EmissionExportAccess::requires_preview(*this,material,nullptr))
+    return detail::EmissionExportAccess::preview(*this,material,cancelled);
   if(baked_&&baked_->normal_authority&&(!normal_projection_||normal_projection_->version!=2))
     throw std::invalid_argument("Retained normal identity requires its own source sampling interpretation");
   if(source_maps_ && !baked_ && !color_projection_ && !normal_projection_){

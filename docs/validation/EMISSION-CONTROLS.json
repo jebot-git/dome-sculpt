@@ -1,0 +1,1917 @@
+{
+  "status": "qualified private component; not main admission or full-goal completion",
+  "runtime": "c93cb87",
+  "base": "1f857b6edf453ebb0fa1d9f9e2ec48e4e14c63a0",
+  "build_and_test_scope": {
+    "source": "c93cb874d9114540162e95618f9055f2252221d8",
+    "input_count": 1618,
+    "scope": "Matched continuation of fresh owned6e core/support/app; rebuild changed palette TU, all affected native/render/test consumers on c93 source; final canonical poll27 SDK",
+    "stages": {
+      "release-build": {
+        "command": [
+          "nice",
+          "-n",
+          "15",
+          "cmake",
+          "--build",
+          "build-release",
+          "--parallel",
+          "2",
+          "--target",
+          "dome-sculpt",
+          "dome-sculpt-emission-controls-test",
+          "dome-sculpt-controls-test",
+          "dome-sculpt-modal-selection-controls-test",
+          "dome-sculpt-import-options-test",
+          "dome-sculpt-palette-text-test",
+          "dome-sculpt-xr-editable-export-test",
+          "dome-sculpt-raw-hdr-authoring-test",
+          "dome-sculpt-source-paint-physical-authoring-test"
+        ],
+        "exit": 0,
+        "seconds": 10.882201052008895
+      },
+      "release-tests": {
+        "command": [
+          "nice",
+          "-n",
+          "15",
+          "ctest",
+          "--test-dir",
+          "build-release",
+          "--output-on-failure",
+          "-R",
+          "^(emission-controls|controller-controls|modal-selection-controls|import-options-controller|palette-unicode|xr-editable-export|raw-hdr-authoring|source-paint-physical-authoring)$"
+        ],
+        "exit": 0,
+        "seconds": 18.14151893000235
+      },
+      "sanitize-build": {
+        "command": [
+          "nice",
+          "-n",
+          "15",
+          "cmake",
+          "--build",
+          "build-sanitize",
+          "--parallel",
+          "2",
+          "--target",
+          "dome-sculpt",
+          "dome-sculpt-emission-controls-test",
+          "dome-sculpt-controls-test",
+          "dome-sculpt-modal-selection-controls-test",
+          "dome-sculpt-import-options-test",
+          "dome-sculpt-palette-text-test",
+          "dome-sculpt-xr-editable-export-test",
+          "dome-sculpt-raw-hdr-authoring-test",
+          "dome-sculpt-source-paint-physical-authoring-test"
+        ],
+        "exit": 0,
+        "seconds": 28.127337573008845
+      },
+      "sanitize-tests": {
+        "command": [
+          "nice",
+          "-n",
+          "15",
+          "ctest",
+          "--test-dir",
+          "build-sanitize",
+          "--output-on-failure",
+          "-R",
+          "^(emission-controls|controller-controls|modal-selection-controls|import-options-controller|palette-unicode|xr-editable-export|raw-hdr-authoring|source-paint-physical-authoring)$"
+        ],
+        "exit": 0,
+        "seconds": 176.16782370899455
+      }
+    },
+    "drift": []
+  },
+  "fresh_owned_predecessor": {
+    "source": "6e5964b56dc51293bb3efc86ba0a4b9d81e8d08a",
+    "input_count": 1617,
+    "scope": "fresh matching owned C/C++ core/support/render/native app +affected controller/producer tests; final canonical poll27 SDK",
+    "stages": {
+      "release-configure": {
+        "command": [
+          "nice",
+          "-n",
+          "15",
+          "cmake",
+          "-S",
+          ".",
+          "-B",
+          "build-release",
+          "-DCMAKE_BUILD_TYPE=Release",
+          "-DDOME_COMPUTE_BACKEND=CPU",
+          "-DDOME_BUILD_UI=ON",
+          "-DDOME_BUILD_XR=ON",
+          "-DFLTK_DIR=/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-release/share/fltk",
+          "-U*DOME_BITMAP_RUNTIME*",
+          "-U*NATIVEGL*",
+          "-U*RENDERFONTS*"
+        ],
+        "exit": 0,
+        "seconds": 2.599357835977571
+      },
+      "syntax-input": {
+        "command": [
+          "nice",
+          "-n",
+          "15",
+          "/usr/bin/c++",
+          "-DDOME_SCULPT_INSTALLED_ASSETS=\"/usr/local/share/dome-sculpt/assets/humanoid\"",
+          "-DDOME_SCULPT_SOURCE_ASSETS=\"/home/blux/de-xr/dome-sculpt/artifacts/hdr-emission-controls-1f857b6/assets/humanoid\"",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/hdr-emission-controls-1f857b6/third_party",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/hdr-emission-controls-1f857b6/include",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/hdr-emission-controls-1f857b6/third_party/openbrush",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/hdr-emission-controls-1f857b6/third_party/cgltf",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/hdr-emission-controls-1f857b6/third_party/nlohmann",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/hdr-emission-controls-1f857b6/third_party/xatlas",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/hdr-emission-controls-1f857b6/third_party/mikktspace",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/hdr-emission-controls-1f857b6/third_party/ufbx",
+          "-O3",
+          "-DNDEBUG",
+          "-std=gnu++20",
+          "-Wall",
+          "-Wextra",
+          "-Wpedantic",
+          "-fsyntax-only",
+          "src/input.cpp"
+        ],
+        "exit": 0,
+        "seconds": 0.7164861960045528
+      },
+      "syntax-palette": {
+        "command": [
+          "nice",
+          "-n",
+          "15",
+          "/usr/bin/c++",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/hdr-emission-controls-1f857b6/include",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/hdr-emission-controls-1f857b6/third_party/openbrush",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/hdr-emission-controls-1f857b6/third_party/nlohmann",
+          "-isystem",
+          "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/harfbuzz",
+          "-isystem",
+          "/usr/include/glib-2.0",
+          "-isystem",
+          "/usr/lib64/glib-2.0/include",
+          "-isystem",
+          "/usr/include/sysprof-6",
+          "-isystem",
+          "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/freetype2",
+          "-isystem",
+          "/usr/include/libpng16",
+          "-isystem",
+          "/usr/include/libxml2",
+          "-O3",
+          "-DNDEBUG",
+          "-std=gnu++20",
+          "-pthread",
+          "-DWITH_GZFILEOP",
+          "-fsyntax-only",
+          "src/palette.cpp"
+        ],
+        "exit": 0,
+        "seconds": 1.522023433004506
+      },
+      "syntax-document": {
+        "command": [
+          "nice",
+          "-n",
+          "15",
+          "/usr/bin/c++",
+          "-DDOME_SCULPT_INSTALLED_ASSETS=\"/usr/local/share/dome-sculpt/assets/humanoid\"",
+          "-DDOME_SCULPT_SOURCE_ASSETS=\"/home/blux/de-xr/dome-sculpt/artifacts/hdr-emission-controls-1f857b6/assets/humanoid\"",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/hdr-emission-controls-1f857b6/third_party",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/hdr-emission-controls-1f857b6/include",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/hdr-emission-controls-1f857b6/third_party/openbrush",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/hdr-emission-controls-1f857b6/third_party/cgltf",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/hdr-emission-controls-1f857b6/third_party/nlohmann",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/hdr-emission-controls-1f857b6/third_party/xatlas",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/hdr-emission-controls-1f857b6/third_party/mikktspace",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/hdr-emission-controls-1f857b6/third_party/ufbx",
+          "-O3",
+          "-DNDEBUG",
+          "-std=gnu++20",
+          "-Wall",
+          "-Wextra",
+          "-Wpedantic",
+          "-fsyntax-only",
+          "src/document.cpp"
+        ],
+        "exit": 0,
+        "seconds": 3.846311130997492
+      },
+      "syntax-object-editor": {
+        "command": [
+          "nice",
+          "-n",
+          "15",
+          "/usr/bin/c++",
+          "-DDOME_HAS_XR=1",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/hdr-emission-controls-1f857b6/third_party/desktop",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/hdr-emission-controls-1f857b6/build-release",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/hdr-emission-controls-1f857b6/include",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/hdr-emission-controls-1f857b6/third_party/openbrush",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/hdr-emission-controls-1f857b6/third_party/nlohmann",
+          "-isystem",
+          "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/harfbuzz",
+          "-isystem",
+          "/usr/include/glib-2.0",
+          "-isystem",
+          "/usr/lib64/glib-2.0/include",
+          "-isystem",
+          "/usr/include/sysprof-6",
+          "-isystem",
+          "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/freetype2",
+          "-isystem",
+          "/usr/include/libpng16",
+          "-isystem",
+          "/usr/include/libxml2",
+          "-isystem",
+          "/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-release/include",
+          "-isystem",
+          "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/cairo",
+          "-isystem",
+          "/usr/include/pixman-1",
+          "-isystem",
+          "/usr/include/libmount",
+          "-isystem",
+          "/usr/include/blkid",
+          "-O3",
+          "-DNDEBUG",
+          "-std=gnu++20",
+          "-pthread",
+          "-DWITH_GZFILEOP",
+          "-fsyntax-only",
+          "src/object-editor.cpp"
+        ],
+        "exit": 0,
+        "seconds": 2.2236649290134665
+      },
+      "syntax-paint-editor": {
+        "command": [
+          "nice",
+          "-n",
+          "15",
+          "/usr/bin/c++",
+          "-DDOME_HAS_XR=1",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/hdr-emission-controls-1f857b6/third_party/desktop",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/hdr-emission-controls-1f857b6/build-release",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/hdr-emission-controls-1f857b6/include",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/hdr-emission-controls-1f857b6/third_party/openbrush",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/hdr-emission-controls-1f857b6/third_party/nlohmann",
+          "-isystem",
+          "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/harfbuzz",
+          "-isystem",
+          "/usr/include/glib-2.0",
+          "-isystem",
+          "/usr/lib64/glib-2.0/include",
+          "-isystem",
+          "/usr/include/sysprof-6",
+          "-isystem",
+          "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/freetype2",
+          "-isystem",
+          "/usr/include/libpng16",
+          "-isystem",
+          "/usr/include/libxml2",
+          "-isystem",
+          "/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-release/include",
+          "-isystem",
+          "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/cairo",
+          "-isystem",
+          "/usr/include/pixman-1",
+          "-isystem",
+          "/usr/include/libmount",
+          "-isystem",
+          "/usr/include/blkid",
+          "-O3",
+          "-DNDEBUG",
+          "-std=gnu++20",
+          "-pthread",
+          "-DWITH_GZFILEOP",
+          "-fsyntax-only",
+          "src/paint-editor.cpp"
+        ],
+        "exit": 0,
+        "seconds": 2.1872698060178664
+      },
+      "syntax-emission-controls": {
+        "command": [
+          "nice",
+          "-n",
+          "15",
+          "/usr/bin/c++",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/hdr-emission-controls-1f857b6/src",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/hdr-emission-controls-1f857b6/include",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/hdr-emission-controls-1f857b6/third_party/openbrush",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/hdr-emission-controls-1f857b6/third_party/nlohmann",
+          "-O3",
+          "-DNDEBUG",
+          "-std=gnu++20",
+          "-fsyntax-only",
+          "tests/emission-controls.cpp"
+        ],
+        "exit": 0,
+        "seconds": 2.1458378460083622
+      },
+      "release-build": {
+        "command": [
+          "nice",
+          "-n",
+          "15",
+          "cmake",
+          "--build",
+          "build-release",
+          "--parallel",
+          "2",
+          "--target",
+          "dome-sculpt",
+          "dome-sculpt-emission-controls-test",
+          "dome-sculpt-controls-test",
+          "dome-sculpt-modal-selection-controls-test",
+          "dome-sculpt-import-options-test",
+          "dome-sculpt-palette-text-test",
+          "dome-sculpt-xr-editable-export-test",
+          "dome-sculpt-raw-hdr-authoring-test",
+          "dome-sculpt-source-paint-physical-authoring-test"
+        ],
+        "exit": 0,
+        "seconds": 9.140429168997798
+      },
+      "release-tests": {
+        "command": [
+          "nice",
+          "-n",
+          "15",
+          "ctest",
+          "--test-dir",
+          "build-release",
+          "--output-on-failure",
+          "-R",
+          "^(emission-controls|controller-controls|modal-selection-controls|import-options-controller|palette-unicode|xr-editable-export|raw-hdr-authoring|source-paint-physical-authoring)$"
+        ],
+        "exit": 0,
+        "seconds": 13.467131381010404
+      },
+      "sanitize-configure": {
+        "command": [
+          "nice",
+          "-n",
+          "15",
+          "cmake",
+          "-S",
+          ".",
+          "-B",
+          "build-sanitize",
+          "-DCMAKE_BUILD_TYPE=Release",
+          "-DDOME_COMPUTE_BACKEND=CPU",
+          "-DDOME_BUILD_UI=ON",
+          "-DDOME_BUILD_XR=ON",
+          "-DFLTK_DIR=/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-sanitize/share/fltk",
+          "-U*DOME_BITMAP_RUNTIME*",
+          "-U*NATIVEGL*",
+          "-U*RENDERFONTS*",
+          "-DCMAKE_C_FLAGS_RELEASE=-O1 -g1 -DNDEBUG -fsanitize=address,undefined -fno-omit-frame-pointer",
+          "-DCMAKE_CXX_FLAGS_RELEASE=-O1 -g1 -DNDEBUG -fsanitize=address,undefined -fno-omit-frame-pointer"
+        ],
+        "exit": 0,
+        "seconds": 4.810559548001038
+      },
+      "sanitize-build": {
+        "command": [
+          "nice",
+          "-n",
+          "15",
+          "cmake",
+          "--build",
+          "build-sanitize",
+          "--parallel",
+          "2",
+          "--target",
+          "dome-sculpt",
+          "dome-sculpt-emission-controls-test",
+          "dome-sculpt-controls-test",
+          "dome-sculpt-modal-selection-controls-test",
+          "dome-sculpt-import-options-test",
+          "dome-sculpt-palette-text-test",
+          "dome-sculpt-xr-editable-export-test",
+          "dome-sculpt-raw-hdr-authoring-test",
+          "dome-sculpt-source-paint-physical-authoring-test"
+        ],
+        "exit": 0,
+        "seconds": 683.3934918130108
+      },
+      "sanitize-tests": {
+        "command": [
+          "nice",
+          "-n",
+          "15",
+          "ctest",
+          "--test-dir",
+          "build-sanitize",
+          "--output-on-failure",
+          "-R",
+          "^(emission-controls|controller-controls|modal-selection-controls|import-options-controller|palette-unicode|xr-editable-export|raw-hdr-authoring|source-paint-physical-authoring)$"
+        ],
+        "exit": 0,
+        "seconds": 88.4990458280081
+      }
+    },
+    "drift": []
+  },
+  "palette_old_runtime_negative": {
+    "source": "6e5964b56dc51293bb3efc86ba0a4b9d81e8d08a",
+    "scope": "New whole palette fixture against unchanged old runtime; actual cache stale-checkmark negative",
+    "build_exit": 0,
+    "test_exit": 1,
+    "diagnostic": "Unicode \u017dlu\u0165ou\u010dk\u00fd k\u016f\u0148 / \u00c9lodie advance=176 ink=386\nUnicode \u4e2d\u6587 \u65e5\u672c\u8a9e \ud55c\uad6d\uc5b4 advance=144 ink=412\nUnicode \u0645\u0631\u062d\u0628\u0627 / \u05e9\u05dc\u05d5\u05dd advance=96 ink=151\nNative XR graphics: windowless EGL 1.5\nGL llvmpipe (LLVM 22.1.8, 256 bits)\nPhysical units did not invalidate the actual HDR page checkmark\n",
+    "inputs": {
+      "/home/blux/de-xr/dome-sculpt/artifacts/hdr-emission-controls-1f857b6/src/palette.cpp": "a3e6e303e81ce217dd0022a4f9c302ba153cbef179165406020322a4aaf42554",
+      "/home/blux/de-xr/dome-sculpt/artifacts/hdr-emission-controls-1f857b6/tests/palette-text.cpp": "81b491137236393e6291521d4d96ea43c0261f6caf638744b81b09d35a1e2775",
+      "/home/blux/de-xr/dome-sculpt/artifacts/hdr-emission-controls-1f857b6/build-release/libdome-sculpt-render.a": "f704840c8460ce85ea402dcb0074044e46ecb50a93832ac3e1c82e6912ce2897",
+      "/home/blux/de-xr/dome-sculpt/artifacts/hdr-emission-controls-1f857b6/build-release/dome-sculpt-palette-text-test": "ecac1dc96b2f2fbd6d61eb47825d34fa44462e8147a9af118f545b1dca36c6d0"
+    }
+  },
+  "palette_cross_profile": [
+    {
+      "file": "emission-original-double.ppm",
+      "release_sha256": "c1ff0fc6561c0a611ad91f78ed5f6dab3ea8b4f0c1815ab24fafd446de7ab67f",
+      "sanitize_sha256": "c1ff0fc6561c0a611ad91f78ed5f6dab3ea8b4f0c1815ab24fafd446de7ab67f",
+      "equal": true
+    },
+    {
+      "file": "emission-physical-double.ppm",
+      "release_sha256": "5afe6d21f5b711e8449e111374f609b7b9f15cb35df0f1fb5957ff4fb1de7767",
+      "sanitize_sha256": "5afe6d21f5b711e8449e111374f609b7b9f15cb35df0f1fb5957ff4fb1de7767",
+      "equal": true
+    },
+    {
+      "file": "emission-physical-native.ppm",
+      "release_sha256": "d6b8dde4ade4d71e699f16160795edfda16fc0ebe204aeaaecf94a4f361db624",
+      "sanitize_sha256": "d6b8dde4ade4d71e699f16160795edfda16fc0ebe204aeaaecf94a4f361db624",
+      "equal": true
+    },
+    {
+      "file": "emission-relative-native.ppm",
+      "release_sha256": "ce0212333d64b0f6a963898f80eb06ecd3e5e8ecb9e780485238ae31489b523f",
+      "sanitize_sha256": "ce0212333d64b0f6a963898f80eb06ecd3e5e8ecb9e780485238ae31489b523f",
+      "equal": true
+    },
+    {
+      "file": "emission-rgb-physical.ppm",
+      "release_sha256": "c7851983275d83611817aac5ae34307303bafd680bf42e44cb745cbaea9bdb21",
+      "sanitize_sha256": "c7851983275d83611817aac5ae34307303bafd680bf42e44cb745cbaea9bdb21",
+      "equal": true
+    },
+    {
+      "file": "emission-rgb-relative.ppm",
+      "release_sha256": "9ec28f738a3b33e2e31b18a4b40fbd541bef17bff78fc7af45ece36588434d96",
+      "sanitize_sha256": "9ec28f738a3b33e2e31b18a4b40fbd541bef17bff78fc7af45ece36588434d96",
+      "equal": true
+    }
+  ],
+  "actual_gui": {
+    "source": "c93cb874d9114540162e95618f9055f2252221d8",
+    "scope": "Actual final matching app+inspector, private Xvfb/D-Bus/HOME/software GL; normal includes real HDR Import/Cancel64atlas; compact exercises real material/physical paint and exact editable export/native recovery",
+    "stages": {
+      "release-normal": {
+        "command": [
+          "nice",
+          "-n",
+          "15",
+          "/home/blux/de-xr/dome-sculpt/artifacts/selection-gui-venv/bin/python",
+          "/home/blux/de-xr/dome-sculpt/artifacts/hdr-emission-controls-1f857b6/tests/emission-controls-menu.py"
+        ],
+        "exit": 0,
+        "seconds": 79.75526738798362,
+        "inputs": 1693,
+        "drift": []
+      },
+      "release-compact": {
+        "command": [
+          "nice",
+          "-n",
+          "15",
+          "/home/blux/de-xr/dome-sculpt/artifacts/selection-gui-venv/bin/python",
+          "/home/blux/de-xr/dome-sculpt/artifacts/hdr-emission-controls-1f857b6/tests/emission-controls-menu.py"
+        ],
+        "exit": 0,
+        "seconds": 66.27763338398654,
+        "inputs": 1693,
+        "drift": []
+      },
+      "sanitize-normal": {
+        "command": [
+          "nice",
+          "-n",
+          "15",
+          "/home/blux/de-xr/dome-sculpt/artifacts/selection-gui-venv/bin/python",
+          "/home/blux/de-xr/dome-sculpt/artifacts/hdr-emission-controls-1f857b6/tests/emission-controls-menu.py"
+        ],
+        "exit": 0,
+        "seconds": 68.87729932498769,
+        "inputs": 1693,
+        "drift": []
+      },
+      "sanitize-compact": {
+        "command": [
+          "nice",
+          "-n",
+          "15",
+          "/home/blux/de-xr/dome-sculpt/artifacts/selection-gui-venv/bin/python",
+          "/home/blux/de-xr/dome-sculpt/artifacts/hdr-emission-controls-1f857b6/tests/emission-controls-menu.py"
+        ],
+        "exit": 0,
+        "seconds": 77.54667068700655,
+        "inputs": 1693,
+        "drift": []
+      }
+    }
+  },
+  "khronos": {
+    "version": "2.0.0-dev.3.10",
+    "maxIssues": 0,
+    "issueFilters": [],
+    "files": [
+      {
+        "file": "artifacts/emission-controls-final-gui/release-normal/output/editable.glb",
+        "sha256": "4c77ab14402708a101df77fe42d295130afa71a889c3d2538bc33f826e7567cb",
+        "numErrors": 0,
+        "numWarnings": 0,
+        "numInfos": 4,
+        "numHints": 0,
+        "messages": [
+          {
+            "code": "UNUSED_MESH_TANGENT",
+            "message": "Tangents are not used because the material has no normal texture.",
+            "severity": 2,
+            "pointer": "/meshes/0/primitives/0/attributes/TANGENT"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/meshes/0/primitives/0/attributes/TEXCOORD_1"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/bufferViews/14"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/textures/2"
+          }
+        ],
+        "truncated": false
+      },
+      {
+        "file": "artifacts/emission-controls-final-gui/release-compact/output/editable.glb",
+        "sha256": "81fc25a3d2f0b5b80e0ce0ae191885f302a2aa684d3d28b70d54c41b3aacc74c",
+        "numErrors": 0,
+        "numWarnings": 0,
+        "numInfos": 4,
+        "numHints": 0,
+        "messages": [
+          {
+            "code": "UNUSED_MESH_TANGENT",
+            "message": "Tangents are not used because the material has no normal texture.",
+            "severity": 2,
+            "pointer": "/meshes/0/primitives/0/attributes/TANGENT"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/meshes/0/primitives/0/attributes/TEXCOORD_1"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/bufferViews/14"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/textures/2"
+          }
+        ],
+        "truncated": false
+      },
+      {
+        "file": "artifacts/emission-controls-final-gui/sanitize-normal/output/editable.glb",
+        "sha256": "4c77ab14402708a101df77fe42d295130afa71a889c3d2538bc33f826e7567cb",
+        "numErrors": 0,
+        "numWarnings": 0,
+        "numInfos": 4,
+        "numHints": 0,
+        "messages": [
+          {
+            "code": "UNUSED_MESH_TANGENT",
+            "message": "Tangents are not used because the material has no normal texture.",
+            "severity": 2,
+            "pointer": "/meshes/0/primitives/0/attributes/TANGENT"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/meshes/0/primitives/0/attributes/TEXCOORD_1"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/bufferViews/14"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/textures/2"
+          }
+        ],
+        "truncated": false
+      },
+      {
+        "file": "artifacts/emission-controls-final-gui/sanitize-compact/output/editable.glb",
+        "sha256": "81fc25a3d2f0b5b80e0ce0ae191885f302a2aa684d3d28b70d54c41b3aacc74c",
+        "numErrors": 0,
+        "numWarnings": 0,
+        "numInfos": 4,
+        "numHints": 0,
+        "messages": [
+          {
+            "code": "UNUSED_MESH_TANGENT",
+            "message": "Tangents are not used because the material has no normal texture.",
+            "severity": 2,
+            "pointer": "/meshes/0/primitives/0/attributes/TANGENT"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/meshes/0/primitives/0/attributes/TEXCOORD_1"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/bufferViews/14"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/textures/2"
+          }
+        ],
+        "truncated": false
+      }
+    ],
+    "errors": 0,
+    "warnings": 0
+  },
+  "gui_checks": {
+    "release-normal": {
+      "checks": [
+        {
+          "passed": true,
+          "check": "Native filename input acknowledges the complete raw0.glb destination"
+        },
+        {
+          "passed": true,
+          "check": "Actual default-Cancel HDR import options preserve project and source bytes"
+        },
+        {
+          "passed": true,
+          "check": "Native filename input acknowledges the complete raw0.glb destination"
+        },
+        {
+          "passed": true,
+          "check": "Actual import options publish genuine Source4 with the selected64-pixel editable atlas"
+        },
+        {
+          "passed": true,
+          "check": "Actual HDR Import preserves raw factor/strength bytes and publishes their genuine native radiance product"
+        },
+        {
+          "passed": true,
+          "check": "Actual focused numeric field begins at expected native value"
+        },
+        {
+          "passed": true,
+          "check": "Native numeric field acknowledges 24"
+        },
+        {
+          "passed": true,
+          "check": "Actual desktop material control accepts and saves linear radiance above one"
+        },
+        {
+          "passed": true,
+          "check": "Desktop radiance edit preserves complete source bindings and original references"
+        },
+        {
+          "passed": true,
+          "check": "Desktop radiance Undo and native Save return the exact original project bytes"
+        },
+        {
+          "passed": true,
+          "check": "Actual focused numeric field begins at expected native value"
+        },
+        {
+          "passed": true,
+          "check": "Native numeric field acknowledges 12"
+        },
+        {
+          "passed": true,
+          "check": "Actual focused numeric field begins at expected native value"
+        },
+        {
+          "passed": true,
+          "check": "Native numeric field acknowledges 0.002"
+        },
+        {
+          "passed": true,
+          "check": "Actual focused numeric field begins at expected native value"
+        },
+        {
+          "passed": true,
+          "check": "Native numeric field acknowledges 3"
+        },
+        {
+          "passed": true,
+          "check": "Actual physical brush settings alone do not rewrite native source content"
+        },
+        {
+          "passed": true,
+          "check": "Actual desktop units/RGB controls create unclamped physical float paint including small linear values"
+        },
+        {
+          "passed": true,
+          "check": "Actual physical pointer painting keeps original source references and factor/strength exact"
+        },
+        {
+          "passed": true,
+          "check": "Editable project export is an actual enabled DomeD universal-menu command"
+        },
+        {
+          "passed": true,
+          "check": "Portable policy uses a native FLTK modal with shared document identity"
+        },
+        {
+          "passed": true,
+          "check": "Actual policy modal disables duplicate document export commands"
+        },
+        {
+          "passed": true,
+          "check": "Return on default Cancel submits no export and preserves the project"
+        },
+        {
+          "passed": true,
+          "check": "Universal Close cancels the policy modal without a model edit"
+        },
+        {
+          "passed": true,
+          "check": "Confirmed portable policy opens the actual owned GLB file chooser"
+        },
+        {
+          "passed": true,
+          "check": "Native filename input acknowledges the complete editable.glb destination"
+        },
+        {
+          "passed": true,
+          "check": "Actual GUI output declares complete native project scope and an approximate portable view"
+        },
+        {
+          "passed": true,
+          "check": "Default native policy really emits the selected512-pixel portable paint images"
+        },
+        {
+          "passed": true,
+          "check": "Actual GUI file worker preserves all editable source, paint, metadata and the original project file"
+        },
+        {
+          "passed": true,
+          "check": "Native filename input acknowledges the complete editable.glb destination"
+        },
+        {
+          "passed": true,
+          "check": "Actual Open restores the exported native project as unsaved and preserves the interchange source"
+        },
+        {
+          "passed": true,
+          "check": "Native filename input acknowledges the complete recovered.dsculpt destination"
+        },
+        {
+          "passed": true,
+          "check": "Actual subsequent Save writes the original editable project independently of the portable GLB"
+        },
+        {
+          "passed": true,
+          "check": "Native export/recovery/Save workflow exits cleanly without sanitizer suppression"
+        }
+      ],
+      "failed": 0,
+      "outputs": {
+        "artifacts/emission-controls-final-gui/release-normal/output/actual-imported.dsculpt": "c01caa2a656a6551e75b82634f3facad17dd04411fd6722d9dacd0727f9f9128",
+        "artifacts/emission-controls-final-gui/release-normal/output/before-native-paint.dsculpt": "c01caa2a656a6551e75b82634f3facad17dd04411fd6722d9dacd0727f9f9128",
+        "artifacts/emission-controls-final-gui/release-normal/output/actual-pointer-paint.dsculpt": "780e5c8d5c7e97908da7cbfd75c5baa4047e9e9e3749a202e299a6d46c9d41bd",
+        "artifacts/emission-controls-final-gui/release-normal/output/editable.glb": "4c77ab14402708a101df77fe42d295130afa71a889c3d2538bc33f826e7567cb",
+        "artifacts/emission-controls-final-gui/release-normal/output/recovered.dsculpt": "780e5c8d5c7e97908da7cbfd75c5baa4047e9e9e3749a202e299a6d46c9d41bd"
+      },
+      "inputs_manifest_sha256": "79c97292bef72e952d06c471d06cbc75d1872418f5a546e35217a9780224b701"
+    },
+    "release-compact": {
+      "checks": [
+        {
+          "passed": true,
+          "check": "Actual focused numeric field begins at expected native value"
+        },
+        {
+          "passed": true,
+          "check": "Native numeric field acknowledges 24"
+        },
+        {
+          "passed": true,
+          "check": "Actual desktop material control accepts and saves linear radiance above one"
+        },
+        {
+          "passed": true,
+          "check": "Desktop radiance edit preserves complete source bindings and original references"
+        },
+        {
+          "passed": true,
+          "check": "Desktop radiance Undo and native Save return the exact original project bytes"
+        },
+        {
+          "passed": true,
+          "check": "Actual focused numeric field begins at expected native value"
+        },
+        {
+          "passed": true,
+          "check": "Native numeric field acknowledges 12"
+        },
+        {
+          "passed": true,
+          "check": "Actual focused numeric field begins at expected native value"
+        },
+        {
+          "passed": true,
+          "check": "Native numeric field acknowledges 0.002"
+        },
+        {
+          "passed": true,
+          "check": "Actual focused numeric field begins at expected native value"
+        },
+        {
+          "passed": true,
+          "check": "Native numeric field acknowledges 3"
+        },
+        {
+          "passed": true,
+          "check": "Actual physical brush settings alone do not rewrite native source content"
+        },
+        {
+          "passed": true,
+          "check": "Actual desktop units/RGB controls create unclamped physical float paint including small linear values"
+        },
+        {
+          "passed": true,
+          "check": "Actual physical pointer painting keeps original source references and factor/strength exact"
+        },
+        {
+          "passed": true,
+          "check": "Editable project export is an actual enabled DomeD universal-menu command"
+        },
+        {
+          "passed": true,
+          "check": "Portable policy uses a native FLTK modal with shared document identity"
+        },
+        {
+          "passed": true,
+          "check": "Actual policy modal disables duplicate document export commands"
+        },
+        {
+          "passed": true,
+          "check": "Return on default Cancel submits no export and preserves the project"
+        },
+        {
+          "passed": true,
+          "check": "Universal Close cancels the policy modal without a model edit"
+        },
+        {
+          "passed": true,
+          "check": "Confirmed portable policy opens the actual owned GLB file chooser"
+        },
+        {
+          "passed": true,
+          "check": "Native filename input acknowledges the complete editable.glb destination"
+        },
+        {
+          "passed": true,
+          "check": "Actual GUI output declares complete native project scope and an approximate portable view"
+        },
+        {
+          "passed": true,
+          "check": "Default native policy really emits the selected512-pixel portable paint images"
+        },
+        {
+          "passed": true,
+          "check": "Actual GUI file worker preserves all editable source, paint, metadata and the original project file"
+        },
+        {
+          "passed": true,
+          "check": "Native filename input acknowledges the complete editable.glb destination"
+        },
+        {
+          "passed": true,
+          "check": "Actual Open restores the exported native project as unsaved and preserves the interchange source"
+        },
+        {
+          "passed": true,
+          "check": "Native filename input acknowledges the complete recovered.dsculpt destination"
+        },
+        {
+          "passed": true,
+          "check": "Actual subsequent Save writes the original editable project independently of the portable GLB"
+        },
+        {
+          "passed": true,
+          "check": "Native export/recovery/Save workflow exits cleanly without sanitizer suppression"
+        }
+      ],
+      "failed": 0,
+      "outputs": {
+        "artifacts/emission-controls-final-gui/release-compact/output/before-native-paint.dsculpt": "fc6b30d47cbecba5cc115367f48a5fb2c305cc06f8e8a88bb1ef1e4459fa56db",
+        "artifacts/emission-controls-final-gui/release-compact/output/actual-pointer-paint.dsculpt": "35f1bc373be46d04df37f31a157094b54d6ae4d06d990936c81c8b1ffe79f826",
+        "artifacts/emission-controls-final-gui/release-compact/output/editable.glb": "81fc25a3d2f0b5b80e0ce0ae191885f302a2aa684d3d28b70d54c41b3aacc74c",
+        "artifacts/emission-controls-final-gui/release-compact/output/recovered.dsculpt": "35f1bc373be46d04df37f31a157094b54d6ae4d06d990936c81c8b1ffe79f826"
+      },
+      "inputs_manifest_sha256": "79c97292bef72e952d06c471d06cbc75d1872418f5a546e35217a9780224b701"
+    },
+    "sanitize-normal": {
+      "checks": [
+        {
+          "passed": true,
+          "check": "Native filename input acknowledges the complete raw0.glb destination"
+        },
+        {
+          "passed": true,
+          "check": "Actual default-Cancel HDR import options preserve project and source bytes"
+        },
+        {
+          "passed": true,
+          "check": "Native filename input acknowledges the complete raw0.glb destination"
+        },
+        {
+          "passed": true,
+          "check": "Actual import options publish genuine Source4 with the selected64-pixel editable atlas"
+        },
+        {
+          "passed": true,
+          "check": "Actual HDR Import preserves raw factor/strength bytes and publishes their genuine native radiance product"
+        },
+        {
+          "passed": true,
+          "check": "Actual focused numeric field begins at expected native value"
+        },
+        {
+          "passed": true,
+          "check": "Native numeric field acknowledges 24"
+        },
+        {
+          "passed": true,
+          "check": "Actual desktop material control accepts and saves linear radiance above one"
+        },
+        {
+          "passed": true,
+          "check": "Desktop radiance edit preserves complete source bindings and original references"
+        },
+        {
+          "passed": true,
+          "check": "Desktop radiance Undo and native Save return the exact original project bytes"
+        },
+        {
+          "passed": true,
+          "check": "Actual focused numeric field begins at expected native value"
+        },
+        {
+          "passed": true,
+          "check": "Native numeric field acknowledges 12"
+        },
+        {
+          "passed": true,
+          "check": "Actual focused numeric field begins at expected native value"
+        },
+        {
+          "passed": true,
+          "check": "Native numeric field acknowledges 0.002"
+        },
+        {
+          "passed": true,
+          "check": "Actual focused numeric field begins at expected native value"
+        },
+        {
+          "passed": true,
+          "check": "Native numeric field acknowledges 3"
+        },
+        {
+          "passed": true,
+          "check": "Actual physical brush settings alone do not rewrite native source content"
+        },
+        {
+          "passed": true,
+          "check": "Actual desktop units/RGB controls create unclamped physical float paint including small linear values"
+        },
+        {
+          "passed": true,
+          "check": "Actual physical pointer painting keeps original source references and factor/strength exact"
+        },
+        {
+          "passed": true,
+          "check": "Editable project export is an actual enabled DomeD universal-menu command"
+        },
+        {
+          "passed": true,
+          "check": "Portable policy uses a native FLTK modal with shared document identity"
+        },
+        {
+          "passed": true,
+          "check": "Actual policy modal disables duplicate document export commands"
+        },
+        {
+          "passed": true,
+          "check": "Return on default Cancel submits no export and preserves the project"
+        },
+        {
+          "passed": true,
+          "check": "Universal Close cancels the policy modal without a model edit"
+        },
+        {
+          "passed": true,
+          "check": "Confirmed portable policy opens the actual owned GLB file chooser"
+        },
+        {
+          "passed": true,
+          "check": "Native filename input acknowledges the complete editable.glb destination"
+        },
+        {
+          "passed": true,
+          "check": "Actual GUI output declares complete native project scope and an approximate portable view"
+        },
+        {
+          "passed": true,
+          "check": "Default native policy really emits the selected512-pixel portable paint images"
+        },
+        {
+          "passed": true,
+          "check": "Actual GUI file worker preserves all editable source, paint, metadata and the original project file"
+        },
+        {
+          "passed": true,
+          "check": "Native filename input acknowledges the complete editable.glb destination"
+        },
+        {
+          "passed": true,
+          "check": "Actual Open restores the exported native project as unsaved and preserves the interchange source"
+        },
+        {
+          "passed": true,
+          "check": "Native filename input acknowledges the complete recovered.dsculpt destination"
+        },
+        {
+          "passed": true,
+          "check": "Actual subsequent Save writes the original editable project independently of the portable GLB"
+        },
+        {
+          "passed": true,
+          "check": "Native export/recovery/Save workflow exits cleanly without sanitizer suppression"
+        }
+      ],
+      "failed": 0,
+      "outputs": {
+        "artifacts/emission-controls-final-gui/sanitize-normal/output/actual-imported.dsculpt": "c01caa2a656a6551e75b82634f3facad17dd04411fd6722d9dacd0727f9f9128",
+        "artifacts/emission-controls-final-gui/sanitize-normal/output/before-native-paint.dsculpt": "c01caa2a656a6551e75b82634f3facad17dd04411fd6722d9dacd0727f9f9128",
+        "artifacts/emission-controls-final-gui/sanitize-normal/output/actual-pointer-paint.dsculpt": "780e5c8d5c7e97908da7cbfd75c5baa4047e9e9e3749a202e299a6d46c9d41bd",
+        "artifacts/emission-controls-final-gui/sanitize-normal/output/editable.glb": "4c77ab14402708a101df77fe42d295130afa71a889c3d2538bc33f826e7567cb",
+        "artifacts/emission-controls-final-gui/sanitize-normal/output/recovered.dsculpt": "780e5c8d5c7e97908da7cbfd75c5baa4047e9e9e3749a202e299a6d46c9d41bd"
+      },
+      "inputs_manifest_sha256": "36e2b5d32b2ff0966ffd2d098f43436f6bd4cf48634b4272c8c399b31e23c3e7"
+    },
+    "sanitize-compact": {
+      "checks": [
+        {
+          "passed": true,
+          "check": "Actual focused numeric field begins at expected native value"
+        },
+        {
+          "passed": true,
+          "check": "Native numeric field acknowledges 24"
+        },
+        {
+          "passed": true,
+          "check": "Actual desktop material control accepts and saves linear radiance above one"
+        },
+        {
+          "passed": true,
+          "check": "Desktop radiance edit preserves complete source bindings and original references"
+        },
+        {
+          "passed": true,
+          "check": "Desktop radiance Undo and native Save return the exact original project bytes"
+        },
+        {
+          "passed": true,
+          "check": "Actual focused numeric field begins at expected native value"
+        },
+        {
+          "passed": true,
+          "check": "Native numeric field acknowledges 12"
+        },
+        {
+          "passed": true,
+          "check": "Actual focused numeric field begins at expected native value"
+        },
+        {
+          "passed": true,
+          "check": "Native numeric field acknowledges 0.002"
+        },
+        {
+          "passed": true,
+          "check": "Actual focused numeric field begins at expected native value"
+        },
+        {
+          "passed": true,
+          "check": "Native numeric field acknowledges 3"
+        },
+        {
+          "passed": true,
+          "check": "Actual physical brush settings alone do not rewrite native source content"
+        },
+        {
+          "passed": true,
+          "check": "Actual desktop units/RGB controls create unclamped physical float paint including small linear values"
+        },
+        {
+          "passed": true,
+          "check": "Actual physical pointer painting keeps original source references and factor/strength exact"
+        },
+        {
+          "passed": true,
+          "check": "Editable project export is an actual enabled DomeD universal-menu command"
+        },
+        {
+          "passed": true,
+          "check": "Portable policy uses a native FLTK modal with shared document identity"
+        },
+        {
+          "passed": true,
+          "check": "Actual policy modal disables duplicate document export commands"
+        },
+        {
+          "passed": true,
+          "check": "Return on default Cancel submits no export and preserves the project"
+        },
+        {
+          "passed": true,
+          "check": "Universal Close cancels the policy modal without a model edit"
+        },
+        {
+          "passed": true,
+          "check": "Confirmed portable policy opens the actual owned GLB file chooser"
+        },
+        {
+          "passed": true,
+          "check": "Native filename input acknowledges the complete editable.glb destination"
+        },
+        {
+          "passed": true,
+          "check": "Actual GUI output declares complete native project scope and an approximate portable view"
+        },
+        {
+          "passed": true,
+          "check": "Default native policy really emits the selected512-pixel portable paint images"
+        },
+        {
+          "passed": true,
+          "check": "Actual GUI file worker preserves all editable source, paint, metadata and the original project file"
+        },
+        {
+          "passed": true,
+          "check": "Native filename input acknowledges the complete editable.glb destination"
+        },
+        {
+          "passed": true,
+          "check": "Actual Open restores the exported native project as unsaved and preserves the interchange source"
+        },
+        {
+          "passed": true,
+          "check": "Native filename input acknowledges the complete recovered.dsculpt destination"
+        },
+        {
+          "passed": true,
+          "check": "Actual subsequent Save writes the original editable project independently of the portable GLB"
+        },
+        {
+          "passed": true,
+          "check": "Native export/recovery/Save workflow exits cleanly without sanitizer suppression"
+        }
+      ],
+      "failed": 0,
+      "outputs": {
+        "artifacts/emission-controls-final-gui/sanitize-compact/output/before-native-paint.dsculpt": "fc6b30d47cbecba5cc115367f48a5fb2c305cc06f8e8a88bb1ef1e4459fa56db",
+        "artifacts/emission-controls-final-gui/sanitize-compact/output/actual-pointer-paint.dsculpt": "35f1bc373be46d04df37f31a157094b54d6ae4d06d990936c81c8b1ffe79f826",
+        "artifacts/emission-controls-final-gui/sanitize-compact/output/editable.glb": "81fc25a3d2f0b5b80e0ce0ae191885f302a2aa684d3d28b70d54c41b3aacc74c",
+        "artifacts/emission-controls-final-gui/sanitize-compact/output/recovered.dsculpt": "35f1bc373be46d04df37f31a157094b54d6ae4d06d990936c81c8b1ffe79f826"
+      },
+      "inputs_manifest_sha256": "36e2b5d32b2ff0966ffd2d098f43436f6bd4cf48634b4272c8c399b31e23c3e7"
+    }
+  },
+  "binaries": {
+    "release": {
+      "build-release/dome-sculpt": "a7e6a0396e6aca09860bc918e7eda411029fcb304da340d20bd89ecc80604d28",
+      "build-release/dome-sculpt-native-authoring-inspect": "88c7396572af0d0d601eb0d41bf894ef31f765e3c6fce592290837d7447771d6",
+      "build-release/dome-sculpt-emission-controls-test": "fc377aa858bf43af84bfc4394b0d6d3f183b1a89b293a4a04d33a7015b042c81",
+      "build-release/dome-sculpt-palette-text-test": "53db9385eda04e4e1070ae3a0cc5318a76d67055032e128d20093040bb25289f",
+      "build-release/libdome-sculpt-emission-codec.a": "0491e3e8cb6018a630374bfce38d5b5335b5467dc3130cb34e69a5f080c5b651",
+      "build-release/libdome-sculpt-affine.a": "dacfe97b65bc4352f4e997f52d72b25088c3b36c721e0f64557f1caf2b5a9c81",
+      "build-release/libxatlas.a": "ccc32656dc79cc2da969ad0c7ad2492d8bf7140a5e832fd3c7a162f22ab30b0b",
+      "build-release/libmikktspace.a": "c19c3734df75e4a03e8749c62f20d66a752007cb3988d2fe668961ff825b9ec6",
+      "build-release/libufbx.a": "12e683e9fe9851ecc514d0864f035b48454e4cf9b1dee5a55895a73c364bdf93",
+      "build-release/libdome-sculpt-polygon.a": "bcac50714006f00487b9bb592dad3781f0e43d185c083f6dc11a2801525f56df",
+      "build-release/libmikktspace-robust.a": "f956127106efdf7909275ea25903b306aad1ede0f9c3bb912dc4cdfb36b9274f",
+      "build-release/libdome-sculpt-spacenav.a": "a825c0b8ca4c6b882215ac1d2b12e61c873f6d0a55720a2f955c402ffb26e1b4",
+      "build-release/libdome-sculpt-xr.a": "1d1dab1a817394f709346264782b36eb35d6f74f41837eb59c747ed0584dbbaf",
+      "build-release/libdome-sculpt-core.a": "3a597fdf189187d76f99d741a5da31b390a340b16ccbd955e5e483d10709bcda",
+      "build-release/libdome-sculpt-render.a": "df82fdd499a6591924f21bab82a5a192127c2c1f887e6fb382b8cd20b81b6421"
+    },
+    "sanitize": {
+      "build-sanitize/dome-sculpt": "510951cd58ac2d75b347bc5bbbdbf0dd224d4654d1474c2a26395e995ad07fa1",
+      "build-sanitize/dome-sculpt-native-authoring-inspect": "ee31e1a9908b4bf2c3420a8995072401909979d5a5af094a83073566fef0a638",
+      "build-sanitize/dome-sculpt-emission-controls-test": "708ebbf0468eb8d98cc0f953ef1db5baa6044236a942d94b2e099c9f70617ce3",
+      "build-sanitize/dome-sculpt-palette-text-test": "7547969867c95a78c06c94ff914713723edbf3b658e630cc40c8bc3da0085650",
+      "build-sanitize/libdome-sculpt-emission-codec.a": "37a16f4d0d2c12be8483fcdb9d71d158190477fcb9a51e34463ae112d7c2e042",
+      "build-sanitize/libdome-sculpt-affine.a": "9ed9fe612cd4486dbd7e60027f81c5dfbb9cad008320382294e453d5117d5c0a",
+      "build-sanitize/libxatlas.a": "ac89be1a306a27cdb0c9d2edddfa3625d152b42715e2781d2a4644cdb0ba3316",
+      "build-sanitize/libmikktspace.a": "4611012df6d4297f6ae2f8961b8be1c20045d5cea3704dc569bdce72abe795ba",
+      "build-sanitize/libufbx.a": "1941b4b1abb74495e8ea683f9150fd43828bc5497eea739040a925ea1344fb0d",
+      "build-sanitize/libmikktspace-robust.a": "744086075bdb6b610aa1b97c185047ee8be85d98aab4dd062d5222bc80978fee",
+      "build-sanitize/libdome-sculpt-spacenav.a": "e05b1c6cf732ee8e703e03e4ecde5f22d699869b8b4712b52d18f4bf2f6286a9",
+      "build-sanitize/libdome-sculpt-polygon.a": "7b9e43c3e5cf611b3760c92541fffdeb6c071557eebd1e33dc0bcf725d71ea0f",
+      "build-sanitize/libdome-sculpt-core.a": "9fdea4dadc2eb019542f665d39a88957a015e449854b34db979b9c84da7d9b51",
+      "build-sanitize/libdome-sculpt-xr.a": "68d018af519edf42ac2a06695bbf46d637cb9a9ee277a8cb88705a4fb5854a74",
+      "build-sanitize/libdome-sculpt-render.a": "4e78a610043ccf44463eb280c76e1adbfdbfeaead8dfbf6402614b0f2b23f3e9"
+    }
+  },
+  "preserved_failures": [
+    {
+      "artifact": "emission-controls-proof",
+      "meaning": "Real Document page30 ownership defect; fixed7b99fbc, not a paint range/clamp defect.",
+      "status": {
+        "source": "e319a510b4a0c33789727a321683879256a25915",
+        "input_count": 1617,
+        "scope": "fresh matching owned C/C++ core/support/render/native app +affected controller/producer tests; final canonical poll27 SDK",
+        "stages": {
+          "release-configure": {
+            "command": [
+              "nice",
+              "-n",
+              "15",
+              "cmake",
+              "-S",
+              ".",
+              "-B",
+              "build-release",
+              "-DCMAKE_BUILD_TYPE=Release",
+              "-DDOME_COMPUTE_BACKEND=CPU",
+              "-DDOME_BUILD_UI=ON",
+              "-DDOME_BUILD_XR=ON",
+              "-DFLTK_DIR=/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-release/share/fltk",
+              "-U*DOME_BITMAP_RUNTIME*",
+              "-U*NATIVEGL*",
+              "-U*RENDERFONTS*"
+            ],
+            "exit": 0,
+            "seconds": 4.849371777992928
+          },
+          "syntax-input": {
+            "command": [
+              "nice",
+              "-n",
+              "15",
+              "/usr/bin/c++",
+              "-DDOME_SCULPT_INSTALLED_ASSETS=\"/usr/local/share/dome-sculpt/assets/humanoid\"",
+              "-DDOME_SCULPT_SOURCE_ASSETS=\"/home/blux/de-xr/dome-sculpt/artifacts/hdr-emission-controls-1f857b6/assets/humanoid\"",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/hdr-emission-controls-1f857b6/third_party",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/hdr-emission-controls-1f857b6/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/hdr-emission-controls-1f857b6/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/hdr-emission-controls-1f857b6/third_party/cgltf",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/hdr-emission-controls-1f857b6/third_party/nlohmann",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/hdr-emission-controls-1f857b6/third_party/xatlas",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/hdr-emission-controls-1f857b6/third_party/mikktspace",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/hdr-emission-controls-1f857b6/third_party/ufbx",
+              "-O3",
+              "-DNDEBUG",
+              "-std=gnu++20",
+              "-Wall",
+              "-Wextra",
+              "-Wpedantic",
+              "-fsyntax-only",
+              "src/input.cpp"
+            ],
+            "exit": 0,
+            "seconds": 0.8160764320055023
+          },
+          "syntax-palette": {
+            "command": [
+              "nice",
+              "-n",
+              "15",
+              "/usr/bin/c++",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/hdr-emission-controls-1f857b6/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/hdr-emission-controls-1f857b6/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/hdr-emission-controls-1f857b6/third_party/nlohmann",
+              "-isystem",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/harfbuzz",
+              "-isystem",
+              "/usr/include/glib-2.0",
+              "-isystem",
+              "/usr/lib64/glib-2.0/include",
+              "-isystem",
+              "/usr/include/sysprof-6",
+              "-isystem",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/freetype2",
+              "-isystem",
+              "/usr/include/libpng16",
+              "-isystem",
+              "/usr/include/libxml2",
+              "-O3",
+              "-DNDEBUG",
+              "-std=gnu++20",
+              "-pthread",
+              "-DWITH_GZFILEOP",
+              "-fsyntax-only",
+              "src/palette.cpp"
+            ],
+            "exit": 0,
+            "seconds": 1.6605221560166683
+          },
+          "syntax-document": {
+            "command": [
+              "nice",
+              "-n",
+              "15",
+              "/usr/bin/c++",
+              "-DDOME_SCULPT_INSTALLED_ASSETS=\"/usr/local/share/dome-sculpt/assets/humanoid\"",
+              "-DDOME_SCULPT_SOURCE_ASSETS=\"/home/blux/de-xr/dome-sculpt/artifacts/hdr-emission-controls-1f857b6/assets/humanoid\"",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/hdr-emission-controls-1f857b6/third_party",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/hdr-emission-controls-1f857b6/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/hdr-emission-controls-1f857b6/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/hdr-emission-controls-1f857b6/third_party/cgltf",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/hdr-emission-controls-1f857b6/third_party/nlohmann",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/hdr-emission-controls-1f857b6/third_party/xatlas",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/hdr-emission-controls-1f857b6/third_party/mikktspace",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/hdr-emission-controls-1f857b6/third_party/ufbx",
+              "-O3",
+              "-DNDEBUG",
+              "-std=gnu++20",
+              "-Wall",
+              "-Wextra",
+              "-Wpedantic",
+              "-fsyntax-only",
+              "src/document.cpp"
+            ],
+            "exit": 0,
+            "seconds": 4.188179135991959
+          },
+          "syntax-object-editor": {
+            "command": [
+              "nice",
+              "-n",
+              "15",
+              "/usr/bin/c++",
+              "-DDOME_HAS_XR=1",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/hdr-emission-controls-1f857b6/third_party/desktop",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/hdr-emission-controls-1f857b6/build-release",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/hdr-emission-controls-1f857b6/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/hdr-emission-controls-1f857b6/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/hdr-emission-controls-1f857b6/third_party/nlohmann",
+              "-isystem",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/harfbuzz",
+              "-isystem",
+              "/usr/include/glib-2.0",
+              "-isystem",
+              "/usr/lib64/glib-2.0/include",
+              "-isystem",
+              "/usr/include/sysprof-6",
+              "-isystem",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/freetype2",
+              "-isystem",
+              "/usr/include/libpng16",
+              "-isystem",
+              "/usr/include/libxml2",
+              "-isystem",
+              "/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-release/include",
+              "-isystem",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/cairo",
+              "-isystem",
+              "/usr/include/pixman-1",
+              "-isystem",
+              "/usr/include/libmount",
+              "-isystem",
+              "/usr/include/blkid",
+              "-O3",
+              "-DNDEBUG",
+              "-std=gnu++20",
+              "-pthread",
+              "-DWITH_GZFILEOP",
+              "-fsyntax-only",
+              "src/object-editor.cpp"
+            ],
+            "exit": 0,
+            "seconds": 2.3946845299797133
+          },
+          "syntax-paint-editor": {
+            "command": [
+              "nice",
+              "-n",
+              "15",
+              "/usr/bin/c++",
+              "-DDOME_HAS_XR=1",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/hdr-emission-controls-1f857b6/third_party/desktop",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/hdr-emission-controls-1f857b6/build-release",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/hdr-emission-controls-1f857b6/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/hdr-emission-controls-1f857b6/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/hdr-emission-controls-1f857b6/third_party/nlohmann",
+              "-isystem",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/harfbuzz",
+              "-isystem",
+              "/usr/include/glib-2.0",
+              "-isystem",
+              "/usr/lib64/glib-2.0/include",
+              "-isystem",
+              "/usr/include/sysprof-6",
+              "-isystem",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/freetype2",
+              "-isystem",
+              "/usr/include/libpng16",
+              "-isystem",
+              "/usr/include/libxml2",
+              "-isystem",
+              "/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-release/include",
+              "-isystem",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/cairo",
+              "-isystem",
+              "/usr/include/pixman-1",
+              "-isystem",
+              "/usr/include/libmount",
+              "-isystem",
+              "/usr/include/blkid",
+              "-O3",
+              "-DNDEBUG",
+              "-std=gnu++20",
+              "-pthread",
+              "-DWITH_GZFILEOP",
+              "-fsyntax-only",
+              "src/paint-editor.cpp"
+            ],
+            "exit": 0,
+            "seconds": 2.2854615389951505
+          },
+          "syntax-emission-controls": {
+            "command": [
+              "nice",
+              "-n",
+              "15",
+              "/usr/bin/c++",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/hdr-emission-controls-1f857b6/src",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/hdr-emission-controls-1f857b6/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/hdr-emission-controls-1f857b6/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/hdr-emission-controls-1f857b6/third_party/nlohmann",
+              "-O3",
+              "-DNDEBUG",
+              "-std=gnu++20",
+              "-fsyntax-only",
+              "tests/emission-controls.cpp"
+            ],
+            "exit": 0,
+            "seconds": 2.3362567060103174
+          },
+          "release-build": {
+            "command": [
+              "nice",
+              "-n",
+              "15",
+              "cmake",
+              "--build",
+              "build-release",
+              "--parallel",
+              "2",
+              "--target",
+              "dome-sculpt",
+              "dome-sculpt-emission-controls-test",
+              "dome-sculpt-controls-test",
+              "dome-sculpt-modal-selection-controls-test",
+              "dome-sculpt-import-options-test",
+              "dome-sculpt-palette-text-test",
+              "dome-sculpt-xr-editable-export-test",
+              "dome-sculpt-raw-hdr-authoring-test",
+              "dome-sculpt-source-paint-physical-authoring-test"
+            ],
+            "exit": 0,
+            "seconds": 446.1822915489902
+          },
+          "release-tests": {
+            "command": [
+              "nice",
+              "-n",
+              "15",
+              "ctest",
+              "--test-dir",
+              "build-release",
+              "--output-on-failure",
+              "-R",
+              "^(emission-controls|controller-controls|modal-selection-controls|import-options-controller|palette-unicode|xr-editable-export|raw-hdr-authoring|source-paint-physical-authoring)$"
+            ],
+            "exit": 8,
+            "seconds": 22.810415030020522
+          }
+        }
+      }
+    },
+    {
+      "artifact": "emission-controls-r2",
+      "meaning": "Close fixture first released then introduced fresh pressure; corrected6e to keep pressure held across Close/focus/tracking loss.",
+      "status": {
+        "source": "7b99fbcd91cdd7f33b74ab97c4bc59ed38245cf0",
+        "input_count": 1617,
+        "scope": "fresh matching owned C/C++ core/support/render/native app +affected controller/producer tests; final canonical poll27 SDK",
+        "stages": {
+          "release-configure": {
+            "command": [
+              "nice",
+              "-n",
+              "15",
+              "cmake",
+              "-S",
+              ".",
+              "-B",
+              "build-release",
+              "-DCMAKE_BUILD_TYPE=Release",
+              "-DDOME_COMPUTE_BACKEND=CPU",
+              "-DDOME_BUILD_UI=ON",
+              "-DDOME_BUILD_XR=ON",
+              "-DFLTK_DIR=/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-release/share/fltk",
+              "-U*DOME_BITMAP_RUNTIME*",
+              "-U*NATIVEGL*",
+              "-U*RENDERFONTS*"
+            ],
+            "exit": 0,
+            "seconds": 2.704483701993013
+          },
+          "syntax-input": {
+            "command": [
+              "nice",
+              "-n",
+              "15",
+              "/usr/bin/c++",
+              "-DDOME_SCULPT_INSTALLED_ASSETS=\"/usr/local/share/dome-sculpt/assets/humanoid\"",
+              "-DDOME_SCULPT_SOURCE_ASSETS=\"/home/blux/de-xr/dome-sculpt/artifacts/hdr-emission-controls-1f857b6/assets/humanoid\"",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/hdr-emission-controls-1f857b6/third_party",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/hdr-emission-controls-1f857b6/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/hdr-emission-controls-1f857b6/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/hdr-emission-controls-1f857b6/third_party/cgltf",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/hdr-emission-controls-1f857b6/third_party/nlohmann",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/hdr-emission-controls-1f857b6/third_party/xatlas",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/hdr-emission-controls-1f857b6/third_party/mikktspace",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/hdr-emission-controls-1f857b6/third_party/ufbx",
+              "-O3",
+              "-DNDEBUG",
+              "-std=gnu++20",
+              "-Wall",
+              "-Wextra",
+              "-Wpedantic",
+              "-fsyntax-only",
+              "src/input.cpp"
+            ],
+            "exit": 0,
+            "seconds": 0.7195154359797016
+          },
+          "syntax-palette": {
+            "command": [
+              "nice",
+              "-n",
+              "15",
+              "/usr/bin/c++",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/hdr-emission-controls-1f857b6/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/hdr-emission-controls-1f857b6/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/hdr-emission-controls-1f857b6/third_party/nlohmann",
+              "-isystem",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/harfbuzz",
+              "-isystem",
+              "/usr/include/glib-2.0",
+              "-isystem",
+              "/usr/lib64/glib-2.0/include",
+              "-isystem",
+              "/usr/include/sysprof-6",
+              "-isystem",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/freetype2",
+              "-isystem",
+              "/usr/include/libpng16",
+              "-isystem",
+              "/usr/include/libxml2",
+              "-O3",
+              "-DNDEBUG",
+              "-std=gnu++20",
+              "-pthread",
+              "-DWITH_GZFILEOP",
+              "-fsyntax-only",
+              "src/palette.cpp"
+            ],
+            "exit": 0,
+            "seconds": 1.4743410559894983
+          },
+          "syntax-document": {
+            "command": [
+              "nice",
+              "-n",
+              "15",
+              "/usr/bin/c++",
+              "-DDOME_SCULPT_INSTALLED_ASSETS=\"/usr/local/share/dome-sculpt/assets/humanoid\"",
+              "-DDOME_SCULPT_SOURCE_ASSETS=\"/home/blux/de-xr/dome-sculpt/artifacts/hdr-emission-controls-1f857b6/assets/humanoid\"",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/hdr-emission-controls-1f857b6/third_party",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/hdr-emission-controls-1f857b6/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/hdr-emission-controls-1f857b6/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/hdr-emission-controls-1f857b6/third_party/cgltf",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/hdr-emission-controls-1f857b6/third_party/nlohmann",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/hdr-emission-controls-1f857b6/third_party/xatlas",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/hdr-emission-controls-1f857b6/third_party/mikktspace",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/hdr-emission-controls-1f857b6/third_party/ufbx",
+              "-O3",
+              "-DNDEBUG",
+              "-std=gnu++20",
+              "-Wall",
+              "-Wextra",
+              "-Wpedantic",
+              "-fsyntax-only",
+              "src/document.cpp"
+            ],
+            "exit": 0,
+            "seconds": 3.8753820749989245
+          },
+          "syntax-object-editor": {
+            "command": [
+              "nice",
+              "-n",
+              "15",
+              "/usr/bin/c++",
+              "-DDOME_HAS_XR=1",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/hdr-emission-controls-1f857b6/third_party/desktop",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/hdr-emission-controls-1f857b6/build-release",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/hdr-emission-controls-1f857b6/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/hdr-emission-controls-1f857b6/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/hdr-emission-controls-1f857b6/third_party/nlohmann",
+              "-isystem",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/harfbuzz",
+              "-isystem",
+              "/usr/include/glib-2.0",
+              "-isystem",
+              "/usr/lib64/glib-2.0/include",
+              "-isystem",
+              "/usr/include/sysprof-6",
+              "-isystem",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/freetype2",
+              "-isystem",
+              "/usr/include/libpng16",
+              "-isystem",
+              "/usr/include/libxml2",
+              "-isystem",
+              "/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-release/include",
+              "-isystem",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/cairo",
+              "-isystem",
+              "/usr/include/pixman-1",
+              "-isystem",
+              "/usr/include/libmount",
+              "-isystem",
+              "/usr/include/blkid",
+              "-O3",
+              "-DNDEBUG",
+              "-std=gnu++20",
+              "-pthread",
+              "-DWITH_GZFILEOP",
+              "-fsyntax-only",
+              "src/object-editor.cpp"
+            ],
+            "exit": 0,
+            "seconds": 2.2185213199991267
+          },
+          "syntax-paint-editor": {
+            "command": [
+              "nice",
+              "-n",
+              "15",
+              "/usr/bin/c++",
+              "-DDOME_HAS_XR=1",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/hdr-emission-controls-1f857b6/third_party/desktop",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/hdr-emission-controls-1f857b6/build-release",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/hdr-emission-controls-1f857b6/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/hdr-emission-controls-1f857b6/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/hdr-emission-controls-1f857b6/third_party/nlohmann",
+              "-isystem",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/harfbuzz",
+              "-isystem",
+              "/usr/include/glib-2.0",
+              "-isystem",
+              "/usr/lib64/glib-2.0/include",
+              "-isystem",
+              "/usr/include/sysprof-6",
+              "-isystem",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/freetype2",
+              "-isystem",
+              "/usr/include/libpng16",
+              "-isystem",
+              "/usr/include/libxml2",
+              "-isystem",
+              "/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-release/include",
+              "-isystem",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/cairo",
+              "-isystem",
+              "/usr/include/pixman-1",
+              "-isystem",
+              "/usr/include/libmount",
+              "-isystem",
+              "/usr/include/blkid",
+              "-O3",
+              "-DNDEBUG",
+              "-std=gnu++20",
+              "-pthread",
+              "-DWITH_GZFILEOP",
+              "-fsyntax-only",
+              "src/paint-editor.cpp"
+            ],
+            "exit": 0,
+            "seconds": 2.1745488430024125
+          },
+          "syntax-emission-controls": {
+            "command": [
+              "nice",
+              "-n",
+              "15",
+              "/usr/bin/c++",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/hdr-emission-controls-1f857b6/src",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/hdr-emission-controls-1f857b6/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/hdr-emission-controls-1f857b6/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/hdr-emission-controls-1f857b6/third_party/nlohmann",
+              "-O3",
+              "-DNDEBUG",
+              "-std=gnu++20",
+              "-fsyntax-only",
+              "tests/emission-controls.cpp"
+            ],
+            "exit": 0,
+            "seconds": 2.1970808150072116
+          },
+          "release-build": {
+            "command": [
+              "nice",
+              "-n",
+              "15",
+              "cmake",
+              "--build",
+              "build-release",
+              "--parallel",
+              "2",
+              "--target",
+              "dome-sculpt",
+              "dome-sculpt-emission-controls-test",
+              "dome-sculpt-controls-test",
+              "dome-sculpt-modal-selection-controls-test",
+              "dome-sculpt-import-options-test",
+              "dome-sculpt-palette-text-test",
+              "dome-sculpt-xr-editable-export-test",
+              "dome-sculpt-raw-hdr-authoring-test",
+              "dome-sculpt-source-paint-physical-authoring-test"
+            ],
+            "exit": 0,
+            "seconds": 28.59335194400046
+          },
+          "release-tests": {
+            "command": [
+              "nice",
+              "-n",
+              "15",
+              "ctest",
+              "--test-dir",
+              "build-release",
+              "--output-on-failure",
+              "-R",
+              "^(emission-controls|controller-controls|modal-selection-controls|import-options-controller|palette-unicode|xr-editable-export|raw-hdr-authoring|source-paint-physical-authoring)$"
+            ],
+            "exit": 8,
+            "seconds": 14.364348299015546
+          }
+        }
+      }
+    },
+    {
+      "artifact": "hdr-paint-desktop-r2",
+      "meaning": "Stale clipboard value exposed wrong numeric focus; no physical paint was reached.",
+      "status": {
+        "source": "6e5964b56dc51293bb3efc86ba0a4b9d81e8d08a",
+        "scope": "Actual current Release app and matching inspector, desktop material/physical units/float pointer paint +HDR policy/export/recovery; initial normal-layout development scope",
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/selection-gui-venv/bin/python",
+          "/home/blux/de-xr/dome-sculpt/artifacts/hdr-emission-controls-1f857b6/artifacts/hdr-paint-desktop-r2/driver.py"
+        ],
+        "inputs": 1644,
+        "exit": 1,
+        "seconds": 21.185566922009457,
+        "drift": []
+      }
+    },
+    {
+      "artifact": "hdr-paint-desktop-r3",
+      "meaning": "Copy readiness was demanded before SelectAll had selected pasted text; fixed test ordering, actual application clipboard ownership/copyback remains required.",
+      "status": {
+        "source": "6e5964b56dc51293bb3efc86ba0a4b9d81e8d08a",
+        "scope": "Actual current Release app and matching inspector, desktop material/physical units/float pointer paint +HDR policy/export/recovery; initial normal-layout development scope",
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/selection-gui-venv/bin/python",
+          "/home/blux/de-xr/dome-sculpt/artifacts/hdr-emission-controls-1f857b6/artifacts/hdr-paint-desktop-r3/driver.py"
+        ],
+        "inputs": 1644,
+        "exit": 1,
+        "seconds": 35.95879968200461,
+        "drift": []
+      }
+    },
+    {
+      "artifact": "hdr-import-desktop-r1",
+      "meaning": "Home did not select the requested real choice; actual saved atlas64 assertion caught default512. Real Up3 choice selection and saved-source proof close this in R2.",
+      "status": {
+        "source": "6e5964b56dc51293bb3efc86ba0a4b9d81e8d08a",
+        "scope": "Actual current Release app and matching inspector, desktop material/physical units/float pointer paint +HDR policy/export/recovery; initial normal-layout development scope",
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/selection-gui-venv/bin/python",
+          "/home/blux/de-xr/dome-sculpt/artifacts/hdr-emission-controls-1f857b6/artifacts/hdr-import-desktop-r1/driver.py"
+        ],
+        "inputs": 1644,
+        "exit": 1,
+        "seconds": 21.2767872249824,
+        "drift": []
+      }
+    },
+    {
+      "artifact": "hdr-paint-compact-r1",
+      "meaning": "Normal-layout pointer positions were outside the scroll viewport.",
+      "status": {
+        "source": "6e5964b56dc51293bb3efc86ba0a4b9d81e8d08a",
+        "scope": "Actual current Release app and matching inspector, desktop material/physical units/float pointer paint +HDR policy/export/recovery; initial normal-layout development scope",
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/selection-gui-venv/bin/python",
+          "/home/blux/de-xr/dome-sculpt/artifacts/hdr-emission-controls-1f857b6/artifacts/hdr-paint-compact-r1/driver.py"
+        ],
+        "inputs": 1644,
+        "exit": 1,
+        "seconds": 40.17429963697214,
+        "drift": []
+      }
+    },
+    {
+      "artifact": "hdr-paint-compact-r2",
+      "meaning": "Keyboard traversal lacked real focused input; corrected by focusing the visible Red input before traversing actual controls.",
+      "status": {
+        "source": "6e5964b56dc51293bb3efc86ba0a4b9d81e8d08a",
+        "scope": "Actual current Release app and matching inspector, desktop material/physical units/float pointer paint +HDR policy/export/recovery; initial normal-layout development scope",
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/selection-gui-venv/bin/python",
+          "/home/blux/de-xr/dome-sculpt/artifacts/hdr-emission-controls-1f857b6/artifacts/hdr-paint-compact-r2/driver.py"
+        ],
+        "inputs": 1644,
+        "exit": 1,
+        "seconds": 40.32012479900732,
+        "drift": []
+      }
+    }
+  ],
+  "limits": [
+    "No new persistent schema or public data-member append; command IDs and old object_properties wrapper retained. Counted page registry expanded and all participating app/core/render/XR users rebuilt.",
+    "Current controls only edit an already active absolute emission override; creation/clearing of that separate override remains outside this UI.",
+    "Actual normal GUI starts from a genuine native HDR source project, then imports raw HDR through the real explicit64-atlas dialog. Compact GUI starts from the native HDR fixture and does not claim compact import.",
+    "GUI uses private Xvfb/D-Bus/HOME and softwareGL, no physical HMD/session/install or new hardware claim.",
+    "Whole-owned core/support sanitizer base plus affected continuation is qualified; no full all-target/CTest claim.",
+    "Preserving-only/nonprepared raw-HDR native import/export and retained/native-only physical compiler domains remain guarded and required. The finite portable PBR approximation is not lossless HDR interchange.",
+    "Bind page29 is reserved/disabled in this isolated lineage. Future joint bind/UI integration must compose the actual page29 implementation and update tests; no wholesale input registry overwrite."
+  ]
+}

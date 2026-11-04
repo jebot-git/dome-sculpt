@@ -5,7 +5,7 @@
 #include "normal-frames.hpp"
 #include <optional>
 namespace dome {
-namespace detail { class PolygonColorArchive; class SourceKeyDerivation; class CanonicalNormalConversion; class CanonicalNormalUv; }
+namespace detail { class PolygonColorArchive; class SourceKeyDerivation; class CanonicalNormalConversion; class CanonicalNormalUv; class NativePaintSampling; }
 class PaintedMesh;
 class CreatorAssetArchive;
 class NormalSamplingArchive;
@@ -64,6 +64,8 @@ struct SourceMaterialBindings {
   std::shared_ptr<const detail::CanonicalNormalConversion> canonical_attributes;
   // Editable atlas correspondence; its authentic root survives Clear Bake.
   std::shared_ptr<const detail::CanonicalNormalUv> canonical_uv;
+  // Scene32/wire14: independent native writable-grid authority.
+  std::shared_ptr<const detail::NativePaintSampling> native_paint_sampling;
   void validate(bool deep=true) const;
 };
 using SourceUvMaterialBindings = SourceMaterialBindings;

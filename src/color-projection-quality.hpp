@@ -7,13 +7,9 @@ struct ColorProjectionBound {
   std::array<double,4> maximum_error{};
   uint64_t tested_cells=0, intersecting_cells=0;
 };
-// Bound only the static linear vertex-color field versus its linear RGBA8
-// clamp/bilinear projection. This does not claim a bound for resampling the
-// complete textured material, its mip selection or its lighting.
-inline ColorProjectionBound color_projection_bound(
+inline void validate_color_projection_bound_input(
     const Mesh &mesh,std::span<const std::array<float,4>> colors,
-    const Image &projection,uint64_t max_cells=128'000'000,
-    const std::function<bool()> &cancelled={}) {
+    const Image &projection,uint64_t max_cells) {
   mesh.validate();projection.validate();
   if(colors.size()!=mesh.positions.size() || mesh.uv.size()!=colors.size() || !max_cells)
     throw std::invalid_argument("Color projection bound requires complete current UV/color authority");
@@ -21,6 +17,15 @@ inline ColorProjectionBound color_projection_bound(
     throw std::invalid_argument("Color projection bound requires finite linear unit RGBA");
   for(auto uv:mesh.uv)for(float x:uv)if(x<0 || x>1)
     throw std::invalid_argument("Color projection atlas must fit the unit square");
+}
+// Bound only the static linear vertex-color field versus its linear RGBA8
+// clamp/bilinear projection. This does not claim a bound for resampling the
+// complete textured material, its mip selection or its lighting.
+inline ColorProjectionBound color_projection_bound(
+    const Mesh &mesh,std::span<const std::array<float,4>> colors,
+    const Image &projection,uint64_t max_cells=128'000'000,
+    const std::function<bool()> &cancelled={}) {
+  validate_color_projection_bound_input(mesh,colors,projection,max_cells);
   using Point=std::array<double,2>;
   struct Polygon {
     std::array<Point,16> points{};size_t count=0;

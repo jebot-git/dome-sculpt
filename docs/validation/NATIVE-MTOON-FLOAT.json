@@ -1,0 +1,639 @@
+{
+  "status": "qualified private component; not main admission or full goal completion",
+  "recorded_utc": "2026-11-04T14:30:28.241758+00:00",
+  "base": "721282ab3f108b18708824f686775fc6d1bf6ba9",
+  "parent_prototype": "c189d123db239a413083e29e0921385e8fc0428e",
+  "runtime_fix": "eba3cf8148ea0ba51a25755508ff4645137276ee",
+  "coherent_source": "1b39d9b2cbfd1c32d1bc0baf307c0370f83398fe",
+  "tracked_contract_source": "183ed5a2fb94c9f0e5d9561be643fce6a06319c6",
+  "product_manifest_count": 502,
+  "product_manifest_canonical_sha256": "18f37aeee768dd85f2b5971726681867ebcf0b7273010eeef01eb93b38362ad7",
+  "public_layout_or_schema_change": false,
+  "post_cohort_product_delta": [],
+  "scope": [
+    "Genuine native MToon V0/V1 float-emission preview; legacy strength-relative and physical absolute units remain distinct.",
+    "704 controls on actual Document; independent radiance, source sampler, masks, layer visibility/opacity, current/absolute/reference background contexts, Save/restart, Undo/Redo, second-eye reuse and actual aggregate GPU-byte refusal.",
+    "Whole owned C/C++ core/support/render and native/XR app plus inspector freshly rebuilt separately optimized and O1 ASan/UBSan/leak;9 affected regressions each.",
+    "Actual FLTK optimized normal32 and owned-sanitizer compact32 using canonical27 SDK/private display.",
+    "New whole-preview-entry persistent C++ allocation denial:31 hidden-only and49 visible-float prefixes per profile;exact complete Scene/strong geometry owners/map planes plus10 cancellation/retry controls.",
+    "Strict PCI03 A770704+79+42 positives;all6 forced software/actualUHD identity refusals;all captured hashes exact."
+  ],
+  "negative_controls": {
+    "old_typed_preview_refusal": "/home/blux/de-xr/dome-sculpt/artifacts/native-mtoon-float-721282a/artifacts/native-mtoon-baseline",
+    "genuine_hidden_f32_regression": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/native-mtoon-float-721282a/artifacts/native-mtoon-hidden-100",
+      "exit": 1,
+      "max": 7,
+      "center_before": 129,
+      "center_after": 124,
+      "inputs": 1661,
+      "drift": []
+    },
+    "fixed_same_input": {
+      "path": "artifacts/hidden-fix-prototype",
+      "exit": 0,
+      "max": 0,
+      "center_before": 129,
+      "center_after": 129
+    },
+    "saturated_control_not_sensitive": "/home/blux/de-xr/dome-sculpt/artifacts/native-mtoon-float-721282a/artifacts/native-mtoon-hidden-probe",
+    "fixture_failures": [
+      "Initial one-argument edit_scene callbacks were invalid; use actual void(Scene&,cancelled) API.",
+      "Early wait_mesh-only observer could read prior Scene while ordered edit still ran; corrected test waits actual asset then mesh and asserts real edit.",
+      "Initial focused compile command inserted include before nice options; corrected argument position, old command failure retained."
+    ],
+    "glslang_config_only_floor_negative_accepted": "/home/blux/de-xr/dome-sculpt/artifacts/native-mtoon-float-721282a/artifacts/native-mtoon-oracle/shader-floor-link-status.json"
+  },
+  "shader_contract": {
+    "private_packed_views": 7,
+    "buffer_texture_unit": 14,
+    "uniform_components_vertex": 295,
+    "uniform_components_fragment": 814,
+    "samplers_vertex": 15,
+    "samplers_fragment": 16,
+    "all_six_captured_shader_sources_byte_equal_prior_audited_prototype": true,
+    "config_only_glslang_success_not_enforcement": true
+  },
+  "records": {
+    "artifacts/native-mtoon-coherent/release-build-status.json": {
+      "sha256": "71249f54b2cc1477b0cf9e8eecdbf78986978d1944b4d291728cea51b50567a0",
+      "result": {
+        "exit": 0,
+        "seconds": 379.94944221898913,
+        "commands": [
+          [
+            "cmake",
+            "-S",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native-mtoon-hidden-c189d12",
+            "-B",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native-mtoon-hidden-c189d12/build-release",
+            "-DCMAKE_BUILD_TYPE=Release",
+            "-DDOME_COMPUTE_BACKEND=CPU",
+            "-DFLTK_DIR=/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-release/share/fltk",
+            "-DBUILD_TESTING=ON",
+            "-DDOME_BUILD_UI=ON",
+            "-DDOME_BUILD_XR=ON"
+          ],
+          [
+            "nice",
+            "-n",
+            "15",
+            "cmake",
+            "--build",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native-mtoon-hidden-c189d12/build-release",
+            "--parallel",
+            "2",
+            "--target",
+            "dome-sculpt",
+            "dome-sculpt-native-authoring-inspect",
+            "dome-sculpt-native-mtoon-physical-test",
+            "dome-sculpt-mtoon-render-test",
+            "dome-sculpt-mtoon-emission-test",
+            "dome-sculpt-mtoon-visibility-test",
+            "dome-sculpt-source-paint-mtoon-test",
+            "dome-sculpt-source-paint-physical-authoring-test",
+            "dome-sculpt-native-retained-physical-test",
+            "dome-sculpt-physical-before-uv-test",
+            "dome-sculpt-scene-file-test"
+          ]
+        ],
+        "drift": []
+      }
+    },
+    "artifacts/native-mtoon-coherent/sanitize-build-status.json": {
+      "sha256": "2632a86f94eb3166c693b194bdebf823dcbcba0fa915ecd7ed2cafa1be49775b",
+      "result": {
+        "exit": 0,
+        "seconds": 905.7603432380129,
+        "commands": [
+          [
+            "cmake",
+            "-S",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native-mtoon-hidden-c189d12",
+            "-B",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native-mtoon-hidden-c189d12/build-sanitize",
+            "-DCMAKE_BUILD_TYPE=Release",
+            "-DDOME_COMPUTE_BACKEND=CPU",
+            "-DFLTK_DIR=/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-sanitize/share/fltk",
+            "-DBUILD_TESTING=ON",
+            "-DDOME_BUILD_UI=ON",
+            "-DDOME_BUILD_XR=ON",
+            "-DCMAKE_C_FLAGS_RELEASE=-O1 -g1 -DNDEBUG -fsanitize=address,undefined -fno-omit-frame-pointer",
+            "-DCMAKE_CXX_FLAGS_RELEASE=-O1 -g1 -DNDEBUG -fsanitize=address,undefined -fno-omit-frame-pointer",
+            "-DCMAKE_EXE_LINKER_FLAGS=-fsanitize=address,undefined"
+          ],
+          [
+            "nice",
+            "-n",
+            "15",
+            "cmake",
+            "--build",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native-mtoon-hidden-c189d12/build-sanitize",
+            "--parallel",
+            "2",
+            "--target",
+            "dome-sculpt",
+            "dome-sculpt-native-authoring-inspect",
+            "dome-sculpt-native-mtoon-physical-test",
+            "dome-sculpt-mtoon-render-test",
+            "dome-sculpt-mtoon-emission-test",
+            "dome-sculpt-mtoon-visibility-test",
+            "dome-sculpt-source-paint-mtoon-test",
+            "dome-sculpt-source-paint-physical-authoring-test",
+            "dome-sculpt-native-retained-physical-test",
+            "dome-sculpt-physical-before-uv-test",
+            "dome-sculpt-scene-file-test"
+          ]
+        ],
+        "drift": []
+      }
+    },
+    "artifacts/native-mtoon-coherent/release-initial-status.json": {
+      "sha256": "cc0783463a199441aa378c3a4a1d6bd9da94e6beee2fa5af15a5f89d3844af86",
+      "result": {
+        "exit": 0,
+        "seconds": 183.76122121402295,
+        "command": [
+          "ctest",
+          "--test-dir",
+          "/home/blux/de-xr/dome-sculpt/artifacts/native-mtoon-hidden-c189d12/build-release",
+          "-R",
+          "^(scene-file|source-paint-mtoon|source-paint-physical-authoring|mtoon-render|mtoon-emission|mtoon-visibility|native-retained-physical|physical-before-uv|native-mtoon-physical)$",
+          "--output-on-failure",
+          "-j",
+          "1"
+        ],
+        "inputs": 1671,
+        "drift": []
+      }
+    },
+    "artifacts/native-mtoon-coherent/sanitize-initial-status.json": {
+      "sha256": "f85d877fc95456a71880562cc86bd65515df2728653c3e41add48722643de577",
+      "result": {
+        "exit": 0,
+        "seconds": 486.22100870800205,
+        "command": [
+          "ctest",
+          "--test-dir",
+          "/home/blux/de-xr/dome-sculpt/artifacts/native-mtoon-hidden-c189d12/build-sanitize",
+          "-R",
+          "^(scene-file|source-paint-mtoon|source-paint-physical-authoring|mtoon-render|mtoon-emission|mtoon-visibility|native-retained-physical|physical-before-uv|native-mtoon-physical)$",
+          "--output-on-failure",
+          "-j",
+          "1"
+        ],
+        "inputs": 1671,
+        "drift": []
+      }
+    },
+    "artifacts/native-mtoon-gui/release-status.json": {
+      "sha256": "1001684b39041a52be1bdbdb04273a253aac6dc9c29fe0e05b364c87575ed281",
+      "result": {
+        "exit": 0,
+        "rows": [
+          {
+            "profile": "release",
+            "compact": "0",
+            "exit": 0,
+            "seconds": 47.03138903598301,
+            "output": "/home/blux/de-xr/dome-sculpt/artifacts/native-mtoon-hidden-c189d12/artifacts/native-mtoon-gui/release-retained-normal"
+          }
+        ],
+        "inputs": 1671,
+        "drift": []
+      }
+    },
+    "artifacts/native-mtoon-gui/sanitize-status.json": {
+      "sha256": "9f6a8e19c37d1c48d885b9e04b1533d24a70fe7a11ec86dd592852fa503d65f9",
+      "result": {
+        "exit": 0,
+        "rows": [
+          {
+            "profile": "sanitize",
+            "compact": "1",
+            "exit": 0,
+            "seconds": 84.55006366100861,
+            "output": "/home/blux/de-xr/dome-sculpt/artifacts/native-mtoon-hidden-c189d12/artifacts/native-mtoon-gui/sanitize-retained-compact"
+          }
+        ],
+        "inputs": 1682,
+        "drift": []
+      }
+    },
+    "artifacts/hidden-preview-contracts/release-runtime-status.json": {
+      "sha256": "64154176877eba2c8b9affc9f66f6bd7cf73487675eea36d8d0a352a3f089798",
+      "result": {
+        "exit": 0,
+        "seconds": 0.17233500099973753,
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/native-mtoon-hidden-c189d12/artifacts/hidden-preview-contracts/release-functional"
+        ],
+        "inputs": 1661,
+        "drift": []
+      }
+    },
+    "artifacts/hidden-preview-contracts/sanitize-runtime-status.json": {
+      "sha256": "d58914e1daa457cb2fa2c08caf9a7ba1a498d75093e174e195a98cabba2d2a35",
+      "result": {
+        "exit": 0,
+        "seconds": 2.550462234998122,
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/native-mtoon-hidden-c189d12/artifacts/hidden-preview-contracts/sanitize-functional"
+        ],
+        "inputs": 1661,
+        "drift": []
+      }
+    },
+    "artifacts/hidden-preview-registered/status.json": {
+      "sha256": "cd3bc2fb5e18e4d9bd075ccad1b01bbc8cc78edfbe701c296db1ca30ed444975",
+      "result": {
+        "exit": 0,
+        "rows": [
+          {
+            "profile": "release",
+            "stage": "configure",
+            "exit": 0,
+            "seconds": 1.4207609129953198,
+            "command": [
+              "cmake",
+              "-S",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native-mtoon-hidden-c189d12",
+              "-B",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native-mtoon-hidden-c189d12/build-release"
+            ]
+          },
+          {
+            "profile": "release",
+            "stage": "build",
+            "exit": 0,
+            "seconds": 19.18263251002645,
+            "command": [
+              "nice",
+              "-n",
+              "15",
+              "cmake",
+              "--build",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native-mtoon-hidden-c189d12/build-release",
+              "--parallel",
+              "2",
+              "--target",
+              "dome-sculpt-native-mtoon-preview-contracts-test",
+              "dome-sculpt-native-mtoon-physical-test"
+            ]
+          },
+          {
+            "profile": "release",
+            "stage": "test",
+            "exit": 0,
+            "seconds": 19.86280344100669,
+            "command": [
+              "ctest",
+              "--test-dir",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native-mtoon-hidden-c189d12/build-release",
+              "-R",
+              "^native-mtoon-(physical|preview-contracts)$",
+              "--output-on-failure",
+              "-j",
+              "1"
+            ]
+          },
+          {
+            "profile": "sanitize",
+            "stage": "configure",
+            "exit": 0,
+            "seconds": 1.540841331006959,
+            "command": [
+              "cmake",
+              "-S",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native-mtoon-hidden-c189d12",
+              "-B",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native-mtoon-hidden-c189d12/build-sanitize"
+            ]
+          },
+          {
+            "profile": "sanitize",
+            "stage": "build",
+            "exit": 0,
+            "seconds": 29.962428667000495,
+            "command": [
+              "nice",
+              "-n",
+              "15",
+              "cmake",
+              "--build",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native-mtoon-hidden-c189d12/build-sanitize",
+              "--parallel",
+              "2",
+              "--target",
+              "dome-sculpt-native-mtoon-preview-contracts-test",
+              "dome-sculpt-native-mtoon-physical-test"
+            ]
+          },
+          {
+            "profile": "sanitize",
+            "stage": "test",
+            "exit": 0,
+            "seconds": 30.169895537022967,
+            "command": [
+              "ctest",
+              "--test-dir",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native-mtoon-hidden-c189d12/build-sanitize",
+              "-R",
+              "^native-mtoon-(physical|preview-contracts)$",
+              "--output-on-failure",
+              "-j",
+              "1"
+            ]
+          }
+        ],
+        "inputs": 1650,
+        "source_drift": [],
+        "stable_product_drift": []
+      }
+    },
+    "artifacts/hidden-fix-arc/status.json": {
+      "sha256": "d1939bcd7aaf8270cd78a8e01422f66c8b8c003a35895ff3bf13b6ec3e5e5dde",
+      "result": {
+        "exit": 0,
+        "rows": [
+          {
+            "mode": "arc",
+            "test": "native-mtoon-physical",
+            "exit": 0,
+            "expected_exit": 0,
+            "gpu": [
+              "GPU Intel / Mesa Intel(R) Arc(tm) A770 Graphics (DG2)"
+            ],
+            "passed": true,
+            "seconds": 5.365474831953179,
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/native-mtoon-hidden-c189d12/build-release/dome-sculpt-native-mtoon-physical-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native-mtoon-hidden-c189d12/artifacts/hidden-fix-arc/arc-native-mtoon-physical",
+              "--hardware"
+            ],
+            "device_env": {
+              "DRI_PRIME": "pci-0000_03_00_0",
+              "LIBGL_ALWAYS_SOFTWARE": null,
+              "GALLIUM_DRIVER": null,
+              "MESA_SHADER_CACHE_DIR": "/home/blux/de-xr/dome-sculpt/artifacts/native-mtoon-hidden-c189d12/artifacts/hidden-fix-arc/arc-mesa-default-cache"
+            }
+          },
+          {
+            "mode": "arc",
+            "test": "native-retained-physical",
+            "exit": 0,
+            "expected_exit": 0,
+            "gpu": [
+              "GPU Intel / Mesa Intel(R) Arc(tm) A770 Graphics (DG2)"
+            ],
+            "passed": true,
+            "seconds": 7.544606890995055,
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/native-mtoon-hidden-c189d12/build-release/dome-sculpt-native-retained-physical-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native-mtoon-hidden-c189d12/artifacts/hidden-fix-arc/arc-native-retained-physical",
+              "--hardware"
+            ],
+            "device_env": {
+              "DRI_PRIME": "pci-0000_03_00_0",
+              "LIBGL_ALWAYS_SOFTWARE": null,
+              "GALLIUM_DRIVER": null,
+              "MESA_SHADER_CACHE_DIR": "/home/blux/de-xr/dome-sculpt/artifacts/native-mtoon-hidden-c189d12/artifacts/hidden-fix-arc/arc-mesa-default-cache"
+            }
+          },
+          {
+            "mode": "arc",
+            "test": "physical-before-uv",
+            "exit": 0,
+            "expected_exit": 0,
+            "gpu": [
+              "GPU Intel / Mesa Intel(R) Arc(tm) A770 Graphics (DG2)"
+            ],
+            "passed": true,
+            "seconds": 2.4074122589663602,
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/native-mtoon-hidden-c189d12/build-release/dome-sculpt-physical-before-uv-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native-mtoon-hidden-c189d12/artifacts/hidden-fix-arc/arc-physical-before-uv",
+              "--hardware"
+            ],
+            "device_env": {
+              "DRI_PRIME": "pci-0000_03_00_0",
+              "LIBGL_ALWAYS_SOFTWARE": null,
+              "GALLIUM_DRIVER": null,
+              "MESA_SHADER_CACHE_DIR": "/home/blux/de-xr/dome-sculpt/artifacts/native-mtoon-hidden-c189d12/artifacts/hidden-fix-arc/arc-mesa-default-cache"
+            }
+          },
+          {
+            "mode": "software",
+            "test": "native-mtoon-physical",
+            "exit": 1,
+            "expected_exit": 1,
+            "gpu": [
+              "GPU Mesa / llvmpipe (LLVM 22.1.8, 256 bits)"
+            ],
+            "passed": true,
+            "seconds": 0.07486429600976408,
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/native-mtoon-hidden-c189d12/build-release/dome-sculpt-native-mtoon-physical-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native-mtoon-hidden-c189d12/artifacts/hidden-fix-arc/software-native-mtoon-physical",
+              "--hardware"
+            ],
+            "device_env": {
+              "DRI_PRIME": null,
+              "LIBGL_ALWAYS_SOFTWARE": "1",
+              "GALLIUM_DRIVER": "llvmpipe",
+              "MESA_SHADER_CACHE_DIR": "/home/blux/de-xr/dome-sculpt/artifacts/native-mtoon-hidden-c189d12/artifacts/hidden-fix-arc/software-mesa-default-cache"
+            }
+          },
+          {
+            "mode": "software",
+            "test": "native-retained-physical",
+            "exit": 1,
+            "expected_exit": 1,
+            "gpu": [
+              "GPU Mesa / llvmpipe (LLVM 22.1.8, 256 bits)"
+            ],
+            "passed": true,
+            "seconds": 0.03630844602594152,
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/native-mtoon-hidden-c189d12/build-release/dome-sculpt-native-retained-physical-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native-mtoon-hidden-c189d12/artifacts/hidden-fix-arc/software-native-retained-physical",
+              "--hardware"
+            ],
+            "device_env": {
+              "DRI_PRIME": null,
+              "LIBGL_ALWAYS_SOFTWARE": "1",
+              "GALLIUM_DRIVER": "llvmpipe",
+              "MESA_SHADER_CACHE_DIR": "/home/blux/de-xr/dome-sculpt/artifacts/native-mtoon-hidden-c189d12/artifacts/hidden-fix-arc/software-mesa-default-cache"
+            }
+          },
+          {
+            "mode": "software",
+            "test": "physical-before-uv",
+            "exit": 1,
+            "expected_exit": 1,
+            "gpu": [
+              "GPU Mesa / llvmpipe (LLVM 22.1.8, 256 bits)"
+            ],
+            "passed": true,
+            "seconds": 0.09974246600177139,
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/native-mtoon-hidden-c189d12/build-release/dome-sculpt-physical-before-uv-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native-mtoon-hidden-c189d12/artifacts/hidden-fix-arc/software-physical-before-uv",
+              "--hardware"
+            ],
+            "device_env": {
+              "DRI_PRIME": null,
+              "LIBGL_ALWAYS_SOFTWARE": "1",
+              "GALLIUM_DRIVER": "llvmpipe",
+              "MESA_SHADER_CACHE_DIR": "/home/blux/de-xr/dome-sculpt/artifacts/native-mtoon-hidden-c189d12/artifacts/hidden-fix-arc/software-mesa-default-cache"
+            }
+          },
+          {
+            "mode": "uhd",
+            "test": "native-mtoon-physical",
+            "exit": 1,
+            "expected_exit": 1,
+            "gpu": [
+              "GPU Intel / Mesa Intel(R) UHD Graphics 770 (ADL-S GT1)"
+            ],
+            "passed": true,
+            "seconds": 0.0332578900270164,
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/native-mtoon-hidden-c189d12/build-release/dome-sculpt-native-mtoon-physical-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native-mtoon-hidden-c189d12/artifacts/hidden-fix-arc/uhd-native-mtoon-physical",
+              "--hardware"
+            ],
+            "device_env": {
+              "DRI_PRIME": "pci-0000_00_02_0",
+              "LIBGL_ALWAYS_SOFTWARE": null,
+              "GALLIUM_DRIVER": null,
+              "MESA_SHADER_CACHE_DIR": "/home/blux/de-xr/dome-sculpt/artifacts/native-mtoon-hidden-c189d12/artifacts/hidden-fix-arc/uhd-mesa-default-cache"
+            }
+          },
+          {
+            "mode": "uhd",
+            "test": "native-retained-physical",
+            "exit": 1,
+            "expected_exit": 1,
+            "gpu": [
+              "GPU Intel / Mesa Intel(R) UHD Graphics 770 (ADL-S GT1)"
+            ],
+            "passed": true,
+            "seconds": 0.04991013900144026,
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/native-mtoon-hidden-c189d12/build-release/dome-sculpt-native-retained-physical-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native-mtoon-hidden-c189d12/artifacts/hidden-fix-arc/uhd-native-retained-physical",
+              "--hardware"
+            ],
+            "device_env": {
+              "DRI_PRIME": "pci-0000_00_02_0",
+              "LIBGL_ALWAYS_SOFTWARE": null,
+              "GALLIUM_DRIVER": null,
+              "MESA_SHADER_CACHE_DIR": "/home/blux/de-xr/dome-sculpt/artifacts/native-mtoon-hidden-c189d12/artifacts/hidden-fix-arc/uhd-mesa-default-cache"
+            }
+          },
+          {
+            "mode": "uhd",
+            "test": "physical-before-uv",
+            "exit": 1,
+            "expected_exit": 1,
+            "gpu": [
+              "GPU Intel / Mesa Intel(R) UHD Graphics 770 (ADL-S GT1)"
+            ],
+            "passed": true,
+            "seconds": 0.08905574399977922,
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/native-mtoon-hidden-c189d12/build-release/dome-sculpt-physical-before-uv-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native-mtoon-hidden-c189d12/artifacts/hidden-fix-arc/uhd-physical-before-uv",
+              "--hardware"
+            ],
+            "device_env": {
+              "DRI_PRIME": "pci-0000_00_02_0",
+              "LIBGL_ALWAYS_SOFTWARE": null,
+              "GALLIUM_DRIVER": null,
+              "MESA_SHADER_CACHE_DIR": "/home/blux/de-xr/dome-sculpt/artifacts/native-mtoon-hidden-c189d12/artifacts/hidden-fix-arc/uhd-mesa-default-cache"
+            }
+          }
+        ],
+        "inputs": 1671,
+        "drift": []
+      }
+    },
+    "artifacts/hidden-fix-compatibility/status.json": {
+      "sha256": "105e76006e3137162455565fb785979c341949509782498c7b38929a96b38280",
+      "result": {
+        "shader_pairs": [
+          {
+            "old": "/home/blux/de-xr/dome-sculpt/artifacts/native-mtoon-float-721282a/artifacts/native-mtoon-oracle/outputs/shaders/1.vert",
+            "new": "/home/blux/de-xr/dome-sculpt/artifacts/native-mtoon-hidden-c189d12/build-release/native-mtoon-physical/shaders/1.vert",
+            "old_sha": "9807688b52f3bc3b9c44748a5dfb9d2dcb903a1f358e428be02bcb5af2c6c9f2",
+            "new_sha": "9807688b52f3bc3b9c44748a5dfb9d2dcb903a1f358e428be02bcb5af2c6c9f2",
+            "equal": true
+          },
+          {
+            "old": "/home/blux/de-xr/dome-sculpt/artifacts/native-mtoon-float-721282a/artifacts/native-mtoon-oracle/outputs/shaders/2.frag",
+            "new": "/home/blux/de-xr/dome-sculpt/artifacts/native-mtoon-hidden-c189d12/build-release/native-mtoon-physical/shaders/2.frag",
+            "old_sha": "a6e46fd67c7812619616eea6f3c1a4c734af66f270c28f1f75c71dba420c9e55",
+            "new_sha": "a6e46fd67c7812619616eea6f3c1a4c734af66f270c28f1f75c71dba420c9e55",
+            "equal": true
+          },
+          {
+            "old": "/home/blux/de-xr/dome-sculpt/artifacts/native-mtoon-float-721282a/artifacts/native-mtoon-oracle/outputs/shaders/3.vert",
+            "new": "/home/blux/de-xr/dome-sculpt/artifacts/native-mtoon-hidden-c189d12/build-release/native-mtoon-physical/shaders/3.vert",
+            "old_sha": "7990dd3c69df76a6138cc55fc5013d68cba0be2f06b51e50bba27a516e92f4e7",
+            "new_sha": "7990dd3c69df76a6138cc55fc5013d68cba0be2f06b51e50bba27a516e92f4e7",
+            "equal": true
+          },
+          {
+            "old": "/home/blux/de-xr/dome-sculpt/artifacts/native-mtoon-float-721282a/artifacts/native-mtoon-oracle/outputs/shaders/4.frag",
+            "new": "/home/blux/de-xr/dome-sculpt/artifacts/native-mtoon-hidden-c189d12/build-release/native-mtoon-physical/shaders/4.frag",
+            "old_sha": "aade15b81f754c0074a62a5b3cf9101d9ebcb2ec603a48ab952d7b948dfd1e3d",
+            "new_sha": "aade15b81f754c0074a62a5b3cf9101d9ebcb2ec603a48ab952d7b948dfd1e3d",
+            "equal": true
+          },
+          {
+            "old": "/home/blux/de-xr/dome-sculpt/artifacts/native-mtoon-float-721282a/artifacts/native-mtoon-oracle/outputs/shaders/5.vert",
+            "new": "/home/blux/de-xr/dome-sculpt/artifacts/native-mtoon-hidden-c189d12/build-release/native-mtoon-physical/shaders/5.vert",
+            "old_sha": "4279b6772a8cc5bb81e0cb3bea18ca247f9895759dca5124e746bc986acbba00",
+            "new_sha": "4279b6772a8cc5bb81e0cb3bea18ca247f9895759dca5124e746bc986acbba00",
+            "equal": true
+          },
+          {
+            "old": "/home/blux/de-xr/dome-sculpt/artifacts/native-mtoon-float-721282a/artifacts/native-mtoon-oracle/outputs/shaders/6.frag",
+            "new": "/home/blux/de-xr/dome-sculpt/artifacts/native-mtoon-hidden-c189d12/build-release/native-mtoon-physical/shaders/6.frag",
+            "old_sha": "069f40cca2da45f1a45adad6c0115ee48747fd4cb0146a5cc628f7f3c47f4cd4",
+            "new_sha": "069f40cca2da45f1a45adad6c0115ee48747fd4cb0146a5cc628f7f3c47f4cd4",
+            "equal": true
+          }
+        ],
+        "all_shader_sources_equal": true,
+        "product_delta_after_frozen_native_cohort": []
+      }
+    },
+    "artifacts/hidden-fix-khronos/report.json": {
+      "sha256": "d24a39f1a425d892235352c49249d7dd0e3870f276e223d3211b988f0a1e0516",
+      "version": "2.0.0-dev.3.10",
+      "maxIssues": 0,
+      "issueFilters": [],
+      "files": 48,
+      "errors": 0,
+      "warnings": 26
+    }
+  },
+  "remaining_functional_work": [
+    "Plain/no-color-preparation physical UV ownership and general alternate native/retained original-role coordinate authority.",
+    "Broader joint typed normal/pose/alpha qualification; native typed fixture is a quad, separate physicalUV9pose/normal proofs do not prove all typed deformation cases.",
+    "Typed portable HDR/MToon/VRM1 composition and genuine physical Bake/cut adapters;existing guards remain.",
+    "Full source/main semantic integration and broader regression;this isolated branch is not delivered on main."
+  ],
+  "older_full_export_sweep": {
+    "handle": 87154,
+    "tree": "../native-physical-contracts-708283b",
+    "state": "still running; not complete or replaced by preview-entry evidence",
+    "baseline": 265789,
+    "last_observed_prefix": 176500,
+    "last_observed_cpu_percent": 99.3,
+    "restart_or_termination": false
+  },
+  "no_physical_hmd_or_session_actions": true
+}

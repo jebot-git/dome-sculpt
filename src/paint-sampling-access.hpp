@@ -7,6 +7,9 @@ namespace dome {
 // must be admitted atomically before Scene24 can expose this editable result.
 std::shared_ptr<PaintedMesh> retain_paint_grid(const PaintedMesh &,Mesh,
     std::shared_ptr<const PaintSamplingDomain>,const PaintSamplingLimits & = {});
+// Borrowed target is copied only after the complete grid budget preflight.
+std::shared_ptr<PaintedMesh> retain_paint_grid_borrowed(const PaintedMesh &,const Mesh &,
+    std::shared_ptr<const PaintSamplingDomain>,const PaintSamplingLimits & = {});
 struct SourceNormalSampling;
 std::shared_ptr<PaintedMesh> adopt_retained_paint_normal(const PaintedMesh &,const SourceNormalSampling &,
     const PaintSamplingLimits & = {});

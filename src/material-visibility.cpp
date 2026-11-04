@@ -1,3 +1,4 @@
+#include "native-paint-sampling.hpp"
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/material-visibility.hpp"
 #include "dome/document.hpp"
@@ -55,7 +56,15 @@ struct Visibility {
     cull = r.material.double_sided ? MToonCull::Off : MToonCull::Back;
     alpha = r.material.alpha; cutoff = r.material.alpha_cutoff; factor = r.material.color[3];
     auto maps = r.textures;
-    if(maps&&maps->overlay){
+    if(maps&&maps->overlay&&maps->overlay->native_geometry()){
+      const auto &packet=*maps->overlay;
+      if(maps->source_only||packet.native_domain()!=(r.paint_sampling_attachment?r.paint_sampling_attachment->domain():nullptr)||
+         (r.paint_sampling_attachment&&!r.paint_sampling_attachment->matches(packet.native_geometry(),packet.native_domain())))
+        throw std::invalid_argument("Native emission visibility lost its actual independent paint attachment");
+      // Native emission does not change alpha. Colour/masks already belong to
+      // the derived RGBA field, so do not apply the full Source4 overlay twice.
+    }
+    if(maps&&maps->overlay&&!maps->overlay->native_geometry()){
       const auto &source=maps->overlay->source_maps();
       if(!maps->source_only||!source||source!=maps->source_maps||source.owner_before(maps->source_maps)||maps->source_maps.owner_before(source))
         throw std::invalid_argument("Visibility overlay lost its exact original source sampling owner");
@@ -69,13 +78,12 @@ struct Visibility {
         paint_corners.push_back(mesh.uv.at(v));
       }
     }
-    const auto paint_node=r.material_bindings&&r.material_bindings->color_preparation?r.material_bindings->color_preparation->paint_sampling:nullptr;
+    const auto paint_node=detail::material_paint_attachment(r.material_bindings.get());
     if(bool(paint_node)!=bool(r.paint_sampling_attachment))throw std::invalid_argument("Visibility paint range omitted or fabricated its own sampling attachment");
     if(r.paint_sampling_attachment) {
       if(!maps||maps->source_only||!r.material_bindings||r.material_bindings->has_mtoon)
         throw std::invalid_argument("Visibility paint domain requires its paired derived material");
-      const auto node=r.material_bindings->color_preparation?r.material_bindings->color_preparation->paint_sampling:nullptr;
-      const auto expected=node?node->geometry_attachment():nullptr;
+      const auto expected=detail::material_paint_attachment(r.material_bindings.get());
       if(!expected||expected!=r.paint_sampling_attachment||expected.owner_before(r.paint_sampling_attachment)||r.paint_sampling_attachment.owner_before(expected))
         throw std::invalid_argument("Visibility paint range differs from its own immutable material attachment");
       const auto &domain=*r.paint_sampling_attachment->domain();

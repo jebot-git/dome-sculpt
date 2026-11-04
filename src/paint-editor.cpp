@@ -8,6 +8,7 @@
 #include <FL/Fl_Double_Window.H>
 #include <FL/Fl_Scroll.H>
 #include <FL/Fl_Value_Input.H>
+#include <FL/fl_ask.H>
 namespace dome {
 void edit_paint(Document &doc) {
   auto settings = doc.frame().state->paint;
@@ -25,11 +26,11 @@ void edit_paint(Document &doc) {
   channel.add("Base color|Metallic|Roughness|Emission|Layer mask");
   channel.value(int(settings.channel));
   y += row;
-  auto field = [&](const char *name, double value) {
+  auto field = [&](const char *name, double value, double maximum=1) {
     auto input =
         new Fl_Value_Input(label, y, width - label - 40, row - 4, name);
+    input->bounds(0, maximum);
     input->value(value);
-    input->bounds(0, 1);
     input->step(.01);
     y += row;
     return input;
@@ -40,10 +41,19 @@ void edit_paint(Document &doc) {
     color[i] = field(names[i], settings.color[i]);
   auto metal = field("Metallic", settings.metallic),
        rough = field("Roughness", settings.roughness);
+  Fl_Choice units(label,y,width-label-40,row-4,"Emission units");
+  units.add("Material-relative (0..1)|Physical radiance (0..10000)");
+  units.value(settings.emission_units==PaintEmissionUnits::Physical?1:0);y+=row;
   std::array<Fl_Value_Input *, 3> emission;
   const char *glow[] = {"Emission red", "Emission green", "Emission blue"};
   for (int i = 0; i < 3; ++i)
-    emission[i] = field(glow[i], settings.emission[i]);
+    emission[i] = field(glow[i], settings.emission[i],units.value()?maximum_native_emission:1);
+  for(auto *value:emission){value->step(0);value->tooltip("Emission is linear. Physical values are absolute; material-relative values follow authored MToon strength. Original source factors remain unchanged.");}
+  struct UnitChoice {Fl_Choice *choice;std::array<Fl_Value_Input*,3> values;int selected;} unit_choice{&units,emission,units.value()};
+  units.callback([](Fl_Widget*,void *data){auto &u=*static_cast<UnitChoice*>(data);const int next=u.choice->value();double peak=0;for(auto *v:u.values)peak=std::max(peak,v->value());
+    if(!next&&peak>1){if(fl_choice("Relative emission supports 0..1. Normalize brush RGB to preserve its hue? This changes brush settings only.","Cancel","Normalize",nullptr)!=1){u.choice->value(u.selected);return;}for(auto *v:u.values)v->value(v->value()/peak);}
+    u.selected=next;for(auto *v:u.values)v->bounds(0,next?maximum_native_emission:1);
+  },&unit_choice);
   auto mask = field("Mask value", settings.mask),
        flow = field("Flow", settings.flow);
   Fl_Check_Button erase(20, y, width / 2 - 20, row, "Erase channel"),
@@ -51,6 +61,7 @@ void edit_paint(Document &doc) {
   erase.value(settings.erase);
   front.value(settings.front_only);
   y += row;
+  content.size(width-24,y+row);
   content.end();
   scroll.end();
   Fl_Button cancel(width / 2 - 150, height - 2 * row + 8, 140, row, "Cancel"),
@@ -78,6 +89,7 @@ void edit_paint(Document &doc) {
   if (!result.accepted)
     return;
   settings.channel = PaintChannel(channel.value());
+  settings.emission_units=units.value()?PaintEmissionUnits::Physical:PaintEmissionUnits::MaterialRelative;
   for (int i = 0; i < 4; ++i)
     settings.color[i] = color[i]->value();
   settings.metallic = metal->value();

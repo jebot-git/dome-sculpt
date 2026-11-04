@@ -26,6 +26,8 @@ ObjectBakeReport bake_object(Scene &scene, uint64_t source_id,
   scene.validate();
   auto target = scene.active();
   auto source = scene.object(source_id);
+  if(target.material_bindings&&target.material_bindings->native_paint_sampling)throw std::logic_error("Retained native paint target requires its sampling-aware Bake adapter");
+  if(source.material_bindings&&source.material_bindings->native_paint_sampling)throw std::logic_error("Retained native paint source requires its sampling-aware Bake adapter");
   if(target.material_bindings&&target.material_bindings->normal_preparation&&target.material_bindings->normal_preparation->canonical_conversion){
     NormalPreparationOptions normal_options;normal_options.cancelled=cancelled;normal_options.max_angular_error=settings.normal_error;
     auto layered=convert_canonical_normals({target.painted,target.appearance,target.material_bindings,target.deformation,target.material,{}},normal_options);

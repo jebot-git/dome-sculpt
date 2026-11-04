@@ -9,6 +9,7 @@
 #include <cstdio>
 #include <bit>
 #include "palette-text.hpp"
+#include "emission-control-scale.hpp"
 namespace dome {
 namespace {
 GLuint shader(GLenum kind, const char *text) {
@@ -191,9 +192,11 @@ void SpatialPalette::raster(const EditorState &s) {
            v.solving || v.committing || !v.topology ? Color{140, 140, 140, 255} : fg);
     }
     rect(8*unit_,249*unit_,94*unit_,42*unit_,v.retain_normal_sampling?accent:(s.light?Color{200,209,220,uint8_t(s.opacity)}:Color{55,65,80,uint8_t(s.opacity)}));
-    text(55*unit_,278*unit_,v.paint_sampling_available?"Keep both":"Keep detail",v.retain_paint_sampling||!v.normal_sampling_available||v.normal_sampling_required||v.solving||v.committing||v.validating||!v.topology?Color{140,140,140,255}:fg);
+    text(55*unit_,278*unit_,v.paint_sampling_available&&v.normal_sampling_available?"Keep both":"Keep detail",v.retain_paint_sampling||!v.normal_sampling_available||v.normal_sampling_required||v.solving||v.committing||v.validating||!v.topology?Color{140,140,140,255}:fg);
     rect(8*unit_,301*unit_,94*unit_,42*unit_,v.retain_paint_sampling?accent:(s.light?Color{200,209,220,uint8_t(s.opacity)}:Color{55,65,80,uint8_t(s.opacity)}));
     text(55*unit_,330*unit_,"Keep paint",!v.paint_sampling_available||v.paint_sampling_required||v.solving||v.committing||v.validating||!v.topology?Color{140,140,140,255}:fg);
+    rect(8*unit_,353*unit_,94*unit_,42*unit_,s.light?Color{200,209,220,uint8_t(s.opacity)}:Color{55,65,80,uint8_t(s.opacity)});
+    text(55*unit_,382*unit_,"Restore",!v.can_restore_paint_source||v.solving||v.committing||v.validating||!v.topology?Color{140,140,140,255}:fg);
     rect(110 * unit_, 110 * unit_, 420 * unit_, 420 * unit_,
          s.light ? Color{208, 208, 208, uint8_t(s.opacity)}
                  : Color{48, 48, 48, uint8_t(s.opacity)});
@@ -273,9 +276,17 @@ void SpatialPalette::raster(const EditorState &s) {
   if (s.controls.parameter != VrParameter::None) {
     auto &c = s.controls;
     text(320 * unit_, 80 * unit_, c.title, fg);
+    if(c.parameter==VrParameter::EmissionSource){
+      if(c.title=="Retained original emission"){
+        char values[128];std::snprintf(values,sizeof(values),"Original RGB factor: %.6g  %.6g  %.6g",double(c.value[0]),double(c.value[1]),double(c.value[2]));text(320*unit_,240*unit_,values,fg);
+        std::snprintf(values,sizeof(values),"Original emissive strength: %.6g",double(c.value[3]));text(320*unit_,300*unit_,values,fg);
+        text(320*unit_,370*unit_,"Factor x strength defines native source radiance",fg);
+      }else text(320*unit_,280*unit_,"This current material has no associated raw source",fg);
+      text(320*unit_,430*unit_,"Read only: original values are never rewritten here",fg);
+    }
     auto normalized = [&](float v) {
       return std::clamp(
-          c.logarithmic
+          detail::emission_control_scale(c)?detail::emission_control_fraction(v,c.maximum):c.logarithmic
               ? (c.parameter==VrParameter::BakeDistances ? float(bake_distance_to_unit(v)) : std::log(v / c.minimum) / std::log(c.maximum / c.minimum))
               : (v - c.minimum) / std::max(1e-8f, c.maximum - c.minimum),
           0.f, 1.f);
@@ -299,7 +310,9 @@ void SpatialPalette::raster(const EditorState &s) {
       else if(c.parameter==VrParameter::CutDirection)label=row==0?"Yaw ":"Pitch ";
       else if (c.components > 1)
         label = std::string(1, (c.parameter == VrParameter::RigRotation ? "XYZ" : "RGBA")[row]) + " ";
-      if(c.parameter==VrParameter::ProceduralPattern)label=value<.5f?"Raised panels":value<1.5f?"Recessed cuts":"Mixed detail";
+      if(c.parameter==VrParameter::InkEmissionUnits)label=value<.5f?"Relative: normalize RGB above 1":"Physical: absolute linear radiance";
+      else if(c.parameter==VrParameter::InkEmission||c.parameter==VrParameter::MaterialEmission){char text[80];std::snprintf(text,sizeof(text),"%c %.7g%s","RGB"[row],double(value),c.maximum>1?" linear":" relative");label=text;}
+      else if(c.parameter==VrParameter::ProceduralPattern)label=value<.5f?"Raised panels":value<1.5f?"Recessed cuts":"Mixed detail";
       else if(c.parameter==VrParameter::ProceduralFace){const char *faces[]={"+X","-X","+Y","-Y","+Z","-Z"};label=std::string("Local face ")+faces[std::clamp(int(std::lround(value)),0,5)];}
       else if(c.parameter==VrParameter::ProceduralGrid)label=std::string(row==0?"Rows ":"Columns ")+std::to_string(int(std::lround(value)));
       else if(c.parameter==VrParameter::ProceduralCoverage)label=std::string(row==0?"Density ":row==1?"Gap ":"Rounding ")+std::to_string(int(std::lround(value*(row==1?90:100))))+"%";
@@ -368,14 +381,15 @@ void SpatialPalette::raster(const EditorState &s) {
       for (int y = 240 + offset; y < 360; y += 16)
         rect(563 * unit_, y * unit_, 30 * unit_, 3 * unit_, fg);
       rect(556 * unit_, 296 * unit_, 44 * unit_, 8 * unit_, accent);
-    } else if (c.parameter != VrParameter::RigRotation && c.parameter!=VrParameter::BakeSource && c.parameter!=VrParameter::CutDirection && c.parameter!=VrParameter::CutOffset && c.parameter!=VrParameter::BakeDistances && c.parameter!=VrParameter::BakeQuality && c.parameter!=VrParameter::BakeProjection && c.parameter!=VrParameter::BakeColors && !skin_parameter(c.parameter) && !sculpt_parameter(c.parameter) && !procedural_parameter(c.parameter) && c.parameter!=VrParameter::SculptResolution && c.parameter!=VrParameter::ImportUnitScale && c.parameter!=VrParameter::ShapeMirror) {
+    } else if (c.parameter!=VrParameter::EmissionSource && c.parameter != VrParameter::RigRotation && c.parameter!=VrParameter::BakeSource && c.parameter!=VrParameter::CutDirection && c.parameter!=VrParameter::CutOffset && c.parameter!=VrParameter::BakeDistances && c.parameter!=VrParameter::BakeQuality && c.parameter!=VrParameter::BakeProjection && c.parameter!=VrParameter::BakeColors && !skin_parameter(c.parameter) && !sculpt_parameter(c.parameter) && !procedural_parameter(c.parameter) && c.parameter!=VrParameter::SculptResolution && c.parameter!=VrParameter::ImportUnitScale && c.parameter!=VrParameter::ShapeMirror) {
+      const float peak=detail::emission_control_scale(c)?std::max({1.f,c.value[0],c.value[1],c.value[2]}):1.f;
       Color swatch{
-          uint8_t(std::clamp(linear_to_srgb(c.value[0]), 0.f, 1.f) * 255),
-          uint8_t(std::clamp(linear_to_srgb(c.value[1]), 0.f, 1.f) * 255),
-          uint8_t(std::clamp(linear_to_srgb(c.value[2]), 0.f, 1.f) * 255), 255};
+          uint8_t(std::clamp(linear_to_srgb(c.value[0]/peak), 0.f, 1.f) * 255),
+          uint8_t(std::clamp(linear_to_srgb(c.value[1]/peak), 0.f, 1.f) * 255),
+          uint8_t(std::clamp(linear_to_srgb(c.value[2]/peak), 0.f, 1.f) * 255), 255};
       rect(280 * unit_, 470 * unit_, 80 * unit_, 40 * unit_, swatch);
     }
-    text(320 * unit_, 530 * unit_, "Aim + trigger: drag slider", fg);
+    text(320 * unit_, 530 * unit_,c.parameter==VrParameter::EmissionSource?"Done or Cancel returns without changes":detail::emission_control_scale(c)?"Radiance slider; swatch shows normalized color":"Aim + trigger: drag slider", fg);
     if(c.parameter==VrParameter::BakeSource){
       const auto disabled=s.light?Color{200,209,220,uint8_t(s.opacity)}:Color{55,65,80,uint8_t(s.opacity)};
       rect(160*unit_,410*unit_,320*unit_,44*unit_,s.bake_recipe?accent:disabled);
@@ -385,7 +399,7 @@ void SpatialPalette::raster(const EditorState &s) {
       if(s.can_convert_bake)text(320*unit_,380*unit_,"New shading model / source retained",fg);
     }
     text(320 * unit_, 560 * unit_,
-         c.components == 1 ? "Stick: slide / Vertical: fine wheel"
+         c.parameter==VrParameter::EmissionSource?"Source factor and strength stay exact":c.components == 1 ? "Stick: slide / Vertical: fine wheel"
                            : "Up/down: row / Left/right: value",
          fg);
     rect(60 * unit_, 588 * unit_, 220 * unit_, 42 * unit_,
@@ -444,6 +458,9 @@ void SpatialPalette::raster(const EditorState &s) {
       if (sector == 10)
         return !current->material.toon;
     }
+    if(s.menu_page==30 && sector==4)return s.paint.emission_units==PaintEmissionUnits::MaterialRelative;
+    if(s.menu_page==30 && sector==5)return s.paint.emission_units==PaintEmissionUnits::Physical;
+    if(s.menu_page==30 && sector==7)return s.paint.channel==PaintChannel::Emission;
     if (s.menu_page == 3) {
       if (sector == 1)
         return !s.mesh_active;
@@ -522,7 +539,7 @@ void SpatialPalette::raster(const EditorState &s) {
     text(320*unit_,295*unit_,view.settings?rig_fit_parameter_text(view):rig_fit_selection_label(view),fg);
     text(320*unit_,320*unit_,view.rest_source?std::to_string(view.bone_heads.size())+" original bones":rig_fit_selection_point(view)?std::to_string(view.landmarks.points.size())+" landmarks placed":"Not placed",fg);
   }
-  const char *page = s.menu_page==28 ? "Export / editable project" : s.menu_page==27 ? "Humanoid rig fitting" : s.menu_page==25 ? "Image projection" : s.menu_page==24 ? "Shapekey tools" : s.menu_page==22 ? "Polygon topology" : s.menu_page==19 ? "Polygon edit" : s.menu_page == 23 ? "Import options" : s.menu_page == 21 ? "Import model" : s.menu_page == 20 ? "Holding / isolation" : s.menu_page == 18 ? "Procedural sculpt" : s.menu_page == 17 ? "Plane cut" : s.menu_page == 16 ? "Retopology" : s.menu_page == 15 ? "Masks / symmetry" : s.menu_page == 14 ? "Bind / transfer skin"
+  const char *page = s.menu_page==30 ? "Emission / HDR" : s.menu_page==28 ? "Export / editable project" : s.menu_page==27 ? "Humanoid rig fitting" : s.menu_page==25 ? "Image projection" : s.menu_page==24 ? "Shapekey tools" : s.menu_page==22 ? "Polygon topology" : s.menu_page==19 ? "Polygon edit" : s.menu_page == 23 ? "Import options" : s.menu_page == 21 ? "Import model" : s.menu_page == 20 ? "Holding / isolation" : s.menu_page == 18 ? "Procedural sculpt" : s.menu_page == 17 ? "Plane cut" : s.menu_page == 16 ? "Retopology" : s.menu_page == 15 ? "Masks / symmetry" : s.menu_page == 14 ? "Bind / transfer skin"
                      : s.menu_page == 13 ? "Skin weights"
                      : s.menu_page == 12 ? "Mesh baking"
                      : s.menu_page == 11 ? "Rig and shapekeys"
@@ -655,6 +672,8 @@ void SpatialPalette::draw(const EditorState &s, const Mat4 &vp) {
       std::to_string(s.sculpt_layer_visible) +
       std::to_string(s.sculpt_layer_locked) + std::to_string(s.layer_visible) +
       std::to_string(int(s.paint.channel)) + std::to_string(s.paint.erase);
+  signature+=":emission-units:"+std::to_string(int(s.paint.emission_units));
+  signature+=":control-domain:"+std::to_string(s.controls.minimum)+":"+std::to_string(s.controls.maximum)+":"+std::to_string(s.controls.components)+":"+std::to_string(s.controls.logarithmic);
   signature+=":selection:"+std::to_string(s.can_select_objects)+":"+std::to_string(s.selection_mode)+":"+std::to_string(s.selection_focus)+":"+std::to_string(s.menu)+":"+std::to_string(s.hierarchy_open)+":"+std::to_string(s.hierarchy_offset)+":"+std::to_string(s.hierarchy_hover[0])+":"+std::to_string(s.hierarchy_hover[1]);
   for(const auto &row:s.hierarchy)signature+=":"+std::to_string(row.id)+":"+std::to_string(row.group)+":"+std::to_string(row.depth)+":"+std::to_string(row.expanded)+":"+std::to_string(row.selected)+":"+std::to_string(row.partial)+":"+std::to_string(row.active)+":"+std::to_string(row.visible)+":"+std::to_string(row.locked)+":"+std::to_string(row.name.size())+":"+row.name;
   signature+=":polygon:"+std::to_string(s.polygon_requires_conversion)+":"+std::to_string(s.polygon_has_source)+":"+std::to_string(s.polygon_controls.move_mode)+":"+std::to_string(s.polygon_controls.additive)+":"+std::to_string(s.polygon_controls.distance_mm)+":"+std::to_string(s.polygon_controls.cuts);

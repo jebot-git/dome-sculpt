@@ -271,6 +271,9 @@ public:
   void focus_selection(bool);
   void object_properties(uint64_t, std::string, bool visible, bool locked,
                          CanvasTransform, Material, AssetSource expected = {});
+  void object_properties(uint64_t, std::string, bool visible, bool locked,
+                         CanvasTransform, Material, AssetSource,
+                         std::optional<std::array<float,3>> active_emission_override);
   bool object_editable(uint64_t) const;
   void configure_object_grab(bool mode, bool isolate);
   void hold_object(uint64_t);
@@ -600,6 +603,7 @@ private:
   bool uv_retention_requested_locked() const;
   bool uv_paint_retention_requested_locked() const;
   bool uv_paint_retention_available_locked() const;
+  void restore_uv_source_locked();
   bool uv_retention_changes_locked() const;
   void uv_loop();
   void queue_uv_operation_locked(UvAction);
@@ -841,7 +845,7 @@ private:
                                     std::shared_ptr<std::string>, std::shared_ptr<AssetWork> = {}, std::shared_ptr<bool> = {},
                                     std::shared_ptr<const MeshSnapshot> = {}, uint64_t retopo_session = 0,
                                     uint64_t cut_session = 0, std::shared_ptr<CutHandoff> = {},
-                                    std::optional<BakeAdmission> = {});
+                                    std::optional<BakeAdmission> = {}, uint64_t uv_restore_session = 0);
   std::vector<uint64_t> bake_sources_locked() const;
   bool bake_source_eligible_locked(uint64_t) const;
   std::vector<uint64_t> bake_cages_locked() const;
