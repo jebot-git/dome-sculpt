@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-#define main detached_kernel_fault_fixture
+#define DOME_CANONICAL_CONVERSION_FAULT_HELPERS_ONLY
 #include "canonical-normal-conversion-faults.cpp"
-#undef main
+#undef DOME_CANONICAL_CONVERSION_FAULT_HELPERS_ONLY
 #include "canonical-normal-owner.hpp"
 
 int main()try{

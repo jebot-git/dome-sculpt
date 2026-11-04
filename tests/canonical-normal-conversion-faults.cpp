@@ -16,6 +16,7 @@ void *operator new(size_t n,std::align_val_t a){conversion_fault::visit();void*p
 void *operator new[](size_t n,std::align_val_t a){return ::operator new(n,a);}
 void operator delete(void*p,std::align_val_t)noexcept{std::free(p);}void operator delete[](void*p,std::align_val_t)noexcept{std::free(p);}
 void operator delete(void*p,size_t,std::align_val_t)noexcept{std::free(p);}void operator delete[](void*p,size_t,std::align_val_t)noexcept{std::free(p);}
+#ifndef DOME_CANONICAL_CONVERSION_FAULT_HELPERS_ONLY
 int main()try{
  auto scene=baked_fan(true,true,true);const auto exact=scene.encode();const auto paint=scene.active().painted;const auto deformation=scene.active().deformation;
  ColorPreparationInput input{paint,scene.active().appearance,scene.active().material_bindings,deformation,scene.active().material};
@@ -37,3 +38,4 @@ int main()try{
  require_cage(signature(produce())==expected,"Every measured cancellation endpoint retries to exact complete candidate data");
  std::cout<<"PASS conversion_persistent_cpp_prefixes="<<count<<" all_cancel_polls="<<polls<<'\n';return 0;
 }catch(const std::exception&e){conversion_fault::enabled=false;std::cerr<<"FAIL "<<e.what()<<'\n';return 1;}
+#endif
