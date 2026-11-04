@@ -13,6 +13,19 @@ resource guards and exact source scopes. No public layout/native schema changes;
 this private milestone awaits coherent main admission. Every unfinished original
 and additional requirement remains active, including controller drawers after
 basic targets. No system, headset or active-session action occurred.
+## Qualified coherent editable-cage milestone — 2026-11-04
+
+Fresh new-layout application/core/render/support builds and all608 Release
+commands pass; owned assertedSAN27/27 includes the full139 combined workflow.
+Actual native normal/compact/Wayland66R+66SAN, patched-softwareSAN XR42 and strict
+PCI03A770 GL/controller42 pass; all recorded sources/artifacts remain exact.
+Four actual UI GLBs have zero Khronos errors/warnings and native R/S files are
+bit-exact. Read COHERENT-CAGE-INTEGRATION.md and its receipt for precise scopes,
+setup negatives and stockMesa112B limitation. This supersedes historical pending
+coherent-cage language below. Geometry persists; durable recipes remain required.
+No FBX/recipe/HDR/weights/V1 WIP or system/HMD/session changes are included.
+Every unfinished original/additional requirement and deferred drawer phase remains.
+
 
 ## Private editable bake cages — 2026-11-04
 

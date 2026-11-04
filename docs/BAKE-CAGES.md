@@ -131,3 +131,11 @@ identities, preserved original negatives and scope. The branch is a private
 milestone awaiting full coherent ABI integration and broader regression;
 all unfinished original/additional requirements remain active. No system
 installation, physical-headset launch or active-session restart occurred.
+
+## Coherent production continuation
+
+The subsequent fresh new-layout application integration is qualified by
+608/608 Release,27/27 ownedSAN, native desktop/Wayland and actual strictA770
+GL/controller gates. Read COHERENT-CAGE-INTEGRATION.md for current scope; the
+component qualification above remains historical evidence rather than a new
+whole-build claim. Durable recipes and every remaining full-goal row remain.
