@@ -27,5 +27,5 @@ cohort is not a robust automatic-weight result: connected/near-contact/thin/
 refinement/pose stress, full world/relative-affine staging, owning native bind/
 locks/history/Save/UI and full solver sanitizer/fault qualification remain.
 All previous all-control/imported-source negatives and public methods remain
-unchanged. Exact three-line source-independent geometry policy is not a
+unchanged. This explicit geometry policy is not a
 per-avatar fallback or a new artist-weight copying route.
