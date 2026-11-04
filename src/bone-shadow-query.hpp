@@ -88,6 +88,19 @@ class BoneShadowQuery {
     (void)w;
     return true;
 #else
+    w.step(9);
+    // Exact binary32 halfspace certificate, independent of mesh/source type:
+    // all node triangles lie in this coordinate plane, the row lies there,
+    // and every point on the finite source lies strictly on one side. Every
+    // open row-to-source segment therefore misses the plane. Origin ownership
+    // has already been validated over the complete wall domain, so a foreign
+    // coincident triangle cannot be hidden by this cull. A coplanar endpoint,
+    // crossing source or nonzero-thickness box deliberately gets no shortcut.
+    for (size_t k = 0; k < 3; ++k)
+      if (box.lo[k] == box.hi[k] && fan.row[k] == box.lo[k] &&
+          ((fan.head[k] > box.lo[k] && fan.tail[k] > box.lo[k]) ||
+           (fan.head[k] < box.lo[k] && fan.tail[k] < box.lo[k])))
+        return false;
     w.step(64);
     if (fan.point) {
       double begin = 0, end = 1;
