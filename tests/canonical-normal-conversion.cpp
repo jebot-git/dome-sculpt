@@ -17,7 +17,7 @@ void audit_filtered(const Scene &scene,const detail::CanonicalNormalConversionCa
  double maximum=0;size_t samples=0;constexpr int divisions=160;
  for(size_t face=0;face<mesh.indices.size()/3;++face)for(int i=0;i<=divisions;++i)for(int j=0;j<=divisions-i;++j){
   const std::array<double,3>w{double(i)/divisions,double(j)/divisions,double(divisions-i-j)/divisions};double u=0,v=0;Vec3 on{},ot{},ob{},nn{},nt{},nb{};
-  for(size_t k=0;k<3;++k){const auto c=face*3+k,vertex=mesh.indices[c];u+=mesh.uv[vertex][0]*w[k];v+=mesh.uv[vertex][1]*w[k];const auto n=independent_unit(mesh.normals[vertex]);const auto t=frames[c];const Vec3 T{t[0],t[1],t[2]};on+=n*float(w[k]);ot+=T*float(w[k]);ob+=cross(n,T)*(t[3]*float(w[k]));const auto a=target->tangents[c];const auto N=independent_unit(target->normals[c]),A=independent_unit({a[0],a[1],a[2]});nn+=N*float(w[k]);nt+=A*float(w[k]);nb+=independent_unit(cross(N,A))*(a[3]*float(w[k]));}
+  for(size_t k=0;k<3;++k){const auto c=face*3+k;const auto vertex=mesh.indices[c];u+=mesh.uv[vertex][0]*w[k];v+=mesh.uv[vertex][1]*w[k];const auto n=independent_unit(mesh.normals[vertex]);const auto t=frames[c];const Vec3 T{t[0],t[1],t[2]};on+=n*float(w[k]);ot+=T*float(w[k]);ob+=cross(n,T)*(t[3]*float(w[k]));const auto a=target->tangents[c];const auto N=independent_unit(target->normals[c]),A=independent_unit({a[0],a[1],a[2]});nn+=N*float(w[k]);nt+=A*float(w[k]);nb+=independent_unit(cross(N,A))*(a[3]*float(w[k]));}
   const auto a=filtered(original->normal,u,v),b=filtered(*candidate.projection->pbr,u,v);
   maximum=std::max(maximum,angle(ot*a.x+ob*a.y+on*a.z,independent_unit(nt)*b.x+independent_unit(nb)*b.y+independent_unit(nn)*b.z));++samples;
  }
