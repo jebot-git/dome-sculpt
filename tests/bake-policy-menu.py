@@ -13,6 +13,7 @@ from dbus_next import Variant
 from dbus_next.aio import MessageBus
 from Xlib import X, XK, display, error
 from Xlib.ext import xtest
+from bake_widgets import BakeWidgets
 from PIL import Image
 
 signal.pthread_sigmask(signal.SIG_SETMASK, [])
@@ -68,9 +69,15 @@ async def main():
         fixture = Path(task_home, "procedural.dsculpt")
         subprocess.run([str(BUILD / "dome-sculpt-bake-projection-policy-test"), "--ui-fixture", str(fixture)], check=True)
         log = (OUT / "app.log").open("w")
+        widget_report=Path(task_home,'native-widgets.json')
+        probe=os.environ.get('DOME_BAKE_WIDGET_PROBE',str(BUILD/'libdome-sculpt-test-widgets.so'))
+        if not Path(probe).is_file():raise RuntimeError('Build dome-sculpt-test-widgets or provide DOME_BAKE_WIDGET_PROBE')
+        env['LD_PRELOAD']=((os.environ['DOME_BAKE_ASAN_RUNTIME']+':') if os.environ.get('DOME_BAKE_ASAN_RUNTIME') else '')+probe
+        env['DOME_CAGE_WIDGET_REPORT']=str(widget_report)
         app = subprocess.Popen([str(BUILD / "dome-sculpt"), str(fixture)], cwd=task_home, env=env, stdout=log, stderr=log)
         processes.append(app)
         connection = display.Display(screen)
+        actual=BakeWidgets(widget_report,connection)
 
         def named(title):
             for window in connection.screen().root.query_tree().children:
@@ -194,7 +201,7 @@ async def main():
         await wait(lambda:"failed" in str(editor.get_wm_name() or ""));image(editor).save(OUT/"strict-projection-refusal.png")
         await command("Close Window");await close_options();await command("Save")
         check(canonical(inspect())==original,"Native default strict projection reports failure and retains exact target and source")
-        editor=await open_options();g=editor.get_geometry();tap(editor,40,306)
+        editor=await open_options();g=editor.get_geometry();await actual.click(editor,"Allow partial projection")
         image(editor).save(OUT/"explicit-partial-projection.png")
         tap(editor,g.width*.75,g.height-48);await wait(lambda:"complete" in str(editor.get_wm_name() or ""));image(editor).save(OUT/"partial-projection-complete.png")
         await command("Close Window");await close_options();await command("Save");accepted=canonical(inspect())

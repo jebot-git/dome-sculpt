@@ -3259,3 +3259,8 @@ if(BUILD_TESTING)
   add_test(NAME bake-cage-caller-admission COMMAND dome-sculpt-bake-admission-test --cage ${CMAKE_CURRENT_BINARY_DIR}/bake-cage-admission)
   set_tests_properties(bake-cage-caller-admission PROPERTIES TIMEOUT 600)
 endif()
+
+if(BUILD_TESTING AND TARGET dome-sculpt)
+  add_library(dome-sculpt-test-widgets SHARED tests/bake-cage-gui-probe.cpp)
+  target_link_libraries(dome-sculpt-test-widgets PRIVATE dome-sculpt-json fltk::fltk-shared PkgConfig::DOME_BITMAP_RUNTIME ${CMAKE_DL_LIBS})
+endif()
