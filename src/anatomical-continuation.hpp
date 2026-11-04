@@ -4,6 +4,7 @@
 #include "geometry-rig-correspondence.hpp"
 #include "heat-component-intent.hpp"
 #include "material-visibility-seams.hpp"
+#include "native-unused-source.hpp"
 #include "screened-continuation-solve.hpp"
 #include "screened-sparse-ldl.hpp"
 #include "skin-affine.hpp"
@@ -90,7 +91,17 @@ anatomical_continuation(const Scene &scene, uint64_t group,
           (declared->rig_geometry != DeclaredRigGeometry::NativeBoneAxes &&
            declared->rig_geometry != DeclaredRigGeometry::ChildHeadControl) ||
           (declared->row_anchors != DeclaredRowAnchors::AllVisible &&
-           declared->row_anchors != DeclaredRowAnchors::NearestPermitted))
+           declared->row_anchors != DeclaredRowAnchors::NearestPermitted) ||
+          (declared->source_requirements !=
+               DeclaredSourceRequirements::AllEligible &&
+           declared->source_requirements !=
+               DeclaredSourceRequirements::GeometryEvidence) ||
+          (declared->source_span != DeclaredSourceSpan::ComponentProjection &&
+           declared->source_span != DeclaredSourceSpan::AuthoredFinite) ||
+          (declared->source_requirements ==
+               DeclaredSourceRequirements::GeometryEvidence &&
+           (declared->rig_geometry != DeclaredRigGeometry::NativeBoneAxes ||
+            declared->row_anchors != DeclaredRowAnchors::NearestPermitted)))
         throw std::invalid_argument("Unknown declared geometry weight policy");
       if (declared->parts.empty() || declared->parts.size() > 64)
         throw std::length_error("Declared weight part dimensions exceeded");
@@ -552,7 +563,29 @@ anatomical_continuation(const Scene &scene, uint64_t group,
       }
     }
     std::vector<double> low(n), high(n);
+    HeatJointMask required{};
+    const bool geometry_requirements =
+        declared && declared->source_requirements ==
+                        DeclaredSourceRequirements::GeometryEvidence;
+    if (geometry_requirements)
+      for (auto mask : usage) {
+        budget.step(4);
+        for (size_t k = 0; k < 4; ++k)
+          required[k] |= mask[k];
+      }
     for (const auto &source : profile.segments) {
+      if (geometry_requirements &&
+          !(required[source.bone / 64] & (uint64_t(1) << (source.bone % 64)))) {
+        // A permitted native rig control is not mandatory on every part.
+        // Retain its exact zero field and the full Skeleton only after a
+        // whole-facet certificate, never vertex-only absence.
+        if (!certify_unused_native_source(source, profile.segments, mesh, usage,
+                                          budget))
+          throw std::runtime_error(
+              "Unused native source lacks whole-facet dominance bone=" +
+              std::to_string(source.bone));
+        continue;
+      }
       bone_shadow::Point head{}, tail{};
       for (size_t k = 0; k < 3; ++k) {
         head[k] = float(source.head[k]);
@@ -570,14 +603,19 @@ anatomical_continuation(const Scene &scene, uint64_t group,
           v /= physical;
       std::fill(low.begin(), low.end(), INFINITY);
       std::fill(high.begin(), high.end(), -INFINITY);
-      for (uint32_t i = 0; i < n; ++i) {
-        budget.step(16);
-        if (!(usage[i][source.bone / 64] & (uint64_t(1) << (source.bone % 64))))
-          continue;
-        double t = dot(sub(s.positions[i], source.head), axis);
-        low[support_root[i]] = std::min(low[support_root[i]], t);
-        high[support_root[i]] = std::max(high[support_root[i]], t);
-      }
+      const bool authored_span =
+          declared &&
+          declared->source_span == DeclaredSourceSpan::AuthoredFinite;
+      if (!authored_span)
+        for (uint32_t i = 0; i < n; ++i) {
+          budget.step(16);
+          if (!(usage[i][source.bone / 64] &
+                (uint64_t(1) << (source.bone % 64))))
+            continue;
+          double t = dot(sub(s.positions[i], source.head), axis);
+          low[support_root[i]] = std::min(low[support_root[i]], t);
+          high[support_root[i]] = std::max(high[support_root[i]], t);
+        }
       bool supported = false;
       for (uint32_t i = 0; i < n; ++i) {
         budget.step(4);
@@ -587,7 +625,7 @@ anatomical_continuation(const Scene &scene, uint64_t group,
                               (uint64_t(1) << (source.bone % 64))))
           continue;
         double lo = 0, hi = 1;
-        if (physical) {
+        if (physical && !authored_span) {
           lo = std::clamp(low[support_root[i]] / physical, 0., 1.);
           hi = std::clamp(high[support_root[i]] / physical, 0., 1.);
         }
@@ -701,7 +739,22 @@ anatomical_continuation(const Scene &scene, uint64_t group,
         budget.step();
         b[i] = rhs[i * labels + label];
       }
-      continuation_solve(s, b, x, ic, budget, out.report);
+      if (geometry_requirements &&
+          !(required[out.joints[label] / 64] &
+            (uint64_t(1) << (out.joints[label] % 64)))) {
+        // Explicit homogeneous system, certified unused above. Do not weaken
+        // the required-control PCG guard or solve then normalize a fallback.
+        budget.step(2 * n);
+        for (double v : b)
+          if (v != 0)
+            throw std::logic_error("Unused source has a nonzero RHS");
+        std::fill(x.begin(), x.end(), 0.);
+        s.multiply(x, b, budget);
+        for (double v : b)
+          if (v != 0)
+            throw std::logic_error("Unused source failed exact zero residual");
+      } else
+        continuation_solve(s, b, x, ic, budget, out.report);
       for (size_t i = 0; i < n; ++i) {
         budget.step(2);
         out.fields[i * labels + label] = x[i];

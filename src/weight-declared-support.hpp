@@ -26,6 +26,8 @@ enum class DeclaredRigGeometry { NativeBoneAxes, ChildHeadControl };
 // Component masks still own permitted controls; only the closest permitted
 // finite source(s) anchor each row. Exact ties retain all joint identities.
 enum class DeclaredRowAnchors { AllVisible, NearestPermitted };
+enum class DeclaredSourceRequirements { AllEligible, GeometryEvidence };
+enum class DeclaredSourceSpan { ComponentProjection, AuthoredFinite };
 struct DeclaredWeightSupport {
   DeclaredSupportPolicy policy = DeclaredSupportPolicy::AllDeformControls;
   bool world_metric = false;
@@ -33,6 +35,9 @@ struct DeclaredWeightSupport {
   uint64_t reference = 0;
   DeclaredRigGeometry rig_geometry = DeclaredRigGeometry::NativeBoneAxes;
   DeclaredRowAnchors row_anchors = DeclaredRowAnchors::AllVisible;
+  DeclaredSourceRequirements source_requirements =
+      DeclaredSourceRequirements::AllEligible;
+  DeclaredSourceSpan source_span = DeclaredSourceSpan::ComponentProjection;
   const DeclaredWeightPart *find(uint64_t id) const {
     auto at = std::find_if(parts.begin(), parts.end(),
                            [&](const auto &p) { return p.object == id; });

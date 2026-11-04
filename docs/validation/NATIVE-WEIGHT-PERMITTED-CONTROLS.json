@@ -1,0 +1,27 @@
+{
+  "base": "62b4355",
+  "scope": "Own optimized/private inline field+producer and asserted O1ASan/UBSan/leaks TU, linked read-only matching completed fresh-owned e161 core/support for SAN and7074 for Release; no public method/UI or fresh whole current project claim",
+  "checks": 27,
+  "passed_release": true,
+  "passed_sanitize": true,
+  "permitted_full_skeleton_bones": 3,
+  "required_controls": 1,
+  "unused_exact_zero_fields": 2,
+  "field_work": 9500,
+  "certificate_work": 5567,
+  "source_assisted_all_required_unchanged": true,
+  "continuous_facet_unknown_refused": true,
+  "legacy_projection_endpoint_negative_retained": true,
+  "frozen_inputs_exact": true,
+  "sha256": {
+    "src/anatomical-continuation.hpp": "b30202c406a86bbe14c34e6ea1bef95e4648c3be2bfab08c7a84667f0799a24e",
+    "src/weight-declared-support.hpp": "1b01444e018bc3c79732b31f06c78982389cfc63f96ded13e915be17c23f6b50",
+    "src/native-unused-source.hpp": "c2ca2c565dc9982ddc481b17769f1336996210657df9ac5f14a3b34bf9078fb7",
+    "tests/native-unused-source.cpp": "eda4974ba6ca3bb54d73ecfe2d80760d9aedebf127caca31e3ef12a916ed8624",
+    "artifacts/release-final-run.log": "b1df4ebd6239b7c771f4ac1a9486682f7c6b2d5725197f533ac8baef2947077e",
+    "artifacts/release-final-status.json": "9881c4108c0a5a4c7fc1ed50404bbf200af50beb11adbbba67cbd2a684c50365",
+    "artifacts/sanitize-final-run.log": "b1df4ebd6239b7c771f4ac1a9486682f7c6b2d5725197f533ac8baef2947077e",
+    "artifacts/sanitize-final-status.json": "05b3e00d7cb6dd52921b256a9710b31b4d47817ac77717b3099a234e1c2ca549",
+    "artifacts/interior-diagnostic-run.log": "0e1cac5b6b7a3ccd06411186a0989ca5d35c4c5e923f769cbf9ad8503eeb0a87"
+  }
+}
