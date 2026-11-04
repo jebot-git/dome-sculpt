@@ -92,7 +92,7 @@ void hidden_physical(Scene &scene) {
   PaintSettings settings;settings.channel=PaintChannel::Emission;settings.emission_units=PaintEmissionUnits::Physical;settings.emission={10000,10000,10000};
   ink(*object.painted,settings);object.painted->layer_properties("Hidden physical",false,1);
 }
-void ready_native(Document &doc) {check(doc.wait_mesh(std::chrono::seconds(30))&&doc.frame().surface,"Actual Document publishes its own complete typed native preview");if(!doc.frame().state->error.empty())throw std::runtime_error(doc.frame().state->error);}
+void ready_native(Document &doc) {check(doc.wait_asset(std::chrono::seconds(30)),"Actual ordered native metadata operation completes before observing its endpoint");check(doc.wait_mesh(std::chrono::seconds(30))&&doc.frame().surface,"Actual Document publishes its own complete typed native preview");if(!doc.frame().state->error.empty())throw std::runtime_error(doc.frame().state->error);}
 }
 extern "C" {
 void __real_glShaderSource(GLuint,GLsizei,const GLchar *const*,const GLint*);
@@ -104,8 +104,8 @@ void __real_glGetTexImage(GLenum,GLint,GLenum,GLenum,void*);
 void __wrap_glGetTexImage(GLenum target,GLint level,GLenum format,GLenum type,void *offset) {GLint bound=0;glGetIntegerv(GL_PIXEL_PACK_BUFFER_BINDING,&bound);gpu_only&=bound!=0;++gpu_copies;__real_glGetTexImage(target,level,format,type,offset);}
 }
 int main(int argc,char **argv)try {
-  if(argc!=2)return 2;const std::filesystem::path out=argv[1];std::filesystem::create_directories(out);shader_directory=out/"shaders";std::filesystem::create_directories(shader_directory);
-  NativeGraphics graphics;std::cout<<"GPU "<<glGetString(GL_VENDOR)<<" / "<<glGetString(GL_RENDERER)<<std::endl;Fbo fbo;fbo.bind();SurfaceRenderer renderer;renderer.set_frame_time(0);
+  if(argc<2||argc>3||(argc==3&&std::string_view(argv[2])!="--hardware"))return 2;const std::filesystem::path out=argv[1];std::filesystem::create_directories(out);shader_directory=out/"shaders";std::filesystem::create_directories(shader_directory);
+  NativeGraphics graphics;const std::string vendor=reinterpret_cast<const char*>(glGetString(GL_VENDOR)),device=reinterpret_cast<const char*>(glGetString(GL_RENDERER));std::cout<<"GPU "<<vendor<<" / "<<device<<std::endl;check(argc<3||(vendor.find("Intel")!=std::string::npos&&device.find("Arc")!=std::string::npos&&device.find("A770")!=std::string::npos&&device.find("llvmpipe")==std::string::npos&&device.find("UHD")==std::string::npos),"Native typed hardware mode requires actual Intel Arc A770");Fbo fbo;fbo.bind();SurfaceRenderer renderer;renderer.set_frame_time(0);
   for(bool legacy:{true,false}) {auto scene=native_typed_physical(legacy);const auto exact=scene.encode();scene.save(out/(legacy?"native-v0.dsculpt":"native-v1.dsculpt"));Document doc;doc.replace(scene);ready_native(doc);
     try {draw(renderer,doc.frame().surface);}catch(...){check(doc.copy_scene().encode()==exact,"Actual typed preview refusal preserves complete float/source/native Scene");throw;}
     check(doc.copy_scene().encode()==exact,"Actual typed float preview preserves all source owners and float project bytes");}
@@ -119,7 +119,7 @@ int main(int argc,char **argv)try {
   }
   for(bool legacy:{true,false})for(bool pbr:{false,true}){
     auto source=native_legacy_emission(legacy);const auto before=source.encode();Document doc;doc.replace(source);if(pbr)doc.shading(false);ready_native(doc);fbo.bind();const auto baseline=draw(renderer,doc.frame().surface);
-    doc.edit_scene("Hidden physical regression",[](Scene &scene,const std::function<bool()> &cancelled){if(cancelled())throw std::runtime_error("Cancelled hidden regression");hidden_physical(scene);});ready_native(doc);const auto after=doc.copy_scene().encode();fbo.bind();const auto hidden=draw(renderer,doc.frame().surface);std::cout<<"NATIVE_HIDDEN_REGRESSION legacy="<<legacy<<" pbr="<<pbr<<" max="<<delta(baseline,hidden)<<std::endl;check(hidden==baseline,"Hidden physical metadata preserves the exact accepted legacy MToon/PBR image");
+    doc.edit_scene("Hidden physical regression",[](Scene &scene,const std::function<bool()> &cancelled){if(cancelled())throw std::runtime_error("Cancelled hidden regression");hidden_physical(scene);});ready_native(doc);const auto after=doc.copy_scene().encode();check(after!=before,"Actual hidden float metadata commits a real project/history edit");fbo.bind();const auto hidden=draw(renderer,doc.frame().surface);std::cout<<"NATIVE_HIDDEN_REGRESSION legacy="<<legacy<<" pbr="<<pbr<<" max="<<delta(baseline,hidden)<<std::endl;check(hidden==baseline,"Hidden physical metadata preserves the exact accepted legacy MToon/PBR image");
     const auto saved=out/("hidden-"+std::to_string(legacy)+"-"+std::to_string(pbr)+".dsculpt");doc.save_async(saved).get();check(Scene::load(saved).encode()==after,"Actual queued Save preserves the complete hidden float project and legacy source");
     check(doc.undo()&&doc.copy_scene().encode()==before,"Hidden physical history Undo restores exact complete legacy input");ready_native(doc);fbo.bind();check(draw(renderer,doc.frame().surface)==baseline,"Actual Undo restores the original legacy pixels exactly");
     check(doc.redo()&&doc.copy_scene().encode()==after,"Hidden physical Redo restores exact float metadata/source history");ready_native(doc);fbo.bind();check(draw(renderer,doc.frame().surface)==baseline,"Actual Redo preserves the original visible image exactly");
