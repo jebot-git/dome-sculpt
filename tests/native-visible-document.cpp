@@ -127,6 +127,9 @@ int main(int argc, char **argv) try {
     SkinAuthoringOptions opts;
     opts.mode = SkinAuthoringMode::NativeVisible;
     opts.reference = 1;
+    if (std::getenv("DOME_NATIVE_LINE"))
+      opts.native_visible.contact_handling =
+          NativeContactHandling::FiniteLineIntegral;
     author_native_visible_skin(scene, std::array<uint64_t, 1>{2}, opts);
     if (argc == 4)
       scene.save(argv[3]);

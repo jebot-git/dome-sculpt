@@ -69,7 +69,10 @@ struct NativeObserver {
         {"busy", state->asset_busy},
         {"can_save", state->can_save_after_asset},
         {"can_cancel", state->can_cancel_asset},
-        {"error", state->error}}.dump();
+        {"error", state->error},
+        {"native_contact_policy",
+         int(state->skin_options.native_visible
+                 .contact_handling)}}.dump();
     Fl::repeat_timeout(.02, tick, p);
   }
   NativeObserver(App &a, std::string p) : app(a), path(std::move(p)) {

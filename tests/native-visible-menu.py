@@ -23,6 +23,7 @@ ROOT = Path(__file__).resolve().parents[1]
 BUILD=Path(os.environ["DOME_NATIVE_SKIN_BUILD"])
 HELPER=BUILD / "dome-sculpt-native-visible-document-test"
 GATED = os.environ.get("DOME_NATIVE_SKIN_GATED") == "1"
+LINE = os.environ.get("DOME_NATIVE_LINE") == "1"
 APP=BUILD / ("dome-sculpt-native-visible-ui-test" if GATED else "dome-sculpt")
 COMPACT = os.environ.get("DOME_SKIN_MENU_COMPACT") == "1"
 AFFINE = os.environ.get("DOME_SKIN_MENU_AFFINE") == "1"
@@ -198,12 +199,28 @@ async def main():
         key("Down");key("Down");key("Down");key("Return")
         await asyncio.sleep(.25)
         image(editor).save(OUT/"native-finite-options.png")
+        if LINE:
+            # Real keyboard focus traverses the native choice controls; disabled
+            # Automatic-only fields are skipped. It also scrolls the compact
+            # dialog to the actual contact row without fixed y coordinates.
+            for _ in range(5): key("Tab")
+            key("space"); key("Down"); key("Return")
+            await asyncio.sleep(.25)
+            if COMPACT:
+                g=editor.get_geometry()
+                xtest.fake_input(connection,X.MotionNotify,x=g.x+g.width-30,y=g.y+g.height//2)
+                for _ in range(24):
+                    xtest.fake_input(connection,X.ButtonPress,5)
+                    xtest.fake_input(connection,X.ButtonRelease,5)
+                connection.sync(); await asyncio.sleep(.25)
+            image(editor).save(OUT/"native-line-contact-choice.png")
         g=editor.get_geometry()
         if GATED: arm()
         tap(editor,g.width/2+80,g.height-40 if not COMPACT else g.height-46)
         await wait(lambda:named("Bind or transfer skin") is None)
         if GATED:
             await wait(lambda:Path(str(gate)+".entered").exists())
+            if LINE: check(observer().get("native_contact_policy")==1,"Actual desktop contact choice reaches typed native request unchanged")
             check(observer().get("busy") and observer().get("can_save"),"Actual worker is gated inside real Native preparation and exposes accepted Save")
             before_bytes=fixture.read_bytes()
             nodes=await layout()
