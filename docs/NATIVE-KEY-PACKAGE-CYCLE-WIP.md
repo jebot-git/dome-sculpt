@@ -39,3 +39,14 @@ root full589 regression jobs remain separate scopes. Read
 [the receipt](validation/NATIVE-KEY-PACKAGE-CYCLE.json) for exact commands,
 source/status hashes, staged-data boundaries and preserved original negatives. No new main admission, install, physical test or completion
 is claimed. The original production objective and all outstanding rows remain.
+
+## Matching sanitizer follow-up
+
+The same complete public API fixture now passes all24 checks for small, female
+and male source scenes on the current c092 fresh whole-owned sanitizer
+core/support. All12 combined/editable/recovered/restored files match Release
+byte-for-byte, so the original three-GLB Khronos reports apply unchanged. The
+wrapper4149.83s includes waiting; actual case execution is2.21/226.78/202.72s.
+Source1699 inputs and artifact inputs remain exact, with no sanitizer diagnostics.
+This is not a new registered590-target sanitizer run, graphics proof, same-object
+key-and-paint compound deformation, headset acceptance or main admission.
