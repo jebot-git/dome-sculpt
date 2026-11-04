@@ -1,0 +1,271 @@
+{
+  "schema": 1,
+  "state": "Qualified private same-object provided-frame Source4/physical/explicit-Mirror codec/native integration; test-only",
+  "test_source": "4c655fcc75ee3fc53172f17ee4991705cd18db07",
+  "runtime_source": "c09202fbf092eaa4d9ddf8d9a2249fe7bf013e74",
+  "profiles": {
+    "release": {
+      "checks": 14,
+      "status_sha256": "b1396dd4185fa4b363c0bec59536b0f523286fd0ceb5b2c460806ee42259c50e",
+      "result": {
+        "state": "terminal",
+        "pid": 1404294,
+        "source": "4c655fcc75ee3fc53172f17ee4991705cd18db07",
+        "runtime_source": "c09202fbf092eaa4d9ddf8d9a2249fe7bf013e74",
+        "scope": "Complete new same-object publicAPI test TU from actual declared target commands; allruntime/API/assets bytes equal frozen c092, completed matching own core/support archives. Genuine Source4+physical beforeplane+BaseRelative Mirror, nativeworker/orderedSave/history and codec/Restore. No fresh wholebuild, graphics/CCO/HMD or API-adapter completion claim.",
+        "steps": [
+          {
+            "phase": "configure",
+            "command": [
+              "cmake",
+              "-S",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source4-relative-key-c092",
+              "-B",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source4-relative-key-c092/build-release",
+              "-G",
+              "Unix Makefiles",
+              "-DCMAKE_BUILD_TYPE=Release",
+              "-DDOME_COMPUTE_BACKEND=CPU",
+              "-DDOME_BUILD_UI=ON",
+              "-DDOME_BUILD_XR=ON",
+              "-DCMAKE_EXPORT_COMPILE_COMMANDS=ON",
+              "-DFLTK_DIR=/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/toolkit/share/fltk",
+              "-U*DOME_BITMAP_RUNTIME*",
+              "-U*NATIVEGL*",
+              "-U*RENDERFONTS*"
+            ],
+            "exit_code": 0,
+            "seconds": 5.041643280012067
+          },
+          {
+            "phase": "compile",
+            "command": [
+              "/usr/bin/c++",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/source4-relative-key-c092/src",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/source4-relative-key-c092/tests",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/source4-relative-key-c092/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/source4-relative-key-c092/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/source4-relative-key-c092/third_party/nlohmann",
+              "-O3",
+              "-DNDEBUG",
+              "-std=gnu++20",
+              "-o",
+              "CMakeFiles/dome-sculpt-source4-relative-key-test.dir/tests/source4-relative-key.cpp.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source4-relative-key-c092/tests/source4-relative-key.cpp"
+            ],
+            "exit_code": 0,
+            "seconds": 7.7585647930100095
+          },
+          {
+            "phase": "link",
+            "command": [
+              "/usr/bin/c++",
+              "-O3",
+              "-DNDEBUG",
+              "-Wl,--wrap=_ZN4dome15author_shapekeyERNS_5SceneEmRKNS_12ShapeKeyEditERKSt8functionIFbvEE",
+              "CMakeFiles/dome-sculpt-source4-relative-key-test.dir/tests/source4-relative-key.cpp.o",
+              "-o",
+              "dome-sculpt-source4-relative-key-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-union-c5/build-union-release/libdome-sculpt-core.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-union-c5/build-union-release/libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-union-c5/build-union-release/libdome-sculpt-polygon.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-union-c5/build-union-release/libxatlas.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-union-c5/build-union-release/libmikktspace.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-union-c5/build-union-release/libmikktspace-robust.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-union-c5/build-union-release/libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-union-c5/build-union-release/libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit_code": 0,
+            "seconds": 0.31119838802260347
+          },
+          {
+            "phase": "ctest",
+            "command": [
+              "ctest",
+              "--test-dir",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source4-relative-key-c092/build-release",
+              "--output-on-failure",
+              "-R",
+              "^source4-relative-key$"
+            ],
+            "exit_code": 0,
+            "seconds": 0.0508437920070719
+          }
+        ],
+        "phase": "ctest",
+        "child_pid": 1406070,
+        "exit_code": 0,
+        "seconds": 13.281013261992484,
+        "inputs": 2234,
+        "drift": []
+      },
+      "note": "Original status does not store profile key; profile is bound by outer record, actual configured/compiler flags and directory, not invented from a status value.",
+      "test_log_sha256": "310f6310889f01100f23f8cda37fa685f9f50b9341097a8cdc04e433c5b0bc1f",
+      "source_manifest_sha256": "801eeec5315dd3c9d697e48b9db63ad7c444362003f6154526fd7d63078ef82a",
+      "after_manifest_sha256": "801eeec5315dd3c9d697e48b9db63ad7c444362003f6154526fd7d63078ef82a"
+    },
+    "sanitize": {
+      "checks": 14,
+      "status_sha256": "150ef61cfd27df9507a0e136324d38fd31cdcdd02eaf699e5c50d341002e89b1",
+      "result": {
+        "state": "terminal",
+        "pid": 1443291,
+        "source": "4c655fcc75ee3fc53172f17ee4991705cd18db07",
+        "runtime_source": "c09202fbf092eaa4d9ddf8d9a2249fe7bf013e74",
+        "scope": "Complete new same-object publicAPI test TU from actual declared target commands; allruntime/API/assets bytes equal frozen c092, completed matching own core/support archives. Genuine Source4+physical beforeplane+BaseRelative Mirror, nativeworker/orderedSave/history and codec/Restore. No fresh wholebuild, graphics/CCO/HMD or API-adapter completion claim.",
+        "steps": [
+          {
+            "phase": "configure",
+            "command": [
+              "cmake",
+              "-S",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source4-relative-key-c092",
+              "-B",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source4-relative-key-c092/build-sanitize",
+              "-G",
+              "Unix Makefiles",
+              "-DCMAKE_BUILD_TYPE=Release",
+              "-DDOME_COMPUTE_BACKEND=CPU",
+              "-DDOME_BUILD_UI=ON",
+              "-DDOME_BUILD_XR=ON",
+              "-DCMAKE_EXPORT_COMPILE_COMMANDS=ON",
+              "-DFLTK_DIR=/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/toolkit-sanitize/share/fltk",
+              "-U*DOME_BITMAP_RUNTIME*",
+              "-U*NATIVEGL*",
+              "-U*RENDERFONTS*",
+              "-DCMAKE_C_FLAGS_RELEASE=-O1 -g1 -fsanitize=address,undefined -fno-omit-frame-pointer",
+              "-DCMAKE_CXX_FLAGS_RELEASE=-O1 -g1 -fsanitize=address,undefined -fno-omit-frame-pointer",
+              "-DCMAKE_EXE_LINKER_FLAGS=-fsanitize=address,undefined",
+              "-DCMAKE_SHARED_LINKER_FLAGS=-fsanitize=address,undefined"
+            ],
+            "exit_code": 0,
+            "seconds": 4.815616524982033
+          },
+          {
+            "phase": "compile",
+            "command": [
+              "/usr/bin/c++",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/source4-relative-key-c092/src",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/source4-relative-key-c092/tests",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/source4-relative-key-c092/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/source4-relative-key-c092/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/source4-relative-key-c092/third_party/nlohmann",
+              "-O1",
+              "-g1",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "-std=gnu++20",
+              "-o",
+              "CMakeFiles/dome-sculpt-source4-relative-key-test.dir/tests/source4-relative-key.cpp.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source4-relative-key-c092/tests/source4-relative-key.cpp"
+            ],
+            "exit_code": 0,
+            "seconds": 13.615752223995514
+          },
+          {
+            "phase": "link",
+            "command": [
+              "/usr/bin/c++",
+              "-O1",
+              "-g1",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "-fsanitize=address,undefined",
+              "-Wl,--wrap=_ZN4dome15author_shapekeyERNS_5SceneEmRKNS_12ShapeKeyEditERKSt8functionIFbvEE",
+              "CMakeFiles/dome-sculpt-source4-relative-key-test.dir/tests/source4-relative-key.cpp.o",
+              "-o",
+              "dome-sculpt-source4-relative-key-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-union-c5/build-union-sanitize/libdome-sculpt-core.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-union-c5/build-union-sanitize/libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-union-c5/build-union-sanitize/libdome-sculpt-polygon.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-union-c5/build-union-sanitize/libxatlas.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-union-c5/build-union-sanitize/libmikktspace.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-union-c5/build-union-sanitize/libmikktspace-robust.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-union-c5/build-union-sanitize/libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-union-c5/build-union-sanitize/libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit_code": 0,
+            "seconds": 2.1935708119999617
+          },
+          {
+            "phase": "ctest",
+            "command": [
+              "ctest",
+              "--test-dir",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source4-relative-key-c092/build-sanitize",
+              "--output-on-failure",
+              "-R",
+              "^source4-relative-key$"
+            ],
+            "exit_code": 0,
+            "seconds": 0.4729022259998601
+          }
+        ],
+        "phase": "ctest",
+        "child_pid": 1445759,
+        "exit_code": 0,
+        "seconds": 21.891989046998788,
+        "inputs": 2234,
+        "drift": []
+      },
+      "note": "Original status does not store profile key; profile is bound by outer record, actual configured/compiler flags and directory, not invented from a status value.",
+      "test_log_sha256": "81c1fa1dda0dafc3632da76482923b631c4579628048c292e63ef4ce327838d3",
+      "source_manifest_sha256": "4f660fe26daa1d26c3047f51cc745c451d4145d38bc939d959ef90228f3d2ce2",
+      "after_manifest_sha256": "4f660fe26daa1d26c3047f51cc745c451d4145d38bc939d959ef90228f3d2ce2"
+    }
+  },
+  "limits": [
+    "Complete new test TU +matching coherent c092 own archives, no new whole-app compile/runtime/API changes.",
+    "Actual single object owns Source4, physical paint and explicit frame-relative Mirror; fixture is genuine provided-frame geometry, not CC0 avatar/adoption/graphics/standard export proof.",
+    "591 is registered test count in this private test-only graph, not591passes.",
+    "No main admission/system installation/physical headset or full production completion."
+  ],
+  "native_outputs": [
+    {
+      "file": "source4-relative-key-hdr.dsculpt",
+      "release_sha256": "bc9b6c03ef4093b17d930ef5cb063fb623482000f6476686f9e93c546d333d8f",
+      "sanitize_sha256": "bc9b6c03ef4093b17d930ef5cb063fb623482000f6476686f9e93c546d333d8f",
+      "byte_equal": true
+    },
+    {
+      "file": "native-source4-relative-key.dsculpt",
+      "release_sha256": "db9d15e65c4b3cba94669646b0c267201bda5ff84fc2a05c42e3643a6eac78ea",
+      "sanitize_sha256": "db9d15e65c4b3cba94669646b0c267201bda5ff84fc2a05c42e3643a6eac78ea",
+      "byte_equal": true
+    }
+  ],
+  "semantic_coverage": [
+    "Actual original-source maps retain independent owner before authoring",
+    "Genuine physical brush plane in same object, then BaseRelative Mirror on real provided-frame seed",
+    "Native worker, immediately queued Save and separate exact UndoRedo endpoints",
+    "Physical current layer removed; physical data exists only in key before-owner",
+    "Scene29/material12 owningbase10 +physicaltrue encode/restart authenticates all actual capabilities",
+    "Wrong base9 and earlierScene28 explicitly refuse; complete Restore recovers original source/paint/skin/artist frames exactly"
+  ]
+}
