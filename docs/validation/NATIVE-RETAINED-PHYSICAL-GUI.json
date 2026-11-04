@@ -1,0 +1,115 @@
+{
+  "schema": 1,
+  "status": "qualified private native/retained actual GUI component; not main/full-goal admission",
+  "runtime_parent": "708283b1104bdf184fc69c163d788110b0dcaa5e",
+  "runtime_changes": false,
+  "scopes": [
+    {
+      "name": "release-native-normal",
+      "assertions": 32,
+      "report": "artifacts/native-gui-r0/report.json",
+      "report_sha256": "31e0d1e406123dabf02ba9b1e4968c79ed065c070489021221c007c037f31b0f",
+      "driver_log": "artifacts/native-gui-r0/driver.log",
+      "driver_log_sha256": "a8a25a0fdd7dec0063479d1f187526378279685b1740504be03a10db83b8d55c",
+      "glb_sha256": "8fce4dec37c1932a08a87b446c84f542455ab9e7912e84813102c9a451087b17"
+    },
+    {
+      "name": "release-retained-normal",
+      "assertions": 32,
+      "report": "artifacts/native-gui-batch/release1-normal/report.json",
+      "report_sha256": "31e0d1e406123dabf02ba9b1e4968c79ed065c070489021221c007c037f31b0f",
+      "driver_log": "artifacts/native-gui-batch/release1-normal/driver.log",
+      "driver_log_sha256": "a8a25a0fdd7dec0063479d1f187526378279685b1740504be03a10db83b8d55c",
+      "glb_sha256": "2f82f237a0dd0702f90dd1480f0f13fb621e7ae785798a7d9d9c0ed1f23599e9"
+    },
+    {
+      "name": "sanitize-native-normal",
+      "assertions": 32,
+      "report": "artifacts/native-gui-batch/sanitize0-normal/report.json",
+      "report_sha256": "31e0d1e406123dabf02ba9b1e4968c79ed065c070489021221c007c037f31b0f",
+      "driver_log": "artifacts/native-gui-batch/sanitize0-normal/driver.log",
+      "driver_log_sha256": "a8a25a0fdd7dec0063479d1f187526378279685b1740504be03a10db83b8d55c",
+      "glb_sha256": "8fce4dec37c1932a08a87b446c84f542455ab9e7912e84813102c9a451087b17"
+    },
+    {
+      "name": "sanitize-retained-normal",
+      "assertions": 32,
+      "report": "artifacts/native-gui-history/sanitize1-normal/report.json",
+      "report_sha256": "31e0d1e406123dabf02ba9b1e4968c79ed065c070489021221c007c037f31b0f",
+      "driver_log": "artifacts/native-gui-history/sanitize1-normal/driver.log",
+      "driver_log_sha256": "a8a25a0fdd7dec0063479d1f187526378279685b1740504be03a10db83b8d55c",
+      "glb_sha256": "2f82f237a0dd0702f90dd1480f0f13fb621e7ae785798a7d9d9c0ed1f23599e9"
+    },
+    {
+      "name": "release-native-compact",
+      "assertions": 32,
+      "report": "artifacts/native-gui-history/release0-compact/report.json",
+      "report_sha256": "31e0d1e406123dabf02ba9b1e4968c79ed065c070489021221c007c037f31b0f",
+      "driver_log": "artifacts/native-gui-history/release0-compact/driver.log",
+      "driver_log_sha256": "a8a25a0fdd7dec0063479d1f187526378279685b1740504be03a10db83b8d55c",
+      "glb_sha256": "f8052d3e96ab409df20ac617146a5eeb911ad37fb2a07b37379f4a70704c862b"
+    },
+    {
+      "name": "release-retained-compact",
+      "assertions": 32,
+      "report": "artifacts/native-gui-history/release1-compact/report.json",
+      "report_sha256": "31e0d1e406123dabf02ba9b1e4968c79ed065c070489021221c007c037f31b0f",
+      "driver_log": "artifacts/native-gui-history/release1-compact/driver.log",
+      "driver_log_sha256": "a8a25a0fdd7dec0063479d1f187526378279685b1740504be03a10db83b8d55c",
+      "glb_sha256": "24f9f7fc2b6acf71a254028be658edd96365e8c8a9f015a9b33de56ed3017d0f"
+    },
+    {
+      "name": "sanitize-native-compact",
+      "assertions": 32,
+      "report": "artifacts/native-gui-history/sanitize0-compact/report.json",
+      "report_sha256": "31e0d1e406123dabf02ba9b1e4968c79ed065c070489021221c007c037f31b0f",
+      "driver_log": "artifacts/native-gui-history/sanitize0-compact/driver.log",
+      "driver_log_sha256": "a8a25a0fdd7dec0063479d1f187526378279685b1740504be03a10db83b8d55c",
+      "glb_sha256": "f8052d3e96ab409df20ac617146a5eeb911ad37fb2a07b37379f4a70704c862b"
+    },
+    {
+      "name": "sanitize-retained-compact",
+      "assertions": 32,
+      "report": "artifacts/native-gui-final/sanitize1-compact/report.json",
+      "report_sha256": "31e0d1e406123dabf02ba9b1e4968c79ed065c070489021221c007c037f31b0f",
+      "driver_log": "artifacts/native-gui-final/sanitize1-compact/driver.log",
+      "driver_log_sha256": "a8a25a0fdd7dec0063479d1f187526378279685b1740504be03a10db83b8d55c",
+      "glb_sha256": "24f9f7fc2b6acf71a254028be658edd96365e8c8a9f015a9b33de56ed3017d0f"
+    }
+  ],
+  "total_assertions": 256,
+  "driver_versions": "Preserved initial driver, history-ACK driver and final mutation-ACK driver; closed scopes are not relabelled as all running final script. Final source also preserves failed private HOME and exact bytes.",
+  "gui_backend": "Actual FLTK app in private Xvfb and D-Bus, software GL; no session/HMD/system action",
+  "sdk": "canonical final27 USE_POLL1 release/sanitize with canonical53b bitmap",
+  "asan": "detect_leaks=1:halt_on_error=1; UBSAN halt_on_error=1; no suppressions",
+  "inspector_scope": "Separate executable observer: own whole new708 Release observer TU, exact parent708 SAN observer. No old archives linked against changed headers.",
+  "binaries": {
+    "/home/blux/de-xr/dome-sculpt/artifacts/native-physical-coverage-708283b/tests/native-physical-menu.py": "59b5c234be9f6eba81af533872d7205bea0360e0e80ef8c11db8984121939f09",
+    "/home/blux/de-xr/dome-sculpt/artifacts/native-physical-coverage-708283b/artifacts/gui-inspector/dome-sculpt-native-authoring-inspect": "3c3742c557b19a9e68067bb1fb79fd3e680793b8b56e87e626e451a8c2048a89",
+    "/home/blux/de-xr/dome-sculpt/artifacts/hdr-native-retained-8c259da/build-release/dome-sculpt": "7fbcf253849b2a90f0cecca839992298248668f7c36d8b799efbd9bf984e1c4a",
+    "/home/blux/de-xr/dome-sculpt/artifacts/hdr-native-retained-8c259da/build-sanitize/dome-sculpt": "8a7335ebefc571e7c7c4802eda5d6fcd02570b7bba67c8f8e990bd5722c5f302",
+    "/home/blux/de-xr/dome-sculpt/artifacts/hdr-native-retained-8c259da/build-sanitize/dome-sculpt-native-authoring-inspect": "39c5baf4c0009bc69d7d6702908c72ff993d7cc80a96ae58dd6d100a147b4405"
+  },
+  "khronos": {
+    "version": "2.0.0-dev.3.10",
+    "maxIssues": 0,
+    "issueFilters": [],
+    "files": 8,
+    "errors": 0,
+    "warnings": 4,
+    "report": "artifacts/native-gui-validation/khronos.json",
+    "sha256": "2e8e55287183517e586ef019a6c3f05d24f0a551134473ef7a45489093deca07"
+  },
+  "negatives": [
+    "artifacts/native-gui-batch/sanitize1-normal: unacknowledged Redo/Save exact-state timeout",
+    "artifacts/native-gui-ack/sanitize1-normal: unacknowledged material Undo/Save exact-state timeout despite enabled command",
+    "artifacts/native-gui-history/sanitize1-compact: unacknowledged AddLayer/Save exact-state timeout"
+  ],
+  "correction": "Wait actual global history/Layer endpoint before Save; poll exact file bytes for known results rather than repeatedly deep-encoding unchanged native graph. Global45s file deadline unchanged; no product/tolerance change.",
+  "limitations": [
+    "UI latency not measured by complete GUI/observer runtimes",
+    "Native geometry quota/OOM continuation is separate source/proof",
+    "Full physical-before-UV, typed native MToon and general native/retained domains/interoperability remain required",
+    "No private runtime/main integration or physical HMD acceptance implied"
+  ]
+}
