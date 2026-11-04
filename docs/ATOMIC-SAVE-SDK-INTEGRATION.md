@@ -1,9 +1,10 @@
 # Atomic save and final canonical SDK integration
 
-This private public-main candidate adds portable atomic-write resource ordering
+Published main1fc20c4 adds portable atomic-write resource ordering
 and requires the final canonical27/poll FLTK SDK. It contains no Source4/HDR,
 private authoring/weights or new Scene-schema admission. The production goal
-remains active and incomplete; root owns main review and publication.
+remains active and incomplete. Main was fast-forwarded from0b5ada0 and the
+remote integration head was independently verified; no local commits were discarded.
 
 The runtime repair is c13909f, carried by qualified8d20d8c: prepare paths and
 open the parent directory before the output commit callback/rename. An

@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "state": "qualified private public-main IO +canonical27/poll SDK integration; root owns publication",
+  "state": "published public-main atomic IO +canonical27/poll SDK milestone; full production goal remains active and incomplete",
   "base": "8d20d8c563c49d30f1f8f845968126fd04683f7e",
   "sdk_guard_commit": "33aba344eed8d1934f10441f50de72d48da7d277",
   "prequalification_head": "12f3885950da9fbb6ac3c80f046c86b0d8da8687",
@@ -1328,5 +1328,13 @@
       "sha256": "e68db516568be90ef085af9089cf0db1991ce8e727d354407a20adf538594943"
     }
   },
-  "metadata_note": "Final source pins/provenance and docs finalized after terminal tests. Relevant executed harness hashes equal final bytes; no runtime/API/SDK/object change. Each original frozen cohort ledger remains exact and distinct."
+  "metadata_note": "Final source pins/provenance and docs finalized after terminal tests. Relevant executed harness hashes equal final bytes; no runtime/API/SDK/object change. Each original frozen cohort ledger remains exact and distinct.",
+  "publication": {
+    "main_integration": "1fc20c497283cfe0cb383d5189c3ef93b22a66a9",
+    "previous_main": "0b5ada05b155ef64333e7aa45db68f41f7a53f22",
+    "remote_verified_utc": "2026-11-04T02:02:06.723725+00:00",
+    "method": "Fast-forward, no local commits discarded",
+    "followup_scope": "Publication metadata/docs only; runtime/API/CMake/harness/assets unchanged from qualified integration",
+    "goal_status": "active and incomplete"
+  }
 }
