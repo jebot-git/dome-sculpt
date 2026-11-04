@@ -20,7 +20,6 @@
     "original-helper independent failure"
   ],
   "remaining": [
-    "whole-owned sanitizer qualification",
     "fresh root/main integration",
     "independent full automatic-weight qualification"
   ],
@@ -76,6 +75,44 @@
     "build/dome-sculpt-source-visible-document-test": {
       "sha256": "90d1ed6d5e532566e6642198316f2f13e7b667f5cfff932dfff233c958ceea22",
       "bytes": 10645072
+    }
+  },
+  "sanitizer": {
+    "source": "1f7503b11a75c3145e76551f8d332c3836a6c9b7",
+    "ctest_passed": 1,
+    "ctest_total": 1,
+    "seconds": 55.78,
+    "metadata_checks": 43,
+    "profile": "fresh O1 assertions-on wholly owned C/C++ core/support ASan+UBSan+leaks",
+    "source_inputs": 1608,
+    "binary_config_inputs": 11,
+    "mismatches": 0,
+    "scope": "existing public Scene/Document APIs; no new solver, frontend or whole-main proof",
+    "files": {
+      "artifacts/source-before.json": {
+        "sha256": "14fea2418d63c061869ed3985fa5bb891d2c48c029c42429b37dbf0d013ab7f0",
+        "bytes": 166275
+      },
+      "artifacts/sanitize-configure.log": {
+        "sha256": "1baf46d469222d98838ef94b208c22dca1d8866080780f805c728dd21e80ef83",
+        "bytes": 1280
+      },
+      "artifacts/sanitize-build.log": {
+        "sha256": "7e50d2be1a80576467f4f99ac310b23b2e17cf3059b202c4912eab662ad00949",
+        "bytes": 138934
+      },
+      "artifacts/sanitize-test.log": {
+        "sha256": "b060de9a216ba1f67060f24f517c1209fead98e63756417ce285c9e3c0518d02",
+        "bytes": 286
+      },
+      "artifacts/sanitize-binaries-before.json": {
+        "sha256": "c45e671dfb42282cdf90ed0530a96852ffaf1b63210585c45b97ff80b5505954",
+        "bytes": 1207
+      },
+      "artifacts/sanitize-after.json": {
+        "sha256": "e8cf1db26dfd3ad77f9b1912349564daa28052cf0a13d03a6297737c4222802a",
+        "bytes": 78
+      }
     }
   }
 }

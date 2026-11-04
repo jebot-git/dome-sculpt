@@ -32,3 +32,9 @@ byte-equal, held object unchanged), and the independent original-helper binary
 that fails before any native mutation. See the JSON receipt for exact files and
 hashes. The broader automatic-weight method remains private and unqualified for
 main; this portable repair does not complete that goal.
+
+A separate immutable1f tree now completes the fresh O1 assertions-enabled
+wholly owned C/C++ core/support sanitizer build and43-check regression:1/1
+passes in55.78 seconds with ASan/UBSan/leaks enabled. All1,608 source inputs
+and the recorded binary/configuration inputs remain exact. This qualifies the
+portable guard's existing native APIs, not the new weight solver or frontend.
