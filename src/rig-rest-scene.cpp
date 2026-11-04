@@ -68,7 +68,20 @@ bool author_rig_rest(Scene &scene,uint64_t id,std::span<const RigRestJointEdit> 
  if(!changed)return false;next.validate();stop(cancelled);scene=std::move(next);return true;
 }
 void restore_rig_source(Scene &scene,uint64_t id,RigRestOptions options,const std::function<bool()> &cancelled){
- options.validate();if(detail::source_rest_identity(scene,scene.object(id))){detail::restore_source_rig_rest(scene,id,options,cancelled);return;}const auto linked_objects=options.linked_objects.empty()?rig_rest_linked_objects(scene,id):options.linked_objects;
+ options.validate();if(detail::source_rest_identity(scene,scene.object(id))){detail::restore_source_rig_rest(scene,id,options,cancelled);return;}
+ // An explicit original-source Restore may legitimately remove a rig that did
+ // not exist before binding. Never infer any linked membership from absence.
+ {
+  const auto &selected=scene.object(id);
+  if(selected.rig_source&&(!selected.rig_source->deformation||!selected.rig_source->deformation->skeleton)){
+   stop(cancelled);editable(selected,true);
+   if(options.linked)throw std::invalid_argument("Restore an originally unskinned source on the active part; turn off linked fitting");
+   const auto &origin=*selected.rig_source;
+   if(!origin.volume||!origin.mesh_active||!origin.paint)throw std::invalid_argument("Original unskinned source capsule is incomplete");
+   Scene next=scene;restore(next.object(id),origin);next.validate();stop(cancelled);scene=std::move(next);return;
+  }
+ }
+ const auto linked_objects=options.linked_objects.empty()?rig_rest_linked_objects(scene,id):options.linked_objects;
  stop(cancelled);const auto &selected=scene.object(id);editable(selected,true);
  if(!selected.rig_source||!selected.rig_source->deformation||!selected.rig_source->deformation->skeleton)throw std::invalid_argument("This mesh has no original rig-fitting source");
  const auto group=boundary(scene,selected);const auto key=selected.rig_source->deformation->skeleton->encode();Scene next=scene;
