@@ -6,6 +6,7 @@
 #include "paint-sampling-render.cpp"
 #undef DOME_PAINT_SAMPLING_RENDER_NO_MAIN
 #include "prepared-normal-shapes-fixtures.hpp"
+#include "dome/normal-sampling.hpp"
 #include <condition_variable>
 #include <future>
 #include <mutex>
@@ -47,6 +48,11 @@ float frame_reference(const NormalFrameSet &reference,const NormalFrameSet &actu
  for(size_t role=0;role<left.size();++role){check(bool(left[role])==bool(right[role]),"Both authoring orders preserve optional PBR/MToon/canonical role presence");if(!left[role])continue;const auto &a=*left[role],&b=*right[role];check(a.origin_vertices==b.origin_vertices&&a.source_vertices==b.source_vertices&&a.source_corners==b.source_corners&&a.transport==b.transport,"Reference role comparison uses ordered original/source corner identity, never coincident positions");vec(a.normals,b.normals);if(a.tangents.size()!=b.tangents.size())throw std::runtime_error("Commutation tangent presence mismatch");for(size_t c=0;c<a.tangents.size();++c)for(size_t k=0;k<4;++k)maximum=std::max(maximum,std::abs(a.tangents[c][k]-b.tangents[c][k]));for(const auto &key:a.targets){const auto *other=find(b,key.id);if(!other)throw std::runtime_error("Commutation lost role target");vec(key.normals,other->normals);vec(key.tangents,other->tangents);}}
  std::cout<<"COMMUTATION_ROLE_MAX "<<maximum<<std::endl;check(maximum<=2e-6f,"Retained-key base and every target N/T delta match the independent intrinsic-key-first role arrays");return maximum;
 }
+nlohmann::json paint_state(const PaintedMesh &paint){
+ PaintImageArchive images;NormalSamplingArchive normals;PaintSamplingArchive writable;
+ auto value=paint.encode(&images,&normals,&writable);
+ value["normal_domains"]=normals.encode(images);value["writable_domains"]=writable.encode();value["images"]=images.encode();return value;
+}
 void image_fields(const Scene&a,const Scene&b){
  const auto &x=*a.active().painted,&y=*b.active().painted;const auto p=x.preview(a.active().material),q=y.preview(b.active().material);
  check(p->color.rgba==q->color.rgba&&p->pbr_color.rgba==q->pbr_color.rgba&&p->metal_rough.rgba==q->metal_rough.rgba&&p->emission.rgba==q->emission.rgba&&p->color_coverage.rgba==q->color_coverage.rgba&&p->emission_coverage.rgba==q->emission_coverage.rgba,"Authoring order retains every writable colour/scalar/coverage texel in its common paint basis");const auto ad=x.baked()->normal_authority,bd=y.baked()->normal_authority;check(ad&&bd&&ad->coverage==bd->coverage&&ad->pbr->rgba==bd->pbr->rgba&&ad->mtoon->rgba==bd->mtoon->rgba,"Independent retained normal events own identical image/coverage bytes across authoring order");
@@ -65,7 +71,7 @@ void seam_owning(){
  const auto accepted=d.copy_scene();const auto &old_delta=previous.active().deformation->morphs->targets[key.target].delta,&new_delta=accepted.active().deformation->morphs->targets[key.target].delta;
  bool exact=length(new_delta[a]-old_delta[a]-Vec3{0,0,.013f})<1e-6f;
  for(size_t v=0;v<new_delta.size();++v)if(v!=a)exact&=length(new_delta[v]-old_delta[v])<1e-7f;
- check(exact&&accepted.active().material_bindings->key_derivation&&accepted.active().material_bindings->normal_frames->position_domain&&accepted.active().painted->encode()==previous.active().painted->encode(),"Actual native independent seam edit owns both distinct displacements without averaging or changing paint");
+ check(exact&&accepted.active().material_bindings->key_derivation&&accepted.active().material_bindings->normal_frames->position_domain&&paint_state(*accepted.active().painted)==paint_state(*previous.active().painted),"Actual native independent seam edit owns both distinct displacements without averaging or changing paint");
  check(d.undo()&&d.copy_scene().encode()==before&&d.redo()&&d.copy_scene().encode()==accepted.encode(),"Independent seam edit is one complete exact native Undo/Redo");done(d);
  check(d.undo()&&d.copy_scene().encode()==before,"Original consistent seam model is retained for cancellation/retry controls");done(d);
  key.positions=positions(d.copy_scene().active().painted->mesh(),1.3f);cancel_after_computation(d,key,root/"seam-cancel.dsculpt");d.author_shape(key);save(d,root/"seam-retry.dsculpt");check(d.copy_scene().encode()!=before,"Same genuine seam input retries after late cancellation without source authority loss");
