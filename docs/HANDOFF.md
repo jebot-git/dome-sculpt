@@ -1,5 +1,32 @@
 # Dome Sculpt production handoff
 
+## Current coherent authoring foundation — 2026-11-04
+
+This candidate combines real normalUV34/native32 ownership (Scene35/material17),
+repaired export normal-frame metadata and complete normal codec context, actual
+palette31 controller coexistence, colour-only VRM1 layers5310 and bounded native
+anatomical packing319. Main documentation history is preserved. No HDR package3
+admission: its functional66e2 milestone has a real OpenEXR C++ OOM leak; owning
+Core C codec work remains required and active.
+
+Original44 fresh owning R/S app/core/render/support270-task builds pass, but
+original selected27 each finish23Pass/4Fail; retain those negatives. Matched f7
+three-TU repairs plus whole consumers repair the actual crash/orphan/context
+failures. Original follow-up30 each finish28Pass/2fixtureFail; corrected actual
+mesh-owner workflow then passes152 each R/S and strict Arc, and camera-corrected
+palette83 each R/S.48 Khronos files0errors/30warnings/150infos;33 exact R/S artifact
+pairs and17 exact R/S/Arc native/container triples. Cross-device PNGmax1; no
+false byte-identical image claim. Mixed archive R all12,149 decoder/24,003encoder
+prefixes+84Cancel pass; same S sweep remains live, not passed. Default-cache/C/
+caller/IO/physical headset/compute scope remains separate.
+
+Current319 port has real current-layout female/male public19, locks/Save/history,
+linked poses, worker Cancel and independent export evidence; full registered
+fixture integration and broader authoring/interop/device work remain. Next fresh
+optimized ALL and selected owning SAN qualification must use this actual combined
+source. A component pass does not qualify the whole candidate or complete the
+original/additional goal. Controller drawers remain required after basic targets.
+
 ## Explicit portable normal model controls — 2026-11-04
 
 Universal/native/XR controls now describe portable normal/tangent target authoring,
@@ -59,6 +86,27 @@ CANONICAL-NORMAL-OWNING.md and receipt for precise fresh-build/component scope.
 This supersedes the kernel-only pending language below for this private branch;
 fresh whole integration/Wayland/newXR-loader and broader adapters remain before
 main admission. The complete original goal and later drawers remain unfinished.
+
+## Combined authoring draft and qualified portable controls — 2026-11-04
+
+Private e1ed525 portable-normal controls pass actual native normal/compact12+12,
+nested Wayland11 and actual-loader syntheticXR30 each profile; final compact
+quality label is screenshot-verified. Private c2f1705 dynamic VRM1 expressions
+is sealed/pushed, including all15 actual writer files with0 Khronos errors;
+five inherited raw controls retain20 errors. Anatomical GUI04e3268 is qualified;
+full locked-weight continuation remains unsealed.
+
+Combined44efeb7 now merges all those lanes and genuine native32/normal34 archive
+ownership in Scene35/material17. Owning Release/sanitizer whole application/core/
+render/support builds plus27 selected registered consumers are running, not
+passed. Its new mixed scene/export/history test is not yet qualified. Frozen f2
+full630 remains separately live (61 passed at the latest observation). See
+PRIVATE-AUTHORING-PROGRESS.md. No new main runtime/device/install/session claim;
+full production and deferred controller drawers remain unfinished.
+
+## Current private authoring work — 2026-11-04
+
+Read [PRIVATE-AUTHORING-PROGRESS.md](PRIVATE-AUTHORING-PROGRESS.md) for pushed normalUV34, native32 paint/export, anatomical linked-pose and VRM1 milestones. No new runtime code is admitted here. The measured9>4 legacy/portable pose difference compares deliberately different declared models; the predating conversion contract permits that transition. The actual within-model image bound4 stays unchanged. Controls are being clarified. Authentic source-pose directions now match exactly in scoped R/S tests. Fresh private f2 ALL1,243 tasks passes; full630 remains running, not passed. Every unfinished full-goal row and later controller drawers remains required.
 
 ## Coherent recipe regression and final fixture repairs — 2026-11-04
 
