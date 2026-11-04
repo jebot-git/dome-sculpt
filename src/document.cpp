@@ -2109,14 +2109,15 @@ void Document::finish_control_locked(bool accept) {
   if (!control_before_)
     return;
   if(state_.controls.parameter==VrParameter::ShapeMirror){
-    const auto controls=state_.controls;const auto source=control_source_;
+    static_assert(std::is_nothrow_move_constructible_v<VrControlState> && std::is_nothrow_move_assignable_v<VrControlState>);
+    auto controls=std::move(state_.controls);const auto source=control_source_;
     auto before=std::move(control_before_);control_before_.reset();state_.controls={};control_changed_=false;
     try{
       if(accept){auto edit=detail::mirror_control_request(controls);
         if(state_.morph_target!=edit.target)throw std::logic_error("Shape selection changed; reopen Mirror controls");
         queue_shape_locked(std::move(edit),source);
       }
-    }catch(...){control_before_=std::move(before);state_.controls=controls;input_.resume_control(VrParameter::ShapeMirror);throw;}
+    }catch(...){control_before_=std::move(before);state_.controls=std::move(controls);input_.resume_control(VrParameter::ShapeMirror);throw;}
     return;
   }
   if(state_.controls.parameter==VrParameter::ShapeRestore){

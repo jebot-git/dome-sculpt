@@ -10,7 +10,7 @@ with tempfile.TemporaryDirectory(prefix='dome-mirror-xr-') as directory:
  root=Path(directory);manifest=root/'runtime.json';manifest.write_text(json.dumps({'file_format_version':'1.0.0','runtime':{'library_path':str(runtime)}}));env={**os.environ,'XR_RUNTIME_JSON':str(manifest),'LIBGL_ALWAYS_SOFTWARE':'1','LP_NUM_THREADS':'2','HOME':str(root),'XDG_RUNTIME_DIR':str(root),'XDG_CONFIG_HOME':str(root/'config'),'XDG_STATE_HOME':str(root/'state'),'XDG_DATA_HOME':str(root/'data')};source=root/'source.dsculpt';subprocess.run([str(helper),'--ui-fixture',str(source)],env=env,check=True);before_bytes=source.read_bytes()
  def inspect(p):
   data=subprocess.check_output([str(helper),'--inspect',str(p)],env=env,text=True);return json.loads(next(line.removeprefix('DOME_MIRROR_JSON ') for line in data.splitlines() if line.startswith('DOME_MIRROR_JSON ')))
- original=inspect(source)
+ original=inspect(source);(out/"source.dsculpt").write_bytes(before_bytes);(out/"source.json").write_text(json.dumps(original,indent=2)+"\n")
  for mode,method in [('accept',0),('accept',1),('accept',2),('cancel',0),('focus',0)]:
   stem=mode+'-'+str(method);target=out/(stem+'.dsculpt');report=out/(stem+'.json')
   with (out/(stem+'.log')).open('w') as log:r=subprocess.run([str(binary),'--xr','--open',str(source),'--frames','126','--save',str(target)],env={**env,'DOME_XR_FIXTURE_MIRROR':mode,'DOME_XR_FIXTURE_MIRROR_METHOD':str(method),'DOME_XR_FIXTURE_REPORT':str(report)},stdout=log,stderr=subprocess.STDOUT,timeout=120)
