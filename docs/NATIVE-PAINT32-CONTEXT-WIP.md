@@ -158,3 +158,27 @@ matching layouts after it qualifies. Scene numbers alone grant no capability.
 Full scoped commands and evidence hashes are in
 `validation/NATIVE-PAINT32-RESTORE.json`. The old full-export sweep87154 is
 unchanged and remains separate live evidence, not a completed or replaced scope.
+
+
+## Native4/current6 pixel slice
+
+The test-only child `b71ad3f` now closes76 checks in Release7.53 seconds and
+matching wholly owned sanitizer10.73 seconds, reusing immutable qualified689
+archives with1174 exact inherited source/header/fixture inputs. This is a new
+consumer TU, not a new full runtime build. Real source4/current6 per-corner
+POSITION/N retain their exact identities; no normal frame, color preparation,
+Source4/imported attribute authority or raw source count is invented.
+Actual nonconstant RGBA/F32 emission/common mask and hidden fields preserve
+exact native images across Opaque, Mask and Blend, repeated current6 UV edits,
+Save/reopen and source Restore. Deliberately using edited authored UVs instead
+of the retained grid produces a real pixel-sensitive negative. The second eye
+has exact pixels with no new geometry/texture upload or packet build.
+
+The exact frozen consumer also passes76 checks on actual PCI03 Intel Arc A770
+in4.53 seconds; llvmpipe and real UHD770 each exit1 at the intended strict device
+guard. All1888 captured source/archive/binary inputs remain exact. These images
+are native-before/native-current preservation proofs, not an independent parsed
+GLB/VRM consumer or full complex-domain authoring claim. The native32 export
+compiler remains a real required adapter. Full commands/limits/negative scopes
+are in `validation/NATIVE-PAINT32-PIXELS.json`. The new CTest registration is
+additive and remains to be exercised by the next coherent descendant build.
