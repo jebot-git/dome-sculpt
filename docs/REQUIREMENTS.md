@@ -1,5 +1,26 @@
 # Full objective and completion evidence
 
+## Private source skin world precision — 2026-11-04
+
+Code 28f27b3 closes the preserved source-eye 7>4 case: actual source-backed native
+worker and untouched independent original-input consumer give 24 pairs max1 at
+unchanged 4, exact original camera/samplers/materials. No native-position
+substitution in the positive. Authenticated model/instance/placement/joint/rest/
+IBM authority drives shared mesh/native-paint/pick positions; no public layout,
+Scene schema or generic matrix-authority change. Current R/S rendering 103,
+ordinary 944, ancestry 529 and full 2,208-prefix/908-Cancel (5,360 checks) pass; actual both 19-part
+CC0 bases 24/profile and seven affected regressions each pass. Strict Arc104 plus
+actual software-refusal closed; lease released. Source validation uses bounded
+local ancestry bits and prospective whole-source metadata scratch accounting;
+legacy 33,152→256 validation allocations and real 6,000-node low-budget refusal
+are independently controlled. Component-only complete three-TU +matched 6a support;
+configure628 is not an all-suite/freshapp/main/Scene31/32/33 claim. Original
+unoptimized 66,187-prefix Release133316 passed; SAME SAN64560 remains live and
+unfinished, not relabelled. Read VRM1-SOURCE-SKIN-PRECISION.md/JSON. Dynamic
+expression-preserving painted export and remaining prepared/normal/plainPBR/
+absolute adapters, full semantic union and every other goal row stay required.
+
+
 ## Private native VRM1 expression preview — 2026-11-04
 
 Codeff13b33 adds immutable source-backed preview with actual universal-menu
