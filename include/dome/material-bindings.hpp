@@ -5,7 +5,7 @@
 #include "normal-frames.hpp"
 #include <optional>
 namespace dome {
-namespace detail { class PolygonColorArchive; class SourceKeyDerivation; }
+namespace detail { class PolygonColorArchive; class SourceKeyDerivation; class NativePaintSampling; }
 class PaintedMesh;
 class CreatorAssetArchive;
 class NormalSamplingArchive;
