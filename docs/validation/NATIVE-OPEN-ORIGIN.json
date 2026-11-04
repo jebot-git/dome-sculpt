@@ -1,0 +1,108 @@
+{
+  "status": "private-kernel-control-pass-complex-field-still-refuses",
+  "parent": "079b518",
+  "certificate": "exact closed-triangle origin plus whole finite source strict triangle-plane halfspace; Native only; strict source-assisted unchanged",
+  "cache": "No native source-independent origin bit; full origin validation for each actual source. Existing plane cache keyed actual source head/tail epoch.",
+  "matrix_incidence_changes": false,
+  "arithmetic_checks_release": 22,
+  "arithmetic_checks_own_inline_O1_ASAN_UBSAN_leaks": 22,
+  "original_strict_control": "128 complete exact union controls+15 constructor allocation boundaries+opaque origin/field negative unchanged",
+  "field_result": {
+    "elapsed": 0.761438895,
+    "error": "Bone query has an unowned origin/coplanar/grazing contact base_work=62810298 source=0 row=5184 face=8504 kind=2",
+    "exact_rollback": true,
+    "targets": [
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19,
+      20
+    ],
+    "work_bound": 500000000
+  },
+  "second_contact": {
+    "face": [
+      {
+        "object": 16,
+        "position": [
+          -0.15761901438236237,
+          0.907018780708313,
+          -0.011130244471132755
+        ],
+        "source": 5203,
+        "vertex": 555
+      },
+      {
+        "object": 16,
+        "position": [
+          -0.15302981436252594,
+          0.9034249782562256,
+          -0.05448503419756889
+        ],
+        "source": 5199,
+        "vertex": 551
+      },
+      {
+        "object": 16,
+        "position": [
+          -0.0008590371580794454,
+          0.9384740591049194,
+          -0.01801494136452675
+        ],
+        "source": 5204,
+        "vertex": 556
+      }
+    ],
+    "face_owner": 16,
+    "head": [
+      0.0002554797101765871,
+      0.9097322225570679,
+      -0.005773227661848068
+    ],
+    "head_side": 1,
+    "local_face": 772,
+    "row": {
+      "object": 16,
+      "position": [
+        -0.0008590371580794454,
+        0.9384740591049194,
+        -0.01801494136452675
+      ],
+      "source": 5182,
+      "vertex": 536
+    },
+    "row_side": 0,
+    "tail": [
+      0.00025547106633894145,
+      0.9626460075378418,
+      -0.015597852878272533
+    ],
+    "tail_side": -1
+  },
+  "new_field_or_pose_quality": false,
+  "input_hash_mismatches": 0,
+  "overlay_scope": "Two changed-private-header readers rebuilt (native-visible-weights,source-visible-weights), exact parent public headers and read-only CPU core/support; link map rejects extraction of stale readers. No fresh whole-project/solver SAN claim.",
+  "hashes": {
+    "src/bone-shadow-query.hpp": "9105652dcd5ae3be3f8c8c3e89c13dc193ac881fa780e605ad1996877b28990d",
+    "src/weight-declared-support.hpp": "a434718892b21c4df527a485100cd5d1d661f237ba55775f1124add3cce33c80",
+    "src/anatomical-continuation.hpp": "d9792badd1b8ea48c2aec3f6017f6257e3da38433c92b607395aa0d5c5487197",
+    "src/native-visible-weights.cpp": "e99decfaa6007c6dfebea96dd9f09a4083af646e4ae69e84206cc5722c919f49",
+    "tests/native-open-origin.cpp": "9e294e863266b8470d7f6caefac9480839417dc32d6f47b2c12e2fc16a2a1a3d",
+    "artifacts/native-open-origin": "92cdd28b4bc087711c3583d8f491e817f60bbfb7d53caf9993c33f69ad11b47b",
+    "artifacts/native-open-origin-sanitize": "146ba750dd6ec20e1e31ab151264eb77573887b3bb948c66a716e3969ddbd653",
+    "artifacts/predicate-final.log": "9ee90f97dd75db7f8d30a3b34504c8246f946a8e2f676476b0073b4cc09c47b9",
+    "artifacts/predicate-sanitize.log": "9ee90f97dd75db7f8d30a3b34504c8246f946a8e2f676476b0073b4cc09c47b9",
+    "artifacts/original-strict.log": "e77126f71685989add7bf74b545a52484b0d70354cbe4e78dad33c536fe3586b",
+    "artifacts/female-open-origin.log": "47e393d08a2f663ce485b9432e000a7b6fa3cc1dadbef18bcfc69fc77519fa56",
+    "artifacts/female-open-origin/failure.json": "be27dcdf75b7aa31d5c7c37fe956eabb6431d8ca18a432f84a6b08d4b86a3387",
+    "artifacts/female-second-contact.json": "62ac836f64675a46d31c6b2b85ca6600d6b1a3bbd0dbed9e323303799ed42d79",
+    "artifacts/field-overlay-before.json": "00f0c1e0580035351ae84d7a2fdde4a8a228e19ddb0656a00c03bfd75ef5a37d",
+    "artifacts/field-link-command.json": "ca1066d45d99cc6adad618d96696c82630b74e8571c8caa203073eabbea2e394",
+    "artifacts/field-overlay.map": "29c808851fb3612fea432297fa995fbee1c3884f73ac0edcf9e639a61f3eec7a",
+    "artifacts/native-visible-unskinned-open": "48e2c5fc18c242774ae961d746cfa28a316dffa562f7b45d67b477ee58c16a34"
+  }
+}

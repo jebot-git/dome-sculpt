@@ -98,6 +98,13 @@ anatomical_continuation(const Scene &scene, uint64_t group,
                DeclaredSourceRequirements::GeometryEvidence) ||
           (declared->source_span != DeclaredSourceSpan::ComponentProjection &&
            declared->source_span != DeclaredSourceSpan::AuthoredFinite) ||
+          (declared->origin_boundary != DeclaredOriginBoundary::StrictOwnership &&
+           declared->origin_boundary != DeclaredOriginBoundary::NativeOpenSegment) ||
+          (declared->origin_boundary == DeclaredOriginBoundary::NativeOpenSegment &&
+           (wall_domain != BoneWallDomain::ConnectedSourceSurface ||
+            declared->rig_geometry != DeclaredRigGeometry::NativeBoneAxes ||
+            declared->row_anchors != DeclaredRowAnchors::NearestPermitted ||
+            declared->source_span != DeclaredSourceSpan::AuthoredFinite)) ||
           (declared->source_requirements ==
                DeclaredSourceRequirements::GeometryEvidence &&
            (declared->rig_geometry != DeclaredRigGeometry::NativeBoneAxes ||
@@ -635,7 +642,10 @@ anatomical_continuation(const Scene &scene, uint64_t group,
         try {
           conductance = shadow_query.integrate(i, head, tail, s.mass[i], lo, hi,
                                                shadow_scratch, budget,
-                                               out.query_report, wall_domain);
+                                               out.query_report, wall_domain, true, true,
+                                               declared && declared->origin_boundary == DeclaredOriginBoundary::NativeOpenSegment
+                                                   ? BoneOriginPolicy::NativeOpenSegment
+                                                   : BoneOriginPolicy::StrictOwnership);
         } catch (const std::length_error &e) {
           throw std::length_error(
               std::string(e.what()) +

@@ -43,6 +43,7 @@ bool author_native_visible_skin(Scene &scene, std::span<const uint64_t> targets,
   support.source_requirements =
       detail::DeclaredSourceRequirements::GeometryEvidence;
   support.source_span = detail::DeclaredSourceSpan::AuthoredFinite;
+  support.origin_boundary = detail::DeclaredOriginBoundary::NativeOpenSegment;
   support.parts.reserve(targets.size());
   for (auto id : targets)
     support.parts.push_back({id, {}});

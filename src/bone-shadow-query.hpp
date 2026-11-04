@@ -10,6 +10,10 @@
 #include <vector>
 namespace dome::detail {
 enum class BoneWallDomain { WholeGroup, ConnectedSourceSurface };
+// Strict source ownership remains the default. Native open-segment semantics
+// exclude only exact origin-plane contacts whose ENTIRE finite source is
+// independently proved strictly on one side. No vertex/incidence union follows.
+enum class BoneOriginPolicy { StrictOwnership, NativeOpenSegment };
 struct BoneQueryReport {
   size_t nodes = 0, candidates = 0, intervals = 0, unions = 0,
          exact_predicates = 0, filtered_misses = 0, filtered_full = 0,
@@ -349,11 +353,13 @@ private:
   // wall domain before any opaque-ray early exit. An opaque wall cannot hide a
   // foreign coincident origin. Only a fully completed pass becomes reusable.
   template <class Budget>
-  void validate_origin(uint32_t row, BoneWallDomain domain, Scratch &s,
-                       Budget &w, BoneQueryReport &r) const {
+  void validate_origin(uint32_t row, BoneWallDomain domain, P head, P tail,
+                       BoneOriginPolicy origin_policy, Scratch &s, Budget &w,
+                       BoneQueryReport &r) const {
     const uint8_t bit = domain == BoneWallDomain::WholeGroup ? 2 : 1;
     w.step();
-    if (s.origin_checked[row] & bit)
+    if (origin_policy == BoneOriginPolicy::StrictOwnership &&
+        (s.origin_checked[row] & bit))
       return;
     const Box point{points_[row], points_[row]};
     s.stack.clear();
@@ -387,11 +393,22 @@ private:
             !overlaps(point, boxes_[face], w))
           continue;
         auto plane = row_plane(row, face, s, w, r);
-        if (!plane.side && plane.inside)
+        if (!plane.side && plane.inside) {
+          if (origin_policy == BoneOriginPolicy::NativeOpenSegment) {
+            // Affine plane distance is strictly nonzero throughout a segment
+            // when both exact endpoint signs agree. Each open ray therefore
+            // meets this plane only at excluded t=0. This proof belongs to
+            // this source epoch, never to source-independent origin_checked.
+            auto &source = source_plane(face, head, tail, s, w, r);
+            if (source.head && source.head == source.tail)
+              continue;
+          }
           throw BoneQueryAmbiguity(bone_shadow::Kind::OriginContact, face);
+        }
       }
     }
-    s.origin_checked[row] |= bit == 2 ? 3 : 1;
+    if (origin_policy == BoneOriginPolicy::StrictOwnership)
+      s.origin_checked[row] |= bit == 2 ? 3 : 1;
   }
   template <class Budget>
   static bool add_coverage(std::vector<volume_exact::Interval> &coverage,
@@ -537,7 +554,8 @@ private:
   bone_shadow::Result cached_shadow(uint32_t row, uint32_t face, P head, P tail,
                                     Scratch &s, Budget &w, BoneQueryReport &r,
                                     bone_shadow::FilterReport &report,
-                                    const Fan &fan) const {
+                                    const Fan &fan,
+                                    BoneOriginPolicy origin_policy) const {
     using K = bone_shadow::Kind;
     const auto &f = faces_[face];
     const P p = points_[row];
@@ -546,8 +564,16 @@ private:
       ++report.rejected;
       return {};
     }
-    if (!row_side.side && row_side.inside)
+    if (!row_side.side && row_side.inside) {
+      if (origin_policy == BoneOriginPolicy::NativeOpenSegment) {
+        auto &source = source_plane(face, head, tail, s, w, r);
+        if (source.head && source.head == source.tail) {
+          ++report.rejected;
+          return {};
+        }
+      }
       return {K::OriginContact, {}};
+    }
     auto &source = source_plane(face, head, tail, s, w, r);
     if ((row_side.side > 0 && source.head > 0 && source.tail > 0) ||
         (!row_side.side && source.head && source.head == source.tail)) {
@@ -758,11 +784,13 @@ public:
   size_t triangles() const { return faces_.size(); }
   size_t nodes() const { return nodes_.size(); }
   template <class Budget>
-  double
-  integrate(uint32_t row, P head, P tail, double mass, double lo, double hi,
-            Scratch &scratch, Budget &w, BoneQueryReport &report,
-            BoneWallDomain domain = BoneWallDomain::WholeGroup,
-            bool use_filter = true, bool incremental_coverage = true) const {
+  double integrate(uint32_t row, P head, P tail, double mass, double lo,
+                   double hi, Scratch &scratch, Budget &w,
+                   BoneQueryReport &report,
+                   BoneWallDomain domain = BoneWallDomain::WholeGroup,
+                   bool use_filter = true, bool incremental_coverage = true,
+                   BoneOriginPolicy origin_policy =
+                       BoneOriginPolicy::StrictOwnership) const {
     w.stop();
     BoneQueryReport staged;
     const size_t query_start = w.used;
@@ -770,6 +798,12 @@ public:
     if (row >= points_.size() || !(mass > 0) || !std::isfinite(mass) ||
         lo < 0 || hi > 1 || lo > hi || !std::isfinite(lo) || !std::isfinite(hi))
       throw std::invalid_argument("Invalid owning source query");
+    if ((origin_policy != BoneOriginPolicy::StrictOwnership &&
+         origin_policy != BoneOriginPolicy::NativeOpenSegment) ||
+        (origin_policy == BoneOriginPolicy::NativeOpenSegment &&
+         domain != BoneWallDomain::ConnectedSourceSurface))
+      throw std::invalid_argument("Native open-segment origins require their "
+                                  "own connected wall component");
     if (scratch.shadows.capacity() < faces_.size() ||
         scratch.stack.capacity() < nodes_.size() ||
         scratch.rows.size() != cache_slots(points_.size()) ||
@@ -788,7 +822,7 @@ public:
       fan.hi[k] = std::max({p[k], head[k], tail[k]});
     }
     prepare(scratch, head, tail, w);
-    validate_origin(row, domain, scratch, w, staged);
+    validate_origin(row, domain, head, tail, origin_policy, scratch, w, staged);
     volume_exact::Arithmetic exact(w);
     const auto exact_lo =
         bone_shadow::ratio(exact.scalar(lo), exact.scalar(1.), exact);
@@ -837,9 +871,18 @@ public:
                                          points_[ids[2]]};
         const auto predicate_start = w.used;
         auto shadow =
-            use_filter ? cached_shadow(row, face, head, tail, scratch, w,
-                                       staged, filter_report, bounded_fan)
-                       : bone_shadow::triangle_shadow(p, head, tail, wall, w);
+            use_filter
+                ? cached_shadow(row, face, head, tail, scratch, w, staged,
+                                filter_report, bounded_fan, origin_policy)
+                : bone_shadow::triangle_shadow(p, head, tail, wall, w);
+        if (!use_filter && shadow.kind == bone_shadow::Kind::OriginContact &&
+            origin_policy == BoneOriginPolicy::NativeOpenSegment) {
+          const auto plane = row_plane(row, face, scratch, w, staged);
+          auto &source = source_plane(face, head, tail, scratch, w, staged);
+          if (!plane.side && plane.inside && source.head &&
+              source.head == source.tail)
+            shadow = {};
+        }
         staged.predicate_work += w.used - predicate_start;
         if (shadow.kind == bone_shadow::Kind::None)
           continue;

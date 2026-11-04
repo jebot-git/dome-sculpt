@@ -28,6 +28,7 @@ enum class DeclaredRigGeometry { NativeBoneAxes, ChildHeadControl };
 enum class DeclaredRowAnchors { AllVisible, NearestPermitted };
 enum class DeclaredSourceRequirements { AllEligible, GeometryEvidence };
 enum class DeclaredSourceSpan { ComponentProjection, AuthoredFinite };
+enum class DeclaredOriginBoundary { StrictOwnership, NativeOpenSegment };
 struct DeclaredWeightSupport {
   DeclaredSupportPolicy policy = DeclaredSupportPolicy::AllDeformControls;
   bool world_metric = false;
@@ -38,6 +39,8 @@ struct DeclaredWeightSupport {
   DeclaredSourceRequirements source_requirements =
       DeclaredSourceRequirements::AllEligible;
   DeclaredSourceSpan source_span = DeclaredSourceSpan::ComponentProjection;
+  DeclaredOriginBoundary origin_boundary =
+      DeclaredOriginBoundary::StrictOwnership;
   const DeclaredWeightPart *find(uint64_t id) const {
     auto at = std::find_if(parts.begin(), parts.end(),
                            [&](const auto &p) { return p.object == id; });
