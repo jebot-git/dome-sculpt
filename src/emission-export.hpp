@@ -2,6 +2,7 @@
 #pragma once
 #include "emission-package.hpp"
 namespace dome::detail {
+EmissionInterchangeImage native_paint_emission_field(const SculptObject &,const std::function<bool()> &);
 bool requires_native_emission_package(const Scene &,const std::function<bool()> & = {});
 struct EmissionExportPrepared {
  std::vector<ObjectSurface> surfaces;
