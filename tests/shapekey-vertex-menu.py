@@ -72,10 +72,16 @@ async def main():
   prior=out/'mirror-before.dsculpt';prior.write_bytes(project.read_bytes())
   await command('Mirror shapekey...');dialog=await wait(lambda:named('Mirror shapekey'));dialog.set_input_focus(X.RevertToParent,X.CurrentTime);d.sync();g=dialog.get_geometry();row=46 if compact else 32
   check(g.width<=600 and g.height<=320 if compact else g.height<=860,'Mirror controls fit the normal or large-bitmap compact display')
-  await asyncio.sleep(.15);pixels(dialog).save(out/'mirror-top.png');before=pixels(dialog);xtest.fake_input(d,X.MotionNotify,x=g.x+g.width//2,y=g.y+g.height//2)
-  for _ in range(14):xtest.fake_input(d,X.ButtonPress,5);xtest.fake_input(d,X.ButtonRelease,5)
-  d.sync();await asyncio.sleep(.15);pixels(dialog).save(out/'mirror-method.png')
-  check(pixels(dialog).tobytes()!=before.tobytes(),'Actual Mirror method controls scroll into view')
+  await asyncio.sleep(.15);pixels(dialog).save(out/'mirror-top.png');before=pixels(dialog)
+  xtest.fake_input(d,X.MotionNotify,x=g.x+g.width-8,y=g.y+(g.height-row*2)//2)
+  previous=before.tobytes();stable=0;reached=False
+  for _ in range(24):
+   for _ in range(8):xtest.fake_input(d,X.ButtonPress,5);xtest.fake_input(d,X.ButtonRelease,5)
+   d.sync();await asyncio.sleep(.08);current=pixels(dialog).tobytes()
+   stable=stable+1 if current==previous else 0;previous=current
+   if stable>=2 and current!=before.tobytes():reached=True;break
+  pixels(dialog).save(out/'mirror-method.png')
+  check(reached,'Actual Mirror controls reach the stable scroll bottom with the method visible')
   check(pixels(dialog).crop((0,g.height-row*2,g.width,g.height)).tobytes()==before.crop((0,g.height-row*2,g.width,g.height)).tobytes(),'Cancel and Apply remain fixed while Mirror controls scroll')
   tap(dialog,g.width*.75,g.height-row*2+24);await wait(lambda:named('Mirror shapekey') is None);await ready('New shapekey...');await command('Save');mirrored=inspect();saved=out/'mirror-after.dsculpt';saved.write_bytes(project.read_bytes())
   subprocess.run([helper,'--verify-ui-vertex',str(prior),str(saved)],env=env,check=True)
