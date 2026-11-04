@@ -12,6 +12,7 @@ struct NativeAuthoringEmission {
   double maximum_absolute_error=0,maximum_relative_error=0;
   size_t erased_nonzero_samples=0;
   bool unlit=false;
+  size_t unlit_ignored_samples=0;
 };
 struct NativeAuthoringCompilation {
   std::vector<ObjectSurface> surfaces;

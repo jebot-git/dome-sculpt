@@ -139,9 +139,10 @@ NativeAuthoringCompilation compile_native_authoring(
       next.material.emissive={};
       result.emission.push_back({object.id,std::move(emission->emission),emission->factor,
         emission->strength,emission->maximum_absolute_error,emission->maximum_relative_error,
-        emission->erased_nonzero_samples,object.material.unlit});
+        emission->erased_nonzero_samples,object.material.unlit,
+        object.material.unlit?emission->nonzero_samples:0});
       result.diagnostics.push_back("Object "+std::to_string(object.id)+
-        ": finite physical-emission PNG/strength view; maximum sample error "+
+        ": finite physical-emission PNG/strength view; maximum texel quantization error "+
         std::to_string(emission->maximum_absolute_error)+
         (object.material.unlit?"; unlit material ignores emission":" linear radiance units"));
     }
@@ -162,6 +163,9 @@ NativeAuthoringCompilation compile_native_authoring(
   }
   if (result.surfaces.size()!=capture.ids().size())
     throw std::invalid_argument("Native authoring compilation changed emitted object membership");
+  for(size_t i=0;i<result.surfaces.size();++i)
+    if(result.surfaces[i].id!=capture.ids()[i])
+      throw std::invalid_argument("Native authoring compilation changed emitted object ordering");
   return result;
 }
 void finish_native_authoring_emission(GltfDocument &document,
@@ -209,6 +213,8 @@ void finish_native_authoring_emission(GltfDocument &document,
     const size_t sampler=j["samplers"].size();j["samplers"].push_back({{"wrapS",33071},{"wrapT",33071},{"minFilter",9729},{"magFilter",9729}});
     const size_t texture=j["textures"].size();j["textures"].push_back({{"source",image},{"sampler",sampler}});
     auto &material=j["materials"].at(identity.material);
+    const bool unlit=material.contains("extensions")&&material.at("extensions").contains("KHR_materials_unlit");
+    if(unlit!=entry.unlit)throw std::logic_error("Physical finite view changed the actual unlit interpretation");
     material["emissiveTexture"]={{"index",texture}};material["emissiveFactor"]=entry.factor;
     if(entry.strength>1){material["extensions"]["KHR_materials_emissive_strength"]={{"emissiveStrength",entry.strength}};
       auto &used=j["extensionsUsed"];if(used.is_null())used=Json::array();
@@ -217,9 +223,12 @@ void finish_native_authoring_emission(GltfDocument &document,
     material["extras"]["domeSculptPortableEmission"]={{"version",1},
       {"evaluation","finite-current-core-pbr-uv0"},{"units","native-linear-radiance"},
       {"lossless",false},{"unlitIgnoresEmission",entry.unlit},
-      {"maximumAbsoluteSampleError",entry.maximum_absolute_error},
-      {"maximumRelativeSampleError",entry.maximum_relative_error},
-      {"erasedNonzeroSamples",entry.erased_nonzero_samples},{"clampedSamples",0}};
+      {"errorScope","encoded-texel-quantization"},{"betweenTexelErrorBound",nullptr},
+      {"maximumAbsoluteTexelQuantizationError",entry.maximum_absolute_error},
+      {"maximumRelativeTexelQuantizationError",entry.maximum_relative_error},
+      {"erasedNonzeroTexelSamples",entry.erased_nonzero_samples},{"clampedTexelSamples",0},
+      {"unlitIgnoredNonzeroTexelSamples",entry.unlit_ignored_samples},
+      {"maximumUnlitIgnoredRadiance",entry.unlit?double(entry.strength)*std::max({entry.factor[0],entry.factor[1],entry.factor[2]}):0.}};
   }
   stop();
 }

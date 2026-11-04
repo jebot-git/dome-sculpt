@@ -526,7 +526,7 @@ detail::SourcePaintPhysicalResult detail::bake_source_paint_physical(
     !options.max_raster_samples||options.max_raster_samples>1024ull*1024*1024||
     !options.max_sample_operations||options.max_sample_operations>1024ull*1024*1024)
   throw std::invalid_argument("Invalid physical source compilation bounds");
- if(!input.paint||!input.paint->source_sampling_prepared()||
+ if(!input.paint||input.paint->in_stroke()||!input.paint->source_sampling_prepared()||
     !input.paint->valid_source_sampling_attachment()||input.paint->paint_sampling_domain())
   throw std::invalid_argument("Physical portable material requires its owning original-source atlas");
  if(!(input.paint->has_physical_emission()||detail::hdr_emission(material.emissive)||
@@ -548,10 +548,25 @@ detail::SourcePaintPhysicalResult detail::bake_source_paint_physical(
    throw std::length_error("Physical source staging exceeds working budget");
   scratch+=n*unit;
  };
+ charge(input.target.positions.size()+input.target.normals.size(),sizeof(Vec3));
+ charge(input.target.uv.size(),sizeof(std::array<float,2>));
+ charge(input.target.indices.size()+input.source_vertices.size(),sizeof(uint32_t));
+ charge(input.target.uv_pins.size()+input.target.uv_seams.size(),1);
+ charge(1,sizeof(detail::PaintOverlayPacket));
+ charge(1,512); // Initial buckets for three bounded capture owner sets.
  for(const auto &layer:input.paint->layers()) {
   if(options.cancelled&&options.cancelled())throw std::runtime_error("Physical source material cancelled");
   charge(1,sizeof(PaintLayer));charge(layer.name.size()+1,1);
   charge(layer.tiles.size()+layer.pbr_tiles.size()+layer.emission_tiles.size(),sizeof(std::shared_ptr<const PaintTile>));
+  // Capture copies the visible metadata vectors and builds three temporary
+  // owner sets. Bound those allocations before entering its factory.
+  if(layer.visible&&layer.opacity>0){
+   charge(1,sizeof(detail::PaintOverlayLayer));
+   charge(layer.tiles.size()+layer.pbr_tiles.size()+layer.emission_tiles.size(),sizeof(std::shared_ptr<const PaintTile>));
+   for(const auto &tile:layer.tiles)if(tile)charge(1,64);
+   for(const auto &tile:layer.pbr_tiles)if(tile)charge(1,64);
+   for(const auto &tile:layer.emission_tiles)if(tile)charge(1,64);
+  }
   for(const auto &tile:layer.tiles)if(tile&&std::any_of(tile->pixels.begin(),tile->pixels.end(),[](const auto &p){return p.data[6]||p.data[7]||p.data[8]||p.data[12];}))
    charge(1,sizeof(PaintTile));
  }
@@ -615,11 +630,10 @@ detail::SourcePaintPhysicalResult detail::bake_source_paint_physical(
   if((at&1023)==0)budget.cancel();
   for(size_t k=0;k<3;++k){budget.work();const auto actual=radiance[at][k];
    const auto q=byte(linear_to_srgb(peak[k]>0?actual/peak[k]:0));result.emission.rgba[at*4+k]=q;
-   // KHR_materials_unlit ignores emissiveTexture, including its strength.
-   const double restored=material.unlit?0:double(srgb_to_linear(q/255.f))*result.factor[k]*result.strength;
+   const double restored=double(srgb_to_linear(q/255.f))*result.factor[k]*result.strength;
    const double error=std::abs(double(actual)-restored);
    result.maximum_absolute_error=std::max(result.maximum_absolute_error,error);
-   if(actual>0){result.maximum_relative_error=std::max(result.maximum_relative_error,error/actual);
+   if(actual>0){++result.nonzero_samples;result.maximum_relative_error=std::max(result.maximum_relative_error,error/actual);
     if(restored==0)++result.erased_nonzero_samples;}
   }
   result.emission.rgba[at*4+3]=255;

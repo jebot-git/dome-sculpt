@@ -11,6 +11,7 @@ struct SourcePaintPhysicalResult {
   float strength=1;
   double maximum_absolute_error=0, maximum_relative_error=0;
   size_t erased_nonzero_samples=0;
+  size_t nonzero_samples=0;
 };
 SourcePaintPhysicalResult bake_source_paint_physical(
     const SourceUvBakeInput &, const Material &, const SourceUvBakeOptions &);
