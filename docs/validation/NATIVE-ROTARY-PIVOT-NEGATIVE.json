@@ -1,0 +1,240 @@
+{
+  "scope": "Private rejected anatomical handle candidate; no public/default/UI admission",
+  "parent": "61df0f5",
+  "point_test": "PASS point analytic.5 +unchanged finite-line refusal +policy admission rejection +foreign cache replay\n",
+  "compile": [
+    [
+      "src/native-visible-weights.cpp",
+      0,
+      [
+        "/usr/bin/c++",
+        "-DDOME_SCULPT_INSTALLED_ASSETS=\"/usr/local/share/dome-sculpt/assets/humanoid\"",
+        "-DDOME_SCULPT_SOURCE_ASSETS=\"/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-rotary-pivot-61df0f5/assets/humanoid\"",
+        "-I/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-rotary-pivot-61df0f5/third_party",
+        "-I/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-rotary-pivot-61df0f5/include",
+        "-I/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-rotary-pivot-61df0f5/third_party/openbrush",
+        "-I/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-rotary-pivot-61df0f5/third_party/cgltf",
+        "-I/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-rotary-pivot-61df0f5/third_party/nlohmann",
+        "-I/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-rotary-pivot-61df0f5/third_party/xatlas",
+        "-I/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-rotary-pivot-61df0f5/third_party/mikktspace",
+        "-I/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-rotary-pivot-61df0f5/third_party/ufbx",
+        "-O3",
+        "-DNDEBUG",
+        "-std=gnu++20",
+        "-Wall",
+        "-Wextra",
+        "-Wpedantic",
+        "-o",
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-rotary-pivot-61df0f5/artifacts/native-visible-weights.cpp.o",
+        "-c",
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-rotary-pivot-61df0f5/src/native-visible-weights.cpp"
+      ]
+    ],
+    [
+      "src/source-visible-weights.cpp",
+      0,
+      [
+        "/usr/bin/c++",
+        "-DDOME_SCULPT_INSTALLED_ASSETS=\"/usr/local/share/dome-sculpt/assets/humanoid\"",
+        "-DDOME_SCULPT_SOURCE_ASSETS=\"/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-rotary-pivot-61df0f5/assets/humanoid\"",
+        "-I/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-rotary-pivot-61df0f5/third_party",
+        "-I/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-rotary-pivot-61df0f5/include",
+        "-I/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-rotary-pivot-61df0f5/third_party/openbrush",
+        "-I/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-rotary-pivot-61df0f5/third_party/cgltf",
+        "-I/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-rotary-pivot-61df0f5/third_party/nlohmann",
+        "-I/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-rotary-pivot-61df0f5/third_party/xatlas",
+        "-I/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-rotary-pivot-61df0f5/third_party/mikktspace",
+        "-I/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-rotary-pivot-61df0f5/third_party/ufbx",
+        "-O3",
+        "-DNDEBUG",
+        "-std=gnu++20",
+        "-Wall",
+        "-Wextra",
+        "-Wpedantic",
+        "-o",
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-rotary-pivot-61df0f5/artifacts/source-visible-weights.cpp.o",
+        "-c",
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-rotary-pivot-61df0f5/src/source-visible-weights.cpp"
+      ]
+    ],
+    [
+      "tests/native-intent-contact-field.cpp",
+      0,
+      [
+        "/usr/bin/c++",
+        "-I/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-rotary-pivot-61df0f5/src",
+        "-I/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-rotary-pivot-61df0f5/include",
+        "-I/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-rotary-pivot-61df0f5/third_party/openbrush",
+        "-I/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-rotary-pivot-61df0f5/third_party/nlohmann",
+        "-O3",
+        "-DNDEBUG",
+        "-std=gnu++20",
+        "-o",
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-rotary-pivot-61df0f5/artifacts/native-intent-contact-field.cpp.o",
+        "-c",
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-rotary-pivot-61df0f5/tests/native-intent-contact-field.cpp"
+      ]
+    ]
+  ],
+  "link": {
+    "command": [
+      "/usr/bin/c++",
+      "-O3",
+      "-DNDEBUG",
+      "-Wl,--dependency-file=/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-rotary-pivot-61df0f5/artifacts/candidate.link.d",
+      "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-rotary-pivot-61df0f5/artifacts/native-intent-contact-field.cpp.o",
+      "-o",
+      "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-rotary-pivot-61df0f5/artifacts/native-rotary-field",
+      "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-rotary-pivot-61df0f5/artifacts/libdome-sculpt-core.a",
+      "libdome-sculpt-affine.a",
+      "/usr/lib64/liblapacke.so",
+      "libdome-sculpt-polygon.a",
+      "libxatlas.a",
+      "libmikktspace.a",
+      "libmikktspace-robust.a",
+      "libufbx.a",
+      "/usr/lib64/libpng.so",
+      "/usr/lib64/libjpeg.so",
+      "/usr/lib64/libz.so",
+      "libdome-sculpt-emission-codec.a",
+      "/usr/lib64/libOpenEXR-3_2.so",
+      "/usr/lib64/libOpenEXRUtil-3_2.so",
+      "/usr/lib64/libOpenEXRCore-3_2.so",
+      "/usr/lib64/libIex-3_2.so",
+      "/usr/lib64/libIlmThread-3_2.so",
+      "/usr/lib64/libImath-3_1.so",
+      "-lgcc_s_asneeded",
+      "-lgcc_s_asneeded"
+    ],
+    "original_core": "d901ac7aec3b0337497dba3fbd73744707518805b4cc4f67c858bb490a58e275",
+    "replacement_core": "01dd752b50772ea1e7d0061091a8e1f5a4f7bd62db329348fa730d34ab88101f"
+  },
+  "fields": [
+    {
+      "sex": "female",
+      "command": [
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-rotary-pivot-61df0f5/artifacts/native-rotary-field",
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-context-api-7849001/build/native-line-female/fitted-unskinned.dsculpt",
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-rotary-pivot-61df0f5/artifacts/female"
+      ],
+      "exit": 0,
+      "seconds": 2.2313433259841986
+    },
+    {
+      "sex": "male",
+      "command": [
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-rotary-pivot-61df0f5/artifacts/native-rotary-field",
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-context-api-7849001/build/native-line-male/fitted-unskinned.dsculpt",
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-rotary-pivot-61df0f5/artifacts/male"
+      ],
+      "exit": 0,
+      "seconds": 2.2703121719823685
+    }
+  ],
+  "quality": [
+    {
+      "sex": "female",
+      "kind": "global",
+      "exit": 0,
+      "seconds": 2.4029141959908884,
+      "command": [
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-context-api-7849001/build/dome-sculpt-native-unskinned-quality-test",
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-rotary-pivot-61df0f5/assets/humanoid/vroid/base-female.vrm",
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-rotary-pivot-61df0f5/artifacts/female/bound.dsculpt",
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-rotary-pivot-61df0f5/artifacts/female-global"
+      ]
+    },
+    {
+      "sex": "female",
+      "kind": "head-eye",
+      "exit": 1,
+      "seconds": 5.096094404987525,
+      "command": [
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-context-api-7849001/artifacts/head-eye-quality",
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-rotary-pivot-61df0f5/assets/humanoid/vroid/base-female.vrm",
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-rotary-pivot-61df0f5/artifacts/female/bound.dsculpt",
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-rotary-pivot-61df0f5/artifacts/female-head-eye"
+      ]
+    },
+    {
+      "sex": "male",
+      "kind": "global",
+      "exit": 0,
+      "seconds": 2.4500280779902823,
+      "command": [
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-context-api-7849001/build/dome-sculpt-native-unskinned-quality-test",
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-rotary-pivot-61df0f5/assets/humanoid/vroid/base-male.vrm",
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-rotary-pivot-61df0f5/artifacts/male/bound.dsculpt",
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-rotary-pivot-61df0f5/artifacts/male-global"
+      ]
+    },
+    {
+      "sex": "male",
+      "kind": "head-eye",
+      "exit": 1,
+      "seconds": 4.534838913008571,
+      "command": [
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-context-api-7849001/artifacts/head-eye-quality",
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-rotary-pivot-61df0f5/assets/humanoid/vroid/base-male.vrm",
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-rotary-pivot-61df0f5/artifacts/male/bound.dsculpt",
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-rotary-pivot-61df0f5/artifacts/male-head-eye"
+      ]
+    }
+  ],
+  "results": {
+    "female": {
+      "field": {
+        "changed": 19,
+        "contacts": 14901,
+        "partition": 3.9668268669856843e-13,
+        "policy": "private humanoid rotary pivots with ordinary shared contact, no fallback",
+        "rows": 9851,
+        "seconds": 1.455611431,
+        "work": 382351854,
+        "workspace": 158367541
+      },
+      "global_passed": 95,
+      "global_total": 95,
+      "local_failures": 166,
+      "local_total": 266,
+      "global_gate_failures_in_local": 0,
+      "local_gate_failures": 166,
+      "rigid_gate_failures": 96
+    },
+    "male": {
+      "field": {
+        "changed": 19,
+        "contacts": 17804,
+        "partition": 5.906386491005833e-14,
+        "policy": "private humanoid rotary pivots with ordinary shared contact, no fallback",
+        "rows": 9878,
+        "seconds": 1.50610366,
+        "work": 393800864,
+        "workspace": 165078935
+      },
+      "global_passed": 95,
+      "global_total": 95,
+      "local_failures": 174,
+      "local_total": 266,
+      "global_gate_failures_in_local": 0,
+      "local_gate_failures": 168,
+      "rigid_gate_failures": 102
+    }
+  },
+  "sha256": {
+    "src/anatomical-continuation.hpp": "17fc4f1bba6954f639cb9284f7b1fff6d51cdd3990c09d372e074828ef3e82ef",
+    "src/weight-declared-support.hpp": "fe257f965bdd0d49d30ac1f15b1cc62f09f631695ad143ec2e8c0a7cedb3fc11",
+    "src/geometry-weight-authoring.hpp": "f1b52820733edb71dc0b7fdb548500a62e5b500362627e9120f147364a767691",
+    "tests/native-intent-contact-field.cpp": "570beb8367db9aaac67b13f6d2758e4ab53e33777e7ddbc5b34e5d2aee02ef1a",
+    "tests/native-rotary-point.cpp": "409a351b3769b0cd2e89b4cc54e4c56f21235ad708af19ea480bbf9ba463514a",
+    "artifacts/native-rotary-point-test": "4aff0672abb8fa29c8de1caac65754d477710256cce3e1ddf9d2e8ca90fa7dd7",
+    "artifacts/native-rotary-field": "c34da11e97c0fdcdf473a9a3b6767ac9290c12dff0638de3910f70ba1b7c0985",
+    "artifacts/libdome-sculpt-core.a": "01dd752b50772ea1e7d0061091a8e1f5a4f7bd62db329348fa730d34ab88101f",
+    "artifacts/female/bound.dsculpt": "9fef8cf05b03726a0d168af6a53fcaa775d30f23c233fae3c7791dbdcb2fa00a",
+    "artifacts/female-head-eye/quality.json": "58e86f20f47e7d1f1a6edbcf273afa52bb110ef97f5b95b9b6d1fc4b1af5d55b",
+    "artifacts/female-global/quality.json": "272424d3752c0f00958d7774595a1097e95f7ffa2c8ae5def29134b494184e42",
+    "artifacts/male/bound.dsculpt": "24776f3021930cf29628f1fb3e16548cbbbab225a18d4e2ac85cf6a9c89e9a7d",
+    "artifacts/male-head-eye/quality.json": "3e428afebc96a5faf7f5d3024be56fd041423a705089f37807ffc16a44580de3",
+    "artifacts/male-global/quality.json": "75ccfeb43a9c91a52023c42de708bc3be2a8043dc9b4338228dd9622b4b4e6da"
+  }
+}

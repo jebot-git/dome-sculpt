@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #pragma once
+#include "dome/avatar.hpp"
 #include "heat-component-intent.hpp"
 #include "weight-contact-intent.hpp"
 #include "weight-nearest-support.hpp"
@@ -22,7 +23,11 @@ enum class DeclaredSupportPolicy {
   // values, geometry weld or hidden fallback supplies the missing intent.
   UniqueSourceWitnesses
 };
-enum class DeclaredRigGeometry { NativeBoneAxes, ChildHeadControl };
+enum class DeclaredRigGeometry {
+  NativeBoneAxes,
+  ChildHeadControl,
+  HumanoidRotaryPivots
+};
 // Separate screened-energy construction, not a fallback after a failed solve.
 // Component masks still own permitted controls; only the closest permitted
 // finite source(s) anchor each row. Exact ties retain all joint identities.
@@ -55,14 +60,28 @@ struct DeclaredWeightSupport {
 };
 inline ImportedHeatProfile
 declared_weight_profile(const Skeleton &rig, weight_surface::Budget &work,
-                        DeclaredRigGeometry geometry) {
+                        DeclaredRigGeometry geometry,
+                        const HumanoidMapping *humanoid = nullptr) {
   if (rig.bones.empty() || rig.bones.size() > 256)
     throw std::length_error("Declared weight control dimensions exceeded");
   work.step_items(rig.bones.size(), rig.bones.size() * 32 + 64);
   rig.validate();
   ImportedHeatProfile profile; // private data container; source remains null
   profile.eligible.resize(rig.bones.size());
-  if (geometry == DeclaredRigGeometry::NativeBoneAxes) {
+  if (geometry == DeclaredRigGeometry::NativeBoneAxes ||
+      geometry == DeclaredRigGeometry::HumanoidRotaryPivots) {
+    std::array<uint8_t, 256> rotary{};
+    if (geometry == DeclaredRigGeometry::HumanoidRotaryPivots) {
+      if (!humanoid)
+        throw std::invalid_argument(
+            "Rotary source geometry needs genuine current humanoid roles");
+      humanoid->validate(rig, false);
+      for (const auto *role : {"leftEye", "rightEye"}) {
+        auto at = humanoid->joints.find(role);
+        if (at != humanoid->joints.end())
+          rotary[at->second] = 1;
+      }
+    }
     const auto actual = rig.segments();
     profile.segments.reserve(actual.size());
     for (uint32_t i = 0; i < actual.size(); ++i) {
@@ -71,7 +90,11 @@ declared_weight_profile(const Skeleton &rig, weight_surface::Budget &work,
         continue;
       profile.eligible[i] = 1;
       const auto &a = actual[i][0], &b = actual[i][1];
-      profile.segments.push_back({{a.x, a.y, a.z}, {b.x, b.y, b.z}, i});
+      profile.segments.push_back({{a.x, a.y, a.z},
+                                  rotary[i]
+                                      ? std::array<double, 3>{a.x, a.y, a.z}
+                                      : std::array<double, 3>{b.x, b.y, b.z},
+                                  i});
     }
     if (profile.segments.empty())
       throw std::invalid_argument("Native rig has no authored deform handles");

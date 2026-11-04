@@ -91,7 +91,8 @@ anatomical_continuation(const Scene &scene, uint64_t group,
            declared->policy != DeclaredSupportPolicy::NearestSourceUnion &&
            declared->policy != DeclaredSupportPolicy::UniqueSourceWitnesses) ||
           (declared->rig_geometry != DeclaredRigGeometry::NativeBoneAxes &&
-           declared->rig_geometry != DeclaredRigGeometry::ChildHeadControl) ||
+           declared->rig_geometry != DeclaredRigGeometry::ChildHeadControl &&
+           declared->rig_geometry != DeclaredRigGeometry::HumanoidRotaryPivots) ||
           (declared->row_anchors != DeclaredRowAnchors::AllVisible &&
            declared->row_anchors != DeclaredRowAnchors::NearestPermitted) ||
           (declared->source_requirements !=
@@ -105,12 +106,12 @@ anatomical_continuation(const Scene &scene, uint64_t group,
            declared->origin_boundary != DeclaredOriginBoundary::NativeFiniteLineIntegral) ||
           (declared->origin_boundary != DeclaredOriginBoundary::StrictOwnership &&
            (wall_domain != BoneWallDomain::ConnectedSourceSurface ||
-            declared->rig_geometry != DeclaredRigGeometry::NativeBoneAxes ||
+            (declared->rig_geometry != DeclaredRigGeometry::NativeBoneAxes && declared->rig_geometry != DeclaredRigGeometry::HumanoidRotaryPivots) ||
             declared->row_anchors != DeclaredRowAnchors::NearestPermitted ||
             declared->source_span != DeclaredSourceSpan::AuthoredFinite)) ||
           (declared->source_requirements ==
                DeclaredSourceRequirements::GeometryEvidence &&
-           (declared->rig_geometry != DeclaredRigGeometry::NativeBoneAxes ||
+           ((declared->rig_geometry != DeclaredRigGeometry::NativeBoneAxes && declared->rig_geometry != DeclaredRigGeometry::HumanoidRotaryPivots) ||
             declared->row_anchors != DeclaredRowAnchors::NearestPermitted)))
         throw std::invalid_argument("Unknown declared geometry weight policy");
       if (declared->parts.empty() || declared->parts.size() > 64)
@@ -321,7 +322,7 @@ anatomical_continuation(const Scene &scene, uint64_t group,
     if (!options.maximum_work)
       throw std::length_error("Source-visible work exhausted before capture");
     if (declared &&
-        declared->rig_geometry == DeclaredRigGeometry::NativeBoneAxes &&
+        declared->rig_geometry != DeclaredRigGeometry::ChildHeadControl &&
         rig_source->appearance) {
       const auto &appearance = *rig_source->appearance;
       if (!appearance.source_joint_nodes.empty())
@@ -341,7 +342,8 @@ anatomical_continuation(const Scene &scene, uint64_t group,
     }
     auto profile =
         declared ? declared_weight_profile(*rig_source->deformation->skeleton,
-                                           budget, declared->rig_geometry)
+                                           budget, declared->rig_geometry,
+                                           rig_source->deformation->humanoid ? &*rig_source->deformation->humanoid : nullptr)
                  : imported_heat_profile(*first->deformation->skeleton,
                                          *first->appearance, options, cancelled,
                                          &*first->deformation->humanoid);
@@ -557,8 +559,18 @@ anatomical_continuation(const Scene &scene, uint64_t group,
                                      incidence.planned_bytes,
                                  budget, incidence.groups, origin_policy);
     BoneShadowQuery::Scratch shadow_scratch(shadow_query);
-    const size_t source_bytes =
-        bytes + incidence.planned_bytes + shadow_query.planned_bytes;
+    size_t source_bytes = bytes + incidence.planned_bytes + shadow_query.planned_bytes;
+    const bool rotary_geometry = declared && declared->rig_geometry == DeclaredRigGeometry::HumanoidRotaryPivots;
+    std::optional<BoneShadowQuery> point_query;
+    std::optional<BoneShadowQuery::Scratch> point_scratch;
+    if (rotary_geometry) {
+      // A point has no finite exceptional-parameter-set admission. Its own
+      // source-independent caches use the stricter open-segment proof.
+      point_query.emplace(query_points, mesh.indices, options.maximum_bytes - source_bytes,
+                          budget, incidence.groups, BoneOriginPolicy::NativeOpenSegment);
+      source_bytes += point_query->planned_bytes;
+      point_scratch.emplace(*point_query);
+    }
     out.report.bytes = source_bytes;
     stage = "analytic visible source fields";
     const size_t source_start_work = budget.used;
@@ -611,6 +623,16 @@ anatomical_continuation(const Scene &scene, uint64_t group,
       }
       const auto delta = sub(source.tail, source.head);
       const double physical = norm(delta);
+      const bool rotary_source = rotary_geometry && [&] {
+        const auto &roles=rig_source->deformation->humanoid->joints;
+        for (const auto *role : {"leftEye","rightEye"}) {
+          auto at=roles.find(role);
+          if(at!=roles.end() && at->second==source.bone) return true;
+        }
+        return false;
+      }();
+      if (rotary_geometry && (rotary_source != (head == tail)))
+        throw std::logic_error("Rotary source kind and captured endpoints disagree");
       auto axis = delta;
       if (physical)
         for (double &v : axis)
@@ -647,10 +669,13 @@ anatomical_continuation(const Scene &scene, uint64_t group,
           continue;
         double conductance = 0;
         try {
-          conductance = shadow_query.integrate(i, head, tail, s.mass[i], lo, hi,
-                                               shadow_scratch, budget,
-                                               out.query_report, wall_domain, true, true,
-                                               origin_policy);
+          const bool point_control = rotary_source;
+          auto &query = point_control ? *point_query : shadow_query;
+          auto &scratch = point_control ? *point_scratch : shadow_scratch;
+          conductance = query.integrate(i, head, tail, s.mass[i], lo, hi,
+                                       scratch, budget, out.query_report,
+                                       wall_domain, true, true,
+                                       point_control ? BoneOriginPolicy::NativeOpenSegment : origin_policy);
         } catch (const std::length_error &e) {
           throw std::length_error(
               std::string(e.what()) +

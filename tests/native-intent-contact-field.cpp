@@ -40,7 +40,8 @@ int main(int argc, char **argv) try {
   support.source_span = detail::DeclaredSourceSpan::AuthoredFinite;
   support.origin_boundary =
       detail::DeclaredOriginBoundary::NativeFiniteLineIntegral;
-  support.contact_support = detail::DeclaredContactSupport::IdenticalMask;
+  support.contact_support = detail::DeclaredContactSupport::CommonMask;
+  support.rig_geometry = detail::DeclaredRigGeometry::HumanoidRotaryPivots;
   for (auto id : targets)
     support.parts.push_back({id, {}});
   const size_t wrapper_work = 4096 + targets.size() * 32,
@@ -62,17 +63,16 @@ int main(int argc, char **argv) try {
           .count();
   scene.save(out / "bound.dsculpt");
   std::ofstream(out / "report.json")
-      << nlohmann::
-             json{{"work", report.work + wrapper_work},
-                  {"workspace", report.workspace + wrapper_bytes},
-                  {"seconds", seconds},
-                  {"contacts", report.field.contacts},
-                  {"rows", report.field.rows},
-                  {"changed", report.changed},
-                  {"partition", report.field.partition},
-                  {"policy",
-                   "private identical component intent contact, no fallback"}}
-                 .dump(2);
+      << nlohmann::json{{"work", report.work + wrapper_work},
+                        {"workspace", report.workspace + wrapper_bytes},
+                        {"seconds", seconds},
+                        {"contacts", report.field.contacts},
+                        {"rows", report.field.rows},
+                        {"changed", report.changed},
+                        {"partition", report.field.partition},
+                        {"policy", "private humanoid rotary pivots with "
+                                   "ordinary shared contact, no fallback"}}
+             .dump(2);
   std::cout << "SAVED candidate contacts=" << report.field.contacts
             << " work=" << report.work + wrapper_work
             << " bytes=" << report.workspace + wrapper_bytes

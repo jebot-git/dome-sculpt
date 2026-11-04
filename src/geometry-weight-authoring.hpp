@@ -114,7 +114,8 @@ author_geometry_weight_skin(Scene &scene, std::span<const uint64_t> targets,
   using namespace geometry_weight_authoring;
   if (targets.empty() || targets.size() > 64 || !support.reference ||
       !support.world_metric ||
-      support.rig_geometry != DeclaredRigGeometry::NativeBoneAxes ||
+      (support.rig_geometry != DeclaredRigGeometry::NativeBoneAxes &&
+       support.rig_geometry != DeclaredRigGeometry::HumanoidRotaryPivots) ||
       !options.maximum_work || options.maximum_work > 3'000'000'000ULL ||
       options.maximum_workspace < 4096 ||
       options.maximum_workspace > 512u * 1024u * 1024u ||
