@@ -182,3 +182,62 @@ GLB/VRM consumer or full complex-domain authoring claim. The native32 export
 compiler remains a real required adapter. Full commands/limits/negative scopes
 are in `validation/NATIVE-PAINT32-PIXELS.json`. The new CTest registration is
 additive and remains to be exercised by the next coherent descendant build.
+
+
+## Explicit finite native32 export
+
+Frozen runtime `d5f4451`, with registered consumer source `af0d86c`, now provides
+an actual native Scene32 coordinate compiler for the existing explicit
+EditableGlb256/512/1024 policy. It authenticates the sealed original Scene and
+its exact native material/paint attachment before compiling actual current
+POSITION/N/authoredUV0 with a separate retained paint coordinate stream. The
+old source4/current6 counts stay real; no imported source map, normal frame or
+color preparation is manufactured. Working storage is preflighted for both LDR
+and physical native inputs at unchanged policy limits. The existing physical
+finisher retains actual float units through factor/strength and reports finite
+texture quantization; the embedded complete native Scene remains the sole exact
+project authority.
+
+Fresh coherent optimized and wholly owned O1 ASan/UBSan/leak app/core/render/
+support/XR/inspector builds pass17 selected commands each (55.85/233.48 seconds).
+The final additive CTest registrations pass6/6 per profile, including the actual
+native32 fixture, public worker contracts, persistent failures and joystick
+export policy. The new consumer passes398 controls per profile and on actual
+PCI03 Intel Arc A770:12 HDR/LDR, lit/unlit and alpha combinations plus genuine
+LDR controls,14 emitted GLBs, exact native recovery/Save/second-cycle and
+independent parsed PBR images within the unchanged2-pixel bound. Native
+source/current images and Restore remain exact across76 render controls.
+All14 core files are byte-identical between Release, sanitizer and A770.
+The isolated unfiltered Khronos cohort covers58 actual outputs with0 errors,
+9 warnings for combined extensions and168 informational findings.
+
+The actual new-domain persistent sweep visits3826 denied allocation prefixes
+with3832 measured baseline calls in each profile. Twenty-two public controls
+cover six budgets/exact boundaries, early/middle/late cancellation, and durable
+running plus queued worker Cancel/following Save/retry. Real joystick controls
+pass68 checks per profile. Actual desktop filename-ACK/export/Open/Save/close
+passes15 checks in normal Release and15 in compact owned sanitizer. Required
+hardware correctly rejects both llvmpipe and actual UHD770 for export/render;
+all captured source/archive/application/fixture inputs remain unchanged.
+
+Affected older source-painted, physical and retained-domain suites pass3/3
+per profile. The complete unchanged legacy192 fixture TU also passes in both
+profiles, with all17 original output hashes byte-identical to the historical
+baseline. Three ordinary native export files separately retain their old
+bytes. The genuine same-input immutable689 public-API failure remains recorded
+and now contrasts with the successful explicit EditableGlb path.
+
+The historical full export sweep87154 has now actually completed0 on its
+original unchanged source:265783 denied prefixes,265789 baseline calls and
+1648 exact inputs, with39521.13 seconds in the retained case. It was never
+restarted, terminated or replaced by the new native32 sweep. The earlier
+statements that it was live describe their respective older checkpoints.
+
+This remains a PRIVATE scoped milestone. Ordinary strict retained-domain HDR
+export still refuses; its exact baseline/correspondence diagnostic, prior file,
+Scene, history and following Save are preserved. Actual normal/bake/source/
+typed-MToon/current rig/key/polygon domain adapters, intentional fresh-layout
+root33/34 composition and broader ALL/regression/Wayland/loader qualification
+remain required. Native Source32 cannot infer those capabilities from a version
+number. Detailed commands, counterfactuals and artifact fingerprints are in
+`validation/NATIVE-PAINT32-EXPORT.json`.
