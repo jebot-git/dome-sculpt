@@ -25,6 +25,11 @@ void roundtrip_layers(Document &document,const std::filesystem::path &path){
 int main(int argc,char **argv)try{
   if(argc!=3)return 2;const std::filesystem::path source=argv[1],out=argv[2];std::filesystem::create_directories(out);
   NativeGraphics graphics;Fbo fbo;SurfaceRenderer renderer;
+  const auto actual_renderer=reinterpret_cast<const char*>(glGetString(GL_RENDERER));
+  std::cout<<"ACTUAL_RENDERER "<<(actual_renderer?actual_renderer:"unavailable")<<'\n';
+  if(const auto wanted=std::getenv("DOME_EXPECT_RENDERER"))
+    check(actual_renderer&&std::string_view(actual_renderer).find(wanted)!=std::string_view::npos,
+      "Actual native worker/render consumer uses the explicitly required renderer");
   for(int variant:{0,7}){
     auto raw=Scene::load(source/("original-"+std::to_string(variant)+".dsculpt"));raw.active().transform.scale=5;
     Document before,after;before.replace(raw);after.replace(raw);before.shading(false);after.shading(false);settled_layers(before);settled_layers(after);
