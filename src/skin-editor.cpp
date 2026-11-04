@@ -40,7 +40,7 @@ void edit_skin_dialog(Document &doc) {
   mode.add("Automatic bind");
   mode.add("Transfer skin weights");
   mode.add("Source-assisted (fixed4)");
-  mode.add("Native finite handles");
+  mode.add("Native handles");
   mode.value(int(options.mode));
   Fl_Choice source(label, y, width - label - 40, row - 4, "Reference mesh");
   y += row;
@@ -87,7 +87,7 @@ void edit_skin_dialog(Document &doc) {
   Fl_Choice contacts(label, y, width - label - 40, row - 4, "Surface contacts");
   y += row;
   contacts.add("Strict rays");
-  contacts.add("Finite-line integral");
+  contacts.add("Line integral");
   contacts.value(int(options.native_visible.contact_handling));
   contacts.tooltip(
       "Finite-line integral handles isolated exact surface contacts.\n"
@@ -190,9 +190,9 @@ void edit_skin_dialog(Document &doc) {
         fields[4]->activate();
         fields[5]->activate();
         scope->activate();
-        hint->label("Native finite handles; connected-surface visibility.\n"
-                    "Selected geometry supplies support; the full rig stays.\n"
-                    "Paint, morphs and pose stay; unused controls need proof.");
+        hint->label("Selected parts supply support.\n"
+                    "Keep the full rig and source.\n"
+                    "Keep paint, morphs and pose.");
         apply->label(scope->value() == 1 ? "Bind selected" : "Bind active");
       } else {
         scope->deactivate();

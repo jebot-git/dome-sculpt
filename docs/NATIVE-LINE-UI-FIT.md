@@ -1,0 +1,7 @@
+# Native contact controls with large bitmap fonts
+
+Initial functional UI checks passed19 normal and20 compact checks, but screenshot inspection found the old long Native hint wrapped into Method and keyboard focus did not show the offscreen contact row. That negative is preserved in100fca3. This frontend-only repair shortens Native labels/help without changing options, callbacks or the method.
+
+The real native GUI again passes19 normal and20 compact checks. The harness uses actual native choices, verifies finite-line policy1 in the typed worker request, gates actual preparation callback64, queues App Save while busy without replacing the old file, and verifies exact Apply/Undo/Redo/Cancel/source Restore/reopen. It now uses actual wheel scrolling to show the compact contact field. Both inspected final images show readable three-line help, Native handles and Line integral labels, the complete contact row and footer.
+
+Build scope is explicit: one changed production frontend TU and two test-only observation/helper TUs, linked to the exact immutable fresh ec8 core/render/frontend objects after a full matching-header audit. No ABI, math, queue or source-domain changes occurred. The original whole ec8 Release26 and ownedSAN26 results retain their own scope. This is not admission of the still-private weight methods; actual-loader/hardware and genuine partial-target support remain separate gates.

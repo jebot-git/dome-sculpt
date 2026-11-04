@@ -206,6 +206,13 @@ async def main():
             for _ in range(5): key("Tab")
             key("space"); key("Down"); key("Return")
             await asyncio.sleep(.25)
+            if COMPACT:
+                g=editor.get_geometry()
+                xtest.fake_input(connection,X.MotionNotify,x=g.x+g.width-30,y=g.y+g.height//2)
+                for _ in range(24):
+                    xtest.fake_input(connection,X.ButtonPress,5)
+                    xtest.fake_input(connection,X.ButtonRelease,5)
+                connection.sync(); await asyncio.sleep(.25)
             image(editor).save(OUT/"native-line-contact-choice.png")
         g=editor.get_geometry()
         if GATED: arm()
