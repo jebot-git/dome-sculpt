@@ -1257,7 +1257,13 @@ std::shared_ptr<const TextureMaps> detail::EmissionExportAccess::preview(const P
   auto &cache=*paint.composite_cache_;
   {std::lock_guard lock(cache.mutex);
     if(cache.native_emission_token==paint.composite_token_&&cache.native_emission_factors==factors)
-      if(auto previous=cache.native_emission_preview.lock())return previous;
+      if(auto previous=cache.native_emission_preview.lock()){
+        // A retained/rebound grid may preserve its visible value token while
+        // changing the exact native geometry attachment carried by the packet.
+        auto same=[](const auto &a,const auto &b){return a==b&&!a.owner_before(b)&&!b.owner_before(a);};
+        if(previous->overlay&&same(previous->overlay->native_geometry(),paint.mesh_owner())&&
+           same(previous->overlay->native_domain(),paint.paint_sampling_domain()))return previous;
+      }
   }
   // Deep normal replay may legitimately visit a before-Paint that shares this
   // metadata cache. Build without holding its mutex, then publish completed maps.
