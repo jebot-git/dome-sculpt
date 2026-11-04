@@ -67,8 +67,13 @@ int main(int argc,char **argv)try{
     auto fake=normal_exact;fake["version"]=35;check(rejects([&]{Scene::decode(fake);}),"A Scene35 number alone cannot manufacture native ownership");
     unsigned polls=0;check(rejects([&]{append_native_scene(destination,package,[&]{return ++polls>=3;});})&&destination.encode()==dst&&package.encode()==src,
       "Cancelled actual append preserves both complete owning scenes");
-    const auto native_id=reverse?destination.active().id:appended.objects.front();
-    doc.select_object(native_id);doc.begin_uv();check(doc.wait_uv(),"Actual native UV worker opens inside the combined scene");
+    // Native packages retain their real hidden empty objects too. Pick the
+    // imported source's actual paint owner, never an assumed first live ID.
+    const auto native_owner=native.active().material_bindings->native_paint_sampling;
+    const auto native_object=std::find_if(combined.objects().begin(),combined.objects().end(),[&](const auto &o){return o.material_bindings&&o.material_bindings->native_paint_sampling==native_owner;});
+    check(native_object!=combined.objects().end()&&native_object->visible&&!native_object->locked&&native_object->painted,
+      "Actual native paint owner selects the editable imported mesh while hidden empty objects remain intact");
+    doc.select_object(native_object->id);doc.begin_uv();check(doc.wait_uv(),"Actual native UV worker opens inside the combined scene");
     doc.edit_uv(UvAction::Pick,.5f,.5f);doc.edit_uv(UvAction::Scale,.8f);check(doc.wait_uv()&&doc.frame().state->uv->valid,"Combined native UV draft remains genuinely editable");
     doc.end_uv(true);const auto save=out/"queued-UV35.dsculpt";doc.save_async(save).get();settled(doc);const auto changed=doc.copy_scene().encode();
     check(changed!=exact&&changed.at("version")==35&&Scene::load(save).encode()==changed,"Ordered Save waits for actual mixed-scene UV Apply and exact restart");
