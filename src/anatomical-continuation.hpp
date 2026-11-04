@@ -84,6 +84,14 @@ anatomical_continuation(const Scene &scene, uint64_t group,
   try {
     ContinuationFields out;
     if (declared) {
+      if ((declared->policy != DeclaredSupportPolicy::AllDeformControls &&
+           declared->policy != DeclaredSupportPolicy::NearestSourceUnion &&
+           declared->policy != DeclaredSupportPolicy::UniqueSourceWitnesses) ||
+          (declared->rig_geometry != DeclaredRigGeometry::NativeBoneAxes &&
+           declared->rig_geometry != DeclaredRigGeometry::ChildHeadControl) ||
+          (declared->row_anchors != DeclaredRowAnchors::AllVisible &&
+           declared->row_anchors != DeclaredRowAnchors::NearestPermitted))
+        throw std::invalid_argument("Unknown declared geometry weight policy");
       if (declared->parts.empty() || declared->parts.size() > 64)
         throw std::length_error("Declared weight part dimensions exceeded");
       std::set<uint64_t> ids;

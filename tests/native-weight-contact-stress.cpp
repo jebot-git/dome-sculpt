@@ -38,7 +38,7 @@ int main() try {
       auto s = fixture(gap, reverse);
       const auto before = s.encode();
       detail::DeclaredWeightSupport support{
-          detail::DeclaredSupportPolicy::NearestSourceUnion,
+          detail::DeclaredSupportPolicy::UniqueSourceWitnesses,
           true,
           {{1, {}}},
           1};

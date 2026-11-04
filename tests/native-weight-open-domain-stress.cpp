@@ -77,7 +77,7 @@ int main() try {
                               input.tilt, input.reversed);
       const auto &m = s.active().painted->mesh();
       detail::DeclaredWeightSupport domain{
-          detail::DeclaredSupportPolicy::NearestSourceUnion,
+          detail::DeclaredSupportPolicy::UniqueSourceWitnesses,
           true,
           {{1, {}}},
           1};

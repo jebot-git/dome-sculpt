@@ -50,7 +50,7 @@ int main() try {
       auto s = fixture(refinement, alternate);
       const auto &m = s.active().painted->mesh();
       detail::DeclaredWeightSupport domain{
-          detail::DeclaredSupportPolicy::NearestSourceUnion,
+          detail::DeclaredSupportPolicy::UniqueSourceWitnesses,
           true,
           {{1, {}}},
           1};

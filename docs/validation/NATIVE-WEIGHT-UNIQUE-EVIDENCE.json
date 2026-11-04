@@ -1,0 +1,25 @@
+{
+  "base": "9e38439",
+  "scope": "Explicit private native component evidence policy, own inline test against matching264 core/support; no native/UI/full SAN claim",
+  "component_evidence_checks": 32,
+  "contact_cases_passed": 8,
+  "original_open_U_cases_passed": 4,
+  "extra_U_cases_passed": 6,
+  "bounds_unchanged": true,
+  "unsupported_auxiliary_refusal_preserved": true,
+  "all_tied_component_refusal": true,
+  "unknown_policy_refusals": 3,
+  "sha256": {
+    "src/weight-declared-support.hpp": "0d07d3ad9aa752e281a5fb1437ae2bf98f81415e4d59ebb6d9a74feff2102d62",
+    "src/anatomical-continuation.hpp": "b9234aa2ea68b1a0ec127296785cb1b64b6e4528b7ef40386c2893d2c3196eea",
+    "tests/native-weight-source-evidence.cpp": "83a28985132019562e2cac74b40256e68b57a0c6d0617b66480e74e1aa1334ee",
+    "tests/native-weight-contact-stress.cpp": "90a2b0361e26faea215c2aaefdbd8c5d19230310fa763301e6bbc2a2257b2c32",
+    "tests/native-weight-open-stress.cpp": "cc6d4c1e7b0532fdfd7eca07f77d19553f8b5e3979a28aed1479e21e13d42e42",
+    "tests/native-weight-open-domain-stress.cpp": "ce73b6b224de712170c083f89a406b1a92968cbc3c90a75770bd393e6c803529",
+    "artifacts/contact-run.log": "be6ecd9d43af0c8a1c243024763bab0f8dc55cd7df433a80e3ad42091c15cea6",
+    "artifacts/native-weight-source-evidence-run.log": "2f3c31eab95ba3a943138715996599f6c1aa3250a01a935c899ed1797a20ac1a",
+    "artifacts/native-weight-open-stress-run.log": "ed051bcfab48be1cd1a4a5759142fd48ad1c9a20c484ece3a96b2b40a997db88",
+    "artifacts/native-weight-open-domain-stress-run.log": "b43176a4544b3889d51358027cc500124b7e2c4ae50c28edadb80d428670cdb3",
+    "artifacts/contact-overlay.json": "cb3bd9dfea4ccbbdb4affec52d8f9d984c1d3a8850d0143d5d9296d9b248a801"
+  }
+}

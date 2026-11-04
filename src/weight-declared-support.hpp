@@ -3,6 +3,7 @@
 #include "heat-component-intent.hpp"
 #include "weight-nearest-support.hpp"
 #include "weight-surface-system.hpp"
+#include <bit>
 namespace dome::detail {
 // Private worker input. Empty declarations select geometry-derived connected
 // components with the current authored deform-bone set, not artist skin values.
@@ -12,7 +13,14 @@ struct DeclaredWeightPart {
   uint64_t object = 0;
   std::vector<HeatComponentDeclaration> declarations;
 };
-enum class DeclaredSupportPolicy { AllDeformControls, NearestSourceUnion };
+enum class DeclaredSupportPolicy {
+  AllDeformControls,
+  NearestSourceUnion,
+  // Native geometry evidence only. A boundary tie is not a component owning
+  // witness for a foreign control. An all-tied component refuses; no artist
+  // values, geometry weld or hidden fallback supplies the missing intent.
+  UniqueSourceWitnesses
+};
 enum class DeclaredRigGeometry { NativeBoneAxes, ChildHeadControl };
 // Separate screened-energy construction, not a fallback after a failed solve.
 // Component masks still own permitted controls; only the closest permitted
@@ -144,11 +152,20 @@ declared_weight_intent(const SculptObject &o, const DeclaredWeightPart &input,
   work.step(local_work);
   std::vector<HeatJointMask> masks(n);
   if (input.declarations.empty()) {
-    if (policy == DeclaredSupportPolicy::NearestSourceUnion) {
+    if (policy == DeclaredSupportPolicy::NearestSourceUnion ||
+        policy == DeclaredSupportPolicy::UniqueSourceWitnesses) {
       NearestWeightSources sources(profile.segments, work);
       for (size_t i = 0; i < n; ++i) {
         const auto p = m.positions[i];
         auto selected = sources.nearest({p.x, p.y, p.z}, work);
+        if (policy == DeclaredSupportPolicy::UniqueSourceWitnesses) {
+          work.step(4);
+          size_t count = 0;
+          for (auto word : selected)
+            count += std::popcount(word);
+          if (count != 1)
+            continue;
+        }
         for (size_t k = 0; k < 4; ++k)
           masks[parents[i]][k] |= selected[k];
       }
