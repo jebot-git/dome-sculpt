@@ -503,7 +503,7 @@ nlohmann::json Scene::encode() const {
   // Scene25 retains its original nullable layout; real nested history owns pool6.
   const bool rig_fields=feature_version==25 ||
     std::any_of(objects_.begin(),objects_.end(),[](const auto &o){return bool(o.rig_source);}) ||
-    std::any_of(polygons.origins().begin(),polygons.origins().end(),[](const auto &o){return bool(o->rig_source);});
+    std::any_of(polygons.origins().begin(),polygons.origins().end(),[](const auto &o){return bool(o->rig_source)||bool(o->bake_recipe);});
   j["next_group_id"] = next_group_;
   j["groups"] = nlohmann::json::array();
   for (auto &g : groups_) {
