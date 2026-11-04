@@ -1,6 +1,6 @@
 # Source4 geometric-key and complete native workflow contract
 
-Private partial test checkpoint, 2026-11-04. Two existing test TUs now verify the
+Qualified private test checkpoint, 2026-11-04. Two existing test TUs now verify the
 actual Source4 contract: strict writable atlas UV0 is independent of genuine
 current/original UV2 sampling. They authenticate the original paint owner and
 current-to-original vertex map, exact positions/UV2/image/strength/affine sampling,
@@ -35,11 +35,16 @@ checks: factory40.850s, entire helper187.248s including full prior/save/after
 oracles,253.575s build/run,1,753 inputs exact. Initial MorphSet encode signature
 compile mistakes are preserved in their separate setup-negative cohorts.
 
-**The complete139-check revised sanitizer repeat is still pending.** This
-checkpoint is reviewable source and partial evidence, not full SAN/main admission.
-Its source files were exact-copied from the separate frozen live run; no source
-there was edited. The pipeline uses complete consumer TUs against byte-matching
-own coherent Release/whole-owned sanitizer archives, not a new whole app build.
+The complete revised owned-sanitizer repeat now passes51+139, returning0 in
+4316.121s including both TU builds,1,750 inputs exact, with no sanitizer report.
+It reaches all23 real source parts, rawUV2/projected-paint/worker Cancel/history/
+restart stages and the same44,484 independent corners, world9.83025e-7, pixels0
+and wrong-normal4 sensitivity. All120/60 per-operation/gate bounds are unchanged.
+The original1238.33s failed cohort remains recorded; it is not relabeled.
+
+Source files were exact-copied from the separate frozen run; no source there
+was edited. The pipeline uses complete consumer TUs against byte-matching own
+coherent Release/whole-owned sanitizer archives, not a new whole app build.
 The one actual complete native GLB and three constructed input GLBs validate
 with zero Khronos errors,22 warnings/22 infos/31 hints unfiltered. The original and revised exports have identical BIN; JSON differs only in the
 generated dome-cut-color-source-PID node label. Whole GLB bytes differ and are
@@ -47,6 +52,11 @@ not claimed equal. Final revised outputs themselves were validated. Focused Sour
 separate nine-image R/S/Arc endpoint; no GPU or physical headset was used here.
 
 Read [the receipt](validation/SOURCE4-KEY-WORKFLOW.json) for exact source and
-command/manifest scope. Full coherent application/regression, remaining allocator
+command/manifest scope. Full coherent main admission, remaining allocator
 fault cleanup, painted VRM/standard export, all unfinished original/additional
 requirements and deferred drawers remain required. No installation/session changed.
+
+Final sanitizer outputs separately validate: four files, zero errors,22 warnings,
+22 infos and31 hints. Three constructed input GLBs are byte-identical R/S. The
+complete native GLB has identical BIN; JSON differs only in its generated
+cut-colour PID label, so whole-file equality is not claimed.

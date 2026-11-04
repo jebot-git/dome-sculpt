@@ -1,6 +1,6 @@
 {
   "date": "2026-11-04",
-  "state": "PARTIAL: full139 sanitizer repeat pending",
+  "state": "QUALIFIED scoped Release51+139 and complete owned-SAN51+139, original failed observers retained",
   "parent": "b6d402bc0a72d47797f14c693a081201d35daa42",
   "source_scope": "Two complete test TUs, no runtime/API/schema/asset/limit/assertion removal. Exact-copy snapshot from separately frozen liveSAN14006 tree; that tree is untouched.",
   "source_sha256": {
@@ -17,7 +17,8 @@
     "same_cohort_sanitize_admission": 51,
     "focused_sanitize_helper": 5,
     "old_sanitize_workflow": "FAIL original120s observation before post-computation gate, no sanitizer report; not relabeled",
-    "full_sanitize_workflow": "PENDING at artifacts/source4-key-workflow-b6/artifacts/key-workflow-proof/sanitize-v2/status.json"
+    "full_sanitize_workflow": 139,
+    "sanitizer_admission": 51
   },
   "cohorts": {
     "release-v1": {
@@ -962,7 +963,6 @@
       }
     }
   },
-  "live_source_manifest_sha256": "8f6ded959edb5d96c6b053c4b331ce43b05534b117137b93b635ed75cc0589f7",
   "release_glb_validation": {
     "path": "/home/blux/de-xr/dome-sculpt/artifacts/source4-key-workflow-b6/artifacts/key-workflow-proof/release-v4/khronos.json",
     "sha256": "28433149bebc4875b29cd845aed4b4d0d48ee718ac028d723f0ec0379319964c",
@@ -1006,5 +1006,235 @@
     "native_export_BIN_sha256": "a4d34fe66064a8745011b321bc934d63715dacaf7b46d3ef2825cd346a03dbee",
     "JSON_difference": "Only generated dome-cut-color-source-PID node label1367213 versus1631302; not whole-file equality.",
     "diff_sha256": "10be6dcf210848c7a2367532b89337942e690d15bd89f5c3a50387eb4c6ea0f9"
-  }
+  },
+  "full_sanitizer": {
+    "status": {
+      "state": "terminal",
+      "pid": 1662099,
+      "source": "b6d402bc0a72d47797f14c693a081201d35daa42",
+      "scope": "Changed complete test TUs against copied matching coherent whole-owned ASAN/UBSAN static archives; no product rebuild. All product/header/asset files byte-equal parent coherent app. SoftwareGL, noGPU/HMD.",
+      "steps": [
+        {
+          "phase": "dome-sculpt-source-extra-uv-key-admission-test-compile",
+          "command": [
+            "/usr/bin/c++",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/source4-key-workflow-b6/src",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/source4-key-workflow-b6/tests",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/source4-key-workflow-b6/include",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/source4-key-workflow-b6/third_party/openbrush",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/source4-key-workflow-b6/third_party/nlohmann",
+            "-O1",
+            "-g1",
+            "-fsanitize=address,undefined",
+            "-fno-omit-frame-pointer",
+            "-std=gnu++20",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/source4-key-workflow-b6/artifacts/key-workflow-proof/sanitize-v2/source-extra-uv-key-admission.cpp.o",
+            "-c",
+            "/home/blux/de-xr/dome-sculpt/artifacts/source4-key-workflow-b6/tests/source-extra-uv-key-admission.cpp"
+          ],
+          "exit": 0,
+          "seconds": 8.931889797007898
+        },
+        {
+          "phase": "dome-sculpt-source-extra-uv-key-admission-test-link",
+          "command": [
+            "/usr/bin/c++",
+            "-O1",
+            "-g1",
+            "-fsanitize=address,undefined",
+            "-fno-omit-frame-pointer",
+            "-fsanitize=address,undefined",
+            "/home/blux/de-xr/dome-sculpt/artifacts/source4-key-workflow-b6/artifacts/key-workflow-proof/sanitize-v2/source-extra-uv-key-admission.cpp.o",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/source4-key-workflow-b6/artifacts/key-workflow-proof/sanitize-v2/dome-sculpt-source-extra-uv-key-admission-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/source4-key-workflow-b6/artifacts/key-workflow-proof/sanitize-v2/libdome-sculpt-core.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/source4-key-workflow-b6/artifacts/key-workflow-proof/sanitize-v2/libdome-sculpt-affine.a",
+            "/usr/lib64/liblapacke.so",
+            "/home/blux/de-xr/dome-sculpt/artifacts/source4-key-workflow-b6/artifacts/key-workflow-proof/sanitize-v2/libdome-sculpt-polygon.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/source4-key-workflow-b6/artifacts/key-workflow-proof/sanitize-v2/libxatlas.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/source4-key-workflow-b6/artifacts/key-workflow-proof/sanitize-v2/libmikktspace.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/source4-key-workflow-b6/artifacts/key-workflow-proof/sanitize-v2/libmikktspace-robust.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/source4-key-workflow-b6/artifacts/key-workflow-proof/sanitize-v2/libufbx.a",
+            "/usr/lib64/libpng.so",
+            "/usr/lib64/libjpeg.so",
+            "/usr/lib64/libz.so",
+            "/home/blux/de-xr/dome-sculpt/artifacts/source4-key-workflow-b6/artifacts/key-workflow-proof/sanitize-v2/libdome-sculpt-emission-codec.a",
+            "/usr/lib64/libOpenEXR-3_2.so",
+            "/usr/lib64/libOpenEXRUtil-3_2.so",
+            "/usr/lib64/libOpenEXRCore-3_2.so",
+            "/usr/lib64/libIex-3_2.so",
+            "/usr/lib64/libIlmThread-3_2.so",
+            "/usr/lib64/libImath-3_1.so",
+            "-lgcc_s_asneeded",
+            "-lgcc_s_asneeded"
+          ],
+          "exit": 0,
+          "seconds": 1.6174377800198272
+        },
+        {
+          "phase": "dome-sculpt-source-union-workflow-test-compile",
+          "command": [
+            "/usr/bin/c++",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/source4-key-workflow-b6/src",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/source4-key-workflow-b6/third_party/cgltf",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/source4-key-workflow-b6/third_party/desktop",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/source4-key-workflow-b6/include",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/source4-key-workflow-b6/third_party/openbrush",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/source4-key-workflow-b6/third_party/nlohmann",
+            "-isystem",
+            "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/harfbuzz",
+            "-isystem",
+            "/usr/include/glib-2.0",
+            "-isystem",
+            "/usr/lib64/glib-2.0/include",
+            "-isystem",
+            "/usr/include/sysprof-6",
+            "-isystem",
+            "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/freetype2",
+            "-isystem",
+            "/usr/include/libpng16",
+            "-isystem",
+            "/usr/include/libxml2",
+            "-O1",
+            "-g1",
+            "-fsanitize=address,undefined",
+            "-fno-omit-frame-pointer",
+            "-std=gnu++20",
+            "-pthread",
+            "-DWITH_GZFILEOP",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/source4-key-workflow-b6/artifacts/key-workflow-proof/sanitize-v2/source-union-workflow.cpp.o",
+            "-c",
+            "/home/blux/de-xr/dome-sculpt/artifacts/source4-key-workflow-b6/tests/source-union-workflow.cpp"
+          ],
+          "exit": 0,
+          "seconds": 28.47080180599005
+        },
+        {
+          "phase": "dome-sculpt-source-union-workflow-test-link",
+          "command": [
+            "/usr/bin/c++",
+            "-O1",
+            "-g1",
+            "-fsanitize=address,undefined",
+            "-fno-omit-frame-pointer",
+            "-fsanitize=address,undefined",
+            "-Wl,--wrap=_ZN4dome15author_shapekeyERNS_5SceneEmRKNS_12ShapeKeyEditERKSt8functionIFbvEE",
+            "/home/blux/de-xr/dome-sculpt/artifacts/source4-key-workflow-b6/artifacts/key-workflow-proof/sanitize-v2/source-union-workflow.cpp.o",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/source4-key-workflow-b6/artifacts/key-workflow-proof/sanitize-v2/dome-sculpt-source-union-workflow-test",
+            "-Wl,-rpath,/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib",
+            "/home/blux/de-xr/dome-sculpt/artifacts/source4-key-workflow-b6/artifacts/key-workflow-proof/sanitize-v2/libdome-sculpt-render.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/source4-key-workflow-b6/artifacts/key-workflow-proof/sanitize-v2/libdome-sculpt-core.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/source4-key-workflow-b6/artifacts/key-workflow-proof/sanitize-v2/libdome-sculpt-affine.a",
+            "/usr/lib64/liblapacke.so",
+            "/home/blux/de-xr/dome-sculpt/artifacts/source4-key-workflow-b6/artifacts/key-workflow-proof/sanitize-v2/libdome-sculpt-polygon.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/source4-key-workflow-b6/artifacts/key-workflow-proof/sanitize-v2/libxatlas.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/source4-key-workflow-b6/artifacts/key-workflow-proof/sanitize-v2/libmikktspace.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/source4-key-workflow-b6/artifacts/key-workflow-proof/sanitize-v2/libmikktspace-robust.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/source4-key-workflow-b6/artifacts/key-workflow-proof/sanitize-v2/libufbx.a",
+            "/usr/lib64/libpng.so",
+            "/usr/lib64/libjpeg.so",
+            "/usr/lib64/libz.so",
+            "/home/blux/de-xr/dome-sculpt/artifacts/source4-key-workflow-b6/artifacts/key-workflow-proof/sanitize-v2/libdome-sculpt-emission-codec.a",
+            "/usr/lib64/libOpenEXR-3_2.so",
+            "/usr/lib64/libOpenEXRUtil-3_2.so",
+            "/usr/lib64/libOpenEXRCore-3_2.so",
+            "/usr/lib64/libIex-3_2.so",
+            "/usr/lib64/libIlmThread-3_2.so",
+            "/usr/lib64/libImath-3_1.so",
+            "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libharfbuzz.so",
+            "/usr/lib64/libEGL.so",
+            "/usr/lib64/libGL.so",
+            "/usr/lib64/libfontconfig.so",
+            "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libfreetype.so",
+            "/usr/lib64/libicui18n.so",
+            "/usr/lib64/libicuuc.so",
+            "-lgcc_s_asneeded",
+            "-lgcc_s_asneeded"
+          ],
+          "exit": 0,
+          "seconds": 1.8178827869996894
+        },
+        {
+          "phase": "admission-run",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/source4-key-workflow-b6/artifacts/key-workflow-proof/sanitize-v2/dome-sculpt-source-extra-uv-key-admission-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/source4-key-workflow-b6/artifacts/key-workflow-proof/sanitize-v2/admission"
+          ],
+          "exit": 0,
+          "seconds": 0.6156449200061616
+        },
+        {
+          "phase": "workflow-run",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/source4-key-workflow-b6/artifacts/key-workflow-proof/sanitize-v2/dome-sculpt-source-union-workflow-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/source4-key-workflow-b6/artifacts/key-workflow-proof/sanitize-v2/workflow",
+            "/home/blux/de-xr/dome-sculpt/artifacts/source4-key-workflow-b6/assets/humanoid/vroid/base-female.vrm"
+          ],
+          "exit": 0,
+          "seconds": 4273.989570417005
+        }
+      ],
+      "child_pid": 1666839,
+      "actual_exit": 0,
+      "seconds": 4316.120965942013,
+      "inputs": 1750,
+      "drift": []
+    },
+    "before_sha256": "8f6ded959edb5d96c6b053c4b331ce43b05534b117137b93b635ed75cc0589f7",
+    "after_sha256": "8f6ded959edb5d96c6b053c4b331ce43b05534b117137b93b635ed75cc0589f7",
+    "run_log_sha256": "402998086062b527c61e31fe539509cdf14c66d60fefb52474d65e33a5188ae4",
+    "validator": {
+      "files": 4,
+      "errors": 0,
+      "warnings": 22,
+      "infos": 22,
+      "hints": 31
+    },
+    "output_comparison": [
+      {
+        "file": "admission/artist-uv2.glb",
+        "release_sha256": "4be00394df3f67b4962fae42af23b9189d8ab03782ce68f99d0b455aaf29a4db",
+        "sanitize_sha256": "4be00394df3f67b4962fae42af23b9189d8ab03782ce68f99d0b455aaf29a4db",
+        "whole_exact": true,
+        "BIN_exact": true,
+        "JSON_diff": []
+      },
+      {
+        "file": "admission/generated-uv2.glb",
+        "release_sha256": "ede104999d53fcf0a14c205ad027f0b319fc79faaabee2f3dcdef3f1b258d11b",
+        "sanitize_sha256": "ede104999d53fcf0a14c205ad027f0b319fc79faaabee2f3dcdef3f1b258d11b",
+        "whole_exact": true,
+        "BIN_exact": true,
+        "JSON_diff": []
+      },
+      {
+        "file": "workflow/raw-uv2.glb",
+        "release_sha256": "69f0ac081ffa140f0b2805e236ca267d79dc950d5e4d763a43084fe3a27e711b",
+        "sanitize_sha256": "69f0ac081ffa140f0b2805e236ca267d79dc950d5e4d763a43084fe3a27e711b",
+        "whole_exact": true,
+        "BIN_exact": true,
+        "JSON_diff": []
+      },
+      {
+        "file": "workflow/union-final.glb",
+        "release_sha256": "28871e2bc69e725237897265f5539b71e6244c2cdb6dafb0b247c044d779fd2a",
+        "sanitize_sha256": "d96084a34f7427e994fc8763c9217e7f0d2d76dc9e156f54fa50a301d2b0662f",
+        "whole_exact": false,
+        "BIN_exact": true,
+        "JSON_diff": [
+          "--- \n",
+          "+++ \n",
+          "@@ -35194,3 +35194,3 @@\n",
+          "       ],",
+          "-      \"name\": \"dome-cut-color-source-1631302\",",
+          "+      \"name\": \"dome-cut-color-source-1666839\",",
+          "       \"rotation\": ["
+        ]
+      }
+    ]
+  },
+  "final_source_manifest_sha256": "8f6ded959edb5d96c6b053c4b331ce43b05534b117137b93b635ed75cc0589f7"
 }
