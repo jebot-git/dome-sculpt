@@ -16,7 +16,7 @@ int main(int argc,char **argv)try{
    Document document;document.replace(scene);document.shading(false);
    check(document.wait_asset()&&document.wait_mesh()&&document.frame().state->error.empty(),"Actual native mirrored normal model publishes its current pose and morph");
    const auto file=out/("view-"+std::to_string(variant)+"-"+std::to_string(pose)+"-"+std::to_string(int(weight*100))+".glb");
-   document.export_asset(file,AssetExportFormat::EditableProject256).get();prepared_normal_consumer::Model model(file);
+   document.export_asset(file,AssetExportFormat::EditableGlb256).get();prepared_normal_consumer::Model model(file);
    fbo.bind();auto expected=draw(native,document.frame().surface);fbo.bind();consumer.render(model.data);auto actual=read();const auto error=delta(expected,actual);
    size_t visible=0;for(size_t i=3;i<actual.size();i+=4)visible+=actual[i]>0&&expected[i]>0;
    std::cout<<"BAKED_TANGENT_IMAGE variant="<<variant<<" pose="<<pose<<" morph="<<weight<<" visible="<<visible<<" max="<<error<<'\n';
