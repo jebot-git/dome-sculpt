@@ -1,5 +1,22 @@
 # Dome Sculpt production handoff
 
+## Private source-aware mesh bake and cut milestone — 2026-11-04
+
+Private14cc064 records runtime3fe61f7 and corrected fixtures16afb67, extending
+qualified atlas8de with native mesh baking of explicit empty source bundles,
+genuine sparse Source4 paint, per-role source coordinates and strict paint-owner
+cut authentication. Release, owned sanitizer and actual Arc each pass85 new
+graphical checks/24 exports; all72 files have zero Khronos errors and24 triples
+are byte-identical. Existing Release authoring workflows and corrected legacy/
+boundary fixtures pass in their explicit component scope. Wider sanitizer and
+allocation-failure cohorts retain live finite handles in the receipt. Relinked
+application Release synthetic-XR21 passes; sanitizer standalone XR retains the
+unresolved Mesa112-byte report. This is not main admission, final27/poll SDK
+application integration, a full589/590 regression or physical-device proof.
+Read SOURCE-AWARE-MESH-BAKE.md and validation/SOURCE-AWARE-MESH-BAKE.json.
+The complete original objective and every unfinished additional row remain
+active; no installation or physical session changed.
+
 This private production union combines the qualified component branches below.
 Its combined runtime is awaiting fresh build and regression qualification; parent
 receipts retain their original source scopes. Full production remains incomplete.
