@@ -6,7 +6,7 @@
 #include "dome/material-bindings.hpp"
 #include "dome/scene-file.hpp"
 #include "source-color-consumer.hpp"
-#include "prepared-normal-consumer.hpp"
+#include "raw-preserving-consumer.hpp"
 #include "source-paint-bake-fixtures.hpp"
 #include <fstream>
 #include "native-authoring-capture.hpp"
@@ -46,14 +46,24 @@ int main(int argc,char **argv)try {
   std::cout<<"GL_VENDOR="<<vendor<<" GL_RENDERER="<<device<<std::endl;
   check(argc<3||std::string_view(argv[2])!="--hardware"||
     (vendor.find("Intel")!=std::string::npos&&device.find("Arc")!=std::string::npos&&device.find("A770")!=std::string::npos),"Raw preserving hardware proof requires actual A770");
-  Fbo fbo;fbo.bind();SurfaceRenderer native;native.set_frame_time(0);prepared_normal_consumer::Renderer reader;
-  for(int kind=0;kind<8;++kind) {
+  Fbo fbo;fbo.bind();SurfaceRenderer native;native.set_frame_time(0);raw_preserving_consumer::Renderer reader;
+  for(int kind=0;kind<12;++kind) {
     auto source=raw_hdr(kind<5?kind:0);auto &m=source.j["materials"][0];
-    if(kind==5) {
+    if(kind==5||kind>=8) {
       source=portable_material_fixture(6);auto &material=source.j["materials"][0];
       material["emissiveFactor"]={1,.002f,.01f};material["extensions"]["KHR_materials_emissive_strength"]={{"emissiveStrength",2}};
       material["emissiveTexture"]={{"index",0},{"texCoord",1}};material["normalTexture"]["texCoord"]=1;
       source.j["extensionsUsed"].push_back("KHR_materials_emissive_strength");
+      if(kind==8||kind==11){
+        while(source.bin.size()%4)source.bin.push_back(0);
+        auto &primitive=source.j["meshes"][0]["primitives"][0];
+        primitive["attributes"]["TEXCOORD_2"]=source.values({.15f,.85f,.85f,.85f,.6f,.15f,.2f,.25f},2,"VEC2");
+        primitive["attributes"]["TEXCOORD_3"]=source.values({.01f,.1f,.31f,.2f,.61f,.3f,.91f,.4f},2,"VEC2");
+        material["normalTexture"]["texCoord"]=2;material["emissiveTexture"]["texCoord"]=2;
+        if(kind==11){primitive["attributes"].erase("TANGENT");for(auto &target:primitive["targets"])target.erase("TANGENT");}
+      }
+      if(kind==9){material["emissiveTexture"]["texCoord"]=0;material["emissiveTexture"]["extensions"]["KHR_texture_transform"]={{"offset",{.13f,-.27f}},{"scale",{.8f,1.1f}},{"rotation",.17f},{"texCoord",1}};source.j["extensionsUsed"].push_back("KHR_texture_transform");}
+      if(kind==10)source.j["nodes"][1]["scale"]={-5,5,5};
     }
     if(kind==6) {
       auto &p=source.j["meshes"][0]["primitives"][0];
@@ -131,6 +141,9 @@ int main(int argc,char **argv)try {
       std::cout<<"RAW_PRESERVING kind="<<kind<<" phase="<<phase<<" visible="<<quality.visible<<" mean="<<quality.mean<<" interior="<<quality.interior_maximum<<std::endl;
       check(quality.visible>20&&quality.mean<=2&&quality.interior_maximum<=2,
         "Independent raw source PBR consumer retains actual sampler/normal/morph pixels within two");
+      if(kind==8||kind==11){const auto &primitive=model.json.at("meshes").at(0).at("primitives").at(0);
+        check(primitive.at("attributes").contains("TEXCOORD_0")&&primitive.at("attributes").contains("TEXCOORD_1")&&primitive.at("attributes").contains("TEXCOORD_2")&&primitive.at("attributes").contains("TEXCOORD_3")&&primitive.at("material")==0,
+          "Raw preserving output retains genuine contiguous authored and unused source UV arrays");}
       bool descriptor=false;
       for(const auto &material:model.json["materials"])if(material.contains("extras")&&material["extras"].contains("domeSculptPortableEmission")) {
         const auto &e=material["extras"]["domeSculptPortableEmission"];
@@ -148,13 +161,14 @@ int main(int argc,char **argv)try {
       reopened.export_asset(again,AssetExportFormat::EditableGlb256).get();
       check(extract_native_authoring(file(again))->encode()==exact&&file(path)==bytes,
         "Recovered raw native project re-exports without recapturing the package as source");
-      if(kind==5) {
+      if(kind==5||kind>=8) {
         auto &material=model.data->materials[0];const auto old=material.normal_texture.texture;
         material.normal_texture.texture=nullptr;fbo.bind();reader.render(model.data,nullptr,{},false);
         check(delta(reference,read())>4,"Independent lit raw normal disable counterfactual is visibly sensitive");material.normal_texture.texture=old;
-        const auto uv=material.emissive_texture.texcoord;material.emissive_texture.texcoord=0;
+        const auto uv=material.emissive_texture.texcoord;const auto transformed_uv=material.emissive_texture.transform.texcoord;const bool transformed=material.emissive_texture.has_transform&&material.emissive_texture.transform.has_texcoord;if(transformed)material.emissive_texture.transform.texcoord=0;else material.emissive_texture.texcoord=0;
         fbo.bind();reader.render(model.data,nullptr,{},false);
-        check(delta(reference,read())>4,"Independent wrong raw emission UV set is visibly sensitive");material.emissive_texture.texcoord=uv;
+        check(delta(reference,read())>4,"Independent wrong raw emission UV set is visibly sensitive");material.emissive_texture.texcoord=uv;material.emissive_texture.transform.texcoord=transformed_uv;
+        if(kind==9){auto texture=*material.emissive_texture.texture;auto sampler=*texture.sampler;const auto prior=material.emissive_texture.texture;sampler.mag_filter=cgltf_filter_type_linear;sampler.min_filter=cgltf_filter_type_linear;texture.sampler=&sampler;material.emissive_texture.texture=&texture;fbo.bind();reader.render(model.data,nullptr,{},false);check(delta(reference,read())>4,"Independent wrong raw emission filter remains visibly sensitive");material.emissive_texture.texture=prior;}
       }
     }
   }
