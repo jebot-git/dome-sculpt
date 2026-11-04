@@ -11,7 +11,7 @@ int main(int argc,char **argv)try{
  std::cout<<"GPU "<<reinterpret_cast<const char*>(glGetString(GL_RENDERER))<<'\n';
  for(int variant=0;variant<4;++variant){const auto initial=load_scene_file(source/("fan-"+std::to_string(variant)+".glb")).scene;
   for(int pose=0;pose<2;++pose)for(float weight:{0.f,.35f,1.f}){
-   auto scene=initial;auto &object=scene.active();if(object.deformation){auto d=*object.deformation;if(d.morphs)d.morph_weights={weight};
+   auto scene=initial;auto &object=scene.active();object.transform.scale=5;if(object.deformation){auto d=*object.deformation;if(d.morphs)d.morph_weights={weight};
     if(d.skeleton){for(const auto &bone:d.skeleton->bones)d.pose.push_back(bone.rest);d.pose[0].rotation=Quat{std::cos(.075f),0,0,std::sin(.075f)};if(pose)d.pose[1].rotation=Quat{std::cos(.1f),0,0,std::sin(.1f)};}scene.set_deformation(object.id,d);}
    Document document;document.replace(scene);document.shading(false);
    check(document.wait_asset()&&document.wait_mesh()&&document.frame().state->error.empty(),"Actual native mirrored normal model publishes its current pose and morph");
@@ -20,8 +20,9 @@ int main(int argc,char **argv)try{
    fbo.bind();auto expected=draw(native,document.frame().surface);fbo.bind();consumer.render(model.data);auto actual=read();const auto error=delta(expected,actual);
    size_t visible=0;for(size_t i=3;i<actual.size();i+=4)visible+=actual[i]>0&&expected[i]>0;
    std::cout<<"BAKED_TANGENT_IMAGE variant="<<variant<<" pose="<<pose<<" morph="<<weight<<" visible="<<visible<<" max="<<error<<'\n';
-   check(visible>10,"Independent parsed normal-texture consumer and native view draw the genuine model");
+   check(visible>500,"Independent parsed normal-texture consumer and native view draw the genuine model");
    check(error<=4,"Independent normal-texture image matches the native baked field at the unchanged four-level bound");
+   if(pose==0&&weight==0){auto &normal=model.data->meshes[0].primitives[0].material->normal_texture.texture;const auto original=normal;normal=nullptr;fbo.bind();consumer.render(model.data);auto absent=read();normal=original;check(absent!=actual,"Removing the actual exported normal texture changes independently rendered pixels");}
   }
  }
  std::cout<<"PASS "<<checks<<" baked tangent image checks\n";return 0;
