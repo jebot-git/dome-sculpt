@@ -42,6 +42,14 @@ template<class F> bool rejects(F f) {try{f();return false;}catch(...){return tru
 Vec3 point(const CanvasTransform &t,Vec3 p) {
   auto q=ob::transform(t,{p.x,p.y,p.z});return {q.x,q.y,q.z};
 }
+bool same_bind_remainder(const Scene &after,uint64_t target,const SculptObject &before_target,const nlohmann::json &before) {
+  // A first capsule can raise the Scene version and change pool indices/null
+  // fields on every wire object. Compare the COMPLETE context after reverting
+  // only the two fields this operation is authorized to change.
+  auto retained=after;retained.object(target).deformation=before_target.deformation;
+  retained.object(target).rig_source=before_target.rig_source;
+  return retained.encode()==before;
+}
 Scene fixture() {
   Mesh m;m.positions={{-.1f,0,0},{.1f,0,0},{0,.5f,0}};
   m.normals.assign(3,{0,0,1});m.indices={0,1,2};m.uv={{{0,0}},{{1,0}},{{.5f,1}}};
@@ -76,13 +84,13 @@ int main(int argc,char **argv) try {
   auto changed=target_mesh.positions;changed[0].z+=.02f;
   morphs.morphs->set_target(target_mesh,"Test",changed);morphs.morph_weights={.25f};
   scene.set_deformation(2,morphs);
-  auto paint=scene.object(2).painted;auto original=scene.encode();
+  auto paint=scene.object(2).painted;auto original=scene.encode();const auto before_target=scene.object(2);
   SkinAuthoringOptions options;options.reference=1;options.mode=SkinAuthoringMode::Transfer;
   options.transfer_distance=.01f;author_skin(scene,2,options);
   check(scene.object(2).painted==paint && scene.object(2).deformation->morphs->encode()==morphs.morphs->encode() &&
         scene.object(2).deformation->morph_weights==morphs.morph_weights,
         "Cross-object weight transfer preserves target paint, morph deltas and active morph values");
-  check(scene.encode()["objects"][0]==original["objects"][0],
+  check(same_bind_remainder(scene,2,before_target,original),
         "A rotated scaled transfer leaves the complete source rig and object immutable");
   auto transferred=scene.object(2).deformation;
   const auto &source=*scene.object(1).deformation,&target=*transferred;
@@ -121,8 +129,8 @@ int main(int argc,char **argv) try {
         "Unreachable transfer vertices fail without changing the target's prior authoring data");
   {
     auto hidden=fixture();hidden.object(1).visible=false;hidden.object(1).locked=true;
-    auto old=hidden.encode()["objects"][0];SkinAuthoringOptions o;o.reference=1;o.mode=SkinAuthoringMode::Transfer;
-    check(author_skin(hidden,2,o)&&hidden.object(2).deformation->skin&&hidden.encode()["objects"][0]==old,
+    auto old=hidden.encode();const auto old_target=hidden.object(2);SkinAuthoringOptions o;o.reference=1;o.mode=SkinAuthoringMode::Transfer;
+    check(author_skin(hidden,2,o)&&hidden.object(2).deformation->skin&&same_bind_remainder(hidden,2,old_target,old),
           "Hidden locked reference rigs can supply weights without being modified");
     for(float distance:{0.f,.0001f,.01f,.3f,10.f,10000.f})
       if(std::abs(skin_distance_metres(skin_distance_slider(distance))-distance)>std::max(1e-7f,distance*2e-6f))
