@@ -8,6 +8,7 @@
 #include <sys/stat.h>
 namespace {
 thread_local bool tracking=false;
+bool cage_mode=false;
 bool hit=false;size_t calls=0,boundary=SIZE_MAX;
 void require(bool ok,const char *why){if(!ok)throw std::runtime_error(why);}
 struct Gate {
@@ -18,10 +19,14 @@ struct Gate {
  void release(){std::lock_guard lock(mutex);armed=false;changed.notify_all();}
 } gate;
 struct Release{~Release(){tracking=false;gate.release();}};
-auto settings_tuple(const ObjectBakeSettings &s){return std::tuple{s.front_mm,s.back_mm,s.ao_distance_mm,s.ao_samples,s.padding,s.allow_partial,s.allow_backfaces,s.prepare_colors,s.color_error,s.prepare_normals,s.normal_error};}
+auto settings_tuple(const ObjectBakeSettings &s){return std::tuple{s.front_mm,s.back_mm,s.ao_distance_mm,s.ao_samples,s.padding,s.allow_partial,s.allow_backfaces,s.prepare_colors,s.color_error,s.prepare_normals,s.normal_error,s.cage_object};}
 Scene fixture(){
  auto scene=source_color_fixture::model(true,false);const auto target=scene.active().id;const auto id=scene.add("Hidden original source",Volume{});
- auto source=source_color_fixture::model(false,false).active();source.id=id;source.name="Hidden original source";source.visible=false;source.locked=true;source.transform.position.z=.005f;scene.object(id)=std::move(source);scene.select(target);scene.validate();return scene;
+ auto source=source_color_fixture::model(false,false).active();source.id=id;source.name="Hidden original source";source.visible=false;source.locked=true;source.transform.position.z=.005f;scene.object(id)=std::move(source);
+ if(cage_mode){auto mesh=scene.object(target).painted->mesh();for(auto &p:mesh.positions)p.z+=.03f;
+  scene.add("Read-only projection cage",Volume{});scene.active().mesh_active=true;scene.active().visible=false;scene.active().locked=true;
+  scene.active().painted=std::make_shared<PaintedMesh>(mesh,64);}
+ scene.select(target);scene.validate();return scene;
 }
 std::unique_ptr<Document> setup(){
  static const auto original=fixture();auto d=std::make_unique<Document>();d->replace(original.snapshot());
@@ -30,9 +35,10 @@ std::unique_ptr<Document> setup(){
 }
 void prepare(Driver &hand){
  hand.open();hand.confirm(false);hand.sector(9);hand.point(520,210);hand.confirm(true);
+ if(cage_mode){hand.sector(0);require(hand.doc.frame().state->controls.components==2,"Actual source/cage panel has two rows");hand.point(520,320);hand.confirm(true);require(hand.doc.frame().state->bake_settings.cage_object==3,"Actual controller stages a nonzero cage before caller faults");}
  require(hand.doc.frame().state->controls.parameter==VrParameter::None&&hand.doc.frame().state->menu&&hand.doc.frame().state->menu_page==12&&hand.doc.frame().state->bake_settings.prepare_colors,"Actual same-controller Bake menu/configuration is ready before direct caller faults");
 }
-ObjectBakeSettings candidate(Document &d){auto s=d.frame().state->bake_settings;s.front_mm=73;s.back_mm=69;s.ao_samples=0;s.padding=3;return s;}
+ObjectBakeSettings candidate(Document &d){auto s=d.frame().state->bake_settings;s.front_mm=73;s.back_mm=69;s.ao_samples=0;s.padding=3;if(cage_mode)s.cage_object=0;return s;}
 }
 [[gnu::noinline]] void *operator new(size_t n){if(tracking&&++calls>=boundary){hit=true;throw std::bad_alloc();}if(auto p=std::malloc(n?n:1))return p;throw std::bad_alloc();}
 [[gnu::noinline]] void *operator new[](size_t n){return ::operator new(n);}
@@ -50,9 +56,10 @@ namespace dome {struct DocumentTransactionTestAccess {
  static size_t queued(const Document &d){std::lock_guard lock(d.file_mutex_);return d.files_.size();}
 };}
 int main(int argc,char **argv)try{
+ if(argc>=3&&std::string_view(argv[1])=="--cage"){cage_mode=true;--argc;++argv;}
  require(argc==2||argc==4,"Choose admission output directory and optional first/last failure range");std::filesystem::path directory=argv[1];std::filesystem::create_directories(directory);size_t count=0;
  {
-  auto d=setup();Release release;gate.arm();auto prior=d->save_async(directory/"measure-before.dsculpt");gate.wait();Driver hand(*d);prepare(hand);auto settings=candidate(*d);auto source=d->copy_scene().objects().back().id;
+  auto d=setup();Release release;gate.arm();auto prior=d->save_async(directory/"measure-before.dsculpt");gate.wait();Driver hand(*d);prepare(hand);auto settings=candidate(*d);auto source=d->copy_scene().objects().at(1).id;
   calls=0;boundary=SIZE_MAX;hit=false;tracking=true;d->bake_from_object(source,settings);tracking=false;count=calls;
   require(count>10&&count<4096&&DocumentTransactionTestAccess::queued(*d)==1&&d->frame().state->asset_busy&&settings_tuple(d->frame().state->bake_settings)==settings_tuple(settings)&&DocumentTransactionTestAccess::controls(*d).second==settings_tuple(settings),"Measured caller has one accepted job and one matching published/internal Bake configuration");
   gate.release();prior.get();require(d->wait_asset()&&d->frame().state->error.empty(),"Measured accepted real Bake finishes normally");
@@ -61,7 +68,7 @@ int main(int argc,char **argv)try{
  size_t first=1,last=count;if(argc==4){first=std::stoull(argv[2]);last=std::min(count,size_t(std::stoull(argv[3])));}require(first&&first<=last&&last<=count,"Measured admission fault range valid");
  for(size_t at=first;at<=last;++at){
   auto d=setup();Release release;auto old_file=directory/"old-source.dsculpt";auto before=d->copy_scene().encode();d->copy_scene().save(old_file);
-  gate.arm();auto prior=d->save_async(directory/"before.dsculpt");gate.wait();Driver hand(*d);prepare(hand);auto settings=candidate(*d);auto source=d->copy_scene().objects().back().id;
+  gate.arm();auto prior=d->save_async(directory/"before.dsculpt");gate.wait();Driver hand(*d);prepare(hand);auto settings=candidate(*d);auto source=d->copy_scene().objects().at(1).id;
   auto state=d->frame().state;auto mesh=d->frame().surface;auto tokens=DocumentTransactionTestAccess::tokens(*d);auto leases=DocumentTransactionTestAccess::leases(*d);auto controls=DocumentTransactionTestAccess::controls(*d);auto input=DocumentTransactionTestAccess::input(*d);
   calls=0;boundary=at;hit=false;bool failed=false;tracking=true;try{d->bake_from_object(source,settings);}catch(const std::bad_alloc&){failed=true;}tracking=false;
   require(hit&&failed,"Every measured real caller prefix allocation is actually denied");

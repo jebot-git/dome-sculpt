@@ -56,6 +56,16 @@ void edit_bake_dialog(Document &doc){
   size_t selected=0;
   for(size_t i=0;i<ids.size();++i){auto &o=draft.scene.object(ids[i]);names.push_back(o.name+(o.visible?"":" [hidden]"));if(ids[i]==state->bake_source)selected=i;}
   for(auto &name:names){Fl_Menu_Item item{};item.label(name.c_str());choices.push_back(item);}choices.emplace_back();source.copy(choices.data());source.value(int(selected));
+  Fl_Choice cage(label,y,width-label-40,row-6,"Cage mesh");y+=row;
+  std::vector<uint64_t> cage_ids=state->bake_cages;
+  std::vector<std::string> cage_names;std::vector<Fl_Menu_Item> cage_choices;size_t selected_cage=0;
+  for(size_t i=0;i<cage_ids.size();++i){
+    const auto id=cage_ids[i];
+    auto found=std::find_if(draft.scene.objects().begin(),draft.scene.objects().end(),[id](const auto &o){return o.id==id;});
+    cage_names.push_back(!id?"Normal offset (automatic)":found==draft.scene.objects().end()?"Unavailable cage - reselect":found->name+(found->visible?"":" [hidden]"));
+    if(id==state->bake_settings.cage_object)selected_cage=i;
+  }
+  for(auto &name:cage_names){Fl_Menu_Item item{};item.label(name.c_str());cage_choices.push_back(item);}cage_choices.emplace_back();cage.copy(cage_choices.data());cage.value(int(selected_cage));
   BakeSlider front(label,y,width-label-40,row-6,"Front (mm)");y+=row;
   BakeSlider back(label,y,width-label-40,row-6,"Back (mm)");y+=row;
   BakeSlider ao(label,y,width-label-40,row-6,"AO radius (mm)");y+=row;
@@ -74,7 +84,7 @@ void edit_bake_dialog(Document &doc){
   color_error.position(label,y);y+=row;
   Fl_Check_Button normals(20,y,width-56,row,"Prepare normal attributes");normals.value(settings.prepare_normals);y+=row;
   normal_error.position(label,y);y+=row;
-  const char *help="Partial projection keeps unprojected areas and reports misses.\nPreparation retains original colors, normal attributes and editable layers.\nDrag or wheel to adjust; 0 samples disables AO. Bake is one Undo step.";
+  const char *help="Partial projection keeps unprojected areas and reports misses.\nPreparation retains original colors, normal attributes and editable layers.\nCage: duplicate target, edit vertices; keep topology. 0 samples disables AO.\nDrag or wheel to adjust. Bake is one Undo step.";
   int help_height=measured(help,row);
   Fl_Box adjustment(16,y,width-48,help_height,help);y+=help_height;
   adjustment.align(FL_ALIGN_CENTER|FL_ALIGN_INSIDE|FL_ALIGN_WRAP);
@@ -82,13 +92,14 @@ void edit_bake_dialog(Document &doc){
   Fl_Box status(16,y,width-48,row*2);status.align(FL_ALIGN_CENTER|FL_ALIGN_INSIDE|FL_ALIGN_WRAP);y+=row*2;
   content.size(width-24,y);content.end();scroll.end();
   Fl_Button close(24,height-row*2+8,width/2-36,row,"Cancel"),bake(width/2+12,height-row*2+8,width/2-36,row,"Bake");
-  struct Run {Document *doc;Fl_Window *window;Fl_Choice *source;std::array<BakeSlider*,7> fields;std::vector<uint64_t>*ids;AssetSource *expected;Fl_Check_Button *partial,*backfaces,*colors,*normals;bool running=false,ever_ran=false;} run{&doc,&window,&source,sliders,&ids,&expected,&partial,&backfaces,&colors,&normals};
+  struct Run {Document *doc;Fl_Window *window;Fl_Choice *source,*cage;std::array<BakeSlider*,7> fields;std::vector<uint64_t>*ids,*cage_ids;AssetSource *expected;Fl_Check_Button *partial,*backfaces,*colors,*normals;bool running=false,ever_ran=false;} run{&doc,&window,&source,&cage,sliders,&ids,&cage_ids,&expected,&partial,&backfaces,&colors,&normals};
   close.callback([](Fl_Widget*w,void*p){auto &r=*static_cast<Run*>(p);if(r.running && r.doc->frame().state->asset_busy)r.doc->cancel_asset_work();else w->window()->hide();},&run);
   bake.callback([](Fl_Widget*,void*p){auto &r=*static_cast<Run*>(p);try{
     ObjectBakeSettings s;s.front_mm=float(r.fields[0]->physical());s.back_mm=float(r.fields[1]->physical());s.ao_distance_mm=float(r.fields[2]->physical());s.ao_samples=uint32_t(std::lround(r.fields[3]->value()));s.padding=uint32_t(std::lround(r.fields[4]->value()));
     s.prepare_colors=r.colors->value();s.color_error=float(r.fields[5]->value());
     s.prepare_normals=r.normals->value();s.normal_error=float(r.fields[6]->physical()/57.29577951308232);
     s.allow_partial=r.partial->value();s.allow_backfaces=r.backfaces->value();
+    s.cage_object=r.cage_ids->at(size_t(r.cage->value()));
     r.doc->bake_from_object(r.ids->at(size_t(r.source->value())),s,*r.expected);r.running=r.ever_ran=true;
   }catch(const std::exception&e){r.doc->report_error(e.what());}},&run);
   window.end();window.set_modal();dx::style(&window);window.show();close.take_focus();
@@ -100,8 +111,8 @@ void edit_bake_dialog(Document &doc){
       if(s->active_object==target && s->generation==expected.generation)expected=doc.draft_scene().source;
     }
     if(s->active_object!=target || s->generation!=expected.generation){window.hide();break;}
-    if(run.running){normals.deactivate();colors.deactivate();partial.deactivate();backfaces.deactivate();source.deactivate();for(auto f:sliders)f->deactivate();bake.deactivate();if(work.cancellable)close.activate();else close.deactivate();close.copy_label(work.cancelling?"Cancelling...":"Cancel bake");progress.value(std::min(99.f,work.progress*100));}
-    else {normals.activate();colors.activate();partial.activate();backfaces.activate();source.activate();for(auto f:sliders)f->activate();bake.activate();close.activate();close.copy_label(run.ever_ran?"Close":"Cancel");if(run.ever_ran && s->error.empty() && s->message.find("complete")!=std::string::npos)progress.value(100);}
+    if(run.running){normals.deactivate();colors.deactivate();partial.deactivate();backfaces.deactivate();source.deactivate();cage.deactivate();for(auto f:sliders)f->deactivate();bake.deactivate();if(work.cancellable)close.activate();else close.deactivate();close.copy_label(work.cancelling?"Cancelling...":"Cancel bake");progress.value(std::min(99.f,work.progress*100));}
+    else {normals.activate();colors.activate();partial.activate();backfaces.activate();source.activate();cage.activate();for(auto f:sliders)f->activate();bake.activate();close.activate();close.copy_label(run.ever_ran?"Close":"Cancel");if(run.ever_ran && s->error.empty() && s->message.find("complete")!=std::string::npos)progress.value(100);}
     std::string title="Bake surface";
     if(run.running)title+=work.cancelling?" - Cancelling...":" - Baking "+std::to_string(std::min(99,int(work.progress*100)))+"%";
     else if(run.ever_ran)title+=!s->error.empty()?" - failed":s->message.find("cancelled")!=std::string::npos?" - cancelled":" - complete";

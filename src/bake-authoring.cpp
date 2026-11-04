@@ -5,6 +5,7 @@
 #include "current-colors.hpp"
 #include "cut-color.hpp"
 #include "bake-canonical-frame.hpp"
+#include "bake-cage.hpp"
 #include "polygon-color-preparation.hpp"
 #include "dome/source-placement.hpp"
 #include "dome/normal-preparation.hpp"
@@ -151,7 +152,11 @@ ObjectBakeReport bake_object(Scene &scene, uint64_t source_id,
       return std::array<std::array<uint8_t,4>,2>{x->rgba,y->rgba};
     };
   }else low=detail::retained_bake_basis(target,options);
-  auto result = bake_mesh(low?*low:target.painted->mesh(), high, options);
+  const auto &low_mesh=low?*low:target.painted->mesh();
+  if(settings.cage_object)
+    options.cage_positions=detail::object_bake_cage(scene,target.id,settings.cage_object,
+        target.painted->mesh(),low_mesh,cancelled);
+  auto result = bake_mesh(low_mesh, high, options);
   check();
   if(!result.projected)throw std::runtime_error("No target texels project onto the selected source");
   ObjectBakeReport report{result.projected,result.padded,result.rays,result.missed};

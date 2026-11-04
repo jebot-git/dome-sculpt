@@ -13,6 +13,7 @@ from dbus_next import Variant
 from dbus_next.aio import MessageBus
 from Xlib import X, XK, display, error
 from Xlib.ext import xtest
+from bake_widgets import BakeWidgets,BakeHome
 from PIL import Image
 
 signal.pthread_sigmask(signal.SIG_SETMASK, [])
@@ -48,7 +49,7 @@ async def wait(operation, seconds=30):
 async def main():
     bus = await MessageBus().connect()
     await bus.request_name("com.canonical.AppMenu.Registrar")
-    with tempfile.TemporaryDirectory(prefix="dome-bake-policy-menu-") as task_home:
+    with BakeHome(processes,prefix="dome-bake-policy-menu-") as task_home:
         read, write = os.pipe()
         log = (OUT / "xvfb.log").open("w")
         processes.append(subprocess.Popen(["Xvfb", "-displayfd", str(write), "-screen", "0", "640x360x24" if COMPACT else "1280x1000x24", "-nolisten", "tcp"], pass_fds=(write,), stdout=log, stderr=log))
@@ -68,9 +69,15 @@ async def main():
         fixture = Path(task_home, "procedural.dsculpt")
         subprocess.run([str(BUILD / "dome-sculpt-bake-projection-policy-test"), "--ui-fixture", str(fixture)], check=True)
         log = (OUT / "app.log").open("w")
+        widget_report=Path(task_home,'native-widgets.json')
+        probe=os.environ.get('DOME_BAKE_WIDGET_PROBE',str(BUILD/'libdome-sculpt-test-widgets.so'))
+        if not Path(probe).is_file():raise RuntimeError('Build dome-sculpt-test-widgets or provide DOME_BAKE_WIDGET_PROBE')
+        env['LD_PRELOAD']=((os.environ['DOME_BAKE_ASAN_RUNTIME']+':') if os.environ.get('DOME_BAKE_ASAN_RUNTIME') else '')+probe
+        env['DOME_CAGE_WIDGET_REPORT']=str(widget_report)
         app = subprocess.Popen([str(BUILD / "dome-sculpt"), str(fixture)], cwd=task_home, env=env, stdout=log, stderr=log)
         processes.append(app)
         connection = display.Display(screen)
+        actual=BakeWidgets(widget_report,connection)
 
         def named(title):
             for window in connection.screen().root.query_tree().children:
@@ -188,13 +195,14 @@ async def main():
             check(before.crop((0,0,geometry.width,geometry.height-100)).tobytes()!=after.crop((0,0,geometry.width,geometry.height-100)).tobytes(),"Compact scrolling reaches projection policy while action buttons stay pinned")
             key("Control_L",True);key("w");key("Control_L",False);await close_options()
             check(app.poll() is None and canonical(inspect())==original,"Compact Ctrl+W cancels options and retains all baked data")
+            await command("Close Window");await wait(lambda:app.poll() is not None);check(app.returncode==0,"Native legacy bake workflow closes normally")
             connection.close();bus.disconnect();return
         key("Return");await close_options();check(canonical(inspect())==original,"Default Return cancels without starting a bake")
         editor=await open_options();g=editor.get_geometry();tap(editor,g.width*.75,g.height-48)
         await wait(lambda:"failed" in str(editor.get_wm_name() or ""));image(editor).save(OUT/"strict-projection-refusal.png")
         await command("Close Window");await close_options();await command("Save")
         check(canonical(inspect())==original,"Native default strict projection reports failure and retains exact target and source")
-        editor=await open_options();g=editor.get_geometry();tap(editor,40,306)
+        editor=await open_options();g=editor.get_geometry();await actual.click(editor,"Allow partial projection")
         image(editor).save(OUT/"explicit-partial-projection.png")
         tap(editor,g.width*.75,g.height-48);await wait(lambda:"complete" in str(editor.get_wm_name() or ""));image(editor).save(OUT/"partial-projection-complete.png")
         await command("Close Window");await close_options();await command("Save");accepted=canonical(inspect())

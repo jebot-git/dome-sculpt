@@ -3254,3 +3254,48 @@ if(BUILD_TESTING AND TARGET dome-sculpt AND TARGET dome-sculpt-test-runtime)
     ${CMAKE_CURRENT_BINARY_DIR}/shapekey-mirror-xr)
   set_tests_properties(shapekey-mirror-openxr PROPERTIES TIMEOUT 600)
 endif()
+
+if(BUILD_TESTING)
+  add_executable(dome-sculpt-bake-cage-test tests/bake-cage.cpp)
+  target_include_directories(dome-sculpt-bake-cage-test PRIVATE src)
+  target_link_libraries(dome-sculpt-bake-cage-test PRIVATE dome-sculpt-core)
+  add_test(NAME bake-custom-cage COMMAND dome-sculpt-bake-cage-test ${CMAKE_CURRENT_BINARY_DIR}/bake-custom-cage)
+  set_tests_properties(bake-custom-cage PROPERTIES TIMEOUT 600)
+  add_executable(dome-sculpt-bake-cage-polygon-test tests/bake-cage-polygon.cpp)
+  target_include_directories(dome-sculpt-bake-cage-polygon-test PRIVATE src)
+  target_link_libraries(dome-sculpt-bake-cage-polygon-test PRIVATE dome-sculpt-core)
+  add_test(NAME bake-polygon-cage COMMAND dome-sculpt-bake-cage-polygon-test ${CMAKE_CURRENT_BINARY_DIR}/bake-polygon-cage)
+  set_tests_properties(bake-polygon-cage PROPERTIES TIMEOUT 600)
+endif()
+
+if(BUILD_TESTING AND TARGET dome-sculpt AND TARGET dome-sculpt-test-runtime)
+  add_test(NAME bake-cage-openxr COMMAND ${Python3_EXECUTABLE}
+    ${CMAKE_CURRENT_SOURCE_DIR}/tests/bake-cage-xr.py
+    $<TARGET_FILE:dome-sculpt> $<TARGET_FILE:dome-sculpt-test-runtime>
+    $<TARGET_FILE:dome-sculpt-bake-cage-test>
+    ${CMAKE_CURRENT_BINARY_DIR}/bake-cage-xr)
+  set_tests_properties(bake-cage-openxr PROPERTIES TIMEOUT 600)
+  add_test(NAME bake-polygon-cage-openxr COMMAND ${Python3_EXECUTABLE}
+    ${CMAKE_CURRENT_SOURCE_DIR}/tests/bake-cage-xr.py
+    $<TARGET_FILE:dome-sculpt> $<TARGET_FILE:dome-sculpt-test-runtime>
+    $<TARGET_FILE:dome-sculpt-bake-cage-polygon-test>
+    ${CMAKE_CURRENT_BINARY_DIR}/bake-polygon-cage-xr)
+  set_tests_properties(bake-polygon-cage-openxr PROPERTIES TIMEOUT 600)
+endif()
+
+if(BUILD_TESTING)
+  add_test(NAME bake-cage-caller-admission COMMAND dome-sculpt-bake-admission-test --cage ${CMAKE_CURRENT_BINARY_DIR}/bake-cage-admission)
+  set_tests_properties(bake-cage-caller-admission PROPERTIES TIMEOUT 600)
+endif()
+
+if(BUILD_TESTING AND TARGET dome-sculpt)
+  add_library(dome-sculpt-test-widgets SHARED tests/bake-cage-gui-probe.cpp)
+  target_link_libraries(dome-sculpt-test-widgets PRIVATE dome-sculpt-json fltk::fltk-shared PkgConfig::DOME_BITMAP_RUNTIME ${CMAKE_DL_LIBS})
+endif()
+
+if(BUILD_TESTING)
+  add_executable(dome-sculpt-bake-source-control-faults-test tests/bake-source-control-faults.cpp)
+  target_link_libraries(dome-sculpt-bake-source-control-faults-test PRIVATE dome-sculpt-core)
+  add_test(NAME bake-source-control-faults COMMAND dome-sculpt-bake-source-control-faults-test)
+  set_tests_properties(bake-source-control-faults PROPERTIES TIMEOUT 600)
+endif()

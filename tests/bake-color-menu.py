@@ -13,6 +13,7 @@ from dbus_next import Variant
 from dbus_next.aio import MessageBus
 from Xlib import X, XK, display, error
 from Xlib.ext import xtest
+from bake_widgets import BakeWidgets,BakeHome
 from PIL import Image
 
 signal.pthread_sigmask(signal.SIG_SETMASK, [])
@@ -52,7 +53,7 @@ async def wait(operation, seconds=30):
 async def main():
     bus = await MessageBus().connect()
     await bus.request_name("com.canonical.AppMenu.Registrar")
-    with tempfile.TemporaryDirectory(prefix="dome-bake-policy-menu-") as task_home:
+    with BakeHome(processes,prefix="dome-bake-policy-menu-") as task_home:
         read, write = os.pipe()
         log = (OUT / "xvfb.log").open("w")
         processes.append(subprocess.Popen(["Xvfb", "-displayfd", str(write), "-screen", "0", "640x360x24" if COMPACT else "1280x1000x24", "-nolisten", "tcp"], pass_fds=(write,), stdout=log, stderr=log))
@@ -73,9 +74,15 @@ async def main():
         helper = "dome-sculpt-current-color-target-test" if TARGET else "dome-sculpt-current-color-bake-test" if CURRENT else "dome-sculpt-normal-preparation-test" if NORMAL else "dome-sculpt-color-polygon-authority-test" if POLYGON else "dome-sculpt-colored-bake-workflow-test"
         subprocess.run([str(BUILD / helper), "--ui-fixture", str(fixture)], check=True)
         log = (OUT / "app.log").open("w")
+        widget_report=Path(task_home,'native-widgets.json')
+        probe=os.environ.get('DOME_BAKE_WIDGET_PROBE',str(BUILD/'libdome-sculpt-test-widgets.so'))
+        if not Path(probe).is_file():raise RuntimeError('Build dome-sculpt-test-widgets or provide DOME_BAKE_WIDGET_PROBE')
+        env['LD_PRELOAD']=((os.environ['DOME_BAKE_ASAN_RUNTIME']+':') if os.environ.get('DOME_BAKE_ASAN_RUNTIME') else '')+probe
+        env['DOME_CAGE_WIDGET_REPORT']=str(widget_report)
         app = subprocess.Popen([str(BUILD / "dome-sculpt"), str(fixture)], cwd=task_home, env=env, stdout=log, stderr=log)
         processes.append(app)
         connection = display.Display(screen)
+        actual=BakeWidgets(widget_report,connection)
 
         def named(title):
             for window in connection.screen().root.query_tree().children:
@@ -214,15 +221,14 @@ async def main():
                 key("Control_L",True);key("w");key("Control_L",False);await close_options()
                 check(canonical(inspect())==original,"Compact cancellation preserves exact native source, deformation and paint")
                 editor=await open_options()
-                for _ in range(13):key("Tab")
+                await actual.focus("Prepare normal attributes")
                 await asyncio.sleep(.2);image(editor).save(OUT/"normal-keyboard-focus.png")
-                key("space");key("Tab");key("Tab");key("space")
+                key("space");await actual.focus("Bake");key("space")
             else:
                 key("Return");await close_options()
                 check(canonical(inspect())==original,"Default Return cancels portable normal choices without source mutation")
-                editor=await open_options();g=editor.get_geometry();tap(editor,40,450)
-                xtest.fake_input(connection,X.MotionNotify,x=g.x+300,y=g.y+486)
-                xtest.fake_input(connection,X.ButtonPress,5);xtest.fake_input(connection,X.ButtonRelease,5);connection.sync()
+                editor=await open_options();g=editor.get_geometry();await actual.click(editor,"Prepare normal attributes")
+                await actual.wheel(editor,"Normal error (deg)")
                 await asyncio.sleep(.1);image(editor).save(OUT/"normal-opt-in.png")
                 tap(editor,g.width*.75,g.height-48)
             await wait(lambda:"complete" in str(editor.get_wm_name() or ""));image(editor).save(OUT/"normal-bake-complete.png")
@@ -234,6 +240,7 @@ async def main():
             check(abs(receipt["accepted_angular_error"]-(.02 if COMPACT else .01975))<1e-6,"Visible degree-valued normal quality control persists its exact angular policy without offscreen wheel edits")
             await command("Undo");await command("Save");check(canonical(inspect())==original,"One universal Undo restores exact pre-normal-conversion state")
             await command("Redo");await command("Save");check(canonical(inspect())==accepted,"One universal Redo restores the complete explicit normal model and bake")
+            await command("Close Window");await wait(lambda:app.poll() is not None);check(app.returncode==0,"Native legacy bake workflow closes normally")
             connection.close();bus.disconnect();return
         if COMPACT:
             geometry=editor.get_geometry();check(geometry.width<=600 and geometry.height<=320,"Double-size color preparation options fit640x360")
@@ -246,9 +253,9 @@ async def main():
             key("Control_L",True);key("w");key("Control_L",False);await close_options()
             check(app.poll() is None and canonical(inspect())==original,"Compact Ctrl+W cancels color options and preserves all original data")
             editor=await open_options()
-            for _ in range(12):key("Tab")
+            await actual.focus("Prepare source colors")
             await asyncio.sleep(.2);image(editor).save(OUT/"color-option-keyboard-focus.png")
-            key("space");key("Tab");key("Tab");key("Tab");key("space")
+            key("space");await actual.focus("Bake");key("space")
             await wait(lambda:"complete" in str(editor.get_wm_name() or ""))
             geometry=editor.get_geometry();quality_before=image(editor)
             for _ in range(200):
@@ -265,15 +272,15 @@ async def main():
             check(accepted["objects"][target_index]["painted"]["baked"]["color_interpretation"]=="resolved-pbr" and sources(accepted)==sources(original),"Compact keyboard controls actually prepare and bake colors while preserving complete source data")
             check(abs(accepted["source_materials"]["color_preparations"][0]["receipt"]["accepted_projection_error"]-.04)<1e-6,"Scrolling the compact dialog never changes the hidden color tolerance")
             await command("Undo");await command("Save");check(canonical(inspect())==original,"Compact accepted preparation and normal bake undo exactly through the universal menu")
+            await command("Close Window");await wait(lambda:app.poll() is not None);check(app.returncode==0,"Native legacy bake workflow closes normally")
             connection.close();bus.disconnect();return
         key("Return");await close_options();check(canonical(inspect())==original,"Default Return cancels color options without preparing or baking")
         editor=await open_options();g=editor.get_geometry();tap(editor,g.width*.75,g.height-48)
         await wait(lambda:"failed" in str(editor.get_wm_name() or ""));image(editor).save(OUT/"explicit-color-required.png")
         await command("Close Window");await close_options();await command("Save")
         check(canonical(inspect())==original,"Default native bake refuses source colors until explicit preparation and preserves exact target and source")
-        editor=await open_options();g=editor.get_geometry();tap(editor,40,378)
-        xtest.fake_input(connection,X.MotionNotify,x=g.x+300,y=g.y+414)
-        xtest.fake_input(connection,X.ButtonPress,5);xtest.fake_input(connection,X.ButtonRelease,5);connection.sync()
+        editor=await open_options();g=editor.get_geometry();await actual.click(editor,"Prepare source colors")
+        await actual.wheel(editor,"Color error (0..1)")
         await asyncio.sleep(.1)
         image(editor).save(OUT/"explicit-prepare-colors.png")
         tap(editor,g.width*.75,g.height-48);await wait(lambda:"complete" in str(editor.get_wm_name() or ""));image(editor).save(OUT/"prepared-color-bake-complete.png")

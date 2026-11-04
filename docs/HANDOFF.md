@@ -1,5 +1,26 @@
 # Dome Sculpt production handoff
 
+## Private editable bake cages — 2026-11-04
+
+The existing native desktop/XR baker now supports an explicitly selected editable
+mesh cage, with exact topology/corner mapping, displayed deformation/full affine
+placement, hidden/locked source retention, outward bounds, Cancel and one Undo.
+Source / cage is a shared two-row panel; no menu page or prior action is removed.
+Fresh owned parent Release/SAN app/core/support/render/UI builds pass9 selected
+commands each; final complete Document/palette TUs and consumers are qualified
+separately on that same new-layout closure, followed by the complete bake TU
+for retained polygon-corner mapping. Final R/S includes32 cage checks,29 real
+polygon Move/Apply/Save/rollback checks,
+49 real confirmation faults and127 actual Bake caller faults each, real loader
+XR21 each, native normal/compact28 each and native Wayland8 Release; these final
+application gates also pass using an actual polygon-applied cage. The initial
+packed-corner rejection is retained alongside the fixed adapter proof. Read
+BAKE-CAGES.md and validation/BAKE-CAGES.json for scoped proof/negatives. C++
+layouts change; native archive formats do not. Full coherent ABI integration,
+production/device/GPU baking and every other unfinished full-goal row remain.
+No system install, headset launch or active-session restart occurred.
+
+
 ## Qualified coherent Source4/Mirror milestone — 2026-11-04
 
 Fresh own optimized application/core/render/support builds; the complete602

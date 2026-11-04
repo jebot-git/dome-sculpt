@@ -10,6 +10,10 @@ struct ObjectBakeSettings {
   float color_error = .04f;
   bool prepare_normals=false;
   float normal_error=.02f;
+  // Explicit existing mesh with the target's ordered vertex/index identities.
+  // Zero uses the ordinary normal-offset projection. Session configuration;
+  // cage geometry is an ordinary editable/persistent scene mesh.
+  uint64_t cage_object=0;
 };
 struct ObjectBakeReport {
   uint64_t projected = 0, padded = 0, rays = 0, missed = 0, preserved_misses = 0;

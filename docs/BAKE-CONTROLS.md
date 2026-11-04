@@ -36,7 +36,7 @@ Accepted completion publishes maps and closes the spatial menu for inspection.
 Reopen the page to rebake/clear or use the normal Undo/Redo/save/export commands.
 
 Settings are session controls; generated maps and retained editable sources are
-persisted in native projects. A durable bake recipe, custom cage geometry,
+persisted in native projects. A durable bake recipe,
 partial masks/multiple source selection, supersampling and production-scale
 quality/performance remain further work. This is an implemented projection-bake
 workflow, not completion of every production requirement.
@@ -62,3 +62,16 @@ projection, padding and final installation. It is not a time/texel-weighted ETA;
 large individual triangles and uncancellable bounded upstream Mikk phases can
 hold a percentage. Cancellation checks in projection/AO/padding remain independent
 of progress reports. See BAKING.txt for kernel contracts and production limits.
+
+Private custom-cage continuation
+-------------------------------
+
+The private cage milestone now adds Source/Cage choices on desktop and the
+shared XR Source / cage panel. Duplicate the prepared target, edit cage
+vertices without changing ordered topology, then choose that mesh and keep its
+outward displacement inside Front. Hidden/locked cages remain read-only.
+Full displayed cage deformation/affine placement is used; missing/incompatible
+cages refuse explicitly. Geometry persists as a normal mesh; settings remain
+session configuration. Read BAKE-CAGES.md and its receipt for current matching
+C++ layout/build scope, exact fault/native/UI/Wayland/XR evidence and unfinished
+recipe/multi-source/device work. This private continuation is not main admission.
