@@ -1,5 +1,9 @@
 # Full objective and completion evidence
 
+## Private normal-field UV safety and actual UI — 2026-11-04
+
+Real silent UV loss is preserved as a negative; actual producer/adopter now refuse atomically and untouched UV Done is NoOp. R/S10 safety +62 native +10 normal/10 compact/11 Wayland/30 syntheticXR checks pass each. Every run ends with zero drift; later test-only changes are explicit and final UI inputs remain exact. SAN privateMesa maps verified. Read LAYERED-NORMAL-UV-SAFETY-UI.md and receipt. Genuine changed-UV normal retention remains required; no full regression/main/physicalHMD claim. Full goal and later drawers remain incomplete.
+
 ## Private layered normal runtime, persistence and exports — 2026-11-04
 
 Actual worker Clear now has error0 instead of the preserved7/74, and partial
