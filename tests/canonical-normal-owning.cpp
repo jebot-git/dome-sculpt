@@ -18,10 +18,11 @@ Scene legacy_conversion_model(int variant){
 }
 Scene mirror_conversion_model(){
  Scene s;auto mesh=mirrored_fan();mesh.indices={0,1,2,0,2,3};mesh.uv[3]={.1f,.5f};
+ mesh.positions.resize(4);mesh.normals.resize(4);mesh.uv.resize(4);mesh.uv_pins.resize(4);
  auto &o=s.active();o.mesh_active=true;o.painted=std::make_shared<PaintedMesh>(mesh,64);
  DeformationState d(mesh);d.morphs=MorphSet(mesh);auto raised=mesh.positions;raised[1].z=.01f;
  d.morphs->set_target(mesh,"Asymmetric source",raised);s.set_deformation(o.id,d);
- auto high=mesh;for(auto &p:high.positions)p.z=.015f;high.normals.assign(5,{.3f,.4f,std::sqrt(.75f)});
+ auto high=mesh;for(auto &p:high.positions)p.z=.015f;high.normals.assign(4,{.3f,.4f,std::sqrt(.75f)});
  s.add("Mirror source",Volume{});s.active().mesh_active=true;s.active().visible=false;s.active().locked=true;s.active().painted=std::make_shared<PaintedMesh>(high,64);s.select(1);
  ObjectBakeSettings settings;settings.ao_samples=0;settings.padding=0;bake_object(s,2,settings);s.validate();return s;
 }
