@@ -2,6 +2,10 @@
 #include "baked-normal-field.hpp"
 namespace dome::detail {
 namespace {
+// Include conservative Image/control-block/container bookkeeping in addition
+// to vector payloads. The immutable conversion origin has its own producer
+// budget and is not silently counted as new field-owned storage here.
+constexpr size_t node_bytes=sizeof(BakedNormalField)+1024;
 void policy(const BakedNormalFieldOptions &o){
   if(!o.max_working_bytes||o.max_working_bytes>512*1024*1024||
      !o.max_retained_bytes||o.max_retained_bytes>128*1024*1024||
@@ -22,14 +26,15 @@ std::shared_ptr<const BakedNormalField> BakedNormalField::from_canonical(
     std::shared_ptr<const CanonicalNormalConversion> origin,const BakedNormalFieldOptions &o){
   policy(o);stop(o);
   if(!origin||!origin->valid_owner(origin))throw std::invalid_argument("Baked normal field needs its actual canonical conversion owner");
-  origin->validate();const auto projection=origin->projection();const auto r=projection->pbr->width;
+  const auto projection=origin->projection();const auto r=projection->pbr->width;
   const auto pixels=size_t(r)*r;
-  budget(sizeof(BakedNormalField),pixels,9,o);
+  budget(node_bytes,pixels,9,o);
+  origin->validate();
   auto result=std::shared_ptr<BakedNormalField>(new BakedNormalField);
   result->origin_=std::move(origin);result->pbr_=projection->pbr;result->mtoon_=projection->mtoon;
   result->coverage_.assign(pixels,255);
   // Conservative resident accounting counts both role images even if aliased.
-  result->retained_bytes_=sizeof(BakedNormalField)+pixels*9;
+  result->retained_bytes_=node_bytes+pixels*9;
   result->self_=result;result->validate();stop(o);return result;
 }
 std::shared_ptr<const BakedNormalField> BakedNormalField::replace(
@@ -43,8 +48,8 @@ std::shared_ptr<const BakedNormalField> BakedNormalField::replace(
   if(!any){stop(o);return self_.lock();}
   if(replacements_>=o.max_replacements)throw std::length_error("Independent baked normal replacement history exceeds its bound");
   const auto pixels=size_t(resolution())*resolution();
-  if(retained_bytes_>SIZE_MAX-sizeof(BakedNormalField))throw std::length_error("Baked normal history size overflow");
-  const auto retained=retained_bytes_+sizeof(BakedNormalField);
+  if(retained_bytes_>SIZE_MAX-node_bytes)throw std::length_error("Baked normal history size overflow");
+  const auto retained=retained_bytes_+node_bytes;
   budget(retained,pixels,18,o);
   auto result=std::shared_ptr<BakedNormalField>(new BakedNormalField);
   result->origin_=origin_;result->prior_=self_.lock();result->replacements_=replacements_+1;
