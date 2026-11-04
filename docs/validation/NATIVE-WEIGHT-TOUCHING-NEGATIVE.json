@@ -1,0 +1,27 @@
+{
+  "base": "2a7cc61",
+  "scope": "Pure own kernel/pose test with matching264 core/support; no native/SAN/admission claim",
+  "completed_cases": 8,
+  "passing_positive_gap_cases": 6,
+  "failing_touching_cases": 2,
+  "max_touch_weight": 0.333339,
+  "mean_touch_weight": 0.333331,
+  "max_touch_pose_m": 0.0666678,
+  "mean_touch_pose_m": 0.0666661,
+  "distinct_rows": 8,
+  "contact_edges": 0,
+  "bounds_unchanged": {
+    "weight_max": 0.03,
+    "weight_mean": 0.01,
+    "pose_max_m": 0.006,
+    "pose_mean_m": 0.002,
+    "work": 500000000
+  },
+  "sha256": {
+    "tests/native-weight-contact-stress.cpp": "8e8e508efe9f189617b6d6bdb5e79e2a3a0b022b885df2e0164dc0bbb9f94718",
+    "artifacts/overlay.json": "5077987a2c47d08bca3ee4595aa449f645b7734b01c12a40db5f2dd052d45222",
+    "artifacts/run.log": "feaa889d1375a0ffeae310ca812b1238233376f195413a3c8bd4d7a3314ec8be",
+    "artifacts/status.json": "085a3e59e72136ee97e1a292cef56e4f6853be09220ac3f1b2bbf9a81cfb69ba",
+    "artifacts/native-weight-contact-stress": "12fb987c4057655885788c27f63c72a0f1b2d1b0bed3b9b69a390857069a1ec3"
+  }
+}
