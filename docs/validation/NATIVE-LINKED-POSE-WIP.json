@@ -1,0 +1,190 @@
+{
+  "scope": "Private native linked-pose repair on76536fe; no public layout/schema change",
+  "source": {
+    "CMakeLists.txt": "4a8ab3b20df5b3aa72789ed927684ff121a1ffb0adee2141476534f554cbffbe",
+    "src/native-anatomical-domain.hpp": "02fed6e1a6cc75b34acb44516549d5346c488a1ec5cae7a03eedab4a8624f38a",
+    "src/native-rig-pose-scope.hpp": "269155bd97aae74e0d91b7e33a141c335ce57912c2a5b933419f66dd51b4d35b",
+    "src/rig-edit.cpp": "88ce2252381844b04375859c482ac87efd33263ea0ad7f5a18d439b8b49ce9c3",
+    "tests/native-rig-pose-scope.cpp": "2d62851581d0e3ee3164ee842807a22038bc74c906ea8ce510064505b3a835aa",
+    "tests/native-rig-pose-faults.cpp": "489c618b4385c3893e75b041cbecf6f5a397e53b6d30a77456533c71ae84bdd7"
+  },
+  "coherent_parent": "76536fe91240fd2510e0f89ed7978136f9343284",
+  "build_scope": "Own rig-edit.cpp and complete fixtures compiled with identical765 public headers/flags. Replaced only rig-edit.cpp.o in copied parent core archives; read-only wholly owned matching support archives. This is a module proof, not a fresh whole-project build.",
+  "public_headers_equal": true,
+  "profiles": {
+    "release": {
+      "tests": {
+        "female": {
+          "exit": 0,
+          "expected": 0,
+          "elapsed": 6.736514071992133,
+          "log_sha256": "3f6a2ace2236be44a0f06637d7028cb6069af4ae67c7a1f960df10c3630d8fd5",
+          "pass_lines": 51
+        },
+        "female-faults": {
+          "exit": 0,
+          "expected": 0,
+          "elapsed": 5.491299523971975,
+          "log_sha256": "2fcedce8a40a52e6a86254d0e9f865a1cc493d70dea1e9493abf63c177b02351",
+          "pass_lines": 34,
+          "sampled": 34,
+          "measured_allocations": 166952,
+          "coverage": "powers-of-two and final16 actual preparation prefixes; not exhaustive"
+        },
+        "male": {
+          "exit": 0,
+          "expected": 0,
+          "elapsed": 7.241934778983705,
+          "log_sha256": "f5d2e4ea4da62b1ba73e4f5e9d4aad91086726a9b61209d39e4a4e365582a055",
+          "pass_lines": 51
+        },
+        "male-faults": {
+          "exit": 0,
+          "expected": 0,
+          "elapsed": 5.224024877999909,
+          "log_sha256": "5666c0d1b74795266a51207e2752c7f3583a08dcb478976de5a7350ef5e3665e",
+          "pass_lines": 34,
+          "sampled": 34,
+          "measured_allocations": 166441,
+          "coverage": "powers-of-two and final16 actual preparation prefixes; not exhaustive"
+        },
+        "legacy": {
+          "exit": 0,
+          "expected": 0,
+          "elapsed": 2.141743330983445,
+          "log_sha256": "0436c2e23122f194e9a0a9ce851bb30db4c2571791e9f391b0e7039418b2c654",
+          "pass_lines": 70
+        },
+        "old-negative": {
+          "exit": 1,
+          "expected": 1,
+          "elapsed": 0.6799258770188317,
+          "log_sha256": "17e840b9b68615acfbe3eff4a960918956ee81d75aef1b11938d675073a28a06",
+          "pass_lines": 1
+        }
+      },
+      "inputs": 1870,
+      "readonly_archives": {
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-anatomical-admission-c1e03e5/build/libdome-sculpt-affine.a": "444f8755d6328a34b0c268a94048a5fb428d9479c985f87858158ac399bc988a",
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-anatomical-admission-c1e03e5/build/libdome-sculpt-core.a": "8b538490caec6bf4571ffd3f7b714284911ec06fc1afb5b33b4600fbe8f1ed8d",
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-anatomical-admission-c1e03e5/build/libdome-sculpt-emission-codec.a": "6c9229f57fb69d7ac9657e14a5b8f086c65de182f5c8e4b9f1a5a3c78303a0dc",
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-anatomical-admission-c1e03e5/build/libdome-sculpt-polygon.a": "53a10aace78f0cee762d8e2477f1f1b59efbd1ed3cbf4ed4afba5dadde1609e3",
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-anatomical-admission-c1e03e5/build/libdome-sculpt-render.a": "73e7e8429ab48f40aac97909dea3ab6b4b7d463a5eb33305accd6ae5e0169da2",
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-anatomical-admission-c1e03e5/build/libdome-sculpt-spacenav.a": "e625dac5db0a85a26bcaca91b6d5385766bc283720c58d41846d0e1be0019adf",
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-anatomical-admission-c1e03e5/build/libdome-sculpt-xr.a": "5653fdd715e6fd387e46bf5c3c981fdeab2dd8677af2a8e736196b68cebd453d",
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-anatomical-admission-c1e03e5/build/libmikktspace-robust.a": "4a44f6c792a92b16bfc096b0a1fd0b0bfd2c16d60c2f866de2a9de9d0a0ae7ed",
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-anatomical-admission-c1e03e5/build/libmikktspace.a": "c10a5d0640dcac146597e14ecff8a3ba25fee124be0c367ac70f7c908a52b54c",
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-anatomical-admission-c1e03e5/build/libufbx.a": "2a9f2e3ff69ed645c67fe10f751eed0e28dfb6015a7ef568d57dadad06ffd7ba",
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-anatomical-admission-c1e03e5/build/libxatlas.a": "fcf5473f3f7a63f069b172c936898fe8d0022250bc19702e2d4c6074ea93157a"
+      },
+      "binaries": {
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-anatomical-pose-76536fe/artifacts/release/native-rig-pose-scope": "7052473ed23a7548e9cebb7dc5018ef9147e98f73c4477c388a5ed1377a62652",
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-anatomical-pose-76536fe/artifacts/release/native-rig-pose-old": "ea759f09d0c13f035214174531536805b1f3feaed89bdd732ed947b509a29965",
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-anatomical-pose-76536fe/artifacts/release/native-rig-pose-faults": "61d3bb60b78646ae6388d1de2cec9186ea8b472d5b14f315ebf8b30302a96e8d",
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-anatomical-pose-76536fe/artifacts/release/native-rig-pose-legacy": "1131191fd2a42048ef5c712b2920bcea0e949923864affec9a81621d9e5f1ba1"
+      },
+      "before_build_manifest_sha256": "00ca93a601e6375c0d08fdb149392644293179821119df3a3546f36e162246f1",
+      "built_manifest_sha256": "3190ed5a708dd19876617aefa58263652ba8a5e763e0dbb0c69fb3bc808e1cbb",
+      "final_manifest_sha256": "da9d162052ce9e568325988a968db71f8f534dfb8bf330b40ccf311144266cd6",
+      "source_archive_binary_after_exact": true
+    },
+    "sanitize": {
+      "tests": {
+        "female": {
+          "exit": 0,
+          "expected": 0,
+          "elapsed": 68.04230123502202,
+          "log_sha256": "435114ab9769689f57c9ec3203275c5311345738b4075803dd8d95ee241aeef4",
+          "pass_lines": 51
+        },
+        "female-faults": {
+          "exit": 0,
+          "expected": 0,
+          "elapsed": 50.28439313604031,
+          "log_sha256": "2fcedce8a40a52e6a86254d0e9f865a1cc493d70dea1e9493abf63c177b02351",
+          "pass_lines": 34,
+          "sampled": 34,
+          "measured_allocations": 166952,
+          "coverage": "powers-of-two and final16 actual preparation prefixes; not exhaustive"
+        },
+        "male": {
+          "exit": 0,
+          "expected": 0,
+          "elapsed": 68.38288082799409,
+          "log_sha256": "81fd9d30b246742288e94b619ee431012c45230efdedf072024cd4ab62b32e42",
+          "pass_lines": 51
+        },
+        "male-faults": {
+          "exit": 0,
+          "expected": 0,
+          "elapsed": 51.14295324095292,
+          "log_sha256": "5666c0d1b74795266a51207e2752c7f3583a08dcb478976de5a7350ef5e3665e",
+          "pass_lines": 34,
+          "sampled": 34,
+          "measured_allocations": 166441,
+          "coverage": "powers-of-two and final16 actual preparation prefixes; not exhaustive"
+        },
+        "legacy": {
+          "exit": 0,
+          "expected": 0,
+          "elapsed": 13.713136270991527,
+          "log_sha256": "0436c2e23122f194e9a0a9ce851bb30db4c2571791e9f391b0e7039418b2c654",
+          "pass_lines": 70
+        },
+        "old-negative": {
+          "exit": 1,
+          "expected": 1,
+          "elapsed": 8.523434720991645,
+          "log_sha256": "17e840b9b68615acfbe3eff4a960918956ee81d75aef1b11938d675073a28a06",
+          "pass_lines": 1
+        }
+      },
+      "inputs": 1870,
+      "readonly_archives": {
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-anatomical-admission-c1e03e5/build-sanitize/libdome-sculpt-affine.a": "e03b51b6ce6d9b5d2bbce123366fcb0d2b20c30c576e3766ff24541b4c7b2140",
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-anatomical-admission-c1e03e5/build-sanitize/libdome-sculpt-core.a": "1bfd6d2bb92e82928fdac9f32b27461d477997582c9f69f044c40c73d56e1f1c",
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-anatomical-admission-c1e03e5/build-sanitize/libdome-sculpt-emission-codec.a": "b12a4d37b54b0bee6ab40ca5dacfe0502ed12d38850eb6b4cb8c2c66fc6bccc2",
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-anatomical-admission-c1e03e5/build-sanitize/libdome-sculpt-polygon.a": "e56a4eb6e27411371be484531865cd90657ca7bb106699c81417866b6eaf8ea0",
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-anatomical-admission-c1e03e5/build-sanitize/libdome-sculpt-render.a": "e64683f46dceaf490700adb0a8b7dbbea05ca1841c0919c6c505b89da3a63bab",
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-anatomical-admission-c1e03e5/build-sanitize/libdome-sculpt-spacenav.a": "694682bb76b865af71eb9c617b5c9ac6b781cfddbf52ef18ee83c9bcc7757844",
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-anatomical-admission-c1e03e5/build-sanitize/libdome-sculpt-xr.a": "396016a55cd6fbbb3b52976e8accbf9ef4c97e55ffb48a750ce64ea59cbeebcb",
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-anatomical-admission-c1e03e5/build-sanitize/libmikktspace-robust.a": "d91066e8b9307d61847b15270cb1763b35b8704c6edcb125175c1e3a3c14808e",
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-anatomical-admission-c1e03e5/build-sanitize/libmikktspace.a": "777b6079a98ba675b5e2d2207a99d7dea698c6321d59653f621cc6fb96e1a421",
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-anatomical-admission-c1e03e5/build-sanitize/libufbx.a": "c7b170850477ef63627f0d1d86eda579d3ab0af725c74ce6d741fbe6e5a30a9b",
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-anatomical-admission-c1e03e5/build-sanitize/libxatlas.a": "2ca8de78229c56a7efaa582bc53a48d6867f5cfd0b774c690cbff423f79b9b31"
+      },
+      "binaries": {
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-anatomical-pose-76536fe/artifacts/sanitize/native-rig-pose-scope": "ee9aee10a4db5430cd3aa02c528e95e096e728062737ff1c25d4c8ede243b1bc",
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-anatomical-pose-76536fe/artifacts/sanitize/native-rig-pose-old": "a4a6d845a4a0b939a3f0c13823d9408928aadc41b49d3b5765e33e53fe779a65",
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-anatomical-pose-76536fe/artifacts/sanitize/native-rig-pose-faults": "f565336f5674546ef94a1aa1e46342b46ccc061e9263ffd7f239db83aed8c978",
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-anatomical-pose-76536fe/artifacts/sanitize/native-rig-pose-legacy": "5801730d7b3797cce479c274f00e9714af1d5b33dfc0ad1608fa8257dc7299b9"
+      },
+      "before_build_manifest_sha256": "99a272c2a29ba1a8b2377becd14f9abc58b9ecdc0039219abc9842cc68d90951",
+      "built_manifest_sha256": "22241e0e61c38085d0a680df06d81dd30d393787ed9fe2fa3e83eb6e390651a6",
+      "final_manifest_sha256": "00cbf6948835b3db571a28528709c8ce5d3eaf1259c9098659a08127c39d29c7",
+      "source_archive_binary_after_exact": true
+    }
+  },
+  "output_pairs": {
+    "release/female/linked": "ceac4e058a7b4f349f101461efa3bec6aa18699a2e55b267bb3800fe86f9aebd",
+    "release/female/controller": "4488e1f194cc848322a804bb73f52a421536b47892b84d5cd6f6f38c15fec51c",
+    "release/male/linked": "6608bd2e3fdae47b01017bc5ed261863d099720f6c45cdbb298f26934cba7c6a",
+    "release/male/controller": "7fd29455c8518d02f5cb08716c68d7eba7434c7f415e34f9d8b7d6f5484b2c9c",
+    "sanitize/female/linked": "ceac4e058a7b4f349f101461efa3bec6aa18699a2e55b267bb3800fe86f9aebd",
+    "sanitize/female/controller": "4488e1f194cc848322a804bb73f52a421536b47892b84d5cd6f6f38c15fec51c",
+    "sanitize/male/linked": "6608bd2e3fdae47b01017bc5ed261863d099720f6c45cdbb298f26934cba7c6a",
+    "sanitize/male/controller": "7fd29455c8518d02f5cb08716c68d7eba7434c7f415e34f9d8b7d6f5484b2c9c"
+  },
+  "setup_and_controls": [
+    "Original linked-pose diagnostic:10/19; fixed diagnostic19/19",
+    "Initial missing artifact input abort preserved; corrected authentic sealed input used",
+    "Fixture setup-only include path and missing vector/quaternion operators corrected",
+    "Invalid role duplicate and invalid source-node before-encoding fixture errors preserved; valid role swap + exact invalid-owner/context rollback test used",
+    "Original native NextJoint actions close the menu; fixture now reopens the genuine rig menu for each action. No runtime fence or control semantics changed."
+  ],
+  "remaining": [
+    "Actual desktop GUI and emitted-current linked-pose independent consumer follow-up",
+    "Dedicated Anatomical page32 and complete typed lock/admission/publication fault qualification",
+    "General unskinned/edited/prepared/original-skinned/relative-affine automatic weighting and broad production admission"
+  ]
+}

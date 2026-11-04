@@ -12,8 +12,8 @@ struct NativeAnatomicalDomain {uint64_t group=0;std::vector<uint64_t> objects;};
 // current instance even when a user later groups several instances together.
 // No original affine/node provenance is invented for legacy current groups.
 inline NativeAnatomicalDomain native_anatomical_domain(const Scene&scene,
- std::span<const uint64_t>selected,weight_surface::Budget&work){
- if(selected.empty()||selected.size()>64||scene.objects().size()>128||scene.groups().size()>128)
+ std::span<const uint64_t>selected,weight_surface::Budget&work,size_t maximum_objects=128){
+ if(selected.empty()||selected.size()>64||!maximum_objects||maximum_objects>256||scene.objects().size()>maximum_objects||scene.groups().size()>128)
    throw std::invalid_argument("Native anatomical bounded current source scope");
  const auto&first=scene.object(selected.front());
  if(!first.appearance||!first.appearance->asset||!first.appearance->original_bytes||!first.group)

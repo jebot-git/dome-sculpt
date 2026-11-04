@@ -4,6 +4,7 @@
 #include <nlohmann/json.hpp>
 #include "source-rigid-pose.hpp"
 #include "source-rest-scene.hpp"
+#include "native-rig-pose-scope.hpp"
 namespace dome {
 namespace {
 void check_cancel(const std::function<bool()> &cancelled) {
@@ -51,7 +52,31 @@ void edit_rig(Scene &scene, uint64_t object, const RigEdit &edit,
     throw std::invalid_argument("Invalid shapekey target or weight");
   auto group = rig_group(scene, source);
   auto imported = detail::source_rig_instance(scene, source);
-  auto signature = pose_edit && !imported ? old.skeleton->encode() : nlohmann::json{};
+  detail::weight_surface::Budget native_work{0,500'000'000,cancelled};
+  auto native_scope=pose_edit&&edit.linked_pose&&!imported
+      ?detail::native_rig_pose_scope(scene,source,native_work)
+      :std::optional<detail::NativeRigPoseScope>{};
+  if(native_scope){
+    // Forecast every real mutable recipient before the first deformation copy.
+    detail::geometry_weight_authoring::Bytes bytes{65536,256u*1024u*1024u};
+    bytes.add(scene.objects().size(),sizeof(SculptObject));
+    bytes.add(scene.groups().size(),sizeof(SceneGroup));
+    for(const auto&o:scene.objects()){
+      native_work.step(o.name.size()+o.material.name.size()+1);
+      bytes.text(o.name);bytes.text(o.material.name);
+    }
+    for(const auto&g:scene.groups()){
+      native_work.step(g.name.size()+1);bytes.text(g.name);
+    }
+    for(auto id:native_scope->objects){const auto&o=scene.object(id);
+      if(!o.deformation||!o.deformation->skeleton||!o.deformation->skin)continue;
+      if(o.locked||!o.mesh_active||!o.painted)throw std::invalid_argument("A linked native source part is locked or has no rest mesh");
+      detail::require_native_pose_rig(scene,source,o,edit.reset_pose,native_work);
+      detail::geometry_weight_authoring::deformation_copy_bytes(*o.deformation,bytes,native_work);
+      native_work.step_items(o.painted->mesh().positions.size()+o.painted->mesh().indices.size(),16);
+    }
+  }
+  auto signature = pose_edit && !imported && !native_scope ? old.skeleton->encode() : nlohmann::json{};
   auto pose = edit.reset_pose ? std::vector<JointTransform>{} : old.pose;
   if (edit.joint) {
     if (pose.empty())
@@ -83,6 +108,8 @@ void edit_rig(Scene &scene, uint64_t object, const RigEdit &edit,
           }
           continue;
         }
+      } else if(native_scope) {
+        if(!native_scope->contains(o.id)||!o.deformation||!o.deformation->skeleton||!o.deformation->skin)continue;
       } else {
         if (!group || rig_group(scene, o) != group || !o.deformation ||
             !o.deformation->skeleton || !o.deformation->skin ||
@@ -132,6 +159,11 @@ void edit_rig(Scene &scene, uint64_t object, const RigEdit &edit,
           remapped[slot] = pose.empty() ? after.rest : pose.at(original);
         }
         next->pose = edit.reset_pose ? std::vector<JointTransform>{} : std::move(remapped);
+      } else if(native_scope&&!selected) {
+        // Preserve every untouched local pose value/representation. Only the
+        // requested joint is shared; reset is an explicit whole-pose action.
+        if(edit.reset_pose)next->pose.clear();
+        if(edit.joint){if(next->pose.empty())for(const auto&bone:next->skeleton->bones)next->pose.push_back(bone.rest);next->pose.at(edit.joint->joint)=pose.at(edit.joint->joint);}
       } else next->pose = pose;
     }
     if (selected && edit.morph) {
