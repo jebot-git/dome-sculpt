@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "key-mirror-correspondence.hpp"
+#include "normal-domain-fixtures.hpp"
 #include <algorithm>
 #include <iostream>
 #include <numeric>
@@ -12,7 +13,15 @@ template<class F>bool rejects(F action){try{action();return false;}catch(const s
 Mesh square(){Mesh m;m.positions={{-1,-1,0},{1,-1,0},{1,1,0},{-1,1,0}};m.normals.assign(4,{0,0,1});m.uv={{{0,0}},{{1,0}},{{1,1}},{{0,1}}};m.indices={0,1,2,0,2,3};return m;}
 bool equal(Vec3 a,Vec3 b){return a.x==b.x&&a.y==b.y&&a.z==b.z;}
 }
-int main()try{
+int main(int argc,char **argv)try{
+ if(argc==3&&std::string_view(argv[1])=="--source-fixture"){
+  auto scene=normal_domain_fixture::model();auto &object=scene.active();
+  SourceUvBakeInput input;input.paint=object.painted;input.current_material=object.material_bindings;input.current_deformation=object.deformation;input.appearance=object.appearance;input.source_vertices=input.paint->mesh().indices;
+  for(auto v:input.source_vertices){const auto &m=input.paint->mesh();input.target.indices.push_back(uint32_t(input.target.positions.size()));input.target.positions.push_back(m.positions[v]);input.target.normals.push_back(m.normals[v]);input.target.uv.push_back(m.uv[v]);}
+  SourceUvBakeOptions options;options.normal_sampling=SourceNormalUvMethod::RetainSource;
+  auto adopted=adopt_source_uv_bake(bake_source_uv(input,options));object.painted=adopted.paint;object.material_bindings=adopted.material_bindings;object.deformation=adopted.deformation;object.appearance=adopted.appearance;scene.validate();scene.save(argv[2]);return 0;
+ }
+ if(argc!=1)return 2;
  const std::array<Vec3,4> values{{{.1f,.2f,.3f},{.4f,.5f,.6f},{.7f,.8f,.9f},{1,1.1f,1.2f}}};
  const std::array<size_t,4> partner{1,0,3,2};
  for(float scale:{.0001f,1.f,10000.f})for(float plane:{0.f,.125f})for(bool diagonal:{false,true}){

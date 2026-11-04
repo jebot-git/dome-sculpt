@@ -128,7 +128,7 @@ ShapeKeyResult author_shapekey(Scene &scene,uint64_t object,const ShapeKeyEdit &
  const size_t slot=replace?edit.target:count;
  if(!replace && count>=128)throw std::length_error("Shapekey target budget exceeded");
  std::string name=edit.action==ShapeKeyAction::Replace?keys.targets[slot].name:key_name(keys,edit.name);
- if(detail::needs_independent_key_domain(source,edit))return detail::author_derived_normal_shapekey(scene,object,edit,cancelled);
+ if(detail::needs_independent_key_domain(source,edit,cancelled))return detail::author_derived_normal_shapekey(scene,object,edit,cancelled);
  if(edit.action==ShapeKeyAction::Mirror&&edit.mirror_frames!=ShapeKeyMirrorFrames::VertexPositions&&(edit.mirror_plane!=0||edit.mirror_frames!=ShapeKeyMirrorFrames::ExactAuthored))throw std::invalid_argument("Explicit-plane frame conversion requires genuine owning native frame authority");
  if(source.material_bindings&&source.material_bindings->normal_preparation)
   return detail::author_prepared_normal_shapekey(scene,object,edit,cancelled);

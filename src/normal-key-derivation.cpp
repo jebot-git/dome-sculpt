@@ -191,12 +191,33 @@ void SourceKeyDerivation::validate(bool deep,const std::function<bool()> &cancel
   }else if(paint_->normal_projection())throw std::invalid_argument("Independent key anchor has unbound normal sampling planes");
   domain_->validate(deep,cancelled);if(deformation_)deformation_->validate(paint_->mesh());if(deep&&!same_frames(*frames_,*replay(cancelled)))throw std::invalid_argument("Independent key attributes differ from genuine source-role authoring replay");
 }
-bool needs_independent_key_domain(const SculptObject &o,const ShapeKeyEdit &edit){
+bool needs_independent_key_domain(const SculptObject &o,const ShapeKeyEdit &edit,
+    const std::function<bool()> &cancelled){
   if(!o.material_bindings||!o.material_bindings->normal_frames||!o.material_bindings->uv_origin)return false;
   if(o.material_bindings->key_derivation)return true;
-  if(edit.action==ShapeKeyAction::Mirror)return true;
-  if(edit.action!=ShapeKeyAction::Replace)return false;const auto &current=o.painted->mesh(),&origin=frame_position_basis(*o.material_bindings);if(edit.positions.size()!=current.positions.size())throw std::invalid_argument("Independent key requires complete current REST positions");
-  std::vector<Vec3> values(origin.positions.size());std::vector<uint8_t> seen(values.size());for(size_t c=0;c<current.indices.size();++c){auto a=current.indices[c],b=origin.indices.at(c);auto delta=edit.positions[a]-current.positions[a];if(seen[b]&&!same(values[b],delta))return true;values[b]=delta;seen[b]=1;}return false;
+  const bool vertex_mirror=edit.action==ShapeKeyAction::Mirror&&edit.mirror_frames==ShapeKeyMirrorFrames::VertexPositions;
+  if(edit.action==ShapeKeyAction::Mirror&&!vertex_mirror)return true;
+  if(edit.action!=ShapeKeyAction::Replace&&!vertex_mirror)return false;
+  const auto &current=o.painted->mesh(),&origin=frame_position_basis(*o.material_bindings);
+  if(current.indices.size()!=origin.indices.size())throw std::invalid_argument("Key authoring lost the original ordered frame corners");
+  if(!vertex_mirror&&edit.positions.size()!=current.positions.size())throw std::invalid_argument("Independent key requires complete current REST positions");
+  std::vector<Vec3> reflected;
+  if(vertex_mirror){
+    if(!o.deformation||!o.deformation->morphs||edit.target>=o.deformation->morphs->targets.size())throw std::invalid_argument("Choose an existing shapekey for vertex-position Mirror");
+    KeyMirrorLimits limits;limits.cancelled=cancelled;
+    reflected=reflected_key_vertex_deltas(current,o.deformation->morphs->targets[edit.target].delta,{edit.mirror_plane},edit.mirror_tolerance,limits);
+  }
+  // A consistent field still belongs to the existing native frame writer.
+  // Only distinct values at a shared original vertex need a new owning domain.
+  std::vector<Vec3> values(origin.positions.size());std::vector<uint8_t> seen(values.size());
+  for(size_t c=0;c<current.indices.size();++c){
+    if((c&1023)==0)stop(cancelled);
+    const auto a=current.indices[c],b=origin.indices.at(c);
+    const auto delta=vertex_mirror?reflected.at(a):edit.positions.at(a)-current.positions.at(a);
+    if(seen.at(b)&&!same(values.at(b),delta))return true;
+    values.at(b)=delta;seen.at(b)=1;
+  }
+  return false;
 }
 ShapeKeyResult author_derived_normal_shapekey(Scene &scene,uint64_t object,const ShapeKeyEdit &edit,const std::function<bool()> &cancelled){
   stop(cancelled);const auto &source=scene.object(object);const auto &binding=source.material_bindings;normal_frame_current_authority(*binding,source.painted->mesh(),source.deformation.get(),cancelled);const auto recipe=binding->normal_preparation;if(recipe)recipe->validate_current(source.painted->mesh(),source.appearance.get(),cancelled);
@@ -235,10 +256,6 @@ ShapeKeyResult author_derived_normal_shapekey(Scene &scene,uint64_t object,const
   node->frames_=node->replay(cancelled);node->validate(true,cancelled);
   deform->morphs->set_target(source.painted->mesh(),name,endpoint);if(duplicate)deform->morphs->targets.back().delta=original_keys->targets.at(edit.target).delta;if(mirror)deform->morphs->targets.back().delta=mirrored_delta;if(create&&!deform->morph_weights.empty())deform->morph_weights.push_back(0);deform->validate(source.painted->mesh());std::shared_ptr<const SourceNormalPreparation> next_recipe;if(recipe){auto prepared=std::make_shared<SourceNormalPreparation>(*recipe);prepared->target_frames=node->frames_;prepared->key_derivation=node;next_recipe=std::move(prepared);}
   auto next_binding=std::make_shared<SourceMaterialBindings>(*binding);next_binding->normal_frames=node->frames_;next_binding->normal_preparation=next_recipe;next_binding->key_derivation=node;next_binding->validate();normal_frame_current_authority(*next_binding,source.painted->mesh(),deform.get(),cancelled);
-  Scene next=scene;auto &output=next.object(object);output.material_bindings=next_binding;output.deformation=deform;// Named copies/mixes of an existing owning key continue its first Restore
-  // source. Their own before-material anchor already retains the intermediate
-  // target arrays; replacing the external capsule would shorten Restore.
-  const bool inherits_source=vertex_mirror||(old&&(duplicate||mix));
-  if(!reuse&&(!inherits_source||!output.shape_source))output.shape_source=capture_polygon_origin(scene,object);next.validate();stop(cancelled);scene=std::move(next);return{slot,true};
+  Scene next=scene;auto &output=next.object(object);output.material_bindings=next_binding;output.deformation=deform;if(!reuse)output.shape_source=capture_polygon_origin(scene,object);next.validate();stop(cancelled);scene=std::move(next);return{slot,true};
 }
 } // namespace dome::detail
