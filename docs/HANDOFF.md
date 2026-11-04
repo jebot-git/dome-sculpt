@@ -1,5 +1,23 @@
 # Dome Sculpt production handoff
 
+## Private VRM1 dynamic paint layers — 2026-11-04
+
+Runtime8fce073 adds actual expression-preserving independent colour paint for the
+bounded opaque/common-UV-target MToon1 domain. Current R/S worker44 includes all
+256/512/1024 policies, one real paint Undo/Redo, running+queued Cancel, ordered
+Save, Open/retry/second cycle; independently parsed renderer112 covers36 pairs
+at unchanged4, max1. All905 factory allocation prefixes/all647 Cancel and three
+unrepresentable-target controls pass each; current legacy81/762/22 also pass.
+StrictArc113/36pairs +actualsoftware-refusal closed; lease released. Component
+six-complete-TU scope only, public95 headers unchanged; configure631 is not a
+freshapp/fullsuite/main claim. All154 official schema instances pass; all15 actual
+writer containers have0KHRerrors (114warnings/248infos). Combined20 validation
+retains20errors exclusively in five inherited raw empty-child-array fixtures.
+Exact R/S20 container and72 PNG pairs match. Read VRM1-DYNAMIC-PAINT-LAYERS.md/JSON
+for scope, preserved negatives and guarded MASK/shared-shade/normal/physical/
+prepared/plainPBR/other-target work. Original unoptimized SAN64560 remains
+live/unfinished; all full-goal requirements and coherent main admission remain.
+
 ## Private source skin world precision — 2026-11-04
 
 Code 28f27b3 closes the preserved source-eye 7>4 case: actual source-backed native
