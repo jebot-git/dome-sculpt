@@ -1,0 +1,7 @@
+# Authentic converted normal UV correspondence
+
+A new private immutable correspondence owns the genuine conversion root, flattened vertex IDs, exact current mesh/UV/pins/seams and original normal coordinates. It supports rotated/scaled atlases and vertices duplicated at seams without resampling the quantized normal planes. Repeated edits flatten directly to the root and release prior UV workspace owners. A foreign same-value conversion or fabricated shared-pointer control block cannot authorize the active field.
+
+Release and ASan/UBSan each pass20 native checks,90 independent barycentric bilinear samples with maximum error0,87 measured persistent C++ allocation prefixes and24 cancellation polls. POSITION/NORMAL changes, altered corner order, out-of-atlas UVs, changed pins and prospective memory overflow refuse with exact original Scene and retry. Both complete product TUs, consumer and actual app relink are qualified over the exact matching current archive cohort;2,332 inputs each remain unchanged. Read [the receipt](validation/CANONICAL-NORMAL-UV-KERNEL.json).
+
+This is the necessary correspondence/sampling kernel, not finished editing: actual UV worker adoption, durable codec, renderer/export coordinates and post-UV rebake integration remain next. Existing guards still prevent unsupported live-state changes. No public layout/schema changes, fresh ALL/full regression, physical GPU/headset, main admission or system installation is claimed. The full production goal and later controller drawers remain required.
