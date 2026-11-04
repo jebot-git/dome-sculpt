@@ -51,6 +51,12 @@ enum class DeclaredOriginBoundary {
 struct DeclaredWeightSupport {
   struct Equality {uint64_t first,second;uint32_t first_vertex,second_vertex;};
   std::vector<Equality> geometric_equalities;
+  // Separate anatomical hierarchy, chosen before solving. UINT32_MAX leaves
+  // the existing screened construction byte-for-byte unchanged.
+  uint32_t hierarchy_joint=UINT32_MAX;
+  std::vector<uint64_t> hierarchy_transition_parts;
+  struct Boundary {uint64_t object;uint32_t vertex;};
+  std::vector<Boundary> hierarchy_one_boundary;
   DeclaredSupportPolicy policy = DeclaredSupportPolicy::AllDeformControls;
   bool world_metric = false;
   std::vector<DeclaredWeightPart> parts;

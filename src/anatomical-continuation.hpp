@@ -13,6 +13,7 @@
 #include "weight-shared-simplex.hpp"
 #include "weight-user-boundary.hpp"
 #include "weight-equality-quotient.hpp"
+#include "weight-hierarchical-partition.hpp"
 #include <map>
 #include <nlohmann/json.hpp>
 namespace dome::detail {
@@ -794,6 +795,8 @@ anatomical_continuation(const Scene &scene, uint64_t group,
       s.columns[b] = edge[0];
       s.values[b] = -w;
     }
+    std::vector<double> hierarchy_membership;
+    size_t hierarchy_peak=0;
     // Lexicographic edge iteration yields sorted unique adjacency rows.
     if(declared&&!declared->geometric_equalities.empty()) {
       stage="exact declared geometric energy quotient";
@@ -818,6 +821,55 @@ anatomical_continuation(const Scene &scene, uint64_t group,
       source_bytes+=equality_bytes+quotient.bytes;
       for(auto&p:out.parts)for(auto&row:p.raw_to_row){budget.step();row=quotient.rows[row];}
       n=s.diagonal.size();out.report.rows=n;
+    }
+    if(declared&&declared->hierarchy_joint!=UINT32_MAX) {
+      stage="independent anatomical membership energy";
+      const auto joint=declared->hierarchy_joint;
+      if(joint>=joint_label.size()||joint_label[joint]==SIZE_MAX||
+         declared->contact_support!=DeclaredContactSupport::CommonMask||
+         declared->hierarchy_transition_parts.empty()||declared->hierarchy_one_boundary.empty())
+        throw std::invalid_argument("Anatomical hierarchy requires its own current handle/domain/boundary");
+      const size_t label=joint_label[joint],nz=s.columns.size();
+      const size_t planned=n*160+nz*16+65536;
+      if(planned>options.maximum_bytes-source_bytes)
+        throw std::length_error("Anatomical membership before staging");
+      budget.step_items(n,labels+32);budget.step_items(nz,4);
+      System hs;hs.positions=s.positions;hs.mass=s.mass;hs.starts=s.starts;
+      hs.columns=s.columns;hs.values=s.values;hs.diagonal=s.diagonal;
+      std::vector<double>hrhs(n*2);std::vector<uint32_t>fixed(n,UINT32_MAX);
+      for(size_t i=0;i<n;++i){
+        hrhs[i*2+1]=rhs[i*labels+label];hrhs[i*2]=screen[i]-hrhs[i*2+1];
+        if(hrhs[i*2]<0||!std::isfinite(hrhs[i*2]))
+          throw std::invalid_argument("Anatomical membership screened load");
+      }
+      for(const auto&p:out.parts){
+        bool free=false;for(auto id:declared->hierarchy_transition_parts){budget.step();free|=id==p.source_lease.id;}
+        if(free)continue;
+        for(auto row:p.raw_to_row){budget.step(4);auto value=user_boundaries[row]==label?1u:0u;
+          if(fixed[row]!=UINT32_MAX&&fixed[row]!=value)throw std::invalid_argument("Anatomical domain boundaries conflict");
+          fixed[row]=value;}
+      }
+      for(const auto&boundary:declared->hierarchy_one_boundary){
+        bool found=false;for(const auto&p:out.parts){budget.step(4);if(p.source_lease.id!=boundary.object)continue;
+          if(boundary.vertex>=p.raw_to_row.size())throw std::invalid_argument("Anatomical boundary current vertex outside owner");
+          auto row=p.raw_to_row[boundary.vertex];if(fixed[row]==0)throw std::invalid_argument("Anatomical one-boundary conflicts with stationary domain");
+          fixed[row]=1;found=true;break;}
+        if(!found)throw std::invalid_argument("Anatomical boundary lacks current owner");
+      }
+      const size_t eliminated=apply_user_weight_boundaries(hs,hrhs,fixed,2,
+                                       options.maximum_bytes-source_bytes-planned,budget);
+      ScreenedSparseLDL hf(hs,options.maximum_bytes-source_bytes-planned-eliminated,budget);
+      std::vector<uint8_t>free(n);
+      struct HeadInverse{ScreenedSparseLDL&factor;std::vector<uint8_t>&free;
+        void apply(std::span<const double>r,std::span<double>z,Budget&w){factor.apply(r,z,free,w);}} hi{hf,free};
+      std::vector<double>b(n);hierarchy_membership.resize(n);
+      for(size_t i=0;i<n;++i){budget.step();b[i]=hrhs[i*2+1];}
+      ContinuationReport hr;
+      continuation_solve(hs,b,hierarchy_membership,hi,budget,hr);
+      out.report.residual=std::max(out.report.residual,hr.residual);
+      out.report.iterations+=hr.iterations;
+      hierarchy_peak=source_bytes+planned+eliminated+hf.planned_bytes;
+      source_bytes+=n*sizeof(double);
     }
     if (std::any_of(user_boundaries.begin(), user_boundaries.end(),
                     [](uint32_t j) { return j != UINT32_MAX; })) {
@@ -893,6 +945,12 @@ anatomical_continuation(const Scene &scene, uint64_t group,
     if (out.report.partition > 1e-9)
       throw std::runtime_error(
           "Continuation failed independent partition certificate");
+    }
+    if(!hierarchy_membership.empty()) {
+      stage="certified hierarchical partition composition";
+      out.report.partition=std::max(out.report.partition,compose_hierarchical_partition(
+        out.fields,hierarchy_membership,labels,joint_label[declared->hierarchy_joint],budget));
+      out.report.bytes=std::max(out.report.bytes,hierarchy_peak);
     }
     size_t current_count = 0;
     for (const auto &o : scene.objects())

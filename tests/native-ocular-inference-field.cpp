@@ -125,9 +125,20 @@ int main(int argc, char **argv) try {
     support.parts.push_back(std::move(part));
   }
   std::ofstream(out/"automatic-constraints.json")<<inferred.dump(2);
-  for(const auto&e:analysis.seam_endpoints)
-    support.geometric_equalities.push_back({e.first,e.second,e.first_vertex,e.second_vertex});
-  size_t declaration_bytes = support.geometric_equalities.capacity()*sizeof(detail::DeclaredWeightSupport::Equality);
+  support.hierarchy_joint=head_joint;
+  auto head=[&](uint64_t id){for(const auto&p:analysis.parts)if(p.object==id)return p.head_region;throw std::logic_error("Unknown captured part");};
+  for(const auto&e:analysis.seam_endpoints) {
+    if(head(e.first)!=head(e.second)) {
+      const auto other=head(e.first)?e.second:e.first;
+      const auto vertex=head(e.first)?e.second_vertex:e.first_vertex;
+      if(std::find(support.hierarchy_transition_parts.begin(),support.hierarchy_transition_parts.end(),other)==support.hierarchy_transition_parts.end())
+        support.hierarchy_transition_parts.push_back(other);
+      support.hierarchy_one_boundary.push_back({other,vertex});
+    }else support.geometric_equalities.push_back({e.first,e.second,e.first_vertex,e.second_vertex});
+  }
+  if(support.hierarchy_transition_parts.empty())support.hierarchy_joint=UINT32_MAX;
+  size_t declaration_bytes = support.geometric_equalities.capacity()*sizeof(detail::DeclaredWeightSupport::Equality)+
+    support.hierarchy_transition_parts.capacity()*sizeof(uint64_t)+support.hierarchy_one_boundary.capacity()*sizeof(detail::DeclaredWeightSupport::Boundary);
   for (const auto &part : support.parts) {
     declaration_bytes += part.user_excluded_joints.capacity() * sizeof(uint32_t);
     declaration_bytes += part.geometric_row_groups.capacity()*sizeof(uint32_t);
