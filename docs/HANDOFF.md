@@ -1,5 +1,21 @@
 # Dome Sculpt production handoff
 
+## Private bake-recipe regression follow-up — 2026-11-04
+
+The preserved original612 run is578Passed/31Failed/1Timeout/2dependencyNotRun.
+Actual Scene30 recipe plus independently encoded older-capability fixtures now
+pass4+8 native commands eachR/S, three loader/client commands Release and two
+loader commands SAN; last16 Release and both Mirror writer/renderer pairs eachR/S
+also pass. Independent252 emittedGLBs have0 Khronos errors with retained271warnings/
+148infos; five original input controls and two exact cancellation sentinels are
+separate. Fresh1212-task optimized ALL passes; test-only46-task continuation
+preserves all12 application/archive hashes. Full615 Release and last16 sanitizer
+are still running; neither is declared passed. Read BAKE-RECIPE-REGRESSION-FOLLOWUP.md
+and receipt for original negatives, sampler-cache controls and exact scope.
+No main recipe admission or system/headset/session changes. Every unfinished
+original/additional requirement and later controller drawers remains required.
+
+
 ## Private coherent saved-recipe and authored-normal candidate — 2026-11-04
 
 This unqualified union preserves published809 authored-normal/zero-morph fixes,
