@@ -1,0 +1,754 @@
+{
+  "code_commit": "ff13b33ae335f0601cfa9048dcf709f39d18bb3b",
+  "base": "1853cc36199679aa03326919b65d3c27fff8662d",
+  "scope": "Private native static expression preview/explicit Apply checkpoint; not full VRM1 or main admission.",
+  "schema_change": false,
+  "abi_changes": [
+    "EditorState owning immutable expression-view pointer; changes embedded Document layout",
+    "MeshJob captured owning view pointer",
+    "New VrmExpressionView and additive Document/description APIs"
+  ],
+  "command_ids": [
+    6144,
+    6151
+  ],
+  "spatial_page": 29,
+  "page_count": 30,
+  "configured_test_count": 624,
+  "configured_count_scope": "Configuration only; not an all-target build or all624 result.",
+  "fresh_abi_builds": {
+    "release": {
+      "scope": "Fresh coherent own app/core/render/support/new+affected consumers with new Document/EditorState/MeshJob layouts. CPU only, no archived support reused.",
+      "exit": 0,
+      "seconds": 503.37560492404737,
+      "inputs": 2072,
+      "drift": [],
+      "artifact": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-preview-1853cc3/artifacts/preview-proof/build-release",
+      "status_sha256": "d7a4ee5083b36f6e3c0f972990f1c6c1490432cf06d6f2b384bc46e362d644c0",
+      "before.json": {
+        "sha256": "54610f97188e1747cd0dbf02e1f204c3aff1a39a5de6479228c987dafea06256",
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-preview-1853cc3/artifacts/preview-proof/build-release/before.json"
+      },
+      "after.json": {
+        "sha256": "54610f97188e1747cd0dbf02e1f204c3aff1a39a5de6479228c987dafea06256",
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-preview-1853cc3/artifacts/preview-proof/build-release/after.json"
+      }
+    },
+    "sanitize": {
+      "scope": "Fresh coherent own app/core/render/support/new+affected consumers with new Document/EditorState/MeshJob layouts. CPU only, no archived support reused.",
+      "exit": 0,
+      "seconds": 761.1462719159899,
+      "inputs": 2072,
+      "drift": [],
+      "artifact": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-preview-1853cc3/artifacts/preview-proof/build-sanitize",
+      "status_sha256": "be5360cbea5f3c8432263351e7be76cef63a6e0b1b06afc4d1ec32e4c0565373",
+      "before.json": {
+        "sha256": "58de0e10999d81307a2887625b52f6ed897180688ac18153121a147b334c8196",
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-preview-1853cc3/artifacts/preview-proof/build-sanitize/before.json"
+      },
+      "after.json": {
+        "sha256": "58de0e10999d81307a2887625b52f6ed897180688ac18153121a147b334c8196",
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-preview-1853cc3/artifacts/preview-proof/build-sanitize/after.json"
+      }
+    }
+  },
+  "continuations": {
+    "release": {
+      "core_document": {
+        "scope": "Exact fresh preview ABI cohort plus complete replacement vrm-expression-scene.cpp TU and complete new native-preview test TU; app/frontend unchanged objects relinked against own staged core. Not a fresh whole build.",
+        "exit": 0,
+        "seconds": 26.484346183016896,
+        "inputs": 2052,
+        "drift": [],
+        "artifact": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-morph-defaults-6003304/artifacts/morph-proof/release-v2",
+        "status_sha256": "c39732512147734cc7882133720929ae2a6d8a200b698276dc875e9683c4a5e5",
+        "before.json": {
+          "sha256": "b60fe6043229977a8638649554b02df2f8540886a03afed7a2aab44f322932a5",
+          "path": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-morph-defaults-6003304/artifacts/morph-proof/release-v2/before.json"
+        },
+        "after.json": {
+          "sha256": "b60fe6043229977a8638649554b02df2f8540886a03afed7a2aab44f322932a5",
+          "path": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-morph-defaults-6003304/artifacts/morph-proof/release-v2/after.json"
+        },
+        "outputs.json": {
+          "sha256": "257d54c099845d796f3cbb239931d6fe83f3286b24e5a878dc1ac0ddb49438a2",
+          "path": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-morph-defaults-6003304/artifacts/morph-proof/release-v2/outputs.json"
+        }
+      },
+      "palette_and_consumers": {
+        "scope": "Complete palette.cpp TU and complete native/palette/fault/test-runtime consumer TUs over own matched fresh preview ABI +exact corrected two-TU core. App/frontend SDK objects relinked; no fresh whole build claim.",
+        "exit": 0,
+        "seconds": 19.264460179954767,
+        "inputs": 2056,
+        "drift": [],
+        "artifact": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-morph-defaults-6003304/artifacts/morph-proof/palette-final-release",
+        "status_sha256": "9c41ec9dcf7d452f71f12d331acd49492ea57a1acf2d2b5c91c21157f217569d",
+        "before.json": {
+          "sha256": "e8cc29237d02f9c41df9d950a808fc24e3dafb7ae8b7c6cae64123e7959a6de1",
+          "path": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-morph-defaults-6003304/artifacts/morph-proof/palette-final-release/before.json"
+        },
+        "after.json": {
+          "sha256": "e8cc29237d02f9c41df9d950a808fc24e3dafb7ae8b7c6cae64123e7959a6de1",
+          "path": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-morph-defaults-6003304/artifacts/morph-proof/palette-final-release/after.json"
+        },
+        "outputs.json": {
+          "sha256": "57bc3cb4d63a785a0195d57efeaa8e6aca1e6259f0fcef47d7d29519c82150a5",
+          "path": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-morph-defaults-6003304/artifacts/morph-proof/palette-final-release/outputs.json"
+        }
+      },
+      "archive_and_binary_sha256": {
+        "libdome-sculpt-affine.a": "fb35d39425c5b622f72c0254fa77db43cea6230f7887922a428a1e6948cd5875",
+        "libxatlas.a": "de14e7b31474ffa0c34df68497f4a886402ccfef759670578ebc995d9d413172",
+        "libufbx.a": "62c101b55ed714d0798f1bb007aad6d7098796d6b6cc89c3e2400a88c71cf548",
+        "libmikktspace.a": "4047428382c619e928aae1fd29a2d4d7e00c70905a929d7ea648295ff7d54fee",
+        "libdome-sculpt-polygon.a": "8307004ff812bf333c332616d8fbe9f558b4f02cbede81319eda7e623841e20f",
+        "libmikktspace-robust.a": "025322a12f603b1b284cff08e9630b1da346c4c821a860deaf260a9a56081a67",
+        "libdome-sculpt-emission-codec.a": "a8529b093ef10dc194fcf4a108af93d0eded35a4dd694a947c32e0a478caade8",
+        "libdome-sculpt-render.a": "63f69169c6de1a3c35a790f2c7fa040ebfcbc42bfef7e486ff2135b2e0f36dcd",
+        "libdome-sculpt-spacenav.a": "39ec5fe4de9b478b6e7bb22789ddc23ca23c918b15d21e4a9a2c4d23fa3e2d17",
+        "libdome-sculpt-xr.a": "b27ecc8f71de03428019fa1fc6c23aefa8fc2bec01cb2717278024cc4759eec8",
+        "libdome-sculpt-core.a": "afb18c7beeccd6f978fb264de66fc8c0c6a2c46c1c2540c9dbffe1439672e274",
+        "dome-sculpt-vrm1-expression-palette-test": "385856f2bf2d8fd6dc80182bc8881e71bc2f37b6d6ee646044ccd146a97854f6",
+        "dome-sculpt-vrm1-expression-preview-test": "6b72431989475ec588123a3ad1278e80d5e954e6e9cfdb597ce8695309514681",
+        "dome-sculpt-vrm1-expression-preview-faults-test": "bc63102ea63a69845711e9270c3a1ac95587effc7606a006a2142d5b3c6ea6b4",
+        "libdome-sculpt-test-runtime.so": "21e7532ef988b7d5b8ed3c40779834b1dea533e7dc28293386603cf057bf41d3",
+        "dome-sculpt": "b757ba28eb63a27bae4a17975cb0dd6ae465fc91a37b7c2d9899624628114102",
+        "dome-sculpt-native-authoring-inspect": "6a66b20ab6d311aec25f276ff5a4cfd01dcba0b8edeb8b9176292632bfc564a1"
+      }
+    },
+    "sanitize": {
+      "core_document": {
+        "scope": "Exact fresh preview ABI cohort plus complete replacement vrm-expression-scene.cpp TU and complete new native-preview test TU; app/frontend unchanged objects relinked against own staged core. Not a fresh whole build.",
+        "exit": 0,
+        "seconds": 68.4342841579928,
+        "inputs": 2052,
+        "drift": [],
+        "artifact": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-morph-defaults-6003304/artifacts/morph-proof/sanitize-v2",
+        "status_sha256": "7aa0a0b117fbf9f8f5de785ef1d65128f94c430287576103a5350ed44c0eed45",
+        "before.json": {
+          "sha256": "e69cfd44c34f5a394a23215f627774b63f514395e8d7999303ea92bfe799136f",
+          "path": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-morph-defaults-6003304/artifacts/morph-proof/sanitize-v2/before.json"
+        },
+        "after.json": {
+          "sha256": "e69cfd44c34f5a394a23215f627774b63f514395e8d7999303ea92bfe799136f",
+          "path": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-morph-defaults-6003304/artifacts/morph-proof/sanitize-v2/after.json"
+        },
+        "outputs.json": {
+          "sha256": "e87fe175bd7e521bb9a1b15a7dd2abc940cc34e7b6c0aa79d2d62605baa2c4e5",
+          "path": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-morph-defaults-6003304/artifacts/morph-proof/sanitize-v2/outputs.json"
+        }
+      },
+      "palette_and_consumers": {
+        "scope": "Complete palette.cpp TU and complete native/palette/fault/test-runtime consumer TUs over own matched fresh preview ABI +exact corrected two-TU core. App/frontend SDK objects relinked; no fresh whole build claim.",
+        "exit": 0,
+        "seconds": 43.026272777991835,
+        "inputs": 2056,
+        "drift": [],
+        "artifact": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-morph-defaults-6003304/artifacts/morph-proof/palette-final-sanitize",
+        "status_sha256": "4f6de9a415fa1805b2506d57a651ef83fa8fe8469819affb95d21729cabd414b",
+        "before.json": {
+          "sha256": "ac5370b81e0592ee147885c6b10d21a1d6d7ec1b2196a5828bd214bf438209d0",
+          "path": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-morph-defaults-6003304/artifacts/morph-proof/palette-final-sanitize/before.json"
+        },
+        "after.json": {
+          "sha256": "ac5370b81e0592ee147885c6b10d21a1d6d7ec1b2196a5828bd214bf438209d0",
+          "path": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-morph-defaults-6003304/artifacts/morph-proof/palette-final-sanitize/after.json"
+        },
+        "outputs.json": {
+          "sha256": "cfe8fd0e95730342ead7baae3dc9472abe4b321fc4f7ad8bf21cbaaf152996f7",
+          "path": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-morph-defaults-6003304/artifacts/morph-proof/palette-final-sanitize/outputs.json"
+        }
+      },
+      "archive_and_binary_sha256": {
+        "libdome-sculpt-affine.a": "306c34ec32845a430d55e84ed3d007fce4c96b13431108598803ffb47fdd7d44",
+        "libxatlas.a": "e8e3ec8a35633ab0abd7dee080072a413f5f96654a5ba98798ddf365be8fbfcc",
+        "libufbx.a": "99f39129fb6b376601ad72af4878302012331de03e2415b172c2d1b0052826a5",
+        "libmikktspace.a": "97e7023a21a2cc30ea0c17e0e07c1e954c988f47d868791a8bbca019f96bc412",
+        "libmikktspace-robust.a": "8aa49e8fc9e789a95875ba3da205cb920ef6d3820ab641e8f8d9927268c06123",
+        "libdome-sculpt-polygon.a": "40765e48c23fb04f310c7cf16127748a590775ed5055edd91d95af3e9bb6e597",
+        "libdome-sculpt-emission-codec.a": "469828a2d39f6d3ceacc931471fce260b65f6cd585507668d8e67c92b11860ea",
+        "libdome-sculpt-spacenav.a": "2576c5a8249e2a0c3aff0f02cb533e61e77fcbd2b805a5cb9f3807b0ae143fce",
+        "libdome-sculpt-render.a": "a5aae11d5187edaf3f05bebfe14a2eacb9ae89200237c86d727e6c78ec0819a7",
+        "libdome-sculpt-xr.a": "cd0baa28e4e27c172195772f980c565ec9e61a000e2b99a7abc9bef046d550a3",
+        "libdome-sculpt-core.a": "eb754c97cea79a38f18c27b17c42039411feb8fb83c85abf036a7c6e879b2c66",
+        "dome-sculpt-vrm1-expression-palette-test": "e99da8b2bd38973809f4c550d8f13b821e5c9954517975a6ba330c91705c1256",
+        "dome-sculpt-vrm1-expression-preview-test": "75e99d8c5223c58c1a8b7b00360468e5ec781361f1151b65359ca49f18ee27d4",
+        "dome-sculpt-vrm1-expression-preview-faults-test": "3d94a50cc195f8790435dd140a66dce027eff17d91abf7d8b245075b0faf449e",
+        "libdome-sculpt-test-runtime.so": "03a1b9fc8b4d2993cf5925aacfaac4b59adf0bc21b650c9d53d2acfcf5783cfc",
+        "dome-sculpt": "e009f31b3608213cb4dff4d4b0270a4dbb2be128b6facbe55f8ca4aaa754dfed",
+        "dome-sculpt-native-authoring-inspect": "e5b9af8548aec71a7c8aecc08dd24b0c1ac4821e7852b412783ec2ff9de76752"
+      }
+    }
+  },
+  "native_checks_per_profile": 81,
+  "palette_checks_per_profile": 15,
+  "faults": {
+    "scope": "Persistent caller-thread C++new admission only; not internal worker/C malloc proof.",
+    "prefixes": {
+      "Begin": 328,
+      "Configure": 242,
+      "Cancel": 248,
+      "Apply": 343
+    },
+    "total_per_profile": 1161,
+    "release": {
+      "scope": "Whole new native API persistent-admission-fault consumer TU against exact two-TU corrected core/current fresh ABI support; caller-thread C++new prefixes only, not internal worker malloc coverage.",
+      "exit": 0,
+      "seconds": 120.8792438590317,
+      "inputs": 1848,
+      "drift": [],
+      "artifact": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-morph-defaults-6003304/artifacts/morph-proof/faults-release-v2",
+      "status_sha256": "6fa25a7d309c53c9069b07ca3798cdf3bb058a976f683010f1e52c3947e7b3ad",
+      "before.json": {
+        "sha256": "28a9d13e947f5d3590542d1d7b275eb7b94f3db6d8cc56f5f236e60cb49cea06",
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-morph-defaults-6003304/artifacts/morph-proof/faults-release-v2/before.json"
+      },
+      "after.json": {
+        "sha256": "28a9d13e947f5d3590542d1d7b275eb7b94f3db6d8cc56f5f236e60cb49cea06",
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-morph-defaults-6003304/artifacts/morph-proof/faults-release-v2/after.json"
+      }
+    },
+    "sanitize": {
+      "scope": "Whole new native API persistent-admission-fault consumer TU against exact two-TU corrected core/current fresh ABI support; caller-thread C++new prefixes only, not internal worker malloc coverage.",
+      "exit": 0,
+      "seconds": 1488.7825166999828,
+      "inputs": 1851,
+      "drift": [],
+      "artifact": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-morph-defaults-6003304/artifacts/morph-proof/faults-final-sanitize",
+      "status_sha256": "39d7e3a4cd983bf330c237a594b008b412df525facb5bd9b41cedf0ca7474bf1",
+      "before.json": {
+        "sha256": "e6936c85608543c3022b94300b21bd2e797c527d8fc4c5441a5edaca18e0e161",
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-morph-defaults-6003304/artifacts/morph-proof/faults-final-sanitize/before.json"
+      },
+      "after.json": {
+        "sha256": "e6936c85608543c3022b94300b21bd2e797c527d8fc4c5441a5edaca18e0e161",
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-morph-defaults-6003304/artifacts/morph-proof/faults-final-sanitize/after.json"
+      }
+    }
+  },
+  "gui": {
+    "release-normal": {
+      "exit": 0,
+      "seconds": 25.13096272101393,
+      "checks": 22,
+      "all_checks_passed": true,
+      "drift": [],
+      "artifact": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-morph-defaults-6003304/artifacts/morph-proof/gui-final-release-normal",
+      "launcher_sha256": "70dcc5281dc20a32138254b8cbcc9e332a15d24a26916956ebd79829975d17e1"
+    },
+    "release-compact": {
+      "exit": 0,
+      "seconds": 25.573050176957622,
+      "checks": 22,
+      "all_checks_passed": true,
+      "drift": [],
+      "artifact": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-morph-defaults-6003304/artifacts/morph-proof/gui-final-release-compact",
+      "launcher_sha256": "1d38f49faa1ce08a755ca202100f5e04e766f273cf540552649c5bedc3369276"
+    },
+    "sanitize-normal": {
+      "exit": 0,
+      "seconds": 37.76122842496261,
+      "checks": 22,
+      "all_checks_passed": true,
+      "drift": [],
+      "artifact": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-morph-defaults-6003304/artifacts/morph-proof/gui-final-sanitize-normal",
+      "launcher_sha256": "0918b4a9cd0ea3fb27c47515c7187f3cd2a728d35a269edc879738e70ae1cbe1"
+    },
+    "sanitize-compact": {
+      "exit": 0,
+      "seconds": 39.0434232489788,
+      "checks": 22,
+      "all_checks_passed": true,
+      "drift": [],
+      "artifact": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-morph-defaults-6003304/artifacts/morph-proof/gui-final-sanitize-compact",
+      "launcher_sha256": "68f34a3655c8bb405efe73a05a34aacaafb32b708a60be7ba33e7e61c0de32ac"
+    }
+  },
+  "loader": {
+    "release": {
+      "scope": "Actual current exact app+loader/native expected/inspector helper, complete current test-runtime TU. Synthetic controllers/real GL only; no physical HMD.",
+      "exit": 0,
+      "seconds": 44.88662268896587,
+      "inputs": 1857,
+      "drift": [],
+      "artifact": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-morph-defaults-6003304/artifacts/morph-proof/xr-final-release-software",
+      "status_sha256": "ff2a226c9dbb5146782ca92fc0d7f114a61736fa9f0af9c05d11e9b3943da980",
+      "before.json": {
+        "sha256": "7b6fb220528081b5b3e5e0b60a3cd2be6035965b3f39f6585c1fc70a5337a286",
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-morph-defaults-6003304/artifacts/morph-proof/xr-final-release-software/before.json"
+      },
+      "after.json": {
+        "sha256": "7b6fb220528081b5b3e5e0b60a3cd2be6035965b3f39f6585c1fc70a5337a286",
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-morph-defaults-6003304/artifacts/morph-proof/xr-final-release-software/after.json"
+      },
+      "checks": 22
+    },
+    "sanitize": {
+      "scope": "Actual current exact app+loader/native expected/inspector helper, complete current test-runtime TU. Synthetic controllers/real GL only; no physical HMD.",
+      "exit": 0,
+      "seconds": 75.32263963797595,
+      "inputs": 1857,
+      "drift": [],
+      "artifact": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-morph-defaults-6003304/artifacts/morph-proof/xr-final-sanitize-software",
+      "status_sha256": "790f58c74fb09ac0c32ec74e34c394aea30b2cc84cfb51f4f6e71081d398250b",
+      "before.json": {
+        "sha256": "443581047e606171dc0756b42e972eef8b700aadaf420ef33eb62bd541fc5788",
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-morph-defaults-6003304/artifacts/morph-proof/xr-final-sanitize-software/before.json"
+      },
+      "after.json": {
+        "sha256": "443581047e606171dc0756b42e972eef8b700aadaf420ef33eb62bd541fc5788",
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-morph-defaults-6003304/artifacts/morph-proof/xr-final-sanitize-software/after.json"
+      },
+      "checks": 22
+    },
+    "arc": {
+      "scope": "Actual current exact app+loader/native expected/inspector helper, complete current test-runtime TU. Synthetic controllers/real GL only; no physical HMD.",
+      "exit": 0,
+      "seconds": 34.57073874998605,
+      "inputs": 1857,
+      "drift": [],
+      "artifact": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-morph-defaults-6003304/artifacts/morph-proof/xr-final-release-hardware",
+      "status_sha256": "e38c207516b7344453eea1f039632bd1f4ac03532afe9d0bd65c1291ac8f16f3",
+      "before.json": {
+        "sha256": "7b6fb220528081b5b3e5e0b60a3cd2be6035965b3f39f6585c1fc70a5337a286",
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-morph-defaults-6003304/artifacts/morph-proof/xr-final-release-hardware/before.json"
+      },
+      "after.json": {
+        "sha256": "7b6fb220528081b5b3e5e0b60a3cd2be6035965b3f39f6585c1fc70a5337a286",
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-morph-defaults-6003304/artifacts/morph-proof/xr-final-release-hardware/after.json"
+      },
+      "checks": 22,
+      "DRI_PRIME": "pci-0000_03_00_0"
+    },
+    "software_refusal": {
+      "scope": "Actual current exact app+loader/native expected/inspector helper, complete current test-runtime TU. Synthetic controllers/real GL only; no physical HMD.",
+      "exit": 1,
+      "seconds": 28.642271032033022,
+      "inputs": 1857,
+      "drift": [],
+      "artifact": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-morph-defaults-6003304/artifacts/morph-proof/xr-final-release-software-refusal",
+      "status_sha256": "c816eab2a9eb5783c3f4383868cf1f4a1a4380c6492ae6b5b522a272f53be7b4",
+      "before.json": {
+        "sha256": "7b6fb220528081b5b3e5e0b60a3cd2be6035965b3f39f6585c1fc70a5337a286",
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-morph-defaults-6003304/artifacts/morph-proof/xr-final-release-software-refusal/before.json"
+      },
+      "after.json": {
+        "sha256": "7b6fb220528081b5b3e5e0b60a3cd2be6035965b3f39f6585c1fc70a5337a286",
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-morph-defaults-6003304/artifacts/morph-proof/xr-final-release-software-refusal/after.json"
+      },
+      "expected_exit": 1
+    }
+  },
+  "affected_registered": {
+    "release": {
+      "scope": "Original registered fixture graph, unchanged full consumer objects with exact matched fresh ABI headers, own staged two-TU corrected core; explicit component relink, not fresh whole build.",
+      "exit": 0,
+      "seconds": 9.47103993903147,
+      "inputs": 1857,
+      "drift": [],
+      "artifact": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-morph-defaults-6003304/artifacts/morph-proof/regressions-final-release",
+      "status_sha256": "2e543d10c45531913347821f50b596f2cc790c02523ea1e3f40ed86cdbee9aaa",
+      "before.json": {
+        "sha256": "338d96a10c4ff8d36384bedea375a28b629e5a88f1486f77ce3c8aa5b0f2ce79",
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-morph-defaults-6003304/artifacts/morph-proof/regressions-final-release/before.json"
+      },
+      "after.json": {
+        "sha256": "338d96a10c4ff8d36384bedea375a28b629e5a88f1486f77ce3c8aa5b0f2ce79",
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-morph-defaults-6003304/artifacts/morph-proof/regressions-final-release/after.json"
+      },
+      "tests": 7
+    },
+    "sanitize": {
+      "scope": "Original registered fixture graph, unchanged full consumer objects with exact matched fresh ABI headers, own staged two-TU corrected core; explicit component relink, not fresh whole build.",
+      "exit": 0,
+      "seconds": 65.32384939701296,
+      "inputs": 1857,
+      "drift": [],
+      "artifact": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-morph-defaults-6003304/artifacts/morph-proof/regressions-final-sanitize",
+      "status_sha256": "43e9a7bfc6f8062ae882c6fb41b62ce6946c564ed5f6db74e051a00af0144657",
+      "before.json": {
+        "sha256": "cdd40f3bb2cb407e093402b1ea444859caf55fb532c957f300a271f96c96ccd2",
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-morph-defaults-6003304/artifacts/morph-proof/regressions-final-sanitize/before.json"
+      },
+      "after.json": {
+        "sha256": "cdd40f3bb2cb407e093402b1ea444859caf55fb532c957f300a271f96c96ccd2",
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-morph-defaults-6003304/artifacts/morph-proof/regressions-final-sanitize/after.json"
+      },
+      "tests": 7
+    }
+  },
+  "remaining": [
+    "Unresolved same-camera original-input PBR eye max7 at unchanged4, reproduced with sealed1853 binaries",
+    "Fresh semantic ABI integration with current public Scene30 and private Scene31/native-float branches",
+    "Prepared/key-derived/normal-UV/plainPBR/absolute-background expression authoring adapters",
+    "Expression-preserving painted standard/native export and complete VRM objective"
+  ],
+  "no_physical_hmd": true,
+  "no_system_install_or_session_change": true,
+  "gpu_lease": "Released; no live job",
+  "primary_morph_rules": [
+    {
+      "url": "https://raw.githubusercontent.com/vrm-c/UniVRM/efd20f62f1bf0ac3fcc34de1e497324c5197d146/Packages/VRM10/Editor/Components/Expression/ReorderableMorphTargetBindingList.cs",
+      "commit": "efd20f62f1bf0ac3fcc34de1e497324c5197d146",
+      "path": "artifacts/preview-proof/primary/UniVRM-ReorderableMorphTargetBindingList.cs",
+      "sha256": "56b92bf50153115c9d09584574a91b722d134779283ec6977280f9e3215e5117"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/vrm-c/UniVRM/efd20f62f1bf0ac3fcc34de1e497324c5197d146/Packages/VRM10/Runtime/Components/Expression/ExpressionMerger.cs",
+      "commit": "efd20f62f1bf0ac3fcc34de1e497324c5197d146",
+      "path": "artifacts/preview-proof/primary/UniVRM-ExpressionMerger.cs",
+      "sha256": "bcac8e3166ae96e63299c093955358379c0d7848f2c9c9f8cbecd7399ad52abf"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/vrm-c/UniVRM/efd20f62f1bf0ac3fcc34de1e497324c5197d146/Packages/VRM10/Runtime/Components/Expression/MorphTargetBinding.cs",
+      "commit": "efd20f62f1bf0ac3fcc34de1e497324c5197d146",
+      "path": "artifacts/preview-proof/primary/UniVRM-MorphTargetBinding.cs",
+      "sha256": "d7c9e32d889829beca502c9e2cecf6755f3cb4c7871198556cef42de595cbdc2"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/vrm-c/UniVRM/efd20f62f1bf0ac3fcc34de1e497324c5197d146/Packages/VRM10/Runtime/Components/Expression/MorphTargetBindingMerger/MorphTargetBindingMerger.cs",
+      "commit": "efd20f62f1bf0ac3fcc34de1e497324c5197d146",
+      "path": "artifacts/preview-proof/primary/UniVRM-MorphTargetBindingMerger.cs",
+      "sha256": "efc82e99ff224ea372ab718f5fab2b656c47fc51131a06ed7166e1f7faf5c3e8"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/vrm-c/UniVRM/efd20f62f1bf0ac3fcc34de1e497324c5197d146/Packages/VRM10/Runtime/Components/Expression/MorphTargetBindingMerger/MorphTargetIdentifier.cs",
+      "commit": "efd20f62f1bf0ac3fcc34de1e497324c5197d146",
+      "path": "artifacts/preview-proof/primary/UniVRM-MorphTargetIdentifier.cs",
+      "sha256": "17dfd2f1dc27407f5f30c0d7a44918350286a3542c822c96fe09d9187f8f1ded"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/vrm-c/UniVRM/efd20f62f1bf0ac3fcc34de1e497324c5197d146/Packages/VRM10/Runtime/Components/Expression/MorphTargetBindingMerger/RuntimeMorphTargetBinding.cs",
+      "commit": "efd20f62f1bf0ac3fcc34de1e497324c5197d146",
+      "path": "artifacts/preview-proof/primary/UniVRM-RuntimeMorphTargetBinding.cs",
+      "sha256": "cc19119d3ef9c7021401d618c3c5613049ce1367638649224d15722aba04c475"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/pixiv/three-vrm/3caf7a21ee68f0d5dfa363ab3d577450bbf60136/packages/three-vrm-core/src/expressions/VRMExpressionMorphTargetBind.ts",
+      "commit": "3caf7a21ee68f0d5dfa363ab3d577450bbf60136",
+      "path": "artifacts/preview-proof/primary/three-vrm-VRMExpressionMorphTargetBind.ts",
+      "sha256": "a16436ea5d979d5ec973a715ca293fec21cb243dd0d6ee82a28174b986986b7a"
+    }
+  ],
+  "source_manifests": {
+    "final_code": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-morph-defaults-6003304/artifacts/morph-proof/final-code-inputs.json",
+      "sha256": "25478368f19251ccdcc9aebdac9436492e692a17610d7f3cc8e04b9609f1051c",
+      "count": 1161
+    }
+  },
+  "sdk_closure": {
+    "release": {
+      "inputs": 237,
+      "mismatches": []
+    },
+    "sanitize": {
+      "inputs": 237,
+      "mismatches": []
+    }
+  },
+  "unresolved_image": {
+    "status": "Failed; not reclassified as passing/consumer-only",
+    "unchanged_bound": 4,
+    "maximum": 7,
+    "pixel": [
+      56,
+      63
+    ],
+    "native_rgba": [
+      69,
+      105,
+      44,
+      255
+    ],
+    "independent_rgba": [
+      62,
+      105,
+      46,
+      255
+    ],
+    "old1853_counterfactual": "zero-old1853",
+    "zero_pairs_exact": [
+      {
+        "name": "zero-native",
+        "current": "artifacts/preview-proof/graphics-diagnostic-current/run/p0-v1-w0.000000-eye-native.png",
+        "old1853": "artifacts/preview-proof/zero-old1853/run/native-m0-w0.000000.png",
+        "max": 0
+      },
+      {
+        "name": "zero-reference",
+        "current": "artifacts/preview-proof/graphics-diagnostic-current/run/p0-v1-w0.000000-eye-independent.png",
+        "old1853": "artifacts/preview-proof/zero-old1853/run/independent-m0-w0.000000.png",
+        "max": 0
+      },
+      {
+        "name": "before-native",
+        "current": "artifacts/preview-proof/graphics-diagnostic-current/run/before-eye-v1.png",
+        "old1853": "artifacts/preview-proof/zero-old1853/run/before-native-eye.png",
+        "max": 0
+      }
+    ],
+    "gpu_boundary": {
+      "primary": {
+        "url": "https://registry.khronos.org/OpenGL/specs/gl/glspec46.core.pdf",
+        "edition": "May 5 2022",
+        "sections": [
+          "8.14.2 nearest sampling",
+          "8.14.3 mipmap selection"
+        ],
+        "direct_download": "HTTP403; primary document was read using browser PDF text instead"
+      },
+      "pixel": [
+        56,
+        63
+      ],
+      "status": "Original fixed4 gate remains failed, max7. Diagnostic only; no shader/material/camera/tolerance change.",
+      "native": {
+        "base_uv": [
+          0.31249991059303284,
+          0.8179210424423218
+        ],
+        "texel_position": [
+          39.9999885559082,
+          104.69389343261719
+        ],
+        "nominal_lod": 0.3366782905121494,
+        "nearest_level0_texel": [
+          39,
+          104
+        ]
+      },
+      "independent": {
+        "base_uv": [
+          0.3125,
+          0.8179210424423218
+        ],
+        "texel_position": [
+          40.0,
+          104.69389343261719
+        ],
+        "nominal_lod": 0.3366782905121494,
+        "nearest_level0_texel": [
+          40,
+          104
+        ]
+      }
+    },
+    "artifacts": {
+      "graphics-release-v1": {
+        "scope": "Whole new interactive GL consumer TU against exact fresh current-ABI app/core/render/support cohort; production files unchanged.",
+        "exit": 1,
+        "seconds": 30.44246913504321,
+        "inputs": 1849,
+        "drift": [],
+        "artifact": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-preview-1853cc3/artifacts/preview-proof/graphics-release-v1",
+        "status_sha256": "02b943ec8757c32f886239ea6d786b834d5b50b7da169a7ad7e2786b412d347e",
+        "before.json": {
+          "sha256": "a23ee3d05f955754070223f7776228fb1500cc215e4b64c9c635c314d03bd76e",
+          "path": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-preview-1853cc3/artifacts/preview-proof/graphics-release-v1/before.json"
+        },
+        "after.json": {
+          "sha256": "a23ee3d05f955754070223f7776228fb1500cc215e4b64c9c635c314d03bd76e",
+          "path": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-preview-1853cc3/artifacts/preview-proof/graphics-release-v1/after.json"
+        }
+      },
+      "graphics-gpu-projection-release": {
+        "scope": "Whole new interactive GL consumer TU against exact fresh current-ABI app/core/render/support cohort; production files unchanged.",
+        "exit": 1,
+        "seconds": 23.353366062045097,
+        "inputs": 1849,
+        "drift": [],
+        "artifact": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-preview-1853cc3/artifacts/preview-proof/graphics-gpu-projection-release",
+        "status_sha256": "72260f378100cadb7156fa947311622e5a9e17d500a197bb318eab403e949345",
+        "before.json": {
+          "sha256": "13410fe744ce9342174945f5ad33627736729413cd70afaab4ca81b1d51a6e7e",
+          "path": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-preview-1853cc3/artifacts/preview-proof/graphics-gpu-projection-release/before.json"
+        },
+        "after.json": {
+          "sha256": "13410fe744ce9342174945f5ad33627736729413cd70afaab4ca81b1d51a6e7e",
+          "path": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-preview-1853cc3/artifacts/preview-proof/graphics-gpu-projection-release/after.json"
+        }
+      },
+      "graphics-double-release": {
+        "scope": "Whole new interactive GL consumer TU against exact fresh current-ABI app/core/render/support cohort; production files unchanged.",
+        "exit": 1,
+        "seconds": 28.12497381400317,
+        "inputs": 1849,
+        "drift": [],
+        "artifact": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-preview-1853cc3/artifacts/preview-proof/graphics-double-release",
+        "status_sha256": "702dc6e65e1b69d69dce8c02bf880fe34a8c94a23dfc3f7ddedb52e1109b38b5",
+        "before.json": {
+          "sha256": "c6de7c9a0c054e5eeae4e23e0ac37484a11c700edcb8741d0d2c62f30cb13ec6",
+          "path": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-preview-1853cc3/artifacts/preview-proof/graphics-double-release/before.json"
+        },
+        "after.json": {
+          "sha256": "c6de7c9a0c054e5eeae4e23e0ac37484a11c700edcb8741d0d2c62f30cb13ec6",
+          "path": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-preview-1853cc3/artifacts/preview-proof/graphics-double-release/after.json"
+        }
+      },
+      "graphics-uv-boundary-release-v2": {
+        "scope": "Whole new interactive GL consumer TU against exact fresh current-ABI app/core/render/support cohort; production files unchanged.",
+        "exit": 1,
+        "seconds": 29.840837938012555,
+        "inputs": 1849,
+        "drift": [],
+        "artifact": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-preview-1853cc3/artifacts/preview-proof/graphics-uv-boundary-release-v2",
+        "status_sha256": "0b00205c8f16f8cee063928ffb52fd24fe5bac5de497f7262a198c84a5e6662e",
+        "before.json": {
+          "sha256": "e9a4b2718478ca59c0e7b6556365cd8894c64bc2a04d5d54a0a9f7782488f348",
+          "path": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-preview-1853cc3/artifacts/preview-proof/graphics-uv-boundary-release-v2/before.json"
+        },
+        "after.json": {
+          "sha256": "e9a4b2718478ca59c0e7b6556365cd8894c64bc2a04d5d54a0a9f7782488f348",
+          "path": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-preview-1853cc3/artifacts/preview-proof/graphics-uv-boundary-release-v2/after.json"
+        }
+      },
+      "graphics-native-world-causal-diagnostic": {
+        "scope": "Whole new interactive GL consumer TU against exact fresh current-ABI app/core/render/support cohort; production files unchanged.",
+        "exit": 1,
+        "seconds": 16.550414755998645,
+        "inputs": 1849,
+        "drift": [],
+        "artifact": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-preview-1853cc3/artifacts/preview-proof/graphics-native-world-causal-diagnostic",
+        "status_sha256": "d0dd419933e6ccf9eac18cc380aece745425eeedeb5d7434cd2c8ec4d3019d6e",
+        "before.json": {
+          "sha256": "b4572c818c7126504ecf8305da613436ac7f6708ed91636dd960ad54f2f0040c",
+          "path": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-preview-1853cc3/artifacts/preview-proof/graphics-native-world-causal-diagnostic/before.json"
+        },
+        "after.json": {
+          "sha256": "b4572c818c7126504ecf8305da613436ac7f6708ed91636dd960ad54f2f0040c",
+          "path": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-preview-1853cc3/artifacts/preview-proof/graphics-native-world-causal-diagnostic/after.json"
+        }
+      }
+    }
+  },
+  "counterexamples": {
+    "bound_morph": {
+      "scope": "New static morph semantic consumer TU against exact fresh current-ABI Release core/render/support cohort; no GL context; production files unchanged.",
+      "exit": 1,
+      "seconds": 4.851033971004654,
+      "inputs": 1849,
+      "drift": [],
+      "artifact": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-preview-1853cc3/artifacts/preview-proof/morph-defaults-old-v2",
+      "status_sha256": "5ccf91f2d6afa6ae1ad1a3f3d05ed8f159d2bd7f58a6b1a32a779fea1143bfc4",
+      "before.json": {
+        "sha256": "a5166198b6204b8e166515c3a1a99804992aac77fe99a34d41259523955979b3",
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-preview-1853cc3/artifacts/preview-proof/morph-defaults-old-v2/before.json"
+      },
+      "after.json": {
+        "sha256": "a5166198b6204b8e166515c3a1a99804992aac77fe99a34d41259523955979b3",
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-preview-1853cc3/artifacts/preview-proof/morph-defaults-old-v2/after.json"
+      }
+    },
+    "menu_mode": {
+      "scope": "Whole extended controller regression TU against unchanged corrected-morph/current fresh ABI archives; renderer/input runtime unchanged.",
+      "exit": 1,
+      "seconds": 3.650820927985478,
+      "inputs": null,
+      "drift": [],
+      "artifact": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-morph-defaults-6003304/artifacts/morph-proof/native-mode-old",
+      "status_sha256": "c093eecffe34622f848cad0d82245c0f8dbdc887afe7f2158c69a0edc8a937b8",
+      "before.json": {
+        "sha256": "d23336d0afdf6a9f5b71ea3143ad07d1939736d8f11e05d763e5910c4cc361e3",
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-morph-defaults-6003304/artifacts/morph-proof/native-mode-old/before.json"
+      },
+      "after.json": {
+        "sha256": "d23336d0afdf6a9f5b71ea3143ad07d1939736d8f11e05d763e5910c4cc361e3",
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-morph-defaults-6003304/artifacts/morph-proof/native-mode-old/after.json"
+      }
+    },
+    "palette_cache": {
+      "scope": "Whole new native API persistent-admission-fault consumer TU against exact two-TU corrected core/current fresh ABI support; caller-thread C++new prefixes only, not internal worker malloc coverage.",
+      "exit": 1,
+      "seconds": 4.75651606102474,
+      "inputs": 1848,
+      "drift": [],
+      "artifact": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-morph-defaults-6003304/artifacts/morph-proof/palette-old-release",
+      "status_sha256": "26248cb8152c32a5282831d78b7931b8c0a6472983fb92b8190702d648b7313c",
+      "before.json": {
+        "sha256": "833c6b429c5c5b465b8af40ca2f8754ee78f02afd3ac2765d213b179cce76c0b",
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-morph-defaults-6003304/artifacts/morph-proof/palette-old-release/before.json"
+      },
+      "after.json": {
+        "sha256": "833c6b429c5c5b465b8af40ca2f8754ee78f02afd3ac2765d213b179cce76c0b",
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-morph-defaults-6003304/artifacts/morph-proof/palette-old-release/after.json"
+      }
+    },
+    "loader_original": {
+      "scope": "Actual native app+OpenXR loader+real two GL swapchains, synthetic controller only; software rendering, no headset. Exact own ABI app relink with corrected morph kernel.",
+      "exit": 1,
+      "seconds": 19.484049752005376,
+      "inputs": 1852,
+      "drift": [],
+      "artifact": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-morph-defaults-6003304/artifacts/morph-proof/xr-release",
+      "status_sha256": "cd5d40a433b1e9302cf3522bd1b5d40f2cad91c2a72f60d07c6300315fa90d64",
+      "before.json": {
+        "sha256": "56e0198b8adc0349f4f03d63e56f183acecc820a851b54cb841c4857053c2d34",
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-morph-defaults-6003304/artifacts/morph-proof/xr-release/before.json"
+      },
+      "after.json": {
+        "sha256": "56e0198b8adc0349f4f03d63e56f183acecc820a851b54cb841c4857053c2d34",
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-morph-defaults-6003304/artifacts/morph-proof/xr-release/after.json"
+      }
+    },
+    "loader_mode": {
+      "scope": "Actual native app+OpenXR loader+real two GL swapchains, synthetic controller only; software rendering, no headset. Exact own ABI app relink with corrected morph kernel.",
+      "exit": 1,
+      "seconds": 23.378934186010156,
+      "inputs": 1852,
+      "drift": [],
+      "artifact": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-morph-defaults-6003304/artifacts/morph-proof/xr-release-v2",
+      "status_sha256": "381ffa0523f12f69b4677fc4714f1581ed118bab0e66566e6c80f1778db9860e",
+      "before.json": {
+        "sha256": "e2705579db97da6a61c1b70c3e4084c9f47effbcb50fae8640ce6b54c768da49",
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-morph-defaults-6003304/artifacts/morph-proof/xr-release-v2/before.json"
+      },
+      "after.json": {
+        "sha256": "e2705579db97da6a61c1b70c3e4084c9f47effbcb50fae8640ce6b54c768da49",
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-morph-defaults-6003304/artifacts/morph-proof/xr-release-v2/after.json"
+      }
+    }
+  },
+  "ui_negatives": {
+    "computed_input_modes_removed": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-preview-1853cc3/artifacts/preview-proof/gui-release-normal-v1-launcher.json",
+      "sha256": "7ee0d20b8052311004a3d26497174ee06cfc0986d4f7ea24679535d717dc4b5a",
+      "exit": 1,
+      "seconds": 167.35256888403092,
+      "drift": []
+    },
+    "missing_save_publication_observer": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-morph-defaults-6003304/artifacts/morph-proof/gui-modefix-sanitize-compact-launcher.json",
+      "sha256": "c251948c94bed1349a82c6d3a0d0383c7ded38db32d5fb2149150e15c4f8aa76",
+      "exit": 1,
+      "seconds": 37.28705247101607,
+      "drift": []
+    }
+  },
+  "changed_files_from_sealed_base": [
+    "CMakeLists.txt",
+    "include/dome/document.hpp",
+    "include/dome/input.hpp",
+    "include/dome/vrm-expression-tool.hpp",
+    "include/dome/vrm-expression.hpp",
+    "src/app.cpp",
+    "src/document-assets.cpp",
+    "src/document-baking.cpp",
+    "src/document-expressions.cpp",
+    "src/document-interaction.cpp",
+    "src/document-projection.cpp",
+    "src/document.cpp",
+    "src/input.cpp",
+    "src/palette.cpp",
+    "src/vrm-expression-editor.cpp",
+    "src/vrm-expression-editor.hpp",
+    "src/vrm-expression-scene.cpp",
+    "tests/vrm1-expression-menu.py",
+    "tests/vrm1-expression-palette.cpp",
+    "tests/vrm1-expression-preview-faults.cpp",
+    "tests/vrm1-expression-preview.cpp",
+    "tests/vrm1-expression-xr.py",
+    "tests/xr_runtime.cpp"
+  ],
+  "consumer_scope_note": "No changes to src/render.cpp in this interactive descendant. Final SurfaceRenderer7/4 counterexample is an earlier source-geometry/nearest-boundary comparison, reproduced with1853; it remains unresolved."
+}

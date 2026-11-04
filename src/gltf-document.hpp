@@ -4,6 +4,7 @@
 #include "source-morph.hpp"
 #include <nlohmann/json.hpp>
 namespace dome::detail {
+class NativeAuthoringCapture;
 struct GltfObjectIdentity {
   int node = -1, mesh = -1, material = -1;
   std::vector<uint32_t> joints;
@@ -19,6 +20,10 @@ GltfDocument make_gltf(const std::vector<ObjectSurface> &,
                        SourceMorphSpace = SourceMorphSpace::Native,
                        bool recompute_changed_normals = false,
                        std::function<bool()> cancelled = {});
+// Private Scene-owner path only; public strict writers retain their guard.
+GltfDocument make_gltf_authoring(const NativeAuthoringCapture &,
+    const std::vector<ObjectSurface> &, bool recompute_changed_normals,
+    std::function<bool()> cancelled = {});
 void write_glb(GltfDocument, const std::filesystem::path &);
 void write_glb(GltfDocument, const std::filesystem::path &,
                const std::function<bool()> &cancelled,

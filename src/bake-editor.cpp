@@ -81,7 +81,7 @@ void edit_bake_dialog(Document &doc){
   auto settings=state->bake_settings;
   BakeSlider color_error(label,0,width-label-40,row-6,"Color error (0..1)");
   constexpr double degrees=57.29577951308232;
-  BakeSlider normal_error(label,0,width-label-40,row-6,"Normal error (deg)");normal_error.units=.25*degrees;
+  BakeSlider normal_error(label,0,width-label-40,row-6,"Rest error (deg)");normal_error.units=.25*degrees;normal_error.tooltip("Maximum rest-space normal quantization error, in degrees. Pose and morph evaluation use the authored portable targets.");
   std::array<BakeSlider*,7> sliders{&front,&back,&ao,&samples,&padding,&color_error,&normal_error};
   std::array<double,7> initial{settings.front_mm,settings.back_mm,settings.ao_distance_mm,double(settings.ao_samples),double(settings.padding),settings.color_error,settings.normal_error*degrees};
   for(size_t i=0;i<7;++i){auto &v=*sliders[i];v.type(FL_HOR_NICE_SLIDER);v.align(FL_ALIGN_LEFT);v.textfont(dx::font);v.textsize(dx::size);v.value_width(std::max(60,dx::size*6));v.logarithmic=i<3;v.fractional=i>=5;v.bounds(0,i<3||i>=5?1:i==3?256:64);v.step(i<3||i>=5?.001:1);v.physical(initial[i]);}
@@ -89,9 +89,9 @@ void edit_bake_dialog(Document &doc){
   Fl_Check_Button backfaces(20,y,width-56,row,"Allow backface projection");backfaces.value(settings.allow_backfaces);y+=row;
   Fl_Check_Button colors(20,y,width-56,row,"Prepare source colors");colors.value(settings.prepare_colors);y+=row;
   color_error.position(label,y);y+=row;
-  Fl_Check_Button normals(20,y,width-56,row,"Prepare normal attributes");normals.value(settings.prepare_normals);y+=row;
+  Fl_Check_Button normals(20,y,width-56,row,"Author portable normal targets");normals.value(settings.prepare_normals);normals.tooltip("Authors portable normal and tangent targets. Pose and morph shading can differ from legacy dynamic shading; original source data is retained.");y+=row;
   normal_error.position(label,y);y+=row;
-  const char *help="Partial projection keeps unprojected areas and reports misses.\nPreparation retains original colors, normal attributes and editable layers.\nCage: duplicate target, edit vertices; keep topology. 0 samples disables AO.\nDrag or wheel to adjust. Bake is one Undo step.";
+  const char *help="Partial projection keeps unprojected areas and reports misses.\nPortable normal authoring creates a new shading model; original data is retained.\nCage: duplicate target, edit vertices; keep topology. 0 samples disables AO.\nDrag or wheel to adjust. Bake is one Undo step.";
   int help_height=measured(help,row);
   Fl_Box adjustment(16,y,width-48,help_height,help);y+=help_height;
   adjustment.align(FL_ALIGN_CENTER|FL_ALIGN_INSIDE|FL_ALIGN_WRAP);

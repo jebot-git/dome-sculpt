@@ -1,0 +1,31 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+#define main existing_native_material_fixture
+#include "mtoon-render.cpp"
+#undef main
+#include "prepared-normal-consumer.hpp"
+#include "dome/document.hpp"
+#include "dome/scene-file.hpp"
+int main(int argc,char **argv)try{
+ if(argc!=3&&argc!=4)return 2;const std::filesystem::path source=argv[1],out=argv[2];std::filesystem::create_directories(out);
+ NativeGraphics graphics;Fbo fbo;SurfaceRenderer native;native.set_frame_time(0);prepared_normal_consumer::Renderer consumer;
+ const std::string vendor=reinterpret_cast<const char*>(glGetString(GL_VENDOR)),renderer=reinterpret_cast<const char*>(glGetString(GL_RENDERER));
+ std::cout<<"GPU "<<vendor<<" / "<<renderer<<'\n';
+ if(argc==4){if(std::string_view(argv[3])!="--hardware")return 2;check(vendor.find("Intel")!=std::string::npos&&renderer.find("Arc")!=std::string::npos&&renderer.find("A770")!=std::string::npos,"Actual requested Intel Arc A770 device is used rather than software or integrated graphics");}
+ for(int variant=0;variant<8;++variant){const auto initial=load_scene_file(source/("fan-"+std::to_string(variant)+".glb")).scene;
+  for(int pose=0;pose<2;++pose)for(float weight:{0.f,.35f,1.f}){
+   auto scene=initial;auto &object=scene.active();object.transform.scale=5;if(object.deformation){auto d=*object.deformation;if(d.morphs)d.morph_weights={weight};
+    if(d.skeleton){for(const auto &bone:d.skeleton->bones)d.pose.push_back(bone.rest);d.pose[0].rotation=Quat{std::cos(.075f),0,0,std::sin(.075f)};if(pose)d.pose[1].rotation=Quat{std::cos(.1f),0,0,std::sin(.1f)};}scene.set_deformation(object.id,d);}
+   Document document;document.replace(scene);document.shading(false);
+   check(document.wait_asset()&&document.wait_mesh()&&document.frame().state->error.empty(),"Actual native mirrored normal model publishes its current pose and morph");
+   const auto file=out/("view-"+std::to_string(variant)+"-"+std::to_string(pose)+"-"+std::to_string(int(weight*100))+".glb");
+   document.export_asset(file,AssetExportFormat::EditableGlb256).get();prepared_normal_consumer::Model model(file);
+   fbo.bind();auto expected=draw(native,document.frame().surface);fbo.bind();consumer.render(model.data);auto actual=read();const auto error=delta(expected,actual);
+   size_t visible=0;for(size_t i=3;i<actual.size();i+=4)visible+=actual[i]>0&&expected[i]>0;
+   std::cout<<"BAKED_TANGENT_IMAGE variant="<<variant<<" pose="<<pose<<" morph="<<weight<<" visible="<<visible<<" max="<<error<<'\n';
+   check(visible>500,"Independent parsed normal-texture consumer and native view draw the genuine model");
+   check(error<=4,"Independent normal-texture image matches the native baked field at the unchanged four-level bound");
+   if(pose==0&&weight==0){auto &normal=model.data->meshes[0].primitives[0].material->normal_texture.texture;const auto original=normal;normal=nullptr;fbo.bind();consumer.render(model.data);auto absent=read();normal=original;check(absent!=actual,"Removing the actual exported normal texture changes independently rendered pixels");}
+  }
+ }
+ std::cout<<"PASS "<<checks<<" baked tangent image checks\n";return 0;
+}catch(const std::exception &e){std::cerr<<"FAIL "<<e.what()<<'\n';return 1;}

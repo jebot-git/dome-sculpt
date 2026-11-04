@@ -9,11 +9,10 @@ using PaintOverlayValues=std::array<std::array<float,4>,5>;
 // Asset-worker point evaluation of the five independent linear contribution
 // fields. Filtering follows composition, matching the live GPU planes. There
 // is no dense float image, mutable paint access or GPU readback.
-inline PaintOverlayValues sample_overlay_values(const PaintOverlayPacket &packet,float u,float v,bool pbr){
- if(!std::isfinite(u)||!std::isfinite(v))throw std::invalid_argument("Nonfinite paint overlay sample");
+inline PaintOverlayValues sample_overlay_texel_values(const PaintOverlayPacket &packet,int x,int y,bool pbr){
  const auto r=packet.resolution();
  auto linear=[](float x){return x<=.04045f?x/12.92f:std::pow((x+.055f)/1.055f,2.4f);};
- auto pixel=[&](int x,int y){
+
   PaintOverlayValues value{};x=std::clamp(x,0,int(r)-1);y=std::clamp(y,0,int(r)-1);
   const auto owner=packet.padding()->at(size_t(y)*r+size_t(x));if(owner<0)return value;
   const size_t at=size_t(owner),px=at%r,py=at/r,tile=(py/32)*(r/32)+px/32,within=(py%32)*32+px%32;
@@ -34,7 +33,11 @@ inline PaintOverlayValues sample_overlay_values(const PaintOverlayPacket &packet
    for(size_t c=0;c<4;++c)value[3][c]=value[3][c]*(1-coverage[c])+coverage[c];
   }
   value[2][3]=value[4][3]=value[3][3];return value;
- };
+}
+inline PaintOverlayValues sample_overlay_values(const PaintOverlayPacket &packet,float u,float v,bool pbr){
+ if(!std::isfinite(u)||!std::isfinite(v))throw std::invalid_argument("Nonfinite paint overlay sample");
+ const auto r=packet.resolution();
+ auto pixel=[&](int x,int y){return sample_overlay_texel_values(packet,x,y,pbr);};
  const float x=std::clamp(u,0.f,1.f)*r-.5f,y=std::clamp(v,0.f,1.f)*r-.5f;const int ix=int(std::floor(x)),iy=int(std::floor(y));const float fx=x-ix,fy=y-iy;
  const auto a=pixel(ix,iy),b=pixel(ix+1,iy),c=pixel(ix,iy+1),d=pixel(ix+1,iy+1);PaintOverlayValues out;
  for(size_t plane=0;plane<5;++plane)for(size_t k=0;k<4;++k)out[plane][k]=std::lerp(std::lerp(a[plane][k],b[plane][k],fx),std::lerp(c[plane][k],d[plane][k],fx),fy);

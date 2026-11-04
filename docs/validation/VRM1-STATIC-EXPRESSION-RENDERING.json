@@ -1,0 +1,3533 @@
+{
+  "base": "662e711c2a2b798a89c0789071c66a2314009bba",
+  "scope": "Test-only authored-MToon static expression/Source4 paint native+original-input independent graphics, matching sealed662 owned support. Not current main/fresh app/interactive/PBR/dynamic-export admission.",
+  "source_sha256": {
+    "CMakeLists.txt": "3b36da4a0128d33d011a4dbd9024bbdbc0510dbd1144097447bf8e51bcf88aea",
+    "tests/vrm1-expression-consumer.hpp": "523ca5f89fdad9e557283aa5fa6b108e7fd8865fbc0f145265b0753d40746505",
+    "tests/vrm1-expression-paint-oracle.hpp": "5ca866cdfac00c930f64bc090bbecf7494464662caf7cb68e7605e8852dc9c41",
+    "tests/vrm1-expression-render-fixture.cpp": "6464bb90946bcb6318ba6dd217f808c02353ca7ee1805ae2d6897d215dbbfe07",
+    "tests/vrm1-expression-render.cpp": "183b95425e133daae0df445d9229798a2cf900d27f193c63bf0ffbbfcca78894"
+  },
+  "production_delta": [],
+  "cohorts": {
+    "release": {
+      "status": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/release/status.json",
+      "status_sha256": "9a950d60a9b302f6b179220a5e9f6c0be0f9188709b551427e7349ada6b98c17",
+      "exit": 0,
+      "seconds": 29.722301455039997,
+      "inputs": 1833,
+      "drift": [],
+      "steps": [
+        {
+          "name": "compile-fixture",
+          "command": [
+            "/usr/bin/c++",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/src",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/third_party/cgltf",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/include",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/third_party/openbrush",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/third_party/nlohmann",
+            "-O3",
+            "-DNDEBUG",
+            "-std=gnu++20",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/release/fixture.o",
+            "-c",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/tests/vrm1-expression-render-fixture.cpp",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/third_party/cgltf"
+          ],
+          "exit": 0,
+          "seconds": 11.294354334997479
+        },
+        {
+          "name": "link-fixture",
+          "command": [
+            "/usr/bin/c++",
+            "-O3",
+            "-DNDEBUG",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/release/fixture.o",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/release/fixture-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/release/libdome-sculpt-core.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/release/libdome-sculpt-affine.a",
+            "/usr/lib64/liblapacke.so",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/release/libdome-sculpt-polygon.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/release/libxatlas.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/release/libmikktspace.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/release/libmikktspace-robust.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/release/libufbx.a",
+            "/usr/lib64/libpng.so",
+            "/usr/lib64/libjpeg.so",
+            "/usr/lib64/libz.so",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/release/libdome-sculpt-emission-codec.a",
+            "/usr/lib64/libOpenEXR-3_2.so",
+            "/usr/lib64/libOpenEXRUtil-3_2.so",
+            "/usr/lib64/libOpenEXRCore-3_2.so",
+            "/usr/lib64/libIex-3_2.so",
+            "/usr/lib64/libIlmThread-3_2.so",
+            "/usr/lib64/libImath-3_1.so",
+            "-lgcc_s_asneeded",
+            "-lgcc_s_asneeded"
+          ],
+          "exit": 0,
+          "seconds": 0.2892125209909864
+        },
+        {
+          "name": "compile-render",
+          "command": [
+            "/usr/bin/c++",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/include",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/third_party/openbrush",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/third_party/nlohmann",
+            "-isystem",
+            "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/harfbuzz",
+            "-isystem",
+            "/usr/include/glib-2.0",
+            "-isystem",
+            "/usr/lib64/glib-2.0/include",
+            "-isystem",
+            "/usr/include/sysprof-6",
+            "-isystem",
+            "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/freetype2",
+            "-isystem",
+            "/usr/include/libpng16",
+            "-isystem",
+            "/usr/include/libxml2",
+            "-O3",
+            "-DNDEBUG",
+            "-std=gnu++20",
+            "-pthread",
+            "-DWITH_GZFILEOP",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/release/render.o",
+            "-c",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/tests/vrm1-expression-render.cpp",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/third_party/cgltf"
+          ],
+          "exit": 0,
+          "seconds": 13.416134651983157
+        },
+        {
+          "name": "link-render",
+          "command": [
+            "/usr/bin/c++",
+            "-O3",
+            "-DNDEBUG",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/release/render.o",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/release/render-test",
+            "-Wl,-rpath,/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/release/libdome-sculpt-render.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/release/libdome-sculpt-core.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/release/libdome-sculpt-affine.a",
+            "/usr/lib64/liblapacke.so",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/release/libdome-sculpt-polygon.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/release/libxatlas.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/release/libmikktspace.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/release/libmikktspace-robust.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/release/libufbx.a",
+            "/usr/lib64/libpng.so",
+            "/usr/lib64/libjpeg.so",
+            "/usr/lib64/libz.so",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/release/libdome-sculpt-emission-codec.a",
+            "/usr/lib64/libOpenEXR-3_2.so",
+            "/usr/lib64/libOpenEXRUtil-3_2.so",
+            "/usr/lib64/libOpenEXRCore-3_2.so",
+            "/usr/lib64/libIex-3_2.so",
+            "/usr/lib64/libIlmThread-3_2.so",
+            "/usr/lib64/libImath-3_1.so",
+            "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libharfbuzz.so",
+            "/usr/lib64/libEGL.so",
+            "/usr/lib64/libGL.so",
+            "/usr/lib64/libfontconfig.so",
+            "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libfreetype.so",
+            "/usr/lib64/libicui18n.so",
+            "/usr/lib64/libicuuc.so",
+            "-lgcc_s_asneeded",
+            "-lgcc_s_asneeded"
+          ],
+          "exit": 0,
+          "seconds": 0.30582269403385
+        },
+        {
+          "name": "fixture",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/release/fixture-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/release/fixture"
+          ],
+          "exit": 0,
+          "seconds": 0.19634039304219186
+        },
+        {
+          "name": "render",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/release/render-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/release/fixture",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/release/images"
+          ],
+          "exit": 0,
+          "seconds": 4.077970583981369
+        }
+      ],
+      "manifests": {
+        "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/release/before.json": "de2547c206986e498b2de97cff231fd3cbfcf882840c84990951bd9ad4a8abf3",
+        "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/release/after.json": "de2547c206986e498b2de97cff231fd3cbfcf882840c84990951bd9ad4a8abf3"
+      }
+    },
+    "sanitize": {
+      "status": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/sanitize/status.json",
+      "status_sha256": "d8f12ae9e48ffd2561b28855f54a30d0b0226749d0417e9e65ece863fe1859d0",
+      "exit": 0,
+      "seconds": 45.32255042705219,
+      "inputs": 1833,
+      "drift": [],
+      "steps": [
+        {
+          "name": "compile-fixture",
+          "command": [
+            "/usr/bin/c++",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/src",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/third_party/cgltf",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/include",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/third_party/openbrush",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/third_party/nlohmann",
+            "-O1",
+            "-g1",
+            "-UNDEBUG",
+            "-fsanitize=address,undefined",
+            "-fno-omit-frame-pointer",
+            "-std=gnu++20",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/sanitize/fixture.o",
+            "-c",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/tests/vrm1-expression-render-fixture.cpp",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/third_party/cgltf"
+          ],
+          "exit": 0,
+          "seconds": 13.334387634997256
+        },
+        {
+          "name": "link-fixture",
+          "command": [
+            "/usr/bin/c++",
+            "-O1",
+            "-g1",
+            "-UNDEBUG",
+            "-fsanitize=address,undefined",
+            "-fno-omit-frame-pointer",
+            "-fsanitize=address,undefined",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/sanitize/fixture.o",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/sanitize/fixture-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/sanitize/libdome-sculpt-core.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/sanitize/libdome-sculpt-affine.a",
+            "/usr/lib64/liblapacke.so",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/sanitize/libdome-sculpt-polygon.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/sanitize/libxatlas.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/sanitize/libmikktspace.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/sanitize/libmikktspace-robust.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/sanitize/libufbx.a",
+            "/usr/lib64/libpng.so",
+            "/usr/lib64/libjpeg.so",
+            "/usr/lib64/libz.so",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/sanitize/libdome-sculpt-emission-codec.a",
+            "/usr/lib64/libOpenEXR-3_2.so",
+            "/usr/lib64/libOpenEXRUtil-3_2.so",
+            "/usr/lib64/libOpenEXRCore-3_2.so",
+            "/usr/lib64/libIex-3_2.so",
+            "/usr/lib64/libIlmThread-3_2.so",
+            "/usr/lib64/libImath-3_1.so",
+            "-lgcc_s_asneeded",
+            "-lgcc_s_asneeded"
+          ],
+          "exit": 0,
+          "seconds": 1.841805292002391
+        },
+        {
+          "name": "compile-render",
+          "command": [
+            "/usr/bin/c++",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/include",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/third_party/openbrush",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/third_party/nlohmann",
+            "-isystem",
+            "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/harfbuzz",
+            "-isystem",
+            "/usr/include/glib-2.0",
+            "-isystem",
+            "/usr/lib64/glib-2.0/include",
+            "-isystem",
+            "/usr/include/sysprof-6",
+            "-isystem",
+            "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/freetype2",
+            "-isystem",
+            "/usr/include/libpng16",
+            "-isystem",
+            "/usr/include/libxml2",
+            "-O1",
+            "-g1",
+            "-UNDEBUG",
+            "-fsanitize=address,undefined",
+            "-fno-omit-frame-pointer",
+            "-std=gnu++20",
+            "-pthread",
+            "-DWITH_GZFILEOP",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/sanitize/render.o",
+            "-c",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/tests/vrm1-expression-render.cpp",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/third_party/cgltf"
+          ],
+          "exit": 0,
+          "seconds": 20.77788396901451
+        },
+        {
+          "name": "link-render",
+          "command": [
+            "/usr/bin/c++",
+            "-O1",
+            "-g1",
+            "-UNDEBUG",
+            "-fsanitize=address,undefined",
+            "-fno-omit-frame-pointer",
+            "-fsanitize=address,undefined",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/sanitize/render.o",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/sanitize/render-test",
+            "-Wl,-rpath,/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/sanitize/libdome-sculpt-render.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/sanitize/libdome-sculpt-core.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/sanitize/libdome-sculpt-affine.a",
+            "/usr/lib64/liblapacke.so",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/sanitize/libdome-sculpt-polygon.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/sanitize/libxatlas.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/sanitize/libmikktspace.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/sanitize/libmikktspace-robust.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/sanitize/libufbx.a",
+            "/usr/lib64/libpng.so",
+            "/usr/lib64/libjpeg.so",
+            "/usr/lib64/libz.so",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/sanitize/libdome-sculpt-emission-codec.a",
+            "/usr/lib64/libOpenEXR-3_2.so",
+            "/usr/lib64/libOpenEXRUtil-3_2.so",
+            "/usr/lib64/libOpenEXRCore-3_2.so",
+            "/usr/lib64/libIex-3_2.so",
+            "/usr/lib64/libIlmThread-3_2.so",
+            "/usr/lib64/libImath-3_1.so",
+            "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libharfbuzz.so",
+            "/usr/lib64/libEGL.so",
+            "/usr/lib64/libGL.so",
+            "/usr/lib64/libfontconfig.so",
+            "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libfreetype.so",
+            "/usr/lib64/libicui18n.so",
+            "/usr/lib64/libicuuc.so",
+            "-lgcc_s_asneeded",
+            "-lgcc_s_asneeded"
+          ],
+          "exit": 0,
+          "seconds": 1.9016652230056934
+        },
+        {
+          "name": "fixture",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/sanitize/fixture-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/sanitize/fixture"
+          ],
+          "exit": 0,
+          "seconds": 1.777961703017354
+        },
+        {
+          "name": "render",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/sanitize/render-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/sanitize/fixture",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/sanitize/images"
+          ],
+          "exit": 0,
+          "seconds": 4.918915257032495
+        }
+      ],
+      "manifests": {
+        "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/sanitize/before.json": "141acdfc5ffb5eca3013527d166089ce8afa00929062a81c8389bc10a5e30163",
+        "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/sanitize/after.json": "141acdfc5ffb5eca3013527d166089ce8afa00929062a81c8389bc10a5e30163"
+      }
+    },
+    "release-v2": {
+      "status": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/release-v2/status.json",
+      "status_sha256": "108762e565c510217604769a63404f7bd79206c242bae299b0e3fed3c898de4d",
+      "exit": 1,
+      "seconds": 11.711867073026951,
+      "inputs": 1833,
+      "drift": [],
+      "steps": [
+        {
+          "name": "compile-fixture",
+          "command": [
+            "/usr/bin/c++",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/src",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/third_party/cgltf",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/include",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/third_party/openbrush",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/third_party/nlohmann",
+            "-O3",
+            "-DNDEBUG",
+            "-std=gnu++20",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/release-v2/fixture.o",
+            "-c",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/tests/vrm1-expression-render-fixture.cpp",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/third_party/cgltf"
+          ],
+          "exit": 0,
+          "seconds": 8.554872617998626
+        },
+        {
+          "name": "link-fixture",
+          "command": [
+            "/usr/bin/c++",
+            "-O3",
+            "-DNDEBUG",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/release-v2/fixture.o",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/release-v2/fixture-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/release-v2/libdome-sculpt-core.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/release-v2/libdome-sculpt-affine.a",
+            "/usr/lib64/liblapacke.so",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/release-v2/libdome-sculpt-polygon.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/release-v2/libxatlas.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/release-v2/libmikktspace.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/release-v2/libmikktspace-robust.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/release-v2/libufbx.a",
+            "/usr/lib64/libpng.so",
+            "/usr/lib64/libjpeg.so",
+            "/usr/lib64/libz.so",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/release-v2/libdome-sculpt-emission-codec.a",
+            "/usr/lib64/libOpenEXR-3_2.so",
+            "/usr/lib64/libOpenEXRUtil-3_2.so",
+            "/usr/lib64/libOpenEXRCore-3_2.so",
+            "/usr/lib64/libIex-3_2.so",
+            "/usr/lib64/libIlmThread-3_2.so",
+            "/usr/lib64/libImath-3_1.so",
+            "-lgcc_s_asneeded",
+            "-lgcc_s_asneeded"
+          ],
+          "exit": 0,
+          "seconds": 0.24204383202595636
+        },
+        {
+          "name": "compile-render",
+          "command": [
+            "/usr/bin/c++",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/include",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/third_party/openbrush",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/third_party/nlohmann",
+            "-isystem",
+            "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/harfbuzz",
+            "-isystem",
+            "/usr/include/glib-2.0",
+            "-isystem",
+            "/usr/lib64/glib-2.0/include",
+            "-isystem",
+            "/usr/include/sysprof-6",
+            "-isystem",
+            "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/freetype2",
+            "-isystem",
+            "/usr/include/libpng16",
+            "-isystem",
+            "/usr/include/libxml2",
+            "-O3",
+            "-DNDEBUG",
+            "-std=gnu++20",
+            "-pthread",
+            "-DWITH_GZFILEOP",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/release-v2/render.o",
+            "-c",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/tests/vrm1-expression-render.cpp",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/third_party/cgltf"
+          ],
+          "exit": 1,
+          "seconds": 2.804836881987285
+        }
+      ],
+      "manifests": {
+        "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/release-v2/before.json": "7af586978dcf7a011e461f223de6054b60fbc59572f6f742133945ed894e93ec",
+        "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/release-v2/after.json": "7af586978dcf7a011e461f223de6054b60fbc59572f6f742133945ed894e93ec"
+      }
+    },
+    "release-v3": {
+      "status": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/release-v3/status.json",
+      "status_sha256": "a4412893a7ff004d03f9bd614c7cc9f91b8553d75e5fd651c4499fa388e595c8",
+      "exit": 1,
+      "seconds": 24.295436137006618,
+      "inputs": 1833,
+      "drift": [],
+      "steps": [
+        {
+          "name": "compile-fixture",
+          "command": [
+            "/usr/bin/c++",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/src",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/third_party/cgltf",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/include",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/third_party/openbrush",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/third_party/nlohmann",
+            "-O3",
+            "-DNDEBUG",
+            "-std=gnu++20",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/release-v3/fixture.o",
+            "-c",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/tests/vrm1-expression-render-fixture.cpp",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/third_party/cgltf"
+          ],
+          "exit": 0,
+          "seconds": 9.779101520020049
+        },
+        {
+          "name": "link-fixture",
+          "command": [
+            "/usr/bin/c++",
+            "-O3",
+            "-DNDEBUG",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/release-v3/fixture.o",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/release-v3/fixture-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/release-v3/libdome-sculpt-core.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/release-v3/libdome-sculpt-affine.a",
+            "/usr/lib64/liblapacke.so",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/release-v3/libdome-sculpt-polygon.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/release-v3/libxatlas.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/release-v3/libmikktspace.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/release-v3/libmikktspace-robust.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/release-v3/libufbx.a",
+            "/usr/lib64/libpng.so",
+            "/usr/lib64/libjpeg.so",
+            "/usr/lib64/libz.so",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/release-v3/libdome-sculpt-emission-codec.a",
+            "/usr/lib64/libOpenEXR-3_2.so",
+            "/usr/lib64/libOpenEXRUtil-3_2.so",
+            "/usr/lib64/libOpenEXRCore-3_2.so",
+            "/usr/lib64/libIex-3_2.so",
+            "/usr/lib64/libIlmThread-3_2.so",
+            "/usr/lib64/libImath-3_1.so",
+            "-lgcc_s_asneeded",
+            "-lgcc_s_asneeded"
+          ],
+          "exit": 0,
+          "seconds": 0.2443593770149164
+        },
+        {
+          "name": "compile-render",
+          "command": [
+            "/usr/bin/c++",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/include",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/third_party/openbrush",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/third_party/nlohmann",
+            "-isystem",
+            "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/harfbuzz",
+            "-isystem",
+            "/usr/include/glib-2.0",
+            "-isystem",
+            "/usr/lib64/glib-2.0/include",
+            "-isystem",
+            "/usr/include/sysprof-6",
+            "-isystem",
+            "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/freetype2",
+            "-isystem",
+            "/usr/include/libpng16",
+            "-isystem",
+            "/usr/include/libxml2",
+            "-O3",
+            "-DNDEBUG",
+            "-std=gnu++20",
+            "-pthread",
+            "-DWITH_GZFILEOP",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/release-v3/render.o",
+            "-c",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/tests/vrm1-expression-render.cpp",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/third_party/cgltf"
+          ],
+          "exit": 0,
+          "seconds": 13.404008641955443
+        },
+        {
+          "name": "link-render",
+          "command": [
+            "/usr/bin/c++",
+            "-O3",
+            "-DNDEBUG",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/release-v3/render.o",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/release-v3/render-test",
+            "-Wl,-rpath,/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/release-v3/libdome-sculpt-render.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/release-v3/libdome-sculpt-core.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/release-v3/libdome-sculpt-affine.a",
+            "/usr/lib64/liblapacke.so",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/release-v3/libdome-sculpt-polygon.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/release-v3/libxatlas.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/release-v3/libmikktspace.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/release-v3/libmikktspace-robust.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/release-v3/libufbx.a",
+            "/usr/lib64/libpng.so",
+            "/usr/lib64/libjpeg.so",
+            "/usr/lib64/libz.so",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/release-v3/libdome-sculpt-emission-codec.a",
+            "/usr/lib64/libOpenEXR-3_2.so",
+            "/usr/lib64/libOpenEXRUtil-3_2.so",
+            "/usr/lib64/libOpenEXRCore-3_2.so",
+            "/usr/lib64/libIex-3_2.so",
+            "/usr/lib64/libIlmThread-3_2.so",
+            "/usr/lib64/libImath-3_1.so",
+            "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libharfbuzz.so",
+            "/usr/lib64/libEGL.so",
+            "/usr/lib64/libGL.so",
+            "/usr/lib64/libfontconfig.so",
+            "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libfreetype.so",
+            "/usr/lib64/libicui18n.so",
+            "/usr/lib64/libicuuc.so",
+            "-lgcc_s_asneeded",
+            "-lgcc_s_asneeded"
+          ],
+          "exit": 0,
+          "seconds": 0.28827778896084055
+        },
+        {
+          "name": "fixture",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/release-v3/fixture-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/release-v3/fixture"
+          ],
+          "exit": 0,
+          "seconds": 0.1885426240041852
+        },
+        {
+          "name": "render",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/release-v3/render-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/release-v3/fixture",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/release-v3/images"
+          ],
+          "exit": 1,
+          "seconds": 0.2583518339670263
+        }
+      ],
+      "manifests": {
+        "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/release-v3/before.json": "87e8cfe483cb2d6571727d744f11ea6b1731305551f3a69305e41defad5caae4",
+        "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/release-v3/after.json": "87e8cfe483cb2d6571727d744f11ea6b1731305551f3a69305e41defad5caae4"
+      }
+    },
+    "release-eye-diagnostic": {
+      "status": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/release-eye-diagnostic/status.json",
+      "status_sha256": "a3d38b07304904dbbe7e23a0157333ab8768ebdc4a31140b15644741e837504e",
+      "exit": 1,
+      "seconds": 29.949954774987418,
+      "inputs": 1833,
+      "drift": [],
+      "steps": [
+        {
+          "name": "compile-fixture",
+          "command": [
+            "/usr/bin/c++",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/src",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/third_party/cgltf",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/include",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/third_party/openbrush",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/third_party/nlohmann",
+            "-O3",
+            "-DNDEBUG",
+            "-std=gnu++20",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/release-eye-diagnostic/fixture.o",
+            "-c",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/tests/vrm1-expression-render-fixture.cpp",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/third_party/cgltf"
+          ],
+          "exit": 0,
+          "seconds": 9.532887289999053
+        },
+        {
+          "name": "link-fixture",
+          "command": [
+            "/usr/bin/c++",
+            "-O3",
+            "-DNDEBUG",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/release-eye-diagnostic/fixture.o",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/release-eye-diagnostic/fixture-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/release-eye-diagnostic/libdome-sculpt-core.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/release-eye-diagnostic/libdome-sculpt-affine.a",
+            "/usr/lib64/liblapacke.so",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/release-eye-diagnostic/libdome-sculpt-polygon.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/release-eye-diagnostic/libxatlas.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/release-eye-diagnostic/libmikktspace.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/release-eye-diagnostic/libmikktspace-robust.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/release-eye-diagnostic/libufbx.a",
+            "/usr/lib64/libpng.so",
+            "/usr/lib64/libjpeg.so",
+            "/usr/lib64/libz.so",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/release-eye-diagnostic/libdome-sculpt-emission-codec.a",
+            "/usr/lib64/libOpenEXR-3_2.so",
+            "/usr/lib64/libOpenEXRUtil-3_2.so",
+            "/usr/lib64/libOpenEXRCore-3_2.so",
+            "/usr/lib64/libIex-3_2.so",
+            "/usr/lib64/libIlmThread-3_2.so",
+            "/usr/lib64/libImath-3_1.so",
+            "-lgcc_s_asneeded",
+            "-lgcc_s_asneeded"
+          ],
+          "exit": 0,
+          "seconds": 0.23380316700786352
+        },
+        {
+          "name": "compile-render",
+          "command": [
+            "/usr/bin/c++",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/include",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/third_party/openbrush",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/third_party/nlohmann",
+            "-isystem",
+            "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/harfbuzz",
+            "-isystem",
+            "/usr/include/glib-2.0",
+            "-isystem",
+            "/usr/lib64/glib-2.0/include",
+            "-isystem",
+            "/usr/include/sysprof-6",
+            "-isystem",
+            "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/freetype2",
+            "-isystem",
+            "/usr/include/libpng16",
+            "-isystem",
+            "/usr/include/libxml2",
+            "-O3",
+            "-DNDEBUG",
+            "-std=gnu++20",
+            "-pthread",
+            "-DWITH_GZFILEOP",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/release-eye-diagnostic/render.o",
+            "-c",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/tests/vrm1-expression-render.cpp",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/third_party/cgltf"
+          ],
+          "exit": 0,
+          "seconds": 18.685659427021164
+        },
+        {
+          "name": "link-render",
+          "command": [
+            "/usr/bin/c++",
+            "-O3",
+            "-DNDEBUG",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/release-eye-diagnostic/render.o",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/release-eye-diagnostic/render-test",
+            "-Wl,-rpath,/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/release-eye-diagnostic/libdome-sculpt-render.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/release-eye-diagnostic/libdome-sculpt-core.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/release-eye-diagnostic/libdome-sculpt-affine.a",
+            "/usr/lib64/liblapacke.so",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/release-eye-diagnostic/libdome-sculpt-polygon.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/release-eye-diagnostic/libxatlas.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/release-eye-diagnostic/libmikktspace.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/release-eye-diagnostic/libmikktspace-robust.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/release-eye-diagnostic/libufbx.a",
+            "/usr/lib64/libpng.so",
+            "/usr/lib64/libjpeg.so",
+            "/usr/lib64/libz.so",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/release-eye-diagnostic/libdome-sculpt-emission-codec.a",
+            "/usr/lib64/libOpenEXR-3_2.so",
+            "/usr/lib64/libOpenEXRUtil-3_2.so",
+            "/usr/lib64/libOpenEXRCore-3_2.so",
+            "/usr/lib64/libIex-3_2.so",
+            "/usr/lib64/libIlmThread-3_2.so",
+            "/usr/lib64/libImath-3_1.so",
+            "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libharfbuzz.so",
+            "/usr/lib64/libEGL.so",
+            "/usr/lib64/libGL.so",
+            "/usr/lib64/libfontconfig.so",
+            "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libfreetype.so",
+            "/usr/lib64/libicui18n.so",
+            "/usr/lib64/libicuuc.so",
+            "-lgcc_s_asneeded",
+            "-lgcc_s_asneeded"
+          ],
+          "exit": 0,
+          "seconds": 0.5550901269889437
+        },
+        {
+          "name": "fixture",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/release-eye-diagnostic/fixture-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/release-eye-diagnostic/fixture"
+          ],
+          "exit": 0,
+          "seconds": 0.31345394504023716
+        },
+        {
+          "name": "render",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/release-eye-diagnostic/render-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/release-eye-diagnostic/fixture",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/release-eye-diagnostic/images"
+          ],
+          "exit": 1,
+          "seconds": 0.4609394790022634
+        }
+      ],
+      "manifests": {
+        "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/release-eye-diagnostic/before.json": "7780301f9b1a606f2c453209f8440cee09e2bf0de6e4274c268b9d1c048909c0",
+        "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/release-eye-diagnostic/after.json": "7780301f9b1a606f2c453209f8440cee09e2bf0de6e4274c268b9d1c048909c0"
+      }
+    },
+    "release-factor-precision": {
+      "status": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/release-factor-precision/status.json",
+      "status_sha256": "081ad77bdc6911c49e0d806a585a22441b1573fbd49f27f96a7d7b6e6c0bca59",
+      "exit": 1,
+      "seconds": 35.031304014031775,
+      "inputs": 1833,
+      "drift": [],
+      "steps": [
+        {
+          "name": "compile-fixture",
+          "command": [
+            "/usr/bin/c++",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/src",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/third_party/cgltf",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/include",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/third_party/openbrush",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/third_party/nlohmann",
+            "-O3",
+            "-DNDEBUG",
+            "-std=gnu++20",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/release-factor-precision/fixture.o",
+            "-c",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/tests/vrm1-expression-render-fixture.cpp",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/third_party/cgltf"
+          ],
+          "exit": 0,
+          "seconds": 15.833072239009198
+        },
+        {
+          "name": "link-fixture",
+          "command": [
+            "/usr/bin/c++",
+            "-O3",
+            "-DNDEBUG",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/release-factor-precision/fixture.o",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/release-factor-precision/fixture-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/release-factor-precision/libdome-sculpt-core.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/release-factor-precision/libdome-sculpt-affine.a",
+            "/usr/lib64/liblapacke.so",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/release-factor-precision/libdome-sculpt-polygon.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/release-factor-precision/libxatlas.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/release-factor-precision/libmikktspace.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/release-factor-precision/libmikktspace-robust.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/release-factor-precision/libufbx.a",
+            "/usr/lib64/libpng.so",
+            "/usr/lib64/libjpeg.so",
+            "/usr/lib64/libz.so",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/release-factor-precision/libdome-sculpt-emission-codec.a",
+            "/usr/lib64/libOpenEXR-3_2.so",
+            "/usr/lib64/libOpenEXRUtil-3_2.so",
+            "/usr/lib64/libOpenEXRCore-3_2.so",
+            "/usr/lib64/libIex-3_2.so",
+            "/usr/lib64/libIlmThread-3_2.so",
+            "/usr/lib64/libImath-3_1.so",
+            "-lgcc_s_asneeded",
+            "-lgcc_s_asneeded"
+          ],
+          "exit": 0,
+          "seconds": 0.3635476499912329
+        },
+        {
+          "name": "compile-render",
+          "command": [
+            "/usr/bin/c++",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/include",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/third_party/openbrush",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/third_party/nlohmann",
+            "-isystem",
+            "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/harfbuzz",
+            "-isystem",
+            "/usr/include/glib-2.0",
+            "-isystem",
+            "/usr/lib64/glib-2.0/include",
+            "-isystem",
+            "/usr/include/sysprof-6",
+            "-isystem",
+            "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/freetype2",
+            "-isystem",
+            "/usr/include/libpng16",
+            "-isystem",
+            "/usr/include/libxml2",
+            "-O3",
+            "-DNDEBUG",
+            "-std=gnu++20",
+            "-pthread",
+            "-DWITH_GZFILEOP",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/release-factor-precision/render.o",
+            "-c",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/tests/vrm1-expression-render.cpp",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/third_party/cgltf"
+          ],
+          "exit": 0,
+          "seconds": 17.331930783053394
+        },
+        {
+          "name": "link-render",
+          "command": [
+            "/usr/bin/c++",
+            "-O3",
+            "-DNDEBUG",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/release-factor-precision/render.o",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/release-factor-precision/render-test",
+            "-Wl,-rpath,/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/release-factor-precision/libdome-sculpt-render.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/release-factor-precision/libdome-sculpt-core.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/release-factor-precision/libdome-sculpt-affine.a",
+            "/usr/lib64/liblapacke.so",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/release-factor-precision/libdome-sculpt-polygon.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/release-factor-precision/libxatlas.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/release-factor-precision/libmikktspace.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/release-factor-precision/libmikktspace-robust.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/release-factor-precision/libufbx.a",
+            "/usr/lib64/libpng.so",
+            "/usr/lib64/libjpeg.so",
+            "/usr/lib64/libz.so",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/release-factor-precision/libdome-sculpt-emission-codec.a",
+            "/usr/lib64/libOpenEXR-3_2.so",
+            "/usr/lib64/libOpenEXRUtil-3_2.so",
+            "/usr/lib64/libOpenEXRCore-3_2.so",
+            "/usr/lib64/libIex-3_2.so",
+            "/usr/lib64/libIlmThread-3_2.so",
+            "/usr/lib64/libImath-3_1.so",
+            "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libharfbuzz.so",
+            "/usr/lib64/libEGL.so",
+            "/usr/lib64/libGL.so",
+            "/usr/lib64/libfontconfig.so",
+            "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libfreetype.so",
+            "/usr/lib64/libicui18n.so",
+            "/usr/lib64/libicuuc.so",
+            "-lgcc_s_asneeded",
+            "-lgcc_s_asneeded"
+          ],
+          "exit": 0,
+          "seconds": 0.2830869850004092
+        },
+        {
+          "name": "fixture",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/release-factor-precision/fixture-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/release-factor-precision/fixture"
+          ],
+          "exit": 0,
+          "seconds": 0.1919530870509334
+        },
+        {
+          "name": "render",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/release-factor-precision/render-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/release-factor-precision/fixture",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/release-factor-precision/images"
+          ],
+          "exit": 1,
+          "seconds": 0.8895353400148451
+        }
+      ],
+      "manifests": {
+        "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/release-factor-precision/before.json": "f949aa91482ce3b3416b3cddc1b8571fff3a3362510dfc4f0f00556616c0b237",
+        "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/release-factor-precision/after.json": "f949aa91482ce3b3416b3cddc1b8571fff3a3362510dfc4f0f00556616c0b237"
+      }
+    },
+    "release-minified": {
+      "status": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/release-minified/status.json",
+      "status_sha256": "bf36f8d99328993c5d8a4ab691cb5c6c82f822ebcc9f3cb35e376aee68cb80b2",
+      "exit": 0,
+      "seconds": 27.918168731965125,
+      "inputs": 1833,
+      "drift": [],
+      "steps": [
+        {
+          "name": "compile-fixture",
+          "command": [
+            "/usr/bin/c++",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/src",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/third_party/cgltf",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/include",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/third_party/openbrush",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/third_party/nlohmann",
+            "-O3",
+            "-DNDEBUG",
+            "-std=gnu++20",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/release-minified/fixture.o",
+            "-c",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/tests/vrm1-expression-render-fixture.cpp",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/third_party/cgltf"
+          ],
+          "exit": 0,
+          "seconds": 10.26845452701673
+        },
+        {
+          "name": "link-fixture",
+          "command": [
+            "/usr/bin/c++",
+            "-O3",
+            "-DNDEBUG",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/release-minified/fixture.o",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/release-minified/fixture-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/release-minified/libdome-sculpt-core.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/release-minified/libdome-sculpt-affine.a",
+            "/usr/lib64/liblapacke.so",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/release-minified/libdome-sculpt-polygon.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/release-minified/libxatlas.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/release-minified/libmikktspace.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/release-minified/libmikktspace-robust.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/release-minified/libufbx.a",
+            "/usr/lib64/libpng.so",
+            "/usr/lib64/libjpeg.so",
+            "/usr/lib64/libz.so",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/release-minified/libdome-sculpt-emission-codec.a",
+            "/usr/lib64/libOpenEXR-3_2.so",
+            "/usr/lib64/libOpenEXRUtil-3_2.so",
+            "/usr/lib64/libOpenEXRCore-3_2.so",
+            "/usr/lib64/libIex-3_2.so",
+            "/usr/lib64/libIlmThread-3_2.so",
+            "/usr/lib64/libImath-3_1.so",
+            "-lgcc_s_asneeded",
+            "-lgcc_s_asneeded"
+          ],
+          "exit": 0,
+          "seconds": 0.3279694620287046
+        },
+        {
+          "name": "compile-render",
+          "command": [
+            "/usr/bin/c++",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/include",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/third_party/openbrush",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/third_party/nlohmann",
+            "-isystem",
+            "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/harfbuzz",
+            "-isystem",
+            "/usr/include/glib-2.0",
+            "-isystem",
+            "/usr/lib64/glib-2.0/include",
+            "-isystem",
+            "/usr/include/sysprof-6",
+            "-isystem",
+            "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/freetype2",
+            "-isystem",
+            "/usr/include/libpng16",
+            "-isystem",
+            "/usr/include/libxml2",
+            "-O3",
+            "-DNDEBUG",
+            "-std=gnu++20",
+            "-pthread",
+            "-DWITH_GZFILEOP",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/release-minified/render.o",
+            "-c",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/tests/vrm1-expression-render.cpp",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/third_party/cgltf"
+          ],
+          "exit": 0,
+          "seconds": 14.525179866002873
+        },
+        {
+          "name": "link-render",
+          "command": [
+            "/usr/bin/c++",
+            "-O3",
+            "-DNDEBUG",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/release-minified/render.o",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/release-minified/render-test",
+            "-Wl,-rpath,/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/release-minified/libdome-sculpt-render.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/release-minified/libdome-sculpt-core.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/release-minified/libdome-sculpt-affine.a",
+            "/usr/lib64/liblapacke.so",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/release-minified/libdome-sculpt-polygon.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/release-minified/libxatlas.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/release-minified/libmikktspace.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/release-minified/libmikktspace-robust.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/release-minified/libufbx.a",
+            "/usr/lib64/libpng.so",
+            "/usr/lib64/libjpeg.so",
+            "/usr/lib64/libz.so",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/release-minified/libdome-sculpt-emission-codec.a",
+            "/usr/lib64/libOpenEXR-3_2.so",
+            "/usr/lib64/libOpenEXRUtil-3_2.so",
+            "/usr/lib64/libOpenEXRCore-3_2.so",
+            "/usr/lib64/libIex-3_2.so",
+            "/usr/lib64/libIlmThread-3_2.so",
+            "/usr/lib64/libImath-3_1.so",
+            "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libharfbuzz.so",
+            "/usr/lib64/libEGL.so",
+            "/usr/lib64/libGL.so",
+            "/usr/lib64/libfontconfig.so",
+            "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libfreetype.so",
+            "/usr/lib64/libicui18n.so",
+            "/usr/lib64/libicuuc.so",
+            "-lgcc_s_asneeded",
+            "-lgcc_s_asneeded"
+          ],
+          "exit": 0,
+          "seconds": 0.31899165001232177
+        },
+        {
+          "name": "fixture",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/release-minified/fixture-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/release-minified/fixture"
+          ],
+          "exit": 0,
+          "seconds": 0.20702088304096833
+        },
+        {
+          "name": "render",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/release-minified/render-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/release-minified/fixture",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/release-minified/images"
+          ],
+          "exit": 0,
+          "seconds": 2.1341551459627226
+        }
+      ],
+      "manifests": {
+        "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/release-minified/before.json": "721f859ebec716f93a92d3e64c63ebc1f5378df6fe7bae359df425cd96173585",
+        "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/release-minified/after.json": "721f859ebec716f93a92d3e64c63ebc1f5378df6fe7bae359df425cd96173585"
+      }
+    },
+    "sanitize-v2": {
+      "status": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/sanitize-v2/status.json",
+      "status_sha256": "184e524e4dc2f7e34d56d72ebc9e0751db17e929cb27dcb5086200ca3fb61634",
+      "exit": 0,
+      "seconds": 65.4391770719667,
+      "inputs": 1833,
+      "drift": [],
+      "steps": [
+        {
+          "name": "compile-fixture",
+          "command": [
+            "/usr/bin/c++",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/src",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/third_party/cgltf",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/include",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/third_party/openbrush",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/third_party/nlohmann",
+            "-O1",
+            "-g1",
+            "-UNDEBUG",
+            "-fsanitize=address,undefined",
+            "-fno-omit-frame-pointer",
+            "-std=gnu++20",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/sanitize-v2/fixture.o",
+            "-c",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/tests/vrm1-expression-render-fixture.cpp",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/third_party/cgltf"
+          ],
+          "exit": 0,
+          "seconds": 15.48254197096685
+        },
+        {
+          "name": "link-fixture",
+          "command": [
+            "/usr/bin/c++",
+            "-O1",
+            "-g1",
+            "-UNDEBUG",
+            "-fsanitize=address,undefined",
+            "-fno-omit-frame-pointer",
+            "-fsanitize=address,undefined",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/sanitize-v2/fixture.o",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/sanitize-v2/fixture-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/sanitize-v2/libdome-sculpt-core.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/sanitize-v2/libdome-sculpt-affine.a",
+            "/usr/lib64/liblapacke.so",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/sanitize-v2/libdome-sculpt-polygon.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/sanitize-v2/libxatlas.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/sanitize-v2/libmikktspace.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/sanitize-v2/libmikktspace-robust.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/sanitize-v2/libufbx.a",
+            "/usr/lib64/libpng.so",
+            "/usr/lib64/libjpeg.so",
+            "/usr/lib64/libz.so",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/sanitize-v2/libdome-sculpt-emission-codec.a",
+            "/usr/lib64/libOpenEXR-3_2.so",
+            "/usr/lib64/libOpenEXRUtil-3_2.so",
+            "/usr/lib64/libOpenEXRCore-3_2.so",
+            "/usr/lib64/libIex-3_2.so",
+            "/usr/lib64/libIlmThread-3_2.so",
+            "/usr/lib64/libImath-3_1.so",
+            "-lgcc_s_asneeded",
+            "-lgcc_s_asneeded"
+          ],
+          "exit": 0,
+          "seconds": 3.2651239080005325
+        },
+        {
+          "name": "compile-render",
+          "command": [
+            "/usr/bin/c++",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/include",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/third_party/openbrush",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/third_party/nlohmann",
+            "-isystem",
+            "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/harfbuzz",
+            "-isystem",
+            "/usr/include/glib-2.0",
+            "-isystem",
+            "/usr/lib64/glib-2.0/include",
+            "-isystem",
+            "/usr/include/sysprof-6",
+            "-isystem",
+            "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/freetype2",
+            "-isystem",
+            "/usr/include/libpng16",
+            "-isystem",
+            "/usr/include/libxml2",
+            "-O1",
+            "-g1",
+            "-UNDEBUG",
+            "-fsanitize=address,undefined",
+            "-fno-omit-frame-pointer",
+            "-std=gnu++20",
+            "-pthread",
+            "-DWITH_GZFILEOP",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/sanitize-v2/render.o",
+            "-c",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/tests/vrm1-expression-render.cpp",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/third_party/cgltf"
+          ],
+          "exit": 0,
+          "seconds": 25.164675856009126
+        },
+        {
+          "name": "link-render",
+          "command": [
+            "/usr/bin/c++",
+            "-O1",
+            "-g1",
+            "-UNDEBUG",
+            "-fsanitize=address,undefined",
+            "-fno-omit-frame-pointer",
+            "-fsanitize=address,undefined",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/sanitize-v2/render.o",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/sanitize-v2/render-test",
+            "-Wl,-rpath,/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/sanitize-v2/libdome-sculpt-render.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/sanitize-v2/libdome-sculpt-core.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/sanitize-v2/libdome-sculpt-affine.a",
+            "/usr/lib64/liblapacke.so",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/sanitize-v2/libdome-sculpt-polygon.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/sanitize-v2/libxatlas.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/sanitize-v2/libmikktspace.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/sanitize-v2/libmikktspace-robust.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/sanitize-v2/libufbx.a",
+            "/usr/lib64/libpng.so",
+            "/usr/lib64/libjpeg.so",
+            "/usr/lib64/libz.so",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/sanitize-v2/libdome-sculpt-emission-codec.a",
+            "/usr/lib64/libOpenEXR-3_2.so",
+            "/usr/lib64/libOpenEXRUtil-3_2.so",
+            "/usr/lib64/libOpenEXRCore-3_2.so",
+            "/usr/lib64/libIex-3_2.so",
+            "/usr/lib64/libIlmThread-3_2.so",
+            "/usr/lib64/libImath-3_1.so",
+            "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libharfbuzz.so",
+            "/usr/lib64/libEGL.so",
+            "/usr/lib64/libGL.so",
+            "/usr/lib64/libfontconfig.so",
+            "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libfreetype.so",
+            "/usr/lib64/libicui18n.so",
+            "/usr/lib64/libicuuc.so",
+            "-lgcc_s_asneeded",
+            "-lgcc_s_asneeded"
+          ],
+          "exit": 0,
+          "seconds": 2.188864643976558
+        },
+        {
+          "name": "fixture",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/sanitize-v2/fixture-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/sanitize-v2/fixture"
+          ],
+          "exit": 0,
+          "seconds": 1.9697622979874723
+        },
+        {
+          "name": "render",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/sanitize-v2/render-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/sanitize-v2/fixture",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/sanitize-v2/images"
+          ],
+          "exit": 0,
+          "seconds": 16.4792629799922
+        }
+      ],
+      "manifests": {
+        "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/sanitize-v2/before.json": "f469b9af3f8a07d2f0ae915406c4b317995dc8381571ea4c7ad677160e843640",
+        "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/sanitize-v2/after.json": "f469b9af3f8a07d2f0ae915406c4b317995dc8381571ea4c7ad677160e843640"
+      }
+    },
+    "final-release": {
+      "status": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/final-release/status.json",
+      "status_sha256": "7dca24ff78aedf62588108b47e46b4ff0f4e8eeee57e3033ab232de0e19931e9",
+      "exit": 0,
+      "seconds": 37.270994608988985,
+      "inputs": 1833,
+      "drift": [],
+      "steps": [
+        {
+          "name": "compile-fixture",
+          "command": [
+            "/usr/bin/c++",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/src",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/third_party/cgltf",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/include",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/third_party/openbrush",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/third_party/nlohmann",
+            "-O3",
+            "-DNDEBUG",
+            "-std=gnu++20",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/final-release/fixture.o",
+            "-c",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/tests/vrm1-expression-render-fixture.cpp",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/third_party/cgltf"
+          ],
+          "exit": 0,
+          "seconds": 11.777926848968491
+        },
+        {
+          "name": "link-fixture",
+          "command": [
+            "/usr/bin/c++",
+            "-O3",
+            "-DNDEBUG",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/final-release/fixture.o",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/final-release/fixture-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/final-release/libdome-sculpt-core.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/final-release/libdome-sculpt-affine.a",
+            "/usr/lib64/liblapacke.so",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/final-release/libdome-sculpt-polygon.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/final-release/libxatlas.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/final-release/libmikktspace.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/final-release/libmikktspace-robust.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/final-release/libufbx.a",
+            "/usr/lib64/libpng.so",
+            "/usr/lib64/libjpeg.so",
+            "/usr/lib64/libz.so",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/final-release/libdome-sculpt-emission-codec.a",
+            "/usr/lib64/libOpenEXR-3_2.so",
+            "/usr/lib64/libOpenEXRUtil-3_2.so",
+            "/usr/lib64/libOpenEXRCore-3_2.so",
+            "/usr/lib64/libIex-3_2.so",
+            "/usr/lib64/libIlmThread-3_2.so",
+            "/usr/lib64/libImath-3_1.so",
+            "-lgcc_s_asneeded",
+            "-lgcc_s_asneeded"
+          ],
+          "exit": 0,
+          "seconds": 0.29639827396022156
+        },
+        {
+          "name": "compile-render",
+          "command": [
+            "/usr/bin/c++",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/include",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/third_party/openbrush",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/third_party/nlohmann",
+            "-isystem",
+            "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/harfbuzz",
+            "-isystem",
+            "/usr/include/glib-2.0",
+            "-isystem",
+            "/usr/lib64/glib-2.0/include",
+            "-isystem",
+            "/usr/include/sysprof-6",
+            "-isystem",
+            "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/freetype2",
+            "-isystem",
+            "/usr/include/libpng16",
+            "-isystem",
+            "/usr/include/libxml2",
+            "-O3",
+            "-DNDEBUG",
+            "-std=gnu++20",
+            "-pthread",
+            "-DWITH_GZFILEOP",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/final-release/render.o",
+            "-c",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/tests/vrm1-expression-render.cpp",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/third_party/cgltf"
+          ],
+          "exit": 0,
+          "seconds": 21.07902494602604
+        },
+        {
+          "name": "link-render",
+          "command": [
+            "/usr/bin/c++",
+            "-O3",
+            "-DNDEBUG",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/final-release/render.o",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/final-release/render-test",
+            "-Wl,-rpath,/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/final-release/libdome-sculpt-render.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/final-release/libdome-sculpt-core.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/final-release/libdome-sculpt-affine.a",
+            "/usr/lib64/liblapacke.so",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/final-release/libdome-sculpt-polygon.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/final-release/libxatlas.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/final-release/libmikktspace.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/final-release/libmikktspace-robust.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/final-release/libufbx.a",
+            "/usr/lib64/libpng.so",
+            "/usr/lib64/libjpeg.so",
+            "/usr/lib64/libz.so",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/final-release/libdome-sculpt-emission-codec.a",
+            "/usr/lib64/libOpenEXR-3_2.so",
+            "/usr/lib64/libOpenEXRUtil-3_2.so",
+            "/usr/lib64/libOpenEXRCore-3_2.so",
+            "/usr/lib64/libIex-3_2.so",
+            "/usr/lib64/libIlmThread-3_2.so",
+            "/usr/lib64/libImath-3_1.so",
+            "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libharfbuzz.so",
+            "/usr/lib64/libEGL.so",
+            "/usr/lib64/libGL.so",
+            "/usr/lib64/libfontconfig.so",
+            "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libfreetype.so",
+            "/usr/lib64/libicui18n.so",
+            "/usr/lib64/libicuuc.so",
+            "-lgcc_s_asneeded",
+            "-lgcc_s_asneeded"
+          ],
+          "exit": 0,
+          "seconds": 0.5737848019925877
+        },
+        {
+          "name": "fixture",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/final-release/fixture-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/final-release/fixture"
+          ],
+          "exit": 0,
+          "seconds": 0.2725186219904572
+        },
+        {
+          "name": "render",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/final-release/render-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/final-release/fixture",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/final-release/images"
+          ],
+          "exit": 0,
+          "seconds": 3.0777053789934143
+        }
+      ],
+      "manifests": {
+        "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/final-release/before.json": "365d35e318bc824259162b73ffe8fc5c131cae6638fe452acb91be1e67063366",
+        "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/final-release/after.json": "365d35e318bc824259162b73ffe8fc5c131cae6638fe452acb91be1e67063366"
+      }
+    },
+    "final-sanitize": {
+      "status": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/final-sanitize/status.json",
+      "status_sha256": "7c35f499b26d0ad2ec7f191a15d046b1f0260181b14dca266374f89f2ae222f2",
+      "exit": 0,
+      "seconds": 62.96846581203863,
+      "inputs": 1833,
+      "drift": [],
+      "steps": [
+        {
+          "name": "compile-fixture",
+          "command": [
+            "/usr/bin/c++",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/src",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/third_party/cgltf",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/include",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/third_party/openbrush",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/third_party/nlohmann",
+            "-O1",
+            "-g1",
+            "-UNDEBUG",
+            "-fsanitize=address,undefined",
+            "-fno-omit-frame-pointer",
+            "-std=gnu++20",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/final-sanitize/fixture.o",
+            "-c",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/tests/vrm1-expression-render-fixture.cpp",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/third_party/cgltf"
+          ],
+          "exit": 0,
+          "seconds": 12.776058149000164
+        },
+        {
+          "name": "link-fixture",
+          "command": [
+            "/usr/bin/c++",
+            "-O1",
+            "-g1",
+            "-UNDEBUG",
+            "-fsanitize=address,undefined",
+            "-fno-omit-frame-pointer",
+            "-fsanitize=address,undefined",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/final-sanitize/fixture.o",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/final-sanitize/fixture-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/final-sanitize/libdome-sculpt-core.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/final-sanitize/libdome-sculpt-affine.a",
+            "/usr/lib64/liblapacke.so",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/final-sanitize/libdome-sculpt-polygon.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/final-sanitize/libxatlas.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/final-sanitize/libmikktspace.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/final-sanitize/libmikktspace-robust.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/final-sanitize/libufbx.a",
+            "/usr/lib64/libpng.so",
+            "/usr/lib64/libjpeg.so",
+            "/usr/lib64/libz.so",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/final-sanitize/libdome-sculpt-emission-codec.a",
+            "/usr/lib64/libOpenEXR-3_2.so",
+            "/usr/lib64/libOpenEXRUtil-3_2.so",
+            "/usr/lib64/libOpenEXRCore-3_2.so",
+            "/usr/lib64/libIex-3_2.so",
+            "/usr/lib64/libIlmThread-3_2.so",
+            "/usr/lib64/libImath-3_1.so",
+            "-lgcc_s_asneeded",
+            "-lgcc_s_asneeded"
+          ],
+          "exit": 0,
+          "seconds": 1.8490644909907132
+        },
+        {
+          "name": "compile-render",
+          "command": [
+            "/usr/bin/c++",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/include",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/third_party/openbrush",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/third_party/nlohmann",
+            "-isystem",
+            "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/harfbuzz",
+            "-isystem",
+            "/usr/include/glib-2.0",
+            "-isystem",
+            "/usr/lib64/glib-2.0/include",
+            "-isystem",
+            "/usr/include/sysprof-6",
+            "-isystem",
+            "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/freetype2",
+            "-isystem",
+            "/usr/include/libpng16",
+            "-isystem",
+            "/usr/include/libxml2",
+            "-O1",
+            "-g1",
+            "-UNDEBUG",
+            "-fsanitize=address,undefined",
+            "-fno-omit-frame-pointer",
+            "-std=gnu++20",
+            "-pthread",
+            "-DWITH_GZFILEOP",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/final-sanitize/render.o",
+            "-c",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/tests/vrm1-expression-render.cpp",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/third_party/cgltf"
+          ],
+          "exit": 0,
+          "seconds": 27.247691116004717
+        },
+        {
+          "name": "link-render",
+          "command": [
+            "/usr/bin/c++",
+            "-O1",
+            "-g1",
+            "-UNDEBUG",
+            "-fsanitize=address,undefined",
+            "-fno-omit-frame-pointer",
+            "-fsanitize=address,undefined",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/final-sanitize/render.o",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/final-sanitize/render-test",
+            "-Wl,-rpath,/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/final-sanitize/libdome-sculpt-render.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/final-sanitize/libdome-sculpt-core.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/final-sanitize/libdome-sculpt-affine.a",
+            "/usr/lib64/liblapacke.so",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/final-sanitize/libdome-sculpt-polygon.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/final-sanitize/libxatlas.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/final-sanitize/libmikktspace.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/final-sanitize/libmikktspace-robust.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/final-sanitize/libufbx.a",
+            "/usr/lib64/libpng.so",
+            "/usr/lib64/libjpeg.so",
+            "/usr/lib64/libz.so",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/final-sanitize/libdome-sculpt-emission-codec.a",
+            "/usr/lib64/libOpenEXR-3_2.so",
+            "/usr/lib64/libOpenEXRUtil-3_2.so",
+            "/usr/lib64/libOpenEXRCore-3_2.so",
+            "/usr/lib64/libIex-3_2.so",
+            "/usr/lib64/libIlmThread-3_2.so",
+            "/usr/lib64/libImath-3_1.so",
+            "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libharfbuzz.so",
+            "/usr/lib64/libEGL.so",
+            "/usr/lib64/libGL.so",
+            "/usr/lib64/libfontconfig.so",
+            "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libfreetype.so",
+            "/usr/lib64/libicui18n.so",
+            "/usr/lib64/libicuuc.so",
+            "-lgcc_s_asneeded",
+            "-lgcc_s_asneeded"
+          ],
+          "exit": 0,
+          "seconds": 2.2810565019608475
+        },
+        {
+          "name": "fixture",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/final-sanitize/fixture-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/final-sanitize/fixture"
+          ],
+          "exit": 0,
+          "seconds": 1.9207634709891863
+        },
+        {
+          "name": "render",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/final-sanitize/render-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/final-sanitize/fixture",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/final-sanitize/images"
+          ],
+          "exit": 0,
+          "seconds": 16.10560778796207
+        }
+      ],
+      "manifests": {
+        "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/final-sanitize/before.json": "ee240e7da199cea1e71718c0e4247126a5db4cfe2ac04eec827af49afcc91c4d",
+        "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/final-sanitize/after.json": "ee240e7da199cea1e71718c0e4247126a5db4cfe2ac04eec827af49afcc91c4d"
+      }
+    },
+    "hardware": {
+      "status": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/hardware/status.json",
+      "status_sha256": "a3994332470fafe82902a81d817ca6760773f07c1ec54364fd8b0f4fc76e2b52",
+      "exit": 0,
+      "seconds": 2.8723229579627514,
+      "inputs": 1836,
+      "drift": [],
+      "steps": [
+        {
+          "name": "actual-a770",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/final-release/render-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/final-release/fixture",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/hardware/actual-a770",
+            "--hardware"
+          ],
+          "exit": 0,
+          "expected": 0,
+          "seconds": 2.7138807930168696,
+          "vendor": "Intel",
+          "renderer": "Mesa Intel(R) Arc(tm) A770 Graphics (DG2)"
+        },
+        {
+          "name": "forced-software",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/final-release/render-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/final-release/fixture",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/hardware/forced-software",
+            "--hardware"
+          ],
+          "exit": 1,
+          "expected": 1,
+          "seconds": 0.052110032993368804,
+          "vendor": "Mesa",
+          "renderer": "llvmpipe (LLVM 22.1.8, 256 bits)"
+        }
+      ],
+      "manifests": {
+        "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/hardware/before.json": "c4d71dfec89d0e57a519e50c23d33f94e5db75e275bbe6841311c5377c31bd1b",
+        "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/hardware/after.json": "c4d71dfec89d0e57a519e50c23d33f94e5db75e275bbe6841311c5377c31bd1b"
+      }
+    },
+    "valid-release": {
+      "status": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/valid-release/status.json",
+      "status_sha256": "86062c1bbf7294a4ade218b6ea10aa1ae3ae8649b7288b2a1118269c57dace63",
+      "exit": 0,
+      "seconds": 26.954069736995734,
+      "inputs": 1833,
+      "drift": [],
+      "steps": [
+        {
+          "name": "compile-fixture",
+          "command": [
+            "/usr/bin/c++",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/src",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/third_party/cgltf",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/include",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/third_party/openbrush",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/third_party/nlohmann",
+            "-O3",
+            "-DNDEBUG",
+            "-std=gnu++20",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/valid-release/fixture.o",
+            "-c",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/tests/vrm1-expression-render-fixture.cpp",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/third_party/cgltf"
+          ],
+          "exit": 0,
+          "seconds": 9.930883196997456
+        },
+        {
+          "name": "link-fixture",
+          "command": [
+            "/usr/bin/c++",
+            "-O3",
+            "-DNDEBUG",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/valid-release/fixture.o",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/valid-release/fixture-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/valid-release/libdome-sculpt-core.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/valid-release/libdome-sculpt-affine.a",
+            "/usr/lib64/liblapacke.so",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/valid-release/libdome-sculpt-polygon.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/valid-release/libxatlas.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/valid-release/libmikktspace.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/valid-release/libmikktspace-robust.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/valid-release/libufbx.a",
+            "/usr/lib64/libpng.so",
+            "/usr/lib64/libjpeg.so",
+            "/usr/lib64/libz.so",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/valid-release/libdome-sculpt-emission-codec.a",
+            "/usr/lib64/libOpenEXR-3_2.so",
+            "/usr/lib64/libOpenEXRUtil-3_2.so",
+            "/usr/lib64/libOpenEXRCore-3_2.so",
+            "/usr/lib64/libIex-3_2.so",
+            "/usr/lib64/libIlmThread-3_2.so",
+            "/usr/lib64/libImath-3_1.so",
+            "-lgcc_s_asneeded",
+            "-lgcc_s_asneeded"
+          ],
+          "exit": 0,
+          "seconds": 0.24325215502176434
+        },
+        {
+          "name": "compile-render",
+          "command": [
+            "/usr/bin/c++",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/include",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/third_party/openbrush",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/third_party/nlohmann",
+            "-isystem",
+            "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/harfbuzz",
+            "-isystem",
+            "/usr/include/glib-2.0",
+            "-isystem",
+            "/usr/lib64/glib-2.0/include",
+            "-isystem",
+            "/usr/include/sysprof-6",
+            "-isystem",
+            "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/freetype2",
+            "-isystem",
+            "/usr/include/libpng16",
+            "-isystem",
+            "/usr/include/libxml2",
+            "-O3",
+            "-DNDEBUG",
+            "-std=gnu++20",
+            "-pthread",
+            "-DWITH_GZFILEOP",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/valid-release/render.o",
+            "-c",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/tests/vrm1-expression-render.cpp",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/third_party/cgltf"
+          ],
+          "exit": 0,
+          "seconds": 14.230447268986609
+        },
+        {
+          "name": "link-render",
+          "command": [
+            "/usr/bin/c++",
+            "-O3",
+            "-DNDEBUG",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/valid-release/render.o",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/valid-release/render-test",
+            "-Wl,-rpath,/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/valid-release/libdome-sculpt-render.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/valid-release/libdome-sculpt-core.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/valid-release/libdome-sculpt-affine.a",
+            "/usr/lib64/liblapacke.so",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/valid-release/libdome-sculpt-polygon.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/valid-release/libxatlas.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/valid-release/libmikktspace.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/valid-release/libmikktspace-robust.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/valid-release/libufbx.a",
+            "/usr/lib64/libpng.so",
+            "/usr/lib64/libjpeg.so",
+            "/usr/lib64/libz.so",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/valid-release/libdome-sculpt-emission-codec.a",
+            "/usr/lib64/libOpenEXR-3_2.so",
+            "/usr/lib64/libOpenEXRUtil-3_2.so",
+            "/usr/lib64/libOpenEXRCore-3_2.so",
+            "/usr/lib64/libIex-3_2.so",
+            "/usr/lib64/libIlmThread-3_2.so",
+            "/usr/lib64/libImath-3_1.so",
+            "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libharfbuzz.so",
+            "/usr/lib64/libEGL.so",
+            "/usr/lib64/libGL.so",
+            "/usr/lib64/libfontconfig.so",
+            "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libfreetype.so",
+            "/usr/lib64/libicui18n.so",
+            "/usr/lib64/libicuuc.so",
+            "-lgcc_s_asneeded",
+            "-lgcc_s_asneeded"
+          ],
+          "exit": 0,
+          "seconds": 0.3060374460183084
+        },
+        {
+          "name": "fixture",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/valid-release/fixture-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/valid-release/fixture"
+          ],
+          "exit": 0,
+          "seconds": 0.1946844980120659
+        },
+        {
+          "name": "render",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/valid-release/render-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/valid-release/fixture",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/valid-release/images"
+          ],
+          "exit": 0,
+          "seconds": 1.9163033780059777
+        }
+      ],
+      "manifests": {
+        "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/valid-release/before.json": "efa4b798ea269b84b79ee03e12499ee3b8adf8443bb110673e3c340c75722a66",
+        "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/valid-release/after.json": "efa4b798ea269b84b79ee03e12499ee3b8adf8443bb110673e3c340c75722a66"
+      }
+    },
+    "valid-sanitize": {
+      "status": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/valid-sanitize/status.json",
+      "status_sha256": "64a9de979ed8405e878e1fea26f4dd91cd9adbd32ce743decbefdb79e4552feb",
+      "exit": 0,
+      "seconds": 52.267770200036466,
+      "inputs": 1833,
+      "drift": [],
+      "steps": [
+        {
+          "name": "compile-fixture",
+          "command": [
+            "/usr/bin/c++",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/src",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/third_party/cgltf",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/include",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/third_party/openbrush",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/third_party/nlohmann",
+            "-O1",
+            "-g1",
+            "-UNDEBUG",
+            "-fsanitize=address,undefined",
+            "-fno-omit-frame-pointer",
+            "-std=gnu++20",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/valid-sanitize/fixture.o",
+            "-c",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/tests/vrm1-expression-render-fixture.cpp",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/third_party/cgltf"
+          ],
+          "exit": 0,
+          "seconds": 12.751078845001757
+        },
+        {
+          "name": "link-fixture",
+          "command": [
+            "/usr/bin/c++",
+            "-O1",
+            "-g1",
+            "-UNDEBUG",
+            "-fsanitize=address,undefined",
+            "-fno-omit-frame-pointer",
+            "-fsanitize=address,undefined",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/valid-sanitize/fixture.o",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/valid-sanitize/fixture-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/valid-sanitize/libdome-sculpt-core.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/valid-sanitize/libdome-sculpt-affine.a",
+            "/usr/lib64/liblapacke.so",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/valid-sanitize/libdome-sculpt-polygon.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/valid-sanitize/libxatlas.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/valid-sanitize/libmikktspace.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/valid-sanitize/libmikktspace-robust.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/valid-sanitize/libufbx.a",
+            "/usr/lib64/libpng.so",
+            "/usr/lib64/libjpeg.so",
+            "/usr/lib64/libz.so",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/valid-sanitize/libdome-sculpt-emission-codec.a",
+            "/usr/lib64/libOpenEXR-3_2.so",
+            "/usr/lib64/libOpenEXRUtil-3_2.so",
+            "/usr/lib64/libOpenEXRCore-3_2.so",
+            "/usr/lib64/libIex-3_2.so",
+            "/usr/lib64/libIlmThread-3_2.so",
+            "/usr/lib64/libImath-3_1.so",
+            "-lgcc_s_asneeded",
+            "-lgcc_s_asneeded"
+          ],
+          "exit": 0,
+          "seconds": 1.7944821320124902
+        },
+        {
+          "name": "compile-render",
+          "command": [
+            "/usr/bin/c++",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/include",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/third_party/openbrush",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/third_party/nlohmann",
+            "-isystem",
+            "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/harfbuzz",
+            "-isystem",
+            "/usr/include/glib-2.0",
+            "-isystem",
+            "/usr/lib64/glib-2.0/include",
+            "-isystem",
+            "/usr/include/sysprof-6",
+            "-isystem",
+            "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/freetype2",
+            "-isystem",
+            "/usr/include/libpng16",
+            "-isystem",
+            "/usr/include/libxml2",
+            "-O1",
+            "-g1",
+            "-UNDEBUG",
+            "-fsanitize=address,undefined",
+            "-fno-omit-frame-pointer",
+            "-std=gnu++20",
+            "-pthread",
+            "-DWITH_GZFILEOP",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/valid-sanitize/render.o",
+            "-c",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/tests/vrm1-expression-render.cpp",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/third_party/cgltf"
+          ],
+          "exit": 0,
+          "seconds": 20.705465898965485
+        },
+        {
+          "name": "link-render",
+          "command": [
+            "/usr/bin/c++",
+            "-O1",
+            "-g1",
+            "-UNDEBUG",
+            "-fsanitize=address,undefined",
+            "-fno-omit-frame-pointer",
+            "-fsanitize=address,undefined",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/valid-sanitize/render.o",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/valid-sanitize/render-test",
+            "-Wl,-rpath,/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/valid-sanitize/libdome-sculpt-render.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/valid-sanitize/libdome-sculpt-core.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/valid-sanitize/libdome-sculpt-affine.a",
+            "/usr/lib64/liblapacke.so",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/valid-sanitize/libdome-sculpt-polygon.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/valid-sanitize/libxatlas.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/valid-sanitize/libmikktspace.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/valid-sanitize/libmikktspace-robust.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/valid-sanitize/libufbx.a",
+            "/usr/lib64/libpng.so",
+            "/usr/lib64/libjpeg.so",
+            "/usr/lib64/libz.so",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/valid-sanitize/libdome-sculpt-emission-codec.a",
+            "/usr/lib64/libOpenEXR-3_2.so",
+            "/usr/lib64/libOpenEXRUtil-3_2.so",
+            "/usr/lib64/libOpenEXRCore-3_2.so",
+            "/usr/lib64/libIex-3_2.so",
+            "/usr/lib64/libIlmThread-3_2.so",
+            "/usr/lib64/libImath-3_1.so",
+            "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libharfbuzz.so",
+            "/usr/lib64/libEGL.so",
+            "/usr/lib64/libGL.so",
+            "/usr/lib64/libfontconfig.so",
+            "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libfreetype.so",
+            "/usr/lib64/libicui18n.so",
+            "/usr/lib64/libicuuc.so",
+            "-lgcc_s_asneeded",
+            "-lgcc_s_asneeded"
+          ],
+          "exit": 0,
+          "seconds": 1.8804085380397737
+        },
+        {
+          "name": "fixture",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/valid-sanitize/fixture-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/valid-sanitize/fixture"
+          ],
+          "exit": 0,
+          "seconds": 1.6555881510139443
+        },
+        {
+          "name": "render",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/valid-sanitize/render-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/valid-sanitize/fixture",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/valid-sanitize/images"
+          ],
+          "exit": 0,
+          "seconds": 12.739233751955908
+        }
+      ],
+      "manifests": {
+        "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/valid-sanitize/before.json": "b5abadddb87dee196b0fabec7d8066e41ef4fc5995eba763738602a76ded3a5c",
+        "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/valid-sanitize/after.json": "b5abadddb87dee196b0fabec7d8066e41ef4fc5995eba763738602a76ded3a5c"
+      }
+    },
+    "hardware-valid": {
+      "status": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/hardware-valid/status.json",
+      "status_sha256": "0a4e8660e38e7551f94196e58fc5f25bebda8a63dc89c31241350065e2a9409b",
+      "exit": 0,
+      "seconds": 1.927204456005711,
+      "inputs": 1836,
+      "drift": [],
+      "steps": [
+        {
+          "name": "actual-a770",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/valid-release/render-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/valid-release/fixture",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/hardware-valid/actual-a770",
+            "--hardware"
+          ],
+          "exit": 0,
+          "expected": 0,
+          "seconds": 1.7863882999517955,
+          "vendor": "Intel",
+          "renderer": "Mesa Intel(R) Arc(tm) A770 Graphics (DG2)"
+        },
+        {
+          "name": "forced-software",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/valid-release/render-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/valid-release/fixture",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/hardware-valid/forced-software",
+            "--hardware"
+          ],
+          "exit": 1,
+          "expected": 1,
+          "seconds": 0.051176626002416015,
+          "vendor": "Mesa",
+          "renderer": "llvmpipe (LLVM 22.1.8, 256 bits)"
+        }
+      ],
+      "manifests": {
+        "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/hardware-valid/before.json": "3a30da9af4fa6a8b30e7f7a124bc1213f692b23391813df9323e171efeba9a6c",
+        "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/hardware-valid/after.json": "3a30da9af4fa6a8b30e7f7a124bc1213f692b23391813df9323e171efeba9a6c"
+      }
+    }
+  },
+  "final": {
+    "fixture_checks_each": 7,
+    "render_checks_each": 94,
+    "poses": 3,
+    "weights": [
+      0,
+      0.35,
+      1
+    ],
+    "paired_views": 27,
+    "paired_maximum": 1,
+    "existing_pixel_bound": 4,
+    "native_restart_pixel_maximum": 0,
+    "native_paint_reference": "Sparse persisted tile bytes +independent UV raster/padding; no production compositor or overlay sampler",
+    "native_worker_scope": "Fixture actual paint +Save; rendered sample actual SceneOperation publication of a detached static result +immediate queuedSave/reopen. Kernel-inside-worker/Undo/Cancel separately qualified662."
+  },
+  "metrics": {
+    "release": {
+      "paired_maxes": [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      "sensitivity_lines": [
+        "EXPRESSION_SENSITIVITY minSampler=17",
+        "EXPRESSION_SENSITIVITY effect=255",
+        "EXPRESSION_SENSITIVITY wrongUV=52",
+        "EXPRESSION_SENSITIVITY movedPaint=57",
+        "EXPRESSION_SENSITIVITY sampler=19",
+        "EXPRESSION_SENSITIVITY isolated=0 max=12",
+        "EXPRESSION_SENSITIVITY isolated=1 max=11",
+        "EXPRESSION_SENSITIVITY isolated=2 max=90"
+      ],
+      "log": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/valid-release/render.log",
+      "sha256": "45a362aff9e36b4e10b5fffea0040e232d3d970080021cb20a244b4fdee8dab9"
+    },
+    "sanitize": {
+      "paired_maxes": [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      "sensitivity_lines": [
+        "EXPRESSION_SENSITIVITY minSampler=17",
+        "EXPRESSION_SENSITIVITY effect=255",
+        "EXPRESSION_SENSITIVITY wrongUV=52",
+        "EXPRESSION_SENSITIVITY movedPaint=57",
+        "EXPRESSION_SENSITIVITY sampler=19",
+        "EXPRESSION_SENSITIVITY isolated=0 max=12",
+        "EXPRESSION_SENSITIVITY isolated=1 max=11",
+        "EXPRESSION_SENSITIVITY isolated=2 max=90"
+      ],
+      "log": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/valid-sanitize/render.log",
+      "sha256": "45a362aff9e36b4e10b5fffea0040e232d3d970080021cb20a244b4fdee8dab9"
+    },
+    "arc": {
+      "paired_maxes": [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      "sensitivity_lines": [
+        "EXPRESSION_SENSITIVITY minSampler=17",
+        "EXPRESSION_SENSITIVITY effect=255",
+        "EXPRESSION_SENSITIVITY wrongUV=52",
+        "EXPRESSION_SENSITIVITY movedPaint=56",
+        "EXPRESSION_SENSITIVITY sampler=20",
+        "EXPRESSION_SENSITIVITY isolated=0 max=12",
+        "EXPRESSION_SENSITIVITY isolated=1 max=11",
+        "EXPRESSION_SENSITIVITY isolated=2 max=90"
+      ],
+      "log": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/hardware-valid/actual-a770.log",
+      "sha256": "7829715613f322a85458fc11475aacce007ec57de949ba6bfc3f0ab71aa5e49b"
+    }
+  },
+  "pairs": {
+    "images": [
+      {
+        "name": "consumer-p0-0.000000.png",
+        "release": "99a0caa459c99327798c0be955892335f90dae9bc10a4002ede0c02794bddfd8",
+        "sanitize": "99a0caa459c99327798c0be955892335f90dae9bc10a4002ede0c02794bddfd8",
+        "equal": true
+      },
+      {
+        "name": "consumer-p0-0.350000.png",
+        "release": "c3bda185f4ee0bb7ef21c7acc5a77b211680b0a72954bcaef8abbde817cdea1f",
+        "sanitize": "c3bda185f4ee0bb7ef21c7acc5a77b211680b0a72954bcaef8abbde817cdea1f",
+        "equal": true
+      },
+      {
+        "name": "consumer-p0-1.000000.png",
+        "release": "f912764520fb7874f1ffd8a4a02c9841e1ac999db0b7d5e0db0b5834ca2d1438",
+        "sanitize": "f912764520fb7874f1ffd8a4a02c9841e1ac999db0b7d5e0db0b5834ca2d1438",
+        "equal": true
+      },
+      {
+        "name": "consumer-p1-0.000000.png",
+        "release": "98a6cf6497f02a8470b49b129940f77605558506e25edcb6b7094a3a50a942b4",
+        "sanitize": "98a6cf6497f02a8470b49b129940f77605558506e25edcb6b7094a3a50a942b4",
+        "equal": true
+      },
+      {
+        "name": "consumer-p1-0.350000.png",
+        "release": "3337fc4728152f0fcd9b8fd4a06338bac98af5294d129ccbdc3ea98323fe2378",
+        "sanitize": "3337fc4728152f0fcd9b8fd4a06338bac98af5294d129ccbdc3ea98323fe2378",
+        "equal": true
+      },
+      {
+        "name": "consumer-p1-1.000000.png",
+        "release": "95dcf7e7fac7cdcbff0704927486f1e7a757e6009d5e0e945c5b66ad06518718",
+        "sanitize": "95dcf7e7fac7cdcbff0704927486f1e7a757e6009d5e0e945c5b66ad06518718",
+        "equal": true
+      },
+      {
+        "name": "consumer-p2-0.000000.png",
+        "release": "298b5cbdad811779b7254c83ae511ef7abb66a108b48627ab896eb36d9af628c",
+        "sanitize": "298b5cbdad811779b7254c83ae511ef7abb66a108b48627ab896eb36d9af628c",
+        "equal": true
+      },
+      {
+        "name": "consumer-p2-0.350000.png",
+        "release": "342ee2e1c47d5db88a07d88e28a89a57150ac832f0c1bf488ffe08bb8200753e",
+        "sanitize": "342ee2e1c47d5db88a07d88e28a89a57150ac832f0c1bf488ffe08bb8200753e",
+        "equal": true
+      },
+      {
+        "name": "consumer-p2-1.000000.png",
+        "release": "1bbdeeb0559f01e3366fc31a3dd26374a90ec4415a16ba146ae5cfed04426e6c",
+        "sanitize": "1bbdeeb0559f01e3366fc31a3dd26374a90ec4415a16ba146ae5cfed04426e6c",
+        "equal": true
+      },
+      {
+        "name": "eye-consumer-p0-0.000000.png",
+        "release": "9a709d35360d11caa4f0cdeccd2436870a900424ee0d92287d4e3e3ae9522866",
+        "sanitize": "9a709d35360d11caa4f0cdeccd2436870a900424ee0d92287d4e3e3ae9522866",
+        "equal": true
+      },
+      {
+        "name": "eye-consumer-p0-0.350000.png",
+        "release": "e940daf3f262a0c9aa668ba93caa4b6a48f8b251c1bdd019f631b9463bc0f887",
+        "sanitize": "e940daf3f262a0c9aa668ba93caa4b6a48f8b251c1bdd019f631b9463bc0f887",
+        "equal": true
+      },
+      {
+        "name": "eye-consumer-p0-1.000000.png",
+        "release": "a51519242b5c360ea2b28bdf3ba022a881a2d7d8eb11ff8755d35ed8fdd5a306",
+        "sanitize": "a51519242b5c360ea2b28bdf3ba022a881a2d7d8eb11ff8755d35ed8fdd5a306",
+        "equal": true
+      },
+      {
+        "name": "eye-consumer-p1-0.000000.png",
+        "release": "7836d74017f7fb1ef392bba7b26b8d982789a24a7f6a594abcbf9aa44a542d43",
+        "sanitize": "7836d74017f7fb1ef392bba7b26b8d982789a24a7f6a594abcbf9aa44a542d43",
+        "equal": true
+      },
+      {
+        "name": "eye-consumer-p1-0.350000.png",
+        "release": "2e7aae01562b27d8f12bc2b8c13c88e3261f1e5759b1ae519685debd688c84f8",
+        "sanitize": "2e7aae01562b27d8f12bc2b8c13c88e3261f1e5759b1ae519685debd688c84f8",
+        "equal": true
+      },
+      {
+        "name": "eye-consumer-p1-1.000000.png",
+        "release": "1a74ea5430db345c19d5231599f31e49ae02721555d124661563d018260b4386",
+        "sanitize": "1a74ea5430db345c19d5231599f31e49ae02721555d124661563d018260b4386",
+        "equal": true
+      },
+      {
+        "name": "eye-consumer-p2-0.000000.png",
+        "release": "f563996808615d9da32fce286607fc0dc51d9d25965a15f4a1dc77440420296f",
+        "sanitize": "f563996808615d9da32fce286607fc0dc51d9d25965a15f4a1dc77440420296f",
+        "equal": true
+      },
+      {
+        "name": "eye-consumer-p2-0.350000.png",
+        "release": "6c1a279a6ba5118519bb0b8a42980e212f30694cfd87101c5d184e94d9f9d5b5",
+        "sanitize": "6c1a279a6ba5118519bb0b8a42980e212f30694cfd87101c5d184e94d9f9d5b5",
+        "equal": true
+      },
+      {
+        "name": "eye-consumer-p2-1.000000.png",
+        "release": "487c1fbab52e45c9e81d11acde0cfc244fd2464c3002a79b816f48b6be0002d5",
+        "sanitize": "487c1fbab52e45c9e81d11acde0cfc244fd2464c3002a79b816f48b6be0002d5",
+        "equal": true
+      },
+      {
+        "name": "eye-native-p0-0.000000.png",
+        "release": "a516c0edef0100d02bf92f82843777874aa50114a67f67941384389e58769de4",
+        "sanitize": "a516c0edef0100d02bf92f82843777874aa50114a67f67941384389e58769de4",
+        "equal": true
+      },
+      {
+        "name": "eye-native-p0-0.350000.png",
+        "release": "e23045e62dd71e371de4c03473a4e1c0f04a6b1e00eb5c7a8a66b2471ee8f0e3",
+        "sanitize": "e23045e62dd71e371de4c03473a4e1c0f04a6b1e00eb5c7a8a66b2471ee8f0e3",
+        "equal": true
+      },
+      {
+        "name": "eye-native-p0-1.000000.png",
+        "release": "b56ffa78a9faee57ba06bf38673c76315111f7708c3f82d5f79923a5149762a5",
+        "sanitize": "b56ffa78a9faee57ba06bf38673c76315111f7708c3f82d5f79923a5149762a5",
+        "equal": true
+      },
+      {
+        "name": "eye-native-p1-0.000000.png",
+        "release": "2eabd1399f91fcc84b2f9fae7826b9bec116a12b6e08feabc8b2e0d2fb103659",
+        "sanitize": "2eabd1399f91fcc84b2f9fae7826b9bec116a12b6e08feabc8b2e0d2fb103659",
+        "equal": true
+      },
+      {
+        "name": "eye-native-p1-0.350000.png",
+        "release": "44f73a83e6b80afa819443e9c1d1229e37446e82f61ebe2e2aee79e3a2b086ae",
+        "sanitize": "44f73a83e6b80afa819443e9c1d1229e37446e82f61ebe2e2aee79e3a2b086ae",
+        "equal": true
+      },
+      {
+        "name": "eye-native-p1-1.000000.png",
+        "release": "3d20d494a9e7ffc15c93b18c9b06ed6e8e342c8ade6291cce688fc20fd26dac6",
+        "sanitize": "3d20d494a9e7ffc15c93b18c9b06ed6e8e342c8ade6291cce688fc20fd26dac6",
+        "equal": true
+      },
+      {
+        "name": "eye-native-p2-0.000000.png",
+        "release": "a776ab4ea600b978a34b54f3ac1a09bd8ce742c2bf8cdb15d73b1a10e6425d6f",
+        "sanitize": "a776ab4ea600b978a34b54f3ac1a09bd8ce742c2bf8cdb15d73b1a10e6425d6f",
+        "equal": true
+      },
+      {
+        "name": "eye-native-p2-0.350000.png",
+        "release": "3a9a8d793e7d56c1fb09d929f4a19863cfa51c17815bf3747cf29d4682a4e126",
+        "sanitize": "3a9a8d793e7d56c1fb09d929f4a19863cfa51c17815bf3747cf29d4682a4e126",
+        "equal": true
+      },
+      {
+        "name": "eye-native-p2-1.000000.png",
+        "release": "1423050d36b6f6192ad08847d89a07ec4b18d09d11b2697de759124398bbb445",
+        "sanitize": "1423050d36b6f6192ad08847d89a07ec4b18d09d11b2697de759124398bbb445",
+        "equal": true
+      },
+      {
+        "name": "far-consumer-p0-0.000000.png",
+        "release": "5b7daf5d21bf87d3c9dabdf6799b4235642c4287c6cdb05af84f651c1f09ecad",
+        "sanitize": "5b7daf5d21bf87d3c9dabdf6799b4235642c4287c6cdb05af84f651c1f09ecad",
+        "equal": true
+      },
+      {
+        "name": "far-consumer-p0-0.350000.png",
+        "release": "d08125040d634ef1ebd9ded8e5342fdb8e761d26266e16fcbabc9a0d420d121f",
+        "sanitize": "d08125040d634ef1ebd9ded8e5342fdb8e761d26266e16fcbabc9a0d420d121f",
+        "equal": true
+      },
+      {
+        "name": "far-consumer-p0-1.000000.png",
+        "release": "b6e3c0dda47b3a95a71916ca13b7282983a7fcd0789a55e85ae0a670c39f7481",
+        "sanitize": "b6e3c0dda47b3a95a71916ca13b7282983a7fcd0789a55e85ae0a670c39f7481",
+        "equal": true
+      },
+      {
+        "name": "far-consumer-p1-0.000000.png",
+        "release": "ed72870f41bb95fc28546d824a2ee4855db697e902469c004c400cbe502a33f2",
+        "sanitize": "ed72870f41bb95fc28546d824a2ee4855db697e902469c004c400cbe502a33f2",
+        "equal": true
+      },
+      {
+        "name": "far-consumer-p1-0.350000.png",
+        "release": "3f1bf3b5e71ff29ea637fc8b70dde90efcc45dbc54626d399fc53a011ba56bd4",
+        "sanitize": "3f1bf3b5e71ff29ea637fc8b70dde90efcc45dbc54626d399fc53a011ba56bd4",
+        "equal": true
+      },
+      {
+        "name": "far-consumer-p1-1.000000.png",
+        "release": "986e6e66da0d6eeb3aff2f5c8945944fa6fe5f2aa40c8d5220e9bf4dec87f3ba",
+        "sanitize": "986e6e66da0d6eeb3aff2f5c8945944fa6fe5f2aa40c8d5220e9bf4dec87f3ba",
+        "equal": true
+      },
+      {
+        "name": "far-consumer-p2-0.000000.png",
+        "release": "84f748d641f09e6c7ba976e843f28ad929cb90fab118bf9bd868b70cdb538106",
+        "sanitize": "84f748d641f09e6c7ba976e843f28ad929cb90fab118bf9bd868b70cdb538106",
+        "equal": true
+      },
+      {
+        "name": "far-consumer-p2-0.350000.png",
+        "release": "252399e8e4b8a7132346dd094bd0505972ad54595d1842d03ee822048bf1cc16",
+        "sanitize": "252399e8e4b8a7132346dd094bd0505972ad54595d1842d03ee822048bf1cc16",
+        "equal": true
+      },
+      {
+        "name": "far-consumer-p2-1.000000.png",
+        "release": "468949a5dedf9571fcfebb9046cd7be8ca8fbb296bf8e606e91fc695b40e64cf",
+        "sanitize": "468949a5dedf9571fcfebb9046cd7be8ca8fbb296bf8e606e91fc695b40e64cf",
+        "equal": true
+      },
+      {
+        "name": "far-native-p0-0.000000.png",
+        "release": "aa6c32682050cad493583e86d0a18b6809ee0ebf48b265c8790cabb8d082d5a5",
+        "sanitize": "aa6c32682050cad493583e86d0a18b6809ee0ebf48b265c8790cabb8d082d5a5",
+        "equal": true
+      },
+      {
+        "name": "far-native-p0-0.350000.png",
+        "release": "c1e6349095867a3b20cbb2c6b9861477036f79805c479730283008206f2213e6",
+        "sanitize": "c1e6349095867a3b20cbb2c6b9861477036f79805c479730283008206f2213e6",
+        "equal": true
+      },
+      {
+        "name": "far-native-p0-1.000000.png",
+        "release": "2b4406ba9bcce0c8b1f76286a397a59963234c92f092b6935ed354d6d6a19958",
+        "sanitize": "2b4406ba9bcce0c8b1f76286a397a59963234c92f092b6935ed354d6d6a19958",
+        "equal": true
+      },
+      {
+        "name": "far-native-p1-0.000000.png",
+        "release": "f2360f4d1b924143b3d95e3913b690399195dba95e20eaa0957280846d19b4b3",
+        "sanitize": "f2360f4d1b924143b3d95e3913b690399195dba95e20eaa0957280846d19b4b3",
+        "equal": true
+      },
+      {
+        "name": "far-native-p1-0.350000.png",
+        "release": "5c7e552986164898a7ee2ee2477f413db5453bcf0b0ebe2b2bd3525205266dea",
+        "sanitize": "5c7e552986164898a7ee2ee2477f413db5453bcf0b0ebe2b2bd3525205266dea",
+        "equal": true
+      },
+      {
+        "name": "far-native-p1-1.000000.png",
+        "release": "e688223cacd687fa016b7b9b9b45e2070e2db4c59b1777e896fb179c9fa998d2",
+        "sanitize": "e688223cacd687fa016b7b9b9b45e2070e2db4c59b1777e896fb179c9fa998d2",
+        "equal": true
+      },
+      {
+        "name": "far-native-p2-0.000000.png",
+        "release": "47b6bad7d8de17a6dca8532a7ec2147907835dc445b96c841ac1234ae338ff97",
+        "sanitize": "47b6bad7d8de17a6dca8532a7ec2147907835dc445b96c841ac1234ae338ff97",
+        "equal": true
+      },
+      {
+        "name": "far-native-p2-0.350000.png",
+        "release": "1a1d18ebe9278892641d55321cbc54190c88635e1a59d31f386802459703dacc",
+        "sanitize": "1a1d18ebe9278892641d55321cbc54190c88635e1a59d31f386802459703dacc",
+        "equal": true
+      },
+      {
+        "name": "far-native-p2-1.000000.png",
+        "release": "2aa88a4d45d16522fbf31dfa09b50f9ad45afcde0348f8e58e20f09fda647d41",
+        "sanitize": "2aa88a4d45d16522fbf31dfa09b50f9ad45afcde0348f8e58e20f09fda647d41",
+        "equal": true
+      },
+      {
+        "name": "native-p0-0.000000.png",
+        "release": "2767a17a5d964f6dca3188db5654d6cc69334fb822258447040004ea1ed7ef47",
+        "sanitize": "2767a17a5d964f6dca3188db5654d6cc69334fb822258447040004ea1ed7ef47",
+        "equal": true
+      },
+      {
+        "name": "native-p0-0.350000.png",
+        "release": "8c303ec4b6c0df4bba64bd49b49d036a45b6ab2ee5b1414f9fb1e71a454b68f4",
+        "sanitize": "8c303ec4b6c0df4bba64bd49b49d036a45b6ab2ee5b1414f9fb1e71a454b68f4",
+        "equal": true
+      },
+      {
+        "name": "native-p0-1.000000.png",
+        "release": "2b38e3e97ff6c2982f68132e69c944d952f472bf9e392ad3c641b60e01c2cb8e",
+        "sanitize": "2b38e3e97ff6c2982f68132e69c944d952f472bf9e392ad3c641b60e01c2cb8e",
+        "equal": true
+      },
+      {
+        "name": "native-p1-0.000000.png",
+        "release": "33d02db092e2a1816941ff3122e3a067a4dec602b47effd01adbe3725f9644c1",
+        "sanitize": "33d02db092e2a1816941ff3122e3a067a4dec602b47effd01adbe3725f9644c1",
+        "equal": true
+      },
+      {
+        "name": "native-p1-0.350000.png",
+        "release": "2e7ef7f54a7b6fcac90d6f7a9406200a793225659d398accda92d24fb6b6ce14",
+        "sanitize": "2e7ef7f54a7b6fcac90d6f7a9406200a793225659d398accda92d24fb6b6ce14",
+        "equal": true
+      },
+      {
+        "name": "native-p1-1.000000.png",
+        "release": "0b6124d2a856284053ecc1373889d8b36d6382f1302850d6566db1daed5aa673",
+        "sanitize": "0b6124d2a856284053ecc1373889d8b36d6382f1302850d6566db1daed5aa673",
+        "equal": true
+      },
+      {
+        "name": "native-p2-0.000000.png",
+        "release": "0e8ad89233628ccddf3b2096243ddfc0f5d759427f4f7862f263251fc1e56bda",
+        "sanitize": "0e8ad89233628ccddf3b2096243ddfc0f5d759427f4f7862f263251fc1e56bda",
+        "equal": true
+      },
+      {
+        "name": "native-p2-0.350000.png",
+        "release": "9a625eaab69eabb0077c332f422f5e313c77bbdf535f165bb4bb084d8aa903d3",
+        "sanitize": "9a625eaab69eabb0077c332f422f5e313c77bbdf535f165bb4bb084d8aa903d3",
+        "equal": true
+      },
+      {
+        "name": "native-p2-1.000000.png",
+        "release": "6230778c1399dac2abc47460ce419564abd19cb0617bbefb91650c83cb83c6e1",
+        "sanitize": "6230778c1399dac2abc47460ce419564abd19cb0617bbefb91650c83cb83c6e1",
+        "equal": true
+      }
+    ],
+    "native": [
+      {
+        "name": "images/pose-0-static-0.000000.dsculpt",
+        "release": "1d4d447d4a3cd8f9503f9fb8c744405739ef26b4e8b3df44b66a0fda2ab8fa46",
+        "sanitize": "1d4d447d4a3cd8f9503f9fb8c744405739ef26b4e8b3df44b66a0fda2ab8fa46",
+        "equal": true
+      },
+      {
+        "name": "images/pose-0-static-0.350000.dsculpt",
+        "release": "26f9e3d502482dd11d6553e50b6acaf6d61213221e20bab92b3e4268832cb7ac",
+        "sanitize": "26f9e3d502482dd11d6553e50b6acaf6d61213221e20bab92b3e4268832cb7ac",
+        "equal": true
+      },
+      {
+        "name": "images/pose-0-static-1.000000.dsculpt",
+        "release": "dcaba2eb6419302cfa02c694aaaadcc21db4e1b406bf3b5046f560e643d3d302",
+        "sanitize": "dcaba2eb6419302cfa02c694aaaadcc21db4e1b406bf3b5046f560e643d3d302",
+        "equal": true
+      },
+      {
+        "name": "images/pose-1-static-0.000000.dsculpt",
+        "release": "4111591a57a0eb7078db765481e4221697f9ebb3569b4c49d0637760b616185c",
+        "sanitize": "4111591a57a0eb7078db765481e4221697f9ebb3569b4c49d0637760b616185c",
+        "equal": true
+      },
+      {
+        "name": "images/pose-1-static-0.350000.dsculpt",
+        "release": "9abb2035ffb1f634423e4f84a124df38593d2c9ae88987a53109f1cbf6bba7dc",
+        "sanitize": "9abb2035ffb1f634423e4f84a124df38593d2c9ae88987a53109f1cbf6bba7dc",
+        "equal": true
+      },
+      {
+        "name": "images/pose-1-static-1.000000.dsculpt",
+        "release": "3f06c455cb6112098e124748f19f9837b1db6db27a94031fcf763e39505995d8",
+        "sanitize": "3f06c455cb6112098e124748f19f9837b1db6db27a94031fcf763e39505995d8",
+        "equal": true
+      },
+      {
+        "name": "images/pose-2-static-0.000000.dsculpt",
+        "release": "b9494d6f10387fa016fc14364b5a820fddbd2dc8c1e19b50e6c442a61bc28b45",
+        "sanitize": "b9494d6f10387fa016fc14364b5a820fddbd2dc8c1e19b50e6c442a61bc28b45",
+        "equal": true
+      },
+      {
+        "name": "images/pose-2-static-0.350000.dsculpt",
+        "release": "26b30b7a3d66935e8bbb76955275a3df4a6c9e520511581ac3a77d13e7af154f",
+        "sanitize": "26b30b7a3d66935e8bbb76955275a3df4a6c9e520511581ac3a77d13e7af154f",
+        "equal": true
+      },
+      {
+        "name": "images/pose-2-static-1.000000.dsculpt",
+        "release": "a8563c5d2fc17a0534646ea68391c6c470c48a02088eb905d54abeec9e8bbfd2",
+        "sanitize": "a8563c5d2fc17a0534646ea68391c6c470c48a02088eb905d54abeec9e8bbfd2",
+        "equal": true
+      },
+      {
+        "name": "fixture/source.vrm",
+        "release": "9c50fa02307f27eae9230c15ab2e974bad86484fb8b8621fe30d2f79c26c1a78",
+        "sanitize": "9c50fa02307f27eae9230c15ab2e974bad86484fb8b8621fe30d2f79c26c1a78",
+        "equal": true
+      },
+      {
+        "name": "fixture/baseline.dsculpt",
+        "release": "07b59bbe0cc1d91780242ad3ca107371424c40f158d0ab01092d673990571095",
+        "sanitize": "07b59bbe0cc1d91780242ad3ca107371424c40f158d0ab01092d673990571095",
+        "equal": true
+      }
+    ],
+    "consumer_binary_previous_input": [
+      {
+        "profile": "release",
+        "equal": true,
+        "sha256": "461a59526f16c63d33fc818337c6c70c9e7bf5bcd175de5f15397b2c1cb3bf06"
+      },
+      {
+        "profile": "sanitize",
+        "equal": true,
+        "sha256": "60a456b39722734bd9792964a6a8dbab798e12b56767d1dae0eca8d007a78a2a"
+      }
+    ],
+    "previous_input_pixels": [
+      {
+        "name": "consumer-p0-0.000000.png",
+        "equal": true
+      },
+      {
+        "name": "consumer-p0-0.350000.png",
+        "equal": true
+      },
+      {
+        "name": "consumer-p0-1.000000.png",
+        "equal": true
+      },
+      {
+        "name": "consumer-p1-0.000000.png",
+        "equal": true
+      },
+      {
+        "name": "consumer-p1-0.350000.png",
+        "equal": true
+      },
+      {
+        "name": "consumer-p1-1.000000.png",
+        "equal": true
+      },
+      {
+        "name": "consumer-p2-0.000000.png",
+        "equal": true
+      },
+      {
+        "name": "consumer-p2-0.350000.png",
+        "equal": true
+      },
+      {
+        "name": "consumer-p2-1.000000.png",
+        "equal": true
+      },
+      {
+        "name": "eye-consumer-p0-0.000000.png",
+        "equal": true
+      },
+      {
+        "name": "eye-consumer-p0-0.350000.png",
+        "equal": true
+      },
+      {
+        "name": "eye-consumer-p0-1.000000.png",
+        "equal": true
+      },
+      {
+        "name": "eye-consumer-p1-0.000000.png",
+        "equal": true
+      },
+      {
+        "name": "eye-consumer-p1-0.350000.png",
+        "equal": true
+      },
+      {
+        "name": "eye-consumer-p1-1.000000.png",
+        "equal": true
+      },
+      {
+        "name": "eye-consumer-p2-0.000000.png",
+        "equal": true
+      },
+      {
+        "name": "eye-consumer-p2-0.350000.png",
+        "equal": true
+      },
+      {
+        "name": "eye-consumer-p2-1.000000.png",
+        "equal": true
+      },
+      {
+        "name": "eye-native-p0-0.000000.png",
+        "equal": true
+      },
+      {
+        "name": "eye-native-p0-0.350000.png",
+        "equal": true
+      },
+      {
+        "name": "eye-native-p0-1.000000.png",
+        "equal": true
+      },
+      {
+        "name": "eye-native-p1-0.000000.png",
+        "equal": true
+      },
+      {
+        "name": "eye-native-p1-0.350000.png",
+        "equal": true
+      },
+      {
+        "name": "eye-native-p1-1.000000.png",
+        "equal": true
+      },
+      {
+        "name": "eye-native-p2-0.000000.png",
+        "equal": true
+      },
+      {
+        "name": "eye-native-p2-0.350000.png",
+        "equal": true
+      },
+      {
+        "name": "eye-native-p2-1.000000.png",
+        "equal": true
+      },
+      {
+        "name": "far-consumer-p0-0.000000.png",
+        "equal": true
+      },
+      {
+        "name": "far-consumer-p0-0.350000.png",
+        "equal": true
+      },
+      {
+        "name": "far-consumer-p0-1.000000.png",
+        "equal": true
+      },
+      {
+        "name": "far-consumer-p1-0.000000.png",
+        "equal": true
+      },
+      {
+        "name": "far-consumer-p1-0.350000.png",
+        "equal": true
+      },
+      {
+        "name": "far-consumer-p1-1.000000.png",
+        "equal": true
+      },
+      {
+        "name": "far-consumer-p2-0.000000.png",
+        "equal": true
+      },
+      {
+        "name": "far-consumer-p2-0.350000.png",
+        "equal": true
+      },
+      {
+        "name": "far-consumer-p2-1.000000.png",
+        "equal": true
+      },
+      {
+        "name": "far-native-p0-0.000000.png",
+        "equal": true
+      },
+      {
+        "name": "far-native-p0-0.350000.png",
+        "equal": true
+      },
+      {
+        "name": "far-native-p0-1.000000.png",
+        "equal": true
+      },
+      {
+        "name": "far-native-p1-0.000000.png",
+        "equal": true
+      },
+      {
+        "name": "far-native-p1-0.350000.png",
+        "equal": true
+      },
+      {
+        "name": "far-native-p1-1.000000.png",
+        "equal": true
+      },
+      {
+        "name": "far-native-p2-0.000000.png",
+        "equal": true
+      },
+      {
+        "name": "far-native-p2-0.350000.png",
+        "equal": true
+      },
+      {
+        "name": "far-native-p2-1.000000.png",
+        "equal": true
+      },
+      {
+        "name": "native-p0-0.000000.png",
+        "equal": true
+      },
+      {
+        "name": "native-p0-0.350000.png",
+        "equal": true
+      },
+      {
+        "name": "native-p0-1.000000.png",
+        "equal": true
+      },
+      {
+        "name": "native-p1-0.000000.png",
+        "equal": true
+      },
+      {
+        "name": "native-p1-0.350000.png",
+        "equal": true
+      },
+      {
+        "name": "native-p1-1.000000.png",
+        "equal": true
+      },
+      {
+        "name": "native-p2-0.000000.png",
+        "equal": true
+      },
+      {
+        "name": "native-p2-0.350000.png",
+        "equal": true
+      },
+      {
+        "name": "native-p2-1.000000.png",
+        "equal": true
+      }
+    ]
+  },
+  "config": {
+    "tests": 617,
+    "scope": "Configuration only; two selected registered consumers actually executed with immutable copied binaries",
+    "artifact": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/configured-tests.json",
+    "sha256": "1907eb06e6b5294f157a7c3d89f662df73fd6abca9024e21df8a140920629a87"
+  },
+  "registered": {
+    "release": {
+      "log": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/registered-valid-release.log",
+      "sha256": "f0a733a093a1262577754e7b398a912dc793044f2a97f26e889b6957e5091161",
+      "exit": 0,
+      "tests": 2
+    },
+    "sanitize": {
+      "log": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/registered-valid-sanitize.log",
+      "sha256": "6f3de73a865ee8bb66393aee272256a6cbd3a0afb7aa904fbf4abfbe171378ea",
+      "exit": 0,
+      "tests": 2
+    }
+  },
+  "registered_artifacts": [
+    {
+      "profile": "release",
+      "file": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/registered-valid-release/dome-sculpt-vrm1-expression-render-fixture-test",
+      "sha256": "3dc994e04d0d93edb0b591b8e768327902b7bf5391775b999f124a054a6b0929"
+    },
+    {
+      "profile": "release",
+      "file": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/registered-valid-release/dome-sculpt-vrm1-expression-render-test",
+      "sha256": "461a59526f16c63d33fc818337c6c70c9e7bf5bcd175de5f15397b2c1cb3bf06"
+    },
+    {
+      "profile": "sanitize",
+      "file": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/registered-valid-sanitize/dome-sculpt-vrm1-expression-render-fixture-test",
+      "sha256": "7dd4ca8e1f517cb583682c43f393fe5a2db724eafd355d8779662074b712f1b5"
+    },
+    {
+      "profile": "sanitize",
+      "file": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/registered-valid-sanitize/dome-sculpt-vrm1-expression-render-test",
+      "sha256": "60a456b39722734bd9792964a6a8dbab798e12b56767d1dae0eca8d007a78a2a"
+    }
+  ],
+  "primary": [
+    {
+      "url": "https://raw.githubusercontent.com/KhronosGroup/glTF/9d23a5a5b1d10f22d1554e847f2a1a3f24222392/extensions/2.0/Khronos/KHR_texture_transform/README.md",
+      "commit": "9d23a5a5b1d10f22d1554e847f2a1a3f24222392",
+      "path": "artifacts/expression-render-proof/primary/KHR_texture_transform.md",
+      "sha256": "5ed0fcd4ddbd98a096985e15b143b5e8031489c16f290a9870acff42e7f71333"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/KhronosGroup/glTF/9d23a5a5b1d10f22d1554e847f2a1a3f24222392/extensions/2.0/Khronos/KHR_materials_emissive_strength/README.md",
+      "commit": "9d23a5a5b1d10f22d1554e847f2a1a3f24222392",
+      "path": "artifacts/expression-render-proof/primary/KHR_materials_emissive_strength.md",
+      "sha256": "9612a316d0713bcceb1122119748feb933d5c2c5acb0555d2e850e84dcbc868e"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/vrm-c/vrm-specification/94e82dd346fa6cf0337c4421728640e5252dd38e/specification/VRMC_materials_mtoon-1.0/README.md",
+      "commit": "94e82dd346fa6cf0337c4421728640e5252dd38e",
+      "path": "artifacts/expression-render-proof/primary/VRMC_materials_mtoon-1.0.md",
+      "sha256": "ac2b6060587b2cd5ddabb26bd7a07e04992a73d0bcbae5e6acb4cdc94da3f70b"
+    }
+  ],
+  "valid_input_khronos": {
+    "path": "artifacts/expression-render-proof/valid-release/fixture/source.vrm",
+    "sha256": "9c50fa02307f27eae9230c15ab2e974bad86484fb8b8621fe30d2f79c26c1a78",
+    "validator": "2.0.0-dev.3.10",
+    "options": {
+      "maxIssues": 0
+    },
+    "report": {
+      "uri": "artifacts/expression-render-proof/valid-release/fixture/source.vrm",
+      "mimeType": "model/gltf-binary",
+      "validatorVersion": "2.0.0-dev.3.10",
+      "validatedAt": "2026-11-04T13:54:23.406Z",
+      "issues": {
+        "numErrors": 0,
+        "numWarnings": 5,
+        "numInfos": 15,
+        "numHints": 12,
+        "messages": [
+          {
+            "code": "UNSUPPORTED_EXTENSION",
+            "message": "Cannot validate an extension as it is not supported by the validator: 'VRMC_vrm'.",
+            "severity": 2,
+            "pointer": "/extensionsUsed/0"
+          },
+          {
+            "code": "UNSUPPORTED_EXTENSION",
+            "message": "Cannot validate an extension as it is not supported by the validator: 'VRMC_materials_mtoon'.",
+            "severity": 2,
+            "pointer": "/extensionsUsed/1"
+          },
+          {
+            "code": "UNSUPPORTED_EXTENSION",
+            "message": "Cannot validate an extension as it is not supported by the validator: 'VRMC_springBone'.",
+            "severity": 2,
+            "pointer": "/extensionsUsed/3"
+          },
+          {
+            "code": "UNSUPPORTED_EXTENSION",
+            "message": "Cannot validate an extension as it is not supported by the validator: 'VRMC_node_constraint'.",
+            "severity": 2,
+            "pointer": "/extensionsUsed/4"
+          },
+          {
+            "code": "BUFFER_VIEW_TARGET_MISSING",
+            "message": "bufferView.target should be set for vertex or index data.",
+            "severity": 3,
+            "pointer": "/meshes/0/primitives/0/attributes/COLOR_0"
+          },
+          {
+            "code": "BUFFER_VIEW_TARGET_MISSING",
+            "message": "bufferView.target should be set for vertex or index data.",
+            "severity": 3,
+            "pointer": "/meshes/0/primitives/0/attributes/JOINTS_0"
+          },
+          {
+            "code": "BUFFER_VIEW_TARGET_MISSING",
+            "message": "bufferView.target should be set for vertex or index data.",
+            "severity": 3,
+            "pointer": "/meshes/0/primitives/0/attributes/NORMAL"
+          },
+          {
+            "code": "BUFFER_VIEW_TARGET_MISSING",
+            "message": "bufferView.target should be set for vertex or index data.",
+            "severity": 3,
+            "pointer": "/meshes/0/primitives/0/attributes/POSITION"
+          },
+          {
+            "code": "BUFFER_VIEW_TARGET_MISSING",
+            "message": "bufferView.target should be set for vertex or index data.",
+            "severity": 3,
+            "pointer": "/meshes/0/primitives/0/attributes/TANGENT"
+          },
+          {
+            "code": "BUFFER_VIEW_TARGET_MISSING",
+            "message": "bufferView.target should be set for vertex or index data.",
+            "severity": 3,
+            "pointer": "/meshes/0/primitives/0/attributes/TEXCOORD_0"
+          },
+          {
+            "code": "BUFFER_VIEW_TARGET_MISSING",
+            "message": "bufferView.target should be set for vertex or index data.",
+            "severity": 3,
+            "pointer": "/meshes/0/primitives/0/attributes/TEXCOORD_1"
+          },
+          {
+            "code": "BUFFER_VIEW_TARGET_MISSING",
+            "message": "bufferView.target should be set for vertex or index data.",
+            "severity": 3,
+            "pointer": "/meshes/0/primitives/0/attributes/WEIGHTS_0"
+          },
+          {
+            "code": "BUFFER_VIEW_TARGET_MISSING",
+            "message": "bufferView.target should be set for vertex or index data.",
+            "severity": 3,
+            "pointer": "/meshes/0/primitives/0/indices"
+          },
+          {
+            "code": "UNUSED_MESH_TANGENT",
+            "message": "Tangents are not used because the material has no normal texture.",
+            "severity": 2,
+            "pointer": "/meshes/0/primitives/0/attributes/TANGENT"
+          },
+          {
+            "code": "BUFFER_VIEW_TARGET_MISSING",
+            "message": "bufferView.target should be set for vertex or index data.",
+            "severity": 3,
+            "pointer": "/meshes/0/primitives/0/targets/0/NORMAL"
+          },
+          {
+            "code": "BUFFER_VIEW_TARGET_MISSING",
+            "message": "bufferView.target should be set for vertex or index data.",
+            "severity": 3,
+            "pointer": "/meshes/0/primitives/0/targets/0/POSITION"
+          },
+          {
+            "code": "BUFFER_VIEW_TARGET_MISSING",
+            "message": "bufferView.target should be set for vertex or index data.",
+            "severity": 3,
+            "pointer": "/meshes/0/primitives/0/targets/0/TANGENT"
+          },
+          {
+            "code": "NODE_SKINNED_MESH_WITHOUT_SKIN",
+            "message": "Node uses skinned mesh, but has no skin defined.",
+            "severity": 1,
+            "pointer": "/nodes/23"
+          },
+          {
+            "code": "NODE_SKINNED_MESH_NON_ROOT",
+            "message": "Node with a skinned mesh is not root. Parent transforms will not affect a skinned mesh.",
+            "severity": 1,
+            "pointer": "/nodes/1"
+          },
+          {
+            "code": "NODE_SKINNED_MESH_LOCAL_TRANSFORMS",
+            "message": "Local transforms will not affect a skinned mesh.",
+            "severity": 1,
+            "pointer": "/nodes/1"
+          },
+          {
+            "code": "NODE_SKINNED_MESH_NON_ROOT",
+            "message": "Node with a skinned mesh is not root. Parent transforms will not affect a skinned mesh.",
+            "severity": 1,
+            "pointer": "/nodes/2"
+          },
+          {
+            "code": "NODE_SKINNED_MESH_LOCAL_TRANSFORMS",
+            "message": "Local transforms will not affect a skinned mesh.",
+            "severity": 1,
+            "pointer": "/nodes/2"
+          },
+          {
+            "code": "NODE_EMPTY",
+            "message": "Empty node encountered.",
+            "severity": 2,
+            "pointer": "/nodes/8"
+          },
+          {
+            "code": "NODE_EMPTY",
+            "message": "Empty node encountered.",
+            "severity": 2,
+            "pointer": "/nodes/11"
+          },
+          {
+            "code": "NODE_EMPTY",
+            "message": "Empty node encountered.",
+            "severity": 2,
+            "pointer": "/nodes/14"
+          },
+          {
+            "code": "NODE_EMPTY",
+            "message": "Empty node encountered.",
+            "severity": 2,
+            "pointer": "/nodes/17"
+          },
+          {
+            "code": "NODE_EMPTY",
+            "message": "Empty node encountered.",
+            "severity": 2,
+            "pointer": "/nodes/19"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/accessors/12"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/accessors/13"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/bufferViews/10"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/textures/1"
+          },
+          {
+            "code": "UNUSED_MESH_WEIGHTS",
+            "message": "The static morph target weights are always overridden.",
+            "severity": 2,
+            "pointer": "/meshes/0/weights"
+          }
+        ],
+        "truncated": false
+      },
+      "info": {
+        "version": "2.0",
+        "extensionsUsed": [
+          "VRMC_vrm",
+          "VRMC_materials_mtoon",
+          "KHR_texture_transform",
+          "VRMC_springBone",
+          "VRMC_node_constraint",
+          "KHR_materials_emissive_strength"
+        ],
+        "extensionsRequired": [
+          "VRMC_vrm",
+          "VRMC_materials_mtoon"
+        ],
+        "resources": [
+          {
+            "pointer": "/buffers/0",
+            "mimeType": "application/gltf-buffer",
+            "storage": "glb",
+            "byteLength": 18032
+          },
+          {
+            "pointer": "/images/0",
+            "mimeType": "image/png",
+            "storage": "buffer-view",
+            "image": {
+              "width": 128,
+              "height": 128,
+              "format": "rgba",
+              "primaries": "srgb",
+              "transfer": "srgb",
+              "bits": 8
+            }
+          }
+        ],
+        "animationCount": 0,
+        "materialCount": 1,
+        "hasMorphTargets": true,
+        "hasSkins": true,
+        "hasTextures": true,
+        "hasDefaultScene": true,
+        "drawCallCount": 1,
+        "totalVertexCount": 4,
+        "totalTriangleCount": 2,
+        "maxUVs": 2,
+        "maxInfluences": 4,
+        "maxAttributes": 8
+      }
+    }
+  },
+  "valid_input_official": {
+    "report": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/official-valid-vrm1-schema.json",
+    "sha256": "eba2c1a43025b4d35c7c3990cc0c5d51b8c8a7e151f08849cdc3fbef06d6fff2",
+    "instances": 6,
+    "errors": 0
+  },
+  "old_input_khronos": {
+    "path": "artifacts/expression-render-proof/final-release/fixture/source.vrm",
+    "sha256": "df524f33d65bcd60d6c9a581901097ee108ad4522dbaa2a02b021798d7151463",
+    "validator": "2.0.0-dev.3.10",
+    "options": {
+      "maxIssues": 0
+    },
+    "report": {
+      "uri": "artifacts/expression-render-proof/final-release/fixture/source.vrm",
+      "mimeType": "model/gltf-binary",
+      "validatorVersion": "2.0.0-dev.3.10",
+      "validatedAt": "2026-11-04T13:48:26.549Z",
+      "issues": {
+        "numErrors": 4,
+        "numWarnings": 7,
+        "numInfos": 15,
+        "numHints": 12,
+        "messages": [
+          {
+            "code": "UNSUPPORTED_EXTENSION",
+            "message": "Cannot validate an extension as it is not supported by the validator: 'VRMC_vrm'.",
+            "severity": 2,
+            "pointer": "/extensionsUsed/1"
+          },
+          {
+            "code": "UNSUPPORTED_EXTENSION",
+            "message": "Cannot validate an extension as it is not supported by the validator: 'VRMC_materials_mtoon'.",
+            "severity": 2,
+            "pointer": "/extensionsUsed/2"
+          },
+          {
+            "code": "UNSUPPORTED_EXTENSION",
+            "message": "Cannot validate an extension as it is not supported by the validator: 'VRMC_springBone'.",
+            "severity": 2,
+            "pointer": "/extensionsUsed/4"
+          },
+          {
+            "code": "UNSUPPORTED_EXTENSION",
+            "message": "Cannot validate an extension as it is not supported by the validator: 'VRMC_node_constraint'.",
+            "severity": 2,
+            "pointer": "/extensionsUsed/5"
+          },
+          {
+            "code": "MATERIAL_ALPHA_CUTOFF_INVALID_MODE",
+            "message": "Alpha cutoff is supported only for 'MASK' alpha mode.",
+            "severity": 1,
+            "pointer": "/materials/0/alphaCutoff"
+          },
+          {
+            "code": "MULTIPLE_EXTENSIONS",
+            "message": "This extension may be incompatible with other extensions for the object.",
+            "severity": 1,
+            "pointer": "/materials/0/extensions/KHR_materials_unlit"
+          },
+          {
+            "code": "EMPTY_ENTITY",
+            "message": "Entity cannot be empty.",
+            "severity": 0,
+            "pointer": "/nodes/8/children"
+          },
+          {
+            "code": "EMPTY_ENTITY",
+            "message": "Entity cannot be empty.",
+            "severity": 0,
+            "pointer": "/nodes/11/children"
+          },
+          {
+            "code": "EMPTY_ENTITY",
+            "message": "Entity cannot be empty.",
+            "severity": 0,
+            "pointer": "/nodes/14/children"
+          },
+          {
+            "code": "EMPTY_ENTITY",
+            "message": "Entity cannot be empty.",
+            "severity": 0,
+            "pointer": "/nodes/17/children"
+          },
+          {
+            "code": "BUFFER_VIEW_TARGET_MISSING",
+            "message": "bufferView.target should be set for vertex or index data.",
+            "severity": 3,
+            "pointer": "/meshes/0/primitives/0/attributes/COLOR_0"
+          },
+          {
+            "code": "BUFFER_VIEW_TARGET_MISSING",
+            "message": "bufferView.target should be set for vertex or index data.",
+            "severity": 3,
+            "pointer": "/meshes/0/primitives/0/attributes/JOINTS_0"
+          },
+          {
+            "code": "BUFFER_VIEW_TARGET_MISSING",
+            "message": "bufferView.target should be set for vertex or index data.",
+            "severity": 3,
+            "pointer": "/meshes/0/primitives/0/attributes/NORMAL"
+          },
+          {
+            "code": "BUFFER_VIEW_TARGET_MISSING",
+            "message": "bufferView.target should be set for vertex or index data.",
+            "severity": 3,
+            "pointer": "/meshes/0/primitives/0/attributes/POSITION"
+          },
+          {
+            "code": "BUFFER_VIEW_TARGET_MISSING",
+            "message": "bufferView.target should be set for vertex or index data.",
+            "severity": 3,
+            "pointer": "/meshes/0/primitives/0/attributes/TANGENT"
+          },
+          {
+            "code": "BUFFER_VIEW_TARGET_MISSING",
+            "message": "bufferView.target should be set for vertex or index data.",
+            "severity": 3,
+            "pointer": "/meshes/0/primitives/0/attributes/TEXCOORD_0"
+          },
+          {
+            "code": "BUFFER_VIEW_TARGET_MISSING",
+            "message": "bufferView.target should be set for vertex or index data.",
+            "severity": 3,
+            "pointer": "/meshes/0/primitives/0/attributes/TEXCOORD_1"
+          },
+          {
+            "code": "BUFFER_VIEW_TARGET_MISSING",
+            "message": "bufferView.target should be set for vertex or index data.",
+            "severity": 3,
+            "pointer": "/meshes/0/primitives/0/attributes/WEIGHTS_0"
+          },
+          {
+            "code": "BUFFER_VIEW_TARGET_MISSING",
+            "message": "bufferView.target should be set for vertex or index data.",
+            "severity": 3,
+            "pointer": "/meshes/0/primitives/0/indices"
+          },
+          {
+            "code": "UNUSED_MESH_TANGENT",
+            "message": "Tangents are not used because the material has no normal texture.",
+            "severity": 2,
+            "pointer": "/meshes/0/primitives/0/attributes/TANGENT"
+          },
+          {
+            "code": "BUFFER_VIEW_TARGET_MISSING",
+            "message": "bufferView.target should be set for vertex or index data.",
+            "severity": 3,
+            "pointer": "/meshes/0/primitives/0/targets/0/NORMAL"
+          },
+          {
+            "code": "BUFFER_VIEW_TARGET_MISSING",
+            "message": "bufferView.target should be set for vertex or index data.",
+            "severity": 3,
+            "pointer": "/meshes/0/primitives/0/targets/0/POSITION"
+          },
+          {
+            "code": "BUFFER_VIEW_TARGET_MISSING",
+            "message": "bufferView.target should be set for vertex or index data.",
+            "severity": 3,
+            "pointer": "/meshes/0/primitives/0/targets/0/TANGENT"
+          },
+          {
+            "code": "NODE_SKINNED_MESH_WITHOUT_SKIN",
+            "message": "Node uses skinned mesh, but has no skin defined.",
+            "severity": 1,
+            "pointer": "/nodes/23"
+          },
+          {
+            "code": "NODE_SKINNED_MESH_NON_ROOT",
+            "message": "Node with a skinned mesh is not root. Parent transforms will not affect a skinned mesh.",
+            "severity": 1,
+            "pointer": "/nodes/1"
+          },
+          {
+            "code": "NODE_SKINNED_MESH_LOCAL_TRANSFORMS",
+            "message": "Local transforms will not affect a skinned mesh.",
+            "severity": 1,
+            "pointer": "/nodes/1"
+          },
+          {
+            "code": "NODE_SKINNED_MESH_NON_ROOT",
+            "message": "Node with a skinned mesh is not root. Parent transforms will not affect a skinned mesh.",
+            "severity": 1,
+            "pointer": "/nodes/2"
+          },
+          {
+            "code": "NODE_SKINNED_MESH_LOCAL_TRANSFORMS",
+            "message": "Local transforms will not affect a skinned mesh.",
+            "severity": 1,
+            "pointer": "/nodes/2"
+          },
+          {
+            "code": "NODE_EMPTY",
+            "message": "Empty node encountered.",
+            "severity": 2,
+            "pointer": "/nodes/8"
+          },
+          {
+            "code": "NODE_EMPTY",
+            "message": "Empty node encountered.",
+            "severity": 2,
+            "pointer": "/nodes/11"
+          },
+          {
+            "code": "NODE_EMPTY",
+            "message": "Empty node encountered.",
+            "severity": 2,
+            "pointer": "/nodes/14"
+          },
+          {
+            "code": "NODE_EMPTY",
+            "message": "Empty node encountered.",
+            "severity": 2,
+            "pointer": "/nodes/17"
+          },
+          {
+            "code": "NODE_EMPTY",
+            "message": "Empty node encountered.",
+            "severity": 2,
+            "pointer": "/nodes/19"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/accessors/12"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/accessors/13"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/bufferViews/10"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/textures/1"
+          },
+          {
+            "code": "UNUSED_MESH_WEIGHTS",
+            "message": "The static morph target weights are always overridden.",
+            "severity": 2,
+            "pointer": "/meshes/0/weights"
+          }
+        ],
+        "truncated": false
+      },
+      "info": {
+        "version": "2.0",
+        "extensionsUsed": [
+          "KHR_materials_unlit",
+          "VRMC_vrm",
+          "VRMC_materials_mtoon",
+          "KHR_texture_transform",
+          "VRMC_springBone",
+          "VRMC_node_constraint",
+          "KHR_materials_emissive_strength"
+        ],
+        "extensionsRequired": [
+          "VRMC_vrm",
+          "VRMC_materials_mtoon"
+        ],
+        "resources": [
+          {
+            "pointer": "/buffers/0",
+            "mimeType": "application/gltf-buffer",
+            "storage": "glb",
+            "byteLength": 18032
+          },
+          {
+            "pointer": "/images/0",
+            "mimeType": "image/png",
+            "storage": "buffer-view",
+            "image": {
+              "width": 128,
+              "height": 128,
+              "format": "rgba",
+              "primaries": "srgb",
+              "transfer": "srgb",
+              "bits": 8
+            }
+          }
+        ],
+        "animationCount": 0,
+        "materialCount": 1,
+        "hasMorphTargets": true,
+        "hasSkins": true,
+        "hasTextures": true,
+        "hasDefaultScene": true,
+        "drawCallCount": 1,
+        "totalVertexCount": 4,
+        "totalTriangleCount": 2,
+        "maxUVs": 2,
+        "maxInfluences": 4,
+        "maxAttributes": 8
+      }
+    }
+  },
+  "negative_scopes": [
+    {
+      "cohort": "release-v2",
+      "reason": "New test-only pose helper used nonexistent axis_angle API and mixed-type auto declaration; no runtime proof."
+    },
+    {
+      "cohorts": [
+        "release-v3",
+        "release-eye-diagnostic"
+      ],
+      "reason": "One second-eye pixel max33 from CPU-precombined UV coefficients; upload counters1\u21921. Primary GPU factor construction fixed consumer precision, unchanged camera/4bound/runtime."
+    },
+    {
+      "cohort": "release-factor-precision",
+      "reason": "Min-filter-only close-view sensitivity was zero; source was actually magnified. Added actual minified camera and independent mag/min controls."
+    },
+    {
+      "cohorts": [
+        "final-release",
+        "final-sanitize",
+        "hardware"
+      ],
+      "reason": "Same render consumer positive but inherited input has four empty children errors +opaque cutoff/unlit-strength warnings. Final initial fixture authoring corrected input before firstsave; no exported JSON rewritten."
+    }
+  ],
+  "remaining": [
+    "Interactive native/shared controls and preview authority",
+    "Alternate CorePBR current background/alpha/strength adapter preserving independent paint",
+    "Normal/prepared/plainPBR/absolute-background adapters",
+    "Representable expression-preserving painted export",
+    "Full application/current-main integration and broader real external/role/device evidence"
+  ],
+  "binary_sha256": {
+    "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/valid-release/libdome-sculpt-affine.a": "748ba41106b6de1678416bacc75e22453e12377c257e96a6e5f9f9a97af25db5",
+    "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/valid-release/libxatlas.a": "5ae3cb839f3ee39d7a081e322de92e55998dc8cd23080df12beaa9af30a18a7b",
+    "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/valid-release/libufbx.a": "bad46a61d710f8a3ae6d5f0c77a47af12aaec2ce9f7b3f6d2bc4c63c90a39b5a",
+    "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/valid-release/libmikktspace.a": "29f611c72effe18c8e11a47786f5904c1b3bb6811ade552077975b4c16e6aa41",
+    "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/valid-release/libdome-sculpt-polygon.a": "2066bffab41b9c17b67492fe4237652bd9392250e72730a58ece15b71458cdb5",
+    "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/valid-release/libmikktspace-robust.a": "d172b6f25d14d28ecc78ec9c417ac78093c5506efe24b00fc5b88fdd3d04fefd",
+    "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/valid-release/libdome-sculpt-emission-codec.a": "7f9eeb34b4fff2538ab0ee53de447473c319b2593411d20066a069e291ff16ad",
+    "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/valid-release/libdome-sculpt-core.a": "54e8c187751ab7d92431648b598a48546f629a90ca37cd9cb297ad0964ffb8f0",
+    "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/valid-release/libdome-sculpt-render.a": "a8c4cbcd788290ce8e038cd16733d468d52a969bfb6a4cf4643786ae51577a64",
+    "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/valid-release/libdome-sculpt-spacenav.a": "eafd15159a83d478c451653cf10b18254659a13822478c7987ac70386512dc88",
+    "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/valid-release/libdome-sculpt-xr.a": "1b45bf6a0479465076bce4ffaf3903438cff07ef58d5026e5b4dcad1ca3eaac8",
+    "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/valid-release/fixture.o": "47db6b49e52a677bf8c403dc962fd1d1be6ee8c6616bc8a8a11ca10ca9a326f9",
+    "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/valid-release/fixture-test": "3dc994e04d0d93edb0b591b8e768327902b7bf5391775b999f124a054a6b0929",
+    "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/valid-release/render.o": "507acff164c4c74a6e8d8e78e4a1b2059ee695d00b6d44ac12b65332905ee729",
+    "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/valid-release/render-test": "461a59526f16c63d33fc818337c6c70c9e7bf5bcd175de5f15397b2c1cb3bf06",
+    "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/valid-sanitize/libdome-sculpt-affine.a": "17ebf77697c62467659518f63c8ab363eb5d9eec193692f2f19998172c41ef4d",
+    "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/valid-sanitize/libxatlas.a": "4b551389eb392e5b9a7bbc1f4ca482785552e10f83d85fb3da54584d61957415",
+    "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/valid-sanitize/libufbx.a": "10e1773dbe026dbf60fd838a9646a3f9a2015e80277fc613ceda3f33aaba0e09",
+    "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/valid-sanitize/libmikktspace.a": "6e95af0f227f9e882a298391feeb5a79be127686470fc672f7b67fd4a6b87e6f",
+    "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/valid-sanitize/libmikktspace-robust.a": "28b1088963324c600e1601ecb21de1522d7c745b668a063253b28d2b95f0d317",
+    "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/valid-sanitize/libdome-sculpt-polygon.a": "5195abe0c65511fecf5f219080b4b2bb59db454fa67d90bfda9d9124bdabcebd",
+    "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/valid-sanitize/libdome-sculpt-emission-codec.a": "1b85e39ec0383d8efbc3ff6ddd3ddb7469c6814921b303e824de6c4ee903a221",
+    "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/valid-sanitize/libdome-sculpt-core.a": "ada1b01410b56b2a2e9e691c8972960e0e4e3a8982093c964bfb0319f75780b6",
+    "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/valid-sanitize/libdome-sculpt-spacenav.a": "47153d310d35a80494049e78a639ea6c3426dce9df3a8d73d81401f43728ab60",
+    "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/valid-sanitize/libdome-sculpt-render.a": "27f55aa884df5e6e56cdf55b3cff747f821aad276bfac1502962ee794450ad24",
+    "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/valid-sanitize/libdome-sculpt-xr.a": "bd30feeb0a709435b6334b912068e80213747f7f2b11eab6d5028b82a516d0d0",
+    "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/valid-sanitize/fixture.o": "d2759d76944f376578422906c4dadcc94b8179729cf50f7304af869362f1bd92",
+    "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/valid-sanitize/fixture-test": "7dd4ca8e1f517cb583682c43f393fe5a2db724eafd355d8779662074b712f1b5",
+    "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/valid-sanitize/render.o": "ff7ad46cd6d9017abd8ea94f04e6fef77e08bae000b51a9a81319c0775f1b002",
+    "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/valid-sanitize/render-test": "60a456b39722734bd9792964a6a8dbab798e12b56767d1dae0eca8d007a78a2a"
+  },
+  "maps": {
+    "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/hardware-valid/actual-a770-maps.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-render-662e711/artifacts/expression-render-proof/hardware-valid/forced-software-maps.txt": "f542f8b2671c495e7502ed17f89ed5a4c68964df4ac5f9ce58b19d59e2baa496"
+  }
+}

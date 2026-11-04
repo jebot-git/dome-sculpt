@@ -11,6 +11,7 @@
 #include "dome/source-maps.hpp"
 #include "dome/source-placement.hpp"
 #include "emission-authority.hpp"
+#include "native-paint-sampling.hpp"
 #include <set>
 #include <nlohmann/json.hpp>
 namespace dome { struct PolygonAuthority; }
@@ -46,7 +47,7 @@ inline unsigned minimum_appearance_scene_version(const nlohmann::json &a){
   if(!material.is_number_integer()||(material.is_number_unsigned()?material.get<uint64_t>()>INT32_MAX:material.get<int64_t>()<0||material.get<int64_t>()>INT32_MAX))throw std::runtime_error("Invalid retained appearance material identity");
   return material.get<int64_t>()==0?17u:0u;
 }
-inline unsigned minimum_scene_version(const PaintedMesh *paint){return paint&&paint->source_sampling_prepared()?28u:paint&&paint->has_physical_emission()?27u:paint&&paint->source_maps()&&!paint->source_maps()->extra_uv_sets.empty()?26u:paint&&paint->paint_sampling_domain()?24u:paint&&paint->normal_projection()&&paint->normal_projection()->version==2?21u:paint&&paint->source_maps()&&paint->source_maps()->uv1?18u:0u;}
+inline unsigned minimum_scene_version(const PaintedMesh *paint){return paint&&paint->baked()&&paint->baked()->normal_field?33u:paint&&paint->source_sampling_prepared()?28u:paint&&paint->has_physical_emission()?27u:paint&&paint->source_maps()&&!paint->source_maps()->extra_uv_sets.empty()?26u:paint&&paint->paint_sampling_domain()?24u:paint&&paint->normal_projection()&&paint->normal_projection()->version==2?21u:paint&&paint->source_maps()&&paint->source_maps()->uv1?18u:0u;}
 
 inline unsigned minimum_scene_version(const SourceMaterialBindings *binding) {
   if (!binding)
@@ -54,7 +55,11 @@ inline unsigned minimum_scene_version(const SourceMaterialBindings *binding) {
   unsigned result=binding->uv_origin
              ? std::max({minimum_scene_version(binding->uv_origin->paint.get()),minimum_scene_version(binding->uv_origin->deformation.get()),minimum_scene_version(binding->uv_origin->appearance.get())})
              : 0u;
+  if(binding->native_paint_sampling){const auto &p=*binding->native_paint_sampling;result=std::max({result,32u,minimum_scene_version(p.before_paint().get()),minimum_scene_version(p.before_material().get())});}
   if(physical_emission(*binding))result=std::max(result,27u);
+  if(binding->canonical_attributes)result=std::max(result,33u);
+  if(binding->canonical_uv)result=std::max(result,34u);
+  if(binding->normal_preparation&&binding->normal_preparation->canonical_conversion)result=std::max(result,31u);
   if(binding->key_derivation){const auto &k=*binding->key_derivation;result=std::max({result,k.uses_explicit_mirror()?29u:22u,minimum_scene_version(k.before_paint().get()),minimum_scene_version(k.before_material().get()),minimum_scene_version(k.before_deformation().get()),minimum_scene_version(k.before_appearance().get())});}
   if(binding->normal_frames)for(const auto &frame:{binding->normal_frames->pbr,binding->normal_frames->mtoon,binding->normal_frames->canonical})if(frame&&frame->generated_uv&&*frame->generated_uv>=2)result=std::max(result,26u);
   if(const auto &preparation=binding->color_preparation)
@@ -115,6 +120,16 @@ inline unsigned minimum_deformation_scene_version(const nlohmann::json &d) {
                  (s.contains("version") && s.at("version") == 2)
              ? 11u
              : 0u;
+}
+// Scan actual reachable material owners, including histories. Separate objects
+// can require the two capabilities even when neither individual binding does.
+inline unsigned composed_material_scene_version(const SourceMaterialArchive &materials){
+  bool native=false,canonical=false;
+  for(const auto &b:materials.bindings()){
+    native|=bool(b->native_paint_sampling);
+    canonical|=bool(b->canonical_attributes)||(b->normal_preparation&&bool(b->normal_preparation->canonical_conversion));
+  }
+  return native&&canonical?35u:0u;
 }
 inline unsigned minimum_scene_version(const Scene &scene){
   unsigned result=0;

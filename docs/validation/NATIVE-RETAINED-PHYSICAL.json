@@ -1,0 +1,1371 @@
+{
+  "runtime": "8e0b95d",
+  "base_raw": "8c259dae2396986f3946518046536f9d1fd113fb",
+  "scope": "Private native/retained physical-emission compiler and distinct native GPU preview foundation, not main/full-goal qualification",
+  "release_build": {
+    "exit": 0,
+    "inputs": 1058,
+    "drift": []
+  },
+  "release79": {
+    "command": [
+      "/home/blux/de-xr/dome-sculpt/artifacts/hdr-native-retained-8c259da/build-release/dome-sculpt-native-retained-physical-test",
+      "/home/blux/de-xr/dome-sculpt/artifacts/hdr-native-retained-8c259da/artifacts/native-physical-attached/runtime/outputs"
+    ],
+    "exit": 0,
+    "seconds": 21.22105357897817,
+    "inputs": 1070,
+    "drift": []
+  },
+  "sanitize_build": {
+    "exit": 0,
+    "inputs": 1058,
+    "drift": []
+  },
+  "sanitize5": {
+    "exit": 0,
+    "inputs": 1058,
+    "drift": []
+  },
+  "sanitize_test_log": "Test project /home/blux/de-xr/dome-sculpt/artifacts/hdr-native-retained-8c259da/build-sanitize\n    Start   4: emission-export\n1/5 Test   #4: emission-export ...................   Passed    0.92 sec\n    Start 209: source-paint-bake\n2/5 Test #209: source-paint-bake .................   Passed   17.77 sec\n    Start 211: source-paint-physical-authoring\n3/5 Test #211: source-paint-physical-authoring ...   Passed   20.57 sec\n    Start 575: raw-hdr-preserving\n4/5 Test #575: raw-hdr-preserving ................   Passed    7.95 sec\n    Start 579: native-retained-physical\n5/5 Test #579: native-retained-physical ..........   Passed  256.29 sec\n\n100% tests passed, 0 tests failed out of 5\n\nTotal Test time (real) = 303.52 sec\n",
+  "arc": {
+    "source": "8e0b95d",
+    "device": "DRI_PRIME=pci-0000_03_00_0",
+    "stages": {
+      "actual-a770": {
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/hdr-native-retained-8c259da/build-release/dome-sculpt-native-retained-physical-test",
+          "/home/blux/de-xr/dome-sculpt/artifacts/hdr-native-retained-8c259da/artifacts/native-physical-arc/actual-a770",
+          "--hardware"
+        ],
+        "exit": 0,
+        "expected": 0,
+        "seconds": 22.315063638990978
+      },
+      "software-refusal": {
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/hdr-native-retained-8c259da/build-release/dome-sculpt-native-retained-physical-test",
+          "/home/blux/de-xr/dome-sculpt/artifacts/hdr-native-retained-8c259da/artifacts/native-physical-arc/software-refusal",
+          "--hardware"
+        ],
+        "exit": 1,
+        "expected": 1,
+        "seconds": 0.03225837100762874
+      }
+    },
+    "inputs": 1071,
+    "drift": [],
+    "exit": 0
+  },
+  "legacy_release4": {
+    "exit": 0,
+    "scope": "current matching Release core/render after private native packet ABI closure"
+  },
+  "legacy_bytes20": {
+    "files": [
+      {
+        "file": "build-release/source-paint-bake/baked0.glb",
+        "old": "/home/blux/de-xr/dome-sculpt/artifacts/hdr-preserving-source-77fa37a/build-release/source-paint-bake/baked0.glb",
+        "equal": true,
+        "sha256": "db1b8171f5f67aaccfb4e98b87efdff9c47731495dd300d8c294c1d36a1d4f84"
+      },
+      {
+        "file": "build-release/source-paint-bake/baked1.glb",
+        "old": "/home/blux/de-xr/dome-sculpt/artifacts/hdr-preserving-source-77fa37a/build-release/source-paint-bake/baked1.glb",
+        "equal": true,
+        "sha256": "65d1144fa187ec78efb1af9d9232956dc0197ab53ba8a61cf5092c5e20a7e10d"
+      },
+      {
+        "file": "build-release/source-paint-bake/baked2.glb",
+        "old": "/home/blux/de-xr/dome-sculpt/artifacts/hdr-preserving-source-77fa37a/build-release/source-paint-bake/baked2.glb",
+        "equal": true,
+        "sha256": "9d272193221c2cca6d07a0ba1962d218af0b601fd7dff943f63382c827c70fab"
+      },
+      {
+        "file": "build-release/source-paint-bake/baked3.glb",
+        "old": "/home/blux/de-xr/dome-sculpt/artifacts/hdr-preserving-source-77fa37a/build-release/source-paint-bake/baked3.glb",
+        "equal": true,
+        "sha256": "c7d6bc026a1040f96e3c874781f07fe5a600aba45f26191ebf050051d7de54f5"
+      },
+      {
+        "file": "build-release/source-paint-bake/baked4.glb",
+        "old": "/home/blux/de-xr/dome-sculpt/artifacts/hdr-preserving-source-77fa37a/build-release/source-paint-bake/baked4.glb",
+        "equal": true,
+        "sha256": "70fa1849735f188b552b17e428db366a40763ce22d161f46228d419fa3768c48"
+      },
+      {
+        "file": "build-release/source-paint-bake/baked5.glb",
+        "old": "/home/blux/de-xr/dome-sculpt/artifacts/hdr-preserving-source-77fa37a/build-release/source-paint-bake/baked5.glb",
+        "equal": true,
+        "sha256": "bfbf5d96065b47546fe4e8fae65c53a333b005146737d964c38a436b70170275"
+      },
+      {
+        "file": "build-release/source-paint-bake/baked6.glb",
+        "old": "/home/blux/de-xr/dome-sculpt/artifacts/hdr-preserving-source-77fa37a/build-release/source-paint-bake/baked6.glb",
+        "equal": true,
+        "sha256": "0ec666cb297cc88eb657cda99838e2f9d5f9cb3fb52d73833a6110a3462f4d9d"
+      },
+      {
+        "file": "build-release/source-paint-bake/baked7.glb",
+        "old": "/home/blux/de-xr/dome-sculpt/artifacts/hdr-preserving-source-77fa37a/build-release/source-paint-bake/baked7.glb",
+        "equal": true,
+        "sha256": "804e7629e6ae5595c64c679fd27effa6656e81359064315c257fee409c8711c1"
+      },
+      {
+        "file": "build-release/source-paint-bake/case0.glb",
+        "old": "/home/blux/de-xr/dome-sculpt/artifacts/hdr-preserving-source-77fa37a/build-release/source-paint-bake/case0.glb",
+        "equal": true,
+        "sha256": "538d68c53372fa8bef88ed05a9d52d2488fab0510816ebcfd33c7534b9fa8c5a"
+      },
+      {
+        "file": "build-release/source-paint-bake/case1.glb",
+        "old": "/home/blux/de-xr/dome-sculpt/artifacts/hdr-preserving-source-77fa37a/build-release/source-paint-bake/case1.glb",
+        "equal": true,
+        "sha256": "f8ed337a8dabbded960d65440a61934462937c1c3736baaf44c408061bd9097c"
+      },
+      {
+        "file": "build-release/source-paint-bake/case2.glb",
+        "old": "/home/blux/de-xr/dome-sculpt/artifacts/hdr-preserving-source-77fa37a/build-release/source-paint-bake/case2.glb",
+        "equal": true,
+        "sha256": "0e42c382215736a049da88170f5d1af3715bdd4ad1ca307112bedd042fa85d97"
+      },
+      {
+        "file": "build-release/source-paint-bake/case3.glb",
+        "old": "/home/blux/de-xr/dome-sculpt/artifacts/hdr-preserving-source-77fa37a/build-release/source-paint-bake/case3.glb",
+        "equal": true,
+        "sha256": "afcea7c409cbf502ecdae1f1297d6ba1337514dfd8f022649f02519d0c88001a"
+      },
+      {
+        "file": "build-release/source-paint-bake/case4.glb",
+        "old": "/home/blux/de-xr/dome-sculpt/artifacts/hdr-preserving-source-77fa37a/build-release/source-paint-bake/case4.glb",
+        "equal": true,
+        "sha256": "06b9832715bbcd51ea70ebacf70429efeae5f5d15eea8e2f68a0d8eccdda7c55"
+      },
+      {
+        "file": "build-release/source-paint-bake/case5.glb",
+        "old": "/home/blux/de-xr/dome-sculpt/artifacts/hdr-preserving-source-77fa37a/build-release/source-paint-bake/case5.glb",
+        "equal": true,
+        "sha256": "c5ef788ec9d75d4ac553c9fade0144a7686f2c8de636c95801793d0594fffc13"
+      },
+      {
+        "file": "build-release/source-paint-bake/case6.glb",
+        "old": "/home/blux/de-xr/dome-sculpt/artifacts/hdr-preserving-source-77fa37a/build-release/source-paint-bake/case6.glb",
+        "equal": true,
+        "sha256": "2b407a16a07b4290249a3478148b2d8a976112330282d950815763f0feaaef0e"
+      },
+      {
+        "file": "build-release/source-paint-bake/case7.glb",
+        "old": "/home/blux/de-xr/dome-sculpt/artifacts/hdr-preserving-source-77fa37a/build-release/source-paint-bake/case7.glb",
+        "equal": true,
+        "sha256": "9599d0905c3b65ecd32c2c0b467aa771ae2b6424e4d102105ee520f5892913b2"
+      },
+      {
+        "file": "build-release/source-paint-bake/minification-input.glb",
+        "old": "/home/blux/de-xr/dome-sculpt/artifacts/hdr-preserving-source-77fa37a/build-release/source-paint-bake/minification-input.glb",
+        "equal": true,
+        "sha256": "a070661d5f7d33bf75190cbdeb6daaddd72a2014259c4b9096bb035cb3f6cf6b"
+      },
+      {
+        "file": "build-release/emission-export/physical.glb",
+        "old": "/home/blux/de-xr/dome-sculpt/artifacts/hdr-preserving-source-77fa37a/build-release/emission-export/physical.glb",
+        "equal": true,
+        "sha256": "85b4a26ce213ec550515686d5ac5b21295df9ef089758aabdae6a0c34b07b764"
+      },
+      {
+        "file": "build-release/emission-export/second-cycle.glb",
+        "old": "/home/blux/de-xr/dome-sculpt/artifacts/hdr-preserving-source-77fa37a/build-release/emission-export/second-cycle.glb",
+        "equal": true,
+        "sha256": "85b4a26ce213ec550515686d5ac5b21295df9ef089758aabdae6a0c34b07b764"
+      },
+      {
+        "file": "build-release/emission-export/subset.glb",
+        "old": "/home/blux/de-xr/dome-sculpt/artifacts/hdr-preserving-source-77fa37a/build-release/emission-export/subset.glb",
+        "equal": true,
+        "sha256": "46ec96696461fe95b30ee5140e1c46ac3f0612a7451477d9f732690b7d315f63"
+      }
+    ],
+    "scope": "actual matching current Release controls vs sealed8c legacy cohort"
+  },
+  "cross_profile_bytes": [
+    {
+      "release": "artifacts/native-physical-attached/runtime/outputs/cycle0.glb",
+      "sanitize": "build-sanitize/native-retained-physical/cycle0.glb",
+      "equal": true,
+      "release_sha256": "00e2cae410ab4a77a983e0019cc5d11527ca0115f2883cc958c2c9bb3eb8fa65",
+      "sanitize_sha256": "00e2cae410ab4a77a983e0019cc5d11527ca0115f2883cc958c2c9bb3eb8fa65"
+    },
+    {
+      "release": "artifacts/native-physical-attached/runtime/outputs/cycle1.glb",
+      "sanitize": "build-sanitize/native-retained-physical/cycle1.glb",
+      "equal": false,
+      "release_sha256": "3f2b70cf285b98fa27ea4d8a8b7c2191580018f00b15a1e5a4346433c1112949",
+      "sanitize_sha256": "ab6385f13c4d4483999cba03174c394fb9d4da20a0cb77543e8c6a6efda5c975"
+    },
+    {
+      "release": "artifacts/native-physical-attached/runtime/outputs/cycle2.glb",
+      "sanitize": "build-sanitize/native-retained-physical/cycle2.glb",
+      "equal": true,
+      "release_sha256": "d62b8639725a1a28a046618eb79660acff5d371bf6f99c5938ecd4fbd883c9b6",
+      "sanitize_sha256": "d62b8639725a1a28a046618eb79660acff5d371bf6f99c5938ecd4fbd883c9b6"
+    },
+    {
+      "release": "artifacts/native-physical-attached/runtime/outputs/cycle3.glb",
+      "sanitize": "build-sanitize/native-retained-physical/cycle3.glb",
+      "equal": true,
+      "release_sha256": "a4568f1970ec77ae65f0e6a907e651e68225244567a9f8222a0775669869dc2e",
+      "sanitize_sha256": "a4568f1970ec77ae65f0e6a907e651e68225244567a9f8222a0775669869dc2e"
+    },
+    {
+      "release": "artifacts/native-physical-attached/runtime/outputs/native0.glb",
+      "sanitize": "build-sanitize/native-retained-physical/native0.glb",
+      "equal": true,
+      "release_sha256": "00e2cae410ab4a77a983e0019cc5d11527ca0115f2883cc958c2c9bb3eb8fa65",
+      "sanitize_sha256": "00e2cae410ab4a77a983e0019cc5d11527ca0115f2883cc958c2c9bb3eb8fa65"
+    },
+    {
+      "release": "artifacts/native-physical-attached/runtime/outputs/native1.glb",
+      "sanitize": "build-sanitize/native-retained-physical/native1.glb",
+      "equal": false,
+      "release_sha256": "3f2b70cf285b98fa27ea4d8a8b7c2191580018f00b15a1e5a4346433c1112949",
+      "sanitize_sha256": "ab6385f13c4d4483999cba03174c394fb9d4da20a0cb77543e8c6a6efda5c975"
+    },
+    {
+      "release": "artifacts/native-physical-attached/runtime/outputs/native2.glb",
+      "sanitize": "build-sanitize/native-retained-physical/native2.glb",
+      "equal": true,
+      "release_sha256": "d62b8639725a1a28a046618eb79660acff5d371bf6f99c5938ecd4fbd883c9b6",
+      "sanitize_sha256": "d62b8639725a1a28a046618eb79660acff5d371bf6f99c5938ecd4fbd883c9b6"
+    },
+    {
+      "release": "artifacts/native-physical-attached/runtime/outputs/native3.glb",
+      "sanitize": "build-sanitize/native-retained-physical/native3.glb",
+      "equal": true,
+      "release_sha256": "a4568f1970ec77ae65f0e6a907e651e68225244567a9f8222a0775669869dc2e",
+      "sanitize_sha256": "a4568f1970ec77ae65f0e6a907e651e68225244567a9f8222a0775669869dc2e"
+    },
+    {
+      "release": "artifacts/native-physical-attached/runtime/outputs/worker-1024.glb",
+      "sanitize": "build-sanitize/native-retained-physical/worker-1024.glb",
+      "equal": true,
+      "release_sha256": "ee4f4e2f7c1fc61071ecca3df64edee28912690fa291268b3eeb9c5b08871422",
+      "sanitize_sha256": "ee4f4e2f7c1fc61071ecca3df64edee28912690fa291268b3eeb9c5b08871422"
+    },
+    {
+      "release": "artifacts/native-physical-attached/runtime/outputs/worker-256.glb",
+      "sanitize": "build-sanitize/native-retained-physical/worker-256.glb",
+      "equal": true,
+      "release_sha256": "0958513c5043d62996a1a18f2a8e752b172dede14c9c9e298f434a5d07627b5a",
+      "sanitize_sha256": "0958513c5043d62996a1a18f2a8e752b172dede14c9c9e298f434a5d07627b5a"
+    },
+    {
+      "release": "artifacts/native-physical-attached/runtime/outputs/worker-512.glb",
+      "sanitize": "build-sanitize/native-retained-physical/worker-512.glb",
+      "equal": true,
+      "release_sha256": "0fa9dbac731c995ba174a9d6c84db343ea2f07de82511667fc1f82193d217d58",
+      "sanitize_sha256": "0fa9dbac731c995ba174a9d6c84db343ea2f07de82511667fc1f82193d217d58"
+    },
+    {
+      "release": "artifacts/native-physical-attached/runtime/outputs/worker-cycle-1024.glb",
+      "sanitize": "build-sanitize/native-retained-physical/worker-cycle-1024.glb",
+      "equal": true,
+      "release_sha256": "ee4f4e2f7c1fc61071ecca3df64edee28912690fa291268b3eeb9c5b08871422",
+      "sanitize_sha256": "ee4f4e2f7c1fc61071ecca3df64edee28912690fa291268b3eeb9c5b08871422"
+    },
+    {
+      "release": "artifacts/native-physical-attached/runtime/outputs/worker-cycle-256.glb",
+      "sanitize": "build-sanitize/native-retained-physical/worker-cycle-256.glb",
+      "equal": true,
+      "release_sha256": "0958513c5043d62996a1a18f2a8e752b172dede14c9c9e298f434a5d07627b5a",
+      "sanitize_sha256": "0958513c5043d62996a1a18f2a8e752b172dede14c9c9e298f434a5d07627b5a"
+    },
+    {
+      "release": "artifacts/native-physical-attached/runtime/outputs/worker-cycle-512.glb",
+      "sanitize": "build-sanitize/native-retained-physical/worker-cycle-512.glb",
+      "equal": true,
+      "release_sha256": "0fa9dbac731c995ba174a9d6c84db343ea2f07de82511667fc1f82193d217d58",
+      "sanitize_sha256": "0fa9dbac731c995ba174a9d6c84db343ea2f07de82511667fc1f82193d217d58"
+    }
+  ],
+  "cross_profile_note": "12/14 exact; native1/cycle1 retain genuine PID-derived fixture source name dome-cut-color-source-<pid> in node0 and exact native payload. Each profile independently verifies recovered Scene equality and deterministic second-cycle bytes. No normalization or all-files byteidentity claim.",
+  "khronos": {
+    "release": {
+      "version": "2.0.0-dev.3.10",
+      "maxIssues": 0,
+      "issueFilters": [],
+      "files": [
+        {
+          "file": "/home/blux/de-xr/dome-sculpt/artifacts/hdr-native-retained-8c259da/artifacts/native-physical-attached/runtime/outputs/cycle0.glb",
+          "sha256": "00e2cae410ab4a77a983e0019cc5d11527ca0115f2883cc958c2c9bb3eb8fa65",
+          "numErrors": 0,
+          "numWarnings": 0,
+          "numInfos": 2,
+          "numHints": 0,
+          "messages": [
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/bufferViews/8"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/textures/2"
+            }
+          ],
+          "truncated": false
+        },
+        {
+          "file": "/home/blux/de-xr/dome-sculpt/artifacts/hdr-native-retained-8c259da/artifacts/native-physical-attached/runtime/outputs/cycle1.glb",
+          "sha256": "3f2b70cf285b98fa27ea4d8a8b7c2191580018f00b15a1e5a4346433c1112949",
+          "numErrors": 0,
+          "numWarnings": 1,
+          "numInfos": 3,
+          "numHints": 0,
+          "messages": [
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/meshes/0/primitives/0/attributes/TEXCOORD_0"
+            },
+            {
+              "code": "NODE_SKINNED_MESH_NON_ROOT",
+              "message": "Node with a skinned mesh is not root. Parent transforms will not affect a skinned mesh.",
+              "severity": 1,
+              "pointer": "/nodes/3"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/bufferViews/17"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/textures/2"
+            }
+          ],
+          "truncated": false
+        },
+        {
+          "file": "/home/blux/de-xr/dome-sculpt/artifacts/hdr-native-retained-8c259da/artifacts/native-physical-attached/runtime/outputs/cycle2.glb",
+          "sha256": "d62b8639725a1a28a046618eb79660acff5d371bf6f99c5938ecd4fbd883c9b6",
+          "numErrors": 0,
+          "numWarnings": 0,
+          "numInfos": 1,
+          "numHints": 0,
+          "messages": [
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/bufferViews/3"
+            }
+          ],
+          "truncated": false
+        },
+        {
+          "file": "/home/blux/de-xr/dome-sculpt/artifacts/hdr-native-retained-8c259da/artifacts/native-physical-attached/runtime/outputs/cycle3.glb",
+          "sha256": "a4568f1970ec77ae65f0e6a907e651e68225244567a9f8222a0775669869dc2e",
+          "numErrors": 0,
+          "numWarnings": 1,
+          "numInfos": 2,
+          "numHints": 0,
+          "messages": [
+            {
+              "code": "MULTIPLE_EXTENSIONS",
+              "message": "This extension may be incompatible with other extensions for the object.",
+              "severity": 1,
+              "pointer": "/materials/0/extensions/KHR_materials_unlit"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/bufferViews/8"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/textures/2"
+            }
+          ],
+          "truncated": false
+        },
+        {
+          "file": "/home/blux/de-xr/dome-sculpt/artifacts/hdr-native-retained-8c259da/artifacts/native-physical-attached/runtime/outputs/native0.glb",
+          "sha256": "00e2cae410ab4a77a983e0019cc5d11527ca0115f2883cc958c2c9bb3eb8fa65",
+          "numErrors": 0,
+          "numWarnings": 0,
+          "numInfos": 2,
+          "numHints": 0,
+          "messages": [
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/bufferViews/8"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/textures/2"
+            }
+          ],
+          "truncated": false
+        },
+        {
+          "file": "/home/blux/de-xr/dome-sculpt/artifacts/hdr-native-retained-8c259da/artifacts/native-physical-attached/runtime/outputs/native1.glb",
+          "sha256": "3f2b70cf285b98fa27ea4d8a8b7c2191580018f00b15a1e5a4346433c1112949",
+          "numErrors": 0,
+          "numWarnings": 1,
+          "numInfos": 3,
+          "numHints": 0,
+          "messages": [
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/meshes/0/primitives/0/attributes/TEXCOORD_0"
+            },
+            {
+              "code": "NODE_SKINNED_MESH_NON_ROOT",
+              "message": "Node with a skinned mesh is not root. Parent transforms will not affect a skinned mesh.",
+              "severity": 1,
+              "pointer": "/nodes/3"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/bufferViews/17"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/textures/2"
+            }
+          ],
+          "truncated": false
+        },
+        {
+          "file": "/home/blux/de-xr/dome-sculpt/artifacts/hdr-native-retained-8c259da/artifacts/native-physical-attached/runtime/outputs/native2.glb",
+          "sha256": "d62b8639725a1a28a046618eb79660acff5d371bf6f99c5938ecd4fbd883c9b6",
+          "numErrors": 0,
+          "numWarnings": 0,
+          "numInfos": 1,
+          "numHints": 0,
+          "messages": [
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/bufferViews/3"
+            }
+          ],
+          "truncated": false
+        },
+        {
+          "file": "/home/blux/de-xr/dome-sculpt/artifacts/hdr-native-retained-8c259da/artifacts/native-physical-attached/runtime/outputs/native3.glb",
+          "sha256": "a4568f1970ec77ae65f0e6a907e651e68225244567a9f8222a0775669869dc2e",
+          "numErrors": 0,
+          "numWarnings": 1,
+          "numInfos": 2,
+          "numHints": 0,
+          "messages": [
+            {
+              "code": "MULTIPLE_EXTENSIONS",
+              "message": "This extension may be incompatible with other extensions for the object.",
+              "severity": 1,
+              "pointer": "/materials/0/extensions/KHR_materials_unlit"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/bufferViews/8"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/textures/2"
+            }
+          ],
+          "truncated": false
+        },
+        {
+          "file": "/home/blux/de-xr/dome-sculpt/artifacts/hdr-native-retained-8c259da/artifacts/native-physical-attached/runtime/outputs/worker-1024.glb",
+          "sha256": "ee4f4e2f7c1fc61071ecca3df64edee28912690fa291268b3eeb9c5b08871422",
+          "numErrors": 0,
+          "numWarnings": 0,
+          "numInfos": 2,
+          "numHints": 0,
+          "messages": [
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/bufferViews/8"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/textures/2"
+            }
+          ],
+          "truncated": false
+        },
+        {
+          "file": "/home/blux/de-xr/dome-sculpt/artifacts/hdr-native-retained-8c259da/artifacts/native-physical-attached/runtime/outputs/worker-256.glb",
+          "sha256": "0958513c5043d62996a1a18f2a8e752b172dede14c9c9e298f434a5d07627b5a",
+          "numErrors": 0,
+          "numWarnings": 0,
+          "numInfos": 2,
+          "numHints": 0,
+          "messages": [
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/bufferViews/8"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/textures/2"
+            }
+          ],
+          "truncated": false
+        },
+        {
+          "file": "/home/blux/de-xr/dome-sculpt/artifacts/hdr-native-retained-8c259da/artifacts/native-physical-attached/runtime/outputs/worker-512.glb",
+          "sha256": "0fa9dbac731c995ba174a9d6c84db343ea2f07de82511667fc1f82193d217d58",
+          "numErrors": 0,
+          "numWarnings": 0,
+          "numInfos": 2,
+          "numHints": 0,
+          "messages": [
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/bufferViews/8"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/textures/2"
+            }
+          ],
+          "truncated": false
+        },
+        {
+          "file": "/home/blux/de-xr/dome-sculpt/artifacts/hdr-native-retained-8c259da/artifacts/native-physical-attached/runtime/outputs/worker-cycle-1024.glb",
+          "sha256": "ee4f4e2f7c1fc61071ecca3df64edee28912690fa291268b3eeb9c5b08871422",
+          "numErrors": 0,
+          "numWarnings": 0,
+          "numInfos": 2,
+          "numHints": 0,
+          "messages": [
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/bufferViews/8"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/textures/2"
+            }
+          ],
+          "truncated": false
+        },
+        {
+          "file": "/home/blux/de-xr/dome-sculpt/artifacts/hdr-native-retained-8c259da/artifacts/native-physical-attached/runtime/outputs/worker-cycle-256.glb",
+          "sha256": "0958513c5043d62996a1a18f2a8e752b172dede14c9c9e298f434a5d07627b5a",
+          "numErrors": 0,
+          "numWarnings": 0,
+          "numInfos": 2,
+          "numHints": 0,
+          "messages": [
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/bufferViews/8"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/textures/2"
+            }
+          ],
+          "truncated": false
+        },
+        {
+          "file": "/home/blux/de-xr/dome-sculpt/artifacts/hdr-native-retained-8c259da/artifacts/native-physical-attached/runtime/outputs/worker-cycle-512.glb",
+          "sha256": "0fa9dbac731c995ba174a9d6c84db343ea2f07de82511667fc1f82193d217d58",
+          "numErrors": 0,
+          "numWarnings": 0,
+          "numInfos": 2,
+          "numHints": 0,
+          "messages": [
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/bufferViews/8"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/textures/2"
+            }
+          ],
+          "truncated": false
+        }
+      ],
+      "errors": 0,
+      "warnings": 4
+    },
+    "sanitize": {
+      "version": "2.0.0-dev.3.10",
+      "maxIssues": 0,
+      "issueFilters": [],
+      "files": [
+        {
+          "file": "/home/blux/de-xr/dome-sculpt/artifacts/hdr-native-retained-8c259da/build-sanitize/native-retained-physical/cycle0.glb",
+          "sha256": "00e2cae410ab4a77a983e0019cc5d11527ca0115f2883cc958c2c9bb3eb8fa65",
+          "numErrors": 0,
+          "numWarnings": 0,
+          "numInfos": 2,
+          "numHints": 0,
+          "messages": [
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/bufferViews/8"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/textures/2"
+            }
+          ],
+          "truncated": false
+        },
+        {
+          "file": "/home/blux/de-xr/dome-sculpt/artifacts/hdr-native-retained-8c259da/build-sanitize/native-retained-physical/cycle1.glb",
+          "sha256": "ab6385f13c4d4483999cba03174c394fb9d4da20a0cb77543e8c6a6efda5c975",
+          "numErrors": 0,
+          "numWarnings": 1,
+          "numInfos": 3,
+          "numHints": 0,
+          "messages": [
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/meshes/0/primitives/0/attributes/TEXCOORD_0"
+            },
+            {
+              "code": "NODE_SKINNED_MESH_NON_ROOT",
+              "message": "Node with a skinned mesh is not root. Parent transforms will not affect a skinned mesh.",
+              "severity": 1,
+              "pointer": "/nodes/3"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/bufferViews/17"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/textures/2"
+            }
+          ],
+          "truncated": false
+        },
+        {
+          "file": "/home/blux/de-xr/dome-sculpt/artifacts/hdr-native-retained-8c259da/build-sanitize/native-retained-physical/cycle2.glb",
+          "sha256": "d62b8639725a1a28a046618eb79660acff5d371bf6f99c5938ecd4fbd883c9b6",
+          "numErrors": 0,
+          "numWarnings": 0,
+          "numInfos": 1,
+          "numHints": 0,
+          "messages": [
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/bufferViews/3"
+            }
+          ],
+          "truncated": false
+        },
+        {
+          "file": "/home/blux/de-xr/dome-sculpt/artifacts/hdr-native-retained-8c259da/build-sanitize/native-retained-physical/cycle3.glb",
+          "sha256": "a4568f1970ec77ae65f0e6a907e651e68225244567a9f8222a0775669869dc2e",
+          "numErrors": 0,
+          "numWarnings": 1,
+          "numInfos": 2,
+          "numHints": 0,
+          "messages": [
+            {
+              "code": "MULTIPLE_EXTENSIONS",
+              "message": "This extension may be incompatible with other extensions for the object.",
+              "severity": 1,
+              "pointer": "/materials/0/extensions/KHR_materials_unlit"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/bufferViews/8"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/textures/2"
+            }
+          ],
+          "truncated": false
+        },
+        {
+          "file": "/home/blux/de-xr/dome-sculpt/artifacts/hdr-native-retained-8c259da/build-sanitize/native-retained-physical/native0.glb",
+          "sha256": "00e2cae410ab4a77a983e0019cc5d11527ca0115f2883cc958c2c9bb3eb8fa65",
+          "numErrors": 0,
+          "numWarnings": 0,
+          "numInfos": 2,
+          "numHints": 0,
+          "messages": [
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/bufferViews/8"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/textures/2"
+            }
+          ],
+          "truncated": false
+        },
+        {
+          "file": "/home/blux/de-xr/dome-sculpt/artifacts/hdr-native-retained-8c259da/build-sanitize/native-retained-physical/native1.glb",
+          "sha256": "ab6385f13c4d4483999cba03174c394fb9d4da20a0cb77543e8c6a6efda5c975",
+          "numErrors": 0,
+          "numWarnings": 1,
+          "numInfos": 3,
+          "numHints": 0,
+          "messages": [
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/meshes/0/primitives/0/attributes/TEXCOORD_0"
+            },
+            {
+              "code": "NODE_SKINNED_MESH_NON_ROOT",
+              "message": "Node with a skinned mesh is not root. Parent transforms will not affect a skinned mesh.",
+              "severity": 1,
+              "pointer": "/nodes/3"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/bufferViews/17"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/textures/2"
+            }
+          ],
+          "truncated": false
+        },
+        {
+          "file": "/home/blux/de-xr/dome-sculpt/artifacts/hdr-native-retained-8c259da/build-sanitize/native-retained-physical/native2.glb",
+          "sha256": "d62b8639725a1a28a046618eb79660acff5d371bf6f99c5938ecd4fbd883c9b6",
+          "numErrors": 0,
+          "numWarnings": 0,
+          "numInfos": 1,
+          "numHints": 0,
+          "messages": [
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/bufferViews/3"
+            }
+          ],
+          "truncated": false
+        },
+        {
+          "file": "/home/blux/de-xr/dome-sculpt/artifacts/hdr-native-retained-8c259da/build-sanitize/native-retained-physical/native3.glb",
+          "sha256": "a4568f1970ec77ae65f0e6a907e651e68225244567a9f8222a0775669869dc2e",
+          "numErrors": 0,
+          "numWarnings": 1,
+          "numInfos": 2,
+          "numHints": 0,
+          "messages": [
+            {
+              "code": "MULTIPLE_EXTENSIONS",
+              "message": "This extension may be incompatible with other extensions for the object.",
+              "severity": 1,
+              "pointer": "/materials/0/extensions/KHR_materials_unlit"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/bufferViews/8"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/textures/2"
+            }
+          ],
+          "truncated": false
+        },
+        {
+          "file": "/home/blux/de-xr/dome-sculpt/artifacts/hdr-native-retained-8c259da/build-sanitize/native-retained-physical/worker-1024.glb",
+          "sha256": "ee4f4e2f7c1fc61071ecca3df64edee28912690fa291268b3eeb9c5b08871422",
+          "numErrors": 0,
+          "numWarnings": 0,
+          "numInfos": 2,
+          "numHints": 0,
+          "messages": [
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/bufferViews/8"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/textures/2"
+            }
+          ],
+          "truncated": false
+        },
+        {
+          "file": "/home/blux/de-xr/dome-sculpt/artifacts/hdr-native-retained-8c259da/build-sanitize/native-retained-physical/worker-256.glb",
+          "sha256": "0958513c5043d62996a1a18f2a8e752b172dede14c9c9e298f434a5d07627b5a",
+          "numErrors": 0,
+          "numWarnings": 0,
+          "numInfos": 2,
+          "numHints": 0,
+          "messages": [
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/bufferViews/8"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/textures/2"
+            }
+          ],
+          "truncated": false
+        },
+        {
+          "file": "/home/blux/de-xr/dome-sculpt/artifacts/hdr-native-retained-8c259da/build-sanitize/native-retained-physical/worker-512.glb",
+          "sha256": "0fa9dbac731c995ba174a9d6c84db343ea2f07de82511667fc1f82193d217d58",
+          "numErrors": 0,
+          "numWarnings": 0,
+          "numInfos": 2,
+          "numHints": 0,
+          "messages": [
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/bufferViews/8"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/textures/2"
+            }
+          ],
+          "truncated": false
+        },
+        {
+          "file": "/home/blux/de-xr/dome-sculpt/artifacts/hdr-native-retained-8c259da/build-sanitize/native-retained-physical/worker-cycle-1024.glb",
+          "sha256": "ee4f4e2f7c1fc61071ecca3df64edee28912690fa291268b3eeb9c5b08871422",
+          "numErrors": 0,
+          "numWarnings": 0,
+          "numInfos": 2,
+          "numHints": 0,
+          "messages": [
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/bufferViews/8"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/textures/2"
+            }
+          ],
+          "truncated": false
+        },
+        {
+          "file": "/home/blux/de-xr/dome-sculpt/artifacts/hdr-native-retained-8c259da/build-sanitize/native-retained-physical/worker-cycle-256.glb",
+          "sha256": "0958513c5043d62996a1a18f2a8e752b172dede14c9c9e298f434a5d07627b5a",
+          "numErrors": 0,
+          "numWarnings": 0,
+          "numInfos": 2,
+          "numHints": 0,
+          "messages": [
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/bufferViews/8"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/textures/2"
+            }
+          ],
+          "truncated": false
+        },
+        {
+          "file": "/home/blux/de-xr/dome-sculpt/artifacts/hdr-native-retained-8c259da/build-sanitize/native-retained-physical/worker-cycle-512.glb",
+          "sha256": "0fa9dbac731c995ba174a9d6c84db343ea2f07de82511667fc1f82193d217d58",
+          "numErrors": 0,
+          "numWarnings": 0,
+          "numInfos": 2,
+          "numHints": 0,
+          "messages": [
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/bufferViews/8"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/textures/2"
+            }
+          ],
+          "truncated": false
+        }
+      ],
+      "errors": 0,
+      "warnings": 4
+    },
+    "arc": {
+      "version": "2.0.0-dev.3.10",
+      "maxIssues": 0,
+      "issueFilters": [],
+      "files": [
+        {
+          "file": "/home/blux/de-xr/dome-sculpt/artifacts/hdr-native-retained-8c259da/artifacts/native-physical-arc/actual-a770/cycle0.glb",
+          "sha256": "00e2cae410ab4a77a983e0019cc5d11527ca0115f2883cc958c2c9bb3eb8fa65",
+          "numErrors": 0,
+          "numWarnings": 0,
+          "numInfos": 2,
+          "numHints": 0,
+          "messages": [
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/bufferViews/8"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/textures/2"
+            }
+          ],
+          "truncated": false
+        },
+        {
+          "file": "/home/blux/de-xr/dome-sculpt/artifacts/hdr-native-retained-8c259da/artifacts/native-physical-arc/actual-a770/cycle1.glb",
+          "sha256": "2c96795bfbb3431e0977d8a114003ae553b9a4ec269ddb4244dd88b279cb9ba2",
+          "numErrors": 0,
+          "numWarnings": 1,
+          "numInfos": 3,
+          "numHints": 0,
+          "messages": [
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/meshes/0/primitives/0/attributes/TEXCOORD_0"
+            },
+            {
+              "code": "NODE_SKINNED_MESH_NON_ROOT",
+              "message": "Node with a skinned mesh is not root. Parent transforms will not affect a skinned mesh.",
+              "severity": 1,
+              "pointer": "/nodes/3"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/bufferViews/17"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/textures/2"
+            }
+          ],
+          "truncated": false
+        },
+        {
+          "file": "/home/blux/de-xr/dome-sculpt/artifacts/hdr-native-retained-8c259da/artifacts/native-physical-arc/actual-a770/cycle2.glb",
+          "sha256": "d62b8639725a1a28a046618eb79660acff5d371bf6f99c5938ecd4fbd883c9b6",
+          "numErrors": 0,
+          "numWarnings": 0,
+          "numInfos": 1,
+          "numHints": 0,
+          "messages": [
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/bufferViews/3"
+            }
+          ],
+          "truncated": false
+        },
+        {
+          "file": "/home/blux/de-xr/dome-sculpt/artifacts/hdr-native-retained-8c259da/artifacts/native-physical-arc/actual-a770/cycle3.glb",
+          "sha256": "a4568f1970ec77ae65f0e6a907e651e68225244567a9f8222a0775669869dc2e",
+          "numErrors": 0,
+          "numWarnings": 1,
+          "numInfos": 2,
+          "numHints": 0,
+          "messages": [
+            {
+              "code": "MULTIPLE_EXTENSIONS",
+              "message": "This extension may be incompatible with other extensions for the object.",
+              "severity": 1,
+              "pointer": "/materials/0/extensions/KHR_materials_unlit"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/bufferViews/8"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/textures/2"
+            }
+          ],
+          "truncated": false
+        },
+        {
+          "file": "/home/blux/de-xr/dome-sculpt/artifacts/hdr-native-retained-8c259da/artifacts/native-physical-arc/actual-a770/native0.glb",
+          "sha256": "00e2cae410ab4a77a983e0019cc5d11527ca0115f2883cc958c2c9bb3eb8fa65",
+          "numErrors": 0,
+          "numWarnings": 0,
+          "numInfos": 2,
+          "numHints": 0,
+          "messages": [
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/bufferViews/8"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/textures/2"
+            }
+          ],
+          "truncated": false
+        },
+        {
+          "file": "/home/blux/de-xr/dome-sculpt/artifacts/hdr-native-retained-8c259da/artifacts/native-physical-arc/actual-a770/native1.glb",
+          "sha256": "2c96795bfbb3431e0977d8a114003ae553b9a4ec269ddb4244dd88b279cb9ba2",
+          "numErrors": 0,
+          "numWarnings": 1,
+          "numInfos": 3,
+          "numHints": 0,
+          "messages": [
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/meshes/0/primitives/0/attributes/TEXCOORD_0"
+            },
+            {
+              "code": "NODE_SKINNED_MESH_NON_ROOT",
+              "message": "Node with a skinned mesh is not root. Parent transforms will not affect a skinned mesh.",
+              "severity": 1,
+              "pointer": "/nodes/3"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/bufferViews/17"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/textures/2"
+            }
+          ],
+          "truncated": false
+        },
+        {
+          "file": "/home/blux/de-xr/dome-sculpt/artifacts/hdr-native-retained-8c259da/artifacts/native-physical-arc/actual-a770/native2.glb",
+          "sha256": "d62b8639725a1a28a046618eb79660acff5d371bf6f99c5938ecd4fbd883c9b6",
+          "numErrors": 0,
+          "numWarnings": 0,
+          "numInfos": 1,
+          "numHints": 0,
+          "messages": [
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/bufferViews/3"
+            }
+          ],
+          "truncated": false
+        },
+        {
+          "file": "/home/blux/de-xr/dome-sculpt/artifacts/hdr-native-retained-8c259da/artifacts/native-physical-arc/actual-a770/native3.glb",
+          "sha256": "a4568f1970ec77ae65f0e6a907e651e68225244567a9f8222a0775669869dc2e",
+          "numErrors": 0,
+          "numWarnings": 1,
+          "numInfos": 2,
+          "numHints": 0,
+          "messages": [
+            {
+              "code": "MULTIPLE_EXTENSIONS",
+              "message": "This extension may be incompatible with other extensions for the object.",
+              "severity": 1,
+              "pointer": "/materials/0/extensions/KHR_materials_unlit"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/bufferViews/8"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/textures/2"
+            }
+          ],
+          "truncated": false
+        },
+        {
+          "file": "/home/blux/de-xr/dome-sculpt/artifacts/hdr-native-retained-8c259da/artifacts/native-physical-arc/actual-a770/worker-1024.glb",
+          "sha256": "ee4f4e2f7c1fc61071ecca3df64edee28912690fa291268b3eeb9c5b08871422",
+          "numErrors": 0,
+          "numWarnings": 0,
+          "numInfos": 2,
+          "numHints": 0,
+          "messages": [
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/bufferViews/8"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/textures/2"
+            }
+          ],
+          "truncated": false
+        },
+        {
+          "file": "/home/blux/de-xr/dome-sculpt/artifacts/hdr-native-retained-8c259da/artifacts/native-physical-arc/actual-a770/worker-256.glb",
+          "sha256": "0958513c5043d62996a1a18f2a8e752b172dede14c9c9e298f434a5d07627b5a",
+          "numErrors": 0,
+          "numWarnings": 0,
+          "numInfos": 2,
+          "numHints": 0,
+          "messages": [
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/bufferViews/8"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/textures/2"
+            }
+          ],
+          "truncated": false
+        },
+        {
+          "file": "/home/blux/de-xr/dome-sculpt/artifacts/hdr-native-retained-8c259da/artifacts/native-physical-arc/actual-a770/worker-512.glb",
+          "sha256": "0fa9dbac731c995ba174a9d6c84db343ea2f07de82511667fc1f82193d217d58",
+          "numErrors": 0,
+          "numWarnings": 0,
+          "numInfos": 2,
+          "numHints": 0,
+          "messages": [
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/bufferViews/8"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/textures/2"
+            }
+          ],
+          "truncated": false
+        },
+        {
+          "file": "/home/blux/de-xr/dome-sculpt/artifacts/hdr-native-retained-8c259da/artifacts/native-physical-arc/actual-a770/worker-cycle-1024.glb",
+          "sha256": "ee4f4e2f7c1fc61071ecca3df64edee28912690fa291268b3eeb9c5b08871422",
+          "numErrors": 0,
+          "numWarnings": 0,
+          "numInfos": 2,
+          "numHints": 0,
+          "messages": [
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/bufferViews/8"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/textures/2"
+            }
+          ],
+          "truncated": false
+        },
+        {
+          "file": "/home/blux/de-xr/dome-sculpt/artifacts/hdr-native-retained-8c259da/artifacts/native-physical-arc/actual-a770/worker-cycle-256.glb",
+          "sha256": "0958513c5043d62996a1a18f2a8e752b172dede14c9c9e298f434a5d07627b5a",
+          "numErrors": 0,
+          "numWarnings": 0,
+          "numInfos": 2,
+          "numHints": 0,
+          "messages": [
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/bufferViews/8"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/textures/2"
+            }
+          ],
+          "truncated": false
+        },
+        {
+          "file": "/home/blux/de-xr/dome-sculpt/artifacts/hdr-native-retained-8c259da/artifacts/native-physical-arc/actual-a770/worker-cycle-512.glb",
+          "sha256": "0fa9dbac731c995ba174a9d6c84db343ea2f07de82511667fc1f82193d217d58",
+          "numErrors": 0,
+          "numWarnings": 0,
+          "numInfos": 2,
+          "numHints": 0,
+          "messages": [
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/bufferViews/8"
+            },
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/textures/2"
+            }
+          ],
+          "truncated": false
+        }
+      ],
+      "errors": 0,
+      "warnings": 4
+    }
+  },
+  "old_negatives": [
+    "artifacts/native-physical-baseline-r2/status.json: genuine old generic native field capture refusal",
+    "artifacts/native-preview-counterfactual/status.json: immutable61 Document ready0 physical compositor refusal",
+    "artifacts/native-physical-draft/runtime/status.json: mask brush missed actual retained cube face",
+    "artifacts/native-physical-face-control/runtime/status.json: empty test SDF geometry",
+    "artifacts/native-physical-preview-r2/runtime/status.json: independent consumer incorrectly required an unused tangent accessor"
+  ],
+  "remaining": [
+    "Native normal/compact GUI and actual controller gesture qualification for new native-only/retained domains",
+    "Persistent allocation denial/queued worker Cancel and broader native sampler/mixed/pose/alpha probes",
+    "Real physical-before-UV transport, typed native float MToon and retained original-emission image adapters",
+    "General refinement/interoperability and coherent main integration; later spatial drawers remain required"
+  ],
+  "no_install_or_physical_session_change": true
+}

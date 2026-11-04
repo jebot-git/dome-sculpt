@@ -392,6 +392,7 @@ void independent(const Scene &scene, const std::filesystem::path &output) {
         "Output preserves actual VRM1 version without legacy relabel");
 }
 } // namespace
+#ifndef DOME_VRM1_SOURCE_EXPORT_NO_MAIN
 int main(int argc, char **argv) try {
   if (argc < 3)
     return 2;
@@ -806,3 +807,5 @@ int main(int argc, char **argv) try {
   std::cerr << "FAIL " << e.what() << '\n';
   return 1;
 }
+
+#endif // DOME_VRM1_SOURCE_EXPORT_NO_MAIN

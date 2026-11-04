@@ -1,0 +1,296 @@
+{
+  "recorded_utc": "2026-11-04T18:10:05.082707+00:00",
+  "source": "56246561ec85675954577e8fb51a3d20f3e96f5e",
+  "scope": "Read-only real native Document Clear Bake and partial rebake counterexamples against converted Scene31; no product change or positive admission.",
+  "unchanged_maximum_channel_error": 4,
+  "observed_clear_errors": [
+    7,
+    74
+  ],
+  "observed_partial_same_direction_rebake_error": 7,
+  "historical_inputs": {
+    "/home/blux/de-xr/dome-sculpt/artifacts/native-canonical-uv-d5/artifacts/uv-proof/release/outputs/original-0.dsculpt": {
+      "sha256": "ea42f974f9dc16de200f5d4bcee371ea861bed5c8124c483627a06c98a5ce3f0",
+      "matches_sealed_owning_receipt": true
+    },
+    "/home/blux/de-xr/dome-sculpt/artifacts/native-canonical-uv-d5/artifacts/uv-proof/release/outputs/converted-0.dsculpt": {
+      "sha256": "584041284f3d611b1da87fec9d894bd403e7a88422f918bc7b43c8f2e618f676",
+      "matches_sealed_owning_receipt": true
+    },
+    "/home/blux/de-xr/dome-sculpt/artifacts/native-canonical-uv-d5/artifacts/uv-proof/release/outputs/original-7.dsculpt": {
+      "sha256": "9690db9603ae5fce91f9b35f67b4a83d1c2fcffc4847ffea32b2d3201cd67d86",
+      "matches_sealed_owning_receipt": true
+    },
+    "/home/blux/de-xr/dome-sculpt/artifacts/native-canonical-uv-d5/artifacts/uv-proof/release/outputs/converted-7.dsculpt": {
+      "sha256": "4d76737188b1ca5111dc8e2b5e3e5c126374e87a0282187251fc8ade765bb6e6",
+      "matches_sealed_owning_receipt": true
+    }
+  },
+  "runs": [
+    {
+      "phase": "clear-proof",
+      "status": {
+        "state": "terminal",
+        "pid": 3991299,
+        "source": "6230d9b224eaba7d7c18836f92e1492b5864d10b",
+        "profile": "release",
+        "scope": "Complete changed material-bindings TU plus complete owning/render consumers and actual application relink over frozen fresh1b5 own matching-profile cohort; no layout change, not fresh whole build/full619/device/main admission. Read-only audit: actual Clear Bake on original and converted native Scenes, actual shader image equivalence. Positive is unproven until endpoint; original data bytes retained. Original first gate failure retained.",
+        "steps": [
+          {
+            "name": "compile-clear-probe",
+            "command": [
+              "/usr/bin/c++",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/canonical-clear-audit-7805/third_party/desktop",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/canonical-clear-audit-7805/third_party/cgltf",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/canonical-clear-audit-7805/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/canonical-clear-audit-7805/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/canonical-clear-audit-7805/third_party/nlohmann",
+              "-isystem",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/harfbuzz",
+              "-isystem",
+              "/usr/include/glib-2.0",
+              "-isystem",
+              "/usr/lib64/glib-2.0/include",
+              "-isystem",
+              "/usr/include/sysprof-6",
+              "-isystem",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/freetype2",
+              "-isystem",
+              "/usr/include/libpng16",
+              "-isystem",
+              "/usr/include/libxml2",
+              "-O3",
+              "-DNDEBUG",
+              "-std=gnu++20",
+              "-pthread",
+              "-DWITH_GZFILEOP",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-clear-audit-7805/artifacts/clear-proof/release/clear-probe.cpp.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-clear-audit-7805/tests/canonical-clear-probe.cpp"
+            ],
+            "exit_code": 0,
+            "seconds": 9.523977277975064
+          },
+          {
+            "name": "link-dome-sculpt-canonical-normal-owning-render-test",
+            "command": [
+              "/usr/bin/c++",
+              "-O3",
+              "-DNDEBUG",
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-clear-audit-7805/artifacts/clear-proof/release/clear-probe.cpp.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-clear-audit-7805/artifacts/clear-proof/release/dome-sculpt-canonical-normal-owning-render-test",
+              "-Wl,-rpath,/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib",
+              "libdome-sculpt-render.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-clear-audit-7805/artifacts/clear-proof/release/libdome-sculpt-core.a",
+              "libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "libdome-sculpt-polygon.a",
+              "libxatlas.a",
+              "libmikktspace.a",
+              "libmikktspace-robust.a",
+              "libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libharfbuzz.so",
+              "/usr/lib64/libEGL.so",
+              "/usr/lib64/libGL.so",
+              "/usr/lib64/libfontconfig.so",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libfreetype.so",
+              "/usr/lib64/libicui18n.so",
+              "/usr/lib64/libicuuc.so",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit_code": 0,
+            "seconds": 0.34552727796835825
+          },
+          {
+            "name": "clear-equivalence",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-clear-audit-7805/artifacts/clear-proof/release/dome-sculpt-canonical-normal-owning-render-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native-canonical-uv-d5/artifacts/uv-proof/release/outputs",
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-clear-audit-7805/artifacts/clear-proof/release/outputs"
+            ],
+            "exit_code": 1,
+            "seconds": 7.085246904985979
+          }
+        ],
+        "phase": "clear-equivalence",
+        "child_pid": 3992274,
+        "error": "clear-equivalence failed 1",
+        "exit_code": 1,
+        "seconds": 17.033584799966775,
+        "inputs": 2296,
+        "drift": [],
+        "artifacts": {
+          "/home/blux/de-xr/dome-sculpt/artifacts/canonical-clear-audit-7805/artifacts/clear-proof/release/libdome-sculpt-core.a": "0c450d60bbce523f6c8a2f15dda5831c2b79d1041ea389c19c058bdd6611f5d8",
+          "/home/blux/de-xr/dome-sculpt/artifacts/canonical-clear-audit-7805/artifacts/clear-proof/release/dome-sculpt-canonical-normal-owning-render-test": "240bac6f8a09bb62efa6aab7930e2c0418b28031ac6a6efc961b7c5509b0caa7"
+        }
+      },
+      "logs": {
+        "artifacts/clear-proof/release/compile-clear-probe.log": {
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "text": ""
+        },
+        "artifacts/clear-proof/release/link-dome-sculpt-canonical-normal-owning-render-test.log": {
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "text": ""
+        },
+        "artifacts/clear-proof/release/clear-equivalence.log": {
+          "sha256": "5021ea688969af45b8944b69d11de0f43f48c0772448ebed9d4d0dd627abf4e8",
+          "text": "Native XR graphics: windowless EGL 1.5\nCLEAR variant=0 raw_has_bake=0 converted_has_bake=0 raw_projection=0 converted_projection=1 pixel_error=7\nCLEAR variant=7 raw_has_bake=0 converted_has_bake=0 raw_projection=0 converted_projection=1 pixel_error=74\nFAIL Clearing Bake before or after explicit conversion removes the same historical detail under the unchanged image bound\n"
+        }
+      },
+      "images": {
+        "artifacts/clear-proof/release/outputs/raw-clear-0.png": "bcb366b802e663e5fffcc5e72673442879f1c946f399f4f434d3e263e8c2a3b5",
+        "artifacts/clear-proof/release/outputs/converted-clear-0.png": "4952ede90dc5458969907cb2907191415ab83adbf3b6992cabcc34265fb78776",
+        "artifacts/clear-proof/release/outputs/raw-clear-7.png": "4103aa6f55534121710ea5ad1768e54b9858af612dd36c687ea6a24246a97c82",
+        "artifacts/clear-proof/release/outputs/converted-clear-7.png": "3c5ed327b1a4a6cdd6dbec82fe373ee75fb4bf6ee2e0db86ca33c3e34c317860"
+      }
+    },
+    {
+      "phase": "rebake-proof",
+      "status": {
+        "state": "terminal",
+        "pid": 102939,
+        "source": "56246561ec85675954577e8fb51a3d20f3e96f5e",
+        "profile": "release",
+        "scope": "Complete changed material-bindings TU plus complete owning/render consumers and actual application relink over frozen fresh1b5 own matching-profile cohort; no layout change, not fresh whole build/full619/device/main admission. Read-only audit: actual Clear Bake on original and converted native Scenes, actual shader image equivalence. Positive is unproven until endpoint; original data bytes retained. Original first gate failure retained.",
+        "steps": [
+          {
+            "name": "compile-clear-probe",
+            "command": [
+              "/usr/bin/c++",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/canonical-clear-audit-7805/third_party/desktop",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/canonical-clear-audit-7805/third_party/cgltf",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/canonical-clear-audit-7805/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/canonical-clear-audit-7805/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/canonical-clear-audit-7805/third_party/nlohmann",
+              "-isystem",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/harfbuzz",
+              "-isystem",
+              "/usr/include/glib-2.0",
+              "-isystem",
+              "/usr/lib64/glib-2.0/include",
+              "-isystem",
+              "/usr/include/sysprof-6",
+              "-isystem",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/freetype2",
+              "-isystem",
+              "/usr/include/libpng16",
+              "-isystem",
+              "/usr/include/libxml2",
+              "-O3",
+              "-DNDEBUG",
+              "-std=gnu++20",
+              "-pthread",
+              "-DWITH_GZFILEOP",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-clear-audit-7805/artifacts/rebake-proof/release/clear-probe.cpp.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-clear-audit-7805/tests/canonical-clear-probe.cpp"
+            ],
+            "exit_code": 0,
+            "seconds": 7.879500717972405
+          },
+          {
+            "name": "link-dome-sculpt-canonical-normal-owning-render-test",
+            "command": [
+              "/usr/bin/c++",
+              "-O3",
+              "-DNDEBUG",
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-clear-audit-7805/artifacts/rebake-proof/release/clear-probe.cpp.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-clear-audit-7805/artifacts/rebake-proof/release/dome-sculpt-canonical-normal-owning-render-test",
+              "-Wl,-rpath,/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib",
+              "libdome-sculpt-render.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-clear-audit-7805/artifacts/rebake-proof/release/libdome-sculpt-core.a",
+              "libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "libdome-sculpt-polygon.a",
+              "libxatlas.a",
+              "libmikktspace.a",
+              "libmikktspace-robust.a",
+              "libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libharfbuzz.so",
+              "/usr/lib64/libEGL.so",
+              "/usr/lib64/libGL.so",
+              "/usr/lib64/libfontconfig.so",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libfreetype.so",
+              "/usr/lib64/libicui18n.so",
+              "/usr/lib64/libicuuc.so",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit_code": 0,
+            "seconds": 0.2936207840102725
+          },
+          {
+            "name": "clear-equivalence",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-clear-audit-7805/artifacts/rebake-proof/release/dome-sculpt-canonical-normal-owning-render-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native-canonical-uv-d5/artifacts/uv-proof/release/outputs",
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-clear-audit-7805/artifacts/rebake-proof/release/outputs"
+            ],
+            "exit_code": 1,
+            "seconds": 6.605352746031713
+          }
+        ],
+        "phase": "clear-equivalence",
+        "child_pid": 103896,
+        "error": "clear-equivalence failed 1",
+        "exit_code": 1,
+        "seconds": 14.839375779032707,
+        "inputs": 2296,
+        "drift": [],
+        "artifacts": {
+          "/home/blux/de-xr/dome-sculpt/artifacts/canonical-clear-audit-7805/artifacts/rebake-proof/release/libdome-sculpt-core.a": "0c450d60bbce523f6c8a2f15dda5831c2b79d1041ea389c19c058bdd6611f5d8",
+          "/home/blux/de-xr/dome-sculpt/artifacts/canonical-clear-audit-7805/artifacts/rebake-proof/release/dome-sculpt-canonical-normal-owning-render-test": "4821398b50fcbdff15109e747cf89e2599d05a21606a26db8d2e853d8962f3f3"
+        }
+      },
+      "logs": {
+        "artifacts/rebake-proof/release/compile-clear-probe.log": {
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "text": ""
+        },
+        "artifacts/rebake-proof/release/link-dome-sculpt-canonical-normal-owning-render-test.log": {
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "text": ""
+        },
+        "artifacts/rebake-proof/release/clear-equivalence.log": {
+          "sha256": "24cc5a3898a608099a85e0c38414e8c2b8697f317c3b0bfecbbaaaf32fd882ed",
+          "text": "Native XR graphics: windowless EGL 1.5\nCLEAR variant=0 raw_has_bake=0 converted_has_bake=0 raw_projection=0 converted_projection=1 pixel_error=7\nCLEAR variant=7 raw_has_bake=0 converted_has_bake=0 raw_projection=0 converted_projection=1 pixel_error=74\nPARTIAL_REBAKE same_source_direction pixel_error=7\nFAIL Partial rebake of the same normal field preserves projected and missed regions after conversion\n"
+        }
+      },
+      "images": {
+        "artifacts/rebake-proof/release/outputs/raw-clear-0.png": "bcb366b802e663e5fffcc5e72673442879f1c946f399f4f434d3e263e8c2a3b5",
+        "artifacts/rebake-proof/release/outputs/converted-clear-0.png": "4952ede90dc5458969907cb2907191415ab83adbf3b6992cabcc34265fb78776",
+        "artifacts/rebake-proof/release/outputs/raw-clear-7.png": "4103aa6f55534121710ea5ad1768e54b9858af612dd36c687ea6a24246a97c82",
+        "artifacts/rebake-proof/release/outputs/converted-clear-7.png": "3c5ed327b1a4a6cdd6dbec82fe373ee75fb4bf6ee2e0db86ca33c3e34c317860",
+        "artifacts/rebake-proof/release/outputs/before-same-normal-partial-rebake.png": "1cbdd8f205d12b108b2f03a39c893b28e741e99660005ceafd5f115165c6af96",
+        "artifacts/rebake-proof/release/outputs/after-same-normal-partial-rebake.png": "5e939b7c2f15416c2dd8f583df5fece7a3310e04f2d7723287849d4f961f80ad"
+      }
+    }
+  ],
+  "next": "Separate real intrinsic state, durable canonical attribute provenance and an independently owned baked-normal field with normal-specific coverage/filtering; never repair only Clear or drop provenance. Reserve Scene33/material15; Scene32/material14 belongs to native-paint agent."
+}

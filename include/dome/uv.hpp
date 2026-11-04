@@ -31,6 +31,7 @@ struct UvView {
   std::string error;
   bool retain_normal_sampling=false,normal_sampling_available=false,normal_sampling_required=false;
   bool retain_paint_sampling=false,paint_sampling_available=false,paint_sampling_required=false;
+  bool can_restore_paint_source=false;
 };
 enum class UvAction {
   Pick,
@@ -52,7 +53,8 @@ enum class UvAction {
   Conformal,
   Stitch,
   RetainNormals,
-  RetainPaint
+  RetainPaint,
+  RestorePaintSource
 };
 struct UvInitializationLimits {
   size_t maximum_vertices = 200'000, maximum_triangles = 400'000;

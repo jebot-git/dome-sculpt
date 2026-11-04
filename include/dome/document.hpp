@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #pragma once
 #include "rig-fit-tool.hpp"
+#include "vrm-expression-tool.hpp"
 #include "input.hpp"
 #include "import-browser.hpp"
 #include "navigation.hpp"
@@ -107,7 +108,7 @@ struct EditorState {
   SkinAuthoringOptions skin_options;
   std::vector<uint64_t> skin_sources;
   bool skin_use_locks = true, can_configure_skin = false, can_bind_skin = false;
-  bool can_bake = false, can_clear_bake = false, can_cancel_asset = false;
+  bool can_bake = false, can_clear_bake = false, can_cancel_asset = false, can_convert_bake = false;
   float asset_progress = 0;
   uint64_t bake_source = 0;
   std::vector<uint64_t> bake_sources;
@@ -175,6 +176,7 @@ struct EditorState {
   bool can_preview = true;
   uint64_t view_epoch = 1;
   std::shared_ptr<const RigFitView> rig_fit;
+  std::shared_ptr<const VrmExpressionView> expressions;
 };
 struct SurfaceRange {
   uint64_t object;
@@ -238,7 +240,8 @@ struct SceneDraft {
   Scene scene;
   AssetSource source;
 };
-enum class AssetExportFormat { Glb, Avatar, EditableGlb256, EditableGlb512, EditableGlb1024 };
+enum class AssetExportFormat { Glb, Avatar, EditableGlb256, EditableGlb512, EditableGlb1024,
+  EditableAvatar256, EditableAvatar512, EditableAvatar1024 };
 struct EditorSnapshot {
   std::shared_ptr<const EditorState> state;
   std::shared_ptr<const MeshSnapshot> surface;
@@ -271,6 +274,9 @@ public:
   void focus_selection(bool);
   void object_properties(uint64_t, std::string, bool visible, bool locked,
                          CanvasTransform, Material, AssetSource expected = {});
+  void object_properties(uint64_t, std::string, bool visible, bool locked,
+                         CanvasTransform, Material, AssetSource,
+                         std::optional<std::array<float,3>> active_emission_override);
   bool object_editable(uint64_t) const;
   void configure_object_grab(bool mode, bool isolate);
   void hold_object(uint64_t);
@@ -304,6 +310,11 @@ public:
                   int opacity);
   void shading(bool toon);
   void authored_shading();
+  bool can_preview_expressions() const;
+  void begin_expression_preview();
+  void configure_expression_preview(size_t entry,float weight,uint64_t session,AssetSource expected={});
+  void end_expression_preview(bool apply,uint64_t session=0,AssetSource expected={});
+  void expression_action(SpatialCommand);
   void prepare_mesh(uint32_t resolution = 512);
   // Native asset operations run on the ordered worker against a detached scene.
   // No callback may retain mutable aliases or access UI/Document/model state.
@@ -326,6 +337,7 @@ public:
   void remesh_to_sculpt(float world_voxel_mm, AssetSource expected = {});
   void bake_from_object(uint64_t source, ObjectBakeSettings = {}, AssetSource expected = {});
   void clear_bake(AssetSource expected = {});
+  void convert_baked_normals(AssetSource expected = {});
   void cancel_asset_work();
   void cancel_background_work();
   void author_shape(ShapeKeyEdit,AssetSource expected={});
@@ -364,6 +376,8 @@ public:
   void paint_settings(PaintSettings);
   void weight_settings(WeightToolSettings, std::optional<uint32_t> joint = {}, AssetSource expected = {});
   void bind_skin(SkinAuthoringOptions, AssetSource expected = {});
+  void bind_skin_selected(SkinAuthoringOptions,AssetSource expected={},
+                          std::vector<uint64_t> expected_selection={});
   void fit_humanoid_rig(HumanLandmarks, RigFitOptions = {}, AssetSource expected = {});
   void begin_rig_fit();
   void configure_rig_fit(RigFitView);
@@ -599,6 +613,7 @@ private:
   bool uv_retention_requested_locked() const;
   bool uv_paint_retention_requested_locked() const;
   bool uv_paint_retention_available_locked() const;
+  void restore_uv_source_locked();
   bool uv_retention_changes_locked() const;
   void uv_loop();
   void queue_uv_operation_locked(UvAction);
@@ -680,6 +695,12 @@ private:
   void cancel_native_locked();
   void drain_native_shutdown();
   void capture_native_file(FileJob &);
+  bool expression_source_matches_locked() const;
+  bool expression_command_enabled_locked(SpatialCommand) const;
+  void begin_expression_preview_locked();
+  void configure_expression_preview_locked(size_t,float,uint64_t,AssetSource);
+  void end_expression_preview_locked(bool,uint64_t=0,AssetSource={});
+  void expression_command_locked(SpatialCommand);
   struct MeshJob {
     uint64_t revision, generation;
     Scene scene;
@@ -694,6 +715,7 @@ private:
     size_t native_samples = 0;
     bool pbr_view = false;
     uint64_t view_epoch = 0;
+    std::shared_ptr<const VrmExpressionView> expressions;
   };
   mutable std::mutex mesh_mutex_;
   mutable std::condition_variable mesh_changed_;
@@ -836,17 +858,24 @@ private:
   // Configuration belongs to the same accepted publication as its Bake job.
   // POD metadata only; no callback or permission to alter arbitrary scene data.
   struct BakeAdmission { uint64_t source=0; ObjectBakeSettings settings; };
+  struct SkinAdmission {
+    SkinAuthoringOptions options;
+    std::vector<uint8_t> locks;
+    bool use_locks=false;
+  };
   void queue_scene_operation_locked(std::string, SceneOperation, AssetSource,
                                     std::shared_ptr<std::string>, std::shared_ptr<AssetWork> = {}, std::shared_ptr<bool> = {},
                                     std::shared_ptr<const MeshSnapshot> = {}, uint64_t retopo_session = 0,
                                     uint64_t cut_session = 0, std::shared_ptr<CutHandoff> = {},
-                                    std::optional<BakeAdmission> = {});
+                                    std::optional<BakeAdmission> = {}, uint64_t uv_restore_session = 0, std::optional<SkinAdmission> = {});
   std::vector<uint64_t> bake_sources_locked() const;
   bool bake_source_eligible_locked(uint64_t) const;
   std::vector<uint64_t> bake_cages_locked() const;
   bool bake_target_ready_locked() const;
   void queue_bake_locked(uint64_t, ObjectBakeSettings, AssetSource = {});
   void queue_clear_bake_locked(AssetSource = {});
+  bool canonical_conversion_ready_locked() const;
+  void queue_convert_bake_locked(AssetSource = {});
   void cancel_asset_work_locked();
   void cancel_background_work_locked();
   bool shape_target_ready_locked() const;
@@ -865,7 +894,9 @@ private:
   bool process_rig_fit_spatial_locked(const SpatialFrame &);
   bool skin_target_ready_locked() const;
   std::vector<uint64_t> skin_sources_locked(SkinAuthoringMode) const;
-  void queue_bind_skin_locked(SkinAuthoringOptions, AssetSource = {});
+  bool selected_skin_ready_locked(SkinAuthoringMode) const;
+  void queue_bind_skin_locked(SkinAuthoringOptions, AssetSource = {},
+                              bool selected=false,std::vector<uint64_t> expected_selection={});
   void queue_voxel_sculpt_locked(float, AssetSource);
 };
 } // namespace dome

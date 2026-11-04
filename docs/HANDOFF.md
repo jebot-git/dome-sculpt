@@ -26,6 +26,97 @@ continuation is separate and live. See PRIVATE-AUTHORING-PROGRESS.md for honest
 scopes. No new main runtime, full-production completion, install or HMD claim;
 all unfinished requirements and deferred drawers remain.
 
+The dated private notes below retain historical observations and restrictions.
+The current qualification and main admission described above supersede their
+stale pending-build or private-only language; full production remains incomplete.
+
+## Current coherent authoring foundation — 2026-11-04
+
+This candidate combines real normalUV34/native32 ownership (Scene35/material17),
+repaired export normal-frame metadata and complete normal codec context, actual
+palette31 controller coexistence, colour-only VRM1 layers5310 and bounded native
+anatomical packing319. Main documentation history is preserved. No HDR package3
+admission: its functional66e2 milestone has a real OpenEXR C++ OOM leak; owning
+Core C codec work remains required and active.
+
+Original44 fresh owning R/S app/core/render/support270-task builds pass, but
+original selected27 each finish23Pass/4Fail; retain those negatives. Matched f7
+three-TU repairs plus whole consumers repair the actual crash/orphan/context
+failures. Original follow-up30 each finish28Pass/2fixtureFail; corrected actual
+mesh-owner workflow then passes152 each R/S and strict Arc, and camera-corrected
+palette83 each R/S.48 Khronos files0errors/30warnings/150infos;33 exact R/S artifact
+pairs and17 exact R/S/Arc native/container triples. Cross-device PNGmax1; no
+false byte-identical image claim. Mixed archive R all12,149 decoder/24,003encoder
+prefixes+84Cancel pass; same S sweep remains live, not passed. Default-cache/C/
+caller/IO/physical headset/compute scope remains separate.
+
+Current319 port has real current-layout female/male public19, locks/Save/history,
+linked poses, worker Cancel and independent export evidence; full registered
+fixture integration and broader authoring/interop/device work remain. Next fresh
+optimized ALL and selected owning SAN qualification must use this actual combined
+source. A component pass does not qualify the whole candidate or complete the
+original/additional goal. Controller drawers remain required after basic targets.
+
+## Explicit portable normal model controls — 2026-11-04
+
+Universal/native/XR controls now describe portable normal/tangent target authoring,
+retained source and rest-space quality. Matched changed-TU R/S plus actual
+normal/compact12+12, Wayland11 and actual-loader syntheticXR30 each pass. Final
+compact rest label repair is screenshot-verified. No math/layout/schema change;
+original different-model measurements and unchanged within-model4 bound remain.
+Read PORTABLE-NORMAL-MODEL-UI.md and receipt. Full630 remains separate/live;
+coherent integration, full production and later drawers remain incomplete.
+
+## Native source pose basis and conversion contract — 2026-11-04
+
+New authentic source-pose producer matches original native geometry/N/Mikk exactly across18 UV/skin/morph states,108corners eachR/S;44checks,161C++ allocation prefixes and16Cancel pass,2,157inputs exact. Read CANONICAL-NATIVE-POSE.md and receipt. Predating conversion contract explicitly authors a new portable target model, so prior9>4 different-model audit is not a within-model regression gate; measurements remain preserved. Actual same-model bound4 stays unchanged. Make authoring/model/rest-quality controls explicit next; no renderer/schema/main admission or whole RGB repair claim. Full630 f2 remains frozen; full goal and later drawers remain incomplete.
+
+## Private original-source deformation audit — 2026-11-04
+
+Actual raw legacy canonical versus converted native shading fails4/9 curved skin/morph states eachR/S, maximum9>unchanged4;9repeated unskinned rest controls remain0. Eight failed PNG pairs are R/S bit-exact,2,152 inputs each unchanged. Read CANONICAL-DEFORMED-SOURCE-AUDIT.md and receipt. This is separate from passed UV34 comparisons against pre-UV converted shading; root cause/native morph normals/pose-frame transport remains open. Keep main admission withheld and preserve frozen f2 fresh ALL/full630. Full goal and later drawers remain incomplete.
+
+## Private actual converted-normal UV editing — 2026-11-04
+
+Scene34/material16 now retains real root UV correspondence through Apply/Cancel/Undo/queued Save/restart, renderer/export, Clear and root-domain rebake. R/S each225 new views/workflow assertions,160 existing export,21kernel/11worker pass; actualArc226+161 and324KHR0errors/108exacttriples. Native normal/compact15each/profile and actual-loader syntheticXR20each pass. Real archive5,439decoder+8,959encoder C++ denial prefixes and24Cancel each pass; defaultcache/C/caller/IO separate. Original fresh224-task R/S builds0 but6/7runs/export8>4 negative preserved; complete matching-TU repair passes, no finalALL/full630/main claim. Read LAYERED-NORMAL-UV-NATIVE.md and receipt for actual artifact/observer negatives and remaining typed/key/corner/native32/device/composition work. Full goal and deferred controller drawers remain incomplete.
+
+## Private normal-field UV safety and actual UI — 2026-11-04
+
+Real silent UV loss is preserved as a negative; actual producer/adopter now refuse atomically and untouched UV Done is NoOp. R/S10 safety +62 native +10 normal/10 compact/11 Wayland/30 syntheticXR checks pass each. Every run ends with zero drift; later test-only changes are explicit and final UI inputs remain exact. SAN privateMesa maps verified. Read LAYERED-NORMAL-UV-SAFETY-UI.md and receipt. Genuine changed-UV normal retention remains required; no full regression/main/physicalHMD claim. Full goal and later drawers remain incomplete.
+
+## Private layered normal runtime, persistence and exports — 2026-11-04
+
+Actual worker Clear now has error0 instead of the preserved7/74, and partial
+rebake including post-Clear agrees within1 under unchanged4. Fresh215-task
+matching-layout app/core/render/support/XR R/S plus scoped bake-guard continuations
+pass62 native checks each and63 strictArc; eight native triples are exact.
+Scene33/material15 retains independent baked detail and durable attribute origin,
+with actual Save/restart, original-source replay and explicit root31 upgrade.
+Independent72-view glTF/PNG/skin/morph consumers eachR/S/Arc have image error0;
+216 actual files have0 Khronos errors/108warnings/297infos and72exacttriples.
+See LAYERED-NORMAL-NATIVE-CODEC.md and LAYERED-NORMAL-INDEPENDENT-EXPORT.md plus
+receipts for exact fresh/component/fixture scopes and preserved negatives.
+Configured624 is not a full-suite pass. Archive/caller faults, new UI/XR,
+full typed/source/corner/UV/key/captured-frame adapters and coherent main/agent
+integration remain; prepared Bake sources still require their real frame adapter.
+This is private, not main admission, system/HMD action or full goal completion.
+All unfinished original/additional requirements and later drawers remain required.
+
+
+## Private owning canonical-normal conversion — 2026-11-04
+
+Explicit universal-menu/XR conversion now retains the genuine historical source
+through Scene31 replay, worker Cancel/Save/Undo/Redo, keys/Mirror and repeated UV
+edits. Native191+independent images378 pass each Release/ownedSAN; Arc379 and
+strict identity refusals pass. Public-factory411 persistent C++ allocation
+prefixes/all35 cancellation polls pass each, with original kernel69/all32 also
+retained. Actual FLTK normal/compact checks pass each profile.654 GLBs/VRMs have
+zero Khronos errors, with all492warnings/920infos retained; cross-device PNGmax1
+meets unchanged4, while the failed byte comparison stays recorded. Read
+CANONICAL-NORMAL-OWNING.md and receipt for precise fresh-build/component scope.
+This supersedes the kernel-only pending language below for this private branch;
+fresh whole integration/Wayland/newXR-loader and broader adapters remain before
+main admission. The complete original goal and later drawers remain unfinished.
+
 ## Combined authoring draft and qualified portable controls — 2026-11-04
 
 Private e1ed525 portable-normal controls pass actual native normal/compact12+12,
@@ -58,6 +149,24 @@ COHERENT-RECIPE-FINAL-FIXTURES.md and its receipt for exact scopes and preserved
 failures. This is composed follow-up evidence, not a green original615 or full
 sanitizer invocation. Scene31 conversion/agent work and the full production goal
 remain separate and incomplete; controller drawers remain required after basics.
+
+## Private explicit canonical-normal conversion kernel — 2026-11-04
+
+A detached native source-retaining conversion now passes210 Release/210 ownedSAN
+checks over16 flat/curved/skin/morph/protected/fractional-coverage models. Each
+profile checks10,400 independent interior centers and417,312 bilinear/boundary
+samples (max0.0111073<unchanged0.02). All32 image/frame pairs are bit-exact;
+69persistent C++ allocation prefixes and all32 cancellation polls pass each.
+The original center-only0.0705364 boundary failure and harness negatives remain.
+Read CANONICAL-NORMAL-CONVERSION.md and receipt. This is not in the default build
+and does not create persisted authority or enable worker/UI/export conversion.
+The original curved native morph13>4 remains; an explicit replayable owning
+format, actual native transactions/history/Save/shared controls and independent
+export images are next. No guard/schema/default/frontend/system/HMD/session
+change; every unfinished original/additional row and later drawers remains.
+
+
+
 
 ## Private bake-recipe regression follow-up — 2026-11-04
 
@@ -123,6 +232,142 @@ receipt for original failures, own fresh-parent/completed-TU build scope and fou
 retained Khronos tangent warnings. This is not fresh ALL/full612, main admission,
 physical headset, GPU baking or full production completion. Broader bake recipes,
 resource/consumer/device work and deferred drawers remain required.
+
+## Private colour-only VRM1 paint expressions — 2026-11-04
+
+Runtime fa4f1fd extends the genuine independent-paint adapter to base-colour
+expressions without UV binds; original source factors/roles remain separate and
+no UV expression is invented. R/S actual worker44 per colour/UV case, full
+886/908 persistent factory prefixes and all647 Cancel each, render112/36pairs
+per case max1 at unchanged4, legacy81/762/22 pass. Strict PCI03 Arc226/72pairs
+and actual llvmpipe refusal closed, lease released. Eight writer containers:
+72 official instances and Khronos0errors/32warnings/144infos; 144PNG+19native/
+container profile pairs exact. Two complete runtime TUs on matching copied c2/8f
+owned support only, no public/layout/schema/UI/fresh-app/main claim. Configure634
+is registration only. Original same long SAN64560 remains unfinished; remaining
+role/prepared/native/physical/plainPBR/external-consumer/full-integration work and
+all goal rows stay required. Read VRM1-COLOUR-EXPRESSION-LAYERS.md/JSON.
+
+## Private VRM1 dynamic paint layers — 2026-11-04
+
+Runtime8fce073 adds actual expression-preserving independent colour paint for the
+bounded opaque/common-UV-target MToon1 domain. Current R/S worker44 includes all
+256/512/1024 policies, one real paint Undo/Redo, running+queued Cancel, ordered
+Save, Open/retry/second cycle; independently parsed renderer112 covers36 pairs
+at unchanged4, max1. All905 factory allocation prefixes/all647 Cancel and three
+unrepresentable-target controls pass each; current legacy81/762/22 also pass.
+StrictArc113/36pairs +actualsoftware-refusal closed; lease released. Component
+six-complete-TU scope only, public95 headers unchanged; configure631 is not a
+freshapp/fullsuite/main claim. All154 official schema instances pass; all15 actual
+writer containers have0KHRerrors (114warnings/248infos). Combined20 validation
+retains20errors exclusively in five inherited raw empty-child-array fixtures.
+Exact R/S20 container and72 PNG pairs match. Read VRM1-DYNAMIC-PAINT-LAYERS.md/JSON
+for scope, preserved negatives and guarded MASK/shared-shade/normal/physical/
+prepared/plainPBR/other-target work. Original unoptimized SAN64560 remains
+live/unfinished; all full-goal requirements and coherent main admission remain.
+
+## Private source skin world precision — 2026-11-04
+
+Code 28f27b3 closes the preserved source-eye 7>4 case: actual source-backed native
+worker and untouched independent original-input consumer give 24 pairs max1 at
+unchanged 4, exact original camera/samplers/materials. No native-position
+substitution in the positive. Authenticated model/instance/placement/joint/rest/
+IBM authority drives shared mesh/native-paint/pick positions; no public layout,
+Scene schema or generic matrix-authority change. Current R/S rendering 103,
+ordinary 944, ancestry 529 and full 2,208-prefix/908-Cancel (5,360 checks) pass; actual both 19-part
+CC0 bases 24/profile and seven affected regressions each pass. Strict Arc104 plus
+actual software-refusal closed; lease released. Source validation uses bounded
+local ancestry bits and prospective whole-source metadata scratch accounting;
+legacy 33,152→256 validation allocations and real 6,000-node low-budget refusal
+are independently controlled. Component-only complete three-TU +matched 6a support;
+configure628 is not an all-suite/freshapp/main/Scene31/32/33 claim. Original
+unoptimized 66,187-prefix Release133316 passed; SAME SAN64560 remains live and
+unfinished, not relabelled. Read VRM1-SOURCE-SKIN-PRECISION.md/JSON. Dynamic
+expression-preserving painted export and remaining prepared/normal/plainPBR/
+absolute adapters, full semantic union and every other goal row stay required.
+
+
+## Private native VRM1 expression preview — 2026-11-04
+
+Codeff13b33 adds immutable source-backed preview with actual universal-menu
+normal/compact controls and shared controller page29. Explicit static Apply uses
+one ordered native operation; Cancel/lateCancel/focus and source/history/save
+ownership are qualified. Current R/S native81, actual cached/fresh palette15,
+GUI22 eachnormal/compact, loader22/profile,1,161 persistent caller admission
+prefixes/profile and finalregistered7/profile pass; strictA77022 and real
+software-refusal are closed. No source-default rewrite: only expression-bound
+morphs reset; unbound.3/.6 stayexact. New EditorState/MeshJob view pointers require
+coherent ABI consumers; no Scene schema change. Fresh own234-task profiles plus
+exact complete-TU continuations are scoped in VRM1-EXPRESSION-PREVIEW.md/JSON.
+Configuration624 is not an all-suite result. Exact-camera sourcePBR eye7>4 stays
+an unresolved pre-existing counterexample, not a consumer-only/pass relabel.
+Private only; current-main/Scene31/native-float semantic union, prepared/normal/
+plainPBR/absolute authoring and expression-preserving painted export remain
+required. All other unfinished goal rows remain active.
+
+## Private static VRM1 CorePBR background/alpha — 2026-11-04
+
+Source-only V1 view now resolves actual typed original background factors while
+keeping independent Source4 paint and absolute physical emission separate. Old
+72-sample query has46 errors; same final valid pixel consumer on oldcore fails74.
+Current R/S eight-command component cohorts pass, PBR97/12pairs max1 at4,
+12native restarts0,101 profile files byteexact; strictA77099/llvmpipe refusal and
+three registered commands/profile pass. No layout/schema/UI/full620/main claim.
+This is separate from Palette native-float packets; semantic union must exclude
+native_geometry and preserve both private draw_range arguments. Interactive,
+normal/prepared/derived/plainPBR authoring and expression-preserving painted
+export remain required. Read VRM1-PBR-EXPRESSION-BACKGROUND.md and its receipt.
+
+
+## Private authored-view static VRM1 expression graphics — 2026-11-04
+
+Test-only662descendant now qualifies Source4 realpaint +static color/UV/morph
+parameters against an original-input independent GL consumer. Valid-inputR7+94,
+S7+94,strictA77094 and actualregistered2/profile pass; all27viewpairs max1 at
+unchanged4, native restarts0, no-eye reuploads,54R/SpNGs+11native/inputfiles exact.
+ValidinputKHR0errors/5warnings andsixofficialinstances0; oldinvalid-input and
+CPU-prematrix33controls stay separate. No runtime/layout/frontend/main/full617
+claim. Interactive/PBR-background/normal/prepared/absolute-emission and dynamic
+painted-export adapters remain required. Read VRM1-STATIC-EXPRESSION-RENDERING.md
+and its exact receipt; all other unfinished goal requirements remain active.
+
+
+## Private static VRM1 expression authoring — 2026-11-04
+
+A3 descendant now qualifies pure version-aware weights/binary/override evaluation
+and genuine typed/Source4 static authoring through the existing native worker.
+R/S each81checks +57persistent allocations/all18parameter Cancel boundaries,
+five affected consumers/profile,44actual pinned third-party color/UV checks and
+12official input-schema instances pass. Paint/source/normal/rig/shape owners,
+oneUndo, orderedSave, lateCancel/priorfile/retry and sixprofilepairs stayexact.
+No layout/schema/frontend/GPU/full615 claim. Interactive preview, normal/prepared/
+plainPBR/absolute-emission adapters and dynamic painted expression export remain
+required; no guard lifted or original goal narrowed. Read VRM1-STATIC-EXPRESSIONS.md
+and its exact receipt.
+
+
+## Private editable VRM1 FLTK / shared Files controls — 2026-11-04
+
+The sealed5f worker now has actual existing-dialog/native-menu and page28
+exposure with explicit selected-avatar/approximate-portable policy. No new
+fields/pages/schema. FinalR/S each38 FLTKnormal+compact,53 actualsoftwareloader
+checks,15 ordinaryGLBGUI and69 unchangednativecontrollerchecks pass; source,
+Cancel/orderedSave/recovery and23R/Spairs stayexact.28 emittedfiles have0KHRerrors;
+12V1outputs pass96officialinstances. Read VRM1-EDITABLE-UI.md/receipt for matching
+component scope, old missedSave/staging negatives and privateMesa qualification.
+Not main/full613/HMD admission; every unfinished VRM1/full-goal row remains.
+
+
+## Private typed painted VRM1 package — 2026-11-04
+
+The isolated a2e-based Scene-owner compiler and explicit Avatar FileJob route now
+pass762 native data/worker +22 independent image checks eachRelease/SAN, strict
+A77022/threeimages, legacyV1 consumers3/profile, exact native recovery and
+running+queued Cancel. Portable max1<=4/native pixels0;25 emitted containers have
+0KHRerrors and236 official schema instances pass including original controls.
+This is a matched component milestone, not main/full application/UI admission.
+Animated material expressions, typedHDR, remaining physics/REST/all-role/external
+coverage stay required. Read VRM1-PAINTED-AUTHORING.md and its exact receipt.
 
 
 ## Qualified FBX generated-normal current-layout continuation — 2026-11-04

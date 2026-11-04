@@ -6,7 +6,7 @@
 #include <map>
 #include <memory>
 namespace dome {
-namespace detail {class PaintOverlayPacket;struct PaintOverlayFactory;struct EmissionExportAccess;}
+namespace detail {class PaintOverlayPacket;struct PaintOverlayFactory;struct EmissionExportAccess;class BakedNormalField;struct NativeWeightPaintAccess;}
 struct Material;
 class PaintProjection;
 class PaintSamplingDomain;
@@ -83,6 +83,8 @@ struct BakedTextures {
   // normal field from a later byte-identical bake operation. Its coverage is
   // normal-specific and independent of the common RGBA coverage above.
   std::shared_ptr<const NormalDetailAuthority> normal_authority;
+  // Independently owned resolved baked normals; never intrinsic material data.
+  std::shared_ptr<const detail::BakedNormalField> normal_field;
   void validate(uint32_t resolution) const;
   size_t storage_bytes() const;
 };
@@ -241,6 +243,7 @@ private:
   friend struct SourceColorPreparationAccess;
   friend struct detail::PaintOverlayFactory;
   friend struct detail::EmissionExportAccess;
+  friend struct detail::NativeWeightPaintAccess;
   friend struct PolygonPaintAccess;
   friend struct SourceNormalPreparationAccess;
   friend struct SourcePaintSamplingAccess;

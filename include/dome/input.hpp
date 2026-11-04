@@ -6,7 +6,7 @@
 #include <optional>
 namespace dome {
 // Shared page registry:18 procedural,19/22 polygon,20 holding,21/23 import.
-inline constexpr int spatial_page_count=29; //25 projection;26 preview;27 rig fitting;28 export.
+inline constexpr int spatial_page_count=31; //25 projection;26 preview;27 rig fitting;28 export;29 expressions;30 emission.
 inline constexpr int spatial_max_page=spatial_page_count-1;
 enum class DeviceKind { Controller, SpatialStylus };
 enum class SpatialCommand {
@@ -95,9 +95,15 @@ enum class SpatialCommand {
   RigFitBegin=2048, RigFitPrevious, RigFitNext, RigFitPlace, RigFitRemove,
   RigFitXDown, RigFitXUp, RigFitYDown, RigFitYUp, RigFitZDown, RigFitZUp,
   RigFitApply, RigFitCancel, RigFitOptions,
-  ExportEditable256=4096, ExportEditable512, ExportEditable1024
+  ExportEditable256=4096, ExportEditable512, ExportEditable1024,
+  ExportEditableAvatar256=4100, ExportEditableAvatar512, ExportEditableAvatar1024,
+  ExpressionBegin=6144, ExpressionPrevious, ExpressionNext, ExpressionDecrease,
+  ExpressionIncrease, ExpressionReset, ExpressionApply, ExpressionCancel,
+  EmissionRelative=16384, EmissionPhysical, EmissionBlack
 };
 inline bool editable_export_command(SpatialCommand c){return c>=SpatialCommand::ExportEditable256&&c<=SpatialCommand::ExportEditable1024;}
+inline bool expression_command(SpatialCommand c){return c>=SpatialCommand::ExpressionBegin&&c<=SpatialCommand::ExpressionCancel;}
+inline bool editable_avatar_export_command(SpatialCommand c){return c>=SpatialCommand::ExportEditableAvatar256&&c<=SpatialCommand::ExportEditableAvatar1024;}
 inline bool rig_fit_command(SpatialCommand c){return c>=SpatialCommand::RigFitBegin&&c<=SpatialCommand::RigFitOptions;}
 inline bool projection_command(SpatialCommand c){return c>=SpatialCommand::ProjectionBrowse&&c<=SpatialCommand::ProjectionIncrease;}
 inline bool preview_command(SpatialCommand c){return c>=SpatialCommand::PreviewAuthored&&c<=SpatialCommand::PreviewToon;}

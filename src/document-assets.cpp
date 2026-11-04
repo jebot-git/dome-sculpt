@@ -4,6 +4,7 @@
 #include "dome/import-authoring.hpp"
 #include "dome/mesh-authoring.hpp"
 #include "document-transaction.hpp"
+#include "native-paint-sampling.hpp"
 #include "text-utf8.hpp"
 namespace dome {
 SceneDraft Document::draft_scene() const {
@@ -22,8 +23,9 @@ void Document::queue_scene_operation(std::string label, SceneOperation operation
 }
 void Document::queue_scene_operation_locked(std::string label, SceneOperation operation,
                                       AssetSource expected, std::shared_ptr<std::string> report, std::shared_ptr<AssetWork> work, std::shared_ptr<bool> changed,
-                                      std::shared_ptr<const MeshSnapshot> rollback_preview, uint64_t retopo_session, uint64_t cut_session, std::shared_ptr<CutHandoff> cut_handoff, std::optional<BakeAdmission> bake_admission) {
+                                      std::shared_ptr<const MeshSnapshot> rollback_preview, uint64_t retopo_session, uint64_t cut_session, std::shared_ptr<CutHandoff> cut_handoff, std::optional<BakeAdmission> bake_admission, uint64_t uv_restore_session, std::optional<SkinAdmission> skin_admission) {
   require_authority_locked(expected);
+  if(state_.expressions)throw std::logic_error("Apply or cancel expression preview before starting authoring work");
   if(state_.object_grabbing && !(work&&work->held_weight))throw std::logic_error("Release object motion before starting asset work");
   if(state_.isolate_held && state_.held_object)require_object_editable_locked(scene_.active().id);
   if (label.empty() || label.size() > 256 || label.find('\0') != std::string::npos || !operation)
@@ -32,7 +34,14 @@ void Document::queue_scene_operation_locked(std::string label, SceneOperation op
       (expected.revision && expected.revision != state_.revision) ||
       (expected.object && expected.object != scene_.active().id))
     throw std::logic_error("The asset editor source changed; reopen the editor");
-  if (state_.asset_busy || state_.recovery_busy || control_before_ || action_active_locked())
+  // A source Restore consumes only its exact ready UV workspace, within the
+  // queue's existing rollback transaction. It never bypasses stroke ownership.
+  const bool restore_uv=uv_restore_session&&uv_restore_session==uv_session_&&uv_&&control_before_&&
+      !uv_accept_pending_&&!uv_solving_&&uv_->view().topology&&!uv_->view().validating&&
+      state_.controls.parameter==VrParameter::UvEdit&&control_object_==scene_.active().id&&
+      detail::native_paint_source_restorable(scene_.active());
+  if(uv_restore_session&&!restore_uv)throw std::logic_error("The source Restore lost its exact ready UV workspace");
+  if (state_.asset_busy || state_.recovery_busy || (control_before_&&!restore_uv) || action_active_locked())
     throw std::logic_error("Finish the current action before starting asset work");
   if(state_.polygon)throw std::logic_error("Apply or cancel polygon editing before starting asset work");
   if (state_.retopology && (!retopo_session || retopo_session != retopo_session_.load()))
@@ -57,6 +66,7 @@ void Document::queue_scene_operation_locked(std::string label, SceneOperation op
   std::lock_guard file_lock(file_mutex_);
   if (files_.size() >= 8) throw std::runtime_error("File and asset work queue is full");
   Transaction transaction(*this);
+  if(restore_uv){transaction.finish_uv();desktop_=false;}
   files_.push_back(std::move(job));
   try {
   asset_work_.store(files_.back().work);
@@ -65,6 +75,12 @@ void Document::queue_scene_operation_locked(std::string label, SceneOperation op
     static_assert(std::is_nothrow_copy_assignable_v<ObjectBakeSettings>);
     state_.bake_source=bake_admission->source;
     state_.bake_settings=bake_admission->settings;
+  }
+  if(skin_admission){
+    static_assert(std::is_nothrow_move_assignable_v<SkinAuthoringOptions>);
+    state_.skin_options=std::move(skin_admission->options);
+    state_.skin_use_locks=skin_admission->use_locks;
+    if(skin_admission->use_locks)state_.weights.locks.swap(skin_admission->locks);
   }
   if(files_.back().cut_handoff){
     state_.cut=files_.back().cut_handoff->accepting;

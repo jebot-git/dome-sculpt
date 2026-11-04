@@ -3,8 +3,38 @@
 #include "dome/normal-preparation.hpp"
 #include "normal-projection-identity.hpp"
 #include "normal-sampling-access.hpp"
+#include "baked-normal-field.hpp"
+#include "canonical-normal-uv.hpp"
 namespace dome::detail {
+struct NormalCoordinateView {
+  const std::vector<std::array<float,2>> &coordinates,&mtoon_coordinates;
+  const std::vector<uint32_t> &indices;
+  void validate(const std::function<bool()> &cancelled={}) const {
+    if(cancelled&&cancelled())throw std::runtime_error("Retained normal coordinate view cancelled");
+    if(coordinates.empty()||indices.empty()||coordinates.size()>2'000'000||indices.size()>6'000'000)
+      throw std::invalid_argument("Invalid retained normal coordinate view");
+  }
+};
+inline std::optional<NormalCoordinateView> retained_normal_coordinates(
+    const SourceMaterialBindings *binding,const TextureMaps *maps){
+  if(binding&&binding->canonical_uv&&maps&&maps->baked_base&&maps->baked_base->normal_field){
+    const auto &uv=*binding->canonical_uv;return NormalCoordinateView{uv.coordinates(),uv.coordinates(),uv.mesh()->indices};
+  }
+  if(maps&&maps->normal_projection&&maps->normal_projection->version==2){
+    const auto &d=*maps->normal_projection->sampling_domain;return NormalCoordinateView{d.coordinates,d.mtoon_coordinates,d.indices};
+  }
+  return {};
+}
 inline bool prepared_normal_state(const SourceMaterialBindings *binding,const TextureMaps *maps,bool deep=false){
+  if(maps&&maps->baked_base&&maps->baked_base->normal_field){
+    const auto &field=maps->baked_base->normal_field;field->validate();
+    if(!binding||!binding->canonical_attributes||binding->canonical_attributes!=field->origin()||
+       maps->normal_projection||binding->normal_preparation||maps->source_only||
+       maps->normal.rgba!=field->pbr()->rgba||maps->mtoon_normal.rgba!=field->mtoon()->rgba||
+       !maps->baked_normal.rgba.empty()||!maps->baked_coverage.rgba.empty())
+      throw std::invalid_argument("Independent baked preview differs from its actual owning resolved field");
+    if(deep)binding->validate(true);return true;
+  }
   const auto recipe=binding?binding->normal_preparation:nullptr;
   const auto projection=maps?maps->normal_projection:nullptr;
   if(bool(recipe)!=bool(projection))throw std::invalid_argument("Normal preview/export lost its owning prepared interpretation");

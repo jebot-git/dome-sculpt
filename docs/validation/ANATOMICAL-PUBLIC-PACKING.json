@@ -1,0 +1,351 @@
+{
+  "scope": "Private exact reference replay and fixed-small-K packing; public full19/locks workflow on765/04e source closure",
+  "parent": "04e3268cce7b714ec9a2f660f8bab05fd8ab9552",
+  "public_layout_schema_normalizer_changed": false,
+  "limits": {
+    "work": 500000000,
+    "workspace": 268435456,
+    "owning_total": 536870912
+  },
+  "source": {
+    "src/anatomical-continuation.hpp": "935a7db3525b41513b273cd356712e27fbaf06e000b8beddb6e68f13f3f4eed9",
+    "src/geometry-weight-authoring.hpp": "7a97deb5e1a92fef6f5f02ee75595d92fe117e477db3fa69a06347accc432b60",
+    "src/geometry-reference-replay.hpp": "22caf09b83c85e45ed50013f4c6631db07835ffa04eae1eb41190221cc9a06a7",
+    "src/geometry-field-packing.hpp": "b540acc0d6a32bb3633677dffe4402b4a50d0b94c7a466b0ee8ff2a7d7c29b48",
+    "tests/anatomical-public-workflow.cpp": "8ba75ab9833bb0709fb32b1f9ed2ca6cbedbf605743c43e85c3c53c693f2a8b5",
+    "tests/geometry-reference-replay.cpp": "e6b2b63943dfa02e854c65722b5f3bca85277df7ea386e78acc4f46f4ee4a86f",
+    "tests/geometry-field-packing.cpp": "e3cc70a5a84e493125142b1de2daa5331f66718b33f34459d60923d547ba1a10",
+    "tests/anatomical-kernel-faults.cpp": "7cca07ae0c3882a42013de9c5a35fe34822f8258478d10b547002022ac3fce12",
+    "CMakeLists.txt": "edc37abd723cdb7c6e4302a0b42b3b00758f3d496aef4da52a50bcf4b919cea3"
+  },
+  "build_scope": "Own complete fixtures plus updated anatomical-authoring.cpp replace only that TU in copied04e core. Exact765 public headers and matching read-only support archives; SAN parent core/support wholly owned C/C++O1ASanUBSan with assertions. Not fresh whole-project/current86 ABI proof.",
+  "profiles": {
+    "release": {
+      "full19_public": {
+        "tests": {
+          "female": {
+            "exit": 0,
+            "elapsed": 17.7106040220242
+          },
+          "male": {
+            "exit": 0,
+            "elapsed": 19.1174621739774
+          }
+        },
+        "inputs": 1908,
+        "drift": []
+      },
+      "actual_worker34": {
+        "exit": 0,
+        "elapsed": 20.619290988019202
+      },
+      "worker_log_sha256": "8bbab3d7e181feec67c3571451221f58512cc1b8320d60cd940fdd87db33545a",
+      "source_before_sha256": "830dd480a28c16195e000fc00d5728b4a4e682b86d3307c468effdf75db183a6",
+      "source_after_sha256": "830dd480a28c16195e000fc00d5728b4a4e682b86d3307c468effdf75db183a6",
+      "build": {
+        "source": {
+          "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-anatomical-public-04e3268/src/anatomical-continuation.hpp": "935a7db3525b41513b273cd356712e27fbaf06e000b8beddb6e68f13f3f4eed9",
+          "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-anatomical-public-04e3268/src/geometry-reference-replay.hpp": "22caf09b83c85e45ed50013f4c6631db07835ffa04eae1eb41190221cc9a06a7",
+          "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-anatomical-public-04e3268/src/anatomical-authoring.cpp": "14eb03384a50812f513790debcbf65efbd37d0cb487a17bf717d262be44693a2",
+          "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-anatomical-public-04e3268/tests/anatomical-public-workflow.cpp": "8ba75ab9833bb0709fb32b1f9ed2ca6cbedbf605743c43e85c3c53c693f2a8b5"
+        },
+        "link": [
+          "/usr/bin/c++",
+          "-O3",
+          "-DNDEBUG",
+          "-Wl,--dependency-file=CMakeFiles/dome-sculpt-rig-edit-test.dir/link.d",
+          "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-anatomical-public-04e3268/artifacts/release/workflow.o",
+          "-o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-anatomical-public-04e3268/artifacts/release/workflow",
+          "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-anatomical-public-04e3268/artifacts/release/libdome-sculpt-core-replay.a",
+          "libdome-sculpt-affine.a",
+          "/usr/lib64/liblapacke.so",
+          "libdome-sculpt-polygon.a",
+          "libxatlas.a",
+          "libmikktspace.a",
+          "libmikktspace-robust.a",
+          "libufbx.a",
+          "/usr/lib64/libpng.so",
+          "/usr/lib64/libjpeg.so",
+          "/usr/lib64/libz.so",
+          "libdome-sculpt-emission-codec.a",
+          "/usr/lib64/libOpenEXR-3_2.so",
+          "/usr/lib64/libOpenEXRUtil-3_2.so",
+          "/usr/lib64/libOpenEXRCore-3_2.so",
+          "/usr/lib64/libIex-3_2.so",
+          "/usr/lib64/libIlmThread-3_2.so",
+          "/usr/lib64/libImath-3_1.so",
+          "-lgcc_s_asneeded",
+          "-lgcc_s_asneeded"
+        ],
+        "inputs": {
+          "/usr/bin/c++": "579d25c2d1e45abeed0c63a517b5c52f6d09ea811a787bf7a7c677a7fd0726f6",
+          "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-anatomical-public-04e3268/artifacts/release/workflow.o": "c88ad6aedb671322c95a3b4c5b072f76d919a015a4791cb206e3a1862e3cf038",
+          "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-anatomical-public-04e3268/artifacts/release/workflow": "fb3ae483c0ee42550adc4da1b97b1a5058e4fe1fc0cc1e19d491789af58c7051",
+          "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-anatomical-public-04e3268/artifacts/release/libdome-sculpt-core-replay.a": "6c8ae31c35f4e2edc6445c7a746d65fc3c62e86c44f51748e57145c964e38dff",
+          "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-anatomical-admission-c1e03e5/build/libdome-sculpt-affine.a": "444f8755d6328a34b0c268a94048a5fb428d9479c985f87858158ac399bc988a",
+          "/usr/lib64/liblapacke.so.3.12.0": "4e74d393b6f5f294cbd96b777da8be3ada9995b1da98aaa0c1eb5fea4b294c7c",
+          "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-anatomical-admission-c1e03e5/build/libdome-sculpt-polygon.a": "53a10aace78f0cee762d8e2477f1f1b59efbd1ed3cbf4ed4afba5dadde1609e3",
+          "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-anatomical-admission-c1e03e5/build/libxatlas.a": "fcf5473f3f7a63f069b172c936898fe8d0022250bc19702e2d4c6074ea93157a",
+          "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-anatomical-admission-c1e03e5/build/libmikktspace.a": "c10a5d0640dcac146597e14ecff8a3ba25fee124be0c367ac70f7c908a52b54c",
+          "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-anatomical-admission-c1e03e5/build/libmikktspace-robust.a": "4a44f6c792a92b16bfc096b0a1fd0b0bfd2c16d60c2f866de2a9de9d0a0ae7ed",
+          "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-anatomical-admission-c1e03e5/build/libufbx.a": "2a9f2e3ff69ed645c67fe10f751eed0e28dfb6015a7ef568d57dadad06ffd7ba",
+          "/usr/lib64/libpng16.so.16.58.0": "65cb04d6c4ec5c031f2f43a58ec5adc4bc9652be5703bb9fa1178f84a2e40446",
+          "/usr/lib64/libjpeg.so.62.4.0": "beb79376b4544260da3c31603784c908b58bdb959cbe1d8c48075dfa7d5bc80c",
+          "/usr/lib64/libz.so.1.3.1.zlib-ng": "cc2d0ee053bda906e3d9de9118fe7eb62d4c193ee1df3c323e60dae88e60780e",
+          "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-anatomical-admission-c1e03e5/build/libdome-sculpt-emission-codec.a": "6c9229f57fb69d7ac9657e14a5b8f086c65de182f5c8e4b9f1a5a3c78303a0dc",
+          "/usr/lib64/libOpenEXR-3_2.so.31.3.2.4": "efdbbe75b27b6a50e4a8e028e008fde32befa53280295e21ef6f036350225769",
+          "/usr/lib64/libOpenEXRUtil-3_2.so.31.3.2.4": "bafa0a2cb708d3ae952987c013d96e992badbb742e1a8e4fac6605c7eae5b5a0",
+          "/usr/lib64/libOpenEXRCore-3_2.so.31.3.2.4": "bc6775af6f33d58d41f20e714d80db4b0fd21209796a6694cb5249739a49a331",
+          "/usr/lib64/libIex-3_2.so.31.3.2.4": "da965da4711be1158555d457dc6ff17582ec88c1b86d98edc69f09cdcc4f6c7a",
+          "/usr/lib64/libIlmThread-3_2.so.31.3.2.4": "424321e69eb6257387820baa90e4fccb209c5dcb8c88589a8c5e1ccf4d4c23d6",
+          "/usr/lib64/libImath-3_1.so.29.11.0": "1e86ce61e14061369bd937b73d53abb69305dff34df4700f99a459f5c024ab45"
+        },
+        "binary_sha256": "1fb333af7453a0a8b8120027cf6cab26d5540da4bbe8daa5a47be1325cf31cb2"
+      },
+      "reference40_log_sha256": "622a41d64f6fcfd78af9231a4c1621cda57800674d99f20daad0f65ade326f27",
+      "packing8288_log_sha256": "82c882cdbfd2829057e658a25941e6efdfcdd2c15cc8ef01619423af121b6609",
+      "faults": {
+        "exit": 0,
+        "source": {
+          "tests/anatomical-kernel-faults.cpp": "7cca07ae0c3882a42013de9c5a35fe34822f8258478d10b547002022ac3fce12",
+          "src/geometry-reference-replay.hpp": "22caf09b83c85e45ed50013f4c6631db07835ffa04eae1eb41190221cc9a06a7",
+          "src/geometry-field-packing.hpp": "b540acc0d6a32bb3633677dffe4402b4a50d0b94c7a466b0ee8ff2a7d7c29b48"
+        },
+        "link": [
+          "/usr/bin/c++",
+          "-O3",
+          "-DNDEBUG",
+          "-Wl,--dependency-file=CMakeFiles/dome-sculpt-rig-edit-test.dir/link.d",
+          "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-anatomical-kernel-faults-04e3268/artifacts/release/faults.o",
+          "-o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-anatomical-kernel-faults-04e3268/artifacts/release/faults",
+          "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-anatomical-public-04e3268/artifacts/release/libdome-sculpt-core-replay.a",
+          "libdome-sculpt-affine.a",
+          "/usr/lib64/liblapacke.so",
+          "libdome-sculpt-polygon.a",
+          "libxatlas.a",
+          "libmikktspace.a",
+          "libmikktspace-robust.a",
+          "libufbx.a",
+          "/usr/lib64/libpng.so",
+          "/usr/lib64/libjpeg.so",
+          "/usr/lib64/libz.so",
+          "libdome-sculpt-emission-codec.a",
+          "/usr/lib64/libOpenEXR-3_2.so",
+          "/usr/lib64/libOpenEXRUtil-3_2.so",
+          "/usr/lib64/libOpenEXRCore-3_2.so",
+          "/usr/lib64/libIex-3_2.so",
+          "/usr/lib64/libIlmThread-3_2.so",
+          "/usr/lib64/libImath-3_1.so",
+          "-lgcc_s_asneeded",
+          "-lgcc_s_asneeded"
+        ]
+      },
+      "fault_log": "PASS all actual canonical allocation prefixes=1648 same-instance retries exact\nPASS all actual packing allocation prefixes=11 same-instance retries exact\n"
+    },
+    "sanitize": {
+      "full19_public": {
+        "tests": {
+          "female": {
+            "exit": 0,
+            "elapsed": 130.1393527360051
+          },
+          "male": {
+            "exit": 0,
+            "elapsed": 132.98869199701585
+          }
+        },
+        "inputs": 1908,
+        "drift": []
+      },
+      "actual_worker34": {
+        "exit": 0,
+        "elapsed": 136.06876336399
+      },
+      "worker_log_sha256": "8bbab3d7e181feec67c3571451221f58512cc1b8320d60cd940fdd87db33545a",
+      "source_before_sha256": "44f6063d82872275d2b6cb8801a9c5061700378710b05f65f9d48358b82223d0",
+      "source_after_sha256": "44f6063d82872275d2b6cb8801a9c5061700378710b05f65f9d48358b82223d0",
+      "build": {
+        "source": {
+          "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-anatomical-public-04e3268/src/anatomical-continuation.hpp": "935a7db3525b41513b273cd356712e27fbaf06e000b8beddb6e68f13f3f4eed9",
+          "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-anatomical-public-04e3268/src/geometry-reference-replay.hpp": "22caf09b83c85e45ed50013f4c6631db07835ffa04eae1eb41190221cc9a06a7",
+          "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-anatomical-public-04e3268/src/anatomical-authoring.cpp": "14eb03384a50812f513790debcbf65efbd37d0cb487a17bf717d262be44693a2",
+          "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-anatomical-public-04e3268/tests/anatomical-public-workflow.cpp": "8ba75ab9833bb0709fb32b1f9ed2ca6cbedbf605743c43e85c3c53c693f2a8b5"
+        },
+        "link": [
+          "/usr/bin/c++",
+          "-O1",
+          "-g1",
+          "-fsanitize=address,undefined",
+          "-fno-omit-frame-pointer",
+          "-fno-sanitize-recover=all",
+          "-fsanitize=address,undefined",
+          "-Wl,--dependency-file=CMakeFiles/dome-sculpt-rig-edit-test.dir/link.d",
+          "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-anatomical-public-04e3268/artifacts/sanitize/workflow.o",
+          "-o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-anatomical-public-04e3268/artifacts/sanitize/workflow",
+          "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-anatomical-public-04e3268/artifacts/sanitize/libdome-sculpt-core-replay.a",
+          "libdome-sculpt-affine.a",
+          "/usr/lib64/liblapacke.so",
+          "libdome-sculpt-polygon.a",
+          "libxatlas.a",
+          "libmikktspace.a",
+          "libmikktspace-robust.a",
+          "libufbx.a",
+          "/usr/lib64/libpng.so",
+          "/usr/lib64/libjpeg.so",
+          "/usr/lib64/libz.so",
+          "libdome-sculpt-emission-codec.a",
+          "/usr/lib64/libOpenEXR-3_2.so",
+          "/usr/lib64/libOpenEXRUtil-3_2.so",
+          "/usr/lib64/libOpenEXRCore-3_2.so",
+          "/usr/lib64/libIex-3_2.so",
+          "/usr/lib64/libIlmThread-3_2.so",
+          "/usr/lib64/libImath-3_1.so",
+          "-lgcc_s_asneeded",
+          "-lgcc_s_asneeded"
+        ],
+        "inputs": {
+          "/usr/bin/c++": "579d25c2d1e45abeed0c63a517b5c52f6d09ea811a787bf7a7c677a7fd0726f6",
+          "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-anatomical-public-04e3268/artifacts/sanitize/workflow.o": "05e66a5cc98862705beb49e856955a0ef04a4593695cb6b4a56edfb68946aee8",
+          "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-anatomical-public-04e3268/artifacts/sanitize/libdome-sculpt-core-replay.a": "fee037ea01a8871692ec42a4495542f9e427f83bfd155a039ca7a1f1ff49df0d",
+          "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-anatomical-admission-c1e03e5/build-sanitize/libdome-sculpt-affine.a": "e03b51b6ce6d9b5d2bbce123366fcb0d2b20c30c576e3766ff24541b4c7b2140",
+          "/usr/lib64/liblapacke.so.3.12.0": "4e74d393b6f5f294cbd96b777da8be3ada9995b1da98aaa0c1eb5fea4b294c7c",
+          "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-anatomical-admission-c1e03e5/build-sanitize/libdome-sculpt-polygon.a": "e56a4eb6e27411371be484531865cd90657ca7bb106699c81417866b6eaf8ea0",
+          "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-anatomical-admission-c1e03e5/build-sanitize/libxatlas.a": "2ca8de78229c56a7efaa582bc53a48d6867f5cfd0b774c690cbff423f79b9b31",
+          "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-anatomical-admission-c1e03e5/build-sanitize/libmikktspace.a": "777b6079a98ba675b5e2d2207a99d7dea698c6321d59653f621cc6fb96e1a421",
+          "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-anatomical-admission-c1e03e5/build-sanitize/libmikktspace-robust.a": "d91066e8b9307d61847b15270cb1763b35b8704c6edcb125175c1e3a3c14808e",
+          "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-anatomical-admission-c1e03e5/build-sanitize/libufbx.a": "c7b170850477ef63627f0d1d86eda579d3ab0af725c74ce6d741fbe6e5a30a9b",
+          "/usr/lib64/libpng16.so.16.58.0": "65cb04d6c4ec5c031f2f43a58ec5adc4bc9652be5703bb9fa1178f84a2e40446",
+          "/usr/lib64/libjpeg.so.62.4.0": "beb79376b4544260da3c31603784c908b58bdb959cbe1d8c48075dfa7d5bc80c",
+          "/usr/lib64/libz.so.1.3.1.zlib-ng": "cc2d0ee053bda906e3d9de9118fe7eb62d4c193ee1df3c323e60dae88e60780e",
+          "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-anatomical-admission-c1e03e5/build-sanitize/libdome-sculpt-emission-codec.a": "b12a4d37b54b0bee6ab40ca5dacfe0502ed12d38850eb6b4cb8c2c66fc6bccc2",
+          "/usr/lib64/libOpenEXR-3_2.so.31.3.2.4": "efdbbe75b27b6a50e4a8e028e008fde32befa53280295e21ef6f036350225769",
+          "/usr/lib64/libOpenEXRUtil-3_2.so.31.3.2.4": "bafa0a2cb708d3ae952987c013d96e992badbb742e1a8e4fac6605c7eae5b5a0",
+          "/usr/lib64/libOpenEXRCore-3_2.so.31.3.2.4": "bc6775af6f33d58d41f20e714d80db4b0fd21209796a6694cb5249739a49a331",
+          "/usr/lib64/libIex-3_2.so.31.3.2.4": "da965da4711be1158555d457dc6ff17582ec88c1b86d98edc69f09cdcc4f6c7a",
+          "/usr/lib64/libIlmThread-3_2.so.31.3.2.4": "424321e69eb6257387820baa90e4fccb209c5dcb8c88589a8c5e1ccf4d4c23d6",
+          "/usr/lib64/libImath-3_1.so.29.11.0": "1e86ce61e14061369bd937b73d53abb69305dff34df4700f99a459f5c024ab45"
+        },
+        "binary_sha256": "8cd1055fe196abee80eff5dc68ed85cf3a9b6d0193a7bf323cf116a8e0f0fa31"
+      },
+      "reference40_log_sha256": "7314463234a3fde93ff68112cd7911cf9df0c745e531df5a444df7b3bd178f45",
+      "packing8288_log_sha256": "df23208abc8e602d466e1561dae75d2ebede1e62545948c76860a743b510a345",
+      "faults": {
+        "exit": 0,
+        "source": {
+          "tests/anatomical-kernel-faults.cpp": "7cca07ae0c3882a42013de9c5a35fe34822f8258478d10b547002022ac3fce12",
+          "src/geometry-reference-replay.hpp": "22caf09b83c85e45ed50013f4c6631db07835ffa04eae1eb41190221cc9a06a7",
+          "src/geometry-field-packing.hpp": "b540acc0d6a32bb3633677dffe4402b4a50d0b94c7a466b0ee8ff2a7d7c29b48"
+        },
+        "link": [
+          "/usr/bin/c++",
+          "-O1",
+          "-g1",
+          "-fsanitize=address,undefined",
+          "-fno-omit-frame-pointer",
+          "-fno-sanitize-recover=all",
+          "-fsanitize=address,undefined",
+          "-Wl,--dependency-file=CMakeFiles/dome-sculpt-rig-edit-test.dir/link.d",
+          "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-anatomical-kernel-faults-04e3268/artifacts/sanitize/faults.o",
+          "-o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-anatomical-kernel-faults-04e3268/artifacts/sanitize/faults",
+          "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-anatomical-public-04e3268/artifacts/sanitize/libdome-sculpt-core-replay.a",
+          "libdome-sculpt-affine.a",
+          "/usr/lib64/liblapacke.so",
+          "libdome-sculpt-polygon.a",
+          "libxatlas.a",
+          "libmikktspace.a",
+          "libmikktspace-robust.a",
+          "libufbx.a",
+          "/usr/lib64/libpng.so",
+          "/usr/lib64/libjpeg.so",
+          "/usr/lib64/libz.so",
+          "libdome-sculpt-emission-codec.a",
+          "/usr/lib64/libOpenEXR-3_2.so",
+          "/usr/lib64/libOpenEXRUtil-3_2.so",
+          "/usr/lib64/libOpenEXRCore-3_2.so",
+          "/usr/lib64/libIex-3_2.so",
+          "/usr/lib64/libIlmThread-3_2.so",
+          "/usr/lib64/libImath-3_1.so",
+          "-lgcc_s_asneeded",
+          "-lgcc_s_asneeded"
+        ]
+      },
+      "fault_log": "PASS all actual canonical allocation prefixes=1648 same-instance retries exact\nPASS all actual packing allocation prefixes=11 same-instance retries exact\n"
+    }
+  },
+  "outputs": {
+    "female/full": {
+      "release": "42858680b2a721109362d43178629522d6e0a4a0fcb92e462b680c1d85af3af1",
+      "sanitize": "42858680b2a721109362d43178629522d6e0a4a0fcb92e462b680c1d85af3af1"
+    },
+    "female/restored": {
+      "release": "8a434ec3c143a72b54f907173132afdf536e3e7df75d13bc82d2c8e3236fd978",
+      "sanitize": "8a434ec3c143a72b54f907173132afdf536e3e7df75d13bc82d2c8e3236fd978"
+    },
+    "female/locked": {
+      "release": "61096cedc078b5afb1ef8f196e3654e05c79be258f4e32406dd364b70a313232",
+      "sanitize": "61096cedc078b5afb1ef8f196e3654e05c79be258f4e32406dd364b70a313232"
+    },
+    "female/locked-prior": {
+      "release": "61096cedc078b5afb1ef8f196e3654e05c79be258f4e32406dd364b70a313232",
+      "sanitize": "61096cedc078b5afb1ef8f196e3654e05c79be258f4e32406dd364b70a313232"
+    },
+    "female/unlocked-retry": {
+      "release": "7ed1011bbe2555467d8ec95367b470c1db4014a5137174f3f796778e226c62a7",
+      "sanitize": "7ed1011bbe2555467d8ec95367b470c1db4014a5137174f3f796778e226c62a7"
+    },
+    "male/full": {
+      "release": "d2cf91a613fa8839027bf64875dbf7cd46719b9f495e7c303a6d19c3700ede25",
+      "sanitize": "d2cf91a613fa8839027bf64875dbf7cd46719b9f495e7c303a6d19c3700ede25"
+    },
+    "male/restored": {
+      "release": "d2c2f8cff859a8403ab4c92ac8221964fe460002ab15b78baa47b3708680644f",
+      "sanitize": "d2c2f8cff859a8403ab4c92ac8221964fe460002ab15b78baa47b3708680644f"
+    },
+    "male/locked": {
+      "release": "eca651c6b6aa462e55d48d5f1b84b27debba844e6550bfd7775e1256f1007cc7",
+      "sanitize": "eca651c6b6aa462e55d48d5f1b84b27debba844e6550bfd7775e1256f1007cc7"
+    },
+    "male/locked-prior": {
+      "release": "eca651c6b6aa462e55d48d5f1b84b27debba844e6550bfd7775e1256f1007cc7",
+      "sanitize": "eca651c6b6aa462e55d48d5f1b84b27debba844e6550bfd7775e1256f1007cc7"
+    },
+    "male/unlocked-retry": {
+      "release": "41a35babadcf3541b25d760e5f3d90102a6e751c7657c8b1f60c53a2cbbdc9a5",
+      "sanitize": "41a35babadcf3541b25d760e5f3d90102a6e751c7657c8b1f60c53a2cbbdc9a5"
+    }
+  },
+  "independent_component_measurements": {
+    "reference_R": "PASS Exact absent-space source accepts without canonical allocation\nPASS Every target agrees with independent original exact replay\nPASS Every target agrees with independent original exact replay\nPASS Every target agrees with independent original exact replay\nPASS Every target agrees with independent original exact replay\nPASS Every target agrees with independent original exact replay\nPASS Every target agrees with independent original exact replay\nPASS Every target agrees with independent original exact replay\nPASS Every target agrees with independent original exact replay\nPASS Every target agrees with independent original exact replay\nPASS Every target agrees with independent original exact replay\nPASS Every target agrees with independent original exact replay\nPASS Every target agrees with independent original exact replay\nPASS Every target agrees with independent original exact replay\nPASS Every target agrees with independent original exact replay\nPASS Every target agrees with independent original exact replay\nPASS Every target agrees with independent original exact replay\nPASS Every target agrees with independent original exact replay\nPASS Every target agrees with independent original exact replay\nPASS Every target agrees with independent original exact replay\nPASS Nineteen full target comparisons share one actual allocating canonical reconstruction\nPASS One-bit current length change is independently checked after cache reuse\nPASS Current deform-role changes cannot borrow canonical proof\nPASS Every current joint name remains compared\nPASS Every current parent identity remains compared\nPASS Signed-zero current rest value remains bit exact\nPASS Current optional rest-matrix presence cannot disappear\nPASS Current inverse-bind presence remains independent\nPASS Every current bind-space matrix component remains independent\nPASS Legally mutable test target baseline agrees\nPASS Same-address target mutation does not reuse a target proof\nPASS Workspace refusal happens before allocating a canonical skeleton\nPASS Charged work refusal happens before canonical construction\nPASS Real cancellation remains active during reference replay\nPASS Non-same-frame path stays original uncached exact algorithm\nPASS Independent allocator observes nineteen-to-one actual reconstruction allocations\nMEASURE original_allocations=29260 shared_allocations=1540 original_seconds=0.00103019 shared_seconds=7.1874e-05\nPASS Same-frame replay owns its explicitly charged canonical data\nPASS A reused canonical owner cannot ignore a smaller workspace bound\nPASS Relative-frame replay releases cached allocation before original uncached work\nPASS A new top-level call cannot borrow an earlier source proof\nReference replay checks 40 originalwork=16980680 sharedwork=978842 canonicalbuilds=1\n",
+    "packing_R": "PASS exact packing rows=8288 primitivework=48751232 old_allocations=71000 new_allocations=11000 old_seconds=0.00287282 new_seconds=0.000589496\n",
+    "reference_SAN": "PASS Exact absent-space source accepts without canonical allocation\nPASS Every target agrees with independent original exact replay\nPASS Every target agrees with independent original exact replay\nPASS Every target agrees with independent original exact replay\nPASS Every target agrees with independent original exact replay\nPASS Every target agrees with independent original exact replay\nPASS Every target agrees with independent original exact replay\nPASS Every target agrees with independent original exact replay\nPASS Every target agrees with independent original exact replay\nPASS Every target agrees with independent original exact replay\nPASS Every target agrees with independent original exact replay\nPASS Every target agrees with independent original exact replay\nPASS Every target agrees with independent original exact replay\nPASS Every target agrees with independent original exact replay\nPASS Every target agrees with independent original exact replay\nPASS Every target agrees with independent original exact replay\nPASS Every target agrees with independent original exact replay\nPASS Every target agrees with independent original exact replay\nPASS Every target agrees with independent original exact replay\nPASS Every target agrees with independent original exact replay\nPASS Nineteen full target comparisons share one actual allocating canonical reconstruction\nPASS One-bit current length change is independently checked after cache reuse\nPASS Current deform-role changes cannot borrow canonical proof\nPASS Every current joint name remains compared\nPASS Every current parent identity remains compared\nPASS Signed-zero current rest value remains bit exact\nPASS Current optional rest-matrix presence cannot disappear\nPASS Current inverse-bind presence remains independent\nPASS Every current bind-space matrix component remains independent\nPASS Legally mutable test target baseline agrees\nPASS Same-address target mutation does not reuse a target proof\nPASS Workspace refusal happens before allocating a canonical skeleton\nPASS Charged work refusal happens before canonical construction\nPASS Real cancellation remains active during reference replay\nPASS Non-same-frame path stays original uncached exact algorithm\nPASS Independent allocator observes nineteen-to-one actual reconstruction allocations\nMEASURE original_allocations=29260 shared_allocations=1540 original_seconds=0.0164471 shared_seconds=0.00130598\nPASS Same-frame replay owns its explicitly charged canonical data\nPASS A reused canonical owner cannot ignore a smaller workspace bound\nPASS Relative-frame replay releases cached allocation before original uncached work\nPASS A new top-level call cannot borrow an earlier source proof\nReference replay checks 40 originalwork=16980680 sharedwork=978842 canonicalbuilds=1\n",
+    "packing_SAN": "PASS exact packing rows=8288 primitivework=48751232 old_allocations=71000 new_allocations=11000 old_seconds=0.0422108 new_seconds=0.00832503\n",
+    "scope": "Synthetic54-bone/54-column component allocator/timing evidence, not full-solver benchmark"
+  },
+  "preserved_failures": {
+    "original_public_full_then_lock": {
+      "exit": 1,
+      "elapsed": 8.452964318043087
+    },
+    "reference_only_still_fails": {
+      "exit": 1,
+      "elapsed": 7.710710405022837
+    },
+    "telemetry": {
+      "exit": 1,
+      "elapsed": 10.824506967968773
+    },
+    "location": "geometry-weight-authoring.hpp packing row charge; used360879266 maximum360880606 request10624",
+    "counterfactual_binary_sha256": "84d5abf4666093f87c6f0934ccf8818e2724f66023e72ab6e79055d69585c48e",
+    "reference_only_binary_sha256": "cbd2e9bfb263c00664dd07c783fa32a3299e6ace303c57c5bcc896f8ae6e4c9d"
+  },
+  "remaining": [
+    "Current86+34/32/V1 semantic integration/fresh ABI rebuild and new closure guard audit",
+    "Whole-helper allocation/publication and caller SkinAdmission fault closure; component1659 prefixes are not these guarantees",
+    "Dedicated Anatomical page32/full actual-loader workflow",
+    "General unskinned/native/edited/prepared/original-skinned/relative-affine production automatic-weight coverage"
+  ]
+}

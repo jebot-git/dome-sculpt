@@ -262,8 +262,8 @@ void validate_vrm1_metadata(const J &source,
                             "matcapColor", "rimColor", "outlineColor"});
                     vector(bind.at("targetValue"), 4);
                   } else {
-                    vector(bind.at("scale"), 2);
-                    vector(bind.at("offset"), 2);
+                    if(bind.contains("scale"))vector(bind.at("scale"), 2);
+                    if(bind.contains("offset"))vector(bind.at("offset"), 2);
                   }
                 }
               }

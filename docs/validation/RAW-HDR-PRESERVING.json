@@ -1,0 +1,1190 @@
+{
+  "source_test_checkpoint": "015fa3c8bf7a2d7addbb357b7b52e80b235f97fc",
+  "runtime_checkpoint": "bcc192395783fc86af90958786d437b24b71a9d6",
+  "branch": "work/raw-source-authority-ad04",
+  "main_admission": false,
+  "public_layout_or_schema_append": false,
+  "build_scope": "Initial clean owned Release app/core/support/render set was built at890 on the final SDK; every affected raw-authoring TU/private-header dependency was coherently rebuilt through015fa. ad04 established a clean wholly owned C/C++ O1g1 ASan/UBSan/leak app/core/support/render set. Subsequent private-header dependencies and whole changed fixtures were incrementally rebuilt in matching profiles. No public layout/schema changed. Final apps/inspectors and fixtures link current owned archives; no changed-layout/old-archive mix.",
+  "implemented": [
+    "Authenticated pristine SourceAuthored raw HDR import/view/Save/EditableGlb/recovery/re-export",
+    "Canonical raw role/sampler/UV/encoded-and-decoded-image replay rather than mutable DTO trust",
+    "Current radiance factor+KHR strength with bounded product error; original factor/strength retained only when canonically proved",
+    "Actual raw paint admission refusal until genuine editable preparation, including unit UV0 physical gestures",
+    "Private C++ parser arena cleanup without third-party/main change",
+    "Sampled-image working peak; actual large unused image retained without decoding it"
+  ],
+  "proofs": {
+    "fresh_release_base": {
+      "report": "/home/blux/de-xr/dome-sculpt/artifacts/hdr-preserving-source-77fa37a/artifacts/raw-preserving-provenance/status.json",
+      "sha256": "7fcc02bbcd40af8d85ca97bd57b2a3045df33f516097c816178e1ea143da0953",
+      "source": "ad04a115defb4945ffc4226f35adb87627f92e0e",
+      "scope": "Fresh coherent optimized owned core/support/render/native app +actual rawHDR/physical/control consumers; PRIVATE raw-preserving HDR candidate; no main admission; new sealed source-role writer path +central raw physical paint fence",
+      "inputs": 1625,
+      "stages": {
+        "configure": {
+          "command": [
+            "nice",
+            "-n",
+            "15",
+            "cmake",
+            "-S",
+            ".",
+            "-B",
+            "build-release",
+            "-DCMAKE_BUILD_TYPE=Release",
+            "-DDOME_COMPUTE_BACKEND=CPU",
+            "-DDOME_BUILD_UI=ON",
+            "-DDOME_BUILD_XR=ON",
+            "-DFLTK_DIR=/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-release/share/fltk",
+            "-U*DOME_BITMAP_RUNTIME*",
+            "-U*NATIVEGL*",
+            "-U*RENDERFONTS*"
+          ],
+          "exit": 0,
+          "seconds": 3.4308592849993147
+        },
+        "build": {
+          "command": [
+            "nice",
+            "-n",
+            "15",
+            "cmake",
+            "--build",
+            "build-release",
+            "--parallel",
+            "2",
+            "--target",
+            "dome-sculpt",
+            "dome-sculpt-raw-hdr-authoring-test",
+            "dome-sculpt-raw-hdr-preserving-test",
+            "dome-sculpt-raw-hdr-provenance-test",
+            "dome-sculpt-source-paint-physical-authoring-test",
+            "dome-sculpt-emission-controls-test"
+          ],
+          "exit": 0,
+          "seconds": 47.541665434022434
+        },
+        "tests": {
+          "command": [
+            "nice",
+            "-n",
+            "15",
+            "ctest",
+            "--test-dir",
+            "build-release",
+            "--output-on-failure",
+            "-R",
+            "^(raw-hdr-provenance|raw-hdr-preserving|raw-hdr-authoring|source-paint-physical-authoring|emission-controls)$"
+          ],
+          "exit": 0,
+          "seconds": 7.942167797009461
+        }
+      },
+      "drift": []
+    },
+    "fresh_owned_sanitize_base": {
+      "report": "/home/blux/de-xr/dome-sculpt/artifacts/hdr-preserving-source-77fa37a/artifacts/raw-preserving-sanitize/status.json",
+      "sha256": "47191825f0fc62553ecd86285355f3b552397b7a59e1d31f6d15decba8b5eb73",
+      "source": "ad04a115defb4945ffc4226f35adb87627f92e0e",
+      "scope": "Fresh coherent wholly owned C/C++ O1g1 ASan/UBSan/leak core/support/render/native app +actual rawHDR/physical/control consumers; PRIVATE raw-preserving HDR candidate; no main admission; new sealed source-role writer path +central raw physical paint fence",
+      "inputs": 1625,
+      "stages": {
+        "configure": {
+          "command": [
+            "nice",
+            "-n",
+            "15",
+            "cmake",
+            "-S",
+            ".",
+            "-B",
+            "build-sanitize",
+            "-DCMAKE_BUILD_TYPE=Release",
+            "-DCMAKE_C_FLAGS_RELEASE=-O1 -g1 -DNDEBUG -fsanitize=address,undefined -fno-omit-frame-pointer",
+            "-DCMAKE_CXX_FLAGS_RELEASE=-O1 -g1 -DNDEBUG -fsanitize=address,undefined -fno-omit-frame-pointer",
+            "-DDOME_COMPUTE_BACKEND=CPU",
+            "-DDOME_BUILD_UI=ON",
+            "-DDOME_BUILD_XR=ON",
+            "-DFLTK_DIR=/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-sanitize/share/fltk",
+            "-U*DOME_BITMAP_RUNTIME*",
+            "-U*NATIVEGL*",
+            "-U*RENDERFONTS*"
+          ],
+          "exit": 0,
+          "seconds": 6.648110458016163
+        },
+        "build": {
+          "command": [
+            "nice",
+            "-n",
+            "15",
+            "cmake",
+            "--build",
+            "build-sanitize",
+            "--parallel",
+            "2",
+            "--target",
+            "dome-sculpt",
+            "dome-sculpt-raw-hdr-authoring-test",
+            "dome-sculpt-raw-hdr-preserving-test",
+            "dome-sculpt-raw-hdr-provenance-test",
+            "dome-sculpt-source-paint-physical-authoring-test",
+            "dome-sculpt-emission-controls-test"
+          ],
+          "exit": 0,
+          "seconds": 1094.1699741740013
+        },
+        "tests": {
+          "command": [
+            "nice",
+            "-n",
+            "15",
+            "ctest",
+            "--test-dir",
+            "build-sanitize",
+            "--output-on-failure",
+            "-R",
+            "^(raw-hdr-provenance|raw-hdr-preserving|raw-hdr-authoring|source-paint-physical-authoring|emission-controls)$"
+          ],
+          "exit": 0,
+          "seconds": 69.08201066899346
+        }
+      },
+      "drift": []
+    },
+    "canonical_arena_runtime": {
+      "report": "/home/blux/de-xr/dome-sculpt/artifacts/hdr-preserving-source-77fa37a/artifacts/raw-canonical-arena/status.json",
+      "sha256": "56fb7823d15f90c044b3e444e313a01295e8d66d285a56d783f213986a729bea",
+      "source": "bcc192395783fc86af90958786d437b24b71a9d6",
+      "scope": "Matched wholly owned core/support/render/native app, incremental rebuild of all canonical-replay private-header dependencies on immutable public ABI +actual rawHDR/physical/control consumers; PRIVATE raw-preserving HDR candidate; no main admission; new sealed source-role writer path +central raw physical paint fence",
+      "inputs": 1627,
+      "stages": {
+        "release-configure": {
+          "command": [
+            "nice",
+            "-n",
+            "15",
+            "cmake",
+            "-S",
+            ".",
+            "-B",
+            "build-release",
+            "-DCMAKE_BUILD_TYPE=Release",
+            "-DDOME_COMPUTE_BACKEND=CPU",
+            "-DDOME_BUILD_UI=ON",
+            "-DDOME_BUILD_XR=ON",
+            "-DFLTK_DIR=/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-release/share/fltk",
+            "-U*DOME_BITMAP_RUNTIME*",
+            "-U*NATIVEGL*",
+            "-U*RENDERFONTS*"
+          ],
+          "exit": 0,
+          "seconds": 2.527098307007691
+        },
+        "release-build": {
+          "command": [
+            "nice",
+            "-n",
+            "15",
+            "cmake",
+            "--build",
+            "build-release",
+            "--parallel",
+            "2",
+            "--target",
+            "dome-sculpt",
+            "dome-sculpt-raw-hdr-authoring-test",
+            "dome-sculpt-raw-hdr-preserving-test",
+            "dome-sculpt-raw-hdr-provenance-test",
+            "dome-sculpt-source-paint-physical-authoring-test",
+            "dome-sculpt-emission-controls-test",
+            "dome-sculpt-raw-canonical-allocator-test"
+          ],
+          "exit": 0,
+          "seconds": 30.174779024993768
+        },
+        "release-tests": {
+          "command": [
+            "nice",
+            "-n",
+            "15",
+            "ctest",
+            "--test-dir",
+            "build-release",
+            "--output-on-failure",
+            "-R",
+            "^(raw-canonical-allocator|raw-hdr-provenance|raw-hdr-preserving|raw-hdr-authoring|source-paint-physical-authoring|emission-controls)$"
+          ],
+          "exit": 0,
+          "seconds": 6.234564377984498
+        },
+        "sanitize-configure": {
+          "command": [
+            "nice",
+            "-n",
+            "15",
+            "cmake",
+            "-S",
+            ".",
+            "-B",
+            "build-sanitize",
+            "-DCMAKE_BUILD_TYPE=Release",
+            "-DCMAKE_C_FLAGS_RELEASE=-O1 -g1 -DNDEBUG -fsanitize=address,undefined -fno-omit-frame-pointer",
+            "-DCMAKE_CXX_FLAGS_RELEASE=-O1 -g1 -DNDEBUG -fsanitize=address,undefined -fno-omit-frame-pointer",
+            "-DDOME_COMPUTE_BACKEND=CPU",
+            "-DDOME_BUILD_UI=ON",
+            "-DDOME_BUILD_XR=ON",
+            "-DFLTK_DIR=/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-sanitize/share/fltk",
+            "-U*DOME_BITMAP_RUNTIME*",
+            "-U*NATIVEGL*",
+            "-U*RENDERFONTS*"
+          ],
+          "exit": 0,
+          "seconds": 2.4903320189914666
+        },
+        "sanitize-build": {
+          "command": [
+            "nice",
+            "-n",
+            "15",
+            "cmake",
+            "--build",
+            "build-sanitize",
+            "--parallel",
+            "2",
+            "--target",
+            "dome-sculpt",
+            "dome-sculpt-raw-hdr-authoring-test",
+            "dome-sculpt-raw-hdr-preserving-test",
+            "dome-sculpt-raw-hdr-provenance-test",
+            "dome-sculpt-source-paint-physical-authoring-test",
+            "dome-sculpt-emission-controls-test",
+            "dome-sculpt-raw-canonical-allocator-test"
+          ],
+          "exit": 0,
+          "seconds": 46.6216167829989
+        },
+        "sanitize-tests": {
+          "command": [
+            "nice",
+            "-n",
+            "15",
+            "ctest",
+            "--test-dir",
+            "build-sanitize",
+            "--output-on-failure",
+            "-R",
+            "^(raw-canonical-allocator|raw-hdr-provenance|raw-hdr-preserving|raw-hdr-authoring|source-paint-physical-authoring|emission-controls)$"
+          ],
+          "exit": 0,
+          "seconds": 30.906876651977655
+        }
+      },
+      "drift": []
+    },
+    "final_formats": {
+      "report": "/home/blux/de-xr/dome-sculpt/artifacts/hdr-preserving-source-77fa37a/artifacts/raw-canonical-formats-r2/status.json",
+      "sha256": "d3fc44ff16a1c93d885dbe65d8f64cc23ce101f7450e22afb006a9f64c2fa4f4",
+      "source": "015fa3c8bf7a2d7addbb357b7b52e80b235f97fc",
+      "scope": "Matched wholly owned core/support/render/native app, incremental rebuild of all canonical-replay private-header dependencies on immutable public ABI +actual rawHDR/physical/control consumers; PRIVATE raw-preserving HDR candidate; no main admission; new sealed source-role writer path +central raw physical paint fence",
+      "inputs": 1628,
+      "stages": {
+        "release-configure": {
+          "command": [
+            "nice",
+            "-n",
+            "15",
+            "cmake",
+            "-S",
+            ".",
+            "-B",
+            "build-release",
+            "-DCMAKE_BUILD_TYPE=Release",
+            "-DDOME_COMPUTE_BACKEND=CPU",
+            "-DDOME_BUILD_UI=ON",
+            "-DDOME_BUILD_XR=ON",
+            "-DFLTK_DIR=/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-release/share/fltk",
+            "-U*DOME_BITMAP_RUNTIME*",
+            "-U*NATIVEGL*",
+            "-U*RENDERFONTS*"
+          ],
+          "exit": 0,
+          "seconds": 3.342153078003321
+        },
+        "release-build": {
+          "command": [
+            "nice",
+            "-n",
+            "15",
+            "cmake",
+            "--build",
+            "build-release",
+            "--parallel",
+            "2",
+            "--target",
+            "dome-sculpt",
+            "dome-sculpt-raw-hdr-authoring-test",
+            "dome-sculpt-raw-hdr-preserving-test",
+            "dome-sculpt-raw-hdr-provenance-test",
+            "dome-sculpt-source-paint-physical-authoring-test",
+            "dome-sculpt-emission-controls-test",
+            "dome-sculpt-raw-canonical-allocator-test",
+            "dome-sculpt-raw-hdr-resource-test"
+          ],
+          "exit": 0,
+          "seconds": 9.276584186998662
+        },
+        "release-tests": {
+          "command": [
+            "nice",
+            "-n",
+            "15",
+            "ctest",
+            "--test-dir",
+            "build-release",
+            "--output-on-failure",
+            "-R",
+            "^(raw-hdr-resource|raw-canonical-allocator|raw-hdr-provenance|raw-hdr-preserving|raw-hdr-authoring|source-paint-physical-authoring|emission-controls)$"
+          ],
+          "exit": 0,
+          "seconds": 14.598564526007976
+        },
+        "sanitize-configure": {
+          "command": [
+            "nice",
+            "-n",
+            "15",
+            "cmake",
+            "-S",
+            ".",
+            "-B",
+            "build-sanitize",
+            "-DCMAKE_BUILD_TYPE=Release",
+            "-DCMAKE_C_FLAGS_RELEASE=-O1 -g1 -DNDEBUG -fsanitize=address,undefined -fno-omit-frame-pointer",
+            "-DCMAKE_CXX_FLAGS_RELEASE=-O1 -g1 -DNDEBUG -fsanitize=address,undefined -fno-omit-frame-pointer",
+            "-DDOME_COMPUTE_BACKEND=CPU",
+            "-DDOME_BUILD_UI=ON",
+            "-DDOME_BUILD_XR=ON",
+            "-DFLTK_DIR=/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-sanitize/share/fltk",
+            "-U*DOME_BITMAP_RUNTIME*",
+            "-U*NATIVEGL*",
+            "-U*RENDERFONTS*"
+          ],
+          "exit": 0,
+          "seconds": 3.443974234018242
+        },
+        "sanitize-build": {
+          "command": [
+            "nice",
+            "-n",
+            "15",
+            "cmake",
+            "--build",
+            "build-sanitize",
+            "--parallel",
+            "2",
+            "--target",
+            "dome-sculpt",
+            "dome-sculpt-raw-hdr-authoring-test",
+            "dome-sculpt-raw-hdr-preserving-test",
+            "dome-sculpt-raw-hdr-provenance-test",
+            "dome-sculpt-source-paint-physical-authoring-test",
+            "dome-sculpt-emission-controls-test",
+            "dome-sculpt-raw-canonical-allocator-test",
+            "dome-sculpt-raw-hdr-resource-test"
+          ],
+          "exit": 0,
+          "seconds": 74.08777888101758
+        },
+        "sanitize-tests": {
+          "command": [
+            "nice",
+            "-n",
+            "15",
+            "ctest",
+            "--test-dir",
+            "build-sanitize",
+            "--output-on-failure",
+            "-R",
+            "^(raw-hdr-resource|raw-canonical-allocator|raw-hdr-provenance|raw-hdr-preserving|raw-hdr-authoring|source-paint-physical-authoring|emission-controls)$"
+          ],
+          "exit": 0,
+          "seconds": 52.912455696001416
+        }
+      },
+      "drift": []
+    },
+    "whole_pipeline_contracts": {
+      "report": "/home/blux/de-xr/dome-sculpt/artifacts/hdr-preserving-source-77fa37a/artifacts/raw-contract-arena-bcc/status.json",
+      "sha256": "e3f25673de098dfecfcc2c16dcdc67605cc42da7c9f23b195f1802c90e5274d3",
+      "source": "bcc192395783fc86af90958786d437b24b71a9d6",
+      "scope": "Complete isolated fixture consumers against exactbcc arena-replay owned R/S core+support+render archives; no product TU overlay and no GPU",
+      "inputs": 3286,
+      "stages": {
+        "release-compile": {
+          "command": [
+            "nice",
+            "-n",
+            "15",
+            "/usr/bin/c++",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/hdr-preserving-source-77fa37a/src",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/hdr-preserving-source-77fa37a/third_party/cgltf",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/hdr-preserving-source-77fa37a/include",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/hdr-preserving-source-77fa37a/third_party/openbrush",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/hdr-preserving-source-77fa37a/third_party/nlohmann",
+            "-isystem",
+            "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/harfbuzz",
+            "-isystem",
+            "/usr/include/glib-2.0",
+            "-isystem",
+            "/usr/lib64/glib-2.0/include",
+            "-isystem",
+            "/usr/include/sysprof-6",
+            "-isystem",
+            "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/freetype2",
+            "-isystem",
+            "/usr/include/libpng16",
+            "-isystem",
+            "/usr/include/libxml2",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/hdr-preserving-source-77fa37a/tests",
+            "-O3",
+            "-DNDEBUG",
+            "-std=gnu++20",
+            "-pthread",
+            "-DWITH_GZFILEOP",
+            "-c",
+            "/home/blux/de-xr/dome-sculpt/artifacts/hdr-preserving-source-77fa37a/artifacts/raw-contract-arena-bcc/consumer.cpp",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/hdr-preserving-source-77fa37a/artifacts/raw-contract-arena-bcc/consumer-release.o"
+          ],
+          "exit": 0,
+          "expected": 0,
+          "seconds": 12.094400219008094
+        },
+        "release-link": {
+          "command": [
+            "nice",
+            "-n",
+            "15",
+            "/usr/bin/c++",
+            "-O3",
+            "-DNDEBUG",
+            "/home/blux/de-xr/dome-sculpt/artifacts/hdr-preserving-source-77fa37a/artifacts/raw-contract-arena-bcc/consumer-release.o",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/hdr-preserving-source-77fa37a/artifacts/raw-contract-arena-bcc/consumer-release",
+            "-Wl,-rpath,/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib",
+            "/home/blux/de-xr/dome-sculpt/artifacts/hdr-preserving-source-77fa37a/build-release/libdome-sculpt-render.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/hdr-preserving-source-77fa37a/build-release/libdome-sculpt-core.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/hdr-preserving-source-77fa37a/build-release/libdome-sculpt-affine.a",
+            "/usr/lib64/liblapacke.so",
+            "/home/blux/de-xr/dome-sculpt/artifacts/hdr-preserving-source-77fa37a/build-release/libdome-sculpt-polygon.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/hdr-preserving-source-77fa37a/build-release/libxatlas.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/hdr-preserving-source-77fa37a/build-release/libmikktspace.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/hdr-preserving-source-77fa37a/build-release/libmikktspace-robust.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/hdr-preserving-source-77fa37a/build-release/libufbx.a",
+            "/usr/lib64/libpng.so",
+            "/usr/lib64/libjpeg.so",
+            "/usr/lib64/libz.so",
+            "/home/blux/de-xr/dome-sculpt/artifacts/hdr-preserving-source-77fa37a/build-release/libdome-sculpt-emission-codec.a",
+            "/usr/lib64/libOpenEXR-3_2.so",
+            "/usr/lib64/libOpenEXRUtil-3_2.so",
+            "/usr/lib64/libOpenEXRCore-3_2.so",
+            "/usr/lib64/libIex-3_2.so",
+            "/usr/lib64/libIlmThread-3_2.so",
+            "/usr/lib64/libImath-3_1.so",
+            "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libharfbuzz.so",
+            "/usr/lib64/libEGL.so",
+            "/usr/lib64/libGL.so",
+            "/usr/lib64/libfontconfig.so",
+            "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libfreetype.so",
+            "/usr/lib64/libicui18n.so",
+            "/usr/lib64/libicuuc.so",
+            "-lgcc_s_asneeded",
+            "-lgcc_s_asneeded",
+            "-Wl,--wrap=fsync",
+            "-Wl,-Map=/home/blux/de-xr/dome-sculpt/artifacts/hdr-preserving-source-77fa37a/artifacts/raw-contract-arena-bcc/link-release.map"
+          ],
+          "exit": 0,
+          "expected": 0,
+          "seconds": 0.31956991500919685
+        },
+        "release-run": {
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/hdr-preserving-source-77fa37a/artifacts/raw-contract-arena-bcc/consumer-release",
+            "/home/blux/de-xr/dome-sculpt/artifacts/hdr-preserving-source-77fa37a/artifacts/raw-contract-arena-bcc/release-output"
+          ],
+          "exit": 0,
+          "expected": 0,
+          "seconds": 0.02698027397855185
+        },
+        "release-oom": {
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/hdr-preserving-source-77fa37a/artifacts/raw-contract-arena-bcc/consumer-release",
+            "/home/blux/de-xr/dome-sculpt/artifacts/hdr-preserving-source-77fa37a/artifacts/raw-contract-arena-bcc/release-oom",
+            "--oom"
+          ],
+          "exit": 0,
+          "expected": 0,
+          "seconds": 4.50818453298416
+        },
+        "sanitize-compile": {
+          "command": [
+            "nice",
+            "-n",
+            "15",
+            "/usr/bin/c++",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/hdr-preserving-source-77fa37a/src",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/hdr-preserving-source-77fa37a/third_party/cgltf",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/hdr-preserving-source-77fa37a/include",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/hdr-preserving-source-77fa37a/third_party/openbrush",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/hdr-preserving-source-77fa37a/third_party/nlohmann",
+            "-isystem",
+            "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/harfbuzz",
+            "-isystem",
+            "/usr/include/glib-2.0",
+            "-isystem",
+            "/usr/lib64/glib-2.0/include",
+            "-isystem",
+            "/usr/include/sysprof-6",
+            "-isystem",
+            "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/freetype2",
+            "-isystem",
+            "/usr/include/libpng16",
+            "-isystem",
+            "/usr/include/libxml2",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/hdr-preserving-source-77fa37a/tests",
+            "-DNDEBUG",
+            "-std=gnu++20",
+            "-pthread",
+            "-DWITH_GZFILEOP",
+            "-O1",
+            "-g1",
+            "-fsanitize=address,undefined",
+            "-fno-omit-frame-pointer",
+            "-c",
+            "/home/blux/de-xr/dome-sculpt/artifacts/hdr-preserving-source-77fa37a/artifacts/raw-contract-arena-bcc/consumer.cpp",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/hdr-preserving-source-77fa37a/artifacts/raw-contract-arena-bcc/consumer-sanitize.o"
+          ],
+          "exit": 0,
+          "expected": 0,
+          "seconds": 17.171919774991693
+        },
+        "sanitize-link": {
+          "command": [
+            "nice",
+            "-n",
+            "15",
+            "/usr/bin/c++",
+            "-O3",
+            "-DNDEBUG",
+            "/home/blux/de-xr/dome-sculpt/artifacts/hdr-preserving-source-77fa37a/artifacts/raw-contract-arena-bcc/consumer-sanitize.o",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/hdr-preserving-source-77fa37a/artifacts/raw-contract-arena-bcc/consumer-sanitize",
+            "-Wl,-rpath,/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib",
+            "/home/blux/de-xr/dome-sculpt/artifacts/hdr-preserving-source-77fa37a/build-sanitize/libdome-sculpt-render.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/hdr-preserving-source-77fa37a/build-sanitize/libdome-sculpt-core.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/hdr-preserving-source-77fa37a/build-sanitize/libdome-sculpt-affine.a",
+            "/usr/lib64/liblapacke.so",
+            "/home/blux/de-xr/dome-sculpt/artifacts/hdr-preserving-source-77fa37a/build-sanitize/libdome-sculpt-polygon.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/hdr-preserving-source-77fa37a/build-sanitize/libxatlas.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/hdr-preserving-source-77fa37a/build-sanitize/libmikktspace.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/hdr-preserving-source-77fa37a/build-sanitize/libmikktspace-robust.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/hdr-preserving-source-77fa37a/build-sanitize/libufbx.a",
+            "/usr/lib64/libpng.so",
+            "/usr/lib64/libjpeg.so",
+            "/usr/lib64/libz.so",
+            "/home/blux/de-xr/dome-sculpt/artifacts/hdr-preserving-source-77fa37a/build-sanitize/libdome-sculpt-emission-codec.a",
+            "/usr/lib64/libOpenEXR-3_2.so",
+            "/usr/lib64/libOpenEXRUtil-3_2.so",
+            "/usr/lib64/libOpenEXRCore-3_2.so",
+            "/usr/lib64/libIex-3_2.so",
+            "/usr/lib64/libIlmThread-3_2.so",
+            "/usr/lib64/libImath-3_1.so",
+            "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libharfbuzz.so",
+            "/usr/lib64/libEGL.so",
+            "/usr/lib64/libGL.so",
+            "/usr/lib64/libfontconfig.so",
+            "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libfreetype.so",
+            "/usr/lib64/libicui18n.so",
+            "/usr/lib64/libicuuc.so",
+            "-lgcc_s_asneeded",
+            "-lgcc_s_asneeded",
+            "-fsanitize=address,undefined",
+            "-Wl,--wrap=fsync",
+            "-Wl,-Map=/home/blux/de-xr/dome-sculpt/artifacts/hdr-preserving-source-77fa37a/artifacts/raw-contract-arena-bcc/link-sanitize.map"
+          ],
+          "exit": 0,
+          "expected": 0,
+          "seconds": 2.007685883989325
+        },
+        "sanitize-run": {
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/hdr-preserving-source-77fa37a/artifacts/raw-contract-arena-bcc/consumer-sanitize",
+            "/home/blux/de-xr/dome-sculpt/artifacts/hdr-preserving-source-77fa37a/artifacts/raw-contract-arena-bcc/sanitize-output"
+          ],
+          "exit": 0,
+          "expected": 0,
+          "seconds": 0.27034670099965297
+        },
+        "sanitize-oom": {
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/hdr-preserving-source-77fa37a/artifacts/raw-contract-arena-bcc/consumer-sanitize",
+            "/home/blux/de-xr/dome-sculpt/artifacts/hdr-preserving-source-77fa37a/artifacts/raw-contract-arena-bcc/sanitize-oom",
+            "--oom"
+          ],
+          "exit": 0,
+          "expected": 0,
+          "seconds": 49.00957282699528
+        }
+      },
+      "drift": []
+    },
+    "legacy_regressions": {
+      "report": "/home/blux/de-xr/dome-sculpt/artifacts/hdr-preserving-source-77fa37a/artifacts/raw-final-regressions/status.json",
+      "sha256": "f86bc1d34f0a1bf23b6db1ef4c1559792ac36303b88ad61956282cb519db4837",
+      "source": "015fa3c8bf7a2d7addbb357b7b52e80b235f97fc",
+      "scope": "Matched current015fa/runtimebcc owning archives; freshly compiled inspector and legacy LDR/source-native/HDR regression fixtures only, all production source bytes unchanged",
+      "inputs": 1650,
+      "stages": {
+        "release-build": {
+          "command": [
+            "nice",
+            "-n",
+            "15",
+            "cmake",
+            "--build",
+            "build-release",
+            "--parallel",
+            "1",
+            "--target",
+            "dome-sculpt-native-authoring-inspect",
+            "dome-sculpt-source-paint-bake-test",
+            "dome-sculpt-source-paint-authoring-test",
+            "dome-sculpt-emission-export-test"
+          ],
+          "exit": 0,
+          "seconds": 2.3919234850036446
+        },
+        "release-tests": {
+          "command": [
+            "nice",
+            "-n",
+            "15",
+            "ctest",
+            "--test-dir",
+            "build-release",
+            "--output-on-failure",
+            "-R",
+            "^(source-paint-bake|source-paint-authoring|emission-export)$"
+          ],
+          "exit": 0,
+          "seconds": 10.983437285001855
+        },
+        "sanitize-build": {
+          "command": [
+            "nice",
+            "-n",
+            "15",
+            "cmake",
+            "--build",
+            "build-sanitize",
+            "--parallel",
+            "1",
+            "--target",
+            "dome-sculpt-native-authoring-inspect",
+            "dome-sculpt-source-paint-bake-test",
+            "dome-sculpt-source-paint-authoring-test",
+            "dome-sculpt-emission-export-test"
+          ],
+          "exit": 0,
+          "seconds": 7.142157007998321
+        },
+        "sanitize-tests": {
+          "command": [
+            "nice",
+            "-n",
+            "15",
+            "ctest",
+            "--test-dir",
+            "build-sanitize",
+            "--output-on-failure",
+            "-R",
+            "^(source-paint-bake|source-paint-authoring|emission-export)$"
+          ],
+          "exit": 0,
+          "seconds": 37.53274492599303
+        }
+      },
+      "drift": []
+    },
+    "actual_final_gui": {
+      "report": "/home/blux/de-xr/dome-sculpt/artifacts/hdr-preserving-source-77fa37a/artifacts/raw-final-gui/status.json",
+      "sha256": "f75cead354edc0e5a894a188a25e0a2578c436d9f3b898c3435f7a7f814d069c",
+      "source": "015fa3c8bf7a2d7addbb357b7b52e80b235f97fc",
+      "scope": "Actual matched current R/S native apps and own current inspectors, final canonical27 SDK, private Xvfb/softwareGL; normal preserving Import plus normal/compact material/paint refusal/EditableGLB/native recovery/Save; no physical HMD",
+      "stages": {
+        "release-normal": {
+          "command": [
+            "nice",
+            "-n",
+            "15",
+            "/home/blux/de-xr/dome-sculpt/artifacts/selection-gui-venv/bin/python",
+            "/home/blux/de-xr/dome-sculpt/artifacts/hdr-preserving-source-77fa37a/artifacts/raw-final-gui/driver.py"
+          ],
+          "exit": 0,
+          "seconds": 48.27819537499454,
+          "inputs": 1704,
+          "drift": []
+        },
+        "release-compact": {
+          "command": [
+            "nice",
+            "-n",
+            "15",
+            "/home/blux/de-xr/dome-sculpt/artifacts/selection-gui-venv/bin/python",
+            "/home/blux/de-xr/dome-sculpt/artifacts/hdr-preserving-source-77fa37a/artifacts/raw-final-gui/driver.py"
+          ],
+          "exit": 0,
+          "seconds": 41.05338903301163,
+          "inputs": 1704,
+          "drift": []
+        },
+        "sanitize-normal": {
+          "command": [
+            "nice",
+            "-n",
+            "15",
+            "/home/blux/de-xr/dome-sculpt/artifacts/selection-gui-venv/bin/python",
+            "/home/blux/de-xr/dome-sculpt/artifacts/hdr-preserving-source-77fa37a/artifacts/raw-final-gui/driver.py"
+          ],
+          "exit": 0,
+          "seconds": 54.353218303003814,
+          "inputs": 1704,
+          "drift": []
+        },
+        "sanitize-compact": {
+          "command": [
+            "nice",
+            "-n",
+            "15",
+            "/home/blux/de-xr/dome-sculpt/artifacts/selection-gui-venv/bin/python",
+            "/home/blux/de-xr/dome-sculpt/artifacts/hdr-preserving-source-77fa37a/artifacts/raw-final-gui/driver.py"
+          ],
+          "exit": 0,
+          "seconds": 49.13902703599888,
+          "inputs": 1704,
+          "drift": []
+        }
+      }
+    },
+    "actual_a770": {
+      "report": "/home/blux/de-xr/dome-sculpt/artifacts/hdr-preserving-source-77fa37a/artifacts/raw-canonical-arc/status.json",
+      "sha256": "f98cf7c850a72c811ef7dee0e2fbc65806955aefcdc41456eb395a4aa024b9ed",
+      "source": "015fa3c8bf7a2d7addbb357b7b52e80b235f97fc",
+      "scope": "Actual strict PCI03 Intel Arc A770 Release raw299/atlas127/physical128 with independent consumers, plus each software-required-hardware negative; no HMD/session/app installation",
+      "inputs": 1642,
+      "stages": {
+        "dome-sculpt-raw-hdr-preserving-test-hardware": {
+          "command": [
+            "nice",
+            "-n",
+            "15",
+            "/home/blux/de-xr/dome-sculpt/artifacts/hdr-preserving-source-77fa37a/build-release/dome-sculpt-raw-hdr-preserving-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/hdr-preserving-source-77fa37a/artifacts/raw-canonical-arc/dome-sculpt-raw-hdr-preserving-test-output",
+            "--hardware"
+          ],
+          "exit": 0,
+          "expected": 0,
+          "seconds": 0.9579164129972924,
+          "device_lines": [
+            "GL_VENDOR=Intel GL_RENDERER=Mesa Intel(R) Arc(tm) A770 Graphics (DG2)"
+          ]
+        },
+        "dome-sculpt-raw-hdr-preserving-test-software-negative": {
+          "command": [
+            "nice",
+            "-n",
+            "15",
+            "/home/blux/de-xr/dome-sculpt/artifacts/hdr-preserving-source-77fa37a/build-release/dome-sculpt-raw-hdr-preserving-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/hdr-preserving-source-77fa37a/artifacts/raw-canonical-arc/dome-sculpt-raw-hdr-preserving-test-negative",
+            "--hardware"
+          ],
+          "exit": 1,
+          "expected": 1,
+          "seconds": 0.04412998998304829,
+          "device_lines": [
+            "GL_VENDOR=Mesa GL_RENDERER=llvmpipe (LLVM 22.1.8, 256 bits)"
+          ]
+        },
+        "dome-sculpt-raw-hdr-authoring-test-hardware": {
+          "command": [
+            "nice",
+            "-n",
+            "15",
+            "/home/blux/de-xr/dome-sculpt/artifacts/hdr-preserving-source-77fa37a/build-release/dome-sculpt-raw-hdr-authoring-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/hdr-preserving-source-77fa37a/artifacts/raw-canonical-arc/dome-sculpt-raw-hdr-authoring-test-output",
+            "--hardware"
+          ],
+          "exit": 0,
+          "expected": 0,
+          "seconds": 3.104390961001627,
+          "device_lines": [
+            "GL_VENDOR=Intel GL_RENDERER=Mesa Intel(R) Arc(tm) A770 Graphics (DG2)"
+          ]
+        },
+        "dome-sculpt-raw-hdr-authoring-test-software-negative": {
+          "command": [
+            "nice",
+            "-n",
+            "15",
+            "/home/blux/de-xr/dome-sculpt/artifacts/hdr-preserving-source-77fa37a/build-release/dome-sculpt-raw-hdr-authoring-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/hdr-preserving-source-77fa37a/artifacts/raw-canonical-arc/dome-sculpt-raw-hdr-authoring-test-negative",
+            "--hardware"
+          ],
+          "exit": 1,
+          "expected": 1,
+          "seconds": 0.037591366010019556,
+          "device_lines": [
+            "GL_VENDOR=Mesa GL_RENDERER=llvmpipe (LLVM 22.1.8, 256 bits)"
+          ]
+        },
+        "dome-sculpt-source-paint-physical-authoring-test-hardware": {
+          "command": [
+            "nice",
+            "-n",
+            "15",
+            "/home/blux/de-xr/dome-sculpt/artifacts/hdr-preserving-source-77fa37a/build-release/dome-sculpt-source-paint-physical-authoring-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/hdr-preserving-source-77fa37a/artifacts/raw-canonical-arc/dome-sculpt-source-paint-physical-authoring-test-output",
+            "--hardware"
+          ],
+          "exit": 0,
+          "expected": 0,
+          "seconds": 3.4579510649782605,
+          "device_lines": [
+            "GL_VENDOR=Intel GL_RENDERER=Mesa Intel(R) Arc(tm) A770 Graphics (DG2)"
+          ]
+        },
+        "dome-sculpt-source-paint-physical-authoring-test-software-negative": {
+          "command": [
+            "nice",
+            "-n",
+            "15",
+            "/home/blux/de-xr/dome-sculpt/artifacts/hdr-preserving-source-77fa37a/build-release/dome-sculpt-source-paint-physical-authoring-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/hdr-preserving-source-77fa37a/artifacts/raw-canonical-arc/dome-sculpt-source-paint-physical-authoring-test-negative",
+            "--hardware"
+          ],
+          "exit": 1,
+          "expected": 1,
+          "seconds": 0.04185117001179606,
+          "device_lines": [
+            "GL_VENDOR=Mesa GL_RENDERER=llvmpipe (LLVM 22.1.8, 256 bits)"
+          ]
+        }
+      },
+      "drift": []
+    },
+    "initial_clean_owned_release": {
+      "report": "/home/blux/de-xr/dome-sculpt/artifacts/hdr-preserving-source-77fa37a/artifacts/initial-atlas-proof/status.json",
+      "sha256": "a41aceb32d7e8f4202440c737906fc04b4081e2c4da834a817fc4e0693fda3ce",
+      "source": "890a3a09218f6223e77a6828e210a96f95ef7258",
+      "scope": "Fresh coherent optimized owned core/support/render/native app +actual rawHDR/physical/control consumers; shared initial-atlas refactor ONLY, preserving raw-HDR admission still guarded",
+      "inputs": 1621,
+      "stages": {
+        "configure": {
+          "command": [
+            "nice",
+            "-n",
+            "15",
+            "cmake",
+            "-S",
+            ".",
+            "-B",
+            "build-release",
+            "-DCMAKE_BUILD_TYPE=Release",
+            "-DDOME_COMPUTE_BACKEND=CPU",
+            "-DDOME_BUILD_UI=ON",
+            "-DDOME_BUILD_XR=ON",
+            "-DFLTK_DIR=/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-release/share/fltk",
+            "-U*DOME_BITMAP_RUNTIME*",
+            "-U*NATIVEGL*",
+            "-U*RENDERFONTS*"
+          ],
+          "exit": 0,
+          "seconds": 7.934722440986661
+        },
+        "build": {
+          "command": [
+            "nice",
+            "-n",
+            "15",
+            "cmake",
+            "--build",
+            "build-release",
+            "--parallel",
+            "2",
+            "--target",
+            "dome-sculpt",
+            "dome-sculpt-raw-hdr-authoring-test",
+            "dome-sculpt-source-paint-physical-authoring-test",
+            "dome-sculpt-emission-controls-test"
+          ],
+          "exit": 0,
+          "seconds": 466.8453853329993
+        },
+        "tests": {
+          "command": [
+            "nice",
+            "-n",
+            "15",
+            "ctest",
+            "--test-dir",
+            "build-release",
+            "--output-on-failure",
+            "-R",
+            "^(raw-hdr-authoring|source-paint-physical-authoring|emission-controls)$"
+          ],
+          "exit": 0,
+          "seconds": 6.422114979999606
+        }
+      },
+      "drift": []
+    }
+  },
+  "pixel_metrics": [
+    {
+      "profile": "release",
+      "images": 32,
+      "maximum_mean": 0.00638298,
+      "maximum_interior": 1,
+      "required_mean": 2,
+      "required_interior": 2,
+      "edge_footprint": "Existing two-pixel geometry/mask edge exclusion for interior metric; mean covers every visible RGBA sample",
+      "full_native_recovery_pixel_delta": 0
+    },
+    {
+      "profile": "sanitize",
+      "images": 32,
+      "maximum_mean": 0.00638298,
+      "maximum_interior": 1,
+      "required_mean": 2,
+      "required_interior": 2,
+      "edge_footprint": "Existing two-pixel geometry/mask edge exclusion for interior metric; mean covers every visible RGBA sample",
+      "full_native_recovery_pixel_delta": 0
+    },
+    {
+      "profile": "actual-A770-release",
+      "images": 32,
+      "maximum_mean": 0.00611702,
+      "maximum_interior": 1,
+      "required_mean": 2,
+      "required_interior": 2,
+      "full_native_recovery_pixel_delta": 0
+    }
+  ],
+  "parser_allocator": {
+    "cpp_new_persistent_sites_each_profile": 44,
+    "malloc_null_persistent_sites_each_profile": 44,
+    "cancellation_boundaries_each_profile": 48,
+    "throwing_callback": true,
+    "zero_tracked_live_allocations_after_every_attempt": true,
+    "source_exact_and_retry": true,
+    "unwind_evidence": "/home/blux/de-xr/dome-sculpt/artifacts/hdr-preserving-source-77fa37a/artifacts/raw-canonical-arena/cpp-unwind-boundary.json"
+  },
+  "whole_pipeline": {
+    "contracts_each_profile": 18,
+    "persistent_cpp_denial_prefixes_each_profile": 6479,
+    "measured_cpp_baseline_each_profile": 6486,
+    "scope": "small actual raw source complete capture/proof/compiler/PNG/factor/native-payload/atomic-file path; includes durable running+queued Cancel followed by ordered Save; not an exhaustive system-C-malloc sweep"
+  },
+  "gui": {
+    "normal_assertions_each_profile": 33,
+    "compact_assertions_each_profile": 28,
+    "total": 122,
+    "compact_import_claim": false,
+    "normal": "actual unprepared64 Import/Cancel, radiance24/Undo, physical pointer refusal, policy/GLB/Open/Save",
+    "compact": "640x360/font32 actual current raw radiance/paint refusal/policy/GLB/Open/Save",
+    "sdk_release": "/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-release",
+    "sdk_sanitize": "/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-sanitize",
+    "bitmap": "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime",
+    "physical_HMD_or_install": false
+  },
+  "unused_resource": {
+    "width": 4095,
+    "height": 4095,
+    "retained_RGBA_bytes": 67076100,
+    "default_working_bytes": 268435456,
+    "actual_native_cbor_decoded_bytes": 67150634,
+    "native_source_scene_exact_R_and_SAN": true
+  },
+  "legacy_byte_controls": [
+    {
+      "profile": "release",
+      "scope": "source-paint-bake",
+      "files": 17,
+      "mismatches": []
+    },
+    {
+      "profile": "release",
+      "scope": "emission-export",
+      "files": 3,
+      "mismatches": []
+    },
+    {
+      "profile": "sanitize",
+      "scope": "source-paint-bake",
+      "files": 17,
+      "mismatches": []
+    },
+    {
+      "profile": "sanitize",
+      "scope": "emission-export",
+      "files": 3,
+      "mismatches": []
+    }
+  ],
+  "validators": [
+    {
+      "report": "/home/blux/de-xr/dome-sculpt/artifacts/hdr-preserving-source-77fa37a/artifacts/raw-canonical-formats-validation/khronos-arc.json",
+      "sha256": "fe678026a49adf4fb7ef9977d9251c86c4cddf84ca99de89484cec370565d1fa",
+      "version": "2.0.0-dev.3.10",
+      "maxIssues": 0,
+      "issueFilters": [],
+      "files": 127,
+      "errors": 0,
+      "warnings": 21
+    },
+    {
+      "report": "/home/blux/de-xr/dome-sculpt/artifacts/hdr-preserving-source-77fa37a/artifacts/raw-canonical-formats-validation/khronos-final-gui.json",
+      "sha256": "3e318f5e2f6154ab32206188eff3fa5118f08dc9748957320afb7177f88d8f50",
+      "version": "2.0.0-dev.3.10",
+      "maxIssues": 0,
+      "issueFilters": [],
+      "files": 4,
+      "errors": 0,
+      "warnings": 0
+    },
+    {
+      "report": "/home/blux/de-xr/dome-sculpt/artifacts/hdr-preserving-source-77fa37a/artifacts/raw-canonical-formats-validation/khronos-release.json",
+      "sha256": "d7d834baa647fee2f277c248f92edd195ffcd0dbe9a48501f2e0c779f10df55f",
+      "version": "2.0.0-dev.3.10",
+      "maxIssues": 0,
+      "issueFilters": [],
+      "files": 82,
+      "errors": 0,
+      "warnings": 13
+    },
+    {
+      "report": "/home/blux/de-xr/dome-sculpt/artifacts/hdr-preserving-source-77fa37a/artifacts/raw-canonical-formats-validation/khronos-sanitize.json",
+      "sha256": "510ade89b69931f5109f98c91de0878d4b3e29655ab1e35ff8369ba847f801b3",
+      "version": "2.0.0-dev.3.10",
+      "maxIssues": 0,
+      "issueFilters": [],
+      "files": 82,
+      "errors": 0,
+      "warnings": 13
+    }
+  ],
+  "preserved_negatives": [
+    {
+      "report": "/home/blux/de-xr/dome-sculpt/artifacts/hdr-preserving-source-77fa37a/artifacts/raw-factor-provenance/status.json",
+      "sha256": "c9b88a93006962c8de465f868039d6e9ec1bc472c2eac2feecbf25c21677fee2",
+      "source": "2b11ab69a63cde88d2c65ce5ddb5b55c280d2ba5",
+      "stage_exits": {
+        "compile": 0,
+        "link": 0,
+        "probe": 1
+      },
+      "drift": []
+    },
+    {
+      "report": "/home/blux/de-xr/dome-sculpt/artifacts/hdr-preserving-source-77fa37a/artifacts/raw-sampler-provenance/status.json",
+      "sha256": "3e1c1212219709ff9f08987d79f9161a7022138976d52fb391250c0972aac5c0",
+      "source": "ad04a115defb4945ffc4226f35adb87627f92e0e",
+      "stage_exits": {
+        "compile": 0,
+        "link": 0,
+        "run": 1
+      },
+      "drift": []
+    },
+    {
+      "report": "/home/blux/de-xr/dome-sculpt/artifacts/hdr-preserving-source-77fa37a/artifacts/raw-contract-canonical48/status.json",
+      "sha256": "6a61cb59b18e5bf754522833f840096a6c2ec60c35cab58cba5fec2343d41b2a",
+      "source": "48f97158c0ab344819a44ded958d046e147ed793",
+      "stage_exits": {
+        "release-compile": 0,
+        "release-link": 0,
+        "release-run": 0,
+        "release-oom": -11
+      },
+      "drift": []
+    },
+    {
+      "report": "/home/blux/de-xr/dome-sculpt/artifacts/hdr-preserving-source-77fa37a/artifacts/raw-canonical-oom-diagnosis/status.json",
+      "sha256": "9170b50e5971f1d1b530620017eaea30222aef3ebea58695be5a7ce7cb82d145",
+      "source": "48f97158c0ab344819a44ded958d046e147ed793",
+      "stage_exits": {
+        "link": 0,
+        "run": 1
+      },
+      "drift": []
+    },
+    {
+      "report": "/home/blux/de-xr/dome-sculpt/artifacts/hdr-preserving-source-77fa37a/artifacts/raw-unused-image-quota/status.json",
+      "sha256": "d293bfa42e1d3c2d65fb713b238f44b3321fc1f39738ef929b0ff5ac31c08d58",
+      "source": "48f97158c0ab344819a44ded958d046e147ed793",
+      "stage_exits": {
+        "compile": 0,
+        "link": 0,
+        "run": 1
+      },
+      "drift": []
+    },
+    {
+      "report": "/home/blux/de-xr/dome-sculpt/artifacts/hdr-preserving-source-77fa37a/artifacts/raw-contract-probe/status.json",
+      "sha256": "16154713991696f4fc53971bb14e2a8a67bc8f741fee864c7e4b5eb767b0c16b",
+      "source": "ad04a115defb4945ffc4226f35adb87627f92e0e",
+      "stage_exits": {
+        "old-compile": 0,
+        "old-link": 0,
+        "old-counterfactual": 1,
+        "release-compile": 1
+      },
+      "drift": []
+    },
+    {
+      "report": "/home/blux/de-xr/dome-sculpt/artifacts/hdr-preserving-source-77fa37a/artifacts/raw-canonical-formats/status.json",
+      "sha256": "e38c1b280c97f5ad4dec5168b900708e0f43c292b94daa69e69460422a44395d",
+      "source": "ffc4a62dd16b9f393cba9f1d8eac873f89a74b08",
+      "stage_exits": {
+        "release-configure": 0,
+        "release-build": 2
+      },
+      "drift": null
+    },
+    {
+      "report": "/home/blux/de-xr/dome-sculpt/artifacts/raw-canonical-48f-frozen/artifacts/parser-malloc-null-counterfactual/status.json",
+      "sha256": "ee88efab21d93cc5437faade053834867f0553a86fe0b98f14ecc13ee2ad2c19",
+      "source": "48f97158c0ab344819a44ded958d046e147ed793",
+      "stage_exits": {
+        "compile": 0,
+        "link": 0,
+        "run": -11
+      },
+      "drift": []
+    }
+  ],
+  "preserved_inputs": [
+    "/home/blux/de-xr/dome-sculpt/artifacts/raw-preserving-ad04-frozen/artifacts/PRESERVED-AD04.json",
+    "/home/blux/de-xr/dome-sculpt/artifacts/raw-canonical-48f-frozen/artifacts/PRESERVED-48F.json"
+  ],
+  "limits": [
+    "Raw direct painting remains unimplemented; explicit genuine Source4 preparation is the current editable workflow",
+    "Generic native-only Strict/SDF physical and retained Paint24/normal-metadata physical compiler adapters remain required",
+    "Source4 finite-filter counterexample remains: seven-case128 physical scope includes preserved NN+smooth-paint boundary failure, not seven lossless views",
+    "No full-avatar HDR/VRM/general-refinement or all-regression/main integration completion claim",
+    "No global cgltf importer OOM cleanup fix claimed; private allocator arena only",
+    "Actual frame/view/format-specific quality limits remain; native data is exact, portable PBR is explicitly approximate"
+  ]
+}

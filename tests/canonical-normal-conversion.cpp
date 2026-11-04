@@ -1,0 +1,89 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+#define DOME_BAKED_NORMAL_EXPORT_HELPERS_ONLY
+#include "baked-normal-export.cpp"
+#include "canonical-normal-conversion.hpp"
+#include "dome/tangents.hpp"
+namespace {
+Vec3 independent_unit(Vec3 v){double s=std::hypot(double(v.x),double(v.y),double(v.z));if(s<1e-12)throw std::runtime_error("Singular independent conversion oracle");return {float(v.x/s),float(v.y/s),float(v.z/s)};}
+double angle(Vec3 a,Vec3 b){a=independent_unit(a);b=independent_unit(b);return std::atan2(double(length(cross(a,b))),std::clamp(double(dot(a,b)),-1.,1.));}
+bool failure(const auto &call,std::string_view wanted){try{call();return false;}catch(const std::exception&e){return std::string_view(e.what()).find(wanted)!=std::string_view::npos;}}
+Vec3 filtered(const Image &image,double u,double v){
+ const double x=u*image.width-.5,y=v*image.height-.5;const int left=int(std::floor(x)),top=int(std::floor(y));const double fx=x-left,fy=y-top;std::array<double,3> rgb{};
+ for(int dy=0;dy<2;++dy)for(int dx=0;dx<2;++dx){const auto at=(size_t(std::clamp(top+dy,0,int(image.height)-1))*image.width+std::clamp(left+dx,0,int(image.width)-1))*4;const double w=(dx?fx:1-fx)*(dy?fy:1-fy);for(size_t c=0;c<3;++c)rgb[c]+=image.rgba[at+c]/255.*w;}
+ return {float(rgb[0]*2-1),float(rgb[1]*2-1),float(rgb[2]*2-1)};
+}
+void audit_filtered(const Scene &scene,const detail::CanonicalNormalConversionCandidate &candidate){
+ const auto &o=scene.active();const auto &mesh=o.painted->mesh();const auto original=o.painted->composite(o.material);const auto frames=tangent_corners(mesh);const auto target=candidate.target_frames->pbr;
+ double maximum=0;size_t samples=0;constexpr int divisions=160;
+ for(size_t face=0;face<mesh.indices.size()/3;++face)for(int i=0;i<=divisions;++i)for(int j=0;j<=divisions-i;++j){
+  const std::array<double,3>w{double(i)/divisions,double(j)/divisions,double(divisions-i-j)/divisions};double u=0,v=0;Vec3 on{},ot{},ob{},nn{},nt{},nb{};
+  for(size_t k=0;k<3;++k){const auto c=face*3+k;const auto vertex=mesh.indices[c];u+=mesh.uv[vertex][0]*w[k];v+=mesh.uv[vertex][1]*w[k];const auto n=independent_unit(mesh.normals[vertex]);const auto t=frames[c];const Vec3 T{t[0],t[1],t[2]};on+=n*float(w[k]);ot+=T*float(w[k]);ob+=cross(n,T)*(t[3]*float(w[k]));const auto a=target->tangents[c];const auto N=independent_unit(target->normals[c]),A=independent_unit({a[0],a[1],a[2]});nn+=N*float(w[k]);nt+=A*float(w[k]);nb+=independent_unit(cross(N,A))*(a[3]*float(w[k]));}
+  const auto a=filtered(original->normal,u,v),b=filtered(*candidate.projection->pbr,u,v);
+  maximum=std::max(maximum,angle(ot*a.x+ob*a.y+on*a.z,independent_unit(nt)*b.x+independent_unit(nb)*b.y+independent_unit(nn)*b.z));++samples;
+ }
+ std::cout<<"CONVERSION_FILTERED "<<samples<<" max="<<maximum<<std::endl;
+ require_cage(maximum<=.02,"Independent dense bilinear and boundary probes preserve the original native field at the unchanged angular bound");
+}
+void audit(const Scene &scene,const detail::CanonicalNormalConversionCandidate &candidate){
+ const auto &object=scene.active();const auto &mesh=object.painted->mesh();const auto original=object.painted->composite(object.material);
+ const auto frames=tangent_corners(mesh);const auto target=candidate.target_frames->pbr;const auto &image=*candidate.projection->pbr;
+ size_t observed=0,changed=0;double maximum=0;
+ for(size_t face=0;face<mesh.indices.size()/3;++face){
+  std::array<std::array<double,2>,3> uv;for(size_t k=0;k<3;++k){const auto p=mesh.uv[mesh.indices[face*3+k]];uv[k]={p[0],p[1]};}
+  const double determinant=(uv[1][1]-uv[2][1])*(uv[0][0]-uv[2][0])+(uv[2][0]-uv[1][0])*(uv[0][1]-uv[2][1]);
+  for(uint32_t y=0;y<image.height;++y)for(uint32_t x=0;x<image.width;++x){
+   const double u=(x+.5)/image.width,v=(y+.5)/image.height;
+   std::array<double,3>w{((uv[1][1]-uv[2][1])*(u-uv[2][0])+(uv[2][0]-uv[1][0])*(v-uv[2][1]))/determinant,((uv[2][1]-uv[0][1])*(u-uv[2][0])+(uv[0][0]-uv[2][0])*(v-uv[2][1]))/determinant,0};w[2]=1-w[0]-w[1];
+   // Strict interior excludes raster ownership edges; it is independent of
+   // the baker's top-left coverage implementation and padding decisions.
+   if(*std::min_element(w.begin(),w.end())<=1e-7)continue;
+   const size_t at=(size_t(y)*image.width+x)*4;Vec3 old_n{},old_t{},old_b{},new_n{},new_t{},new_b{};
+   for(size_t k=0;k<3;++k){const auto c=face*3+k;const auto n=independent_unit(mesh.normals[mesh.indices[c]]);const auto t=frames[c];const Vec3 tangent{t[0],t[1],t[2]};
+    old_n+=n*float(w[k]);old_t+=tangent*float(w[k]);old_b+=cross(n,tangent)*(t[3]*float(w[k]));
+    const auto nt=target->tangents[c];const auto nn=independent_unit(target->normals[c]);const auto tn=independent_unit({nt[0],nt[1],nt[2]});new_n+=nn*float(w[k]);new_t+=tn*float(w[k]);new_b+=independent_unit(cross(nn,tn))*(nt[3]*float(w[k]));
+   }
+   const auto &old=original->normal.rgba;const auto &converted=image.rgba;
+   auto decode=[&](const auto &bytes){return Vec3{float(double(bytes[at])/127.5-1),float(double(bytes[at+1])/127.5-1),float(double(bytes[at+2])/127.5-1)};};
+   const auto a=decode(old),b=decode(converted);const auto expected=old_t*a.x+old_b*a.y+old_n*a.z;
+   const auto actual=independent_unit(new_t)*b.x+independent_unit(new_b)*b.y+independent_unit(new_n)*b.z;
+   maximum=std::max(maximum,angle(expected,actual));changed+=!std::equal(old.begin()+at,old.begin()+at+4,converted.begin()+at);++observed;
+  }
+ }
+ require_cage(observed>100&&maximum<=.02001,"Independent raw native TBN and normalized-column target decoder preserve actual interior sample directions under declared center bound");
+ std::cout<<"CONVERSION_CENTERS "<<observed<<" changed="<<changed<<" max="<<maximum<<'\n';
+ if(scene.active().painted->mesh().positions[1].z!=0)require_cage(changed>20,"Curved conversion changes actual stored pixels instead of relabeling historical normal data");
+}
+}
+#ifndef DOME_CANONICAL_CONVERSION_HELPERS_ONLY
+int main(int argc,char **argv)try{
+ const std::filesystem::path out=argc>1?argv[1]:"";
+ if(!out.empty())std::filesystem::create_directories(out);
+ for(int variant=0;variant<16;++variant){auto scene=baked_fan(variant&1,variant&2,variant&4);
+  if(variant&8){auto paint=scene.active().painted->snapshot();auto baked=*paint->baked();
+   for(size_t at=0;at<baked.coverage.size();++at)if(baked.coverage[at])baked.coverage[at]=at%3==0?0:at%3==1?127:255;
+   paint->clear_bake();paint->install_bake(std::move(baked));scene.active().painted=std::move(paint);scene.validate();
+  }
+  const auto exact=scene.encode();const auto paint=scene.active().painted;const auto deformation=scene.active().deformation;
+  const ColorPreparationInput input{paint,scene.active().appearance,scene.active().material_bindings,deformation,scene.active().material};
+  const auto result=detail::convert_native_canonical_normals(input);
+  if(!out.empty()){
+   NormalFrameArchive archive;archive.add(result.target_frames);
+   std::ofstream frame(out/("frame-"+std::to_string(variant)+".json"));frame<<archive.encode().dump(2)<<'\n';
+   std::ofstream image(out/("normal-"+std::to_string(variant)+".rgba"),std::ios::binary);const auto &bytes=result.projection->pbr->rgba;image.write(reinterpret_cast<const char*>(bytes.data()),bytes.size());
+  }
+  require_cage(result.original_paint==paint&&result.original_deformation==deformation&&result.sampled_centers>100&&result.raster_samples>=result.sampled_centers,"Detached real-baker conversion retains exact genuine original paint/deformation owners and actual sampling counts");
+  require_cage(result.projection->pbr->rgba==result.projection->mtoon->rgba&&result.target_frames->current_targets.size()==size_t(bool(variant&2)),"Native PBR candidate owns real paired planes and complete current morph identities");audit(scene,result);audit_filtered(scene,result);
+  require_cage(scene.encode()==exact&&scene.active().painted==paint&&scene.active().deformation==deformation,"Successful detached conversion preserves all native history, bake recipe, source, layer and shape bytes");
+  NormalPreparationOptions too_small;too_small.max_working_bytes=1;
+  require_cage(failure([&]{detail::convert_native_canonical_normals(input,too_small);},"memory budget")&&scene.encode()==exact,"Working memory denial preserves exact original source");
+  too_small={};too_small.max_samples=1;require_cage(failure([&]{detail::convert_native_canonical_normals(input,too_small);},"sample budget"),"Sample resource bound is enforced before detached image work");
+  size_t polls=0;NormalPreparationOptions options;options.cancelled=[&]{++polls;return false;};detail::convert_native_canonical_normals(input,options);
+  for(auto cut:{size_t(1),std::max(size_t(2),polls/2),polls}){size_t at=0;options.cancelled=[&]{return ++at>=cut;};require_cage(failure([&]{detail::convert_native_canonical_normals(input,options);},"cancel")&&scene.encode()==exact,"Actual early/middle/late conversion cancellation preserves original source and supports retry");}
+  require_cage(detail::convert_native_canonical_normals(input).projection->pbr->rgba==result.projection->pbr->rgba,"Cancelled conversion retries to identical actual converted normal pixels");
+  if(variant&4){NormalPreparationOptions strict;strict.max_angular_error=0;require_cage(failure([&]{detail::convert_native_canonical_normals(input,strict);},"quantization"),"Zero-tolerance control refuses genuinely quantized curved conversion rather than silently relaxing quality");}
+ }
+ auto plain=baked_fan(false,false);auto clear=plain.active().painted->snapshot();clear->clear_bake();
+ require_cage(failure([&]{detail::convert_native_canonical_normals({clear,{},{},{},plain.active().material});},"historical normal payload"),"No-bake input cannot claim conversion provenance");
+ std::cout<<"PASS "<<cage_checks<<" native canonical conversion checks\n";return 0;
+}catch(const std::exception&e){std::cerr<<"FAIL "<<e.what()<<'\n';return 1;}
+#endif

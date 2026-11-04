@@ -20,5 +20,13 @@ struct SourceNormalPreparationAccess {
       std::span<const uint32_t>,const NormalPreparationOptions &);
   static PaintNormalPreparationResult prepare(const PaintedMesh &,
       const SourceMaterialBindings *,const NormalPreparationOptions &);
+  static std::shared_ptr<PaintedMesh> adopt_canonical(const PaintedMesh &,
+      std::shared_ptr<const PaintNormalProjection>,const std::function<bool()> & = {});
+  static std::shared_ptr<PaintedMesh> adopt_baked_field(const PaintedMesh &,
+      std::shared_ptr<const detail::BakedNormalField>,const std::function<bool()> & = {});
+  static std::shared_ptr<const Image> canonical_intrinsic(const PaintedMesh &,
+      const std::function<bool()> & = {});
+  static std::shared_ptr<PaintedMesh> upgrade_canonical(const PaintedMesh &,
+      std::shared_ptr<const detail::BakedNormalField>,const std::function<bool()> & = {});
 };
 } // namespace dome

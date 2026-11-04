@@ -36,6 +36,7 @@ enum class VrParameter {
   CutOffset, CutDirection, CutCapColor,
   SculptMaskMode, SculptMaskStrength, SculptPlanes, SculptResolution,
   ProceduralPattern, ProceduralFace, ProceduralGrid, ProceduralCoverage, ProceduralDepth, ProceduralSeed, BakeProjection, ImportUnitScale, BakeColors, PolygonDistance, PolygonCuts, PolygonConversion, ShapeRestore,
+  InkEmissionUnits, MaterialEmission, EmissionSource,
   ShapeMirror=2048 // Explicit additive ID; existing control identifiers remain stable.
 };
 inline bool procedural_parameter(VrParameter p) {
@@ -66,7 +67,8 @@ enum class VrControlEventType {
   UvPick,
   UvMove,
   UvCommand,
-  RecallBakeRecipe
+  RecallBakeRecipe,
+  ConvertCanonicalNormals
 };
 struct VrControlEvent {
   VrControlEventType type;

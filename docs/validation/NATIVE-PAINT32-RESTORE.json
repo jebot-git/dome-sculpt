@@ -1,0 +1,278 @@
+{
+  "scope": "PRIVATE scoped native32 Restore and responsive UV controls; not main or complete native32 export/authoring",
+  "foundation": "622739b58608bba49494304379d167f8afb1f8ca",
+  "runtime": "d48ce90",
+  "frozen_test_source": "b3e96b11843fd01ab80cb26d6d2ea5912568ed7f",
+  "popup_observer_followup": "74fb42f006ea2135045b377fb4d237aa58201266",
+  "coherent_results": [
+    {
+      "profile": "release",
+      "phase": "configure",
+      "command": [
+        "cmake",
+        "-S",
+        ".",
+        "-B",
+        "build-release",
+        "-G",
+        "Ninja",
+        "-DCMAKE_BUILD_TYPE=Release",
+        "-DBUILD_TESTING=ON",
+        "-DDOME_BUILD_UI=ON",
+        "-DDOME_BUILD_XR=ON",
+        "-DDOME_COMPUTE_BACKEND=CPU",
+        "-DCMAKE_EXPORT_COMPILE_COMMANDS=ON",
+        "-DFLTK_DIR=/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-release/share/fltk"
+      ],
+      "exit": 0,
+      "seconds": 1.299330472946167
+    },
+    {
+      "profile": "release",
+      "phase": "build",
+      "command": [
+        "nice",
+        "-n",
+        "15",
+        "cmake",
+        "--build",
+        "build-release",
+        "-j2",
+        "--target",
+        "dome-sculpt",
+        "dome-sculpt-native-authoring-inspect",
+        "dome-sculpt-native-paint-sampling-test",
+        "dome-sculpt-native-paint-sampling-faults-test",
+        "dome-sculpt-native-paint-sampling-transitions-test",
+        "dome-sculpt-paint-sampling-test",
+        "dome-sculpt-paint-sampling-grid-test",
+        "dome-sculpt-paint-sampling-archive-test",
+        "dome-sculpt-color-paint-sampling-test",
+        "dome-sculpt-native-physical-contracts-test",
+        "dome-sculpt-native-mtoon-physical-test",
+        "dome-sculpt-native-mtoon-preview-contracts-test",
+        "dome-sculpt-uv-workflow-test",
+        "dome-sculpt-modal-selection-controls-test",
+        "dome-sculpt-input-rebind-publication-test"
+      ],
+      "exit": 0,
+      "seconds": 9.642117023468018
+    },
+    {
+      "profile": "release",
+      "phase": "runtime",
+      "command": [
+        "ctest",
+        "--test-dir",
+        "build-release",
+        "-R",
+        "^(native-paint-sampling(-faults|-transitions)?|paint-sampling(-grid|-archive)?|color-paint-sampling|native-physical-contracts|native-mtoon-physical|native-mtoon-preview-contracts|uv-workflow|modal-selection-controls|input-rebind-publication)$",
+        "--output-on-failure"
+      ],
+      "exit": 0,
+      "seconds": 42.255873680114746
+    },
+    {
+      "profile": "sanitize",
+      "phase": "configure",
+      "command": [
+        "cmake",
+        "-S",
+        ".",
+        "-B",
+        "build-sanitize",
+        "-G",
+        "Ninja",
+        "-DCMAKE_BUILD_TYPE=Release",
+        "-DBUILD_TESTING=ON",
+        "-DDOME_BUILD_UI=ON",
+        "-DDOME_BUILD_XR=ON",
+        "-DDOME_COMPUTE_BACKEND=CPU",
+        "-DCMAKE_EXPORT_COMPILE_COMMANDS=ON",
+        "-DFLTK_DIR=/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-sanitize/share/fltk",
+        "-DCMAKE_C_FLAGS_RELEASE=-O1 -g1 -DNDEBUG -fsanitize=address,undefined -fno-omit-frame-pointer",
+        "-DCMAKE_CXX_FLAGS_RELEASE=-O1 -g1 -DNDEBUG -fsanitize=address,undefined -fno-omit-frame-pointer"
+      ],
+      "exit": 0,
+      "seconds": 6.2637739181518555
+    },
+    {
+      "profile": "sanitize",
+      "phase": "build",
+      "command": [
+        "nice",
+        "-n",
+        "15",
+        "cmake",
+        "--build",
+        "build-sanitize",
+        "-j2",
+        "--target",
+        "dome-sculpt",
+        "dome-sculpt-native-authoring-inspect",
+        "dome-sculpt-native-paint-sampling-test",
+        "dome-sculpt-native-paint-sampling-faults-test",
+        "dome-sculpt-native-paint-sampling-transitions-test",
+        "dome-sculpt-paint-sampling-test",
+        "dome-sculpt-paint-sampling-grid-test",
+        "dome-sculpt-paint-sampling-archive-test",
+        "dome-sculpt-color-paint-sampling-test",
+        "dome-sculpt-native-physical-contracts-test",
+        "dome-sculpt-native-mtoon-physical-test",
+        "dome-sculpt-native-mtoon-preview-contracts-test",
+        "dome-sculpt-uv-workflow-test",
+        "dome-sculpt-modal-selection-controls-test",
+        "dome-sculpt-input-rebind-publication-test"
+      ],
+      "exit": 0,
+      "seconds": 752.5040616989136
+    },
+    {
+      "profile": "sanitize",
+      "phase": "runtime",
+      "command": [
+        "ctest",
+        "--test-dir",
+        "build-sanitize",
+        "-R",
+        "^(native-paint-sampling(-faults|-transitions)?|paint-sampling(-grid|-archive)?|color-paint-sampling|native-physical-contracts|native-mtoon-physical|native-mtoon-preview-contracts|uv-workflow|modal-selection-controls|input-rebind-publication)$",
+        "--output-on-failure"
+      ],
+      "exit": 0,
+      "seconds": 159.8690059185028
+    }
+  ],
+  "source_inputs": 1863,
+  "source_inputs_unchanged": true,
+  "owned_sanitizer": [
+    "all C/C++ core/support/render/app/XR and matching consumers",
+    "O1 g1 ASan UBSan leak detection, unsuppressed"
+  ],
+  "checks_per_profile": {
+    "functional_controller_codec_history": 74,
+    "allocation_quota_cancel": 1793,
+    "unsupported_transition": 13
+  },
+  "persistent_allocation_prefixes": {
+    "factory_and_current_validation": 65,
+    "owning_decoder": 539,
+    "restore_detached": 17,
+    "actual_document_restore_admission": 73
+  },
+  "actual_cancellation_polls": {
+    "factory": 56,
+    "restore": 18
+  },
+  "transaction": "Exact ready private UV session handed into shared queue rollback transaction; computed Restore Cancel rejects dependent Save with the shared exact diagnostic and preserves Scene/file/history",
+  "native_byte_equal_pairs": {
+    "native-paint-sampling/first.dsculpt": {
+      "release": "2a13eef8750db1471849afe108cd02cea746c390a594c5557f29c1fa240f2c5e",
+      "sanitize": "2a13eef8750db1471849afe108cd02cea746c390a594c5557f29c1fa240f2c5e"
+    },
+    "native-paint-sampling/repeat.dsculpt": {
+      "release": "35f29674599e52449792f776bc9e378ae665366e9d3d5cd8a8120a22bdefdf69",
+      "sanitize": "35f29674599e52449792f776bc9e378ae665366e9d3d5cd8a8120a22bdefdf69"
+    },
+    "native-paint-sampling/restored.dsculpt": {
+      "release": "0096896fcab4795a69cb60fe91042bef4ade1cfbaf670f104768344a9ca1f6ff",
+      "sanitize": "0096896fcab4795a69cb60fe91042bef4ade1cfbaf670f104768344a9ca1f6ff"
+    },
+    "native-paint-sampling-faults/ordered.dsculpt": {
+      "release": "2a13eef8750db1471849afe108cd02cea746c390a594c5557f29c1fa240f2c5e",
+      "sanitize": "2a13eef8750db1471849afe108cd02cea746c390a594c5557f29c1fa240f2c5e"
+    }
+  },
+  "gui": {
+    "release_normal": {
+      "checks": 18,
+      "seconds": 29.588160514831543
+    },
+    "release_640x360_bitmap32": {
+      "checks": 18,
+      "seconds": 25.48705220222473
+    },
+    "owned_sanitize_640x360_bitmap32": {
+      "checks": 18,
+      "seconds": 41.67770457267761
+    },
+    "claims": [
+      "actual KeepPaint Apply, Save, restart, required mode, source Restore, Undo/Redo, native app Close0",
+      "visual readable compact toolbar/status and real supported native popup selection"
+    ],
+    "not_claimed": [
+      "independent native32 PBR pixel equivalence",
+      "hardware",
+      "Wayland",
+      "all UV toolbar operations"
+    ]
+  },
+  "evidence": {
+    "coherent": {
+      "path": "artifacts/native32-restore-rearm/status.json",
+      "sha256": "2e395e5d40e363190deffee681af48a897eec0c64f61ce20af37a54c9f49ff4f"
+    },
+    "sanitizer_binaries": {
+      "path": "artifacts/native32-restore-rearm/sanitize-runtime-binaries.json",
+      "sha256": "e6f01f0312884c99d0cf1ce70bb8166369d56a5648039b16de8ce1dfaa5b9e43"
+    },
+    "native_pairs": {
+      "path": "artifacts/native32-restore-rearm/native-pairs.json",
+      "sha256": "d4afe67f185fe867c03d70f3f497c5bb4f917217ee7fc5dfe28d44cffe089f44"
+    },
+    "normal_gui": {
+      "path": "artifacts/native32-gui-restore-release/status.json",
+      "sha256": "16a2987324bd5d72c449901f175c9d9cb639ece6c719fc75f93d93697eaea5b4"
+    },
+    "compact_release_gui": {
+      "path": "artifacts/native32-gui-restore-compact-keyboard/status.json",
+      "sha256": "af0a9964fc400f7d7d03e36ca30e30256b4144758b36b8a387bd9ac8c788121b"
+    },
+    "compact_sanitize_gui": {
+      "path": "artifacts/native32-gui-restore-sanitize-compact/status.json",
+      "sha256": "e3e6866dcd146984dd1fe682164cc8335c60a038fe97607bea309e140b8aa579"
+    }
+  },
+  "preserved_negatives": [
+    {
+      "head": "f71ade2",
+      "result": "Release11/13; genuine Nested document transaction",
+      "artifact": "artifacts/native32-restore-first",
+      "fix": "d48ce90"
+    },
+    {
+      "head": "d926477",
+      "result": "Release12/13; observer used desktop begin_uv for controller rays",
+      "artifact": "artifacts/native32-restore-single",
+      "fix": "2063d04"
+    },
+    {
+      "head": "2063d04",
+      "result": "Release12/13; observer assumed controller menu survived accepted worker rebind",
+      "artifact": "artifacts/native32-restore-controller",
+      "fix": "b3e96b1"
+    },
+    {
+      "head": "b3e96b1",
+      "result": "compact GUI timeout at unsupported FLTK popup End key, no product or deadline change",
+      "artifact": "artifacts/native32-gui-restore-release-compact",
+      "fix": "74fb42f"
+    },
+    {
+      "source": "qualified foundation ffbb226",
+      "result": "actual EditableGlb256 Native paint comparison baseline differs from its own source; sentinel/Scene/Save preserved",
+      "artifact": "../native-paint32-context-aa9906f/artifacts/native32-export-negative",
+      "status": "unresolved adapter required"
+    }
+  ],
+  "remaining": [
+    "genuine native32 independent pixels and geometry/normal/picking/source coordinate consumers",
+    "native32 finite editable GLB coordinate and sealed emission compiler, native recovery/interop",
+    "intentional qualified Scene33 composition; do not consume flawed historical31 representation by number",
+    "normal/source/baked/typed/rig/key/polygon current-domain transitions and full UV/Bake/cut adapters",
+    "full coherent main regression/admission"
+  ],
+  "historical_full_export_sweep": {
+    "handle": 87154,
+    "status": "still live and unchanged; not replaced or complete"
+  }
+}

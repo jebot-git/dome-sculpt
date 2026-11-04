@@ -108,8 +108,8 @@ void vrm1_references(const nlohmann::json &source, const ImportedAsset &asset,
                     "VRM1 expression material color type is invalid");
               finite_vector(bind.at("targetValue"), 4);
             } else {
-              finite_vector(bind.at("scale"), 2);
-              finite_vector(bind.at("offset"), 2);
+              if(bind.contains("scale"))finite_vector(bind.at("scale"), 2);
+              if(bind.contains("offset"))finite_vector(bind.at("offset"), 2);
             }
           }
         }

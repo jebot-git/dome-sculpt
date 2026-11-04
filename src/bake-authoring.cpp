@@ -11,6 +11,8 @@
 #include "dome/source-placement.hpp"
 #include "dome/normal-preparation.hpp"
 #include "normal-bake-encoding.hpp"
+#include "baked-normal-field.hpp"
+#include "canonical-normal-uv.hpp"
 namespace dome {
 ObjectBakeReport bake_object(Scene &scene, uint64_t source_id,
                               ObjectBakeSettings settings,
@@ -24,6 +26,13 @@ ObjectBakeReport bake_object(Scene &scene, uint64_t source_id,
   scene.validate();
   auto target = scene.active();
   auto source = scene.object(source_id);
+  if(target.material_bindings&&target.material_bindings->native_paint_sampling)throw std::logic_error("Retained native paint target requires its sampling-aware Bake adapter");
+  if(source.material_bindings&&source.material_bindings->native_paint_sampling)throw std::logic_error("Retained native paint source requires its sampling-aware Bake adapter");
+  if(target.material_bindings&&target.material_bindings->normal_preparation&&target.material_bindings->normal_preparation->canonical_conversion){
+    NormalPreparationOptions normal_options;normal_options.cancelled=cancelled;normal_options.max_angular_error=settings.normal_error;
+    auto layered=convert_canonical_normals({target.painted,target.appearance,target.material_bindings,target.deformation,target.material,{}},normal_options);
+    target.painted=std::move(layered.paint);target.material_bindings=std::move(layered.material_bindings);
+  }
   const bool current_source=source.polygon&&source.polygon->active&&source.polygon->colors;
   const bool current_target=target.polygon&&target.polygon->active&&target.polygon->colors;
   if(!detail::corner_bake_target_supported(target))
@@ -36,7 +45,8 @@ ObjectBakeReport bake_object(Scene &scene, uint64_t source_id,
     throw std::invalid_argument("Choose a different source object for baking");
   if (!target.visible || target.locked || !target.mesh_active || !target.painted)
     throw std::logic_error("Show, unlock and prepare the target painting mesh before baking");
-  if(source.mesh_active&&source.painted&&source.painted->normal_projection())
+  if(source.mesh_active&&source.painted&&(source.painted->normal_projection()||
+      (source.painted->baked()&&source.painted->baked()->normal_field)))
     throw std::invalid_argument("Select a source without prepared normal attributes for this bake; source-frame transport is required and both objects are retained");
   if(!std::isfinite(settings.color_error)||settings.color_error<0||settings.color_error>1)
     throw std::invalid_argument("Invalid vertex-color preparation tolerance");
@@ -89,7 +99,7 @@ ObjectBakeReport bake_object(Scene &scene, uint64_t source_id,
     target.painted=std::move(prepared.paint);target.material_bindings=std::move(prepared.material_bindings);converted=prepared.converted;
   }
   bool normal_converted=false;
-  if(settings.prepare_normals&&!target.painted->normal_projection()){
+  if(settings.prepare_normals&&!target.painted->normal_projection()&&!(target.material_bindings&&target.material_bindings->canonical_attributes)){
     auto placement=capture_source_placement(scene,target.id);
     const auto world=placement?CanvasTransform{}:scene.world_transform(target.id);
     detail::strict_polygon_color_target(target,world,cancelled,std::move(placement),current_target);
@@ -129,7 +139,8 @@ ObjectBakeReport bake_object(Scene &scene, uint64_t source_id,
   options.separate_pbr_color=separate;
   options.cancelled = cancelled;
   if(progress)options.progress=[&](float value){progress(.1f+.8f*value);};
-  const bool prepared_normals=bool(target.painted->normal_projection());
+  const auto canonical_attributes=target.material_bindings?target.material_bindings->canonical_attributes:nullptr;
+  const bool prepared_normals=bool(target.painted->normal_projection())||bool(canonical_attributes);
   const bool canonical_captured=!prepared_normals&&detail::capture_new_bake_frame(target,cancelled);
   std::optional<Mesh> low;
   if(prepared_normals){
@@ -137,7 +148,7 @@ ObjectBakeReport bake_object(Scene &scene, uint64_t source_id,
     low.emplace();low->indices.resize(mesh.indices.size());
     for(size_t c=0;c<mesh.indices.size();++c){if((c&1023)==0)check();const auto v=mesh.indices[c];low->indices[c]=uint32_t(c);low->positions.push_back(mesh.positions[v]);low->normals.push_back(frame.normals[c]);low->uv.push_back(mesh.uv[v]);options.low_tangents.push_back(frame.tangents[c]);}
     const auto frames=target.material_bindings->normal_frames;
-    const auto mode=target.material_bindings->normal_preparation->receipt.mtoon;
+    const auto mode=canonical_attributes?PreparedMToonNormalEvaluation::Absent:target.material_bindings->normal_preparation->receipt.mtoon;
     options.encode_target_normal=[frames,mode,limit=double(settings.normal_error)](uint32_t triangle,std::array<float,3> bary,Vec3 desired){
       std::array<detail::NormalBakeVertex,3> pbr,toon;const auto &f=*frames->pbr;
       for(size_t k=0;k<3;++k){const size_t c=size_t(triangle)*3+k;const auto t=f.tangents[c];const Vec3 T{t[0],t[1],t[2]};
@@ -157,14 +168,35 @@ ObjectBakeReport bake_object(Scene &scene, uint64_t source_id,
   if(settings.cage_object)
     options.cage_positions=detail::object_bake_cage(scene,target.id,settings.cage_object,
         target.painted->mesh(),low_mesh,cancelled);
+  const auto retained_uv=target.material_bindings?target.material_bindings->canonical_uv:nullptr;
+  if(retained_uv&&progress)options.progress=[&](float value){progress(.1f+.4f*value);};
   auto result = bake_mesh(low_mesh, high, options);
+  std::optional<BakeResult> retained_normal_write;
+  if(retained_uv){
+    retained_uv->validate_current(target.painted->mesh(),cancelled);
+    if(!low||!canonical_attributes||low->positions.size()!=target.painted->mesh().indices.size())
+      throw std::invalid_argument("Retained normal rebake lost its exact split corner basis");
+    // Material channels belong to the current editable atlas. The independent
+    // normal field still belongs to its original root coordinates. Project
+    // that role in the original domain instead of replacing it with current-UV
+    // texels. These are CPU geometry queries, never framebuffer readbacks.
+    Mesh normal_low=*low;
+    for(size_t c=0;c<normal_low.uv.size();++c){if((c&1023)==0)check();
+      normal_low.uv[c]=retained_uv->coordinates().at(target.painted->mesh().indices[c]);}
+    auto normal_options=options;
+    if(result.rays>=options.max_rays||result.raster_samples>=options.max_raster_samples)
+      throw std::length_error("Retained normal rebake lacks aggregate projection/raster budget");
+    normal_options.max_rays-=result.rays;normal_options.max_raster_samples-=result.raster_samples;
+    if(progress)normal_options.progress=[&](float value){progress(.5f+.4f*value);};
+    retained_normal_write=bake_mesh(normal_low,high,normal_options);
+  }
   check();
   if(!result.projected)throw std::runtime_error("No target texels project onto the selected source");
-  ObjectBakeReport report{result.projected,result.padded,result.rays,result.missed};
+  ObjectBakeReport report{result.projected,result.padded,result.rays+(retained_normal_write?retained_normal_write->rays:0),result.missed};
   report.color_prepared=converted;
   report.canonical_captured=canonical_captured;
   report.normal_prepared=normal_converted;
-  if(prepared_normals)report.normal_initial_error=target.material_bindings->normal_preparation->receipt.observed_initial_error;
+  if(prepared_normals)report.normal_initial_error=canonical_attributes?canonical_attributes->receipt().observed_initial_error:target.material_bindings->normal_preparation->receipt.observed_initial_error;
   if(target.material_bindings&&target.material_bindings->color_preparation)
     report.color_error_bound=target.material_bindings->color_preparation->projection->maximum_error;
   if(auto prior=target.painted->baked())
@@ -180,6 +212,20 @@ ObjectBakeReport bake_object(Scene &scene, uint64_t source_id,
   textures.coverage.reserve(result.coverage.size());
   for (auto c : result.coverage) textures.coverage.push_back(c==1 || c==2 ? 255 : 0);
   auto painting = target.painted->snapshot();
+  if(canonical_attributes){
+    detail::BakedNormalFieldOptions field_options;field_options.cancelled=cancelled;
+    const auto old=target.painted->baked()?target.painted->baked()->normal_field:nullptr;
+    auto before=old?old:detail::BakedNormalField::from_intrinsic(canonical_attributes,field_options);
+    if(retained_normal_write){
+      BakedTextures normal_write;normal_write.normal_interpretation=BakedNormalInterpretation::PreparedAttributes;
+      normal_write.color_interpretation=textures.color_interpretation;
+      normal_write.maps=std::move(retained_normal_write->maps);normal_write.maps.normal=std::move(retained_normal_write->normal);
+      normal_write.coverage.reserve(retained_normal_write->coverage.size());
+      for(auto c:retained_normal_write->coverage)normal_write.coverage.push_back(c==1||c==2?255:0);
+      textures.normal_field=before->replace(normal_write,field_options);
+    }else textures.normal_field=before->replace(textures,field_options);
+    textures.maps.normal={};textures.maps.mtoon_normal={};
+  }
   painting->install_bake(std::move(textures));
   auto next = scene;
   next.active().painted = std::move(painting);

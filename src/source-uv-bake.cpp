@@ -3,6 +3,8 @@
 #include "dome/source-uv-bake.hpp"
 #include "dome/tangents.hpp"
 #include "normal-frame-runtime.hpp"
+#include "canonical-normal-uv.hpp"
+#include "source-paint-pairing.hpp"
 #include "dome/color-preparation.hpp"
 #include "dome/color-paint-sampling.hpp"
 #include "paint-sampling-access.hpp"
@@ -11,6 +13,8 @@
 #include "paint-overlay-packet.hpp"
 #include "paint-overlay-sample.hpp"
 #include "dome/source-paint-bake.hpp"
+#include "source-paint-physical.hpp"
+#include "emission-paint-access.hpp"
 #include "normal-projection-identity.hpp"
 #include "normal-sampling-access.hpp"
 #include "source-colors.hpp"
@@ -74,9 +78,19 @@ struct Plan {
 bool same(const Plan&a,const Plan&b){return a.view.image==b.view.image&&a.srgb==b.srgb&&a.normal==b.normal&&a.check_backface==b.check_backface&&a.domain==b.domain&&a.transform==b.transform&&!a.animated&&!b.animated&&a.view.wrap_s==b.view.wrap_s&&a.view.wrap_t==b.view.wrap_t&&a.view.min_filter==b.view.min_filter&&a.view.mag_filter==b.view.mag_filter;}
 void validate(const SourceUvBakeInput&i,const SourceUvBakeOptions&o){
  if(o.cancelled&&o.cancelled())throw std::runtime_error("Source UV bake cancelled");
+ if(!i.paint)throw std::invalid_argument("Source UV input requires its actual original paint");
+ const auto canonical=i.current_material?i.current_material->canonical_attributes:nullptr;
+ if(canonical){
+  if(i.appearance||i.polygon_authority||i.paint->normal_projection()||i.paint->color_projection()||
+      i.paint->paint_sampling_domain()||i.current_material->key_derivation||i.current_material->has_mtoon||
+      i.current_material->normal_frames!=canonical->frames()||o.resolution)
+    throw std::invalid_argument("Converted normal UV changes require their exact supported native attribute/field domain");
+  detail::source_paint_pairing(i.paint.get(),i.current_material.get(),nullptr,true);
+ }else if(i.paint&&i.paint->baked()&&i.paint->baked()->normal_field)
+  throw std::invalid_argument("Converted normal UV input lost its authentic attribute origin");
  if((i.current_material&&detail::physical_emission(*i.current_material))||(i.native_material&&detail::hdr_emission(i.native_material->emission))||(i.paint&&i.paint->has_physical_emission()))throw std::invalid_argument("Physical emission requires an exact UV transfer adapter; source retained");
  if(size_t(o.normal_sampling)>1)throw std::invalid_argument("Invalid normal UV sampling method");
- if(o.normal_sampling==SourceNormalUvMethod::RetainSource&&(!i.paint||!i.paint->normal_projection()))
+ if(o.normal_sampling==SourceNormalUvMethod::RetainSource&&!canonical&&(!i.paint||!i.paint->normal_projection()))
    throw std::invalid_argument("Retained normal sampling requires an owning prepared source");
  if(i.paint&&i.paint->paint_sampling_domain()&&o.resolution)
   throw std::invalid_argument("Retained paint detail needs an explicit sampling conversion before changing its resolution; original state retained");
@@ -414,7 +428,7 @@ SourceUvBakeResult bake_source_uv(const SourceUvBakeInput&i,const SourceUvBakeOp
  });
  auto dest=raster(i.target,i.paint->resolution(),false,false,budget);auto source=transfer_layers?raster(old,i.paint->resolution(),true,true,budget):Raster{};uint32_t r=i.paint->resolution(),cols=r/32;result.layers=i.paint->layers();for(auto &layer:result.layers){layer.tiles.assign(size_t(cols)*cols,{});layer.pbr_tiles.assign(prepared?size_t(cols)*cols:0,{});}
  std::shared_ptr<BakedTextures> transferred;std::vector<Tangent> old_frames,new_frames;
- if(old_bake){transferred=std::make_shared<BakedTextures>();auto blank=[&](bool normal=false){Image m{r,r,std::vector<uint8_t>(size_t(r)*r*4)};if(normal)for(size_t n=0;n<m.rgba.size();n+=4){m.rgba[n]=m.rgba[n+1]=128;m.rgba[n+2]=m.rgba[n+3]=255;}return m;};transferred->maps.color=blank();transferred->maps.metal_rough=blank();transferred->maps.emission=blank();transferred->color_interpretation=old_bake->color_interpretation;transferred->normal_interpretation=old_bake->normal_interpretation;if(prepared)transferred->maps.pbr_color=blank();transferred->coverage.assign(size_t(r)*r,0);if(!old_bake->maps.normal.rgba.empty()){transferred->maps.normal=blank(true);if(normal_prepared)transferred->maps.mtoon_normal=blank(true);if(!result.normal_frames){old_frames=tangent_corners(old,o.cancelled);new_frames=tangent_corners(i.target,o.cancelled);}}}
+ if(old_bake){transferred=std::make_shared<BakedTextures>();auto blank=[&](bool normal=false){Image m{r,r,std::vector<uint8_t>(size_t(r)*r*4)};if(normal)for(size_t n=0;n<m.rgba.size();n+=4){m.rgba[n]=m.rgba[n+1]=128;m.rgba[n+2]=m.rgba[n+3]=255;}return m;};transferred->maps.color=blank();transferred->maps.metal_rough=blank();transferred->maps.emission=blank();transferred->color_interpretation=old_bake->color_interpretation;transferred->normal_interpretation=old_bake->normal_interpretation;transferred->normal_field=old_bake->normal_field;if(prepared)transferred->maps.pbr_color=blank();transferred->coverage.assign(size_t(r)*r,0);if(!old_bake->maps.normal.rgba.empty()){transferred->maps.normal=blank(true);if(normal_prepared)transferred->maps.mtoon_normal=blank(true);if(!result.normal_frames){old_frames=tangent_corners(old,o.cancelled);new_frames=tangent_corners(i.target,o.cancelled);}}}
  std::vector<std::vector<std::shared_ptr<PaintTile>>> tiles(result.layers.size(),std::vector<std::shared_ptr<PaintTile>>(size_t(cols)*cols));
  std::vector<std::vector<std::shared_ptr<PaintColorTile>>> color_tiles(prepared?result.layers.size():0,std::vector<std::shared_ptr<PaintColorTile>>(prepared?size_t(cols)*cols:0));
  if(transfer_layers)for(uint32_t y=0;y<r;++y){budget.cancel();for(uint32_t x=0;x<r;++x){auto &h=dest.hits[size_t(y)*r+x];if(h.face==UINT32_MAX)continue;auto q=uv(old,nullptr,h);float px=q[0]*r-.5f,py=q[1]*r-.5f;int bx=int(std::floor(px)),by=int(std::floor(py));float fx=px-bx,fy=py-by;std::array<size_t,4> owners;std::array<float,4>w;for(int k=0;k<4;++k){int sx=std::clamp(bx+(k&1),0,int(r)-1),sy=std::clamp(by+(k>>1),0,int(r)-1);size_t at=size_t(sy)*r+sx;owners[k]=source.padding[at]>=0?size_t(source.padding[at]):at;w[k]=((k&1)?fx:1-fx)*((k>>1)?fy:1-fy);}
@@ -512,6 +526,143 @@ SourcePaintBakeResult bake_source_paint(const SourceUvBakeInput &input,const Mat
  }
  result.textures=std::move(maps);budget.cancel();return result;
 }
+detail::SourcePaintPhysicalResult detail::bake_source_paint_physical(
+    const SourceUvBakeInput &input,const Material &material,
+    const SourceUvBakeOptions &options) {
+ material.validate();
+ if(options.cancelled&&options.cancelled())throw std::runtime_error("Physical source material cancelled");
+ if((options.resolution&&(options.resolution<64||options.resolution>4096))||options.padding>64||
+    !options.max_vertices||options.max_vertices>2'000'000||
+    !options.max_triangles||options.max_triangles>2'000'000||
+    !options.max_layer_bytes||options.max_layer_bytes>128*1024*1024||
+    size_t(options.normal_sampling)>1||size_t(options.animation)>1||
+    !std::isfinite(options.freeze_seconds)||options.freeze_seconds<0||options.freeze_seconds>1e9||
+    !std::isfinite(options.max_normal_sample_error)||options.max_normal_sample_error<0||options.max_normal_sample_error>.25||
+    !options.max_image_pixels||options.max_image_pixels>16*1024*1024||
+    !options.max_output_bytes||options.max_output_bytes>1024ull*1024*1024||
+    !options.max_working_bytes||options.max_working_bytes>512*1024*1024||
+    !options.max_raster_samples||options.max_raster_samples>1024ull*1024*1024||
+    !options.max_sample_operations||options.max_sample_operations>1024ull*1024*1024)
+  throw std::invalid_argument("Invalid physical source compilation bounds");
+ if(!input.paint||input.paint->in_stroke()||!input.paint->source_sampling_prepared()||
+    !input.paint->valid_source_sampling_attachment()||input.paint->paint_sampling_domain())
+  throw std::invalid_argument("Physical portable material requires its owning original-source atlas");
+ if(!(input.paint->has_physical_emission()||detail::hdr_emission(material.emissive)||
+      (input.current_material&&detail::physical_emission(*input.current_material))))
+  throw std::invalid_argument("Physical portable material has no actual float authority");
+ if(input.target.positions.size()>options.max_vertices||input.paint->mesh().positions.size()>options.max_vertices||
+    input.target.indices.size()/3>options.max_triangles||input.paint->mesh().indices.size()/3>options.max_triangles)
+  throw std::length_error("Physical source geometry exceeds budget before staging");
+ uint32_t r=options.resolution?options.resolution:input.paint->resolution();
+ if(!options.resolution)if(const auto &source=input.paint->source_maps())
+  for(const auto *role:{&source->color,&source->metal_rough,&source->emission,&source->normal,&source->occlusion})
+   if(role->image)r=std::max({r,role->image->width,role->image->height});
+ const uint64_t pixels=uint64_t(r)*r;
+ // Keep the float source field until factorization completes. Reserve its
+ // image and the emission-free staging copies before creating any of them.
+ if(pixels>options.max_image_pixels||pixels>options.max_output_bytes/4||
+    pixels>options.max_working_bytes/(sizeof(std::array<float,3>)+4))
+  throw std::length_error("Physical source field exceeds image/working budget");
+ const uint64_t physical_work=pixels*(32+4*input.paint->layers().size());
+ if(physical_work>=options.max_sample_operations)
+  throw std::length_error("Physical source field exceeds sampling budget before compilation");
+ size_t scratch=size_t(pixels)*(sizeof(std::array<float,3>)+4)+sizeof(PaintedMesh);
+ auto charge=[&](size_t n,size_t unit){
+  if(scratch>options.max_working_bytes||n>(options.max_working_bytes-scratch)/unit)
+   throw std::length_error("Physical source staging exceeds working budget");
+  scratch+=n*unit;
+ };
+ charge(input.target.positions.size()+input.target.normals.size(),sizeof(Vec3));
+ charge(input.target.uv.size(),sizeof(std::array<float,2>));
+ charge(input.target.indices.size()+input.source_vertices.size(),sizeof(uint32_t));
+ charge(input.target.uv_pins.size()+input.target.uv_seams.size(),1);
+ charge(1,sizeof(detail::PaintOverlayPacket));
+ charge(1,512); // Initial buckets for three bounded capture owner sets.
+ for(const auto &layer:input.paint->layers()) {
+  if(options.cancelled&&options.cancelled())throw std::runtime_error("Physical source material cancelled");
+  charge(1,sizeof(PaintLayer));charge(layer.name.size()+1,1);
+  charge(layer.tiles.size()+layer.pbr_tiles.size()+layer.emission_tiles.size(),sizeof(std::shared_ptr<const PaintTile>));
+  // Capture copies the visible metadata vectors and builds three temporary
+  // owner sets. Bound those allocations before entering its factory.
+  if(layer.visible&&layer.opacity>0){
+   charge(1,sizeof(detail::PaintOverlayLayer));
+   charge(layer.tiles.size()+layer.pbr_tiles.size()+layer.emission_tiles.size(),sizeof(std::shared_ptr<const PaintTile>));
+   for(const auto &tile:layer.tiles)if(tile)charge(1,64);
+   for(const auto &tile:layer.pbr_tiles)if(tile)charge(1,64);
+   for(const auto &tile:layer.emission_tiles)if(tile)charge(1,64);
+  }
+  for(const auto &tile:layer.tiles)if(tile&&std::any_of(tile->pixels.begin(),tile->pixels.end(),[](const auto &p){return p.data[6]||p.data[7]||p.data[8]||p.data[12];}))
+   charge(1,sizeof(PaintTile));
+ }
+ auto packet=detail::PaintOverlayFactory::capture(*input.paint,options.cancelled);
+ charge(packet->storage_bytes(),1);
+ SourceUvBakeOptions bounded=options;
+ bounded.max_sample_operations-=size_t(physical_work);
+ if(scratch>=bounded.max_working_bytes||pixels*4>=bounded.max_output_bytes)
+  throw std::length_error("Physical source compiler lacks remaining material budget");
+ bounded.max_working_bytes-=scratch;bounded.max_output_bytes-=size_t(pixels)*4;
+ auto safe=input;safe.paint=detail::EmissionExportAccess::without_emission(*input.paint);
+ if(safe.current_material){auto binding=std::make_shared<SourceMaterialBindings>(*safe.current_material);
+  binding->physical_emission.reset();binding->native_reference.emission={};safe.current_material=std::move(binding);}
+ if(safe.native_material)safe.native_material->emission={};
+ auto safe_material=material;safe_material.emissive={};
+ SourcePaintPhysicalResult result;
+ result.material=bake_source_paint(safe,safe_material,bounded);
+ auto &sampling=result.material.sampling;
+ sampling.sample_operations+=size_t(physical_work);
+ // This second pass uses the identical owning triangle/barycentric/padding
+ // raster as the other channels, with its work added to the same counters.
+ auto raster_bounds=options;
+ size_t held=sampling.image_bytes;
+ if(sampling.layer_bytes>SIZE_MAX-held)throw std::length_error("Physical source staging byte overflow");
+ held+=sampling.layer_bytes;
+ if(sampling.baked_bytes>SIZE_MAX-held)throw std::length_error("Physical source staging byte overflow");
+ held+=sampling.baked_bytes;
+ if(held>=bounded.max_working_bytes)throw std::length_error("Physical source retained material exceeds working budget");
+ raster_bounds.max_working_bytes=bounded.max_working_bytes-held;
+ Budget budget{raster_bounds,sampling};
+ const auto layout=raster(input.target,r,false,true,budget);
+ std::vector<std::array<float,3>> radiance(size_t(pixels),std::array<float,3>{});
+ std::array<float,3> peak{};
+ const PaintSourceMaps empty;
+ const auto &source=input.paint->source_maps()?*input.paint->source_maps():empty;
+ auto background=material.emissive;
+ if(input.current_material&&input.current_material->physical_emission)
+  background=*input.current_material->physical_emission;
+ for(size_t at=0;at<pixels;++at){
+  if((at&1023)==0)budget.cancel();const auto owner=layout.padding[at];if(owner<0)continue;
+  const auto &hit=layout.hits[size_t(owner)];
+  const float u=(float(size_t(owner)%r)+.5f)/r,v=(float(size_t(owner)/r)+.5f)/r;
+  // Filtering follows layer composition; coverage is float, independent of
+  // the legacy byte plane. Source image coordinates/samplers are actual roles.
+  const auto overlay=detail::sample_overlay_values(*packet,u,v,true);
+  const auto image=sample_surface_texture(input.paint->mesh(),source,source.emission,hit.face,hit.bary,true);
+  for(size_t k=0;k<3;++k){
+   budget.work();const double value=double(background[k])*image[k]*(1-overlay[3][3])+overlay[2][k]+overlay[4][k];
+   if(!std::isfinite(value)||value<0||value>30000)
+    throw std::invalid_argument("Physical portable radiance is outside its actual finite range");
+   radiance[at][k]=float(value);peak[k]=std::max(peak[k],float(value));
+  }
+ }
+ result.strength=std::max({1.f,peak[0],peak[1],peak[2]});
+ for(size_t k=0;k<3;++k)result.factor[k]=peak[k]/result.strength;
+ result.emission={r,r,std::vector<uint8_t>(size_t(pixels)*4)};
+ for(size_t at=0;at<pixels;++at){
+  if((at&1023)==0)budget.cancel();
+  for(size_t k=0;k<3;++k){budget.work();const auto actual=radiance[at][k];
+   const auto q=byte(linear_to_srgb(peak[k]>0?actual/peak[k]:0));result.emission.rgba[at*4+k]=q;
+   const double restored=double(srgb_to_linear(q/255.f))*result.factor[k]*result.strength;
+   const double error=std::abs(double(actual)-restored);
+   result.maximum_absolute_error=std::max(result.maximum_absolute_error,error);
+   if(actual>0){++result.nonzero_samples;result.maximum_relative_error=std::max(result.maximum_relative_error,error/actual);
+    if(restored==0)++result.erased_nonzero_samples;}
+  }
+  result.emission.rgba[at*4+3]=255;
+ }
+ sampling.image_bytes+=size_t(pixels)*4;
+ if(sampling.image_bytes>options.max_output_bytes)throw std::length_error("Physical source aggregate images exceed output budget");
+ budget.cancel();return result;
+}
 struct SourceUvBakeAccess {
  static std::shared_ptr<PaintedMesh> adopt(const SourceUvBakeResult &result,
                                          const std::function<bool()> &cancelled) {
@@ -520,6 +671,11 @@ struct SourceUvBakeAccess {
      result.active_layer!=old.active_ || old.revision_==UINT64_MAX)
     throw std::invalid_argument("Source UV adoption cannot replace layer identity or active selection");
   const size_t columns=old.resolution()/PaintTile::size, count=columns*columns;
+  if((result.baked?result.baked->normal_field:nullptr)!=(old.baked_?old.baked_->normal_field:nullptr))
+    throw std::invalid_argument("UV adoption cannot drop, invent or replace the original resolved normal field");
+  if(old.baked_&&old.baked_->normal_field&&(!result.original_material||
+      result.original_material->canonical_attributes!=old.baked_->normal_field->origin()))
+    throw std::invalid_argument("UV adoption lost the original resolved normal attribute authority");
   size_t tiles=0,color_tiles=0;const bool prepared=bool(old.color_projection_),normal_prepared=bool(old.normal_projection_);
   for(size_t layer=0;layer<result.layers.size();++layer) {
    const auto &a=result.layers[layer],&b=old.layers_[layer];
@@ -650,6 +806,13 @@ SourceUvAdoption adopt_source_uv_bake(const SourceUvBakeResult &result,
  if(result.normal_reprojection){auto normal=std::make_shared<SourceNormalPreparation>(*result.original_material->normal_preparation);normal->projection=result.normal_reprojection->projection;normal->uv_reprojection=result.normal_reprojection;normal->sampling_domain.reset();binding->normal_preparation=std::move(normal);}
  if(result.normal_sampling){auto normal=std::make_shared<SourceNormalPreparation>(*result.original_material->normal_preparation);normal->projection=result.normal_sampling->projection;normal->sampling_domain=result.normal_sampling;normal->uv_reprojection.reset();binding->normal_preparation=std::move(normal);}
  binding->validate();
+ if(result.original_material&&result.original_material->canonical_attributes){
+  const auto &original=*result.original_material;detail::CanonicalNormalUvOptions uv_options;uv_options.cancelled=cancelled;
+  binding->canonical_attributes=original.canonical_attributes;
+  binding->canonical_uv=original.canonical_uv?original.canonical_uv->reparameterize(result.target,result.source_vertices,uv_options):
+    detail::CanonicalNormalUv::create(original.canonical_attributes,result.target,result.source_vertices,uv_options);
+  binding->validate();
+ }
  auto paint=SourceUvBakeAccess::adopt(result,cancelled);
  if(paint->color_projection()){if(result.color_reprojection)binding->color_preparation=result.color_reprojection;
   else{auto preparation=std::make_shared<SourceColorPreparation>(*result.original_material->color_preparation);preparation->projection=paint->color_projection();binding->color_preparation=std::move(preparation);}binding->validate();}

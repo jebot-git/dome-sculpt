@@ -9,6 +9,7 @@
 #include <FL/Fl_Scroll.H>
 #include <FL/Fl_Value_Input.H>
 #include <FL/fl_ask.H>
+#include <FL/fl_draw.H>
 namespace dome {
 void edit_rig_dialog(Document &doc) {
   auto draft = doc.draft_scene();
@@ -25,11 +26,15 @@ void edit_rig_dialog(Document &doc) {
   scroll.type(Fl_Scroll::VERTICAL);
   Fl_Group content(0, 0, width - 24, row * 14);
   content.resizable(nullptr);
-  Fl_Box hint(16, 4, width - 48, row * 2,
-      "Local rotation and translation are added to the current pose.\n"
-      "Apply commits one undo step; Cancel retains the current pose.");
+  const char *instructions = "Add local joint rotation or translation.\n"
+      "Apply is one Undo; Cancel keeps the pose.";
+  fl_font(dx::font,dx::size);
+  int text_width=width-48, text_height=0;
+  fl_measure(instructions,text_width,text_height,0);
+  const int header=std::max(row*2,text_height+16);
+  Fl_Box hint(16,4,width-48,header-4,instructions);
   hint.align(FL_ALIGN_CENTER | FL_ALIGN_INSIDE | FL_ALIGN_WRAP);
-  int y = row * 2;
+  int y = header;
   Fl_Choice joint(label, y, width - label - 40, row - 4, "Joint"); y += row;
   std::vector<Fl_Menu_Item> joints, shapes;
   if (data->skeleton && data->skin) {
@@ -50,9 +55,9 @@ void edit_rig_dialog(Document &doc) {
     fields[i]->step(i < 3 ? .1 : .001);
     if (joints.empty()) fields[i]->deactivate();
   }
-  Fl_Check_Button linked(20, y, width - 50, row, "Pose all matching rig parts in this group");
+  Fl_Check_Button linked(20, y, width - 50, row, "Pose all linked rig parts");
   linked.value(1); y += row;
-  Fl_Check_Button reset(20, y, width - 50, row, "Reset pose before applying the adjustments"); y += row;
+  Fl_Check_Button reset(20, y, width - 50, row, "Reset pose before Apply"); y += row;
   if (joints.empty()) { linked.deactivate(); reset.deactivate(); }
   Fl_Choice morph(label, y, width - label - 40, row - 4, "Shapekey (selected part)"); y += row;
   Fl_Value_Input weight(label, y, width - label - 40, row - 4, "Shapekey weight"); y += row;

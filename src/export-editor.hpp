@@ -2,5 +2,6 @@
 #pragma once
 #include "dome/document.hpp"
 namespace dome {
-std::optional<AssetExportFormat> editable_export_dialog();
+enum class EditableExportKind { Project, AvatarV1 };
+std::optional<AssetExportFormat> editable_export_dialog(EditableExportKind=EditableExportKind::Project);
 }

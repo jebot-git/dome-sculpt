@@ -8,6 +8,7 @@
 #include "paint-normal-access.hpp"
 #include "source-paint-pairing.hpp"
 #include "normal-preparation-cache.hpp"
+#include "canonical-normal-owner.hpp"
 #include <mutex>
 namespace dome {
 namespace {
@@ -97,7 +98,17 @@ void SourceNormalPreparation::validate(bool deep) const {
   if(original_material)original_material->validate(deep);
   detail::source_paint_pairing(original_paint.get(),original_material.get(),original_appearance.get(),deep);
   if(original_paint->resolution()!=receipt.resolution)throw std::invalid_argument("Normal preparation original resolution differs");
-  if(original_paint->baked()&&!original_paint->baked()->maps.normal.rgba.empty())throw std::invalid_argument("Historical normal payload cannot be silently reinterpreted");
+  if(original_paint->baked()&&!original_paint->baked()->maps.normal.rgba.empty()&&!canonical_conversion)throw std::invalid_argument("Historical normal payload cannot be silently reinterpreted");
+  if(canonical_conversion){
+    const auto &c=*canonical_conversion;
+    auto own=[](const auto &a,const auto &b){return a==b&&!a.owner_before(b)&&!b.owner_before(a);};
+    if(!c.valid_owner(canonical_conversion)||original_appearance||!own(original_paint,c.before_paint())||
+        !own(original_material,c.before_material())||!own(original_deformation,c.before_deformation())||
+        receipt.encode()!=c.receipt().encode()||!detail::normal_projection_identity(*initial_projection,*c.projection())||
+        (!key_derivation&&!own(target_frames,c.frames())))
+      throw std::invalid_argument("Explicit canonical conversion lost its actual source/frame/normal lease");
+    c.validate(deep);
+  }
   projection->validate(receipt.resolution,deep);initial_projection->validate(receipt.resolution,deep);target_frames->validate(false);
   if(initial_projection->version!=1 || (sampling_domain?projection->version!=2:projection->version!=1) || (sampling_domain&&uv_reprojection))
     throw std::invalid_argument("Retained normal sampling requires its complete owning domain replay");
@@ -128,7 +139,7 @@ void SourceNormalPreparation::validate(bool deep) const {
      (receipt.mtoon!=PreparedMToonNormalEvaluation::Absent&&target_frames->mtoon!=target_frames->pbr))
     throw std::invalid_argument("Prepared normal target has no explicit compatible complete attribute model");
   if(original_appearance&&original_appearance->source_vertices.size()!=original_paint->mesh().positions.size())throw std::invalid_argument("Normal preparation original appearance remap differs");
-  if(!deep||key_derivation)return;
+  if(!deep||key_derivation||canonical_conversion)return;
   const auto receipt_data=receipt.encode();
   {
     std::lock_guard lock(proof_mutex);

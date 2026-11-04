@@ -1,0 +1,9 @@
+# Original source shading after canonical conversion
+
+A new read-only actual renderer audit compares the original legacy canonical bake directly with its converted separate normal field after changing native skin pose and morph weights. This comparison is distinct from the qualified UV34 milestone, whose reference is the already converted pre-UV scene.
+
+Each Release and ASan/UBSan profile renders nine repeated unskinned rest controls (all error0), then nine actual curved/skinned/morphed states. The curved rest state is within1, but four states exceed the unchanged image limit4: weights0.35 at poses0/1/2 produce9/7/7, and pose2 at weight0 produces9. Both full morph endpoints at weight1 remain within1. All eight failed-pair PNGs match byte-for-byte across the two profiles. There is no sanitizer memory error; both actual comparison processes correctly exit1. Complete new consumer translation units use the exact matching current own final34 archives;2,152 inputs each remain unchanged.
+
+Read [the receipt](validation/CANONICAL-DEFORMED-SOURCE-AUDIT.json) for every command, state and image hash. The root cause is not yet established: native morph normal generation and pose-dependent canonical/PBR frame transport both require inspection. Do not weaken the bound, replace the original reference, or call this a UV failure. UV layout, source retention, archive, independent converted-field export and controls evidence stays scoped to its actual converted reference.
+
+This is a real additional conversion/source-equivalence gap before main admission. It does not finish the conversion feature or the full production goal. The separate frozen f2dc466 fresh ALL/full630 run continues untouched; a green result there cannot override this new independent counterexample. No system, headset or active-session action occurred.

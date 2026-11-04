@@ -4,6 +4,7 @@
 #include "dome/bake-recipe.hpp"
 #include "dome/polygon-scene.hpp"
 #include "polygon-color-target.hpp"
+#include "dome/normal-preparation.hpp"
 namespace dome {
 AssetStatus Document::asset_status() const {
   auto work=asset_work_.load();
@@ -20,6 +21,7 @@ void Document::cancel_asset_work_locked(){
   }
 }
 void Document::cancel_background_work_locked(){
+  if(state_.expressions)end_expression_preview_locked(false);
   cancel_asset_work_locked();
   for(const auto &work:exports_)if(work && work->cancel())
     state_.message="Cancelling background work...";
@@ -85,7 +87,7 @@ void Document::queue_bake_locked(uint64_t source,ObjectBakeSettings settings,Ass
     *report=std::to_string(result.projected)+" projected, "+std::to_string(result.missed)+" missed ("+std::to_string(result.preserved_misses)+" kept from prior bake)";
     if(result.color_prepared){char quality[96];snprintf(quality,sizeof(quality),"; color error bound %.4f",double(*std::max_element(result.color_error_bound.begin(),result.color_error_bound.end())));*report+=quality;}
     if(result.canonical_captured)*report+="; verified normal frame captured";
-    if(result.normal_prepared){char quality[128];snprintf(quality,sizeof(quality),"; normal attributes prepared (initial quantization %.3f deg)",result.normal_initial_error*57.29577951308232);*report+=quality;}
+    if(result.normal_prepared){char quality[128];snprintf(quality,sizeof(quality),"; portable normal attributes authored (rest quantization %.3f deg)",result.normal_initial_error*57.29577951308232);*report+=quality;}
   },expected,report,work,{}, {},0,0,{},BakeAdmission{source,settings});
 }
 void Document::bake_from_object(uint64_t source,ObjectBakeSettings settings,AssetSource expected){
@@ -95,10 +97,43 @@ void Document::queue_clear_bake_locked(AssetSource expected){
   if(!bake_target_ready_locked() || !scene_.active().painted->baked())throw std::logic_error("Select an editable baked target");
   queue_scene_operation_locked("Clear baked surface",[](Scene &scene,const auto &cancelled){
     if(cancelled())throw std::runtime_error("Clear bake cancelled");
+    auto &o=scene.active();
+    if(o.material_bindings&&o.material_bindings->normal_preparation&&o.material_bindings->normal_preparation->canonical_conversion){
+      NormalPreparationOptions options;options.cancelled=cancelled;
+      auto result=convert_canonical_normals({o.painted,o.appearance,o.material_bindings,o.deformation,o.material,{}},options);
+      o.painted=std::move(result.paint);o.material_bindings=std::move(result.material_bindings);
+    }
     scene.active().painted->clear_bake();
   },expected,{});
 }
 void Document::clear_bake(AssetSource expected){
   std::lock_guard lock(model_mutex_);queue_clear_bake_locked(expected);
+}
+bool Document::canonical_conversion_ready_locked() const {
+  const auto &o=scene_.active();
+  if(!state_.object_grabbing&&bake_target_ready_locked()&&o.material_bindings&&o.material_bindings->normal_preparation){
+    const auto &p=*o.material_bindings->normal_preparation;
+    return p.canonical_conversion&&!p.uv_reprojection&&!p.sampling_domain&&!p.key_derivation;
+  }
+  return !state_.object_grabbing&&bake_target_ready_locked()&&!o.appearance&&!o.material_bindings&&
+    o.painted&&!o.painted->normal_projection()&&!o.painted->paint_sampling_domain()&&!o.painted->source_sampling_prepared()&&
+    o.painted->baked()&&!o.painted->baked()->maps.normal.rgba.empty()&&
+    o.painted->baked()->normal_interpretation==BakedNormalInterpretation::CanonicalMikk;
+}
+void Document::queue_convert_bake_locked(AssetSource expected){
+  if(control_before_||!canonical_conversion_ready_locked())throw std::logic_error("Select an editable native mesh with historical normal detail for explicit conversion");
+  const float error=state_.bake_settings.normal_error;
+  auto report=std::make_shared<std::string>();auto work=std::make_shared<AssetWork>();
+  queue_scene_operation_locked("Convert to portable normals",[error,report,work](Scene &scene,const auto &cancelled){
+    auto &o=scene.active();NormalPreparationOptions options;options.max_angular_error=error;options.cancelled=cancelled;
+    work->progress.store(.05f);
+    auto result=convert_canonical_normals({o.painted,o.appearance,o.material_bindings,o.deformation,o.material,{}},options);
+    o.painted=std::move(result.paint);o.material_bindings=std::move(result.material_bindings);
+    scene.validate();if(cancelled())throw std::runtime_error("Canonical normal conversion cancelled");
+    *report="Portable normal/tangent targets authored; original source retained. Pose and morph shading follow the new model.";work->progress.store(.95f);
+  },expected,report,work);
+}
+void Document::convert_baked_normals(AssetSource expected){
+  std::lock_guard lock(model_mutex_);queue_convert_bake_locked(expected);
 }
 } // namespace dome
