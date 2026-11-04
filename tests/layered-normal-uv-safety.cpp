@@ -15,6 +15,9 @@ int main(int argc,char **argv)try{
   SourceUvBakeInput in;in.paint=o.painted;in.current_material=o.material_bindings;in.current_deformation=o.deformation;in.appearance=o.appearance;in.target=o.painted->mesh();
   in.source_vertices.resize(in.target.positions.size());std::iota(in.source_vertices.begin(),in.source_vertices.end(),0);
   for(auto &uv:in.target.uv){uv[0]=uv[0]*.8f+.1f;uv[1]=uv[1]*.8f+.1f;}
+  auto missing=in;missing.paint.reset();bool refused=false;
+  try{bake_source_uv(missing);}catch(const std::invalid_argument &){refused=true;}
+  check(refused&&scene.encode()==exact,"Missing source paint is refused before any converted-normal access");
   const auto adopted=adopt_source_uv_bake(bake_source_uv(in));
   check(adopted.material_bindings->canonical_uv&&adopted.paint->baked()->normal_field==o.painted->baked()->normal_field&&scene.encode()==exact,
     "Changed UV producer preserves independent normal field and authentic new correspondence");

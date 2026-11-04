@@ -77,7 +77,7 @@ size_t BakedNormalArchive::preflight(const nlohmann::json &j,const nlohmann::jso
     if(!canonical_uv_material_archive(material)||!j.at("uv").is_array()||j.at("uv").empty()||j.at("uv").size()>256)
       throw std::invalid_argument("Normal UV pool requires actual bounded material16 correspondence");
     for(const auto &u:j.at("uv")){
-      if(!u.is_object()||u.size()!=3||u.at("version")!=1)
+      if(!u.is_object()||u.size()!=3||!u.at("version").is_number_integer()||u.at("version")!=1)
         throw std::invalid_argument("Invalid converted normal UV record");
       ref(u.at("origin"),j.at("origins").size());
       const auto bytes=SourceNormalUvLayout::encoded_storage_bytes(u.at("layout"));

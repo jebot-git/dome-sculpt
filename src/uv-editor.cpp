@@ -10,7 +10,7 @@ class UvCanvas : public Fl_Widget {
   Document &doc_;
   bool dragging_ = false, wheeling_ = false;
   float last_u_ = 0, last_v_ = 0;
-  int side() const { return std::max(1, std::min(w(), h()) - 40); }
+  int side() const { return std::max(1, std::min(w(), h()) - (h()<140?8:40)); }
   int left() const { return x() + (w() - side()) / 2; }
   int top() const { return y() + (h() - side()) / 2; }
   static void wheel_finished(void *data) {
@@ -168,11 +168,12 @@ void edit_uv(Document &doc) {
     Fl::screen_work_area(sx, sy, sw, sh);
     int width = std::min(std::max(840, dx::size * 46), sw - 40),
         height = std::min(900, sh - 40);
+    const bool compact=width<840||height<row*8;
     DomeDialog window(width, height, "UV editor");
     window.begin();
     UvCanvas canvas(0, row * 3, width, height - row * 5, doc);
     Fl_Box status(12, height - row * 2, width - 24, row);
-    status.align(FL_ALIGN_LEFT | FL_ALIGN_INSIDE | FL_ALIGN_WRAP);
+    status.align(FL_ALIGN_LEFT | FL_ALIGN_INSIDE | FL_ALIGN_WRAP | FL_ALIGN_CLIP);
     struct Command {
       Document *doc;
       UvCanvas *canvas;
@@ -190,7 +191,7 @@ void edit_uv(Document &doc) {
         window.hide();
         return;
       }
-      status.copy_label(
+      const char *full_status=
           v->solving ? state->message.c_str()
           : !state->error.empty() ? state->error.c_str()
           : (v->retain_paint_sampling||(v->retain_normal_sampling&&v->paint_sampling_available))
@@ -202,7 +203,14 @@ void edit_uv(Document &doc) {
                                "turn | Orange: pinned/cut"
                              : "Islands: drag | Wheel: scale | Shift+wheel: "
                                "turn | Pick seam edge for Seam/Stitch")
-              : v->error.c_str());
+              : v->error.c_str();
+      const char *shown=full_status;
+      if(compact&&!v->solving&&state->error.empty()&&v->valid){
+        shown=v->retain_paint_sampling?"Paint and normal detail kept.":v->retain_normal_sampling?"Normal detail kept. Save project.":
+          v->vertices?"Vertices: drag; wheel scales":"Islands: drag; wheel scales";
+      }
+      status.copy_label(shown);
+      if(std::string_view(status.tooltip()?status.tooltip():"")!=full_status)status.copy_tooltip(full_status);
       if (buttons.size() > 5) {
         for (auto button : buttons)
           if (v->committing || v->solving || !v->topology)
@@ -210,7 +218,7 @@ void edit_uv(Document &doc) {
           else
             button->activate();
         if(buttons.size()>14){
-          buttons[14]->copy_label(v->paint_sampling_available?"Keep paint + normal":"Keep normal detail");
+          buttons[14]->copy_label(compact?(v->paint_sampling_available?"Paint+N":"Normals"):(v->paint_sampling_available?"Keep paint + normal":"Keep normal detail"));
           buttons[14]->value(v->retain_normal_sampling&&!v->retain_paint_sampling);
           if(v->retain_paint_sampling||!v->normal_sampling_available||v->normal_sampling_required||v->validating||v->committing||v->solving||!v->topology)buttons[14]->deactivate();
           else buttons[14]->activate();
@@ -249,12 +257,14 @@ void edit_uv(Document &doc) {
                             {"Stitch", UvAction::Stitch, 0},
                             {"Keep normal detail",UvAction::RetainNormals,0},
                             {"Keep paint detail",UvAction::RetainPaint,0}};
+    const char *compact_labels[]={"Size-","Size+","Turn-","Turn+","Undo","Redo","Mode","Pin","Relax","Pack","Seam","Next","Unwr","Join","Normals","Paint"};
     Fl_Button cancel(width / 2 - 180, height - row + 4, 160, row - 8, "Cancel"),
         apply(width / 2 + 20, height - row + 4, 160, row - 8, "Apply");
     for (size_t i = 0; i < std::size(items); ++i) {
       int col = i==15?4:i%6, y = (i / 6) * row;
       auto b = new Fl_Button(col * width / 6 + 4, y + 4, (i>=14?2:1)*width / 6 - 8, row - 8,
-                             items[i].label);
+                             compact?compact_labels[i]:items[i].label);
+      b->tooltip(items[i].label);
       if(i>=14)b->type(FL_TOGGLE_BUTTON);
       buttons.push_back(b);
       auto c = std::make_unique<Command>(Command{

@@ -76,6 +76,7 @@ struct Plan {
 bool same(const Plan&a,const Plan&b){return a.view.image==b.view.image&&a.srgb==b.srgb&&a.normal==b.normal&&a.check_backface==b.check_backface&&a.domain==b.domain&&a.transform==b.transform&&!a.animated&&!b.animated&&a.view.wrap_s==b.view.wrap_s&&a.view.wrap_t==b.view.wrap_t&&a.view.min_filter==b.view.min_filter&&a.view.mag_filter==b.view.mag_filter;}
 void validate(const SourceUvBakeInput&i,const SourceUvBakeOptions&o){
  if(o.cancelled&&o.cancelled())throw std::runtime_error("Source UV bake cancelled");
+ if(!i.paint)throw std::invalid_argument("Source UV input requires its actual original paint");
  const auto canonical=i.current_material?i.current_material->canonical_attributes:nullptr;
  if(canonical){
   if(i.appearance||i.polygon_authority||i.paint->normal_projection()||i.paint->color_projection()||

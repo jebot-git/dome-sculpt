@@ -81,7 +81,7 @@ void CanonicalNormalUv::validate_current(const Mesh &current,const std::function
   if(!valid_owner(owner)||!origin_||!origin_->valid_owner(origin_)||!layout_||!mesh_||!bytes_||
       coordinates_.size()!=mesh_->positions.size())throw std::invalid_argument("Incomplete actual converted normal UV owner");
   current.validate();
-  if(current.positions.size()!=mesh_->positions.size()||current.indices!=mesh_->indices||
+  if(current.positions.size()!=mesh_->positions.size()||current.uv.size()!=mesh_->uv.size()||current.indices!=mesh_->indices||
       current.uv_pins!=mesh_->uv_pins||current.uv_seams!=mesh_->uv_seams)
     throw std::invalid_argument("Converted normal UV owner does not match the current geometry/layout");
   for(size_t v=0;v<current.positions.size();++v){

@@ -50,7 +50,8 @@ int main(int argc,char **argv)try{
  auto third=current->reparameterize(current_mesh,identity);current.reset();
  uv_check(old.expired()&&third->origin()==origin&&third->storage_bytes()==CanonicalNormalUv::create(origin,current_mesh,split_map)->storage_bytes(),
    "Repeated atlas edits flatten directly to root without retaining previous UV meshes or raster history");
- auto bad=split;bad.positions[0].x+=.01f;uv_check(refuses([&]{third->validate_current(bad);})&&refuses([&]{third->reparameterize(bad,identity);}),"POSITION edits cannot impersonate UV-only correspondence");
+ auto bad=split;bad.uv.clear();uv_check(refuses([&]{third->validate_current(bad);}),"Missing current UV array is refused before indexed correspondence access");
+ bad=split;bad.positions[0].x+=.01f;uv_check(refuses([&]{third->validate_current(bad);})&&refuses([&]{third->reparameterize(bad,identity);}),"POSITION edits cannot impersonate UV-only correspondence");
  bad=split;bad.normals[0].x+=.02f;uv_check(refuses([&]{third->validate_current(bad);})&&refuses([&]{third->reparameterize(bad,identity);}),"NORMAL edits cannot borrow original frame authority");
  bad=split;std::swap(bad.indices[0],bad.indices[1]);uv_check(refuses([&]{third->reparameterize(bad,identity);}),"Changed ordered source corners are refused");
  bad=split;bad.uv[0][0]=1.5f;uv_check(refuses([&]{third->reparameterize(bad,identity);}),"Out-of-atlas target coordinates are refused");

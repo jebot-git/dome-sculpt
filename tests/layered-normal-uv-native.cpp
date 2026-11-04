@@ -40,7 +40,9 @@ int main(int argc,char **argv)try{
    auto restored=Scene::decode(wire);check(restored.encode()==wire,"Scene34 decode replays exact root/corner correspondence and full native data");
    auto &r=restored.active();check(r.material_bindings->canonical_uv->origin()==r.material_bindings->canonical_attributes&&r.painted->baked()->normal_field->origin()==r.material_bindings->canonical_attributes,
      "Restart retains one exact shared original root across UV material and active field");
-   auto bad=wire;bad["version"]=33;check(uv_refuses([&]{Scene::decode(bad);}),"Scene33 cannot smuggle retained UV capability");
+   auto bad=wire;bad["baked_normal_fields"]["uv"][0]["version"]=1.0;
+   check(uv_refuses([&]{Scene::decode(bad);}),"UV archive version must be a real bounded integer capability");
+   bad=wire;bad["version"]=33;check(uv_refuses([&]{Scene::decode(bad);}),"Scene33 cannot smuggle retained UV capability");
    bad=wire;bad["baked_normal_fields"]["uv"].push_back(bad["baked_normal_fields"]["uv"][0]);check(uv_refuses([&]{Scene::decode(bad);}),"Unreachable UV correspondence records are refused");
    bad=wire;bad["source_materials"]["bindings"][0]["canonical_uv"]=uint64_t(1)<<32;check(uv_refuses([&]{Scene::decode(bad);}),"Oversized UV identity cannot wrap into a genuine pool owner");
    for(int pose=0;pose<3;++pose)for(float weight:{0.f,.35f,1.f}){
@@ -53,16 +55,24 @@ int main(int argc,char **argv)try{
     Document before,after;before.replace(original);after.replace(current);before.shading(false);after.shading(false);uv_settle(before);uv_settle(after);
     fbo.bind();auto expected=draw(renderer,before.frame().surface);fbo.bind();auto actual=draw(renderer,after.frame().surface);const auto atlas_error=delta(expected,actual);
     std::cout<<"NORMAL_UV variant="<<variant<<" split="<<split<<" pose="<<pose<<" weight="<<weight<<" atlas_error="<<atlas_error<<std::endl;
+    size_t visible=0;for(size_t i=3;i<actual.size();i+=4)visible+=actual[i]&&expected[i];
+    check(visible>200,"Actual original and UV-edited images contain the rendered surface");
     check(atlas_error<=4,"Actual posed/morphed native OpenGL shading retains original normal field after UV changes");
     const auto stats=renderer.texture_stats();fbo.bind();check(draw(renderer,after.frame().surface)==actual&&renderer.texture_stats().uploads==stats.uploads&&renderer.texture_stats().pack_builds==stats.pack_builds,
       "Second eye adds no new normal texture uploads or pack builds");
     const auto path=out/("uv-"+std::to_string(variant)+"-"+std::to_string(split)+"-"+std::to_string(pose)+"-"+std::to_string(int(weight*100))+".glb");
     after.export_asset(path,AssetExportFormat::EditableGlb256).get();prepared_normal_consumer::Model file(path);fbo.bind();independent.render(file.data);const auto independent_error=delta(actual,read());
     std::cout<<"NORMAL_UV_EXPORT max="<<independent_error<<std::endl;check(independent_error<=4,"Independent GLB/PNG skin/morph consumer uses emitted original normal UV channel");
+    if(variant==0&&split&&pose==0&&weight==0){
+     auto &normal=file.data->meshes[0].primitives[0].material->normal_texture;const auto coordinate=normal.texcoord;
+     normal.texcoord=0;fbo.bind();independent.render(file.data);const auto wrong=read();normal.texcoord=coordinate;
+     check(coordinate>0&&delta(actual,wrong)>4,"Independent wrong-UV counterfactual exceeds the unchanged image bound");
+    }
     if(pose==0&&weight==0){std::ifstream input(path,std::ios::binary);std::vector<uint8_t> bytes{std::istreambuf_iterator<char>(input),{}};auto embedded=extract_native_authoring(bytes);
      check(embedded&&embedded->encode()==current.encode(),"Actual editable GLB restores complete Scene34 and current normal UV correspondence");}
    }
    Document doc;doc.replace(restored);uv_settle(doc);doc.shading(false);doc.begin_uv();check(doc.wait_uv(),"Actual existing UV editor opens retained converted-normal workspace");
+   check(doc.frame().state->uv->normal_sampling_required&&doc.frame().state->uv->retain_normal_sampling,"Shared desktop and XR UV view shows original normal retention selected and required");
    doc.edit_uv(UvAction::Scale,.8f);doc.end_uv(true);auto saved=doc.save_async(out/("queued-"+std::to_string(variant)+"-"+std::to_string(split)+".dsculpt"));saved.get();uv_settle(doc);
    const auto changed=doc.copy_scene().encode();check(changed!=wire&&Scene::load(out/("queued-"+std::to_string(variant)+"-"+std::to_string(split)+".dsculpt")).encode()==changed,"Real UV Apply and ordered queued Save publish the same complete retained-normal scene");
    check(doc.undo(),"Actual UV edit has one global Undo");uv_settle(doc);check(doc.copy_scene().encode()==wire,"UV Undo restores exact whole original scene");check(doc.redo(),"Actual UV edit has one global Redo");uv_settle(doc);check(doc.copy_scene().encode()==changed,"UV Redo restores exact correspondence and field");
