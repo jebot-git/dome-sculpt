@@ -1,5 +1,17 @@
 # Full objective and completion evidence
 
+## Private VRM1 Source4 export regression — 2026-11-04
+
+The existing source-version consumer now proves authenticated pristine Source4
+export through the actual native worker, ordered Save/restart/history and original
+UV/reference transport. Matched Release/sanitizer each pass 5,232 checks plus
+unchanged worker 14/replay 16; five output pairs are byte-identical, Khronos has
+zero errors and 36 official schema instances pass. Runtime/API/schema/guards are
+unchanged. Read VRM1-SOURCE4-EXPORT-CONTRACT.md and receipt for original rejection-
+predicate failure, strict real-paint negatives and component-only scope. Painted
+V1, wider physics/assets, coherent app/device and allocator-null cleanup remain
+required; no complete production/main/physical-device claim is made.
+
 ## Private source-aware mesh bake and cut milestone — 2026-11-04
 
 Private14cc064 records runtime3fe61f7 and corrected fixtures16afb67, extending

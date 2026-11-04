@@ -254,6 +254,30 @@ void independent(const Scene &scene, const std::filesystem::path &output) {
     check(
         count == expected.indices.size(),
         "Every ordered current triangle corner survives source graph emission");
+    const auto &appearance = *surface.appearance;
+    check(appearance.source_mesh >= 0 && appearance.source_primitive >= 0 &&
+              size_t(appearance.source_mesh) < original->meshes_count &&
+              size_t(appearance.source_primitive) < original->meshes[appearance.source_mesh].primitives_count,
+          "Original mesh/primitive identities authorize the independent sampling oracle");
+    const auto &original_primitive = original->meshes[appearance.source_mesh].primitives[appearance.source_primitive];
+    for (int set = 0; set < 8; ++set) {
+      const auto *before_uv = attribute(original_primitive.attributes, original_primitive.attributes_count, cgltf_attribute_type_texcoord, set);
+      if (!before_uv) continue;
+      const auto *current_uv = attribute(primitive.attributes, primitive.attributes_count, cgltf_attribute_type_texcoord, set);
+      check(current_uv != nullptr, "Every real authored UV set remains an emitted accessor");
+      const auto original_count = original_primitive.indices ? original_primitive.indices->count : before_uv->count;
+      check(original_count == count, "Original ordered source corners match the actual emitted sampling domain");
+      for (size_t corner = 0; corner < count; ++corner) {
+        const auto old_vertex = original_primitive.indices ? cgltf_accessor_read_index(original_primitive.indices, corner) : corner;
+        const auto new_vertex = primitive.indices ? cgltf_accessor_read_index(primitive.indices, corner) : corner;
+        float before_value[2], current_value[2];
+        check(cgltf_accessor_read_float(before_uv, old_vertex, before_value, 2) &&
+                  cgltf_accessor_read_float(current_uv, new_vertex, current_value, 2) &&
+                  std::bit_cast<uint32_t>(before_value[0]) == std::bit_cast<uint32_t>(current_value[0]) &&
+                  std::bit_cast<uint32_t>(before_value[1]) == std::bit_cast<uint32_t>(current_value[1]),
+              "Independent source UV float bits remain exact at every ordered emitted corner");
+      }
+    }
     auto point = [](const std::array<float, 16> &m, Vec3 p) {
       return Vec3{m[0] * p.x + m[4] * p.y + m[8] * p.z + m[12],
                   m[1] * p.x + m[5] * p.y + m[9] * p.z + m[13],
@@ -616,17 +640,61 @@ int main(int argc, char **argv) try {
       auto atlas_options = options;
       atlas_options.prepare_texture_atlas = true;
       auto atlas = prepare_authoring_import(Scene{}, input, atlas_options);
+      const auto atlas_before = atlas.scene.encode();
+      const auto atlas_output = output.parent_path() / "source-aware-atlas.vrm";
+      (void)export_vrm(atlas.scene.export_surfaces(), atlas_output);
+      independent(atlas.scene, atlas_output);
+      check(atlas.scene.encode() == atlas_before && imported.scene.encode() == before,
+            "Authenticated pristine Source4 export keeps native writable UVs and complete caller sources exact");
+      const auto atlas_json = json(atlas_output);
+      const auto &atlas_expression = atlas_json["extensions"]["VRMC_vrm"]["expressions"]["preset"]["happy"];
+      check(atlas_expression["textureTransformBinds"].size() == 3 &&
+                atlas_expression["materialColorBinds"].size() == 3,
+            "Actual source-aware V1 export retains expression reference closure across all real material forks");
+      for (const auto &bind : atlas_expression["textureTransformBinds"])
+        check(bind["scale"] == expected["extensions"]["VRMC_vrm"]["expressions"]["preset"]["happy"]["textureTransformBinds"][0]["scale"] &&
+                  bind["offset"] == expected["extensions"]["VRMC_vrm"]["expressions"]["preset"]["happy"]["textureTransformBinds"][0]["offset"],
+              "Actual source-aware expression target transforms retain exact authored values");
       bool atlas_refused = false;
-      try {
-        (void)export_vrm(atlas.scene.preview_surfaces(), output);
-      } catch (const std::invalid_argument &e) {
-        atlas_refused = std::string_view(e.what()).find("UV expression") !=
-                        std::string_view::npos;
-      }
-      check(atlas_refused && bytes(output) == prior_output &&
-                imported.scene.encode() == before,
-            "Real editable-atlas preparation cannot silently reinterpret "
-            "original V1 UV-expression targets");
+      try { (void)export_vrm(atlas.scene.preview_surfaces(), output); }
+      catch (const std::invalid_argument &) { atlas_refused = true; }
+      check(atlas_refused && bytes(output) == prior_output && atlas.scene.encode() == atlas_before,
+            "Uncompiled preview packets refuse atomically instead of silently reinterpreting source UV-expression targets");
+      Document atlas_worker;
+      const auto atlas_empty = atlas_worker.copy_scene().encode();
+      ImportSettings atlas_settings;atlas_settings.paint_resolution = 64;atlas_settings.prepare_texture_atlas = true;
+      atlas_worker.import_asset(input, atlas_settings);
+      atlas_worker.save_async(output.parent_path() / "source-aware-worker.dsculpt").get();
+      check(atlas_worker.wait_asset() && atlas_worker.wait_mesh() && atlas_worker.frame().state->error.empty(),
+            "Actual source-aware V1 worker import and immediately ordered Save complete");
+      const auto atlas_accepted = atlas_worker.copy_scene().encode();
+      check(atlas_accepted == atlas_before && Scene::load(output.parent_path() / "source-aware-worker.dsculpt").encode() == atlas_accepted,
+            "Actual V1 worker Save/restart retains exact original metadata and independent writable authority");
+      const auto atlas_worker_output = output.parent_path() / "source-aware-worker.vrm";
+      atlas_worker.export_asset(atlas_worker_output, AssetExportFormat::Avatar).get();
+      independent(atlas_worker.copy_scene(), atlas_worker_output);
+      check(bytes(atlas_worker_output) == bytes(atlas_output) && atlas_worker.copy_scene().encode() == atlas_accepted &&
+                atlas_worker.undo() && atlas_worker.copy_scene().encode() == atlas_empty &&
+                atlas_worker.redo() && atlas_worker.copy_scene().encode() == atlas_accepted,
+            "Actual source-aware Avatar FileJob agrees with detached export and preserves one exact Undo/Redo endpoint");
+      auto painted_atlas = atlas.scene.snapshot();
+      auto &painted_object = painted_atlas.object(atlas.objects.front());
+      auto actual_paint = painted_object.painted->snapshot();
+      PaintSettings ink;ink.color = {.95f, .01f, .8f, 1};ink.front_only = false;
+      Brush brush;brush.from = brush.to = {0, 0, 0};brush.radius = 1;brush.strength = 1;
+      actual_paint->begin_stroke();actual_paint->stamp(brush, ink);
+      check(actual_paint->end_stroke(), "Genuine prepared Source4 V1 paint is a real changed authority");
+      painted_object.painted = actual_paint;
+      const auto painted_before = painted_atlas.encode();
+      bool painted_preview_refused = false, painted_standard_refused = false;
+      try { (void)export_vrm(painted_atlas.preview_surfaces(), atlas_output); }
+      catch (const std::exception &) { painted_preview_refused = true; }
+      try { (void)export_vrm(painted_atlas.export_surfaces(), atlas_output); }
+      catch (const std::exception &) { painted_standard_refused = true; }
+      check(painted_before != atlas_before && painted_preview_refused && painted_standard_refused &&
+                bytes(atlas_output) == bytes(atlas_worker_output) &&
+                painted_atlas.encode() == painted_before && atlas.scene.encode() == atlas_before,
+            "Actual nonempty V1 paint requires its real animated/compiler adapter; neither strict route drops it or replaces prior output");
       Document doc;
       auto baseline = doc.copy_scene().encode();
       ImportSettings settings;

@@ -1,0 +1,1081 @@
+{
+  "base": "ce9c68a847d42de65d5670eaf4be9bcdd45dafbe",
+  "classification": "Test-only Source4 version1 export routing/interop regression migration. No runtime/API/header/schema/CMake/guard change. Existing target and fixture dependency retained.",
+  "compiled_test_source_sha256": "a503b6d56a846d60d080c7fc8b4c80241c0917dc47f2e6c1a576bc1b2f32ef53",
+  "runtime_api_changed_paths": [],
+  "original_counterfactual": {
+    "state": "terminal",
+    "pid": 106761,
+    "source": "ce9c68a847d42de65d5670eaf4be9bcdd45dafbe",
+    "scope": "One complete unchanged V1 consumer TU compiled/linked against immutable copies of nine fresh own ce9 Release archives, with all product headers/source/assets/third-party bytes verified equal to original fresh cohort. Explicit matched-component counterfactual, not fresh whole/app/SAN/device proof.",
+    "matched_product_files": 518,
+    "steps": [
+      {
+        "phase": "compile",
+        "command": [
+          "/usr/bin/c++",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-source4-probe-ce9/src",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-source4-probe-ce9/third_party/cgltf",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-source4-probe-ce9/include",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-source4-probe-ce9/third_party/openbrush",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-source4-probe-ce9/third_party/nlohmann",
+          "-O3",
+          "-DNDEBUG",
+          "-std=gnu++20",
+          "-o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-source4-probe-ce9/artifacts/probe/original/consumer.o",
+          "-c",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-source4-probe-ce9/tests/vrm1-source-export.cpp"
+        ],
+        "exit": 0,
+        "seconds": 24.463973826001165
+      },
+      {
+        "phase": "link",
+        "command": [
+          "/usr/bin/c++",
+          "-O3",
+          "-DNDEBUG",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-source4-probe-ce9/artifacts/probe/original/consumer.o",
+          "-o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-source4-probe-ce9/artifacts/probe/original/consumer",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-source4-probe-ce9/artifacts/probe/original/libraries/libdome-sculpt-core.a",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-source4-probe-ce9/artifacts/probe/original/libraries/libdome-sculpt-affine.a",
+          "/usr/lib64/liblapacke.so",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-source4-probe-ce9/artifacts/probe/original/libraries/libdome-sculpt-polygon.a",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-source4-probe-ce9/artifacts/probe/original/libraries/libxatlas.a",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-source4-probe-ce9/artifacts/probe/original/libraries/libmikktspace.a",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-source4-probe-ce9/artifacts/probe/original/libraries/libmikktspace-robust.a",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-source4-probe-ce9/artifacts/probe/original/libraries/libufbx.a",
+          "/usr/lib64/libpng.so",
+          "/usr/lib64/libjpeg.so",
+          "/usr/lib64/libz.so",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-source4-probe-ce9/artifacts/probe/original/libraries/libdome-sculpt-emission-codec.a",
+          "/usr/lib64/libOpenEXR-3_2.so",
+          "/usr/lib64/libOpenEXRUtil-3_2.so",
+          "/usr/lib64/libOpenEXRCore-3_2.so",
+          "/usr/lib64/libIex-3_2.so",
+          "/usr/lib64/libIlmThread-3_2.so",
+          "/usr/lib64/libImath-3_1.so",
+          "-lgcc_s_asneeded",
+          "-lgcc_s_asneeded"
+        ],
+        "exit": 0,
+        "seconds": 0.4149252159986645
+      },
+      {
+        "phase": "run",
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-source4-probe-ce9/artifacts/probe/original/consumer",
+          "--selftest",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-source4-probe-ce9/artifacts/probe/original/output"
+        ],
+        "exit": 1,
+        "seconds": 0.8466303200111724
+      }
+    ],
+    "child_pid": 113689,
+    "actual_exit": 1,
+    "seconds": 25.81739388999995,
+    "inputs": 1727,
+    "drift": [],
+    "binary_sha256": "7c60860a1768a1367b2dd6f42771ebb76de59fdef9fc11c29cfed4cacc14f8f4"
+  },
+  "release": {
+    "state": "terminal",
+    "pid": 410735,
+    "source": "ce9c68a847d42de65d5670eaf4be9bcdd45dafbe",
+    "scope": "One complete unchanged V1 consumer TU compiled/linked against immutable copies of nine fresh own ce9 Release archives, with all product headers/source/assets/third-party bytes verified equal to original fresh cohort. Explicit matched-component counterfactual, not fresh whole/app/SAN/device proof.",
+    "matched_product_files": 518,
+    "steps": [
+      {
+        "phase": "compile",
+        "command": [
+          "/usr/bin/c++",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-source4-probe-ce9/src",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-source4-probe-ce9/third_party/cgltf",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-source4-probe-ce9/include",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-source4-probe-ce9/third_party/openbrush",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-source4-probe-ce9/third_party/nlohmann",
+          "-O3",
+          "-DNDEBUG",
+          "-std=gnu++20",
+          "-o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-source4-probe-ce9/artifacts/probe/formal-source4-v1-release/consumer.o",
+          "-c",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-source4-probe-ce9/tests/vrm1-source-export.cpp"
+        ],
+        "exit": 0,
+        "seconds": 15.049123777018394
+      },
+      {
+        "phase": "link",
+        "command": [
+          "/usr/bin/c++",
+          "-O3",
+          "-DNDEBUG",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-source4-probe-ce9/artifacts/probe/formal-source4-v1-release/consumer.o",
+          "-o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-source4-probe-ce9/artifacts/probe/formal-source4-v1-release/consumer",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-source4-probe-ce9/artifacts/probe/formal-source4-v1-release/libraries/libdome-sculpt-core.a",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-source4-probe-ce9/artifacts/probe/formal-source4-v1-release/libraries/libdome-sculpt-affine.a",
+          "/usr/lib64/liblapacke.so",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-source4-probe-ce9/artifacts/probe/formal-source4-v1-release/libraries/libdome-sculpt-polygon.a",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-source4-probe-ce9/artifacts/probe/formal-source4-v1-release/libraries/libxatlas.a",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-source4-probe-ce9/artifacts/probe/formal-source4-v1-release/libraries/libmikktspace.a",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-source4-probe-ce9/artifacts/probe/formal-source4-v1-release/libraries/libmikktspace-robust.a",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-source4-probe-ce9/artifacts/probe/formal-source4-v1-release/libraries/libufbx.a",
+          "/usr/lib64/libpng.so",
+          "/usr/lib64/libjpeg.so",
+          "/usr/lib64/libz.so",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-source4-probe-ce9/artifacts/probe/formal-source4-v1-release/libraries/libdome-sculpt-emission-codec.a",
+          "/usr/lib64/libOpenEXR-3_2.so",
+          "/usr/lib64/libOpenEXRUtil-3_2.so",
+          "/usr/lib64/libOpenEXRCore-3_2.so",
+          "/usr/lib64/libIex-3_2.so",
+          "/usr/lib64/libIlmThread-3_2.so",
+          "/usr/lib64/libImath-3_1.so",
+          "-lgcc_s_asneeded",
+          "-lgcc_s_asneeded"
+        ],
+        "exit": 0,
+        "seconds": 0.31851468500099145
+      },
+      {
+        "phase": "run",
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-source4-probe-ce9/artifacts/probe/formal-source4-v1-release/consumer",
+          "--selftest",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-source4-probe-ce9/artifacts/probe/formal-source4-v1-release/output"
+        ],
+        "exit": 0,
+        "seconds": 1.5386193099839147
+      }
+    ],
+    "child_pid": 412184,
+    "actual_exit": 0,
+    "seconds": 16.98624402200221,
+    "inputs": 1727,
+    "drift": [],
+    "binary_sha256": "f2cb5d8f717c0b0938246edb8b233d7d14bd9a0fa69605956de4a2fddc351707"
+  },
+  "sanitize": {
+    "state": "terminal",
+    "pid": 422646,
+    "source": "ce9c68a847d42de65d5670eaf4be9bcdd45dafbe",
+    "scope": "One complete unchanged V1 consumer TU compiled/linked against immutable copies of nine fresh whole-owned ce9 ASan/UBSan archives, with all product headers/source/assets/third-party bytes verified equal to original fresh cohort. Explicit matched-component counterfactual, not fresh whole/app/SAN/device proof.",
+    "matched_product_files": 518,
+    "steps": [
+      {
+        "phase": "compile",
+        "command": [
+          "/usr/bin/c++",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-source4-probe-ce9/src",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-source4-probe-ce9/third_party/cgltf",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-source4-probe-ce9/include",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-source4-probe-ce9/third_party/openbrush",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-source4-probe-ce9/third_party/nlohmann",
+          "-O1",
+          "-g1",
+          "-fsanitize=address,undefined",
+          "-fno-omit-frame-pointer",
+          "-std=gnu++20",
+          "-o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-source4-probe-ce9/artifacts/probe/formal-source4-v1-sanitize/consumer.o",
+          "-c",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-source4-probe-ce9/tests/vrm1-source-export.cpp"
+        ],
+        "exit": 0,
+        "seconds": 17.945466967998073
+      },
+      {
+        "phase": "link",
+        "command": [
+          "/usr/bin/c++",
+          "-O1",
+          "-g1",
+          "-fsanitize=address,undefined",
+          "-fno-omit-frame-pointer",
+          "-fsanitize=address,undefined",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-source4-probe-ce9/artifacts/probe/formal-source4-v1-sanitize/consumer.o",
+          "-o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-source4-probe-ce9/artifacts/probe/formal-source4-v1-sanitize/consumer",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-source4-probe-ce9/artifacts/probe/formal-source4-v1-sanitize/libraries/libdome-sculpt-core.a",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-source4-probe-ce9/artifacts/probe/formal-source4-v1-sanitize/libraries/libdome-sculpt-affine.a",
+          "/usr/lib64/liblapacke.so",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-source4-probe-ce9/artifacts/probe/formal-source4-v1-sanitize/libraries/libdome-sculpt-polygon.a",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-source4-probe-ce9/artifacts/probe/formal-source4-v1-sanitize/libraries/libxatlas.a",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-source4-probe-ce9/artifacts/probe/formal-source4-v1-sanitize/libraries/libmikktspace.a",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-source4-probe-ce9/artifacts/probe/formal-source4-v1-sanitize/libraries/libmikktspace-robust.a",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-source4-probe-ce9/artifacts/probe/formal-source4-v1-sanitize/libraries/libufbx.a",
+          "/usr/lib64/libpng.so",
+          "/usr/lib64/libjpeg.so",
+          "/usr/lib64/libz.so",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-source4-probe-ce9/artifacts/probe/formal-source4-v1-sanitize/libraries/libdome-sculpt-emission-codec.a",
+          "/usr/lib64/libOpenEXR-3_2.so",
+          "/usr/lib64/libOpenEXRUtil-3_2.so",
+          "/usr/lib64/libOpenEXRCore-3_2.so",
+          "/usr/lib64/libIex-3_2.so",
+          "/usr/lib64/libIlmThread-3_2.so",
+          "/usr/lib64/libImath-3_1.so",
+          "-lgcc_s_asneeded",
+          "-lgcc_s_asneeded"
+        ],
+        "exit": 0,
+        "seconds": 1.915387080021901
+      },
+      {
+        "phase": "run",
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-source4-probe-ce9/artifacts/probe/formal-source4-v1-sanitize/consumer",
+          "--selftest",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-source4-probe-ce9/artifacts/probe/formal-source4-v1-sanitize/output"
+        ],
+        "exit": 0,
+        "seconds": 12.667518258997006
+      }
+    ],
+    "child_pid": 424666,
+    "actual_exit": 0,
+    "seconds": 33.21239120702376,
+    "inputs": 1727,
+    "drift": [],
+    "binary_sha256": "8b0ed7b431e5e4126889632534dcc0dc9fee3ad33e3775f8485fb73bdc3c1829"
+  },
+  "checks_each": 5232,
+  "dependent_consumers": {
+    "summary": {
+      "state": "terminal",
+      "actual_exit": 0,
+      "inputs": 1718,
+      "drift": []
+    },
+    "release": {
+      "scope": "Two complete unchanged dependent consumer TUs; exact immutable matching formal-profile archives/headers, not application/freshwhole proof.",
+      "steps": [
+        {
+          "consumer": "vrm1-export-worker",
+          "phase": "compile",
+          "command": [
+            "/usr/bin/c++",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-source4-probe-ce9/third_party/cgltf",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-source4-probe-ce9/include",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-source4-probe-ce9/third_party/openbrush",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-source4-probe-ce9/third_party/nlohmann",
+            "-O3",
+            "-DNDEBUG",
+            "-std=gnu++20",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-source4-probe-ce9/artifacts/probe/dependent-consumers/release/vrm1-export-worker.o",
+            "-c",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-source4-probe-ce9/tests/vrm1-export-worker.cpp"
+          ],
+          "exit": 0,
+          "seconds": 3.0105968230054714
+        },
+        {
+          "consumer": "vrm1-export-worker",
+          "phase": "link",
+          "command": [
+            "/usr/bin/c++",
+            "-O3",
+            "-DNDEBUG",
+            "-Wl,--wrap=fsync",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-source4-probe-ce9/artifacts/probe/dependent-consumers/release/vrm1-export-worker.o",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-source4-probe-ce9/artifacts/probe/dependent-consumers/release/dome-sculpt-vrm1-export-worker-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-source4-probe-ce9/artifacts/probe/formal-source4-v1-release/libraries/libdome-sculpt-core.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-source4-probe-ce9/artifacts/probe/formal-source4-v1-release/libraries/libdome-sculpt-affine.a",
+            "/usr/lib64/liblapacke.so",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-source4-probe-ce9/artifacts/probe/formal-source4-v1-release/libraries/libdome-sculpt-polygon.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-source4-probe-ce9/artifacts/probe/formal-source4-v1-release/libraries/libxatlas.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-source4-probe-ce9/artifacts/probe/formal-source4-v1-release/libraries/libmikktspace.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-source4-probe-ce9/artifacts/probe/formal-source4-v1-release/libraries/libmikktspace-robust.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-source4-probe-ce9/artifacts/probe/formal-source4-v1-release/libraries/libufbx.a",
+            "/usr/lib64/libpng.so",
+            "/usr/lib64/libjpeg.so",
+            "/usr/lib64/libz.so",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-source4-probe-ce9/artifacts/probe/formal-source4-v1-release/libraries/libdome-sculpt-emission-codec.a",
+            "/usr/lib64/libOpenEXR-3_2.so",
+            "/usr/lib64/libOpenEXRUtil-3_2.so",
+            "/usr/lib64/libOpenEXRCore-3_2.so",
+            "/usr/lib64/libIex-3_2.so",
+            "/usr/lib64/libIlmThread-3_2.so",
+            "/usr/lib64/libImath-3_1.so",
+            "-lgcc_s_asneeded",
+            "-lgcc_s_asneeded"
+          ],
+          "exit": 0,
+          "seconds": 0.2596619790128898
+        },
+        {
+          "consumer": "vrm1-export-worker",
+          "phase": "run",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-source4-probe-ce9/artifacts/probe/dependent-consumers/release/dome-sculpt-vrm1-export-worker-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-source4-probe-ce9/artifacts/probe/formal-source4-v1-release/output/source.vrm"
+          ],
+          "exit": 0,
+          "seconds": 0.23351200699107721
+        },
+        {
+          "consumer": "vrm1-source-replay",
+          "phase": "compile",
+          "command": [
+            "/usr/bin/c++",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-source4-probe-ce9/include",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-source4-probe-ce9/third_party/openbrush",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-source4-probe-ce9/third_party/nlohmann",
+            "-O3",
+            "-DNDEBUG",
+            "-std=gnu++20",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-source4-probe-ce9/artifacts/probe/dependent-consumers/release/vrm1-source-replay.o",
+            "-c",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-source4-probe-ce9/tests/vrm1-source-replay.cpp"
+          ],
+          "exit": 0,
+          "seconds": 3.4633361019950826
+        },
+        {
+          "consumer": "vrm1-source-replay",
+          "phase": "link",
+          "command": [
+            "/usr/bin/c++",
+            "-O3",
+            "-DNDEBUG",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-source4-probe-ce9/artifacts/probe/dependent-consumers/release/vrm1-source-replay.o",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-source4-probe-ce9/artifacts/probe/dependent-consumers/release/dome-sculpt-vrm1-source-replay-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-source4-probe-ce9/artifacts/probe/formal-source4-v1-release/libraries/libdome-sculpt-core.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-source4-probe-ce9/artifacts/probe/formal-source4-v1-release/libraries/libdome-sculpt-affine.a",
+            "/usr/lib64/liblapacke.so",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-source4-probe-ce9/artifacts/probe/formal-source4-v1-release/libraries/libdome-sculpt-polygon.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-source4-probe-ce9/artifacts/probe/formal-source4-v1-release/libraries/libxatlas.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-source4-probe-ce9/artifacts/probe/formal-source4-v1-release/libraries/libmikktspace.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-source4-probe-ce9/artifacts/probe/formal-source4-v1-release/libraries/libmikktspace-robust.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-source4-probe-ce9/artifacts/probe/formal-source4-v1-release/libraries/libufbx.a",
+            "/usr/lib64/libpng.so",
+            "/usr/lib64/libjpeg.so",
+            "/usr/lib64/libz.so",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-source4-probe-ce9/artifacts/probe/formal-source4-v1-release/libraries/libdome-sculpt-emission-codec.a",
+            "/usr/lib64/libOpenEXR-3_2.so",
+            "/usr/lib64/libOpenEXRUtil-3_2.so",
+            "/usr/lib64/libOpenEXRCore-3_2.so",
+            "/usr/lib64/libIex-3_2.so",
+            "/usr/lib64/libIlmThread-3_2.so",
+            "/usr/lib64/libImath-3_1.so",
+            "-lgcc_s_asneeded",
+            "-lgcc_s_asneeded"
+          ],
+          "exit": 0,
+          "seconds": 0.2040316780039575
+        },
+        {
+          "consumer": "vrm1-source-replay",
+          "phase": "run",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-source4-probe-ce9/artifacts/probe/dependent-consumers/release/dome-sculpt-vrm1-source-replay-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-source4-probe-ce9/artifacts/probe/formal-source4-v1-release/output"
+          ],
+          "exit": 0,
+          "seconds": 0.18193674500798807
+        }
+      ]
+    },
+    "sanitize": {
+      "scope": "Two complete unchanged dependent consumer TUs; exact immutable matching formal-profile archives/headers, not application/freshwhole proof.",
+      "steps": [
+        {
+          "consumer": "vrm1-export-worker",
+          "phase": "compile",
+          "command": [
+            "/usr/bin/c++",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-source4-probe-ce9/third_party/cgltf",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-source4-probe-ce9/include",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-source4-probe-ce9/third_party/openbrush",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-source4-probe-ce9/third_party/nlohmann",
+            "-O1",
+            "-g1",
+            "-fsanitize=address,undefined",
+            "-fno-omit-frame-pointer",
+            "-std=gnu++20",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-source4-probe-ce9/artifacts/probe/dependent-consumers/sanitize/vrm1-export-worker.o",
+            "-c",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-source4-probe-ce9/tests/vrm1-export-worker.cpp"
+          ],
+          "exit": 0,
+          "seconds": 3.5525921680091415
+        },
+        {
+          "consumer": "vrm1-export-worker",
+          "phase": "link",
+          "command": [
+            "/usr/bin/c++",
+            "-O1",
+            "-g1",
+            "-fsanitize=address,undefined",
+            "-fno-omit-frame-pointer",
+            "-fsanitize=address,undefined",
+            "-Wl,--wrap=fsync",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-source4-probe-ce9/artifacts/probe/dependent-consumers/sanitize/vrm1-export-worker.o",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-source4-probe-ce9/artifacts/probe/dependent-consumers/sanitize/dome-sculpt-vrm1-export-worker-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-source4-probe-ce9/artifacts/probe/formal-source4-v1-sanitize/libraries/libdome-sculpt-core.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-source4-probe-ce9/artifacts/probe/formal-source4-v1-sanitize/libraries/libdome-sculpt-affine.a",
+            "/usr/lib64/liblapacke.so",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-source4-probe-ce9/artifacts/probe/formal-source4-v1-sanitize/libraries/libdome-sculpt-polygon.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-source4-probe-ce9/artifacts/probe/formal-source4-v1-sanitize/libraries/libxatlas.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-source4-probe-ce9/artifacts/probe/formal-source4-v1-sanitize/libraries/libmikktspace.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-source4-probe-ce9/artifacts/probe/formal-source4-v1-sanitize/libraries/libmikktspace-robust.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-source4-probe-ce9/artifacts/probe/formal-source4-v1-sanitize/libraries/libufbx.a",
+            "/usr/lib64/libpng.so",
+            "/usr/lib64/libjpeg.so",
+            "/usr/lib64/libz.so",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-source4-probe-ce9/artifacts/probe/formal-source4-v1-sanitize/libraries/libdome-sculpt-emission-codec.a",
+            "/usr/lib64/libOpenEXR-3_2.so",
+            "/usr/lib64/libOpenEXRUtil-3_2.so",
+            "/usr/lib64/libOpenEXRCore-3_2.so",
+            "/usr/lib64/libIex-3_2.so",
+            "/usr/lib64/libIlmThread-3_2.so",
+            "/usr/lib64/libImath-3_1.so",
+            "-lgcc_s_asneeded",
+            "-lgcc_s_asneeded"
+          ],
+          "exit": 0,
+          "seconds": 1.8135017119930126
+        },
+        {
+          "consumer": "vrm1-export-worker",
+          "phase": "run",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-source4-probe-ce9/artifacts/probe/dependent-consumers/sanitize/dome-sculpt-vrm1-export-worker-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-source4-probe-ce9/artifacts/probe/formal-source4-v1-sanitize/output/source.vrm"
+          ],
+          "exit": 0,
+          "seconds": 2.104458727000747
+        },
+        {
+          "consumer": "vrm1-source-replay",
+          "phase": "compile",
+          "command": [
+            "/usr/bin/c++",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-source4-probe-ce9/include",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-source4-probe-ce9/third_party/openbrush",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-source4-probe-ce9/third_party/nlohmann",
+            "-O1",
+            "-g1",
+            "-fsanitize=address,undefined",
+            "-fno-omit-frame-pointer",
+            "-std=gnu++20",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-source4-probe-ce9/artifacts/probe/dependent-consumers/sanitize/vrm1-source-replay.o",
+            "-c",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-source4-probe-ce9/tests/vrm1-source-replay.cpp"
+          ],
+          "exit": 0,
+          "seconds": 5.595507199992426
+        },
+        {
+          "consumer": "vrm1-source-replay",
+          "phase": "link",
+          "command": [
+            "/usr/bin/c++",
+            "-O1",
+            "-g1",
+            "-fsanitize=address,undefined",
+            "-fno-omit-frame-pointer",
+            "-fsanitize=address,undefined",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-source4-probe-ce9/artifacts/probe/dependent-consumers/sanitize/vrm1-source-replay.o",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-source4-probe-ce9/artifacts/probe/dependent-consumers/sanitize/dome-sculpt-vrm1-source-replay-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-source4-probe-ce9/artifacts/probe/formal-source4-v1-sanitize/libraries/libdome-sculpt-core.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-source4-probe-ce9/artifacts/probe/formal-source4-v1-sanitize/libraries/libdome-sculpt-affine.a",
+            "/usr/lib64/liblapacke.so",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-source4-probe-ce9/artifacts/probe/formal-source4-v1-sanitize/libraries/libdome-sculpt-polygon.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-source4-probe-ce9/artifacts/probe/formal-source4-v1-sanitize/libraries/libxatlas.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-source4-probe-ce9/artifacts/probe/formal-source4-v1-sanitize/libraries/libmikktspace.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-source4-probe-ce9/artifacts/probe/formal-source4-v1-sanitize/libraries/libmikktspace-robust.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-source4-probe-ce9/artifacts/probe/formal-source4-v1-sanitize/libraries/libufbx.a",
+            "/usr/lib64/libpng.so",
+            "/usr/lib64/libjpeg.so",
+            "/usr/lib64/libz.so",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-source4-probe-ce9/artifacts/probe/formal-source4-v1-sanitize/libraries/libdome-sculpt-emission-codec.a",
+            "/usr/lib64/libOpenEXR-3_2.so",
+            "/usr/lib64/libOpenEXRUtil-3_2.so",
+            "/usr/lib64/libOpenEXRCore-3_2.so",
+            "/usr/lib64/libIex-3_2.so",
+            "/usr/lib64/libIlmThread-3_2.so",
+            "/usr/lib64/libImath-3_1.so",
+            "-lgcc_s_asneeded",
+            "-lgcc_s_asneeded"
+          ],
+          "exit": 0,
+          "seconds": 1.1247193029848859
+        },
+        {
+          "consumer": "vrm1-source-replay",
+          "phase": "run",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-source4-probe-ce9/artifacts/probe/dependent-consumers/sanitize/dome-sculpt-vrm1-source-replay-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-source4-probe-ce9/artifacts/probe/formal-source4-v1-sanitize/output"
+          ],
+          "exit": 0,
+          "seconds": 1.8538038030092139
+        }
+      ]
+    },
+    "counts_each": {
+      "actual_worker_cancel_retry_orderedSave_history": 14,
+      "retained_source_replay": 16
+    }
+  },
+  "outputs": [
+    {
+      "file": "current.vrm",
+      "release": "d52d52287ddfe737dbb16471f04c945f48d720b5265c798fc36bc2907c43de6a",
+      "sanitize": "d52d52287ddfe737dbb16471f04c945f48d720b5265c798fc36bc2907c43de6a",
+      "equal": true
+    },
+    {
+      "file": "worker.vrm",
+      "release": "d52d52287ddfe737dbb16471f04c945f48d720b5265c798fc36bc2907c43de6a",
+      "sanitize": "d52d52287ddfe737dbb16471f04c945f48d720b5265c798fc36bc2907c43de6a",
+      "equal": true
+    },
+    {
+      "file": "kinematic.vrm",
+      "release": "a0bfdcbec71ecfdcddce2dd680390051760684f1c40f50bffe94be396c498740",
+      "sanitize": "a0bfdcbec71ecfdcddce2dd680390051760684f1c40f50bffe94be396c498740",
+      "equal": true
+    },
+    {
+      "file": "source-aware-atlas.vrm",
+      "release": "d52d52287ddfe737dbb16471f04c945f48d720b5265c798fc36bc2907c43de6a",
+      "sanitize": "d52d52287ddfe737dbb16471f04c945f48d720b5265c798fc36bc2907c43de6a",
+      "equal": true
+    },
+    {
+      "file": "source-aware-worker.vrm",
+      "release": "d52d52287ddfe737dbb16471f04c945f48d720b5265c798fc36bc2907c43de6a",
+      "sanitize": "d52d52287ddfe737dbb16471f04c945f48d720b5265c798fc36bc2907c43de6a",
+      "equal": true
+    }
+  ],
+  "independent_sampling": {
+    "scope": "Independent emitted-GLB binary accessors, original encoded-image/sampler/role descriptors and typed reference comparison; data proof only, no GPU/whole-SAN or painted-V1 admission.",
+    "source_sha256": "bf957d22403ac3e2cc6367f2ca3bd23125bc9ebff041d5fe555e753bda7ee543",
+    "outputs": [
+      {
+        "name": "source-aware-atlas.vrm",
+        "bytes": 48708,
+        "sha256": "d52d52287ddfe737dbb16471f04c945f48d720b5265c798fc36bc2907c43de6a"
+      },
+      {
+        "name": "source-aware-worker.vrm",
+        "bytes": 48708,
+        "sha256": "d52d52287ddfe737dbb16471f04c945f48d720b5265c798fc36bc2907c43de6a"
+      }
+    ],
+    "checks": [
+      {
+        "passed": true,
+        "check": "source-aware-atlas.vrm: three genuine original-node instances, no dummy mesh"
+      },
+      {
+        "passed": true,
+        "check": "source-aware-atlas.vrm: all ordered original corners retained"
+      },
+      {
+        "passed": true,
+        "check": "source-aware-atlas.vrm: material0 raw TEXCOORD_0 exact at every ordered corner"
+      },
+      {
+        "passed": true,
+        "check": "source-aware-atlas.vrm: material0 raw TEXCOORD_1 exact at every ordered corner"
+      },
+      {
+        "passed": true,
+        "check": "source-aware-atlas.vrm: material0 raw NORMAL exact at every ordered corner"
+      },
+      {
+        "passed": true,
+        "check": "source-aware-atlas.vrm: material0 raw TANGENT exact at every ordered corner"
+      },
+      {
+        "passed": true,
+        "check": "source-aware-atlas.vrm: material0 baseColorTexture authored coordinate selection"
+      },
+      {
+        "passed": true,
+        "check": "source-aware-atlas.vrm: material0 baseColorTexture exact affine/strength/unknown descriptor"
+      },
+      {
+        "passed": true,
+        "check": "source-aware-atlas.vrm: material0 baseColorTexture exact encoded image/MIME/sampler"
+      },
+      {
+        "passed": true,
+        "check": "source-aware-atlas.vrm: material0 shadeMultiplyTexture authored coordinate selection"
+      },
+      {
+        "passed": true,
+        "check": "source-aware-atlas.vrm: material0 shadeMultiplyTexture exact affine/strength/unknown descriptor"
+      },
+      {
+        "passed": true,
+        "check": "source-aware-atlas.vrm: material0 shadeMultiplyTexture exact encoded image/MIME/sampler"
+      },
+      {
+        "passed": true,
+        "check": "source-aware-atlas.vrm: material0 matcapTexture authored coordinate selection"
+      },
+      {
+        "passed": true,
+        "check": "source-aware-atlas.vrm: material0 matcapTexture exact affine/strength/unknown descriptor"
+      },
+      {
+        "passed": true,
+        "check": "source-aware-atlas.vrm: material0 matcapTexture exact encoded image/MIME/sampler"
+      },
+      {
+        "passed": true,
+        "check": "source-aware-atlas.vrm: all ordered original corners retained"
+      },
+      {
+        "passed": true,
+        "check": "source-aware-atlas.vrm: material1 raw TEXCOORD_0 exact at every ordered corner"
+      },
+      {
+        "passed": true,
+        "check": "source-aware-atlas.vrm: material1 raw TEXCOORD_1 exact at every ordered corner"
+      },
+      {
+        "passed": true,
+        "check": "source-aware-atlas.vrm: material1 raw NORMAL exact at every ordered corner"
+      },
+      {
+        "passed": true,
+        "check": "source-aware-atlas.vrm: material1 raw TANGENT exact at every ordered corner"
+      },
+      {
+        "passed": true,
+        "check": "source-aware-atlas.vrm: material1 baseColorTexture authored coordinate selection"
+      },
+      {
+        "passed": true,
+        "check": "source-aware-atlas.vrm: material1 baseColorTexture exact affine/strength/unknown descriptor"
+      },
+      {
+        "passed": true,
+        "check": "source-aware-atlas.vrm: material1 baseColorTexture exact encoded image/MIME/sampler"
+      },
+      {
+        "passed": true,
+        "check": "source-aware-atlas.vrm: material1 shadeMultiplyTexture authored coordinate selection"
+      },
+      {
+        "passed": true,
+        "check": "source-aware-atlas.vrm: material1 shadeMultiplyTexture exact affine/strength/unknown descriptor"
+      },
+      {
+        "passed": true,
+        "check": "source-aware-atlas.vrm: material1 shadeMultiplyTexture exact encoded image/MIME/sampler"
+      },
+      {
+        "passed": true,
+        "check": "source-aware-atlas.vrm: material1 matcapTexture authored coordinate selection"
+      },
+      {
+        "passed": true,
+        "check": "source-aware-atlas.vrm: material1 matcapTexture exact affine/strength/unknown descriptor"
+      },
+      {
+        "passed": true,
+        "check": "source-aware-atlas.vrm: material1 matcapTexture exact encoded image/MIME/sampler"
+      },
+      {
+        "passed": true,
+        "check": "source-aware-atlas.vrm: all ordered original corners retained"
+      },
+      {
+        "passed": true,
+        "check": "source-aware-atlas.vrm: material2 raw TEXCOORD_0 exact at every ordered corner"
+      },
+      {
+        "passed": true,
+        "check": "source-aware-atlas.vrm: material2 raw TEXCOORD_1 exact at every ordered corner"
+      },
+      {
+        "passed": true,
+        "check": "source-aware-atlas.vrm: material2 raw NORMAL exact at every ordered corner"
+      },
+      {
+        "passed": true,
+        "check": "source-aware-atlas.vrm: material2 raw TANGENT exact at every ordered corner"
+      },
+      {
+        "passed": true,
+        "check": "source-aware-atlas.vrm: material2 baseColorTexture authored coordinate selection"
+      },
+      {
+        "passed": true,
+        "check": "source-aware-atlas.vrm: material2 baseColorTexture exact affine/strength/unknown descriptor"
+      },
+      {
+        "passed": true,
+        "check": "source-aware-atlas.vrm: material2 baseColorTexture exact encoded image/MIME/sampler"
+      },
+      {
+        "passed": true,
+        "check": "source-aware-atlas.vrm: material2 shadeMultiplyTexture authored coordinate selection"
+      },
+      {
+        "passed": true,
+        "check": "source-aware-atlas.vrm: material2 shadeMultiplyTexture exact affine/strength/unknown descriptor"
+      },
+      {
+        "passed": true,
+        "check": "source-aware-atlas.vrm: material2 shadeMultiplyTexture exact encoded image/MIME/sampler"
+      },
+      {
+        "passed": true,
+        "check": "source-aware-atlas.vrm: material2 matcapTexture authored coordinate selection"
+      },
+      {
+        "passed": true,
+        "check": "source-aware-atlas.vrm: material2 matcapTexture exact affine/strength/unknown descriptor"
+      },
+      {
+        "passed": true,
+        "check": "source-aware-atlas.vrm: material2 matcapTexture exact encoded image/MIME/sampler"
+      },
+      {
+        "passed": true,
+        "check": "source-aware-atlas.vrm: exact real meta/license/look-at values with reference indices handled separately"
+      },
+      {
+        "passed": true,
+        "check": "source-aware-atlas.vrm: remapped real thumbnail resolves to the exact original MIME/encoded image"
+      },
+      {
+        "passed": true,
+        "check": "source-aware-atlas.vrm: actual expression flags unchanged"
+      },
+      {
+        "passed": true,
+        "check": "source-aware-atlas.vrm: exact expression material-fork reference closure"
+      },
+      {
+        "passed": true,
+        "check": "source-aware-atlas.vrm: exact expression transforms/absolute colour targets"
+      },
+      {
+        "passed": true,
+        "check": "source-aware-atlas.vrm: exact expression material-fork reference closure"
+      },
+      {
+        "passed": true,
+        "check": "source-aware-atlas.vrm: exact expression transforms/absolute colour targets"
+      },
+      {
+        "passed": true,
+        "check": "source-aware-atlas.vrm: morph expression refers to a real emitted mesh node"
+      },
+      {
+        "passed": true,
+        "check": "source-aware-atlas.vrm: first-person annotation retains real node reference"
+      },
+      {
+        "passed": true,
+        "check": "source-aware-atlas.vrm: first-person annotation retains real node reference"
+      },
+      {
+        "passed": true,
+        "check": "source-aware-atlas.vrm: typed spring order retains distinct actual nodes"
+      },
+      {
+        "passed": true,
+        "check": "source-aware-worker.vrm: three genuine original-node instances, no dummy mesh"
+      },
+      {
+        "passed": true,
+        "check": "source-aware-worker.vrm: all ordered original corners retained"
+      },
+      {
+        "passed": true,
+        "check": "source-aware-worker.vrm: material0 raw TEXCOORD_0 exact at every ordered corner"
+      },
+      {
+        "passed": true,
+        "check": "source-aware-worker.vrm: material0 raw TEXCOORD_1 exact at every ordered corner"
+      },
+      {
+        "passed": true,
+        "check": "source-aware-worker.vrm: material0 raw NORMAL exact at every ordered corner"
+      },
+      {
+        "passed": true,
+        "check": "source-aware-worker.vrm: material0 raw TANGENT exact at every ordered corner"
+      },
+      {
+        "passed": true,
+        "check": "source-aware-worker.vrm: material0 baseColorTexture authored coordinate selection"
+      },
+      {
+        "passed": true,
+        "check": "source-aware-worker.vrm: material0 baseColorTexture exact affine/strength/unknown descriptor"
+      },
+      {
+        "passed": true,
+        "check": "source-aware-worker.vrm: material0 baseColorTexture exact encoded image/MIME/sampler"
+      },
+      {
+        "passed": true,
+        "check": "source-aware-worker.vrm: material0 shadeMultiplyTexture authored coordinate selection"
+      },
+      {
+        "passed": true,
+        "check": "source-aware-worker.vrm: material0 shadeMultiplyTexture exact affine/strength/unknown descriptor"
+      },
+      {
+        "passed": true,
+        "check": "source-aware-worker.vrm: material0 shadeMultiplyTexture exact encoded image/MIME/sampler"
+      },
+      {
+        "passed": true,
+        "check": "source-aware-worker.vrm: material0 matcapTexture authored coordinate selection"
+      },
+      {
+        "passed": true,
+        "check": "source-aware-worker.vrm: material0 matcapTexture exact affine/strength/unknown descriptor"
+      },
+      {
+        "passed": true,
+        "check": "source-aware-worker.vrm: material0 matcapTexture exact encoded image/MIME/sampler"
+      },
+      {
+        "passed": true,
+        "check": "source-aware-worker.vrm: all ordered original corners retained"
+      },
+      {
+        "passed": true,
+        "check": "source-aware-worker.vrm: material1 raw TEXCOORD_0 exact at every ordered corner"
+      },
+      {
+        "passed": true,
+        "check": "source-aware-worker.vrm: material1 raw TEXCOORD_1 exact at every ordered corner"
+      },
+      {
+        "passed": true,
+        "check": "source-aware-worker.vrm: material1 raw NORMAL exact at every ordered corner"
+      },
+      {
+        "passed": true,
+        "check": "source-aware-worker.vrm: material1 raw TANGENT exact at every ordered corner"
+      },
+      {
+        "passed": true,
+        "check": "source-aware-worker.vrm: material1 baseColorTexture authored coordinate selection"
+      },
+      {
+        "passed": true,
+        "check": "source-aware-worker.vrm: material1 baseColorTexture exact affine/strength/unknown descriptor"
+      },
+      {
+        "passed": true,
+        "check": "source-aware-worker.vrm: material1 baseColorTexture exact encoded image/MIME/sampler"
+      },
+      {
+        "passed": true,
+        "check": "source-aware-worker.vrm: material1 shadeMultiplyTexture authored coordinate selection"
+      },
+      {
+        "passed": true,
+        "check": "source-aware-worker.vrm: material1 shadeMultiplyTexture exact affine/strength/unknown descriptor"
+      },
+      {
+        "passed": true,
+        "check": "source-aware-worker.vrm: material1 shadeMultiplyTexture exact encoded image/MIME/sampler"
+      },
+      {
+        "passed": true,
+        "check": "source-aware-worker.vrm: material1 matcapTexture authored coordinate selection"
+      },
+      {
+        "passed": true,
+        "check": "source-aware-worker.vrm: material1 matcapTexture exact affine/strength/unknown descriptor"
+      },
+      {
+        "passed": true,
+        "check": "source-aware-worker.vrm: material1 matcapTexture exact encoded image/MIME/sampler"
+      },
+      {
+        "passed": true,
+        "check": "source-aware-worker.vrm: all ordered original corners retained"
+      },
+      {
+        "passed": true,
+        "check": "source-aware-worker.vrm: material2 raw TEXCOORD_0 exact at every ordered corner"
+      },
+      {
+        "passed": true,
+        "check": "source-aware-worker.vrm: material2 raw TEXCOORD_1 exact at every ordered corner"
+      },
+      {
+        "passed": true,
+        "check": "source-aware-worker.vrm: material2 raw NORMAL exact at every ordered corner"
+      },
+      {
+        "passed": true,
+        "check": "source-aware-worker.vrm: material2 raw TANGENT exact at every ordered corner"
+      },
+      {
+        "passed": true,
+        "check": "source-aware-worker.vrm: material2 baseColorTexture authored coordinate selection"
+      },
+      {
+        "passed": true,
+        "check": "source-aware-worker.vrm: material2 baseColorTexture exact affine/strength/unknown descriptor"
+      },
+      {
+        "passed": true,
+        "check": "source-aware-worker.vrm: material2 baseColorTexture exact encoded image/MIME/sampler"
+      },
+      {
+        "passed": true,
+        "check": "source-aware-worker.vrm: material2 shadeMultiplyTexture authored coordinate selection"
+      },
+      {
+        "passed": true,
+        "check": "source-aware-worker.vrm: material2 shadeMultiplyTexture exact affine/strength/unknown descriptor"
+      },
+      {
+        "passed": true,
+        "check": "source-aware-worker.vrm: material2 shadeMultiplyTexture exact encoded image/MIME/sampler"
+      },
+      {
+        "passed": true,
+        "check": "source-aware-worker.vrm: material2 matcapTexture authored coordinate selection"
+      },
+      {
+        "passed": true,
+        "check": "source-aware-worker.vrm: material2 matcapTexture exact affine/strength/unknown descriptor"
+      },
+      {
+        "passed": true,
+        "check": "source-aware-worker.vrm: material2 matcapTexture exact encoded image/MIME/sampler"
+      },
+      {
+        "passed": true,
+        "check": "source-aware-worker.vrm: exact real meta/license/look-at values with reference indices handled separately"
+      },
+      {
+        "passed": true,
+        "check": "source-aware-worker.vrm: remapped real thumbnail resolves to the exact original MIME/encoded image"
+      },
+      {
+        "passed": true,
+        "check": "source-aware-worker.vrm: actual expression flags unchanged"
+      },
+      {
+        "passed": true,
+        "check": "source-aware-worker.vrm: exact expression material-fork reference closure"
+      },
+      {
+        "passed": true,
+        "check": "source-aware-worker.vrm: exact expression transforms/absolute colour targets"
+      },
+      {
+        "passed": true,
+        "check": "source-aware-worker.vrm: exact expression material-fork reference closure"
+      },
+      {
+        "passed": true,
+        "check": "source-aware-worker.vrm: exact expression transforms/absolute colour targets"
+      },
+      {
+        "passed": true,
+        "check": "source-aware-worker.vrm: morph expression refers to a real emitted mesh node"
+      },
+      {
+        "passed": true,
+        "check": "source-aware-worker.vrm: first-person annotation retains real node reference"
+      },
+      {
+        "passed": true,
+        "check": "source-aware-worker.vrm: first-person annotation retains real node reference"
+      },
+      {
+        "passed": true,
+        "check": "source-aware-worker.vrm: typed spring order retains distinct actual nodes"
+      }
+    ]
+  },
+  "official_schemas": {
+    "source": "https://github.com/vrm-c/vrm-specification",
+    "pin": "94e82dd346fa6cf0337c4421728640e5252dd38e",
+    "schema_files_verified": 27,
+    "schema_manifest_sha256": "aea3a8680a63d0b3bb82e5e5e5173378c84134fb4959c5ca72190bda6d888445",
+    "instances": 36,
+    "outputs": 5,
+    "errors": 0,
+    "report_sha256": "85e453122a6ff47013847c329cd091abef16150ff658989ea669c7e4c9d8772d",
+    "method": "Cached uv --offline --with jsonschema; HTTP/HTTPS schema resolution refused; RefResolver deprecation warning retained. Same five byte-identical sanitizer outputs not counted as separate72 validations."
+  },
+  "khronos": {
+    "release": {
+      "validator": "2.0.0-dev.3.10",
+      "maxIssues": 0,
+      "files": 5,
+      "errors": 0,
+      "warnings": 35,
+      "infos": 56,
+      "warning_codes": {
+        "MULTIPLE_EXTENSIONS": 15,
+        "NODE_SKINNED_MESH_NON_ROOT": 10,
+        "NODE_SKINNED_MESH_LOCAL_TRANSFORMS": 10
+      },
+      "full_report_sha256": "8dadd6efce52fa86a744ffd2d0ab5e81efc165271c3c62e70b16e98899c27303"
+    },
+    "sanitize": {
+      "validator": "2.0.0-dev.3.10",
+      "maxIssues": 0,
+      "files": 5,
+      "errors": 0,
+      "warnings": 35,
+      "infos": 56,
+      "warning_codes": {
+        "MULTIPLE_EXTENSIONS": 15,
+        "NODE_SKINNED_MESH_NON_ROOT": 10,
+        "NODE_SKINNED_MESH_LOCAL_TRANSFORMS": 10
+      },
+      "full_report_sha256": "4ea233725d22c10b138fdb01927da1e6e396a2ea4008f129c4ea3f06f155f5b2"
+    }
+  },
+  "evidence_files": {
+    "artifacts/probe/original/before.json": "e9d75f9182a94200a39c487b74cfb08dc9deef41d9c2af9c412438106d42227d",
+    "artifacts/probe/original/after.json": "e9d75f9182a94200a39c487b74cfb08dc9deef41d9c2af9c412438106d42227d",
+    "artifacts/probe/original/run.log": "bf5b4c43085daf685f91f153138fd70b10147b413b4eed156081f0a60518861d",
+    "artifacts/probe/formal-source4-v1-release/before.json": "812c3623b6b9bd8df4a518faf2e6d1fd222f9d80d5e326a4e91d4c98c38f3bf5",
+    "artifacts/probe/formal-source4-v1-release/after.json": "812c3623b6b9bd8df4a518faf2e6d1fd222f9d80d5e326a4e91d4c98c38f3bf5",
+    "artifacts/probe/formal-source4-v1-release/run.log": "c6580ed4c3931d9757a8aca8be7340387bb1bd076c725ea6833f0a167667756f",
+    "artifacts/probe/formal-source4-v1-sanitize/before.json": "6181d609fae9a03cb902f8f95dff522593b357b0d3b8657aae8444e58b830050",
+    "artifacts/probe/formal-source4-v1-sanitize/after.json": "6181d609fae9a03cb902f8f95dff522593b357b0d3b8657aae8444e58b830050",
+    "artifacts/probe/formal-source4-v1-sanitize/run.log": "c6580ed4c3931d9757a8aca8be7340387bb1bd076c725ea6833f0a167667756f",
+    "artifacts/probe/dependent-consumers/before.json": "ee4129c7340d5c0b371fb84953f0804062beee04f18aa7e396de34b1e53a3a15",
+    "artifacts/probe/dependent-consumers/after.json": "ee4129c7340d5c0b371fb84953f0804062beee04f18aa7e396de34b1e53a3a15",
+    "artifacts/probe/official-schema.log": "6f11b4bd4280acc2e0b0fba56140da89efb713393738abb5ddf9a0d5e79fa3ad",
+    "artifacts/probe/verify-sampling-v1-failed.py": "aa74bae478a20eb6329c1bd18530586b71ca64c1dacab7932358317cea2b1bde",
+    "artifacts/probe/verify-sampling-v2-failed.py": "47136aad4a826c4799c63fdc3915455a2afe1ab529deef698f9f4a470583809d"
+  },
+  "limitations": [
+    "New whole consumer TUs on immutable matching own fresh ce9 profile archives; not a fresh application/current coherent34b build proof.",
+    "Synthetic complete source fixture only; no new actual external-avatar/device/image claim.",
+    "Nonempty Source4 V1 paint refuses strictly; real animated/portable material compiler and native exact painted route remain required.",
+    "UV-expression/physical-expression/physics representability guards unchanged.",
+    "Ordinary cgltf parsing/validation does not establish custom allocator-null/partial cleanup robustness.",
+    "No main admission, full regression, physical session or installation."
+  ]
+}
