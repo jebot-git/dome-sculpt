@@ -943,6 +943,8 @@ SourceMaterialArchive SourceMaterialArchive::decode(const nlohmann::json &input,
   if(detail::material_archive_base_version(input)==7&&!std::any_of(normal_preparations.begin(),normal_preparations.end(),[](const auto &p){return p&&p->sampling_domain;}))
     throw std::invalid_argument("Material archive7 requires its actual retained normal feature");
   if(std::any_of(normal_preparations.begin(),normal_preparations.end(),[](const auto &p){return !p;}))throw std::invalid_argument("Unreferenced normal preparation record");
+  if(native_paint&&std::any_of(native_paints.begin(),native_paints.end(),[](const auto &p){return !p;}))
+    throw std::invalid_argument("Unreferenced native paint owner");
   if(std::any_of(canonical_conversions.begin(),canonical_conversions.end(),[](const auto &p){return !p;}))throw std::invalid_argument("Unreferenced canonical conversion lease");
   if(physical||detail::explicit_mirror_material_archive(input)||detail::canonical_material_archive(input)||layered||native_paint){
     if(native_paint&&input.at("explicit_mirror").get<bool>()!=std::any_of(output.bindings_.begin(),output.bindings_.end(),[](const auto &b){return b->key_derivation&&b->key_derivation->uses_explicit_mirror();}))throw std::invalid_argument("Native paint explicit-Mirror capability differs from actual graph");

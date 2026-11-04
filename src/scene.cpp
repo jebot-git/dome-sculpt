@@ -636,7 +636,9 @@ Scene Scene::decode(const nlohmann::json &j) {
   }
   if(version<2 || (version>21&&version!=22&&version!=23&&version!=24&&version!=25&&version!=26&&version!=27&&version!=28&&version!=29&&version!=30&&version!=31&&version!=32&&version!=33&&version!=34&&version!=35))throw std::runtime_error("Unsupported scene version");
   size_t layered_normal_bytes=0;
-  if(version==33||version==34||(version==35&&detail::layered_material_archive(j.at("source_materials")))){
+  const bool layered_context=version==33||version==34||
+    (version==35&&detail::layered_material_archive(j.at("source_materials")));
+  if(layered_context){
     if(!j.contains("baked_normal_fields")||!j.contains("source_materials")||!detail::layered_material_archive(j.at("source_materials")))
       throw std::invalid_argument("Scene33 requires its complete material15/normal-field ownership graph");
     if(version!=35&&(version==34)!=detail::canonical_uv_material_archive(j.at("source_materials")))throw std::invalid_argument("Scene34 requires actual material16 UV capability");
@@ -738,7 +740,7 @@ Scene Scene::decode(const nlohmann::json &j) {
     for(const auto &o:j.at("polygon_sources").at("origins"))references(o);
     detail::PolygonSceneBudget budget;budget.owning_paint_domain=paint_context;
     budget.paint_bytes=layered_normal_bytes;
-    if(version==33||version==34)for(const auto &c:j.at("baked_normal_fields").at("origins"))budget.deformation(c.at("deformation"),unsigned(version));
+    if(layered_context)for(const auto &c:j.at("baked_normal_fields").at("origins"))budget.deformation(c.at("deformation"),unsigned(version));
     budget.independent_source_paint=source_paint_context.independent_source;budget.owning_physical_emission=version>=27;
     for (const auto &o : objects) {
       budget.volume(o.at("volume"));
@@ -902,7 +904,7 @@ Scene Scene::decode(const nlohmann::json &j) {
         }
         if(bv==4&&version<21)throw std::invalid_argument("Retained normal detail requires Scene21");
         if(bv==3||bv==4){if(version<15||!baked.at("mtoon_normal").is_binary())throw std::invalid_argument("Prepared baked normals require Scene15");storage+=baked.at("mtoon_normal").get_binary().size();}
-        else if(bv==5){if((version!=33&&version!=34)||!baked.contains("normal_field"))throw std::invalid_argument("Independent baked payload5 requires actual Scene33");}
+        else if(bv==5){if(!layered_context||!baked.contains("normal_field"))throw std::invalid_argument("Independent baked payload5 requires actual Scene33");}
         else if(bv!=2)throw std::invalid_argument("Unsupported retained baked payload");
       }
       if(pixels>16*1024*1024 || storage>256*1024*1024)
@@ -968,7 +970,7 @@ Scene Scene::decode(const nlohmann::json &j) {
   }
   PaintImageArchive source_images;
   if (archives) source_images = PaintImageArchive::decode(j.at("source_images"));
-  detail::BakedNormalArchive layered_normals((version==33||version==34)?&j.at("baked_normal_fields"):nullptr,source_images);
+  detail::BakedNormalArchive layered_normals(layered_context?&j.at("baked_normal_fields"):nullptr,source_images);
   CreatorAssetArchive source_models;
   if (archives) {
     if(version<11)for(const auto &model:j.at("source_models"))if(model.contains("original_source"))
