@@ -9,6 +9,7 @@
 #include "raw-preserving-consumer.hpp"
 #include "source-paint-bake-fixtures.hpp"
 #include <fstream>
+#include <jpeglib.h>
 #include "native-authoring-capture.hpp"
 #include "gltf-document.hpp"
 #include "dome/source-paint.hpp"
@@ -47,7 +48,7 @@ int main(int argc,char **argv)try {
   check(argc<3||std::string_view(argv[2])!="--hardware"||
     (vendor.find("Intel")!=std::string::npos&&device.find("Arc")!=std::string::npos&&device.find("A770")!=std::string::npos),"Raw preserving hardware proof requires actual A770");
   Fbo fbo;fbo.bind();SurfaceRenderer native;native.set_frame_time(0);raw_preserving_consumer::Renderer reader;
-  for(int kind=0;kind<12;++kind) {
+  for(int kind=0;kind<16;++kind) {
     auto source=raw_hdr(kind<5?kind:0);auto &m=source.j["materials"][0];
     if(kind==5||kind>=8) {
       source=portable_material_fixture(6);auto &material=source.j["materials"][0];
@@ -64,6 +65,30 @@ int main(int argc,char **argv)try {
       }
       if(kind==9){material["emissiveTexture"]["texCoord"]=0;material["emissiveTexture"]["extensions"]["KHR_texture_transform"]={{"offset",{.13f,-.27f}},{"scale",{.8f,1.1f}},{"rotation",.17f},{"texCoord",1}};source.j["extensionsUsed"].push_back("KHR_texture_transform");}
       if(kind==10)source.j["nodes"][1]["scale"]={-5,5,5};
+      if(kind==12){
+        auto &primitive=source.j["meshes"][0]["primitives"][0];
+        const auto values=source.values({.15f,.85f,.85f,.85f,.6f,.15f,.2f,.25f},2,"VEC2");
+        while(source.bin.size()%4)source.bin.push_back(0);const auto at=source.bin.size();source.bin.insert(source.bin.end(),{0,1,2,3});
+        const auto view=source.j["bufferViews"].size();source.j["bufferViews"].push_back({{"buffer",0},{"byteOffset",at},{"byteLength",4}});
+        const auto accessor=source.j["accessors"].size();source.j["accessors"].push_back({{"componentType",5126},{"count",4},{"type","VEC2"},{"sparse",{{"count",4},{"indices",{{"bufferView",view},{"componentType",5121}}},{"values",{{"bufferView",source.j["accessors"][values]["bufferView"]}}}}}});
+        primitive["attributes"]["TEXCOORD_1"]=accessor;
+      }
+      if(kind==13){
+        while(source.bin.size()%4)source.bin.push_back(0);const auto at=source.bin.size();
+        for(uint16_t v:{9830,55705,55705,55705,39321,9830,13107,16384}){source.bin.push_back(uint8_t(v));source.bin.push_back(uint8_t(v>>8));}
+        const auto view=source.j["bufferViews"].size();source.j["bufferViews"].push_back({{"buffer",0},{"byteOffset",at},{"byteLength",16}});
+        const auto accessor=source.j["accessors"].size();source.j["accessors"].push_back({{"bufferView",view},{"componentType",5123},{"normalized",true},{"count",4},{"type","VEC2"}});source.j["meshes"][0]["primitives"][0]["attributes"]["TEXCOORD_1"]=accessor;
+      }
+      if(kind==14){
+        jpeg_compress_struct encoder{};jpeg_error_mgr errors{};encoder.err=jpeg_std_error(&errors);jpeg_create_compress(&encoder);unsigned char *bytes=nullptr;unsigned long count=0;jpeg_mem_dest(&encoder,&bytes,&count);encoder.image_width=encoder.image_height=16;encoder.input_components=3;encoder.in_color_space=JCS_RGB;jpeg_set_defaults(&encoder);jpeg_set_quality(&encoder,100,TRUE);jpeg_start_compress(&encoder,TRUE);
+        std::array<unsigned char,48> row{};while(encoder.next_scanline<16){const auto y=encoder.next_scanline;for(size_t x=0;x<16;++x){row[x*3]=uint8_t(20+x*13);row[x*3+1]=uint8_t(30+y*12);row[x*3+2]=uint8_t(220-x*5-y*4);}JSAMPROW pixels=row.data();jpeg_write_scanlines(&encoder,&pixels,1);}jpeg_finish_compress(&encoder);jpeg_destroy_compress(&encoder);
+        while(source.bin.size()%4)source.bin.push_back(0);const auto at=source.bin.size();source.bin.insert(source.bin.end(),bytes,bytes+count);std::free(bytes);const auto view=source.j["bufferViews"].size();source.j["bufferViews"].push_back({{"buffer",0},{"byteOffset",at},{"byteLength",count}});source.j["images"][0]["bufferView"]=view;source.j["images"][0]["mimeType"]="image/jpeg";
+      }
+      if(kind==15){
+        auto sampler=source.j["samplers"][0];sampler["wrapS"]=33071;sampler["wrapT"]=33648;sampler["minFilter"]=9728;sampler["magFilter"]=9729;const auto sampler_id=source.j["samplers"].size();source.j["samplers"].push_back(sampler);
+        auto texture=source.j["textures"][0];texture["sampler"]=sampler_id;const auto texture_id=source.j["textures"].size();source.j["textures"].push_back(texture);material["emissiveTexture"]["index"]=texture_id;
+      }
+
     }
     if(kind==6) {
       auto &p=source.j["meshes"][0]["primitives"][0];

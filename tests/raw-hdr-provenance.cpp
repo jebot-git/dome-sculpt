@@ -40,7 +40,11 @@ import_fixture::Fixture raw_hdr(int kind) {
 }
 int main(int argc,char **argv)try {
  if(argc!=2)return 2;const std::filesystem::path out=argv[1];std::filesystem::create_directories(out);
- auto source=raw_hdr(0);const auto input=out/"raw.glb";source.save(input);
+ auto source=raw_hdr(0);
+ // Shared decoded pixels do not merge independent sampler authorities.
+ auto second_sampler=source.j["samplers"][0];second_sampler["wrapT"]=33648;const auto sampler_id=source.j["samplers"].size();source.j["samplers"].push_back(second_sampler);
+ auto second_texture=source.j["textures"][0];second_texture["sampler"]=sampler_id;const auto texture_id=source.j["textures"].size();source.j["textures"].push_back(second_texture);source.j["materials"][0]["emissiveTexture"]["index"]=texture_id;
+ const auto input=out/"raw.glb";source.save(input);
  Scene initial;initial.active().visible=false;ImportAuthoringOptions options;options.paint_resolution=64;
  auto model=prepare_authoring_import(initial,input,options).scene;const auto original=model.encode();
  auto &o=model.active();auto asset=std::make_shared<ImportedAsset>(*o.appearance->asset);
