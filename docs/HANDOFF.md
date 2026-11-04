@@ -1,5 +1,16 @@
 # Dome Sculpt production handoff
 
+## Qualified FBX generated-normal current-layout continuation — 2026-11-04
+
+On published coherentcage2f6, sealedCFBX imported-morph normal generation now
+passes1158 independent checks andfive existingFBX consumers eachR/S, actual
+chooser68assertions,20KHR0errors/0warnings and10R/SexactGLB pairs. Onecomplete
+productTU andwholeconsumerTUs are rebuilt/relinked against exactcurrent-layout
+ownedCage support; no newheader/schema andno609/fullvendor/device claim. Read
+FBX-CURRENT-CAGE-INTEGRATION.md andreceipt. All unfinished original/additional
+goal requirements remain; Scene30recipes/HDR/weights/paintedV1WIP stay separate.
+
+
 ## Private generated FBX morph normals — 2026-11-04
 
 Explicit Generate flat/smooth now imports genuine morph-bearing FBX files through
