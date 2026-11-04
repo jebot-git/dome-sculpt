@@ -1,0 +1,559 @@
+{
+  "date": "2026-11-04",
+  "parent": "b6d402bc0a72d47797f14c693a081201d35daa42",
+  "scope": "One complete new consumer TU against copied coherent whole-owned Release/SAN core/render/support archives with byte-matching product/headers. No application/runtime/API/schema/asset change. CMake registration configuration-only.",
+  "source_sha256": {
+    "CMakeLists.txt": "aa72a15c85cfe45213522a92d4b8a105b65b925f07c323e88b416c2a3f361410",
+    "tests/source-extra-uv-generated.cpp": "83b32c7bc92b3a2f71992c20fec27a68bf09536a99140a73b215aa573c79c1be",
+    "tests/source4-key-export-render.cpp": "a17aee125884b1551e039e3e9e29454bdc31142b8dd1b54c8f5296478d467e7b"
+  },
+  "proofs": {
+    "release-v4": {
+      "status": {
+        "state": "terminal",
+        "pid": 1451072,
+        "source": "b6d402bc0a72d47797f14c693a081201d35daa42",
+        "scope": "One complete new test TU against copied matching whole-owned coherent Release archives; no production rebuild or GPU. All product/header/asset bytes match parent.",
+        "steps": [
+          {
+            "phase": "compile",
+            "command": [
+              "/usr/bin/c++",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/source4-key-render-b6/src",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/source4-key-render-b6/third_party/cgltf",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/source4-key-render-b6/third_party/desktop",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/source4-key-render-b6/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/source4-key-render-b6/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/source4-key-render-b6/third_party/nlohmann",
+              "-isystem",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/harfbuzz",
+              "-isystem",
+              "/usr/include/glib-2.0",
+              "-isystem",
+              "/usr/lib64/glib-2.0/include",
+              "-isystem",
+              "/usr/include/sysprof-6",
+              "-isystem",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/freetype2",
+              "-isystem",
+              "/usr/include/libpng16",
+              "-isystem",
+              "/usr/include/libxml2",
+              "-O3",
+              "-DNDEBUG",
+              "-std=gnu++20",
+              "-pthread",
+              "-DWITH_GZFILEOP",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source4-key-render-b6/artifacts/render-proof/release-v4/fixture.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source4-key-render-b6/tests/source4-key-export-render.cpp"
+            ],
+            "exit": 0,
+            "seconds": 19.002420198987238
+          },
+          {
+            "phase": "link",
+            "command": [
+              "/usr/bin/c++",
+              "-O3",
+              "-DNDEBUG",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source4-key-render-b6/artifacts/render-proof/release-v4/fixture.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source4-key-render-b6/artifacts/render-proof/release-v4/source4-key-export-render",
+              "-Wl,-rpath,/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source4-key-render-b6/artifacts/render-proof/release-v4/libdome-sculpt-render.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source4-key-render-b6/artifacts/render-proof/release-v4/libdome-sculpt-core.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source4-key-render-b6/artifacts/render-proof/release-v4/libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source4-key-render-b6/artifacts/render-proof/release-v4/libdome-sculpt-polygon.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source4-key-render-b6/artifacts/render-proof/release-v4/libxatlas.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source4-key-render-b6/artifacts/render-proof/release-v4/libmikktspace.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source4-key-render-b6/artifacts/render-proof/release-v4/libmikktspace-robust.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source4-key-render-b6/artifacts/render-proof/release-v4/libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source4-key-render-b6/artifacts/render-proof/release-v4/libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libharfbuzz.so",
+              "/usr/lib64/libEGL.so",
+              "/usr/lib64/libGL.so",
+              "/usr/lib64/libfontconfig.so",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libfreetype.so",
+              "/usr/lib64/libicui18n.so",
+              "/usr/lib64/libicuuc.so",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit": 0,
+            "seconds": 0.3487556939944625
+          },
+          {
+            "phase": "run",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/source4-key-render-b6/artifacts/render-proof/release-v4/source4-key-export-render",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source4-key-render-b6/artifacts/render-proof/release-v4/output"
+            ],
+            "exit": 0,
+            "seconds": 4.846960875001969
+          }
+        ],
+        "child_pid": 1453023,
+        "actual_exit": 0,
+        "seconds": 24.277660724997986,
+        "inputs": 1751,
+        "drift": []
+      },
+      "artifact_sha256": {
+        "artifacts/render-proof/release-v4/before.json": "100ce57f10db7c6069a38251f4b9d9abedddc59c190358ddd3653cfeee91026a",
+        "artifacts/render-proof/release-v4/after.json": "100ce57f10db7c6069a38251f4b9d9abedddc59c190358ddd3653cfeee91026a",
+        "artifacts/render-proof/release-v4/status.json": "749e1278d6c7f35e9e56f3aad3c51fadd967f5aae301940f5ab54301268fa3e8",
+        "artifacts/render-proof/release-v4/compile.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "artifacts/render-proof/release-v4/link.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "artifacts/render-proof/release-v4/run.log": "bce4905338f96891434160e3f009fc6992b659370307a3ef313a2a93e73a54b9",
+        "artifacts/render-proof/release-v4/libdome-sculpt-render.a": "604f75750a1f9cf4e886c5d3bee13f655fd14c5322caeb59ee8754553659592d",
+        "artifacts/render-proof/release-v4/libdome-sculpt-core.a": "68eaaefe424bf3b9f0af40addd1e44209a4f17ffab7abf805ef3d489df85822c",
+        "artifacts/render-proof/release-v4/libdome-sculpt-affine.a": "361baefdc6691d0a3f296925a1586907f4c91acce52a86c04191d25d0f466941",
+        "artifacts/render-proof/release-v4/libdome-sculpt-polygon.a": "ac5766ad9935ce8db65537a73a7d755aef18877d868952c2a3c73b9fd6b7a38a",
+        "artifacts/render-proof/release-v4/libxatlas.a": "63f7a7a3f3a0159b32ec6190b1ed60b68e77e4a68a6b2ae2660d576f751ad506",
+        "artifacts/render-proof/release-v4/libmikktspace.a": "69b9b32a53d2e26ab57b6feb06194d8a9493f14e6958bd5f25fff1f54f4563d5",
+        "artifacts/render-proof/release-v4/libmikktspace-robust.a": "931d851f6a80ea601800ab41d2adeee4ee4c6d5842bc6afadecafd1dfc0944eb",
+        "artifacts/render-proof/release-v4/libufbx.a": "19ae3fe685a419c4ddbc105119f5cacc14c76bc3bbc15704db8e496d4904ffb7",
+        "artifacts/render-proof/release-v4/libdome-sculpt-emission-codec.a": "cdfbe600e67051e5ff7b4fcb34b252d7d1312b9e1fbd18dcac72bc802e73fc70",
+        "artifacts/render-proof/release-v4/fixture.o": "2bb939aff5cf65d9f049ce03125825798fb9dafea50fec7a3c825ea730ccce73",
+        "artifacts/render-proof/release-v4/source4-key-export-render": "bbd1f7e603dda717b512cc63e8fdd295394c1d9516abb929bd28866ca99361d6"
+      }
+    },
+    "sanitize-v1": {
+      "status": {
+        "state": "terminal",
+        "pid": 1451182,
+        "source": "b6d402bc0a72d47797f14c693a081201d35daa42",
+        "scope": "One complete new test TU against copied matching whole-owned coherent ASAN/UBSAN archives; no production rebuild or GPU. All product/header/asset bytes match parent.",
+        "steps": [
+          {
+            "phase": "compile",
+            "command": [
+              "/usr/bin/c++",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/source4-key-render-b6/src",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/source4-key-render-b6/third_party/cgltf",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/source4-key-render-b6/third_party/desktop",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/source4-key-render-b6/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/source4-key-render-b6/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/source4-key-render-b6/third_party/nlohmann",
+              "-isystem",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/harfbuzz",
+              "-isystem",
+              "/usr/include/glib-2.0",
+              "-isystem",
+              "/usr/lib64/glib-2.0/include",
+              "-isystem",
+              "/usr/include/sysprof-6",
+              "-isystem",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/freetype2",
+              "-isystem",
+              "/usr/include/libpng16",
+              "-isystem",
+              "/usr/include/libxml2",
+              "-O1",
+              "-g1",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "-std=gnu++20",
+              "-pthread",
+              "-DWITH_GZFILEOP",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source4-key-render-b6/artifacts/render-proof/sanitize-v1/fixture.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source4-key-render-b6/tests/source4-key-export-render.cpp"
+            ],
+            "exit": 0,
+            "seconds": 28.597434497991344
+          },
+          {
+            "phase": "link",
+            "command": [
+              "/usr/bin/c++",
+              "-O1",
+              "-g1",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "-fsanitize=address,undefined",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source4-key-render-b6/artifacts/render-proof/sanitize-v1/fixture.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source4-key-render-b6/artifacts/render-proof/sanitize-v1/source4-key-export-render",
+              "-Wl,-rpath,/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source4-key-render-b6/artifacts/render-proof/sanitize-v1/libdome-sculpt-render.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source4-key-render-b6/artifacts/render-proof/sanitize-v1/libdome-sculpt-core.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source4-key-render-b6/artifacts/render-proof/sanitize-v1/libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source4-key-render-b6/artifacts/render-proof/sanitize-v1/libdome-sculpt-polygon.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source4-key-render-b6/artifacts/render-proof/sanitize-v1/libxatlas.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source4-key-render-b6/artifacts/render-proof/sanitize-v1/libmikktspace.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source4-key-render-b6/artifacts/render-proof/sanitize-v1/libmikktspace-robust.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source4-key-render-b6/artifacts/render-proof/sanitize-v1/libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source4-key-render-b6/artifacts/render-proof/sanitize-v1/libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libharfbuzz.so",
+              "/usr/lib64/libEGL.so",
+              "/usr/lib64/libGL.so",
+              "/usr/lib64/libfontconfig.so",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libfreetype.so",
+              "/usr/lib64/libicui18n.so",
+              "/usr/lib64/libicuuc.so",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit": 0,
+            "seconds": 2.0134615289862268
+          },
+          {
+            "phase": "run",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/source4-key-render-b6/artifacts/render-proof/sanitize-v1/source4-key-export-render",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source4-key-render-b6/artifacts/render-proof/sanitize-v1/output"
+            ],
+            "exit": 0,
+            "seconds": 6.683036342001287
+          }
+        ],
+        "child_pid": 1454404,
+        "actual_exit": 0,
+        "seconds": 37.97720874901279,
+        "inputs": 1751,
+        "drift": []
+      },
+      "artifact_sha256": {
+        "artifacts/render-proof/sanitize-v1/before.json": "b327b8539eec0643d52d7c04550b1c2c43e9e081825c5ef5cfebb425bf0c674e",
+        "artifacts/render-proof/sanitize-v1/after.json": "b327b8539eec0643d52d7c04550b1c2c43e9e081825c5ef5cfebb425bf0c674e",
+        "artifacts/render-proof/sanitize-v1/status.json": "f78a9cadfda84fe55fb85ce7cd5f7f7857e0795871a9f8b1cdd4f6c2293fad9b",
+        "artifacts/render-proof/sanitize-v1/compile.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "artifacts/render-proof/sanitize-v1/link.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "artifacts/render-proof/sanitize-v1/run.log": "bce4905338f96891434160e3f009fc6992b659370307a3ef313a2a93e73a54b9",
+        "artifacts/render-proof/sanitize-v1/libdome-sculpt-render.a": "0189a0f0105b6e45baa21180b2931d4be330a7b1f6783407cfb6036c8e5a3844",
+        "artifacts/render-proof/sanitize-v1/libdome-sculpt-core.a": "d1ce0f499c9c5c44b889a5ee05bcddbbc95be02e43b091088a2e9fd5228f2ee7",
+        "artifacts/render-proof/sanitize-v1/libdome-sculpt-affine.a": "5cbd1de6d274d55c6cae26e6237c448f21c9dbd4dc4584491ddd36d3aa8dcd40",
+        "artifacts/render-proof/sanitize-v1/libdome-sculpt-polygon.a": "eea5dddaaa50e564334ae05430e46be921214f4dd323eaa267a82ec55d63402b",
+        "artifacts/render-proof/sanitize-v1/libxatlas.a": "1fb5613e16aac712678e13fb0608d887ac7dfcf2cc6d872acb1d996d950ffa5c",
+        "artifacts/render-proof/sanitize-v1/libmikktspace.a": "f1c9c68fd9725edc2812b2f9d3961fb59fbffb485bdbe56826c90df41ff037f0",
+        "artifacts/render-proof/sanitize-v1/libmikktspace-robust.a": "3e7df802ce998b5cf34975cc5244f777050e48cd6e593186a53f9f2d8f2216f1",
+        "artifacts/render-proof/sanitize-v1/libufbx.a": "2ee05a9be16ea8a4a75a92d7f8db15aded94a1ddf0ae74443be950fe6642c819",
+        "artifacts/render-proof/sanitize-v1/libdome-sculpt-emission-codec.a": "6fd6874c379fe283f80e6e09a4648eb53a62a5da8ccda72b7ebb1653fca0dab7",
+        "artifacts/render-proof/sanitize-v1/fixture.o": "d25d42cca7eb4f54f31c9708460f2c09a21e183e464345b3c7b51027e08ec1a6",
+        "artifacts/render-proof/sanitize-v1/source4-key-export-render": "a0bc502f7954b4fbe2eb6b97fc0f3798cf891bb203b226cd54f19c2c874b17d8"
+      }
+    },
+    "hardware-v1": {
+      "status": {
+        "state": "terminal",
+        "pid": 1460945,
+        "selector": "pci-0000_03_00_0",
+        "steps": [
+          {
+            "phase": "arc",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/source4-key-render-b6/artifacts/render-proof/release-v4/source4-key-export-render",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source4-key-render-b6/artifacts/render-proof/hardware-v1/arc",
+              "--hardware"
+            ],
+            "exit": 0,
+            "expected": 0,
+            "seconds": 5.007199749990832
+          },
+          {
+            "phase": "software-refusal",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/source4-key-render-b6/artifacts/render-proof/release-v4/source4-key-export-render",
+              "/home/blux/de-xr/dome-sculpt/artifacts/source4-key-render-b6/artifacts/render-proof/hardware-v1/software-refusal",
+              "--hardware"
+            ],
+            "exit": 1,
+            "expected": 1,
+            "seconds": 0.06655795199912973
+          }
+        ],
+        "child_pid": 1461502,
+        "seconds": 5.1628050330036785,
+        "inputs": 1754,
+        "drift": [],
+        "exit": 0
+      },
+      "artifact_sha256": {
+        "artifacts/render-proof/hardware-v1/before.json": "71202e2f92a5553b861f29982de0edf99738e3375c688ae4f7e297c5e9554bf2",
+        "artifacts/render-proof/hardware-v1/after.json": "71202e2f92a5553b861f29982de0edf99738e3375c688ae4f7e297c5e9554bf2",
+        "artifacts/render-proof/hardware-v1/status.json": "bf12646f3980cabb0fe0ffcef44cc75636abedf5e75bba68ef9935529880ae29",
+        "artifacts/render-proof/hardware-v1/arc.log": "71f4a471beb5ae500128363c92052acde8e4c56d97254f89a9819ca873aa735d",
+        "artifacts/render-proof/hardware-v1/software-refusal.log": "59f43d42a2b8cd3220c8e492551a1a6b9792229d530766d8b22c707288df48aa"
+      }
+    }
+  },
+  "metrics": {
+    "checks_per_positive": 45,
+    "images_per_positive": 9,
+    "poses": [
+      0,
+      1,
+      2
+    ],
+    "morph_weights": [
+      0,
+      0.35,
+      1
+    ],
+    "pixel_bound": 4,
+    "pixel_max_all": 0,
+    "wrong_uv_pixel_delta": 92,
+    "unedited_source_pixel_delta": 255
+  },
+  "validator": {
+    "version": "2.0.0-dev.3.10",
+    "maxIssues": 0,
+    "totals": {
+      "outputs": 30,
+      "native": 27,
+      "errors": 0,
+      "warnings": 33,
+      "infos": 102,
+      "hints": 30,
+      "byte_exact_pairs": 11,
+      "pairs": 11
+    },
+    "report_sha256": "065d757f64371fef96721eafb2fbef97bb2be74780f89aa268d368c7c0456da9",
+    "pairs": [
+      {
+        "name": "input.glb",
+        "hashes": {
+          "release": "f2ff6f916e8197ac8b0d32b62dc645dc1c219da2bc191cdbc25ade722a7664c9",
+          "sanitize": "f2ff6f916e8197ac8b0d32b62dc645dc1c219da2bc191cdbc25ade722a7664c9",
+          "arc": "f2ff6f916e8197ac8b0d32b62dc645dc1c219da2bc191cdbc25ade722a7664c9"
+        },
+        "exact": true
+      },
+      {
+        "name": "keyed.dsculpt",
+        "hashes": {
+          "release": "23bd12417a6b967b6bfaa0f5892ac40218271b6fdbc1b38fba4c11415571efcf",
+          "sanitize": "23bd12417a6b967b6bfaa0f5892ac40218271b6fdbc1b38fba4c11415571efcf",
+          "arc": "23bd12417a6b967b6bfaa0f5892ac40218271b6fdbc1b38fba4c11415571efcf"
+        },
+        "exact": true
+      },
+      {
+        "name": "p0-w0.glb",
+        "hashes": {
+          "release": "eb5c86666e7bb845cd4edec8a722abde948d0d583a46e7071021b0a6c7648405",
+          "sanitize": "eb5c86666e7bb845cd4edec8a722abde948d0d583a46e7071021b0a6c7648405",
+          "arc": "eb5c86666e7bb845cd4edec8a722abde948d0d583a46e7071021b0a6c7648405"
+        },
+        "exact": true
+      },
+      {
+        "name": "p0-w100.glb",
+        "hashes": {
+          "release": "73549bc4054028f97f6b8179699881ea3efee426020fce420c39f3a2bd45ce39",
+          "sanitize": "73549bc4054028f97f6b8179699881ea3efee426020fce420c39f3a2bd45ce39",
+          "arc": "73549bc4054028f97f6b8179699881ea3efee426020fce420c39f3a2bd45ce39"
+        },
+        "exact": true
+      },
+      {
+        "name": "p0-w35.glb",
+        "hashes": {
+          "release": "cd45d8a9cc219a96f5f772e8a1d6706284556318bae0908cbd90d61e3929cd26",
+          "sanitize": "cd45d8a9cc219a96f5f772e8a1d6706284556318bae0908cbd90d61e3929cd26",
+          "arc": "cd45d8a9cc219a96f5f772e8a1d6706284556318bae0908cbd90d61e3929cd26"
+        },
+        "exact": true
+      },
+      {
+        "name": "p1-w0.glb",
+        "hashes": {
+          "release": "a6f11bd61b9d75895ff9ceb834f201892a567ccbf5aafe5994ab9d1ac63127a1",
+          "sanitize": "a6f11bd61b9d75895ff9ceb834f201892a567ccbf5aafe5994ab9d1ac63127a1",
+          "arc": "a6f11bd61b9d75895ff9ceb834f201892a567ccbf5aafe5994ab9d1ac63127a1"
+        },
+        "exact": true
+      },
+      {
+        "name": "p1-w100.glb",
+        "hashes": {
+          "release": "de7856ae1081b4dc9fe9deba36496fd658ab8ff9bf7cba2e0f38eeecf0d0af35",
+          "sanitize": "de7856ae1081b4dc9fe9deba36496fd658ab8ff9bf7cba2e0f38eeecf0d0af35",
+          "arc": "de7856ae1081b4dc9fe9deba36496fd658ab8ff9bf7cba2e0f38eeecf0d0af35"
+        },
+        "exact": true
+      },
+      {
+        "name": "p1-w35.glb",
+        "hashes": {
+          "release": "7a47effe5bad23b100c099763dd19938fefd202972486bc240a15bb16984fc1e",
+          "sanitize": "7a47effe5bad23b100c099763dd19938fefd202972486bc240a15bb16984fc1e",
+          "arc": "7a47effe5bad23b100c099763dd19938fefd202972486bc240a15bb16984fc1e"
+        },
+        "exact": true
+      },
+      {
+        "name": "p2-w0.glb",
+        "hashes": {
+          "release": "b3fa42a6014a532bbfa66d01f203030f501822798a761825a53d6c18e02999e6",
+          "sanitize": "b3fa42a6014a532bbfa66d01f203030f501822798a761825a53d6c18e02999e6",
+          "arc": "b3fa42a6014a532bbfa66d01f203030f501822798a761825a53d6c18e02999e6"
+        },
+        "exact": true
+      },
+      {
+        "name": "p2-w100.glb",
+        "hashes": {
+          "release": "8f8a9bdb83408890ae06eb6c41406397e4d1086cd09636f857b56cf87db33a28",
+          "sanitize": "8f8a9bdb83408890ae06eb6c41406397e4d1086cd09636f857b56cf87db33a28",
+          "arc": "8f8a9bdb83408890ae06eb6c41406397e4d1086cd09636f857b56cf87db33a28"
+        },
+        "exact": true
+      },
+      {
+        "name": "p2-w35.glb",
+        "hashes": {
+          "release": "65be77a8bef0366d30f86ad5ed8a2ec81523fcda24073e0a105209a895bcc4a0",
+          "sanitize": "65be77a8bef0366d30f86ad5ed8a2ec81523fcda24073e0a105209a895bcc4a0",
+          "arc": "65be77a8bef0366d30f86ad5ed8a2ec81523fcda24073e0a105209a895bcc4a0"
+        },
+        "exact": true
+      }
+    ]
+  },
+  "configuration": {
+    "scope": "Configuration-only target registration and headless guard; not build proof",
+    "steps": [
+      {
+        "profile": "release",
+        "command": [
+          "cmake",
+          "-S",
+          "/home/blux/de-xr/dome-sculpt/artifacts/source4-key-render-b6",
+          "-B",
+          "/home/blux/de-xr/dome-sculpt/artifacts/source4-key-render-b6/artifacts/render-proof/configuration/release",
+          "-G",
+          "Ninja",
+          "-DCMAKE_BUILD_TYPE=Release",
+          "-DDOME_COMPUTE_BACKEND=CPU",
+          "-DDOME_BUILD_UI=ON",
+          "-DDOME_BUILD_XR=ON",
+          "-DBUILD_TESTING=ON",
+          "-DFLTK_DIR=/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-release/share/fltk",
+          "-U*DOME_BITMAP_RUNTIME*",
+          "-U*NATIVEGL*",
+          "-U*RENDERFONTS*"
+        ],
+        "exit": 0,
+        "seconds": 5.270831706002355,
+        "tests": 599,
+        "new_test": true
+      },
+      {
+        "profile": "headless",
+        "command": [
+          "cmake",
+          "-S",
+          "/home/blux/de-xr/dome-sculpt/artifacts/source4-key-render-b6",
+          "-B",
+          "/home/blux/de-xr/dome-sculpt/artifacts/source4-key-render-b6/artifacts/render-proof/configuration/headless",
+          "-G",
+          "Ninja",
+          "-DCMAKE_BUILD_TYPE=Release",
+          "-DDOME_COMPUTE_BACKEND=CPU",
+          "-DDOME_BUILD_UI=OFF",
+          "-DDOME_BUILD_XR=OFF",
+          "-DBUILD_TESTING=OFF",
+          "-U*DOME_BITMAP_RUNTIME*",
+          "-U*NATIVEGL*",
+          "-U*RENDERFONTS*"
+        ],
+        "exit": 0,
+        "seconds": 1.2650202250224538,
+        "tests": 0,
+        "new_test": false
+      }
+    ],
+    "before": {
+      "CMakeLists.txt": "aa72a15c85cfe45213522a92d4b8a105b65b925f07c323e88b416c2a3f361410",
+      "tests/source-extra-uv-generated.cpp": "83b32c7bc92b3a2f71992c20fec27a68bf09536a99140a73b215aa573c79c1be",
+      "tests/source4-key-export-render.cpp": "a17aee125884b1551e039e3e9e29454bdc31142b8dd1b54c8f5296478d467e7b"
+    },
+    "after": {
+      "CMakeLists.txt": "aa72a15c85cfe45213522a92d4b8a105b65b925f07c323e88b416c2a3f361410",
+      "tests/source-extra-uv-generated.cpp": "83b32c7bc92b3a2f71992c20fec27a68bf09536a99140a73b215aa573c79c1be",
+      "tests/source4-key-export-render.cpp": "a17aee125884b1551e039e3e9e29454bdc31142b8dd1b54c8f5296478d467e7b"
+    },
+    "drift": []
+  },
+  "preserved_compile_negative": {
+    "state": "terminal",
+    "pid": 1435912,
+    "source": "b6d402bc0a72d47797f14c693a081201d35daa42",
+    "scope": "One complete new test TU against copied matching whole-owned coherent Release archives; no production rebuild or GPU. All product/header/asset bytes match parent.",
+    "steps": [
+      {
+        "phase": "compile",
+        "command": [
+          "/usr/bin/c++",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/source4-key-render-b6/src",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/source4-key-render-b6/third_party/cgltf",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/source4-key-render-b6/third_party/desktop",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/source4-key-render-b6/include",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/source4-key-render-b6/third_party/openbrush",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/source4-key-render-b6/third_party/nlohmann",
+          "-isystem",
+          "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/harfbuzz",
+          "-isystem",
+          "/usr/include/glib-2.0",
+          "-isystem",
+          "/usr/lib64/glib-2.0/include",
+          "-isystem",
+          "/usr/include/sysprof-6",
+          "-isystem",
+          "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/freetype2",
+          "-isystem",
+          "/usr/include/libpng16",
+          "-isystem",
+          "/usr/include/libxml2",
+          "-O3",
+          "-DNDEBUG",
+          "-std=gnu++20",
+          "-pthread",
+          "-DWITH_GZFILEOP",
+          "-o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/source4-key-render-b6/artifacts/render-proof/release-v1/fixture.o",
+          "-c",
+          "/home/blux/de-xr/dome-sculpt/artifacts/source4-key-render-b6/tests/source4-key-export-render.cpp"
+        ],
+        "exit": 1,
+        "seconds": 4.789470818999689
+      }
+    ],
+    "child_pid": 1435979,
+    "actual_exit": 1,
+    "seconds": 4.872656903986353,
+    "inputs": 1751,
+    "drift": []
+  },
+  "limits": [
+    "No new physical HMD, actual VRM/MToon or licensed-avatar image cohort.",
+    "No claim of new whole app/core build; new test TU uses matched immutable owned archives.",
+    "Current Source4 overlay is pristine: writable paint/source owners are preserved while geometry key changes. Painted standard export remains a separate required scope.",
+    "Broader combined139 sanitizer continuation and next coherent601 application build are separate/live."
+  ]
+}

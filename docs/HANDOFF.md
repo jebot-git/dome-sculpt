@@ -1,5 +1,17 @@
 # Dome Sculpt production handoff
 
+## Private Source4 UV2 key export images — 2026-11-04
+
+Actual native geometric Replace/queuedSave/restart/UndoRedo/Restore and nine
+mixed-pose/morph independent GLB images pass45 checks each Release, owned SAN
+and strict PCI03 A770. All image errors0, wrong-UV92 and real-key255 sensitivity;
+27 native GLBs have zero Khronos errors and all11 R/S/Arc file triples are exact.
+This is a new test-TU consumer over matched owned archives, with pristine paint
+contributions, not a new whole app/VRM/painted-export/main claim. Read
+SOURCE4-KEY-EXPORT-PIXELS.md and its receipt. Broader coherent qualification and
+every unfinished original/additional goal row remain required.
+
+
 ## Private coherent application qualification candidate — 2026-11-04
 
 This private union composes current public Restore/IO/final27 SDK with qualified
