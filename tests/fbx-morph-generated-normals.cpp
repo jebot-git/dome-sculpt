@@ -16,10 +16,17 @@ double maximum_normal_error=0,maximum_delta=0;
 size_t normal_corners=0;
 void compare_normals(const ImportedAsset &asset,const ufbx_scene &source,ImportNormals mode){
  for(const auto &p:asset.primitives){
-  const auto &mesh=*source.nodes[size_t(p.source_node)]->mesh;
+  const auto extras=nlohmann::json::parse(p.extras_json);
+  const auto element=extras.at("dome_source_ufbx_element").get<uint32_t>();
+  const ufbx_mesh *original=nullptr;
+  for(auto *mesh:source.meshes)if(mesh->element_id==element){
+    check(!original,"Original parser mesh identity is unique");original=mesh;
+  }
+  check(original,"Canonical mesh provenance resolves a real original FBX mesh");
+  const auto &mesh=*original;
   const auto shapes=source_shapes(mesh);
   check(shapes.size()==p.morph_targets.size(),"Every source morph endpoint remains independently editable");
-  const auto controls=nlohmann::json::parse(p.extras_json).at("dome_source_vertices").get<std::vector<uint32_t>>();
+  const auto controls=extras.at("dome_source_vertices").get<std::vector<uint32_t>>();
   for(size_t key=0;key<shapes.size();++key){
    const auto &shape=*shapes[key];const auto &target=p.morph_targets[key];
    check(target.normals.size()==p.mesh.positions.size(),"Generated normal deltas cover every canonical target corner");
