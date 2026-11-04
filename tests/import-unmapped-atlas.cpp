@@ -22,8 +22,10 @@ int main(int argc,char **argv)try{
   Scene original;auto before=original.encode();ImportAuthoringOptions choices;choices.paint_resolution=64;
   auto raw=prepare_authoring_import(original,path,choices);
   check(raw.objects.size()==2&&original.encode()==before,"Unprepared degenerate unused UVs are retained as view-only source without changing the caller");
-  for(auto id:raw.objects){auto paint=raw.scene.object(id).painted->snapshot();const auto encoded=paint->encode();bool refused=false;try{paint->begin_stroke();}catch(const std::invalid_argument&){refused=true;}
-   check(refused&&!paint->in_stroke()&&paint->encode()==encoded&&paint->preview(raw.scene.object(id).material)->source_only,"Raw degenerate coordinates cannot start a writable stroke or fabricate coverage");}
+  for(auto id:raw.objects){auto paint=raw.scene.object(id).painted->snapshot();const auto encoded=paint->encode();bool refused=false;try{paint->begin_stroke();}catch(const std::logic_error&){refused=true;}
+   check(refused&&!paint->in_stroke()&&paint->encode()==encoded&&!paint->surface_diagnostics().covered_texels&&!paint->surface_diagnostics().unpaintable_uv_faces.empty(),"Raw degenerate coordinates cannot start a writable stroke or fabricate coverage");}
+  Document raw_document;raw_document.replace(raw.scene);raw_document.wait_mesh();const auto raw_state=raw_document.copy_scene().encode();
+  check(!raw_document.begin_native_stroke()&&raw_document.copy_scene().encode()==raw_state&&raw_document.frame().state->message.find("editable texture atlas")!=std::string::npos,"Actual native degenerate-source stroke explains preparation before changing source or history");
   choices.prepare_texture_atlas=true;auto result=prepare_authoring_import(original,path,choices);
   check(result.objects.size()==2&&original.encode()==before,"Explicit atlas generation admits both untextured source instances without changing caller");
   for(auto id:result.objects){const auto &object=result.scene.object(id);check(object.painted->surface_diagnostics().unpaintable_uv_faces.empty(),"Generated current atlas provides writable coverage for every actual triangle");

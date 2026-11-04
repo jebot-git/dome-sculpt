@@ -49,8 +49,12 @@ int main(int argc,char **argv)try{
   auto exported=directory/(flat?"flat-painted.glb":"artist-painted.glb");document.export_asset(exported,AssetExportFormat::EditableGlb256).get();cgltf_options parse_options{};cgltf_data *parsed=nullptr;
   check(cgltf_parse_file(&parse_options,exported.c_str(),&parsed)==cgltf_result_success,"Independent cgltf parser reads the actual painted UV1-import export worker result");std::unique_ptr<cgltf_data,decltype(&cgltf_free)> owner(parsed,cgltf_free);
   check(cgltf_load_buffers(&parse_options,parsed,exported.c_str())==cgltf_result_success&&cgltf_validate(parsed)==cgltf_result_success,"Actual GLB worker emits valid prepared texture, morph and attribute resources");
-  size_t mapped=0;for(size_t material=0;material<parsed->materials_count;++material){const auto &m=parsed->materials[material];if(m.normal_texture.texture){++mapped;check(m.normal_texture.texcoord==0&&m.pbr_metallic_roughness.base_color_texture.texcoord==0,"Explicit finite export samples its declared current atlas instead of silently substituting raw UV1");}}
-  check(mapped==2,"Both retained imported instances export their independent editable material bindings");
+  size_t mapped=0,finite=0,pristine=0;for(size_t material=0;material<parsed->materials_count;++material){const auto &m=parsed->materials[material];if(m.normal_texture.texture){++mapped;
+   const auto &color=m.pbr_metallic_roughness.base_color_texture;check(color.texture&&m.normal_texture.texcoord==color.texcoord,"Each independently emitted material uses its actual paired color/normal coordinate domain");
+   if(color.texcoord==0){++finite;check(m.normal_texture.texture!=color.texture&&m.pbr_metallic_roughness.base_color_factor[0]==1,"Painted material uses explicit finite atlas images and resolved factors");}
+   else {++pristine;check(color.texcoord==1&&std::abs(m.pbr_metallic_roughness.base_color_factor[0]-.7f)<1e-6f,"Unpainted instance retains its exact original UV1 material instead of unnecessary resampling");}
+  }}
+  check(mapped==2&&finite==1&&pristine==1,"Only the painted instance compiles a finite view; its unpainted sibling retains original sampling");
  }
  {
   auto many=source();for(int n=0;n<7;++n){auto index=many.j["nodes"].size();many.j["nodes"].push_back(many.j["nodes"][1]);many.j["nodes"][0]["children"].push_back(index);}

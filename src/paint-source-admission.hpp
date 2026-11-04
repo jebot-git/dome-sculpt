@@ -9,6 +9,11 @@ inline constexpr const char *editable_texture_atlas_notice=
 inline bool paint_requires_editable_atlas(const PaintedMesh &paint) noexcept {
   if(!paint.source_maps())return false;
   if(paint.source_maps()->uses_alternate_uv()&&!paint.source_sampling_prepared())return true;
+  // In-tile degenerate source coordinates are valid retained provenance, but
+  // provide no writable texels. Require preparation before accepting a stroke
+  // instead of silently opening an editing transaction which cannot paint.
+  const auto &coverage=paint.surface_diagnostics();
+  if(!coverage.covered_texels&&!coverage.unpaintable_uv_faces.empty())return true;
   // A retained sampling domain has its own independently validated raster.
   // Otherwise raw UVs outside the first tile require explicit atlas creation.
   return !paint.paint_sampling_domain()&&std::any_of(paint.mesh().uv.begin(),paint.mesh().uv.end(),[](const auto &uv){
