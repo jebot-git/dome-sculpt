@@ -184,7 +184,7 @@ void main(){vec2 paintPoint=paintUV+wrongPaint;vec4 coverage=texture(paintCovera
         auto &si = ext.at("shadeMultiplyTexture");
         const auto &ei=m.at("emissiveTexture");
         auto ef=m.value("emissiveFactor",std::array<float,3>{});
-        
+
         float strength=1;if(m.contains("extensions")&&m.at("extensions").contains("KHR_materials_emissive_strength"))strength=m.at("extensions").at("KHR_materials_emissive_strength").value("emissiveStrength",1.f);
         scalar("emissionStrength",strength);scalar("legacyStrength",omit_strength?1:strength);scalar("physicalMultiplier",scale_physical?strength:1);
         auto baseColor =

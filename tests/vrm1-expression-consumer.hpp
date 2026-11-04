@@ -182,7 +182,7 @@ result=vec4(mix(shade,lit.rgb,ratio)+gi*lit.rgb+emission,1);})GLSL";
         auto &si = ext.at("shadeMultiplyTexture");
         const auto &ei=m.at("emissiveTexture");
         auto ef=m.value("emissiveFactor",std::array<float,3>{});
-        
+
         float strength=1;if(m.contains("extensions")&&m.at("extensions").contains("KHR_materials_emissive_strength"))strength=m.at("extensions").at("KHR_materials_emissive_strength").value("emissiveStrength",1.f);
         scalar("emissionStrength",strength);
         auto baseColor =

@@ -4,6 +4,10 @@ The full Dome Sculpt objective remains active and incomplete. The accepted XR
 selection interface is preserved. Controller drawers remain required after the
 basic authoring targets. Animation and final scene rendering remain excluded.
 
+The combined foundation is integrated on main at ae075b1. All 1,326 tracked
+code/build/test/asset files match the qualified tree at that merge; the following
+cleanup changes only trailing whitespace in four test files.
+
 The qualified combined foundation is [4b37f11](https://github.com/jebot-git/dome-sculpt/tree/4b37f119f5c5274b118aa5a55ec8e5a689ef809f), with runtime source 1d573f2. Fresh optimized Release ALL completes 1,397
 build tasks; the separate owning sanitizer application/core/render/support and
 selected consumers complete 276. All 32 selected integration tests pass in each

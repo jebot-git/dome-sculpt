@@ -237,7 +237,7 @@ async def main():
         check(physical and max(v[0] for v in physical)>11.9 and .0019<max(v[1] for v in physical)<.0021,'Actual desktop units/RGB controls create unclamped physical float paint including small linear values')
         check(painted['source_materials']==baseline['source_materials'],'Actual physical pointer painting keeps original source references and factor/strength exact')
         (out/'before-native-paint.dsculpt').write_bytes(original);baseline=painted;original=project.read_bytes();(out/'actual-pointer-paint.dsculpt').write_bytes(original)
-        values=await nodes();label='Export editable project (.glb)...' 
+        values=await nodes();label='Export editable project (.glb)...'
         check(values[label][1].get('enabled',True),'Editable project export is an actual enabled DomeD universal-menu command')
         await command(label);options=await wait(lambda:named('Editable GLB export'))
         check(options.get_wm_transient_for().id==window.id and options.get_wm_class()[1]==window.get_wm_class()[1],'Portable policy uses a native FLTK modal with shared document identity')

@@ -242,7 +242,7 @@ async def main():
         await history('Redo');await command('Save');await exact_file(painted_bytes,'redo')
         check(project.read_bytes()==painted_bytes,'Actual physical stroke Redo restores exact float paint bytes')
         baseline=painted;original=painted_bytes
-        values=await nodes();label='Export editable project (.glb)...' 
+        values=await nodes();label='Export editable project (.glb)...'
         check(values[label][1].get('enabled',True),'Editable project export is an actual enabled DomeD universal-menu command')
         await command(label);options=await wait(lambda:named('Editable GLB export'))
         check(options.get_wm_transient_for().id==window.id and options.get_wm_class()[1]==window.get_wm_class()[1],'Portable policy uses a native FLTK modal with shared document identity')
