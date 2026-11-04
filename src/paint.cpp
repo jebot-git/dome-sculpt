@@ -1,6 +1,8 @@
 #include "source-paint-parameters.hpp"
 #include "paint-overlay-packet.hpp"
 #include "emission-paint-access.hpp"
+#include "native-weight-paint-access.hpp"
+#include "native-weight-state.hpp"
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Ray/triangle picking adapted from Blender 5.4 Alpha isect_ray_tri_v3,
 // GPL-2.0-or-later; see third_party/blender/math_geom.cc.reference.
@@ -181,7 +183,7 @@ struct PaintedMesh::CompositeCache {
   std::weak_ptr<const TextureMaps> maps;
   uint64_t preview_token=0;
   bool source_eligible=false;
-  std::shared_ptr<const TextureMaps> source_preview;
+  std::weak_ptr<const TextureMaps> source_preview;
   uint64_t native_emission_token=0;
   CompositeFactors native_emission_factors{};
   std::weak_ptr<const TextureMaps> native_emission_preview;
@@ -1335,6 +1337,39 @@ std::shared_ptr<PaintedMesh> detail::EmissionExportAccess::without_emission(cons
   for(auto &layer:detached->layers_){layer.emission_tiles.clear();for(auto &tile:layer.tiles)if(tile){bool emission=false;for(const auto &pixel:tile->pixels)emission|=pixel.data[6]||pixel.data[7]||pixel.data[8]||pixel.data[12];if(emission){auto copy=std::make_shared<PaintTile>(*tile);for(auto &pixel:copy->pixels){pixel.data[6]=pixel.data[7]=pixel.data[8]=pixel.data[12]=0;}tile=std::move(copy);}}}
   return detached;
 }
+detail::NativeWeightPaintAccess::Surface detail::NativeWeightPaintAccess::surface(const PaintedMesh &paint,bool prospective) {
+  if (!paint.surface_ || paint.editing_ || (!prospective&&(!paint.undo_.empty() || !paint.redo_.empty())))
+    throw std::invalid_argument("Native weight input must be a detached current-paint snapshot");
+  const auto &surface=*paint.surface_;
+  if(surface.original_sampling || surface.paint_domain || paint.sampling_attachment_ ||
+     paint.color_projection_ || paint.normal_projection_ || paint.baked_)
+    throw std::invalid_argument("Native anatomical input budget does not yet represent prepared paint domains");
+  size_t bytes=sizeof(PaintedMesh::SurfaceMap)+64;
+  auto add=[&](size_t count,size_t unit){if(unit&&count>(SIZE_MAX-bytes)/unit)throw std::length_error("Native paint retained-byte overflow");bytes+=count*unit;if(count){const size_t overhead=count*unit>=128u*1024u?4096:64;if(overhead>SIZE_MAX-bytes)throw std::length_error("Native paint allocation allowance overflow");bytes+=overhead;}};
+  const auto &m=surface.mesh;
+  add(m.positions.capacity(),sizeof(Vec3));add(m.normals.capacity(),sizeof(Vec3));
+  add(m.uv.capacity(),sizeof(std::array<float,2>));add(m.indices.capacity(),sizeof(uint32_t));
+  add(m.uv_pins.capacity(),1);add(m.uv_seams.capacity(),1);
+  add(surface.texels.capacity(),sizeof(PaintedMesh::SurfaceMap::Texel));
+  add(surface.extra.capacity(),sizeof(PaintedMesh::SurfaceMap::Extra));
+  add(surface.tiles.capacity(),sizeof(PaintedMesh::SurfaceMap::Bounds));add(surface.padding.capacity(),sizeof(int32_t));
+  add(surface.linked.size(),sizeof(decltype(surface.linked)::value_type)+3*sizeof(void*)+32);
+  add(surface.linked.bucket_count(),sizeof(void*));add(surface.diagnostics.unpaintable_uv_faces.capacity(),sizeof(uint32_t));
+  return {paint.surface_,bytes};
+}
+bool detail::NativeWeightPaintAccess::same_current(const PaintedMesh&a,const PaintedMesh&b) noexcept {
+  using namespace native_weight_state;
+  // Current authoring state only. Undo scratch, weak render caches and cache
+  // tokens are not a source authority; immutable sparse tile owners are.
+  if(a.editing_||b.editing_||!owner(a.surface_,b.surface_)||!owner(a.sampling_attachment_,b.sampling_attachment_)||!owner(a.source_maps_,b.source_maps_)||!owner(a.color_projection_,b.color_projection_)||!owner(a.normal_projection_,b.normal_projection_)||!owner(a.baked_,b.baked_)||a.active_!=b.active_||a.next_!=b.next_||a.revision_!=b.revision_||a.allocated_tiles_!=b.allocated_tiles_||a.allocated_color_tiles_!=b.allocated_color_tiles_||a.layers_.size()!=b.layers_.size())return false;
+  auto tiles=[](const auto&x,const auto&y){if(x.size()!=y.size())return false;for(size_t i=0;i<x.size();++i)if(!owner(x[i],y[i]))return false;return true;};
+  for(size_t i=0;i<a.layers_.size();++i){const auto&x=a.layers_[i];const auto&y=b.layers_[i];if(x.id!=y.id||x.name!=y.name||x.visible!=y.visible||!scalar(x.opacity,y.opacity)||!tiles(x.tiles,y.tiles)||!tiles(x.pbr_tiles,y.pbr_tiles)||!tiles(x.emission_tiles,y.emission_tiles))return false;}
+  return true;
+}
+std::shared_ptr<PaintedMesh> detail::NativeWeightPaintAccess::snapshot(const PaintedMesh &paint) {
+  auto cache=std::make_shared<PaintedMesh::CompositeCache>();
+  auto result=paint.snapshot();result->composite_cache_=std::move(cache);return result;
+}
 std::shared_ptr<PaintedMesh> PaintedMesh::snapshot() const {
   auto p = std::shared_ptr<PaintedMesh>(new PaintedMesh);
   p->composite_cache_=composite_cache_;
@@ -2140,7 +2175,8 @@ std::shared_ptr<const TextureMaps> PaintedMesh::preview(const Material &material
     }
     if(composite_cache_->source_eligible||source_sampling_prepared()){
       if(!valid_source_sampling_attachment())throw std::invalid_argument("Source paint preview lost its actual immutable attachment");
-      if(!composite_cache_->source_preview){
+      auto preview=composite_cache_->source_preview.lock();
+      if(!preview){
         auto marker=std::make_shared<TextureMaps>();marker->source_maps=source_maps_;marker->source_only=true;
         if(source_sampling_prepared()){
           marker->overlay=detail::PaintOverlayFactory::capture(*this,cancelled);
@@ -2148,9 +2184,9 @@ std::shared_ptr<const TextureMaps> PaintedMesh::preview(const Material &material
             for(const auto &p:tile->pixels)if(p.data[13]&&p.data[9]&&p.data[3]!=255){marker->transparent=true;break;}
         }
         if(auto image=source_maps_->color.image)for(size_t i=3;i<image->rgba.size();i+=4)if(image->rgba[i]!=255){marker->transparent=true;break;}
-        composite_cache_->source_preview=std::move(marker);
+        composite_cache_->source_preview=marker;preview=std::move(marker);
       }
-      return composite_cache_->source_preview;
+      return preview;
     }
   }
   return composite(material,cancelled);

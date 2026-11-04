@@ -1,0 +1,1163 @@
+{
+  "scope": "Private linked-pose FLTK and current export followup to04e6670; frontend help/labels only, no public layout/schema/weight/pose-kernel change",
+  "source": {
+    "CMakeLists.txt": "692a505433791cad97efc86e6e149b94b5a525a61c8022514d1e5a4bbb238a5b",
+    "src/rig-editor.cpp": "a6928c2f0dda6da27d351e839dbc0d0c2f43fae59368635ff7cfc8eb1a12bc37",
+    "tests/native-linked-pose-export.cpp": "ec137d1147e6bd0202cc74882c7f57eec4af3f00c37aa66c930524f712b8c18d",
+    "tests/native-rig-pose-inspect.cpp": "53751d76a9ccd6d77d5539dfaea1a401f8fc0a7cdd227213498e19c1ff5fb828",
+    "tests/native-rig-pose-menu.py": "f130afab32aedeb9bd86071679d90791d7eaf51778954ed2ca034394c3294f61",
+    "tests/native-rig-pose-ui.cpp": "c9f65231c6c365549387d6ce09b37b7eba16881ae4f1ed7bd84ba8c1da5fcdbe"
+  },
+  "runtime_parent": "04e6670f75a9f390c9e29e14127c42c47eecfbfe",
+  "build_scope": "Exact765 matched archived core/support/frontend consumers, own04e rig-edit module and own Rig dialog TU; observer compiles actual App code and reads state/widgets only. No changed public headers. Not a fresh whole-project build. Fresh CMake configure terminal0.",
+  "app_manifest": {
+    "scope": "Exact765 frontend/support with own Rig dialog TU +read-only actual App observer and04e core rig-edit replacement. No public layout change.",
+    "compile": {
+      "src/rig-editor.cpp": [
+        "/usr/bin/c++",
+        "-I/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-anatomical-pose-ui-76536fe/src",
+        "-DDOME_HAS_XR=1",
+        "-I/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-anatomical-pose-ui-76536fe/third_party/desktop",
+        "-I/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-anatomical-pose-ui-76536fe/build",
+        "-I/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-anatomical-pose-ui-76536fe/include",
+        "-I/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-anatomical-pose-ui-76536fe/third_party/openbrush",
+        "-I/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-anatomical-pose-ui-76536fe/third_party/nlohmann",
+        "-isystem",
+        "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/harfbuzz",
+        "-isystem",
+        "/usr/include/glib-2.0",
+        "-isystem",
+        "/usr/lib64/glib-2.0/include",
+        "-isystem",
+        "/usr/include/sysprof-6",
+        "-isystem",
+        "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/freetype2",
+        "-isystem",
+        "/usr/include/libpng16",
+        "-isystem",
+        "/usr/include/libxml2",
+        "-isystem",
+        "/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-release/include",
+        "-isystem",
+        "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/cairo",
+        "-isystem",
+        "/usr/include/pixman-1",
+        "-isystem",
+        "/usr/include/libmount",
+        "-isystem",
+        "/usr/include/blkid",
+        "-O3",
+        "-DNDEBUG",
+        "-std=gnu++20",
+        "-pthread",
+        "-DWITH_GZFILEOP",
+        "-o",
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-anatomical-pose-ui-76536fe/artifacts/ui/rig-editor.cpp.o",
+        "-c",
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-anatomical-pose-ui-76536fe/src/rig-editor.cpp"
+      ],
+      "tests/native-rig-pose-ui.cpp": [
+        "/usr/bin/c++",
+        "-I/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-anatomical-pose-ui-76536fe/src",
+        "-DDOME_HAS_XR=1",
+        "-I/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-anatomical-pose-ui-76536fe/third_party/desktop",
+        "-I/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-anatomical-pose-ui-76536fe/build",
+        "-I/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-anatomical-pose-ui-76536fe/include",
+        "-I/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-anatomical-pose-ui-76536fe/third_party/openbrush",
+        "-I/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-anatomical-pose-ui-76536fe/third_party/nlohmann",
+        "-isystem",
+        "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/harfbuzz",
+        "-isystem",
+        "/usr/include/glib-2.0",
+        "-isystem",
+        "/usr/lib64/glib-2.0/include",
+        "-isystem",
+        "/usr/include/sysprof-6",
+        "-isystem",
+        "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/freetype2",
+        "-isystem",
+        "/usr/include/libpng16",
+        "-isystem",
+        "/usr/include/libxml2",
+        "-isystem",
+        "/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-release/include",
+        "-isystem",
+        "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/cairo",
+        "-isystem",
+        "/usr/include/pixman-1",
+        "-isystem",
+        "/usr/include/libmount",
+        "-isystem",
+        "/usr/include/blkid",
+        "-O3",
+        "-DNDEBUG",
+        "-std=gnu++20",
+        "-pthread",
+        "-DWITH_GZFILEOP",
+        "-o",
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-anatomical-pose-ui-76536fe/artifacts/ui/app.o",
+        "-c",
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-anatomical-pose-ui-76536fe/tests/native-rig-pose-ui.cpp"
+      ]
+    },
+    "link": [
+      "/usr/bin/c++",
+      "-O3",
+      "-DNDEBUG",
+      "-Wl,--dependency-file=CMakeFiles/dome-sculpt.dir/link.d",
+      "CMakeFiles/dome-sculpt.dir/src/native-display-runtime.cpp.o",
+      "CMakeFiles/dome-sculpt.dir/src/rig-fit-editor.cpp.o",
+      "CMakeFiles/dome-sculpt.dir/src/projection-editor.cpp.o",
+      "CMakeFiles/dome-sculpt.dir/src/spacenav-options.cpp.o",
+      "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-anatomical-pose-ui-76536fe/artifacts/ui/app.o",
+      "CMakeFiles/dome-sculpt.dir/src/polygon-editor.cpp.o",
+      "CMakeFiles/dome-sculpt.dir/src/import-editor.cpp.o",
+      "CMakeFiles/dome-sculpt.dir/src/procedural-editor.cpp.o",
+      "CMakeFiles/dome-sculpt.dir/src/resolution-editor.cpp.o",
+      "CMakeFiles/dome-sculpt.dir/src/sculpt-editor.cpp.o",
+      "CMakeFiles/dome-sculpt.dir/src/creator-editor.cpp.o",
+      "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-anatomical-pose-ui-76536fe/artifacts/ui/rig-editor.cpp.o",
+      "CMakeFiles/dome-sculpt.dir/src/shapekey-editor.cpp.o",
+      "CMakeFiles/dome-sculpt.dir/src/weight-editor.cpp.o",
+      "CMakeFiles/dome-sculpt.dir/src/skin-editor.cpp.o",
+      "CMakeFiles/dome-sculpt.dir/src/mesh-editor.cpp.o",
+      "CMakeFiles/dome-sculpt.dir/src/bake-editor.cpp.o",
+      "CMakeFiles/dome-sculpt.dir/src/object-editor.cpp.o",
+      "CMakeFiles/dome-sculpt.dir/src/paint-editor.cpp.o",
+      "CMakeFiles/dome-sculpt.dir/src/uv-editor.cpp.o",
+      "CMakeFiles/dome-sculpt.dir/src/ui-conventions.cpp.o",
+      "CMakeFiles/dome-sculpt.dir/src/session-appearance.cpp.o",
+      "CMakeFiles/dome-sculpt.dir/src/export-editor.cpp.o",
+      "CMakeFiles/dome-sculpt.dir/third_party/desktop/desktop-menu.cpp.o",
+      "CMakeFiles/dome-sculpt.dir/appmenu-protocol.c.o",
+      "-o",
+      "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-anatomical-pose-ui-76536fe/artifacts/ui/dome-sculpt-ui",
+      "-L/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-release/lib",
+      "-L/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib",
+      "-Wl,-rpath,/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-release/lib:/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib:",
+      "libdome-sculpt-spacenav.a",
+      "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-anatomical-pose-76536fe/artifacts/release/libdome-sculpt-core.a",
+      "libdome-sculpt-render.a",
+      "/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-release/lib/libfltk_images.so.1.4.5",
+      "/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-release/lib/libfltk_gl.so.1.4.5",
+      "/usr/lib64/libGLU.so",
+      "libdome-sculpt-xr.a",
+      "/usr/lib64/libjpeg.so",
+      "/usr/lib64/libpng.so",
+      "/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-release/lib/libfltk.so.1.4.5",
+      "-lcairo",
+      "-L/usr/lib64",
+      "-lX11",
+      "-lGLU",
+      "-lGL",
+      "/usr/lib64/libdl.a",
+      "/usr/lib64/libSM.so",
+      "/usr/lib64/libICE.so",
+      "/usr/lib64/libXext.so",
+      "/usr/lib64/libXinerama.so",
+      "/usr/lib64/libXfixes.so",
+      "/usr/lib64/libXcursor.so",
+      "/usr/lib64/libXrender.so",
+      "/usr/lib64/libXft.so",
+      "/usr/lib64/libwayland-egl.so",
+      "/usr/lib64/libwayland-cursor.so",
+      "/usr/lib64/libxkbcommon.so",
+      "/usr/lib64/libGLX.so",
+      "/usr/lib64/libOpenGL.so",
+      "/usr/lib64/libz.so",
+      "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libcairo.so",
+      "libdome-sculpt-render.a",
+      "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-anatomical-pose-76536fe/artifacts/release/libdome-sculpt-core.a",
+      "libdome-sculpt-affine.a",
+      "/usr/lib64/liblapacke.so",
+      "libdome-sculpt-polygon.a",
+      "libxatlas.a",
+      "libmikktspace.a",
+      "libmikktspace-robust.a",
+      "libufbx.a",
+      "/usr/lib64/libpng.so",
+      "/usr/lib64/libjpeg.so",
+      "/usr/lib64/libz.so",
+      "libdome-sculpt-emission-codec.a",
+      "/usr/lib64/libOpenEXR-3_2.so",
+      "/usr/lib64/libOpenEXRUtil-3_2.so",
+      "/usr/lib64/libOpenEXRCore-3_2.so",
+      "/usr/lib64/libIex-3_2.so",
+      "/usr/lib64/libIlmThread-3_2.so",
+      "/usr/lib64/libImath-3_1.so",
+      "/usr/lib64/libEGL.so",
+      "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libharfbuzz.so",
+      "/usr/lib64/libGL.so",
+      "/usr/lib64/libfontconfig.so",
+      "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libfreetype.so",
+      "/usr/lib64/libicui18n.so",
+      "/usr/lib64/libicuuc.so",
+      "/usr/lib64/libopenxr_loader.so",
+      "/usr/lib64/libgio-2.0.so",
+      "/usr/lib64/libgobject-2.0.so",
+      "/usr/lib64/libglib-2.0.so",
+      "/usr/lib64/libX11.so",
+      "/usr/lib64/libwayland-client.so",
+      "-lm",
+      "-lgcc_s_asneeded",
+      "-lgcc_s_asneeded"
+    ],
+    "inputs": {
+      "/usr/bin/c++": "579d25c2d1e45abeed0c63a517b5c52f6d09ea811a787bf7a7c677a7fd0726f6",
+      "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-anatomical-admission-c1e03e5/build/CMakeFiles/dome-sculpt.dir/src/native-display-runtime.cpp.o": "b98d342cc24ad8484f17da94f2aeaa8a7f05d7a8732702be5684d72dc5be702b",
+      "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-anatomical-admission-c1e03e5/build/CMakeFiles/dome-sculpt.dir/src/rig-fit-editor.cpp.o": "5bf5bd80135663d5e7f6755fdc9b95d3e440675841713a741da9fc5b299328ef",
+      "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-anatomical-admission-c1e03e5/build/CMakeFiles/dome-sculpt.dir/src/projection-editor.cpp.o": "449007f62f3a6f07518f7a8a2baa05fc0041d009c72b1c7afe5ff688f77ed203",
+      "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-anatomical-admission-c1e03e5/build/CMakeFiles/dome-sculpt.dir/src/spacenav-options.cpp.o": "0cf464a7d94f3729ad2c12fd927e63b7bd17dd152e035e9b25bc5c8c9f678c60",
+      "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-anatomical-pose-ui-76536fe/artifacts/ui/app.o": "170d9af775a00a9f2c32062b60df49fbe71dde7c701ba3d74137e3555ffcfb4c",
+      "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-anatomical-admission-c1e03e5/build/CMakeFiles/dome-sculpt.dir/src/polygon-editor.cpp.o": "7955be231b95d69b20a031f7198faa30487f7c3940e2f8bc162aa9ec19d34daa",
+      "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-anatomical-admission-c1e03e5/build/CMakeFiles/dome-sculpt.dir/src/import-editor.cpp.o": "afb0591adf749574e19afd36a950add57332261a7ce344d6923f159e0f8ee7b1",
+      "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-anatomical-admission-c1e03e5/build/CMakeFiles/dome-sculpt.dir/src/procedural-editor.cpp.o": "2e7307fa93f7a950dfec29c852489282bfb1fcd8e8d8200f46672811038d823c",
+      "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-anatomical-admission-c1e03e5/build/CMakeFiles/dome-sculpt.dir/src/resolution-editor.cpp.o": "7beb0bf6e2dd783f04f3501d0a9c8a81a652c720c0c128ae90190207b4d228c9",
+      "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-anatomical-admission-c1e03e5/build/CMakeFiles/dome-sculpt.dir/src/sculpt-editor.cpp.o": "0d5488e1ce2e955c2e1ab36d6dec78c7c8a2bc6dec459a61d5456f508c34785b",
+      "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-anatomical-admission-c1e03e5/build/CMakeFiles/dome-sculpt.dir/src/creator-editor.cpp.o": "d3e0ff5d5d1c7a66e78f5e0c9169b8369af23e497e5d2b5d7fcba3829182cf48",
+      "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-anatomical-pose-ui-76536fe/artifacts/ui/rig-editor.cpp.o": "f5641c732aced833920ac51319da6dcdd87a739eadad9e7cb5262e31250bec73",
+      "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-anatomical-admission-c1e03e5/build/CMakeFiles/dome-sculpt.dir/src/shapekey-editor.cpp.o": "6fa951aaa8f5a1ebe539392621db90e878cdddcc1b2a1237b93ab92859c1a7a3",
+      "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-anatomical-admission-c1e03e5/build/CMakeFiles/dome-sculpt.dir/src/weight-editor.cpp.o": "c9cb0d3b214c5a8fbf7e38f209479f035403e816a322f2d2e1f8ae3773107459",
+      "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-anatomical-admission-c1e03e5/build/CMakeFiles/dome-sculpt.dir/src/skin-editor.cpp.o": "cdaac1df37957425ad93a70f9dd71fbec4ca01692165c576c780ebb756f6fd6e",
+      "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-anatomical-admission-c1e03e5/build/CMakeFiles/dome-sculpt.dir/src/mesh-editor.cpp.o": "69055914f50edf5ea9598d4ed36f82d63c05ab3beaa04cbbf9895bd71e7db0be",
+      "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-anatomical-admission-c1e03e5/build/CMakeFiles/dome-sculpt.dir/src/bake-editor.cpp.o": "4ad6c2fd674e8ab7c090aa1477ae6429243a7ea82b5442d9193f014b295337b1",
+      "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-anatomical-admission-c1e03e5/build/CMakeFiles/dome-sculpt.dir/src/object-editor.cpp.o": "00c160293413698f5539ff55b95ede0a8f9ddf6ac07422ef4245bcae23c0d76f",
+      "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-anatomical-admission-c1e03e5/build/CMakeFiles/dome-sculpt.dir/src/paint-editor.cpp.o": "ca13903e38d9986315a1ddcad69bc759e2bc05b6955b5ebfb4e7ae60a52026d8",
+      "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-anatomical-admission-c1e03e5/build/CMakeFiles/dome-sculpt.dir/src/uv-editor.cpp.o": "ab663d1af69e687f965b1e01c6ad470eb95453732008da71dc2f689a5de2383a",
+      "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-anatomical-admission-c1e03e5/build/CMakeFiles/dome-sculpt.dir/src/ui-conventions.cpp.o": "25be2688fe3af820492d4fc36dd1ea272748363b9adbfa6fa5ae4bf82f8dd085",
+      "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-anatomical-admission-c1e03e5/build/CMakeFiles/dome-sculpt.dir/src/session-appearance.cpp.o": "5a99bc410430d83933a423cb02324caa5f4dbee5ece9f85ae6c5184cb4d7a390",
+      "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-anatomical-admission-c1e03e5/build/CMakeFiles/dome-sculpt.dir/src/export-editor.cpp.o": "0f8ee43c89e17d36f175b8bd6aa40e8e303d70f8ae2fbd3678addef1947ea450",
+      "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-anatomical-admission-c1e03e5/build/CMakeFiles/dome-sculpt.dir/third_party/desktop/desktop-menu.cpp.o": "61b076c0388205c073957b993491e8cdf5cbb2b0824ec0994f65aaa58a5e5c29",
+      "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-anatomical-admission-c1e03e5/build/CMakeFiles/dome-sculpt.dir/appmenu-protocol.c.o": "c2656ff292e85cc87cd8d6e6bb5fcc0373f3f3eb051098684a3a246f06173729",
+      "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-anatomical-pose-ui-76536fe/artifacts/ui/dome-sculpt-ui": "a56e5af58cfe687ef1200d2f1c8ad61ba65960fd6b06d7ce8776d574beca989f",
+      "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-anatomical-admission-c1e03e5/build/libdome-sculpt-spacenav.a": "e625dac5db0a85a26bcaca91b6d5385766bc283720c58d41846d0e1be0019adf",
+      "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-anatomical-pose-76536fe/artifacts/release/libdome-sculpt-core.a": "b03e994cb6423d7841e0e6c765c65958f6e05cbc2f80c32aaa2e9811831b24ef",
+      "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-anatomical-admission-c1e03e5/build/libdome-sculpt-render.a": "73e7e8429ab48f40aac97909dea3ab6b4b7d463a5eb33305accd6ae5e0169da2",
+      "/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-release/lib/libfltk_images.so.1.4.5": "8975bed2f2000fa1be94cba95b60c3e6fc5a296de7a85acd7cd598f50419298a",
+      "/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-release/lib/libfltk_gl.so.1.4.5": "9291feb964ab547ca6c26f23e47aa6f428450e5db2fead4df24000af555cf846",
+      "/usr/lib64/libGLU.so.1.3.1": "97e521f2ed137f15978a6122869933c1b507604ee1a5b8df3a1e1c47eaf091af",
+      "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-anatomical-admission-c1e03e5/build/libdome-sculpt-xr.a": "5653fdd715e6fd387e46bf5c3c981fdeab2dd8677af2a8e736196b68cebd453d",
+      "/usr/lib64/libjpeg.so.62.4.0": "beb79376b4544260da3c31603784c908b58bdb959cbe1d8c48075dfa7d5bc80c",
+      "/usr/lib64/libpng16.so.16.58.0": "65cb04d6c4ec5c031f2f43a58ec5adc4bc9652be5703bb9fa1178f84a2e40446",
+      "/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-release/lib/libfltk.so.1.4.5": "095b5435a80e3df959a5ac7559036785f9c39ac87c32ef3658b0fdad96c41066",
+      "/usr/lib64/libdl.a": "f0a17a43c74d2fe5474fa2fd29c8f14799e777d7d75a2cc4d11c20a6e7b161c5",
+      "/usr/lib64/libSM.so.6.0.1": "7308114c821f61001c16dba6655d5110bb40e17f7ce174ec0b8a4b89df3f2a2b",
+      "/usr/lib64/libICE.so.6.3.0": "b07cf955787c878295c219a80c8700d54bc4f0cf7de27046e6147339b5309b53",
+      "/usr/lib64/libXext.so.6.4.0": "09056dd620dc643dc1c2ed20041fa11de6a981dd0f618d6785124b4bdc607a1e",
+      "/usr/lib64/libXinerama.so.1.0.0": "c26b04205179ad676e6167d3a400096de6fbe7df37b9ac413c0c392219eadfba",
+      "/usr/lib64/libXfixes.so.3.1.0": "6160ee5edaa0aa4e96d263b16fcc41892567e82aca7e6d5bbb2a3d2e2bc4fa6f",
+      "/usr/lib64/libXcursor.so.1.0.2": "64b20bf5a9382108cdfd1be6cdc7f48b1847efec3687eafd87223e03d7e7e00c",
+      "/usr/lib64/libXrender.so.1.3.0": "4f7ea2102236e35b7844d83ba1bfc2ed6a74a62e6b51468e9801e3fa3b3ad31e",
+      "/usr/lib64/libXft.so.2.3.8": "acd4c412db6e9fe2bbfa79d0acdb4b7fed07363d96a85966503789f6fa2ab062",
+      "/usr/lib64/libwayland-egl.so.1.26.0": "aadf6a7ce686e3857353f6cc6e4deae84d7907f5afbce3f952593685b0a9196d",
+      "/usr/lib64/libwayland-cursor.so.0.26.0": "a54964427c68e87ce5efebca336fd6db7dcdff92c875861b1480096080214445",
+      "/usr/lib64/libxkbcommon.so.0.13.1": "4ca0a8544873c3b7feafe4b0086ddf74e389e3a739da1e3a940a2aa15a441819",
+      "/usr/lib64/libGLX.so.0.0.0": "e2b8a09e81b686d1184fd7d60e69673bc7bfc7a89ce0ff1ba843a2450542e01b",
+      "/usr/lib64/libOpenGL.so.0.0.0": "07a014ea0624d5d9711f941fb0401a203c2025b683d34897bd1b261a32a83d69",
+      "/usr/lib64/libz.so.1.3.1.zlib-ng": "cc2d0ee053bda906e3d9de9118fe7eb62d4c193ee1df3c323e60dae88e60780e",
+      "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libcairo.so.2.11804.4": "fe12b9ab782c68ba4d28fd8cd9c168cb808da20745a818fe101e1966fc67737c",
+      "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-anatomical-admission-c1e03e5/build/libdome-sculpt-affine.a": "444f8755d6328a34b0c268a94048a5fb428d9479c985f87858158ac399bc988a",
+      "/usr/lib64/liblapacke.so.3.12.0": "4e74d393b6f5f294cbd96b777da8be3ada9995b1da98aaa0c1eb5fea4b294c7c",
+      "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-anatomical-admission-c1e03e5/build/libdome-sculpt-polygon.a": "53a10aace78f0cee762d8e2477f1f1b59efbd1ed3cbf4ed4afba5dadde1609e3",
+      "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-anatomical-admission-c1e03e5/build/libxatlas.a": "fcf5473f3f7a63f069b172c936898fe8d0022250bc19702e2d4c6074ea93157a",
+      "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-anatomical-admission-c1e03e5/build/libmikktspace.a": "c10a5d0640dcac146597e14ecff8a3ba25fee124be0c367ac70f7c908a52b54c",
+      "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-anatomical-admission-c1e03e5/build/libmikktspace-robust.a": "4a44f6c792a92b16bfc096b0a1fd0b0bfd2c16d60c2f866de2a9de9d0a0ae7ed",
+      "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-anatomical-admission-c1e03e5/build/libufbx.a": "2a9f2e3ff69ed645c67fe10f751eed0e28dfb6015a7ef568d57dadad06ffd7ba",
+      "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-anatomical-admission-c1e03e5/build/libdome-sculpt-emission-codec.a": "6c9229f57fb69d7ac9657e14a5b8f086c65de182f5c8e4b9f1a5a3c78303a0dc",
+      "/usr/lib64/libOpenEXR-3_2.so.31.3.2.4": "efdbbe75b27b6a50e4a8e028e008fde32befa53280295e21ef6f036350225769",
+      "/usr/lib64/libOpenEXRUtil-3_2.so.31.3.2.4": "bafa0a2cb708d3ae952987c013d96e992badbb742e1a8e4fac6605c7eae5b5a0",
+      "/usr/lib64/libOpenEXRCore-3_2.so.31.3.2.4": "bc6775af6f33d58d41f20e714d80db4b0fd21209796a6694cb5249739a49a331",
+      "/usr/lib64/libIex-3_2.so.31.3.2.4": "da965da4711be1158555d457dc6ff17582ec88c1b86d98edc69f09cdcc4f6c7a",
+      "/usr/lib64/libIlmThread-3_2.so.31.3.2.4": "424321e69eb6257387820baa90e4fccb209c5dcb8c88589a8c5e1ccf4d4c23d6",
+      "/usr/lib64/libImath-3_1.so.29.11.0": "1e86ce61e14061369bd937b73d53abb69305dff34df4700f99a459f5c024ab45",
+      "/usr/lib64/libEGL.so.1.1.0": "76ffc090b8990696d028e7d1bc82606c564565fb05d2fa9e5f6122b61e9f1b60",
+      "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libharfbuzz.so.0.61410.0": "5248da4d5c68f252551e39a8c929ce120eec9ffa0120d4ac7be39615dbc8e33a",
+      "/usr/lib64/libGL.so.1.7.0": "cc4380adee239f7d4e0b5674ffde3d3add2e030778fb48db290bd96eafaf50e5",
+      "/usr/lib64/libfontconfig.so.1.16.0": "ab67796a1071ee7fe53d89d4ece93a3805134d9c21931687a4f05fa5132036fd",
+      "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libfreetype.so.6.20.6": "826c2bf3007f04253719b5492314fb0521e5f6c4a55b9d18e48995b7d1f95c97",
+      "/usr/lib64/libicui18n.so.77.1": "a7521c96c2517fa0c0eb40a1a93de584e9f2cb75a4515ccde17db9a6c76716b2",
+      "/usr/lib64/libicuuc.so.77.1": "e7253748d03b2eeef515e621e7e9dd9940a42b1130ec8b90e5c72fdc19f14ab5",
+      "/usr/lib64/libopenxr_loader.so.1.1.65": "c5c40e418e83253fcea872a71da5ff59fd84ad53a2b539072554e65f2a9c1b21",
+      "/usr/lib64/libgio-2.0.so.0.8800.4": "bca91d16d1ed9ee423d99284ab8bd749348fff7e75dda3bffe9b4f9f3e4907a0",
+      "/usr/lib64/libgobject-2.0.so.0.8800.4": "60a60bc3961c5cdfba3730f0976124eae34d9c3789b7fc91e8be1088f6e37c15",
+      "/usr/lib64/libglib-2.0.so.0.8800.4": "e9a6099dac743c8f910fb201da63f45ad6d7b4025110409474ec2661e57fa91e",
+      "/usr/lib64/libX11.so.6.4.0": "95b9ecfbde1b73c7f7380ae643e8ade9555234607a47d7e131ae6365a9899244",
+      "/usr/lib64/libwayland-client.so.0.26.0": "cb517c02f6e808257932a4b3f1a4bd1232ce415cdd8e41a854ff0f0e918b51c9"
+    },
+    "app_sha256": "a568634e4a98ee238675b394d590b62087b7b4181ec38961b0e0d7e919f8f3c9"
+  },
+  "frozen_final": {
+    "status": {
+      "normal-layout": {
+        "exit": 0,
+        "elapsed": 80.40434059401741
+      },
+      "compact-layout": {
+        "exit": 0,
+        "elapsed": 78.23221045499668
+      }
+    },
+    "inputs": 2437,
+    "drift": []
+  },
+  "before_sha256": "d1187a84a29e919f02a95d896a599ae927603cd1c191b0462049138001834609",
+  "after_sha256": "d1187a84a29e919f02a95d896a599ae927603cd1c191b0462049138001834609",
+  "gui": {
+    "normal-layout": {
+      "report": {
+        "checks": [
+          {
+            "passed": true,
+            "check": "Actual viewed FLTK app maps software Gallium and its GLX frontend"
+          },
+          {
+            "passed": true,
+            "check": "Actual universal menu enables Rig and shapekeys..."
+          },
+          {
+            "passed": true,
+            "check": "Measured help text and Joint control do not overlap"
+          },
+          {
+            "passed": true,
+            "check": "Actual native dropdown selects the authenticated Head index"
+          },
+          {
+            "passed": true,
+            "check": "Rotation input remains inside actual native scroll viewport"
+          },
+          {
+            "passed": true,
+            "check": "Actual universal menu enables Save"
+          },
+          {
+            "passed": true,
+            "check": "Native Save acknowledged with no worker error"
+          },
+          {
+            "passed": true,
+            "check": "Escape cancels staged linked pose without a Scene or Undo change"
+          },
+          {
+            "passed": true,
+            "check": "Actual universal menu enables Rig and shapekeys..."
+          },
+          {
+            "passed": true,
+            "check": "Measured help text and Joint control do not overlap"
+          },
+          {
+            "passed": true,
+            "check": "Actual native dropdown selects the authenticated Head index"
+          },
+          {
+            "passed": true,
+            "check": "Rotation input remains inside actual native scroll viewport"
+          },
+          {
+            "passed": true,
+            "check": "Actual universal menu enables Save"
+          },
+          {
+            "passed": true,
+            "check": "Native Save acknowledged with no worker error"
+          },
+          {
+            "passed": true,
+            "check": "Actual FLTK Apply plus ordered Save equals all19 independently scoped poses"
+          },
+          {
+            "passed": true,
+            "check": "All non-pose mesh paint source origin material and group values stay exact"
+          },
+          {
+            "passed": true,
+            "check": "Actual GUI changes all19 native parts across both sibling groups"
+          },
+          {
+            "passed": true,
+            "check": "Actual universal menu enables Undo"
+          },
+          {
+            "passed": true,
+            "check": "Actual universal menu enables Save"
+          },
+          {
+            "passed": true,
+            "check": "Native Save acknowledged with no worker error"
+          },
+          {
+            "passed": true,
+            "check": "Exactly one native Undo restores entire pre-pose Scene"
+          },
+          {
+            "passed": true,
+            "check": "Actual universal menu enables Redo"
+          },
+          {
+            "passed": true,
+            "check": "Actual universal menu enables Save"
+          },
+          {
+            "passed": true,
+            "check": "Native Save acknowledged with no worker error"
+          },
+          {
+            "passed": true,
+            "check": "Redo and saved restart restore all19 exact linked poses"
+          },
+          {
+            "passed": true,
+            "check": "Actual universal menu enables Rig and shapekeys..."
+          },
+          {
+            "passed": true,
+            "check": "Measured help text and Joint control do not overlap"
+          },
+          {
+            "passed": true,
+            "check": "Actual native dropdown selects the authenticated Head index"
+          },
+          {
+            "passed": true,
+            "check": "Rotation input remains inside actual native scroll viewport"
+          },
+          {
+            "passed": true,
+            "check": "Actual universal menu enables Save"
+          },
+          {
+            "passed": true,
+            "check": "Native Save acknowledged with no worker error"
+          },
+          {
+            "passed": true,
+            "check": "Universal CtrlW cancels the modal pose edit without changing the accepted Scene"
+          },
+          {
+            "passed": true,
+            "check": "Actual universal menu enables Close Window"
+          },
+          {
+            "passed": true,
+            "check": "Actual native app closes through its normal worker/GL/toolkit teardown"
+          }
+        ]
+      },
+      "elapsed": 79.73384104901925,
+      "file_sha256": "ceac4e058a7b4f349f101461efa3bec6aa18699a2e55b267bb3800fe86f9aebd",
+      "native_worker_output_exact": true,
+      "maps_sha256": "6b1f4f213073171dccc59015cabf1ec36f95a7ab4031e22815cc61ab79081e41",
+      "graphics_inputs": {
+        "/usr/lib64/libGLX_mesa.so.0.0.0": "f01b59507e860158e53226c0d5644406d2b14337ec4af7a6ee684dbaad50d105",
+        "/usr/lib64/libgallium-26.2.5.so": "033e3135e977d3e5fc6b63624573febe48b2e567c0e47da49d3125d9de8d1839"
+      },
+      "commands_sha256": "ed07ee20db6e3eb95d22166fa2e5fc6592daf48b0530196c8baf5ccffa3d061c",
+      "screenshot_sha256": {
+        "staged-12.png": "57e4e41b7b7ddc27fb5b4f4437b51ce9b6f64358bdf18b98c6b517cc932e897d",
+        "staged-29.png": "57e4e41b7b7ddc27fb5b4f4437b51ce9b6f64358bdf18b98c6b517cc932e897d",
+        "staged-5.png": "57e4e41b7b7ddc27fb5b4f4437b51ce9b6f64358bdf18b98c6b517cc932e897d"
+      }
+    },
+    "compact-layout": {
+      "report": {
+        "checks": [
+          {
+            "passed": true,
+            "check": "Actual viewed FLTK app maps software Gallium and its GLX frontend"
+          },
+          {
+            "passed": true,
+            "check": "Actual universal menu enables Rig and shapekeys..."
+          },
+          {
+            "passed": true,
+            "check": "Measured help text and Joint control do not overlap"
+          },
+          {
+            "passed": true,
+            "check": "Actual native dropdown selects the authenticated Head index"
+          },
+          {
+            "passed": true,
+            "check": "Rotation input remains inside actual native scroll viewport"
+          },
+          {
+            "passed": true,
+            "check": "Actual universal menu enables Save"
+          },
+          {
+            "passed": true,
+            "check": "Native Save acknowledged with no worker error"
+          },
+          {
+            "passed": true,
+            "check": "Escape cancels staged linked pose without a Scene or Undo change"
+          },
+          {
+            "passed": true,
+            "check": "Actual universal menu enables Rig and shapekeys..."
+          },
+          {
+            "passed": true,
+            "check": "Measured help text and Joint control do not overlap"
+          },
+          {
+            "passed": true,
+            "check": "Actual native dropdown selects the authenticated Head index"
+          },
+          {
+            "passed": true,
+            "check": "Rotation input remains inside actual native scroll viewport"
+          },
+          {
+            "passed": true,
+            "check": "Actual universal menu enables Save"
+          },
+          {
+            "passed": true,
+            "check": "Native Save acknowledged with no worker error"
+          },
+          {
+            "passed": true,
+            "check": "Actual FLTK Apply plus ordered Save equals all19 independently scoped poses"
+          },
+          {
+            "passed": true,
+            "check": "All non-pose mesh paint source origin material and group values stay exact"
+          },
+          {
+            "passed": true,
+            "check": "Actual GUI changes all19 native parts across both sibling groups"
+          },
+          {
+            "passed": true,
+            "check": "Actual universal menu enables Undo"
+          },
+          {
+            "passed": true,
+            "check": "Actual universal menu enables Save"
+          },
+          {
+            "passed": true,
+            "check": "Native Save acknowledged with no worker error"
+          },
+          {
+            "passed": true,
+            "check": "Exactly one native Undo restores entire pre-pose Scene"
+          },
+          {
+            "passed": true,
+            "check": "Actual universal menu enables Redo"
+          },
+          {
+            "passed": true,
+            "check": "Actual universal menu enables Save"
+          },
+          {
+            "passed": true,
+            "check": "Native Save acknowledged with no worker error"
+          },
+          {
+            "passed": true,
+            "check": "Redo and saved restart restore all19 exact linked poses"
+          },
+          {
+            "passed": true,
+            "check": "Actual universal menu enables Rig and shapekeys..."
+          },
+          {
+            "passed": true,
+            "check": "Measured help text and Joint control do not overlap"
+          },
+          {
+            "passed": true,
+            "check": "Actual native dropdown selects the authenticated Head index"
+          },
+          {
+            "passed": true,
+            "check": "Rotation input remains inside actual native scroll viewport"
+          },
+          {
+            "passed": true,
+            "check": "Actual universal menu enables Save"
+          },
+          {
+            "passed": true,
+            "check": "Native Save acknowledged with no worker error"
+          },
+          {
+            "passed": true,
+            "check": "Universal CtrlW cancels the modal pose edit without changing the accepted Scene"
+          },
+          {
+            "passed": true,
+            "check": "Actual universal menu enables Close Window"
+          },
+          {
+            "passed": true,
+            "check": "Actual native app closes through its normal worker/GL/toolkit teardown"
+          }
+        ]
+      },
+      "elapsed": 77.6893288519932,
+      "file_sha256": "ceac4e058a7b4f349f101461efa3bec6aa18699a2e55b267bb3800fe86f9aebd",
+      "native_worker_output_exact": true,
+      "maps_sha256": "4453cf98384682ad52be333d829bb9c846bca1feacf4e00dc6821239be225888",
+      "graphics_inputs": {
+        "/usr/lib64/libGLX_mesa.so.0.0.0": "f01b59507e860158e53226c0d5644406d2b14337ec4af7a6ee684dbaad50d105",
+        "/usr/lib64/libgallium-26.2.5.so": "033e3135e977d3e5fc6b63624573febe48b2e567c0e47da49d3125d9de8d1839"
+      },
+      "commands_sha256": "7f9d9b074a6b05529d66f724a398477902a802eb17a26d59896891ad2f214d18",
+      "screenshot_sha256": {
+        "staged-12.png": "e185038a342fa16b0aa7bd6b8fee003495633b0f642b75b9e47eadd2df9d9cfa",
+        "staged-29.png": "e185038a342fa16b0aa7bd6b8fee003495633b0f642b75b9e47eadd2df9d9cfa",
+        "staged-5.png": "e185038a342fa16b0aa7bd6b8fee003495633b0f642b75b9e47eadd2df9d9cfa"
+      }
+    }
+  },
+  "exports": {
+    "female-linked": {
+      "exit": 0,
+      "elapsed": 4.804152628988959,
+      "input_sha256": "ceac4e058a7b4f349f101461efa3bec6aa18699a2e55b267bb3800fe86f9aebd",
+      "quality": {
+        "bound_m": 3e-05,
+        "checks": 1034276,
+        "corners": 44412,
+        "max_error_m": 2.813223945639184e-07,
+        "parts": 19,
+        "primitives": 19,
+        "records": [
+          {
+            "max_error_m": 1.7047878886076928e-07,
+            "name": "Face.baked / 0",
+            "object": 2,
+            "pose": 0
+          },
+          {
+            "max_error_m": 1.652044530297451e-07,
+            "name": "Face.baked / 1",
+            "object": 3,
+            "pose": 0
+          },
+          {
+            "max_error_m": 1.6715242433405692e-07,
+            "name": "Face.baked / 2",
+            "object": 4,
+            "pose": 0
+          },
+          {
+            "max_error_m": 1.5894574977824978e-07,
+            "name": "Face.baked / 3",
+            "object": 5,
+            "pose": 0
+          },
+          {
+            "max_error_m": 1.7851725251579213e-07,
+            "name": "Face.baked / 4",
+            "object": 6,
+            "pose": 0
+          },
+          {
+            "max_error_m": 1.786534399710788e-07,
+            "name": "Face.baked / 5",
+            "object": 7,
+            "pose": 0
+          },
+          {
+            "max_error_m": 2.0064557125667212e-07,
+            "name": "Face.baked / 6",
+            "object": 8,
+            "pose": 0
+          },
+          {
+            "max_error_m": 1.763808574078755e-07,
+            "name": "Face.baked / 7",
+            "object": 9,
+            "pose": 0
+          },
+          {
+            "max_error_m": 1.6428320830047978e-07,
+            "name": "Face.baked / 8",
+            "object": 10,
+            "pose": 0
+          },
+          {
+            "max_error_m": 1.5789178847620144e-07,
+            "name": "Face.baked / 9",
+            "object": 11,
+            "pose": 0
+          },
+          {
+            "max_error_m": 2.725111103441923e-07,
+            "name": "Body.baked / 0",
+            "object": 12,
+            "pose": 0
+          },
+          {
+            "max_error_m": 6.47104825940704e-08,
+            "name": "Body.baked / 1",
+            "object": 13,
+            "pose": 0
+          },
+          {
+            "max_error_m": 2.813223945639184e-07,
+            "name": "Body.baked / 2",
+            "object": 14,
+            "pose": 0
+          },
+          {
+            "max_error_m": 1.6228701310639655e-07,
+            "name": "Body.baked / 3",
+            "object": 15,
+            "pose": 0
+          },
+          {
+            "max_error_m": 2.213984086032977e-07,
+            "name": "Body.baked / 4",
+            "object": 16,
+            "pose": 0
+          },
+          {
+            "max_error_m": 1.7849155265834177e-07,
+            "name": "Body.baked / 5",
+            "object": 17,
+            "pose": 0
+          },
+          {
+            "max_error_m": 1.3091549872547346e-07,
+            "name": "Body.baked / 6",
+            "object": 18,
+            "pose": 0
+          },
+          {
+            "max_error_m": 6.488750218709281e-08,
+            "name": "Body.baked / 7",
+            "object": 19,
+            "pose": 0
+          },
+          {
+            "max_error_m": 1.8024608113034377e-07,
+            "name": "Body.baked / 8",
+            "object": 20,
+            "pose": 0
+          }
+        ]
+      },
+      "glb_sha256": "92bbe58096dc40f1b80731a2815cfce7dc8069e6fe8a24919b689bd6ea0aee9c"
+    },
+    "female-controller": {
+      "exit": 0,
+      "elapsed": 4.717255670984741,
+      "input_sha256": "4488e1f194cc848322a804bb73f52a421536b47892b84d5cd6f6f38c15fec51c",
+      "quality": {
+        "bound_m": 3e-05,
+        "checks": 1034276,
+        "corners": 44412,
+        "max_error_m": 2.813223945639184e-07,
+        "parts": 19,
+        "primitives": 19,
+        "records": [
+          {
+            "max_error_m": 1.1222702653788972e-07,
+            "name": "Face.baked / 0",
+            "object": 2,
+            "pose": 0
+          },
+          {
+            "max_error_m": 1.03354782498609e-07,
+            "name": "Face.baked / 1",
+            "object": 3,
+            "pose": 0
+          },
+          {
+            "max_error_m": 1.1875374049890942e-07,
+            "name": "Face.baked / 2",
+            "object": 4,
+            "pose": 0
+          },
+          {
+            "max_error_m": 1.0826211195542073e-07,
+            "name": "Face.baked / 3",
+            "object": 5,
+            "pose": 0
+          },
+          {
+            "max_error_m": 1.1008656912310308e-07,
+            "name": "Face.baked / 4",
+            "object": 6,
+            "pose": 0
+          },
+          {
+            "max_error_m": 1.0902898747855034e-07,
+            "name": "Face.baked / 5",
+            "object": 7,
+            "pose": 0
+          },
+          {
+            "max_error_m": 1.1597611040075471e-07,
+            "name": "Face.baked / 6",
+            "object": 8,
+            "pose": 0
+          },
+          {
+            "max_error_m": 1.22786772682377e-07,
+            "name": "Face.baked / 7",
+            "object": 9,
+            "pose": 0
+          },
+          {
+            "max_error_m": 1.1157754677817048e-07,
+            "name": "Face.baked / 8",
+            "object": 10,
+            "pose": 0
+          },
+          {
+            "max_error_m": 7.524488457696058e-08,
+            "name": "Face.baked / 9",
+            "object": 11,
+            "pose": 0
+          },
+          {
+            "max_error_m": 2.725111103441923e-07,
+            "name": "Body.baked / 0",
+            "object": 12,
+            "pose": 0
+          },
+          {
+            "max_error_m": 6.47104825940704e-08,
+            "name": "Body.baked / 1",
+            "object": 13,
+            "pose": 0
+          },
+          {
+            "max_error_m": 2.813223945639184e-07,
+            "name": "Body.baked / 2",
+            "object": 14,
+            "pose": 0
+          },
+          {
+            "max_error_m": 1.2472348973223335e-07,
+            "name": "Body.baked / 3",
+            "object": 15,
+            "pose": 0
+          },
+          {
+            "max_error_m": 2.213984086032977e-07,
+            "name": "Body.baked / 4",
+            "object": 16,
+            "pose": 0
+          },
+          {
+            "max_error_m": 1.7849155265834177e-07,
+            "name": "Body.baked / 5",
+            "object": 17,
+            "pose": 0
+          },
+          {
+            "max_error_m": 1.3091549872547346e-07,
+            "name": "Body.baked / 6",
+            "object": 18,
+            "pose": 0
+          },
+          {
+            "max_error_m": 6.488750218709281e-08,
+            "name": "Body.baked / 7",
+            "object": 19,
+            "pose": 0
+          },
+          {
+            "max_error_m": 1.3318923857580144e-07,
+            "name": "Body.baked / 8",
+            "object": 20,
+            "pose": 0
+          }
+        ]
+      },
+      "glb_sha256": "161a232fbac293160bf417604fb476cb4a47129d2ab69fa19a50ac58d60c105c"
+    },
+    "male-linked": {
+      "exit": 0,
+      "elapsed": 5.176173078012653,
+      "input_sha256": "6608bd2e3fdae47b01017bc5ed261863d099720f6c45cdbb298f26934cba7c6a",
+      "quality": {
+        "bound_m": 3e-05,
+        "checks": 1030838,
+        "corners": 45528,
+        "max_error_m": 3.7529149830367296e-07,
+        "parts": 19,
+        "primitives": 19,
+        "records": [
+          {
+            "max_error_m": 2.322157403108653e-07,
+            "name": "Face.baked / 0",
+            "object": 2,
+            "pose": 0
+          },
+          {
+            "max_error_m": 2.3747282973017688e-07,
+            "name": "Face.baked / 1",
+            "object": 3,
+            "pose": 0
+          },
+          {
+            "max_error_m": 3.200667433693424e-07,
+            "name": "Face.baked / 2",
+            "object": 4,
+            "pose": 0
+          },
+          {
+            "max_error_m": 3.276869501843719e-07,
+            "name": "Face.baked / 3",
+            "object": 5,
+            "pose": 0
+          },
+          {
+            "max_error_m": 2.258129427774906e-07,
+            "name": "Face.baked / 4",
+            "object": 6,
+            "pose": 0
+          },
+          {
+            "max_error_m": 2.451411673265785e-07,
+            "name": "Face.baked / 5",
+            "object": 7,
+            "pose": 0
+          },
+          {
+            "max_error_m": 2.365497322214265e-07,
+            "name": "Face.baked / 6",
+            "object": 8,
+            "pose": 0
+          },
+          {
+            "max_error_m": 2.4139090249750227e-07,
+            "name": "Face.baked / 7",
+            "object": 9,
+            "pose": 0
+          },
+          {
+            "max_error_m": 2.451411673265785e-07,
+            "name": "Face.baked / 8",
+            "object": 10,
+            "pose": 0
+          },
+          {
+            "max_error_m": 2.3642851904008979e-07,
+            "name": "Face.baked / 9",
+            "object": 11,
+            "pose": 0
+          },
+          {
+            "max_error_m": 2.979661602394197e-07,
+            "name": "Body.baked / 0",
+            "object": 12,
+            "pose": 0
+          },
+          {
+            "max_error_m": 2.582715952940287e-07,
+            "name": "Body.baked / 1",
+            "object": 13,
+            "pose": 0
+          },
+          {
+            "max_error_m": 3.7529149830367296e-07,
+            "name": "Body.baked / 2",
+            "object": 14,
+            "pose": 0
+          },
+          {
+            "max_error_m": 2.465899869003718e-07,
+            "name": "Body.baked / 3",
+            "object": 15,
+            "pose": 0
+          },
+          {
+            "max_error_m": 2.412226556376457e-07,
+            "name": "Body.baked / 4",
+            "object": 16,
+            "pose": 0
+          },
+          {
+            "max_error_m": 1.4848068441484477e-07,
+            "name": "Body.baked / 5",
+            "object": 17,
+            "pose": 0
+          },
+          {
+            "max_error_m": 2.036848780011469e-07,
+            "name": "Body.baked / 6",
+            "object": 18,
+            "pose": 0
+          },
+          {
+            "max_error_m": 2.6573722518067233e-07,
+            "name": "Body.baked / 7",
+            "object": 19,
+            "pose": 0
+          },
+          {
+            "max_error_m": 2.433694733906184e-07,
+            "name": "Body.baked / 8",
+            "object": 20,
+            "pose": 0
+          }
+        ]
+      },
+      "glb_sha256": "10402405ad418a564c96ee65292c74ded1df6d67f82a5500665f9bb27926fa15"
+    },
+    "male-controller": {
+      "exit": 0,
+      "elapsed": 5.660256947041489,
+      "input_sha256": "7fd29455c8518d02f5cb08716c68d7eba7434c7f415e34f9d8b7d6f5484b2c9c",
+      "quality": {
+        "bound_m": 3e-05,
+        "checks": 1030838,
+        "corners": 45528,
+        "max_error_m": 3.7529149830367296e-07,
+        "parts": 19,
+        "primitives": 19,
+        "records": [
+          {
+            "max_error_m": 2.1763370000749081e-07,
+            "name": "Face.baked / 0",
+            "object": 2,
+            "pose": 0
+          },
+          {
+            "max_error_m": 2.404595289815806e-07,
+            "name": "Face.baked / 1",
+            "object": 3,
+            "pose": 0
+          },
+          {
+            "max_error_m": 2.029644975313793e-07,
+            "name": "Face.baked / 2",
+            "object": 4,
+            "pose": 0
+          },
+          {
+            "max_error_m": 1.8695823146313e-07,
+            "name": "Face.baked / 3",
+            "object": 5,
+            "pose": 0
+          },
+          {
+            "max_error_m": 2.241861962172686e-07,
+            "name": "Face.baked / 4",
+            "object": 6,
+            "pose": 0
+          },
+          {
+            "max_error_m": 2.3017979318439995e-07,
+            "name": "Face.baked / 5",
+            "object": 7,
+            "pose": 0
+          },
+          {
+            "max_error_m": 2.337637725016156e-07,
+            "name": "Face.baked / 6",
+            "object": 8,
+            "pose": 0
+          },
+          {
+            "max_error_m": 2.3884691353525375e-07,
+            "name": "Face.baked / 7",
+            "object": 9,
+            "pose": 0
+          },
+          {
+            "max_error_m": 2.3823964335363533e-07,
+            "name": "Face.baked / 8",
+            "object": 10,
+            "pose": 0
+          },
+          {
+            "max_error_m": 2.305916780200307e-07,
+            "name": "Face.baked / 9",
+            "object": 11,
+            "pose": 0
+          },
+          {
+            "max_error_m": 2.979661602394197e-07,
+            "name": "Body.baked / 0",
+            "object": 12,
+            "pose": 0
+          },
+          {
+            "max_error_m": 2.582715952940287e-07,
+            "name": "Body.baked / 1",
+            "object": 13,
+            "pose": 0
+          },
+          {
+            "max_error_m": 3.7529149830367296e-07,
+            "name": "Body.baked / 2",
+            "object": 14,
+            "pose": 0
+          },
+          {
+            "max_error_m": 2.3437685084692095e-07,
+            "name": "Body.baked / 3",
+            "object": 15,
+            "pose": 0
+          },
+          {
+            "max_error_m": 2.412226556376457e-07,
+            "name": "Body.baked / 4",
+            "object": 16,
+            "pose": 0
+          },
+          {
+            "max_error_m": 1.4848068441484477e-07,
+            "name": "Body.baked / 5",
+            "object": 17,
+            "pose": 0
+          },
+          {
+            "max_error_m": 2.036848780011469e-07,
+            "name": "Body.baked / 6",
+            "object": 18,
+            "pose": 0
+          },
+          {
+            "max_error_m": 2.6573722518067233e-07,
+            "name": "Body.baked / 7",
+            "object": 19,
+            "pose": 0
+          },
+          {
+            "max_error_m": 2.2112371507627173e-07,
+            "name": "Body.baked / 8",
+            "object": 20,
+            "pose": 0
+          }
+        ]
+      },
+      "glb_sha256": "903192c2fdb7233da9d94ea2b396b2e69ee1f7d431a5face77180ae00e9c4f4d"
+    }
+  },
+  "preserved_negatives": [
+    "Initial XR/EGL-only driver closure on FLTK GLX gives InsufficientGLsupport before pixels/actions",
+    "Compact initial single menu-layout query raced asynchronous menu publication; bounded actual-enabled polling fixes fixture without bypassing readiness",
+    "Prior compact two-row hint overlaps Joint in screenshot; measured text height plus concise labels repair the frontend"
+  ],
+  "khronos": {
+    "files": 4,
+    "totals": {
+      "numErrors": 0,
+      "numWarnings": 76,
+      "numInfos": 8,
+      "numHints": 0
+    },
+    "full_results_sha256": "3e5972422c203a88bf3255116cd4d2cbf1f036caea641d5f2822c353a7221056",
+    "all_messages_retained": true
+  },
+  "remaining": [
+    "Actual typed public lock and caller/publication allocation coverage for new anatomical method",
+    "Dedicated page32 and complete actual-loader anatomical workflow",
+    "General unskinned/edited/prepared/original-skinned/relative-affine and broader automatic weight admission",
+    "Future coherent main/public-layout integration; these matched module proofs do not admit new layouts to main"
+  ]
+}

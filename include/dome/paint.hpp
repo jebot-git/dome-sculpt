@@ -6,7 +6,7 @@
 #include <map>
 #include <memory>
 namespace dome {
-namespace detail {class PaintOverlayPacket;struct PaintOverlayFactory;struct EmissionExportAccess;class BakedNormalField;}
+namespace detail {class PaintOverlayPacket;struct PaintOverlayFactory;struct EmissionExportAccess;class BakedNormalField;struct NativeWeightPaintAccess;}
 struct Material;
 class PaintProjection;
 class PaintSamplingDomain;
@@ -243,6 +243,7 @@ private:
   friend struct SourceColorPreparationAccess;
   friend struct detail::PaintOverlayFactory;
   friend struct detail::EmissionExportAccess;
+  friend struct detail::NativeWeightPaintAccess;
   friend struct PolygonPaintAccess;
   friend struct SourceNormalPreparationAccess;
   friend struct SourcePaintSamplingAccess;

@@ -23,7 +23,7 @@ void Document::queue_scene_operation(std::string label, SceneOperation operation
 }
 void Document::queue_scene_operation_locked(std::string label, SceneOperation operation,
                                       AssetSource expected, std::shared_ptr<std::string> report, std::shared_ptr<AssetWork> work, std::shared_ptr<bool> changed,
-                                      std::shared_ptr<const MeshSnapshot> rollback_preview, uint64_t retopo_session, uint64_t cut_session, std::shared_ptr<CutHandoff> cut_handoff, std::optional<BakeAdmission> bake_admission, uint64_t uv_restore_session) {
+                                      std::shared_ptr<const MeshSnapshot> rollback_preview, uint64_t retopo_session, uint64_t cut_session, std::shared_ptr<CutHandoff> cut_handoff, std::optional<BakeAdmission> bake_admission, uint64_t uv_restore_session, std::optional<SkinAdmission> skin_admission) {
   require_authority_locked(expected);
   if(state_.expressions)throw std::logic_error("Apply or cancel expression preview before starting authoring work");
   if(state_.object_grabbing && !(work&&work->held_weight))throw std::logic_error("Release object motion before starting asset work");
@@ -75,6 +75,12 @@ void Document::queue_scene_operation_locked(std::string label, SceneOperation op
     static_assert(std::is_nothrow_copy_assignable_v<ObjectBakeSettings>);
     state_.bake_source=bake_admission->source;
     state_.bake_settings=bake_admission->settings;
+  }
+  if(skin_admission){
+    static_assert(std::is_nothrow_move_assignable_v<SkinAuthoringOptions>);
+    state_.skin_options=std::move(skin_admission->options);
+    state_.skin_use_locks=skin_admission->use_locks;
+    if(skin_admission->use_locks)state_.weights.locks.swap(skin_admission->locks);
   }
   if(files_.back().cut_handoff){
     state_.cut=files_.back().cut_handoff->accepting;

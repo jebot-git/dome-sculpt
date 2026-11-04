@@ -376,6 +376,8 @@ public:
   void paint_settings(PaintSettings);
   void weight_settings(WeightToolSettings, std::optional<uint32_t> joint = {}, AssetSource expected = {});
   void bind_skin(SkinAuthoringOptions, AssetSource expected = {});
+  void bind_skin_selected(SkinAuthoringOptions,AssetSource expected={},
+                          std::vector<uint64_t> expected_selection={});
   void fit_humanoid_rig(HumanLandmarks, RigFitOptions = {}, AssetSource expected = {});
   void begin_rig_fit();
   void configure_rig_fit(RigFitView);
@@ -856,11 +858,16 @@ private:
   // Configuration belongs to the same accepted publication as its Bake job.
   // POD metadata only; no callback or permission to alter arbitrary scene data.
   struct BakeAdmission { uint64_t source=0; ObjectBakeSettings settings; };
+  struct SkinAdmission {
+    SkinAuthoringOptions options;
+    std::vector<uint8_t> locks;
+    bool use_locks=false;
+  };
   void queue_scene_operation_locked(std::string, SceneOperation, AssetSource,
                                     std::shared_ptr<std::string>, std::shared_ptr<AssetWork> = {}, std::shared_ptr<bool> = {},
                                     std::shared_ptr<const MeshSnapshot> = {}, uint64_t retopo_session = 0,
                                     uint64_t cut_session = 0, std::shared_ptr<CutHandoff> = {},
-                                    std::optional<BakeAdmission> = {}, uint64_t uv_restore_session = 0);
+                                    std::optional<BakeAdmission> = {}, uint64_t uv_restore_session = 0, std::optional<SkinAdmission> = {});
   std::vector<uint64_t> bake_sources_locked() const;
   bool bake_source_eligible_locked(uint64_t) const;
   std::vector<uint64_t> bake_cages_locked() const;
@@ -887,7 +894,9 @@ private:
   bool process_rig_fit_spatial_locked(const SpatialFrame &);
   bool skin_target_ready_locked() const;
   std::vector<uint64_t> skin_sources_locked(SkinAuthoringMode) const;
-  void queue_bind_skin_locked(SkinAuthoringOptions, AssetSource = {});
+  bool selected_skin_ready_locked(SkinAuthoringMode) const;
+  void queue_bind_skin_locked(SkinAuthoringOptions, AssetSource = {},
+                              bool selected=false,std::vector<uint64_t> expected_selection={});
   void queue_voxel_sculpt_locked(float, AssetSource);
 };
 } // namespace dome
