@@ -1,5 +1,19 @@
 # Full objective and completion evidence
 
+## Repaired mixed workflows and new coherent build — 2026-11-04
+
+Private44b actual mixed scene/export/recovery/history passes152 each R/S/Arc;
+48KHR files0errors,33R/S exact pairs,17native/container device triples,PNGmax1.
+Original270-task owning builds0 but27each23/27; preserved follow-up30each28/30
+has two corrected fixture setups (actual mesh owner and camera-framed palette83).
+New1d573f2 includes VRM5310 and bounded rig319/current44; actual freshRALL1397
+and owningSAN276 are running,689registered/32selected, not passed. HDR66e remains
+separate on genuine OpenEXR constructor OOM leaks; proper owning codec work is
+active. Original f2 full630 actually ended143 after131Pass; exact-source132..630
+continuation is separate and live. See PRIVATE-AUTHORING-PROGRESS.md for honest
+scopes. No new main runtime, full-production completion, install or HMD claim;
+all unfinished requirements and deferred drawers remain.
+
 ## Combined authoring draft and qualified portable controls — 2026-11-04
 
 Private e1ed525 portable-normal controls pass actual native normal/compact12+12,
