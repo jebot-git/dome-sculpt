@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/document.hpp"
 #include "dome/scene-file.hpp"
+#include <nlohmann/json.hpp>
 #include <cstring>
 #include <iostream>
 using namespace dome;
