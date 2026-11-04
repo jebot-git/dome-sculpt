@@ -1,0 +1,5 @@
+# Private owning finite-line solver sanitizer gate
+
+Both genuine unskinned full19-part fields were rebuilt and run using asserted O1 ASan/UBSan with leak detection. Female18.7407s and male19.3658s complete with zero sanitizer diagnostics. The complete saved outputs are byte-for-byte identical to the independently measured O3 fields. All original500M/256MiB limits and fixed four-influence/1e-5 storage policy remain.
+
+Both private-header implementation readers and the actual owning-field test were rebuilt; the exact matching421 core and C/C++ support archives were already wholly owned/instrumented. Link extraction proves old native/source reader members were unused. This is an owning solver gate, not a freshly rebuilt application/frontend, whole-toolkit proof, exhaustive allocation sweep, native policy workflow, or admission. The independent source/field/output/flags/archive maps are preserved. Further native opt-in work opens a public options layout and therefore requires a genuinely fresh coherent app/core/support/render/UI/XR build. General coplanar and interior-only support remain required.
