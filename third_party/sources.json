@@ -184,7 +184,7 @@
       "native/toolkit-hooks/fltk-1.4.5-x11-clipboard-ownership.patch": "db6ca24a101c50c4c106a15fc8129a55ca73713a100c15e572b1dda98c248a57"
     },
     "combined_patch_sha256": "34091d15335d695f3bb328f3ccdcb4f68110f47a75271c563ba909c3682815b2",
-    "used": "Canonical optimized FLTK1.4.5 with all27 patches: compact bitmap picker, actual Enter callback authority, exact X11 clipboard reply/ownership cleanup and official poll backend. Installed runtime profile binds actual generated config, builder, patch chain and library digests. All165 public include files and existing exported symbols retained. Current Sculpt SDK-only runtime delta qualifies actual native menus; core/app code is unchanged. No system installation or physical-session change.",
+    "used": "Canonical optimized FLTK1.4.5 with all27 patches, compact bitmap picker, real Enter callback reason, exact X11 clipboard ownership/reply cleanup and official poll backend. Runtime profile binds generated config, builder, patch chain and actual library digests. All165 public include files and previous exported symbols retained. Public-main save/SDK adoption qualification is recorded in ATOMIC-SAVE-SDK-INTEGRATION.md; no system installation or physical-session change.",
     "verified_at_commit": "6fa2624f89ddb105e482326995daec0bdbfd6643",
     "builder_sha256_at_verified_commit": "85cc04718523dbebfe0ac6c4384fa341641dabdb5022fff98998e18d2e783011"
   },
@@ -523,7 +523,7 @@
         "libpangocairo-1.0.so.0": "482b621e56d8290f0392b1098b87de0aa3fc68ea5250b83b418c4bd85e1de485"
       }
     },
-    "used": "Canonical optimized private FreeType/HarfBuzz/Cairo/Pango native BDF+PCF stack with Cairo Xlib source-cache and deferred-SHM record cleanup. All153 public headers match preceding SDK byte-for-byte. Actual current runtime/build/GUI scopes are in NATIVE-PACKAGE-SDK.md; old SDK and original leak negatives remain preserved. No Pango frontend, outlines, suppression or system installation. Reverified byte-identical at the recorded canonical FLTK source revision; bitmap source pin remains53b0fca.",
+    "used": "Canonical optimized native BDF/PCF FreeType/HarfBuzz/Cairo/Pango stack with Xlib source-cache and deferred-SHM record cleanup. All153 public headers match the preceding SDK. Exact16-library manifest remains pinned to53b0fca and is reverified unchanged at the canonical poll-enabled FLTK source revision. Public-main scope is recorded in ATOMIC-SAVE-SDK-INTEGRATION.md. No Pango frontend, outlines, suppression or system installation.",
     "verified_at_commit": "6fa2624f89ddb105e482326995daec0bdbfd6643"
   },
   "nlohmann_json": {
