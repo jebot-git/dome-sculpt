@@ -95,12 +95,21 @@ async def main():
     if item['y']>=2 and item['y']+item['h']<=viewport-2:return item
     tap(dialog,5,viewport/2,5 if item['y']+item['h']>viewport else 4);await asyncio.sleep(.1)
    raise TimeoutError('Native scroll never exposed '+label)
+  async def select_cage(dialog,index):
+   item=await visible(dialog,'Cage mesh');current=item['choice']
+   tap(dialog,item['x']+item['w']/2,item['y']+item['h']/2);await asyncio.sleep(.15)
+   # Canonical FLTK menus handle arrows, not Home/End. Start from the
+   # observed current item so a reopened custom-cage recipe is exercised too.
+   for _ in range(abs(index-current)):
+    key('Down' if index>current else 'Up');await asyncio.sleep(.08)
+   key('Return')
+   return await wait(lambda:find('Cage mesh') if find('Cage mesh') and find('Cage mesh').get('choice')==index else None)
   async def choose_cage(dialog):
-   item=await visible(dialog,'Cage mesh');tap(dialog,item['x']+item['w']/2,item['y']+item['h']/2);await asyncio.sleep(.15);key('Home');key('Down');await asyncio.sleep(.08);key('Down');await asyncio.sleep(.08);key('Return');selected=await wait(lambda:find('Cage mesh') if find('Cage mesh') and find('Cage mesh').get('choice')==2 else None)
+   selected=await select_cage(dialog,2)
    check('envelope' in selected.get('selected',''),'Actual native FLTK choice selects the hidden Unicode cage mesh')
   dialog=await open_options();g=dialog.get_geometry();check(g.width<=600 if compact else g.width<1280,'Cage options fit the native work area');check(find('Cage mesh')['choice']==2,'Native project reopening restores its saved custom cage instead of automatic projection')
   saved_front=find('Front (mm)')['value']
-  item=await visible(dialog,'Cage mesh');tap(dialog,item['x']+item['w']/2,item['y']+item['h']/2);await asyncio.sleep(.1);key('Home');key('Return');await wait(lambda:find('Cage mesh')['choice']==0)
+  await select_cage(dialog,0);check(True,'Actual arrow-key popup selection changes the saved custom cage to automatic in the local draft')
   item=await visible(dialog,'Front (mm)');tap(dialog,item['x']+item['w']/2,item['y']+item['h']/2,4);await wait(lambda:find('Front (mm)')['value']!=saved_front)
   item=await visible(dialog,'Use last bake');tap(dialog,item['x']+item['w']/2,item['y']+item['h']/2)
   await wait(lambda:find('Cage mesh')['choice']==2 and abs(find('Front (mm)')['value']-saved_front)<1e-7)
