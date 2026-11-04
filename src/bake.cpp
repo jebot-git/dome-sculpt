@@ -174,9 +174,9 @@ void validate(const Mesh &low,const BakeSource &source,const BakeOptions &o) {
         throw std::invalid_argument("Bake overlay differs from its immutable source coordinate owner");
       if(m.maps->source_maps)m.maps->source_maps->validate_surface(source.mesh);
       if(m.maps->source_only){
-        // An authenticated Source4 packet can represent an untextured source.
-        // Its explicit empty role bundle still owns independent paint planes.
-        if(!m.maps->source_maps||(m.maps->source_maps->empty()&&!m.maps->overlay))throw std::invalid_argument("Raw bake source needs original texture bindings or its authenticated source paint packet");
+        // Explicit empty role bundles are valid untextured source captures.
+        // The source-owned paint packet, when present, is independent of images.
+        if(!m.maps->source_maps)throw std::invalid_argument("Raw bake source needs its explicit original texture role bundle");
         if(m.maps->overlay)for(const auto &layer:m.maps->overlay->layers())
           for(const auto &tile:layer.emission_tiles)if(tile)for(const auto &pixel:tile->pixels)
             if(pixel.coverage>0&&std::any_of(pixel.physical.begin(),pixel.physical.end(),[](float v){return v!=0;}))
