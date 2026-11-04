@@ -1,5 +1,9 @@
 # Dome Sculpt production handoff
 
+## Native source pose basis and conversion contract — 2026-11-04
+
+New authentic source-pose producer matches original native geometry/N/Mikk exactly across18 UV/skin/morph states,108corners eachR/S;44checks,161C++ allocation prefixes and16Cancel pass,2,157inputs exact. Read CANONICAL-NATIVE-POSE.md and receipt. Predating conversion contract explicitly authors a new portable target model, so prior9>4 different-model audit is not a within-model regression gate; measurements remain preserved. Actual same-model bound4 stays unchanged. Make authoring/model/rest-quality controls explicit next; no renderer/schema/main admission or whole RGB repair claim. Full630 f2 remains frozen; full goal and later drawers remain incomplete.
+
 ## Private original-source deformation audit — 2026-11-04
 
 Actual raw legacy canonical versus converted native shading fails4/9 curved skin/morph states eachR/S, maximum9>unchanged4;9repeated unskinned rest controls remain0. Eight failed PNG pairs are R/S bit-exact,2,152 inputs each unchanged. Read CANONICAL-DEFORMED-SOURCE-AUDIT.md and receipt. This is separate from passed UV34 comparisons against pre-UV converted shading; root cause/native morph normals/pose-frame transport remains open. Keep main admission withheld and preserve frozen f2 fresh ALL/full630. Full goal and later drawers remain incomplete.
