@@ -1,0 +1,91 @@
+{
+  "base": "02dc791a65fd9e10ff661622fddd595a720cbc5b",
+  "scope": "test-only collector and private template TU against frozen ec8 core/support archives; no public layout, native/UI or SAN admission",
+  "results": {
+    "female": {
+      "solve": {
+        "changed": 1,
+        "context": [
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20
+        ],
+        "failed_control": "leftEye",
+        "field_equal_full_baseline": true,
+        "field_rows": 7797,
+        "prior_error": "Unused native source lacks whole-facet dominance bone=6",
+        "protected_context_exact": true,
+        "save_restore_exact": true,
+        "scope": "explicit test-only related context, not automatic context discovery or public/default admission",
+        "seconds": 0.902701113,
+        "target": 12,
+        "work": 227544374,
+        "workspace": 99886301
+      },
+      "quality": {
+        "poses": 5,
+        "cohorts": 5,
+        "failures": 0,
+        "height_m": 1.5978172643808648,
+        "production_pose_transport_max_m": 3.611474473962405e-07
+      },
+      "maximum_fraction": 0.015201921134817028,
+      "mean_fraction": 0.0017052352842579978
+    },
+    "male": {
+      "solve": {
+        "changed": 1,
+        "context": [
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20
+        ],
+        "failed_control": "leftEye",
+        "field_equal_full_baseline": true,
+        "field_rows": 7822,
+        "prior_error": "Unused native source lacks whole-facet dominance bone=6",
+        "protected_context_exact": true,
+        "save_restore_exact": true,
+        "scope": "explicit test-only related context, not automatic context discovery or public/default admission",
+        "seconds": 0.988356824,
+        "target": 12,
+        "work": 251236826,
+        "workspace": 108833938
+      },
+      "quality": {
+        "poses": 5,
+        "cohorts": 5,
+        "failures": 0,
+        "height_m": 1.756653060670942,
+        "production_pose_transport_max_m": 3.4369249672968117e-07
+      },
+      "maximum_fraction": 0.023264679863320946,
+      "mean_fraction": 0.0013209187980168608
+    }
+  },
+  "inputs": "artifacts/sealed-inputs.json",
+  "inputs_count": 545,
+  "original_setup_negative": {
+    "code": 1,
+    "seconds": 1.3978537569928449,
+    "mismatches": []
+  },
+  "runtime_changes": false,
+  "limitations": [
+    "complete unique original-node group only",
+    "test collector allocation metadata not production budgeted",
+    "production admission/read-only leases/cancel/UI remain required"
+  ]
+}
