@@ -720,7 +720,10 @@ if(BUILD_TESTING)
   target_link_libraries(dome-sculpt-gltf-test PRIVATE dome-sculpt-core PNG::PNG)
   add_test(NAME gltf-interoperability COMMAND dome-sculpt-gltf-test)
 endif()
-if(DOME_BUILD_UI OR DOME_BUILD_XR)
+# Image/palette regression tests use the windowless renderer even when neither
+# frontend is requested. Keep their real rendering/font dependencies available;
+# UI/XR executables and FLTK discovery remain controlled by their own options.
+if(DOME_BUILD_UI OR DOME_BUILD_XR OR BUILD_TESTING)
   find_package(PkgConfig REQUIRED)
   # FindPkgConfig searches accumulated -L directories in order. Resolve the
   # selected bitmap runtime before GL's system directory, which can contain
