@@ -15,6 +15,7 @@ struct DeclaredWeightPart {
 enum class DeclaredSupportPolicy { AllDeformControls, NearestSourceUnion };
 struct DeclaredWeightSupport {
   DeclaredSupportPolicy policy = DeclaredSupportPolicy::AllDeformControls;
+  bool world_metric = false;
   std::vector<DeclaredWeightPart> parts;
   const DeclaredWeightPart *find(uint64_t id) const {
     auto at = std::find_if(parts.begin(), parts.end(),
@@ -53,10 +54,12 @@ declared_weight_profile(const Skeleton &rig, weight_surface::Budget &work) {
     throw std::invalid_argument("Declared weight rig has no deform source");
   return profile;
 }
-inline HeatComponentIntent declared_weight_intent(
-    const SculptObject &o, const DeclaredWeightPart &input,
-    const ImportedHeatProfile &profile, const HeatBindingOptions &options,
-    weight_surface::Budget &work, DeclaredSupportPolicy policy) {
+inline HeatComponentIntent
+declared_weight_intent(const SculptObject &o, const DeclaredWeightPart &input,
+                       const ImportedHeatProfile &profile,
+                       const HeatBindingOptions &options,
+                       weight_surface::Budget &work,
+                       DeclaredSupportPolicy policy, const Mesh &metric_mesh) {
   if (input.object != o.id || !o.painted || !o.deformation ||
       !o.deformation->skeleton)
     throw std::invalid_argument("Declared weight source lease is incomplete");
@@ -64,7 +67,7 @@ inline HeatComponentIntent declared_weight_intent(
   auto declarations =
       std::span<const HeatComponentDeclaration>(input.declarations);
   if (declarations.empty()) {
-    const auto &m = o.painted->mesh();
+    const auto &m = metric_mesh;
     if (m.positions.size() > 2'000'000 || m.indices.size() > 6'000'000 ||
         m.positions.size() > options.maximum_bytes / 32)
       throw std::length_error(

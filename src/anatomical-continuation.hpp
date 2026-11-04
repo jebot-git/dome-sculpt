@@ -5,6 +5,7 @@
 #include "material-visibility-seams.hpp"
 #include "screened-continuation-solve.hpp"
 #include "screened-sparse-ldl.hpp"
+#include "skin-affine.hpp"
 #include "weight-declared-support.hpp"
 #include "weight-surface-system.hpp"
 #include <map>
@@ -130,7 +131,8 @@ anatomical_continuation(const Scene &scene, uint64_t group,
                 first->deformation->humanoid->encode())) ||
           o.deformation->skeleton->encode() !=
               first->deformation->skeleton->encode() ||
-          scene.has_affine_placement(o.id) ||
+          (!(declared && declared->world_metric) &&
+           scene.has_affine_placement(o.id)) ||
           scene.world_matrix(o.id).matrix() !=
               scene.world_matrix(first->id).matrix())
         throw std::invalid_argument(
@@ -139,7 +141,8 @@ anatomical_continuation(const Scene &scene, uint64_t group,
       // similarity leaves angles, the mass/(distance^2+mass) kernel and
       // normalized output invariant. Pose/morph are retained display state,
       // never substituted for REST geometry. Relative/affine placements refuse.
-      if (!(scene.world_transform(o.id).scale > 0))
+      if (!(declared && declared->world_metric) &&
+          !(scene.world_transform(o.id).scale > 0))
         throw std::invalid_argument(
             "Continuation requires positive similarity placement");
       validate_rest_deformation(*o.deformation, o.painted->mesh(), budget);
@@ -152,6 +155,26 @@ anatomical_continuation(const Scene &scene, uint64_t group,
     if (!first || raw_count > 2'000'000 || corners > 12'000'000)
       throw std::length_error("Continuation source bounds");
     const size_t bones = first->deformation->skeleton->bones.size();
+    const bool world_metric = declared && declared->world_metric;
+    AffineTransform metric;
+    size_t metric_bytes = 0;
+    if (world_metric) {
+      const auto world = scene.world_matrix(first->id);
+      AffineInteractionFrame checked(world);
+      (void)checked;
+      auto origin = AffineTransform{}.matrix();
+      for (size_t k = 0; k < 3; ++k)
+        origin[12 + k] = -world.matrix()[12 + k];
+      metric = AffineTransform(origin) * world;
+      for (const auto *o : objects) {
+        const auto &m = o->painted->mesh();
+        metric_bytes += sizeof(Mesh) +
+                        (m.positions.size() + m.normals.size()) * sizeof(Vec3) +
+                        m.uv.size() * sizeof(std::array<float, 2>) +
+                        m.indices.size() * sizeof(uint32_t) + m.uv_pins.size() +
+                        m.uv_seams.size();
+      }
+    }
     // Simultaneous systems, maps, graph/BVH, dense RHS/fields and solve
     // scratch.
     size_t capture_bytes = 0;
@@ -162,8 +185,8 @@ anatomical_continuation(const Scene &scene, uint64_t group,
         throw std::length_error("Continuation snapshot bytes");
       capture_bytes += add;
     }
-    const size_t bytes =
-        capture_bytes + raw_count * (768 + 16 * bones) + corners * 320 + 65536;
+    const size_t bytes = capture_bytes + raw_count * (768 + 16 * bones) +
+                         corners * 320 + 65536 + metric_bytes;
     if (bytes > options.maximum_bytes)
       throw std::length_error("Continuation memory bound before construction");
     out.report.bytes = bytes;
@@ -198,6 +221,18 @@ anatomical_continuation(const Scene &scene, uint64_t group,
                                     *first->appearance, options, cancelled,
                                     &*first->deformation->humanoid);
     budget.step(profile.work);
+    if (world_metric) {
+      budget.step_items(profile.segments.size(), 128);
+      for (auto &source : profile.segments) {
+        auto transform = [&](std::array<double, 3> p) {
+          const auto q = skin_affine_point(
+              metric, {float(p[0]), float(p[1]), float(p[2])});
+          return std::array<double, 3>{q.x, q.y, q.z};
+        };
+        source.head = transform(source.head);
+        source.tail = transform(source.tail);
+      }
+    }
     for (uint32_t j = 0; j < bones; ++j)
       if (profile.eligible[j])
         out.joints.push_back(j);
@@ -227,12 +262,26 @@ anatomical_continuation(const Scene &scene, uint64_t group,
           std::min(size_t(500'000'000), budget.maximum - budget.used);
       if (!options.maximum_work)
         throw std::length_error("Source-visible work exhausted before capture");
+      std::optional<Mesh> staged_metric;
+      if (world_metric) {
+        const auto &m = o.painted->mesh();
+        budget.step_items(m.positions.size() + m.indices.size() + m.uv.size() +
+                              m.uv_pins.size() + m.uv_seams.size() + 1,
+                          64);
+        SkinGeometryWork geometry(budget.maximum - budget.used, cancelled);
+        const auto remaining = geometry.remaining();
+        staged_metric = skin_world_mesh(m, metric, geometry);
+        budget.step(remaining - geometry.remaining());
+      }
+      const auto &solve_mesh =
+          staged_metric ? *staged_metric : o.painted->mesh();
       std::optional<HeatSeamGraph> seams;
       std::optional<HeatComponentIntent> intent;
       std::span<const uint32_t> row_groups;
       if (declared) {
-        intent = declared_weight_intent(o, *declared->find(o.id), profile,
-                                        options, budget, declared->policy);
+        intent =
+            declared_weight_intent(o, *declared->find(o.id), profile, options,
+                                   budget, declared->policy, solve_mesh);
       } else {
         seams = capture_heat_seams(o, options, cancelled);
         budget.step(seams->work());
@@ -247,8 +296,8 @@ anatomical_continuation(const Scene &scene, uint64_t group,
         row_groups = seams->groups(o);
       }
       auto part =
-          assemble(o.painted->mesh(), budget, HeatOperator::PositiveGraph,
-                   row_groups, HeatNormals::UnitFaces, HeatMass::MixedVoronoi);
+          assemble(solve_mesh, budget, HeatOperator::PositiveGraph, row_groups,
+                   HeatNormals::UnitFaces, HeatMass::MixedVoronoi);
       const uint32_t offset = s.positions.size();
       ContinuationPart p;
       p.object = captured[owner];
@@ -281,12 +330,11 @@ anatomical_continuation(const Scene &scene, uint64_t group,
             edges[{offset + i, offset + part.columns[at]}] = -part.values[at];
         }
       }
-      for (auto index : o.painted->mesh().indices) {
+      for (auto index : solve_mesh.indices) {
         budget.step();
         mesh.indices.push_back(out.parts.back().raw_to_row[index]);
       }
-      face_owner.insert(face_owner.end(), o.painted->mesh().indices.size() / 3,
-                        owner);
+      face_owner.insert(face_owner.end(), solve_mesh.indices.size() / 3, owner);
     }
     const size_t n = s.positions.size();
     out.report.rows = n;
