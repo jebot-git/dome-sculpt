@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
+#include "import-contract-inspection.hpp"
 #include "dome/document.hpp"
 #include "dome/import-authoring.hpp"
 #include "dome/material-bindings.hpp"
@@ -16,6 +17,7 @@ import_fixture::Fixture source(bool flat=false){auto f=import_fixture::Fixture{}
 }
 int main(int argc,char **argv)try{
  if(argc==3&&std::string_view(argv[1])=="--empty-project"){Scene{}.save(argv[2]);return 0;}
+ if(argc==3&&std::string_view(argv[1])=="--inspect-import-contract"){std::cout<<import_contract::inspect(Scene::load(argv[2])).dump()<<'\n';return 0;}
  if(argc==3&&std::string_view(argv[1])=="--inspect"){std::cout<<Scene::load(argv[2]).encode().dump()<<'\n';return 0;}
  if(argc==3&&std::string_view(argv[1])=="--ui-fixture"){source().save(argv[2]);return 0;}
  if(argc!=2)return 2;auto directory=std::filesystem::path(argv[1]);std::filesystem::create_directories(directory);

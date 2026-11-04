@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
+#include "import-contract-inspection.hpp"
 #include "dome/document.hpp"
 #include "dome/humanoid-creator.hpp"
 #include "dome/import-authoring.hpp"
@@ -67,6 +68,10 @@ int main(int argc, char **argv) try {
     const std::string_view mode = argv[1];
     if (mode == "--empty-project") {
       Scene{}.save(argv[2]);
+      return 0;
+    }
+    if (mode == "--inspect-import-contract") {
+      std::cout << import_contract::inspect(Scene::load(argv[2])).dump() << '\n';
       return 0;
     }
     if (mode == "--inspect") {

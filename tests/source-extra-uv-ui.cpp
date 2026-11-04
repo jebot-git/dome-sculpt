@@ -1,10 +1,12 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
+#include "import-contract-inspection.hpp"
 #include "import-authoring-fixtures.hpp"
 #include <iostream>
 using namespace dome;
 int main(int argc,char **argv)try {
  if(argc!=3)return 2;const std::string_view mode=argv[1];
  if(mode=="--empty-project"){Scene{}.save(argv[2]);return 0;}
+ if(mode=="--inspect-import-contract"){std::cout<<import_contract::inspect(Scene::load(argv[2])).dump()<<'\n';return 0;}
  if(mode=="--inspect"){std::cout<<Scene::load(argv[2]).encode().dump()<<'\n';return 0;}
  if(mode!="--ui-fixture")return 2;
  import_fixture::Fixture source;while(source.bin.size()%4)source.bin.push_back(0);const int uv=source.values({0,0,0,1,1,1,1,0},2,"VEC2");source.j["meshes"][0]["primitives"][0]["attributes"]["TEXCOORD_2"]=uv;
