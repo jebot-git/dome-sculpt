@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #pragma once
 #include <limits>
+#include "paint-overlay-packet.hpp"
 // Independent finite-field oracle: declared nearest source sampler, public
 // sparse paint values, composition before bilinear filtering, and PNG bytes.
 // It deliberately does not call either production sampling implementation.

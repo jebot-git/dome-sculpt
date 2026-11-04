@@ -520,6 +520,12 @@ detail::SourcePaintPhysicalResult detail::bake_source_paint_physical(
  material.validate();
  if(options.cancelled&&options.cancelled())throw std::runtime_error("Physical source material cancelled");
  if((options.resolution&&(options.resolution<64||options.resolution>4096))||options.padding>64||
+    !options.max_vertices||options.max_vertices>2'000'000||
+    !options.max_triangles||options.max_triangles>2'000'000||
+    !options.max_layer_bytes||options.max_layer_bytes>128*1024*1024||
+    size_t(options.normal_sampling)>1||size_t(options.animation)>1||
+    !std::isfinite(options.freeze_seconds)||options.freeze_seconds<0||options.freeze_seconds>1e9||
+    !std::isfinite(options.max_normal_sample_error)||options.max_normal_sample_error<0||options.max_normal_sample_error>.25||
     !options.max_image_pixels||options.max_image_pixels>16*1024*1024||
     !options.max_output_bytes||options.max_output_bytes>1024ull*1024*1024||
     !options.max_working_bytes||options.max_working_bytes>512*1024*1024||
@@ -532,6 +538,9 @@ detail::SourcePaintPhysicalResult detail::bake_source_paint_physical(
  if(!(input.paint->has_physical_emission()||detail::hdr_emission(material.emissive)||
       (input.current_material&&detail::physical_emission(*input.current_material))))
   throw std::invalid_argument("Physical portable material has no actual float authority");
+ if(input.target.positions.size()>options.max_vertices||input.paint->mesh().positions.size()>options.max_vertices||
+    input.target.indices.size()/3>options.max_triangles||input.paint->mesh().indices.size()/3>options.max_triangles)
+  throw std::length_error("Physical source geometry exceeds budget before staging");
  uint32_t r=options.resolution?options.resolution:input.paint->resolution();
  if(!options.resolution)if(const auto &source=input.paint->source_maps())
   for(const auto *role:{&source->color,&source->metal_rough,&source->emission,&source->normal,&source->occlusion})
@@ -542,6 +551,9 @@ detail::SourcePaintPhysicalResult detail::bake_source_paint_physical(
  if(pixels>options.max_image_pixels||pixels>options.max_output_bytes/4||
     pixels>options.max_working_bytes/(sizeof(std::array<float,3>)+4))
   throw std::length_error("Physical source field exceeds image/working budget");
+ const uint64_t physical_work=pixels*(32+4*input.paint->layers().size());
+ if(physical_work>=options.max_sample_operations)
+  throw std::length_error("Physical source field exceeds sampling budget before compilation");
  size_t scratch=size_t(pixels)*(sizeof(std::array<float,3>)+4)+sizeof(PaintedMesh);
  auto charge=[&](size_t n,size_t unit){
   if(scratch>options.max_working_bytes||n>(options.max_working_bytes-scratch)/unit)
@@ -573,9 +585,6 @@ detail::SourcePaintPhysicalResult detail::bake_source_paint_physical(
  auto packet=detail::PaintOverlayFactory::capture(*input.paint,options.cancelled);
  charge(packet->storage_bytes(),1);
  SourceUvBakeOptions bounded=options;
- const uint64_t physical_work=pixels*(32+4*input.paint->layers().size());
- if(physical_work>=options.max_sample_operations)
-  throw std::length_error("Physical source field exceeds sampling budget before compilation");
  bounded.max_sample_operations-=size_t(physical_work);
  if(scratch>=bounded.max_working_bytes||pixels*4>=bounded.max_output_bytes)
   throw std::length_error("Physical source compiler lacks remaining material budget");
