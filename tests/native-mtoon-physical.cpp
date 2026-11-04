@@ -103,6 +103,7 @@ void __wrap_glShaderSource(GLuint shader,GLsizei count,const GLchar *const*strin
 void __real_glGetTexImage(GLenum,GLint,GLenum,GLenum,void*);
 void __wrap_glGetTexImage(GLenum target,GLint level,GLenum format,GLenum type,void *offset) {GLint bound=0;glGetIntegerv(GL_PIXEL_PACK_BUFFER_BINDING,&bound);gpu_only&=bound!=0;++gpu_copies;__real_glGetTexImage(target,level,format,type,offset);}
 }
+#ifndef DOME_NATIVE_MTOON_PHYSICAL_NO_MAIN
 int main(int argc,char **argv)try {
   if(argc<2||argc>3||(argc==3&&std::string_view(argv[2])!="--hardware"))return 2;const std::filesystem::path out=argv[1];std::filesystem::create_directories(out);shader_directory=out/"shaders";std::filesystem::create_directories(shader_directory);
   NativeGraphics graphics;const std::string vendor=reinterpret_cast<const char*>(glGetString(GL_VENDOR)),device=reinterpret_cast<const char*>(glGetString(GL_RENDERER));std::cout<<"GPU "<<vendor<<" / "<<device<<std::endl;check(argc<3||(vendor.find("Intel")!=std::string::npos&&device.find("Arc")!=std::string::npos&&device.find("A770")!=std::string::npos&&device.find("llvmpipe")==std::string::npos&&device.find("UHD")==std::string::npos),"Native typed hardware mode requires actual Intel Arc A770");Fbo fbo;fbo.bind();SurfaceRenderer renderer;renderer.set_frame_time(0);
@@ -136,3 +137,5 @@ int main(int argc,char **argv)try {
   check(gpu_copies>0&&gpu_only,"Every production native typed field/source copy stays in GPU buffers");
   std::cout<<"PASS "<<checks<<" native typed physical controls\n";return 0;
 }catch(const std::exception &e){std::cerr<<"FAIL "<<e.what()<<std::endl;return 1;}
+
+#endif
