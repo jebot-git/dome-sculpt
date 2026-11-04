@@ -78,12 +78,14 @@ int main(int argc,char **argv)try{
    check(doc.undo(),"Actual UV edit has one global Undo");uv_settle(doc);check(doc.copy_scene().encode()==wire,"UV Undo restores exact whole original scene");check(doc.redo(),"Actual UV edit has one global Redo");uv_settle(doc);check(doc.copy_scene().encode()==changed,"UV Redo restores exact correspondence and field");
    Document baseline;baseline.replace(initial);baseline.shading(false);uv_settle(baseline);doc.clear_bake();baseline.clear_bake();uv_settle(doc);uv_settle(baseline);
    auto cleared=doc.copy_scene();check(!cleared.active().painted->baked()&&cleared.active().material_bindings->canonical_uv&&Scene::decode(cleared.encode()).encode()==cleared.encode(),"Clear drops active detail while retained UV correspondence survives native restart");
+   doc.save(out/("cleared-"+std::to_string(variant)+"-"+std::to_string(split)+".dsculpt"));
    fbo.bind();auto clear_original=draw(renderer,baseline.frame().surface);fbo.bind();check(delta(clear_original,draw(renderer,doc.frame().surface))<=4,"Clear restores original artist shading after repeated UV editing");
    ObjectBakeSettings settings;settings.ao_samples=0;settings.padding=0;settings.allow_partial=true;settings.front_mm=settings.back_mm=1000;
    doc.bake_from_object(2,settings);baseline.bake_from_object(2,settings);uv_settle(doc);uv_settle(baseline);
    const auto baked=doc.copy_scene(),base=baseline.copy_scene();check(baked.active().painted->baked()->normal_field->pbr()->rgba==base.active().painted->baked()->normal_field->pbr()->rgba,
      "Actual post-Clear rebake projects independent normal writes into original root UV rather than current material atlas");
    check(Scene::decode(baked.encode()).encode()==baked.encode(),"Rebaked normal history and retained UV remain exact through owning codec");
+   doc.save(out/("rebaked-"+std::to_string(variant)+"-"+std::to_string(split)+".dsculpt"));
   }
  }
  std::cout<<"PASS "<<checks<<" native retained normal UV checks\n";return 0;
