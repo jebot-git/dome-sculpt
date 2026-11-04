@@ -1,9 +1,10 @@
-# Native paint-sampling context (unqualified)
+# Native paint-sampling context (private qualification)
 
 This isolated context merges root `aa9906f` and the qualified private native
-MToon component `e52f5be`. It has not been compiled or admitted. Both parents,
-the old native counterfactuals, and the source-frozen component proofs remain
-unchanged. The first connected Scene32 owner/codec/native-worker draft is now implemented, but has not yet been built or qualified.
+MToon component `e52f5be`. Its native32 foundation is sealed at `622739b`; the
+scoped Restore and responsive UV controls now pass the qualification below.
+Neither component is admitted to main. Both parents, original negatives, and
+immutable component proofs remain preserved.
 
 The merge keeps root native append/cage/recipe/Mirror behavior, Bake distance
 zero/logarithmic mapping, HDR radiance mapping and page30, historical parameter
@@ -109,3 +110,51 @@ Detailed commands, immutable source/artifact digests, profile-native comparisons
 and all old failures are in validation/NATIVE-PAINT-SAMPLING32.json. The separate
 historical full-export denial sweep87154 remains live and unmodified; the new
 native32 denial tests do not replace its coverage or declare it complete.
+
+
+## Native Restore and responsive controls
+
+Runtime `d48ce90`, with frozen test source `b3e96b1`, passes13/13 selected
+Release and wholly owned O1 ASan/UBSan/leak commands in42.26/159.87 seconds.
+The fresh sanitizer application/core/render/support/XR/inspector and affected
+consumer build finished0 in752.50 seconds. All1863 tracked inputs stayed exact
+through the cohort; all26 captured sanitizer binaries stayed exact through its
+runtime. Four native project pairs (first, repeated, restored and ordered)
+are byte-identical between profiles. Per profile the new tests cover74
+functional/controller/codec/history controls,1793 failure/quota/cancellation
+controls and13 unsupported transitions.
+
+Restore returns the actual immutable first native Paint and Material, preserving
+placement and the rest of the Scene. Unsupported later authoring stays refused
+rather than being dropped. Its queue admission authenticates the exact ready
+UV session and stages workspace removal in the shared queue transaction.
+All73 measured persistent admission-allocation prefixes preserve the exact open
+UV draft, Scene and global history, with no queued work; all17 detached Restore
+prefixes and18 actual callback cancellation polls also preserve exact input.
+A real computed Restore followed by queued Save and Cancel retains the previous
+Scene/file/history and shares the exact cancellation diagnostic; retry works.
+The new source Restore is one ordinary Undo/Redo step after actual restart.
+Real joystick navigation proves Restore, held-trigger consumption and rearm.
+
+Actual private native GUI runs pass18 checks each: normal Release,640x360 with
+bitmap32 Release, and matched wholly owned sanitizer compact. Both normal and
+compact controls are visually checked. The compact layout uses a native Tools
+popup with independent readable toggles/status and available UV canvas. The
+original compact overlap screenshot remains preserved. The tracked popup
+observer followup `74fb42f` uses canonical FLTK Backspace/Tab navigation; the
+original unsupported-End timeout is retained as an observer negative, without
+changing the product or deadlines. The initial nested-transaction product
+failure and both controller-fixture construction failures are also retained.
+
+These GUI results do not assert independent native32 pixel equivalence,
+hardware, Wayland, every toolbar operation or completed export support.
+The actual editable-GLB baseline-authority refusal remains a genuine required
+compiler adapter. Native-only source/normal/Bake/cut/rig/key/typed/polygon
+composition is still limited to the stated supported slice. Root's historical
+canonical31 representation has real Clear/rebake fidelity failures; Scene33
+layered repair is separate and must be intentionally composed with fresh
+matching layouts after it qualifies. Scene numbers alone grant no capability.
+
+Full scoped commands and evidence hashes are in
+`validation/NATIVE-PAINT32-RESTORE.json`. The old full-export sweep87154 is
+unchanged and remains separate live evidence, not a completed or replaced scope.
