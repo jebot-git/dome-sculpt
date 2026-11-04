@@ -27,6 +27,42 @@ All original/additional unfinished requirements and deferred drawers remain.
 The import fault sweeps explicitly deny C++operator new. They do not establish
 cgltf malloc/custom-allocator-null partial-parse cleanup; that separate genuine
 robustness audit remains required. Ordinary V1 cgltf validation is not that proof.
+## Private XR Mirror hardware follow-up — 2026-11-04
+
+Exact private Mirror runtime now passes40 actual-loader1024px stereo workflow
+checks on explicit Intel Arc A770; forced software correctly refuses the
+hardware gate. CPU compute is unchanged. The unchanged sanitizer Mirror app
+also passes all five cases40checks with the staged optional Mesa patch8878;
+stock-stack112B remains recorded. No HMD/system installation/main admission
+is implied. Read XR-MIRROR-CONTROLS.md and validation/XR-MIRROR-HARDWARE.json.
+
+
+## Private XR shapekey Mirror controls — 2026-11-04
+
+XR Mirror now exposes method, local-X plane and tolerance through the shared
+joystick/ray panel, with explicit Apply and exact Cancel/focus/source leases.
+Private native Release/SAN59+48 persistent-fault checks each, six legacy commands
+each and actual loader/software stereo40 checks at320px and1024px pass. The
+standalone SAN XR Mesa112-byte report remains unresolved; these checks do not
+qualify a physical headset, complete suite or main admission. Read
+[XR-MIRROR-CONTROLS.md](XR-MIRROR-CONTROLS.md) and its receipt for exact component
+scope and preserved failures. Every unfinished original/additional requirement,
+including controller drawers after basic targets, remains required.
+
+
+## Complete originally unskinned source Restore — 2026-11-04
+
+The public9987 continuation now restores the complete genuine first source when
+its original mesh had no skeleton, preserving paint/material/shapes/masks and
+original rig absence. No public layout/schema/private-authoring runtime is added.
+Ten affected native commands pass each Release/SAN, including37 complete native/
+controller checks and134 persistent fault prefixes each; actual normal/compact
+FLTK62 and nativeWayland18 assertions pass on current27/POLL SDK. These are
+scoped matching-component/application gates, not a fresh whole build/full suite
+or physical-headset qualification. Read PUBLIC-UNSKINNED-RESTORE.md and its receipt.
+All unfinished full-goal requirements and post-basic controller drawers remain
+active; no installation/session action occurred.
+
 
 ## Private native vertex-position Mirror milestone — 2026-11-04
 
@@ -243,20 +279,6 @@ A real original-to-atlas MASK/morph render error exceeds the fixed mean bound
 at512 and1024; broader atlas fidelity is unqualified and this branch is not
 admitted to main. Untextured capture, inactive grid memory and all unfinished
 original/additional requirements remain active. No system/session changed.
-
-## Complete originally unskinned source Restore — 2026-11-04
-
-The public9987 continuation now restores the complete genuine first source when
-its original mesh had no skeleton, preserving paint/material/shapes/masks and
-original rig absence. No public layout/schema/private-authoring runtime is added.
-Ten affected native commands pass each Release/SAN, including37 complete native/
-controller checks and134 persistent fault prefixes each; actual normal/compact
-FLTK62 and nativeWayland18 assertions pass on current27/POLL SDK. These are
-scoped matching-component/application gates, not a fresh whole build/full suite
-or physical-headset qualification. Read PUBLIC-UNSKINNED-RESTORE.md and its receipt.
-All unfinished full-goal requirements and post-basic controller drawers remain
-active; no installation/session action occurred.
-
 
 ## Portable atomic save and final canonical picker SDK — 2026-11-04
 

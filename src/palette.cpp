@@ -3,6 +3,7 @@
 // (Apache-2.0).
 
 #include "sculpt-ui-values.hpp"
+#include "shapekey-mirror-controls.hpp"
 #include "dome/palette.hpp"
 #include <cstdio>
 #include <bit>
@@ -304,6 +305,10 @@ void SpatialPalette::raster(const EditorState &s) {
       else if(c.parameter==VrParameter::ProceduralSeed)label="Seed "+std::to_string(int(std::lround(value)));
       else if(c.parameter==VrParameter::ProceduralDepth){char text[64];snprintf(text,sizeof(text),"Depth %.4g world mm",double(value));label=text;}
       else if(c.parameter==VrParameter::SculptMaskMode) label=value<.5f?"Add protection":value<1.5f?"Remove protection":"Smooth protection";
+      else if(c.parameter==VrParameter::ShapeMirror){
+        if(row==0){const char *methods[]={"Vertex positions","Exact authored reflection","Relative artist-frame conversion"};label=methods[std::clamp(int(std::lround(value*2)),0,2)];}
+        else {char shown[96];snprintf(shown,sizeof(shown),row==1?"Plane X: %.7g local m":"Match tolerance: %.5g local m",row==1?detail::mirror_plane_metres(value):double(detail::mirror_tolerance_metres(value)));label=shown;}
+      }
       else if(c.parameter==VrParameter::ShapeRestore)label=value>=.5f?"Restore complete original state":"Cancel (default)";
       else if(c.parameter==VrParameter::PolygonConversion)label=value>=1.5f?"Restore retained original source":value>=.5f?(s.polygon_requires_conversion?"Convert visible shape / retain source":"Edit current native polygons"):"Cancel (default)";
       else if(c.parameter==VrParameter::PolygonDistance){char size[64];snprintf(size,sizeof(size),"Distance %.6g world mm",double(value));label=size;}
@@ -360,7 +365,7 @@ void SpatialPalette::raster(const EditorState &s) {
       for (int y = 240 + offset; y < 360; y += 16)
         rect(563 * unit_, y * unit_, 30 * unit_, 3 * unit_, fg);
       rect(556 * unit_, 296 * unit_, 44 * unit_, 8 * unit_, accent);
-    } else if (c.parameter != VrParameter::RigRotation && c.parameter!=VrParameter::CutDirection && c.parameter!=VrParameter::CutOffset && c.parameter!=VrParameter::BakeDistances && c.parameter!=VrParameter::BakeQuality && c.parameter!=VrParameter::BakeProjection && c.parameter!=VrParameter::BakeColors && !skin_parameter(c.parameter) && !sculpt_parameter(c.parameter) && !procedural_parameter(c.parameter) && c.parameter!=VrParameter::SculptResolution && c.parameter!=VrParameter::ImportUnitScale) {
+    } else if (c.parameter != VrParameter::RigRotation && c.parameter!=VrParameter::CutDirection && c.parameter!=VrParameter::CutOffset && c.parameter!=VrParameter::BakeDistances && c.parameter!=VrParameter::BakeQuality && c.parameter!=VrParameter::BakeProjection && c.parameter!=VrParameter::BakeColors && !skin_parameter(c.parameter) && !sculpt_parameter(c.parameter) && !procedural_parameter(c.parameter) && c.parameter!=VrParameter::SculptResolution && c.parameter!=VrParameter::ImportUnitScale && c.parameter!=VrParameter::ShapeMirror) {
       Color swatch{
           uint8_t(std::clamp(linear_to_srgb(c.value[0]), 0.f, 1.f) * 255),
           uint8_t(std::clamp(linear_to_srgb(c.value[1]), 0.f, 1.f) * 255),
@@ -378,7 +383,7 @@ void SpatialPalette::raster(const EditorState &s) {
     rect(360 * unit_, 588 * unit_, 220 * unit_, 42 * unit_, accent);
     text(170 * unit_, 616 * unit_, "Cancel", fg);
     text(470 * unit_, 616 * unit_,
-         c.parameter == VrParameter::VoxelSize ? "Remesh / Press" : "Done / Press", fg);
+         c.parameter == VrParameter::ShapeMirror ? "Mirror / Press" : c.parameter == VrParameter::VoxelSize ? "Remesh / Press" : "Done / Press", fg);
     if (c.parameter == VrParameter::RigRotation || c.parameter == VrParameter::MorphWeight)
       text(320 * unit_, 480 * unit_, "Apply on Done / Press", fg);
     if (c.parameter == VrParameter::VoxelSize) {

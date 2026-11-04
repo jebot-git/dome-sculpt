@@ -9,6 +9,7 @@
 #include "cut-color.hpp"
 #include "affine-surface.hpp"
 #include "shapekey-preview.hpp"
+#include "shapekey-mirror-controls.hpp"
 #include "document-authority.hpp"
 #include "polygon-conversion.hpp"
 #include "document-polygon-authority.hpp"
@@ -756,7 +757,8 @@ void Document::finish_locked() {
     throw std::logic_error("Apply or cancel retopology before changing the document");
   // Starting another command may accept scalar property previews, but must
   // not implicitly execute an action such as creating a remeshed object.
-  finish_control_locked(state_.controls.parameter != VrParameter::ShapeRestore &&
+  finish_control_locked(state_.controls.parameter != VrParameter::ShapeMirror &&
+                        state_.controls.parameter != VrParameter::ShapeRestore &&
                         state_.controls.parameter != VrParameter::PolygonConversion &&
                         state_.controls.parameter != VrParameter::PolygonDistance &&
                         state_.controls.parameter != VrParameter::PolygonCuts &&
@@ -2046,6 +2048,7 @@ void Document::request_save(bool export_mesh) {
   file_locked(export_mesh);
 }
 bool Document::parameter_enabled_locked(VrParameter parameter) const {
+  if(parameter==VrParameter::ShapeMirror){const auto &o=scene_.active();return shape_target_ready_locked()&&o.deformation&&o.deformation->morphs&&state_.morph_target<o.deformation->morphs->targets.size();}
   if(parameter==VrParameter::MorphWeight&&state_.shape_sculpt)return false;
   if(parameter==VrParameter::ShapeRestore)return state_.can_restore_shapes;
   if(parameter==VrParameter::PolygonConversion)return !state_.polygon&&state_.can_polygon&&(polygon_conversion_required(scene_.active())||state_.polygon_has_source);
@@ -2105,6 +2108,18 @@ bool Document::parameter_enabled_locked(VrParameter parameter) const {
 void Document::finish_control_locked(bool accept) {
   if (!control_before_)
     return;
+  if(state_.controls.parameter==VrParameter::ShapeMirror){
+    static_assert(std::is_nothrow_move_constructible_v<VrControlState> && std::is_nothrow_move_assignable_v<VrControlState>);
+    auto controls=std::move(state_.controls);const auto source=control_source_;
+    auto before=std::move(control_before_);control_before_.reset();state_.controls={};control_changed_=false;
+    try{
+      if(accept){auto edit=detail::mirror_control_request(controls);
+        if(state_.morph_target!=edit.target)throw std::logic_error("Shape selection changed; reopen Mirror controls");
+        queue_shape_locked(std::move(edit),source);
+      }
+    }catch(...){control_before_=std::move(before);state_.controls=std::move(controls);input_.resume_control(VrParameter::ShapeMirror);throw;}
+    return;
+  }
   if(state_.controls.parameter==VrParameter::ShapeRestore){
     auto controls=state_.controls;auto source=control_source_;bool restore=accept&&controls.value[0]>=.5f;
     auto before=std::move(control_before_);control_before_.reset();state_.controls={};control_changed_=false;
@@ -2289,6 +2304,18 @@ void Document::finish_control_locked(bool accept) {
 }
 
 void Document::control_event_locked(VrControlEvent event) {
+  if(event.type==VrControlEventType::Begin&&event.parameter==VrParameter::ShapeMirror){
+    finish_control_locked(false);
+    if(!parameter_enabled_locked(event.parameter))throw std::logic_error("Choose an editable shapekey before mirroring");
+    Transaction transaction(*this);
+    const auto &target=scene_.active().deformation->morphs->targets.at(state_.morph_target);
+    VrControlState controls;controls.parameter=VrParameter::ShapeMirror;controls.title="Mirror / "+target.name;
+    controls.components=3;controls.value={0,.5f,1.f/3.f,float(state_.morph_target)};
+    control_before_=scene_;control_object_=scene_.active().id;
+    control_source_={state_.generation,state_.revision,control_object_,state_.edit_authority};
+    control_changed_=false;state_.controls=std::move(controls);state_.message.clear();
+    publish_locked(false,false);transaction.commit(false);return;
+  }
   if (event.type == VrControlEventType::Begin) {
     finish_control_locked(false);
     if (!parameter_enabled_locked(event.parameter))
@@ -2568,6 +2595,7 @@ void Document::control_event_locked(VrControlEvent event) {
   value = std::clamp(value, c.minimum, c.maximum);
   if (value == c.value[event.component])
     return;
+  if(c.parameter==VrParameter::ShapeMirror&&event.component==0)value=std::round(value*2)/2;
   c.value[event.component] = value;
   auto &o = scene_.object(control_object_);
   auto &before = control_before_->object(control_object_);
@@ -2586,6 +2614,7 @@ void Document::control_event_locked(VrControlEvent event) {
   case VrParameter::PolygonCuts:
   case VrParameter::PolygonConversion:
   case VrParameter::ShapeRestore:
+  case VrParameter::ShapeMirror:
     break;
   case VrParameter::ImportUnitScale:
     control_changed_=true;break;

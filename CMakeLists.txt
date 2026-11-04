@@ -3212,3 +3212,37 @@ if(BUILD_TESTING)
   target_include_directories(dome-sculpt-rig-source-unskinned-ui-fixture PRIVATE src)
   target_link_libraries(dome-sculpt-rig-source-unskinned-ui-fixture PRIVATE dome-sculpt-core)
 endif()
+
+if(BUILD_TESTING)
+  add_executable(dome-sculpt-xr-mirror-controls-test tests/xr-mirror-controls.cpp)
+  target_include_directories(dome-sculpt-xr-mirror-controls-test PRIVATE src)
+  target_link_libraries(dome-sculpt-xr-mirror-controls-test PRIVATE dome-sculpt-core)
+  target_link_options(dome-sculpt-xr-mirror-controls-test PRIVATE -Wl,--wrap=_ZN4dome15author_shapekeyERNS_5SceneEmRKNS_12ShapeKeyEditERKSt8functionIFbvEE)
+  add_test(NAME xr-mirror-controls COMMAND dome-sculpt-xr-mirror-controls-test ${CMAKE_CURRENT_BINARY_DIR}/xr-mirror-controls)
+  set_tests_properties(xr-mirror-controls PROPERTIES TIMEOUT 600)
+endif()
+
+if(BUILD_TESTING)
+  add_executable(dome-sculpt-xr-mirror-fixture tests/xr-mirror-fixture.cpp)
+  target_include_directories(dome-sculpt-xr-mirror-fixture PRIVATE src)
+  target_link_libraries(dome-sculpt-xr-mirror-fixture PRIVATE dome-sculpt-core)
+  target_link_options(dome-sculpt-xr-mirror-fixture PRIVATE -Wl,--wrap=_ZN4dome15author_shapekeyERNS_5SceneEmRKNS_12ShapeKeyEditERKSt8functionIFbvEE)
+endif()
+
+if(BUILD_TESTING)
+  add_executable(dome-sculpt-xr-mirror-control-faults-test tests/xr-mirror-control-faults.cpp)
+  target_include_directories(dome-sculpt-xr-mirror-control-faults-test PRIVATE src)
+  target_link_libraries(dome-sculpt-xr-mirror-control-faults-test PRIVATE dome-sculpt-core)
+  target_link_options(dome-sculpt-xr-mirror-control-faults-test PRIVATE -Wl,--wrap=_ZN4dome15author_shapekeyERNS_5SceneEmRKNS_12ShapeKeyEditERKSt8functionIFbvEE)
+  add_test(NAME xr-mirror-control-faults COMMAND dome-sculpt-xr-mirror-control-faults-test)
+  set_tests_properties(xr-mirror-control-faults PROPERTIES TIMEOUT 600)
+endif()
+
+if(BUILD_TESTING AND TARGET dome-sculpt AND TARGET dome-sculpt-test-runtime)
+  add_test(NAME shapekey-mirror-openxr COMMAND ${Python3_EXECUTABLE}
+    ${CMAKE_CURRENT_SOURCE_DIR}/tests/xr-mirror.py
+    $<TARGET_FILE:dome-sculpt> $<TARGET_FILE:dome-sculpt-test-runtime>
+    $<TARGET_FILE:dome-sculpt-xr-mirror-fixture>
+    ${CMAKE_CURRENT_BINARY_DIR}/shapekey-mirror-xr)
+  set_tests_properties(shapekey-mirror-openxr PROPERTIES TIMEOUT 600)
+endif()

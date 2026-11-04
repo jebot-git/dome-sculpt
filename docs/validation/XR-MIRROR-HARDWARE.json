@@ -1,0 +1,251 @@
+{
+  "recorded_utc": "2026-11-04T06:05:51.875266+00:00",
+  "scope": "Complete actual-loader Mirror 1024px stereo settings workflow on explicit PCI03 Intel Arc A770 GL, exact qualified CPU-compute Release app/helper/runtime; software --hardware must refuse. Not physical tracking or GPU compute/weights.",
+  "private_source": "848318b3090ee118c373162f70f72a3d01a88a43",
+  "path": "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-hardware-6e/artifacts/hardware-proof/status.json",
+  "sha256": "3f4fc9a5e76f66d252f6a33297958277839939abd76f43c2892bd1298753b0e1",
+  "result": {
+    "state": "terminal",
+    "pid": 1320051,
+    "source": "848318b3090ee118c373162f70f72a3d01a88a43",
+    "scope": "Complete actual-loader Mirror 1024px stereo settings workflow on explicit PCI03 Intel Arc A770 GL, exact qualified CPU-compute Release app/helper/runtime; software --hardware must refuse. Not physical tracking or GPU compute/weights.",
+    "steps": [
+      {
+        "name": "arc",
+        "command": [
+          "python3",
+          "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-hardware-6e/tests/xr-mirror.py",
+          "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-checkpoints-dde/artifacts/checkpoint-proof/release/dome-sculpt",
+          "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-visual-bounds-736/artifacts/visual-proof/libxr-runtime.so",
+          "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-checkpoints-dde/artifacts/checkpoint-proof/release/xr-mirror-fixture-test",
+          "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-hardware-6e/artifacts/hardware-proof/arc",
+          "--hardware"
+        ],
+        "exit_code": 0,
+        "seconds": 41.942302223003935,
+        "device": {
+          "vendor": "Intel",
+          "renderer": "Mesa Intel(R) Arc(tm) A770 Graphics (DG2)"
+        },
+        "report": {
+          "checks": [
+            {
+              "passed": true,
+              "check": "accept-0: actual native XR client exits and ordered Save finishes"
+            },
+            {
+              "passed": true,
+              "check": "accept-0: actual Intel Arc A770 renders both eyes; software fallback refuses"
+            },
+            {
+              "passed": true,
+              "check": "accept-0: real stereo swapchain ownership is balanced and both eyes are nonblank"
+            },
+            {
+              "passed": true,
+              "check": "accept-0: both actual GL eyes render the settings after real controller row edits"
+            },
+            {
+              "passed": true,
+              "check": "accept-0: original native project bytes remain untouched"
+            },
+            {
+              "passed": true,
+              "check": "accept-0: explicit Mirror adds one real key while keeping both original targets exact"
+            },
+            {
+              "passed": true,
+              "check": "accept-0: independent off-centre counterpart oracle verifies REST-position mirroring"
+            },
+            {
+              "passed": true,
+              "check": "accept-0: skin pose material paint placement and ultimately restored first source stay exact"
+            },
+            {
+              "passed": true,
+              "check": "accept-0: native first-source and explicit authored-checkpoint Restore semantics remain exact"
+            },
+            {
+              "passed": true,
+              "check": "accept-1: actual native XR client exits and ordered Save finishes"
+            },
+            {
+              "passed": true,
+              "check": "accept-1: actual Intel Arc A770 renders both eyes; software fallback refuses"
+            },
+            {
+              "passed": true,
+              "check": "accept-1: real stereo swapchain ownership is balanced and both eyes are nonblank"
+            },
+            {
+              "passed": true,
+              "check": "accept-1: both actual GL eyes render the settings after real controller row edits"
+            },
+            {
+              "passed": true,
+              "check": "accept-1: original native project bytes remain untouched"
+            },
+            {
+              "passed": true,
+              "check": "accept-1: explicit Mirror adds one real key while keeping both original targets exact"
+            },
+            {
+              "passed": true,
+              "check": "accept-1: independent off-centre counterpart oracle verifies REST-position mirroring"
+            },
+            {
+              "passed": true,
+              "check": "accept-1: skin pose material paint placement and ultimately restored first source stay exact"
+            },
+            {
+              "passed": true,
+              "check": "accept-1: native first-source and explicit authored-checkpoint Restore semantics remain exact"
+            },
+            {
+              "passed": true,
+              "check": "accept-2: actual native XR client exits and ordered Save finishes"
+            },
+            {
+              "passed": true,
+              "check": "accept-2: actual Intel Arc A770 renders both eyes; software fallback refuses"
+            },
+            {
+              "passed": true,
+              "check": "accept-2: real stereo swapchain ownership is balanced and both eyes are nonblank"
+            },
+            {
+              "passed": true,
+              "check": "accept-2: both actual GL eyes render the settings after real controller row edits"
+            },
+            {
+              "passed": true,
+              "check": "accept-2: original native project bytes remain untouched"
+            },
+            {
+              "passed": true,
+              "check": "accept-2: explicit Mirror adds one real key while keeping both original targets exact"
+            },
+            {
+              "passed": true,
+              "check": "accept-2: independent off-centre counterpart oracle verifies REST-position mirroring"
+            },
+            {
+              "passed": true,
+              "check": "accept-2: skin pose material paint placement and ultimately restored first source stay exact"
+            },
+            {
+              "passed": true,
+              "check": "accept-2: native first-source and explicit authored-checkpoint Restore semantics remain exact"
+            },
+            {
+              "passed": true,
+              "check": "cancel-0: actual native XR client exits and ordered Save finishes"
+            },
+            {
+              "passed": true,
+              "check": "cancel-0: actual Intel Arc A770 renders both eyes; software fallback refuses"
+            },
+            {
+              "passed": true,
+              "check": "cancel-0: real stereo swapchain ownership is balanced and both eyes are nonblank"
+            },
+            {
+              "passed": true,
+              "check": "cancel-0: both actual GL eyes render the settings after real controller row edits"
+            },
+            {
+              "passed": true,
+              "check": "cancel-0: original native project bytes remain untouched"
+            },
+            {
+              "passed": true,
+              "check": "cancel-0: actual Cancel/focus loss retains the exact complete native Scene"
+            },
+            {
+              "passed": true,
+              "check": "focus-0: actual native XR client exits and ordered Save finishes"
+            },
+            {
+              "passed": true,
+              "check": "focus-0: actual Intel Arc A770 renders both eyes; software fallback refuses"
+            },
+            {
+              "passed": true,
+              "check": "focus-0: real stereo swapchain ownership is balanced and both eyes are nonblank"
+            },
+            {
+              "passed": true,
+              "check": "focus-0: both actual GL eyes render the settings after real controller row edits"
+            },
+            {
+              "passed": true,
+              "check": "focus-0: original native project bytes remain untouched"
+            },
+            {
+              "passed": true,
+              "check": "focus-0: actual Cancel/focus loss retains the exact complete native Scene"
+            },
+            {
+              "passed": true,
+              "check": "focus-0: fixture crosses actual loader focus loss and regain"
+            }
+          ],
+          "physical_headset": false,
+          "requested_hardware": true
+        }
+      },
+      {
+        "name": "software-refusal",
+        "command": [
+          "python3",
+          "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-hardware-6e/tests/xr-mirror.py",
+          "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-checkpoints-dde/artifacts/checkpoint-proof/release/dome-sculpt",
+          "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-visual-bounds-736/artifacts/visual-proof/libxr-runtime.so",
+          "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-checkpoints-dde/artifacts/checkpoint-proof/release/xr-mirror-fixture-test",
+          "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-hardware-6e/artifacts/hardware-proof/software-refusal",
+          "--hardware"
+        ],
+        "exit_code": 1,
+        "seconds": 14.773073641001247,
+        "device": {
+          "vendor": "Mesa",
+          "renderer": "llvmpipe (LLVM 22.1.8, 256 bits)"
+        },
+        "report": {
+          "checks": [
+            {
+              "passed": true,
+              "check": "accept-0: actual native XR client exits and ordered Save finishes"
+            },
+            {
+              "passed": false,
+              "check": "accept-0: actual Intel Arc A770 renders both eyes; software fallback refuses"
+            }
+          ],
+          "physical_headset": false,
+          "requested_hardware": true
+        }
+      }
+    ],
+    "child_pid": 1323842,
+    "exit_code": 0,
+    "seconds": 56.71844411600614,
+    "inputs": 1745,
+    "drift": []
+  },
+  "manifest": {
+    "input_count": 1745,
+    "manifest_file_sha256": "3f4fc9a5e76f66d252f6a33297958277839939abd76f43c2892bd1298753b0e1"
+  },
+  "private_patched_Mesa_SAN_XR": {
+    "source": "public8878f641631240c523b30ce5e5c68dfe908385b4 optionaldependency patch; not installed",
+    "path": "/home/blux/de-xr/dome-sculpt/artifacts/mesa-xr-leak-26.2.5/proof/full-xr/status.json",
+    "scope": "Exact same SAN Mirror app/runtime/helper with staged private driver, not stockstack, no suppression",
+    "sha256": "dadfe472f45a9915ff99b3390bb6aed02531c2ac77d5a56b5918416ba31bb7ea",
+    "seconds": 67.4529688829789,
+    "assertions": 40,
+    "drift": []
+  },
+  "physical_headset": false,
+  "system_install": false
+}
