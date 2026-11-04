@@ -91,7 +91,11 @@ Scene bake_vrm1_expression_pose(const Scene &baseline,uint64_t object,
     }else{if(a.source_morph_targets.size()!=n)throw std::invalid_argument("VRM1 expression requires explicit original morph identities");source=a.source_morph_targets[t];}
     if(!source)continue; // Native-only authored targets retain their current weight.
     if(!seen.insert(*source).second)throw std::invalid_argument("VRM1 expression has conflicting original morph identities");
-    const auto at=evaluated.morphs.find({uint32_t(a.source_node),*source});values[t]=at==evaluated.morphs.end()?0:at->second;
+    const auto at=evaluated.morphs.find({uint32_t(a.source_node),*source});
+    // The expression system owns only its actual bound (node,target) pairs.
+    // The evaluator includes every binding even at zero effective weight;
+    // unrelated authored glTF defaults/native edits remain the baseline.
+    if(at!=evaluated.morphs.end())values[t]=at->second;
    }
    deformation->validate(entry.painted->mesh());current.deformation=std::move(deformation);
   }

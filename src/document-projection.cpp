@@ -123,6 +123,7 @@ void Document::projection_file(const FileJob &job) {
 }
 
 bool Document::projection_command_enabled_locked(SpatialCommand command) const {
+  if(state_.expressions&&command==SpatialCommand::ProjectionPlace)return false;
   if(stopping_.load()||native_stroke_||desktop_||control_before_||action_active_locked())return false;
   const auto v=state_.projection;
   if(command==SpatialCommand::ProjectionBrowse)return !v||!v->placing;

@@ -1076,8 +1076,12 @@ void Document::shading_locked(bool pbr,bool toon) {
   if(state_.pbr_view==pbr&&state_.toon==toon&&!state_.weights.enabled)return;
   if(action_active_locked()||state_.object_grabbing||navigation_.grabbing()||control_before_||(state_.projection&&state_.projection->placing)||(state_.rig_fit&&state_.rig_fit->placing))
     throw std::logic_error("Release the active gesture and close its tool before changing the material preview");
+  const auto expression_owner=expression_source_matches_locked()&&input_.menu_open()&&
+      input_.menu_page()==vrm_expression_page?input_.menu_device():0;
+  const auto expression_sector=input_.menu_index();
   Transaction transaction(*this);
   input_.cancel();++state_.input_epoch;transaction.rebind();
+  if(expression_owner)input_.retain_page(vrm_expression_page,expression_owner,expression_sector);
   state_.selection_pressed={true,true};state_.selection_release={true,true};state_.selection_hover={};
   state_.pbr_view=pbr;
   ++state_.view_epoch;
