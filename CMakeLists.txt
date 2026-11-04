@@ -3245,3 +3245,12 @@ if(BUILD_TESTING)
   add_test(NAME bake-custom-cage COMMAND dome-sculpt-bake-cage-test ${CMAKE_CURRENT_BINARY_DIR}/bake-custom-cage)
   set_tests_properties(bake-custom-cage PROPERTIES TIMEOUT 600)
 endif()
+
+if(BUILD_TESTING AND TARGET dome-sculpt AND TARGET dome-sculpt-test-runtime)
+  add_test(NAME bake-cage-openxr COMMAND ${Python3_EXECUTABLE}
+    ${CMAKE_CURRENT_SOURCE_DIR}/tests/bake-cage-xr.py
+    $<TARGET_FILE:dome-sculpt> $<TARGET_FILE:dome-sculpt-test-runtime>
+    $<TARGET_FILE:dome-sculpt-bake-cage-test>
+    ${CMAKE_CURRENT_BINARY_DIR}/bake-cage-xr)
+  set_tests_properties(bake-cage-openxr PROPERTIES TIMEOUT 600)
+endif()
