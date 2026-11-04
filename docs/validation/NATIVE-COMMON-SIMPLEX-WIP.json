@@ -1,0 +1,1070 @@
+{
+  "scope": "Private constrained-contact kernel and anatomical feasibility/cost counterexamples; no native/default admission",
+  "parent": "f98f120",
+  "kernel_release": "PASS 22 independent shared-role/simplex/dense/scale/identity/budget/cancel controls\n",
+  "kernel_asserted_sanitize": "PASS 22 independent shared-role/simplex/dense/scale/identity/budget/cancel controls\n",
+  "original_500m": [
+    {
+      "sex": "female",
+      "command": [
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-common-simplex-f98f120/artifacts/native-shared-simplex-field",
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-context-api-7849001/build/native-line-female/fitted-unskinned.dsculpt",
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-common-simplex-f98f120/artifacts/female"
+      ],
+      "exit": 1,
+      "seconds": 1.7677254879963584
+    },
+    {
+      "sex": "male",
+      "command": [
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-common-simplex-f98f120/artifacts/native-shared-simplex-field",
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-context-api-7849001/build/native-line-male/fitted-unskinned.dsculpt",
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-common-simplex-f98f120/artifacts/male"
+      ],
+      "exit": 1,
+      "seconds": 1.8678123629943002
+    }
+  ],
+  "test_only_3b": {
+    "command": [
+      "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-common-simplex-f98f120/artifacts/native-shared-simplex-diagnostic",
+      "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-context-api-7849001/build/native-line-male/fitted-unskinned.dsculpt",
+      "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-common-simplex-f98f120/artifacts/male-diagnostic"
+    ],
+    "exit": 1,
+    "seconds": 3.521191184001509,
+    "TEST_ONLY_WORK_CEILING": 3000000000
+  },
+  "strict_whole_wall": [
+    {
+      "sex": "female",
+      "command": [
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-common-simplex-f98f120/artifacts/native-eye-wall-audit",
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-context-api-7849001/build/native-line-female/fitted-unskinned.dsculpt",
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-common-simplex-f98f120/artifacts/female-wall-audit.json"
+      ],
+      "exit": 0,
+      "seconds": 0.7657239380059764
+    },
+    {
+      "sex": "male",
+      "command": [
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-common-simplex-f98f120/artifacts/native-eye-wall-audit",
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-context-api-7849001/build/native-line-male/fitted-unskinned.dsculpt",
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-common-simplex-f98f120/artifacts/male-wall-audit.json"
+      ],
+      "exit": 0,
+      "seconds": 0.8157184190058615
+    }
+  ],
+  "necessary_mask_quality": [
+    {
+      "sex": "female",
+      "command": [
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-context-api-7849001/artifacts/head-eye-quality",
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-common-simplex-f98f120/assets/humanoid/vroid/base-female.vrm",
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-common-simplex-f98f120/artifacts/female-necessity/necessary-condition-only.dsculpt",
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-common-simplex-f98f120/artifacts/female-necessity-quality"
+      ],
+      "exit": 1,
+      "seconds": 4.324625989975175,
+      "uniquely_forced_parts": [
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        11
+      ],
+      "forced_cohorts": 98,
+      "forced_local_failures": 40,
+      "forced_rigid_failures": 40
+    },
+    {
+      "sex": "male",
+      "command": [
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-context-api-7849001/artifacts/head-eye-quality",
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-common-simplex-f98f120/assets/humanoid/vroid/base-male.vrm",
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-common-simplex-f98f120/artifacts/male-necessity/necessary-condition-only.dsculpt",
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-common-simplex-f98f120/artifacts/male-necessity-quality"
+      ],
+      "exit": 1,
+      "seconds": 4.575446490984177,
+      "uniquely_forced_parts": [
+        2,
+        4,
+        5,
+        6,
+        8,
+        9,
+        11
+      ],
+      "forced_cohorts": 98,
+      "forced_local_failures": 40,
+      "forced_rigid_failures": 40
+    }
+  ],
+  "morph_boundary_audit": [
+    {
+      "oppositely_oriented_unique_boundary_edges": [
+        {
+          "parts": [
+            0,
+            7
+          ],
+          "count": 32
+        },
+        {
+          "parts": [
+            1,
+            7
+          ],
+          "count": 48
+        },
+        {
+          "parts": [
+            7,
+            8
+          ],
+          "count": 10
+        }
+      ],
+      "ambiguous_boundary_groups": 115,
+      "sex": "female",
+      "source_sha256": "b7406712ed3e640ccf1904ea6b81e27230069412fe91ddd87731addba08427af",
+      "same_original_mesh_only": true,
+      "all_authored_targets_compared": true,
+      "pairs": [
+        {
+          "parts": [
+            0,
+            7
+          ],
+          "matching_nonzero_morph_rows": 34,
+          "exact_position_rows": 34,
+          "minimum_distance": 0.0,
+          "pairs": [
+            [
+              62,
+              1804,
+              0.0
+            ],
+            [
+              64,
+              1805,
+              0.0
+            ],
+            [
+              66,
+              1810,
+              0.0
+            ],
+            [
+              67,
+              1784,
+              0.0
+            ],
+            [
+              70,
+              1770,
+              0.0
+            ],
+            [
+              71,
+              1754,
+              0.0
+            ],
+            [
+              74,
+              1751,
+              0.0
+            ],
+            [
+              75,
+              1743,
+              0.0
+            ],
+            [
+              83,
+              1725,
+              0.0
+            ],
+            [
+              84,
+              1723,
+              0.0
+            ],
+            [
+              86,
+              1719,
+              0.0
+            ],
+            [
+              87,
+              1717,
+              0.0
+            ],
+            [
+              93,
+              1718,
+              0.0
+            ],
+            [
+              94,
+              1721,
+              0.0
+            ],
+            [
+              102,
+              1728,
+              0.0
+            ],
+            [
+              103,
+              1732,
+              0.0
+            ],
+            [
+              109,
+              1736,
+              0.0
+            ],
+            [
+              110,
+              1748,
+              0.0
+            ],
+            [
+              114,
+              1757,
+              0.0
+            ],
+            [
+              115,
+              1760,
+              0.0
+            ],
+            [
+              117,
+              1764,
+              0.0
+            ],
+            [
+              118,
+              1767,
+              0.0
+            ],
+            [
+              120,
+              1768,
+              0.0
+            ],
+            [
+              121,
+              1773,
+              0.0
+            ],
+            [
+              133,
+              1775,
+              0.0
+            ],
+            [
+              134,
+              1782,
+              0.0
+            ],
+            [
+              138,
+              1787,
+              0.0
+            ],
+            [
+              139,
+              1790,
+              0.0
+            ],
+            [
+              146,
+              1794,
+              0.0
+            ],
+            [
+              147,
+              1797,
+              0.0
+            ],
+            [
+              150,
+              1800,
+              0.0
+            ],
+            [
+              160,
+              1804,
+              0.0
+            ],
+            [
+              161,
+              1802,
+              0.0
+            ],
+            [
+              163,
+              1800,
+              0.0
+            ]
+          ]
+        },
+        {
+          "parts": [
+            1,
+            7
+          ],
+          "matching_nonzero_morph_rows": 48,
+          "exact_position_rows": 48,
+          "minimum_distance": 0.0,
+          "pairs": [
+            [
+              386,
+              1567,
+              0.0
+            ],
+            [
+              388,
+              1564,
+              0.0
+            ],
+            [
+              389,
+              1559,
+              0.0
+            ],
+            [
+              391,
+              1573,
+              0.0
+            ],
+            [
+              392,
+              1579,
+              0.0
+            ],
+            [
+              394,
+              1556,
+              0.0
+            ],
+            [
+              395,
+              1551,
+              0.0
+            ],
+            [
+              397,
+              1581,
+              0.0
+            ],
+            [
+              398,
+              1575,
+              0.0
+            ],
+            [
+              402,
+              1543,
+              0.0
+            ],
+            [
+              403,
+              1570,
+              0.0
+            ],
+            [
+              404,
+              1538,
+              0.0
+            ],
+            [
+              405,
+              1561,
+              0.0
+            ],
+            [
+              407,
+              1535,
+              0.0
+            ],
+            [
+              408,
+              1526,
+              0.0
+            ],
+            [
+              410,
+              1532,
+              0.0
+            ],
+            [
+              411,
+              1529,
+              0.0
+            ],
+            [
+              413,
+              1522,
+              0.0
+            ],
+            [
+              414,
+              1520,
+              0.0
+            ],
+            [
+              416,
+              1528,
+              0.0
+            ],
+            [
+              417,
+              1524,
+              0.0
+            ],
+            [
+              419,
+              1518,
+              0.0
+            ],
+            [
+              420,
+              1519,
+              0.0
+            ],
+            [
+              422,
+              1521,
+              0.0
+            ],
+            [
+              424,
+              1666,
+              0.0
+            ],
+            [
+              425,
+              1711,
+              0.0
+            ],
+            [
+              426,
+              1708,
+              0.0
+            ],
+            [
+              428,
+              1664,
+              0.0
+            ],
+            [
+              429,
+              1662,
+              0.0
+            ],
+            [
+              431,
+              1705,
+              0.0
+            ],
+            [
+              432,
+              1702,
+              0.0
+            ],
+            [
+              434,
+              1661,
+              0.0
+            ],
+            [
+              435,
+              1657,
+              0.0
+            ],
+            [
+              439,
+              1696,
+              0.0
+            ],
+            [
+              440,
+              1655,
+              0.0
+            ],
+            [
+              441,
+              1693,
+              0.0
+            ],
+            [
+              442,
+              1654,
+              0.0
+            ],
+            [
+              444,
+              1690,
+              0.0
+            ],
+            [
+              446,
+              1656,
+              0.0
+            ],
+            [
+              447,
+              1659,
+              0.0
+            ],
+            [
+              449,
+              1687,
+              0.0
+            ],
+            [
+              450,
+              1684,
+              0.0
+            ],
+            [
+              451,
+              1681,
+              0.0
+            ],
+            [
+              453,
+              1669,
+              0.0
+            ],
+            [
+              454,
+              1670,
+              0.0
+            ],
+            [
+              456,
+              1678,
+              0.0
+            ],
+            [
+              457,
+              1675,
+              0.0
+            ],
+            [
+              459,
+              1672,
+              0.0
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "oppositely_oriented_unique_boundary_edges": [
+        {
+          "parts": [
+            1,
+            5
+          ],
+          "count": 32
+        },
+        {
+          "parts": [
+            4,
+            5
+          ],
+          "count": 48
+        },
+        {
+          "parts": [
+            5,
+            8
+          ],
+          "count": 12
+        }
+      ],
+      "ambiguous_boundary_groups": 107,
+      "sex": "male",
+      "source_sha256": "21a40fd24d4cd81404069475c726e15bc3aa1ed5abfcf1b5f779dc53ae915666",
+      "same_original_mesh_only": true,
+      "all_authored_targets_compared": true,
+      "pairs": [
+        {
+          "parts": [
+            1,
+            5
+          ],
+          "matching_nonzero_morph_rows": 33,
+          "exact_position_rows": 33,
+          "minimum_distance": 0.0,
+          "pairs": [
+            [
+              306,
+              1314,
+              0.0
+            ],
+            [
+              307,
+              1313,
+              0.0
+            ],
+            [
+              308,
+              1317,
+              0.0
+            ],
+            [
+              309,
+              1321,
+              0.0
+            ],
+            [
+              310,
+              1325,
+              0.0
+            ],
+            [
+              311,
+              1329,
+              0.0
+            ],
+            [
+              312,
+              1331,
+              0.0
+            ],
+            [
+              313,
+              1335,
+              0.0
+            ],
+            [
+              314,
+              1338,
+              0.0
+            ],
+            [
+              315,
+              1352,
+              0.0
+            ],
+            [
+              316,
+              1355,
+              0.0
+            ],
+            [
+              317,
+              1358,
+              0.0
+            ],
+            [
+              318,
+              1359,
+              0.0
+            ],
+            [
+              319,
+              1361,
+              0.0
+            ],
+            [
+              320,
+              1364,
+              0.0
+            ],
+            [
+              321,
+              1367,
+              0.0
+            ],
+            [
+              323,
+              1370,
+              0.0
+            ],
+            [
+              324,
+              1376,
+              0.0
+            ],
+            [
+              326,
+              1379,
+              0.0
+            ],
+            [
+              327,
+              1382,
+              0.0
+            ],
+            [
+              330,
+              1385,
+              0.0
+            ],
+            [
+              331,
+              1388,
+              0.0
+            ],
+            [
+              333,
+              1389,
+              0.0
+            ],
+            [
+              334,
+              1391,
+              0.0
+            ],
+            [
+              342,
+              1394,
+              0.0
+            ],
+            [
+              343,
+              1400,
+              0.0
+            ],
+            [
+              348,
+              1403,
+              0.0
+            ],
+            [
+              349,
+              1406,
+              0.0
+            ],
+            [
+              352,
+              1327,
+              0.0
+            ],
+            [
+              353,
+              1323,
+              0.0
+            ],
+            [
+              358,
+              1319,
+              0.0
+            ],
+            [
+              359,
+              1315,
+              0.0
+            ],
+            [
+              364,
+              1313,
+              0.0
+            ]
+          ]
+        },
+        {
+          "parts": [
+            4,
+            5
+          ],
+          "matching_nonzero_morph_rows": 48,
+          "exact_position_rows": 48,
+          "minimum_distance": 0.0,
+          "pairs": [
+            [
+              768,
+              1301,
+              0.0
+            ],
+            [
+              769,
+              1304,
+              0.0
+            ],
+            [
+              771,
+              1266,
+              0.0
+            ],
+            [
+              772,
+              1267,
+              0.0
+            ],
+            [
+              774,
+              1307,
+              0.0
+            ],
+            [
+              775,
+              1134,
+              0.0
+            ],
+            [
+              777,
+              1131,
+              0.0
+            ],
+            [
+              778,
+              1140,
+              0.0
+            ],
+            [
+              780,
+              1128,
+              0.0
+            ],
+            [
+              781,
+              1125,
+              0.0
+            ],
+            [
+              783,
+              1143,
+              0.0
+            ],
+            [
+              784,
+              1146,
+              0.0
+            ],
+            [
+              789,
+              1122,
+              0.0
+            ],
+            [
+              790,
+              1117,
+              0.0
+            ],
+            [
+              791,
+              1148,
+              0.0
+            ],
+            [
+              792,
+              1115,
+              0.0
+            ],
+            [
+              793,
+              1152,
+              0.0
+            ],
+            [
+              794,
+              1111,
+              0.0
+            ],
+            [
+              796,
+              1153,
+              0.0
+            ],
+            [
+              797,
+              1156,
+              0.0
+            ],
+            [
+              799,
+              1110,
+              0.0
+            ],
+            [
+              800,
+              1105,
+              0.0
+            ],
+            [
+              802,
+              1113,
+              0.0
+            ],
+            [
+              803,
+              1108,
+              0.0
+            ],
+            [
+              805,
+              1102,
+              0.0
+            ],
+            [
+              806,
+              1101,
+              0.0
+            ],
+            [
+              808,
+              1107,
+              0.0
+            ],
+            [
+              809,
+              1104,
+              0.0
+            ],
+            [
+              811,
+              1103,
+              0.0
+            ],
+            [
+              739,
+              1270,
+              0.0
+            ],
+            [
+              740,
+              1277,
+              0.0
+            ],
+            [
+              741,
+              1263,
+              0.0
+            ],
+            [
+              743,
+              1280,
+              0.0
+            ],
+            [
+              744,
+              1283,
+              0.0
+            ],
+            [
+              746,
+              1259,
+              0.0
+            ],
+            [
+              747,
+              1257,
+              0.0
+            ],
+            [
+              752,
+              1286,
+              0.0
+            ],
+            [
+              753,
+              1289,
+              0.0
+            ],
+            [
+              754,
+              1256,
+              0.0
+            ],
+            [
+              755,
+              1292,
+              0.0
+            ],
+            [
+              756,
+              1255,
+              0.0
+            ],
+            [
+              757,
+              1295,
+              0.0
+            ],
+            [
+              759,
+              1254,
+              0.0
+            ],
+            [
+              760,
+              1253,
+              0.0
+            ],
+            [
+              762,
+              1298,
+              0.0
+            ],
+            [
+              763,
+              1299,
+              0.0
+            ],
+            [
+              765,
+              1258,
+              0.0
+            ],
+            [
+              766,
+              1261,
+              0.0
+            ]
+          ]
+        }
+      ]
+    }
+  ],
+  "build_scope": "Two actual private-layout core consumers plus own fixtures, matching8a copied core/support; standalone O1 asserted ASanUBSan covers only22 small kernel controls, not whole solver/app",
+  "limits_unchanged": {
+    "production_work": 500000000,
+    "production_workspace": 268435456,
+    "whole_height_max": 0.03,
+    "whole_height_mean": 0.01,
+    "local_part_max": 0.03,
+    "local_part_mean": 0.01,
+    "stationary_part_max": 0.005,
+    "stationary_part_mean": 0.001
+  },
+  "sha256": {
+    "src/weight-shared-simplex.hpp": "963c1a291e120941db9cee44d3cb6c7f175029c7d96627687a942b2e7d1a5c3c",
+    "src/anatomical-continuation.hpp": "87c102268e509aee6ac6290f831b6f1fcf5af4999fe37945efaf0444e60f8fb7",
+    "src/weight-contact-intent.hpp": "34f4a0e58360507b7092f3f711132b6f31e3ec3c6796ac626e2ea3cbce90d96b",
+    "tests/weight-shared-simplex.cpp": "0a56379d6e5fe573dd0104f5976fb3e73c11a56c44a4c1c4e6c0333c99a4dd32",
+    "tests/native-eye-wall-audit.cpp": "17f317c5ae820e78c897daf620dba20a4caa4d18c6f1d542071c3356acd738bb",
+    "tests/native-mask-necessity.cpp": "4fd4dd82274c10b7895ba0c475e5d4d05aed6405253b1f922c06ff87aaa3e8b1",
+    "tests/native-shared-simplex-diagnostic.cpp": "a7d5f905a788d4a5d66619fd14961bca0f065523e97380bba6991498e85b1a1b",
+    "tests/native-intent-contact-field.cpp": "b1c919b3d441a15868c70999412d44118946fe0597fe3114e2d02d394cfbdb34",
+    "tests/native-morph-contact-audit.py": "f948f304406269cd5af3d693db2703ae5d5f8521dbeae814b2f0584c08e581b4",
+    "artifacts/native-shared-simplex-field-500m": "ae78d98c6f162b13dbb1503de18643925bbae4b42f3d84cd0eab573eee55ae94",
+    "artifacts/native-shared-simplex-diagnostic": "5ffa0d3609f955fcc78624d034fdd9aeb9c413c10b0231d44af94058cb94b829",
+    "artifacts/native-eye-wall-audit": "20f2d72678d275089fd74b8e28b740e7f727d588cad85be5adc3ae550f03bb9c",
+    "artifacts/native-mask-necessity": "3b05dcebe079b619af0a8c3c6d339ac144cee87e22c960236b88c68db1e08609",
+    "artifacts/weight-shared-simplex-test": "fd10eb3d63e0e789bda7451e3a5cc60c3e8c31b7438d694f356541909b456d89",
+    "artifacts/weight-shared-simplex-sanitize": "84503f23005967fcd18bf7f3f1c8626316b47c010f7d0b4b777dcbb36f89aac6",
+    "artifacts/libdome-sculpt-core.a": "10247942b863e715ae607efc6fcc271090e556b485f7037183c28260226554e1",
+    "artifacts/female-wall-audit.json": "ba8c0148abaa1a7b02a55f4099edcc22a2a7acb06c42087715d365734fea6841",
+    "artifacts/female-necessity/necessary-condition-only.dsculpt": "4521185744439ec17906f5dd56f16073bbfcc6361dedfe532a1e95613541d74d",
+    "artifacts/female-necessity/report.json": "824ba22da05d8c938040050960a041b09497c05057a9a4c4c6ea300426ec5a22",
+    "artifacts/female-necessity-quality/quality.json": "7d23d9863eaadf939382883ecb7135bc38ef0df417fb606855cbdddb2c80391b",
+    "artifacts/male-wall-audit.json": "44474ca843732c566e8d8d848d115fdca5773fa1edbef2597cbab985a696e61b",
+    "artifacts/male-necessity/necessary-condition-only.dsculpt": "e67280d37969b3032a462fcdc1da90e1947bc2c5fb3c8bce67ca19c242e2b4f9",
+    "artifacts/male-necessity/report.json": "97a6932236a09b4fa4ef7b8e9fe103e2141053571d87b7acdfe7067489fa5283",
+    "artifacts/male-necessity-quality/quality.json": "4c64c7023566a6ff1987408cc5a507319ebae742b2762ea1b0ad8e711bd296ec"
+  }
+}

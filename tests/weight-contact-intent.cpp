@@ -53,7 +53,7 @@ int main() try {
           "Empty intents cannot create support");
   bool invalid = false;
   try {
-    compatible_weight_contact(head_left, head_right, DeclaredContactSupport(2));
+    compatible_weight_contact(head_left, head_right, DeclaredContactSupport(3));
   } catch (const std::invalid_argument &) {
     invalid = true;
   }

@@ -10,6 +10,7 @@
 #include "skin-affine.hpp"
 #include "weight-declared-support.hpp"
 #include "weight-surface-system.hpp"
+#include "weight-shared-simplex.hpp"
 #include <map>
 #include <nlohmann/json.hpp>
 namespace dome::detail {
@@ -86,7 +87,8 @@ anatomical_continuation(const Scene &scene, uint64_t group,
     ContinuationFields out;
     if (declared) {
       if ((declared->contact_support != DeclaredContactSupport::CommonMask &&
-           declared->contact_support != DeclaredContactSupport::IdenticalMask) ||
+           declared->contact_support != DeclaredContactSupport::IdenticalMask &&
+           declared->contact_support != DeclaredContactSupport::SharedSimplex) ||
           (declared->policy != DeclaredSupportPolicy::AllDeformControls &&
            declared->policy != DeclaredSupportPolicy::NearestSourceUnion &&
            declared->policy != DeclaredSupportPolicy::UniqueSourceWitnesses) ||
@@ -760,6 +762,16 @@ anatomical_continuation(const Scene &scene, uint64_t group,
       s.values[b] = -w;
     }
     // Lexicographic edge iteration yields sorted unique adjacency rows.
+    if (declared && declared->contact_support == DeclaredContactSupport::SharedSimplex) {
+      stage = "masked common-role simplex solve";
+      auto solved = solve_shared_simplex(s, screen, rhs, usage, out.joints,
+                                        out.fields, options.maximum_bytes - source_bytes,
+                                        budget);
+      out.report.bytes = source_bytes + solved.bytes;
+      out.report.residual = solved.kkt;
+      out.report.partition = solved.partition;
+      out.report.iterations = solved.sweeps;
+    } else {
     stage = "fixed screened factorization";
     ScreenedSparseLDL factor(s, options.maximum_bytes - source_bytes, budget);
     out.report.bytes = source_bytes + factor.planned_bytes;
@@ -817,6 +829,7 @@ anatomical_continuation(const Scene &scene, uint64_t group,
     if (out.report.partition > 1e-9)
       throw std::runtime_error(
           "Continuation failed independent partition certificate");
+    }
     size_t current_count = 0;
     for (const auto &o : scene.objects())
       if (declared ? declared->find(o.id) != nullptr : o.group == group)
