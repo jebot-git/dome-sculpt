@@ -12,6 +12,7 @@ struct GeometryWeightBindOptions {
 struct GeometryWeightBindReport {
   size_t work = 0, workspace = 0, changed = 0;
   ContinuationReport field;
+  size_t measure_zero_origins = 0;
 };
 namespace geometry_weight_authoring {
 using Work = weight_surface::Budget;
@@ -331,7 +332,8 @@ author_geometry_weight_skin(Scene &scene, std::span<const uint64_t> targets,
   require_reference();
   if (changed.empty()) {
     if (report)
-      *report = {work.used, planned, 0, fields.report};
+      *report = {work.used, planned, 0, fields.report,
+                 fields.query_report.measure_zero_origins};
     return false;
   }
   Scene staged = scene;
@@ -351,7 +353,8 @@ author_geometry_weight_skin(Scene &scene, std::span<const uint64_t> targets,
   require_reference();
   scene = std::move(staged);
   if (report)
-    *report = {work.used, planned, changed.size(), fields.report};
+    *report = {work.used, planned, changed.size(), fields.report,
+               fields.query_report.measure_zero_origins};
   return true;
 }
 } // namespace dome::detail

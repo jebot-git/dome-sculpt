@@ -99,8 +99,9 @@ anatomical_continuation(const Scene &scene, uint64_t group,
           (declared->source_span != DeclaredSourceSpan::ComponentProjection &&
            declared->source_span != DeclaredSourceSpan::AuthoredFinite) ||
           (declared->origin_boundary != DeclaredOriginBoundary::StrictOwnership &&
-           declared->origin_boundary != DeclaredOriginBoundary::NativeOpenSegment) ||
-          (declared->origin_boundary == DeclaredOriginBoundary::NativeOpenSegment &&
+           declared->origin_boundary != DeclaredOriginBoundary::NativeOpenSegment &&
+           declared->origin_boundary != DeclaredOriginBoundary::NativeFiniteLineIntegral) ||
+          (declared->origin_boundary != DeclaredOriginBoundary::StrictOwnership &&
            (wall_domain != BoneWallDomain::ConnectedSourceSurface ||
             declared->rig_geometry != DeclaredRigGeometry::NativeBoneAxes ||
             declared->row_anchors != DeclaredRowAnchors::NearestPermitted ||
@@ -545,9 +546,11 @@ anatomical_continuation(const Scene &scene, uint64_t group,
           std::span<const uint32_t>(row_owner), options.maximum_bytes - bytes,
           budget);
     out.visibility_seams = incidence.joined_edges;
-    const auto origin_policy = declared && declared->origin_boundary == DeclaredOriginBoundary::NativeOpenSegment
-                                   ? BoneOriginPolicy::NativeOpenSegment
-                                   : BoneOriginPolicy::StrictOwnership;
+    const auto origin_policy = !declared ? BoneOriginPolicy::StrictOwnership
+        : declared->origin_boundary == DeclaredOriginBoundary::NativeFiniteLineIntegral
+            ? BoneOriginPolicy::NativeFiniteLineIntegral
+        : declared->origin_boundary == DeclaredOriginBoundary::NativeOpenSegment
+            ? BoneOriginPolicy::NativeOpenSegment : BoneOriginPolicy::StrictOwnership;
     BoneShadowQuery shadow_query(query_points, mesh.indices,
                                  options.maximum_bytes - bytes -
                                      incidence.planned_bytes,

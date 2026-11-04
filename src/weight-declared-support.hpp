@@ -28,7 +28,11 @@ enum class DeclaredRigGeometry { NativeBoneAxes, ChildHeadControl };
 enum class DeclaredRowAnchors { AllVisible, NearestPermitted };
 enum class DeclaredSourceRequirements { AllEligible, GeometryEvidence };
 enum class DeclaredSourceSpan { ComponentProjection, AuthoredFinite };
-enum class DeclaredOriginBoundary { StrictOwnership, NativeOpenSegment };
+enum class DeclaredOriginBoundary {
+  StrictOwnership,
+  NativeOpenSegment,
+  NativeFiniteLineIntegral
+};
 struct DeclaredWeightSupport {
   DeclaredSupportPolicy policy = DeclaredSupportPolicy::AllDeformControls;
   bool world_metric = false;

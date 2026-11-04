@@ -13,13 +13,20 @@ enum class BoneWallDomain { WholeGroup, ConnectedSourceSurface };
 // Strict source ownership remains the default. Native open-segment semantics
 // exclude only exact origin-plane contacts whose ENTIRE finite source is
 // independently proved strictly on one side. No vertex/incidence union follows.
-enum class BoneOriginPolicy { StrictOwnership, NativeOpenSegment };
+enum class BoneOriginPolicy {
+  StrictOwnership,
+  NativeOpenSegment,
+  // Experimental finite-line integral semantics, explicitly selected by its
+  // owning caller. Never a pointwise visibility/area-source certificate.
+  NativeFiniteLineIntegral
+};
 struct BoneQueryReport {
   size_t nodes = 0, candidates = 0, intervals = 0, unions = 0,
          exact_predicates = 0, filtered_misses = 0, filtered_full = 0,
          row_hits = 0, row_misses = 0, source_hits = 0, source_misses = 0,
          search_work = 0, union_work = 0, integration_work = 0,
          predicate_work = 0;
+  size_t measure_zero_origins = 0;
 };
 struct BoneQueryAmbiguity : std::runtime_error {
   bone_shadow::Kind kind;
@@ -355,11 +362,21 @@ private:
   // foreign coincident origin. Only a fully completed pass becomes reusable.
   template <class Budget>
   bool open_origin_clear(uint32_t row, uint32_t face, P head, P tail,
-                         Scratch &s, Budget &w, BoneQueryReport &r) const {
+                         Scratch &s, Budget &w, BoneQueryReport &r,
+                         BoneOriginPolicy policy) const {
     const auto plane = row_plane(row, face, s, w, r);
     if (plane.side || !plane.inside)
       return false; // Actual exact p-on-closed-triangle proof is mandatory.
     auto &source = source_plane(face, head, tail, s, w, r);
+    if (policy == BoneOriginPolicy::NativeFiniteLineIntegral) {
+      // A nonidentically-zero exact affine plane function has at most ONE
+      // root over this genuine nonzero finite source segment. Every other
+      // open ray misses the plane except t=0. The regularized kernel is
+      // bounded by1, so its integral equals the continuous representative on
+      // this finite exceptional set. No quadrature sample is discarded and
+      // no root is rounded. Fully coplanar and degenerate sources refuse.
+      return head != tail && (source.head || source.tail);
+    }
     if (source.head && source.head == source.tail)
       return true;
     // At |coordinate|<=10000, each exact binary32 difference has <=225bits.
@@ -453,13 +470,18 @@ private:
           continue;
         auto plane = row_plane(row, face, s, w, r);
         if (!plane.side && plane.inside) {
-          if (origin_policy == BoneOriginPolicy::NativeOpenSegment) {
-            // Affine plane distance is strictly nonzero throughout a segment
-            // when both exact endpoint signs agree. Each open ray therefore
-            // meets this plane only at excluded t=0. This proof belongs to
-            // this source epoch, never to source-independent origin_checked.
-            if (open_origin_clear(row, face, head, tail, s, w, r))
+          if (origin_policy != BoneOriginPolicy::StrictOwnership) {
+            // The explicitly admitted source-specific geometric/integral
+            // proof belongs to this source epoch. It never authorizes the
+            // source-independent strict origin_checked bit.
+            if (open_origin_clear(row, face, head, tail, s, w, r,
+                                  origin_policy)) {
+              if (origin_policy == BoneOriginPolicy::NativeFiniteLineIntegral) {
+                w.step();
+                ++r.measure_zero_origins;
+              }
               continue;
+            }
           }
           throw BoneQueryAmbiguity(bone_shadow::Kind::OriginContact, face);
         }
@@ -623,8 +645,8 @@ private:
       return {};
     }
     if (!row_side.side && row_side.inside) {
-      if (origin_policy == BoneOriginPolicy::NativeOpenSegment) {
-        if (open_origin_clear(row, face, head, tail, s, w, r)) {
+      if (origin_policy != BoneOriginPolicy::StrictOwnership) {
+        if (open_origin_clear(row, face, head, tail, s, w, r, origin_policy)) {
           ++report.rejected;
           return {};
         }
@@ -728,7 +750,8 @@ public:
     w.stop();
     const size_t count = indices.size() / 3;
     if ((origin_admission != BoneOriginPolicy::StrictOwnership &&
-         origin_admission != BoneOriginPolicy::NativeOpenSegment) ||
+         origin_admission != BoneOriginPolicy::NativeOpenSegment &&
+         origin_admission != BoneOriginPolicy::NativeFiniteLineIntegral) ||
         points.empty() || points.size() > 2'000'000 || !count ||
         count > 4'000'000 || indices.size() % 3)
       throw std::invalid_argument("Invalid owning bone query dimensions");
@@ -742,7 +765,7 @@ public:
              2 * sizeof(Node) + sizeof(volume_exact::Interval) +
              2 * sizeof(uint32_t) + sizeof(SourcePlane) + sizeof(uint32_t)) +
         cache_slots(points.size()) * sizeof(RowPlane) + 65536;
-    if (origin_admission == BoneOriginPolicy::NativeOpenSegment)
+    if (origin_admission != BoneOriginPolicy::StrictOwnership)
       planned_bytes += native_origin_workspace;
     if (planned_bytes > maximum_bytes ||
         construction_forecast > w.maximum - w.used)
@@ -863,12 +886,14 @@ public:
         lo < 0 || hi > 1 || lo > hi || !std::isfinite(lo) || !std::isfinite(hi))
       throw std::invalid_argument("Invalid owning source query");
     if ((origin_policy != BoneOriginPolicy::StrictOwnership &&
-         origin_policy != BoneOriginPolicy::NativeOpenSegment) ||
-        (origin_policy == BoneOriginPolicy::NativeOpenSegment &&
+         origin_policy != BoneOriginPolicy::NativeOpenSegment &&
+         origin_policy != BoneOriginPolicy::NativeFiniteLineIntegral) ||
+        (origin_policy != BoneOriginPolicy::StrictOwnership &&
          (domain != BoneWallDomain::ConnectedSourceSurface ||
-          origin_admission_ != BoneOriginPolicy::NativeOpenSegment)))
-      throw std::invalid_argument("Native open-segment origins require their "
-                                  "own connected wall component");
+          origin_admission_ != origin_policy)) ||
+        (origin_policy == BoneOriginPolicy::NativeFiniteLineIntegral &&
+         head == tail))
+      throw std::invalid_argument("Native source policy requires matching connected-wall admission and a nonzero finite line");
     if (scratch.shadows.capacity() < faces_.size() ||
         scratch.stack.capacity() < nodes_.size() ||
         scratch.rows.size() != cache_slots(points_.size()) ||
@@ -941,8 +966,9 @@ public:
                                 filter_report, bounded_fan, origin_policy)
                 : bone_shadow::triangle_shadow(p, head, tail, wall, w);
         if (!use_filter && shadow.kind == bone_shadow::Kind::OriginContact &&
-            origin_policy == BoneOriginPolicy::NativeOpenSegment) {
-          if (open_origin_clear(row, face, head, tail, scratch, w, staged))
+            origin_policy != BoneOriginPolicy::StrictOwnership) {
+          if (open_origin_clear(row, face, head, tail, scratch, w, staged,
+                                origin_policy))
             shadow = {};
         }
         staged.predicate_work += w.used - predicate_start;
@@ -1027,13 +1053,23 @@ public:
     staged.exact_predicates = filter_report.exact;
     staged.filtered_misses = filter_report.rejected;
     staged.filtered_full = filter_report.full;
-    const std::array<size_t, 15> values{
-        staged.nodes,         staged.candidates,       staged.intervals,
-        staged.unions,        staged.exact_predicates, staged.filtered_misses,
-        staged.filtered_full, staged.row_hits,         staged.row_misses,
-        staged.source_hits,   staged.source_misses,    staged.search_work,
-        staged.union_work,    staged.integration_work, staged.predicate_work};
-    const std::array<size_t *, 15> destinations{&report.nodes,
+    const std::array<size_t, 16> values{staged.nodes,
+                                        staged.candidates,
+                                        staged.intervals,
+                                        staged.unions,
+                                        staged.exact_predicates,
+                                        staged.filtered_misses,
+                                        staged.filtered_full,
+                                        staged.row_hits,
+                                        staged.row_misses,
+                                        staged.source_hits,
+                                        staged.source_misses,
+                                        staged.search_work,
+                                        staged.union_work,
+                                        staged.integration_work,
+                                        staged.predicate_work,
+                                        staged.measure_zero_origins};
+    const std::array<size_t *, 16> destinations{&report.nodes,
                                                 &report.candidates,
                                                 &report.intervals,
                                                 &report.unions,
@@ -1047,7 +1083,8 @@ public:
                                                 &report.search_work,
                                                 &report.union_work,
                                                 &report.integration_work,
-                                                &report.predicate_work};
+                                                &report.predicate_work,
+                                                &report.measure_zero_origins};
     for (size_t i = 0; i < values.size(); ++i)
       if (values[i] > SIZE_MAX - *destinations[i])
         throw std::length_error("Bone query report overflow");
