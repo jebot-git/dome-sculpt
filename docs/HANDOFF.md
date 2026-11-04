@@ -1,5 +1,20 @@
 # Dome Sculpt production handoff
 
+## Private colour-only VRM1 paint expressions — 2026-11-04
+
+Runtime fa4f1fd extends the genuine independent-paint adapter to base-colour
+expressions without UV binds; original source factors/roles remain separate and
+no UV expression is invented. R/S actual worker44 per colour/UV case, full
+886/908 persistent factory prefixes and all647 Cancel each, render112/36pairs
+per case max1 at unchanged4, legacy81/762/22 pass. Strict PCI03 Arc226/72pairs
+and actual llvmpipe refusal closed, lease released. Eight writer containers:
+72 official instances and Khronos0errors/32warnings/144infos; 144PNG+19native/
+container profile pairs exact. Two complete runtime TUs on matching copied c2/8f
+owned support only, no public/layout/schema/UI/fresh-app/main claim. Configure634
+is registration only. Original same long SAN64560 remains unfinished; remaining
+role/prepared/native/physical/plainPBR/external-consumer/full-integration work and
+all goal rows stay required. Read VRM1-COLOUR-EXPRESSION-LAYERS.md/JSON.
+
 ## Private VRM1 dynamic paint layers — 2026-11-04
 
 Runtime8fce073 adds actual expression-preserving independent colour paint for the
