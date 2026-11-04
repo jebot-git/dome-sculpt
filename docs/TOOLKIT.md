@@ -26,6 +26,36 @@ current desktop acceptance requirement.
 
 # Earlier24-patch lifecycle baseline
 
+The desktop now requires canonical27/poll runtime source
+`6fa2624f89ddb105e482326995daec0bdbfd6643` (qualified metadata
+`341152b`, on the same code). Patches25/26/27 provide responsive bitmap-scale
+file pickers, actual Enter callback authority and exact X11 clipboard
+reply/ownership cleanup. The canonical builder enables upstream
+`FLTK_USE_POLL=ON`, avoiding the demonstrated high-descriptor select overflow.
+
+CMake verifies all three installed patch checksums and a generated runtime
+profile. That profile must bind the selected prefix, actual private poll
+configuration, builder/complete patch chain and every imported toolkit
+library digest. Stale cached libraries outside the selected prefix refuse.
+The previous24-patch SDK and incomplete25/26 configurations intentionally refuse.
+All165 public include files, FileChooser layout and old exported symbols are
+retained; there is no application/public class-layout change.
+
+Use the canonical builder from the pinned source as a regular user. Its new
+Release and owned ASan/UBSan prefixes are separate. The bitmap runtime remains
+exact canonical53b0fca; its sources/helper/builder are byte-identical at the new
+FLTK pin. No system installation is required.
+
+The qualified matching Sculpt evidence is an explicit SDK-only runtime delta:
+coherent c092 app/core/support binaries, four actual export/Open/Save/Cancel/Close
+menu runs (15 checks each), and native Wayland projection/filename/paint/history
+runs (9 named checks each). This is not a new whole-app build.
+See [TOOLKIT-POLL-ADOPTION.md](TOOLKIT-POLL-ADOPTION.md) and its machine receipt
+for final immutable paths, exact mapped libraries, configure controls, negative
+cohorts and scope. Previous lifecycle evidence below remains historical.
+
+## Earlier24-patch lifecycle baseline
+
 That baseline required canonical DomeD revision
 `53b0fcaf533ad867300d65a4178285d0a2dbef58` and its24th
 `fltk-1.4.5-process-cleanup.patch`. The native process display owner closes the

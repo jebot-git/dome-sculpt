@@ -67,14 +67,12 @@ async def main():
         # Serve the real X11 clipboard throughout D-Bus menu calls: toolkit
         # clipboard probing may be synchronous. XSync alone does not acknowledge
         # FLTK input processing; copy the actual text back before submitting.
-        async def choose(chooser,target):
+        async def choose(chooser,target,navigate=False):
             from Xlib import Xatom
             from Xlib.protocol import event
             clipboard=d.intern_atom('CLIPBOARD');utf8=d.intern_atom('UTF8_STRING');targets=d.intern_atom('TARGETS')
-            owner=d.screen().root.create_window(0,0,1,1,0,X.CopyFromParent)
-            sent=False;copied=[]
+            owner=d.screen().root.create_window(0,0,1,1,0,X.CopyFromParent);offered=str(target);copied=[]
             async def serve():
-                nonlocal sent
                 while True:
                     while d.pending_events():
                         request=d.next_event()
@@ -85,30 +83,49 @@ async def main():
                         if request.type==X.SelectionRequest:
                             prop=request.property or request.target
                             if request.target==targets:request.requestor.change_property(prop,Xatom.ATOM,32,[utf8,Xatom.STRING,targets])
-                            elif request.target in [utf8,Xatom.STRING]:request.requestor.change_property(prop,request.target,8,str(target).encode());sent=True
+                            elif request.target in [utf8,Xatom.STRING]:request.requestor.change_property(prop,request.target,8,offered.encode())
                             else:prop=X.NONE
                             request.requestor.send_event(event.SelectionNotify(time=request.time,requestor=request.requestor,selection=request.selection,target=request.target,property=prop),propagate=False);d.flush()
                     await asyncio.sleep(.01)
-            server=asyncio.create_task(serve())
-            owner.set_selection_owner(clipboard,X.CurrentTime);d.sync()
-            chooser.set_input_focus(X.RevertToParent,X.CurrentTime);d.sync()
-            g=chooser.get_geometry();xtest.fake_input(d,X.MotionNotify,x=g.x+g.width//2,y=g.y+g.height-57);xtest.fake_input(d,X.ButtonPress,1);xtest.fake_input(d,X.ButtonRelease,1);d.sync()
-            await asyncio.sleep(.2);await command('Select All')
-            for _ in range(100):
-                state=await nodes()
-                if state['Copy'][1].get('enabled',True) and state['Paste'][1].get('enabled',True):break
-                await asyncio.sleep(.05)
-            else:raise AssertionError('Native filename input did not acquire editable focus')
-            await command('Paste')
-            await asyncio.sleep(.2)
-            await command('Select All');await command('Copy')
-            reader=d.screen().root.create_window(0,0,1,1,0,X.CopyFromParent);reader.convert_selection(clipboard,utf8,d.intern_atom('DOME_INPUT_ACK'),X.CurrentTime);d.flush();await wait(lambda:copied,10)
-            check(copied[0]==str(target),'Native filename input acknowledges the complete '+target.name+' destination');reader.destroy()
+            server=asyncio.create_task(serve());mask=d.display.info.resource_id_mask;application_base=window.id&~mask
+            def clipboard_is_application():
+                current=d.get_selection_owner(clipboard)
+                return current and current.id!=owner.id and current.id&~mask==application_base
+            async def copyback():
+                await command('Select All');await command('Copy')
+                try:await wait(clipboard_is_application,10)
+                except TimeoutError:
+                    current=d.get_selection_owner(clipboard);(out/'clipboard-owner-failure.json').write_text(json.dumps({'offered':offered,'sender':owner.id,'actual_owner':current.id if current else None,'expected_application_base':application_base,'menu':await nodes()},indent=2)+'\n')
+                    raise AssertionError('Native filename Copy did not transfer clipboard ownership to the actual application client')
+                copied.clear();reader=d.screen().root.create_window(0,0,1,1,0,X.CopyFromParent);reader.convert_selection(clipboard,utf8,d.intern_atom('DOME_INPUT_ACK'),X.CurrentTime);d.flush();await wait(lambda:copied,10);reader.destroy();return copied[0]
+            async def paste_ack(value,counted=False):
+                nonlocal offered
+                offered=str(value);owner.set_selection_owner(clipboard,X.CurrentTime);d.sync();chooser.set_input_focus(X.RevertToParent,X.CurrentTime);d.sync()
+                # Only an active, visible Fl_Input_ in this actual modal enables
+                # Select All. Its default filename focus avoids guessed pixels.
+                for _ in range(200):
+                    state=await nodes()
+                    if state['Select All'][1].get('enabled',False) and state['Paste'][1].get('enabled',False):break
+                    await asyncio.sleep(.05)
+                else:raise AssertionError('Native filename focus readiness was not published')
+                await command('Select All');await command('Paste');await asyncio.sleep(.2)
+                assert chooser.get_attributes().map_state==X.IsViewable,'Universal Paste must not accept a filename before actual Return'
+                value_back=await copyback();assert value_back==offered,'Native filename copy-back differs from the offered destination'
+                with (out/'clipboard-ack.jsonl').open('a') as proof:proof.write(json.dumps({'destination':offered,'actual':value_back,'sender':owner.id,'owner':d.get_selection_owner(clipboard).id,'application_client_base':application_base})+'\n')
+                if counted:check(value_back==str(target),'Native filename input acknowledges the complete '+target.name+' destination')
+            if navigate:
+                directory=target.parent/'chooser navigation 日本語';directory.mkdir();await paste_ack(directory)
+                key('Return');await asyncio.sleep(.2);assert chooser.get_attributes().map_state==X.IsViewable,'Directory Return navigates without accepting a file'
+                directory_back=await copyback();assert Path(directory_back)==directory,'Actual Return must update the native directory field'
+                (out/'directory-return.json').write_text(json.dumps({'requested':str(directory),'actual_filename':directory_back,'chooser_stays_open':True},indent=2)+'\n')
+            await paste_ack(target,True)
+            g=chooser.get_geometry();screen_geometry=d.screen();assert g.x>=0 and g.y>=0 and g.x+g.width<=screen_geometry.width_in_pixels and g.y+g.height<=screen_geometry.height_in_pixels,'Native chooser must fit the actual viewport'
             raw=chooser.get_image(0,0,g.width,g.height,X.ZPixmap,0xffffffff);Image.frombytes('RGB',(g.width,g.height),raw.data,'raw','BGRX').save(out/('chooser-'+target.name+'.png'))
-            tap(chooser,g.width-118,g.height-21);await asyncio.sleep(.2);server.cancel();await asyncio.gather(server,return_exceptions=True);owner.destroy();d.sync()
+            state=await nodes();assert state['Select All'][1].get('enabled',False),'Acknowledged native filename lost focus'
+            chooser.set_input_focus(X.RevertToParent,X.CurrentTime);d.sync();key('Return');await asyncio.sleep(.2);server.cancel();await asyncio.gather(server,return_exceptions=True);owner.destroy();d.sync()
         def tap(window,x,y):
             g=window.get_geometry();xtest.fake_input(d,X.MotionNotify,x=g.x+int(x),y=g.y+int(y));xtest.fake_input(d,X.ButtonPress,1);xtest.fake_input(d,X.ButtonRelease,1);d.sync()
-        await ready();values=await nodes();label='Export editable project (.glb)...'
+        await ready();(out/'runtime-maps.txt').write_text(Path('/proc/'+str(app.pid)+'/maps').read_text());values=await nodes();label='Export editable project (.glb)...'
         check(values[label][1].get('enabled',True),'Editable project export is an actual enabled DomeD universal-menu command')
         await command(label);options=await wait(lambda:named('Editable GLB export'))
         check(options.get_wm_transient_for().id==window.id and options.get_wm_class()[1]==window.get_wm_class()[1],'Portable policy uses a native FLTK modal with shared document identity')
@@ -121,7 +138,7 @@ async def main():
         row=48 if compact else 36;tap(options,g.width*.65,g.height-row/2-12)
         await wait(lambda:named('Editable GLB export') is None);chooser=await wait(lambda:named('Export editable project'))
         check(chooser.get_wm_transient_for().id==window.id,'Confirmed portable policy opens the actual owned GLB file chooser')
-        await choose(chooser,package);await wait(lambda:named('Export editable project') is None)
+        await choose(chooser,package,True);await wait(lambda:named('Export editable project') is None)
         try:await wait(lambda:package.exists(),90)
         except TimeoutError:
             g=window.get_geometry();raw=window.get_image(0,0,g.width,g.height,X.ZPixmap,0xffffffff)

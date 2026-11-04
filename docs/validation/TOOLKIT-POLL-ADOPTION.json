@@ -1,0 +1,646 @@
+{
+  "schema": 1,
+  "state": "qualified SDK-only adoption and native workflow delta; parent runtime c092 unchanged",
+  "runtime_base": "c09202fbf092eaa4d9ddf8d9a2249fe7bf013e74",
+  "guard_commit": "276853746e77a133cfb6f32123e14da6aa5b2692",
+  "canonical_runtime": "6fa2624f89ddb105e482326995daec0bdbfd6643",
+  "canonical_metadata": "341152b2429d28e70834917bc65c371b044481e8",
+  "source_sha256": {
+    "CMakeLists.txt": "f2b4781e9a557334d5d82d756b21ea9ee6dc2ffec6ae38ffd7d44ecffa6bc357",
+    "third_party/sources.json": "0795267719141fa1af506858ea19e30f1cfbcb514eafdc1aa0e09ea683b3ac07",
+    "tests/source-paint-authoring-menu.py": "a08d62874a5ec34f7c052eb0b0d88ce18a2c1eeaa3b6c6cd6b0aa697320f6314",
+    "tests/projection-wayland.py": "f136fdf20c146bca778694864d270c796081e67fe15f50b4fffc9517329f97b8"
+  },
+  "sdk": {
+    "release": {
+      "prefix": "/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-release",
+      "profile": {
+        "schema": 1,
+        "use_poll": true,
+        "source_patch_sha256": "34091d15335d695f3bb328f3ccdcb4f68110f47a75271c563ba909c3682815b2",
+        "archive_sha256": "eede1fb2b8e9c2e581e77082e15252145855c79aad30070ee3b24aabe2f926f1",
+        "builder_sha256": "85cc04718523dbebfe0ac6c4384fa341641dabdb5022fff98998e18d2e783011",
+        "private_config_sha256": "4ca821fe37dfc7b8a65c9a17671bea43df3f9d97647017a867a11b7410ea9585",
+        "toolkit_libraries": {
+          "lib/libfltk.so": "095b5435a80e3df959a5ac7559036785f9c39ac87c32ef3658b0fdad96c41066",
+          "lib/libfltk.so.1.4": "095b5435a80e3df959a5ac7559036785f9c39ac87c32ef3658b0fdad96c41066",
+          "lib/libfltk.so.1.4.5": "095b5435a80e3df959a5ac7559036785f9c39ac87c32ef3658b0fdad96c41066",
+          "lib/libfltk_cairo.so": "9f595566ef8a8b12993e4e0e1b1f25051f66692bc6e58e56b97d9705a65e014c",
+          "lib/libfltk_cairo.so.1.4": "9f595566ef8a8b12993e4e0e1b1f25051f66692bc6e58e56b97d9705a65e014c",
+          "lib/libfltk_cairo.so.1.4.5": "9f595566ef8a8b12993e4e0e1b1f25051f66692bc6e58e56b97d9705a65e014c",
+          "lib/libfltk_gl.so": "9291feb964ab547ca6c26f23e47aa6f428450e5db2fead4df24000af555cf846",
+          "lib/libfltk_gl.so.1.4": "9291feb964ab547ca6c26f23e47aa6f428450e5db2fead4df24000af555cf846",
+          "lib/libfltk_gl.so.1.4.5": "9291feb964ab547ca6c26f23e47aa6f428450e5db2fead4df24000af555cf846",
+          "lib/libfltk_images.so": "8975bed2f2000fa1be94cba95b60c3e6fc5a296de7a85acd7cd598f50419298a",
+          "lib/libfltk_images.so.1.4": "8975bed2f2000fa1be94cba95b60c3e6fc5a296de7a85acd7cd598f50419298a",
+          "lib/libfltk_images.so.1.4.5": "8975bed2f2000fa1be94cba95b60c3e6fc5a296de7a85acd7cd598f50419298a"
+        }
+      },
+      "profile_sha256": "a4e17b9f50ed86f6ddcd906ada3399cf1b95d9fc9740cd6526944eda319a1ffc"
+    },
+    "sanitize": {
+      "prefix": "/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-sanitize",
+      "profile": {
+        "schema": 1,
+        "use_poll": true,
+        "source_patch_sha256": "34091d15335d695f3bb328f3ccdcb4f68110f47a75271c563ba909c3682815b2",
+        "archive_sha256": "eede1fb2b8e9c2e581e77082e15252145855c79aad30070ee3b24aabe2f926f1",
+        "builder_sha256": "85cc04718523dbebfe0ac6c4384fa341641dabdb5022fff98998e18d2e783011",
+        "private_config_sha256": "04b324fcfd2acb41bd92bf7d0c80c29d4ed0923cefef9266dc9826204561765b",
+        "toolkit_libraries": {
+          "lib/libfltk.so": "fbb0b153988bdd461943d56b6a685f9247cd3035601596a5ac4793f7722362cf",
+          "lib/libfltk.so.1.4": "fbb0b153988bdd461943d56b6a685f9247cd3035601596a5ac4793f7722362cf",
+          "lib/libfltk.so.1.4.5": "fbb0b153988bdd461943d56b6a685f9247cd3035601596a5ac4793f7722362cf",
+          "lib/libfltk_cairo.so": "9ab675b4cfce2616845d25207f149d0ffca8bd19a9c3a660d31ff18bfe05ce65",
+          "lib/libfltk_cairo.so.1.4": "9ab675b4cfce2616845d25207f149d0ffca8bd19a9c3a660d31ff18bfe05ce65",
+          "lib/libfltk_cairo.so.1.4.5": "9ab675b4cfce2616845d25207f149d0ffca8bd19a9c3a660d31ff18bfe05ce65",
+          "lib/libfltk_gl.so": "670603234f367801593c8500051aa6bf61923c689892a4c32585555adb7975b9",
+          "lib/libfltk_gl.so.1.4": "670603234f367801593c8500051aa6bf61923c689892a4c32585555adb7975b9",
+          "lib/libfltk_gl.so.1.4.5": "670603234f367801593c8500051aa6bf61923c689892a4c32585555adb7975b9",
+          "lib/libfltk_images.so": "66165a34be996ac7d29bd496fa059fce5b61af349fb49793f5d7ac4175da5915",
+          "lib/libfltk_images.so.1.4": "66165a34be996ac7d29bd496fa059fce5b61af349fb49793f5d7ac4175da5915",
+          "lib/libfltk_images.so.1.4.5": "66165a34be996ac7d29bd496fa059fce5b61af349fb49793f5d7ac4175da5915"
+        }
+      },
+      "profile_sha256": "802ca3d363653a45b37aa3cd1eb2681fb72629bb14959c45023860afb1187029"
+    }
+  },
+  "abi": {
+    "public_files_exact_per_profile": 165,
+    "old_exports_missing": [],
+    "class_size": 6328,
+    "manifest": "artifacts/poll-proof/final-abi.json",
+    "manifest_sha256": "cd0d07e31260b1e426b88be20ecee4a6ac86a197de5f98f4f86014f8750620aa",
+    "compatibility": "Private obsolete fdsets symbol storage retained; actual dispatcher uses official poll"
+  },
+  "canonical_receipt": {
+    "path": "/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/docs/validation/X11-CLIPBOARD-POLL.json",
+    "sha256": "d862899a7c8265c5d18d6e7c53de83d64dded3e60f8fa883a82562fe14ed15c5"
+  },
+  "snapshots": {
+    "release": {
+      "manifest": {
+        "path": "artifacts/viewport-proof/release-complete-snapshot.json",
+        "sha256": "3d8bd76be3829e18fc7efea5c509801167eb95028522e2a1c8f13d70f948a709"
+      },
+      "scope": "Completed coherent c092 own app/inspector/helpers/all app own static-link support; explicit matching SDK runtime delta, no product recompilation.",
+      "parent_status": {
+        "state": "terminal",
+        "pid": 268056,
+        "source": "c09202fbf092eaa4d9ddf8d9a2249fe7bf013e74",
+        "scope": "Coherent optimized ALL-target continuation of the fresh158b build. New source combines key29/selector5258, painted-native927, append6bff, XRd1f and canonical551 provenance; complete changed owned TUs and header dependents rebuilt in same owned build. No foreign archives. Original88percent missing-cgltf failure preserved; target dependency fixed. Build only, no combined regression/UI/device claim.",
+        "command": [
+          "cmake",
+          "--build",
+          "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-union-c5/build-union-release",
+          "--parallel",
+          "2"
+        ],
+        "child_pid": 268110,
+        "exit_code": 0,
+        "seconds": 2518.818004878005,
+        "inputs": 2176,
+        "drift": []
+      },
+      "copied_files": 15
+    },
+    "sanitize": {
+      "manifest": {
+        "path": "artifacts/viewport-proof/sanitize-complete-snapshot.json",
+        "sha256": "5cae123d6ec755af65a1bfb25a8d551792517f303998e87025a068ee457c8267"
+      },
+      "scope": "Completed coherent c092 own app/inspector/helpers/all app own static-link support; explicit matching SDK runtime delta, no product recompilation.",
+      "parent_status": {
+        "state": "terminal",
+        "pid": 284129,
+        "source": "c09202fbf092eaa4d9ddf8d9a2249fe7bf013e74",
+        "scope": "Fresh ALL-target native CPU FLTK/OpenXR own C/C++ ASan+UBSan build with matching owned instrumented FLTK; optimized external canonical53b bitmap libraries are not sanitizer-instrumented. Combined key29/selector/nativeproducer/append/XRexport source. No preceding archives or objects reused. Build only; no runtime/UI/device/fullgoal claim.",
+        "steps": [
+          {
+            "phase": "configure",
+            "command": [
+              "cmake",
+              "-S",
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-union-c5",
+              "-B",
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-union-c5/build-union-sanitize",
+              "-DCMAKE_BUILD_TYPE=Release",
+              "-DDOME_COMPUTE_BACKEND=CPU",
+              "-DDOME_BUILD_UI=ON",
+              "-DDOME_BUILD_XR=ON",
+              "-DCMAKE_EXPORT_COMPILE_COMMANDS=ON",
+              "-DFLTK_DIR=/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/toolkit-sanitize/share/fltk",
+              "-U*DOME_BITMAP_RUNTIME*",
+              "-U*NATIVEGL*",
+              "-U*RENDERFONTS*",
+              "-DCMAKE_C_FLAGS_RELEASE=-O1 -g1 -fsanitize=address,undefined -fno-omit-frame-pointer",
+              "-DCMAKE_CXX_FLAGS_RELEASE=-O1 -g1 -fsanitize=address,undefined -fno-omit-frame-pointer",
+              "-DCMAKE_EXE_LINKER_FLAGS=-fsanitize=address,undefined",
+              "-DCMAKE_SHARED_LINKER_FLAGS=-fsanitize=address,undefined"
+            ],
+            "exit": 0,
+            "seconds": 5.680504065006971
+          },
+          {
+            "phase": "build",
+            "command": [
+              "cmake",
+              "--build",
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-union-c5/build-union-sanitize",
+              "--parallel",
+              "2"
+            ],
+            "exit": 0,
+            "seconds": 4751.117859077
+          }
+        ],
+        "phase": "build",
+        "child_pid": 285315,
+        "exit_code": 0,
+        "seconds": 4757.587303770008,
+        "inputs": 2176,
+        "drift": []
+      },
+      "copied_files": 15
+    }
+  },
+  "cohorts": [
+    {
+      "name": "poll-release-normal",
+      "status": {
+        "state": "terminal",
+        "pid": 1143074,
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/selection-gui-venv/bin/python",
+          "tests/source-paint-authoring-menu.py"
+        ],
+        "child_pid": 1143837,
+        "exit": 0,
+        "seconds": 53.145630954008084,
+        "inputs": 3892,
+        "drift": []
+      },
+      "named_checks": 15,
+      "source_metadata_sha256_during_run": "7ffab69fc55f03c99c19eaed3c2ef05d6909e3f15d7a2828342aee84a54144e2",
+      "report": {
+        "path": "artifacts/viewport-proof/ui-poll-release-normal/report.json",
+        "sha256": "357e32e14b293a75a57219e25c86887677a620cbe3b60a4141a8ad3847d58e71"
+      },
+      "runtime_maps": {
+        "path": "artifacts/viewport-proof/ui-poll-release-normal/runtime-maps.txt",
+        "sha256": "2e6f390804d218e527390aaf1999a9594f249e3230c0a7a79609a26c8b2c50d0"
+      },
+      "before": {
+        "path": "artifacts/viewport-proof/poll-release-normal/before.json",
+        "sha256": "a5f7c862f681ee8543204eb3266e4e3de08d24bd56e0c993f84177ea8e0fb235"
+      },
+      "after": {
+        "path": "artifacts/viewport-proof/poll-release-normal/after.json",
+        "sha256": "a5f7c862f681ee8543204eb3266e4e3de08d24bd56e0c993f84177ea8e0fb235"
+      },
+      "details": {
+        "clipboard-ack.jsonl": {
+          "path": "artifacts/viewport-proof/ui-poll-release-normal/clipboard-ack.jsonl",
+          "sha256": "d359dac70d79dcfb6162277a47a03fb34d2f2caefe7e123674cbdc3005a13181"
+        },
+        "directory-return.json": {
+          "path": "artifacts/viewport-proof/ui-poll-release-normal/directory-return.json",
+          "sha256": "d5d8b9fa401a084baccb6ac3fb8c8c2fde69529af0cc2107dbf7cf54a6f1713a"
+        }
+      }
+    },
+    {
+      "name": "poll-release-compact",
+      "status": {
+        "state": "terminal",
+        "pid": 1143078,
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/selection-gui-venv/bin/python",
+          "tests/source-paint-authoring-menu.py"
+        ],
+        "child_pid": 1143707,
+        "exit": 0,
+        "seconds": 52.73049682000419,
+        "inputs": 3892,
+        "drift": []
+      },
+      "named_checks": 15,
+      "source_metadata_sha256_during_run": "7ffab69fc55f03c99c19eaed3c2ef05d6909e3f15d7a2828342aee84a54144e2",
+      "report": {
+        "path": "artifacts/viewport-proof/ui-poll-release-compact/report.json",
+        "sha256": "357e32e14b293a75a57219e25c86887677a620cbe3b60a4141a8ad3847d58e71"
+      },
+      "runtime_maps": {
+        "path": "artifacts/viewport-proof/ui-poll-release-compact/runtime-maps.txt",
+        "sha256": "5605132992e2eb6b4c510140dc9149216037303e3af219f00f8465bfec5778db"
+      },
+      "before": {
+        "path": "artifacts/viewport-proof/poll-release-compact/before.json",
+        "sha256": "a5f7c862f681ee8543204eb3266e4e3de08d24bd56e0c993f84177ea8e0fb235"
+      },
+      "after": {
+        "path": "artifacts/viewport-proof/poll-release-compact/after.json",
+        "sha256": "a5f7c862f681ee8543204eb3266e4e3de08d24bd56e0c993f84177ea8e0fb235"
+      },
+      "details": {
+        "clipboard-ack.jsonl": {
+          "path": "artifacts/viewport-proof/ui-poll-release-compact/clipboard-ack.jsonl",
+          "sha256": "d8f67473f78221fc2dd02c83827ce3ddc2ca5e537d0e1cbcf8d535a9a814bfff"
+        },
+        "directory-return.json": {
+          "path": "artifacts/viewport-proof/ui-poll-release-compact/directory-return.json",
+          "sha256": "70a45eed800d50d2547c6c59b4e5a802c59d45c20ffaa456c615cf88833da260"
+        }
+      }
+    },
+    {
+      "name": "poll-sanitize-normal",
+      "status": {
+        "state": "terminal",
+        "pid": 1143080,
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/selection-gui-venv/bin/python",
+          "tests/source-paint-authoring-menu.py"
+        ],
+        "child_pid": 1143836,
+        "exit": 0,
+        "seconds": 74.31170513099642,
+        "inputs": 3892,
+        "drift": []
+      },
+      "named_checks": 15,
+      "source_metadata_sha256_during_run": "7ffab69fc55f03c99c19eaed3c2ef05d6909e3f15d7a2828342aee84a54144e2",
+      "report": {
+        "path": "artifacts/viewport-proof/ui-poll-sanitize-normal/report.json",
+        "sha256": "357e32e14b293a75a57219e25c86887677a620cbe3b60a4141a8ad3847d58e71"
+      },
+      "runtime_maps": {
+        "path": "artifacts/viewport-proof/ui-poll-sanitize-normal/runtime-maps.txt",
+        "sha256": "99be3c58398fe1a6ab0b66fad987be31258879cf4019cb9f8e6b06208e7bed34"
+      },
+      "before": {
+        "path": "artifacts/viewport-proof/poll-sanitize-normal/before.json",
+        "sha256": "a5f7c862f681ee8543204eb3266e4e3de08d24bd56e0c993f84177ea8e0fb235"
+      },
+      "after": {
+        "path": "artifacts/viewport-proof/poll-sanitize-normal/after.json",
+        "sha256": "a5f7c862f681ee8543204eb3266e4e3de08d24bd56e0c993f84177ea8e0fb235"
+      },
+      "details": {
+        "clipboard-ack.jsonl": {
+          "path": "artifacts/viewport-proof/ui-poll-sanitize-normal/clipboard-ack.jsonl",
+          "sha256": "5b9709fa0fabe4fa10644cd099d236205d0f0e8c4d48b61e742bbe5d43bf0475"
+        },
+        "directory-return.json": {
+          "path": "artifacts/viewport-proof/ui-poll-sanitize-normal/directory-return.json",
+          "sha256": "6d1ffe371e29ad48530dd974357eab18c05bd39e0fa5e8ff9bf9df8ce0ad888a"
+        }
+      }
+    },
+    {
+      "name": "poll-sanitize-compact",
+      "status": {
+        "state": "terminal",
+        "pid": 1143081,
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/selection-gui-venv/bin/python",
+          "tests/source-paint-authoring-menu.py"
+        ],
+        "child_pid": 1143839,
+        "exit": 0,
+        "seconds": 75.8108794290165,
+        "inputs": 3892,
+        "drift": []
+      },
+      "named_checks": 15,
+      "source_metadata_sha256_during_run": "7ffab69fc55f03c99c19eaed3c2ef05d6909e3f15d7a2828342aee84a54144e2",
+      "report": {
+        "path": "artifacts/viewport-proof/ui-poll-sanitize-compact/report.json",
+        "sha256": "357e32e14b293a75a57219e25c86887677a620cbe3b60a4141a8ad3847d58e71"
+      },
+      "runtime_maps": {
+        "path": "artifacts/viewport-proof/ui-poll-sanitize-compact/runtime-maps.txt",
+        "sha256": "3e51712d8e71ab90348666ddd07455fb321dec8cfd651c2f4f886d1ee67f2634"
+      },
+      "before": {
+        "path": "artifacts/viewport-proof/poll-sanitize-compact/before.json",
+        "sha256": "a5f7c862f681ee8543204eb3266e4e3de08d24bd56e0c993f84177ea8e0fb235"
+      },
+      "after": {
+        "path": "artifacts/viewport-proof/poll-sanitize-compact/after.json",
+        "sha256": "a5f7c862f681ee8543204eb3266e4e3de08d24bd56e0c993f84177ea8e0fb235"
+      },
+      "details": {
+        "clipboard-ack.jsonl": {
+          "path": "artifacts/viewport-proof/ui-poll-sanitize-compact/clipboard-ack.jsonl",
+          "sha256": "e9dd36de5e494452bf70b5cd6c54d1c4d38f9b4f306282f8077511636bdb341a"
+        },
+        "directory-return.json": {
+          "path": "artifacts/viewport-proof/ui-poll-sanitize-compact/directory-return.json",
+          "sha256": "3cd36a05e2463e1d87a50909ae47439071a7e35c01ea53a7a9619fad3d7f4d14"
+        }
+      }
+    },
+    {
+      "name": "wayland-poll-release",
+      "status": {
+        "state": "terminal",
+        "pid": 1143079,
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/selection-gui-venv/bin/python",
+          "tests/projection-wayland.py"
+        ],
+        "child_pid": 1143838,
+        "exit": 0,
+        "seconds": 49.09781868400751,
+        "inputs": 3893,
+        "drift": []
+      },
+      "named_checks": 9,
+      "source_metadata_sha256_during_run": "7ffab69fc55f03c99c19eaed3c2ef05d6909e3f15d7a2828342aee84a54144e2",
+      "report": {
+        "path": "artifacts/viewport-proof/ui-wayland-poll-release/report.json",
+        "sha256": "5ddab1ec1ba80525087dbe3867730cf7e6ed9fbb7f31552023575e08f8e2b4d6"
+      },
+      "runtime_maps": {
+        "path": "artifacts/viewport-proof/ui-wayland-poll-release/runtime-maps.txt",
+        "sha256": "2616d07643af66b4a70b98218aca2fe4e82ac0b8708b7afb9985ff376ba65787"
+      },
+      "before": {
+        "path": "artifacts/viewport-proof/wayland-poll-release/before.json",
+        "sha256": "ce78157786c483e9ec43c6e91ccfd15c0cc6b4e01793595aab4cdeb8c8bfbb5d"
+      },
+      "after": {
+        "path": "artifacts/viewport-proof/wayland-poll-release/after.json",
+        "sha256": "ce78157786c483e9ec43c6e91ccfd15c0cc6b4e01793595aab4cdeb8c8bfbb5d"
+      },
+      "details": {}
+    },
+    {
+      "name": "wayland-poll-sanitize",
+      "status": {
+        "state": "terminal",
+        "pid": 1143082,
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/selection-gui-venv/bin/python",
+          "tests/projection-wayland.py"
+        ],
+        "child_pid": 1143683,
+        "exit": 0,
+        "seconds": 69.23146913899109,
+        "inputs": 3893,
+        "drift": []
+      },
+      "named_checks": 9,
+      "source_metadata_sha256_during_run": "7ffab69fc55f03c99c19eaed3c2ef05d6909e3f15d7a2828342aee84a54144e2",
+      "report": {
+        "path": "artifacts/viewport-proof/ui-wayland-poll-sanitize/report.json",
+        "sha256": "5ddab1ec1ba80525087dbe3867730cf7e6ed9fbb7f31552023575e08f8e2b4d6"
+      },
+      "runtime_maps": {
+        "path": "artifacts/viewport-proof/ui-wayland-poll-sanitize/runtime-maps.txt",
+        "sha256": "4a627838201759a98980d5ca0dfaf1bfd009573c005cb0e49ea0d2eb0925a4eb"
+      },
+      "before": {
+        "path": "artifacts/viewport-proof/wayland-poll-sanitize/before.json",
+        "sha256": "ce78157786c483e9ec43c6e91ccfd15c0cc6b4e01793595aab4cdeb8c8bfbb5d"
+      },
+      "after": {
+        "path": "artifacts/viewport-proof/wayland-poll-sanitize/after.json",
+        "sha256": "ce78157786c483e9ec43c6e91ccfd15c0cc6b4e01793595aab4cdeb8c8bfbb5d"
+      },
+      "details": {}
+    }
+  ],
+  "configure_controls": {
+    "report": {
+      "path": "artifacts/viewport-proof/configure-controls/report.json",
+      "sha256": "caac66460dcd6e96af11ccde5a81952c58c1c67f2dbd42ceb53feac69b3d2709"
+    },
+    "results": [
+      {
+        "name": "old24",
+        "exit": 1,
+        "seconds": 3.2575877899944317,
+        "expected_diagnostic": "compact file-picker viewport",
+        "passed": true,
+        "command": [
+          "cmake",
+          "-S",
+          "/home/blux/de-xr/dome-sculpt/artifacts/toolkit-viewport25-c092",
+          "-B",
+          "/home/blux/de-xr/dome-sculpt/artifacts/toolkit-viewport25-c092/artifacts/viewport-proof/configure-controls/build-old24",
+          "-DDOME_COMPUTE_BACKEND=CPU",
+          "-DDOME_BUILD_UI=ON",
+          "-DDOME_BUILD_XR=OFF",
+          "-DFLTK_DIR=/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/toolkit/share/fltk",
+          "-U*DOME_BITMAP_RUNTIME*",
+          "-U*NATIVEGL*",
+          "-U*RENDERFONTS*"
+        ]
+      },
+      {
+        "name": "old25",
+        "exit": 1,
+        "seconds": 3.2670901689853054,
+        "expected_diagnostic": "filename callback-reason",
+        "passed": true,
+        "command": [
+          "cmake",
+          "-S",
+          "/home/blux/de-xr/dome-sculpt/artifacts/toolkit-viewport25-c092",
+          "-B",
+          "/home/blux/de-xr/dome-sculpt/artifacts/toolkit-viewport25-c092/artifacts/viewport-proof/configure-controls/build-old25",
+          "-DDOME_COMPUTE_BACKEND=CPU",
+          "-DDOME_BUILD_UI=ON",
+          "-DDOME_BUILD_XR=OFF",
+          "-DFLTK_DIR=/home/blux/de-xr/DomeD/artifacts/fltk-picker-viewport-53b/artifacts/toolkit-picker-final/share/fltk",
+          "-U*DOME_BITMAP_RUNTIME*",
+          "-U*NATIVEGL*",
+          "-U*RENDERFONTS*"
+        ]
+      },
+      {
+        "name": "old26",
+        "exit": 1,
+        "seconds": 3.045072397973854,
+        "expected_diagnostic": "X11 clipboard ownership/query",
+        "passed": true,
+        "command": [
+          "cmake",
+          "-S",
+          "/home/blux/de-xr/dome-sculpt/artifacts/toolkit-viewport25-c092",
+          "-B",
+          "/home/blux/de-xr/dome-sculpt/artifacts/toolkit-viewport25-c092/artifacts/viewport-proof/configure-controls/build-old26",
+          "-DDOME_COMPUTE_BACKEND=CPU",
+          "-DDOME_BUILD_UI=ON",
+          "-DDOME_BUILD_XR=OFF",
+          "-DFLTK_DIR=/home/blux/de-xr/DomeD/artifacts/fltk-picker-callback-981/artifacts/toolkit-callback-release/share/fltk",
+          "-U*DOME_BITMAP_RUNTIME*",
+          "-U*NATIVEGL*",
+          "-U*RENDERFONTS*"
+        ]
+      },
+      {
+        "name": "false-profile",
+        "exit": 1,
+        "seconds": 2.978464994026581,
+        "expected_diagnostic": "must use the poll backend",
+        "passed": true,
+        "command": [
+          "cmake",
+          "-S",
+          "/home/blux/de-xr/dome-sculpt/artifacts/toolkit-viewport25-c092",
+          "-B",
+          "/home/blux/de-xr/dome-sculpt/artifacts/toolkit-viewport25-c092/artifacts/viewport-proof/configure-controls/build-false-profile",
+          "-DDOME_COMPUTE_BACKEND=CPU",
+          "-DDOME_BUILD_UI=ON",
+          "-DDOME_BUILD_XR=OFF",
+          "-DFLTK_DIR=/home/blux/de-xr/dome-sculpt/artifacts/toolkit-viewport25-c092/artifacts/viewport-proof/configure-controls/fixtures/false-profile/share/fltk",
+          "-U*DOME_BITMAP_RUNTIME*",
+          "-U*NATIVEGL*",
+          "-U*RENDERFONTS*"
+        ]
+      },
+      {
+        "name": "off-config",
+        "exit": 1,
+        "seconds": 3.044545853015734,
+        "expected_diagnostic": "does not match its actual poll-enabled private configuration",
+        "passed": true,
+        "command": [
+          "cmake",
+          "-S",
+          "/home/blux/de-xr/dome-sculpt/artifacts/toolkit-viewport25-c092",
+          "-B",
+          "/home/blux/de-xr/dome-sculpt/artifacts/toolkit-viewport25-c092/artifacts/viewport-proof/configure-controls/build-off-config",
+          "-DDOME_COMPUTE_BACKEND=CPU",
+          "-DDOME_BUILD_UI=ON",
+          "-DDOME_BUILD_XR=OFF",
+          "-DFLTK_DIR=/home/blux/de-xr/dome-sculpt/artifacts/toolkit-viewport25-c092/artifacts/viewport-proof/configure-controls/fixtures/off-config/share/fltk",
+          "-U*DOME_BITMAP_RUNTIME*",
+          "-U*NATIVEGL*",
+          "-U*RENDERFONTS*"
+        ]
+      },
+      {
+        "name": "stale-import",
+        "exit": 1,
+        "seconds": 2.9451123070030008,
+        "expected_diagnostic": "outside its selected canonical FLTK profile prefix",
+        "passed": true,
+        "command": [
+          "cmake",
+          "-S",
+          "/home/blux/de-xr/dome-sculpt/artifacts/toolkit-viewport25-c092",
+          "-B",
+          "/home/blux/de-xr/dome-sculpt/artifacts/toolkit-viewport25-c092/artifacts/viewport-proof/configure-controls/build-stale-import",
+          "-DDOME_COMPUTE_BACKEND=CPU",
+          "-DDOME_BUILD_UI=ON",
+          "-DDOME_BUILD_XR=OFF",
+          "-DFLTK_DIR=/home/blux/de-xr/dome-sculpt/artifacts/toolkit-viewport25-c092/artifacts/viewport-proof/configure-controls/fixtures/stale-import/share/fltk",
+          "-U*DOME_BITMAP_RUNTIME*",
+          "-U*NATIVEGL*",
+          "-U*RENDERFONTS*"
+        ]
+      },
+      {
+        "name": "changed-library",
+        "exit": 1,
+        "seconds": 2.873977201001253,
+        "expected_diagnostic": "does not match the actual library digest",
+        "passed": true,
+        "command": [
+          "cmake",
+          "-S",
+          "/home/blux/de-xr/dome-sculpt/artifacts/toolkit-viewport25-c092",
+          "-B",
+          "/home/blux/de-xr/dome-sculpt/artifacts/toolkit-viewport25-c092/artifacts/viewport-proof/configure-controls/build-changed-library",
+          "-DDOME_COMPUTE_BACKEND=CPU",
+          "-DDOME_BUILD_UI=ON",
+          "-DDOME_BUILD_XR=OFF",
+          "-DFLTK_DIR=/home/blux/de-xr/dome-sculpt/artifacts/toolkit-viewport25-c092/artifacts/viewport-proof/configure-controls/fixtures/changed-library/share/fltk",
+          "-U*DOME_BITMAP_RUNTIME*",
+          "-U*NATIVEGL*",
+          "-U*RENDERFONTS*"
+        ]
+      },
+      {
+        "name": "final",
+        "exit": 0,
+        "seconds": 6.35752530200989,
+        "expected_diagnostic": null,
+        "passed": true,
+        "command": [
+          "cmake",
+          "-S",
+          "/home/blux/de-xr/dome-sculpt/artifacts/toolkit-viewport25-c092",
+          "-B",
+          "/home/blux/de-xr/dome-sculpt/artifacts/toolkit-viewport25-c092/artifacts/viewport-proof/configure-controls/build-final",
+          "-DDOME_COMPUTE_BACKEND=CPU",
+          "-DDOME_BUILD_UI=ON",
+          "-DDOME_BUILD_XR=OFF",
+          "-DFLTK_DIR=/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-release/share/fltk",
+          "-U*DOME_BITMAP_RUNTIME*",
+          "-U*NATIVEGL*",
+          "-U*RENDERFONTS*"
+        ]
+      }
+    ],
+    "scope": "Configuration only; no build claim"
+  },
+  "fixture": {
+    "path": "artifacts/viewport-proof/inputs/recovered0.dsculpt",
+    "sha256": "4463147ceb3456ce3285a245e3ff548253c403e7811a22eb29cfd503f0a23156"
+  },
+  "named_checks": {
+    "universal_menu": 60,
+    "native_wayland": 18
+  },
+  "metadata_note": "third_party/sources.json provenance prose/source pin was finalized after runtime cohort; its exact during-run digest is separately recorded. CMake and both test sources match each runtime cohort exactly. Current metadata passed the separate eight configure controls. No runtime bytes changed.",
+  "count_note": "Wayland actual report is9 named checks perprofile, correcting earlier11/22 progress shorthand; strict filename readiness/Return assertions also run.",
+  "negatives": [
+    {
+      "path": "artifacts/viewport-proof/release-normal",
+      "scope": "Old25 broad harness allowed sender-owned false ACK; subsequent premature acceptance/BadDrawable retained, not valid full positive"
+    },
+    {
+      "path": "artifacts/viewport-proof/old25-strict",
+      "scope": "Old25 strict actual-application owner transfer refuses"
+    },
+    {
+      "path": "artifacts/viewport-proof/final-release-normal",
+      "scope": "Old26 strict ownership failure"
+    },
+    {
+      "path": "artifacts/viewport-proof/final-release-compact",
+      "scope": "Old26 strict ownership failure"
+    },
+    {
+      "path": "artifacts/viewport-proof/final-sanitize-normal",
+      "scope": "Old26 functional14 then206B/4 XGetWindowProperty allocations on clean exit"
+    },
+    {
+      "path": "artifacts/viewport-proof/final-sanitize-compact",
+      "scope": "Old26 strict ownership failure"
+    },
+    {
+      "path": "/home/blux/de-xr/DomeD/artifacts/fltk-clipboard-8cc/artifacts",
+      "scope": "Preserved OFF high-FD helper and inherited dispatcher sanitizer failures; final officialpoll option fixes both"
+    }
+  ],
+  "environment": {
+    "physical_device": false,
+    "system_install": false,
+    "session_restart": false,
+    "sanitizer_suppressions": false,
+    "private_xvfb": "/home/blux/de-xr/dome-sculpt/artifacts/retained-key-ui-9050/artifacts/private-xvfb/bin",
+    "signed_rpm_provenance": "/home/blux/de-xr/dome-sculpt/artifacts/retained-key-ui-9050/artifacts/private-xvfb/rpms.json",
+    "compositor": "/home/blux/de-xr/dome-sculpt/artifacts/domed-f797e0f-target/release/dome-compositor"
+  },
+  "scope": [
+    "Exact copied coherent c092 app/helpers/all own app static support; final dynamically loaded canonical toolkit inspected in actual process maps. No new whole-app build or new runtime/API claim.",
+    "Owned toolkit SAN is instrumented; unchanged external canonical53b bitmap runtime retains separate scope.",
+    "Old prefixes/negatives remain immutable; all six final commands terminate0 with exact input ledgers."
+  ]
+}
