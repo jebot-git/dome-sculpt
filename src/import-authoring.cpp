@@ -7,6 +7,7 @@
 #include "dome/material-bindings.hpp"
 #include "dome/source-paint.hpp"
 #include "normal-frame-runtime.hpp"
+#include "initial-source-atlas.hpp"
 #include "dome/projection.hpp"
 #include "dome/source-placement.hpp"
 #include "import-skin.hpp"
@@ -611,18 +612,6 @@ ImportedAuthoring prepare_authoring_import(const Scene &input,
       binding->validate();
       object.material_bindings = binding;
       if(options.prepare_texture_atlas){
-        auto atlas=object.painted->mesh();const auto &before=object.painted->mesh();
-        unwrap(atlas,options.paint_resolution,4,options.limits.cancelled);
-        if(atlas.indices.size()!=before.indices.size())throw std::runtime_error("Editable atlas changed original triangle count");
-        std::vector<uint32_t> vertices(atlas.positions.size(),UINT32_MAX);
-        for(size_t corner=0;corner<before.indices.size();++corner){
-          if((corner&4095)==0)stop(options);
-          auto vertex=atlas.indices[corner],source=before.indices[corner];
-          auto &mapped=vertices.at(vertex);
-          if(mapped!=UINT32_MAX&&mapped!=source)throw std::runtime_error("Editable atlas merged different original vertices");
-          mapped=source;
-        }
-        if(std::find(vertices.begin(),vertices.end(),UINT32_MAX)!=vertices.end())throw std::runtime_error("Editable atlas contains an unproven vertex");
         std::shared_ptr<const std::vector<std::array<float,2>>> authored_uv1;
         if(!p.uv1.empty()&&!source_maps->uv1){
           if(p.uv1.size()!=p.mesh.positions.size())throw std::invalid_argument("Imported authored UV1 domain differs");
@@ -631,14 +620,7 @@ ImportedAuthoring prepare_authoring_import(const Scene &input,
           authored_uv1=std::move(coordinates);
         }
         SourcePaintOptions paint;paint.cancelled=options.limits.cancelled;
-        auto adopted=prepare_source_paint(object.painted,atlas,vertices,std::move(authored_uv1),paint);
-        auto deformation=detail::normal_frame_remap_deformation(object.deformation,before,adopted->mesh(),vertices,options.limits.cancelled);
-        auto remapped=std::make_shared<CreatorAppearance>(*appearance);remapped->source_vertices.clear();remapped->source_vertices.reserve(vertices.size());
-        for(size_t v=0;v<vertices.size();++v){if((v&1023)==0)stop(options);remapped->source_vertices.push_back(appearance->source_vertices.at(vertices[v]));}
-        detail::normal_frame_current_authority(*binding,adopted->mesh(),deformation.get(),options.limits.cancelled);
-        object.painted=std::move(adopted);object.appearance=std::move(remapped);object.deformation=std::move(deformation);
-        if(!object.painted->source_sampling_prepared() || !object.painted->valid_source_sampling_attachment())
-          throw std::invalid_argument("Editable import lost its authenticated original sampling adapter");
+        detail::prepare_initial_source_atlas(object,options.paint_resolution,std::move(authored_uv1),paint);
         output.diagnostics.push_back("Prepared editable paint atlas at "+std::to_string(options.paint_resolution)+" pixels; original image sampling, material roles and source coordinates retained");
       }
       if(options.prepare_texture_atlas)output.scene.validate(false);
