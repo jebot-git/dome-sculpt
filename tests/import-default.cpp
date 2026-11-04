@@ -3,6 +3,7 @@
 #include "dome/document.hpp"
 #include "dome/gltf-export.hpp"
 #include "dome/polygon-scene.hpp"
+#include "dome/source-maps.hpp"
 #include "import-skin-fixtures.hpp"
 #include "polygon-conversion.hpp"
 #include "scene-feature-version.hpp"
@@ -28,7 +29,8 @@ int main()try{
    check(a.material==0&&a.source_material==-1&&a.material_json.empty()&&a.mtoon_json.empty(),"Absent primitive material has witnessed identity0/-1 and no invented authored JSON");
    check(*a.original_bytes==f.bytes()&&a.asset->materials.size()==size_t(unused?2:1),"Original bytes and unused authored material table stay exact");
    check(o.material.color==std::array<float,4>{1,1,1,1}&&o.material.metallic==1&&o.material.roughness==1&&o.material.emissive==std::array<float,3>{}&&o.material.alpha==Material::AlphaMode::Opaque&&!o.material.double_sided&&!o.material.unlit,"Native material uses normative glTF defaults rather than unused authored material zero");
-   check(o.material_bindings&&o.material_bindings->uv_origin->appearance==o.appearance&&o.painted&&!o.painted->source_maps(),"Immutable default source frames and plain paint authority remain paired");
+   check(o.material_bindings&&o.material_bindings->normal_frame==SourceMaterialNormalFrame::OriginalAttributes&&o.material_bindings->normal_frames&&o.material_bindings->normal_frames->pbr&&o.material_bindings->uv_origin->appearance==o.appearance&&o.painted&&o.painted->source_maps()&&o.painted->source_maps()->empty()&&!o.painted->source_sampling_prepared(),"Immutable default frames retain exact first-source authority and a real empty PBR role bundle");
+   const auto unchanged=o.painted->encode();auto writable=o.painted->snapshot();Brush brush;const auto &mesh=writable->mesh();brush.from=brush.to=(mesh.positions[mesh.indices[0]]+mesh.positions[mesh.indices[1]]+mesh.positions[mesh.indices[2]])/3.f;brush.normal=mesh.normals[mesh.indices[0]];brush.radius=.1f;PaintSettings ink;ink.color={.2f,.6f,.9f,.7f};ink.front_only=false;writable->begin_stroke();writable->stamp(brush,ink);check(writable->end_stroke()&&writable->encode()!=unchanged&&o.painted->encode()==unchanged,"An empty image-role owner remains genuinely writable without mutating the original default source");
   }
   restart(result.scene);const auto id=result.objects.front();const auto &o=result.scene.object(id);
   CreatorAssetArchive assets;PaintImageArchive images;auto record=encode_creator_appearance(*o.appearance,assets,images);auto reloaded=CreatorAssetArchive::decode(assets.encode(),PaintImageArchive::decode(images.encode()));auto appearance=decode_creator_appearance(record,reloaded);

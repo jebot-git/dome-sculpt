@@ -1,5 +1,18 @@
 # Dome Sculpt production handoff
 
+## Private Source4 import regression contract — 2026-11-04
+
+The four actual native import suites now authenticate independent writable and
+original sampling owners instead of expecting their old flattening representation.
+No runtime/API/schema/asset change: Release 8 passes; owned sanitizer 6 CTest plus
+2 unchanged-binary complete fault sweeps pass, each 10,771 persistent + 128 cancel.
+Original 1,500s sanitizer CTest timeouts remain recorded; actual completion 2433s
+justifies only a conditional 5,400s instrumented test observer. All 38 emitted
+R/S pairs are byte-identical/Khronos 0 errors; native Save/history and strict source
+negatives remain. Read SOURCE4-IMPORT-CONTRACT.md and its receipt for exact
+scopes. This is not coherent application/UI/device/full 594/main qualification;
+all original/additional unfinished production requirements remain required.
+
 ## Private source-aware mesh bake and cut milestone — 2026-11-04
 
 Private14cc064 records runtime3fe61f7 and corrected fixtures16afb67, extending
@@ -833,7 +846,7 @@ source and their own skin products. Source generation/revision/edit authority,
 locked/isolated linked targets, Cancel/retry, oneUndo and orderedSave are covered.
 Read RIG-REST-AUTHORING.md and validation/RIG-REST-SCENE25.json. Final Release7,
 whole-own asserted SAN9, normal/compact/SAN GUI8each, d271Wayland 9, loaderXR11,
-strict actualA770guide9 and pinned Khronos0errors are recorded independently.
+strict actualA770guide9 and pinned Khronos 0 errors are recorded independently.
 
 This is private, not a full source-rig or VRM completion claim. Imported source
 node/multi-skin/rigid REST transport and metadata refitting remain guarded; do
@@ -893,7 +906,7 @@ rigid-oracle timeout) has a samebinary direct424070-check pass254.51s, then a
 corrected registered rigid pass203.15s plus dual185/joint70 checks:3/3 in459.54s.
 Separate graphics7/7 pass1358.67s. Preserve initial51/52 plus3/3; no single54-suite
 or fully instrumented frontend claim. Arc761, nativeFLTK9+10+17+7, latestprivate
-DomeDWayland8 and actual-loader syntheticXR11 pass. Emitted170 Khronos0errors/
+DomeDWayland8 and actual-loader syntheticXR11 pass. Emitted170 Khronos 0 errors/
 1194unfiltered warnings and official71VRM0×15pinned schemas0errors pass.
 
 Component65's51598 unique persistent allocation boundaries are complete in both
@@ -1170,7 +1183,7 @@ one old expected exclusion, then corrected registered1/1Release+1/1ownedSAN
 (61native assertions). Preserve initialfailure; do not claim one317/317greenrun.
 Fresh owned C/C++core/support/render SANnative40+graphics5+fault6 all pass (with
 the corrected1 separately). Actual Arc355, native FLTK/Wayland81, current-source
-actual-loader syntheticXR11, emitted87 Khronos0errors/770unfilteredwarnings and
+actual-loader syntheticXR11, emitted87 Khronos 0 errors/770unfilteredwarnings and
 53official VRM0×15hash-pinned schemas0errors also pass. No new HMD/install claim.
 Latest committed DomeD rechecked unchangedd271cf6; canonical EEE prefixes current.
 

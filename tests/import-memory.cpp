@@ -5,6 +5,7 @@
 #include "dome/material-bindings.hpp"
 #include "import-skin-fixtures.hpp"
 #include <cstdlib>
+#include <cstring>
 #include <cstdarg>
 #include <cerrno>
 #include <dirent.h>
@@ -209,7 +210,13 @@ int main(int argc, char **argv) try {
                 *o.appearance->source_receipt->resources[0].bytes ==
                     resource_before,
             "Texture fixture must decode and retain actual PNG material maps");
-    if(mode=="atlas")check(o.painted->source_maps()&&!o.painted->source_maps()->uv1&&o.material_bindings->uv_origin->paint->source_maps()->uv1,"Atlas fault sweep must execute real UV1 resampling/adoption and retain its original domain");
+    if(mode=="atlas"){
+      const auto &paint=*o.painted;const auto source=paint.source_sampling_original();const auto remap=paint.source_sampling_vertices();
+      check(paint.source_sampling_prepared()&&paint.valid_source_sampling_attachment()&&paint.surface_diagnostics().policy==PaintUvPolicy::Strict&&source&&source->source_maps()&&source->source_maps()->uv1&&paint.source_maps()&&paint.source_maps()->uv1&&remap.size()==paint.mesh().positions.size()&&o.material_bindings->normal_frames&&o.material_bindings->normal_frames->pbr,"Atlas fault sweep must execute authenticated original UV1/normal-frame transport into a real independent writable atlas");
+      const auto current_uv=source_texture_coordinates(paint.mesh(),*paint.source_maps(),paint.source_maps()->normal.texcoord);const auto original_uv=source_texture_coordinates(source->mesh(),*source->source_maps(),source->source_maps()->normal.texcoord);bool separate=false;
+      for(size_t v=0;v<remap.size();++v){check(remap[v]<original_uv.size()&&remap[v]<source->mesh().positions.size()&&current_uv[v]==original_uv[remap[v]]&&!std::memcmp(&paint.mesh().positions[v],&source->mesh().positions[remap[v]],sizeof(Vec3)),"Atlas retains exact source UV1 and geometry at every authenticated remapped vertex");separate|=paint.mesh().uv[v]!=current_uv[v];}
+      check(separate&&paint.source_maps()->normal.image==source->source_maps()->normal.image&&paint.source_maps()->normal_scale==source->source_maps()->normal_scale,"Writable atlas differs from original normal sampling while preserving its real image/strength");
+    }
     if (mode == "skinned")
       check(o.deformation && o.deformation->skin && o.deformation->morphs &&
                 o.deformation->skeleton->inverse_bind_override,

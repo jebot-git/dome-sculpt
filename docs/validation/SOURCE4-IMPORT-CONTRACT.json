@@ -1,0 +1,1007 @@
+{
+  "base": "ce9c68a847d42de65d5670eaf4be9bcdd45dafbe",
+  "classification": "Test-only Source4 owner/UV contract migration. No runtime/public-header/schema/asset changes. Complete R8 plus owned-SAN6 CTest and same-binary standalone2 composition; original SAN CTest1500s timeouts retained.",
+  "changed_paths": [
+    "CMakeLists.txt",
+    "tests/import-default.cpp",
+    "tests/import-memory.cpp",
+    "tests/vrm-matcap-import.cpp",
+    "tests/vrm-typed-uv1-import.cpp"
+  ],
+  "library_sha256": {
+    "build-initial-release/libdome-sculpt-affine.a": "e5d97aa5c7b73356ad5b061ff28fe09283f54297b9fa898645c940728764e68b",
+    "build-initial-release/libxatlas.a": "d757e6aa9d6dc536463d2d7ace0f53ef972ed925d3ad4b60318112e3237735cf",
+    "build-initial-release/libufbx.a": "0a7ae8da37d299e8f42591dedcebd994b85f2df1ca2f5a3bf91c8c51044eddfe",
+    "build-initial-release/libmikktspace.a": "9f656fd805c252bcec4d3aac5a24a3d63320f593adbe0ad0117637b2f6486413",
+    "build-initial-release/libdome-sculpt-polygon.a": "2f80b672525ea78cfb193716dc17b4d3bcb3dd9f2e4a887ad1dabfbeabefc8c6",
+    "build-initial-release/libmikktspace-robust.a": "2ba5ac355b09ca55520fd78bcd1055a0efa868198c2a7819124e26c39658c1bc",
+    "build-initial-release/libdome-sculpt-emission-codec.a": "f9c25ab932c17abed763302bbd42ecad6ad2008503cb9fa00643ba8d330de8ca",
+    "build-initial-release/libdome-sculpt-core.a": "5fdf8108ebde339cafdbfa3aa98f6f5e0fd651bcd35afb3ef703324720ad718c",
+    "build-initial-release/libdome-sculpt-render.a": "620239d78a754951ee304ff4d480d55f910b88808bdb40c044f76bd2d1a75171"
+  },
+  "baseline": {
+    "state": "terminal",
+    "pid": 1854098,
+    "source": "ce9c68a847d42de65d5670eaf4be9bcdd45dafbe",
+    "scope": "Actual unchanged tests on fresh own ce9 diagnostic core/render/support. Counterfactual result only; no failure treated as pass.",
+    "command": [
+      "ctest",
+      "--test-dir",
+      "/home/blux/de-xr/dome-sculpt/artifacts/source4-import-contract-ce9/build-initial-release",
+      "--output-on-failure",
+      "-j",
+      "2",
+      "-R",
+      "^(import-default-material|vrm-typed-uv1-import|vrm-matcap-import|import-memory-atlas|import-memory-atlas-fallback|import-default-render|import-texture-atlas-render|source-paint-import)$"
+    ],
+    "child_pid": 1854120,
+    "actual_exit": 8,
+    "seconds": 9.043365870020352,
+    "inputs": 1733,
+    "drift": []
+  },
+  "release": {
+    "state": "terminal",
+    "pid": 1923747,
+    "source": "ce9c68a847d42de65d5670eaf4be9bcdd45dafbe",
+    "scope": "Actual Source4 test migration on fresh own ce9 core/render/support; complete measured persistent-allocation and cancellation loops unchanged. No runtime changes.",
+    "command": [
+      "ctest",
+      "--test-dir",
+      "/home/blux/de-xr/dome-sculpt/artifacts/source4-import-contract-ce9/build-initial-release",
+      "--output-on-failure",
+      "-j",
+      "2",
+      "-R",
+      "^(import-default-material|vrm-typed-uv1-import|vrm-matcap-import|import-memory-atlas|import-memory-atlas-fallback|import-default-render|import-texture-atlas-render|source-paint-import)$"
+    ],
+    "child_pid": 1923802,
+    "actual_exit": 0,
+    "seconds": 83.21428810301586,
+    "inputs": 1733,
+    "drift": []
+  },
+  "final_test_sha256": {
+    "CMakeLists.txt": "cf5b1fa0b31e81a062d7664f764155cf28a3202165bfa22d8e5671c44d5af1ea",
+    "tests/import-default.cpp": "2a9f276f7b00725b216880eeee3624423ccd249aae8b0c14fff20a38d9eaf889",
+    "tests/import-memory.cpp": "0a510ea83adb9f19d1b7d6fa4961d107ab8c502c657b76a40115ca3fb30d8230",
+    "tests/vrm-matcap-import.cpp": "97a3586e45557d6b1d4a68d0f205d4d6a160cf2136c6e52627a2c7c0e83a69a3",
+    "tests/vrm-typed-uv1-import.cpp": "e9aa5d4888d7673304c5b86f690f5d5b66a39f6c4ed91fe51a131f15bfffce1c"
+  },
+  "negative_sources": {
+    "import-default.cpp": "f3bc96f5bb67845bd4f94d7087cef91f909e46d1abfdd3fd68a966c7a8d4720f",
+    "vrm-typed-uv1-import.cpp": "c9baddb1a187ed01620b7e6c5f2b2759867a612105ba798b0c4524103932f822",
+    "vrm-matcap-import.cpp": "25d1435b54480b4856814a60f1d85de9d65f975084d92a29da7ba2edb3341fd1",
+    "import-memory.cpp": "560e9e6f569095e97ade17be5079673a82602eac218fc49ef0a3d0d7f97ee465"
+  },
+  "release_controls": {
+    "default_checks": 560,
+    "typed_uv1_checks": 41,
+    "typed_uv1_max_linear_error": 3.11336e-08,
+    "wrong_uv0_max_linear_error": 0.266667,
+    "matcap_checks": 56,
+    "default_graphics_checks": 66,
+    "default_graphics_max_error": 0,
+    "wrong_material_zero_max_error": 255,
+    "source_import_graphics_checks": 89,
+    "atlas_graphics_checks": 207,
+    "atlas_persistent_boundaries_each": 10771,
+    "atlas_cancellation_boundaries_each": 128,
+    "atlas_modes": [
+      "openat2",
+      "ENOSYS fallback"
+    ]
+  },
+  "limits": "No resource cap, numeric tolerance, allocation boundary, cancellation callback, caller/file/owner/FD/retry assertion or production guard was relaxed. Only the two instrumented test observers become5400s after measuring2433s; ordinary inherited1500 unchanged. Configuration-only check after compiled proofs, no claim those earlier CTest commands reran under the new observer. No fresh application/UI/actualA770/full594-regression/main admission.",
+  "compiled_test_source_sha256": {
+    "tests/import-default.cpp": "2a9f276f7b00725b216880eeee3624423ccd249aae8b0c14fff20a38d9eaf889",
+    "tests/import-memory.cpp": "0a510ea83adb9f19d1b7d6fa4961d107ab8c502c657b76a40115ca3fb30d8230",
+    "tests/vrm-matcap-import.cpp": "97a3586e45557d6b1d4a68d0f205d4d6a160cf2136c6e52627a2c7c0e83a69a3",
+    "tests/vrm-typed-uv1-import.cpp": "e9aa5d4888d7673304c5b86f690f5d5b66a39f6c4ed91fe51a131f15bfffce1c"
+  },
+  "cmake_final_sha256": "d632e4b023aad5ea3389867b5969ff48ac111de6fa2dbab9be20fcc26ed85f34",
+  "san_build": {
+    "state": "terminal",
+    "pid": 1924038,
+    "source": "ce9c68a847d42de65d5670eaf4be9bcdd45dafbe",
+    "scope": "NEW diagnostic child: fresh whole-owned asserted ASan/UBSan core/render/support and affected migrated Source4 consumers; no ce9 union build or mixed archives. External canonical bitmap remains separately uninstrumented.",
+    "steps": [
+      {
+        "phase": "configure",
+        "command": [
+          "cmake",
+          "-S",
+          "/home/blux/de-xr/dome-sculpt/artifacts/source4-import-contract-ce9",
+          "-B",
+          "/home/blux/de-xr/dome-sculpt/artifacts/source4-import-contract-ce9/build-initial-sanitize",
+          "-G",
+          "Ninja",
+          "-DCMAKE_BUILD_TYPE=Release",
+          "-DDOME_COMPUTE_BACKEND=CPU",
+          "-DDOME_BUILD_UI=ON",
+          "-DDOME_BUILD_XR=ON",
+          "-DCMAKE_EXPORT_COMPILE_COMMANDS=ON",
+          "-DCMAKE_C_FLAGS_RELEASE=-O1 -g1 -fsanitize=address,undefined -fno-omit-frame-pointer",
+          "-DCMAKE_CXX_FLAGS_RELEASE=-O1 -g1 -fsanitize=address,undefined -fno-omit-frame-pointer",
+          "-DCMAKE_EXE_LINKER_FLAGS=-fsanitize=address,undefined",
+          "-DCMAKE_SHARED_LINKER_FLAGS=-fsanitize=address,undefined",
+          "-DFLTK_DIR=/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-sanitize/share/fltk",
+          "-U*DOME_BITMAP_RUNTIME*",
+          "-U*NATIVEGL*",
+          "-U*RENDERFONTS*"
+        ],
+        "exit": 0,
+        "seconds": 8.228646142000798
+      },
+      {
+        "phase": "build",
+        "command": [
+          "cmake",
+          "--build",
+          "/home/blux/de-xr/dome-sculpt/artifacts/source4-import-contract-ce9/build-initial-sanitize",
+          "--parallel",
+          "2",
+          "--target",
+          "dome-sculpt-import-default-test",
+          "dome-sculpt-vrm-typed-uv1-import-test",
+          "dome-sculpt-vrm-matcap-import-test",
+          "dome-sculpt-import-memory-test",
+          "dome-sculpt-import-default-render-test",
+          "dome-sculpt-import-texture-atlas-render-test",
+          "dome-sculpt-source-paint-import-test"
+        ],
+        "exit": 0,
+        "seconds": 702.1085148250277
+      }
+    ],
+    "phase": "build",
+    "child_pid": 1957729,
+    "exit": 0,
+    "seconds": 710.3924407339946,
+    "inputs": 1718,
+    "drift": []
+  },
+  "san_original_ctest": {
+    "state": "terminal",
+    "pid": 2747059,
+    "source": "ce9c68a847d42de65d5670eaf4be9bcdd45dafbe",
+    "scope": "Actual Source4 migration on fresh whole-owned asserted ASan/UBSan core/render/support; complete persistent-allocation and cancellation loops unchanged; external canonical bitmap uninstrumented. No runtime changes.",
+    "command": [
+      "ctest",
+      "--test-dir",
+      "/home/blux/de-xr/dome-sculpt/artifacts/source4-import-contract-ce9/build-initial-sanitize",
+      "--output-on-failure",
+      "-j",
+      "2",
+      "-R",
+      "^(import-default-material|vrm-typed-uv1-import|vrm-matcap-import|import-memory-atlas|import-memory-atlas-fallback|import-default-render|import-texture-atlas-render|source-paint-import)$"
+    ],
+    "child_pid": 2747281,
+    "actual_exit": 8,
+    "seconds": 1557.6996852089942,
+    "inputs": 1733,
+    "drift": []
+  },
+  "san_actual_environment": {
+    "XR_RUNTIME_JSON": "/nonexistent/import-contract-no-headset.json",
+    "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1",
+    "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=1",
+    "LIBGL_ALWAYS_SOFTWARE": "1",
+    "LSAN_OPTIONS_absent": true
+  },
+  "san_same_binary_complete": {
+    "state": "terminal",
+    "pid": 3544683,
+    "source": "ce9c68a847d42de65d5670eaf4be9bcdd45dafbe",
+    "scope": "Unchanged fresh owned ASan/UBSan binary copied byte-exactly from the CTest1500s timeout. Full original direct-import fault/cancel/retry/FD assertions retained. Finite7200s observation per transport for actual complete-duration measurement, not a runtime/resource cap change. No compilation or source edit.",
+    "binary_sha256": "0ddd69c856ef827561b6aa5724c98631c491fa82bda8e42ca4158fc894b961ee",
+    "per_transport_observer_seconds": 7200,
+    "transports": {
+      "openat2": {
+        "state": "terminal",
+        "pid": 3544961,
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/source4-import-contract-ce9/artifacts/import-proof/sanitize-direct-measurement/dome-sculpt-import-memory-test",
+          "atlas"
+        ],
+        "actual_child_exit": 0,
+        "observer_timeout": false,
+        "seconds": 2432.9977972029883
+      },
+      "fallback": {
+        "state": "terminal",
+        "pid": 3544962,
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/source4-import-contract-ce9/artifacts/import-proof/sanitize-direct-measurement/dome-sculpt-import-memory-test",
+          "atlas",
+          "--fallback"
+        ],
+        "actual_child_exit": 0,
+        "observer_timeout": false,
+        "seconds": 2429.6762010030216
+      }
+    },
+    "seconds": 2436.9248906479916,
+    "inputs": 1735,
+    "drift": [],
+    "actual_exit": 0
+  },
+  "observer_configuration": {
+    "state": "terminal",
+    "profiles": [
+      {
+        "profile": "release",
+        "command": [
+          "cmake",
+          "-S",
+          "/home/blux/de-xr/dome-sculpt/artifacts/source4-import-contract-ce9",
+          "-B",
+          "/home/blux/de-xr/dome-sculpt/artifacts/source4-import-contract-ce9/artifacts/import-proof/observer-config/release/build",
+          "-G",
+          "Ninja",
+          "-DCMAKE_BUILD_TYPE=Release",
+          "-DDOME_COMPUTE_BACKEND=CPU",
+          "-DDOME_BUILD_UI=ON",
+          "-DDOME_BUILD_XR=ON",
+          "-DFLTK_DIR=/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-release/share/fltk",
+          "-U*DOME_BITMAP_RUNTIME*",
+          "-U*NATIVEGL*",
+          "-U*RENDERFONTS*"
+        ],
+        "exit": 0,
+        "seconds": 6.550499538978329,
+        "registered_tests": 594,
+        "explicit_atlas_timeouts": {
+          "import-memory-atlas": null,
+          "import-memory-atlas-fallback": null
+        },
+        "ordinary_inherited_timeout": 1500,
+        "scope": "Configuration-only CMake observer check; no product build/retest claim."
+      },
+      {
+        "profile": "sanitize",
+        "command": [
+          "cmake",
+          "-S",
+          "/home/blux/de-xr/dome-sculpt/artifacts/source4-import-contract-ce9",
+          "-B",
+          "/home/blux/de-xr/dome-sculpt/artifacts/source4-import-contract-ce9/artifacts/import-proof/observer-config/sanitize/build",
+          "-G",
+          "Ninja",
+          "-DCMAKE_BUILD_TYPE=Release",
+          "-DDOME_COMPUTE_BACKEND=CPU",
+          "-DDOME_BUILD_UI=ON",
+          "-DDOME_BUILD_XR=ON",
+          "-DFLTK_DIR=/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-sanitize/share/fltk",
+          "-U*DOME_BITMAP_RUNTIME*",
+          "-U*NATIVEGL*",
+          "-U*RENDERFONTS*",
+          "-DCMAKE_CXX_FLAGS_RELEASE=-O1 -g1 -fsanitize=address,undefined -fno-omit-frame-pointer",
+          "-DCMAKE_C_FLAGS_RELEASE=-O1 -g1 -fsanitize=address,undefined -fno-omit-frame-pointer",
+          "-DCMAKE_EXE_LINKER_FLAGS=-fsanitize=address,undefined",
+          "-DCMAKE_SHARED_LINKER_FLAGS=-fsanitize=address,undefined"
+        ],
+        "exit": 0,
+        "seconds": 7.135562913987087,
+        "registered_tests": 594,
+        "explicit_atlas_timeouts": {
+          "import-memory-atlas": 5400.0,
+          "import-memory-atlas-fallback": 5400.0
+        },
+        "ordinary_inherited_timeout": 1500,
+        "scope": "Configuration-only CMake observer check; no product build/retest claim."
+      }
+    ],
+    "inputs": 1717,
+    "drift": []
+  },
+  "rs_outputs": {
+    "files": 38,
+    "equal": 38,
+    "pairs": [
+      {
+        "release": "/home/blux/de-xr/dome-sculpt/artifacts/source4-import-contract-ce9/build-initial-release/import-default-consumer/export-default0-absent-0.000000.glb",
+        "sanitize": "/home/blux/de-xr/dome-sculpt/artifacts/source4-import-contract-ce9/build-initial-sanitize/import-default-consumer/export-default0-absent-0.000000.glb",
+        "release_sha256": "8a807f18bd4fa7ac885aad363c76a7e82fa87e4ff81414df9b1bc2b25465c780",
+        "sanitize_sha256": "8a807f18bd4fa7ac885aad363c76a7e82fa87e4ff81414df9b1bc2b25465c780",
+        "equal": true
+      },
+      {
+        "release": "/home/blux/de-xr/dome-sculpt/artifacts/source4-import-contract-ce9/build-initial-release/import-default-consumer/export-default0-absent-0.650000.glb",
+        "sanitize": "/home/blux/de-xr/dome-sculpt/artifacts/source4-import-contract-ce9/build-initial-sanitize/import-default-consumer/export-default0-absent-0.650000.glb",
+        "release_sha256": "023f0c7af0c2e2825a9087feef72338f4d5198ab80c68a435400c4e253bc1e4b",
+        "sanitize_sha256": "023f0c7af0c2e2825a9087feef72338f4d5198ab80c68a435400c4e253bc1e4b",
+        "equal": true
+      },
+      {
+        "release": "/home/blux/de-xr/dome-sculpt/artifacts/source4-import-contract-ce9/build-initial-release/import-default-consumer/export-default0-unused-0.000000.glb",
+        "sanitize": "/home/blux/de-xr/dome-sculpt/artifacts/source4-import-contract-ce9/build-initial-sanitize/import-default-consumer/export-default0-unused-0.000000.glb",
+        "release_sha256": "e4babe984f8da6203f0c6355c010c76e2bdc231598bd5a99fab07e6a5ecc9aa1",
+        "sanitize_sha256": "e4babe984f8da6203f0c6355c010c76e2bdc231598bd5a99fab07e6a5ecc9aa1",
+        "equal": true
+      },
+      {
+        "release": "/home/blux/de-xr/dome-sculpt/artifacts/source4-import-contract-ce9/build-initial-release/import-default-consumer/export-default0-unused-0.650000.glb",
+        "sanitize": "/home/blux/de-xr/dome-sculpt/artifacts/source4-import-contract-ce9/build-initial-sanitize/import-default-consumer/export-default0-unused-0.650000.glb",
+        "release_sha256": "65c06570246025f222740a11d4b03a79b200235533e142b5bcab3f794f7def7a",
+        "sanitize_sha256": "65c06570246025f222740a11d4b03a79b200235533e142b5bcab3f794f7def7a",
+        "equal": true
+      },
+      {
+        "release": "/home/blux/de-xr/dome-sculpt/artifacts/source4-import-contract-ce9/build-initial-release/import-default-consumer/export-default1-absent-0.000000.glb",
+        "sanitize": "/home/blux/de-xr/dome-sculpt/artifacts/source4-import-contract-ce9/build-initial-sanitize/import-default-consumer/export-default1-absent-0.000000.glb",
+        "release_sha256": "564ce7cde4b3941df9024d7c8b7713f9f8caba2c52026fb22f64ec272f77199a",
+        "sanitize_sha256": "564ce7cde4b3941df9024d7c8b7713f9f8caba2c52026fb22f64ec272f77199a",
+        "equal": true
+      },
+      {
+        "release": "/home/blux/de-xr/dome-sculpt/artifacts/source4-import-contract-ce9/build-initial-release/import-default-consumer/export-default1-absent-0.650000.glb",
+        "sanitize": "/home/blux/de-xr/dome-sculpt/artifacts/source4-import-contract-ce9/build-initial-sanitize/import-default-consumer/export-default1-absent-0.650000.glb",
+        "release_sha256": "46e3463cbbfac1430fc12f2085544f1252f3d71bf671e8a9eb57e657e287fb33",
+        "sanitize_sha256": "46e3463cbbfac1430fc12f2085544f1252f3d71bf671e8a9eb57e657e287fb33",
+        "equal": true
+      },
+      {
+        "release": "/home/blux/de-xr/dome-sculpt/artifacts/source4-import-contract-ce9/build-initial-release/import-default-consumer/export-default1-unused-0.000000.glb",
+        "sanitize": "/home/blux/de-xr/dome-sculpt/artifacts/source4-import-contract-ce9/build-initial-sanitize/import-default-consumer/export-default1-unused-0.000000.glb",
+        "release_sha256": "ace25cc4d1c1cd8797886c17ca189a505baa4ca07397a75af9e526b9b337130b",
+        "sanitize_sha256": "ace25cc4d1c1cd8797886c17ca189a505baa4ca07397a75af9e526b9b337130b",
+        "equal": true
+      },
+      {
+        "release": "/home/blux/de-xr/dome-sculpt/artifacts/source4-import-contract-ce9/build-initial-release/import-default-consumer/export-default1-unused-0.650000.glb",
+        "sanitize": "/home/blux/de-xr/dome-sculpt/artifacts/source4-import-contract-ce9/build-initial-sanitize/import-default-consumer/export-default1-unused-0.650000.glb",
+        "release_sha256": "3e35d8858244805bd9c8434f5f26d9d8a536acebdb382d6395734b4995192726",
+        "sanitize_sha256": "3e35d8858244805bd9c8434f5f26d9d8a536acebdb382d6395734b4995192726",
+        "equal": true
+      },
+      {
+        "release": "/home/blux/de-xr/dome-sculpt/artifacts/source4-import-contract-ce9/build-initial-release/import-default-consumer/export-default2-absent-0.000000.glb",
+        "sanitize": "/home/blux/de-xr/dome-sculpt/artifacts/source4-import-contract-ce9/build-initial-sanitize/import-default-consumer/export-default2-absent-0.000000.glb",
+        "release_sha256": "3a74f5b3938d908f19d2d5b960c9c7fb5ab4f79e35dd23845e8cb18dd3b5bbe8",
+        "sanitize_sha256": "3a74f5b3938d908f19d2d5b960c9c7fb5ab4f79e35dd23845e8cb18dd3b5bbe8",
+        "equal": true
+      },
+      {
+        "release": "/home/blux/de-xr/dome-sculpt/artifacts/source4-import-contract-ce9/build-initial-release/import-default-consumer/export-default2-absent-0.650000.glb",
+        "sanitize": "/home/blux/de-xr/dome-sculpt/artifacts/source4-import-contract-ce9/build-initial-sanitize/import-default-consumer/export-default2-absent-0.650000.glb",
+        "release_sha256": "844a2d67060834b8582c5dca0f375bee4369b9aaadfbdad0c67e6bd9845c0064",
+        "sanitize_sha256": "844a2d67060834b8582c5dca0f375bee4369b9aaadfbdad0c67e6bd9845c0064",
+        "equal": true
+      },
+      {
+        "release": "/home/blux/de-xr/dome-sculpt/artifacts/source4-import-contract-ce9/build-initial-release/import-default-consumer/export-default2-unused-0.000000.glb",
+        "sanitize": "/home/blux/de-xr/dome-sculpt/artifacts/source4-import-contract-ce9/build-initial-sanitize/import-default-consumer/export-default2-unused-0.000000.glb",
+        "release_sha256": "375fe5d77534fcde43c014f44ec6cafeb292d6bb65ebc0445657465072a64b8a",
+        "sanitize_sha256": "375fe5d77534fcde43c014f44ec6cafeb292d6bb65ebc0445657465072a64b8a",
+        "equal": true
+      },
+      {
+        "release": "/home/blux/de-xr/dome-sculpt/artifacts/source4-import-contract-ce9/build-initial-release/import-default-consumer/export-default2-unused-0.650000.glb",
+        "sanitize": "/home/blux/de-xr/dome-sculpt/artifacts/source4-import-contract-ce9/build-initial-sanitize/import-default-consumer/export-default2-unused-0.650000.glb",
+        "release_sha256": "5991628f33d70a4ddcadf3c04a7b134e281d90e2d137238687dfda888b0a8e08",
+        "sanitize_sha256": "5991628f33d70a4ddcadf3c04a7b134e281d90e2d137238687dfda888b0a8e08",
+        "equal": true
+      },
+      {
+        "release": "/home/blux/de-xr/dome-sculpt/artifacts/source4-import-contract-ce9/build-initial-release/import-texture-atlas-render/artist-BLEND-0.000000-0.glb",
+        "sanitize": "/home/blux/de-xr/dome-sculpt/artifacts/source4-import-contract-ce9/build-initial-sanitize/import-texture-atlas-render/artist-BLEND-0.000000-0.glb",
+        "release_sha256": "01c39d78af325eab5a5ceb3b7d95ea50a698f44c4e1651b9fb27c33d63c4db98",
+        "sanitize_sha256": "01c39d78af325eab5a5ceb3b7d95ea50a698f44c4e1651b9fb27c33d63c4db98",
+        "equal": true
+      },
+      {
+        "release": "/home/blux/de-xr/dome-sculpt/artifacts/source4-import-contract-ce9/build-initial-release/import-texture-atlas-render/artist-BLEND-0.000000-1.glb",
+        "sanitize": "/home/blux/de-xr/dome-sculpt/artifacts/source4-import-contract-ce9/build-initial-sanitize/import-texture-atlas-render/artist-BLEND-0.000000-1.glb",
+        "release_sha256": "24288ed13c9b297cc78f99e5dff5020226d288c381dde01707c62599810b4940",
+        "sanitize_sha256": "24288ed13c9b297cc78f99e5dff5020226d288c381dde01707c62599810b4940",
+        "equal": true
+      },
+      {
+        "release": "/home/blux/de-xr/dome-sculpt/artifacts/source4-import-contract-ce9/build-initial-release/import-texture-atlas-render/artist-BLEND-0.650000-0.glb",
+        "sanitize": "/home/blux/de-xr/dome-sculpt/artifacts/source4-import-contract-ce9/build-initial-sanitize/import-texture-atlas-render/artist-BLEND-0.650000-0.glb",
+        "release_sha256": "49b17f7b5327e48b407be1363218b87c90b5080234e1d006c47e5cc8eab84976",
+        "sanitize_sha256": "49b17f7b5327e48b407be1363218b87c90b5080234e1d006c47e5cc8eab84976",
+        "equal": true
+      },
+      {
+        "release": "/home/blux/de-xr/dome-sculpt/artifacts/source4-import-contract-ce9/build-initial-release/import-texture-atlas-render/artist-BLEND-0.650000-1.glb",
+        "sanitize": "/home/blux/de-xr/dome-sculpt/artifacts/source4-import-contract-ce9/build-initial-sanitize/import-texture-atlas-render/artist-BLEND-0.650000-1.glb",
+        "release_sha256": "1ed71ed1d43706af64a0f864a6abdb6fd37ca8de45575f202b91e1c892a353b7",
+        "sanitize_sha256": "1ed71ed1d43706af64a0f864a6abdb6fd37ca8de45575f202b91e1c892a353b7",
+        "equal": true
+      },
+      {
+        "release": "/home/blux/de-xr/dome-sculpt/artifacts/source4-import-contract-ce9/build-initial-release/import-texture-atlas-render/artist-MASK-0.000000-0.glb",
+        "sanitize": "/home/blux/de-xr/dome-sculpt/artifacts/source4-import-contract-ce9/build-initial-sanitize/import-texture-atlas-render/artist-MASK-0.000000-0.glb",
+        "release_sha256": "31e9635b9e4bf5a4d912c8cd194d4f0086e9fcda20670c8ab94280ecd3728676",
+        "sanitize_sha256": "31e9635b9e4bf5a4d912c8cd194d4f0086e9fcda20670c8ab94280ecd3728676",
+        "equal": true
+      },
+      {
+        "release": "/home/blux/de-xr/dome-sculpt/artifacts/source4-import-contract-ce9/build-initial-release/import-texture-atlas-render/artist-MASK-0.000000-1.glb",
+        "sanitize": "/home/blux/de-xr/dome-sculpt/artifacts/source4-import-contract-ce9/build-initial-sanitize/import-texture-atlas-render/artist-MASK-0.000000-1.glb",
+        "release_sha256": "b6337712e790c6a786a8feb3bf88c41ffeb869a7306b09a4d9c823aeca37b83c",
+        "sanitize_sha256": "b6337712e790c6a786a8feb3bf88c41ffeb869a7306b09a4d9c823aeca37b83c",
+        "equal": true
+      },
+      {
+        "release": "/home/blux/de-xr/dome-sculpt/artifacts/source4-import-contract-ce9/build-initial-release/import-texture-atlas-render/artist-MASK-0.650000-0.glb",
+        "sanitize": "/home/blux/de-xr/dome-sculpt/artifacts/source4-import-contract-ce9/build-initial-sanitize/import-texture-atlas-render/artist-MASK-0.650000-0.glb",
+        "release_sha256": "eb6150bf9bb7d81400b604576a5bedd2d87ac3c5191d16c1b5f9f54c84aa5360",
+        "sanitize_sha256": "eb6150bf9bb7d81400b604576a5bedd2d87ac3c5191d16c1b5f9f54c84aa5360",
+        "equal": true
+      },
+      {
+        "release": "/home/blux/de-xr/dome-sculpt/artifacts/source4-import-contract-ce9/build-initial-release/import-texture-atlas-render/artist-MASK-0.650000-1.glb",
+        "sanitize": "/home/blux/de-xr/dome-sculpt/artifacts/source4-import-contract-ce9/build-initial-sanitize/import-texture-atlas-render/artist-MASK-0.650000-1.glb",
+        "release_sha256": "fe167d2e612e2fa8debf23d4917db36761d3de716daa40aa05966b65d4844b3e",
+        "sanitize_sha256": "fe167d2e612e2fa8debf23d4917db36761d3de716daa40aa05966b65d4844b3e",
+        "equal": true
+      },
+      {
+        "release": "/home/blux/de-xr/dome-sculpt/artifacts/source4-import-contract-ce9/build-initial-release/import-texture-atlas-render/artist-OPAQUE-0.000000-0.glb",
+        "sanitize": "/home/blux/de-xr/dome-sculpt/artifacts/source4-import-contract-ce9/build-initial-sanitize/import-texture-atlas-render/artist-OPAQUE-0.000000-0.glb",
+        "release_sha256": "6c8d97d903f7f35e7af5694b988586c7f9263746333159cf033cfa8c6357a4bf",
+        "sanitize_sha256": "6c8d97d903f7f35e7af5694b988586c7f9263746333159cf033cfa8c6357a4bf",
+        "equal": true
+      },
+      {
+        "release": "/home/blux/de-xr/dome-sculpt/artifacts/source4-import-contract-ce9/build-initial-release/import-texture-atlas-render/artist-OPAQUE-0.000000-1.glb",
+        "sanitize": "/home/blux/de-xr/dome-sculpt/artifacts/source4-import-contract-ce9/build-initial-sanitize/import-texture-atlas-render/artist-OPAQUE-0.000000-1.glb",
+        "release_sha256": "d9c1d4a3ce3aeaaa336959b76d75262a9c96eb84b8926f86d75615eae4954db6",
+        "sanitize_sha256": "d9c1d4a3ce3aeaaa336959b76d75262a9c96eb84b8926f86d75615eae4954db6",
+        "equal": true
+      },
+      {
+        "release": "/home/blux/de-xr/dome-sculpt/artifacts/source4-import-contract-ce9/build-initial-release/import-texture-atlas-render/artist-OPAQUE-0.650000-0.glb",
+        "sanitize": "/home/blux/de-xr/dome-sculpt/artifacts/source4-import-contract-ce9/build-initial-sanitize/import-texture-atlas-render/artist-OPAQUE-0.650000-0.glb",
+        "release_sha256": "74e40021e5fba794f87ffbe98f42a6631deabb3892b7c3a8f9599c11b7d069ff",
+        "sanitize_sha256": "74e40021e5fba794f87ffbe98f42a6631deabb3892b7c3a8f9599c11b7d069ff",
+        "equal": true
+      },
+      {
+        "release": "/home/blux/de-xr/dome-sculpt/artifacts/source4-import-contract-ce9/build-initial-release/import-texture-atlas-render/artist-OPAQUE-0.650000-1.glb",
+        "sanitize": "/home/blux/de-xr/dome-sculpt/artifacts/source4-import-contract-ce9/build-initial-sanitize/import-texture-atlas-render/artist-OPAQUE-0.650000-1.glb",
+        "release_sha256": "8e4a6392c9f335f68ff4112f5b46baa761d083fc53e7d61e99839a49f52950bb",
+        "sanitize_sha256": "8e4a6392c9f335f68ff4112f5b46baa761d083fc53e7d61e99839a49f52950bb",
+        "equal": true
+      },
+      {
+        "release": "/home/blux/de-xr/dome-sculpt/artifacts/source4-import-contract-ce9/build-initial-release/import-texture-atlas-render/flat-BLEND-0.000000-0.glb",
+        "sanitize": "/home/blux/de-xr/dome-sculpt/artifacts/source4-import-contract-ce9/build-initial-sanitize/import-texture-atlas-render/flat-BLEND-0.000000-0.glb",
+        "release_sha256": "543d32a66ade9d6b0090cf720655dd128b05ddf612f06261dded5356c22601dd",
+        "sanitize_sha256": "543d32a66ade9d6b0090cf720655dd128b05ddf612f06261dded5356c22601dd",
+        "equal": true
+      },
+      {
+        "release": "/home/blux/de-xr/dome-sculpt/artifacts/source4-import-contract-ce9/build-initial-release/import-texture-atlas-render/flat-BLEND-0.000000-1.glb",
+        "sanitize": "/home/blux/de-xr/dome-sculpt/artifacts/source4-import-contract-ce9/build-initial-sanitize/import-texture-atlas-render/flat-BLEND-0.000000-1.glb",
+        "release_sha256": "83bbc7b1daf62fb6fd7e9405c9625d0ce1cd4d09c5c12aac7b2c503d4c752978",
+        "sanitize_sha256": "83bbc7b1daf62fb6fd7e9405c9625d0ce1cd4d09c5c12aac7b2c503d4c752978",
+        "equal": true
+      },
+      {
+        "release": "/home/blux/de-xr/dome-sculpt/artifacts/source4-import-contract-ce9/build-initial-release/import-texture-atlas-render/flat-BLEND-0.650000-0.glb",
+        "sanitize": "/home/blux/de-xr/dome-sculpt/artifacts/source4-import-contract-ce9/build-initial-sanitize/import-texture-atlas-render/flat-BLEND-0.650000-0.glb",
+        "release_sha256": "7c038b3108219887d5f50b8ad3379cd8e93335ee5034766f07dc95f0d6e896d8",
+        "sanitize_sha256": "7c038b3108219887d5f50b8ad3379cd8e93335ee5034766f07dc95f0d6e896d8",
+        "equal": true
+      },
+      {
+        "release": "/home/blux/de-xr/dome-sculpt/artifacts/source4-import-contract-ce9/build-initial-release/import-texture-atlas-render/flat-BLEND-0.650000-1.glb",
+        "sanitize": "/home/blux/de-xr/dome-sculpt/artifacts/source4-import-contract-ce9/build-initial-sanitize/import-texture-atlas-render/flat-BLEND-0.650000-1.glb",
+        "release_sha256": "8548e1aba31bc0dddcba99f4989e792d72916973977461d2668e7a216d147d83",
+        "sanitize_sha256": "8548e1aba31bc0dddcba99f4989e792d72916973977461d2668e7a216d147d83",
+        "equal": true
+      },
+      {
+        "release": "/home/blux/de-xr/dome-sculpt/artifacts/source4-import-contract-ce9/build-initial-release/import-texture-atlas-render/flat-MASK-0.000000-0.glb",
+        "sanitize": "/home/blux/de-xr/dome-sculpt/artifacts/source4-import-contract-ce9/build-initial-sanitize/import-texture-atlas-render/flat-MASK-0.000000-0.glb",
+        "release_sha256": "7ce6ed3a5a27db66b91b9dbe9cf0b30a5fd37e9fde8a1894adbd3351124770bd",
+        "sanitize_sha256": "7ce6ed3a5a27db66b91b9dbe9cf0b30a5fd37e9fde8a1894adbd3351124770bd",
+        "equal": true
+      },
+      {
+        "release": "/home/blux/de-xr/dome-sculpt/artifacts/source4-import-contract-ce9/build-initial-release/import-texture-atlas-render/flat-MASK-0.000000-1.glb",
+        "sanitize": "/home/blux/de-xr/dome-sculpt/artifacts/source4-import-contract-ce9/build-initial-sanitize/import-texture-atlas-render/flat-MASK-0.000000-1.glb",
+        "release_sha256": "c7572b3bd40456d6509ee6dfd6eee51699017835052a8ba2e752c2937e9337da",
+        "sanitize_sha256": "c7572b3bd40456d6509ee6dfd6eee51699017835052a8ba2e752c2937e9337da",
+        "equal": true
+      },
+      {
+        "release": "/home/blux/de-xr/dome-sculpt/artifacts/source4-import-contract-ce9/build-initial-release/import-texture-atlas-render/flat-MASK-0.650000-0.glb",
+        "sanitize": "/home/blux/de-xr/dome-sculpt/artifacts/source4-import-contract-ce9/build-initial-sanitize/import-texture-atlas-render/flat-MASK-0.650000-0.glb",
+        "release_sha256": "5ed6df2f7682eca82bc5ffac196ccfb636a7dc4431864ad31a1dc5876209d139",
+        "sanitize_sha256": "5ed6df2f7682eca82bc5ffac196ccfb636a7dc4431864ad31a1dc5876209d139",
+        "equal": true
+      },
+      {
+        "release": "/home/blux/de-xr/dome-sculpt/artifacts/source4-import-contract-ce9/build-initial-release/import-texture-atlas-render/flat-MASK-0.650000-1.glb",
+        "sanitize": "/home/blux/de-xr/dome-sculpt/artifacts/source4-import-contract-ce9/build-initial-sanitize/import-texture-atlas-render/flat-MASK-0.650000-1.glb",
+        "release_sha256": "1c64dff0dd5000475611d34db88ed6d25bfefaa6bbfa0229a35cb47b7133d4a7",
+        "sanitize_sha256": "1c64dff0dd5000475611d34db88ed6d25bfefaa6bbfa0229a35cb47b7133d4a7",
+        "equal": true
+      },
+      {
+        "release": "/home/blux/de-xr/dome-sculpt/artifacts/source4-import-contract-ce9/build-initial-release/import-texture-atlas-render/flat-OPAQUE-0.000000-0.glb",
+        "sanitize": "/home/blux/de-xr/dome-sculpt/artifacts/source4-import-contract-ce9/build-initial-sanitize/import-texture-atlas-render/flat-OPAQUE-0.000000-0.glb",
+        "release_sha256": "5f0eb4ae3204ee1bb007d2984250c25caa60c23202d3fb2c93cdd43229006a59",
+        "sanitize_sha256": "5f0eb4ae3204ee1bb007d2984250c25caa60c23202d3fb2c93cdd43229006a59",
+        "equal": true
+      },
+      {
+        "release": "/home/blux/de-xr/dome-sculpt/artifacts/source4-import-contract-ce9/build-initial-release/import-texture-atlas-render/flat-OPAQUE-0.000000-1.glb",
+        "sanitize": "/home/blux/de-xr/dome-sculpt/artifacts/source4-import-contract-ce9/build-initial-sanitize/import-texture-atlas-render/flat-OPAQUE-0.000000-1.glb",
+        "release_sha256": "cb6823557dc477ec90adc03e4fec18a375bdf21ac23cbfbf5f8f6b6e7a547ab8",
+        "sanitize_sha256": "cb6823557dc477ec90adc03e4fec18a375bdf21ac23cbfbf5f8f6b6e7a547ab8",
+        "equal": true
+      },
+      {
+        "release": "/home/blux/de-xr/dome-sculpt/artifacts/source4-import-contract-ce9/build-initial-release/import-texture-atlas-render/flat-OPAQUE-0.650000-0.glb",
+        "sanitize": "/home/blux/de-xr/dome-sculpt/artifacts/source4-import-contract-ce9/build-initial-sanitize/import-texture-atlas-render/flat-OPAQUE-0.650000-0.glb",
+        "release_sha256": "1572ffa4ab6e34d44922c214012344c30f914f6a292cf0a3cde5ea0087d0d4d2",
+        "sanitize_sha256": "1572ffa4ab6e34d44922c214012344c30f914f6a292cf0a3cde5ea0087d0d4d2",
+        "equal": true
+      },
+      {
+        "release": "/home/blux/de-xr/dome-sculpt/artifacts/source4-import-contract-ce9/build-initial-release/import-texture-atlas-render/flat-OPAQUE-0.650000-1.glb",
+        "sanitize": "/home/blux/de-xr/dome-sculpt/artifacts/source4-import-contract-ce9/build-initial-sanitize/import-texture-atlas-render/flat-OPAQUE-0.650000-1.glb",
+        "release_sha256": "ba0f84b18dfed587681b4fcb77a3e253807ecb6610c87bc164067da8cb822535",
+        "sanitize_sha256": "ba0f84b18dfed587681b4fcb77a3e253807ecb6610c87bc164067da8cb822535",
+        "equal": true
+      },
+      {
+        "release": "/home/blux/de-xr/dome-sculpt/artifacts/source4-import-contract-ce9/build-initial-release/vrm-matcap-import/native-matcap-v0.glb",
+        "sanitize": "/home/blux/de-xr/dome-sculpt/artifacts/source4-import-contract-ce9/build-initial-sanitize/vrm-matcap-import/native-matcap-v0.glb",
+        "release_sha256": "908cec9ea4b4767317d8ea86ccec5e7f69330863b89093c58088182104a82ef7",
+        "sanitize_sha256": "908cec9ea4b4767317d8ea86ccec5e7f69330863b89093c58088182104a82ef7",
+        "equal": true
+      },
+      {
+        "release": "/home/blux/de-xr/dome-sculpt/artifacts/source4-import-contract-ce9/build-initial-release/vrm-matcap-import/native-matcap-v1.glb",
+        "sanitize": "/home/blux/de-xr/dome-sculpt/artifacts/source4-import-contract-ce9/build-initial-sanitize/vrm-matcap-import/native-matcap-v1.glb",
+        "release_sha256": "a2df4b524eb1cbf81394e99b9ca5a5b6682c2cfcef01cd0ccd5db501f8a5377a",
+        "sanitize_sha256": "a2df4b524eb1cbf81394e99b9ca5a5b6682c2cfcef01cd0ccd5db501f8a5377a",
+        "equal": true
+      }
+    ]
+  },
+  "runtime_api_changed_paths": [],
+  "san_control_counts": {
+    "each_transport_persistent_failures": 10771,
+    "each_transport_cancellation_boundaries": 128,
+    "transport_names": [
+      "openat2",
+      "forced ENOSYS fallback"
+    ],
+    "assertions": "Exact caller Scene/paint/COW owner/revision, original files, descriptor count and successful retry remain unchanged. Direct helper fault injection, not a file-worker-thread denial claim.",
+    "retained_xatlas_diagnostics": "Four PackCharts: ComputeCharts must be called first messages per transport under real denial; both complete child exit statuses0 and exact retry assertions are preserved."
+  },
+  "khronos": {
+    "release": {
+      "validator": "2.0.0-dev.3.10",
+      "maxIssues": 0,
+      "files": 38,
+      "errors": 0,
+      "warnings": 8,
+      "infos": 140,
+      "warning_code": "NODE_SKINNED_MESH_NON_ROOT",
+      "outputs": [
+        {
+          "file": "/home/blux/de-xr/dome-sculpt/artifacts/source4-import-contract-ce9/build-initial-release/import-default-consumer/export-default0-absent-0.000000.glb",
+          "bytes": 6004,
+          "sha256": "8a807f18bd4fa7ac885aad363c76a7e82fa87e4ff81414df9b1bc2b25465c780"
+        },
+        {
+          "file": "/home/blux/de-xr/dome-sculpt/artifacts/source4-import-contract-ce9/build-initial-release/import-default-consumer/export-default0-absent-0.650000.glb",
+          "bytes": 6032,
+          "sha256": "023f0c7af0c2e2825a9087feef72338f4d5198ab80c68a435400c4e253bc1e4b"
+        },
+        {
+          "file": "/home/blux/de-xr/dome-sculpt/artifacts/source4-import-contract-ce9/build-initial-release/import-default-consumer/export-default0-unused-0.000000.glb",
+          "bytes": 6004,
+          "sha256": "e4babe984f8da6203f0c6355c010c76e2bdc231598bd5a99fab07e6a5ecc9aa1"
+        },
+        {
+          "file": "/home/blux/de-xr/dome-sculpt/artifacts/source4-import-contract-ce9/build-initial-release/import-default-consumer/export-default0-unused-0.650000.glb",
+          "bytes": 6032,
+          "sha256": "65c06570246025f222740a11d4b03a79b200235533e142b5bcab3f794f7def7a"
+        },
+        {
+          "file": "/home/blux/de-xr/dome-sculpt/artifacts/source4-import-contract-ce9/build-initial-release/import-default-consumer/export-default1-absent-0.000000.glb",
+          "bytes": 6356,
+          "sha256": "564ce7cde4b3941df9024d7c8b7713f9f8caba2c52026fb22f64ec272f77199a"
+        },
+        {
+          "file": "/home/blux/de-xr/dome-sculpt/artifacts/source4-import-contract-ce9/build-initial-release/import-default-consumer/export-default1-absent-0.650000.glb",
+          "bytes": 6388,
+          "sha256": "46e3463cbbfac1430fc12f2085544f1252f3d71bf671e8a9eb57e657e287fb33"
+        },
+        {
+          "file": "/home/blux/de-xr/dome-sculpt/artifacts/source4-import-contract-ce9/build-initial-release/import-default-consumer/export-default1-unused-0.000000.glb",
+          "bytes": 6356,
+          "sha256": "ace25cc4d1c1cd8797886c17ca189a505baa4ca07397a75af9e526b9b337130b"
+        },
+        {
+          "file": "/home/blux/de-xr/dome-sculpt/artifacts/source4-import-contract-ce9/build-initial-release/import-default-consumer/export-default1-unused-0.650000.glb",
+          "bytes": 6388,
+          "sha256": "3e35d8858244805bd9c8434f5f26d9d8a536acebdb382d6395734b4995192726"
+        },
+        {
+          "file": "/home/blux/de-xr/dome-sculpt/artifacts/source4-import-contract-ce9/build-initial-release/import-default-consumer/export-default2-absent-0.000000.glb",
+          "bytes": 9492,
+          "sha256": "3a74f5b3938d908f19d2d5b960c9c7fb5ab4f79e35dd23845e8cb18dd3b5bbe8"
+        },
+        {
+          "file": "/home/blux/de-xr/dome-sculpt/artifacts/source4-import-contract-ce9/build-initial-release/import-default-consumer/export-default2-absent-0.650000.glb",
+          "bytes": 9520,
+          "sha256": "844a2d67060834b8582c5dca0f375bee4369b9aaadfbdad0c67e6bd9845c0064"
+        },
+        {
+          "file": "/home/blux/de-xr/dome-sculpt/artifacts/source4-import-contract-ce9/build-initial-release/import-default-consumer/export-default2-unused-0.000000.glb",
+          "bytes": 9492,
+          "sha256": "375fe5d77534fcde43c014f44ec6cafeb292d6bb65ebc0445657465072a64b8a"
+        },
+        {
+          "file": "/home/blux/de-xr/dome-sculpt/artifacts/source4-import-contract-ce9/build-initial-release/import-default-consumer/export-default2-unused-0.650000.glb",
+          "bytes": 9520,
+          "sha256": "5991628f33d70a4ddcadf3c04a7b134e281d90e2d137238687dfda888b0a8e08"
+        },
+        {
+          "file": "/home/blux/de-xr/dome-sculpt/artifacts/source4-import-contract-ce9/build-initial-release/import-texture-atlas-render/artist-BLEND-0.000000-0.glb",
+          "bytes": 6764,
+          "sha256": "01c39d78af325eab5a5ceb3b7d95ea50a698f44c4e1651b9fb27c33d63c4db98"
+        },
+        {
+          "file": "/home/blux/de-xr/dome-sculpt/artifacts/source4-import-contract-ce9/build-initial-release/import-texture-atlas-render/artist-BLEND-0.000000-1.glb",
+          "bytes": 401688,
+          "sha256": "24288ed13c9b297cc78f99e5dff5020226d288c381dde01707c62599810b4940"
+        },
+        {
+          "file": "/home/blux/de-xr/dome-sculpt/artifacts/source4-import-contract-ce9/build-initial-release/import-texture-atlas-render/artist-BLEND-0.650000-0.glb",
+          "bytes": 6796,
+          "sha256": "49b17f7b5327e48b407be1363218b87c90b5080234e1d006c47e5cc8eab84976"
+        },
+        {
+          "file": "/home/blux/de-xr/dome-sculpt/artifacts/source4-import-contract-ce9/build-initial-release/import-texture-atlas-render/artist-BLEND-0.650000-1.glb",
+          "bytes": 372892,
+          "sha256": "1ed71ed1d43706af64a0f864a6abdb6fd37ca8de45575f202b91e1c892a353b7"
+        },
+        {
+          "file": "/home/blux/de-xr/dome-sculpt/artifacts/source4-import-contract-ce9/build-initial-release/import-texture-atlas-render/artist-MASK-0.000000-0.glb",
+          "bytes": 6828,
+          "sha256": "31e9635b9e4bf5a4d912c8cd194d4f0086e9fcda20670c8ab94280ecd3728676"
+        },
+        {
+          "file": "/home/blux/de-xr/dome-sculpt/artifacts/source4-import-contract-ce9/build-initial-release/import-texture-atlas-render/artist-MASK-0.000000-1.glb",
+          "bytes": 401748,
+          "sha256": "b6337712e790c6a786a8feb3bf88c41ffeb869a7306b09a4d9c823aeca37b83c"
+        },
+        {
+          "file": "/home/blux/de-xr/dome-sculpt/artifacts/source4-import-contract-ce9/build-initial-release/import-texture-atlas-render/artist-MASK-0.650000-0.glb",
+          "bytes": 6860,
+          "sha256": "eb6150bf9bb7d81400b604576a5bedd2d87ac3c5191d16c1b5f9f54c84aa5360"
+        },
+        {
+          "file": "/home/blux/de-xr/dome-sculpt/artifacts/source4-import-contract-ce9/build-initial-release/import-texture-atlas-render/artist-MASK-0.650000-1.glb",
+          "bytes": 372960,
+          "sha256": "fe167d2e612e2fa8debf23d4917db36761d3de716daa40aa05966b65d4844b3e"
+        },
+        {
+          "file": "/home/blux/de-xr/dome-sculpt/artifacts/source4-import-contract-ce9/build-initial-release/import-texture-atlas-render/artist-OPAQUE-0.000000-0.glb",
+          "bytes": 6768,
+          "sha256": "6c8d97d903f7f35e7af5694b988586c7f9263746333159cf033cfa8c6357a4bf"
+        },
+        {
+          "file": "/home/blux/de-xr/dome-sculpt/artifacts/source4-import-contract-ce9/build-initial-release/import-texture-atlas-render/artist-OPAQUE-0.000000-1.glb",
+          "bytes": 401696,
+          "sha256": "d9c1d4a3ce3aeaaa336959b76d75262a9c96eb84b8926f86d75615eae4954db6"
+        },
+        {
+          "file": "/home/blux/de-xr/dome-sculpt/artifacts/source4-import-contract-ce9/build-initial-release/import-texture-atlas-render/artist-OPAQUE-0.650000-0.glb",
+          "bytes": 6796,
+          "sha256": "74e40021e5fba794f87ffbe98f42a6631deabb3892b7c3a8f9599c11b7d069ff"
+        },
+        {
+          "file": "/home/blux/de-xr/dome-sculpt/artifacts/source4-import-contract-ce9/build-initial-release/import-texture-atlas-render/artist-OPAQUE-0.650000-1.glb",
+          "bytes": 372896,
+          "sha256": "8e4a6392c9f335f68ff4112f5b46baa761d083fc53e7d61e99839a49f52950bb"
+        },
+        {
+          "file": "/home/blux/de-xr/dome-sculpt/artifacts/source4-import-contract-ce9/build-initial-release/import-texture-atlas-render/flat-BLEND-0.000000-0.glb",
+          "bytes": 7200,
+          "sha256": "543d32a66ade9d6b0090cf720655dd128b05ddf612f06261dded5356c22601dd"
+        },
+        {
+          "file": "/home/blux/de-xr/dome-sculpt/artifacts/source4-import-contract-ce9/build-initial-release/import-texture-atlas-render/flat-BLEND-0.000000-1.glb",
+          "bytes": 402760,
+          "sha256": "83bbc7b1daf62fb6fd7e9405c9625d0ce1cd4d09c5c12aac7b2c503d4c752978"
+        },
+        {
+          "file": "/home/blux/de-xr/dome-sculpt/artifacts/source4-import-contract-ce9/build-initial-release/import-texture-atlas-render/flat-BLEND-0.650000-0.glb",
+          "bytes": 7232,
+          "sha256": "7c038b3108219887d5f50b8ad3379cd8e93335ee5034766f07dc95f0d6e896d8"
+        },
+        {
+          "file": "/home/blux/de-xr/dome-sculpt/artifacts/source4-import-contract-ce9/build-initial-release/import-texture-atlas-render/flat-BLEND-0.650000-1.glb",
+          "bytes": 373972,
+          "sha256": "8548e1aba31bc0dddcba99f4989e792d72916973977461d2668e7a216d147d83"
+        },
+        {
+          "file": "/home/blux/de-xr/dome-sculpt/artifacts/source4-import-contract-ce9/build-initial-release/import-texture-atlas-render/flat-MASK-0.000000-0.glb",
+          "bytes": 7268,
+          "sha256": "7ce6ed3a5a27db66b91b9dbe9cf0b30a5fd37e9fde8a1894adbd3351124770bd"
+        },
+        {
+          "file": "/home/blux/de-xr/dome-sculpt/artifacts/source4-import-contract-ce9/build-initial-release/import-texture-atlas-render/flat-MASK-0.000000-1.glb",
+          "bytes": 402824,
+          "sha256": "c7572b3bd40456d6509ee6dfd6eee51699017835052a8ba2e752c2937e9337da"
+        },
+        {
+          "file": "/home/blux/de-xr/dome-sculpt/artifacts/source4-import-contract-ce9/build-initial-release/import-texture-atlas-render/flat-MASK-0.650000-0.glb",
+          "bytes": 7296,
+          "sha256": "5ed6df2f7682eca82bc5ffac196ccfb636a7dc4431864ad31a1dc5876209d139"
+        },
+        {
+          "file": "/home/blux/de-xr/dome-sculpt/artifacts/source4-import-contract-ce9/build-initial-release/import-texture-atlas-render/flat-MASK-0.650000-1.glb",
+          "bytes": 374032,
+          "sha256": "1c64dff0dd5000475611d34db88ed6d25bfefaa6bbfa0229a35cb47b7133d4a7"
+        },
+        {
+          "file": "/home/blux/de-xr/dome-sculpt/artifacts/source4-import-contract-ce9/build-initial-release/import-texture-atlas-render/flat-OPAQUE-0.000000-0.glb",
+          "bytes": 7204,
+          "sha256": "5f0eb4ae3204ee1bb007d2984250c25caa60c23202d3fb2c93cdd43229006a59"
+        },
+        {
+          "file": "/home/blux/de-xr/dome-sculpt/artifacts/source4-import-contract-ce9/build-initial-release/import-texture-atlas-render/flat-OPAQUE-0.000000-1.glb",
+          "bytes": 402768,
+          "sha256": "cb6823557dc477ec90adc03e4fec18a375bdf21ac23cbfbf5f8f6b6e7a547ab8"
+        },
+        {
+          "file": "/home/blux/de-xr/dome-sculpt/artifacts/source4-import-contract-ce9/build-initial-release/import-texture-atlas-render/flat-OPAQUE-0.650000-0.glb",
+          "bytes": 7236,
+          "sha256": "1572ffa4ab6e34d44922c214012344c30f914f6a292cf0a3cde5ea0087d0d4d2"
+        },
+        {
+          "file": "/home/blux/de-xr/dome-sculpt/artifacts/source4-import-contract-ce9/build-initial-release/import-texture-atlas-render/flat-OPAQUE-0.650000-1.glb",
+          "bytes": 373972,
+          "sha256": "ba0f84b18dfed587681b4fcb77a3e253807ecb6610c87bc164067da8cb822535"
+        },
+        {
+          "file": "/home/blux/de-xr/dome-sculpt/artifacts/source4-import-contract-ce9/build-initial-release/vrm-matcap-import/native-matcap-v0.glb",
+          "bytes": 6288,
+          "sha256": "908cec9ea4b4767317d8ea86ccec5e7f69330863b89093c58088182104a82ef7"
+        },
+        {
+          "file": "/home/blux/de-xr/dome-sculpt/artifacts/source4-import-contract-ce9/build-initial-release/vrm-matcap-import/native-matcap-v1.glb",
+          "bytes": 6288,
+          "sha256": "a2df4b524eb1cbf81394e99b9ca5a5b6682c2cfcef01cd0ccd5db501f8a5377a"
+        }
+      ],
+      "full_report_sha256": "e0740a933596eda2ffaf1f1a26e0e802b08aa9b40e1aed705466371c1317dc50"
+    },
+    "sanitize": {
+      "validator": "2.0.0-dev.3.10",
+      "maxIssues": 0,
+      "files": 38,
+      "errors": 0,
+      "warnings": 8,
+      "infos": 140,
+      "warning_code": "NODE_SKINNED_MESH_NON_ROOT",
+      "outputs": [
+        {
+          "file": "/home/blux/de-xr/dome-sculpt/artifacts/source4-import-contract-ce9/build-initial-sanitize/import-default-consumer/export-default0-absent-0.000000.glb",
+          "bytes": 6004,
+          "sha256": "8a807f18bd4fa7ac885aad363c76a7e82fa87e4ff81414df9b1bc2b25465c780"
+        },
+        {
+          "file": "/home/blux/de-xr/dome-sculpt/artifacts/source4-import-contract-ce9/build-initial-sanitize/import-default-consumer/export-default0-absent-0.650000.glb",
+          "bytes": 6032,
+          "sha256": "023f0c7af0c2e2825a9087feef72338f4d5198ab80c68a435400c4e253bc1e4b"
+        },
+        {
+          "file": "/home/blux/de-xr/dome-sculpt/artifacts/source4-import-contract-ce9/build-initial-sanitize/import-default-consumer/export-default0-unused-0.000000.glb",
+          "bytes": 6004,
+          "sha256": "e4babe984f8da6203f0c6355c010c76e2bdc231598bd5a99fab07e6a5ecc9aa1"
+        },
+        {
+          "file": "/home/blux/de-xr/dome-sculpt/artifacts/source4-import-contract-ce9/build-initial-sanitize/import-default-consumer/export-default0-unused-0.650000.glb",
+          "bytes": 6032,
+          "sha256": "65c06570246025f222740a11d4b03a79b200235533e142b5bcab3f794f7def7a"
+        },
+        {
+          "file": "/home/blux/de-xr/dome-sculpt/artifacts/source4-import-contract-ce9/build-initial-sanitize/import-default-consumer/export-default1-absent-0.000000.glb",
+          "bytes": 6356,
+          "sha256": "564ce7cde4b3941df9024d7c8b7713f9f8caba2c52026fb22f64ec272f77199a"
+        },
+        {
+          "file": "/home/blux/de-xr/dome-sculpt/artifacts/source4-import-contract-ce9/build-initial-sanitize/import-default-consumer/export-default1-absent-0.650000.glb",
+          "bytes": 6388,
+          "sha256": "46e3463cbbfac1430fc12f2085544f1252f3d71bf671e8a9eb57e657e287fb33"
+        },
+        {
+          "file": "/home/blux/de-xr/dome-sculpt/artifacts/source4-import-contract-ce9/build-initial-sanitize/import-default-consumer/export-default1-unused-0.000000.glb",
+          "bytes": 6356,
+          "sha256": "ace25cc4d1c1cd8797886c17ca189a505baa4ca07397a75af9e526b9b337130b"
+        },
+        {
+          "file": "/home/blux/de-xr/dome-sculpt/artifacts/source4-import-contract-ce9/build-initial-sanitize/import-default-consumer/export-default1-unused-0.650000.glb",
+          "bytes": 6388,
+          "sha256": "3e35d8858244805bd9c8434f5f26d9d8a536acebdb382d6395734b4995192726"
+        },
+        {
+          "file": "/home/blux/de-xr/dome-sculpt/artifacts/source4-import-contract-ce9/build-initial-sanitize/import-default-consumer/export-default2-absent-0.000000.glb",
+          "bytes": 9492,
+          "sha256": "3a74f5b3938d908f19d2d5b960c9c7fb5ab4f79e35dd23845e8cb18dd3b5bbe8"
+        },
+        {
+          "file": "/home/blux/de-xr/dome-sculpt/artifacts/source4-import-contract-ce9/build-initial-sanitize/import-default-consumer/export-default2-absent-0.650000.glb",
+          "bytes": 9520,
+          "sha256": "844a2d67060834b8582c5dca0f375bee4369b9aaadfbdad0c67e6bd9845c0064"
+        },
+        {
+          "file": "/home/blux/de-xr/dome-sculpt/artifacts/source4-import-contract-ce9/build-initial-sanitize/import-default-consumer/export-default2-unused-0.000000.glb",
+          "bytes": 9492,
+          "sha256": "375fe5d77534fcde43c014f44ec6cafeb292d6bb65ebc0445657465072a64b8a"
+        },
+        {
+          "file": "/home/blux/de-xr/dome-sculpt/artifacts/source4-import-contract-ce9/build-initial-sanitize/import-default-consumer/export-default2-unused-0.650000.glb",
+          "bytes": 9520,
+          "sha256": "5991628f33d70a4ddcadf3c04a7b134e281d90e2d137238687dfda888b0a8e08"
+        },
+        {
+          "file": "/home/blux/de-xr/dome-sculpt/artifacts/source4-import-contract-ce9/build-initial-sanitize/import-texture-atlas-render/artist-BLEND-0.000000-0.glb",
+          "bytes": 6764,
+          "sha256": "01c39d78af325eab5a5ceb3b7d95ea50a698f44c4e1651b9fb27c33d63c4db98"
+        },
+        {
+          "file": "/home/blux/de-xr/dome-sculpt/artifacts/source4-import-contract-ce9/build-initial-sanitize/import-texture-atlas-render/artist-BLEND-0.000000-1.glb",
+          "bytes": 401688,
+          "sha256": "24288ed13c9b297cc78f99e5dff5020226d288c381dde01707c62599810b4940"
+        },
+        {
+          "file": "/home/blux/de-xr/dome-sculpt/artifacts/source4-import-contract-ce9/build-initial-sanitize/import-texture-atlas-render/artist-BLEND-0.650000-0.glb",
+          "bytes": 6796,
+          "sha256": "49b17f7b5327e48b407be1363218b87c90b5080234e1d006c47e5cc8eab84976"
+        },
+        {
+          "file": "/home/blux/de-xr/dome-sculpt/artifacts/source4-import-contract-ce9/build-initial-sanitize/import-texture-atlas-render/artist-BLEND-0.650000-1.glb",
+          "bytes": 372892,
+          "sha256": "1ed71ed1d43706af64a0f864a6abdb6fd37ca8de45575f202b91e1c892a353b7"
+        },
+        {
+          "file": "/home/blux/de-xr/dome-sculpt/artifacts/source4-import-contract-ce9/build-initial-sanitize/import-texture-atlas-render/artist-MASK-0.000000-0.glb",
+          "bytes": 6828,
+          "sha256": "31e9635b9e4bf5a4d912c8cd194d4f0086e9fcda20670c8ab94280ecd3728676"
+        },
+        {
+          "file": "/home/blux/de-xr/dome-sculpt/artifacts/source4-import-contract-ce9/build-initial-sanitize/import-texture-atlas-render/artist-MASK-0.000000-1.glb",
+          "bytes": 401748,
+          "sha256": "b6337712e790c6a786a8feb3bf88c41ffeb869a7306b09a4d9c823aeca37b83c"
+        },
+        {
+          "file": "/home/blux/de-xr/dome-sculpt/artifacts/source4-import-contract-ce9/build-initial-sanitize/import-texture-atlas-render/artist-MASK-0.650000-0.glb",
+          "bytes": 6860,
+          "sha256": "eb6150bf9bb7d81400b604576a5bedd2d87ac3c5191d16c1b5f9f54c84aa5360"
+        },
+        {
+          "file": "/home/blux/de-xr/dome-sculpt/artifacts/source4-import-contract-ce9/build-initial-sanitize/import-texture-atlas-render/artist-MASK-0.650000-1.glb",
+          "bytes": 372960,
+          "sha256": "fe167d2e612e2fa8debf23d4917db36761d3de716daa40aa05966b65d4844b3e"
+        },
+        {
+          "file": "/home/blux/de-xr/dome-sculpt/artifacts/source4-import-contract-ce9/build-initial-sanitize/import-texture-atlas-render/artist-OPAQUE-0.000000-0.glb",
+          "bytes": 6768,
+          "sha256": "6c8d97d903f7f35e7af5694b988586c7f9263746333159cf033cfa8c6357a4bf"
+        },
+        {
+          "file": "/home/blux/de-xr/dome-sculpt/artifacts/source4-import-contract-ce9/build-initial-sanitize/import-texture-atlas-render/artist-OPAQUE-0.000000-1.glb",
+          "bytes": 401696,
+          "sha256": "d9c1d4a3ce3aeaaa336959b76d75262a9c96eb84b8926f86d75615eae4954db6"
+        },
+        {
+          "file": "/home/blux/de-xr/dome-sculpt/artifacts/source4-import-contract-ce9/build-initial-sanitize/import-texture-atlas-render/artist-OPAQUE-0.650000-0.glb",
+          "bytes": 6796,
+          "sha256": "74e40021e5fba794f87ffbe98f42a6631deabb3892b7c3a8f9599c11b7d069ff"
+        },
+        {
+          "file": "/home/blux/de-xr/dome-sculpt/artifacts/source4-import-contract-ce9/build-initial-sanitize/import-texture-atlas-render/artist-OPAQUE-0.650000-1.glb",
+          "bytes": 372896,
+          "sha256": "8e4a6392c9f335f68ff4112f5b46baa761d083fc53e7d61e99839a49f52950bb"
+        },
+        {
+          "file": "/home/blux/de-xr/dome-sculpt/artifacts/source4-import-contract-ce9/build-initial-sanitize/import-texture-atlas-render/flat-BLEND-0.000000-0.glb",
+          "bytes": 7200,
+          "sha256": "543d32a66ade9d6b0090cf720655dd128b05ddf612f06261dded5356c22601dd"
+        },
+        {
+          "file": "/home/blux/de-xr/dome-sculpt/artifacts/source4-import-contract-ce9/build-initial-sanitize/import-texture-atlas-render/flat-BLEND-0.000000-1.glb",
+          "bytes": 402760,
+          "sha256": "83bbc7b1daf62fb6fd7e9405c9625d0ce1cd4d09c5c12aac7b2c503d4c752978"
+        },
+        {
+          "file": "/home/blux/de-xr/dome-sculpt/artifacts/source4-import-contract-ce9/build-initial-sanitize/import-texture-atlas-render/flat-BLEND-0.650000-0.glb",
+          "bytes": 7232,
+          "sha256": "7c038b3108219887d5f50b8ad3379cd8e93335ee5034766f07dc95f0d6e896d8"
+        },
+        {
+          "file": "/home/blux/de-xr/dome-sculpt/artifacts/source4-import-contract-ce9/build-initial-sanitize/import-texture-atlas-render/flat-BLEND-0.650000-1.glb",
+          "bytes": 373972,
+          "sha256": "8548e1aba31bc0dddcba99f4989e792d72916973977461d2668e7a216d147d83"
+        },
+        {
+          "file": "/home/blux/de-xr/dome-sculpt/artifacts/source4-import-contract-ce9/build-initial-sanitize/import-texture-atlas-render/flat-MASK-0.000000-0.glb",
+          "bytes": 7268,
+          "sha256": "7ce6ed3a5a27db66b91b9dbe9cf0b30a5fd37e9fde8a1894adbd3351124770bd"
+        },
+        {
+          "file": "/home/blux/de-xr/dome-sculpt/artifacts/source4-import-contract-ce9/build-initial-sanitize/import-texture-atlas-render/flat-MASK-0.000000-1.glb",
+          "bytes": 402824,
+          "sha256": "c7572b3bd40456d6509ee6dfd6eee51699017835052a8ba2e752c2937e9337da"
+        },
+        {
+          "file": "/home/blux/de-xr/dome-sculpt/artifacts/source4-import-contract-ce9/build-initial-sanitize/import-texture-atlas-render/flat-MASK-0.650000-0.glb",
+          "bytes": 7296,
+          "sha256": "5ed6df2f7682eca82bc5ffac196ccfb636a7dc4431864ad31a1dc5876209d139"
+        },
+        {
+          "file": "/home/blux/de-xr/dome-sculpt/artifacts/source4-import-contract-ce9/build-initial-sanitize/import-texture-atlas-render/flat-MASK-0.650000-1.glb",
+          "bytes": 374032,
+          "sha256": "1c64dff0dd5000475611d34db88ed6d25bfefaa6bbfa0229a35cb47b7133d4a7"
+        },
+        {
+          "file": "/home/blux/de-xr/dome-sculpt/artifacts/source4-import-contract-ce9/build-initial-sanitize/import-texture-atlas-render/flat-OPAQUE-0.000000-0.glb",
+          "bytes": 7204,
+          "sha256": "5f0eb4ae3204ee1bb007d2984250c25caa60c23202d3fb2c93cdd43229006a59"
+        },
+        {
+          "file": "/home/blux/de-xr/dome-sculpt/artifacts/source4-import-contract-ce9/build-initial-sanitize/import-texture-atlas-render/flat-OPAQUE-0.000000-1.glb",
+          "bytes": 402768,
+          "sha256": "cb6823557dc477ec90adc03e4fec18a375bdf21ac23cbfbf5f8f6b6e7a547ab8"
+        },
+        {
+          "file": "/home/blux/de-xr/dome-sculpt/artifacts/source4-import-contract-ce9/build-initial-sanitize/import-texture-atlas-render/flat-OPAQUE-0.650000-0.glb",
+          "bytes": 7236,
+          "sha256": "1572ffa4ab6e34d44922c214012344c30f914f6a292cf0a3cde5ea0087d0d4d2"
+        },
+        {
+          "file": "/home/blux/de-xr/dome-sculpt/artifacts/source4-import-contract-ce9/build-initial-sanitize/import-texture-atlas-render/flat-OPAQUE-0.650000-1.glb",
+          "bytes": 373972,
+          "sha256": "ba0f84b18dfed587681b4fcb77a3e253807ecb6610c87bc164067da8cb822535"
+        },
+        {
+          "file": "/home/blux/de-xr/dome-sculpt/artifacts/source4-import-contract-ce9/build-initial-sanitize/vrm-matcap-import/native-matcap-v0.glb",
+          "bytes": 6288,
+          "sha256": "908cec9ea4b4767317d8ea86ccec5e7f69330863b89093c58088182104a82ef7"
+        },
+        {
+          "file": "/home/blux/de-xr/dome-sculpt/artifacts/source4-import-contract-ce9/build-initial-sanitize/vrm-matcap-import/native-matcap-v1.glb",
+          "bytes": 6288,
+          "sha256": "a2df4b524eb1cbf81394e99b9ca5a5b6682c2cfcef01cd0ccd5db501f8a5377a"
+        }
+      ],
+      "full_report_sha256": "2027685930f8f6fd1c793aeac1a08f60f845178676790a6abcc4bf2b3d37ff35"
+    }
+  },
+  "evidence_files": {
+    "artifacts/import-proof/initial-release/before.json": "dc419dbd965e3c9dbc1eb7da02f8605c2291cd7454e13f0c5634e140894527c4",
+    "artifacts/import-proof/initial-release/after.json": "dc419dbd965e3c9dbc1eb7da02f8605c2291cd7454e13f0c5634e140894527c4",
+    "artifacts/import-proof/baseline-release/before.json": "aa083995837fa9158b05da7e5a775f49e88c4664f96eb738b3859f69d1155bec",
+    "artifacts/import-proof/baseline-release/after.json": "aa083995837fa9158b05da7e5a775f49e88c4664f96eb738b3859f69d1155bec",
+    "artifacts/import-proof/migration-release/before.json": "d14e9d374ad0c85323a641b58167508d1de2b51393b59391624ba6930bd514e4",
+    "artifacts/import-proof/migration-release/after.json": "d14e9d374ad0c85323a641b58167508d1de2b51393b59391624ba6930bd514e4",
+    "artifacts/import-proof/initial-sanitize/before.json": "18ccc654c78e8ffc18be3ef0c9cfd680eaa81eefce5271b75783058ca722b5a9",
+    "artifacts/import-proof/initial-sanitize/after.json": "18ccc654c78e8ffc18be3ef0c9cfd680eaa81eefce5271b75783058ca722b5a9",
+    "artifacts/import-proof/migration-sanitize/before.json": "2866f3d225b4e98a7a9bf57865ae8bedce2ba181375787303aca96a8b6d9350d",
+    "artifacts/import-proof/migration-sanitize/after.json": "2866f3d225b4e98a7a9bf57865ae8bedce2ba181375787303aca96a8b6d9350d",
+    "artifacts/import-proof/sanitize-direct-measurement/before.json": "908fdaa913178bd3ea8a8c75eadca726edb42318a0f2a0c1e71d8addcd93db33",
+    "artifacts/import-proof/sanitize-direct-measurement/after.json": "908fdaa913178bd3ea8a8c75eadca726edb42318a0f2a0c1e71d8addcd93db33",
+    "artifacts/import-proof/observer-config/before.json": "aec0e22bf138c4079ee8eef5a9bb20761e83c9140671da75c0cb7ed5057cf54c",
+    "artifacts/import-proof/observer-config/after.json": "aec0e22bf138c4079ee8eef5a9bb20761e83c9140671da75c0cb7ed5057cf54c",
+    "artifacts/import-proof/migration-release/run.log": "4fdc0237dbaafe26f321cc0c19e67c9229e81c4312e6113fcf63e4435eeb10b2",
+    "artifacts/import-proof/migration-sanitize/run.log": "1f5331de7131167c79f44cb696c642085045615b7ca0109d13ad23178d4325ad",
+    "artifacts/import-proof/sanitize-direct-measurement/openat2.log": "d9de4c95fb489680c1add5d266a0d1c88f325a86709921b288c9661d165fb7d0",
+    "artifacts/import-proof/sanitize-direct-measurement/fallback.log": "48756fc0fac429222c0855ba9b2b5908d1837d3551a845253a9e6113be824d55"
+  }
+}

@@ -1,5 +1,8 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/import-authoring.hpp"
+#include "dome/document.hpp"
+#include "dome/source-maps.hpp"
+#include "cgltf.h"
 #include "dome/humanoid-creator.hpp"
 #include "dome/material-bindings.hpp"
 #include "import-authoring-fixtures.hpp"
@@ -61,9 +64,15 @@ int main(int argc,char **argv)try{
    check(origin.material&&origin.roles[size_t(MToonSlot::Matcap)].image==object.material_bindings->roles[size_t(MToonSlot::Matcap)].image,"First UV origin retains the same view-dependent image and material descriptor");
    check(!object.painted->mesh().uv.empty()&&object.painted->surface_diagnostics().unpaintable_uv_faces.empty(),"Generated paint atlas remains writable without relabeling view-space MatCap as mesh-UV sampling");
   }
-  if(atlas)for(auto id:imported.objects)check(imported.scene.object(id).material_bindings->sampling_reparameterized,"Explicit editable-atlas preparation keeps view-dependent MatCap roles through its owning resampling route");
+  if(atlas)for(auto id:imported.objects){const auto &o=imported.scene.object(id);check(!o.material_bindings->sampling_reparameterized&&o.painted->source_sampling_prepared()&&o.painted->valid_source_sampling_attachment()&&o.painted->surface_diagnostics().policy==PaintUvPolicy::Strict&&!o.painted->source_sampling_authored_uv1()&&o.painted->source_maps()->empty(),"Explicit writable atlas retains real MatCap view-space authority without fabricated UV1 or PBR image roles");}
   auto encoded=imported.scene.encode();auto saved=directory/(legacy?"matcap-v0.dsculpt":"matcap-v1.dsculpt");imported.scene.save(saved);
   check(Scene::decode(encoded).encode()==encoded&&Scene::load(saved).encode()==encoded,"Native restart preserves both view-dependent roles and original missing coordinate authority");
+  if(atlas){
+   Document native;native.replace(before);ImportSettings settings;settings.paint_resolution=64;settings.prepare_texture_atlas=true;native.import_asset(path,settings);const auto native_path=directory/(legacy?"native-matcap-v0.dsculpt":"native-matcap-v1.dsculpt");native.save_async(native_path).get();
+   check(native.wait_asset()&&native.wait_mesh()&&native.frame().state->error.empty(),"Actual native MatCap import and immediately ordered Save complete with source-aware atlas authority");const auto accepted=native.copy_scene().encode();check(Scene::load(native_path).encode()==accepted,"Native MatCap worker restart retains both original missing UVs and writable source owners");
+   check(native.undo()&&native.copy_scene().encode()==original&&native.redo()&&native.copy_scene().encode()==accepted,"Source-aware MatCap import remains one exact global Undo/Redo endpoint");
+   const auto exported=directory/(legacy?"native-matcap-v0.glb":"native-matcap-v1.glb");native.export_asset(exported,AssetExportFormat::Glb).get();cgltf_options parse_options{};cgltf_data *parsed=nullptr;const auto code=cgltf_parse_file(&parse_options,exported.c_str(),&parsed);bool valid=code==cgltf_result_success;if(valid)valid=cgltf_load_buffers(&parse_options,parsed,exported.c_str())==cgltf_result_success&&cgltf_validate(parsed)==cgltf_result_success;cgltf_free(parsed);check(valid&&native.copy_scene().encode()==accepted,"Actual MatCap standard export has independently valid glTF geometry/resources and preserves the complete native source");
+  }
   auto sampled=fixture;
   if(legacy)sampled.j["extensions"]["VRM"]["materialProperties"][0]["textureProperties"]["_ShadeTexture"]=0;
   else sampled.j["materials"][0]["extensions"]["VRMC_materials_mtoon"]["shadeMultiplyTexture"]={{"index",0},{"texCoord",1}};

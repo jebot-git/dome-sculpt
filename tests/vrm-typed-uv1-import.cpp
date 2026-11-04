@@ -4,6 +4,7 @@
 #undef main
 #include "dome/document.hpp"
 #include <algorithm>
+#include "paint-overlay-packet.hpp"
 int main(int argc,char **argv)try{
  if(argc!=2)return 2;std::filesystem::path out=argv[1];std::filesystem::create_directories(out);
  auto fixture=source(false);import_fixture::Fixture original;
@@ -19,19 +20,20 @@ int main(int argc,char **argv)try{
  check(gap_refused&&empty.encode()==before,"A real UV1-without-UV0 source is rejected precisely with the caller graph unchanged");
  auto imported=prepare_authoring_import(empty,path,options);
  check(imported.objects.size()==2&&empty.encode()==before,"Typed-only shade UV1 imports both real source instances with explicit atlas choice");
- double max_error=0;
+ double max_error=0,wrong_uv0_error=0;
  for(auto id:imported.objects){const auto &object=imported.scene.object(id);const auto &binding=*object.material_bindings;const auto &origin=*binding.uv_origin;
-  check(binding.sampling_reparameterized&&binding.material.textures[size_t(MToonSlot::Shade)].texcoord==0&&origin.material->textures[size_t(MToonSlot::Shade)].texcoord==1,"Current atlas resolves the typed role while first-source descriptor retains original UV1 selection");
-  check(!origin.paint->source_maps()&&object.appearance->asset->primitives[0].mesh.uv==original_uv0,"Typed-only UV1 owns its genuine source UV0 stream without fabricating any PBR image map");
-  const auto &raw=object.appearance->asset->primitives[0];const auto &mesh=object.painted->mesh();const auto &view=binding.roles[size_t(MToonSlot::Shade)];
-  for(size_t c=0;c<mesh.indices.size();c+=3){std::array<float,2> target{},uv{};for(size_t k=0;k<3;++k){auto v=mesh.indices[c+k];auto original_vertex=object.appearance->source_vertices[v];for(size_t axis=0;axis<2;++axis){target[axis]+=mesh.uv[v][axis]/3;uv[axis]+=raw.uv1[original_vertex][axis]/3;}}
+  check(!binding.sampling_reparameterized&&object.painted->source_sampling_prepared()&&object.painted->valid_source_sampling_attachment()&&object.painted->surface_diagnostics().policy==PaintUvPolicy::Strict&&binding.material.textures[size_t(MToonSlot::Shade)].texcoord==1&&origin.material->textures[size_t(MToonSlot::Shade)].texcoord==1&&binding.roles[size_t(MToonSlot::Shade)].image==origin.roles[size_t(MToonSlot::Shade)].image,"Strict writable atlas and exact original UV1 role retain separate owning source authority");
+  check(origin.paint->source_maps()&&origin.paint->source_maps()->empty()&&object.painted->source_maps()->empty()&&object.appearance->asset->primitives[0].mesh.uv==original_uv0&&object.painted->source_sampling_authored_uv1(),"Typed-only UV1 owns genuine original coordinates without inventing a PBR image role");
+  const auto &raw=object.appearance->asset->primitives[0];const auto &mesh=object.painted->mesh();const auto &view=binding.roles[size_t(MToonSlot::Shade)];const auto coordinates=detail::PaintOverlayFactory::source_coordinates(*object.painted);check(coordinates[0]&&coordinates[1]&&coordinates[1]->size()==mesh.positions.size(),"Actual renderer packet exposes authenticated logical UV0 and UV1 in current vertex order");
+  for(size_t c=0;c<mesh.indices.size();c+=3){std::array<float,2> target{},uv{},wrong_uv0{};for(size_t k=0;k<3;++k){auto v=mesh.indices[c+k];auto original_vertex=object.appearance->source_vertices[v];for(size_t axis=0;axis<2;++axis){target[axis]+=coordinates[1]->at(v)[axis]/3;wrong_uv0[axis]+=coordinates[0]->at(v)[axis]/3;uv[axis]+=raw.uv1[original_vertex][axis]/3;check(coordinates[1]->at(v)[axis]==raw.uv1[original_vertex][axis],"Live logical source coordinate matches the exact retained primitive/remap witness");}}
    // Independent analytic bilinear oracle for the fixture's 2x2 red/green/blue/white image.
    double x=std::clamp(double(uv[0])*2-.5,0.,1.),y=std::clamp(double(uv[1])*2-.5,0.,1.);
    std::array<double,4> expected{(1-x)*(1-y)+x*y,x,(y),((1-x)*(1-y)*32+x*(1-y)*96+(1-x)*y*160+x*y*255)/255};
-   auto sampled=sample_source_texture(view,target[0],target[1],true);for(size_t channel=0;channel<4;++channel)max_error=std::max(max_error,std::abs(sampled[channel]-expected[channel]));
+   auto sampled=sample_source_texture(view,target[0],target[1],true);auto wrong=sample_source_texture(view,wrong_uv0[0],wrong_uv0[1],true);for(size_t channel=0;channel<4;++channel){max_error=std::max(max_error,std::abs(sampled[channel]-expected[channel]));wrong_uv0_error=std::max(wrong_uv0_error,std::abs(wrong[channel]-expected[channel]));}
   }
  }
- check(max_error<=2./255,"Independent original-image/UV1 bilinear oracle matches the prepared shade atlas within two linear channel steps");
+ check(max_error<=2./255,"Independent original-image/UV1 bilinear oracle matches the live original-domain shade sampler within two linear channel steps");
+ check(wrong_uv0_error>2./255,"Independent UV1 oracle detects substituting original UV0 for the actual shade role");
  auto encoded=imported.scene.encode();auto saved=out/"typed-uv1.dsculpt";imported.scene.save(saved);
  check(Scene::decode(encoded).encode()==encoded&&Scene::load(saved).encode()==encoded,"Typed-only source UV1, role descriptors and exact source graph survive native restart");
  Document document;ImportSettings settings;settings.paint_resolution=64;settings.prepare_texture_atlas=true;document.import_asset(path,settings);
@@ -44,5 +46,5 @@ int main(int argc,char **argv)try{
  auto painted=document.copy_scene().encode();check(painted!=accepted&&Scene::load(out/"worker.dsculpt").encode()==painted,"Native Save writes the complete painted current role/source endpoint");
  check(document.undo()&&document.copy_scene().encode()==accepted&&document.redo()&&document.copy_scene().encode()==painted,"Native paint has its own exact Undo/Redo endpoint after typed-only import");
  check(document.undo()&&document.undo()&&document.copy_scene().encode()==before&&document.redo()&&document.copy_scene().encode()==accepted,"One separate import Undo/Redo retains exact typed UV1 identity and both source instances");
- std::cout<<"Typed-only UV1 checks "<<checks<<" max linear error "<<max_error<<'\n';return 0;
+ std::cout<<"Typed-only UV1 checks "<<checks<<" max linear error "<<max_error<<" wrong UV0 error "<<wrong_uv0_error<<'\n';return 0;
 }catch(const std::exception &error){std::cerr<<"FAIL "<<error.what()<<'\n';return 1;}
