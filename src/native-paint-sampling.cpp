@@ -2,6 +2,7 @@
 #include "native-paint-sampling.hpp"
 #include "paint-sampling-access.hpp"
 #include <numeric>
+#include <cmath>
 namespace dome::detail {namespace {
 void stop(const PaintSamplingLimits &limits){if(limits.cancelled&&limits.cancelled())throw std::runtime_error("Native paint retention cancelled");}
 bool equal(Vec3 a,Vec3 b){return a.x==b.x&&a.y==b.y&&a.z==b.z;}
@@ -35,13 +36,15 @@ RetainedNativePaint retain_native_paint(const SculptObject &source,Mesh target,
      source.painted->source_sampling_prepared()||source.painted->paint_sampling_domain()||source.painted->surface_diagnostics().policy!=PaintUvPolicy::Strict)
     throw std::invalid_argument("Native retention prototype requires its own unprepared native grid");
   if(!limits.max_vertices||limits.max_vertices>2'000'000||!limits.max_triangles||limits.max_triangles>2'000'000||
-     !limits.max_working_bytes||limits.max_working_bytes>512*1024*1024||!limits.max_work||limits.max_work>256'000'000)
+     !limits.max_basis_bytes||limits.max_basis_bytes>128*1024*1024||!limits.max_working_bytes||limits.max_working_bytes>512*1024*1024||!limits.max_work||limits.max_work>256'000'000)
     throw std::invalid_argument("Invalid native retained paint limits");
   const auto &before=source.painted->mesh();
   if(before.positions.size()>limits.max_vertices||target.positions.size()>limits.max_vertices||
      before.indices.size()/3>limits.max_triangles||target.indices.size()/3>limits.max_triangles||
      vertices.size()!=target.positions.size()||before.indices.size()!=target.indices.size())
     throw std::length_error("Native retained layout exceeds geometry budget");
+  const size_t basis_bytes=before.positions.size()*(2*sizeof(Vec3)+sizeof(std::array<float,2>))+before.indices.size()*2*sizeof(uint32_t)+before.uv_pins.size()+before.uv_seams.size();
+  if(basis_bytes>limits.max_basis_bytes)throw std::length_error("Native retained basis exceeds budget before allocation");
   const uint64_t pixels=uint64_t(source.painted->resolution())*source.painted->resolution();
   uint64_t work=pixels*16+uint64_t(before.positions.size())*8+uint64_t(before.indices.size())*16;
   if(work>limits.max_work)throw std::length_error("Native retained fixed work exceeds budget before allocation");
@@ -53,6 +56,7 @@ RetainedNativePaint retain_native_paint(const SculptObject &source,Mesh target,
     const auto samples=extent(0)*extent(1);if(samples>limits.max_work-work)throw std::length_error("Native retained raster work exceeds budget before allocation");work+=samples;
   }
   size_t metadata=sizeof(NativePaintSampling),scratch=0;
+  if(metadata>limits.max_working_bytes)throw std::length_error("Native retained owner exceeds working budget before allocation");
   auto charge=[&](size_t n,size_t unit){if(n>limits.max_working_bytes/unit||n*unit>limits.max_working_bytes-metadata)throw std::length_error("Native retained metadata exceeds working budget before allocation");metadata+=n*unit;};
   for(const auto &layer:source.painted->layers()){charge(layer.name.size()+1,3);charge(layer.tiles.size()+layer.pbr_tiles.size()+layer.emission_tiles.size(),3*sizeof(std::shared_ptr<const void>));}
   charge(target.positions.size(),sizeof(uint32_t)+sizeof(std::array<float,2>));charge(target.indices.size(),2*sizeof(uint32_t));charge(target.uv_pins.size()+target.uv_seams.size(),1);
