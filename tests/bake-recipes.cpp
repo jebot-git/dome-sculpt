@@ -3,7 +3,7 @@
 #include "bake-cage.cpp"
 #include "dome/bake-recipe.hpp"
 #include "dome/native-scene-append.hpp"
-#include "dome/polygon-conversion.hpp"
+#include "polygon-conversion.hpp"
 #include "dome/shapekey-authoring.hpp"
 int main(int argc,char **argv)try{
   const auto out=std::filesystem::path(argc>1?argv[1]:"bake-recipes");std::filesystem::create_directories(out);
