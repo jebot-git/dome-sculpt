@@ -1,5 +1,21 @@
 # Dome Sculpt production handoff
 
+## Private explicit canonical-normal conversion kernel — 2026-11-04
+
+A detached native source-retaining conversion now passes210 Release/210 ownedSAN
+checks over16 flat/curved/skin/morph/protected/fractional-coverage models. Each
+profile checks10,400 independent interior centers and417,312 bilinear/boundary
+samples (max0.0111073<unchanged0.02). All32 image/frame pairs are bit-exact;
+69persistent C++ allocation prefixes and all32 cancellation polls pass each.
+The original center-only0.0705364 boundary failure and harness negatives remain.
+Read CANONICAL-NORMAL-CONVERSION.md and receipt. This is not in the default build
+and does not create persisted authority or enable worker/UI/export conversion.
+The original curved native morph13>4 remains; an explicit replayable owning
+format, actual native transactions/history/Save/shared controls and independent
+export images are next. No guard/schema/default/frontend/system/HMD/session
+change; every unfinished original/additional row and later drawers remains.
+
+
 ## Private saved bake recipes — 2026-11-04
 
 Last-successful target recipes now persist exact source/cage provenance and all
