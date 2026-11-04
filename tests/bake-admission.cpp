@@ -18,7 +18,7 @@ struct Gate {
  void release(){std::lock_guard lock(mutex);armed=false;changed.notify_all();}
 } gate;
 struct Release{~Release(){tracking=false;gate.release();}};
-auto settings_tuple(const ObjectBakeSettings &s){return std::tuple{s.front_mm,s.back_mm,s.ao_distance_mm,s.ao_samples,s.padding,s.allow_partial,s.allow_backfaces,s.prepare_colors,s.color_error,s.prepare_normals,s.normal_error};}
+auto settings_tuple(const ObjectBakeSettings &s){return std::tuple{s.front_mm,s.back_mm,s.ao_distance_mm,s.ao_samples,s.padding,s.allow_partial,s.allow_backfaces,s.prepare_colors,s.color_error,s.prepare_normals,s.normal_error,s.cage_object};}
 Scene fixture(){
  auto scene=source_color_fixture::model(true,false);const auto target=scene.active().id;const auto id=scene.add("Hidden original source",Volume{});
  auto source=source_color_fixture::model(false,false).active();source.id=id;source.name="Hidden original source";source.visible=false;source.locked=true;source.transform.position.z=.005f;scene.object(id)=std::move(source);scene.select(target);scene.validate();return scene;

@@ -38,6 +38,20 @@ std::vector<uint64_t> Document::bake_sources_locked() const {
       (o.mesh_active ? o.painted && !o.painted->mesh().indices.empty() : !o.volume->voxels().empty()))ids.push_back(o.id);
   return ids;
 }
+std::vector<uint64_t> Document::bake_cages_locked() const {
+  // Eligibility is deliberately cheap on the input thread. Actual ordered
+  // topology, evaluated geometry and outward bounds are checked on the worker.
+  std::vector<uint64_t> ids{0};
+  for(const auto &o:scene_.objects())
+    if(o.id!=scene_.active().id && o.mesh_active && o.painted &&
+       !o.painted->mesh().indices.empty())ids.push_back(o.id);
+  // Preserve a missing/ineligible explicit choice until the user reselects it.
+  // Deletion must never silently change a custom cage into automatic projection.
+  if(state_.bake_settings.cage_object &&
+      std::find(ids.begin(),ids.end(),state_.bake_settings.cage_object)==ids.end())
+    ids.push_back(state_.bake_settings.cage_object);
+  return ids;
+}
 bool Document::bake_target_ready_locked() const {
   const auto &o=scene_.active();
   return detail::corner_bake_target_supported(o) && !state_.shape_sculpt && !scene_.has_affine_placement(o.id) && !state_.polygon && !state_.cut && !state_.retopology && !uv_ &&

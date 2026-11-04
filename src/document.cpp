@@ -623,6 +623,7 @@ void Document::publish_locked(bool force,bool checkpoint) {
       !control_before_ && !action_active_locked() && object_editable_locked(active.id) &&
       scene_.objects().size() < 256 && (active.mesh_active || !active.volume->voxels().empty());
   state_.bake_sources = bake_sources_locked();
+  state_.bake_cages = bake_cages_locked();
   if(std::find(state_.bake_sources.begin(),state_.bake_sources.end(),state_.bake_source)==state_.bake_sources.end())
     state_.bake_source=state_.bake_sources.empty()?0:state_.bake_sources.front();
   state_.can_bake=!state_.object_grabbing && bake_target_ready_locked() && !state_.bake_sources.empty();
@@ -808,6 +809,7 @@ void Document::replace_locked(Scene next,bool clean,std::filesystem::path adopte
   state_.selection_pressed={true,true};state_.selection_release={true,true};
   bind_locked();transaction.clear_history();path_=std::move(adopted_path);
   ++state_.generation;
+  state_.bake_settings.cage_object=0; // Object references never alias a new document.
   transaction.invalidate_import();
   transaction.invalidate_projection();
   if(recovery_){recovery_source_={new_recovery_id(),state_.generation,path_};recovery_content_=0;}
@@ -2221,7 +2223,12 @@ void Document::finish_control_locked(bool accept) {
   if(state_.controls.parameter==VrParameter::BakeSource || state_.controls.parameter==VrParameter::BakeDistances || state_.controls.parameter==VrParameter::BakeQuality || state_.controls.parameter==VrParameter::BakeProjection || state_.controls.parameter==VrParameter::BakeColors){
     auto c=state_.controls;
     if(accept){
-      if(c.parameter==VrParameter::BakeSource){auto ids=bake_sources_locked();state_.bake_source=ids.at(size_t(std::lround(c.value[0])));}
+      if(c.parameter==VrParameter::BakeSource){
+        auto ids=bake_sources_locked(),cages=bake_cages_locked();
+        const auto source=ids.at(size_t(std::lround(c.value[0]*float(ids.size()-1))));
+        const auto cage=cages.at(size_t(std::lround(c.value[1]*float(cages.size()-1))));
+        state_.bake_source=source;state_.bake_settings.cage_object=cage;
+      }
       else if(c.parameter==VrParameter::BakeDistances){state_.bake_settings.front_mm=c.value[0];state_.bake_settings.back_mm=c.value[1];state_.bake_settings.ao_distance_mm=c.value[2];}
       else if(c.parameter==VrParameter::BakeColors){state_.bake_settings.prepare_colors=c.value[0]>=.5f;state_.bake_settings.color_error=c.value[1];state_.bake_settings.prepare_normals=c.value[2]>=.5f;state_.bake_settings.normal_error=c.value[3]*.25f;}
       else if(c.parameter==VrParameter::BakeProjection){state_.bake_settings.allow_partial=c.value[0]>=.5f;state_.bake_settings.allow_backfaces=c.value[1]>=.5f;}
@@ -2420,10 +2427,12 @@ void Document::control_event_locked(VrControlEvent event) {
       c.title = "Retopology projection distance (mm)";
       c.minimum = 1; c.maximum = 200; c.logarithmic = true; c.value[0] = retopo_snap_mm_; break;
     case VrParameter::BakeSource: {
-      auto ids=bake_sources_locked();c.title="Bake source (hidden sources allowed)";
-      c.maximum=float(ids.size()-1);
+      auto ids=bake_sources_locked(),cages=bake_cages_locked();
+      c.title="Bake source / editable cage (hidden meshes allowed)";c.components=2;
       auto found=std::find(ids.begin(),ids.end(),state_.bake_source);
-      c.value[0]=found==ids.end()?0:float(found-ids.begin());break;
+      c.value[0]=ids.size()<2||found==ids.end()?0:float(found-ids.begin())/float(ids.size()-1);
+      auto cage=std::find(cages.begin(),cages.end(),state_.bake_settings.cage_object);
+      c.value[1]=cages.size()<2||cage==cages.end()?0:float(cage-cages.begin())/float(cages.size()-1);break;
     }
     case VrParameter::BakeDistances:
       c.title="Projection / AO distance (world mm)";c.components=3;c.minimum=.01f;c.maximum=10000;c.logarithmic=true;

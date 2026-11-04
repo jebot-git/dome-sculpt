@@ -332,10 +332,12 @@ void SpatialPalette::raster(const EditorState &s) {
       else if(c.parameter==VrParameter::SkinFalloff){char size[48];snprintf(size,sizeof(size),"Falloff %.2f",double(value));label=size;}
       else if(c.parameter==VrParameter::SkinInfluences)label="Max influences "+std::to_string(int(std::lround(value)));
       else if(c.parameter==VrParameter::BakeSource){
-        size_t index=size_t(std::clamp(std::lround(value),0l,long(s.bake_sources.size()?s.bake_sources.size()-1:0)));
-        auto id=s.bake_sources.empty()?0:s.bake_sources[index];
+        const auto &ids=row==0?s.bake_sources:s.bake_cages;
+        const auto index=size_t(std::clamp(std::lround(value*float(ids.empty()?0:ids.size()-1)),0l,long(ids.empty()?0:ids.size()-1)));
+        const auto id=ids.empty()?0:ids[index];
         auto found=std::find_if(s.objects.begin(),s.objects.end(),[&](auto&o){return o.id==id;});
-        label=found==s.objects.end()?"No source":found->name+(found->visible?"":" [hidden]");
+        label=row==0?"Source: ":"Cage: ";
+        label+=row==1&&!id?"Normal offset":found==s.objects.end()?"Unavailable mesh":found->name+(found->visible?"":" [hidden]");
       }
       else if(c.parameter==VrParameter::BakeColors){if(row==0||row==2)label=std::string(row==0?"Prepare source colors: ":"Prepare normal attributes: ")+(value>=.5f?"Yes":"No");else{char text[96];if(row==1)snprintf(text,sizeof(text),"Maximum color error %.3f",double(value));else snprintf(text,sizeof(text),"Maximum normal error %.2f deg",double(value)*.25*57.29577951308232);label=text;}}
       else if(c.parameter==VrParameter::BakeProjection)label=std::string(row==0?"Partial projection: ":"Backfaces: ")+(value>=.5f?"Allow":"Refuse");
@@ -596,7 +598,9 @@ void SpatialPalette::raster(const EditorState &s) {
   } else if(s.menu_page==12){
     auto source=std::find_if(s.objects.begin(),s.objects.end(),[&](auto&o){return o.id==s.bake_source;});
     text(320*unit_,285*unit_,source==s.objects.end()?"Choose a different source":source->name,fg);
-    text(320*unit_,318*unit_,s.asset_busy?"Working "+std::to_string(std::min(99,int(s.asset_progress*100)))+"% / Cancel work":"Adjust source, bounds and quality",fg);
+    auto cage=std::find_if(s.objects.begin(),s.objects.end(),[&](const auto &o){return o.id==s.bake_settings.cage_object;});
+    const auto cage_label=!s.bake_settings.cage_object?std::string("Normal-offset projection"):"Cage: "+(cage==s.objects.end()?std::string("Unavailable - reselect"):cage->name);
+    text(320*unit_,318*unit_,s.asset_busy?"Working "+std::to_string(std::min(99,int(s.asset_progress*100)))+"% / Cancel work":cage_label,fg);
   } else if (s.menu_page == 13 && s.deformation && s.deformation->skeleton) {
     const char *modes[] = {"Add", "Subtract", "Replace", "Smooth"};
     text(320 * unit_, 290 * unit_, s.deformation->skeleton->bones.at(s.rig_joint).name, fg);
@@ -631,7 +635,7 @@ void SpatialPalette::draw(const EditorState &s, const Mat4 &vp) {
   std::string signature =
       s.font_file + std::to_string(s.font_pixels) +
       std::to_string(s.menu_index) + std::to_string(s.menu_page) +
-      std::to_string(s.bake_source)+":"+std::to_string(s.asset_busy)+":"+std::to_string(int(s.asset_progress*100))+":"+
+      std::to_string(s.bake_source)+":"+std::to_string(s.bake_settings.cage_object)+":"+std::to_string(s.asset_busy)+":"+std::to_string(int(s.asset_progress*100))+":"+
       std::to_string(s.skin_options.reference)+":"+std::to_string(int(s.skin_options.mode))+":"+std::to_string(s.skin_use_locks)+":"+
       std::to_string(s.rig_joint) + ":" + std::to_string(s.morph_target) + ":" +
       std::to_string(s.active_object) + std::to_string(s.revision) + s.message + std::to_string(s.recovery_selected) +
