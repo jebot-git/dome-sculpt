@@ -34,12 +34,16 @@ std::array<float,2> pixel_uv(const MeshSnapshot &frame,int x=48,int y=48) {
   if(std::min({wa,wb,wc})>=-1e-5f)return {frame.mesh.uv[ia][0]*wa+frame.mesh.uv[ib][0]*wb+frame.mesh.uv[ic][0]*wc,frame.mesh.uv[ia][1]*wa+frame.mesh.uv[ib][1]*wb+frame.mesh.uv[ic][1]*wc};
  }throw std::runtime_error("Independent pixel oracle has no actual visible triangle");
 }
-std::array<float,4> nearest(const Image &image,std::array<float,2> uv,MToonEncoding encoding) {
- const auto x=std::clamp(int(std::floor(uv[0]*image.width)),0,int(image.width)-1),y=std::clamp(int(std::floor(uv[1]*image.height)),0,int(image.height)-1);std::array<float,4> raw{};for(size_t c=0;c<4;++c)raw[c]=image.rgba[(size_t(y)*image.width+size_t(x))*4+c]/255.f;return mtoon_decode_texel(encoding,raw);
+std::array<float,4> source_sample(const PaintSourceTexture &view,std::array<float,2> uv,MToonEncoding encoding) {
+ const auto &image=*view.image;
+ auto texel=[&](int x,int y){x=std::clamp(x,0,int(image.width)-1);y=std::clamp(y,0,int(image.height)-1);std::array<float,4> raw{};for(size_t c=0;c<4;++c)raw[c]=image.rgba[(size_t(y)*image.width+size_t(x))*4+c]/255.f;return mtoon_decode_texel(encoding,raw);};
+ if(view.mag_filter==GL_NEAREST)return texel(int(std::floor(uv[0]*image.width)),int(std::floor(uv[1]*image.height)));
+ check(view.mag_filter==GL_LINEAR,"Independent source oracle receives an actual supported magnification filter");
+ const float x=uv[0]*image.width-.5f,y=uv[1]*image.height-.5f,fx=x-std::floor(x),fy=y-std::floor(y);const int ix=int(std::floor(x)),iy=int(std::floor(y));const auto a=texel(ix,iy),b=texel(ix+1,iy),c=texel(ix,iy+1),d=texel(ix+1,iy+1);std::array<float,4> out{};for(size_t k=0;k<4;++k)out[k]=std::lerp(std::lerp(a[k],b[k],fx),std::lerp(c[k],d[k],fx),fy);return out;
 }
 std::array<int,4> independent_pixel(const Scene &scene,const MeshSnapshot &frame) {
  const auto &object=scene.active();const auto &binding=*object.material_bindings;const auto uv=pixel_uv(frame);const auto fields=independent_field(*object.painted,uv[0],uv[1]);
- const auto base=nearest(*binding.roles[0].image,uv,binding.material.textures[0].encoding),emission=nearest(*binding.roles[3].image,uv,binding.material.textures[3].encoding);MToonSamples samples;
+ const auto base=source_sample(binding.roles[0],uv,binding.material.textures[0].encoding),emission=source_sample(binding.roles[3],uv,binding.material.textures[3].encoding);MToonSamples samples;
  for(size_t c=0;c<4;++c)samples.base[c]=object.material.color[c]*base[c];
  std::array<float,3> radiance{};for(size_t c=0;c<3;++c){const double background=binding.physical_emission?binding.physical_emission->at(c):double(object.material.emissive[c])*binding.material.parameters.emission_strength;
   radiance[c]=float(background*emission[c]*(1-fields.coverage)+fields.legacy[c]*binding.material.parameters.emission_strength+fields.physical[c]);}samples.emission={radiance[0],radiance[1],radiance[2]};
@@ -58,7 +62,7 @@ void ink(PaintedMesh &paint,PaintSettings settings) {
   Brush brush;brush.from=brush.to={0,0,0};brush.normal={0,0,1};brush.radius=2;brush.strength=.8f;settings.front_only=false;
   paint.begin_stroke();paint.stamp(brush,settings);check(paint.end_stroke(),"Actual native physical brush creates sparse float emission");
 }
-Scene native_typed_physical(bool legacy,float opacity=.63f) {
+Scene native_typed_physical(bool legacy,float opacity=.63f,bool mixed=false) {
   Scene scene;scene.active().visible=false;const auto id=scene.add("Native typed float emission",Volume{});scene.select(id);
   auto &object=scene.active();object.mesh_active=true;object.material=white();object.material.unlit=false;
   object.material.color={.6f,.7f,.5f,1};object.material.emissive={.15f,.03f,.08f};
@@ -68,7 +72,10 @@ Scene native_typed_physical(bool legacy,float opacity=.63f) {
   object.painted=PaintedMesh::from_maps(quad(),maps,64);
   auto holder=binding(legacy,object.material,maps->color.image,maps->emission.image);holder->material.parameters.emission_strength=legacy?1:1.5f;object.material_bindings=holder;
   PaintSettings settings;settings.channel=PaintChannel::Emission;settings.emission_units=PaintEmissionUnits::Physical;settings.emission={2.2f,.03f,1.3f};ink(*object.painted,settings);
-  object.painted->layer_properties("Layer 1",true,opacity);return scene;
+  object.painted->layer_properties("Physical",true,opacity);
+  if(mixed){object.painted->add_layer("Legacy and mask");settings.emission_units=PaintEmissionUnits::MaterialRelative;settings.emission={.07f,.11f,.03f};ink(*object.painted,settings);settings.channel=PaintChannel::Mask;settings.mask=.35f;ink(*object.painted,settings);object.painted->layer_properties("Legacy and mask",true,.47f);
+    object.painted->add_layer("Hidden high radiance");settings.channel=PaintChannel::Emission;settings.emission_units=PaintEmissionUnits::Physical;settings.emission={10000,10000,10000};ink(*object.painted,settings);object.painted->layer_properties("Hidden high radiance",false,1);}
+  return scene;
 }
 void ready_native(Document &doc) {check(doc.wait_mesh(std::chrono::seconds(30))&&doc.frame().surface,"Actual Document publishes its own complete typed native preview");if(!doc.frame().state->error.empty())throw std::runtime_error(doc.frame().state->error);}
 }
@@ -87,10 +94,13 @@ int main(int argc,char **argv)try {
   for(bool legacy:{true,false}) {auto scene=native_typed_physical(legacy);const auto exact=scene.encode();scene.save(out/(legacy?"native-v0.dsculpt":"native-v1.dsculpt"));Document doc;doc.replace(scene);ready_native(doc);
     try {draw(renderer,doc.frame().surface);}catch(...){check(doc.copy_scene().encode()==exact,"Actual typed preview refusal preserves complete float/source/native Scene");throw;}
     check(doc.copy_scene().encode()==exact,"Actual typed float preview preserves all source owners and float project bytes");}
-  for(bool legacy:{true,false})for(float strength:legacy?std::vector<float>{1}:std::vector<float>{0,1,1.5f,3}){
-    auto scene=native_typed_physical(legacy,.15f);auto binding=std::make_shared<SourceMaterialBindings>(*scene.active().material_bindings);binding->material.parameters.emission_strength=strength;scene.active().material_bindings=binding;
-    Document doc;doc.replace(scene);ready_native(doc);fbo.bind();const auto pixels=draw(renderer,doc.frame().surface);const auto want=independent_pixel(scene,*doc.frame().surface),got=at(pixels);std::cout<<"NATIVE_MTOON_ORACLE legacy="<<legacy<<" strength="<<strength<<" actual="<<got[0]<<","<<got[1]<<","<<got[2]<<" expected="<<want[0]<<","<<want[1]<<","<<want[2]<<std::endl;check(close(got,want,2),"Independent native MToon field arithmetic preserves physical radiance and actual typed strength within unchanged2 bound");
+  for(bool legacy:{true,false})for(float strength:legacy?std::vector<float>{1}:std::vector<float>{0,1,1.5f,3})for(bool mixed:{false,true})for(bool linear:{false,true}){
+    auto scene=native_typed_physical(legacy,.15f,mixed);auto binding=std::make_shared<SourceMaterialBindings>(*scene.active().material_bindings);binding->material.parameters.emission_strength=strength;if(linear)binding->roles[3].min_filter=binding->roles[3].mag_filter=GL_LINEAR;scene.active().material_bindings=binding;
+    Document doc;doc.replace(scene);ready_native(doc);fbo.bind();const auto pixels=draw(renderer,doc.frame().surface);const auto want=independent_pixel(scene,*doc.frame().surface),got=at(pixels);std::cout<<"NATIVE_MTOON_ORACLE legacy="<<legacy<<" strength="<<strength<<" mixed="<<mixed<<" linear="<<linear<<" actual="<<got[0]<<","<<got[1]<<","<<got[2]<<" expected="<<want[0]<<","<<want[1]<<","<<want[2]<<std::endl;check(close(got,want,2),"Independent native MToon field arithmetic preserves physical radiance and actual typed strength within unchanged2 bound");
     const auto stats=renderer.texture_stats();const auto geometry=renderer.buffer_stats();fbo.bind();check(draw(renderer,doc.frame().surface)==pixels,"Actual second-eye native typed image is exact");check(renderer.texture_stats().uploads==stats.uploads&&renderer.texture_stats().pack_builds==stats.pack_builds&&renderer.buffer_stats().geometry_uploads==geometry.geometry_uploads,"Native typed second eye reuses actual packet/geometry with no upload or repacking");
+    const auto exact=scene.encode();const auto path=out/(std::to_string(legacy)+"-"+std::to_string(strength)+"-"+std::to_string(mixed)+"-"+std::to_string(linear)+".dsculpt");scene.save(path);auto restored=Scene::load(path);check(restored.encode()==exact,"Actual native Save/restart preserves every typed/legacy/float/mask/hidden owner");Document reopened;reopened.replace(restored);ready_native(reopened);fbo.bind();check(draw(renderer,reopened.frame().surface)==pixels,"Recovered native MToon float and source-sampler pixels are exact");
+    if(!legacy&&strength==1.5f&&mixed&&!linear){const auto cost=renderer.texture_stats();SurfaceTextureLimits limits;limits.max_bytes=cost.bytes+cost.packed_bytes-1;bool refused=false;try{SurfaceRenderer small(limits);fbo.bind();draw(small,reopened.frame().surface);}catch(const std::length_error &){refused=true;}check(refused&&reopened.copy_scene().encode()==exact,"Actual aggregate native typed source/float GPU byte budget refuses atomically before allocation");fbo.bind();check(draw(renderer,reopened.frame().surface)==pixels,"Failed native typed GPU budget leaves the original renderer usable");}
+
   }
   check(gpu_copies>0&&gpu_only,"Every production native typed field/source copy stays in GPU buffers");
   std::cout<<"PASS "<<checks<<" native typed physical controls\n";return 0;
