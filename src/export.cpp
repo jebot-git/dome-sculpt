@@ -48,8 +48,7 @@ GltfExportReport export_glb(const std::vector<ObjectSurface> &objects,
     throw std::invalid_argument("Invalid glTF output resource budget");
   std::optional<detail::EmissionExportPrepared> physical;
   if(options.emission)physical=detail::prepare_emission_export(objects,*options.emission,options.cancelled);
-  auto document=detail::make_gltf(physical?physical->surfaces:objects,detail::SourceMorphSpace::Native,
-                                 options.recompute_changed_normals,options.cancelled);
+  auto document=physical?detail::make_gltf_emission(*physical,options.recompute_changed_normals,options.cancelled):detail::make_gltf(objects,detail::SourceMorphSpace::Native,options.recompute_changed_normals,options.cancelled);
   if(physical)detail::finish_emission_export(document,*physical,*options.emission,options.max_output_bytes,options.cancelled);
   document.json["buffers"]={{{"byteLength",document.binary.size()}}};
   uint64_t bytes=28+((uint64_t(document.json.dump().size())+3)&~uint64_t(3))+
@@ -64,12 +63,12 @@ GltfExportReport export_glb(const std::vector<ObjectSurface> &objects,
 namespace detail {
 static GltfDocument make_gltf_impl(const std::vector<ObjectSurface> &input_objects,
     SourceMorphSpace source_space,bool recompute_changed_normals,std::function<bool()> cancelled,
-    const NativeAuthoringCapture *raw_authority) {
+    const NativeAuthoringCapture *raw_authority,const EmissionExportPrepared *physical) {
   auto stop=[&]{if(cancelled && cancelled())throw std::runtime_error("glTF export cancelled");};
   size_t work=0;auto checkpoint=[&]{if((++work&1023)==0)stop();};
   stop();
   for(const auto &object:input_objects)if((object.textures&&object.textures->overlay)||detail::hdr_emission(object.material.emissive)||(object.material_bindings&&detail::physical_emission(*object.material_bindings))) {
-    if(!raw_authority||(!native_paint_compiled_emission(*raw_authority,object,cancelled)&&!raw_source_emission(*raw_authority,object,cancelled)))
+    if(!(physical&&matches_native_emission_surface(*physical,object,cancelled))&&(!raw_authority||(!native_paint_compiled_emission(*raw_authority,object,cancelled)&&!raw_source_emission(*raw_authority,object,cancelled))))
       throw std::invalid_argument("Physical emission requires a precision-qualified export adapter");
   }
   for(const auto &object:input_objects)if((object.paint_sampling_attachment||!object.paint_corner_coordinates.empty())&&
@@ -769,12 +768,16 @@ static GltfDocument make_gltf_impl(const std::vector<ObjectSurface> &input_objec
 }
 GltfDocument make_gltf(const std::vector<ObjectSurface> &objects,SourceMorphSpace space,
     bool recompute_changed_normals,std::function<bool()> cancelled) {
-  return make_gltf_impl(objects,space,recompute_changed_normals,std::move(cancelled),nullptr);
+  return make_gltf_impl(objects,space,recompute_changed_normals,std::move(cancelled),nullptr,nullptr);
+}
+GltfDocument make_gltf_emission(const EmissionExportPrepared &prepared,bool recompute_changed_normals,std::function<bool()> cancelled){
+ for(const auto &object:prepared.surfaces)if(object.material_bindings&&object.material_bindings->native_paint_sampling&&!matches_native_emission_surface(prepared,object,cancelled))throw std::invalid_argument("Native HDR view has no genuine prepared emission authority");
+ return make_gltf_impl(prepared.surfaces,SourceMorphSpace::Native,recompute_changed_normals,std::move(cancelled),nullptr,&prepared);
 }
 GltfDocument make_gltf_authoring(const NativeAuthoringCapture &capture,
     const std::vector<ObjectSurface> &objects,bool recompute_changed_normals,
     std::function<bool()> cancelled) {
-  auto document=make_gltf_impl(objects,SourceMorphSpace::Native,recompute_changed_normals,cancelled,&capture);
+  auto document=make_gltf_impl(objects,SourceMorphSpace::Native,recompute_changed_normals,cancelled,&capture,nullptr);
   auto &j=document.json;
   for(size_t i=0;i<objects.size();++i) {
     if(cancelled&&cancelled())throw std::runtime_error("Raw source emission finish cancelled");
