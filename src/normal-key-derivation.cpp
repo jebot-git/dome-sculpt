@@ -235,6 +235,10 @@ ShapeKeyResult author_derived_normal_shapekey(Scene &scene,uint64_t object,const
   node->frames_=node->replay(cancelled);node->validate(true,cancelled);
   deform->morphs->set_target(source.painted->mesh(),name,endpoint);if(duplicate)deform->morphs->targets.back().delta=original_keys->targets.at(edit.target).delta;if(mirror)deform->morphs->targets.back().delta=mirrored_delta;if(create&&!deform->morph_weights.empty())deform->morph_weights.push_back(0);deform->validate(source.painted->mesh());std::shared_ptr<const SourceNormalPreparation> next_recipe;if(recipe){auto prepared=std::make_shared<SourceNormalPreparation>(*recipe);prepared->target_frames=node->frames_;prepared->key_derivation=node;next_recipe=std::move(prepared);}
   auto next_binding=std::make_shared<SourceMaterialBindings>(*binding);next_binding->normal_frames=node->frames_;next_binding->normal_preparation=next_recipe;next_binding->key_derivation=node;next_binding->validate();normal_frame_current_authority(*next_binding,source.painted->mesh(),deform.get(),cancelled);
-  Scene next=scene;auto &output=next.object(object);output.material_bindings=next_binding;output.deformation=deform;if(!reuse&&(!vertex_mirror||!output.shape_source))output.shape_source=capture_polygon_origin(scene,object);next.validate();stop(cancelled);scene=std::move(next);return{slot,true};
+  Scene next=scene;auto &output=next.object(object);output.material_bindings=next_binding;output.deformation=deform;// Named copies/mixes of an existing owning key continue its first Restore
+  // source. Their own before-material anchor already retains the intermediate
+  // target arrays; replacing the external capsule would shorten Restore.
+  const bool inherits_source=vertex_mirror||(old&&(duplicate||mix));
+  if(!reuse&&(!inherits_source||!output.shape_source))output.shape_source=capture_polygon_origin(scene,object);next.validate();stop(cancelled);scene=std::move(next);return{slot,true};
 }
 } // namespace dome::detail
