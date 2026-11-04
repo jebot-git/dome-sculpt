@@ -48,6 +48,17 @@ qualify a physical headset, complete suite or main admission. Read
 [XR-MIRROR-CONTROLS.md](XR-MIRROR-CONTROLS.md) and its receipt for exact component
 scope and preserved failures. Every unfinished original/additional requirement,
 including controller drawers after basic targets, remains required.
+## Optional Mesa standalone-XR allocator fix — 2026-11-04
+
+The installed standalone software-XR112-byte report is traced to Mesa26.2.5
+rtasm pool ownership. A separate dependency source patch and native reproducer
+now pass241 allocator checks plus2000 concurrent cycles each Release/SAN, and
+all five actual loader/software stereo Mirror cases40checks under the unchanged
+private sanitizer app. Exact matching unpatched driver reproduces the leak;
+no suppression or system installation occurred. Public app/core/API/formats
+are unchanged. Read [MESA-XR-RTASM-LIFETIME.md](MESA-XR-RTASM-LIFETIME.md) and its
+receipt for source pinning, component scope and original failures. The installed
+stack remains unchanged; all unfinished full-goal requirements remain required.
 
 
 ## Complete originally unskinned source Restore — 2026-11-04

@@ -1,0 +1,20 @@
+{
+  "version": "26.2.5",
+  "archive": "https://archive.mesa3d.org/mesa-26.2.5.tar.xz",
+  "release_notes": "https://docs.mesa3d.org/relnotes/26.2.5.html",
+  "archive_sha256": "794b3d1729075dae7ebd47c7283b7ca0cdb5dec668f7f11cc0a5d82f6138a0a5",
+  "license": "MIT; original source notices retained by patch",
+  "original_sha256": {
+    "VERSION": "13ef6e309f6b266c38880cc86cf536536e6796606f3bd2df7fd34a7267785cf9",
+    "src/gallium/auxiliary/rtasm/rtasm_execmem.c": "e5a77a4a87803ae0eee5b45fdaea83639ce1e50469ee2c8c80e62182bec9c749",
+    "src/gallium/auxiliary/rtasm/rtasm_execmem.h": "9cca074917b18d68eeb064560e666f33119b911fe36eb978d1c7708292dc21dd",
+    "src/util/u_mm.c": "2ebf1ca84994884e33e8e52e642e18e52172b70b5760cd838f8926b3e73c5479",
+    "src/util/u_mm.h": "c150c9af235564794d4a2801bed592766dc1f8196a493a6c521a5755e0d7a986",
+    "src/util/futex.c": "2e588c76b8ac4a922a128c4e5b1f6bca81fdd76a348b3a001c4a4dec48875ede",
+    "src/util/futex.h": "acd349682b307cf44957e027f4e3f03f9d4dbdc304e6e588721b748273a9e75e",
+    "src/util/simple_mtx.h": "e0efe2ae0e27477ab412fe62b80dab64d22a8a9e96d9abb59a52dbba2b01241b"
+  },
+  "patch_sha256": "1bd6bbbe54f0aeec06ce52a39693d37c7e37f5fe75aa980e6c0c254f5d9c7c49",
+  "patched_rtasm_sha256": "abeb65852d79806a5bb774aa606314340b6c44952473e2a1b4b152d3316e58f7",
+  "scope": "Optional external Mesa dependency patch, not compiled into Dome Sculpt and not automatically applied or installed."
+}

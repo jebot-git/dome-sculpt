@@ -639,5 +639,12 @@
       "/usr/include/zlib.h": "8bc935aeb8909d05fe58f9286a0fe2c674a41638c374786ee888485ab5ff4409",
       "/usr/lib64/libz.so.1.3.1.zlib-ng": "cc2d0ee053bda906e3d9de9118fe7eb62d4c193ee1df3c323e60dae88e60780e"
     }
+  },
+  "mesa_rtasm_lifetime_patch": {
+    "repository": "https://gitlab.freedesktop.org/mesa/mesa",
+    "version": "26.2.5",
+    "license": "MIT",
+    "manifest": "third_party/mesa/SOURCES.json",
+    "used": "Optional source patch for empty POSIX rtasm executable pool and partial initialization cleanup. No Mesa source/library bundled, no app ABI/shader/compute change, no automatic application/install. See docs/MESA-XR-RTASM-LIFETIME.md."
   }
 }
