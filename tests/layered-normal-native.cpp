@@ -23,6 +23,18 @@ void roundtrip_layers(Document &document,const std::filesystem::path &path){
 }
 }
 int main(int argc,char **argv)try{
+  if(argc==3&&std::string_view(argv[1])=="--inspect"){
+    const auto scene=Scene::load(argv[2]);const auto &o=scene.active();
+    std::cout<<nlohmann::json{{"scene",scene.encode()},{"converted",bool(o.material_bindings&&o.material_bindings->canonical_attributes)},
+      {"active_detail",bool(o.painted&&o.painted->baked()&&o.painted->baked()->normal_field)}}.dump()<<'\n';return 0;
+  }
+  if(argc==3&&(std::string_view(argv[1])=="--ui-fixture"||std::string_view(argv[1])=="--ui-solo-fixture"||
+      std::string_view(argv[1])=="--ui-converted"||std::string_view(argv[1])=="--ui-solo-converted")){
+    auto scene=Scene::load(std::filesystem::path(__FILE__).parent_path()/"fixtures/layered-normal/original-7.dsculpt");
+    if(std::string_view(argv[1]).find("solo")!=std::string_view::npos){scene.erase(2);scene.active().bake_recipe.reset();}
+    if(std::string_view(argv[1]).find("converted")!=std::string_view::npos){Document doc;doc.replace(scene);settled_layers(doc);doc.convert_baked_normals();settled_layers(doc);doc.save(argv[2]);}
+    else scene.save(argv[2]);return 0;
+  }
   if(argc!=3)return 2;const std::filesystem::path source=argv[1],out=argv[2];std::filesystem::create_directories(out);
   NativeGraphics graphics;Fbo fbo;SurfaceRenderer renderer;
   const auto actual_renderer=reinterpret_cast<const char*>(glGetString(GL_RENDERER));
