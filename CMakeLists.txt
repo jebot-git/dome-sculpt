@@ -654,8 +654,9 @@ if(BUILD_TESTING)
     -Wl,--wrap=_ZN4dome8Document19process_uv_transferERNS0_7FileJobE
     -Wl,--wrap=_ZNK4dome5Scene4saveERKNSt10filesystem7__cxx114pathE
     -Wl,--wrap=_ZN4dome5Scene4loadERKNSt10filesystem7__cxx114pathERKSt8functionIFbvEE
+    -Wl,--wrap=_ZN4dome15load_scene_fileERKNSt10filesystem7__cxx114pathERKSt8functionIFbvEE
     -Wl,--wrap=_ZN4dome15RecoveryService4loadERKNS_17RecoveryCandidateENS_15RecoveryOptionsE)
-  foreach(endpoint structural scalar control undo paint-undo sculpt-undo asset import procedural uv open save recovery asset-queue uv-queue open-queue save-queue export-queue native-begin-queue native-save-queue prepare-queue refresh-queue restore-queue restore postcommit)
+  foreach(endpoint structural scalar control undo paint-undo sculpt-undo asset import procedural uv open open-decode save recovery asset-queue uv-queue open-queue save-queue export-queue native-begin-queue native-save-queue prepare-queue refresh-queue restore-queue restore postcommit)
     add_test(NAME transaction-${endpoint} COMMAND dome-sculpt-document-transactions-test ${endpoint})
   endforeach()
   add_library(dome-sculpt-native-gui-gate SHARED tests/native-gui-gate.cpp)

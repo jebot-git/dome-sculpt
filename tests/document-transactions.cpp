@@ -2,6 +2,7 @@
 #include "dome/document.hpp"
 #include "dome/source-maps.hpp"
 #include "dome/import-authoring.hpp"
+#include "dome/scene-file.hpp"
 #include <nlohmann/json.hpp>
 #include <atomic>
 #include <cstdlib>
@@ -12,11 +13,12 @@
 using namespace dome;
 namespace {
 std::atomic_bool enabled{false},hit{false},phase_tracking{true},postcommit_mode{false};std::atomic<size_t> calls{0},failure{0};
+std::atomic_bool open_decode{false},persistent_failure{false};
 thread_local bool permitted=false,inside=false,whole=false,post_tracking=false;
 void require(bool x,const char *m){if(!x)throw std::runtime_error(m);}
 }
 void *operator new(size_t n){
- if(enabled&&(inside||whole||post_tracking)){auto at=++calls;if(at==failure.load()){failure=0;hit=true;throw std::bad_alloc();}}
+ if(enabled&&(inside||whole||post_tracking)){auto at=++calls;if(auto boundary=failure.load();boundary&&(persistent_failure?at>=boundary:at==boundary)){if(!persistent_failure)failure=0;hit=true;throw std::bad_alloc();}}
  if(auto p=std::malloc(n?n:1))return p;throw std::bad_alloc();
 }
 void operator delete(void *p)noexcept{std::free(p);}void operator delete(void *p,size_t)noexcept{std::free(p);}
@@ -38,6 +40,17 @@ extern "C" void save_wrap(const Scene *s,const std::filesystem::path &p){save_re
 extern "C" Scene load_real(const std::filesystem::path&,const std::function<bool()>&) asm("__real__ZN4dome5Scene4loadERKNSt10filesystem7__cxx114pathERKSt8functionIFbvEE");
 extern "C" Scene load_wrap(const std::filesystem::path&,const std::function<bool()>&) asm("__wrap__ZN4dome5Scene4loadERKNSt10filesystem7__cxx114pathERKSt8functionIFbvEE");
 extern "C" Scene load_wrap(const std::filesystem::path &p,const std::function<bool()> &c){auto s=load_real(p,c);permitted=true;return s;}
+// Project Open now dispatches through the unified native/package loader on the
+// file worker. Arm publication only after its authentic return. The separate
+// open-decode mode denies allocations throughout that loader instead, restoring
+// the worker-local scope before its normal error-delivery and cleanup path.
+extern "C" LoadedSceneFile scene_file_real(const std::filesystem::path&,const std::function<bool()>&) asm("__real__ZN4dome15load_scene_fileERKNSt10filesystem7__cxx114pathERKSt8functionIFbvEE");
+extern "C" LoadedSceneFile scene_file_wrap(const std::filesystem::path&,const std::function<bool()>&) asm("__wrap__ZN4dome15load_scene_fileERKNSt10filesystem7__cxx114pathERKSt8functionIFbvEE");
+extern "C" LoadedSceneFile scene_file_wrap(const std::filesystem::path &p,const std::function<bool()> &c){
+ whole=enabled&&open_decode;
+ try{auto result=scene_file_real(p,c);whole=false;permitted=!open_decode;return result;}
+ catch(...){whole=permitted=false;throw;}
+}
 extern "C" Scene recovery_load_real(const RecoveryCandidate&,RecoveryOptions) asm("__real__ZN4dome15RecoveryService4loadERKNS_17RecoveryCandidateENS_15RecoveryOptionsE");
 extern "C" Scene recovery_load_wrap(const RecoveryCandidate&,RecoveryOptions) asm("__wrap__ZN4dome15RecoveryService4loadERKNS_17RecoveryCandidateENS_15RecoveryOptionsE");
 extern "C" Scene recovery_load_wrap(const RecoveryCandidate &c,RecoveryOptions o){auto s=recovery_load_real(c,std::move(o));permitted=true;return s;}
@@ -112,7 +125,7 @@ void execute(Document &d,const std::string &mode){
  else if(mode=="native-begin"){require(d.begin_native_stroke(),"Begin native admission");}
  else if(mode=="export"){auto path=fixture_path();path.replace_extension(".glb");d.export_asset(path,AssetExportFormat::Glb).get();}
  else if(mode=="save"||mode=="native-save"){d.save(fixture_path());}
- else if(mode=="open"){d.open(fixture_path());}
+ else if(mode=="open"||mode=="open-decode"){d.open(fixture_path());}
  else if(mode=="asset"){d.edit_scene("Asset allocation fixture",[](Scene &s,const auto &){s.active().name="Accepted asset";permitted=true;});require(d.wait_asset(),"Asset worker drains");}
  else if(mode=="import"){d.import_asset(import_path(),64);require(d.wait_asset(),"Actual import worker drains");}
  else if(mode=="procedural"){ProceduralSculptOptions o;o.rows=o.columns=1;o.density=1;o.depth=.12f;d.apply_procedural_sculpt(o);require(d.wait_asset(),"Actual procedural worker drains");}
@@ -138,8 +151,9 @@ int main(int argc,char **argv)try{
   auto invalid=fixture();invalid.active().transform.scale=0;bool refused=false;try{invalid.duplicate(1);}catch(const std::invalid_argument&){refused=true;}
   require(refused&&invalid.objects().size()==1&&invalid.active().id==1,"Invalid duplicate transform refuses before object or identity publication");
  }
- if(mode=="open"||mode=="open-queue"){auto f=fixture();f.active().name="Loaded replacement";f.save(fixture_path());permitted=false;}
+ if(mode=="open"||mode=="open-decode"||mode=="open-queue"){auto f=fixture();f.active().name="Loaded replacement";f.save(fixture_path());permitted=false;}
  if(mode=="import")export_glb(fixture().surfaces(),import_path());
+ open_decode=mode=="open-decode";persistent_failure=mode=="open"||open_decode;
  postcommit_mode=mode=="postcommit";phase_tracking=!mode.ends_with("-queue")&&!postcommit_mode;
  auto measured=setup(mode);calls=0;failure=0;permitted=inside=whole=false;enabled=true;execute(*measured,mode);enabled=false;
  size_t count=calls.load();std::cerr<<"Measured "<<mode<<": "<<count<<" allocation boundaries\n";require(count>10,"Real allocation boundaries were observed");require(measured->frame().state->error.empty(),"Measured endpoint succeeds");auto expected=measured->copy_scene().encode();
@@ -159,7 +173,7 @@ int main(int argc,char **argv)try{
   require(d->copy_scene().encode()==original,"Failed endpoint preserves exact Scene, original source maps and painting");
   require(DocumentTransactionTestAccess::tokens(*d)==tokens,"Failed endpoint preserves history/redo/content/nextContent/revision/generation/recovery identities");
   require(DocumentTransactionTestAccess::source(*d)==source&&d->frame().surface==mesh,"Failed endpoint never exposes candidate source cache or mesh");
-  if(mode!="asset"&&mode!="import"&&mode!="procedural"&&mode!="uv"&&mode!="save"&&mode!="open"&&mode!="export"&&mode!="restore"&&!mode.ends_with("-queue"))require(d->frame().state==publication,"Failed synchronous endpoint retains exact published editor state");
+  if(mode!="asset"&&mode!="import"&&mode!="procedural"&&mode!="uv"&&mode!="save"&&mode!="open"&&mode!="open-decode"&&mode!="export"&&mode!="restore"&&!mode.ends_with("-queue"))require(d->frame().state==publication,"Failed synchronous endpoint retains exact published editor state");
   if(mode=="prepare-queue"){
    require(!d->frame().state->asset_busy,"Rejected prepare retains no busy lease");d->prepare_mesh(64);require(d->wait_asset()&&d->frame().state->error.empty(),"Rejected prepare can retry");
    require(d->copy_scene().encode()["objects"][0]==original["objects"][0],"Preparation retry preserves the independent original source and painting");
@@ -181,10 +195,10 @@ int main(int argc,char **argv)try{
    auto o=d->copy_scene().active();d->object_properties(o.id,"Accepted recovered endpoint",o.visible,o.locked,o.transform,o.material);
    require(DocumentTransactionTestAccess::flush_recovery(*d)&&d->recovery_status().latest,"Successful retry reaches durable recovery");
    auto restored=RecoveryService::load(*d->recovery_status().latest);require(restored.encode()==d->copy_scene().encode(),"Recovery stores the exact successful endpoint");
-  }else if(mode=="save"||mode=="open"||mode=="save-queue"||mode=="open-queue"){
+  }else if(mode=="save"||mode=="open"||mode=="open-decode"||mode=="save-queue"||mode=="open-queue"){
    require(!d->frame().state->asset_busy,"Failed file publication releases busy lease");
    if(mode=="save"||mode=="save-queue"){require(Scene::load(fixture_path()).encode()==original,"Failed Save status never writes an uncommitted scene");d->save(fixture_path());}
-   else d->open(fixture_path());
+   else {d->open(fixture_path());require(d->copy_scene().encode()==expected&&d->frame().state->error.empty(),"Failed Open retries to the exact independent replacement and painting");}
   }else if(mode=="uv"||mode=="uv-queue"){
    require(d->frame().state->uv&&d->frame().state->uv->mesh==draft&&DocumentTransactionTestAccess::control(*d),"Failed UV publication retains the exact draft and source lease");
    d->end_uv(true);require(d->wait_asset()&&d->frame().state->error.empty()&&!d->frame().state->uv,"Actual failed UV Apply can retry without reopening or losing the draft");
