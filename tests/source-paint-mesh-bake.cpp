@@ -4,6 +4,7 @@
 #undef main
 #include "dome/source-paint.hpp"
 #include "dome/bake.hpp"
+#include "dome/tangents.hpp"
 #include "dome/bake-authoring.hpp"
 #include "dome/document.hpp"
 #include "paint-overlay-packet.hpp"
@@ -13,6 +14,8 @@ namespace {
 std::shared_ptr<MeshSnapshot> view(const Mesh &mesh,Material material,
     std::shared_ptr<const TextureMaps> maps,std::vector<std::array<float,4>> colors={}){
  auto result=std::make_shared<MeshSnapshot>();result->mesh=mesh;result->source_colors=std::move(colors);
+ const auto corners=tangent_corners(mesh);result->tangents.resize(mesh.positions.size());
+ for(size_t c=0;c<mesh.indices.size();++c)result->tangents[mesh.indices[c]]=corners[c];
  result->ranges.push_back({1,0,mesh.indices.size(),material,std::move(maps),{},0});return result;
 }
 void stamp(PaintedMesh &paint,PaintSettings settings){
