@@ -291,7 +291,7 @@ FN(EnumerateViewConfigurationViews, XrInstance, XrSystemId,
   if (cap < 2)
     return XR_ERROR_SIZE_INSUFFICIENT;
   for (int i = 0; i < 2; ++i) {
-    p[i].recommendedImageRectWidth = p[i].recommendedImageRectHeight = 320;
+    p[i].recommendedImageRectWidth = p[i].recommendedImageRectHeight = mirror_mode().empty()?320:1024;
     p[i].maxImageRectWidth = p[i].maxImageRectHeight = 1024;
     p[i].recommendedSwapchainSampleCount = p[i].maxSwapchainSampleCount = 1;
   }
