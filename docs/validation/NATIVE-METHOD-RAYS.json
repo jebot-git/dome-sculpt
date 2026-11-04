@@ -1,5 +1,5 @@
 {
-  "status": "private-test-only-correction",
+  "status": "private-scoped-CPU-SAN-OneAPI-Arc-controls-pass",
   "runtime": "421cedcf03959ce5137a62f733d75e8bef8f2a9b unchanged",
   "diff": "Two intended Transfer rays normalized1/3 under appended four-mode HUD; all runtime/behavior/history/affine/locks assertions unchanged. XR script adds explicit optional strictArc renderer check.",
   "original_failure": "421 whole-owned SAN12/13; skin-authoring selects mode2 with old .5 ray instead of intended Transfer1. Original log retained.",
@@ -55,7 +55,7 @@
       0
     ]
   ],
-  "scope": "Own test TUs against read-only matched421 public/private headers/core/support; no fresh runtime, no synthetic13/13 claim. OneAPI tests not yet executed.",
+  "scope": "Own corrected test TUs against read-only matched421 public/private headers/core/support; fresh421 app/core/render/frontend builds qualified separately. Original12/13 and corrected2/2 remain separate; no synthetic13/13, no complex/native-general completion.",
   "archive_count": 33,
   "archive_mismatches": 0,
   "hashes": {
@@ -63,6 +63,60 @@
     "tests/skin-affine-controller.cpp": "13ad824db2dfb87db5198ee49061525e84f14fe6c42c4f29d3e6b476f372da09",
     "tests/native-visible-xr.py": "d66c7594fa2497800c552f1311a9d303ee8a8bb7dd2e4fc663ddb6d827b294dd",
     "artifacts/run-status.json": "ba6a96410a9ec8e534c46513ae224fee8133e02d1435e4eb1fe40cb3e83e6a53",
-    "artifacts/recipes-final.json": "bb04ff50d52a9c7868b3b4047bad648dcab50653eb5b43d4df79f20501b6e320"
+    "artifacts/recipes-final.json": "bb04ff50d52a9c7868b3b4047bad648dcab50653eb5b43d4df79f20501b6e320",
+    "artifacts/arc-before.json": "07cf956d791324f9e7b4eed4d19bd3fc913f4ae4c6d0afcdb138a3e974ae7aed",
+    "artifacts/arc-after.json": "8736d6a98cb2f1b0b087e954812b718dd0e1a05aba89fb79afd4c41ce842b31b",
+    "artifacts/arc-native-tests.log": "6e4a6a2b3810ee8bcfc8643c3ca5bfdca43d2f07bfa603b3a809f12ab921ddcb",
+    "artifacts/arc-device-query.log": "934744ffa9a469afcfc5295fce1800b4b8bf1d8844e22a2bdb94ee8fb2e4cb78",
+    "artifacts/arc-loader/runtime.json": "b149818ac0d6a4047859353d48f107a2a2679c9a860cc2407768245f6229a0a4",
+    "artifacts/arc-loader.log": "00f57ec06944cb1c4719f7c43a91bb68ce6b50147d538c8c2306d9a86df9dac1",
+    "artifacts/arc-legacy-skin.log": "c98ebf04dbec1bbdfcb896aad3f7c92a3232bda0aefba7c3d51ff8b9928423fd",
+    "artifacts/arc-legacy-affine.log": "b54e0c520b6b4b7b945566b54923ddbb114db61830814d79f748992eb12a7142",
+    "artifacts/native-khronos.json": "a40e798903620cd935a52ad885b13207efc1911e2123249137d9ca5bcf07ada6"
+  },
+  "oneapi_native": "5/5 frozen421 native registrations; actual authored weights remain CPU",
+  "oneapi_legacy": "2/2 corrected intended Transfer/controller fixtures; no oracle change",
+  "actual_loader": {
+    "checks": 7,
+    "elapsed_seconds": 15.65,
+    "renderer": "Mesa Intel(R) Arc(tm) A770 Graphics (DG2)",
+    "synthetic_tracking": true,
+    "physical_headset": false,
+    "weights_gpu_kernel_claim": false
+  },
+  "arc_audit": {
+    "parent_source_count": 1716,
+    "binary_config_test_count": 975,
+    "mismatches": 0
+  },
+  "original_owned_SAN": {
+    "total": 13,
+    "pass": 12,
+    "fail": 1,
+    "elapsed_seconds": 271.21,
+    "failure": "obsolete .5 Method ray, preserved"
+  },
+  "actual_SAN_GUI": {
+    "normal": {
+      "checks": 12,
+      "elapsed_seconds": 40.62
+    },
+    "compact": {
+      "checks": 13,
+      "elapsed_seconds": 40.13
+    },
+    "real_preparation_gate": {
+      "checks": 18,
+      "elapsed_seconds": 41.75
+    },
+    "ASan_UBSan_LSan_diagnostics": 0
+  },
+  "independent_interop": {
+    "validator": "2.0.0-dev.3.10",
+    "files": 15,
+    "errors": 0,
+    "warnings": 15,
+    "infos": 0,
+    "hints": 0
   }
 }

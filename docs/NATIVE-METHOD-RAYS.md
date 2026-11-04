@@ -5,8 +5,13 @@ means normalized.5 selects mode2, not Transfer1. Two older intended-Transfer
 fixtures now use exactly1/3; every behavior/history/deformation/affine/locks
 assertion remains. Original ownedSAN12/13 outcome and stale-ray failure remain
 separate. Corrected own test TUs pass Release2/2 and matched whole-ownedSAN2/2;
-this is not relabeled as an original13/13 batch. Matching OneAPI binaries compile;
-no device result is claimed yet. This patch depends on the four-mode registry,
+this is not relabeled as an original13/13 batch. Matching OneAPI native5/5 and corrected legacy2/2 pass. Actual synthetic-loader
+Native7 passes on strict PCI03 Intel Arc A770 GL in15.65s.1716source and975
+binary/config/test hashes stay exact; the lease is released. The original
+ownedSAN12/13 remains distinct from corrected2/2. The actual ordinary/compact/
+gated native FLTK sanitizer cohorts pass12/13/18 checks (40.62/40.13/41.75s),
+with no ASan/UBSan/LSan diagnostics. Independent Khronos checks15 current posed
+GLBs:0errors,15warnings retained unfiltered. This patch depends on the four-mode registry,
 not public main's older menu.
 
 The existing Native loader script additionally accepts an explicit hardware test
