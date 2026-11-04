@@ -24,26 +24,30 @@ int main(int argc,char **argv)try{
   // Verify exceptional nested Scene scopes return the exact existing writer,
   // not a dangling reader granting permission to a later standalone leaf.
   PaintImageArchive outer_images;detail::BakedNormalArchive outer(outer_images);
-  auto produce=[&]{return Scene::decode(encoded);};
-  auto warm=produce();actual_field(warm);const auto expected=warm.encode();
-  conversion_fault::calls=0;conversion_fault::at=SIZE_MAX;conversion_fault::enabled=true;
-  auto positive=produce();conversion_fault::enabled=false;const auto count=conversion_fault::calls;
-  require_cage(count>0&&count<200'000,"Measure actual complete Scene33 decoding C++ allocation path");
-  actual_field(positive);require_cage(positive.encode()==expected&& &detail::BakedNormalArchive::writer()==&outer,
-    "Positive owning archive replay preserves exact complete scene and nested codec context");
-  std::cout<<"MEASURE persistent_cpp_prefixes="<<count<<std::endl;
+  auto exercise=[&](std::string_view mode,auto produce,auto signature){
+    auto warm=produce();const auto expected=signature(warm);
+    conversion_fault::calls=0;conversion_fault::at=SIZE_MAX;conversion_fault::enabled=true;
+    auto positive=produce();conversion_fault::enabled=false;const auto count=conversion_fault::calls;
+    require_cage(count>0&&count<200'000,"Measure actual complete Scene33 C++ allocation path");
+    require_cage(signature(positive)==expected&& &detail::BakedNormalArchive::writer()==&outer,
+      "Positive owning archive operation preserves exact complete scene and nested codec context");
+    std::cout<<"MEASURE mode="<<mode<<" persistent_cpp_prefixes="<<count<<std::endl;
+    if(!measure)for(size_t cut=1;cut<=count;++cut){
+      conversion_fault::calls=0;conversion_fault::at=cut;conversion_fault::hit=false;bool caught=false;conversion_fault::enabled=true;
+      try{produce();}catch(const std::bad_alloc&){caught=true;}
+      conversion_fault::enabled=false;
+      if(!caught||!conversion_fault::hit||&detail::BakedNormalArchive::writer()!=&outer||scene.encode()!=encoded)
+        throw std::runtime_error("Persistent archive allocation failure missed its actual endpoint or changed original/context state");
+      const auto retry=produce();
+      if(signature(retry)!=expected||&detail::BakedNormalArchive::writer()!=&outer)
+        throw std::runtime_error("Archive allocation retry differs from actual original owner/whole native result");
+      if(cut%128==0)std::cout<<"PREFIX "<<mode<<" "<<cut<<"/"<<count<<std::endl;
+    }
+    return count;
+  };
+  const auto decode_count=exercise("decode",[&]{return Scene::decode(encoded);},[&](const Scene &value){actual_field(value);return value.encode();});
+  const auto encode_count=exercise("encode",[&]{return scene.encode();},[&](const nlohmann::json &value){return value;});
   if(measure)return 0;
-  for(size_t cut=1;cut<=count;++cut){
-    conversion_fault::calls=0;conversion_fault::at=cut;conversion_fault::hit=false;bool caught=false;conversion_fault::enabled=true;
-    try{produce();}catch(const std::bad_alloc&){caught=true;}
-    conversion_fault::enabled=false;
-    if(!caught||!conversion_fault::hit||&detail::BakedNormalArchive::writer()!=&outer||scene.encode()!=encoded)
-      throw std::runtime_error("Persistent archive allocation failure missed its actual endpoint or changed original/context state");
-    const auto retry=produce();actual_field(retry);
-    if(retry.encode()!=expected||&detail::BakedNormalArchive::writer()!=&outer)
-      throw std::runtime_error("Archive allocation retry differs from actual original owner/whole native result");
-    if(cut%128==0)std::cout<<"PREFIX "<<cut<<"/"<<count<<std::endl;
-  }
   size_t polls=0;Scene::load(argv[1],[&]{++polls;return false;});
   for(size_t cut=1;cut<=polls;++cut){size_t at=0;bool cancelled=false;
     try{Scene::load(argv[1],[&]{return ++at>=cut;});}catch(const std::exception &e){cancelled=std::string_view(e.what()).find("cancel")!=std::string_view::npos;}
@@ -51,6 +55,6 @@ int main(int argc,char **argv)try{
       throw std::runtime_error("Actual Scene file-load cancellation changed native/context state or failed its observed poll");
   }
   actual_field(Scene::load(argv[1]));
-  std::cout<<"PASS scene33_persistent_cpp_prefixes="<<count<<" file_load_cancel_polls="<<polls<<std::endl;
+  std::cout<<"PASS scene33_persistent_cpp_prefixes="<<decode_count<<" encode_prefixes="<<encode_count<<" file_load_cancel_polls="<<polls<<std::endl;
   return 0;
 }catch(const std::exception &e){conversion_fault::enabled=false;std::cerr<<"FAIL "<<e.what()<<'\n';return 1;}
