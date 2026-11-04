@@ -252,7 +252,9 @@ void ordinary() {
       bad.materials[0].material.roughness = .123f;
     if (kind == 5) {
       auto maps = std::make_shared<TextureMaps>(*bad.materials[0].maps);
-      maps->color.rgba[0] ^= 1;
+      // Raw untextured captures have no dense derived color image. Forge the
+      // actual immutable role-bundle owner, preserving its equal values.
+      maps->source_maps = std::make_shared<const PaintSourceMaps>(*maps->source_maps);
       bad.materials[0].maps = maps;
     }
     if (kind == 6) {
