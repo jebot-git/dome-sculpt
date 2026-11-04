@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "bake-editor.hpp"
 #include "dome/bake-recipe.hpp"
+#include "dome/bake-distance.hpp"
 #include "appearance.h"
 #include "ui-conventions.hpp"
 #include <FL/Fl_Box.H>
@@ -17,8 +18,8 @@ public:
   using Fl_Value_Slider::Fl_Value_Slider;
   bool logarithmic=false,fractional=false;
   double units=1;
-  double physical()const{return logarithmic?std::exp(std::log(.01)+value()*std::log(1000000.)):value()*units;}
-  void physical(double v){value(logarithmic?std::log(std::clamp(v,.01,10000.)/.01)/std::log(1000000.):v/units);}
+  double physical()const{return logarithmic?bake_distance_from_unit(value()):value()*units;}
+  void physical(double v){value(logarithmic?bake_distance_to_unit(v):v/units);}
   int format(char *buffer)override{return snprintf(buffer,32,fractional?"%.3f":logarithmic?"%.2f":"%.0f",physical());}
   int handle(int event)override{
     if(event==FL_MOUSEWHEEL){
@@ -29,7 +30,7 @@ public:
         if(dynamic_cast<Fl_Scroll*>(p)&&!Fl::event_inside(p))return 0;
       int d=Fl::event_dy()?Fl::event_dy():Fl::event_dx();
       double old=value();
-      physical(logarithmic?physical()*std::exp(-d*.025):clamp(value()-d*step())*units);
+      physical(logarithmic?bake_distance_step(physical(),-d*.025):clamp(value()-d*step())*units);
       if(value()!=old){set_changed();do_callback();}return 1;
     }
     return Fl_Value_Slider::handle(event);

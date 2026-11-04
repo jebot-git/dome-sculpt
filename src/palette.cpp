@@ -1,3 +1,4 @@
+#include "dome/bake-distance.hpp"
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Adapted from OpenBrush Native's BDF palette and texture renderer
 // (Apache-2.0).
@@ -275,7 +276,7 @@ void SpatialPalette::raster(const EditorState &s) {
     auto normalized = [&](float v) {
       return std::clamp(
           c.logarithmic
-              ? std::log(v / c.minimum) / std::log(c.maximum / c.minimum)
+              ? (c.parameter==VrParameter::BakeDistances ? float(bake_distance_to_unit(v)) : std::log(v / c.minimum) / std::log(c.maximum / c.minimum))
               : (v - c.minimum) / std::max(1e-8f, c.maximum - c.minimum),
           0.f, 1.f);
     };

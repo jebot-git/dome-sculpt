@@ -1,3 +1,4 @@
+#include "dome/bake-distance.hpp"
 #include "dome/bake-recipe.hpp"
 #include "paint-overlay-packet.hpp"
 // SPDX-License-Identifier: GPL-3.0-or-later
@@ -2458,7 +2459,7 @@ void Document::control_event_locked(VrControlEvent event) {
       c.value[1]=cages.size()<2||cage==cages.end()?0:float(cage-cages.begin())/float(cages.size()-1);break;
     }
     case VrParameter::BakeDistances:
-      c.title="Projection / AO distance (world mm)";c.components=3;c.minimum=.01f;c.maximum=10000;c.logarithmic=true;
+      c.title="Projection / AO distance (world mm)";c.components=3;c.minimum=0;c.maximum=float(bake_distance_max_mm);c.logarithmic=true;
       c.value={state_.bake_settings.front_mm,state_.bake_settings.back_mm,state_.bake_settings.ao_distance_mm,0};
       for(int k=0;k<3;++k)c.value[k]=std::clamp(c.value[k],c.minimum,c.maximum);
       break;
@@ -2634,11 +2635,11 @@ void Document::control_event_locked(VrControlEvent event) {
   float value = c.value[event.component];
   if (event.type == VrControlEventType::Absolute) {
     float t = std::clamp(event.value, 0.f, 1.f);
-    value = c.logarithmic ? std::exp(std::log(c.minimum) +
+    value = c.parameter==VrParameter::BakeDistances ? float(bake_distance_from_unit(t)) : c.logarithmic ? std::exp(std::log(c.minimum) +
                                      t * std::log(c.maximum / c.minimum))
                           : c.minimum + t * (c.maximum - c.minimum);
   } else
-    value = c.logarithmic ? value * std::exp(event.value * .69314718056f)
+    value = c.parameter==VrParameter::BakeDistances ? float(bake_distance_step(value,event.value*.69314718056)) : c.logarithmic ? value * std::exp(event.value * .69314718056f)
                           : value + event.value * .5f * (c.maximum - c.minimum);
   value = std::clamp(value, c.minimum, c.maximum);
   if (value == c.value[event.component])

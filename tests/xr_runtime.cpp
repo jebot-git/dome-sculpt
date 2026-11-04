@@ -1,3 +1,4 @@
+#include "../include/dome/bake-distance.hpp"
 // SPDX-License-Identifier: GPL-3.0-or-later
 // A deterministic OpenXR test runtime. It creates real GL swapchain images;
 // poses and actions are synthetic fixtures, never evidence of hardware
@@ -1146,7 +1147,7 @@ FN(LocateSpace, XrSpace handle, XrSpace, XrTime, XrSpaceLocation *p) {
   if(!cage_mode().empty()){
     p->pose.orientation={0,0,0,1};p->pose.position=s->action?XrVector3f{right(s->hand)?0.f:-.3f,1.48f,-.48f}:XrVector3f{0,1.6f,0};
     if(s->action&&right(s->hand)&&s->action->name=="aim_pose"&&(frame==38||frame==56||(frame==62&&cage_mode()=="cancel"))){
-      float x=frame==38?100+420*float(std::log((bake_recipe_fixture()?40.f:100.f)/.01f)/std::log(10000.f/.01f)):frame==56?(bake_recipe_fixture()?320:520):170;
+      float x=frame==38?100+420*float(dome::bake_distance_to_unit(bake_recipe_fixture()?40:100)):frame==56?(bake_recipe_fixture()?320:520):170;
       float y=frame==38?240:frame==56?(bake_recipe_fixture()?432:320):609;
       p->pose.position={(x/640-.5f)*.6f,1.56f+(.5f-y/640)*.6f,-.3f};
     }
