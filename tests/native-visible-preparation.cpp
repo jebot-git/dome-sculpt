@@ -20,7 +20,8 @@ auto values(const NativeVisibleSkinReport &r) {
                     r.changed_parts,
                     r.rows,
                     r.permitted_controls,
-                    r.supported_controls};
+                    r.supported_controls,
+                    r.measure_zero_origins};
 }
 } // namespace
 [[gnu::noinline]] void *operator new(size_t n) {
@@ -46,6 +47,8 @@ int main() try {
   const auto encoded = input.encode();
   SkinAuthoringOptions options;
   options.mode = SkinAuthoringMode::NativeVisible;
+  options.native_visible.contact_handling =
+      NativeContactHandling::FiniteLineIntegral;
   options.reference = 1;
   auto measured = input.snapshot();
   calls = 0;

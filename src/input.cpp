@@ -5,7 +5,7 @@ namespace dome {
 const std::array<const char *, 12> &spatial_labels(int page) {
   static const std::array<const char *,12> source_skin={"Source","Method","Bind active","Bind selected","Use locks","Undo","Redo","Cancel work","Back","Source-assisted","Own surfaces","Fixed4 influences"};
   if(page==29)return source_skin;
-  static const std::array<const char *,12> native_skin={"Source","Method","Bind active","Bind selected","Use locks","Undo","Redo","Cancel work","Back","Influences","Prune","Native handles"};
+  static const std::array<const char *,12> native_skin={"Source","Method","Bind active","Bind selected","Use locks","Undo","Redo","Cancel work","Back","Influences","Prune","Surface contacts"};
   if(page==31)return native_skin;
   static const std::array<const char*,12> emission={"Brush RGB","Brush units","Material radiance","Source factors","Relative / normalize","Physical brush","Brush black","Paint emission","Back","Undo","Redo","Close"};
   if(page==30)return emission;
@@ -93,6 +93,7 @@ std::optional<VrParameter> spatial_parameter(int page, int sector) {
   if((page==29||page==31)&&sector>=0&&sector<2)return sector==0?VrParameter::SkinSource:VrParameter::SkinMode;
   if(page==31&&sector==9)return VrParameter::SkinInfluences;
   if(page==31&&sector==10)return VrParameter::SkinPrune;
+  if(page==31&&sector==11)return VrParameter::SkinContacts;
   if(page==30){if(sector==0)return VrParameter::InkEmission;if(sector==1)return VrParameter::InkEmissionUnits;if(sector==2)return VrParameter::MaterialEmission;if(sector==3)return VrParameter::EmissionSource;return {};}
   if(page==24&&sector==4)return VrParameter::MorphWeight;
   if(page==24&&sector==7)return VrParameter::ShapeRestore;

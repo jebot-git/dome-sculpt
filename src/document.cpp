@@ -716,7 +716,6 @@ void Document::publish_locked(bool force,bool checkpoint) {
                                        : true;
     if(state_.menu_page==26&&i>2&&i!=8)state_.menu_enabled[i]=false;
     if(state_.menu_page==29&&i>8)state_.menu_enabled[i]=false;
-    if(state_.menu_page==31&&i==11)state_.menu_enabled[i]=false;
     if(state_.menu_page==28&&(i==6||i>9))state_.menu_enabled[i]=false;
   }
   bool weight_preview = weight_stroking_ && !weight_samples_.empty() &&
@@ -2084,6 +2083,7 @@ bool Document::parameter_enabled_locked(VrParameter parameter) const {
     return state_.retopology && state_.retopology->source && !retopo_accepting_ && !state_.asset_busy;
   if (state_.retopology) return false;
   if(skin_parameter(parameter)) return
+    (parameter!=VrParameter::SkinContacts || state_.skin_options.mode==SkinAuthoringMode::NativeVisible) &&
     (state_.skin_options.mode!=SkinAuthoringMode::SourceVisible || parameter==VrParameter::SkinSource || parameter==VrParameter::SkinMode) &&
     (state_.skin_options.mode!=SkinAuthoringMode::NativeVisible || (parameter!=VrParameter::SkinDistances && parameter!=VrParameter::SkinFalloff)) && skin_target_ready_locked() &&
     (parameter==VrParameter::SkinSource ? !skin_sources_locked(state_.skin_options.mode).empty()
@@ -2215,6 +2215,7 @@ void Document::finish_control_locked(bool accept) {
       } else if(c.parameter==VrParameter::SkinFalloff) options.falloff=c.value[0];
       else if(c.parameter==VrParameter::SkinInfluences) options.limits.max_influences=uint32_t(std::lround(c.value[0]));
       else if(c.parameter==VrParameter::SkinPrune) options.limits.prune=c.value[0];
+      else if(c.parameter==VrParameter::SkinContacts) options.native_visible.contact_handling=NativeContactHandling(int(std::lround(c.value[0])));
     }
     control_before_.reset();control_changed_=false;state_.controls={};
     if(accept && c.parameter==VrParameter::SkinMode && input_.menu_open())
@@ -2405,6 +2406,8 @@ void Document::control_event_locked(VrControlEvent event) {
     }
     case VrParameter::SkinMode:
       c.title="Surface / transfer / source-assisted / native handles";c.maximum=3;c.value[0]=int(state_.skin_options.mode);break;
+    case VrParameter::SkinContacts:
+      c.title="Surface contacts: strict rays / finite-line integral";c.maximum=1;c.value[0]=int(state_.skin_options.native_visible.contact_handling);break;
     case VrParameter::SkinDistances:
       c.title="Seed / margin / transfer (world mm)";c.components=3;
       c.value={skin_distance_slider(state_.skin_options.seed_distance),skin_distance_slider(state_.skin_options.seed_margin),skin_distance_slider(state_.skin_options.transfer_distance),0};break;
@@ -2652,6 +2655,7 @@ void Document::control_event_locked(VrControlEvent event) {
   case VrParameter::SkinFalloff:
   case VrParameter::SkinInfluences:
   case VrParameter::SkinPrune:
+  case VrParameter::SkinContacts:
     break; // Staged operation configuration never changes scene/history.
   case VrParameter::WeightStrength:
     state_.weights.strength = value;

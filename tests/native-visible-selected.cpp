@@ -79,9 +79,15 @@ int main(int argc, char **argv) try {
   check(doc.frame().state->menu_enabled[3] &&
             doc.frame().state->menu_enabled[9] &&
             doc.frame().state->menu_enabled[10] &&
-            !doc.frame().state->menu_enabled[11],
-        "Native selected/influence/prune controls enabled and policy label "
-        "informational");
+            doc.frame().state->menu_enabled[11],
+        "Native selected/influence/prune/contact controls enabled");
+  hand.sector(11);
+  hand.value(1);
+  hand.confirm();
+  check(doc.frame().state->skin_options.native_visible.contact_handling ==
+            NativeContactHandling::FiniteLineIntegral,
+        "Actual page31 surface-contact control explicitly selects finite-line "
+        "integral");
   hand.sector(9);
   hand.value(1.f / 31);
   hand.confirm();

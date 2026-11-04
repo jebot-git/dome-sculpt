@@ -69,7 +69,8 @@ auto settings(const SkinAuthoringOptions &o) {
                     o.source_visible.maximum_work,
                     o.source_visible.maximum_workspace,
                     o.native_visible.maximum_work,
-                    o.native_visible.maximum_workspace};
+                    o.native_visible.maximum_workspace,
+                    o.native_visible.contact_handling};
 }
 Scene fixture() {
   auto s = native_reference_fixture();
@@ -98,6 +99,7 @@ SkinAuthoringOptions candidate(const Document &d) {
   o.seed_margin = .011f;
   o.transfer_distance = .089f;
   o.falloff = 3;
+  o.native_visible.contact_handling = NativeContactHandling::FiniteLineIntegral;
   o.native_visible.maximum_work = 490'000'000ULL;
   o.native_visible.maximum_workspace = 192u * 1024u * 1024u;
   o.locks.assign(scene.active().deformation->skeleton->bones.size(), 1);

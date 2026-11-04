@@ -84,6 +84,15 @@ void edit_skin_dialog(Document &doc) {
   prune.bounds(0, .99);
   prune.step(.0001);
   prune.value(options.limits.prune);
+  Fl_Choice contacts(label, y, width - label - 40, row - 4, "Surface contacts");
+  y += row;
+  contacts.add("Strict rays");
+  contacts.add("Finite-line integral");
+  contacts.value(int(options.native_visible.contact_handling));
+  contacts.tooltip(
+      "Finite-line integral handles isolated exact surface contacts.\n"
+      "Fully coplanar handles and unresolved support still refuse.\n"
+      "No fallback or topology repair is applied.");
   Fl_Check_Button keep(20, y, width - 50, row, "Preserve checked influences");
   y += row;
   Fl_Check_Browser locks(20, y, width - 64, row * 6);
@@ -111,7 +120,7 @@ void edit_skin_dialog(Document &doc) {
             "Bind / transfer");
   struct Context {
     Fl_Window *window;
-    Fl_Choice *source, *mode, *scope;
+    Fl_Choice *source, *mode, *scope, *contacts;
     Fl_Box *hint;
     Fl_Button *apply;
     const Scene *scene;
@@ -162,6 +171,10 @@ void edit_skin_dialog(Document &doc) {
       const bool source_assisted = mode->value() == 2;
       const bool native = mode->value() == 3;
       const bool explicit_parts = source_assisted || native;
+      if (native)
+        contacts->activate();
+      else
+        contacts->deactivate();
       if (source_assisted) {
         for (auto *field : fields)
           field->deactivate();
@@ -211,13 +224,21 @@ void edit_skin_dialog(Document &doc) {
       else
         apply->activate();
     }
-  } context{&window,      &source,
-            &mode,        &scope,
-            &hint,        &apply,
-            &draft.scene, target.id,
-            &options,     {},
-            {},           {&seed, &margin, &distance, &falloff, &cap, &prune},
-            &keep,        &locks};
+  } context{&window,
+            &source,
+            &mode,
+            &scope,
+            &contacts,
+            &hint,
+            &apply,
+            &draft.scene,
+            target.id,
+            &options,
+            {},
+            {},
+            {&seed, &margin, &distance, &falloff, &cap, &prune},
+            &keep,
+            &locks};
   context.source_ready = !state->shape_sculpt && !state->object_grabbing;
   context.selection_ok =
       !state->selected_objects.empty() && state->selected_objects.size() <= 64;
@@ -251,6 +272,8 @@ void edit_skin_dialog(Document &doc) {
           auto next = *c.options;
           next.reference = c.ids[c.source->value()];
           next.mode = SkinAuthoringMode(c.mode->value());
+          next.native_visible.contact_handling =
+              NativeContactHandling(c.contacts->value());
           next.seed_distance = float(c.fields[0]->value() / 1000);
           next.seed_margin = float(c.fields[1]->value() / 1000);
           next.transfer_distance = float(c.fields[2]->value() / 1000);

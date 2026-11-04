@@ -4,7 +4,9 @@
 #include "native-weight-reference.hpp"
 namespace dome {
 void NativeVisibleSkinOptions::validate() const {
-  if (!maximum_work || maximum_work > 500'000'000 || maximum_workspace < 4096 ||
+  if ((contact_handling != NativeContactHandling::PointwiseOpen &&
+       contact_handling != NativeContactHandling::FiniteLineIntegral) ||
+      !maximum_work || maximum_work > 500'000'000 || maximum_workspace < 4096 ||
       maximum_workspace > 512u * 1024u * 1024u)
     throw std::invalid_argument(
         "Invalid native visible-source work/workspace bounds");
@@ -43,7 +45,11 @@ bool author_native_visible_skin(Scene &scene, std::span<const uint64_t> targets,
   support.source_requirements =
       detail::DeclaredSourceRequirements::GeometryEvidence;
   support.source_span = detail::DeclaredSourceSpan::AuthoredFinite;
-  support.origin_boundary = detail::DeclaredOriginBoundary::NativeOpenSegment;
+  support.origin_boundary =
+      options.native_visible.contact_handling ==
+              NativeContactHandling::FiniteLineIntegral
+          ? detail::DeclaredOriginBoundary::NativeFiniteLineIntegral
+          : detail::DeclaredOriginBoundary::NativeOpenSegment;
   support.parts.reserve(targets.size());
   for (auto id : targets)
     support.parts.push_back({id, {}});
@@ -63,7 +69,8 @@ bool author_native_visible_skin(Scene &scene, std::span<const uint64_t> targets,
                result.changed,
                result.field.rows,
                permitted,
-               result.field.supported_controls};
+               result.field.supported_controls,
+               result.measure_zero_origins};
   return changed;
 }
 } // namespace dome

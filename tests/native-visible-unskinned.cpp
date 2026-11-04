@@ -29,67 +29,6 @@ Vec3 point(const AffineTransform &m, Vec3 p) {
   const auto q = m.point({p.x, p.y, p.z});
   return {float(q[0]), float(q[1]), float(q[2])};
 }
-bool experimental_integral_skin(Scene &scene, std::span<const uint64_t> targets,
-                                const SkinAuthoringOptions &options,
-                                const std::function<bool()> &cancelled,
-                                NativeVisibleSkinReport *report,
-                                size_t *certificates) {
-  options.validate();
-  if (options.mode != SkinAuthoringMode::NativeVisible || targets.empty() ||
-      targets.size() > 64 ||
-      !detail::native_weight_reference(scene.object(options.reference)))
-    throw std::invalid_argument(
-        "Choose editable targets and a genuine native fitted reference rig");
-  const auto &rig = *scene.object(options.reference).deformation->skeleton;
-  const size_t permitted =
-      std::count_if(rig.bones.begin(), rig.bones.end(),
-                    [](const auto &b) { return b.deform; });
-  const size_t wrapper_work =
-      256 + targets.size() * 16 + options.locks.size() + rig.bones.size() * 4;
-  const size_t wrapper_bytes =
-      sizeof(detail::DeclaredWeightSupport) +
-      sizeof(detail::GeometryWeightBindOptions) +
-      targets.size() * sizeof(detail::DeclaredWeightPart) +
-      options.locks.size() + 128;
-  if (wrapper_work >= options.native_visible.maximum_work ||
-      wrapper_bytes >= options.native_visible.maximum_workspace ||
-      options.native_visible.maximum_workspace - wrapper_bytes < 4096)
-    throw std::length_error(
-        "Native bind input staging exceeds work/workspace before copies");
-  detail::DeclaredWeightSupport support;
-  support.policy = detail::DeclaredSupportPolicy::UniqueSourceWitnesses;
-  support.world_metric = true;
-  support.reference = options.reference;
-  support.row_anchors = detail::DeclaredRowAnchors::NearestPermitted;
-  support.source_requirements =
-      detail::DeclaredSourceRequirements::GeometryEvidence;
-  support.source_span = detail::DeclaredSourceSpan::AuthoredFinite;
-  support.origin_boundary =
-      detail::DeclaredOriginBoundary::NativeFiniteLineIntegral;
-  support.parts.reserve(targets.size());
-  for (auto id : targets)
-    support.parts.push_back({id, {}});
-  detail::GeometryWeightBindOptions bind;
-  bind.limits = options.limits;
-  bind.locks = options.locks;
-  bind.maximum_work = options.native_visible.maximum_work - wrapper_work;
-  bind.maximum_workspace =
-      options.native_visible.maximum_workspace - wrapper_bytes;
-  detail::GeometryWeightBindReport result;
-  const bool changed = detail::author_geometry_weight_skin(
-      scene, targets, support, bind, cancelled, &result);
-  if (report)
-    *report = {result.work + wrapper_work,
-               result.workspace + wrapper_bytes,
-               targets.size(),
-               result.changed,
-               result.field.rows,
-               permitted,
-               result.field.supported_controls};
-  if (certificates)
-    *certificates = result.measure_zero_origins;
-  return changed;
-}
 } // namespace
 int main(int argc, char **argv) try {
   if (argc != 5 &&
@@ -179,21 +118,20 @@ int main(int argc, char **argv) try {
   SkinAuthoringOptions options;
   options.mode = SkinAuthoringMode::NativeVisible;
   options.reference = reference;
+  if (integral)
+    options.native_visible.contact_handling =
+        NativeContactHandling::FiniteLineIntegral;
   NativeVisibleSkinReport report;
-  size_t certificates = 0;
   const auto start = std::chrono::steady_clock::now();
   std::cout << "STAGE genuine native solve targets=" << targets.size()
             << " construction="
-            << (integral ? "experimental-finite-line-integral"
+            << (integral ? "native-finite-line-integral"
                          : "public-pointwise-native")
             << " work_bound=" << options.native_visible.maximum_work
             << std::endl;
   try {
     const bool changed =
-        integral
-            ? experimental_integral_skin(scene, targets, options, {}, &report,
-                                         &certificates)
-            : author_native_visible_skin(scene, targets, options, {}, &report);
+        author_native_visible_skin(scene, targets, options, {}, &report);
     if (!changed)
       throw std::runtime_error("No native field produced");
   } catch (const std::exception &e) {
@@ -218,7 +156,7 @@ int main(int argc, char **argv) try {
             << std::chrono::duration<double>(std::chrono::steady_clock::now() -
                                              start)
                    .count()
-            << " measure_zero_origins=" << certificates
+            << " measure_zero_origins=" << report.measure_zero_origins
             << " quality_unmeasured=1\n";
   return 0;
 } catch (const std::exception &e) {

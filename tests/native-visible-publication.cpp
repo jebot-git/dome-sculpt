@@ -76,6 +76,7 @@ std::unique_ptr<Document> setup() {
 SkinAuthoringOptions options(const Document &d) {
   auto o = d.frame().state->skin_options;
   o.mode = SkinAuthoringMode::NativeVisible;
+  o.native_visible.contact_handling = NativeContactHandling::FiniteLineIntegral;
   o.reference = 1;
   return o;
 }

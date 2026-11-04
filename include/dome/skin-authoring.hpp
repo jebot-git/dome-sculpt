@@ -10,14 +10,20 @@ enum class SkinAuthoringMode {
 };
 // Explicit native finite-handle surface method. Imported artist rig axes are
 // not interpreted as native handles. No volume PDE or rig recognition claim.
+enum class NativeContactHandling { PointwiseOpen, FiniteLineIntegral };
 struct NativeVisibleSkinOptions {
   size_t maximum_work = 500'000'000;
   size_t maximum_workspace = 256u * 1024u * 1024u;
+  // PointwiseOpen preserves the original candidate. Integral is a distinct
+  // bounded finite-line construction, never an error fallback. Both retain
+  // genuine positive-measure blockers and refuse fully coplanar handles.
+  NativeContactHandling contact_handling = NativeContactHandling::PointwiseOpen;
   void validate() const;
 };
 struct NativeVisibleSkinReport {
   size_t work = 0, planned_workspace = 0, parts = 0, changed_parts = 0,
-         rows = 0, permitted_controls = 0, supported_controls = 0;
+         rows = 0, permitted_controls = 0, supported_controls = 0,
+         measure_zero_origins = 0;
 };
 // Explicit source-assisted imported-rig method: original positive component
 // membership, connected-surface entry-wall visibility, fixed4-influence output.

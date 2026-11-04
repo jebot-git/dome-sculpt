@@ -333,6 +333,7 @@ void SpatialPalette::raster(const EditorState &s) {
         auto found=std::find_if(s.objects.begin(),s.objects.end(),[&](const auto &o){return o.id==id;});
         label=found==s.objects.end()?"No reference":found->name+(found->visible?"":" [hidden]");
       }
+      else if(c.parameter==VrParameter::SkinContacts)label=value<.5f?"Strict surface contacts":"Isolated contacts: line integral";
       else if(c.parameter==VrParameter::SkinMode)label=value<.5f?"Automatic binding":value<1.5f?"Barycentric transfer":value<2.5f?"Source-assisted (fixed4)":"Native finite handles";
       else if(c.parameter==VrParameter::SkinDistances){char size[48];snprintf(size,sizeof(size),"%.2f mm",double(skin_distance_metres(value))*1000);label+=size;}
       else if(c.parameter==VrParameter::SkinFalloff){char size[48];snprintf(size,sizeof(size),"Falloff %.2f",double(value));label=size;}
