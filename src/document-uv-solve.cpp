@@ -308,7 +308,11 @@ void Document::process_uv_transfer(FileJob &job) {
     (job.uv_keep_paint&&!source.painted->paint_sampling_domain());
   std::shared_ptr<PaintedMesh> painted;
   auto binding=source.material_bindings;
-  if(job.uv_keep_paint) {
+  if(!changed&&binding&&binding->canonical_attributes){
+    // Finishing an untouched workspace is a genuine no-op. It must not enter
+    // an atlas transfer that lacks this separate normal-role interpretation.
+    painted=source.painted;deformation=source.deformation;appearance=source.appearance;
+  }else if(job.uv_keep_paint) {
     if(!job.uv_keep_normals)throw std::invalid_argument("Retained paint lost its independent normal sampling choice");
     if(!own_corners||!polygon||!source.material_bindings||!source.material_bindings->normal_preparation||
         !source.material_bindings->color_preparation||source.appearance||source.material_bindings->has_mtoon||

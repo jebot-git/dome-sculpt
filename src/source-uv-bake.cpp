@@ -74,6 +74,9 @@ struct Plan {
 bool same(const Plan&a,const Plan&b){return a.view.image==b.view.image&&a.srgb==b.srgb&&a.normal==b.normal&&a.check_backface==b.check_backface&&a.domain==b.domain&&a.transform==b.transform&&!a.animated&&!b.animated&&a.view.wrap_s==b.view.wrap_s&&a.view.wrap_t==b.view.wrap_t&&a.view.min_filter==b.view.min_filter&&a.view.mag_filter==b.view.mag_filter;}
 void validate(const SourceUvBakeInput&i,const SourceUvBakeOptions&o){
  if(o.cancelled&&o.cancelled())throw std::runtime_error("Source UV bake cancelled");
+ if((i.current_material&&i.current_material->canonical_attributes)||
+    (i.paint&&i.paint->baked()&&i.paint->baked()->normal_field))
+  throw std::invalid_argument("UV changes cannot yet preserve this converted normal detail; original mesh and paint retained");
  if((i.current_material&&detail::physical_emission(*i.current_material))||(i.native_material&&detail::hdr_emission(i.native_material->emission))||(i.paint&&i.paint->has_physical_emission()))throw std::invalid_argument("Physical emission requires an exact UV transfer adapter; source retained");
  if(size_t(o.normal_sampling)>1)throw std::invalid_argument("Invalid normal UV sampling method");
  if(o.normal_sampling==SourceNormalUvMethod::RetainSource&&(!i.paint||!i.paint->normal_projection()))
@@ -520,6 +523,8 @@ struct SourceUvBakeAccess {
      result.active_layer!=old.active_ || old.revision_==UINT64_MAX)
     throw std::invalid_argument("Source UV adoption cannot replace layer identity or active selection");
   const size_t columns=old.resolution()/PaintTile::size, count=columns*columns;
+  if((result.original_material&&result.original_material->canonical_attributes)||(old.baked_&&old.baked_->normal_field))
+    throw std::invalid_argument("UV adoption cannot drop converted normal detail or its original material provenance");
   size_t tiles=0,color_tiles=0;const bool prepared=bool(old.color_projection_),normal_prepared=bool(old.normal_projection_);
   for(size_t layer=0;layer<result.layers.size();++layer) {
    const auto &a=result.layers[layer],&b=old.layers_[layer];
