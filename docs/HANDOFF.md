@@ -1,5 +1,15 @@
 # Dome Sculpt production handoff
 
+## Private XR Mirror hardware follow-up — 2026-11-04
+
+Exact private Mirror runtime now passes40 actual-loader1024px stereo workflow
+checks on explicit Intel Arc A770; forced software correctly refuses the
+hardware gate. CPU compute is unchanged. The unchanged sanitizer Mirror app
+also passes all five cases40checks with the staged optional Mesa patch8878;
+stock-stack112B remains recorded. No HMD/system installation/main admission
+is implied. Read XR-MIRROR-CONTROLS.md and validation/XR-MIRROR-HARDWARE.json.
+
+
 ## Private XR shapekey Mirror controls — 2026-11-04
 
 XR Mirror now exposes method, local-X plane and tolerance through the shared

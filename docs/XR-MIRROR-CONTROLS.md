@@ -59,10 +59,29 @@ actual swapchain identity, offset and dimensions rather than assuming320px.
 Actual standalone sanitizer XR still exits with the unsuppressed Mesa112-byte,
 two-allocation report. Native/model sanitizer passes do not override that failed
 application check. The private Mesa investigation is separate; this milestone
-changes no graphics-system libraries. There is no physical-headset or positive
-GPU qualification of these new controls, full-suite pass, system installation
-or main-branch admission claim.
+changes no graphics-system libraries. A later explicitly scoped hardware and
+staged-driver follow-up is recorded below; no physical-headset, full-suite,
+system-installation or main-admission claim is made.
 
 See validation/XR-MIRROR-CONTROLS.json for immutable source/artifact manifests,
 commands, results and preserved counterexamples. All original production
 requirements and the later controller-mounted drawers remain required.
+
+## Arc rendering and staged-driver sanitizer follow-up
+
+The exact qualified Release app/helper and1024px runtime pass all40 actual
+loader Mirror checks on explicit PCI03 Intel Arc A770. The test's new
+`--hardware` mode requires the actual GL vendor/renderer to identify Intel,
+Arc and A770. A forced llvmpipe run reaches the same real application and
+ordered Save, then correctly refuses at the device check; it cannot silently
+qualify software as hardware. Caller-selected device/environment is retained
+in this explicit mode; the ordinary CTest mode still requests software.
+The CPU-compute application is unchanged, so this proves GPU rendering of the
+settings/workflow, not GPU Mirror computation. No headset was connected.
+
+Separately, the optional Mesa26.2.5 allocator patch published at8878f64 permits
+all five unchanged owned-sanitizer Mirror application cases40checks to exit
+cleanly with a staged private driver in67.45s. The installed Mesa stack remains
+unmodified and its original112-byte failure remains recorded. Read
+validation/XR-MIRROR-HARDWARE.json for exact sources, binary/input manifests,
+device reports, positive40 checks and the forced-software negative.
