@@ -1,5 +1,17 @@
 # Dome Sculpt production handoff
 
+## Private HDR native/controller controls — 2026-11-04
+
+The physical-producer continuation now has actual desktop and controller radiance
+controls. Final selected R8/SAN8, controller 31 each, actual normal GUI 34 + compact 29
+per profile, six pixel-identical HDR palette captures and four current GUI GLBs
+with 0 Khronos errors/warnings pass. Read [EMISSION-CONTROLS.md](EMISSION-CONTROLS.md)
+and its receipt for exact build/GUI/old-negative scopes. It is private, not main
+admission or completion. Preserving-only raw HDR and retained/native-only physical
+compiler domains, general authoring/interoperability and later spatial drawers
+remain required. No installation, display session or physical HMD changed.
+
+
 ## Private physical editable-project continuation — 2026-11-04
 
 Source4 physical paint now has an explicit finite PBR/native-project compiler;
