@@ -35,6 +35,14 @@ void operator delete(void *p,std::align_val_t)noexcept{std::free(p);}
 void operator delete[](void *p,std::align_val_t)noexcept{std::free(p);}
 void operator delete(void *p,size_t,std::align_val_t)noexcept{std::free(p);}
 void operator delete[](void *p,size_t,std::align_val_t)noexcept{std::free(p);}
+void *operator new(size_t n,const std::nothrow_t&)noexcept{try{return ::operator new(n);}catch(...){return nullptr;}}
+void *operator new[](size_t n,const std::nothrow_t&)noexcept{try{return ::operator new[](n);}catch(...){return nullptr;}}
+void *operator new(size_t n,std::align_val_t a,const std::nothrow_t&)noexcept{try{return ::operator new(n,a);}catch(...){return nullptr;}}
+void *operator new[](size_t n,std::align_val_t a,const std::nothrow_t&)noexcept{try{return ::operator new[](n,a);}catch(...){return nullptr;}}
+void operator delete(void*p,const std::nothrow_t&)noexcept{std::free(p);}
+void operator delete[](void*p,const std::nothrow_t&)noexcept{std::free(p);}
+void operator delete(void*p,std::align_val_t,const std::nothrow_t&)noexcept{std::free(p);}
+void operator delete[](void*p,std::align_val_t,const std::nothrow_t&)noexcept{std::free(p);}
 namespace durable_gate {
 std::mutex mutex;std::condition_variable changed;bool armed=false,entered=false,released=false;
 void arm(){std::lock_guard lock(mutex);armed=true;entered=released=false;}
@@ -61,7 +69,6 @@ NativeAuthoringExport owner(const Scene&s){NativeAuthoringExport out;out.scene=s
 }
 int main(int argc,char**argv)try{
  if(argc<2||argc>3)return 2;const std::filesystem::path out=argv[1];std::filesystem::create_directories(out);
- NativeGraphics graphics;Fbo fbo;fbo.bind();SurfaceRenderer native;native.set_frame_time(0);color_consumer::Renderer reader;prepared_normal_consumer::Renderer roles;
  auto scene=fixture(out);const auto exact=scene.encode();auto captured=owner(scene);SourceUvBakeOptions policy;policy.resolution=64;
  if(argc==3&&std::string_view(argv[2])=="--oom"){
   const auto path=out/"oom.glb";seed(path);const auto prior=bytes(path);size_t baseline=0;
@@ -69,12 +76,13 @@ int main(int argc,char**argv)try{
   size_t denied=0;bool success=false;
   for(size_t prefix=0;prefix<=baseline+2048;++prefix){bool failed=false;
    {allocation_probe::Guard guard(prefix);try{export_glb_authoring(captured,path,{},policy);}catch(const std::bad_alloc&){failed=true;}}
-   if(failed){if(bytes(path)!=prior||scene.encode()!=exact)throw std::runtime_error("Physical persistent allocation failure changed original file or owner");++denied;}
+   if(failed){if(bytes(path)!=prior||scene.encode()!=exact){std::cerr<<"PHYSICAL_FAILED_PREFIX "<<prefix<<" FILE_CHANGED "<<(bytes(path)!=prior)<<" OWNER_CHANGED "<<(scene.encode()!=exact)<<std::endl;throw std::runtime_error("Physical persistent allocation failure changed original file or owner");}++denied;}
    else{check(extract_native_authoring(bytes(path))->encode()==exact,"Physical allocation sweep eventually produces a complete exact native project");success=true;break;}
   }
   check(success&&denied>0,"Physical capture/compiler/float/factor/native-payload persistent allocation prefixes rollback and retry");
   std::cout<<"PHYSICAL_PERSISTENT_CPP_PREFIXES "<<denied<<" baseline="<<baseline<<std::endl;return 0;
  }
+ NativeGraphics graphics;Fbo fbo;fbo.bind();SurfaceRenderer native;native.set_frame_time(0);color_consumer::Renderer reader;prepared_normal_consumer::Renderer roles;
  const auto path=out/"direct.glb";export_glb_authoring(captured,path,{},policy);const auto original=bytes(path);
  for(int n=0;n<6;++n){auto limit=policy;if(n==0)limit.max_working_bytes=4;if(n==1)limit.max_output_bytes=4;if(n==2)limit.max_sample_operations=4;if(n==3)limit.max_raster_samples=4;if(n==4)limit.max_vertices=1;if(n==5)limit.max_triangles=1;
   check(refusal([&]{export_glb_authoring(captured,path,{},limit);},"budget")&&bytes(path)==original&&scene.encode()==exact,"Physical geometry/image/work/raster quota refusal preserves prior output and exact native inputs");}
