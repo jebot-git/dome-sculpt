@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
+#include "bake-recipe-capabilities.hpp"
 #define DOME_PAINT_SAMPLING_DOCUMENT_NO_MAIN
 #include "paint-sampling-document.cpp"
 #undef DOME_PAINT_SAMPLING_DOCUMENT_NO_MAIN
@@ -44,7 +45,7 @@ int main(int argc,char **argv)try{
   Document doc;paint_gate::Release release;doc.replace(source);ready(doc);lossless_accept(doc);auto path=directory/"accepted.dsculpt";auto f=doc.save_async(path);
   check(f.wait_for(std::chrono::milliseconds(20))!=std::future_status::ready&&refuses([&]{doc.edit_uv(UvAction::RetainPaint);}),"Accepted old command seals its transfer policy and exact ordered Save endpoint");paint_gate::release();saved(f);ready(doc);
   auto accepted=doc.copy_scene();auto encoded=accepted.encode();
-  check(encoded.at("version")==24&&Scene::load(path).encode()==encoded&&rgba(*accepted.active().painted)==pixels,"Actual Keep-normal Apply and immediate Save/restart retain the unchanged writable paint basis");
+  check(bake_recipe_fixture::scene30(accepted,24,encoded)&&Scene::load(path).encode()==encoded&&rgba(*accepted.active().painted)==pixels,"Actual Keep-normal Apply and immediate Save/restart retain the unchanged writable paint basis");
   check(accepted.active().deformation->encode(accepted.active().painted->mesh())==source.active().deformation->encode(source.active().painted->mesh()),"Lossless native operation preserves current pose, skin and morph state");
   check(doc.undo()&&doc.copy_scene().encode()==exact&&doc.redo()&&doc.copy_scene().encode()==encoded,"Original command has one exact source/paint/normal/history Undo and Redo");
   ready(doc);doc.export_asset(directory/"accepted.glb").get();check(std::filesystem::file_size(directory/"accepted.glb")>100,"Actual restarted retained-grid state emits its current GLB through the cancellable file worker");
@@ -55,7 +56,7 @@ int main(int argc,char **argv)try{
   if(mode==0)doc.cancel_background_work();if(mode==2){replacement=source.snapshot();replacement.active().name="Replacement";doc.replace(replacement);}paint_gate::release();
   check(f.wait_for(std::chrono::seconds(60))==std::future_status::ready,"Cancelled, stale or failed original-command worker releases its dependent Save");bool refused=false,typed=false;try{f.get();}catch(const ExactPaintFailure&){refused=typed=true;}catch(const std::exception&){refused=true;}
   check(refused&&(mode!=1||typed)&&file_bytes(path)==bytes&&doc.wait_asset()&&doc.copy_scene().encode()==(mode==2?replacement.encode():exact),"Exact worker failure/cancel/stale generation preserves original output, owner graph and history");
-  if(mode==1){check(doc.frame().state->uv&&!doc.frame().state->uv->committing,"Factory failure retains the same ready draft");doc.end_uv(true);ready(doc);check(doc.copy_scene().encode().at("version")==24&&doc.undo()&&doc.copy_scene().encode()==exact,"Same native Keep-normal draft retries successfully with one Undo");}
+  if(mode==1){check(doc.frame().state->uv&&!doc.frame().state->uv->committing,"Factory failure retains the same ready draft");doc.end_uv(true);ready(doc);check(bake_recipe_fixture::scene30(doc.copy_scene(),24)&&doc.undo()&&doc.copy_scene().encode()==exact,"Same native Keep-normal draft retries successfully with one Undo");}
  }
  {
   Document doc;doc.replace(source);ready(doc);doc.configure_selection(true);Hand hand(doc);hand.open();check(doc.wait_uv()&&doc.frame().state->uv,"Actual selection-on joystick opens original prepared UV workflow");

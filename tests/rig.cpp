@@ -204,7 +204,7 @@ int main() try {
   morph.mirror_target(mesh, 0, "Raise.R");
   auto authored = mesh;
   for (size_t v = 0; v < authored.normals.size(); ++v)
-    authored.normals[v] = normalized(Vec3{float(v + 1) * .1f, -.3f, 1});
+    authored.normals[v] = dome::normalized(Vec3{float(v + 1) * .1f, -.3f, 1});
   auto morph_rest = morph.evaluate(authored, std::array<float, 2>{0.f, -0.f});
   bool exact_rest = morph_rest.indices == authored.indices && morph_rest.uv == authored.uv &&
                     morph_rest.uv_pins == authored.uv_pins && morph_rest.uv_seams == authored.uv_seams;

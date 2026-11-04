@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
+#include "bake-fixture-identity.hpp"
 #include "dome/document.hpp"
 #include <fstream>
 #include <exception>
@@ -34,7 +35,7 @@ int main(int argc,char **argv)try {
   for(size_t i=0;i<source_maps->color.rgba.size();i+=4)
     painted_blue+=source_maps->color.rgba[i+2]>150 && source_maps->color.rgba[i+2]>source_maps->color.rgba[i]*2;
   check(painted_blue>10000,"Real pressure/flow accumulation creates the intended blue source paint");
-  auto painted_source=doc.copy_scene().encode()["objects"][0];
+  auto painted_source=bake_fixture::isolated_object(doc.copy_scene(),source_id);
   doc.remesh_to_sculpt(60);asset(doc);
   auto remeshed=doc.copy_scene();auto low_id=remeshed.active().id;
   check(remeshed.objects().size()==2 && low_id!=source_id &&
@@ -52,7 +53,7 @@ int main(int argc,char **argv)try {
         before.active().painted->baked()==nullptr,
         "Baking into the new atlas retains low geometry, object identity and immutable prior snapshots");
   painted_source["visible"]=false;
-  check(after_encoded["objects"][0]==painted_source &&
+  check(bake_fixture::isolated_object(baked,source_id)==painted_source &&
         after_encoded["objects"][1]["painted"]["layers"]==before_encoded["objects"][1]["painted"]["layers"],
         "The complete source and editable target layers remain exact across the full workflow");
   auto maps=baked.active().painted->composite(baked.active().material);size_t blue=0;
@@ -65,9 +66,9 @@ int main(int argc,char **argv)try {
         "The complete bake is one exact native scene Undo/Redo transaction");
   auto path=root/"baked-workflow.dsculpt";
   doc.save(path);auto loaded=Scene::load(path);
-  check(loaded.encode()["version"]==6 && loaded.active().painted->encode()==baked.active().painted->encode() &&
+  check(loaded.encode()["version"]==30 && bool(loaded.active().bake_recipe) && loaded.active().bake_recipe->source.object==source_id && loaded.active().painted->encode()==baked.active().painted->encode() &&
         loaded.active().volume->voxels()==baked.active().volume->voxels(),
-        "Version 6 native saving and reopening retain the complete baked target and scalar field");
+        "Scene30 native saving and reopening retain the complete baked target, scalar field and genuine source recipe");
   auto surfaces=loaded.surfaces(true);
   check(surfaces.size()==1 && surfaces[0].id==low_id && surfaces[0].textures &&
         surfaces[0].textures->normal.rgba==maps->normal.rgba,

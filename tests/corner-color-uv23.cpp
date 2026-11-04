@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
+#include "bake-fixture-identity.hpp"
 #include "current-color-target-fixture.hpp"
 #include "dome/document.hpp"
 #include "dome/uv.hpp"
@@ -33,12 +34,12 @@ int main()try{
   check(current->current_descriptor()->field==old.polygon->colors&&current->uv_reprojection->before_material==old.material_bindings&&current->uv_reprojection->before_paint==old.painted,"New current receipt owns the actual prior paint/material and independent corner field");
   check(adopted.paint->layers().size()==old.painted->layers().size()&&adopted.paint->baked()&&!adopted.paint->baked()->maps.normal.rgba.empty()&&!adopted.paint->baked()->maps.pbr_color.rgba.empty(),"Actual UV transfer preserves editable common/PBR channels and baked normal/PBR planes");
   auto changed=scene.snapshot();auto &target=changed.object(id);target.painted=adopted.paint;target.material_bindings=adopted.material_bindings;target.deformation=adopted.deformation;target.appearance=adopted.appearance;target.polygon=derivative.authority;changed.validate();auto encoded=changed.encode();
-  check(encoded.at("version")==23&&encoded.at("source_materials").at("version")==8,"Required current-domain colour replay writes explicit Scene23/material8");
-  auto loaded=Scene::decode(encoded);check(loaded.encode()==encoded,"Scene23 restarts exact UV recipe, current field, initial receipt and before-state");
+  check(encoded.at("version")==30&&target.bake_recipe==old.bake_recipe&&bool(old.bake_recipe)&&encoded.at("source_materials").at("version")==8,"Actual saved recipe and current-domain UV replay compose Scene30/material8");
+  auto loaded=Scene::decode(encoded);check(loaded.encode()==encoded,"Scene30 restarts the bake and UV recipes, current field, initial receipt and before-state");
   const auto saved=loaded.object(id).material_bindings->color_preparation;check(saved->current_descriptor()->field==loaded.object(id).polygon->colors&&saved->uv_reprojection->before_material->color_preparation->polygon_colors==saved->polygon_colors,"Restart preserves current-field aliases and immutable initial descriptor ownership");
-  auto legacy=encoded;legacy["version"]=20;refuse([&]{Scene::decode(legacy);},"Old Scene20 cannot silently ignore new current-colour UV authority");
+  auto control=changed;control.active().bake_recipe.reset();auto uv_only=control.encode();check(uv_only.at("version")==23,"Actual UV-only capability remains Scene23 when the independent bake recipe is absent");auto legacy=uv_only;legacy["version"]=20;refuse([&]{Scene::decode(legacy);},"Old Scene20 cannot silently ignore new current-colour UV authority");
   auto wrong=encoded;wrong["source_materials"]["version"]=6;refuse([&]{Scene::decode(wrong);},"Legacy material6 cannot admit new UV receipt metadata");
-  check(original.at("version")==20&&original.at("source_materials").at("version")==6,"The same input without a UV node retains its previous Scene20/material6 representation");
+  auto before_control=scene;before_control.active().bake_recipe.reset();check(original.at("version")==30&&bool(old.bake_recipe)&&before_control.encode().at("version")==20&&original.at("source_materials").at("version")==6,"Actual recipe selects Scene30 while removing only that recipe restores the genuine pre-UV Scene20/material6 capability");
   for(const auto mode:{0,1,2,3,4,5}){auto bad=encoded;auto &entries=bad["source_materials"]["color_preparations"];size_t at=0;while(!entries[at].contains("uv_reprojection"))++at;auto &node=entries[at]["uv_reprojection"];
    if(mode==0)node["before_binding"]=bad["source_materials"]["bindings"].size()-1;
    if(mode==1)node["paint"]=entries[at]["paint"];
@@ -48,7 +49,7 @@ int main()try{
    if(mode==5)node["receipt"]["raster_budget"]=1;
    refuse([&]{Scene::decode(bad);},"Cross-before-state, initial projection, exact layout, orphan and quota forgeries cannot borrow current-field authority");
   }
-  auto unsupported=encoded;unsupported["version"]=21;refuse([&]{Scene::decode(unsupported);},"Standalone colour23 does not borrow the reserved normal21 format");
+  auto unsupported=uv_only;unsupported["version"]=21;refuse([&]{Scene::decode(unsupported);},"Standalone colour23 does not borrow the reserved normal21 format");
   size_t calls=0;SourceUvBakeOptions measured;measured.cancelled=[&]{++calls;return false;};bake_source_uv(input,measured);check(calls>100,"Actual prepared UV cancellation work is measured across geometry, all-channel raster and current field replay");
   for(auto boundary:{calls/2,calls}){size_t current_call=0;SourceUvBakeOptions cancel;cancel.cancelled=[&]{return ++current_call>=boundary;};refuse([&]{bake_source_uv(input,cancel);},"Middle and final actual prepared UV cancellation refuse before adoption");check(scene.encode()==original,"Cancelled prepared UV retains exact whole source paint, field, pose and initial receipt");}
   auto forged=*current->uv_reprojection;forged.receipt.projection_error_bound[0]+=.001f;refuse([&]{forged.validate();},"Current UV quality cannot borrow or forge observed initial bounds");

@@ -1,9 +1,9 @@
 # Native rig, skin and morph foundations
 
 `include/dome/rig.hpp` and `src/rig.cpp` are native C++20 authoring kernels.
-They do not yet constitute a scene-integrated avatar editor. Desktop/XR editing,
-scene ownership/history, glTF/VRM skin/morph serialization, humanoid semantic
-mapping/fitting and physical-device authoring remain integration work.
+The editor integrates immutable rig/skin/morph data with Scene ownership,
+FLTK/OpenXR controls, worker publication, history and glTF/VRM adapters. See
+REQUIREMENTS.md for the remaining production authoring and interoperability work.
 
 ## Skeleton and deformation
 
@@ -15,10 +15,12 @@ Matrices are column-major. Quaternion records deliberately store internal
 `[w,x,y,z]`; glTF adapters must convert to its `[x,y,z,w]` convention explicitly.
 
 `world`, `inverse_bind` and `skin_matrices` provide hierarchy evaluation and
-`poseWorld * inverseBind`. `deform_mesh` applies sparse linear blend skinning
-and recalculates area-weighted triangle normals; it retains mesh indices/UVs.
-Dual-quaternion deformation and authored split-normal preservation are not
-implemented. Degenerate deformation output is reported rather than published.
+`poseWorld * inverseBind`. `deform_mesh` applies sparse linear blend skinning to positions. Authored normals
+use the explicit Dome weighted sum of per-joint inverse transposes, normalized
+after blending; split normals, indices, UVs, pins and seams remain distinct.
+Cancelling/nonfinite normals fail rather than becoming geometric replacements.
+This differs from taking the inverse transpose of the blended joint matrix.
+Dual-quaternion deformation remains unsupported. See AUTHORED-SKIN-NORMALS.md.
 
 ## Weight constraints and surface-aware binding
 
@@ -64,7 +66,10 @@ weights to the wrong index. This is geometric symmetry, not anatomical fitting.
 `MorphSet` stores named per-vertex displacement targets, supports replacement,
 mirroring and weighted preview, and uses a stable identity over original vertex
 positions and triangle order. A changed base/triangulation cannot silently reuse
-old indices. UV coordinates and triangle IDs are retained by preview. Pin/seam
+old indices. UV coordinates and triangle IDs are retained by preview. All-zero/signed-zero
+weights retain authored normals exactly; active native positional morphs still
+recompute geometric normals, and their general portable normal adapter remains
+unfinished. Pin/seam
 splitting or remeshing requires explicit morph transfer; it invalidates the old
 identity. Target edits validate a detached candidate before publication. Resource
 budgets cover target count and total displacement entries. Version-one JSON
@@ -100,19 +105,17 @@ the native build/runtime has no downloader, Python or Blender dependency.
 
 ## Reproduction and integration
 
-After building the existing core library:
+After configuring the canonical toolkit as described in TOOLKIT.md:
 
 ```sh
-c++ -std=c++20 -O2 -Wall -Wextra -Wpedantic -Iinclude \
-  src/rig.cpp tests/rig.cpp build/libdome-sculpt-core.a build/libxatlas.a \
-  -lpng -pthread -o /tmp/dome-rig-test
-/tmp/dome-rig-test
+cmake --build build --target dome-sculpt-rig-test dome-sculpt-skin-normal-transport-test dome-sculpt-skin-normal-render-test
+ctest --test-dir build -R '^(rig-authoring|skin-normal-transport|skin-normal-render)$' --output-on-failure
 ```
 
-Root integration should add `src/rig.cpp` to dome-sculpt-core and a native test
-executable for tests/rig.cpp, then place immutable rig/skin/morph asset ownership
-on Scene objects with source identity and generation checks for background work.
-Use the existing exact document history, not a second isolated undo stack.
+Scene already owns immutable rig/skin/morph values. Native authoring uses the
+existing document history and generation/source checks for worker publication.
+The current scoped Release/SAN/Arc evidence is in AUTHORED-SKIN-NORMALS.md; the
+following original standalone checkpoint is historical.
 
 
 Milestone evidence (2026-10-29): the standalone optimized native tests pass,

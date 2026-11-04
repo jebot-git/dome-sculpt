@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
+#include "bake-fixture-identity.hpp"
 #include "current-color-target-fixture.hpp"
 #include "dome/document.hpp"
 #include <fstream>
@@ -136,8 +137,8 @@ int main(int argc,char **argv)try {
     authoring.arm();doc.bake_from_object(source,settings);authoring.wait();auto path=directory/"actual-bake.dsculpt";auto saving=doc.save_async(path);
     check(doc.copy_scene().encode()==unchanged&&saving.wait_for(std::chrono::seconds(0))!=std::future_status::ready,"Save queues behind real detached current-field Bake preparation");
     authoring.release();finish(saving);auto accepted=doc.copy_scene();auto reopened=Scene::load(path);
-    check(doc.wait_asset()&&accepted.encode()==reopened.encode()&&reopened.encode()["version"]==20&&accepted.active().painted->baked()&&accepted.active().material_bindings->color_preparation,
-      "Actual Bake and dependent Save retain the complete Scene20 colour receipt and prior source");
+    check(doc.wait_asset()&&accepted.encode()==reopened.encode()&&reopened.encode()["version"]==30&&bool(accepted.active().bake_recipe)&&accepted.active().bake_recipe->source.object==source&&accepted.active().painted->baked()&&accepted.active().material_bindings->color_preparation,
+      "Actual Bake and dependent Save retain the actual colour receipt, source and durable bake recipe");
     check(doc.undo()&&doc.copy_scene().encode()==unchanged&&doc.redo()&&doc.copy_scene().encode()==accepted.encode(),"Actual Bake keeps exact one-step global history when its Save was accepted mid-preparation");
   }
   std::cout<<checks<<" accepted-authoring Save checks passed\n";return 0;

@@ -1,0 +1,2614 @@
+{
+  "date": "2026-11-04T12:37:17.385167+00:00",
+  "state": "Qualified scoped zero-weight rest-normal fix on public a2; full production goal incomplete",
+  "base_main": "a2e27805ecfb72344f7e26f54058703e38bb07ef",
+  "runtime_source": "df68bd3",
+  "test_source": "0f000c22d1c2b1520a2fb1f9457aa6bf3055e653",
+  "product_change": "Only src/rig.cpp complete TU. Validate every morph weight and complete mesh, skip exactly zero/signed-zero targets, recompute normals only when a nonzero target is active. Nonzero morph semantics and schemas unchanged.",
+  "public_layout_change": false,
+  "native_schema_change": false,
+  "gates": {
+    "release": {
+      "native": {
+        "state": "terminal",
+        "pid": 2206527,
+        "source": "88af17f852328d92dd9c3fb789ab68ea31088e5e",
+        "scope": "Complete rig TU and native consumer TUs over exact public a2 core/owned current-layout cage support; zero morph identity and native Bake/Save/recovery, no fresh whole build/device claim",
+        "steps": [
+          {
+            "name": "rig.cpp-compile",
+            "command": [
+              "/usr/bin/c++",
+              "-DDOME_SCULPT_INSTALLED_ASSETS=\"/usr/local/share/dome-sculpt/assets/humanoid\"",
+              "-DDOME_SCULPT_SOURCE_ASSETS=\"/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/assets/humanoid\"",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/third_party",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/third_party/cgltf",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/third_party/nlohmann",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/third_party/xatlas",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/third_party/mikktspace",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/third_party/ufbx",
+              "-O3",
+              "-DNDEBUG",
+              "-std=gnu++20",
+              "-Wall",
+              "-Wextra",
+              "-Wpedantic",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/artifacts/zero-proof/release/rig.cpp.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/src/rig.cpp"
+            ],
+            "exit_code": 0,
+            "expected": 0,
+            "seconds": 6.705620271008229
+          },
+          {
+            "name": "core-replace",
+            "command": [
+              "ar",
+              "r",
+              "/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/artifacts/zero-proof/release/libdome-sculpt-core.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/artifacts/zero-proof/release/rig.cpp.o"
+            ],
+            "exit_code": 0,
+            "expected": 0,
+            "seconds": 0.14046539302216843
+          },
+          {
+            "name": "core-index",
+            "command": [
+              "ar",
+              "s",
+              "/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/artifacts/zero-proof/release/libdome-sculpt-core.a"
+            ],
+            "exit_code": 0,
+            "expected": 0,
+            "seconds": 0.09715287701692432
+          },
+          {
+            "name": "zero-morph-rest-compile",
+            "command": [
+              "/usr/bin/c++",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/third_party/nlohmann",
+              "-O3",
+              "-DNDEBUG",
+              "-std=gnu++20",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/artifacts/zero-proof/release/zero-morph-rest.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/tests/zero-morph-rest.cpp"
+            ],
+            "exit_code": 0,
+            "expected": 0,
+            "seconds": 3.8180734149937052
+          },
+          {
+            "name": "zero-morph-rest-link",
+            "command": [
+              "/usr/bin/c++",
+              "-O3",
+              "-DNDEBUG",
+              "/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/artifacts/zero-proof/release/zero-morph-rest.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/artifacts/zero-proof/release/zero-morph-rest",
+              "/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/artifacts/zero-proof/release/libdome-sculpt-core.a",
+              "libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "libdome-sculpt-polygon.a",
+              "libxatlas.a",
+              "libmikktspace.a",
+              "libmikktspace-robust.a",
+              "libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit_code": 0,
+            "expected": 0,
+            "seconds": 0.2494431649975013
+          },
+          {
+            "name": "zero-morph-rest",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/artifacts/zero-proof/release/zero-morph-rest",
+              "/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/artifacts/zero-proof/release/actual"
+            ],
+            "exit_code": 0,
+            "expected": 0,
+            "seconds": 0.022811523027485237
+          },
+          {
+            "name": "zero-morph-rest-old-link",
+            "command": [
+              "/usr/bin/c++",
+              "-O3",
+              "-DNDEBUG",
+              "/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/artifacts/zero-proof/release/zero-morph-rest.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/artifacts/zero-proof/release/zero-morph-rest-old",
+              "/home/blux/de-xr/dome-sculpt/artifacts/fbx-main-2f6f519/artifacts/fbx-main-proof/release/libdome-sculpt-core.a",
+              "libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "libdome-sculpt-polygon.a",
+              "libxatlas.a",
+              "libmikktspace.a",
+              "libmikktspace-robust.a",
+              "libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit_code": 0,
+            "expected": 0,
+            "seconds": 0.26800398697378114
+          },
+          {
+            "name": "zero-morph-rest-old",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/artifacts/zero-proof/release/zero-morph-rest-old",
+              "/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/artifacts/zero-proof/release/old-actual"
+            ],
+            "exit_code": 1,
+            "expected": 1,
+            "seconds": 0.004423582984600216
+          },
+          {
+            "name": "rig-compile",
+            "command": [
+              "/usr/bin/c++",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/third_party/nlohmann",
+              "-O3",
+              "-DNDEBUG",
+              "-std=gnu++20",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/artifacts/zero-proof/release/rig.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/tests/rig.cpp"
+            ],
+            "exit_code": 0,
+            "expected": 0,
+            "seconds": 3.5450053669919726
+          },
+          {
+            "name": "rig-link",
+            "command": [
+              "/usr/bin/c++",
+              "-O3",
+              "-DNDEBUG",
+              "/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/artifacts/zero-proof/release/rig.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/artifacts/zero-proof/release/rig",
+              "/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/artifacts/zero-proof/release/libdome-sculpt-core.a",
+              "libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "libdome-sculpt-polygon.a",
+              "libxatlas.a",
+              "libmikktspace.a",
+              "libmikktspace-robust.a",
+              "libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit_code": 0,
+            "expected": 0,
+            "seconds": 0.1075370530015789
+          },
+          {
+            "name": "rig",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/artifacts/zero-proof/release/rig"
+            ],
+            "exit_code": 0,
+            "expected": 0,
+            "seconds": 0.006506673991680145
+          },
+          {
+            "name": "rig-old-link",
+            "command": [
+              "/usr/bin/c++",
+              "-O3",
+              "-DNDEBUG",
+              "/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/artifacts/zero-proof/release/rig.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/artifacts/zero-proof/release/rig-old",
+              "/home/blux/de-xr/dome-sculpt/artifacts/fbx-main-2f6f519/artifacts/fbx-main-proof/release/libdome-sculpt-core.a",
+              "libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "libdome-sculpt-polygon.a",
+              "libxatlas.a",
+              "libmikktspace.a",
+              "libmikktspace-robust.a",
+              "libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit_code": 0,
+            "expected": 0,
+            "seconds": 0.10885395598597825
+          },
+          {
+            "name": "rig-old",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/artifacts/zero-proof/release/rig-old"
+            ],
+            "exit_code": 1,
+            "expected": 1,
+            "seconds": 0.004243790986947715
+          },
+          {
+            "name": "deformation-compile",
+            "command": [
+              "/usr/bin/c++",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/third_party/nlohmann",
+              "-O3",
+              "-DNDEBUG",
+              "-std=gnu++20",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/artifacts/zero-proof/release/deformation.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/tests/deformation.cpp"
+            ],
+            "exit_code": 0,
+            "expected": 0,
+            "seconds": 4.395531338988803
+          },
+          {
+            "name": "deformation-link",
+            "command": [
+              "/usr/bin/c++",
+              "-O3",
+              "-DNDEBUG",
+              "/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/artifacts/zero-proof/release/deformation.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/artifacts/zero-proof/release/deformation",
+              "/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/artifacts/zero-proof/release/libdome-sculpt-core.a",
+              "libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "libdome-sculpt-polygon.a",
+              "libxatlas.a",
+              "libmikktspace.a",
+              "libmikktspace-robust.a",
+              "libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit_code": 0,
+            "expected": 0,
+            "seconds": 0.19875546000548638
+          },
+          {
+            "name": "deformation",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/artifacts/zero-proof/release/deformation"
+            ],
+            "exit_code": 0,
+            "expected": 0,
+            "seconds": 0.008276630978798494
+          },
+          {
+            "name": "source-morph-compile",
+            "command": [
+              "/usr/bin/c++",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/third_party/cgltf",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/third_party/nlohmann",
+              "-O3",
+              "-DNDEBUG",
+              "-std=gnu++20",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/artifacts/zero-proof/release/source-morph.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/tests/source-morph.cpp"
+            ],
+            "exit_code": 0,
+            "expected": 0,
+            "seconds": 3.723598573997151
+          },
+          {
+            "name": "source-morph-link",
+            "command": [
+              "/usr/bin/c++",
+              "-O3",
+              "-DNDEBUG",
+              "/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/artifacts/zero-proof/release/source-morph.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/artifacts/zero-proof/release/source-morph",
+              "/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/artifacts/zero-proof/release/libdome-sculpt-core.a",
+              "libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "libdome-sculpt-polygon.a",
+              "libxatlas.a",
+              "libmikktspace.a",
+              "libmikktspace-robust.a",
+              "libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit_code": 0,
+            "expected": 0,
+            "seconds": 0.21283767398563214
+          },
+          {
+            "name": "source-morph",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/artifacts/zero-proof/release/source-morph",
+              "/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/artifacts/zero-proof/release/source-morph"
+            ],
+            "exit_code": 0,
+            "expected": 0,
+            "seconds": 0.004540785012068227
+          },
+          {
+            "name": "normal-frame-export-compile",
+            "command": [
+              "/usr/bin/c++",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/third_party/cgltf",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/third_party/nlohmann",
+              "-O3",
+              "-DNDEBUG",
+              "-std=gnu++20",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/artifacts/zero-proof/release/normal-frame-export.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/tests/normal-frame-export.cpp"
+            ],
+            "exit_code": 0,
+            "expected": 0,
+            "seconds": 5.390134507004404
+          },
+          {
+            "name": "normal-frame-export-link",
+            "command": [
+              "/usr/bin/c++",
+              "-O3",
+              "-DNDEBUG",
+              "/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/artifacts/zero-proof/release/normal-frame-export.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/artifacts/zero-proof/release/normal-frame-export",
+              "/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/artifacts/zero-proof/release/libdome-sculpt-core.a",
+              "libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "libdome-sculpt-polygon.a",
+              "libxatlas.a",
+              "libmikktspace.a",
+              "libmikktspace-robust.a",
+              "libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit_code": 0,
+            "expected": 0,
+            "seconds": 0.2138400329858996
+          },
+          {
+            "name": "normal-frame-export",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/artifacts/zero-proof/release/normal-frame-export",
+              "/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/artifacts/zero-proof/release/frames.glb"
+            ],
+            "exit_code": 0,
+            "expected": 0,
+            "seconds": 0.012682700005825609
+          },
+          {
+            "name": "shapekey-authoring-compile",
+            "command": [
+              "/usr/bin/c++",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/src",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/third_party/cgltf",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/third_party/nlohmann",
+              "-O3",
+              "-DNDEBUG",
+              "-std=gnu++20",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/artifacts/zero-proof/release/shapekey-authoring.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/tests/shapekey-authoring.cpp"
+            ],
+            "exit_code": 0,
+            "expected": 0,
+            "seconds": 4.979385434999131
+          },
+          {
+            "name": "shapekey-authoring-link",
+            "command": [
+              "/usr/bin/c++",
+              "-O3",
+              "-DNDEBUG",
+              "/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/artifacts/zero-proof/release/shapekey-authoring.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/artifacts/zero-proof/release/shapekey-authoring",
+              "/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/artifacts/zero-proof/release/libdome-sculpt-core.a",
+              "libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "libdome-sculpt-polygon.a",
+              "libxatlas.a",
+              "libmikktspace.a",
+              "libmikktspace-robust.a",
+              "libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit_code": 0,
+            "expected": 0,
+            "seconds": 0.20725671699619852
+          },
+          {
+            "name": "shapekey-authoring",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/artifacts/zero-proof/release/shapekey-authoring",
+              "/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/artifacts/zero-proof/release/shape-authoring"
+            ],
+            "exit_code": 0,
+            "expected": 0,
+            "seconds": 1.9431425210204907
+          },
+          {
+            "name": "shapekey-document-compile",
+            "command": [
+              "/usr/bin/c++",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/src",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/third_party/cgltf",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/third_party/nlohmann",
+              "-O3",
+              "-DNDEBUG",
+              "-std=gnu++20",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/artifacts/zero-proof/release/shapekey-document.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/tests/shapekey-document.cpp"
+            ],
+            "exit_code": 0,
+            "expected": 0,
+            "seconds": 6.108702103985706
+          },
+          {
+            "name": "shapekey-document-link",
+            "command": [
+              "/usr/bin/c++",
+              "-O3",
+              "-DNDEBUG",
+              "-Wl,--wrap=_ZN4dome15author_shapekeyERNS_5SceneEmRKNS_12ShapeKeyEditERKSt8functionIFbvEE",
+              "/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/artifacts/zero-proof/release/shapekey-document.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/artifacts/zero-proof/release/shapekey-document",
+              "/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/artifacts/zero-proof/release/libdome-sculpt-core.a",
+              "libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "libdome-sculpt-polygon.a",
+              "libxatlas.a",
+              "libmikktspace.a",
+              "libmikktspace-robust.a",
+              "libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit_code": 0,
+            "expected": 0,
+            "seconds": 0.25311103102285415
+          },
+          {
+            "name": "shapekey-document",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/artifacts/zero-proof/release/shapekey-document",
+              "/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/artifacts/zero-proof/release/shape-document"
+            ],
+            "exit_code": 0,
+            "expected": 0,
+            "seconds": 0.01641338798799552
+          },
+          {
+            "name": "shapekey-selection-compile",
+            "command": [
+              "/usr/bin/c++",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/src",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/tests",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/third_party/nlohmann",
+              "-O3",
+              "-DNDEBUG",
+              "-std=gnu++20",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/artifacts/zero-proof/release/shapekey-selection.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/tests/shapekey-selection.cpp"
+            ],
+            "exit_code": 0,
+            "expected": 0,
+            "seconds": 7.977725831005955
+          },
+          {
+            "name": "shapekey-selection-link",
+            "command": [
+              "/usr/bin/c++",
+              "-O3",
+              "-DNDEBUG",
+              "-Wl,--wrap=_ZN4dome15author_shapekeyERNS_5SceneEmRKNS_12ShapeKeyEditERKSt8functionIFbvEE",
+              "/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/artifacts/zero-proof/release/shapekey-selection.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/artifacts/zero-proof/release/shapekey-selection",
+              "/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/artifacts/zero-proof/release/libdome-sculpt-core.a",
+              "libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "libdome-sculpt-polygon.a",
+              "libxatlas.a",
+              "libmikktspace.a",
+              "libmikktspace-robust.a",
+              "libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit_code": 0,
+            "expected": 0,
+            "seconds": 0.27511520401458256
+          },
+          {
+            "name": "shapekey-selection",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/artifacts/zero-proof/release/shapekey-selection",
+              "/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/artifacts/zero-proof/release/shape-selection"
+            ],
+            "exit_code": 0,
+            "expected": 0,
+            "seconds": 0.18526877998374403
+          }
+        ],
+        "child_pid": 2460792,
+        "exit_code": 0,
+        "seconds": 51.426298250997206,
+        "inputs": 1802,
+        "drift": []
+      },
+      "signed_zero_followup": {
+        "state": "terminal",
+        "pid": 3259955,
+        "source": "0f000c22d1c2b1520a2fb1f9457aa6bf3055e653",
+        "scope": "Complete rig TU and native consumer TUs over exact public a2 core/owned current-layout cage support; zero morph identity and native Bake/Save/recovery, no fresh whole build/device claim",
+        "steps": [
+          {
+            "name": "zero-morph-rest-compile",
+            "command": [
+              "/usr/bin/c++",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-signed-88af/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-signed-88af/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-signed-88af/third_party/nlohmann",
+              "-O3",
+              "-DNDEBUG",
+              "-std=gnu++20",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-signed-88af/artifacts/signed-proof/release/zero-morph-rest.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-signed-88af/tests/zero-morph-rest.cpp"
+            ],
+            "exit_code": 0,
+            "expected": 0,
+            "seconds": 3.6482613389962353
+          },
+          {
+            "name": "zero-morph-rest-link",
+            "command": [
+              "/usr/bin/c++",
+              "-O3",
+              "-DNDEBUG",
+              "/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-signed-88af/artifacts/signed-proof/release/zero-morph-rest.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-signed-88af/artifacts/signed-proof/release/zero-morph-rest",
+              "/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/artifacts/zero-proof/release/libdome-sculpt-core.a",
+              "libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "libdome-sculpt-polygon.a",
+              "libxatlas.a",
+              "libmikktspace.a",
+              "libmikktspace-robust.a",
+              "libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit_code": 0,
+            "expected": 0,
+            "seconds": 0.24834940800792538
+          },
+          {
+            "name": "zero-morph-rest",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-signed-88af/artifacts/signed-proof/release/zero-morph-rest",
+              "/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-signed-88af/artifacts/signed-proof/release/actual"
+            ],
+            "exit_code": 0,
+            "expected": 0,
+            "seconds": 0.022956787986913696
+          },
+          {
+            "name": "zero-morph-rest-old-link",
+            "command": [
+              "/usr/bin/c++",
+              "-O3",
+              "-DNDEBUG",
+              "/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-signed-88af/artifacts/signed-proof/release/zero-morph-rest.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-signed-88af/artifacts/signed-proof/release/zero-morph-rest-old",
+              "/home/blux/de-xr/dome-sculpt/artifacts/fbx-main-2f6f519/artifacts/fbx-main-proof/release/libdome-sculpt-core.a",
+              "libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "libdome-sculpt-polygon.a",
+              "libxatlas.a",
+              "libmikktspace.a",
+              "libmikktspace-robust.a",
+              "libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit_code": 0,
+            "expected": 0,
+            "seconds": 0.2524478670093231
+          },
+          {
+            "name": "zero-morph-rest-old",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-signed-88af/artifacts/signed-proof/release/zero-morph-rest-old",
+              "/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-signed-88af/artifacts/signed-proof/release/old-actual"
+            ],
+            "exit_code": 1,
+            "expected": 1,
+            "seconds": 0.004516667017014697
+          }
+        ],
+        "child_pid": 3283261,
+        "exit_code": 0,
+        "seconds": 4.230787444015732,
+        "inputs": 1803,
+        "drift": []
+      },
+      "application_relink": {
+        "state": "terminal",
+        "pid": 2766012,
+        "source": "88af17f852328d92dd9c3fb789ab68ea31088e5e",
+        "scope": "Relink current public-layout native application from25exact immutable frontend objects and matching canonical support, new complete rigTU core; not fresh app build or GUI test",
+        "steps": [
+          {
+            "name": "link",
+            "command": [
+              "/usr/bin/c++",
+              "-O3",
+              "-DNDEBUG",
+              "/home/blux/de-xr/dome-sculpt/artifacts/cage-coherent-4b96151/build-release/CMakeFiles/dome-sculpt.dir/src/native-display-runtime.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/cage-coherent-4b96151/build-release/CMakeFiles/dome-sculpt.dir/src/rig-fit-editor.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/cage-coherent-4b96151/build-release/CMakeFiles/dome-sculpt.dir/src/projection-editor.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/cage-coherent-4b96151/build-release/CMakeFiles/dome-sculpt.dir/src/spacenav-options.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/cage-coherent-4b96151/build-release/CMakeFiles/dome-sculpt.dir/src/app.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/cage-coherent-4b96151/build-release/CMakeFiles/dome-sculpt.dir/src/polygon-editor.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/cage-coherent-4b96151/build-release/CMakeFiles/dome-sculpt.dir/src/import-editor.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/cage-coherent-4b96151/build-release/CMakeFiles/dome-sculpt.dir/src/procedural-editor.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/cage-coherent-4b96151/build-release/CMakeFiles/dome-sculpt.dir/src/resolution-editor.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/cage-coherent-4b96151/build-release/CMakeFiles/dome-sculpt.dir/src/sculpt-editor.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/cage-coherent-4b96151/build-release/CMakeFiles/dome-sculpt.dir/src/creator-editor.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/cage-coherent-4b96151/build-release/CMakeFiles/dome-sculpt.dir/src/rig-editor.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/cage-coherent-4b96151/build-release/CMakeFiles/dome-sculpt.dir/src/shapekey-editor.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/cage-coherent-4b96151/build-release/CMakeFiles/dome-sculpt.dir/src/weight-editor.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/cage-coherent-4b96151/build-release/CMakeFiles/dome-sculpt.dir/src/skin-editor.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/cage-coherent-4b96151/build-release/CMakeFiles/dome-sculpt.dir/src/mesh-editor.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/cage-coherent-4b96151/build-release/CMakeFiles/dome-sculpt.dir/src/bake-editor.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/cage-coherent-4b96151/build-release/CMakeFiles/dome-sculpt.dir/src/object-editor.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/cage-coherent-4b96151/build-release/CMakeFiles/dome-sculpt.dir/src/paint-editor.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/cage-coherent-4b96151/build-release/CMakeFiles/dome-sculpt.dir/src/uv-editor.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/cage-coherent-4b96151/build-release/CMakeFiles/dome-sculpt.dir/src/ui-conventions.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/cage-coherent-4b96151/build-release/CMakeFiles/dome-sculpt.dir/src/session-appearance.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/cage-coherent-4b96151/build-release/CMakeFiles/dome-sculpt.dir/src/export-editor.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/cage-coherent-4b96151/build-release/CMakeFiles/dome-sculpt.dir/third_party/desktop/desktop-menu.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/cage-coherent-4b96151/build-release/CMakeFiles/dome-sculpt.dir/appmenu-protocol.c.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/artifacts/app-completion/release/dome-sculpt",
+              "-L/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-release/lib",
+              "-L/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib",
+              "-Wl,-rpath,/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-release/lib:/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib:",
+              "/home/blux/de-xr/dome-sculpt/artifacts/fbx-main-2f6f519/artifacts/fbx-main-proof/release/libdome-sculpt-spacenav.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/artifacts/zero-proof/release/libdome-sculpt-core.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/fbx-main-2f6f519/artifacts/fbx-main-proof/release/libdome-sculpt-render.a",
+              "/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-release/lib/libfltk_images.so.1.4.5",
+              "/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-release/lib/libfltk_gl.so.1.4.5",
+              "/usr/lib64/libGLU.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/fbx-main-2f6f519/artifacts/fbx-main-proof/release/libdome-sculpt-xr.a",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libpng.so",
+              "/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-release/lib/libfltk.so.1.4.5",
+              "-lcairo",
+              "-L/usr/lib64",
+              "-lX11",
+              "-lGLU",
+              "-lGL",
+              "/usr/lib64/libdl.a",
+              "/usr/lib64/libSM.so",
+              "/usr/lib64/libICE.so",
+              "/usr/lib64/libXext.so",
+              "/usr/lib64/libXinerama.so",
+              "/usr/lib64/libXfixes.so",
+              "/usr/lib64/libXcursor.so",
+              "/usr/lib64/libXrender.so",
+              "/usr/lib64/libXft.so",
+              "/usr/lib64/libwayland-egl.so",
+              "/usr/lib64/libwayland-cursor.so",
+              "/usr/lib64/libxkbcommon.so",
+              "/usr/lib64/libGLX.so",
+              "/usr/lib64/libOpenGL.so",
+              "/usr/lib64/libz.so",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libcairo.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/fbx-main-2f6f519/artifacts/fbx-main-proof/release/libdome-sculpt-render.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/artifacts/zero-proof/release/libdome-sculpt-core.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/fbx-main-2f6f519/artifacts/fbx-main-proof/release/libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/fbx-main-2f6f519/artifacts/fbx-main-proof/release/libdome-sculpt-polygon.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/fbx-main-2f6f519/artifacts/fbx-main-proof/release/libxatlas.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/fbx-main-2f6f519/artifacts/fbx-main-proof/release/libmikktspace.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/fbx-main-2f6f519/artifacts/fbx-main-proof/release/libmikktspace-robust.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/fbx-main-2f6f519/artifacts/fbx-main-proof/release/libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/fbx-main-2f6f519/artifacts/fbx-main-proof/release/libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "/usr/lib64/libEGL.so",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libharfbuzz.so",
+              "/usr/lib64/libGL.so",
+              "/usr/lib64/libfontconfig.so",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libfreetype.so",
+              "/usr/lib64/libicui18n.so",
+              "/usr/lib64/libicuuc.so",
+              "/usr/lib64/libopenxr_loader.so",
+              "/usr/lib64/libgio-2.0.so",
+              "/usr/lib64/libgobject-2.0.so",
+              "/usr/lib64/libglib-2.0.so",
+              "/usr/lib64/libX11.so",
+              "/usr/lib64/libwayland-client.so",
+              "-lm",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit_code": 0
+          },
+          {
+            "name": "version",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/artifacts/app-completion/release/dome-sculpt",
+              "--version"
+            ],
+            "exit_code": 0
+          }
+        ],
+        "child_pid": 2768847,
+        "exit_code": 0,
+        "seconds": 0.4078746089944616,
+        "inputs": 1868,
+        "drift": [],
+        "app_sha256": "cd961684f7b5b82d92b8d5be06b93b1a684b39a3a73dd8855a6dd83940853bd8"
+      }
+    },
+    "sanitize": {
+      "native": {
+        "state": "terminal",
+        "pid": 2239686,
+        "source": "88af17f852328d92dd9c3fb789ab68ea31088e5e",
+        "scope": "Complete rig TU and native consumer TUs over exact public a2 core/owned current-layout cage support; zero morph identity and native Bake/Save/recovery, no fresh whole build/device claim",
+        "steps": [
+          {
+            "name": "rig.cpp-compile",
+            "command": [
+              "/usr/bin/c++",
+              "-DDOME_SCULPT_INSTALLED_ASSETS=\"/usr/local/share/dome-sculpt/assets/humanoid\"",
+              "-DDOME_SCULPT_SOURCE_ASSETS=\"/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/assets/humanoid\"",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/third_party",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/third_party/cgltf",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/third_party/nlohmann",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/third_party/xatlas",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/third_party/mikktspace",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/third_party/ufbx",
+              "-O1",
+              "-g1",
+              "-UNDEBUG",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "-std=gnu++20",
+              "-Wall",
+              "-Wextra",
+              "-Wpedantic",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/artifacts/zero-proof/sanitize/rig.cpp.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/src/rig.cpp"
+            ],
+            "exit_code": 0,
+            "expected": 0,
+            "seconds": 12.662409100012155
+          },
+          {
+            "name": "core-replace",
+            "command": [
+              "ar",
+              "r",
+              "/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/artifacts/zero-proof/sanitize/libdome-sculpt-core.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/artifacts/zero-proof/sanitize/rig.cpp.o"
+            ],
+            "exit_code": 0,
+            "expected": 0,
+            "seconds": 1.4988155850151088
+          },
+          {
+            "name": "core-index",
+            "command": [
+              "ar",
+              "s",
+              "/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/artifacts/zero-proof/sanitize/libdome-sculpt-core.a"
+            ],
+            "exit_code": 0,
+            "expected": 0,
+            "seconds": 1.0261012710107025
+          },
+          {
+            "name": "zero-morph-rest-compile",
+            "command": [
+              "/usr/bin/c++",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/third_party/nlohmann",
+              "-O1",
+              "-g1",
+              "-UNDEBUG",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "-std=gnu++20",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/artifacts/zero-proof/sanitize/zero-morph-rest.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/tests/zero-morph-rest.cpp"
+            ],
+            "exit_code": 0,
+            "expected": 0,
+            "seconds": 6.030131605977658
+          },
+          {
+            "name": "zero-morph-rest-link",
+            "command": [
+              "/usr/bin/c++",
+              "-O1",
+              "-g1",
+              "-UNDEBUG",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "-fsanitize=address,undefined",
+              "/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/artifacts/zero-proof/sanitize/zero-morph-rest.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/artifacts/zero-proof/sanitize/zero-morph-rest",
+              "/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/artifacts/zero-proof/sanitize/libdome-sculpt-core.a",
+              "libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "libdome-sculpt-polygon.a",
+              "libxatlas.a",
+              "libmikktspace.a",
+              "libmikktspace-robust.a",
+              "libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit_code": 0,
+            "expected": 0,
+            "seconds": 1.939471053017769
+          },
+          {
+            "name": "zero-morph-rest",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/artifacts/zero-proof/sanitize/zero-morph-rest",
+              "/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/artifacts/zero-proof/sanitize/actual"
+            ],
+            "exit_code": 0,
+            "expected": 0,
+            "seconds": 0.20383935398422182
+          },
+          {
+            "name": "zero-morph-rest-old-link",
+            "command": [
+              "/usr/bin/c++",
+              "-O1",
+              "-g1",
+              "-UNDEBUG",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "-fsanitize=address,undefined",
+              "/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/artifacts/zero-proof/sanitize/zero-morph-rest.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/artifacts/zero-proof/sanitize/zero-morph-rest-old",
+              "/home/blux/de-xr/dome-sculpt/artifacts/fbx-main-2f6f519/artifacts/fbx-main-proof/sanitize/libdome-sculpt-core.a",
+              "libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "libdome-sculpt-polygon.a",
+              "libxatlas.a",
+              "libmikktspace.a",
+              "libmikktspace-robust.a",
+              "libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit_code": 0,
+            "expected": 0,
+            "seconds": 2.0047685359895695
+          },
+          {
+            "name": "zero-morph-rest-old",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/artifacts/zero-proof/sanitize/zero-morph-rest-old",
+              "/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/artifacts/zero-proof/sanitize/old-actual"
+            ],
+            "exit_code": 1,
+            "expected": 1,
+            "seconds": 0.1376547880063299
+          },
+          {
+            "name": "rig-compile",
+            "command": [
+              "/usr/bin/c++",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/third_party/nlohmann",
+              "-O1",
+              "-g1",
+              "-UNDEBUG",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "-std=gnu++20",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/artifacts/zero-proof/sanitize/rig.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/tests/rig.cpp"
+            ],
+            "exit_code": 0,
+            "expected": 0,
+            "seconds": 4.839192583021941
+          },
+          {
+            "name": "rig-link",
+            "command": [
+              "/usr/bin/c++",
+              "-O1",
+              "-g1",
+              "-UNDEBUG",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "-fsanitize=address,undefined",
+              "/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/artifacts/zero-proof/sanitize/rig.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/artifacts/zero-proof/sanitize/rig",
+              "/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/artifacts/zero-proof/sanitize/libdome-sculpt-core.a",
+              "libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "libdome-sculpt-polygon.a",
+              "libxatlas.a",
+              "libmikktspace.a",
+              "libmikktspace-robust.a",
+              "libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit_code": 0,
+            "expected": 0,
+            "seconds": 0.2458133500185795
+          },
+          {
+            "name": "rig",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/artifacts/zero-proof/sanitize/rig"
+            ],
+            "exit_code": 0,
+            "expected": 0,
+            "seconds": 0.022503304993733764
+          },
+          {
+            "name": "rig-old-link",
+            "command": [
+              "/usr/bin/c++",
+              "-O1",
+              "-g1",
+              "-UNDEBUG",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "-fsanitize=address,undefined",
+              "/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/artifacts/zero-proof/sanitize/rig.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/artifacts/zero-proof/sanitize/rig-old",
+              "/home/blux/de-xr/dome-sculpt/artifacts/fbx-main-2f6f519/artifacts/fbx-main-proof/sanitize/libdome-sculpt-core.a",
+              "libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "libdome-sculpt-polygon.a",
+              "libxatlas.a",
+              "libmikktspace.a",
+              "libmikktspace-robust.a",
+              "libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit_code": 0,
+            "expected": 0,
+            "seconds": 0.20817007499863394
+          },
+          {
+            "name": "rig-old",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/artifacts/zero-proof/sanitize/rig-old"
+            ],
+            "exit_code": 1,
+            "expected": 1,
+            "seconds": 0.021128488995600492
+          },
+          {
+            "name": "deformation-compile",
+            "command": [
+              "/usr/bin/c++",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/third_party/nlohmann",
+              "-O1",
+              "-g1",
+              "-UNDEBUG",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "-std=gnu++20",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/artifacts/zero-proof/sanitize/deformation.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/tests/deformation.cpp"
+            ],
+            "exit_code": 0,
+            "expected": 0,
+            "seconds": 7.833573187992442
+          },
+          {
+            "name": "deformation-link",
+            "command": [
+              "/usr/bin/c++",
+              "-O1",
+              "-g1",
+              "-UNDEBUG",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "-fsanitize=address,undefined",
+              "/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/artifacts/zero-proof/sanitize/deformation.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/artifacts/zero-proof/sanitize/deformation",
+              "/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/artifacts/zero-proof/sanitize/libdome-sculpt-core.a",
+              "libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "libdome-sculpt-polygon.a",
+              "libxatlas.a",
+              "libmikktspace.a",
+              "libmikktspace-robust.a",
+              "libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit_code": 0,
+            "expected": 0,
+            "seconds": 1.2132544379855972
+          },
+          {
+            "name": "deformation",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/artifacts/zero-proof/sanitize/deformation"
+            ],
+            "exit_code": 0,
+            "expected": 0,
+            "seconds": 0.12858851900091395
+          },
+          {
+            "name": "source-morph-compile",
+            "command": [
+              "/usr/bin/c++",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/third_party/cgltf",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/third_party/nlohmann",
+              "-O1",
+              "-g1",
+              "-UNDEBUG",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "-std=gnu++20",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/artifacts/zero-proof/sanitize/source-morph.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/tests/source-morph.cpp"
+            ],
+            "exit_code": 0,
+            "expected": 0,
+            "seconds": 7.255975342006423
+          },
+          {
+            "name": "source-morph-link",
+            "command": [
+              "/usr/bin/c++",
+              "-O1",
+              "-g1",
+              "-UNDEBUG",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "-fsanitize=address,undefined",
+              "/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/artifacts/zero-proof/sanitize/source-morph.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/artifacts/zero-proof/sanitize/source-morph",
+              "/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/artifacts/zero-proof/sanitize/libdome-sculpt-core.a",
+              "libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "libdome-sculpt-polygon.a",
+              "libxatlas.a",
+              "libmikktspace.a",
+              "libmikktspace-robust.a",
+              "libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit_code": 0,
+            "expected": 0,
+            "seconds": 1.2168599780125078
+          },
+          {
+            "name": "source-morph",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/artifacts/zero-proof/sanitize/source-morph",
+              "/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/artifacts/zero-proof/sanitize/source-morph"
+            ],
+            "exit_code": 0,
+            "expected": 0,
+            "seconds": 0.07420145298237912
+          },
+          {
+            "name": "normal-frame-export-compile",
+            "command": [
+              "/usr/bin/c++",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/third_party/cgltf",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/third_party/nlohmann",
+              "-O1",
+              "-g1",
+              "-UNDEBUG",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "-std=gnu++20",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/artifacts/zero-proof/sanitize/normal-frame-export.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/tests/normal-frame-export.cpp"
+            ],
+            "exit_code": 0,
+            "expected": 0,
+            "seconds": 10.334786936000455
+          },
+          {
+            "name": "normal-frame-export-link",
+            "command": [
+              "/usr/bin/c++",
+              "-O1",
+              "-g1",
+              "-UNDEBUG",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "-fsanitize=address,undefined",
+              "/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/artifacts/zero-proof/sanitize/normal-frame-export.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/artifacts/zero-proof/sanitize/normal-frame-export",
+              "/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/artifacts/zero-proof/sanitize/libdome-sculpt-core.a",
+              "libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "libdome-sculpt-polygon.a",
+              "libxatlas.a",
+              "libmikktspace.a",
+              "libmikktspace-robust.a",
+              "libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit_code": 0,
+            "expected": 0,
+            "seconds": 1.241383346990915
+          },
+          {
+            "name": "normal-frame-export",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/artifacts/zero-proof/sanitize/normal-frame-export",
+              "/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/artifacts/zero-proof/sanitize/frames.glb"
+            ],
+            "exit_code": 0,
+            "expected": 0,
+            "seconds": 0.10980940400622785
+          },
+          {
+            "name": "shapekey-authoring-compile",
+            "command": [
+              "/usr/bin/c++",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/src",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/third_party/cgltf",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/third_party/nlohmann",
+              "-O1",
+              "-g1",
+              "-UNDEBUG",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "-std=gnu++20",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/artifacts/zero-proof/sanitize/shapekey-authoring.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/tests/shapekey-authoring.cpp"
+            ],
+            "exit_code": 0,
+            "expected": 0,
+            "seconds": 8.995134099997813
+          },
+          {
+            "name": "shapekey-authoring-link",
+            "command": [
+              "/usr/bin/c++",
+              "-O1",
+              "-g1",
+              "-UNDEBUG",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "-fsanitize=address,undefined",
+              "/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/artifacts/zero-proof/sanitize/shapekey-authoring.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/artifacts/zero-proof/sanitize/shapekey-authoring",
+              "/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/artifacts/zero-proof/sanitize/libdome-sculpt-core.a",
+              "libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "libdome-sculpt-polygon.a",
+              "libxatlas.a",
+              "libmikktspace.a",
+              "libmikktspace-robust.a",
+              "libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit_code": 0,
+            "expected": 0,
+            "seconds": 1.234025431011105
+          },
+          {
+            "name": "shapekey-authoring",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/artifacts/zero-proof/sanitize/shapekey-authoring",
+              "/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/artifacts/zero-proof/sanitize/shape-authoring"
+            ],
+            "exit_code": 0,
+            "expected": 0,
+            "seconds": 17.352720372000476
+          },
+          {
+            "name": "shapekey-document-compile",
+            "command": [
+              "/usr/bin/c++",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/src",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/third_party/cgltf",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/third_party/nlohmann",
+              "-O1",
+              "-g1",
+              "-UNDEBUG",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "-std=gnu++20",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/artifacts/zero-proof/sanitize/shapekey-document.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/tests/shapekey-document.cpp"
+            ],
+            "exit_code": 0,
+            "expected": 0,
+            "seconds": 10.142382532008924
+          },
+          {
+            "name": "shapekey-document-link",
+            "command": [
+              "/usr/bin/c++",
+              "-O1",
+              "-g1",
+              "-UNDEBUG",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "-fsanitize=address,undefined",
+              "-Wl,--wrap=_ZN4dome15author_shapekeyERNS_5SceneEmRKNS_12ShapeKeyEditERKSt8functionIFbvEE",
+              "/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/artifacts/zero-proof/sanitize/shapekey-document.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/artifacts/zero-proof/sanitize/shapekey-document",
+              "/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/artifacts/zero-proof/sanitize/libdome-sculpt-core.a",
+              "libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "libdome-sculpt-polygon.a",
+              "libxatlas.a",
+              "libmikktspace.a",
+              "libmikktspace-robust.a",
+              "libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit_code": 0,
+            "expected": 0,
+            "seconds": 1.8811460889992304
+          },
+          {
+            "name": "shapekey-document",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/artifacts/zero-proof/sanitize/shapekey-document",
+              "/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/artifacts/zero-proof/sanitize/shape-document"
+            ],
+            "exit_code": 0,
+            "expected": 0,
+            "seconds": 0.2081291799840983
+          },
+          {
+            "name": "shapekey-selection-compile",
+            "command": [
+              "/usr/bin/c++",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/src",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/tests",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/third_party/nlohmann",
+              "-O1",
+              "-g1",
+              "-UNDEBUG",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "-std=gnu++20",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/artifacts/zero-proof/sanitize/shapekey-selection.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/tests/shapekey-selection.cpp"
+            ],
+            "exit_code": 0,
+            "expected": 0,
+            "seconds": 14.345744475984247
+          },
+          {
+            "name": "shapekey-selection-link",
+            "command": [
+              "/usr/bin/c++",
+              "-O1",
+              "-g1",
+              "-UNDEBUG",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "-fsanitize=address,undefined",
+              "-Wl,--wrap=_ZN4dome15author_shapekeyERNS_5SceneEmRKNS_12ShapeKeyEditERKSt8functionIFbvEE",
+              "/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/artifacts/zero-proof/sanitize/shapekey-selection.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/artifacts/zero-proof/sanitize/shapekey-selection",
+              "/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/artifacts/zero-proof/sanitize/libdome-sculpt-core.a",
+              "libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "libdome-sculpt-polygon.a",
+              "libxatlas.a",
+              "libmikktspace.a",
+              "libmikktspace-robust.a",
+              "libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit_code": 0,
+            "expected": 0,
+            "seconds": 2.288735251990147
+          },
+          {
+            "name": "shapekey-selection",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/artifacts/zero-proof/sanitize/shapekey-selection",
+              "/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/artifacts/zero-proof/sanitize/shape-selection"
+            ],
+            "exit_code": 0,
+            "expected": 0,
+            "seconds": 3.263894020987209
+          }
+        ],
+        "child_pid": 2833609,
+        "exit_code": 0,
+        "seconds": 120.24147088301834,
+        "inputs": 1802,
+        "drift": []
+      },
+      "signed_zero_followup": {
+        "state": "terminal",
+        "pid": 3299274,
+        "source": "0f000c22d1c2b1520a2fb1f9457aa6bf3055e653",
+        "scope": "Complete rig TU and native consumer TUs over exact public a2 core/owned current-layout cage support; zero morph identity and native Bake/Save/recovery, no fresh whole build/device claim",
+        "steps": [
+          {
+            "name": "zero-morph-rest-compile",
+            "command": [
+              "/usr/bin/c++",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-signed-88af/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-signed-88af/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-signed-88af/third_party/nlohmann",
+              "-O1",
+              "-g1",
+              "-UNDEBUG",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "-std=gnu++20",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-signed-88af/artifacts/signed-proof/sanitize/zero-morph-rest.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-signed-88af/tests/zero-morph-rest.cpp"
+            ],
+            "exit_code": 0,
+            "expected": 0,
+            "seconds": 5.811872828984633
+          },
+          {
+            "name": "zero-morph-rest-link",
+            "command": [
+              "/usr/bin/c++",
+              "-O1",
+              "-g1",
+              "-UNDEBUG",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "-fsanitize=address,undefined",
+              "/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-signed-88af/artifacts/signed-proof/sanitize/zero-morph-rest.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-signed-88af/artifacts/signed-proof/sanitize/zero-morph-rest",
+              "/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/artifacts/zero-proof/sanitize/libdome-sculpt-core.a",
+              "libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "libdome-sculpt-polygon.a",
+              "libxatlas.a",
+              "libmikktspace.a",
+              "libmikktspace-robust.a",
+              "libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit_code": 0,
+            "expected": 0,
+            "seconds": 1.8192888240155298
+          },
+          {
+            "name": "zero-morph-rest",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-signed-88af/artifacts/signed-proof/sanitize/zero-morph-rest",
+              "/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-signed-88af/artifacts/signed-proof/sanitize/actual"
+            ],
+            "exit_code": 0,
+            "expected": 0,
+            "seconds": 0.19352138100657612
+          },
+          {
+            "name": "zero-morph-rest-old-link",
+            "command": [
+              "/usr/bin/c++",
+              "-O1",
+              "-g1",
+              "-UNDEBUG",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "-fsanitize=address,undefined",
+              "/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-signed-88af/artifacts/signed-proof/sanitize/zero-morph-rest.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-signed-88af/artifacts/signed-proof/sanitize/zero-morph-rest-old",
+              "/home/blux/de-xr/dome-sculpt/artifacts/fbx-main-2f6f519/artifacts/fbx-main-proof/sanitize/libdome-sculpt-core.a",
+              "libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "libdome-sculpt-polygon.a",
+              "libxatlas.a",
+              "libmikktspace.a",
+              "libmikktspace-robust.a",
+              "libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit_code": 0,
+            "expected": 0,
+            "seconds": 1.8570298539998475
+          },
+          {
+            "name": "zero-morph-rest-old",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-signed-88af/artifacts/signed-proof/sanitize/zero-morph-rest-old",
+              "/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-signed-88af/artifacts/signed-proof/sanitize/old-actual"
+            ],
+            "exit_code": 1,
+            "expected": 1,
+            "seconds": 0.11698654398787767
+          }
+        ],
+        "child_pid": 3359812,
+        "exit_code": 0,
+        "seconds": 9.857661824993556,
+        "inputs": 1803,
+        "drift": []
+      },
+      "application_relink": {
+        "state": "terminal",
+        "pid": 2769662,
+        "source": "88af17f852328d92dd9c3fb789ab68ea31088e5e",
+        "scope": "Relink current public-layout native application from25exact immutable frontend objects and matching canonical support, new complete rigTU core; not fresh app build or GUI test",
+        "steps": [
+          {
+            "name": "link",
+            "command": [
+              "/usr/bin/c++",
+              "-O1",
+              "-g1",
+              "-UNDEBUG",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "-fsanitize=address,undefined",
+              "/home/blux/de-xr/dome-sculpt/artifacts/cage-coherent-4b96151/build-sanitize/CMakeFiles/dome-sculpt.dir/src/native-display-runtime.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/cage-coherent-4b96151/build-sanitize/CMakeFiles/dome-sculpt.dir/src/rig-fit-editor.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/cage-coherent-4b96151/build-sanitize/CMakeFiles/dome-sculpt.dir/src/projection-editor.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/cage-coherent-4b96151/build-sanitize/CMakeFiles/dome-sculpt.dir/src/spacenav-options.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/cage-coherent-4b96151/build-sanitize/CMakeFiles/dome-sculpt.dir/src/app.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/cage-coherent-4b96151/build-sanitize/CMakeFiles/dome-sculpt.dir/src/polygon-editor.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/cage-coherent-4b96151/build-sanitize/CMakeFiles/dome-sculpt.dir/src/import-editor.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/cage-coherent-4b96151/build-sanitize/CMakeFiles/dome-sculpt.dir/src/procedural-editor.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/cage-coherent-4b96151/build-sanitize/CMakeFiles/dome-sculpt.dir/src/resolution-editor.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/cage-coherent-4b96151/build-sanitize/CMakeFiles/dome-sculpt.dir/src/sculpt-editor.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/cage-coherent-4b96151/build-sanitize/CMakeFiles/dome-sculpt.dir/src/creator-editor.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/cage-coherent-4b96151/build-sanitize/CMakeFiles/dome-sculpt.dir/src/rig-editor.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/cage-coherent-4b96151/build-sanitize/CMakeFiles/dome-sculpt.dir/src/shapekey-editor.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/cage-coherent-4b96151/build-sanitize/CMakeFiles/dome-sculpt.dir/src/weight-editor.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/cage-coherent-4b96151/build-sanitize/CMakeFiles/dome-sculpt.dir/src/skin-editor.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/cage-coherent-4b96151/build-sanitize/CMakeFiles/dome-sculpt.dir/src/mesh-editor.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/cage-coherent-4b96151/build-sanitize/CMakeFiles/dome-sculpt.dir/src/bake-editor.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/cage-coherent-4b96151/build-sanitize/CMakeFiles/dome-sculpt.dir/src/object-editor.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/cage-coherent-4b96151/build-sanitize/CMakeFiles/dome-sculpt.dir/src/paint-editor.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/cage-coherent-4b96151/build-sanitize/CMakeFiles/dome-sculpt.dir/src/uv-editor.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/cage-coherent-4b96151/build-sanitize/CMakeFiles/dome-sculpt.dir/src/ui-conventions.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/cage-coherent-4b96151/build-sanitize/CMakeFiles/dome-sculpt.dir/src/session-appearance.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/cage-coherent-4b96151/build-sanitize/CMakeFiles/dome-sculpt.dir/src/export-editor.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/cage-coherent-4b96151/build-sanitize/CMakeFiles/dome-sculpt.dir/third_party/desktop/desktop-menu.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/cage-coherent-4b96151/build-sanitize/CMakeFiles/dome-sculpt.dir/appmenu-protocol.c.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/artifacts/app-completion/sanitize/dome-sculpt",
+              "-L/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-sanitize/lib",
+              "-L/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib",
+              "-Wl,-rpath,/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-sanitize/lib:/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib:",
+              "/home/blux/de-xr/dome-sculpt/artifacts/fbx-main-2f6f519/artifacts/fbx-main-proof/sanitize/libdome-sculpt-spacenav.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/artifacts/zero-proof/sanitize/libdome-sculpt-core.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/fbx-main-2f6f519/artifacts/fbx-main-proof/sanitize/libdome-sculpt-render.a",
+              "/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-sanitize/lib/libfltk_images.so.1.4.5",
+              "/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-sanitize/lib/libfltk_gl.so.1.4.5",
+              "/usr/lib64/libGLU.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/fbx-main-2f6f519/artifacts/fbx-main-proof/sanitize/libdome-sculpt-xr.a",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libpng.so",
+              "/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-sanitize/lib/libfltk.so.1.4.5",
+              "-lcairo",
+              "-L/usr/lib64",
+              "-lX11",
+              "-lGLU",
+              "-lGL",
+              "/usr/lib64/libdl.a",
+              "/usr/lib64/libSM.so",
+              "/usr/lib64/libICE.so",
+              "/usr/lib64/libXext.so",
+              "/usr/lib64/libXinerama.so",
+              "/usr/lib64/libXfixes.so",
+              "/usr/lib64/libXcursor.so",
+              "/usr/lib64/libXrender.so",
+              "/usr/lib64/libXft.so",
+              "/usr/lib64/libwayland-egl.so",
+              "/usr/lib64/libwayland-cursor.so",
+              "/usr/lib64/libxkbcommon.so",
+              "/usr/lib64/libGLX.so",
+              "/usr/lib64/libOpenGL.so",
+              "/usr/lib64/libz.so",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libcairo.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/fbx-main-2f6f519/artifacts/fbx-main-proof/sanitize/libdome-sculpt-render.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/artifacts/zero-proof/sanitize/libdome-sculpt-core.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/fbx-main-2f6f519/artifacts/fbx-main-proof/sanitize/libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/fbx-main-2f6f519/artifacts/fbx-main-proof/sanitize/libdome-sculpt-polygon.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/fbx-main-2f6f519/artifacts/fbx-main-proof/sanitize/libxatlas.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/fbx-main-2f6f519/artifacts/fbx-main-proof/sanitize/libmikktspace.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/fbx-main-2f6f519/artifacts/fbx-main-proof/sanitize/libmikktspace-robust.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/fbx-main-2f6f519/artifacts/fbx-main-proof/sanitize/libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/fbx-main-2f6f519/artifacts/fbx-main-proof/sanitize/libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "/usr/lib64/libEGL.so",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libharfbuzz.so",
+              "/usr/lib64/libGL.so",
+              "/usr/lib64/libfontconfig.so",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libfreetype.so",
+              "/usr/lib64/libicui18n.so",
+              "/usr/lib64/libicuuc.so",
+              "/usr/lib64/libopenxr_loader.so",
+              "/usr/lib64/libgio-2.0.so",
+              "/usr/lib64/libgobject-2.0.so",
+              "/usr/lib64/libglib-2.0.so",
+              "/usr/lib64/libX11.so",
+              "/usr/lib64/libwayland-client.so",
+              "-lm",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit_code": 0
+          },
+          {
+            "name": "version",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/morph-zero-oracle-6b84/artifacts/app-completion/sanitize/dome-sculpt",
+              "--version"
+            ],
+            "exit_code": 0
+          }
+        ],
+        "child_pid": 2787769,
+        "exit_code": 0,
+        "seconds": 2.4708630079985596,
+        "inputs": 1868,
+        "drift": [],
+        "app_sha256": "5ae21d3fea493a07710587ee849a10126e6b79ce5d72d24b3b6a8da6ff5be54b"
+      }
+    }
+  },
+  "configuration_only": {
+    "registered_count": 610,
+    "new_target": "zero-morph-rest",
+    "full610_run_claim": false,
+    "configure_log_sha256": "2bb7125f5319b4f71904164aa00cd61b608636736e999c9f009d8b122a0a247b"
+  },
+  "interop": {
+    "validator": "2.0.0-dev.3.10",
+    "files": [
+      {
+        "file": "artifacts/signed-proof/release/actual/zero-morph-rest.glb",
+        "sha256": "8768b98ff0db924c712b996f118d26266670dd8e2c2057b5c0dfb55001835a44",
+        "report": {
+          "uri": "zero-morph-rest.glb",
+          "mimeType": "model/gltf-binary",
+          "validatorVersion": "2.0.0-dev.3.10",
+          "validatedAt": "2026-11-04T12:35:51.471Z",
+          "issues": {
+            "numErrors": 0,
+            "numWarnings": 1,
+            "numInfos": 1,
+            "numHints": 0,
+            "messages": [
+              {
+                "code": "MESH_PRIMITIVE_GENERATED_TANGENT_SPACE",
+                "message": "Material requires a tangent space but the mesh primitive does not provide it. Runtime-generated tangent space may be non-portable across implementations.",
+                "severity": 1,
+                "pointer": "/meshes/0/primitives/0/material"
+              },
+              {
+                "code": "UNUSED_OBJECT",
+                "message": "This object may be unused.",
+                "severity": 2,
+                "pointer": "/bufferViews/10"
+              }
+            ],
+            "truncated": false
+          },
+          "info": {
+            "version": "2.0",
+            "generator": "Dome Sculpt",
+            "resources": [
+              {
+                "pointer": "/buffers/0",
+                "mimeType": "application/gltf-buffer",
+                "storage": "glb",
+                "byteLength": 74956
+              },
+              {
+                "pointer": "/images/0",
+                "mimeType": "image/png",
+                "storage": "buffer-view",
+                "image": {
+                  "width": 64,
+                  "height": 64,
+                  "format": "rgba",
+                  "primaries": "srgb",
+                  "transfer": "srgb",
+                  "bits": 8
+                }
+              },
+              {
+                "pointer": "/images/1",
+                "mimeType": "image/png",
+                "storage": "buffer-view",
+                "image": {
+                  "width": 64,
+                  "height": 64,
+                  "format": "rgba",
+                  "primaries": "srgb",
+                  "transfer": "srgb",
+                  "bits": 8
+                }
+              },
+              {
+                "pointer": "/images/2",
+                "mimeType": "image/png",
+                "storage": "buffer-view",
+                "image": {
+                  "width": 64,
+                  "height": 64,
+                  "format": "rgba",
+                  "primaries": "srgb",
+                  "transfer": "srgb",
+                  "bits": 8
+                }
+              },
+              {
+                "pointer": "/images/3",
+                "mimeType": "image/png",
+                "storage": "buffer-view",
+                "image": {
+                  "width": 64,
+                  "height": 64,
+                  "format": "rgba",
+                  "primaries": "srgb",
+                  "transfer": "srgb",
+                  "bits": 8
+                }
+              }
+            ],
+            "animationCount": 0,
+            "materialCount": 1,
+            "hasMorphTargets": true,
+            "hasSkins": false,
+            "hasTextures": true,
+            "hasDefaultScene": true,
+            "drawCallCount": 1,
+            "totalVertexCount": 4,
+            "totalTriangleCount": 2,
+            "maxUVs": 1,
+            "maxInfluences": 0,
+            "maxAttributes": 3
+          }
+        }
+      },
+      {
+        "file": "artifacts/signed-proof/sanitize/actual/zero-morph-rest.glb",
+        "sha256": "8768b98ff0db924c712b996f118d26266670dd8e2c2057b5c0dfb55001835a44",
+        "report": {
+          "uri": "zero-morph-rest.glb",
+          "mimeType": "model/gltf-binary",
+          "validatorVersion": "2.0.0-dev.3.10",
+          "validatedAt": "2026-11-04T12:35:51.479Z",
+          "issues": {
+            "numErrors": 0,
+            "numWarnings": 1,
+            "numInfos": 1,
+            "numHints": 0,
+            "messages": [
+              {
+                "code": "MESH_PRIMITIVE_GENERATED_TANGENT_SPACE",
+                "message": "Material requires a tangent space but the mesh primitive does not provide it. Runtime-generated tangent space may be non-portable across implementations.",
+                "severity": 1,
+                "pointer": "/meshes/0/primitives/0/material"
+              },
+              {
+                "code": "UNUSED_OBJECT",
+                "message": "This object may be unused.",
+                "severity": 2,
+                "pointer": "/bufferViews/10"
+              }
+            ],
+            "truncated": false
+          },
+          "info": {
+            "version": "2.0",
+            "generator": "Dome Sculpt",
+            "resources": [
+              {
+                "pointer": "/buffers/0",
+                "mimeType": "application/gltf-buffer",
+                "storage": "glb",
+                "byteLength": 74956
+              },
+              {
+                "pointer": "/images/0",
+                "mimeType": "image/png",
+                "storage": "buffer-view",
+                "image": {
+                  "width": 64,
+                  "height": 64,
+                  "format": "rgba",
+                  "primaries": "srgb",
+                  "transfer": "srgb",
+                  "bits": 8
+                }
+              },
+              {
+                "pointer": "/images/1",
+                "mimeType": "image/png",
+                "storage": "buffer-view",
+                "image": {
+                  "width": 64,
+                  "height": 64,
+                  "format": "rgba",
+                  "primaries": "srgb",
+                  "transfer": "srgb",
+                  "bits": 8
+                }
+              },
+              {
+                "pointer": "/images/2",
+                "mimeType": "image/png",
+                "storage": "buffer-view",
+                "image": {
+                  "width": 64,
+                  "height": 64,
+                  "format": "rgba",
+                  "primaries": "srgb",
+                  "transfer": "srgb",
+                  "bits": 8
+                }
+              },
+              {
+                "pointer": "/images/3",
+                "mimeType": "image/png",
+                "storage": "buffer-view",
+                "image": {
+                  "width": 64,
+                  "height": 64,
+                  "format": "rgba",
+                  "primaries": "srgb",
+                  "transfer": "srgb",
+                  "bits": 8
+                }
+              }
+            ],
+            "animationCount": 0,
+            "materialCount": 1,
+            "hasMorphTargets": true,
+            "hasSkins": false,
+            "hasTextures": true,
+            "hasDefaultScene": true,
+            "drawCallCount": 1,
+            "totalVertexCount": 4,
+            "totalTriangleCount": 2,
+            "maxUVs": 1,
+            "maxInfluences": 0,
+            "maxAttributes": 3
+          }
+        }
+      },
+      {
+        "file": "../morph-zero-oracle-6b84/artifacts/zero-proof/release/frames.glb",
+        "sha256": "8f7f20c145b8178c20b7c6c88b1b9bdbc8736a6de1c110bbe86138224c97956f",
+        "report": {
+          "uri": "frames.glb",
+          "mimeType": "model/gltf-binary",
+          "validatorVersion": "2.0.0-dev.3.10",
+          "validatedAt": "2026-11-04T12:35:51.486Z",
+          "issues": {
+            "numErrors": 0,
+            "numWarnings": 1,
+            "numInfos": 1,
+            "numHints": 0,
+            "messages": [
+              {
+                "code": "UNUSED_OBJECT",
+                "message": "This object may be unused.",
+                "severity": 2,
+                "pointer": "/meshes/0/primitives/0/attributes/TEXCOORD_1"
+              },
+              {
+                "code": "NODE_SKINNED_MESH_NON_ROOT",
+                "message": "Node with a skinned mesh is not root. Parent transforms will not affect a skinned mesh.",
+                "severity": 1,
+                "pointer": "/nodes/1"
+              }
+            ],
+            "truncated": false
+          },
+          "info": {
+            "version": "2.0",
+            "generator": "Dome Sculpt",
+            "resources": [
+              {
+                "pointer": "/buffers/0",
+                "mimeType": "application/gltf-buffer",
+                "storage": "glb",
+                "byteLength": 832
+              },
+              {
+                "pointer": "/images/0",
+                "mimeType": "image/png",
+                "storage": "buffer-view",
+                "image": {
+                  "width": 1,
+                  "height": 1,
+                  "format": "rgba",
+                  "primaries": "srgb",
+                  "transfer": "srgb",
+                  "bits": 8
+                }
+              }
+            ],
+            "animationCount": 0,
+            "materialCount": 1,
+            "hasMorphTargets": true,
+            "hasSkins": true,
+            "hasTextures": true,
+            "hasDefaultScene": true,
+            "drawCallCount": 1,
+            "totalVertexCount": 5,
+            "totalTriangleCount": 2,
+            "maxUVs": 2,
+            "maxInfluences": 4,
+            "maxAttributes": 8
+          }
+        }
+      },
+      {
+        "file": "../morph-zero-oracle-6b84/artifacts/zero-proof/sanitize/frames.glb",
+        "sha256": "8f7f20c145b8178c20b7c6c88b1b9bdbc8736a6de1c110bbe86138224c97956f",
+        "report": {
+          "uri": "frames.glb",
+          "mimeType": "model/gltf-binary",
+          "validatorVersion": "2.0.0-dev.3.10",
+          "validatedAt": "2026-11-04T12:35:51.488Z",
+          "issues": {
+            "numErrors": 0,
+            "numWarnings": 1,
+            "numInfos": 1,
+            "numHints": 0,
+            "messages": [
+              {
+                "code": "UNUSED_OBJECT",
+                "message": "This object may be unused.",
+                "severity": 2,
+                "pointer": "/meshes/0/primitives/0/attributes/TEXCOORD_1"
+              },
+              {
+                "code": "NODE_SKINNED_MESH_NON_ROOT",
+                "message": "Node with a skinned mesh is not root. Parent transforms will not affect a skinned mesh.",
+                "severity": 1,
+                "pointer": "/nodes/1"
+              }
+            ],
+            "truncated": false
+          },
+          "info": {
+            "version": "2.0",
+            "generator": "Dome Sculpt",
+            "resources": [
+              {
+                "pointer": "/buffers/0",
+                "mimeType": "application/gltf-buffer",
+                "storage": "glb",
+                "byteLength": 832
+              },
+              {
+                "pointer": "/images/0",
+                "mimeType": "image/png",
+                "storage": "buffer-view",
+                "image": {
+                  "width": 1,
+                  "height": 1,
+                  "format": "rgba",
+                  "primaries": "srgb",
+                  "transfer": "srgb",
+                  "bits": 8
+                }
+              }
+            ],
+            "animationCount": 0,
+            "materialCount": 1,
+            "hasMorphTargets": true,
+            "hasSkins": true,
+            "hasTextures": true,
+            "hasDefaultScene": true,
+            "drawCallCount": 1,
+            "totalVertexCount": 5,
+            "totalTriangleCount": 2,
+            "maxUVs": 2,
+            "maxInfluences": 4,
+            "maxAttributes": 8
+          }
+        }
+      },
+      {
+        "file": "../morph-zero-oracle-6b84/artifacts/zero-proof/release/frames-normal-only.glb",
+        "sha256": "c5cc09187c87da74586348832f15bbc17ddb53fda76be27757832de02e1dcfb5",
+        "report": {
+          "uri": "frames-normal-only.glb",
+          "mimeType": "model/gltf-binary",
+          "validatorVersion": "2.0.0-dev.3.10",
+          "validatedAt": "2026-11-04T12:35:51.491Z",
+          "issues": {
+            "numErrors": 0,
+            "numWarnings": 1,
+            "numInfos": 2,
+            "numHints": 0,
+            "messages": [
+              {
+                "code": "UNUSED_OBJECT",
+                "message": "This object may be unused.",
+                "severity": 2,
+                "pointer": "/meshes/0/primitives/0/attributes/TEXCOORD_0"
+              },
+              {
+                "code": "UNUSED_OBJECT",
+                "message": "This object may be unused.",
+                "severity": 2,
+                "pointer": "/meshes/0/primitives/0/attributes/TEXCOORD_1"
+              },
+              {
+                "code": "NODE_SKINNED_MESH_NON_ROOT",
+                "message": "Node with a skinned mesh is not root. Parent transforms will not affect a skinned mesh.",
+                "severity": 1,
+                "pointer": "/nodes/1"
+              }
+            ],
+            "truncated": false
+          },
+          "info": {
+            "version": "2.0",
+            "generator": "Dome Sculpt",
+            "resources": [
+              {
+                "pointer": "/buffers/0",
+                "mimeType": "application/gltf-buffer",
+                "storage": "glb",
+                "byteLength": 504
+              }
+            ],
+            "animationCount": 0,
+            "materialCount": 1,
+            "hasMorphTargets": true,
+            "hasSkins": true,
+            "hasTextures": false,
+            "hasDefaultScene": true,
+            "drawCallCount": 1,
+            "totalVertexCount": 4,
+            "totalTriangleCount": 2,
+            "maxUVs": 2,
+            "maxInfluences": 4,
+            "maxAttributes": 7
+          }
+        }
+      },
+      {
+        "file": "../morph-zero-oracle-6b84/artifacts/zero-proof/sanitize/frames-normal-only.glb",
+        "sha256": "c5cc09187c87da74586348832f15bbc17ddb53fda76be27757832de02e1dcfb5",
+        "report": {
+          "uri": "frames-normal-only.glb",
+          "mimeType": "model/gltf-binary",
+          "validatorVersion": "2.0.0-dev.3.10",
+          "validatedAt": "2026-11-04T12:35:51.494Z",
+          "issues": {
+            "numErrors": 0,
+            "numWarnings": 1,
+            "numInfos": 2,
+            "numHints": 0,
+            "messages": [
+              {
+                "code": "UNUSED_OBJECT",
+                "message": "This object may be unused.",
+                "severity": 2,
+                "pointer": "/meshes/0/primitives/0/attributes/TEXCOORD_0"
+              },
+              {
+                "code": "UNUSED_OBJECT",
+                "message": "This object may be unused.",
+                "severity": 2,
+                "pointer": "/meshes/0/primitives/0/attributes/TEXCOORD_1"
+              },
+              {
+                "code": "NODE_SKINNED_MESH_NON_ROOT",
+                "message": "Node with a skinned mesh is not root. Parent transforms will not affect a skinned mesh.",
+                "severity": 1,
+                "pointer": "/nodes/1"
+              }
+            ],
+            "truncated": false
+          },
+          "info": {
+            "version": "2.0",
+            "generator": "Dome Sculpt",
+            "resources": [
+              {
+                "pointer": "/buffers/0",
+                "mimeType": "application/gltf-buffer",
+                "storage": "glb",
+                "byteLength": 504
+              }
+            ],
+            "animationCount": 0,
+            "materialCount": 1,
+            "hasMorphTargets": true,
+            "hasSkins": true,
+            "hasTextures": false,
+            "hasDefaultScene": true,
+            "drawCallCount": 1,
+            "totalVertexCount": 4,
+            "totalTriangleCount": 2,
+            "maxUVs": 2,
+            "maxInfluences": 4,
+            "maxAttributes": 7
+          }
+        }
+      }
+    ]
+  },
+  "profile_pairs": [
+    {
+      "file": "actual/zero-morph-rest.dsculpt",
+      "bytes": 71706,
+      "sha256": "70906e3c38c37fc669363dfb58973e1e69ae86a5735d760eda3f771f129e35e3",
+      "equal": true
+    },
+    {
+      "file": "actual/zero-morph-rest.glb",
+      "bytes": 77896,
+      "sha256": "8768b98ff0db924c712b996f118d26266670dd8e2c2057b5c0dfb55001835a44",
+      "equal": true
+    },
+    {
+      "file": "frames.glb",
+      "bytes": 4124,
+      "sha256": "8f7f20c145b8178c20b7c6c88b1b9bdbc8736a6de1c110bbe86138224c97956f",
+      "equal": true
+    },
+    {
+      "file": "frames-normal-only.glb",
+      "bytes": 3300,
+      "sha256": "c5cc09187c87da74586348832f15bbc17ddb53fda76be27757832de02e1dcfb5",
+      "equal": true
+    },
+    {
+      "file": "shape-authoring.dsculpt",
+      "bytes": 5200,
+      "sha256": "0b5e89724535a3c15f7c20b6504d4125c3006a98605b6a6da6ee5c39ea51b68a",
+      "equal": true
+    },
+    {
+      "file": "shape-authoring-vroid.dsculpt",
+      "bytes": 135665934,
+      "sha256": "6139c8bec33ab393085a41a3ce1ab965c326db90e0469a3baf60ac029c3416df",
+      "equal": true
+    },
+    {
+      "file": "shape-document.dsculpt",
+      "bytes": 4750,
+      "sha256": "e55b089fa33f557fe66da5043cc04754f60e0bae5b581cee63ba446c72983921",
+      "equal": true
+    },
+    {
+      "file": "shape-selection/selection.dsculpt",
+      "bytes": 21282,
+      "sha256": "b071934e2698d4847c8cf5568b0bc19270ce28b2c34a95a8f1a6f95043d67588",
+      "equal": true
+    },
+    {
+      "file": "shape-selection/reselected-stroke.dsculpt",
+      "bytes": 21282,
+      "sha256": "f565700914616d42f208df3a59bdfbadbd2a1715fd194a533e4d6f6ad05d50f1",
+      "equal": true
+    },
+    {
+      "file": "signed-followup/zero-morph-rest.dsculpt",
+      "bytes": 71706,
+      "sha256": "70906e3c38c37fc669363dfb58973e1e69ae86a5735d760eda3f771f129e35e3",
+      "equal": true
+    },
+    {
+      "file": "signed-followup/zero-morph-rest.glb",
+      "bytes": 77896,
+      "sha256": "8768b98ff0db924c712b996f118d26266670dd8e2c2057b5c0dfb55001835a44",
+      "equal": true
+    }
+  ],
+  "product_sha256": {
+    "src/rig.cpp": "68bdcfb0001443e9910839edbe185a976f720910f5ed98cdee3242162db44ae3"
+  },
+  "evidence_sha256": {
+    "morph-zero-oracle-6b84/artifacts/zero-proof/run.py": "5a7314335e7b3245cc4a4e837861c8049e2e3250f45c183aa8ee5c0d27d1da05",
+    "morph-zero-oracle-6b84/artifacts/zero-proof/complete.py": "c9a55eb5865b66c936f1b08289d4d2bd7072e00b457fe5b21638f795e57039f6",
+    "morph-zero-oracle-6b84/artifacts/zero-proof/configure.log": "2bb7125f5319b4f71904164aa00cd61b608636736e999c9f009d8b122a0a247b",
+    "morph-zero-oracle-6b84/artifacts/zero-proof/registered.json": "eeb30b5570ed17d9d4d0d24992e6cb5f0b4abc0558d1c150d1ed799264d70773",
+    "morph-zero-oracle-6b84/artifacts/zero-proof/release/before.json": "7a6d77dc9eadc8a97005370e825f7c3a24fb0d104f20eaac127181d970f02f4d",
+    "morph-zero-oracle-6b84/artifacts/zero-proof/release/status.json": "a36a5d6a771dfb26e2474fdf6b80917a5399df1138c4dbf5dc447bdafdba3d58",
+    "morph-zero-oracle-6b84/artifacts/zero-proof/release/rig.cpp-compile.log": "df5176f4701facb3408d7d69d8770714950f3a924b3b0c4e4bd25c3275ba7dfd",
+    "morph-zero-oracle-6b84/artifacts/zero-proof/release/core-replace.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "morph-zero-oracle-6b84/artifacts/zero-proof/release/core-index.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "morph-zero-oracle-6b84/artifacts/zero-proof/release/zero-morph-rest-compile.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "morph-zero-oracle-6b84/artifacts/zero-proof/release/zero-morph-rest-link.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "morph-zero-oracle-6b84/artifacts/zero-proof/release/zero-morph-rest.log": "909c4d72284ed977225cdf598d137167fea05dcb4df1032f2225a4353d2c9aa6",
+    "morph-zero-oracle-6b84/artifacts/zero-proof/release/zero-morph-rest-old-link.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "morph-zero-oracle-6b84/artifacts/zero-proof/release/zero-morph-rest-old.log": "3abac6382a0cf1b31606c1f47f6d6bade1f483ad91eb2d3416e505cfcbc6ab2a",
+    "morph-zero-oracle-6b84/artifacts/zero-proof/release/rig-compile.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "morph-zero-oracle-6b84/artifacts/zero-proof/release/rig-link.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "morph-zero-oracle-6b84/artifacts/zero-proof/release/rig.log": "6e262db7cde7a26db92a72063e5383a2c0b04bc5f8905b13dd5a3c27089994a8",
+    "morph-zero-oracle-6b84/artifacts/zero-proof/release/rig-old-link.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "morph-zero-oracle-6b84/artifacts/zero-proof/release/rig-old.log": "c8ef2a95f93ad8a0d3f1e3e43b79dcee18651754811c39e6219e7074639f8aa7",
+    "morph-zero-oracle-6b84/artifacts/zero-proof/release/deformation-compile.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "morph-zero-oracle-6b84/artifacts/zero-proof/release/deformation-link.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "morph-zero-oracle-6b84/artifacts/zero-proof/release/deformation.log": "0ca6ac77a7a53988e406b2c11f39779ae2d7c245a9c539154e4a93b4cd299fc3",
+    "morph-zero-oracle-6b84/artifacts/zero-proof/release/source-morph-compile.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "morph-zero-oracle-6b84/artifacts/zero-proof/release/source-morph-link.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "morph-zero-oracle-6b84/artifacts/zero-proof/release/source-morph.log": "271774a47f50578c92517ae2d1c3b4c0738526635e30334f613530c4beef2d92",
+    "morph-zero-oracle-6b84/artifacts/zero-proof/release/normal-frame-export-compile.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "morph-zero-oracle-6b84/artifacts/zero-proof/release/normal-frame-export-link.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "morph-zero-oracle-6b84/artifacts/zero-proof/release/normal-frame-export.log": "cb442c4a1e72785f579d41be99c7259f91700dd2b64c12f42efc33c383b92211",
+    "morph-zero-oracle-6b84/artifacts/zero-proof/release/shapekey-authoring-compile.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "morph-zero-oracle-6b84/artifacts/zero-proof/release/shapekey-authoring-link.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "morph-zero-oracle-6b84/artifacts/zero-proof/release/shapekey-authoring.log": "33b4d15403079ca8f470226e2307bf6492d65a74078c4000037ec270255a4e50",
+    "morph-zero-oracle-6b84/artifacts/zero-proof/release/shapekey-document-compile.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "morph-zero-oracle-6b84/artifacts/zero-proof/release/shapekey-document-link.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "morph-zero-oracle-6b84/artifacts/zero-proof/release/shapekey-document.log": "2c2b74ad22679419a4309d95d4f21281743bec1446f10694340bf280955f160d",
+    "morph-zero-oracle-6b84/artifacts/zero-proof/release/shapekey-selection-compile.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "morph-zero-oracle-6b84/artifacts/zero-proof/release/shapekey-selection-link.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "morph-zero-oracle-6b84/artifacts/zero-proof/release/shapekey-selection.log": "babeb811f320fdb12983667b9c7a06817ae78a9b91609c8232118c05a0e77d72",
+    "morph-zero-oracle-6b84/artifacts/zero-proof/sanitize/before.json": "8f21fda036ae08e626932c130bb38eba1ddd84bc57db8aba8228f0830f8b32c9",
+    "morph-zero-oracle-6b84/artifacts/zero-proof/sanitize/status.json": "0ace7436e37b5d8d1d1cf069884e57abf856e654649a06c34ee8f26dea6599da",
+    "morph-zero-oracle-6b84/artifacts/zero-proof/sanitize/rig.cpp-compile.log": "df5176f4701facb3408d7d69d8770714950f3a924b3b0c4e4bd25c3275ba7dfd",
+    "morph-zero-oracle-6b84/artifacts/zero-proof/sanitize/core-replace.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "morph-zero-oracle-6b84/artifacts/zero-proof/sanitize/core-index.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "morph-zero-oracle-6b84/artifacts/zero-proof/sanitize/zero-morph-rest-compile.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "morph-zero-oracle-6b84/artifacts/zero-proof/sanitize/zero-morph-rest-link.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "morph-zero-oracle-6b84/artifacts/zero-proof/sanitize/zero-morph-rest.log": "909c4d72284ed977225cdf598d137167fea05dcb4df1032f2225a4353d2c9aa6",
+    "morph-zero-oracle-6b84/artifacts/zero-proof/sanitize/zero-morph-rest-old-link.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "morph-zero-oracle-6b84/artifacts/zero-proof/sanitize/zero-morph-rest-old.log": "3abac6382a0cf1b31606c1f47f6d6bade1f483ad91eb2d3416e505cfcbc6ab2a",
+    "morph-zero-oracle-6b84/artifacts/zero-proof/sanitize/rig-compile.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "morph-zero-oracle-6b84/artifacts/zero-proof/sanitize/rig-link.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "morph-zero-oracle-6b84/artifacts/zero-proof/sanitize/rig.log": "6e262db7cde7a26db92a72063e5383a2c0b04bc5f8905b13dd5a3c27089994a8",
+    "morph-zero-oracle-6b84/artifacts/zero-proof/sanitize/rig-old-link.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "morph-zero-oracle-6b84/artifacts/zero-proof/sanitize/rig-old.log": "c8ef2a95f93ad8a0d3f1e3e43b79dcee18651754811c39e6219e7074639f8aa7",
+    "morph-zero-oracle-6b84/artifacts/zero-proof/sanitize/deformation-compile.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "morph-zero-oracle-6b84/artifacts/zero-proof/sanitize/deformation-link.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "morph-zero-oracle-6b84/artifacts/zero-proof/sanitize/deformation.log": "0ca6ac77a7a53988e406b2c11f39779ae2d7c245a9c539154e4a93b4cd299fc3",
+    "morph-zero-oracle-6b84/artifacts/zero-proof/sanitize/source-morph-compile.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "morph-zero-oracle-6b84/artifacts/zero-proof/sanitize/source-morph-link.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "morph-zero-oracle-6b84/artifacts/zero-proof/sanitize/source-morph.log": "271774a47f50578c92517ae2d1c3b4c0738526635e30334f613530c4beef2d92",
+    "morph-zero-oracle-6b84/artifacts/zero-proof/sanitize/normal-frame-export-compile.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "morph-zero-oracle-6b84/artifacts/zero-proof/sanitize/normal-frame-export-link.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "morph-zero-oracle-6b84/artifacts/zero-proof/sanitize/normal-frame-export.log": "cb442c4a1e72785f579d41be99c7259f91700dd2b64c12f42efc33c383b92211",
+    "morph-zero-oracle-6b84/artifacts/zero-proof/sanitize/shapekey-authoring-compile.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "morph-zero-oracle-6b84/artifacts/zero-proof/sanitize/shapekey-authoring-link.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "morph-zero-oracle-6b84/artifacts/zero-proof/sanitize/shapekey-authoring.log": "33b4d15403079ca8f470226e2307bf6492d65a74078c4000037ec270255a4e50",
+    "morph-zero-oracle-6b84/artifacts/zero-proof/sanitize/shapekey-document-compile.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "morph-zero-oracle-6b84/artifacts/zero-proof/sanitize/shapekey-document-link.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "morph-zero-oracle-6b84/artifacts/zero-proof/sanitize/shapekey-document.log": "2c2b74ad22679419a4309d95d4f21281743bec1446f10694340bf280955f160d",
+    "morph-zero-oracle-6b84/artifacts/zero-proof/sanitize/shapekey-selection-compile.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "morph-zero-oracle-6b84/artifacts/zero-proof/sanitize/shapekey-selection-link.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "morph-zero-oracle-6b84/artifacts/zero-proof/sanitize/shapekey-selection.log": "babeb811f320fdb12983667b9c7a06817ae78a9b91609c8232118c05a0e77d72",
+    "morph-zero-oracle-6b84/artifacts/app-completion/release/before.json": "ba6416e75109f90faea00f3a78abcfd426830f193dfc0bd577e4eb44984a3954",
+    "morph-zero-oracle-6b84/artifacts/app-completion/release/status.json": "8644fbbef12c9129beb8503f74bbfbcb8a7272735f082e7906a78a396a67f9e0",
+    "morph-zero-oracle-6b84/artifacts/app-completion/release/link.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "morph-zero-oracle-6b84/artifacts/app-completion/release/version.log": "9455a20a636a6599ace60120261649d3b29dc51fe2c774305994879190e7336b",
+    "morph-zero-oracle-6b84/artifacts/app-completion/sanitize/before.json": "3244a0af230d04c9d475accccbcf2942af85cfe473cb2d9c3c313ccdd3303c6b",
+    "morph-zero-oracle-6b84/artifacts/app-completion/sanitize/status.json": "ee182869e4332f1c0de07bc5ef03789648267b0176fefe89f5939633cef652a7",
+    "morph-zero-oracle-6b84/artifacts/app-completion/sanitize/link.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "morph-zero-oracle-6b84/artifacts/app-completion/sanitize/version.log": "9455a20a636a6599ace60120261649d3b29dc51fe2c774305994879190e7336b",
+    "morph-zero-signed-88af/artifacts/signed-proof/run.py": "dbd5b733aaa5b5c162e15bb6645371df73f4b6ec94b72f1dc0372a3e99c63ac1",
+    "morph-zero-signed-88af/artifacts/signed-proof/release/before.json": "41fedadb10e4e0103eded566673d2670c92ea0e926d0da0a5274f657cd6f980b",
+    "morph-zero-signed-88af/artifacts/signed-proof/release/status.json": "ebaead25f03749861b62c28b3324f0f3dc9f9c2ca72f0db4d8939bc0a988affa",
+    "morph-zero-signed-88af/artifacts/signed-proof/release/zero-morph-rest-compile.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "morph-zero-signed-88af/artifacts/signed-proof/release/zero-morph-rest-link.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "morph-zero-signed-88af/artifacts/signed-proof/release/zero-morph-rest.log": "909c4d72284ed977225cdf598d137167fea05dcb4df1032f2225a4353d2c9aa6",
+    "morph-zero-signed-88af/artifacts/signed-proof/release/zero-morph-rest-old-link.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "morph-zero-signed-88af/artifacts/signed-proof/release/zero-morph-rest-old.log": "3abac6382a0cf1b31606c1f47f6d6bade1f483ad91eb2d3416e505cfcbc6ab2a",
+    "morph-zero-signed-88af/artifacts/signed-proof/sanitize/before.json": "23bb1ff392e491a654fc62238a622dd86cf1d28ef87aff87b243d911216995c7",
+    "morph-zero-signed-88af/artifacts/signed-proof/sanitize/status.json": "cfbc3037d6ec081df41170bb76eefbd6f151f9c490dbbc0d60a19afc923dde39",
+    "morph-zero-signed-88af/artifacts/signed-proof/sanitize/zero-morph-rest-compile.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "morph-zero-signed-88af/artifacts/signed-proof/sanitize/zero-morph-rest-link.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "morph-zero-signed-88af/artifacts/signed-proof/sanitize/zero-morph-rest.log": "909c4d72284ed977225cdf598d137167fea05dcb4df1032f2225a4353d2c9aa6",
+    "morph-zero-signed-88af/artifacts/signed-proof/sanitize/zero-morph-rest-old-link.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "morph-zero-signed-88af/artifacts/signed-proof/sanitize/zero-morph-rest-old.log": "3abac6382a0cf1b31606c1f47f6d6bade1f483ad91eb2d3416e505cfcbc6ab2a",
+    "morph-zero-signed-88af/artifacts/interop/check.cjs": "1c67c0e06837e028329df927c8b3b1c00bf600524639ea393c76062ab6dc61a8",
+    "morph-zero-signed-88af/artifacts/interop/report.json": "68af515b48b1fd50f8c466a1a8647b1d7310e697630ffff133cd532fc8ccfa4e",
+    "morph-zero-native-a2e/artifacts/zero-proof/run.py": "5a7314335e7b3245cc4a4e837861c8049e2e3250f45c183aa8ee5c0d27d1da05",
+    "morph-zero-native-a2e/artifacts/zero-proof/release/before.json": "b1a95cb070c9956236ac19cdd28d23614e88c94de1a2a1755dc6447dc68f3591",
+    "morph-zero-native-a2e/artifacts/zero-proof/release/status.json": "77f92c795c4f8edc28c25486c582400d9cfc61c99c312af9c40fba6f2b38c252",
+    "morph-zero-native-a2e/artifacts/zero-proof/release/rig.cpp-compile.log": "e0ea6f0210944519f336c98a7d37f43f4bbad42e916b366e8cbcd7b9b83d78d8",
+    "morph-zero-native-a2e/artifacts/zero-proof/release/core-replace.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "morph-zero-native-a2e/artifacts/zero-proof/release/core-index.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "morph-zero-native-a2e/artifacts/zero-proof/release/zero-morph-rest-compile.log": "70e43ab839f9b6babc5ad549c7b8607d03d91ff78f247897371ec9311c9ee1fe",
+    "morph-zero-native-a2e/artifacts/zero-proof/sanitize/before.json": "64926863216699b5bba600375dbe8ccc72617707584146a94108750381444214",
+    "morph-zero-native-a2e/artifacts/zero-proof/sanitize/status.json": "3ff2b1c4b9474d7a017cc7629a247bfb28017d661752c33d9a4d86e1d006a957",
+    "morph-zero-native-a2e/artifacts/zero-proof/sanitize/rig.cpp-compile.log": "e0ea6f0210944519f336c98a7d37f43f4bbad42e916b366e8cbcd7b9b83d78d8",
+    "morph-zero-native-a2e/artifacts/zero-proof/sanitize/core-replace.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "morph-zero-native-a2e/artifacts/zero-proof/sanitize/core-index.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "morph-zero-native-a2e/artifacts/zero-proof/sanitize/zero-morph-rest-compile.log": "70e43ab839f9b6babc5ad549c7b8607d03d91ff78f247897371ec9311c9ee1fe",
+    "morph-zero-fixture-1beb/artifacts/zero-proof/run.py": "5a7314335e7b3245cc4a4e837861c8049e2e3250f45c183aa8ee5c0d27d1da05",
+    "morph-zero-fixture-1beb/artifacts/zero-proof/release/before.json": "fdea770460a14d34a8de60917254875d61b1246f35b2396f0a753d8e182bca6d",
+    "morph-zero-fixture-1beb/artifacts/zero-proof/release/status.json": "e0ddbd7f056f080b804f6ea11c4fe732aeb6c2372a3a87de717d1a9dd5b9967d",
+    "morph-zero-fixture-1beb/artifacts/zero-proof/release/rig.cpp-compile.log": "0e3b07911a13176b44c2a55fe63aaa706018ab4ee0cc23f4f05b1c00c252990e",
+    "morph-zero-fixture-1beb/artifacts/zero-proof/release/core-replace.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "morph-zero-fixture-1beb/artifacts/zero-proof/release/core-index.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "morph-zero-fixture-1beb/artifacts/zero-proof/release/zero-morph-rest-compile.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "morph-zero-fixture-1beb/artifacts/zero-proof/release/zero-morph-rest-link.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "morph-zero-fixture-1beb/artifacts/zero-proof/release/zero-morph-rest.log": "909c4d72284ed977225cdf598d137167fea05dcb4df1032f2225a4353d2c9aa6",
+    "morph-zero-fixture-1beb/artifacts/zero-proof/release/zero-morph-rest-old-link.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "morph-zero-fixture-1beb/artifacts/zero-proof/release/zero-morph-rest-old.log": "3abac6382a0cf1b31606c1f47f6d6bade1f483ad91eb2d3416e505cfcbc6ab2a",
+    "morph-zero-fixture-1beb/artifacts/zero-proof/release/rig-compile.log": "fa898a5dd72f75b1fbf3ba9673ef0d7e60cbc3fabe7866b33455256aa3a3d7f7",
+    "morph-zero-fixture-1beb/artifacts/zero-proof/sanitize/before.json": "108fcaf7370c398241062ebcd570f77bb77af785f418d08331a188cdf7fca4fc",
+    "morph-zero-fixture-1beb/artifacts/zero-proof/sanitize/status.json": "cda3ef24fc8805582faff0fb7fe36ce69d7e43a4258dd5515f1e3b5bdd32b389",
+    "morph-zero-fixture-1beb/artifacts/zero-proof/sanitize/rig.cpp-compile.log": "0e3b07911a13176b44c2a55fe63aaa706018ab4ee0cc23f4f05b1c00c252990e",
+    "morph-zero-fixture-1beb/artifacts/zero-proof/sanitize/core-replace.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "morph-zero-fixture-1beb/artifacts/zero-proof/sanitize/core-index.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "morph-zero-fixture-1beb/artifacts/zero-proof/sanitize/zero-morph-rest-compile.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "morph-zero-fixture-1beb/artifacts/zero-proof/sanitize/zero-morph-rest-link.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "morph-zero-fixture-1beb/artifacts/zero-proof/sanitize/zero-morph-rest.log": "909c4d72284ed977225cdf598d137167fea05dcb4df1032f2225a4353d2c9aa6",
+    "morph-zero-fixture-1beb/artifacts/zero-proof/sanitize/zero-morph-rest-old-link.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "morph-zero-fixture-1beb/artifacts/zero-proof/sanitize/zero-morph-rest-old.log": "3abac6382a0cf1b31606c1f47f6d6bade1f483ad91eb2d3416e505cfcbc6ab2a",
+    "morph-zero-fixture-1beb/artifacts/zero-proof/sanitize/rig-compile.log": "fa898a5dd72f75b1fbf3ba9673ef0d7e60cbc3fabe7866b33455256aa3a3d7f7"
+  },
+  "scope_limits": [
+    "Eight actual native commands per Release/SAN; signed-zero native fixture separately strengthened/recompiled and rerun. Whole current rig TU into exact public a2 core with owned matching current-layout support; app relink from25immutable frontend objects, --version smoke. Not a fresh whole application build or full610 suite.",
+    "No UI/control change or new GUI/Wayland/OpenXR/headset/GPU/vendor claim. SAN native checks use ASAN/UBSAN/leak detection with no suppression.",
+    "Old core fails genuine authored-normal identity in both rig and native fixtures. Initial missing JSON include and fixture variable shadowing compiler failures preserved separately; runtime body unchanged through corrections.",
+    "Six actual GLBs have zero Khronos errors and six warnings: two generated-tangent-space and four skinned-nonroot warnings, plus eight infos; all messages retained. Tangent interoperability remains open.",
+    "Additional private curved/skin baked-normal tangent experiment ae5d0b2 fails original image bound13>4; not included or admitted. General bake, expression/material, automatic-weight and all other unfinished full-goal requirements remain required."
+  ]
+}

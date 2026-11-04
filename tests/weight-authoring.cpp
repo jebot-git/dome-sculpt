@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
+#include "bake-fixture-identity.hpp"
 #include "dome/document.hpp"
 #include "dome/creation.hpp"
 #include "dome/tangents.hpp"
@@ -251,12 +252,13 @@ int main(int argc, char **argv) try {
     scene.active().material.color = {.1f, .2f, .8f, 1};
     scene.select(target);
     auto initial = scene.encode();
+    auto original_source=bake_fixture::isolated_object(scene,source_id);
     Document workflow; workflow.replace(std::move(scene));
     ObjectBakeSettings options; options.ao_samples = 0;
     workflow.bake_from_object(source_id, options);
     check(workflow.wait_asset() && workflow.frame().state->error.empty(),
           "A skinned target accepts guarded source-aware baking before weight authoring");
-    auto baked = workflow.copy_scene().encode();
+    auto baked_scene=workflow.copy_scene();auto baked = baked_scene.encode();
     workflow.weight_settings(tool(), 1);
     check(workflow.wait_mesh() && workflow.begin_desktop(),
           "The baked skinned target acquires a posed weight gesture");
@@ -267,7 +269,7 @@ int main(int argc, char **argv) try {
     auto weighted = workflow.copy_scene().encode();
     check(std::abs(value(workflow.copy_scene(), target, 0, 1) - .5f) < 1e-6f &&
           weighted["objects"][0]["painted"] == baked["objects"][0]["painted"] &&
-          weighted["objects"].back() == initial["objects"].back(),
+          bake_fixture::isolated_object(workflow.copy_scene(),source_id)==original_source && workflow.copy_scene().object(target).bake_recipe==baked_scene.object(target).bake_recipe,
           "A linked weight gesture preserves all baked maps and the complete hidden bake source");
     check(workflow.undo() && workflow.copy_scene().encode() == baked &&
           workflow.undo() && workflow.copy_scene().encode() == initial &&

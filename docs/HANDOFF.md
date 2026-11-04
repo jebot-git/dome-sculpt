@@ -16,6 +16,56 @@ export images are next. No guard/schema/default/frontend/system/HMD/session
 change; every unfinished original/additional row and later drawers remains.
 
 
+
+## Private bake-recipe regression follow-up — 2026-11-04
+
+The preserved original612 run is578Passed/31Failed/1Timeout/2dependencyNotRun.
+Actual Scene30 recipe plus independently encoded older-capability fixtures now
+pass4+8 native commands eachR/S, three loader/client commands Release and two
+loader commands SAN; last16 Release and both Mirror writer/renderer pairs eachR/S
+also pass. Independent252 emittedGLBs have0 Khronos errors with retained271warnings/
+148infos; five original input controls and two exact cancellation sentinels are
+separate. Fresh1212-task optimized ALL passes; test-only46-task continuation
+preserves all12 application/archive hashes. Full615 Release and last16 sanitizer
+are still running; neither is declared passed. Read BAKE-RECIPE-REGRESSION-FOLLOWUP.md
+and receipt for original negatives, sampler-cache controls and exact scope.
+No main recipe admission or system/headset/session changes. Every unfinished
+original/additional requirement and later controller drawers remains required.
+
+
+## Private coherent saved-recipe and authored-normal candidate — 2026-11-04
+
+This unqualified union preserves published809 authored-normal/zero-morph fixes,
+qualified176 Scene30 recipes and actual recipe-aware workflow/XR fixture repairs.
+It excludes tangent/HDR/weights/V1 WIP. Fresh optimized own ALL build is next;
+no new whole-build/full615/physical-device/main-admission claim is made. Original
+frozen176 full612 regression remains distinct and its failures are preserved.
+Every unfinished full-goal requirement and later controller tray phase remains.
+
+## Preserve authored split normals through skinning — 2026-11-04
+
+Ordinary native skinning now transports authored normals with the existing Dome
+weighted joint inverse-transpose convention instead of rebuilding triangle
+normals. Nine native commands eachR/S include77 independent/rigBake checks;
+PBR127+preparedShape51 each also pass. Actual worker GLB images max0 across
+Release/SAN/Arc; old core fails59>unchanged4. Eighteen GLBs0KHRerrors/18warnings,
+12 exact profile/device pairs; current-layout application relinks pass. Read
+AUTHORED-SKIN-NORMALS.md and receipt for complete changed-TU scope. No freshwhole
+build/full612/newUI/HMD/compute claim. Active curved native morph export remains
+a real separate gap; all unfinished original/additional requirements remain.
+
+## Preserve authored rest shading at zero morph weights — 2026-11-04
+
+The native evaluator now retains exact artist normals with zero/signed-zero
+weights instead of recomputing them and falsely refusing a legitimate rest Bake.
+Eight Release/eight owned sanitizer native commands pass, including actual
+Bake/Undo/Redo/Save/editable-GLB recovery; strengthened signed-zero persistence
+passes separately. Eleven output pairs are exact; six GLBs have zero Khronos
+errors and six retained warnings. Read ZERO-MORPH-REST.md and its receipt for
+complete changed-TU scope, old-core negatives and compiler-fixture corrections.
+No header/schema/default frontend changes, fresh whole-build/full610/device
+claim, system/headset/session action. General normal-map portability and all
+unfinished original/additional requirements, including later trays, remain.
 ## Private saved bake recipes — 2026-11-04
 
 Last-successful target recipes now persist exact source/cage provenance and all
