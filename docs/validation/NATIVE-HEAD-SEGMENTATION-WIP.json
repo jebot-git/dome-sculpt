@@ -1,0 +1,160 @@
+{
+  "scope": "Private incomplete automatic source/morph Head segmentation. No manual part IDs/material names/artist influence values; not admission.",
+  "parent": "8668f14",
+  "initial_graph_control": [
+    {
+      "sex": "female",
+      "command": [
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-head-segmentation-8668f14/artifacts/native-head-geometry",
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-context-api-7849001/build/native-line-female/fitted-unskinned.dsculpt",
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-head-segmentation-8668f14/artifacts/female-geometry.json"
+      ],
+      "exit": 1,
+      "seconds": 1.6677570690226275
+    },
+    {
+      "sex": "male",
+      "command": [
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-head-segmentation-8668f14/artifacts/native-head-geometry",
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-context-api-7849001/build/native-line-male/fitted-unskinned.dsculpt",
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-head-segmentation-8668f14/artifacts/male-geometry.json"
+      ],
+      "exit": 0,
+      "seconds": 1.4170553350122645
+    }
+  ],
+  "final_graph": [
+    {
+      "sex": "female",
+      "command": [
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-head-segmentation-8668f14/artifacts/native-head-geometry",
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-context-api-7849001/build/native-line-female/fitted-unskinned.dsculpt",
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-head-segmentation-8668f14/artifacts/female-geometry-final.json"
+      ],
+      "exit": 0,
+      "seconds": 1.2164848519896623
+    },
+    {
+      "sex": "male",
+      "command": [
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-head-segmentation-8668f14/artifacts/native-head-geometry",
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-context-api-7849001/build/native-line-male/fitted-unskinned.dsculpt",
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-head-segmentation-8668f14/artifacts/male-geometry-final.json"
+      ],
+      "exit": 0,
+      "seconds": 1.2665184490033425
+    }
+  ],
+  "fields": [
+    {
+      "sex": "female",
+      "command": [
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-head-segmentation-8668f14/artifacts/native-head-inference-field",
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-context-api-7849001/build/native-line-female/fitted-unskinned.dsculpt",
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-head-segmentation-8668f14/artifacts/female"
+      ],
+      "exit": 0,
+      "seconds": 2.4688460860052146
+    },
+    {
+      "sex": "male",
+      "command": [
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-head-segmentation-8668f14/artifacts/native-head-inference-field",
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-context-api-7849001/build/native-line-male/fitted-unskinned.dsculpt",
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-head-segmentation-8668f14/artifacts/male"
+      ],
+      "exit": 0,
+      "seconds": 2.518844531994546
+    }
+  ],
+  "quality": [
+    {
+      "sex": "female",
+      "kind": "global",
+      "exit": 0,
+      "seconds": 2.2694601099938154,
+      "command": [
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-context-api-7849001/build/dome-sculpt-native-unskinned-quality-test",
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-head-segmentation-8668f14/assets/humanoid/vroid/base-female.vrm",
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-head-segmentation-8668f14/artifacts/female/bound.dsculpt",
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-head-segmentation-8668f14/artifacts/female-global"
+      ],
+      "cohorts": 95,
+      "failed": 0
+    },
+    {
+      "sex": "female",
+      "kind": "head-eye",
+      "exit": 1,
+      "seconds": 4.624805394007126,
+      "command": [
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-context-api-7849001/artifacts/head-eye-quality",
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-head-segmentation-8668f14/assets/humanoid/vroid/base-female.vrm",
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-head-segmentation-8668f14/artifacts/female/bound.dsculpt",
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-head-segmentation-8668f14/artifacts/female-head-eye"
+      ],
+      "cohorts": 266,
+      "failed": 32
+    },
+    {
+      "sex": "male",
+      "kind": "global",
+      "exit": 0,
+      "seconds": 2.169057988008717,
+      "command": [
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-context-api-7849001/build/dome-sculpt-native-unskinned-quality-test",
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-head-segmentation-8668f14/assets/humanoid/vroid/base-male.vrm",
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-head-segmentation-8668f14/artifacts/male/bound.dsculpt",
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-head-segmentation-8668f14/artifacts/male-global"
+      ],
+      "cohorts": 95,
+      "failed": 0
+    },
+    {
+      "sex": "male",
+      "kind": "head-eye",
+      "exit": 1,
+      "seconds": 4.224205954989884,
+      "command": [
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-context-api-7849001/artifacts/head-eye-quality",
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-head-segmentation-8668f14/assets/humanoid/vroid/base-male.vrm",
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-head-segmentation-8668f14/artifacts/male/bound.dsculpt",
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-head-segmentation-8668f14/artifacts/male-head-eye"
+      ],
+      "cohorts": 266,
+      "failed": 32
+    }
+  ],
+  "source_before_after_exact": true,
+  "build_scope": "Own current-header analysis and producer objects linked to frozen8668 copied two-private-consumer core plus exact8a support; no whole app or solverSAN",
+  "metric_label_correction": "The inherited producer JSON kkt/sweeps aliases are existing per-label LINEAR residual/iteration metrics, not a general masked-simplex KKT or Gauss-Seidel sweep certificate.",
+  "remaining": [
+    "32/266 each avatar eye-rotation failures on eyebrow/lash/eyeline/overlay attachments",
+    "shape/native-only geometry domain beyond exact original correspondence",
+    "adversarial source/contact/morph/owner tests",
+    "whole solverSAN/fault/cancel/native UI/history/Save/export/render admission"
+  ],
+  "sha256": {
+    "src/native-head-geometry.hpp": "1e11317dd8fcb9b64fa3bc09c4b2da3572a9b69daaa0533421af0aa14fe13f64",
+    "tests/native-head-geometry.cpp": "9538647d1e4aec488f41ce098705ade08a6dbb2d8802426bf8825a557e1c485b",
+    "tests/native-head-inference-field.cpp": "c464a4556d15b44eb4966d806de6e8e540ce52f19d3e88ceee6d84a6ac982376",
+    "artifacts/native-head-geometry": "e751de3e92233befea0643ead457f1fcbbebd94b25c4a00b7c54878fc9de0e1c",
+    "artifacts/native-head-inference-field": "10c97087c17c8791a89e4deae4b1eddff9cf495267b720cd8085e5de942b7288",
+    "artifacts/geometry-commands.json": "dea3e61d0d131089cd99451f6f1013ff6050e0f9314e19432e992e2958b7e112",
+    "artifacts/inference-commands.json": "76f7214bd51c38b32b45123679b802ad20a479ae381ecf72c6a518b8d5baffb2",
+    "artifacts/inference-source-before.json": "195073e55e8f356b4e6aff2b456e5e0cd52a6a5881de10cea7cbf7239e0d887a",
+    "artifacts/inference-source-after.json": "195073e55e8f356b4e6aff2b456e5e0cd52a6a5881de10cea7cbf7239e0d887a",
+    "artifacts/female/bound.dsculpt": "a21353eedf18ef26225e1d9ab2ea12f8302e5a1806cf8f698294e2f28fbe835e",
+    "artifacts/female/report.json": "7107868df84f6a69c31ca35e2a0f912e0f4c24c5b3cc9ded37a04fa3f866d5a8",
+    "artifacts/female/automatic-constraints.json": "c44a1753eac1e7d735ad2f52ba50400e48b638221e4ed260e45eb2099ccd6dee",
+    "artifacts/female-geometry-final.json": "19666277440b16339930e13ecf0b6ede3a6c63a600d72e2f22ac03950748f70b",
+    "artifacts/female-global/quality.json": "65a31604603945120d577b3e0e851c0b28e4a4759474cc24775e1046b1037d80",
+    "artifacts/female-head-eye/quality.json": "e0fa1b362f03e7689278db20a8d592eb388e3dbdc27b28b06311f2b39c66920d",
+    "artifacts/male/bound.dsculpt": "750847396c0aa2d9411cdeb46c56eb90d3933fa795a42aae495ef7600901bb37",
+    "artifacts/male/report.json": "20fc6775121a25bbacf3dd169d45ed82488939a09f2d396fd1df8a05eb3a3c5c",
+    "artifacts/male/automatic-constraints.json": "f052685afd75a3cb383b5745fbb854e03a4e20638b255c5a65623c29788fce0b",
+    "artifacts/male-geometry-final.json": "c126d21e59eb863daf29c4ef527021ea092d0281f03a39cc606a6ee18aa96c0d",
+    "artifacts/male-global/quality.json": "1167048959ce1e4917d46dd04bf1af8612df9bee95d00ff12212e2312b47f43d",
+    "artifacts/male-head-eye/quality.json": "8c8d0dd4e569a982b763b481b0943376df98d7b5f88029264db8ef394e8074d5"
+  }
+}
