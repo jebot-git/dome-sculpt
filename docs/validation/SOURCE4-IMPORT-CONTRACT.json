@@ -1003,5 +1003,6 @@
     "artifacts/import-proof/migration-sanitize/run.log": "1f5331de7131167c79f44cb696c642085045615b7ca0109d13ad23178d4325ad",
     "artifacts/import-proof/sanitize-direct-measurement/openat2.log": "d9de4c95fb489680c1add5d266a0d1c88f325a86709921b288c9661d165fb7d0",
     "artifacts/import-proof/sanitize-direct-measurement/fallback.log": "48756fc0fac429222c0855ba9b2b5908d1837d3551a845253a9e6113be824d55"
-  }
+  },
+  "union_scope_clarification": "Measured persistent failures override C++ operator new. cgltf malloc/custom allocator-null/partial-parse cleanup is a separate unqualified robustness requirement; no inference from this sweep."
 }

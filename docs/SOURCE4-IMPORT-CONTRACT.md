@@ -66,3 +66,8 @@ remain independent. Original full-589 failures and every wider unfinished
 production requirement remain explicit. No installation or physical session
 changed. Exact commands, manifests and output digests are in
 [the receipt](validation/SOURCE4-IMPORT-CONTRACT.json).
+
+Fault-mechanism clarification in the later application union: the measured
+boundaries override C++ operator new. They do not deny cgltf malloc/custom
+allocators or qualify null-return/partial-parse cleanup. That separate actual
+allocator robustness requirement remains open.

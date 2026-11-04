@@ -1,5 +1,22 @@
 # Dome Sculpt production handoff
 
+## Private coherent application qualification candidate — 2026-11-04
+
+This private union composes current public Restore/IO/final27 SDK with qualified
+source-aware Bake/cut, geometry Mirror, extra-UV, native-cycle/graphics and
+Source4 import/V1 test contracts. The fresh optimized ALL build at34b completed
+through an audited same-source continuation after one wrapper143 interruption;
+its final continuation returned0 with1,730inputs exact. Followup35da has all518
+product/header/asset/third-party files byte-identical; only tests/docs/CMake
+metadata follow. Actual coherent XR/menu/consumer regressions are next, not yet
+qualification or main admission. Original589 ended537pass/50fail/2dependency-
+NotRun and remains recorded, rather than relabeled as a new full-suite pass.
+All original/additional unfinished requirements and deferred drawers remain.
+
+The import fault sweeps explicitly deny C++operator new. They do not establish
+cgltf malloc/custom-allocator-null partial-parse cleanup; that separate genuine
+robustness audit remains required. Ordinary V1 cgltf validation is not that proof.
+
 ## Private native vertex-position Mirror milestone — 2026-11-04
 
 Private runtimeaf79fdf and GUI endpoint e6cf4c3 restore ordinary vertex Mirror
