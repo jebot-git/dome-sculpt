@@ -8,7 +8,7 @@ namespace dome::detail {
 // retained initial topology, never from nearby/equal current positions.
 inline std::vector<uint32_t> polygon_bake_cage_vertices(
     const SculptObject &target_object, const SculptObject &cage,
-    const Mesh &target, const std::function<bool()> &cancelled) {
+    const Mesh &target, const Mesh &visible, const std::function<bool()> &cancelled) {
   auto stop=[&]{if(cancelled&&cancelled())throw std::runtime_error("Bake cage cancelled");};
   auto refuse=[] {throw std::invalid_argument(
     "Bake cage needs unchanged target topology and its retained original source; duplicate the target before moving cage vertices");};
@@ -79,7 +79,12 @@ inline std::vector<uint32_t> polygon_bake_cage_vertices(
     if((corner&1023)==0)stop();
     const auto source=source_vertices[corner];
     if(source>=mapping.size())refuse();
-    if(mapping[source]!=UINT32_MAX&&logical[source]!=c.vertex)refuse();
+    if(mapping[source]!=UINT32_MAX){
+      if(logical[source]!=c.vertex)refuse();
+      const auto a=visible.positions[mapping[source]],b=visible.positions[corner];
+      if(a.x!=b.x||a.y!=b.y||a.z!=b.z)
+        throw std::invalid_argument("Displayed polygon cage splits one original target vertex; use consistent skin and morph displacements");
+    }
     mapping[source]=uint32_t(corner++);logical[source]=c.vertex;
   }
   for(auto vertex:mapping)if(vertex==UINT32_MAX)refuse();

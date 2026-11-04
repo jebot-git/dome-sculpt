@@ -41,5 +41,33 @@ int main(int argc,char **argv)try{
   require_cage(document.undo()&&document.copy_scene().encode()==before&&
     document.redo()&&document.copy_scene().encode()==baked.encode(),
     "Polygon cage Bake is exactly one Undo/Redo transaction");
+  auto restarted=Scene::load(out/"edited-cage.dsculpt");
+  auto restart_report=bake_object(restarted,2,cage_settings());
+  require_cage(restart_report.projected==4096&&!restart_report.missed,
+    "Fresh native restart retains the actual cage-to-original identity mapping");
+  auto prepared=edited;prepared.select(1);auto normal=cage_settings();normal.prepare_normals=true;
+  auto prepared_report=bake_object(prepared,2,normal);
+  require_cage(prepared_report.projected==4096&&prepared.active().painted->normal_projection(),
+    "Real polygon-edited cage also maps through the prepared normal bake basis");
+  auto cracked=edited;cracked.select(1);const auto &rest=cracked.object(3).painted->mesh();
+  auto moved=rest.positions;moved[0].x+=.001f;
+  auto morph=std::make_shared<DeformationState>(rest);morph->morphs.emplace(rest);
+  morph->morphs->set_target(rest,"Cracked corner",moved);morph->morph_weights={1};
+  cracked.set_deformation(3,*morph);const auto cracked_before=cracked.encode();
+  require_cage(rejected_cage([&]{bake_object(cracked,2,cage_settings());})&&cracked.encode()==cracked_before,
+    "Conflicting displayed corners of one original cage vertex refuse with exact retained state");
+  document.select_object(3);document.begin_polygon();ready();
+  document.edit_polygon(PolygonAction::Faces);ready();
+  document.edit_polygon(PolygonAction::SelectAll);ready();
+  document.edit_polygon(PolygonAction::FlipFaces);ready();document.end_polygon(true);ready();
+  document.select_object(1);ready_cage(document);
+  const auto incompatible=document.copy_scene().encode();
+  document.bake_from_object(2,cage_settings());auto failed_save=document.save_async(out/"edited-cage.dsculpt");
+  require_cage(rejected_cage([&]{failed_save.get();}),
+    "Real topology-changing polygon edit fails its dependent native Save");
+  ready_cage(document);
+  require_cage(!document.frame().state->error.empty()&&document.copy_scene().encode()==incompatible&&
+    Scene::load(out/"edited-cage.dsculpt").encode()==baked.encode(),
+    "Incompatible cage preserves exact committed scene and prior project file");
   std::cout<<"PASS "<<cage_checks<<" polygon cage checks\n";return 0;
 }catch(const std::exception &error){std::cerr<<"FAIL "<<error.what()<<'\n';return 1;}

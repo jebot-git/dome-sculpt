@@ -19,9 +19,6 @@ inline std::vector<Vec3> object_bake_cage(const Scene &scene,uint64_t target_id,
   if(!object.mesh_active||!object.painted)
     throw std::invalid_argument("The selected bake cage is no longer a prepared mesh; reselect it");
   const auto &rest=object.painted->mesh();
-  const bool ordered=rest.positions.size()==target.positions.size()&&rest.indices==target.indices;
-  std::vector<uint32_t> polygon_identity;
-  if(!ordered)polygon_identity=polygon_bake_cage_vertices(scene.object(target_id),object,target,cancelled);
   if(low.indices.size()!=target.indices.size())
     throw std::invalid_argument("Low bake basis lost the ordered target corners");
   std::optional<Mesh> posed;
@@ -29,6 +26,9 @@ inline std::vector<Vec3> object_bake_cage(const Scene &scene,uint64_t target_id,
   const auto &visible=posed?*posed:rest;
   if(visible.positions.size()!=rest.positions.size()||visible.indices!=rest.indices)
     throw std::invalid_argument("Evaluated bake cage changed its vertex identities");
+  const bool ordered=rest.positions.size()==target.positions.size()&&rest.indices==target.indices;
+  std::vector<uint32_t> polygon_identity;
+  if(!ordered)polygon_identity=polygon_bake_cage_vertices(scene.object(target_id),object,target,visible,cancelled);
   const auto relative=scene.world_matrix(target_id).inverse()*scene.world_matrix(cage_id);
   std::vector<uint32_t> identity(low.positions.size(),UINT32_MAX);
   for(size_t c=0;c<target.indices.size();++c){
