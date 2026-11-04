@@ -1,5 +1,19 @@
 # Dome Sculpt production handoff
 
+## Private saved bake recipes — 2026-11-04
+
+Last-successful target recipes now persist exact source/cage provenance and all
+projection/preparation settings through Scene30/history7, deletion/group deletion,
+append/subsets and native packages. Existing desktop/XR draft Recall preserves
+Cancel/Done/history and never implicitly Bakes. Matched owning R/S each pass35
+native recipe checks, nine selected consumers,161 new persistent allocation
+prefixes, normal/compact32 GUI, Wayland9 and actual-loader22 checks. Existing
+caller127 and source-confirm47 prefixes remain. Read BAKE-RECIPES.md and its
+receipt for original failures, own fresh-parent/completed-TU build scope and four
+retained Khronos tangent warnings. This is not fresh ALL/full612, main admission,
+physical headset, GPU baking or full production completion. Broader bake recipes,
+resource/consumer/device work and deferred drawers remain required.
+
 ## Private generated FBX morph normals — 2026-11-04
 
 Explicit Generate flat/smooth now imports genuine morph-bearing FBX files through
