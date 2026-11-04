@@ -744,7 +744,7 @@ detail::GltfDocument detail::make_gltf(const std::vector<ObjectSurface> &input_o
       material["normalTexture"]=source_info(result.objects[i].canonical_normal);
       material["normalTexture"]["scale"]=1;
     }
-    if(maps.normal_projection&&maps.normal_projection->version==2){
+    if(detail::retained_normal_coordinates(objects[i].material_bindings.get(),&maps)){
       material["normalTexture"]=source_info(result.objects[i].prepared_normal);
       const auto coordinate=retained_normal_sets.at(i);
       const auto &attributes=j["meshes"][result.objects[i].mesh]["primitives"][0]["attributes"];
