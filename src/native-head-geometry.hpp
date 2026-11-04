@@ -27,7 +27,8 @@ inline NativeHeadGeometryReport analyze_native_head_geometry(
     const Scene &scene, uint64_t reference,
     size_t maximum_work = 100'000'000,
     size_t maximum_bytes = 128u * 1024u * 1024u,
-    const std::function<bool()> &cancelled = {}) {
+    const std::function<bool()> &cancelled = {},
+    std::span<const uint64_t> included = {}) {
   using namespace weight_surface;
   if (!maximum_work || maximum_work > 500'000'000 || maximum_bytes < 4096 ||
       maximum_bytes > 256u * 1024u * 1024u)
@@ -63,7 +64,7 @@ inline NativeHeadGeometryReport analyze_native_head_geometry(
   size_t planned = 65536, raw = 0, corners = 0;
   // Capture strong owners and placements BEFORE any user cancellation callback.
   // The caller supplies its detached immutable worker scene.
-  for (const auto &o : scene.objects()) if (o.mesh_active && o.painted && o.appearance) {
+  for (const auto &o : scene.objects()) if ((included.empty() || std::find(included.begin(),included.end(),o.id)!=included.end()) && o.mesh_active && o.painted && o.appearance) {
     if (captured.size() == 64) throw std::length_error("Head source part cap");
     const auto &m = o.painted->mesh();
     const size_t targets = o.deformation && o.deformation->morphs ? o.deformation->morphs->targets.size() : 0;
@@ -75,7 +76,7 @@ inline NativeHeadGeometryReport analyze_native_head_geometry(
     planned += cost; raw += m.positions.size(); corners += m.indices.size();
     captured.push_back({o,scene.world_matrix(o.id).matrix(),o.painted->revision(),o.volume->revision(),o.painted->mesh_owner(),o.volume->geometry_owner(),{}, {}, {}, 0});
   }
-  if (captured.empty() || raw > 2'000'000 || corners > 6'000'000)
+  if ((!included.empty() && captured.size()!=included.size()) || captured.empty() || raw > 2'000'000 || corners > 6'000'000)
     throw std::length_error("Head aggregate geometry cap");
   Budget work{0,maximum_work,cancelled};
   work.step_items(raw+corners+captured.size(),64);

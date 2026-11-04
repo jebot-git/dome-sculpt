@@ -2,6 +2,7 @@
 #pragma once
 #include "native-weight-retention.hpp"
 #include "native-head-geometry.hpp"
+#include "native-anatomical-domain.hpp"
 #include "rotary-cap-geometry.hpp"
 #include "weight-boundary-sewing.hpp"
 #include "native-carrier-continuation.hpp"
@@ -92,29 +93,11 @@ inline NativeAnatomicalRequest capture_native_anatomical(const Scene&source,
   const auto&ref=source.object(reference);
   if(!ref.deformation||!ref.deformation->skeleton||!ref.deformation->humanoid)throw std::invalid_argument("Choose the current native humanoid reference");
   if(!options.locks.empty()&&options.locks.size()!=ref.deformation->skeleton->bones.size())throw std::invalid_argument("Native anatomical lock/joint identity");
-  const CreatorAppearance*first=nullptr;uint64_t current_root=0;
-  std::optional<uint64_t> source_instance;std::shared_ptr<const CreatorSourceModel> model;
-  std::set<std::pair<int,int>> primitives;
-  auto same=[](const auto&a,const auto&b){return a.get()==b.get()&&!a.owner_before(b)&&!b.owner_before(a);};
-  for(const auto&o:source.objects())if(o.mesh_active&&o.painted&&o.appearance){
-    const auto&a=*o.appearance;
-    if(!o.group)throw std::invalid_argument("Native anatomical support lacks an explicit current group");
-    const auto path=source.group_path(o.group);
-    if(path.empty())throw std::invalid_argument("Native anatomical current group path missing");
-    if(!first){first=&a;current_root=path.front().id;}
-    if(!a.asset||!a.original_bytes||!same(a.asset,first->asset)||!same(a.original_bytes,first->original_bytes)||path.front().id!=current_root||!primitives.emplace(a.source_mesh,a.source_primitive).second)throw std::invalid_argument("Native anatomical support requires one complete unambiguous current source group");
-    // Legacy similarity imports have genuine primitive provenance but no
-    // Source13 node capsule. The CURRENT group is request scope, never claimed
-    // original placement authority; all metric transforms are current world.
-    const auto&node=source.group(o.group).source_placement;
-    if(node){
-      if(!node->model||!node->source_instance||a.source_node<0||node->source_node!=uint32_t(a.source_node)||!same(node->model->asset,a.asset)||!same(node->model->original_bytes,a.original_bytes))throw std::invalid_argument("Native anatomical primitive contradicts its source node/model placement");
-      if(source_instance&&(*source_instance!=node->source_instance||!same(model,node->model)))throw std::invalid_argument("Native anatomical support crosses original instances");
-      model=node->model;source_instance=node->source_instance;
-    }
-    request.support_.push_back(o.id);
-  }
-  if(!first||request.support_.size()>64||request.support_.size()!=first->asset->primitives.size())throw std::invalid_argument("Native anatomical support needs every authenticated current source primitive");
+  // Select the actual current source instance from explicit targets; foreign
+  // instances/objects stay in the full lease and owning resource admission.
+  auto domain=native_anatomical_domain(source,selected,capture_work);
+  request.support_=std::move(domain.objects);
+  request.retained_.work=capture_work.used;
   for(auto id:request.targets_)if(std::find(request.support_.begin(),request.support_.end(),id)==request.support_.end())throw std::invalid_argument("Native anatomical target lacks current source correspondence");
   if(!options.locks.empty())for(auto id:request.targets_){const auto&o=source.object(id);if(!o.deformation||!o.deformation->skin||!o.deformation->skeleton)throw std::invalid_argument("Native anatomical locks require actual current skin authority");}
   request.lease_.active=source.active().id;request.lease_.groups=source.groups();
@@ -157,7 +140,7 @@ inline NativeAnatomicalPrepared prepare_native_anatomical(const NativeAnatomical
   support.rig_geometry = DeclaredRigGeometry::NativeBoneAxes;
   const auto analysis = analyze_native_head_geometry(scene, reference,
       std::min(size_t(100'000'000),options.maximum_work-retained.work),
-      std::min(size_t(128u*1024u*1024u),options.maximum_workspace),cancelled);
+      std::min(size_t(128u*1024u*1024u),options.maximum_workspace),cancelled,request.support_);
   // Research candidate only: the same exact boundary algebra applies these
   // GEOMETRY-GENERATED constraints, with no manual target IDs or role palette.
   // They are not represented as user provenance or original-source authority.
