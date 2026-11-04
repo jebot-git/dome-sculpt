@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #pragma once
 #include "native-weight-paint-access.hpp"
+#include "native-weight-state.hpp"
 #include "geometry-weight-authoring.hpp"
 #include "dome/creator-archive.hpp"
 #include "dome/material-bindings.hpp"
@@ -9,6 +10,14 @@
 #include <array>
 namespace dome::detail {
 struct NativeWeightVolumeAccess {
+ static bool same_current(const Volume&a,const Volume&b)noexcept{
+   using namespace native_weight_state;
+   if(a.editing_||b.editing_||!scalar(a.voxel_,b.voxel_)||!scalar(a.band_,b.band_)||a.active_!=b.active_||a.next_layer_!=b.next_layer_||a.revision_!=b.revision_||!owner(a.cells_.owner(),b.cells_.owner())||!scalar(a.mask_.background,b.mask_.background)||!owner(a.mask_.values.owner(),b.mask_.values.owner())||a.layers_.size()!=b.layers_.size())return false;
+   const auto&x=a.settings_;const auto&y=b.settings_;
+   if(x.symmetry_axes!=y.symmetry_axes||!vector(x.symmetry_origin,y.symmetry_origin)||x.mask_edit!=y.mask_edit||x.mask_visible!=y.mask_visible||x.mask_tool!=y.mask_tool||!scalar(x.mask_strength,y.mask_strength))return false;
+   for(size_t i=0;i<a.layers_.size();++i){const auto&u=a.layers_[i];const auto&v=b.layers_[i];if(u.id!=v.id||u.name!=v.name||u.visible!=v.visible||u.locked!=v.locked||!scalar(u.opacity,v.opacity)||!owner(u.delta.owner(),v.delta.owner()))return false;}
+   return true;
+ }
  static bool detached(const Volume&v){return !v.editing_&&v.undo_.empty()&&v.redo_.empty()&&v.before_.empty()&&!v.mask_start_&&!v.cells_start_&&!v.delta_start_;}
 };
 struct NativeWeightMaterialAccess {
@@ -34,7 +43,7 @@ struct Counter {
   template<class T> void vector(const std::vector<T>&v){add(v.capacity(),sizeof(T));if(v.capacity())add(v.capacity()*sizeof(T)>=128u*1024u?4096:64);}
   void text(const std::string&s){add(s.capacity()+1);add(s.capacity()>=128u*1024u?4096:64);}
   template<class T> bool enter(const std::shared_ptr<T>&p){
-    if(!p)return false;
+    if(!p){std::shared_ptr<const void>empty;if(p.owner_before(empty)||empty.owner_before(p))throw std::invalid_argument("Native source has an owned null alias");return false;}
     using Value=std::remove_cv_t<T>;
     if(active==64)throw std::length_error("Native owning source depth cap");
     for(size_t i=0;i<count;++i){step();if(seen[i].address==p.get()&&seen[i].type==tag<Value>()&&!p.owner_before(seen[i].owner)&&!seen[i].owner.owner_before(p)){

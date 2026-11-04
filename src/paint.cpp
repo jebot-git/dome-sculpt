@@ -1,6 +1,7 @@
 #include "paint-overlay-packet.hpp"
 #include "emission-paint-access.hpp"
 #include "native-weight-paint-access.hpp"
+#include "native-weight-state.hpp"
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Ray/triangle picking adapted from Blender 5.4 Alpha isect_ray_tri_v3,
 // GPL-2.0-or-later; see third_party/blender/math_geom.cc.reference.
@@ -1258,6 +1259,15 @@ detail::NativeWeightPaintAccess::Surface detail::NativeWeightPaintAccess::surfac
   add(surface.linked.size(),sizeof(decltype(surface.linked)::value_type)+3*sizeof(void*)+32);
   add(surface.linked.bucket_count(),sizeof(void*));add(surface.diagnostics.unpaintable_uv_faces.capacity(),sizeof(uint32_t));
   return {paint.surface_,bytes};
+}
+bool detail::NativeWeightPaintAccess::same_current(const PaintedMesh&a,const PaintedMesh&b) noexcept {
+  using namespace native_weight_state;
+  // Current authoring state only. Undo scratch, weak render caches and cache
+  // tokens are not a source authority; immutable sparse tile owners are.
+  if(a.editing_||b.editing_||!owner(a.surface_,b.surface_)||!owner(a.sampling_attachment_,b.sampling_attachment_)||!owner(a.source_maps_,b.source_maps_)||!owner(a.color_projection_,b.color_projection_)||!owner(a.normal_projection_,b.normal_projection_)||!owner(a.baked_,b.baked_)||a.active_!=b.active_||a.next_!=b.next_||a.revision_!=b.revision_||a.allocated_tiles_!=b.allocated_tiles_||a.allocated_color_tiles_!=b.allocated_color_tiles_||a.layers_.size()!=b.layers_.size())return false;
+  auto tiles=[](const auto&x,const auto&y){if(x.size()!=y.size())return false;for(size_t i=0;i<x.size();++i)if(!owner(x[i],y[i]))return false;return true;};
+  for(size_t i=0;i<a.layers_.size();++i){const auto&x=a.layers_[i];const auto&y=b.layers_[i];if(x.id!=y.id||x.name!=y.name||x.visible!=y.visible||!scalar(x.opacity,y.opacity)||!tiles(x.tiles,y.tiles)||!tiles(x.pbr_tiles,y.pbr_tiles)||!tiles(x.emission_tiles,y.emission_tiles))return false;}
+  return true;
 }
 std::shared_ptr<PaintedMesh> detail::NativeWeightPaintAccess::snapshot(const PaintedMesh &paint) {
   auto cache=std::make_shared<PaintedMesh::CompositeCache>();

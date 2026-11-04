@@ -35,9 +35,9 @@ struct NativeAnatomicalLease {
   bool matches(const Scene&scene)const {
     if(scene.objects().size()!=objects.size()||scene.groups().size()!=groups.size()||scene.active().id!=active)return false;
     auto same=[](const auto&a,const auto&b){return a.get()==b.get()&&!a.owner_before(b)&&!b.owner_before(a);};
-    for(size_t i=0;i<groups.size();++i){const auto&a=groups[i];const auto&b=scene.groups()[i];if(a.id!=b.id||a.parent!=b.parent||a.name!=b.name||!same_transform(a.transform,b.transform)||!same_humanoid_controls(a.humanoid,b.humanoid)||!same(a.source_placement,b.source_placement)||!same(a.affine_edit,b.affine_edit))return false;}
+    for(size_t i=0;i<groups.size();++i){const auto&a=groups[i];const auto&b=scene.groups()[i];if(a.id!=b.id||a.parent!=b.parent||a.name!=b.name||!native_weight_state::transform(a.transform,b.transform)||!same_humanoid_controls(a.humanoid,b.humanoid)||!same(a.source_placement,b.source_placement)||!same(a.affine_edit,b.affine_edit))return false;}
     for(size_t i=0;i<objects.size();++i){const auto&x=objects[i];const auto&a=x.metadata;const auto&b=scene.objects()[i];auto p=x.paint.lock();auto v=x.volume.lock();
-      if(a.id!=b.id||a.name!=b.name||a.group!=b.group||a.visible!=b.visible||a.locked!=b.locked||a.mesh_active!=b.mesh_active||!same_transform(a.transform,b.transform)||!same_material(a.material,b.material)||!same(p,b.painted)||!same(v,b.volume)||!v||!same(a.deformation,b.deformation)||!same(a.appearance,b.appearance)||!same(a.material_bindings,b.material_bindings)||!same(a.retopology,b.retopology)||!same(a.polygon,b.polygon)||!same(a.shape_source,b.shape_source)||!same(a.rig_source,b.rig_source)||!same(a.affine_edit,b.affine_edit)||b.volume->revision()!=x.volume_revision||!same(x.geometry,b.volume->geometry_owner())||(p&&(p->revision()!=x.paint_revision||!same(x.mesh,p->mesh_owner())))||scene.world_matrix(b.id).matrix()!=x.world)return false;
+      if(a.id!=b.id||a.name!=b.name||a.group!=b.group||a.visible!=b.visible||a.locked!=b.locked||a.mesh_active!=b.mesh_active||!native_weight_state::transform(a.transform,b.transform)||!native_weight_state::material(a.material,b.material)||!same(p,b.painted)||!same(v,b.volume)||!v||!same(a.deformation,b.deformation)||!same(a.appearance,b.appearance)||!same(a.material_bindings,b.material_bindings)||!same(a.retopology,b.retopology)||!same(a.polygon,b.polygon)||!same(a.shape_source,b.shape_source)||!same(a.rig_source,b.rig_source)||!same(a.affine_edit,b.affine_edit)||b.volume->revision()!=x.volume_revision||!same(x.geometry,b.volume->geometry_owner())||!NativeWeightVolumeAccess::same_current(*a.volume,*b.volume)||(p&&(!a.painted||!NativeWeightPaintAccess::same_current(*a.painted,*p)))||(p&&(p->revision()!=x.paint_revision||!same(x.mesh,p->mesh_owner())))||!native_weight_state::world(scene.world_matrix(b.id).matrix(),x.world))return false;
     }
     return true;
   }
@@ -125,10 +125,11 @@ inline NativeAnatomicalRequest capture_native_anatomical(const Scene&source,
     lease.metadata=o;lease.paint=o.painted;lease.volume=o.volume;lease.world=source.world_matrix(o.id).matrix();
     if(o.painted){lease.mesh=o.painted->mesh_owner();lease.paint_revision=o.painted->revision();}
     if(o.volume){lease.geometry=o.volume->geometry_owner();lease.volume_revision=o.volume->revision();}
-    lease.metadata.painted.reset();lease.metadata.volume.reset();request.lease_.objects.push_back(std::move(lease));
     auto&detached=request.input_.object(o.id);
     if(o.painted)detached.painted=NativeWeightPaintAccess::snapshot(*o.painted);
     if(o.volume)detached.volume=std::make_shared<Volume>(o.volume->geometry_snapshot());
+    lease.metadata.painted=detached.painted;lease.metadata.volume=detached.volume;
+    request.lease_.objects.push_back(std::move(lease));
   }
   if(!request.lease_.matches(source))throw std::runtime_error("Native anatomical source changed during capture");
   return request;

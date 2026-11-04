@@ -7,6 +7,7 @@ namespace dome::detail {
 struct NativeWeightPaintAccess {
   struct Surface { std::shared_ptr<const void> owner; size_t bytes=0; };
   static Surface surface(const PaintedMesh &,bool prospective=false);
+  static bool same_current(const PaintedMesh &,const PaintedMesh &) noexcept;
   static std::shared_ptr<PaintedMesh> snapshot(const PaintedMesh &);
 };
 }
