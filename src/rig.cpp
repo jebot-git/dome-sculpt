@@ -815,14 +815,30 @@ Mesh deform_mesh(const Mesh &m, const SkinWeights &w, const Skeleton &s,
   mesh_valid(m);
   w.validate(m.positions.size(), s.bones.size());
   auto matrices = s.skin_matrices(local);
+  std::vector<RigMatrix> inverse_matrices;
+  inverse_matrices.reserve(matrices.size());
+  for (const auto &matrix : matrices)
+    inverse_matrices.push_back(inverse(matrix));
   Mesh out = m;
   for (size_t v = 0; v < m.positions.size(); v++) {
-    Vec3 p{};
-    for (auto i : w.vertices[v])
+    Vec3 p{}, n{};
+    for (auto i : w.vertices[v]) {
       p += point(matrices[i.joint], m.positions[v]) * i.weight;
+      const auto &a = inverse_matrices[i.joint];
+      const auto source = m.normals[v];
+      // Match retained source frames: weighted joint inverse transposes,
+      // then normalize once. Rebuilding triangle normals loses authored
+      // split normals even for an identity or purely rigid pose.
+      n += Vec3{a[0] * source.x + a[1] * source.y + a[2] * source.z,
+                a[4] * source.x + a[5] * source.y + a[6] * source.z,
+                a[8] * source.x + a[9] * source.y + a[10] * source.z} * i.weight;
+    }
+    const auto magnitude = length(n);
+    if (!finite(n) || !std::isfinite(magnitude) || magnitude < 1e-10f)
+      throw std::invalid_argument("Skinned authored normal is singular");
     out.positions[v] = p;
+    out.normals[v] = n / magnitude;
   }
-  normals(out);
   out.validate();
   return out;
 }
