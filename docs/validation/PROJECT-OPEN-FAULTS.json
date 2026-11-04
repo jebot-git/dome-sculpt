@@ -1,0 +1,295 @@
+{
+  "schema": 1,
+  "runtime": "af79fdf on 9aeabee; unchanged src/include/third_party",
+  "test_commit": "42da762",
+  "kind": "test-only; complete changed consumer over own qualified Mirror core and matching c092 support",
+  "negative": "Original c092 transaction-open reported zero measured allocations: it observed Scene::load after Open adopted load_scene_file. Original full589 result is preserved, not relabeled.",
+  "persistent_scope": {
+    "open": "all allocations from each prefix through real replacement publication transaction; worker error delivery is outside scope",
+    "open-decode": "all allocations from each prefix inside authentic load_scene_file; wrapper restores worker-local scope on return or throw"
+  },
+  "profiles": {
+    "release": {
+      "source": "42da762dd083dfb263f09b546e36c5a63e47a095",
+      "seconds": 9.612213256012183,
+      "inputs": 2234,
+      "drift": [],
+      "steps": [
+        {
+          "name": "document-transactions",
+          "phase": "compile",
+          "command": [
+            "/usr/bin/c++",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/project-open-faults-9ae/include",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/project-open-faults-9ae/third_party/openbrush",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/project-open-faults-9ae/third_party/nlohmann",
+            "-O3",
+            "-DNDEBUG",
+            "-std=gnu++20",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/project-open-faults-9ae/artifacts/open-proof/release/document-transactions.o",
+            "-c",
+            "/home/blux/de-xr/dome-sculpt/artifacts/project-open-faults-9ae/tests/document-transactions.cpp"
+          ],
+          "exit_code": 0,
+          "seconds": 6.483079401019495
+        },
+        {
+          "name": "document-transactions",
+          "phase": "link",
+          "command": [
+            "/usr/bin/c++",
+            "-Wl,--wrap=_ZN4dome15load_scene_fileERKNSt10filesystem7__cxx114pathERKSt8functionIFbvEE",
+            "-O3",
+            "-DNDEBUG",
+            "-Wl,--wrap=_ZN4dome24prepare_authoring_importERKNS_5SceneERKNSt10filesystem7__cxx114pathENS_22ImportAuthoringOptionsE",
+            "-Wl,--wrap=_ZN4dome24procedural_sculpt_objectERNS_5SceneEmRKNS_23ProceduralSculptOptionsEPNS_22ProceduralSculptReportE",
+            "-Wl,--wrap=_ZN4dome8Document11TransactionC1ERS0_",
+            "-Wl,--wrap=_ZN4dome8Document11Transaction6commitEb",
+            "-Wl,--wrap=_ZN4dome8Document11TransactionD1Ev",
+            "-Wl,--wrap=_ZN4dome8Document19process_uv_transferERNS0_7FileJobE",
+            "-Wl,--wrap=_ZNK4dome5Scene4saveERKNSt10filesystem7__cxx114pathE",
+            "-Wl,--wrap=_ZN4dome5Scene4loadERKNSt10filesystem7__cxx114pathERKSt8functionIFbvEE",
+            "-Wl,--wrap=_ZN4dome15RecoveryService4loadERKNS_17RecoveryCandidateENS_15RecoveryOptionsE",
+            "/home/blux/de-xr/dome-sculpt/artifacts/project-open-faults-9ae/artifacts/open-proof/release/document-transactions.o",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/project-open-faults-9ae/artifacts/open-proof/release/document-transactions-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/mirror-vertex-0d9a/artifacts/mirror-proof/v3-release/libdome-sculpt-core.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-union-c5/build-union-release/libdome-sculpt-affine.a",
+            "/usr/lib64/liblapacke.so",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-union-c5/build-union-release/libdome-sculpt-polygon.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-union-c5/build-union-release/libxatlas.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-union-c5/build-union-release/libmikktspace.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-union-c5/build-union-release/libmikktspace-robust.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-union-c5/build-union-release/libufbx.a",
+            "/usr/lib64/libpng.so",
+            "/usr/lib64/libjpeg.so",
+            "/usr/lib64/libz.so",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-union-c5/build-union-release/libdome-sculpt-emission-codec.a",
+            "/usr/lib64/libOpenEXR-3_2.so",
+            "/usr/lib64/libOpenEXRUtil-3_2.so",
+            "/usr/lib64/libOpenEXRCore-3_2.so",
+            "/usr/lib64/libIex-3_2.so",
+            "/usr/lib64/libIlmThread-3_2.so",
+            "/usr/lib64/libImath-3_1.so",
+            "-lgcc_s_asneeded",
+            "-lgcc_s_asneeded"
+          ],
+          "exit_code": 0,
+          "seconds": 0.3267702129960526
+        },
+        {
+          "name": "open",
+          "phase": "test",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/project-open-faults-9ae/artifacts/open-proof/release/document-transactions-test",
+            "open"
+          ],
+          "exit_code": 0,
+          "seconds": 0.24287570000160486
+        },
+        {
+          "name": "open-decode",
+          "phase": "test",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/project-open-faults-9ae/artifacts/open-proof/release/document-transactions-test",
+            "open-decode"
+          ],
+          "exit_code": 0,
+          "seconds": 1.8826976580021437
+        },
+        {
+          "name": "open-queue",
+          "phase": "test",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/project-open-faults-9ae/artifacts/open-proof/release/document-transactions-test",
+            "open-queue"
+          ],
+          "exit_code": 0,
+          "seconds": 0.1808101880014874
+        },
+        {
+          "name": "save",
+          "phase": "test",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/project-open-faults-9ae/artifacts/open-proof/release/document-transactions-test",
+            "save"
+          ],
+          "exit_code": 0,
+          "seconds": 0.13379098899895325
+        },
+        {
+          "name": "scalar",
+          "phase": "test",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/project-open-faults-9ae/artifacts/open-proof/release/document-transactions-test",
+            "scalar"
+          ],
+          "exit_code": 0,
+          "seconds": 0.22506940201856196
+        }
+      ],
+      "outputs": {
+        "/home/blux/de-xr/dome-sculpt/artifacts/project-open-faults-9ae/artifacts/open-proof/release/document-transactions-test": "3e74f8964a9a0bef4d0040278db7f3954a2db357da18faf19924edc0f6ef1b9e"
+      },
+      "logs": {
+        "open": "Measured open: 57 allocation boundaries\nPASS open: every one of 57 real endpoint allocation boundaries; exact scene/history/cache/lease rollback and retry",
+        "open-decode": "Measured open-decode: 512 allocation boundaries\nPASS open-decode: every one of 512 real endpoint allocation boundaries; exact scene/history/cache/lease rollback and retry",
+        "open-queue": "Measured open-queue: 51 allocation boundaries\nPASS open-queue: every one of 51 real endpoint allocation boundaries; exact scene/history/cache/lease rollback and retry",
+        "save": "Measured save: 34 allocation boundaries\nPASS save: every one of 34 real endpoint allocation boundaries; exact scene/history/cache/lease rollback and retry",
+        "scalar": "Measured scalar: 79 allocation boundaries\nPASS scalar: every one of 79 real endpoint allocation boundaries; exact scene/history/cache/lease rollback and retry"
+      },
+      "manifest_sha256": {
+        "before.json": "bba10658ec694bc8bd4ac7694a4ebb97b7228c11ac0c573e892b9d57625078db",
+        "after.json": "bba10658ec694bc8bd4ac7694a4ebb97b7228c11ac0c573e892b9d57625078db",
+        "status.json": "24e595c31b9e4eff597bdff74e6ca5e343d9f4d3917e408c91999b640cfb319c"
+      }
+    },
+    "sanitize": {
+      "source": "42da762dd083dfb263f09b546e36c5a63e47a095",
+      "seconds": 34.46723680300056,
+      "inputs": 2234,
+      "drift": [],
+      "steps": [
+        {
+          "name": "document-transactions",
+          "phase": "compile",
+          "command": [
+            "/usr/bin/c++",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/project-open-faults-9ae/include",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/project-open-faults-9ae/third_party/openbrush",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/project-open-faults-9ae/third_party/nlohmann",
+            "-O1",
+            "-g1",
+            "-fsanitize=address,undefined",
+            "-fno-omit-frame-pointer",
+            "-std=gnu++20",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/project-open-faults-9ae/artifacts/open-proof/sanitize/document-transactions.o",
+            "-c",
+            "/home/blux/de-xr/dome-sculpt/artifacts/project-open-faults-9ae/tests/document-transactions.cpp"
+          ],
+          "exit_code": 0,
+          "seconds": 11.171165261999704
+        },
+        {
+          "name": "document-transactions",
+          "phase": "link",
+          "command": [
+            "/usr/bin/c++",
+            "-Wl,--wrap=_ZN4dome15load_scene_fileERKNSt10filesystem7__cxx114pathERKSt8functionIFbvEE",
+            "-O1",
+            "-g1",
+            "-fsanitize=address,undefined",
+            "-fno-omit-frame-pointer",
+            "-fsanitize=address,undefined",
+            "-Wl,--wrap=_ZN4dome24prepare_authoring_importERKNS_5SceneERKNSt10filesystem7__cxx114pathENS_22ImportAuthoringOptionsE",
+            "-Wl,--wrap=_ZN4dome24procedural_sculpt_objectERNS_5SceneEmRKNS_23ProceduralSculptOptionsEPNS_22ProceduralSculptReportE",
+            "-Wl,--wrap=_ZN4dome8Document11TransactionC1ERS0_",
+            "-Wl,--wrap=_ZN4dome8Document11Transaction6commitEb",
+            "-Wl,--wrap=_ZN4dome8Document11TransactionD1Ev",
+            "-Wl,--wrap=_ZN4dome8Document19process_uv_transferERNS0_7FileJobE",
+            "-Wl,--wrap=_ZNK4dome5Scene4saveERKNSt10filesystem7__cxx114pathE",
+            "-Wl,--wrap=_ZN4dome5Scene4loadERKNSt10filesystem7__cxx114pathERKSt8functionIFbvEE",
+            "-Wl,--wrap=_ZN4dome15RecoveryService4loadERKNS_17RecoveryCandidateENS_15RecoveryOptionsE",
+            "/home/blux/de-xr/dome-sculpt/artifacts/project-open-faults-9ae/artifacts/open-proof/sanitize/document-transactions.o",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/project-open-faults-9ae/artifacts/open-proof/sanitize/document-transactions-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/mirror-vertex-0d9a/artifacts/mirror-proof/v3-sanitize/libdome-sculpt-core.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-union-c5/build-union-sanitize/libdome-sculpt-affine.a",
+            "/usr/lib64/liblapacke.so",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-union-c5/build-union-sanitize/libdome-sculpt-polygon.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-union-c5/build-union-sanitize/libxatlas.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-union-c5/build-union-sanitize/libmikktspace.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-union-c5/build-union-sanitize/libmikktspace-robust.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-union-c5/build-union-sanitize/libufbx.a",
+            "/usr/lib64/libpng.so",
+            "/usr/lib64/libjpeg.so",
+            "/usr/lib64/libz.so",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-union-c5/build-union-sanitize/libdome-sculpt-emission-codec.a",
+            "/usr/lib64/libOpenEXR-3_2.so",
+            "/usr/lib64/libOpenEXRUtil-3_2.so",
+            "/usr/lib64/libOpenEXRCore-3_2.so",
+            "/usr/lib64/libIex-3_2.so",
+            "/usr/lib64/libIlmThread-3_2.so",
+            "/usr/lib64/libImath-3_1.so",
+            "-lgcc_s_asneeded",
+            "-lgcc_s_asneeded"
+          ],
+          "exit_code": 0,
+          "seconds": 2.1263966170081403
+        },
+        {
+          "name": "open",
+          "phase": "test",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/project-open-faults-9ae/artifacts/open-proof/sanitize/document-transactions-test",
+            "open"
+          ],
+          "exit_code": 0,
+          "seconds": 1.9331215849961154
+        },
+        {
+          "name": "open-decode",
+          "phase": "test",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/project-open-faults-9ae/artifacts/open-proof/sanitize/document-transactions-test",
+            "open-decode"
+          ],
+          "exit_code": 0,
+          "seconds": 13.855380783992587
+        },
+        {
+          "name": "open-queue",
+          "phase": "test",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/project-open-faults-9ae/artifacts/open-proof/sanitize/document-transactions-test",
+            "open-queue"
+          ],
+          "exit_code": 0,
+          "seconds": 1.368414822005434
+        },
+        {
+          "name": "save",
+          "phase": "test",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/project-open-faults-9ae/artifacts/open-proof/sanitize/document-transactions-test",
+            "save"
+          ],
+          "exit_code": 0,
+          "seconds": 1.1222293880127836
+        },
+        {
+          "name": "scalar",
+          "phase": "test",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/project-open-faults-9ae/artifacts/open-proof/sanitize/document-transactions-test",
+            "scalar"
+          ],
+          "exit_code": 0,
+          "seconds": 1.4632213340082671
+        }
+      ],
+      "outputs": {
+        "/home/blux/de-xr/dome-sculpt/artifacts/project-open-faults-9ae/artifacts/open-proof/sanitize/document-transactions-test": "7c7653e64a8789286c0199a119659ec0bfb37431dd34b3b233f7d3fc3fd71a84"
+      },
+      "logs": {
+        "open": "Measured open: 57 allocation boundaries\nPASS open: every one of 57 real endpoint allocation boundaries; exact scene/history/cache/lease rollback and retry",
+        "open-decode": "Measured open-decode: 511 allocation boundaries\nPASS open-decode: every one of 511 real endpoint allocation boundaries; exact scene/history/cache/lease rollback and retry",
+        "open-queue": "Measured open-queue: 51 allocation boundaries\nPASS open-queue: every one of 51 real endpoint allocation boundaries; exact scene/history/cache/lease rollback and retry",
+        "save": "Measured save: 34 allocation boundaries\nPASS save: every one of 34 real endpoint allocation boundaries; exact scene/history/cache/lease rollback and retry",
+        "scalar": "Measured scalar: 79 allocation boundaries\nPASS scalar: every one of 79 real endpoint allocation boundaries; exact scene/history/cache/lease rollback and retry"
+      },
+      "manifest_sha256": {
+        "before.json": "5ea411367b7ddb3a96c58555dd6c806f591e06378ecb2618ad839c8a5529b8c1",
+        "after.json": "5ea411367b7ddb3a96c58555dd6c806f591e06378ecb2618ad839c8a5529b8c1",
+        "status.json": "66b3164338c415d9d866bcbf7c92232d82c5d2c3f1b640bca6c6f8fa309149f5"
+      }
+    }
+  },
+  "limits": [
+    "Not a fresh whole application build or full regression",
+    "No UI/physical device/system installation claim",
+    "Existing other endpoints retain their earlier one-shot failure semantics; Open publication and decode are persistent"
+  ]
+}
