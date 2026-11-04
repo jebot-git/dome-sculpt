@@ -1,0 +1,76 @@
+{
+  "base": "5833534 plus exact841329a cull",
+  "private_row_policy": "NearestSourceUnion + NearestPermitted (not newer62b UniqueSourceWitnesses)",
+  "optimized_scope": "Own native workflow/kernel/test TU against completed coherent7074 core/support/public headers with staged IO5ab; no old-public/new-layout mixing",
+  "release": {
+    "exit": 0,
+    "seconds": 0.16458981300820597
+  },
+  "native_checks": 169955,
+  "poses": 3,
+  "parsed_corners": 16992,
+  "export_max_error_m": 1.08497e-07,
+  "pose_max_m": 0.00104129,
+  "pose_mean_m": 0.000288227,
+  "khronos": {
+    "validator": "2.0.0-dev.3.10",
+    "files": 3,
+    "errors": 0,
+    "warnings": 3,
+    "infos": 3,
+    "hints": 0
+  },
+  "sanitizer_scope": "Fresh complete owned C/C++ core+affine/polygon/xatlas/mikktspace/ufbx/emission-support headless O1 asserted ASan/UBSan/leaks and7selected tests; no frontend/GPU claim",
+  "sanitizer": {
+    "exit": 0,
+    "seconds": 4.426345521002077,
+    "command": [
+      "ctest",
+      "--test-dir",
+      "build-sanitize",
+      "--output-on-failure",
+      "-R",
+      "^(native-weight-row-workflow|native-weight-row-anchors|native-weight-open-stress|bone-planar-node-cull|bone-shadow-query-cull-regression|rig-source-unskinned|atomic-write-allocation)$"
+    ]
+  },
+  "source_inputs": 1647,
+  "source_outputs_exact": true,
+  "outputs": {
+    "build-sanitize/libmikktspace.a": "bc833542656afaaf88886c5e3877f49335517c9d96cc3245ac23efcd6df0285b",
+    "build-sanitize/libufbx.a": "5a273f22e2d9592367e661474d8c44959c237dca8be8b8105d07fb79042c5b24",
+    "build-sanitize/libmikktspace-robust.a": "7e4c2f6427256a9719da9fce822ad7f992b3297f5e6fde7096e4d6b44c87817a",
+    "build-sanitize/libdome-sculpt-emission-codec.a": "8c0d5c66319a874b9080370ffdcd048179c56d67862a5c125941155ca9487f1c",
+    "build-sanitize/libdome-sculpt-polygon.a": "21c31203ee5300f1de4388ce543510e282201e1a9d5dc9b65501368ed7a47aeb",
+    "build-sanitize/libdome-sculpt-affine.a": "5cdc101f5b903867b7496588d071352c0cef2c3cd24184fc8d217d3d54fea10b",
+    "build-sanitize/libxatlas.a": "c0ccbcf23180db37c54ac51250b259294816ce8e5f923a05a2ddcbb640dc2e0f",
+    "build-sanitize/libdome-sculpt-core.a": "1f66ec699ce62b61b869c9db043e5bc0af11c2378ead4fdc6d2c33c3181d1d49",
+    "build-sanitize/dome-sculpt-native-weight-row-workflow-test": "a86932ab656ffad60ece3eb9d0d13f7c1efbe93742192e931f31d26f1a110885",
+    "build-sanitize/dome-sculpt-native-weight-row-anchors-test": "2976ac298d5ad0e1d6f8d91ce08000d1e2cef227f900f7f63bf07348d675ac74",
+    "build-sanitize/dome-sculpt-native-weight-open-stress-test": "9fdc47b884eb165b0bba8e3bc4c6987ed4947e0460f060abe7389911a00e41f8",
+    "build-sanitize/dome-sculpt-bone-planar-node-cull-test": "9adc44d425d91c8c2564352738f7d315966b781fc7462be998ff696e5580f5af",
+    "build-sanitize/dome-sculpt-bone-shadow-query-cull-regression-test": "dea27747e8659561ad4b12c7890375e141edc35b87526242dc62c13b89579c96",
+    "build-sanitize/dome-sculpt-rig-source-unskinned-test": "38d77e86ea85dd0f4ae2597930de2aabe9aa381bf24a8f45b9e64d4872fec2f6",
+    "build-sanitize/dome-sculpt-atomic-write-allocation-test": "d715c263c3881641a19add9c55c110d3e53a81a98f2c1a361d70b3a519230b03",
+    "build-sanitize/CMakeCache.txt": "4d3589ee5885637ad8c5fcadf343af387644027047e3d0d404e3056ffaf68a5e",
+    "build-sanitize/compile_commands.json": "70de14e976504ec28e3ad342d3939dd865cda1e04d29f9e06cfd8c563c8b69c3"
+  },
+  "limitations": [
+    "No public native-visible method/UI path",
+    "No coverage claim for newer62b palette or permitted-unused controls",
+    "No exhaustive whole-helper allocation sweep",
+    "General anatomy/continuous-facet/source-seam cases remain required"
+  ],
+  "sha256": {
+    "tests/native-weight-row-workflow.cpp": "2ca9a2ab2f06df4499bf2c6ab4cf482ee735c2bd958e23072d163b234311a6c0",
+    "CMakeLists.txt": "fb803f4b2d6cf705997110b5e0f20f8e08a6d40256c24590b2e799d212212950",
+    "artifacts/workflow-overlay.json": "26a4d0a4629bf03004a80615e6832cf2d13c514fcd298c56db93aec4b84c0c91",
+    "artifacts/workflow-run.log": "1dd8cca452e161e80f7aeb5c3e0432ea0cedbde4008e6962d9341247422704b4",
+    "artifacts/workflow-status.json": "b778010d6ca6c8999a0e591758e5b7aef5a7da4dc150fd8a48bc179f72fcae6b",
+    "artifacts/row-pose-khronos.json": "a55a5222d45018fd523499135982dd8f86629495d693938a165ac8738983c1ca",
+    "artifacts/coherent-sanitize-tests.log": "73b2db65d9837e22e6ce0d3d4bb9d22b1ba4055adb73b0c7a620db015478db66",
+    "artifacts/coherent-sanitize-status.json": "94ef011f4393ba4f8b2067dcd8cd71643bdd51ab339a68a82431836b4085eef1",
+    "artifacts/coherent-sanitize-before.json": "90a27b76b061600e220e01ced3f8bc398e8ed22921c77ef51e5ff06b8bdedd3c",
+    "artifacts/coherent-sanitize-after.json": "88c47207c6861a0920ce82ec84e588d7663f4a9d5d2710712276eb326b4df410",
+    "artifacts/sanitize-outputs-before.json": "49a2443208d4af7c824a6ac586e4dd8fbe4b1c67182bbd3698140dfcc337c0fe"
+  }
+}
