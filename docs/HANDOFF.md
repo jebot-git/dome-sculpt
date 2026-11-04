@@ -1,5 +1,23 @@
 # Dome Sculpt production handoff
 
+## Private native VRM1 expression preview — 2026-11-04
+
+Codeff13b33 adds immutable source-backed preview with actual universal-menu
+normal/compact controls and shared controller page29. Explicit static Apply uses
+one ordered native operation; Cancel/lateCancel/focus and source/history/save
+ownership are qualified. Current R/S native81, actual cached/fresh palette15,
+GUI22 eachnormal/compact, loader22/profile,1,161 persistent caller admission
+prefixes/profile and finalregistered7/profile pass; strictA77022 and real
+software-refusal are closed. No source-default rewrite: only expression-bound
+morphs reset; unbound.3/.6 stayexact. New EditorState/MeshJob view pointers require
+coherent ABI consumers; no Scene schema change. Fresh own234-task profiles plus
+exact complete-TU continuations are scoped in VRM1-EXPRESSION-PREVIEW.md/JSON.
+Configuration624 is not an all-suite result. Exact-camera sourcePBR eye7>4 stays
+an unresolved pre-existing counterexample, not a consumer-only/pass relabel.
+Private only; current-main/Scene31/native-float semantic union, prepared/normal/
+plainPBR/absolute authoring and expression-preserving painted export remain
+required. All other unfinished goal rows remain active.
+
 ## Private static VRM1 CorePBR background/alpha — 2026-11-04
 
 Source-only V1 view now resolves actual typed original background factors while
