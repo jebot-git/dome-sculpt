@@ -49,8 +49,17 @@ inline RawSourceProofPlan raw_source_proof_plan(const CreatorAppearance &a,
   for(const auto &i:*a.decoded_images){
     if(cancelled&&cancelled())throw std::runtime_error("Raw canonical image proof cancelled");
     if(!i||!i->width||!i->height||i->height>16*1024*1024/size_t(i->width))throw std::length_error("Raw canonical image proof exceeds pixel limits");
+  }
+  if(a.material<0||size_t(a.material)>=a.asset->materials.size())throw std::invalid_argument("Raw canonical material is unavailable");
+  const auto &material=a.asset->materials[size_t(a.material)];
+  for(const int id:{material.color_texture,material.metal_rough_texture,material.normal_texture,material.occlusion_texture,material.emissive_texture}){
+    if(id<0)continue;
+    if(size_t(id)>=a.asset->textures.size())throw std::invalid_argument("Raw canonical texture is unavailable");
+    const auto image=a.asset->textures[size_t(id)].image;
+    if(image<0||size_t(image)>=a.decoded_images->size())throw std::invalid_argument("Raw canonical image is unavailable");
+    const auto &i=*a.decoded_images->at(size_t(image));
     // RGBA result, codec output/rows and JPEG coefficient storage coexist.
-    plan.image=std::max(plan.image,size_t(i->width)*i->height*16+4096);
+    plan.image=std::max(plan.image,size_t(i.width)*i.height*16+4096);
   }
   if(plan.metadata>512*1024*1024||plan.uv>512*1024*1024-plan.metadata||
      plan.image>512*1024*1024-plan.metadata-plan.uv)
@@ -61,18 +70,29 @@ inline RawSourceProofPlan raw_source_proof_plan(const CreatorAppearance &a,
 // mutable aliases, so equal current DTO/map values alone are not provenance.
 class RawSourceCanonical {
   struct Budget {
-    struct alignas(std::max_align_t) Header{size_t bytes;};
-    size_t used=0,limit=0;bool exhausted=false,limited=false,stopped=false;
-    const std::function<bool()> *cancelled=nullptr;std::exception_ptr error;
-    static void *allocate(void *user,cgltf_size n)noexcept{
+    struct alignas(std::max_align_t) Header{size_t bytes;Header *previous,*next;};
+    size_t used=0,limit=0;Header *head=nullptr;
+    const std::function<bool()> *cancelled=nullptr;
+    ~Budget()noexcept{while(head){auto *next=head->next;::operator delete(head);head=next;}used=0;}
+    static void *allocate(void *user,cgltf_size n){
       auto &b=*static_cast<Budget*>(user);
-      try{if(b.cancelled&&*b.cancelled&&(*b.cancelled)()){b.stopped=true;return nullptr;}}
-      catch(...){b.error=std::current_exception();return nullptr;}
-      if(b.used>b.limit||sizeof(Header)>b.limit-b.used||n>b.limit-b.used-sizeof(Header)){b.limited=true;return nullptr;}
+      if(b.cancelled&&*b.cancelled&&(*b.cancelled)())throw std::runtime_error("Raw canonical source proof cancelled");
+      if(b.used>b.limit||sizeof(Header)>b.limit-b.used||n>b.limit-b.used-sizeof(Header))
+        throw std::length_error("Raw canonical parser exceeds prospective working budget");
+      // cgltf is compiled as C++ in our owned import.cpp. Never hand its
+      // partial-table cleanup a null allocation: unwind to this arena instead.
+      // Nothrow new preserves both C++ fault coverage and malloc-null handling.
       auto *h=static_cast<Header*>(::operator new(n+sizeof(Header),std::nothrow));
-      if(!h){b.exhausted=true;return nullptr;}h->bytes=n+sizeof(Header);b.used+=h->bytes;return h+1;
+      if(!h)throw std::bad_alloc();
+      h->bytes=n+sizeof(Header);h->previous=nullptr;h->next=b.head;
+      if(b.head)b.head->previous=h;b.head=h;b.used+=h->bytes;return h+1;
     }
-    static void release(void *user,void *p)noexcept{if(!p)return;auto &b=*static_cast<Budget*>(user);auto *h=static_cast<Header*>(p)-1;b.used-=h->bytes;::operator delete(h);}
+    static void release(void *user,void *p)noexcept{
+      if(!p)return;auto &b=*static_cast<Budget*>(user);auto *h=static_cast<Header*>(p)-1;
+      if(h->previous)h->previous->next=h->next;else b.head=h->next;
+      if(h->next)h->next->previous=h->previous;b.used-=h->bytes;::operator delete(h);
+    }
+
   } budget_;
   std::unique_ptr<cgltf_data,decltype(&cgltf_free)> data_{nullptr,cgltf_free};
   const CreatorAppearance &a_;
@@ -81,10 +101,6 @@ class RawSourceCanonical {
   [[noreturn]] static void fail(){throw std::invalid_argument("Raw sampling differs from canonical source authority");}
   void stop()const{if(cancelled_&&cancelled_())throw std::runtime_error("Raw canonical source proof cancelled");}
   void result(cgltf_result result){
-    if(budget_.error)std::rethrow_exception(budget_.error);
-    if(budget_.stopped)throw std::runtime_error("Raw canonical source proof cancelled");
-    if(budget_.exhausted)throw std::bad_alloc();
-    if(budget_.limited)throw std::length_error("Raw canonical parser exceeds prospective working budget");
     if(result!=cgltf_result_success)fail();
   }
 public:
