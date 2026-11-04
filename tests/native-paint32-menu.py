@@ -95,7 +95,13 @@ async def main():
         async def tool(edit,last=False):
             g=edit.get_geometry()
             if compact:
-                tap(edit,g.width/8,row/2);await asyncio.sleep(.1);key('End' if last else 'Home');key('Return')
+                tap(edit,g.width/8,row/2);await asyncio.sleep(.1)
+                # Canonical FLTK popup navigation implements Backspace/Tab,
+                # not Home/End. Backspace wraps to the last active item;
+                # Tab wraps forward to Scale when that is the requested tool.
+                key('BackSpace')
+                if not last:key('Tab')
+                await asyncio.sleep(.1);capture(connection.screen().root,'restore-popup.png' if last else 'scale-popup.png');key('Return')
             else:tap(edit,g.width/2 if last else g.width/12,row*3.5 if last else row/2)
             await asyncio.sleep(.2)
         edit=await editor();g=edit.get_geometry();initial=capture(edit,'default.png')
