@@ -1,5 +1,5 @@
 {
-  "recorded_utc": "2026-11-04T02:52:13.339005+00:00",
+  "recorded_utc": "2026-11-04T02:53:55.037019+00:00",
   "goal": "active and incomplete",
   "public_main_admission": false,
   "scope": "Qualified source-aware generic mesh bake and cut compatibility on private c092 plus f89/8de atlas admission. Product TUs bake.cpp and cut-color.cpp only; no public layout/archive/schema change. Matching complete-TU component qualification; not a fresh all-target build.",
@@ -2546,100 +2546,6 @@
     }
   },
   "pending_fault_sweeps": {
-    "release": {
-      "receipt": "/home/blux/de-xr/dome-sculpt/artifacts/current-color-source4-render-3fe/artifacts/graphics-proof/bake-faults-release/status.json",
-      "snapshot": {
-        "state": "terminal",
-        "pid": 1624433,
-        "profile": "release",
-        "source": "16afb67df44c208e54d7cf7c571286a998d6ac91",
-        "scope": "Complete existing current-color-bake-faults TU on identical3fe product sources and exact matching bake/cut-color+f89 component archive, unchanged own c092 support; no wholeapp/fullsuite claim.",
-        "steps": [
-          {
-            "phase": "compile",
-            "command": [
-              "/usr/bin/c++",
-              "-I/home/blux/de-xr/dome-sculpt/artifacts/current-color-source4-render-3fe/src",
-              "-I/home/blux/de-xr/dome-sculpt/artifacts/current-color-source4-render-3fe/include",
-              "-I/home/blux/de-xr/dome-sculpt/artifacts/current-color-source4-render-3fe/third_party/openbrush",
-              "-I/home/blux/de-xr/dome-sculpt/artifacts/current-color-source4-render-3fe/third_party/nlohmann",
-              "-O3",
-              "-DNDEBUG",
-              "-std=gnu++20",
-              "-o",
-              "/home/blux/de-xr/dome-sculpt/artifacts/current-color-source4-render-3fe/artifacts/graphics-proof/bake-faults-release/fixture.o",
-              "-c",
-              "/home/blux/de-xr/dome-sculpt/artifacts/current-color-source4-render-3fe/tests/current-color-bake-faults.cpp"
-            ],
-            "exit_code": 0,
-            "seconds": 4.581067302991869
-          },
-          {
-            "phase": "link",
-            "command": [
-              "/usr/bin/c++",
-              "-O3",
-              "-DNDEBUG",
-              "-Wl,--wrap=_ZNK4dome17PolygonColorField6packedERKNS_11PolygonMeshERKNS_13PolygonLimitsE",
-              "/home/blux/de-xr/dome-sculpt/artifacts/current-color-source4-render-3fe/artifacts/graphics-proof/bake-faults-release/fixture.o",
-              "-o",
-              "/home/blux/de-xr/dome-sculpt/artifacts/current-color-source4-render-3fe/artifacts/graphics-proof/bake-faults-release/source-paint-mesh-bake-test",
-              "/home/blux/de-xr/dome-sculpt/artifacts/current-color-source4-8de/artifacts/color-proof/v2-release/libdome-sculpt-core.a",
-              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-union-c5/build-union-release/libdome-sculpt-affine.a",
-              "/usr/lib64/liblapacke.so",
-              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-union-c5/build-union-release/libdome-sculpt-polygon.a",
-              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-union-c5/build-union-release/libxatlas.a",
-              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-union-c5/build-union-release/libmikktspace.a",
-              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-union-c5/build-union-release/libmikktspace-robust.a",
-              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-union-c5/build-union-release/libufbx.a",
-              "/usr/lib64/libpng.so",
-              "/usr/lib64/libjpeg.so",
-              "/usr/lib64/libz.so",
-              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-union-c5/build-union-release/libdome-sculpt-emission-codec.a",
-              "/usr/lib64/libOpenEXR-3_2.so",
-              "/usr/lib64/libOpenEXRUtil-3_2.so",
-              "/usr/lib64/libOpenEXRCore-3_2.so",
-              "/usr/lib64/libIex-3_2.so",
-              "/usr/lib64/libIlmThread-3_2.so",
-              "/usr/lib64/libImath-3_1.so",
-              "-lgcc_s_asneeded",
-              "-lgcc_s_asneeded"
-            ],
-            "exit_code": 0,
-            "seconds": 0.40164429001742974
-          },
-          {
-            "phase": "packed",
-            "command": [
-              "/home/blux/de-xr/dome-sculpt/artifacts/current-color-source4-render-3fe/artifacts/graphics-proof/bake-faults-release/source-paint-mesh-bake-test",
-              "packed"
-            ],
-            "exit_code": 0,
-            "seconds": 13.910163256019587
-          },
-          {
-            "phase": "precommit",
-            "command": [
-              "/home/blux/de-xr/dome-sculpt/artifacts/current-color-source4-render-3fe/artifacts/graphics-proof/bake-faults-release/source-paint-mesh-bake-test",
-              "precommit"
-            ],
-            "exit_code": 0,
-            "seconds": 166.16151618599542
-          }
-        ],
-        "phase": "precommit",
-        "child_pid": 1626751,
-        "exit_code": 0,
-        "seconds": 185.28718828500132,
-        "inputs": 2227,
-        "drift": [],
-        "outputs": {
-          "/home/blux/de-xr/dome-sculpt/artifacts/current-color-source4-render-3fe/artifacts/graphics-proof/bake-faults-release/source-paint-mesh-bake-test": "6179b4defa2e269c334059adc29fe3d8de1fbe431ac96a5e1d8b615ca0148c6b"
-        }
-      },
-      "handle": 43670,
-      "interpretation": "Poll same live finite handle to terminal; snapshot is not a full-prefix pass."
-    },
     "sanitize": {
       "receipt": "/home/blux/de-xr/dome-sculpt/artifacts/current-color-source4-render-3fe/artifacts/graphics-proof/bake-faults-sanitize/status.json",
       "snapshot": {
@@ -3237,5 +3143,103 @@
   ],
   "system_install": false,
   "headset_launch": false,
-  "session_restart": false
+  "session_restart": false,
+  "completed_release_fault_sweep": {
+    "receipt": "/home/blux/de-xr/dome-sculpt/artifacts/current-color-source4-render-3fe/artifacts/graphics-proof/bake-faults-release/status.json",
+    "sha256": "3858d89b43a21fc3ef34c9b471f6be6a4aa5af4246f54fdffea6076c2a547ef1",
+    "status": {
+      "state": "terminal",
+      "pid": 1624433,
+      "profile": "release",
+      "source": "16afb67df44c208e54d7cf7c571286a998d6ac91",
+      "scope": "Complete existing current-color-bake-faults TU on identical3fe product sources and exact matching bake/cut-color+f89 component archive, unchanged own c092 support; no wholeapp/fullsuite claim.",
+      "steps": [
+        {
+          "phase": "compile",
+          "command": [
+            "/usr/bin/c++",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/current-color-source4-render-3fe/src",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/current-color-source4-render-3fe/include",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/current-color-source4-render-3fe/third_party/openbrush",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/current-color-source4-render-3fe/third_party/nlohmann",
+            "-O3",
+            "-DNDEBUG",
+            "-std=gnu++20",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/current-color-source4-render-3fe/artifacts/graphics-proof/bake-faults-release/fixture.o",
+            "-c",
+            "/home/blux/de-xr/dome-sculpt/artifacts/current-color-source4-render-3fe/tests/current-color-bake-faults.cpp"
+          ],
+          "exit_code": 0,
+          "seconds": 4.581067302991869
+        },
+        {
+          "phase": "link",
+          "command": [
+            "/usr/bin/c++",
+            "-O3",
+            "-DNDEBUG",
+            "-Wl,--wrap=_ZNK4dome17PolygonColorField6packedERKNS_11PolygonMeshERKNS_13PolygonLimitsE",
+            "/home/blux/de-xr/dome-sculpt/artifacts/current-color-source4-render-3fe/artifacts/graphics-proof/bake-faults-release/fixture.o",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/current-color-source4-render-3fe/artifacts/graphics-proof/bake-faults-release/source-paint-mesh-bake-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/current-color-source4-8de/artifacts/color-proof/v2-release/libdome-sculpt-core.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-union-c5/build-union-release/libdome-sculpt-affine.a",
+            "/usr/lib64/liblapacke.so",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-union-c5/build-union-release/libdome-sculpt-polygon.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-union-c5/build-union-release/libxatlas.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-union-c5/build-union-release/libmikktspace.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-union-c5/build-union-release/libmikktspace-robust.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-union-c5/build-union-release/libufbx.a",
+            "/usr/lib64/libpng.so",
+            "/usr/lib64/libjpeg.so",
+            "/usr/lib64/libz.so",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-union-c5/build-union-release/libdome-sculpt-emission-codec.a",
+            "/usr/lib64/libOpenEXR-3_2.so",
+            "/usr/lib64/libOpenEXRUtil-3_2.so",
+            "/usr/lib64/libOpenEXRCore-3_2.so",
+            "/usr/lib64/libIex-3_2.so",
+            "/usr/lib64/libIlmThread-3_2.so",
+            "/usr/lib64/libImath-3_1.so",
+            "-lgcc_s_asneeded",
+            "-lgcc_s_asneeded"
+          ],
+          "exit_code": 0,
+          "seconds": 0.40164429001742974
+        },
+        {
+          "phase": "packed",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/current-color-source4-render-3fe/artifacts/graphics-proof/bake-faults-release/source-paint-mesh-bake-test",
+            "packed"
+          ],
+          "exit_code": 0,
+          "seconds": 13.910163256019587
+        },
+        {
+          "phase": "precommit",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/current-color-source4-render-3fe/artifacts/graphics-proof/bake-faults-release/source-paint-mesh-bake-test",
+            "precommit"
+          ],
+          "exit_code": 0,
+          "seconds": 166.16151618599542
+        }
+      ],
+      "phase": "precommit",
+      "child_pid": 1626751,
+      "exit_code": 0,
+      "seconds": 185.28718828500132,
+      "inputs": 2227,
+      "drift": [],
+      "outputs": {
+        "/home/blux/de-xr/dome-sculpt/artifacts/current-color-source4-render-3fe/artifacts/graphics-proof/bake-faults-release/source-paint-mesh-bake-test": "6179b4defa2e269c334059adc29fe3d8de1fbe431ac96a5e1d8b615ca0148c6b"
+      }
+    },
+    "actual_full_prefixes": {
+      "packed": 858,
+      "precommit": 4397
+    },
+    "same_handle_closed": 43670
+  }
 }

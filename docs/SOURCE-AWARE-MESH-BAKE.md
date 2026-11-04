@@ -61,10 +61,13 @@ pass in Release and owned sanitizer builds.
 
 The sanitizer standalone-XR attempt still fails on the known112-byte Mesa report,
 with two allocations originating in shader rendering. It has not been suppressed,
-ignored or counted as a clean exit. The wider selected sanitizer cohort and
-858 packed /4397 precommit allocation-failure sweeps retain their original finite
-handles and logs in the receipt. Snapshots are not terminal-pass claims; inspect
-the current status before continuing those handles.
+ignored or counted as a clean exit. The complete Release858 packed and4397 precommit allocation-failure sweeps now
+pass, with exact source/scene/owner preservation and successful full-helper retry
+at every measured prefix (185.29 seconds,2227 unchanged inputs). The wider
+selected sanitizer cohort and matching sanitizer fault sweep retain their
+original finite handles in the receipt. Sanitizer packed858 has finished, while
+precommit remains running; snapshots are not final whole-sweep pass claims.
+Inspect current status before continuing those handles.
 
 Generic Source4 target baking, general MToon and physical-source baking, broader
 normal/filter/minification fidelity and coherent integration with published

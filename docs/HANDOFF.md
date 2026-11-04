@@ -13,6 +13,8 @@ allocation-failure cohorts retain live finite handles in the receipt. Relinked
 application Release synthetic-XR21 passes; sanitizer standalone XR retains the
 unresolved Mesa112-byte report. This is not main admission, final27/poll SDK
 application integration, a full589/590 regression or physical-device proof.
+The full Release858 packed plus4397 precommit failure prefixes now pass
+(185.29s,2227 inputs exact); matching sanitizer precommit still runs.
 Read SOURCE-AWARE-MESH-BAKE.md and validation/SOURCE-AWARE-MESH-BAKE.json.
 The complete original objective and every unfinished additional row remain
 active; no installation or physical session changed.
