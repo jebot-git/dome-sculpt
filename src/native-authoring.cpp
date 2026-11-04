@@ -86,7 +86,7 @@ GltfExportReport export_glb_authoring(const NativeAuthoringExport &owner,const s
  const auto capture=detail::NativeAuthoringCapture::create(owner,options.cancelled);
  auto compiler_policy=paint_policy;compiler_policy.cancelled={};
  auto compiled=detail::compile_native_authoring(*capture,compiler_policy,options.max_output_bytes,options.cancelled);
- auto document=detail::make_gltf(compiled.surfaces,detail::SourceMorphSpace::Native,options.recompute_changed_normals,options.cancelled);
+ auto document=detail::make_gltf_authoring(*capture,compiled.surfaces,options.recompute_changed_normals,options.cancelled);
  detail::finish_native_authoring_emission(document,compiled,options.max_output_bytes,options.cancelled);
  attach(document,*capture,options.max_output_bytes,options.cancelled);const uint64_t size=28+((uint64_t(document.json.dump().size())+3)&~uint64_t(3))+((uint64_t(document.binary.size())+3)&~uint64_t(3));if(size>options.max_output_bytes)throw std::length_error("Complete native authoring GLB exceeds output budget");
  GltfExportReport report{capture->ids().size(),document.normal_targets_recomputed,{"Exact native authoring Scene retained; portable core view is not declared lossless"}};report.diagnostics.insert(report.diagnostics.end(),compiled.diagnostics.begin(),compiled.diagnostics.end());stop(options.cancelled);detail::write_glb(std::move(document),path,options.cancelled,options.before_commit);return report;

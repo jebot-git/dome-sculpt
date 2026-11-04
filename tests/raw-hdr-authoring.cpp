@@ -49,9 +49,11 @@ int main(int argc,char **argv)try {
   Fbo fbo;fbo.bind();SurfaceRenderer native;native.set_frame_time(0);color_consumer::Renderer reader;
   for(int kind=0;kind<5;++kind){
     auto source=raw_hdr(kind);const auto input=out/("raw"+std::to_string(kind)+".glb");source.save(input);const auto raw_bytes=source.bytes();
-    auto raw_options=options;raw_options.prepare_texture_atlas=false;bool refused=false;
-    try{prepare_authoring_import(initial,input,raw_options);}catch(const std::invalid_argument &e){refused=std::string_view(e.what()).find("explicit material/paint adapter")!=std::string_view::npos;}
-    check(refused&&file(input)==raw_bytes,"Unprepared raw-HDR import keeps its original adapter refusal and exact bytes");
+    auto raw_options=options;raw_options.prepare_texture_atlas=false;
+    const auto raw_native=prepare_authoring_import(initial,input,raw_options);
+    check(!raw_native.scene.active().painted->source_sampling_prepared()&&
+      *raw_native.scene.active().appearance->original_bytes==raw_bytes&&file(input)==raw_bytes,
+      "Raw-HDR preserving admission keeps genuine source sampling and exact bytes without claiming an editable atlas");
     Document imported;imported.replace(initial.snapshot());ImportSettings settings;settings.paint_resolution=64;settings.prepare_texture_atlas=true;imported.import_asset(input,settings);imported_endpoint(imported);
     auto scene=imported.copy_scene();const auto id=scene.active().id;const auto &o=scene.object(id);const auto paint=o.painted;
     check(paint&&paint->resolution()==64&&paint->source_sampling_prepared()&&paint->valid_source_sampling_attachment()&&*o.appearance->original_bytes==raw_bytes,"Actual native raw-HDR import publishes genuine owned Source4 and exact source bytes");

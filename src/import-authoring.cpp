@@ -105,7 +105,7 @@ std::optional<CanvasTransform> similarity(const ImportedNode &n) {
   try{validate_transform(out);}catch(const std::invalid_argument&){return {};}
   return out;
 }
-Material native_material(const ImportedMaterial &m, bool prepare_original_sampling) {
+Material native_material(const ImportedMaterial &m) {
   Material out;
   out.name = name(m.name, "Imported material");
   out.color = m.color;
@@ -114,10 +114,8 @@ Material native_material(const ImportedMaterial &m, bool prepare_original_sampli
   out.emissive = m.emissive;
   for (auto &value : out.emissive) {
     value *= m.emissive_strength;
-    if (!std::isfinite(value) || (value > 1 && !prepare_original_sampling))
-      throw std::invalid_argument(
-          "Native HDR emissive authoring requires an explicit material/paint "
-          "adapter; original source is retained by preserving import");
+    if (!std::isfinite(value) || value<0 || value>maximum_native_emission)
+      throw std::invalid_argument("Imported native emission exceeds bounded linear radiance");
   }
   out.double_sided = m.double_sided;
   out.unlit = m.unlit;
@@ -429,7 +427,7 @@ ImportedAuthoring prepare_authoring_import(const Scene &input,
       auto id = output.scene.add(name(p.name, "Imported primitive"), Volume{});
       auto &object = output.scene.object(id);
       object.group = groups[n];
-      object.material = native_material(m, options.prepare_texture_atlas);
+      object.material = native_material(m);
       auto appearance = std::make_shared<CreatorAppearance>();
       appearance->original_bytes = bytes;
       if(captured.original->root.bytes!=bytes || captured.original->format!=ImportSourceFormat::Glb ||

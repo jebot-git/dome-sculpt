@@ -26,6 +26,7 @@
 #include "dome/frame-clock.hpp"
 #include "normal-frame-runtime.hpp"
 #include "paint-source-admission.hpp"
+#include "emission-authority.hpp"
 #include "export-corner-coordinates.hpp"
 #include "dome/paint-sampling.hpp"
 #include "dome/normal-preview.hpp"
@@ -201,7 +202,13 @@ bool Document::pending_locked() const {
 }
 bool Document::reject_texture_paint_locked() {
   const auto &o=scene_.active();
-  if(!o.mesh_active || !o.painted || !detail::paint_requires_editable_atlas(*o.painted))return false;
+  if(!o.mesh_active || !o.painted)return false;
+  const bool raw_physical=o.painted->surface_diagnostics().policy==PaintUvPolicy::SourceAuthored &&
+      !o.painted->source_sampling_prepared() &&
+      (detail::hdr_emission(o.material.emissive)||o.painted->has_physical_emission()||
+       (o.material_bindings&&detail::physical_emission(*o.material_bindings))||
+       (state_.paint.channel==PaintChannel::Emission&&state_.paint.emission_units==PaintEmissionUnits::Physical));
+  if(!raw_physical&&!detail::paint_requires_editable_atlas(*o.painted))return false;
   Transaction transaction(*this);
   state_.message=detail::editable_texture_atlas_notice;
   state_.error.clear();publish_locked(false,false);transaction.commit(false);
