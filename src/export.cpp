@@ -1,3 +1,4 @@
+#include "baked-normal-export.hpp"
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "affine-matrix.hpp"
 #include "emission-authority.hpp"
@@ -182,6 +183,9 @@ detail::GltfDocument detail::make_gltf(const std::vector<ObjectSurface> &input_o
       input.material_bindings->color_preparation->validate_current(input.mesh,input.appearance.get(),cancelled);
     std::optional<NormalFrameExport> prepared;
     if(input.material_bindings && input.material_bindings->normal_frames)prepared=normal_frame_export(input,source_space,cancelled,source_space==SourceMorphSpace::Native);
+    else if(auto generated=baked_normal_export(input,source_space,recompute_changed_normals,cancelled)){
+      result.normal_targets_recomputed+=generated->recomputed_normals;prepared=std::move(generated->frame);
+    }
     const auto &o=prepared?prepared->surface:input;auto *frame=prepared?&*prepared:nullptr;
     GltfObjectIdentity emission;
     if(frame){emission.canonical_normal=frame->canonical_normal;emission.prepared_normal=frame->prepared_normal;}
