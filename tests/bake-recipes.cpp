@@ -3,6 +3,8 @@
 #include "bake-cage.cpp"
 #include "dome/bake-recipe.hpp"
 #include "dome/native-scene-append.hpp"
+#include "dome/native-authoring.hpp"
+#include <fstream>
 #include "polygon-conversion.hpp"
 #include "dome/shapekey-authoring.hpp"
 int main(int argc,char **argv)try{
@@ -59,6 +61,54 @@ int main(int argc,char **argv)try{
   auto retained=scene;retained.active().shape_source=capture_polygon_origin(retained,retained.active().id);retained.active().bake_recipe.reset();
   auto retained_json=retained.encode();require_cage(retained_json["version"]==30&&retained_json["polygon_sources"]["version"]==7,
     "A retained recipe selects the owning Scene30/history7 capability even without a current recipe");
+  const auto retained_source=retained.active().shape_source;
+  auto retained_appended=append_native_scene(destination,retained);
+  const auto &retained_ref=*retained_appended.scene.active().shape_source->bake_recipe;
+  require_cage(retained_ref.source.object==retained_appended.objects.at(1)&&
+    retained_ref.cage->object==retained_appended.objects.at(2)&&
+    retained_ref.source.original_object==2&&retained_ref.cage->original_object==3&&
+    retained.active().shape_source==retained_source&&retained.encode()==retained_json,
+    "Append rebases immutable retained recipe references while preserving the complete input history");
+  auto grouped=retained;const auto source_group=grouped.add_group("Source dependencies");
+  const auto child_group=grouped.add_group("Nested cage",{},source_group);
+  grouped.object(2).group=source_group;grouped.object(3).group=child_group;
+  const auto grouped_source=grouped.active().shape_source;
+  auto ungrouped=grouped;ungrouped.erase_group(source_group,false);ungrouped.validate();
+  require_cage(ungrouped.groups().empty()&&ungrouped.objects().size()==3&&
+    ungrouped.active().shape_source==grouped_source&&
+    ungrouped.active().shape_source->bake_recipe->source.object==2&&
+    ungrouped.active().shape_source->bake_recipe->settings.cage_object==3,
+    "Removing only a group preserves live dependencies and their shared immutable recipe owner");
+  grouped.erase_group(source_group,true);grouped.validate();
+  require_cage(grouped.groups().empty()&&grouped.objects().size()==1&&
+    grouped.active().shape_source!=grouped_source&&
+    grouped.active().shape_source->bake_recipe->source.object==unavailable_bake_object&&
+    grouped.active().shape_source->bake_recipe->cage->object==unavailable_bake_object&&
+    grouped_source->bake_recipe->source.object==2&&grouped_source->bake_recipe->cage->object==3,
+    "Deleting nested dependency groups invalidates retained bindings with copy-on-write source history");
+  grouped.save(out/"group-deleted.dsculpt");
+  require_cage(Scene::load(out/"group-deleted.dsculpt").encode()==grouped.encode(),
+    "Grouped dependency deletion and unavailable retained recipes restart exactly");
+  NativeAuthoringExport portable;portable.scene=std::make_shared<const Scene>(scene.snapshot());
+  portable.allow_portable_fallback=true;portable.scope=NativeAuthoringExport::Scope::WholeScene;
+  auto read_native=[&](const std::filesystem::path &file){
+    std::ifstream input(file,std::ios::binary);std::vector<uint8_t> bytes{std::istreambuf_iterator<char>(input),{}};
+    auto result=extract_native_authoring(bytes);if(!result)throw std::runtime_error("Recipe package has no native owner");return *result;
+  };
+  export_glb_authoring(portable,out/"recipe-whole.glb");
+  require_cage(read_native(out/"recipe-whole.glb").encode()==scene.encode(),
+    "Real native-authoring GLB retains complete hidden source, cage and recipe through its authenticated payload");
+  portable.scope=NativeAuthoringExport::Scope::ExportedObjects;portable.objects={scene.active().id};
+  export_glb_authoring(portable,out/"recipe-subset.glb");auto subset_recipe=read_native(out/"recipe-subset.glb");
+  require_cage(subset_recipe.objects().size()==1&&
+    subset_recipe.active().bake_recipe->source.object==unavailable_bake_object&&
+    subset_recipe.active().bake_recipe->cage->object==unavailable_bake_object&&
+    subset_recipe.active().bake_recipe->source.original_object==2,
+    "Real exported-object package marks omitted source and cage unavailable instead of keeping invalid bindings");
+  auto subset_rebound=append_native_scene(destination,subset_recipe);
+  require_cage(subset_rebound.scene.active().bake_recipe->source.object==unavailable_bake_object&&
+    subset_rebound.scene.active().bake_recipe->cage->object==unavailable_bake_object,
+    "Importing the actual subset payload cannot bind missing dependencies to coincident destination IDs");
   retained=Scene::decode(retained_json);retained.erase(2);
   require_cage(retained.active().shape_source->bake_recipe->source.object==unavailable_bake_object,
     "Deletion invalidates live references throughout immutable retained source histories");
