@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/document.hpp"
 #include "dome/scene-file.hpp"
+#include "dome/bake-recipe.hpp"
 #include <nlohmann/json.hpp>
 #include <cstring>
 #include <iostream>
@@ -21,7 +22,14 @@ int main(int argc,char **argv)try{
  ObjectBakeSettings settings;settings.ao_samples=0;settings.padding=0;
  doc.bake_from_object(2,settings);ready(doc);auto baked=doc.copy_scene();const auto accepted=baked.encode();
  check(bool(baked.active().painted->baked()),"Actual native Bake accepts an unchanged authored rest surface with zero morph weights");
- check(exact_mesh(baked.active().painted->mesh(),rest)&&accepted.at("objects").at(1)==original.at("objects").at(1)&&accepted.at("objects").at(0).at("deformation")==original.at("objects").at(0).at("deformation"),"Actual Bake retains the complete rest mesh, morphs and read-only source");
+ // Scene30 adds a recipe field to every object record, including a null field
+ // on the untouched source. Compare complete sources in the actual capability
+ // context rather than treating that archive-shape change as a source edit.
+ auto reference=initial;reference.active().bake_recipe=capture_bake_recipe(initial,2,settings);
+ check(accepted.at("version")==30&&baked.active().bake_recipe&&
+   baked.active().bake_recipe->encode()==reference.active().bake_recipe->encode()&&initial.encode()==original,
+   "Zero-weight Bake records the actual source/settings recipe without changing its input Scene");
+ check(exact_mesh(baked.active().painted->mesh(),rest)&&accepted.at("objects").at(1)==reference.encode().at("objects").at(1)&&accepted.at("objects").at(0).at("deformation")==original.at("objects").at(0).at("deformation"),"Actual Bake retains the complete rest mesh, morphs and read-only source");
  check(doc.undo()&&doc.copy_scene().encode()==original&&doc.redo()&&doc.copy_scene().encode()==accepted,"Native Bake remains one exact Undo and Redo transaction");ready(doc);
  doc.save(out/"zero-morph-rest.dsculpt");auto loaded=Scene::load(out/"zero-morph-rest.dsculpt");check(loaded.encode()==accepted&&std::signbit(loaded.active().deformation->morph_weights.at(1))&&exact_mesh(loaded.active().deformation->preview(loaded.active().painted->mesh()),rest),"Native Save and restart retain authored rest normals and signed-zero morph state");
  doc.export_asset(out/"zero-morph-rest.glb",AssetExportFormat::EditableGlb256).get();auto recovered=load_scene_file(out/"zero-morph-rest.glb").scene;check(recovered.encode()==accepted&&std::signbit(recovered.active().deformation->morph_weights.at(1))&&exact_mesh(recovered.active().deformation->preview(recovered.active().painted->mesh()),rest),"Actual editable GLB worker and native recovery retain exact authored rest shading");
