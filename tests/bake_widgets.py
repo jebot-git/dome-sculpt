@@ -1,5 +1,5 @@
 """Read-only native widget observations; all interaction uses real X events."""
-import asyncio,json,time
+import asyncio,json,time,tempfile
 from Xlib import X,XK
 from Xlib.ext import xtest
 class BakeWidgets:
@@ -41,3 +41,13 @@ class BakeWidgets:
    if (await self.item(label))['focused']:return
    code=self.connection.keysym_to_keycode(XK.string_to_keysym('Tab'));xtest.fake_input(self.connection,X.KeyPress,code);xtest.fake_input(self.connection,X.KeyRelease,code);self.connection.sync();await asyncio.sleep(.08)
   raise TimeoutError('Actual native keyboard focus did not reach '+label)
+
+class BakeHome(tempfile.TemporaryDirectory):
+ def __init__(self,processes,**kwargs):self.processes=processes;super().__init__(**kwargs)
+ def __exit__(self,*args):
+  for process in reversed(self.processes):
+   if process.poll() is None:
+    process.terminate()
+    try:process.wait(timeout=5)
+    except Exception:process.kill();process.wait()
+  return super().__exit__(*args)

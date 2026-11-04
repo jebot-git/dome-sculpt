@@ -13,7 +13,7 @@ from dbus_next import Variant
 from dbus_next.aio import MessageBus
 from Xlib import X, XK, display, error
 from Xlib.ext import xtest
-from bake_widgets import BakeWidgets
+from bake_widgets import BakeWidgets,BakeHome
 from PIL import Image
 
 signal.pthread_sigmask(signal.SIG_SETMASK, [])
@@ -53,7 +53,7 @@ async def wait(operation, seconds=30):
 async def main():
     bus = await MessageBus().connect()
     await bus.request_name("com.canonical.AppMenu.Registrar")
-    with tempfile.TemporaryDirectory(prefix="dome-bake-policy-menu-") as task_home:
+    with BakeHome(processes,prefix="dome-bake-policy-menu-") as task_home:
         read, write = os.pipe()
         log = (OUT / "xvfb.log").open("w")
         processes.append(subprocess.Popen(["Xvfb", "-displayfd", str(write), "-screen", "0", "640x360x24" if COMPACT else "1280x1000x24", "-nolisten", "tcp"], pass_fds=(write,), stdout=log, stderr=log))
@@ -240,6 +240,7 @@ async def main():
             check(abs(receipt["accepted_angular_error"]-(.02 if COMPACT else .01975))<1e-6,"Visible degree-valued normal quality control persists its exact angular policy without offscreen wheel edits")
             await command("Undo");await command("Save");check(canonical(inspect())==original,"One universal Undo restores exact pre-normal-conversion state")
             await command("Redo");await command("Save");check(canonical(inspect())==accepted,"One universal Redo restores the complete explicit normal model and bake")
+            await command("Close Window");await wait(lambda:app.poll() is not None);check(app.returncode==0,"Native legacy bake workflow closes normally")
             connection.close();bus.disconnect();return
         if COMPACT:
             geometry=editor.get_geometry();check(geometry.width<=600 and geometry.height<=320,"Double-size color preparation options fit640x360")
@@ -271,6 +272,7 @@ async def main():
             check(accepted["objects"][target_index]["painted"]["baked"]["color_interpretation"]=="resolved-pbr" and sources(accepted)==sources(original),"Compact keyboard controls actually prepare and bake colors while preserving complete source data")
             check(abs(accepted["source_materials"]["color_preparations"][0]["receipt"]["accepted_projection_error"]-.04)<1e-6,"Scrolling the compact dialog never changes the hidden color tolerance")
             await command("Undo");await command("Save");check(canonical(inspect())==original,"Compact accepted preparation and normal bake undo exactly through the universal menu")
+            await command("Close Window");await wait(lambda:app.poll() is not None);check(app.returncode==0,"Native legacy bake workflow closes normally")
             connection.close();bus.disconnect();return
         key("Return");await close_options();check(canonical(inspect())==original,"Default Return cancels color options without preparing or baking")
         editor=await open_options();g=editor.get_geometry();tap(editor,g.width*.75,g.height-48)

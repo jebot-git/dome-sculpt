@@ -13,7 +13,7 @@ from dbus_next import Variant
 from dbus_next.aio import MessageBus
 from Xlib import X, XK, display, error
 from Xlib.ext import xtest
-from bake_widgets import BakeWidgets
+from bake_widgets import BakeWidgets,BakeHome
 from PIL import Image
 
 signal.pthread_sigmask(signal.SIG_SETMASK, [])
@@ -49,7 +49,7 @@ async def wait(operation, seconds=30):
 async def main():
     bus = await MessageBus().connect()
     await bus.request_name("com.canonical.AppMenu.Registrar")
-    with tempfile.TemporaryDirectory(prefix="dome-bake-policy-menu-") as task_home:
+    with BakeHome(processes,prefix="dome-bake-policy-menu-") as task_home:
         read, write = os.pipe()
         log = (OUT / "xvfb.log").open("w")
         processes.append(subprocess.Popen(["Xvfb", "-displayfd", str(write), "-screen", "0", "640x360x24" if COMPACT else "1280x1000x24", "-nolisten", "tcp"], pass_fds=(write,), stdout=log, stderr=log))
@@ -195,6 +195,7 @@ async def main():
             check(before.crop((0,0,geometry.width,geometry.height-100)).tobytes()!=after.crop((0,0,geometry.width,geometry.height-100)).tobytes(),"Compact scrolling reaches projection policy while action buttons stay pinned")
             key("Control_L",True);key("w");key("Control_L",False);await close_options()
             check(app.poll() is None and canonical(inspect())==original,"Compact Ctrl+W cancels options and retains all baked data")
+            await command("Close Window");await wait(lambda:app.poll() is not None);check(app.returncode==0,"Native legacy bake workflow closes normally")
             connection.close();bus.disconnect();return
         key("Return");await close_options();check(canonical(inspect())==original,"Default Return cancels without starting a bake")
         editor=await open_options();g=editor.get_geometry();tap(editor,g.width*.75,g.height-48)
