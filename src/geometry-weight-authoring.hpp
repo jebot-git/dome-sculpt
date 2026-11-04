@@ -3,6 +3,7 @@
 #include "anatomical-continuation.hpp"
 #include "document-authority.hpp"
 #include "polygon-conversion.hpp"
+#include "geometry-field-packing.hpp"
 namespace dome::detail {
 struct GeometryWeightBindOptions {
   WeightLimits limits{};
@@ -270,6 +271,13 @@ author_geometry_weight_skin(Scene &scene, std::span<const uint64_t> targets,
       {work.maximum - work.used, bytes.maximum - bytes.used}, &support);
   work.step(fields.report.work);
   const size_t planned = bytes.used + fields.report.bytes;
+  // Fixed label-table/row scratch fits the existing64KiB packing allowance;
+  // per-raw output storage is unchanged and candidate heap storage is reduced.
+  std::optional<GeometryFieldPacker> packer;
+  if(options.locks.empty()&&options.limits.max_influences<=8&&
+     fields.joints.size()>options.limits.max_influences&&
+     32+16*options.limits.max_influences<=32*std::bit_width(fields.joints.size()+1))
+    packer.emplace(fields.joints,source.deformation->skeleton->bones.size(),options.limits,work);
   std::vector<std::pair<uint64_t, std::shared_ptr<const DeformationState>>>
       changed;
   changed.reserve(targets.size());
@@ -284,10 +292,16 @@ author_geometry_weight_skin(Scene &scene, std::span<const uint64_t> targets,
     skin.vertices.reserve(part->raw_to_row.size());
     bool differs = !o.deformation || !o.deformation->skin;
     for (size_t raw = 0; raw < part->raw_to_row.size(); ++raw) {
+      const auto row = part->raw_to_row[raw];
+      VertexWeights next;
+      if(packer){
+        if(fields.joints.empty()||fields.fields.size()%fields.joints.size()||row>=fields.fields.size()/fields.joints.size())
+          throw std::invalid_argument("Geometry field row/corner correspondence");
+        next=packer->pack(std::span<const double>(fields.fields).subspan(row*fields.joints.size(),fields.joints.size()),work);
+      }else{
       work.step(256 + 32 * fields.joints.size() *
                           std::bit_width(fields.joints.size() + 1));
       VertexWeights values;
-      const auto row = part->raw_to_row[raw];
       for (size_t j = 0; j < fields.joints.size(); ++j)
         if (fields.fields[row * fields.joints.size() + j] > 0 &&
             (options.locks.empty() || !options.locks[fields.joints[j]]))
@@ -298,9 +312,10 @@ author_geometry_weight_skin(Scene &scene, std::span<const uint64_t> targets,
         for (auto x : o.deformation->skin->vertices[raw])
           if (options.locks[x.joint])
             values.push_back(x);
-      auto next = normalize_weights(std::move(values),
+      next = normalize_weights(std::move(values),
                                     source.deformation->skeleton->bones.size(),
                                     options.locks, options.limits);
+      }
       if (o.deformation && o.deformation->skin &&
           equal_row(next, o.deformation->skin->vertices[raw]))
         skin.vertices.push_back(o.deformation->skin->vertices[raw]);

@@ -2,6 +2,7 @@
 #pragma once
 #include "bone-shadow-query.hpp"
 #include "geometry-rig-correspondence.hpp"
+#include "geometry-reference-replay.hpp"
 #include "heat-component-intent.hpp"
 #include "material-visibility-seams.hpp"
 #include "native-unused-source.hpp"
@@ -131,6 +132,8 @@ anatomical_continuation(const Scene &scene, uint64_t group,
     }
     size_t authority_workspace = 0;
     std::optional<ContinuationPart> reference_lease;
+    std::optional<GeometryReferenceReplay> reference_replay;
+    size_t reference_owner_bytes=0;
     if (declared && declared->reference) {
       if (!declared->world_metric)
         throw std::invalid_argument(
@@ -156,6 +159,8 @@ anatomical_continuation(const Scene &scene, uint64_t group,
       lease.volume_revision = r.volume->revision();
       lease.world = scene.world_matrix(r.id).matrix();
       reference_lease = std::move(lease);
+      reference_owner_bytes=owner_bytes;
+      reference_replay.emplace(reference_lease->object->deformation);
     }
     std::vector<const SculptObject *> objects;
     size_t raw_count = 0, corners = 0;
@@ -193,12 +198,14 @@ anatomical_continuation(const Scene &scene, uint64_t group,
           const auto current_world = scene.world_matrix(o.id);
           const auto change =
               current_world.inverse() * scene.world_matrix(r.id);
-          if (!geometry_reference_rig_matches(
-                  *r.deformation->skeleton, *o.deformation->skeleton, change,
+          size_t replay_workspace=0;
+          if (!reference_replay->matches(
+                  *o.deformation->skeleton, change,
                   current_world.matrix() == reference_lease->world, budget,
-                  limits.maximum_bytes, &authority_workspace))
+                  limits.maximum_bytes-reference_owner_bytes, &replay_workspace))
             throw std::invalid_argument("Existing target rig requires explicit "
                                         "exact reference correspondence");
+          authority_workspace=std::max(authority_workspace,reference_owner_bytes+replay_workspace);
           if (o.appearance && o.appearance->asset &&
               (!r.appearance || o.appearance->asset != r.appearance->asset ||
                o.appearance->asset.owner_before(r.appearance->asset) ||
@@ -249,6 +256,9 @@ anatomical_continuation(const Scene &scene, uint64_t group,
       raw_count += o.painted->mesh().positions.size();
       corners += o.painted->mesh().indices.size();
     }
+    // Reference replay is a source-capture temporary, not retained beside the
+    // later geometry/BVH/field solver allocations.
+    reference_replay.reset();
     if (!first || raw_count > 2'000'000 || corners > 12'000'000)
       throw std::length_error("Continuation source bounds");
     const auto *rig_source =
