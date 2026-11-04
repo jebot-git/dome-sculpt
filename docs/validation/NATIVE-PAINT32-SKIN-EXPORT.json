@@ -1,0 +1,3771 @@
+{
+  "runtime": "4b9ee9f88777fa5ba5fa21c4ffd7b1f3ef274b04",
+  "final_consumer": "fb4b4fd",
+  "parent_runtime": "1d573f2aa1f17f83bcc78533e130627c607fcf48",
+  "implementation": "Native retained paint coordinate export remaps real native skin/pose/IBM through exact emitted REST vertices; conservative skin storage preflight shared with capture. No fake normal frame receipt, public layout, Scene version or paint interpretation change. Four complete affected production TUs per actual Ninja dependency closure.",
+  "original_counter": "Original owning1d library actual public rest/posed native32 skin export rejects; original whole consumer10checks0 preserved. First compile active_id typo retained separately.",
+  "results": {
+    "initial": {
+      "release": {
+        "state": "terminal",
+        "pid": 2749828,
+        "source": "4b9ee9f88777fa5ba5fa21c4ffd7b1f3ef274b04",
+        "profile": "release",
+        "scope": "Complete four production TUs affected by two private headers and direct source change; whole five consumer TUs, exact current1d ABI/owned app+core/render/support archives and app relink. Only coordinate-native skin/pose/IBM adapter; morph-bearing native paint retains explicit unsupported shading guard. Not a fresh whole build, general deformation adapter, full regression, physical device or main admission.",
+        "parent": {
+          "state": "terminal",
+          "pid": 2645703,
+          "source": "1d573f2aa1f17f83bcc78533e130627c607fcf48",
+          "profile": "release",
+          "scope": "Actual fresh coherent current normal34/native32/VRM5310/anatomical319 source with all f7 source repairs/current palette/test fixes. Optimized Release ALL; sanitizer whole app/core/render/support/runtime and whole selected test consumers. No parent archive/object reuse. Original44 failures and matched repair followups preserved. HDR3 not admitted while real upstream C++ OOM leak is under owning-codec repair. Not main runtime/full-goal/HMD/vendor-compute qualification.",
+          "steps": [
+            {
+              "name": "configure",
+              "command": [
+                "cmake",
+                "-S",
+                "/home/blux/de-xr/dome-sculpt/artifacts/authoring-coherent-final-44b",
+                "-B",
+                "/home/blux/de-xr/dome-sculpt/artifacts/authoring-coherent-final-44b/build-coherent-final-release",
+                "-G",
+                "Ninja",
+                "-DCMAKE_BUILD_TYPE=Release",
+                "-DBUILD_TESTING=ON",
+                "-DCMAKE_EXPORT_COMPILE_COMMANDS=ON",
+                "-DDOME_COMPUTE_BACKEND=CPU",
+                "-DFLTK_DIR=/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-release/share/fltk",
+                "-DDOME_BUILD_UI=ON",
+                "-DDOME_BUILD_XR=ON",
+                "-U*DOME_BITMAP_RUNTIME*",
+                "-U*NATIVEGL*",
+                "-U*RENDERFONTS*"
+              ],
+              "exit_code": 0,
+              "seconds": 5.060898685012944
+            },
+            {
+              "name": "fresh-optimized-ALL",
+              "command": [
+                "nice",
+                "-n",
+                "15",
+                "cmake",
+                "--build",
+                "/home/blux/de-xr/dome-sculpt/artifacts/authoring-coherent-final-44b/build-coherent-final-release",
+                "--parallel",
+                "4"
+              ],
+              "exit_code": 0,
+              "seconds": 2139.436526167963
+            },
+            {
+              "name": "registered-selected",
+              "command": [
+                "nice",
+                "-n",
+                "15",
+                "ctest",
+                "--test-dir",
+                "/home/blux/de-xr/dome-sculpt/artifacts/authoring-coherent-final-44b/build-coherent-final-release",
+                "-R",
+                "^(authoring-native-normal-union|vrm1-(expression-(layer-(authoring|render)|palette)|colour-layer-(authoring|render)|painted-(authoring|render)|source-export)|native-paint32-(fixture|render|export|contracts)|native-paint-sampling(-transitions)?|layered-normal-(native|uv-native|render|uv-safety)|canonical-(normal-uv|native-pose)|baked-normal-field|emission-controls|xr-editable-export|skin-normal-transport|zero-morph-rest|bake-recipes|geometry-(reference-replay|field-packing)|anatomical-(admission-controls|kernel-faults))$",
+                "--output-on-failure"
+              ],
+              "exit_code": 0,
+              "seconds": 30.50535315601155
+            }
+          ],
+          "phase": "registered-selected",
+          "child_pid": 2026818,
+          "registered_all_tests": 689,
+          "selected_tests": [
+            "vrm1-source-export",
+            "vrm1-background-fixture",
+            "vrm1-expression-layer-authoring",
+            "vrm1-expression-layer-render",
+            "vrm1-colour-layer-authoring",
+            "vrm1-colour-layer-render",
+            "vrm1-expression-palette",
+            "vrm1-painted-authoring",
+            "vrm1-painted-render",
+            "xr-editable-export",
+            "zero-morph-rest",
+            "skin-normal-transport",
+            "bake-recipes",
+            "baked-normal-field",
+            "canonical-native-pose",
+            "canonical-normal-uv",
+            "layered-normal-uv-safety",
+            "layered-normal-uv-native",
+            "layered-normal-render",
+            "layered-normal-native",
+            "emission-controls",
+            "native-paint-sampling",
+            "native-paint-sampling-transitions",
+            "native-paint32-render",
+            "native-paint32-export",
+            "native-paint32-fixture",
+            "native-paint32-contracts",
+            "authoring-native-normal-union",
+            "anatomical-admission-controls",
+            "geometry-reference-replay",
+            "geometry-field-packing",
+            "anatomical-kernel-faults"
+          ],
+          "artifacts": {
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-coherent-final-44b/build-coherent-final-release/dome-sculpt": "d79e8391625be835301894e61812d9f6361e8bf68b3c3bdf4b123a292fa10502",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-coherent-final-44b/build-coherent-final-release/libdome-sculpt-affine.a": "fe52047c8df6de986fdfb2c063996a4dafdea6929d5570b6507a8ee75c04df0d",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-coherent-final-44b/build-coherent-final-release/libmikktspace.a": "a9038585692a40d703abccdb85428afbe627caf2c6c56f2f6c0790a2f3d0eef4",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-coherent-final-44b/build-coherent-final-release/libmikktspace-robust.a": "feb95a693be20df84c388c9bae935434ee4330d78558de79d704364206f99af7",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-coherent-final-44b/build-coherent-final-release/libxatlas.a": "1d0f3b3a374735cc6a8fab741d8afbd356948fd0d8cde1fd2b87f96019421755",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-coherent-final-44b/build-coherent-final-release/libdome-sculpt-polygon.a": "d7586f1fbf183f3b0d3295eb7f75b52c6c88653963d93f899461bfd6b89c48b6",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-coherent-final-44b/build-coherent-final-release/libufbx.a": "770295a53d75b4c8cbedb84857173c773e599b10e7647abc4c66ec60f6492b95",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-coherent-final-44b/build-coherent-final-release/libdome-sculpt-emission-codec.a": "3edf828b53b7b8457d70459c55775b27defc5ad0bfb34708fb8948799c37127b",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-coherent-final-44b/build-coherent-final-release/libdome-sculpt-spacenav.a": "03382f8966b17d72f4497ec8d37680290968bcaf45b18db97a445e2280e3a8eb",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-coherent-final-44b/build-coherent-final-release/libdome-sculpt-core.a": "3dbb898e5d5af306c539e418843f7939f9a4ca0a1fb62e0bcbccb190de2f074a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-coherent-final-44b/build-coherent-final-release/libdome-sculpt-render.a": "c82db114f309614c49ae2a717c70b45f4303070c6a79b53c9086410d2ebce0df",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-coherent-final-44b/build-coherent-final-release/libdome-sculpt-xr.a": "7a92d0200896bb27c1530c81cee28d2bb794a9133bdb2554c06ffbef838805b4",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-coherent-final-44b/build-coherent-final-release/libdome-sculpt-test-runtime.so": "400f02ae0f995d8a9e32e83d7e57cb525047b13e66bcd952900fb6bfb923b4b7"
+          },
+          "exit_code": 0,
+          "seconds": 2175.148182029021,
+          "inputs": 2537,
+          "drift": []
+        },
+        "steps": [
+          {
+            "name": "compile-normal-preparation.cpp",
+            "command": [
+              "/usr/bin/c++",
+              "-DDOME_SCULPT_INSTALLED_ASSETS=\"/usr/local/share/dome-sculpt/assets/humanoid\"",
+              "-DDOME_SCULPT_SOURCE_ASSETS=\"/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/assets/humanoid\"",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/third_party",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/third_party/cgltf",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/third_party/nlohmann",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/third_party/xatlas",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/third_party/mikktspace",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/third_party/ufbx",
+              "-O3",
+              "-DNDEBUG",
+              "-std=gnu++20",
+              "-Wall",
+              "-Wextra",
+              "-Wpedantic",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/artifacts/skin-proof/release/normal-preparation.cpp.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/src/normal-preparation.cpp"
+            ],
+            "exit_code": 0,
+            "seconds": 6.63790784298908
+          },
+          {
+            "name": "compile-export.cpp",
+            "command": [
+              "/usr/bin/c++",
+              "-DDOME_SCULPT_INSTALLED_ASSETS=\"/usr/local/share/dome-sculpt/assets/humanoid\"",
+              "-DDOME_SCULPT_SOURCE_ASSETS=\"/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/assets/humanoid\"",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/third_party",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/third_party/cgltf",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/third_party/nlohmann",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/third_party/xatlas",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/third_party/mikktspace",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/third_party/ufbx",
+              "-O3",
+              "-DNDEBUG",
+              "-std=gnu++20",
+              "-Wall",
+              "-Wextra",
+              "-Wpedantic",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/artifacts/skin-proof/release/export.cpp.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/src/export.cpp"
+            ],
+            "exit_code": 0,
+            "seconds": 41.86595321097411
+          },
+          {
+            "name": "compile-vrm1-export.cpp",
+            "command": [
+              "/usr/bin/c++",
+              "-DDOME_SCULPT_INSTALLED_ASSETS=\"/usr/local/share/dome-sculpt/assets/humanoid\"",
+              "-DDOME_SCULPT_SOURCE_ASSETS=\"/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/assets/humanoid\"",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/third_party",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/third_party/cgltf",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/third_party/nlohmann",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/third_party/xatlas",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/third_party/mikktspace",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/third_party/ufbx",
+              "-O3",
+              "-DNDEBUG",
+              "-std=gnu++20",
+              "-Wall",
+              "-Wextra",
+              "-Wpedantic",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/artifacts/skin-proof/release/vrm1-export.cpp.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/src/vrm1-export.cpp"
+            ],
+            "exit_code": 0,
+            "seconds": 18.082298714027274
+          },
+          {
+            "name": "compile-native-authoring-compiler.cpp",
+            "command": [
+              "/usr/bin/c++",
+              "-DDOME_SCULPT_INSTALLED_ASSETS=\"/usr/local/share/dome-sculpt/assets/humanoid\"",
+              "-DDOME_SCULPT_SOURCE_ASSETS=\"/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/assets/humanoid\"",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/third_party",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/third_party/cgltf",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/third_party/nlohmann",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/third_party/xatlas",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/third_party/mikktspace",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/third_party/ufbx",
+              "-O3",
+              "-DNDEBUG",
+              "-std=gnu++20",
+              "-Wall",
+              "-Wextra",
+              "-Wpedantic",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/artifacts/skin-proof/release/native-authoring-compiler.cpp.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/src/native-authoring-compiler.cpp"
+            ],
+            "exit_code": 0,
+            "seconds": 11.987549213983584
+          },
+          {
+            "name": "archive",
+            "command": [
+              "ar",
+              "r",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/artifacts/skin-proof/release/libdome-sculpt-core.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/artifacts/skin-proof/release/normal-preparation.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/artifacts/skin-proof/release/export.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/artifacts/skin-proof/release/vrm1-export.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/artifacts/skin-proof/release/native-authoring-compiler.cpp.o"
+            ],
+            "exit_code": 0,
+            "seconds": 0.2181547919753939
+          },
+          {
+            "name": "compile-dome-sculpt-native-paint32-skin-export-test",
+            "command": [
+              "/usr/bin/c++",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/src",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/third_party/cgltf",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/third_party/nlohmann",
+              "-isystem",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/harfbuzz",
+              "-isystem",
+              "/usr/include/glib-2.0",
+              "-isystem",
+              "/usr/lib64/glib-2.0/include",
+              "-isystem",
+              "/usr/include/sysprof-6",
+              "-isystem",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/freetype2",
+              "-isystem",
+              "/usr/include/libpng16",
+              "-isystem",
+              "/usr/include/libxml2",
+              "-O3",
+              "-DNDEBUG",
+              "-std=gnu++20",
+              "-pthread",
+              "-DWITH_GZFILEOP",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/artifacts/skin-proof/release/dome-sculpt-native-paint32-skin-export-test.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/tests/native-paint32-skin-export.cpp"
+            ],
+            "exit_code": 0,
+            "seconds": 33.25129003904294
+          },
+          {
+            "name": "link-dome-sculpt-native-paint32-skin-export-test",
+            "command": [
+              "/usr/bin/c++",
+              "-O3",
+              "-DNDEBUG",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/artifacts/skin-proof/release/dome-sculpt-native-paint32-skin-export-test.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/artifacts/skin-proof/release/dome-sculpt-native-paint32-skin-export-test",
+              "-Wl,-rpath,/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib",
+              "libdome-sculpt-render.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/artifacts/skin-proof/release/libdome-sculpt-core.a",
+              "libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "libdome-sculpt-polygon.a",
+              "libxatlas.a",
+              "libmikktspace.a",
+              "libmikktspace-robust.a",
+              "libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libharfbuzz.so",
+              "/usr/lib64/libEGL.so",
+              "/usr/lib64/libGL.so",
+              "/usr/lib64/libfontconfig.so",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libfreetype.so",
+              "/usr/lib64/libicui18n.so",
+              "/usr/lib64/libicuuc.so",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit_code": 0,
+            "seconds": 0.5378301670425572
+          },
+          {
+            "name": "compile-dome-sculpt-native-paint32-export-test",
+            "command": [
+              "/usr/bin/c++",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/src",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/third_party/cgltf",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/third_party/nlohmann",
+              "-isystem",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/harfbuzz",
+              "-isystem",
+              "/usr/include/glib-2.0",
+              "-isystem",
+              "/usr/lib64/glib-2.0/include",
+              "-isystem",
+              "/usr/include/sysprof-6",
+              "-isystem",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/freetype2",
+              "-isystem",
+              "/usr/include/libpng16",
+              "-isystem",
+              "/usr/include/libxml2",
+              "-O3",
+              "-DNDEBUG",
+              "-std=gnu++20",
+              "-pthread",
+              "-DWITH_GZFILEOP",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/artifacts/skin-proof/release/dome-sculpt-native-paint32-export-test.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/tests/native-paint32-export.cpp"
+            ],
+            "exit_code": 0,
+            "seconds": 32.890182312054094
+          },
+          {
+            "name": "link-dome-sculpt-native-paint32-export-test",
+            "command": [
+              "/usr/bin/c++",
+              "-O3",
+              "-DNDEBUG",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/artifacts/skin-proof/release/dome-sculpt-native-paint32-export-test.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/artifacts/skin-proof/release/dome-sculpt-native-paint32-export-test",
+              "-Wl,-rpath,/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib",
+              "libdome-sculpt-render.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/artifacts/skin-proof/release/libdome-sculpt-core.a",
+              "libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "libdome-sculpt-polygon.a",
+              "libxatlas.a",
+              "libmikktspace.a",
+              "libmikktspace-robust.a",
+              "libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libharfbuzz.so",
+              "/usr/lib64/libEGL.so",
+              "/usr/lib64/libGL.so",
+              "/usr/lib64/libfontconfig.so",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libfreetype.so",
+              "/usr/lib64/libicui18n.so",
+              "/usr/lib64/libicuuc.so",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit_code": 0,
+            "seconds": 0.6692165230051614
+          },
+          {
+            "name": "compile-dome-sculpt-skin-affine-export-test",
+            "command": [
+              "/usr/bin/c++",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/third_party/cgltf",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/third_party/nlohmann",
+              "-O3",
+              "-DNDEBUG",
+              "-std=gnu++20",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/artifacts/skin-proof/release/dome-sculpt-skin-affine-export-test.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/tests/skin-affine-export.cpp"
+            ],
+            "exit_code": 0,
+            "seconds": 7.6711508220178075
+          },
+          {
+            "name": "link-dome-sculpt-skin-affine-export-test",
+            "command": [
+              "/usr/bin/c++",
+              "-O3",
+              "-DNDEBUG",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/artifacts/skin-proof/release/dome-sculpt-skin-affine-export-test.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/artifacts/skin-proof/release/dome-sculpt-skin-affine-export-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/artifacts/skin-proof/release/libdome-sculpt-core.a",
+              "libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "libdome-sculpt-polygon.a",
+              "libxatlas.a",
+              "libmikktspace.a",
+              "libmikktspace-robust.a",
+              "libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit_code": 0,
+            "seconds": 0.5552236320218071
+          },
+          {
+            "name": "compile-dome-sculpt-source-union-authoring-test",
+            "command": [
+              "/usr/bin/c++",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/src",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/tests",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/third_party/cgltf",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/third_party/desktop",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/third_party/nlohmann",
+              "-isystem",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/harfbuzz",
+              "-isystem",
+              "/usr/include/glib-2.0",
+              "-isystem",
+              "/usr/lib64/glib-2.0/include",
+              "-isystem",
+              "/usr/include/sysprof-6",
+              "-isystem",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/freetype2",
+              "-isystem",
+              "/usr/include/libpng16",
+              "-isystem",
+              "/usr/include/libxml2",
+              "-O3",
+              "-DNDEBUG",
+              "-std=gnu++20",
+              "-pthread",
+              "-DWITH_GZFILEOP",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/artifacts/skin-proof/release/dome-sculpt-source-union-authoring-test.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/tests/source-union-authoring.cpp"
+            ],
+            "exit_code": 0,
+            "seconds": 32.422604012012016
+          },
+          {
+            "name": "link-dome-sculpt-source-union-authoring-test",
+            "command": [
+              "/usr/bin/c++",
+              "-O3",
+              "-DNDEBUG",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/artifacts/skin-proof/release/dome-sculpt-source-union-authoring-test.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/artifacts/skin-proof/release/dome-sculpt-source-union-authoring-test",
+              "-Wl,-rpath,/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib",
+              "libdome-sculpt-render.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/artifacts/skin-proof/release/libdome-sculpt-core.a",
+              "libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "libdome-sculpt-polygon.a",
+              "libxatlas.a",
+              "libmikktspace.a",
+              "libmikktspace-robust.a",
+              "libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libharfbuzz.so",
+              "/usr/lib64/libEGL.so",
+              "/usr/lib64/libGL.so",
+              "/usr/lib64/libfontconfig.so",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libfreetype.so",
+              "/usr/lib64/libicui18n.so",
+              "/usr/lib64/libicuuc.so",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit_code": 0,
+            "seconds": 0.762696769030299
+          },
+          {
+            "name": "compile-dome-sculpt-authoring-native-normal-union-test",
+            "command": [
+              "/usr/bin/c++",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/src",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/tests",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/third_party/cgltf",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/third_party/nlohmann",
+              "-isystem",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/harfbuzz",
+              "-isystem",
+              "/usr/include/glib-2.0",
+              "-isystem",
+              "/usr/lib64/glib-2.0/include",
+              "-isystem",
+              "/usr/include/sysprof-6",
+              "-isystem",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/freetype2",
+              "-isystem",
+              "/usr/include/libpng16",
+              "-isystem",
+              "/usr/include/libxml2",
+              "-O3",
+              "-DNDEBUG",
+              "-std=gnu++20",
+              "-pthread",
+              "-DWITH_GZFILEOP",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/artifacts/skin-proof/release/dome-sculpt-authoring-native-normal-union-test.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/tests/authoring-native-normal-union.cpp"
+            ],
+            "exit_code": 0,
+            "seconds": 33.04517144599231
+          },
+          {
+            "name": "link-dome-sculpt-authoring-native-normal-union-test",
+            "command": [
+              "/usr/bin/c++",
+              "-O3",
+              "-DNDEBUG",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/artifacts/skin-proof/release/dome-sculpt-authoring-native-normal-union-test.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/artifacts/skin-proof/release/dome-sculpt-authoring-native-normal-union-test",
+              "-Wl,-rpath,/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib",
+              "libdome-sculpt-render.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/artifacts/skin-proof/release/libdome-sculpt-core.a",
+              "libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "libdome-sculpt-polygon.a",
+              "libxatlas.a",
+              "libmikktspace.a",
+              "libmikktspace-robust.a",
+              "libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libharfbuzz.so",
+              "/usr/lib64/libEGL.so",
+              "/usr/lib64/libGL.so",
+              "/usr/lib64/libfontconfig.so",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libfreetype.so",
+              "/usr/lib64/libicui18n.so",
+              "/usr/lib64/libicuuc.so",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit_code": 0,
+            "seconds": 0.6122374850092456
+          },
+          {
+            "name": "link-dome-sculpt",
+            "command": [
+              "/usr/bin/c++",
+              "-O3",
+              "-DNDEBUG",
+              "CMakeFiles/dome-sculpt.dir/src/native-display-runtime.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/vrm-expression-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/rig-fit-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/projection-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/spacenav-options.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/app.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/polygon-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/import-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/procedural-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/resolution-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/sculpt-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/creator-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/rig-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/shapekey-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/weight-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/skin-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/mesh-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/bake-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/object-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/paint-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/uv-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/ui-conventions.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/session-appearance.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/export-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/third_party/desktop/desktop-menu.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/appmenu-protocol.c.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/artifacts/skin-proof/release/dome-sculpt",
+              "-L/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-release/lib",
+              "-L/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib",
+              "-Wl,-rpath,/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-release/lib:/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib:",
+              "libdome-sculpt-spacenav.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/artifacts/skin-proof/release/libdome-sculpt-core.a",
+              "libdome-sculpt-render.a",
+              "/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-release/lib/libfltk_images.so.1.4.5",
+              "/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-release/lib/libfltk_gl.so.1.4.5",
+              "/usr/lib64/libGLU.so",
+              "libdome-sculpt-xr.a",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libpng.so",
+              "/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-release/lib/libfltk.so.1.4.5",
+              "-lcairo",
+              "-L/usr/lib64",
+              "-lX11",
+              "-lGLU",
+              "-lGL",
+              "/usr/lib64/libdl.a",
+              "/usr/lib64/libSM.so",
+              "/usr/lib64/libICE.so",
+              "/usr/lib64/libXext.so",
+              "/usr/lib64/libXinerama.so",
+              "/usr/lib64/libXfixes.so",
+              "/usr/lib64/libXcursor.so",
+              "/usr/lib64/libXrender.so",
+              "/usr/lib64/libXft.so",
+              "/usr/lib64/libwayland-egl.so",
+              "/usr/lib64/libwayland-cursor.so",
+              "/usr/lib64/libxkbcommon.so",
+              "/usr/lib64/libGLX.so",
+              "/usr/lib64/libOpenGL.so",
+              "/usr/lib64/libz.so",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libcairo.so",
+              "libdome-sculpt-render.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/artifacts/skin-proof/release/libdome-sculpt-core.a",
+              "libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "libdome-sculpt-polygon.a",
+              "libxatlas.a",
+              "libmikktspace.a",
+              "libmikktspace-robust.a",
+              "libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "/usr/lib64/libEGL.so",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libharfbuzz.so",
+              "/usr/lib64/libGL.so",
+              "/usr/lib64/libfontconfig.so",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libfreetype.so",
+              "/usr/lib64/libicui18n.so",
+              "/usr/lib64/libicuuc.so",
+              "/usr/lib64/libopenxr_loader.so",
+              "/usr/lib64/libgio-2.0.so",
+              "/usr/lib64/libgobject-2.0.so",
+              "/usr/lib64/libglib-2.0.so",
+              "/usr/lib64/libX11.so",
+              "/usr/lib64/libwayland-client.so",
+              "-lm",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit_code": 0,
+            "seconds": 0.711713004973717
+          },
+          {
+            "name": "run-dome-sculpt-native-paint32-skin-export-test",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/artifacts/skin-proof/release/dome-sculpt-native-paint32-skin-export-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/artifacts/skin-proof/release/dome-sculpt-native-paint32-skin-export-test-outputs"
+            ],
+            "exit_code": 0,
+            "seconds": 0.3141453160205856
+          },
+          {
+            "name": "run-dome-sculpt-native-paint32-export-test",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/artifacts/skin-proof/release/dome-sculpt-native-paint32-export-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/artifacts/skin-proof/release/dome-sculpt-native-paint32-export-test-outputs"
+            ],
+            "exit_code": 0,
+            "seconds": 1.5530129570397548
+          },
+          {
+            "name": "run-dome-sculpt-skin-affine-export-test",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/artifacts/skin-proof/release/dome-sculpt-skin-affine-export-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/artifacts/skin-proof/release/dome-sculpt-skin-affine-export-test-outputs"
+            ],
+            "exit_code": 0,
+            "seconds": 0.053666041989345104
+          },
+          {
+            "name": "run-dome-sculpt-source-union-authoring-test",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/artifacts/skin-proof/release/dome-sculpt-source-union-authoring-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/artifacts/skin-proof/release/dome-sculpt-source-union-authoring-test-outputs"
+            ],
+            "exit_code": 0,
+            "seconds": 38.804652160964906
+          },
+          {
+            "name": "run-dome-sculpt-authoring-native-normal-union-test",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/artifacts/skin-proof/release/dome-sculpt-authoring-native-normal-union-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/artifacts/skin-proof/release/dome-sculpt-authoring-native-normal-union-test-outputs"
+            ],
+            "exit_code": 2,
+            "seconds": 0.019925865984987468
+          }
+        ],
+        "phase": "run-dome-sculpt-authoring-native-normal-union-test",
+        "child_pid": 2780325,
+        "error": "run-dome-sculpt-authoring-native-normal-union-test failed 2",
+        "exit_code": 1,
+        "seconds": 262.84608033503173,
+        "inputs": 2583,
+        "drift": [],
+        "artifacts": {
+          "/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/artifacts/skin-proof/release/libdome-sculpt-core.a": "0656fd2a2d211201df74553081b1b362ba5dff244f9d23c043121b2dc4a74d7f",
+          "/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/artifacts/skin-proof/release/dome-sculpt-native-paint32-skin-export-test": "9e6b96e8bf878851ffabb6fd3e7725f0280ac89f146865ce1d977c3f50fec673",
+          "/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/artifacts/skin-proof/release/dome-sculpt-native-paint32-export-test": "19f7ecd3f44f9e2e0be83070e6f5510ca33593fae3577f5503ef72e2a114358a",
+          "/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/artifacts/skin-proof/release/dome-sculpt-skin-affine-export-test": "519b79afebb8a62537a74f97322b43bf1bcb5769741cad8db8222ed62d382d63",
+          "/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/artifacts/skin-proof/release/dome-sculpt-source-union-authoring-test": "da4688bf9e2b6bde27fcc3f470c4fde7cd9b8a300db8d5186be6eed697fa6d7d",
+          "/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/artifacts/skin-proof/release/dome-sculpt-authoring-native-normal-union-test": "031a691654eaf0943ced20866f36314a0b9aa1dd70fb8b439b8071332f889e52",
+          "/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/artifacts/skin-proof/release/dome-sculpt": "645ce6d257a2aef7cf8c2f58f71f373250d7113e41af64ad50bcba20ea434e02"
+        }
+      },
+      "sanitize": {
+        "state": "terminal",
+        "pid": 2749964,
+        "source": "4b9ee9f88777fa5ba5fa21c4ffd7b1f3ef274b04",
+        "profile": "sanitize",
+        "scope": "Complete four production TUs affected by two private headers and direct source change; whole five consumer TUs, exact current1d ABI/owned app+core/render/support archives and app relink. Only coordinate-native skin/pose/IBM adapter; morph-bearing native paint retains explicit unsupported shading guard. Not a fresh whole build, general deformation adapter, full regression, physical device or main admission.",
+        "parent": {
+          "state": "terminal",
+          "pid": 2645706,
+          "source": "1d573f2aa1f17f83bcc78533e130627c607fcf48",
+          "profile": "sanitize",
+          "scope": "Actual fresh coherent current normal34/native32/VRM5310/anatomical319 source with all f7 source repairs/current palette/test fixes. Optimized Release ALL; sanitizer whole app/core/render/support/runtime and whole selected test consumers. No parent archive/object reuse. Original44 failures and matched repair followups preserved. HDR3 not admitted while real upstream C++ OOM leak is under owning-codec repair. Not main runtime/full-goal/HMD/vendor-compute qualification.",
+          "steps": [
+            {
+              "name": "configure",
+              "command": [
+                "cmake",
+                "-S",
+                "/home/blux/de-xr/dome-sculpt/artifacts/authoring-coherent-final-44b",
+                "-B",
+                "/home/blux/de-xr/dome-sculpt/artifacts/authoring-coherent-final-44b/build-coherent-final-sanitize",
+                "-G",
+                "Ninja",
+                "-DCMAKE_BUILD_TYPE=Release",
+                "-DBUILD_TESTING=ON",
+                "-DCMAKE_EXPORT_COMPILE_COMMANDS=ON",
+                "-DDOME_COMPUTE_BACKEND=CPU",
+                "-DFLTK_DIR=/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-sanitize/share/fltk",
+                "-DDOME_BUILD_UI=ON",
+                "-DDOME_BUILD_XR=ON",
+                "-U*DOME_BITMAP_RUNTIME*",
+                "-U*NATIVEGL*",
+                "-U*RENDERFONTS*",
+                "-DCMAKE_C_FLAGS_RELEASE=-O1 -g1 -DNDEBUG -fsanitize=address,undefined -fno-omit-frame-pointer",
+                "-DCMAKE_CXX_FLAGS_RELEASE=-O1 -g1 -DNDEBUG -fsanitize=address,undefined -fno-omit-frame-pointer"
+              ],
+              "exit_code": 0,
+              "seconds": 5.159636595053598
+            },
+            {
+              "name": "fresh-owning-app-and-consumers",
+              "command": [
+                "nice",
+                "-n",
+                "15",
+                "cmake",
+                "--build",
+                "/home/blux/de-xr/dome-sculpt/artifacts/authoring-coherent-final-44b/build-coherent-final-sanitize",
+                "-j2",
+                "--target",
+                "dome-sculpt",
+                "dome-sculpt-test-runtime",
+                "dome-sculpt-anatomical-admission-controls-test",
+                "dome-sculpt-anatomical-kernel-faults-test",
+                "dome-sculpt-authoring-native-normal-union-test",
+                "dome-sculpt-bake-recipes-test",
+                "dome-sculpt-baked-normal-field-test",
+                "dome-sculpt-canonical-native-pose-test",
+                "dome-sculpt-canonical-normal-uv-test",
+                "dome-sculpt-emission-controls-test",
+                "dome-sculpt-geometry-field-packing-test",
+                "dome-sculpt-geometry-reference-replay-test",
+                "dome-sculpt-layered-normal-native-test",
+                "dome-sculpt-layered-normal-render-test",
+                "dome-sculpt-layered-normal-uv-native-test",
+                "dome-sculpt-layered-normal-uv-safety-test",
+                "dome-sculpt-native-paint-sampling-test",
+                "dome-sculpt-native-paint-sampling-transitions-test",
+                "dome-sculpt-native-paint32-export-test",
+                "dome-sculpt-native-paint32-render-test",
+                "dome-sculpt-native-physical-contracts-test",
+                "dome-sculpt-skin-normal-transport-test",
+                "dome-sculpt-vrm1-background-fixture-test",
+                "dome-sculpt-vrm1-expression-layer-authoring-test",
+                "dome-sculpt-vrm1-expression-layer-render-test",
+                "dome-sculpt-vrm1-expression-palette-test",
+                "dome-sculpt-vrm1-painted-authoring-test",
+                "dome-sculpt-vrm1-painted-render-test",
+                "dome-sculpt-vrm1-source-export-test",
+                "dome-sculpt-xr-editable-export-test",
+                "dome-sculpt-zero-morph-rest-test"
+              ],
+              "exit_code": 0,
+              "seconds": 1531.317556664988
+            },
+            {
+              "name": "registered-selected",
+              "command": [
+                "nice",
+                "-n",
+                "15",
+                "ctest",
+                "--test-dir",
+                "/home/blux/de-xr/dome-sculpt/artifacts/authoring-coherent-final-44b/build-coherent-final-sanitize",
+                "-R",
+                "^(authoring-native-normal-union|vrm1-(expression-(layer-(authoring|render)|palette)|colour-layer-(authoring|render)|painted-(authoring|render)|source-export)|native-paint32-(fixture|render|export|contracts)|native-paint-sampling(-transitions)?|layered-normal-(native|uv-native|render|uv-safety)|canonical-(normal-uv|native-pose)|baked-normal-field|emission-controls|xr-editable-export|skin-normal-transport|zero-morph-rest|bake-recipes|geometry-(reference-replay|field-packing)|anatomical-(admission-controls|kernel-faults))$",
+                "--output-on-failure"
+              ],
+              "exit_code": 0,
+              "seconds": 176.3679144969792
+            }
+          ],
+          "phase": "registered-selected",
+          "child_pid": 77282,
+          "registered_all_tests": 689,
+          "selected_tests": [
+            "vrm1-source-export",
+            "vrm1-background-fixture",
+            "vrm1-expression-layer-authoring",
+            "vrm1-expression-layer-render",
+            "vrm1-colour-layer-authoring",
+            "vrm1-colour-layer-render",
+            "vrm1-expression-palette",
+            "vrm1-painted-authoring",
+            "vrm1-painted-render",
+            "xr-editable-export",
+            "zero-morph-rest",
+            "skin-normal-transport",
+            "bake-recipes",
+            "baked-normal-field",
+            "canonical-native-pose",
+            "canonical-normal-uv",
+            "layered-normal-uv-safety",
+            "layered-normal-uv-native",
+            "layered-normal-render",
+            "layered-normal-native",
+            "emission-controls",
+            "native-paint-sampling",
+            "native-paint-sampling-transitions",
+            "native-paint32-render",
+            "native-paint32-export",
+            "native-paint32-fixture",
+            "native-paint32-contracts",
+            "authoring-native-normal-union",
+            "anatomical-admission-controls",
+            "geometry-reference-replay",
+            "geometry-field-packing",
+            "anatomical-kernel-faults"
+          ],
+          "selected_fresh_targets": [
+            "dome-sculpt-anatomical-admission-controls-test",
+            "dome-sculpt-anatomical-kernel-faults-test",
+            "dome-sculpt-authoring-native-normal-union-test",
+            "dome-sculpt-bake-recipes-test",
+            "dome-sculpt-baked-normal-field-test",
+            "dome-sculpt-canonical-native-pose-test",
+            "dome-sculpt-canonical-normal-uv-test",
+            "dome-sculpt-emission-controls-test",
+            "dome-sculpt-geometry-field-packing-test",
+            "dome-sculpt-geometry-reference-replay-test",
+            "dome-sculpt-layered-normal-native-test",
+            "dome-sculpt-layered-normal-render-test",
+            "dome-sculpt-layered-normal-uv-native-test",
+            "dome-sculpt-layered-normal-uv-safety-test",
+            "dome-sculpt-native-paint-sampling-test",
+            "dome-sculpt-native-paint-sampling-transitions-test",
+            "dome-sculpt-native-paint32-export-test",
+            "dome-sculpt-native-paint32-render-test",
+            "dome-sculpt-native-physical-contracts-test",
+            "dome-sculpt-skin-normal-transport-test",
+            "dome-sculpt-vrm1-background-fixture-test",
+            "dome-sculpt-vrm1-expression-layer-authoring-test",
+            "dome-sculpt-vrm1-expression-layer-render-test",
+            "dome-sculpt-vrm1-expression-palette-test",
+            "dome-sculpt-vrm1-painted-authoring-test",
+            "dome-sculpt-vrm1-painted-render-test",
+            "dome-sculpt-vrm1-source-export-test",
+            "dome-sculpt-xr-editable-export-test",
+            "dome-sculpt-zero-morph-rest-test"
+          ],
+          "artifacts": {
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-coherent-final-44b/build-coherent-final-sanitize/dome-sculpt": "d96f1cfab9aa3f601d017fcfcb0df924704d9f6e5a41ddfd2f781c9b41e06d82",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-coherent-final-44b/build-coherent-final-sanitize/libdome-sculpt-affine.a": "edd7b48072f7da209c65eba3781051bc1f67ac12deba5ed510689542e15440ca",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-coherent-final-44b/build-coherent-final-sanitize/libxatlas.a": "b374d748f099da403d48c1f988bc155b1a48b334b89458ae3c7c9b6c7e66c9d3",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-coherent-final-44b/build-coherent-final-sanitize/libufbx.a": "f8ed112641c8394c09f4263dd1b50ef9f9690ae6917cad32e76caef6d5f8d0cb",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-coherent-final-44b/build-coherent-final-sanitize/libmikktspace.a": "212b51143eeab25aff176e12d81bc493f62846056016e89da66f9bca8590fb00",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-coherent-final-44b/build-coherent-final-sanitize/libmikktspace-robust.a": "423f1590ee1ae98a4fd927a10c8eb0be4a66c5fde9510f88f52147b305dc5497",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-coherent-final-44b/build-coherent-final-sanitize/libdome-sculpt-polygon.a": "e6ae20075ef0c7c5586d7a976b8d0f3141e9215b410eb2e0540fb8fdbfaaff6f",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-coherent-final-44b/build-coherent-final-sanitize/libdome-sculpt-emission-codec.a": "a17012e1c2b025285d5662f211f13ce3e370b5e9e5a2c56f4fef7fedb0ed7940",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-coherent-final-44b/build-coherent-final-sanitize/libdome-sculpt-spacenav.a": "553ba2ade6c0309bf0caab5608cc6a76cf4b508491cdd3c6c6eb836a9fe3e659",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-coherent-final-44b/build-coherent-final-sanitize/libdome-sculpt-core.a": "cbfae85d05ac5664d1a8fd01792cbb20acfaae6002208976dbed740872981791",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-coherent-final-44b/build-coherent-final-sanitize/libdome-sculpt-render.a": "8322b608d095292be92f5e28bd9fa1e435b67f07bc03041b1d5419b676b309a6",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-coherent-final-44b/build-coherent-final-sanitize/libdome-sculpt-xr.a": "f6886807c3ffbd460559f9a6da47805924fe8ba6d920535277eda8da2651cbb9",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-coherent-final-44b/build-coherent-final-sanitize/libdome-sculpt-test-runtime.so": "114c5180592cc9eb02d22e1bf077d6684bac8addf465a9fd71205b0ea74c7d0b"
+          },
+          "exit_code": 0,
+          "seconds": 1714.3263459739974,
+          "inputs": 2537,
+          "drift": []
+        },
+        "steps": [
+          {
+            "name": "compile-normal-preparation.cpp",
+            "command": [
+              "/usr/bin/c++",
+              "-DDOME_SCULPT_INSTALLED_ASSETS=\"/usr/local/share/dome-sculpt/assets/humanoid\"",
+              "-DDOME_SCULPT_SOURCE_ASSETS=\"/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/assets/humanoid\"",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/third_party",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/third_party/cgltf",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/third_party/nlohmann",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/third_party/xatlas",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/third_party/mikktspace",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/third_party/ufbx",
+              "-O1",
+              "-g1",
+              "-DNDEBUG",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "-std=gnu++20",
+              "-Wall",
+              "-Wextra",
+              "-Wpedantic",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/artifacts/skin-proof/sanitize/normal-preparation.cpp.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/src/normal-preparation.cpp"
+            ],
+            "exit_code": 0,
+            "seconds": 11.616158707998693
+          },
+          {
+            "name": "compile-export.cpp",
+            "command": [
+              "/usr/bin/c++",
+              "-DDOME_SCULPT_INSTALLED_ASSETS=\"/usr/local/share/dome-sculpt/assets/humanoid\"",
+              "-DDOME_SCULPT_SOURCE_ASSETS=\"/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/assets/humanoid\"",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/third_party",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/third_party/cgltf",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/third_party/nlohmann",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/third_party/xatlas",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/third_party/mikktspace",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/third_party/ufbx",
+              "-O1",
+              "-g1",
+              "-DNDEBUG",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "-std=gnu++20",
+              "-Wall",
+              "-Wextra",
+              "-Wpedantic",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/artifacts/skin-proof/sanitize/export.cpp.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/src/export.cpp"
+            ],
+            "exit_code": 0,
+            "seconds": 45.2123356499942
+          },
+          {
+            "name": "compile-vrm1-export.cpp",
+            "command": [
+              "/usr/bin/c++",
+              "-DDOME_SCULPT_INSTALLED_ASSETS=\"/usr/local/share/dome-sculpt/assets/humanoid\"",
+              "-DDOME_SCULPT_SOURCE_ASSETS=\"/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/assets/humanoid\"",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/third_party",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/third_party/cgltf",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/third_party/nlohmann",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/third_party/xatlas",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/third_party/mikktspace",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/third_party/ufbx",
+              "-O1",
+              "-g1",
+              "-DNDEBUG",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "-std=gnu++20",
+              "-Wall",
+              "-Wextra",
+              "-Wpedantic",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/artifacts/skin-proof/sanitize/vrm1-export.cpp.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/src/vrm1-export.cpp"
+            ],
+            "exit_code": 0,
+            "seconds": 33.86714824801311
+          },
+          {
+            "name": "compile-native-authoring-compiler.cpp",
+            "command": [
+              "/usr/bin/c++",
+              "-DDOME_SCULPT_INSTALLED_ASSETS=\"/usr/local/share/dome-sculpt/assets/humanoid\"",
+              "-DDOME_SCULPT_SOURCE_ASSETS=\"/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/assets/humanoid\"",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/third_party",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/third_party/cgltf",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/third_party/nlohmann",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/third_party/xatlas",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/third_party/mikktspace",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/third_party/ufbx",
+              "-O1",
+              "-g1",
+              "-DNDEBUG",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "-std=gnu++20",
+              "-Wall",
+              "-Wextra",
+              "-Wpedantic",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/artifacts/skin-proof/sanitize/native-authoring-compiler.cpp.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/src/native-authoring-compiler.cpp"
+            ],
+            "exit_code": 0,
+            "seconds": 25.339356216951273
+          },
+          {
+            "name": "archive",
+            "command": [
+              "ar",
+              "r",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/artifacts/skin-proof/sanitize/libdome-sculpt-core.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/artifacts/skin-proof/sanitize/normal-preparation.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/artifacts/skin-proof/sanitize/export.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/artifacts/skin-proof/sanitize/vrm1-export.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/artifacts/skin-proof/sanitize/native-authoring-compiler.cpp.o"
+            ],
+            "exit_code": 0,
+            "seconds": 2.677342905953992
+          },
+          {
+            "name": "compile-dome-sculpt-native-paint32-skin-export-test",
+            "command": [
+              "/usr/bin/c++",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/src",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/third_party/cgltf",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/third_party/nlohmann",
+              "-isystem",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/harfbuzz",
+              "-isystem",
+              "/usr/include/glib-2.0",
+              "-isystem",
+              "/usr/lib64/glib-2.0/include",
+              "-isystem",
+              "/usr/include/sysprof-6",
+              "-isystem",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/freetype2",
+              "-isystem",
+              "/usr/include/libpng16",
+              "-isystem",
+              "/usr/include/libxml2",
+              "-O1",
+              "-g1",
+              "-DNDEBUG",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "-std=gnu++20",
+              "-pthread",
+              "-DWITH_GZFILEOP",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/artifacts/skin-proof/sanitize/dome-sculpt-native-paint32-skin-export-test.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/tests/native-paint32-skin-export.cpp"
+            ],
+            "exit_code": 0,
+            "seconds": 47.32663719996344
+          },
+          {
+            "name": "link-dome-sculpt-native-paint32-skin-export-test",
+            "command": [
+              "/usr/bin/c++",
+              "-O1",
+              "-g1",
+              "-DNDEBUG",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/artifacts/skin-proof/sanitize/dome-sculpt-native-paint32-skin-export-test.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/artifacts/skin-proof/sanitize/dome-sculpt-native-paint32-skin-export-test",
+              "-Wl,-rpath,/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib",
+              "libdome-sculpt-render.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/artifacts/skin-proof/sanitize/libdome-sculpt-core.a",
+              "libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "libdome-sculpt-polygon.a",
+              "libxatlas.a",
+              "libmikktspace.a",
+              "libmikktspace-robust.a",
+              "libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libharfbuzz.so",
+              "/usr/lib64/libEGL.so",
+              "/usr/lib64/libGL.so",
+              "/usr/lib64/libfontconfig.so",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libfreetype.so",
+              "/usr/lib64/libicui18n.so",
+              "/usr/lib64/libicuuc.so",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit_code": 0,
+            "seconds": 5.163311999000143
+          },
+          {
+            "name": "compile-dome-sculpt-native-paint32-export-test",
+            "command": [
+              "/usr/bin/c++",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/src",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/third_party/cgltf",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/third_party/nlohmann",
+              "-isystem",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/harfbuzz",
+              "-isystem",
+              "/usr/include/glib-2.0",
+              "-isystem",
+              "/usr/lib64/glib-2.0/include",
+              "-isystem",
+              "/usr/include/sysprof-6",
+              "-isystem",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/freetype2",
+              "-isystem",
+              "/usr/include/libpng16",
+              "-isystem",
+              "/usr/include/libxml2",
+              "-O1",
+              "-g1",
+              "-DNDEBUG",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "-std=gnu++20",
+              "-pthread",
+              "-DWITH_GZFILEOP",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/artifacts/skin-proof/sanitize/dome-sculpt-native-paint32-export-test.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/tests/native-paint32-export.cpp"
+            ],
+            "exit_code": 0,
+            "seconds": 45.74257260200102
+          },
+          {
+            "name": "link-dome-sculpt-native-paint32-export-test",
+            "command": [
+              "/usr/bin/c++",
+              "-O1",
+              "-g1",
+              "-DNDEBUG",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/artifacts/skin-proof/sanitize/dome-sculpt-native-paint32-export-test.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/artifacts/skin-proof/sanitize/dome-sculpt-native-paint32-export-test",
+              "-Wl,-rpath,/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib",
+              "libdome-sculpt-render.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/artifacts/skin-proof/sanitize/libdome-sculpt-core.a",
+              "libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "libdome-sculpt-polygon.a",
+              "libxatlas.a",
+              "libmikktspace.a",
+              "libmikktspace-robust.a",
+              "libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libharfbuzz.so",
+              "/usr/lib64/libEGL.so",
+              "/usr/lib64/libGL.so",
+              "/usr/lib64/libfontconfig.so",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libfreetype.so",
+              "/usr/lib64/libicui18n.so",
+              "/usr/lib64/libicuuc.so",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit_code": 0,
+            "seconds": 5.138884978950955
+          },
+          {
+            "name": "compile-dome-sculpt-skin-affine-export-test",
+            "command": [
+              "/usr/bin/c++",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/third_party/cgltf",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/third_party/nlohmann",
+              "-O1",
+              "-g1",
+              "-DNDEBUG",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "-std=gnu++20",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/artifacts/skin-proof/sanitize/dome-sculpt-skin-affine-export-test.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/tests/skin-affine-export.cpp"
+            ],
+            "exit_code": 0,
+            "seconds": 18.218493670981843
+          },
+          {
+            "name": "link-dome-sculpt-skin-affine-export-test",
+            "command": [
+              "/usr/bin/c++",
+              "-O1",
+              "-g1",
+              "-DNDEBUG",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/artifacts/skin-proof/sanitize/dome-sculpt-skin-affine-export-test.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/artifacts/skin-proof/sanitize/dome-sculpt-skin-affine-export-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/artifacts/skin-proof/sanitize/libdome-sculpt-core.a",
+              "libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "libdome-sculpt-polygon.a",
+              "libxatlas.a",
+              "libmikktspace.a",
+              "libmikktspace-robust.a",
+              "libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit_code": 0,
+            "seconds": 4.5370904869632795
+          },
+          {
+            "name": "compile-dome-sculpt-source-union-authoring-test",
+            "command": [
+              "/usr/bin/c++",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/src",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/tests",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/third_party/cgltf",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/third_party/desktop",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/third_party/nlohmann",
+              "-isystem",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/harfbuzz",
+              "-isystem",
+              "/usr/include/glib-2.0",
+              "-isystem",
+              "/usr/lib64/glib-2.0/include",
+              "-isystem",
+              "/usr/include/sysprof-6",
+              "-isystem",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/freetype2",
+              "-isystem",
+              "/usr/include/libpng16",
+              "-isystem",
+              "/usr/include/libxml2",
+              "-O1",
+              "-g1",
+              "-DNDEBUG",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "-std=gnu++20",
+              "-pthread",
+              "-DWITH_GZFILEOP",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/artifacts/skin-proof/sanitize/dome-sculpt-source-union-authoring-test.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/tests/source-union-authoring.cpp"
+            ],
+            "exit_code": 0,
+            "seconds": 69.98156803898746
+          },
+          {
+            "name": "link-dome-sculpt-source-union-authoring-test",
+            "command": [
+              "/usr/bin/c++",
+              "-O1",
+              "-g1",
+              "-DNDEBUG",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/artifacts/skin-proof/sanitize/dome-sculpt-source-union-authoring-test.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/artifacts/skin-proof/sanitize/dome-sculpt-source-union-authoring-test",
+              "-Wl,-rpath,/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib",
+              "libdome-sculpt-render.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/artifacts/skin-proof/sanitize/libdome-sculpt-core.a",
+              "libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "libdome-sculpt-polygon.a",
+              "libxatlas.a",
+              "libmikktspace.a",
+              "libmikktspace-robust.a",
+              "libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libharfbuzz.so",
+              "/usr/lib64/libEGL.so",
+              "/usr/lib64/libGL.so",
+              "/usr/lib64/libfontconfig.so",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libfreetype.so",
+              "/usr/lib64/libicui18n.so",
+              "/usr/lib64/libicuuc.so",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit_code": 0,
+            "seconds": 4.22938618902117
+          },
+          {
+            "name": "compile-dome-sculpt-authoring-native-normal-union-test",
+            "command": [
+              "/usr/bin/c++",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/src",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/tests",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/third_party/cgltf",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/third_party/nlohmann",
+              "-isystem",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/harfbuzz",
+              "-isystem",
+              "/usr/include/glib-2.0",
+              "-isystem",
+              "/usr/lib64/glib-2.0/include",
+              "-isystem",
+              "/usr/include/sysprof-6",
+              "-isystem",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/freetype2",
+              "-isystem",
+              "/usr/include/libpng16",
+              "-isystem",
+              "/usr/include/libxml2",
+              "-O1",
+              "-g1",
+              "-DNDEBUG",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "-std=gnu++20",
+              "-pthread",
+              "-DWITH_GZFILEOP",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/artifacts/skin-proof/sanitize/dome-sculpt-authoring-native-normal-union-test.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/tests/authoring-native-normal-union.cpp"
+            ],
+            "exit_code": 0,
+            "seconds": 54.310251220013015
+          },
+          {
+            "name": "link-dome-sculpt-authoring-native-normal-union-test",
+            "command": [
+              "/usr/bin/c++",
+              "-O1",
+              "-g1",
+              "-DNDEBUG",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/artifacts/skin-proof/sanitize/dome-sculpt-authoring-native-normal-union-test.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/artifacts/skin-proof/sanitize/dome-sculpt-authoring-native-normal-union-test",
+              "-Wl,-rpath,/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib",
+              "libdome-sculpt-render.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/artifacts/skin-proof/sanitize/libdome-sculpt-core.a",
+              "libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "libdome-sculpt-polygon.a",
+              "libxatlas.a",
+              "libmikktspace.a",
+              "libmikktspace-robust.a",
+              "libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libharfbuzz.so",
+              "/usr/lib64/libEGL.so",
+              "/usr/lib64/libGL.so",
+              "/usr/lib64/libfontconfig.so",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libfreetype.so",
+              "/usr/lib64/libicui18n.so",
+              "/usr/lib64/libicuuc.so",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit_code": 0,
+            "seconds": 4.46416691999184
+          },
+          {
+            "name": "link-dome-sculpt",
+            "command": [
+              "/usr/bin/c++",
+              "-O1",
+              "-g1",
+              "-DNDEBUG",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "CMakeFiles/dome-sculpt.dir/src/native-display-runtime.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/vrm-expression-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/rig-fit-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/projection-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/spacenav-options.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/app.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/polygon-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/import-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/procedural-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/resolution-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/sculpt-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/creator-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/rig-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/shapekey-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/weight-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/skin-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/mesh-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/bake-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/object-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/paint-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/uv-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/ui-conventions.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/session-appearance.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/export-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/third_party/desktop/desktop-menu.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/appmenu-protocol.c.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/artifacts/skin-proof/sanitize/dome-sculpt",
+              "-L/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-sanitize/lib",
+              "-L/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib",
+              "-Wl,-rpath,/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-sanitize/lib:/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib:",
+              "libdome-sculpt-spacenav.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/artifacts/skin-proof/sanitize/libdome-sculpt-core.a",
+              "libdome-sculpt-render.a",
+              "/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-sanitize/lib/libfltk_images.so.1.4.5",
+              "/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-sanitize/lib/libfltk_gl.so.1.4.5",
+              "/usr/lib64/libGLU.so",
+              "libdome-sculpt-xr.a",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libpng.so",
+              "/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-sanitize/lib/libfltk.so.1.4.5",
+              "-lcairo",
+              "-L/usr/lib64",
+              "-lX11",
+              "-lGLU",
+              "-lGL",
+              "/usr/lib64/libdl.a",
+              "/usr/lib64/libSM.so",
+              "/usr/lib64/libICE.so",
+              "/usr/lib64/libXext.so",
+              "/usr/lib64/libXinerama.so",
+              "/usr/lib64/libXfixes.so",
+              "/usr/lib64/libXcursor.so",
+              "/usr/lib64/libXrender.so",
+              "/usr/lib64/libXft.so",
+              "/usr/lib64/libwayland-egl.so",
+              "/usr/lib64/libwayland-cursor.so",
+              "/usr/lib64/libxkbcommon.so",
+              "/usr/lib64/libGLX.so",
+              "/usr/lib64/libOpenGL.so",
+              "/usr/lib64/libz.so",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libcairo.so",
+              "libdome-sculpt-render.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/artifacts/skin-proof/sanitize/libdome-sculpt-core.a",
+              "libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "libdome-sculpt-polygon.a",
+              "libxatlas.a",
+              "libmikktspace.a",
+              "libmikktspace-robust.a",
+              "libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "/usr/lib64/libEGL.so",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libharfbuzz.so",
+              "/usr/lib64/libGL.so",
+              "/usr/lib64/libfontconfig.so",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libfreetype.so",
+              "/usr/lib64/libicui18n.so",
+              "/usr/lib64/libicuuc.so",
+              "/usr/lib64/libopenxr_loader.so",
+              "/usr/lib64/libgio-2.0.so",
+              "/usr/lib64/libgobject-2.0.so",
+              "/usr/lib64/libglib-2.0.so",
+              "/usr/lib64/libX11.so",
+              "/usr/lib64/libwayland-client.so",
+              "-lm",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit_code": 0,
+            "seconds": 4.0783881429815665
+          },
+          {
+            "name": "run-dome-sculpt-native-paint32-skin-export-test",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/artifacts/skin-proof/sanitize/dome-sculpt-native-paint32-skin-export-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/artifacts/skin-proof/sanitize/dome-sculpt-native-paint32-skin-export-test-outputs"
+            ],
+            "exit_code": 0,
+            "seconds": 1.3530706650344655
+          },
+          {
+            "name": "run-dome-sculpt-native-paint32-export-test",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/artifacts/skin-proof/sanitize/dome-sculpt-native-paint32-export-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/artifacts/skin-proof/sanitize/dome-sculpt-native-paint32-export-test-outputs"
+            ],
+            "exit_code": 0,
+            "seconds": 9.845932797994465
+          },
+          {
+            "name": "run-dome-sculpt-skin-affine-export-test",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/artifacts/skin-proof/sanitize/dome-sculpt-skin-affine-export-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/artifacts/skin-proof/sanitize/dome-sculpt-skin-affine-export-test-outputs"
+            ],
+            "exit_code": 0,
+            "seconds": 0.3771048950147815
+          },
+          {
+            "name": "run-dome-sculpt-source-union-authoring-test",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/artifacts/skin-proof/sanitize/dome-sculpt-source-union-authoring-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/artifacts/skin-proof/sanitize/dome-sculpt-source-union-authoring-test-outputs"
+            ],
+            "exit_code": 0,
+            "seconds": 370.4110080539831
+          },
+          {
+            "name": "run-dome-sculpt-authoring-native-normal-union-test",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/artifacts/skin-proof/sanitize/dome-sculpt-authoring-native-normal-union-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/artifacts/skin-proof/sanitize/dome-sculpt-authoring-native-normal-union-test-outputs"
+            ],
+            "exit_code": 2,
+            "seconds": 0.17534082202473655
+          }
+        ],
+        "phase": "run-dome-sculpt-authoring-native-normal-union-test",
+        "child_pid": 2839766,
+        "error": "run-dome-sculpt-authoring-native-normal-union-test failed 2",
+        "exit_code": 1,
+        "seconds": 764.2226146669709,
+        "inputs": 2581,
+        "drift": [],
+        "artifacts": {
+          "/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/artifacts/skin-proof/sanitize/libdome-sculpt-core.a": "cb167e295a2c26a64a612de769322467e2964d330c453a4912d76fa6c40fe191",
+          "/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/artifacts/skin-proof/sanitize/dome-sculpt-native-paint32-skin-export-test": "c2225001c4c364ec1fe21993ce840861f0b37f97b2fc2cc85159350400a137b7",
+          "/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/artifacts/skin-proof/sanitize/dome-sculpt-native-paint32-export-test": "fa23f2a3facf659bd8f233bf9d2d98763c88489768ece4079ce2c375fd3107ef",
+          "/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/artifacts/skin-proof/sanitize/dome-sculpt-skin-affine-export-test": "95b4ce95b54329fcb2dcbebea750f0bb8a9c25fefda914ddc9736ebe2c772d0d",
+          "/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/artifacts/skin-proof/sanitize/dome-sculpt-source-union-authoring-test": "72fca2e837f3adadb7612059159a731ceb0dca9f472f7a6a9690bb28adaeb6e7",
+          "/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/artifacts/skin-proof/sanitize/dome-sculpt-authoring-native-normal-union-test": "3ed3c9f945bd3cfa0aaf946fd8086364c4de31664167e732d2e257207d27a55e",
+          "/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/artifacts/skin-proof/sanitize/dome-sculpt": "513d88cf60a10c15bfb13cfa7e2ac33064fff2b427c708d1a9a1c5bb4da097ca"
+        }
+      }
+    },
+    "corrected": {
+      "release": {
+        "state": "terminal",
+        "pid": 2791900,
+        "source": "4b9ee9f88777fa5ba5fa21c4ffd7b1f3ef274b04",
+        "scope": "Explicit continuation of complete4TU/fivewholeconsumer matched current1d adapter build. Original wrapper1 is preserved: final mixed binary received one output argument but requires normalDir,uvDir,nativeFile,out and returned2 before executing. New actual invocation supplies all four real current1d producer arguments and own new output; app version follows. No source/core/consumer rebuild or original-relabel.",
+        "steps": [
+          {
+            "name": "mixed-correct-arguments",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/artifacts/skin-proof/release/dome-sculpt-authoring-native-normal-union-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-coherent-final-44b/build-coherent-final-release/layered-normal-native",
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-coherent-final-44b/build-coherent-final-release/layered-normal-uv-native",
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-coherent-final-44b/build-coherent-final-release/native-paint32-fixture.dsculpt",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/artifacts/skin-followup/release/mixed"
+            ],
+            "exit_code": 0,
+            "seconds": 1.5120023320196196
+          },
+          {
+            "name": "application-version",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/artifacts/skin-proof/release/dome-sculpt",
+              "--version"
+            ],
+            "exit_code": 0,
+            "seconds": 0.03296043100999668
+          }
+        ],
+        "phase": "application-version",
+        "child_pid": 2792303,
+        "exit_code": 0,
+        "seconds": 1.5464791880222037,
+        "inputs": 2610,
+        "drift": []
+      },
+      "sanitize": {
+        "state": "terminal",
+        "pid": 2845420,
+        "source": "4b9ee9f88777fa5ba5fa21c4ffd7b1f3ef274b04",
+        "scope": "Explicit continuation of complete4TU/fivewholeconsumer matched current1d adapter build. Original wrapper1 is preserved: final mixed binary received one output argument but requires normalDir,uvDir,nativeFile,out and returned2 before executing. New actual invocation supplies all four real current1d producer arguments and own new output; app version follows. No source/core/consumer rebuild or original-relabel.",
+        "steps": [
+          {
+            "name": "mixed-correct-arguments",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/artifacts/skin-proof/sanitize/dome-sculpt-authoring-native-normal-union-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-coherent-final-44b/build-coherent-final-sanitize/layered-normal-native",
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-coherent-final-44b/build-coherent-final-sanitize/layered-normal-uv-native",
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-coherent-final-44b/build-coherent-final-sanitize/native-paint32-fixture.dsculpt",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/artifacts/skin-followup/sanitize/mixed"
+            ],
+            "exit_code": 0,
+            "seconds": 7.96938239200972
+          },
+          {
+            "name": "application-version",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/artifacts/skin-proof/sanitize/dome-sculpt",
+              "--version"
+            ],
+            "exit_code": 0,
+            "seconds": 0.245312851970084
+          }
+        ],
+        "phase": "application-version",
+        "child_pid": 2847045,
+        "exit_code": 0,
+        "seconds": 8.21582317299908,
+        "inputs": 2610,
+        "drift": []
+      }
+    },
+    "final": {
+      "release": {
+        "state": "terminal",
+        "pid": 2855837,
+        "source": "fb4b4fd64174cd97557964890edad97a15407820",
+        "runtime": "4b9ee9f88777fa5ba5fa21c4ffd7b1f3ef274b04",
+        "scope": "Final whole consumer gains strict hardware flag and actual curved-morph failure/prior-file/dependentSave proof. Production4TU/runtime/ABI is exactly previously matched4b9; all original recorded inputs except this one test TU equal. All original wrapper negatives and correct mixed/app continuations remain. No fresh whole build/general morph adapter claim.",
+        "steps": [
+          {
+            "name": "compile",
+            "command": [
+              "/usr/bin/c++",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/src",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/third_party/cgltf",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/third_party/nlohmann",
+              "-isystem",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/harfbuzz",
+              "-isystem",
+              "/usr/include/glib-2.0",
+              "-isystem",
+              "/usr/lib64/glib-2.0/include",
+              "-isystem",
+              "/usr/include/sysprof-6",
+              "-isystem",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/freetype2",
+              "-isystem",
+              "/usr/include/libpng16",
+              "-isystem",
+              "/usr/include/libxml2",
+              "-O3",
+              "-DNDEBUG",
+              "-std=gnu++20",
+              "-pthread",
+              "-DWITH_GZFILEOP",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/artifacts/skin-final/release/consumer.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/tests/native-paint32-skin-export.cpp"
+            ],
+            "exit_code": 0,
+            "expected": 0,
+            "seconds": 30.79864648199873,
+            "fds": []
+          },
+          {
+            "name": "link",
+            "command": [
+              "/usr/bin/c++",
+              "-O3",
+              "-DNDEBUG",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/artifacts/skin-final/release/consumer.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/artifacts/skin-final/release/consumer",
+              "-Wl,-rpath,/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib",
+              "libdome-sculpt-render.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/artifacts/skin-proof/release/libdome-sculpt-core.a",
+              "libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "libdome-sculpt-polygon.a",
+              "libxatlas.a",
+              "libmikktspace.a",
+              "libmikktspace-robust.a",
+              "libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libharfbuzz.so",
+              "/usr/lib64/libEGL.so",
+              "/usr/lib64/libGL.so",
+              "/usr/lib64/libfontconfig.so",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libfreetype.so",
+              "/usr/lib64/libicui18n.so",
+              "/usr/lib64/libicuuc.so",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit_code": 0,
+            "expected": 0,
+            "seconds": 0.5161672480171546,
+            "fds": []
+          },
+          {
+            "name": "software",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/artifacts/skin-final/release/consumer",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/artifacts/skin-final/release/software"
+            ],
+            "exit_code": 0,
+            "expected": 0,
+            "seconds": 0.2647782750427723,
+            "fds": []
+          },
+          {
+            "name": "arc",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/artifacts/skin-final/release/consumer",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/artifacts/skin-final/release/arc",
+              "--hardware"
+            ],
+            "exit_code": 0,
+            "expected": 0,
+            "seconds": 0.34305887698428705,
+            "fds": [
+              "/dev/dri/renderD129"
+            ]
+          },
+          {
+            "name": "software-refusal",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/artifacts/skin-final/release/consumer",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/artifacts/skin-final/release/software-refusal",
+              "--hardware"
+            ],
+            "exit_code": 1,
+            "expected": 1,
+            "seconds": 0.07152611197670922,
+            "fds": []
+          }
+        ],
+        "phase": "software-refusal",
+        "child_pid": 2858911,
+        "exit_code": 0,
+        "seconds": 32.000577130005695,
+        "inputs": 2545,
+        "binary_sha256": "6632c5b1b8bc7a16381582e68e78cf2b29ccc72dcb348228c1273e2a1a7c046d",
+        "drift": []
+      },
+      "sanitize": {
+        "state": "terminal",
+        "pid": 2855938,
+        "source": "fb4b4fd64174cd97557964890edad97a15407820",
+        "runtime": "4b9ee9f88777fa5ba5fa21c4ffd7b1f3ef274b04",
+        "scope": "Final whole consumer gains strict hardware flag and actual curved-morph failure/prior-file/dependentSave proof. Production4TU/runtime/ABI is exactly previously matched4b9; all original recorded inputs except this one test TU equal. All original wrapper negatives and correct mixed/app continuations remain. No fresh whole build/general morph adapter claim.",
+        "steps": [
+          {
+            "name": "compile",
+            "command": [
+              "/usr/bin/c++",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/src",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/third_party/cgltf",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/third_party/nlohmann",
+              "-isystem",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/harfbuzz",
+              "-isystem",
+              "/usr/include/glib-2.0",
+              "-isystem",
+              "/usr/lib64/glib-2.0/include",
+              "-isystem",
+              "/usr/include/sysprof-6",
+              "-isystem",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/freetype2",
+              "-isystem",
+              "/usr/include/libpng16",
+              "-isystem",
+              "/usr/include/libxml2",
+              "-O1",
+              "-g1",
+              "-DNDEBUG",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "-std=gnu++20",
+              "-pthread",
+              "-DWITH_GZFILEOP",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/artifacts/skin-final/sanitize/consumer.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/tests/native-paint32-skin-export.cpp"
+            ],
+            "exit_code": 0,
+            "expected": 0,
+            "seconds": 39.76849250297528,
+            "fds": []
+          },
+          {
+            "name": "link",
+            "command": [
+              "/usr/bin/c++",
+              "-O1",
+              "-g1",
+              "-DNDEBUG",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/artifacts/skin-final/sanitize/consumer.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/artifacts/skin-final/sanitize/consumer",
+              "-Wl,-rpath,/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib",
+              "libdome-sculpt-render.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/artifacts/skin-proof/sanitize/libdome-sculpt-core.a",
+              "libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "libdome-sculpt-polygon.a",
+              "libxatlas.a",
+              "libmikktspace.a",
+              "libmikktspace-robust.a",
+              "libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libharfbuzz.so",
+              "/usr/lib64/libEGL.so",
+              "/usr/lib64/libGL.so",
+              "/usr/lib64/libfontconfig.so",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libfreetype.so",
+              "/usr/lib64/libicui18n.so",
+              "/usr/lib64/libicuuc.so",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit_code": 0,
+            "expected": 0,
+            "seconds": 3.3652292199549265,
+            "fds": []
+          },
+          {
+            "name": "software",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/artifacts/skin-final/sanitize/consumer",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/artifacts/skin-final/sanitize/software"
+            ],
+            "exit_code": 0,
+            "expected": 0,
+            "seconds": 1.593327748007141,
+            "fds": []
+          }
+        ],
+        "phase": "software",
+        "child_pid": 2860949,
+        "exit_code": 0,
+        "seconds": 44.730239505006466,
+        "inputs": 2545,
+        "binary_sha256": "70d266279d7bb1ff24e3dd0a09f3a30ed75afaf891a451a66d1e2f564858e1cb",
+        "drift": []
+      }
+    }
+  },
+  "interop": {
+    "validator": "2.0.0-dev.3.10",
+    "scope": "All actual new native paint skin writer GLBs; unfiltered maxIssues0 messages. Not a claim for inherited output cohorts or general VRM support.",
+    "files": 12,
+    "errors": 0,
+    "warnings": 12,
+    "infos": 24,
+    "records": [
+      {
+        "profile": "release",
+        "file": "/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/artifacts/skin-final/release/software/posed-editable.glb",
+        "sha256": "c671a9d71be058a646f7ab3673105b330c9b12fff7781b4dd051beade9693326",
+        "bytes": 268572,
+        "report": {
+          "uri": "posed-editable.glb",
+          "mimeType": "model/gltf-binary",
+          "validatorVersion": "2.0.0-dev.3.10",
+          "validatedAt": "2026-11-04T23:49:33.334Z",
+          "issues": {
+            "numErrors": 0,
+            "numWarnings": 1,
+            "numInfos": 2,
+            "numHints": 0,
+            "messages": [
+              {
+                "code": "UNUSED_OBJECT",
+                "message": "This object may be unused.",
+                "severity": 2,
+                "pointer": "/meshes/0/primitives/0/attributes/TEXCOORD_0"
+              },
+              {
+                "code": "NODE_SKINNED_MESH_NON_ROOT",
+                "message": "Node with a skinned mesh is not root. Parent transforms will not affect a skinned mesh.",
+                "severity": 1,
+                "pointer": "/nodes/1"
+              },
+              {
+                "code": "UNUSED_OBJECT",
+                "message": "This object may be unused.",
+                "severity": 2,
+                "pointer": "/bufferViews/11"
+              }
+            ],
+            "truncated": false
+          },
+          "info": {
+            "version": "2.0",
+            "generator": "Dome Sculpt",
+            "resources": [
+              {
+                "pointer": "/buffers/0",
+                "mimeType": "application/gltf-buffer",
+                "storage": "glb",
+                "byteLength": 265020
+              },
+              {
+                "pointer": "/images/0",
+                "mimeType": "image/png",
+                "storage": "buffer-view",
+                "image": {
+                  "width": 64,
+                  "height": 64,
+                  "format": "rgba",
+                  "primaries": "srgb",
+                  "transfer": "srgb",
+                  "bits": 8
+                }
+              },
+              {
+                "pointer": "/images/1",
+                "mimeType": "image/png",
+                "storage": "buffer-view",
+                "image": {
+                  "width": 64,
+                  "height": 64,
+                  "format": "rgba",
+                  "primaries": "srgb",
+                  "transfer": "srgb",
+                  "bits": 8
+                }
+              },
+              {
+                "pointer": "/images/2",
+                "mimeType": "image/png",
+                "storage": "buffer-view",
+                "image": {
+                  "width": 64,
+                  "height": 64,
+                  "format": "rgba",
+                  "primaries": "srgb",
+                  "transfer": "srgb",
+                  "bits": 8
+                }
+              }
+            ],
+            "animationCount": 0,
+            "materialCount": 1,
+            "hasMorphTargets": false,
+            "hasSkins": true,
+            "hasTextures": true,
+            "hasDefaultScene": true,
+            "drawCallCount": 1,
+            "totalVertexCount": 6,
+            "totalTriangleCount": 2,
+            "maxUVs": 2,
+            "maxInfluences": 4,
+            "maxAttributes": 6
+          }
+        }
+      },
+      {
+        "profile": "release",
+        "file": "/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/artifacts/skin-final/release/software/posed.glb",
+        "sha256": "e070f156a44cb958487493294872998abf1bd27db2bf48839849664dc10bcddf",
+        "bytes": 268444,
+        "report": {
+          "uri": "posed.glb",
+          "mimeType": "model/gltf-binary",
+          "validatorVersion": "2.0.0-dev.3.10",
+          "validatedAt": "2026-11-04T23:49:33.348Z",
+          "issues": {
+            "numErrors": 0,
+            "numWarnings": 1,
+            "numInfos": 2,
+            "numHints": 0,
+            "messages": [
+              {
+                "code": "UNUSED_OBJECT",
+                "message": "This object may be unused.",
+                "severity": 2,
+                "pointer": "/meshes/0/primitives/0/attributes/TEXCOORD_0"
+              },
+              {
+                "code": "NODE_SKINNED_MESH_NON_ROOT",
+                "message": "Node with a skinned mesh is not root. Parent transforms will not affect a skinned mesh.",
+                "severity": 1,
+                "pointer": "/nodes/1"
+              },
+              {
+                "code": "UNUSED_OBJECT",
+                "message": "This object may be unused.",
+                "severity": 2,
+                "pointer": "/bufferViews/11"
+              }
+            ],
+            "truncated": false
+          },
+          "info": {
+            "version": "2.0",
+            "generator": "Dome Sculpt",
+            "resources": [
+              {
+                "pointer": "/buffers/0",
+                "mimeType": "application/gltf-buffer",
+                "storage": "glb",
+                "byteLength": 265020
+              },
+              {
+                "pointer": "/images/0",
+                "mimeType": "image/png",
+                "storage": "buffer-view",
+                "image": {
+                  "width": 64,
+                  "height": 64,
+                  "format": "rgba",
+                  "primaries": "srgb",
+                  "transfer": "srgb",
+                  "bits": 8
+                }
+              },
+              {
+                "pointer": "/images/1",
+                "mimeType": "image/png",
+                "storage": "buffer-view",
+                "image": {
+                  "width": 64,
+                  "height": 64,
+                  "format": "rgba",
+                  "primaries": "srgb",
+                  "transfer": "srgb",
+                  "bits": 8
+                }
+              },
+              {
+                "pointer": "/images/2",
+                "mimeType": "image/png",
+                "storage": "buffer-view",
+                "image": {
+                  "width": 64,
+                  "height": 64,
+                  "format": "rgba",
+                  "primaries": "srgb",
+                  "transfer": "srgb",
+                  "bits": 8
+                }
+              }
+            ],
+            "animationCount": 0,
+            "materialCount": 1,
+            "hasMorphTargets": false,
+            "hasSkins": true,
+            "hasTextures": true,
+            "hasDefaultScene": true,
+            "drawCallCount": 1,
+            "totalVertexCount": 6,
+            "totalTriangleCount": 2,
+            "maxUVs": 2,
+            "maxInfluences": 4,
+            "maxAttributes": 6
+          }
+        }
+      },
+      {
+        "profile": "release",
+        "file": "/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/artifacts/skin-final/release/software/rest-editable.glb",
+        "sha256": "0b6e877076373deaf4aaa721ad1997fa50c259b378c55f84452a2435badb4b2b",
+        "bytes": 268512,
+        "report": {
+          "uri": "rest-editable.glb",
+          "mimeType": "model/gltf-binary",
+          "validatorVersion": "2.0.0-dev.3.10",
+          "validatedAt": "2026-11-04T23:49:33.357Z",
+          "issues": {
+            "numErrors": 0,
+            "numWarnings": 1,
+            "numInfos": 2,
+            "numHints": 0,
+            "messages": [
+              {
+                "code": "UNUSED_OBJECT",
+                "message": "This object may be unused.",
+                "severity": 2,
+                "pointer": "/meshes/0/primitives/0/attributes/TEXCOORD_0"
+              },
+              {
+                "code": "NODE_SKINNED_MESH_NON_ROOT",
+                "message": "Node with a skinned mesh is not root. Parent transforms will not affect a skinned mesh.",
+                "severity": 1,
+                "pointer": "/nodes/1"
+              },
+              {
+                "code": "UNUSED_OBJECT",
+                "message": "This object may be unused.",
+                "severity": 2,
+                "pointer": "/bufferViews/11"
+              }
+            ],
+            "truncated": false
+          },
+          "info": {
+            "version": "2.0",
+            "generator": "Dome Sculpt",
+            "resources": [
+              {
+                "pointer": "/buffers/0",
+                "mimeType": "application/gltf-buffer",
+                "storage": "glb",
+                "byteLength": 265020
+              },
+              {
+                "pointer": "/images/0",
+                "mimeType": "image/png",
+                "storage": "buffer-view",
+                "image": {
+                  "width": 64,
+                  "height": 64,
+                  "format": "rgba",
+                  "primaries": "srgb",
+                  "transfer": "srgb",
+                  "bits": 8
+                }
+              },
+              {
+                "pointer": "/images/1",
+                "mimeType": "image/png",
+                "storage": "buffer-view",
+                "image": {
+                  "width": 64,
+                  "height": 64,
+                  "format": "rgba",
+                  "primaries": "srgb",
+                  "transfer": "srgb",
+                  "bits": 8
+                }
+              },
+              {
+                "pointer": "/images/2",
+                "mimeType": "image/png",
+                "storage": "buffer-view",
+                "image": {
+                  "width": 64,
+                  "height": 64,
+                  "format": "rgba",
+                  "primaries": "srgb",
+                  "transfer": "srgb",
+                  "bits": 8
+                }
+              }
+            ],
+            "animationCount": 0,
+            "materialCount": 1,
+            "hasMorphTargets": false,
+            "hasSkins": true,
+            "hasTextures": true,
+            "hasDefaultScene": true,
+            "drawCallCount": 1,
+            "totalVertexCount": 6,
+            "totalTriangleCount": 2,
+            "maxUVs": 2,
+            "maxInfluences": 4,
+            "maxAttributes": 6
+          }
+        }
+      },
+      {
+        "profile": "release",
+        "file": "/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/artifacts/skin-final/release/software/rest.glb",
+        "sha256": "4a5ef6ba62b33e55dd9c194f79cdccdd06ee5c3dd54c330639c59af019523158",
+        "bytes": 268384,
+        "report": {
+          "uri": "rest.glb",
+          "mimeType": "model/gltf-binary",
+          "validatorVersion": "2.0.0-dev.3.10",
+          "validatedAt": "2026-11-04T23:49:33.364Z",
+          "issues": {
+            "numErrors": 0,
+            "numWarnings": 1,
+            "numInfos": 2,
+            "numHints": 0,
+            "messages": [
+              {
+                "code": "UNUSED_OBJECT",
+                "message": "This object may be unused.",
+                "severity": 2,
+                "pointer": "/meshes/0/primitives/0/attributes/TEXCOORD_0"
+              },
+              {
+                "code": "NODE_SKINNED_MESH_NON_ROOT",
+                "message": "Node with a skinned mesh is not root. Parent transforms will not affect a skinned mesh.",
+                "severity": 1,
+                "pointer": "/nodes/1"
+              },
+              {
+                "code": "UNUSED_OBJECT",
+                "message": "This object may be unused.",
+                "severity": 2,
+                "pointer": "/bufferViews/11"
+              }
+            ],
+            "truncated": false
+          },
+          "info": {
+            "version": "2.0",
+            "generator": "Dome Sculpt",
+            "resources": [
+              {
+                "pointer": "/buffers/0",
+                "mimeType": "application/gltf-buffer",
+                "storage": "glb",
+                "byteLength": 265020
+              },
+              {
+                "pointer": "/images/0",
+                "mimeType": "image/png",
+                "storage": "buffer-view",
+                "image": {
+                  "width": 64,
+                  "height": 64,
+                  "format": "rgba",
+                  "primaries": "srgb",
+                  "transfer": "srgb",
+                  "bits": 8
+                }
+              },
+              {
+                "pointer": "/images/1",
+                "mimeType": "image/png",
+                "storage": "buffer-view",
+                "image": {
+                  "width": 64,
+                  "height": 64,
+                  "format": "rgba",
+                  "primaries": "srgb",
+                  "transfer": "srgb",
+                  "bits": 8
+                }
+              },
+              {
+                "pointer": "/images/2",
+                "mimeType": "image/png",
+                "storage": "buffer-view",
+                "image": {
+                  "width": 64,
+                  "height": 64,
+                  "format": "rgba",
+                  "primaries": "srgb",
+                  "transfer": "srgb",
+                  "bits": 8
+                }
+              }
+            ],
+            "animationCount": 0,
+            "materialCount": 1,
+            "hasMorphTargets": false,
+            "hasSkins": true,
+            "hasTextures": true,
+            "hasDefaultScene": true,
+            "drawCallCount": 1,
+            "totalVertexCount": 6,
+            "totalTriangleCount": 2,
+            "maxUVs": 2,
+            "maxInfluences": 4,
+            "maxAttributes": 6
+          }
+        }
+      },
+      {
+        "profile": "sanitize",
+        "file": "/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/artifacts/skin-final/sanitize/software/posed-editable.glb",
+        "sha256": "c671a9d71be058a646f7ab3673105b330c9b12fff7781b4dd051beade9693326",
+        "bytes": 268572,
+        "report": {
+          "uri": "posed-editable.glb",
+          "mimeType": "model/gltf-binary",
+          "validatorVersion": "2.0.0-dev.3.10",
+          "validatedAt": "2026-11-04T23:49:33.371Z",
+          "issues": {
+            "numErrors": 0,
+            "numWarnings": 1,
+            "numInfos": 2,
+            "numHints": 0,
+            "messages": [
+              {
+                "code": "UNUSED_OBJECT",
+                "message": "This object may be unused.",
+                "severity": 2,
+                "pointer": "/meshes/0/primitives/0/attributes/TEXCOORD_0"
+              },
+              {
+                "code": "NODE_SKINNED_MESH_NON_ROOT",
+                "message": "Node with a skinned mesh is not root. Parent transforms will not affect a skinned mesh.",
+                "severity": 1,
+                "pointer": "/nodes/1"
+              },
+              {
+                "code": "UNUSED_OBJECT",
+                "message": "This object may be unused.",
+                "severity": 2,
+                "pointer": "/bufferViews/11"
+              }
+            ],
+            "truncated": false
+          },
+          "info": {
+            "version": "2.0",
+            "generator": "Dome Sculpt",
+            "resources": [
+              {
+                "pointer": "/buffers/0",
+                "mimeType": "application/gltf-buffer",
+                "storage": "glb",
+                "byteLength": 265020
+              },
+              {
+                "pointer": "/images/0",
+                "mimeType": "image/png",
+                "storage": "buffer-view",
+                "image": {
+                  "width": 64,
+                  "height": 64,
+                  "format": "rgba",
+                  "primaries": "srgb",
+                  "transfer": "srgb",
+                  "bits": 8
+                }
+              },
+              {
+                "pointer": "/images/1",
+                "mimeType": "image/png",
+                "storage": "buffer-view",
+                "image": {
+                  "width": 64,
+                  "height": 64,
+                  "format": "rgba",
+                  "primaries": "srgb",
+                  "transfer": "srgb",
+                  "bits": 8
+                }
+              },
+              {
+                "pointer": "/images/2",
+                "mimeType": "image/png",
+                "storage": "buffer-view",
+                "image": {
+                  "width": 64,
+                  "height": 64,
+                  "format": "rgba",
+                  "primaries": "srgb",
+                  "transfer": "srgb",
+                  "bits": 8
+                }
+              }
+            ],
+            "animationCount": 0,
+            "materialCount": 1,
+            "hasMorphTargets": false,
+            "hasSkins": true,
+            "hasTextures": true,
+            "hasDefaultScene": true,
+            "drawCallCount": 1,
+            "totalVertexCount": 6,
+            "totalTriangleCount": 2,
+            "maxUVs": 2,
+            "maxInfluences": 4,
+            "maxAttributes": 6
+          }
+        }
+      },
+      {
+        "profile": "sanitize",
+        "file": "/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/artifacts/skin-final/sanitize/software/posed.glb",
+        "sha256": "e070f156a44cb958487493294872998abf1bd27db2bf48839849664dc10bcddf",
+        "bytes": 268444,
+        "report": {
+          "uri": "posed.glb",
+          "mimeType": "model/gltf-binary",
+          "validatorVersion": "2.0.0-dev.3.10",
+          "validatedAt": "2026-11-04T23:49:33.376Z",
+          "issues": {
+            "numErrors": 0,
+            "numWarnings": 1,
+            "numInfos": 2,
+            "numHints": 0,
+            "messages": [
+              {
+                "code": "UNUSED_OBJECT",
+                "message": "This object may be unused.",
+                "severity": 2,
+                "pointer": "/meshes/0/primitives/0/attributes/TEXCOORD_0"
+              },
+              {
+                "code": "NODE_SKINNED_MESH_NON_ROOT",
+                "message": "Node with a skinned mesh is not root. Parent transforms will not affect a skinned mesh.",
+                "severity": 1,
+                "pointer": "/nodes/1"
+              },
+              {
+                "code": "UNUSED_OBJECT",
+                "message": "This object may be unused.",
+                "severity": 2,
+                "pointer": "/bufferViews/11"
+              }
+            ],
+            "truncated": false
+          },
+          "info": {
+            "version": "2.0",
+            "generator": "Dome Sculpt",
+            "resources": [
+              {
+                "pointer": "/buffers/0",
+                "mimeType": "application/gltf-buffer",
+                "storage": "glb",
+                "byteLength": 265020
+              },
+              {
+                "pointer": "/images/0",
+                "mimeType": "image/png",
+                "storage": "buffer-view",
+                "image": {
+                  "width": 64,
+                  "height": 64,
+                  "format": "rgba",
+                  "primaries": "srgb",
+                  "transfer": "srgb",
+                  "bits": 8
+                }
+              },
+              {
+                "pointer": "/images/1",
+                "mimeType": "image/png",
+                "storage": "buffer-view",
+                "image": {
+                  "width": 64,
+                  "height": 64,
+                  "format": "rgba",
+                  "primaries": "srgb",
+                  "transfer": "srgb",
+                  "bits": 8
+                }
+              },
+              {
+                "pointer": "/images/2",
+                "mimeType": "image/png",
+                "storage": "buffer-view",
+                "image": {
+                  "width": 64,
+                  "height": 64,
+                  "format": "rgba",
+                  "primaries": "srgb",
+                  "transfer": "srgb",
+                  "bits": 8
+                }
+              }
+            ],
+            "animationCount": 0,
+            "materialCount": 1,
+            "hasMorphTargets": false,
+            "hasSkins": true,
+            "hasTextures": true,
+            "hasDefaultScene": true,
+            "drawCallCount": 1,
+            "totalVertexCount": 6,
+            "totalTriangleCount": 2,
+            "maxUVs": 2,
+            "maxInfluences": 4,
+            "maxAttributes": 6
+          }
+        }
+      },
+      {
+        "profile": "sanitize",
+        "file": "/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/artifacts/skin-final/sanitize/software/rest-editable.glb",
+        "sha256": "0b6e877076373deaf4aaa721ad1997fa50c259b378c55f84452a2435badb4b2b",
+        "bytes": 268512,
+        "report": {
+          "uri": "rest-editable.glb",
+          "mimeType": "model/gltf-binary",
+          "validatorVersion": "2.0.0-dev.3.10",
+          "validatedAt": "2026-11-04T23:49:33.381Z",
+          "issues": {
+            "numErrors": 0,
+            "numWarnings": 1,
+            "numInfos": 2,
+            "numHints": 0,
+            "messages": [
+              {
+                "code": "UNUSED_OBJECT",
+                "message": "This object may be unused.",
+                "severity": 2,
+                "pointer": "/meshes/0/primitives/0/attributes/TEXCOORD_0"
+              },
+              {
+                "code": "NODE_SKINNED_MESH_NON_ROOT",
+                "message": "Node with a skinned mesh is not root. Parent transforms will not affect a skinned mesh.",
+                "severity": 1,
+                "pointer": "/nodes/1"
+              },
+              {
+                "code": "UNUSED_OBJECT",
+                "message": "This object may be unused.",
+                "severity": 2,
+                "pointer": "/bufferViews/11"
+              }
+            ],
+            "truncated": false
+          },
+          "info": {
+            "version": "2.0",
+            "generator": "Dome Sculpt",
+            "resources": [
+              {
+                "pointer": "/buffers/0",
+                "mimeType": "application/gltf-buffer",
+                "storage": "glb",
+                "byteLength": 265020
+              },
+              {
+                "pointer": "/images/0",
+                "mimeType": "image/png",
+                "storage": "buffer-view",
+                "image": {
+                  "width": 64,
+                  "height": 64,
+                  "format": "rgba",
+                  "primaries": "srgb",
+                  "transfer": "srgb",
+                  "bits": 8
+                }
+              },
+              {
+                "pointer": "/images/1",
+                "mimeType": "image/png",
+                "storage": "buffer-view",
+                "image": {
+                  "width": 64,
+                  "height": 64,
+                  "format": "rgba",
+                  "primaries": "srgb",
+                  "transfer": "srgb",
+                  "bits": 8
+                }
+              },
+              {
+                "pointer": "/images/2",
+                "mimeType": "image/png",
+                "storage": "buffer-view",
+                "image": {
+                  "width": 64,
+                  "height": 64,
+                  "format": "rgba",
+                  "primaries": "srgb",
+                  "transfer": "srgb",
+                  "bits": 8
+                }
+              }
+            ],
+            "animationCount": 0,
+            "materialCount": 1,
+            "hasMorphTargets": false,
+            "hasSkins": true,
+            "hasTextures": true,
+            "hasDefaultScene": true,
+            "drawCallCount": 1,
+            "totalVertexCount": 6,
+            "totalTriangleCount": 2,
+            "maxUVs": 2,
+            "maxInfluences": 4,
+            "maxAttributes": 6
+          }
+        }
+      },
+      {
+        "profile": "sanitize",
+        "file": "/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/artifacts/skin-final/sanitize/software/rest.glb",
+        "sha256": "4a5ef6ba62b33e55dd9c194f79cdccdd06ee5c3dd54c330639c59af019523158",
+        "bytes": 268384,
+        "report": {
+          "uri": "rest.glb",
+          "mimeType": "model/gltf-binary",
+          "validatorVersion": "2.0.0-dev.3.10",
+          "validatedAt": "2026-11-04T23:49:33.386Z",
+          "issues": {
+            "numErrors": 0,
+            "numWarnings": 1,
+            "numInfos": 2,
+            "numHints": 0,
+            "messages": [
+              {
+                "code": "UNUSED_OBJECT",
+                "message": "This object may be unused.",
+                "severity": 2,
+                "pointer": "/meshes/0/primitives/0/attributes/TEXCOORD_0"
+              },
+              {
+                "code": "NODE_SKINNED_MESH_NON_ROOT",
+                "message": "Node with a skinned mesh is not root. Parent transforms will not affect a skinned mesh.",
+                "severity": 1,
+                "pointer": "/nodes/1"
+              },
+              {
+                "code": "UNUSED_OBJECT",
+                "message": "This object may be unused.",
+                "severity": 2,
+                "pointer": "/bufferViews/11"
+              }
+            ],
+            "truncated": false
+          },
+          "info": {
+            "version": "2.0",
+            "generator": "Dome Sculpt",
+            "resources": [
+              {
+                "pointer": "/buffers/0",
+                "mimeType": "application/gltf-buffer",
+                "storage": "glb",
+                "byteLength": 265020
+              },
+              {
+                "pointer": "/images/0",
+                "mimeType": "image/png",
+                "storage": "buffer-view",
+                "image": {
+                  "width": 64,
+                  "height": 64,
+                  "format": "rgba",
+                  "primaries": "srgb",
+                  "transfer": "srgb",
+                  "bits": 8
+                }
+              },
+              {
+                "pointer": "/images/1",
+                "mimeType": "image/png",
+                "storage": "buffer-view",
+                "image": {
+                  "width": 64,
+                  "height": 64,
+                  "format": "rgba",
+                  "primaries": "srgb",
+                  "transfer": "srgb",
+                  "bits": 8
+                }
+              },
+              {
+                "pointer": "/images/2",
+                "mimeType": "image/png",
+                "storage": "buffer-view",
+                "image": {
+                  "width": 64,
+                  "height": 64,
+                  "format": "rgba",
+                  "primaries": "srgb",
+                  "transfer": "srgb",
+                  "bits": 8
+                }
+              }
+            ],
+            "animationCount": 0,
+            "materialCount": 1,
+            "hasMorphTargets": false,
+            "hasSkins": true,
+            "hasTextures": true,
+            "hasDefaultScene": true,
+            "drawCallCount": 1,
+            "totalVertexCount": 6,
+            "totalTriangleCount": 2,
+            "maxUVs": 2,
+            "maxInfluences": 4,
+            "maxAttributes": 6
+          }
+        }
+      },
+      {
+        "profile": "arc",
+        "file": "/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/artifacts/skin-final/release/arc/posed-editable.glb",
+        "sha256": "c671a9d71be058a646f7ab3673105b330c9b12fff7781b4dd051beade9693326",
+        "bytes": 268572,
+        "report": {
+          "uri": "posed-editable.glb",
+          "mimeType": "model/gltf-binary",
+          "validatorVersion": "2.0.0-dev.3.10",
+          "validatedAt": "2026-11-04T23:49:33.396Z",
+          "issues": {
+            "numErrors": 0,
+            "numWarnings": 1,
+            "numInfos": 2,
+            "numHints": 0,
+            "messages": [
+              {
+                "code": "UNUSED_OBJECT",
+                "message": "This object may be unused.",
+                "severity": 2,
+                "pointer": "/meshes/0/primitives/0/attributes/TEXCOORD_0"
+              },
+              {
+                "code": "NODE_SKINNED_MESH_NON_ROOT",
+                "message": "Node with a skinned mesh is not root. Parent transforms will not affect a skinned mesh.",
+                "severity": 1,
+                "pointer": "/nodes/1"
+              },
+              {
+                "code": "UNUSED_OBJECT",
+                "message": "This object may be unused.",
+                "severity": 2,
+                "pointer": "/bufferViews/11"
+              }
+            ],
+            "truncated": false
+          },
+          "info": {
+            "version": "2.0",
+            "generator": "Dome Sculpt",
+            "resources": [
+              {
+                "pointer": "/buffers/0",
+                "mimeType": "application/gltf-buffer",
+                "storage": "glb",
+                "byteLength": 265020
+              },
+              {
+                "pointer": "/images/0",
+                "mimeType": "image/png",
+                "storage": "buffer-view",
+                "image": {
+                  "width": 64,
+                  "height": 64,
+                  "format": "rgba",
+                  "primaries": "srgb",
+                  "transfer": "srgb",
+                  "bits": 8
+                }
+              },
+              {
+                "pointer": "/images/1",
+                "mimeType": "image/png",
+                "storage": "buffer-view",
+                "image": {
+                  "width": 64,
+                  "height": 64,
+                  "format": "rgba",
+                  "primaries": "srgb",
+                  "transfer": "srgb",
+                  "bits": 8
+                }
+              },
+              {
+                "pointer": "/images/2",
+                "mimeType": "image/png",
+                "storage": "buffer-view",
+                "image": {
+                  "width": 64,
+                  "height": 64,
+                  "format": "rgba",
+                  "primaries": "srgb",
+                  "transfer": "srgb",
+                  "bits": 8
+                }
+              }
+            ],
+            "animationCount": 0,
+            "materialCount": 1,
+            "hasMorphTargets": false,
+            "hasSkins": true,
+            "hasTextures": true,
+            "hasDefaultScene": true,
+            "drawCallCount": 1,
+            "totalVertexCount": 6,
+            "totalTriangleCount": 2,
+            "maxUVs": 2,
+            "maxInfluences": 4,
+            "maxAttributes": 6
+          }
+        }
+      },
+      {
+        "profile": "arc",
+        "file": "/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/artifacts/skin-final/release/arc/posed.glb",
+        "sha256": "e070f156a44cb958487493294872998abf1bd27db2bf48839849664dc10bcddf",
+        "bytes": 268444,
+        "report": {
+          "uri": "posed.glb",
+          "mimeType": "model/gltf-binary",
+          "validatorVersion": "2.0.0-dev.3.10",
+          "validatedAt": "2026-11-04T23:49:33.404Z",
+          "issues": {
+            "numErrors": 0,
+            "numWarnings": 1,
+            "numInfos": 2,
+            "numHints": 0,
+            "messages": [
+              {
+                "code": "UNUSED_OBJECT",
+                "message": "This object may be unused.",
+                "severity": 2,
+                "pointer": "/meshes/0/primitives/0/attributes/TEXCOORD_0"
+              },
+              {
+                "code": "NODE_SKINNED_MESH_NON_ROOT",
+                "message": "Node with a skinned mesh is not root. Parent transforms will not affect a skinned mesh.",
+                "severity": 1,
+                "pointer": "/nodes/1"
+              },
+              {
+                "code": "UNUSED_OBJECT",
+                "message": "This object may be unused.",
+                "severity": 2,
+                "pointer": "/bufferViews/11"
+              }
+            ],
+            "truncated": false
+          },
+          "info": {
+            "version": "2.0",
+            "generator": "Dome Sculpt",
+            "resources": [
+              {
+                "pointer": "/buffers/0",
+                "mimeType": "application/gltf-buffer",
+                "storage": "glb",
+                "byteLength": 265020
+              },
+              {
+                "pointer": "/images/0",
+                "mimeType": "image/png",
+                "storage": "buffer-view",
+                "image": {
+                  "width": 64,
+                  "height": 64,
+                  "format": "rgba",
+                  "primaries": "srgb",
+                  "transfer": "srgb",
+                  "bits": 8
+                }
+              },
+              {
+                "pointer": "/images/1",
+                "mimeType": "image/png",
+                "storage": "buffer-view",
+                "image": {
+                  "width": 64,
+                  "height": 64,
+                  "format": "rgba",
+                  "primaries": "srgb",
+                  "transfer": "srgb",
+                  "bits": 8
+                }
+              },
+              {
+                "pointer": "/images/2",
+                "mimeType": "image/png",
+                "storage": "buffer-view",
+                "image": {
+                  "width": 64,
+                  "height": 64,
+                  "format": "rgba",
+                  "primaries": "srgb",
+                  "transfer": "srgb",
+                  "bits": 8
+                }
+              }
+            ],
+            "animationCount": 0,
+            "materialCount": 1,
+            "hasMorphTargets": false,
+            "hasSkins": true,
+            "hasTextures": true,
+            "hasDefaultScene": true,
+            "drawCallCount": 1,
+            "totalVertexCount": 6,
+            "totalTriangleCount": 2,
+            "maxUVs": 2,
+            "maxInfluences": 4,
+            "maxAttributes": 6
+          }
+        }
+      },
+      {
+        "profile": "arc",
+        "file": "/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/artifacts/skin-final/release/arc/rest-editable.glb",
+        "sha256": "0b6e877076373deaf4aaa721ad1997fa50c259b378c55f84452a2435badb4b2b",
+        "bytes": 268512,
+        "report": {
+          "uri": "rest-editable.glb",
+          "mimeType": "model/gltf-binary",
+          "validatorVersion": "2.0.0-dev.3.10",
+          "validatedAt": "2026-11-04T23:49:33.417Z",
+          "issues": {
+            "numErrors": 0,
+            "numWarnings": 1,
+            "numInfos": 2,
+            "numHints": 0,
+            "messages": [
+              {
+                "code": "UNUSED_OBJECT",
+                "message": "This object may be unused.",
+                "severity": 2,
+                "pointer": "/meshes/0/primitives/0/attributes/TEXCOORD_0"
+              },
+              {
+                "code": "NODE_SKINNED_MESH_NON_ROOT",
+                "message": "Node with a skinned mesh is not root. Parent transforms will not affect a skinned mesh.",
+                "severity": 1,
+                "pointer": "/nodes/1"
+              },
+              {
+                "code": "UNUSED_OBJECT",
+                "message": "This object may be unused.",
+                "severity": 2,
+                "pointer": "/bufferViews/11"
+              }
+            ],
+            "truncated": false
+          },
+          "info": {
+            "version": "2.0",
+            "generator": "Dome Sculpt",
+            "resources": [
+              {
+                "pointer": "/buffers/0",
+                "mimeType": "application/gltf-buffer",
+                "storage": "glb",
+                "byteLength": 265020
+              },
+              {
+                "pointer": "/images/0",
+                "mimeType": "image/png",
+                "storage": "buffer-view",
+                "image": {
+                  "width": 64,
+                  "height": 64,
+                  "format": "rgba",
+                  "primaries": "srgb",
+                  "transfer": "srgb",
+                  "bits": 8
+                }
+              },
+              {
+                "pointer": "/images/1",
+                "mimeType": "image/png",
+                "storage": "buffer-view",
+                "image": {
+                  "width": 64,
+                  "height": 64,
+                  "format": "rgba",
+                  "primaries": "srgb",
+                  "transfer": "srgb",
+                  "bits": 8
+                }
+              },
+              {
+                "pointer": "/images/2",
+                "mimeType": "image/png",
+                "storage": "buffer-view",
+                "image": {
+                  "width": 64,
+                  "height": 64,
+                  "format": "rgba",
+                  "primaries": "srgb",
+                  "transfer": "srgb",
+                  "bits": 8
+                }
+              }
+            ],
+            "animationCount": 0,
+            "materialCount": 1,
+            "hasMorphTargets": false,
+            "hasSkins": true,
+            "hasTextures": true,
+            "hasDefaultScene": true,
+            "drawCallCount": 1,
+            "totalVertexCount": 6,
+            "totalTriangleCount": 2,
+            "maxUVs": 2,
+            "maxInfluences": 4,
+            "maxAttributes": 6
+          }
+        }
+      },
+      {
+        "profile": "arc",
+        "file": "/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/artifacts/skin-final/release/arc/rest.glb",
+        "sha256": "4a5ef6ba62b33e55dd9c194f79cdccdd06ee5c3dd54c330639c59af019523158",
+        "bytes": 268384,
+        "report": {
+          "uri": "rest.glb",
+          "mimeType": "model/gltf-binary",
+          "validatorVersion": "2.0.0-dev.3.10",
+          "validatedAt": "2026-11-04T23:49:33.422Z",
+          "issues": {
+            "numErrors": 0,
+            "numWarnings": 1,
+            "numInfos": 2,
+            "numHints": 0,
+            "messages": [
+              {
+                "code": "UNUSED_OBJECT",
+                "message": "This object may be unused.",
+                "severity": 2,
+                "pointer": "/meshes/0/primitives/0/attributes/TEXCOORD_0"
+              },
+              {
+                "code": "NODE_SKINNED_MESH_NON_ROOT",
+                "message": "Node with a skinned mesh is not root. Parent transforms will not affect a skinned mesh.",
+                "severity": 1,
+                "pointer": "/nodes/1"
+              },
+              {
+                "code": "UNUSED_OBJECT",
+                "message": "This object may be unused.",
+                "severity": 2,
+                "pointer": "/bufferViews/11"
+              }
+            ],
+            "truncated": false
+          },
+          "info": {
+            "version": "2.0",
+            "generator": "Dome Sculpt",
+            "resources": [
+              {
+                "pointer": "/buffers/0",
+                "mimeType": "application/gltf-buffer",
+                "storage": "glb",
+                "byteLength": 265020
+              },
+              {
+                "pointer": "/images/0",
+                "mimeType": "image/png",
+                "storage": "buffer-view",
+                "image": {
+                  "width": 64,
+                  "height": 64,
+                  "format": "rgba",
+                  "primaries": "srgb",
+                  "transfer": "srgb",
+                  "bits": 8
+                }
+              },
+              {
+                "pointer": "/images/1",
+                "mimeType": "image/png",
+                "storage": "buffer-view",
+                "image": {
+                  "width": 64,
+                  "height": 64,
+                  "format": "rgba",
+                  "primaries": "srgb",
+                  "transfer": "srgb",
+                  "bits": 8
+                }
+              },
+              {
+                "pointer": "/images/2",
+                "mimeType": "image/png",
+                "storage": "buffer-view",
+                "image": {
+                  "width": 64,
+                  "height": 64,
+                  "format": "rgba",
+                  "primaries": "srgb",
+                  "transfer": "srgb",
+                  "bits": 8
+                }
+              }
+            ],
+            "animationCount": 0,
+            "materialCount": 1,
+            "hasMorphTargets": false,
+            "hasSkins": true,
+            "hasTextures": true,
+            "hasDefaultScene": true,
+            "drawCallCount": 1,
+            "totalVertexCount": 6,
+            "totalTriangleCount": 2,
+            "maxUVs": 2,
+            "maxInfluences": 4,
+            "maxAttributes": 6
+          }
+        }
+      }
+    ]
+  },
+  "pairs": [
+    {
+      "name": "rest.glb",
+      "profile_equal": true,
+      "triple_equal": true,
+      "hashes": [
+        "4a5ef6ba62b33e55dd9c194f79cdccdd06ee5c3dd54c330639c59af019523158",
+        "4a5ef6ba62b33e55dd9c194f79cdccdd06ee5c3dd54c330639c59af019523158",
+        "4a5ef6ba62b33e55dd9c194f79cdccdd06ee5c3dd54c330639c59af019523158"
+      ]
+    },
+    {
+      "name": "rest-native.png",
+      "profile_equal": true,
+      "triple_equal": false,
+      "hashes": [
+        "780034ad448f06fa26d9201d9e649145c67251f4eb4b20cc007c81c4434e7840",
+        "780034ad448f06fa26d9201d9e649145c67251f4eb4b20cc007c81c4434e7840",
+        "252e75aec86427d8587c0079de60a55ed388fe750301fa0c5c148602828d47a3"
+      ],
+      "release_arc_pixel_max": 1
+    },
+    {
+      "name": "rest-portable.png",
+      "profile_equal": true,
+      "triple_equal": false,
+      "hashes": [
+        "780034ad448f06fa26d9201d9e649145c67251f4eb4b20cc007c81c4434e7840",
+        "780034ad448f06fa26d9201d9e649145c67251f4eb4b20cc007c81c4434e7840",
+        "252e75aec86427d8587c0079de60a55ed388fe750301fa0c5c148602828d47a3"
+      ],
+      "release_arc_pixel_max": 1
+    },
+    {
+      "name": "rest-editable.glb",
+      "profile_equal": true,
+      "triple_equal": true,
+      "hashes": [
+        "0b6e877076373deaf4aaa721ad1997fa50c259b378c55f84452a2435badb4b2b",
+        "0b6e877076373deaf4aaa721ad1997fa50c259b378c55f84452a2435badb4b2b",
+        "0b6e877076373deaf4aaa721ad1997fa50c259b378c55f84452a2435badb4b2b"
+      ]
+    },
+    {
+      "name": "rest.dsculpt",
+      "profile_equal": true,
+      "triple_equal": true,
+      "hashes": [
+        "c95cbdff9c91cb5d7a9a7d47d2a7380efc76712e9c5f7d9dbc6b4affecd7cb79",
+        "c95cbdff9c91cb5d7a9a7d47d2a7380efc76712e9c5f7d9dbc6b4affecd7cb79",
+        "c95cbdff9c91cb5d7a9a7d47d2a7380efc76712e9c5f7d9dbc6b4affecd7cb79"
+      ]
+    },
+    {
+      "name": "posed.glb",
+      "profile_equal": true,
+      "triple_equal": true,
+      "hashes": [
+        "e070f156a44cb958487493294872998abf1bd27db2bf48839849664dc10bcddf",
+        "e070f156a44cb958487493294872998abf1bd27db2bf48839849664dc10bcddf",
+        "e070f156a44cb958487493294872998abf1bd27db2bf48839849664dc10bcddf"
+      ]
+    },
+    {
+      "name": "posed-native.png",
+      "profile_equal": true,
+      "triple_equal": false,
+      "hashes": [
+        "0b79a4ca835be6560e5f9d65da7cdef6783359e9a71faec00a884e20bfd2cd28",
+        "0b79a4ca835be6560e5f9d65da7cdef6783359e9a71faec00a884e20bfd2cd28",
+        "0500a3f5e1005d562c06a476575e08df8f089ccad24206a65de7c0a0ec877944"
+      ],
+      "release_arc_pixel_max": 1
+    },
+    {
+      "name": "posed-portable.png",
+      "profile_equal": true,
+      "triple_equal": false,
+      "hashes": [
+        "0b79a4ca835be6560e5f9d65da7cdef6783359e9a71faec00a884e20bfd2cd28",
+        "0b79a4ca835be6560e5f9d65da7cdef6783359e9a71faec00a884e20bfd2cd28",
+        "0500a3f5e1005d562c06a476575e08df8f089ccad24206a65de7c0a0ec877944"
+      ],
+      "release_arc_pixel_max": 1
+    },
+    {
+      "name": "posed-editable.glb",
+      "profile_equal": true,
+      "triple_equal": true,
+      "hashes": [
+        "c671a9d71be058a646f7ab3673105b330c9b12fff7781b4dd051beade9693326",
+        "c671a9d71be058a646f7ab3673105b330c9b12fff7781b4dd051beade9693326",
+        "c671a9d71be058a646f7ab3673105b330c9b12fff7781b4dd051beade9693326"
+      ]
+    },
+    {
+      "name": "posed.dsculpt",
+      "profile_equal": true,
+      "triple_equal": true,
+      "hashes": [
+        "787cda5e3aba44b8713bd03cae7675d369b902e05906b65446cc32eac37319fb",
+        "787cda5e3aba44b8713bd03cae7675d369b902e05906b65446cc32eac37319fb",
+        "787cda5e3aba44b8713bd03cae7675d369b902e05906b65446cc32eac37319fb"
+      ]
+    },
+    {
+      "name": "refusal/morph.glb",
+      "profile_equal": true,
+      "triple_equal": true,
+      "hashes": [
+        "97e20be976afeac8391bab2e42628fb3502bbd344132981d8cbd2d68a536282a",
+        "97e20be976afeac8391bab2e42628fb3502bbd344132981d8cbd2d68a536282a",
+        "97e20be976afeac8391bab2e42628fb3502bbd344132981d8cbd2d68a536282a"
+      ]
+    },
+    {
+      "name": "refusal/following.dsculpt",
+      "profile_equal": true,
+      "triple_equal": true,
+      "hashes": [
+        "d60d2262bad48d36f2c7fa69b099990383b5d00d8e162a0b432648756bfb8e67",
+        "d60d2262bad48d36f2c7fa69b099990383b5d00d8e162a0b432648756bfb8e67",
+        "d60d2262bad48d36f2c7fa69b099990383b5d00d8e162a0b432648756bfb8e67"
+      ]
+    }
+  ],
+  "original_device_probe": {
+    "state": "terminal",
+    "pid": 2835002,
+    "runtime": "4b9ee9f88777fa5ba5fa21c4ffd7b1f3ef274b04",
+    "scope": "Whole strict hardware-instrumented derivative of the same new110-check native paint skin consumer, changed only include path, GL_RENDERER guard and self maps/device-FD capture; exact4b9 product/runtime and current1d support. No geometry/render math change. ActualPCI03Arc and forcedsoftware rejection; no compute or HMD claim.",
+    "steps": [
+      {
+        "name": "compile",
+        "command": [
+          "/usr/bin/c++",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/src",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/third_party/cgltf",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/include",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/third_party/openbrush",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/third_party/nlohmann",
+          "-isystem",
+          "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/harfbuzz",
+          "-isystem",
+          "/usr/include/glib-2.0",
+          "-isystem",
+          "/usr/lib64/glib-2.0/include",
+          "-isystem",
+          "/usr/include/sysprof-6",
+          "-isystem",
+          "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/freetype2",
+          "-isystem",
+          "/usr/include/libpng16",
+          "-isystem",
+          "/usr/include/libxml2",
+          "-O3",
+          "-DNDEBUG",
+          "-std=gnu++20",
+          "-pthread",
+          "-DWITH_GZFILEOP",
+          "-o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/artifacts/skin-device/consumer.o",
+          "-c",
+          "/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/artifacts/skin-device/consumer.cpp"
+        ],
+        "exit_code": 0,
+        "expected": 0,
+        "seconds": 31.048905260977335
+      },
+      {
+        "name": "link",
+        "command": [
+          "/usr/bin/c++",
+          "-O3",
+          "-DNDEBUG",
+          "/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/artifacts/skin-device/consumer.o",
+          "-o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/artifacts/skin-device/consumer",
+          "-Wl,-rpath,/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib",
+          "libdome-sculpt-render.a",
+          "/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/artifacts/skin-proof/release/libdome-sculpt-core.a",
+          "libdome-sculpt-affine.a",
+          "/usr/lib64/liblapacke.so",
+          "libdome-sculpt-polygon.a",
+          "libxatlas.a",
+          "libmikktspace.a",
+          "libmikktspace-robust.a",
+          "libufbx.a",
+          "/usr/lib64/libpng.so",
+          "/usr/lib64/libjpeg.so",
+          "/usr/lib64/libz.so",
+          "libdome-sculpt-emission-codec.a",
+          "/usr/lib64/libOpenEXR-3_2.so",
+          "/usr/lib64/libOpenEXRUtil-3_2.so",
+          "/usr/lib64/libOpenEXRCore-3_2.so",
+          "/usr/lib64/libIex-3_2.so",
+          "/usr/lib64/libIlmThread-3_2.so",
+          "/usr/lib64/libImath-3_1.so",
+          "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libharfbuzz.so",
+          "/usr/lib64/libEGL.so",
+          "/usr/lib64/libGL.so",
+          "/usr/lib64/libfontconfig.so",
+          "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libfreetype.so",
+          "/usr/lib64/libicui18n.so",
+          "/usr/lib64/libicuuc.so",
+          "-lgcc_s_asneeded",
+          "-lgcc_s_asneeded"
+        ],
+        "exit_code": 0,
+        "expected": 0,
+        "seconds": 0.5719722690409981
+      },
+      {
+        "name": "hardware",
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/artifacts/skin-device/consumer",
+          "/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/artifacts/skin-device/hardware",
+          "--hardware"
+        ],
+        "exit_code": 0,
+        "expected": 0,
+        "seconds": 0.3226552000269294
+      },
+      {
+        "name": "software-refusal",
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/artifacts/skin-device/consumer",
+          "/home/blux/de-xr/dome-sculpt/artifacts/native32-deformation-export-1d573f2/artifacts/skin-device/software-refusal",
+          "--hardware"
+        ],
+        "exit_code": 1,
+        "expected": 1,
+        "seconds": 0.06803709996165708
+      }
+    ],
+    "phase": "software-refusal",
+    "child_pid": 2838162,
+    "actual_device": "/dev/dri/renderD129",
+    "mapped_libraries": {
+      "hardware/runtime.maps": {
+        "/usr/lib64/libGLdispatch.so.0.0.0": "3c53e14fb731128afe1fa1c88e94944fe9a60cbe170f2e08c1134b709d771ec7",
+        "/usr/lib64/libEGL.so.1.1.0": "76ffc090b8990696d028e7d1bc82606c564565fb05d2fa9e5f6122b61e9f1b60",
+        "/usr/lib64/libgallium-26.2.5.so": "033e3135e977d3e5fc6b63624573febe48b2e567c0e47da49d3125d9de8d1839",
+        "/usr/lib64/libEGL_mesa.so.0.0.0": "c786fa61da74b62ae0b8ab9fdb9bc020be92c02896d37220c58724107195002c",
+        "/usr/lib64/libGL.so.1.7.0": "cc4380adee239f7d4e0b5674ffde3d3add2e030778fb48db290bd96eafaf50e5",
+        "/usr/lib64/libGLX.so.0.0.0": "e2b8a09e81b686d1184fd7d60e69673bc7bfc7a89ce0ff1ba843a2450542e01b"
+      },
+      "software-refusal/runtime.maps": {
+        "/usr/lib64/libGLdispatch.so.0.0.0": "3c53e14fb731128afe1fa1c88e94944fe9a60cbe170f2e08c1134b709d771ec7",
+        "/usr/lib64/libEGL.so.1.1.0": "76ffc090b8990696d028e7d1bc82606c564565fb05d2fa9e5f6122b61e9f1b60",
+        "/usr/lib64/libgallium-26.2.5.so": "033e3135e977d3e5fc6b63624573febe48b2e567c0e47da49d3125d9de8d1839",
+        "/usr/lib64/libEGL_mesa.so.0.0.0": "c786fa61da74b62ae0b8ab9fdb9bc020be92c02896d37220c58724107195002c",
+        "/usr/lib64/libGL.so.1.7.0": "cc4380adee239f7d4e0b5674ffde3d3add2e030778fb48db290bd96eafaf50e5",
+        "/usr/lib64/libGLX.so.0.0.0": "e2b8a09e81b686d1184fd7d60e69673bc7bfc7a89ce0ff1ba843a2450542e01b"
+      }
+    },
+    "exit_code": 0,
+    "seconds": 32.148922633961774,
+    "inputs": 2360,
+    "binary_sha256": "7ef29680c6cb4066f89801322e0a315447699d96cf517b7e0f967123d11d347d",
+    "drift": []
+  },
+  "logs": {
+    "artifacts/skin-export-negative/compile.log": {
+      "sha256": "b5f28065ecbe20d62486d8bec41536c36545153d58d7ebfe446d3b10b83283cb",
+      "bytes": 1460
+    },
+    "artifacts/skin-export-negative/compile-fixed.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/skin-export-negative/link.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/skin-export-negative/counter.log": {
+      "sha256": "9b4a355fe1b799a738ebb057eed2e7c30866ae46c9d6d8729a3399600565e542",
+      "bytes": 836
+    },
+    "artifacts/skin-proof/release/compile-normal-preparation.cpp.log": {
+      "sha256": "b17c8a52cc4dd5e92555e7fce97443798d685a8474d93b76c471d8e7842ce62c",
+      "bytes": 5319
+    },
+    "artifacts/skin-proof/release/compile-export.cpp.log": {
+      "sha256": "2a783c09281cdd077671060e4588b79de413877538068594471d3aaf9550324a",
+      "bytes": 6055
+    },
+    "artifacts/skin-proof/release/compile-vrm1-export.cpp.log": {
+      "sha256": "50793c865909ec05dbb8a079ce45247f96225287c614fcd43dd1ecbd7f8a89e5",
+      "bytes": 2877
+    },
+    "artifacts/skin-proof/release/compile-native-authoring-compiler.cpp.log": {
+      "sha256": "fa78deecf6a3d786be08bb27adbea7972699518d962572a853ead1db908f513a",
+      "bytes": 9023
+    },
+    "artifacts/skin-proof/release/archive.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/skin-proof/release/compile-dome-sculpt-native-paint32-skin-export-test.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/skin-proof/release/link-dome-sculpt-native-paint32-skin-export-test.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/skin-proof/release/compile-dome-sculpt-native-paint32-export-test.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/skin-proof/release/link-dome-sculpt-native-paint32-export-test.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/skin-proof/release/compile-dome-sculpt-skin-affine-export-test.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/skin-proof/release/link-dome-sculpt-skin-affine-export-test.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/skin-proof/release/compile-dome-sculpt-source-union-authoring-test.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/skin-proof/release/link-dome-sculpt-source-union-authoring-test.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/skin-proof/release/compile-dome-sculpt-authoring-native-normal-union-test.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/skin-proof/release/link-dome-sculpt-authoring-native-normal-union-test.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/skin-proof/release/link-dome-sculpt.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/skin-proof/release/run-dome-sculpt-native-paint32-skin-export-test.log": {
+      "sha256": "cfd852c6e30661984953260a0bc54be0dfc24c64a098dbc25a9d53359a4ada39",
+      "bytes": 6814
+    },
+    "artifacts/skin-proof/release/run-dome-sculpt-native-paint32-export-test.log": {
+      "sha256": "1e110a9d5f65250f15b3b0b81a62f496db8187a2e9a13906c695d08c29af2e87",
+      "bytes": 32717
+    },
+    "artifacts/skin-proof/release/run-dome-sculpt-skin-affine-export-test.log": {
+      "sha256": "9c0ec20d37d6a2fa918068d0ce34998cd7803903490d5742ea7442434d50565c",
+      "bytes": 79
+    },
+    "artifacts/skin-proof/release/run-dome-sculpt-source-union-authoring-test.log": {
+      "sha256": "616f69eac1e87958da93cf19b860953cd24f26ab29e6ae11fc882b04ea2b2545",
+      "bytes": 5989
+    },
+    "artifacts/skin-proof/release/run-dome-sculpt-authoring-native-normal-union-test.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/skin-proof/sanitize/compile-normal-preparation.cpp.log": {
+      "sha256": "b17c8a52cc4dd5e92555e7fce97443798d685a8474d93b76c471d8e7842ce62c",
+      "bytes": 5319
+    },
+    "artifacts/skin-proof/sanitize/compile-export.cpp.log": {
+      "sha256": "2a783c09281cdd077671060e4588b79de413877538068594471d3aaf9550324a",
+      "bytes": 6055
+    },
+    "artifacts/skin-proof/sanitize/compile-vrm1-export.cpp.log": {
+      "sha256": "50793c865909ec05dbb8a079ce45247f96225287c614fcd43dd1ecbd7f8a89e5",
+      "bytes": 2877
+    },
+    "artifacts/skin-proof/sanitize/compile-native-authoring-compiler.cpp.log": {
+      "sha256": "fa78deecf6a3d786be08bb27adbea7972699518d962572a853ead1db908f513a",
+      "bytes": 9023
+    },
+    "artifacts/skin-proof/sanitize/archive.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/skin-proof/sanitize/compile-dome-sculpt-native-paint32-skin-export-test.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/skin-proof/sanitize/link-dome-sculpt-native-paint32-skin-export-test.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/skin-proof/sanitize/compile-dome-sculpt-native-paint32-export-test.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/skin-proof/sanitize/link-dome-sculpt-native-paint32-export-test.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/skin-proof/sanitize/compile-dome-sculpt-skin-affine-export-test.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/skin-proof/sanitize/link-dome-sculpt-skin-affine-export-test.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/skin-proof/sanitize/compile-dome-sculpt-source-union-authoring-test.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/skin-proof/sanitize/link-dome-sculpt-source-union-authoring-test.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/skin-proof/sanitize/compile-dome-sculpt-authoring-native-normal-union-test.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/skin-proof/sanitize/link-dome-sculpt-authoring-native-normal-union-test.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/skin-proof/sanitize/link-dome-sculpt.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/skin-proof/sanitize/run-dome-sculpt-native-paint32-skin-export-test.log": {
+      "sha256": "cfd852c6e30661984953260a0bc54be0dfc24c64a098dbc25a9d53359a4ada39",
+      "bytes": 6814
+    },
+    "artifacts/skin-proof/sanitize/run-dome-sculpt-native-paint32-export-test.log": {
+      "sha256": "1e110a9d5f65250f15b3b0b81a62f496db8187a2e9a13906c695d08c29af2e87",
+      "bytes": 32717
+    },
+    "artifacts/skin-proof/sanitize/run-dome-sculpt-skin-affine-export-test.log": {
+      "sha256": "9c0ec20d37d6a2fa918068d0ce34998cd7803903490d5742ea7442434d50565c",
+      "bytes": 79
+    },
+    "artifacts/skin-proof/sanitize/run-dome-sculpt-source-union-authoring-test.log": {
+      "sha256": "616f69eac1e87958da93cf19b860953cd24f26ab29e6ae11fc882b04ea2b2545",
+      "bytes": 5989
+    },
+    "artifacts/skin-proof/sanitize/run-dome-sculpt-authoring-native-normal-union-test.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/skin-followup/release/mixed-correct-arguments.log": {
+      "sha256": "e745d106efa825236827310e220b93549cc6a36f5a3baa679cebf8377770dcd0",
+      "bytes": 12735
+    },
+    "artifacts/skin-followup/release/application-version.log": {
+      "sha256": "9455a20a636a6599ace60120261649d3b29dc51fe2c774305994879190e7336b",
+      "bytes": 60
+    },
+    "artifacts/skin-followup/sanitize/mixed-correct-arguments.log": {
+      "sha256": "e745d106efa825236827310e220b93549cc6a36f5a3baa679cebf8377770dcd0",
+      "bytes": 12735
+    },
+    "artifacts/skin-followup/sanitize/application-version.log": {
+      "sha256": "9455a20a636a6599ace60120261649d3b29dc51fe2c774305994879190e7336b",
+      "bytes": 60
+    },
+    "artifacts/skin-final/release/compile.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/skin-final/release/link.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/skin-final/release/software.log": {
+      "sha256": "e8a7cb3afb682e7e3296f3ab3b4c001db8a4354af3396e552e905a2e65e0b90e",
+      "bytes": 7360
+    },
+    "artifacts/skin-final/release/arc.log": {
+      "sha256": "007ebc2473f048fb23a8aa0057a4de7b0851f748e6c85a938fdee4e26a6b4488",
+      "bytes": 7369
+    },
+    "artifacts/skin-final/release/software-refusal.log": {
+      "sha256": "5fe0ed29b14b264a2d64dc83d745299c590ecd77ed3eb89791d88cc26c8838fc",
+      "bytes": 155
+    },
+    "artifacts/skin-final/sanitize/compile.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/skin-final/sanitize/link.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/skin-final/sanitize/software.log": {
+      "sha256": "e8a7cb3afb682e7e3296f3ab3b4c001db8a4354af3396e552e905a2e65e0b90e",
+      "bytes": 7360
+    },
+    "artifacts/skin-device/compile.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/skin-device/link.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/skin-device/hardware.log": {
+      "sha256": "bf1c14517e96a4ddefaba0855f9d2cb46452cf4abf3cbffbfcb4d609bcca36fd",
+      "bytes": 6939
+    },
+    "artifacts/skin-device/software-refusal.log": {
+      "sha256": "5fe0ed29b14b264a2d64dc83d745299c590ecd77ed3eb89791d88cc26c8838fc",
+      "bytes": 155
+    }
+  },
+  "scope_limits": "Component qualification over fresh owning current1d R/S app/core/render/support; not a new fresh whole build or full regression. Original wrappers1 solely final mixed invocation missing four actual arguments; actual corrected152 and appversion0 each profile preserved separately. Actual117 skin consumer eachR/S/Arc. Curved morph refusal is a genuine prior-file sentinel under refusal/morph.glb, excluded from four successfully emitted GLBs/profile and retained with exact following native Save; not a validator-positive file. No new general morph shading, post-bind UV/key, paired physical normal-domain, physical headset or accelerated deformation claim. No system/session actions."
+}
