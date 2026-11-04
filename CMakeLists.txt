@@ -3812,3 +3812,12 @@ if(BUILD_TESTING)
   add_test(NAME anatomical-kernel-faults COMMAND dome-sculpt-anatomical-kernel-faults-test)
   set_tests_properties(anatomical-kernel-faults PROPERTIES TIMEOUT 300)
 endif()
+
+# Controlled-data caller faults. The real owning helper is only entry-gated,
+# then cancelled; completed native preparation has its separate workflow tests.
+if(BUILD_TESTING)
+  add_executable(dome-sculpt-anatomical-caller-faults-test tests/anatomical-caller-faults.cpp)
+  target_include_directories(dome-sculpt-anatomical-caller-faults-test PRIVATE src)
+  target_link_libraries(dome-sculpt-anatomical-caller-faults-test PRIVATE dome-sculpt-core)
+  target_link_options(dome-sculpt-anatomical-caller-faults-test PRIVATE "-Wl,--wrap=_ZN4dome22author_anatomical_skinERNS_5SceneESt4spanIKmLm18446744073709551615EERKNS_20SkinAuthoringOptionsERKSt8functionIFbvEE")
+endif()
