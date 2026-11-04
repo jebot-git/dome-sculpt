@@ -1,5 +1,19 @@
 # Full objective and completion evidence
 
+## Portable atomic save and final canonical picker SDK — 2026-11-04
+
+A qualified private public-main candidate carries c13909f atomic-output resource
+ordering plus canonical27/poll SDK guards and provenance. It adds no private
+Source4/HDR/weights/schema runtime. Matching immutable8d app/core/support is
+relinked with165 byte-identical SDK headers; normal+640/font32 native export
+workflows pass8 each in Release/SAN, and native Wayland passes9 each. Exact
+SDK-unlinked parent core20 proofs per profile are retained after binary/fixture/
+dependency audit, not rerun or relabeled. Read ATOMIC-SAVE-SDK-INTEGRATION.md and
+its receipt for source scopes, old missing-fixture/preload/readiness negatives
+and actual clean-exit gates. Main admission belongs to root. The full goal and
+every unfinished original/additional requirement remain active; no system or
+physical session changed.
+
 ## Private HDR native/controller controls — 2026-11-04
 
 The physical-producer continuation now has actual desktop and controller radiance

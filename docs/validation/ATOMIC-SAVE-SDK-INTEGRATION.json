@@ -1,0 +1,1332 @@
+{
+  "schema": 1,
+  "state": "qualified private public-main IO +canonical27/poll SDK integration; root owns publication",
+  "base": "8d20d8c563c49d30f1f8f845968126fd04683f7e",
+  "sdk_guard_commit": "33aba344eed8d1934f10441f50de72d48da7d277",
+  "prequalification_head": "12f3885950da9fbb6ac3c80f046c86b0d8da8687",
+  "runtime_changes_vs_8d": "none",
+  "runtime_repair": "c13909f portable atomic output path/directory resource preparation before commit; no new runtime/API changes in this child",
+  "canonical_runtime_commit": "6fa2624f89ddb105e482326995daec0bdbfd6643",
+  "canonical_published_metadata_commit": "341152b2429d28e70834917bc65c371b044481e8",
+  "bitmap_source_commit": "53b0fcaf533ad867300d65a4178285d0a2dbef58",
+  "sdk": {
+    "release": {
+      "prefix": "/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-release",
+      "profile": {
+        "schema": 1,
+        "use_poll": true,
+        "source_patch_sha256": "34091d15335d695f3bb328f3ccdcb4f68110f47a75271c563ba909c3682815b2",
+        "archive_sha256": "eede1fb2b8e9c2e581e77082e15252145855c79aad30070ee3b24aabe2f926f1",
+        "builder_sha256": "85cc04718523dbebfe0ac6c4384fa341641dabdb5022fff98998e18d2e783011",
+        "private_config_sha256": "4ca821fe37dfc7b8a65c9a17671bea43df3f9d97647017a867a11b7410ea9585",
+        "toolkit_libraries": {
+          "lib/libfltk.so": "095b5435a80e3df959a5ac7559036785f9c39ac87c32ef3658b0fdad96c41066",
+          "lib/libfltk.so.1.4": "095b5435a80e3df959a5ac7559036785f9c39ac87c32ef3658b0fdad96c41066",
+          "lib/libfltk.so.1.4.5": "095b5435a80e3df959a5ac7559036785f9c39ac87c32ef3658b0fdad96c41066",
+          "lib/libfltk_cairo.so": "9f595566ef8a8b12993e4e0e1b1f25051f66692bc6e58e56b97d9705a65e014c",
+          "lib/libfltk_cairo.so.1.4": "9f595566ef8a8b12993e4e0e1b1f25051f66692bc6e58e56b97d9705a65e014c",
+          "lib/libfltk_cairo.so.1.4.5": "9f595566ef8a8b12993e4e0e1b1f25051f66692bc6e58e56b97d9705a65e014c",
+          "lib/libfltk_gl.so": "9291feb964ab547ca6c26f23e47aa6f428450e5db2fead4df24000af555cf846",
+          "lib/libfltk_gl.so.1.4": "9291feb964ab547ca6c26f23e47aa6f428450e5db2fead4df24000af555cf846",
+          "lib/libfltk_gl.so.1.4.5": "9291feb964ab547ca6c26f23e47aa6f428450e5db2fead4df24000af555cf846",
+          "lib/libfltk_images.so": "8975bed2f2000fa1be94cba95b60c3e6fc5a296de7a85acd7cd598f50419298a",
+          "lib/libfltk_images.so.1.4": "8975bed2f2000fa1be94cba95b60c3e6fc5a296de7a85acd7cd598f50419298a",
+          "lib/libfltk_images.so.1.4.5": "8975bed2f2000fa1be94cba95b60c3e6fc5a296de7a85acd7cd598f50419298a"
+        }
+      },
+      "profile_sha256": "a4e17b9f50ed86f6ddcd906ada3399cf1b95d9fc9740cd6526944eda319a1ffc"
+    },
+    "sanitize": {
+      "prefix": "/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-sanitize",
+      "profile": {
+        "schema": 1,
+        "use_poll": true,
+        "source_patch_sha256": "34091d15335d695f3bb328f3ccdcb4f68110f47a75271c563ba909c3682815b2",
+        "archive_sha256": "eede1fb2b8e9c2e581e77082e15252145855c79aad30070ee3b24aabe2f926f1",
+        "builder_sha256": "85cc04718523dbebfe0ac6c4384fa341641dabdb5022fff98998e18d2e783011",
+        "private_config_sha256": "04b324fcfd2acb41bd92bf7d0c80c29d4ed0923cefef9266dc9826204561765b",
+        "toolkit_libraries": {
+          "lib/libfltk.so": "fbb0b153988bdd461943d56b6a685f9247cd3035601596a5ac4793f7722362cf",
+          "lib/libfltk.so.1.4": "fbb0b153988bdd461943d56b6a685f9247cd3035601596a5ac4793f7722362cf",
+          "lib/libfltk.so.1.4.5": "fbb0b153988bdd461943d56b6a685f9247cd3035601596a5ac4793f7722362cf",
+          "lib/libfltk_cairo.so": "9ab675b4cfce2616845d25207f149d0ffca8bd19a9c3a660d31ff18bfe05ce65",
+          "lib/libfltk_cairo.so.1.4": "9ab675b4cfce2616845d25207f149d0ffca8bd19a9c3a660d31ff18bfe05ce65",
+          "lib/libfltk_cairo.so.1.4.5": "9ab675b4cfce2616845d25207f149d0ffca8bd19a9c3a660d31ff18bfe05ce65",
+          "lib/libfltk_gl.so": "670603234f367801593c8500051aa6bf61923c689892a4c32585555adb7975b9",
+          "lib/libfltk_gl.so.1.4": "670603234f367801593c8500051aa6bf61923c689892a4c32585555adb7975b9",
+          "lib/libfltk_gl.so.1.4.5": "670603234f367801593c8500051aa6bf61923c689892a4c32585555adb7975b9",
+          "lib/libfltk_images.so": "66165a34be996ac7d29bd496fa059fce5b61af349fb49793f5d7ac4175da5915",
+          "lib/libfltk_images.so.1.4": "66165a34be996ac7d29bd496fa059fce5b61af349fb49793f5d7ac4175da5915",
+          "lib/libfltk_images.so.1.4.5": "66165a34be996ac7d29bd496fa059fce5b61af349fb49793f5d7ac4175da5915"
+        }
+      },
+      "profile_sha256": "802ca3d363653a45b37aa3cd1eb2681fb72629bb14959c45023860afb1187029"
+    }
+  },
+  "abi": {
+    "public_files_exact_per_profile": 165,
+    "old_exports_missing": [],
+    "class_size": 6328,
+    "manifest": "artifacts/poll-proof/final-abi.json",
+    "manifest_sha256": "cd0d07e31260b1e426b88be20ecee4a6ac86a197de5f98f4f86014f8750620aa",
+    "compatibility": "Private obsolete fdsets symbol storage retained; actual dispatcher uses official poll"
+  },
+  "build": {
+    "manifest": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20/artifacts/sdk-proof/build-status.json",
+      "sha256": "1f7f7d718948b44e306805a22a907f43dedb8e83d5e1838c1b86bb745af6dd7b"
+    },
+    "scope": "SDK-only configured relink, unchanged product code and165 public SDK headers; Release audited parent IO core plus original owned392 objects; SAN completed fresh parent own app/core/support. Missing projection test consumer compiled against own matching headers/copied core only.",
+    "seconds": 36.76735630299663,
+    "steps": [
+      {
+        "phase": "release-configure",
+        "command": [
+          "cmake",
+          "-S",
+          "/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20",
+          "-B",
+          "/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20/build-sdk-release",
+          "-G",
+          "Ninja",
+          "-DCMAKE_BUILD_TYPE=Release",
+          "-DDOME_COMPUTE_BACKEND=CPU",
+          "-DDOME_BUILD_UI=ON",
+          "-DDOME_BUILD_XR=ON",
+          "-DCMAKE_EXPORT_COMPILE_COMMANDS=ON",
+          "-DFLTK_DIR=/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-release/share/fltk",
+          "-U*DOME_BITMAP_RUNTIME*",
+          "-U*NATIVEGL*",
+          "-U*RENDERFONTS*"
+        ],
+        "cwd": "/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20",
+        "exit": 0,
+        "seconds": 4.269438169983914
+      },
+      {
+        "phase": "release-link-dome-sculpt",
+        "command": [
+          "/usr/bin/c++",
+          "-O3",
+          "-DNDEBUG",
+          "-Wl,--dependency-file=CMakeFiles/dome-sculpt.dir/link.d",
+          "/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20/build-sdk-release/matched-inputs/b98d342cc24ad848-native-display-runtime.cpp.o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20/build-sdk-release/matched-inputs/2fb2cbb4390f6ba1-rig-fit-editor.cpp.o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20/build-sdk-release/matched-inputs/449007f62f3a6f07-projection-editor.cpp.o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20/build-sdk-release/matched-inputs/0cf464a7d94f3729-spacenav-options.cpp.o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20/build-sdk-release/matched-inputs/05837505548b5ffd-app.cpp.o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20/build-sdk-release/matched-inputs/7955be231b95d69b-polygon-editor.cpp.o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20/build-sdk-release/matched-inputs/74fdb34e32b209bc-import-editor.cpp.o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20/build-sdk-release/matched-inputs/2e7307fa93f7a950-procedural-editor.cpp.o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20/build-sdk-release/matched-inputs/7beb0bf6e2dd783f-resolution-editor.cpp.o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20/build-sdk-release/matched-inputs/0d5488e1ce2e955c-sculpt-editor.cpp.o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20/build-sdk-release/matched-inputs/994af75987239d1b-creator-editor.cpp.o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20/build-sdk-release/matched-inputs/bec7aadf6e6178a3-rig-editor.cpp.o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20/build-sdk-release/matched-inputs/c6e0f398467804cd-shapekey-editor.cpp.o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20/build-sdk-release/matched-inputs/ff8fb152d9af5e67-weight-editor.cpp.o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20/build-sdk-release/matched-inputs/c4cd470191aeba67-skin-editor.cpp.o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20/build-sdk-release/matched-inputs/65247ce2ef8e7660-mesh-editor.cpp.o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20/build-sdk-release/matched-inputs/ed630682aa54b478-bake-editor.cpp.o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20/build-sdk-release/matched-inputs/907106f22b8046be-object-editor.cpp.o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20/build-sdk-release/matched-inputs/c117d416253226fc-paint-editor.cpp.o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20/build-sdk-release/matched-inputs/3fba487c9160e4e5-uv-editor.cpp.o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20/build-sdk-release/matched-inputs/25be2688fe3af820-ui-conventions.cpp.o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20/build-sdk-release/matched-inputs/7c62d2d31d0f85f9-session-appearance.cpp.o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20/build-sdk-release/matched-inputs/61b076c0388205c0-desktop-menu.cpp.o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20/build-sdk-release/matched-inputs/c2656ff292e85cc8-appmenu-protocol.c.o",
+          "-o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20/build-sdk-release/dome-sculpt",
+          "-L/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-release/lib",
+          "-L/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib",
+          "-Wl,-rpath,/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-release/lib:/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib:",
+          "/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20/build-sdk-release/matched-inputs/6db6886197b37f2f-libdome-sculpt-spacenav.a",
+          "/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20/build-sdk-release/matched-inputs/01d47ed55f4863e5-libdome-sculpt-core.a",
+          "/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20/build-sdk-release/matched-inputs/268da410fb20a468-libdome-sculpt-render.a",
+          "/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-release/lib/libfltk_images.so.1.4.5",
+          "/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-release/lib/libfltk_gl.so.1.4.5",
+          "/usr/lib64/libGLU.so",
+          "/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20/build-sdk-release/matched-inputs/ca337baf68ac5d7a-libdome-sculpt-xr.a",
+          "/usr/lib64/libjpeg.so",
+          "/usr/lib64/libpng.so",
+          "/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-release/lib/libfltk.so.1.4.5",
+          "-lcairo",
+          "-L/usr/lib64",
+          "-lX11",
+          "-lGLU",
+          "-lGL",
+          "/usr/lib64/libdl.a",
+          "/usr/lib64/libSM.so",
+          "/usr/lib64/libICE.so",
+          "/usr/lib64/libXext.so",
+          "/usr/lib64/libXinerama.so",
+          "/usr/lib64/libXfixes.so",
+          "/usr/lib64/libXcursor.so",
+          "/usr/lib64/libXrender.so",
+          "/usr/lib64/libXft.so",
+          "/usr/lib64/libwayland-egl.so",
+          "/usr/lib64/libwayland-cursor.so",
+          "/usr/lib64/libxkbcommon.so",
+          "/usr/lib64/libGLX.so",
+          "/usr/lib64/libOpenGL.so",
+          "/usr/lib64/libz.so",
+          "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libcairo.so",
+          "/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20/build-sdk-release/matched-inputs/268da410fb20a468-libdome-sculpt-render.a",
+          "/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20/build-sdk-release/matched-inputs/01d47ed55f4863e5-libdome-sculpt-core.a",
+          "/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20/build-sdk-release/matched-inputs/2d38a048799d7664-libdome-sculpt-affine.a",
+          "/usr/lib64/liblapacke.so",
+          "/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20/build-sdk-release/matched-inputs/bc1f2fb313bf8081-libdome-sculpt-polygon.a",
+          "/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20/build-sdk-release/matched-inputs/48f0506fde0a7fa0-libxatlas.a",
+          "/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20/build-sdk-release/matched-inputs/6d3ef0088de965a0-libmikktspace.a",
+          "/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20/build-sdk-release/matched-inputs/3ab486c3f061fc8f-libmikktspace-robust.a",
+          "/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20/build-sdk-release/matched-inputs/9473d2e900d2ba04-libufbx.a",
+          "/usr/lib64/libpng.so",
+          "/usr/lib64/libz.so",
+          "/usr/lib64/libjpeg.so",
+          "/usr/lib64/libEGL.so",
+          "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libharfbuzz.so",
+          "/usr/lib64/libGL.so",
+          "/usr/lib64/libfontconfig.so",
+          "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libfreetype.so",
+          "/usr/lib64/libicui18n.so",
+          "/usr/lib64/libicuuc.so",
+          "/usr/lib64/libopenxr_loader.so",
+          "/usr/lib64/libgio-2.0.so",
+          "/usr/lib64/libgobject-2.0.so",
+          "/usr/lib64/libglib-2.0.so",
+          "/usr/lib64/libX11.so",
+          "/usr/lib64/libwayland-client.so",
+          "-lm",
+          "-lgcc_s_asneeded",
+          "-Wl,-Map,/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20/build-sdk-release/dome-sculpt.map",
+          "-lgcc_s_asneeded"
+        ],
+        "cwd": "/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20/build-sdk-release",
+        "exit": 0,
+        "seconds": 0.3917465190170333
+      },
+      {
+        "phase": "release-link-dome-sculpt-export-cancellation-test",
+        "command": [
+          "/usr/bin/c++",
+          "-O3",
+          "-DNDEBUG",
+          "-Wl,--wrap=fsync",
+          "-Wl,--dependency-file=CMakeFiles/dome-sculpt-export-cancellation-test.dir/link.d",
+          "/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20/build-sdk-release/matched-inputs/b80907b333523ba5-export-cancellation.cpp.o",
+          "-o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20/build-sdk-release/dome-sculpt-export-cancellation-test",
+          "/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20/build-sdk-release/matched-inputs/01d47ed55f4863e5-libdome-sculpt-core.a",
+          "/usr/lib64/libpng.so",
+          "/usr/lib64/libz.so",
+          "/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20/build-sdk-release/matched-inputs/2d38a048799d7664-libdome-sculpt-affine.a",
+          "/usr/lib64/liblapacke.so",
+          "/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20/build-sdk-release/matched-inputs/bc1f2fb313bf8081-libdome-sculpt-polygon.a",
+          "/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20/build-sdk-release/matched-inputs/48f0506fde0a7fa0-libxatlas.a",
+          "/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20/build-sdk-release/matched-inputs/6d3ef0088de965a0-libmikktspace.a",
+          "/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20/build-sdk-release/matched-inputs/3ab486c3f061fc8f-libmikktspace-robust.a",
+          "/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20/build-sdk-release/matched-inputs/9473d2e900d2ba04-libufbx.a",
+          "/usr/lib64/libjpeg.so",
+          "-lgcc_s_asneeded",
+          "-Wl,-Map,/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20/build-sdk-release/dome-sculpt-export-cancellation-test.map",
+          "-lgcc_s_asneeded"
+        ],
+        "cwd": "/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20/build-sdk-release",
+        "exit": 0,
+        "seconds": 0.27945418099989183
+      },
+      {
+        "phase": "release-link-dome-sculpt-projection-native-test",
+        "command": [
+          "/usr/bin/c++",
+          "-O3",
+          "-DNDEBUG",
+          "-Wl,--dependency-file=CMakeFiles/dome-sculpt-projection-native-test.dir/link.d",
+          "/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20/build-sdk-release/matched-inputs/8b0eaf93fd891b91-projection-native.cpp.o",
+          "-o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20/build-sdk-release/dome-sculpt-projection-native-test",
+          "/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20/build-sdk-release/matched-inputs/01d47ed55f4863e5-libdome-sculpt-core.a",
+          "/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20/build-sdk-release/matched-inputs/2d38a048799d7664-libdome-sculpt-affine.a",
+          "/usr/lib64/liblapacke.so",
+          "/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20/build-sdk-release/matched-inputs/bc1f2fb313bf8081-libdome-sculpt-polygon.a",
+          "/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20/build-sdk-release/matched-inputs/48f0506fde0a7fa0-libxatlas.a",
+          "/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20/build-sdk-release/matched-inputs/6d3ef0088de965a0-libmikktspace.a",
+          "/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20/build-sdk-release/matched-inputs/3ab486c3f061fc8f-libmikktspace-robust.a",
+          "/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20/build-sdk-release/matched-inputs/9473d2e900d2ba04-libufbx.a",
+          "/usr/lib64/libpng.so",
+          "/usr/lib64/libz.so",
+          "/usr/lib64/libjpeg.so",
+          "-lgcc_s_asneeded",
+          "-Wl,-Map,/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20/build-sdk-release/dome-sculpt-projection-native-test.map",
+          "-lgcc_s_asneeded"
+        ],
+        "cwd": "/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20/build-sdk-release",
+        "exit": 0,
+        "seconds": 0.2633000100031495
+      },
+      {
+        "phase": "sanitize-configure",
+        "command": [
+          "cmake",
+          "-S",
+          "/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20",
+          "-B",
+          "/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20/build-sdk-sanitize",
+          "-G",
+          "Ninja",
+          "-DCMAKE_BUILD_TYPE=Release",
+          "-DDOME_COMPUTE_BACKEND=CPU",
+          "-DDOME_BUILD_UI=ON",
+          "-DDOME_BUILD_XR=ON",
+          "-DCMAKE_EXPORT_COMPILE_COMMANDS=ON",
+          "-DFLTK_DIR=/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-sanitize/share/fltk",
+          "-U*DOME_BITMAP_RUNTIME*",
+          "-U*NATIVEGL*",
+          "-U*RENDERFONTS*",
+          "-DCMAKE_C_FLAGS_RELEASE=-O1 -g1 -fsanitize=address,undefined -fno-omit-frame-pointer",
+          "-DCMAKE_CXX_FLAGS_RELEASE=-O1 -g1 -fsanitize=address,undefined -fno-omit-frame-pointer",
+          "-DCMAKE_EXE_LINKER_FLAGS=-fsanitize=address,undefined",
+          "-DCMAKE_SHARED_LINKER_FLAGS=-fsanitize=address,undefined"
+        ],
+        "cwd": "/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20",
+        "exit": 0,
+        "seconds": 4.594564233993879
+      },
+      {
+        "phase": "sanitize-link-dome-sculpt",
+        "command": [
+          "/usr/bin/c++",
+          "-O1",
+          "-g1",
+          "-fsanitize=address,undefined",
+          "-fno-omit-frame-pointer",
+          "-fsanitize=address,undefined",
+          "-Wl,--dependency-file=CMakeFiles/dome-sculpt.dir/link.d",
+          "/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20/build-sdk-sanitize/matched-inputs/0608adcdc395b416-native-display-runtime.cpp.o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20/build-sdk-sanitize/matched-inputs/38dfb94a1b9d5609-rig-fit-editor.cpp.o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20/build-sdk-sanitize/matched-inputs/187f664633ed201d-projection-editor.cpp.o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20/build-sdk-sanitize/matched-inputs/eaeb3bc20bed6ce7-spacenav-options.cpp.o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20/build-sdk-sanitize/matched-inputs/5584464cef23c178-app.cpp.o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20/build-sdk-sanitize/matched-inputs/4f8dde0463a1c0b9-polygon-editor.cpp.o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20/build-sdk-sanitize/matched-inputs/781195251fd830bd-import-editor.cpp.o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20/build-sdk-sanitize/matched-inputs/fc3cde5aaaec4e81-procedural-editor.cpp.o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20/build-sdk-sanitize/matched-inputs/dd7f2e9c96eaec45-resolution-editor.cpp.o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20/build-sdk-sanitize/matched-inputs/ec2205ed2013311d-sculpt-editor.cpp.o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20/build-sdk-sanitize/matched-inputs/24fa4d43f6d48b9d-creator-editor.cpp.o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20/build-sdk-sanitize/matched-inputs/56928c045ba79a0a-rig-editor.cpp.o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20/build-sdk-sanitize/matched-inputs/a61228a640d16b76-shapekey-editor.cpp.o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20/build-sdk-sanitize/matched-inputs/0caeea939c2407de-weight-editor.cpp.o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20/build-sdk-sanitize/matched-inputs/55795383b94e24fb-skin-editor.cpp.o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20/build-sdk-sanitize/matched-inputs/9be2d493fdfd232c-mesh-editor.cpp.o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20/build-sdk-sanitize/matched-inputs/45e2f2602b8ebfd3-bake-editor.cpp.o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20/build-sdk-sanitize/matched-inputs/2eea1a7789115072-object-editor.cpp.o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20/build-sdk-sanitize/matched-inputs/1a58ec328dc736f3-paint-editor.cpp.o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20/build-sdk-sanitize/matched-inputs/d06d006741fd65db-uv-editor.cpp.o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20/build-sdk-sanitize/matched-inputs/ed91ac5b68f165ec-ui-conventions.cpp.o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20/build-sdk-sanitize/matched-inputs/11d98dfcbfec66f6-session-appearance.cpp.o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20/build-sdk-sanitize/matched-inputs/eefccbeb8c69946a-desktop-menu.cpp.o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20/build-sdk-sanitize/matched-inputs/dd34cfd053964d2f-appmenu-protocol.c.o",
+          "-o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20/build-sdk-sanitize/dome-sculpt",
+          "-L/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-sanitize/lib",
+          "-L/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib",
+          "-Wl,-rpath,/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-sanitize/lib:/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib:",
+          "/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20/build-sdk-sanitize/matched-inputs/b5b7bd964f8572c3-libdome-sculpt-spacenav.a",
+          "/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20/build-sdk-sanitize/matched-inputs/95b52b072d6a9140-libdome-sculpt-core.a",
+          "/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20/build-sdk-sanitize/matched-inputs/84640f97da6a02f6-libdome-sculpt-render.a",
+          "/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-sanitize/lib/libfltk_images.so.1.4.5",
+          "/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-sanitize/lib/libfltk_gl.so.1.4.5",
+          "/usr/lib64/libGLU.so",
+          "/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20/build-sdk-sanitize/matched-inputs/80509c2892d60c2c-libdome-sculpt-xr.a",
+          "/usr/lib64/libjpeg.so",
+          "/usr/lib64/libpng.so",
+          "/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-sanitize/lib/libfltk.so.1.4.5",
+          "-lcairo",
+          "-L/usr/lib64",
+          "-lX11",
+          "-lGLU",
+          "-lGL",
+          "/usr/lib64/libdl.a",
+          "/usr/lib64/libSM.so",
+          "/usr/lib64/libICE.so",
+          "/usr/lib64/libXext.so",
+          "/usr/lib64/libXinerama.so",
+          "/usr/lib64/libXfixes.so",
+          "/usr/lib64/libXcursor.so",
+          "/usr/lib64/libXrender.so",
+          "/usr/lib64/libXft.so",
+          "/usr/lib64/libwayland-egl.so",
+          "/usr/lib64/libwayland-cursor.so",
+          "/usr/lib64/libxkbcommon.so",
+          "/usr/lib64/libGLX.so",
+          "/usr/lib64/libOpenGL.so",
+          "/usr/lib64/libz.so",
+          "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libcairo.so",
+          "/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20/build-sdk-sanitize/matched-inputs/84640f97da6a02f6-libdome-sculpt-render.a",
+          "/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20/build-sdk-sanitize/matched-inputs/95b52b072d6a9140-libdome-sculpt-core.a",
+          "/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20/build-sdk-sanitize/matched-inputs/94380cfaa2f322ec-libdome-sculpt-affine.a",
+          "/usr/lib64/liblapacke.so",
+          "/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20/build-sdk-sanitize/matched-inputs/e7460891de1f6e17-libdome-sculpt-polygon.a",
+          "/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20/build-sdk-sanitize/matched-inputs/09f8a68c1f797d22-libxatlas.a",
+          "/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20/build-sdk-sanitize/matched-inputs/5aaaaace774cd5b7-libmikktspace.a",
+          "/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20/build-sdk-sanitize/matched-inputs/c870998a3ccecb96-libmikktspace-robust.a",
+          "/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20/build-sdk-sanitize/matched-inputs/e8dcfe86da25fa83-libufbx.a",
+          "/usr/lib64/libpng.so",
+          "/usr/lib64/libz.so",
+          "/usr/lib64/libjpeg.so",
+          "/usr/lib64/libEGL.so",
+          "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libharfbuzz.so",
+          "/usr/lib64/libGL.so",
+          "/usr/lib64/libfontconfig.so",
+          "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libfreetype.so",
+          "/usr/lib64/libicui18n.so",
+          "/usr/lib64/libicuuc.so",
+          "/usr/lib64/libopenxr_loader.so",
+          "/usr/lib64/libgio-2.0.so",
+          "/usr/lib64/libgobject-2.0.so",
+          "/usr/lib64/libglib-2.0.so",
+          "/usr/lib64/libX11.so",
+          "/usr/lib64/libwayland-client.so",
+          "-lm",
+          "-lgcc_s_asneeded",
+          "-Wl,-Map,/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20/build-sdk-sanitize/dome-sculpt.map",
+          "-lgcc_s_asneeded"
+        ],
+        "cwd": "/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20/build-sdk-sanitize",
+        "exit": 0,
+        "seconds": 2.150554066989571
+      },
+      {
+        "phase": "sanitize-link-dome-sculpt-export-cancellation-test",
+        "command": [
+          "/usr/bin/c++",
+          "-O1",
+          "-g1",
+          "-fsanitize=address,undefined",
+          "-fno-omit-frame-pointer",
+          "-fsanitize=address,undefined",
+          "-Wl,--wrap=fsync",
+          "-Wl,--dependency-file=CMakeFiles/dome-sculpt-export-cancellation-test.dir/link.d",
+          "/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20/build-sdk-sanitize/matched-inputs/55c73ff99e61c30a-export-cancellation.cpp.o",
+          "-o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20/build-sdk-sanitize/dome-sculpt-export-cancellation-test",
+          "/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20/build-sdk-sanitize/matched-inputs/95b52b072d6a9140-libdome-sculpt-core.a",
+          "/usr/lib64/libpng.so",
+          "/usr/lib64/libz.so",
+          "/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20/build-sdk-sanitize/matched-inputs/94380cfaa2f322ec-libdome-sculpt-affine.a",
+          "/usr/lib64/liblapacke.so",
+          "/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20/build-sdk-sanitize/matched-inputs/e7460891de1f6e17-libdome-sculpt-polygon.a",
+          "/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20/build-sdk-sanitize/matched-inputs/09f8a68c1f797d22-libxatlas.a",
+          "/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20/build-sdk-sanitize/matched-inputs/5aaaaace774cd5b7-libmikktspace.a",
+          "/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20/build-sdk-sanitize/matched-inputs/c870998a3ccecb96-libmikktspace-robust.a",
+          "/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20/build-sdk-sanitize/matched-inputs/e8dcfe86da25fa83-libufbx.a",
+          "/usr/lib64/libjpeg.so",
+          "-lgcc_s_asneeded",
+          "-Wl,-Map,/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20/build-sdk-sanitize/dome-sculpt-export-cancellation-test.map",
+          "-lgcc_s_asneeded"
+        ],
+        "cwd": "/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20/build-sdk-sanitize",
+        "exit": 0,
+        "seconds": 1.792109119007364
+      },
+      {
+        "phase": "sanitize-compile-projection-helper",
+        "command": [
+          "/usr/bin/c++",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20/include",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20/third_party/openbrush",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20/third_party/nlohmann",
+          "-O1",
+          "-g1",
+          "-fsanitize=address,undefined",
+          "-fno-omit-frame-pointer",
+          "-std=gnu++20",
+          "-o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20/build-sdk-sanitize/matched-inputs/projection-native.cpp.o",
+          "-c",
+          "/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20/tests/projection-native.cpp"
+        ],
+        "cwd": "/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20/build-sdk-sanitize",
+        "exit": 0,
+        "seconds": 9.45433876698371
+      },
+      {
+        "phase": "sanitize-link-dome-sculpt-projection-native-test",
+        "command": [
+          "/usr/bin/c++",
+          "-O1",
+          "-g1",
+          "-fsanitize=address,undefined",
+          "-fno-omit-frame-pointer",
+          "-fsanitize=address,undefined",
+          "-Wl,--dependency-file=CMakeFiles/dome-sculpt-projection-native-test.dir/link.d",
+          "/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20/build-sdk-sanitize/matched-inputs/4992d70c9f14812c-projection-native.cpp.o",
+          "-o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20/build-sdk-sanitize/dome-sculpt-projection-native-test",
+          "/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20/build-sdk-sanitize/matched-inputs/95b52b072d6a9140-libdome-sculpt-core.a",
+          "/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20/build-sdk-sanitize/matched-inputs/94380cfaa2f322ec-libdome-sculpt-affine.a",
+          "/usr/lib64/liblapacke.so",
+          "/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20/build-sdk-sanitize/matched-inputs/e7460891de1f6e17-libdome-sculpt-polygon.a",
+          "/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20/build-sdk-sanitize/matched-inputs/09f8a68c1f797d22-libxatlas.a",
+          "/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20/build-sdk-sanitize/matched-inputs/5aaaaace774cd5b7-libmikktspace.a",
+          "/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20/build-sdk-sanitize/matched-inputs/c870998a3ccecb96-libmikktspace-robust.a",
+          "/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20/build-sdk-sanitize/matched-inputs/e8dcfe86da25fa83-libufbx.a",
+          "/usr/lib64/libpng.so",
+          "/usr/lib64/libz.so",
+          "/usr/lib64/libjpeg.so",
+          "-lgcc_s_asneeded",
+          "-Wl,-Map,/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20/build-sdk-sanitize/dome-sculpt-projection-native-test.map",
+          "-lgcc_s_asneeded"
+        ],
+        "cwd": "/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20/build-sdk-sanitize",
+        "exit": 0,
+        "seconds": 1.925375430000713
+      }
+    ],
+    "links": {
+      "release/dome-sculpt": {
+        "binary": "/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20/build-sdk-release/dome-sculpt",
+        "sha256": "cebf8aed91a8a984cd3d19e79ad949edcfbacf2320b47ea3d924f04e2cb78ef5",
+        "ldd": "\tlinux-vdso.so.1 (0x00007f008907e000)\n\tlibfltk_images.so.1.4 => /home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-release/lib/libfltk_images.so.1.4 (0x00007f0089036000)\n\tlibfltk_gl.so.1.4 => /home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-release/lib/libfltk_gl.so.1.4 (0x00007f0089002000)\n\tlibGLU.so.1 => /lib64/libGLU.so.1 (0x00007f0088f82000)\n\tlibjpeg.so.62 => /lib64/libjpeg.so.62 (0x00007f0088ede000)\n\tlibpng16.so.16 => /lib64/libpng16.so.16 (0x00007f0088ea1000)\n\tlibfltk.so.1.4 => /home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-release/lib/libfltk.so.1.4 (0x00007f0088c00000)\n\tlibcairo.so.2 => /home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libcairo.so.2 (0x00007f0088a66000)\n\tlibX11.so.6 => /lib64/libX11.so.6 (0x00007f0088911000)\n\tlibGL.so.1 => /lib64/libGL.so.1 (0x00007f0088e2c000)\n\tlibSM.so.6 => /lib64/libSM.so.6 (0x00007f0088e21000)\n\tlibICE.so.6 => /lib64/libICE.so.6 (0x00007f00888f3000)\n\tlibXext.so.6 => /lib64/libXext.so.6 (0x00007f00888dd000)\n\tlibXinerama.so.1 => /lib64/libXinerama.so.1 (0x00007f00888d9000)\n\tlibXfixes.so.3 => /lib64/libXfixes.so.3 (0x00007f00888d1000)\n\tlibXcursor.so.1 => /lib64/libXcursor.so.1 (0x00007f00888c4000)\n\tlibXrender.so.1 => /lib64/libXrender.so.1 (0x00007f00888b7000)\n\tlibXft.so.2 => /lib64/libXft.so.2 (0x00007f008889c000)\n\tlibwayland-egl.so.1 => /lib64/libwayland-egl.so.1 (0x00007f0088896000)\n\tlibwayland-cursor.so.0 => /lib64/libwayland-cursor.so.0 (0x00007f008888c000)\n\tlibxkbcommon.so.0 => /lib64/libxkbcommon.so.0 (0x00007f008882d000)\n\tlibGLX.so.0 => /lib64/libGLX.so.0 (0x00007f00887fc000)\n\tlibOpenGL.so.0 => /lib64/libOpenGL.so.0 (0x00007f00887d8000)\n\tlibz.so.1 => /lib64/libz.so.1 (0x00007f00887ae000)\n\tliblapacke.so.3 => /lib64/liblapacke.so.3 (0x00007f0088400000)\n\tlibEGL.so.1 => /lib64/libEGL.so.1 (0x00007f008879b000)\n\tlibharfbuzz.so.0 => /home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libharfbuzz.so.0 (0x00007f0088239000)\n\tlibfontconfig.so.1 => /lib64/libfontconfig.so.1 (0x00007f0088748000)\n\tlibfreetype.so.6 => /home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libfreetype.so.6 (0x00007f008864b000)\n\tlibicui18n.so.77 => /lib64/libicui18n.so.77 (0x00007f0087e00000)\n\tlibicuuc.so.77 => /lib64/libicuuc.so.77 (0x00007f0087a00000)\n\tlibopenxr_loader.so.1 => /lib64/libopenxr_loader.so.1 (0x00007f00881f4000)\n\tlibgio-2.0.so.0 => /lib64/libgio-2.0.so.0 (0x00007f0087c20000)\n\tlibgobject-2.0.so.0 => /lib64/libgobject-2.0.so.0 (0x00007f008799f000)\n\tlibglib-2.0.so.0 => /lib64/libglib-2.0.so.0 (0x00007f008783d000)\n\tlibwayland-client.so.0 => /lib64/libwayland-client.so.0 (0x00007f00881e4000)\n\tlibgcc_s.so.1 => /lib64/libgcc_s.so.1 (0x00007f00881b7000)\n\tlibstdc++.so.6 => /lib64/libstdc++.so.6 (0x00007f0087400000)\n\tlibm.so.6 => /lib64/libm.so.6 (0x00007f0087726000)\n\tlibc.so.6 => /lib64/libc.so.6 (0x00007f0087207000)\n\tlibxcb.so.1 => /lib64/libxcb.so.1 (0x00007f00876fc000)\n\tlibxcb-render.so.0 => /lib64/libxcb-render.so.0 (0x00007f00881a6000)\n\tlibxcb-shm.so.0 => /lib64/libxcb-shm.so.0 (0x00007f00881a2000)\n\tlibpixman-1.so.0 => /lib64/libpixman-1.so.0 (0x00007f0087156000)\n\tlibGLdispatch.so.0 => /lib64/libGLdispatch.so.0 (0x00007f00870de000)\n\tlibuuid.so.1 => /lib64/libuuid.so.1 (0x00007f00876f3000)\n\tlibtmglib.so.3 => /lib64/libtmglib.so.3 (0x00007f008707b000)\n\tliblapack.so.3 => /lib64/liblapack.so.3 (0x00007f0086800000)\n\tlibgraphite2.so.3 => /lib64/libgraphite2.so.3 (0x00007f00876d3000)\n\tlibxml2.so.2 => /lib64/libxml2.so.2 (0x00007f0086f0c000)\n\tlibbz2.so.1 => /lib64/libbz2.so.1 (0x00007f00876bf000)\n\tlibbrotlidec.so.1 => /lib64/libbrotlidec.so.1 (0x00007f0086efd000)\n\tlibicudata.so.77 => /lib64/libicudata.so.77 (0x00007f0084800000)\n\tlibjsoncpp.so.26 => /lib64/libjsoncpp.so.26 (0x00007f0086eb8000)\n\tlibgmodule-2.0.so.0 => /lib64/libgmodule-2.0.so.0 (0x00007f00876b9000)\n\tlibmount.so.1 => /lib64/libmount.so.1 (0x00007f00867a6000)\n\tlibselinux.so.1 => /lib64/libselinux.so.1 (0x00007f0086772000)\n\tlibffi.so.8 => /lib64/libffi.so.8 (0x00007f0086762000)\n\tlibpcre2-8.so.0 => /lib64/libpcre2-8.so.0 (0x00007f00866b1000)\n\t/lib64/ld-linux-x86-64.so.2 (0x00007f0089080000)\n\tlibXau.so.6 => /lib64/libXau.so.6 (0x00007f00876b2000)\n\tlibblas.so.3 => /lib64/libblas.so.3 (0x00007f0084736000)\n\tlibmvec.so.1 => /lib64/libmvec.so.1 (0x00007f008463c000)\n\tlibgfortran.so.5 => /lib64/libgfortran.so.5 (0x00007f0084200000)\n\tliblzma.so.5 => /lib64/liblzma.so.5 (0x00007f008667b000)\n\tlibbrotlicommon.so.1 => /lib64/libbrotlicommon.so.1 (0x00007f0084619000)\n\tlibblkid.so.1 => /lib64/libblkid.so.1 (0x00007f00845dc000)\n"
+      },
+      "release/dome-sculpt-export-cancellation-test": {
+        "binary": "/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20/build-sdk-release/dome-sculpt-export-cancellation-test",
+        "sha256": "0dd2735b2db8d0169d2144f7753b367caa78a5977b1e5df670e0ab339bd120a7",
+        "ldd": "\tlinux-vdso.so.1 (0x00007f3146ba7000)\n\tlibpng16.so.16 => /lib64/libpng16.so.16 (0x00007f3146b3d000)\n\tlibz.so.1 => /lib64/libz.so.1 (0x00007f3146b13000)\n\tliblapacke.so.3 => /lib64/liblapacke.so.3 (0x00007f3146800000)\n\tlibjpeg.so.62 => /lib64/libjpeg.so.62 (0x00007f3146a6f000)\n\tlibgcc_s.so.1 => /lib64/libgcc_s.so.1 (0x00007f31467d3000)\n\tlibstdc++.so.6 => /lib64/libstdc++.so.6 (0x00007f3146400000)\n\tlibm.so.6 => /lib64/libm.so.6 (0x00007f31466bc000)\n\tlibc.so.6 => /lib64/libc.so.6 (0x00007f3146207000)\n\tlibtmglib.so.3 => /lib64/libtmglib.so.3 (0x00007f31461a4000)\n\tliblapack.so.3 => /lib64/liblapack.so.3 (0x00007f3145a00000)\n\t/lib64/ld-linux-x86-64.so.2 (0x00007f3146ba9000)\n\tlibblas.so.3 => /lib64/libblas.so.3 (0x00007f31460da000)\n\tlibmvec.so.1 => /lib64/libmvec.so.1 (0x00007f3145906000)\n\tlibgfortran.so.5 => /lib64/libgfortran.so.5 (0x00007f3145400000)\n"
+      },
+      "release/dome-sculpt-projection-native-test": {
+        "binary": "/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20/build-sdk-release/dome-sculpt-projection-native-test",
+        "sha256": "8994742b96b33a5dc300e78d1de8c1db0ef2e6e116d3b4bea8c6fbad5e152173",
+        "ldd": "\tlinux-vdso.so.1 (0x00007fec45e4b000)\n\tliblapacke.so.3 => /lib64/liblapacke.so.3 (0x00007fec45a00000)\n\tlibpng16.so.16 => /lib64/libpng16.so.16 (0x00007fec45de1000)\n\tlibz.so.1 => /lib64/libz.so.1 (0x00007fec45db7000)\n\tlibjpeg.so.62 => /lib64/libjpeg.so.62 (0x00007fec45d13000)\n\tlibgcc_s.so.1 => /lib64/libgcc_s.so.1 (0x00007fec45ce4000)\n\tlibstdc++.so.6 => /lib64/libstdc++.so.6 (0x00007fec45600000)\n\tlibm.so.6 => /lib64/libm.so.6 (0x00007fec458e9000)\n\tlibc.so.6 => /lib64/libc.so.6 (0x00007fec45407000)\n\tlibtmglib.so.3 => /lib64/libtmglib.so.3 (0x00007fec45c81000)\n\tliblapack.so.3 => /lib64/liblapack.so.3 (0x00007fec44c00000)\n\t/lib64/ld-linux-x86-64.so.2 (0x00007fec45e4d000)\n\tlibblas.so.3 => /lib64/libblas.so.3 (0x00007fec4533d000)\n\tlibmvec.so.1 => /lib64/libmvec.so.1 (0x00007fec44b06000)\n\tlibgfortran.so.5 => /lib64/libgfortran.so.5 (0x00007fec44600000)\n"
+      },
+      "sanitize/dome-sculpt": {
+        "binary": "/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20/build-sdk-sanitize/dome-sculpt",
+        "sha256": "89dd31d0fb604aab88e937c81243f968310e20171c9c1e27a989fffe5fc34fb7",
+        "ldd": "\tlinux-vdso.so.1 (0x00007fbf23d79000)\n\tlibasan.so.8 => /lib64/libasan.so.8 (0x00007fbf23600000)\n\tlibfltk_images.so.1.4 => /home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-sanitize/lib/libfltk_images.so.1.4 (0x00007fbf23200000)\n\tlibfltk_gl.so.1.4 => /home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-sanitize/lib/libfltk_gl.so.1.4 (0x00007fbf22e00000)\n\tlibGLU.so.1 => /lib64/libGLU.so.1 (0x00007fbf231a5000)\n\tlibjpeg.so.62 => /lib64/libjpeg.so.62 (0x00007fbf23101000)\n\tlibpng16.so.16 => /lib64/libpng16.so.16 (0x00007fbf23d0d000)\n\tlibfltk.so.1.4 => /home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-sanitize/lib/libfltk.so.1.4 (0x00007fbf1fe00000)\n\tlibcairo.so.2 => /home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libcairo.so.2 (0x00007fbf1fc66000)\n\tlibX11.so.6 => /lib64/libX11.so.6 (0x00007fbf1fb11000)\n\tlibGL.so.1 => /lib64/libGL.so.1 (0x00007fbf2308e000)\n\tlibSM.so.6 => /lib64/libSM.so.6 (0x00007fbf23083000)\n\tlibICE.so.6 => /lib64/libICE.so.6 (0x00007fbf23065000)\n\tlibXext.so.6 => /lib64/libXext.so.6 (0x00007fbf23051000)\n\tlibXinerama.so.1 => /lib64/libXinerama.so.1 (0x00007fbf23d07000)\n\tlibXfixes.so.3 => /lib64/libXfixes.so.3 (0x00007fbf23049000)\n\tlibXcursor.so.1 => /lib64/libXcursor.so.1 (0x00007fbf2303c000)\n\tlibXrender.so.1 => /lib64/libXrender.so.1 (0x00007fbf2302f000)\n\tlibXft.so.2 => /lib64/libXft.so.2 (0x00007fbf23014000)\n\tlibwayland-egl.so.1 => /lib64/libwayland-egl.so.1 (0x00007fbf23010000)\n\tlibwayland-cursor.so.0 => /lib64/libwayland-cursor.so.0 (0x00007fbf22df6000)\n\tlibxkbcommon.so.0 => /lib64/libxkbcommon.so.0 (0x00007fbf22d97000)\n\tlibGLX.so.0 => /lib64/libGLX.so.0 (0x00007fbf22d66000)\n\tlibOpenGL.so.0 => /lib64/libOpenGL.so.0 (0x00007fbf1faed000)\n\tlibz.so.1 => /lib64/libz.so.1 (0x00007fbf1fac3000)\n\tliblapacke.so.3 => /lib64/liblapacke.so.3 (0x00007fbf1f800000)\n\tlibEGL.so.1 => /lib64/libEGL.so.1 (0x00007fbf1fab2000)\n\tlibharfbuzz.so.0 => /home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libharfbuzz.so.0 (0x00007fbf1f639000)\n\tlibfontconfig.so.1 => /lib64/libfontconfig.so.1 (0x00007fbf1fa5f000)\n\tlibfreetype.so.6 => /home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libfreetype.so.6 (0x00007fbf1f53c000)\n\tlibicui18n.so.77 => /lib64/libicui18n.so.77 (0x00007fbf1f000000)\n\tlibicuuc.so.77 => /lib64/libicuuc.so.77 (0x00007fbf1ec00000)\n\tlibopenxr_loader.so.1 => /lib64/libopenxr_loader.so.1 (0x00007fbf1f4f7000)\n\tlibgio-2.0.so.0 => /lib64/libgio-2.0.so.0 (0x00007fbf1ee20000)\n\tlibgobject-2.0.so.0 => /lib64/libgobject-2.0.so.0 (0x00007fbf1f496000)\n\tlibglib-2.0.so.0 => /lib64/libglib-2.0.so.0 (0x00007fbf1ea9e000)\n\tlibwayland-client.so.0 => /lib64/libwayland-client.so.0 (0x00007fbf1fa4b000)\n\tlibgcc_s.so.1 => /lib64/libgcc_s.so.1 (0x00007fbf1f469000)\n\tlibstdc++.so.6 => /lib64/libstdc++.so.6 (0x00007fbf1e600000)\n\tlibm.so.6 => /lib64/libm.so.6 (0x00007fbf1e987000)\n\tlibubsan.so.1 => /lib64/libubsan.so.1 (0x00007fbf1de00000)\n\tlibc.so.6 => /lib64/libc.so.6 (0x00007fbf1dc07000)\n\tlibxcb.so.1 => /lib64/libxcb.so.1 (0x00007fbf1f43f000)\n\tlibxcb-render.so.0 => /lib64/libxcb-render.so.0 (0x00007fbf1f430000)\n\tlibxcb-shm.so.0 => /lib64/libxcb-shm.so.0 (0x00007fbf1f42c000)\n\tlibpixman-1.so.0 => /lib64/libpixman-1.so.0 (0x00007fbf1e8d6000)\n\tlibGLdispatch.so.0 => /lib64/libGLdispatch.so.0 (0x00007fbf1f3b4000)\n\tlibuuid.so.1 => /lib64/libuuid.so.1 (0x00007fbf1f3ab000)\n\tlibtmglib.so.3 => /lib64/libtmglib.so.3 (0x00007fbf1e59d000)\n\tliblapack.so.3 => /lib64/liblapack.so.3 (0x00007fbf1d400000)\n\tlibgraphite2.so.3 => /lib64/libgraphite2.so.3 (0x00007fbf1e8b6000)\n\tlibxml2.so.2 => /lib64/libxml2.so.2 (0x00007fbf1e42e000)\n\tlibbz2.so.1 => /lib64/libbz2.so.1 (0x00007fbf1e41a000)\n\tlibbrotlidec.so.1 => /lib64/libbrotlidec.so.1 (0x00007fbf1dbf8000)\n\tlibicudata.so.77 => /lib64/libicudata.so.77 (0x00007fbf1b400000)\n\tlibjsoncpp.so.26 => /lib64/libjsoncpp.so.26 (0x00007fbf1dbb3000)\n\tlibgmodule-2.0.so.0 => /lib64/libgmodule-2.0.so.0 (0x00007fbf1f3a1000)\n\tlibmount.so.1 => /lib64/libmount.so.1 (0x00007fbf1db59000)\n\tlibselinux.so.1 => /lib64/libselinux.so.1 (0x00007fbf1db25000)\n\tlibffi.so.8 => /lib64/libffi.so.8 (0x00007fbf1db15000)\n\tlibpcre2-8.so.0 => /lib64/libpcre2-8.so.0 (0x00007fbf1d34f000)\n\t/lib64/ld-linux-x86-64.so.2 (0x00007fbf23d7b000)\n\tlibXau.so.6 => /lib64/libXau.so.6 (0x00007fbf1db10000)\n\tlibblas.so.3 => /lib64/libblas.so.3 (0x00007fbf1d285000)\n\tlibmvec.so.1 => /lib64/libmvec.so.1 (0x00007fbf1b306000)\n\tlibgfortran.so.5 => /lib64/libgfortran.so.5 (0x00007fbf1ae00000)\n\tliblzma.so.5 => /lib64/liblzma.so.5 (0x00007fbf1dada000)\n\tlibbrotlicommon.so.1 => /lib64/libbrotlicommon.so.1 (0x00007fbf1dab7000)\n\tlibblkid.so.1 => /lib64/libblkid.so.1 (0x00007fbf1b2c9000)\n"
+      },
+      "sanitize/dome-sculpt-export-cancellation-test": {
+        "binary": "/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20/build-sdk-sanitize/dome-sculpt-export-cancellation-test",
+        "sha256": "02b66ca02563f4c2b21816c5af2f8df2f03fce92f79e868677bc0257142ed8f3",
+        "ldd": "\tlinux-vdso.so.1 (0x00007faa9aa16000)\n\tlibasan.so.8 => /lib64/libasan.so.8 (0x00007faa9a200000)\n\tlibpng16.so.16 => /lib64/libpng16.so.16 (0x00007faa9a9ac000)\n\tlibz.so.1 => /lib64/libz.so.1 (0x00007faa9a982000)\n\tliblapacke.so.3 => /lib64/liblapacke.so.3 (0x00007faa99e00000)\n\tlibjpeg.so.62 => /lib64/libjpeg.so.62 (0x00007faa9a15c000)\n\tlibgcc_s.so.1 => /lib64/libgcc_s.so.1 (0x00007faa9a953000)\n\tlibstdc++.so.6 => /lib64/libstdc++.so.6 (0x00007faa99a00000)\n\tlibm.so.6 => /lib64/libm.so.6 (0x00007faa99ce9000)\n\tlibubsan.so.1 => /lib64/libubsan.so.1 (0x00007faa99200000)\n\tlibc.so.6 => /lib64/libc.so.6 (0x00007faa99007000)\n\tlibtmglib.so.3 => /lib64/libtmglib.so.3 (0x00007faa9a0f9000)\n\tliblapack.so.3 => /lib64/liblapack.so.3 (0x00007faa98800000)\n\t/lib64/ld-linux-x86-64.so.2 (0x00007faa9aa18000)\n\tlibblas.so.3 => /lib64/libblas.so.3 (0x00007faa99936000)\n\tlibmvec.so.1 => /lib64/libmvec.so.1 (0x00007faa9983c000)\n\tlibgfortran.so.5 => /lib64/libgfortran.so.5 (0x00007faa98400000)\n"
+      },
+      "sanitize/dome-sculpt-projection-native-test": {
+        "binary": "/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20/build-sdk-sanitize/dome-sculpt-projection-native-test",
+        "sha256": "3dedd3a05a378fe3e560928794be59953adb898e9b17ac3bf691758ca1efe050",
+        "ldd": "\tlinux-vdso.so.1 (0x00007f3279ea3000)\n\tlibasan.so.8 => /lib64/libasan.so.8 (0x00007f3279600000)\n\tliblapacke.so.3 => /lib64/liblapacke.so.3 (0x00007f3279200000)\n\tlibpng16.so.16 => /lib64/libpng16.so.16 (0x00007f3279e39000)\n\tlibz.so.1 => /lib64/libz.so.1 (0x00007f3279e0f000)\n\tlibjpeg.so.62 => /lib64/libjpeg.so.62 (0x00007f3279d69000)\n\tlibgcc_s.so.1 => /lib64/libgcc_s.so.1 (0x00007f3279d3c000)\n\tlibstdc++.so.6 => /lib64/libstdc++.so.6 (0x00007f3278e00000)\n\tlibm.so.6 => /lib64/libm.so.6 (0x00007f32794e9000)\n\tlibubsan.so.1 => /lib64/libubsan.so.1 (0x00007f3278600000)\n\tlibc.so.6 => /lib64/libc.so.6 (0x00007f3278407000)\n\tlibtmglib.so.3 => /lib64/libtmglib.so.3 (0x00007f3279486000)\n\tliblapack.so.3 => /lib64/liblapack.so.3 (0x00007f3277c00000)\n\t/lib64/ld-linux-x86-64.so.2 (0x00007f3279ea5000)\n\tlibblas.so.3 => /lib64/libblas.so.3 (0x00007f3279136000)\n\tlibmvec.so.1 => /lib64/libmvec.so.1 (0x00007f3278d06000)\n\tlibgfortran.so.5 => /lib64/libgfortran.so.5 (0x00007f3277800000)\n"
+      }
+    },
+    "source_before": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20/artifacts/sdk-proof/source-before.json",
+      "sha256": "68b84eadbd545bfccb13e53ad0833076bba99da644fbefe15d4800f56394eedf"
+    },
+    "source_after": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20/artifacts/sdk-proof/source-after.json",
+      "sha256": "68b84eadbd545bfccb13e53ad0833076bba99da644fbefe15d4800f56394eedf"
+    },
+    "note": "Export fixture auto-ASAN selection corrected after initial build; only test harness bytes changed. Runtime/header/object/library bytes stay exact. No whole-app recompilation or new full-suite claim."
+  },
+  "product_equality": {
+    "path": "/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20/artifacts/sdk-proof/product-equality.json",
+    "sha256": "7e6ea1d0d2a3e3c0aabf2b4bb88ca2ddb52fc01b1062f5ab003bf3c16187d167"
+  },
+  "core_reuse": {
+    "manifest": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20/artifacts/sdk-proof/core-sdk-reuse.json",
+      "sha256": "01e0c28d5f2e728455e8ee12c543d8b711327f46034d45f2050ccaa65505aaa5"
+    },
+    "scope": "Pure core20 parent commands retain exact tested binaries/fixtures, static support and runtime sources. SDK not linked, no rerun or new SDK behavior claim. ParentRelease is composed18 Passed +required-fixture2 Passed, preserving initial2NotRun; SAN one20/20 command.",
+    "parent_receipts": {
+      "release-v3/status.json": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/atomic-main-0b5ada0/artifacts/io-proof/release-v3/status.json",
+        "sha256": "70eea5959faef4eb34d0458f5f73a8ded7756c554f78735237166d046071e618"
+      },
+      "release-required-fixture/status.json": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/atomic-main-0b5ada0/artifacts/io-proof/release-required-fixture/status.json",
+        "sha256": "4233ccb7028b148ba4420c637370dc1a4da11ba9a85e44a99f35f1717ce4b1e2"
+      },
+      "release-composition-audit.json": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/atomic-main-0b5ada0/artifacts/io-proof/release-composition-audit.json",
+        "sha256": "f801080bd13fe0f145682d64c77d139a3001ba34969b966ba0d6693a63c3fa33"
+      },
+      "sanitize-build-v3/status.json": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/atomic-main-0b5ada0/artifacts/io-proof/sanitize-build-v3/status.json",
+        "sha256": "f3fb6dfbf690aef65e02846aaecff85f5996fb6d7740a2df10e20124b6a7fbdb"
+      },
+      "sanitize-tests/status.json": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/atomic-main-0b5ada0/artifacts/io-proof/sanitize-tests/status.json",
+        "sha256": "a437f1890432d2398dd3bd9b907df76002010b8f32ec2ce147858dda4bcdd02e"
+      },
+      "gui-release/status.json": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/atomic-main-0b5ada0/artifacts/io-proof/gui-release/status.json",
+        "sha256": "2fb4f7e8210d9f8de1b3e2298c3d61e66bfc29de610d33cf0552a5c72cec89be"
+      },
+      "gui-sanitize-v3/status.json": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/atomic-main-0b5ada0/artifacts/io-proof/gui-sanitize-v3/status.json",
+        "sha256": "6138c22fb361be4b8e680b5ab174325fc0d5ae3fd08b33c799a18bb0bcdd4241"
+      }
+    },
+    "count": 20,
+    "release": "18 initial Passed +requiredfixture2 Passed; original2NotRun preserved, not relabeled originalcommand0",
+    "sanitize": "one20/20 actual registered command; fresh wholeown parentbuild209tasks748.38s, tests135.50s",
+    "sdk_link": "All exact original core test ELF copies audited ldd: neitherFLTK norCairo. Parentbinary hashes verified against actual test output ledgers; fixture hashes retained. New GUIhelper relink is separatelyqualified."
+  },
+  "cohorts": [
+    {
+      "name": "release-normal-v2",
+      "status": {
+        "state": "terminal",
+        "pid": 1244724,
+        "scope": "Current public8d unchanged runtime, matched immutable objects/core/support relinked by current CMake against final27 SDK; actual private native UI, no GPU/HMD/session/install.",
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/selection-gui-venv/bin/python",
+          "tests/export-menu.py"
+        ],
+        "environment": {
+          "DOME_SESSION_LOG": "/home/blux/.local/state/dome/logs/login-20261101-130106-2075.log",
+          "XR_RUNTIME_JSON": "/nonexistent/sdk-no-headset.json",
+          "DOME_START_XWAYLAND": "0",
+          "DOME_BACKEND": "drm",
+          "DOME_TERMINAL_MODE": "overlay",
+          "DOME_START_XR": "1",
+          "DOME_LOGIN_SESSION": "1",
+          "DOME_TERMINAL_BACKEND": "flterm",
+          "LD_LIBRARY_PATH": "/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-release/lib:/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib",
+          "DOME_TERMINAL_REALM": "XR",
+          "DOME_BDF_RUNTIME_PREFIX": "/opt/fltk-vr/bdf-runtime",
+          "DOME_SCULPT_TEST_BUILD": "/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20/build-sdk-release",
+          "GIO_USE_VFS": "local",
+          "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1",
+          "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=1",
+          "DOME_EXPORT_MENU_OUT": "/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20/artifacts/sdk-proof/release-normal-v2/actual",
+          "DOME_EXPORT_MENU_COMPACT": "0"
+        },
+        "child_pid": 1244776,
+        "exit": 0,
+        "seconds": 26.249324559990782,
+        "inputs": 2070,
+        "drift": [],
+        "report": {
+          "checks": [
+            {
+              "passed": true,
+              "check": "Native universal menu initially disables Cancel background work without an export"
+            },
+            {
+              "passed": true,
+              "check": "Actual export chooser retains document ownership and DomeD application identity"
+            },
+            {
+              "passed": true,
+              "check": "Universal Close cancels the native export chooser before submitting any output"
+            },
+            {
+              "passed": true,
+              "check": "A real export pauses after temporary fsync while native authoring and ordered Save remain available"
+            },
+            {
+              "passed": true,
+              "check": "Actual universal Cancel stops replacement and removes the incomplete export temporary"
+            },
+            {
+              "passed": true,
+              "check": "The following Save completes with exact original scene and preserved authoring Redo"
+            },
+            {
+              "passed": true,
+              "check": "Retry through the actual native chooser produces an independently parsed GLB and preserves the project"
+            },
+            {
+              "passed": true,
+              "check": "Actual native Close drains and exits cleanly with no live export"
+            }
+          ],
+          "failed": 0,
+          "complete": true
+        }
+      },
+      "named_checks": 8,
+      "executed_script": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20/tests/export-menu.py",
+        "sha256": "93c4eac68442ba442a8429c37f3419c13fa3dfed752e281edf6173a71e48f6c6"
+      },
+      "before": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20/artifacts/sdk-proof/release-normal-v2/before.json",
+        "sha256": "d8108c7cd5d8e5d9cf8886cc448bc79d214824c1cf36042ec8171c4b7bee45c6"
+      },
+      "after": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20/artifacts/sdk-proof/release-normal-v2/after.json",
+        "sha256": "d8108c7cd5d8e5d9cf8886cc448bc79d214824c1cf36042ec8171c4b7bee45c6"
+      },
+      "report": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20/artifacts/sdk-proof/release-normal-v2/actual/report.json",
+        "sha256": "e639de4256013ada82cfc9d9724721c9bb444aaf77499e397752bb55f3568a91"
+      },
+      "actual_maps": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20/artifacts/sdk-proof/release-normal-v2/actual/runtime-maps.txt",
+        "sha256": "70327d5a8d3763e3851e875f4fd45c14db93978aa9c6f135e10485c134ec2ea3"
+      },
+      "mapped_sdk_libraries": {
+        "/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-release/lib/libfltk.so.1.4.5": "095b5435a80e3df959a5ac7559036785f9c39ac87c32ef3658b0fdad96c41066",
+        "/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-release/lib/libfltk_gl.so.1.4.5": "9291feb964ab547ca6c26f23e47aa6f428450e5db2fead4df24000af555cf846",
+        "/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-release/lib/libfltk_images.so.1.4.5": "8975bed2f2000fa1be94cba95b60c3e6fc5a296de7a85acd7cd598f50419298a"
+      },
+      "clipboard_acks": [
+        {
+          "destination": "/tmp/dome-export-menu-riq5nq93/Sculpt.glb",
+          "actual": "/tmp/dome-export-menu-riq5nq93/Sculpt.glb",
+          "sender": 2097152,
+          "owner": 4194305,
+          "application_client_base": 4194304
+        },
+        {
+          "destination": "/tmp/dome-export-menu-riq5nq93/Sculpt.glb",
+          "actual": "/tmp/dome-export-menu-riq5nq93/Sculpt.glb",
+          "sender": 2097153,
+          "owner": 4194305,
+          "application_client_base": 4194304
+        }
+      ]
+    },
+    {
+      "name": "release-compact-v2",
+      "status": {
+        "state": "terminal",
+        "pid": 1244729,
+        "scope": "Current public8d unchanged runtime, matched immutable objects/core/support relinked by current CMake against final27 SDK; actual private native UI, no GPU/HMD/session/install.",
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/selection-gui-venv/bin/python",
+          "tests/export-menu.py"
+        ],
+        "environment": {
+          "DOME_SESSION_LOG": "/home/blux/.local/state/dome/logs/login-20261101-130106-2075.log",
+          "XR_RUNTIME_JSON": "/nonexistent/sdk-no-headset.json",
+          "DOME_START_XWAYLAND": "0",
+          "DOME_BACKEND": "drm",
+          "DOME_TERMINAL_MODE": "overlay",
+          "DOME_START_XR": "1",
+          "DOME_LOGIN_SESSION": "1",
+          "DOME_TERMINAL_BACKEND": "flterm",
+          "LD_LIBRARY_PATH": "/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-release/lib:/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib",
+          "DOME_TERMINAL_REALM": "XR",
+          "DOME_BDF_RUNTIME_PREFIX": "/opt/fltk-vr/bdf-runtime",
+          "DOME_SCULPT_TEST_BUILD": "/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20/build-sdk-release",
+          "GIO_USE_VFS": "local",
+          "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1",
+          "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=1",
+          "DOME_EXPORT_MENU_OUT": "/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20/artifacts/sdk-proof/release-compact-v2/actual",
+          "DOME_EXPORT_MENU_COMPACT": "1"
+        },
+        "child_pid": 1244777,
+        "exit": 0,
+        "seconds": 26.0235566769843,
+        "inputs": 2070,
+        "drift": [],
+        "report": {
+          "checks": [
+            {
+              "passed": true,
+              "check": "Native universal menu initially disables Cancel background work without an export"
+            },
+            {
+              "passed": true,
+              "check": "Actual export chooser retains document ownership and DomeD application identity"
+            },
+            {
+              "passed": true,
+              "check": "Universal Close cancels the native export chooser before submitting any output"
+            },
+            {
+              "passed": true,
+              "check": "A real export pauses after temporary fsync while native authoring and ordered Save remain available"
+            },
+            {
+              "passed": true,
+              "check": "Actual universal Cancel stops replacement and removes the incomplete export temporary"
+            },
+            {
+              "passed": true,
+              "check": "The following Save completes with exact original scene and preserved authoring Redo"
+            },
+            {
+              "passed": true,
+              "check": "Retry through the actual native chooser produces an independently parsed GLB and preserves the project"
+            },
+            {
+              "passed": true,
+              "check": "Actual native Close drains and exits cleanly with no live export"
+            }
+          ],
+          "failed": 0,
+          "complete": true
+        }
+      },
+      "named_checks": 8,
+      "executed_script": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20/tests/export-menu.py",
+        "sha256": "93c4eac68442ba442a8429c37f3419c13fa3dfed752e281edf6173a71e48f6c6"
+      },
+      "before": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20/artifacts/sdk-proof/release-compact-v2/before.json",
+        "sha256": "d8108c7cd5d8e5d9cf8886cc448bc79d214824c1cf36042ec8171c4b7bee45c6"
+      },
+      "after": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20/artifacts/sdk-proof/release-compact-v2/after.json",
+        "sha256": "d8108c7cd5d8e5d9cf8886cc448bc79d214824c1cf36042ec8171c4b7bee45c6"
+      },
+      "report": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20/artifacts/sdk-proof/release-compact-v2/actual/report.json",
+        "sha256": "e639de4256013ada82cfc9d9724721c9bb444aaf77499e397752bb55f3568a91"
+      },
+      "actual_maps": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20/artifacts/sdk-proof/release-compact-v2/actual/runtime-maps.txt",
+        "sha256": "dfc703f5acd98302a7050dee706fbc915966c02f34048ea00c22c9a3b9bf76f5"
+      },
+      "mapped_sdk_libraries": {
+        "/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-release/lib/libfltk.so.1.4.5": "095b5435a80e3df959a5ac7559036785f9c39ac87c32ef3658b0fdad96c41066",
+        "/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-release/lib/libfltk_gl.so.1.4.5": "9291feb964ab547ca6c26f23e47aa6f428450e5db2fead4df24000af555cf846",
+        "/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-release/lib/libfltk_images.so.1.4.5": "8975bed2f2000fa1be94cba95b60c3e6fc5a296de7a85acd7cd598f50419298a"
+      },
+      "clipboard_acks": [
+        {
+          "destination": "/tmp/dome-export-menu-nbfcyanw/Sculpt.glb",
+          "actual": "/tmp/dome-export-menu-nbfcyanw/Sculpt.glb",
+          "sender": 2097152,
+          "owner": 4194305,
+          "application_client_base": 4194304
+        },
+        {
+          "destination": "/tmp/dome-export-menu-nbfcyanw/Sculpt.glb",
+          "actual": "/tmp/dome-export-menu-nbfcyanw/Sculpt.glb",
+          "sender": 2097153,
+          "owner": 4194305,
+          "application_client_base": 4194304
+        }
+      ]
+    },
+    {
+      "name": "sanitize-normal-v2",
+      "status": {
+        "state": "terminal",
+        "pid": 1244731,
+        "scope": "Current public8d unchanged runtime, matched immutable objects/core/support relinked by current CMake against final27 SDK; actual private native UI, no GPU/HMD/session/install.",
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/selection-gui-venv/bin/python",
+          "tests/export-menu.py"
+        ],
+        "environment": {
+          "DOME_SESSION_LOG": "/home/blux/.local/state/dome/logs/login-20261101-130106-2075.log",
+          "XR_RUNTIME_JSON": "/nonexistent/sdk-no-headset.json",
+          "DOME_START_XWAYLAND": "0",
+          "DOME_BACKEND": "drm",
+          "DOME_TERMINAL_MODE": "overlay",
+          "DOME_START_XR": "1",
+          "DOME_LOGIN_SESSION": "1",
+          "DOME_TERMINAL_BACKEND": "flterm",
+          "LD_LIBRARY_PATH": "/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-sanitize/lib:/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib",
+          "DOME_TERMINAL_REALM": "XR",
+          "DOME_BDF_RUNTIME_PREFIX": "/opt/fltk-vr/bdf-runtime",
+          "DOME_SCULPT_TEST_BUILD": "/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20/build-sdk-sanitize",
+          "GIO_USE_VFS": "local",
+          "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1",
+          "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=1",
+          "DOME_EXPORT_MENU_OUT": "/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20/artifacts/sdk-proof/sanitize-normal-v2/actual",
+          "DOME_EXPORT_MENU_COMPACT": "0"
+        },
+        "child_pid": 1245036,
+        "exit": 0,
+        "seconds": 43.299811945995316,
+        "inputs": 2071,
+        "drift": [],
+        "report": {
+          "checks": [
+            {
+              "passed": true,
+              "check": "Native universal menu initially disables Cancel background work without an export"
+            },
+            {
+              "passed": true,
+              "check": "Actual export chooser retains document ownership and DomeD application identity"
+            },
+            {
+              "passed": true,
+              "check": "Universal Close cancels the native export chooser before submitting any output"
+            },
+            {
+              "passed": true,
+              "check": "A real export pauses after temporary fsync while native authoring and ordered Save remain available"
+            },
+            {
+              "passed": true,
+              "check": "Actual universal Cancel stops replacement and removes the incomplete export temporary"
+            },
+            {
+              "passed": true,
+              "check": "The following Save completes with exact original scene and preserved authoring Redo"
+            },
+            {
+              "passed": true,
+              "check": "Retry through the actual native chooser produces an independently parsed GLB and preserves the project"
+            },
+            {
+              "passed": true,
+              "check": "Actual native Close drains and exits cleanly with no live export"
+            }
+          ],
+          "failed": 0,
+          "complete": true
+        }
+      },
+      "named_checks": 8,
+      "executed_script": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20/tests/export-menu.py",
+        "sha256": "93c4eac68442ba442a8429c37f3419c13fa3dfed752e281edf6173a71e48f6c6"
+      },
+      "before": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20/artifacts/sdk-proof/sanitize-normal-v2/before.json",
+        "sha256": "cce8d0708107ad4d9c6190e326551d76a85c22e4af01b3e40d089f2bfb0ff0b3"
+      },
+      "after": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20/artifacts/sdk-proof/sanitize-normal-v2/after.json",
+        "sha256": "cce8d0708107ad4d9c6190e326551d76a85c22e4af01b3e40d089f2bfb0ff0b3"
+      },
+      "report": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20/artifacts/sdk-proof/sanitize-normal-v2/actual/report.json",
+        "sha256": "e639de4256013ada82cfc9d9724721c9bb444aaf77499e397752bb55f3568a91"
+      },
+      "actual_maps": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20/artifacts/sdk-proof/sanitize-normal-v2/actual/runtime-maps.txt",
+        "sha256": "c24359fc5d938d783484190a31a26471787f4dead2e8e21ad63a01613755c0fc"
+      },
+      "mapped_sdk_libraries": {
+        "/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-sanitize/lib/libfltk.so.1.4.5": "fbb0b153988bdd461943d56b6a685f9247cd3035601596a5ac4793f7722362cf",
+        "/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-sanitize/lib/libfltk_gl.so.1.4.5": "670603234f367801593c8500051aa6bf61923c689892a4c32585555adb7975b9",
+        "/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-sanitize/lib/libfltk_images.so.1.4.5": "66165a34be996ac7d29bd496fa059fce5b61af349fb49793f5d7ac4175da5915"
+      },
+      "clipboard_acks": [
+        {
+          "destination": "/tmp/dome-export-menu-p64qpb72/Sculpt.glb",
+          "actual": "/tmp/dome-export-menu-p64qpb72/Sculpt.glb",
+          "sender": 2097152,
+          "owner": 4194305,
+          "application_client_base": 4194304
+        },
+        {
+          "destination": "/tmp/dome-export-menu-p64qpb72/Sculpt.glb",
+          "actual": "/tmp/dome-export-menu-p64qpb72/Sculpt.glb",
+          "sender": 2097153,
+          "owner": 4194305,
+          "application_client_base": 4194304
+        }
+      ]
+    },
+    {
+      "name": "sanitize-compact-v2",
+      "status": {
+        "state": "terminal",
+        "pid": 1244730,
+        "scope": "Current public8d unchanged runtime, matched immutable objects/core/support relinked by current CMake against final27 SDK; actual private native UI, no GPU/HMD/session/install.",
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/selection-gui-venv/bin/python",
+          "tests/export-menu.py"
+        ],
+        "environment": {
+          "DOME_SESSION_LOG": "/home/blux/.local/state/dome/logs/login-20261101-130106-2075.log",
+          "XR_RUNTIME_JSON": "/nonexistent/sdk-no-headset.json",
+          "DOME_START_XWAYLAND": "0",
+          "DOME_BACKEND": "drm",
+          "DOME_TERMINAL_MODE": "overlay",
+          "DOME_START_XR": "1",
+          "DOME_LOGIN_SESSION": "1",
+          "DOME_TERMINAL_BACKEND": "flterm",
+          "LD_LIBRARY_PATH": "/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-sanitize/lib:/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib",
+          "DOME_TERMINAL_REALM": "XR",
+          "DOME_BDF_RUNTIME_PREFIX": "/opt/fltk-vr/bdf-runtime",
+          "DOME_SCULPT_TEST_BUILD": "/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20/build-sdk-sanitize",
+          "GIO_USE_VFS": "local",
+          "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1",
+          "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=1",
+          "DOME_EXPORT_MENU_OUT": "/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20/artifacts/sdk-proof/sanitize-compact-v2/actual",
+          "DOME_EXPORT_MENU_COMPACT": "1"
+        },
+        "child_pid": 1245041,
+        "exit": 0,
+        "seconds": 45.60174087100313,
+        "inputs": 2071,
+        "drift": [],
+        "report": {
+          "checks": [
+            {
+              "passed": true,
+              "check": "Native universal menu initially disables Cancel background work without an export"
+            },
+            {
+              "passed": true,
+              "check": "Actual export chooser retains document ownership and DomeD application identity"
+            },
+            {
+              "passed": true,
+              "check": "Universal Close cancels the native export chooser before submitting any output"
+            },
+            {
+              "passed": true,
+              "check": "A real export pauses after temporary fsync while native authoring and ordered Save remain available"
+            },
+            {
+              "passed": true,
+              "check": "Actual universal Cancel stops replacement and removes the incomplete export temporary"
+            },
+            {
+              "passed": true,
+              "check": "The following Save completes with exact original scene and preserved authoring Redo"
+            },
+            {
+              "passed": true,
+              "check": "Retry through the actual native chooser produces an independently parsed GLB and preserves the project"
+            },
+            {
+              "passed": true,
+              "check": "Actual native Close drains and exits cleanly with no live export"
+            }
+          ],
+          "failed": 0,
+          "complete": true
+        }
+      },
+      "named_checks": 8,
+      "executed_script": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20/tests/export-menu.py",
+        "sha256": "93c4eac68442ba442a8429c37f3419c13fa3dfed752e281edf6173a71e48f6c6"
+      },
+      "before": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20/artifacts/sdk-proof/sanitize-compact-v2/before.json",
+        "sha256": "cce8d0708107ad4d9c6190e326551d76a85c22e4af01b3e40d089f2bfb0ff0b3"
+      },
+      "after": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20/artifacts/sdk-proof/sanitize-compact-v2/after.json",
+        "sha256": "cce8d0708107ad4d9c6190e326551d76a85c22e4af01b3e40d089f2bfb0ff0b3"
+      },
+      "report": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20/artifacts/sdk-proof/sanitize-compact-v2/actual/report.json",
+        "sha256": "e639de4256013ada82cfc9d9724721c9bb444aaf77499e397752bb55f3568a91"
+      },
+      "actual_maps": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20/artifacts/sdk-proof/sanitize-compact-v2/actual/runtime-maps.txt",
+        "sha256": "f17589fd19398258b0786bd7f2a22062a020d53c513628f99938475d18f9fab3"
+      },
+      "mapped_sdk_libraries": {
+        "/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-sanitize/lib/libfltk.so.1.4.5": "fbb0b153988bdd461943d56b6a685f9247cd3035601596a5ac4793f7722362cf",
+        "/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-sanitize/lib/libfltk_gl.so.1.4.5": "670603234f367801593c8500051aa6bf61923c689892a4c32585555adb7975b9",
+        "/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-sanitize/lib/libfltk_images.so.1.4.5": "66165a34be996ac7d29bd496fa059fce5b61af349fb49793f5d7ac4175da5915"
+      },
+      "clipboard_acks": [
+        {
+          "destination": "/tmp/dome-export-menu-nynmcam7/Sculpt.glb",
+          "actual": "/tmp/dome-export-menu-nynmcam7/Sculpt.glb",
+          "sender": 2097152,
+          "owner": 4194305,
+          "application_client_base": 4194304
+        },
+        {
+          "destination": "/tmp/dome-export-menu-nynmcam7/Sculpt.glb",
+          "actual": "/tmp/dome-export-menu-nynmcam7/Sculpt.glb",
+          "sender": 2097153,
+          "owner": 4194305,
+          "application_client_base": 4194304
+        }
+      ]
+    },
+    {
+      "name": "wayland-release",
+      "status": {
+        "state": "terminal",
+        "pid": 1238588,
+        "scope": "Current public8d unchanged runtime, matched immutable objects/core/support relinked by current CMake against final27 SDK; actual private native UI, no GPU/HMD/session/install.",
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/selection-gui-venv/bin/python",
+          "tests/projection-wayland.py"
+        ],
+        "environment": {
+          "DOME_SESSION_LOG": "/home/blux/.local/state/dome/logs/login-20261101-130106-2075.log",
+          "XR_RUNTIME_JSON": "/nonexistent/sdk-no-headset.json",
+          "DOME_START_XWAYLAND": "0",
+          "DOME_BACKEND": "drm",
+          "DOME_TERMINAL_MODE": "overlay",
+          "DOME_START_XR": "1",
+          "DOME_LOGIN_SESSION": "1",
+          "DOME_TERMINAL_BACKEND": "flterm",
+          "LD_LIBRARY_PATH": "/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-release/lib:/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib",
+          "DOME_TERMINAL_REALM": "XR",
+          "DOME_BDF_RUNTIME_PREFIX": "/opt/fltk-vr/bdf-runtime",
+          "DOME_SCULPT_TEST_BUILD": "/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20/build-sdk-release",
+          "GIO_USE_VFS": "local",
+          "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1",
+          "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=1",
+          "DOME_COMPOSITOR": "/home/blux/de-xr/dome-sculpt/artifacts/toolkit-viewport25-c092/artifacts/viewport-proof/compositor-release",
+          "DOME_PROJECTION_WL_OUT": "/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20/artifacts/sdk-proof/wayland-release/actual"
+        },
+        "child_pid": 1238662,
+        "exit": 0,
+        "seconds": 27.53517139700125,
+        "inputs": 2070,
+        "drift": [],
+        "report": {
+          "checks": [
+            {
+              "passed": true,
+              "check": "Native Wayland projection client publishes the Dome Sculpt identity"
+            },
+            {
+              "passed": true,
+              "check": "Canonical FLTK image chooser is native Wayland and retains focused document identity"
+            },
+            {
+              "passed": true,
+              "check": "Native Wayland Escape cancels image chooser without editing Scene"
+            },
+            {
+              "passed": true,
+              "check": "Detached native Wayland image load leaves ordinary Save enabled"
+            },
+            {
+              "passed": true,
+              "check": "Projection options use canonical native FLTK Wayland"
+            },
+            {
+              "passed": true,
+              "check": "Real native Wayland pointer paints projected pixels and ordered Save persists them"
+            },
+            {
+              "passed": true,
+              "check": "DomeD universal Undo restores exact pre-projection Scene"
+            },
+            {
+              "passed": true,
+              "check": "Native Wayland Redo and ordered Save/reopen retain exact projected endpoint"
+            },
+            {
+              "passed": true,
+              "check": "Native Wayland projection closes through normal App/GL/font teardown"
+            }
+          ],
+          "complete": true,
+          "physical_device": false,
+          "backend": "native FLTK Wayland + private canonical d271 DomeD nested compositor"
+        }
+      },
+      "named_checks": 9,
+      "executed_script": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20/tests/projection-wayland.py",
+        "sha256": "f136fdf20c146bca778694864d270c796081e67fe15f50b4fffc9517329f97b8"
+      },
+      "before": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20/artifacts/sdk-proof/wayland-release/before.json",
+        "sha256": "7c7500b062767f1eae9d34bb605a505c8c9ce4d335639143f2ca41eca24b8c2f"
+      },
+      "after": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20/artifacts/sdk-proof/wayland-release/after.json",
+        "sha256": "7c7500b062767f1eae9d34bb605a505c8c9ce4d335639143f2ca41eca24b8c2f"
+      },
+      "report": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20/artifacts/sdk-proof/wayland-release/actual/report.json",
+        "sha256": "5ddab1ec1ba80525087dbe3867730cf7e6ed9fbb7f31552023575e08f8e2b4d6"
+      },
+      "actual_maps": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20/artifacts/sdk-proof/wayland-release/actual/runtime-maps.txt",
+        "sha256": "73e1cfb90c6aee94371770e08d379c99da8a72387a33b16a795059b32677df4a"
+      },
+      "mapped_sdk_libraries": {
+        "/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-release/lib/libfltk.so.1.4.5": "095b5435a80e3df959a5ac7559036785f9c39ac87c32ef3658b0fdad96c41066",
+        "/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-release/lib/libfltk_gl.so.1.4.5": "9291feb964ab547ca6c26f23e47aa6f428450e5db2fead4df24000af555cf846",
+        "/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-release/lib/libfltk_images.so.1.4.5": "8975bed2f2000fa1be94cba95b60c3e6fc5a296de7a85acd7cd598f50419298a"
+      },
+      "clipboard_acks": []
+    },
+    {
+      "name": "wayland-sanitize",
+      "status": {
+        "state": "terminal",
+        "pid": 1238592,
+        "scope": "Current public8d unchanged runtime, matched immutable objects/core/support relinked by current CMake against final27 SDK; actual private native UI, no GPU/HMD/session/install.",
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/selection-gui-venv/bin/python",
+          "tests/projection-wayland.py"
+        ],
+        "environment": {
+          "DOME_SESSION_LOG": "/home/blux/.local/state/dome/logs/login-20261101-130106-2075.log",
+          "XR_RUNTIME_JSON": "/nonexistent/sdk-no-headset.json",
+          "DOME_START_XWAYLAND": "0",
+          "DOME_BACKEND": "drm",
+          "DOME_TERMINAL_MODE": "overlay",
+          "DOME_START_XR": "1",
+          "DOME_LOGIN_SESSION": "1",
+          "DOME_TERMINAL_BACKEND": "flterm",
+          "LD_LIBRARY_PATH": "/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-sanitize/lib:/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib",
+          "DOME_TERMINAL_REALM": "XR",
+          "DOME_BDF_RUNTIME_PREFIX": "/opt/fltk-vr/bdf-runtime",
+          "DOME_SCULPT_TEST_BUILD": "/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20/build-sdk-sanitize",
+          "GIO_USE_VFS": "local",
+          "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1",
+          "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=1",
+          "DOME_COMPOSITOR": "/home/blux/de-xr/dome-sculpt/artifacts/toolkit-viewport25-c092/artifacts/viewport-proof/compositor-release",
+          "DOME_PROJECTION_WL_OUT": "/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20/artifacts/sdk-proof/wayland-sanitize/actual"
+        },
+        "child_pid": 1238891,
+        "exit": 0,
+        "seconds": 41.69134198699612,
+        "inputs": 2071,
+        "drift": [],
+        "report": {
+          "checks": [
+            {
+              "passed": true,
+              "check": "Native Wayland projection client publishes the Dome Sculpt identity"
+            },
+            {
+              "passed": true,
+              "check": "Canonical FLTK image chooser is native Wayland and retains focused document identity"
+            },
+            {
+              "passed": true,
+              "check": "Native Wayland Escape cancels image chooser without editing Scene"
+            },
+            {
+              "passed": true,
+              "check": "Detached native Wayland image load leaves ordinary Save enabled"
+            },
+            {
+              "passed": true,
+              "check": "Projection options use canonical native FLTK Wayland"
+            },
+            {
+              "passed": true,
+              "check": "Real native Wayland pointer paints projected pixels and ordered Save persists them"
+            },
+            {
+              "passed": true,
+              "check": "DomeD universal Undo restores exact pre-projection Scene"
+            },
+            {
+              "passed": true,
+              "check": "Native Wayland Redo and ordered Save/reopen retain exact projected endpoint"
+            },
+            {
+              "passed": true,
+              "check": "Native Wayland projection closes through normal App/GL/font teardown"
+            }
+          ],
+          "complete": true,
+          "physical_device": false,
+          "backend": "native FLTK Wayland + private canonical d271 DomeD nested compositor"
+        }
+      },
+      "named_checks": 9,
+      "executed_script": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20/tests/projection-wayland.py",
+        "sha256": "f136fdf20c146bca778694864d270c796081e67fe15f50b4fffc9517329f97b8"
+      },
+      "before": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20/artifacts/sdk-proof/wayland-sanitize/before.json",
+        "sha256": "b1c1b579593a3618f724b567d6be4554dc8c0d49d2f49c1a3279858cb200c520"
+      },
+      "after": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20/artifacts/sdk-proof/wayland-sanitize/after.json",
+        "sha256": "b1c1b579593a3618f724b567d6be4554dc8c0d49d2f49c1a3279858cb200c520"
+      },
+      "report": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20/artifacts/sdk-proof/wayland-sanitize/actual/report.json",
+        "sha256": "5ddab1ec1ba80525087dbe3867730cf7e6ed9fbb7f31552023575e08f8e2b4d6"
+      },
+      "actual_maps": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20/artifacts/sdk-proof/wayland-sanitize/actual/runtime-maps.txt",
+        "sha256": "95573a18cda5152d1d442327d2ff54b64ade4ce0166bbe5bdfdc46ca63056cf5"
+      },
+      "mapped_sdk_libraries": {
+        "/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-sanitize/lib/libfltk.so.1.4.5": "fbb0b153988bdd461943d56b6a685f9247cd3035601596a5ac4793f7722362cf",
+        "/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-sanitize/lib/libfltk_gl.so.1.4.5": "670603234f367801593c8500051aa6bf61923c689892a4c32585555adb7975b9",
+        "/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-sanitize/lib/libfltk_images.so.1.4.5": "66165a34be996ac7d29bd496fa059fce5b61af349fb49793f5d7ac4175da5915"
+      },
+      "clipboard_acks": []
+    }
+  ],
+  "named_checks": {
+    "x11_native_export": 32,
+    "native_wayland": 18
+  },
+  "configure_old24": {
+    "status": {
+      "exit": 1,
+      "expected_refusal": true,
+      "seconds": 1.9781967970193364,
+      "command": [
+        "cmake",
+        "-S",
+        "/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20",
+        "-B",
+        "/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20/artifacts/sdk-proof/old24-control/build",
+        "-G",
+        "Ninja",
+        "-DCMAKE_BUILD_TYPE=Release",
+        "-DDOME_BUILD_UI=ON",
+        "-DDOME_BUILD_XR=OFF",
+        "-DDOME_COMPUTE_BACKEND=CPU",
+        "-DFLTK_DIR=/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/toolkit/share/fltk",
+        "-U*DOME_BITMAP_RUNTIME*",
+        "-U*NATIVEGL*",
+        "-U*RENDERFONTS*"
+      ],
+      "scope": "Configuration-only old24 negative; finalRelease/SANconfiguredsuccess in main delta status"
+    },
+    "log": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20/artifacts/sdk-proof/old24-control/configure.log",
+      "sha256": "f28353a620ac66e8b69aecf30985905bef2d357996734df4b0aade6dd2422a6e"
+    }
+  },
+  "initial_negatives": [
+    {
+      "status": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20/artifacts/sdk-proof/sanitize-normal/status.json",
+        "sha256": "de65d7812af88a5c924ae4d8293c54a4cec3a3edd7f78872444d9c26d757a984"
+      },
+      "log": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20/artifacts/sdk-proof/sanitize-normal/driver.log",
+        "sha256": "205c810cf0552dd2029060d60ecb5e33e223e539b9633c4cdbdc627a27097f87"
+      },
+      "scope": "Harness asserted nonELF compiler libasan linker script; app notstarted;3.03s/all2071inputs unchanged"
+    },
+    {
+      "status": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20/artifacts/sdk-proof/sanitize-compact/status.json",
+        "sha256": "a5926ff7137b7711b8013df8532833a766dbbc32804b13ee3c7f9506f4a36d2c"
+      },
+      "log": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/atomic-sdk-final-8d20/artifacts/sdk-proof/sanitize-compact/driver.log",
+        "sha256": "205c810cf0552dd2029060d60ecb5e33e223e539b9633c4cdbdc627a27097f87"
+      },
+      "scope": "Same pre-app ELF assertion;3.17s/all2071inputs unchanged"
+    }
+  ],
+  "source_sha256": {
+    "tests/export-menu.py": "93c4eac68442ba442a8429c37f3419c13fa3dfed752e281edf6173a71e48f6c6",
+    "tests/projection-wayland.py": "f136fdf20c146bca778694864d270c796081e67fe15f50b4fffc9517329f97b8",
+    "CMakeLists.txt": "327f725d907100e90b77791b7ca9634531a300533547f6d0607de1dadcde13d5",
+    "third_party/sources.json": "80460b2e59f44456f13f98e1b6c142cd752510ccaadb9d0355264590e49732ae"
+  },
+  "boundaries": [
+    "SDK-only matching relink of existing qualified8d objects/core/support and actual native GUI; only absentSANprojection consumer testTU newlycompiled. Release app objects/support retain audited392 provenance, fresh SANapp/core/support retain parentwholeown provenance.",
+    "No authoring/HDR/weights/newScene29 runtime imported; no product/API/layout change here.",
+    "Owned SANprogram/toolkit uses ASan/UBSan assertions; canonical external bitmap remains separatelyoptimized. No suppressions.",
+    "All tests run privateXvfb/bus/HOME and nestedDomeDsoftwareGL. No GPU/physicalHMD/systeminstall/sessionrestart.",
+    "Earlier public540CPUresult remains its originalruntime cohort, not a new fullsuite on thisSDK."
+  ],
+  "environment": {
+    "private_xvfb": "/home/blux/de-xr/dome-sculpt/artifacts/retained-key-ui-9050/artifacts/private-xvfb/bin",
+    "signed_rpm_manifest": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/retained-key-ui-9050/artifacts/private-xvfb/rpms.json",
+      "sha256": "8769208f1e5c64d52fe74171c04be374d105ff72a21f1c287b17ab45ec24873d"
+    },
+    "compositor": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/domed-f797e0f-target/release/dome-compositor",
+      "sha256": "e68db516568be90ef085af9089cf0db1991ce8e727d354407a20adf538594943"
+    }
+  },
+  "metadata_note": "Final source pins/provenance and docs finalized after terminal tests. Relevant executed harness hashes equal final bytes; no runtime/API/SDK/object change. Each original frozen cohort ledger remains exact and distinct."
+}
