@@ -95,6 +95,9 @@ struct Counter {
     else if(j.is_binary())add(j.get_binary().capacity()+64);
   }
   void material(const std::shared_ptr<const SourceMaterialBindings>&p){if(enter(p)){
+    unsupported(p->canonical_attributes,"Native anatomical budget requires its retained canonical attribute closure adapter");
+    unsupported(p->canonical_uv,"Native anatomical budget requires its retained canonical UV closure adapter");
+    unsupported(p->native_paint_sampling,"Native anatomical budget requires its retained native paint closure adapter");
     unsupported(p->color_preparation,"Native anatomical budget has not yet admitted prepared colour closures");unsupported(p->normal_preparation,"Native anatomical budget has not yet admitted prepared normal closures");unsupported(p->key_derivation,"Native anatomical budget has not yet admitted key derivation closures");
     add(sizeof(*p));for(auto*j:NativeWeightMaterialAccess::json(p->material))json(*j);vector(p->material.diagnostics);for(auto&s:p->material.diagnostics)text(s);for(auto&t:p->roles)image(t.image);frame_set(p->normal_frames);uv_origin(p->uv_origin);leave(p);
   }}

@@ -109,7 +109,7 @@ Scene bake_vrm1_expression_pose(const Scene &baseline,uint64_t object,
   const auto binding=entry.material_bindings;
   if(!binding||!binding->has_mtoon||binding->material.version()!=MToonVersion::V1)
    throw std::invalid_argument("Static VRM1 plain-PBR material authoring needs its separate native factor adapter");
-  if(binding->color_preparation||binding->normal_preparation||binding->key_derivation)
+  if(binding->canonical_attributes||binding->canonical_uv||binding->native_paint_sampling||binding->color_preparation||binding->normal_preparation||binding->key_derivation)
    throw std::invalid_argument("Static VRM1 prepared material expressions need an authenticated before-state parameter adapter");
   auto edited=std::make_shared<SourceMaterialBindings>(*binding);auto &parameters=edited->material.parameters;
   // Fold the current inspector correction into the initial source term only.

@@ -4,6 +4,7 @@
 #undef DOME_NATIVE_PAINT32_RENDER_NO_MAIN
 #include "dome/native-scene-append.hpp"
 #include "dome/native-authoring.hpp"
+#include "native-weight-retention.hpp"
 #include <fstream>
 namespace {
 std::vector<uint8_t> union_bytes(const std::filesystem::path &path){
@@ -21,6 +22,8 @@ int main(int argc,char **argv)try{
  unsigned number=0;
  for(const auto &normal_file:normal_files){
   const auto normals=Scene::load(normal_file);const auto normal_exact=normals.encode();
+  check(rejects([&]{detail::native_weight_retention_impl::Counter budget(512*1024*1024,500'000'000);budget.material(normals.active().material_bindings);}),
+    "Anatomical ownership budget refuses unrepresented authentic canonical roots, including after Clear");
   check(normal_exact.at("version")==33||normal_exact.at("version")==34,"Normal side owns actual converted/UV/Clear/rebake history");
   for(bool reverse:{false,true}){
    const auto &destination=reverse?native:normals,&package=reverse?normals:native;
