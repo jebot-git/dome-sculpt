@@ -56,6 +56,14 @@ int main(int argc,char **argv)try{
   auto transformed_before=transformed.encode();auto affine_report=bake_object(transformed,2,settings);
   require_cage(affine_report.projected==4096&&!affine_report.missed&&transformed.encode()["objects"][2]==transformed_before["objects"][2],
     "Reflected sheared cage uses its complete displayed affine placement without rewriting its mesh");
+  auto posed_cage=cage_scene();auto base=posed_cage.active().painted->mesh();
+  auto moved=posed_cage.object(3).painted->mesh().positions;
+  auto deformation=std::make_shared<DeformationState>(base);deformation->morphs.emplace(base);
+  deformation->morphs->set_target(base,"Displayed cage envelope",moved);deformation->morph_weights={1};
+  posed_cage.object(3).painted=std::make_shared<PaintedMesh>(base,64);posed_cage.set_deformation(3,*deformation);
+  const auto posed_before=posed_cage.encode();auto posed_report=bake_object(posed_cage,2,settings);
+  require_cage(posed_report.projected==4096&&!posed_report.missed&&posed_cage.encode()["objects"][2]==posed_before["objects"][2],
+    "Cage rays use the actual displayed morph while exact REST geometry and deformation remain editable");
   auto prepared=cage_scene();auto normal=settings;normal.prepare_normals=true;auto prepared_report=bake_object(prepared,2,normal);
   require_cage(prepared_report.projected==4096&&prepared.active().painted->normal_projection(),
     "Explicit normal preparation transports cage IDs into the real split low bake basis");

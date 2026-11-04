@@ -3254,3 +3254,8 @@ if(BUILD_TESTING AND TARGET dome-sculpt AND TARGET dome-sculpt-test-runtime)
     ${CMAKE_CURRENT_BINARY_DIR}/bake-cage-xr)
   set_tests_properties(bake-cage-openxr PROPERTIES TIMEOUT 600)
 endif()
+
+if(BUILD_TESTING)
+  add_test(NAME bake-cage-caller-admission COMMAND dome-sculpt-bake-admission-test --cage ${CMAKE_CURRENT_BINARY_DIR}/bake-cage-admission)
+  set_tests_properties(bake-cage-caller-admission PROPERTIES TIMEOUT 600)
+endif()
