@@ -1,3 +1,4 @@
+#include "bake-recipe-remap.hpp"
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/scene.hpp"
 #include "dome/humanoid-creator.hpp"
@@ -83,6 +84,8 @@ uint64_t Scene::add_group(std::string name, CanvasTransform transform,
 }
 void Scene::erase_group(uint64_t id, bool erase_objects) {
   group(id);
+  auto before=*this;
+  try {
   std::set<uint64_t> removed;
   for (const auto &g : groups_)
     for (const auto &ancestor : group_path(g.id))
@@ -91,6 +94,9 @@ void Scene::erase_group(uint64_t id, bool erase_objects) {
     if (next_ == UINT64_MAX && std::all_of(objects_.begin(), objects_.end(),
          [&](auto &o) { return removed.contains(o.group); }))
       throw std::length_error("Cannot retain an empty sculpt: object IDs exhausted");
+    std::map<uint64_t,uint64_t> deleted;
+    for(const auto &o:objects_)if(removed.contains(o.group))deleted.emplace(o.id,unavailable_bake_object);
+    detail::remap_scene_bake_recipes(*this,deleted,false);
     std::erase_if(objects_, [&](auto &o) { return removed.contains(o.group); });
     if (objects_.empty()) add("Empty sculpt", Volume{});
     if (std::none_of(objects_.begin(), objects_.end(), [&](auto &o) { return o.id == active_; }))
@@ -111,5 +117,6 @@ void Scene::erase_group(uint64_t id, bool erase_objects) {
     }
   }
   std::erase_if(groups_, [&](auto &g) { return removed.contains(g.id); });
+  }catch(...){*this=std::move(before);throw;}
 }
 } // namespace dome

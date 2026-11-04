@@ -38,6 +38,7 @@ struct PolygonOrigin {
   std::shared_ptr<const SourcePlacementCapsule> placement{};
   std::shared_ptr<const PolygonOrigin> shape_source{};
   std::shared_ptr<const PolygonOrigin> rig_source{};
+  std::shared_ptr<const ObjectBakeRecipe> bake_recipe{};
 };
 // Compare the active painted REST derivative only. Posed preview positions and
 // unrelated source attributes must not replace the editable topology authority.

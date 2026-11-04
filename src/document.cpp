@@ -1,3 +1,4 @@
+#include "dome/bake-recipe.hpp"
 #include "paint-overlay-packet.hpp"
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "emission-export.hpp"
@@ -622,6 +623,10 @@ void Document::publish_locked(bool force,bool checkpoint) {
   state_.can_retopologize = !state_.polygon && !state_.cut && !state_.retopology && !uv_ && !state_.asset_busy && !state_.recovery_busy &&
       !control_before_ && !action_active_locked() && object_editable_locked(active.id) &&
       scene_.objects().size() < 256 && (active.mesh_active || !active.volume->voxels().empty());
+  if(state_.bake_settings_object!=active.id||state_.bake_recipe!=active.bake_recipe){
+    if(active.bake_recipe){state_.bake_source=active.bake_recipe->source.object;state_.bake_settings=active.bake_recipe->settings;}
+    state_.bake_settings_object=active.id;state_.bake_recipe=active.bake_recipe;
+  }
   state_.bake_sources = bake_sources_locked();
   state_.bake_cages = bake_cages_locked();
   if(std::find(state_.bake_sources.begin(),state_.bake_sources.end(),state_.bake_source)==state_.bake_sources.end())
@@ -2127,6 +2132,7 @@ void Document::finish_control_locked(bool accept) {
         const auto source=ids.at(size_t(std::lround(controls.value[0]*float(ids.size()-1))));
         const auto cage=cages.at(size_t(std::lround(controls.value[1]*float(cages.size()-1))));
         Transaction transaction(*this);
+        if(controls.bake_preset)state_.bake_settings=controls.bake_preset->settings;
         state_.bake_source=source;state_.bake_settings.cage_object=cage;
         publish_locked(false,false);transaction.commit(false);
       }
@@ -2575,6 +2581,22 @@ void Document::control_event_locked(VrControlEvent event) {
   if ((uv_accept_pending_ || uv_solving_) && event.type != VrControlEventType::Cancel)
     return;
   auto &c = state_.controls;
+  if(event.type==VrControlEventType::RecallBakeRecipe){
+    if(c.parameter!=VrParameter::BakeSource)return;
+    const auto recipe=scene_.active().bake_recipe;
+    if(!recipe){state_.message="No successful bake has been saved for this target";return;}
+    require_authority_locked(control_source_);
+    if(control_source_.generation!=state_.generation||control_source_.revision!=state_.revision||control_source_.object!=scene_.active().id)
+      throw std::logic_error("Bake recipe target changed; reopen controls");
+    const auto sources=bake_sources_locked(),cages=bake_cages_locked();
+    const auto source=std::find(sources.begin(),sources.end(),recipe->source.object);
+    const auto cage=std::find(cages.begin(),cages.end(),recipe->settings.cage_object);
+    if(source==sources.end()||cage==cages.end())throw std::logic_error("Saved bake dependency is unavailable; select its replacement");
+    Transaction transaction(*this);
+    c.bake_preset=recipe;c.title="Source / cage - recipe staged";c.value[0]=sources.size()<2?0:float(source-sources.begin())/float(sources.size()-1);
+    c.value[1]=cages.size()<2?0:float(cage-cages.begin())/float(cages.size()-1);
+    publish_locked(false,false);transaction.commit(false);return;
+  }
   if (uv_ && event.type != VrControlEventType::Confirm &&
       event.type != VrControlEventType::Cancel) {
     try {
@@ -2853,7 +2875,7 @@ bool Document::command_enabled_locked(SpatialCommand command) const {
     if (command == SpatialCommand::Redo) return !retopo_stroking_ && state_.retopology->can_redo;
     return false;
   }
-  if(command==SpatialCommand::BakeSurface)return !control_before_ && bake_target_ready_locked() && !bake_sources_locked().empty();
+  if(command==SpatialCommand::BakeSurface)return !control_before_ && bake_source_eligible_locked(state_.bake_source) && state_.bake_settings.cage_object!=unavailable_bake_object && bake_target_ready_locked();
   if(command==SpatialCommand::ClearBake)return !control_before_ && bake_target_ready_locked() && bool(scene_.active().painted->baked());
   if(command==SpatialCommand::BindSkin) return !control_before_ && skin_target_ready_locked() &&
     !skin_sources_locked(state_.skin_options.mode).empty();

@@ -1,3 +1,4 @@
+#include "bake-recipe-remap.hpp"
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/native-scene-append.hpp"
 #include "dome/polygon-scene.hpp"
@@ -147,7 +148,7 @@ struct Append {
     auto n=std::make_shared<PolygonOrigin>(*p);
     n->placement=capsule(p->placement);n->polygon=authority(p->polygon);
     n->shape_source=origin(p->shape_source);n->rig_source=origin(p->rig_source);
-    n->retopology=patch(p->retopology);
+    n->retopology=patch(p->retopology);n->bake_recipe=detail::remap_bake_recipe(p->bake_recipe,objects,true);
     origins.emplace(p.get(),n);return n;
   }
 };
@@ -212,6 +213,7 @@ NativeSceneAppend append_native_scene(const Scene &destination,const Scene &pack
     a.stop();auto copy=o;copy.id=a.objects.at(o.id);copy.group=o.group?a.groups.at(o.group):0;
     copy.polygon=a.authority(o.polygon);copy.shape_source=a.origin(o.shape_source);
     copy.rig_source=a.origin(o.rig_source);copy.retopology=a.patch(o.retopology);
+    copy.bake_recipe=detail::remap_bake_recipe(o.bake_recipe,a.objects,true);
     out.scene.object(copy.id)=std::move(copy);
   }
   out.scene.select(a.objects.at(source.active().id));a.stop();out.scene.validate();a.stop();require_saveable(out.scene,cancelled);a.stop();return out;

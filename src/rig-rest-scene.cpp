@@ -19,7 +19,7 @@ void restore(SculptObject &object,const PolygonOrigin &origin){
  object.volume=std::make_shared<Volume>(origin.volume->geometry_snapshot());
  object.painted=origin.paint?origin.paint->snapshot():nullptr;object.material=origin.material;
  object.deformation=origin.deformation;object.appearance=origin.appearance;object.material_bindings=origin.material_bindings;
- object.retopology=origin.retopology;object.polygon=origin.polygon;object.shape_source=origin.shape_source;object.rig_source=origin.rig_source;object.mesh_active=origin.mesh_active;
+ object.retopology=origin.retopology;object.polygon=origin.polygon;object.shape_source=origin.shape_source;object.rig_source=origin.rig_source;object.bake_recipe=origin.bake_recipe;object.mesh_active=origin.mesh_active;
  // Identity/name/current placement are intentionally retained. Source placement
  // is immutable provenance; restoring data must not rewire the live hierarchy.
 }

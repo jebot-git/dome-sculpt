@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "cut-color.hpp"
 #include "dome/document.hpp"
+#include "dome/bake-recipe.hpp"
 #include "dome/polygon-scene.hpp"
 #include "polygon-color-target.hpp"
 namespace dome {
@@ -29,6 +30,11 @@ void Document::cancel_asset_work(){
 void Document::cancel_background_work(){
   std::lock_guard lock(model_mutex_);cancel_background_work_locked();publish_locked();
 }
+bool Document::bake_source_eligible_locked(uint64_t id) const {
+  const auto at=std::find_if(scene_.objects().begin(),scene_.objects().end(),[id](const auto &o){return o.id==id;});
+  return at!=scene_.objects().end()&&id!=scene_.active().id&&!scene_.has_affine_placement(id)&&
+    detail::cut_color_supported(*at)&&(at->mesh_active?at->painted&&!at->painted->mesh().indices.empty():!at->volume->voxels().empty());
+}
 std::vector<uint64_t> Document::bake_sources_locked() const {
   std::vector<uint64_t> ids;
   const auto &target=scene_.active();
@@ -36,6 +42,11 @@ std::vector<uint64_t> Document::bake_sources_locked() const {
   for(const auto &o:scene_.objects())if(o.id!=scene_.active().id && !scene_.has_affine_placement(o.id) &&
       detail::cut_color_supported(o) &&
       (o.mesh_active ? o.painted && !o.painted->mesh().indices.empty() : !o.volume->voxels().empty()))ids.push_back(o.id);
+  if(state_.bake_source==unavailable_bake_object||
+      (target.bake_recipe&&target.bake_recipe->source.object==unavailable_bake_object))
+    ids.push_back(unavailable_bake_object);
+  if(target.bake_recipe&&std::find(ids.begin(),ids.end(),target.bake_recipe->source.object)==ids.end())
+    ids.push_back(target.bake_recipe->source.object);
   return ids;
 }
 std::vector<uint64_t> Document::bake_cages_locked() const {
@@ -50,6 +61,10 @@ std::vector<uint64_t> Document::bake_cages_locked() const {
   if(state_.bake_settings.cage_object &&
       std::find(ids.begin(),ids.end(),state_.bake_settings.cage_object)==ids.end())
     ids.push_back(state_.bake_settings.cage_object);
+  if(scene_.active().bake_recipe&&scene_.active().bake_recipe->cage&&
+      scene_.active().bake_recipe->cage->object==unavailable_bake_object&&
+      std::find(ids.begin(),ids.end(),unavailable_bake_object)==ids.end())
+    ids.push_back(unavailable_bake_object);
   return ids;
 }
 bool Document::bake_target_ready_locked() const {
@@ -59,8 +74,10 @@ bool Document::bake_target_ready_locked() const {
     object_editable_locked(o.id) && o.mesh_active && o.painted;
 }
 void Document::queue_bake_locked(uint64_t source,ObjectBakeSettings settings,AssetSource expected){
+  if(source==unavailable_bake_object||settings.cage_object==unavailable_bake_object)
+    throw std::logic_error("The saved bake source or cage is unavailable; select its replacement explicitly");
   auto ids=bake_sources_locked();
-  if(!bake_target_ready_locked() || std::find(ids.begin(),ids.end(),source)==ids.end())
+  if(!bake_target_ready_locked() || !bake_source_eligible_locked(source) || std::find(ids.begin(),ids.end(),source)==ids.end())
     throw std::logic_error("Choose a prepared, visible, unlocked target and a different nonempty source");
   auto report=std::make_shared<std::string>();auto work=std::make_shared<AssetWork>();
   queue_scene_operation_locked("Bake surface",[source,settings,report,work](Scene &scene,const auto &cancelled){

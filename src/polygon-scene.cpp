@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/retopo-authoring.hpp"
+#include "dome/bake-recipe.hpp"
 #include "dome/color-preparation.hpp"
 #include "source-paint-pairing.hpp"
 #include "polygon-color-target.hpp"
@@ -294,10 +295,11 @@ nlohmann::json PolygonSceneArchive::encode(PaintImageArchive &images,CreatorAsse
   PolygonColorArchive colors=shared_colors?*shared_colors:colors_;
   for(const auto &field:colors_.fields())colors.add(field);
   const bool affine=std::any_of(origins_.begin(),origins_.end(),[](const auto&o){return bool(o->placement);});
-  const bool rigs=direct_rig_origins_ || std::any_of(origins_.begin(),origins_.end(),[](const auto&o){return bool(o->rig_source);});
+  const bool recipes=std::any_of(origins_.begin(),origins_.end(),[](const auto &o){return bool(o->bake_recipe);});
+  const bool rigs=recipes || direct_rig_origins_ || std::any_of(origins_.begin(),origins_.end(),[](const auto&o){return bool(o->rig_source);});
   const bool shapes=rigs || shared_colors || direct_origins_ || std::any_of(origins_.begin(),origins_.end(),[](const auto&o){return bool(o->shape_source);});
   if(affine&&!placements)throw std::logic_error("Polygon source placement requires its shared archive");
-  nlohmann::json j = {{"version", rigs?6:shared_colors?5:shapes?4:!colors_.empty()?3:affine?2:1},
+  nlohmann::json j = {{"version", recipes?7:rigs?6:shared_colors?5:shapes?4:!colors_.empty()?3:affine?2:1},
                       {"authorities", nlohmann::json::array()},
                       {"origins", nlohmann::json::array()},
                       {"volumes", nlohmann::json::array()},
@@ -352,6 +354,7 @@ nlohmann::json PolygonSceneArchive::encode(PaintImageArchive &images,CreatorAsse
          {"scale", t.scale},
          {"name", o->name},
          {"source_object", o->source_object}});
+    if(recipes)j["origins"].back()["bake_recipe"]=o->bake_recipe?o->bake_recipe->encode():nlohmann::json(nullptr);
     if(shapes)j["origins"].back()["shape_source"]=o->shape_source?nlohmann::json(find(origins_,o->shape_source.get())):nlohmann::json(nullptr);
     if(rigs)j["origins"].back()["rig_source"]=o->rig_source?nlohmann::json(find(origins_,o->rig_source.get())):nlohmann::json(nullptr);
     if(o->placement) {
@@ -372,9 +375,10 @@ void PolygonSceneArchive::preflight(const nlohmann::json &j,
 }
 void PolygonSceneArchive::preflight(const nlohmann::json &j,const nlohmann::json &objects,const nlohmann::json *materials) {
   if (!j.is_object() || !j.at("version").is_number_integer() ||
-      (j.at("version") != 1 && j.at("version") != 2 && j.at("version") != 3 && j.at("version") != 4 && j.at("version") != 5 && j.at("version") != 6))
+      (j.at("version") != 1 && j.at("version") != 2 && j.at("version") != 3 && j.at("version") != 4 && j.at("version") != 5 && j.at("version") != 6 && j.at("version") != 7))
     throw std::invalid_argument("Unsupported polygon source archive");
-  const bool rigs=j.at("version")==6;
+  const bool recipes=j.at("version")==7;
+  const bool rigs=j.at("version")>=6;
   if(rigs&&(!j.contains("shared_colors")||!j.at("shared_colors").is_boolean()))throw std::invalid_argument("Rig source archive requires explicit color context");
   const bool shared=j.at("version")==5 || (rigs&&j.at("shared_colors").get<bool>());
   if(shared&&(!materials||(material_archive_base_version(*materials)!=6&&material_archive_base_version(*materials)!=7&&material_archive_base_version(*materials)!=8&&material_archive_base_version(*materials)!=9&&!encoded_key_context(*materials))))throw std::invalid_argument("Shared corner color projection requires material archive6–9");
@@ -458,13 +462,16 @@ void PolygonSceneArchive::preflight(const nlohmann::json &j,const nlohmann::json
     if (!a.at("origin").is_null())
       polygon_archive_index(a.at("origin"), oo.size());
   }
+  bool actual_recipe=false;
   for (const auto &o : oo) {
+    if(recipes){if(!o.contains("bake_recipe"))throw std::invalid_argument("Incomplete recipe origin record");if(!o.at("bake_recipe").is_null()){(void)ObjectBakeRecipe::decode(o.at("bake_recipe"));actual_recipe=true;}}
+    else if(o.contains("bake_recipe"))throw std::invalid_argument("Origin bake recipe requires archive7");
     const bool affine=o.contains("placement"),shapes=j.at("version")>=4;
     if(shapes){if(!o.contains("shape_source"))throw std::invalid_argument("Incomplete object source history");if(!o.at("shape_source").is_null())polygon_archive_index(o.at("shape_source"),oo.size());}
     else if(o.contains("shape_source"))throw std::invalid_argument("Shape source requires archive version four");
     if(rigs){if(!o.contains("rig_source"))throw std::invalid_argument("Incomplete rig source history");if(!o.at("rig_source").is_null())polygon_archive_index(o.at("rig_source"),oo.size());}
     else if(o.contains("rig_source"))throw std::invalid_argument("Rig source requires archive version six");
-    if (!o.is_object() || o.size() != (affine?12u:14u)+(shapes?1u:0u)+(rigs?1u:0u) || !o.at("mesh_active").is_boolean() ||
+    if (!o.is_object() || o.size() != (affine?12u:14u)+(shapes?1u:0u)+(rigs?1u:0u)+(recipes?1u:0u) || !o.at("mesh_active").is_boolean() ||
         !o.at("name").is_string())
       throw std::invalid_argument("Invalid polygon origin record");
     if(affine) {
@@ -495,6 +502,7 @@ void PolygonSceneArchive::preflight(const nlohmann::json &j,const nlohmann::json
   std::vector<uint8_t> status_a(aa.size()),status_o(oo.size()),
       used_volumes(j.at("volumes").size()),used_paints(j.at("paints").size());
   std::vector<size_t> height_a(aa.size()),height_o(oo.size());
+  if(recipes&&!actual_recipe)throw std::invalid_argument("Archive7 requires an actual bake recipe");
   std::function<size_t(size_t,size_t)> authority,origin;
   auto enter=[&](auto &status,auto &height,size_t i,size_t depth){
     if(depth>maximum_depth)throw std::length_error("Object source history depth exceeded");
@@ -554,8 +562,8 @@ PolygonSceneArchive PolygonSceneArchive::decode(const nlohmann::json &j,const Pa
   return decode(j,images,models,materials,placements,shared_colors,domains,paint_domains,SourcePaintDecodeContext{false,physical});
 }
 PolygonSceneArchive PolygonSceneArchive::decode(const nlohmann::json &j,const PaintImageArchive &images,const CreatorAssetArchive &models,const SourceMaterialArchive &materials,const SourcePlacementArchive *placements,const PolygonColorArchive *shared_colors,const NormalSamplingArchive *domains,const PaintSamplingArchive *paint_domains,const SourcePaintDecodeContext &context) {
-  PolygonSceneArchive out;out.direct_origins_=j.at("version")>=4;out.direct_rig_origins_=j.at("version")==6;
-  if((j.at("version")==5||(j.at("version")==6&&j.at("shared_colors").get<bool>()))&&!shared_colors)throw std::invalid_argument("Shared current corner archive requires Scene20");
+  PolygonSceneArchive out;out.direct_origins_=j.at("version")>=4;out.direct_rig_origins_=j.at("version")>=6;
+  if((j.at("version")==5||(j.at("version")>=6&&j.at("shared_colors").get<bool>()))&&!shared_colors)throw std::invalid_argument("Shared current corner archive requires Scene20");
   const bool colored=j.at("version")==3 || j.contains("color_fields");
   if(shared_colors)out.colors_=*shared_colors;
   else if(colored)out.colors_=PolygonColorArchive::decode(j.at("color_bases"),j.at("color_fields"));
@@ -586,6 +594,7 @@ PolygonSceneArchive PolygonSceneArchive::decode(const nlohmann::json &j,const Pa
     value->mesh_active = o.at("mesh_active").get<bool>();
     value->name = o.at("name").get<std::string>();
     value->source_object = unsigned_id(o.at("source_object"));
+    if(j.at("version")==7&&!o.at("bake_recipe").is_null())value->bake_recipe=ObjectBakeRecipe::decode(o.at("bake_recipe"));
     if(o.contains("placement")) {
       if(!placements)throw std::invalid_argument("Polygon source placement archive is missing");
       value->placement=placements->capsule(uint32_t(unsigned_id(o.at("placement"))));

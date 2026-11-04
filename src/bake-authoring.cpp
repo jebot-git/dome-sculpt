@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/bake-authoring.hpp"
+#include "dome/bake-recipe.hpp"
 #include "dome/source-maps.hpp"
 #include "dome/color-preparation.hpp"
 #include "current-colors.hpp"
@@ -184,6 +185,7 @@ ObjectBakeReport bake_object(Scene &scene, uint64_t source_id,
   next.active().painted = std::move(painting);
   next.active().material_bindings=target.material_bindings;
   next.active().polygon=target.polygon;
+  next.active().bake_recipe=capture_bake_recipe(scene,source_id,settings);
   next.validate();
   check();
   // A user progress callback can throw or request cancellation. No fallible

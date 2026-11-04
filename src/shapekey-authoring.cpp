@@ -112,7 +112,7 @@ ShapeKeyResult author_shapekey(Scene &scene,uint64_t object,const ShapeKeyEdit &
   const auto &origin=*source.shape_source;Scene next=scene;auto &o=next.object(object);
   o.volume=std::make_shared<Volume>(origin.volume->geometry_snapshot());o.painted=origin.paint?origin.paint->snapshot():nullptr;
   o.mesh_active=origin.mesh_active;o.material=origin.material;o.deformation=origin.deformation;o.appearance=origin.appearance;
-  o.material_bindings=origin.material_bindings;o.retopology=origin.retopology;o.polygon=origin.polygon;o.shape_source=origin.shape_source;o.rig_source=origin.rig_source;
+  o.material_bindings=origin.material_bindings;o.retopology=origin.retopology;o.polygon=origin.polygon;o.shape_source=origin.shape_source;o.rig_source=origin.rig_source;o.bake_recipe=origin.bake_recipe;
   next.validate();stop(cancelled);scene=std::move(next);return {0,true};
  }
  if(edit.action==ShapeKeyAction::Mirror&&(!std::isfinite(edit.mirror_plane)||std::abs(edit.mirror_plane)>1e6||size_t(edit.mirror_frames)>2))throw std::invalid_argument("Invalid explicit Mirror plane or frame interpretation");

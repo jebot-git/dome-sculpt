@@ -375,6 +375,10 @@ void SpatialPalette::raster(const EditorState &s) {
       rect(280 * unit_, 470 * unit_, 80 * unit_, 40 * unit_, swatch);
     }
     text(320 * unit_, 530 * unit_, "Aim + trigger: drag slider", fg);
+    if(c.parameter==VrParameter::BakeSource){
+      rect(160*unit_,410*unit_,320*unit_,44*unit_,s.bake_recipe?accent:grid);
+      text(320*unit_,440*unit_,s.bake_recipe?(c.bake_preset?"Recipe loaded":"Recall last bake"):"No saved bake yet",fg);
+    }
     text(320 * unit_, 560 * unit_,
          c.components == 1 ? "Stick: slide / Vertical: fine wheel"
                            : "Up/down: row / Left/right: value",

@@ -127,6 +127,7 @@ capture_origin(const SculptObject &source, CanvasTransform world,
   origin->material_bindings = source.material_bindings;
   origin->shape_source = source.shape_source;
   origin->rig_source = source.rig_source;
+  origin->bake_recipe = source.bake_recipe;
   origin->retopology = source.retopology;
   origin->polygon = source.polygon;
   origin->mesh_active = source.mesh_active;
@@ -530,6 +531,7 @@ void restore_polygon_origin(Scene &scene, uint64_t id,
   target.material_bindings = origin.material_bindings;
   target.shape_source = origin.shape_source;
   target.rig_source = origin.rig_source;
+  target.bake_recipe = origin.bake_recipe;
   target.retopology = origin.retopology;
   target.polygon = origin.polygon;
   // Keep current object identity, placement/group and user name. Original

@@ -96,7 +96,7 @@ inline unsigned source_feature_version(const PolygonAuthority *root,const Polygo
     if(depth>32||active_o.contains(o)||done_a.size()+done_o.size()>512)throw std::invalid_argument("Invalid retained object feature-version graph");
     if(done_o.contains(o))return;
     active_o.insert(o);
-    result=std::max({result,hdr_emission(o->material.emissive)?27u:0u,minimum_scene_version(o->placement.get()),o->shape_source?16u:0u,o->rig_source?25u:0u,minimum_scene_version(o->paint.get()),minimum_scene_version(o->deformation.get()),minimum_scene_version(o->appearance.get()),minimum_scene_version(o->material_bindings.get())});
+    result=std::max({result,o->bake_recipe?30u:0u,hdr_emission(o->material.emissive)?27u:0u,minimum_scene_version(o->placement.get()),o->shape_source?16u:0u,o->rig_source?25u:0u,minimum_scene_version(o->paint.get()),minimum_scene_version(o->deformation.get()),minimum_scene_version(o->appearance.get()),minimum_scene_version(o->material_bindings.get())});
     authority(o->polygon.get(),depth+1);origin(o->shape_source.get(),depth+1);origin(o->rig_source.get(),depth+1);active_o.erase(o);done_o.insert(o);
   };
   if(root)authority(root,1);else if(source){result=16;origin(source,1);}return result;
@@ -119,7 +119,7 @@ inline unsigned minimum_deformation_scene_version(const nlohmann::json &d) {
 inline unsigned minimum_scene_version(const Scene &scene){
   unsigned result=0;
   for(const auto &o:scene.objects()){
-    result=std::max({result,hdr_emission(o.material.emissive)?27u:0u,minimum_scene_version(o.painted.get()),minimum_scene_version(o.deformation.get()),
+    result=std::max({result,o.bake_recipe?30u:0u,hdr_emission(o.material.emissive)?27u:0u,minimum_scene_version(o.painted.get()),minimum_scene_version(o.deformation.get()),
       minimum_scene_version(o.material_bindings.get()),minimum_scene_version(o.appearance.get()),
       minimum_scene_version(o.polygon.get()),minimum_scene_version(o.shape_source.get()),
       o.rig_source?25u:0u,minimum_scene_version(o.rig_source.get()),o.affine_edit?13u:0u});
