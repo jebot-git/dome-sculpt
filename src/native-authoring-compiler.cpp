@@ -38,7 +38,7 @@ NativeExtractionCost native_extraction_cost(const Scene &scene,const SourceUvBak
     throw std::length_error("Native physical geometry budget is outside its supported range");
   auto charge=[](size_t &total,size_t n,size_t unit,size_t cap,const char *message){
     if(total>cap||n>(cap-total)/unit)throw std::length_error(message);total+=n*unit;};
-  for(const auto &o:scene.objects())if(o.visible&&native_physical(o)&&o.mesh_active){
+  for(const auto &o:scene.objects())if(o.visible&&o.mesh_active&&(native_physical(o)||(o.material_bindings&&o.material_bindings->native_paint_sampling))){
     if(cancelled&&cancelled())throw std::runtime_error("Native physical extraction cancelled");
     const auto &p=*o.painted;
     if(p.mesh().positions.size()>policy.max_vertices||p.mesh().indices.size()/3>policy.max_triangles)
