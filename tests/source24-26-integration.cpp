@@ -49,9 +49,8 @@ int main(int argc,char **argv)try{
   auto values=std::make_shared<const std::vector<std::array<float,2>>>(original.active().painted->mesh().uv);
   maps.color.image=std::make_shared<const Image>(Image{1,1,{255,255,255,255}});maps.color.texcoord=extra?2:1;
   if(extra)maps.extra_uv_sets[2]=values;else maps.uv1=values;encoded["source_maps"]=encode_source_maps(maps,images);
-  auto before=PaintedMesh::decode(encoded,&images);auto snapshot=before->encode(&images);std::vector<uint32_t> remap(before->mesh().positions.size());std::iota(remap.begin(),remap.end(),0u);
-  bool refused=false;try{retain_source_corner_paint(before,original.active().material_bindings,original.active().deformation,original.active().material_bindings->color_preparation->current_descriptor(),before->mesh(),remap);}catch(const std::exception&e){refused=std::string_view(e.what())=="Retained corner paint requires explicit atlas preparation of active source coordinates";}
-  check(refused&&before->encode(&images)==snapshot,"Detached KeepPaint factory refuses active original coordinate owners before remapping or mutation");
+  const auto snapshot=original.encode();bool refused=false;try{(void)PaintedMesh::decode(encoded,&images);}catch(const std::invalid_argument&e){refused=std::string_view(e.what()).find("actual Paint4 owner")!=std::string_view::npos;}
+  check(refused&&original.encode()==snapshot,"Detached retained-corner data cannot mint UV1 or UV2 paint authority by replacing serialized maps");
  }
  auto mixed=retained.snapshot();for(const auto &object:mixed.objects())mixed.object(object.id).visible=false;mixed.object(retained_id).visible=true;mixed.object(retained_id).transform.position.x=-3;document.replace(mixed);endpoint(document);document.shading(false);endpoint(document);
  import_fixture::Fixture input;while(input.bin.size()%4)input.bin.push_back(0);const auto uv2=input.values({0,1,0,0,1,0,1,1},2,"VEC2");input.j["meshes"][0]["primitives"][0]["attributes"]["TEXCOORD_2"]=uv2;input.j["materials"][0]["pbrMetallicRoughness"]["baseColorTexture"]["texCoord"]=2;input.j["materials"][0]["alphaMode"]="OPAQUE";input.j["materials"][0].erase("alphaCutoff");

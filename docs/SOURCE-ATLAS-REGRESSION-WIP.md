@@ -39,3 +39,15 @@ that all sibling materials must be flattened. The actual package correctly keeps
 an unpainted sibling's original UV1 while compiling only the painted material.
 Four other updated workflows pass, including the 12-case graphical workflow;
 these intermediate results do not qualify the new admission continuation.
+
+The f89 direct caller and native zero-coverage regression passes in Release and
+sanitizer. Release16 finishes14passing, with a genuine asynchronous test error
+(no surface wait after Undo/Redo) and another forged-UV owner fixture failure.
+A separate diagnostic reproduces both normal and flat cases: before waiting,
+`begin_native_stroke` correctly explains “Wait for the current surface before
+painting”; after the existing public `wait_mesh`, the same gesture succeeds.
+This child adds that missing wait and updates the second ownership negative,
+while retaining its actual subsequent mixed retained-paint/raw-UV2 workflow.
+The twelve finite views observed max1; their existing mean/interior2 nominal
+bound is now asserted as well as independent compiled-view/recovery contracts.
+These fixture bounds are not a global finite-sampling guarantee.

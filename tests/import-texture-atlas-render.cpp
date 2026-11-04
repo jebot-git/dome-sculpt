@@ -64,6 +64,7 @@ int main(int argc,char **argv)try{
    }else{
     document.export_asset(exported,AssetExportFormat::EditableGlb512).get();color_consumer::Model model(exported);fbo.bind();independent.render(model.data);const auto file_pixels=read();const auto loss=fidelity(pixels,file_pixels);
     std::cout<<"EXPLICIT_FINITE_VIEW "<<prefix<<" mean="<<loss.mean<<" max="<<loss.maximum<<" interior="<<loss.interior_maximum<<'\n';
+    check(loss.visible>128&&loss.mean<=2&&loss.interior_maximum<=2,"Explicit finite output retains the nominal-view bounds on these twelve fixtures; minification counterexamples remain separate");
     // The portable view has a deliberately finite sampling domain. Qualify its
     // actual emitted pixels against a separately installed detached bake, and
     // qualify exact native recovery separately; never label it lossless.
