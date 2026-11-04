@@ -12,6 +12,7 @@ struct EmissionExportPrepared {
  bool authored_mtoon=false;
  std::shared_ptr<const EmissionExportProof> proof;
 };
+void validate_native_emission_surfaces(const EmissionExportPrepared &,const std::function<bool()> &);
 bool matches_native_emission_surface(const EmissionExportPrepared &,const ObjectSurface &,const std::function<bool()> &);
 EmissionExportPrepared prepare_emission_export(std::span<const ObjectSurface>,
  const NativeEmissionExport &,const std::function<bool()> &,bool authored_mtoon=false);

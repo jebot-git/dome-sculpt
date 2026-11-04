@@ -44,6 +44,7 @@ class EmissionExportProof final {
  std::shared_ptr<const Scene> scene;std::vector<Entry> entries;
  EmissionExportProof()=default;
  friend EmissionExportPrepared prepare_emission_export(std::span<const ObjectSurface>,const NativeEmissionExport &,const std::function<bool()> &,bool);
+ friend void validate_native_emission_surfaces(const EmissionExportPrepared &,const std::function<bool()> &);
  friend bool matches_native_emission_surface(const EmissionExportPrepared &,const ObjectSurface &,const std::function<bool()> &);
  friend void finish_emission_export(GltfDocument &,EmissionExportPrepared &,const NativeEmissionExport &,size_t,const std::function<bool()> &);
 };
@@ -53,6 +54,14 @@ bool matches_native_emission_surface(const EmissionExportPrepared &prepared,cons
  auto same=[](const auto &a,const auto &b){return a==b&&!a.owner_before(b)&&!b.owner_before(a);};const auto &owner=proof->scene->object(surface.id);if(!owner.painted||!owner.material_bindings||!owner.material_bindings->native_paint_sampling)throw std::invalid_argument("Normalized native HDR lost its actual current Paint owner");const auto &a=surface.material,&b=entry->material;
  if(!same(surface.textures,entry->textures)||!same(surface.material_bindings,entry->binding)||!same(surface.material_bindings,owner.material_bindings)||a.name!=b.name||a.color!=b.color||a.emissive!=b.emissive||a.metallic!=b.metallic||a.roughness!=b.roughness||a.toon!=b.toon||a.double_sided!=b.double_sided||a.alpha!=b.alpha||a.alpha_cutoff!=b.alpha_cutoff||a.unlit!=b.unlit||surface.appearance||surface.deformation||surface.polygon_colors||!same_mesh(surface.mesh,owner.painted->mesh())||surface.world_matrix().float_matrix()!=proof->scene->world_matrix(owner.id).float_matrix())throw std::invalid_argument("Normalized native HDR view differs from its exact prepared owner");
  const auto node=owner.material_bindings->native_paint_sampling;PaintSamplingLimits limits;limits.cancelled=cancelled;node->validate_current(*owner.painted,limits);if(!same(surface.paint_sampling_attachment,node->attachment())||surface.paint_corner_coordinates!=node->domain()->corner_coordinates(surface.mesh,limits))throw std::invalid_argument("Normalized native HDR view changed its owning paint corners");return true;
+}
+void validate_native_emission_surfaces(const EmissionExportPrepared &prepared,const std::function<bool()> &cancelled){
+ if(!prepared.proof)return;
+ for(const auto &entry:prepared.proof->entries){stop(cancelled);const auto matches=[&](const auto &object){return object.id==entry.id;};
+  if(std::count_if(prepared.surfaces.begin(),prepared.surfaces.end(),matches)!=1)throw std::invalid_argument("Native HDR prepared field lost its unique emitted subject");
+  const auto surface=std::find_if(prepared.surfaces.begin(),prepared.surfaces.end(),matches);
+  if(!matches_native_emission_surface(prepared,*surface,cancelled))throw std::invalid_argument("Native HDR field has no genuine prepared emission authority");
+ }
 }
 EmissionInterchangeImage native_paint_emission_field(const SculptObject &object,const std::function<bool()> &cancelled){
  const auto binding=object.material_bindings;const auto owner=binding?binding->native_paint_sampling:nullptr;

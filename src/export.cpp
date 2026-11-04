@@ -771,7 +771,7 @@ GltfDocument make_gltf(const std::vector<ObjectSurface> &objects,SourceMorphSpac
   return make_gltf_impl(objects,space,recompute_changed_normals,std::move(cancelled),nullptr,nullptr);
 }
 GltfDocument make_gltf_emission(const EmissionExportPrepared &prepared,bool recompute_changed_normals,std::function<bool()> cancelled){
- for(const auto &object:prepared.surfaces)if(object.material_bindings&&object.material_bindings->native_paint_sampling&&!matches_native_emission_surface(prepared,object,cancelled))throw std::invalid_argument("Native HDR view has no genuine prepared emission authority");
+ validate_native_emission_surfaces(prepared,cancelled);
  return make_gltf_impl(prepared.surfaces,SourceMorphSpace::Native,recompute_changed_normals,std::move(cancelled),nullptr,&prepared);
 }
 GltfDocument make_gltf_authoring(const NativeAuthoringCapture &capture,

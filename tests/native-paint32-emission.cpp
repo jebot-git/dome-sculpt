@@ -15,6 +15,7 @@ detail::GltfDocument document32(const std::vector<uint8_t> &bytes){detail::GltfD
 EmissionInterchangeImage field32(const detail::GltfDocument &d){const auto &record=d.json.at("extras").at("domeSculptEmission").at("images").at(0);const auto &v=d.json.at("bufferViews").at(record.at("bufferView").get<size_t>());return decode_emission_exr(std::span<const uint8_t>(d.binary).subspan(v.at("byteOffset").get<size_t>(),v.at("byteLength").get<size_t>()));}
 void resign32(detail::GltfDocument &d){auto &marker=d.json["extras"]["domeSculptEmission"];marker["binarySha256"]=creator_detail::sha256(d.binary);auto copy=d.json;copy["extras"]["domeSculptEmission"].erase("documentSha256");marker["documentSha256"]=creator_detail::sha256(nlohmann::json::to_cbor(copy));}
 }
+#ifndef DOME_NATIVE32_EMISSION_NO_MAIN
 int main(int argc,char **argv)try{
  if(argc!=2)return 2;const std::filesystem::path out=argv[1];std::filesystem::create_directories(out);NativeGraphics graphics;Fbo fbo;fbo.bind();SurfaceRenderer renderer;renderer.set_frame_time(0);prepared_normal_consumer::Renderer independent;unsigned number=0;
  for(auto alpha:{Material::AlphaMode::Opaque,Material::AlphaMode::Mask,Material::AlphaMode::Blend})for(bool hdr:{false,true}){
@@ -35,3 +36,5 @@ int main(int argc,char **argv)try{
  }
  std::cout<<"PASS "<<checks<<" native32 owning physical emission checks\n";return 0;
 }catch(const std::exception &e){std::cerr<<"FAIL "<<e.what()<<'\n';return 1;}
+
+#endif
