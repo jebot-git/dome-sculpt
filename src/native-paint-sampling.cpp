@@ -23,6 +23,13 @@ void replay_budget(const PaintedMesh &before,size_t target_vertices,size_t targe
   if(bytes>limits.max_working_bytes)throw std::length_error("Native paint replay exceeds scratch budget before allocation");
 }
 void replay_budget(const PaintedMesh &before,const Mesh &target,const PaintSamplingLimits &limits){replay_budget(before,target.positions.size(),target.indices.size(),target.uv_pins.size(),target.uv_seams.size(),limits);}
+size_t mesh_storage(const Mesh &m){return m.positions.size()*(2*sizeof(Vec3)+sizeof(std::array<float,2>))+m.indices.size()*sizeof(uint32_t)+m.uv_pins.size()+m.uv_seams.size();}
+void layout_current(const Mesh &before,const Mesh &target,const SourceNormalUvLayout &layout,const PaintSamplingLimits &limits){
+  stop(limits);layout.storage_bytes();before.validate();target.validate();
+  if(layout.source_vertices.size()!=target.positions.size()||layout.indices!=target.indices||layout.uv!=target.uv||layout.pins!=target.uv_pins||layout.seams!=target.uv_seams||target.indices.size()!=before.indices.size())throw std::invalid_argument("Native layout lost exact current dimensions");
+  for(size_t v=0;v<target.positions.size();++v){if((v&1023)==0)stop(limits);const auto old=layout.source_vertices[v];if(old>=before.positions.size()||!equal(target.positions[v],before.positions[old])||!equal(target.normals[v],before.normals[old]))throw std::invalid_argument("Native layout changed exact REST source correspondence");for(float q:target.uv[v])if(q<0||q>1)throw std::invalid_argument("Native UV layout is outside its unit atlas");}
+  for(size_t c=0;c<target.indices.size();++c){if((c&1023)==0)stop(limits);if(layout.source_vertices[target.indices[c]]!=before.indices[c])throw std::invalid_argument("Native layout changed exact ordered source corners");}stop(limits);
+}
 void same_mesh(const Mesh &a,const Mesh &b,const PaintSamplingLimits &limits){
   if(a.positions.size()!=b.positions.size()||a.normals.size()!=b.normals.size()||a.indices!=b.indices||a.uv!=b.uv||a.uv_pins!=b.uv_pins||a.uv_seams!=b.uv_seams)
     throw std::invalid_argument("Native retained paint differs from its exact ordered REST layout");
@@ -56,7 +63,7 @@ void NativePaintSampling::validate(const PaintSamplingLimits &limits) const {
   const auto prior=before_->paint_sampling_domain();
   if(domain_->source_corners().size()!=before_->mesh().indices.size())throw std::invalid_argument("Native paint corner history differs");
   for(size_t c=0;c<domain_->source_corners().size();++c){if((c&1023)==0)stop(limits);if(domain_->source_corners()[c]!=(prior?prior->source_corners()[c]:uint32_t(c)))throw std::invalid_argument("Native paint changed ordered original sampling corners");}
-  const auto target=layout_->target_mesh(before_->mesh(),limits.cancelled);domain_->validate_current(target,limits);same_mesh(target,*attachment_->authored_geometry(),limits);
+  layout_current(before_->mesh(),*attachment_->authored_geometry(),*layout_,limits);domain_->validate_current(*attachment_->authored_geometry(),limits);
 }
 void NativePaintSampling::validate_current(const PaintedMesh &paint,const PaintSamplingLimits &limits) const {
   validate(limits);if(!native_grid_state(paint))throw std::invalid_argument("Native retained paint needs an explicit baked/projection/source transition");if(!matches_current(paint))throw std::invalid_argument("Native retained paint borrowed another current attachment or grid");
@@ -65,7 +72,7 @@ bool native_paint_retention_supported(const SculptObject &source) noexcept {
   if(!source.mesh_active||!source.painted||source.painted->in_stroke()||source.appearance||source.deformation||source.shape_source||source.rig_source||source.polygon||
      source.painted->source_maps()||source.painted->color_projection()||source.painted->normal_projection()||source.painted->baked()||source.painted->source_sampling_prepared()||source.painted->surface_diagnostics().policy!=PaintUvPolicy::Strict)return false;
   const auto &b=source.material_bindings;
-  return !b?!source.painted->paint_sampling_domain():!b->has_mtoon&&!b->normal_frames&&!b->key_derivation&&!b->normal_preparation&&!b->color_preparation&&b->native_paint_sampling&&b->native_paint_sampling->valid_owner(b->native_paint_sampling)&&b->native_paint_sampling->history_depth()<32&&b->native_paint_sampling->matches_current(*source.painted);
+  return !b?!source.painted->paint_sampling_domain():!b->has_mtoon&&b->normal_frame==SourceMaterialNormalFrame::UvDerivative&&!b->normal_frames&&!b->key_derivation&&!b->normal_preparation&&!b->color_preparation&&b->native_paint_sampling&&b->native_paint_sampling->valid_owner(b->native_paint_sampling)&&b->native_paint_sampling->history_depth()<32&&b->native_paint_sampling->matches_current(*source.painted);
 }
 std::shared_ptr<const SourceMaterialBindings> bind_native_paint(const std::shared_ptr<const NativePaintSampling> &owner,std::shared_ptr<const SourceMaterialBindings> previous){
   if(!owner)throw std::invalid_argument("Native paint binding needs its real owner");
@@ -79,10 +86,11 @@ std::shared_ptr<const PaintSamplingAttachment> material_paint_attachment(const S
   return b->native_paint_sampling?b->native_paint_sampling->attachment():color?color->geometry_attachment():nullptr;
 }
 struct NativePaintSamplingAccess {
- template<class Capture,class CaptureBinding>static RetainedNativePaint build(const SculptObject &source,Mesh target,
+ template<class Capture,class CaptureBinding>static RetainedNativePaint build(const SculptObject &source,const Mesh &target,
     std::span<const uint32_t> vertices,const PaintSamplingLimits &limits,
-    std::shared_ptr<const PaintSamplingDomain> pooled,Capture capture,CaptureBinding capture_binding){
+    std::shared_ptr<const PaintSamplingDomain> pooled,Capture capture,CaptureBinding capture_binding,Mesh *owned_target=nullptr){
   stop(limits);
+  if(owned_target&&owned_target!=&target)throw std::logic_error("Native decoded target lost its actual owned mesh");
   if(!native_paint_retention_supported(source))throw std::invalid_argument("Native paint retention requires its own supported native grid and history");
   if(!limits.max_vertices||limits.max_vertices>2'000'000||!limits.max_triangles||limits.max_triangles>2'000'000||
      !limits.max_basis_bytes||limits.max_basis_bytes>128*1024*1024||!limits.max_working_bytes||limits.max_working_bytes>512*1024*1024||!limits.max_work||limits.max_work>256'000'000)
@@ -95,7 +103,7 @@ struct NativePaintSamplingAccess {
   const size_t basis_bytes=before.positions.size()*(2*sizeof(Vec3)+sizeof(std::array<float,2>))+before.indices.size()*2*sizeof(uint32_t)+before.uv_pins.size()+before.uv_seams.size();
   if(basis_bytes>limits.max_basis_bytes)throw std::length_error("Native retained basis exceeds budget before allocation");
   const uint64_t pixels=uint64_t(source.painted->resolution())*source.painted->resolution();
-  uint64_t work=pixels*16+uint64_t(before.positions.size())*8+uint64_t(before.indices.size())*16;
+  uint64_t work=pixels*16+uint64_t(before.positions.size())*8+uint64_t(target.positions.size())*8+uint64_t(before.indices.size())*16;
   if(work>limits.max_work)throw std::length_error("Native retained fixed work exceeds budget before allocation");
   for(size_t c=0;c<before.indices.size();c+=3){
     if((c&1023)==0)stop(limits);
@@ -104,15 +112,17 @@ struct NativePaintSamplingAccess {
     auto extent=[&](size_t axis){const int low=std::max(0,int(std::floor(std::min({a[axis],b[axis],d[axis]})*r))),high=std::min(r-1,int(std::ceil(std::max({a[axis],b[axis],d[axis]})*r)));return high<low?uint64_t(0):uint64_t(high-low+1);};
     const auto samples=extent(0)*extent(1);if(samples>limits.max_work-work)throw std::length_error("Native retained raster work exceeds budget before allocation");work+=samples;
   }
-  size_t metadata=sizeof(NativePaintSampling),scratch=0;
+  size_t metadata=sizeof(NativePaintSampling)+2*sizeof(PaintedMesh)+sizeof(SourceNormalUvLayout)+4096,scratch=0;
   if(metadata>limits.max_working_bytes)throw std::length_error("Native retained owner exceeds working budget before allocation");
   auto charge=[&](size_t n,size_t unit){if(n>limits.max_working_bytes/unit||n*unit>limits.max_working_bytes-metadata)throw std::length_error("Native retained metadata exceeds working budget before allocation");metadata+=n*unit;};
+  charge(source.material.name.size()+1,3);
   for(const auto &layer:source.painted->layers()){charge(layer.name.size()+1,3);charge(layer.tiles.size()+layer.pbr_tiles.size()+layer.emission_tiles.size(),3*sizeof(std::shared_ptr<const void>));}
   charge(target.positions.size(),sizeof(uint32_t)+sizeof(std::array<float,2>));charge(target.indices.size(),2*sizeof(uint32_t));charge(target.uv_pins.size()+target.uv_seams.size(),1);
   scratch=metadata;auto budget=limits;if(scratch>=budget.max_working_bytes)throw std::length_error("Native retained metadata exhausts working budget");budget.max_working_bytes-=scratch;budget.max_basis_bytes=std::min(budget.max_basis_bytes,budget.max_working_bytes);
+  const auto geometry_bytes=mesh_storage(target);if(geometry_bytes>=budget.max_working_bytes)throw std::length_error("Native authored geometry exhausts working budget before allocation");
   SourceNormalUvLayout value;value.source_vertices.assign(vertices.begin(),vertices.end());value.indices=target.indices;value.uv=target.uv;value.pins=target.uv_pins;value.seams=target.uv_seams;
   auto layout=std::make_shared<const SourceNormalUvLayout>(std::move(value));
-  const auto replay=layout->target_mesh(before,limits.cancelled);same_mesh(target,replay,limits);
+  layout_current(before,target,*layout,limits);
   std::vector<uint32_t> corners(target.indices.size());std::iota(corners.begin(),corners.end(),0u);
   auto domain=retain_paint_sampling(before,source.painted->paint_sampling_domain(),target,corners,budget);
   if(pooled){
@@ -123,13 +133,15 @@ struct NativePaintSamplingAccess {
   // Freeze mutable layer names/visibility/opacity and tile tables. Surface and
   // immutable pixel owners remain shared; current metadata cannot edit anchor.
   auto captured=capture(source.painted);
-  auto paint=retain_paint_grid(*captured,std::move(target),domain,budget);
+  std::shared_ptr<PaintedMesh> paint;
+  if(owned_target){auto grid_budget=budget;grid_budget.max_working_bytes-=geometry_bytes;grid_budget.max_basis_bytes=std::min(grid_budget.max_basis_bytes,grid_budget.max_working_bytes);paint=retain_paint_grid(*captured,std::move(*owned_target),domain,grid_budget);}
+  else paint=retain_paint_grid_borrowed(*captured,target,domain,budget);
   auto owner=std::shared_ptr<NativePaintSampling>(new NativePaintSampling);owner->before_=std::move(captured);owner->native_=source.material;owner->before_material_=capture_binding(source.material_bindings);owner->depth_=source.material_bindings?source.material_bindings->native_paint_sampling->history_depth()+1:1;owner->layout_=std::move(layout);owner->domain_=std::move(domain);owner->attachment_=paint->paint_sampling_attachment();
   owner->self_=owner;owner->validate_current(*paint,limits);stop(limits);return {std::move(paint),std::move(owner)};
 }
 };
-RetainedNativePaint retain_native_paint(const SculptObject &source,Mesh target,std::span<const uint32_t> vertices,const PaintSamplingLimits &limits){
-  return NativePaintSamplingAccess::build(source,std::move(target),vertices,limits,{},[](const auto &paint){return std::make_shared<const PaintedMesh>(*paint->snapshot());},[](const auto &binding){return binding?std::make_shared<const SourceMaterialBindings>(*binding):nullptr;});
+RetainedNativePaint retain_native_paint(const SculptObject &source,const Mesh &target,std::span<const uint32_t> vertices,const PaintSamplingLimits &limits){
+  return NativePaintSamplingAccess::build(source,target,vertices,limits,{},[](const auto &paint){return std::make_shared<const PaintedMesh>(*paint->snapshot());},[](const auto &binding){return binding?std::make_shared<const SourceMaterialBindings>(*binding):nullptr;});
 }
 RetainedNativePaint NativePaintSamplingCodec::replay(std::shared_ptr<const PaintedMesh> before,Material native,
     std::shared_ptr<const SourceMaterialBindings> binding,std::shared_ptr<const SourceNormalUvLayout> layout,
@@ -139,7 +151,7 @@ RetainedNativePaint NativePaintSamplingCodec::replay(std::shared_ptr<const Paint
   layout->storage_bytes();
   replay_budget(*before,layout->source_vertices.size(),layout->indices.size(),layout->pins.size(),layout->seams.size(),limits);
   auto target=layout->target_mesh(before->mesh(),limits.cancelled);
-  return NativePaintSamplingAccess::build(source,std::move(target),layout->source_vertices,limits,std::move(domain),[&](const auto &){return before;},[](const auto &binding){return binding;});
+  return NativePaintSamplingAccess::build(source,target,layout->source_vertices,limits,std::move(domain),[&](const auto &){return before;},[](const auto &binding){return binding;},&target);
 }
 nlohmann::json encode_native_material(const Material &m){m.validate();return {{"name",m.name},{"color",m.color},{"metallic",m.metallic},{"roughness",m.roughness},{"emissive",m.emissive},{"toon",m.toon},{"double_sided",m.double_sided},{"alpha",int(m.alpha)},{"alpha_cutoff",m.alpha_cutoff},{"unlit",m.unlit}};}
 Material decode_native_material(const nlohmann::json &j){

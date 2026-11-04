@@ -21,7 +21,7 @@ class NativePaintSampling final {
   std::shared_ptr<const PaintSamplingAttachment> attachment_;
   NativePaintSampling()=default;
   friend struct NativePaintSamplingAccess;
-  friend RetainedNativePaint retain_native_paint(const SculptObject &,Mesh,
+  friend RetainedNativePaint retain_native_paint(const SculptObject &,const Mesh &,
       std::span<const uint32_t>,const PaintSamplingLimits &);
 public:
   const auto &before_paint() const noexcept{return before_;}
@@ -39,7 +39,7 @@ public:
   void validate(const PaintSamplingLimits & = {}) const;
   void validate_current(const PaintedMesh &,const PaintSamplingLimits & = {}) const;
 };
-RetainedNativePaint retain_native_paint(const SculptObject &,Mesh,
+RetainedNativePaint retain_native_paint(const SculptObject &,const Mesh &,
     std::span<const uint32_t>,const PaintSamplingLimits & = {});
 std::shared_ptr<const SourceMaterialBindings> bind_native_paint(
     const std::shared_ptr<const NativePaintSampling> &,std::shared_ptr<const SourceMaterialBindings>);

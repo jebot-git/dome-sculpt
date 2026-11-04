@@ -184,7 +184,7 @@ void SourceMaterialBindings::validate(bool deep) const {
   if(native_paint_sampling){
     if(!native_paint_sampling->valid_owner(native_paint_sampling))throw std::invalid_argument("Native paint material has no genuine owning lease");
     native_paint_sampling->validate();
-    if(has_mtoon||color_preparation||normal_preparation||normal_frames||key_derivation||!sampling_reparameterized||!uv_origin||uv_origin->appearance||uv_origin->deformation||uv_origin->material||!uv_origin->creator_kind.empty()||uv_origin->creator_version||!uv_origin->creator_parameters.empty()||!owning_key_ref(uv_origin->paint,native_paint_sampling->original_paint()))throw std::invalid_argument("Native paint material lost its exact unprepared source interpretation");
+    if(has_mtoon||normal_frame!=SourceMaterialNormalFrame::UvDerivative||color_preparation||normal_preparation||normal_frames||key_derivation||!sampling_reparameterized||!uv_origin||uv_origin->appearance||uv_origin->deformation||uv_origin->material||!uv_origin->creator_kind.empty()||uv_origin->creator_version||!uv_origin->creator_parameters.empty()||!owning_key_ref(uv_origin->paint,native_paint_sampling->original_paint()))throw std::invalid_argument("Native paint material lost its exact unprepared source interpretation");
     for(const auto &role:roles)if(role.image)throw std::invalid_argument("Native paint image roles need their independent adapter");
     for(const auto &role:uv_origin->roles)if(role.image)throw std::invalid_argument("Native paint original role cannot borrow an image");
     const auto &m=native_paint_sampling->original_native_material();

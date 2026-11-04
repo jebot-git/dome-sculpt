@@ -1350,7 +1350,7 @@ struct SourcePaintSamplingAccess {
       throw std::invalid_argument("Writable paint rebind differs from exact REST geometry");}
     auto result=paint.snapshot();result->surface_=surface;result->sampling_attachment_=std::move(attachment);stop();return result;
   }
-  static std::shared_ptr<PaintedMesh> retain(const PaintedMesh &before,Mesh authored,
+  template<class Geometry> static std::shared_ptr<PaintedMesh> retain(const PaintedMesh &before,Geometry &&authored,
       std::shared_ptr<const PaintSamplingDomain> domain,const PaintSamplingLimits &limits){
     auto stop=[&]{if(limits.cancelled&&limits.cancelled())throw std::runtime_error("Writable paint-grid attachment cancelled");};stop();
     if(before.in_stroke()||!domain||!before.valid_paint_sampling_attachment())
@@ -1379,7 +1379,7 @@ struct SourcePaintSamplingAccess {
     if(owned>limits.max_working_bytes||raster_bytes>limits.max_working_bytes-owned||grid_bytes>limits.max_working_bytes-owned-raster_bytes)
       throw std::length_error("Writable paint domain/raster/grid exceed the combined working budget");
     auto options=before.surface_->options;options.cancelled=limits.cancelled;
-    auto surface=std::make_shared<PaintedMesh::SurfaceMap>(std::move(authored),before.resolution(),options,std::move(domain),limits);
+    auto surface=std::make_shared<PaintedMesh::SurfaceMap>(std::forward<Geometry>(authored),before.resolution(),options,std::move(domain),limits);
     auto result=before.snapshot();result->surface_=std::move(surface);result->seal_paint_sampling_attachment();
     // Paint values, their one grid, and every image/projection owner are exact.
     // Sampling geometry lives outside TextureMaps, so this stage needs neither
@@ -1391,6 +1391,13 @@ struct SourcePaintSamplingAccess {
 std::shared_ptr<PaintedMesh> retain_paint_grid(const PaintedMesh &before,Mesh authored,
     std::shared_ptr<const PaintSamplingDomain> domain,const PaintSamplingLimits &limits){
   return SourcePaintSamplingAccess::retain(before,std::move(authored),std::move(domain),limits);
+}
+std::shared_ptr<PaintedMesh> retain_paint_grid_borrowed(const PaintedMesh &before,const Mesh &authored,
+    std::shared_ptr<const PaintSamplingDomain> domain,const PaintSamplingLimits &limits){
+  const size_t bytes=authored.positions.size()*(2*sizeof(Vec3)+sizeof(std::array<float,2>))+authored.indices.size()*sizeof(uint32_t)+authored.uv_pins.size()+authored.uv_seams.size();
+  if(bytes>=limits.max_working_bytes)throw std::length_error("Borrowed writable geometry exhausts working budget before allocation");
+  auto budget=limits;budget.max_working_bytes-=bytes;budget.max_basis_bytes=std::min(budget.max_basis_bytes,budget.max_working_bytes);
+  return SourcePaintSamplingAccess::retain(before,authored,std::move(domain),budget);
 }
 std::shared_ptr<PaintedMesh> adopt_retained_paint_normal(const PaintedMesh &paint,const SourceNormalSampling &proof,
     const PaintSamplingLimits &limits){return SourcePaintSamplingAccess::normal(paint,proof,limits);}
