@@ -2110,6 +2110,29 @@ bool Document::parameter_enabled_locked(VrParameter parameter) const {
 void Document::finish_control_locked(bool accept) {
   if (!control_before_)
     return;
+  if(state_.controls.parameter==VrParameter::BakeSource){
+    static_assert(std::is_nothrow_move_constructible_v<VrControlState> && std::is_nothrow_move_assignable_v<VrControlState>);
+    auto controls=std::move(state_.controls);
+    auto before=std::move(control_before_);control_before_.reset();state_.controls={};control_changed_=false;
+    try{
+      if(accept){
+        require_authority_locked(control_source_);
+        if(control_source_.generation!=state_.generation||control_source_.revision!=state_.revision||control_source_.object!=scene_.active().id)
+          throw std::logic_error("Bake source changed; reopen source and cage controls");
+        if(controls.components!=2||!std::isfinite(controls.value[0])||!std::isfinite(controls.value[1])||
+            controls.value[0]<0||controls.value[0]>1||controls.value[1]<0||controls.value[1]>1)
+          throw std::invalid_argument("Invalid source and cage controls");
+        auto ids=bake_sources_locked(),cages=bake_cages_locked();
+        if(ids.empty())throw std::logic_error("Choose an eligible bake source");
+        const auto source=ids.at(size_t(std::lround(controls.value[0]*float(ids.size()-1))));
+        const auto cage=cages.at(size_t(std::lround(controls.value[1]*float(cages.size()-1))));
+        Transaction transaction(*this);
+        state_.bake_source=source;state_.bake_settings.cage_object=cage;
+        publish_locked(false,false);transaction.commit(false);
+      }
+    }catch(...){control_before_=std::move(before);state_.controls=std::move(controls);input_.resume_control(VrParameter::BakeSource);throw;}
+    return;
+  }
   if(state_.controls.parameter==VrParameter::ShapeMirror){
     static_assert(std::is_nothrow_move_constructible_v<VrControlState> && std::is_nothrow_move_assignable_v<VrControlState>);
     auto controls=std::move(state_.controls);const auto source=control_source_;
@@ -2220,16 +2243,10 @@ void Document::finish_control_locked(bool accept) {
     }
     control_before_.reset(); control_changed_ = false; state_.controls = {}; return;
   }
-  if(state_.controls.parameter==VrParameter::BakeSource || state_.controls.parameter==VrParameter::BakeDistances || state_.controls.parameter==VrParameter::BakeQuality || state_.controls.parameter==VrParameter::BakeProjection || state_.controls.parameter==VrParameter::BakeColors){
+  if(state_.controls.parameter==VrParameter::BakeDistances || state_.controls.parameter==VrParameter::BakeQuality || state_.controls.parameter==VrParameter::BakeProjection || state_.controls.parameter==VrParameter::BakeColors){
     auto c=state_.controls;
     if(accept){
-      if(c.parameter==VrParameter::BakeSource){
-        auto ids=bake_sources_locked(),cages=bake_cages_locked();
-        const auto source=ids.at(size_t(std::lround(c.value[0]*float(ids.size()-1))));
-        const auto cage=cages.at(size_t(std::lround(c.value[1]*float(cages.size()-1))));
-        state_.bake_source=source;state_.bake_settings.cage_object=cage;
-      }
-      else if(c.parameter==VrParameter::BakeDistances){state_.bake_settings.front_mm=c.value[0];state_.bake_settings.back_mm=c.value[1];state_.bake_settings.ao_distance_mm=c.value[2];}
+      if(c.parameter==VrParameter::BakeDistances){state_.bake_settings.front_mm=c.value[0];state_.bake_settings.back_mm=c.value[1];state_.bake_settings.ao_distance_mm=c.value[2];}
       else if(c.parameter==VrParameter::BakeColors){state_.bake_settings.prepare_colors=c.value[0]>=.5f;state_.bake_settings.color_error=c.value[1];state_.bake_settings.prepare_normals=c.value[2]>=.5f;state_.bake_settings.normal_error=c.value[3]*.25f;}
       else if(c.parameter==VrParameter::BakeProjection){state_.bake_settings.allow_partial=c.value[0]>=.5f;state_.bake_settings.allow_backfaces=c.value[1]>=.5f;}
       else {state_.bake_settings.ao_samples=uint32_t(std::lround(c.value[0]*256));state_.bake_settings.padding=uint32_t(std::lround(c.value[1]*64));}
