@@ -1,0 +1,1195 @@
+{
+  "receipt_version": 1,
+  "status": "Qualified private scoped source-atlas admission/regression milestone; not main or full production completion",
+  "source_test_head": "a296f694c49e85f496ee194963ca36d6e91fe998",
+  "runtime_fix": "f89c4c7141ff4445b28c89b5ec8da924ce6ac7a4",
+  "runtime_parent": "c09202fbf092eaa4d9ddf8d9a2249fe7bf013e74",
+  "profiles": {
+    "release": {
+      "qualified_tests": 16,
+      "composition": "13 actual unchanged prior passes +3 complete corrected test TU passes; no repeat of13",
+      "runtime_build": "Complete paint.cpp/document.cpp +all actual private-header dependent tests; exactly two product archive members replaced, every other member equal to current c092 owned archive",
+      "prior_wrapper_seconds": 229.59597761702025,
+      "corrected_wrapper_seconds": 122.55348104200675,
+      "prior_inputs": 2400,
+      "corrected_inputs": 2227,
+      "prior_failures_preserved": [
+        "import-texture-atlas",
+        "source24-26-integration"
+      ],
+      "reused_tests": [
+        {
+          "name": "import-unmapped-atlas",
+          "phase": "test",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/source-atlas-regression-c092/artifacts/atlas-proof/v2-release/import-unmapped-atlas-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/source-atlas-regression-c092/artifacts/atlas-proof/v2-release/import-unmapped-atlas-data/import-unmapped-atlas"
+          ],
+          "exit_code": 0,
+          "seconds": 0.144587771006627
+        },
+        {
+          "name": "initial-source-uv-pixels",
+          "phase": "test",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/source-atlas-regression-c092/artifacts/atlas-proof/v2-release/initial-source-uv-pixels-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/source-atlas-regression-c092/artifacts/atlas-proof/v2-release/initial-source-uv-pixels-data/initial-source-uv-pixels"
+          ],
+          "exit_code": 0,
+          "seconds": 0.09793049702420831
+        },
+        {
+          "name": "initial-source-uv",
+          "phase": "test",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/source-atlas-regression-c092/artifacts/atlas-proof/v2-release/initial-source-uv-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/source-atlas-regression-c092/artifacts/atlas-proof/v2-release/initial-source-uv-data/initial-source-uv"
+          ],
+          "exit_code": 0,
+          "seconds": 0.14330764400074258
+        },
+        {
+          "name": "corner-color-uv23-domain",
+          "phase": "test",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/source-atlas-regression-c092/artifacts/atlas-proof/v2-release/corner-color-uv23-domain-test"
+          ],
+          "exit_code": 0,
+          "seconds": 0.09223007201217115
+        },
+        {
+          "name": "source-paint-import",
+          "phase": "test",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/source-atlas-regression-c092/artifacts/atlas-proof/v2-release/source-paint-import-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/source-atlas-regression-c092/artifacts/atlas-proof/v2-release/source-paint-import-data/source-paint-import"
+          ],
+          "exit_code": 0,
+          "seconds": 0.5235206510114949
+        },
+        {
+          "name": "source-paint-native",
+          "phase": "test",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/source-atlas-regression-c092/artifacts/atlas-proof/v2-release/source-paint-native-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/source-atlas-regression-c092/artifacts/atlas-proof/v2-release/source-paint-native-data/source-paint-native"
+          ],
+          "exit_code": 0,
+          "seconds": 0.18936944799497724
+        },
+        {
+          "name": "source-paint-owning",
+          "phase": "test",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/source-atlas-regression-c092/artifacts/atlas-proof/v2-release/source-paint-owning-test"
+          ],
+          "exit_code": 0,
+          "seconds": 0.015335775999119505
+        },
+        {
+          "name": "source-paint-resources",
+          "phase": "test",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/source-atlas-regression-c092/artifacts/atlas-proof/v2-release/source-paint-resources-test"
+          ],
+          "exit_code": 0,
+          "seconds": 2.7026187219889835
+        },
+        {
+          "name": "source-extra-uv-raw",
+          "phase": "test",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/source-atlas-regression-c092/artifacts/atlas-proof/v2-release/source-extra-uv-raw-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/source-atlas-regression-c092/artifacts/atlas-proof/v2-release/source-extra-uv-raw-data/source-extra-uv-raw/native"
+          ],
+          "exit_code": 0,
+          "seconds": 6.114645275985822
+        },
+        {
+          "name": "texture-painting",
+          "phase": "test",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/source-atlas-regression-c092/artifacts/atlas-proof/v2-release/texture-painting-test"
+          ],
+          "exit_code": 0,
+          "seconds": 4.545146356977057
+        },
+        {
+          "name": "native-strokes",
+          "phase": "test",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/source-atlas-regression-c092/artifacts/atlas-proof/v2-release/native-strokes-test"
+          ],
+          "exit_code": 0,
+          "seconds": 0.2766461739956867
+        },
+        {
+          "name": "import-options-controller",
+          "phase": "test",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/source-atlas-regression-c092/artifacts/atlas-proof/v2-release/import-options-controller-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/source-atlas-regression-c092/artifacts/atlas-proof/v2-release/import-options-controller-data/import-options"
+          ],
+          "exit_code": 0,
+          "seconds": 0.08093177402042784
+        },
+        {
+          "name": "source-paint-authoring",
+          "phase": "test",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/source-atlas-regression-c092/artifacts/atlas-proof/v2-release/source-paint-authoring-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/source-atlas-regression-c092/artifacts/atlas-proof/v2-release/source-paint-authoring-data/source-paint-authoring"
+          ],
+          "exit_code": 0,
+          "seconds": 8.473330772976624
+        }
+      ],
+      "corrected_tests": [
+        {
+          "name": "import-texture-atlas",
+          "phase": "test",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/source-atlas-corrections-f89/artifacts/atlas-proof/release/import-texture-atlas-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/source-atlas-corrections-f89/artifacts/atlas-proof/release/import-texture-atlas-data"
+          ],
+          "exit_code": 0,
+          "seconds": 0.36618618899956346
+        },
+        {
+          "name": "source24-26-integration",
+          "phase": "test",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/source-atlas-corrections-f89/artifacts/atlas-proof/release/source24-26-integration-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/source-atlas-corrections-f89/artifacts/atlas-proof/release/source24-26-integration-data"
+          ],
+          "exit_code": 0,
+          "seconds": 35.13542674400378
+        },
+        {
+          "name": "import-texture-atlas-render",
+          "phase": "test",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/source-atlas-corrections-f89/artifacts/atlas-proof/release/import-texture-atlas-render-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/source-atlas-corrections-f89/artifacts/atlas-proof/release/import-texture-atlas-render-data"
+          ],
+          "exit_code": 0,
+          "seconds": 11.8444902029878
+        }
+      ],
+      "reuse_dependency_closure": [
+        {
+          "name": "import-unmapped-atlas",
+          "dependency_files": {
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-union-c5/build-union-release/CMakeFiles/dome-sculpt-import-unmapped-atlas-test.dir/tests/import-unmapped-atlas.cpp.o.d": "ee643ba170397ebd4a9ecb586cc94d27ac98cc96010439aeeb7d586e25c25946"
+          }
+        },
+        {
+          "name": "initial-source-uv-pixels",
+          "dependency_files": {
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-union-c5/build-union-release/CMakeFiles/dome-sculpt-initial-source-uv-pixels-test.dir/tests/initial-source-uv-pixels.cpp.o.d": "154c0a787088e0ba589191220026a8be06cbefebbe9f7c8065fc129309d4e1f9"
+          }
+        },
+        {
+          "name": "initial-source-uv",
+          "dependency_files": {
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-union-c5/build-union-release/CMakeFiles/dome-sculpt-initial-source-uv-test.dir/tests/initial-source-uv.cpp.o.d": "4da496681d63c4684decd3921e154164ed5722251604d93a5f35339123680ba9"
+          }
+        },
+        {
+          "name": "corner-color-uv23-domain",
+          "dependency_files": {
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-union-c5/build-union-release/CMakeFiles/dome-sculpt-corner-color-uv23-domain-test.dir/tests/corner-color-uv23-domain.cpp.o.d": "2dfa1f90505a101ac3cff0179eeede9668c1b6caa081f1fa5cedd33e890b6e1e"
+          }
+        },
+        {
+          "name": "source-paint-import",
+          "dependency_files": {
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-union-c5/build-union-release/CMakeFiles/dome-sculpt-source-paint-import-test.dir/tests/source-paint-import.cpp.o.d": "492598d43dfa40446b63e8a790562165ec3eba9cb49bfb6abac072dc91114a09"
+          }
+        },
+        {
+          "name": "source-paint-native",
+          "dependency_files": {
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-union-c5/build-union-release/CMakeFiles/dome-sculpt-source-paint-native-test.dir/tests/source-paint-native.cpp.o.d": "0d717214b58563a42e76e32c2c95d29f6a782436afd9265ffe24fe7f545b9452"
+          }
+        },
+        {
+          "name": "source-paint-owning",
+          "dependency_files": {
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-union-c5/build-union-release/CMakeFiles/dome-sculpt-source-paint-owning-test.dir/tests/source-paint-owning.cpp.o.d": "46880621712be26bdf950e9d3885924652627ae84c50ff6e69787952711466c9"
+          }
+        },
+        {
+          "name": "source-paint-resources",
+          "dependency_files": {
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-union-c5/build-union-release/CMakeFiles/dome-sculpt-source-paint-resources-test.dir/tests/source-paint-resources.cpp.o.d": "1eab233a554c1115e0d6acb8bebe7c38cc191a34b1ae5dd76bd591cf09facdd2"
+          }
+        },
+        {
+          "name": "source-extra-uv-raw",
+          "dependency_files": {
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-union-c5/build-union-release/CMakeFiles/dome-sculpt-source-extra-uv-raw-test.dir/tests/source-extra-uv-raw.cpp.o.d": "79f956babb7edc6fd6776b667d74181b792a65bf739a980cec2e814ddd2a6c85"
+          }
+        },
+        {
+          "name": "texture-painting",
+          "dependency_files": {
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-union-c5/build-union-release/CMakeFiles/dome-sculpt-paint-test.dir/tests/paint.cpp.o.d": "58fedb3cd58da983ecac5dec1562432522b0ddf77994424426efc7550e90b65b"
+          }
+        },
+        {
+          "name": "native-strokes",
+          "dependency_files": {
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-union-c5/build-union-release/CMakeFiles/dome-sculpt-native-strokes-test.dir/tests/native-strokes.cpp.o.d": "69f428f3717781caf22a46ddadc07642437d79ac4b258025e8f03c4e4c170ba3"
+          }
+        },
+        {
+          "name": "import-options-controller",
+          "dependency_files": {
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-union-c5/build-union-release/CMakeFiles/dome-sculpt-import-options-test.dir/tests/import-options.cpp.o.d": "37a537cbb82a1e35ec859216c05f9e2a7c5c885532f2ef8439b3c53b5acc4797"
+          }
+        },
+        {
+          "name": "source-paint-authoring",
+          "dependency_files": {
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-union-c5/build-union-release/CMakeFiles/dome-sculpt-source-paint-authoring-test.dir/tests/source-paint-authoring.cpp.o.d": "9c3bdbf7d42612297d76afbde1eaf3351f53a6a8b3f543080ecf1ecdf0578cd5"
+          }
+        }
+      ],
+      "core_members_changed": [
+        "paint.cpp.o",
+        "document.cpp.o"
+      ],
+      "proof_manifest_sha256": {
+        "/home/blux/de-xr/dome-sculpt/artifacts/source-atlas-regression-c092/artifacts/atlas-proof/v2-release/before.json": "d6c1bce1662485b0682b89f844ca1553ea1ab634d704a5b9e7bb308017e507d0",
+        "/home/blux/de-xr/dome-sculpt/artifacts/source-atlas-regression-c092/artifacts/atlas-proof/v2-release/after.json": "d6c1bce1662485b0682b89f844ca1553ea1ab634d704a5b9e7bb308017e507d0",
+        "/home/blux/de-xr/dome-sculpt/artifacts/source-atlas-corrections-f89/artifacts/atlas-proof/release/before.json": "96fec067778dbfd9fa84a6305107048f802da446d673d8c59ef72f3439f4c4c5",
+        "/home/blux/de-xr/dome-sculpt/artifacts/source-atlas-corrections-f89/artifacts/atlas-proof/release/after.json": "96fec067778dbfd9fa84a6305107048f802da446d673d8c59ef72f3439f4c4c5"
+      }
+    },
+    "sanitize": {
+      "qualified_tests": 16,
+      "composition": "13 actual unchanged prior passes +3 complete corrected test TU passes; no repeat of13",
+      "runtime_build": "Complete paint.cpp/document.cpp +all actual private-header dependent tests; exactly two product archive members replaced, every other member equal to current c092 owned archive",
+      "prior_wrapper_seconds": 850.4140848999959,
+      "corrected_wrapper_seconds": 754.204977913003,
+      "prior_inputs": 2400,
+      "corrected_inputs": 2227,
+      "prior_failures_preserved": [
+        "source24-26-integration"
+      ],
+      "reused_tests": [
+        {
+          "name": "import-unmapped-atlas",
+          "phase": "test",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/source-atlas-regression-c092/artifacts/atlas-proof/v2-sanitize/import-unmapped-atlas-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/source-atlas-regression-c092/artifacts/atlas-proof/v2-sanitize/import-unmapped-atlas-data/import-unmapped-atlas"
+          ],
+          "exit_code": 0,
+          "seconds": 2.28643281100085
+        },
+        {
+          "name": "initial-source-uv-pixels",
+          "phase": "test",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/source-atlas-regression-c092/artifacts/atlas-proof/v2-sanitize/initial-source-uv-pixels-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/source-atlas-regression-c092/artifacts/atlas-proof/v2-sanitize/initial-source-uv-pixels-data/initial-source-uv-pixels"
+          ],
+          "exit_code": 0,
+          "seconds": 0.7315549089980777
+        },
+        {
+          "name": "initial-source-uv",
+          "phase": "test",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/source-atlas-regression-c092/artifacts/atlas-proof/v2-sanitize/initial-source-uv-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/source-atlas-regression-c092/artifacts/atlas-proof/v2-sanitize/initial-source-uv-data/initial-source-uv"
+          ],
+          "exit_code": 0,
+          "seconds": 2.509869761997834
+        },
+        {
+          "name": "corner-color-uv23-domain",
+          "phase": "test",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/source-atlas-regression-c092/artifacts/atlas-proof/v2-sanitize/corner-color-uv23-domain-test"
+          ],
+          "exit_code": 0,
+          "seconds": 1.6427292599983048
+        },
+        {
+          "name": "source-paint-import",
+          "phase": "test",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/source-atlas-regression-c092/artifacts/atlas-proof/v2-sanitize/source-paint-import-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/source-atlas-regression-c092/artifacts/atlas-proof/v2-sanitize/source-paint-import-data/source-paint-import"
+          ],
+          "exit_code": 0,
+          "seconds": 1.9257664309989195
+        },
+        {
+          "name": "source-paint-native",
+          "phase": "test",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/source-atlas-regression-c092/artifacts/atlas-proof/v2-sanitize/source-paint-native-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/source-atlas-regression-c092/artifacts/atlas-proof/v2-sanitize/source-paint-native-data/source-paint-native"
+          ],
+          "exit_code": 0,
+          "seconds": 0.5568035570031498
+        },
+        {
+          "name": "source-paint-owning",
+          "phase": "test",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/source-atlas-regression-c092/artifacts/atlas-proof/v2-sanitize/source-paint-owning-test"
+          ],
+          "exit_code": 0,
+          "seconds": 0.12028718600049615
+        },
+        {
+          "name": "source-paint-resources",
+          "phase": "test",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/source-atlas-regression-c092/artifacts/atlas-proof/v2-sanitize/source-paint-resources-test"
+          ],
+          "exit_code": 0,
+          "seconds": 22.96259988800739
+        },
+        {
+          "name": "source-extra-uv-raw",
+          "phase": "test",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/source-atlas-regression-c092/artifacts/atlas-proof/v2-sanitize/source-extra-uv-raw-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/source-atlas-regression-c092/artifacts/atlas-proof/v2-sanitize/source-extra-uv-raw-data/source-extra-uv-raw/native"
+          ],
+          "exit_code": 0,
+          "seconds": 20.887509072985267
+        },
+        {
+          "name": "texture-painting",
+          "phase": "test",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/source-atlas-regression-c092/artifacts/atlas-proof/v2-sanitize/texture-painting-test"
+          ],
+          "exit_code": 0,
+          "seconds": 60.413517869019415
+        },
+        {
+          "name": "native-strokes",
+          "phase": "test",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/source-atlas-regression-c092/artifacts/atlas-proof/v2-sanitize/native-strokes-test"
+          ],
+          "exit_code": 0,
+          "seconds": 2.9048179909877945
+        },
+        {
+          "name": "import-options-controller",
+          "phase": "test",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/source-atlas-regression-c092/artifacts/atlas-proof/v2-sanitize/import-options-controller-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/source-atlas-regression-c092/artifacts/atlas-proof/v2-sanitize/import-options-controller-data/import-options"
+          ],
+          "exit_code": 0,
+          "seconds": 0.7408329609897919
+        },
+        {
+          "name": "source-paint-authoring",
+          "phase": "test",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/source-atlas-regression-c092/artifacts/atlas-proof/v2-sanitize/source-paint-authoring-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/source-atlas-regression-c092/artifacts/atlas-proof/v2-sanitize/source-paint-authoring-data/source-paint-authoring"
+          ],
+          "exit_code": 0,
+          "seconds": 44.77200389900827
+        }
+      ],
+      "corrected_tests": [
+        {
+          "name": "import-texture-atlas",
+          "phase": "test",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/source-atlas-corrections-f89/artifacts/atlas-proof/sanitize/import-texture-atlas-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/source-atlas-corrections-f89/artifacts/atlas-proof/sanitize/import-texture-atlas-data"
+          ],
+          "exit_code": 0,
+          "seconds": 1.6599660799838603
+        },
+        {
+          "name": "source24-26-integration",
+          "phase": "test",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/source-atlas-corrections-f89/artifacts/atlas-proof/sanitize/source24-26-integration-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/source-atlas-corrections-f89/artifacts/atlas-proof/sanitize/source24-26-integration-data"
+          ],
+          "exit_code": 0,
+          "seconds": 563.4473292669863
+        },
+        {
+          "name": "import-texture-atlas-render",
+          "phase": "test",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/source-atlas-corrections-f89/artifacts/atlas-proof/sanitize/import-texture-atlas-render-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/source-atlas-corrections-f89/artifacts/atlas-proof/sanitize/import-texture-atlas-render-data"
+          ],
+          "exit_code": 0,
+          "seconds": 76.69469167801435
+        }
+      ],
+      "reuse_dependency_closure": [
+        {
+          "name": "import-unmapped-atlas",
+          "dependency_files": {
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-union-c5/build-union-sanitize/CMakeFiles/dome-sculpt-import-unmapped-atlas-test.dir/tests/import-unmapped-atlas.cpp.o.d": "ee643ba170397ebd4a9ecb586cc94d27ac98cc96010439aeeb7d586e25c25946"
+          }
+        },
+        {
+          "name": "initial-source-uv-pixels",
+          "dependency_files": {
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-union-c5/build-union-sanitize/CMakeFiles/dome-sculpt-initial-source-uv-pixels-test.dir/tests/initial-source-uv-pixels.cpp.o.d": "154c0a787088e0ba589191220026a8be06cbefebbe9f7c8065fc129309d4e1f9"
+          }
+        },
+        {
+          "name": "initial-source-uv",
+          "dependency_files": {
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-union-c5/build-union-sanitize/CMakeFiles/dome-sculpt-initial-source-uv-test.dir/tests/initial-source-uv.cpp.o.d": "4da496681d63c4684decd3921e154164ed5722251604d93a5f35339123680ba9"
+          }
+        },
+        {
+          "name": "corner-color-uv23-domain",
+          "dependency_files": {
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-union-c5/build-union-sanitize/CMakeFiles/dome-sculpt-corner-color-uv23-domain-test.dir/tests/corner-color-uv23-domain.cpp.o.d": "2dfa1f90505a101ac3cff0179eeede9668c1b6caa081f1fa5cedd33e890b6e1e"
+          }
+        },
+        {
+          "name": "source-paint-import",
+          "dependency_files": {
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-union-c5/build-union-sanitize/CMakeFiles/dome-sculpt-source-paint-import-test.dir/tests/source-paint-import.cpp.o.d": "492598d43dfa40446b63e8a790562165ec3eba9cb49bfb6abac072dc91114a09"
+          }
+        },
+        {
+          "name": "source-paint-native",
+          "dependency_files": {
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-union-c5/build-union-sanitize/CMakeFiles/dome-sculpt-source-paint-native-test.dir/tests/source-paint-native.cpp.o.d": "0d717214b58563a42e76e32c2c95d29f6a782436afd9265ffe24fe7f545b9452"
+          }
+        },
+        {
+          "name": "source-paint-owning",
+          "dependency_files": {
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-union-c5/build-union-sanitize/CMakeFiles/dome-sculpt-source-paint-owning-test.dir/tests/source-paint-owning.cpp.o.d": "46880621712be26bdf950e9d3885924652627ae84c50ff6e69787952711466c9"
+          }
+        },
+        {
+          "name": "source-paint-resources",
+          "dependency_files": {
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-union-c5/build-union-sanitize/CMakeFiles/dome-sculpt-source-paint-resources-test.dir/tests/source-paint-resources.cpp.o.d": "1eab233a554c1115e0d6acb8bebe7c38cc191a34b1ae5dd76bd591cf09facdd2"
+          }
+        },
+        {
+          "name": "source-extra-uv-raw",
+          "dependency_files": {
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-union-c5/build-union-sanitize/CMakeFiles/dome-sculpt-source-extra-uv-raw-test.dir/tests/source-extra-uv-raw.cpp.o.d": "79f956babb7edc6fd6776b667d74181b792a65bf739a980cec2e814ddd2a6c85"
+          }
+        },
+        {
+          "name": "texture-painting",
+          "dependency_files": {
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-union-c5/build-union-sanitize/CMakeFiles/dome-sculpt-paint-test.dir/tests/paint.cpp.o.d": "58fedb3cd58da983ecac5dec1562432522b0ddf77994424426efc7550e90b65b"
+          }
+        },
+        {
+          "name": "native-strokes",
+          "dependency_files": {
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-union-c5/build-union-sanitize/CMakeFiles/dome-sculpt-native-strokes-test.dir/tests/native-strokes.cpp.o.d": "69f428f3717781caf22a46ddadc07642437d79ac4b258025e8f03c4e4c170ba3"
+          }
+        },
+        {
+          "name": "import-options-controller",
+          "dependency_files": {
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-union-c5/build-union-sanitize/CMakeFiles/dome-sculpt-import-options-test.dir/tests/import-options.cpp.o.d": "37a537cbb82a1e35ec859216c05f9e2a7c5c885532f2ef8439b3c53b5acc4797"
+          }
+        },
+        {
+          "name": "source-paint-authoring",
+          "dependency_files": {
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-union-c5/build-union-sanitize/CMakeFiles/dome-sculpt-source-paint-authoring-test.dir/tests/source-paint-authoring.cpp.o.d": "9c3bdbf7d42612297d76afbde1eaf3351f53a6a8b3f543080ecf1ecdf0578cd5"
+          }
+        }
+      ],
+      "core_members_changed": [
+        "paint.cpp.o",
+        "document.cpp.o"
+      ],
+      "proof_manifest_sha256": {
+        "/home/blux/de-xr/dome-sculpt/artifacts/source-atlas-regression-c092/artifacts/atlas-proof/v2-sanitize/before.json": "c2f5f2d1f5d2395173f12057c8f66c9875480b7f9978a473597ddd210ce649f9",
+        "/home/blux/de-xr/dome-sculpt/artifacts/source-atlas-regression-c092/artifacts/atlas-proof/v2-sanitize/after.json": "c2f5f2d1f5d2395173f12057c8f66c9875480b7f9978a473597ddd210ce649f9",
+        "/home/blux/de-xr/dome-sculpt/artifacts/source-atlas-corrections-f89/artifacts/atlas-proof/sanitize/before.json": "b8d60bcff40709c6d4f9f08a603c8670618285af242093fad76ac2717f388889",
+        "/home/blux/de-xr/dome-sculpt/artifacts/source-atlas-corrections-f89/artifacts/atlas-proof/sanitize/after.json": "b8d60bcff40709c6d4f9f08a603c8670618285af242093fad76ac2717f388889"
+      }
+    }
+  },
+  "limits": [
+    "Not fresh whole application/core build or full589/590 regression pass. Product/header change is private admission only; exact current c092 own support reused.",
+    "Initial source-aware capture/painting/export semantics are qualified on the selected fixtures, not every source, material, FBX, VRM, topology or physical device.",
+    "Genuine current-corner plus Source4 UV1/UV2 authoring still requires its actual domain adapters; fake ownership refusals do not implement them.",
+    "Finite PBR retains nominal bounds on twelve fixtures; the existing minification counterexamples and strict ordinary painted-export refusal remain.",
+    "No system installation, active session change or physical headset test."
+  ],
+  "hardware": {
+    "scope": "Two exact Release correction test executables on matching f89 two-TU own component +c092 renderer/support; strict PCI03 A770 hardware and explicit llvmpipe --hardware refusals. No physical HMD/session proof.",
+    "pci": "03:00.0 VGA compatible controller [0300]: Intel Corporation DG2 [Arc A770] [8086:56a0] (rev 08)\n",
+    "steps": [
+      {
+        "name": "source24-26-integration",
+        "phase": "arc",
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/source-atlas-corrections-f89/artifacts/atlas-proof/release/source24-26-integration-test",
+          "/home/blux/de-xr/dome-sculpt/artifacts/source-atlas-corrections-f89/artifacts/atlas-proof/hardware/source24-26-integration-arc",
+          "--hardware"
+        ],
+        "exit_code": 0,
+        "seconds": 34.27498548000585
+      },
+      {
+        "name": "import-texture-atlas-render",
+        "phase": "arc",
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/source-atlas-corrections-f89/artifacts/atlas-proof/release/import-texture-atlas-render-test",
+          "/home/blux/de-xr/dome-sculpt/artifacts/source-atlas-corrections-f89/artifacts/atlas-proof/hardware/import-texture-atlas-render-arc",
+          "--hardware"
+        ],
+        "exit_code": 0,
+        "seconds": 24.30744701201911
+      },
+      {
+        "name": "source24-26-integration",
+        "phase": "software-negative",
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/source-atlas-corrections-f89/artifacts/atlas-proof/release/source24-26-integration-test",
+          "/home/blux/de-xr/dome-sculpt/artifacts/source-atlas-corrections-f89/artifacts/atlas-proof/hardware/source24-26-integration-software-negative",
+          "--hardware"
+        ],
+        "exit_code": 1,
+        "seconds": 0.14823126801638864
+      },
+      {
+        "name": "import-texture-atlas-render",
+        "phase": "software-negative",
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/source-atlas-corrections-f89/artifacts/atlas-proof/release/import-texture-atlas-render-test",
+          "/home/blux/de-xr/dome-sculpt/artifacts/source-atlas-corrections-f89/artifacts/atlas-proof/hardware/import-texture-atlas-render-software-negative",
+          "--hardware"
+        ],
+        "exit_code": 1,
+        "seconds": 0.10425574900000356
+      }
+    ],
+    "seconds": 59.026716696011135,
+    "inputs": 2231,
+    "drift": []
+  },
+  "interoperability": {
+    "validator": "2.0.0-dev.3.10",
+    "maxIssues": 0,
+    "files": 82,
+    "totals": {
+      "numErrors": 0,
+      "numWarnings": 6,
+      "numInfos": 216,
+      "numHints": 0
+    },
+    "profileByteDifferences": [
+      {
+        "profile": "sanitize",
+        "key": "mixed/current-paint-normal.glb"
+      },
+      {
+        "profile": "sanitize",
+        "key": "mixed/projected.glb"
+      },
+      {
+        "profile": "arc",
+        "key": "mixed/current-paint-normal.glb"
+      },
+      {
+        "profile": "arc",
+        "key": "mixed/projected.glb"
+      }
+    ],
+    "byte_difference_audit": "Four mixed-fixture comparisons differ only in PID-derived source node name; original names preserved. Every corresponding BIN byte is identical. Other50 R/S/Arc comparisons are whole-file byte-identical. No output normalization or issue filtering.",
+    "differences": [
+      {
+        "name": "current-paint-normal.glb",
+        "profile": "sanitize",
+        "json_differences": [
+          [
+            "/nodes/0/name",
+            "dome-cut-color-source-940288",
+            "dome-cut-color-source-944899"
+          ]
+        ],
+        "bin_equal": true,
+        "bin_lengths": [
+          12244,
+          12244
+        ],
+        "binary_differing_bytes": 0
+      },
+      {
+        "name": "current-paint-normal.glb",
+        "profile": "arc",
+        "json_differences": [
+          [
+            "/nodes/0/name",
+            "dome-cut-color-source-940288",
+            "dome-cut-color-source-949619"
+          ]
+        ],
+        "bin_equal": true,
+        "bin_lengths": [
+          12244,
+          12244
+        ],
+        "binary_differing_bytes": 0
+      },
+      {
+        "name": "projected.glb",
+        "profile": "sanitize",
+        "json_differences": [
+          [
+            "/nodes/0/name",
+            "dome-cut-color-source-940288",
+            "dome-cut-color-source-944899"
+          ]
+        ],
+        "bin_equal": true,
+        "bin_lengths": [
+          84840,
+          84840
+        ],
+        "binary_differing_bytes": 0
+      },
+      {
+        "name": "projected.glb",
+        "profile": "arc",
+        "json_differences": [
+          [
+            "/nodes/0/name",
+            "dome-cut-color-source-940288",
+            "dome-cut-color-source-949619"
+          ]
+        ],
+        "bin_equal": true,
+        "bin_lengths": [
+          84840,
+          84840
+        ],
+        "binary_differing_bytes": 0
+      }
+    ],
+    "full_report_sha256": "e6137cb13cb6f4274dd3595d04eb1ec53f0fe98962d92c5496722f9c8f5107fe",
+    "files_sha256": [
+      {
+        "profile": "release",
+        "key": "import/artist-painted.glb",
+        "file": "/home/blux/de-xr/dome-sculpt/artifacts/source-atlas-corrections-f89/artifacts/atlas-proof/release/import-texture-atlas-data/artist-painted.glb",
+        "sha256": "a0e2e43bf0907ebf8d9490850284f614c50ee9a564371a1354fe7c2b72fb19f6"
+      },
+      {
+        "profile": "release",
+        "key": "import/flat-painted.glb",
+        "file": "/home/blux/de-xr/dome-sculpt/artifacts/source-atlas-corrections-f89/artifacts/atlas-proof/release/import-texture-atlas-data/flat-painted.glb",
+        "sha256": "a6ae50ab33bae08771c96b6fdbef1723785cbc40bacbe93d68d95193f1cfdbb0"
+      },
+      {
+        "profile": "release",
+        "key": "mixed/current-paint-normal.glb",
+        "file": "/home/blux/de-xr/dome-sculpt/artifacts/source-atlas-corrections-f89/artifacts/atlas-proof/release/source24-26-integration-data/current-paint-normal.glb",
+        "sha256": "8b90f037897debba593b2022487504ec7c5791748b48ae420c94d5fab5f8f0d7"
+      },
+      {
+        "profile": "release",
+        "key": "mixed/projected.glb",
+        "file": "/home/blux/de-xr/dome-sculpt/artifacts/source-atlas-corrections-f89/artifacts/atlas-proof/release/source24-26-integration-data/projected.glb",
+        "sha256": "ce2a5b50ce71e54db2f3994e74234145dcfa1b09e0b910dc2130cabbbe0ac000"
+      },
+      {
+        "profile": "release",
+        "key": "render/artist-BLEND-0.000000-0.glb",
+        "file": "/home/blux/de-xr/dome-sculpt/artifacts/source-atlas-corrections-f89/artifacts/atlas-proof/release/import-texture-atlas-render-data/artist-BLEND-0.000000-0.glb",
+        "sha256": "01c39d78af325eab5a5ceb3b7d95ea50a698f44c4e1651b9fb27c33d63c4db98"
+      },
+      {
+        "profile": "release",
+        "key": "render/artist-BLEND-0.000000-1.glb",
+        "file": "/home/blux/de-xr/dome-sculpt/artifacts/source-atlas-corrections-f89/artifacts/atlas-proof/release/import-texture-atlas-render-data/artist-BLEND-0.000000-1.glb",
+        "sha256": "24288ed13c9b297cc78f99e5dff5020226d288c381dde01707c62599810b4940"
+      },
+      {
+        "profile": "release",
+        "key": "render/artist-BLEND-0.650000-0.glb",
+        "file": "/home/blux/de-xr/dome-sculpt/artifacts/source-atlas-corrections-f89/artifacts/atlas-proof/release/import-texture-atlas-render-data/artist-BLEND-0.650000-0.glb",
+        "sha256": "49b17f7b5327e48b407be1363218b87c90b5080234e1d006c47e5cc8eab84976"
+      },
+      {
+        "profile": "release",
+        "key": "render/artist-BLEND-0.650000-1.glb",
+        "file": "/home/blux/de-xr/dome-sculpt/artifacts/source-atlas-corrections-f89/artifacts/atlas-proof/release/import-texture-atlas-render-data/artist-BLEND-0.650000-1.glb",
+        "sha256": "1ed71ed1d43706af64a0f864a6abdb6fd37ca8de45575f202b91e1c892a353b7"
+      },
+      {
+        "profile": "release",
+        "key": "render/artist-MASK-0.000000-0.glb",
+        "file": "/home/blux/de-xr/dome-sculpt/artifacts/source-atlas-corrections-f89/artifacts/atlas-proof/release/import-texture-atlas-render-data/artist-MASK-0.000000-0.glb",
+        "sha256": "31e9635b9e4bf5a4d912c8cd194d4f0086e9fcda20670c8ab94280ecd3728676"
+      },
+      {
+        "profile": "release",
+        "key": "render/artist-MASK-0.000000-1.glb",
+        "file": "/home/blux/de-xr/dome-sculpt/artifacts/source-atlas-corrections-f89/artifacts/atlas-proof/release/import-texture-atlas-render-data/artist-MASK-0.000000-1.glb",
+        "sha256": "b6337712e790c6a786a8feb3bf88c41ffeb869a7306b09a4d9c823aeca37b83c"
+      },
+      {
+        "profile": "release",
+        "key": "render/artist-MASK-0.650000-0.glb",
+        "file": "/home/blux/de-xr/dome-sculpt/artifacts/source-atlas-corrections-f89/artifacts/atlas-proof/release/import-texture-atlas-render-data/artist-MASK-0.650000-0.glb",
+        "sha256": "eb6150bf9bb7d81400b604576a5bedd2d87ac3c5191d16c1b5f9f54c84aa5360"
+      },
+      {
+        "profile": "release",
+        "key": "render/artist-MASK-0.650000-1.glb",
+        "file": "/home/blux/de-xr/dome-sculpt/artifacts/source-atlas-corrections-f89/artifacts/atlas-proof/release/import-texture-atlas-render-data/artist-MASK-0.650000-1.glb",
+        "sha256": "fe167d2e612e2fa8debf23d4917db36761d3de716daa40aa05966b65d4844b3e"
+      },
+      {
+        "profile": "release",
+        "key": "render/artist-OPAQUE-0.000000-0.glb",
+        "file": "/home/blux/de-xr/dome-sculpt/artifacts/source-atlas-corrections-f89/artifacts/atlas-proof/release/import-texture-atlas-render-data/artist-OPAQUE-0.000000-0.glb",
+        "sha256": "6c8d97d903f7f35e7af5694b988586c7f9263746333159cf033cfa8c6357a4bf"
+      },
+      {
+        "profile": "release",
+        "key": "render/artist-OPAQUE-0.000000-1.glb",
+        "file": "/home/blux/de-xr/dome-sculpt/artifacts/source-atlas-corrections-f89/artifacts/atlas-proof/release/import-texture-atlas-render-data/artist-OPAQUE-0.000000-1.glb",
+        "sha256": "d9c1d4a3ce3aeaaa336959b76d75262a9c96eb84b8926f86d75615eae4954db6"
+      },
+      {
+        "profile": "release",
+        "key": "render/artist-OPAQUE-0.650000-0.glb",
+        "file": "/home/blux/de-xr/dome-sculpt/artifacts/source-atlas-corrections-f89/artifacts/atlas-proof/release/import-texture-atlas-render-data/artist-OPAQUE-0.650000-0.glb",
+        "sha256": "74e40021e5fba794f87ffbe98f42a6631deabb3892b7c3a8f9599c11b7d069ff"
+      },
+      {
+        "profile": "release",
+        "key": "render/artist-OPAQUE-0.650000-1.glb",
+        "file": "/home/blux/de-xr/dome-sculpt/artifacts/source-atlas-corrections-f89/artifacts/atlas-proof/release/import-texture-atlas-render-data/artist-OPAQUE-0.650000-1.glb",
+        "sha256": "8e4a6392c9f335f68ff4112f5b46baa761d083fc53e7d61e99839a49f52950bb"
+      },
+      {
+        "profile": "release",
+        "key": "render/flat-BLEND-0.000000-0.glb",
+        "file": "/home/blux/de-xr/dome-sculpt/artifacts/source-atlas-corrections-f89/artifacts/atlas-proof/release/import-texture-atlas-render-data/flat-BLEND-0.000000-0.glb",
+        "sha256": "543d32a66ade9d6b0090cf720655dd128b05ddf612f06261dded5356c22601dd"
+      },
+      {
+        "profile": "release",
+        "key": "render/flat-BLEND-0.000000-1.glb",
+        "file": "/home/blux/de-xr/dome-sculpt/artifacts/source-atlas-corrections-f89/artifacts/atlas-proof/release/import-texture-atlas-render-data/flat-BLEND-0.000000-1.glb",
+        "sha256": "83bbc7b1daf62fb6fd7e9405c9625d0ce1cd4d09c5c12aac7b2c503d4c752978"
+      },
+      {
+        "profile": "release",
+        "key": "render/flat-BLEND-0.650000-0.glb",
+        "file": "/home/blux/de-xr/dome-sculpt/artifacts/source-atlas-corrections-f89/artifacts/atlas-proof/release/import-texture-atlas-render-data/flat-BLEND-0.650000-0.glb",
+        "sha256": "7c038b3108219887d5f50b8ad3379cd8e93335ee5034766f07dc95f0d6e896d8"
+      },
+      {
+        "profile": "release",
+        "key": "render/flat-BLEND-0.650000-1.glb",
+        "file": "/home/blux/de-xr/dome-sculpt/artifacts/source-atlas-corrections-f89/artifacts/atlas-proof/release/import-texture-atlas-render-data/flat-BLEND-0.650000-1.glb",
+        "sha256": "8548e1aba31bc0dddcba99f4989e792d72916973977461d2668e7a216d147d83"
+      },
+      {
+        "profile": "release",
+        "key": "render/flat-MASK-0.000000-0.glb",
+        "file": "/home/blux/de-xr/dome-sculpt/artifacts/source-atlas-corrections-f89/artifacts/atlas-proof/release/import-texture-atlas-render-data/flat-MASK-0.000000-0.glb",
+        "sha256": "7ce6ed3a5a27db66b91b9dbe9cf0b30a5fd37e9fde8a1894adbd3351124770bd"
+      },
+      {
+        "profile": "release",
+        "key": "render/flat-MASK-0.000000-1.glb",
+        "file": "/home/blux/de-xr/dome-sculpt/artifacts/source-atlas-corrections-f89/artifacts/atlas-proof/release/import-texture-atlas-render-data/flat-MASK-0.000000-1.glb",
+        "sha256": "c7572b3bd40456d6509ee6dfd6eee51699017835052a8ba2e752c2937e9337da"
+      },
+      {
+        "profile": "release",
+        "key": "render/flat-MASK-0.650000-0.glb",
+        "file": "/home/blux/de-xr/dome-sculpt/artifacts/source-atlas-corrections-f89/artifacts/atlas-proof/release/import-texture-atlas-render-data/flat-MASK-0.650000-0.glb",
+        "sha256": "5ed6df2f7682eca82bc5ffac196ccfb636a7dc4431864ad31a1dc5876209d139"
+      },
+      {
+        "profile": "release",
+        "key": "render/flat-MASK-0.650000-1.glb",
+        "file": "/home/blux/de-xr/dome-sculpt/artifacts/source-atlas-corrections-f89/artifacts/atlas-proof/release/import-texture-atlas-render-data/flat-MASK-0.650000-1.glb",
+        "sha256": "1c64dff0dd5000475611d34db88ed6d25bfefaa6bbfa0229a35cb47b7133d4a7"
+      },
+      {
+        "profile": "release",
+        "key": "render/flat-OPAQUE-0.000000-0.glb",
+        "file": "/home/blux/de-xr/dome-sculpt/artifacts/source-atlas-corrections-f89/artifacts/atlas-proof/release/import-texture-atlas-render-data/flat-OPAQUE-0.000000-0.glb",
+        "sha256": "5f0eb4ae3204ee1bb007d2984250c25caa60c23202d3fb2c93cdd43229006a59"
+      },
+      {
+        "profile": "release",
+        "key": "render/flat-OPAQUE-0.000000-1.glb",
+        "file": "/home/blux/de-xr/dome-sculpt/artifacts/source-atlas-corrections-f89/artifacts/atlas-proof/release/import-texture-atlas-render-data/flat-OPAQUE-0.000000-1.glb",
+        "sha256": "cb6823557dc477ec90adc03e4fec18a375bdf21ac23cbfbf5f8f6b6e7a547ab8"
+      },
+      {
+        "profile": "release",
+        "key": "render/flat-OPAQUE-0.650000-0.glb",
+        "file": "/home/blux/de-xr/dome-sculpt/artifacts/source-atlas-corrections-f89/artifacts/atlas-proof/release/import-texture-atlas-render-data/flat-OPAQUE-0.650000-0.glb",
+        "sha256": "1572ffa4ab6e34d44922c214012344c30f914f6a292cf0a3cde5ea0087d0d4d2"
+      },
+      {
+        "profile": "release",
+        "key": "render/flat-OPAQUE-0.650000-1.glb",
+        "file": "/home/blux/de-xr/dome-sculpt/artifacts/source-atlas-corrections-f89/artifacts/atlas-proof/release/import-texture-atlas-render-data/flat-OPAQUE-0.650000-1.glb",
+        "sha256": "ba0f84b18dfed587681b4fcb77a3e253807ecb6610c87bc164067da8cb822535"
+      },
+      {
+        "profile": "sanitize",
+        "key": "import/artist-painted.glb",
+        "file": "/home/blux/de-xr/dome-sculpt/artifacts/source-atlas-corrections-f89/artifacts/atlas-proof/sanitize/import-texture-atlas-data/artist-painted.glb",
+        "sha256": "a0e2e43bf0907ebf8d9490850284f614c50ee9a564371a1354fe7c2b72fb19f6"
+      },
+      {
+        "profile": "sanitize",
+        "key": "import/flat-painted.glb",
+        "file": "/home/blux/de-xr/dome-sculpt/artifacts/source-atlas-corrections-f89/artifacts/atlas-proof/sanitize/import-texture-atlas-data/flat-painted.glb",
+        "sha256": "a6ae50ab33bae08771c96b6fdbef1723785cbc40bacbe93d68d95193f1cfdbb0"
+      },
+      {
+        "profile": "sanitize",
+        "key": "mixed/current-paint-normal.glb",
+        "file": "/home/blux/de-xr/dome-sculpt/artifacts/source-atlas-corrections-f89/artifacts/atlas-proof/sanitize/source24-26-integration-data/current-paint-normal.glb",
+        "sha256": "29d7febe38c2fa686a857d76138d31ac3e6e6df28ba52f6e233e416565774743"
+      },
+      {
+        "profile": "sanitize",
+        "key": "mixed/projected.glb",
+        "file": "/home/blux/de-xr/dome-sculpt/artifacts/source-atlas-corrections-f89/artifacts/atlas-proof/sanitize/source24-26-integration-data/projected.glb",
+        "sha256": "71f34e79dda7945ebceda99b8cb999679360e5dada5b866bcdcff3c0df8b9b82"
+      },
+      {
+        "profile": "sanitize",
+        "key": "render/artist-BLEND-0.000000-0.glb",
+        "file": "/home/blux/de-xr/dome-sculpt/artifacts/source-atlas-corrections-f89/artifacts/atlas-proof/sanitize/import-texture-atlas-render-data/artist-BLEND-0.000000-0.glb",
+        "sha256": "01c39d78af325eab5a5ceb3b7d95ea50a698f44c4e1651b9fb27c33d63c4db98"
+      },
+      {
+        "profile": "sanitize",
+        "key": "render/artist-BLEND-0.000000-1.glb",
+        "file": "/home/blux/de-xr/dome-sculpt/artifacts/source-atlas-corrections-f89/artifacts/atlas-proof/sanitize/import-texture-atlas-render-data/artist-BLEND-0.000000-1.glb",
+        "sha256": "24288ed13c9b297cc78f99e5dff5020226d288c381dde01707c62599810b4940"
+      },
+      {
+        "profile": "sanitize",
+        "key": "render/artist-BLEND-0.650000-0.glb",
+        "file": "/home/blux/de-xr/dome-sculpt/artifacts/source-atlas-corrections-f89/artifacts/atlas-proof/sanitize/import-texture-atlas-render-data/artist-BLEND-0.650000-0.glb",
+        "sha256": "49b17f7b5327e48b407be1363218b87c90b5080234e1d006c47e5cc8eab84976"
+      },
+      {
+        "profile": "sanitize",
+        "key": "render/artist-BLEND-0.650000-1.glb",
+        "file": "/home/blux/de-xr/dome-sculpt/artifacts/source-atlas-corrections-f89/artifacts/atlas-proof/sanitize/import-texture-atlas-render-data/artist-BLEND-0.650000-1.glb",
+        "sha256": "1ed71ed1d43706af64a0f864a6abdb6fd37ca8de45575f202b91e1c892a353b7"
+      },
+      {
+        "profile": "sanitize",
+        "key": "render/artist-MASK-0.000000-0.glb",
+        "file": "/home/blux/de-xr/dome-sculpt/artifacts/source-atlas-corrections-f89/artifacts/atlas-proof/sanitize/import-texture-atlas-render-data/artist-MASK-0.000000-0.glb",
+        "sha256": "31e9635b9e4bf5a4d912c8cd194d4f0086e9fcda20670c8ab94280ecd3728676"
+      },
+      {
+        "profile": "sanitize",
+        "key": "render/artist-MASK-0.000000-1.glb",
+        "file": "/home/blux/de-xr/dome-sculpt/artifacts/source-atlas-corrections-f89/artifacts/atlas-proof/sanitize/import-texture-atlas-render-data/artist-MASK-0.000000-1.glb",
+        "sha256": "b6337712e790c6a786a8feb3bf88c41ffeb869a7306b09a4d9c823aeca37b83c"
+      },
+      {
+        "profile": "sanitize",
+        "key": "render/artist-MASK-0.650000-0.glb",
+        "file": "/home/blux/de-xr/dome-sculpt/artifacts/source-atlas-corrections-f89/artifacts/atlas-proof/sanitize/import-texture-atlas-render-data/artist-MASK-0.650000-0.glb",
+        "sha256": "eb6150bf9bb7d81400b604576a5bedd2d87ac3c5191d16c1b5f9f54c84aa5360"
+      },
+      {
+        "profile": "sanitize",
+        "key": "render/artist-MASK-0.650000-1.glb",
+        "file": "/home/blux/de-xr/dome-sculpt/artifacts/source-atlas-corrections-f89/artifacts/atlas-proof/sanitize/import-texture-atlas-render-data/artist-MASK-0.650000-1.glb",
+        "sha256": "fe167d2e612e2fa8debf23d4917db36761d3de716daa40aa05966b65d4844b3e"
+      },
+      {
+        "profile": "sanitize",
+        "key": "render/artist-OPAQUE-0.000000-0.glb",
+        "file": "/home/blux/de-xr/dome-sculpt/artifacts/source-atlas-corrections-f89/artifacts/atlas-proof/sanitize/import-texture-atlas-render-data/artist-OPAQUE-0.000000-0.glb",
+        "sha256": "6c8d97d903f7f35e7af5694b988586c7f9263746333159cf033cfa8c6357a4bf"
+      },
+      {
+        "profile": "sanitize",
+        "key": "render/artist-OPAQUE-0.000000-1.glb",
+        "file": "/home/blux/de-xr/dome-sculpt/artifacts/source-atlas-corrections-f89/artifacts/atlas-proof/sanitize/import-texture-atlas-render-data/artist-OPAQUE-0.000000-1.glb",
+        "sha256": "d9c1d4a3ce3aeaaa336959b76d75262a9c96eb84b8926f86d75615eae4954db6"
+      },
+      {
+        "profile": "sanitize",
+        "key": "render/artist-OPAQUE-0.650000-0.glb",
+        "file": "/home/blux/de-xr/dome-sculpt/artifacts/source-atlas-corrections-f89/artifacts/atlas-proof/sanitize/import-texture-atlas-render-data/artist-OPAQUE-0.650000-0.glb",
+        "sha256": "74e40021e5fba794f87ffbe98f42a6631deabb3892b7c3a8f9599c11b7d069ff"
+      },
+      {
+        "profile": "sanitize",
+        "key": "render/artist-OPAQUE-0.650000-1.glb",
+        "file": "/home/blux/de-xr/dome-sculpt/artifacts/source-atlas-corrections-f89/artifacts/atlas-proof/sanitize/import-texture-atlas-render-data/artist-OPAQUE-0.650000-1.glb",
+        "sha256": "8e4a6392c9f335f68ff4112f5b46baa761d083fc53e7d61e99839a49f52950bb"
+      },
+      {
+        "profile": "sanitize",
+        "key": "render/flat-BLEND-0.000000-0.glb",
+        "file": "/home/blux/de-xr/dome-sculpt/artifacts/source-atlas-corrections-f89/artifacts/atlas-proof/sanitize/import-texture-atlas-render-data/flat-BLEND-0.000000-0.glb",
+        "sha256": "543d32a66ade9d6b0090cf720655dd128b05ddf612f06261dded5356c22601dd"
+      },
+      {
+        "profile": "sanitize",
+        "key": "render/flat-BLEND-0.000000-1.glb",
+        "file": "/home/blux/de-xr/dome-sculpt/artifacts/source-atlas-corrections-f89/artifacts/atlas-proof/sanitize/import-texture-atlas-render-data/flat-BLEND-0.000000-1.glb",
+        "sha256": "83bbc7b1daf62fb6fd7e9405c9625d0ce1cd4d09c5c12aac7b2c503d4c752978"
+      },
+      {
+        "profile": "sanitize",
+        "key": "render/flat-BLEND-0.650000-0.glb",
+        "file": "/home/blux/de-xr/dome-sculpt/artifacts/source-atlas-corrections-f89/artifacts/atlas-proof/sanitize/import-texture-atlas-render-data/flat-BLEND-0.650000-0.glb",
+        "sha256": "7c038b3108219887d5f50b8ad3379cd8e93335ee5034766f07dc95f0d6e896d8"
+      },
+      {
+        "profile": "sanitize",
+        "key": "render/flat-BLEND-0.650000-1.glb",
+        "file": "/home/blux/de-xr/dome-sculpt/artifacts/source-atlas-corrections-f89/artifacts/atlas-proof/sanitize/import-texture-atlas-render-data/flat-BLEND-0.650000-1.glb",
+        "sha256": "8548e1aba31bc0dddcba99f4989e792d72916973977461d2668e7a216d147d83"
+      },
+      {
+        "profile": "sanitize",
+        "key": "render/flat-MASK-0.000000-0.glb",
+        "file": "/home/blux/de-xr/dome-sculpt/artifacts/source-atlas-corrections-f89/artifacts/atlas-proof/sanitize/import-texture-atlas-render-data/flat-MASK-0.000000-0.glb",
+        "sha256": "7ce6ed3a5a27db66b91b9dbe9cf0b30a5fd37e9fde8a1894adbd3351124770bd"
+      },
+      {
+        "profile": "sanitize",
+        "key": "render/flat-MASK-0.000000-1.glb",
+        "file": "/home/blux/de-xr/dome-sculpt/artifacts/source-atlas-corrections-f89/artifacts/atlas-proof/sanitize/import-texture-atlas-render-data/flat-MASK-0.000000-1.glb",
+        "sha256": "c7572b3bd40456d6509ee6dfd6eee51699017835052a8ba2e752c2937e9337da"
+      },
+      {
+        "profile": "sanitize",
+        "key": "render/flat-MASK-0.650000-0.glb",
+        "file": "/home/blux/de-xr/dome-sculpt/artifacts/source-atlas-corrections-f89/artifacts/atlas-proof/sanitize/import-texture-atlas-render-data/flat-MASK-0.650000-0.glb",
+        "sha256": "5ed6df2f7682eca82bc5ffac196ccfb636a7dc4431864ad31a1dc5876209d139"
+      },
+      {
+        "profile": "sanitize",
+        "key": "render/flat-MASK-0.650000-1.glb",
+        "file": "/home/blux/de-xr/dome-sculpt/artifacts/source-atlas-corrections-f89/artifacts/atlas-proof/sanitize/import-texture-atlas-render-data/flat-MASK-0.650000-1.glb",
+        "sha256": "1c64dff0dd5000475611d34db88ed6d25bfefaa6bbfa0229a35cb47b7133d4a7"
+      },
+      {
+        "profile": "sanitize",
+        "key": "render/flat-OPAQUE-0.000000-0.glb",
+        "file": "/home/blux/de-xr/dome-sculpt/artifacts/source-atlas-corrections-f89/artifacts/atlas-proof/sanitize/import-texture-atlas-render-data/flat-OPAQUE-0.000000-0.glb",
+        "sha256": "5f0eb4ae3204ee1bb007d2984250c25caa60c23202d3fb2c93cdd43229006a59"
+      },
+      {
+        "profile": "sanitize",
+        "key": "render/flat-OPAQUE-0.000000-1.glb",
+        "file": "/home/blux/de-xr/dome-sculpt/artifacts/source-atlas-corrections-f89/artifacts/atlas-proof/sanitize/import-texture-atlas-render-data/flat-OPAQUE-0.000000-1.glb",
+        "sha256": "cb6823557dc477ec90adc03e4fec18a375bdf21ac23cbfbf5f8f6b6e7a547ab8"
+      },
+      {
+        "profile": "sanitize",
+        "key": "render/flat-OPAQUE-0.650000-0.glb",
+        "file": "/home/blux/de-xr/dome-sculpt/artifacts/source-atlas-corrections-f89/artifacts/atlas-proof/sanitize/import-texture-atlas-render-data/flat-OPAQUE-0.650000-0.glb",
+        "sha256": "1572ffa4ab6e34d44922c214012344c30f914f6a292cf0a3cde5ea0087d0d4d2"
+      },
+      {
+        "profile": "sanitize",
+        "key": "render/flat-OPAQUE-0.650000-1.glb",
+        "file": "/home/blux/de-xr/dome-sculpt/artifacts/source-atlas-corrections-f89/artifacts/atlas-proof/sanitize/import-texture-atlas-render-data/flat-OPAQUE-0.650000-1.glb",
+        "sha256": "ba0f84b18dfed587681b4fcb77a3e253807ecb6610c87bc164067da8cb822535"
+      },
+      {
+        "profile": "arc",
+        "key": "mixed/current-paint-normal.glb",
+        "file": "/home/blux/de-xr/dome-sculpt/artifacts/source-atlas-corrections-f89/artifacts/atlas-proof/hardware/source24-26-integration-arc/current-paint-normal.glb",
+        "sha256": "f0c51808ff5439bea6140a1eefa0011ff648ec53d46ce15aad5fe4cc0d9469fb"
+      },
+      {
+        "profile": "arc",
+        "key": "mixed/projected.glb",
+        "file": "/home/blux/de-xr/dome-sculpt/artifacts/source-atlas-corrections-f89/artifacts/atlas-proof/hardware/source24-26-integration-arc/projected.glb",
+        "sha256": "938d475984f464a4ec74049dbe3d8ebaafc92a28f59ee761359fba990e3a0039"
+      },
+      {
+        "profile": "arc",
+        "key": "render/artist-BLEND-0.000000-0.glb",
+        "file": "/home/blux/de-xr/dome-sculpt/artifacts/source-atlas-corrections-f89/artifacts/atlas-proof/hardware/import-texture-atlas-render-arc/artist-BLEND-0.000000-0.glb",
+        "sha256": "01c39d78af325eab5a5ceb3b7d95ea50a698f44c4e1651b9fb27c33d63c4db98"
+      },
+      {
+        "profile": "arc",
+        "key": "render/artist-BLEND-0.000000-1.glb",
+        "file": "/home/blux/de-xr/dome-sculpt/artifacts/source-atlas-corrections-f89/artifacts/atlas-proof/hardware/import-texture-atlas-render-arc/artist-BLEND-0.000000-1.glb",
+        "sha256": "24288ed13c9b297cc78f99e5dff5020226d288c381dde01707c62599810b4940"
+      },
+      {
+        "profile": "arc",
+        "key": "render/artist-BLEND-0.650000-0.glb",
+        "file": "/home/blux/de-xr/dome-sculpt/artifacts/source-atlas-corrections-f89/artifacts/atlas-proof/hardware/import-texture-atlas-render-arc/artist-BLEND-0.650000-0.glb",
+        "sha256": "49b17f7b5327e48b407be1363218b87c90b5080234e1d006c47e5cc8eab84976"
+      },
+      {
+        "profile": "arc",
+        "key": "render/artist-BLEND-0.650000-1.glb",
+        "file": "/home/blux/de-xr/dome-sculpt/artifacts/source-atlas-corrections-f89/artifacts/atlas-proof/hardware/import-texture-atlas-render-arc/artist-BLEND-0.650000-1.glb",
+        "sha256": "1ed71ed1d43706af64a0f864a6abdb6fd37ca8de45575f202b91e1c892a353b7"
+      },
+      {
+        "profile": "arc",
+        "key": "render/artist-MASK-0.000000-0.glb",
+        "file": "/home/blux/de-xr/dome-sculpt/artifacts/source-atlas-corrections-f89/artifacts/atlas-proof/hardware/import-texture-atlas-render-arc/artist-MASK-0.000000-0.glb",
+        "sha256": "31e9635b9e4bf5a4d912c8cd194d4f0086e9fcda20670c8ab94280ecd3728676"
+      },
+      {
+        "profile": "arc",
+        "key": "render/artist-MASK-0.000000-1.glb",
+        "file": "/home/blux/de-xr/dome-sculpt/artifacts/source-atlas-corrections-f89/artifacts/atlas-proof/hardware/import-texture-atlas-render-arc/artist-MASK-0.000000-1.glb",
+        "sha256": "b6337712e790c6a786a8feb3bf88c41ffeb869a7306b09a4d9c823aeca37b83c"
+      },
+      {
+        "profile": "arc",
+        "key": "render/artist-MASK-0.650000-0.glb",
+        "file": "/home/blux/de-xr/dome-sculpt/artifacts/source-atlas-corrections-f89/artifacts/atlas-proof/hardware/import-texture-atlas-render-arc/artist-MASK-0.650000-0.glb",
+        "sha256": "eb6150bf9bb7d81400b604576a5bedd2d87ac3c5191d16c1b5f9f54c84aa5360"
+      },
+      {
+        "profile": "arc",
+        "key": "render/artist-MASK-0.650000-1.glb",
+        "file": "/home/blux/de-xr/dome-sculpt/artifacts/source-atlas-corrections-f89/artifacts/atlas-proof/hardware/import-texture-atlas-render-arc/artist-MASK-0.650000-1.glb",
+        "sha256": "fe167d2e612e2fa8debf23d4917db36761d3de716daa40aa05966b65d4844b3e"
+      },
+      {
+        "profile": "arc",
+        "key": "render/artist-OPAQUE-0.000000-0.glb",
+        "file": "/home/blux/de-xr/dome-sculpt/artifacts/source-atlas-corrections-f89/artifacts/atlas-proof/hardware/import-texture-atlas-render-arc/artist-OPAQUE-0.000000-0.glb",
+        "sha256": "6c8d97d903f7f35e7af5694b988586c7f9263746333159cf033cfa8c6357a4bf"
+      },
+      {
+        "profile": "arc",
+        "key": "render/artist-OPAQUE-0.000000-1.glb",
+        "file": "/home/blux/de-xr/dome-sculpt/artifacts/source-atlas-corrections-f89/artifacts/atlas-proof/hardware/import-texture-atlas-render-arc/artist-OPAQUE-0.000000-1.glb",
+        "sha256": "d9c1d4a3ce3aeaaa336959b76d75262a9c96eb84b8926f86d75615eae4954db6"
+      },
+      {
+        "profile": "arc",
+        "key": "render/artist-OPAQUE-0.650000-0.glb",
+        "file": "/home/blux/de-xr/dome-sculpt/artifacts/source-atlas-corrections-f89/artifacts/atlas-proof/hardware/import-texture-atlas-render-arc/artist-OPAQUE-0.650000-0.glb",
+        "sha256": "74e40021e5fba794f87ffbe98f42a6631deabb3892b7c3a8f9599c11b7d069ff"
+      },
+      {
+        "profile": "arc",
+        "key": "render/artist-OPAQUE-0.650000-1.glb",
+        "file": "/home/blux/de-xr/dome-sculpt/artifacts/source-atlas-corrections-f89/artifacts/atlas-proof/hardware/import-texture-atlas-render-arc/artist-OPAQUE-0.650000-1.glb",
+        "sha256": "8e4a6392c9f335f68ff4112f5b46baa761d083fc53e7d61e99839a49f52950bb"
+      },
+      {
+        "profile": "arc",
+        "key": "render/flat-BLEND-0.000000-0.glb",
+        "file": "/home/blux/de-xr/dome-sculpt/artifacts/source-atlas-corrections-f89/artifacts/atlas-proof/hardware/import-texture-atlas-render-arc/flat-BLEND-0.000000-0.glb",
+        "sha256": "543d32a66ade9d6b0090cf720655dd128b05ddf612f06261dded5356c22601dd"
+      },
+      {
+        "profile": "arc",
+        "key": "render/flat-BLEND-0.000000-1.glb",
+        "file": "/home/blux/de-xr/dome-sculpt/artifacts/source-atlas-corrections-f89/artifacts/atlas-proof/hardware/import-texture-atlas-render-arc/flat-BLEND-0.000000-1.glb",
+        "sha256": "83bbc7b1daf62fb6fd7e9405c9625d0ce1cd4d09c5c12aac7b2c503d4c752978"
+      },
+      {
+        "profile": "arc",
+        "key": "render/flat-BLEND-0.650000-0.glb",
+        "file": "/home/blux/de-xr/dome-sculpt/artifacts/source-atlas-corrections-f89/artifacts/atlas-proof/hardware/import-texture-atlas-render-arc/flat-BLEND-0.650000-0.glb",
+        "sha256": "7c038b3108219887d5f50b8ad3379cd8e93335ee5034766f07dc95f0d6e896d8"
+      },
+      {
+        "profile": "arc",
+        "key": "render/flat-BLEND-0.650000-1.glb",
+        "file": "/home/blux/de-xr/dome-sculpt/artifacts/source-atlas-corrections-f89/artifacts/atlas-proof/hardware/import-texture-atlas-render-arc/flat-BLEND-0.650000-1.glb",
+        "sha256": "8548e1aba31bc0dddcba99f4989e792d72916973977461d2668e7a216d147d83"
+      },
+      {
+        "profile": "arc",
+        "key": "render/flat-MASK-0.000000-0.glb",
+        "file": "/home/blux/de-xr/dome-sculpt/artifacts/source-atlas-corrections-f89/artifacts/atlas-proof/hardware/import-texture-atlas-render-arc/flat-MASK-0.000000-0.glb",
+        "sha256": "7ce6ed3a5a27db66b91b9dbe9cf0b30a5fd37e9fde8a1894adbd3351124770bd"
+      },
+      {
+        "profile": "arc",
+        "key": "render/flat-MASK-0.000000-1.glb",
+        "file": "/home/blux/de-xr/dome-sculpt/artifacts/source-atlas-corrections-f89/artifacts/atlas-proof/hardware/import-texture-atlas-render-arc/flat-MASK-0.000000-1.glb",
+        "sha256": "c7572b3bd40456d6509ee6dfd6eee51699017835052a8ba2e752c2937e9337da"
+      },
+      {
+        "profile": "arc",
+        "key": "render/flat-MASK-0.650000-0.glb",
+        "file": "/home/blux/de-xr/dome-sculpt/artifacts/source-atlas-corrections-f89/artifacts/atlas-proof/hardware/import-texture-atlas-render-arc/flat-MASK-0.650000-0.glb",
+        "sha256": "5ed6df2f7682eca82bc5ffac196ccfb636a7dc4431864ad31a1dc5876209d139"
+      },
+      {
+        "profile": "arc",
+        "key": "render/flat-MASK-0.650000-1.glb",
+        "file": "/home/blux/de-xr/dome-sculpt/artifacts/source-atlas-corrections-f89/artifacts/atlas-proof/hardware/import-texture-atlas-render-arc/flat-MASK-0.650000-1.glb",
+        "sha256": "1c64dff0dd5000475611d34db88ed6d25bfefaa6bbfa0229a35cb47b7133d4a7"
+      },
+      {
+        "profile": "arc",
+        "key": "render/flat-OPAQUE-0.000000-0.glb",
+        "file": "/home/blux/de-xr/dome-sculpt/artifacts/source-atlas-corrections-f89/artifacts/atlas-proof/hardware/import-texture-atlas-render-arc/flat-OPAQUE-0.000000-0.glb",
+        "sha256": "5f0eb4ae3204ee1bb007d2984250c25caa60c23202d3fb2c93cdd43229006a59"
+      },
+      {
+        "profile": "arc",
+        "key": "render/flat-OPAQUE-0.000000-1.glb",
+        "file": "/home/blux/de-xr/dome-sculpt/artifacts/source-atlas-corrections-f89/artifacts/atlas-proof/hardware/import-texture-atlas-render-arc/flat-OPAQUE-0.000000-1.glb",
+        "sha256": "cb6823557dc477ec90adc03e4fec18a375bdf21ac23cbfbf5f8f6b6e7a547ab8"
+      },
+      {
+        "profile": "arc",
+        "key": "render/flat-OPAQUE-0.650000-0.glb",
+        "file": "/home/blux/de-xr/dome-sculpt/artifacts/source-atlas-corrections-f89/artifacts/atlas-proof/hardware/import-texture-atlas-render-arc/flat-OPAQUE-0.650000-0.glb",
+        "sha256": "1572ffa4ab6e34d44922c214012344c30f914f6a292cf0a3cde5ea0087d0d4d2"
+      },
+      {
+        "profile": "arc",
+        "key": "render/flat-OPAQUE-0.650000-1.glb",
+        "file": "/home/blux/de-xr/dome-sculpt/artifacts/source-atlas-corrections-f89/artifacts/atlas-proof/hardware/import-texture-atlas-render-arc/flat-OPAQUE-0.650000-1.glb",
+        "sha256": "ba0f84b18dfed587681b4fcb77a3e253807ecb6610c87bc164067da8cb822535"
+      }
+    ]
+  },
+  "preserved_negatives": [
+    "Original c092 full-regression five failures remain in frozen original log; correction never edits that job.",
+    "d09: raw degenerate coordinates allowed a stroke; new f89 admission rejects before editing/history and explains preparation.",
+    "d09: test incorrectly expected both sibling materials flattened; actual package correctly preserves the unpainted sibling UV1.",
+    "f89: actual Undo/Redo mesh publication busy; same geometry/gesture succeeds after wait_mesh. Corrected test waits, product ownership fence retained.",
+    "f89: old current-corner/UV2 test fabricated owner by replacing serialized maps; actual owning decoder correctly rejects.",
+    "Two hardware-required software controls actually exit1."
+  ]
+}

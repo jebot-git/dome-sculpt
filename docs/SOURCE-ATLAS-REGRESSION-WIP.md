@@ -1,3 +1,5 @@
+Latest scoped qualification: [SOURCE-ATLAS-REGRESSION.md](SOURCE-ATLAS-REGRESSION.md). The pending states below are preserved historical investigation notes.
+
 # Source-aware atlas regression migration (work in progress)
 
 Base runtime: c09202fbf092eaa4d9ddf8d9a2249fe7bf013e74. The initial d09 test-only child exposed a real empty-raster stroke admission gap.
