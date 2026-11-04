@@ -19,6 +19,7 @@ output.mkdir(parents=True,exist_ok=True)
 helper=build/'dome-sculpt-native-authoring-inspect'
 fixture_source=Path(os.environ['DOME_NATIVE32_FIXTURE'])
 checks=[]; processes=[]
+row=46 if os.environ.get('DOME_NATIVE32_COMPACT')=='1' else 32
 def check(ok,label):
     checks.append({'passed':bool(ok),'check':label})
     (output/'report.json').write_text(json.dumps({'checks':checks,'failed':sum(not c['passed'] for c in checks)},indent=2)+'\n')
@@ -89,13 +90,13 @@ async def main():
         async def editor():
             await command('UV editor...');value=await wait(lambda:named('UV editor'));value.set_input_focus(X.RevertToParent,X.CurrentTime);connection.sync();await asyncio.sleep(.25);return value
         edit=await editor();g=edit.get_geometry();initial=capture(edit,'default.png')
-        tap(edit,g.width*5/6,80);await asyncio.sleep(.3);selected=capture(edit,'selected.png')
+        tap(edit,g.width*5/6,row*2.5);await asyncio.sleep(.3);selected=capture(edit,'selected.png')
         check(initial.tobytes()!=selected.tobytes(),'Actual native Keep paint detail toggle changes its visible state and actionable status')
         check(edit.get_wm_transient_for().id==window.id,'Keep-detail controls retain native modal parent and universal application identity')
         key('Control_L',True);key('w');key('Control_L',False);await wait(lambda:named('UV editor') is None);await save()
-        check(inspect()==baseline,'Native FLTK Ctrl+W cancels the choice and preserves all original normal, current-corner RGBA, paint, pose and key sources')
-        edit=await editor();g=edit.get_geometry();tap(edit,g.width*5/6,80);tap(edit,g.width/12,16);await asyncio.sleep(.3)
-        tap(edit,g.width/2+80,g.height-16);await wait(lambda:named('UV editor') is None);await save();accepted=inspect()
+        check(inspect()==baseline,'Native FLTK Ctrl+W cancels the choice and preserves the complete original native float project')
+        edit=await editor();g=edit.get_geometry();tap(edit,g.width*5/6,row*2.5);tap(edit,g.width/12,row/2);await asyncio.sleep(.3)
+        tap(edit,g.width/2+80,g.height-row/2);await wait(lambda:named('UV editor') is None);await save();accepted=inspect()
         check(accepted['version']==32 and accepted['source_materials']['version']==14 and accepted['source_materials']['base_version']==1 and bool(accepted['source_materials']['native_paints']) and bool(accepted['paint_sampling']['domains']),'Actual native Keep paint plus Scale and Apply saves genuine native32/material14 ownership')
         a=next(o for o in accepted['objects'] if o['id']==accepted['active']);b=next(o for o in baseline['objects'] if o['id']==baseline['active']);material=accepted['source_materials']['bindings'][a['material_bindings']];node=accepted['source_materials']['native_paints'][material['native_paint_sampling']]
         check(accepted['source_materials']['paints'][node['paint']]==b['painted'],'Native UV owner retains every original float/layer/material-grid byte')
@@ -105,7 +106,7 @@ async def main():
         await command('Redo');await save();check(inspect()==accepted,'Universal Redo restores exact retained-domain paint, source and detail ownership')
         await command('Close Window');await wait(lambda:app.poll() is not None);check(app.returncode==0,'Actual native32 first session closes normally without sanitizer suppression');await wait(lambda:named('Dome Sculpt') is None)
         app,window,menu=await launch('restart');edit=await editor();g=edit.get_geometry();before=capture(edit,'restart.png')
-        tap(edit,g.width*5/6,80);await asyncio.sleep(.2);after=capture(edit,'required.png')
+        tap(edit,g.width*5/6,row*2.5);await asyncio.sleep(.2);after=capture(edit,'required.png')
         check(before.tobytes()==after.tobytes(),'Restarted retained domain keeps its required toggle visibly selected and disabled')
         key('Control_L',True);key('w');key('Control_L',False);await wait(lambda:named('UV editor') is None);await save()
         check(inspect()==accepted,'Reopening and cancelling required retained mode preserves every saved owner exactly')
