@@ -1,5 +1,19 @@
 # Dome Sculpt production handoff
 
+## Private ordinary rig Restore after authoring — 2026-11-05
+
+Ordinary bind/rebind now stages its complete first source and verifies current
+normal/morph authority without changing paint/UV/frame owners. Self-contained
+R/S164 workflow +1424 actual worker checks pass each, including all203+261 SMALL
+helper allocation prefixes, actual Cancel/stale/accepted Save/Undo/Restore/reopen.
+Legacy ordinary skin/affine136/unskinned37 pass with contextual full-Scene oracles.
+No ABI/schema/cap/default change, freshALL or GUI/GPU/main admission claim. Read
+RIG-AFTER-AUTHORING.md and receipt for precise copied-current44 component scope,
+preserved counterexamples and setup negatives. Actual native32 post-bind UV/key
+adapters remain required; canonical-normal UV/key controls already succeed. Full
+goal, broader automatic-weight domains and later drawers remain incomplete.
+
+
 ## Current coherent authoring foundation — 2026-11-04
 
 This candidate combines real normalUV34/native32 ownership (Scene35/material17),

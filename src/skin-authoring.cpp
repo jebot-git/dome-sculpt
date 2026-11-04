@@ -1,6 +1,9 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/skin-authoring.hpp"
 #include "skin-affine.hpp"
+#include "normal-frame-runtime.hpp"
+#include "polygon-conversion.hpp"
+#include "source-rest-scene.hpp"
 #include <nlohmann/json.hpp>
 namespace dome {
 namespace {
@@ -195,8 +198,23 @@ bool author_skin(Scene &scene,uint64_t target_id,const SkinAuthoringOptions &opt
     }
   }
   next.validate(target.painted->mesh());
+  // Skin changes keep the authored REST/corner and morph POSITION authority.
+  // Check that association on this worker; current paint/normal owners are
+  // preserved verbatim, never replaced by the reference object's material.
+  if(target.material_bindings && target.material_bindings->normal_frames)
+    detail::normal_frame_current_authority(*target.material_bindings,
+        target.painted->mesh(),&next,cancelled);
+  stop(cancelled);
+  // Native bind/rebind needs the same complete first-source Restore contract
+  // as native rig fitting. Original imported-node rigs keep their existing
+  // source-graph Restore, and genuine no-ops returned above create no capsule.
+  auto original=target.rig_source;
+  if(!original && !detail::source_rest_identity(scene,target))
+    original=capture_polygon_origin(scene,target.id);
+  stop(cancelled);
   Scene result=scene;
   result.object(target.id).deformation=std::make_shared<const DeformationState>(std::move(next));
+  result.object(target.id).rig_source=std::move(original);
   result.validate(false); stop(cancelled); scene=std::move(result);return true;
 }
 } // namespace dome

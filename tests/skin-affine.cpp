@@ -12,6 +12,14 @@ template<class F>bool refuses(F f){try{f();return false;}catch(const std::except
 Vec3 point(const AffineTransform &m,Vec3 p){auto q=m.point({p.x,p.y,p.z});return {float(q[0]),float(q[1]),float(q[2])};}
 Vec3 normal(const AffineTransform &m,Vec3 p){auto q=m.normal({p.x,p.y,p.z});return normalized(Vec3{float(q[0]),float(q[1]),float(q[2])});}
 AffineTransform matrix(bool reflected,float scale=1){return AffineTransform(std::array<double,16>{reflected?-1.3*scale:1.3*scale,.1*scale,0,0,.35*scale,.8*scale,.05*scale,0,.1*scale,.15*scale,1.2*scale,0,.2,.1,-.2,1});}
+bool same_bind_remainder(const Scene &after,uint64_t target,const SculptObject &before_target,const nlohmann::json &before) {
+  // A first capsule can raise the Scene version and change pool indices/null
+  // fields on every wire object. Compare the COMPLETE context after reverting
+  // only the two fields this operation is authorized to change.
+  auto retained=after;retained.object(target).deformation=before_target.deformation;
+  retained.object(target).rig_source=before_target.rig_source;
+  return retained.encode()==before;
+}
 Scene fixture(int bind=0,bool reflected=true,bool dyadic=false){
  Mesh m;m.positions={{dyadic?-.125f:-.1f,0,0},{dyadic?.125f:.1f,0,0},{0,.5f,0}};m.normals.assign(3,{0,0,1});m.indices={0,1,2};m.uv={{{0,0}},{{1,0}},{{.5f,1}}};
  Scene s;s.active().name="Source rig";s.active().painted=std::make_shared<PaintedMesh>(m,64);s.active().mesh_active=true;
@@ -42,10 +50,10 @@ int main(int argc,char **argv)try{
  if(argc==3&&std::string(argv[1])=="--ui-fixture"){auto s=fixture(2,true,true);s.object(1).visible=false;s.object(1).locked=true;s.save(argv[2]);return 0;}
  if(argc==3&&std::string(argv[1])=="--inspect"){auto s=Scene::load(argv[2]);std::cout<<nlohmann::json{{"skinned",bool(s.active().deformation&&s.active().deformation->skin)},{"scene",s.encode()}}.dump()<<'\n';return 0;}
  for(int bind:{0,1,2})for(bool reflection:{false,true}){
-  auto s=fixture(bind,reflection);auto before=s.encode();auto paint=s.active().painted;auto morph=s.active().deformation->morphs->encode();auto old_axes=s.object(1).deformation->landmarks;
+  auto s=fixture(bind,reflection);auto before=s.encode();const auto before_target=s.object(2);auto paint=s.active().painted;auto morph=s.active().deformation->morphs->encode();auto old_axes=s.object(1).deformation->landmarks;
   check(author_skin(s,2,options()),"Affine transfer creates actual skin weights");
   check(s.active().painted==paint&&s.active().deformation->morphs->encode()==morph&&s.active().deformation->morph_weights==std::vector<float>{.25f},"Affine binding preserves exact paint, rest geometry and authored morph channels/values");
-  check(s.encode()["objects"][0]==before["objects"][0],"Complete source rig, pose, appearance and placement remain immutable");
+  check(same_bind_remainder(s,2,before_target,before),"Complete source rig, pose, appearance and placement remain immutable");
   for(size_t v=0;v<3;++v)for(auto expected:s.object(1).deformation->skin->vertices[v]){float actual=0;for(auto i:s.active().deformation->skin->vertices[v])if(i.joint==expected.joint)actual=i.weight;check(std::abs(actual-expected.weight)<2e-5f,"World barycentric transfer retains independently authored endpoint weights");}
   compare_pose(s);auto c=s.world_matrix(2).inverse()*s.world_matrix(1);
   for(const auto &[name,p]:old_axes->points)check(length(s.active().deformation->landmarks->points.at(name)-point(c,p))<1e-6f,"Copied landmark positions retain full affine transport");
@@ -56,14 +64,14 @@ int main(int argc,char **argv)try{
  // Independent world segments, constructed from endpoints rather than the
  // production space/IBM transport helper, define the automatic-bind oracle.
  for(bool reflected:{false,true}){
-  auto scene=fixture(0,reflected);auto original=scene.encode();auto world=scene.world_matrix(1);auto mesh=scene.object(1).painted->mesh();
+  auto scene=fixture(0,reflected);auto original=scene.encode();const auto before_target=scene.object(2);auto world=scene.world_matrix(1);auto mesh=scene.object(1).painted->mesh();
   for(size_t v=0;v<mesh.positions.size();++v){mesh.positions[v]=point(world,mesh.positions[v]);mesh.normals[v]=normal(world,mesh.normals[v]);}
   auto a=point(world,{}),b=point(world,{0,.3f,0}),c=point(world,{0,.5f,0});auto rotation=arcball({0,1,0},normalized(b-a));
   Skeleton rig{{{"root",-1,{a,rotation},length(b-a)},{"tip",0,{{0,length(b-a),0}},length(c-b)}}};
   BindOptions bind;auto expected=automatic_bind(mesh,rig,bind);SkinAuthoringOptions operation;operation.reference=1;
   check(author_skin(scene,2,operation),"Automatic binding supports a real reflected/sheared target and source");
   for(size_t v=0;v<mesh.positions.size();++v)for(auto i:expected.vertices[v]){float actual=0;for(auto w:scene.active().deformation->skin->vertices[v])if(w.joint==i.joint)actual=w.weight;check(std::abs(actual-i.weight)<2e-5f,"Automatic weights equal independent physical-world segment/edge metric");}
-  check(scene.encode()["objects"][0]==original["objects"][0],"Automatic solve retains complete immutable source rig");
+  check(same_bind_remainder(scene,2,before_target,original),"Automatic solve retains complete immutable source rig");
  }
  // A common translation must change neither metric nor serialized skin data.
  for(auto mode:{SkinAuthoringMode::Automatic,SkinAuthoringMode::Transfer}){

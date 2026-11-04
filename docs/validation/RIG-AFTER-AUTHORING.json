@@ -1,0 +1,1167 @@
+{
+  "scope": "Private ordinary native bind/rebind first-source Restore; current44 matching-source single-product-TU component, fresh fixture TUs; not freshALL or GUI/device",
+  "base": "4a1dfc8c46cc82cf0380d875f53d3c3ca82bd3d0",
+  "production": [
+    "src/skin-authoring.cpp"
+  ],
+  "public_header_schema_default_cap_changes": false,
+  "source_files": {
+    "src/skin-authoring.cpp": "e8fa2076862c843d44bbff145969f4fafd92a037cc7c0b6e5934d7397fe3abfb",
+    "tests/rig-after-authoring.cpp": "ca090c21e7574719587ec7ea4ebd70f48fd3ab9678d0b7d62cd7fb2bf61c2177",
+    "tests/rig-after-authoring-worker.cpp": "ec400e550bfc0959b7b706a923349cf991fed84d2f482b38a9e3f66427ead60c",
+    "tests/skin-authoring.cpp": "ea09ee16f56e5bb06c26434d32dd835e4326247f80039049a787daadab6cad2a",
+    "tests/skin-affine.cpp": "91434bf4da17a6a2540532ee9f295e3fc923630b337606f1388125bca95af9e9",
+    "CMakeLists.txt": "bd36e5c28f63be1e8d77e3c9c0c5440fe1d2fa02c7abe8a7ebd3704b7d16fc41"
+  },
+  "evidence": {
+    "artifacts/rig-diagnostic/cases-status.json": {
+      "sha256": "6fee4b982d4c15c067fe2b4128cf235c7adf63520941d609c86d1816c2dbf3f0",
+      "bytes": 379
+    },
+    "artifacts/rig-diagnostic/fixed-status.json": {
+      "sha256": "4a3c89b03c7d1d88cf20f6788477dea98d59192a52af0fadfd7a20fc3b8d8c2c",
+      "bytes": 433
+    },
+    "artifacts/rig-diagnostic/build-fixed.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/rig-diagnostic/native32-fixed.log": {
+      "sha256": "b3bc096ae1636118d00be8252edd74a864bb3f29589b0c77d7f8d2cec8e3394a",
+      "bytes": 151
+    },
+    "artifacts/rig-diagnostic/converted0-fixed.log": {
+      "sha256": "b3bc096ae1636118d00be8252edd74a864bb3f29589b0c77d7f8d2cec8e3394a",
+      "bytes": 151
+    },
+    "artifacts/rig-diagnostic/cleared0-fixed.log": {
+      "sha256": "b3bc096ae1636118d00be8252edd74a864bb3f29589b0c77d7f8d2cec8e3394a",
+      "bytes": 151
+    },
+    "artifacts/rig-diagnostic/converted7-fixed.log": {
+      "sha256": "b3bc096ae1636118d00be8252edd74a864bb3f29589b0c77d7f8d2cec8e3394a",
+      "bytes": 151
+    },
+    "artifacts/rig-diagnostic/uv0-fixed.log": {
+      "sha256": "b3bc096ae1636118d00be8252edd74a864bb3f29589b0c77d7f8d2cec8e3394a",
+      "bytes": 151
+    },
+    "artifacts/rig-diagnostic/uv-cleared0-fixed.log": {
+      "sha256": "b3bc096ae1636118d00be8252edd74a864bb3f29589b0c77d7f8d2cec8e3394a",
+      "bytes": 151
+    },
+    "artifacts/rig-diagnostic/build.py": {
+      "sha256": "4f6ebb027a3cc1a8b92843d2560a5770a665bc0334915189cb88591eddcd1c1c",
+      "bytes": 962
+    },
+    "artifacts/rig-diagnostic/build-fixed.py": {
+      "sha256": "ab67151842ea050683205a38b5a25b86854dce4af5fe9f2b8ab9ed2cb013d092",
+      "bytes": 1220
+    },
+    "artifacts/rig-diagnostic/build-test.py": {
+      "sha256": "cc1a3de05264b88c812b764385df5c5b17771970bbc968780beed652d46f4b3c",
+      "bytes": 1142
+    },
+    "artifacts/rig-diagnostic/qualify.py": {
+      "sha256": "798aaffcafa237ecf71a59d92fffb5ab2a36b84bc0b10e5b0a017d94bd3d2f2e",
+      "bytes": 4045
+    },
+    "artifacts/rig-diagnostic/verify-v2.py": {
+      "sha256": "8942564b69418fbbfc2581ad20ae8963f6416676fc9a304428b306803ba936d9",
+      "bytes": 3394
+    },
+    "artifacts/rig-diagnostic/worker.py": {
+      "sha256": "27e08ba8ba892504a12412246e2090b35b23fc963e33f8134d73d9361dd7ec43",
+      "bytes": 2909
+    },
+    "artifacts/rig-diagnostic/legacy-source-fixed-invocation.json": {
+      "sha256": "bc5f2a64e91be935fba1011fc1337995b68fef65c2a6e1b82b0b7e768c45b83a",
+      "bytes": 143
+    },
+    "artifacts/rig-diagnostic/release/status.json": {
+      "sha256": "c06a21e892bed55d5d7605f04226e3aeb42a68072ef5dfc7c64b8946d28b47e0",
+      "bytes": 10359
+    },
+    "artifacts/rig-diagnostic/release/before.json": {
+      "sha256": "16dca408598987456210fdb36e70b83ca24ae136d76a4ee3d813b25b22db3b9d",
+      "bytes": 359720
+    },
+    "artifacts/rig-diagnostic/release/compile-runtime.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/rig-diagnostic/release/skin-authoring.cpp.o.d": {
+      "sha256": "c5d2a0ba2fefd16e659b323fb20b4f01de82454a71b98fde17c88ea1e96b7a7b",
+      "bytes": 4619
+    },
+    "artifacts/rig-diagnostic/release/skin-authoring.cpp.o": {
+      "sha256": "1d4be09897cd7a4f7991c6b12ff731c35da42e4a707dc9737bf91a8656e89d0f",
+      "bytes": 141808
+    },
+    "artifacts/rig-diagnostic/release/libdome-sculpt-core.a": {
+      "sha256": "c4b04530b0350857d3e81773b9c3711db4cb4edea3e99d4e5acf2125605e38e6",
+      "bytes": 34868592
+    },
+    "artifacts/rig-diagnostic/release/replace-runtime.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/rig-diagnostic/release/compile-new.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/rig-diagnostic/release/new.o.d": {
+      "sha256": "a9aa691551ec34eae29cf9bd8b5d6f3723cc126c88a6434b3b28a337fece72aa",
+      "bytes": 8080
+    },
+    "artifacts/rig-diagnostic/release/new.o": {
+      "sha256": "700f4fc87cf6867217ba6775a850b2b7c667cc6bf4cfad779d3995f466fddaeb",
+      "bytes": 236912
+    },
+    "artifacts/rig-diagnostic/release/link-new.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/rig-diagnostic/release/new": {
+      "sha256": "e874199b20a6d2722a603bbdd751b0972893f057bfa9a8973a3b7174067ff53f",
+      "bytes": 12601648
+    },
+    "artifacts/rig-diagnostic/release/run-new.log": {
+      "sha256": "1e139ee05352c0efdabea8c4e8f018d47be8e272bc20d6827eceff317b81336d",
+      "bytes": 13354
+    },
+    "artifacts/rig-diagnostic/release/compile-legacy-skin.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/rig-diagnostic/release/legacy-skin.o.d": {
+      "sha256": "01555c0634b765d9a09063ddb10c9869af6f969f309731544b2b85d5867a9dad",
+      "bytes": 5754
+    },
+    "artifacts/rig-diagnostic/release/legacy-skin.o": {
+      "sha256": "af2d2043c145bf9071d56d7cdaa533031c2f4afcd240348173af58e29ac1ae50",
+      "bytes": 267488
+    },
+    "artifacts/rig-diagnostic/release/link-legacy-skin.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/rig-diagnostic/release/legacy-skin": {
+      "sha256": "49593923b09a20c1626d8ebd3694b8022ced85f9562f334bb8836bf32ff3c356",
+      "bytes": 12566104
+    },
+    "artifacts/rig-diagnostic/release/run-legacy-skin.log": {
+      "sha256": "a892e322287e0ed77fb5757ffa954ed0a31f65b62eee52909b5006cc37351674",
+      "bytes": 178
+    },
+    "artifacts/rig-diagnostic/sanitize/status.json": {
+      "sha256": "eb4d2149120e8a4dad1b15c65ade4f4c501dad8ececab05cccfafb0200a7f0db",
+      "bytes": 10843
+    },
+    "artifacts/rig-diagnostic/sanitize/before.json": {
+      "sha256": "798c3f02298e4189edb2e449f27599129b1d3ba5a5974a19920b010cd7a99f5c",
+      "bytes": 359731
+    },
+    "artifacts/rig-diagnostic/sanitize/compile-runtime.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/rig-diagnostic/sanitize/skin-authoring.cpp.o.d": {
+      "sha256": "57642b8acaa80d7aa117e6df4c0ef66c9944c68c9e5337cd88441065be1bcd40",
+      "bytes": 4620
+    },
+    "artifacts/rig-diagnostic/sanitize/skin-authoring.cpp.o": {
+      "sha256": "12200b8603ae952506a0fff4a0ec8e488021cb350ab062b25c6203579bb60f6e",
+      "bytes": 5440456
+    },
+    "artifacts/rig-diagnostic/sanitize/libdome-sculpt-core.a": {
+      "sha256": "64e6820153a57252ad0239eade6bfd1d1a9649c2ac69dc43594577f969b2dc49",
+      "bytes": 890939150
+    },
+    "artifacts/rig-diagnostic/sanitize/replace-runtime.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/rig-diagnostic/sanitize/compile-new.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/rig-diagnostic/sanitize/new.o.d": {
+      "sha256": "c1298b062943c076f9a44bc6be46444bfb94b20856c91678aca2d8198820660e",
+      "bytes": 8081
+    },
+    "artifacts/rig-diagnostic/sanitize/new.o": {
+      "sha256": "303ab838ff7743d161cd8716808e23dee4943d17e5326e9b800222246584707d",
+      "bytes": 6204640
+    },
+    "artifacts/rig-diagnostic/sanitize/link-new.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/rig-diagnostic/sanitize/new": {
+      "sha256": "a9bb6f4b0d6ef0b7229dec32e6713eecf9789cd0e7fdd99548d8eb4dc2b53924",
+      "bytes": 369574440
+    },
+    "artifacts/rig-diagnostic/sanitize/run-new.log": {
+      "sha256": "1e139ee05352c0efdabea8c4e8f018d47be8e272bc20d6827eceff317b81336d",
+      "bytes": 13354
+    },
+    "artifacts/rig-diagnostic/sanitize/compile-legacy-skin.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/rig-diagnostic/sanitize/legacy-skin.o.d": {
+      "sha256": "024975e175d55773af2453a98bc943faaed80ac6edd06b466745fe428ac3f3a1",
+      "bytes": 5755
+    },
+    "artifacts/rig-diagnostic/sanitize/legacy-skin.o": {
+      "sha256": "16a6ff21e6a0a53db5ecee0feb9ff7569e3b1b0afde48821be8f4152fa6550b9",
+      "bytes": 7447936
+    },
+    "artifacts/rig-diagnostic/sanitize/link-legacy-skin.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/rig-diagnostic/sanitize/legacy-skin": {
+      "sha256": "a7a90e7d074298bc53383e181cf88be0255ab0234a082571fb8018f11c5cda72",
+      "bytes": 369893120
+    },
+    "artifacts/rig-diagnostic/sanitize/run-legacy-skin.log": {
+      "sha256": "a892e322287e0ed77fb5757ffa954ed0a31f65b62eee52909b5006cc37351674",
+      "bytes": 178
+    },
+    "artifacts/rig-diagnostic/v2-release/before.json": {
+      "sha256": "9317816bfd62a4e97ba123500bb94d16f501f902822c9a2b8600d137e8628c4a",
+      "bytes": 359917
+    },
+    "artifacts/rig-diagnostic/v2-release/status.json": {
+      "sha256": "9b8bacd6a9bec0e043f5431fc63ee69e63a2865a4062733b8a15b62f7def911b",
+      "bytes": 12858
+    },
+    "artifacts/rig-diagnostic/v2-release/compile-new.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/rig-diagnostic/v2-release/new.o.d": {
+      "sha256": "5a99c53ce3d1899dfaee248b979681be6fa67832cf47a5d7c3910b35920869d4",
+      "bytes": 8083
+    },
+    "artifacts/rig-diagnostic/v2-release/new.o": {
+      "sha256": "055c2a7f1c8fe74440afacb54a69553d5e8754d92551b3333521ca8cba031548",
+      "bytes": 237808
+    },
+    "artifacts/rig-diagnostic/v2-release/link-new.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/rig-diagnostic/v2-release/new": {
+      "sha256": "6a7d804cc3ece186408aa0f18854eb2b17bb4fa80932d56bf01c72dd29cd5344",
+      "bytes": 12601648
+    },
+    "artifacts/rig-diagnostic/v2-release/run-new.log": {
+      "sha256": "15a2d19573307085c95266c050890714f2fadc3eecc96ea6b97c65cfc27c0575",
+      "bytes": 13924
+    },
+    "artifacts/rig-diagnostic/v2-release/compile-legacy-skin.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/rig-diagnostic/v2-release/legacy-skin.o.d": {
+      "sha256": "2f2da6019883aa22647995d158cfa2fc0789c246ab99cb08bec870d522bfdc97",
+      "bytes": 5757
+    },
+    "artifacts/rig-diagnostic/v2-release/legacy-skin.o": {
+      "sha256": "8dc67d7bc0f3778e742fe0a6b3bc7f6c2049dc58ba184d4637aa76bc94066519",
+      "bytes": 260856
+    },
+    "artifacts/rig-diagnostic/v2-release/link-legacy-skin.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/rig-diagnostic/v2-release/legacy-skin": {
+      "sha256": "a7f7df68e763f80ee040a049573150b3a1aba36e50ba318928d0bcc0ddf2a0f9",
+      "bytes": 12566584
+    },
+    "artifacts/rig-diagnostic/v2-release/run-legacy-skin.log": {
+      "sha256": "c98ebf04dbec1bbdfcb896aad3f7c92a3232bda0aefba7c3d51ff8b9928423fd",
+      "bytes": 2934
+    },
+    "artifacts/rig-diagnostic/v2-release/compile-legacy-affine.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/rig-diagnostic/v2-release/legacy-affine.o.d": {
+      "sha256": "c615b892a260a36bfefb106d958b482e6e35b8b68d3af88158f7ec1ae0033f5b",
+      "bytes": 5966
+    },
+    "artifacts/rig-diagnostic/v2-release/legacy-affine.o": {
+      "sha256": "057924594cc28dccd7fee509308f190f7257b4ec620397add0eb879bbf69548c",
+      "bytes": 233064
+    },
+    "artifacts/rig-diagnostic/v2-release/link-legacy-affine.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/rig-diagnostic/v2-release/legacy-affine": {
+      "sha256": "23348da2c26f886235704410862781b27d6409a51369d61060d2c7dbcb75385d",
+      "bytes": 12548352
+    },
+    "artifacts/rig-diagnostic/v2-release/run-legacy-affine.log": {
+      "sha256": "e13936c53dd8ad4e15e12c57777e50767d7c15cf9d6f0dd72aae96eb81772cdc",
+      "bytes": 28
+    },
+    "artifacts/rig-diagnostic/v2-release/compile-legacy-source.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/rig-diagnostic/v2-release/legacy-source.o.d": {
+      "sha256": "a7b6ca2a422ea73d0f968f79931065c93b09cce76e3717f7d806f4ece23e1df3",
+      "bytes": 6374
+    },
+    "artifacts/rig-diagnostic/v2-release/legacy-source.o": {
+      "sha256": "76cd49b5724465d84eabde8ced9ff91ff00c9d08c7325dd739f9bf5998c1644f",
+      "bytes": 155792
+    },
+    "artifacts/rig-diagnostic/v2-release/link-legacy-source.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/rig-diagnostic/v2-release/legacy-source": {
+      "sha256": "e344617cf82ccb040aa087b4ae2507ed7cbf77257ede751909a488e69855db12",
+      "bytes": 12551712
+    },
+    "artifacts/rig-diagnostic/v2-release/run-legacy-source.log": {
+      "sha256": "b4198a527363724379f21786f346a600b5b4713fbb77397bd77739db36c521e0",
+      "bytes": 57
+    },
+    "artifacts/rig-diagnostic/v2-release/run-legacy-source-with-output.log": {
+      "sha256": "19cce33bdf22bd460cfb78ce257752810390c5d4c82e9f693c409d789638da10",
+      "bytes": 2737
+    },
+    "artifacts/rig-diagnostic/v2-sanitize/before.json": {
+      "sha256": "d20422563069ab6ae33cea9bbbb7a049a21cccae85351b0859560bfb38baa5b5",
+      "bytes": 359929
+    },
+    "artifacts/rig-diagnostic/v2-sanitize/status.json": {
+      "sha256": "7f9870b88c1f14aa66f34ba4a8ec6a2a0a08baa24965f678bc3666bb8346d7c5",
+      "bytes": 13631
+    },
+    "artifacts/rig-diagnostic/v2-sanitize/compile-new.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/rig-diagnostic/v2-sanitize/new.o.d": {
+      "sha256": "3daa57df6b932fe163bf3124db5de939e2bd6c6109ac301ff9268fe150d9a416",
+      "bytes": 8084
+    },
+    "artifacts/rig-diagnostic/v2-sanitize/new.o": {
+      "sha256": "d5a7ba53983baf98f275c83b4d196e83f6469155a8499233b707f3f54414552e",
+      "bytes": 6222080
+    },
+    "artifacts/rig-diagnostic/v2-sanitize/link-new.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/rig-diagnostic/v2-sanitize/new": {
+      "sha256": "7d4ad69e3b9619c4537d1a1edbfde535e46a9d0d966bc73b304b0a296fa1f945",
+      "bytes": 369580672
+    },
+    "artifacts/rig-diagnostic/v2-sanitize/run-new.log": {
+      "sha256": "15a2d19573307085c95266c050890714f2fadc3eecc96ea6b97c65cfc27c0575",
+      "bytes": 13924
+    },
+    "artifacts/rig-diagnostic/v2-sanitize/compile-legacy-skin.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/rig-diagnostic/v2-sanitize/legacy-skin.o.d": {
+      "sha256": "61b03f56f4d953a63ea0c62c13948fd5c606dc1ffb1bc0721f3d5e267b0831e5",
+      "bytes": 5758
+    },
+    "artifacts/rig-diagnostic/v2-sanitize/legacy-skin.o": {
+      "sha256": "f10cbc1bff4b60377f9f5584fb859e3f49f6699205de107f666046c5fa9d8f38",
+      "bytes": 7075664
+    },
+    "artifacts/rig-diagnostic/v2-sanitize/link-legacy-skin.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/rig-diagnostic/v2-sanitize/legacy-skin": {
+      "sha256": "0a16da59dd16bd745a89e9605af68e2bc891d03e4c062b3b43c9bd0b254fba9b",
+      "bytes": 369773280
+    },
+    "artifacts/rig-diagnostic/v2-sanitize/run-legacy-skin.log": {
+      "sha256": "c98ebf04dbec1bbdfcb896aad3f7c92a3232bda0aefba7c3d51ff8b9928423fd",
+      "bytes": 2934
+    },
+    "artifacts/rig-diagnostic/v2-sanitize/compile-legacy-affine.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/rig-diagnostic/v2-sanitize/legacy-affine.o.d": {
+      "sha256": "f1d273d061e789876376248bafec323ef85b63f6128f477b3eeae09eff0fa3b5",
+      "bytes": 5967
+    },
+    "artifacts/rig-diagnostic/v2-sanitize/legacy-affine.o": {
+      "sha256": "e7cfea609f5f79dc227df3ed8cc3d66c983b0411256dbfb25fd034476023098b",
+      "bytes": 7134544
+    },
+    "artifacts/rig-diagnostic/v2-sanitize/link-legacy-affine.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/rig-diagnostic/v2-sanitize/legacy-affine": {
+      "sha256": "00a43313badf795750c9c46a1da79741ca4bb50ad6017d8c121766d3ff277a40",
+      "bytes": 369720432
+    },
+    "artifacts/rig-diagnostic/v2-sanitize/run-legacy-affine.log": {
+      "sha256": "e13936c53dd8ad4e15e12c57777e50767d7c15cf9d6f0dd72aae96eb81772cdc",
+      "bytes": 28
+    },
+    "artifacts/rig-diagnostic/v2-sanitize/compile-legacy-source.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/rig-diagnostic/v2-sanitize/legacy-source.o.d": {
+      "sha256": "f2adb737be806967464a9dceeb988fef7e8cdcbe3c78b96608219c69406f888b",
+      "bytes": 6375
+    },
+    "artifacts/rig-diagnostic/v2-sanitize/legacy-source.o": {
+      "sha256": "d4fcaad433c416cb8c2aeb77610b3ab091a48d989cf3f1947000c8957222c7b3",
+      "bytes": 5344888
+    },
+    "artifacts/rig-diagnostic/v2-sanitize/link-legacy-source.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/rig-diagnostic/v2-sanitize/legacy-source": {
+      "sha256": "d73b4c53b12241f3b918b98a35ca8d31d3bbf2a0d39538f8506370ee915447ba",
+      "bytes": 369141976
+    },
+    "artifacts/rig-diagnostic/v2-sanitize/run-legacy-source.log": {
+      "sha256": "b4198a527363724379f21786f346a600b5b4713fbb77397bd77739db36c521e0",
+      "bytes": 57
+    },
+    "artifacts/rig-diagnostic/v2-sanitize/run-legacy-source-with-output.log": {
+      "sha256": "19cce33bdf22bd460cfb78ce257752810390c5d4c82e9f693c409d789638da10",
+      "bytes": 2737
+    },
+    "artifacts/rig-diagnostic/worker-release/before.json": {
+      "sha256": "9c143191aede3a5cd162a11942edf49a61bd559295fdb5b83e5411b056d251dd",
+      "bytes": 360091
+    },
+    "artifacts/rig-diagnostic/worker-release/status.json": {
+      "sha256": "fdea9b5abf9ff6f62d7d76d3f8f91b6d9ad3f843ecce9d8fc0cbae40c431c137",
+      "bytes": 3587
+    },
+    "artifacts/rig-diagnostic/worker-release/compile.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/rig-diagnostic/worker-release/worker.o.d": {
+      "sha256": "4ead20b693d58aaa129107a5bb15f32119780e177901fd70d47bc3e4c6282c85",
+      "bytes": 8197
+    },
+    "artifacts/rig-diagnostic/worker-release/worker.o": {
+      "sha256": "ae7f13658e3d3819cb55b7c8ddde9b392a2519472cc1bb87b602d8eb2fd1fd24",
+      "bytes": 230112
+    },
+    "artifacts/rig-diagnostic/worker-release/link.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/rig-diagnostic/worker-release/worker": {
+      "sha256": "90e0a09e36324282d9a4e3d14edff202943da37630408cb3784e1b9c025f6a26",
+      "bytes": 12590576
+    },
+    "artifacts/rig-diagnostic/worker-release/actual-worker.log": {
+      "sha256": "065317a5f476d1def67e21fc0b3bc10b3ffd4d3dca0821d3d7186696393e6893",
+      "bytes": 126009
+    },
+    "artifacts/rig-diagnostic/worker-sanitize/before.json": {
+      "sha256": "a16cf09de829dfed10b861d2efddbca4d26bf175f3ed609f8a1cd0dff2f20372",
+      "bytes": 360103
+    },
+    "artifacts/rig-diagnostic/worker-sanitize/status.json": {
+      "sha256": "3466ce1506b0f599e6a455dc00ae90043ac1e12fcabd9e947da02a339eba200a",
+      "bytes": 3782
+    },
+    "artifacts/rig-diagnostic/worker-sanitize/compile.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/rig-diagnostic/worker-sanitize/worker.o.d": {
+      "sha256": "70e55f46b54fcc0e4d740e0e68d40fafd2494afa327526f165ab297742055365",
+      "bytes": 8198
+    },
+    "artifacts/rig-diagnostic/worker-sanitize/worker.o": {
+      "sha256": "17f5e73d1b7eb12b578eb6ad2e1d53d855939ab9f85cc9637e842a36477f84a6",
+      "bytes": 6197608
+    },
+    "artifacts/rig-diagnostic/worker-sanitize/link.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/rig-diagnostic/worker-sanitize/worker": {
+      "sha256": "65096918ea794ebbef3bb542405e58033f297d34d264e3f689ed97954c39045e",
+      "bytes": 369563064
+    },
+    "artifacts/rig-diagnostic/worker-sanitize/actual-worker.log": {
+      "sha256": "065317a5f476d1def67e21fc0b3bc10b3ffd4d3dca0821d3d7186696393e6893",
+      "bytes": 126009
+    },
+    "artifacts/rig-diagnostic/final-main/release/compile-new.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/rig-diagnostic/final-main/release/new.o.d": {
+      "sha256": "171e420415662d8f4c2daf5ba4374202ea5b13f58dc863583ee83f6b86e2f4ab",
+      "bytes": 8091
+    },
+    "artifacts/rig-diagnostic/final-main/release/new.o": {
+      "sha256": "055c2a7f1c8fe74440afacb54a69553d5e8754d92551b3333521ca8cba031548",
+      "bytes": 237808
+    },
+    "artifacts/rig-diagnostic/final-main/release/link-new.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/rig-diagnostic/final-main/release/new": {
+      "sha256": "6a7d804cc3ece186408aa0f18854eb2b17bb4fa80932d56bf01c72dd29cd5344",
+      "bytes": 12601648
+    },
+    "artifacts/rig-diagnostic/final-main/release/run-new.log": {
+      "sha256": "15a2d19573307085c95266c050890714f2fadc3eecc96ea6b97c65cfc27c0575",
+      "bytes": 13924
+    },
+    "artifacts/rig-diagnostic/final-main/sanitize/compile-new.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/rig-diagnostic/final-main/sanitize/new.o.d": {
+      "sha256": "838f467a4a1fb2cb820a4b1bedc091a51ab86c26ef7b40f27cc039d61c764b33",
+      "bytes": 8092
+    },
+    "artifacts/rig-diagnostic/final-main/sanitize/new.o": {
+      "sha256": "8b8f8ca4124e7f7ae6047ef201dd47eea3d4b4bb497f70c7ae55a9a3ffa99c92",
+      "bytes": 6222184
+    },
+    "artifacts/rig-diagnostic/final-main/sanitize/link-new.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/rig-diagnostic/final-main/sanitize/new": {
+      "sha256": "0e9211310241ed154893ae58c24f02f757238fcafc7b9671a1ebcc8545eeb280",
+      "bytes": 369580792
+    },
+    "artifacts/rig-diagnostic/final-main/sanitize/run-new.log": {
+      "sha256": "15a2d19573307085c95266c050890714f2fadc3eecc96ea6b97c65cfc27c0575",
+      "bytes": 13924
+    },
+    "artifacts/rig-diagnostic/post-0.log": {
+      "sha256": "3facadff59727ba59b9fc441c9d40c4f51b292c0c502fb5e0884a3a0b69b75ad",
+      "bytes": 166
+    },
+    "artifacts/rig-diagnostic/post-3.log": {
+      "sha256": "a4b21c84f0b4dc217eff380c7a2edf8bc8f6df99733ae0d7d321f7b0f115f8a2",
+      "bytes": 24
+    },
+    "artifacts/rig-diagnostic/post-4.log": {
+      "sha256": "a4b21c84f0b4dc217eff380c7a2edf8bc8f6df99733ae0d7d321f7b0f115f8a2",
+      "bytes": 24
+    }
+  },
+  "profiles": {
+    "release": {
+      "final_main": {
+        "steps": [
+          {
+            "name": "compile-new",
+            "command": [
+              "/usr/bin/c++",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/rig-after-authoring-4a1dfc8/src",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/rig-after-authoring-4a1dfc8/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/rig-after-authoring-4a1dfc8/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/rig-after-authoring-4a1dfc8/third_party/nlohmann",
+              "-O3",
+              "-DNDEBUG",
+              "-std=gnu++20",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/rig-after-authoring-4a1dfc8/artifacts/rig-diagnostic/final-main/release/new.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/rig-after-authoring-4a1dfc8/tests/rig-after-authoring.cpp",
+              "-MMD",
+              "-MF",
+              "/home/blux/de-xr/dome-sculpt/artifacts/rig-after-authoring-4a1dfc8/artifacts/rig-diagnostic/final-main/release/new.o.d"
+            ],
+            "exit": 0,
+            "seconds": 6.681119618995581
+          },
+          {
+            "name": "link-new",
+            "command": [
+              "/usr/bin/c++",
+              "-O3",
+              "-DNDEBUG",
+              "/home/blux/de-xr/dome-sculpt/artifacts/rig-after-authoring-4a1dfc8/artifacts/rig-diagnostic/final-main/release/new.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/rig-after-authoring-4a1dfc8/artifacts/rig-diagnostic/final-main/release/new",
+              "/home/blux/de-xr/dome-sculpt/artifacts/rig-after-authoring-4a1dfc8/artifacts/rig-diagnostic/release/libdome-sculpt-core.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/release/libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/release/libdome-sculpt-polygon.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/release/libxatlas.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/release/libmikktspace.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/release/libmikktspace-robust.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/release/libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/release/libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit": 0,
+            "seconds": 0.4657273350167088
+          },
+          {
+            "name": "run-new",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/rig-after-authoring-4a1dfc8/artifacts/rig-diagnostic/final-main/release/new",
+              "/home/blux/de-xr/dome-sculpt/artifacts/rig-after-authoring-4a1dfc8/artifacts/rig-diagnostic/final-main/release/new-data"
+            ],
+            "exit": 0,
+            "seconds": 0.264932124002371
+          }
+        ],
+        "drift": [],
+        "inputs": {
+          "/home/blux/de-xr/dome-sculpt/artifacts/rig-after-authoring-4a1dfc8/tests/rig-after-authoring.cpp": "ca090c21e7574719587ec7ea4ebd70f48fd3ab9678d0b7d62cd7fb2bf61c2177",
+          "/home/blux/de-xr/dome-sculpt/artifacts/rig-after-authoring-4a1dfc8/src/skin-authoring.cpp": "e8fa2076862c843d44bbff145969f4fafd92a037cc7c0b6e5934d7397fe3abfb",
+          "/home/blux/de-xr/dome-sculpt/artifacts/rig-after-authoring-4a1dfc8/artifacts/rig-diagnostic/release/libdome-sculpt-core.a": "c4b04530b0350857d3e81773b9c3711db4cb4edea3e99d4e5acf2125605e38e6",
+          "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/release/libdome-sculpt-affine.a": "b9a8bb64084a5dee888837118d269129f5ab0c03bd5ee11881d9fda9e48e0d9b",
+          "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/release/libxatlas.a": "e39575bd59fbadec722f0a7c0ddd5c171f913c99ffaa5ef67b1a0b588972834f",
+          "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/release/libufbx.a": "a3498b5cae7ff7298cad646f68ff74776c3a22682316c5ba013df046e9e5acf5",
+          "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/release/libmikktspace.a": "126b7bec428c029ca0ed1468dbb8c29fbf8e430899a37846cce5ec73ad4bb01e",
+          "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/release/libdome-sculpt-polygon.a": "9ac0337b2cff6c4d0908b47495e861937cdc98cb6fe94b10592225cb94fd2f47",
+          "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/release/libmikktspace-robust.a": "46d9dd03dc49d9346dee9f0a41bea5df89d721ac4dfcf5e1db594ce5f1814eaf",
+          "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/release/libdome-sculpt-emission-codec.a": "320e3c030161900f88088a1d12815f4ee32ead1d19b2c3e8e7bb125eaaa8b148",
+          "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/release/libdome-sculpt-core.a": "72f5be39475f5bae765ea76de84566467a25e7c49c1b9b1adfc034f9a715bf5b",
+          "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/release/libdome-sculpt-render.a": "ba58328b379cebc433e419133a32793188f4fec655fc74f2333a6f6d3f55ffee",
+          "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/release/libdome-sculpt-spacenav.a": "494cf5a6b4941d5f3b87ff2a5e5f4cf47b2d2009949704e69546ad406f3beccc",
+          "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/release/libdome-sculpt-xr.a": "4c6c02f2f30c57487974b012e8d8c71b6def274379e83d03b796368474621bc1"
+        },
+        "outputs": {
+          "/home/blux/de-xr/dome-sculpt/artifacts/rig-after-authoring-4a1dfc8/artifacts/rig-diagnostic/final-main/release/compile-new.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "/home/blux/de-xr/dome-sculpt/artifacts/rig-after-authoring-4a1dfc8/artifacts/rig-diagnostic/final-main/release/new.o.d": "171e420415662d8f4c2daf5ba4374202ea5b13f58dc863583ee83f6b86e2f4ab",
+          "/home/blux/de-xr/dome-sculpt/artifacts/rig-after-authoring-4a1dfc8/artifacts/rig-diagnostic/final-main/release/new.o": "055c2a7f1c8fe74440afacb54a69553d5e8754d92551b3333521ca8cba031548",
+          "/home/blux/de-xr/dome-sculpt/artifacts/rig-after-authoring-4a1dfc8/artifacts/rig-diagnostic/final-main/release/link-new.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "/home/blux/de-xr/dome-sculpt/artifacts/rig-after-authoring-4a1dfc8/artifacts/rig-diagnostic/final-main/release/new": "6a7d804cc3ece186408aa0f18854eb2b17bb4fa80932d56bf01c72dd29cd5344",
+          "/home/blux/de-xr/dome-sculpt/artifacts/rig-after-authoring-4a1dfc8/artifacts/rig-diagnostic/final-main/release/run-new.log": "15a2d19573307085c95266c050890714f2fadc3eecc96ea6b97c65cfc27c0575",
+          "/home/blux/de-xr/dome-sculpt/artifacts/rig-after-authoring-4a1dfc8/artifacts/rig-diagnostic/final-main/release/new-data/0/bound.dsculpt": "6e4f3562e9a9e04ddee95ed18b54fcdf97e72640d28852e9a690e52a571ebe87",
+          "/home/blux/de-xr/dome-sculpt/artifacts/rig-after-authoring-4a1dfc8/artifacts/rig-diagnostic/final-main/release/new-data/0/noop.dsculpt": "6e4f3562e9a9e04ddee95ed18b54fcdf97e72640d28852e9a690e52a571ebe87",
+          "/home/blux/de-xr/dome-sculpt/artifacts/rig-after-authoring-4a1dfc8/artifacts/rig-diagnostic/final-main/release/new-data/0/posed.dsculpt": "0807c3a404df8aada5f1338d8e65cdf6e4c3cfb480ee02d81774b94734bbb96d",
+          "/home/blux/de-xr/dome-sculpt/artifacts/rig-after-authoring-4a1dfc8/artifacts/rig-diagnostic/final-main/release/new-data/0/restored.dsculpt": "1f2e7dfe9b0e436c835165c310885466953459d2dfc2be5ec27605f64ea1f439",
+          "/home/blux/de-xr/dome-sculpt/artifacts/rig-after-authoring-4a1dfc8/artifacts/rig-diagnostic/final-main/release/new-data/1/bound.dsculpt": "834617af44c2395a4e8fc759aa1b0fb5273475be3eafa31ad1898fa1e3b8def7",
+          "/home/blux/de-xr/dome-sculpt/artifacts/rig-after-authoring-4a1dfc8/artifacts/rig-diagnostic/final-main/release/new-data/1/noop.dsculpt": "834617af44c2395a4e8fc759aa1b0fb5273475be3eafa31ad1898fa1e3b8def7",
+          "/home/blux/de-xr/dome-sculpt/artifacts/rig-after-authoring-4a1dfc8/artifacts/rig-diagnostic/final-main/release/new-data/1/posed.dsculpt": "0663f225a96b61fc419fda400802198a44029cab6530c624b0f9603df395a730",
+          "/home/blux/de-xr/dome-sculpt/artifacts/rig-after-authoring-4a1dfc8/artifacts/rig-diagnostic/final-main/release/new-data/1/restored.dsculpt": "b06e56edc2267fdeb7e818df2ea676a0bda6a8f9f75cce333b92d4aa962d1539",
+          "/home/blux/de-xr/dome-sculpt/artifacts/rig-after-authoring-4a1dfc8/artifacts/rig-diagnostic/final-main/release/new-data/2/bound.dsculpt": "3a09a4f97b00168e3cfa916b16291d6ffaa6b54e09f5b6499b0e4a9debc12ea1",
+          "/home/blux/de-xr/dome-sculpt/artifacts/rig-after-authoring-4a1dfc8/artifacts/rig-diagnostic/final-main/release/new-data/2/noop.dsculpt": "3a09a4f97b00168e3cfa916b16291d6ffaa6b54e09f5b6499b0e4a9debc12ea1",
+          "/home/blux/de-xr/dome-sculpt/artifacts/rig-after-authoring-4a1dfc8/artifacts/rig-diagnostic/final-main/release/new-data/2/posed.dsculpt": "13fb609e057ad6c23b5fcdcdfa7706312e928347e9a5a6affa583853ba91a77c",
+          "/home/blux/de-xr/dome-sculpt/artifacts/rig-after-authoring-4a1dfc8/artifacts/rig-diagnostic/final-main/release/new-data/2/restored.dsculpt": "95cac860991536271efaadb84f9dda43bc55a18b11d53702145eab474c708ed8",
+          "/home/blux/de-xr/dome-sculpt/artifacts/rig-after-authoring-4a1dfc8/artifacts/rig-diagnostic/final-main/release/new-data/3/bound.dsculpt": "7d153f7552cd6457d9b0cb37df4f1f12910ef14f1984baff0198f6033b29cea8",
+          "/home/blux/de-xr/dome-sculpt/artifacts/rig-after-authoring-4a1dfc8/artifacts/rig-diagnostic/final-main/release/new-data/3/noop.dsculpt": "7d153f7552cd6457d9b0cb37df4f1f12910ef14f1984baff0198f6033b29cea8",
+          "/home/blux/de-xr/dome-sculpt/artifacts/rig-after-authoring-4a1dfc8/artifacts/rig-diagnostic/final-main/release/new-data/3/posed.dsculpt": "d7ae9a7d487f9ad83a4d3fd4c790ce0761399522e09e49bbbff401dd15b7bf90",
+          "/home/blux/de-xr/dome-sculpt/artifacts/rig-after-authoring-4a1dfc8/artifacts/rig-diagnostic/final-main/release/new-data/3/restored.dsculpt": "0fed4de1715269e21ab85a4412d1c1d27fca6d007d66597c1a4614041f676b11",
+          "/home/blux/de-xr/dome-sculpt/artifacts/rig-after-authoring-4a1dfc8/artifacts/rig-diagnostic/final-main/release/new-data/4/bound.dsculpt": "cee028182be8a26b2fd1e0a7fedf7d0ca9e3239e0680857dc451a9c2c4e17d08",
+          "/home/blux/de-xr/dome-sculpt/artifacts/rig-after-authoring-4a1dfc8/artifacts/rig-diagnostic/final-main/release/new-data/4/noop.dsculpt": "cee028182be8a26b2fd1e0a7fedf7d0ca9e3239e0680857dc451a9c2c4e17d08",
+          "/home/blux/de-xr/dome-sculpt/artifacts/rig-after-authoring-4a1dfc8/artifacts/rig-diagnostic/final-main/release/new-data/4/posed.dsculpt": "12d19e5350e159ee4ae444020118239c5aec8d0c3a20c6d25510ba0eb4d6a608",
+          "/home/blux/de-xr/dome-sculpt/artifacts/rig-after-authoring-4a1dfc8/artifacts/rig-diagnostic/final-main/release/new-data/4/restored.dsculpt": "e953b6953d268fdbc2b68b9fb95858217eeaa30bf453bb201b09cf64f7bd1234",
+          "/home/blux/de-xr/dome-sculpt/artifacts/rig-after-authoring-4a1dfc8/artifacts/rig-diagnostic/final-main/release/new-data/5/bound.dsculpt": "26f9859571613dd20bf9e262b81415993f2a85cfd47edc56783e8ef06a85a8c8",
+          "/home/blux/de-xr/dome-sculpt/artifacts/rig-after-authoring-4a1dfc8/artifacts/rig-diagnostic/final-main/release/new-data/5/noop.dsculpt": "26f9859571613dd20bf9e262b81415993f2a85cfd47edc56783e8ef06a85a8c8",
+          "/home/blux/de-xr/dome-sculpt/artifacts/rig-after-authoring-4a1dfc8/artifacts/rig-diagnostic/final-main/release/new-data/5/posed.dsculpt": "05d94f1dfc6a105df9fef2b209179e7d13b73415b5db8942acddc60776c0667b",
+          "/home/blux/de-xr/dome-sculpt/artifacts/rig-after-authoring-4a1dfc8/artifacts/rig-diagnostic/final-main/release/new-data/5/restored.dsculpt": "662a1b70ef5a8cf5e790203b2739bd4f5b397428f489095413d8ca79668c18c7"
+        }
+      },
+      "worker": {
+        "state": "terminal",
+        "pid": 2828750,
+        "profile": "release",
+        "steps": [
+          {
+            "name": "compile",
+            "command": [
+              "/usr/bin/c++",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/rig-after-authoring-4a1dfc8/src",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/rig-after-authoring-4a1dfc8/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/rig-after-authoring-4a1dfc8/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/rig-after-authoring-4a1dfc8/third_party/nlohmann",
+              "-O3",
+              "-DNDEBUG",
+              "-std=gnu++20",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/rig-after-authoring-4a1dfc8/artifacts/rig-diagnostic/worker-release/worker.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/rig-after-authoring-4a1dfc8/tests/rig-after-authoring-worker.cpp",
+              "-MMD",
+              "-MF",
+              "/home/blux/de-xr/dome-sculpt/artifacts/rig-after-authoring-4a1dfc8/artifacts/rig-diagnostic/worker-release/worker.o.d"
+            ],
+            "exit": 0,
+            "seconds": 6.980459800048266
+          },
+          {
+            "name": "link",
+            "command": [
+              "/usr/bin/c++",
+              "-Wl,--wrap=_ZN4dome11author_skinERNS_5SceneEmRKNS_20SkinAuthoringOptionsERKSt8functionIFbvEE",
+              "-O3",
+              "-DNDEBUG",
+              "/home/blux/de-xr/dome-sculpt/artifacts/rig-after-authoring-4a1dfc8/artifacts/rig-diagnostic/worker-release/worker.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/rig-after-authoring-4a1dfc8/artifacts/rig-diagnostic/worker-release/worker",
+              "/home/blux/de-xr/dome-sculpt/artifacts/rig-after-authoring-4a1dfc8/artifacts/rig-diagnostic/release/libdome-sculpt-core.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/release/libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/release/libdome-sculpt-polygon.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/release/libxatlas.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/release/libmikktspace.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/release/libmikktspace-robust.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/release/libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/release/libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit": 0,
+            "seconds": 0.5668827740009874
+          },
+          {
+            "name": "actual-worker",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/rig-after-authoring-4a1dfc8/artifacts/rig-diagnostic/worker-release/worker",
+              "/home/blux/de-xr/dome-sculpt/artifacts/rig-after-authoring-4a1dfc8/artifacts/rig-diagnostic/worker-release/data"
+            ],
+            "exit": 0,
+            "seconds": 0.41517113998997957
+          }
+        ],
+        "phase": "actual-worker",
+        "child": 2829588,
+        "exit": 0,
+        "seconds": 8.00466066703666,
+        "drift": [],
+        "inputs": 2098
+      },
+      "matched_support": {
+        "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/release/libdome-sculpt-affine.a": "b9a8bb64084a5dee888837118d269129f5ab0c03bd5ee11881d9fda9e48e0d9b",
+        "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/release/libxatlas.a": "e39575bd59fbadec722f0a7c0ddd5c171f913c99ffaa5ef67b1a0b588972834f",
+        "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/release/libufbx.a": "a3498b5cae7ff7298cad646f68ff74776c3a22682316c5ba013df046e9e5acf5",
+        "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/release/libmikktspace.a": "126b7bec428c029ca0ed1468dbb8c29fbf8e430899a37846cce5ec73ad4bb01e",
+        "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/release/libdome-sculpt-polygon.a": "9ac0337b2cff6c4d0908b47495e861937cdc98cb6fe94b10592225cb94fd2f47",
+        "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/release/libmikktspace-robust.a": "46d9dd03dc49d9346dee9f0a41bea5df89d721ac4dfcf5e1db594ce5f1814eaf",
+        "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/release/libdome-sculpt-emission-codec.a": "320e3c030161900f88088a1d12815f4ee32ead1d19b2c3e8e7bb125eaaa8b148",
+        "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/release/libdome-sculpt-core.a": "72f5be39475f5bae765ea76de84566467a25e7c49c1b9b1adfc034f9a715bf5b",
+        "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/release/libdome-sculpt-render.a": "ba58328b379cebc433e419133a32793188f4fec655fc74f2333a6f6d3f55ffee",
+        "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/release/libdome-sculpt-spacenav.a": "494cf5a6b4941d5f3b87ff2a5e5f4cf47b2d2009949704e69546ad406f3beccc",
+        "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/release/libdome-sculpt-xr.a": "4c6c02f2f30c57487974b012e8d8c71b6def274379e83d03b796368474621bc1"
+      },
+      "core_original": "72f5be39475f5bae765ea76de84566467a25e7c49c1b9b1adfc034f9a715bf5b",
+      "core_repaired": "c4b04530b0350857d3e81773b9c3711db4cb4edea3e99d4e5acf2125605e38e6",
+      "core_members": 157,
+      "changed_core_members": [
+        "skin-authoring.cpp.o"
+      ],
+      "legacy_skin_checks": 36,
+      "legacy_affine_checks": 136,
+      "legacy_unskinned_checks": 37,
+      "legacy_source_setup_failure_preserved": true,
+      "small_fixture_helper_denied_prefixes": [
+        203,
+        261
+      ],
+      "no_exhaustive_caller_publication_or_large_helper_claim": true
+    },
+    "sanitize": {
+      "final_main": {
+        "steps": [
+          {
+            "name": "compile-new",
+            "command": [
+              "/usr/bin/c++",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/rig-after-authoring-4a1dfc8/src",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/rig-after-authoring-4a1dfc8/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/rig-after-authoring-4a1dfc8/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/rig-after-authoring-4a1dfc8/third_party/nlohmann",
+              "-O1",
+              "-g1",
+              "-DNDEBUG",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "-std=gnu++20",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/rig-after-authoring-4a1dfc8/artifacts/rig-diagnostic/final-main/sanitize/new.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/rig-after-authoring-4a1dfc8/tests/rig-after-authoring.cpp",
+              "-MMD",
+              "-MF",
+              "/home/blux/de-xr/dome-sculpt/artifacts/rig-after-authoring-4a1dfc8/artifacts/rig-diagnostic/final-main/sanitize/new.o.d"
+            ],
+            "exit": 0,
+            "seconds": 11.493507498991676
+          },
+          {
+            "name": "link-new",
+            "command": [
+              "/usr/bin/c++",
+              "-O1",
+              "-g1",
+              "-DNDEBUG",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "/home/blux/de-xr/dome-sculpt/artifacts/rig-after-authoring-4a1dfc8/artifacts/rig-diagnostic/final-main/sanitize/new.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/rig-after-authoring-4a1dfc8/artifacts/rig-diagnostic/final-main/sanitize/new",
+              "/home/blux/de-xr/dome-sculpt/artifacts/rig-after-authoring-4a1dfc8/artifacts/rig-diagnostic/sanitize/libdome-sculpt-core.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/sanitize/libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/sanitize/libdome-sculpt-polygon.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/sanitize/libxatlas.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/sanitize/libmikktspace.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/sanitize/libmikktspace-robust.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/sanitize/libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/sanitize/libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit": 0,
+            "seconds": 3.1752619660110213
+          },
+          {
+            "name": "run-new",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/rig-after-authoring-4a1dfc8/artifacts/rig-diagnostic/final-main/sanitize/new",
+              "/home/blux/de-xr/dome-sculpt/artifacts/rig-after-authoring-4a1dfc8/artifacts/rig-diagnostic/final-main/sanitize/new-data"
+            ],
+            "exit": 0,
+            "seconds": 1.8181918939808384
+          }
+        ],
+        "drift": [],
+        "inputs": {
+          "/home/blux/de-xr/dome-sculpt/artifacts/rig-after-authoring-4a1dfc8/tests/rig-after-authoring.cpp": "ca090c21e7574719587ec7ea4ebd70f48fd3ab9678d0b7d62cd7fb2bf61c2177",
+          "/home/blux/de-xr/dome-sculpt/artifacts/rig-after-authoring-4a1dfc8/src/skin-authoring.cpp": "e8fa2076862c843d44bbff145969f4fafd92a037cc7c0b6e5934d7397fe3abfb",
+          "/home/blux/de-xr/dome-sculpt/artifacts/rig-after-authoring-4a1dfc8/artifacts/rig-diagnostic/sanitize/libdome-sculpt-core.a": "64e6820153a57252ad0239eade6bfd1d1a9649c2ac69dc43594577f969b2dc49",
+          "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/sanitize/libdome-sculpt-affine.a": "fb434accb2351cfae2d5052becd9e0228aac4e9924913d9cdaa18b257637c1ff",
+          "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/sanitize/libxatlas.a": "2ac2970978df2b04026e5217a276554e64af4018b86cb27ad7670da674271367",
+          "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/sanitize/libufbx.a": "696cf1db333459b75f4041dc5cd109c96f8f2c4e45e97f044b789e8d01d4519e",
+          "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/sanitize/libmikktspace.a": "9f5c86659ab50f29fd3356bbc1a1c98610d6a6939a338d38fb2a81ee959af33b",
+          "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/sanitize/libmikktspace-robust.a": "bda3e6591b43b1eac7e1b15283c79fbf4a2d65f61658d35e6dda0d0243e68615",
+          "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/sanitize/libdome-sculpt-polygon.a": "68f90f4dd36fbaf7d5b8648a1fc5fdcedd11c431fc73fb912d9fdfeafd1a429d",
+          "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/sanitize/libdome-sculpt-emission-codec.a": "859c1ea125e4919150b3cbfe5c5d582c840b7c5beb5b8e083d05aa882fc61ac2",
+          "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/sanitize/libdome-sculpt-spacenav.a": "43c45b02dbfcb5ef96c5f5aa33e7a141044ff2cf5f2347219c896a201414c73c",
+          "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/sanitize/libdome-sculpt-core.a": "08ba662ff8c50164dc8fce3f3d8f7069972bce8f6b1d62796b9f53d2871625ef",
+          "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/sanitize/libdome-sculpt-render.a": "1fd941fe1433abed423f31eb351ec0eea30f9935f98420956008c4024190078c",
+          "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/sanitize/libdome-sculpt-xr.a": "a1163d3b762955509eaded99322c451b05dd492ee625931b5de2a2a89910417b"
+        },
+        "outputs": {
+          "/home/blux/de-xr/dome-sculpt/artifacts/rig-after-authoring-4a1dfc8/artifacts/rig-diagnostic/final-main/sanitize/compile-new.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "/home/blux/de-xr/dome-sculpt/artifacts/rig-after-authoring-4a1dfc8/artifacts/rig-diagnostic/final-main/sanitize/new.o.d": "838f467a4a1fb2cb820a4b1bedc091a51ab86c26ef7b40f27cc039d61c764b33",
+          "/home/blux/de-xr/dome-sculpt/artifacts/rig-after-authoring-4a1dfc8/artifacts/rig-diagnostic/final-main/sanitize/new.o": "8b8f8ca4124e7f7ae6047ef201dd47eea3d4b4bb497f70c7ae55a9a3ffa99c92",
+          "/home/blux/de-xr/dome-sculpt/artifacts/rig-after-authoring-4a1dfc8/artifacts/rig-diagnostic/final-main/sanitize/link-new.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "/home/blux/de-xr/dome-sculpt/artifacts/rig-after-authoring-4a1dfc8/artifacts/rig-diagnostic/final-main/sanitize/new": "0e9211310241ed154893ae58c24f02f757238fcafc7b9671a1ebcc8545eeb280",
+          "/home/blux/de-xr/dome-sculpt/artifacts/rig-after-authoring-4a1dfc8/artifacts/rig-diagnostic/final-main/sanitize/run-new.log": "15a2d19573307085c95266c050890714f2fadc3eecc96ea6b97c65cfc27c0575",
+          "/home/blux/de-xr/dome-sculpt/artifacts/rig-after-authoring-4a1dfc8/artifacts/rig-diagnostic/final-main/sanitize/new-data/0/bound.dsculpt": "6e4f3562e9a9e04ddee95ed18b54fcdf97e72640d28852e9a690e52a571ebe87",
+          "/home/blux/de-xr/dome-sculpt/artifacts/rig-after-authoring-4a1dfc8/artifacts/rig-diagnostic/final-main/sanitize/new-data/0/noop.dsculpt": "6e4f3562e9a9e04ddee95ed18b54fcdf97e72640d28852e9a690e52a571ebe87",
+          "/home/blux/de-xr/dome-sculpt/artifacts/rig-after-authoring-4a1dfc8/artifacts/rig-diagnostic/final-main/sanitize/new-data/0/posed.dsculpt": "0807c3a404df8aada5f1338d8e65cdf6e4c3cfb480ee02d81774b94734bbb96d",
+          "/home/blux/de-xr/dome-sculpt/artifacts/rig-after-authoring-4a1dfc8/artifacts/rig-diagnostic/final-main/sanitize/new-data/0/restored.dsculpt": "1f2e7dfe9b0e436c835165c310885466953459d2dfc2be5ec27605f64ea1f439",
+          "/home/blux/de-xr/dome-sculpt/artifacts/rig-after-authoring-4a1dfc8/artifacts/rig-diagnostic/final-main/sanitize/new-data/1/bound.dsculpt": "834617af44c2395a4e8fc759aa1b0fb5273475be3eafa31ad1898fa1e3b8def7",
+          "/home/blux/de-xr/dome-sculpt/artifacts/rig-after-authoring-4a1dfc8/artifacts/rig-diagnostic/final-main/sanitize/new-data/1/noop.dsculpt": "834617af44c2395a4e8fc759aa1b0fb5273475be3eafa31ad1898fa1e3b8def7",
+          "/home/blux/de-xr/dome-sculpt/artifacts/rig-after-authoring-4a1dfc8/artifacts/rig-diagnostic/final-main/sanitize/new-data/1/posed.dsculpt": "0663f225a96b61fc419fda400802198a44029cab6530c624b0f9603df395a730",
+          "/home/blux/de-xr/dome-sculpt/artifacts/rig-after-authoring-4a1dfc8/artifacts/rig-diagnostic/final-main/sanitize/new-data/1/restored.dsculpt": "b06e56edc2267fdeb7e818df2ea676a0bda6a8f9f75cce333b92d4aa962d1539",
+          "/home/blux/de-xr/dome-sculpt/artifacts/rig-after-authoring-4a1dfc8/artifacts/rig-diagnostic/final-main/sanitize/new-data/2/bound.dsculpt": "3a09a4f97b00168e3cfa916b16291d6ffaa6b54e09f5b6499b0e4a9debc12ea1",
+          "/home/blux/de-xr/dome-sculpt/artifacts/rig-after-authoring-4a1dfc8/artifacts/rig-diagnostic/final-main/sanitize/new-data/2/noop.dsculpt": "3a09a4f97b00168e3cfa916b16291d6ffaa6b54e09f5b6499b0e4a9debc12ea1",
+          "/home/blux/de-xr/dome-sculpt/artifacts/rig-after-authoring-4a1dfc8/artifacts/rig-diagnostic/final-main/sanitize/new-data/2/posed.dsculpt": "13fb609e057ad6c23b5fcdcdfa7706312e928347e9a5a6affa583853ba91a77c",
+          "/home/blux/de-xr/dome-sculpt/artifacts/rig-after-authoring-4a1dfc8/artifacts/rig-diagnostic/final-main/sanitize/new-data/2/restored.dsculpt": "95cac860991536271efaadb84f9dda43bc55a18b11d53702145eab474c708ed8",
+          "/home/blux/de-xr/dome-sculpt/artifacts/rig-after-authoring-4a1dfc8/artifacts/rig-diagnostic/final-main/sanitize/new-data/3/bound.dsculpt": "7d153f7552cd6457d9b0cb37df4f1f12910ef14f1984baff0198f6033b29cea8",
+          "/home/blux/de-xr/dome-sculpt/artifacts/rig-after-authoring-4a1dfc8/artifacts/rig-diagnostic/final-main/sanitize/new-data/3/noop.dsculpt": "7d153f7552cd6457d9b0cb37df4f1f12910ef14f1984baff0198f6033b29cea8",
+          "/home/blux/de-xr/dome-sculpt/artifacts/rig-after-authoring-4a1dfc8/artifacts/rig-diagnostic/final-main/sanitize/new-data/3/posed.dsculpt": "d7ae9a7d487f9ad83a4d3fd4c790ce0761399522e09e49bbbff401dd15b7bf90",
+          "/home/blux/de-xr/dome-sculpt/artifacts/rig-after-authoring-4a1dfc8/artifacts/rig-diagnostic/final-main/sanitize/new-data/3/restored.dsculpt": "0fed4de1715269e21ab85a4412d1c1d27fca6d007d66597c1a4614041f676b11",
+          "/home/blux/de-xr/dome-sculpt/artifacts/rig-after-authoring-4a1dfc8/artifacts/rig-diagnostic/final-main/sanitize/new-data/4/bound.dsculpt": "cee028182be8a26b2fd1e0a7fedf7d0ca9e3239e0680857dc451a9c2c4e17d08",
+          "/home/blux/de-xr/dome-sculpt/artifacts/rig-after-authoring-4a1dfc8/artifacts/rig-diagnostic/final-main/sanitize/new-data/4/noop.dsculpt": "cee028182be8a26b2fd1e0a7fedf7d0ca9e3239e0680857dc451a9c2c4e17d08",
+          "/home/blux/de-xr/dome-sculpt/artifacts/rig-after-authoring-4a1dfc8/artifacts/rig-diagnostic/final-main/sanitize/new-data/4/posed.dsculpt": "12d19e5350e159ee4ae444020118239c5aec8d0c3a20c6d25510ba0eb4d6a608",
+          "/home/blux/de-xr/dome-sculpt/artifacts/rig-after-authoring-4a1dfc8/artifacts/rig-diagnostic/final-main/sanitize/new-data/4/restored.dsculpt": "e953b6953d268fdbc2b68b9fb95858217eeaa30bf453bb201b09cf64f7bd1234",
+          "/home/blux/de-xr/dome-sculpt/artifacts/rig-after-authoring-4a1dfc8/artifacts/rig-diagnostic/final-main/sanitize/new-data/5/bound.dsculpt": "26f9859571613dd20bf9e262b81415993f2a85cfd47edc56783e8ef06a85a8c8",
+          "/home/blux/de-xr/dome-sculpt/artifacts/rig-after-authoring-4a1dfc8/artifacts/rig-diagnostic/final-main/sanitize/new-data/5/noop.dsculpt": "26f9859571613dd20bf9e262b81415993f2a85cfd47edc56783e8ef06a85a8c8",
+          "/home/blux/de-xr/dome-sculpt/artifacts/rig-after-authoring-4a1dfc8/artifacts/rig-diagnostic/final-main/sanitize/new-data/5/posed.dsculpt": "05d94f1dfc6a105df9fef2b209179e7d13b73415b5db8942acddc60776c0667b",
+          "/home/blux/de-xr/dome-sculpt/artifacts/rig-after-authoring-4a1dfc8/artifacts/rig-diagnostic/final-main/sanitize/new-data/5/restored.dsculpt": "662a1b70ef5a8cf5e790203b2739bd4f5b397428f489095413d8ca79668c18c7"
+        }
+      },
+      "worker": {
+        "state": "terminal",
+        "pid": 2829422,
+        "profile": "sanitize",
+        "steps": [
+          {
+            "name": "compile",
+            "command": [
+              "/usr/bin/c++",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/rig-after-authoring-4a1dfc8/src",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/rig-after-authoring-4a1dfc8/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/rig-after-authoring-4a1dfc8/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/rig-after-authoring-4a1dfc8/third_party/nlohmann",
+              "-O1",
+              "-g1",
+              "-DNDEBUG",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "-std=gnu++20",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/rig-after-authoring-4a1dfc8/artifacts/rig-diagnostic/worker-sanitize/worker.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/rig-after-authoring-4a1dfc8/tests/rig-after-authoring-worker.cpp",
+              "-MMD",
+              "-MF",
+              "/home/blux/de-xr/dome-sculpt/artifacts/rig-after-authoring-4a1dfc8/artifacts/rig-diagnostic/worker-sanitize/worker.o.d"
+            ],
+            "exit": 0,
+            "seconds": 10.690885191957932
+          },
+          {
+            "name": "link",
+            "command": [
+              "/usr/bin/c++",
+              "-Wl,--wrap=_ZN4dome11author_skinERNS_5SceneEmRKNS_20SkinAuthoringOptionsERKSt8functionIFbvEE",
+              "-O1",
+              "-g1",
+              "-DNDEBUG",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "/home/blux/de-xr/dome-sculpt/artifacts/rig-after-authoring-4a1dfc8/artifacts/rig-diagnostic/worker-sanitize/worker.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/rig-after-authoring-4a1dfc8/artifacts/rig-diagnostic/worker-sanitize/worker",
+              "/home/blux/de-xr/dome-sculpt/artifacts/rig-after-authoring-4a1dfc8/artifacts/rig-diagnostic/sanitize/libdome-sculpt-core.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/sanitize/libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/sanitize/libdome-sculpt-polygon.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/sanitize/libxatlas.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/sanitize/libmikktspace.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/sanitize/libmikktspace-robust.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/sanitize/libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/sanitize/libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit": 0,
+            "seconds": 2.821263089950662
+          },
+          {
+            "name": "actual-worker",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/rig-after-authoring-4a1dfc8/artifacts/rig-diagnostic/worker-sanitize/worker",
+              "/home/blux/de-xr/dome-sculpt/artifacts/rig-after-authoring-4a1dfc8/artifacts/rig-diagnostic/worker-sanitize/data"
+            ],
+            "exit": 0,
+            "seconds": 8.684201430995017
+          }
+        ],
+        "phase": "actual-worker",
+        "child": 2830979,
+        "exit": 0,
+        "seconds": 22.232496567012277,
+        "drift": [],
+        "inputs": 2098
+      },
+      "matched_support": {
+        "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/sanitize/libdome-sculpt-affine.a": "fb434accb2351cfae2d5052becd9e0228aac4e9924913d9cdaa18b257637c1ff",
+        "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/sanitize/libxatlas.a": "2ac2970978df2b04026e5217a276554e64af4018b86cb27ad7670da674271367",
+        "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/sanitize/libufbx.a": "696cf1db333459b75f4041dc5cd109c96f8f2c4e45e97f044b789e8d01d4519e",
+        "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/sanitize/libmikktspace.a": "9f5c86659ab50f29fd3356bbc1a1c98610d6a6939a338d38fb2a81ee959af33b",
+        "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/sanitize/libmikktspace-robust.a": "bda3e6591b43b1eac7e1b15283c79fbf4a2d65f61658d35e6dda0d0243e68615",
+        "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/sanitize/libdome-sculpt-polygon.a": "68f90f4dd36fbaf7d5b8648a1fc5fdcedd11c431fc73fb912d9fdfeafd1a429d",
+        "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/sanitize/libdome-sculpt-emission-codec.a": "859c1ea125e4919150b3cbfe5c5d582c840b7c5beb5b8e083d05aa882fc61ac2",
+        "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/sanitize/libdome-sculpt-spacenav.a": "43c45b02dbfcb5ef96c5f5aa33e7a141044ff2cf5f2347219c896a201414c73c",
+        "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/sanitize/libdome-sculpt-core.a": "08ba662ff8c50164dc8fce3f3d8f7069972bce8f6b1d62796b9f53d2871625ef",
+        "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/sanitize/libdome-sculpt-render.a": "1fd941fe1433abed423f31eb351ec0eea30f9935f98420956008c4024190078c",
+        "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/sanitize/libdome-sculpt-xr.a": "a1163d3b762955509eaded99322c451b05dd492ee625931b5de2a2a89910417b"
+      },
+      "core_original": "08ba662ff8c50164dc8fce3f3d8f7069972bce8f6b1d62796b9f53d2871625ef",
+      "core_repaired": "64e6820153a57252ad0239eade6bfd1d1a9649c2ac69dc43594577f969b2dc49",
+      "core_members": 157,
+      "changed_core_members": [
+        "skin-authoring.cpp.o"
+      ],
+      "legacy_skin_checks": 36,
+      "legacy_affine_checks": 136,
+      "legacy_unskinned_checks": 37,
+      "legacy_source_setup_failure_preserved": true,
+      "small_fixture_helper_denied_prefixes": [
+        203,
+        261
+      ],
+      "no_exhaustive_caller_publication_or_large_helper_claim": true
+    }
+  },
+  "native_pairs": [
+    {
+      "release": "artifacts/rig-diagnostic/final-main/release/new-data/0/bound.dsculpt",
+      "sanitize": "artifacts/rig-diagnostic/final-main/sanitize/new-data/0/bound.dsculpt",
+      "sha256": "6e4f3562e9a9e04ddee95ed18b54fcdf97e72640d28852e9a690e52a571ebe87"
+    },
+    {
+      "release": "artifacts/rig-diagnostic/final-main/release/new-data/0/noop.dsculpt",
+      "sanitize": "artifacts/rig-diagnostic/final-main/sanitize/new-data/0/noop.dsculpt",
+      "sha256": "6e4f3562e9a9e04ddee95ed18b54fcdf97e72640d28852e9a690e52a571ebe87"
+    },
+    {
+      "release": "artifacts/rig-diagnostic/final-main/release/new-data/0/posed.dsculpt",
+      "sanitize": "artifacts/rig-diagnostic/final-main/sanitize/new-data/0/posed.dsculpt",
+      "sha256": "0807c3a404df8aada5f1338d8e65cdf6e4c3cfb480ee02d81774b94734bbb96d"
+    },
+    {
+      "release": "artifacts/rig-diagnostic/final-main/release/new-data/0/restored.dsculpt",
+      "sanitize": "artifacts/rig-diagnostic/final-main/sanitize/new-data/0/restored.dsculpt",
+      "sha256": "1f2e7dfe9b0e436c835165c310885466953459d2dfc2be5ec27605f64ea1f439"
+    },
+    {
+      "release": "artifacts/rig-diagnostic/final-main/release/new-data/1/bound.dsculpt",
+      "sanitize": "artifacts/rig-diagnostic/final-main/sanitize/new-data/1/bound.dsculpt",
+      "sha256": "834617af44c2395a4e8fc759aa1b0fb5273475be3eafa31ad1898fa1e3b8def7"
+    },
+    {
+      "release": "artifacts/rig-diagnostic/final-main/release/new-data/1/noop.dsculpt",
+      "sanitize": "artifacts/rig-diagnostic/final-main/sanitize/new-data/1/noop.dsculpt",
+      "sha256": "834617af44c2395a4e8fc759aa1b0fb5273475be3eafa31ad1898fa1e3b8def7"
+    },
+    {
+      "release": "artifacts/rig-diagnostic/final-main/release/new-data/1/posed.dsculpt",
+      "sanitize": "artifacts/rig-diagnostic/final-main/sanitize/new-data/1/posed.dsculpt",
+      "sha256": "0663f225a96b61fc419fda400802198a44029cab6530c624b0f9603df395a730"
+    },
+    {
+      "release": "artifacts/rig-diagnostic/final-main/release/new-data/1/restored.dsculpt",
+      "sanitize": "artifacts/rig-diagnostic/final-main/sanitize/new-data/1/restored.dsculpt",
+      "sha256": "b06e56edc2267fdeb7e818df2ea676a0bda6a8f9f75cce333b92d4aa962d1539"
+    },
+    {
+      "release": "artifacts/rig-diagnostic/final-main/release/new-data/2/bound.dsculpt",
+      "sanitize": "artifacts/rig-diagnostic/final-main/sanitize/new-data/2/bound.dsculpt",
+      "sha256": "3a09a4f97b00168e3cfa916b16291d6ffaa6b54e09f5b6499b0e4a9debc12ea1"
+    },
+    {
+      "release": "artifacts/rig-diagnostic/final-main/release/new-data/2/noop.dsculpt",
+      "sanitize": "artifacts/rig-diagnostic/final-main/sanitize/new-data/2/noop.dsculpt",
+      "sha256": "3a09a4f97b00168e3cfa916b16291d6ffaa6b54e09f5b6499b0e4a9debc12ea1"
+    },
+    {
+      "release": "artifacts/rig-diagnostic/final-main/release/new-data/2/posed.dsculpt",
+      "sanitize": "artifacts/rig-diagnostic/final-main/sanitize/new-data/2/posed.dsculpt",
+      "sha256": "13fb609e057ad6c23b5fcdcdfa7706312e928347e9a5a6affa583853ba91a77c"
+    },
+    {
+      "release": "artifacts/rig-diagnostic/final-main/release/new-data/2/restored.dsculpt",
+      "sanitize": "artifacts/rig-diagnostic/final-main/sanitize/new-data/2/restored.dsculpt",
+      "sha256": "95cac860991536271efaadb84f9dda43bc55a18b11d53702145eab474c708ed8"
+    },
+    {
+      "release": "artifacts/rig-diagnostic/final-main/release/new-data/3/bound.dsculpt",
+      "sanitize": "artifacts/rig-diagnostic/final-main/sanitize/new-data/3/bound.dsculpt",
+      "sha256": "7d153f7552cd6457d9b0cb37df4f1f12910ef14f1984baff0198f6033b29cea8"
+    },
+    {
+      "release": "artifacts/rig-diagnostic/final-main/release/new-data/3/noop.dsculpt",
+      "sanitize": "artifacts/rig-diagnostic/final-main/sanitize/new-data/3/noop.dsculpt",
+      "sha256": "7d153f7552cd6457d9b0cb37df4f1f12910ef14f1984baff0198f6033b29cea8"
+    },
+    {
+      "release": "artifacts/rig-diagnostic/final-main/release/new-data/3/posed.dsculpt",
+      "sanitize": "artifacts/rig-diagnostic/final-main/sanitize/new-data/3/posed.dsculpt",
+      "sha256": "d7ae9a7d487f9ad83a4d3fd4c790ce0761399522e09e49bbbff401dd15b7bf90"
+    },
+    {
+      "release": "artifacts/rig-diagnostic/final-main/release/new-data/3/restored.dsculpt",
+      "sanitize": "artifacts/rig-diagnostic/final-main/sanitize/new-data/3/restored.dsculpt",
+      "sha256": "0fed4de1715269e21ab85a4412d1c1d27fca6d007d66597c1a4614041f676b11"
+    },
+    {
+      "release": "artifacts/rig-diagnostic/final-main/release/new-data/4/bound.dsculpt",
+      "sanitize": "artifacts/rig-diagnostic/final-main/sanitize/new-data/4/bound.dsculpt",
+      "sha256": "cee028182be8a26b2fd1e0a7fedf7d0ca9e3239e0680857dc451a9c2c4e17d08"
+    },
+    {
+      "release": "artifacts/rig-diagnostic/final-main/release/new-data/4/noop.dsculpt",
+      "sanitize": "artifacts/rig-diagnostic/final-main/sanitize/new-data/4/noop.dsculpt",
+      "sha256": "cee028182be8a26b2fd1e0a7fedf7d0ca9e3239e0680857dc451a9c2c4e17d08"
+    },
+    {
+      "release": "artifacts/rig-diagnostic/final-main/release/new-data/4/posed.dsculpt",
+      "sanitize": "artifacts/rig-diagnostic/final-main/sanitize/new-data/4/posed.dsculpt",
+      "sha256": "12d19e5350e159ee4ae444020118239c5aec8d0c3a20c6d25510ba0eb4d6a608"
+    },
+    {
+      "release": "artifacts/rig-diagnostic/final-main/release/new-data/4/restored.dsculpt",
+      "sanitize": "artifacts/rig-diagnostic/final-main/sanitize/new-data/4/restored.dsculpt",
+      "sha256": "e953b6953d268fdbc2b68b9fb95858217eeaa30bf453bb201b09cf64f7bd1234"
+    },
+    {
+      "release": "artifacts/rig-diagnostic/final-main/release/new-data/5/bound.dsculpt",
+      "sanitize": "artifacts/rig-diagnostic/final-main/sanitize/new-data/5/bound.dsculpt",
+      "sha256": "26f9859571613dd20bf9e262b81415993f2a85cfd47edc56783e8ef06a85a8c8"
+    },
+    {
+      "release": "artifacts/rig-diagnostic/final-main/release/new-data/5/noop.dsculpt",
+      "sanitize": "artifacts/rig-diagnostic/final-main/sanitize/new-data/5/noop.dsculpt",
+      "sha256": "26f9859571613dd20bf9e262b81415993f2a85cfd47edc56783e8ef06a85a8c8"
+    },
+    {
+      "release": "artifacts/rig-diagnostic/final-main/release/new-data/5/posed.dsculpt",
+      "sanitize": "artifacts/rig-diagnostic/final-main/sanitize/new-data/5/posed.dsculpt",
+      "sha256": "05d94f1dfc6a105df9fef2b209179e7d13b73415b5db8942acddc60776c0667b"
+    },
+    {
+      "release": "artifacts/rig-diagnostic/final-main/release/new-data/5/restored.dsculpt",
+      "sanitize": "artifacts/rig-diagnostic/final-main/sanitize/new-data/5/restored.dsculpt",
+      "sha256": "662a1b70ef5a8cf5e790203b2739bd4f5b397428f489095413d8ca79668c18c7"
+    }
+  ],
+  "remaining": [
+    "native32 post-bind UV worker refuses until actual remap adapter",
+    "native32 post-bind key capture refuses incompatible coordinate origin",
+    "desktop/controller proof not run",
+    "native32 skin export separately parent-owned; morph shading guarded",
+    "general robust automatic weights/native/prepared/relative-affine domains incomplete"
+  ]
+}
