@@ -113,7 +113,11 @@ int main(int argc,char **argv)try{
    "Public conversion is one exact Undo/Redo transaction including historical data and bake recipes");
  doc.replace(before);settled(doc);Driver driver(doc);driver.open();driver.sector(0);
  require_cage(doc.frame().state->controls.parameter==VrParameter::BakeSource,"Actual controller reaches the existing source/cage panel");
- driver.ray(.5f,492.f/640);settled(doc);
+ const auto panel=doc.frame().state->panel;auto &hand=driver.f.hands[1];hand.tracked.aimValid=true;
+ hand.tracked.aim.position=ob::transform(panel,{0,(.5f-492.f/640)*.6f,.25f});hand.tracked.aim.orientation=panel.orientation;
+ // Keep the physical trigger held across worker publication. Driver::ray
+ // releases it and would make the later sample a legitimate new paint press.
+ driver.send(0,0,false,.8f);settled(doc);
  require_cage(doc.frame().state->controls.parameter==VrParameter::None&&doc.copy_scene().encode()==accepted,
    "Direct controller conversion uses the same native worker and closes its staged source controls");
  const auto controller=doc.copy_scene().encode();driver.send(0,0,false,.8f);driver.send(0,0,false,.8f);driver.send();settled(doc);
