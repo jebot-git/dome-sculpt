@@ -1,8 +1,21 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-#define main established_physical_foundation
-#include "source-paint-physical-authoring.cpp"
+#define main existing_mtoon_fixture
+#include "mtoon-render.cpp"
 #undef main
+#include "dome/native-authoring.hpp"
+#include "dome/scene-file.hpp"
+#include "source-color-consumer.hpp"
+#include "source-paint-bake-fixtures.hpp"
+#include <fstream>
 namespace {
+std::vector<uint8_t> file(const std::filesystem::path &p){std::ifstream f(p,std::ios::binary);return {std::istreambuf_iterator<char>(f),{}};}
+void physical_ink(Scene &scene) {
+  auto &o=scene.active();o.painted=o.painted->snapshot();auto &paint=*o.painted;
+  paint.add_layer("Actual physical raw-HDR overlay");PaintSettings settings;settings.front_only=false;settings.channel=PaintChannel::Emission;settings.emission_units=PaintEmissionUnits::Physical;settings.emission={12,.005f,3};
+  Brush b;b.from=b.to={-.02f,.015f,0};b.normal={0,0,1};b.radius=.19f;b.strength=.73f;paint.begin_stroke();paint.stamp(b,settings);check(paint.end_stroke(),"Raw-HDR source receives actual physical float paint");paint.layer_properties("Actual physical raw-HDR overlay",true,.63f);
+  settings.channel=PaintChannel::Mask;settings.mask=.4f;b.from=b.to={.07f,.01f,0};b.radius=.1f;paint.begin_stroke();paint.stamp(b,settings);check(paint.end_stroke(),"Raw-HDR float overlay uses actual editable layer mask");
+  paint.add_layer("Hidden physical raw-HDR overlay");settings.channel=PaintChannel::Emission;settings.emission={10000,10000,10000};paint.begin_stroke();paint.stamp(b,settings);paint.end_stroke();paint.layer_properties("Hidden physical raw-HDR overlay",false,1);
+}
 void imported_endpoint(Document &d) {
   if(!d.wait_asset()||!d.wait_mesh()||!d.frame().state->error.empty())
     throw std::runtime_error("Raw HDR native worker: "+d.frame().state->error);
@@ -61,7 +74,7 @@ int main(int argc,char **argv)try {
       const auto second=out/("second"+std::to_string(kind)+"-"+std::to_string(phase)+".glb");reopened.export_asset(second,AssetExportFormat::EditableGlb256).get();check(file(second)==captured,"Raw-HDR native recovery and second portable cycle are byte-identical");
     }
   }
-  {const auto path=out/"raw0.glb";const auto before=initial.encode(),raw=file(path);size_t polls=0;auto counted=options;counted.limits.cancelled=[&]{++polls;return false;};prepare_authoring_import(initial,path,counted);
+  {const auto path=out/"raw0.glb";const auto before=initial.encode();const auto raw=file(path);size_t polls=0;auto counted=options;counted.limits.cancelled=[&]{++polls;return false;};prepare_authoring_import(initial,path,counted);
     for(size_t at:{size_t(1),polls/4,polls/2,polls*3/4,polls-1}){size_t calls=0;auto cancel=options;cancel.limits.cancelled=[&]{return ++calls>=at;};bool refused=false;try{prepare_authoring_import(initial,path,cancel);}catch(const std::exception&e){refused=std::string_view(e.what()).find("cancelled")!=std::string_view::npos;}check(refused&&initial.encode()==before&&file(path)==raw,"Raw-HDR capture/parse/frame/atlas cancellation preserves caller and original file");}}
   {auto source=raw_hdr(0);source.j["materials"][0]["extensions"]["KHR_materials_emissive_strength"]["emissiveStrength"]=10001;const auto path=out/"over-native-bound.glb";source.save(path);const auto before=initial.encode();bool refused=false;try{prepare_authoring_import(initial,path,options);}catch(const std::invalid_argument&){refused=true;}check(refused&&initial.encode()==before&&file(path)==source.bytes(),"Raw-HDR initial adoption retains the existing native radiance bound and exact rollback");}
   std::cout<<"PASS "<<checks<<" raw HDR initial-adoption checks\n";return 0;
