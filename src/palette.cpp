@@ -380,6 +380,9 @@ void SpatialPalette::raster(const EditorState &s) {
       const auto disabled=s.light?Color{200,209,220,uint8_t(s.opacity)}:Color{55,65,80,uint8_t(s.opacity)};
       rect(160*unit_,410*unit_,320*unit_,44*unit_,s.bake_recipe?accent:disabled);
       text(320*unit_,440*unit_,s.bake_recipe?(c.bake_preset?"Recipe loaded":"Recall last bake"):"No saved bake yet",fg);
+      rect(160*unit_,470*unit_,320*unit_,44*unit_,s.can_convert_bake?accent:disabled);
+      text(320*unit_,500*unit_,s.can_convert_bake?"Convert normal detail":"Standard normals / unavailable",fg);
+      if(s.can_convert_bake)text(320*unit_,380*unit_,"Standard shading / original detail retained",fg);
     }
     text(320 * unit_, 560 * unit_,
          c.components == 1 ? "Stick: slide / Vertical: fine wheel"

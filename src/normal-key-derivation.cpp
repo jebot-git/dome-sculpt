@@ -147,7 +147,7 @@ bool same_frames(const NormalFrameSet&a,const NormalFrameSet&b){
   return (a.pbr==a.mtoon)==(b.pbr==b.mtoon)&&(a.pbr==a.canonical)==(b.pbr==b.canonical)&&(a.mtoon==a.canonical)==(b.mtoon==b.canonical);
 }
 }
-bool key_recipe_sampling_matches(const SourceNormalPreparation &a,const SourceNormalPreparation &b){return own(a.original_paint,b.original_paint)&&own(a.original_material,b.original_material)&&own(a.original_appearance,b.original_appearance)&&own(a.original_deformation,b.original_deformation)&&own(a.sampling_domain,b.sampling_domain)&&own(a.uv_reprojection,b.uv_reprojection)&&a.receipt.encode()==b.receipt.encode()&&normal_projection_identity(*a.projection,*b.projection)&&normal_projection_identity(*a.initial_projection,*b.initial_projection);}
+bool key_recipe_sampling_matches(const SourceNormalPreparation &a,const SourceNormalPreparation &b){return own(a.canonical_conversion,b.canonical_conversion)&&own(a.original_paint,b.original_paint)&&own(a.original_material,b.original_material)&&own(a.original_appearance,b.original_appearance)&&own(a.original_deformation,b.original_deformation)&&own(a.sampling_domain,b.sampling_domain)&&own(a.uv_reprojection,b.uv_reprojection)&&a.receipt.encode()==b.receipt.encode()&&normal_projection_identity(*a.projection,*b.projection)&&normal_projection_identity(*a.initial_projection,*b.initial_projection);}
 bool SourceKeyDerivation::uses_explicit_mirror() const noexcept {return std::any_of(targets_.begin(),targets_.end(),[](const auto &t){return bool(t.mirror_conversion);});}
 const std::vector<Vec3> &SourceKeyDerivation::positions(uint64_t id) const {if(!frames_)throw std::invalid_argument("Independent key endpoints have no owning frame registry");return identity(*frames_,id).positions;}
 std::shared_ptr<const NormalFrameSet> SourceKeyDerivation::replay(const std::function<bool()> &cancelled) const {
@@ -195,6 +195,7 @@ bool needs_independent_key_domain(const SculptObject &o,const ShapeKeyEdit &edit
     const std::function<bool()> &cancelled){
   if(!o.material_bindings||!o.material_bindings->normal_frames||!o.material_bindings->uv_origin)return false;
   if(o.material_bindings->key_derivation)return true;
+  if(o.material_bindings->normal_preparation&&o.material_bindings->normal_preparation->canonical_conversion)return true;
   const bool vertex_mirror=edit.action==ShapeKeyAction::Mirror&&edit.mirror_frames==ShapeKeyMirrorFrames::VertexPositions;
   if(edit.action==ShapeKeyAction::Mirror&&!vertex_mirror)return true;
   if(edit.action!=ShapeKeyAction::Replace&&!vertex_mirror)return false;

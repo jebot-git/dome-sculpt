@@ -23,7 +23,7 @@ struct NormalPreparationReceipt {
 };
 struct SourceNormalUvReprojection;
 struct SourceNormalSampling;
-namespace detail { struct NormalMetadataSealAccess; class SourceKeyDerivation; }
+namespace detail { struct NormalMetadataSealAccess; class SourceKeyDerivation; class CanonicalNormalConversion; }
 class PaintSamplingDomain;
 struct SourceNormalPreparation {
   NormalPreparationReceipt receipt;
@@ -41,6 +41,9 @@ struct SourceNormalPreparation {
   // operation; older recipes remain in the immutable before-graph.
   std::shared_ptr<const SourceNormalSampling> sampling_domain;
   std::shared_ptr<const detail::SourceKeyDerivation> key_derivation;
+  // Scene31 only: an explicitly replayed conversion retains the complete
+  // historical canonical paint and declares its new standard attribute model.
+  std::shared_ptr<const detail::CanonicalNormalConversion> canonical_conversion;
   void validate(bool deep=true) const;
   void validate_current(const Mesh &,const CreatorAppearance *,
                         const std::function<bool()> &cancelled={}) const;
@@ -121,6 +124,8 @@ struct NormalPreparationResult {
 };
 NormalPreparationResult prepare_source_normals(const ColorPreparationInput &,
                                                const NormalPreparationOptions & = {});
+NormalPreparationResult convert_canonical_normals(const ColorPreparationInput &,
+                                                 const NormalPreparationOptions & = {});
 nlohmann::json encode_normal_projection(const PaintNormalProjection &,PaintImageArchive &);
 std::shared_ptr<const PaintNormalProjection> decode_normal_projection(const nlohmann::json &,const PaintImageArchive &);
 nlohmann::json encode_normal_projection(const PaintNormalProjection &,PaintImageArchive &,NormalSamplingArchive *);

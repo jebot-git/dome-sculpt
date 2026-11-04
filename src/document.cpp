@@ -634,6 +634,7 @@ void Document::publish_locked(bool force,bool checkpoint) {
     state_.bake_source=state_.bake_sources.empty()?0:state_.bake_sources.front();
   state_.can_bake=!state_.object_grabbing && bake_target_ready_locked() && !state_.bake_sources.empty();
   state_.can_clear_bake=!state_.object_grabbing && bake_target_ready_locked() && bool(active.painted->baked());
+  state_.can_convert_bake=canonical_conversion_ready_locked();
   auto work=asset_status();state_.can_cancel_asset=state_.asset_busy && work.cancellable;
   state_.can_cancel_asset|=projection_load_&&!projection_load_->done.load()&&!projection_load_->cancelled.load();
   const auto asset=asset_work_.load();
@@ -2076,6 +2077,7 @@ bool Document::parameter_enabled_locked(VrParameter parameter) const {
   if(skin_parameter(parameter)) return skin_target_ready_locked() &&
     (parameter==VrParameter::SkinSource ? !skin_sources_locked(state_.skin_options.mode).empty()
       : !skin_sources_locked(SkinAuthoringMode::Automatic).empty());
+  if(parameter==VrParameter::BakeSource&&canonical_conversion_ready_locked())return true;
   if(parameter==VrParameter::BakeSource || parameter==VrParameter::BakeDistances || parameter==VrParameter::BakeQuality || parameter==VrParameter::BakeProjection || parameter==VrParameter::BakeColors)
     return bake_target_ready_locked() && !bake_sources_locked().empty();
   if (parameter == VrParameter::WeightStrength || parameter == VrParameter::WeightValue)
@@ -2129,7 +2131,7 @@ void Document::finish_control_locked(bool accept) {
             controls.value[0]<0||controls.value[0]>1||controls.value[1]<0||controls.value[1]>1)
           throw std::invalid_argument("Invalid source and cage controls");
         auto ids=bake_sources_locked(),cages=bake_cages_locked();
-        if(ids.empty())throw std::logic_error("Choose an eligible bake source");
+        if(ids.empty())return; // Conversion-only legacy project: Done changes no bake binding.
         const auto source=ids.at(size_t(std::lround(controls.value[0]*float(ids.size()-1))));
         const auto cage=cages.at(size_t(std::lround(controls.value[1]*float(cages.size()-1))));
         Transaction transaction(*this);
@@ -2582,6 +2584,15 @@ void Document::control_event_locked(VrControlEvent event) {
   if ((uv_accept_pending_ || uv_solving_) && event.type != VrControlEventType::Cancel)
     return;
   auto &c = state_.controls;
+  if(event.type==VrControlEventType::ConvertCanonicalNormals){
+    if(c.parameter!=VrParameter::BakeSource||!canonical_conversion_ready_locked())return;
+    const auto source=control_source_;require_authority_locked(source);
+    auto controls=std::move(state_.controls);auto before=std::move(control_before_);
+    control_before_.reset();state_.controls={};control_changed_=false;
+    try{queue_convert_bake_locked(source);input_.complete_control();}
+    catch(...){control_before_=std::move(before);state_.controls=std::move(controls);input_.resume_control(VrParameter::BakeSource);throw;}
+    return;
+  }
   if(event.type==VrControlEventType::RecallBakeRecipe){
     if(c.parameter!=VrParameter::BakeSource)return;
     const auto recipe=scene_.active().bake_recipe;

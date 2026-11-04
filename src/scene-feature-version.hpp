@@ -55,6 +55,7 @@ inline unsigned minimum_scene_version(const SourceMaterialBindings *binding) {
              ? std::max({minimum_scene_version(binding->uv_origin->paint.get()),minimum_scene_version(binding->uv_origin->deformation.get()),minimum_scene_version(binding->uv_origin->appearance.get())})
              : 0u;
   if(physical_emission(*binding))result=std::max(result,27u);
+  if(binding->normal_preparation&&binding->normal_preparation->canonical_conversion)result=std::max(result,31u);
   if(binding->key_derivation){const auto &k=*binding->key_derivation;result=std::max({result,k.uses_explicit_mirror()?29u:22u,minimum_scene_version(k.before_paint().get()),minimum_scene_version(k.before_material().get()),minimum_scene_version(k.before_deformation().get()),minimum_scene_version(k.before_appearance().get())});}
   if(binding->normal_frames)for(const auto &frame:{binding->normal_frames->pbr,binding->normal_frames->mtoon,binding->normal_frames->canonical})if(frame&&frame->generated_uv&&*frame->generated_uv>=2)result=std::max(result,26u);
   if(const auto &preparation=binding->color_preparation)

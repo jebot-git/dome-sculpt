@@ -1655,6 +1655,26 @@ std::shared_ptr<const PaintNormalProjection> SourceNormalPreparationAccess::reso
   auto result=std::make_shared<PaintNormalProjection>();result->pbr=std::move(pbr);result->mtoon=std::move(toon);
   result->validate(r);stop();return result;
 }
+std::shared_ptr<PaintedMesh> SourceNormalPreparationAccess::adopt_canonical(const PaintedMesh &source,
+    std::shared_ptr<const PaintNormalProjection> projection,const std::function<bool()> &cancelled){
+  auto stop=[&]{if(cancelled&&cancelled())throw std::runtime_error("Canonical normal adoption cancelled");};stop();
+  if(source.in_stroke()||source.normal_projection_||!source.baked_||
+      source.baked_->normal_interpretation!=BakedNormalInterpretation::CanonicalMikk||source.baked_->maps.normal.rgba.empty()||!projection)
+    throw std::invalid_argument("Canonical normal adoption requires its genuine completed historical input");
+  projection->validate(source.resolution());
+  source.baked_->validate(source.resolution());
+  auto result=source.snapshot();auto baked=std::make_shared<BakedTextures>();
+  baked->maps.color=source.baked_->maps.color;baked->maps.metal_rough=source.baked_->maps.metal_rough;
+  baked->maps.emission=source.baked_->maps.emission;baked->maps.pbr_color=source.baked_->maps.pbr_color;
+  baked->maps.transparent=source.baked_->maps.transparent;baked->coverage=source.baked_->coverage;
+  baked->color_interpretation=source.baked_->color_interpretation;
+  // Only the normal role moves into the explicitly converted intrinsic plane.
+  // Material channels, coverage, editable sparse layers and source maps remain.
+  baked->normal_interpretation=BakedNormalInterpretation::PreparedAttributes;baked->validate(source.resolution());
+  result->baked_=std::move(baked);result->normal_projection_=std::move(projection);
+  if(result->storage_bytes()>128*1024*1024)throw std::length_error("Converted normal planes exceed paint storage budget");
+  result->composite_token_=next_composite_token();++result->revision_;stop();return result;
+}
 PaintNormalPreparationResult SourceNormalPreparationAccess::prepare(const PaintedMesh &source,
     const SourceMaterialBindings *binding,const NormalPreparationOptions &options) {
   auto check=[&]{if(options.cancelled&&options.cancelled())throw std::runtime_error("Normal preparation cancelled");};check();

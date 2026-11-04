@@ -8,6 +8,20 @@ inline const nlohmann::json &material_archive_base_version(const nlohmann::json 
   if(!input.is_object()||!input.contains("version")||!input.at("version").is_number_integer())
     throw std::invalid_argument("Invalid material archive version");
   const auto &wire=input.at("version");
+  if(wire==13){
+    if(!input.contains("base_version")||!input.at("base_version").is_number_integer()||
+        input.at("base_version").get<int64_t>()<1||input.at("base_version").get<int64_t>()>10||
+        !input.contains("physical_emission")||!input.at("physical_emission").is_boolean()||
+        !input.contains("explicit_mirror")||!input.at("explicit_mirror").is_boolean()||
+        !input.contains("canonical_normals")||input.at("canonical_normals")!=true||
+        (input.at("explicit_mirror").get<bool>()&&input.at("base_version")!=10)||
+        !input.contains("canonical_conversions")||!input.at("canonical_conversions").is_array()||
+        input.at("canonical_conversions").empty()||input.at("canonical_conversions").size()>256)
+      throw std::invalid_argument("Canonical material13 requires its actual conversion pool and explicit existing capabilities");
+    return input.at("base_version");
+  }
+  for(const char *field:{"explicit_mirror","canonical_normals","canonical_conversions"})
+    if(input.contains(field))throw std::invalid_argument("Canonical normal capability requires material13");
   if(wire==12){
     if(!input.contains("base_version")||input.at("base_version")!=10||!input.contains("physical_emission")||!input.at("physical_emission").is_boolean())throw std::invalid_argument("Explicit Mirror material12 requires owning base10 and physical capability boolean");
     return input.at("base_version");
@@ -23,6 +37,21 @@ inline const nlohmann::json &material_archive_base_version(const nlohmann::json 
   return wire;
 }
 inline bool physical_material_archive(const nlohmann::json &input){
-  material_archive_base_version(input);return input.at("version")==11||(input.at("version")==12&&input.at("physical_emission").get<bool>());
+  material_archive_base_version(input);return input.at("version")==11||((input.at("version")==12||input.at("version")==13)&&input.at("physical_emission").get<bool>());
+}
+inline bool explicit_mirror_material_archive(const nlohmann::json &input){
+  material_archive_base_version(input);return input.at("version")==12||(input.at("version")==13&&input.at("explicit_mirror").get<bool>());
+}
+inline bool canonical_material_archive(const nlohmann::json &input){material_archive_base_version(input);return input.at("version")==13;}
+inline const nlohmann::json &normal_preparation_base_version(const nlohmann::json &p,const nlohmann::json &archive){
+  if(!p.is_object()||!p.contains("version")||!p.at("version").is_number_integer())throw std::invalid_argument("Invalid normal preparation version");
+  if(p.at("version")==7){
+    if(!canonical_material_archive(archive)||!p.contains("base_version")||!p.at("base_version").is_number_integer()||
+        p.at("base_version").get<int64_t>()<1||p.at("base_version").get<int64_t>()>6||!p.contains("canonical_conversion"))
+      throw std::invalid_argument("Normal entry7 requires its actual owning canonical conversion context");
+    return p.at("base_version");
+  }
+  if(p.contains("canonical_conversion")||p.contains("base_version"))throw std::invalid_argument("Normal conversion reference requires entry7");
+  return p.at("version");
 }
 } // namespace dome::detail

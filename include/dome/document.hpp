@@ -107,7 +107,7 @@ struct EditorState {
   SkinAuthoringOptions skin_options;
   std::vector<uint64_t> skin_sources;
   bool skin_use_locks = true, can_configure_skin = false, can_bind_skin = false;
-  bool can_bake = false, can_clear_bake = false, can_cancel_asset = false;
+  bool can_bake = false, can_clear_bake = false, can_cancel_asset = false, can_convert_bake = false;
   float asset_progress = 0;
   uint64_t bake_source = 0;
   std::vector<uint64_t> bake_sources;
@@ -326,6 +326,7 @@ public:
   void remesh_to_sculpt(float world_voxel_mm, AssetSource expected = {});
   void bake_from_object(uint64_t source, ObjectBakeSettings = {}, AssetSource expected = {});
   void clear_bake(AssetSource expected = {});
+  void convert_baked_normals(AssetSource expected = {});
   void cancel_asset_work();
   void cancel_background_work();
   void author_shape(ShapeKeyEdit,AssetSource expected={});
@@ -847,6 +848,8 @@ private:
   bool bake_target_ready_locked() const;
   void queue_bake_locked(uint64_t, ObjectBakeSettings, AssetSource = {});
   void queue_clear_bake_locked(AssetSource = {});
+  bool canonical_conversion_ready_locked() const;
+  void queue_convert_bake_locked(AssetSource = {});
   void cancel_asset_work_locked();
   void cancel_background_work_locked();
   bool shape_target_ready_locked() const;

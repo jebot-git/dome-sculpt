@@ -66,7 +66,8 @@ enum class VrControlEventType {
   UvPick,
   UvMove,
   UvCommand,
-  RecallBakeRecipe
+  RecallBakeRecipe,
+  ConvertCanonicalNormals
 };
 struct VrControlEvent {
   VrControlEventType type;

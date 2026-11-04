@@ -372,6 +372,10 @@ void SpatialInput::uv_gesture_end(bool force) {
 }
 void SpatialInput::ray_controls(const SpatialSample &s, bool pressed) {
   if(parameter_==VrParameter::BakeSource&&pressed&&s.panel_hit&&
+      s.panel_u>=.25f&&s.panel_u<=.75f&&s.panel_v>=470.f/640&&s.panel_v<=514.f/640){
+    controls_.push_back({VrControlEventType::ConvertCanonicalNormals,parameter_});return;
+  }
+  if(parameter_==VrParameter::BakeSource&&pressed&&s.panel_hit&&
       s.panel_u>=.25f&&s.panel_u<=.75f&&s.panel_v>=410.f/640&&s.panel_v<=454.f/640){
     controls_.push_back({VrControlEventType::RecallBakeRecipe,parameter_});return;
   }

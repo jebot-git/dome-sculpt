@@ -586,18 +586,22 @@ Scene Scene::decode(const nlohmann::json &j) {
     throw std::runtime_error("Unsupported scene format or version type");
   const auto version=j.at("version").get<int64_t>();
   const bool normal_context=j.contains("normal_sampling"),paint_context=j.contains("paint_sampling");
-  const bool explicit_mirror_context=(version==29||version==30)&&j.contains("source_materials")&&j.at("source_materials").at("version")==12&&detail::encoded_key_context(j.at("source_materials"));
+  const bool explicit_mirror_context=version>=29&&j.contains("source_materials")&&detail::explicit_mirror_material_archive(j.at("source_materials"))&&detail::encoded_key_context(j.at("source_materials"));
   if(version==29&&!explicit_mirror_context)throw std::invalid_argument("Scene29 requires its actual owning explicit Mirror capability");
   const SourcePaintDecodeContext source_paint_context{version>=28,version>=27};
   bool flat_volume=false;
   for(const char *key:{"samples","voxel_size","distance_band","sculpt_layers","active_sculpt_layer","next_sculpt_layer","sculpt_mask","sculpt_controls"})
     flat_volume|=j.contains(key);
-  if(version==30&&flat_volume)throw std::invalid_argument("Recipe Scene30 cannot be a flat Volume");
+  if(version>=30&&flat_volume)throw std::invalid_argument("Owning Scene30+ cannot be a flat Volume");
   if(flat_volume || version==1) {
     if(j.contains("objects"))throw std::runtime_error("Mixed flat Volume and Scene fields");
     result.active().volume=std::make_shared<Volume>(Volume::decode(j));return result;
   }
-  if(version<2 || (version>21&&version!=22&&version!=23&&version!=24&&version!=25&&version!=26&&version!=27&&version!=28&&version!=29&&version!=30))throw std::runtime_error("Unsupported scene version");
+  if(version<2 || (version>21&&version!=22&&version!=23&&version!=24&&version!=25&&version!=26&&version!=27&&version!=28&&version!=29&&version!=30&&version!=31))throw std::runtime_error("Unsupported scene version");
+  if(j.contains("source_materials")&&detail::canonical_material_archive(j.at("source_materials"))&&version<31)
+    throw std::invalid_argument("Canonical material13 requires actual Scene31 authority");
+  if(version==31&&(!j.contains("source_materials")||!detail::canonical_material_archive(j.at("source_materials"))))
+    throw std::invalid_argument("Scene31 requires actual canonical conversion authority");
   if(version<27&&j.contains("source_materials")&&j.at("source_materials").at("version")==11)
     throw std::invalid_argument("Physical material11 requires Scene27");
   if(version<29&&j.contains("source_materials")&&j.at("source_materials").at("version")==12)throw std::invalid_argument("Explicit Mirror material12 requires Scene29");
@@ -605,7 +609,7 @@ Scene Scene::decode(const nlohmann::json &j) {
     throw std::invalid_argument("Recipe history archive7 requires Scene30");
   for(const auto &object:j.at("objects")){
     if(version<30&&object.contains("bake_recipe"))throw std::invalid_argument("Bake recipes require Scene30");
-    if(version==30&&!object.contains("bake_recipe"))throw std::invalid_argument("Incomplete Scene30 recipe fields");
+    if(version>=30&&!object.contains("bake_recipe"))throw std::invalid_argument("Incomplete Scene30+ recipe fields");
   }
   const bool key_context=j.contains("source_materials")&&detail::encoded_key_context(j.at("source_materials"));
   auto key_feature=[&](const char *table,const char *field){return key_context&&detail::encoded_key_feature(j.at("source_materials"),table,field);};
@@ -1094,9 +1098,10 @@ Scene Scene::decode(const nlohmann::json &j) {
   if(actual_feature>unsigned(version))throw std::invalid_argument("Retained data requires its actual Scene feature version");
   if(version==29&&actual_feature!=29)throw std::invalid_argument("Scene29 requires genuine decoded explicit Mirror authority");
   if(version==30&&actual_feature!=30)throw std::invalid_argument("Scene30 requires an actual bake recipe");
+  if(version==31&&actual_feature!=31)throw std::invalid_argument("Scene31 requires an actual decoded canonical conversion lease");
   if(version==28&&actual_feature!=28)throw std::invalid_argument("Scene28 requires actual independent source paint ownership");
   if(version==27&&actual_feature<27)throw std::invalid_argument("Scene27 requires genuine physical emission state");
-  if(material_fields&&(detail::physical_material_archive(j.at("source_materials"))||j.at("source_materials").at("version")==12)){
+  if(material_fields&&(detail::physical_material_archive(j.at("source_materials"))||detail::explicit_mirror_material_archive(j.at("source_materials"))||detail::canonical_material_archive(j.at("source_materials")))){
     SourceMaterialArchive reachable;
     for(const auto &o:result.objects_)if(o.material_bindings)reachable.add(o.material_bindings,false);
     for(const auto &o:polygons.origins())if(o->material_bindings)reachable.add(o->material_bindings,false);

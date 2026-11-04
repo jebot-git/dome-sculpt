@@ -20,5 +20,7 @@ struct SourceNormalPreparationAccess {
       std::span<const uint32_t>,const NormalPreparationOptions &);
   static PaintNormalPreparationResult prepare(const PaintedMesh &,
       const SourceMaterialBindings *,const NormalPreparationOptions &);
+  static std::shared_ptr<PaintedMesh> adopt_canonical(const PaintedMesh &,
+      std::shared_ptr<const PaintNormalProjection>,const std::function<bool()> & = {});
 };
 } // namespace dome
