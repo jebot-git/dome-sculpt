@@ -54,10 +54,18 @@ void audit(const Scene &scene,const detail::CanonicalNormalConversionCandidate &
  if(scene.active().painted->mesh().positions[1].z!=0)require_cage(changed>20,"Curved conversion changes actual stored pixels instead of relabeling historical normal data");
 }
 }
-int main()try{
+#ifndef DOME_CANONICAL_CONVERSION_HELPERS_ONLY
+int main(int argc,char **argv)try{
+ const std::filesystem::path out=argc>1?argv[1]:"";
+ if(!out.empty())std::filesystem::create_directories(out);
  for(int variant=0;variant<8;++variant){auto scene=baked_fan(variant&1,variant&2,variant&4);const auto exact=scene.encode();const auto paint=scene.active().painted;const auto deformation=scene.active().deformation;
   const ColorPreparationInput input{paint,scene.active().appearance,scene.active().material_bindings,deformation,scene.active().material};
   const auto result=detail::convert_native_canonical_normals(input);
+  if(!out.empty()){
+   NormalFrameArchive archive;archive.add(result.target_frames);
+   std::ofstream frame(out/("frame-"+std::to_string(variant)+".json"));frame<<archive.encode().dump(2)<<'\n';
+   std::ofstream image(out/("normal-"+std::to_string(variant)+".rgba"),std::ios::binary);const auto &bytes=result.projection->pbr->rgba;image.write(reinterpret_cast<const char*>(bytes.data()),bytes.size());
+  }
   require_cage(result.original_paint==paint&&result.original_deformation==deformation&&result.sampled_centers>100&&result.raster_samples>=result.sampled_centers,"Detached real-baker conversion retains exact genuine original paint/deformation owners and actual sampling counts");
   require_cage(result.projection->pbr->rgba==result.projection->mtoon->rgba&&result.target_frames->current_targets.size()==size_t(bool(variant&2)),"Native PBR candidate owns real paired planes and complete current morph identities");audit(scene,result);audit_filtered(scene,result);
   require_cage(scene.encode()==exact&&scene.active().painted==paint&&scene.active().deformation==deformation,"Successful detached conversion preserves all native history, bake recipe, source, layer and shape bytes");
@@ -73,3 +81,4 @@ int main()try{
  require_cage(failure([&]{detail::convert_native_canonical_normals({clear,{},{},{},plain.active().material});},"historical normal payload"),"No-bake input cannot claim conversion provenance");
  std::cout<<"PASS "<<cage_checks<<" native canonical conversion checks\n";return 0;
 }catch(const std::exception&e){std::cerr<<"FAIL "<<e.what()<<'\n';return 1;}
+#endif

@@ -118,7 +118,8 @@ CanonicalNormalConversionCandidate convert_native_canonical_normals(
       result.maximum_center_angular_error=std::max(result.maximum_center_angular_error,error);
     }
   }
-  if(!result.sampled_centers)throw std::invalid_argument("Canonical conversion has no sampled native footprint");stop();
+  if(!result.sampled_centers)throw std::invalid_argument("Canonical conversion has no sampled native footprint");
+  stop();
   auto projection=std::make_shared<PaintNormalProjection>();
   projection->pbr=projection->mtoon=std::move(converted);
   projection->validate(paint.resolution());
