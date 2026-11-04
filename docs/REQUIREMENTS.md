@@ -1,5 +1,19 @@
 # Full objective and completion evidence
 
+## Private generated FBX morph normals — 2026-11-04
+
+Explicit Generate flat/smooth now imports genuine morph-bearing FBX files through
+the existing options and native worker, preserving original data and a distinct
+conversion receipt. Exact matching-component Release/SAN each pass1158 endpoint/
+owning checks and four original FBX commands, including75 unit/axis rows. Real
+FLTK chooser17 checks per mode/profile,20 Khronos files with0 errors/0 warnings,
+and10 byte-identical profile pairs pass. Read FBX-MORPH-GENERATED-NORMALS.md and
+its receipt for the retained old rejection, test-only mesh/node oracle failure,
+resource guards and exact source scopes. No public layout/native schema changes;
+this private milestone awaits coherent main admission. Every unfinished original
+and additional requirement remains active, including controller drawers after
+basic targets. No system, headset or active-session action occurred.
+
 ## Private editable bake cages — 2026-11-04
 
 The existing native desktop/XR baker now supports an explicitly selected editable
@@ -510,7 +524,7 @@ These extend the original matrix; all unfinished original rows stay required.
 | Wings3D-referenced polygonal edit mode | Shared native/controller vertex/edge/face workspace, practical topology tools, stable N-gons, ordered worker acceptance, exact local/global history, sculpt/evaluated conversion and Scene12 source retention are integrated. Complete combined qualification is recorded in POLYGON-COLOR-INTEGRATION.md; arbitrary COLOR/prepared-color topology transport, richer primitives/nonplanar operations and physical production workflow remain incomplete | Editable vertex/edge/polygon topology, practical topology tools, persistence, exact history/data handling and FLTK/XR workflows |
 | Individual mesh hiding and held-mesh ghosts | Native visibility, physical holding, GPU ghost transforms and exclusive edit authority are integrated. Direct touch/ray multiselection and an XR hierarchy retain18% unselected opacity;250 Release/nine selected sanitizer suites,24 native menu and separate Arc/loader checks pass. The user accepted the physical selection interface on2026-10-31; full holding/authoring production workflows and device evidence remain required | Correct translucent view plus mutation/input guards, preserved object visibility/material/locks, controller/desktop holding and cancellation/stale-job checks |
 | VRoid-only humanoid bases | Only verified CC0 VRoid female/male bases are offered/shipped; compiled MakeHuman geometry/converter removed and legacy command disabled. Existing authored legacy projects retain load/export; native creator/compact GUI and legacy preservation fixtures pass in the integration candidate | Only VRoid base meshes shipped/offered, native creator workflows and independently verified legacy project load/export without the removed mesh data |
-| Standard FBX and OBJ import options | Native ufbx static OBJ/FBX conversion and immutable original/resource capture are integrated with Scene11; supported textured OBJ worker transactions preserve exact source/pixels/history. Shared FLTK/XR options, large-mm metre conversion and atomic browser/chooser admission now integrated and tested. Full affine/skin/morph/material cases remain required | Format-aware options, units/axes/materials/UV/deformation conversion, original-source provenance, undo/cancel and independent native/GUI/interoperability fixtures |
+| Standard FBX and OBJ import options | Native ufbx static OBJ/FBX conversion and immutable original/resource capture are integrated with Scene11; supported textured OBJ worker transactions preserve exact source/pixels/history. Shared FLTK/XR options, large-mm metre conversion and atomic browser/chooser admission now integrated and tested. Private generated flat/smooth FBX morph-normal endpoints now have matching native/GUI/consumer proof (FBX-MORPH-GENERATED-NORMALS.md); broader affine/skin/morph/material cases remain required | Format-aware options, units/axes/materials/UV/deformation conversion, original-source provenance, undo/cancel and independent native/GUI/interoperability fixtures |
 
 ## Additional user specification — 2026-11-02: controller spatial drawers
 
