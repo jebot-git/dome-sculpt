@@ -25,9 +25,11 @@ each profile. No original invocation is relabeled green.
 
 The [new coherent source1d573f2](https://github.com/jebot-git/dome-sculpt/tree/1d573f2aa1f17f83bcc78533e130627c607fcf48)
 adds qualified colour-only VRM15310 and anatomical packing319 to that foundation.
-Fresh optimized Release ALL1,397 tasks and fresh owning sanitizer276 tasks are
-running, with689 registered and32 selected tests plus fixtures. They have not
-passed yet. The [current44 anatomical portaca9dd2](https://github.com/jebot-git/dome-sculpt/tree/aca9dd22efa990342e3a62aece7dcce4c01c79ea)
+The fresh owning sanitizer application/core/render/support build completes all276
+tasks, and all32 selected registered tests pass with no recorded input drift.
+The optimized Release ALL1,397-task build remains running (715 completed at the
+latest observation), with689 tests registered. This is selected integration
+evidence, not a complete current-suite or final production pass. The [current44 anatomical portaca9dd2](https://github.com/jebot-git/dome-sculpt/tree/aca9dd22efa990342e3a62aece7dcce4c01c79ea)
 has actual female/male public19, locks/Save/history, linked poses, worker Cancel,
 sampled caller rollback and independent export evidence. Its new
 [repository-asset fixture chain4a1dfc8](https://github.com/jebot-git/dome-sculpt/tree/4a1dfc8c46cc82cf0380d875f53d3c3ca82bd3d0)
@@ -44,9 +46,25 @@ explicit, and the original long source-world sanitizer sweep remains separate.
 HDR [functional milestone66e2e51](https://github.com/jebot-git/dome-sculpt/tree/66e2e5185759046578e730e843eb5227583ede48)
 remains separate. Its R/S10 functional gates, native GUI, exact byte limits and
 persistence pass, but actual sanitizer OOM injection finds5,736 bytes/142 leaks
-in system OpenEXR C++ constructors. An owning Core C codec replacement is being
-implemented and tested, without suppression, disabled failures or increased
-limits. No complete codec-memory-safety or new HDR admission claim is made.
+in system OpenEXR C++ constructors. The owning Core C codec replacement now passes its fresh227-task Release
+application build and12 selected tests. The previously leaking public OOM path
+passes3,868 denial prefixes each Release/sanitizer without leaks, in explicitly
+replaced-codec scope; all85 common Release GLBs remain byte-identical. Its fresh
+whole-application sanitizer build is still running. No suppression, disabled
+failures or increased limits are used; full current HDR admission remains pending.
+
+Ordinary skin Transfer after native paint or portable-normal/UV authoring exposed
+six genuine Restore failures: binding preserved paint, but did not capture the
+first complete rig source. A private single-TU repair now passes all six Release
+prototypes; owning history/cancellation/export and sanitizer qualification remain
+pending. Broader rig/native-paint composition is still incomplete.
+
+The next integration tree combines the reproducible17-endpoint anatomical fixture
+chain and shared-shade VRM work, but has not been built or admitted. A separate
+frontend-off test-graph fix preserves real offscreen renderer/font dependencies;
+configuration and unchanged default689-test commands are checked, while its
+actual optimized headless test build remains running. No new runtime from these
+lanes is installed or admitted to main.
 
 The original frozen f2 full630 handle ended143 after131 passing tests without a
 final summary. Both original processes are gone; its raw partial log and stale

@@ -5,9 +5,11 @@
 Private1299fb4 seals actual mixed152 R/S/Arc and both complete archive profiles:
 12,149decoder/24,003encoder persistent C++ prefixes plus84loadCancel each.
 48 Khronos files0errors; original failures and scope limits remain preserved.
-Read PRIVATE-AUTHORING-PROGRESS.md for the reconciled current state, live1d full
-builds, separate HDR ownership defect, current rig/VRM/fixture milestones and
-interrupted original f2 regression continuation. No main runtime or full-goal
+Read PRIVATE-AUTHORING-PROGRESS.md for the current state: fresh1d sanitizer
+build and32 selected tests pass; Release ALL remains live. Owning HDR codec
+repair passes Release and scoped OOM checks, with fresh sanitizer pending.
+Ordinary rig Restore repair and remaining VRM/fixture integration are private;
+interrupted original f2 regression continuation remains separate. No main runtime or full-goal
 completion; all remaining original/additional rows and later drawers remain.
 
 ## Repaired mixed workflows and new coherent build — 2026-11-04
