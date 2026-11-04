@@ -1,0 +1,68 @@
+{
+  "status": "private-test-only-correction",
+  "runtime": "421cedcf03959ce5137a62f733d75e8bef8f2a9b unchanged",
+  "diff": "Two intended Transfer rays normalized1/3 under appended four-mode HUD; all runtime/behavior/history/affine/locks assertions unchanged. XR script adds explicit optional strictArc renderer check.",
+  "original_failure": "421 whole-owned SAN12/13; skin-authoring selects mode2 with old .5 ray instead of intended Transfer1. Original log retained.",
+  "corrected_direct_runs": [
+    {
+      "profile": "release",
+      "test": "skin-authoring",
+      "exit_code": 0,
+      "elapsed_seconds": 0.8166808029927779
+    },
+    {
+      "profile": "release",
+      "test": "skin-affine-controller",
+      "exit_code": 0,
+      "elapsed_seconds": 0.016233542992267758
+    },
+    {
+      "profile": "sanitize",
+      "test": "skin-authoring",
+      "exit_code": 0,
+      "elapsed_seconds": 6.731942715996411
+    },
+    {
+      "profile": "sanitize",
+      "test": "skin-affine-controller",
+      "exit_code": 0,
+      "elapsed_seconds": 0.2655022949911654
+    }
+  ],
+  "profiles_built": [
+    [
+      "release-skin-authoring",
+      0
+    ],
+    [
+      "release-skin-affine-controller",
+      0
+    ],
+    [
+      "sanitize-skin-authoring",
+      0
+    ],
+    [
+      "sanitize-skin-affine-controller",
+      0
+    ],
+    [
+      "oneapi-skin-authoring",
+      0
+    ],
+    [
+      "oneapi-skin-affine-controller",
+      0
+    ]
+  ],
+  "scope": "Own test TUs against read-only matched421 public/private headers/core/support; no fresh runtime, no synthetic13/13 claim. OneAPI tests not yet executed.",
+  "archive_count": 33,
+  "archive_mismatches": 0,
+  "hashes": {
+    "tests/skin-authoring.cpp": "e99ec635c95947661172840856c7a37e7434c62da5c10bcfcbad7952fe62478e",
+    "tests/skin-affine-controller.cpp": "13ad824db2dfb87db5198ee49061525e84f14fe6c42c4f29d3e6b476f372da09",
+    "tests/native-visible-xr.py": "d66c7594fa2497800c552f1311a9d303ee8a8bb7dd2e4fc663ddb6d827b294dd",
+    "artifacts/run-status.json": "ba6a96410a9ec8e534c46513ae224fee8133e02d1435e4eb1fe40cb3e83e6a53",
+    "artifacts/recipes-final.json": "bb04ff50d52a9c7868b3b4047bad648dcab50653eb5b43d4df79f20501b6e320"
+  }
+}
