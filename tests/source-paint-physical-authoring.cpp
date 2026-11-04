@@ -34,7 +34,7 @@ int main(int argc,char **argv)try{
  NativeGraphics graphics;const std::string vendor=reinterpret_cast<const char*>(glGetString(GL_VENDOR)),device=reinterpret_cast<const char*>(glGetString(GL_RENDERER));
  std::cout<<"GL_VENDOR="<<vendor<<" GL_RENDERER="<<device<<std::endl;
  check(argc<3||std::string_view(argv[2])!="--hardware"||(vendor.find("Intel")!=std::string::npos&&device.find("Arc")!=std::string::npos&&device.find("A770")!=std::string::npos),"Requested physical export consumer requires actual A770");
- Fbo fbo;fbo.bind();SurfaceRenderer native;native.set_frame_time(0);color_consumer::Renderer independent;
+ Fbo fbo;fbo.bind();SurfaceRenderer native;native.set_frame_time(0);color_consumer::Renderer independent;prepared_normal_consumer::Renderer all_roles;
  for(int kind=0;kind<7;++kind){
   auto source=portable_material_fixture(kind==1?1:kind==3?6:0);auto &material=source.j["materials"][0];
   material["emissiveFactor"]={.025f,.002f,.02f};material["extensions"]["KHR_materials_emissive_strength"]={{"emissiveStrength",8}};
@@ -62,7 +62,7 @@ int main(int argc,char **argv)try{
   const auto bytes=file(package);auto recovered=extract_native_authoring(bytes);
   check(recovered&&recovered->encode()==exact&&document.copy_scene().encode()==exact&&imported.scene.active().painted==before_owner,"Physical editable export retains exact float/source/hidden project data without mutating owners");
   color_consumer::Model parsed(package);fbo.bind();
-  if(kind==3){prepared_normal_consumer::Renderer roles;roles.render(parsed.data);}
+  if(kind==3)all_roles.render(parsed.data);
   else independent.render(parsed.data,nullptr,{},true);
   const auto error=fidelity(reference,read());std::cout<<"PHYSICAL_AUTHORING kind="<<kind<<" mean="<<error.mean<<" interior="<<error.interior_maximum<<" max="<<error.maximum<<std::endl;
   if(kind==3){
