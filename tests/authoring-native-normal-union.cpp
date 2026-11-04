@@ -13,9 +13,13 @@ std::vector<uint8_t> union_bytes(const std::filesystem::path &path){
 }
 }
 int main(int argc,char **argv)try{
- if(argc!=5)return 2;
+ if(argc!=5&&(argc!=6||std::string_view(argv[5])!="--hardware"))return 2;
  const std::filesystem::path normal_dir=argv[1],uv_dir=argv[2],native_file=argv[3],out=argv[4];
- std::filesystem::create_directories(out);NativeGraphics graphics;Fbo fbo;SurfaceRenderer renderer;prepared_normal_consumer::Renderer independent;
+ std::filesystem::create_directories(out);NativeGraphics graphics;
+ const std::string device=reinterpret_cast<const char*>(glGetString(GL_RENDERER));std::cout<<"GPU "<<device<<std::endl;
+ const bool actual=device.find("Intel")!=std::string::npos&&device.find("Arc")!=std::string::npos&&device.find("A770")!=std::string::npos&&device.find("llvmpipe")==std::string::npos&&device.find("softpipe")==std::string::npos;
+ check(argc!=6||actual,"Mixed authoring strict hardware request requires actual Intel Arc A770");
+ Fbo fbo;SurfaceRenderer renderer;prepared_normal_consumer::Renderer independent;
  auto native=Scene::load(native_file);native.active().transform.position.x+=.65f;
  const auto native_exact=native.encode();check(native_exact.at("version")==32,"Native side is a genuine Scene32 factory/worker fixture");
  const std::array<std::filesystem::path,4> normal_files{normal_dir/"converted-7.dsculpt",uv_dir/"queued-7-1.dsculpt",uv_dir/"cleared-7-1.dsculpt",uv_dir/"rebaked-7-1.dsculpt"};
