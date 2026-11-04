@@ -127,7 +127,10 @@ int main(int argc,char **argv)try{
  doc.edit_scene("Convert with actual prepublication gate",[entered,release](Scene &s,const auto &cancelled){auto &o=s.active();NormalPreparationOptions options;options.cancelled=cancelled;auto result=convert_canonical_normals({o.painted,o.appearance,o.material_bindings,o.deformation,o.material,{}},options);o.painted=std::move(result.paint);o.material_bindings=std::move(result.material_bindings);entered->set_value();while(!release->load()&&!cancelled())std::this_thread::sleep_for(std::chrono::milliseconds(1));});
  require_cage(ready.wait_for(std::chrono::seconds(30))==std::future_status::ready,"Real conversion completes before controlled native publication boundary");
  auto queued=doc.save_async(out/"late-cancel.dsculpt");doc.cancel_background_work();release->store(true);
- require_cage(queued.wait_for(std::chrono::seconds(30))==std::future_status::ready&&failure([&]{queued.get();},"cancel")&&doc.wait_asset(std::chrono::seconds(30))&&doc.wait_mesh(std::chrono::seconds(30))&&doc.copy_scene().encode()==exact&&Scene::load(out/"late-cancel.dsculpt").encode()==exact,
+ require_cage(queued.wait_for(std::chrono::seconds(30))==std::future_status::ready&&
+   failure([&]{queued.get();},"Scene changed during Convert with actual prepublication gate"),
+   "Dependent Save rethrows the actual controlled prepublication cancellation failure");
+ require_cage(doc.wait_asset(std::chrono::seconds(30))&&doc.wait_mesh(std::chrono::seconds(30))&&doc.copy_scene().encode()==exact&&Scene::load(out/"late-cancel.dsculpt").encode()==exact,
    "Late conversion Cancel preserves exact original Scene and existing file and cancels its dependent Save");
  doc.convert_baked_normals();settled(doc);require_cage(doc.copy_scene().encode()==accepted,"Actual native conversion retries exactly after late cancellation");
  auto solo=before;solo.erase(2);solo.active().bake_recipe.reset();doc.replace(solo);settled(doc);Driver independent_source(doc);independent_source.open();independent_source.sector(0);
