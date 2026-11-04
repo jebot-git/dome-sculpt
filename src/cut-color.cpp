@@ -83,6 +83,7 @@ bool same_maps(const std::shared_ptr<const TextureMaps> &a,
     return true;
   if (!a || !b || a->source_maps != b->source_maps ||
       a->source_only != b->source_only || a->transparent != b->transparent ||
+      a->overlay != b->overlay ||
       a->color_projection || b->color_projection || a->normal_projection ||
       b->normal_projection)
     return false;

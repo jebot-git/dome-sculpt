@@ -3,6 +3,7 @@
 #include "dome/mesh-processing.hpp"
 #include "dome/tangents.hpp"
 #include "dome/source-maps.hpp"
+#include "paint-overlay-sample.hpp"
 #include <algorithm>
 #include <cmath>
 #include <deque>
@@ -77,18 +78,27 @@ std::array<float,4> sample(const Image &image, std::array<float,2> uv, bool repe
 }
 uint8_t byte(float value) { return uint8_t(std::lround(std::clamp(value,0.f,1.f)*255)); }
 struct Channels { std::array<float,4> color; std::array<float,3> emission; float roughness,metallic,ao=1; };
-Channels material(const BakeMaterial &m, std::array<float,2> uv) {
+Channels material(const BakeMaterial &m, const Mesh &mesh, size_t triangle,
+                  const std::array<float,3> &bary, std::array<float,2> uv, bool pbr=false) {
   Channels result{m.material.color,m.material.emissive,m.material.roughness,m.material.metallic,1};
   if (!m.maps) return result;
   if(m.maps->source_only){
     const auto &raw=*m.maps->source_maps;
-    auto color=sample_source_texture(raw.color,uv[0],uv[1],true),
-         orm=sample_source_texture(raw.metal_rough,uv[0],uv[1],false),
-         emission=sample_source_texture(raw.emission,uv[0],uv[1],true);
+    auto color=sample_surface_texture(mesh,raw,raw.color,triangle,bary,true),
+         orm=sample_surface_texture(mesh,raw,raw.metal_rough,triangle,bary,false),
+         emission=sample_surface_texture(mesh,raw,raw.emission,triangle,bary,true);
     for(int c=0;c<4;++c)result.color[c]*=color[c];
     for(int c=0;c<3;++c)result.emission[c]*=emission[c];
     result.roughness*=orm[1];result.metallic*=orm[2];
-    if(raw.occlusion.image)result.ao=1-raw.occlusion_strength*(1-sample_source_texture(raw.occlusion,uv[0],uv[1],false)[0]);
+    if(raw.occlusion.image)result.ao=1-raw.occlusion_strength*(1-sample_surface_texture(mesh,raw,raw.occlusion,triangle,bary,false)[0]);
+    if(m.maps->overlay){
+      const auto contribution=detail::sample_overlay_values(*m.maps->overlay,uv[0],uv[1],pbr);
+      for(size_t c=0;c<4;++c)result.color[c]=result.color[c]*(1-contribution[3][0])+contribution[0][c];
+      result.ao=result.ao*(1-contribution[1][3])+contribution[1][0];
+      result.roughness=result.roughness*(1-contribution[3][2])+contribution[1][1];
+      result.metallic=result.metallic*(1-contribution[3][1])+contribution[1][2];
+      for(size_t c=0;c<3;++c)result.emission[c]=result.emission[c]*(1-contribution[3][3])+contribution[2][c];
+    }
     return result;
   }
   auto color=sample(m.maps->color,uv,m.repeat_uv,true), orm=sample(m.maps->metal_rough,uv,m.repeat_uv,false),
@@ -160,9 +170,17 @@ void validate(const Mesh &low,const BakeSource &source,const BakeOptions &o) {
     m.material.validate();
     if (!std::isfinite(m.normal_strength)||m.normal_strength<0||m.normal_strength>4) throw std::invalid_argument("Invalid normal-map strength");
     if (m.maps) {
-      if(m.maps->source_maps)m.maps->source_maps->validate();
+      if(m.maps->overlay&&(!m.maps->source_only||m.maps->overlay->source_maps()!=m.maps->source_maps))
+        throw std::invalid_argument("Bake overlay differs from its immutable source coordinate owner");
+      if(m.maps->source_maps)m.maps->source_maps->validate_surface(source.mesh);
       if(m.maps->source_only){
-        if(!m.maps->source_maps||m.maps->source_maps->empty())throw std::invalid_argument("Raw bake source needs original texture bindings");
+        // An authenticated Source4 packet can represent an untextured source.
+        // Its explicit empty role bundle still owns independent paint planes.
+        if(!m.maps->source_maps||(m.maps->source_maps->empty()&&!m.maps->overlay))throw std::invalid_argument("Raw bake source needs original texture bindings or its authenticated source paint packet");
+        if(m.maps->overlay)for(const auto &layer:m.maps->overlay->layers())
+          for(const auto &tile:layer.emission_tiles)if(tile)for(const auto &pixel:tile->pixels)
+            if(pixel.coverage>0&&std::any_of(pixel.physical.begin(),pixel.physical.end(),[](float v){return v!=0;}))
+              throw std::invalid_argument("Physical source emission requires its explicit radiance-preserving bake adapter");
         if(m.maps->color.width||m.maps->metal_rough.width||m.maps->emission.width||m.maps->normal.width)throw std::invalid_argument("Raw bake source cannot also contain derived maps");
       }else{m.maps->color.validate(); m.maps->metal_rough.validate(); m.maps->emission.validate();}
       if(m.maps->pbr_color.width||m.maps->pbr_color.height||!m.maps->pbr_color.rgba.empty()) {
@@ -293,8 +311,8 @@ BakeResult bake_mesh(const Mesh &low,const BakeSource &source,const BakeOptions 
       auto material_id=source.triangle_materials.empty()?0:source.triangle_materials[hit->triangle];
       const auto &m=source.materials[material_id];
       auto high_uv=source.mesh.uv.empty()?std::array<float,2>{}:texcoord(source.mesh,hit->triangle,hit->barycentric);
-      auto channels=material(m,high_uv); auto high_normal=normalized(hit->normal);
-      auto pbr_color=channels.color;
+      auto channels=material(m,source.mesh,hit->triangle,hit->barycentric,high_uv); auto high_normal=normalized(hit->normal);
+      auto pbr_color=m.maps&&m.maps->overlay?material(m,source.mesh,hit->triangle,hit->barycentric,high_uv,true).color:channels.color;
       const bool resolved_source=m.maps&&!m.maps->pbr_color.rgba.empty();
       if(o.separate_pbr_color&&resolved_source)pbr_color=sample(m.maps->pbr_color,high_uv,false,true);
       if(!source.colors.empty()){
@@ -322,7 +340,7 @@ BakeResult bake_mesh(const Mesh &low,const BakeSource &source,const BakeOptions 
           // Explicit imported frames remain authoritative; affine UV applies to
           // the lookup, while the supplied XYZ/handedness defines its basis.
           auto supplied=basis(source.mesh,hit->triangle,high_normal,hit->barycentric,source.tangents);
-          auto encoded=sample_source_texture(raw.normal,high_uv[0],high_uv[1],false);
+          auto encoded=sample_surface_texture(source.mesh,raw,raw.normal,hit->triangle,hit->barycentric,false);
           double scale=double(raw.normal_scale)*m.normal_strength;
           double x=(encoded[0]*2-1)*scale,y=(encoded[1]*2-1)*scale,z=encoded[2]*2-1;
           double size=std::hypot(x,y,z);
