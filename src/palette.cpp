@@ -530,7 +530,7 @@ void SpatialPalette::raster(const EditorState &s) {
         rect(mx + 2 * unit_, my + 2 * unit_, 4 * unit_, 4 * unit_, label_color);
     }
   }
-  if (s.menu_page != 28 && s.menu_page != 24 && s.menu_page != 11 && s.menu_page != 12 && s.menu_page != 13 && s.menu_page != 14 && s.menu_page != 15 && s.menu_page != 16 && s.menu_page != 17 && s.menu_page!=19 && s.menu_page!=22 && s.menu_page != 21 && s.menu_page != 23) {
+  if (s.menu_page != 29 && s.menu_page != 28 && s.menu_page != 24 && s.menu_page != 11 && s.menu_page != 12 && s.menu_page != 13 && s.menu_page != 14 && s.menu_page != 15 && s.menu_page != 16 && s.menu_page != 17 && s.menu_page!=19 && s.menu_page!=22 && s.menu_page != 21 && s.menu_page != 23) {
     text(320 * unit_, 295 * unit_, "Stick to choose", fg);
     text(320 * unit_, 320 * unit_, "Press to confirm", fg);
   }
@@ -539,7 +539,7 @@ void SpatialPalette::raster(const EditorState &s) {
     text(320*unit_,295*unit_,view.settings?rig_fit_parameter_text(view):rig_fit_selection_label(view),fg);
     text(320*unit_,320*unit_,view.rest_source?std::to_string(view.bone_heads.size())+" original bones":rig_fit_selection_point(view)?std::to_string(view.landmarks.points.size())+" landmarks placed":"Not placed",fg);
   }
-  const char *page = s.menu_page==30 ? "Emission / HDR" : s.menu_page==28 ? "Export / editable project" : s.menu_page==27 ? "Humanoid rig fitting" : s.menu_page==25 ? "Image projection" : s.menu_page==24 ? "Shapekey tools" : s.menu_page==22 ? "Polygon topology" : s.menu_page==19 ? "Polygon edit" : s.menu_page == 23 ? "Import options" : s.menu_page == 21 ? "Import model" : s.menu_page == 20 ? "Holding / isolation" : s.menu_page == 18 ? "Procedural sculpt" : s.menu_page == 17 ? "Plane cut" : s.menu_page == 16 ? "Retopology" : s.menu_page == 15 ? "Masks / symmetry" : s.menu_page == 14 ? "Bind / transfer skin"
+  const char *page = s.menu_page==30 ? "Emission / HDR" : s.menu_page==29 ? "VRM1 expression preview" : s.menu_page==28 ? "Export / editable project" : s.menu_page==27 ? "Humanoid rig fitting" : s.menu_page==25 ? "Image projection" : s.menu_page==24 ? "Shapekey tools" : s.menu_page==22 ? "Polygon topology" : s.menu_page==19 ? "Polygon edit" : s.menu_page == 23 ? "Import options" : s.menu_page == 21 ? "Import model" : s.menu_page == 20 ? "Holding / isolation" : s.menu_page == 18 ? "Procedural sculpt" : s.menu_page == 17 ? "Plane cut" : s.menu_page == 16 ? "Retopology" : s.menu_page == 15 ? "Masks / symmetry" : s.menu_page == 14 ? "Bind / transfer skin"
                      : s.menu_page == 13 ? "Skin weights"
                      : s.menu_page == 12 ? "Mesh baking"
                      : s.menu_page == 11 ? "Rig and shapekeys"
@@ -555,9 +555,16 @@ void SpatialPalette::raster(const EditorState &s) {
   text(320 * unit_, 345 * unit_, page, fg);
   auto active = std::find_if(s.objects.begin(), s.objects.end(),
                              [&](auto &o) { return o.id == s.active_object; });
+  if(s.menu_page==29&&s.expressions){
+    const auto &v=*s.expressions;std::string status;
+    if(!v.entries.empty()){const auto &entry=v.entries.at(v.selected);status=(entry.custom?"Custom: ":"Preset: ")+entry.name+" | "+std::to_string(int(std::lround(entry.weight*100)))+"%"+(entry.binary?" (binary)":"");}
+    else status="Reading original expression definitions";
+    text(320*unit_,280*unit_,status,fg,592*unit_);
+    text(320*unit_,312*unit_,!v.error.empty()?"Refused: "+v.error:v.ready?"Preview only; Apply static pose or Cancel":"Updating preview",fg,592*unit_);
+  }
   if(s.menu_page==28){
-    text(320*unit_,252*unit_,"Native: all objects, including hidden",fg);
-    text(320*unit_,280*unit_,"Other viewers: approximate PBR",fg);
+    text(320*unit_,252*unit_,"GLB: all objects; V1: selected avatar",fg);
+    text(320*unit_,280*unit_,"Other viewers: approximate textures",fg);
     text(320*unit_,308*unit_,"Open in Dome Sculpt restores edits",fg);
     text(320*unit_,376*unit_,"Finite textures can miss fine patterns",fg);
   }
@@ -680,6 +687,17 @@ void SpatialPalette::draw(const EditorState &s, const Mat4 &vp) {
   if(s.polygon)signature+=":"+std::to_string(s.polygon->revision)+":"+std::to_string(s.polygon->busy)+":"+std::to_string(s.polygon->committing)+s.polygon->error;
   signature += ":procedural:"+std::to_string(s.procedural_options.seed)+":"+std::to_string(unsigned(s.procedural_options.pattern));
   if(s.projection){signature+=":projection:"+std::to_string(s.projection->request)+":"+std::to_string(s.projection->selected)+":"+std::to_string(s.projection->parameter)+":"+std::to_string(int(s.projection->panel))+std::to_string(s.projection->settings.enabled)+std::to_string(s.projection->settings.preview)+std::to_string(int(s.projection->settings.image.usage))+std::to_string(s.projection->loading)+std::to_string(s.projection->browsing)+s.projection->error+projection_parameter_text(s.projection->settings,s.projection->parameter);if(s.projection->image)signature+=s.projection->image->name;}
+  if(s.expressions){
+    const auto &view=*s.expressions;
+    signature+=":expressions:"+std::to_string(view.session)+":"+std::to_string(view.request)+":"+
+        std::to_string(view.selected)+":"+std::to_string(view.ready)+":"+std::to_string(view.error.size())+":"+view.error;
+    if(view.selected<view.entries.size()){
+      const auto &entry=view.entries[view.selected];
+      signature+=":"+std::to_string(entry.name.size())+":"+entry.name+":"+
+          std::to_string(entry.custom)+":"+std::to_string(entry.binary)+":"+
+          std::to_string(std::bit_cast<uint32_t>(entry.weight));
+    }
+  }
   if(s.importing)signature+=":import:"+std::to_string(s.importing->request)+":"+std::to_string(s.importing->selected)+":"+std::to_string(s.importing->busy)+s.importing->directory.string()+s.importing->error+
     std::to_string(int(s.importing->settings.choices.format))+std::to_string(s.importing->settings.choices.materials)+std::to_string(std::bit_cast<uint64_t>(s.importing->settings.choices.custom_metres_per_unit))+std::to_string(int(s.importing->settings.choices.units))+std::to_string(int(s.importing->settings.choices.axes))+std::to_string(int(s.importing->settings.choices.normals))+std::to_string(s.importing->settings.paint_resolution);
   signature += ":sculpt:" + std::to_string(s.sculpt_settings.symmetry_axes) + ":" +

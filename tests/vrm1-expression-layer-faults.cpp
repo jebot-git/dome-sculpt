@@ -1,0 +1,21 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "vrm1-expression-layer.hpp"
+#include <nlohmann/json.hpp>
+#include <cstdlib>
+#include <new>
+#include <iostream>
+namespace {thread_local bool injecting=false,denied=false;thread_local size_t allocations=0,boundary=SIZE_MAX;}
+[[gnu::noinline]]void *operator new(size_t n){if(injecting&&++allocations>=boundary){denied=true;throw std::bad_alloc();}if(auto p=std::malloc(n?n:1))return p;throw std::bad_alloc();}
+[[gnu::noinline]]void *operator new[](size_t n){return ::operator new(n);}void operator delete(void*p)noexcept{std::free(p);}void operator delete[](void*p)noexcept{std::free(p);}void operator delete(void*p,size_t)noexcept{std::free(p);}void operator delete[](void*p,size_t)noexcept{std::free(p);}
+using namespace dome;
+int main(int argc,char**argv)try{
+ if(argc!=2)return 2;const auto scene=Scene::load(argv[1]);const auto exact=scene.encode();const auto &object=scene.active();const auto &raw=*object.appearance->original_bytes;const size_t count=uint32_t(raw[12])|uint32_t(raw[13])<<8|uint32_t(raw[14])<<16|uint32_t(raw[15])<<24;const auto original=nlohmann::json::parse(raw.begin()+20,raw.begin()+20+count);const auto packet=detail::PaintOverlayFactory::capture(*object.painted);SourceUvBakeOptions limits;limits.resolution=256;
+ size_t count_new=0,polls=0;detail::Vrm1ExpressionLayer expected;
+ for(int repeat=0;repeat<2;++repeat){size_t observed=0;allocations=0;boundary=SIZE_MAX;injecting=true;auto next=detail::compile_vrm1_expression_layer(original,object,*packet,256,limits,[&]{++observed;return false;});injecting=false;if(!allocations||!observed||(repeat&&(allocations!=count_new||observed!=polls||next.image->rgba!=expected.image->rgba||next.paint_coordinates!=expected.paint_coordinates)))throw std::runtime_error("Actual repeated expression-layer allocation/poll/output profile is unstable");count_new=allocations;polls=observed;expected=std::move(next);}
+ std::cout<<"LAYER_BOUNDARIES allocations="<<count_new<<" cancel="<<polls<<" continuousRGB="<<expected.maximum_color_error<<" coverage="<<expected.maximum_coverage_error<<" working="<<expected.working_bytes<<" operations="<<expected.sample_operations<<std::endl;
+ size_t passed=0;for(size_t at=1;at<=count_new;++at){allocations=0;boundary=at;denied=false;injecting=true;bool caught=false;try{(void)detail::compile_vrm1_expression_layer(original,object,*packet,256,limits,{});}catch(const std::bad_alloc&){caught=true;}injecting=false;if(!caught||!denied||scene.encode()!=exact)throw std::runtime_error("Persistent expression-layer allocation denial changed native owner or did not propagate");++passed;}
+ for(size_t at=1;at<=polls;++at){size_t calls=0;bool caught=false;try{(void)detail::compile_vrm1_expression_layer(original,object,*packet,256,limits,[&]{return ++calls>=at;});}catch(const std::runtime_error&e){caught=std::string_view(e.what()).find("cancelled")!=std::string_view::npos;}if(!caught||calls<at||scene.encode()!=exact)throw std::runtime_error("Actual expression-layer cancellation boundary is unreachable or changed native owner");++passed;}
+ for(int variant=0;variant<3;++variant){auto changed=original;auto &happy=changed["extensions"]["VRMC_vrm"]["expressions"]["preset"]["happy"];if(variant==0)happy["textureTransformBinds"][0]["scale"][0]=0;else if(variant==1){auto other=happy;other["textureTransformBinds"][0]["offset"][0]=.6;changed["extensions"]["VRMC_vrm"]["expressions"]["custom"]["different"]=other;}else happy["textureTransformBinds"][0]["offset"][0]=1000000000.;bool refused=false;try{(void)detail::compile_vrm1_expression_layer(changed,object,*packet,256,limits,{});}catch(const std::invalid_argument&){refused=true;}if(!refused||scene.encode()!=exact)throw std::runtime_error("Unrepresentable real expression target did not refuse with exact native owner");++passed;}
+ auto retry=detail::compile_vrm1_expression_layer(original,object,*packet,256,limits,{});if(retry.image->rgba!=expected.image->rgba||retry.paint_coordinates!=expected.paint_coordinates||scene.encode()!=exact)throw std::runtime_error("Expression-layer retry after actual denials changed output or authority");
+ std::cout<<"PASS "<<passed+1<<" actual layer allocation/cancel/target/retry checks\n";return 0;
+}catch(const std::exception&e){injecting=false;std::cerr<<"FAIL "<<e.what()<<std::endl;return 1;}

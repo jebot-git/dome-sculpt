@@ -3,6 +3,7 @@
 #include "desktop-menu.h"
 #include "dome/document.hpp"
 #include "export-editor.hpp"
+#include "editable-avatar-eligibility.hpp"
 #include "dome/frame-clock.hpp"
 #include "desktop-framing.hpp"
 #include "spacenav-options.hpp"
@@ -16,6 +17,7 @@
 #include "rig-editor.hpp"
 #include "rig-fit-editor.hpp"
 #include "shapekey-editor.hpp"
+#include "vrm-expression-editor.hpp"
 #include "weight-editor.hpp"
 #include "skin-editor.hpp"
 #include "sculpt-editor.hpp"
@@ -566,6 +568,7 @@ struct App {
     menu.add("&File/Save &As...", FL_CTRL | FL_SHIFT | 's', command, this);
     menu.add("&File/Export &glTF (.glb)...", FL_CTRL + 'e', command, this);
     menu.add("&File/Export editable project (.glb)...", 0, command, this);
+    menu.add("&File/Export editable avatar (.vrm)...", 0, command, this);
     menu.add("&File/Export selected avatar (.vrm)...", 0, command, this);
     menu.add("&File/Recovery/Refresh recovery", 0, command, this);
     menu.add("&File/Recovery/Recover project...", 0, command, this);
@@ -588,6 +591,14 @@ struct App {
              FL_MENU_RADIO | FL_MENU_VALUE);
     menu.add("&View/Shading/&PBR", 0, command, this, FL_MENU_RADIO);
     menu.add("&View/Shading/&Toon preview", 0, command, this, FL_MENU_RADIO);
+    menu.add("&View/Expressions/Start preview",0,command,this);
+    menu.add("&View/Expressions/Choose expression...",0,command,this);
+    menu.add("&View/Expressions/Weight...",0,command,this);
+    menu.add("&View/Expressions/Weight -",0,command,this);
+    menu.add("&View/Expressions/Weight +",0,command,this);
+    menu.add("&View/Expressions/Reset weights",0,command,this);
+    menu.add("&View/Expressions/Apply static pose",0,command,this);
+    menu.add("&View/Expressions/Cancel preview",0,command,this);
     menu.add("&Sculpt/&Clay", '1', command, this,
              FL_MENU_RADIO | FL_MENU_VALUE);
     menu.add("&Sculpt/Ca&rve", '2', command, this, FL_MENU_RADIO);
@@ -798,6 +809,7 @@ struct App {
     const bool can_frame=!modal&&!s->stroking&&!s->native_pending&&!s->object_grabbing;
     enable("&View/Frame &all",can_frame&&detail::desktop_frameable(frame,false));
     enable("&View/Frame &selection",can_frame&&detail::desktop_frameable(frame,true));
+    enable("&File/Export editable avatar (.vrm)...",!modal&&!s->asset_busy&&detail::editable_avatar_view(frame));
     const char *document_actions[] = {"&File/&New",
                                       "&File/&Open...",
                                       "&File/&Save",
@@ -920,6 +932,11 @@ struct App {
     checked("&View/Shading/&Authored material", !s->toon&&!s->pbr_view);
     checked("&View/Shading/&PBR", s->pbr_view);
     checked("&View/Shading/&Toon preview", s->toon);
+    const auto expressions=s->expressions;
+    enable("&View/Expressions/Start preview",!modal&&!expressions&&canvas.document.can_preview_expressions());
+    for(auto path:{"&View/Expressions/Choose expression...","&View/Expressions/Weight...","&View/Expressions/Weight -","&View/Expressions/Weight +","&View/Expressions/Reset weights"})enable(path,!modal&&expressions&&!expressions->entries.empty());
+    enable("&View/Expressions/Apply static pose",!modal&&expressions&&expressions->ready&&expressions->error.empty());
+    enable("&View/Expressions/Cancel preview",!modal&&bool(expressions));
     const char *layer_actions[] = {
         "&Paint/Add layer", "&Paint/Next layer", "&Paint/Layer visible",
         "&Paint/Delete layer", "&Paint/Cycle layer opacity"};
@@ -1006,6 +1023,17 @@ struct App {
     enable("&Mesh/Plane cut/Apply cut",cutting&&!cut->busy&&cut->preview&&cut->preview_request==cut->request&&cut->preview->changed);
     checked("&Mesh/Plane cut/Cap cut",!cut||cut->settings.cap);
     checked("&Mesh/Plane cut/Flip kept side",cut&&cut->settings.flipped);
+    if(expressions){
+      const std::array<int,6> native_inputs{menu.find_index("&Edit/Cu&t"),menu.find_index("&Edit/&Copy"),menu.find_index("&Edit/&Paste"),menu.find_index("&Edit/Select &All"),menu.find_index("&Edit/&Undo"),menu.find_index("&Edit/&Redo")};
+      // Preserve the canonical input/focus-derived modes above, including
+      // owned modal fields. The preview excludes other document mutations.
+      for(int i=0;i<menu.size();++i)if(menu.menu()[i].label()&&!(modes[i]&FL_SUBMENU)&&std::find(native_inputs.begin(),native_inputs.end(),i)==native_inputs.end())modes[i]|=FL_MENU_INACTIVE;
+      for(auto path:views)enable(path,!modal);
+      for(auto path:{"&View/Shading/&Authored material","&View/Shading/&PBR","&View/Shading/&Toon preview"})enable(path,!modal&&s->can_preview);
+      for(auto path:{"&View/Expressions/Choose expression...","&View/Expressions/Weight...","&View/Expressions/Weight -","&View/Expressions/Weight +","&View/Expressions/Reset weights"})enable(path,!modal&&!expressions->entries.empty());
+      enable("&View/Expressions/Apply static pose",!modal&&expressions->ready&&expressions->error.empty());
+      enable("&View/Expressions/Cancel preview",!modal);enable("&File/Cancel background work",!modal);enable("&File/Close &Window",true);
+    }
     for (int i = 0; i < menu.size(); ++i)
       if (menu.mode(i) != modes[i])
         menu.mode(i, modes[i]);
@@ -1038,6 +1066,11 @@ struct App {
       text << "Paint " << channels[int(info->paint.channel)] << " | radius "
            << int(canvas.radius * 1000) << " mm | " << info->paint_layers.size()
            << " layers | Shift+drag: paint | P: painted mesh | Shift+P: source";
+    }
+    if(info->expressions){
+      const auto &view=*info->expressions;text.str("");text<<"Expression preview";
+      if(!view.entries.empty()){const auto &entry=view.entries.at(view.selected);text<<" | "<<entry.name<<" "<<int(std::lround(entry.weight*100))<<"%"<<(entry.binary?" (binary)":"");}
+      text<<(view.ready?" | Apply static pose or Cancel":" | Updating preview");
     }
     if (info->weights.enabled) {
       text.str("");
@@ -1175,7 +1208,14 @@ struct App {
       canvas.document.end_desktop();
       canvas.sculpting = false;
     }
-    if(label=="Humanoid rig fitting..."){edit_humanoid_fit_dialog(canvas.document);
+    if(label=="Start preview"){canvas.document.begin_expression_preview();}
+    else if(label=="Choose expression..."){choose_expression_dialog(canvas.document);}
+    else if(label=="Weight..."){expression_weight_dialog(canvas.document);}
+    else if(label=="Weight -"||label=="Weight +"){canvas.document.expression_action(label=="Weight +"?SpatialCommand::ExpressionIncrease:SpatialCommand::ExpressionDecrease);}
+    else if(label=="Reset weights"){canvas.document.expression_action(SpatialCommand::ExpressionReset);}
+    else if(label=="Apply static pose"){canvas.document.end_expression_preview(true);}
+    else if(label=="Cancel preview"){canvas.document.end_expression_preview(false);}
+    else if(label=="Humanoid rig fitting..."){edit_humanoid_fit_dialog(canvas.document);
     }else if(label=="Load projection image..."){
       const auto state=canvas.document.frame().state;const AssetSource source{state->generation,state->revision,state->active_object,state->edit_authority};
       auto selected=projection_image_dialog();
@@ -1439,6 +1479,11 @@ struct App {
         auto chosen=fl_file_chooser("Export editable project", "*.glb", "Project.glb");
         if(chosen)canvas.document.export_asset(chosen,*format);
       }
+    } else if (label == "Export editable avatar (.vrm)...") {
+      if(!detail::editable_avatar_view(canvas.document.frame()))return;
+      auto format=editable_export_dialog(EditableExportKind::AvatarV1);
+      if(format){auto chosen=fl_file_chooser("Export editable avatar","*.vrm","Avatar.vrm");
+        if(chosen)canvas.document.export_asset(chosen,*format);}
     } else if (label == "Export selected avatar (.vrm)...") {
       auto chosen = fl_file_chooser("Export selected avatar", "*.vrm", "Avatar.vrm");
       if (chosen) canvas.document.export_asset(chosen, AssetExportFormat::Avatar);

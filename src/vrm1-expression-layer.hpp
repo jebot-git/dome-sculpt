@@ -1,0 +1,23 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+#pragma once
+#include "dome/scene.hpp"
+#include "dome/source-uv-bake.hpp"
+#include "paint-overlay-packet.hpp"
+namespace dome::detail {
+// Private compiler product, retained only by the sealed Scene compilation.
+// The ordinary source exporter cannot use this to discard a paint packet.
+struct Vrm1ExpressionLayer {
+ std::shared_ptr<const Image> image;
+ std::vector<std::array<float,2>> paint_coordinates;
+ std::array<float,2> scale{1,1},offset{};
+ double maximum_color_error=0,maximum_coverage_error=0;
+ size_t working_bytes=0,sample_operations=0;
+};
+Vrm1ExpressionLayer compile_vrm1_expression_layer(const nlohmann::json &original,
+ const SculptObject &,const PaintOverlayPacket &,uint32_t resolution,
+ const SourceUvBakeOptions &,const std::function<bool()> &);
+// Complementary source view: this is called only after the real nonempty paint
+// has been compiled into the sealed additional primitive, never as pristine.
+void vrm1_expression_background(const PaintedMesh &,ObjectSurface &,
+ const std::function<bool()> &);
+}

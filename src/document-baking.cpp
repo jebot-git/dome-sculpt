@@ -21,6 +21,7 @@ void Document::cancel_asset_work_locked(){
   }
 }
 void Document::cancel_background_work_locked(){
+  if(state_.expressions)end_expression_preview_locked(false);
   cancel_asset_work_locked();
   for(const auto &work:exports_)if(work && work->cancel())
     state_.message="Cancelling background work...";

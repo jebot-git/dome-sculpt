@@ -14,6 +14,7 @@
 #include "normal-preparation-state.hpp"
 #include "cut-color.hpp"
 #include "affine-surface.hpp"
+#include "source-skin-world.hpp"
 #include "shapekey-preview.hpp"
 #include "shapekey-mirror-controls.hpp"
 #include "document-authority.hpp"
@@ -24,6 +25,8 @@
 #include "dome/creation.hpp"
 #include "dome/rig-edit.hpp"
 #include "dome/vrm.hpp"
+#include "dome/vrm-authoring.hpp"
+#include "editable-avatar-eligibility.hpp"
 #include "dome/gltf-export.hpp"
 #include "dome/mesh-processing.hpp"
 #include "dome/mesh-authoring.hpp"
@@ -195,6 +198,7 @@ bool Document::action_active_locked() const {
   return o.mesh_active ? o.painted->in_stroke() : volume().in_stroke();
 }
 bool Document::pending_locked() const {
+  if(state_.expressions)return true;
   if(state_.polygon)return state_.polygon->changed||polygon_stroking_||polygon_pending_.load()!=0;
   if(state_.object_grabbing)return true;
   if(native_stroke_)return true;
@@ -568,6 +572,10 @@ void Document::publish_locked(bool force,bool checkpoint) {
     last_paint_ = paint_revision;
     ++state_.revision;
   }
+  if(state_.expressions&&!expression_source_matches_locked()){
+    if(state_.view_epoch==UINT64_MAX)throw std::overflow_error("Expression view identity exhausted");
+    state_.expressions.reset();++state_.view_epoch;
+  }
   if(state_.rig_fit&&!rig_fit_source_matches_locked())state_.rig_fit.reset();
   if(state_.polygon_handoff&&state_.polygon_handoff_revision==UINT64_MAX)state_.polygon_handoff_revision=state_.revision;
   if(state_.polygon_handoff&&(state_.polygon_handoff_generation!=state_.generation||state_.polygon_handoff_revision!=state_.revision||state_.polygon_handoff_object!=active.id||!object_editable_locked(active.id))) {
@@ -731,8 +739,8 @@ void Document::publish_locked(bool force,bool checkpoint) {
     state_.menu_enabled[i] = parameter ? parameter_enabled_locked(*parameter)
                              : command ? command_enabled_locked(*command)
                                        : true;
-    if(state_.menu_page==26&&i>2&&i!=8)state_.menu_enabled[i]=false;
-    if(state_.menu_page==28&&(i==6||i>9))state_.menu_enabled[i]=false;
+    if(state_.menu_page==26&&i>3&&i!=8)state_.menu_enabled[i]=false;
+
   }
   bool weight_preview = weight_stroking_ && !weight_samples_.empty() &&
       (weight_scheduled_epoch_ != state_.weight_gesture || weight_scheduled_samples_ != weight_samples_.size());
@@ -748,6 +756,7 @@ void Document::publish_locked(bool force,bool checkpoint) {
     mesh_job->sculpt_mask_view=state_.sculpt_mask_visible;
     mesh_job->pbr_view=state_.pbr_view;
     mesh_job->view_epoch=state_.view_epoch;
+    mesh_job->expressions=state_.expressions;
     if(state_.retopology&&active.retopology){
       mesh_job->scene.object(active.id).visible=false;
       mesh_job->scene.object(active.retopology->source).visible=true;
@@ -786,6 +795,7 @@ void Document::publish_locked(bool force,bool checkpoint) {
 }
 
 void Document::finish_locked() {
+  if(state_.expressions)throw std::logic_error("Apply or cancel expression preview before changing or saving the document");
   if(state_.polygon)throw std::logic_error("Apply or cancel polygon editing before changing the document");
   if(state_.object_grabbing)finish_object_grab_locked(true,false);
   if(native_stroke_)throw std::logic_error("Wait for the accepted desktop stroke, or cancel it, before changing the document");
@@ -1103,8 +1113,12 @@ void Document::shading_locked(bool pbr,bool toon) {
   if(state_.pbr_view==pbr&&state_.toon==toon&&!state_.weights.enabled)return;
   if(action_active_locked()||state_.object_grabbing||navigation_.grabbing()||control_before_||(state_.projection&&state_.projection->placing)||(state_.rig_fit&&state_.rig_fit->placing))
     throw std::logic_error("Release the active gesture and close its tool before changing the material preview");
+  const auto expression_owner=expression_source_matches_locked()&&input_.menu_open()&&
+      input_.menu_page()==vrm_expression_page?input_.menu_device():0;
+  const auto expression_sector=input_.menu_index();
   Transaction transaction(*this);
   input_.cancel();++state_.input_epoch;transaction.rebind();
+  if(expression_owner)input_.retain_page(vrm_expression_page,expression_owner,expression_sector);
   state_.selection_pressed={true,true};state_.selection_release={true,true};state_.selection_hover={};
   state_.pbr_view=pbr;
   ++state_.view_epoch;
@@ -1298,6 +1312,7 @@ void Document::begin_spatial() {
 void Document::rebase_space(std::optional<CanvasTransform> old_from_new) {
   std::lock_guard lock(model_mutex_);
   if (!desktop_) {
+    if(state_.expressions)end_expression_preview_locked(false);
     bool accepted_uv = uv_accept_pending_;
     if (!accepted_uv) finish_control_locked(false);
     input_.cancel();
@@ -1332,6 +1347,7 @@ void Document::finish_spatial() {
     throw std::runtime_error("Spatial edit worker did not finish");
   std::lock_guard lock(model_mutex_);
   if (!desktop_) {
+    if(state_.expressions)end_expression_preview_locked(false);
     bool accepted_uv = uv_accept_pending_;
     if (!accepted_uv) finish_control_locked(false);
     input_.cancel();
@@ -1360,6 +1376,7 @@ void Document::process_locked(const SpatialFrame &incoming) {
     if(state_.object_grabbing&&held_weight_pending_locked()){
       input_.cancel();held_preview_transform_=held_start_transform_;object_navigation_.reset();navigation_.reset();state_.hands={};publish_locked(false,false);return;
     }
+    if(state_.expressions)end_expression_preview_locked(false);
     bool accepted_uv = uv_accept_pending_;
     if (!accepted_uv) finish_control_locked(false);
     input_.cancel();
@@ -1482,12 +1499,12 @@ void Document::process_locked(const SpatialFrame &incoming) {
     state_.hands=f.hands;
     // Mask page commands already end their gesture on menu entry. Retain the
     // live page so toggles and Fill can be followed by Resume without losing it.
-    if (!state_.retopology && !state_.cut && !sculpt_mask_command(*c) && !import_command(*c) && !projection_command(*c) && !preview_command(*c) && !rig_fit_command(*c) &&
+    if (!state_.retopology && !state_.cut && !sculpt_mask_command(*c) && !import_command(*c) && !projection_command(*c) && !preview_command(*c) && !rig_fit_command(*c) && !expression_command(*c) &&
         !(input_.menu_page()==15 && *c==SpatialCommand::CancelWork) &&
         input_.menu_page()!=30 && input_.menu_page()!=24 && input_.menu_page()!=18 && input_.menu_page()!=20 && input_.menu_page()!=19 && input_.menu_page()!=22 && !state_.polygon) finish_locked();
     auto command_publication=published_.load();
     command_locked(*c);
-    import_published=(import_command(*c)||projection_command(*c)||rig_fit_command(*c))&&published_.load()!=command_publication;
+    import_published=(import_command(*c)||projection_command(*c)||rig_fit_command(*c)||expression_command(*c))&&published_.load()!=command_publication;
     if((command_page==30)||(command_page==20)||(command_page==24&&*c!=SpatialCommand::ShapeSculpt)){input_.retain_page(command_page,command_owner,command_sector);publish_locked(false,false);}
   }
 
@@ -1611,7 +1628,18 @@ void Document::mesh_loop() {
              (job->weight_gesture && weight_epoch_.load() != job->weight_gesture) ||
              (job->native_gesture && native_epoch_.load()!=job->native_gesture);
     };
+    std::shared_ptr<VrmExpressionView> expression_result;
     try {
+      if(job->expressions){
+        expression_result=std::make_shared<VrmExpressionView>(*job->expressions);
+        if(expression_result->entries.empty()){
+          const auto catalog=describe_vrm1_expressions(*expression_result->baseline_,expression_result->object,cancelled);
+          for(const auto &entry:catalog)expression_result->entries.push_back({entry.name,entry.custom,entry.binary,0});
+          if(expression_result->entries.empty())throw std::logic_error("The actual VRM1 source has no expressions");
+        }
+        job->scene=bake_vrm1_expression_pose(*expression_result->baseline_,expression_result->object,expression_result->weights_,cancelled);
+        expression_result->ready=true;expression_result->error.clear();
+      }
       std::optional<Scene> proposed;
       if (job->weight_gesture) {
         proposed = job->scene.snapshot();
@@ -1757,6 +1785,7 @@ void Document::mesh_loop() {
             snapshot->source_tangents.assign(snapshot->mesh.positions.size(),{1,0,0,1});
           }
         }
+        const auto source_world_positions=detail::source_skin_world_positions(o,cancelled);
         if (o.deformation) o.mesh = o.preview_mesh();
         if(dynamic_canonical) {
           retained_pose->tangents[2]=tangent_corners(o.mesh,cancelled);
@@ -1801,7 +1830,7 @@ void Document::mesh_loop() {
             snapshot->normal_coordinates.push_back({uv[0],uv[1],toon[0],toon[1]});
           }
           if(!colors.empty() || !snapshot->source_colors.empty())snapshot->source_colors.push_back(colors.empty()?std::array<float,4>{1,1,1,1}:colors.at(vertex));
-          snapshot->mesh.positions.push_back(frame?detail::placed_position(*frame,o.mesh.positions.at(vertex)):vec(ob::transform(world, obv(o.mesh.positions.at(vertex)))));
+          snapshot->mesh.positions.push_back(source_world_positions?source_world_positions->at(vertex):frame?detail::placed_position(*frame,o.mesh.positions.at(vertex)):vec(ob::transform(world, obv(o.mesh.positions.at(vertex)))));
           snapshot->mesh.normals.push_back(frame?detail::placed_normal(*frame,o.mesh.normals.at(vertex)):vec(ob::rotate(world.orientation, obv(o.mesh.normals.at(vertex)))));
           snapshot->mesh.uv.push_back(o.mesh.uv.empty() ? std::array<float,2>{0,0} : o.mesh.uv.at(vertex));
           auto direction = vec(ob::rotate(world.orientation, obv({tangent[0],tangent[1],tangent[2]})));
@@ -1881,17 +1910,26 @@ void Document::mesh_loop() {
       if ((has_polygon_colors || !snapshot->paint_coordinates.empty() || job->weight_view || std::any_of(snapshot->ranges.begin(),snapshot->ranges.end(),[](const auto&r){return bool(r.affine_world);}) || ((published_.load()->object_grab_mode&&!published_.load()->object_grabbing)||published_.load()->selection_mode)) && !snapshot->mesh.indices.empty())
         snapshot->picking = std::make_shared<MaterialSurfaceQuery>(snapshot->mesh, snapshot->ranges, cancelled,snapshot->source_colors,PaintVertexCoordinates{snapshot->paint_coordinates});
       snapshot->sculpt_meshing.worker_ms=std::chrono::duration<double,std::milli>(std::chrono::steady_clock::now()-worker_start).count();
-      std::lock_guard lock(mesh_mutex_);
-      if (!cancelled()) {
-        geometry_identity=std::move(identity);
-        mesh_.store(std::move(snapshot));
+      if(expression_result){
+        std::lock_guard model_lock(model_mutex_);
+        if(cancelled()||!state_.expressions||state_.expressions->request!=job->expressions->request)continue;
+        expression_result->selected=state_.expressions->selected;
+        Transaction transaction(*this);state_.expressions=std::move(expression_result);state_.message="Expression preview only; Apply static pose or Cancel";publish_locked(false,false);
+        {std::lock_guard mesh_lock(mesh_mutex_);geometry_identity=std::move(identity);mesh_.store(std::move(snapshot));}
+        transaction.commit(false);
+      }else{
+        std::lock_guard lock(mesh_mutex_);
+        if(!cancelled()){geometry_identity=std::move(identity);mesh_.store(std::move(snapshot));}
       }
     } catch (const std::exception &e) {
       if (!cancelled()) {
         std::lock_guard lock(model_mutex_);
         if (cancelled()) continue;
-        state_.error = e.what();
-        publish_locked();
+        if(job->expressions&&state_.expressions&&state_.expressions->request==job->expressions->request){
+          auto failed=expression_result?expression_result:std::make_shared<VrmExpressionView>(*state_.expressions);
+          failed->selected=state_.expressions->selected;failed->ready=false;failed->error=e.what();state_.expressions=std::move(failed);
+        }
+        state_.error=e.what();publish_locked(false,false);
       }
     }
     mesh_changed_.notify_all();
@@ -1913,6 +1951,7 @@ bool Document::wait_mesh(std::chrono::milliseconds timeout) const {
     return ready() || stopping_.load() || current->generation != wanted->generation || current->pbr_view!=wanted->pbr_view || current->view_epoch!=wanted->view_epoch ||
            (wanted->cut && (!current->cut || current->cut->session!=wanted->cut->session ||
              (!current->cut->busy && !current->cut->error.empty()))) ||
+           (wanted->expressions&&current->expressions&&current->expressions->request==wanted->expressions->request&&!current->expressions->error.empty()) ||
            (wanted->weight_samples && weight_epoch_.load() != wanted->weight_gesture);
   }) && ready();
 }
@@ -2009,7 +2048,8 @@ std::future<void> Document::export_asset(const std::filesystem::path &path,
                                        AssetExportFormat format) {
   if (path.empty() || (format != AssetExportFormat::Glb && format != AssetExportFormat::Avatar &&
       format != AssetExportFormat::EditableGlb256 && format != AssetExportFormat::EditableGlb512 &&
-      format != AssetExportFormat::EditableGlb1024))
+      format != AssetExportFormat::EditableGlb1024 && format != AssetExportFormat::EditableAvatar256 &&
+      format != AssetExportFormat::EditableAvatar512 && format != AssetExportFormat::EditableAvatar1024))
     throw std::invalid_argument("Choose an export filename and supported format");
   auto completion = std::make_shared<std::promise<void>>();
   auto result = completion->get_future();
@@ -2017,7 +2057,8 @@ std::future<void> Document::export_asset(const std::filesystem::path &path,
   finish_locked();
   if (state_.asset_busy || state_.recovery_busy)
     throw std::logic_error("Wait for pending authoring work before exporting");
-  if (format == AssetExportFormat::Avatar && !state_.can_export_avatar)
+  if ((format == AssetExportFormat::Avatar || format == AssetExportFormat::EditableAvatar256 ||
+       format == AssetExportFormat::EditableAvatar512 || format == AssetExportFormat::EditableAvatar1024) && !state_.can_export_avatar)
     throw std::logic_error("Select a source avatar group to export");
   FileJob job{scene_.snapshot(), path, state_.revision, state_.generation, content_, true};
   job.object = scene_.active().id; job.export_format = format; job.completion = completion;
@@ -2060,7 +2101,8 @@ void Document::file_locked(bool export_mesh, AssetExportFormat format) {
     path = dir / ("Recovery-" + std::to_string(getpid()) + ".dsculpt");
   }
   if (export_mesh)
-    path.replace_extension(format == AssetExportFormat::Avatar ? ".vrm" : ".glb");
+    path.replace_extension((format == AssetExportFormat::Avatar || format == AssetExportFormat::EditableAvatar256 ||
+      format == AssetExportFormat::EditableAvatar512 || format == AssetExportFormat::EditableAvatar1024) ? ".vrm" : ".glb");
   if(accepted) {
     FileJob job{};job.path=path;job.create_parent=create_parent;
     job.asset_capture=std::move(token);job.generation=state_.generation;
@@ -2866,6 +2908,10 @@ void Document::control_event_locked(VrControlEvent event) {
 }
 
 bool Document::command_enabled_locked(SpatialCommand command) const {
+  if(expression_command(command))return expression_command_enabled_locked(command);
+  if(state_.expressions&&!preview_command(command)&&command!=SpatialCommand::CancelWork&&command!=SpatialCommand::Center)return false;
+  if(editable_avatar_export_command(command))return
+      detail::editable_avatar_source(scene_.active())&&command_enabled_locked(SpatialCommand::ExportAvatar);
   if(command>=SpatialCommand::EmissionRelative&&command<=SpatialCommand::EmissionBlack)return !control_before_&&!action_active_locked()&&!state_.asset_busy&&!state_.recovery_busy&&object_editable_locked(scene_.active().id);
   if(editable_export_command(command))return command_enabled_locked(SpatialCommand::Export);
   if(rig_fit_command(command))return rig_fit_command_enabled_locked(command);
@@ -2873,7 +2919,7 @@ bool Document::command_enabled_locked(SpatialCommand command) const {
   if(preview_command(command))return !action_active_locked()&&!state_.object_grabbing&&!navigation_.grabbing()&&!control_before_&&(!state_.projection||!state_.projection->placing)&&(!state_.rig_fit||!state_.rig_fit->placing);
   if(command==SpatialCommand::Save&&state_.asset_busy)return state_.can_save_after_asset;
   if(command==SpatialCommand::CancelWork)
-    return (state_.asset_busy && asset_status().cancellable) ||
+    return bool(state_.expressions) || (state_.asset_busy && asset_status().cancellable) ||
       (projection_load_&&!projection_load_->done.load()&&!projection_load_->cancelled.load()) ||
       std::any_of(exports_.begin(),exports_.end(),[](const auto &work){return work && work->cancellable();});
   if(command==SpatialCommand::SelectionMode||command==SpatialCommand::SelectionFocus)return selection_ready_locked();
@@ -3075,6 +3121,15 @@ void Document::sculpt_command(SpatialCommand command) {
   if(published_.load()==publication)publish_locked();
 }
 void Document::command_locked(SpatialCommand command) {
+  if(expression_command(command)){expression_command_locked(command);return;}
+  if(state_.expressions&&command==SpatialCommand::CancelWork){end_expression_preview_locked(false);return;}
+  if(state_.expressions&&!preview_command(command)&&command!=SpatialCommand::Center)return;
+  if(editable_avatar_export_command(command)){
+    if(!command_enabled_locked(command))return;
+    file_locked(true,command==SpatialCommand::ExportEditableAvatar256?AssetExportFormat::EditableAvatar256:
+        command==SpatialCommand::ExportEditableAvatar512?AssetExportFormat::EditableAvatar512:AssetExportFormat::EditableAvatar1024);
+    return;
+  }
   if(command>=SpatialCommand::EmissionRelative&&command<=SpatialCommand::EmissionBlack){
     if(!command_enabled_locked(command))return;
     if(command==SpatialCommand::EmissionBlack)state_.paint.emission={};
@@ -3747,7 +3802,24 @@ void Document::file_loop() {
         auto work=job->export_work;
         auto cancelled=[work]{return work && work->cancelled();};
         auto before_commit=[work]{if(work)work->begin_commit();};
-        if (job->export_format == AssetExportFormat::Avatar) {
+        if (job->export_format == AssetExportFormat::EditableAvatar256 ||
+            job->export_format == AssetExportFormat::EditableAvatar512 ||
+            job->export_format == AssetExportFormat::EditableAvatar1024) {
+          auto group=avatar_group(job->scene,job->object);
+          if(!group)throw std::runtime_error("Select a grouped avatar to export");
+          NativeAuthoringExport owner;
+          owner.scene=std::make_shared<const Scene>(job->scene.snapshot());
+          owner.scope=NativeAuthoringExport::Scope::ExportedObjects;
+          owner.allow_portable_fallback=true;
+          for(const auto &object:job->scene.objects())
+            if(object.visible&&in_group(job->scene,object,group))owner.objects.push_back(object.id);
+          VrmExportOptions options;options.cancelled=cancelled;options.before_commit=before_commit;
+          options.paint_resolution=job->export_format==AssetExportFormat::EditableAvatar256?256:
+              job->export_format==AssetExportFormat::EditableAvatar512?512:1024;
+          auto report=export_vrm_authoring(owner,job->path,options);
+          for(size_t i=0;i<std::min<size_t>(8,report.diagnostics.size());++i)
+            export_diagnostics+=" | "+report.diagnostics[i].substr(0,200);
+        } else if (job->export_format == AssetExportFormat::Avatar) {
           auto group = avatar_group(job->scene, job->object);
           if (!group) throw std::runtime_error("Select a grouped avatar to export");
           for (const auto &object : job->scene.objects())

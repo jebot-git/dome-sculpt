@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #pragma once
 #include "rig-fit-tool.hpp"
+#include "vrm-expression-tool.hpp"
 #include "input.hpp"
 #include "import-browser.hpp"
 #include "navigation.hpp"
@@ -175,6 +176,7 @@ struct EditorState {
   bool can_preview = true;
   uint64_t view_epoch = 1;
   std::shared_ptr<const RigFitView> rig_fit;
+  std::shared_ptr<const VrmExpressionView> expressions;
 };
 struct SurfaceRange {
   uint64_t object;
@@ -238,7 +240,8 @@ struct SceneDraft {
   Scene scene;
   AssetSource source;
 };
-enum class AssetExportFormat { Glb, Avatar, EditableGlb256, EditableGlb512, EditableGlb1024 };
+enum class AssetExportFormat { Glb, Avatar, EditableGlb256, EditableGlb512, EditableGlb1024,
+  EditableAvatar256, EditableAvatar512, EditableAvatar1024 };
 struct EditorSnapshot {
   std::shared_ptr<const EditorState> state;
   std::shared_ptr<const MeshSnapshot> surface;
@@ -307,6 +310,11 @@ public:
                   int opacity);
   void shading(bool toon);
   void authored_shading();
+  bool can_preview_expressions() const;
+  void begin_expression_preview();
+  void configure_expression_preview(size_t entry,float weight,uint64_t session,AssetSource expected={});
+  void end_expression_preview(bool apply,uint64_t session=0,AssetSource expected={});
+  void expression_action(SpatialCommand);
   void prepare_mesh(uint32_t resolution = 512);
   // Native asset operations run on the ordered worker against a detached scene.
   // No callback may retain mutable aliases or access UI/Document/model state.
@@ -685,6 +693,12 @@ private:
   void cancel_native_locked();
   void drain_native_shutdown();
   void capture_native_file(FileJob &);
+  bool expression_source_matches_locked() const;
+  bool expression_command_enabled_locked(SpatialCommand) const;
+  void begin_expression_preview_locked();
+  void configure_expression_preview_locked(size_t,float,uint64_t,AssetSource);
+  void end_expression_preview_locked(bool,uint64_t=0,AssetSource={});
+  void expression_command_locked(SpatialCommand);
   struct MeshJob {
     uint64_t revision, generation;
     Scene scene;
@@ -699,6 +713,7 @@ private:
     size_t native_samples = 0;
     bool pbr_view = false;
     uint64_t view_epoch = 0;
+    std::shared_ptr<const VrmExpressionView> expressions;
   };
   mutable std::mutex mesh_mutex_;
   mutable std::condition_variable mesh_changed_;

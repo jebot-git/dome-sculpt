@@ -7,18 +7,21 @@
 #include <FL/Fl_Scroll.H>
 #include <FL/fl_draw.H>
 namespace dome {
-std::optional<AssetExportFormat> editable_export_dialog() {
+std::optional<AssetExportFormat> editable_export_dialog(EditableExportKind kind) {
+  const bool avatar=kind==EditableExportKind::AvatarV1;
   int sx,sy,sw,sh;
   Fl::screen_work_area(sx,sy,sw,sh);
   const int row=std::max(36,dx::size+16);
   const int width=std::min(std::max(580,dx::size*35),sw-40);
   const int height=std::min(row*10,sh-40);
-  DomeDialog window(width,height,"Editable GLB export");
+  DomeDialog window(width,height,avatar?"Editable VRM1 export":"Editable GLB export");
   Fl_Scroll scroll(0,0,width,height-row-24);
   scroll.type(Fl_Scroll::VERTICAL);
   Fl_Group content(0,0,width-24,row*8+40);
   content.resizable(nullptr);
-  const char *description="Keeps the complete editable project, including hidden objects. "
+  const char *description=avatar?"Selected avatar and required sources only. "
+      "Native edits stay exact; other viewers use approximate textures.":
+      "Keeps the complete editable project, including hidden objects. "
       "Other viewers use an approximate PBR view. Open the file in Dome Sculpt to recover the original project.";
   fl_font(dx::font,dx::size);
   int measured_width=width-70,description_height=0;
@@ -31,7 +34,9 @@ std::optional<AssetExportFormat> editable_export_dialog() {
   Fl_Choice resolution(label,choice_y,width-label-44,row-6,"Portable textures");
   resolution.add("256 pixels|512 pixels|1024 pixels");
   resolution.value(1);
-  const char *meaning="Baked paint uses finite textures. Fine repeated patterns and distant views may differ; native source data stays exact.";
+  const char *meaning=avatar?"Open in Dome Sculpt to recover the original edits. "
+      "Baked paint uses finite textures; fine patterns and distant views may differ.":
+      "Baked paint uses finite textures. Fine repeated patterns and distant views may differ; native source data stays exact.";
   measured_width=width-70;int sampling_height=0;
   fl_measure(meaning,measured_width,sampling_height,0);sampling_height+=dx::size;
   const int meaning_y=choice_y+row+8;
@@ -48,6 +53,8 @@ std::optional<AssetExportFormat> editable_export_dialog() {
   window.end();window.set_modal();dx::style(&window);window.show();cancel.take_focus();
   while(window.shown())Fl::wait();
   if(!draft.accepted)return {};
+  if(avatar)return resolution.value()==0?AssetExportFormat::EditableAvatar256:
+      resolution.value()==1?AssetExportFormat::EditableAvatar512:AssetExportFormat::EditableAvatar1024;
   return resolution.value()==0?AssetExportFormat::EditableGlb256:
          resolution.value()==1?AssetExportFormat::EditableGlb512:AssetExportFormat::EditableGlb1024;
 }
