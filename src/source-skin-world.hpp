@@ -41,6 +41,9 @@ inline std::optional<std::vector<Vec3>> source_skin_world_positions(
   auto charge=[&](size_t count,size_t stride){if(count>(maximum_bytes-scratch_bytes)/stride)throw std::length_error("Source skin world scratch budget exceeded");scratch_bytes+=count*stride;};
   charge(surface.mesh.positions.size(),sizeof(Vec3));charge(surface.mesh.normals.size(),sizeof(Vec3));charge(surface.mesh.indices.size(),sizeof(uint32_t));charge(surface.mesh.uv.size(),sizeof(std::array<float,2>));charge(surface.mesh.uv_pins.size(),1);charge(surface.mesh.uv_seams.size(),1);
   charge(skeleton.bones.size(),sizeof(AffineTransform)*2+sizeof(RigMatrix)*3+sizeof(uint8_t));
+  // The authenticated graph builds complete MODEL parent/rest/world tables,
+  // including retained nodes outside the editable mesh ancestor closure.
+  charge(asset.nodes.size(),sizeof(int)+2*sizeof(RigMatrix)+sizeof(uint64_t)+2*sizeof(uint8_t));
   std::vector<RigMatrix> local;
   {
     auto graph=capture_source_rest_graph(std::span<const ObjectSurface>(&surface,1),surface.id,maximum_bytes-position_bytes,cancelled);
@@ -54,7 +57,9 @@ inline std::optional<std::vector<Vec3>> source_skin_world_positions(
     auto matrix=AffineTransform(local[bone]);const auto parent=skeleton.bones[bone].parent;
     if(parent>=0){self(self,size_t(parent),depth+1);matrix=world[size_t(parent)]*matrix;}world[bone]=matrix;done[bone]=2;
   };
-  const auto binds=skeleton.inverse_bind();std::vector<AffineTransform> matrices;matrices.reserve(local.size());
+  // capture_source_rest_graph authenticated this exact immutable explicit IBM
+  // owner/count and finite affine values. Reuse it within this operation.
+  const auto &binds=*skeleton.inverse_bind_override;std::vector<AffineTransform> matrices;matrices.reserve(local.size());
   for(size_t bone=0;bone<local.size();++bone){visit(visit,bone,1);matrices.push_back(model_to_world*world[bone]*AffineTransform(binds[bone]));}
   auto morphed=surface.mesh;if(d->morphs&&!d->morph_weights.empty())morphed=d->morphs->evaluate(surface.mesh,d->morph_weights);
   std::vector<Vec3> positions;positions.reserve(morphed.positions.size());

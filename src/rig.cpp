@@ -2,6 +2,7 @@
 // Locked-weight normalization semantics adapt Blender BKE_defvert_normalize_ex;
 // see docs/RIGGING.md for pinned source, copyright, license and deviations.
 #include "dome/rig.hpp"
+#include <bitset>
 #include "dome/affine.hpp"
 #include <bit>
 #include <limits>
@@ -284,10 +285,11 @@ void Skeleton::validate() const {
         !std::isfinite(b.length) || b.length <= 1e-6f || b.length > 1000)
       throw std::invalid_argument("Invalid bone hierarchy/name/length");
     matrix(b.rest);if(b.rest_matrix)affine(*b.rest_matrix);
-    std::set<int> seen;
+    std::bitset<256> seen;
     for (int p = int(i); p >= 0; p = bones[p].parent) {
-      if (p >= int(bones.size()) || p < -1 || !seen.insert(p).second)
+      if (p >= int(bones.size()) || p < -1 || seen.test(size_t(p)))
         throw std::invalid_argument("Cyclic or invalid skeleton hierarchy");
+      seen.set(size_t(p));
     }
   }
 }
