@@ -1,5 +1,17 @@
 # Full objective and completion evidence
 
+## Qualified repaired mixed authoring foundation — 2026-11-05
+
+Actual mixed native32/normal34 Scene35 workflows pass152 each R/S/Arc;48 Khronos
+files0errors/30warnings/150infos,33R/S exact artifacts,17native/container triples,
+cross-device PNGmax1. Both profile archive sweeps finish12,149decoder/24,003encoder
+persistent C++ prefixes plus84Cancel, with actual owner/root retry checks.
+Read COHERENT-AUTHORING-MIXED-REPAIR.md and receipt for preserved original23/27,
+28/30 and observer failures, exact3TU/current44 owning scope and separate camera83.
+No original test invocation is relabeled green. New coherent1d ALL/SAN remains
+separate/live; HDR owning codec, broader adapters and all unfinished full-goal
+requirements including later drawers remain. No install/HMD/session action.
+
 ## Explicit portable normal model controls — 2026-11-04
 
 Universal/native/XR controls now describe portable normal/tangent target authoring,
