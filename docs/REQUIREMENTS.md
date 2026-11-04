@@ -1,5 +1,19 @@
 # Full objective and completion evidence
 
+## Complete originally unskinned source Restore — 2026-11-04
+
+The public9987 continuation now restores the complete genuine first source when
+its original mesh had no skeleton, preserving paint/material/shapes/masks and
+original rig absence. No public layout/schema/private-authoring runtime is added.
+Ten affected native commands pass each Release/SAN, including37 complete native/
+controller checks and134 persistent fault prefixes each; actual normal/compact
+FLTK62 and nativeWayland18 assertions pass on current27/POLL SDK. These are
+scoped matching-component/application gates, not a fresh whole build/full suite
+or physical-headset qualification. Read PUBLIC-UNSKINNED-RESTORE.md and its receipt.
+All unfinished full-goal requirements and post-basic controller drawers remain
+active; no installation/session action occurred.
+
+
 ## Private native vertex-position Mirror milestone — 2026-11-04
 
 Private runtimeaf79fdf and GUI endpoint e6cf4c3 restore ordinary vertex Mirror
