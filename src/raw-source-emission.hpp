@@ -19,6 +19,22 @@ struct RawSourceEmission {
   double product_error=0;
   bool original_factors=false;
 };
+// Conservative temporary JSON allocation forecast, obtained without allocating
+// or trusting parsed DTO values. Charge one peak, not every aliased material.
+inline size_t raw_emission_proof_bytes(const CreatorAppearance &a,
+    const std::function<bool()> &cancelled={}) {
+  const auto &text=a.material_json;
+  if(text.size()>16*1024*1024)throw std::length_error("Raw source material JSON exceeds canonical limits");
+  size_t structural=1;bool quoted=false,escaped=false;
+  for(size_t n=0;n<text.size();++n){if((n&4095)==0&&cancelled&&cancelled())throw std::runtime_error("Raw material proof forecast cancelled");
+    const char c=text[n];
+    if(quoted){if(escaped)escaped=false;else if(c=='\\')escaped=true;else if(c=='"')quoted=false;}
+    else if(c=='"')quoted=true;else if(c=='{'||c=='['||c==':'||c==',')++structural;
+  }
+  const size_t bytes=8*text.size()+512*structural;
+  if(bytes>512*1024*1024)throw std::length_error("Raw material proof exceeds bounded working storage");
+  return bytes;
+}
 // Per-call replay, not a persistent seal or an arbitrary-surface permission.
 // Only the sealed capture authenticates geometry, placement and current owners;
 // the retained parsed source authenticates the exact role/sampler/UV mapping.
@@ -68,6 +84,19 @@ inline std::optional<RawSourceEmission> raw_source_emission(
   if(!a.asset||!a.decoded_images||a.material<0||size_t(a.material)>=a.asset->materials.size()||
      a.source_vertices.size()!=mesh.positions.size())fail();
   const auto &m=a.asset->materials.at(size_t(a.material));
+  (void)raw_emission_proof_bytes(a,cancelled);
+  size_t nodes=0;
+  const auto canonical=a.material_json.empty()?nlohmann::json::object():
+    nlohmann::json::parse(a.material_json,[&](int depth,nlohmann::json::parse_event_t,const nlohmann::json&){
+      if(depth>128||++nodes>1'000'000)throw std::length_error("Raw material proof depth/count exceeded");
+      if((nodes&1023)==0)stop();return true;});
+  const auto factor=canonical.value("emissiveFactor",std::array<float,3>{});
+  float strength=1;
+  if(canonical.contains("extensions")&&canonical.at("extensions").contains("KHR_materials_emissive_strength"))
+    strength=canonical.at("extensions").at("KHR_materials_emissive_strength").value("emissiveStrength",1.f);
+  if(std::bit_cast<std::array<uint32_t,3>>(factor)!=std::bit_cast<std::array<uint32_t,3>>(m.emissive)||
+     std::bit_cast<uint32_t>(strength)!=std::bit_cast<uint32_t>(m.emissive_strength))
+    throw std::invalid_argument("Raw emission factor and strength differ from canonical source material");
   const ImportedPrimitive *primitive=nullptr;
   for(const auto &p:a.asset->primitives)if(p.source_mesh==a.source_mesh&&p.source_primitive==a.source_primitive){if(primitive)fail();primitive=&p;}
   if(!primitive||primitive->material!=uint32_t(a.material))fail();

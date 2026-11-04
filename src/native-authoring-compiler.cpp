@@ -21,6 +21,9 @@ NativeAuthoringCompilation compile_native_authoring(
     if (stop()) throw std::runtime_error("Native authoring compilation cancelled");
   };
   check();
+  if(!policy.max_working_bytes||policy.max_working_bytes>512*1024*1024)
+    throw std::invalid_argument("Invalid native authoring working budget");
+  size_t raw_proof_peak=0;
   size_t fixed = sizeof(Scene) + sizeof(NativeAuthoringCompilation);
   auto reserve = [&](size_t count, size_t unit) {
     if (fixed > policy.max_working_bytes ||
@@ -47,6 +50,9 @@ NativeAuthoringCompilation compile_native_authoring(
     for(const auto &group:surface.groups)reserve(group.name.size()+1,sizeof(char));
     const auto &object = capture.scene().object(surface.id);
     if(physical(object)&&(!object.painted||!object.painted->source_sampling_prepared())) {
+      if(object.appearance){const auto scratch=raw_emission_proof_bytes(*object.appearance,stop);
+        if(scratch>policy.max_working_bytes-fixed)throw std::length_error("Raw source material proof exceeds available working budget");
+        raw_proof_peak=std::max(raw_proof_peak,scratch);}
       if(!raw_source_emission(capture,surface,stop))
         throw std::invalid_argument("Physical editable export requires its actual original-source sampling adapter");
       reserve(1,sizeof(TextureMaps)+64+256);
@@ -58,6 +64,7 @@ NativeAuthoringCompilation compile_native_authoring(
       painted |= !maps->overlay->empty()||physical(object);
     }
   }
+  reserve(raw_proof_peak,1); // Keep the single proof peak available during writer replay.
   NativeAuthoringCompilation result;
   if (!painted) {
     result.surfaces = capture.originals();
