@@ -26,13 +26,13 @@ std::string rig_fit_tool_label(const RigFitView *v,int sector){
  static const std::array<const char *,12> labels={"Previous landmark","Next landmark","Place landmark","Fitting options","X -","X +","Y -","Y +","Z -","Z +","Fit and bind","Cancel fitting"};
  if(sector<0||sector>=12)return {};
  if(v&&v->settings){if(sector==0)return "Previous option";if(sector==1)return "Next option";if(sector==2||sector==3)return "Landmarks";if(sector==4)return "Decrease";if(sector==5)return "Increase";if(sector>=6&&sector<=9)return "";}
- if(v&&v->rest_source){if(sector==0&&!v->settings)return "Previous bone";if(sector==1&&!v->settings)return "Next bone";if(sector==2&&!v->settings&&!v->placing)return "Place bone head";if(sector==10)return v->restore_source?"Restore original rig":"Apply rest fitting";}
+ if(v&&v->rest_source){if(sector==0&&!v->settings)return "Previous bone";if(sector==1&&!v->settings)return "Next bone";if(sector==2&&!v->settings&&!v->placing)return "Place bone head";if(sector==10)return v->restore_source?"Restore original source":"Apply rest fitting";}
  if(sector==2&&v&&v->placing)return "Finish placement";
  if(sector==10&&v&&!v->options.bind)return "Fit skeleton";
  return labels[size_t(sector)];
 }
 std::string rig_fit_parameter_text(const RigFitView &v){
- if(v.rest_source){switch(v.parameter){case 0:return "Step (world m) "+std::to_string(v.step);case 1:{const auto parent=v.bone_parents.at(v.role);return "Parent: "+(parent<0?std::string("Root"):v.rest_source->skeleton->bones.at(size_t(parent)).name);}case 2:return "Bone length (world m) "+std::to_string(v.bone_lengths.at(v.role));case 3:return v.linked_rest?"Fit all linked rig parts":"Fit selected rig part";case 4:return v.restore_source?"Restore original rig data":"Keep fitted rig data";default:throw std::invalid_argument("Unknown REST fitting option");}}
+ if(v.rest_source){switch(v.parameter){case 0:return "Step (world m) "+std::to_string(v.step);case 1:{const auto parent=v.bone_parents.at(v.role);return "Parent: "+(parent<0?std::string("Root"):v.rest_source->skeleton->bones.at(size_t(parent)).name);}case 2:return "Bone length (world m) "+std::to_string(v.bone_lengths.at(v.role));case 3:return v.linked_rest?"Fit all linked rig parts":"Fit selected rig part";case 4:return v.restore_source?"Restore original source":"Keep fitted rig data";default:throw std::invalid_argument("Unknown REST fitting option");}}
  auto number=[](const char *name,float value){return std::string(name)+std::to_string(value);};
  const auto &o=v.options;
  switch(v.parameter){case 0:return number("Step (world m) ",v.step);case 1:return o.bind?"Bind skin weights":"Fit skeleton only";
