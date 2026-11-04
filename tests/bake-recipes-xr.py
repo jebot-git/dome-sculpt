@@ -10,7 +10,7 @@ def check(ok,label):
  checks.append({'passed':bool(ok),'check':label});(out/'report.json').write_text(json.dumps({'checks':checks,'physical_headset':False},indent=2)+'\n');print(('PASS ' if ok else 'FAIL ')+label,flush=True);assert ok,label
 with tempfile.TemporaryDirectory(prefix='dome-cage-xr-') as directory:
  root=Path(directory);manifest=root/'runtime.json';manifest.write_text(json.dumps({'file_format_version':'1.0.0','runtime':{'library_path':str(a.runtime)}}))
- env={**os.environ,'DOME_XR_FIXTURE_RECIPE':'1','XR_RUNTIME_JSON':str(manifest),'LIBGL_ALWAYS_SOFTWARE':'1','LP_NUM_THREADS':'2','HOME':str(root),'XDG_RUNTIME_DIR':str(root),'XDG_CONFIG_HOME':str(root/'config'),'XDG_STATE_HOME':str(root/'state'),'XDG_CACHE_HOME':str(root/'cache'),'XDG_DATA_HOME':str(root/'data')};source=out/'source.dsculpt';subprocess.run([str(a.helper),'--ui-fixture',str(source)],env=env,check=True);before=source.read_bytes()
+ env={**os.environ,'DOME_XR_FIXTURE_RECIPE':'1','XR_RUNTIME_JSON':str(manifest),'LIBGL_ALWAYS_SOFTWARE':'1','LP_NUM_THREADS':'2','HOME':str(root),'XDG_RUNTIME_DIR':str(root),'XDG_CONFIG_HOME':str(root/'config'),'XDG_STATE_HOME':str(root/'state'),'XDG_CACHE_HOME':str(root/'cache'),'XDG_DATA_HOME':str(root/'data')};source=out/'source.dsculpt';subprocess.run([str(a.helper),'--ui-wide-fixture' if os.environ.get('DOME_RECIPE_WIDE')=='1' else '--ui-fixture',str(source)],env=env,check=True);before=source.read_bytes()
  def inspect(path):return json.loads(subprocess.check_output([str(a.helper),'--inspect',str(path)],env=env,text=True))
  original_inspection=inspect(source);original=original_inspection['scene'];(out/'source.json').write_text(json.dumps(original,indent=2)+'\n')
  for mode in ['accept','cancel','focus']:

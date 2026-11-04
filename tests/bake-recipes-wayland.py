@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Private native Wayland/DomeD + real Unix stream; no physical-device claim."""
-import asyncio,json,os,platform,re,signal,socket,struct,subprocess,sys,tempfile,time,urllib.request
+import asyncio,json,math,os,platform,re,signal,socket,struct,subprocess,sys,tempfile,time,urllib.request
 from pathlib import Path
 from dbus_next.aio import MessageBus
 from dbus_next import Variant
@@ -88,7 +88,7 @@ async def main():
   check('automatic' in choice['selected'],'Actual compositor keyboard changes the custom cage to automatic in the local draft')
   await key('Tab');await wait(lambda:widget('Use last bake')['focused']);await key('space')
   await wait(lambda:widget('Cage mesh')['choice']==2)
-  check('envelope' in widget('Cage mesh')['selected'] and abs(widget('Front (mm)')['value']-2/3)<1e-6,'Actual native Wayland Recall restores the custom Unicode cage and saved projection range')
+  check('envelope' in widget('Cage mesh')['selected'] and abs(widget('Front (mm)')['value']-math.log1p(100/.01)/math.log1p(100000/.01))<1e-6,'Actual native Wayland Recall restores the custom Unicode cage and saved projection range')
   await chord('Control_L','w');await wait(lambda:named('Bake surface') is None);await command('Save');check(inspect()['scene']==original,'Native Ctrl+W cancels staged cage choice and ordered Save preserves the complete scene')
   await command('Bake surface...');dialog=await wait(lambda:named('Bake surface'));action({'op':'focus','id':dialog['id']});choice=await wait(lambda:widget('Cage mesh'));check(choice['choice']==2,'Reopened Wayland options retain saved recipe after cancelling the recalled draft')
   await chord('Control_L','w');await wait(lambda:named('Bake surface') is None);await command('Close Window');await wait(lambda:client.poll() is not None);check(client.returncode==0,'Native Wayland client closes through normal worker and graphics/font release')

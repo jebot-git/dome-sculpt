@@ -9,7 +9,7 @@ from Xlib.ext import xtest
 from PIL import Image
 signal.pthread_sigmask(signal.SIG_SETMASK,[])
 if os.environ.get('DOME_CAGE_MENU_BUS')!='1':os.execvpe('dbus-run-session',['dbus-run-session','--',sys.executable,*sys.argv],{**os.environ,'DOME_CAGE_MENU_BUS':'1'})
-r=Path(__file__).resolve().parents[1];app_path=Path(os.environ['DOME_CAGE_APP']);helper=Path(os.environ['DOME_CAGE_HELPER']);probe=Path(os.environ['DOME_CAGE_PROBE']);out=Path(os.environ['DOME_CAGE_OUT']);compact=os.environ.get('DOME_CAGE_COMPACT')=='1';out.mkdir(parents=True,exist_ok=True);checks=[];processes=[]
+r=Path(__file__).resolve().parents[1];app_path=Path(os.environ['DOME_CAGE_APP']);helper=Path(os.environ['DOME_CAGE_HELPER']);probe=Path(os.environ['DOME_CAGE_PROBE']);out=Path(os.environ['DOME_CAGE_OUT']);compact=os.environ.get('DOME_CAGE_COMPACT')=='1';wide=os.environ.get('DOME_RECIPE_WIDE')=='1';out.mkdir(parents=True,exist_ok=True);checks=[];processes=[]
 def check(ok,label):
  checks.append({'passed':bool(ok),'check':label});(out/'report.json').write_text(json.dumps({'checks':checks},indent=2)+'\n');print(('PASS ' if ok else 'FAIL ')+label,flush=True);assert ok,label
 async def wait(fn,seconds=30):
@@ -39,7 +39,7 @@ async def main():
   for k,suffix in [('XDG_STATE_HOME','state'),('XDG_CONFIG_HOME','config'),('XDG_CACHE_HOME','cache'),('XDG_DATA_HOME','data'),('XDG_RUNTIME_DIR','runtime')]:env[k]=home+'/'+suffix;Path(env[k]).mkdir(mode=0o700)
   if compact:
    p=Path(home,'config/dome/appearance.json');p.parent.mkdir(parents=True,exist_ok=True);p.write_text(json.dumps({'font':'Unifont / Sans-Serif','font_size':16,'font_scale':2}))
-  project=Path(home,'cage.dsculpt');subprocess.run([str(helper),'--ui-fixture',str(project)],check=True,env=env)
+  project=Path(home,'cage.dsculpt');subprocess.run([str(helper),'--ui-wide-fixture' if wide else '--ui-fixture',str(project)],check=True,env=env)
   def inspect():return json.loads(subprocess.check_output([str(helper),'--inspect',str(project)],env=env))
   original=inspect()['scene'];report=Path(home,'widgets.json');log=(out/'app.log').open('w')
   app=subprocess.Popen([str(app_path),str(project)],cwd=home,env={**env,'LD_PRELOAD':((os.environ['DOME_CAGE_ASAN_RUNTIME']+':') if os.environ.get('DOME_CAGE_ASAN_RUNTIME') else '')+str(probe),'DOME_CAGE_WIDGET_REPORT':str(report)},stdout=log,stderr=log);processes.append(app);d=display.Display(screen)
@@ -109,6 +109,16 @@ async def main():
    check('envelope' in selected.get('selected',''),'Actual native FLTK choice selects the hidden Unicode cage mesh')
   dialog=await open_options();g=dialog.get_geometry();check(g.width<=600 if compact else g.width<1280,'Cage options fit the native work area');check(find('Cage mesh')['choice']==2,'Native project reopening restores its saved custom cage instead of automatic projection')
   saved_front=find('Front (mm)')['value']
+  if wide:
+   check(find('Front (mm)')['value']==1 and find('Back (mm)')['value']==0 and 0<find('AO radius (mm)')['value']<.001,'Native controls retain the saved maximum, zero and tiny positive distances')
+   item=await visible(dialog,'Use last bake');tap(dialog,item['x']+item['w']/2,item['y']+item['h']/2);capture(dialog,'wide-recalled.png')
+   button=await wait(lambda:find('Bake'));tap(dialog,button['x']+button['w']/2,button['y']+button['h']/2)
+   await wait(lambda:'complete' in str(named('Bake surface').get_wm_name()).lower() if named('Bake surface') else False,90)
+   key('Control_L',True);key('w');key('Control_L',False);await wait(lambda:not named('Bake surface'));await command('Save');after=inspect()
+   check(after['baked'] and after['scene']['objects'][0]['bake_recipe']['settings']==original['objects'][0]['bake_recipe']['settings'],'Actual Recall and unchanged Bake preserve all saved zero/tiny/maximum settings through the worker and Save')
+   await command('Undo');await command('Save');check(inspect()['scene']==original,'Wide-range native Bake undoes to the exact saved recipe and original pixels')
+   await command('Redo');await command('Save');check(inspect()['scene']==after['scene'],'Wide-range native Bake redoes to the exact accepted endpoint')
+   await command('Close Window');await wait(lambda:app.poll() is not None);check(app.returncode==0,'Wide-range native client closes with normal worker and graphics teardown');d.close();bus.disconnect();return
   await select_cage(dialog,0);check(True,'Actual arrow-key popup selection changes the saved custom cage to automatic in the local draft')
   item=await visible(dialog,'Front (mm)');tap(dialog,item['x']+item['w']/2,item['y']+item['h']/2,4);await wait(lambda:find('Front (mm)')['value']!=saved_front)
   item=await visible(dialog,'Use last bake');tap(dialog,item['x']+item['w']/2,item['y']+item['h']/2)

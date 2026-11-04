@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/document.hpp"
+#include "dome/bake-distance.hpp"
 #include <nlohmann/json.hpp>
 #include <iostream>
 #include <chrono>
@@ -41,9 +42,9 @@ int main(int argc,char**argv)try{
   check(doc.frame().state->bake_source==scene.objects()[2].id && doc.copy_scene().encode()==before && !doc.frame().state->dirty,"Source choice is staged configuration with no scene or history mutation");
   driver.sector(1);auto c=doc.frame().state->controls;
   check(c.components==3 && c.logarithmic,"Front, back and AO world distances share three logarithmic ray sliders");
-  driver.value(std::log(20/c.minimum)/std::log(c.maximum/c.minimum));driver.ray(.25f,.95f);
+  driver.value(float(bake_distance_to_unit(20)));driver.ray(.25f,.95f);
   check(doc.frame().state->bake_settings.front_mm==50 && doc.copy_scene().encode()==before,"Ray Cancel discards staged projection bounds exactly");
-  driver.sector(1);c=doc.frame().state->controls;driver.value(std::log(20/c.minimum)/std::log(c.maximum/c.minimum));driver.confirm();
+  driver.sector(1);c=doc.frame().state->controls;driver.value(float(bake_distance_to_unit(20)));driver.confirm();
   check(std::abs(doc.frame().state->bake_settings.front_mm-20)<.01f,"Joystick confirmation retains the chosen world-millimetre bounds");
   driver.sector(2);check(doc.frame().state->controls.components==2,"AO sampling and seam padding expose independent controller rows");driver.value(0);driver.value(.125f,1);driver.confirm();
   check(doc.frame().state->bake_settings.ao_samples==0 && doc.frame().state->bake_settings.padding==8 && !doc.frame().state->dirty,"Quality confirmation selects integer AO samples and padding without dirtying the scene");
