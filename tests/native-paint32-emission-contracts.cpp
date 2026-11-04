@@ -3,6 +3,7 @@
 #include "native-physical-contracts.cpp"
 #undef DOME_NATIVE_PHYSICAL_CONTRACTS_NO_MAIN
 #include "native-paint32-fixture.hpp"
+#include "emission-export.hpp"
 int main(int argc,char **argv)try{
  if(argc<2||argc>3)return 2;const std::filesystem::path out=argv[1];std::filesystem::create_directories(out);auto scene=native_split(native_grid(Material::AlphaMode::Opaque));scene.active().material.emissive={8,.016f,.16f};scene.validate();const auto exact=scene.encode();auto captured=std::make_shared<NativeEmissionExport>();captured->scene=std::make_shared<const Scene>(scene.snapshot());captured->scope=NativeEmissionExport::Scope::WholeScene;captured->allow_measured_core_fallback=true;GltfExportOptions options;options.emission=captured;
  auto emit=[&](const std::filesystem::path &path,const GltfExportOptions &settings){auto surfaces=emission_export_surfaces(*captured->scene,settings.cancelled);return export_glb(surfaces,path,settings);};
@@ -11,8 +12,9 @@ int main(int argc,char **argv)try{
  if(argc==3&&std::string_view(argv[2])=="--oom"){
   size_t baseline=0;{allocation_probe::Guard guard(SIZE_MAX);emit(baseline_file,options);baseline=allocation_probe::calls;}
   std::cout<<"NATIVE32_PHYSICAL_BASELINE "<<baseline<<std::endl;size_t denied=0,successful=0,translated=0;std::set<std::string> messages;
-  for(size_t prefix=0;prefix<=baseline;++prefix){seed(file);const auto prior=bytes(file);bool failed=false,other=false;char message[256]{};size_t calls=0;
-   {allocation_probe::Guard guard(prefix);try{emit(file,options);}catch(const std::bad_alloc&){failed=true;}catch(const std::exception&e){failed=other=true;std::snprintf(message,sizeof(message),"%s",e.what());}calls=allocation_probe::calls;}
+  for(size_t prefix=0;prefix<=baseline;++prefix){seed(file);const auto prior=bytes(file);bool failed=false,other=false;std::exception_ptr error;size_t calls=0;
+   {allocation_probe::Guard guard(prefix);try{emit(file,options);}catch(const std::bad_alloc&){failed=true;}catch(const std::exception&e){failed=other=true;error=std::current_exception();}calls=allocation_probe::calls;}
+   std::string message;if(error)try{std::rethrow_exception(error);}catch(const std::exception&e){message=e.what();}
    if(other&&calls<=prefix)throw std::runtime_error(std::string("Unrelated export error in allocation sweep: ")+message);
    if(failed){if(bytes(file)!=prior||scene.encode()!=exact)throw std::runtime_error("Native32 physical allocation denial changed prior output or complete source");++denied;if(other){++translated;if(messages.insert(message).second)std::cout<<"NATIVE32_TRANSLATED_DENIAL "<<message<<std::endl;}}
    else {auto restored=extract_native_emission(bytes(file));if(!restored||restored->encode()!=exact)throw std::runtime_error("Successful allocation prefix failed exact native32 recovery");++successful;}
@@ -22,6 +24,7 @@ int main(int argc,char **argv)try{
   check(denied&&successful&&scene.encode()==exact,"All measured calling-thread C++ prefixes retain exact file/source or complete successful package");std::cout<<"NATIVE32_PHYSICAL_PREFIXES denied="<<denied<<" successful="<<successful<<" baseline="<<baseline<<" translated="<<translated<<std::endl;return 0;
  }
  emit(file,options);const auto original=bytes(file);auto native=extract_native_emission(original);check(native&&native->encode()==exact,"Real physical package3 entrypoint recovers complete exact native32 source");
+ const auto field=detail::native_paint_emission_field(scene.active(),{});const auto encoded=encode_emission_exr(field);EmissionInterchangeLimits codec;codec.max_encoded_bytes=encoded.size();check(encode_emission_exr(field,codec)==encoded,"Exact compressed EXR byte cap preserves encoded physical data");--codec.max_encoded_bytes;check(refusal([&]{encode_emission_exr(field,codec);},"budget"),"One below actual compressed EXR size refuses through bounded stream without publication");
  auto bounded=options;bounded.max_output_bytes=original.size();emit(file,bounded);check(bytes(file)==original,"Exact complete physical container limit preserves successful bytes");--bounded.max_output_bytes;check(refusal([&]{emit(file,bounded);},"budget")&&bytes(file)==original,"One byte below complete physical container limit refuses without publication");
  NativeEmissionReadLimits limits;limits.max_container_bytes=original.size();check(extract_native_emission(original,limits)->encode()==exact,"Exact physical reader container limit remains valid");--limits.max_container_bytes;check(refusal([&]{extract_native_emission(original,limits);},"limits"),"One below physical reader container limit refuses before decode");
  auto word=[](const auto &b,size_t p){return uint32_t(b[p])|uint32_t(b[p+1])<<8|uint32_t(b[p+2])<<16|uint32_t(b[p+3])<<24;};const auto json_size=word(original,12);auto json=nlohmann::json::parse(original.begin()+20,original.begin()+20+json_size);const auto &entry=json.at("extras").at("domeSculptEmission").at("native");const auto stored=json.at("bufferViews").at(entry.at("bufferView").get<size_t>()).at("byteLength").get<size_t>();limits={};limits.max_native_bytes=stored;check(extract_native_emission(original,limits)->encode()==exact,"Exact stored native32 owner byte cap recovers unchanged source");--limits.max_native_bytes;check(refusal([&]{extract_native_emission(original,limits);},"byte"),"One below actual stored owner cap refuses without reconstruction");

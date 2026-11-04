@@ -70,8 +70,11 @@ void EmissionInterchangeImage::validate(const EmissionInterchangeLimits &l)const
 }
 std::vector<uint8_t> encode_emission_exr(const EmissionInterchangeImage &image,const EmissionInterchangeLimits &l){
  image.validate(l);const auto raw=image.pixels.size()*sizeof(image.pixels[0]);const size_t forecast=raw+raw/50+1024*1024;
- if(forecast>l.max_encoded_bytes||raw>l.max_working_bytes-std::min(l.max_working_bytes,forecast))throw std::length_error("HDR EXR encode forecast exceeds working/output budgets");
- Output stream(l,forecast);exr::Header header(int(image.width),int(image.height));header.compression()=exr::ZIP_COMPRESSION;header.insert("domeSculptEmissionVersion",exr::IntAttribute(1));header.insert("domeSculptEmissionUnits",exr::StringAttribute("linear-cd/m2;legacy-relative-premult;physical-absolute-premult;coverage-linear"));header.insert("domeSculptEmissionCoordinates",exr::StringAttribute("row0=v0"));
+ if(raw>l.max_working_bytes-std::min(l.max_working_bytes,forecast))throw std::length_error("HDR EXR encode forecast exceeds working/output budgets");
+ // Keep the original conservative working preflight, but reserve only the
+ // permitted encoded capacity. The stream enforces the real byte/seek cap,
+ // including a compressed result smaller than the allocation forecast.
+ Output stream(l,std::min(forecast,l.max_encoded_bytes));exr::Header header(int(image.width),int(image.height));header.compression()=exr::ZIP_COMPRESSION;header.insert("domeSculptEmissionVersion",exr::IntAttribute(1));header.insert("domeSculptEmissionUnits",exr::StringAttribute("linear-cd/m2;legacy-relative-premult;physical-absolute-premult;coverage-linear"));header.insert("domeSculptEmissionCoordinates",exr::StringAttribute("row0=v0"));
  exr::FrameBuffer frame;for(size_t c=0;c<channels.size();++c){header.channels().insert(channels[c],exr::Channel(exr::FLOAT));frame.insert(channels[c],exr::Slice(exr::FLOAT,reinterpret_cast<char*>(const_cast<float*>(image.pixels[0].data()+c)),sizeof(image.pixels[0]),sizeof(image.pixels[0])*image.width));}
  {exr::OutputFile file(stream,header,0);file.setFrameBuffer(frame);for(uint32_t y=0;y<image.height;y+=16){stop(l);file.writePixels(int(std::min(16u,image.height-y)));}}
  stop(l);return std::move(stream.bytes);
