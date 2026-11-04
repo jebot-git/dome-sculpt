@@ -1,5 +1,16 @@
 # Dome Sculpt production handoff
 
+## Private XR Files policy fixture — 2026-11-04
+
+The complete actual synthetic-loader suite passes152 checks after the test
+selects the real Export policy with release/re-arm and valid tracking/focus.
+Only the fake-runtime TU changes; coherent product bytes are unchanged. Native
+Save and GLB export complete; the emitted GLB has zero Khronos errors/warnings.
+Read XR-FILES-POLICY.md and its exact scoped receipt. This is not full coherent,
+sanitizer/device/main admission; the two Source4 downstream workflow migrations
+and every unfinished original/additional requirement remain active.
+
+
 ## Private coherent application qualification candidate — 2026-11-04
 
 This private union composes current public Restore/IO/final27 SDK with qualified

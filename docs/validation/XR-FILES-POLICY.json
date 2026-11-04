@@ -1,0 +1,419 @@
+{
+  "date": "2026-11-04",
+  "source_parent": "b6d402bc0a72d47797f14c693a081201d35daa42",
+  "scope": "Test-only full fake-runtime TU rebuilt with matching coherent compiler/header ABI; unchanged immutable complete app from34b/b6product-equal snapshot. Actual full native loader/controller suite with privatefake manifests/softwareGL/privateDBus, noHMD/GPU. Not a new product/appbuild.",
+  "runtime_product_changes": false,
+  "terminal": {
+    "state": "terminal",
+    "pid": 1327658,
+    "source": "b6d402bc0a72d47797f14c693a081201d35daa42",
+    "scope": "Test-only full fake-runtime TU rebuilt with matching coherent compiler/header ABI; unchanged immutable complete app from34b/b6product-equal snapshot. Actual full native loader/controller suite with privatefake manifests/softwareGL/privateDBus, noHMD/GPU. Not a new product/appbuild.",
+    "steps": [
+      {
+        "phase": "compile",
+        "command": [
+          "/usr/bin/c++",
+          "-Ddome_sculpt_test_runtime_EXPORTS",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/xr-file-policy-b6d402b/third_party/nlohmann",
+          "-isystem",
+          "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/harfbuzz",
+          "-isystem",
+          "/usr/include/glib-2.0",
+          "-isystem",
+          "/usr/lib64/glib-2.0/include",
+          "-isystem",
+          "/usr/include/sysprof-6",
+          "-isystem",
+          "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/freetype2",
+          "-isystem",
+          "/usr/include/libpng16",
+          "-isystem",
+          "/usr/include/libxml2",
+          "-O3",
+          "-DNDEBUG",
+          "-std=gnu++20",
+          "-fPIC",
+          "-pthread",
+          "-DWITH_GZFILEOP",
+          "-o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/xr-file-policy-b6d402b/artifacts/policy-proof/release-v4/runtime.o",
+          "-c",
+          "/home/blux/de-xr/dome-sculpt/artifacts/xr-file-policy-b6d402b/tests/xr_runtime.cpp"
+        ],
+        "exit": 0,
+        "seconds": 3.661380036995979
+      },
+      {
+        "phase": "link",
+        "command": [
+          "/usr/bin/c++",
+          "-fPIC",
+          "-O3",
+          "-DNDEBUG",
+          "-shared",
+          "-Wl,-soname,libdome-sculpt-test-runtime.so",
+          "-o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/xr-file-policy-b6d402b/artifacts/policy-proof/release-v4/libdome-sculpt-test-runtime.so",
+          "/home/blux/de-xr/dome-sculpt/artifacts/xr-file-policy-b6d402b/artifacts/policy-proof/release-v4/runtime.o",
+          "-Wl,-rpath,/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib",
+          "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libharfbuzz.so",
+          "/usr/lib64/libEGL.so",
+          "/usr/lib64/libGL.so",
+          "/usr/lib64/libfontconfig.so",
+          "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libfreetype.so",
+          "/usr/lib64/libicui18n.so",
+          "/usr/lib64/libicuuc.so"
+        ],
+        "exit": 0,
+        "seconds": 0.0482829779793974
+      },
+      {
+        "phase": "run",
+        "command": [
+          "dbus-run-session",
+          "--",
+          "python3",
+          "/home/blux/de-xr/dome-sculpt/artifacts/xr-file-policy-b6d402b/tests/xr_runtime.py",
+          "/home/blux/de-xr/dome-sculpt/artifacts/xr-file-policy-b6d402b/artifacts/policy-proof/release-v4/dome-sculpt",
+          "/home/blux/de-xr/dome-sculpt/artifacts/xr-file-policy-b6d402b/artifacts/policy-proof/release-v4/libdome-sculpt-test-runtime.so",
+          "/home/blux/de-xr/dome-sculpt/artifacts/xr-file-policy-b6d402b/artifacts/policy-proof/release-v4/output"
+        ],
+        "exit": 0,
+        "seconds": 158.8543275060074
+      }
+    ],
+    "child_pid": 1328016,
+    "actual_exit": 0,
+    "seconds": 162.65080526299425,
+    "inputs": 1747,
+    "drift": [],
+    "app_sha256": "c79f3014c8a4ccef4d9f915f3f1ef48fb17667caae772083fadfd456e67e889b",
+    "runtime_sha256": "99eeff9b634bcdb4bf61a5e81c8ec6571c51bc16b684b199d8a0aeba2f360a21"
+  },
+  "pass_checks": 152,
+  "inputs": {
+    "count": 1747,
+    "before_sha256": "dfdcb0164a8e64922b5dafde6cf25f410ecc9afdd67f90f365232285d2fc5147",
+    "after_sha256": "dfdcb0164a8e64922b5dafde6cf25f410ecc9afdd67f90f365232285d2fc5147",
+    "drift": []
+  },
+  "source_sha256": {
+    "tests/xr_runtime.cpp": "908094dd3e4fda4f9077504bf23174d1c247708c1f5fd0f39d2918577aaf97a0",
+    "tests/xr_runtime.py": "062f27028d4db51eb9a2a004002086426eb34e5588b2b185617b9b7fd555c06b"
+  },
+  "artifacts": {
+    "artifacts/policy-proof/release-v4/run.log": "885498b8841646991e57305da4c865986bd0fb027eb135e71709b490a7566115",
+    "artifacts/policy-proof/release-v4/runtime.o": "01812993212e871bb83974daa06339f773b15c8a081b330e8aa03af37066d340",
+    "artifacts/policy-proof/release-v4/dome-sculpt": "c79f3014c8a4ccef4d9f915f3f1ef48fb17667caae772083fadfd456e67e889b",
+    "artifacts/policy-proof/release-v4/libdome-sculpt-test-runtime.so": "99eeff9b634bcdb4bf61a5e81c8ec6571c51bc16b684b199d8a0aeba2f360a21",
+    "artifacts/policy-proof/release-v4/output/files.json": "84c9e7e472c140633a14a74741a5ccfbee4768c613f911d7c4e21c7a478ed115",
+    "artifacts/policy-proof/release-v4/output/files.json.file-export-32-0.ppm": "3341c609f57f79cce7b1c24a1775ba7bb9f84b781cb34d9e7fd1439707966e80",
+    "artifacts/policy-proof/release-v4/output/files.json.file-export-32-1.ppm": "9ff0287bf939b5d6cfbf6bc43bf14e08199709ec6f9bbcfe3bd44ad5fca9e92e"
+  },
+  "validator": {
+    "version": "2.0.0-dev.3.10",
+    "maxIssues": 0,
+    "outputs": [
+      {
+        "path": "artifacts/policy-proof/release-v4/output/projects-5v4nxkq0/state/dome-sculpt/Recovery-1341916.glb",
+        "sha256": "22200865cba16ae30ca9b64781d4d7203fc9307a55f48b28298d6402866171c6",
+        "issues": {
+          "numErrors": 0,
+          "numWarnings": 0,
+          "numInfos": 1,
+          "numHints": 0,
+          "messages": [
+            {
+              "code": "UNUSED_OBJECT",
+              "message": "This object may be unused.",
+              "severity": 2,
+              "pointer": "/meshes/0/primitives/0/attributes/TEXCOORD_0"
+            }
+          ],
+          "truncated": false
+        }
+      }
+    ]
+  },
+  "preserved_negatives": [
+    {
+      "cohort": "release",
+      "status": {
+        "state": "terminal",
+        "pid": 286102,
+        "source": "b6d402bc0a72d47797f14c693a081201d35daa42",
+        "scope": "Test-only full fake-runtime TU rebuilt with matching coherent compiler/header ABI; unchanged immutable complete app from34b/b6product-equal snapshot. Actual full native loader/controller suite with privatefake manifests/softwareGL/privateDBus, noHMD/GPU. Not a new product/appbuild.",
+        "steps": [
+          {
+            "phase": "compile",
+            "command": [
+              "/usr/bin/c++",
+              "-Ddome_sculpt_test_runtime_EXPORTS",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/xr-file-policy-b6d402b/third_party/nlohmann",
+              "-isystem",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/harfbuzz",
+              "-isystem",
+              "/usr/include/glib-2.0",
+              "-isystem",
+              "/usr/lib64/glib-2.0/include",
+              "-isystem",
+              "/usr/include/sysprof-6",
+              "-isystem",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/freetype2",
+              "-isystem",
+              "/usr/include/libpng16",
+              "-isystem",
+              "/usr/include/libxml2",
+              "-O3",
+              "-DNDEBUG",
+              "-std=gnu++20",
+              "-fPIC",
+              "-pthread",
+              "-DWITH_GZFILEOP",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-file-policy-b6d402b/artifacts/policy-proof/release/runtime.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-file-policy-b6d402b/tests/xr_runtime.cpp"
+            ],
+            "exit": 0,
+            "seconds": 5.092858074000105
+          },
+          {
+            "phase": "link",
+            "command": [
+              "/usr/bin/c++",
+              "-fPIC",
+              "-O3",
+              "-DNDEBUG",
+              "-shared",
+              "-Wl,-soname,libdome-sculpt-test-runtime.so",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-file-policy-b6d402b/artifacts/policy-proof/release/libdome-sculpt-test-runtime.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-file-policy-b6d402b/artifacts/policy-proof/release/runtime.o",
+              "-Wl,-rpath,/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libharfbuzz.so",
+              "/usr/lib64/libEGL.so",
+              "/usr/lib64/libGL.so",
+              "/usr/lib64/libfontconfig.so",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libfreetype.so",
+              "/usr/lib64/libicui18n.so",
+              "/usr/lib64/libicuuc.so"
+            ],
+            "exit": 0,
+            "seconds": 0.08601053600432351
+          },
+          {
+            "phase": "run",
+            "command": [
+              "dbus-run-session",
+              "--",
+              "python3",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-file-policy-b6d402b/tests/xr_runtime.py",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-file-policy-b6d402b/artifacts/policy-proof/release/dome-sculpt",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-file-policy-b6d402b/artifacts/policy-proof/release/libdome-sculpt-test-runtime.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-file-policy-b6d402b/artifacts/policy-proof/release/output"
+            ],
+            "exit": 1,
+            "seconds": 60.45506240800023
+          }
+        ],
+        "child_pid": 312053,
+        "actual_exit": 1,
+        "seconds": 65.85556685499614,
+        "inputs": 1742,
+        "drift": [],
+        "app_sha256": "c79f3014c8a4ccef4d9f915f3f1ef48fb17667caae772083fadfd456e67e889b",
+        "runtime_sha256": "a38a016f067231835794a4e7f373fa447f32bd6e472ba7cdec3c2e4c5302b4ec"
+      },
+      "status_sha256": "c8b14b18028f4e0ca13c18a2b1caab83f62f56ca5c640128ce1d6fa1a4f52467"
+    },
+    {
+      "cohort": "release-v2",
+      "status": {
+        "state": "terminal",
+        "pid": 1278370,
+        "source": "b6d402bc0a72d47797f14c693a081201d35daa42",
+        "scope": "Test-only full fake-runtime TU rebuilt with matching coherent compiler/header ABI; unchanged immutable complete app from34b/b6product-equal snapshot. Actual full native loader/controller suite with privatefake manifests/softwareGL/privateDBus, noHMD/GPU. Not a new product/appbuild.",
+        "steps": [
+          {
+            "phase": "compile",
+            "command": [
+              "/usr/bin/c++",
+              "-Ddome_sculpt_test_runtime_EXPORTS",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/xr-file-policy-b6d402b/third_party/nlohmann",
+              "-isystem",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/harfbuzz",
+              "-isystem",
+              "/usr/include/glib-2.0",
+              "-isystem",
+              "/usr/lib64/glib-2.0/include",
+              "-isystem",
+              "/usr/include/sysprof-6",
+              "-isystem",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/freetype2",
+              "-isystem",
+              "/usr/include/libpng16",
+              "-isystem",
+              "/usr/include/libxml2",
+              "-O3",
+              "-DNDEBUG",
+              "-std=gnu++20",
+              "-fPIC",
+              "-pthread",
+              "-DWITH_GZFILEOP",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-file-policy-b6d402b/artifacts/policy-proof/release-v2/runtime.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-file-policy-b6d402b/tests/xr_runtime.cpp"
+            ],
+            "exit": 0,
+            "seconds": 3.715263858990511
+          },
+          {
+            "phase": "link",
+            "command": [
+              "/usr/bin/c++",
+              "-fPIC",
+              "-O3",
+              "-DNDEBUG",
+              "-shared",
+              "-Wl,-soname,libdome-sculpt-test-runtime.so",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-file-policy-b6d402b/artifacts/policy-proof/release-v2/libdome-sculpt-test-runtime.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-file-policy-b6d402b/artifacts/policy-proof/release-v2/runtime.o",
+              "-Wl,-rpath,/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libharfbuzz.so",
+              "/usr/lib64/libEGL.so",
+              "/usr/lib64/libGL.so",
+              "/usr/lib64/libfontconfig.so",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libfreetype.so",
+              "/usr/lib64/libicui18n.so",
+              "/usr/lib64/libicuuc.so"
+            ],
+            "exit": 0,
+            "seconds": 0.058347178011899814
+          },
+          {
+            "phase": "run",
+            "command": [
+              "dbus-run-session",
+              "--",
+              "python3",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-file-policy-b6d402b/tests/xr_runtime.py",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-file-policy-b6d402b/artifacts/policy-proof/release-v2/dome-sculpt",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-file-policy-b6d402b/artifacts/policy-proof/release-v2/libdome-sculpt-test-runtime.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-file-policy-b6d402b/artifacts/policy-proof/release-v2/output"
+            ],
+            "exit": 1,
+            "seconds": 152.99257028198917
+          }
+        ],
+        "child_pid": 1278765,
+        "actual_exit": 1,
+        "seconds": 156.85214483502205,
+        "inputs": 1747,
+        "drift": [],
+        "app_sha256": "c79f3014c8a4ccef4d9f915f3f1ef48fb17667caae772083fadfd456e67e889b",
+        "runtime_sha256": "a38a016f067231835794a4e7f373fa447f32bd6e472ba7cdec3c2e4c5302b4ec"
+      },
+      "status_sha256": "abffd63d03e80e86b36cb82659aebc14dbf0ccb501177b7e7e19c19702c29db2"
+    },
+    {
+      "cohort": "focused-v3",
+      "status": {
+        "state": "terminal",
+        "pid": 1316867,
+        "source": "b6d402bc0a72d47797f14c693a081201d35daa42",
+        "scope": "Test-only full fake-runtime TU rebuilt with matching coherent compiler/header ABI; unchanged immutable complete app from34b/b6product-equal snapshot. Actual full native loader/controller suite with privatefake manifests/softwareGL/privateDBus, noHMD/GPU. Not a new product/appbuild.",
+        "steps": [
+          {
+            "phase": "compile",
+            "command": [
+              "/usr/bin/c++",
+              "-Ddome_sculpt_test_runtime_EXPORTS",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/xr-file-policy-b6d402b/third_party/nlohmann",
+              "-isystem",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/harfbuzz",
+              "-isystem",
+              "/usr/include/glib-2.0",
+              "-isystem",
+              "/usr/lib64/glib-2.0/include",
+              "-isystem",
+              "/usr/include/sysprof-6",
+              "-isystem",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/freetype2",
+              "-isystem",
+              "/usr/include/libpng16",
+              "-isystem",
+              "/usr/include/libxml2",
+              "-O3",
+              "-DNDEBUG",
+              "-std=gnu++20",
+              "-fPIC",
+              "-pthread",
+              "-DWITH_GZFILEOP",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-file-policy-b6d402b/artifacts/policy-proof/focused-v3/runtime.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-file-policy-b6d402b/tests/xr_runtime.cpp"
+            ],
+            "exit": 0,
+            "seconds": 3.6876601169933565
+          },
+          {
+            "phase": "link",
+            "command": [
+              "/usr/bin/c++",
+              "-fPIC",
+              "-O3",
+              "-DNDEBUG",
+              "-shared",
+              "-Wl,-soname,libdome-sculpt-test-runtime.so",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-file-policy-b6d402b/artifacts/policy-proof/focused-v3/libdome-sculpt-test-runtime.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-file-policy-b6d402b/artifacts/policy-proof/focused-v3/runtime.o",
+              "-Wl,-rpath,/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libharfbuzz.so",
+              "/usr/lib64/libEGL.so",
+              "/usr/lib64/libGL.so",
+              "/usr/lib64/libfontconfig.so",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libfreetype.so",
+              "/usr/lib64/libicui18n.so",
+              "/usr/lib64/libicuuc.so"
+            ],
+            "exit": 0,
+            "seconds": 0.048873088002437726
+          },
+          {
+            "phase": "run",
+            "command": [
+              "dbus-run-session",
+              "--",
+              "python3",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-file-policy-b6d402b/artifacts/policy-proof/focused-files.py",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-file-policy-b6d402b/artifacts/policy-proof/focused-v3/dome-sculpt",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-file-policy-b6d402b/artifacts/policy-proof/focused-v3/libdome-sculpt-test-runtime.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-file-policy-b6d402b/artifacts/policy-proof/focused-v3/output"
+            ],
+            "exit": 0,
+            "seconds": 5.501404075999744
+          }
+        ],
+        "child_pid": 1317241,
+        "actual_exit": 0,
+        "seconds": 9.32478035998065,
+        "inputs": 1747,
+        "drift": [],
+        "app_sha256": "c79f3014c8a4ccef4d9f915f3f1ef48fb17667caae772083fadfd456e67e889b",
+        "runtime_sha256": "99eeff9b634bcdb4bf61a5e81c8ec6571c51bc16b684b199d8a0aeba2f360a21"
+      },
+      "status_sha256": "543947e42212f2a7c6b8a1d20779528cbde7be53a6a59ed336325028e180a6b6"
+    }
+  ],
+  "limits": [
+    "Synthetic runtime and software OpenGL; no physical HMD or new GPU qualification.",
+    "Only full test-runtime TU rebuilt; application/core/headers unchanged coherent snapshot.",
+    "Not a full coherent regression or sanitizer XR proof.",
+    "Current public Mesa and newer XR Mirror controls are separate unmerged leaves."
+  ]
+}

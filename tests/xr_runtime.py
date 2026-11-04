@@ -547,6 +547,15 @@ with contextlib.nullcontext(tempfile.mkdtemp(prefix="projects-", dir=output)) as
         files.returncode == 0,
         "Joystick file commands complete without running I/O in the XR frame thread",
     )
+    file_report = json.loads((output / "files.json").read_text())
+    check(
+        all(file_report.get("file_export_images", {}).get("32", {}).get(eye, 0) > 1000 for eye in ("0", "1")),
+        "Both actual stereo swapchains draw the explicit Export policy before its joystick Strict glTF choice",
+    )
+    check(
+        all((output / ("files.json.file-export-32-" + eye + ".ppm")).is_file() for eye in ("0", "1")),
+        "Actual native Export policy captures are retained for visual review",
+    )
     saved = list((root / "state/dome-sculpt").glob("*.dsculpt"))
     exported = list((root / "state/dome-sculpt").glob("*.glb"))
     check(

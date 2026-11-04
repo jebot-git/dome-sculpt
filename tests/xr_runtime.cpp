@@ -405,6 +405,13 @@ FN(ReleaseSwapchainImage, XrSwapchain p, const XrSwapchainImageReleaseInfo *) {
       for(int y=int(s->height)-1;y>=0;--y)for(unsigned x=0;x<s->width;++x)for(int c=0;c<3;++c)capture.put(char(displayed(bytes[(size_t(y)*s->width+x)*4+c])));
     }
   }
+  if(getenv("DOME_XR_FIXTURE_FILES") && frame==32){
+    report["file_export_images"]["32"][std::to_string(s->eye)]=std::count_if(bytes.begin(),bytes.end(),[](uint8_t value){return value!=0;});
+    if(auto path=getenv("DOME_XR_FIXTURE_REPORT")){
+      std::ofstream capture(std::string(path)+".file-export-32-"+std::to_string(s->eye)+".ppm",std::ios::binary);capture<<"P6\n"<<s->width<<' '<<s->height<<"\n255\n";
+      for(int y=int(s->height)-1;y>=0;--y)for(unsigned x=0;x<s->width;++x)for(int c=0;c<3;++c)capture.put(char(displayed(bytes[(size_t(y)*s->width+x)*4+c])));
+    }
+  }
   if(selection_fixture()&&(frame==24||frame==29||frame==40)){
     unsigned red=0,green=0,ghost=0,solid=0;
     for(size_t k=0;k<bytes.size();k+=4){
@@ -588,6 +595,7 @@ FN(PollEvent, XrInstance, XrEventDataBuffer *out) {
   if(selection_fixture()||pbr_preview_fixture())focus_at=90;
   if(!import_atlas_mode().empty())focus_at=1000;
   if(!rig_fit_mode().empty())focus_at=rig_fit_mode()=="focus"?47:1000;
+  if(getenv("DOME_XR_FIXTURE_FILES"))focus_at=90;
   if(!projection_mode().empty())focus_at=projection_mode()=="focus"?78:1000;
   if(!affine_contact_mode().empty())focus_at=affine_contact_mode()=="focus"?12:90;
   if (focus_frame >= focus_at && !lost) {
@@ -707,7 +715,7 @@ FN(EndFrame, XrSession, const XrFrameEndInfo *p) {
 FN(LocateViews, XrSession, const XrViewLocateInfo *, XrViewState *state,
    uint32_t cap, uint32_t *n, XrView *p) {
   *n = 2;
-  state->viewStateFlags = frame == 27 && (import_atlas_mode().empty()&&projection_mode().empty()&&rig_fit_mode().empty()) && !selection_fixture() && affine_contact_mode().empty() && (polygon_mode().empty()&&corner_uv_mode().empty()) && bake_policy_mode().empty() && procedural_mode().empty() && resolution_mode().empty() && skin_mode()!="focus" && retopo_mode().empty() && mask_mode().empty() && cut_mode().empty() ? 0
+  state->viewStateFlags = frame == 27 && !getenv("DOME_XR_FIXTURE_FILES") && (import_atlas_mode().empty()&&projection_mode().empty()&&rig_fit_mode().empty()) && !selection_fixture() && affine_contact_mode().empty() && (polygon_mode().empty()&&corner_uv_mode().empty()) && bake_policy_mode().empty() && procedural_mode().empty() && resolution_mode().empty() && skin_mode()!="focus" && retopo_mode().empty() && mask_mode().empty() && cut_mode().empty() ? 0
                                       : XR_VIEW_STATE_POSITION_VALID_BIT |
                                             XR_VIEW_STATE_ORIENTATION_VALID_BIT;
   if (cap < 2)
@@ -749,8 +757,9 @@ FN(GetActionStateBoolean, XrSession, const XrActionStateGetInfo *p,
        (getenv("DOME_XR_FIXTURE_SCENE") &&
         (frame == 12 || frame == 16 || frame == 18 || frame == 20)) ||
        (getenv("DOME_XR_FIXTURE_FILES") &&
-        (frame == 24 || frame == 26 || frame == 28 || frame == 30)));
-  out->changedSinceLastSync = button && (frame >= 8 && frame <= 11);
+        (frame == 24 || frame == 26 || frame == 28 || frame == 30 || frame == 34)));
+  out->changedSinceLastSync = button && ((frame >= 8 && frame <= 11) ||
+      (getenv("DOME_XR_FIXTURE_FILES") && frame >= 24 && frame <= 35));
   if (auto mode = voxel_mode(); !mode.empty()) {
     out->currentState = button &&
         (frame == 8 || frame == 10 || frame == 12 || frame == 14 ||
@@ -910,6 +919,10 @@ FN(GetActionStateVector2f, XrSession, const XrActionStateGetInfo *p,
       out->currentState = {-1, 0};
     if (frame == 29 || frame == 30)
       out->currentState = {-.8660254f, -.5f};
+    // The main-page sector opens Export options. Release/re-arm, then
+    // explicitly choose Strict glTF on the current policy page.
+    if (frame == 33 || frame == 34)
+      out->currentState = {1, 0};
   }
   if (getenv("DOME_XR_FIXTURE_SCENE") && right(p->subactionPath) &&
       a->name == "right_stick") {
