@@ -1,10 +1,12 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/paint.hpp"
+#include "dome/source-paint.hpp"
 #include "dome/projection.hpp"
 #include "dome/source-maps.hpp"
 #include "dome/scene.hpp"
 #include "dome/humanoid-creator.hpp"
 #include <iostream>
+#include <cstdlib>
 #include <nlohmann/json.hpp>
 using namespace dome;
 namespace {
@@ -40,7 +42,15 @@ int main(int argc,char **argv)try{
   Mesh zero=quad();for(auto &uv:zero.uv)uv={.25f,.25f};check(rejects([&]{PaintedMesh p(zero,64);}),"Strict authoring still rejects zero-area UV triangles");
   auto retained=PaintedMesh::from_maps(zero,appearance,64,source());
   check(retained->mesh().indices==zero.indices&&retained->surface_diagnostics().unpaintable_uv_faces==std::vector<uint32_t>{0,1}&&retained->surface_diagnostics().covered_texels==0,"Zero-area source UV faces remain rendered with explicit unpaintable-face diagnostics");
-  retained->begin_stroke();retained->stamp(brush({0,0,0}),settings);check(!retained->end_stroke()&&retained->has_paint_data()&&retained->layers()[0].tiles[0]==nullptr,"Unpaintable source UV faces do not allocate paint coverage or discard original appearance");
+  const auto zero_before=retained->encode();bool zero_refused=false;try{retained->begin_stroke();}catch(const std::logic_error &e){zero_refused=std::string_view(e.what()).find("Prepare an editable texture atlas")!=std::string_view::npos;}
+  check(zero_refused&&!retained->in_stroke()&&!retained->pending_changes()&&retained->encode()==zero_before&&retained->has_paint_data()&&retained->layers()[0].tiles[0]==nullptr,"Wholly unpaintable source UVs refuse a stroke atomically without allocating coverage or discarding original appearance");
+  const std::vector<uint32_t> identity={0,1,2,3};auto editable=prepare_source_paint(retained,quad(),identity);
+  check(editable->valid_source_sampling_attachment()&&editable->surface_diagnostics().policy==PaintUvPolicy::Strict&&editable->surface_diagnostics().covered_texels==4096&&editable->source_sampling_original()->mesh().uv==zero.uv&&editable->source_maps()->color.image==appearance->color.image&&editable->source_sampling_original()->source_maps()->color.image==appearance->color.image,"Genuine source preparation creates a strict writable atlas while retaining exact degenerate coordinates and immutable source image ownership");
+  const auto empty_pixel=editable->pixel(editable->active_layer(),32,32).data;auto paint_settings=settings;paint_settings.color={.1f,.9f,.2f,1};editable->begin_stroke();editable->stamp(brush({0,0,0}),paint_settings);check(editable->end_stroke(),"Prepared formerly degenerate source receives a real changed colour stroke");const auto painted_pixel=editable->pixel(editable->active_layer(),32,32).data;
+  check(painted_pixel!=empty_pixel&&editable->undo()&&editable->pixel(editable->active_layer(),32,32).data==empty_pixel&&editable->redo()&&editable->pixel(editable->active_layer(),32,32).data==painted_pixel,"Actual prepared-source colour has exact pixel Undo and Redo without changing the original sampling owner");
+  Scene prepared_scene;prepared_scene.active().mesh_active=true;prepared_scene.active().painted=editable;prepared_scene.active().material=white();const auto prepared_state=prepared_scene.encode();const char *output=std::getenv("DOME_SOURCE_UV_TEST_OUT");const auto directory=output?std::filesystem::path(output):std::filesystem::current_path()/"source-uv-preparation";std::filesystem::create_directories(directory);const auto project=directory/"prepared-source.dsculpt";prepared_scene.save(project);auto prepared_reload=Scene::load(project);const auto restored_paint=prepared_reload.active().painted;
+  check(prepared_state.at("version")==28&&prepared_reload.encode()==prepared_state&&restored_paint->valid_source_sampling_attachment()&&restored_paint->source_sampling_original()->mesh().uv==zero.uv&&restored_paint->source_maps()->color.image==restored_paint->source_sampling_original()->source_maps()->color.image&&restored_paint->pixel(restored_paint->active_layer(),32,32).data==painted_pixel,"Actual native Save/restart retains independent writable pixels, exact original degenerate UVs and shared source image authority");
+  check(retained->encode()==zero_before,"Prepared painting, history and persistence leave the immutable original zero-area capture exact");
   auto restored=PaintedMesh::decode(paint->encode());check(restored->surface_diagnostics().policy==PaintUvPolicy::SourceAuthored&&restored->surface_diagnostics().linked_texels==4096&&restored->composite(white())->color.rgba==after,"Native restart reconstructs the explicit source UV policy and exact linked paint");
   auto invalid=paint->encode();invalid["uv_policy"]="silently-relax-all";check(rejects([&]{PaintedMesh::decode(invalid);}),"Unknown persisted UV policy cannot relax strict authoring silently");
   auto options=source();options.max_additional_candidates=0;check(rejects([&]{PaintedMesh::from_maps(linked,appearance,64,options);}),"Sparse linked surface storage has an explicit construction budget");

@@ -1,5 +1,15 @@
 # Full objective and completion evidence
 
+## Original source UV editing admission regression — 2026-11-04
+
+The preserved coherent602 run has601Pass/1Fail. Its sole zero-area source stroke
+no-op expectation is corrected with exact refusal and actual source→strict atlas
+preparation, changed paint, UndoRedo and native Save/restart. Full changed test
+passes68 Release/68 ownedSAN, all19+19 real avatar tails retained; native files
+byte-identical. No runtime/guard/limit change. See SOURCE-UV-EDITABLE-ADMISSION.md;
+this is composed targeted coverage, not a relabeled green602 invocation.
+
+
 ## Fresh coherent application build — 2026-11-04
 
 Own source916 builds all1,189 optimized tasks/application/core/render/support and
