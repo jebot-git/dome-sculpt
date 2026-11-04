@@ -41,8 +41,8 @@ std::array<int,4> independent_pixel(const Scene &scene,const MeshSnapshot &frame
  const auto &object=scene.active();const auto &binding=*object.material_bindings;const auto uv=pixel_uv(frame);const auto fields=independent_field(*object.painted,uv[0],uv[1]);
  const auto base=nearest(*binding.roles[0].image,uv,binding.material.textures[0].encoding),emission=nearest(*binding.roles[3].image,uv,binding.material.textures[3].encoding);MToonSamples samples;
  for(size_t c=0;c<4;++c)samples.base[c]=object.material.color[c]*base[c];
- for(size_t c=0;c<3;++c){const double background=binding.physical_emission?binding.physical_emission->at(c):double(object.material.emissive[c])*binding.material.parameters.emission_strength;
-  samples.emission[c]=float(background*emission[c]*(1-fields.coverage)+fields.legacy[c]*binding.material.parameters.emission_strength+fields.physical[c]);}
+ std::array<float,3> radiance{};for(size_t c=0;c<3;++c){const double background=binding.physical_emission?binding.physical_emission->at(c):double(object.material.emissive[c])*binding.material.parameters.emission_strength;
+  radiance[c]=float(background*emission[c]*(1-fields.coverage)+fields.legacy[c]*binding.material.parameters.emission_strength+fields.physical[c]);}samples.emission={radiance[0],radiance[1],radiance[2]};
  auto neutral=binding.material;neutral.parameters.base_color={1,1,1,1};neutral.parameters.emission={1,1,1};neutral.parameters.emission_strength=1;return expected(neutral,samples);
 }
 std::shared_ptr<SourceMaterialBindings> binding(bool legacy,const Material &native,
