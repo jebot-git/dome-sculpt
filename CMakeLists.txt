@@ -3062,3 +3062,13 @@ if(BUILD_TESTING AND TARGET dome-sculpt-source-paint-authoring-test
     FIXTURES_REQUIRED "native-key-cycle-input;native-paint-cycle-input"
     TIMEOUT 600 ENVIRONMENT "LIBGL_ALWAYS_SOFTWARE=1;LP_NUM_THREADS=2")
 endif()
+
+# Same-object Source4 + physical historical layers + explicit frame-relative key.
+if(BUILD_TESTING)
+  add_executable(dome-sculpt-source4-relative-key-test tests/source4-relative-key.cpp)
+  target_include_directories(dome-sculpt-source4-relative-key-test PRIVATE src tests)
+  target_link_libraries(dome-sculpt-source4-relative-key-test PRIVATE dome-sculpt-core)
+  target_link_options(dome-sculpt-source4-relative-key-test PRIVATE "-Wl,--wrap=_ZN4dome15author_shapekeyERNS_5SceneEmRKNS_12ShapeKeyEditERKSt8functionIFbvEE")
+  add_test(NAME source4-relative-key COMMAND dome-sculpt-source4-relative-key-test ${CMAKE_CURRENT_BINARY_DIR}/source4-relative-key)
+  set_tests_properties(source4-relative-key PROPERTIES TIMEOUT 1200)
+endif()
