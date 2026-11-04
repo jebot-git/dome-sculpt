@@ -81,7 +81,7 @@ void edit_bake_dialog(Document &doc){
   auto settings=state->bake_settings;
   BakeSlider color_error(label,0,width-label-40,row-6,"Color error (0..1)");
   constexpr double degrees=57.29577951308232;
-  BakeSlider normal_error(label,0,width-label-40,row-6,"Rest normal error (deg)");normal_error.units=.25*degrees;
+  BakeSlider normal_error(label,0,width-label-40,row-6,"Rest error (deg)");normal_error.units=.25*degrees;normal_error.tooltip("Maximum rest-space normal quantization error, in degrees. Pose and morph evaluation use the authored portable targets.");
   std::array<BakeSlider*,7> sliders{&front,&back,&ao,&samples,&padding,&color_error,&normal_error};
   std::array<double,7> initial{settings.front_mm,settings.back_mm,settings.ao_distance_mm,double(settings.ao_samples),double(settings.padding),settings.color_error,settings.normal_error*degrees};
   for(size_t i=0;i<7;++i){auto &v=*sliders[i];v.type(FL_HOR_NICE_SLIDER);v.align(FL_ALIGN_LEFT);v.textfont(dx::font);v.textsize(dx::size);v.value_width(std::max(60,dx::size*6));v.logarithmic=i<3;v.fractional=i>=5;v.bounds(0,i<3||i>=5?1:i==3?256:64);v.step(i<3||i>=5?.001:1);v.physical(initial[i]);}
