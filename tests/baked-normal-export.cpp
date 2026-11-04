@@ -31,6 +31,7 @@ std::array<float,4> read(const cgltf_accessor *a,size_t v){std::array<float,4> v
 bool close(Vec3 a,Vec3 b,float tolerance=2e-6f){return length(a-b)<=tolerance;}
 Vec3 vector(std::array<float,4> a){return {a[0],a[1],a[2]};}
 }
+#ifndef DOME_BAKED_NORMAL_EXPORT_HELPERS_ONLY
 int main(int argc,char **argv)try{
  const auto out=std::filesystem::path(argc>1?argv[1]:"baked-normal-export");std::filesystem::create_directories(out);
  for(int variant=0;variant<8;++variant){auto scene=baked_fan(variant&1,variant&2,variant&4);const auto before=scene.encode();const auto source=scene.object(2).painted;const auto paint=scene.active().painted;const auto deformation=scene.active().deformation;
@@ -63,3 +64,4 @@ int main(int argc,char **argv)try{
  }
  std::cout<<"PASS "<<cage_checks<<" independent baked tangent export checks\n";return 0;
 }catch(const std::exception &e){std::cerr<<"FAIL "<<e.what()<<'\n';return 1;}
+#endif

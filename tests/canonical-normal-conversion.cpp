@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-#define main existing_baked_normal_export_fixture
+#define DOME_BAKED_NORMAL_EXPORT_HELPERS_ONLY
 #include "baked-normal-export.cpp"
-#undef main
 #include "canonical-normal-conversion.hpp"
 #include "dome/tangents.hpp"
 namespace {

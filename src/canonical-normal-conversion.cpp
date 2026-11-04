@@ -34,8 +34,10 @@ CanonicalNormalConversionCandidate convert_native_canonical_normals(
   // source composite, bake images/owners and conservative container overhead.
   const size_t corner_bytes=256+targets*2*sizeof(Vec3),vertex_bytes=128;
   size_t remaining=options.max_working_bytes;
-  auto charge=[&](size_t n,size_t unit){if(n>remaining/unit)
-    throw std::length_error("Canonical conversion exceeds its working memory budget");remaining-=n*unit;};
+  auto charge=[&](size_t n,size_t unit){
+    if(n>remaining/unit)throw std::length_error("Canonical conversion exceeds its working memory budget");
+    remaining-=n*unit;
+  };
   charge(count,corner_bytes);charge(vertices,vertex_bytes);charge(pixels,96);
   auto frames=normal_bake_frame_candidate(mesh,input.deformation.get(),nullptr,
       {128*1024*1024,std::min(size_t(128*1024*1024),options.max_working_bytes),options.cancelled});
