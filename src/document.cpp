@@ -694,6 +694,7 @@ void Document::publish_locked(bool force,bool checkpoint) {
                              : command ? command_enabled_locked(*command)
                                        : true;
     if(state_.menu_page==26&&i>2&&i!=8)state_.menu_enabled[i]=false;
+    if(state_.menu_page==28&&(i==6||i>9))state_.menu_enabled[i]=false;
   }
   bool weight_preview = weight_stroking_ && !weight_samples_.empty() &&
       (weight_scheduled_epoch_ != state_.weight_gesture || weight_scheduled_samples_ != weight_samples_.size());
@@ -2722,6 +2723,7 @@ void Document::control_event_locked(VrControlEvent event) {
 }
 
 bool Document::command_enabled_locked(SpatialCommand command) const {
+  if(editable_export_command(command))return command_enabled_locked(SpatialCommand::Export);
   if(rig_fit_command(command))return rig_fit_command_enabled_locked(command);
   if(projection_command(command))return projection_command_enabled_locked(command);
   if(preview_command(command))return !action_active_locked()&&!state_.object_grabbing&&!navigation_.grabbing()&&!control_before_&&(!state_.projection||!state_.projection->placing)&&(!state_.rig_fit||!state_.rig_fit->placing);
@@ -2929,6 +2931,12 @@ void Document::sculpt_command(SpatialCommand command) {
   if(published_.load()==publication)publish_locked();
 }
 void Document::command_locked(SpatialCommand command) {
+  if(editable_export_command(command)){
+    if(!command_enabled_locked(command))return;
+    file_locked(true,command==SpatialCommand::ExportEditable256?AssetExportFormat::EditableGlb256:
+        command==SpatialCommand::ExportEditable512?AssetExportFormat::EditableGlb512:AssetExportFormat::EditableGlb1024);
+    return;
+  }
   if(rig_fit_command(command)){rig_fit_command_locked(command);return;}
   if(projection_command(command)){projection_command_locked(command);return;}
   if(preview_command(command)){shading_locked(command==SpatialCommand::PreviewPbr,command==SpatialCommand::PreviewToon);return;}

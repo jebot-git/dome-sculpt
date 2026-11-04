@@ -1,0 +1,299 @@
+{
+  "status": "qualified private component; not main admission",
+  "runtime": "7e5b16f74746bd4c5b92ee3b0611fa21a16e0c98",
+  "base": "c5c1893827921829ce0eeb4bb40f53f58b44ae26",
+  "initial_runtime": "f189f147536f64274fd6f8d8c65cc926442dba96",
+  "initial_fresh_build": {
+    "source": "f189f147536f64274fd6f8d8c65cc926442dba96",
+    "inputs": 1598,
+    "release-configure": {
+      "exit_code": 0,
+      "seconds": 4.2216187689919025,
+      "command": [
+        "nice",
+        "-n",
+        "15",
+        "cmake",
+        "-S",
+        ".",
+        "-B",
+        "build-native",
+        "-DCMAKE_BUILD_TYPE=Release",
+        "-DDOME_COMPUTE_BACKEND=CPU",
+        "-DDOME_BUILD_UI=ON",
+        "-DDOME_BUILD_XR=ON",
+        "-DFLTK_DIR=/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/toolkit/share/fltk",
+        "-U*DOME_BITMAP_RUNTIME*",
+        "-U*NATIVEGL*",
+        "-U*RENDERFONTS*"
+      ]
+    },
+    "release-build": {
+      "exit_code": 0,
+      "seconds": 322.33345281597576,
+      "command": [
+        "nice",
+        "-n",
+        "15",
+        "cmake",
+        "--build",
+        "build-native",
+        "--parallel",
+        "2",
+        "--target",
+        "dome-sculpt",
+        "dome-sculpt-xr-editable-export-test",
+        "dome-sculpt-import-options-test",
+        "dome-sculpt-controls-test",
+        "dome-sculpt-export-cancellation-test",
+        "dome-sculpt-input-rebind-publication-test"
+      ]
+    },
+    "release-tests": {
+      "exit_code": 0,
+      "seconds": 9.547722197021358,
+      "command": [
+        "nice",
+        "-n",
+        "15",
+        "ctest",
+        "--test-dir",
+        "build-native",
+        "--output-on-failure",
+        "-R",
+        "^(xr-editable-export|import-options-controller|controller-controls|export-cancellation|input-rebind-publication)$"
+      ]
+    },
+    "sanitize-configure": {
+      "exit_code": 0,
+      "seconds": 4.416922550997697,
+      "command": [
+        "nice",
+        "-n",
+        "15",
+        "cmake",
+        "-S",
+        ".",
+        "-B",
+        "build-sanitize",
+        "-DCMAKE_BUILD_TYPE=Release",
+        "-DDOME_COMPUTE_BACKEND=CPU",
+        "-DDOME_BUILD_UI=ON",
+        "-DDOME_BUILD_XR=ON",
+        "-DFLTK_DIR=/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/toolkit/share/fltk",
+        "-U*DOME_BITMAP_RUNTIME*",
+        "-U*NATIVEGL*",
+        "-U*RENDERFONTS*",
+        "-DCMAKE_C_FLAGS_RELEASE=-O1 -g1 -DNDEBUG -fsanitize=address,undefined -fno-omit-frame-pointer",
+        "-DCMAKE_CXX_FLAGS_RELEASE=-O1 -g1 -DNDEBUG -fsanitize=address,undefined -fno-omit-frame-pointer"
+      ]
+    },
+    "sanitize-build": {
+      "exit_code": 0,
+      "seconds": 716.524371653999,
+      "command": [
+        "nice",
+        "-n",
+        "15",
+        "cmake",
+        "--build",
+        "build-sanitize",
+        "--parallel",
+        "2",
+        "--target",
+        "dome-sculpt",
+        "dome-sculpt-xr-editable-export-test",
+        "dome-sculpt-import-options-test",
+        "dome-sculpt-controls-test",
+        "dome-sculpt-export-cancellation-test",
+        "dome-sculpt-input-rebind-publication-test"
+      ]
+    },
+    "sanitize-tests": {
+      "exit_code": 0,
+      "seconds": 79.28137429099297,
+      "command": [
+        "nice",
+        "-n",
+        "15",
+        "ctest",
+        "--test-dir",
+        "build-sanitize",
+        "--output-on-failure",
+        "-R",
+        "^(xr-editable-export|import-options-controller|controller-controls|export-cancellation|input-rebind-publication)$"
+      ]
+    },
+    "input_mismatches": []
+  },
+  "final_matched_consumers": {
+    "source": "7e5b16f74746bd4c5b92ee3b0611fa21a16e0c98",
+    "inputs": 1598,
+    "release-configure": {
+      "exit_code": 0,
+      "seconds": 2.843243436975172,
+      "command": [
+        "nice",
+        "-n",
+        "15",
+        "cmake",
+        "-S",
+        ".",
+        "-B",
+        "build-native",
+        "-DCMAKE_BUILD_TYPE=Release",
+        "-DDOME_COMPUTE_BACKEND=CPU",
+        "-DDOME_BUILD_UI=ON",
+        "-DDOME_BUILD_XR=ON",
+        "-DFLTK_DIR=/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/toolkit/share/fltk",
+        "-U*DOME_BITMAP_RUNTIME*",
+        "-U*NATIVEGL*",
+        "-U*RENDERFONTS*"
+      ]
+    },
+    "release-build": {
+      "exit_code": 0,
+      "seconds": 16.63854970401735,
+      "command": [
+        "nice",
+        "-n",
+        "15",
+        "cmake",
+        "--build",
+        "build-native",
+        "--parallel",
+        "2",
+        "--target",
+        "dome-sculpt",
+        "dome-sculpt-xr-editable-export-test",
+        "dome-sculpt-import-options-test",
+        "dome-sculpt-controls-test",
+        "dome-sculpt-export-cancellation-test",
+        "dome-sculpt-input-rebind-publication-test",
+        "dome-sculpt-palette-text-test"
+      ]
+    },
+    "release-tests": {
+      "exit_code": 0,
+      "seconds": 10.347624559013639,
+      "command": [
+        "nice",
+        "-n",
+        "15",
+        "ctest",
+        "--test-dir",
+        "build-native",
+        "--output-on-failure",
+        "-R",
+        "^(xr-editable-export|import-options-controller|controller-controls|export-cancellation|input-rebind-publication|palette-unicode)$"
+      ]
+    },
+    "sanitize-configure": {
+      "exit_code": 0,
+      "seconds": 2.5980746030109003,
+      "command": [
+        "nice",
+        "-n",
+        "15",
+        "cmake",
+        "-S",
+        ".",
+        "-B",
+        "build-sanitize",
+        "-DCMAKE_BUILD_TYPE=Release",
+        "-DDOME_COMPUTE_BACKEND=CPU",
+        "-DDOME_BUILD_UI=ON",
+        "-DDOME_BUILD_XR=ON",
+        "-DFLTK_DIR=/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/toolkit/share/fltk",
+        "-U*DOME_BITMAP_RUNTIME*",
+        "-U*NATIVEGL*",
+        "-U*RENDERFONTS*",
+        "-DCMAKE_C_FLAGS_RELEASE=-O1 -g1 -DNDEBUG -fsanitize=address,undefined -fno-omit-frame-pointer",
+        "-DCMAKE_CXX_FLAGS_RELEASE=-O1 -g1 -DNDEBUG -fsanitize=address,undefined -fno-omit-frame-pointer"
+      ]
+    },
+    "sanitize-build": {
+      "exit_code": 0,
+      "seconds": 27.310005988983903,
+      "command": [
+        "nice",
+        "-n",
+        "15",
+        "cmake",
+        "--build",
+        "build-sanitize",
+        "--parallel",
+        "2",
+        "--target",
+        "dome-sculpt",
+        "dome-sculpt-xr-editable-export-test",
+        "dome-sculpt-import-options-test",
+        "dome-sculpt-controls-test",
+        "dome-sculpt-export-cancellation-test",
+        "dome-sculpt-input-rebind-publication-test",
+        "dome-sculpt-palette-text-test"
+      ]
+    },
+    "sanitize-tests": {
+      "exit_code": 0,
+      "seconds": 54.624784145999,
+      "command": [
+        "nice",
+        "-n",
+        "15",
+        "ctest",
+        "--test-dir",
+        "build-sanitize",
+        "--output-on-failure",
+        "-R",
+        "^(xr-editable-export|import-options-controller|controller-controls|export-cancellation|input-rebind-publication|palette-unicode)$"
+      ]
+    },
+    "input_mismatches": []
+  },
+  "controller_checks_per_profile": 69,
+  "regressions": [
+    "input-rebind-publication",
+    "import-options-controller",
+    "controller-controls",
+    "palette-unicode",
+    "export-cancellation",
+    "xr-editable-export"
+  ],
+  "integrity": {
+    "inputs": 1598,
+    "mismatches": [],
+    "interchange_byte_equal": 8,
+    "bitmap_captures_byte_equal": 4
+  },
+  "khronos": {
+    "version": "2.0.0-dev.3.10",
+    "files": 16,
+    "errors": 0,
+    "warnings": 0,
+    "maxIssues": 0,
+    "issueFilters": []
+  },
+  "gpu": "none; software GL llvmpipe",
+  "physical_headset": false,
+  "negative_preserved": "Initial software palette help line overlaps Close; corrected without changing worker semantics",
+  "scopes": [
+    "Actual synthetic SpatialFrame navigation and Document file-worker execution",
+    "Whole project including hidden objects, native Open/Save and deterministic second export",
+    "Running/queued export Cancel plus ordered Save; strict refusal preserves output",
+    "Dark/light native/double bitmap palette rendering"
+  ],
+  "limits": [
+    "No new physical headset, loader, desktop chooser or hardware proof",
+    "Finite PBR quality and native payload implementation are inherited unchanged from base",
+    "No completion claim for general Mirror refinement or spatial drawers"
+  ],
+  "evidence": {
+    "artifacts/xr-export-proof/status.json": "b5c6f70be16b39adfb8ae3fc773a5fd1a5e38909e49ef5410a2a354a54945610",
+    "artifacts/xr-export-proof/binaries-final.json": "e11d0f5f0a49fb5782a9c7860309f05a4830f9f8e5f40092b7d4c3add5aff768",
+    "artifacts/xr-export-proof-final/status.json": "2c21a64edcb66c8d139f6cdf73ff16005acec09d136ec8621d3486c09396e64f",
+    "artifacts/xr-export-proof-final/binaries-final.json": "4746863a1dc37621f8d0ae6c62087b7b84267f7f12f357177981e075c100471a",
+    "artifacts/xr-export-proof-final/output-parity.json": "a901d3795df516e4274e9f598a1c6b6de25ce530d7fd7085b6ae1ababc5e61c6",
+    "artifacts/xr-export-proof-final/khronos.json": "1132f4fbd14dcef2949be45608ed85fa3b32f89a0392b6296ad1a8451d4e7d14"
+  }
+}

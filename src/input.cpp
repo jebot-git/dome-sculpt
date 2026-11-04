@@ -3,11 +3,13 @@
 #include "dome/uv.hpp"
 namespace dome {
 const std::array<const char *, 12> &spatial_labels(int page) {
+  static const std::array<const char *,12> exporting={"Strict glTF","Editable 256","Editable 512","Editable 1024","Avatar VRM","Native Save","","Cancel work","Back","Close","",""};
+  if(page==28)return exporting;
   static const std::array<const char *,12> preview={"Authored","Core PBR","Toon preview","","","","","","Back","","",""};
   if(page==26)return preview;
   static const std::array<const char *, 12> root = {
       "Clay", "Carve",       "Smooth",  "Flatten",   "Undo",       "Redo",
-      "Save", "Export glTF", "Objects", "Materials", "Brush size", "Selection"};
+      "Save", "Export options", "Objects", "Materials", "Brush size", "Selection"};
   static const std::array<const char *, 12> objects = {
       "New sphere", "New empty",  "Duplicate",  "Next",
       "Previous",   "Visibility", "Lock",       "Delete",
@@ -164,6 +166,11 @@ std::optional<SpatialCommand> spatial_action(int page, int index) {
   if (index < 0 || index >= 12 || page < 0 || page >= spatial_page_count || page == 5 ||
       spatial_parameter(page, index))
     return {};
+  if(page==28){
+    static const SpatialCommand commands[]={SpatialCommand::Export,SpatialCommand::ExportEditable256,SpatialCommand::ExportEditable512,SpatialCommand::ExportEditable1024,SpatialCommand::ExportAvatar,SpatialCommand::Save,SpatialCommand::Undo,SpatialCommand::CancelWork};
+    return index<8&&index!=6?std::optional<SpatialCommand>(commands[index]):std::nullopt;
+  }
+  if(page==0&&index==7)return {}; // Discoverable export-policy navigation.
   if(page==27){static const SpatialCommand commands[]={SpatialCommand::RigFitPrevious,SpatialCommand::RigFitNext,SpatialCommand::RigFitPlace,SpatialCommand::RigFitOptions,SpatialCommand::RigFitXDown,SpatialCommand::RigFitXUp,SpatialCommand::RigFitYDown,SpatialCommand::RigFitYUp,SpatialCommand::RigFitZDown,SpatialCommand::RigFitZUp,SpatialCommand::RigFitApply,SpatialCommand::RigFitCancel};return commands[index];}
   if(page==25){
     static const SpatialCommand commands[]={SpatialCommand::ProjectionBrowse,SpatialCommand::ProjectionPrevious,SpatialCommand::ProjectionNext,SpatialCommand::ProjectionOpen,SpatialCommand::ProjectionParent,SpatialCommand::ProjectionToggle,SpatialCommand::ProjectionUsage,SpatialCommand::ProjectionPlace,SpatialCommand::Undo,SpatialCommand::Undo,SpatialCommand::ProjectionDecrease,SpatialCommand::ProjectionIncrease};
@@ -654,6 +661,10 @@ void SpatialInput::update(const SpatialSample &s) {
       menu_anchor_ = s.tip;
       device_ = s.id;
       selected_ = polygon_editing ? 0 : cutting ? 1 : retopology ? 1 : int(tool_);
+    } else if(page_==0&&selected_==7){
+      page_=28;selected_=0;d.armed=false;
+    } else if(page_==28&&selected_==9){
+      menu_=false;device_=0;page_=0;d.armed=false;
     } else if (page_ == 0 && (selected_ == 8 || selected_ == 9)) {
       page_ = selected_ == 8 ? 1 : 2;
       selected_ = 0;
@@ -726,6 +737,7 @@ void SpatialInput::update(const SpatialSample &s) {
       page_ = 5;
       controls_.push_back({VrControlEventType::Begin, parameter_});
     } else if (page_ != 0 && page_ != 27 && selected_ == 8) {
+      const bool export_back=page_==28;
       page_ = page_==25 ? 3 : page_==24 ? 10 : page_==22 ? 19 : page_==19 ? 10 : page_==23 ? 21 : (page_ == 16 || page_ == 17 || page_==20 || page_==21) ? 10 : (page_ == 18 || page_ == 15) ? 7 : page_ == 14 ? 13 : page_ == 13 ? 11
               : page_ == 12 ? 10
               : page_ == 11 ? 9
@@ -737,6 +749,7 @@ void SpatialInput::update(const SpatialSample &s) {
               : page_ == 3 ? 2
                            : 0;
       selected_ = int(tool_);
+      if(export_back)d.armed=false;
     } else {
       if (page_ == 0 && selected_ < 4) {
         if ((painting || sculpt_mask_edit) && allowed && !allowed(SpatialCommand::EditSource)) {
