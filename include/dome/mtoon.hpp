@@ -4,6 +4,8 @@
 #include <nlohmann/json.hpp>
 #include <string_view>
 namespace dome {
+namespace detail {struct NativeWeightMaterialAccess;}
+
 enum class MToonVersion { V0, V1 };
 enum class MToonAlpha { Opaque, Mask, Blend };
 enum class MToonCull { Off, Front, Back };
@@ -65,6 +67,7 @@ struct MToonRenderState {
 using MToonGpuParameters = std::array<std::array<float, 4>, 12>;
 static_assert(sizeof(MToonGpuParameters) == 48 * sizeof(float));
 class MToonMaterial {
+  friend struct detail::NativeWeightMaterialAccess;
   MToonVersion version_ = MToonVersion::V1;
   nlohmann::json source_, initial_known_;
   nlohmann::json known() const;

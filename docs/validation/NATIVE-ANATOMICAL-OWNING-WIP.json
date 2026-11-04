@@ -1,0 +1,49 @@
+{
+  "status": "private optimized owning prototype; no SAN/native UI admission",
+  "source_head_parent": "907aa34d0095ea320f7a1d4c22dc901aca9ef33a",
+  "sources_at_checkpoint": {
+    "src/native-weight-context.hpp": "a32565141144612c487280a959a11c016ebc38c8dc8c46d86ace9c3f73f30998",
+    "src/native-weight-reference.hpp": "0e726284c63f82d63282c17f62f21351058d679d8c17fea956573fb254f3a5d5",
+    "src/native-weight-paint-access.hpp": "37b42a81e22595f5b9956035ebd896a0a21bc342eb6b382819fba2981ba17c69",
+    "src/native-weight-retention.hpp": "6924e94e1e3e3c741f5cb059a3317d195a817bed8562cc0ef37193a8ace905c2",
+    "src/native-anatomical-weights.hpp": "31fd589f7992442db93b4e261d6d94689f0d7d364c6c54bc302b8a0cc57ec4a2",
+    "src/native-head-geometry.hpp": "5010217363b4e4576fd01e54aead29143fe0c7c7f0b1be724bdad3498fa0ce91",
+    "src/paint.cpp": "ddcf37c1814e40384a23fe5d4932a961fa0a7a456cec6a8e992accd372c66d6d",
+    "tests/native-anatomical-owning.cpp": "715b087cb4dc93d1af40a83e80b76476ec0b9cd2aa65406310fa5e851c179045",
+    "include/dome/paint.hpp": "8a6533b5c6c60965280cf88db489879b4a6d366b710edbbe9ec80c6bf9e8d00e",
+    "include/dome/mtoon.hpp": "2276a89d021e0102247d22d8fdb0ebc9a3cbdfe9e941a82c5a2323c9a0ce76a6",
+    "include/dome/volume.hpp": "9ec1223891ac34cb1196cbf04e55091a73dabcc40dbd341d5d134fc5be462514"
+  },
+  "actors": {
+    "female": {
+      "report": {
+        "cancel_callbacks": 3,
+        "changed": 19,
+        "owners": 356,
+        "retained_input": 221693091,
+        "retention_work": 84714,
+        "seconds": 1.819251377,
+        "total_admission": 490128547,
+        "work": 495360088,
+        "workspace": 123878130
+      },
+      "output_sha256": "42858680b2a721109362d43178629522d6e0a4a0fcb92e462b680c1d85af3af1",
+      "log_sha256": "be38a5e49c036a6df7e29c2a731e58f55565da6311fe4533a897a5f6e29d6c3d"
+    },
+    "male": {
+      "report": {
+        "cancel_callbacks": 3,
+        "changed": 19,
+        "owners": 356,
+        "retained_input": 226246223,
+        "retention_work": 84202,
+        "seconds": 2.239778203,
+        "total_admission": 494681679,
+        "work": 459667034,
+        "workspace": 130901482
+      },
+      "output_sha256": "d2cf91a613fa8839027bf64875dbf7cd46719b9f495e7c303a6d19c3700ede25",
+      "log_sha256": "3c99c170d57a4fd2dfaaa9af406733a0d46b3f54d2535ed3fec4df84f257adcd"
+    }
+  }
+}

@@ -52,6 +52,8 @@ inline NativeHeadGeometryReport analyze_native_head_geometry(
     SculptObject object;
     std::array<double,16> world{};
     uint64_t paint_revision = 0, volume_revision = 0;
+    std::shared_ptr<const Mesh> mesh_owner;
+    Volume::GeometryOwner volume_owner;
     Mesh mesh;
     std::vector<uint32_t> source_targets;
     std::vector<std::vector<Vec3>> deltas;
@@ -71,7 +73,7 @@ inline NativeHeadGeometryReport analyze_native_head_geometry(
     const size_t cost = m.positions.size()*(160 + targets*16) + m.indices.size()*(512 + targets*32);
     if (cost > maximum_bytes - planned) throw std::length_error("Head boundary-key bytes before copies");
     planned += cost; raw += m.positions.size(); corners += m.indices.size();
-    captured.push_back({o,scene.world_matrix(o.id).matrix(),o.painted->revision(),o.volume->revision(),{}, {}, {}, 0});
+    captured.push_back({o,scene.world_matrix(o.id).matrix(),o.painted->revision(),o.volume->revision(),o.painted->mesh_owner(),o.volume->geometry_owner(),{}, {}, {}, 0});
   }
   if (captured.empty() || raw > 2'000'000 || corners > 6'000'000)
     throw std::length_error("Head aggregate geometry cap");
@@ -205,7 +207,7 @@ inline NativeHeadGeometryReport analyze_native_head_geometry(
     if(!changed)break;
   }
   if(scene.objects().size()!=initial_objects)throw std::runtime_error("Head geometry membership changed");
-  for(const auto&c:captured){work.step(64);const auto&o=scene.object(c.object.id);if(!same_object_authority(c.object,o)||!same(c.object.painted,o.painted)||o.painted->revision()!=c.paint_revision||o.volume->revision()!=c.volume_revision||scene.world_matrix(o.id).matrix()!=c.world)throw std::runtime_error("Head geometry captured input changed");}
+  for(const auto&c:captured){work.step(64);const auto&o=scene.object(c.object.id);if(!same_object_authority(c.object,o)||!same(c.object.painted,o.painted)||!same(c.mesh_owner,o.painted->mesh_owner())||!same(c.volume_owner,o.volume->geometry_owner())||o.painted->revision()!=c.paint_revision||o.volume->revision()!=c.volume_revision||scene.world_matrix(o.id).matrix()!=c.world)throw std::runtime_error("Head geometry captured input changed");}
   result.work=work.used;return result;
 }
 } // namespace dome::detail

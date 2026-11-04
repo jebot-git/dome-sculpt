@@ -12,6 +12,8 @@
 #include <unordered_map>
 #include <vector>
 namespace dome {
+namespace detail {struct NativeWeightVolumeAccess;}
+
 struct CsgBox;
 struct ProceduralSculptOptions;
 struct ProceduralSculptResult;
@@ -106,6 +108,7 @@ public:
 
 private:
   friend class Document;
+  friend struct detail::NativeWeightVolumeAccess;
   void swap_state(Volume &) noexcept;
   struct GeometryHistory;
   using GeometryHistoryPtr = std::shared_ptr<const GeometryHistory>;
