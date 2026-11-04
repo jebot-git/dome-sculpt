@@ -16,7 +16,8 @@ struct NativeWeightMaterialAccess {
 };
 // Prospective immutable REQUEST ownership, not allocator RSS, file decoding,
 // saving, UI Undo history, or global render caches. Buffers use real capacities;
-// shared controls are charged once. Overheads deliberately overestimate nodes.
+// identical object/control pairs are charged once; distinct aliases are
+// conservatively visited separately. Overheads overestimate node allocations.
 // Unsupported closure shapes refuse; they are never omitted from the sum.
 struct NativeWeightRetention {
   size_t bytes=0, work=0, owners=0;
@@ -30,8 +31,8 @@ struct Counter {
   explicit Counter(size_t max):maximum(max) { if(used>maximum)throw std::length_error("Native total admission cannot hold its ownership ledger"); }
   void step(size_t n=1){if(n>500'000'000-work)throw std::length_error("Native ownership scan work");work+=n;}
   void add(size_t n,size_t unit=1){step();if(unit&&n>(maximum-used)/unit)throw std::length_error("Native owning input exceeds total request budget before staging");used+=n*unit;}
-  template<class T> void vector(const std::vector<T>&v){add(v.capacity(),sizeof(T));if(v.capacity())add(32);}
-  void text(const std::string&s){add(s.capacity()+1);add(32);}
+  template<class T> void vector(const std::vector<T>&v){add(v.capacity(),sizeof(T));if(v.capacity())add(v.capacity()*sizeof(T)>=128u*1024u?4096:64);}
+  void text(const std::string&s){add(s.capacity()+1);add(s.capacity()>=128u*1024u?4096:64);}
   template<class T> bool enter(const std::shared_ptr<T>&p){
     if(!p)return false;
     using Value=std::remove_cv_t<T>;

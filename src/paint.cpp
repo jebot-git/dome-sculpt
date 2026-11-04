@@ -176,7 +176,7 @@ struct PaintedMesh::CompositeCache {
   std::weak_ptr<const TextureMaps> maps;
   uint64_t preview_token=0;
   bool source_eligible=false;
-  std::shared_ptr<const TextureMaps> source_preview;
+  std::weak_ptr<const TextureMaps> source_preview;
 };
 PaintCompositeCacheStats paint_composite_cache_stats(){
   auto &cache=composite_retention();std::lock_guard lock(cache.mutex);
@@ -1246,13 +1246,8 @@ detail::NativeWeightPaintAccess::Surface detail::NativeWeightPaintAccess::surfac
   if(surface.original_sampling || surface.paint_domain || paint.sampling_attachment_ ||
      paint.color_projection_ || paint.normal_projection_ || paint.baked_)
     throw std::invalid_argument("Native anatomical input budget does not yet represent prepared paint domains");
-  if(!prospective&&paint.composite_cache_) {
-    std::lock_guard lock(paint.composite_cache_->mutex);
-    if(paint.composite_cache_->source_preview)
-      throw std::invalid_argument("Native historical paint snapshot still owns a mutable preview cache");
-  }
   size_t bytes=sizeof(PaintedMesh::SurfaceMap)+64;
-  auto add=[&](size_t count,size_t unit){if(unit&&count>(SIZE_MAX-bytes)/unit)throw std::length_error("Native paint retained-byte overflow");bytes+=count*unit;};
+  auto add=[&](size_t count,size_t unit){if(unit&&count>(SIZE_MAX-bytes)/unit)throw std::length_error("Native paint retained-byte overflow");bytes+=count*unit;if(count){const size_t overhead=count*unit>=128u*1024u?4096:64;if(overhead>SIZE_MAX-bytes)throw std::length_error("Native paint allocation allowance overflow");bytes+=overhead;}};
   const auto &m=surface.mesh;
   add(m.positions.capacity(),sizeof(Vec3));add(m.normals.capacity(),sizeof(Vec3));
   add(m.uv.capacity(),sizeof(std::array<float,2>));add(m.indices.capacity(),sizeof(uint32_t));
@@ -1265,7 +1260,8 @@ detail::NativeWeightPaintAccess::Surface detail::NativeWeightPaintAccess::surfac
   return {paint.surface_,bytes};
 }
 std::shared_ptr<PaintedMesh> detail::NativeWeightPaintAccess::snapshot(const PaintedMesh &paint) {
-  auto result=paint.snapshot();result->composite_cache_.reset();return result;
+  auto cache=std::make_shared<PaintedMesh::CompositeCache>();
+  auto result=paint.snapshot();result->composite_cache_=std::move(cache);return result;
 }
 std::shared_ptr<PaintedMesh> PaintedMesh::snapshot() const {
   auto p = std::shared_ptr<PaintedMesh>(new PaintedMesh);
@@ -1737,7 +1733,8 @@ std::shared_ptr<const TextureMaps> PaintedMesh::preview(const Material &material
     }
     if(composite_cache_->source_eligible||source_sampling_prepared()){
       if(!valid_source_sampling_attachment())throw std::invalid_argument("Source paint preview lost its actual immutable attachment");
-      if(!composite_cache_->source_preview){
+      auto preview=composite_cache_->source_preview.lock();
+      if(!preview){
         auto marker=std::make_shared<TextureMaps>();marker->source_maps=source_maps_;marker->source_only=true;
         if(source_sampling_prepared()){
           marker->overlay=detail::PaintOverlayFactory::capture(*this,cancelled);
@@ -1745,9 +1742,9 @@ std::shared_ptr<const TextureMaps> PaintedMesh::preview(const Material &material
             for(const auto &p:tile->pixels)if(p.data[13]&&p.data[9]&&p.data[3]!=255){marker->transparent=true;break;}
         }
         if(auto image=source_maps_->color.image)for(size_t i=3;i<image->rgba.size();i+=4)if(image->rgba[i]!=255){marker->transparent=true;break;}
-        composite_cache_->source_preview=std::move(marker);
+        composite_cache_->source_preview=marker;preview=std::move(marker);
       }
-      return composite_cache_->source_preview;
+      return preview;
     }
   }
   return composite(material,cancelled);

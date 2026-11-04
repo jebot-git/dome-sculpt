@@ -252,14 +252,16 @@ inline NativeAnatomicalPrepared prepare_native_anatomical(const NativeAnatomical
   }
   const auto carrier=native_carrier_plan(scene,analysis,support,rig,*reference_object.deformation->humanoid,construction);
   const size_t continuation_allowance=native_carrier_work_plan(scene,carrier,reference,construction);
+  geometry_weight_authoring::Bytes locks_bytes{0,options.maximum_workspace};
+  if(!options.locks.empty())for(auto id:request.targets_){const auto&o=scene.object(id);geometry_weight_authoring::deformation_copy_bytes(*o.deformation,locks_bytes,construction);locks_bytes.add(o.painted->mesh().positions.size(),4*sizeof(Influence)+96);}
   const size_t wrapper_work = retained.work + analysis.work + construction.used + 4096 + targets.size()*32;
-  const size_t wrapper_bytes = request.capture_bytes_+sizeof(support)+sizeof(analysis)+analysis.parts.capacity()*sizeof(NativeHeadGeometryReport::Part)+analysis.contacts.capacity()*sizeof(NativeHeadGeometryReport::Contact)+analysis.seam_endpoints.capacity()*sizeof(NativeHeadGeometryReport::Seam)+declaration_bytes+targets.size()*sizeof(DeclaredWeightPart)+scene.objects().size()*(sizeof(SculptObject)+512)+scene.groups().size()*(sizeof(SceneGroup)+512)+65536;
+  const size_t wrapper_bytes = locks_bytes.used+request.capture_bytes_+sizeof(support)+sizeof(analysis)+analysis.parts.capacity()*sizeof(NativeHeadGeometryReport::Part)+analysis.contacts.capacity()*sizeof(NativeHeadGeometryReport::Contact)+analysis.seam_endpoints.capacity()*sizeof(NativeHeadGeometryReport::Seam)+declaration_bytes+targets.size()*sizeof(DeclaredWeightPart)+scene.objects().size()*(sizeof(SculptObject)+512)+scene.groups().size()*(sizeof(SceneGroup)+512)+65536;
   if(wrapper_work>=options.maximum_work||wrapper_bytes>=options.maximum_workspace||continuation_allowance>options.maximum_work-wrapper_work)throw std::length_error("Native anatomical complete request forecast exceeds original resources");
   GeometryWeightBindOptions bind;
   bind.limits={4,1e-5f};bind.maximum_work=options.maximum_work-wrapper_work-continuation_allowance;bind.maximum_workspace=options.maximum_workspace-wrapper_bytes;
   GeometryWeightBindReport report;
   for(auto id:targets){prepared.object(id).visible=true;prepared.object(id).locked=false;}
-  if(!author_geometry_weight_skin(prepared,targets,support,bind,cancelled,&report))throw std::runtime_error("Native anatomical full support produced no field");
+  author_geometry_weight_skin(prepared,targets,support,bind,cancelled,&report);
   const auto continuation_bytes=carrier.targets.empty()?0:continue_native_carrier(prepared,carrier,reference,continuation_allowance,options.maximum_workspace-wrapper_bytes,cancelled);
   NativeAnatomicalPrepared result;result.identity_=request.identity_;
   result.report_={report.work+wrapper_work+continuation_allowance,std::max({report.workspace+wrapper_bytes,temporary_peak,continuation_bytes+wrapper_bytes}),retained.bytes,retained.bytes+options.maximum_workspace,0,report};
@@ -273,16 +275,22 @@ inline NativeAnatomicalPrepared prepare_native_anatomical(const NativeAnatomical
       for(size_t row=0;row<d->skin->vertices.size();++row){output.step(256);VertexWeights values;for(auto x:d->skin->vertices[row])if(!options.locks.at(x.joint))values.push_back(x);for(auto x:before.deformation->skin->vertices.at(row))if(options.locks.at(x.joint))values.push_back(x);d->skin->vertices[row]=normalize_weights(std::move(values),d->skeleton->bones.size(),options.locks,{4,1e-5f});}
       d->validate(before.painted->mesh());deform=std::move(d);
     }
-    result.changes.push_back({id,std::move(deform),after.rig_source});
+    bool differs=!before.deformation||!before.deformation->skeleton||!before.deformation->skin;
+    if(!differs){const auto&a=before.deformation->skin->vertices;const auto&b=deform->skin->vertices;differs=a.size()!=b.size();
+      if(!differs)for(size_t i=0;i<a.size();++i){output.step(8+4*a[i].size()*b[i].size());if(!geometry_weight_authoring::equal_row(a[i],b[i])){differs=true;break;}}}
+    if(differs)result.changes.push_back({id,std::move(deform),after.rig_source});
   }
   output.stop();result.report_.work=output.used;result.report_.changed=result.changes.size();return result;
 }
 inline bool adopt_native_anatomical(Scene&scene,const NativeAnatomicalRequest&request,NativeAnatomicalPrepared&&result){
   if(!result.identity_||result.identity_!=request.identity_||result.identity_.owner_before(request.identity_)||request.identity_.owner_before(result.identity_))throw std::invalid_argument("Native anatomical prepared result belongs to another owning request");
   if(!request.lease_.matches(scene))throw std::runtime_error("Native anatomical source lease changed before publication");
-  if(result.changes.size()!=request.targets_.size())throw std::invalid_argument("Native anatomical prepared recipients incomplete");
-  Scene staged=scene;
-  for(size_t i=0;i<result.changes.size();++i){const auto&c=result.changes[i];if(c.object!=request.targets_[i]||!c.deformation||!c.origin)throw std::invalid_argument("Native anatomical prepared recipient authority");auto&o=staged.object(c.object);o.deformation=c.deformation;o.rig_source=c.origin;}
+  if(result.changes.size()>request.targets_.size())throw std::invalid_argument("Native anatomical prepared recipients exceed request");
+  if(result.changes.empty())return false;
+  Scene staged=scene;size_t cursor=0;
+  for(const auto&c:result.changes){while(cursor<request.targets_.size()&&request.targets_[cursor]!=c.object)++cursor;
+    if(cursor==request.targets_.size()||!c.deformation||!c.origin)throw std::invalid_argument("Native anatomical prepared recipient authority");++cursor;
+    auto&o=staged.object(c.object);o.deformation=c.deformation;o.rig_source=c.origin;}
   staged.validate();
   if(!request.lease_.matches(scene))throw std::runtime_error("Native anatomical source changed during final validation");
   static_assert(std::is_nothrow_move_assignable_v<Scene>);scene=std::move(staged);return true;
