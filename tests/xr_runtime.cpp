@@ -52,6 +52,7 @@ int instance_tag, session_tag, action_set_tag;
 unsigned frame = 0, physical_frame = 0, event = 0, restart_phase = 0;
 unsigned menu_completion_event = 0;
 std::string cage_mode(){auto p=getenv("DOME_XR_FIXTURE_CAGE");return p?p:"";}
+bool bake_recipe_fixture(){return getenv("DOME_XR_FIXTURE_RECIPE")!=nullptr;}
 bool cage_click(){return frame==8||frame==14||frame==20||frame==26||frame==32||frame==44||frame==50||(cage_mode()=="accept"&&(frame==62||frame==68));}
 int cage_sector(){if(frame>=12&&frame<=14)return 8;if(frame>=18&&frame<=20)return 9;if(frame>=24&&frame<=26)return 6;if(frame>=30&&frame<=32)return 1;if(frame>=48&&frame<=50)return 0;if(frame>=66&&frame<=68&&cage_mode()=="accept")return 3;return -1;}
 std::string mirror_mode(){auto p=getenv("DOME_XR_FIXTURE_MIRROR");return p?p:"";}
@@ -1145,8 +1146,8 @@ FN(LocateSpace, XrSpace handle, XrSpace, XrTime, XrSpaceLocation *p) {
   if(!cage_mode().empty()){
     p->pose.orientation={0,0,0,1};p->pose.position=s->action?XrVector3f{right(s->hand)?0.f:-.3f,1.48f,-.48f}:XrVector3f{0,1.6f,0};
     if(s->action&&right(s->hand)&&s->action->name=="aim_pose"&&(frame==38||frame==56||(frame==62&&cage_mode()=="cancel"))){
-      float x=frame==38?100+420*float(std::log(100.f/.01f)/std::log(10000.f/.01f)):frame==56?520:170;
-      float y=frame==38?240:frame==56?320:609;
+      float x=frame==38?100+420*float(std::log((bake_recipe_fixture()?40.f:100.f)/.01f)/std::log(10000.f/.01f)):frame==56?(bake_recipe_fixture()?320:520):170;
+      float y=frame==38?240:frame==56?(bake_recipe_fixture()?432:320):609;
       p->pose.position={(x/640-.5f)*.6f,1.56f+(.5f-y/640)*.6f,-.3f};
     }
     return XR_SUCCESS;
