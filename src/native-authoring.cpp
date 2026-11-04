@@ -70,8 +70,10 @@ std::shared_ptr<const NativeAuthoringCapture> NativeAuthoringCapture::create(con
  if((options.scope==NativeAuthoringExport::Scope::WholeScene&&!options.objects.empty())||(options.scope==NativeAuthoringExport::Scope::ExportedObjects&&options.objects.empty()))throw std::invalid_argument("Native authoring scope and object selection disagree");
  auto scene=options.scene->snapshot();if(options.scope==NativeAuthoringExport::Scope::ExportedObjects)scene=emission_export_subset(scene,options.objects);scene.validate();scene.require_exportable_sources();stop(cancelled);
  // No caller-provided surface or changed-surface equivalence flag enters here.
- const bool physical=std::any_of(scene.objects().begin(),scene.objects().end(),[](const auto &o){return detail::hdr_emission(o.material.emissive)||(o.painted&&o.painted->has_physical_emission())||(o.material_bindings&&detail::physical_emission(*o.material_bindings));});
- auto originals=physical?emission_export_surfaces(scene,cancelled):scene.preview_surfaces(cancelled);if(originals.empty()||originals.size()>256)throw std::length_error("Native authoring requires1..256 emitted objects");std::vector<uint64_t> ids;std::set<uint64_t> unique;
+ // These are actual native preview/source owners, not an offline UV0 HDR
+ // raster. A pristine raw source has no writable padding or sparse overlay;
+ // only Source4 paint owns that independently authenticated GPU contribution.
+ auto originals=scene.preview_surfaces(cancelled);if(originals.empty()||originals.size()>256)throw std::length_error("Native authoring requires1..256 emitted objects");std::vector<uint64_t> ids;std::set<uint64_t> unique;
  for(const auto &object:originals){stop(cancelled);scene.object(object.id);if(!unique.insert(object.id).second)throw std::invalid_argument("Duplicate native authoring original identity");ids.push_back(object.id);}
  if(options.scope==NativeAuthoringExport::Scope::ExportedObjects&&unique!=std::set<uint64_t>(options.objects.begin(),options.objects.end()))throw std::invalid_argument("Native authoring subset contains hidden or empty nonexported objects");
  return std::shared_ptr<const NativeAuthoringCapture>(new NativeAuthoringCapture(std::make_shared<const Scene>(std::move(scene)),std::move(originals),std::move(ids),options.scope));

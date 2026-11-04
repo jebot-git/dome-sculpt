@@ -6,7 +6,6 @@
 #include "emission-authority.hpp"
 #include "gltf-document.hpp"
 #include "raw-source-emission.hpp"
-#include "emission-export.hpp"
 #include <set>
 #include <algorithm>
 #include <map>
@@ -35,7 +34,7 @@ NativeAuthoringCompilation compile_native_authoring(
   auto physical=[](const SculptObject &o){return hdr_emission(o.material.emissive)||
       (o.painted&&o.painted->has_physical_emission())||
       (o.material_bindings&&physical_emission(*o.material_bindings));};
-  bool painted = false, raw_present = false;
+  bool painted = false;
   for (const auto &surface : capture.originals()) {
     check();
     const auto &mesh = surface.mesh;
@@ -51,7 +50,6 @@ NativeAuthoringCompilation compile_native_authoring(
       if(!raw_source_emission(capture,surface,stop))
         throw std::invalid_argument("Physical editable export requires its actual original-source sampling adapter");
       reserve(1,sizeof(TextureMaps)+64+256);
-      raw_present=true;
     }
     if (object.painted && object.painted->source_sampling_prepared()) {
       const auto &maps = surface.textures;
@@ -167,19 +165,8 @@ NativeAuthoringCompilation compile_native_authoring(
   }
   check();
   staged.validate();
-  result.surfaces = raw_present?emission_export_surfaces(staged,stop):staged.export_surfaces(stop);
+  result.surfaces = staged.export_surfaces(stop);
   for (auto &surface : result.surfaces) {
-    if(raw_present) {
-      const auto &object=staged.object(surface.id);
-      if(object.painted&&object.painted->source_sampling_prepared())
-        source_paint_export(*object.painted,surface,stop);
-      else if(physical(object)) {
-        if(!raw_source_emission(capture,surface,stop))
-          throw std::invalid_argument("Raw emission lost its exact current source in a mixed compilation");
-        auto maps=std::make_shared<TextureMaps>(*surface.textures);
-        maps->overlay.reset();surface.textures=std::move(maps);
-      }
-    }
     check();
     if (auto view=views.find(surface.id);view!=views.end()) {
       surface.textures = view->second.textures;

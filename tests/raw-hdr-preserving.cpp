@@ -115,10 +115,12 @@ int main(int argc,char **argv)try {
         check(d.undo()&&d.copy_scene().encode()==base&&d.redo()&&d.copy_scene().encode()==edited,
           "Current raw radiance/morph edit has exact native Undo/Redo");imported_endpoint(d);
       }
+      std::cout<<"STAGE raw-preserving "<<kind<<"/"<<phase<<" actual-native-render"<<std::endl;
       const auto exact=d.copy_scene().encode();d.shading(true);imported_endpoint(d);
       const auto authored=draw(native,d.frame().surface);
       d.shading(false);imported_endpoint(d);const auto reference=draw(native,d.frame().surface);
       const auto path=out/("kind"+std::to_string(kind)+"-phase"+std::to_string(phase)+".glb");
+      std::cout<<"STAGE raw-preserving "<<kind<<"/"<<phase<<" actual-native-export"<<std::endl;
       d.export_asset(path,AssetExportFormat::EditableGlb256).get();
       const auto bytes=file(path);const auto restored=extract_native_authoring(bytes);
       check(restored&&restored->encode()==exact&&d.copy_scene().encode()==exact&&file(input)==raw,
