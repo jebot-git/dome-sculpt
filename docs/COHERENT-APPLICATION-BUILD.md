@@ -30,3 +30,9 @@ current602 run or physical headset proof. The original589 remains537Passed/
 50Failed/2dependencyNotRun. Root cage ABI/other new feature branches remain outside
 this frozen runtime. All unfinished original/additional requirements and deferred
 drawers remain required; no system installation or active session changed.
+
+## Qualified continuation
+
+The subsequent602 run, corrected source-uv and complete ownedSAN139 are now
+closed. Read COHERENT-SOURCE4-MIRROR-INTEGRATION.md for the current composed
+publication scope; pending statements above record the original build checkpoint.

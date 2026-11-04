@@ -1,0 +1,254 @@
+{
+  "date": "2026-11-04",
+  "qualified_source": "02d60223fe009c655fd88fa0c312598e87e8d829",
+  "publication_scope": "Coherent Source4/Mirror/native authoring/public8878 integration with final27/POLL SDK. Original602 invocation retains601Pass/1Fail; corrected source-uv registered1/1 plus68R/S compose without relabeling that invocation. No cage newABI, paintedV1 draft or unqualified native HDR lane included.",
+  "fresh_build": {
+    "state": "terminal",
+    "pid": 1388176,
+    "source": "916d9e539a4b8d2d0bdc883c7405402369e6a3d5",
+    "scope": "Fresh optimized ALL-target CPU application/core/render/support/consumers. Isolated 916d union preserves prior coherent authoring, current public IO/SDK/Restore, qualified b58 XR Mirror, Files2034 fixture and optional8878Mesa source dependency. No reused core/archive/object; configuration-only prior build directory. Pending isolated Source4 test migration not yet adopted; no regression/UI/device claim from build",
+    "steps": [
+      {
+        "phase": "configure",
+        "command": [
+          "cmake",
+          "-S",
+          "/home/blux/de-xr/dome-sculpt/artifacts/authoring-next-2034",
+          "-B",
+          "/home/blux/de-xr/dome-sculpt/artifacts/authoring-next-2034/build-release",
+          "-G",
+          "Ninja",
+          "-DCMAKE_BUILD_TYPE=Release",
+          "-DDOME_COMPUTE_BACKEND=CPU",
+          "-DDOME_BUILD_UI=ON",
+          "-DDOME_BUILD_XR=ON",
+          "-DCMAKE_EXPORT_COMPILE_COMMANDS=ON",
+          "-DFLTK_DIR=/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-release/share/fltk",
+          "-U*DOME_BITMAP_RUNTIME*",
+          "-U*NATIVEGL*",
+          "-U*RENDERFONTS*"
+        ],
+        "exit": 0,
+        "seconds": 2.6231675050221384
+      },
+      {
+        "phase": "build",
+        "command": [
+          "cmake",
+          "--build",
+          "/home/blux/de-xr/dome-sculpt/artifacts/authoring-next-2034/build-release",
+          "--parallel",
+          "2"
+        ],
+        "exit": 0,
+        "seconds": 2401.455451065005
+      }
+    ],
+    "phase": "build",
+    "child_pid": 1388649,
+    "registered_tests": 601,
+    "exit": 0,
+    "seconds": 2404.3696805269865,
+    "inputs": 1758,
+    "drift": []
+  },
+  "test_followup": {
+    "state": "terminal",
+    "pid": 1715756,
+    "source": "d63993e8d19ee957deb1fa620a35608989bac6c9",
+    "scope": "Test/docs/CMake-only continuation over completed fresh own601 application/core/render/support build, product/header/asset bytes exact. Regenerate602 registration and complete ALL targets; no foreign archives. No test-pass claim.",
+    "steps": [
+      {
+        "phase": "configure",
+        "command": [
+          "cmake",
+          "-S",
+          "/home/blux/de-xr/dome-sculpt/artifacts/authoring-next-2034",
+          "-B",
+          "/home/blux/de-xr/dome-sculpt/artifacts/authoring-next-2034/build-release",
+          "-G",
+          "Ninja",
+          "-DCMAKE_BUILD_TYPE=Release",
+          "-DDOME_COMPUTE_BACKEND=CPU",
+          "-DDOME_BUILD_UI=ON",
+          "-DDOME_BUILD_XR=ON",
+          "-DCMAKE_EXPORT_COMPILE_COMMANDS=ON",
+          "-DFLTK_DIR=/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-release/share/fltk",
+          "-U*DOME_BITMAP_RUNTIME*",
+          "-U*NATIVEGL*",
+          "-U*RENDERFONTS*"
+        ],
+        "exit": 0,
+        "seconds": 2.124116277991561
+      },
+      {
+        "phase": "build",
+        "command": [
+          "cmake",
+          "--build",
+          "/home/blux/de-xr/dome-sculpt/artifacts/authoring-next-2034/build-release",
+          "--parallel",
+          "2"
+        ],
+        "exit": 0,
+        "seconds": 34.446004265977535
+      }
+    ],
+    "child_pid": 1716191,
+    "registered_tests": 602,
+    "exit": 0,
+    "seconds": 36.64178354397882,
+    "inputs": 1765,
+    "drift": []
+  },
+  "original_full_run": {
+    "state": "terminal",
+    "pid": 1730021,
+    "source": "d63993e8d19ee957deb1fa620a35608989bac6c9",
+    "fresh_source": "916d9e539a4b8d2d0bdc883c7405402369e6a3d5",
+    "scope": "All registered commands/properties, coherent optimized own CPU application/core/render/support/current canonical27SDK. Software graphics/private fake XR with global missing-runtime sentinel; no hardware, physical headset or system session. Test-only followup over byte-identical freshly built product.",
+    "command": [
+      "ctest",
+      "--test-dir",
+      "/home/blux/de-xr/dome-sculpt/artifacts/authoring-next-2034/build-release",
+      "--output-on-failure",
+      "--parallel",
+      "4"
+    ],
+    "registered": 602,
+    "child_pid": 1730319,
+    "ctest_exit": 8,
+    "seconds": 3274.218251129001,
+    "source_inputs": 2248,
+    "artifact_inputs": 494,
+    "source_drift": [],
+    "artifact_drift": [],
+    "exit": 1
+  },
+  "original_totals": {
+    "Passed": 601,
+    "Failed": 1,
+    "Other": 0
+  },
+  "original_failure": {
+    "order": 278,
+    "id": 275,
+    "name": "source-uv",
+    "line": "278/602 Test #275: source-uv ......................................***Failed    0.01 sec",
+    "status": "Failed"
+  },
+  "final_followup": {
+    "state": "terminal",
+    "pid": 2766288,
+    "source": "02d60223fe009c655fd88fa0c312598e87e8d829",
+    "scope": "Test/docs/CMake-only continuation over completed fresh own601 application/core/render/support build, product/header/asset bytes exact. Regenerate602 registration and complete ALL targets; no foreign archives. No test-pass claim.",
+    "steps": [
+      {
+        "phase": "configure",
+        "command": [
+          "cmake",
+          "-S",
+          "/home/blux/de-xr/dome-sculpt/artifacts/authoring-next-2034",
+          "-B",
+          "/home/blux/de-xr/dome-sculpt/artifacts/authoring-next-2034/build-release",
+          "-G",
+          "Ninja",
+          "-DCMAKE_BUILD_TYPE=Release",
+          "-DDOME_COMPUTE_BACKEND=CPU",
+          "-DDOME_BUILD_UI=ON",
+          "-DDOME_BUILD_XR=ON",
+          "-DCMAKE_EXPORT_COMPILE_COMMANDS=ON",
+          "-DFLTK_DIR=/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-release/share/fltk",
+          "-U*DOME_BITMAP_RUNTIME*",
+          "-U*NATIVEGL*",
+          "-U*RENDERFONTS*"
+        ],
+        "exit": 0,
+        "seconds": 1.9449999390053563
+      },
+      {
+        "phase": "build",
+        "command": [
+          "cmake",
+          "--build",
+          "/home/blux/de-xr/dome-sculpt/artifacts/authoring-next-2034/build-release",
+          "--parallel",
+          "2"
+        ],
+        "exit": 0,
+        "seconds": 4.207940956985112
+      },
+      {
+        "phase": "corrected-registered-source-uv",
+        "command": [
+          "ctest",
+          "--test-dir",
+          "/home/blux/de-xr/dome-sculpt/artifacts/authoring-next-2034/build-release",
+          "-R",
+          "^source-uv$",
+          "--output-on-failure"
+        ],
+        "exit": 0,
+        "seconds": 2.0003412929945625
+      }
+    ],
+    "child_pid": 2767164,
+    "registered_tests": 602,
+    "exit": 0,
+    "artifact_hashes": {
+      "/home/blux/de-xr/dome-sculpt/artifacts/authoring-next-2034/build-release/dome-sculpt": "9301602b821ec2f31bf9d646080f9c2f9919253d2a5c53f3804db51ad254ede9",
+      "/home/blux/de-xr/dome-sculpt/artifacts/authoring-next-2034/build-release/dome-sculpt-source-uv-test": "298b6e8df88c9faa9a96b09ed350e220965548a14cf38915ac36418b9b13cb08",
+      "/home/blux/de-xr/dome-sculpt/artifacts/authoring-next-2034/build-release/libdome-sculpt-affine.a": "60861a578e972c6eba79bfa27890378061575b6f46d70aeba74d805b263bacac",
+      "/home/blux/de-xr/dome-sculpt/artifacts/authoring-next-2034/build-release/libxatlas.a": "1ebd2d617b4e5708b240b5af9727cb94e95f04d7ce0404e06aeff34a329a04c1",
+      "/home/blux/de-xr/dome-sculpt/artifacts/authoring-next-2034/build-release/libufbx.a": "8409fdcfe9913e06a96e66b87b8ba87944713184ad73a1ed5a0401b21271e7dd",
+      "/home/blux/de-xr/dome-sculpt/artifacts/authoring-next-2034/build-release/libmikktspace.a": "6ad800b5e68e18f9ff33a50cda51eea52bdc10a1b16bb82c1e0cd6adbf2a74b3",
+      "/home/blux/de-xr/dome-sculpt/artifacts/authoring-next-2034/build-release/libdome-sculpt-polygon.a": "bcc5f7988c343310d06fc6bda92109978d9a224d42147ca944bccfb7eafeeb1b",
+      "/home/blux/de-xr/dome-sculpt/artifacts/authoring-next-2034/build-release/libmikktspace-robust.a": "8cff745d3259035c7a021d6387842335bf6d5f995e63f2c0f474abe2b43925d1",
+      "/home/blux/de-xr/dome-sculpt/artifacts/authoring-next-2034/build-release/libdome-sculpt-emission-codec.a": "39b7ae31f76ef0880b4724cfa4613bd678f58649d27501ea4396c808c84a8124",
+      "/home/blux/de-xr/dome-sculpt/artifacts/authoring-next-2034/build-release/libdome-sculpt-core.a": "a684e9f1d69305c04107e941302ad7e12e0fc8a96de5783d902303045f8f836a",
+      "/home/blux/de-xr/dome-sculpt/artifacts/authoring-next-2034/build-release/libdome-sculpt-render.a": "f1f13ae256c3ef1c0943ac5082d3d01b6eee132966062063f4daa05b768a4e55",
+      "/home/blux/de-xr/dome-sculpt/artifacts/authoring-next-2034/build-release/libdome-sculpt-spacenav.a": "417725b5dbdaeebd243d10eca2dcf9223a137116c16ceb3947bdd0e2c9d9381b",
+      "/home/blux/de-xr/dome-sculpt/artifacts/authoring-next-2034/build-release/libdome-sculpt-xr.a": "fb7d95ca049cad9c12b78c4e74bbf55672e06a4348ee271bf0701d7bca8ead42"
+    },
+    "seconds": 8.263050150009803,
+    "inputs": 1767,
+    "drift": []
+  },
+  "unchanged_application_archives": {
+    "/home/blux/de-xr/dome-sculpt/artifacts/authoring-next-2034/build-release/dome-sculpt": true,
+    "/home/blux/de-xr/dome-sculpt/artifacts/authoring-next-2034/build-release/libdome-sculpt-affine.a": true,
+    "/home/blux/de-xr/dome-sculpt/artifacts/authoring-next-2034/build-release/libxatlas.a": true,
+    "/home/blux/de-xr/dome-sculpt/artifacts/authoring-next-2034/build-release/libufbx.a": true,
+    "/home/blux/de-xr/dome-sculpt/artifacts/authoring-next-2034/build-release/libmikktspace.a": true,
+    "/home/blux/de-xr/dome-sculpt/artifacts/authoring-next-2034/build-release/libdome-sculpt-polygon.a": true,
+    "/home/blux/de-xr/dome-sculpt/artifacts/authoring-next-2034/build-release/libmikktspace-robust.a": true,
+    "/home/blux/de-xr/dome-sculpt/artifacts/authoring-next-2034/build-release/libdome-sculpt-emission-codec.a": true,
+    "/home/blux/de-xr/dome-sculpt/artifacts/authoring-next-2034/build-release/libdome-sculpt-core.a": true,
+    "/home/blux/de-xr/dome-sculpt/artifacts/authoring-next-2034/build-release/libdome-sculpt-render.a": true,
+    "/home/blux/de-xr/dome-sculpt/artifacts/authoring-next-2034/build-release/libdome-sculpt-spacenav.a": true,
+    "/home/blux/de-xr/dome-sculpt/artifacts/authoring-next-2034/build-release/libdome-sculpt-xr.a": true
+  },
+  "key_workflow_receipt_sha256": "1f6e16dd2e8dde350883aa617308e126dec0e898c66f480e37ef34679f8ed9e2",
+  "source_uv_receipt_sha256": "1de89e6b9b7446c9dd19047b237998c7ad2250e8dca7af9a9165fbfc0057f73b",
+  "source_graphics_receipt_sha256": "6efd126b47326a6b86c75c66d205314bdc9d740fba038918d1b61a6593578c81",
+  "evidence": {
+    "artifacts/coherent-proof/all-release/completion-audit.json": "fa873e474a36b53109eec6dc582a1aabdc98f618d38ee6c79847aad017f973e7",
+    "artifacts/coherent-proof/all-release/ctest.log": "6e1fba79868ec9dc622c6ada77f8372080543e9f524992f1bf4f0065ac6e4b5d",
+    "artifacts/coherent-proof/all-release/before-source.json": "ed089319542953c6b958ae3c0cceac81082f6af15c34877ae8697b3079156266",
+    "artifacts/coherent-proof/all-release/after-source.json": "ed089319542953c6b958ae3c0cceac81082f6af15c34877ae8697b3079156266",
+    "artifacts/coherent-proof/all-release/before-artifacts.json": "56e33d3a3daa5f98b4da01c65b2a7e22b5ffc43aae1bd3dc965c3cfa0eb7fa4d",
+    "artifacts/coherent-proof/all-release/after-artifacts.json": "56e33d3a3daa5f98b4da01c65b2a7e22b5ffc43aae1bd3dc965c3cfa0eb7fa4d",
+    "artifacts/coherent-proof/publication-followup/before.json": "82e39bf3539f6af6002f5121f62f19ef1c0a21a598707d2b63e6a6153fae2654",
+    "artifacts/coherent-proof/publication-followup/after.json": "82e39bf3539f6af6002f5121f62f19ef1c0a21a598707d2b63e6a6153fae2654",
+    "artifacts/coherent-proof/publication-followup/registry.json": "cb5eb87919edc6636785e7b90909f8ec3954ff5ab58db3229256c655ce1bdb3c",
+    "artifacts/coherent-proof/publication-followup/source-uv.log": "024fdb6dc9ba7f3ad42e71b35739eb196a60ccbd109b233ab74261367fac1722"
+  },
+  "limits": [
+    "No single green602 rerun or whole602 SAN claim.",
+    "Whole-owned SAN51+139 is matching immutable B6 component scope; all consumed headers/product byte-proved, not a freshly rebuilt finalapp.",
+    "Existing normal/compact FLTK30R+30SAN and synthetic importXR82 are coherentB6 app component scopes; Files152 and Mirror40 separately scoped.",
+    "Source4 key image45 R/S/strictA770,9images each, is separate matched consumer; current full602 uses software rendering.",
+    "No physicalHMD/3Dmouse/system installation/session change. StockMesa standaloneSAN112B retained; optional private patchedMesa qualification does not change system drivers.",
+    "PaintedV1 typed compiler, cage newABI union, broad physics/export/production/device and deferred controller drawers remain required."
+  ]
+}

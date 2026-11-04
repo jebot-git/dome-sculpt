@@ -1,5 +1,17 @@
 # Full objective and completion evidence
 
+## Qualified coherent Source4/Mirror milestone — 2026-11-04
+
+Fresh own optimized application/core/render/support builds; the complete602
+run records601Pass/1Fail, followed by the real corrected source-uv68R/S and
+registered1/1. Final ALL followup is0, with unchanged application/archive hashes.
+Complete owned Source4 sanitizer51+139 and separate strictA770 key images45
+pass. Read COHERENT-SOURCE4-MIRROR-INTEGRATION.md and its exact receipt. This
+current status supersedes pending language in the historical checkpoints below;
+original failed runs remain preserved. Cage/newABI and paintedV1 WIP stay separate.
+All unfinished original/additional requirements and deferred drawers remain active.
+
+
 ## Original source UV editing admission regression — 2026-11-04
 
 The preserved coherent602 run has601Pass/1Fail. Its sole zero-area source stroke
