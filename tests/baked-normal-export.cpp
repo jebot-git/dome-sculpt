@@ -22,6 +22,7 @@ Scene baked_fan(bool skin,bool morph,bool curved=false){
   s.set_deformation(target,d);
  }
  auto high=mesh;for(auto &p:high.positions)p.z=.01f;high.normals.assign(5,{.3f,.4f,std::sqrt(.75f)});
+ if(curved){high.positions={{-.3f,-.3f,.02f},{.3f,-.3f,.02f},{.3f,.3f,.02f},{-.3f,.3f,.02f}};high.normals.assign(4,{.3f,.4f,std::sqrt(.75f)});high.uv={{{0,0}},{{1,0}},{{1,1}},{{0,1}}};high.indices={0,1,2,0,2,3};high.uv_pins.clear();}
  s.add("Unchanged source",Volume{});s.active().mesh_active=true;s.active().visible=false;s.active().locked=true;s.active().painted=std::make_shared<PaintedMesh>(high,64);s.select(target);
  ObjectBakeSettings settings;settings.ao_samples=0;settings.padding=0;auto report=bake_object(s,2,settings);require_cage(report.projected>100,"Actual native baker covers both disjoint mirrored-UV triangles");return s;
 }
