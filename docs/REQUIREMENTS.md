@@ -5,9 +5,11 @@
 Last-successful target recipes now persist exact source/cage provenance and all
 projection/preparation settings through Scene30/history7, deletion/group deletion,
 append/subsets and native packages. Existing desktop/XR draft Recall preserves
-Cancel/Done/history and never implicitly Bakes. Matched owning R/S each pass35
+Cancel/Done/history and never implicitly Bakes. Matched owning R/S each pass39
 native recipe checks, nine selected consumers,161 new persistent allocation
-prefixes, normal/compact32 GUI, Wayland9 and actual-loader22 checks. Existing
+prefixes, normal/compact/wide46 GUI, Wayland9 and actual-loader44 checks. Shared
+zero-capable distance controls preserve0..100000mm, and unit conversion fixes
+the genuine maximum-bound float rounding refusal without changing kernel limits. Existing
 caller127 and source-confirm47 prefixes remain. Read BAKE-RECIPES.md and its
 receipt for original failures, own fresh-parent/completed-TU build scope and four
 retained Khronos tangent warnings. This is not fresh ALL/full612, main admission,
