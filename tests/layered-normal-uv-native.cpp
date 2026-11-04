@@ -26,7 +26,11 @@ Scene uv_edit(Scene scene,bool split){
 }
 int main(int argc,char **argv)try{
  if(argc!=3)return 2;const std::filesystem::path source=argv[1],out=argv[2];std::filesystem::create_directories(out);
- NativeGraphics gl;Fbo fbo;SurfaceRenderer renderer;prepared_normal_consumer::Renderer independent;
+ NativeGraphics gl;
+ const auto device=reinterpret_cast<const char*>(glGetString(GL_RENDERER));std::cout<<"ACTUAL_RENDERER "<<(device?device:"unavailable")<<std::endl;
+ if(const auto expected=std::getenv("DOME_EXPECT_RENDERER"))check(device&&std::string_view(device).find(expected)!=std::string_view::npos,
+   "Actual retained normal UV consumer runs on the explicitly required renderer");
+ Fbo fbo;SurfaceRenderer renderer;prepared_normal_consumer::Renderer independent;
  for(int variant:{0,7}){
   auto initial=Scene::load(source/("converted-"+std::to_string(variant)+".dsculpt"));initial.active().transform.scale=5;
   for(bool split:{false,true}){
@@ -49,7 +53,7 @@ int main(int argc,char **argv)try{
     Document before,after;before.replace(original);after.replace(current);before.shading(false);after.shading(false);uv_settle(before);uv_settle(after);
     fbo.bind();auto expected=draw(renderer,before.frame().surface);fbo.bind();auto actual=draw(renderer,after.frame().surface);const auto atlas_error=delta(expected,actual);
     std::cout<<"NORMAL_UV variant="<<variant<<" split="<<split<<" pose="<<pose<<" weight="<<weight<<" atlas_error="<<atlas_error<<std::endl;
-    check(atlas_error<=4,"Actual posed/morphed native GPU shading retains original normal field after UV changes");
+    check(atlas_error<=4,"Actual posed/morphed native OpenGL shading retains original normal field after UV changes");
     const auto stats=renderer.texture_stats();fbo.bind();check(draw(renderer,after.frame().surface)==actual&&renderer.texture_stats().uploads==stats.uploads&&renderer.texture_stats().pack_builds==stats.pack_builds,
       "Second eye adds no new normal texture uploads or pack builds");
     const auto path=out/("uv-"+std::to_string(variant)+"-"+std::to_string(split)+"-"+std::to_string(pose)+"-"+std::to_string(int(weight*100))+".glb");

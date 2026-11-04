@@ -578,8 +578,8 @@ void Document::publish_locked(bool force,bool checkpoint) {
   if (uv_) {
     auto view = std::make_shared<UvView>(uv_->view());
     const auto &source=scene_.object(control_object_);
-    view->normal_sampling_available=source.painted&&source.painted->normal_projection()&&source.material_bindings&&source.material_bindings->normal_preparation;
-    view->normal_sampling_required=view->normal_sampling_available&&source.painted->normal_projection()->version==2;
+    view->normal_sampling_available=source.material_bindings&&(source.material_bindings->canonical_attributes||(source.painted&&source.painted->normal_projection()&&source.material_bindings->normal_preparation));
+    view->normal_sampling_required=view->normal_sampling_available&&(source.material_bindings->canonical_attributes||(source.painted->normal_projection()&&source.painted->normal_projection()->version==2));
     view->retain_normal_sampling=uv_retention_requested_locked();
     view->paint_sampling_available=uv_paint_retention_available_locked();
     view->paint_sampling_required=bool(source.painted&&source.painted->paint_sampling_domain());
@@ -2370,7 +2370,7 @@ void Document::control_event_locked(VrControlEvent event) {
         ++uv_session_;
         uv_.emplace(std::shared_ptr<const Mesh>(o.painted, &o.painted->mesh()),
                     o.painted->resolution());
-        c.value[3]=o.painted->paint_sampling_domain()?2.f:o.painted->normal_projection()&&o.painted->normal_projection()->version==2?1.f:0.f;
+        c.value[3]=o.painted->paint_sampling_domain()?2.f:(o.material_bindings&&o.material_bindings->canonical_attributes)||(o.painted->normal_projection()&&o.painted->normal_projection()->version==2)?1.f:0.f;
         c.title = "UV editor";
       } catch (...) {
         control_before_.reset();

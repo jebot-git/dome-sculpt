@@ -21,6 +21,9 @@ bool heavy_uv(UvAction action) {
 bool Document::uv_retention_requested_locked() const {
   // The UV workspace has no numeric fourth component. Keep this draft-only
   // option in the existing transactional control snapshot, never in Scene.
+  if(control_before_&&control_object_){const auto &o=scene_.object(control_object_);
+    if(o.material_bindings&&o.material_bindings->canonical_attributes)return true;
+  }
   return state_.controls.parameter==VrParameter::UvEdit&&state_.controls.value[3]>.5f;
 }
 bool Document::uv_paint_retention_requested_locked() const {
@@ -65,6 +68,8 @@ void Document::apply_uv_action_locked(UvAction action, float x, float y) {
     else if(action==UvAction::RetainNormals){
       if(uv_paint_retention_requested_locked())throw std::logic_error("Turn off Keep paint detail before changing normal sampling");
       const auto &o=scene_.object(control_object_);
+      if(o.material_bindings&&o.material_bindings->canonical_attributes)
+        throw std::logic_error("Converted normal detail keeps its original coordinates while the UV layout changes");
       if(!o.painted||!o.painted->normal_projection()||!o.material_bindings||!o.material_bindings->normal_preparation)
         throw std::logic_error("Prepare normal detail in the Bake controls first");
       if(o.painted->normal_projection()->version==2)
@@ -385,7 +390,7 @@ void Document::process_uv_transfer(FileJob &job) {
     transaction.finish_uv();
     if(job.uv_desktop)desktop_=false;
     if(changed){scene_=std::move(prepared);record_locked({{},transaction.before(),scene_});bind_locked();}
-    state_.asset_busy=false;if(asset_work_.load()==job.work)asset_work_.store({});state_.message=retained_paint?"UV layout updated. Paint and normal detail retained; save the native project to keep editable sources.":job.uv_keep_normals?"UVs updated; original normal detail kept. Save the native project; glTF/VRM export still needs a sampling conversion.":"UVs, paint and deformation identities updated";state_.error.clear();
+    state_.asset_busy=false;if(asset_work_.load()==job.work)asset_work_.store({});state_.message=scene_.active().material_bindings&&scene_.active().material_bindings->canonical_attributes?"UV layout updated; original normal detail retained. Native and glTF export supported.":retained_paint?"UV layout updated. Paint and normal detail retained; save the native project to keep editable sources.":job.uv_keep_normals?"UVs updated; original normal detail kept. Save the native project; glTF/VRM export still needs a sampling conversion.":"UVs, paint and deformation identities updated";state_.error.clear();
     publish_locked(changed,false);transaction.commit();
     if(accepted){
       accepted->revision=state_.revision;accepted->content=content_;
