@@ -72,6 +72,8 @@ int main(int argc,char **argv)try{
   }
   if(variant==7){
    auto bad=encoded;bad["version"]=30;require_cage(failure([&]{Scene::decode(bad);},"Scene31"),"Scene30 cannot acquire conversion authority by relabeling outer data");
+   bad=encoded;bad["source_materials"]["version"]=4;bad["source_materials"].erase("base_version");
+   require_cage(failure([&]{Scene::decode(bad);},"material13"),"Historical material wire cannot carry a staged canonical conversion pool without its actual capability");
    bad=encoded;bad["source_materials"]["canonical_conversions"][0]["receipt"]["observed_center_error"]=.2;
    require_cage(failure([&]{Scene::decode(bad);},"replay"),"Forged conversion quality data fails actual retained-source replay");
    bad=encoded;bad["source_materials"]["canonical_conversions"][0]["anchor"]=123;

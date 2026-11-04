@@ -430,7 +430,11 @@ nlohmann::json SourceMaterialArchive::encode(PaintImageArchive &images,CreatorAs
   if(explicit_mirror){output["base_version"]=10;output["version"]=12;output["physical_emission"]=physical;}
   else if(physical){output["base_version"]=output.at("version");output["version"]=11;}
   if(!canonical_conversions.empty()){
-    const auto base=detail::material_archive_base_version(output);output["base_version"]=base;output["version"]=13;
+    // The conversion pool is already staged, but its wire capability has not
+    // been wrapped yet. The strict decoder must reject that intermediate DTO;
+    // take the writer's actual selected layout before publishing material13.
+    const auto base=output.contains("base_version")?output.at("base_version"):output.at("version");
+    output["base_version"]=base;output["version"]=13;
     output["physical_emission"]=physical;output["explicit_mirror"]=explicit_mirror;output["canonical_normals"]=true;
   }
   return output;
