@@ -12,6 +12,7 @@
 #include "dome/normal-preparation.hpp"
 #include "normal-bake-encoding.hpp"
 #include "baked-normal-field.hpp"
+#include "canonical-normal-uv.hpp"
 namespace dome {
 ObjectBakeReport bake_object(Scene &scene, uint64_t source_id,
                               ObjectBakeSettings settings,
@@ -165,10 +166,31 @@ ObjectBakeReport bake_object(Scene &scene, uint64_t source_id,
   if(settings.cage_object)
     options.cage_positions=detail::object_bake_cage(scene,target.id,settings.cage_object,
         target.painted->mesh(),low_mesh,cancelled);
+  const auto retained_uv=target.material_bindings?target.material_bindings->canonical_uv:nullptr;
+  if(retained_uv&&progress)options.progress=[&](float value){progress(.1f+.4f*value);};
   auto result = bake_mesh(low_mesh, high, options);
+  std::optional<BakeResult> retained_normal_write;
+  if(retained_uv){
+    retained_uv->validate_current(target.painted->mesh(),cancelled);
+    if(!low||!canonical_attributes||low->positions.size()!=target.painted->mesh().indices.size())
+      throw std::invalid_argument("Retained normal rebake lost its exact split corner basis");
+    // Material channels belong to the current editable atlas. The independent
+    // normal field still belongs to its original root coordinates. Project
+    // that role in the original domain instead of replacing it with current-UV
+    // texels. These are CPU geometry queries, never framebuffer readbacks.
+    Mesh normal_low=*low;
+    for(size_t c=0;c<normal_low.uv.size();++c){if((c&1023)==0)check();
+      normal_low.uv[c]=retained_uv->coordinates().at(target.painted->mesh().indices[c]);}
+    auto normal_options=options;
+    if(result.rays>=options.max_rays||result.raster_samples>=options.max_raster_samples)
+      throw std::length_error("Retained normal rebake lacks aggregate projection/raster budget");
+    normal_options.max_rays-=result.rays;normal_options.max_raster_samples-=result.raster_samples;
+    if(progress)normal_options.progress=[&](float value){progress(.5f+.4f*value);};
+    retained_normal_write=bake_mesh(normal_low,high,normal_options);
+  }
   check();
   if(!result.projected)throw std::runtime_error("No target texels project onto the selected source");
-  ObjectBakeReport report{result.projected,result.padded,result.rays,result.missed};
+  ObjectBakeReport report{result.projected,result.padded,result.rays+(retained_normal_write?retained_normal_write->rays:0),result.missed};
   report.color_prepared=converted;
   report.canonical_captured=canonical_captured;
   report.normal_prepared=normal_converted;
@@ -192,7 +214,15 @@ ObjectBakeReport bake_object(Scene &scene, uint64_t source_id,
     detail::BakedNormalFieldOptions field_options;field_options.cancelled=cancelled;
     const auto old=target.painted->baked()?target.painted->baked()->normal_field:nullptr;
     auto before=old?old:detail::BakedNormalField::from_intrinsic(canonical_attributes,field_options);
-    textures.normal_field=before->replace(textures,field_options);textures.maps.normal={};textures.maps.mtoon_normal={};
+    if(retained_normal_write){
+      BakedTextures normal_write;normal_write.normal_interpretation=BakedNormalInterpretation::PreparedAttributes;
+      normal_write.color_interpretation=textures.color_interpretation;
+      normal_write.maps=std::move(retained_normal_write->maps);normal_write.maps.normal=std::move(retained_normal_write->normal);
+      normal_write.coverage.reserve(retained_normal_write->coverage.size());
+      for(auto c:retained_normal_write->coverage)normal_write.coverage.push_back(c==1||c==2?255:0);
+      textures.normal_field=before->replace(normal_write,field_options);
+    }else textures.normal_field=before->replace(textures,field_options);
+    textures.maps.normal={};textures.maps.mtoon_normal={};
   }
   painting->install_bake(std::move(textures));
   auto next = scene;

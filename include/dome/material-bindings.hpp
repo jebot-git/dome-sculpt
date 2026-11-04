@@ -5,7 +5,7 @@
 #include "normal-frames.hpp"
 #include <optional>
 namespace dome {
-namespace detail { class PolygonColorArchive; class SourceKeyDerivation; class CanonicalNormalConversion; }
+namespace detail { class PolygonColorArchive; class SourceKeyDerivation; class CanonicalNormalConversion; class CanonicalNormalUv; }
 class PaintedMesh;
 class CreatorAssetArchive;
 class NormalSamplingArchive;
@@ -62,6 +62,8 @@ struct SourceMaterialBindings {
   std::shared_ptr<const detail::SourceKeyDerivation> key_derivation;
   // Durable attribute provenance survives clearing the active baked detail.
   std::shared_ptr<const detail::CanonicalNormalConversion> canonical_attributes;
+  // Editable atlas correspondence; its authentic root survives Clear Bake.
+  std::shared_ptr<const detail::CanonicalNormalUv> canonical_uv;
   void validate(bool deep=true) const;
 };
 using SourceUvMaterialBindings = SourceMaterialBindings;

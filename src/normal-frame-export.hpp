@@ -97,11 +97,13 @@ inline NormalFrameExport normal_frame_export(const ObjectSurface &input,SourceMo
     const std::function<bool()> &cancelled={},bool retain_pbr_sampling=false) {
   if(!input.material_bindings || !input.material_bindings->normal_frames)throw std::invalid_argument("Missing original frame export payload");
   const auto &binding=*input.material_bindings;binding.validate();const auto &set=*binding.normal_frames;
-  const bool retained=input.textures&&input.textures->normal_projection&&input.textures->normal_projection->version==2;
+  const auto normal_domain=retained_normal_coordinates(&binding,input.textures.get());
+  const bool retained=bool(normal_domain);
   if(retained&&(!retain_pbr_sampling||space!=SourceMorphSpace::Native))throw std::invalid_argument("Retained normal domains require an explicitly compiled format-specific sampling export; original source retained");
   if(retained){
     prepared_normal_state(&binding,input.textures.get(),true);
-    binding.normal_preparation->sampling_domain->validate_current(input.mesh,input.appearance.get(),cancelled);
+    if(binding.canonical_uv)binding.canonical_uv->validate_current(input.mesh,cancelled);
+    else binding.normal_preparation->sampling_domain->validate_current(input.mesh,input.appearance.get(),cancelled);
   }
   const bool prepared=prepared_normal_state(&binding,input.textures.get(),false);
   const bool legacy=space==SourceMorphSpace::Original;const auto selected=legacy?set.mtoon:set.pbr;auto tangent_source=selected;
@@ -145,7 +147,7 @@ inline NormalFrameExport normal_frame_export(const ObjectSurface &input,SourceMo
   }
   out.canonical_normal=std::move(canonical_normal);out.rest_vertices=layout.vertices;out.input_polygon_colors=input.polygon_colors;
   if(prepared){out.prepared_normal.image=std::shared_ptr<const Image>(input.textures,legacy?&input.textures->mtoon_normal:&input.textures->normal);out.prepared_normal.wrap_s=out.prepared_normal.wrap_t=33071;out.prepared_normal.min_filter=out.prepared_normal.mag_filter=9729;}
-  if(retained){
+  if(retained&&input.textures->normal_projection){
     const auto &projection=*input.textures->normal_projection;
     out.prepared_normal.image=input.textures->baked_base&&!input.textures->baked_base->maps.normal.rgba.empty()
       ?projection.sampling_domain->resolved_pbr:projection.pbr;
@@ -157,7 +159,7 @@ inline NormalFrameExport normal_frame_export(const ObjectSurface &input,SourceMo
   for(size_t v=0;v<layout.vertices.size();++v) {
     if((v&1023)==0 && cancelled && cancelled())throw std::runtime_error("Normal frame export cancelled");
     auto vertex=layout.vertices[v],corner=layout.corners[v];
-    if(retained)out.normal_coordinates.push_back(input.textures->normal_projection->sampling_domain->coordinates.at(vertex));
+    if(retained)out.normal_coordinates.push_back(normal_domain->coordinates.at(vertex));
     mesh.positions.push_back(input.mesh.positions.at(vertex));mesh.normals.push_back(from_native.rotate(selected->normals.at(corner)));
     if(!input.mesh.uv.empty())mesh.uv.push_back(input.mesh.uv.at(vertex));
     if(!input.mesh.uv_pins.empty())mesh.uv_pins.push_back(input.mesh.uv_pins.at(vertex));

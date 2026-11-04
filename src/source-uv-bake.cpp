@@ -3,6 +3,8 @@
 #include "dome/source-uv-bake.hpp"
 #include "dome/tangents.hpp"
 #include "normal-frame-runtime.hpp"
+#include "canonical-normal-uv.hpp"
+#include "source-paint-pairing.hpp"
 #include "dome/color-preparation.hpp"
 #include "dome/color-paint-sampling.hpp"
 #include "paint-sampling-access.hpp"
@@ -74,12 +76,18 @@ struct Plan {
 bool same(const Plan&a,const Plan&b){return a.view.image==b.view.image&&a.srgb==b.srgb&&a.normal==b.normal&&a.check_backface==b.check_backface&&a.domain==b.domain&&a.transform==b.transform&&!a.animated&&!b.animated&&a.view.wrap_s==b.view.wrap_s&&a.view.wrap_t==b.view.wrap_t&&a.view.min_filter==b.view.min_filter&&a.view.mag_filter==b.view.mag_filter;}
 void validate(const SourceUvBakeInput&i,const SourceUvBakeOptions&o){
  if(o.cancelled&&o.cancelled())throw std::runtime_error("Source UV bake cancelled");
- if((i.current_material&&i.current_material->canonical_attributes)||
-    (i.paint&&i.paint->baked()&&i.paint->baked()->normal_field))
-  throw std::invalid_argument("UV changes cannot yet preserve this converted normal detail; original mesh and paint retained");
+ const auto canonical=i.current_material?i.current_material->canonical_attributes:nullptr;
+ if(canonical){
+  if(i.appearance||i.polygon_authority||i.paint->normal_projection()||i.paint->color_projection()||
+      i.paint->paint_sampling_domain()||i.current_material->key_derivation||i.current_material->has_mtoon||
+      i.current_material->normal_frames!=canonical->frames()||o.resolution)
+    throw std::invalid_argument("Converted normal UV changes require their exact supported native attribute/field domain");
+  detail::source_paint_pairing(i.paint.get(),i.current_material.get(),nullptr,true);
+ }else if(i.paint&&i.paint->baked()&&i.paint->baked()->normal_field)
+  throw std::invalid_argument("Converted normal UV input lost its authentic attribute origin");
  if((i.current_material&&detail::physical_emission(*i.current_material))||(i.native_material&&detail::hdr_emission(i.native_material->emission))||(i.paint&&i.paint->has_physical_emission()))throw std::invalid_argument("Physical emission requires an exact UV transfer adapter; source retained");
  if(size_t(o.normal_sampling)>1)throw std::invalid_argument("Invalid normal UV sampling method");
- if(o.normal_sampling==SourceNormalUvMethod::RetainSource&&(!i.paint||!i.paint->normal_projection()))
+ if(o.normal_sampling==SourceNormalUvMethod::RetainSource&&!canonical&&(!i.paint||!i.paint->normal_projection()))
    throw std::invalid_argument("Retained normal sampling requires an owning prepared source");
  if(i.paint&&i.paint->paint_sampling_domain()&&o.resolution)
   throw std::invalid_argument("Retained paint detail needs an explicit sampling conversion before changing its resolution; original state retained");
@@ -417,7 +425,7 @@ SourceUvBakeResult bake_source_uv(const SourceUvBakeInput&i,const SourceUvBakeOp
  });
  auto dest=raster(i.target,i.paint->resolution(),false,false,budget);auto source=transfer_layers?raster(old,i.paint->resolution(),true,true,budget):Raster{};uint32_t r=i.paint->resolution(),cols=r/32;result.layers=i.paint->layers();for(auto &layer:result.layers){layer.tiles.assign(size_t(cols)*cols,{});layer.pbr_tiles.assign(prepared?size_t(cols)*cols:0,{});}
  std::shared_ptr<BakedTextures> transferred;std::vector<Tangent> old_frames,new_frames;
- if(old_bake){transferred=std::make_shared<BakedTextures>();auto blank=[&](bool normal=false){Image m{r,r,std::vector<uint8_t>(size_t(r)*r*4)};if(normal)for(size_t n=0;n<m.rgba.size();n+=4){m.rgba[n]=m.rgba[n+1]=128;m.rgba[n+2]=m.rgba[n+3]=255;}return m;};transferred->maps.color=blank();transferred->maps.metal_rough=blank();transferred->maps.emission=blank();transferred->color_interpretation=old_bake->color_interpretation;transferred->normal_interpretation=old_bake->normal_interpretation;if(prepared)transferred->maps.pbr_color=blank();transferred->coverage.assign(size_t(r)*r,0);if(!old_bake->maps.normal.rgba.empty()){transferred->maps.normal=blank(true);if(normal_prepared)transferred->maps.mtoon_normal=blank(true);if(!result.normal_frames){old_frames=tangent_corners(old,o.cancelled);new_frames=tangent_corners(i.target,o.cancelled);}}}
+ if(old_bake){transferred=std::make_shared<BakedTextures>();auto blank=[&](bool normal=false){Image m{r,r,std::vector<uint8_t>(size_t(r)*r*4)};if(normal)for(size_t n=0;n<m.rgba.size();n+=4){m.rgba[n]=m.rgba[n+1]=128;m.rgba[n+2]=m.rgba[n+3]=255;}return m;};transferred->maps.color=blank();transferred->maps.metal_rough=blank();transferred->maps.emission=blank();transferred->color_interpretation=old_bake->color_interpretation;transferred->normal_interpretation=old_bake->normal_interpretation;transferred->normal_field=old_bake->normal_field;if(prepared)transferred->maps.pbr_color=blank();transferred->coverage.assign(size_t(r)*r,0);if(!old_bake->maps.normal.rgba.empty()){transferred->maps.normal=blank(true);if(normal_prepared)transferred->maps.mtoon_normal=blank(true);if(!result.normal_frames){old_frames=tangent_corners(old,o.cancelled);new_frames=tangent_corners(i.target,o.cancelled);}}}
  std::vector<std::vector<std::shared_ptr<PaintTile>>> tiles(result.layers.size(),std::vector<std::shared_ptr<PaintTile>>(size_t(cols)*cols));
  std::vector<std::vector<std::shared_ptr<PaintColorTile>>> color_tiles(prepared?result.layers.size():0,std::vector<std::shared_ptr<PaintColorTile>>(prepared?size_t(cols)*cols:0));
  if(transfer_layers)for(uint32_t y=0;y<r;++y){budget.cancel();for(uint32_t x=0;x<r;++x){auto &h=dest.hits[size_t(y)*r+x];if(h.face==UINT32_MAX)continue;auto q=uv(old,nullptr,h);float px=q[0]*r-.5f,py=q[1]*r-.5f;int bx=int(std::floor(px)),by=int(std::floor(py));float fx=px-bx,fy=py-by;std::array<size_t,4> owners;std::array<float,4>w;for(int k=0;k<4;++k){int sx=std::clamp(bx+(k&1),0,int(r)-1),sy=std::clamp(by+(k>>1),0,int(r)-1);size_t at=size_t(sy)*r+sx;owners[k]=source.padding[at]>=0?size_t(source.padding[at]):at;w[k]=((k&1)?fx:1-fx)*((k>>1)?fy:1-fy);}
@@ -523,8 +531,11 @@ struct SourceUvBakeAccess {
      result.active_layer!=old.active_ || old.revision_==UINT64_MAX)
     throw std::invalid_argument("Source UV adoption cannot replace layer identity or active selection");
   const size_t columns=old.resolution()/PaintTile::size, count=columns*columns;
-  if((result.original_material&&result.original_material->canonical_attributes)||(old.baked_&&old.baked_->normal_field))
-    throw std::invalid_argument("UV adoption cannot drop converted normal detail or its original material provenance");
+  if((result.baked?result.baked->normal_field:nullptr)!=(old.baked_?old.baked_->normal_field:nullptr))
+    throw std::invalid_argument("UV adoption cannot drop, invent or replace the original resolved normal field");
+  if(old.baked_&&old.baked_->normal_field&&(!result.original_material||
+      result.original_material->canonical_attributes!=old.baked_->normal_field->origin()))
+    throw std::invalid_argument("UV adoption lost the original resolved normal attribute authority");
   size_t tiles=0,color_tiles=0;const bool prepared=bool(old.color_projection_),normal_prepared=bool(old.normal_projection_);
   for(size_t layer=0;layer<result.layers.size();++layer) {
    const auto &a=result.layers[layer],&b=old.layers_[layer];
@@ -655,6 +666,13 @@ SourceUvAdoption adopt_source_uv_bake(const SourceUvBakeResult &result,
  if(result.normal_reprojection){auto normal=std::make_shared<SourceNormalPreparation>(*result.original_material->normal_preparation);normal->projection=result.normal_reprojection->projection;normal->uv_reprojection=result.normal_reprojection;normal->sampling_domain.reset();binding->normal_preparation=std::move(normal);}
  if(result.normal_sampling){auto normal=std::make_shared<SourceNormalPreparation>(*result.original_material->normal_preparation);normal->projection=result.normal_sampling->projection;normal->sampling_domain=result.normal_sampling;normal->uv_reprojection.reset();binding->normal_preparation=std::move(normal);}
  binding->validate();
+ if(result.original_material&&result.original_material->canonical_attributes){
+  const auto &original=*result.original_material;detail::CanonicalNormalUvOptions uv_options;uv_options.cancelled=cancelled;
+  binding->canonical_attributes=original.canonical_attributes;
+  binding->canonical_uv=original.canonical_uv?original.canonical_uv->reparameterize(result.target,result.source_vertices,uv_options):
+    detail::CanonicalNormalUv::create(original.canonical_attributes,result.target,result.source_vertices,uv_options);
+  binding->validate();
+ }
  auto paint=SourceUvBakeAccess::adopt(result,cancelled);
  if(paint->color_projection()){if(result.color_reprojection)binding->color_preparation=result.color_reprojection;
   else{auto preparation=std::make_shared<SourceColorPreparation>(*result.original_material->color_preparation);preparation->projection=paint->color_projection();binding->color_preparation=std::move(preparation);}binding->validate();}

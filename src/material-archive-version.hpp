@@ -8,7 +8,10 @@ inline const nlohmann::json &material_archive_base_version(const nlohmann::json 
   if(!input.is_object()||!input.contains("version")||!input.at("version").is_number_integer())
     throw std::invalid_argument("Invalid material archive version");
   const auto &wire=input.at("version");
-  if(wire==15){
+  if(wire==16){
+    if(!input.contains("retained_canonical_uv")||input.at("retained_canonical_uv")!=true)throw std::invalid_argument("Material16 requires explicit retained canonical UV capability");
+  }else if(input.contains("retained_canonical_uv"))throw std::invalid_argument("Retained canonical UV capability requires material16");
+  if(wire==15||wire==16){
     if(!input.contains("base_version")||!input.at("base_version").is_number_integer()||
        input.at("base_version").get<int64_t>()<1||input.at("base_version").get<int64_t>()>10||
        !input.contains("layered_normals")||input.at("layered_normals")!=true||
@@ -53,13 +56,14 @@ inline const nlohmann::json &material_archive_base_version(const nlohmann::json 
   return wire;
 }
 inline bool physical_material_archive(const nlohmann::json &input){
-  material_archive_base_version(input);return input.at("version")==11||((input.at("version")==12||input.at("version")==13||input.at("version")==15)&&input.at("physical_emission").get<bool>());
+  material_archive_base_version(input);return input.at("version")==11||((input.at("version")==12||input.at("version")==13||(input.at("version")==15||input.at("version")==16))&&input.at("physical_emission").get<bool>());
 }
 inline bool explicit_mirror_material_archive(const nlohmann::json &input){
-  material_archive_base_version(input);return input.at("version")==12||((input.at("version")==13||input.at("version")==15)&&input.at("explicit_mirror").get<bool>());
+  material_archive_base_version(input);return input.at("version")==12||((input.at("version")==13||(input.at("version")==15||input.at("version")==16))&&input.at("explicit_mirror").get<bool>());
 }
-inline bool canonical_material_archive(const nlohmann::json &input){material_archive_base_version(input);return input.at("version")==13||(input.at("version")==15&&input.at("canonical_normals").get<bool>());}
-inline bool layered_material_archive(const nlohmann::json &input){material_archive_base_version(input);return input.at("version")==15;}
+inline bool canonical_material_archive(const nlohmann::json &input){material_archive_base_version(input);return input.at("version")==13||((input.at("version")==15||input.at("version")==16)&&input.at("canonical_normals").get<bool>());}
+inline bool canonical_uv_material_archive(const nlohmann::json &input){material_archive_base_version(input);return input.at("version")==16;}
+inline bool layered_material_archive(const nlohmann::json &input){material_archive_base_version(input);return (input.at("version")==15||input.at("version")==16);}
 inline const nlohmann::json &normal_preparation_base_version(const nlohmann::json &p,const nlohmann::json &archive){
   if(!p.is_object()||!p.contains("version")||!p.at("version").is_number_integer())throw std::invalid_argument("Invalid normal preparation version");
   if(p.at("version")==7){

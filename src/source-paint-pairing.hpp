@@ -4,6 +4,7 @@
 #include "dome/color-paint-sampling.hpp"
 #include "normal-projection-identity.hpp"
 #include "baked-normal-field.hpp"
+#include "canonical-normal-uv.hpp"
 namespace dome::detail {
 // Call after holder validation. A retained paint needs its OWN interpretation;
 // a current object or a neighboring Origin cannot authenticate that before-state.
@@ -13,11 +14,16 @@ inline void source_paint_pairing(const PaintedMesh *paint,const SourceMaterialBi
   const auto normal=paint?paint->normal_projection():nullptr;
   const auto color_recipe=binding?binding->color_preparation:nullptr;
   const auto normal_recipe=binding?binding->normal_preparation:nullptr;
+  if(binding&&binding->canonical_uv){
+    if(!paint||appearance||binding->canonical_uv->origin()!=binding->canonical_attributes)
+      throw std::invalid_argument("Retained canonical UV paint lost its original native authority");
+    if(deep)binding->canonical_uv->validate_current(paint->mesh());
+  }
   if(paint&&paint->baked()&&paint->baked()->normal_field){
     const auto &field=paint->baked()->normal_field;field->validate();
     if(!binding||!binding->canonical_attributes||field->origin()!=binding->canonical_attributes||normal||normal_recipe)
       throw std::invalid_argument("Baked normal field lost its actual separate attribute origin");
-    if(deep){
+    if(deep&&!binding->canonical_uv){
       const auto &before=field->origin()->before_paint()->mesh(),&current=paint->mesh();
       if(current.indices.size()!=before.indices.size())throw std::invalid_argument("Independent baked normals require their actual ordered surface domain");
       for(size_t c=0;c<current.indices.size();++c){

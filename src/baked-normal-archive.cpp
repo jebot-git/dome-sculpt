@@ -21,6 +21,7 @@ BakedNormalArchive::BakedNormalArchive(const nlohmann::json *input,const PaintIm
     origins_.resize(input_->at("origins").size());fields_.resize(input_->at("fields").size());
     origin_busy_.resize(origins_.size());field_busy_.resize(fields_.size());
     origin_used_.resize(origins_.size());field_used_.resize(fields_.size());
+    if(input_->at("version")==2){uv_.resize(input_->at("uv").size());uv_used_.resize(uv_.size());}
   }
   current_=this;
 }
@@ -34,7 +35,8 @@ BakedNormalArchive &BakedNormalArchive::reader(){
   return *current_;
 }
 size_t BakedNormalArchive::preflight(const nlohmann::json &j,const nlohmann::json &material){
-  if(!j.is_object()||j.size()!=3||!j.at("version").is_number_integer()||j.at("version")!=1||!j.at("origins").is_array()||j.at("origins").empty()||
+  if(!j.is_object()||!j.at("version").is_number_integer()||
+     !((j.at("version")==1&&j.size()==3)||(j.at("version")==2&&j.size()==4))||!j.at("origins").is_array()||j.at("origins").empty()||
      j.at("origins").size()>256||!j.at("fields").is_array()||j.at("fields").size()>256||!material.at("paints").is_array())
     throw std::invalid_argument("Invalid Scene33 layered normal graph");
   size_t retained=0;
@@ -71,6 +73,20 @@ size_t BakedNormalArchive::preflight(const nlohmann::json &j,const nlohmann::jso
       depth.push_back(depth[prior]+1);
     }
   }
+  if(j.at("version")==2){
+    if(!canonical_uv_material_archive(material)||!j.at("uv").is_array()||j.at("uv").empty()||j.at("uv").size()>256)
+      throw std::invalid_argument("Normal UV pool requires actual bounded material16 correspondence");
+    for(const auto &u:j.at("uv")){
+      if(!u.is_object()||u.size()!=3||u.at("version")!=1)
+        throw std::invalid_argument("Invalid converted normal UV record");
+      ref(u.at("origin"),j.at("origins").size());
+      const auto bytes=SourceNormalUvLayout::encoded_storage_bytes(u.at("layout"));
+      // Include retained current mesh, root-coordinate stream and decode/compose scratch.
+      if(retained>256*1024*1024-4096||bytes>(256*1024*1024-4096-retained)/8)
+        throw std::length_error("Converted normal UV pool exceeds prospective aggregate budget");
+      retained+=bytes*8+4096;
+    }
+  }else if(canonical_uv_material_archive(material))throw std::invalid_argument("Material16 requires actual normal UV pool version2");
   return retained;
 }
 uint32_t BakedNormalArchive::add_origin(std::shared_ptr<const CanonicalNormalConversion> c){
@@ -85,6 +101,22 @@ uint32_t BakedNormalArchive::add_field(std::shared_ptr<const BakedNormalField> f
   f->validate();add_origin(f->origin());if(f->prior())add_field(f->prior());
   if(fields_.size()>=256)throw std::length_error("Baked normal pool exceeds node budget");
   fields_.push_back(std::move(f));return uint32_t(fields_.size()-1);
+}
+uint32_t BakedNormalArchive::add_uv(std::shared_ptr<const CanonicalNormalUv> uv){
+  if(!write_images_||!uv||!uv->valid_owner(uv))throw std::invalid_argument("Missing actual converted normal UV owner");
+  auto at=std::find(uv_.begin(),uv_.end(),uv);if(at!=uv_.end())return uint32_t(at-uv_.begin());
+  if(uv_.size()>=256)throw std::length_error("Converted normal UV pool exceeds node budget");
+  uv->validate_current(*uv->mesh());add_origin(uv->origin());uv_.push_back(std::move(uv));return uint32_t(uv_.size()-1);
+}
+std::shared_ptr<const CanonicalNormalUv> BakedNormalArchive::uv_at(uint32_t id){
+  if(!input_||id>=uv_.size())throw std::invalid_argument("Invalid converted normal UV pool identity");
+  uv_used_[id]=1;if(uv_[id])return uv_[id];const auto &j=input_->at("uv")[id];
+  const auto origin=origin_at(uint32_t(ref(j.at("origin"),origins_.size())));
+  const auto layout=SourceNormalUvLayout::decode(j.at("layout"));
+  auto mesh=layout->target_mesh(origin->before_paint()->mesh());
+  auto replay=CanonicalNormalUv::create(origin,mesh,layout->source_vertices);
+  if(replay->layout()->encode()!=j.at("layout"))throw std::invalid_argument("Converted normal UV differs from actual owning source replay");
+  uv_[id]=std::move(replay);return uv_[id];
 }
 void BakedNormalArchive::register_paint(const std::shared_ptr<const PaintedMesh> &paint,uint32_t id){
   const auto [it,inserted]=paint_ids_.emplace(paint.get(),id);
@@ -111,6 +143,13 @@ nlohmann::json BakedNormalArchive::encode(){
       {"write_pbr",f->write_pbr_?nlohmann::json(write_images_->add(f->write_pbr_)):nlohmann::json(nullptr)},
       {"write_mtoon",f->write_mtoon_?nlohmann::json(write_images_->add(f->write_mtoon_)):nlohmann::json(nullptr)},
       {"write_coverage",nlohmann::json::binary(f->write_coverage_)}});
+  }
+  if(!uv_.empty()){
+    j["version"]=2;j["uv"]=nlohmann::json::array();
+    for(const auto &uv:uv_){auto origin=std::find(origins_.begin(),origins_.end(),uv->origin());
+      if(origin==origins_.end())throw std::logic_error("Normal UV owner lacks its actual root pool identity");
+      j["uv"].push_back({{"version",1},{"origin",size_t(origin-origins_.begin())},{"layout",uv->layout()->encode()}});
+    }
   }
   return j;
 }
@@ -149,7 +188,7 @@ std::shared_ptr<const BakedNormalField> BakedNormalArchive::field_at(uint32_t id
   fields_[id]=std::move(adopted);field_busy_[id]=0;return fields_[id];
 }
 void BakedNormalArchive::require_reachable() const {
-  if(input_&&(std::find(origin_used_.begin(),origin_used_.end(),0)!=origin_used_.end()||std::find(field_used_.begin(),field_used_.end(),0)!=field_used_.end()))
+  if(input_&&(std::find(uv_used_.begin(),uv_used_.end(),0)!=uv_used_.end()||std::find(origin_used_.begin(),origin_used_.end(),0)!=origin_used_.end()||std::find(field_used_.begin(),field_used_.end(),0)!=field_used_.end()))
     throw std::invalid_argument("Scene33 contains unreachable normal ownership records");
 }
 } // namespace dome::detail

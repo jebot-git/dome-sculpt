@@ -8,6 +8,7 @@
 #include "dome/native-authoring.hpp"
 #include "dome/source-uv-bake.hpp"
 #include "dome/normal-sampling.hpp"
+#include "normal-preparation-state.hpp"
 #include "cut-color.hpp"
 #include "affine-surface.hpp"
 #include "shapekey-preview.hpp"
@@ -1660,7 +1661,7 @@ void Document::mesh_loop() {
         const auto paint_attachment=o.paint_sampling_attachment;
         if(paint_attachment&&snapshot->paint_coordinates.empty())snapshot->paint_coordinates=snapshot->mesh.uv;
         std::shared_ptr<const std::vector<std::array<float,2>>> paint_coordinates;
-        const auto normal_domain=o.textures&&o.textures->normal_projection?o.textures->normal_projection->sampling_domain:nullptr;
+        const auto normal_domain=detail::retained_normal_coordinates(o.material_bindings.get(),o.textures.get());
         if(normal_domain){
           normal_domain->validate(cancelled);
           if(normal_domain->coordinates.size()!=o.mesh.positions.size()||normal_domain->indices!=o.mesh.indices)

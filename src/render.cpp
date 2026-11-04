@@ -259,8 +259,8 @@ struct SurfaceRenderer::TextureState {
             throw std::invalid_argument("Paint GPU stream lost exact ordered corner correspondence");
         }
       }
-      if(maps&&maps->normal_projection&&maps->normal_projection->version==2){
-        const auto &domain=*maps->normal_projection->sampling_domain;
+      if(const auto coordinates=detail::retained_normal_coordinates(range.material_bindings.get(),maps.get())){
+        const auto &domain=*coordinates;
         if(mesh.normal_coordinates.size()!=count||range.count!=domain.indices.size())
           throw std::invalid_argument("Retained normal stream/range dimensions differ from its own field");
         if(geometry_changed){
@@ -766,13 +766,13 @@ void SurfaceRenderer::draw(std::shared_ptr<const MeshSnapshot> mesh,
   };
   bool ghost_pass=false;
   auto draw_range = [&](const Material &original, size_t first, size_t count,
-                        uint64_t id, const TextureMaps *maps,bool use_source=false,bool use_canonical=false,bool force_pbr=false,bool paint_domain=false) {
+                        uint64_t id, const TextureMaps *maps,bool use_source=false,bool use_canonical=false,bool force_pbr=false,bool paint_domain=false,bool normal_domain=false) {
     Material material = original;
     glDepthFunc(GL_LESS);glBlendEquationSeparate(GL_FUNC_ADD,GL_FUNC_ADD);glDisable(GL_SAMPLE_ALPHA_TO_COVERAGE);
     glUniform1i(glGetUniformLocation(program_,"source_frame"),use_source);glUniform1i(glGetUniformLocation(program_,"canonical_frame"),use_canonical);
     glUniform1i(glGetUniformLocation(program_,"prepared_pbr_frame"),maps&&(maps->normal_projection||(maps->baked_base&&maps->baked_base->normal_field)));
     glUniform1i(glGetUniformLocation(program_,"paint_domain"),paint_domain||(maps&&maps->overlay&&maps->overlay->original_uv0()));
-    glUniform1i(glGetUniformLocation(program_,"retained_normal_domain"),maps&&maps->normal_projection&&maps->normal_projection->version==2);
+    glUniform1i(glGetUniformLocation(program_,"retained_normal_domain"),normal_domain||(maps&&maps->normal_projection&&maps->normal_projection->version==2));
     const auto overlay=maps?maps->overlay:nullptr;
     const auto uv0=overlay?overlay->original_uv0():nullptr;
     const auto carrier=maps&&maps->source_maps?maps->source_maps->uv1:nullptr;
@@ -954,7 +954,7 @@ void SurfaceRenderer::draw(std::shared_ptr<const MeshSnapshot> mesh,
       bool weighted=!ghost_pass && textures_->weighted.contains(r->object);
       glUniform1i(glGetUniformLocation(program_,"weight_pass"),weighted);
       auto typed=textures_->toons.find(r->object);
-      if(typed==textures_->toons.end())draw_range(r->material,r->first,r->count,r->object,r->textures.get(),r->source_frame,r->canonical_frame,r->pbr_view,bool(r->paint_sampling_attachment));
+      if(typed==textures_->toons.end())draw_range(r->material,r->first,r->count,r->object,r->textures.get(),r->source_frame,r->canonical_frame,r->pbr_view,bool(r->paint_sampling_attachment),bool(detail::retained_normal_coordinates(r->material_bindings.get(),r->textures.get())));
       else{
         draw_toon(*r,typed->second,false);
         if(!ghost_pass&&!weighted&&typed->second.material.parameters.outline!=MToonOutline::None&&typed->second.material.parameters.outline_width>0)
