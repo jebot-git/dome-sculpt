@@ -236,7 +236,8 @@ struct SceneDraft {
   Scene scene;
   AssetSource source;
 };
-enum class AssetExportFormat { Glb, Avatar, EditableGlb256, EditableGlb512, EditableGlb1024 };
+enum class AssetExportFormat { Glb, Avatar, EditableGlb256, EditableGlb512, EditableGlb1024,
+  EditableAvatar256, EditableAvatar512, EditableAvatar1024 };
 struct EditorSnapshot {
   std::shared_ptr<const EditorState> state;
   std::shared_ptr<const MeshSnapshot> surface;

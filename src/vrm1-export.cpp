@@ -6,6 +6,8 @@
 #include "vrm-painted.hpp"
 #include "vrm-source-graph.hpp"
 #include "vrm1-metadata.hpp"
+#include "vrm1-authoring.hpp"
+#include "native-authoring-attach.hpp"
 #include <set>
 namespace dome::detail {
 namespace {
@@ -25,10 +27,11 @@ bool painted(const Image &image) {
   return false;
 }
 } // namespace
-VrmExportReport export_vrm1(const std::vector<ObjectSurface> &objects,
+static VrmExportReport export_vrm1_impl(const std::vector<ObjectSurface> &objects,
                             const J &original,
                             const std::filesystem::path &path,
-                            const VrmExportOptions &options,EmissionExportPrepared *physical) {
+                            const VrmExportOptions &options,EmissionExportPrepared *physical,
+                            const Vrm1AuthoringCompilation *authoring) {
   stop(options);
   validate_vrm1_metadata(original, options.cancelled, true);
   require(!objects.empty(), "no original source surfaces");
@@ -137,7 +140,8 @@ VrmExportReport export_vrm1(const std::vector<ObjectSurface> &objects,
       require(a.x == b.x && a.y == b.y && a.z == b.z,
               "base shape refitting requires explicit VRM1 metadata transport");
     }
-    if (object.textures && !object.textures->source_only) {
+    if (object.textures && !object.textures->source_only &&
+        !(authoring && authoring->compiled(object))) {
       require(!painted(object.textures->color_coverage) &&
                   !painted(object.textures->emission_coverage),
               "painted MToon1 role composition requires the version-specific "
@@ -442,8 +446,10 @@ VrmExportReport export_vrm1(const std::vector<ObjectSurface> &objects,
       require(!binding.color_preparation,
               "independent PBR/MToon colour planes need a proven shared V1 "
               "base-colour representation");
-      auto material = binding.material;
-      auto roles = binding.roles;
+      const auto *compiled = authoring ? authoring->material(object) : nullptr;
+      auto material = compiled ? compiled->material : binding.material;
+      auto roles = compiled ? compiled->roles : binding.roles;
+      if (!compiled) {
       for (size_t c = 0; c < 4; ++c)
         material.parameters.base_color[c] = vrm_native_factor(
             material.parameters.base_color[c],
@@ -458,6 +464,7 @@ VrmExportReport export_vrm1(const std::vector<ObjectSurface> &objects,
           vrm_native_factor(material.parameters.emission.z,
                             binding.native_reference.emission[2],
                             object.material.emissive[2])};
+      }
       if (object.material.double_sided != binding.native_reference.double_sided)
         material.parameters.cull =
             object.material.double_sided ? MToonCull::Off : MToonCull::Back;
@@ -583,6 +590,12 @@ VrmExportReport export_vrm1(const std::vector<ObjectSurface> &objects,
       "Source-version VRM1 metadata/node/material/morph identities preserved; "
       "physics and constraint simulation are not evaluated by this exporter");
   if(physical){finish_emission_export(document,*physical,*options.emission,options.max_output_bytes,options.cancelled);validate_vrm1_metadata(j,options.cancelled,true);for(const auto &image:physical->images)report.diagnostics.push_back("Exact native/FLOAT32 HDR object "+std::to_string(image.object)+"; measured VRM1 fallback maximum radiance error "+std::to_string(image.maximum_absolute_error));}
+  if(authoring) {
+    attach_native_authoring(document,authoring->capture(),options.max_output_bytes,options.cancelled);
+    report.diagnostics.insert(report.diagnostics.end(),authoring->diagnostics().begin(),authoring->diagnostics().end());
+    for(const auto &object:objects) if(authoring->compiled(object)) ++report.painted_materials;
+    report.diagnostics.push_back("Exact native authoring Scene retained; portable typed MToon1 view is not declared lossless");
+  }
   budget();
   const auto json_bytes = j.dump().size();
   require(json_bytes <= options.max_output_bytes - binary.size() &&
@@ -591,5 +604,15 @@ VrmExportReport export_vrm1(const std::vector<ObjectSurface> &objects,
   write_glb(std::move(document), path, options.cancelled,
             options.before_commit);
   return report;
+}
+VrmExportReport export_vrm1(const std::vector<ObjectSurface> &objects,
+    const J &original,const std::filesystem::path &path,
+    const VrmExportOptions &options,EmissionExportPrepared *physical) {
+  return export_vrm1_impl(objects,original,path,options,physical,nullptr);
+}
+VrmExportReport export_vrm1_authoring(const Vrm1AuthoringCompilation &compiled,
+    const std::filesystem::path &path,const VrmExportOptions &options) {
+  if(options.emission)throw std::invalid_argument("Competing native HDR and VRM1 authoring export owners");
+  return export_vrm1_impl(compiled.surfaces(),compiled.original(),path,options,nullptr,&compiled);
 }
 } // namespace dome::detail

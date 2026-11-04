@@ -18,6 +18,7 @@
 #include "dome/creation.hpp"
 #include "dome/rig-edit.hpp"
 #include "dome/vrm.hpp"
+#include "dome/vrm-authoring.hpp"
 #include "dome/gltf-export.hpp"
 #include "dome/mesh-processing.hpp"
 #include "dome/mesh-authoring.hpp"
@@ -1973,7 +1974,8 @@ std::future<void> Document::export_asset(const std::filesystem::path &path,
                                        AssetExportFormat format) {
   if (path.empty() || (format != AssetExportFormat::Glb && format != AssetExportFormat::Avatar &&
       format != AssetExportFormat::EditableGlb256 && format != AssetExportFormat::EditableGlb512 &&
-      format != AssetExportFormat::EditableGlb1024))
+      format != AssetExportFormat::EditableGlb1024 && format != AssetExportFormat::EditableAvatar256 &&
+      format != AssetExportFormat::EditableAvatar512 && format != AssetExportFormat::EditableAvatar1024))
     throw std::invalid_argument("Choose an export filename and supported format");
   auto completion = std::make_shared<std::promise<void>>();
   auto result = completion->get_future();
@@ -1981,7 +1983,8 @@ std::future<void> Document::export_asset(const std::filesystem::path &path,
   finish_locked();
   if (state_.asset_busy || state_.recovery_busy)
     throw std::logic_error("Wait for pending authoring work before exporting");
-  if (format == AssetExportFormat::Avatar && !state_.can_export_avatar)
+  if ((format == AssetExportFormat::Avatar || format == AssetExportFormat::EditableAvatar256 ||
+       format == AssetExportFormat::EditableAvatar512 || format == AssetExportFormat::EditableAvatar1024) && !state_.can_export_avatar)
     throw std::logic_error("Select a source avatar group to export");
   FileJob job{scene_.snapshot(), path, state_.revision, state_.generation, content_, true};
   job.object = scene_.active().id; job.export_format = format; job.completion = completion;
@@ -2024,7 +2027,8 @@ void Document::file_locked(bool export_mesh, AssetExportFormat format) {
     path = dir / ("Recovery-" + std::to_string(getpid()) + ".dsculpt");
   }
   if (export_mesh)
-    path.replace_extension(format == AssetExportFormat::Avatar ? ".vrm" : ".glb");
+    path.replace_extension((format == AssetExportFormat::Avatar || format == AssetExportFormat::EditableAvatar256 ||
+      format == AssetExportFormat::EditableAvatar512 || format == AssetExportFormat::EditableAvatar1024) ? ".vrm" : ".glb");
   if(accepted) {
     FileJob job{};job.path=path;job.create_parent=create_parent;
     job.asset_capture=std::move(token);job.generation=state_.generation;
@@ -3653,7 +3657,24 @@ void Document::file_loop() {
         auto work=job->export_work;
         auto cancelled=[work]{return work && work->cancelled();};
         auto before_commit=[work]{if(work)work->begin_commit();};
-        if (job->export_format == AssetExportFormat::Avatar) {
+        if (job->export_format == AssetExportFormat::EditableAvatar256 ||
+            job->export_format == AssetExportFormat::EditableAvatar512 ||
+            job->export_format == AssetExportFormat::EditableAvatar1024) {
+          auto group=avatar_group(job->scene,job->object);
+          if(!group)throw std::runtime_error("Select a grouped avatar to export");
+          NativeAuthoringExport owner;
+          owner.scene=std::make_shared<const Scene>(job->scene.snapshot());
+          owner.scope=NativeAuthoringExport::Scope::ExportedObjects;
+          owner.allow_portable_fallback=true;
+          for(const auto &object:job->scene.objects())
+            if(object.visible&&in_group(job->scene,object,group))owner.objects.push_back(object.id);
+          VrmExportOptions options;options.cancelled=cancelled;options.before_commit=before_commit;
+          options.paint_resolution=job->export_format==AssetExportFormat::EditableAvatar256?256:
+              job->export_format==AssetExportFormat::EditableAvatar512?512:1024;
+          auto report=export_vrm_authoring(owner,job->path,options);
+          for(size_t i=0;i<std::min<size_t>(8,report.diagnostics.size());++i)
+            export_diagnostics+=" | "+report.diagnostics[i].substr(0,200);
+        } else if (job->export_format == AssetExportFormat::Avatar) {
           auto group = avatar_group(job->scene, job->object);
           if (!group) throw std::runtime_error("Select a grouped avatar to export");
           for (const auto &object : job->scene.objects())

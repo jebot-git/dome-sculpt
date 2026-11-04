@@ -1,5 +1,17 @@
 # Dome Sculpt production handoff
 
+## Private typed painted VRM1 package — 2026-11-04
+
+The isolated a2e-based Scene-owner compiler and explicit Avatar FileJob route now
+pass762 native data/worker +22 independent image checks eachRelease/SAN, strict
+A77022/threeimages, legacyV1 consumers3/profile, exact native recovery and
+running+queued Cancel. Portable max1<=4/native pixels0;25 emitted containers have
+0KHRerrors and236 official schema instances pass including original controls.
+This is a matched component milestone, not main/full application/UI admission.
+Animated material expressions, typedHDR, remaining physics/REST/all-role/external
+coverage stay required. Read VRM1-PAINTED-AUTHORING.md and its exact receipt.
+
+
 ## Qualified FBX generated-normal current-layout continuation — 2026-11-04
 
 On published coherentcage2f6, sealedCFBX imported-morph normal generation now
