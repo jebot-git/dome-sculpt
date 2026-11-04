@@ -241,3 +241,66 @@ root33/34 composition and broader ALL/regression/Wayland/loader qualification
 remain required. Native Source32 cannot infer those capabilities from a version
 number. Detailed commands, counterfactuals and artifact fingerprints are in
 `validation/NATIVE-PAINT32-EXPORT.json`.
+
+
+## Native physical package3: functional checkpoint, codec OOM blocker
+
+Runtime `2124ae4` now routes the existing native physical GLB policy through a
+genuine native32 retained-grid adapter. Conditional emission-package3 records
+name their actual paint domain and emitted texCoord. The reader authenticates
+current POSITION/N/authored UV0/paint corners against the decoded owner and
+replays every native32 image's ten FLOAT32 channels from actual current Paint.
+The original Scene, float units, hidden data and first source remain exact.
+The normalized temporary has a private factory-minted proof of the original
+Scene, material, textures and current paint owners; ownerless strict surfaces
+remain refused. Old typed/source/normal/rig/key/polygon adapters are not inferred.
+
+Real mixed scenes now include two distinct native32 float fields, a current
+nonemitting native32, legacy UV0 HDR paint and legacy nonemitting paint. Only
+actual field owners need HDR proofs. A downstream exact-data deduplication of
+images/samplers/textures/materials previously caused a100-pixel mismatch: the
+legacy HDR finisher modified a material still used by a nonemitter. Package3
+now isolates each physical field's final mesh/material mapping. Actual mixed
+and shared-material comparisons remain within the unchanged2-pixel bound;
+native recovery, Save/restart, worker and second-cycle bytes are exact. No raw
+attribute/source identities were merged by deduplicating compiled image data.
+
+The fresh coherent application/core/render/support/inspector build and10
+selected suites pass in optimized Release and wholly owned O1 ASan/UBSan/leak
+profiles. The owned sanitizer build finishes222 targets in901.48 seconds;
+runtime is40.10/105.40 seconds. Each profile covers131 native physical,29 mixed,
+400 generic native,69 native controller and39 physical transaction controls.
+The existing source controller and legacy HDR regressions also pass. Actual
+normal Release and compact owned-sanitizer desktop runs pass15 checks each,
+including chooser Cancel/Close, acknowledged filename entry, actual physical
+export, native Open/Save and clean exit. The94-file unfiltered Khronos cohort
+has0 errors,6 combined-extension warnings and428 informational findings.
+All46 paired emitted models and six historical package1/2 controls are
+byte-identical between the relevant profiles/baselines.
+
+The byte-limit negative is retained: a571408-byte container with a16116-byte
+EXR was rejected because its1215692-byte allocation forecast was treated as an
+encoded size requirement. The encoder now reserves the smaller of forecast
+and encoded cap, enforces actual write/seek bounds, and retains the original
+conservative raw-plus-forecast working preflight. Exact compressed EXR/container
+limits pass and one below refuses without publication. No cap was increased.
+Reader byte/dimension limits and real running plus queued Cancel, following
+Save and preexisting Undo/Redo are also exercised.
+
+**This is not full OOM qualification or main admission.** Both allocation runs
+visit every measured calling-thread C++ prefix0 through4037 inclusive:4006
+denials and32 complete successful fallbacks, with exact file/source rollback
+and early/middle/final retries. Release exits0. The owned sanitizer run exits1:
+LeakSanitizer reports5736 bytes in142 allocations from the system OpenEXR3.2
+Header insert/copy and OutputFile constructor exception paths. No suppression,
+injection disabling or passed-label substitution is used. The successful
+functional-prefix line printed before that exit does not make the sweep pass.
+The legacy package1/2 encoder calls the same C++ path; its general exception
+safety has not been established by these new-domain results.
+
+Next is a genuine owning codec allocator/context repair, then intentional
+normal34/native32 integration with fresh matching layouts. Current Source35
+work is separate. The source-preserving/typed/baked/normal/key/rig domains and
+broader integrated ALL/GUI/loader/Wayland/hardware gates remain required.
+Commands, hashes, all negatives and the leak stacks are preserved in
+`validation/NATIVE-PAINT32-PACKAGE3.json`.
