@@ -29,6 +29,16 @@ OUT=Path(os.environ['DOME_FBX_NORMAL_OUT']);OUT.mkdir(parents=True,exist_ok=True
 NORMAL_MODE=int(os.environ['DOME_FBX_NORMAL_MODE'])
 assert NORMAL_MODE in (1,2)
 checks=[];processes=[]
+def stop_processes():
+    for process in reversed(processes):
+        if process.poll() is None:
+            process.terminate()
+            try:process.wait(timeout=5)
+            except subprocess.TimeoutExpired:process.kill();process.wait()
+class PrivateHome(tempfile.TemporaryDirectory):
+    def __exit__(self,*args):
+        stop_processes()
+        return super().__exit__(*args)
 def check(value,message):
     checks.append({'passed':bool(value),'check':message});(OUT/'report.json').write_text(json.dumps({'checks':checks,'failed':sum(not c['passed'] for c in checks)},indent=2)+'\n')
     print(('PASS ' if value else 'FAIL ')+message,flush=True);assert value,message
@@ -41,7 +51,7 @@ async def wait(operation,seconds=45):
     raise TimeoutError('Native import workflow did not reach expected state')
 async def main():
     bus=await MessageBus().connect();await bus.request_name('com.canonical.AppMenu.Registrar')
-    with tempfile.TemporaryDirectory(prefix='dome-import-menu-') as home:
+    with PrivateHome(prefix='dome-import-menu-') as home:
         read,write=os.pipe();log=(OUT/'xvfb.log').open('w');processes.append(subprocess.Popen(['Xvfb','-displayfd',str(write),'-screen','0','1280x1000x24','-nolisten','tcp'],pass_fds=(write,),stdout=log,stderr=log));os.close(write)
         with os.fdopen(read) as stream:screen=':'+stream.readline().strip()
         env={**os.environ,'HOME':home,'DISPLAY':screen,'FLTK_BACKEND':'x11','XDG_CURRENT_DESKTOP':'Dome','LIBGL_ALWAYS_SOFTWARE':'1','XMODIFIERS':'@im=none'}
@@ -203,5 +213,4 @@ async def main():
     bus.disconnect()
 try:asyncio.run(main())
 finally:
-    for p in reversed(processes):
-        if p.poll() is None:p.terminate()
+    stop_processes()
