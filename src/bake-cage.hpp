@@ -2,6 +2,7 @@
 #pragma once
 #include "dome/bake.hpp"
 #include "dome/source-placement.hpp"
+#include "bake-cage-polygon.hpp"
 #include <limits>
 namespace dome::detail {
 // Worker-only: no nearest-position/weld inference. Cage IDs are the explicit
@@ -18,13 +19,9 @@ inline std::vector<Vec3> object_bake_cage(const Scene &scene,uint64_t target_id,
   if(!object.mesh_active||!object.painted)
     throw std::invalid_argument("The selected bake cage is no longer a prepared mesh; reselect it");
   const auto &rest=object.painted->mesh();
-  if(rest.positions.size()!=target.positions.size()||rest.indices.size()!=target.indices.size())
-    throw std::invalid_argument("Bake cage must share the target's ordered vertex and triangle identities");
-  for(size_t c=0;c<target.indices.size();++c){
-    if((c&1023)==0)stop();
-    if(rest.indices[c]!=target.indices[c])
-      throw std::invalid_argument("Bake cage triangle identities differ from the target; duplicate the target before editing cage vertices");
-  }
+  const bool ordered=rest.positions.size()==target.positions.size()&&rest.indices==target.indices;
+  std::vector<uint32_t> polygon_identity;
+  if(!ordered)polygon_identity=polygon_bake_cage_vertices(scene.object(target_id),object,target,cancelled);
   if(low.indices.size()!=target.indices.size())
     throw std::invalid_argument("Low bake basis lost the ordered target corners");
   std::optional<Mesh> posed;
@@ -53,9 +50,11 @@ inline std::vector<Vec3> object_bake_cage(const Scene &scene,uint64_t target_id,
   for(size_t v=0;v<low.positions.size();++v){
     if((v&1023)==0)stop();
     const auto original=unchanged?uint32_t(v):identity[v];
-    if(original==UINT32_MAX||original>=visible.positions.size())
+    const auto cage_vertex=ordered?original:
+      (original<polygon_identity.size()?polygon_identity[original]:UINT32_MAX);
+    if(original==UINT32_MAX||cage_vertex>=visible.positions.size())
       throw std::invalid_argument("Low bake basis has an unwitnessed cage vertex");
-    const auto p=visible.positions[original];
+    const auto p=visible.positions[cage_vertex];
     const auto q=relative.point({p.x,p.y,p.z});Vec3 converted;
     float *axes[]{&converted.x,&converted.y,&converted.z};
     for(size_t axis=0;axis<3;++axis){
