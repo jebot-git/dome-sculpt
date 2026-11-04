@@ -93,6 +93,10 @@ std::string mask_mode(){auto mode=getenv("DOME_XR_FIXTURE_SCULPT_MASK");return m
 bool bake_normal_mode(){return getenv("DOME_XR_FIXTURE_BAKE_NORMAL")!=nullptr;}
 bool bake_color_mode(){return getenv("DOME_XR_FIXTURE_BAKE_COLOR")!=nullptr||bake_normal_mode();}
 std::string bake_policy_mode(){auto mode=getenv("DOME_XR_FIXTURE_BAKE_POLICY");if(!mode)mode=getenv("DOME_XR_FIXTURE_BAKE_COLOR");if(!mode)mode=getenv("DOME_XR_FIXTURE_BAKE_NORMAL");return mode?mode:"";}
+bool bake_projection_mode(){return getenv("DOME_XR_FIXTURE_BAKE_POLICY")!=nullptr;}
+// Projection-policy tests first select their live source explicitly. The saved
+// recipe can correctly retain an unavailable historical source after deletion.
+unsigned bake_policy_stage(){return !bake_projection_mode()||frame<=20?frame:frame<=22?0:frame-8;}
 std::string procedural_mode(){auto mode=getenv("DOME_XR_FIXTURE_PROCEDURAL");return mode?mode:"";}
 std::string resolution_mode(){auto mode=getenv("DOME_XR_FIXTURE_RESOLUTION");return mode?mode:"";}
 std::string polygon_mode(){auto mode=getenv("DOME_XR_FIXTURE_POLYGON");return mode?mode:"";}
@@ -610,7 +614,7 @@ FN(PollEvent, XrInstance, XrEventDataBuffer *out) {
   auto retopo = retopo_mode();
   unsigned focus_frame = !polygon_mode().empty()?polygon_stage():!cut_mode().empty()?cut_step:!mask_mode().empty() ? mask_step : retopo.empty() ? frame : retopo_step;
   unsigned focus_at = !cut_mode().empty()?90:!mask_mode().empty() ? (mask_mode()=="focus"?40:90) : retopo.empty() ? 30 : retopo == "focus" ? 40 : 90;
-  if(!bake_policy_mode().empty())focus_at=bake_policy_mode()=="focus"?20:90;
+  if(!bake_policy_mode().empty())focus_at=bake_policy_mode()=="focus"?(bake_projection_mode()?28:20):90;
   if(!procedural_mode().empty())focus_at=procedural_mode()=="focus"?20:90;
   if(!polygon_mode().empty())focus_at=polygon_mode()=="focus"?30:90;
   if(!resolution_mode().empty())focus_at=resolution_mode()=="focus"?20:90;
@@ -832,7 +836,7 @@ FN(GetActionStateBoolean, XrSession, const XrActionStateGetInfo *p,
     if(button)report["mask_buttons"][std::to_string(step)]=bool(out->currentState);
   }
   if(auto mode=bake_policy_mode();!mode.empty()) {
-    out->currentState=button && (frame==8 || frame==10 || frame==12 || frame==14 || frame==16 || (mode!="focus" && (!bake_normal_mode()||mode=="accept") && frame==24));
+    const auto step=bake_policy_stage();out->currentState=button && (step==8 || step==10 || step==12 || step==14 || step==16 || (mode!="focus" && (!bake_normal_mode()||mode=="accept") && step==24));
     out->changedSinceLastSync=button;
   }
   if(!procedural_mode().empty()) {
@@ -901,7 +905,7 @@ FN(GetActionStateFloat, XrSession, const XrActionStateGetInfo *p,
     }
     if(auto mode=resolution_mode();!mode.empty())stroke=(mode!="noop" && frame==18) || ((mode=="accept" || mode=="cancel" || mode=="noop") && frame==22);
     if(auto mode=procedural_mode();!mode.empty())stroke=mode!="accept" && (frame==18 || (mode=="cancel" && frame==22));
-    if(auto mode=bake_policy_mode();!mode.empty())stroke=frame==18 || (mode!="focus"&&frame==20);
+    if(auto mode=bake_policy_mode();!mode.empty()){const auto step=bake_policy_stage();stroke=(bake_projection_mode()&&(frame==18||frame==20))||step==18||(mode!="focus"&&step==20);}
     if(auto mode=polygon_mode();!mode.empty()){
       const bool restore=mode.starts_with("restore");
       stroke=restore?((mode!="restore-default"&&polygon_stage()==18)||polygon_stage()==22):
@@ -1092,12 +1096,12 @@ FN(GetActionStateVector2f, XrSession, const XrActionStateGetInfo *p,
     report["mask_vectors"][std::to_string(step)]={out->currentState.x,out->currentState.y};
   }
   if(!bake_policy_mode().empty() && right(p->subactionPath) && a->name=="right_stick") {
-    out->currentState={0,0};int sector=-1;
-    if(frame==9 || frame==10)sector=8;
-    if(frame==11 || frame==12)sector=9;
-    if(frame==13 || frame==14)sector=6;
-    if(frame==15 || frame==16)sector=bake_color_mode()?9:11;
-    if(frame==23 || frame==24)sector=3;
+    out->currentState={0,0};int sector=-1;const auto step=bake_policy_stage();
+    if(step==9 || step==10)sector=8;
+    if(step==11 || step==12)sector=9;
+    if(step==13 || step==14)sector=6;
+    if(step==15 || step==16)sector=bake_projection_mode()&&frame<=20?0:bake_color_mode()?9:11;
+    if(step==23 || step==24)sector=3;
     if(sector>=0){float angle=sector*6.28318530718f/12;out->currentState={std::cos(angle),std::sin(angle)};}
   }
   if(auto mode=procedural_mode();!mode.empty() && right(p->subactionPath) && a->name=="right_stick") {
@@ -1263,9 +1267,9 @@ FN(LocateSpace, XrSpace handle, XrSpace, XrTime, XrSpaceLocation *p) {
     }
   }
   if(auto mode=bake_policy_mode();!mode.empty() && s->action && right(s->hand)) {
-    p->pose.position={0,1.48f,-.48f};
-    if(s->action->name=="aim_pose" && (frame==18 || frame==20)) {
-      float x=520,y=bake_normal_mode()?350:bake_color_mode()?210:240;if(frame==20){x=mode=="cancel"?170:470;y=609;}
+    p->pose.position={0,1.48f,-.48f};const auto step=bake_policy_stage();
+    if(s->action->name=="aim_pose" && (step==18 || step==20)) {
+      float x=520,y=bake_normal_mode()?350:bake_color_mode()?210:240;if(bake_projection_mode()&&frame<=20){y=210;if(frame==20){x=470;y=609;}}else if(step==20){x=mode=="cancel"?170:470;y=609;}
       p->pose.position={(x/640-.5f)*.6f,1.56f+(.5f-y/640)*.6f,-.3f};
     }
   }
