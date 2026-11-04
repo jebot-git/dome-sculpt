@@ -1,0 +1,56 @@
+{
+  "base": "7074bbc72116dec4b548f0a7cc717e9b63974b0d",
+  "scope": "Own private inline field/pose test linked exact264 public/core/support; no IO, full project, sanitizer or native admission claim",
+  "exit": 1,
+  "limits": {
+    "work": 500000000,
+    "weight_max": 0.03,
+    "weight_mean": 0.01,
+    "pose_max_m": 0.006,
+    "pose_mean_m": 0.002
+  },
+  "completed_cases": [
+    {
+      "refinement": 1,
+      "alternate": false,
+      "vertices": 1185,
+      "max_wrong": 0.0758421,
+      "mean_wrong": 0.0710652,
+      "pose_max_m": 0.0151684,
+      "pose_mean_m": 0.014213,
+      "work": 261068185
+    },
+    {
+      "refinement": 1,
+      "alternate": true,
+      "vertices": 1185,
+      "max_wrong": 0.0758421,
+      "mean_wrong": 0.0710652,
+      "pose_max_m": 0.0151684,
+      "pose_mean_m": 0.014213,
+      "work": 261059601
+    }
+  ],
+  "refused_case": {
+    "refinement": 2,
+    "alternate": false,
+    "used": 500000000,
+    "completed_integrals": 2252
+  },
+  "not_run": [
+    {
+      "refinement": 2,
+      "alternate": true
+    }
+  ],
+  "sha256": {
+    "tests/native-weight-open-stress.cpp": "4232c432bfe9335e7f519aea2f38d185bca1f5faeaa23bde84f4fb0c2fdfeed7",
+    "artifacts/open-run.log": "9c0eb7e5a93188b53b30fbeef728a77fbff6ba71053660095f4b0bb23dd13f31",
+    "artifacts/open-status.json": "6d1faed4453489b77edbd316289788e0f71b7fea0a73f04d17832063280ee92f",
+    "artifacts/overlay.json": "6b4f1584af12a8555ae5cf8db73020641f9e6221958112331bdb65a8cb80a6b6",
+    "artifacts/native-weight-open-stress": "4068db59f7f98a286dc7eef93bc1982335ca4e70e69e57119d80f46aa0cbd94f",
+    "src/anatomical-continuation.hpp": "0fbfc896aa3a23fc2a8323188dc669c814bf8b30e753f52073c221362a9ea70f",
+    "src/weight-declared-support.hpp": "4a7a30132eddc3f17d8d184c585e53e2ce48eea544e4643e0173d26f51d954e6",
+    "src/weight-nearest-support.hpp": "8e60b8ecb9d20e8b280a41357b32a1bab342a201265a41792488ae80f08057b9"
+  }
+}
