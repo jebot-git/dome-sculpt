@@ -12,7 +12,8 @@ caller sweep. This qualifies admission; it does not sweep the solver's worker
 allocations. It uses a genuine19-part creator's Body target with explicit locks.
 
 The preserved original13a caller counterfactual measures1,402 allocations. The
-separate final32-prefix diagnostic immediately fails at1370: the caller throws
+separate planned1370..1402 window (33 inclusive candidates) immediately fails
+at its first actual tested boundary1370: the caller throws
 while asset_busy=true and one job remains queued. No runtime limit or failure
 assertion was weakened to produce the new pass.
 

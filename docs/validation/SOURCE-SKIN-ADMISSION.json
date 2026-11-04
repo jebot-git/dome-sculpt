@@ -10,12 +10,16 @@
   },
   "negative": {
     "old_observed_allocations": 1402,
-    "tested_window": "last32prefixes",
     "first_tested_failure": 1370,
     "caller_threw": true,
     "asset_busy": true,
     "queued": 1,
-    "fixture_exit": 1
+    "fixture_exit": 1,
+    "planned_window": "1370..1402 inclusive (33 candidates)",
+    "actual_tested_boundaries": [
+      1370
+    ],
+    "historical_label_correction": "Original artifact calls this last32; subtraction count-32 yields33 inclusive candidates; first actual boundary1370 already fails."
   },
   "audit": {
     "mismatches": 0,
