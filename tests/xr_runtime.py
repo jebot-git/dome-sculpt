@@ -273,6 +273,20 @@ with contextlib.nullcontext(tempfile.mkdtemp(prefix="projects-", dir=output)) as
     bake_fixture=root / "bake-input.dsculpt"
     subprocess.run([str(binary.parent / "dome-sculpt-bake-controls-test"),"--ui-fixture",str(bake_fixture)],check=True)
     bake_base=json.loads(subprocess.check_output([str(binary),"--project-info",str(bake_fixture)],env=env,text=True))
+    def independent_sources(path):
+        helper=binary.parent/"dome-sculpt-corner-color-uv23-gui-fixture"
+        value=json.loads(subprocess.check_output([str(helper),"--inspect",str(path)],env=env,text=True))["isolated_objects"][1:]
+        def stable(item):
+            if isinstance(item,dict):
+                if "voxel_size" in item and "samples" in item:
+                    item["samples"].sort()
+                    for layer in item.get("sculpt_layers",[]):layer["delta"].sort()
+                    if "sculpt_mask" in item:item["sculpt_mask"]["values"].sort()
+                for child in item.values():stable(child)
+            elif isinstance(item,list):
+                for child in item:stable(child)
+        stable(value);return value
+    bake_sources=independent_sources(bake_fixture)
     for mode in ("accept","cancel","focus","undo"):
         result,path=run("bake-"+mode,50 if mode=="undo" else 45,extra=["--open",str(bake_fixture)],mode={"DOME_XR_FIXTURE_BAKE":mode})
         check(result.returncode==0,"Native OpenXR bake "+mode+" completes with a saved scene")
@@ -280,7 +294,7 @@ with contextlib.nullcontext(tempfile.mkdtemp(prefix="projects-", dir=output)) as
         if mode=="accept":
             check(info["objects"][0]["baked"] and info["paint_blue_texels"]>1000,
                   "Joystick baking page and world-distance aim slider publish visible baked source paint")
-            check(info["objects"][1:]==bake_base["objects"][1:],"Native OpenXR baking retains both complete hidden sources")
+            check(independent_sources(path)==bake_sources,"Native OpenXR baking retains both complete independently encoded hidden sources")
         else:
             check(info["scene_hash"]==bake_base["scene_hash"],"Native OpenXR bake "+mode+" retains or restores the exact pre-bake scene")
 

@@ -221,12 +221,12 @@ int main() try {
   source_rig.pose={source_rig.skeleton->bones[0].rest};source_rig.pose[0].translation.z=.02f;
   authoring.set_deformation(source_id,source_rig);
   authoring.select(target_id);
-  auto source_before=authoring.encode();
+  auto source_before=authoring.encode();auto readonly_before=authoring;readonly_before.erase(target_id);
   ObjectBakeSettings settings;settings.front_mm=25;settings.back_mm=5;settings.ao_samples=0;settings.padding=2;
   auto statistics=bake_object(authoring,source_id,settings);
   auto baked_scene=authoring.encode();
   check(statistics.projected>2000 && statistics.rays>=statistics.projected &&
-        baked_scene["objects"][1]==source_before["objects"][1] &&
+        [&]{auto readonly_after=authoring;readonly_after.erase(target_id);return readonly_after.encode()==readonly_before.encode();}() &&
         baked_scene["objects"][0]["deformation"]==source_before["objects"][0]["deformation"] &&
         baked_scene["objects"][0]["painted"]["layers"]==source_before["objects"][0]["painted"]["layers"],
         "Object baking samples a hidden posed source with exact target rig/paint and source retention");

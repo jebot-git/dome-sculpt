@@ -113,6 +113,8 @@ struct EditorState {
   std::vector<uint64_t> bake_sources;
   std::vector<uint64_t> bake_cages; // First entry0 = normal-offset projection.
   ObjectBakeSettings bake_settings;
+  std::shared_ptr<const ObjectBakeRecipe> bake_recipe{};
+  uint64_t bake_settings_object=0;
   Volume::SculptSettings sculpt_settings;
   CanvasTransform sculpt_transform{};
   bool can_configure_sculpt = false, sculpt_mask_visible = false;
@@ -840,6 +842,7 @@ private:
                                     uint64_t cut_session = 0, std::shared_ptr<CutHandoff> = {},
                                     std::optional<BakeAdmission> = {});
   std::vector<uint64_t> bake_sources_locked() const;
+  bool bake_source_eligible_locked(uint64_t) const;
   std::vector<uint64_t> bake_cages_locked() const;
   bool bake_target_ready_locked() const;
   void queue_bake_locked(uint64_t, ObjectBakeSettings, AssetSource = {});

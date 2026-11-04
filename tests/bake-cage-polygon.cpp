@@ -4,7 +4,7 @@
 #include "dome/polygon-scene.hpp"
 int main(int argc,char **argv)try{
   if(argc==3&&std::string_view(argv[1])=="--inspect"){
-    auto scene=Scene::load(argv[2]);std::cout<<nlohmann::json{{"scene",scene.encode()},{"baked",bool(scene.active().painted->baked())}}.dump()<<'\n';return 0;
+    auto scene=Scene::load(argv[2]);std::cout<<nlohmann::json{{"scene",scene.encode()},{"sources",cage_sources(scene)},{"baked",bool(scene.active().painted->baked())}}.dump()<<'\n';return 0;
   }
   const bool ui_fixture=argc==3&&std::string_view(argv[1])=="--ui-fixture";
   const auto out=ui_fixture?std::filesystem::absolute(argv[2]).parent_path():
@@ -35,7 +35,7 @@ int main(int argc,char **argv)try{
     fixture.select(1);fixture.save(argv[2]);return 0;
   }
   document.select_object(1);ready_cage(document);
-  const auto before=document.copy_scene().encode();
+  const auto before_scene=document.copy_scene();const auto before=before_scene.encode();const auto readonly_sources=cage_sources(before_scene);
   document.bake_from_object(2,cage_settings());
   auto save=document.save_async(out/"edited-cage.dsculpt");save.get();ready_cage(document);
   require_cage(document.frame().state->error.empty()&&document.copy_scene().active().painted->baked(),
@@ -44,7 +44,7 @@ int main(int argc,char **argv)try{
   const auto &pixels=baked.active().painted->baked()->maps.color.rgba;
   bool blue=true;for(size_t i=0;i<pixels.size();i+=4)blue&=pixels[i]==0&&pixels[i+1]==0&&pixels[i+2]==255&&pixels[i+3]==255;
   require_cage(blue,"Polygon-edited cage reaches every independently located off-axis blue source texel");
-  require_cage(baked.encode()["objects"][2]==before["objects"][2]&&
+  require_cage(cage_sources(baked)==readonly_sources&&baked.object(3).polygon==before_scene.object(3).polygon&&
     Scene::load(out/"edited-cage.dsculpt").encode()==baked.encode(),
     "Actual cage topology, retained source and ordered native Save remain exact");
   require_cage(document.undo()&&document.copy_scene().encode()==before&&

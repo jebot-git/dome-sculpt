@@ -4,6 +4,7 @@
 #include "deformation-json.hpp"
 #include "polygon-paint-authority.hpp"
 #include "scene-feature-version.hpp"
+#include "bake-recipe-remap.hpp"
 #include "source-extra-uv-authority.hpp"
 #include "creator-source-uv-archive.hpp"
 #include "dome/normal-sampling.hpp"
@@ -152,11 +153,12 @@ void Scene::set_deformation(uint64_t id, DeformationState state) {
 void Scene::clear_deformation(uint64_t id) { object(id).deformation.reset(); }
 void Scene::erase(uint64_t id) {
   object(id);
-  if (objects_.size() == 1)
-    throw std::logic_error("Keep at least one sculpt object");
-  std::erase_if(objects_, [&](auto &o) { return o.id == id; });
-  if (active_ == id)
-    active_ = objects_.front().id;
+  if (objects_.size() == 1)throw std::logic_error("Keep at least one sculpt object");
+  auto next=*this;
+  detail::remap_scene_bake_recipes(next,{{id,unavailable_bake_object}},false);
+  std::erase_if(next.objects_,[&](const auto &o){return o.id==id;});
+  if(next.active_==id)next.active_=next.objects_.front().id;
+  *this=std::move(next);
 }
 Scene Scene::snapshot() const {
   Scene result = *this;
@@ -359,6 +361,14 @@ void Scene::validate(bool deep_sources) const {
     if(p->mesh().positions.size()>8'000'000-origin_vertices)throw std::length_error("Retained polygon source geometry exceeds scene budget");
     origin_vertices+=p->mesh().positions.size();
   }
+  auto recipe_references=[&](const std::shared_ptr<const ObjectBakeRecipe> &recipe,uint64_t target){
+    if(!recipe)return;recipe->validate();
+    for(const auto ref:{recipe->source.object,recipe->settings.cage_object})
+      if(ref&&ref!=unavailable_bake_object&&(!ids.contains(ref)||(target&&ref==target)))
+        throw std::invalid_argument("Bake recipe has a missing or self live reference");
+  };
+  for(const auto &o:objects_)recipe_references(o.bake_recipe,o.id);
+  for(const auto &o:polygons.origins())recipe_references(o->bake_recipe,0);
   for (const auto &origin : polygons.origins()) {
     if(origin->placement) {
       origin->placement->validate();
@@ -493,7 +503,7 @@ nlohmann::json Scene::encode() const {
   // Scene25 retains its original nullable layout; real nested history owns pool6.
   const bool rig_fields=feature_version==25 ||
     std::any_of(objects_.begin(),objects_.end(),[](const auto &o){return bool(o.rig_source);}) ||
-    std::any_of(polygons.origins().begin(),polygons.origins().end(),[](const auto &o){return bool(o->rig_source);});
+    std::any_of(polygons.origins().begin(),polygons.origins().end(),[](const auto &o){return bool(o->rig_source)||bool(o->bake_recipe);});
   j["next_group_id"] = next_group_;
   j["groups"] = nlohmann::json::array();
   for (auto &g : groups_) {
@@ -543,6 +553,7 @@ nlohmann::json Scene::encode() const {
                              : nlohmann::json(nullptr)}});
     if(polygon_fields)j["objects"].back()["polygon"]=o.polygon?nlohmann::json(polygons.add(o.polygon)):nlohmann::json(nullptr);
     if(o.affine_edit)j["objects"].back()["affine_edit"]=placements.add_edit(o.affine_edit);
+    if(feature_version>=30)j["objects"].back()["bake_recipe"]=o.bake_recipe?o.bake_recipe->encode():nlohmann::json(nullptr);
     if(feature_version>=16)j["objects"].back()["shape_source"]=o.shape_source?nlohmann::json(polygons.add_origin(o.shape_source)):nlohmann::json(nullptr);
     if(rig_fields)j["objects"].back()["rig_source"]=o.rig_source?nlohmann::json(polygons.add_rig_origin(o.rig_source)):nlohmann::json(nullptr);
     if(extended) {
@@ -575,25 +586,32 @@ Scene Scene::decode(const nlohmann::json &j) {
     throw std::runtime_error("Unsupported scene format or version type");
   const auto version=j.at("version").get<int64_t>();
   const bool normal_context=j.contains("normal_sampling"),paint_context=j.contains("paint_sampling");
-  const bool explicit_mirror_context=version==29&&j.contains("source_materials")&&j.at("source_materials").at("version")==12&&detail::encoded_key_context(j.at("source_materials"));
+  const bool explicit_mirror_context=(version==29||version==30)&&j.contains("source_materials")&&j.at("source_materials").at("version")==12&&detail::encoded_key_context(j.at("source_materials"));
   if(version==29&&!explicit_mirror_context)throw std::invalid_argument("Scene29 requires its actual owning explicit Mirror capability");
-  const SourcePaintDecodeContext source_paint_context{version==28||explicit_mirror_context,version>=27};
+  const SourcePaintDecodeContext source_paint_context{version>=28,version>=27};
   bool flat_volume=false;
   for(const char *key:{"samples","voxel_size","distance_band","sculpt_layers","active_sculpt_layer","next_sculpt_layer","sculpt_mask","sculpt_controls"})
     flat_volume|=j.contains(key);
+  if(version==30&&flat_volume)throw std::invalid_argument("Recipe Scene30 cannot be a flat Volume");
   if(flat_volume || version==1) {
     if(j.contains("objects"))throw std::runtime_error("Mixed flat Volume and Scene fields");
     result.active().volume=std::make_shared<Volume>(Volume::decode(j));return result;
   }
-  if(version<2 || (version>21&&version!=22&&version!=23&&version!=24&&version!=25&&version!=26&&version!=27&&version!=28&&version!=29))throw std::runtime_error("Unsupported scene version");
+  if(version<2 || (version>21&&version!=22&&version!=23&&version!=24&&version!=25&&version!=26&&version!=27&&version!=28&&version!=29&&version!=30))throw std::runtime_error("Unsupported scene version");
   if(version<27&&j.contains("source_materials")&&j.at("source_materials").at("version")==11)
     throw std::invalid_argument("Physical material11 requires Scene27");
   if(version<29&&j.contains("source_materials")&&j.at("source_materials").at("version")==12)throw std::invalid_argument("Explicit Mirror material12 requires Scene29");
+  if(version<30&&j.contains("polygon_sources")&&j.at("polygon_sources").at("version")==7)
+    throw std::invalid_argument("Recipe history archive7 requires Scene30");
+  for(const auto &object:j.at("objects")){
+    if(version<30&&object.contains("bake_recipe"))throw std::invalid_argument("Bake recipes require Scene30");
+    if(version==30&&!object.contains("bake_recipe"))throw std::invalid_argument("Incomplete Scene30 recipe fields");
+  }
   const bool key_context=j.contains("source_materials")&&detail::encoded_key_context(j.at("source_materials"));
   auto key_feature=[&](const char *table,const char *field){return key_context&&detail::encoded_key_feature(j.at("source_materials"),table,field);};
   if(version==22&&(!key_context||!j.at("source_materials").at("key_derivations").is_array()||j.at("source_materials").at("key_derivations").empty()))throw std::invalid_argument("Scene22 requires actual owning native key derivation");
   if(j.contains("source_materials")&&detail::material_archive_base_version(j.at("source_materials"))==10&&version<22)throw std::invalid_argument("Owning native key derivation requires Scene22");
-  const bool rig_pool=j.contains("polygon_sources")&&j.at("polygon_sources").at("version")==6;
+  const bool rig_pool=j.contains("polygon_sources")&&(j.at("polygon_sources").at("version")==6||j.at("polygon_sources").at("version")==7);
   const bool shared_corner_context=j.contains("polygon_sources")&&(j.at("polygon_sources").at("version")==5||(rig_pool&&j.at("polygon_sources").at("shared_colors").get<bool>()));
   if(version<25&&rig_pool)throw std::invalid_argument("Rig source archive requires Scene25");
   if(paint_context&&version<24)throw std::invalid_argument("Independent writable paint requires explicit Scene24");
@@ -1064,6 +1082,7 @@ Scene Scene::decode(const nlohmann::json &j) {
     }
     if(o.painted&&o.material_bindings&&o.material_bindings->key_derivation)o.painted=detail::adopt_key_paint_geometry(*o.painted,*o.material_bindings,o.appearance.get(),o.deformation.get());
     if(polygon_fields && !v.at("polygon").is_null())o.polygon=polygons.at(detail::polygon_archive_index(v.at("polygon"),polygons.authorities().size()));
+    if(version>=30&&!v.at("bake_recipe").is_null())o.bake_recipe=ObjectBakeRecipe::decode(v.at("bake_recipe"));
     if(version>=16 && !v.at("shape_source").is_null())o.shape_source=polygons.origins().at(detail::polygon_archive_index(v.at("shape_source"),polygons.origins().size()));
     if(version>=25 && v.contains("rig_source") && !v.at("rig_source").is_null())o.rig_source=polygons.origins().at(detail::polygon_archive_index(v.at("rig_source"),polygons.origins().size()));
     result.objects_.push_back(std::move(o));
@@ -1071,9 +1090,10 @@ Scene Scene::decode(const nlohmann::json &j) {
   placements.require_reachable();
   if(normal_context)normal_domains.require_reachable();if(paint_context)writable_domains.require_reachable();
   unsigned actual_feature=0;
-  for(const auto &o:result.objects_)actual_feature=std::max({actual_feature,detail::hdr_emission(o.material.emissive)?27u:0u,detail::minimum_scene_version(o.painted.get()),detail::minimum_scene_version(o.appearance.get()),detail::minimum_scene_version(o.deformation.get()),detail::minimum_scene_version(o.material_bindings.get()),detail::minimum_scene_version(o.polygon.get()),detail::minimum_scene_version(o.shape_source.get()),o.rig_source?25u:0u,detail::minimum_scene_version(o.rig_source.get())});
+  for(const auto &o:result.objects_)actual_feature=std::max({actual_feature,o.bake_recipe?30u:0u,detail::hdr_emission(o.material.emissive)?27u:0u,detail::minimum_scene_version(o.painted.get()),detail::minimum_scene_version(o.appearance.get()),detail::minimum_scene_version(o.deformation.get()),detail::minimum_scene_version(o.material_bindings.get()),detail::minimum_scene_version(o.polygon.get()),detail::minimum_scene_version(o.shape_source.get()),o.rig_source?25u:0u,detail::minimum_scene_version(o.rig_source.get())});
   if(actual_feature>unsigned(version))throw std::invalid_argument("Retained data requires its actual Scene feature version");
   if(version==29&&actual_feature!=29)throw std::invalid_argument("Scene29 requires genuine decoded explicit Mirror authority");
+  if(version==30&&actual_feature!=30)throw std::invalid_argument("Scene30 requires an actual bake recipe");
   if(version==28&&actual_feature!=28)throw std::invalid_argument("Scene28 requires actual independent source paint ownership");
   if(version==27&&actual_feature<27)throw std::invalid_argument("Scene27 requires genuine physical emission state");
   if(material_fields&&(detail::physical_material_archive(j.at("source_materials"))||j.at("source_materials").at("version")==12)){

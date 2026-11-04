@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/bake-authoring.hpp"
+#include "dome/bake-recipe.hpp"
 #include "dome/source-maps.hpp"
 #include "dome/color-preparation.hpp"
 #include "current-colors.hpp"
@@ -118,9 +119,9 @@ ObjectBakeReport bake_object(Scene &scene, uint64_t source_id,
   }
   BakeOptions options;
   options.resolution = target.painted->resolution();
-  options.front_distance = settings.front_mm * .001f / target_world.scale;
-  options.back_distance = settings.back_mm * .001f / target_world.scale;
-  options.ao_distance = settings.ao_distance_mm * .001f / target_world.scale;
+  options.front_distance = float(double(settings.front_mm) * .001 / double(target_world.scale));
+  options.back_distance = float(double(settings.back_mm) * .001 / double(target_world.scale));
+  options.ao_distance = float(double(settings.ao_distance_mm) * .001 / double(target_world.scale));
   options.ray_bias = .0001f / target_world.scale;
   options.ao_samples = settings.ao_samples;
   options.padding = settings.padding;
@@ -184,6 +185,7 @@ ObjectBakeReport bake_object(Scene &scene, uint64_t source_id,
   next.active().painted = std::move(painting);
   next.active().material_bindings=target.material_bindings;
   next.active().polygon=target.polygon;
+  next.active().bake_recipe=capture_bake_recipe(scene,source_id,settings);
   next.validate();
   check();
   // A user progress callback can throw or request cancellation. No fallible

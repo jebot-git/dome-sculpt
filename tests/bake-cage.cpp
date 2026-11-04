@@ -20,6 +20,9 @@ Scene cage_scene(uint32_t resolution=64){
   for(auto &p:low.positions){p.x+=.06f;p.z+=.03f;}
   s.active().painted=std::make_shared<PaintedMesh>(low,64);s.select(target);s.validate();return s;
 }
+// Encode the entire readonly source/cage Scene independently of the target's
+// newly acquired global format capability. No fields are filtered or ignored.
+nlohmann::json cage_sources(const Scene &scene){auto sources=scene;sources.erase(scene.active().id);return sources.encode();}
 ObjectBakeSettings cage_settings(uint64_t cage=3){ObjectBakeSettings s;s.front_mm=s.back_mm=100;s.ao_samples=0;s.padding=0;s.cage_object=cage;return s;}
 template<class F> bool rejected_cage(F fn){try{fn();return false;}catch(const std::exception &){return true;}}
 void ready_cage(Document &d){require_cage(d.wait_asset()&&d.wait_mesh(),"Native cage worker and immutable mesh publication finish");}
@@ -35,10 +38,10 @@ void controller_cage(Driver &hand,Document &d,uint64_t id){
 int main(int argc,char **argv)try{
   if(argc==3&&std::string(argv[1])=="--ui-fixture"){cage_scene(128).save(argv[2]);return 0;}
   if(argc==3&&std::string(argv[1])=="--inspect"){
-    auto s=Scene::load(argv[2]);std::cout<<nlohmann::json{{"scene",s.encode()},{"baked",bool(s.active().painted->baked())}}.dump()<<'\n';return 0;
+    auto s=Scene::load(argv[2]);std::cout<<nlohmann::json{{"scene",s.encode()},{"sources",cage_sources(s)},{"baked",bool(s.active().painted->baked())}}.dump()<<'\n';return 0;
   }
   const auto out=std::filesystem::path(argc>1?argv[1]:"bake-cage");std::filesystem::create_directories(out);
-  auto s=cage_scene();const auto before=s.encode();auto automatic=s;auto settings=cage_settings(0);
+  auto s=cage_scene();const auto before=s.encode(),sources_before=cage_sources(s);const auto source_owner=s.object(2).painted,cage_owner=s.object(3).painted;auto automatic=s;auto settings=cage_settings(0);
   require_cage(rejected_cage([&]{bake_object(automatic,2,settings);})&&automatic.encode()==before,
     "Independent off-axis source cannot be reached by ordinary normal rays");
   settings=cage_settings();auto report=bake_object(s,2,settings);
@@ -46,7 +49,7 @@ int main(int argc,char **argv)try{
   const auto endpoint=s.encode();auto image=s.active().painted->baked()->maps.color;
   bool blue=true;for(size_t i=0;i<image.rgba.size();i+=4)blue&=image.rgba[i]==0&&image.rgba[i+1]==0&&image.rgba[i+2]==255&&image.rgba[i+3]==255;
   require_cage(blue,"Every baked color pixel matches the independent solid-blue source oracle");
-  require_cage(endpoint["objects"][1]==before["objects"][1]&&endpoint["objects"][2]==before["objects"][2]&&
+  require_cage(cage_sources(s)==sources_before&&s.object(2).painted==source_owner&&s.object(3).painted==cage_owner&&
     endpoint.at("objects").at(0).at("painted").at("layers")==before.at("objects").at(0).at("painted").at("layers"),
     "Complete hidden locked source and cage plus target editable paint remain exact");
   auto file=out/"cage.dsculpt";s.save(file);require_cage(Scene::load(file).encode()==endpoint,"Editable cage geometry and baked target survive native save and restart");
@@ -54,16 +57,16 @@ int main(int argc,char **argv)try{
   auto affine=AffineTransform(raw);auto cage=transformed.object(3).painted->mesh();
   for(auto &p:cage.positions){auto q=affine.inverse().point({p.x,p.y,p.z});p={float(q[0]),float(q[1]),float(q[2])};}
   transformed.object(3).painted=std::make_shared<PaintedMesh>(cage,64);transformed.object(3).affine_edit=std::make_shared<const NativeAffineEdit>(affine);
-  auto transformed_before=transformed.encode();auto affine_report=bake_object(transformed,2,settings);
-  require_cage(affine_report.projected==4096&&!affine_report.missed&&transformed.encode()["objects"][2]==transformed_before["objects"][2],
+  auto transformed_before=cage_sources(transformed);auto affine_report=bake_object(transformed,2,settings);
+  require_cage(affine_report.projected==4096&&!affine_report.missed&&cage_sources(transformed)==transformed_before,
     "Reflected sheared cage uses its complete displayed affine placement without rewriting its mesh");
   auto posed_cage=cage_scene();auto base=posed_cage.active().painted->mesh();
   auto moved=posed_cage.object(3).painted->mesh().positions;
   auto deformation=std::make_shared<DeformationState>(base);deformation->morphs.emplace(base);
   deformation->morphs->set_target(base,"Displayed cage envelope",moved);deformation->morph_weights={1};
   posed_cage.object(3).painted=std::make_shared<PaintedMesh>(base,64);posed_cage.set_deformation(3,*deformation);
-  const auto posed_before=posed_cage.encode();auto posed_report=bake_object(posed_cage,2,settings);
-  require_cage(posed_report.projected==4096&&!posed_report.missed&&posed_cage.encode()["objects"][2]==posed_before["objects"][2],
+  const auto posed_before=cage_sources(posed_cage);auto posed_report=bake_object(posed_cage,2,settings);
+  require_cage(posed_report.projected==4096&&!posed_report.missed&&cage_sources(posed_cage)==posed_before,
     "Cage rays use the actual displayed morph while exact REST geometry and deformation remain editable");
   auto prepared=cage_scene();auto normal=settings;normal.prepare_normals=true;auto prepared_report=bake_object(prepared,2,normal);
   require_cage(prepared_report.projected==4096&&prepared.active().painted->normal_projection(),

@@ -1,3 +1,4 @@
+#include "dome/bake-distance.hpp"
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Adapted from OpenBrush Native's BDF palette and texture renderer
 // (Apache-2.0).
@@ -275,7 +276,7 @@ void SpatialPalette::raster(const EditorState &s) {
     auto normalized = [&](float v) {
       return std::clamp(
           c.logarithmic
-              ? std::log(v / c.minimum) / std::log(c.maximum / c.minimum)
+              ? (c.parameter==VrParameter::BakeDistances ? float(bake_distance_to_unit(v)) : std::log(v / c.minimum) / std::log(c.maximum / c.minimum))
               : (v - c.minimum) / std::max(1e-8f, c.maximum - c.minimum),
           0.f, 1.f);
     };
@@ -342,7 +343,7 @@ void SpatialPalette::raster(const EditorState &s) {
       else if(c.parameter==VrParameter::BakeColors){if(row==0||row==2)label=std::string(row==0?"Prepare source colors: ":"Prepare normal attributes: ")+(value>=.5f?"Yes":"No");else{char text[96];if(row==1)snprintf(text,sizeof(text),"Maximum color error %.3f",double(value));else snprintf(text,sizeof(text),"Maximum normal error %.2f deg",double(value)*.25*57.29577951308232);label=text;}}
       else if(c.parameter==VrParameter::BakeProjection)label=std::string(row==0?"Partial projection: ":"Backfaces: ")+(value>=.5f?"Allow":"Refuse");
       else if(c.parameter==VrParameter::BakeQuality)label+=std::to_string(int(std::lround(value*(row==0?256:64))))+(row==1?" px":"");
-      else if(c.parameter==VrParameter::BakeDistances){char size[48];snprintf(size,sizeof(size),"%.2f mm",double(value));label+=size;}
+      else if(c.parameter==VrParameter::BakeDistances){char size[48];snprintf(size,sizeof(size),value>0&&value<.01f?"%.3g mm":"%.2f mm",double(value));label+=size;}
       else if(c.parameter==VrParameter::CutOffset){char size[48];snprintf(size,sizeof(size),"%.2f mm",double(value));label+=size;}
       else if (c.parameter == VrParameter::RigRotation || c.parameter==VrParameter::CutDirection)
         label += std::to_string(int(std::lround(value))) + " deg";
@@ -375,6 +376,11 @@ void SpatialPalette::raster(const EditorState &s) {
       rect(280 * unit_, 470 * unit_, 80 * unit_, 40 * unit_, swatch);
     }
     text(320 * unit_, 530 * unit_, "Aim + trigger: drag slider", fg);
+    if(c.parameter==VrParameter::BakeSource){
+      const auto disabled=s.light?Color{200,209,220,uint8_t(s.opacity)}:Color{55,65,80,uint8_t(s.opacity)};
+      rect(160*unit_,410*unit_,320*unit_,44*unit_,s.bake_recipe?accent:disabled);
+      text(320*unit_,440*unit_,s.bake_recipe?(c.bake_preset?"Recipe loaded":"Recall last bake"):"No saved bake yet",fg);
+    }
     text(320 * unit_, 560 * unit_,
          c.components == 1 ? "Stick: slide / Vertical: fine wheel"
                            : "Up/down: row / Left/right: value",

@@ -1,0 +1,151 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+#define DOME_BAKE_CAGE_HELPERS_ONLY
+#include "bake-cage.cpp"
+#include "dome/bake-recipe.hpp"
+#include "dome/native-scene-append.hpp"
+#include "dome/native-authoring.hpp"
+#include <fstream>
+#include "polygon-conversion.hpp"
+#include "dome/shapekey-authoring.hpp"
+int main(int argc,char **argv)try{
+  if(argc==3&&(std::string_view(argv[1])=="--ui-fixture"||std::string_view(argv[1])=="--ui-wide-fixture")){
+    auto scene=cage_scene(128);auto settings=cage_settings();if(std::string_view(argv[1])=="--ui-wide-fixture"){settings.front_mm=100000;settings.back_mm=0;settings.ao_distance_mm=.00001f;}bake_object(scene,2,settings);scene.active().painted->clear_bake();scene.save(argv[2]);return 0;
+  }
+  if(argc==3&&std::string_view(argv[1])=="--inspect"){
+    auto scene=Scene::load(argv[2]);std::cout<<nlohmann::json{{"scene",scene.encode()},{"sources",cage_sources(scene)},{"baked",bool(scene.active().painted->baked())}}.dump()<<'\n';return 0;
+  }
+  const auto out=std::filesystem::path(argc>1?argv[1]:"bake-recipes");std::filesystem::create_directories(out);
+  auto scene=cage_scene();const auto source=scene.object(2).painted,cage=scene.object(3).painted;
+  const auto options=cage_settings();bake_object(scene,2,options);
+  const auto recipe=scene.active().bake_recipe;
+  require_cage(recipe&&recipe->source.object==2&&recipe->source.original_object==2&&recipe->cage&&recipe->cage->object==3,
+    "Successful native Bake records exact source and custom cage identities");
+  require_cage(recipe->settings.front_mm==options.front_mm&&recipe->settings.padding==options.padding&&
+    scene.object(2).painted==source&&scene.object(3).painted==cage,
+    "Recipe captures actual projection settings without editing readonly source or cage owners");
+  auto encoded=scene.encode();require_cage(encoded["version"]==30,"Actual recipe capability selects native Scene30");
+  scene.save(out/"recipe.dsculpt");auto reopened=Scene::load(out/"recipe.dsculpt");
+  require_cage(reopened.encode()==encoded&&reopened.active().bake_recipe->encode()==recipe->encode(),
+    "Recipe, geometry, paint and complete source data restart exactly in the native project");
+  auto malformed=encoded;malformed["version"]=28;
+  require_cage(rejected_cage([&]{Scene::decode(malformed);}),"Recipe fields cannot be relabelled as an older Scene capability");
+  malformed=encoded;for(auto &o:malformed["objects"])o["bake_recipe"]=nullptr;
+  require_cage(rejected_cage([&]{Scene::decode(malformed);}),"Scene30 requires actual recipe ownership rather than a version stamp");
+  for(int kind=0;kind<5;++kind){auto invalid=recipe->encode();
+    if(kind==0)invalid["source"]["object"]=-1;
+    if(kind==1)invalid["source"]["name"]=std::string(257,'x');
+    if(kind==2)invalid["settings"]["padding"]=65;
+    if(kind==3)invalid["settings"]["allow_partial"]=1;
+    if(kind==4)invalid["settings"]["normal_error"]=.5;
+    require_cage(rejected_cage([&]{ObjectBakeRecipe::decode(invalid);}),"Invalid recipe IDs, names, integer quality, flags and tolerances refuse");
+  }
+  auto cleared=scene;cleared.active().painted=cleared.active().painted->snapshot();cleared.active().painted->clear_bake();
+  require_cage(cleared.active().bake_recipe==recipe&&!cleared.active().painted->baked(),"Clear baked pixels retains the reusable recipe");
+  auto missing=scene;missing.erase(2);missing.erase(3);
+  require_cage(missing.active().bake_recipe->source.object==unavailable_bake_object&&
+    missing.active().bake_recipe->source.original_object==2&&missing.active().bake_recipe->cage->object==unavailable_bake_object&&
+    missing.active().bake_recipe->settings.cage_object==unavailable_bake_object,
+    "Source/cage deletion preserves original identities as explicit unavailable references");
+  missing.save(out/"unavailable.dsculpt");require_cage(Scene::load(out/"unavailable.dsculpt").encode()==missing.encode(),
+    "Unavailable custom cage remains distinct from automatic projection after restart");
+  auto appended=append_native_scene(Scene{},scene);
+  const auto &rebased=*appended.scene.active().bake_recipe;
+  require_cage(rebased.source.object==appended.objects.at(1)&&rebased.cage->object==appended.objects.at(2)&&
+    rebased.source.original_object==2&&rebased.cage->original_object==3,
+    "Actual native package append rebases live bindings and preserves original provenance");
+  Scene destination;destination.add("Unrelated old source number",Volume{});destination.add("Unrelated old cage number",Volume{});
+  auto subset=append_native_scene(destination,missing);
+  require_cage(subset.scene.active().bake_recipe->source.object==unavailable_bake_object&&
+    subset.scene.active().bake_recipe->cage->object==unavailable_bake_object,
+    "Subset append cannot bind missing dependencies to unrelated coincident recipient IDs");
+  auto retained=scene;retained.active().shape_source=capture_polygon_origin(retained,retained.active().id);retained.active().bake_recipe.reset();
+  auto retained_json=retained.encode();require_cage(retained_json["version"]==30&&retained_json["polygon_sources"]["version"]==7,
+    "A retained recipe selects the owning Scene30/history7 capability even without a current recipe");
+  const auto retained_source=retained.active().shape_source;
+  auto retained_appended=append_native_scene(destination,retained);
+  const auto &retained_ref=*retained_appended.scene.active().shape_source->bake_recipe;
+  require_cage(retained_ref.source.object==retained_appended.objects.at(1)&&
+    retained_ref.cage->object==retained_appended.objects.at(2)&&
+    retained_ref.source.original_object==2&&retained_ref.cage->original_object==3&&
+    retained.active().shape_source==retained_source&&retained.encode()==retained_json,
+    "Append rebases immutable retained recipe references while preserving the complete input history");
+  auto grouped=retained;const auto source_group=grouped.add_group("Source dependencies");
+  const auto child_group=grouped.add_group("Nested cage",{},source_group);
+  grouped.object(2).group=source_group;grouped.object(3).group=child_group;
+  const auto grouped_source=grouped.active().shape_source;
+  auto ungrouped=grouped;ungrouped.erase_group(source_group,false);ungrouped.validate();
+  require_cage(ungrouped.groups().empty()&&ungrouped.objects().size()==3&&
+    ungrouped.active().shape_source==grouped_source&&
+    ungrouped.active().shape_source->bake_recipe->source.object==2&&
+    ungrouped.active().shape_source->bake_recipe->settings.cage_object==3,
+    "Removing only a group preserves live dependencies and their shared immutable recipe owner");
+  grouped.erase_group(source_group,true);grouped.validate();
+  require_cage(grouped.groups().empty()&&grouped.objects().size()==1&&
+    grouped.active().shape_source!=grouped_source&&
+    grouped.active().shape_source->bake_recipe->source.object==unavailable_bake_object&&
+    grouped.active().shape_source->bake_recipe->cage->object==unavailable_bake_object&&
+    grouped_source->bake_recipe->source.object==2&&grouped_source->bake_recipe->cage->object==3,
+    "Deleting nested dependency groups invalidates retained bindings with copy-on-write source history");
+  grouped.save(out/"group-deleted.dsculpt");
+  require_cage(Scene::load(out/"group-deleted.dsculpt").encode()==grouped.encode(),
+    "Grouped dependency deletion and unavailable retained recipes restart exactly");
+  NativeAuthoringExport portable;portable.scene=std::make_shared<const Scene>(scene.snapshot());
+  portable.allow_portable_fallback=true;portable.scope=NativeAuthoringExport::Scope::WholeScene;
+  auto read_native=[&](const std::filesystem::path &file){
+    std::ifstream input(file,std::ios::binary);std::vector<uint8_t> bytes{std::istreambuf_iterator<char>(input),{}};
+    auto result=extract_native_authoring(bytes);if(!result)throw std::runtime_error("Recipe package has no native owner");return *result;
+  };
+  export_glb_authoring(portable,out/"recipe-whole.glb");
+  require_cage(read_native(out/"recipe-whole.glb").encode()==scene.encode(),
+    "Real native-authoring GLB retains complete hidden source, cage and recipe through its authenticated payload");
+  portable.scope=NativeAuthoringExport::Scope::ExportedObjects;portable.objects={scene.active().id};
+  export_glb_authoring(portable,out/"recipe-subset.glb");auto subset_recipe=read_native(out/"recipe-subset.glb");
+  require_cage(subset_recipe.objects().size()==1&&
+    subset_recipe.active().bake_recipe->source.object==unavailable_bake_object&&
+    subset_recipe.active().bake_recipe->cage->object==unavailable_bake_object&&
+    subset_recipe.active().bake_recipe->source.original_object==2,
+    "Real exported-object package marks omitted source and cage unavailable instead of keeping invalid bindings");
+  auto subset_rebound=append_native_scene(destination,subset_recipe);
+  require_cage(subset_rebound.scene.active().bake_recipe->source.object==unavailable_bake_object&&
+    subset_rebound.scene.active().bake_recipe->cage->object==unavailable_bake_object,
+    "Importing the actual subset payload cannot bind missing dependencies to coincident destination IDs");
+  retained=Scene::decode(retained_json);retained.erase(2);
+  require_cage(retained.active().shape_source->bake_recipe->source.object==unavailable_bake_object,
+    "Deletion invalidates live references throughout immutable retained source histories");
+  auto restored=author_shapekey(retained,retained.active().id,{ShapeKeyAction::Restore});
+  require_cage(restored.changed&&retained.active().bake_recipe&&retained.active().bake_recipe->source.object==unavailable_bake_object,
+    "Complete original-source Restore carries its original recipe and current explicit unavailability");
+  Document document;document.replace(reopened);ready_cage(document);
+  require_cage(document.frame().state->bake_source==2&&document.frame().state->bake_settings.cage_object==3&&
+    document.frame().state->bake_settings.front_mm==100&&!document.frame().state->can_undo,
+    "Opening a project restores target-specific settings without adding history");
+  Driver hand(document);hand.open();hand.sector(1);hand.value(.2f,0);hand.confirm();
+  const auto changed=document.frame().state->bake_settings.front_mm;
+  require_cage(changed!=100,"Actual controller changes the session projection distance before Recall");
+  hand.sector(0);hand.ray(.5f,432.f/640);require_cage(document.frame().state->controls.bake_preset&&
+    document.frame().state->bake_settings.front_mm==changed,"Actual ray Recall stages the full recipe without committing session settings");
+  hand.ray(.25f,.95f);require_cage(document.frame().state->bake_settings.front_mm==changed&&document.copy_scene().encode()==encoded,
+    "Cancel discards a recalled recipe draft with exact scene and current settings preserved");
+  hand.sector(0);hand.ray(.5f,432.f/640);hand.confirm();
+  require_cage(document.frame().state->bake_settings.front_mm==100&&document.frame().state->bake_source==2&&
+    document.frame().state->bake_settings.cage_object==3&&document.copy_scene().encode()==encoded&&!document.frame().state->can_undo,
+    "Done applies the full saved settings but never implicitly Bakes or edits the Scene");
+  auto wide=cage_scene();auto wide_options=cage_settings();wide_options.front_mm=100000;wide_options.back_mm=0;wide_options.ao_distance_mm=.00001f;
+  bake_object(wide,2,wide_options);const auto wide_before=wide.encode();document.replace(wide);ready_cage(document);Driver limits(document);limits.open();limits.sector(1);
+  const auto distances=document.frame().state->controls;
+  require_cage(distances.minimum==0&&distances.maximum==100000&&distances.logarithmic&&
+    distances.value[0]==100000&&distances.value[1]==0&&distances.value[2]==wide_options.ao_distance_mm,
+    "Opening XR distance controls preserves the complete native zero/tiny/100000mm recipe domain");
+  limits.confirm();require_cage(document.frame().state->bake_settings.front_mm==100000&&document.frame().state->bake_settings.back_mm==0&&
+    document.frame().state->bake_settings.ao_distance_mm==wide_options.ao_distance_mm&&document.copy_scene().encode()==wide_before&&!document.frame().state->can_undo,
+    "Unchanged XR confirmation preserves every saved distance exactly without Scene or history mutation");
+  limits.sector(1);limits.value(0,0);limits.value(1,1);limits.confirm();
+  require_cage(document.frame().state->bake_settings.front_mm==0&&document.frame().state->bake_settings.back_mm==100000&&document.copy_scene().encode()==wide_before,
+    "Actual controller rays reach exact zero and maximum endpoints without changing the saved Scene");
+  document.replace(missing);ready_cage(document);auto frame=document.frame().state;
+  require_cage(frame->bake_source==unavailable_bake_object&&frame->bake_settings.cage_object==unavailable_bake_object,
+    "Opening missing-dependency recipe cannot fall back to another source or automatic cage");
+  require_cage(rejected_cage([&]{document.bake_from_object(unavailable_bake_object,options);})&&
+    document.frame().state==frame&&!frame->asset_busy,"Unavailable recipe refuses before caller admission and leaves the exact publication intact");
+  std::cout<<"PASS "<<cage_checks<<" durable bake recipe checks\n";return 0;
+}catch(const std::exception &e){std::cerr<<"FAIL "<<e.what()<<'\n';return 1;}

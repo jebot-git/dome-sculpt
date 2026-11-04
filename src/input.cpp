@@ -371,6 +371,10 @@ void SpatialInput::uv_gesture_end(bool force) {
   }
 }
 void SpatialInput::ray_controls(const SpatialSample &s, bool pressed) {
+  if(parameter_==VrParameter::BakeSource&&pressed&&s.panel_hit&&
+      s.panel_u>=.25f&&s.panel_u<=.75f&&s.panel_v>=410.f/640&&s.panel_v<=454.f/640){
+    controls_.push_back({VrControlEventType::RecallBakeRecipe,parameter_});return;
+  }
   if (pressed && s.panel_hit && s.panel_v >= 588.f / 640 &&
       s.panel_v <= 630.f / 640) {
     bool cancel = s.panel_u >= 60.f / 640 && s.panel_u <= 280.f / 640;

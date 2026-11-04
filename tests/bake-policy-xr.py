@@ -24,7 +24,7 @@ with tempfile.TemporaryDirectory(prefix='dome-bake-policy-xr-') as directory:
     for mode in ('accept','cancel','focus'):
         target=output/(mode+'.dsculpt');report=output/(mode+'.json')
         with (output/(mode+'.log')).open('w') as log:
-            result=subprocess.run([str(binary),'--xr','--open',str(fixture),'--frames','36','--save',str(target)],env={**env,'DOME_XR_FIXTURE_REPORT':str(report),'DOME_XR_FIXTURE_BAKE_POLICY':mode},stdout=log,stderr=subprocess.STDOUT,timeout=90)
+            result=subprocess.run([str(binary),'--xr','--open',str(fixture),'--frames','44','--save',str(target)],env={**env,'DOME_XR_FIXTURE_REPORT':str(report),'DOME_XR_FIXTURE_BAKE_POLICY':mode},stdout=log,stderr=subprocess.STDOUT,timeout=90)
         check(result.returncode==0,'Real-loader projection policy '+mode+' closes normally and saves native state')
         after=inspect(target);r=json.loads(report.read_text())
         check(r.get('acquires')==r.get('image_waits')==r.get('releases') and r.get('left_eye_nonblank',0)>0 and r.get('right_eye_nonblank',0)>0 and r.get('palette_images',0)>0 and r.get('tracking_losses',0)==0,'Projection policy '+mode+' renders both real GL eyes with balanced image ownership')
@@ -32,6 +32,8 @@ with tempfile.TemporaryDirectory(prefix='dome-bake-policy-xr-') as directory:
             old=original['objects'][0]['painted']['baked'];new=after['objects'][0]['painted']['baked']
             right=all(new[channel]['bytes'][4*(y*64+x):4*(y*64+x)+4]==old[channel]['bytes'][4*(y*64+x):4*(y*64+x)+4] for channel in ('color','orm','emission','normal') for y in range(64) for x in range(32,64))
             left=all(new['color']['bytes'][4*(y*64+x)]==0 and new['color']['bytes'][4*(y*64+x)+2]==255 for y in range(64) for x in range(32))
+            recipe=after['objects'][0]['bake_recipe']
+            check(recipe['source']['object']==after['objects'][1]['id'] and recipe['settings']['allow_partial'],'Actual controller explicitly selects the live source rather than rebinding its unavailable historical recipe')
             check(right and left,'Actual joystick policy confirmation and Bake update hits while preserving every missed channel')
             check(after['objects'][1:]==original['objects'][1:] and after['objects'][0]['painted']['layers']==original['objects'][0]['painted']['layers'],'Real-loader partial bake retains exact sources and editable layers')
         else:check(after==original,'Projection policy '+mode+' preserves complete original scene exactly')

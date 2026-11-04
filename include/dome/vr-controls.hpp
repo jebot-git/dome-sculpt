@@ -5,7 +5,9 @@
 #include <optional>
 #include <string>
 #include <vector>
+#include <memory>
 namespace dome {
+struct ObjectBakeRecipe;
 enum class VrParameter {
   None,
   BrushRadius,
@@ -52,6 +54,7 @@ struct VrControlState {
   float minimum = 0, maximum = 1;
   int components = 1, selected = 0;
   bool logarithmic = false;
+  std::shared_ptr<const ObjectBakeRecipe> bake_preset{};
 };
 enum class VrControlEventType {
   Begin,
@@ -62,7 +65,8 @@ enum class VrControlEventType {
   Cancel,
   UvPick,
   UvMove,
-  UvCommand
+  UvCommand,
+  RecallBakeRecipe
 };
 struct VrControlEvent {
   VrControlEventType type;

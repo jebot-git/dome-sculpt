@@ -1,5 +1,14 @@
 # Dome Sculpt production handoff
 
+## Private coherent saved-recipe and authored-normal candidate — 2026-11-04
+
+This unqualified union preserves published809 authored-normal/zero-morph fixes,
+qualified176 Scene30 recipes and actual recipe-aware workflow/XR fixture repairs.
+It excludes tangent/HDR/weights/V1 WIP. Fresh optimized own ALL build is next;
+no new whole-build/full615/physical-device/main-admission claim is made. Original
+frozen176 full612 regression remains distinct and its failures are preserved.
+Every unfinished full-goal requirement and later controller tray phase remains.
+
 ## Preserve authored split normals through skinning — 2026-11-04
 
 Ordinary native skinning now transports authored normals with the existing Dome
@@ -24,6 +33,22 @@ complete changed-TU scope, old-core negatives and compiler-fixture corrections.
 No header/schema/default frontend changes, fresh whole-build/full610/device
 claim, system/headset/session action. General normal-map portability and all
 unfinished original/additional requirements, including later trays, remain.
+## Private saved bake recipes — 2026-11-04
+
+Last-successful target recipes now persist exact source/cage provenance and all
+projection/preparation settings through Scene30/history7, deletion/group deletion,
+append/subsets and native packages. Existing desktop/XR draft Recall preserves
+Cancel/Done/history and never implicitly Bakes. Matched owning R/S each pass39
+native recipe checks, nine selected consumers,161 new persistent allocation
+prefixes, normal/compact/wide46 GUI, Wayland9 and actual-loader44 checks. Shared
+zero-capable distance controls preserve0..100000mm, and unit conversion fixes
+the genuine maximum-bound float rounding refusal without changing kernel limits. Existing
+caller127 and source-confirm47 prefixes remain. Read BAKE-RECIPES.md and its
+receipt for original failures, own fresh-parent/completed-TU build scope and four
+retained Khronos tangent warnings. This is not fresh ALL/full612, main admission,
+physical headset, GPU baking or full production completion. Broader bake recipes,
+resource/consumer/device work and deferred drawers remain required.
+
 
 ## Qualified FBX generated-normal current-layout continuation — 2026-11-04
 
@@ -49,6 +74,8 @@ resource guards and exact source scopes. No public layout/native schema changes;
 this private milestone awaits coherent main admission. Every unfinished original
 and additional requirement remains active, including controller drawers after
 basic targets. No system, headset or active-session action occurred.
+
+
 
 ## Qualified coherent editable-cage milestone — 2026-11-04
 

@@ -14,6 +14,7 @@ struct SourceMaterialBindings;
 struct RetopoPatch;
 struct PolygonAuthority;
 struct PolygonOrigin;
+struct ObjectBakeRecipe;
 struct Material {
   std::string name = "Clay";
   std::array<float, 4> color{.58f, .30f, .15f, 1};
@@ -46,6 +47,7 @@ struct SculptObject {
   std::shared_ptr<const PolygonOrigin> shape_source{};
   // Scene25 complete first source before rig/rest authoring.
   std::shared_ptr<const PolygonOrigin> rig_source{};
+  std::shared_ptr<const ObjectBakeRecipe> bake_recipe{};
 };
 bool source_is_dormant(const SculptObject &);
 class PaintSamplingAttachment;
