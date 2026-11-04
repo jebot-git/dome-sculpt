@@ -51,3 +51,28 @@ qualified canonical31 composition remain pending. No new-header/old-library
 execution is permitted. The focused native-paint-sampling fixture is new and
 unrun; its direct and actual-worker checks must expose real implementation
 failures without changing quality or resource limits.
+
+
+The first coherent owned build and functional proof closed on `ad0357c`:
+Release44 +1458 failure/cancellation checks, and the same two complete tests in
+owned ASan/UBSan/leak instrumentation. The broader sanitizer selection was8/9;
+its only failure was the pre-existing exact Scene24 fixture predicate after
+actual Bake recipes made Scene30 necessary. The exact published main38e8 fixture
+repair was carried as3f8eac8 and passed both optimized and sanitized profiles;
+all production archive bytes remained unchanged. These results do not qualify
+subsequent runtime changes automatically.
+
+A real unsupported transition was then proved on the preserved ad0357c archives:
+`bake_object` projected1936 texels from a distinct source, produced1937 distinct
+normal directions and committed while retaining the native-grid owner. The
+old result and both native Scenes remain in the ignored native32-bake-negative-v2
+cohort. The earlier probe accidentally selected its source as target and is
+retained as an observer-construction negative, not a Bake rejection proof.
+
+The next draft3a54902 closes that admission hole: current native ownership cannot
+silently acquire baked/projection/source metadata; native retained targets and
+sources are excluded from unadapted Bake/cut readiness. The direct full-goal
+adapters remain required. These refusals are not Bake/cut functionality.
+Matching optimized/owned-sanitized builds and transition tests are pending at
+this source boundary. Root31 is sealed separately at7805e3c and has not been
+consumed here; the canonical flag continues to fail closed until actual union.
