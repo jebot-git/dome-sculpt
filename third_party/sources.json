@@ -122,7 +122,7 @@
   },
   "domed_fltk": {
     "repository": "https://github.com/jebot-git/DomeD",
-    "commit": "f797e0f1d43e7be5a06128ca7b0b0b0259fefabd",
+    "commit": "6fa2624f89ddb105e482326995daec0bdbfd6643",
     "version": "1.4.5",
     "archive_sha256": "eede1fb2b8e9c2e581e77082e15252145855c79aad30070ee3b24aabe2f926f1",
     "patches_in_application_order": [
@@ -149,7 +149,10 @@
       "native/toolkit-hooks/fltk-1.4.5-touch-input.patch",
       "native/toolkit-hooks/fltk-1.4.5-pen-input.patch",
       "native/toolkit-hooks/fltk-1.4.5-pcf-fonts.patch",
-      "native/toolkit-hooks/fltk-1.4.5-process-cleanup.patch"
+      "native/toolkit-hooks/fltk-1.4.5-process-cleanup.patch",
+      "native/toolkit-hooks/fltk-1.4.5-file-picker-viewport.patch",
+      "native/toolkit-hooks/fltk-1.4.5-file-picker-callback-reason.patch",
+      "native/toolkit-hooks/fltk-1.4.5-x11-clipboard-ownership.patch"
     ],
     "patch_sha256": {
       "native/toolkit-hooks/fltk-1.4.5-bitmap-fonts.patch": "5a4318d315dae55e7e5d3fff18d3875d16a0a1886a413501d5e97ba51f6d6261",
@@ -175,12 +178,15 @@
       "native/toolkit-hooks/fltk-1.4.5-touch-input.patch": "80b54a5f69889f4197f1a3a7dfffaa8a70a493b1192983c0ae21ffaa588ce27a",
       "native/toolkit-hooks/fltk-1.4.5-pen-input.patch": "f90bab41cb33c949bd4efe2659f6e103d06611fdaeb98b06e8af0dd817f44152",
       "native/toolkit-hooks/fltk-1.4.5-pcf-fonts.patch": "3dc6e2f311db0661e1b8117afa0b4fbabfe84d356a75c8bace3cd39a5782eec2",
-      "native/toolkit-hooks/fltk-1.4.5-process-cleanup.patch": "c40abb454f7cd648227cdaca8802a9f01073b992250accd10969c5b9627537c3"
+      "native/toolkit-hooks/fltk-1.4.5-process-cleanup.patch": "c40abb454f7cd648227cdaca8802a9f01073b992250accd10969c5b9627537c3",
+      "native/toolkit-hooks/fltk-1.4.5-file-picker-viewport.patch": "5fa7b9ae2264019680222fbda5750153eea387cc1cae184e77b1ec4d3504744a",
+      "native/toolkit-hooks/fltk-1.4.5-file-picker-callback-reason.patch": "71b9d4f202177734d91182c54cd404d3eb27d68521c326e1ec679f98d2201f87",
+      "native/toolkit-hooks/fltk-1.4.5-x11-clipboard-ownership.patch": "db6ca24a101c50c4c106a15fc8129a55ca73713a100c15e572b1dda98c248a57"
     },
-    "combined_patch_sha256": "d9e70caf0b983f4b12dfe6a345d0f7525af87812749a5b3f3880be7210455b18",
-    "used": "Canonical Release FLTK1.4.5 with all24 patches, native BDF/PCF, exception-safe process display cleanup and plugin construction; regular-user optimized lib prefix. Whole-toolkit sanitizer counterpart uses identical source/patches. BDF helper bytes unchanged; the matching corrected bitmap-runtime pin is recorded below.",
-    "verified_at_commit": "53b0fcaf533ad867300d65a4178285d0a2dbef58",
-    "builder_sha256_at_verified_commit": "7a6bef76fcb22805ebcb655b17d8fc5f1bbf082991fab3be557c6a79fb136d44"
+    "combined_patch_sha256": "34091d15335d695f3bb328f3ccdcb4f68110f47a75271c563ba909c3682815b2",
+    "used": "Canonical optimized FLTK1.4.5 with all27 patches: compact bitmap picker, actual Enter callback authority, exact X11 clipboard reply/ownership cleanup and official poll backend. Installed runtime profile binds actual generated config, builder, patch chain and library digests. All165 public include files and existing exported symbols retained. Current Sculpt SDK-only runtime delta qualifies actual native menus; core/app code is unchanged. No system installation or physical-session change.",
+    "verified_at_commit": "6fa2624f89ddb105e482326995daec0bdbfd6643",
+    "builder_sha256_at_verified_commit": "85cc04718523dbebfe0ac6c4384fa341641dabdb5022fff98998e18d2e783011"
   },
   "vrm_specification": {
     "repository": "https://github.com/vrm-c/vrm-specification",
@@ -517,8 +523,8 @@
         "libpangocairo-1.0.so.0": "482b621e56d8290f0392b1098b87de0aa3fc68ea5250b83b418c4bd85e1de485"
       }
     },
-    "used": "Canonical optimized private FreeType/HarfBuzz/Cairo/Pango native BDF+PCF stack with Cairo Xlib source-cache and deferred-SHM record cleanup. All153 public headers match preceding SDK byte-for-byte. Actual current runtime/build/GUI scopes are in NATIVE-PACKAGE-SDK.md; old SDK and original leak negatives remain preserved. No Pango frontend, outlines, suppression or system installation.",
-    "verified_at_commit": "53b0fcaf533ad867300d65a4178285d0a2dbef58"
+    "used": "Canonical optimized private FreeType/HarfBuzz/Cairo/Pango native BDF+PCF stack with Cairo Xlib source-cache and deferred-SHM record cleanup. All153 public headers match preceding SDK byte-for-byte. Actual current runtime/build/GUI scopes are in NATIVE-PACKAGE-SDK.md; old SDK and original leak negatives remain preserved. No Pango frontend, outlines, suppression or system installation. Reverified byte-identical at the recorded canonical FLTK source revision; bitmap source pin remains53b0fca.",
+    "verified_at_commit": "6fa2624f89ddb105e482326995daec0bdbfd6643"
   },
   "nlohmann_json": {
     "repository": "https://github.com/nlohmann/json",
