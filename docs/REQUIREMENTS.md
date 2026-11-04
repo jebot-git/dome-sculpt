@@ -1,5 +1,19 @@
 # Full objective and completion evidence
 
+## Private static VRM1 expression authoring — 2026-11-04
+
+A3 descendant now qualifies pure version-aware weights/binary/override evaluation
+and genuine typed/Source4 static authoring through the existing native worker.
+R/S each81checks +57persistent allocations/all18parameter Cancel boundaries,
+five affected consumers/profile,44actual pinned third-party color/UV checks and
+12official input-schema instances pass. Paint/source/normal/rig/shape owners,
+oneUndo, orderedSave, lateCancel/priorfile/retry and sixprofilepairs stayexact.
+No layout/schema/frontend/GPU/full615 claim. Interactive preview, normal/prepared/
+plainPBR/absolute-emission adapters and dynamic painted expression export remain
+required; no guard lifted or original goal narrowed. Read VRM1-STATIC-EXPRESSIONS.md
+and its exact receipt.
+
+
 ## Private editable VRM1 FLTK / shared Files controls — 2026-11-04
 
 The sealed5f worker now has actual existing-dialog/native-menu and page28

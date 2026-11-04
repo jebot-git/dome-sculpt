@@ -1,3 +1,4 @@
+#include "source-paint-parameters.hpp"
 #include "paint-overlay-packet.hpp"
 #include "emission-paint-access.hpp"
 // SPDX-License-Identifier: GPL-3.0-or-later
@@ -684,6 +685,35 @@ struct SourcePaintAccess {
     if(current.surface_.use_count()!=1)throw std::logic_error("Source paint attachment escaped before construction completed");
     std::const_pointer_cast<PaintedMesh::SurfaceMap>(current.surface_)->original_sampling=std::move(proof);
   }
+  static std::shared_ptr<PaintedMesh> parameters(const PaintedMesh &current,
+      const std::array<std::array<float,6>,5> &transforms,const SourcePaintOptions &o) {
+    if(current.in_stroke()||!current.source_sampling_prepared()||!current.valid_source_sampling_attachment())
+      throw std::invalid_argument("Source parameter edit requires its genuine independent writable owner");
+    paint_compute::checkpoint(o.cancelled);
+    const auto &original=*current.source_sampling_original();pristine(original);
+    // Prospective check includes actual current sparse tiles, before deriving
+    // coordinate/raster copies. Parameter edits do not alter their sizes.
+    if(!o.max_working_bytes||o.max_working_bytes>SourcePaintOptions::maximum_working_bytes||working_bytes(current)>o.max_working_bytes)
+      throw std::length_error("Source parameter edit exceeds prospective working budget");
+    // Authenticate the old attachment independently before deriving a new one.
+    auto old=detail::transport_source_sampling(original.mesh(),maps(original),current.mesh(),
+      current.source_sampling_vertices(),limits(o,current.mesh().positions.size(),current.source_sampling_authored_uv1()?current.source_sampling_authored_uv1()->size():0));
+    if(!same(*old,maps(current)))throw std::invalid_argument("Source parameter edit has a stale original sampling witness");
+    auto roles=std::make_shared<PaintSourceMaps>(maps(original));
+    const std::array<PaintSourceTexture*,5> views{&roles->color,&roles->metal_rough,&roles->emission,&roles->normal,&roles->occlusion};
+    for(size_t k=0;k<views.size();++k)views[k]->uv_transform=transforms[k];
+    roles->validate_surface(original.mesh());
+    auto before=original.snapshot();before->source_maps_=std::move(roles);
+    before->composite_cache_=std::make_shared<PaintedMesh::CompositeCache>();before->composite_token_=next_composite_token();
+    auto result=prepare(before,current.mesh(),current.source_sampling_vertices(),o,current.source_sampling_authored_uv1());
+    result->layers_=current.layers_;result->active_=current.active_;result->next_=current.next_;
+    result->allocated_tiles_=current.allocated_tiles_;result->allocated_color_tiles_=current.allocated_color_tiles_;
+    result->revision_=current.revision_+1;
+    if(working_bytes(*result)>o.max_working_bytes||retained_bytes(footprint(*before),footprint(*result),
+       result->source_sampling_vertices().size()*sizeof(uint32_t),result->source_sampling_authored_uv1()?result->source_sampling_authored_uv1()->size()*sizeof(std::array<float,2>):0)>128*1024*1024)
+      throw std::length_error("Source parameter edit exceeds cumulative paint storage budget");
+    paint_compute::checkpoint(o.cancelled);return result;
+  }
   static std::shared_ptr<PaintedMesh> prepare(std::shared_ptr<const PaintedMesh> before,Mesh target,
                                            std::span<const uint32_t> vertices,const SourcePaintOptions &o,std::shared_ptr<const Coordinates> uv1={}) {
     if(!before)throw std::invalid_argument("Independent source paint has no original owner");
@@ -701,6 +731,10 @@ struct SourcePaintAccess {
     attach(*result,std::move(before),vertices,o.cancelled,std::move(uv1));return result;
   }
 };
+std::shared_ptr<PaintedMesh> detail::rebind_source_paint_transforms(const PaintedMesh &current,
+ const std::array<std::array<float,6>,5> &transforms,const SourcePaintOptions &options) {
+ return SourcePaintAccess::parameters(current,transforms,options);
+}
 std::shared_ptr<PaintedMesh> prepare_source_paint(std::shared_ptr<const PaintedMesh> before,Mesh target,
     std::span<const uint32_t> vertices,const SourcePaintOptions &options) {
   return SourcePaintAccess::prepare(std::move(before),std::move(target),vertices,options);
