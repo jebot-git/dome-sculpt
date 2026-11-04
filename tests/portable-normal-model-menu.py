@@ -80,10 +80,11 @@ async def main():
     except error.BadWindow:pass
   await command('Bake surface...');dialog=await wait(bake_window);dialog.set_input_focus(X.RevertToParent,X.CurrentTime);d.sync();await asyncio.sleep(.3)
   check(dialog.get_wm_transient_for().id==window.id,'Portable normal authoring settings retain native modal and universal application ownership')
-  for step in range(6):
+  for step in range(12):
    g=dialog.get_geometry();raw=dialog.get_image(0,0,g.width,g.height,X.ZPixmap,0xffffffff);Image.frombytes('RGB',(g.width,g.height),raw.data,'raw','BGRX').save(out/('bake-settings-'+str(step)+'.png'))
-   xtest.fake_input(d,X.MotionNotify,x=g.x+g.width-10,y=g.y+g.height//3)
-   for _ in range(3):xtest.fake_input(d,X.ButtonPress,5);xtest.fake_input(d,X.ButtonRelease,5)
+   # Native scrollbar page advance avoids changing any underlying slider.
+   xtest.fake_input(d,X.MotionNotify,x=g.x+g.width-7,y=g.y+g.height-(max(36,32+16) if compact else max(36,16+16))*2-24)
+   xtest.fake_input(d,X.ButtonPress,1);xtest.fake_input(d,X.ButtonRelease,1)
    d.sync();await asyncio.sleep(.12)
   chord('Control_L','w');await wait(lambda:bake_window()is None);await command('Save')
   check(inspect()['scene']==original,'DomeD Ctrl+W cancels native model/quality settings with the complete source scene exact')
