@@ -3003,6 +3003,25 @@ if(BUILD_TESTING)
   target_link_options(dome-sculpt-vrm1-expression-preview-test PRIVATE -Wl,--wrap=_ZN4dome25bake_vrm1_expression_poseERKNS_5SceneEmRKNS_21Vrm1ExpressionWeightsERKSt8functionIFbvEE)
   add_test(NAME vrm1-expression-preview COMMAND dome-sculpt-vrm1-expression-preview-test ${CMAKE_CURRENT_BINARY_DIR}/vrm1-background-fixture/baseline.dsculpt ${CMAKE_CURRENT_BINARY_DIR}/vrm1-expression-preview)
   set_tests_properties(vrm1-expression-preview PROPERTIES TIMEOUT 900 FIXTURES_REQUIRED vrm1-background-model)
+  add_executable(dome-sculpt-vrm1-expression-preview-faults-test tests/vrm1-expression-preview-faults.cpp)
+  target_link_libraries(dome-sculpt-vrm1-expression-preview-faults-test PRIVATE dome-sculpt-core)
+  add_test(NAME vrm1-expression-preview-faults COMMAND dome-sculpt-vrm1-expression-preview-faults-test ${CMAKE_CURRENT_BINARY_DIR}/vrm1-background-fixture/baseline.dsculpt)
+  set_tests_properties(vrm1-expression-preview-faults PROPERTIES TIMEOUT 1800 FIXTURES_REQUIRED vrm1-background-model)
+  add_executable(dome-sculpt-vrm1-expression-palette-test tests/vrm1-expression-palette.cpp)
+  target_include_directories(dome-sculpt-vrm1-expression-palette-test PRIVATE src third_party/desktop)
+  target_link_libraries(dome-sculpt-vrm1-expression-palette-test PRIVATE dome-sculpt-render PkgConfig::RENDERFONTS)
+  add_test(NAME vrm1-expression-palette COMMAND dome-sculpt-vrm1-expression-palette-test ${CMAKE_CURRENT_BINARY_DIR}/vrm1-background-fixture/baseline.dsculpt ${CMAKE_CURRENT_BINARY_DIR}/vrm1-expression-palette)
+  set_tests_properties(vrm1-expression-palette PROPERTIES TIMEOUT 300 FIXTURES_REQUIRED vrm1-background-model)
+  if(TARGET dome-sculpt AND TARGET dome-sculpt-test-runtime)
+    add_test(NAME vrm1-expression-openxr COMMAND ${Python3_EXECUTABLE}
+      ${CMAKE_CURRENT_SOURCE_DIR}/tests/vrm1-expression-xr.py
+      $<TARGET_FILE:dome-sculpt> $<TARGET_FILE:dome-sculpt-test-runtime>
+      $<TARGET_FILE:dome-sculpt-vrm1-expression-preview-test>
+      $<TARGET_FILE:dome-sculpt-native-authoring-inspect>
+      ${CMAKE_CURRENT_BINARY_DIR}/vrm1-background-fixture/baseline.dsculpt
+      ${CMAKE_CURRENT_BINARY_DIR}/vrm1-expression-xr)
+    set_tests_properties(vrm1-expression-openxr PROPERTIES TIMEOUT 600 FIXTURES_REQUIRED vrm1-background-model)
+  endif()
 
   add_executable(dome-sculpt-vrm1-expression-parameters-faults-test tests/vrm1-expression-parameters-faults.cpp)
   target_include_directories(dome-sculpt-vrm1-expression-parameters-faults-test PRIVATE src)

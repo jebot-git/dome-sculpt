@@ -659,6 +659,17 @@ void SpatialPalette::draw(const EditorState &s, const Mat4 &vp) {
   if(s.polygon)signature+=":"+std::to_string(s.polygon->revision)+":"+std::to_string(s.polygon->busy)+":"+std::to_string(s.polygon->committing)+s.polygon->error;
   signature += ":procedural:"+std::to_string(s.procedural_options.seed)+":"+std::to_string(unsigned(s.procedural_options.pattern));
   if(s.projection){signature+=":projection:"+std::to_string(s.projection->request)+":"+std::to_string(s.projection->selected)+":"+std::to_string(s.projection->parameter)+":"+std::to_string(int(s.projection->panel))+std::to_string(s.projection->settings.enabled)+std::to_string(s.projection->settings.preview)+std::to_string(int(s.projection->settings.image.usage))+std::to_string(s.projection->loading)+std::to_string(s.projection->browsing)+s.projection->error+projection_parameter_text(s.projection->settings,s.projection->parameter);if(s.projection->image)signature+=s.projection->image->name;}
+  if(s.expressions){
+    const auto &view=*s.expressions;
+    signature+=":expressions:"+std::to_string(view.session)+":"+std::to_string(view.request)+":"+
+        std::to_string(view.selected)+":"+std::to_string(view.ready)+":"+std::to_string(view.error.size())+":"+view.error;
+    if(view.selected<view.entries.size()){
+      const auto &entry=view.entries[view.selected];
+      signature+=":"+std::to_string(entry.name.size())+":"+entry.name+":"+
+          std::to_string(entry.custom)+":"+std::to_string(entry.binary)+":"+
+          std::to_string(std::bit_cast<uint32_t>(entry.weight));
+    }
+  }
   if(s.importing)signature+=":import:"+std::to_string(s.importing->request)+":"+std::to_string(s.importing->selected)+":"+std::to_string(s.importing->busy)+s.importing->directory.string()+s.importing->error+
     std::to_string(int(s.importing->settings.choices.format))+std::to_string(s.importing->settings.choices.materials)+std::to_string(std::bit_cast<uint64_t>(s.importing->settings.choices.custom_metres_per_unit))+std::to_string(int(s.importing->settings.choices.units))+std::to_string(int(s.importing->settings.choices.axes))+std::to_string(int(s.importing->settings.choices.normals))+std::to_string(s.importing->settings.paint_resolution);
   signature += ":sculpt:" + std::to_string(s.sculpt_settings.symmetry_axes) + ":" +
