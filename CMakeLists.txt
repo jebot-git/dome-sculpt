@@ -3821,3 +3821,71 @@ if(BUILD_TESTING)
   target_link_libraries(dome-sculpt-anatomical-caller-faults-test PRIVATE dome-sculpt-core)
   target_link_options(dome-sculpt-anatomical-caller-faults-test PRIVATE "-Wl,--wrap=_ZN4dome22author_anatomical_skinERNS_5SceneESt4spanIKmLm18446744073709551615EERKNS_20SkinAuthoringOptionsERKSt8functionIFbvEE")
 endif()
+
+# Reproducible repository-asset prerequisites for the actual native anatomical
+# workflows. No archived Scene or prior build/worktree path is an input.
+if(BUILD_TESTING)
+  add_executable(dome-sculpt-anatomical-fixture-test tests/anatomical-fixture.cpp)
+  target_include_directories(dome-sculpt-anatomical-fixture-test PRIVATE src)
+  target_link_libraries(dome-sculpt-anatomical-fixture-test PRIVATE dome-sculpt-core)
+  foreach(consumer IN ITEMS anatomical-public-workflow anatomical-authoring-worker anatomical-caller-faults)
+    add_dependencies(dome-sculpt-${consumer}-test dome-sculpt-anatomical-fixture-test)
+  endforeach()
+  foreach(consumer IN ITEMS native-rig-pose-scope native-rig-pose-faults)
+    add_dependencies(dome-sculpt-${consumer}-test dome-sculpt-anatomical-public-workflow-test)
+  endforeach()
+  add_dependencies(dome-sculpt-native-linked-pose-export-test dome-sculpt-native-rig-pose-scope-test)
+  foreach(base IN ITEMS female male)
+    set(anatomical_fixture_dir ${CMAKE_CURRENT_BINARY_DIR}/anatomical-native/${base})
+    set(anatomical_public_dir ${CMAKE_CURRENT_BINARY_DIR}/anatomical-native/${base}-public)
+    set(anatomical_pose_dir ${CMAKE_CURRENT_BINARY_DIR}/anatomical-native/${base}-pose)
+    add_test(NAME anatomical-${base}-fixture COMMAND dome-sculpt-anatomical-fixture-test
+      ${CMAKE_CURRENT_SOURCE_DIR}/assets/humanoid/vroid/base-${base}.vrm ${anatomical_fixture_dir})
+    set_tests_properties(anatomical-${base}-fixture PROPERTIES
+      FIXTURES_SETUP anatomical_${base}_input TIMEOUT 600)
+    add_test(NAME anatomical-${base}-public COMMAND dome-sculpt-anatomical-public-workflow-test
+      ${anatomical_fixture_dir}/fitted-unskinned.dsculpt ${anatomical_fixture_dir}/bound.dsculpt ${anatomical_public_dir})
+    set_tests_properties(anatomical-${base}-public PROPERTIES
+      FIXTURES_REQUIRED anatomical_${base}_input FIXTURES_SETUP anatomical_${base}_public TIMEOUT 900)
+    add_test(NAME anatomical-${base}-worker COMMAND dome-sculpt-anatomical-authoring-worker-test
+      ${anatomical_fixture_dir}/fitted-unskinned.dsculpt ${anatomical_fixture_dir}/bound.dsculpt
+      ${CMAKE_CURRENT_BINARY_DIR}/anatomical-native/${base}-worker)
+    set_tests_properties(anatomical-${base}-worker PROPERTIES FIXTURES_REQUIRED anatomical_${base}_input TIMEOUT 900)
+    add_test(NAME anatomical-${base}-linked COMMAND dome-sculpt-native-rig-pose-scope-test
+      ${anatomical_public_dir}/full.dsculpt ${anatomical_pose_dir})
+    set_tests_properties(anatomical-${base}-linked PROPERTIES
+      FIXTURES_REQUIRED anatomical_${base}_public FIXTURES_SETUP anatomical_${base}_pose TIMEOUT 900)
+    add_test(NAME anatomical-${base}-pose-faults COMMAND dome-sculpt-native-rig-pose-faults-test
+      ${anatomical_public_dir}/full.dsculpt)
+    set_tests_properties(anatomical-${base}-pose-faults PROPERTIES FIXTURES_REQUIRED anatomical_${base}_public TIMEOUT 600)
+    foreach(pose IN ITEMS linked controller)
+      add_test(NAME anatomical-${base}-${pose}-export COMMAND dome-sculpt-native-linked-pose-export-test
+        ${anatomical_pose_dir}/${pose}.dsculpt ${CMAKE_CURRENT_BINARY_DIR}/anatomical-native/${base}-${pose}-export)
+      set_tests_properties(anatomical-${base}-${pose}-export PROPERTIES FIXTURES_REQUIRED anatomical_${base}_pose TIMEOUT 300)
+    endforeach()
+  endforeach()
+  add_test(NAME anatomical-caller-faults COMMAND dome-sculpt-anatomical-caller-faults-test
+    ${CMAKE_CURRENT_BINARY_DIR}/anatomical-native/female/fitted-unskinned.dsculpt
+    ${CMAKE_CURRENT_BINARY_DIR}/anatomical-native/caller-faults)
+  set_tests_properties(anatomical-caller-faults PROPERTIES FIXTURES_REQUIRED anatomical_female_input TIMEOUT 600)
+endif()
+if(BUILD_TESTING)
+  add_dependencies(dome-sculpt-native-unskinned-quality-test dome-sculpt-anatomical-public-workflow-test)
+  foreach(base IN ITEMS female male)
+    # Original artist data is opened in this separate process only AFTER the
+    # actual public field has been generated and saved by the earlier fixture.
+    add_test(NAME anatomical-${base}-quality COMMAND dome-sculpt-native-unskinned-quality-test
+      ${CMAKE_CURRENT_SOURCE_DIR}/assets/humanoid/vroid/base-${base}.vrm
+      ${CMAKE_CURRENT_BINARY_DIR}/anatomical-native/${base}-public/full.dsculpt
+      ${CMAKE_CURRENT_BINARY_DIR}/anatomical-native/${base}-quality)
+    set_tests_properties(anatomical-${base}-quality PROPERTIES FIXTURES_REQUIRED anatomical_${base}_public TIMEOUT 600)
+  endforeach()
+  set(anatomical_registered anatomical-caller-faults)
+  foreach(base IN ITEMS female male)
+    foreach(endpoint IN ITEMS fixture public worker linked pose-faults linked-export controller-export quality)
+      list(APPEND anatomical_registered anatomical-${base}-${endpoint})
+    endforeach()
+  endforeach()
+  set_tests_properties(${anatomical_registered} PROPERTIES
+    ENVIRONMENT "LIBGL_ALWAYS_SOFTWARE=1;LP_NUM_THREADS=2;XR_RUNTIME_JSON=${CMAKE_CURRENT_BINARY_DIR}/anatomical-no-physical-runtime.json")
+endif()
