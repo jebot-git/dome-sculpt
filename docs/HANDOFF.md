@@ -1,5 +1,19 @@
 # Dome Sculpt production handoff
 
+## Private physical editable-project continuation — 2026-11-04
+
+Source4 physical paint now has an explicit finite PBR/native-project compiler;
+raw HDR initial adoption uses the real source-aware atlas factory. Foundation128
+and raw127 pass Release/owned sanitizer/strict A770, exact native recovery and
+current legacy controls. The post-publication IO OOM bug is independently fixed
+and qualified through9,387 physical-export denial prefixes perprofile. Read
+[PHYSICAL-EDITABLE-AUTHORING.md](PHYSICAL-EDITABLE-AUTHORING.md) and its receipt
+for component/fresh-build boundaries, zero-error unfiltered Khronos cohorts,
+the retained finite-filter counterexample and remaining domain/import guards.
+This private checkpoint is not main admission or full-goal completion; all
+unfinished rows remain required. No installation or physical session changed.
+
+
 ## Private painted native-project GLB producer — 2026-11-03
 
 The native Scene-owned producer/Document worker and Cancel-default FLTK export
