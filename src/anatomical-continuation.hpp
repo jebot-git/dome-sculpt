@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #pragma once
 #include "bone-shadow-query.hpp"
+#include "geometry-rig-correspondence.hpp"
 #include "heat-component-intent.hpp"
 #include "material-visibility-seams.hpp"
 #include "screened-continuation-solve.hpp"
@@ -93,6 +94,34 @@ anatomical_continuation(const Scene &scene, uint64_t group,
         (void)scene.object(p.object);
       }
     }
+    size_t authority_workspace = 0;
+    std::optional<ContinuationPart> reference_lease;
+    if (declared && declared->reference) {
+      if (!declared->world_metric)
+        throw std::invalid_argument(
+            "Explicit reference needs full actual world metric");
+      const auto &r = scene.object(declared->reference);
+      if (!r.painted || !r.volume || !r.deformation ||
+          !r.deformation->skeleton || r.painted->in_stroke())
+        throw std::invalid_argument(
+            "Explicit geometry source needs a prepared genuine rig owner");
+      validate_rest_deformation(*r.deformation, r.painted->mesh(), budget);
+      const size_t owner_bytes =
+          2 * (sizeof(SculptObject) + r.name.size() + r.material.name.size()) +
+          4096;
+      if (owner_bytes > limits.maximum_bytes)
+        throw std::length_error(
+            "Reference owner copy exceeds workspace before capture");
+      budget.step_items(r.name.size() + r.material.name.size() + 1, 2);
+      ContinuationPart lease;
+      lease.object = std::make_shared<const SculptObject>(r);
+      lease.source_lease = r;
+      lease.source_mesh = r.painted->mesh_owner();
+      lease.paint_revision = r.painted->revision();
+      lease.volume_revision = r.volume->revision();
+      lease.world = scene.world_matrix(r.id).matrix();
+      reference_lease = std::move(lease);
+    }
     std::vector<const SculptObject *> objects;
     size_t raw_count = 0, corners = 0;
     const SculptObject *first = nullptr;
@@ -101,14 +130,16 @@ anatomical_continuation(const Scene &scene, uint64_t group,
       budget.step();
       if (declared ? !declared->find(o.id) : o.group != group)
         continue;
-      if (!o.painted || !o.mesh_active || source_is_dormant(o) ||
-          o.painted->in_stroke() || !o.deformation ||
-          !o.deformation->skeleton ||
+      if (!o.painted || !o.volume || !o.mesh_active || source_is_dormant(o) ||
+          o.painted->in_stroke() ||
+          (!reference_lease && (!o.deformation || !o.deformation->skeleton)) ||
           (!declared &&
            (!o.deformation->skin || !o.deformation->humanoid || !o.appearance)))
         throw std::invalid_argument("Continuation group has unsupported owner");
-      if (o.deformation->skeleton->bones.empty() ||
-          o.deformation->skeleton->bones.size() > 256 ||
+      const auto &current_rig =
+          reference_lease ? *reference_lease->object->deformation->skeleton
+                          : *o.deformation->skeleton;
+      if (current_rig.bones.empty() || current_rig.bones.size() > 256 ||
           o.painted->mesh().positions.size() > 2'000'000 - raw_count ||
           o.painted->mesh().indices.size() > 12'000'000 - corners)
         throw std::length_error("Continuation aggregate source bound");
@@ -121,51 +152,85 @@ anatomical_continuation(const Scene &scene, uint64_t group,
             "Continuation has duplicate original primitive instances");
       if (!first)
         first = &o;
-      if ((!declared &&
-           (o.appearance->asset.get() != first->appearance->asset.get() ||
-            o.appearance->asset.owner_before(first->appearance->asset) ||
-            first->appearance->asset.owner_before(o.appearance->asset) ||
-            o.appearance->source_joint_nodes !=
-                first->appearance->source_joint_nodes ||
-            o.deformation->humanoid->encode() !=
-                first->deformation->humanoid->encode())) ||
-          o.deformation->skeleton->encode() !=
-              first->deformation->skeleton->encode() ||
-          (!(declared && declared->world_metric) &&
-           scene.has_affine_placement(o.id)) ||
-          scene.world_matrix(o.id).matrix() !=
-              scene.world_matrix(first->id).matrix())
-        throw std::invalid_argument(
-            "Continuation current source/rig/metric changed");
+      if (reference_lease) {
+        const auto &r = *reference_lease->object;
+        if (o.deformation && o.deformation->skeleton && o.id != r.id) {
+          const auto current_world = scene.world_matrix(o.id);
+          const auto change =
+              current_world.inverse() * scene.world_matrix(r.id);
+          if (!geometry_reference_rig_matches(
+                  *r.deformation->skeleton, *o.deformation->skeleton, change,
+                  current_world.matrix() == reference_lease->world, budget,
+                  limits.maximum_bytes, &authority_workspace))
+            throw std::invalid_argument("Existing target rig requires explicit "
+                                        "exact reference correspondence");
+          if (o.appearance && o.appearance->asset &&
+              (!r.appearance || o.appearance->asset != r.appearance->asset ||
+               o.appearance->asset.owner_before(r.appearance->asset) ||
+               r.appearance->asset.owner_before(o.appearance->asset) ||
+               o.appearance->source_joint_nodes !=
+                   r.appearance->source_joint_nodes))
+            throw std::invalid_argument(
+                "Existing imported rig cannot borrow unrelated native "
+                "reference identities");
+        }
+      } else {
+        if ((!declared &&
+             (o.appearance->asset.get() != first->appearance->asset.get() ||
+              o.appearance->asset.owner_before(first->appearance->asset) ||
+              first->appearance->asset.owner_before(o.appearance->asset) ||
+              o.appearance->source_joint_nodes !=
+                  first->appearance->source_joint_nodes ||
+              o.deformation->humanoid->encode() !=
+                  first->deformation->humanoid->encode())) ||
+            o.deformation->skeleton->encode() !=
+                first->deformation->skeleton->encode() ||
+            (!(declared && declared->world_metric) &&
+             scene.has_affine_placement(o.id)) ||
+            scene.world_matrix(o.id).matrix() !=
+                scene.world_matrix(first->id).matrix())
+          throw std::invalid_argument(
+              "Continuation current source/rig/metric changed");
+      }
       // Solve in the common source REST frame. A shared native positive
       // similarity leaves angles, the mass/(distance^2+mass) kernel and
       // normalized output invariant. Pose/morph are retained display state,
-      // never substituted for REST geometry. Relative/affine placements refuse.
+      // never substituted for REST geometry. The separate explicit reference
+      // path stages each genuine REST mesh in its actual world metric.
       if (!(declared && declared->world_metric) &&
           !(scene.world_transform(o.id).scale > 0))
         throw std::invalid_argument(
             "Continuation requires positive similarity placement");
-      validate_rest_deformation(*o.deformation, o.painted->mesh(), budget);
-      budget.step(o.deformation->skeleton->bones.size() *
-                  o.deformation->skeleton->bones.size());
+      if (o.deformation)
+        validate_rest_deformation(*o.deformation, o.painted->mesh(), budget);
+      else {
+        budget.step_items(o.painted->mesh().positions.size() +
+                              o.painted->mesh().indices.size() + 1,
+                          32);
+        o.painted->mesh().validate();
+      }
+      budget.step(current_rig.bones.size() * current_rig.bones.size());
       objects.push_back(&o);
       raw_count += o.painted->mesh().positions.size();
       corners += o.painted->mesh().indices.size();
     }
     if (!first || raw_count > 2'000'000 || corners > 12'000'000)
       throw std::length_error("Continuation source bounds");
-    const size_t bones = first->deformation->skeleton->bones.size();
+    const auto *rig_source =
+        reference_lease ? reference_lease->object.get() : first;
+    const size_t bones = rig_source->deformation->skeleton->bones.size();
     const bool world_metric = declared && declared->world_metric;
-    AffineTransform metric;
+    AffineTransform metric, metric_shift;
     size_t metric_bytes = 0;
     if (world_metric) {
-      const auto world = scene.world_matrix(first->id);
+      const auto world = scene.world_matrix(rig_source->id);
       AffineInteractionFrame checked(world);
       (void)checked;
       auto origin = AffineTransform{}.matrix();
       for (size_t k = 0; k < 3; ++k)
         origin[12 + k] = -world.matrix()[12 + k];
-      metric = AffineTransform(origin) * world;
+      metric_shift = AffineTransform(origin);
+      metric = metric_shift * world;
       for (const auto *o : objects) {
         const auto &m = o->painted->mesh();
         metric_bytes += sizeof(Mesh) +
@@ -179,12 +244,18 @@ anatomical_continuation(const Scene &scene, uint64_t group,
     // scratch.
     size_t capture_bytes = 0;
     for (const auto *o : objects) {
-      const size_t add = sizeof(SculptObject) + o->name.size() +
-                         o->material.name.size() + o->painted->storage_bytes();
+      const size_t add = 3 * (sizeof(SculptObject) + o->name.size() +
+                              o->material.name.size()) +
+                         o->painted->storage_bytes();
       if (add > options.maximum_bytes - capture_bytes)
         throw std::length_error("Continuation snapshot bytes");
       capture_bytes += add;
     }
+    if (reference_lease)
+      capture_bytes +=
+          2 * (sizeof(SculptObject) + reference_lease->object->name.size() +
+               reference_lease->object->material.name.size()) +
+          4096;
     const size_t bytes = capture_bytes + raw_count * (768 + 16 * bones) +
                          corners * 320 + 65536 + metric_bytes;
     if (bytes > options.maximum_bytes)
@@ -209,17 +280,18 @@ anatomical_continuation(const Scene &scene, uint64_t group,
       captured.push_back(std::move(copy));
     }
     first = captured.front().get();
+    rig_source = reference_lease ? reference_lease->object.get() : first;
     budget.step();
     options.maximum_work =
         std::min(size_t(500'000'000), budget.maximum - budget.used);
     if (!options.maximum_work)
       throw std::length_error("Source-visible work exhausted before capture");
     auto profile =
-        declared
-            ? declared_weight_profile(*first->deformation->skeleton, budget)
-            : imported_heat_profile(*first->deformation->skeleton,
-                                    *first->appearance, options, cancelled,
-                                    &*first->deformation->humanoid);
+        declared ? declared_weight_profile(*rig_source->deformation->skeleton,
+                                           budget)
+                 : imported_heat_profile(*first->deformation->skeleton,
+                                         *first->appearance, options, cancelled,
+                                         &*first->deformation->humanoid);
     budget.step(profile.work);
     if (world_metric) {
       budget.step_items(profile.segments.size(), 128);
@@ -270,18 +342,20 @@ anatomical_continuation(const Scene &scene, uint64_t group,
                           64);
         SkinGeometryWork geometry(budget.maximum - budget.used, cancelled);
         const auto remaining = geometry.remaining();
-        staged_metric = skin_world_mesh(m, metric, geometry);
+        staged_metric = skin_world_mesh(
+            m, metric_shift * scene.world_matrix(o.id), geometry);
         budget.step(remaining - geometry.remaining());
       }
       const auto &solve_mesh =
           staged_metric ? *staged_metric : o.painted->mesh();
       std::optional<HeatSeamGraph> seams;
       std::optional<HeatComponentIntent> intent;
+      std::optional<DeclaredWeightIntent> declared_intent;
       std::span<const uint32_t> row_groups;
       if (declared) {
-        intent =
-            declared_weight_intent(o, *declared->find(o.id), profile, options,
-                                   budget, declared->policy, solve_mesh);
+        declared_intent = declared_weight_intent(
+            o, *declared->find(o.id), profile, options, budget,
+            declared->policy, solve_mesh, rig_source->deformation);
       } else {
         seams = capture_heat_seams(o, options, cancelled);
         budget.step(seams->work());
@@ -307,7 +381,7 @@ anatomical_continuation(const Scene &scene, uint64_t group,
       p.volume_revision = objects[owner]->volume->revision();
       p.world = scene.world_matrix(o.id).matrix();
       p.raw_to_row = part.raw_to_row;
-      auto masks = intent->masks(o);
+      auto masks = declared ? declared_intent->masks(o) : intent->masks(o);
       usage.resize(offset + part.positions.size());
       for (size_t raw = 0; raw < p.raw_to_row.size(); ++raw) {
         budget.step(4);
@@ -601,6 +675,10 @@ anatomical_continuation(const Scene &scene, uint64_t group,
     for (const auto &part : out.parts)
       if (!part.matches(scene))
         throw std::runtime_error("Captured weight source lease changed");
+    if (reference_lease && !reference_lease->matches(scene))
+      throw std::runtime_error(
+          "Captured actual reference rig/world/REST owner changed");
+    out.report.bytes = std::max(out.report.bytes, authority_workspace);
     out.report.work = budget.used;
     return out;
   } catch (const std::length_error &e) {

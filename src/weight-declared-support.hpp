@@ -17,6 +17,7 @@ struct DeclaredWeightSupport {
   DeclaredSupportPolicy policy = DeclaredSupportPolicy::AllDeformControls;
   bool world_metric = false;
   std::vector<DeclaredWeightPart> parts;
+  uint64_t reference = 0;
   const DeclaredWeightPart *find(uint64_t id) const {
     auto at = std::find_if(parts.begin(), parts.end(),
                            [&](const auto &p) { return p.object == id; });
@@ -54,93 +55,120 @@ declared_weight_profile(const Skeleton &rig, weight_surface::Budget &work) {
     throw std::invalid_argument("Declared weight rig has no deform source");
   return profile;
 }
-inline HeatComponentIntent
+// New geometry-only intent type: it never fabricates a target skin/skeleton to
+// satisfy the imported-source HeatComponentIntent factory. The genuine source
+// rig owner is retained independently from the target's optional deformation.
+class DeclaredWeightIntent {
+  uint64_t object_ = 0, revision_ = 0;
+  std::shared_ptr<const PaintedMesh> paint_;
+  std::shared_ptr<const Mesh> mesh_;
+  std::shared_ptr<const DeformationState> target_, reference_;
+  std::vector<HeatJointMask> masks_;
+  template <class A, class B>
+  static bool same(const std::shared_ptr<A> &a, const std::shared_ptr<B> &b) {
+    return a.get() == b.get() && !a.owner_before(b) && !b.owner_before(a);
+  }
+  friend DeclaredWeightIntent
+  declared_weight_intent(const SculptObject &, const DeclaredWeightPart &,
+                         const ImportedHeatProfile &,
+                         const HeatBindingOptions &, weight_surface::Budget &,
+                         DeclaredSupportPolicy, const Mesh &,
+                         std::shared_ptr<const DeformationState>);
+
+public:
+  std::span<const HeatJointMask> masks(const SculptObject &o) const {
+    if (o.id != object_ || !same(paint_, o.painted) || !o.painted ||
+        !same(mesh_, o.painted->mesh_owner()) ||
+        o.painted->revision() != revision_ || !same(target_, o.deformation) ||
+        !reference_ || !reference_->skeleton)
+      throw std::logic_error(
+          "Declared geometry/reference intent lease changed");
+    return masks_;
+  }
+};
+inline DeclaredWeightIntent
 declared_weight_intent(const SculptObject &o, const DeclaredWeightPart &input,
                        const ImportedHeatProfile &profile,
                        const HeatBindingOptions &options,
                        weight_surface::Budget &work,
-                       DeclaredSupportPolicy policy, const Mesh &metric_mesh) {
-  if (input.object != o.id || !o.painted || !o.deformation ||
-      !o.deformation->skeleton)
-    throw std::invalid_argument("Declared weight source lease is incomplete");
-  std::vector<HeatComponentDeclaration> generated;
-  auto declarations =
-      std::span<const HeatComponentDeclaration>(input.declarations);
-  if (declarations.empty()) {
-    const auto &m = metric_mesh;
-    if (m.positions.size() > 2'000'000 || m.indices.size() > 6'000'000 ||
-        m.positions.size() > options.maximum_bytes / 32)
-      throw std::length_error(
-          "Default weight intent exceeds construction bounds");
-    size_t local_work = 0;
-    auto parents = heat_intent_components(
-        m, {}, local_work,
-        std::min(options.maximum_work, work.maximum - work.used), work.cancel);
-    work.step(local_work);
-    size_t components = 0, labels = 0;
-    for (size_t i = 0; i < parents.size(); ++i) {
-      work.step();
-      components += parents[i] == i;
-    }
-    for (auto x : profile.eligible)
-      labels += bool(x);
-    const size_t unit =
-        sizeof(HeatComponentDeclaration) + labels * sizeof(uint32_t);
-    if (!labels || components > options.maximum_bytes / unit ||
-        parents.size() * sizeof(uint32_t) >
-            options.maximum_bytes - components * unit)
-      throw std::length_error(
-          "Default weight intent declaration budget exceeded");
-    const size_t metadata =
-        parents.size() * (sizeof(uint32_t) + sizeof(HeatJointMask)) +
-        components * unit;
-    if (metadata > options.maximum_bytes)
-      throw std::length_error("Nearest component support metadata exceeded");
-    const size_t intent_bytes =
-        parents.size() * 80 + m.indices.size() * 16 +
-        profile.eligible.size() * profile.eligible.size() * 64 + 8192;
-    if (intent_bytes > options.maximum_bytes - metadata)
-      throw std::length_error("Default intent simultaneous workspace exceeded");
-    std::vector<HeatJointMask> masks(parents.size());
+                       DeclaredSupportPolicy policy, const Mesh &metric_mesh,
+                       std::shared_ptr<const DeformationState> reference) {
+  if (input.object != o.id || !o.painted || !reference || !reference->skeleton)
+    throw std::invalid_argument(
+        "Declared geometry needs its genuine reference rig owner");
+  const auto &m = metric_mesh;
+  const auto &rig = *reference->skeleton;
+  const size_t n = m.positions.size(), b = rig.bones.size();
+  if (!n || n > 2'000'000 || m.indices.size() > 6'000'000 || !b || b > 256 ||
+      profile.eligible.size() != b || input.declarations.size() > n ||
+      n > options.maximum_bytes / 80)
+    throw std::length_error(
+        "Declared geometry intent dimensions/workspace exceeded");
+  if (m.positions.size() != o.painted->mesh().positions.size() ||
+      m.indices.size() != o.painted->mesh().indices.size())
+    throw std::logic_error(
+        "Worker metric vertex/corner correspondence changed");
+  const size_t source_bytes =
+      profile.segments.size() * sizeof(HeatSourceSegment) + 4096;
+  if (source_bytes > options.maximum_bytes ||
+      n > (options.maximum_bytes - source_bytes) / 80)
+    throw std::length_error(
+        "Declared geometry simultaneous mask/source workspace exceeded");
+  size_t local_work = 0;
+  auto parents = heat_intent_components(
+      m, {}, local_work,
+      std::min(options.maximum_work, work.maximum - work.used), work.cancel);
+  work.step(local_work);
+  std::vector<HeatJointMask> masks(n);
+  if (input.declarations.empty()) {
     if (policy == DeclaredSupportPolicy::NearestSourceUnion) {
       NearestWeightSources sources(profile.segments, work);
-      for (size_t i = 0; i < parents.size(); ++i) {
+      for (size_t i = 0; i < n; ++i) {
         const auto p = m.positions[i];
-        const auto selected = sources.nearest({p.x, p.y, p.z}, work);
+        auto selected = sources.nearest({p.x, p.y, p.z}, work);
         for (size_t k = 0; k < 4; ++k)
           masks[parents[i]][k] |= selected[k];
       }
     } else
-      for (size_t i = 0; i < parents.size(); ++i)
+      for (size_t i = 0; i < n; ++i)
         if (parents[i] == i)
-          for (size_t j = 0; j < profile.eligible.size(); ++j)
+          for (size_t j = 0; j < b; ++j) {
+            work.step();
             if (profile.eligible[j])
               masks[i][j / 64] |= uint64_t(1) << (j % 64);
-    generated.reserve(components);
-    for (uint32_t i = 0; i < parents.size(); ++i)
-      if (parents[i] == i) {
-        work.step(labels + 1);
-        HeatComponentDeclaration d;
-        d.vertex = i;
-        d.joints.reserve(labels);
-        for (uint32_t j = 0; j < profile.eligible.size(); ++j)
-          if (masks[i][j / 64] & (uint64_t(1) << (j % 64)))
-            d.joints.push_back(j);
-        if (d.joints.empty())
+          }
+  } else
+    for (const auto &d : input.declarations) {
+      work.step();
+      if (d.vertex >= n || d.joints.empty() || d.joints.size() > b)
+        throw std::invalid_argument(
+            "Invalid explicit geometry component declaration");
+      for (auto joint : d.joints) {
+        work.step();
+        if (joint >= b || !rig.bones[joint].deform || !profile.eligible[joint])
           throw std::invalid_argument(
-              "Default component has no nearest declared source");
-        generated.push_back(std::move(d));
+              "Explicit geometry joint is outside authored deform domain");
+        masks[parents[d.vertex]][joint / 64] |= uint64_t(1) << (joint % 64);
       }
-    declarations = generated;
+    }
+  for (size_t i = 0; i < n; ++i) {
+    work.step();
+    if (parents[i] == i && masks[i] == HeatJointMask{})
+      throw std::invalid_argument(
+          "Explicit geometry intent omitted a connected component");
   }
-  auto remaining = options;
-  remaining.maximum_work =
-      std::min(remaining.maximum_work, work.maximum - work.used);
-  if (!remaining.maximum_work)
-    throw std::length_error("Declared intent has no remaining work");
-  auto result =
-      capture_user_component_intent(o, declarations, remaining, work.cancel);
-  work.step(result.work());
-  return result;
+  DeclaredWeightIntent out;
+  out.object_ = o.id;
+  out.paint_ = o.painted;
+  out.mesh_ = o.painted->mesh_owner();
+  out.revision_ = o.painted->revision();
+  out.target_ = o.deformation;
+  out.reference_ = std::move(reference);
+  out.masks_.resize(n);
+  for (size_t i = 0; i < n; ++i) {
+    work.step();
+    out.masks_[i] = masks[parents[i]];
+  }
+  return out;
 }
 } // namespace dome::detail
