@@ -1,5 +1,24 @@
 # Full objective and completion evidence
 
+## Private layered normal runtime, persistence and exports — 2026-11-04
+
+Actual worker Clear now has error0 instead of the preserved7/74, and partial
+rebake including post-Clear agrees within1 under unchanged4. Fresh215-task
+matching-layout app/core/render/support/XR R/S plus scoped bake-guard continuations
+pass62 native checks each and63 strictArc; eight native triples are exact.
+Scene33/material15 retains independent baked detail and durable attribute origin,
+with actual Save/restart, original-source replay and explicit root31 upgrade.
+Independent72-view glTF/PNG/skin/morph consumers eachR/S/Arc have image error0;
+216 actual files have0 Khronos errors/108warnings/297infos and72exacttriples.
+See LAYERED-NORMAL-NATIVE-CODEC.md and LAYERED-NORMAL-INDEPENDENT-EXPORT.md plus
+receipts for exact fresh/component/fixture scopes and preserved negatives.
+Configured624 is not a full-suite pass. Archive/caller faults, new UI/XR,
+full typed/source/corner/UV/key/captured-frame adapters and coherent main/agent
+integration remain; prepared Bake sources still require their real frame adapter.
+This is private, not main admission, system/HMD action or full goal completion.
+All unfinished original/additional requirements and later drawers remain required.
+
+
 ## Private owning canonical-normal conversion — 2026-11-04
 
 Explicit universal-menu/XR conversion now retains the genuine historical source
