@@ -17,6 +17,8 @@ struct NativeAuthoringEmission {
   size_t erased_nonzero_samples=0;
   bool unlit=false;
   size_t unlit_ignored_samples=0;
+  // Actual emitted emission-only sampling transform, never an authored UV edit.
+  std::array<float,2> texture_offset{};
 };
 struct NativeAuthoringCompilation {
   std::vector<ObjectSurface> surfaces;

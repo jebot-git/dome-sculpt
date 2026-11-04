@@ -1,3 +1,4 @@
+#include "color-bound-memo.hpp"
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/material-bindings.hpp"
 #include "deformation-json.hpp"
@@ -148,6 +149,7 @@ void SourceNativeMaterial::validate() const {
     throw std::invalid_argument("Invalid native factor baseline for resolved material");
 }
 void SourceMaterialBindings::validate(bool deep) const {
+  detail::ColorBoundScope color_bound_scope;
   MaterialValidationScope validation(this,deep);
   if(validation.proved)return;
   if(size_t(normal_frame)>1 || size_t(animation_policy)>1 ||

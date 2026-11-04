@@ -137,11 +137,21 @@ NativePhysicalField native_physical_field(const SculptObject &o,
   for(const auto &layer:paint.layers())charge(layer.tiles.size()+layer.pbr_tiles.size()+layer.emission_tiles.size(),sizeof(void*)*8);
   auto packet=PaintOverlayFactory::capture(paint,cancelled);
   charge(packet->storage_bytes(),1);
+  // A constant background plus independently linear paint coefficients is a
+  // bilinear field in the retained grid. Integer upsampling must preserve its
+  // original texel-centre breakpoints instead of introducing a second blur.
+  const bool sampled_background=maps&&maps->emission.image&&
+    !(o.material_bindings&&o.material_bindings->physical_emission);
+  if(!sampled_background&&r>paint.resolution()&&r%paint.resolution()==0){
+    const float offset=-float(r/paint.resolution()-1)/(2*r);
+    out.emission.texture_offset={offset,offset};
+  }
   std::vector<std::array<float,3>> radiance(pixels);std::array<float,3> peak{};
   auto linear=[](float v){return v<=.04045f?v/12.92f:std::pow((v+.055f)/1.055f,2.4f);};
   auto srgb=[](float v){return v<=.0031308f?v*12.92f:1.055f*std::pow(v,1/2.4f)-.055f;};
   for(size_t at=0;at<pixels;++at){if((at&1023)==0)stop();
-    const float u=(float(at%r)+.5f)/r,v=(float(at/r)+.5f)/r;
+    const float u=(float(at%r)+.5f)/r-out.emission.texture_offset[0],
+                v=(float(at/r)+.5f)/r-out.emission.texture_offset[1];
     const auto overlay=sample_overlay_values(*packet,u,v,true);
     std::array<float,4> source{1,1,1,1};
     if(maps&&maps->emission.image&&!(o.material_bindings&&o.material_bindings->physical_emission))
@@ -215,7 +225,7 @@ NativeAuthoringCompilation compile_native_authoring(
   auto physical=[](const SculptObject &o){return hdr_emission(o.material.emissive)||
       (o.painted&&o.painted->has_physical_emission())||
       (o.material_bindings&&physical_emission(*o.material_bindings));};
-  bool painted = false;
+  bool painted = false;size_t emission_fields=0;
   for (const auto &surface : capture.originals()) {
     check();
     const auto &mesh = surface.mesh;
@@ -230,7 +240,7 @@ NativeAuthoringCompilation compile_native_authoring(
     reserve(surface.groups.size(),sizeof(SceneGroup));
     for(const auto &group:surface.groups)reserve(group.name.size()+1,sizeof(char));
     if(native_physical(object)){
-      painted=true;
+      ++emission_fields;painted=true;
       if(surface.textures)reserve(texture_bytes(*surface.textures),1);
       // The final emitted mesh is a distinct copy of the captured geometry.
       reserve(mesh.positions.size()+mesh.normals.size(),sizeof(Vec3));
@@ -249,10 +259,12 @@ NativeAuthoringCompilation compile_native_authoring(
       if (!maps || !maps->overlay || !object.painted->valid_source_sampling_attachment())
         throw std::invalid_argument("Native authoring lost its original source paint owner");
       painted |= !maps->overlay->empty()||physical(object);
+      if(physical(object)&&!native_physical(object))++emission_fields;
     }
   }
   reserve(raw_proof_peak,1); // Keep the single proof peak available during writer replay.
-  NativeAuthoringCompilation result;
+  reserve(emission_fields,sizeof(NativeAuthoringEmission));
+  NativeAuthoringCompilation result;result.emission.reserve(emission_fields);
   if (!painted) {
     result.surfaces = capture.originals();
     for (auto &surface : result.surfaces) {
@@ -414,6 +426,10 @@ void finish_native_authoring_emission(GltfDocument &document,
   auto stop=[&]{if(cancelled&&cancelled())throw std::runtime_error("Physical authoring finish cancelled");};
   auto &j=document.json;auto &binary=document.binary;std::set<uint64_t> identities;
   for(const auto &entry:compiled.emission){
+    for(float offset:entry.texture_offset)if(!std::isfinite(offset)||std::abs(offset)>1)
+      throw std::invalid_argument("Physical emission sampling offset exceeds its finite unit domain");
+    if(!entry.image.width&&entry.texture_offset!=std::array<float,2>{})
+      throw std::invalid_argument("Constant physical emission cannot invent a texture sampling transform");
     stop();
     for(const char *table:{"meshes","materials","bufferViews","images","samplers","textures"})
       if(j.contains(table)&&(!j.at(table).is_array()||j.at(table).size()>=65536))
@@ -465,6 +481,11 @@ void finish_native_authoring_emission(GltfDocument &document,
     if(unlit!=entry.unlit)throw std::logic_error("Physical finite view changed the actual unlit interpretation");
     material["emissiveTexture"]={{"index",texture}};
     if(coordinate)material["emissiveTexture"]["texCoord"]=coordinate;
+    if(entry.texture_offset!=std::array<float,2>{}){
+      material["emissiveTexture"]["extensions"]["KHR_texture_transform"]={{"offset",entry.texture_offset}};
+      auto &used=j["extensionsUsed"];if(used.is_null())used=Json::array();
+      if(std::find(used.begin(),used.end(),"KHR_texture_transform")==used.end())used.push_back("KHR_texture_transform");
+    }
     }
     auto &material=j["materials"].at(identity.material);
     const bool unlit=material.contains("extensions")&&material.at("extensions").contains("KHR_materials_unlit");
@@ -483,6 +504,8 @@ void finish_native_authoring_emission(GltfDocument &document,
       {"erasedNonzeroTexelSamples",entry.erased_nonzero_samples},{"clampedTexelSamples",0},
       {"unlitIgnoredNonzeroTexelSamples",entry.unlit_ignored_samples},
       {"maximumUnlitIgnoredRadiance",entry.unlit?double(entry.strength)*std::max({entry.factor[0],entry.factor[1],entry.factor[2]}):0.}};
+    if(entry.texture_offset!=std::array<float,2>{})
+      material["extras"]["domeSculptPortableEmission"]["samplingLattice"]="aligned-native-linear-grid";
     if(!entry.image.width){auto &report=material["extras"]["domeSculptPortableEmission"];
       report["errorScope"]="constant-factor-product";report["maximumAbsoluteFactorProductError"]=entry.maximum_absolute_error;
       report["maximumRelativeFactorProductError"]=entry.maximum_relative_error;

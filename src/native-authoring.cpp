@@ -1,3 +1,4 @@
+#include "color-bound-memo.hpp"
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/native-authoring.hpp"
 #include "native-authoring-capture.hpp"
@@ -71,6 +72,7 @@ std::shared_ptr<const NativeAuthoringCapture> NativeAuthoringCapture::create(con
  return create(options,cancelled,SourceUvBakeOptions{});
 }
 std::shared_ptr<const NativeAuthoringCapture> NativeAuthoringCapture::create(const NativeAuthoringExport &options,const std::function<bool()> &cancelled,const SourceUvBakeOptions &policy){
+  ColorBoundScope color_bound_scope;
  stop(cancelled);if(!policy.max_working_bytes||policy.max_working_bytes>512*1024*1024)throw std::invalid_argument("Invalid native authoring working budget");if(!options.scene||!options.allow_portable_fallback)throw std::invalid_argument("Native authoring requires an immutable Scene and explicit portable-view permission");
  if(options.scope!=NativeAuthoringExport::Scope::WholeScene&&options.scope!=NativeAuthoringExport::Scope::ExportedObjects)throw std::invalid_argument("Unknown native authoring export scope");
  if((options.scope==NativeAuthoringExport::Scope::WholeScene&&!options.objects.empty())||(options.scope==NativeAuthoringExport::Scope::ExportedObjects&&options.objects.empty()))throw std::invalid_argument("Native authoring scope and object selection disagree");
@@ -89,6 +91,7 @@ GltfExportReport export_glb_authoring(const NativeAuthoringExport &owner,const s
  return export_glb_authoring(owner,path,options,SourceUvBakeOptions{});
 }
 GltfExportReport export_glb_authoring(const NativeAuthoringExport &owner,const std::filesystem::path &path,const GltfExportOptions &requested,const SourceUvBakeOptions &paint_policy){
+  detail::ColorBoundScope color_bound_scope;
  auto options=requested;options.cancelled=[first=requested.cancelled,second=paint_policy.cancelled]{return (first&&first())||(second&&second());};
  stop(options.cancelled);if(options.emission)throw std::invalid_argument("Competing native HDR and authoring export owners");if(path.extension()!=".glb")throw std::invalid_argument("Native authoring export requires.glb");if(!options.max_output_bytes||options.max_output_bytes>container_cap)throw std::invalid_argument("Invalid native authoring output limit");
  const auto capture=detail::NativeAuthoringCapture::create(owner,options.cancelled,paint_policy);

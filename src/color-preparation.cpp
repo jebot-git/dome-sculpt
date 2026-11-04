@@ -7,6 +7,7 @@
 #include "paint-color-access.hpp"
 #include "source-colors.hpp"
 #include "color-projection-quality.hpp"
+#include "color-bound-memo.hpp"
 #include "source-paint-pairing.hpp"
 #include "polygon-color-target.hpp"
 #include <mutex>
@@ -29,6 +30,35 @@ struct InitialProof {
 std::mutex proof_mutex;
 std::deque<InitialProof> initial_proofs;
 template<class T>bool same_owner(const std::weak_ptr<const T>&a,const std::shared_ptr<const T>&b){return a.lock()==b&&!a.owner_before(b)&&!b.owner_before(a);}
+std::optional<detail::ColorBoundMemoKey> bound_key(
+    const Mesh &mesh,const Mesh &current_mesh,const SourceColorPreparation &preparation,
+    const CreatorAppearance *appearance,const PaintColorProjection &projection,
+    const std::shared_ptr<const PolygonColorSurface> &descriptor,
+    std::span<const std::array<float,4>> colors,bool initial,uint64_t max_cells) {
+  if(!detail::color_bound_scope_active()||appearance||!descriptor||!descriptor->field||
+     !descriptor->topology||projection.quality_cells<512)return {};
+  std::shared_ptr<const Mesh> owner,current_owner;
+  if(!initial&&preparation.paint_sampling){
+    owner=preparation.paint_sampling->domain()->basis();
+    current_owner=preparation.paint_sampling->geometry_attachment()->authored_geometry();
+  }else if(preparation.original_paint)owner=current_owner=preparation.original_paint->mesh_owner();
+  if(owner.get()!=&mesh||current_owner.get()!=&current_mesh)return {};
+  // A borrowed/evaluated copy is not either genuine COW owner.
+  std::shared_ptr<const PaintColorProjection> projected;
+  if(preparation.projection.get()==&projection)projected=preparation.projection;
+  else if(preparation.initial_projection.get()==&projection)projected=preparation.initial_projection;
+  if(!projected||!projection.vertex_rgba)return {};
+  detail::ColorBoundMemoKey key;key.mesh=std::move(owner);key.current_mesh=std::move(current_owner);key.field=descriptor->field;
+  key.topology=descriptor->topology;key.projection=std::move(projected);key.image=projection.vertex_rgba;
+  key.source_paint=preparation.original_paint;key.sampling=preparation.paint_sampling;
+  key.material=preparation.original_material;key.deformation=preparation.original_deformation;
+  key.recipe=&preparation;key.max_cells=max_cells;key.claimed_cells=projection.quality_cells;
+  key.error_bits=std::bit_cast<std::array<uint32_t,4>>(projection.maximum_error);
+  key.dimensions={key.image->width,key.image->height};key.source_field=uint32_t(preparation.receipt.source_field);key.initial=initial;
+  key.image_content=detail::color_bound_digest(key.image->rgba);
+  key.colors_content=detail::color_bound_digest({reinterpret_cast<const uint8_t*>(colors.data()),colors.size_bytes()});
+  return key;
+}
 void verify_field(const Mesh &mesh,const SourceColorPreparation &preparation,const CreatorAppearance *appearance,const PaintColorProjection &projection,
                   const std::function<bool()> &cancelled,bool initial=false) {
   if(cancelled&&cancelled())throw std::runtime_error("Color projection validation cancelled");
@@ -40,7 +70,19 @@ void verify_field(const Mesh &mesh,const SourceColorPreparation &preparation,con
     ?detail::polygon_target_colors(sampling_mesh,*descriptor,cancelled)
     :preparation.vertex_field(mesh.positions.size(),appearance,cancelled);
   if(colors.empty())throw std::invalid_argument("Prepared color projection lost its raw original color authority");
-  auto bound=detail::color_projection_bound(sampling_mesh,colors,*projection.vertex_rgba,128'000'000,cancelled);
+  constexpr uint64_t max_cells=128'000'000;
+  detail::validate_color_projection_bound_input(sampling_mesh,colors,*projection.vertex_rgba,max_cells);
+  auto key=bound_key(sampling_mesh,mesh,preparation,appearance,projection,descriptor,colors,initial,max_cells);
+  auto memo=key?detail::find_color_bound(*key):std::nullopt;
+  if(memo&&cancelled&&cancelled())throw std::runtime_error("Color projection validation cancelled");
+  // A callback may have changed a legally mutable input. Never use/store a
+  // result under the old content/scalar identity in that case.
+  if(memo){auto current=bound_key(sampling_mesh,mesh,preparation,appearance,projection,descriptor,colors,initial,max_cells);
+    if(!current||!detail::same_color_bound_key(*key,*current)){memo.reset();key=std::move(current);}}
+  if(!projection.vertex_rgba)throw std::invalid_argument("Color projection lost its current image during validation");
+  auto bound=memo?*memo:detail::color_projection_bound(sampling_mesh,colors,*projection.vertex_rgba,max_cells,cancelled);
+  if(!memo&&key){auto current=bound_key(sampling_mesh,mesh,preparation,appearance,projection,descriptor,colors,initial,max_cells);
+    if(current&&detail::same_color_bound_key(*key,*current))detail::remember_color_bound(std::move(*key),bound);}
   if(bound.tested_cells!=projection.quality_cells)throw std::invalid_argument("Current color projection quality work differs from its recorded authority");
   for(size_t c=0;c<4;++c)if(bound.maximum_error[c]>projection.maximum_error[c])
     throw std::invalid_argument("Current color projection pixels exceed their recorded source-field error bound");

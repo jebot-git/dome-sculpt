@@ -67,6 +67,7 @@ bool refusal(auto fn,std::string_view expected){try{fn();}catch(const std::excep
 bool cancelled(std::future<void> work){if(work.wait_for(std::chrono::seconds(120))!=std::future_status::ready)throw std::runtime_error("Native physical Cancel observer timed out");return refusal([&]{work.get();},"cancelled");}
 NativeAuthoringExport owner(const Scene&s){NativeAuthoringExport out;out.scene=std::make_shared<const Scene>(s.snapshot());out.allow_portable_fallback=true;return out;}
 }
+#ifndef DOME_NATIVE_PHYSICAL_CONTRACTS_NO_MAIN
 int main(int argc,char**argv)try{
  if(argc<3||argc>4)return 2;const std::filesystem::path out=argv[1];std::filesystem::create_directories(out);
  auto scene=std::string_view(argv[2])=="--retained"?joint::transfer(prepared64()):
@@ -111,3 +112,5 @@ int main(int argc,char**argv)try{
  d.export_asset(running,AssetExportFormat::EditableGlb256).get();check(Scene::load(running).encode()==exact&&!d.frame().state->pending_exports,"New native export retry succeeds and retires file status");
  check(scene.encode()==exact,"All new native contracts leave original owning scene unchanged");std::cout<<"PASS "<<checks<<" new native physical contracts\n";return 0;
 }catch(const std::exception&e){durable_gate::release();std::cerr<<"FAIL "<<e.what()<<std::endl;return 1;}
+
+#endif
