@@ -1,5 +1,9 @@
 # Dome Sculpt production handoff
 
+## Private actual converted-normal UV editing — 2026-11-04
+
+Scene34/material16 now retains real root UV correspondence through Apply/Cancel/Undo/queued Save/restart, renderer/export, Clear and root-domain rebake. R/S each225 new views/workflow assertions,160 existing export,21kernel/11worker pass; actualArc226+161 and324KHR0errors/108exacttriples. Native normal/compact15each/profile and actual-loader syntheticXR20each pass. Real archive5,439decoder+8,959encoder C++ denial prefixes and24Cancel each pass; defaultcache/C/caller/IO separate. Original fresh224-task R/S builds0 but6/7runs/export8>4 negative preserved; complete matching-TU repair passes, no finalALL/full630/main claim. Read LAYERED-NORMAL-UV-NATIVE.md and receipt for actual artifact/observer negatives and remaining typed/key/corner/native32/device/composition work. Full goal and deferred controller drawers remain incomplete.
+
 ## Private normal-field UV safety and actual UI — 2026-11-04
 
 Real silent UV loss is preserved as a negative; actual producer/adopter now refuse atomically and untouched UV Done is NoOp. R/S10 safety +62 native +10 normal/10 compact/11 Wayland/30 syntheticXR checks pass each. Every run ends with zero drift; later test-only changes are explicit and final UI inputs remain exact. SAN privateMesa maps verified. Read LAYERED-NORMAL-UV-SAFETY-UI.md and receipt. Genuine changed-UV normal retention remains required; no full regression/main/physicalHMD claim. Full goal and later drawers remain incomplete.
