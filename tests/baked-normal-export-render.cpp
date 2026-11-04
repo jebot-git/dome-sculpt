@@ -12,7 +12,7 @@ int main(int argc,char **argv)try{
  for(int variant=0;variant<4;++variant){const auto initial=load_scene_file(source/("fan-"+std::to_string(variant)+".glb")).scene;
   for(int pose=0;pose<2;++pose)for(float weight:{0.f,.35f,1.f}){
    auto scene=initial;auto &object=scene.active();if(object.deformation){auto d=*object.deformation;if(d.morphs)d.morph_weights={weight};
-    if(d.skeleton){for(const auto &bone:d.skeleton->bones)d.pose.push_back(bone.rest);d.pose[0].rotation={0,0,std::sin(.075f),std::cos(.075f)};if(pose)d.pose[1].rotation={0,0,std::sin(.1f),std::cos(.1f)};}scene.set_deformation(object.id,d);}
+    if(d.skeleton){for(const auto &bone:d.skeleton->bones)d.pose.push_back(bone.rest);d.pose[0].rotation=Quat{std::cos(.075f),0,0,std::sin(.075f)};if(pose)d.pose[1].rotation=Quat{std::cos(.1f),0,0,std::sin(.1f)};}scene.set_deformation(object.id,d);}
    Document document;document.replace(scene);document.shading(false);
    check(document.wait_asset()&&document.wait_mesh()&&document.frame().state->error.empty(),"Actual native mirrored normal model publishes its current pose and morph");
    const auto file=out/("view-"+std::to_string(variant)+"-"+std::to_string(pose)+"-"+std::to_string(int(weight*100))+".glb");
