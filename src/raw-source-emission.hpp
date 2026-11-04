@@ -6,6 +6,7 @@
 #include "dome/source-maps.hpp"
 #include "paint-overlay-packet.hpp"
 #include "import-texture-transform.hpp"
+#include "raw-source-canonical.hpp"
 #include <algorithm>
 #include <bit>
 #include <optional>
@@ -23,17 +24,7 @@ struct RawSourceEmission {
 // or trusting parsed DTO values. Charge one peak, not every aliased material.
 inline size_t raw_emission_proof_bytes(const CreatorAppearance &a,
     const std::function<bool()> &cancelled={}) {
-  const auto &text=a.material_json;
-  if(text.size()>16*1024*1024)throw std::length_error("Raw source material JSON exceeds canonical limits");
-  size_t structural=1;bool quoted=false,escaped=false;
-  for(size_t n=0;n<text.size();++n){if((n&4095)==0&&cancelled&&cancelled())throw std::runtime_error("Raw material proof forecast cancelled");
-    const char c=text[n];
-    if(quoted){if(escaped)escaped=false;else if(c=='\\')escaped=true;else if(c=='"')quoted=false;}
-    else if(c=='"')quoted=true;else if(c=='{'||c=='['||c==':'||c==',')++structural;
-  }
-  const size_t bytes=8*text.size()+512*structural;
-  if(bytes>512*1024*1024)throw std::length_error("Raw material proof exceeds bounded working storage");
-  return bytes;
+  return raw_source_proof_plan(a,cancelled).bytes();
 }
 // Per-call replay, not a persistent seal or an arbitrary-surface permission.
 // Only the sealed capture authenticates geometry, placement and current owners;
@@ -84,27 +75,30 @@ inline std::optional<RawSourceEmission> raw_source_emission(
   if(!a.asset||!a.decoded_images||a.material<0||size_t(a.material)>=a.asset->materials.size()||
      a.source_vertices.size()!=mesh.positions.size())fail();
   const auto &m=a.asset->materials.at(size_t(a.material));
-  (void)raw_emission_proof_bytes(a,cancelled);
-  size_t nodes=0;
-  const auto canonical=a.material_json.empty()?nlohmann::json::object():
-    nlohmann::json::parse(a.material_json,[&](int depth,nlohmann::json::parse_event_t,const nlohmann::json&){
-      if(depth>128||++nodes>1'000'000)throw std::length_error("Raw material proof depth/count exceeded");
-      if((nodes&1023)==0)stop();return true;});
-  const auto factor=canonical.value("emissiveFactor",std::array<float,3>{});
-  float strength=1;
-  if(canonical.contains("extensions")&&canonical.at("extensions").contains("KHR_materials_emissive_strength"))
-    strength=canonical.at("extensions").at("KHR_materials_emissive_strength").value("emissiveStrength",1.f);
+  RawSourceCanonical canonical(a,cancelled);
+  const cgltf_material empty{};const auto *source=canonical.material();const auto &source_material=source?*source:empty;
+  std::array<float,3> factor{};std::copy_n(source_material.emissive_factor,3,factor.begin());
+  const float strength=source_material.has_emissive_strength?source_material.emissive_strength.emissive_strength:1;
   if(std::bit_cast<std::array<uint32_t,3>>(factor)!=std::bit_cast<std::array<uint32_t,3>>(m.emissive)||
      std::bit_cast<uint32_t>(strength)!=std::bit_cast<uint32_t>(m.emissive_strength))
     throw std::invalid_argument("Raw emission factor and strength differ from canonical source material");
+  canonical.role(source_material.pbr_metallic_roughness.base_color_texture,m.color_texture,m.color_texcoord,m.color_transform);
+  canonical.role(source_material.pbr_metallic_roughness.metallic_roughness_texture,m.metal_rough_texture,m.metal_rough_texcoord,m.metal_rough_transform);
+  canonical.role(source_material.normal_texture,m.normal_texture,m.normal_texcoord,m.normal_transform);
+  canonical.role(source_material.emissive_texture,m.emissive_texture,m.emissive_texcoord,m.emissive_transform);
+  canonical.role(source_material.occlusion_texture,m.occlusion_texture,m.occlusion_texcoord,m.occlusion_transform);
+  if(m.normal_scale!=(source_material.normal_texture.texture?source_material.normal_texture.scale:1)||
+     m.occlusion_strength!=(source_material.occlusion_texture.texture?source_material.occlusion_texture.scale:1))
+    throw std::invalid_argument("Raw normal/occlusion strength differs from canonical source authority");
   const ImportedPrimitive *primitive=nullptr;
   for(const auto &p:a.asset->primitives)if(p.source_mesh==a.source_mesh&&p.source_primitive==a.source_primitive){if(primitive)fail();primitive=&p;}
   if(!primitive||primitive->material!=uint32_t(a.material))fail();
   size_t work=0;
-  auto pair=[&](const auto &current,const auto &raw){
+  auto pair=[&](const auto &current,const auto &raw,int set){
     if(current.size()!=a.source_vertices.size())fail();
     for(size_t v=0;v<current.size();++v){if((++work&1023)==0)stop();if(a.source_vertices[v]>=raw.size()||
         std::bit_cast<std::array<uint32_t,2>>(current[v])!=std::bit_cast<std::array<uint32_t,2>>(raw[a.source_vertices[v]]))fail();}
+    canonical.coordinates(set,raw);
   };
   auto role=[&](const PaintSourceTexture &slot,int index,int coordinate,const ImportedTextureTransform &transform){
     if(index<0){if(slot.image)fail();return;}
@@ -114,9 +108,9 @@ inline std::optional<RawSourceEmission> raw_source_emission(
        slot.wrap_s!=t.wrap_s||slot.wrap_t!=t.wrap_t||slot.min_filter!=t.min_filter||slot.mag_filter!=t.mag_filter||
        slot.texcoord!=imported_texture_coordinate(coordinate,transform)||
        slot.uv_transform!=imported_texture_matrix(transform))fail();
-    if(slot.texcoord==0)pair(mesh.uv,primitive->mesh.uv);
-    else if(slot.texcoord==1){if(!maps->uv1)fail();pair(*maps->uv1,primitive->uv1);}
-    else {const auto set=uint32_t(slot.texcoord);if(!maps->extra_uv_sets.contains(set)||!primitive->extra_uv_sets.contains(set))fail();pair(*maps->extra_uv_sets.at(set),primitive->extra_uv_sets.at(set));}
+    if(slot.texcoord==0)pair(mesh.uv,primitive->mesh.uv,0);
+    else if(slot.texcoord==1){if(!maps->uv1)fail();pair(*maps->uv1,primitive->uv1,1);}
+    else {const auto set=uint32_t(slot.texcoord);if(!maps->extra_uv_sets.contains(set)||!primitive->extra_uv_sets.contains(set))fail();pair(*maps->extra_uv_sets.at(set),primitive->extra_uv_sets.at(set),int(set));}
   };
   role(maps->color,m.color_texture,m.color_texcoord,m.color_transform);
   role(maps->metal_rough,m.metal_rough_texture,m.metal_rough_texcoord,m.metal_rough_transform);
@@ -124,8 +118,8 @@ inline std::optional<RawSourceEmission> raw_source_emission(
   role(maps->emission,m.emissive_texture,m.emissive_texcoord,m.emissive_transform);
   role(maps->occlusion,m.occlusion_texture,m.occlusion_texcoord,m.occlusion_transform);
   if(maps->normal_scale!=m.normal_scale||maps->occlusion_strength!=m.occlusion_strength)fail();
-  if(maps->uv1)pair(*maps->uv1,primitive->uv1);
-  for(const auto &[set,values]:maps->extra_uv_sets){if(!primitive->extra_uv_sets.contains(set))fail();pair(*values,primitive->extra_uv_sets.at(set));}
+  if(maps->uv1)pair(*maps->uv1,primitive->uv1,1);
+  for(const auto &[set,values]:maps->extra_uv_sets){if(!primitive->extra_uv_sets.contains(set))fail();pair(*values,primitive->extra_uv_sets.at(set),int(set));}
   RawSourceEmission result;
   auto native=m.emissive;for(auto &c:native)c*=m.emissive_strength;
   if(native!=o.material_bindings->native_reference.emission)fail();
