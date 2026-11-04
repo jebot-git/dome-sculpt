@@ -19,9 +19,19 @@ async def wait(fn,seconds=30):
   if value:return value
   await asyncio.sleep(.04)
  raise TimeoutError('Actual native cage client did not reach expected state')
+def stop_processes():
+ for process in reversed(processes):
+  if process.poll() is None:
+   process.terminate()
+   try:process.wait(timeout=5)
+   except subprocess.TimeoutExpired:process.kill();process.wait()
+class PrivateHome(tempfile.TemporaryDirectory):
+ def __exit__(self,*args):
+  stop_processes()
+  return super().__exit__(*args)
 async def main():
  bus=await MessageBus().connect();await bus.request_name('com.canonical.AppMenu.Registrar')
- with tempfile.TemporaryDirectory(prefix='dome-cage-menu-') as home:
+ with PrivateHome(prefix='dome-cage-menu-') as home:
   read,write=os.pipe();log=(out/'xvfb.log').open('w');processes.append(subprocess.Popen(['Xvfb','-displayfd',str(write),'-screen','0','640x360x24' if compact else '1280x1000x24','-nolisten','tcp'],pass_fds=(write,),stdout=log,stderr=log));os.close(write)
   with os.fdopen(read) as f:screen=':'+f.readline().strip()
   env={**os.environ,'HOME':home,'DISPLAY':screen,'FLTK_BACKEND':'x11','XDG_CURRENT_DESKTOP':'Dome','LIBGL_ALWAYS_SOFTWARE':'1','LP_NUM_THREADS':'2','XMODIFIERS':'@im=none'}
@@ -86,7 +96,7 @@ async def main():
     tap(dialog,5,viewport/2,5 if item['y']+item['h']>viewport else 4);await asyncio.sleep(.1)
    raise TimeoutError('Native scroll never exposed '+label)
   async def choose_cage(dialog):
-   item=await visible(dialog,'Cage mesh');tap(dialog,item['x']+item['w']/2,item['y']+item['h']/2);await asyncio.sleep(.08);key('End');key('Return');selected=await wait(lambda:find('Cage mesh') if find('Cage mesh') and find('Cage mesh').get('choice')==2 else None)
+   item=await visible(dialog,'Cage mesh');tap(dialog,item['x']+item['w']/2,item['y']+item['h']/2);await asyncio.sleep(.15);key('Down');await asyncio.sleep(.08);key('Down');await asyncio.sleep(.08);key('Return');selected=await wait(lambda:find('Cage mesh') if find('Cage mesh') and find('Cage mesh').get('choice')==2 else None)
    check('envelope' in selected.get('selected',''),'Actual native FLTK choice selects the hidden Unicode cage mesh')
   dialog=await open_options();g=dialog.get_geometry();check(g.width<=600 if compact else g.width<1280,'Cage options fit the native work area');check(find('Cage mesh')['choice']==0,'Normal-offset projection remains the explicit default')
   await choose_cage(dialog);capture(dialog,'cage-choice.png');key('Control_L',True);key('w');key('Control_L',False);await wait(lambda:not named('Bake surface'));await command('Save');check(inspect()['scene']==original,'Universal Close cancels local cage selection with complete Scene unchanged')
