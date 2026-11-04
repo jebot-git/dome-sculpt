@@ -76,3 +76,36 @@ adapters remain required. These refusals are not Bake/cut functionality.
 Matching optimized/owned-sanitized builds and transition tests are pending at
 this source boundary. Root31 is sealed separately at7805e3c and has not been
 consumed here; the canonical flag continues to fail closed until actual union.
+
+
+The final foundation runtime is ffbb226. Matching Release and wholly owned
+ASan/UBSan/leak application/core/render/support builds passed10/10 selected
+commands in32.47/133.87 seconds. The new scopes are45 functional controls,
+1355 resource/failure/cancellation controls and13 transition controls per
+profile. All65 measured factory/deep-current-validation allocation prefixes,
+539 owning-decoder prefixes and56 factory cancellation polls close with exact
+rollback and retry. The real computed UV endpoint also rejects its dependent
+queued Save on Cancel and keeps the prior file/history exact.
+
+The larger borrowed-target counterexample is closed: the byte-identical8192
+input probe previously copied98304 bytes before max_work=1 refused (five
+allocation calls); the fixed const-reference entry refuses with only84 bytes
+of exception text (one call). No limits changed. Exact correspondence now
+validates without constructing redundant replay meshes. The borrowed grid
+path copies its output only after preflight and charges its live geometry;
+existing owned/color paths still move their meshes. The private late-Cancel
+linker seam and every consumer were rebuilt for the changed private signature.
+
+This is a qualified PRIVATE data/worker/codec foundation, not main admission or
+full-goal completion. Actual GUI/pixels, finite native32 export, explicit source
+Restore and intentional31/33 composition are next. An actual Document editable
+export currently refuses with `Native paint comparison baseline differs from
+its own source`, preserves the previous output sentinel and exact Scene, and
+allows a following exact native Save. This counterfactual drives the compiler
+adapter; it is not completed export support. Unsupported Bake/cut/normal/source
+transitions remain required future adapters, with atomic guards in this slice.
+
+Detailed commands, immutable source/artifact digests, profile-native comparisons,
+and all old failures are in validation/NATIVE-PAINT-SAMPLING32.json. The separate
+historical full-export denial sweep87154 remains live and unmodified; the new
+native32 denial tests do not replace its coverage or declare it complete.
