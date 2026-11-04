@@ -3,6 +3,7 @@
 #include "dome/document.hpp"
 #include "dome/uv.hpp"
 #include "dome/source-uv-bake.hpp"
+#include "dome/color-preparation.hpp"
 #include <atomic>
 #include <cstdlib>
 #include <iostream>
@@ -24,7 +25,7 @@ void draft(Document&d){d.begin_uv();require(d.wait_uv(),"Caller UV init");const 
 int main()try{
  auto initial=current_color_target_fixture::fixture(true);Document prepared;prepared.replace(initial);ObjectBakeSettings settings;settings.prepare_colors=true;settings.ao_samples=0;prepared.bake_from_object(initial.objects().back().id,settings);ready(prepared);const auto source=prepared.copy_scene();const auto before=source.encode();
  size_t count=0; nlohmann::json accepted;
- {Document measure;measure.replace(source);ready(measure);draft(measure);allocation::begin(-1);measure.end_uv(true);count=allocation::calls;allocation::stop();ready(measure);accepted=measure.copy_scene().encode();require(accepted.at("version")==23,"Actual caller measurement needs accepted Scene23");}
+ {Document measure;measure.replace(source);ready(measure);draft(measure);allocation::begin(-1);measure.end_uv(true);count=allocation::calls;allocation::stop();ready(measure);accepted=measure.copy_scene().encode();require(accepted.at("version")==30&&measure.copy_scene().active().bake_recipe==source.active().bake_recipe&&source.active().bake_recipe&&measure.copy_scene().active().material_bindings->color_preparation->uv_reprojection,"Actual caller keeps its genuine Bake recipe and accepted UV23 reprojection in Scene30");}
  std::cout<<"MEASURE "<<count<<" actual caller admission allocations"<<std::endl;
  size_t refused=0,optional=0;
  for(size_t boundary=0;boundary<count;++boundary){Document d;d.replace(source);ready(d);draft(d);const auto mesh=d.frame().state->uv->mesh;const auto topology=d.frame().state->uv->topology;const auto draft_undo=d.frame().state->can_undo;
