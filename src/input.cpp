@@ -84,6 +84,7 @@ const std::array<const char *, 12> &spatial_labels(int page) {
                      : root;
 }
 std::optional<VrParameter> spatial_parameter(int page, int sector) {
+  if(page==24&&sector==3)return VrParameter::ShapeMirror;
   if(page==24&&sector==4)return VrParameter::MorphWeight;
   if(page==24&&sector==7)return VrParameter::ShapeRestore;
   if(page==12&&sector==9)return VrParameter::BakeColors;
@@ -475,8 +476,8 @@ void SpatialInput::ray_controls(const SpatialSample &s, bool pressed) {
   bool color = parameter_ == VrParameter::InkColor ||
                parameter_ == VrParameter::InkEmission ||
                parameter_ == VrParameter::BaseColor || parameter_ == VrParameter::CutCapColor;
-  bool multi = parameter_==VrParameter::BakeColors || parameter_==VrParameter::BakeProjection || parameter_==VrParameter::ProceduralGrid || parameter_==VrParameter::ProceduralCoverage || color || parameter_ == VrParameter::SculptPlanes || parameter_ == VrParameter::CutDirection || parameter_ == VrParameter::RigRotation || parameter_==VrParameter::BakeDistances || parameter_==VrParameter::SkinDistances || parameter_==VrParameter::BakeQuality;
-  int components = (parameter_==VrParameter::BakeProjection || parameter_==VrParameter::ProceduralGrid || parameter_==VrParameter::BakeQuality || parameter_==VrParameter::CutDirection)?2:parameter_==VrParameter::ProceduralCoverage?3:parameter_==VrParameter::BakeDistances || parameter_==VrParameter::SkinDistances || parameter_ == VrParameter::RigRotation || parameter_ == VrParameter::InkEmission ? 3 : parameter_==VrParameter::BakeColors || color || parameter_ == VrParameter::SculptPlanes ? 4 : 1;
+  bool multi = parameter_==VrParameter::ShapeMirror || parameter_==VrParameter::BakeColors || parameter_==VrParameter::BakeProjection || parameter_==VrParameter::ProceduralGrid || parameter_==VrParameter::ProceduralCoverage || color || parameter_ == VrParameter::SculptPlanes || parameter_ == VrParameter::CutDirection || parameter_ == VrParameter::RigRotation || parameter_==VrParameter::BakeDistances || parameter_==VrParameter::SkinDistances || parameter_==VrParameter::BakeQuality;
+  int components = (parameter_==VrParameter::BakeProjection || parameter_==VrParameter::ProceduralGrid || parameter_==VrParameter::BakeQuality || parameter_==VrParameter::CutDirection)?2:(parameter_==VrParameter::ProceduralCoverage||parameter_==VrParameter::ShapeMirror)?3:parameter_==VrParameter::BakeDistances || parameter_==VrParameter::SkinDistances || parameter_ == VrParameter::RigRotation || parameter_ == VrParameter::InkEmission ? 3 : parameter_==VrParameter::BakeColors || color || parameter_ == VrParameter::SculptPlanes ? 4 : 1;
   if (s.trigger && s.panel_hit) {
     int row = 0;
     float y = .46875f;
@@ -626,8 +627,8 @@ void SpatialInput::update(const SpatialSample &s) {
     bool color = parameter_ == VrParameter::InkColor ||
                  parameter_ == VrParameter::InkEmission ||
                  parameter_ == VrParameter::BaseColor || parameter_ == VrParameter::CutCapColor;
-    bool multi = parameter_==VrParameter::BakeColors || parameter_==VrParameter::BakeProjection || parameter_==VrParameter::ProceduralGrid || parameter_==VrParameter::ProceduralCoverage || color || parameter_ == VrParameter::SculptPlanes || parameter_ == VrParameter::CutDirection || parameter_ == VrParameter::RigRotation || parameter_==VrParameter::BakeDistances || parameter_==VrParameter::SkinDistances || parameter_==VrParameter::BakeQuality;
-    int components = (parameter_==VrParameter::BakeProjection || parameter_==VrParameter::ProceduralGrid || parameter_==VrParameter::BakeQuality || parameter_==VrParameter::CutDirection)?2:parameter_==VrParameter::ProceduralCoverage?3:parameter_==VrParameter::BakeDistances || parameter_==VrParameter::SkinDistances || parameter_ == VrParameter::RigRotation || parameter_ == VrParameter::InkEmission ? 3 : parameter_==VrParameter::BakeColors || color || parameter_ == VrParameter::SculptPlanes ? 4 : 1;
+    bool multi = parameter_==VrParameter::ShapeMirror || parameter_==VrParameter::BakeColors || parameter_==VrParameter::BakeProjection || parameter_==VrParameter::ProceduralGrid || parameter_==VrParameter::ProceduralCoverage || color || parameter_ == VrParameter::SculptPlanes || parameter_ == VrParameter::CutDirection || parameter_ == VrParameter::RigRotation || parameter_==VrParameter::BakeDistances || parameter_==VrParameter::SkinDistances || parameter_==VrParameter::BakeQuality;
+    int components = (parameter_==VrParameter::BakeProjection || parameter_==VrParameter::ProceduralGrid || parameter_==VrParameter::BakeQuality || parameter_==VrParameter::CutDirection)?2:(parameter_==VrParameter::ProceduralCoverage||parameter_==VrParameter::ShapeMirror)?3:parameter_==VrParameter::BakeDistances || parameter_==VrParameter::SkinDistances || parameter_ == VrParameter::RigRotation || parameter_ == VrParameter::InkEmission ? 3 : parameter_==VrParameter::BakeColors || color || parameter_ == VrParameter::SculptPlanes ? 4 : 1;
     if (multi) {
       if (std::abs(s.stick_y) < .3f)
         y_latch_ = 0;
