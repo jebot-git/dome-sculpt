@@ -1,0 +1,52 @@
+{
+  "runtime": "7074bbc72116dec4b548f0a7cc717e9b63974b0d",
+  "build_scope": "Fresh optimized CPU app/core/render/FLTK/OpenXR support plus11 selected tests; no OpenXR launch or device use",
+  "source_count": 1636,
+  "outputs": {
+    "build/CMakeCache.txt": "7d4388bc2e78d25d1dae55e458468a8150da981449d7c546cc34f1b30fd7a0a7",
+    "build/compile_commands.json": "eb3cf6d807e10fa6c846ad643dc1289f7b218c52df5d6c00dbff475430e0233e",
+    "build/libdome-sculpt-emission-codec.a": "0fdaff67222e5ba80cc1bddb3c967d27796c78e17ec811f5d74e2771c72ed763",
+    "build/libdome-sculpt-affine.a": "c93f407790eb36c0aaf378555fec593d4e62561113c5fc43e717e6c98a21eb94",
+    "build/libxatlas.a": "28c913c50465aaa5f86e508ff06c7a24e31677e68113d294653488d8a86051c6",
+    "build/libmikktspace.a": "b6a63966e066c3c726793a6c69b5ff6a6cbe7095d150654708b5bf19e1b763a6",
+    "build/libufbx.a": "02dcaa1b15be2c29844a8157b67f73762bf9923ea6d19fddaab47225bc7f8ebf",
+    "build/libdome-sculpt-polygon.a": "af06e73d4ef3f782f8fae3507228626247c656a6e85c3769ee5d3925dc45950f",
+    "build/libmikktspace-robust.a": "2047953632c7503265ff4d34470289295aaf0c3cb2d45c51e5bc134b1ef5fd3d",
+    "build/libdome-sculpt-spacenav.a": "3ca7aaa2420c3268024c6a5f57bcc6b9c8cec3f8d46a4db87c760a5751d67c95",
+    "build/libdome-sculpt-core.a": "17c5e15bad8ae470f5705bb4df9a7fc1c90599e02422c78102c8de99ebc2e812",
+    "build/libdome-sculpt-render.a": "9ab1bfb98ee9f083a07f63ec13e55a8334a5e22b965270f77348fb97d71f3365",
+    "build/libdome-sculpt-xr.a": "bd0a540192b41c488399b2920ba10c97957a71d2965179b038cc20f873887c54",
+    "build/dome-sculpt": "b47d9a371da743b105100f4c1e69d90c8cfb5c0f6fd988f43d3d1eb31f789795",
+    "build/dome-sculpt-geometry-weight-authoring-test": "06e0d554d43d41e21c554112a7d40374451d0a6275f87b9441425c95da6c7550",
+    "build/dome-sculpt-native-weight-handles-test": "aa18ae03894a60ba153e4aadaf7bfb3c34eb430b67826bbb1284243b517da91f",
+    "build/dome-sculpt-rig-source-unskinned-test": "463eeded0b581ecd031a9767cbfb4b6b7daa09cecbdf81114a63c4caa7b3251e",
+    "build/dome-sculpt-rig-source-unskinned-faults-test": "255ba27caacf38765b5ea91f99ceb84734007e0b8f4a1fc7194f43f10442ba90",
+    "build/dome-sculpt-atomic-write-allocation-test": "60b0c51cd590185e2e34b65021d80f4552a7d5ac6079ee94fac2f01fd327cf3d",
+    "build/dome-sculpt-rig-rest-authoring-test": "6c686fcd66e56dd9ac096e8a2389f53af724e9c62eddc273279f721c34cf8511",
+    "build/dome-sculpt-source-visible-skin-test": "71d08f2979a6b1ab9389fa81c4abb734ff43e9bb83ab1aa3d959525819e60f7c",
+    "build/dome-sculpt-source-visible-placement-test": "82ef743233f0964ec5fb003ba4a1ffe29156b5e0ed95023fac50958151ba2132",
+    "build/dome-sculpt-source-visible-document-test": "6f3a7bdfb44f1cf2ef840b1cffc5168de2a1881ae94898725d828d72f493d38d",
+    "build/dome-sculpt-source-visible-locks-test": "a95bfaf005b52485933c2d22753cb10e021ea40294f6d6068f3ed4c174d0066d"
+  },
+  "all_source_output_hashes_unchanged": true,
+  "tests": [
+    {
+      "count": 9,
+      "seconds": 57.47,
+      "result": "pass",
+      "log_sha256": "3f108c4e06860bf07a454f57c7f4dc570808cb0f274a0e35eb22edac46ea73b8"
+    },
+    {
+      "count": 2,
+      "seconds": 17.17,
+      "result": "pass",
+      "log_sha256": "98efd7016f327153c6c6d153a20418bdfcd61b1ad0a1b8ca8836b8ce164c3c14"
+    }
+  ],
+  "limitations": [
+    "No full solver SAN/new public binding admission",
+    "General connected-openU quality failure sealed9309833",
+    "NativeBoneAxes explicitly refuses raw imported-skin axes",
+    "Pure originally-unskinned Restore134prefix proof is distinct from later IO allocation handling"
+  ]
+}

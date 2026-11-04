@@ -1,0 +1,7 @@
+# Native finite-handle coherent checkpoint
+
+Private7074 uses native authored Skeleton::segments local-Y/length handles, including genuine leaf length and current deform flags. It does not replace them with unrelated child heads or zero-length leaf points. Nonuniform current-world metric uses actual transformed endpoints. ChildHeadControl remains an explicit sensitive control. Imported raw skinned axes are refused; the existing source-authenticated source-assisted route is unchanged.
+
+The tree includes the independently qualified original-unskinned full capsule Restore adapter a5ab8c3 and portable staged-IO fix5ab9168. All appended source-assisted layouts and new private inline producers were rebuilt coherently in an optimized CPU app/core/render/FLTK/OpenXR support configuration. Eleven selected registered tests pass:9/9 in57.47s (native handles, geometry producer, Restore/faults/legacy, source placement/document/locks, atomic IO) plus female/male2/2 in17.17s. All1636 tracked inputs and24 output/config hashes are exact before/after.
+
+This is a selected coherent CPU build/test checkpoint. It adds no general automatic-bind public method and proves no new actual controller/frontend run, full solver sanitizer, whole-scene unbound-rig export or arbitrary complex-mesh quality. The subsequent connected open-U failure remains a real blocker, preserved in9309833; it is not waived by the small producer/handle tests.
