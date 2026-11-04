@@ -1,16 +1,16 @@
 # Dome Sculpt production handoff
 
-## Qualified mixed archive endpoints — 2026-11-05
+## Qualified combined authoring foundation — 2026-11-05
 
-Private1299fb4 seals actual mixed152 R/S/Arc and both complete archive profiles:
-12,149decoder/24,003encoder persistent C++ prefixes plus84loadCancel each.
-48 Khronos files0errors; original failures and scope limits remain preserved.
-Read PRIVATE-AUTHORING-PROGRESS.md for the current state: fresh1d sanitizer
-build and32 selected tests pass; Release ALL remains live. Owning HDR codec
-repair passes Release and scoped OOM checks, with fresh sanitizer pending.
-Ordinary rig Restore repair and remaining VRM/fixture integration are private;
-interrupted original f2 regression continuation remains separate. No main runtime or full-goal
-completion; all remaining original/additional rows and later drawers remain.
+Foundation4b37f11 completes fresh Release ALL1397 and owning SAN276 builds;
+selected32 and actual native/compact/Wayland/syntheticXR65 pass each profile.
+Current full689 regression remains running. Next1f completes owning Release294
+and52/52 including real repository anatomical17; SAN remains live. Skin export
+117R/S/Arc, first-rig Restore3ec and owned EXR e29 are separately qualified and
+queued for combined integration. Read PRIVATE-AUTHORING-PROGRESS.md for exact
+scopes, retained failures, ongoing VRM/HDR/rig adapters and original f2 continuation.
+Full production and controller drawers remain incomplete; no install/HMD/session
+action is included.
 
 ## Repaired mixed workflows and new coherent build — 2026-11-04
 
