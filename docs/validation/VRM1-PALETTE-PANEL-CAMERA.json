@@ -1,0 +1,363 @@
+{
+  "scope": "Test-only panel camera correction onf117/44; complete whole consumer on immutable fresh44 R/S render/support plus f7 repaired core. No product/header change, fresh full app or full union test claim.",
+  "old_failure": {
+    "root_source": "f7f1e13e9121184affe9b4863a82ec46d9b927d2",
+    "path": "artifacts/authoring-union-repair-44ef/artifacts/repair-registered/release/registered-followup.log",
+    "message": "Expression/emission page transitions refresh the actual cached bitmap contents",
+    "actual_original_coexistence_captures": "all4RGBAzero: alpha coverage0, identicalPNGsha256a15060918b0e prefix; real controller moved actual panel outof old origin camera. Original28/30 result retained."
+  },
+  "repair": "Frame actual state.panel inverse onlyin testVP, preserve real controller poses; assert each capture visible>300 and nonuniform, then retain exact cached-vs-fresh and different-page bitmap predicates, heldCancel/source/history oracles.",
+  "test_sha256": "43f0c3059dcf83a873cd7c22801b433ea9fa666588b76b53cda80180ac6ee64a",
+  "profiles": {
+    "release": {
+      "status": {
+        "state": "terminal",
+        "steps": [
+          {
+            "name": "compile",
+            "command": [
+              "/usr/bin/c++",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/input-palette-camera-f117/src",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/input-palette-camera-f117/third_party/desktop",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/input-palette-camera-f117/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/input-palette-camera-f117/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/input-palette-camera-f117/third_party/nlohmann",
+              "-isystem",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/harfbuzz",
+              "-isystem",
+              "/usr/include/glib-2.0",
+              "-isystem",
+              "/usr/lib64/glib-2.0/include",
+              "-isystem",
+              "/usr/include/sysprof-6",
+              "-isystem",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/freetype2",
+              "-isystem",
+              "/usr/include/libpng16",
+              "-isystem",
+              "/usr/include/libxml2",
+              "-O3",
+              "-DNDEBUG",
+              "-std=gnu++20",
+              "-pthread",
+              "-DWITH_GZFILEOP",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/input-palette-camera-f117/artifacts/palette-proof/v2-release/stage/palette.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/input-palette-camera-f117/tests/vrm1-expression-palette.cpp"
+            ],
+            "exit": 0,
+            "seconds": 6.603870933991857
+          },
+          {
+            "name": "link",
+            "command": [
+              "/usr/bin/c++",
+              "-O3",
+              "-DNDEBUG",
+              "/home/blux/de-xr/dome-sculpt/artifacts/input-palette-camera-f117/artifacts/palette-proof/v2-release/stage/palette.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/input-palette-camera-f117/artifacts/palette-proof/v2-release/stage/palette",
+              "-Wl,-rpath,/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib",
+              "/home/blux/de-xr/dome-sculpt/artifacts/input-palette-camera-f117/artifacts/palette-proof/v2-release/stage/libdome-sculpt-render.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/input-palette-camera-f117/artifacts/palette-proof/v2-release/stage/libdome-sculpt-core.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/input-palette-camera-f117/artifacts/palette-proof/v2-release/stage/libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/input-palette-camera-f117/artifacts/palette-proof/v2-release/stage/libdome-sculpt-polygon.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/input-palette-camera-f117/artifacts/palette-proof/v2-release/stage/libxatlas.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/input-palette-camera-f117/artifacts/palette-proof/v2-release/stage/libmikktspace.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/input-palette-camera-f117/artifacts/palette-proof/v2-release/stage/libmikktspace-robust.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/input-palette-camera-f117/artifacts/palette-proof/v2-release/stage/libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/input-palette-camera-f117/artifacts/palette-proof/v2-release/stage/libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libharfbuzz.so",
+              "/usr/lib64/libEGL.so",
+              "/usr/lib64/libGL.so",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libfreetype.so",
+              "/usr/lib64/libicui18n.so",
+              "/usr/lib64/libicuuc.so",
+              "/usr/lib64/libfontconfig.so",
+              "/usr/lib64/libz.so",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit": 0,
+            "seconds": 0.507014493981842
+          },
+          {
+            "name": "native",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/input-palette-camera-f117/artifacts/palette-proof/v2-release/stage/palette",
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-union-repair-44ef/artifacts/repair-registered/release/vrm1-background-fixture/baseline.dsculpt",
+              "/home/blux/de-xr/dome-sculpt/artifacts/input-palette-camera-f117/artifacts/palette-proof/v2-release/images"
+            ],
+            "exit": 0,
+            "seconds": 1.1031840070500039
+          }
+        ],
+        "scope": "Test-only whole consumer on immutable fresh44 owning ABI/support with f7 repaired core; all public/private/transitive header bytes compared. No production edit, root tree mutation, fresh whole app or full suite claim.",
+        "fixture": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-union-repair-44ef/artifacts/repair-registered/release/vrm1-background-fixture/baseline.dsculpt",
+        "identical_headers": 389,
+        "staged_archives": {
+          "libdome-sculpt-affine.a": "b9a8bb64084a5dee888837118d269129f5ab0c03bd5ee11881d9fda9e48e0d9b",
+          "libxatlas.a": "e39575bd59fbadec722f0a7c0ddd5c171f913c99ffaa5ef67b1a0b588972834f",
+          "libufbx.a": "a3498b5cae7ff7298cad646f68ff74776c3a22682316c5ba013df046e9e5acf5",
+          "libmikktspace.a": "126b7bec428c029ca0ed1468dbb8c29fbf8e430899a37846cce5ec73ad4bb01e",
+          "libdome-sculpt-polygon.a": "9ac0337b2cff6c4d0908b47495e861937cdc98cb6fe94b10592225cb94fd2f47",
+          "libmikktspace-robust.a": "46d9dd03dc49d9346dee9f0a41bea5df89d721ac4dfcf5e1db594ce5f1814eaf",
+          "libdome-sculpt-emission-codec.a": "320e3c030161900f88088a1d12815f4ee32ead1d19b2c3e8e7bb125eaaa8b148",
+          "libdome-sculpt-core.a": "6ae5b846b548b61b4ff358318ae81c8b198ecd36ae278d4af9117a8c3f30fe4c",
+          "libdome-sculpt-render.a": "ba58328b379cebc433e419133a32793188f4fec655fc74f2333a6f6d3f55ffee",
+          "libdome-sculpt-spacenav.a": "494cf5a6b4941d5f3b87ff2a5e5f4cf47b2d2009949704e69546ad406f3beccc",
+          "libdome-sculpt-xr.a": "4c6c02f2f30c57487974b012e8d8c71b6def274379e83d03b796368474621bc1"
+        },
+        "child_pid": 2489444,
+        "exit": 0,
+        "seconds": 8.535435689962469,
+        "drift": [],
+        "inputs": 2082
+      },
+      "manifests": {
+        "before.json": "38488258e2b0e5c8fc6ebe333d36f636f50536dbc7e13dd78fed41429b5f7bbd",
+        "after.json": "38488258e2b0e5c8fc6ebe333d36f636f50536dbc7e13dd78fed41429b5f7bbd"
+      },
+      "captures": [
+        {
+          "name": "zero.png",
+          "sha256": "e774006cffb1eff705fb1b5528f41ae473672d898a8fd00cb0e31f95a4d71ab3",
+          "visible_alpha_pixels": 409600,
+          "unique_colours": 4
+        },
+        {
+          "name": "cached-ten.png",
+          "sha256": "48d7e2dcb8de89eb61882f880169632493682a74f9347b2c94048456b508900c",
+          "visible_alpha_pixels": 409600,
+          "unique_colours": 4
+        },
+        {
+          "name": "fresh-ten.png",
+          "sha256": "48d7e2dcb8de89eb61882f880169632493682a74f9347b2c94048456b508900c",
+          "visible_alpha_pixels": 409600,
+          "unique_colours": 4
+        },
+        {
+          "name": "noop-ten.png",
+          "sha256": "48d7e2dcb8de89eb61882f880169632493682a74f9347b2c94048456b508900c",
+          "visible_alpha_pixels": 409600,
+          "unique_colours": 4
+        },
+        {
+          "name": "coexist-emission.png",
+          "sha256": "7ee957a9944e2eae1fc92434570ff122c63717b3b6bac0cc830209848280f8df",
+          "visible_alpha_pixels": 409600,
+          "unique_colours": 5
+        },
+        {
+          "name": "coexist-emission-fresh.png",
+          "sha256": "7ee957a9944e2eae1fc92434570ff122c63717b3b6bac0cc830209848280f8df",
+          "visible_alpha_pixels": 409600,
+          "unique_colours": 5
+        },
+        {
+          "name": "coexist-expression.png",
+          "sha256": "6e32333bd39526c0d5b5a2e1084c22739e74bd37631561a00b15206a33c6c48e",
+          "visible_alpha_pixels": 409600,
+          "unique_colours": 4
+        },
+        {
+          "name": "coexist-expression-fresh.png",
+          "sha256": "6e32333bd39526c0d5b5a2e1084c22739e74bd37631561a00b15206a33c6c48e",
+          "visible_alpha_pixels": 409600,
+          "unique_colours": 4
+        }
+      ]
+    },
+    "sanitize": {
+      "status": {
+        "state": "terminal",
+        "steps": [
+          {
+            "name": "compile",
+            "command": [
+              "/usr/bin/c++",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/input-palette-camera-f117/src",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/input-palette-camera-f117/third_party/desktop",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/input-palette-camera-f117/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/input-palette-camera-f117/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/input-palette-camera-f117/third_party/nlohmann",
+              "-isystem",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/harfbuzz",
+              "-isystem",
+              "/usr/include/glib-2.0",
+              "-isystem",
+              "/usr/lib64/glib-2.0/include",
+              "-isystem",
+              "/usr/include/sysprof-6",
+              "-isystem",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/freetype2",
+              "-isystem",
+              "/usr/include/libpng16",
+              "-isystem",
+              "/usr/include/libxml2",
+              "-O1",
+              "-g1",
+              "-DNDEBUG",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "-std=gnu++20",
+              "-pthread",
+              "-DWITH_GZFILEOP",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/input-palette-camera-f117/artifacts/palette-proof/v2-sanitize/stage/palette.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/input-palette-camera-f117/tests/vrm1-expression-palette.cpp"
+            ],
+            "exit": 0,
+            "seconds": 8.459070445038378
+          },
+          {
+            "name": "link",
+            "command": [
+              "/usr/bin/c++",
+              "-O1",
+              "-g1",
+              "-DNDEBUG",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "/home/blux/de-xr/dome-sculpt/artifacts/input-palette-camera-f117/artifacts/palette-proof/v2-sanitize/stage/palette.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/input-palette-camera-f117/artifacts/palette-proof/v2-sanitize/stage/palette",
+              "-Wl,-rpath,/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib",
+              "/home/blux/de-xr/dome-sculpt/artifacts/input-palette-camera-f117/artifacts/palette-proof/v2-sanitize/stage/libdome-sculpt-render.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/input-palette-camera-f117/artifacts/palette-proof/v2-sanitize/stage/libdome-sculpt-core.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/input-palette-camera-f117/artifacts/palette-proof/v2-sanitize/stage/libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/input-palette-camera-f117/artifacts/palette-proof/v2-sanitize/stage/libdome-sculpt-polygon.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/input-palette-camera-f117/artifacts/palette-proof/v2-sanitize/stage/libxatlas.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/input-palette-camera-f117/artifacts/palette-proof/v2-sanitize/stage/libmikktspace.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/input-palette-camera-f117/artifacts/palette-proof/v2-sanitize/stage/libmikktspace-robust.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/input-palette-camera-f117/artifacts/palette-proof/v2-sanitize/stage/libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/input-palette-camera-f117/artifacts/palette-proof/v2-sanitize/stage/libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libharfbuzz.so",
+              "/usr/lib64/libEGL.so",
+              "/usr/lib64/libGL.so",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libfreetype.so",
+              "/usr/lib64/libicui18n.so",
+              "/usr/lib64/libicuuc.so",
+              "/usr/lib64/libfontconfig.so",
+              "/usr/lib64/libz.so",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit": 0,
+            "seconds": 3.082506937033031
+          },
+          {
+            "name": "native",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/input-palette-camera-f117/artifacts/palette-proof/v2-sanitize/stage/palette",
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-union-repair-44ef/artifacts/repair-proof-fixed/sanitize/vrm1-background-fixture/baseline.dsculpt",
+              "/home/blux/de-xr/dome-sculpt/artifacts/input-palette-camera-f117/artifacts/palette-proof/v2-sanitize/images"
+            ],
+            "exit": 0,
+            "seconds": 2.777151098998729
+          }
+        ],
+        "scope": "Test-only whole consumer on immutable fresh44 owning ABI/support with f7 repaired core; all public/private/transitive header bytes compared. No production edit, root tree mutation, fresh whole app or full suite claim.",
+        "fixture": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-union-repair-44ef/artifacts/repair-proof-fixed/sanitize/vrm1-background-fixture/baseline.dsculpt",
+        "identical_headers": 389,
+        "staged_archives": {
+          "libdome-sculpt-affine.a": "fb434accb2351cfae2d5052becd9e0228aac4e9924913d9cdaa18b257637c1ff",
+          "libxatlas.a": "2ac2970978df2b04026e5217a276554e64af4018b86cb27ad7670da674271367",
+          "libufbx.a": "696cf1db333459b75f4041dc5cd109c96f8f2c4e45e97f044b789e8d01d4519e",
+          "libmikktspace.a": "9f5c86659ab50f29fd3356bbc1a1c98610d6a6939a338d38fb2a81ee959af33b",
+          "libmikktspace-robust.a": "bda3e6591b43b1eac7e1b15283c79fbf4a2d65f61658d35e6dda0d0243e68615",
+          "libdome-sculpt-polygon.a": "68f90f4dd36fbaf7d5b8648a1fc5fdcedd11c431fc73fb912d9fdfeafd1a429d",
+          "libdome-sculpt-emission-codec.a": "859c1ea125e4919150b3cbfe5c5d582c840b7c5beb5b8e083d05aa882fc61ac2",
+          "libdome-sculpt-spacenav.a": "43c45b02dbfcb5ef96c5f5aa33e7a141044ff2cf5f2347219c896a201414c73c",
+          "libdome-sculpt-core.a": "bff355a2f166c9048af81751fe672f3a76c0ef62ed7e45a693d92d64bed05f7c",
+          "libdome-sculpt-render.a": "1fd941fe1433abed423f31eb351ec0eea30f9935f98420956008c4024190078c",
+          "libdome-sculpt-xr.a": "a1163d3b762955509eaded99322c451b05dd492ee625931b5de2a2a89910417b"
+        },
+        "child_pid": 2490192,
+        "exit": 0,
+        "seconds": 17.420667961006984,
+        "drift": [],
+        "inputs": 2082
+      },
+      "manifests": {
+        "before.json": "fe036546018338af817b515ee96602e23d350ac2c6c13c045565b17ee2beeb4d",
+        "after.json": "fe036546018338af817b515ee96602e23d350ac2c6c13c045565b17ee2beeb4d"
+      },
+      "captures": [
+        {
+          "name": "zero.png",
+          "sha256": "e774006cffb1eff705fb1b5528f41ae473672d898a8fd00cb0e31f95a4d71ab3",
+          "visible_alpha_pixels": 409600,
+          "unique_colours": 4
+        },
+        {
+          "name": "cached-ten.png",
+          "sha256": "48d7e2dcb8de89eb61882f880169632493682a74f9347b2c94048456b508900c",
+          "visible_alpha_pixels": 409600,
+          "unique_colours": 4
+        },
+        {
+          "name": "fresh-ten.png",
+          "sha256": "48d7e2dcb8de89eb61882f880169632493682a74f9347b2c94048456b508900c",
+          "visible_alpha_pixels": 409600,
+          "unique_colours": 4
+        },
+        {
+          "name": "noop-ten.png",
+          "sha256": "48d7e2dcb8de89eb61882f880169632493682a74f9347b2c94048456b508900c",
+          "visible_alpha_pixels": 409600,
+          "unique_colours": 4
+        },
+        {
+          "name": "coexist-emission.png",
+          "sha256": "7ee957a9944e2eae1fc92434570ff122c63717b3b6bac0cc830209848280f8df",
+          "visible_alpha_pixels": 409600,
+          "unique_colours": 5
+        },
+        {
+          "name": "coexist-emission-fresh.png",
+          "sha256": "7ee957a9944e2eae1fc92434570ff122c63717b3b6bac0cc830209848280f8df",
+          "visible_alpha_pixels": 409600,
+          "unique_colours": 5
+        },
+        {
+          "name": "coexist-expression.png",
+          "sha256": "6e32333bd39526c0d5b5a2e1084c22739e74bd37631561a00b15206a33c6c48e",
+          "visible_alpha_pixels": 409600,
+          "unique_colours": 4
+        },
+        {
+          "name": "coexist-expression-fresh.png",
+          "sha256": "6e32333bd39526c0d5b5a2e1084c22739e74bd37631561a00b15206a33c6c48e",
+          "visible_alpha_pixels": 409600,
+          "unique_colours": 4
+        }
+      ]
+    }
+  },
+  "setup_negative": "Initial ignored driver CTestJSON lackedcommand for unbuilt original target; no compiler/runtime executed. Actual registered baseline path then used from immutable repaired cohort.",
+  "GPU": false
+}
