@@ -376,7 +376,8 @@ void SpatialPalette::raster(const EditorState &s) {
     }
     text(320 * unit_, 530 * unit_, "Aim + trigger: drag slider", fg);
     if(c.parameter==VrParameter::BakeSource){
-      rect(160*unit_,410*unit_,320*unit_,44*unit_,s.bake_recipe?accent:grid);
+      const auto disabled=s.light?Color{200,209,220,uint8_t(s.opacity)}:Color{55,65,80,uint8_t(s.opacity)};
+      rect(160*unit_,410*unit_,320*unit_,44*unit_,s.bake_recipe?accent:disabled);
       text(320*unit_,440*unit_,s.bake_recipe?(c.bake_preset?"Recipe loaded":"Recall last bake"):"No saved bake yet",fg);
     }
     text(320 * unit_, 560 * unit_,
