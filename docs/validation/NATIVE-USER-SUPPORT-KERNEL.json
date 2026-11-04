@@ -1,0 +1,379 @@
+{
+  "scope": "Optional explicit user-support kernel oracle. Not automatic inference, native UI admission or full solver sanitizer qualification.",
+  "parent": "f068bc3",
+  "kernel_release": "PASS 10 independent Dirichlet/load/partition/cancel/atomicity controls\n",
+  "kernel_asserted_sanitize": "PASS 10 independent Dirichlet/load/partition/cancel/atomicity controls\n",
+  "matched_build": [
+    [
+      "src/native-visible-weights.cpp",
+      0,
+      [
+        "/usr/bin/c++",
+        "-DDOME_SCULPT_INSTALLED_ASSETS=\"/usr/local/share/dome-sculpt/assets/humanoid\"",
+        "-DDOME_SCULPT_SOURCE_ASSETS=\"/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-morph-attachment-f068bc3/assets/humanoid\"",
+        "-I/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-morph-attachment-f068bc3/third_party",
+        "-I/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-morph-attachment-f068bc3/include",
+        "-I/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-morph-attachment-f068bc3/third_party/openbrush",
+        "-I/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-morph-attachment-f068bc3/third_party/cgltf",
+        "-I/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-morph-attachment-f068bc3/third_party/nlohmann",
+        "-I/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-morph-attachment-f068bc3/third_party/xatlas",
+        "-I/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-morph-attachment-f068bc3/third_party/mikktspace",
+        "-I/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-morph-attachment-f068bc3/third_party/ufbx",
+        "-O3",
+        "-DNDEBUG",
+        "-std=gnu++20",
+        "-Wall",
+        "-Wextra",
+        "-Wpedantic",
+        "-o",
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-morph-attachment-f068bc3/artifacts/native-visible-weights.cpp.o",
+        "-c",
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-morph-attachment-f068bc3/src/native-visible-weights.cpp"
+      ]
+    ],
+    [
+      "src/source-visible-weights.cpp",
+      0,
+      [
+        "/usr/bin/c++",
+        "-DDOME_SCULPT_INSTALLED_ASSETS=\"/usr/local/share/dome-sculpt/assets/humanoid\"",
+        "-DDOME_SCULPT_SOURCE_ASSETS=\"/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-morph-attachment-f068bc3/assets/humanoid\"",
+        "-I/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-morph-attachment-f068bc3/third_party",
+        "-I/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-morph-attachment-f068bc3/include",
+        "-I/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-morph-attachment-f068bc3/third_party/openbrush",
+        "-I/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-morph-attachment-f068bc3/third_party/cgltf",
+        "-I/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-morph-attachment-f068bc3/third_party/nlohmann",
+        "-I/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-morph-attachment-f068bc3/third_party/xatlas",
+        "-I/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-morph-attachment-f068bc3/third_party/mikktspace",
+        "-I/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-morph-attachment-f068bc3/third_party/ufbx",
+        "-O3",
+        "-DNDEBUG",
+        "-std=gnu++20",
+        "-Wall",
+        "-Wextra",
+        "-Wpedantic",
+        "-o",
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-morph-attachment-f068bc3/artifacts/source-visible-weights.cpp.o",
+        "-c",
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-morph-attachment-f068bc3/src/source-visible-weights.cpp"
+      ]
+    ],
+    [
+      "tests/native-user-support-field.cpp",
+      0,
+      [
+        "/usr/bin/c++",
+        "-I/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-morph-attachment-f068bc3/src",
+        "-I/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-morph-attachment-f068bc3/include",
+        "-I/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-morph-attachment-f068bc3/third_party/openbrush",
+        "-I/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-morph-attachment-f068bc3/third_party/nlohmann",
+        "-O3",
+        "-DNDEBUG",
+        "-std=gnu++20",
+        "-o",
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-morph-attachment-f068bc3/artifacts/native-user-support-field.cpp.o",
+        "-c",
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-morph-attachment-f068bc3/tests/native-user-support-field.cpp"
+      ]
+    ]
+  ],
+  "matched_link": {
+    "command": [
+      "/usr/bin/c++",
+      "-O3",
+      "-DNDEBUG",
+      "-Wl,--dependency-file=/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-morph-attachment-f068bc3/artifacts/candidate.link.d",
+      "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-morph-attachment-f068bc3/artifacts/native-user-support-field.cpp.o",
+      "-o",
+      "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-morph-attachment-f068bc3/artifacts/native-user-support-field",
+      "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-morph-attachment-f068bc3/artifacts/libdome-sculpt-core.a",
+      "libdome-sculpt-affine.a",
+      "/usr/lib64/liblapacke.so",
+      "libdome-sculpt-polygon.a",
+      "libxatlas.a",
+      "libmikktspace.a",
+      "libmikktspace-robust.a",
+      "libufbx.a",
+      "/usr/lib64/libpng.so",
+      "/usr/lib64/libjpeg.so",
+      "/usr/lib64/libz.so",
+      "libdome-sculpt-emission-codec.a",
+      "/usr/lib64/libOpenEXR-3_2.so",
+      "/usr/lib64/libOpenEXRUtil-3_2.so",
+      "/usr/lib64/libOpenEXRCore-3_2.so",
+      "/usr/lib64/libIex-3_2.so",
+      "/usr/lib64/libIlmThread-3_2.so",
+      "/usr/lib64/libImath-3_1.so",
+      "-lgcc_s_asneeded",
+      "-lgcc_s_asneeded"
+    ],
+    "exit": 0,
+    "original_core": "d901ac7aec3b0337497dba3fbd73744707518805b4cc4f67c858bb490a58e275",
+    "replacement_core": "32c8e5ad369664072de3e88f899dac8754bb95479c6771dca030c19e9a2f85ca"
+  },
+  "initial_partial_head_inputs": [
+    {
+      "sex": "female",
+      "kind": "global",
+      "exit": 0,
+      "seconds": 2.3739335749996826,
+      "command": [
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-context-api-7849001/build/dome-sculpt-native-unskinned-quality-test",
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-morph-attachment-f068bc3/assets/humanoid/vroid/base-female.vrm",
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-morph-attachment-f068bc3/artifacts/female/bound.dsculpt",
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-morph-attachment-f068bc3/artifacts/female-global"
+      ],
+      "cohorts": 95,
+      "failed": 0
+    },
+    {
+      "sex": "female",
+      "kind": "head-eye",
+      "exit": 1,
+      "seconds": 4.777982911007712,
+      "command": [
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-context-api-7849001/artifacts/head-eye-quality",
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-morph-attachment-f068bc3/assets/humanoid/vroid/base-female.vrm",
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-morph-attachment-f068bc3/artifacts/female/bound.dsculpt",
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-morph-attachment-f068bc3/artifacts/female-head-eye"
+      ],
+      "cohorts": 266,
+      "failed": 16
+    },
+    {
+      "sex": "male",
+      "kind": "global",
+      "exit": 0,
+      "seconds": 2.2193655609735288,
+      "command": [
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-context-api-7849001/build/dome-sculpt-native-unskinned-quality-test",
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-morph-attachment-f068bc3/assets/humanoid/vroid/base-male.vrm",
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-morph-attachment-f068bc3/artifacts/male/bound.dsculpt",
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-morph-attachment-f068bc3/artifacts/male-global"
+      ],
+      "cohorts": 95,
+      "failed": 0
+    },
+    {
+      "sex": "male",
+      "kind": "head-eye",
+      "exit": 1,
+      "seconds": 4.273636783007532,
+      "command": [
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-context-api-7849001/artifacts/head-eye-quality",
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-morph-attachment-f068bc3/assets/humanoid/vroid/base-male.vrm",
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-morph-attachment-f068bc3/artifacts/male/bound.dsculpt",
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-morph-attachment-f068bc3/artifacts/male-head-eye"
+      ],
+      "cohorts": 266,
+      "failed": 18
+    }
+  ],
+  "all_role_replacement_negative": [
+    {
+      "sex": "female",
+      "kind": "global",
+      "exit": 0,
+      "seconds": 3.7332010509853717,
+      "command": [
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-context-api-7849001/build/dome-sculpt-native-unskinned-quality-test",
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-morph-attachment-f068bc3/assets/humanoid/vroid/base-female.vrm",
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-morph-attachment-f068bc3/artifacts/female-partition/bound.dsculpt",
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-morph-attachment-f068bc3/artifacts/female-partition-global"
+      ],
+      "cohorts": 95,
+      "failed": 0
+    },
+    {
+      "sex": "female",
+      "kind": "head-eye",
+      "exit": 0,
+      "seconds": 9.029074106976623,
+      "command": [
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-context-api-7849001/artifacts/head-eye-quality",
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-morph-attachment-f068bc3/assets/humanoid/vroid/base-female.vrm",
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-morph-attachment-f068bc3/artifacts/female-partition/bound.dsculpt",
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-morph-attachment-f068bc3/artifacts/female-partition-head-eye"
+      ],
+      "cohorts": 266,
+      "failed": 0
+    },
+    {
+      "sex": "male",
+      "kind": "global",
+      "exit": 1,
+      "seconds": 4.522650174010778,
+      "command": [
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-context-api-7849001/build/dome-sculpt-native-unskinned-quality-test",
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-morph-attachment-f068bc3/assets/humanoid/vroid/base-male.vrm",
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-morph-attachment-f068bc3/artifacts/male-partition/bound.dsculpt",
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-morph-attachment-f068bc3/artifacts/male-partition-global"
+      ],
+      "cohorts": 95,
+      "failed": 1
+    },
+    {
+      "sex": "male",
+      "kind": "head-eye",
+      "exit": 0,
+      "seconds": 8.607907758007059,
+      "command": [
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-context-api-7849001/artifacts/head-eye-quality",
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-morph-attachment-f068bc3/assets/humanoid/vroid/base-male.vrm",
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-morph-attachment-f068bc3/artifacts/male-partition/bound.dsculpt",
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-morph-attachment-f068bc3/artifacts/male-partition-head-eye"
+      ],
+      "cohorts": 266,
+      "failed": 0
+    }
+  ],
+  "preserved_geometry_support_final_fields": [
+    {
+      "sex": "female",
+      "command": [
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-morph-attachment-f068bc3/artifacts/native-user-support-field",
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-context-api-7849001/build/native-line-female/fitted-unskinned.dsculpt",
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-morph-attachment-f068bc3/artifacts/female-user-exclusion.json",
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-morph-attachment-f068bc3/artifacts/female-exclusion"
+      ],
+      "exit": 0,
+      "seconds": 1.8173042040143628
+    },
+    {
+      "sex": "male",
+      "command": [
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-morph-attachment-f068bc3/artifacts/native-user-support-field",
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-context-api-7849001/build/native-line-male/fitted-unskinned.dsculpt",
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-morph-attachment-f068bc3/artifacts/male-user-exclusion.json",
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-morph-attachment-f068bc3/artifacts/male-exclusion"
+      ],
+      "exit": 0,
+      "seconds": 1.8677818569994997
+    }
+  ],
+  "final_quality": [
+    {
+      "sex": "female",
+      "kind": "global",
+      "exit": 0,
+      "seconds": 2.37017047801055,
+      "command": [
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-context-api-7849001/build/dome-sculpt-native-unskinned-quality-test",
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-morph-attachment-f068bc3/assets/humanoid/vroid/base-female.vrm",
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-morph-attachment-f068bc3/artifacts/female-exclusion/bound.dsculpt",
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-morph-attachment-f068bc3/artifacts/female-exclusion-global"
+      ],
+      "cohorts": 95,
+      "failed": 0
+    },
+    {
+      "sex": "female",
+      "kind": "head-eye",
+      "exit": 0,
+      "seconds": 5.177686548995553,
+      "command": [
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-context-api-7849001/artifacts/head-eye-quality",
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-morph-attachment-f068bc3/assets/humanoid/vroid/base-female.vrm",
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-morph-attachment-f068bc3/artifacts/female-exclusion/bound.dsculpt",
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-morph-attachment-f068bc3/artifacts/female-exclusion-head-eye"
+      ],
+      "cohorts": 266,
+      "failed": 0
+    },
+    {
+      "sex": "male",
+      "kind": "global",
+      "exit": 0,
+      "seconds": 2.4711254090070724,
+      "command": [
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-context-api-7849001/build/dome-sculpt-native-unskinned-quality-test",
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-morph-attachment-f068bc3/assets/humanoid/vroid/base-male.vrm",
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-morph-attachment-f068bc3/artifacts/male-exclusion/bound.dsculpt",
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-morph-attachment-f068bc3/artifacts/male-exclusion-global"
+      ],
+      "cohorts": 95,
+      "failed": 0
+    },
+    {
+      "sex": "male",
+      "kind": "head-eye",
+      "exit": 0,
+      "seconds": 4.525007725023897,
+      "command": [
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-context-api-7849001/artifacts/head-eye-quality",
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-morph-attachment-f068bc3/assets/humanoid/vroid/base-male.vrm",
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-morph-attachment-f068bc3/artifacts/male-exclusion/bound.dsculpt",
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-morph-attachment-f068bc3/artifacts/male-exclusion-head-eye"
+      ],
+      "cohorts": 266,
+      "failed": 0
+    }
+  ],
+  "byte_exact_field_replay": [
+    {
+      "sex": "female",
+      "command": [
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-morph-attachment-f068bc3/artifacts/native-user-support-field",
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-context-api-7849001/build/native-line-female/fitted-unskinned.dsculpt",
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-morph-attachment-f068bc3/tests/fixtures/native-user-support/female.json",
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-morph-attachment-f068bc3/artifacts/female-final"
+      ],
+      "exit": 0,
+      "seconds": 2.198914420994697,
+      "prior_qualified_field_bytes_exact": true,
+      "output_sha256": "14293c4d4135c83f53ad4fa85c191aa8e983dff3e9542394a1cc8831074c61d5"
+    },
+    {
+      "sex": "male",
+      "command": [
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-morph-attachment-f068bc3/artifacts/native-user-support-field",
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-context-api-7849001/build/native-line-male/fitted-unskinned.dsculpt",
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-morph-attachment-f068bc3/tests/fixtures/native-user-support/male.json",
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-morph-attachment-f068bc3/artifacts/male-final"
+      ],
+      "exit": 0,
+      "seconds": 2.3089603839907795,
+      "prior_qualified_field_bytes_exact": true,
+      "output_sha256": "d104110cfd4126dbeab0d7635e2d2513d768616d1802f61a136f7e9cfd5bf15e"
+    }
+  ],
+  "frozen_source_inputs": 1072,
+  "frozen_before_after_exact": true,
+  "production_limits_unchanged": {
+    "work": 500000000,
+    "workspace": 268435456,
+    "influences": 4,
+    "prune": 1e-05
+  },
+  "open": [
+    "automatic anatomical inference",
+    "general unskinned/thin/open/disconnected stress qualification",
+    "locks conflicts for explicit boundary requests",
+    "whole solver/support sanitizer",
+    "allocation/cancel/stale/native history/Save/UI/XR workflow for new explicit input",
+    "full current exported-pose proof for new input"
+  ],
+  "sha256": {
+    "src/anatomical-continuation.hpp": "8450640b756db3b3812a0b0da03ac50a4e2a65411bbc67eabe9eab1289abf119",
+    "src/weight-declared-support.hpp": "b091b0fbc151aca4fc97635d2cd8916e49f371df5d9eb951cc39a8bab90b01fa",
+    "src/weight-user-boundary.hpp": "8a7d9c5f12ef1e8640e4679b74840f0c86d2f6bee8a97c665dab22a7f5531174",
+    "tests/native-user-support-field.cpp": "80de17a5597f11f7770d40e7dcaba3627120c384bdc57ee4b0ed392860f5efa4",
+    "tests/weight-user-boundary.cpp": "93d6c4c71c3a4da7be396e5f9ba2dfdabcea74382c59a0d3b147dd5b71c06e7a",
+    "tests/fixtures/native-user-support/female.json": "809932dc1f4f0461552b1d8cbaddfb2458e95f4a31cc2d1aed4964d526a74f1a",
+    "tests/fixtures/native-user-support/male.json": "ae7a123c3901b48a6132552368b88730af9eeabecebb50d453e6d6148190c63d",
+    "artifacts/native-user-support-field": "c100a1ad705435f20e3006ae3efd62389366d174d074a49e276162ae3926a7ad",
+    "artifacts/libdome-sculpt-core.a": "32c8e5ad369664072de3e88f899dac8754bb95479c6771dca030c19e9a2f85ca",
+    "artifacts/weight-user-boundary-test": "f4c748b728c6a92d29d63f954f8fb83d197565ee8ffa4cfa7f759a059518db05",
+    "artifacts/weight-user-boundary-sanitize": "5dd623c33e6b798b8bf9282c9e640a4d70268a38aeb6643bd061deb4a93110db",
+    "artifacts/final-source-before.json": "14bc3da0ed0bb2b5d64fb7f52b276d7d889ff69ce7ad8f0fb89183aa5d19339e",
+    "artifacts/final-source-after.json": "14bc3da0ed0bb2b5d64fb7f52b276d7d889ff69ce7ad8f0fb89183aa5d19339e",
+    "artifacts/female-exclusion/report.json": "e52051b8ea9af6bdc95173587a95f843a21b11b81e5afdccea246beabf80c9af",
+    "artifacts/female-final/bound.dsculpt": "14293c4d4135c83f53ad4fa85c191aa8e983dff3e9542394a1cc8831074c61d5",
+    "artifacts/female-exclusion-global/quality.json": "b28ec8ddc0cef9f0e402ac15d4187e8599590050e1c3939eaabcd03ac7b2643f",
+    "artifacts/female-exclusion-head-eye/quality.json": "f0b373cc28ce2fad0910ccf7bb81aa36d2f91fe855de8de5f23ddb0d85b17c81",
+    "artifacts/male-exclusion/report.json": "c9be7c7aa45865c2cad54f98fe92af5f887772099ded42d88f1e4b64ca7f3f43",
+    "artifacts/male-final/bound.dsculpt": "d104110cfd4126dbeab0d7635e2d2513d768616d1802f61a136f7e9cfd5bf15e",
+    "artifacts/male-exclusion-global/quality.json": "05c658e40461c112f7e11ac0bb442611247823628d95fb7f1149071de6a6840d",
+    "artifacts/male-exclusion-head-eye/quality.json": "bc6754e9e2b9150b0e3b4ff463915d076ca9a1e17e0e521bec11ab04692df0c4"
+  }
+}

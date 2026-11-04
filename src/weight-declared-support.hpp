@@ -14,6 +14,12 @@ namespace dome::detail {
 struct DeclaredWeightPart {
   uint64_t object = 0;
   std::vector<HeatComponentDeclaration> declarations;
+  // Explicit user authoring input only. Geometric/default singleton masks
+  // must never acquire a hard boundary merely because they have one label.
+  bool user_singleton_boundary = false;
+  // Optional authored exclusions preserve all other geometry-derived component
+  // evidence; they do not replace it with the entire skeleton palette.
+  std::vector<uint32_t> user_excluded_joints;
 };
 enum class DeclaredSupportPolicy {
   AllDeformControls,
@@ -169,6 +175,7 @@ declared_weight_intent(const SculptObject &o, const DeclaredWeightPart &input,
   const size_t n = m.positions.size(), b = rig.bones.size();
   if (!n || n > 2'000'000 || m.indices.size() > 6'000'000 || !b || b > 256 ||
       profile.eligible.size() != b || input.declarations.size() > n ||
+      input.user_excluded_joints.size() > b ||
       n > options.maximum_bytes / 80)
     throw std::length_error(
         "Declared geometry intent dimensions/workspace exceeded");
@@ -228,8 +235,22 @@ declared_weight_intent(const SculptObject &o, const DeclaredWeightPart &input,
         masks[parents[d.vertex]][joint / 64] |= uint64_t(1) << (joint % 64);
       }
     }
+  HeatJointMask excluded{};
+  for (auto joint : input.user_excluded_joints) {
+    work.step(8);
+    if (joint >= b || (excluded[joint/64] & (uint64_t(1) << (joint%64))))
+      throw std::invalid_argument("User excluded control identity invalid or duplicated");
+    excluded[joint/64] |= uint64_t(1) << (joint%64);
+  }
   for (size_t i = 0; i < n; ++i) {
-    work.step();
+    work.step(5);
+    if (parents[i] == i) {
+      for (size_t k = 0; k < 4; ++k) {
+        if (!input.declarations.empty() && (masks[i][k] & excluded[k]))
+          throw std::invalid_argument("User declaration conflicts with excluded control");
+        masks[i][k] &= ~excluded[k];
+      }
+    }
     if (parents[i] == i && masks[i] == HeatJointMask{})
       throw std::invalid_argument(
           "Explicit geometry intent omitted a connected component");

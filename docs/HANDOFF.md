@@ -1,5 +1,7 @@
 # Dome Sculpt production handoff
 
+Private optional user-support kernel: original190 +strict local532 pose cases pass under500M/256MiB with explicit anatomical region input. This is not automatic inference or native/UI admission. Read [NATIVE-USER-SUPPORT-KERNEL.md](NATIVE-USER-SUPPORT-KERNEL.md). Automatic mask infeasibility and all earlier geometry/solver negatives remain preserved; the full robust-weight goal is active.
+
 This is a private unqualified Native-weights/HDR union. Public-main and component records below retain their original scope; no new combined qualification is claimed.
 
 The native finite-handle API/controller/desktop/software-loader workflow now has

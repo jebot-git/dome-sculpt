@@ -11,6 +11,7 @@
 #include "weight-declared-support.hpp"
 #include "weight-surface-system.hpp"
 #include "weight-shared-simplex.hpp"
+#include "weight-user-boundary.hpp"
 #include <map>
 #include <nlohmann/json.hpp>
 namespace dome::detail {
@@ -293,7 +294,7 @@ anatomical_continuation(const Scene &scene, uint64_t group,
         declared->row_anchors == DeclaredRowAnchors::NearestPermitted;
     const size_t bytes =
         capture_bytes +
-        raw_count * (768 + 16 * bones + (nearest_rows ? 32 : 0)) +
+        raw_count * (772 + 16 * bones + (nearest_rows ? 32 : 0)) +
         corners * 320 + 65536 + metric_bytes;
     if (bytes > options.maximum_bytes)
       throw std::length_error("Continuation memory bound before construction");
@@ -370,6 +371,7 @@ anatomical_continuation(const Scene &scene, uint64_t group,
     for (size_t j = 0; j < labels; ++j)
       joint_label[out.joints[j]] = j;
     std::vector<HeatJointMask> usage;
+    std::vector<uint32_t> user_boundaries;
     std::vector<uint32_t> row_owner, face_owner, support_root;
     struct EdgeLess {
       Budget *budget;
@@ -440,10 +442,29 @@ anatomical_continuation(const Scene &scene, uint64_t group,
       p.raw_to_row = part.raw_to_row;
       auto masks = declared ? declared_intent->masks(o) : intent->masks(o);
       usage.resize(offset + part.positions.size());
+      user_boundaries.resize(offset + part.positions.size(), UINT32_MAX);
+      const auto *declaration = declared ? declared->find(o.id) : nullptr;
+      if (declaration && declaration->user_singleton_boundary &&
+          declaration->declarations.empty())
+        throw std::invalid_argument("User boundary needs explicit component declarations");
       for (size_t raw = 0; raw < p.raw_to_row.size(); ++raw) {
         budget.step(4);
         p.raw_to_row[raw] += offset;
         usage[p.raw_to_row[raw]] = masks[raw];
+        if (declaration && declaration->user_singleton_boundary) {
+          uint32_t joint = UINT32_MAX;
+          size_t count = 0;
+          for (size_t j = 0; j < bones; ++j) {
+            budget.step();
+            if (masks[raw][j / 64] & (uint64_t(1) << (j % 64))) {
+              joint = uint32_t(j);
+              ++count;
+            }
+          }
+          if (count != 1 || joint_label[joint] == SIZE_MAX)
+            throw std::invalid_argument("Explicit user boundary is not a singleton current control");
+          user_boundaries[p.raw_to_row[raw]] = uint32_t(joint_label[joint]);
+        }
       }
       out.parts.push_back(std::move(p));
       for (uint32_t i = 0; i < part.positions.size(); ++i) {
@@ -762,6 +783,13 @@ anatomical_continuation(const Scene &scene, uint64_t group,
       s.values[b] = -w;
     }
     // Lexicographic edge iteration yields sorted unique adjacency rows.
+    if (std::any_of(user_boundaries.begin(), user_boundaries.end(),
+                    [](uint32_t j) { return j != UINT32_MAX; })) {
+      stage = "explicit user boundary elimination";
+      source_bytes += apply_user_weight_boundaries(
+          s, rhs, user_boundaries, labels, options.maximum_bytes - source_bytes,
+          budget);
+    }
     if (declared && declared->contact_support == DeclaredContactSupport::SharedSimplex) {
       stage = "masked common-role simplex solve";
       auto solved = solve_shared_simplex(s, screen, rhs, usage, out.joints,

@@ -1,0 +1,89 @@
+{
+  "2": [
+    "head"
+  ],
+  "3": [
+    "head"
+  ],
+  "6": [
+    "head"
+  ],
+  "7": [
+    "head"
+  ],
+  "8": [
+    "head"
+  ],
+  "9": [
+    "head"
+  ],
+  "10": [
+    "head"
+  ],
+  "11": [
+    "head"
+  ],
+  "15": [
+    "head"
+  ],
+  "20": [
+    "head"
+  ],
+  "4": [
+    "leftEye",
+    "rightEye"
+  ],
+  "5": [
+    "leftEye",
+    "rightEye"
+  ],
+  "12": {
+    "exclude_roles": [
+      "head",
+      "leftEye",
+      "rightEye"
+    ]
+  },
+  "13": {
+    "exclude_roles": [
+      "head",
+      "leftEye",
+      "rightEye"
+    ]
+  },
+  "14": {
+    "exclude_roles": [
+      "head",
+      "leftEye",
+      "rightEye"
+    ]
+  },
+  "16": {
+    "exclude_roles": [
+      "head",
+      "leftEye",
+      "rightEye"
+    ]
+  },
+  "17": {
+    "exclude_roles": [
+      "head",
+      "leftEye",
+      "rightEye"
+    ]
+  },
+  "18": {
+    "exclude_roles": [
+      "head",
+      "leftEye",
+      "rightEye"
+    ]
+  },
+  "19": {
+    "exclude_roles": [
+      "head",
+      "leftEye",
+      "rightEye"
+    ]
+  }
+}
