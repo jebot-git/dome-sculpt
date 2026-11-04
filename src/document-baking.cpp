@@ -86,7 +86,7 @@ void Document::queue_bake_locked(uint64_t source,ObjectBakeSettings settings,Ass
     *report=std::to_string(result.projected)+" projected, "+std::to_string(result.missed)+" missed ("+std::to_string(result.preserved_misses)+" kept from prior bake)";
     if(result.color_prepared){char quality[96];snprintf(quality,sizeof(quality),"; color error bound %.4f",double(*std::max_element(result.color_error_bound.begin(),result.color_error_bound.end())));*report+=quality;}
     if(result.canonical_captured)*report+="; verified normal frame captured";
-    if(result.normal_prepared){char quality[128];snprintf(quality,sizeof(quality),"; normal attributes prepared (initial quantization %.3f deg)",result.normal_initial_error*57.29577951308232);*report+=quality;}
+    if(result.normal_prepared){char quality[128];snprintf(quality,sizeof(quality),"; portable normal attributes authored (rest quantization %.3f deg)",result.normal_initial_error*57.29577951308232);*report+=quality;}
   },expected,report,work,{}, {},0,0,{},BakeAdmission{source,settings});
 }
 void Document::bake_from_object(uint64_t source,ObjectBakeSettings settings,AssetSource expected){
@@ -123,13 +123,13 @@ void Document::queue_convert_bake_locked(AssetSource expected){
   if(control_before_||!canonical_conversion_ready_locked())throw std::logic_error("Select an editable native mesh with historical normal detail for explicit conversion");
   const float error=state_.bake_settings.normal_error;
   auto report=std::make_shared<std::string>();auto work=std::make_shared<AssetWork>();
-  queue_scene_operation_locked("Convert normal detail",[error,report,work](Scene &scene,const auto &cancelled){
+  queue_scene_operation_locked("Convert to portable normals",[error,report,work](Scene &scene,const auto &cancelled){
     auto &o=scene.active();NormalPreparationOptions options;options.max_angular_error=error;options.cancelled=cancelled;
     work->progress.store(.05f);
     auto result=convert_canonical_normals({o.painted,o.appearance,o.material_bindings,o.deformation,o.material,{}},options);
     o.painted=std::move(result.paint);o.material_bindings=std::move(result.material_bindings);
     scene.validate();if(cancelled())throw std::runtime_error("Canonical normal conversion cancelled");
-    *report="Standard normal attributes adopted; original normal bake, material channels and paint retained";work->progress.store(.95f);
+    *report="Portable normal/tangent targets authored; original source retained. Pose and morph shading follow the new model.";work->progress.store(.95f);
   },expected,report,work);
 }
 void Document::convert_baked_normals(AssetSource expected){

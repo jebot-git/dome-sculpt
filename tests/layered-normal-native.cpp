@@ -48,6 +48,7 @@ int main(int argc,char **argv)try{
     fbo.bind();const auto original=draw(renderer,before.frame().surface);
     after.convert_baked_normals();settled_layers(after);auto converted=after.copy_scene();
     const auto origin=converted.active().material_bindings->canonical_attributes;
+    check(origin->receipt().authored_native_normals&&origin->receipt().authored_native_tangents&&origin->frames()->pbr->generated_tangents,"Explicit conversion records newly authored portable target channels while retaining original source");
     roundtrip_layers(after,out/("converted-"+std::to_string(variant)+".dsculpt"));
     check(origin&&!converted.active().painted->normal_projection()&&!converted.active().material_bindings->normal_preparation&&
       converted.active().painted->baked()->normal_field->origin()==origin,"Real conversion keeps baked detail separate from intrinsic planes and authentic attribute provenance");

@@ -640,7 +640,7 @@ struct App {
     menu.add("&Mesh/Voxel remesh...", 0, command, this);
     menu.add("&Mesh/Bake surface...",0,command,this);
     menu.add("&Mesh/Clear baked surface",0,command,this);
-    menu.add("&Mesh/Convert normal detail",0,command,this);
+    menu.add("&Mesh/Convert to portable normals",0,command,this);
     menu.add("&File/Cancel background work",0,command,this);
     menu.add("&Mesh/UV editor...", FL_ALT + 'u', command, this);
     menu.add("&Mesh/Polygon edit/Start polygon editing", 0, command, this);
@@ -785,7 +785,7 @@ struct App {
     enable("&Mesh/Voxel remesh...", !modal && s->can_voxel_remesh);
     enable("&Mesh/Bake surface...",!modal && s->can_bake);
     enable("&Mesh/Clear baked surface",!modal && s->can_clear_bake);
-    enable("&Mesh/Convert normal detail",!modal && s->can_convert_bake);
+    enable("&Mesh/Convert to portable normals",!modal && s->can_convert_bake);
     enable("&File/Cancel background work",!modal && (s->can_cancel_asset||s->native_pending));
     enable("&File/Close &Window", true);
     const char *views[] = {"&View/Frame &all", "&View/Frame &selection", "&View/Reset &trackball", "&View/Start or stop &XR",
@@ -1271,7 +1271,7 @@ struct App {
       edit_rig_dialog(canvas.document);
     } else if(label=="Bake surface..."){edit_bake_dialog(canvas.document);
     } else if(label=="Clear baked surface"){canvas.document.clear_bake();
-    } else if(label=="Convert normal detail"){canvas.document.convert_baked_normals();
+    } else if(label=="Convert to portable normals"){canvas.document.convert_baked_normals();
     } else if(label=="Cancel background work"){canvas.document.cancel_background_work();
     } else if(label=="Procedural detail...") {
       auto draft=canvas.document.draft_scene();auto initial=canvas.document.frame().state->procedural_options;

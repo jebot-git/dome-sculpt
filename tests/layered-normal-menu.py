@@ -73,8 +73,8 @@ async def main():
    d.sync()
   def capture(name):
    g=window.get_geometry();raw=window.get_image(0,0,g.width,g.height,X.ZPixmap,0xffffffff);Image.frombytes('RGB',(g.width,g.height),raw.data,'raw','BGRX').save(out/name)
-  nodes=await layout();check(nodes['Convert normal detail'][1].get('enabled',True),'Actual DomeD universal menu exposes enabled native normal conversion')
-  capture('before.png');await command('Convert normal detail');await command('Save');accepted=inspect();scene=accepted['scene']
+  nodes=await layout();check(nodes['Convert to portable normals'][1].get('enabled',True),'Actual DomeD universal menu exposes enabled native normal conversion')
+  capture('before.png');await command('Convert to portable normals');await command('Save');accepted=inspect();scene=accepted['scene']
   check(accepted['converted']and scene['version']==33,'Real menu callback and ordered native Save publish a replayable Scene33 conversion')
   m=scene['source_materials'];anchor=scene['baked_normal_fields']['origins'][0];raw=m['paints'][anchor['paint']]
   check(raw==original['objects'][0]['painted'],'GUI conversion retains the exact complete original canonical paint')
@@ -82,7 +82,7 @@ async def main():
   target=scene['objects'][0];old=original['objects'][0]
   check(target['painted']['layers']==old['painted']['layers']and target['deformation']==old['deformation']and target['bake_recipe']==old['bake_recipe'],'Editable sparse layers, skin/morph and saved bake recipe remain exact')
   check(all(target['painted']['baked'][name]==old['painted']['baked'][name]for name in ['color','orm','emission','coverage']),'All other baked channels and coverage survive actual GUI conversion')
-  nodes=await layout();check(not nodes['Convert normal detail'][1].get('enabled',True),'Already converted target disables duplicate conversion in its actual menu')
+  nodes=await layout();check(not nodes['Convert to portable normals'][1].get('enabled',True),'Already converted target disables duplicate conversion in its actual menu')
   capture('converted.png');chord('Control_L','z');await asyncio.sleep(.3);await command('Save');check(inspect()['scene']==original,'Standard Ctrl+Z restores the whole original project in one step')
   chord('Control_L','Shift_L','z');await asyncio.sleep(.3);await command('Save');check(inspect()['scene']==scene,'Standard Ctrl+Shift+Z restores the exact converted project')
   await command('Close Window');await wait(lambda:app.poll()is not None);check(app.returncode==0,'Native window command drains workers and closes graphics/fonts normally')

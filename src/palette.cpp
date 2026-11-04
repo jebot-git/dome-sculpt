@@ -340,7 +340,7 @@ void SpatialPalette::raster(const EditorState &s) {
         label=row==0?"Source: ":"Cage: ";
         label+=row==1&&!id?"Normal offset":found==s.objects.end()?"Unavailable mesh":found->name+(found->visible?"":" [hidden]");
       }
-      else if(c.parameter==VrParameter::BakeColors){if(row==0||row==2)label=std::string(row==0?"Prepare source colors: ":"Prepare normal attributes: ")+(value>=.5f?"Yes":"No");else{char text[96];if(row==1)snprintf(text,sizeof(text),"Maximum color error %.3f",double(value));else snprintf(text,sizeof(text),"Maximum normal error %.2f deg",double(value)*.25*57.29577951308232);label=text;}}
+      else if(c.parameter==VrParameter::BakeColors){if(row==0||row==2)label=std::string(row==0?"Prepare source colors: ":"Author portable normals: ")+(value>=.5f?"Yes":"No");else{char text[96];if(row==1)snprintf(text,sizeof(text),"Maximum color error %.3f",double(value));else snprintf(text,sizeof(text),"Rest normal error %.2f deg",double(value)*.25*57.29577951308232);label=text;}}
       else if(c.parameter==VrParameter::BakeProjection)label=std::string(row==0?"Partial projection: ":"Backfaces: ")+(value>=.5f?"Allow":"Refuse");
       else if(c.parameter==VrParameter::BakeQuality)label+=std::to_string(int(std::lround(value*(row==0?256:64))))+(row==1?" px":"");
       else if(c.parameter==VrParameter::BakeDistances){char size[48];snprintf(size,sizeof(size),value>0&&value<.01f?"%.3g mm":"%.2f mm",double(value));label+=size;}
@@ -381,8 +381,8 @@ void SpatialPalette::raster(const EditorState &s) {
       rect(160*unit_,410*unit_,320*unit_,44*unit_,s.bake_recipe?accent:disabled);
       text(320*unit_,440*unit_,s.bake_recipe?(c.bake_preset?"Recipe loaded":"Recall last bake"):"No saved bake yet",fg);
       rect(160*unit_,470*unit_,320*unit_,44*unit_,s.can_convert_bake?accent:disabled);
-      text(320*unit_,500*unit_,s.can_convert_bake?"Convert normal detail":"Standard normals / unavailable",fg);
-      if(s.can_convert_bake)text(320*unit_,380*unit_,"Standard shading / original detail retained",fg);
+      text(320*unit_,500*unit_,s.can_convert_bake?"Portable normals":"Portable normals / unavailable",fg);
+      if(s.can_convert_bake)text(320*unit_,380*unit_,"New shading model / source retained",fg);
     }
     text(320 * unit_, 560 * unit_,
          c.components == 1 ? "Stick: slide / Vertical: fine wheel"

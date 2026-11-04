@@ -57,7 +57,7 @@ async def main():
     if not service.startswith(':'):continue
     try:
      endpoint='/org/de_xr/FLTK/Menu1';candidate=bus.get_proxy_object(service,endpoint,await asyncio.wait_for(bus.introspect(service,endpoint),1)).get_interface('com.canonical.dbusmenu');result=await candidate.call_get_layout(0,-1,[])
-     if 'Convert normal detail' in str(result):menu=candidate;break
+     if 'Convert to portable normals' in str(result):menu=candidate;break
     except Exception:pass
    if menu is None:await asyncio.sleep(.1)
   check(menu is not None,'Actual native Wayland client exports the universal normal-conversion command')
@@ -76,15 +76,15 @@ async def main():
    old=project.stat().st_mtime_ns;await menu.call_event(nodes[label][0],'clicked',Variant('i',0),0)
    if label=='Save':await wait(lambda:project.stat().st_mtime_ns!=old)
    await asyncio.sleep(.15)
-  nodes=await layout();check(nodes['Convert normal detail'][1].get('enabled',True),'Eligible canonical mesh enables its actual Wayland universal-menu action')
-  await command('Convert normal detail');await command('Save');accepted=inspect();converted=accepted['scene']
+  nodes=await layout();check(nodes['Convert to portable normals'][1].get('enabled',True),'Eligible canonical mesh enables its actual Wayland universal-menu action')
+  await command('Convert to portable normals');await command('Save');accepted=inspect();converted=accepted['scene']
   check(accepted['converted'] and converted['version']==33,'Actual Wayland callback and ordered Save publish a replayable Scene33 conversion')
   materials=converted['source_materials'];anchor=converted['baked_normal_fields']['origins'][0]
   check(materials['paints'][anchor['paint']]==original['objects'][0]['painted'],'Actual Wayland conversion retains the complete genuine original canonical paint')
   target=converted['objects'][0];old=original['objects'][0]
   check(target['painted']['layers']==old['painted']['layers'] and target['deformation']==old['deformation'] and target['bake_recipe']==old['bake_recipe'] and converted['objects'][1]==original['objects'][1],'Native Wayland conversion preserves sparse layers, skin/morph, recipe and hidden source')
   check(all(target['painted']['baked'][name]==old['painted']['baked'][name]for name in ['color','orm','emission','coverage']),'All other baked roles and coverage remain exact through the Wayland action')
-  nodes=await layout();check(not nodes['Convert normal detail'][1].get('enabled',True),'Converted native Wayland target disables duplicate conversion')
+  nodes=await layout();check(not nodes['Convert to portable normals'][1].get('enabled',True),'Converted native Wayland target disables duplicate conversion')
   action({'op':'focus','id':window['id']});await chord('Control_L','z');await asyncio.sleep(.3);await command('Save')
   check(inspect()['scene']==original,'Actual compositor Ctrl+Z restores the complete original native project')
   await chord('Control_L','Shift_L','z');await asyncio.sleep(.3);await command('Save')
