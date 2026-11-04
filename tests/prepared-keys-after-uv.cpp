@@ -165,6 +165,7 @@ void exercise(bool seam, const std::filesystem::path &prefix) {
         "Post-UV Duplicate preserves exact authored POSITION/NORMAL/TANGENT channels under a new stable ID");
 
   edit.action = ShapeKeyAction::Mirror;
+  edit.mirror_frames = ShapeKeyMirrorFrames::VertexPositions;
   edit.name = "Mirrored after UV";
   document.author_shape(edit);
   ready(document);

@@ -22,6 +22,11 @@ KeyMirrorCorrespondence reflected_key_correspondence(const Mesh &,KeyMirrorPlane
     const KeyMirrorLimits & = {});
 KeyMirrorCorrespondence reflected_key_correspondence(const Mesh &,float tolerance,
     const KeyMirrorLimits & = {});
+// Mirror the complete displacement field, without choosing between conflicting
+// seam values or requiring a reflected triangle partition. Coincident candidate
+// vertices must agree exactly; there is no averaging or silent nearest fallback.
+std::vector<Vec3> reflected_key_vertex_deltas(const Mesh &,std::span<const Vec3>,
+    KeyMirrorPlane,float tolerance,const KeyMirrorLimits & = {});
 // Explicit logical CORNER coordinates of this actual named role. An owning
 // factory must derive them from the retained role source, never edited UV0.
 std::vector<int8_t> reflected_key_role_signs(const NormalFrames &,

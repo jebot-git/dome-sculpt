@@ -2950,6 +2950,7 @@ void Document::command_locked(SpatialCommand command) {
     if(command==SpatialCommand::ShapeSculpt){configure_shape_sculpt_locked(!state_.shape_sculpt);return;}
     ShapeKeyEdit edit;edit.target=state_.morph_target;
     edit.action=command==SpatialCommand::ShapeNew?ShapeKeyAction::Create:command==SpatialCommand::ShapeCapture?ShapeKeyAction::CaptureMix:command==SpatialCommand::ShapeDuplicate?ShapeKeyAction::Duplicate:ShapeKeyAction::Mirror;
+    if(edit.action==ShapeKeyAction::Mirror)edit.mirror_frames=ShapeKeyMirrorFrames::VertexPositions;
     queue_shape_locked(std::move(edit));return;
   }
 
