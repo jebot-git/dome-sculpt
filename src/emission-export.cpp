@@ -87,8 +87,9 @@ EmissionExportPrepared prepare_emission_export(std::span<const ObjectSurface> ob
 }
 void finish_emission_export(GltfDocument &document,EmissionExportPrepared &prepared,const NativeEmissionExport &options,size_t max_bytes,const std::function<bool()> &cancelled){
  using Json=nlohmann::json;if(prepared.proof&&(prepared.proof->scene!=options.scene||prepared.proof->scene.owner_before(options.scene)||options.scene.owner_before(prepared.proof->scene)))throw std::invalid_argument("Native HDR finisher borrowed another owning Scene");auto &j=document.json;auto &binary=document.binary;
+ const bool native_domains=std::any_of(prepared.images.begin(),prepared.images.end(),[](const auto &entry){return entry.native_paint_domain;});
  for(auto &entry:prepared.images){stop(cancelled);const auto found=std::find(prepared.ids.begin(),prepared.ids.end(),entry.object);if(found==prepared.ids.end())throw std::logic_error("Missing HDR export object");const auto i=size_t(found-prepared.ids.begin());auto &identity=document.objects.at(i);entry.node=identity.node;
-  if(entry.native_paint_domain){
+  if(native_domains){
    if(identity.mesh<0||identity.node<0||j.at("nodes").at(identity.node).at("mesh")!=identity.mesh)throw std::logic_error("Native HDR lost its actual emitted object mapping");
    size_t users=0;for(const auto &node:j.at("nodes"))if(node.contains("mesh")&&node.at("mesh")==identity.mesh)++users;
    if(users>1){if(j.at("meshes").size()>=65536)throw std::length_error("Native HDR mesh table exceeds policy");auto copy=j.at("meshes").at(identity.mesh);identity.mesh=int(j.at("meshes").size());j["meshes"].push_back(std::move(copy));j["nodes"][identity.node]["mesh"]=identity.mesh;}
