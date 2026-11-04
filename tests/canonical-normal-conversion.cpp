@@ -58,7 +58,12 @@ void audit(const Scene &scene,const detail::CanonicalNormalConversionCandidate &
 int main(int argc,char **argv)try{
  const std::filesystem::path out=argc>1?argv[1]:"";
  if(!out.empty())std::filesystem::create_directories(out);
- for(int variant=0;variant<8;++variant){auto scene=baked_fan(variant&1,variant&2,variant&4);const auto exact=scene.encode();const auto paint=scene.active().painted;const auto deformation=scene.active().deformation;
+ for(int variant=0;variant<16;++variant){auto scene=baked_fan(variant&1,variant&2,variant&4);
+  if(variant&8){auto paint=scene.active().painted->snapshot();auto baked=*paint->baked();
+   for(size_t at=0;at<baked.coverage.size();++at)if(baked.coverage[at])baked.coverage[at]=at%3==0?0:at%3==1?127:255;
+   paint->clear_bake();paint->install_bake(std::move(baked));scene.active().painted=std::move(paint);scene.validate();
+  }
+  const auto exact=scene.encode();const auto paint=scene.active().painted;const auto deformation=scene.active().deformation;
   const ColorPreparationInput input{paint,scene.active().appearance,scene.active().material_bindings,deformation,scene.active().material};
   const auto result=detail::convert_native_canonical_normals(input);
   if(!out.empty()){
