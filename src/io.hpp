@@ -21,6 +21,14 @@ inline void atomic_write(const std::filesystem::path &path,
   auto check=[&]{if(options.cancelled && options.cancelled())
     throw std::runtime_error("Output cancelled");};
   check();
+  // Paths and the directory handle must be ready before a caller claims the
+  // commit. In particular, parent_path() may allocate after a successful rename.
+  auto parent = path.parent_path();
+  if (parent.empty()) parent = ".";
+  struct Directory {
+    int value = -1;
+    ~Directory() { if (value >= 0) close(value); }
+  } directory;
   auto name = path.string() + ".tmp-XXXXXX";
   std::vector<char> temporary(name.begin(), name.end());
   temporary.push_back(0);
@@ -28,6 +36,7 @@ inline void atomic_write(const std::filesystem::path &path,
   if (fd < 0)
     throw std::runtime_error("Cannot create output file");
   try {
+    const std::filesystem::path temporary_path(temporary.data());
     size_t done = 0;
     while (done < bytes.size()) {
       check();
@@ -47,17 +56,16 @@ inline void atomic_write(const std::filesystem::path &path,
       throw std::runtime_error("Cannot close output file");
     }
     fd = -1;
+    directory.value = open(parent.c_str(), O_RDONLY | O_DIRECTORY | O_CLOEXEC);
+    if (directory.value < 0)
+      throw std::runtime_error("Cannot open output directory for sync");
     check();
     if(options.before_commit)options.before_commit();
     // Replacement is the commit point. Do not report cancellation after it.
-    std::filesystem::rename(temporary.data(), path);
-    auto parent = path.parent_path();
-    if (parent.empty()) parent = ".";
-    int directory = open(parent.c_str(), O_RDONLY | O_DIRECTORY | O_CLOEXEC);
-    if (directory < 0)
-      throw std::runtime_error("Cannot open output directory for sync");
-    int synced = fsync(directory);
-    int closed = close(directory);
+    std::filesystem::rename(temporary_path, path);
+    int synced = fsync(directory.value);
+    int closed = close(directory.value);
+    directory.value = -1;
     if (synced || closed)
       throw std::runtime_error("Cannot sync output directory");
   } catch (...) {
