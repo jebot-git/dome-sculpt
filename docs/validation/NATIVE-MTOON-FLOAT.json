@@ -42,7 +42,7 @@
       "Early wait_mesh-only observer could read prior Scene while ordered edit still ran; corrected test waits actual asset then mesh and asserts real edit.",
       "Initial focused compile command inserted include before nice options; corrected argument position, old command failure retained."
     ],
-    "glslang_config_only_floor_negative_accepted": "/home/blux/de-xr/dome-sculpt/artifacts/native-mtoon-float-721282a/artifacts/native-mtoon-oracle/outputs/shaders"
+    "glslang_config_only_floor_negative_accepted": "/home/blux/de-xr/dome-sculpt/artifacts/native-mtoon-float-721282a/artifacts/native-mtoon-oracle/shader-floor-link-status.json"
   },
   "shader_contract": {
     "private_packed_views": 7,
