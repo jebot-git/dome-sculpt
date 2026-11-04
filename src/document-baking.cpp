@@ -96,6 +96,12 @@ void Document::queue_clear_bake_locked(AssetSource expected){
   if(!bake_target_ready_locked() || !scene_.active().painted->baked())throw std::logic_error("Select an editable baked target");
   queue_scene_operation_locked("Clear baked surface",[](Scene &scene,const auto &cancelled){
     if(cancelled())throw std::runtime_error("Clear bake cancelled");
+    auto &o=scene.active();
+    if(o.material_bindings&&o.material_bindings->normal_preparation&&o.material_bindings->normal_preparation->canonical_conversion){
+      NormalPreparationOptions options;options.cancelled=cancelled;
+      auto result=convert_canonical_normals({o.painted,o.appearance,o.material_bindings,o.deformation,o.material,{}},options);
+      o.painted=std::move(result.paint);o.material_bindings=std::move(result.material_bindings);
+    }
     scene.active().painted->clear_bake();
   },expected,{});
 }
@@ -104,6 +110,10 @@ void Document::clear_bake(AssetSource expected){
 }
 bool Document::canonical_conversion_ready_locked() const {
   const auto &o=scene_.active();
+  if(!state_.object_grabbing&&bake_target_ready_locked()&&o.material_bindings&&o.material_bindings->normal_preparation){
+    const auto &p=*o.material_bindings->normal_preparation;
+    return p.canonical_conversion&&!p.uv_reprojection&&!p.sampling_domain&&!p.key_derivation;
+  }
   return !state_.object_grabbing&&bake_target_ready_locked()&&!o.appearance&&!o.material_bindings&&
     o.painted&&!o.painted->normal_projection()&&!o.painted->paint_sampling_domain()&&!o.painted->source_sampling_prepared()&&
     o.painted->baked()&&!o.painted->baked()->maps.normal.rgba.empty()&&

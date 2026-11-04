@@ -16,6 +16,7 @@
 #include "dome/normal-preparation.hpp"
 #include "normal-sampling-access.hpp"
 #include "canonical-normal-owner.hpp"
+#include "baked-normal-archive.hpp"
 #include "dome/normal-sampling.hpp"
 #include "dome/creator-archive.hpp"
 #include "dome/paint.hpp"
@@ -134,6 +135,7 @@ std::set<const PaintedMesh*> material_paint_owners(
   auto add=[&](const auto &p){if(p)owners.insert(p.get());};
   for(const auto &o:origins)add(o->paint);
   for(const auto &b:bindings){
+    if(b->canonical_attributes)add(b->canonical_attributes->before_paint());
     if(b->key_derivation)add(b->key_derivation->before_paint());
     if(const auto &p=b->color_preparation){add(p->original_paint);if(p->uv_reprojection)add(p->uv_reprojection->before_paint);if(p->paint_sampling)add(p->paint_sampling->before_paint());}
     if(const auto &p=b->normal_preparation){add(p->original_paint);if(p->uv_reprojection)add(p->uv_reprojection->before_paint);if(p->sampling_domain)add(p->sampling_domain->before_paint);}
@@ -244,6 +246,7 @@ uint32_t SourceMaterialArchive::add(std::shared_ptr<const SourceMaterialBindings
   if(found!=bindings_.end())return uint32_t(found-bindings_.begin());
   if(bindings_.size()>=256)throw std::length_error("Resolved material archive count exceeds budget");
   value->validate(deep);
+  if(value->canonical_attributes&&value->canonical_attributes->before_material())add(value->canonical_attributes->before_material(),deep);
   if(value->color_preparation && value->color_preparation->original_material)
     add(value->color_preparation->original_material,deep);
   if(value->color_preparation&&value->color_preparation->uv_reprojection)
@@ -282,6 +285,7 @@ nlohmann::json SourceMaterialArchive::encode(PaintImageArchive &images,CreatorAs
 nlohmann::json SourceMaterialArchive::encode(PaintImageArchive &images,CreatorAssetArchive &models,
     detail::PolygonColorArchive *colors,NormalSamplingArchive *domains,PaintSamplingArchive *paint_domains) const {
   const bool keyed=std::any_of(bindings_.begin(),bindings_.end(),[](const auto&b){return bool(b->key_derivation);});
+  const bool layered=std::any_of(bindings_.begin(),bindings_.end(),[](const auto&b){return bool(b->canonical_attributes);});
   const bool corners=std::any_of(bindings_.begin(),bindings_.end(),[](const auto &b){return b->color_preparation&&b->color_preparation->polygon_colors;});
   if(corners&&!colors)throw std::invalid_argument("Current corner color preparation requires its shared Scene20 archive");
   const bool paint_sampling=std::any_of(bindings_.begin(),bindings_.end(),[](const auto &b){return (b->color_preparation&&b->color_preparation->paint_sampling)||(b->normal_preparation&&b->normal_preparation->sampling_domain&&b->normal_preparation->sampling_domain->metadata_sampling_domain);});
@@ -299,8 +303,11 @@ nlohmann::json SourceMaterialArchive::encode(PaintImageArchive &images,CreatorAs
     auto found=std::find(paints.begin(),paints.end(),paint);
     if(found!=paints.end())return size_t(found-paints.begin());
     if(paints.size()>=256)throw std::length_error("Retained paint archive count exceeds budget");
-    const auto id=paints.size();paints.push_back(paint);output["paints"].push_back(paint->encode(&images,domains,paint_domains));return id;
+    const auto id=paints.size();paints.push_back(paint);
+    if(layered)detail::BakedNormalArchive::writer().register_paint(paint,uint32_t(id));
+    output["paints"].push_back(paint->encode(&images,domains,paint_domains));return id;
   };
+  for(const auto &b:bindings_)if(b->canonical_attributes){detail::BakedNormalArchive::writer().add_origin(b->canonical_attributes);paint_id(b->canonical_attributes->before_paint());}
   std::vector<std::shared_ptr<const detail::SourceKeyDerivation>> key_derivations;
   if(keyed){output["key_derivations"]=nlohmann::json::array();for(const auto &binding:bindings_)if(binding->key_derivation&&std::find(key_derivations.begin(),key_derivations.end(),binding->key_derivation)==key_derivations.end()){const auto node=binding->key_derivation;const auto before=std::find(bindings_.begin(),bindings_.end(),node->before_material());if(before==bindings_.end())throw std::logic_error("Missing key derivation before material");key_derivations.push_back(node);output["key_derivations"].push_back(detail::KeyDerivationCodec::encode(*node,frames,uint32_t(paint_id(node->before_paint())),uint32_t(before-bindings_.begin()),models,images));}}
   std::vector<std::shared_ptr<const SourceColorPreparation>> preparations;size_t color_uv_layout_bytes=0;
@@ -423,6 +430,8 @@ nlohmann::json SourceMaterialArchive::encode(PaintImageArchive &images,CreatorAs
         {"double_sided",binding->native_reference.double_sided}}},
       {"origin",binding->uv_origin?nlohmann::json(size_t(origin-origins_.begin())):nlohmann::json(nullptr)}});
     if(binding->physical_emission)output["bindings"].back()["physical_emission"]=*binding->physical_emission;
+    if(layered)output["bindings"].back()["canonical_attributes"]=binding->canonical_attributes?
+      nlohmann::json(detail::BakedNormalArchive::writer().add_origin(binding->canonical_attributes)):nlohmann::json(nullptr);
     if(normal_prepared||corners||keyed){const auto found=std::find(normal_preparations.begin(),normal_preparations.end(),binding->normal_preparation);
       output["bindings"].back()["normal_preparation"]=binding->normal_preparation?nlohmann::json(size_t(found-normal_preparations.begin())):nlohmann::json(nullptr);
     }
@@ -445,6 +454,11 @@ nlohmann::json SourceMaterialArchive::encode(PaintImageArchive &images,CreatorAs
     const auto base=output.contains("base_version")?output.at("base_version"):output.at("version");
     output["base_version"]=base;output["version"]=13;
     output["physical_emission"]=physical;output["explicit_mirror"]=explicit_mirror;output["canonical_normals"]=true;
+  }
+  if(layered){
+    const auto base=output.contains("base_version")?output.at("base_version"):output.at("version");
+    output["base_version"]=base;output["version"]=15;output["physical_emission"]=physical;
+    output["explicit_mirror"]=explicit_mirror;output["canonical_normals"]=!canonical_conversions.empty();output["layered_normals"]=true;
   }
   return output;
 }
@@ -529,6 +543,9 @@ SourceMaterialArchive SourceMaterialArchive::decode(const nlohmann::json &input,
 SourceMaterialArchive SourceMaterialArchive::decode(const nlohmann::json &input,const PaintImageArchive &images,
     const CreatorAssetArchive &models,const detail::PolygonColorArchive *colors,const NormalSamplingArchive *domains,const PaintSamplingArchive *paint_domains,const SourcePaintDecodeContext &supplied) {
   const bool physical=detail::physical_material_archive(input);
+  const bool layered=detail::layered_material_archive(input);
+  if(layered)(void)detail::BakedNormalArchive::reader();
+  else for(const auto &b:input.at("bindings"))if(b.contains("canonical_attributes"))throw std::invalid_argument("Canonical attribute reference requires actual material15/Scene33");
   SourcePaintDecodeContext context=supplied;context.physical_emission=physical;
   if(!detail::material_archive_base_version(input).is_number_integer() || (detail::material_archive_base_version(input)!=1 && detail::material_archive_base_version(input)!=2 && detail::material_archive_base_version(input)!=3 && detail::material_archive_base_version(input)!=4 && detail::material_archive_base_version(input)!=5 && detail::material_archive_base_version(input)!=6 && detail::material_archive_base_version(input)!=8 && detail::material_archive_base_version(input)!=7 && detail::material_archive_base_version(input)!=9 && detail::material_archive_base_version(input)!=10) || !input.at("paints").is_array() || input.at("paints").size()>256 || !input.at("origins").is_array() || input.at("origins").size()>256 ||
      !input.at("bindings").is_array() || input.at("bindings").size()>256)
@@ -562,7 +579,7 @@ SourceMaterialArchive SourceMaterialArchive::decode(const nlohmann::json &input,
     if(input.contains("color_preparations"))throw std::runtime_error("Color preparations require material archive3");
     for(const auto &b:input.at("bindings"))if(b.contains("color_preparation"))throw std::runtime_error("Color preparation references require material archive3");
     for(const auto &record:input.at("paints"))detail::visit_paint_archive_payloads(record,detail::material_archive_base_version(input)==9,context,[&](const nlohmann::json &p) {
-      if(p.contains("color_projection") || (p.contains("baked") && p.at("baked").at("version")!=1))throw std::runtime_error("Prepared paint requires material archive3");
+      if(p.contains("color_projection") || (p.contains("baked") && p.at("baked").at("version")!=1&&!(layered&&p.at("baked").at("version")==5)))throw std::runtime_error("Prepared paint requires material archive3");
       for(const auto &l:p.at("layers"))if(l.contains("pbr_color_tiles"))throw std::runtime_error("Prepared paint layers require material archive3");
     });
   }
@@ -640,8 +657,16 @@ SourceMaterialArchive SourceMaterialArchive::decode(const nlohmann::json &input,
   };
   for(const auto &record:input.at("paints"))preflight_paint(record);
   SourceMaterialArchive output;
-  std::vector<std::shared_ptr<const PaintedMesh>> paints;
-  for(const auto &paint:input.at("paints"))paints.push_back(PaintedMesh::decode(paint,&images,false,domains,paint_domains,context));
+  std::vector<std::shared_ptr<const PaintedMesh>> paints(input.at("paints").size());
+  std::vector<uint8_t> decoding_paint(paints.size());
+  std::function<std::shared_ptr<const PaintedMesh>(uint32_t)> decode_paint=[&](uint32_t id){
+    if(id>=paints.size())throw std::invalid_argument("Original layered paint identity exceeds material pool");
+    if(paints[id])return paints[id];
+    if(decoding_paint[id])throw std::invalid_argument("Cyclic original normal/paint ownership");
+    decoding_paint[id]=1;paints[id]=PaintedMesh::decode(input.at("paints")[id],&images,false,domains,paint_domains,context);decoding_paint[id]=0;return paints[id];
+  };
+  if(layered)detail::BakedNormalArchive::reader().paint_resolver(decode_paint);
+  for(size_t i=0;i<paints.size();++i)decode_paint(uint32_t(i));
   std::vector<std::shared_ptr<const PaintSamplingAttachment>> bound_paints(paints.size());
   auto bind_paint=[&](size_t id,const std::shared_ptr<const SourceMaterialBindings> &before){
     if(!paints[id]->paint_sampling_domain())return paints[id];
@@ -703,6 +728,16 @@ SourceMaterialArchive SourceMaterialArchive::decode(const nlohmann::json &input,
     binding->native_reference.double_sided=native.at("double_sided").get<bool>();
     if(!value.at("origin").is_null())binding->uv_origin=output.origins_.at(index(value.at("origin"),output.origins_.size()));
     binding->sampling_reparameterized=extended?value.at("sampling_reparameterized").get<bool>():bool(binding->uv_origin);
+    if(layered&&!value.at("canonical_attributes").is_null()){
+      const auto &reference=value.at("canonical_attributes");
+      if((!reference.is_number_unsigned()&&(!reference.is_number_integer()||reference.get<int64_t>()<0))||reference.get<uint64_t>()>UINT32_MAX)throw std::invalid_argument("Invalid canonical attribute origin reference");
+      binding->canonical_attributes=detail::BakedNormalArchive::reader().origin_at(reference.get<uint32_t>());
+      if(!(keyed&&!value.at("key_derivation").is_null())){
+        NormalFrameArchive a,b;a.add(binding->normal_frames);b.add(binding->canonical_attributes->frames());
+        if(a.encode()!=b.encode())throw std::invalid_argument("Canonical attribute frames differ from actual source replay");
+        binding->normal_frames=binding->canonical_attributes->frames();
+      }
+    }
     if(keyed&&!value.at("key_derivation").is_null()){const auto id=index(value.at("key_derivation"),key_derivations.size());const auto &record=input.at("key_derivations").at(id);if(record.at("frames")!=value.at("frames"))throw std::invalid_argument("Material key frame reference differs from its owning node");if(!key_derivations[id])key_derivations[id]=detail::KeyDerivationCodec::decode(record,uint32_t(output.bindings_.size()),output.bindings_,[&](uint32_t p,const auto &b){if(p>=paints.size())throw std::out_of_range("Owning key Paint reference outside pool");return bind_paint(p,b);},*key_frames,models,{},detail::explicit_mirror_material_archive(input));binding->key_derivation=key_derivations[id];binding->normal_frames=binding->key_derivation->frames();}
     if(prepared && !value.at("color_preparation").is_null()) {
       const auto id=index(value.at("color_preparation"),preparations.size());
@@ -830,7 +865,7 @@ SourceMaterialArchive SourceMaterialArchive::decode(const nlohmann::json &input,
     throw std::invalid_argument("Material archive7 requires its actual retained normal feature");
   if(std::any_of(normal_preparations.begin(),normal_preparations.end(),[](const auto &p){return !p;}))throw std::invalid_argument("Unreferenced normal preparation record");
   if(std::any_of(canonical_conversions.begin(),canonical_conversions.end(),[](const auto &p){return !p;}))throw std::invalid_argument("Unreferenced canonical conversion lease");
-  if(physical||detail::explicit_mirror_material_archive(input)||detail::canonical_material_archive(input)){
+  if(physical||detail::explicit_mirror_material_archive(input)||detail::canonical_material_archive(input)||layered){
     SourceMaterialArchive reachable;
     for(const auto &binding:output.bindings_)reachable.add(binding,false);
     if(reachable.origins_.size()!=output.origins_.size())throw std::invalid_argument("HDR archive has unreferenced source origins");
@@ -841,6 +876,10 @@ SourceMaterialArchive SourceMaterialArchive::decode(const nlohmann::json &input,
       throw std::invalid_argument("HDR material base layout differs from its actual owning features");
   }
   if(keyed){if(std::any_of(key_derivations.begin(),key_derivations.end(),[](const auto &k){return !k;}))throw std::invalid_argument("Unreferenced material10 key record");key_frames->require_complete();}
+  if(layered){
+    if(!std::any_of(output.bindings_.begin(),output.bindings_.end(),[](const auto &b){return bool(b->canonical_attributes);}))throw std::invalid_argument("Material15 requires genuine canonical attribute provenance");
+    detail::BakedNormalArchive::reader().paint_resolver({});
+  }
   return output;
 }
 } // namespace dome

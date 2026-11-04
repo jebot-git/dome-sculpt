@@ -43,6 +43,18 @@ std::shared_ptr<const BakedNormalField> BakedNormalField::replace(
   if(incoming.normal_interpretation!=BakedNormalInterpretation::PreparedAttributes||
      incoming.maps.normal.rgba.empty()||incoming.maps.mtoon_normal.rgba.empty()||incoming.normal_authority)
     throw std::invalid_argument("Independent baked field requires complete newly encoded prepared normal roles");
+  return replace_planes(incoming.maps.normal,incoming.maps.mtoon_normal,incoming.coverage,o);
+}
+std::shared_ptr<const BakedNormalField> BakedNormalField::replace_planes(
+    const Image &pbr_write,const Image &toon_write,std::span<const uint8_t> coverage,
+    const BakedNormalFieldOptions &o) const {
+  policy(o);stop(o);validate();
+  pbr_write.validate();toon_write.validate();
+  if(pbr_write.width!=resolution()||pbr_write.height!=resolution()||toon_write.width!=resolution()||
+      toon_write.height!=resolution()||coverage.size()!=size_t(resolution())*resolution())
+    throw std::invalid_argument("Prepared normal write dimensions differ from their actual owning field");
+  struct Write {struct Maps {const Image &normal,&mtoon_normal;} maps;std::span<const uint8_t> coverage;};
+  const Write incoming{{pbr_write,toon_write},coverage};
   bool any=false;
   for(size_t i=0;i<incoming.coverage.size();++i){if((i&1023)==0)stop(o);any|=incoming.coverage[i]!=0;}
   if(!any){stop(o);return self_.lock();}
@@ -55,7 +67,7 @@ std::shared_ptr<const BakedNormalField> BakedNormalField::replace(
   result->origin_=origin_;result->prior_=self_.lock();result->replacements_=replacements_+1;result->intrinsic_baseline_=intrinsic_baseline_;
   result->write_pbr_=std::make_shared<const Image>(incoming.maps.normal);
   result->write_mtoon_=std::make_shared<const Image>(incoming.maps.mtoon_normal);
-  result->write_coverage_=incoming.coverage;
+  result->write_coverage_.assign(incoming.coverage.begin(),incoming.coverage.end());
   auto pbr=std::make_shared<Image>(*pbr_),toon=std::make_shared<Image>(*mtoon_);
   result->coverage_=coverage_;
   for(size_t i=0;i<pixels;++i){

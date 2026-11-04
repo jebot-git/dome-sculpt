@@ -34,6 +34,9 @@ public:
   size_t retained_bytes() const noexcept {return retained_bytes_;}
   void validate() const;
 private:
+  friend class BakedNormalArchive;
+  std::shared_ptr<const BakedNormalField> replace_planes(const Image &,const Image &,
+      std::span<const uint8_t>,const BakedNormalFieldOptions &) const;
   BakedNormalField()=default;
   BakedNormalField(const BakedNormalField&)=delete;
   BakedNormalField &operator=(const BakedNormalField&)=delete;

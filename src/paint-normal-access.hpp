@@ -26,5 +26,7 @@ struct SourceNormalPreparationAccess {
       std::shared_ptr<const detail::BakedNormalField>,const std::function<bool()> & = {});
   static std::shared_ptr<const Image> canonical_intrinsic(const PaintedMesh &,
       const std::function<bool()> & = {});
+  static std::shared_ptr<PaintedMesh> upgrade_canonical(const PaintedMesh &,
+      std::shared_ptr<const detail::BakedNormalField>,const std::function<bool()> & = {});
 };
 } // namespace dome

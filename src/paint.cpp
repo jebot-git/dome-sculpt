@@ -24,6 +24,7 @@
 #include "paint-color-access.hpp"
 #include "paint-normal-access.hpp"
 #include "baked-normal-field.hpp"
+#include "baked-normal-archive.hpp"
 #include "color-projection-quality.hpp"
 #include <bit>
 #include <cstring>
@@ -1712,6 +1713,23 @@ std::shared_ptr<const Image> SourceNormalPreparationAccess::canonical_intrinsic(
   }
   return image;
 }
+std::shared_ptr<PaintedMesh> SourceNormalPreparationAccess::upgrade_canonical(const PaintedMesh &source,
+    std::shared_ptr<const detail::BakedNormalField> field,const std::function<bool()> &cancelled){
+  if(cancelled&&cancelled())throw std::runtime_error("Canonical layer upgrade cancelled");
+  if(source.in_stroke()||!field||!source.normal_projection_||source.normal_projection_->version!=1||
+      source.normal_projection_->pbr!=field->origin()->projection()->pbr||
+      source.normal_projection_->mtoon!=field->origin()->projection()->mtoon)
+    throw std::invalid_argument("Canonical layer upgrade needs its actual unchanged owning legacy projection");
+  auto result=source.snapshot();result->normal_projection_.reset();
+  if(source.baked_){
+    if(source.baked_->normal_field||source.baked_->normal_authority||!source.baked_->maps.normal.rgba.empty())
+      throw std::invalid_argument("Legacy canonical layer upgrade needs its explicit later-bake/UV adapter");
+    auto baked=std::make_shared<BakedTextures>(*source.baked_);baked->normal_field=std::move(field);
+    baked->validate(source.resolution());result->baked_=std::move(baked);
+  }
+  result->composite_token_=next_composite_token();++result->revision_;
+  if(cancelled&&cancelled())throw std::runtime_error("Canonical layer upgrade cancelled");return result;
+}
 PaintNormalPreparationResult SourceNormalPreparationAccess::prepare(const PaintedMesh &source,
     const SourceMaterialBindings *binding,const NormalPreparationOptions &options) {
   auto check=[&]{if(options.cancelled&&options.cancelled())throw std::runtime_error("Normal preparation cancelled");};check();
@@ -2754,7 +2772,6 @@ nlohmann::json PaintedMesh::encode(PaintImageArchive *archive,NormalSamplingArch
     }
   }
   if (baked_) {
-    if(baked_->normal_field)throw std::invalid_argument("Independent baked normal persistence requires its owning Scene33 archive");
     j["baked"] = {{"version", 1},
                     {"color", nlohmann::json::binary(baked_->maps.color.rgba)},
                     {"orm", nlohmann::json::binary(baked_->maps.metal_rough.rgba)},
@@ -2775,6 +2792,11 @@ nlohmann::json PaintedMesh::encode(PaintImageArchive *archive,NormalSamplingArch
       j["baked"]["version"]=4;
       j["baked"]["normal_interpretation"]="retained-field-metadata-v1";
       j["baked"]["normal_authority"]=domains->add_detail(baked_->normal_authority);
+    }
+    if(baked_->normal_field){
+      if(!archive)throw std::invalid_argument("Independent baked normal persistence needs the actual Scene33 image archive");
+      j["baked"]["version"]=5;j["baked"]["normal_interpretation"]="independent-baked-field-v1";
+      j["baked"]["normal_field"]=detail::BakedNormalArchive::writer().add_field(baked_->normal_field);
     }
   }
   if(source_sampling_prepared()) {
@@ -3032,8 +3054,14 @@ std::shared_ptr<PaintedMesh> PaintedMesh::decode(const nlohmann::json &input,con
     const auto &v = j.at("baked");
     if(v.contains("normal_authority")&&!domains)
       throw std::invalid_argument("Retained normal bake requires a complete owning sampling archive context");
-    if(!v.at("version").is_number_integer() || (v.at("version")!=1 && v.at("version")!=2 && v.at("version")!=3 && v.at("version")!=4))throw std::runtime_error("Unsupported baked texture version");
+    if(!v.at("version").is_number_integer() || (v.at("version")!=1 && v.at("version")!=2 && v.at("version")!=3 && v.at("version")!=4&&v.at("version")!=5))throw std::runtime_error("Unsupported baked texture version");
     const bool retained=v.at("version")==4;
+    const bool layered=v.at("version")==5;
+    if(layered){
+      (void)detail::BakedNormalArchive::reader();
+      if(!v.contains("normal_field")||v.at("normal_interpretation")!="independent-baked-field-v1"||result->normal_projection_)
+        throw std::invalid_argument("Independent baked field has contradictory intrinsic/normal ownership");
+    }else if(v.contains("normal_field"))throw std::invalid_argument("Independent baked reference requires payload5/Scene33");
     if(retained&&(!domains||!v.contains("normal_authority")||!result->normal_projection_||result->normal_projection_->version!=2))
       throw std::invalid_argument("Retained normal metadata requires complete paired field context");
     if(!retained&&v.contains("normal_authority"))
@@ -3054,8 +3082,8 @@ std::shared_ptr<PaintedMesh> PaintedMesh::decode(const nlohmann::json &input,con
     auto normal = bytes("normal", size_t(r)*r*4, true);
     if (!normal.empty()) baked.maps.normal = {r, r, std::move(normal)};
     baked.coverage = bytes("coverage", size_t(r)*r);
-    if(v.at("version")!=3&&!retained&&(v.contains("normal_interpretation")||v.contains("mtoon_normal")))throw std::runtime_error("Prepared normals require baked payload3");
-    if(v.at("version")==2||((v.at("version")==3||retained)&&(v.contains("color_interpretation")||v.contains("pbr_color")))) {
+    if(v.at("version")!=3&&!retained&&!layered&&(v.contains("normal_interpretation")||v.contains("mtoon_normal")))throw std::runtime_error("Prepared normals require baked payload3");
+    if(v.at("version")==2||((v.at("version")==3||retained||layered)&&(v.contains("color_interpretation")||v.contains("pbr_color")))) {
       if(v.at("color_interpretation")!="resolved-pbr")throw std::runtime_error("Unknown baked color interpretation");
       baked.color_interpretation=BakedColorInterpretation::ResolvedPbr;baked.maps.pbr_color={r,r,bytes("pbr_color",size_t(r)*r*4)};
     }
@@ -3064,6 +3092,12 @@ std::shared_ptr<PaintedMesh> PaintedMesh::decode(const nlohmann::json &input,con
       if(!kind.is_string()||kind.get_ref<const std::string&>()!=(retained?"retained-field-metadata-v1":"prepared-attributes-v1"))throw std::runtime_error("Unknown baked normal interpretation");
       baked.normal_interpretation=BakedNormalInterpretation::PreparedAttributes;
       auto normal=bytes("mtoon_normal",size_t(r)*r*4,true);if(!normal.empty())baked.maps.mtoon_normal={r,r,std::move(normal)};
+    }
+    if(layered){
+      const auto &reference=v.at("normal_field");
+      if((!reference.is_number_unsigned()&&(!reference.is_number_integer()||reference.get<int64_t>()<0))||reference.get<uint64_t>()>UINT32_MAX)throw std::invalid_argument("Invalid independent baked normal reference");
+      baked.normal_interpretation=BakedNormalInterpretation::PreparedAttributes;
+      baked.normal_field=detail::BakedNormalArchive::reader().field_at(reference.get<uint32_t>());
     }
     if(retained){
       const auto &reference=v.at("normal_authority");

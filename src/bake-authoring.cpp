@@ -25,6 +25,11 @@ ObjectBakeReport bake_object(Scene &scene, uint64_t source_id,
   scene.validate();
   auto target = scene.active();
   auto source = scene.object(source_id);
+  if(target.material_bindings&&target.material_bindings->normal_preparation&&target.material_bindings->normal_preparation->canonical_conversion){
+    NormalPreparationOptions normal_options;normal_options.cancelled=cancelled;normal_options.max_angular_error=settings.normal_error;
+    auto layered=convert_canonical_normals({target.painted,target.appearance,target.material_bindings,target.deformation,target.material,{}},normal_options);
+    target.painted=std::move(layered.paint);target.material_bindings=std::move(layered.material_bindings);
+  }
   const bool current_source=source.polygon&&source.polygon->active&&source.polygon->colors;
   const bool current_target=target.polygon&&target.polygon->active&&target.polygon->colors;
   if(!detail::corner_bake_target_supported(target))

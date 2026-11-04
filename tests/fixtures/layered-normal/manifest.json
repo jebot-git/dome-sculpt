@@ -1,0 +1,17 @@
+{
+  "provenance": "Actual native test baker/conversion outputs from sealed private7805 milestone; exact matches to docs/validation/CANONICAL-NORMAL-OWNING.json pixel_native_audit.native_scene_pairs. These are historical emitted files, not newly relabeled current writer output.",
+  "files": {
+    "original-0.dsculpt": {
+      "sha256": "ea42f974f9dc16de200f5d4bcee371ea861bed5c8124c483627a06c98a5ce3f0",
+      "bytes": 100736
+    },
+    "original-7.dsculpt": {
+      "sha256": "9690db9603ae5fce91f9b35f67b4a83d1c2fcffc4847ffea32b2d3201cd67d86",
+      "bytes": 101288
+    },
+    "converted-7.dsculpt": {
+      "sha256": "4d76737188b1ca5111dc8e2b5e3e5c126374e87a0282187251fc8ade765bb6e6",
+      "bytes": 203986
+    }
+  }
+}
