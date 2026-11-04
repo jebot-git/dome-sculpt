@@ -19,6 +19,15 @@ This is a new test-TU consumer over matched owned archives, with pristine paint
 contributions, not a new whole app/VRM/painted-export/main claim. Read
 SOURCE4-KEY-EXPORT-PIXELS.md and its receipt. Broader coherent qualification and
 every unfinished original/additional goal row remain required.
+## Private Source4 key/workflow partial checkpoint — 2026-11-04
+
+Two test-only native consumers now authenticate separate writable/original UV2
+sampling owners and pass51+139 Release checks, complete23part REST/key/paint/Save/
+Cancel/restart and44,484 independent GLB corners/pixels0. SAN51 +focused actual
+lateCancel5 pass; the complete revisedSAN139 repeat is explicitly pending after
+preserved original120s test-gate failure. No runtime/guard/resource change.
+Read SOURCE4-KEY-WORKFLOW.md and receipt; full coherent/main admission and all
+unfinished original/additional requirements remain required.
 
 
 ## Private coherent application qualification candidate — 2026-11-04
