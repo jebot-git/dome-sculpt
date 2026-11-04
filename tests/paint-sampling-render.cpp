@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
+#include "bake-recipe-capabilities.hpp"
 #define DOME_NORMAL_COLOR_RENDER_NO_MAIN
 #include "normal-color-uv-render.cpp"
 #undef DOME_NORMAL_COLOR_RENDER_NO_MAIN
@@ -33,7 +34,7 @@ int main(int argc,char **argv)try {
  Fbo fbo;fbo.bind();SurfaceRenderer renderer;prepared_normal_consumer::Renderer independent;size_t number=0;
  for(bool seam:{false,true})for(auto alpha:{Material::AlphaMode::Opaque,Material::AlphaMode::Mask,Material::AlphaMode::Blend}) {
   auto original=joint::prepare(seam,alpha);auto current=retain_writable(original);auto file=prefix/(std::to_string(number)+".dsculpt");current.save(file);current=Scene::load(file);
-  check(current.encode().at("version")==24,"Actual fractional scale/turn restarts its owning Scene24 normal/colour/paint closure");
+  check(bake_recipe_fixture::scene30(current,24),"Actual fractional scale/turn restarts its owning Scene24 normal/colour/paint closure");
   for(int pose=0;pose<3;++pose)for(float weight:{0.f,.35f,1.f}) {
    auto before=original,after=current;posed(before,pose,weight);posed(after,pose,weight);Document b,a;b.replace(before);a.replace(after);settled(b);settled(a);
    auto surface=a.frame().surface;check(!surface->paint_coordinates.empty()&&surface->paint_coordinates.size()==surface->mesh.positions.size(),"Worker publishes explicit retained paint coordinates beside independent normal coordinates");

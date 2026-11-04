@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
+#include "bake-recipe-capabilities.hpp"
 #include "prepared-normal-shapes-fixtures.hpp"
 #include "dome/source-uv-bake.hpp"
 #include "dome/creator-archive.hpp"
@@ -16,9 +17,9 @@ int main(int argc,char **argv)try{
  check(adopted.paint->baked()->normal_interpretation==BakedNormalInterpretation::PreparedAttributes&&!adopted.paint->baked()->maps.mtoon_normal.rgba.empty(),"Prepared baked detail retains both PBR and MToon channels under its declared interpretation");
  bool detail=true;const auto &a=*adopted.paint->baked(),&b=*old->baked();for(size_t y=0;y<64;++y)for(size_t x=0;x<64;++x){const auto at=(y*64+x)*4,from=((63-y)*64+63-x)*4;detail&=a.coverage[y*64+x]==b.coverage[(63-y)*64+63-x];if(b.coverage[(63-y)*64+63-x])for(size_t c=0;c<3;++c){detail&=a.maps.normal.rgba[at+c]==b.maps.normal.rgba[from+c];detail&=a.maps.mtoon_normal.rgba[at+c]==b.maps.mtoon_normal.rgba[from+c];}}
  check(detail,"Exact rotated normal detail and fractional coverage are transferred without derivative-basis conversion");
- const auto encoded=after.encode();check(encoded.at("version")==19&&encoded.at("source_materials").at("version")==5,"Writer emits explicit Scene19/material5 rather than letting older readers ignore UV authority");auto reopened=Scene::decode(encoded);check(reopened.encode()==encoded,"Complete normalUV model, current skin/pose and original source DAG roundtrip exactly");
+ const auto encoded=after.encode();check(bake_recipe_fixture::scene30(after,19,encoded)&&encoded.at("source_materials").at("version")==5,"Writer emits explicit Scene19/material5 rather than letting older readers ignore UV authority");auto reopened=Scene::decode(encoded);check(reopened.encode()==encoded,"Complete normalUV model, current skin/pose and original source DAG roundtrip exactly");
  std::filesystem::path path=argv[1];path+=".dsculpt";after.save(path);check(Scene::load(path).encode()==encoded,"Actual native Save/reopen retains the owning source-aware normalUV receipt");
- auto lower=encoded;lower["version"]=18;check(refuses([&]{Scene::decode(lower);}),"Older scene version cannot smuggle a normalUV interpretation");lower=encoded;lower["source_materials"]["version"]=4;check(refuses([&]{Scene::decode(lower);}),"Older material archive cannot silently ignore UV receipt data");
+ auto lower=bake_recipe_fixture::legacy(after,19);lower["version"]=18;check(refuses([&]{Scene::decode(lower);}),"Older scene version cannot smuggle a normalUV interpretation");lower=encoded;lower["source_materials"]["version"]=4;check(refuses([&]{Scene::decode(lower);}),"Older material archive cannot silently ignore UV receipt data");
  auto malformed=encoded;auto &records=malformed["source_materials"]["normal_preparations"];size_t target=0;while(!records.at(target).contains("uv_reprojection"))++target;records[target]["uv_reprojection"]["receipt"]["source_constraints"]=0;check(refuses([&]{Scene::decode(malformed);}),"Malformed quality counters refuse before publishing a restored model");
  malformed=encoded;auto &layout=malformed["source_materials"]["normal_preparations"][target]["uv_reprojection"]["layout"];layout["indices"].get_binary()[0]=255;check(refuses([&]{Scene::decode(malformed);}),"Packed out-of-range UV indices cannot wrap into native source identity");
  malformed=encoded;malformed["source_materials"]["normal_preparations"][target]["uv_reprojection"]["before_binding"]=255;check(refuses([&]{Scene::decode(malformed);}),"Unbound or cyclic before-material references refuse");

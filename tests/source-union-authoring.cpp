@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
+#include "bake-recipe-capabilities.hpp"
 #define DOME_NORMAL_COLOR_RENDER_NO_MAIN
 #include "normal-color-uv-render.cpp"
 #undef DOME_NORMAL_COLOR_RENDER_NO_MAIN
@@ -52,12 +53,12 @@ int main(int argc,char **argv)try{
   const auto &mesh=fitted.active().painted->mesh();size_t face=0;while(face<mesh.indices.size()/3&&mesh.normals[mesh.indices[face*3]].z<.9f)++face;std::array<float,2> p{};for(size_t k=0;k<3;++k){auto uv=mesh.uv[mesh.indices[face*3+k]];p[0]+=uv[0]/3;p[1]+=uv[1]/3;}
   doc.edit_uv(UvAction::Pick,p[0],p[1]);doc.edit_uv(UvAction::Scale,.7f);doc.edit_uv(UvAction::Rotate,1.57079632679f);check(doc.wait_uv()&&doc.frame().state->uv->valid,"Fitted master source validates the actual fractional scale and turn");doc.end_uv(true);
   const auto project=directory/("fitted-"+std::to_string(pose)+".dsculpt");doc.save_async(project).get();settled(doc);auto accepted=doc.copy_scene();auto encoded=accepted.encode();auto restarted=Scene::load(project);
-  check(encoded.at("version")==26&&encoded.at("polygon_sources").at("version")==6&&encoded.at("source_materials").at("version")==9&&restarted.encode()==encoded,"One actual native Save/restart composes Scene26 raw coordinates, rig history6 and independent material9 domains");
+  check(bake_recipe_fixture::scene30(accepted,26,encoded)&&encoded.at("polygon_sources").at("version")==7&&bake_recipe_fixture::legacy(accepted,26).at("polygon_sources").at("version")==6&&encoded.at("source_materials").at("version")==9&&restarted.encode()==encoded,"One actual native Save/restart composes Scene26 raw coordinates, rig history6 and independent material9 domains");
   const auto &b=*restarted.active().material_bindings;auto colour=b.color_preparation->paint_sampling;auto normal=b.normal_preparation->sampling_domain;
   check(colour&&normal&&normal->metadata_sampling_domain==restarted.active().painted->paint_sampling_domain()&&colour->before_deformation()&&normal->before_deformation&&colour->before_deformation()->encode(colour->before_paint()->mesh())==normal->before_deformation->encode(normal->before_paint->mesh())&&(std::any_of(normal->before_deformation->pose.begin(),normal->before_deformation->pose.end(),[](const auto &p){return bool(p.full_local_matrix);})==has_exact),"Independent colour/normal nodes retain equivalent owning before-states and actual pose authority");
   const auto &raw_current=restarted.object(raw);check(raw_current.rig_source&&raw_current.rig_source->paint->source_maps()->color.texcoord==2&&*raw_current.painted->source_maps()->extra_uv_sets.at(2)==*raw_before->extra_uv_sets.at(2)&&*raw_current.rig_source->paint->source_maps()->uv1==*raw_before->uv1,"Current and retained first-rig maps preserve exact UV1/UV2 arrays and original role IDs");
   auto surfaces=accepted.surfaces();auto surface=std::find_if(surfaces.begin(),surfaces.end(),[&](const auto &s){return s.id==active;});check(surface!=surfaces.end(),"Expanded-frame test uses the actual current authoring surface");auto expanded=detail::normal_frame_export(*surface,detail::SourceMorphSpace::Native,{},true);check(expanded.surface.rig_source==accepted.active().rig_source,"Paint/frame corner expansion preserves its exact complete rig-source capsule");
-  auto malformed=encoded;malformed["version"]=24;check(rejects([&]{Scene::decode(malformed);}),"Older outer contexts cannot hide exact poses and genuine extra-coordinate rig histories");
+  auto malformed=bake_recipe_fixture::legacy(accepted,26);malformed["version"]=24;check(rejects([&]{Scene::decode(malformed);}),"Older outer contexts cannot hide exact poses and genuine extra-coordinate rig histories");
   check(doc.undo()&&doc.copy_scene().encode()==fitted.encode()&&doc.redo()&&doc.copy_scene().encode()==encoded,"Combined UV worker retains exactly one global Undo/Redo and all first rig sources");settled(doc);
   for(float weight:{0.f,.35f,1.f}){
    auto a=before.snapshot(),c=restarted.snapshot();for(auto *s:{&a,&c}){auto d=*s->active().deformation;d.morph_weights[0]=weight;s->set_deformation(active,std::move(d));}

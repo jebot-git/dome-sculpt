@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
+#include "bake-recipe-capabilities.hpp"
 #include "current-color-target-fixture.hpp"
 #include "dome/bake-authoring.hpp"
 #include "dome/document.hpp"
@@ -78,7 +79,7 @@ int main(int argc,char **argv)try{
   document.bake_from_object(source,settings);check(document.wait_asset()&&!document.frame().state->error.empty()&&document.copy_scene().encode()==before&&!document.frame().state->can_undo,"Native target Bake requires explicit preparation and preserves exact input/history on refusal");
   settings.prepare_colors=true;document.bake_from_object(source,settings);check(document.wait_asset()&&document.wait_mesh()&&document.frame().state->error.empty(),"Actual guarded native worker prepares and bakes a current-corner target");
   auto baked=document.copy_scene();auto accepted=baked.encode();auto preparation=baked.active().material_bindings->color_preparation;
-  check(accepted.at("version")==20&&preparation->polygon_colors->field==field&&baked.active().polygon->colors==field&&baked.active().shape_source==shape,"Native target keeps actual immutable current field, shape source and Scene20 receipt");
+  check(bake_recipe_fixture::scene30(baked,20,accepted)&&preparation->polygon_colors->field==field&&baked.active().polygon->colors==field&&baked.active().shape_source==shape,"Native target keeps actual immutable current field, shape source and Scene20 receipt");
   check(baked.active().polygon->origin->polygon==authority&&baked.active().polygon->origin->paint->encode()==original.active().painted->encode(),"Actual same-mesh strict conversion retains complete prior PA authority and paint in its own Origin");
   check(current_color_bake_fixture::source_only(baked.snapshot(),source)==source_before,"Native target conversion never mutates independently archived hidden read-only source");
   check(document.undo()&&document.copy_scene().encode()==before&&!document.frame().state->can_undo&&document.redo()&&document.copy_scene().encode()==accepted,"Target strict conversion, projection and real Bake are one exact native Undo/Redo");

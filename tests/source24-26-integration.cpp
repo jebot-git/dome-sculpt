@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
+#include "bake-recipe-capabilities.hpp"
 #define DOME_PAINT_SAMPLING_RENDER_NO_MAIN
 #include "paint-sampling-render.cpp"
 #undef DOME_PAINT_SAMPLING_RENDER_NO_MAIN
@@ -24,7 +25,7 @@ int main(int argc,char **argv)try{
  const auto image=Image{1,1,{255,0,0,255}}.png();const auto image_path=root/"projection.png";{std::ofstream out(image_path,std::ios::binary);out.write(reinterpret_cast<const char*>(image.data()),image.size());}
  Fbo fbo;fbo.bind();SurfaceRenderer renderer;prepared_normal_consumer::Renderer independent;
  auto original=joint::prepare(true,Material::AlphaMode::Opaque);auto retained=retain_writable(original);
- auto unsupported=retained.encode();unsupported["version"]=26;unsupported["objects"][0]["rig_source"]=0;
+ auto unsupported=bake_recipe_fixture::legacy(retained,24);unsupported["version"]=26;unsupported["objects"][0]["rig_source"]=0;
  check(rejects([&]{Scene::decode(unsupported);}),"Outer Scene26 cannot silently discard an unsupported actual Source25 rig capsule");
  unsupported=retained.encode();unsupported["objects"][0]["rig_source"]=nullptr;
  check(Scene::decode(unsupported).encode()==retained.encode(),"Null future rig capsule field does not fabricate a Source25 feature");
@@ -56,14 +57,14 @@ int main(int argc,char **argv)try{
  import_fixture::Fixture input;while(input.bin.size()%4)input.bin.push_back(0);const auto uv2=input.values({0,1,0,0,1,0,1,1},2,"VEC2");input.j["meshes"][0]["primitives"][0]["attributes"]["TEXCOORD_2"]=uv2;input.j["materials"][0]["pbrMetallicRoughness"]["baseColorTexture"]["texCoord"]=2;input.j["materials"][0]["alphaMode"]="OPAQUE";input.j["materials"][0].erase("alphaCutoff");
  const auto source=root/"genuine-source-uv2.glb";input.save(source);
  ImportSettings settings;settings.paint_resolution=64;document.configure_import(settings);document.import_asset(source);endpoint(document);auto combined=document.copy_scene();
- check(combined.encode().at("version")==26&&combined.encode().at("source_materials").at("version")==9,"Single native project writes actual Source26 ownership with material9 retained paint/normal context");
+ check(bake_recipe_fixture::scene30(combined,26)&&combined.encode().at("source_materials").at("version")==9,"Single native project writes actual Source26 ownership with material9 retained paint/normal context");
  check(combined.object(retained_id).painted->mesh_owner()==retained_paint->mesh_owner()&&combined.object(retained_id).painted->paint_sampling_attachment()==retained_paint->paint_sampling_attachment()&&combined.active().painted->source_maps()->uses_alternate_uv(),"Raw extra-coordinate import retains the earlier owning writable-paint object");
  ProjectionCamera camera;camera.pose.position={0,0,2};camera.width=camera.height=2;document.load_projection_image(image_path,camera);check(document.wait_projection_image(),"Actual current-main projection image worker loads on the mixed-context project");
  auto before=document.copy_scene().encode();check(!document.begin_native_stroke()&&document.frame().state->message==detail::editable_texture_atlas_notice&&document.copy_scene().encode()==before,"Projection trigger on raw extra coordinates refuses before any stroke/history mutation");
  document.begin_uv();check(document.wait_uv(),"Mixed-context raw object starts its real UV worker");document.edit_uv(UvAction::Pack);check(document.wait_uv()&&document.frame().state->uv->valid,"Actual Pack produces a validated editable atlas");document.end_uv(true);endpoint(document);
  auto atlas=document.copy_scene();check(!atlas.active().painted->source_maps()->uses_alternate_uv()&&atlas.active().material_bindings->uv_origin->paint->source_maps()->extra_uv_sets.contains(2),"Native UV Apply compiles current roles but retains the exact original UV2 owner");
  ink(document,atlas);const auto saved=root/"projected.dsculpt";document.save_async(saved).get();endpoint(document);auto painted=document.copy_scene();auto restored=Scene::load(saved);
- check(restored.encode()==painted.encode()&&restored.encode().at("version")==26,"Projection gesture and ordered Save/reopen retain both paint/normal pools and original extra coordinates");
+ check(restored.encode()==painted.encode()&&bake_recipe_fixture::scene30(restored,26),"Projection gesture and ordered Save/reopen retain both paint/normal pools and original extra coordinates");
  check(painted.active().painted->encode()!=atlas.active().painted->encode(),"Known opaque imported texel produces a real projected paint transaction");
  std::cout<<"PROJECTED_CHANGED "<<(painted.active().painted->encode()!=atlas.active().painted->encode())<<" CAN_UNDO "<<document.frame().state->can_undo<<std::endl;
  const bool undone=document.undo();auto undone_scene=document.copy_scene().encode();auto difference=nlohmann::json::diff(atlas.encode(),undone_scene);std::ofstream(root/"undo-difference.json")<<difference.dump(2);
@@ -72,6 +73,6 @@ int main(int argc,char **argv)try{
  const auto output=root/"projected.glb";document.export_asset(output).get();prepared_normal_consumer::Model emitted(output);fbo.bind();independent.render(emitted.data);auto final_error=delta(native,read());std::cout<<"COMBINED_GLB_MAX "<<final_error<<std::endl;check(final_error<=3,"Actual combined native PBR and independently parsed final GLB agree after UV preparation and projection");
  cgltf_texture_view *wrong=nullptr;for(size_t m=0;m<emitted.data->meshes_count&&!wrong;++m)for(size_t p=0;p<emitted.data->meshes[m].primitives_count;++p){auto &primitive=emitted.data->meshes[m].primitives[p];if(primitive.material&&primitive.material->pbr_metallic_roughness.base_color_texture.texture&&primitive.material->pbr_metallic_roughness.base_color_texture.texcoord==2)wrong=&primitive.material->pbr_metallic_roughness.base_color_texture;}
  check(wrong!=nullptr,"Mixed current output retains an actual visible original UV2 material role");wrong->texcoord=0;fbo.bind();independent.render(emitted.data);auto wrong_error=delta(native,read());wrong->texcoord=2;std::cout<<"COMBINED_WRONG_UV_MAX "<<wrong_error<<std::endl;check(wrong_error>3,"Independent mixed-project comparison detects wrong original UV2 role sampling");
- auto lowered=restored.encode();lowered["version"]=24;check(rejects([&]{Scene::decode(lowered);}),"Retained-only original UV2 cannot be smuggled into Scene24 through the paint-domain history");
+ auto lowered=bake_recipe_fixture::legacy(restored,26);lowered["version"]=24;check(rejects([&]{Scene::decode(lowered);}),"Retained-only original UV2 cannot be smuggled into Scene24 through the paint-domain history");
  std::cout<<"PASS "<<checks<<" combined Source24/26/current-main workflow checks\n";return 0;
 }catch(const std::exception&e){std::cerr<<"FAIL "<<e.what()<<'\n';return 1;}

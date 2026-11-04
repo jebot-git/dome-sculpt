@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
+#include "bake-recipe-capabilities.hpp"
 #include "prepared-normal-shapes-fixtures.hpp"
 #include "current-color-target-fixture.hpp"
 #include "polygon-paint.hpp"
@@ -92,7 +93,7 @@ int main()try{
         object.painted->normal_projection()->sampling_domain->detail,
         "Detached exact Scale adoption binds the captured normal event to its own owning recipe");
   const auto saved=current_scene.encode();
-  check(saved.at("version")==21&&saved.at("source_materials").at("version")==7,
+  check(bake_recipe_fixture::scene30(current_scene,21,saved)&&saved.at("source_materials").at("version")==7,
         "Only actual retained-domain authoring selects Scene21/material7");
   auto restarted=Scene::decode(saved);
   const auto &restarted_paint=*restarted.active().painted;
@@ -111,7 +112,7 @@ int main()try{
   color_object.painted=color.paint;color_object.material_bindings=color.material_bindings;
   const auto normal_id=joint.add("Retained normal field",Volume{});auto &normal_object=joint.object(normal_id);normal_object=object;normal_object.id=normal_id;
   joint.validate();const auto joint_saved=joint.encode();auto joint_restarted=Scene::decode(joint_saved);
-  check(joint_saved.at("version")==21&&joint_saved.at("source_materials").at("version")==7&&joint_restarted.encode()==joint_saved,
+  check(bake_recipe_fixture::scene30(joint,21,joint_saved)&&joint_saved.at("source_materials").at("version")==7&&joint_restarted.encode()==joint_saved,
         "Normal7 owns its real Scene20 color pool without requiring or discarding an unused feature");
   check(joint_restarted.objects()[0].polygon->colors==joint_restarted.objects()[0].material_bindings->color_preparation->polygon_colors->field,
         "Joint restart preserves current-corner field identity independently of normal-event identity");
@@ -119,7 +120,7 @@ int main()try{
   check(decode_normal_surface(paired).encode()==saved,
         "Owning standalone surface envelope retains complete source and authoring context");
   check(refuses([&]{object.painted->encode();}),"Bare retained Paint archive refuses missing source context");
-  auto malformed=saved;malformed["version"]=20;
+  auto malformed=bake_recipe_fixture::legacy(current_scene,21);malformed["version"]=20;
   check(refuses([&]{Scene::decode(malformed);}),"Legacy Scene versions cannot relabel retained-domain semantics");
   malformed=saved;malformed["source_materials"]["normal_preparations"].back()["sampling_domain"]["sampling_binding"]=999;
   check(refuses([&]{Scene::decode(malformed);}),"Missing source sampler history refuses before editable publication");

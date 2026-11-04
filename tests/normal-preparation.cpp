@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
+#include "bake-recipe-capabilities.hpp"
 #include "dome/document.hpp"
 #include "dome/normal-preparation.hpp"
 #include "dome/source-uv-bake.hpp"
@@ -72,7 +73,7 @@ int main(int argc,char **argv)try {
   const auto before_uv=restarted.copy_scene().encode();restarted.begin_uv();check(restarted.wait_uv()&&restarted.frame().state->uv&&restarted.frame().state->uv->valid,"Prepared normal target enters the real native UV workspace without changing its source interpretation");
   restarted.edit_uv(UvAction::Scale,.9f);check(restarted.wait_uv()&&restarted.frame().state->uv->valid,"A real changed UV draft validates its geometry before source-aware adoption");
   const auto draft_uv=restarted.frame().state->uv->mesh->uv;
-  restarted.end_uv(true);check(restarted.wait_asset()&&restarted.frame().state->error.empty()&&restarted.wait_mesh()&&restarted.copy_scene().encode().at("version")==19,"Explicit normalUV adapter accepts the represented prepared-normal draft through the actual worker");
+  restarted.end_uv(true);check(restarted.wait_asset()&&restarted.frame().state->error.empty()&&restarted.wait_mesh()&&bake_recipe_fixture::scene30(restarted.copy_scene(),19),"Explicit normalUV adapter accepts the represented prepared-normal draft through the actual worker");
   const auto after_uv=restarted.copy_scene().encode();const auto current_uv=restarted.copy_scene().active().material_bindings->normal_preparation;
   check(!restarted.frame().state->uv&&restarted.copy_scene().active().painted->mesh().uv==draft_uv&&current_uv->uv_reprojection&&current_uv->target_frames==repeat_recipe->target_frames&&current_uv->original_paint==repeat_recipe->original_paint,"Accepted normalUV draft owns its exact before-state and sampling layout while preserving original frame/source authority");
   restarted.begin_uv();check(restarted.wait_uv(),"A new prepared-normal draft opens after accepted UV publication");restarted.edit_uv(UvAction::Scale,.8f);check(restarted.wait_uv(),"A new detached draft validates before explicit Cancel");restarted.end_uv(false);check(restarted.wait_mesh()&&restarted.copy_scene().encode()==after_uv,"Cancelling a subsequent draft preserves the exact accepted normalUV model");
