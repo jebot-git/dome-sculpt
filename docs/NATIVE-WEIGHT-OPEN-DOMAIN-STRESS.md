@@ -1,0 +1,5 @@
+# Open-domain continuation stress
+
+Six additional pure-kernel connected-U cases pass the original3%/1% weight and6/2mm actual deformation gates under500M charged work:1cm thin legs, the same thin legs refined5mm with reversed winding/alternate triangles, narrow1cm and broad8cm bridges, reversed winding, and an oblique exact dyadic plane. All cases use a fixed binary-exact phase shift and native genuine finite handles centered on their geometric limbs; no artist weights or part-specific fit tuning enter the energy. Maximum opposite influence is0.817518%, mean0.226295%, actual pose1.63504/0.452578mm. The oblique case uses135.36M work, demonstrating correct behavior without the axis-plane cull; it does not establish fine arbitrary oblique-mesh cost viability.
+
+This test-only overlay is own841 private kernel/test linked matching264 public/core/support. It is not solver SAN, native/UI/history or full arbitrary unskinned qualification. Coincident/touching source intent, curved/complex domains, broader inferred anatomy and fine non-axis performance still need explicit treatment; these six cases do not replace those requirements.

@@ -1,0 +1,38 @@
+{
+  "base": "841329a",
+  "scope": "Own inline private kernel/test against matching264 core/support; pure geometry/field/pose gates, no native/SAN claim from this run",
+  "bounds": {
+    "work": 500000000,
+    "weight_max": 0.03,
+    "weight_mean": 0.01,
+    "pose_max_m": 0.006,
+    "pose_mean_m": 0.002
+  },
+  "completed_cases": 6,
+  "cases": [
+    "1cm thin1cm leg",
+    "5mm thin1cm leg, reversed winding and alternate triangles",
+    "1cm narrow1cm bridge",
+    "1cm broad8cm bridge",
+    "1cm reversed winding",
+    "1cm oblique exact-dyadic plane"
+  ],
+  "phase_shift": [
+    0.0078125,
+    0.03125,
+    0.015625
+  ],
+  "all_passed": true,
+  "maximum_wrong": 0.00817518,
+  "maximum_mean_wrong": 0.00226295,
+  "maximum_pose_m": 0.00163504,
+  "maximum_pose_mean_m": 0.000452578,
+  "largest_work": 135359710,
+  "sha256": {
+    "tests/native-weight-open-domain-stress.cpp": "a1f61ed418d5cd1d510daa132c18dff019f14e672528bdce41de659a3edb4251",
+    "artifacts/overlay.json": "ab112a85eb01d6817b6b92ee7b531baf9cd6b94381874f459f354ade300ec4b7",
+    "artifacts/run.log": "6c6b8eccea963c6b2f6557c789113dc88153701d8831fcfec321e36e8128200c",
+    "artifacts/status.json": "597ec924c605043334154635c5e52a3463f4da2d5cbf942a0f61a263ec8cb745",
+    "artifacts/native-weight-open-domain-stress": "6a17022b169c63aea3c666f66c4c24f7eb42bc9ac22635c76d57d6e71e88c69b"
+  }
+}
