@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
+#include "bake-fixture-identity.hpp"
 #include "current-color-target-fixture.hpp"
 #include "dome/color-preparation.hpp"
 #include "dome/document.hpp"
@@ -37,7 +38,7 @@ int main(int argc,char **argv)try{
   Document doc;Release release;doc.replace(source);ready(doc);accept(doc);auto path=directory/"accepted.dsculpt";auto saved=doc.save_async(path);
   check(saved.wait_for(std::chrono::milliseconds(20))!=std::future_status::ready,"Save remains queued behind the exact paused UV operation");
   check(refused([&]{doc.edit_uv(UvAction::Move,.1f,0);}),"An accepted UV job cannot race a changed draft");gate.release();complete(saved);ready(doc);const auto accepted=doc.copy_scene().encode();
-  check(accepted.at("version")==23&&accepted!=original&&Scene::load(path).encode()==accepted,"Queued Save stores the actual accepted UV model rather than the prior scene");
+  check(accepted.at("version")==30&&doc.copy_scene().active().bake_recipe==source.active().bake_recipe&&accepted!=original&&Scene::load(path).encode()==accepted,"Queued Save stores the actual accepted UV model rather than the prior scene");
   check(doc.undo()&&doc.copy_scene().encode()==original&&doc.redo()&&doc.copy_scene().encode()==accepted,"Accepted UV plus queued Save retains exactly one Undo/Redo boundary");
  }
  {
@@ -78,7 +79,7 @@ int main(int argc,char **argv)try{
   check(controller.wait_uv()&&controller.frame().state->uv&&controller.frame().state->controls.parameter==VrParameter::UvEdit,"Actual joystick navigation enters the existing UV workspace for the prepared corner target");
   controller.edit_uv(UvAction::Scale,.7f);check(controller.wait_uv()&&controller.frame().state->uv->valid,"Actual prepared-corner UV scale validates for the supported unposed normal basis");
   auto draft=controller.frame().state->uv->mesh->uv;send(-1,0);send();check(controller.wait_uv()&&controller.frame().state->uv->mesh->uv!=draft,"Controller physical axis changes the actual prepared-corner draft");
-  send(0,0,true);send();ready(controller);check(!controller.frame().state->uv&&controller.copy_scene().encode().at("version")==23,"Joystick Confirm publishes the actual Scene23 colour UV model");
+  send(0,0,true);send();ready(controller);check(!controller.frame().state->uv&&controller.copy_scene().encode().at("version")==30&&controller.copy_scene().active().bake_recipe==source.active().bake_recipe,"Joystick Confirm publishes the actual Scene30 colour UV model and retained bake recipe");
   check(controller.undo()&&controller.copy_scene().encode()==controller_before,"Controller accepted colour UV is one exact global Undo");
  }
  {

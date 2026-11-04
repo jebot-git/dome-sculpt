@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
+#include "bake-fixture-identity.hpp"
 // Actual public Document workflow across separately developed subsystems.
 #include "dome/document.hpp"
 #include "dome/import.hpp"
@@ -13,7 +14,7 @@ unsigned checks=0;
 void check(bool ok,const char *message){if(!ok)throw std::runtime_error(message);++checks;std::cout<<"PASS "<<message<<std::endl;}
 void ready(Document &d){if(!d.wait_asset()||!d.wait_mesh())throw std::runtime_error("Authoring worker failed to become ready: "+d.frame().state->error);if(!d.frame().state->error.empty())throw std::runtime_error(d.frame().state->error);}
 nlohmann::json canonical(Scene scene){auto j=scene.encode();for(auto &o:j["objects"]){auto &v=o["volume"];std::sort(v["samples"].begin(),v["samples"].end());for(auto &l:v["sculpt_layers"])std::sort(l["delta"].begin(),l["delta"].end());if(v.contains("sculpt_mask"))std::sort(v["sculpt_mask"]["values"].begin(),v["sculpt_mask"]["values"].end());}return j;}
-nlohmann::json source_record(Scene scene,uint64_t id){auto j=canonical(std::move(scene));for(auto o:j["objects"])if(o["id"]==id){o.erase("visible");return o;}throw std::runtime_error("Retained source disappeared");}
+nlohmann::json source_record(Scene scene,uint64_t id){auto j=canonical(bake_fixture::isolated_scene(std::move(scene),id));for(auto o:j["objects"])if(o["id"]==id){o.erase("visible");return o;}throw std::runtime_error("Retained source disappeared");}
 std::vector<uint8_t> bytes(const std::filesystem::path &p){std::ifstream in(p,std::ios::binary);return {std::istreambuf_iterator<char>(in),{}};}
 Scene painted_cube(){Mesh m;constexpr float r=.12f;m.positions={{-r,-r,-r},{r,-r,-r},{r,r,-r},{-r,r,-r},{-r,-r,r},{r,-r,r},{r,r,r},{-r,r,r}};for(auto p:m.positions)m.normals.push_back(normalized(p));m.indices={0,2,1,0,3,2,4,5,6,4,6,7,0,1,5,0,5,4,1,2,6,1,6,5,2,3,7,2,7,6,3,0,4,3,4,7};unwrap(m,128);
   Scene scene;auto &o=scene.active();o.name="Source 日本語";o.painted=std::make_shared<PaintedMesh>(m,128);o.mesh_active=true;o.transform.position={.3f,.1f,-.2f};o.transform.scale=1.6f;
