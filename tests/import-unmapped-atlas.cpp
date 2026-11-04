@@ -20,13 +20,15 @@ int main(int argc,char **argv)try{
   if(flat){primitive["attributes"].erase("NORMAL");primitive["targets"][0].erase("NORMAL");}
   auto label=std::string(implicit?"implicit-":"authored-")+(flat?"flat":"artist");auto path=directory/(label+".glb");fixture.save(path);
   Scene original;auto before=original.encode();ImportAuthoringOptions choices;choices.paint_resolution=64;
-  bool refused=false;try{(void)prepare_authoring_import(original,path,choices);}catch(const std::invalid_argument &e){refused=std::string_view(e.what())=="Painting requires nondegenerate UV triangles";}
-  check(refused&&original.encode()==before,"Unprepared degenerate unused UVs retain the explicit original writable-atlas refusal");
+  auto raw=prepare_authoring_import(original,path,choices);
+  check(raw.objects.size()==2&&original.encode()==before,"Unprepared degenerate unused UVs are retained as view-only source without changing the caller");
+  for(auto id:raw.objects){auto paint=raw.scene.object(id).painted->snapshot();const auto encoded=paint->encode();bool refused=false;try{paint->begin_stroke();}catch(const std::invalid_argument&){refused=true;}
+   check(refused&&!paint->in_stroke()&&paint->encode()==encoded&&paint->preview(raw.scene.object(id).material)->source_only,"Raw degenerate coordinates cannot start a writable stroke or fabricate coverage");}
   choices.prepare_texture_atlas=true;auto result=prepare_authoring_import(original,path,choices);
   check(result.objects.size()==2&&original.encode()==before,"Explicit atlas generation admits both untextured source instances without changing caller");
   for(auto id:result.objects){const auto &object=result.scene.object(id);check(object.painted->surface_diagnostics().unpaintable_uv_faces.empty(),"Generated current atlas provides writable coverage for every actual triangle");
    check(*object.appearance->original_bytes==fixture.bytes()&&std::all_of(object.appearance->asset->primitives[0].mesh.uv.begin(),object.appearance->asset->primitives[0].mesh.uv.end(),[](auto q){return q==std::array<float,2>{0,0};}),"Raw original bytes and unused degenerate source coordinates remain exact immutable provenance");
-   check(object.material_bindings&&object.material_bindings->sampling_reparameterized&&object.deformation&&object.deformation->morphs,"Generated UVs coexist with retained frame identity and current editable morphs");
+   check(object.material_bindings&&!object.material_bindings->sampling_reparameterized&&object.painted->source_sampling_prepared()&&object.painted->source_maps()->empty()&&object.deformation&&object.deformation->morphs,"Generated UVs coexist with retained frame identity and current editable morphs");
   }
   auto encoded=result.scene.encode();check(Scene::decode(encoded).encode()==encoded,"Exact atlas and original source survive a native restart");
   Document document;document.replace(original);ImportSettings options;options.paint_resolution=64;options.prepare_texture_atlas=true;document.import_asset(path,options);
@@ -49,8 +51,10 @@ int main(int argc,char **argv)try{
   auto &material=typed.j["materials"][0];material["pbrMetallicRoughness"].erase("baseColorTexture");
   material["extensions"]["VRMC_materials_mtoon"]={{"specVersion","1.0"},{"shadeMultiplyTexture",{{"index",0},{"texCoord",1}}}};typed.j["extensionsUsed"].push_back("VRMC_materials_mtoon");
   auto path=directory/"typed-unused-pbr.glb";typed.save(path);Scene source;auto before=source.encode();ImportAuthoringOptions choices;choices.paint_resolution=64;choices.prepare_texture_atlas=true;
-  bool refused=false;try{(void)prepare_authoring_import(source,path,choices);}catch(const std::exception&){refused=true;}
-  check(refused&&source.encode()==before,"Absence of PBR roles never authorizes discarding coordinates sampled by a typed MToon role before its adapter is available");
+  auto result=prepare_authoring_import(source,path,choices);
+  check(result.objects.size()==2&&source.encode()==before,"Typed MToon-only UV1 import uses the actual source-aware adapter without changing its caller");
+  for(auto id:result.objects){const auto &o=result.scene.object(id);check(o.painted->source_sampling_prepared()&&o.painted->source_maps()->empty()&&o.painted->source_sampling_authored_uv1()&&o.material_bindings->has_mtoon&&o.material_bindings->material.textures[1].texcoord==1,"Typed-only coordinates remain genuine authored UV1 with no invented PBR image role");}
+  const auto encoded=result.scene.encode();check(Scene::decode(encoded).encode()==encoded,"Typed-only source and writable field survive exact native restart");
  }
  std::cout<<"Unmapped atlas checks "<<checks<<'\n';return 0;
 }catch(const std::exception &error){std::cerr<<"FAIL "<<error.what()<<'\n';return 1;}

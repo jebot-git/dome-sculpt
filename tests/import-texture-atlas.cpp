@@ -26,11 +26,11 @@ int main(int argc,char **argv)try{
   auto prepared_options=options;prepared_options.prepare_texture_atlas=true;auto prepared=prepare_authoring_import(original,path,prepared_options);
   check(prepared.objects.size()==2&&prepared.scene.groups().size()==4&&original.encode()==baseline,"Explicit editable-atlas import retains instances and hierarchy without changing the caller");
   for(auto id:prepared.objects){const auto &object=prepared.scene.object(id);const auto &binding=*object.material_bindings;
-   check(!object.painted->source_maps()->uv1&&binding.sampling_reparameterized&&binding.uv_origin->paint->source_maps()->uv1,"Current editable maps use their new atlas while the exact original UV1 domain remains retained");
+   check(object.painted->source_sampling_prepared()&&object.painted->source_maps()->uv1&&!binding.sampling_reparameterized&&object.painted->source_sampling_original()->encode()==raw.scene.object(id).painted->encode()&&binding.uv_origin->paint->source_maps()->uv1,"Writable atlas and exact original UV1 image domain retain independent actual owners");
    check(*object.appearance->original_bytes==fixture.bytes()&&object.appearance->source_node>=1&&binding.normal_frames->pbr->generated_tangents==flat,"Original raw bytes, node identities and authored/generated original tangent authority survive preparation");
-   check(object.painted->composite(object.material)->color.width==64&&object.deformation->morphs->targets.size()==1,"Imported UV1 material composites on its selected atlas while retaining editable morph state");
+   check(object.painted->resolution()==64&&object.painted->preview(object.material)->overlay!=nullptr&&object.deformation->morphs->targets.size()==1,"Imported UV1 material keeps an independent selected-resolution paint overlay and editable morph state");
   }
-  auto encoded=prepared.scene.encode();check(encoded["version"]==18&&Scene::decode(encoded).encode()==encoded,"Native Scene18 restart preserves prepared layers, original coordinates and retained material frames");
+  auto encoded=prepared.scene.encode();check(encoded["version"]==28&&Scene::decode(encoded).encode()==encoded,"Native Scene28 restart preserves prepared layers, original coordinates and retained material frames");
   auto saved=directory/(flat?"flat.dsculpt":"artist.dsculpt");prepared.scene.save(saved);check(Scene::load(saved).encode()==encoded,"Actual project Save/reopen retains prepared source-coordinate authority");
   auto bad=fixture;bad.j["meshes"][0]["primitives"][0]["attributes"].erase("TEXCOORD_1");auto missing=directory/(flat?"flat-missing.glb":"artist-missing.glb");bad.save(missing);
   check(refuses([&]{prepare_authoring_import(original,missing,prepared_options);})&&original.encode()==baseline,"Missing selected source coordinates fail explicitly without publishing a partial atlas");
@@ -46,10 +46,10 @@ int main(int argc,char **argv)try{
   check(document.wait_native_stroke()&&document.wait_mesh()&&document.frame().state->error.empty(),"Immediately queued Save follows actual native painting on the imported texture atlas");auto painted=document.copy_scene().encode();
   check(painted!=accepted&&Scene::load(painted_path).encode()==painted&&document.copy_scene().active().material_bindings->uv_origin->paint->source_maps()->uv1,"Painting changes editable atlas data while original UV1 authority and ordered restart remain intact");
   check(document.undo()&&document.copy_scene().encode()==accepted&&document.redo()&&document.copy_scene().encode()==painted,"Painting and import retain separate exact global history endpoints");
-  auto exported=directory/(flat?"flat-painted.glb":"artist-painted.glb");document.export_asset(exported).get();cgltf_options parse_options{};cgltf_data *parsed=nullptr;
+  auto exported=directory/(flat?"flat-painted.glb":"artist-painted.glb");document.export_asset(exported,AssetExportFormat::EditableGlb256).get();cgltf_options parse_options{};cgltf_data *parsed=nullptr;
   check(cgltf_parse_file(&parse_options,exported.c_str(),&parsed)==cgltf_result_success,"Independent cgltf parser reads the actual painted UV1-import export worker result");std::unique_ptr<cgltf_data,decltype(&cgltf_free)> owner(parsed,cgltf_free);
   check(cgltf_load_buffers(&parse_options,parsed,exported.c_str())==cgltf_result_success&&cgltf_validate(parsed)==cgltf_result_success,"Actual GLB worker emits valid prepared texture, morph and attribute resources");
-  size_t mapped=0;for(size_t material=0;material<parsed->materials_count;++material){const auto &m=parsed->materials[material];if(m.normal_texture.texture){++mapped;check(m.normal_texture.texcoord==0&&m.pbr_metallic_roughness.base_color_texture.texcoord==0,"Prepared import export samples the actual current atlas rather than restored raw UV1");}}
+  size_t mapped=0;for(size_t material=0;material<parsed->materials_count;++material){const auto &m=parsed->materials[material];if(m.normal_texture.texture){++mapped;check(m.normal_texture.texcoord==0&&m.pbr_metallic_roughness.base_color_texture.texcoord==0,"Explicit finite export samples its declared current atlas instead of silently substituting raw UV1");}}
   check(mapped==2,"Both retained imported instances export their independent editable material bindings");
  }
  {
