@@ -34,6 +34,8 @@ NativeExtractionCost native_extraction_cost(const Scene &scene,const SourceUvBak
   for(const auto &o:scene.objects())if(o.visible&&native_physical(o)&&o.mesh_active){
     if(cancelled&&cancelled())throw std::runtime_error("Native physical extraction cancelled");
     const auto &p=*o.painted;const auto r=p.resolution();const size_t grid=size_t(r)*r;
+    if(policy.resolution&&(policy.resolution<64||policy.resolution>2048||(policy.resolution&(policy.resolution-1))))
+      throw std::invalid_argument("Native physical finite resolution must be a power of two in64..2048");
     auto bytes=[&](size_t n,size_t unit){charge(cost.bytes,n,unit,policy.max_working_bytes,"Native physical extraction exceeds working budget before allocation");};
     bytes(1,sizeof(PaintedMesh)+sizeof(TextureMaps)+sizeof(SourceMaterialBindings)+4096);
     const auto maps=p.source_maps();
@@ -108,7 +110,12 @@ NativePhysicalField native_physical_field(const SculptObject &o,
   // emission image needs an actual face/barycentric adapter before admission.
   if(maps&&maps->emission.image&&(paint.paint_sampling_domain()||maps->emission.texcoord!=0))
     throw std::invalid_argument("Native physical source emission requires its actual paint/source coordinate adapter");
-  const uint32_t r=paint.resolution();const size_t pixels=size_t(r)*r;
+  uint32_t r=policy.resolution?policy.resolution:paint.resolution();
+  if(policy.resolution&&(r<64||r>2048||(r&(r-1))))
+    throw std::invalid_argument("Native physical finite resolution must be a power of two in64..2048");
+  if(!policy.resolution&&maps&&maps->emission.image){const auto largest=std::max(maps->emission.image->width,maps->emission.image->height);
+    while(r<largest){if(r>2048)throw std::length_error("Native physical source image requires an explicit bounded finite resolution");r*=2;}}
+  const size_t pixels=size_t(r)*r;
   // Four composed texels, five independent RGBA planes, then six output
   // radiance/quantization channels. Reserve both passes before dense storage.
   constexpr size_t work_per_pixel=86;

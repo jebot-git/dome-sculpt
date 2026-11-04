@@ -70,6 +70,19 @@ int main(int argc,char **argv)try{
   check(native.texture_stats().uploads==texture_uploads&&native.buffer_stats().geometry_uploads==geometry_uploads,"Second eye/no-op reuses actual native float planes and geometry without uploads");
   if(kind==1){auto &emission=exported.data->materials[0].emissive_texture;const auto coordinate=emission.texcoord;emission.texcoord=0;fbo.bind();independent.render(exported.data,nullptr);const auto wrong=read();emission.texcoord=coordinate;
     check(delta(portable,wrong)>2,"Independent wrong authored-UV emission counterfactual detects the genuine retained paint coordinate");}
+  if(kind==0){
+    for(const auto [format,resolution]:{std::pair{AssetExportFormat::EditableGlb256,256},std::pair{AssetExportFormat::EditableGlb512,512},std::pair{AssetExportFormat::EditableGlb1024,1024}}){
+      const auto worker_file=out/("worker-"+std::to_string(resolution)+".glb");document.export_asset(worker_file,format).get();
+      prepared_normal_consumer::Model emitted(worker_file);const auto image=prepared_normal_consumer::image(emitted.data->materials[0].emissive_texture.texture);
+      check(image.width==uint32_t(resolution)&&image.height==uint32_t(resolution),"Actual native file worker honors the selected256/512/1024 finite-emission resolution");
+      fbo.bind();independent.render(emitted.data,nullptr);check(delta(original,read())<=2,"Actual worker finite resolution preserves the sensitive native physical PBR view within two pixels");
+      Document recovered;recovered.open_async(worker_file).get();recovered.shading(false);settled(recovered);
+      check(recovered.copy_scene().encode()==exact&&recovered.frame().state->dirty&&recovered.frame().state->project_path.empty(),"Actual Open worker restores the exact float project and unsaved native identity");
+      const auto saved=out/("worker-"+std::to_string(resolution)+".dsculpt");recovered.save_async(saved).get();
+      const auto again=out/("worker-cycle-"+std::to_string(resolution)+".glb");recovered.export_asset(again,format).get();
+      check(Scene::load(saved).encode()==exact&&bytes(again)==bytes(worker_file),"Native worker Save and second editable-export cycle preserve exact project and deterministic portable bytes");
+    }
+  }
   if(kind==1){auto wrong=std::make_shared<MeshSnapshot>(*snapshot);wrong->ranges.front().textures=reopened.frame().surface->ranges.front().textures;bool refused=false;
     try{draw(native,wrong);}catch(const std::exception&e){refused=std::string(e.what()).find("Native emission packet lost")!=std::string::npos;}
     check(refused&&scene.encode()==exact,"A genuinely decoded foreign native packet cannot borrow another retained paint-domain control owner");

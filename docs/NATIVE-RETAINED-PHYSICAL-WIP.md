@@ -20,13 +20,15 @@ the existing GPU plane compiler. Current preview cache entries are weak, publish
 only after completion, and do not hold their mutex during deep before-state replay.
 
 Initial complete own Release core/support/render/XR/app build and updated matched
-consumers pass. Current connected Release fixture has 67 checks: Strict physical
+consumers pass. Current connected Release fixture has 79 checks: Strict physical
 paint, genuine Paint24+normal metadata .7/90, real SDF constant and unlit controls;
 full native recovery/second cycle, independent numeric radiance and rendered GLB,
 foreign decoded retained-owner rejection/retry, budgets, precommit cancellation,
 and explicit ordinary-export/Bake/float-UV refusals. Software pixel maxima are
 1/1/0/0, recovered native full frames are exactly equal, and second-eye/no-op
-texture/geometry uploads are zero. This is not sanitizer, hardware, GUI, or
+texture/geometry uploads are zero. The actual file worker honors256/512/1024,
+Open restores exact native float data with unsaved identity, and Save/second-cycle
+portable bytes are deterministic. This is not sanitizer, hardware, GUI, or
 persistent-OOM qualification. Inputs and old negatives remain in ignored artifacts.
 
 Preserved negatives include the original generic native capture refusal89968,
@@ -36,8 +38,8 @@ mandatory-tangent assumption on a validated untextured-normal primitive. The
 consumer now requires real accessors for every sampled role and permits unused
 UV/tangent absence; it never changes emitted files to fabricate those attributes.
 
-Required next work includes full own sanitizer and legacy bytes, actual worker/
-ordered Save/Cancel/OOM and UI, requested finite-resolution policy, mixed Source4
+Required next work includes full own sanitizer and legacy bytes, running/queued worker
+Cancel/OOM and UI, mixed Source4
 and native scenes, pose/alpha/source-sampler sensitivities and bounded strict A770.
 Native typed MToon float preview, physical-before-UV transport and retained original
 emission-image compilation remain explicit real adapter requirements. Existing HDR
