@@ -8,19 +8,20 @@
 namespace dome::detail {namespace {
 void stop(const PaintSamplingLimits &limits){if(limits.cancelled&&limits.cancelled())throw std::runtime_error("Native paint retention cancelled");}
 bool equal(Vec3 a,Vec3 b){return a.x==b.x&&a.y==b.y&&a.z==b.z;}
-void replay_budget(const PaintedMesh &before,const Mesh &target,const PaintSamplingLimits &limits){
+void replay_budget(const PaintedMesh &before,size_t target_vertices,size_t target_indices,size_t pins,size_t seams,const PaintSamplingLimits &limits){
   if(!limits.max_vertices||limits.max_vertices>2'000'000||!limits.max_triangles||limits.max_triangles>2'000'000||
      !limits.max_working_bytes||limits.max_working_bytes>512*1024*1024||!limits.max_work||limits.max_work>256'000'000)
     throw std::invalid_argument("Invalid native paint replay limits");
   const auto &source=before.mesh();
-  if(source.positions.size()>limits.max_vertices||target.positions.size()>limits.max_vertices||
-     source.indices.size()/3>limits.max_triangles||target.indices.size()/3>limits.max_triangles)
+  if(source.positions.size()>limits.max_vertices||target_vertices>limits.max_vertices||
+     source.indices.size()/3>limits.max_triangles||target_indices/3>limits.max_triangles)
     throw std::length_error("Native paint replay exceeds geometry budget before allocation");
-  const uint64_t work=uint64_t(source.positions.size())*8+uint64_t(target.positions.size())*8+uint64_t(target.indices.size())*16;
+  const uint64_t work=uint64_t(source.positions.size())*8+uint64_t(target_vertices)*8+uint64_t(target_indices)*16;
   if(work>limits.max_work)throw std::length_error("Native paint replay exceeds work budget before allocation");
-  const size_t bytes=target.positions.size()*(2*sizeof(Vec3)+sizeof(std::array<float,2>))+target.indices.size()*sizeof(uint32_t)+target.uv_pins.size()+target.uv_seams.size();
+  const size_t bytes=target_vertices*(2*sizeof(Vec3)+sizeof(std::array<float,2>))+target_indices*sizeof(uint32_t)+pins+seams;
   if(bytes>limits.max_working_bytes)throw std::length_error("Native paint replay exceeds scratch budget before allocation");
 }
+void replay_budget(const PaintedMesh &before,const Mesh &target,const PaintSamplingLimits &limits){replay_budget(before,target.positions.size(),target.indices.size(),target.uv_pins.size(),target.uv_seams.size(),limits);}
 void same_mesh(const Mesh &a,const Mesh &b,const PaintSamplingLimits &limits){
   if(a.positions.size()!=b.positions.size()||a.normals.size()!=b.normals.size()||a.indices!=b.indices||a.uv!=b.uv||a.uv_pins!=b.uv_pins||a.uv_seams!=b.uv_seams)
     throw std::invalid_argument("Native retained paint differs from its exact ordered REST layout");
@@ -133,7 +134,8 @@ RetainedNativePaint NativePaintSamplingCodec::replay(std::shared_ptr<const Paint
     std::shared_ptr<const PaintSamplingDomain> domain,const PaintSamplingLimits &limits){
   if(!before||!layout||!domain)throw std::invalid_argument("Native paint replay is incomplete");
   SculptObject source;source.mesh_active=true;source.painted=std::const_pointer_cast<PaintedMesh>(before);source.material=std::move(native);source.material_bindings=std::move(binding);
-  replay_budget(*before,*domain->basis(),limits);
+  layout->storage_bytes();
+  replay_budget(*before,layout->source_vertices.size(),layout->indices.size(),layout->pins.size(),layout->seams.size(),limits);
   auto target=layout->target_mesh(before->mesh(),limits.cancelled);
   return NativePaintSamplingAccess::build(source,std::move(target),layout->source_vertices,limits,std::move(domain),[&](const auto &){return before;},[](const auto &binding){return binding;});
 }
