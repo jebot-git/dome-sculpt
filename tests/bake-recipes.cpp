@@ -6,6 +6,12 @@
 #include "polygon-conversion.hpp"
 #include "dome/shapekey-authoring.hpp"
 int main(int argc,char **argv)try{
+  if(argc==3&&std::string_view(argv[1])=="--ui-fixture"){
+    auto scene=cage_scene(128);bake_object(scene,2,cage_settings());scene.active().painted->clear_bake();scene.save(argv[2]);return 0;
+  }
+  if(argc==3&&std::string_view(argv[1])=="--inspect"){
+    auto scene=Scene::load(argv[2]);std::cout<<nlohmann::json{{"scene",scene.encode()},{"baked",bool(scene.active().painted->baked())}}.dump()<<'\n';return 0;
+  }
   const auto out=std::filesystem::path(argc>1?argv[1]:"bake-recipes");std::filesystem::create_directories(out);
   auto scene=cage_scene();const auto source=scene.object(2).painted,cage=scene.object(3).painted;
   const auto options=cage_settings();bake_object(scene,2,options);
