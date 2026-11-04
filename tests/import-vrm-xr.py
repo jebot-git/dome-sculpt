@@ -22,12 +22,12 @@ try:
   fixture=assets/'source.vrm';project=assets/'original.dsculpt';target=directory/'result.dsculpt'
   subprocess.run([str(helper),'--ui-fixture',str(fixture)],env=env,check=True)
   subprocess.run([str(helper),'--empty-project',str(project)],env=env,check=True)
-  inspect=lambda path:json.loads(subprocess.check_output([str(helper),'--inspect',str(path)],env=env,text=True))
-  original=inspect(project);source=fixture.read_bytes();project_bytes=project.read_bytes()
+  inspect=lambda path:json.loads(subprocess.check_output([str(helper),'--inspect-import-contract',str(path)],env=env,text=True))
+  original_inspection=inspect(project);original=original_inspection['scene'];source=fixture.read_bytes();project_bytes=project.read_bytes()
   with (directory/'application.log').open('w') as stream:
    result=subprocess.run([str(binary),'--xr','--open',str(project),'--frames','360','--save',str(target)],env=env,stdout=stream,stderr=subprocess.STDOUT,timeout=90)
   check(result.returncode==0,mode+': actual native XR import client stops and ordered Save completes')
-  runtime_report=json.loads((directory/'runtime.json').read_text());after=inspect(target)
+  runtime_report=json.loads((directory/'runtime.json').read_text());after_inspection=inspect(target);after=after_inspection['scene']
   check('llvmpipe' in runtime_report.get('gl_renderer','').lower(),mode+': explicitly requested software GL renders actual loader swapchains')
   check(runtime_report.get('acquires',0)>0 and runtime_report.get('acquires')==runtime_report.get('image_waits')==runtime_report.get('releases'),mode+': actual stereo swapchains preserve balanced acquire/wait/release ownership')
   check(runtime_report.get('stereo_submissions',0)>50 and runtime_report.get('palette_images',0)>0,mode+': actual stereo frames contain the shared XR palette')
@@ -36,13 +36,15 @@ try:
   check(fixture.read_bytes()==source and project.read_bytes()==project_bytes,mode+': original model and project bytes remain untouched')
   if mode=='accept':
    objects=after['objects'][len(original['objects']):]
+   native=[after_inspection['native_objects'][str(obj['id'])] for obj in objects]
    check(len(objects)==19,mode+': actual joystick Import publishes all nineteen original avatar parts')
-   check(all(obj['painted']['resolution']==64 and 'source_uv1' not in obj['painted'].get('source_maps',{}) for obj in objects),mode+': joystick paint-size controls and atlas toggle reach actual editable UV0 maps')
-   check(after['version']==13 and len(after['groups'])==88,mode+': native Save retains the complete original humanoid/node hierarchy')
+   check(all(facts['resolution']==64 and facts['strict'] and facts['prepared'] and facts['valid_source_owner'] and facts['original_geometry_exact'] and not facts['sampling_reparameterized'] for facts in native),mode+': actual joystick controls create independent Strict writable grids with authenticated original sampling owners')
+   check(all(facts['has_mtoon'] and facts['normal_mtoon_frames'] and facts['mtoon_images_retained'] for facts in native),mode+': all nineteen native parts retain their actual typed appearance images and normal-frame owners')
+   check(after['version']==28 and len(after['groups'])==88,mode+': native Source4 Save retains the complete original humanoid/node hierarchy without inventing key ownership')
    check(len(after['source_models'])==1 and bytes(after['source_models'][0]['original_glb']['bytes'])==source,mode+': all avatar parts share the exact original captured model bytes')
    check(all(obj.get('appearance') and obj['appearance']['source_material']>=0 and obj['appearance']['source_node']>=0 for obj in objects),mode+': all nineteen authored parts retain their exact source material and node identities')
   else:
-   check(after==original,mode+': leaving without joystick Import preserves the complete original Scene')
+   check(after==original and after_inspection==original_inspection,mode+': leaving without joystick Import preserves the complete original Scene and actual native ownership/coordinate facts')
  report('passed')
  print(str(len(checks))+' actual-loader VRM import checks passed',flush=True)
 except BaseException as error:
