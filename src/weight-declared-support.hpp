@@ -14,12 +14,17 @@ struct DeclaredWeightPart {
 };
 enum class DeclaredSupportPolicy { AllDeformControls, NearestSourceUnion };
 enum class DeclaredRigGeometry { NativeBoneAxes, ChildHeadControl };
+// Separate screened-energy construction, not a fallback after a failed solve.
+// Component masks still own permitted controls; only the closest permitted
+// finite source(s) anchor each row. Exact ties retain all joint identities.
+enum class DeclaredRowAnchors { AllVisible, NearestPermitted };
 struct DeclaredWeightSupport {
   DeclaredSupportPolicy policy = DeclaredSupportPolicy::AllDeformControls;
   bool world_metric = false;
   std::vector<DeclaredWeightPart> parts;
   uint64_t reference = 0;
   DeclaredRigGeometry rig_geometry = DeclaredRigGeometry::NativeBoneAxes;
+  DeclaredRowAnchors row_anchors = DeclaredRowAnchors::AllVisible;
   const DeclaredWeightPart *find(uint64_t id) const {
     auto at = std::find_if(parts.begin(), parts.end(),
                            [&](const auto &p) { return p.object == id; });

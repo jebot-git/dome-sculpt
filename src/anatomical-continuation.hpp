@@ -256,8 +256,13 @@ anatomical_continuation(const Scene &scene, uint64_t group,
           2 * (sizeof(SculptObject) + reference_lease->object->name.size() +
                reference_lease->object->material.name.size()) +
           4096;
-    const size_t bytes = capture_bytes + raw_count * (768 + 16 * bones) +
-                         corners * 320 + 65536 + metric_bytes;
+    const bool nearest_rows =
+        declared &&
+        declared->row_anchors == DeclaredRowAnchors::NearestPermitted;
+    const size_t bytes =
+        capture_bytes +
+        raw_count * (768 + 16 * bones + (nearest_rows ? 32 : 0)) +
+        corners * 320 + 65536 + metric_bytes;
     if (bytes > options.maximum_bytes)
       throw std::length_error("Continuation memory bound before construction");
     out.report.bytes = bytes;
@@ -524,6 +529,20 @@ anatomical_continuation(const Scene &scene, uint64_t group,
     out.report.bytes = source_bytes;
     stage = "analytic visible source fields";
     const size_t source_start_work = budget.used;
+    std::vector<HeatJointMask> row_anchors;
+    if (nearest_rows) {
+      // Captured metric REST rows, not posed positions. Component/user intent
+      // remains the allowed set; unrelated closest controls cannot override it.
+      // Selection precedes visibility. An occluded nearest control does not
+      // silently promote a farther source, and an unsupported source refuses.
+      NearestWeightSources sources(profile.segments, budget);
+      row_anchors.reserve(n);
+      for (size_t i = 0; i < n; ++i) {
+        budget.step(4);
+        row_anchors.push_back(
+            sources.nearest(query_points[i], usage[i], budget));
+      }
+    }
     std::vector<double> low(n), high(n);
     for (const auto &source : profile.segments) {
       bone_shadow::Point head{}, tail{};
@@ -555,6 +574,9 @@ anatomical_continuation(const Scene &scene, uint64_t group,
       for (uint32_t i = 0; i < n; ++i) {
         budget.step(4);
         if (!(usage[i][source.bone / 64] & (uint64_t(1) << (source.bone % 64))))
+          continue;
+        if (nearest_rows && !(row_anchors[i][source.bone / 64] &
+                              (uint64_t(1) << (source.bone % 64))))
           continue;
         double lo = 0, hi = 1;
         if (physical) {

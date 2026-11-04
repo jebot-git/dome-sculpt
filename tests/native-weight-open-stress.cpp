@@ -54,6 +54,7 @@ int main() try {
           true,
           {{1, {}}},
           1};
+      domain.row_anchors = detail::DeclaredRowAnchors::NearestPermitted;
       const auto start = std::chrono::steady_clock::now();
       auto result = detail::anatomical_continuation(
           s, 0, {}, detail::BoneWallDomain::ConnectedSourceSurface,

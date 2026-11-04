@@ -88,6 +88,13 @@ public:
   template <class Budget>
   std::array<uint64_t, 4> nearest(std::array<float, 3> point,
                                   Budget &work) const {
+    return nearest(point, {UINT64_MAX, UINT64_MAX, UINT64_MAX, UINT64_MAX},
+                   work);
+  }
+  template <class Budget>
+  std::array<uint64_t, 4> nearest(std::array<float, 3> point,
+                                  std::array<uint64_t, 4> allowed,
+                                  Budget &work) const {
     work.stop();
     volume_exact::Arithmetic exact(work);
     auto shift = source_shift_;
@@ -104,6 +111,9 @@ public:
     std::optional<Fraction> best;
     std::array<uint64_t, 4> mask{};
     for (const auto &source : sources_) {
+      work.step();
+      if (!(allowed[source.joint / 64] & (uint64_t(1) << (source.joint % 64))))
+        continue;
       auto value = distance(point, source, shift, exact);
       const int order = best ? exact.compare(value, *best) : -1;
       if (order < 0) {
@@ -113,6 +123,8 @@ public:
       if (order <= 0)
         mask[source.joint / 64] |= uint64_t(1) << (source.joint % 64);
     }
+    if (!best)
+      throw std::invalid_argument("Nearest row has no permitted finite source");
     return mask;
   }
 };

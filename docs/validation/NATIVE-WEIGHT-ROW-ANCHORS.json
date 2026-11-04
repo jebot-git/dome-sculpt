@@ -1,0 +1,25 @@
+{
+  "base": "9309833",
+  "scope": "Private explicit row-anchor construction and own small/stress fixture overlays against matching264 core; not native admission or full solver SAN",
+  "independent_dense_checks": 30,
+  "dense_max": 5.55112e-17,
+  "all_visible_control_sensitivity": 0.0390516,
+  "coarse_cases_passed": 2,
+  "fine_first_case_work_refused": true,
+  "original_work_cap": 500000000,
+  "sha256": {
+    "src/anatomical-continuation.hpp": "2b807caebccc6784d46288d5735fe4c3e83537a0e5c91761c08d157c508b070c",
+    "src/weight-declared-support.hpp": "96b1a28816a5ff72aedb0c401d0f4d58252057f18ad4bab1bf8643fff3df0056",
+    "src/weight-nearest-support.hpp": "91c08e066a69e09d7bb9509e66e5dd9e05f6ea9e43b2d9d9c78f5b4a701a4a39",
+    "tests/native-weight-row-anchors.cpp": "aafcbc91f1a31e5ce6d64249c93331f765502c23e444400bc3a1dac60582b16a",
+    "tests/native-weight-open-stress.cpp": "f8448d707195d0ce6f3b296bc2efe8d514ad1cd57764dcdbdd54f97434812f4a",
+    "artifacts/row-overlay.json": "7ec2948d731d8d3fb40ef5f2d7c75486383d46123d13b622959701de31b4ea83",
+    "artifacts/row-run.log": "3ee0898cfdf3226b42bd443ecdbe975e1752e2d470e0d73af3099b36d7317b7c",
+    "artifacts/row-status.json": "ac9b5ce1b5e5dc3fdc86c66569b9699d48cb113a60533863f5824fef4ca816f1",
+    "artifacts/open-overlay.json": "528ad14a0dcbcccff5fe645c802c4823fd60c4d260febcaaac87346923f080f0",
+    "artifacts/open-run.log": "ce0accb2d64d9191aea42b183282450e1de7d6f57f1e81eae8e7513031df598f",
+    "artifacts/open-status.json": "3c27bd6ed9ce7c39b0f97200e70c722b3112d7f981ccefb45cb725413062aa20",
+    "artifacts/native-weight-row-anchors": "14487c75e08af6820c599444bb9794492a9f9a8d1f655427db764716a4716408",
+    "artifacts/native-weight-open-stress": "e4dee12e6d8c0edf2a211dc32547ca3d635e89e7c42710e0665dfa667fa2891f"
+  }
+}
