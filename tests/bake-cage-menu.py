@@ -41,7 +41,7 @@ async def main():
    p=Path(home,'config/dome/appearance.json');p.parent.mkdir(parents=True,exist_ok=True);p.write_text(json.dumps({'font':'Unifont / Sans-Serif','font_size':16,'font_scale':2}))
   project=Path(home,'cage.dsculpt');subprocess.run([str(helper),'--ui-fixture',str(project)],check=True,env=env)
   def inspect():return json.loads(subprocess.check_output([str(helper),'--inspect',str(project)],env=env))
-  original=inspect()['scene'];report=Path(home,'widgets.json');log=(out/'app.log').open('w')
+  original_inspection=inspect();original=original_inspection['scene'];report=Path(home,'widgets.json');log=(out/'app.log').open('w')
   app=subprocess.Popen([str(app_path),str(project)],cwd=home,env={**env,'LD_PRELOAD':((os.environ['DOME_CAGE_ASAN_RUNTIME']+':') if os.environ.get('DOME_CAGE_ASAN_RUNTIME') else '')+str(probe),'DOME_CAGE_WIDGET_REPORT':str(report)},stdout=log,stderr=log);processes.append(app);d=display.Display(screen)
   def named(title):
    for w in d.screen().root.query_tree().children:
@@ -107,7 +107,7 @@ async def main():
   capture(dialog,'cage-ready.png');button=await wait(lambda:find('Bake'));tap(dialog,button['x']+button['w']/2,button['y']+button['h']/2)
   await wait(lambda:'complete' in str(named('Bake surface').get_wm_name()).lower() if named('Bake surface') else False,90)
   check(True,'Actual native cage Bake completes through the guarded background worker');capture(dialog,'cage-complete.png');key('Control_L',True);key('w');key('Control_L',False);await wait(lambda:not named('Bake surface'));await command('Save');after=inspect();check(after['baked'],'Native cage result persists through the immediately ordered Save')
-  scene=after['scene'];check(scene['objects'][1:]==original['objects'][1:] and scene['objects'][0]['painted']['layers']==original['objects'][0]['painted']['layers'],'Complete native source/cage and editable target paint remain exact')
+  scene=after['scene'];check(after['sources']==original_inspection['sources'] and scene['objects'][0]['painted']['layers']==original['objects'][0]['painted']['layers'],'Complete native source/cage and editable target paint remain exact')
   color=scene['objects'][0]['painted']['baked']['color']['bytes'];check(all(color[i:i+4]==[0,0,255,255] for i in range(0,len(color),4)),'Every native baked pixel matches the independent off-axis source')
   await command('Undo');await command('Save');check(inspect()['scene']==original,'Universal Undo restores the complete original scene in one step');await command('Redo');await command('Save');check(inspect()['scene']==scene,'Universal Redo restores the exact custom-cage endpoint')
   await command('Close Window');await wait(lambda:app.poll() is not None);check(app.returncode==0,'Native app closes through normal worker, graphics and font teardown');d.close();bus.disconnect()

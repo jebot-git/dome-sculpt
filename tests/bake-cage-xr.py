@@ -12,7 +12,7 @@ with tempfile.TemporaryDirectory(prefix='dome-cage-xr-') as directory:
  root=Path(directory);manifest=root/'runtime.json';manifest.write_text(json.dumps({'file_format_version':'1.0.0','runtime':{'library_path':str(a.runtime)}}))
  env={**os.environ,'XR_RUNTIME_JSON':str(manifest),'LIBGL_ALWAYS_SOFTWARE':'1','LP_NUM_THREADS':'2','HOME':str(root),'XDG_RUNTIME_DIR':str(root),'XDG_CONFIG_HOME':str(root/'config'),'XDG_STATE_HOME':str(root/'state'),'XDG_CACHE_HOME':str(root/'cache'),'XDG_DATA_HOME':str(root/'data')};source=out/'source.dsculpt';subprocess.run([str(a.helper),'--ui-fixture',str(source)],env=env,check=True);before=source.read_bytes()
  def inspect(path):return json.loads(subprocess.check_output([str(a.helper),'--inspect',str(path)],env=env,text=True))
- original=inspect(source)['scene'];(out/'source.json').write_text(json.dumps(original,indent=2)+'\n')
+ original_inspection=inspect(source);original=original_inspection['scene'];(out/'source.json').write_text(json.dumps(original,indent=2)+'\n')
  for mode in ['accept','cancel','focus']:
   target=out/(mode+'.dsculpt');report=out/(mode+'.json')
   with (out/(mode+'.log')).open('w') as log:r=subprocess.run([str(a.binary),'--xr','--open',str(source),'--frames','100','--save',str(target)],env={**env,'DOME_XR_FIXTURE_CAGE':mode,'DOME_XR_FIXTURE_REPORT':str(report)},stdout=log,stderr=subprocess.STDOUT,timeout=180)
@@ -23,7 +23,7 @@ with tempfile.TemporaryDirectory(prefix='dome-cage-xr-') as directory:
   check(source.read_bytes()==before,mode+': input project bytes remain untouched')
   if mode=='accept':
    check(after['baked'],mode+': real controller cage choice and explicit Bake reach actual native worker publication')
-   scene=after['scene'];check(scene['objects'][1:]==original['objects'][1:] and scene['objects'][0]['painted']['layers']==original['objects'][0]['painted']['layers'],mode+': complete hidden source/cage and target editable paint remain exact')
+   scene=after['scene'];check(after['sources']==original_inspection['sources'] and scene['objects'][0]['painted']['layers']==original['objects'][0]['painted']['layers'],mode+': complete hidden source/cage and target editable paint remain exact')
    color=scene['objects'][0]['painted']['baked']['color']['bytes'];check(all(color[i:i+4]==[0,0,255,255] for i in range(0,len(color),4)),mode+': every projected pixel matches independently placed off-axis blue source')
   else:check(after['scene']==original,mode+': Cancel/focus loss keeps the complete Scene exact')
   if mode=='focus':check(detail.get('focus_losses')==1 and detail.get('focus_regains')==1,mode+': actual loader focus loss and regain crossed')
