@@ -59,6 +59,7 @@ struct Converter {
   size_t vertices=0,triangles=0,triangulation_work=0;
   size_t deformation_work=0;
   bool deformers_converted=false;
+  bool generated_morph_normals=false;
   double coordinate_scale=1;
   std::array<double,4> root_rotation{0,0,0,1};
   Converter(ImportSourceCapture &c,const ImportOptions &o,ufbx_scene &s,ImportLimits l)
@@ -293,6 +294,64 @@ struct Converter {
     deformers_converted=true;return &skins.emplace(node.typed_id,std::move(result)).first->second;
   }
   struct MorphData {const ufbx_blend_shape *shape;float weight;std::string name;nlohmann::json source;};
+  std::vector<float> morph_normals(const ufbx_mesh &mesh,const ufbx_blend_shape &shape,
+      std::span<const uint32_t> vertices,std::span<const float> base){
+    const bool smooth=options.normals==ImportNormals::GenerateSmooth;
+    auto charge=[&](size_t count){
+      if(count>builder.limits.max_metadata_visits-std::min(deformation_work,builder.limits.max_metadata_visits))
+        throw std::length_error("Generated FBX morph normals exceed deformation work budget");
+      deformation_work+=count;
+    };
+    charge(mesh.num_vertices);charge(vertices.size());
+    if(smooth){charge(mesh.num_vertices);charge(mesh.num_indices);charge(mesh.num_indices);}
+    const size_t fields=smooth?2:1;
+    const auto bytes=builder.limits.max_resource_bytes;
+    if(mesh.num_vertices>bytes/(sizeof(ufbx_vec3)*fields))
+      throw std::length_error("Generated FBX morph normals exceed temporary byte budget");
+    const size_t geometry_bytes=mesh.num_vertices*sizeof(ufbx_vec3)*fields;
+    if(vertices.size()>(bytes-geometry_bytes)/(3*sizeof(float)))
+      throw std::length_error("Generated FBX morph normals exceed temporary byte budget");
+    std::vector<ufbx_vec3> positions;positions.reserve(mesh.num_vertices);
+    for(size_t v=0;v<mesh.num_vertices;++v){
+      builder.stop();auto p=mesh.vertices[v];auto offset=ufbx_get_blend_shape_offset_index(&shape,v);
+      if(offset!=UFBX_NO_INDEX){
+        const auto delta=shape.position_offsets[offset];
+        const double weight=offset<shape.offset_weights.count?shape.offset_weights[offset]:1;
+        p.x+=delta.x*weight;p.y+=delta.y*weight;p.z+=delta.z*weight;
+      }
+      if(!std::isfinite(p.x)||!std::isfinite(p.y)||!std::isfinite(p.z))
+        throw std::runtime_error("Generated FBX morph positions are not finite");
+      positions.push_back(p);
+    }
+    std::vector<ufbx_vec3> normals;
+    if(smooth){
+      normals.resize(mesh.num_vertices);
+      auto coordinates=mesh.vertex_position;
+      coordinates.values={positions.data(),positions.size()};coordinates.indices=mesh.vertex_indices;
+      for(auto face:mesh.faces){
+        builder.stop();auto n=ufbx_get_weighted_face_normal(&coordinates,face);
+        for(uint32_t c=0;c<face.num_indices;++c){
+          if((c&4095)==0)builder.stop();auto &sum=normals.at(mesh.vertex_indices[face.index_begin+c]);
+          sum.x+=n.x;sum.y+=n.y;sum.z+=n.z;
+        }
+      }
+      // Isolated source vertices may be unused by this material part. Only
+      // normalize emitted vertices; a genuinely cancelled surface normal refuses.
+    }
+    if(vertices.size()%3||base.size()!=vertices.size()*3)
+      throw std::logic_error("Generated FBX morph basis lost its ordered triangles");
+    std::vector<float> result;result.reserve(base.size());
+    for(size_t t=0;t<vertices.size();t+=3){
+      builder.stop();ufbx_vec3 flat{};
+      if(!smooth){const auto a=positions.at(vertices[t]),b=positions.at(vertices[t+1]),c=positions.at(vertices[t+2]);
+        flat=normalize3(cross3(subtract(b,a),subtract(c,a)));}
+      for(size_t k=0;k<3;++k){
+        const auto n=smooth?normalize3(normals.at(vertices[t+k])):flat;
+        result.insert(result.end(),{real(n.x-base[(t+k)*3]),real(n.y-base[(t+k)*3+1]),real(n.z-base[(t+k)*3+2])});
+      }
+    }
+    generated_morph_normals=true;return result;
+  }
   std::vector<MorphData> morphs(const ufbx_mesh &mesh){
     std::vector<MorphData> result;
     for(auto *deformer:mesh.blend_deformers)for(auto *channel:deformer->channels){
@@ -331,8 +390,6 @@ struct Converter {
       diagnostics.push_back("Mesh '"+string(m.name)+"': explicit area-weighted smooth normals generated across shared control points.");
     }
     const auto *binding=skin(node);auto shapes=morphs(m);
-    if(!shapes.empty()&&options.normals!=ImportNormals::Preserve)
-      throw std::runtime_error("Generating FBX morph normals requires an explicit target-normal adapter");
     std::vector<uint32_t> tri(m.max_face_triangles*3);
     struct Attributes {std::vector<float> position,normal,uv,uv1,color,tangent;std::vector<uint32_t> source_vertex,source_corner;nlohmann::json polygons=nlohmann::json::array();};
     std::map<uint32_t,Attributes> parts;
@@ -412,12 +469,14 @@ struct Converter {
         deformation_work+=a.source_vertex.size()*shapes.size();primitive["targets"]=nlohmann::json::array();
         for(const auto &shape:shapes){
           std::vector<float> position,normal;position.reserve(a.source_vertex.size()*3);
-          if(shape.shape->normal_offsets.count)normal.reserve(a.source_vertex.size()*3);
+          const bool generated=options.normals!=ImportNormals::Preserve;
+          if(generated)normal=morph_normals(m,*shape.shape,a.source_vertex,a.normal);
+          else if(shape.shape->normal_offsets.count)normal.reserve(a.source_vertex.size()*3);
           for(auto v:a.source_vertex){builder.stop();auto offset=ufbx_get_blend_shape_offset_index(shape.shape,v);
             auto p=offset==UFBX_NO_INDEX?ufbx_vec3{}:shape.shape->position_offsets[offset];
             double influence=offset!=UFBX_NO_INDEX&&offset<shape.shape->offset_weights.count?shape.shape->offset_weights[offset]:1;
             position.insert(position.end(),{real(p.x*coordinate_scale*influence),real(p.y*coordinate_scale*influence),real(p.z*coordinate_scale*influence)});
-            if(shape.shape->normal_offsets.count){auto n=offset==UFBX_NO_INDEX?ufbx_vec3{}:shape.shape->normal_offsets[offset];normal.insert(normal.end(),{real(n.x*influence),real(n.y*influence),real(n.z*influence)});}
+            if(!generated&&shape.shape->normal_offsets.count){auto n=offset==UFBX_NO_INDEX?ufbx_vec3{}:shape.shape->normal_offsets[offset];normal.insert(normal.end(),{real(n.x*influence),real(n.y*influence),real(n.z*influence)});}
           }
           nlohmann::json target={{"POSITION",builder.floats(position,3,true)}};if(!normal.empty())target["NORMAL"]=builder.floats(normal,3);primitive["targets"].push_back(std::move(target));
         }
@@ -521,6 +580,10 @@ CapturedImportSource capture_native_source(const std::filesystem::path &path,Imp
   // before the detached authoring Scene can adopt any object.
   auto validation=limits;if(converter.deformers_converted)validation.mode=ImportMode::PreserveGltf;
   (void)import_glb(*result,validation);
-  return capture.finish(result,"ufbx v0.23.1 26a482ae native adapter 4",std::move(converter.diagnostics));
+  if(converter.generated_morph_normals)
+    converter.diagnostics.push_back("Explicit generated FBX morph normals preserve the selected flat/smooth basis for every target endpoint; original attributes remain retained.");
+  return capture.finish(result,converter.generated_morph_normals?
+    "ufbx v0.23.1 26a482ae native adapter 5 / generated morph normals":
+    "ufbx v0.23.1 26a482ae native adapter 4",std::move(converter.diagnostics));
 }
 } // namespace dome
