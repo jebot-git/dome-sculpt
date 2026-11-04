@@ -1,3 +1,5 @@
+#include "color-bound-memo.hpp"
+#include "emission-paint-access.hpp"
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/scene.hpp"
 #include "dome/scene-file.hpp"
@@ -172,6 +174,7 @@ Scene Scene::snapshot() const {
   return result;
 }
 void Scene::validate(bool deep_sources) const {
+  detail::ColorBoundScope color_bound_scope;
   if (objects_.empty() || objects_.size() > 256)
     throw std::length_error("Invalid scene object count");
   if (groups_.size() > 128) throw std::length_error("Scene group limit exceeded");
@@ -475,6 +478,7 @@ void Scene::validate(bool deep_sources) const {
   object(active_);
 }
 nlohmann::json Scene::encode() const {
+  detail::ColorBoundScope color_bound_scope;
   validate();
   bool baked = std::any_of(objects_.begin(), objects_.end(), [](const auto &o) { return o.painted && o.painted->baked(); });
   bool resolved=std::any_of(objects_.begin(),objects_.end(),[](const auto &o){return bool(o.material_bindings) || (!o.mesh_active && bool(o.deformation));});
@@ -1158,7 +1162,7 @@ std::vector<ObjectSurface> Scene::surfaces_impl(bool atlas, bool preview, const 
         unwrap(mesh, 1024, 4, cancelled);
       result.push_back(
           {o.id, o.name, o.transform, o.material, std::move(mesh),
-           o.mesh_active ? ((preview||o.painted->source_sampling_prepared()) ? o.painted->preview(o.material,cancelled) : o.painted->composite(o.material,cancelled)) : nullptr,
+           o.mesh_active ? ((preview||o.painted->source_sampling_prepared()) ? (detail::EmissionExportAccess::requires_preview(*o.painted,o.material,o.material_bindings.get()) ? detail::EmissionExportAccess::preview(*o.painted,o.material,cancelled) : o.painted->preview(o.material,cancelled)) : o.painted->composite(o.material,cancelled)) : nullptr,
            o.mesh_active ? o.deformation : nullptr, group_path(o.group),
            o.mesh_active ? o.appearance : nullptr,
            o.mesh_active ? o.material_bindings : nullptr,

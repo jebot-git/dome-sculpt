@@ -1,3 +1,5 @@
+#include "paint-overlay-packet.hpp"
+#include "emission-authority.hpp"
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/bake.hpp"
 #include "dome/mesh-processing.hpp"
@@ -168,6 +170,8 @@ void validate(const Mesh &low,const BakeSource &source,const BakeOptions &o) {
   for (auto id:source.triangle_materials) if (id>=source.materials.size()) throw std::out_of_range("Unknown source triangle material");
   for (const auto &m:source.materials) {
     m.material.validate();
+    if(detail::hdr_emission(m.material.emissive)||(m.maps&&m.maps->overlay&&m.maps->overlay->native_geometry()))
+      throw std::invalid_argument("Physical emission Bake requires its actual float sampling/output adapter");
     if (!std::isfinite(m.normal_strength)||m.normal_strength<0||m.normal_strength>4) throw std::invalid_argument("Invalid normal-map strength");
     if (m.maps) {
       if(m.maps->overlay&&(!m.maps->source_only||m.maps->overlay->source_maps()!=m.maps->source_maps))

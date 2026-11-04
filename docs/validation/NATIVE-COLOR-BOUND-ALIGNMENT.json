@@ -1,0 +1,456 @@
+{
+  "status": "Qualified private component; no main admission or completion of unsupported domains",
+  "qualified_source": "44e492b3288cfe98e41f3f2a5921adae1daefa9e",
+  "full_suite_source": "ab5630ba692d9c31af52aaf6b9af2a825e4a0396",
+  "source_difference": "Only tests/physical-before-uv.cpp gains argument and strict device checks. Production src/include/CMake unchanged; affected fixture rebuilt against the same coherent own Release/SAN archives and repeated.",
+  "base_components": [
+    "708283b1104bdf184fc69c163d788110b0dcaa5e",
+    "b6b769ff9dd96d0e094310b08be384f7ae7ceec7",
+    "4f846337e03580167fa4a2489ca1731ba162720b"
+  ],
+  "implementation": {
+    "color_bound": "Fixed64 per-top-level-call numerical result reuse, exact strong mesh/COW/field/image/context owners, content/scalar identity; actual pairing/resource/cancel/claimed-bound checks still execute; borrowed/unsupported contexts recompute; capacity fallback; return/throw releases owners. No general validity cache or serialized seal.",
+    "emission": "Constant-background native bilinear paint fields integer-upsampled to M=qR are sampled at (j+.5)/M-offset, offset=-(q-1)/(2M), and emitted with genuine emission-only KHR_texture_transform. Authored/paint coordinates remain genuine. Equal-grid and Source4 routes retain their old behavior. No global filtered-field fidelity claim.",
+    "layout": "Private NativeAuthoringEmission adds texture_offset; fresh coherent core/support/render/XR/native app/inspector/consumers. No public or serialized schema layout changes."
+  },
+  "release14": {
+    "record": {
+      "path": "artifacts/coherent-bound-proof/release-final-status.json",
+      "sha256": "a301042851b4f78e358f524b35137d5f3411690899d3d34cc8071538b2dfca19"
+    },
+    "exit": 0,
+    "seconds": 75.21257551101735,
+    "command": [
+      "ctest",
+      "--test-dir",
+      "/home/blux/de-xr/dome-sculpt/artifacts/native-color-bound-memo-b6b769f/build-release",
+      "-R",
+      "^(color-bound-memo|physical-before-uv|(native|retained|sdf)-physical-contracts|native-retained-physical|color-preparation|normal-preparation-native|native-authoring|native-authoring-real|scene-file|source-paint-bake|source-paint-physical-authoring|raw-hdr-preserving)$",
+      "--output-on-failure",
+      "-j",
+      "1"
+    ],
+    "inputs": 1671,
+    "drift": []
+  },
+  "sanitizer_build": {
+    "record": {
+      "path": "artifacts/coherent-bound-proof/sanitize-build-status.json",
+      "sha256": "4cbf6b2cd75fbc98b0843496958b0ace8b646eabe25ee33a1bbcdc998c19ef43"
+    },
+    "exit": 0,
+    "seconds": 679.7595685010019,
+    "commands": [
+      [
+        "cmake",
+        "-S",
+        "/home/blux/de-xr/dome-sculpt/artifacts/native-color-bound-memo-b6b769f",
+        "-B",
+        "/home/blux/de-xr/dome-sculpt/artifacts/native-color-bound-memo-b6b769f/build-sanitize",
+        "-DCMAKE_BUILD_TYPE=Release",
+        "-DDOME_COMPUTE_BACKEND=CPU",
+        "-DFLTK_DIR=/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-sanitize/share/fltk",
+        "-DBUILD_TESTING=ON",
+        "-DDOME_BUILD_UI=ON",
+        "-DDOME_BUILD_XR=ON",
+        "-DCMAKE_C_FLAGS_RELEASE=-O1 -g1 -DNDEBUG -fsanitize=address,undefined -fno-omit-frame-pointer",
+        "-DCMAKE_CXX_FLAGS_RELEASE=-O1 -g1 -DNDEBUG -fsanitize=address,undefined -fno-omit-frame-pointer",
+        "-DCMAKE_EXE_LINKER_FLAGS=-fsanitize=address,undefined"
+      ],
+      [
+        "nice",
+        "-n",
+        "15",
+        "cmake",
+        "--build",
+        "/home/blux/de-xr/dome-sculpt/artifacts/native-color-bound-memo-b6b769f/build-sanitize",
+        "--parallel",
+        "2",
+        "--target",
+        "dome-sculpt",
+        "dome-sculpt-native-authoring-inspect",
+        "dome-sculpt-color-bound-memo-test",
+        "dome-sculpt-physical-before-uv-test",
+        "dome-sculpt-native-physical-contracts-test",
+        "dome-sculpt-native-retained-physical-test",
+        "dome-sculpt-color-preparation-test",
+        "dome-sculpt-normal-preparation-test",
+        "dome-sculpt-scene-file-test",
+        "dome-sculpt-source-paint-bake-test",
+        "dome-sculpt-source-paint-physical-authoring-test",
+        "dome-sculpt-raw-hdr-preserving-test",
+        "dome-sculpt-native-authoring-test",
+        "dome-sculpt-native-authoring-real-test"
+      ]
+    ],
+    "drift": []
+  },
+  "sanitizer14": {
+    "record": {
+      "path": "artifacts/coherent-bound-proof/sanitize-final-status.json",
+      "sha256": "5fe8d86d113300aefdc86eedcee8e0ed32e56218a36cafcfd1f12dcc22457cb3"
+    },
+    "exit": 0,
+    "seconds": 753.7431652609957,
+    "command": [
+      "ctest",
+      "--test-dir",
+      "/home/blux/de-xr/dome-sculpt/artifacts/native-color-bound-memo-b6b769f/build-sanitize",
+      "-R",
+      "^(color-bound-memo|physical-before-uv|(native|retained|sdf)-physical-contracts|native-retained-physical|color-preparation|normal-preparation-native|native-authoring|native-authoring-real|scene-file|source-paint-bake|source-paint-physical-authoring|raw-hdr-preserving)$",
+      "--output-on-failure",
+      "-j",
+      "1"
+    ],
+    "inputs": 1671,
+    "drift": []
+  },
+  "sanitizer_policy": "Whole owned C/C++ core/support/render/native/XR/app/inspector and selected consumers O1/g1 ASan/UBSan, leak detection and halt-on-error, no suppressions. Selected14 only, not full repository regression.",
+  "affected_fixture_build": {
+    "record": {
+      "path": "artifacts/strict-physical-followup/build-status.json",
+      "sha256": "29efe6067ea78d7231f3e2e26c4246e87b203abc5a72cd19fc63e3e92e471fe8"
+    },
+    "exit": 0,
+    "seconds": 45.491270008991705,
+    "rows": [
+      {
+        "profile": "release",
+        "exit": 0,
+        "command": [
+          "nice",
+          "-n",
+          "15",
+          "cmake",
+          "--build",
+          "/home/blux/de-xr/dome-sculpt/artifacts/native-color-bound-memo-b6b769f/build-release",
+          "--parallel",
+          "1",
+          "--target",
+          "dome-sculpt-physical-before-uv-test"
+        ]
+      },
+      {
+        "profile": "sanitize",
+        "exit": 0,
+        "command": [
+          "nice",
+          "-n",
+          "15",
+          "cmake",
+          "--build",
+          "/home/blux/de-xr/dome-sculpt/artifacts/native-color-bound-memo-b6b769f/build-sanitize",
+          "--parallel",
+          "1",
+          "--target",
+          "dome-sculpt-physical-before-uv-test"
+        ]
+      }
+    ],
+    "drift": []
+  },
+  "affected_fixture_runs": {
+    "record": {
+      "path": "artifacts/strict-physical-followup/test-status.json",
+      "sha256": "264dedeb9b368979e7a4401193c557d6ed004b376a92514a823ead06e6fec652"
+    },
+    "exit": 0,
+    "rows": [
+      {
+        "profile": "release",
+        "exit": 0,
+        "seconds": 3.426458641013596,
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/native-color-bound-memo-b6b769f/build-release/dome-sculpt-physical-before-uv-test",
+          "/home/blux/de-xr/dome-sculpt/artifacts/native-color-bound-memo-b6b769f/artifacts/strict-physical-followup/release-outputs"
+        ]
+      },
+      {
+        "profile": "sanitize",
+        "exit": 0,
+        "seconds": 31.481035237025935,
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/native-color-bound-memo-b6b769f/build-sanitize/dome-sculpt-physical-before-uv-test",
+          "/home/blux/de-xr/dome-sculpt/artifacts/native-color-bound-memo-b6b769f/artifacts/strict-physical-followup/sanitize-outputs"
+        ]
+      }
+    ],
+    "inputs": 1670,
+    "drift": []
+  },
+  "memo_controls": {
+    "checks": 3467,
+    "persistent_allocation_denials": 3438,
+    "actual_baseline_calls": 3438,
+    "encode_hits": 27,
+    "encode_computations": 2,
+    "scope": "Real numerical-bound miss+hit entry, exact complete Scene encode rollback after each denial and retry; separate from the still-running old full-export sweep. Same-owner mutable pixels/field values, foreign control blocks, borrowed mesh, claimed scalars, resource limits, cancellation, capacity and exception clean-up controls."
+  },
+  "physical_uv": {
+    "operation": "Actual64 Bake color+normal owners, physical layers/mask/opacity/hidden high radiance, KeepPaint .7 scale+90degree Apply, queuedSave/restart and exact Undo/Redo",
+    "cases": 9,
+    "native_maximum_error": 0,
+    "independent_finite_maximum_error": 1,
+    "unchanged_pixel_bound": 2,
+    "native_recovery": "Exact complete per-case Scene including full float/source/normal/rig/morph/history owners",
+    "wrong_offset": "Same emitted parsed file with actual offset zeroed exceeds2; restored original offset passes. No source-state rewrite."
+  },
+  "current_gui": {
+    "record": {
+      "path": "artifacts/current-native-gui/status.json",
+      "sha256": "ef676933fc26423ae62451ab0b64c5cf60f08a6d7e856ab75ac4f6ee2adef2a2"
+    },
+    "exit": 0,
+    "rows": [
+      {
+        "profile": "release",
+        "compact": "0",
+        "exit": 0,
+        "seconds": 53.260513653978705,
+        "output": "/home/blux/de-xr/dome-sculpt/artifacts/native-color-bound-memo-b6b769f/artifacts/current-native-gui/release-retained-normal"
+      },
+      {
+        "profile": "sanitize",
+        "compact": "1",
+        "exit": 0,
+        "seconds": 160.76836606900906,
+        "output": "/home/blux/de-xr/dome-sculpt/artifacts/native-color-bound-memo-b6b769f/artifacts/current-native-gui/sanitize-retained-compact"
+      }
+    ],
+    "inputs": 1685,
+    "drift": []
+  },
+  "gui_assertions": {
+    "release_retained_normal": 32,
+    "sanitizer_retained_compact640x360": 32,
+    "scope": "Actual FLTK/D-Bus private Xvfb softwareGL apps, own coherent inspector; physical material/brush/mask/history/Cancel, editable512/Open/exactnativeSave, no system/HMD/session change"
+  },
+  "hardware": {
+    "record": {
+      "path": "artifacts/current-arc-proof/status.json",
+      "sha256": "d1c33e9844105cedf7e34ed271079bd430355842435580fcbf670ac2ed4cf455"
+    },
+    "exit": 0,
+    "source": "44e492b3288cfe98e41f3f2a5921adae1daefa9e",
+    "rows": [
+      {
+        "mode": "arc",
+        "test": "physical-before-uv",
+        "exit": 0,
+        "expected_exit": 0,
+        "seconds": 2.30874523500097,
+        "gpu": [
+          "GPU Intel / Mesa Intel(R) Arc(tm) A770 Graphics (DG2)"
+        ],
+        "identity_expected": true,
+        "passed": true,
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/native-color-bound-memo-b6b769f/build-release/dome-sculpt-physical-before-uv-test",
+          "/home/blux/de-xr/dome-sculpt/artifacts/native-color-bound-memo-b6b769f/artifacts/current-arc-proof/arc-physical-before-uv",
+          "--hardware"
+        ]
+      },
+      {
+        "mode": "arc",
+        "test": "native-retained-physical",
+        "exit": 0,
+        "expected_exit": 0,
+        "seconds": 6.867223815992475,
+        "gpu": [
+          "GPU Intel / Mesa Intel(R) Arc(tm) A770 Graphics (DG2)"
+        ],
+        "identity_expected": true,
+        "passed": true,
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/native-color-bound-memo-b6b769f/build-release/dome-sculpt-native-retained-physical-test",
+          "/home/blux/de-xr/dome-sculpt/artifacts/native-color-bound-memo-b6b769f/artifacts/current-arc-proof/arc-native-retained-physical",
+          "--hardware"
+        ]
+      },
+      {
+        "mode": "software",
+        "test": "physical-before-uv",
+        "exit": 1,
+        "expected_exit": 1,
+        "seconds": 0.07098313001915812,
+        "gpu": [
+          "GPU Mesa / llvmpipe (LLVM 22.1.8, 256 bits)"
+        ],
+        "identity_expected": true,
+        "passed": true,
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/native-color-bound-memo-b6b769f/build-release/dome-sculpt-physical-before-uv-test",
+          "/home/blux/de-xr/dome-sculpt/artifacts/native-color-bound-memo-b6b769f/artifacts/current-arc-proof/software-physical-before-uv",
+          "--hardware"
+        ]
+      },
+      {
+        "mode": "software",
+        "test": "native-retained-physical",
+        "exit": 1,
+        "expected_exit": 1,
+        "seconds": 0.032557969010667875,
+        "gpu": [
+          "GPU Mesa / llvmpipe (LLVM 22.1.8, 256 bits)"
+        ],
+        "identity_expected": true,
+        "passed": true,
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/native-color-bound-memo-b6b769f/build-release/dome-sculpt-native-retained-physical-test",
+          "/home/blux/de-xr/dome-sculpt/artifacts/native-color-bound-memo-b6b769f/artifacts/current-arc-proof/software-native-retained-physical",
+          "--hardware"
+        ]
+      },
+      {
+        "mode": "uhd",
+        "test": "physical-before-uv",
+        "exit": 1,
+        "expected_exit": 1,
+        "seconds": 0.06989542199880816,
+        "gpu": [
+          "GPU Intel / Mesa Intel(R) UHD Graphics 770 (ADL-S GT1)"
+        ],
+        "identity_expected": true,
+        "passed": true,
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/native-color-bound-memo-b6b769f/build-release/dome-sculpt-physical-before-uv-test",
+          "/home/blux/de-xr/dome-sculpt/artifacts/native-color-bound-memo-b6b769f/artifacts/current-arc-proof/uhd-physical-before-uv",
+          "--hardware"
+        ]
+      },
+      {
+        "mode": "uhd",
+        "test": "native-retained-physical",
+        "exit": 1,
+        "expected_exit": 1,
+        "seconds": 0.03316533600445837,
+        "gpu": [
+          "GPU Intel / Mesa Intel(R) UHD Graphics 770 (ADL-S GT1)"
+        ],
+        "identity_expected": true,
+        "passed": true,
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/native-color-bound-memo-b6b769f/build-release/dome-sculpt-native-retained-physical-test",
+          "/home/blux/de-xr/dome-sculpt/artifacts/native-color-bound-memo-b6b769f/artifacts/current-arc-proof/uhd-native-retained-physical",
+          "--hardware"
+        ]
+      }
+    ],
+    "inputs": 1659,
+    "drift": []
+  },
+  "hardware_scope": "Release strict actual PCI03 Intel Arc A770 physicalUV42(9image cases)+native79. Four exact identity negatives: forced llvmpipe and actual Intel UHD770 for each consumer. Lease released after terminal/hash audit.",
+  "legacy_source4_bytes": {
+    "record": {
+      "path": "artifacts/bound-format-validation/legacy-byte-parity.json",
+      "sha256": "664ae03187d819048eaada03dff75bdfff24ee022201fdc312fe46ea6ad8ceb2"
+    },
+    "equal_files": 38,
+    "different_files": 0,
+    "scope": "Same original legacy Source4 LDR/physical fixture outputs against sealed708, complete emitted GLB bytes"
+  },
+  "observer_performance": {
+    "record": {
+      "path": "artifacts/observer-parity/status.json",
+      "sha256": "94044d5a871282851a2f9035b11b58141a211eeccb3e06afa73766b566167325"
+    },
+    "exit": 0,
+    "scope": "independent complete observer executables, same saved256 retained source; includes decode/validation/encode/process overhead, not UI latency",
+    "rows": [
+      {
+        "profile": "old708",
+        "seconds": 1.526552312017884,
+        "sha256": "c4ccc6a4d9e0782f7e251d4324d38cd4c60dfdc1af96a6bd812938a4e880e863",
+        "bytes": 18592298
+      },
+      {
+        "profile": "candidate",
+        "seconds": 0.776762574998429,
+        "sha256": "c4ccc6a4d9e0782f7e251d4324d38cd4c60dfdc1af96a6bd812938a4e880e863",
+        "bytes": 18592298
+      },
+      {
+        "profile": "old708",
+        "seconds": 1.525304413982667,
+        "sha256": "c4ccc6a4d9e0782f7e251d4324d38cd4c60dfdc1af96a6bd812938a4e880e863",
+        "bytes": 18592298
+      },
+      {
+        "profile": "candidate",
+        "seconds": 0.7690560609917156,
+        "sha256": "c4ccc6a4d9e0782f7e251d4324d38cd4c60dfdc1af96a6bd812938a4e880e863",
+        "bytes": 18592298
+      },
+      {
+        "profile": "old708",
+        "seconds": 1.5356643100094516,
+        "sha256": "c4ccc6a4d9e0782f7e251d4324d38cd4c60dfdc1af96a6bd812938a4e880e863",
+        "bytes": 18592298
+      },
+      {
+        "profile": "candidate",
+        "seconds": 0.7663984020182397,
+        "sha256": "c4ccc6a4d9e0782f7e251d4324d38cd4c60dfdc1af96a6bd812938a4e880e863",
+        "bytes": 18592298
+      }
+    ],
+    "inputs": {
+      "/home/blux/de-xr/dome-sculpt/artifacts/native-physical-coverage-708283b/artifacts/gui-inspector/dome-sculpt-native-authoring-inspect": "3c3742c557b19a9e68067bb1fb79fd3e680793b8b56e87e626e451a8c2048a89",
+      "/home/blux/de-xr/dome-sculpt/artifacts/native-color-bound-memo-b6b769f/build-release/dome-sculpt-native-authoring-inspect": "6cb859b27ebcfe6670964af6376de1474e0f2f64cbd5926823adad91c1ffec55",
+      "/home/blux/de-xr/dome-sculpt/artifacts/hdr-native-retained-8c259da/artifacts/native-physical-attached/runtime/outputs/native1.dsculpt": "f5b00baa3a27ff674b80efb669bdb43f2b2b54874b2c02677405b1b164a21149"
+    },
+    "drift": []
+  },
+  "performance_scope": "Same saved256 retained project, three alternating independent complete old/current observer processes: old1.525..1.536s/current.766..777s, all18,592,298-byte JSON outputs SHA-identical. Decode/validate/encode/process scope, not UI latency or global speed guarantee. Independent old stage timer measured actual duplicate arithmetic, not COW snapshot cost.",
+  "khronos": [
+    {
+      "record": {
+        "path": "artifacts/bound-format-validation/khronos-release.json",
+        "sha256": "12498c3703263a1467ea70fa028a584181d8181a0f202a44ef3103ce998facff"
+      },
+      "files": 47,
+      "errors": 0,
+      "warnings": 13
+    },
+    {
+      "record": {
+        "path": "artifacts/bound-format-validation/khronos-current-all.json",
+        "sha256": "f0944eaff24e3e0cb2daa7445a6be4a08683366fcc4d63dbbf33931a0749d686"
+      },
+      "files": 61,
+      "errors": 0,
+      "warnings": 51
+    },
+    {
+      "record": {
+        "path": "artifacts/current-native-gui/khronos.json",
+        "sha256": "4117efeb4b6b734873a57d8918294aa6194c755e4b794f43571b2fd3853705a6"
+      },
+      "files": 2,
+      "errors": 0,
+      "warnings": 2
+    }
+  ],
+  "validator": "Pinned2.0.0-dev.3.10, maxIssues0, no issue filters; cohorts overlap and are not summed.",
+  "preserved_negatives": [
+    "Old physical-beforeUV finite256 max17 both before and after UV; emission-off max1; no-emission unlit0. Old before/after finite images exact0, proving emission resampling rather than UV/normal loss. See sibling native-physical-contracts-708283b/artifacts/physical-before-uv-{probe,attribution}.",
+    "Coherent build56031 incomplete fixture type declaration;9207 missing explicit appearance argument;36685 independent consumer refused actual emission transform. Corrected only declaration/call/reader, with owned rebuilds preserved.",
+    "Historical independent native fixture byte comparison includes process-specific generated source names and is not same-input parity (artifacts/bound-format-validation/native-byte-parity.json)."
+  ],
+  "still_running_old_export_sweep": {
+    "tree": "../native-physical-contracts-708283b",
+    "handle": 87154,
+    "baseline": 265789,
+    "last_observed_prefix": 103000,
+    "state": "Incomplete, CPU-active; retained unchanged per root. No exhaustive export pass claim; do not restart or terminate without deliberate review."
+  },
+  "limitations": [
+    "Not integrated with current main; coherent semantic integration/full regression remains required.",
+    "Plain/no-color-preparation physical UV ownership remains required. The positive is actual dual-prepared Bake\u2192physical\u2192KeepPaint.",
+    "Typed native MToon float preview/compiler adapter remains required; existing strict refusal is preserved.",
+    "Alternate original-image/retained physical sampling domains and general physical UV transport remain required.",
+    "Independent source-image/filter products/downsampling keep honest finite approximation and original quality counterexamples; native data remains exact.",
+    "Central physical Bake/cut and standard strict HDR/ordinary painted export guards remain unless their own real adapter exists.",
+    "3438 numerical memo denial prefixes are not exhaustive full-export allocation coverage."
+  ]
+}

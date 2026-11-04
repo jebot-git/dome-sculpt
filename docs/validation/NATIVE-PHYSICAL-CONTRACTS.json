@@ -1,0 +1,69 @@
+{
+  "schema": 1,
+  "status": "qualified private geometry-quota and native/retained worker contracts; exhaustive retained allocation sweep unfinished",
+  "parent": "708283b1104bdf184fc69c163d788110b0dcaa5e",
+  "runtime_source": "src/native-authoring-compiler.cpp",
+  "runtime_sha256": "050eca8a47e2d5cdb3f42de1ba3ef7c53f13ee3900aaa3ad98192a983c22646a",
+  "change": "Enforce actual native paint geometry before extraction and actual extracted/captured geometry before staging; preserve default successful outputs and caller caps.",
+  "builds": {
+    "release": "fresh owned C/C++ core/support/render then changed compiler TU/test relink; final code tested",
+    "sanitize": "fresh whole owned O1g1 C/C++ ASan/UBSan/leaks core/support/render; external SDK/system dependencies remain external",
+    "app": "No new frontend app build in this component. GUI qualification is separate708 checkpoint."
+  },
+  "release": {
+    "exit": 0,
+    "seconds": 24.856907283014152,
+    "command": [
+      "ctest",
+      "--test-dir",
+      "/home/blux/de-xr/dome-sculpt/artifacts/native-physical-contracts-708283b/build-release",
+      "-R",
+      "^((native|retained|sdf)-physical-contracts|native-retained-physical)$",
+      "--output-on-failure",
+      "-j",
+      "1"
+    ],
+    "inputs": 1648,
+    "drift": []
+  },
+  "sanitize": {
+    "exit": 0,
+    "seconds": 433.1638211950194,
+    "command": [
+      "ctest",
+      "--test-dir",
+      "/home/blux/de-xr/dome-sculpt/artifacts/native-physical-contracts-708283b/build-sanitize",
+      "-R",
+      "^((native|retained|sdf)-physical-contracts|native-retained-physical)$",
+      "--output-on-failure",
+      "-j",
+      "1"
+    ],
+    "inputs": 1648,
+    "drift": []
+  },
+  "proofs": [
+    "original native-retained79 independent finite/native/normal/owner/worker checks",
+    "new native/retained contracts: real float/mask/hidden layers,6resource limits, exact geometry boundary/one-below, cancel probes, fsync-gated running+queued Cancel and following orderedSave/retry",
+    "constant SDF: actual extracted geometry budget and exact boundary; no invented image/raster work for constant emission"
+  ],
+  "negatives": [
+    "artifacts/contracts-old-geometry-negative: old708 accepts max_vertices1 on actual native geometry",
+    "artifacts/contracts-proof/release-sdf3-negative.log: paint-only fix still accepts SDF max_vertices1",
+    "artifacts/contracts-proof/release-dormant-sdf-refusal.log: dormant physical Paint correctly refuses, not relabelled a quota bug",
+    "artifacts/contracts-proof/release-sdf2-negative.log: constantSDF has noimage work, so image-only caps do not require failure; fixture corrected explicitly"
+  ],
+  "allocation_scope": {
+    "old_native": "old exact708 actual native-only2222 persistent C++ denial prefixes passed",
+    "current_native": "final-source native-only2224 denial prefixes passed, exact payload and retry",
+    "old_retained256": "Intentional supplemental prior-source sweep termination -15 after412.06s; baseline266409, reached marker0(<500), no drift. Not passed, not restarted.",
+    "current_retained64": "LIVE265789-allocation baseline, actual Paint3/domain grid64 verified; no exhaustive completion claim. Physical setup uses genuine64 Bake then KeepPaint, not an artificial source node."
+  },
+  "remaining": [
+    "complete bounded/new-domain allocation proof after measured production duplicate-bound work is addressed",
+    "same-file physical-before-UV finite quality17 negative remains; native before/current images0 and exact owner/history positive are separate",
+    "full native/retained source-sampler domains and typed native physical MToon adapters",
+    "current-main semantic integration and whole frontend/consumer qualification"
+  ],
+  "limits": "All existing limits unchanged. SDF mesh extent is checked after existing bounded extraction; this is not a new predictive SDF mesher memory-limit adapter."
+}

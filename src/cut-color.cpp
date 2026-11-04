@@ -1,3 +1,4 @@
+#include "emission-authority.hpp"
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "cut-color.hpp"
 #include "affine-surface.hpp"
@@ -203,6 +204,9 @@ Source authenticate(const Scene &scene, const BakeSource &display, Work &work) {
     throw std::invalid_argument(
         "The cut source no longer matches its complete colored surface");
   display.mesh.validate();
+  if(detail::hdr_emission(object.material.emissive)||object.painted->has_physical_emission()||
+     (object.material_bindings&&detail::physical_emission(*object.material_bindings)))
+    throw std::invalid_argument("Physical emission cut requires its actual float source/output adapter");
   auto maps = object.painted->preview(object.material);
   const auto &material = display.materials.front();
   if (!same_material(material.material, object.material) ||

@@ -23,8 +23,13 @@ class PaintOverlayPacket {
  // their correspondence; packed wrappers own their actual expanded domain.
  std::shared_ptr<const std::vector<std::array<float,2>>> original_uv0_,original_uv1_;
  std::shared_ptr<const PaintOverlayPacket> contribution_owner_;
+ // Independent native emission-only interpretation, never original Source4 UV.
+ std::shared_ptr<const Mesh> native_geometry_;
+ std::shared_ptr<const PaintSamplingDomain> native_domain_;
  PaintOverlayPacket()=default;
 public:
+ const std::shared_ptr<const Mesh>&native_geometry()const noexcept{return contribution_owner_?contribution_owner_->native_geometry():native_geometry_;}
+ const std::shared_ptr<const PaintSamplingDomain>&native_domain()const noexcept{return contribution_owner_?contribution_owner_->native_domain():native_domain_;}
  uint32_t resolution()const noexcept{return contribution_owner_?contribution_owner_->resolution():resolution_;}
  bool empty()const noexcept{return contribution_owner_?contribution_owner_->empty():empty_;}
  size_t storage_bytes()const noexcept{return storage_bytes_+(contribution_owner_?contribution_owner_->storage_bytes():0);}
@@ -37,12 +42,19 @@ public:
  // Packed coordinate metadata shares one actual immutable contribution owner.
  const std::shared_ptr<const PaintOverlayPacket>&contribution_owner()const noexcept{return contribution_owner_;}
 };
+// Captured layers already exclude hidden and zero-opacity metadata. A real
+// float tile keeps its interpretation even when its current value is zero.
+inline bool overlay_uses_float_emission(const PaintOverlayPacket &packet) noexcept {
+  for(const auto &layer:packet.layers())for(const auto &tile:layer.emission_tiles)if(tile)return true;
+  return false;
+}
 struct PaintOverlayFactory {
  // Read only the sealed original coordinate owners; no sparse tile packet or
  // padding upload is needed by a CPU asset worker.
  static std::array<std::shared_ptr<const std::vector<std::array<float,2>>>,2>
    source_coordinates(const PaintedMesh &);
  static std::shared_ptr<const PaintOverlayPacket> capture(const PaintedMesh &,const std::function<bool()> &cancelled={});
+ static std::shared_ptr<const PaintOverlayPacket> capture_native_emission(const PaintedMesh &,const std::function<bool()> &cancelled={});
  // Render-only ordered vertex expansion. Does not grant Scene/paint authority.
  static std::shared_ptr<const PaintOverlayPacket> pack_source_maps(
    const std::shared_ptr<const PaintOverlayPacket> &,std::shared_ptr<const PaintSourceMaps>,

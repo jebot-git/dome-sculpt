@@ -271,6 +271,9 @@ public:
   void focus_selection(bool);
   void object_properties(uint64_t, std::string, bool visible, bool locked,
                          CanvasTransform, Material, AssetSource expected = {});
+  void object_properties(uint64_t, std::string, bool visible, bool locked,
+                         CanvasTransform, Material, AssetSource,
+                         std::optional<std::array<float,3>> active_emission_override);
   bool object_editable(uint64_t) const;
   void configure_object_grab(bool mode, bool isolate);
   void hold_object(uint64_t);
