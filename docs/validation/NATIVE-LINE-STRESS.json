@@ -1,0 +1,74 @@
+{
+  "schema": 1,
+  "component": "64a19c674cc8fc3c2fbc619764c28284623040e8",
+  "scope": "Two test-only TUs with unchanged independent stress oracles; explicit geometry evidence +authored finite span +finite-line integral. Matching64a private readers and421 owned archives, no native/public policy admission",
+  "source_and_evidence_hashes": {
+    "tests/native-line-open-stress.cpp": "fe7e175e93031d5e5b66a9e93fddb5d141ddbaf18576985898e7363f386f7276",
+    "tests/native-line-contact-stress.cpp": "f054d57b332c88629867fb561778e18ceb2ec2ed3953389a4a809b203b11b986",
+    "artifacts/native-line-open-stress": "c6b6c2dec7bdb8469d8d2c7c7ef36ccf422bfdd32f70b92495bba4608bba8b2f",
+    "artifacts/native-line-contact-stress": "c352f2a53ca4d1ad30dcd24a682cec7372f1e351735fbdd76da61897ca8b020b",
+    "artifacts/native-line-open-stress.log": "579f20e6e87890f133f86c1545d41925d2baa7fd29d065c910ad4cdf5c8e61b3",
+    "artifacts/native-line-contact-stress.log": "b80a406baa14aeb62b933c64cdce0be8e4a2c4c9f109126d13b5b76c3fa0578e",
+    "artifacts/compile.json": "be9d1fdc419b63b6d562560f039eb1147bd6d0cb4a1c117310b75752cc031039",
+    "artifacts/status.json": "5699d93986a857f3328a5b083242134032b6769828620183aeda7053b1f0bd93"
+  },
+  "frozen_inputs": {
+    "/usr/bin/c++": "579d25c2d1e45abeed0c63a517b5c52f6d09ea811a787bf7a7c677a7fd0726f6",
+    "tests/native-line-open-stress.cpp": "fe7e175e93031d5e5b66a9e93fddb5d141ddbaf18576985898e7363f386f7276",
+    "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-line-integral-f288127/artifacts/native-visible-weights.cpp.o": "31960598cb01d7cccd616197762b285c0694e5e84e4058102391a07387af76fd",
+    "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-line-integral-f288127/artifacts/source-visible-weights.cpp.o": "8f285d0a6eeb20d503c0d759670091154c77c26ab51c37432055cecbfaa9d460",
+    "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-api-18ddcff/build/libdome-sculpt-core.a": "12ceee3645c4d94e7721062f0d1c1b9ad3e5748213807b7bdfded6f5427ca41c",
+    "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-api-18ddcff/build/libdome-sculpt-affine.a": "2dd5261ca8b4173661384eb78b67e4bf9e74753787c68cf84b93778fc1665394",
+    "/usr/lib64/liblapacke.so": "4e74d393b6f5f294cbd96b777da8be3ada9995b1da98aaa0c1eb5fea4b294c7c",
+    "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-api-18ddcff/build/libdome-sculpt-polygon.a": "93bfbbfe340e89c9bc3555877201bf7bade33ee81bb3ccc665a2d642aafffb2a",
+    "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-api-18ddcff/build/libxatlas.a": "751213ec1ec9588bdb02a31880b109ec6d170c294253422157620946fe4bbd42",
+    "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-api-18ddcff/build/libmikktspace.a": "0f5aa8d4d2f53c794d3a0850abe5c879785d4feabf3adf4e4de509d027619ddf",
+    "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-api-18ddcff/build/libmikktspace-robust.a": "14dd6664a7d89e8c78af0e54f3ee4ed0912019d63919f71155bac6268f1bb010",
+    "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-api-18ddcff/build/libufbx.a": "555c9e1eeff16ebd040eeae38a039abd6225aad67e69e1578fb7e77a59d86dcf",
+    "/usr/lib64/libpng.so": "65cb04d6c4ec5c031f2f43a58ec5adc4bc9652be5703bb9fa1178f84a2e40446",
+    "/usr/lib64/libjpeg.so": "beb79376b4544260da3c31603784c908b58bdb959cbe1d8c48075dfa7d5bc80c",
+    "/usr/lib64/libz.so": "cc2d0ee053bda906e3d9de9118fe7eb62d4c193ee1df3c323e60dae88e60780e",
+    "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-api-18ddcff/build/libdome-sculpt-emission-codec.a": "f3f71c63bf4be3a70163414d9c87b7d78cdeb0159979ae36e068dcf9f04ac877",
+    "/usr/lib64/libOpenEXR-3_2.so": "efdbbe75b27b6a50e4a8e028e008fde32befa53280295e21ef6f036350225769",
+    "/usr/lib64/libOpenEXRUtil-3_2.so": "bafa0a2cb708d3ae952987c013d96e992badbb742e1a8e4fac6605c7eae5b5a0",
+    "/usr/lib64/libOpenEXRCore-3_2.so": "bc6775af6f33d58d41f20e714d80db4b0fd21209796a6694cb5249739a49a331",
+    "/usr/lib64/libIex-3_2.so": "da965da4711be1158555d457dc6ff17582ec88c1b86d98edc69f09cdcc4f6c7a",
+    "/usr/lib64/libIlmThread-3_2.so": "424321e69eb6257387820baa90e4fccb209c5dcb8c88589a8c5e1ccf4d4c23d6",
+    "/usr/lib64/libImath-3_1.so": "1e86ce61e14061369bd937b73d53abb69305dff34df4700f99a459f5c024ab45",
+    "tests/native-line-contact-stress.cpp": "f054d57b332c88629867fb561778e18ceb2ec2ed3953389a4a809b203b11b986"
+  },
+  "runs": [
+    {
+      "name": "native-line-open-stress",
+      "code": 0,
+      "seconds": 1.2000112340028863
+    },
+    {
+      "name": "native-line-contact-stress",
+      "code": 0,
+      "seconds": 0.009943112003384158
+    }
+  ],
+  "open_U_cases": 6,
+  "near_and_exact_contact_cases": 8,
+  "unchanged_bounds": {
+    "wrong_max": 0.03,
+    "wrong_mean": 0.01,
+    "pose_max_m": 0.006,
+    "pose_mean_m": 0.002,
+    "work": 500000000,
+    "bytes": 268435456
+  },
+  "worst_U": {
+    "wrong_max": 0.00817518,
+    "wrong_mean": 0.00226295,
+    "pose_max_m": 0.00163504,
+    "pose_mean_m": 0.000452578
+  },
+  "original_touching_negative_preserved": "9e38439 old all-source support construction; current exact source witnesses retain8 raw separate rows",
+  "limitations": [
+    "Fully coplanar/degenerate finite handles remain guarded",
+    "Interior-only or ambiguous control-support intent remains unresolved",
+    "Not full general stress coverage or whole-own solver SAN"
+  ]
+}
