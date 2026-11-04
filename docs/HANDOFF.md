@@ -1,5 +1,9 @@
 # Dome Sculpt production handoff
 
+## Current private authoring work — 2026-11-04
+
+Read [PRIVATE-AUTHORING-PROGRESS.md](PRIVATE-AUTHORING-PROGRESS.md) for pushed normalUV34, native32 paint/export, anatomical linked-pose and VRM1 milestones. No new runtime code is admitted here. Real original-source curved skin/morph shading still fails4/9 states at9>unchanged4; fix it before integration. Fresh private f2 ALL/full630 is running, not passed. Every unfinished full-goal row and later controller drawers remains required.
+
 ## Coherent recipe regression and final fixture repairs — 2026-11-04
 
 The original complete615 Release run finishes613Pass/2Fail. Complete test-only
