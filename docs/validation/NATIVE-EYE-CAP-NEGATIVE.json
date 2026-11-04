@@ -1,0 +1,1172 @@
+{
+  "scope": "Read-only ocular-layer geometry audit; no inferred field or admission",
+  "parent": "95cc60d",
+  "analytic_release": "PASS 15 independent cap/ellipsoid/plane/crescent/similarity/budget/cancel controls\n",
+  "analytic_sanitize": "PASS 15 independent cap/ellipsoid/plane/crescent/similarity/budget/cancel controls\n",
+  "actual": [
+    {
+      "sex": "female",
+      "command": [
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-eye-layer-95cc60d/artifacts/native-eye-cap-audit",
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-context-api-7849001/build/native-line-female/fitted-unskinned.dsculpt",
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-eye-layer-95cc60d/artifacts/female-eye-cap.json"
+      ],
+      "exit": 0,
+      "seconds": 1.166694447019836
+    },
+    {
+      "sex": "male",
+      "command": [
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-eye-layer-95cc60d/artifacts/native-eye-cap-audit",
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-context-api-7849001/build/native-line-male/fitted-unskinned.dsculpt",
+        "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-eye-layer-95cc60d/artifacts/male-eye-cap.json"
+      ],
+      "exit": 0,
+      "seconds": 1.2168938319955487
+    }
+  ],
+  "ellipsoid_hypothesis_rejected": true,
+  "results": {
+    "female": {
+      "work": 88561957,
+      "components": [
+        {
+          "boundary": 28,
+          "center": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "convex": false,
+          "disk": true,
+          "eigenvalues": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "maximum_polynomial_residual": 0.0,
+          "negative_turns": 7,
+          "object": 4,
+          "positive_ellipsoid_fit": false,
+          "radii": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rank_ratio": 0.0,
+          "root": 54,
+          "singular": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "source_distance_m": {},
+          "vertices": 55
+        },
+        {
+          "boundary": 36,
+          "center": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "convex": false,
+          "disk": true,
+          "eigenvalues": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "maximum_polynomial_residual": 0.0,
+          "negative_turns": 16,
+          "object": 4,
+          "positive_ellipsoid_fit": false,
+          "radii": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rank_ratio": 0.0,
+          "root": 129,
+          "singular": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "source_distance_m": {},
+          "vertices": 75
+        },
+        {
+          "boundary": 36,
+          "center": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "convex": false,
+          "disk": true,
+          "eigenvalues": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "maximum_polynomial_residual": 0.0,
+          "negative_turns": 20,
+          "object": 4,
+          "positive_ellipsoid_fit": false,
+          "radii": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rank_ratio": 0.0,
+          "root": 203,
+          "singular": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "source_distance_m": {},
+          "vertices": 75
+        },
+        {
+          "boundary": 28,
+          "center": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "convex": false,
+          "disk": true,
+          "eigenvalues": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "maximum_polynomial_residual": 0.0,
+          "negative_turns": 7,
+          "object": 4,
+          "positive_ellipsoid_fit": false,
+          "radii": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rank_ratio": 0.0,
+          "root": 257,
+          "singular": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "source_distance_m": {},
+          "vertices": 55
+        },
+        {
+          "boundary": 36,
+          "center": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "convex": false,
+          "disk": true,
+          "eigenvalues": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "maximum_polynomial_residual": 0.0,
+          "negative_turns": 20,
+          "object": 5,
+          "positive_ellipsoid_fit": false,
+          "radii": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rank_ratio": 0.0,
+          "root": 74,
+          "singular": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "source_distance_m": {},
+          "vertices": 75
+        },
+        {
+          "boundary": 36,
+          "center": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "convex": false,
+          "disk": true,
+          "eigenvalues": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "maximum_polynomial_residual": 0.0,
+          "negative_turns": 16,
+          "object": 5,
+          "positive_ellipsoid_fit": false,
+          "radii": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rank_ratio": 0.0,
+          "root": 149,
+          "singular": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "source_distance_m": {},
+          "vertices": 75
+        },
+        {
+          "boundary": 28,
+          "center": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "convex": false,
+          "disk": true,
+          "eigenvalues": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "maximum_polynomial_residual": 0.0,
+          "negative_turns": 19,
+          "object": 6,
+          "positive_ellipsoid_fit": false,
+          "radii": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rank_ratio": 0.0,
+          "root": 54,
+          "singular": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "source_distance_m": {},
+          "vertices": 55
+        },
+        {
+          "boundary": 28,
+          "center": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "convex": false,
+          "disk": true,
+          "eigenvalues": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "maximum_polynomial_residual": 0.0,
+          "negative_turns": 9,
+          "object": 6,
+          "positive_ellipsoid_fit": false,
+          "radii": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rank_ratio": 0.0,
+          "root": 107,
+          "singular": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "source_distance_m": {},
+          "vertices": 55
+        },
+        {
+          "boundary": 24,
+          "center": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "convex": true,
+          "disk": true,
+          "eigenvalues": [
+            -0.00928189980403229,
+            -0.004836603702044323,
+            1.0552779365929645
+          ],
+          "maximum_polynomial_residual": 0.0,
+          "negative_turns": 0,
+          "object": 7,
+          "positive_ellipsoid_fit": false,
+          "radii": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rank_ratio": 0.03842364052779092,
+          "root": 60,
+          "singular": [
+            1.4398144789273044,
+            1.3856589801619914,
+            1.2857419032156552,
+            0.8426279205630155,
+            0.6448566152092519,
+            0.3845669214027401,
+            0.1064957186811914,
+            0.08396143328350882,
+            0.055322913965011336,
+            0.006500438909364793
+          ],
+          "source_distance_m": {},
+          "vertices": 61
+        },
+        {
+          "boundary": 24,
+          "center": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "convex": true,
+          "disk": true,
+          "eigenvalues": [
+            -0.009281935033292773,
+            -0.004836554590074502,
+            1.0552781505682058
+          ],
+          "maximum_polynomial_residual": 0.0,
+          "negative_turns": 0,
+          "object": 7,
+          "positive_ellipsoid_fit": false,
+          "radii": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rank_ratio": 0.03842358559106714,
+          "root": 120,
+          "singular": [
+            1.4398148448528358,
+            1.3856586126910382,
+            1.2857420453428614,
+            0.8426277073518129,
+            0.6448567298776285,
+            0.3845668901071212,
+            0.10649570181526631,
+            0.08396116604482541,
+            0.055322848926491995,
+            0.006500440186038539
+          ],
+          "source_distance_m": {},
+          "vertices": 61
+        },
+        {
+          "boundary": 24,
+          "center": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "convex": true,
+          "disk": true,
+          "eigenvalues": [
+            -0.03215422827707418,
+            0.0022193838228181176,
+            1.0536841279392521
+          ],
+          "maximum_polynomial_residual": 0.0,
+          "negative_turns": 0,
+          "object": 8,
+          "positive_ellipsoid_fit": false,
+          "radii": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rank_ratio": 0.01715851317451166,
+          "root": 60,
+          "singular": [
+            1.4507500125872728,
+            1.3750012131620175,
+            1.2869100039265797,
+            0.8411427027751901,
+            0.6432644316049729,
+            0.3842999506936445,
+            0.10265689894509561,
+            0.09357602768345627,
+            0.024892713203901674,
+            0.006256396616698756
+          ],
+          "source_distance_m": {},
+          "vertices": 61
+        },
+        {
+          "boundary": 24,
+          "center": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "convex": true,
+          "disk": true,
+          "eigenvalues": [
+            -0.032153508681483464,
+            0.0022191160368566004,
+            1.053684480165245
+          ],
+          "maximum_polynomial_residual": 0.0,
+          "negative_turns": 0,
+          "object": 8,
+          "positive_ellipsoid_fit": false,
+          "radii": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rank_ratio": 0.01715848923498367,
+          "root": 121,
+          "singular": [
+            1.4507504206388107,
+            1.3750008168890817,
+            1.2869101743078033,
+            0.8411425911609469,
+            0.6432644097022048,
+            0.38429977168305696,
+            0.10265680085905696,
+            0.09357603419760377,
+            0.024892685475179064,
+            0.0062564295611256685
+          ],
+          "source_distance_m": {},
+          "vertices": 61
+        },
+        {
+          "boundary": 16,
+          "center": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "convex": false,
+          "disk": true,
+          "eigenvalues": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "maximum_polynomial_residual": 0.0,
+          "negative_turns": 6,
+          "object": 11,
+          "positive_ellipsoid_fit": false,
+          "radii": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rank_ratio": 0.0,
+          "root": 22,
+          "singular": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "source_distance_m": {},
+          "vertices": 25
+        },
+        {
+          "boundary": 16,
+          "center": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "convex": false,
+          "disk": true,
+          "eigenvalues": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "maximum_polynomial_residual": 0.0,
+          "negative_turns": 10,
+          "object": 11,
+          "positive_ellipsoid_fit": false,
+          "radii": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rank_ratio": 0.0,
+          "root": 47,
+          "singular": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "source_distance_m": {},
+          "vertices": 25
+        }
+      ]
+    },
+    "male": {
+      "work": 86568666,
+      "components": [
+        {
+          "boundary": 28,
+          "center": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "convex": false,
+          "disk": true,
+          "eigenvalues": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "maximum_polynomial_residual": 0.0,
+          "negative_turns": 8,
+          "object": 2,
+          "positive_ellipsoid_fit": false,
+          "radii": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rank_ratio": 0.0,
+          "root": 53,
+          "singular": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "source_distance_m": {},
+          "vertices": 55
+        },
+        {
+          "boundary": 28,
+          "center": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "convex": false,
+          "disk": true,
+          "eigenvalues": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "maximum_polynomial_residual": 0.0,
+          "negative_turns": 8,
+          "object": 2,
+          "positive_ellipsoid_fit": false,
+          "radii": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rank_ratio": 0.0,
+          "root": 109,
+          "singular": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "source_distance_m": {},
+          "vertices": 55
+        },
+        {
+          "boundary": 24,
+          "center": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "convex": true,
+          "disk": true,
+          "eigenvalues": [
+            -0.01726905050048285,
+            -0.001680652658446735,
+            1.0483912341587467
+          ],
+          "maximum_polynomial_residual": 0.0,
+          "negative_turns": 0,
+          "object": 4,
+          "positive_ellipsoid_fit": false,
+          "radii": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rank_ratio": 0.007785261360185602,
+          "root": 59,
+          "singular": [
+            1.4250544669127334,
+            1.4027608247063916,
+            1.2846993495524626,
+            0.8489060032474871,
+            0.6378749828908725,
+            0.3924297022086902,
+            0.05071025437743631,
+            0.03566051496770709,
+            0.011094421477415595,
+            0.0007152417156319343
+          ],
+          "source_distance_m": {},
+          "vertices": 61
+        },
+        {
+          "boundary": 24,
+          "center": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "convex": true,
+          "disk": true,
+          "eigenvalues": [
+            -0.017269254416362935,
+            -0.0016807638338065109,
+            1.0483911471894896
+          ],
+          "maximum_polynomial_residual": 0.0,
+          "negative_turns": 0,
+          "object": 4,
+          "positive_ellipsoid_fit": false,
+          "radii": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rank_ratio": 0.007785202504118065,
+          "root": 119,
+          "singular": [
+            1.4250543115102798,
+            1.4027609822309395,
+            1.2846994413795354,
+            0.848906107559399,
+            0.6378749094746721,
+            0.3924296925309771,
+            0.05071021680536959,
+            0.035660528591903135,
+            0.011094336394474075,
+            0.0007152262257601498
+          ],
+          "source_distance_m": {},
+          "vertices": 61
+        },
+        {
+          "boundary": 24,
+          "center": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "convex": true,
+          "disk": true,
+          "eigenvalues": [
+            -0.004096192571252441,
+            0.0005327393053219276,
+            1.0601366674839412
+          ],
+          "maximum_polynomial_residual": 0.0,
+          "negative_turns": 0,
+          "object": 5,
+          "positive_ellipsoid_fit": false,
+          "radii": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rank_ratio": 0.011930300719170969,
+          "root": 58,
+          "singular": [
+            1.4223565437642214,
+            1.4058796625172605,
+            1.2851322791690982,
+            0.848822143379177,
+            0.6390247351571432,
+            0.389286726919809,
+            0.036672123213613295,
+            0.03225174638277526,
+            0.016969141296987823,
+            0.0008140711417782458
+          ],
+          "source_distance_m": {},
+          "vertices": 61
+        },
+        {
+          "boundary": 24,
+          "center": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "convex": true,
+          "disk": true,
+          "eigenvalues": [
+            -0.0040960981854462775,
+            0.0005327256066383825,
+            1.0601368889801948
+          ],
+          "maximum_polynomial_residual": 0.0,
+          "negative_turns": 0,
+          "object": 5,
+          "positive_ellipsoid_fit": false,
+          "radii": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rank_ratio": 0.011930248728366915,
+          "root": 121,
+          "singular": [
+            1.4223563127225165,
+            1.4058799096141437,
+            1.2851323837572657,
+            0.8488221961204594,
+            0.6390247149415234,
+            0.38928666925998284,
+            0.0366719270086187,
+            0.03225151341791806,
+            0.016969064591142457,
+            0.0008140680777214518
+          ],
+          "source_distance_m": {},
+          "vertices": 61
+        },
+        {
+          "boundary": 36,
+          "center": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "convex": false,
+          "disk": true,
+          "eigenvalues": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "maximum_polynomial_residual": 0.0,
+          "negative_turns": 16,
+          "object": 8,
+          "positive_ellipsoid_fit": false,
+          "radii": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rank_ratio": 0.0,
+          "root": 74,
+          "singular": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "source_distance_m": {},
+          "vertices": 75
+        },
+        {
+          "boundary": 36,
+          "center": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "convex": false,
+          "disk": true,
+          "eigenvalues": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "maximum_polynomial_residual": 0.0,
+          "negative_turns": 16,
+          "object": 8,
+          "positive_ellipsoid_fit": false,
+          "radii": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rank_ratio": 0.0,
+          "root": 148,
+          "singular": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "source_distance_m": {},
+          "vertices": 75
+        },
+        {
+          "boundary": 28,
+          "center": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "convex": false,
+          "disk": true,
+          "eigenvalues": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "maximum_polynomial_residual": 0.0,
+          "negative_turns": 16,
+          "object": 9,
+          "positive_ellipsoid_fit": false,
+          "radii": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rank_ratio": 0.0,
+          "root": 54,
+          "singular": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "source_distance_m": {},
+          "vertices": 55
+        },
+        {
+          "boundary": 36,
+          "center": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "convex": false,
+          "disk": true,
+          "eigenvalues": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "maximum_polynomial_residual": 0.0,
+          "negative_turns": 20,
+          "object": 9,
+          "positive_ellipsoid_fit": false,
+          "radii": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rank_ratio": 0.0,
+          "root": 129,
+          "singular": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "source_distance_m": {},
+          "vertices": 75
+        },
+        {
+          "boundary": 36,
+          "center": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "convex": false,
+          "disk": true,
+          "eigenvalues": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "maximum_polynomial_residual": 0.0,
+          "negative_turns": 16,
+          "object": 9,
+          "positive_ellipsoid_fit": false,
+          "radii": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rank_ratio": 0.0,
+          "root": 204,
+          "singular": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "source_distance_m": {},
+          "vertices": 75
+        },
+        {
+          "boundary": 28,
+          "center": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "convex": false,
+          "disk": true,
+          "eigenvalues": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "maximum_polynomial_residual": 0.0,
+          "negative_turns": 12,
+          "object": 9,
+          "positive_ellipsoid_fit": false,
+          "radii": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rank_ratio": 0.0,
+          "root": 257,
+          "singular": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "source_distance_m": {},
+          "vertices": 55
+        },
+        {
+          "boundary": 16,
+          "center": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "convex": false,
+          "disk": true,
+          "eigenvalues": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "maximum_polynomial_residual": 0.0,
+          "negative_turns": 5,
+          "object": 11,
+          "positive_ellipsoid_fit": false,
+          "radii": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rank_ratio": 0.0,
+          "root": 22,
+          "singular": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "source_distance_m": {},
+          "vertices": 25
+        },
+        {
+          "boundary": 16,
+          "center": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "convex": false,
+          "disk": true,
+          "eigenvalues": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "maximum_polynomial_residual": 0.0,
+          "negative_turns": 11,
+          "object": 11,
+          "positive_ellipsoid_fit": false,
+          "radii": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rank_ratio": 0.0,
+          "root": 47,
+          "singular": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "source_distance_m": {},
+          "vertices": 25
+        }
+      ]
+    }
+  },
+  "sha256": {
+    "src/rotary-cap-geometry.hpp": "4655fe81925c75a27ad8cfa2b562077322af5323b5156e4b8523c004493d73d9",
+    "tests/rotary-cap-geometry.cpp": "e9cebdff609c38c74e885650e29a3468c6cdaf47d497329e500bdd3c166143f4",
+    "tests/native-eye-cap-audit.cpp": "cc2294aa420d0248acdcc2b4d25fc04c5e886811aca3a6fed0e906da9247d846",
+    "artifacts/rotary-cap-geometry-test": "4f679659b994c0894461175da5edeee3efe96ce05bb3cab7371a9b9eac4473c4",
+    "artifacts/rotary-cap-geometry-sanitize": "bc06402444d363719bfbf46301c82114eabf928037a98246b67e37937602412f",
+    "artifacts/native-eye-cap-audit": "c38bc274690acb335240cbbc3e75e1a8c8b204375c50a0cf3ebefded151c958b",
+    "artifacts/eye-cap-commands.json": "f9209ac149007c2a060a5207201f67959690c10bc1d65f7cd2f320e1cfac5ec0",
+    "artifacts/female-eye-cap.json": "d6a6a8719663bb05eebcd3e13c32d4c1edc45aaf3f898604c28d51ed2e3e3f9e",
+    "artifacts/male-eye-cap.json": "0d96c92fa3b2a5b9f8e26dc282214182d43f423ee98b73bfad06e83979412bb3"
+  }
+}
