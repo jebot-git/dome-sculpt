@@ -407,7 +407,7 @@ FN(ReleaseSwapchainImage, XrSwapchain p, const XrSwapchainImageReleaseInfo *) {
       for(int y=int(s->height)-1;y>=0;--y)for(unsigned x=0;x<s->width;++x)for(int c=0;c<3;++c)capture.put(char(displayed(bytes[(size_t(y)*s->width+x)*4+c])));
     }
   }
-  if(!cage_mode().empty()&&(frame==54||frame==58||frame==64)){
+  if(!cage_mode().empty()&&(frame==54||frame==58||frame==64||(bake_recipe_fixture()&&(frame==34||frame==40)))){
     report["cage_images"][std::to_string(frame)][std::to_string(s->eye)]=std::count_if(bytes.begin(),bytes.end(),[](uint8_t v){return v!=0;});
     if(auto path=getenv("DOME_XR_FIXTURE_REPORT")){
       std::ofstream capture(std::string(path)+".cage-"+std::to_string(frame)+"-"+std::to_string(s->eye)+".ppm",std::ios::binary);capture<<"P6\n"<<s->width<<' '<<s->height<<"\n255\n";
