@@ -79,7 +79,7 @@ int main(int argc,char **argv)try{
   check(controller.wait_uv()&&controller.frame().state->uv&&controller.frame().state->controls.parameter==VrParameter::UvEdit,"Actual joystick navigation enters the existing UV workspace for the prepared corner target");
   controller.edit_uv(UvAction::Scale,.7f);check(controller.wait_uv()&&controller.frame().state->uv->valid,"Actual prepared-corner UV scale validates for the supported unposed normal basis");
   auto draft=controller.frame().state->uv->mesh->uv;send(-1,0);send();check(controller.wait_uv()&&controller.frame().state->uv->mesh->uv!=draft,"Controller physical axis changes the actual prepared-corner draft");
-  send(0,0,true);send();ready(controller);check(!controller.frame().state->uv&&controller.copy_scene().encode().at("version")==30&&controller.copy_scene().active().bake_recipe==source.active().bake_recipe,"Joystick Confirm publishes the actual Scene30 colour UV model and retained bake recipe");
+  send(0,0,true);send();ready(controller);check(!controller.frame().state->uv&&controller.copy_scene().encode().at("version")==30&&controller.copy_scene().active().bake_recipe==controller_source.active().bake_recipe,"Joystick Confirm publishes the actual Scene30 colour UV model and retained bake recipe");
   check(controller.undo()&&controller.copy_scene().encode()==controller_before,"Controller accepted colour UV is one exact global Undo");
  }
  {
