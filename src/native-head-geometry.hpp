@@ -19,6 +19,8 @@ struct NativeHeadGeometryReport {
   struct Contact { uint64_t first = 0, second = 0; size_t edges = 0; };
   std::vector<Part> parts;
   std::vector<Contact> contacts;
+  struct Seam {uint64_t first,second;uint32_t first_vertex,second_vertex;};
+  std::vector<Seam> seam_endpoints;
   size_t ambiguous = 0, rejected = 0, work = 0, bytes = 0;
 };
 inline NativeHeadGeometryReport analyze_native_head_geometry(
@@ -181,6 +183,8 @@ inline NativeHeadGeometryReport analyze_native_head_geometry(
     auto p=[](Vec3 v){return std::array<float,3>{v.x,v.y,v.z};};
     auto tri=[&](const Captured&c,uint32_t f){const auto&m=c.mesh;return volume_topology::Triangle{p(m.positions[m.indices[f*3]]),p(m.positions[m.indices[f*3+1]]),p(m.positions[m.indices[f*3+2]])};};
     if(p(x.mesh.positions[a.a])!=p(y.mesh.positions[b.b])||p(x.mesh.positions[a.b])!=p(y.mesh.positions[b.a])||volume_topology::unexpected_contact(tri(x,a.face),tri(y,b.face),work)){++result.rejected;continue;}
+    result.seam_endpoints.push_back({x.object.id,y.object.id,a.a,b.b});
+    result.seam_endpoints.push_back({x.object.id,y.object.id,a.b,b.a});
     ++contacts[{std::min(a.part,b.part),std::max(a.part,b.part)}];
   }
   for(const auto&[edge,count]:contacts)result.contacts.push_back({captured[edge[0]].object.id,captured[edge[1]].object.id,count});

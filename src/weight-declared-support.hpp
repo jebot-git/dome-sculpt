@@ -49,6 +49,8 @@ enum class DeclaredOriginBoundary {
   NativeFiniteLineIntegral
 };
 struct DeclaredWeightSupport {
+  struct Equality {uint64_t first,second;uint32_t first_vertex,second_vertex;};
+  std::vector<Equality> geometric_equalities;
   DeclaredSupportPolicy policy = DeclaredSupportPolicy::AllDeformControls;
   bool world_metric = false;
   std::vector<DeclaredWeightPart> parts;

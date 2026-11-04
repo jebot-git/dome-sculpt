@@ -125,7 +125,9 @@ int main(int argc, char **argv) try {
     support.parts.push_back(std::move(part));
   }
   std::ofstream(out/"automatic-constraints.json")<<inferred.dump(2);
-  size_t declaration_bytes = 0;
+  for(const auto&e:analysis.seam_endpoints)
+    support.geometric_equalities.push_back({e.first,e.second,e.first_vertex,e.second_vertex});
+  size_t declaration_bytes = support.geometric_equalities.capacity()*sizeof(detail::DeclaredWeightSupport::Equality);
   for (const auto &part : support.parts) {
     declaration_bytes += part.user_excluded_joints.capacity() * sizeof(uint32_t);
     declaration_bytes += part.geometric_row_groups.capacity()*sizeof(uint32_t);
@@ -135,7 +137,7 @@ int main(int argc, char **argv) try {
   }
   const size_t wrapper_work = analysis.work + construction.used + 4096 + targets.size() * 32,
                wrapper_bytes =
-                   sizeof(support) + sizeof(analysis) + analysis.parts.capacity()*sizeof(detail::NativeHeadGeometryReport::Part) + analysis.contacts.capacity()*sizeof(detail::NativeHeadGeometryReport::Contact) + declaration_bytes +
+                   sizeof(support) + sizeof(analysis) + analysis.parts.capacity()*sizeof(detail::NativeHeadGeometryReport::Part) + analysis.contacts.capacity()*sizeof(detail::NativeHeadGeometryReport::Contact)+analysis.seam_endpoints.capacity()*sizeof(detail::NativeHeadGeometryReport::Seam) + declaration_bytes +
                    targets.size() * sizeof(detail::DeclaredWeightPart) + 4096;
   if(wrapper_work>=500000000||wrapper_bytes>=256u*1024u*1024u)
     throw std::length_error("Automatic request staging exhausted original resources");

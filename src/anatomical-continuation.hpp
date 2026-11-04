@@ -12,6 +12,7 @@
 #include "weight-surface-system.hpp"
 #include "weight-shared-simplex.hpp"
 #include "weight-user-boundary.hpp"
+#include "weight-equality-quotient.hpp"
 #include <map>
 #include <nlohmann/json.hpp>
 namespace dome::detail {
@@ -499,7 +500,7 @@ anatomical_continuation(const Scene &scene, uint64_t group,
       }
       face_owner.insert(face_owner.end(), solve_mesh.indices.size() / 3, owner);
     }
-    const size_t n = s.positions.size();
+    size_t n = s.positions.size();
     out.report.rows = n;
     double length = 0;
     for (const auto &[edge, w] : edges) {
@@ -794,6 +795,30 @@ anatomical_continuation(const Scene &scene, uint64_t group,
       s.values[b] = -w;
     }
     // Lexicographic edge iteration yields sorted unique adjacency rows.
+    if(declared&&!declared->geometric_equalities.empty()) {
+      stage="exact declared geometric energy quotient";
+      if(declared->contact_support!=DeclaredContactSupport::CommonMask ||
+         declared->geometric_equalities.size()>corners)
+        throw std::invalid_argument("Geometric equality policy/dimensions");
+      const size_t equality_bytes=declared->geometric_equalities.size()*sizeof(std::array<uint32_t,2>);
+      if(equality_bytes>options.maximum_bytes-source_bytes)
+        throw std::length_error("Equality row staging before allocation");
+      std::vector<std::array<uint32_t,2>> equalities;
+      equalities.reserve(declared->geometric_equalities.size());
+      auto row=[&](uint64_t object,uint32_t vertex){
+        for(const auto&p:out.parts){budget.step(4);if(p.source_lease.id==object){
+          if(vertex>=p.raw_to_row.size())throw std::invalid_argument("Equality current vertex outside owner");
+          return p.raw_to_row[vertex];}}
+        throw std::invalid_argument("Equality current owner absent");
+      };
+      for(const auto&e:declared->geometric_equalities)
+        equalities.push_back({row(e.first,e.first_vertex),row(e.second,e.second_vertex)});
+      auto quotient=quotient_weight_equalities(s,rhs,screen,user_boundaries,usage,labels,
+                           equalities,options.maximum_bytes-source_bytes-equality_bytes,budget);
+      source_bytes+=equality_bytes+quotient.bytes;
+      for(auto&p:out.parts)for(auto&row:p.raw_to_row){budget.step();row=quotient.rows[row];}
+      n=s.diagonal.size();out.report.rows=n;
+    }
     if (std::any_of(user_boundaries.begin(), user_boundaries.end(),
                     [](uint32_t j) { return j != UINT32_MAX; })) {
       stage = "explicit user boundary elimination";
