@@ -102,6 +102,20 @@ int main(int argc,char **argv)try{
    const auto shaped=recovered.encode();require_cage(Scene::decode(shaped).encode()==shaped&&recovered.active().material_bindings->normal_preparation->canonical_conversion,
      "New/Replace shapekeys retain explicit converted planes and actual owning frame derivations through restart");
    recovered.save(out/"converted-key.dsculpt");
+   Document uv;uv.replace(recovered);settled(uv);
+   for(int pass=0;pass<2;++pass){
+    const auto previous=uv.copy_scene().encode();const auto frames=uv.copy_scene().active().material_bindings->normal_frames;
+    uv.begin_uv();require_cage(uv.wait_uv(),"Converted normal mesh opens the actual native UV workspace");
+    uv.edit_uv(UvAction::Scale,.8f);require_cage(uv.wait_uv(),"Converted normal UV scale finishes through the native worker");
+    uv.end_uv(true);settled(uv);const auto current=uv.copy_scene();const auto encoded_uv=current.encode();
+    require_cage(current.active().material_bindings->normal_preparation->canonical_conversion&&
+      current.active().material_bindings->normal_preparation->uv_reprojection&&current.active().material_bindings->normal_frames==frames&&
+      Scene::decode(encoded_uv).encode()==encoded_uv,
+      "Repeated converted-normal UV Apply retains original conversion ownership, authored shape frames and exact native restart");
+    require_cage(uv.undo()&&uv.copy_scene().encode()==previous&&uv.redo()&&uv.copy_scene().encode()==encoded_uv,
+      "Each converted-normal UV Apply is one exact Undo/Redo transaction");settled(uv);
+   }
+   uv.save(out/"converted-uv.dsculpt");
   }
  }
  auto before=legacy_conversion_model(7);const auto exact=before.encode();Document doc;doc.replace(before);settled(doc);

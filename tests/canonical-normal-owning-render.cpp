@@ -17,8 +17,9 @@ int main(int argc,char**argv)try{
  std::cout<<"GL_VENDOR "<<vendor<<"\nGL_RENDERER "<<device<<std::endl;
  if(argc==4)check(vendor.find("Intel")!=std::string::npos&&device.find("Arc")!=std::string::npos&&device.find("A770")!=std::string::npos&&device.find("llvmpipe")==std::string::npos&&device.find("UHD")==std::string::npos,"Actual strict Intel Arc A770 device executes conversion consumer images");
  Fbo fbo;SurfaceRenderer native;prepared_normal_consumer::Renderer independent;
- for(int variant=0;variant<16;++variant){
-  auto original=Scene::load(source/("original-"+std::to_string(variant)+".dsculpt"));auto converted=Scene::load(source/("converted-"+std::to_string(variant)+".dsculpt"));
+ for(int variant=0;variant<18;++variant){
+  const auto name=variant<16?"converted-"+std::to_string(variant):variant==16?"converted-key":"converted-uv";
+  auto original=Scene::load(source/("original-"+std::to_string(variant<16?variant:7)+".dsculpt"));auto converted=Scene::load(source/(name+".dsculpt"));
   original.active().transform.scale=converted.active().transform.scale=5;
   Document a,b;a.replace(original);b.replace(converted);a.shading(false);b.shading(false);finish_conversion_frame(a);finish_conversion_frame(b);
   fbo.bind();const auto old_pixels=draw(native,a.frame().surface);fbo.bind();const auto converted_pixels=draw(native,b.frame().surface);
@@ -26,7 +27,7 @@ int main(int argc,char**argv)try{
   png(out/("original-"+std::to_string(variant)+".png"),old_pixels);png(out/("converted-"+std::to_string(variant)+".png"),converted_pixels);
   check(rest_error<=4,"Actual old raw-TBN native view and explicitly converted native rest view meet the unchanged four-level bound");
   for(int pose=0;pose<3;++pose)for(float weight:{0.f,.35f,1.f}){
-   auto scene=converted;auto &o=scene.active();if(o.deformation){auto d=*o.deformation;if(d.morphs)d.morph_weights={weight};
+   auto scene=converted;auto &o=scene.active();if(o.deformation){auto d=*o.deformation;if(d.morphs)d.morph_weights.assign(d.morphs->targets.size(),weight);
     if(d.skeleton&&pose){for(const auto &bone:d.skeleton->bones)d.pose.push_back(bone.rest);
      d.pose[0].scale=pose==1?Vec3{1.1f,.85f,.55f}:Vec3{.8f,1.05f,1.6f};
      const float angle=pose==1?.2f:-.25f;d.pose[1].rotation={std::cos(angle/2),0,std::sin(angle/2),0};d.pose[1].scale=pose==1?Vec3{.9f,1.1f,1.5f}:Vec3{1.15f,.8f,.7f};}
