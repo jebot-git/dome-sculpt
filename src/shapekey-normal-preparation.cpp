@@ -280,7 +280,7 @@ ShapeKeyResult author_prepared_normal_shapekey(Scene &scene,uint64_t object,cons
     throw std::invalid_argument("Prepared shapekey authoring requires its finished owning normal model");
   const auto &recipe=*binding->normal_preparation;binding->validate();
   recipe.validate_current(source.painted->mesh(),source.appearance.get(),cancelled);
-  if(needs_independent_key_domain(source,edit))return author_derived_normal_shapekey(scene,object,edit,cancelled);
+  if(needs_independent_key_domain(source,edit,cancelled))return author_derived_normal_shapekey(scene,object,edit,cancelled);
   if(recipe.uv_reprojection||recipe.sampling_domain)return author_domain_prepared_key(scene,object,edit,cancelled);
   const auto projection=source.painted->normal_projection();
   if(!normal_projection_identity(*projection,*recipe.projection)||!normal_projection_identity(*projection,*recipe.initial_projection))

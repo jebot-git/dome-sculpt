@@ -50,7 +50,8 @@ private:
   std::shared_ptr<const NormalFrameSet> replay(const std::function<bool()> &) const;
   friend ShapeKeyResult author_derived_normal_shapekey(Scene &,uint64_t,const ShapeKeyEdit &,const std::function<bool()> &);
 };
-bool needs_independent_key_domain(const SculptObject &,const ShapeKeyEdit &);
+bool needs_independent_key_domain(const SculptObject &,const ShapeKeyEdit &,
+    const std::function<bool()> &cancelled={});
 ShapeKeyResult author_derived_normal_shapekey(Scene &,uint64_t,const ShapeKeyEdit &,
     const std::function<bool()> &cancelled={});
 bool key_recipe_sampling_matches(const SourceNormalPreparation &,const SourceNormalPreparation &);

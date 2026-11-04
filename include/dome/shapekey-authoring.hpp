@@ -4,7 +4,10 @@
 namespace dome {
 enum class ShapeKeyAction { Create, CaptureMix, Duplicate, Mirror, Replace, Rename, Restore };
 // BaseRelative is an explicit artist-frame conversion, not exact reflection.
-enum class ShapeKeyMirrorFrames { ExactAuthored, BaseRelative };
+// VertexPositions reflects only the native POSITION displacement field and
+// transports destination artist offsets through its geometric frame change.
+// It does not claim exact reflected artist directions or continuous triangles.
+enum class ShapeKeyMirrorFrames { ExactAuthored, BaseRelative, VertexPositions };
 struct ShapeKeyEdit {
   ShapeKeyAction action=ShapeKeyAction::Create;
   size_t target=0;

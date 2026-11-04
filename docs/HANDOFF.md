@@ -1,5 +1,19 @@
 # Dome Sculpt production handoff
 
+## Private native vertex-position Mirror milestone — 2026-11-04
+
+Private runtimeaf79fdf and GUI endpoint e6cf4c3 restore ordinary vertex Mirror
+without weakening exact/relative authored-frame modes. All13 matching Release
+and owned-sanitizer workflows pass; actual FLTK normal+640/font32 default Mirror,
+Cancel/UndoRedo/clean exit pass9 assertions per layout/profile. Native first-source
+Restore and independent named checkpoints retain their original semantics.
+Read VERTEX-MIRROR-WORKFLOWS.md and its receipt for component scope, preserved
+failures and genuine independent-seam fixture migration. This is not main/latest27
+SDK/full-regression/physical-device admission. The original frozen589 regression
+has537Passed/50Failed/2dependencyNotRun, with2177source and451artifact hashes exact.
+All unfinished original/additional requirements and post-basic drawers remain
+active; no installation or physical session changed.
+
 ## Private source-aware mesh bake and cut milestone — 2026-11-04
 
 Private14cc064 records runtime3fe61f7 and corrected fixtures16afb67, extending

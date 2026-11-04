@@ -99,6 +99,7 @@ std::pair<bool,bool> seed_presence(const SourceMaterialBindings &before,const De
 }
 size_t future_frame_payload(const SculptObject &source,const std::shared_ptr<const FramePositionDomain> &domain,const ShapeKeyEdit &edit,const SourceKeyDerivation *reuse,const std::function<bool()> &cancelled){
   const auto &binding=*source.material_bindings;const auto &current=*binding.normal_frames;const bool create=edit.action==ShapeKeyAction::Create||edit.action==ShapeKeyAction::Duplicate||edit.action==ShapeKeyAction::CaptureMix||edit.action==ShapeKeyAction::Mirror;
+  const bool vertex_mirror=edit.action==ShapeKeyAction::Mirror&&edit.mirror_frames==ShapeKeyMirrorFrames::VertexPositions;
   const size_t count=current.targets.size()+(create?1:0),n=domain->basis()->positions.size(),corners=domain->basis()->indices.size();
   constexpr size_t cap=128*1024*1024;size_t bytes=0;auto add=[&](size_t amount){if(amount>cap-bytes)throw std::length_error("Prospective key frame payload exceeds 128 MiB before allocation");bytes+=amount;};
   if(!n||n>cap/sizeof(Vec3)||count>(cap/sizeof(Vec3))/n)throw std::length_error("Prospective key POSITION payload exceeds native frame quota");add(count*n*sizeof(Vec3));
@@ -110,14 +111,14 @@ size_t future_frame_payload(const SculptObject &source,const std::shared_ptr<con
     std::optional<KeyMirrorCorrespondence> reflected;
     if(selected.mirror_tolerance){KeyMirrorLimits limits;limits.cancelled=cancelled;reflected=reflected_key_correspondence(*domain->basis(),mirror_plane(selected),*selected.mirror_tolerance,limits);}
     for(size_t v=0;v<n;++v){if((v&1023)==0)stop(cancelled);const auto current_vertex=domain->current_vertices().at(v);const auto desired=edit.positions.at(current_vertex)-source.painted->mesh().positions.at(current_vertex);const auto seed=reuse?seed_position_at(*reuse,selected,v,reflected?&*reflected:nullptr):prior_position_at(binding,id,anchor_vertex(binding,*domain,v));if(!same(desired,seed)){equal_seed=false;break;}}
-  }else if(edit.action==ShapeKeyAction::Duplicate||edit.action==ShapeKeyAction::Mirror)selected.reference=current.current_targets.at(edit.target);
+  }else if(edit.action==ShapeKeyAction::Duplicate||(edit.action==ShapeKeyAction::Mirror&&!vertex_mirror))selected.reference=current.current_targets.at(edit.target);
   else if(edit.action==ShapeKeyAction::CaptureMix)selected.reference=0;
   std::set<std::pair<const NormalFrames*,uint32_t>> seen;
   auto role=[&](const std::shared_ptr<const NormalFrames>&artist,const std::shared_ptr<const NormalFrames>&now,ShapeFrameRole kind){
     stop(cancelled);if(!artist)return;const auto coordinate=shapekey_frame_coordinate(before,*artist,kind);if(!seen.insert({artist.get(),coordinate}).second)return;
     auto size=now->storage_bytes();const auto presence=seed_presence(before,reuse?reuse->before_deformation().get():source.deformation.get(),selected,*artist);
-    const size_t new_normals=(create||equal_seed)?(presence.first?corners:0):corners;
-    const size_t new_tangents=(create||equal_seed)?(presence.second?corners:0):(artist->tangents.empty()?0:corners);
+    const size_t new_normals=vertex_mirror?corners:(create||equal_seed)?(presence.first?corners:0):corners;
+    const size_t new_tangents=vertex_mirror?(artist->tangents.empty()?0:corners):(create||equal_seed)?(presence.second?corners:0):(artist->tangents.empty()?0:corners);
     if(!create){const auto &old=attributes(*now,selected.id);size-=(old.normals.size()+old.tangents.size())*sizeof(Vec3);}
     add(size);if(new_normals>cap/sizeof(Vec3)||new_tangents>cap/sizeof(Vec3))throw std::length_error("Prospective role target exceeds native quota");add((new_normals+new_tangents)*sizeof(Vec3));
   };
@@ -190,16 +191,37 @@ void SourceKeyDerivation::validate(bool deep,const std::function<bool()> &cancel
   }else if(paint_->normal_projection())throw std::invalid_argument("Independent key anchor has unbound normal sampling planes");
   domain_->validate(deep,cancelled);if(deformation_)deformation_->validate(paint_->mesh());if(deep&&!same_frames(*frames_,*replay(cancelled)))throw std::invalid_argument("Independent key attributes differ from genuine source-role authoring replay");
 }
-bool needs_independent_key_domain(const SculptObject &o,const ShapeKeyEdit &edit){
+bool needs_independent_key_domain(const SculptObject &o,const ShapeKeyEdit &edit,
+    const std::function<bool()> &cancelled){
   if(!o.material_bindings||!o.material_bindings->normal_frames||!o.material_bindings->uv_origin)return false;
   if(o.material_bindings->key_derivation)return true;
-  if(edit.action==ShapeKeyAction::Mirror)return true;
-  if(edit.action!=ShapeKeyAction::Replace)return false;const auto &current=o.painted->mesh(),&origin=frame_position_basis(*o.material_bindings);if(edit.positions.size()!=current.positions.size())throw std::invalid_argument("Independent key requires complete current REST positions");
-  std::vector<Vec3> values(origin.positions.size());std::vector<uint8_t> seen(values.size());for(size_t c=0;c<current.indices.size();++c){auto a=current.indices[c],b=origin.indices.at(c);auto delta=edit.positions[a]-current.positions[a];if(seen[b]&&!same(values[b],delta))return true;values[b]=delta;seen[b]=1;}return false;
+  const bool vertex_mirror=edit.action==ShapeKeyAction::Mirror&&edit.mirror_frames==ShapeKeyMirrorFrames::VertexPositions;
+  if(edit.action==ShapeKeyAction::Mirror&&!vertex_mirror)return true;
+  if(edit.action!=ShapeKeyAction::Replace&&!vertex_mirror)return false;
+  const auto &current=o.painted->mesh(),&origin=frame_position_basis(*o.material_bindings);
+  if(current.indices.size()!=origin.indices.size())throw std::invalid_argument("Key authoring lost the original ordered frame corners");
+  if(!vertex_mirror&&edit.positions.size()!=current.positions.size())throw std::invalid_argument("Independent key requires complete current REST positions");
+  std::vector<Vec3> reflected;
+  if(vertex_mirror){
+    if(!o.deformation||!o.deformation->morphs||edit.target>=o.deformation->morphs->targets.size())throw std::invalid_argument("Choose an existing shapekey for vertex-position Mirror");
+    KeyMirrorLimits limits;limits.cancelled=cancelled;
+    reflected=reflected_key_vertex_deltas(current,o.deformation->morphs->targets[edit.target].delta,{edit.mirror_plane},edit.mirror_tolerance,limits);
+  }
+  // A consistent field still belongs to the existing native frame writer.
+  // Only distinct values at a shared original vertex need a new owning domain.
+  std::vector<Vec3> values(origin.positions.size());std::vector<uint8_t> seen(values.size());
+  for(size_t c=0;c<current.indices.size();++c){
+    if((c&1023)==0)stop(cancelled);
+    const auto a=current.indices[c],b=origin.indices.at(c);
+    const auto delta=vertex_mirror?reflected.at(a):edit.positions.at(a)-current.positions.at(a);
+    if(seen.at(b)&&!same(values.at(b),delta))return true;
+    values.at(b)=delta;seen.at(b)=1;
+  }
+  return false;
 }
 ShapeKeyResult author_derived_normal_shapekey(Scene &scene,uint64_t object,const ShapeKeyEdit &edit,const std::function<bool()> &cancelled){
   stop(cancelled);const auto &source=scene.object(object);const auto &binding=source.material_bindings;normal_frame_current_authority(*binding,source.painted->mesh(),source.deformation.get(),cancelled);const auto recipe=binding->normal_preparation;if(recipe)recipe->validate_current(source.painted->mesh(),source.appearance.get(),cancelled);
-  const auto &current=source.painted->mesh();const auto *original_keys=source.deformation&&source.deformation->morphs?&*source.deformation->morphs:nullptr;const size_t count=original_keys?original_keys->targets.size():0;const bool duplicate=edit.action==ShapeKeyAction::Duplicate,mix=edit.action==ShapeKeyAction::CaptureMix,mirror=edit.action==ShapeKeyAction::Mirror;const bool create=edit.action==ShapeKeyAction::Create||duplicate||mix||mirror;if((!create||duplicate||mirror)&&edit.target>=count)throw std::invalid_argument("Choose an existing shapekey");if(create&&count>=128)throw std::length_error("Shapekey target budget exceeded");
+  const auto &current=source.painted->mesh();const auto *original_keys=source.deformation&&source.deformation->morphs?&*source.deformation->morphs:nullptr;const size_t count=original_keys?original_keys->targets.size():0;const bool duplicate=edit.action==ShapeKeyAction::Duplicate,mix=edit.action==ShapeKeyAction::CaptureMix,mirror=edit.action==ShapeKeyAction::Mirror;const bool vertex_mirror=mirror&&edit.mirror_frames==ShapeKeyMirrorFrames::VertexPositions;const bool create=edit.action==ShapeKeyAction::Create||duplicate||mix||mirror;if((!create||duplicate||mirror)&&edit.target>=count)throw std::invalid_argument("Choose an existing shapekey");if(create&&count>=128)throw std::length_error("Shapekey target budget exceeded");
   // Reserve the new owning-anchor depth before snapshots or target arrays.
   if(duplicate||mix||mirror){size_t depth=1;for(auto anchor=binding->key_derivation;anchor;anchor=anchor->before_material()->key_derivation){stop(cancelled);if(++depth>32)throw std::length_error("Named key anchor exceeds bounded source history before allocation");}}
   key_budget(source.deformation.get(),current.positions.size(),count+(create?1:0));
@@ -222,9 +244,10 @@ ShapeKeyResult author_derived_normal_shapekey(Scene &scene,uint64_t object,const
   if(reuse){node->paint_=old->paint_;node->material_=old->material_;node->deformation_=old->deformation_;node->appearance_=old->appearance_;node->targets_=old->targets_;}
   else {node->paint_=source.painted->snapshot();node->material_=binding;node->deformation_=source.deformation;node->appearance_=source.appearance;node->domain_=domain;staged->targets.clear();const auto map=anchor_map(*node);for(const auto &t:binding->normal_frames->targets){node->targets_.push_back({t.id,t.id});FrameTargetIdentity record=t;auto old_positions=prior_positions(*binding,t.id);record.positions.clear();record.positions.reserve(map.size());for(auto v:map)record.positions.push_back(old_positions.at(v));staged->targets.push_back(std::move(record));}}
   node->domain_=domain;node->current_targets_=binding->normal_frames->current_targets;node->next_target_=binding->normal_frames->next_target;
-  uint64_t id;if(create){if(node->targets_.size()>=128||node->next_target_==UINT64_MAX)throw std::length_error("Independent key stable identity budget exceeded");id=node->next_target_++;node->current_targets_.push_back(id);node->targets_.push_back({id,(duplicate||mirror)?std::optional<uint64_t>{binding->normal_frames->current_targets.at(edit.target)}:mix?std::optional<uint64_t>{0}:std::optional<uint64_t>{}});if(mirror){node->targets_.back().mirror_tolerance=edit.mirror_tolerance;if(edit.mirror_plane!=0||edit.mirror_frames!=ShapeKeyMirrorFrames::ExactAuthored)node->targets_.back().mirror_conversion=DerivedMirrorConversion{edit.mirror_plane,edit.mirror_frames};}staged->targets.push_back({id,{},{},std::vector<Vec3>(domain->basis()->positions.size())});}else id=node->current_targets_.at(slot);
+  uint64_t id;if(create){if(node->targets_.size()>=128||node->next_target_==UINT64_MAX)throw std::length_error("Independent key stable identity budget exceeded");id=node->next_target_++;node->current_targets_.push_back(id);node->targets_.push_back({id,(duplicate||(mirror&&!vertex_mirror))?std::optional<uint64_t>{binding->normal_frames->current_targets.at(edit.target)}:mix?std::optional<uint64_t>{0}:std::optional<uint64_t>{}});if(mirror&&!vertex_mirror){node->targets_.back().mirror_tolerance=edit.mirror_tolerance;if(edit.mirror_plane!=0||edit.mirror_frames!=ShapeKeyMirrorFrames::ExactAuthored)node->targets_.back().mirror_conversion=DerivedMirrorConversion{edit.mirror_plane,edit.mirror_frames};}staged->targets.push_back({id,{},{},std::vector<Vec3>(domain->basis()->positions.size())});}else id=node->current_targets_.at(slot);
   auto target=std::find_if(staged->targets.begin(),staged->targets.end(),[&](const auto&t){return t.id==id;});auto endpoint=current.positions;std::vector<Vec3> mirrored_delta;
-  if(mirror){KeyMirrorLimits limits;limits.cancelled=cancelled;const auto correspondence=reflected_key_correspondence(current,KeyMirrorPlane{edit.mirror_plane},edit.mirror_tolerance,limits);mirrored_delta.resize(current.positions.size());for(size_t v=0;v<endpoint.size();++v){if((v&1023)==0)stop(cancelled);const auto p=original_keys->targets.at(edit.target).delta.at(correspondence.vertices.at(v));mirrored_delta[v]={-p.x,p.y,p.z};endpoint[v]+=mirrored_delta[v];}}
+  if(vertex_mirror){KeyMirrorLimits limits;limits.cancelled=cancelled;mirrored_delta=reflected_key_vertex_deltas(current,original_keys->targets.at(edit.target).delta,KeyMirrorPlane{edit.mirror_plane},edit.mirror_tolerance,limits);for(size_t v=0;v<endpoint.size();++v){if((v&1023)==0)stop(cancelled);endpoint[v]+=mirrored_delta[v];}}
+  else if(mirror){KeyMirrorLimits limits;limits.cancelled=cancelled;const auto correspondence=reflected_key_correspondence(current,KeyMirrorPlane{edit.mirror_plane},edit.mirror_tolerance,limits);mirrored_delta.resize(current.positions.size());for(size_t v=0;v<endpoint.size();++v){if((v&1023)==0)stop(cancelled);const auto p=original_keys->targets.at(edit.target).delta.at(correspondence.vertices.at(v));mirrored_delta[v]={-p.x,p.y,p.z};endpoint[v]+=mirrored_delta[v];}}
   else if(duplicate){for(size_t v=0;v<endpoint.size();++v){if((v&1023)==0)stop(cancelled);endpoint[v]+=original_keys->targets.at(edit.target).delta[v];}}
   else if(mix){for(size_t t=0;t<count;++t){const float w=deform->morph_weights.empty()?0:deform->morph_weights[t];for(size_t v=0;v<endpoint.size();++v){if((v&1023)==0)stop(cancelled);endpoint[v]+=original_keys->targets[t].delta[v]*w;}}}
   else if(!create)endpoint=edit.positions;

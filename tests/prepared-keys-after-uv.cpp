@@ -136,16 +136,22 @@ void exercise(bool seam, const std::filesystem::path &prefix) {
         "A post-UV key replacement remains one exact Undo/Redo transaction");
 
   if (seam) {
-    auto invalid = replaced;
-    edit.positions = invalid.active().painted->mesh().positions;
+    auto independent = replaced;
+    edit.positions = independent.active().painted->mesh().positions;
     edit.positions[0].z += .01f;
-    bool refused = false;
-    try { author_shapekey(invalid, invalid.active().id, edit); }
-    catch (const std::exception &error) {
-      refused = std::string_view(error.what()).find("seam vertices") != std::string_view::npos;
-    }
-    check(refused && invalid.encode() == replaced.encode(),
-          "Unrepresentable independent seam tearing refuses without averaging or replacing original authority");
+    author_shapekey(independent, independent.active().id, edit);
+    const auto &new_delta = independent.active().deformation->morphs->targets[slot].delta;
+    bool exact = length(new_delta[0]-Vec3{0,0,.01f}) < 1e-6f;
+    for (size_t v=1;v<new_delta.size();++v) exact &= length(new_delta[v]) < 1e-6f;
+    check(exact && independent.active().material_bindings->key_derivation &&
+              independent.active().material_bindings->normal_frames->position_domain &&
+              independent.active().painted->encode() == paint && rig(independent) == before_rig &&
+              Scene::decode(independent.encode()).encode() == independent.encode(),
+          "Independent seam displacement owns its distinct field and restarts without averaging or changing paint/rig");
+    ShapeKeyEdit restore; restore.action=ShapeKeyAction::Restore;
+    author_shapekey(independent, independent.active().id, restore);
+    check(independent.encode() == replaced.encode(),
+          "Independent seam Restore recovers its exact actual before-model");
   }
   edit = {};
   edit.action = ShapeKeyAction::Duplicate;
@@ -165,6 +171,7 @@ void exercise(bool seam, const std::filesystem::path &prefix) {
         "Post-UV Duplicate preserves exact authored POSITION/NORMAL/TANGENT channels under a new stable ID");
 
   edit.action = ShapeKeyAction::Mirror;
+  edit.mirror_frames = ShapeKeyMirrorFrames::VertexPositions;
   edit.name = "Mirrored after UV";
   document.author_shape(edit);
   ready(document);

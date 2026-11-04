@@ -53,7 +53,7 @@ int main(int argc,char **argv)try{
  auto before_noop=doc.copy_scene().encode();doc.author_shape(edit);ready(doc);check(doc.copy_scene().encode()==before_noop,"Identical prepared key replacement remains a true no-op");
  check(doc.undo()&&doc.copy_scene().encode()==authored.encode()&&doc.redo()&&doc.copy_scene().encode()==before_noop,"No-op authoring adds no hidden native history entry");ready(doc);
  edit.action=ShapeKeyAction::Duplicate;edit.name="Prepared duplicate";doc.author_shape(edit);ready(doc);
- edit.action=ShapeKeyAction::Mirror;edit.name="Prepared mirror";doc.author_shape(edit);ready(doc);
+ edit.action=ShapeKeyAction::Mirror;edit.mirror_frames=ShapeKeyMirrorFrames::VertexPositions;edit.name="Prepared mirror";doc.author_shape(edit);ready(doc);
  edit.action=ShapeKeyAction::CaptureMix;edit.name="Prepared captured mix";doc.author_shape(edit);ready(doc);
  edit.action=ShapeKeyAction::Rename;edit.target=initial_count;edit.name="Prepared renamed";doc.author_shape(edit);ready(doc);
  check(doc.copy_scene().active().deformation->morphs->targets.size()==initial_count+4&&doc.copy_scene().active().deformation->morphs->targets[initial_count].name==edit.name,"Native Duplicate/Mirror/CaptureMix/Rename all reauthor owning prepared recipes");

@@ -12,6 +12,7 @@
 #include "shapekey-source-uv.hpp"
 #include "shapekey-attributes.hpp"
 #include "normal-key-derivation.hpp"
+#include "key-mirror-correspondence.hpp"
 #include <vector>
 namespace dome {
 namespace {
@@ -114,7 +115,7 @@ ShapeKeyResult author_shapekey(Scene &scene,uint64_t object,const ShapeKeyEdit &
   o.material_bindings=origin.material_bindings;o.retopology=origin.retopology;o.polygon=origin.polygon;o.shape_source=origin.shape_source;o.rig_source=origin.rig_source;
   next.validate();stop(cancelled);scene=std::move(next);return {0,true};
  }
- if(edit.action==ShapeKeyAction::Mirror&&(!std::isfinite(edit.mirror_plane)||std::abs(edit.mirror_plane)>1e6||size_t(edit.mirror_frames)>1))throw std::invalid_argument("Invalid explicit Mirror plane or frame interpretation");
+ if(edit.action==ShapeKeyAction::Mirror&&(!std::isfinite(edit.mirror_plane)||std::abs(edit.mirror_plane)>1e6||size_t(edit.mirror_frames)>2))throw std::invalid_argument("Invalid explicit Mirror plane or frame interpretation");
  const auto &rest=source.painted->mesh();rest.validate();
  const MorphSet empty(rest);const auto &keys=source.deformation&&source.deformation->morphs?*source.deformation->morphs:empty;
  const size_t count=keys.targets.size();
@@ -127,8 +128,8 @@ ShapeKeyResult author_shapekey(Scene &scene,uint64_t object,const ShapeKeyEdit &
  const size_t slot=replace?edit.target:count;
  if(!replace && count>=128)throw std::length_error("Shapekey target budget exceeded");
  std::string name=edit.action==ShapeKeyAction::Replace?keys.targets[slot].name:key_name(keys,edit.name);
- if(detail::needs_independent_key_domain(source,edit))return detail::author_derived_normal_shapekey(scene,object,edit,cancelled);
- if(edit.action==ShapeKeyAction::Mirror&&(edit.mirror_plane!=0||edit.mirror_frames!=ShapeKeyMirrorFrames::ExactAuthored))throw std::invalid_argument("Explicit-plane frame conversion requires genuine owning native frame authority");
+ if(detail::needs_independent_key_domain(source,edit,cancelled))return detail::author_derived_normal_shapekey(scene,object,edit,cancelled);
+ if(edit.action==ShapeKeyAction::Mirror&&edit.mirror_frames!=ShapeKeyMirrorFrames::VertexPositions&&(edit.mirror_plane!=0||edit.mirror_frames!=ShapeKeyMirrorFrames::ExactAuthored))throw std::invalid_argument("Explicit-plane frame conversion requires genuine owning native frame authority");
  if(source.material_bindings&&source.material_bindings->normal_preparation)
   return detail::author_prepared_normal_shapekey(scene,object,edit,cancelled);
  auto deform=std::make_shared<DeformationState>(source.deformation?*source.deformation:DeformationState(rest));if(!deform->morphs)deform->morphs=MorphSet(rest);
@@ -142,9 +143,12 @@ ShapeKeyResult author_shapekey(Scene &scene,uint64_t object,const ShapeKeyEdit &
  }
  std::vector<Vec3> positions=rest.positions;
  if(edit.action==ShapeKeyAction::Duplicate||edit.action==ShapeKeyAction::Mirror){
-  std::vector<uint32_t> mirror;
-  if(edit.action==ShapeKeyAction::Mirror){if(!std::isfinite(edit.mirror_tolerance)||edit.mirror_tolerance<=0||edit.mirror_tolerance>1)throw std::invalid_argument("Invalid local mirror tolerance");mirror=mirror_vertices(rest,edit.mirror_tolerance,cancelled);}
-  for(size_t v=0;v<positions.size();++v){if((v&1023)==0)stop(cancelled);auto d=deform->morphs->targets[edit.target].delta[mirror.empty()?v:mirror[v]];if(!mirror.empty())d.x=-d.x;positions[v]+=d;}
+  std::vector<uint32_t> mirror;std::vector<Vec3> vertex_delta;
+  if(edit.action==ShapeKeyAction::Mirror){if(!std::isfinite(edit.mirror_tolerance)||edit.mirror_tolerance<=0||edit.mirror_tolerance>1)throw std::invalid_argument("Invalid local mirror tolerance");
+   if(edit.mirror_frames==ShapeKeyMirrorFrames::VertexPositions){detail::KeyMirrorLimits limits;limits.cancelled=cancelled;vertex_delta=detail::reflected_key_vertex_deltas(rest,deform->morphs->targets[edit.target].delta,{edit.mirror_plane},edit.mirror_tolerance,limits);}
+   else mirror=mirror_vertices(rest,edit.mirror_tolerance,cancelled);
+  }
+  for(size_t v=0;v<positions.size();++v){if((v&1023)==0)stop(cancelled);auto d=vertex_delta.empty()?deform->morphs->targets[edit.target].delta[mirror.empty()?v:mirror[v]]:vertex_delta[v];if(!mirror.empty())d.x=-d.x;positions[v]+=d;}
  }else if(edit.action==ShapeKeyAction::CaptureMix){
   for(size_t t=0;t<count;++t){float weight=deform->morph_weights.empty()?0:deform->morph_weights[t];for(size_t v=0;v<positions.size();++v){if((v&1023)==0)stop(cancelled);positions[v]+=deform->morphs->targets[t].delta[v]*weight;}}
  }else if(edit.action==ShapeKeyAction::Replace)positions=edit.positions;

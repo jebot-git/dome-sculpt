@@ -37,7 +37,7 @@ void standalone(const std::filesystem::path &prefix){
  check(s.active().material_bindings->normal_frames->current_targets[0]==id&&!key(*s.active().material_bindings->normal_frames->pbr,id).normals.empty(),"Geometry editing retains stable key identity and authors full normal/tangent channels");
  check(s.active().shape_source->material_bindings==nullptr&&s.active().shape_source->deformation==nullptr&&s.active().shape_source->paint->encode()==fixture().active().painted->encode(),"Editing retains the exact original native mesh and pre-deformation material state");
  auto exact=s.encode();check(!author_shapekey(s,s.active().id,edit).changed&&s.encode()==exact,"Identical replacement is a true no-op with exact source/state");
- edit={};edit.action=ShapeKeyAction::Mirror;edit.target=0;edit.name="Mirror";auto mirror=author_shapekey(s,s.active().id,edit);
+ edit={};edit.action=ShapeKeyAction::Mirror;edit.mirror_frames=ShapeKeyMirrorFrames::VertexPositions;edit.target=0;edit.name="Mirror";auto mirror=author_shapekey(s,s.active().id,edit);
  check(mirror.target==1&&std::abs(s.active().deformation->morphs->targets[1].delta[1].z-.2f)<1e-6,"Mirror creates the geometric counterpart with independent key identity");
  edit.action=ShapeKeyAction::Duplicate;edit.name="Copy";auto copy=author_shapekey(s,s.active().id,edit);auto f=s.active().material_bindings->normal_frames;
  check(copy.target==2&&same_vectors(s.active().deformation->morphs->targets[2].delta,edited)&&same_vectors(key(*f->pbr,f->current_targets[2]).normals,key(*f->pbr,id).normals),"Duplicate keeps exact POSITION and artist direction deltas");

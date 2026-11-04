@@ -29,6 +29,34 @@ KeyMirrorCorrespondence reflected_key_correspondence(const Mesh &mesh,KeyMirrorP
  for(size_t c=0;c<count;++c){budget.check();if(out.corners[out.corners[c]]!=c)throw std::invalid_argument("Key mirror corners do not form an authentic involution");}
  for(size_t v=0;v<vertices;++v){budget.check();if(out.vertices[v]==UINT32_MAX||out.vertices[out.vertices[v]]!=v)throw std::invalid_argument("Unreferenced or non-bijective vertices need explicit mirror authority");}return out;
 }
+std::vector<Vec3> reflected_key_vertex_deltas(const Mesh &mesh,std::span<const Vec3> delta,
+    KeyMirrorPlane plane,float tolerance,const KeyMirrorLimits &limits){
+ Budget budget(limits);mesh.validate();const auto count=mesh.positions.size();
+ if(!count||count>2'000'000||delta.size()!=count||!std::isfinite(plane.offset)||std::abs(plane.offset)>1e6||
+    !std::isfinite(tolerance)||tolerance<=0||tolerance>1)
+  throw std::invalid_argument("Vertex-position Mirror needs a complete bounded displacement field and local plane/tolerance");
+ // Worst-case hash nodes, buckets, per-cell vectors and output, including
+ // allocator overhead. Spatial candidates are additionally work-metered.
+ if(count>limits.max_bytes/160)throw std::length_error("Vertex-position Mirror exceeds prospective scratch/output budget");
+ const double size=std::max(double(tolerance),1e-6),square=double(tolerance)*tolerance;
+ auto cell=[&](double x,double y,double z){auto q=[&](double v){v=std::floor(v/size);if(!std::isfinite(v)||std::abs(v)>=0x1p63-4096.0)throw std::length_error("Vertex-position Mirror exceeds spatial coordinate bounds");return int64_t(v);};return Cell{q(x),q(y),q(z)};};
+ std::unordered_map<Cell,std::vector<uint32_t>,Hash> bins;bins.reserve(count);
+ for(size_t v=0;v<count;++v){budget.check();if(!finite(delta[v]))throw std::invalid_argument("Vertex-position Mirror requires finite source displacements");const auto p=mesh.positions[v];bins[cell(p.x,p.y,p.z)].push_back(uint32_t(v));}
+ std::vector<Vec3> out;out.reserve(count);
+ for(const auto p:mesh.positions){budget.check();const auto key=cell(2*plane.offset-p.x,p.y,p.z);bool found=false;Vec3 value;
+  for(int dx=-1;dx<=1;++dx)for(int dy=-1;dy<=1;++dy)for(int dz=-1;dz<=1;++dz){budget.check();const auto it=bins.find({key.x+dx,key.y+dy,key.z+dz});if(it==bins.end())continue;
+   for(auto v:it->second){budget.check();const auto q=mesh.positions[v];const double x=double(p.x)+q.x-2*plane.offset,y=double(p.y)-q.y,z=double(p.z)-q.z;
+    if(x*x+y*y+z*z>square)continue;
+    const auto candidate=delta[v];
+    if(found&&!same(value,candidate))throw std::invalid_argument("Coincident mirrored vertices have different shapekey displacements; select an explicit seam correspondence");
+    value=candidate;found=true;
+   }
+  }
+  if(!found)throw std::invalid_argument("Vertex-position Mirror has no reflected source within the explicit local tolerance");
+  out.push_back({-value.x,value.y,value.z});
+ }
+ return out;
+}
 std::vector<int8_t> reflected_key_role_signs(const NormalFrames &frame,std::span<const std::array<float,2>> uv,const KeyMirrorCorrespondence &map,const KeyMirrorLimits &limits){
  Budget budget(limits);frame.validate();const auto count=frame.normals.size();if(map.corners.size()!=count||count%3||count>limits.max_bytes||(!frame.tangents.empty()&&uv.size()!=count))throw std::invalid_argument("Mirror role/corner-coordinate dimensions differ");
  std::vector<int8_t> signs(count,0);for(size_t c=0;c<count;++c){budget.check();if(map.corners[c]>=count||map.corners[map.corners[c]]!=c||!same(frame.normals[c],reflect(frame.normals[map.corners[c]])))throw std::invalid_argument("Mirror role requires actual base normal parity; zero key must remain zero");}
