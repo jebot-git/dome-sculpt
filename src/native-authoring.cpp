@@ -73,7 +73,7 @@ std::shared_ptr<const NativeAuthoringCapture> NativeAuthoringCapture::create(con
  // These are actual native preview/source owners, not an offline UV0 HDR
  // raster. A pristine raw source has no writable padding or sparse overlay;
  // only Source4 paint owns that independently authenticated GPU contribution.
- auto originals=scene.preview_surfaces(cancelled);if(originals.empty()||originals.size()>256)throw std::length_error("Native authoring requires1..256 emitted objects");std::vector<uint64_t> ids;std::set<uint64_t> unique;
+ auto originals=native_authoring_surfaces(scene,cancelled);if(originals.empty()||originals.size()>256)throw std::length_error("Native authoring requires1..256 emitted objects");std::vector<uint64_t> ids;std::set<uint64_t> unique;
  for(const auto &object:originals){stop(cancelled);scene.object(object.id);if(!unique.insert(object.id).second)throw std::invalid_argument("Duplicate native authoring original identity");ids.push_back(object.id);}
  if(options.scope==NativeAuthoringExport::Scope::ExportedObjects&&unique!=std::set<uint64_t>(options.objects.begin(),options.objects.end()))throw std::invalid_argument("Native authoring subset contains hidden or empty nonexported objects");
  return std::shared_ptr<const NativeAuthoringCapture>(new NativeAuthoringCapture(std::make_shared<const Scene>(std::move(scene)),std::move(originals),std::move(ids),options.scope));

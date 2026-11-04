@@ -1,0 +1,52 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+#define DOME_NORMAL_COLOR_RENDER_NO_MAIN
+#include "normal-color-uv-render.cpp"
+#undef DOME_NORMAL_COLOR_RENDER_NO_MAIN
+#include "dome/native-authoring.hpp"
+#include "dome/emission-native.hpp"
+#include "native-authoring-compiler.hpp"
+#include "paint-overlay-sample.hpp"
+#include <fstream>
+namespace {
+std::vector<uint8_t> bytes(const std::filesystem::path &p){std::ifstream f(p,std::ios::binary);return {std::istreambuf_iterator<char>(f),{}};}
+Scene plain(){Scene scene;scene.active().visible=false;const auto id=scene.add("Native physical paint",Volume{});scene.select(id);auto &o=scene.active();o.mesh_active=true;o.painted=std::make_shared<PaintedMesh>(quad(),64);o.material.unlit=false;o.material.color={.7f,.8f,.6f,1};return scene;}
+void ink(Scene &scene){auto &o=scene.active();o.material.emissive={8,.016f,.16f};o.painted=o.painted->snapshot();auto &p=*o.painted;p.add_layer("Float partial mask");PaintSettings s;s.front_only=false;s.channel=PaintChannel::Emission;s.emission_units=PaintEmissionUnits::Physical;s.emission={12,.002f,3};Brush b;b.from=b.to={-.02f,.015f,0};b.normal={0,0,1};b.radius=.19f;b.strength=.73f;p.begin_stroke();p.stamp(b,s);check(p.end_stroke(),"Actual native/retained physical brush changes float detail");p.layer_properties("Float partial mask",true,.63f);s.channel=PaintChannel::Mask;s.mask=.4f;b.radius=.1f;p.begin_stroke();p.stamp(b,s);check(p.end_stroke(),"Physical float detail uses the actual editable common mask");p.add_layer("Hidden high radiance");s.channel=PaintChannel::Emission;s.emission={10000,10000,10000};p.begin_stroke();p.stamp(b,s);p.end_stroke();p.layer_properties("Hidden high radiance",false,1);}
+}
+int main(int argc,char **argv)try{
+ if(argc!=2)return 2;const std::filesystem::path out=argv[1];std::filesystem::create_directories(out);
+ for(int kind=0;kind<3;++kind){
+  std::cout<<"STAGE kind="<<kind<<" prepare"<<std::endl;
+  auto scene=kind==1?joint::transfer(joint::prepare(false,Material::AlphaMode::Opaque)):plain();
+  if(kind==2){auto &o=scene.active();o.mesh_active=false;o.material.emissive={8,.016f,.16f};}else ink(scene);
+  const auto exact=scene.encode();const auto paint=scene.active().painted;const auto binding=scene.active().material_bindings;
+  NativeAuthoringExport options{std::make_shared<const Scene>(scene.snapshot()),NativeAuthoringExport::Scope::WholeScene,{},true};
+  const auto capture=detail::NativeAuthoringCapture::create(options,{});
+  auto compiled=detail::compile_native_authoring(*capture,{},256*1024*1024,{});
+  check(compiled.emission.size()==1,"Only the actual visible native physical object owns compiled emission");
+  const auto &field=compiled.emission.front();
+  if(kind!=2){check(field.image.width==paint->resolution(),"Float view preserves its actual writable-grid resolution");
+    auto packet=detail::PaintOverlayFactory::capture(*paint);double max_error=0;size_t nonzero=0;
+    auto lin=[](double v){return v<=.04045?v/12.92:std::pow((v+.055)/1.055,2.4);};
+    // Independent coefficient/coverage equation at actual texel centres. No
+    // generated source image or colour receipt is used as normal authority.
+    for(size_t at=0;at<field.image.rgba.size()/4;++at){auto q=detail::sample_overlay_values(*packet,(float(at%field.image.width)+.5f)/field.image.width,(float(at/field.image.width)+.5f)/field.image.height,true);
+      for(size_t k=0;k<3;++k){const double expected=scene.active().material.emissive[k]*(1-q[3][3])+q[2][k]+q[4][k];const double actual=lin(field.image.rgba[at*4+k]/255.)*field.factor[k]*field.strength;max_error=std::max(max_error,std::abs(expected-actual));nonzero+=expected>0;}}
+    check(nonzero>100&&max_error<=field.maximum_absolute_error+1e-5,"Actual physical radiance/factor/strength obeys its measured texel quantization bound");
+    if(kind==1)check(compiled.surfaces.front().paint_sampling_attachment==paint->paint_sampling_attachment(),"Retained emission preserves genuine paint coordinates separately from authored UV0 and normal authority");
+  }else check(!field.image.width&&field.factor[0]*field.strength==8,"Native constant radiance needs no invented UV/image authority");
+  const auto path=out/("native"+std::to_string(kind)+".glb");
+  std::cout<<"STAGE kind="<<kind<<" export"<<std::endl;
+  export_glb_authoring(options,path);
+  auto restored=extract_native_authoring(bytes(path));check(restored&&restored->encode()==exact,"Native physical project recovers every float plane/owner/history exactly");
+  restored->save(out/("native"+std::to_string(kind)+".dsculpt"));
+  export_glb_authoring(NativeAuthoringExport{std::make_shared<const Scene>(restored->snapshot()),NativeAuthoringExport::Scope::WholeScene,{},true},out/("cycle"+std::to_string(kind)+".glb"));
+  check(extract_native_authoring(bytes(out/("cycle"+std::to_string(kind)+".glb")))->encode()==exact,"Second physical native production retains the same exact project");
+  check(scene.encode()==exact&&scene.active().painted==paint&&scene.active().material_bindings==binding,"Physical compiler never mutates original paint/material control owners");
+  if(kind==1){prepared_normal_consumer::Model file(path);const auto &m=file.data->materials[0];check(m.emissive_texture.texcoord>0,"Retained emission binds its genuinely emitted independent paint coordinate accessor");}
+  const auto before=bytes(path);SourceUvBakeOptions budget;budget.max_sample_operations=1;
+  if(kind!=2)check(rejects([&]{export_glb_authoring(options,path,{},budget);})&&bytes(path)==before&&scene.encode()==exact,"Physical image/sample quota refuses before publication with exact old destination and native Scene");
+  GltfExportOptions cancel;cancel.before_commit=[]{throw std::runtime_error("actual precommit cancellation");};
+  check(rejects([&]{export_glb_authoring(options,path,cancel);})&&bytes(path)==before,"Physical native precommit cancellation preserves the completed old destination");
+ }
+ std::cout<<"PASS "<<checks<<" native/retained physical authoring checks\n";return 0;
+}catch(const std::exception&e){std::cerr<<"FAIL "<<e.what()<<std::endl;return 1;}
