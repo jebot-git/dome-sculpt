@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/native-authoring.hpp"
 #include "native-authoring-capture.hpp"
+#include "native-authoring-attach.hpp"
 #include "native-authoring-compiler.hpp"
 #include "native-scene-payload.hpp"
 #include "emission-package.hpp"
@@ -63,6 +64,8 @@ void attach(detail::GltfDocument &document,const detail::NativeAuthoringCapture 
 }
 }
 namespace detail {
+void attach_native_authoring(GltfDocument &document,const NativeAuthoringCapture &capture,size_t maximum,
+    const std::function<bool()> &cancelled){attach(document,capture,maximum,cancelled);}
 NativeAuthoringCapture::NativeAuthoringCapture(std::shared_ptr<const Scene> scene,std::vector<ObjectSurface> originals,std::vector<uint64_t> ids,NativeAuthoringExport::Scope scope):scene_(std::move(scene)),originals_(std::move(originals)),ids_(std::move(ids)),scope_(scope){}
 std::shared_ptr<const NativeAuthoringCapture> NativeAuthoringCapture::create(const NativeAuthoringExport &options,const std::function<bool()> &cancelled){
  return create(options,cancelled,SourceUvBakeOptions{});
@@ -93,7 +96,7 @@ GltfExportReport export_glb_authoring(const NativeAuthoringExport &owner,const s
  auto compiled=detail::compile_native_authoring(*capture,compiler_policy,options.max_output_bytes,options.cancelled);
  auto document=detail::make_gltf_authoring(*capture,compiled.surfaces,options.recompute_changed_normals,options.cancelled);
  detail::finish_native_authoring_emission(document,compiled,options.max_output_bytes,options.cancelled);
- attach(document,*capture,options.max_output_bytes,options.cancelled);const uint64_t size=28+((uint64_t(document.json.dump().size())+3)&~uint64_t(3))+((uint64_t(document.binary.size())+3)&~uint64_t(3));if(size>options.max_output_bytes)throw std::length_error("Complete native authoring GLB exceeds output budget");
+ detail::attach_native_authoring(document,*capture,options.max_output_bytes,options.cancelled);const uint64_t size=28+((uint64_t(document.json.dump().size())+3)&~uint64_t(3))+((uint64_t(document.binary.size())+3)&~uint64_t(3));if(size>options.max_output_bytes)throw std::length_error("Complete native authoring GLB exceeds output budget");
  GltfExportReport report{capture->ids().size(),document.normal_targets_recomputed,{"Exact native authoring Scene retained; portable core view is not declared lossless"}};report.diagnostics.insert(report.diagnostics.end(),compiled.diagnostics.begin(),compiled.diagnostics.end());stop(options.cancelled);detail::write_glb(std::move(document),path,options.cancelled,options.before_commit);return report;
 }
 std::optional<Scene> extract_native_authoring(std::span<const uint8_t> bytes,const NativeAuthoringReadLimits &limits){
