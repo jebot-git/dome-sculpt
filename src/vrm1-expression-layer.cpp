@@ -37,7 +37,7 @@ Vrm1ExpressionLayer compile_vrm1_expression_layer(const J &original,const Sculpt
  for(auto role:{MToonSlot::Normal,MToonSlot::Matcap,MToonSlot::Rim,MToonSlot::OutlineWidth,MToonSlot::Shift,MToonSlot::UvMask})
   if(binding.roles[size_t(role)].image)throw std::invalid_argument("VRM1 expression layer role needs its independent consumer adapter");
  const auto &base=binding.roles[0],&shade=binding.roles[1];const auto &bt=material.textures[0],&st=material.textures[1];
- Vrm1ExpressionLayer result;bool found=false,colour=false;
+ Vrm1ExpressionLayer result;bool found=false,colour=false,same_target=true;
  result.shade_alias=base.image&&base.image==shade.image&&base.wrap_s==shade.wrap_s&&base.wrap_t==shade.wrap_t&&base.min_filter==shade.min_filter&&base.mag_filter==shade.mag_filter&&mtoon_coordinate(bt)==mtoon_coordinate(st)&&bt.offset==st.offset&&bt.scale==st.scale&&bt.rotation==st.rotation;
  if(result.shade_alias)for(size_t k=0;k<3;++k)result.shade_divisor[k]=object.material.color[k]!=0?object.material.color[k]:1;
  auto shade_factor=[&](const std::array<float,3> &factor){if(result.shade_alias)for(size_t k=0;k<3;++k){const double value=double(factor[k])/result.shade_divisor[k];if(!std::isfinite(value)||value<0||value>1)throw std::invalid_argument("VRM1 shared painted shade factor exceeds standard unit representation");}};
@@ -50,15 +50,34 @@ Vrm1ExpressionLayer compile_vrm1_expression_layer(const J &original,const Sculpt
    if(bind.at("type")=="shadeColor"){const auto target=bind.at("targetValue").get<std::array<float,4>>();shade_factor({target[0],target[1],target[2]});}
   }
   for(const auto &bind:expression.value("textureTransformBinds",J::array()))if(bind.at("material").get<int>()==object.appearance->source_material){
-  const auto scale=bind.value("scale",std::array<float,2>{1,1}),offset=bind.value("offset",std::array<float,2>{});
-  if(found&&(result.scale!=scale||result.offset!=offset))throw std::invalid_argument("VRM1 painted UV expressions have incompatible texture targets");
-  found=true;result.scale=scale;result.offset=offset;
+  const auto raw_scale=bind.value("scale",std::array<double,2>{1,1}),raw_offset=bind.value("offset",std::array<double,2>{});
+  std::array<float,2> scale{},offset{};for(size_t k=0;k<2;++k){if(!std::isfinite(raw_scale[k])||!std::isfinite(raw_offset[k])||std::abs(raw_scale[k])>1e20||std::abs(raw_offset[k])>1e20)throw std::invalid_argument("VRM1 texture target is outside finite source metadata bounds");scale[k]=float(raw_scale[k]);offset[k]=float(raw_offset[k]);}
+  if(found&&(result.scale!=scale||result.offset!=offset))same_target=false;
+  if(!found){result.scale=scale;result.offset=offset;}found=true;
  }}
- // With genuine colour-only bindings, the paint carrier stays identity and
- // no UV expression is synthesized. The original lower base factor changes;
- // the independently owned upper colour contribution remains untinted.
- if((!found&&!colour)||!std::isfinite(result.scale[0])||!std::isfinite(result.scale[1])||result.scale[0]==0||result.scale[1]==0)
-  throw std::invalid_argument("VRM1 expression-layer texture target must have two finite nonzero scales");
+ // Source per-material bindings need not be copied onto an upper role
+ // whose actual contribution is UV-invariant. Shared shade is the new paint
+ // image itself; other shade/emission roles require immutable data proof.
+ auto active_components=[&](std::array<float,3> initial,std::string_view type){std::array<bool,3> active{};for(size_t k=0;k<3;++k){if(!std::isfinite(initial[k]))throw std::invalid_argument("VRM1 upper role has nonfinite native coefficients");active[k]=initial[k]!=0;}
+  size_t visits=0;for(const auto *table:{"preset","custom"})if(expressions.contains(table))for(const auto &expression:expressions.at(table)){stop();if(expression.contains("materialColorBinds"))for(const auto &bind:expression.at("materialColorBinds")){if((++visits&255)==0)stop();if(bind.at("material").get<int>()==object.appearance->source_material&&bind.at("type").get_ref<const std::string&>()==type)for(size_t k=0;k<3;++k){const double target=bind.at("targetValue").at(k).get<double>();if(!std::isfinite(target)||std::abs(target)>1e20)throw std::invalid_argument("VRM1 colour target is outside finite source metadata bounds");active[k]=active[k]||target!=0;}}}
+  return active;
+ };
+ auto invariant_image=[&](const PaintSourceTexture &role,std::array<bool,3> active){
+  if(!role.image||std::none_of(active.begin(),active.end(),[](bool v){return v;}))return true;
+  const auto &image=*role.image;const size_t pixels=size_t(image.width)*image.height;
+  if(pixels>limits.max_image_pixels||result.sample_operations>limits.max_sample_operations||pixels>(limits.max_sample_operations-result.sample_operations)/3)throw std::length_error("VRM1 invariant-role prospective pixel/work limit exceeded");
+  result.sample_operations+=pixels*3;
+  for(size_t y=0;y<image.height;++y){stop();for(size_t x=0;x<image.width;++x)for(size_t k=0;k<3;++k)if(active[k]&&image.rgba[(y*image.width+x)*4+k]!=image.rgba[k])return false;}
+  return true;
+ };
+ if(!found&&!colour)throw std::invalid_argument("VRM1 expression layer has no relevant original binding");
+ if(found&&(!same_target||result.scale[0]==0||result.scale[1]==0)){
+  bool invariant=result.shade_alias||invariant_image(shade,active_components({material.parameters.shade_color.x,material.parameters.shade_color.y,material.parameters.shade_color.z},"shadeColor"));
+  const auto &emission=material.parameters.emission;std::array<float,3> effective{vrm_native_factor(emission.x,binding.native_reference.emission[0],object.material.emissive[0]),vrm_native_factor(emission.y,binding.native_reference.emission[1],object.material.emissive[1]),vrm_native_factor(emission.z,binding.native_reference.emission[2],object.material.emissive[2])};
+  invariant=invariant&&(material.parameters.emission_strength==0||invariant_image(binding.roles[size_t(MToonSlot::Emission)],active_components(effective,"emissionColor")));
+  if(!invariant)throw std::invalid_argument(same_target?"VRM1 zero UV target couples moving upper roles to fixed paint":"VRM1 differing UV targets couple moving upper roles to fixed paint");
+  result.forward_uv=false;result.scale={1,1};result.offset={};
+ }
  const size_t n=packet.resolution(),pixels=size_t(size)*size,native_pixels=n*n;
  if(size<64||size>4096||pixels>limits.max_image_pixels||native_pixels>limits.max_image_pixels)
   throw std::length_error("VRM1 expression-layer pixel limit exceeded");
