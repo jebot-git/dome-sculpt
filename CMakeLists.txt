@@ -3904,3 +3904,11 @@ if(BUILD_TESTING)
   set_tests_properties(${anatomical_registered} PROPERTIES
     ENVIRONMENT "LIBGL_ALWAYS_SOFTWARE=1;LP_NUM_THREADS=2;XR_RUNTIME_JSON=${CMAKE_CURRENT_BINARY_DIR}/anatomical-no-physical-runtime.json")
 endif()
+
+if(BUILD_TESTING)
+  add_executable(dome-sculpt-native-paint32-skin-export-test tests/native-paint32-skin-export.cpp)
+  target_include_directories(dome-sculpt-native-paint32-skin-export-test PRIVATE src third_party/cgltf)
+  target_link_libraries(dome-sculpt-native-paint32-skin-export-test PRIVATE dome-sculpt-render)
+  add_test(NAME native-paint32-skin-export COMMAND dome-sculpt-native-paint32-skin-export-test ${CMAKE_CURRENT_BINARY_DIR}/native-paint32-skin-export)
+  set_tests_properties(native-paint32-skin-export PROPERTIES TIMEOUT 300 ENVIRONMENT "LIBGL_ALWAYS_SOFTWARE=1;LP_NUM_THREADS=2;XR_RUNTIME_JSON=${CMAKE_CURRENT_BINARY_DIR}/no-physical-native32-runtime.json")
+endif()

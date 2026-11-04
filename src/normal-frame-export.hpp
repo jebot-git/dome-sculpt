@@ -30,13 +30,13 @@ struct NormalFrameExport {
 inline NormalFrameExport native_paint_export(const ObjectSurface &input,SourceMorphSpace space,
     const std::function<bool()> &cancelled={}) {
   auto stop=[&]{if(cancelled&&cancelled())throw std::runtime_error("Native paint coordinate export cancelled");};
-  stop();native_paint_export_working_bytes(input.mesh);input.mesh.validate();
+  stop();native_paint_export_working_bytes(input.mesh,input.deformation.get());input.mesh.validate();
   const auto binding=input.material_bindings;const auto owner=binding?binding->native_paint_sampling:nullptr;
   const auto attachment=owner?owner->attachment():nullptr;
   if(space!=SourceMorphSpace::Native||!owner||!owner->valid_owner(owner)||!attachment||
       attachment!=input.paint_sampling_attachment||attachment.owner_before(input.paint_sampling_attachment)||input.paint_sampling_attachment.owner_before(attachment)||
       binding->has_mtoon||binding->normal_frames||binding->normal_preparation||binding->color_preparation||binding->key_derivation||
-      input.appearance||input.deformation||input.polygon_colors)
+      input.appearance||input.polygon_colors)
     throw std::invalid_argument("Native paint export requires its own supported geometry, material and coordinate owners");
   if(input.textures&&(input.textures->source_maps||input.textures->normal_projection||input.textures->color_projection||input.textures->baked_base||
       !input.textures->normal.rgba.empty()||!input.textures->mtoon_normal.rgba.empty()||!input.textures->baked_normal.rgba.empty()))
@@ -55,7 +55,11 @@ inline NormalFrameExport native_paint_export(const ObjectSurface &input,SourceMo
   auto &mesh=out.surface.mesh;mesh.positions.reserve(out.rest_vertices.size());mesh.normals.reserve(out.rest_vertices.size());mesh.uv.reserve(out.rest_vertices.size());
   if(!input.mesh.uv_pins.empty())mesh.uv_pins.reserve(out.rest_vertices.size());
   for(size_t v=0;v<out.rest_vertices.size();++v){if((v&1023)==0)stop();const auto from=out.rest_vertices[v];mesh.positions.push_back(input.mesh.positions[from]);mesh.normals.push_back(input.mesh.normals[from]);mesh.uv.push_back(input.mesh.uv.at(from));if(!input.mesh.uv_pins.empty())mesh.uv_pins.push_back(input.mesh.uv_pins[from]);}
-  mesh.indices=std::move(split.frames.indices);mesh.uv_seams=input.mesh.uv_seams;mesh.validate();stop();return out;
+  mesh.indices=std::move(split.frames.indices);mesh.uv_seams=input.mesh.uv_seams;mesh.validate();
+  // This is only a coordinate split. Carry the actual native skin/pose/IBM
+  // through its exact REST vertex map without inventing normal-frame authority.
+  out.surface.deformation=normal_frame_remap_deformation(input.deformation,input.mesh,mesh,out.rest_vertices,cancelled);
+  stop();return out;
 }
 inline bool normal_frame_attribute_equal(const NormalFrames &a,const NormalFrames &b,bool compare_tangent,
     const std::function<bool()> &cancelled={}) {
