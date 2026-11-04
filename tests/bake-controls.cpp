@@ -6,6 +6,7 @@
 #include <thread>
 using namespace dome;
 namespace {
+nlohmann::json bake_readonly_sources(const Scene &scene){auto sources=scene;sources.erase(scene.active().id);return sources.encode();}
 void check(bool b,const char*label){if(!b)throw std::runtime_error(label);std::cout<<"PASS "<<label<<'\n';}
 Scene fixture(uint32_t resolution=128){
   Mesh m;m.positions={{-.1f,-.1f,0},{.1f,-.1f,0},{.1f,.1f,0},{-.1f,.1f,0}};
@@ -33,7 +34,7 @@ struct Driver {
 int main(int argc,char**argv)try{
   if(argc==3 && (std::string(argv[1])=="--ui-fixture" || std::string(argv[1])=="--ui-large-fixture")){fixture(std::string(argv[1])=="--ui-large-fixture"?512:128).save(argv[2]);return 0;}
   check(!spatial_parameter(12,-1) && !spatial_parameter(12,12) && !spatial_action(12,-1),"Baking menu mappings reject invalid sectors");
-  auto scene=fixture();auto before=scene.encode();Document doc;doc.replace(scene);
+  auto scene=fixture();auto before=scene.encode(),readonly_sources=bake_readonly_sources(scene);Document doc;doc.replace(scene);
   check(doc.frame().state->can_bake && doc.frame().state->bake_sources.size()==2 && !doc.frame().state->can_clear_bake,"Prepared targets expose both hidden locked sources and no premature Clear command");
   Driver driver(doc);driver.open();check(doc.frame().state->menu_page==12,"Joystick menu reaches Objects / Mesh tools / Baking");
   driver.sector(0);check(doc.frame().state->controls.parameter==VrParameter::BakeSource,"Source selection opens a controller slider");driver.value(1);driver.confirm();
@@ -47,7 +48,7 @@ int main(int argc,char**argv)try{
   driver.sector(2);check(doc.frame().state->controls.components==2,"AO sampling and seam padding expose independent controller rows");driver.value(0);driver.value(.125f,1);driver.confirm();
   check(doc.frame().state->bake_settings.ao_samples==0 && doc.frame().state->bake_settings.padding==8 && !doc.frame().state->dirty,"Quality confirmation selects integer AO samples and padding without dirtying the scene");
   driver.sector(3);check(doc.wait_asset() && doc.frame().state->error.empty(),"Controller Bake runs the guarded native worker");
-  auto baked=doc.copy_scene().encode();check(doc.copy_scene().active().painted->baked() && baked["objects"][1]==before["objects"][1] && baked["objects"][2]==before["objects"][2] && doc.frame().state->can_clear_bake,"Accepted baking retains both complete hidden sources and enables Clear");
+  auto baked=doc.copy_scene().encode();check(doc.copy_scene().active().painted->baked() && bake_readonly_sources(doc.copy_scene())==readonly_sources && doc.frame().state->can_clear_bake,"Accepted baking retains both complete hidden sources and enables Clear");
   check(doc.undo() && doc.copy_scene().encode()==before && doc.redo() && doc.copy_scene().encode()==baked,"Baking is one exact global Undo/Redo transaction");
   doc.clear_bake();check(doc.wait_asset() && !doc.copy_scene().active().painted->baked() && doc.undo() && doc.copy_scene().encode()==baked,"Explicit Clear removes only the baked base and is exactly undoable");
   auto confirmed_front=doc.frame().state->bake_settings.front_mm;
