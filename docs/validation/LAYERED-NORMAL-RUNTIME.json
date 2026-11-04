@@ -1,0 +1,311 @@
+{
+  "date": "2026-11-04T18:45:07.491169+00:00",
+  "source": "6050008e1727a5183048a1eb77c63cca84695aa2",
+  "scope": "Fresh complete app/core/render/support/XR and selected new consumer closure,214tasks/profile; not ALL targets/full regression. New public append layouts, no borrowed core archives. Runtime repair only; Save explicitly refuses until owning33 codec.",
+  "native_worker_checks_each_profile": 17,
+  "field_checks_each_profile": 108,
+  "initial_factory_cpp_prefixes_each": 23,
+  "replacement_cpp_prefixes_each": 12,
+  "all_cancel_polls_each": {
+    "initial": 2,
+    "replacement": 10
+  },
+  "fixed_image_bound": 4,
+  "clear_errors_each": [
+    0,
+    0
+  ],
+  "partial_same_normal_error_each": 1,
+  "clear_then_rebake_vs_legacy_error_each": 1,
+  "runs": {
+    "release": {
+      "status": {
+        "state": "terminal",
+        "pid": 180770,
+        "source": "6050008e1727a5183048a1eb77c63cca84695aa2",
+        "profile": "release",
+        "scope": "Fresh current-main38 plus sealed owning7805 native SourceNormalPreparation/EditorState layout. Release actual ALL then full620; SAN complete ownapp/core/render/support/XR and26selected consumers. No archive reuse; canonical27 SDK. Fresh entire public-layout core/app/render/support/XR/test cohort; layered runtime only, owning codec still required and Save refuses explicitly. No HMD/device/main admission.",
+        "steps": [
+          {
+            "name": "configure",
+            "command": [
+              "cmake",
+              "-S",
+              "/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-native-78d",
+              "-B",
+              "/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-native-78d/build-native-release",
+              "-G",
+              "Ninja",
+              "-DCMAKE_BUILD_TYPE=Release",
+              "-DCMAKE_EXPORT_COMPILE_COMMANDS=ON",
+              "-DDOME_COMPUTE_BACKEND=CPU",
+              "-DFLTK_DIR=/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-release/share/fltk",
+              "-DDOME_BUILD_UI=ON",
+              "-DDOME_BUILD_XR=ON",
+              "-U*DOME_BITMAP_RUNTIME*",
+              "-U*NATIVEGL*",
+              "-U*RENDERFONTS*"
+            ],
+            "exit_code": 0,
+            "seconds": 4.6165520119830035
+          },
+          {
+            "name": "fresh-native-build",
+            "command": [
+              "nice",
+              "-n",
+              "15",
+              "cmake",
+              "--build",
+              "/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-native-78d/build-native-release",
+              "--parallel",
+              "2",
+              "--target",
+              "dome-sculpt",
+              "dome-sculpt-test-runtime",
+              "dome-sculpt-test-widgets",
+              "dome-sculpt-layered-normal-native-test",
+              "dome-sculpt-baked-normal-field-test",
+              "dome-sculpt-baked-normal-field-faults-test"
+            ],
+            "exit_code": 0,
+            "seconds": 513.877121351019
+          },
+          {
+            "name": "field",
+            "command": [
+              "nice",
+              "-n",
+              "15",
+              "/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-native-78d/build-native-release/dome-sculpt-baked-normal-field-test"
+            ],
+            "exit_code": 0,
+            "seconds": 0.05507919698720798
+          },
+          {
+            "name": "field-faults",
+            "command": [
+              "nice",
+              "-n",
+              "15",
+              "/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-native-78d/build-native-release/dome-sculpt-baked-normal-field-faults-test"
+            ],
+            "exit_code": 0,
+            "seconds": 0.032708252023439854
+          },
+          {
+            "name": "native-worker-render",
+            "command": [
+              "nice",
+              "-n",
+              "15",
+              "/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-native-78d/build-native-release/dome-sculpt-layered-normal-native-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native-canonical-uv-d5/artifacts/uv-proof/release/outputs",
+              "/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-native-78d/artifacts/native-build/release/outputs"
+            ],
+            "exit_code": 0,
+            "seconds": 9.221234970958903
+          }
+        ],
+        "phase": "native-worker-render",
+        "child_pid": 988708,
+        "registered_tests": 622,
+        "selected_tests": [],
+        "owned_instrumented_compile_commands": null,
+        "artifacts": {
+          "/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-native-78d/build-native-release/dome-sculpt": "314d45499e298b2429f206d0328095e9e07127e09ed05f6359d764880e98d456",
+          "/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-native-78d/build-native-release/libdome-sculpt-affine.a": "9e2d7b089ec0644aa99a9bcf8fe1cb933fc426f1fee11d518ea3890f2fbe1698",
+          "/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-native-78d/build-native-release/libxatlas.a": "1e3ba1902dc8a7d5617945efad9cae105545988bd4c9c7b6be37966bd89056a1",
+          "/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-native-78d/build-native-release/libufbx.a": "d1ed96f7ee69f6b13c8d3c0bef65bf6c32081451f07d5261a899b2ea95e65535",
+          "/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-native-78d/build-native-release/libmikktspace.a": "7330090e44346fc5b80c1f3c7e88da43d03c48b9677d09a420587aaef03025a7",
+          "/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-native-78d/build-native-release/libmikktspace-robust.a": "49845d30a364446d17a3abfbc184bd1beb81d9523fa0b5a7ca345bcc6bd4def2",
+          "/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-native-78d/build-native-release/libdome-sculpt-polygon.a": "6105205f9ba666919a65086e0b255b40e18d2f7ecfbd87d79593bf02d4b6a178",
+          "/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-native-78d/build-native-release/libdome-sculpt-emission-codec.a": "637364b18576ef2c6a21e4826d0649c1fd5de9938324217b278dc81b8b20e5a4",
+          "/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-native-78d/build-native-release/libdome-sculpt-core.a": "30f2dbeabaa16cd597e63633b44eeb5e7a1b0ff8915d90498be3bb065c2c43ce",
+          "/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-native-78d/build-native-release/libdome-sculpt-render.a": "1845086407a9a927f8469c1598c7948b44c822a9e979df7fff05a7f833743288",
+          "/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-native-78d/build-native-release/libdome-sculpt-spacenav.a": "fee240b1babbef0960582cb275fc3a03b3d965ed3902b6f6a7e5f1b9006533d7",
+          "/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-native-78d/build-native-release/libdome-sculpt-xr.a": "8c9a54d7f6ce8d81c6c98d6cf6cadcde16791294a7a03af683e3fbef9e611c74"
+        },
+        "exit_code": 0,
+        "seconds": 527.9187038170057,
+        "inputs": 2296,
+        "drift": []
+      },
+      "status_sha256": "48f5395f4555b67a0cca4068887d63d893f93e82a2dece839f0a393afb2e7b65",
+      "manifest_sha256": "b5de647ac43c41c3ad2a81b958edcc6c0e4126f39a61cf02d8ddf4c38866ed2d",
+      "script_sha256": "1fcab3ebfb52ddcddde2d04ae7382f197c8f41c4e542b334a5dca6ee93356ff8",
+      "logs": {
+        "field.log": {
+          "sha256": "b3becf796f607bceb91e70dbfd4719eecd8e7b117016281ecd3045f274dae776",
+          "text": "PASS Actual native baker covers both disjoint mirrored-UV triangles\nPASS Converted baked role does not fabricate an intrinsic projection or change the genuine input\nPASS Resolved normal coverage is independent of partial material coverage and missed atlas regions\nPASS Independent double-precision oracle verifies both roles normalize and quantize each texel before filtering\nPASS Partial normal replacement preserves missed texels byte-exactly and retains its actual prior field and origin\nPASS Caller mutation cannot alter detached replacement planes or the previous immutable field\nPASS All-miss replacement is an exact same-owner no-op\nPASS Repeated partial baking combines with the real previous resolved normal, not material alpha or neutral fallback\nPASS Replacement history is bounded before detached copies\nPASS Initial and replacement retained/working memory limits refuse atomically\nPASS Raw canonical pixels cannot masquerade as prepared replacement detail\nPASS Baked field can be released while durable original provenance and genuine intrinsic absence remain intact\nVARIANT 0 pbr_error=0 toon_error=0\nPASS Actual native baker covers both disjoint mirrored-UV triangles\nPASS Converted baked role does not fabricate an intrinsic projection or change the genuine input\nPASS Resolved normal coverage is independent of partial material coverage and missed atlas regions\nPASS Independent double-precision oracle verifies both roles normalize and quantize each texel before filtering\nPASS Partial normal replacement preserves missed texels byte-exactly and retains its actual prior field and origin\nPASS Caller mutation cannot alter detached replacement planes or the previous immutable field\nPASS All-miss replacement is an exact same-owner no-op\nPASS Repeated partial baking combines with the real previous resolved normal, not material alpha or neutral fallback\nPASS Replacement history is bounded before detached copies\nPASS Initial and replacement retained/working memory limits refuse atomically\nPASS Raw canonical pixels cannot masquerade as prepared replacement detail\nPASS Baked field can be released while durable original provenance and genuine intrinsic absence remain intact\nVARIANT 1 pbr_error=0 toon_error=0\nPASS Actual native baker covers both disjoint mirrored-UV triangles\nPASS Converted baked role does not fabricate an intrinsic projection or change the genuine input\nPASS Resolved normal coverage is independent of partial material coverage and missed atlas regions\nPASS Independent double-precision oracle verifies both roles normalize and quantize each texel before filtering\nPASS Partial normal replacement preserves missed texels byte-exactly and retains its actual prior field and origin\nPASS Caller mutation cannot alter detached replacement planes or the previous immutable field\nPASS All-miss replacement is an exact same-owner no-op\nPASS Repeated partial baking combines with the real previous resolved normal, not material alpha or neutral fallback\nPASS Replacement history is bounded before detached copies\nPASS Initial and replacement retained/working memory limits refuse atomically\nPASS Raw canonical pixels cannot masquerade as prepared replacement detail\nPASS Baked field can be released while durable original provenance and genuine intrinsic absence remain intact\nVARIANT 2 pbr_error=0 toon_error=0\nPASS Actual native baker covers both disjoint mirrored-UV triangles\nPASS Converted baked role does not fabricate an intrinsic projection or change the genuine input\nPASS Resolved normal coverage is independent of partial material coverage and missed atlas regions\nPASS Independent double-precision oracle verifies both roles normalize and quantize each texel before filtering\nPASS Partial normal replacement preserves missed texels byte-exactly and retains its actual prior field and origin\nPASS Caller mutation cannot alter detached replacement planes or the previous immutable field\nPASS All-miss replacement is an exact same-owner no-op\nPASS Repeated partial baking combines with the real previous resolved normal, not material alpha or neutral fallback\nPASS Replacement history is bounded before detached copies\nPASS Initial and replacement retained/working memory limits refuse atomically\nPASS Raw canonical pixels cannot masquerade as prepared replacement detail\nPASS Baked field can be released while durable original provenance and genuine intrinsic absence remain intact\nVARIANT 3 pbr_error=0 toon_error=0\nPASS Actual native baker covers both disjoint mirrored-UV triangles\nPASS Converted baked role does not fabricate an intrinsic projection or change the genuine input\nPASS Resolved normal coverage is independent of partial material coverage and missed atlas regions\nPASS Independent double-precision oracle verifies both roles normalize and quantize each texel before filtering\nPASS Partial normal replacement preserves missed texels byte-exactly and retains its actual prior field and origin\nPASS Caller mutation cannot alter detached replacement planes or the previous immutable field\nPASS All-miss replacement is an exact same-owner no-op\nPASS Repeated partial baking combines with the real previous resolved normal, not material alpha or neutral fallback\nPASS Replacement history is bounded before detached copies\nPASS Initial and replacement retained/working memory limits refuse atomically\nPASS Raw canonical pixels cannot masquerade as prepared replacement detail\nPASS Baked field can be released while durable original provenance and genuine intrinsic absence remain intact\nVARIANT 4 pbr_error=0 toon_error=0\nPASS Actual native baker covers both disjoint mirrored-UV triangles\nPASS Converted baked role does not fabricate an intrinsic projection or change the genuine input\nPASS Resolved normal coverage is independent of partial material coverage and missed atlas regions\nPASS Independent double-precision oracle verifies both roles normalize and quantize each texel before filtering\nPASS Partial normal replacement preserves missed texels byte-exactly and retains its actual prior field and origin\nPASS Caller mutation cannot alter detached replacement planes or the previous immutable field\nPASS All-miss replacement is an exact same-owner no-op\nPASS Repeated partial baking combines with the real previous resolved normal, not material alpha or neutral fallback\nPASS Replacement history is bounded before detached copies\nPASS Initial and replacement retained/working memory limits refuse atomically\nPASS Raw canonical pixels cannot masquerade as prepared replacement detail\nPASS Baked field can be released while durable original provenance and genuine intrinsic absence remain intact\nVARIANT 5 pbr_error=0 toon_error=0\nPASS Actual native baker covers both disjoint mirrored-UV triangles\nPASS Converted baked role does not fabricate an intrinsic projection or change the genuine input\nPASS Resolved normal coverage is independent of partial material coverage and missed atlas regions\nPASS Independent double-precision oracle verifies both roles normalize and quantize each texel before filtering\nPASS Partial normal replacement preserves missed texels byte-exactly and retains its actual prior field and origin\nPASS Caller mutation cannot alter detached replacement planes or the previous immutable field\nPASS All-miss replacement is an exact same-owner no-op\nPASS Repeated partial baking combines with the real previous resolved normal, not material alpha or neutral fallback\nPASS Replacement history is bounded before detached copies\nPASS Initial and replacement retained/working memory limits refuse atomically\nPASS Raw canonical pixels cannot masquerade as prepared replacement detail\nPASS Baked field can be released while durable original provenance and genuine intrinsic absence remain intact\nVARIANT 6 pbr_error=0 toon_error=0\nPASS Actual native baker covers both disjoint mirrored-UV triangles\nPASS Converted baked role does not fabricate an intrinsic projection or change the genuine input\nPASS Resolved normal coverage is independent of partial material coverage and missed atlas regions\nPASS Independent double-precision oracle verifies both roles normalize and quantize each texel before filtering\nPASS Partial normal replacement preserves missed texels byte-exactly and retains its actual prior field and origin\nPASS Caller mutation cannot alter detached replacement planes or the previous immutable field\nPASS All-miss replacement is an exact same-owner no-op\nPASS Repeated partial baking combines with the real previous resolved normal, not material alpha or neutral fallback\nPASS Replacement history is bounded before detached copies\nPASS Initial and replacement retained/working memory limits refuse atomically\nPASS Raw canonical pixels cannot masquerade as prepared replacement detail\nPASS Baked field can be released while durable original provenance and genuine intrinsic absence remain intact\nVARIANT 7 pbr_error=0 toon_error=0\nPASS Actual native baker covers both disjoint mirrored-UV triangles\nPASS Every replacement cancellation poll leaves complete source and prior field exact\nPASS Every replacement cancellation poll leaves complete source and prior field exact\nPASS Every replacement cancellation poll leaves complete source and prior field exact\nPASS Every replacement cancellation poll leaves complete source and prior field exact\nPASS Every replacement cancellation poll leaves complete source and prior field exact\nPASS Every replacement cancellation poll leaves complete source and prior field exact\nPASS Every replacement cancellation poll leaves complete source and prior field exact\nPASS Every replacement cancellation poll leaves complete source and prior field exact\nPASS Every replacement cancellation poll leaves complete source and prior field exact\nPASS Every replacement cancellation poll leaves complete source and prior field exact\nPASS Cancelled replacement retries to exact resolved pixels\nPASS 108 independent layered baked-normal checks; all_cancel_polls=10\n"
+        },
+        "field-faults.log": {
+          "sha256": "73a3ab082b9f62e711658775575aee9fd13871fabfc0c1ac7f768a0f57deb904",
+          "text": "PASS Actual native baker covers both disjoint mirrored-UV triangles\nPASS Measure real independent field C++ allocation prefixes\nPASS Every persistent allocation and cancellation endpoint retries to identical owning normal planes\nPASS initial persistent_cpp_prefixes=23 all_cancel_polls=2\nPASS Measure real independent field C++ allocation prefixes\nPASS Every persistent allocation and cancellation endpoint retries to identical owning normal planes\nPASS replace persistent_cpp_prefixes=12 all_cancel_polls=10\n"
+        },
+        "native-worker-render.log": {
+          "sha256": "4b21b348f2e9c543bed05465c4faabf6d4a858ba638497fca93a1c7c0969a2a7",
+          "text": "Native XR graphics: windowless EGL 1.5\nPASS Real conversion keeps baked detail separate from intrinsic planes and authentic attribute provenance\nPASS Actual converted native frame remains within unchanged image bound\nPASS Actual worker Clear Bake removes converted detail and restores genuine original shading\nPASS Clear drops active field but retains complete original normal/material/deformation provenance\nPASS Clear Undo restores exact converted shading\nPASS Clear Redo restores exact intrinsic shading\nCLEAR variant=0 conversion_error=0 clear_error=0\nPASS Real conversion keeps baked detail separate from intrinsic planes and authentic attribute provenance\nPASS Actual converted native frame remains within unchanged image bound\nPASS Actual worker Clear Bake removes converted detail and restores genuine original shading\nPASS Clear drops active field but retains complete original normal/material/deformation provenance\nPASS Clear Undo restores exact converted shading\nPASS Clear Redo restores exact intrinsic shading\nCLEAR variant=7 conversion_error=1 clear_error=0\nPASS Actual partial Bake agrees with legacy original in projected and missed regions, including after Clear\nPASS Partial rebake of the same direction preserves the actual previous field\nPASS Rebake uses current resolved detail or genuine cleared intrinsic baseline without resurrecting old bake\nREBAKE clear_first=0 legacy_error=1 prior_error=1\nPASS Actual partial Bake agrees with legacy original in projected and missed regions, including after Clear\nPASS Rebake uses current resolved detail or genuine cleared intrinsic baseline without resurrecting old bake\nREBAKE clear_first=1 legacy_error=1 prior_error=7\n"
+        }
+      },
+      "image_hashes": {
+        "converted-0.png": "1cbdd8f205d12b108b2f03a39c893b28e741e99660005ceafd5f115165c6af96",
+        "raw-clear-0.png": "bcb366b802e663e5fffcc5e72673442879f1c946f399f4f434d3e263e8c2a3b5",
+        "converted-clear-0.png": "bcb366b802e663e5fffcc5e72673442879f1c946f399f4f434d3e263e8c2a3b5",
+        "converted-7.png": "1311c7ba6e711dbc129898eb8fcf2e9350e8882fe7ee7d9a349420b2d46bd8d8",
+        "raw-clear-7.png": "4103aa6f55534121710ea5ad1768e54b9858af612dd36c687ea6a24246a97c82",
+        "converted-clear-7.png": "4103aa6f55534121710ea5ad1768e54b9858af612dd36c687ea6a24246a97c82",
+        "same-normal-partial-rebake.png": "081d6d919ad4ca623b4a47c5e528c48800dba43a2dc6d98ad95b1c9f19e01f8d",
+        "clear-then-rebake.png": "30350b318fa7311a53100a8fcbc1ba39e88b00bd9e4f1bdfc734cdb55892e4f4"
+      }
+    },
+    "sanitize": {
+      "status": {
+        "state": "terminal",
+        "pid": 180769,
+        "source": "6050008e1727a5183048a1eb77c63cca84695aa2",
+        "profile": "sanitize",
+        "scope": "Fresh current-main38 plus sealed owning7805 native SourceNormalPreparation/EditorState layout. Release actual ALL then full620; SAN complete ownapp/core/render/support/XR and26selected consumers. No archive reuse; canonical27 SDK. Fresh entire public-layout core/app/render/support/XR/test cohort; layered runtime only, owning codec still required and Save refuses explicitly. No HMD/device/main admission.",
+        "steps": [
+          {
+            "name": "configure",
+            "command": [
+              "cmake",
+              "-S",
+              "/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-native-78d",
+              "-B",
+              "/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-native-78d/build-native-sanitize",
+              "-G",
+              "Ninja",
+              "-DCMAKE_BUILD_TYPE=Debug",
+              "-DCMAKE_EXPORT_COMPILE_COMMANDS=ON",
+              "-DDOME_COMPUTE_BACKEND=CPU",
+              "-DFLTK_DIR=/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-sanitize/share/fltk",
+              "-DDOME_BUILD_UI=ON",
+              "-DDOME_BUILD_XR=ON",
+              "-U*DOME_BITMAP_RUNTIME*",
+              "-U*NATIVEGL*",
+              "-U*RENDERFONTS*",
+              "-DCMAKE_C_FLAGS=-fsanitize=address,undefined -fno-omit-frame-pointer -O1 -g1",
+              "-DCMAKE_CXX_FLAGS=-fsanitize=address,undefined -fno-omit-frame-pointer -O1 -g1",
+              "-DCMAKE_C_FLAGS_DEBUG=",
+              "-DCMAKE_CXX_FLAGS_DEBUG=",
+              "-DCMAKE_EXE_LINKER_FLAGS=-fsanitize=address,undefined",
+              "-DCMAKE_SHARED_LINKER_FLAGS=-fsanitize=address,undefined"
+            ],
+            "exit_code": 0,
+            "seconds": 5.03560624999227
+          },
+          {
+            "name": "fresh-native-build",
+            "command": [
+              "nice",
+              "-n",
+              "15",
+              "cmake",
+              "--build",
+              "/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-native-78d/build-native-sanitize",
+              "--parallel",
+              "2",
+              "--target",
+              "dome-sculpt",
+              "dome-sculpt-test-runtime",
+              "dome-sculpt-test-widgets",
+              "dome-sculpt-layered-normal-native-test",
+              "dome-sculpt-baked-normal-field-test",
+              "dome-sculpt-baked-normal-field-faults-test"
+            ],
+            "exit_code": 0,
+            "seconds": 829.5964473090135
+          },
+          {
+            "name": "field",
+            "command": [
+              "nice",
+              "-n",
+              "15",
+              "/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-native-78d/build-native-sanitize/dome-sculpt-baked-normal-field-test"
+            ],
+            "exit_code": 0,
+            "seconds": 0.292012364952825
+          },
+          {
+            "name": "field-faults",
+            "command": [
+              "nice",
+              "-n",
+              "15",
+              "/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-native-78d/build-native-sanitize/dome-sculpt-baked-normal-field-faults-test"
+            ],
+            "exit_code": 0,
+            "seconds": 0.33935618499526754
+          },
+          {
+            "name": "native-worker-render",
+            "command": [
+              "nice",
+              "-n",
+              "15",
+              "/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-native-78d/build-native-sanitize/dome-sculpt-layered-normal-native-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native-canonical-uv-d5/artifacts/uv-proof/release/outputs",
+              "/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-native-78d/artifacts/native-build/sanitize/outputs"
+            ],
+            "exit_code": 0,
+            "seconds": 9.975602180988062
+          }
+        ],
+        "phase": "native-worker-render",
+        "child_pid": 1022602,
+        "registered_tests": 622,
+        "selected_tests": [],
+        "owned_instrumented_compile_commands": 220,
+        "artifacts": {
+          "/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-native-78d/build-native-sanitize/dome-sculpt": "e905dc36003df86d474d0ef7fb368748033bc9f80a19beb62108132644979cd5",
+          "/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-native-78d/build-native-sanitize/libdome-sculpt-affine.a": "2125ff7430eed4679b59e2c7f308909849f74212ce4567e458a326f5812f4aff",
+          "/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-native-78d/build-native-sanitize/libxatlas.a": "1d1494c914fe6b4b1027aa7b923bee11b35ea54b677e0b1b6efe10f53bd6402a",
+          "/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-native-78d/build-native-sanitize/libufbx.a": "bdeb9f2fe59fc06323bb3dc80d8ec53651130f6dca84c343074a81bb7abbb55e",
+          "/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-native-78d/build-native-sanitize/libmikktspace.a": "3dd40a9b1f6db477a3c397cf535d206d9df7e835a5d23ba999a20187bb2fc882",
+          "/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-native-78d/build-native-sanitize/libmikktspace-robust.a": "e21236207427398489dfb98187670fdcf4626b887735dcfcc7ac41f2d3cb6de6",
+          "/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-native-78d/build-native-sanitize/libdome-sculpt-polygon.a": "a037efe04714029d1fa338ff8a2f612c5fa6f96b24a32cee200b9a86b374924b",
+          "/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-native-78d/build-native-sanitize/libdome-sculpt-emission-codec.a": "0f94a2d54d5e9eeeea6189fe5f293275832ccde163d6d62ef623f5ab4d10d583",
+          "/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-native-78d/build-native-sanitize/libdome-sculpt-core.a": "5b20e6c76021ab14f06714d0638b77df7e1f79dea1eaaa0e0e7670d37137b02d",
+          "/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-native-78d/build-native-sanitize/libdome-sculpt-spacenav.a": "b71a5e6c6dabbf8fbe9486edae80c9e2401c57d2431d21b806c08f071ec50c9c",
+          "/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-native-78d/build-native-sanitize/libdome-sculpt-render.a": "7ced99a9c4b7f96d6dba86af1389f74c021aa53bf59fe4e887caf4e9431c5e7a",
+          "/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-native-78d/build-native-sanitize/libdome-sculpt-xr.a": "340731dd9d646ccc9a952a2bd4ec7ed5b81164349a74ea95678548fc438e3a28"
+        },
+        "exit_code": 0,
+        "seconds": 846.2796320890193,
+        "inputs": 2296,
+        "drift": []
+      },
+      "status_sha256": "5a6bd94739d664d4e22ea24c833397da9061ae7086a0cac780d0a79739aa302b",
+      "manifest_sha256": "dd72012dd21538199f297f82cabe38096ff8da6a5c879075f2e22ec001fcb9de",
+      "script_sha256": "1fcab3ebfb52ddcddde2d04ae7382f197c8f41c4e542b334a5dca6ee93356ff8",
+      "logs": {
+        "field.log": {
+          "sha256": "b3becf796f607bceb91e70dbfd4719eecd8e7b117016281ecd3045f274dae776",
+          "text": "PASS Actual native baker covers both disjoint mirrored-UV triangles\nPASS Converted baked role does not fabricate an intrinsic projection or change the genuine input\nPASS Resolved normal coverage is independent of partial material coverage and missed atlas regions\nPASS Independent double-precision oracle verifies both roles normalize and quantize each texel before filtering\nPASS Partial normal replacement preserves missed texels byte-exactly and retains its actual prior field and origin\nPASS Caller mutation cannot alter detached replacement planes or the previous immutable field\nPASS All-miss replacement is an exact same-owner no-op\nPASS Repeated partial baking combines with the real previous resolved normal, not material alpha or neutral fallback\nPASS Replacement history is bounded before detached copies\nPASS Initial and replacement retained/working memory limits refuse atomically\nPASS Raw canonical pixels cannot masquerade as prepared replacement detail\nPASS Baked field can be released while durable original provenance and genuine intrinsic absence remain intact\nVARIANT 0 pbr_error=0 toon_error=0\nPASS Actual native baker covers both disjoint mirrored-UV triangles\nPASS Converted baked role does not fabricate an intrinsic projection or change the genuine input\nPASS Resolved normal coverage is independent of partial material coverage and missed atlas regions\nPASS Independent double-precision oracle verifies both roles normalize and quantize each texel before filtering\nPASS Partial normal replacement preserves missed texels byte-exactly and retains its actual prior field and origin\nPASS Caller mutation cannot alter detached replacement planes or the previous immutable field\nPASS All-miss replacement is an exact same-owner no-op\nPASS Repeated partial baking combines with the real previous resolved normal, not material alpha or neutral fallback\nPASS Replacement history is bounded before detached copies\nPASS Initial and replacement retained/working memory limits refuse atomically\nPASS Raw canonical pixels cannot masquerade as prepared replacement detail\nPASS Baked field can be released while durable original provenance and genuine intrinsic absence remain intact\nVARIANT 1 pbr_error=0 toon_error=0\nPASS Actual native baker covers both disjoint mirrored-UV triangles\nPASS Converted baked role does not fabricate an intrinsic projection or change the genuine input\nPASS Resolved normal coverage is independent of partial material coverage and missed atlas regions\nPASS Independent double-precision oracle verifies both roles normalize and quantize each texel before filtering\nPASS Partial normal replacement preserves missed texels byte-exactly and retains its actual prior field and origin\nPASS Caller mutation cannot alter detached replacement planes or the previous immutable field\nPASS All-miss replacement is an exact same-owner no-op\nPASS Repeated partial baking combines with the real previous resolved normal, not material alpha or neutral fallback\nPASS Replacement history is bounded before detached copies\nPASS Initial and replacement retained/working memory limits refuse atomically\nPASS Raw canonical pixels cannot masquerade as prepared replacement detail\nPASS Baked field can be released while durable original provenance and genuine intrinsic absence remain intact\nVARIANT 2 pbr_error=0 toon_error=0\nPASS Actual native baker covers both disjoint mirrored-UV triangles\nPASS Converted baked role does not fabricate an intrinsic projection or change the genuine input\nPASS Resolved normal coverage is independent of partial material coverage and missed atlas regions\nPASS Independent double-precision oracle verifies both roles normalize and quantize each texel before filtering\nPASS Partial normal replacement preserves missed texels byte-exactly and retains its actual prior field and origin\nPASS Caller mutation cannot alter detached replacement planes or the previous immutable field\nPASS All-miss replacement is an exact same-owner no-op\nPASS Repeated partial baking combines with the real previous resolved normal, not material alpha or neutral fallback\nPASS Replacement history is bounded before detached copies\nPASS Initial and replacement retained/working memory limits refuse atomically\nPASS Raw canonical pixels cannot masquerade as prepared replacement detail\nPASS Baked field can be released while durable original provenance and genuine intrinsic absence remain intact\nVARIANT 3 pbr_error=0 toon_error=0\nPASS Actual native baker covers both disjoint mirrored-UV triangles\nPASS Converted baked role does not fabricate an intrinsic projection or change the genuine input\nPASS Resolved normal coverage is independent of partial material coverage and missed atlas regions\nPASS Independent double-precision oracle verifies both roles normalize and quantize each texel before filtering\nPASS Partial normal replacement preserves missed texels byte-exactly and retains its actual prior field and origin\nPASS Caller mutation cannot alter detached replacement planes or the previous immutable field\nPASS All-miss replacement is an exact same-owner no-op\nPASS Repeated partial baking combines with the real previous resolved normal, not material alpha or neutral fallback\nPASS Replacement history is bounded before detached copies\nPASS Initial and replacement retained/working memory limits refuse atomically\nPASS Raw canonical pixels cannot masquerade as prepared replacement detail\nPASS Baked field can be released while durable original provenance and genuine intrinsic absence remain intact\nVARIANT 4 pbr_error=0 toon_error=0\nPASS Actual native baker covers both disjoint mirrored-UV triangles\nPASS Converted baked role does not fabricate an intrinsic projection or change the genuine input\nPASS Resolved normal coverage is independent of partial material coverage and missed atlas regions\nPASS Independent double-precision oracle verifies both roles normalize and quantize each texel before filtering\nPASS Partial normal replacement preserves missed texels byte-exactly and retains its actual prior field and origin\nPASS Caller mutation cannot alter detached replacement planes or the previous immutable field\nPASS All-miss replacement is an exact same-owner no-op\nPASS Repeated partial baking combines with the real previous resolved normal, not material alpha or neutral fallback\nPASS Replacement history is bounded before detached copies\nPASS Initial and replacement retained/working memory limits refuse atomically\nPASS Raw canonical pixels cannot masquerade as prepared replacement detail\nPASS Baked field can be released while durable original provenance and genuine intrinsic absence remain intact\nVARIANT 5 pbr_error=0 toon_error=0\nPASS Actual native baker covers both disjoint mirrored-UV triangles\nPASS Converted baked role does not fabricate an intrinsic projection or change the genuine input\nPASS Resolved normal coverage is independent of partial material coverage and missed atlas regions\nPASS Independent double-precision oracle verifies both roles normalize and quantize each texel before filtering\nPASS Partial normal replacement preserves missed texels byte-exactly and retains its actual prior field and origin\nPASS Caller mutation cannot alter detached replacement planes or the previous immutable field\nPASS All-miss replacement is an exact same-owner no-op\nPASS Repeated partial baking combines with the real previous resolved normal, not material alpha or neutral fallback\nPASS Replacement history is bounded before detached copies\nPASS Initial and replacement retained/working memory limits refuse atomically\nPASS Raw canonical pixels cannot masquerade as prepared replacement detail\nPASS Baked field can be released while durable original provenance and genuine intrinsic absence remain intact\nVARIANT 6 pbr_error=0 toon_error=0\nPASS Actual native baker covers both disjoint mirrored-UV triangles\nPASS Converted baked role does not fabricate an intrinsic projection or change the genuine input\nPASS Resolved normal coverage is independent of partial material coverage and missed atlas regions\nPASS Independent double-precision oracle verifies both roles normalize and quantize each texel before filtering\nPASS Partial normal replacement preserves missed texels byte-exactly and retains its actual prior field and origin\nPASS Caller mutation cannot alter detached replacement planes or the previous immutable field\nPASS All-miss replacement is an exact same-owner no-op\nPASS Repeated partial baking combines with the real previous resolved normal, not material alpha or neutral fallback\nPASS Replacement history is bounded before detached copies\nPASS Initial and replacement retained/working memory limits refuse atomically\nPASS Raw canonical pixels cannot masquerade as prepared replacement detail\nPASS Baked field can be released while durable original provenance and genuine intrinsic absence remain intact\nVARIANT 7 pbr_error=0 toon_error=0\nPASS Actual native baker covers both disjoint mirrored-UV triangles\nPASS Every replacement cancellation poll leaves complete source and prior field exact\nPASS Every replacement cancellation poll leaves complete source and prior field exact\nPASS Every replacement cancellation poll leaves complete source and prior field exact\nPASS Every replacement cancellation poll leaves complete source and prior field exact\nPASS Every replacement cancellation poll leaves complete source and prior field exact\nPASS Every replacement cancellation poll leaves complete source and prior field exact\nPASS Every replacement cancellation poll leaves complete source and prior field exact\nPASS Every replacement cancellation poll leaves complete source and prior field exact\nPASS Every replacement cancellation poll leaves complete source and prior field exact\nPASS Every replacement cancellation poll leaves complete source and prior field exact\nPASS Cancelled replacement retries to exact resolved pixels\nPASS 108 independent layered baked-normal checks; all_cancel_polls=10\n"
+        },
+        "field-faults.log": {
+          "sha256": "73a3ab082b9f62e711658775575aee9fd13871fabfc0c1ac7f768a0f57deb904",
+          "text": "PASS Actual native baker covers both disjoint mirrored-UV triangles\nPASS Measure real independent field C++ allocation prefixes\nPASS Every persistent allocation and cancellation endpoint retries to identical owning normal planes\nPASS initial persistent_cpp_prefixes=23 all_cancel_polls=2\nPASS Measure real independent field C++ allocation prefixes\nPASS Every persistent allocation and cancellation endpoint retries to identical owning normal planes\nPASS replace persistent_cpp_prefixes=12 all_cancel_polls=10\n"
+        },
+        "native-worker-render.log": {
+          "sha256": "4b21b348f2e9c543bed05465c4faabf6d4a858ba638497fca93a1c7c0969a2a7",
+          "text": "Native XR graphics: windowless EGL 1.5\nPASS Real conversion keeps baked detail separate from intrinsic planes and authentic attribute provenance\nPASS Actual converted native frame remains within unchanged image bound\nPASS Actual worker Clear Bake removes converted detail and restores genuine original shading\nPASS Clear drops active field but retains complete original normal/material/deformation provenance\nPASS Clear Undo restores exact converted shading\nPASS Clear Redo restores exact intrinsic shading\nCLEAR variant=0 conversion_error=0 clear_error=0\nPASS Real conversion keeps baked detail separate from intrinsic planes and authentic attribute provenance\nPASS Actual converted native frame remains within unchanged image bound\nPASS Actual worker Clear Bake removes converted detail and restores genuine original shading\nPASS Clear drops active field but retains complete original normal/material/deformation provenance\nPASS Clear Undo restores exact converted shading\nPASS Clear Redo restores exact intrinsic shading\nCLEAR variant=7 conversion_error=1 clear_error=0\nPASS Actual partial Bake agrees with legacy original in projected and missed regions, including after Clear\nPASS Partial rebake of the same direction preserves the actual previous field\nPASS Rebake uses current resolved detail or genuine cleared intrinsic baseline without resurrecting old bake\nREBAKE clear_first=0 legacy_error=1 prior_error=1\nPASS Actual partial Bake agrees with legacy original in projected and missed regions, including after Clear\nPASS Rebake uses current resolved detail or genuine cleared intrinsic baseline without resurrecting old bake\nREBAKE clear_first=1 legacy_error=1 prior_error=7\n"
+        }
+      },
+      "image_hashes": {
+        "converted-0.png": "1cbdd8f205d12b108b2f03a39c893b28e741e99660005ceafd5f115165c6af96",
+        "raw-clear-0.png": "bcb366b802e663e5fffcc5e72673442879f1c946f399f4f434d3e263e8c2a3b5",
+        "converted-clear-0.png": "bcb366b802e663e5fffcc5e72673442879f1c946f399f4f434d3e263e8c2a3b5",
+        "converted-7.png": "1311c7ba6e711dbc129898eb8fcf2e9350e8882fe7ee7d9a349420b2d46bd8d8",
+        "raw-clear-7.png": "4103aa6f55534121710ea5ad1768e54b9858af612dd36c687ea6a24246a97c82",
+        "converted-clear-7.png": "4103aa6f55534121710ea5ad1768e54b9858af612dd36c687ea6a24246a97c82",
+        "same-normal-partial-rebake.png": "081d6d919ad4ca623b4a47c5e528c48800dba43a2dc6d98ad95b1c9f19e01f8d",
+        "clear-then-rebake.png": "30350b318fa7311a53100a8fcbc1ba39e88b00bd9e4f1bdfc734cdb55892e4f4"
+      }
+    }
+  },
+  "remaining": "Full owning Scene33/material15 codec and actual Save/restart, legacy migration, UV/key/material adapters and broader caller/interop/device/current-main integration remain. No full goal completion/main admission/system/HMD action."
+}
