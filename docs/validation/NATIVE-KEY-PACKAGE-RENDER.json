@@ -1,0 +1,1702 @@
+{
+  "schema": 1,
+  "state": "qualified private matched-component graphics and actual native fileworker proof; broader production/consumer scopes remain open",
+  "base": "3050717c2b75efbb347571cfc9b8fbdf50b4e31b",
+  "runtime": "c09202fbf092eaa4d9ddf8d9a2249fe7bf013e74",
+  "product_source_changes": [],
+  "source_sha256": {
+    "tests/native-key-package-render.cpp": "88fbe461bc4c372eed731d1eb8250f81e0a08ee8306a5ec3cb0a9cde470f9d54",
+    "CMakeLists.txt": "b0545056be2691e13872711de63560309de6211cc73aaffddde41a0009e80af3",
+    "tests/post-uv-avatar-render.cpp": "865632802ac279d941ab64d0a1fb79b953fdd93ea6a19f8b78f794cdc81fcd73",
+    "tests/prepared-normal-consumer.hpp": "4f1d70427248d9aebdbb7725652a0da5d794055425514828b029f862491d281b",
+    "tests/mtoon-render.cpp": "9692b244aa72ab319d84a059d8ebc0ce62b226d5c850bee965b12d9ae3de1ac0"
+  },
+  "builds": {
+    "release": {
+      "status": {
+        "state": "terminal",
+        "pid": 1440342,
+        "source": "3050717c2b75efbb347571cfc9b8fbdf50b4e31b",
+        "scope": "Complete new consumer TU, explicit copied immutable matching c092 core/render/support; all product source/API/assets exact. No fresh core/app build; no physicaldevice claim.",
+        "matching_product_files": 518,
+        "steps": [
+          {
+            "phase": "configure",
+            "command": [
+              "cmake",
+              "-S",
+              "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717",
+              "-B",
+              "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/build-release-v4/graph",
+              "-G",
+              "Ninja",
+              "-DCMAKE_BUILD_TYPE=Release",
+              "-DDOME_COMPUTE_BACKEND=CPU",
+              "-DDOME_BUILD_UI=ON",
+              "-DDOME_BUILD_XR=ON",
+              "-DCMAKE_EXPORT_COMPILE_COMMANDS=ON",
+              "-DFLTK_DIR=/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-release/share/fltk",
+              "-U*DOME_BITMAP_RUNTIME*",
+              "-U*NATIVEGL*",
+              "-U*RENDERFONTS*"
+            ],
+            "exit": 0
+          },
+          {
+            "phase": "compile",
+            "command": [
+              "/usr/bin/c++",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/src",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/tests",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/third_party/cgltf",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/third_party/desktop",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/third_party/nlohmann",
+              "-isystem",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/harfbuzz",
+              "-isystem",
+              "/usr/include/glib-2.0",
+              "-isystem",
+              "/usr/lib64/glib-2.0/include",
+              "-isystem",
+              "/usr/include/sysprof-6",
+              "-isystem",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/freetype2",
+              "-isystem",
+              "/usr/include/libpng16",
+              "-isystem",
+              "/usr/include/libxml2",
+              "-O3",
+              "-DNDEBUG",
+              "-std=gnu++20",
+              "-pthread",
+              "-DWITH_GZFILEOP",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/build-release-v4/consumer.cpp.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/tests/native-key-package-render.cpp"
+            ],
+            "exit": 0
+          },
+          {
+            "phase": "link",
+            "command": [
+              "/usr/bin/c++",
+              "-O3",
+              "-DNDEBUG",
+              "-Wl,--dependency-file=CMakeFiles/dome-sculpt-native-key-package-render-test.dir/link.d",
+              "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/build-release-v4/consumer.cpp.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/build-release-v4/consumer",
+              "-Wl,-rpath,/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib",
+              "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/build-release-v4/libraries/libdome-sculpt-render.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/build-release-v4/libraries/libdome-sculpt-core.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/build-release-v4/libraries/libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/build-release-v4/libraries/libdome-sculpt-polygon.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/build-release-v4/libraries/libxatlas.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/build-release-v4/libraries/libmikktspace.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/build-release-v4/libraries/libmikktspace-robust.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/build-release-v4/libraries/libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/build-release-v4/libraries/libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libharfbuzz.so",
+              "/usr/lib64/libEGL.so",
+              "/usr/lib64/libGL.so",
+              "/usr/lib64/libfontconfig.so",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libfreetype.so",
+              "/usr/lib64/libicui18n.so",
+              "/usr/lib64/libicuuc.so",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded",
+              "-Wl,-Map,/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/build-release-v4/consumer.map"
+            ],
+            "exit": 0
+          }
+        ],
+        "archives": {
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/build-release-v4/libraries/libdome-sculpt-affine.a": "564010e8df3c6e92bf784246530e032e2048232fc17af4dde45bf490b2b84fba",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/build-release-v4/libraries/libxatlas.a": "58bfbad7f51ec662524a29bb9034772fb72b7a22b938858984791b2703071929",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/build-release-v4/libraries/libmikktspace.a": "3f8cfd2e1b4456de47f642bc68f518e8a840268412a86403ceedda9784111fa9",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/build-release-v4/libraries/libufbx.a": "393648103f0856adc0a0d29c10bf94d41bbdc372ca90304225f846d3673986af",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/build-release-v4/libraries/libmikktspace-robust.a": "a5c8ba30b15afc14039c239e235b39ad369298af291736b83c4d473450060cec",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/build-release-v4/libraries/libdome-sculpt-polygon.a": "a0a5570eafce86f101be5eff7dcfd3db7faba22a45730b26ecf9b7f4eb6429d9",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/build-release-v4/libraries/libdome-sculpt-spacenav.a": "6cbee5d7d4bcc903ffedfb045aa6afd04901aeeb9627db75ff499e35d068adb9",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/build-release-v4/libraries/libdome-sculpt-emission-codec.a": "539f3e177409d1854d51ef822f1df873deb6b7d9176508be0f696c62373d1625",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/build-release-v4/libraries/libdome-sculpt-core.a": "b3a3826946765b298b7f7aea7315c3de33027fb569039100af3605fa257878b7",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/build-release-v4/libraries/libdome-sculpt-render.a": "5eb1221dff3ad3acfbfe1190cb903bea19868e7dfc13a23256f5bf2a0a28e395",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/build-release-v4/libraries/libdome-sculpt-xr.a": "2b79bf26cb3ea1c3b63a5c4550f0099a212ec5b5677a35bbc7e9dbc641bc00b8"
+        },
+        "phase": "link",
+        "child_pid": 1442571,
+        "exit": 0,
+        "binary_sha256": "f72e43a63338082c47f44f98bbe0371d6c82d81fa3257d63275086910340fa0c",
+        "object_sha256": "1c6bb83cfa411a49558ef32d140393ee10d072b3c555066febefb0f7c405ea90",
+        "test_sha256": "88fbe461bc4c372eed731d1eb8250f81e0a08ee8306a5ec3cb0a9cde470f9d54",
+        "seconds": 19.00396473298315,
+        "drift": []
+      },
+      "manifest": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/build-release-v4/status.json",
+        "sha256": "13380eca4c07464d35c870f8420bfc799bb8a79adf60b2bdb549ae85cbd266ac"
+      },
+      "before": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/build-release-v4/before.json",
+        "sha256": "d3321e98994dd340848c99e65af7d691bc29320ccbc39c3c111937579751f37b"
+      },
+      "after": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/build-release-v4/after.json",
+        "sha256": "d3321e98994dd340848c99e65af7d691bc29320ccbc39c3c111937579751f37b"
+      },
+      "map": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/build-release-v4/consumer.map",
+        "sha256": "da7540a4c721cd18e1919de55b3fa98c89d8aba71a314408fc36f8e5e56ac7fd"
+      }
+    },
+    "sanitize": {
+      "status": {
+        "state": "terminal",
+        "pid": 1445610,
+        "source": "3050717c2b75efbb347571cfc9b8fbdf50b4e31b",
+        "scope": "Complete new consumer TU, explicit copied immutable matching c092 core/render/support; all product source/API/assets exact. No fresh core/app build; no physicaldevice claim.",
+        "matching_product_files": 518,
+        "steps": [
+          {
+            "phase": "configure",
+            "command": [
+              "cmake",
+              "-S",
+              "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717",
+              "-B",
+              "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/build-sanitize-v4/graph",
+              "-G",
+              "Ninja",
+              "-DCMAKE_BUILD_TYPE=Release",
+              "-DDOME_COMPUTE_BACKEND=CPU",
+              "-DDOME_BUILD_UI=ON",
+              "-DDOME_BUILD_XR=ON",
+              "-DCMAKE_EXPORT_COMPILE_COMMANDS=ON",
+              "-DFLTK_DIR=/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-sanitize/share/fltk",
+              "-U*DOME_BITMAP_RUNTIME*",
+              "-U*NATIVEGL*",
+              "-U*RENDERFONTS*",
+              "-DCMAKE_C_FLAGS_RELEASE=-O1 -g1 -fsanitize=address,undefined -fno-omit-frame-pointer",
+              "-DCMAKE_CXX_FLAGS_RELEASE=-O1 -g1 -fsanitize=address,undefined -fno-omit-frame-pointer",
+              "-DCMAKE_EXE_LINKER_FLAGS=-fsanitize=address,undefined",
+              "-DCMAKE_SHARED_LINKER_FLAGS=-fsanitize=address,undefined"
+            ],
+            "exit": 0
+          },
+          {
+            "phase": "compile",
+            "command": [
+              "/usr/bin/c++",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/src",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/tests",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/third_party/cgltf",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/third_party/desktop",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/third_party/nlohmann",
+              "-isystem",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/harfbuzz",
+              "-isystem",
+              "/usr/include/glib-2.0",
+              "-isystem",
+              "/usr/lib64/glib-2.0/include",
+              "-isystem",
+              "/usr/include/sysprof-6",
+              "-isystem",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/freetype2",
+              "-isystem",
+              "/usr/include/libpng16",
+              "-isystem",
+              "/usr/include/libxml2",
+              "-O1",
+              "-g1",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "-std=gnu++20",
+              "-pthread",
+              "-DWITH_GZFILEOP",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/build-sanitize-v4/consumer.cpp.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/tests/native-key-package-render.cpp"
+            ],
+            "exit": 0
+          },
+          {
+            "phase": "link",
+            "command": [
+              "/usr/bin/c++",
+              "-O1",
+              "-g1",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "-fsanitize=address,undefined",
+              "-Wl,--dependency-file=CMakeFiles/dome-sculpt-native-key-package-render-test.dir/link.d",
+              "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/build-sanitize-v4/consumer.cpp.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/build-sanitize-v4/consumer",
+              "-Wl,-rpath,/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib",
+              "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/build-sanitize-v4/libraries/libdome-sculpt-render.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/build-sanitize-v4/libraries/libdome-sculpt-core.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/build-sanitize-v4/libraries/libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/build-sanitize-v4/libraries/libdome-sculpt-polygon.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/build-sanitize-v4/libraries/libxatlas.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/build-sanitize-v4/libraries/libmikktspace.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/build-sanitize-v4/libraries/libmikktspace-robust.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/build-sanitize-v4/libraries/libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/build-sanitize-v4/libraries/libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libharfbuzz.so",
+              "/usr/lib64/libEGL.so",
+              "/usr/lib64/libGL.so",
+              "/usr/lib64/libfontconfig.so",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libfreetype.so",
+              "/usr/lib64/libicui18n.so",
+              "/usr/lib64/libicuuc.so",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded",
+              "-Wl,-Map,/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/build-sanitize-v4/consumer.map"
+            ],
+            "exit": 0
+          }
+        ],
+        "archives": {
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/build-sanitize-v4/libraries/libdome-sculpt-affine.a": "de2c691384467b2da08387b4277d3374a225e2c1943050490262126e99b3f0ed",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/build-sanitize-v4/libraries/libxatlas.a": "51b5f8c20b075b2d020f2a6bba240dc966d70132c916498f60aa7e2ac2d98aff",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/build-sanitize-v4/libraries/libmikktspace.a": "2161f0ca864a87e8170593fbb9e923c4206e85d25442cabbd1c5c7668df243f2",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/build-sanitize-v4/libraries/libufbx.a": "0366c7b60114fcf0c2fc10c123811a1096d9d7c97c2aca6b06417a1ea6f97099",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/build-sanitize-v4/libraries/libmikktspace-robust.a": "1a12973b7d36c4bfab106cd55fe271feea907b0d1f7fcaadbc94383036baecd8",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/build-sanitize-v4/libraries/libdome-sculpt-spacenav.a": "32111357103156bf1be7df19c068ee474dfcba292f7582522b91c79d2e4d651e",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/build-sanitize-v4/libraries/libdome-sculpt-emission-codec.a": "ccdb81d7fddcd83d724893ddedb89b5893e0056c39ffb9435ec07709e0b737f1",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/build-sanitize-v4/libraries/libdome-sculpt-polygon.a": "b2ac0276a661e95778df88e434c811f197bfae0d871ef7d50c38e1107273d034",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/build-sanitize-v4/libraries/libdome-sculpt-core.a": "c99033db00e38b488119bc2c936783eb3fa5a69cbbd11fed0ddf3202876a35b5",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/build-sanitize-v4/libraries/libdome-sculpt-render.a": "65b66b756356ae3655bbd5925ef85f1903f39893aa32cf038e23e6090f2c446f",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/build-sanitize-v4/libraries/libdome-sculpt-xr.a": "5a2275ac4beddea2a3da3eecee21b61c99ede1ee9534b3babffedc9c153ac00a"
+        },
+        "phase": "link",
+        "child_pid": 1449176,
+        "exit": 0,
+        "binary_sha256": "e89a0907c7ddef3eab78de825d7b4832e578c103c6aa8d7e3edc5913a075572f",
+        "object_sha256": "c9d7fd05e85eb4634265a982212362a36487327c142f716a9b6d3af3f60fc5e4",
+        "test_sha256": "88fbe461bc4c372eed731d1eb8250f81e0a08ee8306a5ec3cb0a9cde470f9d54",
+        "seconds": 33.460245711001335,
+        "drift": []
+      },
+      "manifest": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/build-sanitize-v4/status.json",
+        "sha256": "c8d442f0e36ed6810a0107100062ddeab441a01b974d6af84ff8f6abb873511b"
+      },
+      "before": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/build-sanitize-v4/before.json",
+        "sha256": "3f2d7c7179f5df16fc398fdadaf1b0684557442583c03a6f8da23b7bab012ad0"
+      },
+      "after": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/build-sanitize-v4/after.json",
+        "sha256": "3f2d7c7179f5df16fc398fdadaf1b0684557442583c03a6f8da23b7bab012ad0"
+      },
+      "map": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/build-sanitize-v4/consumer.map",
+        "sha256": "36cbc51763f95dc31e716277b7fd4b292c959da482f7897a5b4271bf1220b3f9"
+      }
+    }
+  },
+  "cohorts": [
+    {
+      "name": "small-v4",
+      "status": {
+        "state": "terminal",
+        "pid": 1443811,
+        "scope": "New complete matched-c092 consumer TU; real combined Scene29 owningkey+separate hiddenSource4 paint namespace, no same-object coupling claim. Actual worker packageexport/Open/Save, independent cgltf/PBR geometry/pixels, Restore/history; no app/HMD/session claim.",
+        "profile": "release",
+        "command": [
+          "nice",
+          "-n",
+          "15",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/build-release-v4/consumer",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/small-v4/outputs",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/inputs/small.dsculpt"
+        ],
+        "child_pid": 1443912,
+        "exit": 0,
+        "seconds": 0.679838354990352,
+        "inputs": 2203,
+        "drift": [],
+        "outputs": {
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/small-v4/outputs/case0/p0-w0-editable.glb": "298b7416595ac1c615b807895ab78410ccd9843793568f022911c14d42693f9c",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/small-v4/outputs/case0/p0-w0.native.rgba": "0e645c915a20cdae1fed297aea20601ec6218e1a265a17483264ea99e98b8229",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/small-v4/outputs/case0/p0-w0.external.rgba": "0e645c915a20cdae1fed297aea20601ec6218e1a265a17483264ea99e98b8229",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/small-v4/outputs/case0/p0-w0-recovered.dsculpt": "f67d70062131e03c3846babab29de55c9374467f1244c4e28d33167f9a470806",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/small-v4/outputs/case0/p0-w0-standard.glb": "14ed272f69d36d07aeadfa114edb60edc8414cd4f4698422ab2da4d03efd88e9",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/small-v4/outputs/case0/p0-w35-editable.glb": "d9753cc899fdcfbb5608c203fafa59083abdf2d13bd22d68c2260785c2fd7ea7",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/small-v4/outputs/case0/p0-w35.native.rgba": "b3f76cdff93a54927510779a8d8cf0f29b785ca0ece54200224169f85cf40dff",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/small-v4/outputs/case0/p0-w35.external.rgba": "b3f76cdff93a54927510779a8d8cf0f29b785ca0ece54200224169f85cf40dff",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/small-v4/outputs/case0/p0-w35-recovered.dsculpt": "c23361947c9d59ef1e5b66241cd2045f50465d65ef2970a2ef1b238fb428c53f",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/small-v4/outputs/case0/p0-w35-standard.glb": "2aa12004a06e825aff63f6827f14dd8f92f269b0be36ac3da8a8f28681c4a7bc",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/small-v4/outputs/case0/p0-w100-editable.glb": "11c96049808561d68d034a5de4715c73fd77c67cb373d4bce7dda3fcc9a32ed9",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/small-v4/outputs/case0/p0-w100.native.rgba": "ce07bf5c117b9a18e12cc3885e2cd2b74cff6572b04251f01fc0b3dabc2d4219",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/small-v4/outputs/case0/p0-w100.external.rgba": "ce07bf5c117b9a18e12cc3885e2cd2b74cff6572b04251f01fc0b3dabc2d4219",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/small-v4/outputs/case0/p0-w100-recovered.dsculpt": "f5ea337b2a3d849e7bb52926ea5e13b6bca22b47f024413526ea9e33d7b3614f",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/small-v4/outputs/case0/p0-w100-standard.glb": "917e268db0d95d34a7ee0b52c97643e2ee949bc6bdebcf9213c62bf3c044a125"
+        }
+      },
+      "checks": 45,
+      "log": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/small-v4/run.log",
+        "sha256": "13275eeadf581b77f52013e5b42bc3018055af510f2daa51eba4b31660c45b3e"
+      },
+      "before": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/small-v4/before.json",
+        "sha256": "c64afbe076e7d4076815cf952acba2fd88b5372e18ba080e252c080dc0b713cb"
+      },
+      "after": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/small-v4/after.json",
+        "sha256": "c64afbe076e7d4076815cf952acba2fd88b5372e18ba080e252c080dc0b713cb"
+      },
+      "frames": [
+        {
+          "input": "small.dsculpt",
+          "pose_weight": "p0-w0",
+          "maxerror": 0,
+          "coverage": 1920,
+          "geometry_max": 4.21468e-08
+        },
+        {
+          "input": "small.dsculpt",
+          "pose_weight": "p0-w35",
+          "maxerror": 0,
+          "coverage": 1872,
+          "geometry_max": 4.21468e-08
+        },
+        {
+          "input": "small.dsculpt",
+          "pose_weight": "p0-w100",
+          "maxerror": 0,
+          "coverage": 1915,
+          "geometry_max": 5.96046e-08
+        }
+      ],
+      "sensitivity": [
+        {
+          "pose_weight": "p0-w100",
+          "maxdelta": 255
+        }
+      ],
+      "authored_consumer_refusals": 0
+    },
+    {
+      "name": "avatars-v4",
+      "status": {
+        "state": "terminal",
+        "pid": 1445495,
+        "scope": "New complete matched-c092 consumer TU; real combined Scene29 owningkey+separate hiddenSource4 paint namespace, no same-object coupling claim. Actual worker packageexport/Open/Save, independent cgltf/PBR geometry/pixels, Restore/history; no app/HMD/session claim.",
+        "profile": "release",
+        "command": [
+          "nice",
+          "-n",
+          "15",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/build-release-v4/consumer",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v4/outputs",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/inputs/female.dsculpt",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/inputs/male.dsculpt"
+        ],
+        "child_pid": 1445602,
+        "exit": 0,
+        "seconds": 277.64011544000823,
+        "inputs": 2204,
+        "drift": [],
+        "outputs": {
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v4/outputs/case0/p0-w0-editable.glb": "ad3a01df14f40e1d198dd582202f996b7fc678aacc2224597b4b30343cb307c5",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v4/outputs/case0/p0-w0.native.rgba": "1f98fe49158280f06809f902a00272f99373370f4e117d229865f2805c0bea7b",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v4/outputs/case0/p0-w0.external.rgba": "1f98fe49158280f06809f902a00272f99373370f4e117d229865f2805c0bea7b",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v4/outputs/case0/p0-w0-recovered.dsculpt": "2111c231add16ae327cc540edb4e4e73b43f9c1556fbd1dbeb7668cc2dab5f0e",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v4/outputs/case0/p0-w0-standard.glb": "9ed7b4e0a5ee11da9d557ebee75f2117aaa7b24e0ab44138dd3520ed4bd0e744",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v4/outputs/case0/p0-w35-editable.glb": "248ac425978a350626b957705e46245a43ab14ae8cb2ed5d6cf00e537852e343",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v4/outputs/case0/p0-w35.native.rgba": "b9903b2491e0349a9fd7fabf3d887a60821a49519699a3145671fd0287686e6c",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v4/outputs/case0/p0-w35.external.rgba": "b9903b2491e0349a9fd7fabf3d887a60821a49519699a3145671fd0287686e6c",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v4/outputs/case0/p0-w35-recovered.dsculpt": "2a49ea8277f48863f3e41e982afacdea7c163c8b10cfca69b04a0b3c5cbb81fa",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v4/outputs/case0/p0-w35-standard.glb": "5955143963fc5049b4d4e0526aa306ade67d03db9c9ac721136eed85fff89a77",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v4/outputs/case0/p0-w100-editable.glb": "c56ad528f7b7f31d691222213d642d1e904328d9074fbce650d0a457bd1d486e",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v4/outputs/case0/p0-w100.native.rgba": "d63897c7bf0e1d281f8bad9e8553545db3133d730ae0394319da16b33ad08d26",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v4/outputs/case0/p0-w100.external.rgba": "d63897c7bf0e1d281f8bad9e8553545db3133d730ae0394319da16b33ad08d26",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v4/outputs/case0/p0-w100-recovered.dsculpt": "1f1a5657e6e1ac11d55aa53fe99f194c7d36a670d55289a61b800cdc1f794d2b",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v4/outputs/case0/p0-w100-standard.glb": "7fc3e24f8fcefd8ff1e4bca5cb72a0a618b20d837290b851c50ee2eb07b1e800",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v4/outputs/case0/p0-w100-standard.vrm": "ab537061d865c6c69b3f17b246489408930428fb72fcba36bb832d944a46b0d5",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v4/outputs/case0/p0-w100.authored-native.rgba": "4909851310cb97498814f84423853cb5e5ed98c6dda52fe3dbf3785d449919f9",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v4/outputs/case0/p0-w100-authored-consumer-negative.txt": "15cf7d301da8b248b9c1fd903754a7fa5cd79025a5511dcd63f26eacb2fbeec7",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v4/outputs/case0/p2-w0-editable.glb": "f299c2ac6fc92ceac0822aa1f77b0e3b539adf0b7eb30a47f6f63caec7505923",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v4/outputs/case0/p2-w0.native.rgba": "acc940e9918bca099e30ba6a8e818c15d6870eb8d6566395714c7afc84cb1db2",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v4/outputs/case0/p2-w0.external.rgba": "acc940e9918bca099e30ba6a8e818c15d6870eb8d6566395714c7afc84cb1db2",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v4/outputs/case0/p2-w0-recovered.dsculpt": "f3468645bbbec318c7c1b01143efca4edee0d13da7cc0ed65f1d31792deb2964",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v4/outputs/case0/p2-w0-standard.glb": "6a159f887cf60ebbec5f04a325391683b4787161f322fd1c2a51508c0b2b3c06",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v4/outputs/case0/p2-w35-editable.glb": "f1fb77881982b057b405486103a5d65bb1d1fe5411fd5732f9105251cb9a864a",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v4/outputs/case0/p2-w35.native.rgba": "b8711300128f2260098af29bbd41ea3235332ddbaf621fa7b244557fccb59390",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v4/outputs/case0/p2-w35.external.rgba": "b8711300128f2260098af29bbd41ea3235332ddbaf621fa7b244557fccb59390",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v4/outputs/case0/p2-w35-recovered.dsculpt": "13d4225b3edd8cc5f30ff8f312d54b4b61ebf982992c3e49c89d8694bcba0bcd",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v4/outputs/case0/p2-w35-standard.glb": "75f70b6bec783dd55ed57477f8557bd248607d1848c21c8c0a56f975f5c9ac65",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v4/outputs/case0/p2-w100-editable.glb": "371ffa6c038f67736114f41a96f889117019eff7b659c7ab564686d04286bcd2",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v4/outputs/case0/p2-w100.native.rgba": "1ac0c6884cd49c459806ac3cbb5543c68ae76cc68a671a5c339e91bae5284adc",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v4/outputs/case0/p2-w100.external.rgba": "1ac0c6884cd49c459806ac3cbb5543c68ae76cc68a671a5c339e91bae5284adc",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v4/outputs/case0/p2-w100-recovered.dsculpt": "5e288f324aa8716e4032d481a01d63a7949e8be93309d99777947eca26e46472",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v4/outputs/case0/p2-w100-standard.glb": "48fa381b491d61ed23e5bb4e790a8452dc6a07453e548c49f6127e83d99c5c5c",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v4/outputs/case0/p2-w100-standard.vrm": "f7ba10c0297a00cdfe7febe5bf06568779ed9530099718228c7c42b745636aa3",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v4/outputs/case0/p2-w100.authored-native.rgba": "dd9e121eb34d7f7cd5efb44c498f69d63989805886faa1db16a9581128e42554",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v4/outputs/case0/p2-w100-authored-consumer-negative.txt": "15cf7d301da8b248b9c1fd903754a7fa5cd79025a5511dcd63f26eacb2fbeec7",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v4/outputs/case1/p0-w0-editable.glb": "7dda4b1f0a5d20c3c638ebecf166577982c8511e4787bd6d9be2c12976014820",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v4/outputs/case1/p0-w0.native.rgba": "ef90b366520bab6cf6f135f689faa891826595bd86f619de549f2b74a002bbc8",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v4/outputs/case1/p0-w0.external.rgba": "ef90b366520bab6cf6f135f689faa891826595bd86f619de549f2b74a002bbc8",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v4/outputs/case1/p0-w0-recovered.dsculpt": "4088a72537bdf4b1d9b7b2ba76dc556519c135cc1333cd4ec06e415a7654758c",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v4/outputs/case1/p0-w0-standard.glb": "7a9ede16a390ae1ba46b06c073f309e80bc247f99e73d602e26df18584a89565",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v4/outputs/case1/p0-w35-editable.glb": "0a59d70a2b8d2ec1912828714b7dbf25062a90248afd9f213b9db91f2c4bdd67",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v4/outputs/case1/p0-w35.native.rgba": "576e19551afbb55c9ce8791425a464743a6a32ea699efd74780c91b7c1a86324",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v4/outputs/case1/p0-w35.external.rgba": "576e19551afbb55c9ce8791425a464743a6a32ea699efd74780c91b7c1a86324",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v4/outputs/case1/p0-w35-recovered.dsculpt": "5b9438c0921d16a2af89f86328916fcc33d5cf48e04afdaaa9e256416e0ccee8",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v4/outputs/case1/p0-w35-standard.glb": "52424b22eadc073d13e98bc04fbbee10c0ba38425469d986eb979d81d4869242",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v4/outputs/case1/p0-w100-editable.glb": "5c0c10ed443bff8c888ab465f1f1f990d6ec23f80f9e1ad1b17fc50772b7dbe8",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v4/outputs/case1/p0-w100.native.rgba": "141baebfff443ca9014439434f23e48d5597bc23885abad8a05bc538be4cc312",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v4/outputs/case1/p0-w100.external.rgba": "141baebfff443ca9014439434f23e48d5597bc23885abad8a05bc538be4cc312",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v4/outputs/case1/p0-w100-recovered.dsculpt": "a954b7b09d7e3732120a5ef7db3f166c7b9941a5374dc1b3817ecf3d4bc32a94",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v4/outputs/case1/p0-w100-standard.glb": "4df4de575b134a2246e20377246e08ece8f2f079cb03335c42b070ec57bfc75b",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v4/outputs/case1/p0-w100-standard.vrm": "e466141bd6e0bebc61eda008e5cce7bc462a2046376570f4b8c54b4f3ad05b72",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v4/outputs/case1/p0-w100.authored-native.rgba": "a5de005ab8b634aeec205f6bc8c939991051f9aa3c17e3c351f950446eccafd0",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v4/outputs/case1/p0-w100-authored-consumer-negative.txt": "15cf7d301da8b248b9c1fd903754a7fa5cd79025a5511dcd63f26eacb2fbeec7",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v4/outputs/case1/p2-w0-editable.glb": "32ee70766493b6acbd09ce7693f525250085be4ffceccef46a1f3260aeb44fd5",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v4/outputs/case1/p2-w0.native.rgba": "81e3b46fc4944b23100f8065e247129447ab2bc0e1a2d1a4623a647e970d5f4d",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v4/outputs/case1/p2-w0.external.rgba": "81e3b46fc4944b23100f8065e247129447ab2bc0e1a2d1a4623a647e970d5f4d",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v4/outputs/case1/p2-w0-recovered.dsculpt": "8bbf14166976ba26061102e287c62888a22af5b19da0daa30ee03106cc89375e",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v4/outputs/case1/p2-w0-standard.glb": "30758442d2284bf5bda9673497646e01e31493542adccad882248daefe2aedc8",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v4/outputs/case1/p2-w35-editable.glb": "8c2ffaa1c5beca82e4bab5e9fe9258decdc87da80605c1eefec4cc5cddbc5a7b",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v4/outputs/case1/p2-w35.native.rgba": "c79c9910e2b95bf54a289ac79a7a491d603bd04133192097a3d9230c2e2e963a",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v4/outputs/case1/p2-w35.external.rgba": "c79c9910e2b95bf54a289ac79a7a491d603bd04133192097a3d9230c2e2e963a",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v4/outputs/case1/p2-w35-recovered.dsculpt": "533a3d1341f22e9a298b6fe41b7024b1b384ff6735818c3732274a5aaa6499dd",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v4/outputs/case1/p2-w35-standard.glb": "c1fb75cc2a2b99f6e355019dc653a1f3cd9d92c9f85f8f4e8fac4d348065b54d",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v4/outputs/case1/p2-w100-editable.glb": "6dd995ab689bccecbd86845051cc1e35624c018467aa2b91374aa8644c410e49",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v4/outputs/case1/p2-w100.native.rgba": "d014eaf8bf3079156666f82955bfcaca6be0080c7e6cf9502d8d6d8a0087025f",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v4/outputs/case1/p2-w100.external.rgba": "d014eaf8bf3079156666f82955bfcaca6be0080c7e6cf9502d8d6d8a0087025f",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v4/outputs/case1/p2-w100-recovered.dsculpt": "2395761c742f2c64c51442b884bf5ab69b81c5cfd09c7a92a51690f7c02e8307",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v4/outputs/case1/p2-w100-standard.glb": "e6b754de6845145b017580f3df6e9929d131b06c9b72f91c222b503246323dd2",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v4/outputs/case1/p2-w100-standard.vrm": "5a70ec29f7c47ea167cb39727b56da40db6fdaae9c38de051b82a797e24216bb",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v4/outputs/case1/p2-w100.authored-native.rgba": "930660990f27d2107435c0465cd694a490fab7484b455514d971c8245ed1738e",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v4/outputs/case1/p2-w100-authored-consumer-negative.txt": "15cf7d301da8b248b9c1fd903754a7fa5cd79025a5511dcd63f26eacb2fbeec7"
+        }
+      },
+      "checks": 399,
+      "log": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v4/run.log",
+        "sha256": "3effa11f3849f6a3950820dea90e1ced3e22770c1752a4b5ab1fa9386c8b7707"
+      },
+      "before": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v4/before.json",
+        "sha256": "a7313d80369f224e0bedc8850b8b8912a69c41c0e3dcc20b57a1d313aefd124e"
+      },
+      "after": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v4/after.json",
+        "sha256": "a7313d80369f224e0bedc8850b8b8912a69c41c0e3dcc20b57a1d313aefd124e"
+      },
+      "frames": [
+        {
+          "input": "female.dsculpt",
+          "pose_weight": "p0-w0",
+          "maxerror": 0,
+          "coverage": 566,
+          "geometry_max": 2.68248e-07
+        },
+        {
+          "input": "female.dsculpt",
+          "pose_weight": "p0-w35",
+          "maxerror": 0,
+          "coverage": 566,
+          "geometry_max": 2.68248e-07
+        },
+        {
+          "input": "female.dsculpt",
+          "pose_weight": "p0-w100",
+          "maxerror": 0,
+          "coverage": 566,
+          "geometry_max": 2.68248e-07
+        },
+        {
+          "input": "female.dsculpt",
+          "pose_weight": "p2-w0",
+          "maxerror": 0,
+          "coverage": 539,
+          "geometry_max": 4.77084e-07
+        },
+        {
+          "input": "female.dsculpt",
+          "pose_weight": "p2-w35",
+          "maxerror": 0,
+          "coverage": 539,
+          "geometry_max": 4.77084e-07
+        },
+        {
+          "input": "female.dsculpt",
+          "pose_weight": "p2-w100",
+          "maxerror": 0,
+          "coverage": 539,
+          "geometry_max": 4.77084e-07
+        },
+        {
+          "input": "male.dsculpt",
+          "pose_weight": "p0-w0",
+          "maxerror": 0,
+          "coverage": 739,
+          "geometry_max": 1.8128e-07
+        },
+        {
+          "input": "male.dsculpt",
+          "pose_weight": "p0-w35",
+          "maxerror": 0,
+          "coverage": 739,
+          "geometry_max": 1.8128e-07
+        },
+        {
+          "input": "male.dsculpt",
+          "pose_weight": "p0-w100",
+          "maxerror": 0,
+          "coverage": 739,
+          "geometry_max": 1.8128e-07
+        },
+        {
+          "input": "male.dsculpt",
+          "pose_weight": "p2-w0",
+          "maxerror": 0,
+          "coverage": 717,
+          "geometry_max": 4.50991e-07
+        },
+        {
+          "input": "male.dsculpt",
+          "pose_weight": "p2-w35",
+          "maxerror": 0,
+          "coverage": 717,
+          "geometry_max": 4.50991e-07
+        },
+        {
+          "input": "male.dsculpt",
+          "pose_weight": "p2-w100",
+          "maxerror": 0,
+          "coverage": 715,
+          "geometry_max": 4.50991e-07
+        }
+      ],
+      "sensitivity": [
+        {
+          "pose_weight": "p0-w100",
+          "maxdelta": 135
+        },
+        {
+          "pose_weight": "p2-w100",
+          "maxdelta": 123
+        },
+        {
+          "pose_weight": "p0-w100",
+          "maxdelta": 66
+        },
+        {
+          "pose_weight": "p2-w100",
+          "maxdelta": 255
+        }
+      ],
+      "authored_consumer_refusals": 4
+    },
+    {
+      "name": "small-v4-sanitize",
+      "status": {
+        "state": "terminal",
+        "pid": 1454902,
+        "scope": "New complete matched-c092 consumer TU; real combined Scene29 owningkey+separate hiddenSource4 paint namespace, no same-object coupling claim. Actual worker packageexport/Open/Save, independent cgltf/PBR geometry/pixels, Restore/history; no app/HMD/session claim.",
+        "profile": "sanitize",
+        "command": [
+          "nice",
+          "-n",
+          "15",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/build-sanitize-v4/consumer",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/small-v4-sanitize/outputs",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/inputs/small.dsculpt"
+        ],
+        "child_pid": 1455038,
+        "exit": 0,
+        "seconds": 3.166597497998737,
+        "inputs": 2203,
+        "drift": [],
+        "outputs": {
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/small-v4-sanitize/outputs/case0/p0-w0-editable.glb": "298b7416595ac1c615b807895ab78410ccd9843793568f022911c14d42693f9c",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/small-v4-sanitize/outputs/case0/p0-w0.native.rgba": "0e645c915a20cdae1fed297aea20601ec6218e1a265a17483264ea99e98b8229",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/small-v4-sanitize/outputs/case0/p0-w0.external.rgba": "0e645c915a20cdae1fed297aea20601ec6218e1a265a17483264ea99e98b8229",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/small-v4-sanitize/outputs/case0/p0-w0-recovered.dsculpt": "f67d70062131e03c3846babab29de55c9374467f1244c4e28d33167f9a470806",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/small-v4-sanitize/outputs/case0/p0-w0-standard.glb": "14ed272f69d36d07aeadfa114edb60edc8414cd4f4698422ab2da4d03efd88e9",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/small-v4-sanitize/outputs/case0/p0-w35-editable.glb": "d9753cc899fdcfbb5608c203fafa59083abdf2d13bd22d68c2260785c2fd7ea7",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/small-v4-sanitize/outputs/case0/p0-w35.native.rgba": "b3f76cdff93a54927510779a8d8cf0f29b785ca0ece54200224169f85cf40dff",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/small-v4-sanitize/outputs/case0/p0-w35.external.rgba": "b3f76cdff93a54927510779a8d8cf0f29b785ca0ece54200224169f85cf40dff",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/small-v4-sanitize/outputs/case0/p0-w35-recovered.dsculpt": "c23361947c9d59ef1e5b66241cd2045f50465d65ef2970a2ef1b238fb428c53f",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/small-v4-sanitize/outputs/case0/p0-w35-standard.glb": "2aa12004a06e825aff63f6827f14dd8f92f269b0be36ac3da8a8f28681c4a7bc",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/small-v4-sanitize/outputs/case0/p0-w100-editable.glb": "11c96049808561d68d034a5de4715c73fd77c67cb373d4bce7dda3fcc9a32ed9",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/small-v4-sanitize/outputs/case0/p0-w100.native.rgba": "ce07bf5c117b9a18e12cc3885e2cd2b74cff6572b04251f01fc0b3dabc2d4219",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/small-v4-sanitize/outputs/case0/p0-w100.external.rgba": "ce07bf5c117b9a18e12cc3885e2cd2b74cff6572b04251f01fc0b3dabc2d4219",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/small-v4-sanitize/outputs/case0/p0-w100-recovered.dsculpt": "f5ea337b2a3d849e7bb52926ea5e13b6bca22b47f024413526ea9e33d7b3614f",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/small-v4-sanitize/outputs/case0/p0-w100-standard.glb": "917e268db0d95d34a7ee0b52c97643e2ee949bc6bdebcf9213c62bf3c044a125"
+        }
+      },
+      "checks": 45,
+      "log": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/small-v4-sanitize/run.log",
+        "sha256": "13275eeadf581b77f52013e5b42bc3018055af510f2daa51eba4b31660c45b3e"
+      },
+      "before": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/small-v4-sanitize/before.json",
+        "sha256": "b84ef776301c664c152369220ed97aef9b9a8a3a59ff4f49b9fbe7870cce4f62"
+      },
+      "after": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/small-v4-sanitize/after.json",
+        "sha256": "b84ef776301c664c152369220ed97aef9b9a8a3a59ff4f49b9fbe7870cce4f62"
+      },
+      "frames": [
+        {
+          "input": "small.dsculpt",
+          "pose_weight": "p0-w0",
+          "maxerror": 0,
+          "coverage": 1920,
+          "geometry_max": 4.21468e-08
+        },
+        {
+          "input": "small.dsculpt",
+          "pose_weight": "p0-w35",
+          "maxerror": 0,
+          "coverage": 1872,
+          "geometry_max": 4.21468e-08
+        },
+        {
+          "input": "small.dsculpt",
+          "pose_weight": "p0-w100",
+          "maxerror": 0,
+          "coverage": 1915,
+          "geometry_max": 5.96046e-08
+        }
+      ],
+      "sensitivity": [
+        {
+          "pose_weight": "p0-w100",
+          "maxdelta": 255
+        }
+      ],
+      "authored_consumer_refusals": 0
+    },
+    {
+      "name": "avatars-v4-sanitize",
+      "status": {
+        "state": "terminal",
+        "pid": 1457093,
+        "scope": "New complete matched-c092 consumer TU; real combined Scene29 owningkey+separate hiddenSource4 paint namespace, no same-object coupling claim. Actual worker packageexport/Open/Save, independent cgltf/PBR geometry/pixels, Restore/history; no app/HMD/session claim.",
+        "profile": "sanitize",
+        "command": [
+          "nice",
+          "-n",
+          "15",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/build-sanitize-v4/consumer",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v4-sanitize/outputs",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/inputs/female.dsculpt",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/inputs/male.dsculpt"
+        ],
+        "child_pid": 1457302,
+        "exit": 0,
+        "seconds": 1906.3117430270067,
+        "inputs": 2204,
+        "drift": [],
+        "outputs": {
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v4-sanitize/outputs/case0/p0-w0-editable.glb": "ad3a01df14f40e1d198dd582202f996b7fc678aacc2224597b4b30343cb307c5",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v4-sanitize/outputs/case0/p0-w0.native.rgba": "1f98fe49158280f06809f902a00272f99373370f4e117d229865f2805c0bea7b",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v4-sanitize/outputs/case0/p0-w0.external.rgba": "1f98fe49158280f06809f902a00272f99373370f4e117d229865f2805c0bea7b",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v4-sanitize/outputs/case0/p0-w0-recovered.dsculpt": "2111c231add16ae327cc540edb4e4e73b43f9c1556fbd1dbeb7668cc2dab5f0e",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v4-sanitize/outputs/case0/p0-w0-standard.glb": "9ed7b4e0a5ee11da9d557ebee75f2117aaa7b24e0ab44138dd3520ed4bd0e744",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v4-sanitize/outputs/case0/p0-w35-editable.glb": "248ac425978a350626b957705e46245a43ab14ae8cb2ed5d6cf00e537852e343",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v4-sanitize/outputs/case0/p0-w35.native.rgba": "b9903b2491e0349a9fd7fabf3d887a60821a49519699a3145671fd0287686e6c",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v4-sanitize/outputs/case0/p0-w35.external.rgba": "b9903b2491e0349a9fd7fabf3d887a60821a49519699a3145671fd0287686e6c",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v4-sanitize/outputs/case0/p0-w35-recovered.dsculpt": "2a49ea8277f48863f3e41e982afacdea7c163c8b10cfca69b04a0b3c5cbb81fa",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v4-sanitize/outputs/case0/p0-w35-standard.glb": "5955143963fc5049b4d4e0526aa306ade67d03db9c9ac721136eed85fff89a77",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v4-sanitize/outputs/case0/p0-w100-editable.glb": "c56ad528f7b7f31d691222213d642d1e904328d9074fbce650d0a457bd1d486e",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v4-sanitize/outputs/case0/p0-w100.native.rgba": "d63897c7bf0e1d281f8bad9e8553545db3133d730ae0394319da16b33ad08d26",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v4-sanitize/outputs/case0/p0-w100.external.rgba": "d63897c7bf0e1d281f8bad9e8553545db3133d730ae0394319da16b33ad08d26",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v4-sanitize/outputs/case0/p0-w100-recovered.dsculpt": "1f1a5657e6e1ac11d55aa53fe99f194c7d36a670d55289a61b800cdc1f794d2b",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v4-sanitize/outputs/case0/p0-w100-standard.glb": "7fc3e24f8fcefd8ff1e4bca5cb72a0a618b20d837290b851c50ee2eb07b1e800",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v4-sanitize/outputs/case0/p0-w100-standard.vrm": "ab537061d865c6c69b3f17b246489408930428fb72fcba36bb832d944a46b0d5",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v4-sanitize/outputs/case0/p0-w100.authored-native.rgba": "4909851310cb97498814f84423853cb5e5ed98c6dda52fe3dbf3785d449919f9",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v4-sanitize/outputs/case0/p0-w100-authored-consumer-negative.txt": "15cf7d301da8b248b9c1fd903754a7fa5cd79025a5511dcd63f26eacb2fbeec7",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v4-sanitize/outputs/case0/p2-w0-editable.glb": "f299c2ac6fc92ceac0822aa1f77b0e3b539adf0b7eb30a47f6f63caec7505923",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v4-sanitize/outputs/case0/p2-w0.native.rgba": "acc940e9918bca099e30ba6a8e818c15d6870eb8d6566395714c7afc84cb1db2",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v4-sanitize/outputs/case0/p2-w0.external.rgba": "acc940e9918bca099e30ba6a8e818c15d6870eb8d6566395714c7afc84cb1db2",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v4-sanitize/outputs/case0/p2-w0-recovered.dsculpt": "f3468645bbbec318c7c1b01143efca4edee0d13da7cc0ed65f1d31792deb2964",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v4-sanitize/outputs/case0/p2-w0-standard.glb": "6a159f887cf60ebbec5f04a325391683b4787161f322fd1c2a51508c0b2b3c06",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v4-sanitize/outputs/case0/p2-w35-editable.glb": "f1fb77881982b057b405486103a5d65bb1d1fe5411fd5732f9105251cb9a864a",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v4-sanitize/outputs/case0/p2-w35.native.rgba": "b8711300128f2260098af29bbd41ea3235332ddbaf621fa7b244557fccb59390",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v4-sanitize/outputs/case0/p2-w35.external.rgba": "b8711300128f2260098af29bbd41ea3235332ddbaf621fa7b244557fccb59390",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v4-sanitize/outputs/case0/p2-w35-recovered.dsculpt": "13d4225b3edd8cc5f30ff8f312d54b4b61ebf982992c3e49c89d8694bcba0bcd",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v4-sanitize/outputs/case0/p2-w35-standard.glb": "75f70b6bec783dd55ed57477f8557bd248607d1848c21c8c0a56f975f5c9ac65",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v4-sanitize/outputs/case0/p2-w100-editable.glb": "371ffa6c038f67736114f41a96f889117019eff7b659c7ab564686d04286bcd2",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v4-sanitize/outputs/case0/p2-w100.native.rgba": "1ac0c6884cd49c459806ac3cbb5543c68ae76cc68a671a5c339e91bae5284adc",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v4-sanitize/outputs/case0/p2-w100.external.rgba": "1ac0c6884cd49c459806ac3cbb5543c68ae76cc68a671a5c339e91bae5284adc",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v4-sanitize/outputs/case0/p2-w100-recovered.dsculpt": "5e288f324aa8716e4032d481a01d63a7949e8be93309d99777947eca26e46472",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v4-sanitize/outputs/case0/p2-w100-standard.glb": "48fa381b491d61ed23e5bb4e790a8452dc6a07453e548c49f6127e83d99c5c5c",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v4-sanitize/outputs/case0/p2-w100-standard.vrm": "f7ba10c0297a00cdfe7febe5bf06568779ed9530099718228c7c42b745636aa3",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v4-sanitize/outputs/case0/p2-w100.authored-native.rgba": "dd9e121eb34d7f7cd5efb44c498f69d63989805886faa1db16a9581128e42554",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v4-sanitize/outputs/case0/p2-w100-authored-consumer-negative.txt": "15cf7d301da8b248b9c1fd903754a7fa5cd79025a5511dcd63f26eacb2fbeec7",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v4-sanitize/outputs/case1/p0-w0-editable.glb": "7dda4b1f0a5d20c3c638ebecf166577982c8511e4787bd6d9be2c12976014820",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v4-sanitize/outputs/case1/p0-w0.native.rgba": "ef90b366520bab6cf6f135f689faa891826595bd86f619de549f2b74a002bbc8",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v4-sanitize/outputs/case1/p0-w0.external.rgba": "ef90b366520bab6cf6f135f689faa891826595bd86f619de549f2b74a002bbc8",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v4-sanitize/outputs/case1/p0-w0-recovered.dsculpt": "4088a72537bdf4b1d9b7b2ba76dc556519c135cc1333cd4ec06e415a7654758c",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v4-sanitize/outputs/case1/p0-w0-standard.glb": "7a9ede16a390ae1ba46b06c073f309e80bc247f99e73d602e26df18584a89565",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v4-sanitize/outputs/case1/p0-w35-editable.glb": "0a59d70a2b8d2ec1912828714b7dbf25062a90248afd9f213b9db91f2c4bdd67",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v4-sanitize/outputs/case1/p0-w35.native.rgba": "576e19551afbb55c9ce8791425a464743a6a32ea699efd74780c91b7c1a86324",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v4-sanitize/outputs/case1/p0-w35.external.rgba": "576e19551afbb55c9ce8791425a464743a6a32ea699efd74780c91b7c1a86324",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v4-sanitize/outputs/case1/p0-w35-recovered.dsculpt": "5b9438c0921d16a2af89f86328916fcc33d5cf48e04afdaaa9e256416e0ccee8",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v4-sanitize/outputs/case1/p0-w35-standard.glb": "52424b22eadc073d13e98bc04fbbee10c0ba38425469d986eb979d81d4869242",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v4-sanitize/outputs/case1/p0-w100-editable.glb": "5c0c10ed443bff8c888ab465f1f1f990d6ec23f80f9e1ad1b17fc50772b7dbe8",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v4-sanitize/outputs/case1/p0-w100.native.rgba": "141baebfff443ca9014439434f23e48d5597bc23885abad8a05bc538be4cc312",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v4-sanitize/outputs/case1/p0-w100.external.rgba": "141baebfff443ca9014439434f23e48d5597bc23885abad8a05bc538be4cc312",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v4-sanitize/outputs/case1/p0-w100-recovered.dsculpt": "a954b7b09d7e3732120a5ef7db3f166c7b9941a5374dc1b3817ecf3d4bc32a94",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v4-sanitize/outputs/case1/p0-w100-standard.glb": "4df4de575b134a2246e20377246e08ece8f2f079cb03335c42b070ec57bfc75b",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v4-sanitize/outputs/case1/p0-w100-standard.vrm": "e466141bd6e0bebc61eda008e5cce7bc462a2046376570f4b8c54b4f3ad05b72",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v4-sanitize/outputs/case1/p0-w100.authored-native.rgba": "a5de005ab8b634aeec205f6bc8c939991051f9aa3c17e3c351f950446eccafd0",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v4-sanitize/outputs/case1/p0-w100-authored-consumer-negative.txt": "15cf7d301da8b248b9c1fd903754a7fa5cd79025a5511dcd63f26eacb2fbeec7",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v4-sanitize/outputs/case1/p2-w0-editable.glb": "32ee70766493b6acbd09ce7693f525250085be4ffceccef46a1f3260aeb44fd5",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v4-sanitize/outputs/case1/p2-w0.native.rgba": "81e3b46fc4944b23100f8065e247129447ab2bc0e1a2d1a4623a647e970d5f4d",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v4-sanitize/outputs/case1/p2-w0.external.rgba": "81e3b46fc4944b23100f8065e247129447ab2bc0e1a2d1a4623a647e970d5f4d",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v4-sanitize/outputs/case1/p2-w0-recovered.dsculpt": "8bbf14166976ba26061102e287c62888a22af5b19da0daa30ee03106cc89375e",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v4-sanitize/outputs/case1/p2-w0-standard.glb": "30758442d2284bf5bda9673497646e01e31493542adccad882248daefe2aedc8",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v4-sanitize/outputs/case1/p2-w35-editable.glb": "8c2ffaa1c5beca82e4bab5e9fe9258decdc87da80605c1eefec4cc5cddbc5a7b",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v4-sanitize/outputs/case1/p2-w35.native.rgba": "c79c9910e2b95bf54a289ac79a7a491d603bd04133192097a3d9230c2e2e963a",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v4-sanitize/outputs/case1/p2-w35.external.rgba": "c79c9910e2b95bf54a289ac79a7a491d603bd04133192097a3d9230c2e2e963a",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v4-sanitize/outputs/case1/p2-w35-recovered.dsculpt": "533a3d1341f22e9a298b6fe41b7024b1b384ff6735818c3732274a5aaa6499dd",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v4-sanitize/outputs/case1/p2-w35-standard.glb": "c1fb75cc2a2b99f6e355019dc653a1f3cd9d92c9f85f8f4e8fac4d348065b54d",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v4-sanitize/outputs/case1/p2-w100-editable.glb": "6dd995ab689bccecbd86845051cc1e35624c018467aa2b91374aa8644c410e49",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v4-sanitize/outputs/case1/p2-w100.native.rgba": "d014eaf8bf3079156666f82955bfcaca6be0080c7e6cf9502d8d6d8a0087025f",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v4-sanitize/outputs/case1/p2-w100.external.rgba": "d014eaf8bf3079156666f82955bfcaca6be0080c7e6cf9502d8d6d8a0087025f",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v4-sanitize/outputs/case1/p2-w100-recovered.dsculpt": "2395761c742f2c64c51442b884bf5ab69b81c5cfd09c7a92a51690f7c02e8307",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v4-sanitize/outputs/case1/p2-w100-standard.glb": "e6b754de6845145b017580f3df6e9929d131b06c9b72f91c222b503246323dd2",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v4-sanitize/outputs/case1/p2-w100-standard.vrm": "5a70ec29f7c47ea167cb39727b56da40db6fdaae9c38de051b82a797e24216bb",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v4-sanitize/outputs/case1/p2-w100.authored-native.rgba": "930660990f27d2107435c0465cd694a490fab7484b455514d971c8245ed1738e",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v4-sanitize/outputs/case1/p2-w100-authored-consumer-negative.txt": "15cf7d301da8b248b9c1fd903754a7fa5cd79025a5511dcd63f26eacb2fbeec7"
+        }
+      },
+      "checks": 399,
+      "log": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v4-sanitize/run.log",
+        "sha256": "3effa11f3849f6a3950820dea90e1ced3e22770c1752a4b5ab1fa9386c8b7707"
+      },
+      "before": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v4-sanitize/before.json",
+        "sha256": "b90deab177414819ceab4dfe520cb7fd24ceaa1159d36047c793887326f3b8e9"
+      },
+      "after": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v4-sanitize/after.json",
+        "sha256": "b90deab177414819ceab4dfe520cb7fd24ceaa1159d36047c793887326f3b8e9"
+      },
+      "frames": [
+        {
+          "input": "female.dsculpt",
+          "pose_weight": "p0-w0",
+          "maxerror": 0,
+          "coverage": 566,
+          "geometry_max": 2.68248e-07
+        },
+        {
+          "input": "female.dsculpt",
+          "pose_weight": "p0-w35",
+          "maxerror": 0,
+          "coverage": 566,
+          "geometry_max": 2.68248e-07
+        },
+        {
+          "input": "female.dsculpt",
+          "pose_weight": "p0-w100",
+          "maxerror": 0,
+          "coverage": 566,
+          "geometry_max": 2.68248e-07
+        },
+        {
+          "input": "female.dsculpt",
+          "pose_weight": "p2-w0",
+          "maxerror": 0,
+          "coverage": 539,
+          "geometry_max": 4.77084e-07
+        },
+        {
+          "input": "female.dsculpt",
+          "pose_weight": "p2-w35",
+          "maxerror": 0,
+          "coverage": 539,
+          "geometry_max": 4.77084e-07
+        },
+        {
+          "input": "female.dsculpt",
+          "pose_weight": "p2-w100",
+          "maxerror": 0,
+          "coverage": 539,
+          "geometry_max": 4.77084e-07
+        },
+        {
+          "input": "male.dsculpt",
+          "pose_weight": "p0-w0",
+          "maxerror": 0,
+          "coverage": 739,
+          "geometry_max": 1.8128e-07
+        },
+        {
+          "input": "male.dsculpt",
+          "pose_weight": "p0-w35",
+          "maxerror": 0,
+          "coverage": 739,
+          "geometry_max": 1.8128e-07
+        },
+        {
+          "input": "male.dsculpt",
+          "pose_weight": "p0-w100",
+          "maxerror": 0,
+          "coverage": 739,
+          "geometry_max": 1.8128e-07
+        },
+        {
+          "input": "male.dsculpt",
+          "pose_weight": "p2-w0",
+          "maxerror": 0,
+          "coverage": 717,
+          "geometry_max": 4.50991e-07
+        },
+        {
+          "input": "male.dsculpt",
+          "pose_weight": "p2-w35",
+          "maxerror": 0,
+          "coverage": 717,
+          "geometry_max": 4.50991e-07
+        },
+        {
+          "input": "male.dsculpt",
+          "pose_weight": "p2-w100",
+          "maxerror": 0,
+          "coverage": 715,
+          "geometry_max": 4.50991e-07
+        }
+      ],
+      "sensitivity": [
+        {
+          "pose_weight": "p0-w100",
+          "maxdelta": 135
+        },
+        {
+          "pose_weight": "p2-w100",
+          "maxdelta": 123
+        },
+        {
+          "pose_weight": "p0-w100",
+          "maxdelta": 66
+        },
+        {
+          "pose_weight": "p2-w100",
+          "maxdelta": 255
+        }
+      ],
+      "authored_consumer_refusals": 4
+    },
+    {
+      "name": "arc-v4",
+      "status": {
+        "state": "terminal",
+        "pid": 1667864,
+        "scope": "New complete matched-c092 consumer TU; real combined Scene29 owningkey+separate hiddenSource4 paint namespace, no same-object coupling claim. Actual worker packageexport/Open/Save, independent cgltf/PBR geometry/pixels, Restore/history; no app/HMD/session claim.",
+        "profile": "release",
+        "command": [
+          "nice",
+          "-n",
+          "15",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/build-release-v4/consumer",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/arc-v4/outputs",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/inputs/small.dsculpt",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/inputs/female.dsculpt",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/inputs/male.dsculpt",
+          "--hardware"
+        ],
+        "child_pid": 1668022,
+        "exit": 0,
+        "seconds": 362.81042876301217,
+        "inputs": 2205,
+        "drift": [],
+        "outputs": {
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/arc-v4/outputs/case0/p0-w0-editable.glb": "298b7416595ac1c615b807895ab78410ccd9843793568f022911c14d42693f9c",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/arc-v4/outputs/case0/p0-w0.native.rgba": "6bc7faf4218be7c296967e13fc01023f61ccc014c26ffd3e80d42c75c1051d29",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/arc-v4/outputs/case0/p0-w0.external.rgba": "6bc7faf4218be7c296967e13fc01023f61ccc014c26ffd3e80d42c75c1051d29",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/arc-v4/outputs/case0/p0-w0-recovered.dsculpt": "f67d70062131e03c3846babab29de55c9374467f1244c4e28d33167f9a470806",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/arc-v4/outputs/case0/p0-w0-standard.glb": "14ed272f69d36d07aeadfa114edb60edc8414cd4f4698422ab2da4d03efd88e9",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/arc-v4/outputs/case0/p0-w35-editable.glb": "d9753cc899fdcfbb5608c203fafa59083abdf2d13bd22d68c2260785c2fd7ea7",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/arc-v4/outputs/case0/p0-w35.native.rgba": "5b67bda0425858e5a7a70c9fb857081321ef3ef0e412e475bed918d0ed53f3ea",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/arc-v4/outputs/case0/p0-w35.external.rgba": "5b67bda0425858e5a7a70c9fb857081321ef3ef0e412e475bed918d0ed53f3ea",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/arc-v4/outputs/case0/p0-w35-recovered.dsculpt": "c23361947c9d59ef1e5b66241cd2045f50465d65ef2970a2ef1b238fb428c53f",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/arc-v4/outputs/case0/p0-w35-standard.glb": "2aa12004a06e825aff63f6827f14dd8f92f269b0be36ac3da8a8f28681c4a7bc",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/arc-v4/outputs/case0/p0-w100-editable.glb": "11c96049808561d68d034a5de4715c73fd77c67cb373d4bce7dda3fcc9a32ed9",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/arc-v4/outputs/case0/p0-w100.native.rgba": "24bb5e4bb3b8f0d2ec984021744797c81b975212c168da1dbd6cac950d80a897",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/arc-v4/outputs/case0/p0-w100.external.rgba": "24bb5e4bb3b8f0d2ec984021744797c81b975212c168da1dbd6cac950d80a897",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/arc-v4/outputs/case0/p0-w100-recovered.dsculpt": "f5ea337b2a3d849e7bb52926ea5e13b6bca22b47f024413526ea9e33d7b3614f",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/arc-v4/outputs/case0/p0-w100-standard.glb": "917e268db0d95d34a7ee0b52c97643e2ee949bc6bdebcf9213c62bf3c044a125",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/arc-v4/outputs/case1/p0-w0-editable.glb": "ad3a01df14f40e1d198dd582202f996b7fc678aacc2224597b4b30343cb307c5",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/arc-v4/outputs/case1/p0-w0.native.rgba": "df2619eb9e71163711f1936b5a5edf972e738001a1105c4648ee083e825a78a9",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/arc-v4/outputs/case1/p0-w0.external.rgba": "df2619eb9e71163711f1936b5a5edf972e738001a1105c4648ee083e825a78a9",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/arc-v4/outputs/case1/p0-w0-recovered.dsculpt": "2111c231add16ae327cc540edb4e4e73b43f9c1556fbd1dbeb7668cc2dab5f0e",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/arc-v4/outputs/case1/p0-w0-standard.glb": "9ed7b4e0a5ee11da9d557ebee75f2117aaa7b24e0ab44138dd3520ed4bd0e744",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/arc-v4/outputs/case1/p0-w35-editable.glb": "248ac425978a350626b957705e46245a43ab14ae8cb2ed5d6cf00e537852e343",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/arc-v4/outputs/case1/p0-w35.native.rgba": "d4b808fa2d2ff7d8a76bc937ccdb52cb822d74d407beec6514102ea6593d3088",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/arc-v4/outputs/case1/p0-w35.external.rgba": "d4b808fa2d2ff7d8a76bc937ccdb52cb822d74d407beec6514102ea6593d3088",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/arc-v4/outputs/case1/p0-w35-recovered.dsculpt": "2a49ea8277f48863f3e41e982afacdea7c163c8b10cfca69b04a0b3c5cbb81fa",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/arc-v4/outputs/case1/p0-w35-standard.glb": "5955143963fc5049b4d4e0526aa306ade67d03db9c9ac721136eed85fff89a77",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/arc-v4/outputs/case1/p0-w100-editable.glb": "c56ad528f7b7f31d691222213d642d1e904328d9074fbce650d0a457bd1d486e",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/arc-v4/outputs/case1/p0-w100.native.rgba": "75c523db42651568319f1acf63385dc9808aa182d428543639865669821ecb72",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/arc-v4/outputs/case1/p0-w100.external.rgba": "75c523db42651568319f1acf63385dc9808aa182d428543639865669821ecb72",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/arc-v4/outputs/case1/p0-w100-recovered.dsculpt": "1f1a5657e6e1ac11d55aa53fe99f194c7d36a670d55289a61b800cdc1f794d2b",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/arc-v4/outputs/case1/p0-w100-standard.glb": "7fc3e24f8fcefd8ff1e4bca5cb72a0a618b20d837290b851c50ee2eb07b1e800",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/arc-v4/outputs/case1/p0-w100-standard.vrm": "ab537061d865c6c69b3f17b246489408930428fb72fcba36bb832d944a46b0d5",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/arc-v4/outputs/case1/p0-w100.authored-native.rgba": "35d50e0cbb80d626b6c4b2f9e4b675cee328744ecf06ed23472e83efb46d8bf0",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/arc-v4/outputs/case1/p0-w100-authored-consumer-negative.txt": "15cf7d301da8b248b9c1fd903754a7fa5cd79025a5511dcd63f26eacb2fbeec7",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/arc-v4/outputs/case1/p2-w0-editable.glb": "f299c2ac6fc92ceac0822aa1f77b0e3b539adf0b7eb30a47f6f63caec7505923",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/arc-v4/outputs/case1/p2-w0.native.rgba": "5323c2b5e57d20a323a7eb7a704e2d06a806a19e674c4ba3a19459d437e03bc7",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/arc-v4/outputs/case1/p2-w0.external.rgba": "5323c2b5e57d20a323a7eb7a704e2d06a806a19e674c4ba3a19459d437e03bc7",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/arc-v4/outputs/case1/p2-w0-recovered.dsculpt": "f3468645bbbec318c7c1b01143efca4edee0d13da7cc0ed65f1d31792deb2964",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/arc-v4/outputs/case1/p2-w0-standard.glb": "6a159f887cf60ebbec5f04a325391683b4787161f322fd1c2a51508c0b2b3c06",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/arc-v4/outputs/case1/p2-w35-editable.glb": "f1fb77881982b057b405486103a5d65bb1d1fe5411fd5732f9105251cb9a864a",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/arc-v4/outputs/case1/p2-w35.native.rgba": "7273b4d4ecb37aa559c470c38573c8bd42f72104cd48cd3ded912f9f725835cd",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/arc-v4/outputs/case1/p2-w35.external.rgba": "7273b4d4ecb37aa559c470c38573c8bd42f72104cd48cd3ded912f9f725835cd",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/arc-v4/outputs/case1/p2-w35-recovered.dsculpt": "13d4225b3edd8cc5f30ff8f312d54b4b61ebf982992c3e49c89d8694bcba0bcd",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/arc-v4/outputs/case1/p2-w35-standard.glb": "75f70b6bec783dd55ed57477f8557bd248607d1848c21c8c0a56f975f5c9ac65",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/arc-v4/outputs/case1/p2-w100-editable.glb": "371ffa6c038f67736114f41a96f889117019eff7b659c7ab564686d04286bcd2",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/arc-v4/outputs/case1/p2-w100.native.rgba": "e8376933ecf836f5b9ec5c490063eda032bff44802b6cbf94f9d8b92444a6149",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/arc-v4/outputs/case1/p2-w100.external.rgba": "e8376933ecf836f5b9ec5c490063eda032bff44802b6cbf94f9d8b92444a6149",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/arc-v4/outputs/case1/p2-w100-recovered.dsculpt": "5e288f324aa8716e4032d481a01d63a7949e8be93309d99777947eca26e46472",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/arc-v4/outputs/case1/p2-w100-standard.glb": "48fa381b491d61ed23e5bb4e790a8452dc6a07453e548c49f6127e83d99c5c5c",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/arc-v4/outputs/case1/p2-w100-standard.vrm": "f7ba10c0297a00cdfe7febe5bf06568779ed9530099718228c7c42b745636aa3",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/arc-v4/outputs/case1/p2-w100.authored-native.rgba": "a2bacec416465e42fc9711350b36d6f07d7c7c8288fd2c30761d921797d0f60c",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/arc-v4/outputs/case1/p2-w100-authored-consumer-negative.txt": "15cf7d301da8b248b9c1fd903754a7fa5cd79025a5511dcd63f26eacb2fbeec7",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/arc-v4/outputs/case2/p0-w0-editable.glb": "7dda4b1f0a5d20c3c638ebecf166577982c8511e4787bd6d9be2c12976014820",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/arc-v4/outputs/case2/p0-w0.native.rgba": "cc0994cab6c3f9964c7e7d20918c7e13d5145e803f7d7c23053f5bc9b11f2532",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/arc-v4/outputs/case2/p0-w0.external.rgba": "cc0994cab6c3f9964c7e7d20918c7e13d5145e803f7d7c23053f5bc9b11f2532",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/arc-v4/outputs/case2/p0-w0-recovered.dsculpt": "4088a72537bdf4b1d9b7b2ba76dc556519c135cc1333cd4ec06e415a7654758c",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/arc-v4/outputs/case2/p0-w0-standard.glb": "7a9ede16a390ae1ba46b06c073f309e80bc247f99e73d602e26df18584a89565",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/arc-v4/outputs/case2/p0-w35-editable.glb": "0a59d70a2b8d2ec1912828714b7dbf25062a90248afd9f213b9db91f2c4bdd67",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/arc-v4/outputs/case2/p0-w35.native.rgba": "7a87f3b615950986804d357d2212b696d8326b4975cc020ff8771e107520c952",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/arc-v4/outputs/case2/p0-w35.external.rgba": "7a87f3b615950986804d357d2212b696d8326b4975cc020ff8771e107520c952",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/arc-v4/outputs/case2/p0-w35-recovered.dsculpt": "5b9438c0921d16a2af89f86328916fcc33d5cf48e04afdaaa9e256416e0ccee8",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/arc-v4/outputs/case2/p0-w35-standard.glb": "52424b22eadc073d13e98bc04fbbee10c0ba38425469d986eb979d81d4869242",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/arc-v4/outputs/case2/p0-w100-editable.glb": "5c0c10ed443bff8c888ab465f1f1f990d6ec23f80f9e1ad1b17fc50772b7dbe8",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/arc-v4/outputs/case2/p0-w100.native.rgba": "7972990a925ac5e6a8b453c5e25f79781e9b55187e6d265cade803a3db3f4286",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/arc-v4/outputs/case2/p0-w100.external.rgba": "7972990a925ac5e6a8b453c5e25f79781e9b55187e6d265cade803a3db3f4286",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/arc-v4/outputs/case2/p0-w100-recovered.dsculpt": "a954b7b09d7e3732120a5ef7db3f166c7b9941a5374dc1b3817ecf3d4bc32a94",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/arc-v4/outputs/case2/p0-w100-standard.glb": "4df4de575b134a2246e20377246e08ece8f2f079cb03335c42b070ec57bfc75b",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/arc-v4/outputs/case2/p0-w100-standard.vrm": "e466141bd6e0bebc61eda008e5cce7bc462a2046376570f4b8c54b4f3ad05b72",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/arc-v4/outputs/case2/p0-w100.authored-native.rgba": "96bf83540e40e3cb260218c4824e84fda836656a26a179e6605ac5f150d00156",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/arc-v4/outputs/case2/p0-w100-authored-consumer-negative.txt": "15cf7d301da8b248b9c1fd903754a7fa5cd79025a5511dcd63f26eacb2fbeec7",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/arc-v4/outputs/case2/p2-w0-editable.glb": "32ee70766493b6acbd09ce7693f525250085be4ffceccef46a1f3260aeb44fd5",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/arc-v4/outputs/case2/p2-w0.native.rgba": "f4e4c31e2bbdad224bf56f2b46e57ddee07f8f1edd49b652a614f1cdbc9bc64d",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/arc-v4/outputs/case2/p2-w0.external.rgba": "f4e4c31e2bbdad224bf56f2b46e57ddee07f8f1edd49b652a614f1cdbc9bc64d",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/arc-v4/outputs/case2/p2-w0-recovered.dsculpt": "8bbf14166976ba26061102e287c62888a22af5b19da0daa30ee03106cc89375e",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/arc-v4/outputs/case2/p2-w0-standard.glb": "30758442d2284bf5bda9673497646e01e31493542adccad882248daefe2aedc8",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/arc-v4/outputs/case2/p2-w35-editable.glb": "8c2ffaa1c5beca82e4bab5e9fe9258decdc87da80605c1eefec4cc5cddbc5a7b",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/arc-v4/outputs/case2/p2-w35.native.rgba": "0544fd3f106de9e9ba88da531216c86103a3f80779b49b7e8425a12927b5362e",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/arc-v4/outputs/case2/p2-w35.external.rgba": "0544fd3f106de9e9ba88da531216c86103a3f80779b49b7e8425a12927b5362e",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/arc-v4/outputs/case2/p2-w35-recovered.dsculpt": "533a3d1341f22e9a298b6fe41b7024b1b384ff6735818c3732274a5aaa6499dd",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/arc-v4/outputs/case2/p2-w35-standard.glb": "c1fb75cc2a2b99f6e355019dc653a1f3cd9d92c9f85f8f4e8fac4d348065b54d",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/arc-v4/outputs/case2/p2-w100-editable.glb": "6dd995ab689bccecbd86845051cc1e35624c018467aa2b91374aa8644c410e49",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/arc-v4/outputs/case2/p2-w100.native.rgba": "ba878c1356072b90ca88e112d7a9a85166f28f5137d4307782dbf02f271ef45b",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/arc-v4/outputs/case2/p2-w100.external.rgba": "ba878c1356072b90ca88e112d7a9a85166f28f5137d4307782dbf02f271ef45b",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/arc-v4/outputs/case2/p2-w100-recovered.dsculpt": "2395761c742f2c64c51442b884bf5ab69b81c5cfd09c7a92a51690f7c02e8307",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/arc-v4/outputs/case2/p2-w100-standard.glb": "e6b754de6845145b017580f3df6e9929d131b06c9b72f91c222b503246323dd2",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/arc-v4/outputs/case2/p2-w100-standard.vrm": "5a70ec29f7c47ea167cb39727b56da40db6fdaae9c38de051b82a797e24216bb",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/arc-v4/outputs/case2/p2-w100.authored-native.rgba": "d4c325ffaec1dbe68329901c946b4626714a796b5abbbe62ae45421ad95c6499",
+          "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/arc-v4/outputs/case2/p2-w100-authored-consumer-negative.txt": "15cf7d301da8b248b9c1fd903754a7fa5cd79025a5511dcd63f26eacb2fbeec7"
+        }
+      },
+      "checks": 443,
+      "log": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/arc-v4/run.log",
+        "sha256": "df3ed0246bfcef263e8680239676652d121a88ff01eab7ced9fd828b656bf1d8"
+      },
+      "before": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/arc-v4/before.json",
+        "sha256": "825a99393a8d74d639410636831397e6589bd54012f08aa0a1566fce0b4e65db"
+      },
+      "after": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/arc-v4/after.json",
+        "sha256": "825a99393a8d74d639410636831397e6589bd54012f08aa0a1566fce0b4e65db"
+      },
+      "frames": [
+        {
+          "input": "small.dsculpt",
+          "pose_weight": "p0-w0",
+          "maxerror": 0,
+          "coverage": 1920,
+          "geometry_max": 4.21468e-08
+        },
+        {
+          "input": "small.dsculpt",
+          "pose_weight": "p0-w35",
+          "maxerror": 0,
+          "coverage": 1872,
+          "geometry_max": 4.21468e-08
+        },
+        {
+          "input": "small.dsculpt",
+          "pose_weight": "p0-w100",
+          "maxerror": 0,
+          "coverage": 1915,
+          "geometry_max": 5.96046e-08
+        },
+        {
+          "input": "female.dsculpt",
+          "pose_weight": "p0-w0",
+          "maxerror": 0,
+          "coverage": 566,
+          "geometry_max": 2.68248e-07
+        },
+        {
+          "input": "female.dsculpt",
+          "pose_weight": "p0-w35",
+          "maxerror": 0,
+          "coverage": 566,
+          "geometry_max": 2.68248e-07
+        },
+        {
+          "input": "female.dsculpt",
+          "pose_weight": "p0-w100",
+          "maxerror": 0,
+          "coverage": 566,
+          "geometry_max": 2.68248e-07
+        },
+        {
+          "input": "female.dsculpt",
+          "pose_weight": "p2-w0",
+          "maxerror": 0,
+          "coverage": 539,
+          "geometry_max": 4.77084e-07
+        },
+        {
+          "input": "female.dsculpt",
+          "pose_weight": "p2-w35",
+          "maxerror": 0,
+          "coverage": 539,
+          "geometry_max": 4.77084e-07
+        },
+        {
+          "input": "female.dsculpt",
+          "pose_weight": "p2-w100",
+          "maxerror": 0,
+          "coverage": 539,
+          "geometry_max": 4.77084e-07
+        },
+        {
+          "input": "male.dsculpt",
+          "pose_weight": "p0-w0",
+          "maxerror": 0,
+          "coverage": 739,
+          "geometry_max": 1.8128e-07
+        },
+        {
+          "input": "male.dsculpt",
+          "pose_weight": "p0-w35",
+          "maxerror": 0,
+          "coverage": 739,
+          "geometry_max": 1.8128e-07
+        },
+        {
+          "input": "male.dsculpt",
+          "pose_weight": "p0-w100",
+          "maxerror": 0,
+          "coverage": 739,
+          "geometry_max": 1.8128e-07
+        },
+        {
+          "input": "male.dsculpt",
+          "pose_weight": "p2-w0",
+          "maxerror": 0,
+          "coverage": 717,
+          "geometry_max": 4.50991e-07
+        },
+        {
+          "input": "male.dsculpt",
+          "pose_weight": "p2-w35",
+          "maxerror": 0,
+          "coverage": 717,
+          "geometry_max": 4.50991e-07
+        },
+        {
+          "input": "male.dsculpt",
+          "pose_weight": "p2-w100",
+          "maxerror": 0,
+          "coverage": 715,
+          "geometry_max": 4.50991e-07
+        }
+      ],
+      "sensitivity": [
+        {
+          "pose_weight": "p0-w100",
+          "maxdelta": 255
+        },
+        {
+          "pose_weight": "p0-w100",
+          "maxdelta": 135
+        },
+        {
+          "pose_weight": "p2-w100",
+          "maxdelta": 124
+        },
+        {
+          "pose_weight": "p0-w100",
+          "maxdelta": 66
+        },
+        {
+          "pose_weight": "p2-w100",
+          "maxdelta": 255
+        }
+      ],
+      "authored_consumer_refusals": 4
+    }
+  ],
+  "software_hardware_control": {
+    "status": {
+      "actual_child_exit": 1,
+      "expected_refusal": true,
+      "command": [
+        "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/build-release-v4/consumer",
+        "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/software-hardware-refusal/unused-output",
+        "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/inputs/small.dsculpt",
+        "--hardware"
+      ],
+      "seconds": 0.10423206200357527,
+      "drift": [],
+      "scope": "Forcedsoftware --hardware must refuse before Scene load; no device used or hardware success claim."
+    },
+    "log": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/software-hardware-refusal/run.log",
+      "sha256": "d3bed2012462d1469274ea72f50fb4844166b775ab555bdd0b7fd1918567ab29"
+    }
+  },
+  "registered_small": {
+    "exit": 0,
+    "seconds": 0.42062329800683074,
+    "registered_count": 591,
+    "test": {
+      "backtrace": 1181,
+      "command": [
+        "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/build-release-v4/graph/dome-sculpt-native-key-package-render-test",
+        "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/build-release-v4/graph/native-key-package-render",
+        "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/build-release-v4/graph/native-key-package-cycle/case0/combined.dsculpt"
+      ],
+      "name": "native-key-package-render",
+      "properties": [
+        {
+          "name": "DEPENDS",
+          "value": [
+            "native-key-package-cycle"
+          ]
+        },
+        {
+          "name": "ENVIRONMENT",
+          "value": [
+            "EGL_PLATFORM=surfaceless",
+            "LIBGL_ALWAYS_SOFTWARE=1",
+            "LP_NUM_THREADS=2"
+          ]
+        },
+        {
+          "name": "FIXTURES_REQUIRED",
+          "value": [
+            "native-combined-render-input"
+          ]
+        },
+        {
+          "name": "TIMEOUT",
+          "value": 1800.0
+        },
+        {
+          "name": "WORKING_DIRECTORY",
+          "value": "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/build-release-v4/graph"
+        }
+      ]
+    },
+    "command": [
+      "ctest",
+      "--test-dir",
+      "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/build-release-v4/graph",
+      "--output-on-failure",
+      "-R",
+      "^native-key-package-render$",
+      "-FA",
+      "^native-combined-render-input$"
+    ],
+    "scope": "Actual registered small consumer command only; byte-exact existing fixture staged and -FA omits qualified setup regeneration. No all591 or freshcore claim.",
+    "fixture_sha256": "7c701c4fd2deaf0317238563903b03ca14c7013b3ae94fa0260fb6c196ea67d7",
+    "binary_sha256": "f72e43a63338082c47f44f98bbe0371d6c82d81fa3257d63275086910340fa0c"
+  },
+  "validation": {
+    "khronos": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/khronos-release-v4.json",
+      "sha256": "50837a5284016575aa2cf0017468b970ee5ee8e12449a15c1f0ac0edaf910475"
+    },
+    "version": "2.0.0-dev.3.10",
+    "maxIssues": 0,
+    "files": 34,
+    "errors": 0,
+    "warnings": 542,
+    "infos": 252,
+    "official_vrm": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/official-vrm-release-v4.json",
+      "sha256": "5c1d1514ad58f28d3ea49ace6f242f4468c2c92468485e04b43a2424683746bd"
+    },
+    "vrm_instances": 4,
+    "vrm_errors": 0,
+    "vrm_primary_pin": "94e82dd346fa6cf0337c4421728640e5252dd38e"
+  },
+  "release_sanitize_outputs": {
+    "report": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/profile-output-identity.json",
+      "sha256": "2f4305846e3d65e31e1246d8a36e5f8f3a1b4aab38140c6e63926eedf2772fcb"
+    },
+    "files": 87,
+    "all_exact": true
+  },
+  "hardware_core_native_output_identity": [
+    {
+      "file": "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/arc-v4/outputs/case0/p0-w0-editable.glb",
+      "sha256": "298b7416595ac1c615b807895ab78410ccd9843793568f022911c14d42693f9c",
+      "release": "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/small-v4/outputs/case0/p0-w0-editable.glb",
+      "equal": true
+    },
+    {
+      "file": "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/arc-v4/outputs/case0/p0-w0-recovered.dsculpt",
+      "sha256": "f67d70062131e03c3846babab29de55c9374467f1244c4e28d33167f9a470806",
+      "release": "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/small-v4/outputs/case0/p0-w0-recovered.dsculpt",
+      "equal": true
+    },
+    {
+      "file": "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/arc-v4/outputs/case0/p0-w0-standard.glb",
+      "sha256": "14ed272f69d36d07aeadfa114edb60edc8414cd4f4698422ab2da4d03efd88e9",
+      "release": "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/small-v4/outputs/case0/p0-w0-standard.glb",
+      "equal": true
+    },
+    {
+      "file": "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/arc-v4/outputs/case0/p0-w35-editable.glb",
+      "sha256": "d9753cc899fdcfbb5608c203fafa59083abdf2d13bd22d68c2260785c2fd7ea7",
+      "release": "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/small-v4/outputs/case0/p0-w35-editable.glb",
+      "equal": true
+    },
+    {
+      "file": "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/arc-v4/outputs/case0/p0-w35-recovered.dsculpt",
+      "sha256": "c23361947c9d59ef1e5b66241cd2045f50465d65ef2970a2ef1b238fb428c53f",
+      "release": "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/small-v4/outputs/case0/p0-w35-recovered.dsculpt",
+      "equal": true
+    },
+    {
+      "file": "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/arc-v4/outputs/case0/p0-w35-standard.glb",
+      "sha256": "2aa12004a06e825aff63f6827f14dd8f92f269b0be36ac3da8a8f28681c4a7bc",
+      "release": "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/small-v4/outputs/case0/p0-w35-standard.glb",
+      "equal": true
+    },
+    {
+      "file": "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/arc-v4/outputs/case0/p0-w100-editable.glb",
+      "sha256": "11c96049808561d68d034a5de4715c73fd77c67cb373d4bce7dda3fcc9a32ed9",
+      "release": "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/small-v4/outputs/case0/p0-w100-editable.glb",
+      "equal": true
+    },
+    {
+      "file": "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/arc-v4/outputs/case0/p0-w100-recovered.dsculpt",
+      "sha256": "f5ea337b2a3d849e7bb52926ea5e13b6bca22b47f024413526ea9e33d7b3614f",
+      "release": "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/small-v4/outputs/case0/p0-w100-recovered.dsculpt",
+      "equal": true
+    },
+    {
+      "file": "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/arc-v4/outputs/case0/p0-w100-standard.glb",
+      "sha256": "917e268db0d95d34a7ee0b52c97643e2ee949bc6bdebcf9213c62bf3c044a125",
+      "release": "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/small-v4/outputs/case0/p0-w100-standard.glb",
+      "equal": true
+    },
+    {
+      "file": "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/arc-v4/outputs/case1/p0-w0-editable.glb",
+      "sha256": "ad3a01df14f40e1d198dd582202f996b7fc678aacc2224597b4b30343cb307c5",
+      "release": "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v4/outputs/case0/p0-w0-editable.glb",
+      "equal": true
+    },
+    {
+      "file": "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/arc-v4/outputs/case1/p0-w0-recovered.dsculpt",
+      "sha256": "2111c231add16ae327cc540edb4e4e73b43f9c1556fbd1dbeb7668cc2dab5f0e",
+      "release": "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v4/outputs/case0/p0-w0-recovered.dsculpt",
+      "equal": true
+    },
+    {
+      "file": "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/arc-v4/outputs/case1/p0-w0-standard.glb",
+      "sha256": "9ed7b4e0a5ee11da9d557ebee75f2117aaa7b24e0ab44138dd3520ed4bd0e744",
+      "release": "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v4/outputs/case0/p0-w0-standard.glb",
+      "equal": true
+    },
+    {
+      "file": "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/arc-v4/outputs/case1/p0-w35-editable.glb",
+      "sha256": "248ac425978a350626b957705e46245a43ab14ae8cb2ed5d6cf00e537852e343",
+      "release": "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v4/outputs/case0/p0-w35-editable.glb",
+      "equal": true
+    },
+    {
+      "file": "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/arc-v4/outputs/case1/p0-w35-recovered.dsculpt",
+      "sha256": "2a49ea8277f48863f3e41e982afacdea7c163c8b10cfca69b04a0b3c5cbb81fa",
+      "release": "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v4/outputs/case0/p0-w35-recovered.dsculpt",
+      "equal": true
+    },
+    {
+      "file": "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/arc-v4/outputs/case1/p0-w35-standard.glb",
+      "sha256": "5955143963fc5049b4d4e0526aa306ade67d03db9c9ac721136eed85fff89a77",
+      "release": "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v4/outputs/case0/p0-w35-standard.glb",
+      "equal": true
+    },
+    {
+      "file": "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/arc-v4/outputs/case1/p0-w100-editable.glb",
+      "sha256": "c56ad528f7b7f31d691222213d642d1e904328d9074fbce650d0a457bd1d486e",
+      "release": "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v4/outputs/case0/p0-w100-editable.glb",
+      "equal": true
+    },
+    {
+      "file": "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/arc-v4/outputs/case1/p0-w100-recovered.dsculpt",
+      "sha256": "1f1a5657e6e1ac11d55aa53fe99f194c7d36a670d55289a61b800cdc1f794d2b",
+      "release": "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v4/outputs/case0/p0-w100-recovered.dsculpt",
+      "equal": true
+    },
+    {
+      "file": "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/arc-v4/outputs/case1/p0-w100-standard.glb",
+      "sha256": "7fc3e24f8fcefd8ff1e4bca5cb72a0a618b20d837290b851c50ee2eb07b1e800",
+      "release": "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v4/outputs/case0/p0-w100-standard.glb",
+      "equal": true
+    },
+    {
+      "file": "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/arc-v4/outputs/case1/p0-w100-standard.vrm",
+      "sha256": "ab537061d865c6c69b3f17b246489408930428fb72fcba36bb832d944a46b0d5",
+      "release": "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v4/outputs/case0/p0-w100-standard.vrm",
+      "equal": true
+    },
+    {
+      "file": "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/arc-v4/outputs/case1/p2-w0-editable.glb",
+      "sha256": "f299c2ac6fc92ceac0822aa1f77b0e3b539adf0b7eb30a47f6f63caec7505923",
+      "release": "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v4/outputs/case0/p2-w0-editable.glb",
+      "equal": true
+    },
+    {
+      "file": "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/arc-v4/outputs/case1/p2-w0-recovered.dsculpt",
+      "sha256": "f3468645bbbec318c7c1b01143efca4edee0d13da7cc0ed65f1d31792deb2964",
+      "release": "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v4/outputs/case0/p2-w0-recovered.dsculpt",
+      "equal": true
+    },
+    {
+      "file": "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/arc-v4/outputs/case1/p2-w0-standard.glb",
+      "sha256": "6a159f887cf60ebbec5f04a325391683b4787161f322fd1c2a51508c0b2b3c06",
+      "release": "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v4/outputs/case0/p2-w0-standard.glb",
+      "equal": true
+    },
+    {
+      "file": "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/arc-v4/outputs/case1/p2-w35-editable.glb",
+      "sha256": "f1fb77881982b057b405486103a5d65bb1d1fe5411fd5732f9105251cb9a864a",
+      "release": "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v4/outputs/case0/p2-w35-editable.glb",
+      "equal": true
+    },
+    {
+      "file": "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/arc-v4/outputs/case1/p2-w35-recovered.dsculpt",
+      "sha256": "13d4225b3edd8cc5f30ff8f312d54b4b61ebf982992c3e49c89d8694bcba0bcd",
+      "release": "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v4/outputs/case0/p2-w35-recovered.dsculpt",
+      "equal": true
+    },
+    {
+      "file": "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/arc-v4/outputs/case1/p2-w35-standard.glb",
+      "sha256": "75f70b6bec783dd55ed57477f8557bd248607d1848c21c8c0a56f975f5c9ac65",
+      "release": "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v4/outputs/case0/p2-w35-standard.glb",
+      "equal": true
+    },
+    {
+      "file": "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/arc-v4/outputs/case1/p2-w100-editable.glb",
+      "sha256": "371ffa6c038f67736114f41a96f889117019eff7b659c7ab564686d04286bcd2",
+      "release": "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v4/outputs/case0/p2-w100-editable.glb",
+      "equal": true
+    },
+    {
+      "file": "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/arc-v4/outputs/case1/p2-w100-recovered.dsculpt",
+      "sha256": "5e288f324aa8716e4032d481a01d63a7949e8be93309d99777947eca26e46472",
+      "release": "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v4/outputs/case0/p2-w100-recovered.dsculpt",
+      "equal": true
+    },
+    {
+      "file": "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/arc-v4/outputs/case1/p2-w100-standard.glb",
+      "sha256": "48fa381b491d61ed23e5bb4e790a8452dc6a07453e548c49f6127e83d99c5c5c",
+      "release": "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v4/outputs/case0/p2-w100-standard.glb",
+      "equal": true
+    },
+    {
+      "file": "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/arc-v4/outputs/case1/p2-w100-standard.vrm",
+      "sha256": "f7ba10c0297a00cdfe7febe5bf06568779ed9530099718228c7c42b745636aa3",
+      "release": "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v4/outputs/case0/p2-w100-standard.vrm",
+      "equal": true
+    },
+    {
+      "file": "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/arc-v4/outputs/case2/p0-w0-editable.glb",
+      "sha256": "7dda4b1f0a5d20c3c638ebecf166577982c8511e4787bd6d9be2c12976014820",
+      "release": "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v4/outputs/case1/p0-w0-editable.glb",
+      "equal": true
+    },
+    {
+      "file": "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/arc-v4/outputs/case2/p0-w0-recovered.dsculpt",
+      "sha256": "4088a72537bdf4b1d9b7b2ba76dc556519c135cc1333cd4ec06e415a7654758c",
+      "release": "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v4/outputs/case1/p0-w0-recovered.dsculpt",
+      "equal": true
+    },
+    {
+      "file": "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/arc-v4/outputs/case2/p0-w0-standard.glb",
+      "sha256": "7a9ede16a390ae1ba46b06c073f309e80bc247f99e73d602e26df18584a89565",
+      "release": "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v4/outputs/case1/p0-w0-standard.glb",
+      "equal": true
+    },
+    {
+      "file": "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/arc-v4/outputs/case2/p0-w35-editable.glb",
+      "sha256": "0a59d70a2b8d2ec1912828714b7dbf25062a90248afd9f213b9db91f2c4bdd67",
+      "release": "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v4/outputs/case1/p0-w35-editable.glb",
+      "equal": true
+    },
+    {
+      "file": "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/arc-v4/outputs/case2/p0-w35-recovered.dsculpt",
+      "sha256": "5b9438c0921d16a2af89f86328916fcc33d5cf48e04afdaaa9e256416e0ccee8",
+      "release": "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v4/outputs/case1/p0-w35-recovered.dsculpt",
+      "equal": true
+    },
+    {
+      "file": "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/arc-v4/outputs/case2/p0-w35-standard.glb",
+      "sha256": "52424b22eadc073d13e98bc04fbbee10c0ba38425469d986eb979d81d4869242",
+      "release": "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v4/outputs/case1/p0-w35-standard.glb",
+      "equal": true
+    },
+    {
+      "file": "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/arc-v4/outputs/case2/p0-w100-editable.glb",
+      "sha256": "5c0c10ed443bff8c888ab465f1f1f990d6ec23f80f9e1ad1b17fc50772b7dbe8",
+      "release": "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v4/outputs/case1/p0-w100-editable.glb",
+      "equal": true
+    },
+    {
+      "file": "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/arc-v4/outputs/case2/p0-w100-recovered.dsculpt",
+      "sha256": "a954b7b09d7e3732120a5ef7db3f166c7b9941a5374dc1b3817ecf3d4bc32a94",
+      "release": "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v4/outputs/case1/p0-w100-recovered.dsculpt",
+      "equal": true
+    },
+    {
+      "file": "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/arc-v4/outputs/case2/p0-w100-standard.glb",
+      "sha256": "4df4de575b134a2246e20377246e08ece8f2f079cb03335c42b070ec57bfc75b",
+      "release": "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v4/outputs/case1/p0-w100-standard.glb",
+      "equal": true
+    },
+    {
+      "file": "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/arc-v4/outputs/case2/p0-w100-standard.vrm",
+      "sha256": "e466141bd6e0bebc61eda008e5cce7bc462a2046376570f4b8c54b4f3ad05b72",
+      "release": "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v4/outputs/case1/p0-w100-standard.vrm",
+      "equal": true
+    },
+    {
+      "file": "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/arc-v4/outputs/case2/p2-w0-editable.glb",
+      "sha256": "32ee70766493b6acbd09ce7693f525250085be4ffceccef46a1f3260aeb44fd5",
+      "release": "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v4/outputs/case1/p2-w0-editable.glb",
+      "equal": true
+    },
+    {
+      "file": "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/arc-v4/outputs/case2/p2-w0-recovered.dsculpt",
+      "sha256": "8bbf14166976ba26061102e287c62888a22af5b19da0daa30ee03106cc89375e",
+      "release": "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v4/outputs/case1/p2-w0-recovered.dsculpt",
+      "equal": true
+    },
+    {
+      "file": "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/arc-v4/outputs/case2/p2-w0-standard.glb",
+      "sha256": "30758442d2284bf5bda9673497646e01e31493542adccad882248daefe2aedc8",
+      "release": "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v4/outputs/case1/p2-w0-standard.glb",
+      "equal": true
+    },
+    {
+      "file": "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/arc-v4/outputs/case2/p2-w35-editable.glb",
+      "sha256": "8c2ffaa1c5beca82e4bab5e9fe9258decdc87da80605c1eefec4cc5cddbc5a7b",
+      "release": "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v4/outputs/case1/p2-w35-editable.glb",
+      "equal": true
+    },
+    {
+      "file": "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/arc-v4/outputs/case2/p2-w35-recovered.dsculpt",
+      "sha256": "533a3d1341f22e9a298b6fe41b7024b1b384ff6735818c3732274a5aaa6499dd",
+      "release": "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v4/outputs/case1/p2-w35-recovered.dsculpt",
+      "equal": true
+    },
+    {
+      "file": "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/arc-v4/outputs/case2/p2-w35-standard.glb",
+      "sha256": "c1fb75cc2a2b99f6e355019dc653a1f3cd9d92c9f85f8f4e8fac4d348065b54d",
+      "release": "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v4/outputs/case1/p2-w35-standard.glb",
+      "equal": true
+    },
+    {
+      "file": "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/arc-v4/outputs/case2/p2-w100-editable.glb",
+      "sha256": "6dd995ab689bccecbd86845051cc1e35624c018467aa2b91374aa8644c410e49",
+      "release": "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v4/outputs/case1/p2-w100-editable.glb",
+      "equal": true
+    },
+    {
+      "file": "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/arc-v4/outputs/case2/p2-w100-recovered.dsculpt",
+      "sha256": "2395761c742f2c64c51442b884bf5ab69b81c5cfd09c7a92a51690f7c02e8307",
+      "release": "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v4/outputs/case1/p2-w100-recovered.dsculpt",
+      "equal": true
+    },
+    {
+      "file": "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/arc-v4/outputs/case2/p2-w100-standard.glb",
+      "sha256": "e6b754de6845145b017580f3df6e9929d131b06c9b72f91c222b503246323dd2",
+      "release": "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v4/outputs/case1/p2-w100-standard.glb",
+      "equal": true
+    },
+    {
+      "file": "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/arc-v4/outputs/case2/p2-w100-standard.vrm",
+      "sha256": "5a70ec29f7c47ea167cb39727b56da40db6fdaae9c38de051b82a797e24216bb",
+      "release": "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v4/outputs/case1/p2-w100-standard.vrm",
+      "equal": true
+    }
+  ],
+  "inputs": {
+    "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/inputs/small.dsculpt": "7c701c4fd2deaf0317238563903b03ca14c7013b3ae94fa0260fb6c196ea67d7",
+    "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/inputs/female.dsculpt": "9f07a061e3252e96cb12c7be2959409b852ea4d24d8b41f20047059aaa596923",
+    "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/inputs/male.dsculpt": "d55cd5da80a1f0c7c2e74265245c849f2bfe84d3af23e0fa3ea0c42621f34f5d"
+  },
+  "previous_scope": {
+    "real_v2": {
+      "state": "terminal",
+      "pid": 1406344,
+      "scope": "New complete matched-c092 consumer TU; real combined Scene29 owningkey+separate hiddenSource4 paint namespace, no same-object coupling claim. Actual worker packageexport/Open/Save, independent cgltf/PBR geometry/pixels, Restore/history; no app/HMD/session claim.",
+      "profile": "release",
+      "command": [
+        "nice",
+        "-n",
+        "15",
+        "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/build-release-v2/consumer",
+        "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v2/outputs",
+        "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/inputs/female.dsculpt",
+        "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/inputs/male.dsculpt"
+      ],
+      "child_pid": 1406464,
+      "exit": 0,
+      "seconds": 256.7966877639992,
+      "inputs": 2204,
+      "drift": [],
+      "outputs": {
+        "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v2/outputs/case0/p0-w0-editable.glb": "ad3a01df14f40e1d198dd582202f996b7fc678aacc2224597b4b30343cb307c5",
+        "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v2/outputs/case0/p0-w0.native.rgba": "1f98fe49158280f06809f902a00272f99373370f4e117d229865f2805c0bea7b",
+        "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v2/outputs/case0/p0-w0.external.rgba": "1f98fe49158280f06809f902a00272f99373370f4e117d229865f2805c0bea7b",
+        "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v2/outputs/case0/p0-w0-recovered.dsculpt": "2111c231add16ae327cc540edb4e4e73b43f9c1556fbd1dbeb7668cc2dab5f0e",
+        "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v2/outputs/case0/p0-w0-standard.glb": "9ed7b4e0a5ee11da9d557ebee75f2117aaa7b24e0ab44138dd3520ed4bd0e744",
+        "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v2/outputs/case0/p0-w35-editable.glb": "248ac425978a350626b957705e46245a43ab14ae8cb2ed5d6cf00e537852e343",
+        "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v2/outputs/case0/p0-w35.native.rgba": "b9903b2491e0349a9fd7fabf3d887a60821a49519699a3145671fd0287686e6c",
+        "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v2/outputs/case0/p0-w35.external.rgba": "b9903b2491e0349a9fd7fabf3d887a60821a49519699a3145671fd0287686e6c",
+        "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v2/outputs/case0/p0-w35-recovered.dsculpt": "2a49ea8277f48863f3e41e982afacdea7c163c8b10cfca69b04a0b3c5cbb81fa",
+        "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v2/outputs/case0/p0-w35-standard.glb": "5955143963fc5049b4d4e0526aa306ade67d03db9c9ac721136eed85fff89a77",
+        "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v2/outputs/case0/p0-w100-editable.glb": "c56ad528f7b7f31d691222213d642d1e904328d9074fbce650d0a457bd1d486e",
+        "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v2/outputs/case0/p0-w100.native.rgba": "d63897c7bf0e1d281f8bad9e8553545db3133d730ae0394319da16b33ad08d26",
+        "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v2/outputs/case0/p0-w100.external.rgba": "d63897c7bf0e1d281f8bad9e8553545db3133d730ae0394319da16b33ad08d26",
+        "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v2/outputs/case0/p0-w100-recovered.dsculpt": "1f1a5657e6e1ac11d55aa53fe99f194c7d36a670d55289a61b800cdc1f794d2b",
+        "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v2/outputs/case0/p0-w100-standard.glb": "7fc3e24f8fcefd8ff1e4bca5cb72a0a618b20d837290b851c50ee2eb07b1e800",
+        "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v2/outputs/case0/p0-w100-standard.vrm": "ab537061d865c6c69b3f17b246489408930428fb72fcba36bb832d944a46b0d5",
+        "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v2/outputs/case0/p2-w0-editable.glb": "f299c2ac6fc92ceac0822aa1f77b0e3b539adf0b7eb30a47f6f63caec7505923",
+        "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v2/outputs/case0/p2-w0.native.rgba": "acc940e9918bca099e30ba6a8e818c15d6870eb8d6566395714c7afc84cb1db2",
+        "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v2/outputs/case0/p2-w0.external.rgba": "acc940e9918bca099e30ba6a8e818c15d6870eb8d6566395714c7afc84cb1db2",
+        "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v2/outputs/case0/p2-w0-recovered.dsculpt": "f3468645bbbec318c7c1b01143efca4edee0d13da7cc0ed65f1d31792deb2964",
+        "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v2/outputs/case0/p2-w0-standard.glb": "6a159f887cf60ebbec5f04a325391683b4787161f322fd1c2a51508c0b2b3c06",
+        "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v2/outputs/case0/p2-w35-editable.glb": "f1fb77881982b057b405486103a5d65bb1d1fe5411fd5732f9105251cb9a864a",
+        "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v2/outputs/case0/p2-w35.native.rgba": "b8711300128f2260098af29bbd41ea3235332ddbaf621fa7b244557fccb59390",
+        "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v2/outputs/case0/p2-w35.external.rgba": "b8711300128f2260098af29bbd41ea3235332ddbaf621fa7b244557fccb59390",
+        "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v2/outputs/case0/p2-w35-recovered.dsculpt": "13d4225b3edd8cc5f30ff8f312d54b4b61ebf982992c3e49c89d8694bcba0bcd",
+        "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v2/outputs/case0/p2-w35-standard.glb": "75f70b6bec783dd55ed57477f8557bd248607d1848c21c8c0a56f975f5c9ac65",
+        "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v2/outputs/case0/p2-w100-editable.glb": "371ffa6c038f67736114f41a96f889117019eff7b659c7ab564686d04286bcd2",
+        "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v2/outputs/case0/p2-w100.native.rgba": "1ac0c6884cd49c459806ac3cbb5543c68ae76cc68a671a5c339e91bae5284adc",
+        "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v2/outputs/case0/p2-w100.external.rgba": "1ac0c6884cd49c459806ac3cbb5543c68ae76cc68a671a5c339e91bae5284adc",
+        "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v2/outputs/case0/p2-w100-recovered.dsculpt": "5e288f324aa8716e4032d481a01d63a7949e8be93309d99777947eca26e46472",
+        "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v2/outputs/case0/p2-w100-standard.glb": "48fa381b491d61ed23e5bb4e790a8452dc6a07453e548c49f6127e83d99c5c5c",
+        "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v2/outputs/case0/p2-w100-standard.vrm": "f7ba10c0297a00cdfe7febe5bf06568779ed9530099718228c7c42b745636aa3",
+        "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v2/outputs/case1/p0-w0-editable.glb": "7dda4b1f0a5d20c3c638ebecf166577982c8511e4787bd6d9be2c12976014820",
+        "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v2/outputs/case1/p0-w0.native.rgba": "ef90b366520bab6cf6f135f689faa891826595bd86f619de549f2b74a002bbc8",
+        "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v2/outputs/case1/p0-w0.external.rgba": "ef90b366520bab6cf6f135f689faa891826595bd86f619de549f2b74a002bbc8",
+        "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v2/outputs/case1/p0-w0-recovered.dsculpt": "4088a72537bdf4b1d9b7b2ba76dc556519c135cc1333cd4ec06e415a7654758c",
+        "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v2/outputs/case1/p0-w0-standard.glb": "7a9ede16a390ae1ba46b06c073f309e80bc247f99e73d602e26df18584a89565",
+        "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v2/outputs/case1/p0-w35-editable.glb": "0a59d70a2b8d2ec1912828714b7dbf25062a90248afd9f213b9db91f2c4bdd67",
+        "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v2/outputs/case1/p0-w35.native.rgba": "576e19551afbb55c9ce8791425a464743a6a32ea699efd74780c91b7c1a86324",
+        "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v2/outputs/case1/p0-w35.external.rgba": "576e19551afbb55c9ce8791425a464743a6a32ea699efd74780c91b7c1a86324",
+        "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v2/outputs/case1/p0-w35-recovered.dsculpt": "5b9438c0921d16a2af89f86328916fcc33d5cf48e04afdaaa9e256416e0ccee8",
+        "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v2/outputs/case1/p0-w35-standard.glb": "52424b22eadc073d13e98bc04fbbee10c0ba38425469d986eb979d81d4869242",
+        "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v2/outputs/case1/p0-w100-editable.glb": "5c0c10ed443bff8c888ab465f1f1f990d6ec23f80f9e1ad1b17fc50772b7dbe8",
+        "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v2/outputs/case1/p0-w100.native.rgba": "141baebfff443ca9014439434f23e48d5597bc23885abad8a05bc538be4cc312",
+        "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v2/outputs/case1/p0-w100.external.rgba": "141baebfff443ca9014439434f23e48d5597bc23885abad8a05bc538be4cc312",
+        "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v2/outputs/case1/p0-w100-recovered.dsculpt": "a954b7b09d7e3732120a5ef7db3f166c7b9941a5374dc1b3817ecf3d4bc32a94",
+        "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v2/outputs/case1/p0-w100-standard.glb": "4df4de575b134a2246e20377246e08ece8f2f079cb03335c42b070ec57bfc75b",
+        "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v2/outputs/case1/p0-w100-standard.vrm": "e466141bd6e0bebc61eda008e5cce7bc462a2046376570f4b8c54b4f3ad05b72",
+        "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v2/outputs/case1/p2-w0-editable.glb": "32ee70766493b6acbd09ce7693f525250085be4ffceccef46a1f3260aeb44fd5",
+        "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v2/outputs/case1/p2-w0.native.rgba": "81e3b46fc4944b23100f8065e247129447ab2bc0e1a2d1a4623a647e970d5f4d",
+        "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v2/outputs/case1/p2-w0.external.rgba": "81e3b46fc4944b23100f8065e247129447ab2bc0e1a2d1a4623a647e970d5f4d",
+        "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v2/outputs/case1/p2-w0-recovered.dsculpt": "8bbf14166976ba26061102e287c62888a22af5b19da0daa30ee03106cc89375e",
+        "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v2/outputs/case1/p2-w0-standard.glb": "30758442d2284bf5bda9673497646e01e31493542adccad882248daefe2aedc8",
+        "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v2/outputs/case1/p2-w35-editable.glb": "8c2ffaa1c5beca82e4bab5e9fe9258decdc87da80605c1eefec4cc5cddbc5a7b",
+        "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v2/outputs/case1/p2-w35.native.rgba": "c79c9910e2b95bf54a289ac79a7a491d603bd04133192097a3d9230c2e2e963a",
+        "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v2/outputs/case1/p2-w35.external.rgba": "c79c9910e2b95bf54a289ac79a7a491d603bd04133192097a3d9230c2e2e963a",
+        "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v2/outputs/case1/p2-w35-recovered.dsculpt": "533a3d1341f22e9a298b6fe41b7024b1b384ff6735818c3732274a5aaa6499dd",
+        "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v2/outputs/case1/p2-w35-standard.glb": "c1fb75cc2a2b99f6e355019dc653a1f3cd9d92c9f85f8f4e8fac4d348065b54d",
+        "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v2/outputs/case1/p2-w100-editable.glb": "6dd995ab689bccecbd86845051cc1e35624c018467aa2b91374aa8644c410e49",
+        "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v2/outputs/case1/p2-w100.native.rgba": "d014eaf8bf3079156666f82955bfcaca6be0080c7e6cf9502d8d6d8a0087025f",
+        "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v2/outputs/case1/p2-w100.external.rgba": "d014eaf8bf3079156666f82955bfcaca6be0080c7e6cf9502d8d6d8a0087025f",
+        "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v2/outputs/case1/p2-w100-recovered.dsculpt": "2395761c742f2c64c51442b884bf5ab69b81c5cfd09c7a92a51690f7c02e8307",
+        "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v2/outputs/case1/p2-w100-standard.glb": "e6b754de6845145b017580f3df6e9929d131b06c9b72f91c222b503246323dd2",
+        "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/avatars-v2/outputs/case1/p2-w100-standard.vrm": "5a70ec29f7c47ea167cb39727b56da40db6fdaae9c38de051b82a797e24216bb"
+      }
+    },
+    "source": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/frozen-v2-test.cpp",
+      "sha256": "e4523f1ca9c1b5e3593192f5b6994bd2d3e00423ba5db89285bdf98925a134ed"
+    },
+    "scope": "387 real-avatar checks before final small native viewing placement and explicit authoredVRM consumer diagnostics. Preserved, not relabeled finalv4."
+  },
+  "negatives": [
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/build-release-setup-negative",
+      "scope": "Snapshot expected Ninja graph in Makefile parent; no compiler ran"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/small-initial",
+      "scope": "Wrong fixture classifier treated any Skeleton as fullavatar; before rendering"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/small-v2",
+      "scope": "PureZ .01..05 target frontalview maxpixel2; strict>2 failure preserved; finalnative rigidY viewing placement exposes actual motion, no target/material/oracle change"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/key29-source4-render-3050717/artifacts/proof/build-release-v3",
+      "scope": "Fixture used non-existent CanvasTransform.rotation; final uses actual orientation; compile-negative only"
+    }
+  ],
+  "limits": [
+    "Whole native payload retains genuine hiddenSource4 beside owningScene29 key. Focused visibleavatar rendering is NOT same-object coupled key+paint proof.",
+    "All actual roles/materials/source data unchanged. Doc authored/PBR is ephemeral; actualcoreGLB19materials lit, actualVRM16fallbackmaterials unlit. Original PBRfallback mismatch is diagnostic, not aVRM appearance comparison.",
+    "Correct authored view/Open pixels are0; existing independent all-roleVRM consumer refuses actualGI=.1. No external MToon color pass is claimed or forced by rewriting materials.",
+    "Existing original589 failures, especially legacyMirror/refinement workflows, are not fixed or reclassified. Root owns their adapter and nextcoherentunion.",
+    "New complete testTU linked only matching immutablec092 core/render/support; no fresh app/wholecore/current1fc-header mix/full591pass. Actual registeredsmall1/1, knownfixture staged/-FA excludes setup regeneration.",
+    "Nextcoherentapplication union requires qualifiedatlas8de, source-awareBake/cut, rootMirror repair, and currentpublishedIO/27SDK; not merged here.",
+    "No physicalHMD/GPUphysics/fullVRMphysics, systeminstall or sessionchange. Softwarellvmpipe and strictPCI03A770 are explicit separate scopes."
+  ]
+}

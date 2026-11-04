@@ -50,3 +50,15 @@ wrapper4149.83s includes waiting; actual case execution is2.21/226.78/202.72s.
 Source1699 inputs and artifact inputs remain exact, with no sanitizer diagnostics.
 This is not a new registered590-target sanitizer run, graphics proof, same-object
 key-and-paint compound deformation, headset acceptance or main admission.
+
+## Graphics follow-up
+
+The separate test-only native-key-package-render continuation now qualifies
+actual c092 Document rendering, EditableGlb256/export/Open/Save and Restore on
+these combined projects: Release/SAN45small+399real, strictA770443combined,
+all87 R/S artifacts identical and34unique Khronos/4officialVRM instances without
+errors. Read [NATIVE-KEY-PACKAGE-RENDER.md](NATIVE-KEY-PACKAGE-RENDER.md) for exact
+matched-component scope, unchanged4-pixel bound and preserved negatives. Hidden
+Source4 remains exact in the whole native payload; same-object coupled painting,
+full external MToonGI, Mirror construction/refinement and coherent latest-app
+qualification remain required. This does not reclassify the original589 failures.

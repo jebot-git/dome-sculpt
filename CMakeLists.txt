@@ -3062,3 +3062,15 @@ if(BUILD_TESTING AND TARGET dome-sculpt-source-paint-authoring-test
     FIXTURES_REQUIRED "native-key-cycle-input;native-paint-cycle-input"
     TIMEOUT 600 ENVIRONMENT "LIBGL_ALWAYS_SOFTWARE=1;LP_NUM_THREADS=2")
 endif()
+
+if(BUILD_TESTING AND TARGET dome-sculpt-render AND TARGET dome-sculpt-native-key-package-cycle-test)
+  add_executable(dome-sculpt-native-key-package-render-test tests/native-key-package-render.cpp)
+  target_include_directories(dome-sculpt-native-key-package-render-test PRIVATE src tests third_party/cgltf third_party/desktop)
+  target_link_libraries(dome-sculpt-native-key-package-render-test PRIVATE dome-sculpt-render)
+  set_property(TEST native-key-package-cycle APPEND PROPERTY FIXTURES_SETUP native-combined-render-input)
+  add_test(NAME native-key-package-render COMMAND dome-sculpt-native-key-package-render-test
+    ${CMAKE_CURRENT_BINARY_DIR}/native-key-package-render
+    ${CMAKE_CURRENT_BINARY_DIR}/native-key-package-cycle/case0/combined.dsculpt)
+  set_tests_properties(native-key-package-render PROPERTIES FIXTURES_REQUIRED native-combined-render-input
+    TIMEOUT 1800 ENVIRONMENT "EGL_PLATFORM=surfaceless;LIBGL_ALWAYS_SOFTWARE=1;LP_NUM_THREADS=2")
+endif()
