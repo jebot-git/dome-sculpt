@@ -43,6 +43,15 @@ else()
   message(FATAL_ERROR "Unknown DOME_COMPUTE_BACKEND=${DOME_COMPUTE_BACKEND}")
 endif()
 
+if(BUILD_TESTING AND TARGET dome-sculpt AND TARGET dome-sculpt-test-runtime AND TARGET dome-sculpt-canonical-normal-owning-test)
+  add_test(NAME canonical-normal-owning-openxr COMMAND ${Python3_EXECUTABLE}
+    ${CMAKE_CURRENT_SOURCE_DIR}/tests/canonical-normal-xr.py
+    $<TARGET_FILE:dome-sculpt> $<TARGET_FILE:dome-sculpt-test-runtime>
+    $<TARGET_FILE:dome-sculpt-canonical-normal-owning-test>
+    ${CMAKE_CURRENT_BINARY_DIR}/canonical-normal-owning-xr)
+  set_tests_properties(canonical-normal-owning-openxr PROPERTIES TIMEOUT 900)
+endif()
+
 # Sparse interpolation has a separate nearest-even binary64 contract. Keep
 # multiply/add boundaries identical to the integer GPU implementation even
 # when the caller enables native CPU/FMA optimization. Brush math is separate.

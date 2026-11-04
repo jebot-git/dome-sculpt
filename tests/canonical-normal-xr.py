@@ -2,6 +2,7 @@
 """Actual XR loader/stereo controls for explicit conversion; synthetic poses only."""
 import argparse,json,os,signal,subprocess,tempfile,time
 from pathlib import Path
+from PIL import Image
 signal.pthread_sigmask(signal.SIG_SETMASK,[])
 p=argparse.ArgumentParser(description=__doc__)
 for name in ('binary','runtime','helper','out'):p.add_argument(name,type=lambda v:Path(v).resolve())
@@ -36,6 +37,14 @@ with tempfile.TemporaryDirectory(prefix='dome-canonical-xr-')as home:
   check('llvmpipe'in detail.get('gl_renderer','').lower(),mode+': actual renderer is explicitly software rather than physical GPU qualification')
   check(detail.get('acquires',0)>0 and detail.get('acquires')==detail.get('image_waits')==detail.get('releases') and detail.get('left_eye_nonblank',0)>0 and detail.get('right_eye_nonblank',0)>0,mode+': actual GL stereo images balance ownership and both eyes contain output')
   check(all(detail.get('canonical_images',{}).get('34',{}).get(eye,0)>1000 for eye in ['0','1']),mode+': both captured real eyes display the open Source/cage controls before conversion input')
+  # Fixed synthetic camera, 1024px eyes and 640px panel put the conversion
+  # label here. The button blue/background fail this white-glyph predicate;
+  # geometry or an invisible hot rectangle cannot satisfy it.
+  label_pixels=[]
+  for eye in [0,1]:
+   image=Image.open(str(report)+'.canonical-34-'+str(eye)+'.ppm').convert('RGB')
+   label_pixels.append(image.size==(1024,1024)and sum(r>210 and g>215 and b>220 for r,g,b in image.crop((300,720,800,765)).get_flattened_data())>40)
+  check(all(label_pixels),mode+': actual bitmap conversion label is visible in both rendered eyes')
   check(source.read_bytes()==before,mode+': original native project bytes remain unchanged')
   if mode in ['accept','solo']:
    check(after['converted'] and after['scene']==wanted,mode+': actual joystick and held ray trigger publish exactly the independently produced native conversion')
