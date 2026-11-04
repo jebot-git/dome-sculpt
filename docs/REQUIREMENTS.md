@@ -1,5 +1,22 @@
 # Full objective and completion evidence
 
+## Private invariant-role VRM1 UV targets — 2026-11-05
+
+Runtime7e5f869 supports differing/zero targets only when actual upper roles are
+proved invariant from shared paint shade, all future coefficients, absent
+images or complete active-RGB image scans. Original lower sampling/targets stay
+exact; genuinely coupled/hidden-future roles still refuse. R/S five realworker
+cases, three coupled18-check failures with exact Save/history,324 independent
+pairs each max1 at unchanged4,940persistent/907Cancel (1853) and oldshared smoke
+pass. StrictPCI03 Arc1531/324pairs +actualsoftware refusal closed; lease released.
+Twenty writers:180official instances/KHR0errors128warnings336infos.648PNG+65native/
+container/control pairs exact;29current old-domain files/profile byte-identical
+ccc. Three complete directTUs/private product on matchingccc support, public/
+layout/schema/UI/freshapp/main unchanged. Configure651/14new is registrationonly.
+Full MASK/BLEND/widercoefficients/remainingroles/derived/native/physical/external
+consumer/currentrootunion and fullgoal remain open. SAME longSAN64560 remains
+unfinished. Read VRM1-INVARIANT-UV-EXPRESSIONS.md/JSON.
+
 ## Private shared base/shade VRM1 expressions — 2026-11-04
 
 Runtime f8f295e adds genuine shared-role independent colour paint using one
