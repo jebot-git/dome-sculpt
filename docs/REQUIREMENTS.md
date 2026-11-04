@@ -1,5 +1,20 @@
 # Full objective and completion evidence
 
+## Private owning canonical-normal conversion — 2026-11-04
+
+Explicit universal-menu/XR conversion now retains the genuine historical source
+through Scene31 replay, worker Cancel/Save/Undo/Redo, keys/Mirror and repeated UV
+edits. Native191+independent images378 pass each Release/ownedSAN; Arc379 and
+strict identity refusals pass. Public-factory411 persistent C++ allocation
+prefixes/all35 cancellation polls pass each, with original kernel69/all32 also
+retained. Actual FLTK normal/compact checks pass each profile.654 GLBs/VRMs have
+zero Khronos errors, with all492warnings/920infos retained; cross-device PNGmax1
+meets unchanged4, while the failed byte comparison stays recorded. Read
+CANONICAL-NORMAL-OWNING.md and receipt for precise fresh-build/component scope.
+This supersedes the kernel-only pending language below for this private branch;
+fresh whole integration/Wayland/newXR-loader and broader adapters remain before
+main admission. The complete original goal and later drawers remain unfinished.
+
 ## Coherent recipe regression and final fixture repairs — 2026-11-04
 
 The original complete615 Release run finishes613Pass/2Fail. Complete test-only
