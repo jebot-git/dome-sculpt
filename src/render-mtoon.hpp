@@ -49,7 +49,7 @@ uniform vec4 mt_effective_color,mt_native_color;uniform vec3 mt_effective_emissi
 uniform int mt_shade_alias,mt_baked_normal;
 uniform int mt_overlay,mt_absolute_background;uniform float mt_emission_strength;uniform vec3 mt_background;
 uniform samplerBuffer packedSources;
-uniform ivec4 mt_pack_levels[98],mt_pack_sampler[7];uniform ivec2 mt_pack_info[7];
+uniform ivec4 mt_pack_levels[98],mt_pack_sampler[4];uniform ivec2 mt_pack_info[4];
 vec2 mt_packed_wrap(vec2 q,ivec2 wrap){for(int axis=0;axis<2;++axis){
 if(wrap[axis]==10497)q[axis]=fract(q[axis]);
 else if(wrap[axis]==33648){float cell=floor(q[axis]);q[axis]=fract(q[axis]);if(mod(cell,2.)>=1.)q[axis]=1.-q[axis];}

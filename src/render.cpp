@@ -387,7 +387,7 @@ struct SurfaceRenderer::TextureState {
           toon.packed_srgb[1]=typed->textures[3].encoding==MToonEncoding::Srgb;
           if(toon.native_emission){
             // Emission uses the real original typed role, never a subtraction
-            // from a finite generic emission map. Only color correction needs0.
+            // from a finite generic emission map. Only color correction needs view0.
             for(size_t view=1;view<4;++view)toon.packed_views[view]={};
           }else{
             auto &coverage=toon.packed_views[3];coverage.image=std::shared_ptr<const Image>(maps,&maps->emission_coverage);
@@ -927,12 +927,12 @@ void SurfaceRenderer::draw(std::shared_ptr<const MeshSnapshot> mesh,
     if(t.derived||t.overlay) {
       if(t.derived){derived[0]=1;derived[3]=!t.native_emission;}
       const auto &pack=textures_->packed_sources.at(t.packed_inputs);
-      std::array<std::array<GLint,4>,MToonSourcePacks::view_count> sampling{};
+      std::array<std::array<GLint,4>,4> sampling{};
       for(size_t view=0;view<4;++view)sampling[view]=TextureState::sampler(t.packed_views[view]);
       glUniform1i(glGetUniformLocation(program_,"packedSources"),14);
       glUniform4iv(glGetUniformLocation(program_,"mt_pack_levels[0]"),GLsizei(MToonSourcePacks::view_count*14),pack.levels[0].data());
-      glUniform2iv(glGetUniformLocation(program_,"mt_pack_info[0]"),GLsizei(MToonSourcePacks::view_count),pack.info[0].data());
-      glUniform4iv(glGetUniformLocation(program_,"mt_pack_sampler[0]"),GLsizei(MToonSourcePacks::view_count),sampling[0].data());
+      glUniform2iv(glGetUniformLocation(program_,"mt_pack_info[0]"),4,pack.info[0].data());
+      glUniform4iv(glGetUniformLocation(program_,"mt_pack_sampler[0]"),4,sampling[0].data());
       const auto &uv=t.packed_views[2].uv_transform;
       pbrx[3]=uv[0];pbrx[4]=uv[1];pbrx[5]=uv[4];pbry[3]=uv[2];pbry[4]=uv[3];pbry[5]=uv[5];
     }
