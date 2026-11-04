@@ -5,6 +5,7 @@
 #include "material-visibility-seams.hpp"
 #include "screened-continuation-solve.hpp"
 #include "screened-sparse-ldl.hpp"
+#include "weight-declared-support.hpp"
 #include "weight-surface-system.hpp"
 #include <map>
 #include <nlohmann/json.hpp>
@@ -66,7 +67,8 @@ inline ContinuationFields
 anatomical_continuation(const Scene &scene, uint64_t group,
                         const std::function<bool()> &cancelled = {},
                         BoneWallDomain wall_domain = BoneWallDomain::WholeGroup,
-                        ContinuationLimits limits = {}) {
+                        ContinuationLimits limits = {},
+                        const DeclaredWeightSupport *declared = nullptr) {
   if (!limits.maximum_work || limits.maximum_work > 3'000'000'000ULL ||
       limits.maximum_bytes < 4096 ||
       limits.maximum_bytes > 512u * 1024u * 1024u)
@@ -79,25 +81,38 @@ anatomical_continuation(const Scene &scene, uint64_t group,
   const char *stage = "source capture";
   try {
     ContinuationFields out;
+    if (declared) {
+      if (declared->parts.empty() || declared->parts.size() > 64)
+        throw std::length_error("Declared weight part dimensions exceeded");
+      std::set<uint64_t> ids;
+      for (const auto &p : declared->parts) {
+        budget.step(p.declarations.size() + 1);
+        if (!p.object || !ids.insert(p.object).second)
+          throw std::invalid_argument("Duplicate declared weight object");
+        (void)scene.object(p.object);
+      }
+    }
     std::vector<const SculptObject *> objects;
     size_t raw_count = 0, corners = 0;
     const SculptObject *first = nullptr;
     std::set<std::array<int, 3>> source_instances;
     for (const auto &o : scene.objects()) {
       budget.step();
-      if (o.group != group)
+      if (declared ? !declared->find(o.id) : o.group != group)
         continue;
       if (!o.painted || !o.mesh_active || source_is_dormant(o) ||
           o.painted->in_stroke() || !o.deformation ||
-          !o.deformation->skeleton || !o.deformation->skin ||
-          !o.deformation->humanoid || !o.appearance)
+          !o.deformation->skeleton ||
+          (!declared &&
+           (!o.deformation->skin || !o.deformation->humanoid || !o.appearance)))
         throw std::invalid_argument("Continuation group has unsupported owner");
       if (o.deformation->skeleton->bones.empty() ||
           o.deformation->skeleton->bones.size() > 256 ||
           o.painted->mesh().positions.size() > 2'000'000 - raw_count ||
           o.painted->mesh().indices.size() > 12'000'000 - corners)
         throw std::length_error("Continuation aggregate source bound");
-      if (!source_instances
+      if (!declared &&
+          !source_instances
                .insert({o.appearance->source_node, o.appearance->source_mesh,
                         o.appearance->source_primitive})
                .second)
@@ -105,15 +120,16 @@ anatomical_continuation(const Scene &scene, uint64_t group,
             "Continuation has duplicate original primitive instances");
       if (!first)
         first = &o;
-      if (o.appearance->asset.get() != first->appearance->asset.get() ||
-          o.appearance->asset.owner_before(first->appearance->asset) ||
-          first->appearance->asset.owner_before(o.appearance->asset) ||
-          o.appearance->source_joint_nodes !=
-              first->appearance->source_joint_nodes ||
+      if ((!declared &&
+           (o.appearance->asset.get() != first->appearance->asset.get() ||
+            o.appearance->asset.owner_before(first->appearance->asset) ||
+            first->appearance->asset.owner_before(o.appearance->asset) ||
+            o.appearance->source_joint_nodes !=
+                first->appearance->source_joint_nodes ||
+            o.deformation->humanoid->encode() !=
+                first->deformation->humanoid->encode())) ||
           o.deformation->skeleton->encode() !=
               first->deformation->skeleton->encode() ||
-          o.deformation->humanoid->encode() !=
-              first->deformation->humanoid->encode() ||
           scene.has_affine_placement(o.id) ||
           scene.world_matrix(o.id).matrix() !=
               scene.world_matrix(first->id).matrix())
@@ -175,9 +191,12 @@ anatomical_continuation(const Scene &scene, uint64_t group,
         std::min(size_t(500'000'000), budget.maximum - budget.used);
     if (!options.maximum_work)
       throw std::length_error("Source-visible work exhausted before capture");
-    auto profile = imported_heat_profile(*first->deformation->skeleton,
-                                         *first->appearance, options, cancelled,
-                                         &*first->deformation->humanoid);
+    auto profile =
+        declared
+            ? declared_weight_profile(*first->deformation->skeleton, budget)
+            : imported_heat_profile(*first->deformation->skeleton,
+                                    *first->appearance, options, cancelled,
+                                    &*first->deformation->humanoid);
     budget.step(profile.work);
     for (uint32_t j = 0; j < bones; ++j)
       if (profile.eligible[j])
@@ -208,19 +227,28 @@ anatomical_continuation(const Scene &scene, uint64_t group,
           std::min(size_t(500'000'000), budget.maximum - budget.used);
       if (!options.maximum_work)
         throw std::length_error("Source-visible work exhausted before capture");
-      auto seams = capture_heat_seams(o, options, cancelled);
-      budget.step(seams.work());
-      budget.step();
-      options.maximum_work =
-          std::min(size_t(500'000'000), budget.maximum - budget.used);
-      if (!options.maximum_work)
-        throw std::length_error("Source-visible work exhausted before capture");
-      auto intent =
-          capture_imported_component_intent(o, seams, options, cancelled);
-      budget.step(intent.work());
-      auto part = assemble(o.painted->mesh(), budget,
-                           HeatOperator::PositiveGraph, seams.groups(o),
-                           HeatNormals::UnitFaces, HeatMass::MixedVoronoi);
+      std::optional<HeatSeamGraph> seams;
+      std::optional<HeatComponentIntent> intent;
+      std::span<const uint32_t> row_groups;
+      if (declared) {
+        intent = declared_weight_intent(o, *declared->find(o.id), profile,
+                                        options, budget);
+      } else {
+        seams = capture_heat_seams(o, options, cancelled);
+        budget.step(seams->work());
+        options.maximum_work =
+            std::min(size_t(500'000'000), budget.maximum - budget.used);
+        if (!options.maximum_work)
+          throw std::length_error(
+              "Source-visible work exhausted before capture");
+        intent =
+            capture_imported_component_intent(o, *seams, options, cancelled);
+        budget.step(intent->work());
+        row_groups = seams->groups(o);
+      }
+      auto part =
+          assemble(o.painted->mesh(), budget, HeatOperator::PositiveGraph,
+                   row_groups, HeatNormals::UnitFaces, HeatMass::MixedVoronoi);
       const uint32_t offset = s.positions.size();
       ContinuationPart p;
       p.object = captured[owner];
@@ -230,7 +258,7 @@ anatomical_continuation(const Scene &scene, uint64_t group,
       p.volume_revision = objects[owner]->volume->revision();
       p.world = scene.world_matrix(o.id).matrix();
       p.raw_to_row = part.raw_to_row;
-      auto masks = intent.masks(o);
+      auto masks = intent->masks(o);
       usage.resize(offset + part.positions.size());
       for (size_t raw = 0; raw < p.raw_to_row.size(); ++raw) {
         budget.step(4);
@@ -518,7 +546,7 @@ anatomical_continuation(const Scene &scene, uint64_t group,
           "Continuation failed independent partition certificate");
     size_t current_count = 0;
     for (const auto &o : scene.objects())
-      if (o.group == group)
+      if (declared ? declared->find(o.id) != nullptr : o.group == group)
         ++current_count;
     if (current_count != out.parts.size())
       throw std::runtime_error("Captured source group membership changed");
