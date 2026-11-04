@@ -1,0 +1,21 @@
+# Native anatomical assembly continuation: qualified kernel, admission open
+
+The remaining female point gap is fixed without changing or welding valid nonmanifold geometry. Before solving, exact current REST/all-morph boundary signatures detect point contacts across separate already edge-sewn surface components. An assembly is secondary only if its geometry-witnessed controls fit one current humanoid handle's participating parent/child articulation star. Broad torso/limb surfaces and unknown controls remain direct support; fixed Head/ocular regions keep their separately established geometry rules. No actor/material/display-name policy, original artist influences or posed error values select a route.
+
+All other actual group surfaces, including clothing where skin was removed, supply their newly generated native field. The existing bounded native barycentric transfer evaluates that field on the localized assembly, with unchanged0.1m support radius and output{4,1e-5}. Coincident points therefore share the same supporting field while retaining their original independent arrays/morphs. Base solver and continuation are staged together before outer Scene adoption; this prototype is not yet an admitted Document operation. The earlier maximal-skin-carrier male Tops refusal remains in ancestry: no radius increase or failure retry hides it.
+
+## Completed evidence
+
+Final optimized source passes all190 global and532 independent head/eye local/stationary pose cases at unchanged bounds. Female all2843 and male all2577 independent AFTER-SOLVE expected-continuity pairs across19 poses pass exactly0m. Original artist rows are opened only in those separate oracles after the producer has saved its field. Female localization selects the geometrically ambiguous assembly; male has no such disconnected-contact assembly, and is not switched based on a failed test.
+
+Eighteen independent controls pass optimized and with wholly owned instrumented native Mesh/Morph/transfer dependencies: exact/incompatible/near point contacts, real seam exclusion, opposite limbs/broad surface/unknown controls, affine trait, both key-container/morph byte planning, true small-input cancellation, independent linear barycentric native transfer, finite missing-support and real BVH work limits. The initial small-input Cancel negative and fixture Vec3 comparison error remain recorded.
+
+The original500M/256MiB method limits remain. Continuation planning accounts for complete geometry, canonical joint replay, recipient copy/validation and a separate bounded native BVH/query allowance before the base solve. The complete reserved allowance is conservatively charged, not mislabeled actual query hits. Female495,259,790 and male459,567,248 charged work fit the original limit. Forecast solver workspace is123,410,225/130,499,113 bytes. The earlier fixed20M subdivision refused before query and is preserved; replacing it with an input-sized subdivision of the same500M does not raise the whole-method cap or discount counters.
+
+Wholly owned O1 ASan/UBSan/leak real producers pass female23.16s/male22.46s, and their complete saved scenes are byte-identical to optimized outputs. Both changed private-header core consumers and all new objects were rebuilt with own headers against the immutable matching8a fully instrumented C/C++ core/support baseline; all public headers and CPP sources match that baseline. This is a matched owned executable closure, not a fresh full native frontend build. All1827 source and recorded input/core/support hashes remain exact.
+
+## Resource and admission limitation
+
+Optimized end-to-end profile times are3.23/3.57s including load/encode/Save. Actual process peak is748,496/766,884KiB (731.0/748.9MiB), far larger than the solver forecast. The producer includes retained whole-Scene debug JSON, immutable source loading and Save; phase attribution and real admission memory remain unfinished. The exact process peaks must not be replaced by the narrower workspace numbers.
+
+Broader geometry/source/near-contact stress, memory/fault/cancellation qualification and real native worker/history/Save/Restore/locks/UI/controller/export/render integration remain required before any public/default admission. No GPU or physical headset was used, no app/public layout/schema changed, and all previous counterexamples remain available.

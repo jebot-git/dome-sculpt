@@ -2,32 +2,52 @@
 #pragma once
 #include "native-head-geometry.hpp"
 #include "geometry-weight-authoring.hpp"
+#include "native-localized-assembly.hpp"
 namespace dome::detail {
 // Private, pre-solve geometry policy. A maximal primary axial/limb support
 // surface, extended through exact co-moving boundaries, supplies its NEW native
 // field to subordinate surfaces. It never supplies original artist values or
 // topology/seam authority, and is never selected in response to fit/error.
 struct NativeCarrierPlan {std::vector<uint64_t> carrier,targets;size_t work=0;};
-inline NativeCarrierPlan native_carrier_plan(const NativeHeadGeometryReport&analysis,
- const DeclaredWeightSupport&support,const HumanoidMapping&roles,
- weight_surface::Budget&work){
- const auto start=work.used;HeatJointMask primary{};
- for(auto name:{"hips","spine","chest","upperChest","neck","head","leftShoulder","rightShoulder","leftUpperArm","rightUpperArm","leftLowerArm","rightLowerArm","leftUpperLeg","rightUpperLeg","leftLowerLeg","rightLowerLeg"}){
-   auto it=roles.joints.find(name);if(it!=roles.joints.end())primary[it->second/64]|=uint64_t(1)<<(it->second%64);
- }
- auto mask=[&](const auto&p){auto m=p.geometric_controls;for(size_t k=0;k<4;++k)m[k]&=primary[k];return m;};
- NativeCarrierPlan out;
+inline NativeCarrierPlan native_carrier_plan(const Scene&scene,
+ const NativeHeadGeometryReport&analysis,const DeclaredWeightSupport&support,
+ const Skeleton&rig,const HumanoidMapping&roles,weight_surface::Budget&work){
+ const auto start=work.used;NativeCarrierPlan out;
  for(const auto&p:analysis.parts){
-   const auto*decl=support.find(p.object);if(!decl||decl->user_singleton_boundary)continue;
-   const auto m=mask(p);bool dominates=m!=HeatJointMask{};
-   for(const auto&q:analysis.parts){work.step(8);const auto*d=support.find(q.object);if(!d||d->user_singleton_boundary)continue;const auto n=mask(q);for(size_t k=0;k<4;++k)dominates&=(n[k]&~m[k])==0;}
-   if(dominates)out.carrier.push_back(p.object);
+   const auto*decl=support.find(p.object);if(!decl)throw std::invalid_argument("Anatomical assembly source missing");
+   bool subordinate=false;
+   if(!decl->user_singleton_boundary&&one_anatomical_articulation_star(p.geometric_controls,rig,roles,work)){
+     const auto&o=scene.object(p.object);
+     auto contact=localized_assembly_contacts(o.painted->mesh(),decl->geometric_row_groups,
+        o.deformation&&o.deformation->morphs?&*o.deformation->morphs:nullptr,
+        128u*1024u*1024u,work);
+     subordinate=contact.point_groups>0;
+   }
+   (subordinate?out.targets:out.carrier).push_back(p.object);
  }
- if(out.carrier.size()!=1)throw std::invalid_argument("No unique geometry-witnessed primary anatomical carrier");
- for(size_t pass=0;pass<analysis.parts.size();++pass){bool changed=false;for(const auto&e:analysis.contacts){work.step(16);for(auto ids:{std::array{e.first,e.second},std::array{e.second,e.first}}){if(std::find(out.carrier.begin(),out.carrier.end(),ids[0])!=out.carrier.end()&&std::find(out.carrier.begin(),out.carrier.end(),ids[1])==out.carrier.end()){out.carrier.push_back(ids[1]);changed=true;}}}if(!changed)break;}
- for(const auto&p:analysis.parts){work.step(8);const auto*d=support.find(p.object);if(d&&!d->user_singleton_boundary&&std::find(out.carrier.begin(),out.carrier.end(),p.object)==out.carrier.end())out.targets.push_back(p.object);}
- if(out.targets.empty())throw std::invalid_argument("Anatomical carrier has no subordinate target");
+ if(out.carrier.empty())throw std::invalid_argument("Localized assembly has no independent anatomical support surface");
  out.work=work.used-start;return out;
+}
+// Prospective subdivision of the unchanged500M whole-method budget. It
+// includes complete canonical joint replay and copy/validation/packing work;
+// the native BVH/query reserve is separate. No post-failure budget retry.
+inline size_t native_carrier_work_plan(const Scene&scene,const NativeCarrierPlan&plan,
+ uint64_t reference,weight_surface::Budget&planning){
+ if(plan.targets.empty())return 0;
+ const auto &rig=*scene.object(reference).deformation->skeleton;
+ const size_t bones=rig.bones.size();size_t names=0;
+ for(const auto&b:rig.bones){planning.step();names+=b.name.size();}
+ std::function<bool()> no=[] {return false;};weight_surface::Budget forecast{0,500'000'000,no};
+ forecast.step(20'000'000+65536); // bounded native BVH construction+queries
+ auto owner=[&](uint64_t id){planning.step(16);const auto&o=scene.object(id);const auto&m=o.painted->mesh();
+   if(m.positions.size()>2'000'000||m.indices.size()>6'000'000)throw std::length_error("Anatomical work-plan geometry");
+   forecast.step_items(m.positions.size(),1024);forecast.step_items(m.indices.size(),64);
+   forecast.step_items(2*bones+1,8192);forecast.step_items(names+1,2);
+ };
+ for(auto id:plan.carrier)owner(id);for(auto id:plan.targets)owner(id);
+ for(auto id:plan.targets){const auto&o=scene.object(id);if(o.deformation&&o.deformation->morphs)
+   for(const auto&t:o.deformation->morphs->targets){planning.step();forecast.step_items(t.delta.size()+1,32);}}
+ return forecast.used;
 }
 // Research owning application on an already detached Scene. Callers must run
 // base solver+this continuation in one outer staged transaction before publish.
