@@ -34,6 +34,12 @@ int main(int argc,char**argv)try{
   check(cancelled&&doc.wait_asset(std::chrono::seconds(120))&&doc.copy_scene().encode()==before.encode()&&!doc.frame().state->can_undo&&files_equal(file,prior),"Actual mid-helper Cancel fails dependent Save and preserves whole Scene/history/prior file");
  }
  {
+  auto gate=std::make_shared<Gate>();queue(gate);wait_gate(*gate);auto save=doc.save_async(file);
+  doc.replace(before);gate->armed=false;bool stale=false;try{save.get();}catch(const std::exception&){stale=true;}
+  check(stale&&doc.wait_asset(std::chrono::seconds(120))&&doc.copy_scene().encode()==before.encode()&&!doc.frame().state->can_undo&&files_equal(file,prior),"Actual new-generation replacement refuses stale work and accepted Save without overwriting its model/history/file");
+  check(doc.wait_mesh(std::chrono::seconds(120)),"Replacement native mesh fence ready before same-controller retry");
+ }
+ {
   auto gate=std::make_shared<Gate>();queue(gate);wait_gate(*gate);auto save=doc.save_async(file);gate->armed=false;save.get();
   check(doc.wait_asset(std::chrono::seconds(120))&&doc.frame().state->error.empty(),"Real native worker publishes prepared anatomical subset");
   check(doc.copy_scene().encode()==expected.encode(),"Only explicit two targets receive exact907 fields and first complete capsules; readonly group remains exact");
@@ -47,6 +53,20 @@ int main(int argc,char**argv)try{
   auto same=doc.copy_scene();auto request=capture_native_anatomical(same,ids,reference);auto prepared=prepare_native_anatomical(request);
   check(prepared.report().changed==0&&!adopt_native_anatomical(same,request,std::move(prepared)),"Repeated identical actual field is a true factory no-op");
   check(same.encode()==expected.encode(),"No-op preserves all capsules/paint/source values");
+ }
+ {
+  auto locked=doc.copy_scene();uint64_t target=0;size_t row=0;uint32_t joint=0;
+  for(auto id:ids){const auto&rows=locked.object(id).deformation->skin->vertices;for(size_t i=0;i<rows.size();++i)if(rows[i].size()==1&&rows[i][0].weight==1){target=id;row=i;joint=rows[i][0].joint;break;}if(target)break;}
+  check(target!=0,"Actual generated singleton row supplies an independent hard-lock constraint");
+  auto d=std::make_shared<DeformationState>(*locked.object(target).deformation);uint32_t other=0;while(other==joint||!d->skeleton->bones.at(other).deform)++other;
+  d->skin->vertices[row]={{joint,.375f},{other,.625f}};d->validate(locked.object(target).painted->mesh());locked.object(target).deformation=d;
+  const auto old=locked;
+  NativeAnatomicalOptions options;options.locks.assign(d->skeleton->bones.size(),1);
+  auto request=capture_native_anatomical(locked,std::span<const uint64_t>(&target,1),reference,options);auto prepared=prepare_native_anatomical(request);
+  check(prepared.report().changed==0&&!adopt_native_anatomical(locked,request,std::move(prepared))&&locked.encode()==old.encode(),"All hard locks preserve genuinely edited current rows exactly without inventing a field or Undo change");
+  options.locks.assign(d->skeleton->bones.size(),0);options.locks[joint]=1;bool infeasible=false;
+  try{auto r=capture_native_anatomical(locked,std::span<const uint64_t>(&target,1),reference,options);auto p=prepare_native_anatomical(r);(void)p;}catch(const std::invalid_argument&e){infeasible=std::string(e.what()).find("No unlocked weight")!=std::string::npos;}
+  check(infeasible&&locked.encode()==old.encode(),"Incompatible partial lock refuses atomically instead of manufacturing unsupported free mass");
  }
  doc.edit_scene("Restore anatomical originals",[ids](Scene&s,const auto&cancel){for(auto id:ids)restore_rig_source(s,id,false,cancel);});auto restored=out/"restored.dsculpt";doc.save_async(restored).get();
  check(doc.wait_asset(std::chrono::seconds(120))&&doc.wait_mesh(std::chrono::seconds(120)),"Actual worker Restore and cache-backed native remesh complete");

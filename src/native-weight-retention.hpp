@@ -49,6 +49,7 @@ struct Counter {
   void maps(const std::shared_ptr<const PaintSourceMaps>&p){if(enter(p)){add(sizeof(*p));for(auto&t:{&p->color,&p->normal,&p->metal_rough,&p->emission,&p->occlusion})image(t->image);shared_vector(p->uv1);for(auto&[id,uv]:p->extra_uv_sets){(void)id;add(128);shared_vector(uv);}leave(p);}}
   void receipt(const std::shared_ptr<const ImportSourceReceipt>&p){if(enter(p)){add(sizeof(*p));text(p->adapter);text(p->root.name);shared_vector(p->root.bytes);vector(p->resources);for(auto&r:p->resources){text(r.name);shared_vector(r.bytes);}leave(p);}}
   void asset(const std::shared_ptr<const ImportedAsset>&p){if(!enter(p))return;
+    if(p->nodes.size()>4096||p->primitives.size()>256||p->images.size()>256||p->materials.size()>4096)throw std::length_error("Native retained source dimensions");
     add(sizeof(*p));text(p->extras_json);vector(p->extensions_used);for(auto&s:p->extensions_used)text(s);
     vector(p->nodes);for(auto&n:p->nodes){text(n.name);text(n.extras_json);vector(n.children);vector(n.weights);}
     vector(p->skins);for(auto&s:p->skins){text(s.name);text(s.extras_json);vector(s.joints);vector(s.inverse_bind_matrices);}
@@ -64,7 +65,8 @@ struct Counter {
   void images(const std::shared_ptr<const std::vector<std::shared_ptr<const Image>>>&p){if(enter(p)){add(sizeof(*p));vector(*p);for(auto&i:*p)image(i);leave(p);}}
   void appearance(const std::shared_ptr<const CreatorAppearance>&p){if(enter(p)){add(sizeof(*p));shared_vector(p->original_bytes);receipt(p->source_receipt);asset(p->asset);images(p->decoded_images);string(p->vrm_json);vector(p->source_vertices);vector(p->source_joint_nodes);vector(p->source_morph_targets);text(p->material_json);text(p->mtoon_json);leave(p);}}
   void model(const std::shared_ptr<const CreatorSourceModel>&p){if(enter(p)){add(sizeof(*p));shared_vector(p->original_bytes);receipt(p->source_receipt);asset(p->asset);images(p->decoded_images);string(p->vrm_json);leave(p);}}
-  void deformation(const std::shared_ptr<const DeformationState>&p){if(!enter(p))return;add(sizeof(*p));vector(p->pose);vector(p->morph_weights);
+  void deformation(const std::shared_ptr<const DeformationState>&p){if(!enter(p))return;
+    if(p->pose.size()>256||p->morph_weights.size()>128||(p->skeleton&&p->skeleton->bones.size()>256)||(p->skin&&p->skin->vertices.size()>2'000'000)||(p->morphs&&p->morphs->targets.size()>128))throw std::length_error("Native retained deformation dimensions");add(sizeof(*p));vector(p->pose);vector(p->morph_weights);
     if(p->skeleton){vector(p->skeleton->bones);for(auto&b:p->skeleton->bones)text(b.name);if(p->skeleton->inverse_bind_override)vector(*p->skeleton->inverse_bind_override);}
     if(p->skin){vector(p->skin->vertices);for(auto&r:p->skin->vertices)vector(r);}
     if(p->morphs){vector(p->morphs->targets);for(auto&t:p->morphs->targets){text(t.name);vector(t.delta);}}
