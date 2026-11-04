@@ -3,6 +3,7 @@
 #include "desktop-menu.h"
 #include "dome/document.hpp"
 #include "export-editor.hpp"
+#include "editable-avatar-eligibility.hpp"
 #include "dome/frame-clock.hpp"
 #include "desktop-framing.hpp"
 #include "spacenav-options.hpp"
@@ -566,6 +567,7 @@ struct App {
     menu.add("&File/Save &As...", FL_CTRL | FL_SHIFT | 's', command, this);
     menu.add("&File/Export &glTF (.glb)...", FL_CTRL + 'e', command, this);
     menu.add("&File/Export editable project (.glb)...", 0, command, this);
+    menu.add("&File/Export editable avatar (.vrm)...", 0, command, this);
     menu.add("&File/Export selected avatar (.vrm)...", 0, command, this);
     menu.add("&File/Recovery/Refresh recovery", 0, command, this);
     menu.add("&File/Recovery/Recover project...", 0, command, this);
@@ -796,6 +798,7 @@ struct App {
     const bool can_frame=!modal&&!s->stroking&&!s->native_pending&&!s->object_grabbing;
     enable("&View/Frame &all",can_frame&&detail::desktop_frameable(frame,false));
     enable("&View/Frame &selection",can_frame&&detail::desktop_frameable(frame,true));
+    enable("&File/Export editable avatar (.vrm)...",!modal&&!s->asset_busy&&detail::editable_avatar_view(frame));
     const char *document_actions[] = {"&File/&New",
                                       "&File/&Open...",
                                       "&File/&Save",
@@ -1436,6 +1439,11 @@ struct App {
         auto chosen=fl_file_chooser("Export editable project", "*.glb", "Project.glb");
         if(chosen)canvas.document.export_asset(chosen,*format);
       }
+    } else if (label == "Export editable avatar (.vrm)...") {
+      if(!detail::editable_avatar_view(canvas.document.frame()))return;
+      auto format=editable_export_dialog(EditableExportKind::AvatarV1);
+      if(format){auto chosen=fl_file_chooser("Export editable avatar","*.vrm","Avatar.vrm");
+        if(chosen)canvas.document.export_asset(chosen,*format);}
     } else if (label == "Export selected avatar (.vrm)...") {
       auto chosen = fl_file_chooser("Export selected avatar", "*.vrm", "Avatar.vrm");
       if (chosen) canvas.document.export_asset(chosen, AssetExportFormat::Avatar);

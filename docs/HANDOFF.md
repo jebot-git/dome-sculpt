@@ -1,5 +1,17 @@
 # Dome Sculpt production handoff
 
+## Private editable VRM1 FLTK / shared Files controls — 2026-11-04
+
+The sealed5f worker now has actual existing-dialog/native-menu and page28
+exposure with explicit selected-avatar/approximate-portable policy. No new
+fields/pages/schema. FinalR/S each38 FLTKnormal+compact,53 actualsoftwareloader
+checks,15 ordinaryGLBGUI and69 unchangednativecontrollerchecks pass; source,
+Cancel/orderedSave/recovery and23R/Spairs stayexact.28 emittedfiles have0KHRerrors;
+12V1outputs pass96officialinstances. Read VRM1-EDITABLE-UI.md/receipt for matching
+component scope, old missedSave/staging negatives and privateMesa qualification.
+Not main/full613/HMD admission; every unfinished VRM1/full-goal row remains.
+
+
 ## Private typed painted VRM1 package — 2026-11-04
 
 The isolated a2e-based Scene-owner compiler and explicit Avatar FileJob route now

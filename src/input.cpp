@@ -3,7 +3,7 @@
 #include "dome/uv.hpp"
 namespace dome {
 const std::array<const char *, 12> &spatial_labels(int page) {
-  static const std::array<const char *,12> exporting={"Strict glTF","Editable 256","Editable 512","Editable 1024","Avatar VRM","Native Save","","Cancel work","Back","Close","",""};
+  static const std::array<const char *,12> exporting={"Strict glTF","Editable 256","Editable 512","Editable 1024","Avatar VRM","Native Save","V1 edit256","Cancel work","Back","Close","V1 edit512","V1 edit1024"};
   if(page==28)return exporting;
   static const std::array<const char *,12> preview={"Authored","Core PBR","Toon preview","","","","","","Back","","",""};
   if(page==26)return preview;
@@ -169,7 +169,10 @@ std::optional<SpatialCommand> spatial_action(int page, int index) {
     return {};
   if(page==28){
     static const SpatialCommand commands[]={SpatialCommand::Export,SpatialCommand::ExportEditable256,SpatialCommand::ExportEditable512,SpatialCommand::ExportEditable1024,SpatialCommand::ExportAvatar,SpatialCommand::Save,SpatialCommand::Undo,SpatialCommand::CancelWork};
-    return index<8&&index!=6?std::optional<SpatialCommand>(commands[index]):std::nullopt;
+    if(index==6)return SpatialCommand::ExportEditableAvatar256;
+    if(index==10)return SpatialCommand::ExportEditableAvatar512;
+    if(index==11)return SpatialCommand::ExportEditableAvatar1024;
+    return index<8?std::optional<SpatialCommand>(commands[index]):std::nullopt;
   }
   if(page==0&&index==7)return {}; // Discoverable export-policy navigation.
   if(page==27){static const SpatialCommand commands[]={SpatialCommand::RigFitPrevious,SpatialCommand::RigFitNext,SpatialCommand::RigFitPlace,SpatialCommand::RigFitOptions,SpatialCommand::RigFitXDown,SpatialCommand::RigFitXUp,SpatialCommand::RigFitYDown,SpatialCommand::RigFitYUp,SpatialCommand::RigFitZDown,SpatialCommand::RigFitZUp,SpatialCommand::RigFitApply,SpatialCommand::RigFitCancel};return commands[index];}

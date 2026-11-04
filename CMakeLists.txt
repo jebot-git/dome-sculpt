@@ -3322,3 +3322,21 @@ if(BUILD_TESTING)
   add_test(NAME fbx-morph-generated-normals COMMAND dome-sculpt-fbx-morph-generated-normals-test ${CMAKE_CURRENT_BINARY_DIR}/fbx-morph-generated-normals)
   set_tests_properties(fbx-morph-generated-normals PROPERTIES TIMEOUT 300)
 endif()
+
+if(BUILD_TESTING)
+  add_executable(dome-sculpt-vrm1-editable-ui-test tests/vrm1-editable-ui.cpp)
+  target_link_libraries(dome-sculpt-vrm1-editable-ui-test PRIVATE dome-sculpt-core)
+  add_test(NAME vrm1-editable-scene COMMAND dome-sculpt-vrm1-editable-ui-test --fixture
+    ${CMAKE_CURRENT_BINARY_DIR}/vrm1-painted-authoring/graphics/worker-editable.vrm
+    ${CMAKE_CURRENT_BINARY_DIR}/vrm1-editable-ui/source.dsculpt)
+  set_tests_properties(vrm1-editable-scene PROPERTIES TIMEOUT 120 FIXTURES_REQUIRED vrm1-painted-model FIXTURES_SETUP vrm1-editable-model)
+endif()
+if(BUILD_TESTING AND TARGET dome-sculpt AND TARGET dome-sculpt-test-runtime AND TARGET dome-sculpt-export-cancel-gate AND Python3_Interpreter_FOUND)
+  add_test(NAME vrm1-editable-openxr COMMAND ${Python3_EXECUTABLE}
+    ${CMAKE_CURRENT_SOURCE_DIR}/tests/vrm1-editable-xr.py
+    $<TARGET_FILE:dome-sculpt> $<TARGET_FILE:dome-sculpt-test-runtime>
+    $<TARGET_FILE:dome-sculpt-vrm1-editable-ui-test>
+    ${CMAKE_CURRENT_BINARY_DIR}/vrm1-editable-ui/source.dsculpt
+    $<TARGET_FILE:dome-sculpt-export-cancel-gate> ${CMAKE_CURRENT_BINARY_DIR}/vrm1-editable-xr)
+  set_tests_properties(vrm1-editable-openxr PROPERTIES TIMEOUT 900 FIXTURES_REQUIRED vrm1-editable-model)
+endif()

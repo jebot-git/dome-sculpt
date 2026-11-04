@@ -530,8 +530,8 @@ void SpatialPalette::raster(const EditorState &s) {
   auto active = std::find_if(s.objects.begin(), s.objects.end(),
                              [&](auto &o) { return o.id == s.active_object; });
   if(s.menu_page==28){
-    text(320*unit_,252*unit_,"Native: all objects, including hidden",fg);
-    text(320*unit_,280*unit_,"Other viewers: approximate PBR",fg);
+    text(320*unit_,252*unit_,"GLB: all objects; V1: selected avatar",fg);
+    text(320*unit_,280*unit_,"Other viewers: approximate textures",fg);
     text(320*unit_,308*unit_,"Open in Dome Sculpt restores edits",fg);
     text(320*unit_,376*unit_,"Finite textures can miss fine patterns",fg);
   }

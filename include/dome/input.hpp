@@ -95,9 +95,11 @@ enum class SpatialCommand {
   RigFitBegin=2048, RigFitPrevious, RigFitNext, RigFitPlace, RigFitRemove,
   RigFitXDown, RigFitXUp, RigFitYDown, RigFitYUp, RigFitZDown, RigFitZUp,
   RigFitApply, RigFitCancel, RigFitOptions,
-  ExportEditable256=4096, ExportEditable512, ExportEditable1024
+  ExportEditable256=4096, ExportEditable512, ExportEditable1024,
+  ExportEditableAvatar256=4100, ExportEditableAvatar512, ExportEditableAvatar1024
 };
 inline bool editable_export_command(SpatialCommand c){return c>=SpatialCommand::ExportEditable256&&c<=SpatialCommand::ExportEditable1024;}
+inline bool editable_avatar_export_command(SpatialCommand c){return c>=SpatialCommand::ExportEditableAvatar256&&c<=SpatialCommand::ExportEditableAvatar1024;}
 inline bool rig_fit_command(SpatialCommand c){return c>=SpatialCommand::RigFitBegin&&c<=SpatialCommand::RigFitOptions;}
 inline bool projection_command(SpatialCommand c){return c>=SpatialCommand::ProjectionBrowse&&c<=SpatialCommand::ProjectionIncrease;}
 inline bool preview_command(SpatialCommand c){return c>=SpatialCommand::PreviewAuthored&&c<=SpatialCommand::PreviewToon;}

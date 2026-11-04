@@ -19,6 +19,7 @@
 #include "dome/rig-edit.hpp"
 #include "dome/vrm.hpp"
 #include "dome/vrm-authoring.hpp"
+#include "editable-avatar-eligibility.hpp"
 #include "dome/gltf-export.hpp"
 #include "dome/mesh-processing.hpp"
 #include "dome/mesh-authoring.hpp"
@@ -697,7 +698,7 @@ void Document::publish_locked(bool force,bool checkpoint) {
                              : command ? command_enabled_locked(*command)
                                        : true;
     if(state_.menu_page==26&&i>2&&i!=8)state_.menu_enabled[i]=false;
-    if(state_.menu_page==28&&(i==6||i>9))state_.menu_enabled[i]=false;
+
   }
   bool weight_preview = weight_stroking_ && !weight_samples_.empty() &&
       (weight_scheduled_epoch_ != state_.weight_gesture || weight_scheduled_samples_ != weight_samples_.size());
@@ -2784,6 +2785,8 @@ void Document::control_event_locked(VrControlEvent event) {
 }
 
 bool Document::command_enabled_locked(SpatialCommand command) const {
+  if(editable_avatar_export_command(command))return
+      detail::editable_avatar_source(scene_.active())&&command_enabled_locked(SpatialCommand::ExportAvatar);
   if(editable_export_command(command))return command_enabled_locked(SpatialCommand::Export);
   if(rig_fit_command(command))return rig_fit_command_enabled_locked(command);
   if(projection_command(command))return projection_command_enabled_locked(command);
@@ -2992,6 +2995,12 @@ void Document::sculpt_command(SpatialCommand command) {
   if(published_.load()==publication)publish_locked();
 }
 void Document::command_locked(SpatialCommand command) {
+  if(editable_avatar_export_command(command)){
+    if(!command_enabled_locked(command))return;
+    file_locked(true,command==SpatialCommand::ExportEditableAvatar256?AssetExportFormat::EditableAvatar256:
+        command==SpatialCommand::ExportEditableAvatar512?AssetExportFormat::EditableAvatar512:AssetExportFormat::EditableAvatar1024);
+    return;
+  }
   if(editable_export_command(command)){
     if(!command_enabled_locked(command))return;
     file_locked(true,command==SpatialCommand::ExportEditable256?AssetExportFormat::EditableGlb256:
