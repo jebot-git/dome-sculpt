@@ -1,0 +1,302 @@
+{
+  "source": "6fc1e7e78cecb7d3a1f2482bb8d01040d21d67df",
+  "recorded_utc": "2026-11-04T20:48:01.721327+00:00",
+  "scope": "Read-only actual original legacy canonical native shading versus converted independent baked field after changing real curved native skin/morph state. Nine repeated unskinned rest controls and nine actual curved skin/morph states per profile;4 of curved9 exceed unchanged4. Not new runtime implementation or goal/main completion.",
+  "maximum_error": 9,
+  "failed_each": 4,
+  "profiles": {
+    "release": {
+      "status": {
+        "state": "terminal",
+        "pid": 1841870,
+        "source": "6fc1e7e78cecb7d3a1f2482bb8d01040d21d67df",
+        "profile": "release",
+        "scope": "Read-only original raw canonical vs converted-field native renderer across actual curved skin/morph source; same unchanged4 image bound, independent from UV34/export comparisons. Complete new consumer TU over exact owning current final34 profile; no product changes.",
+        "steps": [
+          {
+            "name": "compile",
+            "command": [
+              "/usr/bin/c++",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/canonical-deformed-audit-f2/src",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/canonical-deformed-audit-f2/third_party/desktop",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/canonical-deformed-audit-f2/third_party/cgltf",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/canonical-deformed-audit-f2/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/canonical-deformed-audit-f2/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/canonical-deformed-audit-f2/third_party/nlohmann",
+              "-isystem",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/harfbuzz",
+              "-isystem",
+              "/usr/include/glib-2.0",
+              "-isystem",
+              "/usr/lib64/glib-2.0/include",
+              "-isystem",
+              "/usr/include/sysprof-6",
+              "-isystem",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/freetype2",
+              "-isystem",
+              "/usr/include/libpng16",
+              "-isystem",
+              "/usr/include/libxml2",
+              "-O3",
+              "-DNDEBUG",
+              "-std=gnu++20",
+              "-pthread",
+              "-DWITH_GZFILEOP",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-deformed-audit-f2/artifacts/deformed-proof/release/consumer.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-deformed-audit-f2/tests/canonical-deformed-equivalence.cpp"
+            ],
+            "exit_code": 0,
+            "seconds": 14.971874170994852
+          },
+          {
+            "name": "link",
+            "command": [
+              "/usr/bin/c++",
+              "-O3",
+              "-DNDEBUG",
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-deformed-audit-f2/artifacts/deformed-proof/release/consumer.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-deformed-audit-f2/artifacts/deformed-proof/release/native",
+              "-Wl,-rpath,/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib",
+              "libdome-sculpt-render.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-uv-final-a086/artifacts/uv-final-build/release/libdome-sculpt-core.a",
+              "libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "libdome-sculpt-polygon.a",
+              "libxatlas.a",
+              "libmikktspace.a",
+              "libmikktspace-robust.a",
+              "libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libharfbuzz.so",
+              "/usr/lib64/libEGL.so",
+              "/usr/lib64/libGL.so",
+              "/usr/lib64/libfontconfig.so",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libfreetype.so",
+              "/usr/lib64/libicui18n.so",
+              "/usr/lib64/libicuuc.so",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit_code": 0,
+            "seconds": 0.4709972129785456
+          },
+          {
+            "name": "actual-source-comparison",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-deformed-audit-f2/artifacts/deformed-proof/release/native",
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-deformed-audit-f2/tests/fixtures/layered-normal",
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-deformed-audit-f2/artifacts/deformed-proof/release/output"
+            ],
+            "exit_code": 1,
+            "seconds": 0.3353538390365429
+          }
+        ],
+        "phase": "actual-source-comparison",
+        "child_pid": 1843850,
+        "exit_code": 1,
+        "seconds": 15.821462462015916,
+        "inputs": 2152,
+        "drift": []
+      },
+      "before_sha256": "df6396e747e2a07049fb302680295695797bd06359ad590c54757b5ac93f050a",
+      "files": {
+        "/home/blux/de-xr/dome-sculpt/artifacts/canonical-deformed-audit-f2/artifacts/deformed-proof/release/status.json": "367c5e6d1d6e5e06de5178bc2ec53edeaecd64a73d5b8dc2b16a7b67b93fd59a",
+        "/home/blux/de-xr/dome-sculpt/artifacts/canonical-deformed-audit-f2/artifacts/deformed-proof/release/compile.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "/home/blux/de-xr/dome-sculpt/artifacts/canonical-deformed-audit-f2/artifacts/deformed-proof/release/consumer.o": "87026db85d4af4efb564c7c4ad5c0c955933432f17ef7dd832c910c207d59444",
+        "/home/blux/de-xr/dome-sculpt/artifacts/canonical-deformed-audit-f2/artifacts/deformed-proof/release/link.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "/home/blux/de-xr/dome-sculpt/artifacts/canonical-deformed-audit-f2/artifacts/deformed-proof/release/native": "c6cfe18d6a36282df6bd04e99c583531d175e6827268223fac84ad1226c89cbe",
+        "/home/blux/de-xr/dome-sculpt/artifacts/canonical-deformed-audit-f2/artifacts/deformed-proof/release/actual-source-comparison.log": "ac29eb82ebc70a82e9958acd485b5b91a99f9a75b1db4b434627ebe12dd6745e",
+        "/home/blux/de-xr/dome-sculpt/artifacts/canonical-deformed-audit-f2/artifacts/deformed-proof/release/output/7-0-35-raw.png": "8cc74dfb03e4142acfe0e3704704975463d72832e8ea9f4939bc3025d46a0c2f",
+        "/home/blux/de-xr/dome-sculpt/artifacts/canonical-deformed-audit-f2/artifacts/deformed-proof/release/output/7-0-35-converted.png": "978372c1cb600c2cc3133c384fe06fd88ac7f07f1f965b9289f2db9e29a3d1b0",
+        "/home/blux/de-xr/dome-sculpt/artifacts/canonical-deformed-audit-f2/artifacts/deformed-proof/release/output/7-1-35-raw.png": "2cdb2e78dc95a9f096be80a09d181d8d9890622cbeb2e919cd64d87faf87632f",
+        "/home/blux/de-xr/dome-sculpt/artifacts/canonical-deformed-audit-f2/artifacts/deformed-proof/release/output/7-1-35-converted.png": "436f056e6409dc7d609d42f571fb781cd10bdf0ac9603f8381cfa87c824f23a8",
+        "/home/blux/de-xr/dome-sculpt/artifacts/canonical-deformed-audit-f2/artifacts/deformed-proof/release/output/7-2-0-raw.png": "fde64bbb1aa7fa6ec2be6db8e55030abac5274508da2b10406b8f2a24caa5ab1",
+        "/home/blux/de-xr/dome-sculpt/artifacts/canonical-deformed-audit-f2/artifacts/deformed-proof/release/output/7-2-0-converted.png": "d8683184f9a2bbfe676a48cbbc9cd3051b42ab12234b2644c81a5d3c5bae5998",
+        "/home/blux/de-xr/dome-sculpt/artifacts/canonical-deformed-audit-f2/artifacts/deformed-proof/release/output/7-2-35-raw.png": "c3c420219e5f97b0d3310461e2a4766e496c75cfd6d73a41b69bbc746127884d",
+        "/home/blux/de-xr/dome-sculpt/artifacts/canonical-deformed-audit-f2/artifacts/deformed-proof/release/output/7-2-35-converted.png": "6e056fbee0f6846cc9a04384f91e281cca256b8ccfd1ca72c0ee763a2a321c9e"
+      }
+    },
+    "sanitize": {
+      "status": {
+        "state": "terminal",
+        "pid": 1842054,
+        "source": "6fc1e7e78cecb7d3a1f2482bb8d01040d21d67df",
+        "profile": "sanitize",
+        "scope": "Read-only original raw canonical vs converted-field native renderer across actual curved skin/morph source; same unchanged4 image bound, independent from UV34/export comparisons. Complete new consumer TU over exact owning current final34 profile; no product changes.",
+        "steps": [
+          {
+            "name": "compile",
+            "command": [
+              "/usr/bin/c++",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/canonical-deformed-audit-f2/src",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/canonical-deformed-audit-f2/third_party/desktop",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/canonical-deformed-audit-f2/third_party/cgltf",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/canonical-deformed-audit-f2/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/canonical-deformed-audit-f2/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/canonical-deformed-audit-f2/third_party/nlohmann",
+              "-isystem",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/harfbuzz",
+              "-isystem",
+              "/usr/include/glib-2.0",
+              "-isystem",
+              "/usr/lib64/glib-2.0/include",
+              "-isystem",
+              "/usr/include/sysprof-6",
+              "-isystem",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/freetype2",
+              "-isystem",
+              "/usr/include/libpng16",
+              "-isystem",
+              "/usr/include/libxml2",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "-O1",
+              "-g1",
+              "-std=gnu++20",
+              "-pthread",
+              "-DWITH_GZFILEOP",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-deformed-audit-f2/artifacts/deformed-proof/sanitize/consumer.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-deformed-audit-f2/tests/canonical-deformed-equivalence.cpp"
+            ],
+            "exit_code": 0,
+            "seconds": 18.766402162029408
+          },
+          {
+            "name": "link",
+            "command": [
+              "/usr/bin/c++",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "-O1",
+              "-g1",
+              "-fsanitize=address,undefined",
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-deformed-audit-f2/artifacts/deformed-proof/sanitize/consumer.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-deformed-audit-f2/artifacts/deformed-proof/sanitize/native",
+              "-Wl,-rpath,/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib",
+              "libdome-sculpt-render.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-uv-final-a086/artifacts/uv-final-build/sanitize/libdome-sculpt-core.a",
+              "libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "libdome-sculpt-polygon.a",
+              "libxatlas.a",
+              "libmikktspace.a",
+              "libmikktspace-robust.a",
+              "libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libharfbuzz.so",
+              "/usr/lib64/libEGL.so",
+              "/usr/lib64/libGL.so",
+              "/usr/lib64/libfontconfig.so",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libfreetype.so",
+              "/usr/lib64/libicui18n.so",
+              "/usr/lib64/libicuuc.so",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit_code": 0,
+            "seconds": 2.5547559009864926
+          },
+          {
+            "name": "actual-source-comparison",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-deformed-audit-f2/artifacts/deformed-proof/sanitize/native",
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-deformed-audit-f2/tests/fixtures/layered-normal",
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-deformed-audit-f2/artifacts/deformed-proof/sanitize/output"
+            ],
+            "exit_code": 1,
+            "seconds": 0.65781376499217
+          }
+        ],
+        "phase": "actual-source-comparison",
+        "child_pid": 1845808,
+        "exit_code": 1,
+        "seconds": 22.01705432101153,
+        "inputs": 2152,
+        "drift": []
+      },
+      "before_sha256": "36a8ba67537db4488f79acc4142952777c0c2b38e573bbb05e02b4a6a94d276c",
+      "files": {
+        "/home/blux/de-xr/dome-sculpt/artifacts/canonical-deformed-audit-f2/artifacts/deformed-proof/sanitize/status.json": "0af538934862c415cb7376e1af29810957bd55f869849f4c0eb5241c0161ea40",
+        "/home/blux/de-xr/dome-sculpt/artifacts/canonical-deformed-audit-f2/artifacts/deformed-proof/sanitize/compile.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "/home/blux/de-xr/dome-sculpt/artifacts/canonical-deformed-audit-f2/artifacts/deformed-proof/sanitize/consumer.o": "f220be498b2206cbae4a8a67e7deba8ffc936bcb9f4923c717df6e3bc83ebca4",
+        "/home/blux/de-xr/dome-sculpt/artifacts/canonical-deformed-audit-f2/artifacts/deformed-proof/sanitize/link.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "/home/blux/de-xr/dome-sculpt/artifacts/canonical-deformed-audit-f2/artifacts/deformed-proof/sanitize/native": "616151649815d7f9be9db78d397d5619d69dd76619d4799904281e2bb528db15",
+        "/home/blux/de-xr/dome-sculpt/artifacts/canonical-deformed-audit-f2/artifacts/deformed-proof/sanitize/actual-source-comparison.log": "ac29eb82ebc70a82e9958acd485b5b91a99f9a75b1db4b434627ebe12dd6745e",
+        "/home/blux/de-xr/dome-sculpt/artifacts/canonical-deformed-audit-f2/artifacts/deformed-proof/sanitize/output/7-0-35-raw.png": "8cc74dfb03e4142acfe0e3704704975463d72832e8ea9f4939bc3025d46a0c2f",
+        "/home/blux/de-xr/dome-sculpt/artifacts/canonical-deformed-audit-f2/artifacts/deformed-proof/sanitize/output/7-0-35-converted.png": "978372c1cb600c2cc3133c384fe06fd88ac7f07f1f965b9289f2db9e29a3d1b0",
+        "/home/blux/de-xr/dome-sculpt/artifacts/canonical-deformed-audit-f2/artifacts/deformed-proof/sanitize/output/7-1-35-raw.png": "2cdb2e78dc95a9f096be80a09d181d8d9890622cbeb2e919cd64d87faf87632f",
+        "/home/blux/de-xr/dome-sculpt/artifacts/canonical-deformed-audit-f2/artifacts/deformed-proof/sanitize/output/7-1-35-converted.png": "436f056e6409dc7d609d42f571fb781cd10bdf0ac9603f8381cfa87c824f23a8",
+        "/home/blux/de-xr/dome-sculpt/artifacts/canonical-deformed-audit-f2/artifacts/deformed-proof/sanitize/output/7-2-0-raw.png": "fde64bbb1aa7fa6ec2be6db8e55030abac5274508da2b10406b8f2a24caa5ab1",
+        "/home/blux/de-xr/dome-sculpt/artifacts/canonical-deformed-audit-f2/artifacts/deformed-proof/sanitize/output/7-2-0-converted.png": "d8683184f9a2bbfe676a48cbbc9cd3051b42ab12234b2644c81a5d3c5bae5998",
+        "/home/blux/de-xr/dome-sculpt/artifacts/canonical-deformed-audit-f2/artifacts/deformed-proof/sanitize/output/7-2-35-raw.png": "c3c420219e5f97b0d3310461e2a4766e496c75cfd6d73a41b69bbc746127884d",
+        "/home/blux/de-xr/dome-sculpt/artifacts/canonical-deformed-audit-f2/artifacts/deformed-proof/sanitize/output/7-2-35-converted.png": "6e056fbee0f6846cc9a04384f91e281cca256b8ccfd1ca72c0ee763a2a321c9e"
+      }
+    }
+  },
+  "R_S_PNG_pairs": [
+    {
+      "release": "/home/blux/de-xr/dome-sculpt/artifacts/canonical-deformed-audit-f2/artifacts/deformed-proof/release/output/7-0-35-converted.png",
+      "sanitize": "/home/blux/de-xr/dome-sculpt/artifacts/canonical-deformed-audit-f2/artifacts/deformed-proof/sanitize/output/7-0-35-converted.png",
+      "sha256": "978372c1cb600c2cc3133c384fe06fd88ac7f07f1f965b9289f2db9e29a3d1b0"
+    },
+    {
+      "release": "/home/blux/de-xr/dome-sculpt/artifacts/canonical-deformed-audit-f2/artifacts/deformed-proof/release/output/7-0-35-raw.png",
+      "sanitize": "/home/blux/de-xr/dome-sculpt/artifacts/canonical-deformed-audit-f2/artifacts/deformed-proof/sanitize/output/7-0-35-raw.png",
+      "sha256": "8cc74dfb03e4142acfe0e3704704975463d72832e8ea9f4939bc3025d46a0c2f"
+    },
+    {
+      "release": "/home/blux/de-xr/dome-sculpt/artifacts/canonical-deformed-audit-f2/artifacts/deformed-proof/release/output/7-1-35-converted.png",
+      "sanitize": "/home/blux/de-xr/dome-sculpt/artifacts/canonical-deformed-audit-f2/artifacts/deformed-proof/sanitize/output/7-1-35-converted.png",
+      "sha256": "436f056e6409dc7d609d42f571fb781cd10bdf0ac9603f8381cfa87c824f23a8"
+    },
+    {
+      "release": "/home/blux/de-xr/dome-sculpt/artifacts/canonical-deformed-audit-f2/artifacts/deformed-proof/release/output/7-1-35-raw.png",
+      "sanitize": "/home/blux/de-xr/dome-sculpt/artifacts/canonical-deformed-audit-f2/artifacts/deformed-proof/sanitize/output/7-1-35-raw.png",
+      "sha256": "2cdb2e78dc95a9f096be80a09d181d8d9890622cbeb2e919cd64d87faf87632f"
+    },
+    {
+      "release": "/home/blux/de-xr/dome-sculpt/artifacts/canonical-deformed-audit-f2/artifacts/deformed-proof/release/output/7-2-0-converted.png",
+      "sanitize": "/home/blux/de-xr/dome-sculpt/artifacts/canonical-deformed-audit-f2/artifacts/deformed-proof/sanitize/output/7-2-0-converted.png",
+      "sha256": "d8683184f9a2bbfe676a48cbbc9cd3051b42ab12234b2644c81a5d3c5bae5998"
+    },
+    {
+      "release": "/home/blux/de-xr/dome-sculpt/artifacts/canonical-deformed-audit-f2/artifacts/deformed-proof/release/output/7-2-0-raw.png",
+      "sanitize": "/home/blux/de-xr/dome-sculpt/artifacts/canonical-deformed-audit-f2/artifacts/deformed-proof/sanitize/output/7-2-0-raw.png",
+      "sha256": "fde64bbb1aa7fa6ec2be6db8e55030abac5274508da2b10406b8f2a24caa5ab1"
+    },
+    {
+      "release": "/home/blux/de-xr/dome-sculpt/artifacts/canonical-deformed-audit-f2/artifacts/deformed-proof/release/output/7-2-35-converted.png",
+      "sanitize": "/home/blux/de-xr/dome-sculpt/artifacts/canonical-deformed-audit-f2/artifacts/deformed-proof/sanitize/output/7-2-35-converted.png",
+      "sha256": "6e056fbee0f6846cc9a04384f91e281cca256b8ccfd1ca72c0ee763a2a321c9e"
+    },
+    {
+      "release": "/home/blux/de-xr/dome-sculpt/artifacts/canonical-deformed-audit-f2/artifacts/deformed-proof/release/output/7-2-35-raw.png",
+      "sanitize": "/home/blux/de-xr/dome-sculpt/artifacts/canonical-deformed-audit-f2/artifacts/deformed-proof/sanitize/output/7-2-35-raw.png",
+      "sha256": "c3c420219e5f97b0d3310461e2a4766e496c75cfd6d73a41b69bbc746127884d"
+    }
+  ]
+}

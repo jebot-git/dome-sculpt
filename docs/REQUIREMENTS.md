@@ -1,5 +1,9 @@
 # Full objective and completion evidence
 
+## Private original-source deformation audit — 2026-11-04
+
+Actual raw legacy canonical versus converted native shading fails4/9 curved skin/morph states eachR/S, maximum9>unchanged4;9repeated unskinned rest controls remain0. Eight failed PNG pairs are R/S bit-exact,2,152 inputs each unchanged. Read CANONICAL-DEFORMED-SOURCE-AUDIT.md and receipt. This is separate from passed UV34 comparisons against pre-UV converted shading; root cause/native morph normals/pose-frame transport remains open. Keep main admission withheld and preserve frozen f2 fresh ALL/full630. Full goal and later drawers remain incomplete.
+
 ## Private actual converted-normal UV editing — 2026-11-04
 
 Scene34/material16 now retains real root UV correspondence through Apply/Cancel/Undo/queued Save/restart, renderer/export, Clear and root-domain rebake. R/S each225 new views/workflow assertions,160 existing export,21kernel/11worker pass; actualArc226+161 and324KHR0errors/108exacttriples. Native normal/compact15each/profile and actual-loader syntheticXR20each pass. Real archive5,439decoder+8,959encoder C++ denial prefixes and24Cancel each pass; defaultcache/C/caller/IO separate. Original fresh224-task R/S builds0 but6/7runs/export8>4 negative preserved; complete matching-TU repair passes, no finalALL/full630/main claim. Read LAYERED-NORMAL-UV-NATIVE.md and receipt for actual artifact/observer negatives and remaining typed/key/corner/native32/device/composition work. Full goal and deferred controller drawers remain incomplete.
