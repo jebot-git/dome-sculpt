@@ -7,7 +7,8 @@
 #include <tuple>
 #include <climits>
 namespace dome {
-// Four arbitrary-sized sampled images share one fragment texture unit. Mips
+// Seven bounded views share one fragment texture unit. Legacy uses the first
+// four; native emission adds three independent floating contribution views. Mips
 // stay GPU-resident: texture -> pixel-pack buffer -> texture-buffer attachment. Linear overlay
 // views promote the shared destination to RGBA32F; legacy source-only packs
 // retain their exact RGBA8 path and byte budget.
@@ -21,14 +22,15 @@ public:
     std::shared_ptr<const detail::PaintOverlayPacket> overlay;uint32_t plane=0;bool overlay_pbr=false;
     static Input linear(const detail::PaintOverlayCompiler::Resource &resource,uint32_t plane,bool mips=false){if(plane>=5)throw std::invalid_argument("Invalid GPU overlay plane");Input in;in.texture=resource.planes[plane];in.mips=mips;in.srgb=false;in.overlay=resource.owner;in.plane=plane;in.overlay_pbr=resource.pbr;return in;}
   };
-  using Inputs=std::array<Input,4>;
-  using Key=std::array<std::tuple<uintptr_t,bool,bool,uint32_t>,4>;
+  static constexpr size_t view_count=7;
+  using Inputs=std::array<Input,view_count>;
+  using Key=std::array<std::tuple<uintptr_t,bool,bool,uint32_t>,view_count>;
   struct Resource {
     GLuint texture=0,buffer=0;size_t bytes=0;bool floating=false;
     Inputs owners;
-    // offset (RGBA texels), width, height, reserved, for4x14 mip levels.
-    std::array<std::array<GLint,4>,56> levels{};
-    std::array<std::array<GLint,2>,4> info{}; // count,sRGB.
+    // offset (RGBA texels), width, height, reserved, for view_count*14 levels.
+    std::array<std::array<GLint,4>,view_count*14> levels{};
+    std::array<std::array<GLint,2>,view_count> info{}; // count,sRGB.
   };
 private:
   std::map<Key,Resource> cache_;
@@ -38,7 +40,7 @@ private:
     std::map<std::tuple<uintptr_t,bool,bool,uint32_t>,size_t> shared;
     output.floating=std::any_of(inputs.begin(),inputs.end(),[](const auto &in){return bool(in.overlay);});
     size_t texels=0;
-    for(size_t view=0;view<4;++view) {
+    for(size_t view=0;view<view_count;++view) {
       const auto &input=inputs[view];if(!input.owner&&!input.overlay)continue;
       if(input.overlay){if(input.owner||input.overlay->empty()||input.srgb||input.plane>=5)throw std::invalid_argument("Invalid linear overlay source-pack authority");}
       else input.owner->validate();
@@ -85,7 +87,7 @@ private:
       glBufferData(GL_PIXEL_PACK_BUFFER,GLsizeiptr(resource.bytes),nullptr,GL_STATIC_COPY);
       if(glGetError()!=GL_NO_ERROR)throw std::runtime_error("GPU source pack allocation failed");
       std::set<GLint> copied;
-      for(size_t view=0;view<4;++view)for(GLint level=0;level<resource.info[view][0];++level) {
+      for(size_t view=0;view<view_count;++view)for(GLint level=0;level<resource.info[view][0];++level) {
         auto offset=resource.levels[view*14+size_t(level)][0];
         if(!copied.insert(offset).second)continue;
         if(!resource.owners[view].texture)throw std::invalid_argument("GPU source pack has no uploaded texture");
@@ -126,7 +128,7 @@ private:
   }
 public:
   static Key key(const Inputs &inputs) {
-    Key result;for(size_t n=0;n<4;++n)result[n]={reinterpret_cast<uintptr_t>(inputs[n].overlay?static_cast<const void*>(inputs[n].overlay.get()):static_cast<const void*>(inputs[n].owner.get())),inputs[n].mips,inputs[n].srgb,inputs[n].overlay?inputs[n].plane+1+(inputs[n].overlay_pbr?5u:0u):0u};return result;
+    Key result;for(size_t n=0;n<view_count;++n)result[n]={reinterpret_cast<uintptr_t>(inputs[n].overlay?static_cast<const void*>(inputs[n].overlay.get()):static_cast<const void*>(inputs[n].owner.get())),inputs[n].mips,inputs[n].srgb,inputs[n].overlay?inputs[n].plane+1+(inputs[n].overlay_pbr?5u:0u):0u};return result;
   }
   void preflight(const std::vector<Inputs> &inputs,size_t base_bytes,size_t base_images,const SurfaceTextureLimits &limits) {
     auto wanted=planning(inputs,base_bytes,base_images,limits);sweep(wanted);

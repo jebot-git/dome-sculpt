@@ -114,7 +114,7 @@ struct SurfaceRenderer::TextureState {
     std::array<bool,4> packed_srgb{true,true,true,false};
     MToonSourcePacks::Inputs packed_inputs;
     std::shared_ptr<const detail::PaintOverlayPacket> overlay;
-    bool derived=false,shade_alias=false,baked_normal=false;
+    bool derived=false,shade_alias=false,baked_normal=false,native_emission=false;
   };
   GLint vertex_attributes=0;
   std::unordered_map<uint64_t,Toon> toons;
@@ -334,9 +334,10 @@ struct SurfaceRenderer::TextureState {
           (!typed && maps && maps->source_maps && maps->source_maps->normal.image && maps->source_maps->normal_scale!=0)))
         throw std::invalid_argument("Normal-mapped source material requires retained tangent authority");
       if(typed){
-        if(maps&&maps->overlay&&maps->overlay->native_geometry())
-          throw std::invalid_argument("Native physical MToon preview needs its actual typed float adapter; choose Core PBR for this view");
         Toon toon;toon.appearance=range.appearance;toon.source=range.material_bindings;toon.material=*typed;
+        // This packet was authenticated against the actual native paint/domain
+        // above. Its color is already in maps; it carries emission only here.
+        toon.native_emission=maps&&maps->overlay&&bool(maps->overlay->native_geometry());
         toon.derived=maps&&!maps->source_only;
         if(maps&&maps->overlay&&!maps->overlay->empty())toon.overlay=maps->overlay;
         if(toon.source) {toon.roles=toon.source->roles;toon.native=toon.source->native_reference;}
@@ -377,14 +378,22 @@ struct SurfaceRenderer::TextureState {
           PaintSourceMaps empty;const auto &source_maps=maps->source_maps?*maps->source_maps:empty;
           original(12,0);
           auto derived=[&](int destination,const Image&image,const PaintSourceTexture&original,bool srgb){auto view=original;view.uv_transform={1,0,0,1,0,0};if(!view.image)view.wrap_s=view.wrap_t=GL_CLAMP_TO_EDGE;slot(destination,std::shared_ptr<const Image>(maps,&image),view,srgb);};
-          derived(0,maps->color,source_maps.color,true);derived(3,maps->emission,source_maps.emission,true);
+          derived(0,maps->color,source_maps.color,true);
+          if(toon.native_emission)original(3,3);
+          else derived(3,maps->emission,source_maps.emission,true);
           derived(11,maps->color_coverage,source_maps.color,false);
           slot(14,source_maps.color.image,source_maps.color,true);
           toon.packed_views={source_maps.color,toon.roles[3],source_maps.emission,source_maps.emission};
           toon.packed_srgb[1]=typed->textures[3].encoding==MToonEncoding::Srgb;
-          auto &coverage=toon.packed_views[3];coverage.image=std::shared_ptr<const Image>(maps,&maps->emission_coverage);
-          coverage.texcoord=0;coverage.uv_transform={1,0,0,1,0,0};
-          if(!source_maps.emission.image)coverage.wrap_s=coverage.wrap_t=GL_CLAMP_TO_EDGE;
+          if(toon.native_emission){
+            // Emission uses the real original typed role, never a subtraction
+            // from a finite generic emission map. Only color correction needs0.
+            for(size_t view=1;view<4;++view)toon.packed_views[view]={};
+          }else{
+            auto &coverage=toon.packed_views[3];coverage.image=std::shared_ptr<const Image>(maps,&maps->emission_coverage);
+            coverage.texcoord=0;coverage.uv_transform={1,0,0,1,0,0};
+            if(!source_maps.emission.image)coverage.wrap_s=coverage.wrap_t=GL_CLAMP_TO_EDGE;
+          }
           for(size_t packed=0;packed<4;++packed) {
             const auto &view=toon.packed_views[packed];if(!view.image)continue;view.validate();view.image->validate();
             Key key{view.image.get(),toon.packed_srgb[packed]};auto sample=sampler(view);
@@ -462,10 +471,16 @@ struct SurfaceRenderer::TextureState {
       }
       if(toon.overlay){
         detail::PaintOverlayCompiler::Resource forecast;forecast.owner=toon.overlay->contribution_owner()?toon.overlay->contribution_owner():toon.overlay;forecast.pbr=true;
-        toon.packed_inputs[0]=MToonSourcePacks::Input::linear(forecast,0);
-        toon.packed_inputs[1]=MToonSourcePacks::Input::linear(forecast,2);
-        toon.packed_inputs[2]=MToonSourcePacks::Input::linear(forecast,4);
-        toon.packed_inputs[3]=MToonSourcePacks::Input::linear(forecast,3);
+        if(toon.native_emission){
+          toon.packed_inputs[4]=MToonSourcePacks::Input::linear(forecast,2);
+          toon.packed_inputs[5]=MToonSourcePacks::Input::linear(forecast,4);
+          toon.packed_inputs[6]=MToonSourcePacks::Input::linear(forecast,3);
+        }else{
+          toon.packed_inputs[0]=MToonSourcePacks::Input::linear(forecast,0);
+          toon.packed_inputs[1]=MToonSourcePacks::Input::linear(forecast,2);
+          toon.packed_inputs[2]=MToonSourcePacks::Input::linear(forecast,4);
+          toon.packed_inputs[3]=MToonSourcePacks::Input::linear(forecast,3);
+        }
       }
       source_packs.push_back(toon.packed_inputs);
     }
@@ -507,10 +522,16 @@ struct SurfaceRenderer::TextureState {
     for(auto &[object,toon]:next_toons)if(toon.derived||toon.overlay) {
       for(auto &view:toon.packed_inputs)if(view.owner)view.texture=images.at(Key{view.owner.get(),view.srgb}).id;
       if(toon.overlay){const auto &resource=paint_overlays.at(toon.overlay,true);
-        toon.packed_inputs[0]=MToonSourcePacks::Input::linear(resource,0);
-        toon.packed_inputs[1]=MToonSourcePacks::Input::linear(resource,2);
-        toon.packed_inputs[2]=MToonSourcePacks::Input::linear(resource,4);
-        toon.packed_inputs[3]=MToonSourcePacks::Input::linear(resource,3);
+        if(toon.native_emission){
+          toon.packed_inputs[4]=MToonSourcePacks::Input::linear(resource,2);
+          toon.packed_inputs[5]=MToonSourcePacks::Input::linear(resource,4);
+          toon.packed_inputs[6]=MToonSourcePacks::Input::linear(resource,3);
+        }else{
+          toon.packed_inputs[0]=MToonSourcePacks::Input::linear(resource,0);
+          toon.packed_inputs[1]=MToonSourcePacks::Input::linear(resource,2);
+          toon.packed_inputs[2]=MToonSourcePacks::Input::linear(resource,4);
+          toon.packed_inputs[3]=MToonSourcePacks::Input::linear(resource,3);
+        }
       }
       source_packs.push_back(toon.packed_inputs);
     }
@@ -888,7 +909,7 @@ void SurfaceRenderer::draw(std::shared_ptr<const MeshSnapshot> mesh,
     if(t.derived){u[0]={1,1,1,1};u[2][0]=u[2][1]=u[2][2]=emission_strength;}
     const auto background=textures_->physical_backgrounds.find(r.object);
     if(t.overlay)u[0]={1,1,1,1};
-    if(t.overlay||background!=textures_->physical_backgrounds.end())u[2][0]=u[2][1]=u[2][2]=1;
+    if(t.overlay||t.native_emission||background!=textures_->physical_backgrounds.end())u[2][0]=u[2][1]=u[2][2]=1;
     auto original=Material::AlphaMode(source.alpha);
     if(r.material.alpha!=Material::AlphaMode::Automatic&&r.material.alpha!=original)u[8][1]=r.material.alpha==Material::AlphaMode::Opaque?0:r.material.alpha==Material::AlphaMode::Mask?1:2;
     if(r.material.alpha_cutoff!=source.alpha_cutoff)u[6][3]=r.material.alpha_cutoff;
@@ -904,14 +925,14 @@ void SurfaceRenderer::draw(std::shared_ptr<const MeshSnapshot> mesh,
       auto name="tex"+std::to_string(n);glUniform1i(glGetUniformLocation(program_,name.c_str()),n);
     }
     if(t.derived||t.overlay) {
-      if(t.derived)derived[0]=derived[3]=1;
+      if(t.derived){derived[0]=1;derived[3]=!t.native_emission;}
       const auto &pack=textures_->packed_sources.at(t.packed_inputs);
-      std::array<std::array<GLint,4>,4> sampling{};
+      std::array<std::array<GLint,4>,MToonSourcePacks::view_count> sampling{};
       for(size_t view=0;view<4;++view)sampling[view]=TextureState::sampler(t.packed_views[view]);
       glUniform1i(glGetUniformLocation(program_,"packedSources"),14);
-      glUniform4iv(glGetUniformLocation(program_,"mt_pack_levels[0]"),56,pack.levels[0].data());
-      glUniform2iv(glGetUniformLocation(program_,"mt_pack_info[0]"),4,pack.info[0].data());
-      glUniform4iv(glGetUniformLocation(program_,"mt_pack_sampler[0]"),4,sampling[0].data());
+      glUniform4iv(glGetUniformLocation(program_,"mt_pack_levels[0]"),GLsizei(MToonSourcePacks::view_count*14),pack.levels[0].data());
+      glUniform2iv(glGetUniformLocation(program_,"mt_pack_info[0]"),GLsizei(MToonSourcePacks::view_count),pack.info[0].data());
+      glUniform4iv(glGetUniformLocation(program_,"mt_pack_sampler[0]"),GLsizei(MToonSourcePacks::view_count),sampling[0].data());
       const auto &uv=t.packed_views[2].uv_transform;
       pbrx[3]=uv[0];pbrx[4]=uv[1];pbrx[5]=uv[4];pbry[3]=uv[2];pbry[4]=uv[3];pbry[5]=uv[5];
     }
@@ -923,7 +944,7 @@ void SurfaceRenderer::draw(std::shared_ptr<const MeshSnapshot> mesh,
     glUniform1iv(glGetUniformLocation(program_,"mt_present[0]"),16,present.data());glUniform1iv(glGetUniformLocation(program_,"mt_coord[0]"),16,coordinates.data());glUniform1iv(glGetUniformLocation(program_,"mt_derived[0]"),16,derived.data());glUniform1iv(glGetUniformLocation(program_,"mt_channel[0]"),16,channels.data());
     glUniform2fv(glGetUniformLocation(program_,"mt_offset[0]"),16,offsets.data());glUniform2fv(glGetUniformLocation(program_,"mt_scale[0]"),16,scales.data());glUniform1fv(glGetUniformLocation(program_,"mt_rotation[0]"),16,rotations.data());glUniform3fv(glGetUniformLocation(program_,"mt_pbr_x[0]"),2,pbrx.data());glUniform3fv(glGetUniformLocation(program_,"mt_pbr_y[0]"),2,pbry.data());
     glUniform3fv(glGetUniformLocation(program_,"mt_effective_emission"),1,effective_emission.data());
-    glUniform1i(glGetUniformLocation(program_,"mt_overlay"),bool(t.overlay));
+    glUniform1i(glGetUniformLocation(program_,"mt_overlay"),t.native_emission?(t.overlay?2:3):int(bool(t.overlay)));
     glUniform1f(glGetUniformLocation(program_,"mt_emission_strength"),emission_strength);
     glUniform1i(glGetUniformLocation(program_,"mt_absolute_background"),background!=textures_->physical_backgrounds.end());
     if(background!=textures_->physical_backgrounds.end())glUniform3fv(glGetUniformLocation(program_,"mt_background"),1,background->second.data());

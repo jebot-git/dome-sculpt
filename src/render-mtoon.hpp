@@ -49,7 +49,7 @@ uniform vec4 mt_effective_color,mt_native_color;uniform vec3 mt_effective_emissi
 uniform int mt_shade_alias,mt_baked_normal;
 uniform int mt_overlay,mt_absolute_background;uniform float mt_emission_strength;uniform vec3 mt_background;
 uniform samplerBuffer packedSources;
-uniform ivec4 mt_pack_levels[56],mt_pack_sampler[4];uniform ivec2 mt_pack_info[4];
+uniform ivec4 mt_pack_levels[98],mt_pack_sampler[7];uniform ivec2 mt_pack_info[7];
 vec2 mt_packed_wrap(vec2 q,ivec2 wrap){for(int axis=0;axis<2;++axis){
 if(wrap[axis]==10497)q[axis]=fract(q[axis]);
 else if(wrap[axis]==33648){float cell=floor(q[axis]);q[axis]=fract(q[axis]);if(mod(cell,2.)>=1.)q[axis]=1.-q[axis];}
@@ -140,6 +140,14 @@ if(mt_overlay==1){float coverage=mt_paint_read(3,paintcoord).a;
 vec3 original=s.emission;
 vec3 background=mt_absolute_background==1?mt_background:mt_effective_emission*mt_emission_strength;
 s.emission=background*original*(1-coverage)+mt_paint_read(1,paintcoord).rgb*mt_emission_strength+mt_paint_read(2,paintcoord).rgb;
+}else if(mt_overlay>=2){
+// Native color/normal maps are already resolved. Only emission is evaluated
+// from these separate genuine coefficient fields, in its actual paint domain.
+float coverage=mt_overlay==2?mt_paint_read(6,paintcoord).a:0.;
+vec3 legacy=mt_overlay==2?mt_paint_read(4,paintcoord).rgb:vec3(0);
+vec3 physical=mt_overlay==2?mt_paint_read(5,paintcoord).rgb:vec3(0);
+vec3 background=mt_absolute_background==1?mt_background:mt_effective_emission*mt_emission_strength;
+s.emission=background*s.emission*(1.-coverage)+legacy*mt_emission_strength+physical;
 }else if(mt_absolute_background==1)s.emission*=mt_background;
 s.rim=mt_read(4,mt_uv(4,texcoord,texcoord1,N,V,mask)).rgb;s.matcap=mt_read(5,mt_uv(5,texcoord,texcoord1,N,V,mask)).rgb;
 s.shift=mt_scalar(6,mt_read(6,mt_uv(6,texcoord,texcoord1,N,V,mask)));s.receiveShadow=mt_scalar(9,mt_read(9,mt_uv(9,texcoord,texcoord1,N,V,mask)));s.grade=mt_scalar(10,mt_read(10,mt_uv(10,texcoord,texcoord1,N,V,mask)));
