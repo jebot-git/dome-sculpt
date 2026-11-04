@@ -3,6 +3,7 @@
 #include "native-paint32-render.cpp"
 #undef DOME_NATIVE_PAINT32_RENDER_NO_MAIN
 #include "dome/emission-native.hpp"
+#include "dome/gltf-export.hpp"
 #include "emission-export.hpp"
 #include "gltf-document.hpp"
 #include "humanoid-sha256.hpp"
@@ -26,7 +27,7 @@ int main(int argc,char **argv)try{
   const auto actual_worker=out/(std::to_string(number)+"-worker.glb");doc.export_asset(actual_worker,AssetExportFormat::Glb).get();auto worker_restored=extract_native_emission(bytes32(actual_worker));check(worker_restored&&worker_restored->encode()==exact,"Actual ordinary physical Document worker now emits/reopens genuine native32 package");
   auto next=std::make_shared<NativeEmissionExport>(*owner);next->scene=std::make_shared<const Scene>(restored->snapshot());options.emission=next;const auto second=out/(std::to_string(number)+"-second.glb");export_glb(emission_export_surfaces(*next->scene),second,options);check(bytes32(second)==bytes,"Native32 physical package second cycle preserves exact bytes and graph size");
   if(number==0){
-   auto foreign=surfaces;foreign[0].paint_corner_coordinates[0][0]+=.01f;check(rejects([&]{export_glb(foreign,out/"wrong-corner.glb",options);}),"Foreign current paint corners cannot borrow physical Scene authority");
+   auto foreign=surfaces;foreign[0].material_bindings=std::shared_ptr<const SourceMaterialBindings>(surfaces[0].material_bindings.get(),[](const SourceMaterialBindings*){});check(rejects([&]{export_glb(foreign,out/"foreign-controlblock.glb",options);}),"Same-address foreign material control block cannot borrow physical Scene authority");foreign=surfaces;foreign[0].paint_corner_coordinates[0][0]+=.01f;check(rejects([&]{export_glb(foreign,out/"wrong-corner.glb",options);}),"Foreign current paint corners cannot borrow physical Scene authority");
    auto changed=d;auto &bad=changed.json["extras"]["domeSculptEmission"]["images"][0];bad["domain"]["texCoord"]=0;changed.json["materials"][bad["material"].get<size_t>()]["emissiveTexture"]["texCoord"]=0;resign32(changed);detail::write_glb(std::move(changed),out/"wrong-basis.glb");check(rejects([&]{extract_native_emission(bytes32(out/"wrong-basis.glb"));}),"Rehashed wrong UV0 basis refuses actual owning corner replay");
    changed=d;changed.json["extras"]["domeSculptEmission"]["images"][0].erase("domain");resign32(changed);detail::write_glb(std::move(changed),out/"missing-domain.glb");check(rejects([&]{extract_native_emission(bytes32(out/"missing-domain.glb"));}),"Package3 without actual domain witness fails closed");
   }
