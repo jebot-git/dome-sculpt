@@ -9,6 +9,7 @@
 #include "vrm1-authoring.hpp"
 #include "native-authoring-attach.hpp"
 #include <set>
+#include <bit>
 namespace dome::detail {
 namespace {
 using J = nlohmann::json;
@@ -67,6 +68,8 @@ static VrmExportReport export_vrm1_impl(const std::vector<ObjectSurface> &object
       for (const auto &extension : node.at("extensions").items())
         require(extension.key() == "VRMC_node_constraint",
                 "node extension has no typed reference remapper");
+  struct ExpressionLayerIdentity {int source,lower,upper;};
+  std::vector<ExpressionLayerIdentity> expression_layers;
   std::set<int> uv_expression_materials, color_expression_materials;
   const auto &vrm = original.at("extensions").at("VRMC_vrm");
   if (vrm.contains("expressions"))
@@ -519,6 +522,50 @@ static VrmExportReport export_vrm1_impl(const std::vector<ObjectSurface> &object
     }
     j["materials"][emitted.material] = std::move(value);
     identities.materials[size_t(a.source_material)].push_back(emitted.material);
+    if(const auto *layer=authoring?authoring->expression_layer(object):nullptr){
+      // Replay the same owning frame expansion as make_gltf, then authenticate
+      // the actual emitted index bytes. Never infer correspondence by position.
+      auto frame=normal_frame_export(object,SourceMorphSpace::Native,options.cancelled,true);
+      const auto lower=j["meshes"][emitted.mesh]["primitives"][0];
+      const auto &position=j["accessors"][lower.at("attributes").at("POSITION").get<size_t>()];
+      require(position.at("count").get<size_t>()==frame.rest_vertices.size(),"expression layer frame expansion count differs");
+      require(frame.surface.mesh.indices.size()==object.mesh.indices.size(),"expression layer ordered corners differ");
+      const auto &index=j["accessors"][lower.at("indices").get<size_t>()];
+      require(index.at("componentType")==5125&&index.at("type")=="SCALAR"&&index.at("count")==frame.surface.mesh.indices.size(),"expression layer emitted index representation differs");
+      const auto &view=j["bufferViews"][index.at("bufferView").get<size_t>()];
+      const size_t index_offset=view.value("byteOffset",size_t(0))+index.value("byteOffset",size_t(0));
+      require(index_offset<=binary.size()&&frame.surface.mesh.indices.size()<=(binary.size()-index_offset)/4,"expression layer emitted indices exceed binary");
+      for(size_t c=0;c<frame.surface.mesh.indices.size();++c){
+        if((c&4095)==0)stop(options);
+        const size_t at=index_offset+c*4;const uint32_t actual=uint32_t(binary[at])|(uint32_t(binary[at+1])<<8)|(uint32_t(binary[at+2])<<16)|(uint32_t(binary[at+3])<<24);
+        require(actual==frame.surface.mesh.indices[c]&&frame.rest_vertices.at(actual)==object.mesh.indices[c],"expression layer actual corner identity differs");
+      }
+      auto upper=j["materials"][emitted.material];auto &toon=upper["extensions"]["VRMC_materials_mtoon"];
+      unsigned channel=0;std::set<unsigned> used;
+      auto coordinate=[&](const J &info){unsigned c=info.value("texCoord",0u);if(info.contains("extensions")&&info.at("extensions").contains("KHR_texture_transform"))c=info.at("extensions").at("KHR_texture_transform").value("texCoord",c);used.insert(c);};
+      // Every lower role, including the PBR fallback, retains its coordinates.
+      const auto &pbr=upper.at("pbrMetallicRoughness");for(const char *key:{"baseColorTexture","metallicRoughnessTexture"})if(pbr.contains(key))coordinate(pbr.at(key));
+      for(const char *key:{"normalTexture","occlusionTexture","emissiveTexture"})if(upper.contains(key))coordinate(upper.at(key));
+      for(const auto &entry:toon.items())if(entry.value().is_object()&&entry.value().contains("index"))coordinate(entry.value());
+      while(channel<8&&used.contains(channel))++channel;
+      require(channel<8,"expression layer has no unused genuine texture-coordinate set");
+      require(frame.rest_vertices.size()<=(options.max_output_bytes-std::min(binary.size(),options.max_output_bytes))/8,"expression layer coordinates exceed output bound");
+      const size_t offset=binary.size();for(auto rest:frame.rest_vertices){stop(options);const auto uv=layer->paint_coordinates.at(rest);for(float f:uv){const uint32_t bits=std::bit_cast<uint32_t>(f);for(unsigned b=0;b<4;++b)binary.push_back(uint8_t(bits>>(b*8)));}}
+      const int uv_view=int(j["bufferViews"].size());j["bufferViews"].push_back({{"buffer",0},{"byteOffset",offset},{"byteLength",binary.size()-offset},{"target",34962}});
+      const int uv_accessor=int(j["accessors"].size());j["accessors"].push_back({{"bufferView",uv_view},{"componentType",5126},{"count",frame.rest_vertices.size()},{"type","VEC2"}});
+      PaintSourceTexture paint;paint.image=layer->image;paint.wrap_s=paint.wrap_t=33071;paint.min_filter=paint.mag_filter=9729;
+      const int texture=role_texture(paint);
+      upper["pbrMetallicRoughness"]["baseColorFactor"]=std::array<float,4>{1,1,1,1};
+      upper["pbrMetallicRoughness"]["baseColorTexture"]={{"index",texture},{"texCoord",channel},{"extensions",{{"KHR_texture_transform",{{"scale",layer->scale},{"offset",layer->offset}}}}}};
+      upper["alphaMode"]="BLEND";upper.erase("alphaCutoff");toon["transparentWithZWrite"]=false;toon["renderQueueOffsetNumber"]=0;toon["outlineWidthMode"]="none";toon["outlineWidthFactor"]=0;
+      upper["name"]=object.name+" independent paint contribution";
+      // Source material extras stay on the original lower material. The upper
+      // is a derived standard primitive, with no editor authority of its own.
+      upper.erase("extras");(void)MToonMaterial::from_vrm1(upper,j["textures"].size());
+      const int upper_material=int(j["materials"].size());j["materials"].push_back(std::move(upper));auto primitive=lower;primitive.erase("extras");primitive["material"]=upper_material;primitive["attributes"]["TEXCOORD_"+std::to_string(channel)]=uv_accessor;j["meshes"][emitted.mesh]["primitives"].push_back(std::move(primitive));
+      expression_layers.push_back({a.source_material,emitted.material,upper_material});budget();
+    }
+
     ++report.meshes;
   }
   size_t expected = 0;
@@ -569,6 +616,19 @@ static VrmExportReport export_vrm1_impl(const std::vector<ObjectSurface> &object
   for (auto &extension : extensions.items())
     j["extensions"][extension.key()] = std::move(extension.value());
   remap_vrm1_constraints(j, source, identities, options.cancelled);
+  if(!expression_layers.empty()){
+    auto &definitions=j["extensions"]["VRMC_vrm"]["expressions"];
+    for(const auto *table:{"preset","custom"})if(definitions.contains(table))for(auto &expression:definitions[table]){
+      for(const char *kind:{"textureTransformBinds","materialColorBinds"})if(expression.contains(kind)){
+        const auto original_binds=expression[kind];
+        for(const auto &bind:original_binds)for(const auto &layer:expression_layers)if(bind.at("material").get<int>()==layer.lower){
+          if(std::string_view(kind)=="materialColorBinds"&&(bind.at("type")=="color"||bind.at("type")=="outlineColor"))continue;
+          auto forwarded=bind;forwarded["material"]=layer.upper;expression[kind].push_back(std::move(forwarded));
+        }
+      }
+    }
+  }
+
   auto use = [&](const J &extension) {
     auto &used = j["extensionsUsed"];
     if (!used.is_array())
@@ -579,6 +639,7 @@ static VrmExportReport export_vrm1_impl(const std::vector<ObjectSurface> &object
   for (const auto &extension : original.value("extensionsUsed", J::array()))
     use(extension);
   use("VRMC_vrm");
+  if(!expression_layers.empty())use("KHR_texture_transform");
   if (original.contains("extensionsRequired"))
     j["extensionsRequired"] = original.at("extensionsRequired");
   if (original.contains("extras"))

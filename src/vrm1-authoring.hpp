@@ -2,6 +2,7 @@
 #pragma once
 #include "native-authoring-capture.hpp"
 #include "vrm1-painted-material.hpp"
+#include "vrm1-expression-layer.hpp"
 #include <map>
 #include <set>
 #include <algorithm>
@@ -21,6 +22,7 @@ class Vrm1AuthoringCompilation final {
  std::vector<ObjectSurface> surfaces_;
  std::map<uint64_t,Vrm1PaintedMaterial> materials_;
  std::set<uint64_t> compiled_;
+ std::map<uint64_t,Vrm1ExpressionLayer> expression_layers_;
  std::vector<std::string> diagnostics_;
  Vrm1AuthoringCompilation()=default;
 public:
@@ -34,6 +36,10 @@ public:
  bool compiled(const ObjectSurface &surface)const {
   if(!owns(surface))throw std::invalid_argument("VRM1 compiled surface is not its sealed owner");
   return compiled_.contains(surface.id);
+ }
+ const Vrm1ExpressionLayer *expression_layer(const ObjectSurface &surface)const {
+  if(!owns(surface))throw std::invalid_argument("VRM1 expression layer is not its sealed surface");
+  auto at=expression_layers_.find(surface.id);return at==expression_layers_.end()?nullptr:&at->second;
  }
  const Vrm1PaintedMaterial *material(const ObjectSurface &surface)const {
   if(!owns(surface))throw std::invalid_argument("VRM1 material override is not its sealed surface");

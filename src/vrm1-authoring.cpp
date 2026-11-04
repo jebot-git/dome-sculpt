@@ -49,6 +49,26 @@ std::shared_ptr<const Vrm1AuthoringCompilation> compile_vrm1_authoring(
   if(!object.material_bindings)throw std::invalid_argument("VRM1 painted source lacks its material owner");
   uint32_t resolution=policy.resolution?policy.resolution:object.painted->resolution();if(!policy.resolution){for(const auto &role:object.material_bindings->roles)if(role.image)resolution=std::max({resolution,role.image->width,role.image->height});}
   if(resolution<64||resolution>4096)throw std::length_error("VRM1 portable paint resolution exceeds64..4096");
+  bool dynamic_uv=false;
+  const auto definitions=result->original_.at("extensions").at("VRMC_vrm").value("expressions",J::object());
+  for(const auto *table:{"preset","custom"})if(definitions.contains(table))for(const auto &expression:definitions.at(table))for(const auto &bind:expression.value("textureTransformBinds",J::array()))dynamic_uv|=bind.at("material").get<int>()==surface.appearance->source_material;
+  if(dynamic_uv){
+   const auto before=object.painted->source_sampling_original();
+   if(!before)throw std::invalid_argument("VRM1 dynamic paint has no original source owner");
+   const auto maps=before->source_maps();const size_t arrays=1+(maps?bool(maps->uv1)+maps->extra_uv_sets.size():0);
+   reserve(object.painted->mesh().positions.size(),arrays*sizeof(std::array<float,2>));
+   // make_gltf plus the independent authenticated frame replay can each split
+   // ordered corners. Charge both expanded geometry/morph/channel vectors
+   // before allocating the additional primitive or its carrier coordinates.
+   const size_t targets=object.deformation&&object.deformation->morphs?object.deformation->morphs->targets.size():0;
+   reserve(object.painted->mesh().indices.size(),2*(sizeof(Vec3)*(3+3*targets)+sizeof(uint32_t)+sizeof(std::array<float,2>)*arrays+sizeof(std::array<float,4>)));
+
+   auto bounded=policy;bounded.max_working_bytes=policy.max_working_bytes-working;bounded.max_output_bytes=image_limit-images;bounded.max_sample_operations=policy.max_sample_operations-samples;
+   auto layer=compile_vrm1_expression_layer(result->original_,object,*packet,resolution,bounded,stop);
+   reserve(layer.working_bytes,1);images+=layer.image->rgba.size();samples+=layer.sample_operations;
+   result->diagnostics_.push_back("Object "+std::to_string(object.id)+": separate expression-preserving paint layer; continuous premultiplied RGB bound="+std::to_string(layer.maximum_color_error)+", coverage="+std::to_string(layer.maximum_coverage_error));
+   result->expression_layers_.emplace(object.id,std::move(layer));result->compiled_.insert(object.id);continue;
+  }
   const size_t pixels=size_t(resolution)*resolution;
   if(pixels>policy.max_image_pixels||pixels>image_limit/12)throw std::length_error("VRM1 typed paint output forecast exceeds budget");
   const size_t extra_images=pixels*12,extra_samples=pixels*2*(32+4*packet->layers().size());
@@ -70,7 +90,7 @@ std::shared_ptr<const Vrm1AuthoringCompilation> compile_vrm1_authoring(
  }
  check();staged.validate();result->surfaces_=staged.preview_surfaces(stop);
  if(result->surfaces_.size()!=result->capture_->ids().size())throw std::invalid_argument("VRM1 compilation changed native emitted membership");
- for(size_t i=0;i<result->surfaces_.size();++i){auto &surface=result->surfaces_[i];if(surface.id!=result->capture_->ids()[i])throw std::invalid_argument("VRM1 compilation changed native emitted order");if(result->compiled_.contains(surface.id)){if(auto at=views.find(surface.id);at!=views.end()){surface.textures=at->second.texture;surface.material_bindings=at->second.material;}}else{const auto &object=result->capture_->scene().object(surface.id);if(object.painted&&object.painted->source_sampling_prepared())source_paint_export(*object.painted,surface,stop);}}
+ for(size_t i=0;i<result->surfaces_.size();++i){auto &surface=result->surfaces_[i];if(surface.id!=result->capture_->ids()[i])throw std::invalid_argument("VRM1 compilation changed native emitted order");if(result->expression_layers_.contains(surface.id)){const auto &object=result->capture_->scene().object(surface.id);vrm1_expression_background(*object.painted,surface,stop);}else if(result->compiled_.contains(surface.id)){if(auto at=views.find(surface.id);at!=views.end()){surface.textures=at->second.texture;surface.material_bindings=at->second.material;}}else{const auto &object=result->capture_->scene().object(surface.id);if(object.painted&&object.painted->source_sampling_prepared())source_paint_export(*object.painted,surface,stop);}}
  check();return result;
 }
 }
