@@ -1,5 +1,15 @@
 # Dome Sculpt production handoff
 
+## Explicit portable normal model controls — 2026-11-04
+
+Universal/native/XR controls now describe portable normal/tangent target authoring,
+retained source and rest-space quality. Matched changed-TU R/S plus actual
+normal/compact12+12, Wayland11 and actual-loader syntheticXR30 each pass. Final
+compact rest label repair is screenshot-verified. No math/layout/schema change;
+original different-model measurements and unchanged within-model4 bound remain.
+Read PORTABLE-NORMAL-MODEL-UI.md and receipt. Full630 remains separate/live;
+coherent integration, full production and later drawers remain incomplete.
+
 ## Native source pose basis and conversion contract — 2026-11-04
 
 New authentic source-pose producer matches original native geometry/N/Mikk exactly across18 UV/skin/morph states,108corners eachR/S;44checks,161C++ allocation prefixes and16Cancel pass,2,157inputs exact. Read CANONICAL-NATIVE-POSE.md and receipt. Predating conversion contract explicitly authors a new portable target model, so prior9>4 different-model audit is not a within-model regression gate; measurements remain preserved. Actual same-model bound4 stays unchanged. Make authoring/model/rest-quality controls explicit next; no renderer/schema/main admission or whole RGB repair claim. Full630 f2 remains frozen; full goal and later drawers remain incomplete.

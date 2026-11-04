@@ -1,0 +1,2937 @@
+{
+  "recorded_utc": "2026-11-04T21:43:56.857087+00:00",
+  "source": "2cda3f9f6122df7e974cac8ce178be31b87a9db1",
+  "scope": "Explicit portable attribute authoring and rest-space quality UI/status/receipt assertions; complete changed-TU matched-own-archive builds and actual controls, not new shading math/ABI/schema/fresh ALL/full regression/HMD/device/compute. Final compact label repair compiles complete bake-editor TU and native app relink only. Wayland/XR preceding model7f app unchanged outside bake dialog; exact final GUI uses repaired dialog.",
+  "records": {
+    "model-ui-build/release": {
+      "status": {
+        "state": "terminal",
+        "pid": 2139151,
+        "source": "7f6fce335c9cbcef371e1c190d753360b259c1c6",
+        "profile": "release",
+        "scope": "Complete Document baking/palette/native app/bake-dialog TUs and changed whole native consumer over matching final34+nativePose own archives; no header ABI/schema/math changes. Explicit portable target model, rest-space quality labels, retained source flags/status. Existing original-pose difference measurements are retained as different declared models, not relabeled equal. Not fresh ALL/full631/main/HMD/compute.",
+        "steps": [
+          {
+            "name": "compile-document-baking.cpp",
+            "command": [
+              "/usr/bin/c++",
+              "-DDOME_SCULPT_INSTALLED_ASSETS=\"/usr/local/share/dome-sculpt/assets/humanoid\"",
+              "-DDOME_SCULPT_SOURCE_ASSETS=\"/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/assets/humanoid\"",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/third_party",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/third_party/cgltf",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/third_party/nlohmann",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/third_party/xatlas",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/third_party/mikktspace",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/third_party/ufbx",
+              "-O3",
+              "-DNDEBUG",
+              "-std=gnu++20",
+              "-Wall",
+              "-Wextra",
+              "-Wpedantic",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/release/document-baking.cpp.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/src/document-baking.cpp"
+            ],
+            "exit_code": 0,
+            "seconds": 3.649173131037969
+          },
+          {
+            "name": "archive",
+            "command": [
+              "ar",
+              "r",
+              "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/release/libdome-sculpt-core.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/release/document-baking.cpp.o"
+            ],
+            "exit_code": 0,
+            "seconds": 0.1674162009730935
+          },
+          {
+            "name": "compile-app.cpp",
+            "command": [
+              "/usr/bin/c++",
+              "-DDOME_HAS_XR=1",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/third_party/desktop",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/build-uv-native-release",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/third_party/nlohmann",
+              "-isystem",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/harfbuzz",
+              "-isystem",
+              "/usr/include/glib-2.0",
+              "-isystem",
+              "/usr/lib64/glib-2.0/include",
+              "-isystem",
+              "/usr/include/sysprof-6",
+              "-isystem",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/freetype2",
+              "-isystem",
+              "/usr/include/libpng16",
+              "-isystem",
+              "/usr/include/libxml2",
+              "-isystem",
+              "/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-release/include",
+              "-isystem",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/cairo",
+              "-isystem",
+              "/usr/include/pixman-1",
+              "-isystem",
+              "/usr/include/libmount",
+              "-isystem",
+              "/usr/include/blkid",
+              "-O3",
+              "-DNDEBUG",
+              "-std=gnu++20",
+              "-pthread",
+              "-DWITH_GZFILEOP",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/release/app.cpp.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/src/app.cpp"
+            ],
+            "exit_code": 0,
+            "seconds": 14.093078697042074
+          },
+          {
+            "name": "compile-bake-editor.cpp",
+            "command": [
+              "/usr/bin/c++",
+              "-DDOME_HAS_XR=1",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/third_party/desktop",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/build-uv-native-release",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/third_party/nlohmann",
+              "-isystem",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/harfbuzz",
+              "-isystem",
+              "/usr/include/glib-2.0",
+              "-isystem",
+              "/usr/lib64/glib-2.0/include",
+              "-isystem",
+              "/usr/include/sysprof-6",
+              "-isystem",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/freetype2",
+              "-isystem",
+              "/usr/include/libpng16",
+              "-isystem",
+              "/usr/include/libxml2",
+              "-isystem",
+              "/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-release/include",
+              "-isystem",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/cairo",
+              "-isystem",
+              "/usr/include/pixman-1",
+              "-isystem",
+              "/usr/include/libmount",
+              "-isystem",
+              "/usr/include/blkid",
+              "-O3",
+              "-DNDEBUG",
+              "-std=gnu++20",
+              "-pthread",
+              "-DWITH_GZFILEOP",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/release/bake-editor.cpp.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/src/bake-editor.cpp"
+            ],
+            "exit_code": 0,
+            "seconds": 3.741964798013214
+          },
+          {
+            "name": "compile-palette.cpp",
+            "command": [
+              "/usr/bin/c++",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/third_party/nlohmann",
+              "-isystem",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/harfbuzz",
+              "-isystem",
+              "/usr/include/glib-2.0",
+              "-isystem",
+              "/usr/lib64/glib-2.0/include",
+              "-isystem",
+              "/usr/include/sysprof-6",
+              "-isystem",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/freetype2",
+              "-isystem",
+              "/usr/include/libpng16",
+              "-isystem",
+              "/usr/include/libxml2",
+              "-O3",
+              "-DNDEBUG",
+              "-std=gnu++20",
+              "-pthread",
+              "-DWITH_GZFILEOP",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/release/palette.cpp.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/src/palette.cpp"
+            ],
+            "exit_code": 0,
+            "seconds": 4.7738496320089325
+          },
+          {
+            "name": "archive-render",
+            "command": [
+              "ar",
+              "r",
+              "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/release/libdome-sculpt-render.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/release/palette.cpp.o"
+            ],
+            "exit_code": 0,
+            "seconds": 0.02754937397548929
+          },
+          {
+            "name": "link-dome-sculpt",
+            "command": [
+              "/usr/bin/c++",
+              "-O3",
+              "-DNDEBUG",
+              "CMakeFiles/dome-sculpt.dir/src/native-display-runtime.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/rig-fit-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/projection-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/spacenav-options.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/release/app.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/polygon-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/import-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/procedural-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/resolution-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/sculpt-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/creator-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/rig-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/shapekey-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/weight-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/skin-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/mesh-editor.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/release/bake-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/object-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/paint-editor.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-uv-final-a086/artifacts/uv-final-build/release/uv-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/ui-conventions.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/session-appearance.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/export-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/third_party/desktop/desktop-menu.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/appmenu-protocol.c.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/release/dome-sculpt",
+              "-L/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-release/lib",
+              "-L/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib",
+              "-Wl,-rpath,/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-release/lib:/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib:",
+              "libdome-sculpt-spacenav.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/release/libdome-sculpt-core.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/release/libdome-sculpt-render.a",
+              "/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-release/lib/libfltk_images.so.1.4.5",
+              "/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-release/lib/libfltk_gl.so.1.4.5",
+              "/usr/lib64/libGLU.so",
+              "libdome-sculpt-xr.a",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libpng.so",
+              "/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-release/lib/libfltk.so.1.4.5",
+              "-lcairo",
+              "-L/usr/lib64",
+              "-lX11",
+              "-lGLU",
+              "-lGL",
+              "/usr/lib64/libdl.a",
+              "/usr/lib64/libSM.so",
+              "/usr/lib64/libICE.so",
+              "/usr/lib64/libXext.so",
+              "/usr/lib64/libXinerama.so",
+              "/usr/lib64/libXfixes.so",
+              "/usr/lib64/libXcursor.so",
+              "/usr/lib64/libXrender.so",
+              "/usr/lib64/libXft.so",
+              "/usr/lib64/libwayland-egl.so",
+              "/usr/lib64/libwayland-cursor.so",
+              "/usr/lib64/libxkbcommon.so",
+              "/usr/lib64/libGLX.so",
+              "/usr/lib64/libOpenGL.so",
+              "/usr/lib64/libz.so",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libcairo.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/release/libdome-sculpt-render.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/release/libdome-sculpt-core.a",
+              "libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "libdome-sculpt-polygon.a",
+              "libxatlas.a",
+              "libmikktspace.a",
+              "libmikktspace-robust.a",
+              "libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "/usr/lib64/libEGL.so",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libharfbuzz.so",
+              "/usr/lib64/libGL.so",
+              "/usr/lib64/libfontconfig.so",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libfreetype.so",
+              "/usr/lib64/libicui18n.so",
+              "/usr/lib64/libicuuc.so",
+              "/usr/lib64/libopenxr_loader.so",
+              "/usr/lib64/libgio-2.0.so",
+              "/usr/lib64/libgobject-2.0.so",
+              "/usr/lib64/libglib-2.0.so",
+              "/usr/lib64/libX11.so",
+              "/usr/lib64/libwayland-client.so",
+              "-lm",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit_code": 0,
+            "seconds": 0.5094879009993747
+          },
+          {
+            "name": "compile-native-uv",
+            "command": [
+              "/usr/bin/c++",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/src",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/third_party/desktop",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/third_party/cgltf",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/third_party/nlohmann",
+              "-isystem",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/harfbuzz",
+              "-isystem",
+              "/usr/include/glib-2.0",
+              "-isystem",
+              "/usr/lib64/glib-2.0/include",
+              "-isystem",
+              "/usr/include/sysprof-6",
+              "-isystem",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/freetype2",
+              "-isystem",
+              "/usr/include/libpng16",
+              "-isystem",
+              "/usr/include/libxml2",
+              "-O3",
+              "-DNDEBUG",
+              "-std=gnu++20",
+              "-pthread",
+              "-DWITH_GZFILEOP",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/release/native-uv.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/tests/layered-normal-uv-native.cpp"
+            ],
+            "exit_code": 0,
+            "seconds": 17.216062112012878
+          },
+          {
+            "name": "compile-native",
+            "command": [
+              "/usr/bin/c++",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/src",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/third_party/desktop",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/third_party/cgltf",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/third_party/nlohmann",
+              "-isystem",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/harfbuzz",
+              "-isystem",
+              "/usr/include/glib-2.0",
+              "-isystem",
+              "/usr/lib64/glib-2.0/include",
+              "-isystem",
+              "/usr/include/sysprof-6",
+              "-isystem",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/freetype2",
+              "-isystem",
+              "/usr/include/libpng16",
+              "-isystem",
+              "/usr/include/libxml2",
+              "-O3",
+              "-DNDEBUG",
+              "-std=gnu++20",
+              "-pthread",
+              "-DWITH_GZFILEOP",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/release/native.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/tests/layered-normal-native.cpp"
+            ],
+            "exit_code": 0,
+            "seconds": 12.622789321001619
+          },
+          {
+            "name": "compile-kernel",
+            "command": [
+              "/usr/bin/c++",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/src",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/third_party/nlohmann",
+              "-O3",
+              "-DNDEBUG",
+              "-std=gnu++20",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/release/kernel.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/tests/canonical-normal-uv.cpp"
+            ],
+            "exit_code": 0,
+            "seconds": 4.977473667997401
+          },
+          {
+            "name": "compile-worker",
+            "command": [
+              "/usr/bin/c++",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/src",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/third_party/nlohmann",
+              "-O3",
+              "-DNDEBUG",
+              "-std=gnu++20",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/release/worker.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/tests/layered-normal-uv-safety.cpp"
+            ],
+            "exit_code": 0,
+            "seconds": 4.000629643967841
+          },
+          {
+            "name": "compile-faults",
+            "command": [
+              "/usr/bin/c++",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/src",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/third_party/nlohmann",
+              "-O3",
+              "-DNDEBUG",
+              "-std=gnu++20",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/release/faults.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/tests/layered-normal-archive-faults.cpp"
+            ],
+            "exit_code": 0,
+            "seconds": 4.4659598779981025
+          },
+          {
+            "name": "link-dome-sculpt-layered-normal-native-test",
+            "command": [
+              "/usr/bin/c++",
+              "-O3",
+              "-DNDEBUG",
+              "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/release/native.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/release/dome-sculpt-layered-normal-native-test",
+              "-Wl,-rpath,/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib",
+              "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/release/libdome-sculpt-render.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/release/libdome-sculpt-core.a",
+              "libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "libdome-sculpt-polygon.a",
+              "libxatlas.a",
+              "libmikktspace.a",
+              "libmikktspace-robust.a",
+              "libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libharfbuzz.so",
+              "/usr/lib64/libEGL.so",
+              "/usr/lib64/libGL.so",
+              "/usr/lib64/libfontconfig.so",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libfreetype.so",
+              "/usr/lib64/libicui18n.so",
+              "/usr/lib64/libicuuc.so",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit_code": 0,
+            "seconds": 0.35921896900981665
+          },
+          {
+            "name": "link-dome-sculpt-layered-normal-uv-native-test",
+            "command": [
+              "/usr/bin/c++",
+              "-O3",
+              "-DNDEBUG",
+              "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/release/native-uv.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/release/dome-sculpt-layered-normal-uv-native-test",
+              "-Wl,-rpath,/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib",
+              "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/release/libdome-sculpt-render.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/release/libdome-sculpt-core.a",
+              "libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "libdome-sculpt-polygon.a",
+              "libxatlas.a",
+              "libmikktspace.a",
+              "libmikktspace-robust.a",
+              "libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libharfbuzz.so",
+              "/usr/lib64/libEGL.so",
+              "/usr/lib64/libGL.so",
+              "/usr/lib64/libfontconfig.so",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libfreetype.so",
+              "/usr/lib64/libicui18n.so",
+              "/usr/lib64/libicuuc.so",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit_code": 0,
+            "seconds": 0.36011840600986034
+          },
+          {
+            "name": "link-dome-sculpt-canonical-normal-uv-test",
+            "command": [
+              "/usr/bin/c++",
+              "-O3",
+              "-DNDEBUG",
+              "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/release/kernel.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/release/dome-sculpt-canonical-normal-uv-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/release/libdome-sculpt-core.a",
+              "libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "libdome-sculpt-polygon.a",
+              "libxatlas.a",
+              "libmikktspace.a",
+              "libmikktspace-robust.a",
+              "libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit_code": 0,
+            "seconds": 0.3051529389922507
+          },
+          {
+            "name": "link-dome-sculpt-layered-normal-uv-safety-test",
+            "command": [
+              "/usr/bin/c++",
+              "-O3",
+              "-DNDEBUG",
+              "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/release/worker.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/release/dome-sculpt-layered-normal-uv-safety-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/release/libdome-sculpt-core.a",
+              "libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "libdome-sculpt-polygon.a",
+              "libxatlas.a",
+              "libmikktspace.a",
+              "libmikktspace-robust.a",
+              "libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit_code": 0,
+            "seconds": 0.2991765300394036
+          },
+          {
+            "name": "link-dome-sculpt-layered-normal-render-test",
+            "command": [
+              "/usr/bin/c++",
+              "-O3",
+              "-DNDEBUG",
+              "CMakeFiles/dome-sculpt-layered-normal-render-test.dir/tests/layered-normal-render.cpp.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/release/dome-sculpt-layered-normal-render-test",
+              "-Wl,-rpath,/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib",
+              "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/release/libdome-sculpt-render.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/release/libdome-sculpt-core.a",
+              "libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "libdome-sculpt-polygon.a",
+              "libxatlas.a",
+              "libmikktspace.a",
+              "libmikktspace-robust.a",
+              "libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libharfbuzz.so",
+              "/usr/lib64/libEGL.so",
+              "/usr/lib64/libGL.so",
+              "/usr/lib64/libfontconfig.so",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libfreetype.so",
+              "/usr/lib64/libicui18n.so",
+              "/usr/lib64/libicuuc.so",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit_code": 0,
+            "seconds": 0.374530045024585
+          },
+          {
+            "name": "link-dome-sculpt-baked-normal-field-test",
+            "command": [
+              "/usr/bin/c++",
+              "-O3",
+              "-DNDEBUG",
+              "CMakeFiles/dome-sculpt-baked-normal-field-test.dir/tests/baked-normal-field.cpp.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/release/dome-sculpt-baked-normal-field-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/release/libdome-sculpt-core.a",
+              "libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "libdome-sculpt-polygon.a",
+              "libxatlas.a",
+              "libmikktspace.a",
+              "libmikktspace-robust.a",
+              "libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit_code": 0,
+            "seconds": 0.2983726210077293
+          },
+          {
+            "name": "link-dome-sculpt-baked-normal-field-faults-test",
+            "command": [
+              "/usr/bin/c++",
+              "-O3",
+              "-DNDEBUG",
+              "CMakeFiles/dome-sculpt-baked-normal-field-faults-test.dir/tests/baked-normal-field-faults.cpp.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/release/dome-sculpt-baked-normal-field-faults-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/release/libdome-sculpt-core.a",
+              "libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "libdome-sculpt-polygon.a",
+              "libxatlas.a",
+              "libmikktspace.a",
+              "libmikktspace-robust.a",
+              "libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit_code": 0,
+            "seconds": 0.30847489601001143
+          },
+          {
+            "name": "link-dome-sculpt-baked-normal-field-test",
+            "command": [
+              "/usr/bin/c++",
+              "-O3",
+              "-DNDEBUG",
+              "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/release/faults.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/release/dome-sculpt-layered-normal-archive-faults-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/release/libdome-sculpt-core.a",
+              "libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "libdome-sculpt-polygon.a",
+              "libxatlas.a",
+              "libmikktspace.a",
+              "libmikktspace-robust.a",
+              "libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit_code": 0,
+            "seconds": 0.30728947499301285
+          },
+          {
+            "name": "native",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/release/dome-sculpt-layered-normal-native-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/tests/fixtures/layered-normal",
+              "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/release/native"
+            ],
+            "exit_code": 0,
+            "seconds": 0.30154816701542586
+          },
+          {
+            "name": "UV-kernel",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/release/dome-sculpt-canonical-normal-uv-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/release/native/converted-7.dsculpt"
+            ],
+            "exit_code": 0,
+            "seconds": 0.03140999696915969
+          },
+          {
+            "name": "UV-worker",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/release/dome-sculpt-layered-normal-uv-safety-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/release/native/converted-7.dsculpt"
+            ],
+            "exit_code": 0,
+            "seconds": 0.018514782015699893
+          },
+          {
+            "name": "UV-native-export",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/release/dome-sculpt-layered-normal-uv-native-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/release/native",
+              "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/release/UV-native-export"
+            ],
+            "exit_code": 0,
+            "seconds": 0.6765850909869187
+          },
+          {
+            "name": "existing-export",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/release/dome-sculpt-layered-normal-render-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/release/native",
+              "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/release/existing-export"
+            ],
+            "exit_code": 0,
+            "seconds": 0.8496346939937212
+          },
+          {
+            "name": "baked-normal-field",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/release/dome-sculpt-baked-normal-field-test"
+            ],
+            "exit_code": 0,
+            "seconds": 0.03331605700077489
+          },
+          {
+            "name": "baked-normal-field-faults",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/release/dome-sculpt-baked-normal-field-faults-test"
+            ],
+            "exit_code": 0,
+            "seconds": 0.02306373999454081
+          },
+          {
+            "name": "app-version",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/release/dome-sculpt",
+              "--version"
+            ],
+            "exit_code": 0,
+            "seconds": 0.01750889199320227
+          }
+        ],
+        "phase": "app-version",
+        "child_pid": 2150370,
+        "exit_code": 0,
+        "seconds": 75.11094145802781,
+        "inputs": 2346,
+        "drift": [],
+        "artifacts": {
+          "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/release/libdome-sculpt-core.a": "8eb3440781c1cd9980757a6763a53aecbb4f65bbf066f1a753ac8213f871819c",
+          "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/release/libdome-sculpt-render.a": "a779982d5e6f592979247e065c3f243874334cb0fec4c51e4648435858c97fd4",
+          "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/release/dome-sculpt": "422347805566309db9c6c57004044ba131924a73ac59d281236ec7f8e46a2788",
+          "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/release/dome-sculpt-layered-normal-native-test": "496279817d0c42418cc611e716c2955e35546700be97bab65c9be355bf082642",
+          "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/release/dome-sculpt-layered-normal-uv-native-test": "6882419aa25fdfb94336232ba04cba6d4536c52a422acf18eba6f079a73c100b",
+          "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/release/dome-sculpt-canonical-normal-uv-test": "93e26fc94528c351dc08f2f7466701067ec01a857a64f6a34e4f3db0d8c4068d",
+          "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/release/dome-sculpt-layered-normal-uv-safety-test": "263748a197d74b05d2bc0c341e5c30e22d2fd4cd63fdd36c92d74ca7fe465f37",
+          "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/release/dome-sculpt-layered-normal-render-test": "370b70910d07a274cb26ebb149b7d9d518cc2a352bb37b5fd28ef5200a75c160",
+          "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/release/dome-sculpt-baked-normal-field-test": "d636818e9618d8db18cb7ef94b6d27df92a4b0bb86e3bf22a4811c99393f87ab",
+          "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/release/dome-sculpt-baked-normal-field-faults-test": "5913ed1667f65863de63291928da60349633370dd443e6a34ecc686990d6aefc",
+          "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/release/dome-sculpt-layered-normal-archive-faults-test": "2055390a51858a9821d42ebba8e1ce967f0914ed6c213ea34f331c1fb3a1d7db"
+        }
+      },
+      "status_sha256": "973d7b9cda8c40332543e4a7742f1961bccd6b2954c1cbbf50e4da3bdd47cee8",
+      "before_sha256": "eadaf10f54537b120881fb87f30627c71ae738f3dfe40004bf6cd14de31c45e0",
+      "reports": {},
+      "logs": {
+        "artifacts/model-ui-build/release/compile-document-baking.cpp.log": {
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "PASS_lines": 0
+        },
+        "artifacts/model-ui-build/release/archive.log": {
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "PASS_lines": 0
+        },
+        "artifacts/model-ui-build/release/compile-app.cpp.log": {
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "PASS_lines": 0
+        },
+        "artifacts/model-ui-build/release/compile-bake-editor.cpp.log": {
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "PASS_lines": 0
+        },
+        "artifacts/model-ui-build/release/compile-palette.cpp.log": {
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "PASS_lines": 0
+        },
+        "artifacts/model-ui-build/release/archive-render.log": {
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "PASS_lines": 0
+        },
+        "artifacts/model-ui-build/release/link-dome-sculpt.log": {
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "PASS_lines": 0
+        },
+        "artifacts/model-ui-build/release/compile-native-uv.log": {
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "PASS_lines": 0
+        },
+        "artifacts/model-ui-build/release/compile-native.log": {
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "PASS_lines": 0
+        },
+        "artifacts/model-ui-build/release/compile-kernel.log": {
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "PASS_lines": 0
+        },
+        "artifacts/model-ui-build/release/compile-worker.log": {
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "PASS_lines": 0
+        },
+        "artifacts/model-ui-build/release/compile-faults.log": {
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "PASS_lines": 0
+        },
+        "artifacts/model-ui-build/release/link-dome-sculpt-layered-normal-native-test.log": {
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "PASS_lines": 0
+        },
+        "artifacts/model-ui-build/release/link-dome-sculpt-layered-normal-uv-native-test.log": {
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "PASS_lines": 0
+        },
+        "artifacts/model-ui-build/release/link-dome-sculpt-canonical-normal-uv-test.log": {
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "PASS_lines": 0
+        },
+        "artifacts/model-ui-build/release/link-dome-sculpt-layered-normal-uv-safety-test.log": {
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "PASS_lines": 0
+        },
+        "artifacts/model-ui-build/release/link-dome-sculpt-layered-normal-render-test.log": {
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "PASS_lines": 0
+        },
+        "artifacts/model-ui-build/release/link-dome-sculpt-baked-normal-field-test.log": {
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "PASS_lines": 0
+        },
+        "artifacts/model-ui-build/release/link-dome-sculpt-baked-normal-field-faults-test.log": {
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "PASS_lines": 0
+        },
+        "artifacts/model-ui-build/release/native.log": {
+          "sha256": "e27b06b806ef2a71f05f5be0428a35b5360c797562786783764a0b9ab1c2e6de",
+          "PASS_lines": 66
+        },
+        "artifacts/model-ui-build/release/UV-kernel.log": {
+          "sha256": "4b994707001f65b4bc079ca5b5c21efabd7cb69655d222bc6cd6f62698d6c2c6",
+          "PASS_lines": 25
+        },
+        "artifacts/model-ui-build/release/UV-worker.log": {
+          "sha256": "7524e115d4239999d9411758da6237086e19e5cba0dfd0aaa78bc95ccb60fcd4",
+          "PASS_lines": 12
+        },
+        "artifacts/model-ui-build/release/UV-native-export.log": {
+          "sha256": "568a4d4e112fd4a74d6157eed2dbd60a0f03fd64722bf3194ff8a90087d198a3",
+          "PASS_lines": 226
+        },
+        "artifacts/model-ui-build/release/existing-export.log": {
+          "sha256": "9b0354965097f822d720587b28fabf8e16e8b5403d21c345bf42667c65759b26",
+          "PASS_lines": 161
+        },
+        "artifacts/model-ui-build/release/baked-normal-field.log": {
+          "sha256": "686a1ac5ba99b0412876ed6082e0873ad16cefec0277ca1ac30022308ce5db89",
+          "PASS_lines": 110
+        },
+        "artifacts/model-ui-build/release/baked-normal-field-faults.log": {
+          "sha256": "e02a71f6f85d9a7d6b94e7e43be241d6ec46cce5b9b8edcf7d28920d41193096",
+          "PASS_lines": 7
+        },
+        "artifacts/model-ui-build/release/app-version.log": {
+          "sha256": "9455a20a636a6599ace60120261649d3b29dc51fe2c774305994879190e7336b",
+          "PASS_lines": 0
+        }
+      },
+      "consumed_binaries_current_exact": {
+        "/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-uv-native/build-uv-native-release/libdome-sculpt-affine.a": "2e0e70545200d4f6e314cd775d74bd4ddb5ba7cf390de3a2addb79058b3fd508",
+        "/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-uv-native/build-uv-native-release/libxatlas.a": "a80317237338cd4a5e80d074b9ad7fda24caf698462f08e6db4677e9ce5c4aba",
+        "/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-uv-native/build-uv-native-release/libufbx.a": "e07f5cf1985ad8ddf0d8ce1087783115090e5dafc551586e5bf4fd6a19a4a638",
+        "/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-uv-native/build-uv-native-release/libmikktspace.a": "539c441b0f6bf5f6a0c4077114f4ae2c505a18b5875f96be9ddd822a7a4b3b8a",
+        "/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-uv-native/build-uv-native-release/libdome-sculpt-polygon.a": "44ce1b21f3fdbfc614c28f26ddf4b4b20f03dd4d3514bf05aec9f1a15fa14d91",
+        "/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-uv-native/build-uv-native-release/libmikktspace-robust.a": "e0b9b376615fdba3d486fd1a4d074cf02dbcafc74a1bf5150e531afdaa883932",
+        "/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-uv-native/build-uv-native-release/libdome-sculpt-emission-codec.a": "cfe4e73b13e1645af8bab9fc7a9ed40a11384678a4092950758f2c4c2970ce8f",
+        "/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-uv-native/build-uv-native-release/libdome-sculpt-core.a": "bb7522fbb8edde84125a141707b4b192080102fc6326e40792ae357eeec19381",
+        "/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-uv-native/build-uv-native-release/libdome-sculpt-render.a": "e0a2568e3b516863ac17547d17799f3b567ca21c8ed91fbac31c9d2e68b4bd0e",
+        "/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-uv-native/build-uv-native-release/libdome-sculpt-spacenav.a": "55d7e1b2518e67afc3274c303be16b7d10c10fa60c678b141acd091a1df7d97d",
+        "/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-uv-native/build-uv-native-release/libdome-sculpt-xr.a": "b6a86b8cb6cb3a1fbbf453a87cb107c388e5d15d3c86d1f6f8e383f42a3808bc",
+        "/home/blux/de-xr/dome-sculpt/artifacts/canonical-native-pose-9dab/artifacts/native-pose-proof/release/libdome-sculpt-core.a": "8f885ace028642fe11bee49b472e3b0ffeeecb411f65bd69dbdb80539f3da8ae",
+        "/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-release/lib/libfltk_cairo.a": "1f09ab78e1806ead2cba75cbe70c5b4d8c2e69e4848ae696677f4f1500c8db35",
+        "/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-release/lib/libfltk.a": "1b73fa146531cefa7a5859db222da96255c6eb99cd4544e8e41ed9339f826540",
+        "/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-release/lib/libfltk_images.a": "7b80394f820c41eef8fd642ed65faa5cf4e374c9f0bb35800f374f5f2eb43434",
+        "/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-release/lib/libfltk_gl.a": "81059124e1de5a2d4b261a527f37698cb3c9cc29059836d5fc3568de6a0054e0"
+      }
+    },
+    "model-ui-build/sanitize": {
+      "status": {
+        "state": "terminal",
+        "pid": 2139328,
+        "source": "7f6fce335c9cbcef371e1c190d753360b259c1c6",
+        "profile": "sanitize",
+        "scope": "Complete Document baking/palette/native app/bake-dialog TUs and changed whole native consumer over matching final34+nativePose own archives; no header ABI/schema/math changes. Explicit portable target model, rest-space quality labels, retained source flags/status. Existing original-pose difference measurements are retained as different declared models, not relabeled equal. Not fresh ALL/full631/main/HMD/compute.",
+        "steps": [
+          {
+            "name": "compile-document-baking.cpp",
+            "command": [
+              "/usr/bin/c++",
+              "-DDOME_SCULPT_INSTALLED_ASSETS=\"/usr/local/share/dome-sculpt/assets/humanoid\"",
+              "-DDOME_SCULPT_SOURCE_ASSETS=\"/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/assets/humanoid\"",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/third_party",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/third_party/cgltf",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/third_party/nlohmann",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/third_party/xatlas",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/third_party/mikktspace",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/third_party/ufbx",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "-O1",
+              "-g1",
+              "-std=gnu++20",
+              "-Wall",
+              "-Wextra",
+              "-Wpedantic",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/sanitize/document-baking.cpp.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/src/document-baking.cpp"
+            ],
+            "exit_code": 0,
+            "seconds": 4.718747547012754
+          },
+          {
+            "name": "archive",
+            "command": [
+              "ar",
+              "r",
+              "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/sanitize/libdome-sculpt-core.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/sanitize/document-baking.cpp.o"
+            ],
+            "exit_code": 0,
+            "seconds": 1.669668962014839
+          },
+          {
+            "name": "compile-app.cpp",
+            "command": [
+              "/usr/bin/c++",
+              "-DDOME_HAS_XR=1",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/third_party/desktop",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/build-uv-native-sanitize",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/third_party/nlohmann",
+              "-isystem",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/harfbuzz",
+              "-isystem",
+              "/usr/include/glib-2.0",
+              "-isystem",
+              "/usr/lib64/glib-2.0/include",
+              "-isystem",
+              "/usr/include/sysprof-6",
+              "-isystem",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/freetype2",
+              "-isystem",
+              "/usr/include/libpng16",
+              "-isystem",
+              "/usr/include/libxml2",
+              "-isystem",
+              "/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-sanitize/include",
+              "-isystem",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/cairo",
+              "-isystem",
+              "/usr/include/pixman-1",
+              "-isystem",
+              "/usr/include/libmount",
+              "-isystem",
+              "/usr/include/blkid",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "-O1",
+              "-g1",
+              "-std=gnu++20",
+              "-pthread",
+              "-DWITH_GZFILEOP",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/sanitize/app.cpp.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/src/app.cpp"
+            ],
+            "exit_code": 0,
+            "seconds": 27.319667860050686
+          },
+          {
+            "name": "compile-bake-editor.cpp",
+            "command": [
+              "/usr/bin/c++",
+              "-DDOME_HAS_XR=1",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/third_party/desktop",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/build-uv-native-sanitize",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/third_party/nlohmann",
+              "-isystem",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/harfbuzz",
+              "-isystem",
+              "/usr/include/glib-2.0",
+              "-isystem",
+              "/usr/lib64/glib-2.0/include",
+              "-isystem",
+              "/usr/include/sysprof-6",
+              "-isystem",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/freetype2",
+              "-isystem",
+              "/usr/include/libpng16",
+              "-isystem",
+              "/usr/include/libxml2",
+              "-isystem",
+              "/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-sanitize/include",
+              "-isystem",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/cairo",
+              "-isystem",
+              "/usr/include/pixman-1",
+              "-isystem",
+              "/usr/include/libmount",
+              "-isystem",
+              "/usr/include/blkid",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "-O1",
+              "-g1",
+              "-std=gnu++20",
+              "-pthread",
+              "-DWITH_GZFILEOP",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/sanitize/bake-editor.cpp.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/src/bake-editor.cpp"
+            ],
+            "exit_code": 0,
+            "seconds": 5.122239132993855
+          },
+          {
+            "name": "compile-palette.cpp",
+            "command": [
+              "/usr/bin/c++",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/third_party/nlohmann",
+              "-isystem",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/harfbuzz",
+              "-isystem",
+              "/usr/include/glib-2.0",
+              "-isystem",
+              "/usr/lib64/glib-2.0/include",
+              "-isystem",
+              "/usr/include/sysprof-6",
+              "-isystem",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/freetype2",
+              "-isystem",
+              "/usr/include/libpng16",
+              "-isystem",
+              "/usr/include/libxml2",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "-O1",
+              "-g1",
+              "-std=gnu++20",
+              "-pthread",
+              "-DWITH_GZFILEOP",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/sanitize/palette.cpp.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/src/palette.cpp"
+            ],
+            "exit_code": 0,
+            "seconds": 7.808603360026609
+          },
+          {
+            "name": "archive-render",
+            "command": [
+              "ar",
+              "r",
+              "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/sanitize/libdome-sculpt-render.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/sanitize/palette.cpp.o"
+            ],
+            "exit_code": 0,
+            "seconds": 0.06698499200865626
+          },
+          {
+            "name": "link-dome-sculpt",
+            "command": [
+              "/usr/bin/c++",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "-O1",
+              "-g1",
+              "-fsanitize=address,undefined",
+              "CMakeFiles/dome-sculpt.dir/src/native-display-runtime.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/rig-fit-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/projection-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/spacenav-options.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/sanitize/app.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/polygon-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/import-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/procedural-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/resolution-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/sculpt-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/creator-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/rig-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/shapekey-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/weight-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/skin-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/mesh-editor.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/sanitize/bake-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/object-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/paint-editor.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-uv-final-a086/artifacts/uv-final-build/sanitize/uv-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/ui-conventions.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/session-appearance.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/export-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/third_party/desktop/desktop-menu.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/appmenu-protocol.c.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/sanitize/dome-sculpt",
+              "-L/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-sanitize/lib",
+              "-L/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib",
+              "-Wl,-rpath,/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-sanitize/lib:/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib:",
+              "libdome-sculpt-spacenav.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/sanitize/libdome-sculpt-core.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/sanitize/libdome-sculpt-render.a",
+              "/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-sanitize/lib/libfltk_images.so.1.4.5",
+              "/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-sanitize/lib/libfltk_gl.so.1.4.5",
+              "/usr/lib64/libGLU.so",
+              "libdome-sculpt-xr.a",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libpng.so",
+              "/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-sanitize/lib/libfltk.so.1.4.5",
+              "-lcairo",
+              "-L/usr/lib64",
+              "-lX11",
+              "-lGLU",
+              "-lGL",
+              "/usr/lib64/libdl.a",
+              "/usr/lib64/libSM.so",
+              "/usr/lib64/libICE.so",
+              "/usr/lib64/libXext.so",
+              "/usr/lib64/libXinerama.so",
+              "/usr/lib64/libXfixes.so",
+              "/usr/lib64/libXcursor.so",
+              "/usr/lib64/libXrender.so",
+              "/usr/lib64/libXft.so",
+              "/usr/lib64/libwayland-egl.so",
+              "/usr/lib64/libwayland-cursor.so",
+              "/usr/lib64/libxkbcommon.so",
+              "/usr/lib64/libGLX.so",
+              "/usr/lib64/libOpenGL.so",
+              "/usr/lib64/libz.so",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libcairo.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/sanitize/libdome-sculpt-render.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/sanitize/libdome-sculpt-core.a",
+              "libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "libdome-sculpt-polygon.a",
+              "libxatlas.a",
+              "libmikktspace.a",
+              "libmikktspace-robust.a",
+              "libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "/usr/lib64/libEGL.so",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libharfbuzz.so",
+              "/usr/lib64/libGL.so",
+              "/usr/lib64/libfontconfig.so",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libfreetype.so",
+              "/usr/lib64/libicui18n.so",
+              "/usr/lib64/libicuuc.so",
+              "/usr/lib64/libopenxr_loader.so",
+              "/usr/lib64/libgio-2.0.so",
+              "/usr/lib64/libgobject-2.0.so",
+              "/usr/lib64/libglib-2.0.so",
+              "/usr/lib64/libX11.so",
+              "/usr/lib64/libwayland-client.so",
+              "-lm",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit_code": 0,
+            "seconds": 2.6813678379985504
+          },
+          {
+            "name": "compile-native-uv",
+            "command": [
+              "/usr/bin/c++",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/src",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/third_party/desktop",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/third_party/cgltf",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/third_party/nlohmann",
+              "-isystem",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/harfbuzz",
+              "-isystem",
+              "/usr/include/glib-2.0",
+              "-isystem",
+              "/usr/lib64/glib-2.0/include",
+              "-isystem",
+              "/usr/include/sysprof-6",
+              "-isystem",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/freetype2",
+              "-isystem",
+              "/usr/include/libpng16",
+              "-isystem",
+              "/usr/include/libxml2",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "-O1",
+              "-g1",
+              "-std=gnu++20",
+              "-pthread",
+              "-DWITH_GZFILEOP",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/sanitize/native-uv.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/tests/layered-normal-uv-native.cpp"
+            ],
+            "exit_code": 0,
+            "seconds": 28.818903894978575
+          },
+          {
+            "name": "compile-native",
+            "command": [
+              "/usr/bin/c++",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/src",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/third_party/desktop",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/third_party/cgltf",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/third_party/nlohmann",
+              "-isystem",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/harfbuzz",
+              "-isystem",
+              "/usr/include/glib-2.0",
+              "-isystem",
+              "/usr/lib64/glib-2.0/include",
+              "-isystem",
+              "/usr/include/sysprof-6",
+              "-isystem",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/freetype2",
+              "-isystem",
+              "/usr/include/libpng16",
+              "-isystem",
+              "/usr/include/libxml2",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "-O1",
+              "-g1",
+              "-std=gnu++20",
+              "-pthread",
+              "-DWITH_GZFILEOP",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/sanitize/native.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/tests/layered-normal-native.cpp"
+            ],
+            "exit_code": 0,
+            "seconds": 17.820867305039428
+          },
+          {
+            "name": "compile-kernel",
+            "command": [
+              "/usr/bin/c++",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/src",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/third_party/nlohmann",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "-O1",
+              "-g1",
+              "-std=gnu++20",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/sanitize/kernel.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/tests/canonical-normal-uv.cpp"
+            ],
+            "exit_code": 0,
+            "seconds": 7.204858843004331
+          },
+          {
+            "name": "compile-worker",
+            "command": [
+              "/usr/bin/c++",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/src",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/third_party/nlohmann",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "-O1",
+              "-g1",
+              "-std=gnu++20",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/sanitize/worker.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/tests/layered-normal-uv-safety.cpp"
+            ],
+            "exit_code": 0,
+            "seconds": 4.261426380020566
+          },
+          {
+            "name": "compile-faults",
+            "command": [
+              "/usr/bin/c++",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/src",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/third_party/nlohmann",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "-O1",
+              "-g1",
+              "-std=gnu++20",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/sanitize/faults.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/tests/layered-normal-archive-faults.cpp"
+            ],
+            "exit_code": 0,
+            "seconds": 6.240441675996408
+          },
+          {
+            "name": "link-dome-sculpt-layered-normal-native-test",
+            "command": [
+              "/usr/bin/c++",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "-O1",
+              "-g1",
+              "-fsanitize=address,undefined",
+              "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/sanitize/native.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/sanitize/dome-sculpt-layered-normal-native-test",
+              "-Wl,-rpath,/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib",
+              "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/sanitize/libdome-sculpt-render.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/sanitize/libdome-sculpt-core.a",
+              "libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "libdome-sculpt-polygon.a",
+              "libxatlas.a",
+              "libmikktspace.a",
+              "libmikktspace-robust.a",
+              "libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libharfbuzz.so",
+              "/usr/lib64/libEGL.so",
+              "/usr/lib64/libGL.so",
+              "/usr/lib64/libfontconfig.so",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libfreetype.so",
+              "/usr/lib64/libicui18n.so",
+              "/usr/lib64/libicuuc.so",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit_code": 0,
+            "seconds": 2.2889720120001584
+          },
+          {
+            "name": "link-dome-sculpt-layered-normal-uv-native-test",
+            "command": [
+              "/usr/bin/c++",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "-O1",
+              "-g1",
+              "-fsanitize=address,undefined",
+              "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/sanitize/native-uv.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/sanitize/dome-sculpt-layered-normal-uv-native-test",
+              "-Wl,-rpath,/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib",
+              "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/sanitize/libdome-sculpt-render.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/sanitize/libdome-sculpt-core.a",
+              "libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "libdome-sculpt-polygon.a",
+              "libxatlas.a",
+              "libmikktspace.a",
+              "libmikktspace-robust.a",
+              "libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libharfbuzz.so",
+              "/usr/lib64/libEGL.so",
+              "/usr/lib64/libGL.so",
+              "/usr/lib64/libfontconfig.so",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libfreetype.so",
+              "/usr/lib64/libicui18n.so",
+              "/usr/lib64/libicuuc.so",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit_code": 0,
+            "seconds": 2.374574251996819
+          },
+          {
+            "name": "link-dome-sculpt-canonical-normal-uv-test",
+            "command": [
+              "/usr/bin/c++",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "-O1",
+              "-g1",
+              "-fsanitize=address,undefined",
+              "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/sanitize/kernel.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/sanitize/dome-sculpt-canonical-normal-uv-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/sanitize/libdome-sculpt-core.a",
+              "libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "libdome-sculpt-polygon.a",
+              "libxatlas.a",
+              "libmikktspace.a",
+              "libmikktspace-robust.a",
+              "libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit_code": 0,
+            "seconds": 2.23990526702255
+          },
+          {
+            "name": "link-dome-sculpt-layered-normal-uv-safety-test",
+            "command": [
+              "/usr/bin/c++",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "-O1",
+              "-g1",
+              "-fsanitize=address,undefined",
+              "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/sanitize/worker.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/sanitize/dome-sculpt-layered-normal-uv-safety-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/sanitize/libdome-sculpt-core.a",
+              "libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "libdome-sculpt-polygon.a",
+              "libxatlas.a",
+              "libmikktspace.a",
+              "libmikktspace-robust.a",
+              "libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit_code": 0,
+            "seconds": 2.165195900015533
+          },
+          {
+            "name": "link-dome-sculpt-layered-normal-render-test",
+            "command": [
+              "/usr/bin/c++",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "-O1",
+              "-g1",
+              "-fsanitize=address,undefined",
+              "CMakeFiles/dome-sculpt-layered-normal-render-test.dir/tests/layered-normal-render.cpp.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/sanitize/dome-sculpt-layered-normal-render-test",
+              "-Wl,-rpath,/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib",
+              "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/sanitize/libdome-sculpt-render.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/sanitize/libdome-sculpt-core.a",
+              "libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "libdome-sculpt-polygon.a",
+              "libxatlas.a",
+              "libmikktspace.a",
+              "libmikktspace-robust.a",
+              "libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libharfbuzz.so",
+              "/usr/lib64/libEGL.so",
+              "/usr/lib64/libGL.so",
+              "/usr/lib64/libfontconfig.so",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libfreetype.so",
+              "/usr/lib64/libicui18n.so",
+              "/usr/lib64/libicuuc.so",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit_code": 0,
+            "seconds": 2.5456693829619326
+          },
+          {
+            "name": "link-dome-sculpt-baked-normal-field-test",
+            "command": [
+              "/usr/bin/c++",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "-O1",
+              "-g1",
+              "-fsanitize=address,undefined",
+              "CMakeFiles/dome-sculpt-baked-normal-field-test.dir/tests/baked-normal-field.cpp.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/sanitize/dome-sculpt-baked-normal-field-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/sanitize/libdome-sculpt-core.a",
+              "libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "libdome-sculpt-polygon.a",
+              "libxatlas.a",
+              "libmikktspace.a",
+              "libmikktspace-robust.a",
+              "libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit_code": 0,
+            "seconds": 2.146443176025059
+          },
+          {
+            "name": "link-dome-sculpt-baked-normal-field-faults-test",
+            "command": [
+              "/usr/bin/c++",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "-O1",
+              "-g1",
+              "-fsanitize=address,undefined",
+              "CMakeFiles/dome-sculpt-baked-normal-field-faults-test.dir/tests/baked-normal-field-faults.cpp.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/sanitize/dome-sculpt-baked-normal-field-faults-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/sanitize/libdome-sculpt-core.a",
+              "libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "libdome-sculpt-polygon.a",
+              "libxatlas.a",
+              "libmikktspace.a",
+              "libmikktspace-robust.a",
+              "libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit_code": 0,
+            "seconds": 2.1449898870196193
+          },
+          {
+            "name": "link-dome-sculpt-baked-normal-field-test",
+            "command": [
+              "/usr/bin/c++",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "-O1",
+              "-g1",
+              "-fsanitize=address,undefined",
+              "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/sanitize/faults.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/sanitize/dome-sculpt-layered-normal-archive-faults-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/sanitize/libdome-sculpt-core.a",
+              "libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "libdome-sculpt-polygon.a",
+              "libxatlas.a",
+              "libmikktspace.a",
+              "libmikktspace-robust.a",
+              "libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit_code": 0,
+            "seconds": 2.144924831984099
+          },
+          {
+            "name": "native",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/sanitize/dome-sculpt-layered-normal-native-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/tests/fixtures/layered-normal",
+              "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/sanitize/native"
+            ],
+            "exit_code": 0,
+            "seconds": 1.2804464049986564
+          },
+          {
+            "name": "UV-kernel",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/sanitize/dome-sculpt-canonical-normal-uv-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/sanitize/native/converted-7.dsculpt"
+            ],
+            "exit_code": 0,
+            "seconds": 0.665560876019299
+          },
+          {
+            "name": "UV-worker",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/sanitize/dome-sculpt-layered-normal-uv-safety-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/sanitize/native/converted-7.dsculpt"
+            ],
+            "exit_code": 0,
+            "seconds": 0.21743262000381947
+          },
+          {
+            "name": "UV-native-export",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/sanitize/dome-sculpt-layered-normal-uv-native-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/sanitize/native",
+              "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/sanitize/UV-native-export"
+            ],
+            "exit_code": 0,
+            "seconds": 3.0115059100207873
+          },
+          {
+            "name": "existing-export",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/sanitize/dome-sculpt-layered-normal-render-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/sanitize/native",
+              "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/sanitize/existing-export"
+            ],
+            "exit_code": 0,
+            "seconds": 3.827414339990355
+          },
+          {
+            "name": "baked-normal-field",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/sanitize/dome-sculpt-baked-normal-field-test"
+            ],
+            "exit_code": 0,
+            "seconds": 0.31581385602476075
+          },
+          {
+            "name": "baked-normal-field-faults",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/sanitize/dome-sculpt-baked-normal-field-faults-test"
+            ],
+            "exit_code": 0,
+            "seconds": 0.3619693840155378
+          },
+          {
+            "name": "app-version",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/sanitize/dome-sculpt",
+              "--version"
+            ],
+            "exit_code": 0,
+            "seconds": 0.16943313897354528
+          }
+        ],
+        "phase": "app-version",
+        "child_pid": 2160714,
+        "exit_code": 0,
+        "seconds": 141.9567346900003,
+        "inputs": 2346,
+        "drift": [],
+        "artifacts": {
+          "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/sanitize/libdome-sculpt-core.a": "6905085942729dbcf5231d719b105e91ff271cc96a41f818ee43ad9f2d297a4e",
+          "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/sanitize/libdome-sculpt-render.a": "71257adbdc0234c5a729ca5fa7b506f39d5b2ee05f02ac8f679c080bca5aff2a",
+          "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/sanitize/dome-sculpt": "c66bc2484be92a02f587870de2a881c2b3a455aaf31dbdb434c8433e76bc7f6f",
+          "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/sanitize/dome-sculpt-layered-normal-native-test": "676c13785d2f890a6195c8e085f0d809fb53f87a7d91ae0cb3492ed15c33e578",
+          "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/sanitize/dome-sculpt-layered-normal-uv-native-test": "5caedacc4033bb7afef7b1cbcaeb2ebf965c5aa49f066bddeda249872a9514c0",
+          "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/sanitize/dome-sculpt-canonical-normal-uv-test": "099085c4dcd3d43d75376bd566a192e63fa2c9f2cfba8b3513e92d80dfa29cd5",
+          "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/sanitize/dome-sculpt-layered-normal-uv-safety-test": "c3498018ff7b11512b06a6a20ce3942881c2e7e40a161e8d92a38a6898d1faa2",
+          "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/sanitize/dome-sculpt-layered-normal-render-test": "ae9b23681cba9212a2576fd496af77ddde08ab26da3d370c32cfc2f5abd3233d",
+          "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/sanitize/dome-sculpt-baked-normal-field-test": "6ef9667f08e5785a8cb029fb41817c238824b4022a01fabfb22795da6e8dcb99",
+          "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/sanitize/dome-sculpt-baked-normal-field-faults-test": "00c9c8ed5b979af4d2e09cd4a403141547845d65539230135dfe402bebfe6b22",
+          "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/sanitize/dome-sculpt-layered-normal-archive-faults-test": "e7853bd0cf72fe5a69da2741007a6c8adebc6a307bfce9242524902707560843"
+        }
+      },
+      "status_sha256": "552e025057df82ea056a423f3363e973dbd0504cf7a62f69369ecf531be2f29b",
+      "before_sha256": "803718c5c99a93b502b14ef4767145f8237610a9035e02fb1bbf4a00b1ef0a78",
+      "reports": {},
+      "logs": {
+        "artifacts/model-ui-build/sanitize/compile-document-baking.cpp.log": {
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "PASS_lines": 0
+        },
+        "artifacts/model-ui-build/sanitize/archive.log": {
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "PASS_lines": 0
+        },
+        "artifacts/model-ui-build/sanitize/compile-app.cpp.log": {
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "PASS_lines": 0
+        },
+        "artifacts/model-ui-build/sanitize/compile-bake-editor.cpp.log": {
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "PASS_lines": 0
+        },
+        "artifacts/model-ui-build/sanitize/compile-palette.cpp.log": {
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "PASS_lines": 0
+        },
+        "artifacts/model-ui-build/sanitize/archive-render.log": {
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "PASS_lines": 0
+        },
+        "artifacts/model-ui-build/sanitize/link-dome-sculpt.log": {
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "PASS_lines": 0
+        },
+        "artifacts/model-ui-build/sanitize/compile-native-uv.log": {
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "PASS_lines": 0
+        },
+        "artifacts/model-ui-build/sanitize/compile-native.log": {
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "PASS_lines": 0
+        },
+        "artifacts/model-ui-build/sanitize/compile-kernel.log": {
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "PASS_lines": 0
+        },
+        "artifacts/model-ui-build/sanitize/compile-worker.log": {
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "PASS_lines": 0
+        },
+        "artifacts/model-ui-build/sanitize/compile-faults.log": {
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "PASS_lines": 0
+        },
+        "artifacts/model-ui-build/sanitize/link-dome-sculpt-layered-normal-native-test.log": {
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "PASS_lines": 0
+        },
+        "artifacts/model-ui-build/sanitize/link-dome-sculpt-layered-normal-uv-native-test.log": {
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "PASS_lines": 0
+        },
+        "artifacts/model-ui-build/sanitize/link-dome-sculpt-canonical-normal-uv-test.log": {
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "PASS_lines": 0
+        },
+        "artifacts/model-ui-build/sanitize/link-dome-sculpt-layered-normal-uv-safety-test.log": {
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "PASS_lines": 0
+        },
+        "artifacts/model-ui-build/sanitize/link-dome-sculpt-layered-normal-render-test.log": {
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "PASS_lines": 0
+        },
+        "artifacts/model-ui-build/sanitize/link-dome-sculpt-baked-normal-field-test.log": {
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "PASS_lines": 0
+        },
+        "artifacts/model-ui-build/sanitize/link-dome-sculpt-baked-normal-field-faults-test.log": {
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "PASS_lines": 0
+        },
+        "artifacts/model-ui-build/sanitize/native.log": {
+          "sha256": "e27b06b806ef2a71f05f5be0428a35b5360c797562786783764a0b9ab1c2e6de",
+          "PASS_lines": 66
+        },
+        "artifacts/model-ui-build/sanitize/UV-kernel.log": {
+          "sha256": "4b994707001f65b4bc079ca5b5c21efabd7cb69655d222bc6cd6f62698d6c2c6",
+          "PASS_lines": 25
+        },
+        "artifacts/model-ui-build/sanitize/UV-worker.log": {
+          "sha256": "7524e115d4239999d9411758da6237086e19e5cba0dfd0aaa78bc95ccb60fcd4",
+          "PASS_lines": 12
+        },
+        "artifacts/model-ui-build/sanitize/UV-native-export.log": {
+          "sha256": "568a4d4e112fd4a74d6157eed2dbd60a0f03fd64722bf3194ff8a90087d198a3",
+          "PASS_lines": 226
+        },
+        "artifacts/model-ui-build/sanitize/existing-export.log": {
+          "sha256": "9b0354965097f822d720587b28fabf8e16e8b5403d21c345bf42667c65759b26",
+          "PASS_lines": 161
+        },
+        "artifacts/model-ui-build/sanitize/baked-normal-field.log": {
+          "sha256": "686a1ac5ba99b0412876ed6082e0873ad16cefec0277ca1ac30022308ce5db89",
+          "PASS_lines": 110
+        },
+        "artifacts/model-ui-build/sanitize/baked-normal-field-faults.log": {
+          "sha256": "e02a71f6f85d9a7d6b94e7e43be241d6ec46cce5b9b8edcf7d28920d41193096",
+          "PASS_lines": 7
+        },
+        "artifacts/model-ui-build/sanitize/app-version.log": {
+          "sha256": "9455a20a636a6599ace60120261649d3b29dc51fe2c774305994879190e7336b",
+          "PASS_lines": 0
+        }
+      },
+      "consumed_binaries_current_exact": {
+        "/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-uv-native/build-uv-native-sanitize/libdome-sculpt-affine.a": "2402b1c027cc44638076d55950a585eeca5b4eb240183d028cd75d9d8f80ad29",
+        "/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-uv-native/build-uv-native-sanitize/libxatlas.a": "a77c2ab8d954c65a36616779bd7b277e205f84e578eb901d0bbb1423552bf567",
+        "/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-uv-native/build-uv-native-sanitize/libufbx.a": "8b337f57b4163e9df1b13451d331b758bd01e3fc246a57cc9ec681bcc3cdc469",
+        "/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-uv-native/build-uv-native-sanitize/libmikktspace.a": "07ac582c68ac48bbc4d6af686ee22cfc863fb1f32fc4fcfc00343021b68e1e96",
+        "/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-uv-native/build-uv-native-sanitize/libmikktspace-robust.a": "76f97524808d02247a633e560496c740de509ce0142a1d64222ae87ac302948e",
+        "/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-uv-native/build-uv-native-sanitize/libdome-sculpt-polygon.a": "b5b1ed88700f669c58a6e1e0a2908fa518c2eaf1c96d0a09fa058781746c6670",
+        "/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-uv-native/build-uv-native-sanitize/libdome-sculpt-emission-codec.a": "2e3ea0c286c7c94bec9f30678c4e0ed8fed2962c42f38e2b329b05807ecd3822",
+        "/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-uv-native/build-uv-native-sanitize/libdome-sculpt-core.a": "0170c5ce691edc8f441e02e8289ff64a469fff3a2a28cb142ba753cfa2de16e3",
+        "/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-uv-native/build-uv-native-sanitize/libdome-sculpt-render.a": "403e72f3a328de15e8f9302d5bad40983afb1aa019875ad17c4a884024bab8a1",
+        "/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-uv-native/build-uv-native-sanitize/libdome-sculpt-spacenav.a": "b7060db390785674e50dcb7ea397c95782d1a9a509ef9de861e2ff3f938c8df1",
+        "/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-uv-native/build-uv-native-sanitize/libdome-sculpt-xr.a": "e03286d29b3ac5bb1afe56ba74ba6ce5eecf863ab4f4248ad08e3a75f06cae85",
+        "/home/blux/de-xr/dome-sculpt/artifacts/canonical-native-pose-9dab/artifacts/native-pose-proof/sanitize/libdome-sculpt-core.a": "0261999bb84f4cc2a73177089db07cc9ba5f0efa3cbaa4a2656fe90400cc9d21",
+        "/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-sanitize/lib/libfltk_cairo.a": "6499c6ab18b73e20dbf3b79e664f1f2c236b101e1c116ec55c0da97e7fd3f78a",
+        "/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-sanitize/lib/libfltk.a": "6db1869846293b7a54c0171c831571e9da54ec8ffcfdeae044101dd58b180a9a",
+        "/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-sanitize/lib/libfltk_images.a": "933e7d0f81e02acf065874fe06c35ae3b9a886493f7245eeaf671f4b87251ea6",
+        "/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-sanitize/lib/libfltk_gl.a": "9f004d0a1f36fadd7a52a70069e76b2399d75aaa7de5bab8bc366e2dec8ffa1e"
+      }
+    },
+    "model-menu-proof/release": {
+      "status": {
+        "state": "terminal",
+        "pid": 2162973,
+        "source": "7f6fce335c9cbcef371e1c190d753360b259c1c6",
+        "profile": "release",
+        "scope": "Actual normal/compact FLTK UV editor via native DomeD universal menu; new normal33->UV34 Apply/Save/Cancel/history plus preserved independent normal roles. Private Xvfb, no system/HMD/session/main claim.",
+        "steps": [
+          {
+            "name": "normal",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/selection-gui-venv/bin/python",
+              "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/tests/layered-normal-uv-menu.py"
+            ],
+            "exit_code": 0,
+            "seconds": 17.852278831996955
+          },
+          {
+            "name": "compact",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/selection-gui-venv/bin/python",
+              "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/tests/layered-normal-uv-menu.py"
+            ],
+            "exit_code": 0,
+            "seconds": 17.08995347400196
+          }
+        ],
+        "phase": "compact",
+        "child_pid": 2165312,
+        "exit_code": 0,
+        "seconds": 34.94332692498574,
+        "inputs": 2344,
+        "drift": []
+      },
+      "status_sha256": "7eed4bc116ed17c9619c075713c8bb0fdcaf5ba8c5ca323092bd6b6d7fb7b1c8",
+      "before_sha256": "50fc877d3bb46e2ff2e177db2fe559fbbfc45857c91959edd8b64f82df5e5359",
+      "reports": {
+        "artifacts/model-menu-proof/release/normal/report.json": {
+          "checks": 15,
+          "sha256": "25f846dab13cb451ea66aba8564fee7c59c790d7c77c158a1f47538eaf340a2f"
+        },
+        "artifacts/model-menu-proof/release/compact/report.json": {
+          "checks": 15,
+          "sha256": "25f846dab13cb451ea66aba8564fee7c59c790d7c77c158a1f47538eaf340a2f"
+        }
+      },
+      "logs": {
+        "artifacts/model-menu-proof/release/normal.log": {
+          "sha256": "e73afd9d5627b4c5fc9ea632935538875384dd186b7d346caaabc99b6164ddf2",
+          "PASS_lines": 15
+        },
+        "artifacts/model-menu-proof/release/compact.log": {
+          "sha256": "e73afd9d5627b4c5fc9ea632935538875384dd186b7d346caaabc99b6164ddf2",
+          "PASS_lines": 15
+        }
+      },
+      "consumed_binaries_current_exact": {
+        "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/release/libdome-sculpt-core.a": "8eb3440781c1cd9980757a6763a53aecbb4f65bbf066f1a753ac8213f871819c",
+        "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/release/libdome-sculpt-render.a": "a779982d5e6f592979247e065c3f243874334cb0fec4c51e4648435858c97fd4",
+        "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/release/dome-sculpt": "422347805566309db9c6c57004044ba131924a73ac59d281236ec7f8e46a2788",
+        "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/release/dome-sculpt-layered-normal-native-test": "496279817d0c42418cc611e716c2955e35546700be97bab65c9be355bf082642",
+        "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/release/dome-sculpt-layered-normal-uv-native-test": "6882419aa25fdfb94336232ba04cba6d4536c52a422acf18eba6f079a73c100b",
+        "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/release/dome-sculpt-canonical-normal-uv-test": "93e26fc94528c351dc08f2f7466701067ec01a857a64f6a34e4f3db0d8c4068d",
+        "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/release/dome-sculpt-layered-normal-uv-safety-test": "263748a197d74b05d2bc0c341e5c30e22d2fd4cd63fdd36c92d74ca7fe465f37",
+        "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/release/dome-sculpt-layered-normal-render-test": "370b70910d07a274cb26ebb149b7d9d518cc2a352bb37b5fd28ef5200a75c160",
+        "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/release/dome-sculpt-baked-normal-field-test": "d636818e9618d8db18cb7ef94b6d27df92a4b0bb86e3bf22a4811c99393f87ab",
+        "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/release/dome-sculpt-baked-normal-field-faults-test": "5913ed1667f65863de63291928da60349633370dd443e6a34ecc686990d6aefc",
+        "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/release/dome-sculpt-layered-normal-archive-faults-test": "2055390a51858a9821d42ebba8e1ce967f0914ed6c213ea34f331c1fb3a1d7db",
+        "/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-release/lib/libfltk_cairo.a": "1f09ab78e1806ead2cba75cbe70c5b4d8c2e69e4848ae696677f4f1500c8db35",
+        "/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-release/lib/libfltk.a": "1b73fa146531cefa7a5859db222da96255c6eb99cd4544e8e41ed9339f826540",
+        "/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-release/lib/libfltk_images.a": "7b80394f820c41eef8fd642ed65faa5cf4e374c9f0bb35800f374f5f2eb43434",
+        "/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-release/lib/libfltk_gl.a": "81059124e1de5a2d4b261a527f37698cb3c9cc29059836d5fc3568de6a0054e0"
+      }
+    },
+    "model-native-controls/release": {
+      "status": {
+        "state": "terminal",
+        "pid": 2177015,
+        "source": "e1459325399945084ce5f0de8e4ae7a7251a3a66",
+        "profile": "release",
+        "scope": "Actual normal/compact FLTK UV editor via native DomeD universal menu; new normal33->UV34 Apply/Save/Cancel/history plus preserved independent normal roles. Private Xvfb, no system/HMD/session/main claim.",
+        "steps": [
+          {
+            "name": "normal",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/selection-gui-venv/bin/python",
+              "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/tests/portable-normal-model-menu.py"
+            ],
+            "exit_code": 0,
+            "seconds": 15.756248177029192
+          },
+          {
+            "name": "compact",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/selection-gui-venv/bin/python",
+              "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/tests/portable-normal-model-menu.py"
+            ],
+            "exit_code": 0,
+            "seconds": 16.033553040993866
+          }
+        ],
+        "phase": "compact",
+        "child_pid": 2178584,
+        "exit_code": 0,
+        "seconds": 31.790876344020944,
+        "inputs": 2345,
+        "drift": []
+      },
+      "status_sha256": "fa14387f7089d6c4cd5b25ff3c9a97ff58902971b853633d8296ef7a2085c950",
+      "before_sha256": "b4debb1a69aa4e6172487f5d5077096b4a0e588ab9fe488eb3ba470059576f62",
+      "reports": {
+        "artifacts/model-native-controls/release/normal/report.json": {
+          "checks": 12,
+          "sha256": "e6534e7dfa8553a8bec99c49d12de1438cb74c5880c8dd2626bd86f72f54ae5c"
+        },
+        "artifacts/model-native-controls/release/compact/report.json": {
+          "checks": 12,
+          "sha256": "e6534e7dfa8553a8bec99c49d12de1438cb74c5880c8dd2626bd86f72f54ae5c"
+        }
+      },
+      "logs": {
+        "artifacts/model-native-controls/release/normal.log": {
+          "sha256": "a8ced3415f62230124595637705c462654be1c6d8bb8757fc4fc35d54cd3c929",
+          "PASS_lines": 12
+        },
+        "artifacts/model-native-controls/release/compact.log": {
+          "sha256": "a8ced3415f62230124595637705c462654be1c6d8bb8757fc4fc35d54cd3c929",
+          "PASS_lines": 12
+        }
+      },
+      "consumed_binaries_current_exact": {
+        "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/release/libdome-sculpt-core.a": "8eb3440781c1cd9980757a6763a53aecbb4f65bbf066f1a753ac8213f871819c",
+        "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/release/libdome-sculpt-render.a": "a779982d5e6f592979247e065c3f243874334cb0fec4c51e4648435858c97fd4",
+        "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/release/dome-sculpt": "422347805566309db9c6c57004044ba131924a73ac59d281236ec7f8e46a2788",
+        "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/release/dome-sculpt-layered-normal-native-test": "496279817d0c42418cc611e716c2955e35546700be97bab65c9be355bf082642",
+        "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/release/dome-sculpt-layered-normal-uv-native-test": "6882419aa25fdfb94336232ba04cba6d4536c52a422acf18eba6f079a73c100b",
+        "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/release/dome-sculpt-canonical-normal-uv-test": "93e26fc94528c351dc08f2f7466701067ec01a857a64f6a34e4f3db0d8c4068d",
+        "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/release/dome-sculpt-layered-normal-uv-safety-test": "263748a197d74b05d2bc0c341e5c30e22d2fd4cd63fdd36c92d74ca7fe465f37",
+        "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/release/dome-sculpt-layered-normal-render-test": "370b70910d07a274cb26ebb149b7d9d518cc2a352bb37b5fd28ef5200a75c160",
+        "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/release/dome-sculpt-baked-normal-field-test": "d636818e9618d8db18cb7ef94b6d27df92a4b0bb86e3bf22a4811c99393f87ab",
+        "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/release/dome-sculpt-baked-normal-field-faults-test": "5913ed1667f65863de63291928da60349633370dd443e6a34ecc686990d6aefc",
+        "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/release/dome-sculpt-layered-normal-archive-faults-test": "2055390a51858a9821d42ebba8e1ce967f0914ed6c213ea34f331c1fb3a1d7db",
+        "/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-release/lib/libfltk_cairo.a": "1f09ab78e1806ead2cba75cbe70c5b4d8c2e69e4848ae696677f4f1500c8db35",
+        "/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-release/lib/libfltk.a": "1b73fa146531cefa7a5859db222da96255c6eb99cd4544e8e41ed9339f826540",
+        "/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-release/lib/libfltk_images.a": "7b80394f820c41eef8fd642ed65faa5cf4e374c9f0bb35800f374f5f2eb43434",
+        "/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-release/lib/libfltk_gl.a": "81059124e1de5a2d4b261a527f37698cb3c9cc29059836d5fc3568de6a0054e0"
+      }
+    },
+    "model-native-controls/sanitize": {
+      "status": {
+        "state": "terminal",
+        "pid": 2177165,
+        "source": "e1459325399945084ce5f0de8e4ae7a7251a3a66",
+        "profile": "sanitize",
+        "scope": "Actual normal/compact FLTK UV editor via native DomeD universal menu; new normal33->UV34 Apply/Save/Cancel/history plus preserved independent normal roles. Private Xvfb, no system/HMD/session/main claim.",
+        "steps": [
+          {
+            "name": "normal",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/selection-gui-venv/bin/python",
+              "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/tests/portable-normal-model-menu.py"
+            ],
+            "exit_code": 0,
+            "seconds": 25.978006026998628
+          },
+          {
+            "name": "compact",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/selection-gui-venv/bin/python",
+              "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/tests/portable-normal-model-menu.py"
+            ],
+            "exit_code": 0,
+            "seconds": 27.13991976599209
+          }
+        ],
+        "phase": "compact",
+        "child_pid": 2180228,
+        "exit_code": 0,
+        "seconds": 53.11867852596333,
+        "inputs": 2345,
+        "drift": []
+      },
+      "status_sha256": "144b6e4a64dffcab8b864c80f527454df8edbb37130b69acaa5b8f70fe50228e",
+      "before_sha256": "0601d6d8e84e0ce8fc3dce711b8562e6a9bb2f2f70cac42721e69e91b9191c9a",
+      "reports": {
+        "artifacts/model-native-controls/sanitize/normal/report.json": {
+          "checks": 12,
+          "sha256": "e6534e7dfa8553a8bec99c49d12de1438cb74c5880c8dd2626bd86f72f54ae5c"
+        },
+        "artifacts/model-native-controls/sanitize/compact/report.json": {
+          "checks": 12,
+          "sha256": "e6534e7dfa8553a8bec99c49d12de1438cb74c5880c8dd2626bd86f72f54ae5c"
+        }
+      },
+      "logs": {
+        "artifacts/model-native-controls/sanitize/normal.log": {
+          "sha256": "a8ced3415f62230124595637705c462654be1c6d8bb8757fc4fc35d54cd3c929",
+          "PASS_lines": 12
+        },
+        "artifacts/model-native-controls/sanitize/compact.log": {
+          "sha256": "a8ced3415f62230124595637705c462654be1c6d8bb8757fc4fc35d54cd3c929",
+          "PASS_lines": 12
+        }
+      },
+      "consumed_binaries_current_exact": {
+        "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/sanitize/libdome-sculpt-core.a": "6905085942729dbcf5231d719b105e91ff271cc96a41f818ee43ad9f2d297a4e",
+        "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/sanitize/libdome-sculpt-render.a": "71257adbdc0234c5a729ca5fa7b506f39d5b2ee05f02ac8f679c080bca5aff2a",
+        "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/sanitize/dome-sculpt": "c66bc2484be92a02f587870de2a881c2b3a455aaf31dbdb434c8433e76bc7f6f",
+        "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/sanitize/dome-sculpt-layered-normal-native-test": "676c13785d2f890a6195c8e085f0d809fb53f87a7d91ae0cb3492ed15c33e578",
+        "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/sanitize/dome-sculpt-layered-normal-uv-native-test": "5caedacc4033bb7afef7b1cbcaeb2ebf965c5aa49f066bddeda249872a9514c0",
+        "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/sanitize/dome-sculpt-canonical-normal-uv-test": "099085c4dcd3d43d75376bd566a192e63fa2c9f2cfba8b3513e92d80dfa29cd5",
+        "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/sanitize/dome-sculpt-layered-normal-uv-safety-test": "c3498018ff7b11512b06a6a20ce3942881c2e7e40a161e8d92a38a6898d1faa2",
+        "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/sanitize/dome-sculpt-layered-normal-render-test": "ae9b23681cba9212a2576fd496af77ddde08ab26da3d370c32cfc2f5abd3233d",
+        "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/sanitize/dome-sculpt-baked-normal-field-test": "6ef9667f08e5785a8cb029fb41817c238824b4022a01fabfb22795da6e8dcb99",
+        "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/sanitize/dome-sculpt-baked-normal-field-faults-test": "00c9c8ed5b979af4d2e09cd4a403141547845d65539230135dfe402bebfe6b22",
+        "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/sanitize/dome-sculpt-layered-normal-archive-faults-test": "e7853bd0cf72fe5a69da2741007a6c8adebc6a307bfce9242524902707560843",
+        "/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-sanitize/lib/libfltk_cairo.a": "6499c6ab18b73e20dbf3b79e664f1f2c236b101e1c116ec55c0da97e7fd3f78a",
+        "/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-sanitize/lib/libfltk.a": "6db1869846293b7a54c0171c831571e9da54ec8ffcfdeae044101dd58b180a9a",
+        "/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-sanitize/lib/libfltk_images.a": "933e7d0f81e02acf065874fe06c35ae3b9a886493f7245eeaf671f4b87251ea6",
+        "/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-sanitize/lib/libfltk_gl.a": "9f004d0a1f36fadd7a52a70069e76b2399d75aaa7de5bab8bc366e2dec8ffa1e"
+      }
+    },
+    "model-native-pages/release": {
+      "status": {
+        "state": "terminal",
+        "pid": 2211373,
+        "source": "40204b8bf8ab9ceca4a4d151cd82c8e4d59bcd88",
+        "profile": "release",
+        "scope": "Actual normal/compact FLTK UV editor via native DomeD universal menu; new normal33->UV34 Apply/Save/Cancel/history plus preserved independent normal roles. Private Xvfb, no system/HMD/session/main claim.",
+        "steps": [
+          {
+            "name": "normal",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/selection-gui-venv/bin/python",
+              "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/tests/portable-normal-model-menu.py"
+            ],
+            "exit_code": 0,
+            "seconds": 16.5853668100317
+          },
+          {
+            "name": "compact",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/selection-gui-venv/bin/python",
+              "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/tests/portable-normal-model-menu.py"
+            ],
+            "exit_code": 0,
+            "seconds": 17.234897644957528
+          }
+        ],
+        "phase": "compact",
+        "child_pid": 2213030,
+        "exit_code": 0,
+        "seconds": 33.82106438302435,
+        "inputs": 2345,
+        "drift": []
+      },
+      "status_sha256": "05611dfb59d337bdb8f229081a44f72ec07d4f639eb68160704e6c008ed96b3b",
+      "before_sha256": "78ed1b6cff753a7dbe005e138fbb96668ad314023de81f346270c4bfa4e4ebde",
+      "reports": {
+        "artifacts/model-native-pages/release/normal/report.json": {
+          "checks": 12,
+          "sha256": "e6534e7dfa8553a8bec99c49d12de1438cb74c5880c8dd2626bd86f72f54ae5c"
+        },
+        "artifacts/model-native-pages/release/compact/report.json": {
+          "checks": 12,
+          "sha256": "e6534e7dfa8553a8bec99c49d12de1438cb74c5880c8dd2626bd86f72f54ae5c"
+        }
+      },
+      "logs": {
+        "artifacts/model-native-pages/release/normal.log": {
+          "sha256": "a8ced3415f62230124595637705c462654be1c6d8bb8757fc4fc35d54cd3c929",
+          "PASS_lines": 12
+        },
+        "artifacts/model-native-pages/release/compact.log": {
+          "sha256": "a8ced3415f62230124595637705c462654be1c6d8bb8757fc4fc35d54cd3c929",
+          "PASS_lines": 12
+        }
+      },
+      "consumed_binaries_current_exact": {
+        "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/release/libdome-sculpt-core.a": "8eb3440781c1cd9980757a6763a53aecbb4f65bbf066f1a753ac8213f871819c",
+        "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/release/libdome-sculpt-render.a": "a779982d5e6f592979247e065c3f243874334cb0fec4c51e4648435858c97fd4",
+        "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/release/dome-sculpt": "422347805566309db9c6c57004044ba131924a73ac59d281236ec7f8e46a2788",
+        "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/release/dome-sculpt-layered-normal-native-test": "496279817d0c42418cc611e716c2955e35546700be97bab65c9be355bf082642",
+        "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/release/dome-sculpt-layered-normal-uv-native-test": "6882419aa25fdfb94336232ba04cba6d4536c52a422acf18eba6f079a73c100b",
+        "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/release/dome-sculpt-canonical-normal-uv-test": "93e26fc94528c351dc08f2f7466701067ec01a857a64f6a34e4f3db0d8c4068d",
+        "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/release/dome-sculpt-layered-normal-uv-safety-test": "263748a197d74b05d2bc0c341e5c30e22d2fd4cd63fdd36c92d74ca7fe465f37",
+        "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/release/dome-sculpt-layered-normal-render-test": "370b70910d07a274cb26ebb149b7d9d518cc2a352bb37b5fd28ef5200a75c160",
+        "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/release/dome-sculpt-baked-normal-field-test": "d636818e9618d8db18cb7ef94b6d27df92a4b0bb86e3bf22a4811c99393f87ab",
+        "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/release/dome-sculpt-baked-normal-field-faults-test": "5913ed1667f65863de63291928da60349633370dd443e6a34ecc686990d6aefc",
+        "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/release/dome-sculpt-layered-normal-archive-faults-test": "2055390a51858a9821d42ebba8e1ce967f0914ed6c213ea34f331c1fb3a1d7db",
+        "/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-release/lib/libfltk_cairo.a": "1f09ab78e1806ead2cba75cbe70c5b4d8c2e69e4848ae696677f4f1500c8db35",
+        "/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-release/lib/libfltk.a": "1b73fa146531cefa7a5859db222da96255c6eb99cd4544e8e41ed9339f826540",
+        "/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-release/lib/libfltk_images.a": "7b80394f820c41eef8fd642ed65faa5cf4e374c9f0bb35800f374f5f2eb43434",
+        "/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-release/lib/libfltk_gl.a": "81059124e1de5a2d4b261a527f37698cb3c9cc29059836d5fc3568de6a0054e0"
+      }
+    },
+    "model-native-pages/sanitize": {
+      "status": {
+        "state": "terminal",
+        "pid": 2211372,
+        "source": "40204b8bf8ab9ceca4a4d151cd82c8e4d59bcd88",
+        "profile": "sanitize",
+        "scope": "Actual normal/compact FLTK UV editor via native DomeD universal menu; new normal33->UV34 Apply/Save/Cancel/history plus preserved independent normal roles. Private Xvfb, no system/HMD/session/main claim.",
+        "steps": [
+          {
+            "name": "normal",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/selection-gui-venv/bin/python",
+              "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/tests/portable-normal-model-menu.py"
+            ],
+            "exit_code": 0,
+            "seconds": 27.855329519021325
+          },
+          {
+            "name": "compact",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/selection-gui-venv/bin/python",
+              "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/tests/portable-normal-model-menu.py"
+            ],
+            "exit_code": 0,
+            "seconds": 33.50456976296846
+          }
+        ],
+        "phase": "compact",
+        "child_pid": 2214883,
+        "exit_code": 0,
+        "seconds": 61.36133664601948,
+        "inputs": 2345,
+        "drift": []
+      },
+      "status_sha256": "dc4c9adf1faf7bf6c1c9926e4cfaee2fc5b7f0d3666dde135b39f6263147990b",
+      "before_sha256": "ce8c2c85afaba94364b2743fb320ddab61e392e1ab973a8142f5715e60f0bae0",
+      "reports": {
+        "artifacts/model-native-pages/sanitize/normal/report.json": {
+          "checks": 12,
+          "sha256": "e6534e7dfa8553a8bec99c49d12de1438cb74c5880c8dd2626bd86f72f54ae5c"
+        },
+        "artifacts/model-native-pages/sanitize/compact/report.json": {
+          "checks": 12,
+          "sha256": "e6534e7dfa8553a8bec99c49d12de1438cb74c5880c8dd2626bd86f72f54ae5c"
+        }
+      },
+      "logs": {
+        "artifacts/model-native-pages/sanitize/normal.log": {
+          "sha256": "a8ced3415f62230124595637705c462654be1c6d8bb8757fc4fc35d54cd3c929",
+          "PASS_lines": 12
+        },
+        "artifacts/model-native-pages/sanitize/compact.log": {
+          "sha256": "a8ced3415f62230124595637705c462654be1c6d8bb8757fc4fc35d54cd3c929",
+          "PASS_lines": 12
+        }
+      },
+      "consumed_binaries_current_exact": {
+        "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/sanitize/libdome-sculpt-core.a": "6905085942729dbcf5231d719b105e91ff271cc96a41f818ee43ad9f2d297a4e",
+        "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/sanitize/libdome-sculpt-render.a": "71257adbdc0234c5a729ca5fa7b506f39d5b2ee05f02ac8f679c080bca5aff2a",
+        "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/sanitize/dome-sculpt": "c66bc2484be92a02f587870de2a881c2b3a455aaf31dbdb434c8433e76bc7f6f",
+        "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/sanitize/dome-sculpt-layered-normal-native-test": "676c13785d2f890a6195c8e085f0d809fb53f87a7d91ae0cb3492ed15c33e578",
+        "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/sanitize/dome-sculpt-layered-normal-uv-native-test": "5caedacc4033bb7afef7b1cbcaeb2ebf965c5aa49f066bddeda249872a9514c0",
+        "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/sanitize/dome-sculpt-canonical-normal-uv-test": "099085c4dcd3d43d75376bd566a192e63fa2c9f2cfba8b3513e92d80dfa29cd5",
+        "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/sanitize/dome-sculpt-layered-normal-uv-safety-test": "c3498018ff7b11512b06a6a20ce3942881c2e7e40a161e8d92a38a6898d1faa2",
+        "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/sanitize/dome-sculpt-layered-normal-render-test": "ae9b23681cba9212a2576fd496af77ddde08ab26da3d370c32cfc2f5abd3233d",
+        "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/sanitize/dome-sculpt-baked-normal-field-test": "6ef9667f08e5785a8cb029fb41817c238824b4022a01fabfb22795da6e8dcb99",
+        "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/sanitize/dome-sculpt-baked-normal-field-faults-test": "00c9c8ed5b979af4d2e09cd4a403141547845d65539230135dfe402bebfe6b22",
+        "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/sanitize/dome-sculpt-layered-normal-archive-faults-test": "e7853bd0cf72fe5a69da2741007a6c8adebc6a307bfce9242524902707560843",
+        "/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-sanitize/lib/libfltk_cairo.a": "6499c6ab18b73e20dbf3b79e664f1f2c236b101e1c116ec55c0da97e7fd3f78a",
+        "/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-sanitize/lib/libfltk.a": "6db1869846293b7a54c0171c831571e9da54ec8ffcfdeae044101dd58b180a9a",
+        "/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-sanitize/lib/libfltk_images.a": "933e7d0f81e02acf065874fe06c35ae3b9a886493f7245eeaf671f4b87251ea6",
+        "/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-sanitize/lib/libfltk_gl.a": "9f004d0a1f36fadd7a52a70069e76b2399d75aaa7de5bab8bc366e2dec8ffa1e"
+      }
+    },
+    "model-wayland-xr-runtime/release": {
+      "status": {
+        "state": "terminal",
+        "pid": 2213961,
+        "source": "40204b8bf8ab9ceca4a4d151cd82c8e4d59bcd88",
+        "profile": "release",
+        "scope": "Actual portable-normal naming/model cues through private nested DomeD Wayland and actual OpenXR loader with synthetic stereo/controller poses on current matched app/helper/runtime. Native dialogs qualified separately. No system/headset/session or main admission. SAN compositor uses Release toolkit; client/helper ownSAN. XR SAN uses private patched EGL/Mesa, not installed/no suppression.",
+        "steps": [
+          {
+            "name": "wayland",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/selection-gui-venv/bin/python",
+              "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/tests/layered-normal-wayland.py"
+            ],
+            "exit_code": 0,
+            "seconds": 20.268375134968664
+          },
+          {
+            "name": "xr",
+            "command": [
+              "python3",
+              "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/tests/layered-normal-xr.py",
+              "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/release/dome-sculpt",
+              "/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-uv-native/build-uv-native-release/libdome-sculpt-test-runtime.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/release/dome-sculpt-layered-normal-native-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-wayland-xr-runtime/release/xr"
+            ],
+            "exit_code": 0,
+            "seconds": 37.94386792398291
+          }
+        ],
+        "phase": "xr",
+        "child_pid": 2216338,
+        "exit_code": 0,
+        "seconds": 58.21326535800472,
+        "inputs": 2338,
+        "drift": []
+      },
+      "status_sha256": "10f5e65c882510b7b7d03d105ed39288ee949574c20c9cb5b749a8f44cd07e17",
+      "before_sha256": "daf28e364919e84c3b60fb02dcaae3d3b80dc3fbf5d8cdc364c9076d1de0b56c",
+      "reports": {
+        "artifacts/model-wayland-xr-runtime/release/wayland/report.json": {
+          "checks": 11,
+          "sha256": "3caf1006c0454b0bdfa09dd75797cf7c99307834c00989998d0a12b4cf37634c"
+        },
+        "artifacts/model-wayland-xr-runtime/release/xr/report.json": {
+          "checks": 30,
+          "sha256": "f6ed045750b7aa42bfb1c8834669becbf3cf7872b21b9427729b0bfebd6acc27"
+        }
+      },
+      "logs": {
+        "artifacts/model-wayland-xr-runtime/release/wayland.log": {
+          "sha256": "3f40cfabcb39c47418e432267bf8c61178f92bdb0060e34a673fe935ad4daeb6",
+          "PASS_lines": 11
+        },
+        "artifacts/model-wayland-xr-runtime/release/xr.log": {
+          "sha256": "c0f861bb47ddea3ef50607a59f7ef1f019233f5c410d7483ef8a3194e28c7875",
+          "PASS_lines": 30
+        }
+      },
+      "consumed_binaries_current_exact": {
+        "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/release/dome-sculpt": "422347805566309db9c6c57004044ba131924a73ac59d281236ec7f8e46a2788",
+        "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/release/dome-sculpt-layered-normal-native-test": "496279817d0c42418cc611e716c2955e35546700be97bab65c9be355bf082642",
+        "/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-release/lib/libfltk_cairo.a": "1f09ab78e1806ead2cba75cbe70c5b4d8c2e69e4848ae696677f4f1500c8db35",
+        "/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-release/lib/libfltk.a": "1b73fa146531cefa7a5859db222da96255c6eb99cd4544e8e41ed9339f826540",
+        "/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-release/lib/libfltk_images.a": "7b80394f820c41eef8fd642ed65faa5cf4e374c9f0bb35800f374f5f2eb43434",
+        "/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-release/lib/libfltk_gl.a": "81059124e1de5a2d4b261a527f37698cb3c9cc29059836d5fc3568de6a0054e0"
+      }
+    },
+    "model-wayland-xr-runtime/sanitize": {
+      "status": {
+        "state": "terminal",
+        "pid": 2213960,
+        "source": "40204b8bf8ab9ceca4a4d151cd82c8e4d59bcd88",
+        "profile": "sanitize",
+        "scope": "Actual portable-normal naming/model cues through private nested DomeD Wayland and actual OpenXR loader with synthetic stereo/controller poses on current matched app/helper/runtime. Native dialogs qualified separately. No system/headset/session or main admission. SAN compositor uses Release toolkit; client/helper ownSAN. XR SAN uses private patched EGL/Mesa, not installed/no suppression.",
+        "steps": [
+          {
+            "name": "wayland",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/selection-gui-venv/bin/python",
+              "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/tests/layered-normal-wayland.py"
+            ],
+            "exit_code": 0,
+            "seconds": 33.94108756299829
+          },
+          {
+            "name": "xr",
+            "command": [
+              "python3",
+              "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/tests/layered-normal-xr.py",
+              "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/sanitize/dome-sculpt",
+              "/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-uv-native/build-uv-native-sanitize/libdome-sculpt-test-runtime.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/sanitize/dome-sculpt-layered-normal-native-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-wayland-xr-runtime/sanitize/xr"
+            ],
+            "exit_code": 0,
+            "seconds": 61.25122724799439
+          }
+        ],
+        "phase": "xr",
+        "child_pid": 2218178,
+        "exit_code": 0,
+        "seconds": 95.21325428097043,
+        "inputs": 2560,
+        "drift": []
+      },
+      "status_sha256": "fe55cf050bce93fdca6c808071724f122d67d83b2265ce275f5888967eb2a8b2",
+      "before_sha256": "fa56e45ab2cc09700afa54307d88e8700f9f74ff56a5e984ebc798d77ca3f531",
+      "reports": {
+        "artifacts/model-wayland-xr-runtime/sanitize/wayland/report.json": {
+          "checks": 11,
+          "sha256": "3caf1006c0454b0bdfa09dd75797cf7c99307834c00989998d0a12b4cf37634c"
+        },
+        "artifacts/model-wayland-xr-runtime/sanitize/xr/report.json": {
+          "checks": 30,
+          "sha256": "f6ed045750b7aa42bfb1c8834669becbf3cf7872b21b9427729b0bfebd6acc27"
+        }
+      },
+      "logs": {
+        "artifacts/model-wayland-xr-runtime/sanitize/wayland.log": {
+          "sha256": "3f40cfabcb39c47418e432267bf8c61178f92bdb0060e34a673fe935ad4daeb6",
+          "PASS_lines": 11
+        },
+        "artifacts/model-wayland-xr-runtime/sanitize/xr.log": {
+          "sha256": "c0f861bb47ddea3ef50607a59f7ef1f019233f5c410d7483ef8a3194e28c7875",
+          "PASS_lines": 30
+        }
+      },
+      "consumed_binaries_current_exact": {
+        "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/sanitize/dome-sculpt": "c66bc2484be92a02f587870de2a881c2b3a455aaf31dbdb434c8433e76bc7f6f",
+        "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/sanitize/dome-sculpt-layered-normal-native-test": "676c13785d2f890a6195c8e085f0d809fb53f87a7d91ae0cb3492ed15c33e578",
+        "/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-sanitize/lib/libfltk_cairo.a": "6499c6ab18b73e20dbf3b79e664f1f2c236b101e1c116ec55c0da97e7fd3f78a",
+        "/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-sanitize/lib/libfltk.a": "6db1869846293b7a54c0171c831571e9da54ec8ffcfdeae044101dd58b180a9a",
+        "/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-sanitize/lib/libfltk_images.a": "933e7d0f81e02acf065874fe06c35ae3b9a886493f7245eeaf671f4b87251ea6",
+        "/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-sanitize/lib/libfltk_gl.a": "9f004d0a1f36fadd7a52a70069e76b2399d75aaa7de5bab8bc366e2dec8ffa1e",
+        "/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-release/lib/libfltk_cairo.a": "1f09ab78e1806ead2cba75cbe70c5b4d8c2e69e4848ae696677f4f1500c8db35",
+        "/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-release/lib/libfltk.a": "1b73fa146531cefa7a5859db222da96255c6eb99cd4544e8e41ed9339f826540",
+        "/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-release/lib/libfltk_images.a": "7b80394f820c41eef8fd642ed65faa5cf4e374c9f0bb35800f374f5f2eb43434",
+        "/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-release/lib/libfltk_gl.a": "81059124e1de5a2d4b261a527f37698cb3c9cc29059836d5fc3568de6a0054e0"
+      }
+    },
+    "model-compact-fix/release": {
+      "status": {
+        "state": "terminal",
+        "pid": 2234339,
+        "source": "2cda3f9f6122df7e974cac8ce178be31b87a9db1",
+        "profile": "release",
+        "scope": "Complete bake-editor TU plus actual native application relink over unchanged qualified model-UI owned archives/objects. New shorter rest quality label and explanatory tooltip only; real native normal/compact menu/dialog/save/history. No new math/header/schema/renderer/XR claim.",
+        "steps": [
+          {
+            "name": "compile-bake-editor",
+            "command": [
+              "/usr/bin/c++",
+              "-DDOME_HAS_XR=1",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/third_party/desktop",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/build-uv-native-release",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/third_party/nlohmann",
+              "-isystem",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/harfbuzz",
+              "-isystem",
+              "/usr/include/glib-2.0",
+              "-isystem",
+              "/usr/lib64/glib-2.0/include",
+              "-isystem",
+              "/usr/include/sysprof-6",
+              "-isystem",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/freetype2",
+              "-isystem",
+              "/usr/include/libpng16",
+              "-isystem",
+              "/usr/include/libxml2",
+              "-isystem",
+              "/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-release/include",
+              "-isystem",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/cairo",
+              "-isystem",
+              "/usr/include/pixman-1",
+              "-isystem",
+              "/usr/include/libmount",
+              "-isystem",
+              "/usr/include/blkid",
+              "-O3",
+              "-DNDEBUG",
+              "-std=gnu++20",
+              "-pthread",
+              "-DWITH_GZFILEOP",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-compact-fix/release/bake-editor.cpp.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/src/bake-editor.cpp"
+            ],
+            "exit_code": 0,
+            "seconds": 3.3262727609835565
+          },
+          {
+            "name": "link-native",
+            "command": [
+              "/usr/bin/c++",
+              "-O3",
+              "-DNDEBUG",
+              "CMakeFiles/dome-sculpt.dir/src/native-display-runtime.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/rig-fit-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/projection-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/spacenav-options.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/release/app.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/polygon-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/import-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/procedural-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/resolution-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/sculpt-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/creator-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/rig-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/shapekey-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/weight-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/skin-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/mesh-editor.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-compact-fix/release/bake-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/object-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/paint-editor.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-uv-final-a086/artifacts/uv-final-build/release/uv-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/ui-conventions.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/session-appearance.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/export-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/third_party/desktop/desktop-menu.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/appmenu-protocol.c.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-compact-fix/release/dome-sculpt",
+              "-L/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-release/lib",
+              "-L/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib",
+              "-Wl,-rpath,/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-release/lib:/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib:",
+              "libdome-sculpt-spacenav.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/release/libdome-sculpt-core.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/release/libdome-sculpt-render.a",
+              "/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-release/lib/libfltk_images.so.1.4.5",
+              "/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-release/lib/libfltk_gl.so.1.4.5",
+              "/usr/lib64/libGLU.so",
+              "libdome-sculpt-xr.a",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libpng.so",
+              "/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-release/lib/libfltk.so.1.4.5",
+              "-lcairo",
+              "-L/usr/lib64",
+              "-lX11",
+              "-lGLU",
+              "-lGL",
+              "/usr/lib64/libdl.a",
+              "/usr/lib64/libSM.so",
+              "/usr/lib64/libICE.so",
+              "/usr/lib64/libXext.so",
+              "/usr/lib64/libXinerama.so",
+              "/usr/lib64/libXfixes.so",
+              "/usr/lib64/libXcursor.so",
+              "/usr/lib64/libXrender.so",
+              "/usr/lib64/libXft.so",
+              "/usr/lib64/libwayland-egl.so",
+              "/usr/lib64/libwayland-cursor.so",
+              "/usr/lib64/libxkbcommon.so",
+              "/usr/lib64/libGLX.so",
+              "/usr/lib64/libOpenGL.so",
+              "/usr/lib64/libz.so",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libcairo.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/release/libdome-sculpt-render.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/release/libdome-sculpt-core.a",
+              "libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "libdome-sculpt-polygon.a",
+              "libxatlas.a",
+              "libmikktspace.a",
+              "libmikktspace-robust.a",
+              "libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "/usr/lib64/libEGL.so",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libharfbuzz.so",
+              "/usr/lib64/libGL.so",
+              "/usr/lib64/libfontconfig.so",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libfreetype.so",
+              "/usr/lib64/libicui18n.so",
+              "/usr/lib64/libicuuc.so",
+              "/usr/lib64/libopenxr_loader.so",
+              "/usr/lib64/libgio-2.0.so",
+              "/usr/lib64/libgobject-2.0.so",
+              "/usr/lib64/libglib-2.0.so",
+              "/usr/lib64/libX11.so",
+              "/usr/lib64/libwayland-client.so",
+              "-lm",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit_code": 0,
+            "seconds": 0.42924891196889803
+          },
+          {
+            "name": "normal",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/selection-gui-venv/bin/python",
+              "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/tests/portable-normal-model-menu.py"
+            ],
+            "exit_code": 0,
+            "seconds": 16.773365990957245
+          },
+          {
+            "name": "compact",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/selection-gui-venv/bin/python",
+              "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/tests/portable-normal-model-menu.py"
+            ],
+            "exit_code": 0,
+            "seconds": 16.71909060498001
+          }
+        ],
+        "phase": "compact",
+        "child_pid": 2237062,
+        "exit_code": 0,
+        "seconds": 37.28015665698331,
+        "inputs": 2346,
+        "drift": [],
+        "artifacts": {
+          "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-compact-fix/release/dome-sculpt": "29487347f044d01f5b7e0db625d8f13ca48a6baa9e39db81434b9dce048339d5"
+        }
+      },
+      "status_sha256": "ed3162b3859dc2b62095b85061741a5bf149588c0c11873bee992e5c684a0d45",
+      "before_sha256": "060135ff5c2d9845170aa0e926bf223e27af02d976981229bddb8ce1248012c3",
+      "reports": {
+        "artifacts/model-compact-fix/release/normal/report.json": {
+          "checks": 12,
+          "sha256": "e6534e7dfa8553a8bec99c49d12de1438cb74c5880c8dd2626bd86f72f54ae5c"
+        },
+        "artifacts/model-compact-fix/release/compact/report.json": {
+          "checks": 12,
+          "sha256": "e6534e7dfa8553a8bec99c49d12de1438cb74c5880c8dd2626bd86f72f54ae5c"
+        }
+      },
+      "logs": {
+        "artifacts/model-compact-fix/release/compile-bake-editor.log": {
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "PASS_lines": 0
+        },
+        "artifacts/model-compact-fix/release/link-native.log": {
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "PASS_lines": 0
+        },
+        "artifacts/model-compact-fix/release/normal.log": {
+          "sha256": "a8ced3415f62230124595637705c462654be1c6d8bb8757fc4fc35d54cd3c929",
+          "PASS_lines": 12
+        },
+        "artifacts/model-compact-fix/release/compact.log": {
+          "sha256": "a8ced3415f62230124595637705c462654be1c6d8bb8757fc4fc35d54cd3c929",
+          "PASS_lines": 12
+        }
+      },
+      "consumed_binaries_current_exact": {
+        "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/release/libdome-sculpt-core.a": "8eb3440781c1cd9980757a6763a53aecbb4f65bbf066f1a753ac8213f871819c",
+        "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/release/libdome-sculpt-render.a": "a779982d5e6f592979247e065c3f243874334cb0fec4c51e4648435858c97fd4",
+        "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/release/dome-sculpt": "422347805566309db9c6c57004044ba131924a73ac59d281236ec7f8e46a2788",
+        "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/release/dome-sculpt-layered-normal-native-test": "496279817d0c42418cc611e716c2955e35546700be97bab65c9be355bf082642",
+        "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/release/dome-sculpt-layered-normal-uv-native-test": "6882419aa25fdfb94336232ba04cba6d4536c52a422acf18eba6f079a73c100b",
+        "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/release/dome-sculpt-canonical-normal-uv-test": "93e26fc94528c351dc08f2f7466701067ec01a857a64f6a34e4f3db0d8c4068d",
+        "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/release/dome-sculpt-layered-normal-uv-safety-test": "263748a197d74b05d2bc0c341e5c30e22d2fd4cd63fdd36c92d74ca7fe465f37",
+        "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/release/dome-sculpt-layered-normal-render-test": "370b70910d07a274cb26ebb149b7d9d518cc2a352bb37b5fd28ef5200a75c160",
+        "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/release/dome-sculpt-baked-normal-field-test": "d636818e9618d8db18cb7ef94b6d27df92a4b0bb86e3bf22a4811c99393f87ab",
+        "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/release/dome-sculpt-baked-normal-field-faults-test": "5913ed1667f65863de63291928da60349633370dd443e6a34ecc686990d6aefc",
+        "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/release/dome-sculpt-layered-normal-archive-faults-test": "2055390a51858a9821d42ebba8e1ce967f0914ed6c213ea34f331c1fb3a1d7db",
+        "/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-release/lib/libfltk_cairo.a": "1f09ab78e1806ead2cba75cbe70c5b4d8c2e69e4848ae696677f4f1500c8db35",
+        "/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-release/lib/libfltk.a": "1b73fa146531cefa7a5859db222da96255c6eb99cd4544e8e41ed9339f826540",
+        "/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-release/lib/libfltk_images.a": "7b80394f820c41eef8fd642ed65faa5cf4e374c9f0bb35800f374f5f2eb43434",
+        "/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-release/lib/libfltk_gl.a": "81059124e1de5a2d4b261a527f37698cb3c9cc29059836d5fc3568de6a0054e0"
+      }
+    },
+    "model-compact-fix/sanitize": {
+      "status": {
+        "state": "terminal",
+        "pid": 2234338,
+        "source": "2cda3f9f6122df7e974cac8ce178be31b87a9db1",
+        "profile": "sanitize",
+        "scope": "Complete bake-editor TU plus actual native application relink over unchanged qualified model-UI owned archives/objects. New shorter rest quality label and explanatory tooltip only; real native normal/compact menu/dialog/save/history. No new math/header/schema/renderer/XR claim.",
+        "steps": [
+          {
+            "name": "compile-bake-editor",
+            "command": [
+              "/usr/bin/c++",
+              "-DDOME_HAS_XR=1",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/third_party/desktop",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/build-uv-native-sanitize",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/third_party/nlohmann",
+              "-isystem",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/harfbuzz",
+              "-isystem",
+              "/usr/include/glib-2.0",
+              "-isystem",
+              "/usr/lib64/glib-2.0/include",
+              "-isystem",
+              "/usr/include/sysprof-6",
+              "-isystem",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/freetype2",
+              "-isystem",
+              "/usr/include/libpng16",
+              "-isystem",
+              "/usr/include/libxml2",
+              "-isystem",
+              "/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-sanitize/include",
+              "-isystem",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/cairo",
+              "-isystem",
+              "/usr/include/pixman-1",
+              "-isystem",
+              "/usr/include/libmount",
+              "-isystem",
+              "/usr/include/blkid",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "-O1",
+              "-g1",
+              "-std=gnu++20",
+              "-pthread",
+              "-DWITH_GZFILEOP",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-compact-fix/sanitize/bake-editor.cpp.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/src/bake-editor.cpp"
+            ],
+            "exit_code": 0,
+            "seconds": 4.532660753000528
+          },
+          {
+            "name": "link-native",
+            "command": [
+              "/usr/bin/c++",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "-O1",
+              "-g1",
+              "-fsanitize=address,undefined",
+              "CMakeFiles/dome-sculpt.dir/src/native-display-runtime.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/rig-fit-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/projection-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/spacenav-options.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/sanitize/app.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/polygon-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/import-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/procedural-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/resolution-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/sculpt-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/creator-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/rig-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/shapekey-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/weight-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/skin-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/mesh-editor.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-compact-fix/sanitize/bake-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/object-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/paint-editor.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-uv-final-a086/artifacts/uv-final-build/sanitize/uv-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/ui-conventions.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/session-appearance.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/export-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/third_party/desktop/desktop-menu.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/appmenu-protocol.c.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-compact-fix/sanitize/dome-sculpt",
+              "-L/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-sanitize/lib",
+              "-L/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib",
+              "-Wl,-rpath,/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-sanitize/lib:/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib:",
+              "libdome-sculpt-spacenav.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/sanitize/libdome-sculpt-core.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/sanitize/libdome-sculpt-render.a",
+              "/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-sanitize/lib/libfltk_images.so.1.4.5",
+              "/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-sanitize/lib/libfltk_gl.so.1.4.5",
+              "/usr/lib64/libGLU.so",
+              "libdome-sculpt-xr.a",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libpng.so",
+              "/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-sanitize/lib/libfltk.so.1.4.5",
+              "-lcairo",
+              "-L/usr/lib64",
+              "-lX11",
+              "-lGLU",
+              "-lGL",
+              "/usr/lib64/libdl.a",
+              "/usr/lib64/libSM.so",
+              "/usr/lib64/libICE.so",
+              "/usr/lib64/libXext.so",
+              "/usr/lib64/libXinerama.so",
+              "/usr/lib64/libXfixes.so",
+              "/usr/lib64/libXcursor.so",
+              "/usr/lib64/libXrender.so",
+              "/usr/lib64/libXft.so",
+              "/usr/lib64/libwayland-egl.so",
+              "/usr/lib64/libwayland-cursor.so",
+              "/usr/lib64/libxkbcommon.so",
+              "/usr/lib64/libGLX.so",
+              "/usr/lib64/libOpenGL.so",
+              "/usr/lib64/libz.so",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libcairo.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/sanitize/libdome-sculpt-render.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/sanitize/libdome-sculpt-core.a",
+              "libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "libdome-sculpt-polygon.a",
+              "libxatlas.a",
+              "libmikktspace.a",
+              "libmikktspace-robust.a",
+              "libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "/usr/lib64/libEGL.so",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libharfbuzz.so",
+              "/usr/lib64/libGL.so",
+              "/usr/lib64/libfontconfig.so",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libfreetype.so",
+              "/usr/lib64/libicui18n.so",
+              "/usr/lib64/libicuuc.so",
+              "/usr/lib64/libopenxr_loader.so",
+              "/usr/lib64/libgio-2.0.so",
+              "/usr/lib64/libgobject-2.0.so",
+              "/usr/lib64/libglib-2.0.so",
+              "/usr/lib64/libX11.so",
+              "/usr/lib64/libwayland-client.so",
+              "-lm",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit_code": 0,
+            "seconds": 2.424837644037325
+          },
+          {
+            "name": "normal",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/selection-gui-venv/bin/python",
+              "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/tests/portable-normal-model-menu.py"
+            ],
+            "exit_code": 0,
+            "seconds": 27.20193569100229
+          },
+          {
+            "name": "compact",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/selection-gui-venv/bin/python",
+              "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/tests/portable-normal-model-menu.py"
+            ],
+            "exit_code": 0,
+            "seconds": 27.856775752967224
+          }
+        ],
+        "phase": "compact",
+        "child_pid": 2239692,
+        "exit_code": 0,
+        "seconds": 62.050578469003085,
+        "inputs": 2346,
+        "drift": [],
+        "artifacts": {
+          "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-compact-fix/sanitize/dome-sculpt": "c0b62860c0a78c301ab3d144ae15a83f830d7aeafc86d623b56d829e3b874028"
+        }
+      },
+      "status_sha256": "d2e49f57f320402e5db682eee843a6c6138e279d47eb1d7863b9a1da59aced84",
+      "before_sha256": "3bb59ab5ff1467c9eba5ed08df386641ba4cbbb19edb304bc127391b33de7863",
+      "reports": {
+        "artifacts/model-compact-fix/sanitize/normal/report.json": {
+          "checks": 12,
+          "sha256": "e6534e7dfa8553a8bec99c49d12de1438cb74c5880c8dd2626bd86f72f54ae5c"
+        },
+        "artifacts/model-compact-fix/sanitize/compact/report.json": {
+          "checks": 12,
+          "sha256": "e6534e7dfa8553a8bec99c49d12de1438cb74c5880c8dd2626bd86f72f54ae5c"
+        }
+      },
+      "logs": {
+        "artifacts/model-compact-fix/sanitize/compile-bake-editor.log": {
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "PASS_lines": 0
+        },
+        "artifacts/model-compact-fix/sanitize/link-native.log": {
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "PASS_lines": 0
+        },
+        "artifacts/model-compact-fix/sanitize/normal.log": {
+          "sha256": "a8ced3415f62230124595637705c462654be1c6d8bb8757fc4fc35d54cd3c929",
+          "PASS_lines": 12
+        },
+        "artifacts/model-compact-fix/sanitize/compact.log": {
+          "sha256": "a8ced3415f62230124595637705c462654be1c6d8bb8757fc4fc35d54cd3c929",
+          "PASS_lines": 12
+        }
+      },
+      "consumed_binaries_current_exact": {
+        "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/sanitize/libdome-sculpt-core.a": "6905085942729dbcf5231d719b105e91ff271cc96a41f818ee43ad9f2d297a4e",
+        "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/sanitize/libdome-sculpt-render.a": "71257adbdc0234c5a729ca5fa7b506f39d5b2ee05f02ac8f679c080bca5aff2a",
+        "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/sanitize/dome-sculpt": "c66bc2484be92a02f587870de2a881c2b3a455aaf31dbdb434c8433e76bc7f6f",
+        "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/sanitize/dome-sculpt-layered-normal-native-test": "676c13785d2f890a6195c8e085f0d809fb53f87a7d91ae0cb3492ed15c33e578",
+        "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/sanitize/dome-sculpt-layered-normal-uv-native-test": "5caedacc4033bb7afef7b1cbcaeb2ebf965c5aa49f066bddeda249872a9514c0",
+        "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/sanitize/dome-sculpt-canonical-normal-uv-test": "099085c4dcd3d43d75376bd566a192e63fa2c9f2cfba8b3513e92d80dfa29cd5",
+        "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/sanitize/dome-sculpt-layered-normal-uv-safety-test": "c3498018ff7b11512b06a6a20ce3942881c2e7e40a161e8d92a38a6898d1faa2",
+        "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/sanitize/dome-sculpt-layered-normal-render-test": "ae9b23681cba9212a2576fd496af77ddde08ab26da3d370c32cfc2f5abd3233d",
+        "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/sanitize/dome-sculpt-baked-normal-field-test": "6ef9667f08e5785a8cb029fb41817c238824b4022a01fabfb22795da6e8dcb99",
+        "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/sanitize/dome-sculpt-baked-normal-field-faults-test": "00c9c8ed5b979af4d2e09cd4a403141547845d65539230135dfe402bebfe6b22",
+        "/home/blux/de-xr/dome-sculpt/artifacts/portable-normal-model-ui/artifacts/model-ui-build/sanitize/dome-sculpt-layered-normal-archive-faults-test": "e7853bd0cf72fe5a69da2741007a6c8adebc6a307bfce9242524902707560843",
+        "/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-sanitize/lib/libfltk_cairo.a": "6499c6ab18b73e20dbf3b79e664f1f2c236b101e1c116ec55c0da97e7fd3f78a",
+        "/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-sanitize/lib/libfltk.a": "6db1869846293b7a54c0171c831571e9da54ec8ffcfdeae044101dd58b180a9a",
+        "/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-sanitize/lib/libfltk_images.a": "933e7d0f81e02acf065874fe06c35ae3b9a886493f7245eeaf671f4b87251ea6",
+        "/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-sanitize/lib/libfltk_gl.a": "9f004d0a1f36fadd7a52a70069e76b2399d75aaa7de5bab8bc366e2dec8ffa1e"
+      }
+    },
+    "private_sanitizer_drivers": {
+      "/home/blux/de-xr/dome-sculpt/artifacts/mesa-xr-leak-26.2.5/build-patched-v2/src/egl/libEGL_mesa.so.0.0.0": "1a6aedf2eb11801863d1d24fdb8880a16a5ced8feb437d54916dec1b57e4a75e",
+      "/home/blux/de-xr/dome-sculpt/artifacts/mesa-xr-leak-26.2.5/build-patched-v2/src/gallium/targets/dri/libgallium-26.2.5.so": "d8cf7ee81cf354f7595d5b98c5d2e45d5d52cf06e88fb6a82edf08bd203fd132"
+    }
+  },
+  "negative_evidence": [
+    "Original legacy/portable different-model comparison9 retained; predating declared portable target model contract unchanged. Within-model4 bound unchanged.",
+    "Initial Wayland/XR preflight aborts before client launch: wrongly named dome-sculpt-test-runtime instead of real libdome-sculpt-test-runtime.so. Original empty output dirs retained; corrected runtime batches separate.",
+    "Initial six wheel screenshots did not reach every control; native scrollbar12-page screenshots added. Compact Rest normal error label clipped, then shortened to Rest error (deg) and verified in final actual screenshots.",
+    "model-ui-build archive-named helper binary is not claimed as a new archive-prefix proof; actual final34 separate archive sweep remains authoritative."
+  ],
+  "full_goal_complete": false,
+  "main_runtime_admitted": false
+}
