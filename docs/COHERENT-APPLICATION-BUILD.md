@@ -15,7 +15,7 @@ selected by strict source/profile/library checksum guards in a new cache.
 [The receipt](validation/COHERENT-APPLICATION-BUILD.json) records exact commands,
 source manifests, registry and the terminal ELF/archive hash closure. The late
 artifact ledger was captured after build terminal and before followup, rather
-than relabeled as part of the original wrapper. No builders remained live then.
+than relabeled as part of the original wrapper. No builders for this tree remained live then.
 Subsequently merged40c6851 graphics and partiald22b0eb workflow leaves change only
 tests/docs/CMake; all product/header/asset bytes remain equal. They need their
 same-source all-target followup before602-command coherent regression.
