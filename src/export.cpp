@@ -604,7 +604,9 @@ static GltfDocument make_gltf_impl(const std::vector<ObjectSurface> &input_objec
          {"emissiveFactor", m.emissive},
          {"doubleSided", m.double_sided},
          {"alphaMode", m.color[3] < 1 || vertex_alpha ? "BLEND" : "OPAQUE"}});
-    if(frame) {
+    // A native paint coordinate expansion has no artist normal-frame owner.
+    // Only the real frame-backed route carries this deformation policy receipt.
+    if(frame&&o.material_bindings&&o.material_bindings->normal_frames) {
       auto &extra=j["meshes"][mesh_index]["primitives"][0]["extras"]["domeSculptNormalTransport"];
       extra={{"version",1},{"skinPolicy","weighted-joint-inverse-transpose-1"},{"frameTargetIds",nlohmann::json::array()}};
       for(auto id:o.material_bindings->normal_frames->current_targets)extra["frameTargetIds"].push_back(std::to_string(id));
