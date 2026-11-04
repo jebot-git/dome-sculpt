@@ -14,6 +14,7 @@
 #include "io.hpp"
 #include "gltf-document.hpp"
 #include "raw-source-emission.hpp"
+#include "native-authoring-compiler.hpp"
 #include "normal-frame-export.hpp"
 #include "prepared-color-state.hpp"
 #include "current-colors.hpp"
@@ -68,15 +69,15 @@ static GltfDocument make_gltf_impl(const std::vector<ObjectSurface> &input_objec
   size_t work=0;auto checkpoint=[&]{if((++work&1023)==0)stop();};
   stop();
   for(const auto &object:input_objects)if((object.textures&&object.textures->overlay)||detail::hdr_emission(object.material.emissive)||(object.material_bindings&&detail::physical_emission(*object.material_bindings))) {
-    if(!raw_authority||!raw_source_emission(*raw_authority,object,cancelled))
+    if(!raw_authority||(!native_paint_compiled_emission(*raw_authority,object,cancelled)&&!raw_source_emission(*raw_authority,object,cancelled)))
       throw std::invalid_argument("Physical emission requires a precision-qualified export adapter");
   }
   for(const auto &object:input_objects)if((object.paint_sampling_attachment||!object.paint_corner_coordinates.empty())&&
-      (source_space!=SourceMorphSpace::Native||!object.material_bindings||!object.material_bindings->normal_frames))
+      (source_space!=SourceMorphSpace::Native||!object.material_bindings||(!object.material_bindings->normal_frames&&!object.material_bindings->native_paint_sampling)))
     throw std::invalid_argument("Retained paint export requires its complete native normal/colour coordinate compiler");
   for(const auto &object:input_objects) {
-    const auto node=object.material_bindings&&object.material_bindings->color_preparation?object.material_bindings->color_preparation->paint_sampling:nullptr;
-    if(bool(node)!=bool(object.paint_sampling_attachment))throw std::invalid_argument("Current paint export omitted or fabricated its own sampling attachment");
+    const auto expected=material_paint_attachment(object.material_bindings.get());
+    if(expected!=object.paint_sampling_attachment||expected.owner_before(object.paint_sampling_attachment)||object.paint_sampling_attachment.owner_before(expected))throw std::invalid_argument("Current paint export omitted or fabricated its own sampling attachment");
   }
   GltfDocument result;
   const auto &objects=input_objects;
@@ -189,6 +190,7 @@ static GltfDocument make_gltf_impl(const std::vector<ObjectSurface> &input_objec
       input.material_bindings->color_preparation->validate_current(input.mesh,input.appearance.get(),cancelled);
     std::optional<NormalFrameExport> prepared;
     if(input.material_bindings && input.material_bindings->normal_frames)prepared=normal_frame_export(input,source_space,cancelled,source_space==SourceMorphSpace::Native);
+    else if(input.material_bindings&&input.material_bindings->native_paint_sampling)prepared=native_paint_export(input,source_space,cancelled);
     else if(auto generated=baked_normal_export(input,source_space,recompute_changed_normals,cancelled)){
       result.normal_targets_recomputed+=generated->recomputed_normals;prepared=std::move(generated->frame);
     }
@@ -779,6 +781,7 @@ GltfDocument make_gltf_authoring(const NativeAuthoringCapture &capture,
     const auto &object=objects[i];
     if(!hdr_emission(object.material.emissive)&&
        !(object.material_bindings&&physical_emission(*object.material_bindings)))continue;
+    if(native_paint_compiled_emission(capture,object,cancelled))continue;
     const auto factors=raw_source_emission(capture,object,cancelled);
     if(!factors)throw std::invalid_argument("Raw emission output lacks its authenticated source-role replay");
     auto &identity=document.objects.at(i);

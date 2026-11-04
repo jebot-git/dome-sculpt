@@ -2,6 +2,8 @@
 #pragma once
 #include "normal-frame-runtime.hpp"
 #include "export-corner-coordinates.hpp"
+#include "native-paint-sampling.hpp"
+#include "native-paint-export-policy.hpp"
 #include "dome/color-paint-sampling.hpp"
 #include "source-morph.hpp"
 #include "dome/humanoid-creator.hpp"
@@ -23,6 +25,38 @@ struct NormalFrameExport {
   const ImportedPrimitive *source=nullptr;
   PaintSourceTexture canonical_normal,prepared_normal;
 };
+// Plain native paint owns real geometry and a writable coordinate domain; it
+// does not acquire imported/artist normal frames merely to emit that domain.
+inline NormalFrameExport native_paint_export(const ObjectSurface &input,SourceMorphSpace space,
+    const std::function<bool()> &cancelled={}) {
+  auto stop=[&]{if(cancelled&&cancelled())throw std::runtime_error("Native paint coordinate export cancelled");};
+  stop();native_paint_export_working_bytes(input.mesh);input.mesh.validate();
+  const auto binding=input.material_bindings;const auto owner=binding?binding->native_paint_sampling:nullptr;
+  const auto attachment=owner?owner->attachment():nullptr;
+  if(space!=SourceMorphSpace::Native||!owner||!owner->valid_owner(owner)||!attachment||
+      attachment!=input.paint_sampling_attachment||attachment.owner_before(input.paint_sampling_attachment)||input.paint_sampling_attachment.owner_before(attachment)||
+      binding->has_mtoon||binding->normal_frames||binding->normal_preparation||binding->color_preparation||binding->key_derivation||
+      input.appearance||input.deformation||input.polygon_colors)
+    throw std::invalid_argument("Native paint export requires its own supported geometry, material and coordinate owners");
+  if(input.textures&&(input.textures->source_maps||input.textures->normal_projection||input.textures->color_projection||input.textures->baked_base||
+      !input.textures->normal.rgba.empty()||!input.textures->mtoon_normal.rgba.empty()||!input.textures->baked_normal.rgba.empty()))
+    throw std::invalid_argument("Native paint normal/source export still requires its genuine role-frame adapter");
+  binding->validate();PaintSamplingLimits limits;limits.cancelled=cancelled;owner->validate(limits);owner->validate_mesh(input.mesh,limits);
+  const auto corners=attachment->domain()->corner_coordinates(input.mesh,limits);
+  if(corners!=input.paint_corner_coordinates)throw std::invalid_argument("Native export paint coordinates differ from their exact current owner");
+  NormalFrameLayout base;base.indices.reserve(input.mesh.indices.size());
+  const auto capacity=std::min(input.mesh.positions.size(),input.mesh.indices.size());base.vertices.reserve(capacity);base.corners.reserve(capacity);
+  std::vector<uint32_t> seen(input.mesh.positions.size(),UINT32_MAX);
+  for(size_t c=0;c<input.mesh.indices.size();++c){if((c&1023)==0)stop();auto v=input.mesh.indices[c];auto &slot=seen[v];if(slot==UINT32_MAX){slot=uint32_t(base.vertices.size());base.vertices.push_back(v);base.corners.push_back(uint32_t(c));}base.indices.push_back(slot);}
+  auto split=split_frame_corner_coordinates(input.mesh,base,corners,cancelled);NormalFrameExport out;
+  out.rest_vertices=std::move(split.frames.vertices);out.paint_coordinates=std::move(split.coordinates);
+  out.surface={input.id,input.name,input.transform,input.material,{},input.textures,{},input.groups,{},input.material_bindings,input.source_dormant};
+  out.surface.affine_edit=input.affine_edit;out.surface.rig_source=input.rig_source;
+  auto &mesh=out.surface.mesh;mesh.positions.reserve(out.rest_vertices.size());mesh.normals.reserve(out.rest_vertices.size());mesh.uv.reserve(out.rest_vertices.size());
+  if(!input.mesh.uv_pins.empty())mesh.uv_pins.reserve(out.rest_vertices.size());
+  for(size_t v=0;v<out.rest_vertices.size();++v){if((v&1023)==0)stop();const auto from=out.rest_vertices[v];mesh.positions.push_back(input.mesh.positions[from]);mesh.normals.push_back(input.mesh.normals[from]);mesh.uv.push_back(input.mesh.uv.at(from));if(!input.mesh.uv_pins.empty())mesh.uv_pins.push_back(input.mesh.uv_pins[from]);}
+  mesh.indices=std::move(split.frames.indices);mesh.uv_seams=input.mesh.uv_seams;mesh.validate();stop();return out;
+}
 inline bool normal_frame_attribute_equal(const NormalFrames &a,const NormalFrames &b,bool compare_tangent,
     const std::function<bool()> &cancelled={}) {
   if(a.normals.size()!=b.normals.size() || a.origin_vertex_count!=b.origin_vertex_count || a.origin_vertices!=b.origin_vertices || a.targets.size()!=b.targets.size())return false;

@@ -25,6 +25,10 @@ struct NativeAuthoringCompilation {
   std::vector<std::string> diagnostics;
   std::vector<NativeAuthoringEmission> emission;
 };
+// Replay only the actual sealed capture's emission-normalized native32 view.
+// This is neither a public surface permission nor original Source4 authority.
+bool native_paint_compiled_emission(const NativeAuthoringCapture &,const ObjectSurface &,
+    const std::function<bool()> & = {});
 // The only input geometry/material authority is the sealed original capture.
 // Portable surfaces never replace the Scene retained in the container.
 NativeAuthoringCompilation compile_native_authoring(

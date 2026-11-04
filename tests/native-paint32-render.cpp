@@ -17,6 +17,7 @@ Scene native_split(const Scene &before){
  auto retained=detail::retain_native_paint(before.active(),target,map);auto current=before;current.active().painted=retained.paint;current.active().material_bindings=detail::bind_native_paint(retained.owner,{});current.validate();check(m.positions.size()==4&&target.positions.size()==6,"Pixel fixture retains actual source4/current6 geometry identities");for(size_t c=0;c<map.size();++c){check(length(target.positions[c]-m.positions[map[c]])==0&&length(target.normals[c]-m.normals[map[c]])==0,"Independent per-corner POSITION/N oracle preserves exact source map");}check(!current.active().material_bindings->normal_frames&&!current.active().painted->normal_projection(),"Native grid pixels do not borrow or manufacture normal frames");return current;
 }
 }
+#ifndef DOME_NATIVE_PAINT32_RENDER_NO_MAIN
 int main(int argc,char **argv)try{
  if(argc<2)return 2;const std::filesystem::path out=argv[1];std::filesystem::create_directories(out);NativeGraphics graphics;const std::string device=reinterpret_cast<const char*>(glGetString(GL_RENDERER));std::cout<<"GPU "<<device<<std::endl;const bool actual=device.find("Intel")!=std::string::npos&&device.find("Arc")!=std::string::npos&&device.find("A770")!=std::string::npos&&device.find("llvmpipe")==std::string::npos&&device.find("softpipe")==std::string::npos;check(argc<3||std::string_view(argv[2])!="--hardware"||actual,"Native32 strict device identity is actual Intel Arc A770");Fbo fbo;SurfaceRenderer renderer;unsigned number=0;
  for(auto alpha:{Material::AlphaMode::Opaque,Material::AlphaMode::Mask,Material::AlphaMode::Blend}){
@@ -29,3 +30,5 @@ int main(int argc,char **argv)try{
  }
  std::cout<<"PASS "<<checks<<" native32 source/current/repeat/restart/Restore pixel controls\n";return 0;
 }catch(const std::exception &e){std::cerr<<"FAIL "<<e.what()<<'\n';return 1;}
+
+#endif

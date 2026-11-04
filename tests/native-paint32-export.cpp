@@ -1,0 +1,26 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+#define DOME_NATIVE_PAINT32_RENDER_NO_MAIN
+#include "native-paint32-render.cpp"
+#undef DOME_NATIVE_PAINT32_RENDER_NO_MAIN
+#include "dome/native-authoring.hpp"
+#include "native-authoring-compiler.hpp"
+#include <fstream>
+namespace {
+std::vector<uint8_t> native32_bytes(const std::filesystem::path &p){std::ifstream f(p,std::ios::binary);return {std::istreambuf_iterator<char>(f),{}};}
+}
+int main(int argc,char **argv)try{
+ if(argc!=2)return 2;const std::filesystem::path out=argv[1];std::filesystem::create_directories(out);NativeGraphics graphics;Fbo fbo;SurfaceRenderer renderer;prepared_normal_consumer::Renderer independent;unsigned number=0;
+ for(bool hdr:{false,true})for(bool unlit:{false,true})for(auto alpha:{Material::AlphaMode::Opaque,Material::AlphaMode::Mask,Material::AlphaMode::Blend}){
+  auto source=native_grid(alpha);source.active().material.unlit=unlit;if(hdr)source.active().material.emissive={8,.016f,.16f};auto scene=native_split(source);const auto exact=scene.encode();Document doc;doc.replace(scene);doc.shading(false);settled(doc);fbo.bind();const auto native=draw(renderer,doc.frame().surface);
+  const auto path=out/(std::to_string(number)+".glb");doc.export_asset(path,AssetExportFormat::EditableGlb256).get();check(doc.copy_scene().encode()==exact,"Actual explicit finite native32 export retains every original float/material/domain owner");const auto file=native32_bytes(path);auto restored=extract_native_authoring(file);check(restored&&restored->encode()==exact,"Actual emitted generic GLB recovers complete native32 owning project exactly");
+  prepared_normal_consumer::Model model(path);check(model.data->meshes_count==1,"Native32 portable view emits actual subject geometry only");const auto &p=model.data->meshes[0].primitives[0];const cgltf_accessor *uv0=nullptr,*uv1=nullptr;
+  for(size_t a=0;a<p.attributes_count;++a)if(p.attributes[a].type==cgltf_attribute_type_texcoord){if(p.attributes[a].index==0)uv0=p.attributes[a].data;if(p.attributes[a].index==1)uv1=p.attributes[a].data;}
+  check(uv0&&uv1&&uv0->count==6&&uv1->count==6,"Native32 output owns actual contiguous authored0 and separate paint1 arrays");const auto coordinates=scene.active().painted->paint_sampling_domain()->corner_coordinates(scene.active().painted->mesh());
+  for(size_t v=0;v<6;++v){std::array<float,2>a{},b{};check(cgltf_accessor_read_float(uv0,v,a.data(),2)&&cgltf_accessor_read_float(uv1,v,b.data(),2),"Independent parser reads actual native32 coordinate vectors");check(a==scene.active().painted->mesh().uv[v]&&b==coordinates[v],"Original edited authored UV0 and exact independent paint coordinates remain distinct and truthful");}
+  check(p.material&&p.material->emissive_texture.texture&&p.material->emissive_texture.texcoord==1,"Physical finisher retains the genuine emitted paint coordinate association");fbo.bind();independent.render(model.data,nullptr);const auto portable=read();const auto error=delta(native,portable);std::cout<<"NATIVE32_EXPORT hdr="<<hdr<<" unlit="<<unlit<<" alpha="<<int(alpha)<<" max="<<error<<std::endl;joint::capture(out/(std::to_string(number)+"-native.png"),native);joint::capture(out/(std::to_string(number)+"-portable.png"),portable);check(error<=2,"Independent emitted PNG/factor/strength/CorePBR consumer stays within unchanged2 bound");
+  Document reopen;reopen.replace(*restored);reopen.shading(false);settled(reopen);fbo.bind();check(draw(renderer,reopen.frame().surface)==native,"Recovered native32 project renders every original native pixel exactly");const auto native_path=out/(std::to_string(number)+".dsculpt");reopen.save_async(native_path).get();check(Scene::load(native_path).encode()==exact,"Following native Save retains exact native32 graph after generic GLB recovery");
+  if(number==0){NativeAuthoringExport owner;owner.scene=std::make_shared<const Scene>(scene.snapshot());owner.allow_portable_fallback=true;SourceUvBakeOptions policy;policy.resolution=256;auto capture=detail::NativeAuthoringCapture::create(owner,{},policy);auto compiled=detail::compile_native_authoring(*capture,policy,256*1024*1024,{});check(compiled.surfaces.size()==1&&detail::native_paint_compiled_emission(*capture,compiled.surfaces[0]),"Normalized native view has a genuine per-call sealed capture replay");auto foreign=compiled.surfaces[0];foreign.textures=std::make_shared<const TextureMaps>(*foreign.textures);check(rejects([&]{detail::native_paint_compiled_emission(*capture,foreign);}),"Equal-valued foreign texture owner cannot authorize native physical view");foreign=compiled.surfaces[0];foreign.material_bindings=std::make_shared<const SourceMaterialBindings>(*foreign.material_bindings);check(rejects([&]{detail::native_paint_compiled_emission(*capture,foreign);}),"Equal-valued foreign material owner cannot authorize native physical view");foreign=compiled.surfaces[0];foreign.paint_corner_coordinates[0][0]+=.01f;check(rejects([&]{detail::native_paint_compiled_emission(*capture,foreign);}),"Wrong current paint corner stream cannot borrow captured native authority");}
+  ++number;
+ }
+ std::cout<<"PASS "<<checks<<" native32 explicit finite export and independent consumer controls\n";return 0;
+}catch(const std::exception &e){std::cerr<<"FAIL "<<e.what()<<'\n';return 1;}
