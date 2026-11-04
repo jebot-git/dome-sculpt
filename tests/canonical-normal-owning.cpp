@@ -16,6 +16,15 @@ Scene legacy_conversion_model(int variant){
  require_cage(paint->end_stroke(),"Actual native conversion source includes editable sparse paint");
  paint->add_layer("Hidden source-preserving layer");paint->layer_properties("Hidden source-preserving layer",false,.37f);s.active().painted=std::move(paint);s.validate();return s;
 }
+Scene mirror_conversion_model(){
+ Scene s;auto mesh=mirrored_fan();mesh.indices={0,1,2,0,2,3};mesh.uv[3]={.1f,.5f};
+ auto &o=s.active();o.mesh_active=true;o.painted=std::make_shared<PaintedMesh>(mesh,64);
+ DeformationState d(mesh);d.morphs=MorphSet(mesh);auto raised=mesh.positions;raised[1].z=.01f;
+ d.morphs->set_target(mesh,"Asymmetric source",raised);s.set_deformation(o.id,d);
+ auto high=mesh;for(auto &p:high.positions)p.z=.015f;high.normals.assign(5,{.3f,.4f,std::sqrt(.75f)});
+ s.add("Mirror source",Volume{});s.active().mesh_active=true;s.active().visible=false;s.active().locked=true;s.active().painted=std::make_shared<PaintedMesh>(high,64);s.select(1);
+ ObjectBakeSettings settings;settings.ao_samples=0;settings.padding=0;bake_object(s,2,settings);s.validate();return s;
+}
 void settled(Document &doc){
  if(!doc.wait_asset(std::chrono::seconds(120))||!doc.wait_mesh(std::chrono::seconds(120))||!doc.frame().state->error.empty())
   throw std::runtime_error("Canonical conversion native worker: "+doc.frame().state->error);
@@ -65,7 +74,9 @@ int main(int argc,char **argv)try{
   require_cage(Scene::load(out/("converted-"+std::to_string(variant)+".dsculpt")).encode()==encoded&&before.encode()==exact,
     "Actual native Save/restart preserves converted and complete original data with the input Scene unchanged");
   if(variant==3){auto mirrored=recovered;ShapeKeyEdit mirror;mirror.action=ShapeKeyAction::Mirror;mirror.target=0;mirror.name="Converted explicit Mirror";mirror.mirror_frames=ShapeKeyMirrorFrames::BaseRelative;
-   author_shapekey(mirrored,mirrored.active().id,mirror);const auto wire=mirrored.encode();
+   require_cage(failure([&]{author_shapekey(mirrored,mirrored.active().id,mirror);},"triangle refinement")&&mirrored.encode()==encoded,
+     "Converted asymmetric triangle topology retains exact BaseRelative Mirror refusal and all native data");
+   mirrored=mirror_conversion_model();converted_model(mirrored);author_shapekey(mirrored,mirrored.active().id,mirror);const auto wire=mirrored.encode();
    require_cage(wire.at("version")==31&&wire.at("source_materials").at("version")==13&&wire.at("source_materials").at("explicit_mirror")==true&&Scene::decode(wire).encode()==wire,
      "Explicit Mirror and canonical conversion compose actual material capabilities and shared source leases through restart");
    mirrored.save(out/"converted-mirror.dsculpt");
