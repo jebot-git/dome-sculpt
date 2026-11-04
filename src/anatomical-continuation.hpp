@@ -286,9 +286,28 @@ anatomical_continuation(const Scene &scene, uint64_t group,
         std::min(size_t(500'000'000), budget.maximum - budget.used);
     if (!options.maximum_work)
       throw std::length_error("Source-visible work exhausted before capture");
+    if (declared &&
+        declared->rig_geometry == DeclaredRigGeometry::NativeBoneAxes &&
+        rig_source->appearance) {
+      const auto &appearance = *rig_source->appearance;
+      if (!appearance.source_joint_nodes.empty())
+        throw std::invalid_argument(
+            "Imported rig needs source-authenticated handle geometry; raw bone "
+            "axes are not native handles");
+      if (appearance.asset) {
+        if (appearance.source_node < 0 ||
+            size_t(appearance.source_node) >= appearance.asset->nodes.size())
+          throw std::invalid_argument(
+              "Native handle reference has invalid original node authority");
+        if (appearance.asset->nodes[size_t(appearance.source_node)].skin >= 0)
+          throw std::invalid_argument(
+              "Original skinned source cannot be silently reinterpreted as "
+              "native bone axes");
+      }
+    }
     auto profile =
         declared ? declared_weight_profile(*rig_source->deformation->skeleton,
-                                           budget)
+                                           budget, declared->rig_geometry)
                  : imported_heat_profile(*first->deformation->skeleton,
                                          *first->appearance, options, cancelled,
                                          &*first->deformation->humanoid);

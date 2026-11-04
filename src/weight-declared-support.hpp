@@ -13,11 +13,13 @@ struct DeclaredWeightPart {
   std::vector<HeatComponentDeclaration> declarations;
 };
 enum class DeclaredSupportPolicy { AllDeformControls, NearestSourceUnion };
+enum class DeclaredRigGeometry { NativeBoneAxes, ChildHeadControl };
 struct DeclaredWeightSupport {
   DeclaredSupportPolicy policy = DeclaredSupportPolicy::AllDeformControls;
   bool world_metric = false;
   std::vector<DeclaredWeightPart> parts;
   uint64_t reference = 0;
+  DeclaredRigGeometry rig_geometry = DeclaredRigGeometry::NativeBoneAxes;
   const DeclaredWeightPart *find(uint64_t id) const {
     auto at = std::find_if(parts.begin(), parts.end(),
                            [&](const auto &p) { return p.object == id; });
@@ -25,13 +27,29 @@ struct DeclaredWeightSupport {
   }
 };
 inline ImportedHeatProfile
-declared_weight_profile(const Skeleton &rig, weight_surface::Budget &work) {
+declared_weight_profile(const Skeleton &rig, weight_surface::Budget &work,
+                        DeclaredRigGeometry geometry) {
   if (rig.bones.empty() || rig.bones.size() > 256)
     throw std::length_error("Declared weight control dimensions exceeded");
   work.step_items(rig.bones.size(), rig.bones.size() * 32 + 64);
   rig.validate();
   ImportedHeatProfile profile; // private data container; source remains null
   profile.eligible.resize(rig.bones.size());
+  if (geometry == DeclaredRigGeometry::NativeBoneAxes) {
+    const auto actual = rig.segments();
+    profile.segments.reserve(actual.size());
+    for (uint32_t i = 0; i < actual.size(); ++i) {
+      work.step(32);
+      if (!rig.bones[i].deform)
+        continue;
+      profile.eligible[i] = 1;
+      const auto &a = actual[i][0], &b = actual[i][1];
+      profile.segments.push_back({{a.x, a.y, a.z}, {b.x, b.y, b.z}, i});
+    }
+    if (profile.segments.empty())
+      throw std::invalid_argument("Native rig has no authored deform handles");
+    return profile;
+  }
   const auto world = rig.world();
   auto head = [&](size_t j) {
     return std::array<double, 3>{world[j][12], world[j][13], world[j][14]};
