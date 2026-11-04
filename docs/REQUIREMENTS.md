@@ -14,6 +14,19 @@ has537Passed/50Failed/2dependencyNotRun, with2177source and451artifact hashes ex
 All unfinished original/additional requirements and post-basic drawers remain
 active; no installation or physical session changed.
 
+## Private Source4 import regression contract — 2026-11-04
+
+The four actual native import suites now authenticate independent writable and
+original sampling owners instead of expecting their old flattening representation.
+No runtime/API/schema/asset change: Release 8 passes; owned sanitizer 6 CTest plus
+2 unchanged-binary complete fault sweeps pass, each 10,771 persistent + 128 cancel.
+Original 1,500s sanitizer CTest timeouts remain recorded; actual completion 2433s
+justifies only a conditional 5,400s instrumented test observer. All 38 emitted
+R/S pairs are byte-identical/Khronos 0 errors; native Save/history and strict source
+negatives remain. Read SOURCE4-IMPORT-CONTRACT.md and its receipt for exact
+scopes. This is not coherent application/UI/device/full 594/main qualification;
+all original/additional unfinished production requirements remain required.
+
 ## Private source-aware mesh bake and cut milestone — 2026-11-04
 
 Private14cc064 records runtime3fe61f7 and corrected fixtures16afb67, extending
@@ -295,7 +308,7 @@ The subsequent mixed rigid/source integration extends the same Scene19 applicati
 without new archive/public layout fields. Fresh optimized alltargets and selected
 Release67 pass; owned sanitizer45/46 initial (one240s timeout) plus corrected1/1,
 6graphics and6fault suites pass. ActualArc404, nativeFLTK7/Wayland8 and independent
-emitted105 Khronos0errors/1,130warnings +official71VRM0 files0errors pass. Read
+emitted105 Khronos 0 errors/1,130warnings +official71VRM0 files0errors pass. Read
 RIGID-AUTHORING-INTEGRATION.md for scoped commands, preserved timeout/interruption
 and remaining source-rig/VRM1/physics limitations. Private Scene20/21/23 work and
 post-basic controller drawers are not implemented by this checkpoint.
