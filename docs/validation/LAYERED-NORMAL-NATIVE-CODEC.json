@@ -1,0 +1,1043 @@
+{
+  "recorded_utc": "2026-11-04T19:04:38.915562+00:00",
+  "source": "2792d4433dfcca355604068c3bf76e004bf0a768",
+  "scope": "Owning Scene33/material15 actual worker/render/Save/legacy/malformed contracts; source-role policy preserved. Private checkpoint, not full production/main admission. Fresh complete215task app/core/render/support/XR/test R/S then complete changed bake TU/test +app continuations with unchanged public layout.",
+  "native_checks_each_profile": 62,
+  "fresh_native_registered_each_profile": 1,
+  "fixed_image_bound": 4,
+  "native_pairs": [
+    {
+      "name": "clear-then-rebake.dsculpt",
+      "release": "34cb4b6de0540e5c9da60eb22a5a8ceece35d3e5a1b6e51f58c0b918a58ad54b",
+      "sanitize": "34cb4b6de0540e5c9da60eb22a5a8ceece35d3e5a1b6e51f58c0b918a58ad54b",
+      "Arc": "34cb4b6de0540e5c9da60eb22a5a8ceece35d3e5a1b6e51f58c0b918a58ad54b"
+    },
+    {
+      "name": "cleared-0.dsculpt",
+      "release": "266aa63dccf964fadfa4342f237c7aa43c9983665e2ef648abaa6387b6cd864d",
+      "sanitize": "266aa63dccf964fadfa4342f237c7aa43c9983665e2ef648abaa6387b6cd864d",
+      "Arc": "266aa63dccf964fadfa4342f237c7aa43c9983665e2ef648abaa6387b6cd864d"
+    },
+    {
+      "name": "cleared-7.dsculpt",
+      "release": "e70004d9fa74460e612bf417bdb15a174edd7df5057662b16b74f75c847f4d71",
+      "sanitize": "e70004d9fa74460e612bf417bdb15a174edd7df5057662b16b74f75c847f4d71",
+      "Arc": "e70004d9fa74460e612bf417bdb15a174edd7df5057662b16b74f75c847f4d71"
+    },
+    {
+      "name": "converted-0.dsculpt",
+      "release": "da9d095dc9cf1abb3efaf749bde3f7bf95156f80f0642711730e374bb9528c05",
+      "sanitize": "da9d095dc9cf1abb3efaf749bde3f7bf95156f80f0642711730e374bb9528c05",
+      "Arc": "da9d095dc9cf1abb3efaf749bde3f7bf95156f80f0642711730e374bb9528c05"
+    },
+    {
+      "name": "converted-7.dsculpt",
+      "release": "f9f7ba9fe9ddddc503ec226c933bcf8207f816fd283c87d9f6c8b7dbfe116f27",
+      "sanitize": "f9f7ba9fe9ddddc503ec226c933bcf8207f816fd283c87d9f6c8b7dbfe116f27",
+      "Arc": "f9f7ba9fe9ddddc503ec226c933bcf8207f816fd283c87d9f6c8b7dbfe116f27"
+    },
+    {
+      "name": "legacy-clear.dsculpt",
+      "release": "410d164b90eeffcf35a794e9c99da18db1d90042ac6a6e7a37f65456ef7411ed",
+      "sanitize": "410d164b90eeffcf35a794e9c99da18db1d90042ac6a6e7a37f65456ef7411ed",
+      "Arc": "410d164b90eeffcf35a794e9c99da18db1d90042ac6a6e7a37f65456ef7411ed"
+    },
+    {
+      "name": "legacy-upgrade.dsculpt",
+      "release": "0670776d08aa3f9bacca292a1e554c20cce7a704345dcfc4fa47c0e9aa3a65b3",
+      "sanitize": "0670776d08aa3f9bacca292a1e554c20cce7a704345dcfc4fa47c0e9aa3a65b3",
+      "Arc": "0670776d08aa3f9bacca292a1e554c20cce7a704345dcfc4fa47c0e9aa3a65b3"
+    },
+    {
+      "name": "partial-rebake.dsculpt",
+      "release": "4042bb3925c481215f5dba2b3a7e239f82362089c1b013b40375ccc36e6de269",
+      "sanitize": "4042bb3925c481215f5dba2b3a7e239f82362089c1b013b40375ccc36e6de269",
+      "Arc": "4042bb3925c481215f5dba2b3a7e239f82362089c1b013b40375ccc36e6de269"
+    }
+  ],
+  "image_pairs": [
+    {
+      "name": "clear-then-rebake.png",
+      "release_sha256": "30350b318fa7311a53100a8fcbc1ba39e88b00bd9e4f1bdfc734cdb55892e4f4",
+      "sanitize_sha256": "30350b318fa7311a53100a8fcbc1ba39e88b00bd9e4f1bdfc734cdb55892e4f4",
+      "Arc_sha256": "32e5eacd8677c9b7ead7e55d2b483cd62e8a6528aab05946ebafa84265eb8c59",
+      "release_sanitize_max": 0,
+      "release_Arc_max": 1
+    },
+    {
+      "name": "converted-0.png",
+      "release_sha256": "1cbdd8f205d12b108b2f03a39c893b28e741e99660005ceafd5f115165c6af96",
+      "sanitize_sha256": "1cbdd8f205d12b108b2f03a39c893b28e741e99660005ceafd5f115165c6af96",
+      "Arc_sha256": "123c1d1aa970bb362baa4c4dbaff9c855455ee7048163785baf36e832f5f9d28",
+      "release_sanitize_max": 0,
+      "release_Arc_max": 1
+    },
+    {
+      "name": "converted-7.png",
+      "release_sha256": "1311c7ba6e711dbc129898eb8fcf2e9350e8882fe7ee7d9a349420b2d46bd8d8",
+      "sanitize_sha256": "1311c7ba6e711dbc129898eb8fcf2e9350e8882fe7ee7d9a349420b2d46bd8d8",
+      "Arc_sha256": "2b2cdbb24070e65f95610184c672980872de6163343dcd25d4ce0c5eded67ff7",
+      "release_sanitize_max": 0,
+      "release_Arc_max": 1
+    },
+    {
+      "name": "converted-clear-0.png",
+      "release_sha256": "bcb366b802e663e5fffcc5e72673442879f1c946f399f4f434d3e263e8c2a3b5",
+      "sanitize_sha256": "bcb366b802e663e5fffcc5e72673442879f1c946f399f4f434d3e263e8c2a3b5",
+      "Arc_sha256": "b899d4d08f895e77c7025e65fa75b838568fe2450a2c19fd66cf60249ba6692a",
+      "release_sanitize_max": 0,
+      "release_Arc_max": 1
+    },
+    {
+      "name": "converted-clear-7.png",
+      "release_sha256": "4103aa6f55534121710ea5ad1768e54b9858af612dd36c687ea6a24246a97c82",
+      "sanitize_sha256": "4103aa6f55534121710ea5ad1768e54b9858af612dd36c687ea6a24246a97c82",
+      "Arc_sha256": "dd90f86e8acda3afc51d723db2e646f37e805619acdb6454abf4bcafebb1d1d6",
+      "release_sanitize_max": 0,
+      "release_Arc_max": 1
+    },
+    {
+      "name": "raw-clear-0.png",
+      "release_sha256": "bcb366b802e663e5fffcc5e72673442879f1c946f399f4f434d3e263e8c2a3b5",
+      "sanitize_sha256": "bcb366b802e663e5fffcc5e72673442879f1c946f399f4f434d3e263e8c2a3b5",
+      "Arc_sha256": "b899d4d08f895e77c7025e65fa75b838568fe2450a2c19fd66cf60249ba6692a",
+      "release_sanitize_max": 0,
+      "release_Arc_max": 1
+    },
+    {
+      "name": "raw-clear-7.png",
+      "release_sha256": "4103aa6f55534121710ea5ad1768e54b9858af612dd36c687ea6a24246a97c82",
+      "sanitize_sha256": "4103aa6f55534121710ea5ad1768e54b9858af612dd36c687ea6a24246a97c82",
+      "Arc_sha256": "dd90f86e8acda3afc51d723db2e646f37e805619acdb6454abf4bcafebb1d1d6",
+      "release_sanitize_max": 0,
+      "release_Arc_max": 1
+    },
+    {
+      "name": "same-normal-partial-rebake.png",
+      "release_sha256": "081d6d919ad4ca623b4a47c5e528c48800dba43a2dc6d98ad95b1c9f19e01f8d",
+      "sanitize_sha256": "081d6d919ad4ca623b4a47c5e528c48800dba43a2dc6d98ad95b1c9f19e01f8d",
+      "Arc_sha256": "8e14b401cf4609cb638b2175f466b61fed8ad158bf49252efaa2cb21033f2685",
+      "release_sanitize_max": 0,
+      "release_Arc_max": 1
+    }
+  ],
+  "runs": {
+    "fresh_release": {
+      "status": {
+        "state": "terminal",
+        "pid": 1044877,
+        "source": "1ce5fbbefb237bc91184780c12fdd2dc805e42da",
+        "profile": "release",
+        "scope": "Fresh complete independent-normal public-layout app/core/render/support/XR/new tests in each profile. Owning Scene33/material15 replay, real worker Clear/rebake, ordered Save/restart and genuine31 migration; not ALL targets/full623/device/main admission. No archive reuse; canonical27 SDK.",
+        "steps": [
+          {
+            "name": "configure",
+            "command": [
+              "cmake",
+              "-S",
+              "/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-codec-605",
+              "-B",
+              "/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-codec-605/build-codec-release",
+              "-G",
+              "Ninja",
+              "-DCMAKE_BUILD_TYPE=Release",
+              "-DCMAKE_EXPORT_COMPILE_COMMANDS=ON",
+              "-DDOME_COMPUTE_BACKEND=CPU",
+              "-DFLTK_DIR=/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-release/share/fltk",
+              "-DDOME_BUILD_UI=ON",
+              "-DDOME_BUILD_XR=ON",
+              "-U*DOME_BITMAP_RUNTIME*",
+              "-U*NATIVEGL*",
+              "-U*RENDERFONTS*"
+            ],
+            "exit_code": 0,
+            "seconds": 5.692452479037456
+          },
+          {
+            "name": "fresh-native-build",
+            "command": [
+              "nice",
+              "-n",
+              "15",
+              "cmake",
+              "--build",
+              "/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-codec-605/build-codec-release",
+              "--parallel",
+              "2",
+              "--target",
+              "dome-sculpt",
+              "dome-sculpt-test-runtime",
+              "dome-sculpt-test-widgets",
+              "dome-sculpt-layered-normal-native-test",
+              "dome-sculpt-baked-normal-field-test",
+              "dome-sculpt-baked-normal-field-faults-test"
+            ],
+            "exit_code": 0,
+            "seconds": 429.39172138803406
+          },
+          {
+            "name": "field",
+            "command": [
+              "nice",
+              "-n",
+              "15",
+              "/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-codec-605/build-codec-release/dome-sculpt-baked-normal-field-test"
+            ],
+            "exit_code": 0,
+            "seconds": 0.03188535402296111
+          },
+          {
+            "name": "field-faults",
+            "command": [
+              "nice",
+              "-n",
+              "15",
+              "/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-codec-605/build-codec-release/dome-sculpt-baked-normal-field-faults-test"
+            ],
+            "exit_code": 0,
+            "seconds": 0.023472712957300246
+          },
+          {
+            "name": "native-worker-render",
+            "command": [
+              "nice",
+              "-n",
+              "15",
+              "ctest",
+              "--test-dir",
+              "/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-codec-605/build-codec-release",
+              "--output-on-failure",
+              "-V",
+              "-R",
+              "^layered-normal-native$"
+            ],
+            "exit_code": 0,
+            "seconds": 7.714154104993213
+          }
+        ],
+        "phase": "native-worker-render",
+        "child_pid": 1096341,
+        "registered_tests": 623,
+        "selected_tests": [],
+        "owned_instrumented_compile_commands": null,
+        "artifacts": {
+          "/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-codec-605/build-codec-release/dome-sculpt": "986e6342aaeea210e396fdca9e3573c2d8cfde2a4eb247309671ae57ba34f551",
+          "/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-codec-605/build-codec-release/libdome-sculpt-affine.a": "06fdf5f772569ceb933d716cb1c55ce35f5feac8b0db73ccb05313922595e479",
+          "/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-codec-605/build-codec-release/libxatlas.a": "720e5de3787025cab6bcfaaa998be47e812e1972b7d1916049d740ad1a984f04",
+          "/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-codec-605/build-codec-release/libufbx.a": "ef7e334b6e1c3278d0e4c368f5342e5aa6dfb5472cd31d213c310550cbad0ac5",
+          "/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-codec-605/build-codec-release/libmikktspace.a": "9ac60b3393bb351404513e35d36e52ed6e33d6556a615977f75b8ce867616069",
+          "/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-codec-605/build-codec-release/libdome-sculpt-polygon.a": "f57571d935075555496a2902d0af0a05bc0e80bb9c09bce785c8853476cc81ad",
+          "/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-codec-605/build-codec-release/libmikktspace-robust.a": "f00f979f7188f21989d773ef9232da61b6e389ac26dceee1e421bdd7d0f7d342",
+          "/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-codec-605/build-codec-release/libdome-sculpt-emission-codec.a": "9f6e5f62455156f25c7dca48f7ea72f6cca17f4074ace9fc1bce9aa555439635",
+          "/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-codec-605/build-codec-release/libdome-sculpt-core.a": "14eb071e381c049c0a180a48d8c53915a56094fd3dd16a976a675e4593e1f388",
+          "/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-codec-605/build-codec-release/libdome-sculpt-render.a": "b111df9da41c088e8f35b96d40abea370871d311bae4b7e57bfd31df3282b2c1",
+          "/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-codec-605/build-codec-release/libdome-sculpt-spacenav.a": "343d5d66b9f27d0710ec06e436a459bceab7f60defa93a91c78cd445ab74b802",
+          "/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-codec-605/build-codec-release/libdome-sculpt-xr.a": "74bf397cee6b65a5fc2084e9dc6a61c1e26af79ba1921fb5b996c3b8c9a46b5a"
+        },
+        "exit_code": 0,
+        "seconds": 442.93743748101406,
+        "inputs": 2300,
+        "drift": []
+      },
+      "status_sha256": "c1c1b8552b831a680e0834880493d58904c5dac6a49048f4d3a5a1f5fd92b3bb",
+      "before_manifest_sha256": "214b7d567393931e1706699bee21ca137f7ef70f0736f062211b110581c2ce4e",
+      "logs": {
+        "field.log": {
+          "sha256": "686a1ac5ba99b0412876ed6082e0873ad16cefec0277ca1ac30022308ce5db89",
+          "text": "PASS Actual native baker covers both disjoint mirrored-UV triangles\nPASS Converted baked role does not fabricate an intrinsic projection or change the genuine input\nPASS Resolved normal coverage is independent of partial material coverage and missed atlas regions\nPASS Independent double-precision oracle verifies both roles normalize and quantize each texel before filtering\nPASS Partial normal replacement preserves missed texels byte-exactly and retains its actual prior field and origin\nPASS Caller mutation cannot alter detached replacement planes or the previous immutable field\nPASS All-miss replacement is an exact same-owner no-op\nPASS Repeated partial baking combines with the real previous resolved normal, not material alpha or neutral fallback\nPASS Replacement history is bounded before detached copies\nPASS Initial and replacement retained/working memory limits refuse atomically\nPASS Raw canonical pixels cannot masquerade as prepared replacement detail\nPASS Baked field can be released while durable original provenance and genuine intrinsic absence remain intact\nVARIANT 0 pbr_error=0 toon_error=0\nPASS Actual native baker covers both disjoint mirrored-UV triangles\nPASS Converted baked role does not fabricate an intrinsic projection or change the genuine input\nPASS Resolved normal coverage is independent of partial material coverage and missed atlas regions\nPASS Independent double-precision oracle verifies both roles normalize and quantize each texel before filtering\nPASS Partial normal replacement preserves missed texels byte-exactly and retains its actual prior field and origin\nPASS Caller mutation cannot alter detached replacement planes or the previous immutable field\nPASS All-miss replacement is an exact same-owner no-op\nPASS Repeated partial baking combines with the real previous resolved normal, not material alpha or neutral fallback\nPASS Replacement history is bounded before detached copies\nPASS Initial and replacement retained/working memory limits refuse atomically\nPASS Raw canonical pixels cannot masquerade as prepared replacement detail\nPASS Baked field can be released while durable original provenance and genuine intrinsic absence remain intact\nVARIANT 1 pbr_error=0 toon_error=0\nPASS Actual native baker covers both disjoint mirrored-UV triangles\nPASS Converted baked role does not fabricate an intrinsic projection or change the genuine input\nPASS Resolved normal coverage is independent of partial material coverage and missed atlas regions\nPASS Independent double-precision oracle verifies both roles normalize and quantize each texel before filtering\nPASS Partial normal replacement preserves missed texels byte-exactly and retains its actual prior field and origin\nPASS Caller mutation cannot alter detached replacement planes or the previous immutable field\nPASS All-miss replacement is an exact same-owner no-op\nPASS Repeated partial baking combines with the real previous resolved normal, not material alpha or neutral fallback\nPASS Replacement history is bounded before detached copies\nPASS Initial and replacement retained/working memory limits refuse atomically\nPASS Raw canonical pixels cannot masquerade as prepared replacement detail\nPASS Baked field can be released while durable original provenance and genuine intrinsic absence remain intact\nVARIANT 2 pbr_error=0 toon_error=0\nPASS Actual native baker covers both disjoint mirrored-UV triangles\nPASS Converted baked role does not fabricate an intrinsic projection or change the genuine input\nPASS Resolved normal coverage is independent of partial material coverage and missed atlas regions\nPASS Independent double-precision oracle verifies both roles normalize and quantize each texel before filtering\nPASS Partial normal replacement preserves missed texels byte-exactly and retains its actual prior field and origin\nPASS Caller mutation cannot alter detached replacement planes or the previous immutable field\nPASS All-miss replacement is an exact same-owner no-op\nPASS Repeated partial baking combines with the real previous resolved normal, not material alpha or neutral fallback\nPASS Replacement history is bounded before detached copies\nPASS Initial and replacement retained/working memory limits refuse atomically\nPASS Raw canonical pixels cannot masquerade as prepared replacement detail\nPASS Baked field can be released while durable original provenance and genuine intrinsic absence remain intact\nVARIANT 3 pbr_error=0 toon_error=0\nPASS Actual native baker covers both disjoint mirrored-UV triangles\nPASS Converted baked role does not fabricate an intrinsic projection or change the genuine input\nPASS Resolved normal coverage is independent of partial material coverage and missed atlas regions\nPASS Independent double-precision oracle verifies both roles normalize and quantize each texel before filtering\nPASS Partial normal replacement preserves missed texels byte-exactly and retains its actual prior field and origin\nPASS Caller mutation cannot alter detached replacement planes or the previous immutable field\nPASS All-miss replacement is an exact same-owner no-op\nPASS Repeated partial baking combines with the real previous resolved normal, not material alpha or neutral fallback\nPASS Replacement history is bounded before detached copies\nPASS Initial and replacement retained/working memory limits refuse atomically\nPASS Raw canonical pixels cannot masquerade as prepared replacement detail\nPASS Baked field can be released while durable original provenance and genuine intrinsic absence remain intact\nVARIANT 4 pbr_error=0 toon_error=0\nPASS Actual native baker covers both disjoint mirrored-UV triangles\nPASS Converted baked role does not fabricate an intrinsic projection or change the genuine input\nPASS Resolved normal coverage is independent of partial material coverage and missed atlas regions\nPASS Independent double-precision oracle verifies both roles normalize and quantize each texel before filtering\nPASS Partial normal replacement preserves missed texels byte-exactly and retains its actual prior field and origin\nPASS Caller mutation cannot alter detached replacement planes or the previous immutable field\nPASS All-miss replacement is an exact same-owner no-op\nPASS Repeated partial baking combines with the real previous resolved normal, not material alpha or neutral fallback\nPASS Replacement history is bounded before detached copies\nPASS Initial and replacement retained/working memory limits refuse atomically\nPASS Raw canonical pixels cannot masquerade as prepared replacement detail\nPASS Baked field can be released while durable original provenance and genuine intrinsic absence remain intact\nVARIANT 5 pbr_error=0 toon_error=0\nPASS Actual native baker covers both disjoint mirrored-UV triangles\nPASS Converted baked role does not fabricate an intrinsic projection or change the genuine input\nPASS Resolved normal coverage is independent of partial material coverage and missed atlas regions\nPASS Independent double-precision oracle verifies both roles normalize and quantize each texel before filtering\nPASS Partial normal replacement preserves missed texels byte-exactly and retains its actual prior field and origin\nPASS Caller mutation cannot alter detached replacement planes or the previous immutable field\nPASS All-miss replacement is an exact same-owner no-op\nPASS Repeated partial baking combines with the real previous resolved normal, not material alpha or neutral fallback\nPASS Replacement history is bounded before detached copies\nPASS Initial and replacement retained/working memory limits refuse atomically\nPASS Raw canonical pixels cannot masquerade as prepared replacement detail\nPASS Baked field can be released while durable original provenance and genuine intrinsic absence remain intact\nVARIANT 6 pbr_error=0 toon_error=0\nPASS Actual native baker covers both disjoint mirrored-UV triangles\nPASS Converted baked role does not fabricate an intrinsic projection or change the genuine input\nPASS Resolved normal coverage is independent of partial material coverage and missed atlas regions\nPASS Independent double-precision oracle verifies both roles normalize and quantize each texel before filtering\nPASS Partial normal replacement preserves missed texels byte-exactly and retains its actual prior field and origin\nPASS Caller mutation cannot alter detached replacement planes or the previous immutable field\nPASS All-miss replacement is an exact same-owner no-op\nPASS Repeated partial baking combines with the real previous resolved normal, not material alpha or neutral fallback\nPASS Replacement history is bounded before detached copies\nPASS Initial and replacement retained/working memory limits refuse atomically\nPASS Raw canonical pixels cannot masquerade as prepared replacement detail\nPASS Baked field can be released while durable original provenance and genuine intrinsic absence remain intact\nVARIANT 7 pbr_error=0 toon_error=0\nPASS Actual native baker covers both disjoint mirrored-UV triangles\nPASS Every replacement cancellation poll leaves complete source and prior field exact\nPASS Every replacement cancellation poll leaves complete source and prior field exact\nPASS Every replacement cancellation poll leaves complete source and prior field exact\nPASS Every replacement cancellation poll leaves complete source and prior field exact\nPASS Every replacement cancellation poll leaves complete source and prior field exact\nPASS Every replacement cancellation poll leaves complete source and prior field exact\nPASS Every replacement cancellation poll leaves complete source and prior field exact\nPASS Every replacement cancellation poll leaves complete source and prior field exact\nPASS Every replacement cancellation poll leaves complete source and prior field exact\nPASS Every replacement cancellation poll leaves complete source and prior field exact\nPASS Every replacement cancellation poll leaves complete source and prior field exact\nPASS Cancelled replacement retries to exact resolved pixels\nPASS 109 independent layered baked-normal checks; all_cancel_polls=11\n"
+        },
+        "field-faults.log": {
+          "sha256": "e02a71f6f85d9a7d6b94e7e43be241d6ec46cce5b9b8edcf7d28920d41193096",
+          "text": "PASS Actual native baker covers both disjoint mirrored-UV triangles\nPASS Measure real independent field C++ allocation prefixes\nPASS Every persistent allocation and cancellation endpoint retries to identical owning normal planes\nPASS initial persistent_cpp_prefixes=23 all_cancel_polls=2\nPASS Measure real independent field C++ allocation prefixes\nPASS Every persistent allocation and cancellation endpoint retries to identical owning normal planes\nPASS replace persistent_cpp_prefixes=12 all_cancel_polls=11\n"
+        },
+        "native-worker-render.log": {
+          "sha256": "8a0e7cc17b63b147c9f167c0804e640919aa028c7268998236755b8241706ab3",
+          "text": "UpdateCTestConfiguration  from :/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-codec-605/build-codec-release/DartConfiguration.tcl\nParse Config file:/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-codec-605/build-codec-release/DartConfiguration.tcl\nTest project /home/blux/de-xr/dome-sculpt/artifacts/layered-normal-codec-605/build-codec-release\nConstructing a list of tests\nDone constructing a list of tests\nUpdating test list for fixtures\nAdded 0 tests to meet fixture requirements\nChecking test dependency graph...\nChecking test dependency graph end\ntest 622\n    Start 622: layered-normal-native\n\n622: Test command: /home/blux/de-xr/dome-sculpt/artifacts/layered-normal-codec-605/build-codec-release/dome-sculpt-layered-normal-native-test \"/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-codec-605/tests/fixtures/layered-normal\" \"/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-codec-605/build-codec-release/layered-normal-native\"\n622: Working Directory: /home/blux/de-xr/dome-sculpt/artifacts/layered-normal-codec-605/build-codec-release\n622: Environment variables: \n622:  LIBGL_ALWAYS_SOFTWARE=1\n622:  LP_NUM_THREADS=2\n622: Test timeout computed to be: 600\n622: Native XR graphics: windowless EGL 1.5\n622: PASS Actual owning writer declares separate Scene33/material15 capabilities\n622: PASS Owning decoder replays exact normal history and preserves complete native Scene\n622: PASS Restart preserves one genuine shared original paint/frame origin across current material and baked field\n622: PASS Actual ordered Document Save/restart retains exact layered normals and material/source data\n622: PASS Real conversion keeps baked detail separate from intrinsic planes and authentic attribute provenance\n622: PASS Actual converted native frame remains within unchanged image bound\n622: PASS Actual worker Clear Bake removes converted detail and restores genuine original shading\n622: PASS Clear drops active field but retains complete original normal/material/deformation provenance\n622: PASS Actual owning writer declares separate Scene33/material15 capabilities\n622: PASS Owning decoder replays exact normal history and preserves complete native Scene\n622: PASS Restart preserves one genuine shared original paint/frame origin across current material and baked field\n622: PASS Actual ordered Document Save/restart retains exact layered normals and material/source data\n622: PASS Clear Undo restores exact converted shading\n622: PASS Clear Redo restores exact intrinsic shading\n622: CLEAR variant=0 conversion_error=0 clear_error=0\n622: PASS Actual owning writer declares separate Scene33/material15 capabilities\n622: PASS Owning decoder replays exact normal history and preserves complete native Scene\n622: PASS Restart preserves one genuine shared original paint/frame origin across current material and baked field\n622: PASS Actual ordered Document Save/restart retains exact layered normals and material/source data\n622: PASS Real conversion keeps baked detail separate from intrinsic planes and authentic attribute provenance\n622: PASS Actual converted native frame remains within unchanged image bound\n622: PASS Actual worker Clear Bake removes converted detail and restores genuine original shading\n622: PASS Clear drops active field but retains complete original normal/material/deformation provenance\n622: PASS Actual owning writer declares separate Scene33/material15 capabilities\n622: PASS Owning decoder replays exact normal history and preserves complete native Scene\n622: PASS Restart preserves one genuine shared original paint/frame origin across current material and baked field\n622: PASS Actual ordered Document Save/restart retains exact layered normals and material/source data\n622: PASS Clear Undo restores exact converted shading\n622: PASS Clear Redo restores exact intrinsic shading\n622: CLEAR variant=7 conversion_error=1 clear_error=0\n622: PASS Actual partial Bake agrees with legacy original in projected and missed regions, including after Clear\n622: PASS Partial rebake of the same direction preserves the actual previous field\n622: PASS Rebake uses current resolved detail or genuine cleared intrinsic baseline without resurrecting old bake\n622: PASS Actual owning writer declares separate Scene33/material15 capabilities\n622: PASS Owning decoder replays exact normal history and preserves complete native Scene\n622: PASS Restart preserves one genuine shared original paint/frame origin across current material and baked field\n622: PASS Actual ordered Document Save/restart retains exact layered normals and material/source data\n622: REBAKE clear_first=0 legacy_error=1 prior_error=1\n622: PASS Actual partial Bake agrees with legacy original in projected and missed regions, including after Clear\n622: PASS Rebake uses current resolved detail or genuine cleared intrinsic baseline without resurrecting old bake\n622: PASS Actual owning writer declares separate Scene33/material15 capabilities\n622: PASS Owning decoder replays exact normal history and preserves complete native Scene\n622: PASS Restart preserves one genuine shared original paint/frame origin across current material and baked field\n622: PASS Actual ordered Document Save/restart retains exact layered normals and material/source data\n622: REBAKE clear_first=1 legacy_error=1 prior_error=7\n622: PASS Existing Scene31 remains readable without silent reinterpretation\n622: PASS Actual owning writer declares separate Scene33/material15 capabilities\n622: PASS Owning decoder replays exact normal history and preserves complete native Scene\n622: PASS Restart preserves one genuine shared original paint/frame origin across current material and baked field\n622: PASS Actual ordered Document Save/restart retains exact layered normals and material/source data\n622: PASS Explicit legacy command removes false intrinsic ownership while retaining original source\n622: PASS Existing Scene31 remains readable without silent reinterpretation\n622: PASS Actual owning writer declares separate Scene33/material15 capabilities\n622: PASS Owning decoder replays exact normal history and preserves complete native Scene\n622: PASS Restart preserves one genuine shared original paint/frame origin across current material and baked field\n622: PASS Actual ordered Document Save/restart retains exact layered normals and material/source data\n622: PASS Explicit legacy command removes false intrinsic ownership while retaining original source\n622: PASS Relabeling the outer Scene cannot grant independent normal authority\n622: PASS Historical material cannot acquire layered capabilities by relabeling\n622: PASS Oversized original-owner references cannot wrap to a valid identity\n622: PASS Forged canonical quality receipt fails actual original-source replay\n622: PASS Cyclic normal-field history fails preflight\n622: PASS Historical detail cannot be relabeled as a cleared intrinsic baseline\n622: PASS Unreachable owning field records are rejected\n622: PASS Malformed independent graphs preserve complete live document and exact retry\n1/1 Test #622: layered-normal-native ............   Passed    7.69 sec\n\nThe following tests passed:\n\tlayered-normal-native\n\n100% tests passed, 0 tests failed out of 1\n\nTotal Test time (real) =   7.70 sec\n"
+        }
+      }
+    },
+    "guard_release": {
+      "status": {
+        "state": "terminal",
+        "pid": 1133042,
+        "source": "2792d4433dfcca355604068c3bf76e004bf0a768",
+        "profile": "release",
+        "scope": "Complete changed bake-authoring product TU plus complete current native worker/render consumer and actual app relink over exact matching fresh1ce public-layout cohort. No new layout/codec change; historical binary fixtures now tracked and all pinned bytes included. Not fresh ALL/full623/HMD/main admission.",
+        "steps": [
+          {
+            "name": "compile-bake-authoring.cpp",
+            "command": [
+              "/usr/bin/c++",
+              "-DDOME_SCULPT_INSTALLED_ASSETS=\"/usr/local/share/dome-sculpt/assets/humanoid\"",
+              "-DDOME_SCULPT_SOURCE_ASSETS=\"/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-sourceguard-1ce/assets/humanoid\"",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-sourceguard-1ce/third_party",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-sourceguard-1ce/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-sourceguard-1ce/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-sourceguard-1ce/third_party/cgltf",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-sourceguard-1ce/third_party/nlohmann",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-sourceguard-1ce/third_party/xatlas",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-sourceguard-1ce/third_party/mikktspace",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-sourceguard-1ce/third_party/ufbx",
+              "-O3",
+              "-DNDEBUG",
+              "-std=gnu++20",
+              "-Wall",
+              "-Wextra",
+              "-Wpedantic",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-sourceguard-1ce/artifacts/guard-proof/release/bake-authoring.cpp.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-sourceguard-1ce/src/bake-authoring.cpp"
+            ],
+            "exit_code": 0,
+            "seconds": 4.799217773019336
+          },
+          {
+            "name": "archive",
+            "command": [
+              "ar",
+              "r",
+              "/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-sourceguard-1ce/artifacts/guard-proof/release/libdome-sculpt-core.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-sourceguard-1ce/artifacts/guard-proof/release/bake-authoring.cpp.o"
+            ],
+            "exit_code": 0,
+            "seconds": 0.12797621003119275
+          },
+          {
+            "name": "compile-native",
+            "command": [
+              "/usr/bin/c++",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-sourceguard-1ce/src",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-sourceguard-1ce/third_party/desktop",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-sourceguard-1ce/third_party/cgltf",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-sourceguard-1ce/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-sourceguard-1ce/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-sourceguard-1ce/third_party/nlohmann",
+              "-isystem",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/harfbuzz",
+              "-isystem",
+              "/usr/include/glib-2.0",
+              "-isystem",
+              "/usr/lib64/glib-2.0/include",
+              "-isystem",
+              "/usr/include/sysprof-6",
+              "-isystem",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/freetype2",
+              "-isystem",
+              "/usr/include/libpng16",
+              "-isystem",
+              "/usr/include/libxml2",
+              "-O3",
+              "-DNDEBUG",
+              "-std=gnu++20",
+              "-pthread",
+              "-DWITH_GZFILEOP",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-sourceguard-1ce/artifacts/guard-proof/release/native.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-sourceguard-1ce/tests/layered-normal-native.cpp"
+            ],
+            "exit_code": 0,
+            "seconds": 9.87246863503242
+          },
+          {
+            "name": "link-dome-sculpt-layered-normal-native-test",
+            "command": [
+              "/usr/bin/c++",
+              "-O3",
+              "-DNDEBUG",
+              "/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-sourceguard-1ce/artifacts/guard-proof/release/native.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-sourceguard-1ce/artifacts/guard-proof/release/dome-sculpt-layered-normal-native-test",
+              "-Wl,-rpath,/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib",
+              "libdome-sculpt-render.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-sourceguard-1ce/artifacts/guard-proof/release/libdome-sculpt-core.a",
+              "libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "libdome-sculpt-polygon.a",
+              "libxatlas.a",
+              "libmikktspace.a",
+              "libmikktspace-robust.a",
+              "libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libharfbuzz.so",
+              "/usr/lib64/libEGL.so",
+              "/usr/lib64/libGL.so",
+              "/usr/lib64/libfontconfig.so",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libfreetype.so",
+              "/usr/lib64/libicui18n.so",
+              "/usr/lib64/libicuuc.so",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit_code": 0,
+            "seconds": 0.291871618013829
+          },
+          {
+            "name": "link-dome-sculpt",
+            "command": [
+              "/usr/bin/c++",
+              "-O3",
+              "-DNDEBUG",
+              "CMakeFiles/dome-sculpt.dir/src/native-display-runtime.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/rig-fit-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/projection-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/spacenav-options.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/app.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/polygon-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/import-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/procedural-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/resolution-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/sculpt-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/creator-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/rig-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/shapekey-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/weight-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/skin-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/mesh-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/bake-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/object-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/paint-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/uv-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/ui-conventions.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/session-appearance.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/export-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/third_party/desktop/desktop-menu.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/appmenu-protocol.c.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-sourceguard-1ce/artifacts/guard-proof/release/dome-sculpt",
+              "-L/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-release/lib",
+              "-L/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib",
+              "-Wl,-rpath,/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-release/lib:/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib:",
+              "libdome-sculpt-spacenav.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-sourceguard-1ce/artifacts/guard-proof/release/libdome-sculpt-core.a",
+              "libdome-sculpt-render.a",
+              "/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-release/lib/libfltk_images.so.1.4.5",
+              "/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-release/lib/libfltk_gl.so.1.4.5",
+              "/usr/lib64/libGLU.so",
+              "libdome-sculpt-xr.a",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libpng.so",
+              "/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-release/lib/libfltk.so.1.4.5",
+              "-lcairo",
+              "-L/usr/lib64",
+              "-lX11",
+              "-lGLU",
+              "-lGL",
+              "/usr/lib64/libdl.a",
+              "/usr/lib64/libSM.so",
+              "/usr/lib64/libICE.so",
+              "/usr/lib64/libXext.so",
+              "/usr/lib64/libXinerama.so",
+              "/usr/lib64/libXfixes.so",
+              "/usr/lib64/libXcursor.so",
+              "/usr/lib64/libXrender.so",
+              "/usr/lib64/libXft.so",
+              "/usr/lib64/libwayland-egl.so",
+              "/usr/lib64/libwayland-cursor.so",
+              "/usr/lib64/libxkbcommon.so",
+              "/usr/lib64/libGLX.so",
+              "/usr/lib64/libOpenGL.so",
+              "/usr/lib64/libz.so",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libcairo.so",
+              "libdome-sculpt-render.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-sourceguard-1ce/artifacts/guard-proof/release/libdome-sculpt-core.a",
+              "libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "libdome-sculpt-polygon.a",
+              "libxatlas.a",
+              "libmikktspace.a",
+              "libmikktspace-robust.a",
+              "libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "/usr/lib64/libEGL.so",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libharfbuzz.so",
+              "/usr/lib64/libGL.so",
+              "/usr/lib64/libfontconfig.so",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libfreetype.so",
+              "/usr/lib64/libicui18n.so",
+              "/usr/lib64/libicuuc.so",
+              "/usr/lib64/libopenxr_loader.so",
+              "/usr/lib64/libgio-2.0.so",
+              "/usr/lib64/libgobject-2.0.so",
+              "/usr/lib64/libglib-2.0.so",
+              "/usr/lib64/libX11.so",
+              "/usr/lib64/libwayland-client.so",
+              "-lm",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit_code": 0,
+            "seconds": 0.3185459320084192
+          },
+          {
+            "name": "native",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-sourceguard-1ce/artifacts/guard-proof/release/dome-sculpt-layered-normal-native-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-sourceguard-1ce/tests/fixtures/layered-normal",
+              "/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-sourceguard-1ce/artifacts/guard-proof/release/outputs"
+            ],
+            "exit_code": 0,
+            "seconds": 0.2537609440041706
+          }
+        ],
+        "phase": "native",
+        "child_pid": 1134605,
+        "exit_code": 0,
+        "seconds": 15.71911522897426,
+        "inputs": 2316,
+        "drift": [],
+        "artifacts": {
+          "/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-sourceguard-1ce/artifacts/guard-proof/release/libdome-sculpt-core.a": "cc3c102f2fd3b9912b1bb4597537fbae1cf28e873a707f65dbcc263ad7742b47",
+          "/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-sourceguard-1ce/artifacts/guard-proof/release/dome-sculpt-layered-normal-native-test": "38411b7bace3489ccdfe27c3b6d0bf883d2765f42d4b183bb7480aba60ec549c",
+          "/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-sourceguard-1ce/artifacts/guard-proof/release/dome-sculpt": "49511979758786fd08a1f9d2fc0203ec5713311deb5de6ee6a8cfb7caf65be71"
+        }
+      },
+      "status_sha256": "18cec55f430514e00e17658a9aa74fd4ffcf681a2376d27e85fc91afc12e74b9",
+      "before_manifest_sha256": "c4849660ac9aa4799fd14b5a8b13bb4bd887a929b8dce1f6473c194442d7417d",
+      "logs": {
+        "compile-bake-authoring.cpp.log": {
+          "sha256": "712a9cc4771f9bd8d5fb140c1ff94bcd10cf6d48d3c596095c55b8888ceb9569",
+          "text": "/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-sourceguard-1ce/src/bake-authoring.cpp: In function \u2018dome::ObjectBakeReport dome::bake_object(Scene&, uint64_t, ObjectBakeSettings, const std::function<bool()>&, const std::function<void(float)>&)\u2019:\n/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-sourceguard-1ce/src/bake-authoring.cpp:104:41: warning: missing initializer for member \u2018dome::ColorPreparationInput::polygon_colors\u2019 [-Wmissing-field-initializers]\n  104 |     auto prepared=prepare_source_normals({target.painted,target.appearance,target.material_bindings,target.deformation,target.material},normal_options);\n      |                   ~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n"
+        },
+        "archive.log": {
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "text": ""
+        },
+        "compile-native.log": {
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "text": ""
+        },
+        "link-dome-sculpt-layered-normal-native-test.log": {
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "text": ""
+        },
+        "link-dome-sculpt.log": {
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "text": ""
+        },
+        "native.log": {
+          "sha256": "522c845c9f78dfd293ae7a955cc117de98ef6cd3597412766cd00024002ed9d1",
+          "text": "Native XR graphics: windowless EGL 1.5\nACTUAL_RENDERER llvmpipe (LLVM 22.1.8, 256 bits)\nPASS Actual owning writer declares separate Scene33/material15 capabilities\nPASS Owning decoder replays exact normal history and preserves complete native Scene\nPASS Restart preserves one genuine shared original paint/frame origin across current material and baked field\nPASS Actual ordered Document Save/restart retains exact layered normals and material/source data\nPASS Real conversion keeps baked detail separate from intrinsic planes and authentic attribute provenance\nPASS Actual converted native frame remains within unchanged image bound\nPASS Actual worker Clear Bake removes converted detail and restores genuine original shading\nPASS Clear drops active field but retains complete original normal/material/deformation provenance\nPASS Actual owning writer declares separate Scene33/material15 capabilities\nPASS Owning decoder replays exact normal history and preserves complete native Scene\nPASS Restart preserves one genuine shared original paint/frame origin across current material and baked field\nPASS Actual ordered Document Save/restart retains exact layered normals and material/source data\nPASS Clear Undo restores exact converted shading\nPASS Clear Redo restores exact intrinsic shading\nCLEAR variant=0 conversion_error=0 clear_error=0\nPASS Actual owning writer declares separate Scene33/material15 capabilities\nPASS Owning decoder replays exact normal history and preserves complete native Scene\nPASS Restart preserves one genuine shared original paint/frame origin across current material and baked field\nPASS Actual ordered Document Save/restart retains exact layered normals and material/source data\nPASS Real conversion keeps baked detail separate from intrinsic planes and authentic attribute provenance\nPASS Actual converted native frame remains within unchanged image bound\nPASS Actual worker Clear Bake removes converted detail and restores genuine original shading\nPASS Clear drops active field but retains complete original normal/material/deformation provenance\nPASS Actual owning writer declares separate Scene33/material15 capabilities\nPASS Owning decoder replays exact normal history and preserves complete native Scene\nPASS Restart preserves one genuine shared original paint/frame origin across current material and baked field\nPASS Actual ordered Document Save/restart retains exact layered normals and material/source data\nPASS Clear Undo restores exact converted shading\nPASS Clear Redo restores exact intrinsic shading\nCLEAR variant=7 conversion_error=1 clear_error=0\nPASS Actual partial Bake agrees with legacy original in projected and missed regions, including after Clear\nPASS Partial rebake of the same direction preserves the actual previous field\nPASS Rebake uses current resolved detail or genuine cleared intrinsic baseline without resurrecting old bake\nPASS Actual owning writer declares separate Scene33/material15 capabilities\nPASS Owning decoder replays exact normal history and preserves complete native Scene\nPASS Restart preserves one genuine shared original paint/frame origin across current material and baked field\nPASS Actual ordered Document Save/restart retains exact layered normals and material/source data\nREBAKE clear_first=0 legacy_error=1 prior_error=1\nPASS Actual partial Bake agrees with legacy original in projected and missed regions, including after Clear\nPASS Rebake uses current resolved detail or genuine cleared intrinsic baseline without resurrecting old bake\nPASS Actual owning writer declares separate Scene33/material15 capabilities\nPASS Owning decoder replays exact normal history and preserves complete native Scene\nPASS Restart preserves one genuine shared original paint/frame origin across current material and baked field\nPASS Actual ordered Document Save/restart retains exact layered normals and material/source data\nREBAKE clear_first=1 legacy_error=1 prior_error=7\nPASS Existing Scene31 remains readable without silent reinterpretation\nPASS Actual owning writer declares separate Scene33/material15 capabilities\nPASS Owning decoder replays exact normal history and preserves complete native Scene\nPASS Restart preserves one genuine shared original paint/frame origin across current material and baked field\nPASS Actual ordered Document Save/restart retains exact layered normals and material/source data\nPASS Explicit legacy command removes false intrinsic ownership while retaining original source\nPASS Existing Scene31 remains readable without silent reinterpretation\nPASS Actual owning writer declares separate Scene33/material15 capabilities\nPASS Owning decoder replays exact normal history and preserves complete native Scene\nPASS Restart preserves one genuine shared original paint/frame origin across current material and baked field\nPASS Actual ordered Document Save/restart retains exact layered normals and material/source data\nPASS Explicit legacy command removes false intrinsic ownership while retaining original source\nPASS Relabeling the outer Scene cannot grant independent normal authority\nPASS Historical material cannot acquire layered capabilities by relabeling\nPASS Oversized original-owner references cannot wrap to a valid identity\nPASS Forged canonical quality receipt fails actual original-source replay\nPASS Cyclic normal-field history fails preflight\nPASS Historical detail cannot be relabeled as a cleared intrinsic baseline\nPASS Unreachable owning field records are rejected\nPASS Malformed independent graphs preserve complete live document and exact retry\nPASS Independent prepared source cannot bypass genuine source-frame transport or mutate either object\n"
+        }
+      }
+    },
+    "fresh_sanitize": {
+      "status": {
+        "state": "terminal",
+        "pid": 1044878,
+        "source": "1ce5fbbefb237bc91184780c12fdd2dc805e42da",
+        "profile": "sanitize",
+        "scope": "Fresh complete independent-normal public-layout app/core/render/support/XR/new tests in each profile. Owning Scene33/material15 replay, real worker Clear/rebake, ordered Save/restart and genuine31 migration; not ALL targets/full623/device/main admission. No archive reuse; canonical27 SDK.",
+        "steps": [
+          {
+            "name": "configure",
+            "command": [
+              "cmake",
+              "-S",
+              "/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-codec-605",
+              "-B",
+              "/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-codec-605/build-codec-sanitize",
+              "-G",
+              "Ninja",
+              "-DCMAKE_BUILD_TYPE=Debug",
+              "-DCMAKE_EXPORT_COMPILE_COMMANDS=ON",
+              "-DDOME_COMPUTE_BACKEND=CPU",
+              "-DFLTK_DIR=/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-sanitize/share/fltk",
+              "-DDOME_BUILD_UI=ON",
+              "-DDOME_BUILD_XR=ON",
+              "-U*DOME_BITMAP_RUNTIME*",
+              "-U*NATIVEGL*",
+              "-U*RENDERFONTS*",
+              "-DCMAKE_C_FLAGS=-fsanitize=address,undefined -fno-omit-frame-pointer -O1 -g1",
+              "-DCMAKE_CXX_FLAGS=-fsanitize=address,undefined -fno-omit-frame-pointer -O1 -g1",
+              "-DCMAKE_C_FLAGS_DEBUG=",
+              "-DCMAKE_CXX_FLAGS_DEBUG=",
+              "-DCMAKE_EXE_LINKER_FLAGS=-fsanitize=address,undefined",
+              "-DCMAKE_SHARED_LINKER_FLAGS=-fsanitize=address,undefined"
+            ],
+            "exit_code": 0,
+            "seconds": 5.730104153975844
+          },
+          {
+            "name": "fresh-native-build",
+            "command": [
+              "nice",
+              "-n",
+              "15",
+              "cmake",
+              "--build",
+              "/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-codec-605/build-codec-sanitize",
+              "--parallel",
+              "2",
+              "--target",
+              "dome-sculpt",
+              "dome-sculpt-test-runtime",
+              "dome-sculpt-test-widgets",
+              "dome-sculpt-layered-normal-native-test",
+              "dome-sculpt-baked-normal-field-test",
+              "dome-sculpt-baked-normal-field-faults-test"
+            ],
+            "exit_code": 0,
+            "seconds": 649.487657643971
+          },
+          {
+            "name": "field",
+            "command": [
+              "nice",
+              "-n",
+              "15",
+              "/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-codec-605/build-codec-sanitize/dome-sculpt-baked-normal-field-test"
+            ],
+            "exit_code": 0,
+            "seconds": 0.24312349501997232
+          },
+          {
+            "name": "field-faults",
+            "command": [
+              "nice",
+              "-n",
+              "15",
+              "/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-codec-605/build-codec-sanitize/dome-sculpt-baked-normal-field-faults-test"
+            ],
+            "exit_code": 0,
+            "seconds": 0.27616390597540885
+          },
+          {
+            "name": "native-worker-render",
+            "command": [
+              "nice",
+              "-n",
+              "15",
+              "ctest",
+              "--test-dir",
+              "/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-codec-605/build-codec-sanitize",
+              "--output-on-failure",
+              "-V",
+              "-R",
+              "^layered-normal-native$"
+            ],
+            "exit_code": 0,
+            "seconds": 8.34691586700501
+          }
+        ],
+        "phase": "native-worker-render",
+        "child_pid": 1120978,
+        "registered_tests": 623,
+        "selected_tests": [],
+        "owned_instrumented_compile_commands": 221,
+        "artifacts": {
+          "/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-codec-605/build-codec-sanitize/dome-sculpt": "35abea020d616f568a33f050258cf0305a13cc1ea359d686d6d7510d32ba53ac",
+          "/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-codec-605/build-codec-sanitize/libdome-sculpt-affine.a": "27046ca2629e0ca84210507412d9a0883cb3834fb9d1c3d4361c9be366227267",
+          "/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-codec-605/build-codec-sanitize/libxatlas.a": "4b98891730222687e98ffc21ed67368fb783cd2a0abb6defb330598e62e5fe7c",
+          "/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-codec-605/build-codec-sanitize/libufbx.a": "93e9b58c7f40c0a0e44536b318bf592673ff89cc5c5ecc0ec2d5ee293dce4e00",
+          "/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-codec-605/build-codec-sanitize/libmikktspace.a": "78067071b0763370012b2e9770a632e39cac89f0375f475649145830f757f925",
+          "/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-codec-605/build-codec-sanitize/libmikktspace-robust.a": "a270f141bfc8ffc71cb1d03947b63d7b040aad3480cf71c7e45af437ec445fbc",
+          "/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-codec-605/build-codec-sanitize/libdome-sculpt-polygon.a": "ad194f632993d1499d261a221ad32ea592cb0eb2b7a8062f873afa11aca0cf70",
+          "/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-codec-605/build-codec-sanitize/libdome-sculpt-emission-codec.a": "ac4aeb7887d5aaf562283e8176af98d26ece50b2f727ee28ae63187ef9369a01",
+          "/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-codec-605/build-codec-sanitize/libdome-sculpt-core.a": "a3db71f2b16b58fa190a21abc2d7e4454517affda7d417e627a0d4197ac875ee",
+          "/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-codec-605/build-codec-sanitize/libdome-sculpt-render.a": "52063fd4f4c7898659130503bbb37a61c5ce4eb1bfec06dfdfc704bc6dd2d9f7",
+          "/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-codec-605/build-codec-sanitize/libdome-sculpt-spacenav.a": "b072916bb89cc087d7c848401658f2d57eb404f938b3ea68a0e9933fda3cb26b",
+          "/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-codec-605/build-codec-sanitize/libdome-sculpt-xr.a": "8576f7f9257d387eecfd831562ac55721be95eb0277bb62434c4da8e39bef01d"
+        },
+        "exit_code": 0,
+        "seconds": 664.9461679399828,
+        "inputs": 2300,
+        "drift": []
+      },
+      "status_sha256": "2724a8bd42d705ef866679263909c0f57c0d0f991215fbb61508716d37bebf4f",
+      "before_manifest_sha256": "e65f3570aa0d1db29c04e6738e445a7c2065ea0d3c4e1f26d47b2e6ecef54b2d",
+      "logs": {
+        "field.log": {
+          "sha256": "686a1ac5ba99b0412876ed6082e0873ad16cefec0277ca1ac30022308ce5db89",
+          "text": "PASS Actual native baker covers both disjoint mirrored-UV triangles\nPASS Converted baked role does not fabricate an intrinsic projection or change the genuine input\nPASS Resolved normal coverage is independent of partial material coverage and missed atlas regions\nPASS Independent double-precision oracle verifies both roles normalize and quantize each texel before filtering\nPASS Partial normal replacement preserves missed texels byte-exactly and retains its actual prior field and origin\nPASS Caller mutation cannot alter detached replacement planes or the previous immutable field\nPASS All-miss replacement is an exact same-owner no-op\nPASS Repeated partial baking combines with the real previous resolved normal, not material alpha or neutral fallback\nPASS Replacement history is bounded before detached copies\nPASS Initial and replacement retained/working memory limits refuse atomically\nPASS Raw canonical pixels cannot masquerade as prepared replacement detail\nPASS Baked field can be released while durable original provenance and genuine intrinsic absence remain intact\nVARIANT 0 pbr_error=0 toon_error=0\nPASS Actual native baker covers both disjoint mirrored-UV triangles\nPASS Converted baked role does not fabricate an intrinsic projection or change the genuine input\nPASS Resolved normal coverage is independent of partial material coverage and missed atlas regions\nPASS Independent double-precision oracle verifies both roles normalize and quantize each texel before filtering\nPASS Partial normal replacement preserves missed texels byte-exactly and retains its actual prior field and origin\nPASS Caller mutation cannot alter detached replacement planes or the previous immutable field\nPASS All-miss replacement is an exact same-owner no-op\nPASS Repeated partial baking combines with the real previous resolved normal, not material alpha or neutral fallback\nPASS Replacement history is bounded before detached copies\nPASS Initial and replacement retained/working memory limits refuse atomically\nPASS Raw canonical pixels cannot masquerade as prepared replacement detail\nPASS Baked field can be released while durable original provenance and genuine intrinsic absence remain intact\nVARIANT 1 pbr_error=0 toon_error=0\nPASS Actual native baker covers both disjoint mirrored-UV triangles\nPASS Converted baked role does not fabricate an intrinsic projection or change the genuine input\nPASS Resolved normal coverage is independent of partial material coverage and missed atlas regions\nPASS Independent double-precision oracle verifies both roles normalize and quantize each texel before filtering\nPASS Partial normal replacement preserves missed texels byte-exactly and retains its actual prior field and origin\nPASS Caller mutation cannot alter detached replacement planes or the previous immutable field\nPASS All-miss replacement is an exact same-owner no-op\nPASS Repeated partial baking combines with the real previous resolved normal, not material alpha or neutral fallback\nPASS Replacement history is bounded before detached copies\nPASS Initial and replacement retained/working memory limits refuse atomically\nPASS Raw canonical pixels cannot masquerade as prepared replacement detail\nPASS Baked field can be released while durable original provenance and genuine intrinsic absence remain intact\nVARIANT 2 pbr_error=0 toon_error=0\nPASS Actual native baker covers both disjoint mirrored-UV triangles\nPASS Converted baked role does not fabricate an intrinsic projection or change the genuine input\nPASS Resolved normal coverage is independent of partial material coverage and missed atlas regions\nPASS Independent double-precision oracle verifies both roles normalize and quantize each texel before filtering\nPASS Partial normal replacement preserves missed texels byte-exactly and retains its actual prior field and origin\nPASS Caller mutation cannot alter detached replacement planes or the previous immutable field\nPASS All-miss replacement is an exact same-owner no-op\nPASS Repeated partial baking combines with the real previous resolved normal, not material alpha or neutral fallback\nPASS Replacement history is bounded before detached copies\nPASS Initial and replacement retained/working memory limits refuse atomically\nPASS Raw canonical pixels cannot masquerade as prepared replacement detail\nPASS Baked field can be released while durable original provenance and genuine intrinsic absence remain intact\nVARIANT 3 pbr_error=0 toon_error=0\nPASS Actual native baker covers both disjoint mirrored-UV triangles\nPASS Converted baked role does not fabricate an intrinsic projection or change the genuine input\nPASS Resolved normal coverage is independent of partial material coverage and missed atlas regions\nPASS Independent double-precision oracle verifies both roles normalize and quantize each texel before filtering\nPASS Partial normal replacement preserves missed texels byte-exactly and retains its actual prior field and origin\nPASS Caller mutation cannot alter detached replacement planes or the previous immutable field\nPASS All-miss replacement is an exact same-owner no-op\nPASS Repeated partial baking combines with the real previous resolved normal, not material alpha or neutral fallback\nPASS Replacement history is bounded before detached copies\nPASS Initial and replacement retained/working memory limits refuse atomically\nPASS Raw canonical pixels cannot masquerade as prepared replacement detail\nPASS Baked field can be released while durable original provenance and genuine intrinsic absence remain intact\nVARIANT 4 pbr_error=0 toon_error=0\nPASS Actual native baker covers both disjoint mirrored-UV triangles\nPASS Converted baked role does not fabricate an intrinsic projection or change the genuine input\nPASS Resolved normal coverage is independent of partial material coverage and missed atlas regions\nPASS Independent double-precision oracle verifies both roles normalize and quantize each texel before filtering\nPASS Partial normal replacement preserves missed texels byte-exactly and retains its actual prior field and origin\nPASS Caller mutation cannot alter detached replacement planes or the previous immutable field\nPASS All-miss replacement is an exact same-owner no-op\nPASS Repeated partial baking combines with the real previous resolved normal, not material alpha or neutral fallback\nPASS Replacement history is bounded before detached copies\nPASS Initial and replacement retained/working memory limits refuse atomically\nPASS Raw canonical pixels cannot masquerade as prepared replacement detail\nPASS Baked field can be released while durable original provenance and genuine intrinsic absence remain intact\nVARIANT 5 pbr_error=0 toon_error=0\nPASS Actual native baker covers both disjoint mirrored-UV triangles\nPASS Converted baked role does not fabricate an intrinsic projection or change the genuine input\nPASS Resolved normal coverage is independent of partial material coverage and missed atlas regions\nPASS Independent double-precision oracle verifies both roles normalize and quantize each texel before filtering\nPASS Partial normal replacement preserves missed texels byte-exactly and retains its actual prior field and origin\nPASS Caller mutation cannot alter detached replacement planes or the previous immutable field\nPASS All-miss replacement is an exact same-owner no-op\nPASS Repeated partial baking combines with the real previous resolved normal, not material alpha or neutral fallback\nPASS Replacement history is bounded before detached copies\nPASS Initial and replacement retained/working memory limits refuse atomically\nPASS Raw canonical pixels cannot masquerade as prepared replacement detail\nPASS Baked field can be released while durable original provenance and genuine intrinsic absence remain intact\nVARIANT 6 pbr_error=0 toon_error=0\nPASS Actual native baker covers both disjoint mirrored-UV triangles\nPASS Converted baked role does not fabricate an intrinsic projection or change the genuine input\nPASS Resolved normal coverage is independent of partial material coverage and missed atlas regions\nPASS Independent double-precision oracle verifies both roles normalize and quantize each texel before filtering\nPASS Partial normal replacement preserves missed texels byte-exactly and retains its actual prior field and origin\nPASS Caller mutation cannot alter detached replacement planes or the previous immutable field\nPASS All-miss replacement is an exact same-owner no-op\nPASS Repeated partial baking combines with the real previous resolved normal, not material alpha or neutral fallback\nPASS Replacement history is bounded before detached copies\nPASS Initial and replacement retained/working memory limits refuse atomically\nPASS Raw canonical pixels cannot masquerade as prepared replacement detail\nPASS Baked field can be released while durable original provenance and genuine intrinsic absence remain intact\nVARIANT 7 pbr_error=0 toon_error=0\nPASS Actual native baker covers both disjoint mirrored-UV triangles\nPASS Every replacement cancellation poll leaves complete source and prior field exact\nPASS Every replacement cancellation poll leaves complete source and prior field exact\nPASS Every replacement cancellation poll leaves complete source and prior field exact\nPASS Every replacement cancellation poll leaves complete source and prior field exact\nPASS Every replacement cancellation poll leaves complete source and prior field exact\nPASS Every replacement cancellation poll leaves complete source and prior field exact\nPASS Every replacement cancellation poll leaves complete source and prior field exact\nPASS Every replacement cancellation poll leaves complete source and prior field exact\nPASS Every replacement cancellation poll leaves complete source and prior field exact\nPASS Every replacement cancellation poll leaves complete source and prior field exact\nPASS Every replacement cancellation poll leaves complete source and prior field exact\nPASS Cancelled replacement retries to exact resolved pixels\nPASS 109 independent layered baked-normal checks; all_cancel_polls=11\n"
+        },
+        "field-faults.log": {
+          "sha256": "e02a71f6f85d9a7d6b94e7e43be241d6ec46cce5b9b8edcf7d28920d41193096",
+          "text": "PASS Actual native baker covers both disjoint mirrored-UV triangles\nPASS Measure real independent field C++ allocation prefixes\nPASS Every persistent allocation and cancellation endpoint retries to identical owning normal planes\nPASS initial persistent_cpp_prefixes=23 all_cancel_polls=2\nPASS Measure real independent field C++ allocation prefixes\nPASS Every persistent allocation and cancellation endpoint retries to identical owning normal planes\nPASS replace persistent_cpp_prefixes=12 all_cancel_polls=11\n"
+        },
+        "native-worker-render.log": {
+          "sha256": "6c513acd6fb0c6ed5533401695abd22c3d1af81726e0338d4b64229b35aa806c",
+          "text": "UpdateCTestConfiguration  from :/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-codec-605/build-codec-sanitize/DartConfiguration.tcl\nParse Config file:/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-codec-605/build-codec-sanitize/DartConfiguration.tcl\nTest project /home/blux/de-xr/dome-sculpt/artifacts/layered-normal-codec-605/build-codec-sanitize\nConstructing a list of tests\nDone constructing a list of tests\nUpdating test list for fixtures\nAdded 0 tests to meet fixture requirements\nChecking test dependency graph...\nChecking test dependency graph end\ntest 622\n    Start 622: layered-normal-native\n\n622: Test command: /home/blux/de-xr/dome-sculpt/artifacts/layered-normal-codec-605/build-codec-sanitize/dome-sculpt-layered-normal-native-test \"/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-codec-605/tests/fixtures/layered-normal\" \"/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-codec-605/build-codec-sanitize/layered-normal-native\"\n622: Working Directory: /home/blux/de-xr/dome-sculpt/artifacts/layered-normal-codec-605/build-codec-sanitize\n622: Environment variables: \n622:  LIBGL_ALWAYS_SOFTWARE=1\n622:  LP_NUM_THREADS=2\n622: Test timeout computed to be: 600\n622: Native XR graphics: windowless EGL 1.5\n622: PASS Actual owning writer declares separate Scene33/material15 capabilities\n622: PASS Owning decoder replays exact normal history and preserves complete native Scene\n622: PASS Restart preserves one genuine shared original paint/frame origin across current material and baked field\n622: PASS Actual ordered Document Save/restart retains exact layered normals and material/source data\n622: PASS Real conversion keeps baked detail separate from intrinsic planes and authentic attribute provenance\n622: PASS Actual converted native frame remains within unchanged image bound\n622: PASS Actual worker Clear Bake removes converted detail and restores genuine original shading\n622: PASS Clear drops active field but retains complete original normal/material/deformation provenance\n622: PASS Actual owning writer declares separate Scene33/material15 capabilities\n622: PASS Owning decoder replays exact normal history and preserves complete native Scene\n622: PASS Restart preserves one genuine shared original paint/frame origin across current material and baked field\n622: PASS Actual ordered Document Save/restart retains exact layered normals and material/source data\n622: PASS Clear Undo restores exact converted shading\n622: PASS Clear Redo restores exact intrinsic shading\n622: CLEAR variant=0 conversion_error=0 clear_error=0\n622: PASS Actual owning writer declares separate Scene33/material15 capabilities\n622: PASS Owning decoder replays exact normal history and preserves complete native Scene\n622: PASS Restart preserves one genuine shared original paint/frame origin across current material and baked field\n622: PASS Actual ordered Document Save/restart retains exact layered normals and material/source data\n622: PASS Real conversion keeps baked detail separate from intrinsic planes and authentic attribute provenance\n622: PASS Actual converted native frame remains within unchanged image bound\n622: PASS Actual worker Clear Bake removes converted detail and restores genuine original shading\n622: PASS Clear drops active field but retains complete original normal/material/deformation provenance\n622: PASS Actual owning writer declares separate Scene33/material15 capabilities\n622: PASS Owning decoder replays exact normal history and preserves complete native Scene\n622: PASS Restart preserves one genuine shared original paint/frame origin across current material and baked field\n622: PASS Actual ordered Document Save/restart retains exact layered normals and material/source data\n622: PASS Clear Undo restores exact converted shading\n622: PASS Clear Redo restores exact intrinsic shading\n622: CLEAR variant=7 conversion_error=1 clear_error=0\n622: PASS Actual partial Bake agrees with legacy original in projected and missed regions, including after Clear\n622: PASS Partial rebake of the same direction preserves the actual previous field\n622: PASS Rebake uses current resolved detail or genuine cleared intrinsic baseline without resurrecting old bake\n622: PASS Actual owning writer declares separate Scene33/material15 capabilities\n622: PASS Owning decoder replays exact normal history and preserves complete native Scene\n622: PASS Restart preserves one genuine shared original paint/frame origin across current material and baked field\n622: PASS Actual ordered Document Save/restart retains exact layered normals and material/source data\n622: REBAKE clear_first=0 legacy_error=1 prior_error=1\n622: PASS Actual partial Bake agrees with legacy original in projected and missed regions, including after Clear\n622: PASS Rebake uses current resolved detail or genuine cleared intrinsic baseline without resurrecting old bake\n622: PASS Actual owning writer declares separate Scene33/material15 capabilities\n622: PASS Owning decoder replays exact normal history and preserves complete native Scene\n622: PASS Restart preserves one genuine shared original paint/frame origin across current material and baked field\n622: PASS Actual ordered Document Save/restart retains exact layered normals and material/source data\n622: REBAKE clear_first=1 legacy_error=1 prior_error=7\n622: PASS Existing Scene31 remains readable without silent reinterpretation\n622: PASS Actual owning writer declares separate Scene33/material15 capabilities\n622: PASS Owning decoder replays exact normal history and preserves complete native Scene\n622: PASS Restart preserves one genuine shared original paint/frame origin across current material and baked field\n622: PASS Actual ordered Document Save/restart retains exact layered normals and material/source data\n622: PASS Explicit legacy command removes false intrinsic ownership while retaining original source\n622: PASS Existing Scene31 remains readable without silent reinterpretation\n622: PASS Actual owning writer declares separate Scene33/material15 capabilities\n622: PASS Owning decoder replays exact normal history and preserves complete native Scene\n622: PASS Restart preserves one genuine shared original paint/frame origin across current material and baked field\n622: PASS Actual ordered Document Save/restart retains exact layered normals and material/source data\n622: PASS Explicit legacy command removes false intrinsic ownership while retaining original source\n622: PASS Relabeling the outer Scene cannot grant independent normal authority\n622: PASS Historical material cannot acquire layered capabilities by relabeling\n622: PASS Oversized original-owner references cannot wrap to a valid identity\n622: PASS Forged canonical quality receipt fails actual original-source replay\n622: PASS Cyclic normal-field history fails preflight\n622: PASS Historical detail cannot be relabeled as a cleared intrinsic baseline\n622: PASS Unreachable owning field records are rejected\n622: PASS Malformed independent graphs preserve complete live document and exact retry\n1/1 Test #622: layered-normal-native ............   Passed    8.33 sec\n\nThe following tests passed:\n\tlayered-normal-native\n\n100% tests passed, 0 tests failed out of 1\n\nTotal Test time (real) =   8.34 sec\n"
+        }
+      }
+    },
+    "guard_sanitize": {
+      "status": {
+        "state": "terminal",
+        "pid": 1133041,
+        "source": "2792d4433dfcca355604068c3bf76e004bf0a768",
+        "profile": "sanitize",
+        "scope": "Complete changed bake-authoring product TU plus complete current native worker/render consumer and actual app relink over exact matching fresh1ce public-layout cohort. No new layout/codec change; historical binary fixtures now tracked and all pinned bytes included. Not fresh ALL/full623/HMD/main admission.",
+        "steps": [
+          {
+            "name": "compile-bake-authoring.cpp",
+            "command": [
+              "/usr/bin/c++",
+              "-DDOME_SCULPT_INSTALLED_ASSETS=\"/usr/local/share/dome-sculpt/assets/humanoid\"",
+              "-DDOME_SCULPT_SOURCE_ASSETS=\"/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-sourceguard-1ce/assets/humanoid\"",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-sourceguard-1ce/third_party",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-sourceguard-1ce/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-sourceguard-1ce/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-sourceguard-1ce/third_party/cgltf",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-sourceguard-1ce/third_party/nlohmann",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-sourceguard-1ce/third_party/xatlas",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-sourceguard-1ce/third_party/mikktspace",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-sourceguard-1ce/third_party/ufbx",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "-O1",
+              "-g1",
+              "-std=gnu++20",
+              "-Wall",
+              "-Wextra",
+              "-Wpedantic",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-sourceguard-1ce/artifacts/guard-proof/sanitize/bake-authoring.cpp.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-sourceguard-1ce/src/bake-authoring.cpp"
+            ],
+            "exit_code": 0,
+            "seconds": 8.783481273974758
+          },
+          {
+            "name": "archive",
+            "command": [
+              "ar",
+              "r",
+              "/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-sourceguard-1ce/artifacts/guard-proof/sanitize/libdome-sculpt-core.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-sourceguard-1ce/artifacts/guard-proof/sanitize/bake-authoring.cpp.o"
+            ],
+            "exit_code": 0,
+            "seconds": 1.3790922270272858
+          },
+          {
+            "name": "compile-native",
+            "command": [
+              "/usr/bin/c++",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-sourceguard-1ce/src",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-sourceguard-1ce/third_party/desktop",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-sourceguard-1ce/third_party/cgltf",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-sourceguard-1ce/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-sourceguard-1ce/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-sourceguard-1ce/third_party/nlohmann",
+              "-isystem",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/harfbuzz",
+              "-isystem",
+              "/usr/include/glib-2.0",
+              "-isystem",
+              "/usr/lib64/glib-2.0/include",
+              "-isystem",
+              "/usr/include/sysprof-6",
+              "-isystem",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/freetype2",
+              "-isystem",
+              "/usr/include/libpng16",
+              "-isystem",
+              "/usr/include/libxml2",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "-O1",
+              "-g1",
+              "-std=gnu++20",
+              "-pthread",
+              "-DWITH_GZFILEOP",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-sourceguard-1ce/artifacts/guard-proof/sanitize/native.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-sourceguard-1ce/tests/layered-normal-native.cpp"
+            ],
+            "exit_code": 0,
+            "seconds": 13.750811532954685
+          },
+          {
+            "name": "link-dome-sculpt-layered-normal-native-test",
+            "command": [
+              "/usr/bin/c++",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "-O1",
+              "-g1",
+              "-fsanitize=address,undefined",
+              "/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-sourceguard-1ce/artifacts/guard-proof/sanitize/native.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-sourceguard-1ce/artifacts/guard-proof/sanitize/dome-sculpt-layered-normal-native-test",
+              "-Wl,-rpath,/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib",
+              "libdome-sculpt-render.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-sourceguard-1ce/artifacts/guard-proof/sanitize/libdome-sculpt-core.a",
+              "libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "libdome-sculpt-polygon.a",
+              "libxatlas.a",
+              "libmikktspace.a",
+              "libmikktspace-robust.a",
+              "libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libharfbuzz.so",
+              "/usr/lib64/libEGL.so",
+              "/usr/lib64/libGL.so",
+              "/usr/lib64/libfontconfig.so",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libfreetype.so",
+              "/usr/lib64/libicui18n.so",
+              "/usr/lib64/libicuuc.so",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit_code": 0,
+            "seconds": 1.9214733830303885
+          },
+          {
+            "name": "link-dome-sculpt",
+            "command": [
+              "/usr/bin/c++",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "-O1",
+              "-g1",
+              "-fsanitize=address,undefined",
+              "CMakeFiles/dome-sculpt.dir/src/native-display-runtime.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/rig-fit-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/projection-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/spacenav-options.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/app.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/polygon-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/import-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/procedural-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/resolution-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/sculpt-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/creator-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/rig-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/shapekey-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/weight-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/skin-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/mesh-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/bake-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/object-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/paint-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/uv-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/ui-conventions.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/session-appearance.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/export-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/third_party/desktop/desktop-menu.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/appmenu-protocol.c.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-sourceguard-1ce/artifacts/guard-proof/sanitize/dome-sculpt",
+              "-L/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-sanitize/lib",
+              "-L/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib",
+              "-Wl,-rpath,/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-sanitize/lib:/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib:",
+              "libdome-sculpt-spacenav.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-sourceguard-1ce/artifacts/guard-proof/sanitize/libdome-sculpt-core.a",
+              "libdome-sculpt-render.a",
+              "/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-sanitize/lib/libfltk_images.so.1.4.5",
+              "/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-sanitize/lib/libfltk_gl.so.1.4.5",
+              "/usr/lib64/libGLU.so",
+              "libdome-sculpt-xr.a",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libpng.so",
+              "/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-sanitize/lib/libfltk.so.1.4.5",
+              "-lcairo",
+              "-L/usr/lib64",
+              "-lX11",
+              "-lGLU",
+              "-lGL",
+              "/usr/lib64/libdl.a",
+              "/usr/lib64/libSM.so",
+              "/usr/lib64/libICE.so",
+              "/usr/lib64/libXext.so",
+              "/usr/lib64/libXinerama.so",
+              "/usr/lib64/libXfixes.so",
+              "/usr/lib64/libXcursor.so",
+              "/usr/lib64/libXrender.so",
+              "/usr/lib64/libXft.so",
+              "/usr/lib64/libwayland-egl.so",
+              "/usr/lib64/libwayland-cursor.so",
+              "/usr/lib64/libxkbcommon.so",
+              "/usr/lib64/libGLX.so",
+              "/usr/lib64/libOpenGL.so",
+              "/usr/lib64/libz.so",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libcairo.so",
+              "libdome-sculpt-render.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-sourceguard-1ce/artifacts/guard-proof/sanitize/libdome-sculpt-core.a",
+              "libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "libdome-sculpt-polygon.a",
+              "libxatlas.a",
+              "libmikktspace.a",
+              "libmikktspace-robust.a",
+              "libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "/usr/lib64/libEGL.so",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libharfbuzz.so",
+              "/usr/lib64/libGL.so",
+              "/usr/lib64/libfontconfig.so",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libfreetype.so",
+              "/usr/lib64/libicui18n.so",
+              "/usr/lib64/libicuuc.so",
+              "/usr/lib64/libopenxr_loader.so",
+              "/usr/lib64/libgio-2.0.so",
+              "/usr/lib64/libgobject-2.0.so",
+              "/usr/lib64/libglib-2.0.so",
+              "/usr/lib64/libX11.so",
+              "/usr/lib64/libwayland-client.so",
+              "-lm",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit_code": 0,
+            "seconds": 2.3081184590118937
+          },
+          {
+            "name": "native",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-sourceguard-1ce/artifacts/guard-proof/sanitize/dome-sculpt-layered-normal-native-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-sourceguard-1ce/tests/fixtures/layered-normal",
+              "/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-sourceguard-1ce/artifacts/guard-proof/sanitize/outputs"
+            ],
+            "exit_code": 0,
+            "seconds": 1.1628976159845479
+          }
+        ],
+        "phase": "native",
+        "child_pid": 1135974,
+        "exit_code": 0,
+        "seconds": 29.4390705699916,
+        "inputs": 2316,
+        "drift": [],
+        "artifacts": {
+          "/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-sourceguard-1ce/artifacts/guard-proof/sanitize/libdome-sculpt-core.a": "309e6570726ca9c47ae04c3ead6bf00641c5eb47575b8db2b684b55cb48ec0fb",
+          "/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-sourceguard-1ce/artifacts/guard-proof/sanitize/dome-sculpt-layered-normal-native-test": "7a518686de9e2cf3f3bb1f1711d34cd660d5abf86adbd866c2f1ee9a903b1eb2",
+          "/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-sourceguard-1ce/artifacts/guard-proof/sanitize/dome-sculpt": "39c2ba810af56eb3c60daf91dd9e52e5553aa8fc33cc22854cb465b8bc283775"
+        }
+      },
+      "status_sha256": "bf84b3a34d8775904c84915e3cab11138ef15be34ed188e51991b5f911b72b84",
+      "before_manifest_sha256": "38522f34687c870be0b5eb3d5be822ac8844dde0edcfe23a06193c279eb2489e",
+      "logs": {
+        "compile-bake-authoring.cpp.log": {
+          "sha256": "712a9cc4771f9bd8d5fb140c1ff94bcd10cf6d48d3c596095c55b8888ceb9569",
+          "text": "/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-sourceguard-1ce/src/bake-authoring.cpp: In function \u2018dome::ObjectBakeReport dome::bake_object(Scene&, uint64_t, ObjectBakeSettings, const std::function<bool()>&, const std::function<void(float)>&)\u2019:\n/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-sourceguard-1ce/src/bake-authoring.cpp:104:41: warning: missing initializer for member \u2018dome::ColorPreparationInput::polygon_colors\u2019 [-Wmissing-field-initializers]\n  104 |     auto prepared=prepare_source_normals({target.painted,target.appearance,target.material_bindings,target.deformation,target.material},normal_options);\n      |                   ~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n"
+        },
+        "archive.log": {
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "text": ""
+        },
+        "compile-native.log": {
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "text": ""
+        },
+        "link-dome-sculpt-layered-normal-native-test.log": {
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "text": ""
+        },
+        "link-dome-sculpt.log": {
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "text": ""
+        },
+        "native.log": {
+          "sha256": "522c845c9f78dfd293ae7a955cc117de98ef6cd3597412766cd00024002ed9d1",
+          "text": "Native XR graphics: windowless EGL 1.5\nACTUAL_RENDERER llvmpipe (LLVM 22.1.8, 256 bits)\nPASS Actual owning writer declares separate Scene33/material15 capabilities\nPASS Owning decoder replays exact normal history and preserves complete native Scene\nPASS Restart preserves one genuine shared original paint/frame origin across current material and baked field\nPASS Actual ordered Document Save/restart retains exact layered normals and material/source data\nPASS Real conversion keeps baked detail separate from intrinsic planes and authentic attribute provenance\nPASS Actual converted native frame remains within unchanged image bound\nPASS Actual worker Clear Bake removes converted detail and restores genuine original shading\nPASS Clear drops active field but retains complete original normal/material/deformation provenance\nPASS Actual owning writer declares separate Scene33/material15 capabilities\nPASS Owning decoder replays exact normal history and preserves complete native Scene\nPASS Restart preserves one genuine shared original paint/frame origin across current material and baked field\nPASS Actual ordered Document Save/restart retains exact layered normals and material/source data\nPASS Clear Undo restores exact converted shading\nPASS Clear Redo restores exact intrinsic shading\nCLEAR variant=0 conversion_error=0 clear_error=0\nPASS Actual owning writer declares separate Scene33/material15 capabilities\nPASS Owning decoder replays exact normal history and preserves complete native Scene\nPASS Restart preserves one genuine shared original paint/frame origin across current material and baked field\nPASS Actual ordered Document Save/restart retains exact layered normals and material/source data\nPASS Real conversion keeps baked detail separate from intrinsic planes and authentic attribute provenance\nPASS Actual converted native frame remains within unchanged image bound\nPASS Actual worker Clear Bake removes converted detail and restores genuine original shading\nPASS Clear drops active field but retains complete original normal/material/deformation provenance\nPASS Actual owning writer declares separate Scene33/material15 capabilities\nPASS Owning decoder replays exact normal history and preserves complete native Scene\nPASS Restart preserves one genuine shared original paint/frame origin across current material and baked field\nPASS Actual ordered Document Save/restart retains exact layered normals and material/source data\nPASS Clear Undo restores exact converted shading\nPASS Clear Redo restores exact intrinsic shading\nCLEAR variant=7 conversion_error=1 clear_error=0\nPASS Actual partial Bake agrees with legacy original in projected and missed regions, including after Clear\nPASS Partial rebake of the same direction preserves the actual previous field\nPASS Rebake uses current resolved detail or genuine cleared intrinsic baseline without resurrecting old bake\nPASS Actual owning writer declares separate Scene33/material15 capabilities\nPASS Owning decoder replays exact normal history and preserves complete native Scene\nPASS Restart preserves one genuine shared original paint/frame origin across current material and baked field\nPASS Actual ordered Document Save/restart retains exact layered normals and material/source data\nREBAKE clear_first=0 legacy_error=1 prior_error=1\nPASS Actual partial Bake agrees with legacy original in projected and missed regions, including after Clear\nPASS Rebake uses current resolved detail or genuine cleared intrinsic baseline without resurrecting old bake\nPASS Actual owning writer declares separate Scene33/material15 capabilities\nPASS Owning decoder replays exact normal history and preserves complete native Scene\nPASS Restart preserves one genuine shared original paint/frame origin across current material and baked field\nPASS Actual ordered Document Save/restart retains exact layered normals and material/source data\nREBAKE clear_first=1 legacy_error=1 prior_error=7\nPASS Existing Scene31 remains readable without silent reinterpretation\nPASS Actual owning writer declares separate Scene33/material15 capabilities\nPASS Owning decoder replays exact normal history and preserves complete native Scene\nPASS Restart preserves one genuine shared original paint/frame origin across current material and baked field\nPASS Actual ordered Document Save/restart retains exact layered normals and material/source data\nPASS Explicit legacy command removes false intrinsic ownership while retaining original source\nPASS Existing Scene31 remains readable without silent reinterpretation\nPASS Actual owning writer declares separate Scene33/material15 capabilities\nPASS Owning decoder replays exact normal history and preserves complete native Scene\nPASS Restart preserves one genuine shared original paint/frame origin across current material and baked field\nPASS Actual ordered Document Save/restart retains exact layered normals and material/source data\nPASS Explicit legacy command removes false intrinsic ownership while retaining original source\nPASS Relabeling the outer Scene cannot grant independent normal authority\nPASS Historical material cannot acquire layered capabilities by relabeling\nPASS Oversized original-owner references cannot wrap to a valid identity\nPASS Forged canonical quality receipt fails actual original-source replay\nPASS Cyclic normal-field history fails preflight\nPASS Historical detail cannot be relabeled as a cleared intrinsic baseline\nPASS Unreachable owning field records are rejected\nPASS Malformed independent graphs preserve complete live document and exact retry\nPASS Independent prepared source cannot bypass genuine source-frame transport or mutate either object\n"
+        }
+      }
+    },
+    "Arc": {
+      "status": {
+        "state": "terminal",
+        "pid": 1148933,
+        "source": "2792d4433dfcca355604068c3bf76e004bf0a768",
+        "scope": "Actual observed strict Arc A770 native worker/Scene33 Save/restart and GL shading; forced software identity refusal. No compute or physical HMD claim.",
+        "steps": [
+          {
+            "name": "hardware",
+            "exit_code": 0,
+            "expected": 0,
+            "seconds": 0.3290831799968146,
+            "renderer": [
+              "ACTUAL_RENDERER Mesa Intel(R) Arc(tm) A770 Graphics (DG2)"
+            ]
+          },
+          {
+            "name": "forced-software",
+            "exit_code": 1,
+            "expected": 1,
+            "seconds": 0.11527238896815106,
+            "renderer": [
+              "ACTUAL_RENDERER llvmpipe (LLVM 22.1.8, 256 bits)"
+            ]
+          }
+        ],
+        "phase": "forced-software",
+        "child_pid": 1149103,
+        "exit_code": 0,
+        "seconds": 0.44501735700760037,
+        "inputs": 2120,
+        "drift": []
+      },
+      "status_sha256": "0ccf7766ba52a59effdea76578aae76e005cd3d4cb9ccc63db710ef1abd69205",
+      "logs": {
+        "hardware.log": {
+          "sha256": "9ac0f56918b4f3c1799e1634f985064ed0054cea4894304ea02cd1e95872e362",
+          "text": "Native XR graphics: windowless EGL 1.5\nACTUAL_RENDERER Mesa Intel(R) Arc(tm) A770 Graphics (DG2)\nPASS Actual native worker/render consumer uses the explicitly required renderer\nPASS Actual owning writer declares separate Scene33/material15 capabilities\nPASS Owning decoder replays exact normal history and preserves complete native Scene\nPASS Restart preserves one genuine shared original paint/frame origin across current material and baked field\nPASS Actual ordered Document Save/restart retains exact layered normals and material/source data\nPASS Real conversion keeps baked detail separate from intrinsic planes and authentic attribute provenance\nPASS Actual converted native frame remains within unchanged image bound\nPASS Actual worker Clear Bake removes converted detail and restores genuine original shading\nPASS Clear drops active field but retains complete original normal/material/deformation provenance\nPASS Actual owning writer declares separate Scene33/material15 capabilities\nPASS Owning decoder replays exact normal history and preserves complete native Scene\nPASS Restart preserves one genuine shared original paint/frame origin across current material and baked field\nPASS Actual ordered Document Save/restart retains exact layered normals and material/source data\nPASS Clear Undo restores exact converted shading\nPASS Clear Redo restores exact intrinsic shading\nCLEAR variant=0 conversion_error=0 clear_error=0\nPASS Actual owning writer declares separate Scene33/material15 capabilities\nPASS Owning decoder replays exact normal history and preserves complete native Scene\nPASS Restart preserves one genuine shared original paint/frame origin across current material and baked field\nPASS Actual ordered Document Save/restart retains exact layered normals and material/source data\nPASS Real conversion keeps baked detail separate from intrinsic planes and authentic attribute provenance\nPASS Actual converted native frame remains within unchanged image bound\nPASS Actual worker Clear Bake removes converted detail and restores genuine original shading\nPASS Clear drops active field but retains complete original normal/material/deformation provenance\nPASS Actual owning writer declares separate Scene33/material15 capabilities\nPASS Owning decoder replays exact normal history and preserves complete native Scene\nPASS Restart preserves one genuine shared original paint/frame origin across current material and baked field\nPASS Actual ordered Document Save/restart retains exact layered normals and material/source data\nPASS Clear Undo restores exact converted shading\nPASS Clear Redo restores exact intrinsic shading\nCLEAR variant=7 conversion_error=1 clear_error=0\nPASS Actual partial Bake agrees with legacy original in projected and missed regions, including after Clear\nPASS Partial rebake of the same direction preserves the actual previous field\nPASS Rebake uses current resolved detail or genuine cleared intrinsic baseline without resurrecting old bake\nPASS Actual owning writer declares separate Scene33/material15 capabilities\nPASS Owning decoder replays exact normal history and preserves complete native Scene\nPASS Restart preserves one genuine shared original paint/frame origin across current material and baked field\nPASS Actual ordered Document Save/restart retains exact layered normals and material/source data\nREBAKE clear_first=0 legacy_error=1 prior_error=1\nPASS Actual partial Bake agrees with legacy original in projected and missed regions, including after Clear\nPASS Rebake uses current resolved detail or genuine cleared intrinsic baseline without resurrecting old bake\nPASS Actual owning writer declares separate Scene33/material15 capabilities\nPASS Owning decoder replays exact normal history and preserves complete native Scene\nPASS Restart preserves one genuine shared original paint/frame origin across current material and baked field\nPASS Actual ordered Document Save/restart retains exact layered normals and material/source data\nREBAKE clear_first=1 legacy_error=1 prior_error=6\nPASS Existing Scene31 remains readable without silent reinterpretation\nPASS Actual owning writer declares separate Scene33/material15 capabilities\nPASS Owning decoder replays exact normal history and preserves complete native Scene\nPASS Restart preserves one genuine shared original paint/frame origin across current material and baked field\nPASS Actual ordered Document Save/restart retains exact layered normals and material/source data\nPASS Explicit legacy command removes false intrinsic ownership while retaining original source\nPASS Existing Scene31 remains readable without silent reinterpretation\nPASS Actual owning writer declares separate Scene33/material15 capabilities\nPASS Owning decoder replays exact normal history and preserves complete native Scene\nPASS Restart preserves one genuine shared original paint/frame origin across current material and baked field\nPASS Actual ordered Document Save/restart retains exact layered normals and material/source data\nPASS Explicit legacy command removes false intrinsic ownership while retaining original source\nPASS Relabeling the outer Scene cannot grant independent normal authority\nPASS Historical material cannot acquire layered capabilities by relabeling\nPASS Oversized original-owner references cannot wrap to a valid identity\nPASS Forged canonical quality receipt fails actual original-source replay\nPASS Cyclic normal-field history fails preflight\nPASS Historical detail cannot be relabeled as a cleared intrinsic baseline\nPASS Unreachable owning field records are rejected\nPASS Malformed independent graphs preserve complete live document and exact retry\nPASS Independent prepared source cannot bypass genuine source-frame transport or mutate either object\n"
+        },
+        "forced-software.log": {
+          "sha256": "c388acb8f99f65ef90078ab7e3ce0adf7439c9c7221cc2d584df886e3ec8f70a",
+          "text": "Native XR graphics: windowless EGL 1.5\nACTUAL_RENDERER llvmpipe (LLVM 22.1.8, 256 bits)\nFAIL Actual native worker/render consumer uses the explicitly required renderer\n"
+        }
+      }
+    }
+  },
+  "source_role_counterexample": {
+    "log": "ACCEPTED_PREPARED_SOURCE projected=650\n",
+    "sha256": {
+      "probe.cpp": "beeaf81c8ecf68bb67ca575e1782ab75be25a77eeff43c9d5c94ca7383db89d7",
+      "compile.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "probe.o": "a8eb21b851d299cbc3a2bb429f62a9def84861ed54278403674afe4266640f4a",
+      "link.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "probe": "bcf829a6ca44f1e9e7fe2fa8334011e0c28581cdbca47be37b9af5095e312afb",
+      "native.log": "d77b625b23cc9047ea6a5d9c6e05199e4734eb62c506c378eaa5aaa0897acc3d"
+    },
+    "actual_result": "Unfixed real prepared source was accepted with650projected texels; this proves policy bypass, not a measured source-image error."
+  },
+  "fixture_scope": "Three original binary files were initially ignored by global *.dsculpt and omitted from fresh build tracking. They matched the immutable tracked manifest/provenance from initial copy; guard continuation force-tracks all three and hashes actual fixture bytes in both profiles andArc. No binary/header archive mixing; fresh1ce proof and final2792 guard proof are composed, not relabeled as a fresh final ALL build.",
+  "remaining": [
+    "Full scene-codec/caller allocation and cancellation qualification",
+    "Prepared-source Bake frame transport remains unfinished and explicitly refused",
+    "UV/typed/corner/current native captured-frame conversion and source-role adapters",
+    "New desktop/Wayland/OpenXR controls and independent GLB/VRM/devices and coherent agent/main integration",
+    "Full original production objective and later controller drawers"
+  ]
+}
