@@ -1,0 +1,17 @@
+{
+  "main_merge": "ae075b199ae25d80fbc8ae4ce33345521c631a21",
+  "qualified_seal": "4b37f119f5c5274b118aa5a55ec8e5a689ef809f",
+  "qualified_runtime": "1d573f2aa1f17f83bcc78533e130627c607fcf48",
+  "product_files": 1326,
+  "product_tree_exact_at_merge": true,
+  "local_parity_manifest_sha256": "4415c253d0d2722dafba2f708c9a3058c526104cfad73e3fedeb89e7fe2c115c",
+  "validation": "Fresh optimized ALL1397, fresh ownSAN276, selected32 each; actual native/compact/Wayland/synthetic-loader UI65 each. See COHERENT-AUTHORING-BUILDS.json and CURRENT-AUTHORING-UI.json.",
+  "test_format_cleanup": [
+    "tests/emission-controls-menu.py",
+    "tests/native-physical-menu.py",
+    "tests/vrm1-background-consumer.hpp",
+    "tests/vrm1-expression-consumer.hpp"
+  ],
+  "cleanup_verification": "git diff --ignore-space-at-eol --exit-code on these four paths succeeds; no runtime implementation edit. Inherited trailing whitespace found during merge is removed.",
+  "remaining": "Full689 regression remains live on exact frozen qualified source. Next1f/709 registered/52selected, standalone skin117, rigRestore3ec, EXR e29 and later VRM/HDR/rig adapters are separate until combined. Full production incomplete. No install/HMD/session action."
+}

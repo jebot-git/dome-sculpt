@@ -1,17 +1,97 @@
-# Current private authoring progress — 2026-11-04
+# Current production progress — 2026-11-05
 
-This documentation checkpoint does not admit new runtime code. The full production objective remains active and incomplete; controller drawers remain required after the basic targets.
+The full Dome Sculpt objective remains active and incomplete. The accepted XR
+selection interface is preserved. Controller drawers remain required after the
+basic authoring targets. Animation and final scene rendering remain excluded.
 
-The native converted-normal UV milestone is pushed at [f2dc466](https://github.com/jebot-git/dome-sculpt/tree/f2dc46652947365af65312a99d610e303dc85bf5). It implements actual UV Apply/Cancel/history/ordered Save, Scene34/material16 correspondence, retained GPU coordinates, independent GLB export, Clear and root-domain rebake. Scoped Release/sanitizer qualification includes225 new workflow assertions each, actualArc226,324 Khronos files with zero errors and108 identical profile/device triples,15 normal/15 compact native menu checks per profile,20 synthetic OpenXR checks per profile, and real archive5,439 decoder/8,959 encoder allocation-denial prefixes plus24 cancellation polls per profile. Read its [full evidence and limitations](https://github.com/jebot-git/dome-sculpt/blob/f2dc46652947365af65312a99d610e303dc85bf5/docs/LAYERED-NORMAL-UV-NATIVE.md). Default-cache/C allocation/caller/IO, physical headset and GPU-baking claims are excluded. The fresh complete optimized ALL build finishes1,243 tasks successfully. Its original registered full630 regression is running (61 passed at the latest process/log observation) and has not passed overall.
+The combined foundation is integrated on main at ae075b1. All 1,326 tracked
+code/build/test/asset files match the qualified tree at that merge; the following
+cleanup changes only trailing whitespace in four test files.
 
-A separate direct original-source audit is pushed at [9dabf78](https://github.com/jebot-git/dome-sculpt/blob/9dabf78887545aff7d9edadc5167c218735537d1/docs/CANONICAL-DEFORMED-SOURCE-AUDIT.md). Four of nine curved skin/morph states differ from original legacy canonical shading beyond the unchanged4 image limit, maximum9, in both profiles. The UV milestone compares against the already converted pre-UV scene and does not resolve this original-source conversion gap. The predating [conversion contract](https://github.com/jebot-git/dome-sculpt/blob/f2dc46652947365af65312a99d610e303dc85bf5/docs/CANONICAL-NORMAL-CONVERSION.md) explicitly authors a new portable normal/tangent target model and disclaims equality with legacy dynamic evaluation at every pose. Treating this different-model measurement as a new regression gate was too broad. Preserve the measured images; the actual within-model UV/glTF bound4 remains unchanged. The qualified [portable model UI milestone](https://github.com/jebot-git/dome-sculpt/tree/e1ed5259cd9d53f78f0f75ec16fc137213568a01) now makes target authoring and rest-space quality explicit: actual normal/compact12+12, nested Wayland11 and actual-loader syntheticXR30 each Release/sanitizer. Screenshot review found and repaired a clipped compact quality label. No shading math or archive change.
+The qualified combined foundation is [4b37f11](https://github.com/jebot-git/dome-sculpt/tree/4b37f119f5c5274b118aa5a55ec8e5a689ef809f), with runtime source 1d573f2. Fresh optimized Release ALL completes 1,397
+build tasks; the separate owning sanitizer application/core/render/support and
+selected consumers complete 276. All 32 selected integration tests pass in each
+profile, with exact recorded inputs. Actual current native normal and compact
+windows, nested DomeD Wayland menus/history, and synthetic OpenXR controls pass
+65 checks per profile (12 + 12 + 11 + 30). The compact bitmap dialog was visually
+inspected. See validation/CURRENT-AUTHORING-UI.json and the foundation's
+COHERENT-AUTHORING-BUILDS.md. The complete 689-test Release regression is running
+in explicit batches; it is not yet a full-suite pass.
 
-The native32 painting/export milestone [7a24ea2](https://github.com/jebot-git/dome-sculpt/tree/7a24ea2c5fd4b0a032ebb04e179bee5dbf95950a) has fresh owning Release/sanitizer application and selected regression, actual Arc, native menu/controller, native recovery, independent consumer and allocation-failure evidence. It remains separate from normal34; emission package3 and broader material/normal/key adapters are ongoing.
+The next source 1f4f55c combines the genuine repository-backed anatomical fixture
+chain and shared-shade VRM expressions with that foundation. Its fresh optimized
+application/core/render/support build completes 294 tasks and all 52 selected
+tests pass, including all 17 female/male/caller anatomical endpoints. Its separate
+fresh sanitizer build and selected tests remain running. The graph has 709
+registered tests. New private expression fields require matching dependent TUs;
+this candidate rebuilds the complete owning cohort. It is not a full 709-test
+runtime result. The [frontend-off correction 26a0704](https://github.com/jebot-git/dome-sculpt/tree/26a0704) separately passes a fresh 191-task offscreen build and four real tests;
+default frontend commands/properties remain identical. FLTK remains the default.
 
-The anatomical linked-pose repair [04e6670](https://github.com/jebot-git/dome-sculpt/tree/04e6670f75a9f390c9e29e14127c42c47eecfbfe) fixes the real10/19 partial-pose counterexample and passes51 checks per actual avatar/profile on matching module builds. Its allocation sampling is explicitly partial. Qualified [native rig UI](https://github.com/jebot-git/dome-sculpt/tree/04e3268cce7b714ec9a2f660f8bab05fd8ab9552) adds34 normal/34 compact checks and independent current-pose export evidence. Full locked-weight rebinding remains under repair; new packing/replay work is not yet sealed. The qualified [VRM1 dynamic painted expression milestone](https://github.com/jebot-git/dome-sculpt/tree/c2f1705f07351bbb9633eca552667d23e1f5bfac) now has actual worker44, independent render112, factory1556 and Arc113 checks. All15 actual native-writer containers have zero Khronos errors; five inherited raw controls retain20 empty-child-array errors. Broader typed/material/normal/prepared adapters remain.
+The [mixed foundation 1299fb4](https://github.com/jebot-git/dome-sculpt/tree/1299fb4) preserves actual portable-normal and native-paint owners together in
+Scene35/material17. Append in both orders, UV editing, Clear/rebake, persistence,
+editable export/recovery and history pass 152 checks each Release/sanitizer/Arc.
+These scenes combine distinct normal and native-paint objects; this does not
+claim all same-object combinations. The 48 Khronos files have zero errors,
+30 retained warnings and 150 infos. Five actual mixed archive files pass 12,149
+decoder and 24,003 encoder persistent C++ denial prefixes plus 84 load-cancellation
+polls per profile. Default-cache, C, caller and I/O scopes remain separate.
+Original failed invocations and subsequent fixture corrections are preserved in
+COHERENT-AUTHORING-MIXED-REPAIR.md; none is relabeled green.
 
-A new [authentic native source-pose producer](https://github.com/jebot-git/dome-sculpt/blob/f80678f/docs/CANONICAL-NATIVE-POSE.md) now matches original POSITION/NORMAL/Mikk directions exactly through18 curved skin/morph/UV states and108 corners per profile;44 checks,161 persistent C++ allocation prefixes and16 cancellation polls pass each Release/sanitizer. It is a source-basis helper, with no new renderer/schema admission.
+The [new native-paint skin export milestone ee5c2e5](https://github.com/jebot-git/dome-sculpt/tree/ee5c2e5) carries genuine reordered-vertex skin weights, pose and inverse binds through
+the independent paint-coordinate export. The final consumer passes 117 checks
+each Release, sanitizer and actual PCI03 Arc A770. Independent posed positions
+match within 8.43e-8 metres; native/portable pixels match within each device.
+Editable GLBs recover the original project. All 12 successful GLBs have zero
+Khronos errors, 12 warnings and 24 infos; cross-device PNG differences are at most
+one. Complete affected TUs and five whole consumers use exact owning current
+support. An original final mixed-test invocation omitted required arguments;
+its error is preserved and separate corrected mixed152/app-version checks pass.
+Actual curved morph export still refuses its missing shading adapter while
+preserving the prior file and subsequent native Save. Read the milestone's
+NATIVE-PAINT32-SKIN-EXPORT.md for scope. Post-bind UV/key composition remains work.
 
-A new [combined authoring draft](https://github.com/jebot-git/dome-sculpt/tree/44efeb7fec2d79a820a1a64b04c70affb192edf3) merges normalUV34, native32 painting/export, VRM1 expression authoring, anatomical linked-pose controls and the qualified portable model UI. Scene35/material17 represents genuine simultaneous native/canonical capabilities, with actual pool replay and downgrade/refusal guards. Its new mixed workflow test exercises native append, Save/restart, editable export, independent images, deletion back to minimal format and worker UV history. Fresh owning Release/sanitizer app/core/render/support plus selected consumers are currently compiling; neither the draft nor the new test is declared qualified. Initial test-driver command discovery failed before compilation and is retained separately; the corrected run reads actual generated CMake command records.
+Ordinary skin Transfer exposed six genuine Restore failures: binding preserved
+paint but failed to capture the first complete rig source. The [first-source repair 3ecda66](https://github.com/jebot-git/dome-sculpt/tree/3ecda6637175fb6d6c3a13a5e9ce8389edf8fb96)
+changes one production TU and passes 164 owning/history checks and 1,424 worker
+checks per profile, including all measured small-fixture helper failures, real
+mid-helper Cancel, stale-generation discard and dependent Save. Broader legacy
+and original-source controls also pass. Actual native32 post-bind UV and key
+editing are the next adapter work. Scene36/material18 is reserved for genuine
+native-paint/key-frame composition if required; version numbers alone grant no
+authority.
 
-Next finish the coherent builds and actual mixed tests, close each lane's remaining gates, and qualify the final combined cohort before runtime admission. A passing older620 run, a scoped component pass or a configured630 graph cannot establish a green latest combined candidate. Broader original/additional requirement rows remain unfinished. No installation, physical-headset test or session restart is included in this documentation checkpoint.
+The [HDR ownership repair e29defb](https://github.com/jebot-git/dome-sculpt/tree/e29defb1bd24489d8ee02dc43cad8eab11db61cf) closes the reproduced OpenEXR constructor failure using owned Core contexts and
+pipelines. Fresh 227-task application/core/render/support builds and all 12
+selected tests pass each Release/sanitizer. The actual public denial overlay
+passes 3,868 prefixes per profile without leaks; complementary raw context
+allocator sweeps cover 114 measured prefixes. All 170 common GLBs remain exact
+to the functional parent, including 92 previously validated successes. The
+original 5,736-byte/142-allocation leak remains preserved. No suppressions,
+disabled failures or increased caps are used. Actual current canonical-normal,
+UV, key and physical-emission composition is being implemented in a new child.
+
+Typed VRM1 expression work includes qualified [colour-only 5310](https://github.com/jebot-git/dome-sculpt/tree/5310acba0495384e3ba654d70355f95a9e28c201) and
+[shared-shade ccc109e](https://github.com/jebot-git/dome-sculpt/tree/ccc109e540704121d5dc439c407efe7bd439b20d) milestones with independent Release/sanitizer/Arc evidence. A further
+UV-invariant upper-role adapter now passes its actual worker, mixed-expression
+image and failure/cancellation checks in Release/sanitizer; hardware and final
+schema/cohort sealing are in progress. Full MASK/BLEND, wider coefficient and
+remaining role adapters stay required. The separate original long source-world
+sanitizer sweep remains live and incomplete.
+
+The original frozen f2 full630 invocation ended 143 after 131 passing tests and
+no final summary. Its original partial log and stale running-status file are
+preserved. A separately named exact-source continuation runs remaining tests
+132–630 after verifying source/SDK/application/archive hashes. Neither the
+partial run nor that continuation is called a complete original invocation.
+The newer current 689-test run is separate.
+
+The [legacy/portable deformation audit 9dabf78](https://github.com/jebot-git/dome-sculpt/tree/9dabf78887545aff7d9edadc5167c218735537d1) retains four curved-state differences above four, maximum nine. The predating
+conversion contract explicitly authors a portable normal/tangent model and
+disclaims legacy equality at every pose; this is a different-model comparison.
+The within-model bound remains four. [Portable model controls e1ed525](https://github.com/jebot-git/dome-sculpt/tree/e1ed5259cd9d53f78f0f75ec16fc137213568a01) make this authoring choice and rest-space quality explicit and retain the
+source. Broader normal/key/corner/typed/prepared/rig adapters, full interoperation,
+complex GPU workloads, production-scale and physical-device workflows remain
+required. No installation, physical-headset launch or active-session restart is
+included in these milestones.

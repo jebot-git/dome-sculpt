@@ -1,5 +1,35 @@
 # Dome Sculpt production handoff
 
+## Qualified combined authoring foundation — 2026-11-05
+
+Foundation4b37f11 completes fresh Release ALL1397 and owning SAN276 builds;
+selected32 and actual native/compact/Wayland/syntheticXR65 pass each profile.
+Current full689 regression remains running. Next1f completes owning Release294
+and52/52 including real repository anatomical17; SAN remains live. Skin export
+117R/S/Arc, first-rig Restore3ec and owned EXR e29 are separately qualified and
+queued for combined integration. Read PRIVATE-AUTHORING-PROGRESS.md for exact
+scopes, retained failures, ongoing VRM/HDR/rig adapters and original f2 continuation.
+Full production and controller drawers remain incomplete; no install/HMD/session
+action is included.
+
+## Repaired mixed workflows and new coherent build — 2026-11-04
+
+Private44b actual mixed scene/export/recovery/history passes152 each R/S/Arc;
+48KHR files0errors,33R/S exact pairs,17native/container device triples,PNGmax1.
+Original270-task owning builds0 but27each23/27; preserved follow-up30each28/30
+has two corrected fixture setups (actual mesh owner and camera-framed palette83).
+New1d573f2 includes VRM5310 and bounded rig319/current44; actual freshRALL1397
+and owningSAN276 are running,689registered/32selected, not passed. HDR66e remains
+separate on genuine OpenEXR constructor OOM leaks; proper owning codec work is
+active. Original f2 full630 actually ended143 after131Pass; exact-source132..630
+continuation is separate and live. See PRIVATE-AUTHORING-PROGRESS.md for honest
+scopes. No new main runtime, full-production completion, install or HMD claim;
+all unfinished requirements and deferred drawers remain.
+
+The dated private notes below retain historical observations and restrictions.
+The current qualification and main admission described above supersede their
+stale pending-build or private-only language; full production remains incomplete.
+
 ## Private ordinary rig Restore after authoring — 2026-11-05
 
 Ordinary bind/rebind now stages its complete first source and verifies current

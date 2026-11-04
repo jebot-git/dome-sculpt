@@ -1,0 +1,1062 @@
+{
+  "runtime": "1d573f2aa1f17f83bcc78533e130627c607fcf48",
+  "sealed_builds": "4b37f119f5c5274b118aa5a55ec8e5a689ef809f",
+  "profiles": {
+    "release": {
+      "state": "terminal",
+      "pid": 2779506,
+      "source": "4b37f119f5c5274b118aa5a55ec8e5a689ef809f",
+      "runtime": "1d573f2aa1f17f83bcc78533e130627c607fcf48",
+      "profile": "release",
+      "scope": "Actual current owning application/helper/runtime: native normal+compact portable-normal controls, nested DomeD Wayland universal-menu/history, actual OpenXR loader synthetic stereo/controller. No old app or helper replacement. Private displays/buses; software renderer, no physical HMD/device/main admission. SAN XR private patched Mesa/EGL, not installed or suppressed. Full689 independent source freeze remains.",
+      "steps": [
+        {
+          "name": "normal",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/selection-gui-venv/bin/python",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-coherent-final-44b/tests/portable-normal-model-menu.py"
+          ],
+          "exit_code": 0,
+          "seconds": 26.12962622998748
+        },
+        {
+          "name": "compact",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/selection-gui-venv/bin/python",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-coherent-final-44b/tests/portable-normal-model-menu.py"
+          ],
+          "exit_code": 0,
+          "seconds": 24.915100793994498
+        },
+        {
+          "name": "wayland",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/selection-gui-venv/bin/python",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-coherent-final-44b/tests/layered-normal-wayland.py"
+          ],
+          "exit_code": 0,
+          "seconds": 26.68734881898854
+        },
+        {
+          "name": "xr",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/selection-gui-venv/bin/python",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-coherent-final-44b/tests/layered-normal-xr.py",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-coherent-final-44b/build-coherent-final-release/dome-sculpt",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-coherent-final-44b/build-coherent-final-release/libdome-sculpt-test-runtime.so",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-coherent-final-44b/build-coherent-final-release/dome-sculpt-layered-normal-native-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-coherent-final-44b/artifacts/current-ui/release/xr"
+          ],
+          "exit_code": 0,
+          "seconds": 53.684374498028774
+        }
+      ],
+      "phase": "xr",
+      "child_pid": 2790612,
+      "exit_code": 0,
+      "seconds": 131.41976396198152,
+      "inputs": 2543,
+      "drift": []
+    },
+    "sanitize": {
+      "state": "terminal",
+      "pid": 2779666,
+      "source": "4b37f119f5c5274b118aa5a55ec8e5a689ef809f",
+      "runtime": "1d573f2aa1f17f83bcc78533e130627c607fcf48",
+      "profile": "sanitize",
+      "scope": "Actual current owning application/helper/runtime: native normal+compact portable-normal controls, nested DomeD Wayland universal-menu/history, actual OpenXR loader synthetic stereo/controller. No old app or helper replacement. Private displays/buses; software renderer, no physical HMD/device/main admission. SAN XR private patched Mesa/EGL, not installed or suppressed. Full689 independent source freeze remains.",
+      "steps": [
+        {
+          "name": "normal",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/selection-gui-venv/bin/python",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-coherent-final-44b/tests/portable-normal-model-menu.py"
+          ],
+          "exit_code": 0,
+          "seconds": 40.30832252802793
+        },
+        {
+          "name": "compact",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/selection-gui-venv/bin/python",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-coherent-final-44b/tests/portable-normal-model-menu.py"
+          ],
+          "exit_code": 0,
+          "seconds": 44.060406778997276
+        },
+        {
+          "name": "wayland",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/selection-gui-venv/bin/python",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-coherent-final-44b/tests/layered-normal-wayland.py"
+          ],
+          "exit_code": 0,
+          "seconds": 43.532433222047985
+        },
+        {
+          "name": "xr",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/selection-gui-venv/bin/python",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-coherent-final-44b/tests/layered-normal-xr.py",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-coherent-final-44b/build-coherent-final-sanitize/dome-sculpt",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-coherent-final-44b/build-coherent-final-sanitize/libdome-sculpt-test-runtime.so",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-coherent-final-44b/build-coherent-final-sanitize/dome-sculpt-layered-normal-native-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/authoring-coherent-final-44b/artifacts/current-ui/sanitize/xr"
+          ],
+          "exit_code": 0,
+          "seconds": 90.65430033899611
+        }
+      ],
+      "phase": "xr",
+      "child_pid": 2796669,
+      "exit_code": 0,
+      "seconds": 218.604326620989,
+      "inputs": 2765,
+      "drift": []
+    }
+  },
+  "reports": {
+    "artifacts/authoring-coherent-final-44b/artifacts/current-ui/release/normal/report.json": {
+      "checks": [
+        {
+          "passed": true,
+          "check": "Portable normal authoring settings retain native modal and universal application ownership"
+        },
+        {
+          "passed": true,
+          "check": "DomeD Ctrl+W cancels native model/quality settings with the complete source scene exact"
+        },
+        {
+          "passed": true,
+          "check": "Actual DomeD universal menu exposes enabled native normal conversion"
+        },
+        {
+          "passed": true,
+          "check": "Real menu callback and ordered native Save publish a replayable Scene33 conversion"
+        },
+        {
+          "passed": true,
+          "check": "GUI conversion retains the exact complete original canonical paint"
+        },
+        {
+          "passed": true,
+          "check": "Complete hidden source survives the actual native action unchanged"
+        },
+        {
+          "passed": true,
+          "check": "Editable sparse layers, skin/morph and saved bake recipe remain exact"
+        },
+        {
+          "passed": true,
+          "check": "All other baked channels and coverage survive actual GUI conversion"
+        },
+        {
+          "passed": true,
+          "check": "Already converted target disables duplicate conversion in its actual menu"
+        },
+        {
+          "passed": true,
+          "check": "Standard Ctrl+Z restores the whole original project in one step"
+        },
+        {
+          "passed": true,
+          "check": "Standard Ctrl+Shift+Z restores the exact converted project"
+        },
+        {
+          "passed": true,
+          "check": "Native window command drains workers and closes graphics/fonts normally"
+        }
+      ],
+      "physical_headset": false
+    },
+    "artifacts/authoring-coherent-final-44b/artifacts/current-ui/release/compact/report.json": {
+      "checks": [
+        {
+          "passed": true,
+          "check": "Portable normal authoring settings retain native modal and universal application ownership"
+        },
+        {
+          "passed": true,
+          "check": "DomeD Ctrl+W cancels native model/quality settings with the complete source scene exact"
+        },
+        {
+          "passed": true,
+          "check": "Actual DomeD universal menu exposes enabled native normal conversion"
+        },
+        {
+          "passed": true,
+          "check": "Real menu callback and ordered native Save publish a replayable Scene33 conversion"
+        },
+        {
+          "passed": true,
+          "check": "GUI conversion retains the exact complete original canonical paint"
+        },
+        {
+          "passed": true,
+          "check": "Complete hidden source survives the actual native action unchanged"
+        },
+        {
+          "passed": true,
+          "check": "Editable sparse layers, skin/morph and saved bake recipe remain exact"
+        },
+        {
+          "passed": true,
+          "check": "All other baked channels and coverage survive actual GUI conversion"
+        },
+        {
+          "passed": true,
+          "check": "Already converted target disables duplicate conversion in its actual menu"
+        },
+        {
+          "passed": true,
+          "check": "Standard Ctrl+Z restores the whole original project in one step"
+        },
+        {
+          "passed": true,
+          "check": "Standard Ctrl+Shift+Z restores the exact converted project"
+        },
+        {
+          "passed": true,
+          "check": "Native window command drains workers and closes graphics/fonts normally"
+        }
+      ],
+      "physical_headset": false
+    },
+    "artifacts/authoring-coherent-final-44b/artifacts/current-ui/release/wayland/report.json": {
+      "checks": [
+        {
+          "passed": true,
+          "check": "Actual native Wayland conversion client publishes the Dome Sculpt identity"
+        },
+        {
+          "passed": true,
+          "check": "Actual native Wayland client exports the universal normal-conversion command"
+        },
+        {
+          "passed": true,
+          "check": "Eligible canonical mesh enables its actual Wayland universal-menu action"
+        },
+        {
+          "passed": true,
+          "check": "Actual Wayland callback and ordered Save publish a replayable Scene33 conversion"
+        },
+        {
+          "passed": true,
+          "check": "Actual Wayland conversion retains the complete genuine original canonical paint"
+        },
+        {
+          "passed": true,
+          "check": "Native Wayland conversion preserves sparse layers, skin/morph, recipe and hidden source"
+        },
+        {
+          "passed": true,
+          "check": "All other baked roles and coverage remain exact through the Wayland action"
+        },
+        {
+          "passed": true,
+          "check": "Converted native Wayland target disables duplicate conversion"
+        },
+        {
+          "passed": true,
+          "check": "Actual compositor Ctrl+Z restores the complete original native project"
+        },
+        {
+          "passed": true,
+          "check": "Actual compositor Ctrl+Shift+Z restores the exact converted project"
+        },
+        {
+          "passed": true,
+          "check": "Native Wayland conversion client closes through normal worker/graphics/font teardown"
+        }
+      ],
+      "complete": true,
+      "physical_headset": false
+    },
+    "artifacts/authoring-coherent-final-44b/artifacts/current-ui/release/xr/report.json": {
+      "checks": [
+        {
+          "passed": true,
+          "check": "accept: actual XR application exits normally and ordered native Save drains"
+        },
+        {
+          "passed": true,
+          "check": "accept: actual renderer is explicitly software rather than physical GPU qualification"
+        },
+        {
+          "passed": true,
+          "check": "accept: actual GL stereo images balance ownership and both eyes contain output"
+        },
+        {
+          "passed": true,
+          "check": "accept: both captured real eyes display the open Source/cage controls before conversion input"
+        },
+        {
+          "passed": true,
+          "check": "accept: actual bitmap conversion label is visible in both rendered eyes"
+        },
+        {
+          "passed": true,
+          "check": "accept: original native project bytes remain unchanged"
+        },
+        {
+          "passed": true,
+          "check": "accept: actual joystick and held ray trigger publish exactly the independently produced native conversion"
+        },
+        {
+          "passed": true,
+          "check": "cancel: actual XR application exits normally and ordered native Save drains"
+        },
+        {
+          "passed": true,
+          "check": "cancel: actual renderer is explicitly software rather than physical GPU qualification"
+        },
+        {
+          "passed": true,
+          "check": "cancel: actual GL stereo images balance ownership and both eyes contain output"
+        },
+        {
+          "passed": true,
+          "check": "cancel: both captured real eyes display the open Source/cage controls before conversion input"
+        },
+        {
+          "passed": true,
+          "check": "cancel: actual bitmap conversion label is visible in both rendered eyes"
+        },
+        {
+          "passed": true,
+          "check": "cancel: original native project bytes remain unchanged"
+        },
+        {
+          "passed": true,
+          "check": "cancel: Cancel or focus loss preserves the complete original Scene"
+        },
+        {
+          "passed": true,
+          "check": "focus: actual XR application exits normally and ordered native Save drains"
+        },
+        {
+          "passed": true,
+          "check": "focus: actual renderer is explicitly software rather than physical GPU qualification"
+        },
+        {
+          "passed": true,
+          "check": "focus: actual GL stereo images balance ownership and both eyes contain output"
+        },
+        {
+          "passed": true,
+          "check": "focus: both captured real eyes display the open Source/cage controls before conversion input"
+        },
+        {
+          "passed": true,
+          "check": "focus: actual bitmap conversion label is visible in both rendered eyes"
+        },
+        {
+          "passed": true,
+          "check": "focus: original native project bytes remain unchanged"
+        },
+        {
+          "passed": true,
+          "check": "focus: Cancel or focus loss preserves the complete original Scene"
+        },
+        {
+          "passed": true,
+          "check": "focus: actual loader focus loss/regain crossed while the trigger remained held"
+        },
+        {
+          "passed": true,
+          "check": "solo: actual XR application exits normally and ordered native Save drains"
+        },
+        {
+          "passed": true,
+          "check": "solo: actual renderer is explicitly software rather than physical GPU qualification"
+        },
+        {
+          "passed": true,
+          "check": "solo: actual GL stereo images balance ownership and both eyes contain output"
+        },
+        {
+          "passed": true,
+          "check": "solo: both captured real eyes display the open Source/cage controls before conversion input"
+        },
+        {
+          "passed": true,
+          "check": "solo: actual bitmap conversion label is visible in both rendered eyes"
+        },
+        {
+          "passed": true,
+          "check": "solo: original native project bytes remain unchanged"
+        },
+        {
+          "passed": true,
+          "check": "solo: actual joystick and held ray trigger publish exactly the independently produced native conversion"
+        },
+        {
+          "passed": true,
+          "check": "solo: historical normal detail converts without inventing a live Bake source or recipe"
+        }
+      ],
+      "physical_headset": false
+    },
+    "artifacts/authoring-coherent-final-44b/artifacts/current-ui/sanitize/normal/report.json": {
+      "checks": [
+        {
+          "passed": true,
+          "check": "Portable normal authoring settings retain native modal and universal application ownership"
+        },
+        {
+          "passed": true,
+          "check": "DomeD Ctrl+W cancels native model/quality settings with the complete source scene exact"
+        },
+        {
+          "passed": true,
+          "check": "Actual DomeD universal menu exposes enabled native normal conversion"
+        },
+        {
+          "passed": true,
+          "check": "Real menu callback and ordered native Save publish a replayable Scene33 conversion"
+        },
+        {
+          "passed": true,
+          "check": "GUI conversion retains the exact complete original canonical paint"
+        },
+        {
+          "passed": true,
+          "check": "Complete hidden source survives the actual native action unchanged"
+        },
+        {
+          "passed": true,
+          "check": "Editable sparse layers, skin/morph and saved bake recipe remain exact"
+        },
+        {
+          "passed": true,
+          "check": "All other baked channels and coverage survive actual GUI conversion"
+        },
+        {
+          "passed": true,
+          "check": "Already converted target disables duplicate conversion in its actual menu"
+        },
+        {
+          "passed": true,
+          "check": "Standard Ctrl+Z restores the whole original project in one step"
+        },
+        {
+          "passed": true,
+          "check": "Standard Ctrl+Shift+Z restores the exact converted project"
+        },
+        {
+          "passed": true,
+          "check": "Native window command drains workers and closes graphics/fonts normally"
+        }
+      ],
+      "physical_headset": false
+    },
+    "artifacts/authoring-coherent-final-44b/artifacts/current-ui/sanitize/compact/report.json": {
+      "checks": [
+        {
+          "passed": true,
+          "check": "Portable normal authoring settings retain native modal and universal application ownership"
+        },
+        {
+          "passed": true,
+          "check": "DomeD Ctrl+W cancels native model/quality settings with the complete source scene exact"
+        },
+        {
+          "passed": true,
+          "check": "Actual DomeD universal menu exposes enabled native normal conversion"
+        },
+        {
+          "passed": true,
+          "check": "Real menu callback and ordered native Save publish a replayable Scene33 conversion"
+        },
+        {
+          "passed": true,
+          "check": "GUI conversion retains the exact complete original canonical paint"
+        },
+        {
+          "passed": true,
+          "check": "Complete hidden source survives the actual native action unchanged"
+        },
+        {
+          "passed": true,
+          "check": "Editable sparse layers, skin/morph and saved bake recipe remain exact"
+        },
+        {
+          "passed": true,
+          "check": "All other baked channels and coverage survive actual GUI conversion"
+        },
+        {
+          "passed": true,
+          "check": "Already converted target disables duplicate conversion in its actual menu"
+        },
+        {
+          "passed": true,
+          "check": "Standard Ctrl+Z restores the whole original project in one step"
+        },
+        {
+          "passed": true,
+          "check": "Standard Ctrl+Shift+Z restores the exact converted project"
+        },
+        {
+          "passed": true,
+          "check": "Native window command drains workers and closes graphics/fonts normally"
+        }
+      ],
+      "physical_headset": false
+    },
+    "artifacts/authoring-coherent-final-44b/artifacts/current-ui/sanitize/wayland/report.json": {
+      "checks": [
+        {
+          "passed": true,
+          "check": "Actual native Wayland conversion client publishes the Dome Sculpt identity"
+        },
+        {
+          "passed": true,
+          "check": "Actual native Wayland client exports the universal normal-conversion command"
+        },
+        {
+          "passed": true,
+          "check": "Eligible canonical mesh enables its actual Wayland universal-menu action"
+        },
+        {
+          "passed": true,
+          "check": "Actual Wayland callback and ordered Save publish a replayable Scene33 conversion"
+        },
+        {
+          "passed": true,
+          "check": "Actual Wayland conversion retains the complete genuine original canonical paint"
+        },
+        {
+          "passed": true,
+          "check": "Native Wayland conversion preserves sparse layers, skin/morph, recipe and hidden source"
+        },
+        {
+          "passed": true,
+          "check": "All other baked roles and coverage remain exact through the Wayland action"
+        },
+        {
+          "passed": true,
+          "check": "Converted native Wayland target disables duplicate conversion"
+        },
+        {
+          "passed": true,
+          "check": "Actual compositor Ctrl+Z restores the complete original native project"
+        },
+        {
+          "passed": true,
+          "check": "Actual compositor Ctrl+Shift+Z restores the exact converted project"
+        },
+        {
+          "passed": true,
+          "check": "Native Wayland conversion client closes through normal worker/graphics/font teardown"
+        }
+      ],
+      "complete": true,
+      "physical_headset": false
+    },
+    "artifacts/authoring-coherent-final-44b/artifacts/current-ui/sanitize/xr/report.json": {
+      "checks": [
+        {
+          "passed": true,
+          "check": "accept: actual XR application exits normally and ordered native Save drains"
+        },
+        {
+          "passed": true,
+          "check": "accept: actual renderer is explicitly software rather than physical GPU qualification"
+        },
+        {
+          "passed": true,
+          "check": "accept: actual GL stereo images balance ownership and both eyes contain output"
+        },
+        {
+          "passed": true,
+          "check": "accept: both captured real eyes display the open Source/cage controls before conversion input"
+        },
+        {
+          "passed": true,
+          "check": "accept: actual bitmap conversion label is visible in both rendered eyes"
+        },
+        {
+          "passed": true,
+          "check": "accept: original native project bytes remain unchanged"
+        },
+        {
+          "passed": true,
+          "check": "accept: actual joystick and held ray trigger publish exactly the independently produced native conversion"
+        },
+        {
+          "passed": true,
+          "check": "cancel: actual XR application exits normally and ordered native Save drains"
+        },
+        {
+          "passed": true,
+          "check": "cancel: actual renderer is explicitly software rather than physical GPU qualification"
+        },
+        {
+          "passed": true,
+          "check": "cancel: actual GL stereo images balance ownership and both eyes contain output"
+        },
+        {
+          "passed": true,
+          "check": "cancel: both captured real eyes display the open Source/cage controls before conversion input"
+        },
+        {
+          "passed": true,
+          "check": "cancel: actual bitmap conversion label is visible in both rendered eyes"
+        },
+        {
+          "passed": true,
+          "check": "cancel: original native project bytes remain unchanged"
+        },
+        {
+          "passed": true,
+          "check": "cancel: Cancel or focus loss preserves the complete original Scene"
+        },
+        {
+          "passed": true,
+          "check": "focus: actual XR application exits normally and ordered native Save drains"
+        },
+        {
+          "passed": true,
+          "check": "focus: actual renderer is explicitly software rather than physical GPU qualification"
+        },
+        {
+          "passed": true,
+          "check": "focus: actual GL stereo images balance ownership and both eyes contain output"
+        },
+        {
+          "passed": true,
+          "check": "focus: both captured real eyes display the open Source/cage controls before conversion input"
+        },
+        {
+          "passed": true,
+          "check": "focus: actual bitmap conversion label is visible in both rendered eyes"
+        },
+        {
+          "passed": true,
+          "check": "focus: original native project bytes remain unchanged"
+        },
+        {
+          "passed": true,
+          "check": "focus: Cancel or focus loss preserves the complete original Scene"
+        },
+        {
+          "passed": true,
+          "check": "focus: actual loader focus loss/regain crossed while the trigger remained held"
+        },
+        {
+          "passed": true,
+          "check": "solo: actual XR application exits normally and ordered native Save drains"
+        },
+        {
+          "passed": true,
+          "check": "solo: actual renderer is explicitly software rather than physical GPU qualification"
+        },
+        {
+          "passed": true,
+          "check": "solo: actual GL stereo images balance ownership and both eyes contain output"
+        },
+        {
+          "passed": true,
+          "check": "solo: both captured real eyes display the open Source/cage controls before conversion input"
+        },
+        {
+          "passed": true,
+          "check": "solo: actual bitmap conversion label is visible in both rendered eyes"
+        },
+        {
+          "passed": true,
+          "check": "solo: original native project bytes remain unchanged"
+        },
+        {
+          "passed": true,
+          "check": "solo: actual joystick and held ray trigger publish exactly the independently produced native conversion"
+        },
+        {
+          "passed": true,
+          "check": "solo: historical normal detail converts without inventing a live Bake source or recipe"
+        }
+      ],
+      "physical_headset": false
+    }
+  },
+  "evidence_files": {
+    "artifacts/authoring-coherent-final-44b/artifacts/current-ui/release/normal.log": {
+      "sha256": "a8ced3415f62230124595637705c462654be1c6d8bb8757fc4fc35d54cd3c929",
+      "bytes": 932
+    },
+    "artifacts/authoring-coherent-final-44b/artifacts/current-ui/release/compact.log": {
+      "sha256": "a8ced3415f62230124595637705c462654be1c6d8bb8757fc4fc35d54cd3c929",
+      "bytes": 932
+    },
+    "artifacts/authoring-coherent-final-44b/artifacts/current-ui/release/wayland.log": {
+      "sha256": "3f40cfabcb39c47418e432267bf8c61178f92bdb0060e34a673fe935ad4daeb6",
+      "bytes": 890
+    },
+    "artifacts/authoring-coherent-final-44b/artifacts/current-ui/release/xr.log": {
+      "sha256": "c0f861bb47ddea3ef50607a59f7ef1f019233f5c410d7483ef8a3194e28c7875",
+      "bytes": 2541
+    },
+    "artifacts/authoring-coherent-final-44b/artifacts/current-ui/sanitize/normal.log": {
+      "sha256": "a8ced3415f62230124595637705c462654be1c6d8bb8757fc4fc35d54cd3c929",
+      "bytes": 932
+    },
+    "artifacts/authoring-coherent-final-44b/artifacts/current-ui/sanitize/compact.log": {
+      "sha256": "a8ced3415f62230124595637705c462654be1c6d8bb8757fc4fc35d54cd3c929",
+      "bytes": 932
+    },
+    "artifacts/authoring-coherent-final-44b/artifacts/current-ui/sanitize/wayland.log": {
+      "sha256": "3f40cfabcb39c47418e432267bf8c61178f92bdb0060e34a673fe935ad4daeb6",
+      "bytes": 890
+    },
+    "artifacts/authoring-coherent-final-44b/artifacts/current-ui/sanitize/xr.log": {
+      "sha256": "c0f861bb47ddea3ef50607a59f7ef1f019233f5c410d7483ef8a3194e28c7875",
+      "bytes": 2541
+    },
+    "artifacts/authoring-coherent-final-44b/artifacts/current-ui/sanitize/normal/xvfb.log": {
+      "sha256": "01ef9ea754ecffbc73812d25bc9331cbeb1b8b9f781723c23bafbe959b2a1bc9",
+      "bytes": 800
+    },
+    "artifacts/authoring-coherent-final-44b/artifacts/current-ui/sanitize/normal/app.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/authoring-coherent-final-44b/artifacts/current-ui/sanitize/normal/bake-settings-0.png": {
+      "sha256": "e75828511cd425a8ced21ded06240a69aa84b0fdb39b867d8d6795451d4c5641",
+      "bytes": 18135
+    },
+    "artifacts/authoring-coherent-final-44b/artifacts/current-ui/sanitize/normal/bake-settings-1.png": {
+      "sha256": "b86222e2ff8656a1c3f2826a63ce7b77c6eaddf534251147144089da8b2e7e85",
+      "bytes": 16770
+    },
+    "artifacts/authoring-coherent-final-44b/artifacts/current-ui/sanitize/normal/bake-settings-2.png": {
+      "sha256": "b86222e2ff8656a1c3f2826a63ce7b77c6eaddf534251147144089da8b2e7e85",
+      "bytes": 16770
+    },
+    "artifacts/authoring-coherent-final-44b/artifacts/current-ui/sanitize/normal/bake-settings-3.png": {
+      "sha256": "b86222e2ff8656a1c3f2826a63ce7b77c6eaddf534251147144089da8b2e7e85",
+      "bytes": 16770
+    },
+    "artifacts/authoring-coherent-final-44b/artifacts/current-ui/sanitize/normal/bake-settings-4.png": {
+      "sha256": "b86222e2ff8656a1c3f2826a63ce7b77c6eaddf534251147144089da8b2e7e85",
+      "bytes": 16770
+    },
+    "artifacts/authoring-coherent-final-44b/artifacts/current-ui/sanitize/normal/bake-settings-5.png": {
+      "sha256": "b86222e2ff8656a1c3f2826a63ce7b77c6eaddf534251147144089da8b2e7e85",
+      "bytes": 16770
+    },
+    "artifacts/authoring-coherent-final-44b/artifacts/current-ui/sanitize/normal/bake-settings-6.png": {
+      "sha256": "b86222e2ff8656a1c3f2826a63ce7b77c6eaddf534251147144089da8b2e7e85",
+      "bytes": 16770
+    },
+    "artifacts/authoring-coherent-final-44b/artifacts/current-ui/sanitize/normal/bake-settings-7.png": {
+      "sha256": "b86222e2ff8656a1c3f2826a63ce7b77c6eaddf534251147144089da8b2e7e85",
+      "bytes": 16770
+    },
+    "artifacts/authoring-coherent-final-44b/artifacts/current-ui/sanitize/normal/bake-settings-8.png": {
+      "sha256": "b86222e2ff8656a1c3f2826a63ce7b77c6eaddf534251147144089da8b2e7e85",
+      "bytes": 16770
+    },
+    "artifacts/authoring-coherent-final-44b/artifacts/current-ui/sanitize/normal/bake-settings-9.png": {
+      "sha256": "b86222e2ff8656a1c3f2826a63ce7b77c6eaddf534251147144089da8b2e7e85",
+      "bytes": 16770
+    },
+    "artifacts/authoring-coherent-final-44b/artifacts/current-ui/sanitize/normal/bake-settings-10.png": {
+      "sha256": "b86222e2ff8656a1c3f2826a63ce7b77c6eaddf534251147144089da8b2e7e85",
+      "bytes": 16770
+    },
+    "artifacts/authoring-coherent-final-44b/artifacts/current-ui/sanitize/normal/bake-settings-11.png": {
+      "sha256": "b86222e2ff8656a1c3f2826a63ce7b77c6eaddf534251147144089da8b2e7e85",
+      "bytes": 16770
+    },
+    "artifacts/authoring-coherent-final-44b/artifacts/current-ui/sanitize/normal/before.png": {
+      "sha256": "12219ef000c80c119752370b7c64971116a0ae5acdb5d018116670edd846e7dd",
+      "bytes": 7121
+    },
+    "artifacts/authoring-coherent-final-44b/artifacts/current-ui/sanitize/normal/converted.png": {
+      "sha256": "be0de11b0a9135f07723097cef1a5b4f2162224409e992f9902b270ddcaabc32",
+      "bytes": 7189
+    },
+    "artifacts/authoring-coherent-final-44b/artifacts/current-ui/sanitize/compact/xvfb.log": {
+      "sha256": "01ef9ea754ecffbc73812d25bc9331cbeb1b8b9f781723c23bafbe959b2a1bc9",
+      "bytes": 800
+    },
+    "artifacts/authoring-coherent-final-44b/artifacts/current-ui/sanitize/compact/app.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/authoring-coherent-final-44b/artifacts/current-ui/sanitize/compact/bake-settings-0.png": {
+      "sha256": "6384000cfa85aa20768196b9de95da0b868e9359212e48601c548398e97c6312",
+      "bytes": 5753
+    },
+    "artifacts/authoring-coherent-final-44b/artifacts/current-ui/sanitize/compact/bake-settings-1.png": {
+      "sha256": "d0205b3ca5aad5ebd0c1e41afe57ae9b91e7d6a09f0ed3e6c99623833700ab98",
+      "bytes": 6148
+    },
+    "artifacts/authoring-coherent-final-44b/artifacts/current-ui/sanitize/compact/bake-settings-2.png": {
+      "sha256": "10421a2fcac4324d04b33ae2be39d3cf2b01b266459ce6f0666a139c2fc55e36",
+      "bytes": 5655
+    },
+    "artifacts/authoring-coherent-final-44b/artifacts/current-ui/sanitize/compact/bake-settings-3.png": {
+      "sha256": "d3a89cb3644390999708a66998dee60f1d6387962a0fa19aadf68a6a07997f14",
+      "bytes": 5916
+    },
+    "artifacts/authoring-coherent-final-44b/artifacts/current-ui/sanitize/compact/bake-settings-4.png": {
+      "sha256": "b4f64e69257a7b8d114c8faf769796456a63d250d59249fd6801f26d00bd77f0",
+      "bytes": 5333
+    },
+    "artifacts/authoring-coherent-final-44b/artifacts/current-ui/sanitize/compact/bake-settings-5.png": {
+      "sha256": "a650d0eb3d3eb3b37dbfff091252d8c193d025b701261e7e2d45062a0ed081dd",
+      "bytes": 4332
+    },
+    "artifacts/authoring-coherent-final-44b/artifacts/current-ui/sanitize/compact/bake-settings-6.png": {
+      "sha256": "a650d0eb3d3eb3b37dbfff091252d8c193d025b701261e7e2d45062a0ed081dd",
+      "bytes": 4332
+    },
+    "artifacts/authoring-coherent-final-44b/artifacts/current-ui/sanitize/compact/bake-settings-7.png": {
+      "sha256": "a650d0eb3d3eb3b37dbfff091252d8c193d025b701261e7e2d45062a0ed081dd",
+      "bytes": 4332
+    },
+    "artifacts/authoring-coherent-final-44b/artifacts/current-ui/sanitize/compact/bake-settings-8.png": {
+      "sha256": "a650d0eb3d3eb3b37dbfff091252d8c193d025b701261e7e2d45062a0ed081dd",
+      "bytes": 4332
+    },
+    "artifacts/authoring-coherent-final-44b/artifacts/current-ui/sanitize/compact/bake-settings-9.png": {
+      "sha256": "a650d0eb3d3eb3b37dbfff091252d8c193d025b701261e7e2d45062a0ed081dd",
+      "bytes": 4332
+    },
+    "artifacts/authoring-coherent-final-44b/artifacts/current-ui/sanitize/compact/bake-settings-10.png": {
+      "sha256": "a650d0eb3d3eb3b37dbfff091252d8c193d025b701261e7e2d45062a0ed081dd",
+      "bytes": 4332
+    },
+    "artifacts/authoring-coherent-final-44b/artifacts/current-ui/sanitize/compact/bake-settings-11.png": {
+      "sha256": "a650d0eb3d3eb3b37dbfff091252d8c193d025b701261e7e2d45062a0ed081dd",
+      "bytes": 4332
+    },
+    "artifacts/authoring-coherent-final-44b/artifacts/current-ui/sanitize/compact/before.png": {
+      "sha256": "4d8b27ecd0d0ebbda2f56edd1502239b4e6a8772d335266c08630879b32c0b62",
+      "bytes": 2505
+    },
+    "artifacts/authoring-coherent-final-44b/artifacts/current-ui/sanitize/compact/converted.png": {
+      "sha256": "d877e86f6bee98627cb589ed1c12c75f9e2b9bb6a8d09e183b76dcde24767080",
+      "bytes": 2519
+    },
+    "artifacts/authoring-coherent-final-44b/artifacts/current-ui/sanitize/wayland/xvfb.log": {
+      "sha256": "d236b6348ddfd83fe1d4caa97b7c4b2cf1812f6399d68d81553ef19f904a774d",
+      "bytes": 668
+    },
+    "artifacts/authoring-coherent-final-44b/artifacts/current-ui/sanitize/wayland/compositor.log": {
+      "sha256": "47c280e76026c27173fd7f271a9fdf079123bfdc38c3ea6010a5879741b811ef",
+      "bytes": 1212
+    },
+    "artifacts/authoring-coherent-final-44b/artifacts/current-ui/sanitize/wayland/client.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/authoring-coherent-final-44b/artifacts/current-ui/sanitize/xr/accept.log": {
+      "sha256": "ebfb898452aa05d0af4ac5176c7f2eb8161220154112ac406486367dc6811668",
+      "bytes": 275
+    },
+    "artifacts/authoring-coherent-final-44b/artifacts/current-ui/sanitize/xr/accept.maps": {
+      "sha256": "9b27b1f3db4adc1b54d5e09071d7ef1d0235b649c323d802abf719126781e778",
+      "bytes": 63705
+    },
+    "artifacts/authoring-coherent-final-44b/artifacts/current-ui/sanitize/xr/cancel.log": {
+      "sha256": "7dc296ba103bc5c6730a76d4241c162bcb0cd9515f4ed705c8388ade1c378661",
+      "bytes": 275
+    },
+    "artifacts/authoring-coherent-final-44b/artifacts/current-ui/sanitize/xr/cancel.maps": {
+      "sha256": "bc2c19ada9214ec6cb08c5edc7a015cc9e8ed09504b9530e47c6c020d5d2c0cf",
+      "bytes": 63460
+    },
+    "artifacts/authoring-coherent-final-44b/artifacts/current-ui/sanitize/xr/focus.log": {
+      "sha256": "a8c171e4e03a2a2198f35abf69e119ff462d408606bcd1d1690df4e9717acbd7",
+      "bytes": 275
+    },
+    "artifacts/authoring-coherent-final-44b/artifacts/current-ui/sanitize/xr/focus.maps": {
+      "sha256": "06684cb1a83653d609a63caf77786c1286bb410d2897b238bea9887fefc4562b",
+      "bytes": 51998
+    },
+    "artifacts/authoring-coherent-final-44b/artifacts/current-ui/sanitize/xr/solo.log": {
+      "sha256": "ebfb898452aa05d0af4ac5176c7f2eb8161220154112ac406486367dc6811668",
+      "bytes": 275
+    },
+    "artifacts/authoring-coherent-final-44b/artifacts/current-ui/sanitize/xr/solo.maps": {
+      "sha256": "78720a5fe45c1a04860e05d91dabc08992e91780e7b14b17d2506094ef98404c",
+      "bytes": 51900
+    },
+    "artifacts/authoring-coherent-final-44b/artifacts/current-ui/release/normal/xvfb.log": {
+      "sha256": "d236b6348ddfd83fe1d4caa97b7c4b2cf1812f6399d68d81553ef19f904a774d",
+      "bytes": 668
+    },
+    "artifacts/authoring-coherent-final-44b/artifacts/current-ui/release/normal/app.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/authoring-coherent-final-44b/artifacts/current-ui/release/normal/bake-settings-0.png": {
+      "sha256": "e75828511cd425a8ced21ded06240a69aa84b0fdb39b867d8d6795451d4c5641",
+      "bytes": 18135
+    },
+    "artifacts/authoring-coherent-final-44b/artifacts/current-ui/release/normal/bake-settings-1.png": {
+      "sha256": "b86222e2ff8656a1c3f2826a63ce7b77c6eaddf534251147144089da8b2e7e85",
+      "bytes": 16770
+    },
+    "artifacts/authoring-coherent-final-44b/artifacts/current-ui/release/normal/bake-settings-2.png": {
+      "sha256": "b86222e2ff8656a1c3f2826a63ce7b77c6eaddf534251147144089da8b2e7e85",
+      "bytes": 16770
+    },
+    "artifacts/authoring-coherent-final-44b/artifacts/current-ui/release/normal/bake-settings-3.png": {
+      "sha256": "b86222e2ff8656a1c3f2826a63ce7b77c6eaddf534251147144089da8b2e7e85",
+      "bytes": 16770
+    },
+    "artifacts/authoring-coherent-final-44b/artifacts/current-ui/release/normal/bake-settings-4.png": {
+      "sha256": "b86222e2ff8656a1c3f2826a63ce7b77c6eaddf534251147144089da8b2e7e85",
+      "bytes": 16770
+    },
+    "artifacts/authoring-coherent-final-44b/artifacts/current-ui/release/normal/bake-settings-5.png": {
+      "sha256": "b86222e2ff8656a1c3f2826a63ce7b77c6eaddf534251147144089da8b2e7e85",
+      "bytes": 16770
+    },
+    "artifacts/authoring-coherent-final-44b/artifacts/current-ui/release/normal/bake-settings-6.png": {
+      "sha256": "b86222e2ff8656a1c3f2826a63ce7b77c6eaddf534251147144089da8b2e7e85",
+      "bytes": 16770
+    },
+    "artifacts/authoring-coherent-final-44b/artifacts/current-ui/release/normal/bake-settings-7.png": {
+      "sha256": "b86222e2ff8656a1c3f2826a63ce7b77c6eaddf534251147144089da8b2e7e85",
+      "bytes": 16770
+    },
+    "artifacts/authoring-coherent-final-44b/artifacts/current-ui/release/normal/bake-settings-8.png": {
+      "sha256": "b86222e2ff8656a1c3f2826a63ce7b77c6eaddf534251147144089da8b2e7e85",
+      "bytes": 16770
+    },
+    "artifacts/authoring-coherent-final-44b/artifacts/current-ui/release/normal/bake-settings-9.png": {
+      "sha256": "b86222e2ff8656a1c3f2826a63ce7b77c6eaddf534251147144089da8b2e7e85",
+      "bytes": 16770
+    },
+    "artifacts/authoring-coherent-final-44b/artifacts/current-ui/release/normal/bake-settings-10.png": {
+      "sha256": "b86222e2ff8656a1c3f2826a63ce7b77c6eaddf534251147144089da8b2e7e85",
+      "bytes": 16770
+    },
+    "artifacts/authoring-coherent-final-44b/artifacts/current-ui/release/normal/bake-settings-11.png": {
+      "sha256": "b86222e2ff8656a1c3f2826a63ce7b77c6eaddf534251147144089da8b2e7e85",
+      "bytes": 16770
+    },
+    "artifacts/authoring-coherent-final-44b/artifacts/current-ui/release/normal/before.png": {
+      "sha256": "a7864265e0867b559f45a274cc2d475a0d0a9e5e5a40f443a506f1b426ff25b7",
+      "bytes": 7153
+    },
+    "artifacts/authoring-coherent-final-44b/artifacts/current-ui/release/normal/converted.png": {
+      "sha256": "d6b0e2e00d8cf32dbb24b51f49dc1f57020a110de73cf752984699e340de70d2",
+      "bytes": 7222
+    },
+    "artifacts/authoring-coherent-final-44b/artifacts/current-ui/release/compact/xvfb.log": {
+      "sha256": "d236b6348ddfd83fe1d4caa97b7c4b2cf1812f6399d68d81553ef19f904a774d",
+      "bytes": 668
+    },
+    "artifacts/authoring-coherent-final-44b/artifacts/current-ui/release/compact/app.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/authoring-coherent-final-44b/artifacts/current-ui/release/compact/bake-settings-0.png": {
+      "sha256": "6384000cfa85aa20768196b9de95da0b868e9359212e48601c548398e97c6312",
+      "bytes": 5753
+    },
+    "artifacts/authoring-coherent-final-44b/artifacts/current-ui/release/compact/bake-settings-1.png": {
+      "sha256": "d0205b3ca5aad5ebd0c1e41afe57ae9b91e7d6a09f0ed3e6c99623833700ab98",
+      "bytes": 6148
+    },
+    "artifacts/authoring-coherent-final-44b/artifacts/current-ui/release/compact/bake-settings-2.png": {
+      "sha256": "10421a2fcac4324d04b33ae2be39d3cf2b01b266459ce6f0666a139c2fc55e36",
+      "bytes": 5655
+    },
+    "artifacts/authoring-coherent-final-44b/artifacts/current-ui/release/compact/bake-settings-3.png": {
+      "sha256": "d3a89cb3644390999708a66998dee60f1d6387962a0fa19aadf68a6a07997f14",
+      "bytes": 5916
+    },
+    "artifacts/authoring-coherent-final-44b/artifacts/current-ui/release/compact/bake-settings-4.png": {
+      "sha256": "b4f64e69257a7b8d114c8faf769796456a63d250d59249fd6801f26d00bd77f0",
+      "bytes": 5333
+    },
+    "artifacts/authoring-coherent-final-44b/artifacts/current-ui/release/compact/bake-settings-5.png": {
+      "sha256": "a650d0eb3d3eb3b37dbfff091252d8c193d025b701261e7e2d45062a0ed081dd",
+      "bytes": 4332
+    },
+    "artifacts/authoring-coherent-final-44b/artifacts/current-ui/release/compact/bake-settings-6.png": {
+      "sha256": "a650d0eb3d3eb3b37dbfff091252d8c193d025b701261e7e2d45062a0ed081dd",
+      "bytes": 4332
+    },
+    "artifacts/authoring-coherent-final-44b/artifacts/current-ui/release/compact/bake-settings-7.png": {
+      "sha256": "a650d0eb3d3eb3b37dbfff091252d8c193d025b701261e7e2d45062a0ed081dd",
+      "bytes": 4332
+    },
+    "artifacts/authoring-coherent-final-44b/artifacts/current-ui/release/compact/bake-settings-8.png": {
+      "sha256": "a650d0eb3d3eb3b37dbfff091252d8c193d025b701261e7e2d45062a0ed081dd",
+      "bytes": 4332
+    },
+    "artifacts/authoring-coherent-final-44b/artifacts/current-ui/release/compact/bake-settings-9.png": {
+      "sha256": "a650d0eb3d3eb3b37dbfff091252d8c193d025b701261e7e2d45062a0ed081dd",
+      "bytes": 4332
+    },
+    "artifacts/authoring-coherent-final-44b/artifacts/current-ui/release/compact/bake-settings-10.png": {
+      "sha256": "a650d0eb3d3eb3b37dbfff091252d8c193d025b701261e7e2d45062a0ed081dd",
+      "bytes": 4332
+    },
+    "artifacts/authoring-coherent-final-44b/artifacts/current-ui/release/compact/bake-settings-11.png": {
+      "sha256": "a650d0eb3d3eb3b37dbfff091252d8c193d025b701261e7e2d45062a0ed081dd",
+      "bytes": 4332
+    },
+    "artifacts/authoring-coherent-final-44b/artifacts/current-ui/release/compact/before.png": {
+      "sha256": "04ec4d55aed56ef2c361ea91586df9179f7cedf5f338978f04dd32c5d7a7ce85",
+      "bytes": 2458
+    },
+    "artifacts/authoring-coherent-final-44b/artifacts/current-ui/release/compact/converted.png": {
+      "sha256": "b1af623e023901e58a1f36c668f694c954b63f19ab05ca17c2c4026d0dd2610b",
+      "bytes": 2471
+    },
+    "artifacts/authoring-coherent-final-44b/artifacts/current-ui/release/wayland/xvfb.log": {
+      "sha256": "d236b6348ddfd83fe1d4caa97b7c4b2cf1812f6399d68d81553ef19f904a774d",
+      "bytes": 668
+    },
+    "artifacts/authoring-coherent-final-44b/artifacts/current-ui/release/wayland/compositor.log": {
+      "sha256": "05d137653f65b364498faf0b74885ee6bbca89f380260d7dc7fe7733437af7b7",
+      "bytes": 1212
+    },
+    "artifacts/authoring-coherent-final-44b/artifacts/current-ui/release/wayland/client.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/authoring-coherent-final-44b/artifacts/current-ui/release/xr/accept.log": {
+      "sha256": "ebfb898452aa05d0af4ac5176c7f2eb8161220154112ac406486367dc6811668",
+      "bytes": 275
+    },
+    "artifacts/authoring-coherent-final-44b/artifacts/current-ui/release/xr/accept.maps": {
+      "sha256": "426ef51fbf3a2ade3afdcbd8102a21cfcab8058ba5ebeb4aa4f20de146e9db8d",
+      "bytes": 57939
+    },
+    "artifacts/authoring-coherent-final-44b/artifacts/current-ui/release/xr/cancel.log": {
+      "sha256": "7dc296ba103bc5c6730a76d4241c162bcb0cd9515f4ed705c8388ade1c378661",
+      "bytes": 275
+    },
+    "artifacts/authoring-coherent-final-44b/artifacts/current-ui/release/xr/cancel.maps": {
+      "sha256": "719c15c6c2e20dc588edf5c9007564d97537746d0d965d243b4dbed11f76c2b6",
+      "bytes": 53738
+    },
+    "artifacts/authoring-coherent-final-44b/artifacts/current-ui/release/xr/focus.log": {
+      "sha256": "a8c171e4e03a2a2198f35abf69e119ff462d408606bcd1d1690df4e9717acbd7",
+      "bytes": 275
+    },
+    "artifacts/authoring-coherent-final-44b/artifacts/current-ui/release/xr/focus.maps": {
+      "sha256": "72cd5af57c994398a4ee64c602c872ef76df8ea92a26bf97ef44e975d72e2902",
+      "bytes": 58674
+    },
+    "artifacts/authoring-coherent-final-44b/artifacts/current-ui/release/xr/solo.log": {
+      "sha256": "ebfb898452aa05d0af4ac5176c7f2eb8161220154112ac406486367dc6811668",
+      "bytes": 275
+    },
+    "artifacts/authoring-coherent-final-44b/artifacts/current-ui/release/xr/solo.maps": {
+      "sha256": "1eb80d1f337456ed3bd55c2b4c7cc7580b6144db3f0eb89d5f30e7cb0cda97fd",
+      "bytes": 55416
+    }
+  },
+  "scope": "Actual own current app/helper/runtime,65 checks per profile: normal12,compact12,nestedDomeDWayland11,actual-loader syntheticXR30. Private displays/buses; no physical-headset claim. SANXR uses private patchedMesa/EGL mapping verified, not installed/no suppression. Compact bitmap bake dialog visually inspected.",
+  "limitations": "Not all authoring UI, full689, new709-cohort integration, physicaldevice, accelerator or main-runtime qualification. No system install/session restart."
+}
