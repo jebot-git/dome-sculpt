@@ -1022,7 +1022,10 @@ struct App {
     checked("&Mesh/Plane cut/Cap cut",!cut||cut->settings.cap);
     checked("&Mesh/Plane cut/Flip kept side",cut&&cut->settings.flipped);
     if(expressions){
-      for(int i=0;i<menu.size();++i)if(menu.menu()[i].label()&&!(modes[i]&FL_SUBMENU))modes[i]|=FL_MENU_INACTIVE;
+      const std::array<int,6> native_inputs{menu.find_index("&Edit/Cu&t"),menu.find_index("&Edit/&Copy"),menu.find_index("&Edit/&Paste"),menu.find_index("&Edit/Select &All"),menu.find_index("&Edit/&Undo"),menu.find_index("&Edit/&Redo")};
+      // Preserve the canonical input/focus-derived modes above, including
+      // owned modal fields. The preview excludes other document mutations.
+      for(int i=0;i<menu.size();++i)if(menu.menu()[i].label()&&!(modes[i]&FL_SUBMENU)&&std::find(native_inputs.begin(),native_inputs.end(),i)==native_inputs.end())modes[i]|=FL_MENU_INACTIVE;
       for(auto path:views)enable(path,!modal);
       for(auto path:{"&View/Shading/&Authored material","&View/Shading/&PBR","&View/Shading/&Toon preview"})enable(path,!modal&&s->can_preview);
       for(auto path:{"&View/Expressions/Choose expression...","&View/Expressions/Weight...","&View/Expressions/Weight -","&View/Expressions/Weight +","&View/Expressions/Reset weights"})enable(path,!modal&&!expressions->entries.empty());
