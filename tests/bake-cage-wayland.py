@@ -38,7 +38,7 @@ async def main():
   await wait(lambda:scene()['source']=='wayland');wayland=re.search(r'Dome Wayland socket: (\S+)',(out/'compositor.log').read_text())[1]
   helper=Path(os.environ['DOME_CAGE_HELPER']);project=Path(home,'cage.dsculpt');subprocess.run([str(helper),'--ui-fixture',str(project)],env=env,check=True)
   def inspect():return json.loads(subprocess.check_output([str(helper),'--inspect',str(project)],env=env))
-  original=inspect()['scene'];report=Path(home,'widgets.json');client=start([os.environ['DOME_CAGE_APP'],str(project)],'client',{**env,'WAYLAND_DISPLAY':wayland,'FLTK_BACKEND':'wayland','LD_PRELOAD':os.environ['DOME_CAGE_PROBE'],'DOME_CAGE_WIDGET_REPORT':str(report)},cwd=home)
+  original=inspect()['scene'];report=Path(home,'widgets.json');client=start([os.environ['DOME_CAGE_APP'],str(project)],'client',{**env,'WAYLAND_DISPLAY':wayland,'FLTK_BACKEND':'wayland','LD_PRELOAD':os.environ['DOME_CAGE_PROBE'],'LD_LIBRARY_PATH':os.environ.get('DOME_CAGE_CLIENT_LD_LIBRARY_PATH',env.get('LD_LIBRARY_PATH','')),'DOME_CAGE_WIDGET_REPORT':str(report)},cwd=home)
   def named(title):return next((w for w in scene()['windows'] if title in w['title']),None)
   window=await wait(lambda:named('cage.dsculpt'));(out/'runtime-maps.txt').write_text(Path('/proc/'+str(client.pid)+'/maps').read_text());check(window['app_id']=='org.domed.Sculpt','Native Wayland cage client publishes the Dome Sculpt identity')
   d=display.Display(screen);host=await wait(lambda:next((w for w in d.screen().root.query_tree().children if 'Dome' in str(w.get_wm_name() or '')),None));host.set_input_focus(X.RevertToParent,X.CurrentTime);d.sync();action({'op':'focus','id':window['id']});await asyncio.sleep(.4)
