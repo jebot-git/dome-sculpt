@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <iostream>
 #include <numeric>
+#include <nlohmann/json.hpp>
 #include <limits>
 using namespace dome;
 namespace {
