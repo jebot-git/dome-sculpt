@@ -1,0 +1,80 @@
+{
+  "base": "583353482691607d92fb3d2aac0eafca30a5fc0d",
+  "scope": "Own O3 and assertions-enabled O1 ASan/UBSan/leaks private kernel/test TUs; field tests link read-only matching whole-owned264 instrumented core/support; no full fresh project or native-method admission",
+  "all_source_hashes_exact": true,
+  "tracked_and_explicit_inputs": 1644,
+  "runs": {
+    "bone-planar-node-cull": {
+      "sanitize": {
+        "exit": 0,
+        "seconds": 0.03216433498892002
+      },
+      "release": {
+        "exit": 0,
+        "seconds": 0.0018084550101775676
+      }
+    },
+    "bone-shadow-query-cull-regression": {
+      "sanitize": {
+        "exit": 0,
+        "seconds": 0.11469242599559948
+      },
+      "release": {
+        "exit": 0,
+        "seconds": 0.012187740008812398
+      }
+    },
+    "native-weight-row-anchors": {
+      "sanitize": {
+        "exit": 0,
+        "seconds": 0.1664550140267238
+      },
+      "release": {
+        "exit": 0,
+        "seconds": 0.004999013006454334
+      }
+    },
+    "native-weight-open-stress": {
+      "sanitize": {
+        "exit": 0,
+        "seconds": 2.633768511994276
+      },
+      "release": {
+        "exit": 0,
+        "seconds": 0.20139278497663327
+      }
+    }
+  },
+  "quality_bounds_unchanged": true,
+  "work_cap": 500000000,
+  "open_U_cases_passed": 4,
+  "geometry_controls": 150,
+  "complete_exact_control_queries": 128,
+  "ordinary_new_failure_boundaries": 15,
+  "independent_dense_checks": 30,
+  "old_nearest_checks": 77,
+  "sha256": {
+    "src/bone-shadow-query.hpp": "ed356a05da2ac191ae4ceb9d79064396244bd532a175cf44babe130ff4d16de6",
+    "tests/bone-planar-node-cull.cpp": "dbc0ba8f5713275b5a8ff102131f28e5b8badba5d552649a2f43716673594636",
+    "tests/bone-shadow-query-cull-regression.cpp": "a20ffe1e3d8ce5e364aead5ac21befed886064715bdb85ff6dace92c93877a89",
+    "artifacts/sanitize-before.json": "aec7894852dae6b9e171812c36e259143269206d5488cdfc6796a5e9564b48f1",
+    "artifacts/sanitize-after.json": "aec7894852dae6b9e171812c36e259143269206d5488cdfc6796a5e9564b48f1",
+    "artifacts/sanitize-recipes.json": "f86384f91df3216b53ec2d81d50dd3710b1c4427930f892bd7dca7ae0ce11888",
+    "artifacts/bone-planar-node-cull-sanitize-run.log": "b65d2916622d98f79582da1e25a1d893544e145f4ef09fd7a94a0e6075ca7a34",
+    "artifacts/bone-planar-node-cull-final-run.log": "b65d2916622d98f79582da1e25a1d893544e145f4ef09fd7a94a0e6075ca7a34",
+    "artifacts/bone-planar-node-cull-sanitize": "4d7d29ff9acfe2c173d353372b12a451da99eac3a7cdf22e6f93b91e3e7fbf64",
+    "artifacts/bone-planar-node-cull": "0570d397f774f18a228129d60fa63a948ced10514ad35e539f93eff9826dd063",
+    "artifacts/bone-shadow-query-cull-regression-sanitize-run.log": "e77126f71685989add7bf74b545a52484b0d70354cbe4e78dad33c536fe3586b",
+    "artifacts/bone-shadow-query-cull-regression-final-run.log": "e77126f71685989add7bf74b545a52484b0d70354cbe4e78dad33c536fe3586b",
+    "artifacts/bone-shadow-query-cull-regression-sanitize": "2c65138a060026bca7bffcd4cb6ba24dcefd1352f83da7a25e347fac2a589519",
+    "artifacts/bone-shadow-query-cull-regression": "c06a4c8e17ddac329da5f02dacccf201e68366abdf95d3c450f4ae472babe85f",
+    "artifacts/native-weight-row-anchors-sanitize-run.log": "185cfc33af4c9116c4dd31798a0e45a87108786c0d56f766ee8a24367a629ac0",
+    "artifacts/native-weight-row-anchors-final-run.log": "185cfc33af4c9116c4dd31798a0e45a87108786c0d56f766ee8a24367a629ac0",
+    "artifacts/native-weight-row-anchors-sanitize": "39dd640a4b694ce26698180b3fbe6f58dcbe7c873aaa31405f2b22ce9acf695a",
+    "artifacts/native-weight-row-anchors": "7fafb61c2aaaacdb5a9cd83045b8694aaa750b80388fa1f8d2f3cc1af8eadc37",
+    "artifacts/native-weight-open-stress-sanitize-run.log": "763a59e75652868acbacb66207443626ea861611e95067c4cdeaf74dbfb61609",
+    "artifacts/native-weight-open-stress-final-run.log": "fc6b6082b43bf110aab2d0604c77f5d55be8b4a7f6dbd5155ac3d514f5f15e84",
+    "artifacts/native-weight-open-stress-sanitize": "b41bc492eca0963cff316d2b2bf6e5d7a46da5a0c773ae019d9c362b50f75d43",
+    "artifacts/native-weight-open-stress": "8ef71134368dec3833e5287ffd9d988406ff8c09e5eb2227be005698c2901ac5"
+  }
+}
