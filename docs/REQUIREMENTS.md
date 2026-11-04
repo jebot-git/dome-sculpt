@@ -1,5 +1,18 @@
 # Full objective and completion evidence
 
+## Private authored-view static VRM1 expression graphics — 2026-11-04
+
+Test-only662descendant now qualifies Source4 realpaint +static color/UV/morph
+parameters against an original-input independent GL consumer. Valid-inputR7+94,
+S7+94,strictA77094 and actualregistered2/profile pass; all27viewpairs max1 at
+unchanged4, native restarts0, no-eye reuploads,54R/SpNGs+11native/inputfiles exact.
+ValidinputKHR0errors/5warnings andsixofficialinstances0; oldinvalid-input and
+CPU-prematrix33controls stay separate. No runtime/layout/frontend/main/full617
+claim. Interactive/PBR-background/normal/prepared/absolute-emission and dynamic
+painted-export adapters remain required. Read VRM1-STATIC-EXPRESSION-RENDERING.md
+and its exact receipt; all other unfinished goal requirements remain active.
+
+
 ## Private static VRM1 expression authoring — 2026-11-04
 
 A3 descendant now qualifies pure version-aware weights/binary/override evaluation
