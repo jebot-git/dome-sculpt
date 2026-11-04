@@ -24,12 +24,20 @@ inline std::optional<GeneratedBakedNormalExport> baked_normal_export(
  const auto &mesh=input.mesh;mesh.validate();
  const size_t count=input.deformation&&input.deformation->morphs?input.deformation->morphs->targets.size():0;
  constexpr size_t cap=128*1024*1024;
- size_t bytes=0;
- auto reserve=[&](size_t n,size_t unit){if(bytes>cap||n>(cap-bytes)/unit)throw std::length_error("Baked normal tangent staging exceeds128MiB");bytes+=n*unit;};
- reserve(mesh.indices.size(),sizeof(uint32_t)+sizeof(Vec3)+sizeof(Tangent));
- reserve(mesh.indices.size(),count*2*sizeof(Vec3)+sizeof(Tangent)+3*sizeof(uint32_t));
- reserve(mesh.positions.size(),2*sizeof(Vec3)+sizeof(std::array<float,2>)+sizeof(uint8_t));
  if(count>128)throw std::length_error("Baked normal tangent target count exceeds native limits");
+ size_t bytes=64*1024;
+ auto reserve=[&](size_t n,size_t unit){if(bytes>cap||n>(cap-bytes)/unit)throw std::length_error("Baked normal tangent staging exceeds128MiB");bytes+=n*unit;};
+ // Charge both corner-direction copies, endpoint scratch, worst-case split
+ // geometry, hash/layout storage and all remapped morph channels before work.
+ reserve(mesh.indices.size(),192+count*60);
+ reserve(mesh.positions.size(),64);
+ if(input.deformation){
+  reserve(input.deformation->resource_entries(),sizeof(Vec3));
+  if(input.deformation->skin){
+   reserve(mesh.indices.size(),sizeof(decltype(input.deformation->skin->vertices)::value_type));
+   for(size_t c=0;c<mesh.indices.size();++c){if((c&1023)==0)stop();reserve(input.deformation->skin->vertices.at(mesh.indices[c]).size(),sizeof(decltype(input.deformation->skin->vertices)::value_type::value_type));}
+  }
+ }
  auto directions=std::make_shared<NormalFrames>();directions->transport=NormalFrameTransport::CanonicalMikk;
  directions->generated_tangents=true;directions->generated_uv=0;directions->origin_vertex_count=uint32_t(mesh.positions.size());
  directions->origin_vertices=mesh.indices;directions->tangents=tangent_corners(mesh,cancelled);
