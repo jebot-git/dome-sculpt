@@ -31,10 +31,12 @@ std::vector<uint8_t> bytes(const std::filesystem::path &p){std::ifstream f(p,std
 int main(int argc,char **argv)try{
  if(argc<2||argc>3)return 2;const std::filesystem::path out=argv[1];std::filesystem::create_directories(out);
  const bool negative=argc==3&&std::string_view(argv[2])=="--expect-refusal";
+ NativeGraphics graphics;Fbo fbo;SurfaceRenderer renderer;prepared_normal_consumer::Renderer independent;
  for(bool posed:{false,true}){
   auto scene=skinned_native32(posed);const auto before=scene.encode();Document d;d.replace(scene);
   const auto path=out/(posed?"posed.glb":"rest.glb");
   if(negative){std::string reason;try{d.export_asset(path).get();}catch(const std::exception &e){reason=e.what();}std::cout<<"ORIGINAL_NEGATIVE "<<reason<<'\n';check(reason.find("Native paint export requires")!=std::string::npos,"Old actual public export refuses genuine native32 skin");check(scene.encode()==before&&d.copy_scene().encode()==before,"Original refusal preserves real native32/skin source");continue;}
+  d.shading(false);settled(d);fbo.bind();const auto native_pixels=draw(renderer,d.frame().surface);
   d.export_asset(path).get();check(d.copy_scene().encode()==before,"Actual public skin export retains every original native paint and bind byte");
   prepared_normal_consumer::Model model(path);auto *raw=model.data;check(cgltf_validate(raw)==cgltf_result_success,"Independent emitted skin/accessor hierarchy validation");
   const auto expected=scene.active().deformation->preview(scene.active().painted->mesh());const auto &original=scene.active().painted->mesh();auto coordinates=scene.active().painted->paint_sampling_domain()->corner_coordinates(original);size_t corners=0;float maximum=0,wrong_maximum=0;
@@ -48,8 +50,12 @@ int main(int argc,char **argv)try{
    }
   }
   check(corners==6&&wrong_maximum>.01f,"All corners checked and missing-IBM negative is sensitive");
+  fbo.bind();independent.render(model.data,nullptr);const auto portable_pixels=read();const auto image_error=delta(native_pixels,portable_pixels);check(image_error<=4,"Independent actual skinned native paint pixels meet unchanged4 bound");
+  size_t visible=0;std::set<std::array<uint8_t,4>> colours;for(size_t p=0;p<native_pixels.size();p+=4)if(native_pixels[p+3]){++visible;colours.insert({native_pixels[p],native_pixels[p+1],native_pixels[p+2],native_pixels[p+3]});}check(visible>1000&&colours.size()>8,"Actual skin render has substantial varied visible paint coverage");
+  joint::capture(out/(posed?"posed-native.png":"rest-native.png"),native_pixels);joint::capture(out/(posed?"posed-portable.png":"rest-portable.png"),portable_pixels);
+  auto editable=out/(posed?"posed-editable.glb":"rest-editable.glb");d.export_asset(editable,AssetExportFormat::EditableGlb256).get();auto recovered=extract_native_authoring(bytes(editable));check(recovered&&recovered->encode()==before,"Actual editable GLB recovers exact original skin/native paint graph");
   auto native=out/(posed?"posed.dsculpt":"rest.dsculpt");d.save_async(native).get();check(Scene::load(native).encode()==before,"Following Save/reopen preserves exact native paint and deformation owners");
-  std::cout<<"NATIVE32_SKIN posed="<<posed<<" corners="<<corners<<" max="<<maximum<<" wrong_missing_ibm="<<wrong_maximum<<'\n';
+  std::cout<<"NATIVE32_SKIN posed="<<posed<<" corners="<<corners<<" max="<<maximum<<" image_error="<<image_error<<" wrong_missing_ibm="<<wrong_maximum<<'\n';
  }
  std::cout<<"PASS "<<checks<<" native paint skin export checks\n";return 0;
 }catch(const std::exception &e){std::cerr<<"FAIL "<<e.what()<<'\n';return 1;}
