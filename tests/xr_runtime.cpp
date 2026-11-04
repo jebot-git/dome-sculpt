@@ -699,8 +699,13 @@ FN(EndFrame, XrSession, const XrFrameEndInfo *p) {
       return XR_ERROR_LAYER_INVALID;
     for (int eye = 0; eye < 2; ++eye) {
       auto &v = layer->views[eye];
-      if (v.subImage.imageRect.extent.width != 320 ||
-          v.subImage.imageRect.extent.height != 320 ||
+      auto *swap = reinterpret_cast<Swap *>(v.subImage.swapchain);
+      auto known = std::find_if(chains.begin(), chains.end(),
+                                [swap](const auto &chain) { return chain.get() == swap; });
+      if (known == chains.end() || swap->eye != eye ||
+          v.subImage.imageRect.offset.x != 0 || v.subImage.imageRect.offset.y != 0 ||
+          v.subImage.imageRect.extent.width != int32_t(swap->width) ||
+          v.subImage.imageRect.extent.height != int32_t(swap->height) ||
           std::abs(v.pose.position.x - ((eye ? .032f : -.032f) +
                                         (frame >= 38 && (mirror_mode().empty()&&import_atlas_mode().empty()&&projection_mode().empty()&&rig_fit_mode().empty()) && (polygon_mode().empty()&&corner_uv_mode().empty()) && !selection_fixture() ? -.2f : 0))) > .0001f)
         return XR_ERROR_POSE_INVALID;
