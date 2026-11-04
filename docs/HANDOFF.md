@@ -1,5 +1,19 @@
 # Dome Sculpt production handoff
 
+## Private preserving-only raw HDR continuation — 2026-11-04
+
+Runtime `bcc1923` with final `015fa3c` format tests now qualifies authenticated raw HDR
+Import/view/Save and explicit editable-project export without atlas preparation.
+Matched R7/SAN7, 299 independent consumer checks, 6479 C++ denial prefixes per
+profile,44 new + 44 malloc-null parser boundaries, 122 actual GUI assertions and strict
+A770 raw/atlas/physical checks pass. Canonical sampler/UV/image ownership and
+partial-parser allocation cleanup are real fixes with old negatives preserved.
+Read [RAW-HDR-PRESERVING.md](RAW-HDR-PRESERVING.md) and its receipt for exact
+source/build/metric boundaries. It remains private, not main delivery. Direct raw
+paint and generic native-only/retained physical domains, full interoperability,
+coherent integration and later spatial drawers remain required.
+
+
 ## Private HDR native/controller controls — 2026-11-04
 
 The physical-producer continuation now has actual desktop and controller radiance
