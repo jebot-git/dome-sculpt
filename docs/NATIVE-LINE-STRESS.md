@@ -1,0 +1,5 @@
+# Explicit finite-line stress controls
+
+The existing six thin/open U cases and eight separated/near/exact-contact cases now explicitly select the private finite-line construction, geometry-derived support and authored finite source span. None of the original quality thresholds changed: maximum/mean wrong-limb weights 3%/1%, posed error 6mm/2mm, 500M work and 256MiB workspace. All 14 cases pass. U cases include phase shift, refinement, changed triangulation, reversed faces, one-cell limbs/base and oblique surface. Worst U leakage is .817518%/.226295%, posed1.63504mm/.452578mm. Near/contact fixtures retain every raw row and do not weld coincident disconnected parts.
+
+These two exact test-only TUs use the immutable64a private readers and matching421 core/support archives. Original earlier contact and pointwise failures remain preserved, with no fallback or oracle changes. This is evidence for the declared finite-line construction, not a production/native option or universal robustness claim. Whole solver sanitizer/fault/native gates, general coplanar and interior-only support remain required.
