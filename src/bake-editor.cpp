@@ -20,7 +20,7 @@ public:
   double units=1;
   double physical()const{return logarithmic?bake_distance_from_unit(value()):value()*units;}
   void physical(double v){value(logarithmic?bake_distance_to_unit(v):v/units);}
-  int format(char *buffer)override{return snprintf(buffer,32,fractional?"%.3f":logarithmic?"%.2f":"%.0f",physical());}
+  int format(char *buffer)override{return snprintf(buffer,32,fractional?"%.3f":logarithmic?(physical()>0&&physical()<.01?"%.3g":"%.2f"):"%.0f",physical());}
   int handle(int event)override{
     if(event==FL_MOUSEWHEEL){
       // Nested groups can offer wheel events to an offscreen child. Leave

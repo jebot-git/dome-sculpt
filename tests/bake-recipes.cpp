@@ -8,8 +8,8 @@
 #include "polygon-conversion.hpp"
 #include "dome/shapekey-authoring.hpp"
 int main(int argc,char **argv)try{
-  if(argc==3&&std::string_view(argv[1])=="--ui-fixture"){
-    auto scene=cage_scene(128);bake_object(scene,2,cage_settings());scene.active().painted->clear_bake();scene.save(argv[2]);return 0;
+  if(argc==3&&(std::string_view(argv[1])=="--ui-fixture"||std::string_view(argv[1])=="--ui-wide-fixture")){
+    auto scene=cage_scene(128);auto settings=cage_settings();if(std::string_view(argv[1])=="--ui-wide-fixture"){settings.front_mm=100000;settings.back_mm=0;settings.ao_distance_mm=.00001f;}bake_object(scene,2,settings);scene.active().painted->clear_bake();scene.save(argv[2]);return 0;
   }
   if(argc==3&&std::string_view(argv[1])=="--inspect"){
     auto scene=Scene::load(argv[2]);std::cout<<nlohmann::json{{"scene",scene.encode()},{"sources",cage_sources(scene)},{"baked",bool(scene.active().painted->baked())}}.dump()<<'\n';return 0;
@@ -130,6 +130,18 @@ int main(int argc,char **argv)try{
   require_cage(document.frame().state->bake_settings.front_mm==100&&document.frame().state->bake_source==2&&
     document.frame().state->bake_settings.cage_object==3&&document.copy_scene().encode()==encoded&&!document.frame().state->can_undo,
     "Done applies the full saved settings but never implicitly Bakes or edits the Scene");
+  auto wide=cage_scene();auto wide_options=cage_settings();wide_options.front_mm=100000;wide_options.back_mm=0;wide_options.ao_distance_mm=.00001f;
+  bake_object(wide,2,wide_options);const auto wide_before=wide.encode();document.replace(wide);ready_cage(document);Driver limits(document);limits.open();limits.sector(1);
+  const auto distances=document.frame().state->controls;
+  require_cage(distances.minimum==0&&distances.maximum==100000&&distances.logarithmic&&
+    distances.value[0]==100000&&distances.value[1]==0&&distances.value[2]==wide_options.ao_distance_mm,
+    "Opening XR distance controls preserves the complete native zero/tiny/100000mm recipe domain");
+  limits.confirm();require_cage(document.frame().state->bake_settings.front_mm==100000&&document.frame().state->bake_settings.back_mm==0&&
+    document.frame().state->bake_settings.ao_distance_mm==wide_options.ao_distance_mm&&document.copy_scene().encode()==wide_before&&!document.frame().state->can_undo,
+    "Unchanged XR confirmation preserves every saved distance exactly without Scene or history mutation");
+  limits.sector(1);limits.value(0,0);limits.value(1,1);limits.confirm();
+  require_cage(document.frame().state->bake_settings.front_mm==0&&document.frame().state->bake_settings.back_mm==100000&&document.copy_scene().encode()==wide_before,
+    "Actual controller rays reach exact zero and maximum endpoints without changing the saved Scene");
   document.replace(missing);ready_cage(document);auto frame=document.frame().state;
   require_cage(frame->bake_source==unavailable_bake_object&&frame->bake_settings.cage_object==unavailable_bake_object,
     "Opening missing-dependency recipe cannot fall back to another source or automatic cage");
