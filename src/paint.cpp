@@ -23,6 +23,7 @@
 #include "dome/tangents.hpp"
 #include "paint-color-access.hpp"
 #include "paint-normal-access.hpp"
+#include "baked-normal-field.hpp"
 #include "color-projection-quality.hpp"
 #include <bit>
 #include <cstring>
@@ -1675,6 +1676,42 @@ std::shared_ptr<PaintedMesh> SourceNormalPreparationAccess::adopt_canonical(cons
   if(result->storage_bytes()>128*1024*1024)throw std::length_error("Converted normal planes exceed paint storage budget");
   result->composite_token_=next_composite_token();++result->revision_;stop();return result;
 }
+std::shared_ptr<PaintedMesh> SourceNormalPreparationAccess::adopt_baked_field(const PaintedMesh &source,
+    std::shared_ptr<const detail::BakedNormalField> field,const std::function<bool()> &cancelled){
+  if(cancelled&&cancelled())throw std::runtime_error("Baked normal adoption cancelled");
+  if(!field||source.in_stroke()||source.normal_projection_||!source.baked_||
+      source.baked_->normal_interpretation!=BakedNormalInterpretation::CanonicalMikk||source.baked_->maps.normal.rgba.empty())
+    throw std::invalid_argument("Baked field adoption requires its actual completed canonical before-state");
+  field->validate();
+  if(field->origin()->before_paint()->mesh_owner()!=source.mesh_owner()||field->resolution()!=source.resolution())
+    throw std::invalid_argument("Baked field adoption borrowed another geometry/grid owner");
+  auto result=source.snapshot();auto baked=std::make_shared<BakedTextures>(*source.baked_);
+  baked->maps.normal={};baked->maps.mtoon_normal={};baked->normal_interpretation=BakedNormalInterpretation::PreparedAttributes;
+  baked->normal_field=std::move(field);baked->validate(source.resolution());result->baked_=std::move(baked);
+  if(result->storage_bytes()>128*1024*1024)throw std::length_error("Independent baked normals exceed paint storage budget");
+  result->composite_token_=next_composite_token();++result->revision_;
+  if(cancelled&&cancelled())throw std::runtime_error("Baked normal adoption cancelled");return result;
+}
+std::shared_ptr<const Image> SourceNormalPreparationAccess::canonical_intrinsic(
+    const PaintedMesh &source,const std::function<bool()> &cancelled){
+  if(source.in_stroke()||source.normal_projection_)throw std::invalid_argument("Intrinsic canonical baseline needs finished original paint");
+  auto image=std::make_shared<Image>(blank_image(source.resolution(),true));
+  const PaintSourceMaps empty;const auto &maps=source.source_maps_?*source.source_maps_:empty;
+  std::vector<Tangent> corners;
+  if(maps.normal.image&&maps.normal_scale>0)corners=tangent_corners(source.mesh(),cancelled);
+  for(size_t at=0;at<size_t(source.resolution())*source.resolution();++at){
+    if((at&1023)==0&&cancelled&&cancelled())throw std::runtime_error("Intrinsic canonical baseline cancelled");
+    const auto owner=source.surface_->padding[at];if(owner<0)continue;Vec3 n{0,0,1};
+    if(!corners.empty()){
+      const auto &texel=source.surface_->texels[size_t(owner)];
+      const std::array<float,3> bary{texel.bary[0],texel.bary[1],1-texel.bary[0]-texel.bary[1]};
+      n=tangent_frame(source.mesh(),corners,texel.face,bary).to_tangent(source_texture_normal(source.mesh(),maps,texel.face,bary));
+    }
+    n=length(n)>1e-8f?normalized(n):Vec3{0,0,1};
+    image->rgba[at*4]=byte(n.x*.5f+.5f);image->rgba[at*4+1]=byte(n.y*.5f+.5f);image->rgba[at*4+2]=byte(n.z*.5f+.5f);
+  }
+  return image;
+}
 PaintNormalPreparationResult SourceNormalPreparationAccess::prepare(const PaintedMesh &source,
     const SourceMaterialBindings *binding,const NormalPreparationOptions &options) {
   auto check=[&]{if(options.cancelled&&options.cancelled())throw std::runtime_error("Normal preparation cancelled");};check();
@@ -1816,6 +1853,12 @@ void BakedTextures::validate(uint32_t resolution) const {
       throw std::invalid_argument("Retained normal identity requires prepared detail channels");
     normal_authority->validate(resolution);
   }
+  if(normal_field){
+    normal_field->validate();
+    if(normal_field->resolution()!=resolution||normal_authority||maps.normal_projection||
+       normal_interpretation!=BakedNormalInterpretation::PreparedAttributes||!maps.normal.rgba.empty()||!maps.mtoon_normal.rgba.empty())
+      throw std::invalid_argument("Independent baked normal field has contradictory role/coverage ownership");
+  }
   if (resolution < 64 || resolution > 2048 ||
       coverage.size() != size_t(resolution) * resolution)
     throw std::invalid_argument("Baked coverage differs from the painting surface");
@@ -1829,7 +1872,7 @@ void BakedTextures::validate(uint32_t resolution) const {
 }
 size_t BakedTextures::storage_bytes() const {
   return maps.color.rgba.size() + maps.metal_rough.rgba.size() +
-         maps.emission.rgba.size() + maps.normal.rgba.size() + maps.mtoon_normal.rgba.size()+maps.pbr_color.rgba.size() + coverage.size();
+         maps.emission.rgba.size() + maps.normal.rgba.size() + maps.mtoon_normal.rgba.size()+maps.pbr_color.rgba.size() + coverage.size()+(normal_field?normal_field->retained_bytes():0);
 }
 size_t PaintedMesh::storage_bytes() const {
   size_t result = (baked_ ? baked_->storage_bytes() : 0)+(color_projection_?color_projection_->vertex_rgba->rgba.size():0);
@@ -1864,8 +1907,15 @@ void PaintedMesh::install_bake(BakedTextures incoming,BakedNormalWrite normal_wr
     throw std::invalid_argument("Retained normal identity requires a source-owning field transition");
   if(bool(color_projection_)!=(incoming.color_interpretation==BakedColorInterpretation::ResolvedPbr))
     throw std::invalid_argument("Baked color interpretation must match explicit current color preparation");
-  if(bool(normal_projection_)!=(incoming.normal_interpretation==BakedNormalInterpretation::PreparedAttributes))
+  if(bool(normal_projection_)||incoming.normal_field){
+    if(incoming.normal_interpretation!=BakedNormalInterpretation::PreparedAttributes)
+      throw std::invalid_argument("Baked field/preparation needs prepared normal interpretation");
+  }else if(incoming.normal_interpretation==BakedNormalInterpretation::PreparedAttributes)
     throw std::invalid_argument("Baked normal interpretation must match explicit normal preparation");
+  if(normal_projection_&&incoming.normal_field)throw std::invalid_argument("Independent baked field cannot overwrite genuine intrinsic preparation");
+  if(baked_&&baked_->normal_field&&(!incoming.normal_field||
+      (incoming.normal_field!=baked_->normal_field&&incoming.normal_field->prior()!=baked_->normal_field)))
+    throw std::invalid_argument("Independent normal rebake must retain its actual previous field");
   const bool retained=normal_projection_&&normal_projection_->version==2;
   const bool preserve_normal=normal_write==BakedNormalWrite::PreserveRetained;
   if(preserve_normal&&(!retained||!incoming.maps.normal.rgba.empty()||!incoming.maps.mtoon_normal.rgba.empty()))
@@ -1891,6 +1941,7 @@ void PaintedMesh::install_bake(BakedTextures incoming,BakedNormalWrite normal_wr
     if(baked_->normal_interpretation!=incoming.normal_interpretation)
       throw std::invalid_argument("Different normal interpretations require explicit source-retaining conversion");
     auto merged = *baked_;
+    merged.normal_field=incoming.normal_field;
     if (merged.maps.normal.rgba.empty() && !incoming.maps.normal.rgba.empty())
       merged.maps.normal = blank_image(resolution(), true);
     if(merged.normal_interpretation==BakedNormalInterpretation::PreparedAttributes&&merged.maps.mtoon_normal.rgba.empty()&&!incoming.maps.mtoon_normal.rgba.empty())merged.maps.mtoon_normal=blank_image(resolution(),true);
@@ -2255,7 +2306,9 @@ PaintedMesh::build_composite(const Material &material,const std::function<bool()
   make_coverage(maps->color_coverage,maps->color,9);
   make_coverage(maps->emission_coverage,maps->emission,12);
   maps->baked_base=baked_;
-  if(normal_projection_) {
+  if(baked_&&baked_->normal_field){
+    baked_->normal_field->validate();maps->normal=*baked_->normal_field->pbr();maps->mtoon_normal=*baked_->normal_field->mtoon();
+  }else if(normal_projection_) {
     normal_projection_->validate(r);
     auto field=normal_projection_->version==2?SourceNormalPreparationAccess::resolved(*this):normal_projection_;
     maps->normal=*field->pbr;maps->mtoon_normal=*field->mtoon;
@@ -2350,7 +2403,7 @@ PaintedMesh::build_composite(const Material &material,const std::function<bool()
         pair.first->rgba[a]=byte(value.x*.5f+.5f);pair.first->rgba[a+1]=byte(value.y*.5f+.5f);pair.first->rgba[a+2]=byte(value.z*.5f+.5f);pair.first->rgba[a+3]=255;
       }
     }
-  } else if (!normal_projection_ && baked_ && !maps->normal.rgba.empty()) {
+  } else if (!normal_projection_ && baked_ && !baked_->normal_field && !maps->normal.rgba.empty()) {
     // Protected/fractional coverage keeps original source normal detail. Convert
     // that affine-UV derivative frame into the canonical baked tangent basis.
     std::vector<Tangent> corners;
@@ -2701,6 +2754,7 @@ nlohmann::json PaintedMesh::encode(PaintImageArchive *archive,NormalSamplingArch
     }
   }
   if (baked_) {
+    if(baked_->normal_field)throw std::invalid_argument("Independent baked normal persistence requires its owning Scene33 archive");
     j["baked"] = {{"version", 1},
                     {"color", nlohmann::json::binary(baked_->maps.color.rgba)},
                     {"orm", nlohmann::json::binary(baked_->maps.metal_rough.rgba)},

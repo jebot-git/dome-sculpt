@@ -4,6 +4,7 @@
 #include "deformation-json.hpp"
 #include "polygon-paint-authority.hpp"
 #include "scene-feature-version.hpp"
+#include "baked-normal-field.hpp"
 #include "bake-recipe-remap.hpp"
 #include "source-extra-uv-authority.hpp"
 #include "creator-source-uv-archive.hpp"
@@ -326,6 +327,8 @@ void Scene::validate(bool deep_sources) const {
     detail::polygon_color_owner(o.polygon.get(),preparation.get(),deep_sources);
     const auto normal_projection=o.painted?o.painted->normal_projection():nullptr;
     const auto normal_preparation=o.material_bindings?o.material_bindings->normal_preparation:nullptr;
+    if(o.painted&&o.painted->baked()&&o.painted->baked()->normal_field)
+      detail::source_paint_pairing(o.painted.get(),o.material_bindings.get(),o.appearance.get(),deep_sources);
     if(bool(normal_projection)!=bool(normal_preparation))throw std::invalid_argument("Current normal projection and retained interpretation differ");
     if(normal_projection){
       if(!detail::normal_projection_identity(*normal_projection,*normal_preparation->projection))throw std::invalid_argument("Prepared normal planes are not their recorded current intrinsic field");
@@ -401,6 +404,12 @@ void Scene::validate(bool deep_sources) const {
   normal_frames.storage_bytes();
   for(const auto &binding:source_materials.bindings())
     for(const auto &view:binding->roles)if(view.image)source_images.add(view.image);
+  std::set<const detail::CanonicalNormalConversion*> canonical_origins;
+  for(const auto &binding:source_materials.bindings())if(binding->canonical_attributes&&canonical_origins.insert(binding->canonical_attributes.get()).second){
+    const auto &c=*binding->canonical_attributes;
+    retain_paint(c.before_paint(),true);source_images.add(c.projection()->pbr);source_images.add(c.projection()->mtoon);
+    normal_frames.add(c.frames(),deep_sources);
+  }
   for(const auto &origin:source_materials.origins()) {
     const bool fresh_paint=!retained_paint.contains(origin->paint.get());
     retain_paint(origin->paint,true);if(fresh_paint)origin_vertices+=origin->paint->mesh().positions.size();
@@ -476,6 +485,8 @@ void Scene::validate(bool deep_sources) const {
 }
 nlohmann::json Scene::encode() const {
   validate();
+  for(const auto &o:objects_)if(o.material_bindings&&o.material_bindings->canonical_attributes)
+    throw std::invalid_argument("Canonical attribute persistence requires its owning Scene33 archive");
   bool baked = std::any_of(objects_.begin(), objects_.end(), [](const auto &o) { return o.painted && o.painted->baked(); });
   bool resolved=std::any_of(objects_.begin(),objects_.end(),[](const auto &o){return bool(o.material_bindings) || (!o.mesh_active && bool(o.deformation));});
   bool retopology=std::any_of(objects_.begin(),objects_.end(),[](const auto &o){return bool(o.retopology);});

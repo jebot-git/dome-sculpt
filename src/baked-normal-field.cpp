@@ -52,7 +52,7 @@ std::shared_ptr<const BakedNormalField> BakedNormalField::replace(
   const auto retained=retained_bytes_+node_bytes;
   budget(retained,pixels,18,o);
   auto result=std::shared_ptr<BakedNormalField>(new BakedNormalField);
-  result->origin_=origin_;result->prior_=self_.lock();result->replacements_=replacements_+1;
+  result->origin_=origin_;result->prior_=self_.lock();result->replacements_=replacements_+1;result->intrinsic_baseline_=intrinsic_baseline_;
   result->write_pbr_=std::make_shared<const Image>(incoming.maps.normal);
   result->write_mtoon_=std::make_shared<const Image>(incoming.maps.mtoon_normal);
   result->write_coverage_=incoming.coverage;
@@ -88,11 +88,25 @@ void BakedNormalField::validate() const {
     throw std::invalid_argument("Resolved baked normal field lost its independent full coverage");
   if(!prior_){
     if(replacements_||write_pbr_||write_mtoon_||!write_coverage_.empty()||
-       pbr_!=origin_->projection()->pbr||mtoon_!=origin_->projection()->mtoon)
+       (!intrinsic_baseline_&&(pbr_!=origin_->projection()->pbr||mtoon_!=origin_->projection()->mtoon)))
       throw std::invalid_argument("Initial baked normal field differs from its actual conversion");
   }else{
     if(prior_->origin_!=origin_||replacements_!=prior_->replacements_+1||!write_pbr_||!write_mtoon_||write_coverage_.size()!=coverage_.size())
       throw std::invalid_argument("Baked normal replacement lost its exact input history");
   }
+}
+std::shared_ptr<const BakedNormalField> BakedNormalField::from_intrinsic(
+    std::shared_ptr<const CanonicalNormalConversion> origin,const BakedNormalFieldOptions &o){
+  policy(o);stop(o);
+  if(!origin||!origin->valid_owner(origin))throw std::invalid_argument("Intrinsic baked baseline requires its genuine conversion origin");
+  const auto pixels=size_t(origin->before_paint()->resolution())*origin->before_paint()->resolution();
+  budget(node_bytes,pixels,9,o);
+  NormalPreparationOptions options;options.max_working_bytes=o.max_working_bytes;options.cancelled=o.cancelled;
+  options.max_angular_error=origin->receipt().accepted_angular_error;
+  auto candidate=convert_native_intrinsic_normals({origin->before_paint(),{},origin->before_material(),origin->before_deformation(),{}},options);
+  auto result=std::shared_ptr<BakedNormalField>(new BakedNormalField);
+  result->origin_=std::move(origin);result->pbr_=candidate.projection->pbr;result->mtoon_=candidate.projection->mtoon;
+  result->coverage_.assign(pixels,255);result->retained_bytes_=node_bytes+pixels*9;result->intrinsic_baseline_=true;
+  result->self_=result;result->validate();stop(o);return result;
 }
 } // namespace dome::detail

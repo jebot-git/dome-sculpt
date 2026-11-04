@@ -4,6 +4,7 @@
 #include "normal-bake-encoding.hpp"
 #include "dome/tangents.hpp"
 #include "dome/source-maps.hpp"
+#include "paint-normal-access.hpp"
 namespace dome::detail {
 namespace {
 bool touches(const std::array<std::array<double,2>,3> &t,double left,double bottom,double right,double top){
@@ -33,8 +34,9 @@ NormalBakeBasis extrapolate(const std::array<NormalBakeVertex,3> &v,
   return out;
 }
 }
-CanonicalNormalConversionCandidate convert_native_canonical_normals(
-    const ColorPreparationInput &input,const NormalPreparationOptions &options) {
+static CanonicalNormalConversionCandidate convert_native_normal_grid(
+    const ColorPreparationInput &input,const NormalPreparationOptions &options,
+    std::shared_ptr<const Image> intrinsic) {
   auto stop=[&]{if(options.cancelled&&options.cancelled())
     throw std::runtime_error("Canonical normal conversion cancelled");};stop();
   if(!std::isfinite(options.max_angular_error)||options.max_angular_error<0||options.max_angular_error>.25||
@@ -68,15 +70,15 @@ CanonicalNormalConversionCandidate convert_native_canonical_normals(
   charge(count,corner_bytes);charge(vertices,vertex_bytes);charge(pixels,96);
   auto frames=normal_bake_frame_candidate(mesh,input.deformation.get(),nullptr,
       {128*1024*1024,std::min(size_t(128*1024*1024),options.max_working_bytes),options.cancelled});
-  stop();auto maps=paint.composite(input.material,options.cancelled);
-  if(maps->normal.rgba.empty()||maps->normal_projection||maps->source_only)
+  stop();auto maps=intrinsic?std::shared_ptr<const TextureMaps>{}:paint.composite(input.material,options.cancelled);
+  if(!intrinsic&&(maps->normal.rgba.empty()||maps->normal_projection||maps->source_only))
     throw std::invalid_argument("Canonical conversion lost its actual resolved legacy normal field");
-  maps->normal.validate();
-  if(maps->normal.width!=paint.resolution()||maps->normal.height!=paint.resolution())
+  const auto &grid=intrinsic?*intrinsic:maps->normal;grid.validate();
+  if(grid.width!=paint.resolution()||grid.height!=paint.resolution())
     throw std::invalid_argument("Canonical conversion normal grid differs from its owning paint");
   CanonicalNormalConversionCandidate result;
   const auto target=frames.frames->pbr;
-  auto converted=std::make_shared<Image>(maps->normal);
+  auto converted=std::make_shared<Image>(grid);
   const auto old_tangents=tangent_corners(mesh,options.cancelled);std::vector<uint8_t> visited(pixels);
   const int resolution=int(paint.resolution());
   for(size_t face=0;face<count/3;++face){
@@ -102,7 +104,7 @@ CanonicalNormalConversionCandidate convert_native_canonical_normals(
       const double u=x+.5,v=y+.5;std::array<double,3>bary{
         ((uv[1][1]-uv[2][1])*(u-uv[2][0])+(uv[2][0]-uv[1][0])*(v-uv[2][1]))/det,
         ((uv[2][1]-uv[0][1])*(u-uv[2][0])+(uv[0][0]-uv[2][0])*(v-uv[2][1]))/det,0};bary[2]=1-bary[0]-bary[1];
-      const size_t at=size_t(y)*resolution+x;std::array<uint8_t,4> pixel;std::copy_n(maps->normal.rgba.begin()+at*4,4,pixel.begin());
+      const size_t at=size_t(y)*resolution+x;std::array<uint8_t,4> pixel;std::copy_n(grid.rgba.begin()+at*4,4,pixel.begin());
       const auto desired=normal_bake_evaluate(extrapolate(old_v,bary,false),pixel);
       const auto basis=extrapolate(new_v,bary,true);double error=0;
       if(visited[at]){
@@ -126,5 +128,17 @@ CanonicalNormalConversionCandidate convert_native_canonical_normals(
   result.original_paint=input.paint;result.original_deformation=input.deformation;
   result.target_frames=std::move(frames.frames);result.projection=std::move(projection);
   stop();return result;
+}
+CanonicalNormalConversionCandidate convert_native_canonical_normals(
+    const ColorPreparationInput &input,const NormalPreparationOptions &options){
+  return convert_native_normal_grid(input,options,{});
+}
+CanonicalNormalConversionCandidate convert_native_intrinsic_normals(
+    const ColorPreparationInput &input,const NormalPreparationOptions &options){
+  if(!input.paint)throw std::invalid_argument("Intrinsic baked baseline requires genuine input paint");
+  const size_t bytes=size_t(input.paint->resolution())*input.paint->resolution()*4;
+  if(bytes>=options.max_working_bytes)throw std::length_error("Intrinsic baked baseline exceeds working budget");
+  auto reduced=options;reduced.max_working_bytes-=bytes;
+  return convert_native_normal_grid(input,reduced,SourceNormalPreparationAccess::canonical_intrinsic(*input.paint,options.cancelled));
 }
 } // namespace dome::detail

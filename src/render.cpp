@@ -348,7 +348,7 @@ struct SurfaceRenderer::TextureState {
         }
         if(prepared_normal){PaintSourceTexture view;view.wrap_s=view.wrap_t=GL_CLAMP_TO_EDGE;view.min_filter=view.mag_filter=GL_LINEAR;
           auto image=std::shared_ptr<const Image>(maps,&maps->mtoon_normal);
-          if(maps->normal_projection->version==2){const auto &p=*maps->normal_projection;
+          if(maps->normal_projection&&maps->normal_projection->version==2){const auto &p=*maps->normal_projection;
             image=maps->baked_base&&!maps->baked_base->maps.normal.rgba.empty()?p.sampling_domain->resolved_mtoon:p.mtoon;}
           slot(2,std::move(image),view,false);
         }
@@ -407,7 +407,7 @@ struct SurfaceRenderer::TextureState {
         if(!maps->normal.rgba.empty()){
           if(!prepared_normal&&mesh.tangents.size()!=mesh.mesh.positions.size())throw std::invalid_argument("Normal-mapped snapshots require worker-generated tangent corners");
           auto image=std::shared_ptr<const Image>(maps,&maps->normal);
-          if(prepared_normal&&maps->normal_projection->version==2){const auto &p=*maps->normal_projection;
+          if(prepared_normal&&maps->normal_projection&&maps->normal_projection->version==2){const auto &p=*maps->normal_projection;
             image=maps->baked_base&&!maps->baked_base->maps.normal.rgba.empty()?p.sampling_domain->resolved_pbr:p.pbr;
             view.min_filter=view.mag_filter=GL_LINEAR;}
           slot(3,std::move(image),view,false);
@@ -770,7 +770,7 @@ void SurfaceRenderer::draw(std::shared_ptr<const MeshSnapshot> mesh,
     Material material = original;
     glDepthFunc(GL_LESS);glBlendEquationSeparate(GL_FUNC_ADD,GL_FUNC_ADD);glDisable(GL_SAMPLE_ALPHA_TO_COVERAGE);
     glUniform1i(glGetUniformLocation(program_,"source_frame"),use_source);glUniform1i(glGetUniformLocation(program_,"canonical_frame"),use_canonical);
-    glUniform1i(glGetUniformLocation(program_,"prepared_pbr_frame"),maps&&maps->normal_projection);
+    glUniform1i(glGetUniformLocation(program_,"prepared_pbr_frame"),maps&&(maps->normal_projection||(maps->baked_base&&maps->baked_base->normal_field)));
     glUniform1i(glGetUniformLocation(program_,"paint_domain"),paint_domain||(maps&&maps->overlay&&maps->overlay->original_uv0()));
     glUniform1i(glGetUniformLocation(program_,"retained_normal_domain"),maps&&maps->normal_projection&&maps->normal_projection->version==2);
     const auto overlay=maps?maps->overlay:nullptr;
@@ -803,9 +803,9 @@ void SurfaceRenderer::draw(std::shared_ptr<const MeshSnapshot> mesh,
       constexpr std::array<int,5> slots{7,8,9,10,13};
       for(size_t n=0;n<slots.size();++n){glActiveTexture(GL_TEXTURE0+slots[n]);glBindTexture(GL_TEXTURE_2D,overlay.planes[n]);glBindSampler(slots[n],0);}}
     glUniform1i(glGetUniformLocation(program_,"map_mode"),maps?(maps->source_only?2:1):0);
-    glUniform1i(glGetUniformLocation(program_,"baked_normal"),maps&&!maps->normal_projection&&!maps->normal.rgba.empty());
+    glUniform1i(glGetUniformLocation(program_,"baked_normal"),maps&&!maps->normal_projection&&!(maps->baked_base&&maps->baked_base->normal_field)&&!maps->normal.rgba.empty());
     for(int n=0;n<16;++n){auto name="tex"+std::to_string(n);glUniform1i(glGetUniformLocation(program_,name.c_str()),n);}
-    glUniform1f(glGetUniformLocation(program_,"normal_scale"),maps&&maps->source_maps&&!maps->normal_projection?maps->source_maps->normal_scale:1);
+    glUniform1f(glGetUniformLocation(program_,"normal_scale"),maps&&maps->source_maps&&!maps->normal_projection&&!(maps->baked_base&&maps->baked_base->normal_field)?maps->source_maps->normal_scale:1);
     glUniform1f(glGetUniformLocation(program_,"ao_strength"),maps&&maps->source_maps?maps->source_maps->occlusion_strength:1);
     glUniform1i(glGetUniformLocation(program_, "toon"), !force_pbr&&(toon || material.toon));
     glUniform1i(glGetUniformLocation(program_, "unlit"), material.unlit);

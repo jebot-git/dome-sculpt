@@ -3,6 +3,7 @@
 #include "dome/normal-preparation.hpp"
 #include "dome/color-paint-sampling.hpp"
 #include "normal-projection-identity.hpp"
+#include "baked-normal-field.hpp"
 namespace dome::detail {
 // Call after holder validation. A retained paint needs its OWN interpretation;
 // a current object or a neighboring Origin cannot authenticate that before-state.
@@ -12,6 +13,21 @@ inline void source_paint_pairing(const PaintedMesh *paint,const SourceMaterialBi
   const auto normal=paint?paint->normal_projection():nullptr;
   const auto color_recipe=binding?binding->color_preparation:nullptr;
   const auto normal_recipe=binding?binding->normal_preparation:nullptr;
+  if(paint&&paint->baked()&&paint->baked()->normal_field){
+    const auto &field=paint->baked()->normal_field;field->validate();
+    if(!binding||!binding->canonical_attributes||field->origin()!=binding->canonical_attributes||normal||normal_recipe)
+      throw std::invalid_argument("Baked normal field lost its actual separate attribute origin");
+    if(deep){
+      const auto &before=field->origin()->before_paint()->mesh(),&current=paint->mesh();
+      if(current.indices.size()!=before.indices.size())throw std::invalid_argument("Independent baked normals require their actual ordered surface domain");
+      for(size_t c=0;c<current.indices.size();++c){
+        const auto a=current.indices[c],b=before.indices[c];
+        const auto x=current.positions.at(a),y=before.positions.at(b);
+        if(current.uv.at(a)!=before.uv.at(b)||x.x!=y.x||x.y!=y.y||x.z!=y.z)
+          throw std::invalid_argument("Independent baked normal geometry/UV edits require an owning sampling-domain adapter");
+      }
+    }
+  }
   if(paint&&paint->baked()&&paint->baked()->normal_authority&&
      (!normal||normal->version!=2||!normal_recipe||!normal_recipe->sampling_domain))
     throw std::invalid_argument("Source normal detail identity requires its own complete field replay");

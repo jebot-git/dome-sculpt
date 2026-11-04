@@ -195,7 +195,7 @@ bool needs_independent_key_domain(const SculptObject &o,const ShapeKeyEdit &edit
     const std::function<bool()> &cancelled){
   if(!o.material_bindings||!o.material_bindings->normal_frames||!o.material_bindings->uv_origin)return false;
   if(o.material_bindings->key_derivation)return true;
-  if(o.material_bindings->normal_preparation&&o.material_bindings->normal_preparation->canonical_conversion)return true;
+  if(o.material_bindings->canonical_attributes||(o.material_bindings->normal_preparation&&o.material_bindings->normal_preparation->canonical_conversion))return true;
   const bool vertex_mirror=edit.action==ShapeKeyAction::Mirror&&edit.mirror_frames==ShapeKeyMirrorFrames::VertexPositions;
   if(edit.action==ShapeKeyAction::Mirror&&!vertex_mirror)return true;
   if(edit.action!=ShapeKeyAction::Replace&&!vertex_mirror)return false;

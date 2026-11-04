@@ -19,6 +19,8 @@ class BakedNormalField {
 public:
   static std::shared_ptr<const BakedNormalField> from_canonical(
       std::shared_ptr<const CanonicalNormalConversion>,const BakedNormalFieldOptions & = {});
+  static std::shared_ptr<const BakedNormalField> from_intrinsic(
+      std::shared_ptr<const CanonicalNormalConversion>,const BakedNormalFieldOptions & = {});
   std::shared_ptr<const BakedNormalField> replace(
       const BakedTextures &,const BakedNormalFieldOptions & = {}) const;
   const auto &origin() const noexcept {return origin_;}
@@ -28,6 +30,7 @@ public:
   const auto &normal_coverage() const noexcept {return coverage_;}
   uint32_t resolution() const noexcept {return pbr_->width;}
   uint32_t replacements() const noexcept {return replacements_;}
+  bool intrinsic_baseline() const noexcept {return intrinsic_baseline_;}
   size_t retained_bytes() const noexcept {return retained_bytes_;}
   void validate() const;
 private:
@@ -43,6 +46,7 @@ private:
   std::shared_ptr<const Image> write_pbr_,write_mtoon_;
   std::vector<uint8_t> write_coverage_;
   uint32_t replacements_=0;
+  bool intrinsic_baseline_=false;
   size_t retained_bytes_=0;
 };
 } // namespace dome::detail

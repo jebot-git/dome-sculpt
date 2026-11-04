@@ -16,4 +16,6 @@ struct CanonicalNormalConversionCandidate {
 };
 CanonicalNormalConversionCandidate convert_native_canonical_normals(
     const ColorPreparationInput &,const NormalPreparationOptions & = {});
+CanonicalNormalConversionCandidate convert_native_intrinsic_normals(
+    const ColorPreparationInput &,const NormalPreparationOptions & = {});
 } // namespace dome::detail

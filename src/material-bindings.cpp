@@ -164,6 +164,15 @@ void SourceMaterialBindings::validate(bool deep) const {
     throw std::invalid_argument("Invalid derived material frame or animation provenance");
   if(sampling_reparameterized && !uv_origin)throw std::invalid_argument("Reparameterized sampling requires retained original provenance");
   if(color_preparation)color_preparation->validate(deep);
+  if(canonical_attributes){
+    if(!canonical_attributes->valid_owner(canonical_attributes)||has_mtoon||normal_preparation||
+        normal_frame!=SourceMaterialNormalFrame::OriginalAttributes||!normal_frames)
+      throw std::invalid_argument("Canonical attributes require their genuine separate native provenance");
+    canonical_attributes->validate(deep);
+    if(normal_frames!=canonical_attributes->frames()&&
+       (!key_derivation||!key_derivation->before_material()||key_derivation->before_material()->canonical_attributes!=canonical_attributes))
+      throw std::invalid_argument("Canonical attributes borrowed another current frame owner");
+  }
   if(key_derivation){if(!key_derivation->valid_owner(key_derivation))throw std::invalid_argument("Material key derivation has no genuine owning node lease");if(!normal_frames||!owning_key_ref(key_derivation->frames(),normal_frames)||!owning_key_ref(key_derivation->position_domain(),normal_frames->position_domain))throw std::invalid_argument("Material key derivation lost its own native frame/POSITION authority");key_derivation->validate(deep);}
   if(normal_frames&&normal_frames->position_domain&&!key_derivation)throw std::invalid_argument("Derived native frame POSITION geometry needs an owning material key derivation");
   if(normal_preparation){if(!owning_key_ref(normal_preparation->key_derivation,key_derivation))throw std::invalid_argument("Prepared normal key replay differs from its actual material key derivation");normal_preparation->validate(deep);

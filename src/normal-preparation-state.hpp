@@ -3,8 +3,18 @@
 #include "dome/normal-preparation.hpp"
 #include "normal-projection-identity.hpp"
 #include "normal-sampling-access.hpp"
+#include "baked-normal-field.hpp"
 namespace dome::detail {
 inline bool prepared_normal_state(const SourceMaterialBindings *binding,const TextureMaps *maps,bool deep=false){
+  if(maps&&maps->baked_base&&maps->baked_base->normal_field){
+    const auto &field=maps->baked_base->normal_field;field->validate();
+    if(!binding||!binding->canonical_attributes||binding->canonical_attributes!=field->origin()||
+       maps->normal_projection||binding->normal_preparation||maps->source_only||
+       maps->normal.rgba!=field->pbr()->rgba||maps->mtoon_normal.rgba!=field->mtoon()->rgba||
+       !maps->baked_normal.rgba.empty()||!maps->baked_coverage.rgba.empty())
+      throw std::invalid_argument("Independent baked preview differs from its actual owning resolved field");
+    if(deep)binding->validate(true);return true;
+  }
   const auto recipe=binding?binding->normal_preparation:nullptr;
   const auto projection=maps?maps->normal_projection:nullptr;
   if(bool(recipe)!=bool(projection))throw std::invalid_argument("Normal preview/export lost its owning prepared interpretation");

@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "canonical-normal-owner.hpp"
+#include "baked-normal-field.hpp"
 #include "paint-normal-access.hpp"
 #include "text-utf8.hpp"
 #include <nlohmann/json.hpp>
@@ -124,17 +125,14 @@ NormalPreparationResult convert_canonical_normals(const ColorPreparationInput &i
     const NormalPreparationOptions &options){
   if(input.polygon_colors)throw std::invalid_argument("Canonical corner colour conversion requires its owning adapter");
   const auto owner=detail::CanonicalNormalConversion::create(input,options);
-  auto recipe=std::make_shared<SourceNormalPreparation>();recipe->receipt=owner->receipt();
-  recipe->projection=recipe->initial_projection=owner->projection();recipe->target_frames=owner->frames();
-  recipe->original_paint=owner->before_paint();recipe->original_deformation=owner->before_deformation();
-  recipe->original_material=owner->before_material();recipe->canonical_conversion=owner;
   auto binding=input.material_bindings?std::make_shared<SourceMaterialBindings>(*input.material_bindings):std::make_shared<SourceMaterialBindings>();
   binding->has_mtoon=false;binding->normal_frame=SourceMaterialNormalFrame::OriginalAttributes;
-  binding->normal_frames=owner->frames();binding->normal_preparation=std::move(recipe);
+  binding->normal_frames=owner->frames();binding->normal_preparation.reset();binding->canonical_attributes=owner;
   if(!binding->uv_origin){auto origin=std::make_shared<SourceUvOrigin>();origin->paint=owner->before_paint();origin->deformation=owner->before_deformation();binding->uv_origin=std::move(origin);}
   if(!input.material_bindings){binding->native_reference.color=input.material.color;binding->native_reference.emission=input.material.emissive;
     binding->native_reference.alpha=int(input.material.alpha);binding->native_reference.alpha_cutoff=input.material.alpha_cutoff;binding->native_reference.double_sided=input.material.double_sided;}
-  auto paint=SourceNormalPreparationAccess::adopt_canonical(*owner->before_paint(),owner->projection(),options.cancelled);
+  detail::BakedNormalFieldOptions field_options;field_options.max_working_bytes=options.max_working_bytes;field_options.cancelled=options.cancelled;
+  auto paint=SourceNormalPreparationAccess::adopt_baked_field(*owner->before_paint(),detail::BakedNormalField::from_canonical(owner,field_options),options.cancelled);
   binding->validate();if(options.cancelled&&options.cancelled())throw std::runtime_error("Canonical normal conversion cancelled");
   return {std::move(paint),std::move(binding),true};
 }

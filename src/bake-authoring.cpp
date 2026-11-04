@@ -11,6 +11,7 @@
 #include "dome/source-placement.hpp"
 #include "dome/normal-preparation.hpp"
 #include "normal-bake-encoding.hpp"
+#include "baked-normal-field.hpp"
 namespace dome {
 ObjectBakeReport bake_object(Scene &scene, uint64_t source_id,
                               ObjectBakeSettings settings,
@@ -89,7 +90,7 @@ ObjectBakeReport bake_object(Scene &scene, uint64_t source_id,
     target.painted=std::move(prepared.paint);target.material_bindings=std::move(prepared.material_bindings);converted=prepared.converted;
   }
   bool normal_converted=false;
-  if(settings.prepare_normals&&!target.painted->normal_projection()){
+  if(settings.prepare_normals&&!target.painted->normal_projection()&&!(target.material_bindings&&target.material_bindings->canonical_attributes)){
     auto placement=capture_source_placement(scene,target.id);
     const auto world=placement?CanvasTransform{}:scene.world_transform(target.id);
     detail::strict_polygon_color_target(target,world,cancelled,std::move(placement),current_target);
@@ -129,7 +130,8 @@ ObjectBakeReport bake_object(Scene &scene, uint64_t source_id,
   options.separate_pbr_color=separate;
   options.cancelled = cancelled;
   if(progress)options.progress=[&](float value){progress(.1f+.8f*value);};
-  const bool prepared_normals=bool(target.painted->normal_projection());
+  const auto canonical_attributes=target.material_bindings?target.material_bindings->canonical_attributes:nullptr;
+  const bool prepared_normals=bool(target.painted->normal_projection())||bool(canonical_attributes);
   const bool canonical_captured=!prepared_normals&&detail::capture_new_bake_frame(target,cancelled);
   std::optional<Mesh> low;
   if(prepared_normals){
@@ -137,7 +139,7 @@ ObjectBakeReport bake_object(Scene &scene, uint64_t source_id,
     low.emplace();low->indices.resize(mesh.indices.size());
     for(size_t c=0;c<mesh.indices.size();++c){if((c&1023)==0)check();const auto v=mesh.indices[c];low->indices[c]=uint32_t(c);low->positions.push_back(mesh.positions[v]);low->normals.push_back(frame.normals[c]);low->uv.push_back(mesh.uv[v]);options.low_tangents.push_back(frame.tangents[c]);}
     const auto frames=target.material_bindings->normal_frames;
-    const auto mode=target.material_bindings->normal_preparation->receipt.mtoon;
+    const auto mode=canonical_attributes?PreparedMToonNormalEvaluation::Absent:target.material_bindings->normal_preparation->receipt.mtoon;
     options.encode_target_normal=[frames,mode,limit=double(settings.normal_error)](uint32_t triangle,std::array<float,3> bary,Vec3 desired){
       std::array<detail::NormalBakeVertex,3> pbr,toon;const auto &f=*frames->pbr;
       for(size_t k=0;k<3;++k){const size_t c=size_t(triangle)*3+k;const auto t=f.tangents[c];const Vec3 T{t[0],t[1],t[2]};
@@ -164,7 +166,7 @@ ObjectBakeReport bake_object(Scene &scene, uint64_t source_id,
   report.color_prepared=converted;
   report.canonical_captured=canonical_captured;
   report.normal_prepared=normal_converted;
-  if(prepared_normals)report.normal_initial_error=target.material_bindings->normal_preparation->receipt.observed_initial_error;
+  if(prepared_normals)report.normal_initial_error=canonical_attributes?canonical_attributes->receipt().observed_initial_error:target.material_bindings->normal_preparation->receipt.observed_initial_error;
   if(target.material_bindings&&target.material_bindings->color_preparation)
     report.color_error_bound=target.material_bindings->color_preparation->projection->maximum_error;
   if(auto prior=target.painted->baked())
@@ -180,6 +182,12 @@ ObjectBakeReport bake_object(Scene &scene, uint64_t source_id,
   textures.coverage.reserve(result.coverage.size());
   for (auto c : result.coverage) textures.coverage.push_back(c==1 || c==2 ? 255 : 0);
   auto painting = target.painted->snapshot();
+  if(canonical_attributes){
+    detail::BakedNormalFieldOptions field_options;field_options.cancelled=cancelled;
+    const auto old=target.painted->baked()?target.painted->baked()->normal_field:nullptr;
+    auto before=old?old:detail::BakedNormalField::from_intrinsic(canonical_attributes,field_options);
+    textures.normal_field=before->replace(textures,field_options);textures.maps.normal={};textures.maps.mtoon_normal={};
+  }
   painting->install_bake(std::move(textures));
   auto next = scene;
   next.active().painted = std::move(painting);
