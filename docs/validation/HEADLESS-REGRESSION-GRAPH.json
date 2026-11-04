@@ -1,0 +1,88 @@
+{
+  "runtime_commit": "a08c9d94ee33d97e6f87de79fe97ac0e502c717b",
+  "scope": "CMake-only correction: retain real offscreen regression renderer and bitmap font targets for BUILD_TESTING when both optional application frontends are disabled. FLTK remains default; frontend-off and core-only remain explicit configurations.",
+  "original_negative": "artifacts/headless-graph/original-configure.log: expression-palette links missing PkgConfig::RENDERFONTS",
+  "graph": {
+    "default_frontend_tests": 689,
+    "default_commands_and_properties_exact": true,
+    "headless_registered_tests": 663,
+    "headless_tests_keep_offscreen_palette_and_appearance": true,
+    "core_only_configure": true,
+    "frontends_unchanged": true,
+    "original_missing_font_target_log": "artifacts/headless-graph/original-configure.log",
+    "runtime_build_pending": false
+  },
+  "runtime": {
+    "state": "terminal",
+    "pid": 3544399,
+    "source": "a08c9d94ee33d97e6f87de79fe97ac0e502c717b",
+    "scope": "Actual optimized CPU headless frontend-off build with real offscreen regression renderer/fonts and native test callbacks. No FLTK frontend or XR executable requested. Default frontend graph comparison and core-only configure separately recorded. No core/math/schema/renderer source change.",
+    "steps": [
+      {
+        "name": "build-real-offscreen-tests",
+        "command": [
+          "nice",
+          "-n",
+          "15",
+          "cmake",
+          "--build",
+          "/home/blux/de-xr/dome-sculpt/artifacts/headless-test-graph-1d573f2/build-headless-fixed",
+          "-j2",
+          "--target",
+          "dome-sculpt-vrm1-expression-palette-test",
+          "dome-sculpt-vrm1-background-fixture-test",
+          "dome-sculpt-compute-backend-test",
+          "dome-sculpt-appearance-test"
+        ],
+        "exit_code": 0,
+        "seconds": 641.7326814270345
+      },
+      {
+        "name": "headless-real-tests",
+        "command": [
+          "ctest",
+          "--test-dir",
+          "/home/blux/de-xr/dome-sculpt/artifacts/headless-test-graph-1d573f2/build-headless-fixed",
+          "-R",
+          "^(vrm1-expression-palette|compute-backend|session-appearance)$",
+          "--output-on-failure"
+        ],
+        "exit_code": 0,
+        "seconds": 15.735774822998792
+      }
+    ],
+    "phase": "headless-real-tests",
+    "child_pid": 1471777,
+    "exit_code": 0,
+    "seconds": 657.4746115290327,
+    "inputs": 2317,
+    "drift": []
+  },
+  "logs": {
+    "artifacts/headless-graph/original-configure.log": {
+      "sha256": "e23d9497d344fc0c23cc1ee129aaa25fb3085508050a3626ce9e2e2ffd21799f",
+      "bytes": 1580
+    },
+    "artifacts/headless-graph/fixed-configure.log": {
+      "sha256": "0c810fbf2076b2b974b9133d92801b8c856f059c80b20ad7e95583e3fdcd50e4",
+      "bytes": 1711
+    },
+    "artifacts/headless-graph/frontends-configure.log": {
+      "sha256": "80f762c6d6c8aa9cad57ec021c2e365b488362ffcf84d19662dd8f078b997c08",
+      "bytes": 2347
+    },
+    "artifacts/headless-graph/core-configure.log": {
+      "sha256": "1a024561b6d8781002f3b3210099328a5aada8332279f7d81e4a32f6adbc51f8",
+      "bytes": 1186
+    },
+    "artifacts/headless-graph/build-real-offscreen-tests.log": {
+      "sha256": "9b0e2e0ed1be09a6ddf8b9afc4af10ecbee1394ad76da4fd416a3c44c2065482",
+      "bytes": 289267
+    },
+    "artifacts/headless-graph/headless-real-tests.log": {
+      "sha256": "3bb119582a2156e3b4242787ca43e5f3d98e9dfb5910d9f2d78c3d8a84b3abd6",
+      "bytes": 609
+    }
+  },
+  "limitations": "Selected optimized headless191-task build and4 real tests; not full663 execution, no fresh frontend build or new renderer/core implementation. Default689 normalized commands/properties exact; no system/session/headset changes."
+}
