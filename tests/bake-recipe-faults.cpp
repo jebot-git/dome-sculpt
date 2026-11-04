@@ -1,7 +1,8 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-#define main original_recipe_fixture
-#include "bake-recipes.cpp"
-#undef main
+#define DOME_BAKE_CAGE_HELPERS_ONLY
+#include "bake-cage.cpp"
+#include "dome/bake-recipe.hpp"
+#include "polygon-conversion.hpp"
 #include <cstdlib>
 #include <new>
 namespace {thread_local bool inject=false,denied=false;thread_local size_t calls=0,boundary=SIZE_MAX;}
