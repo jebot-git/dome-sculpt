@@ -1,0 +1,315 @@
+{
+  "recorded_utc": "2026-11-04T19:51:58.312405+00:00",
+  "source": "9f49aac9a7d77f49d1fe3a57af9737fb0c0b64d8",
+  "scope": "Full Scene33 C++ decoder/writer persistent denial, exact scene/retry/nested codec context and file-load cancellation. Complete new consumer TU over matching owning1ce+guard archives, not full627 or actual Document caller/IO/C malloc/default-cache sweep. Strong global paint cache explicitly disabled only in harness.",
+  "profiles": {
+    "release": {
+      "status": {
+        "state": "terminal",
+        "pid": 1365442,
+        "source": "9f49aac9a7d77f49d1fe3a57af9737fb0c0b64d8",
+        "profile": "release",
+        "scope": "Complete new Scene33 persistent C++ allocation/file-load cancellation consumer TU over exact current owning1ce+guard profile; no product/layout changes, not full627/normal-cache-C-allocator/public-UI/main admission. Strong global paint-cache retention explicitly disabled in harness for deterministic decoder-prefix coverage; local/native library paths unchanged.",
+        "steps": [
+          {
+            "name": "compile",
+            "command": [
+              "/usr/bin/c++",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-archive-faults-881/src",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-archive-faults-881/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-archive-faults-881/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-archive-faults-881/third_party/nlohmann",
+              "-O3",
+              "-DNDEBUG",
+              "-std=gnu++20",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-archive-faults-881/artifacts/archive-full-proof/release/consumer.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-archive-faults-881/tests/layered-normal-archive-faults.cpp"
+            ],
+            "exit_code": 0,
+            "seconds": 3.9654919719905593
+          },
+          {
+            "name": "link",
+            "command": [
+              "/usr/bin/c++",
+              "-O3",
+              "-DNDEBUG",
+              "/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-archive-faults-881/artifacts/archive-full-proof/release/consumer.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-archive-faults-881/artifacts/archive-full-proof/release/dome-sculpt-layered-normal-archive-faults-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-sourceguard-1ce/artifacts/guard-proof/release/libdome-sculpt-core.a",
+              "libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "libdome-sculpt-polygon.a",
+              "libxatlas.a",
+              "libmikktspace.a",
+              "libmikktspace-robust.a",
+              "libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit_code": 0,
+            "seconds": 0.27658826200058684
+          },
+          {
+            "name": "measure-converted-7",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-archive-faults-881/artifacts/archive-full-proof/release/dome-sculpt-layered-normal-archive-faults-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-sourceguard-1ce/artifacts/guard-proof/release/outputs/converted-7.dsculpt",
+              "--measure"
+            ],
+            "exit_code": 0,
+            "seconds": 0.01340077503118664
+          },
+          {
+            "name": "all-prefixes-converted-7",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-archive-faults-881/artifacts/archive-full-proof/release/dome-sculpt-layered-normal-archive-faults-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-sourceguard-1ce/artifacts/guard-proof/release/outputs/converted-7.dsculpt"
+            ],
+            "exit_code": 0,
+            "seconds": 6.822461015020963
+          },
+          {
+            "name": "measure-clear-then-rebake",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-archive-faults-881/artifacts/archive-full-proof/release/dome-sculpt-layered-normal-archive-faults-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-sourceguard-1ce/artifacts/guard-proof/release/outputs/clear-then-rebake.dsculpt",
+              "--measure"
+            ],
+            "exit_code": 0,
+            "seconds": 0.013100626994855702
+          },
+          {
+            "name": "all-prefixes-clear-then-rebake",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-archive-faults-881/artifacts/archive-full-proof/release/dome-sculpt-layered-normal-archive-faults-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-sourceguard-1ce/artifacts/guard-proof/release/outputs/clear-then-rebake.dsculpt"
+            ],
+            "exit_code": 0,
+            "seconds": 4.360004474991001
+          },
+          {
+            "name": "measure-legacy-clear",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-archive-faults-881/artifacts/archive-full-proof/release/dome-sculpt-layered-normal-archive-faults-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-sourceguard-1ce/artifacts/guard-proof/release/outputs/legacy-clear.dsculpt",
+              "--measure"
+            ],
+            "exit_code": 0,
+            "seconds": 0.011905469989869744
+          },
+          {
+            "name": "all-prefixes-legacy-clear",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-archive-faults-881/artifacts/archive-full-proof/release/dome-sculpt-layered-normal-archive-faults-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-sourceguard-1ce/artifacts/guard-proof/release/outputs/legacy-clear.dsculpt"
+            ],
+            "exit_code": 0,
+            "seconds": 6.791970616031904
+          }
+        ],
+        "phase": "all-prefixes-legacy-clear",
+        "child_pid": 1367397,
+        "exit_code": 0,
+        "seconds": 22.295132721948903,
+        "inputs": 2090,
+        "drift": [],
+        "artifacts": {
+          "/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-archive-faults-881/artifacts/archive-full-proof/release/dome-sculpt-layered-normal-archive-faults-test": "2c863df0f3705ffa2ace935f61162a5209900985d8cd8339b07a9a3426f664f0"
+        }
+      },
+      "manifest_sha256": "f450e1fa899af07c7a7072d2d2684a2de24703e7dca94f2ad786712d4a17f62c",
+      "artifacts": {
+        "artifacts/archive-full-proof/release/all-prefixes-clear-then-rebake.log": "5a45b891004d5180947e63977305dad9f20758c0e24a3d1e9a5cdce70187bd5d",
+        "artifacts/archive-full-proof/release/all-prefixes-converted-7.log": "5b1118022c8337da0b6896028c960e82dac480ff2a2da1ce3e5cc282e8fcb5b2",
+        "artifacts/archive-full-proof/release/all-prefixes-legacy-clear.log": "88347ae2728d8bcd88ff04672c1f5e53abb31a6905c8ede931505fde92a281ab",
+        "artifacts/archive-full-proof/release/compile.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "artifacts/archive-full-proof/release/consumer.o": "2838514f39cb5e8d4d32c6567e6dfbb213948e2963d1d4ff7dcedc64d202e994",
+        "artifacts/archive-full-proof/release/dome-sculpt-layered-normal-archive-faults-test": "2c863df0f3705ffa2ace935f61162a5209900985d8cd8339b07a9a3426f664f0",
+        "artifacts/archive-full-proof/release/link.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "artifacts/archive-full-proof/release/measure-clear-then-rebake.log": "a213d004bf178df8a087c94d4156074c836a4e666f6c09e8a8fe6a849343b560",
+        "artifacts/archive-full-proof/release/measure-converted-7.log": "089c59673ba4ce6a6e8bf7d47220df6ac064e2d6b38723d9930c51b22488fceb",
+        "artifacts/archive-full-proof/release/measure-legacy-clear.log": "dfea208f46f61fe84bc35d182c85cfe9c210e1f68c58eae153c3fe8f3bb756e5",
+        "artifacts/archive-full-proof/release/status.json": "68bf574f6d833ef7a4457ddb4a829c5a483a5c82fbc638a97da65759a84237f3"
+      }
+    },
+    "sanitize": {
+      "status": {
+        "state": "terminal",
+        "pid": 1365441,
+        "source": "9f49aac9a7d77f49d1fe3a57af9737fb0c0b64d8",
+        "profile": "sanitize",
+        "scope": "Complete new Scene33 persistent C++ allocation/file-load cancellation consumer TU over exact current owning1ce+guard profile; no product/layout changes, not full627/normal-cache-C-allocator/public-UI/main admission. Strong global paint-cache retention explicitly disabled in harness for deterministic decoder-prefix coverage; local/native library paths unchanged.",
+        "steps": [
+          {
+            "name": "compile",
+            "command": [
+              "/usr/bin/c++",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-archive-faults-881/src",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-archive-faults-881/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-archive-faults-881/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-archive-faults-881/third_party/nlohmann",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "-O1",
+              "-g1",
+              "-std=gnu++20",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-archive-faults-881/artifacts/archive-full-proof/sanitize/consumer.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-archive-faults-881/tests/layered-normal-archive-faults.cpp"
+            ],
+            "exit_code": 0,
+            "seconds": 5.658166909997817
+          },
+          {
+            "name": "link",
+            "command": [
+              "/usr/bin/c++",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "-O1",
+              "-g1",
+              "-fsanitize=address,undefined",
+              "/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-archive-faults-881/artifacts/archive-full-proof/sanitize/consumer.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-archive-faults-881/artifacts/archive-full-proof/sanitize/dome-sculpt-layered-normal-archive-faults-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-sourceguard-1ce/artifacts/guard-proof/sanitize/libdome-sculpt-core.a",
+              "libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "libdome-sculpt-polygon.a",
+              "libxatlas.a",
+              "libmikktspace.a",
+              "libmikktspace-robust.a",
+              "libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit_code": 0,
+            "seconds": 1.9735384800005704
+          },
+          {
+            "name": "measure-converted-7",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-archive-faults-881/artifacts/archive-full-proof/sanitize/dome-sculpt-layered-normal-archive-faults-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-sourceguard-1ce/artifacts/guard-proof/sanitize/outputs/converted-7.dsculpt",
+              "--measure"
+            ],
+            "exit_code": 0,
+            "seconds": 0.19296838901937008
+          },
+          {
+            "name": "all-prefixes-converted-7",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-archive-faults-881/artifacts/archive-full-proof/sanitize/dome-sculpt-layered-normal-archive-faults-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-sourceguard-1ce/artifacts/guard-proof/sanitize/outputs/converted-7.dsculpt"
+            ],
+            "exit_code": 0,
+            "seconds": 82.03087121498538
+          },
+          {
+            "name": "measure-clear-then-rebake",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-archive-faults-881/artifacts/archive-full-proof/sanitize/dome-sculpt-layered-normal-archive-faults-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-sourceguard-1ce/artifacts/guard-proof/sanitize/outputs/clear-then-rebake.dsculpt",
+              "--measure"
+            ],
+            "exit_code": 0,
+            "seconds": 0.26184906903654337
+          },
+          {
+            "name": "all-prefixes-clear-then-rebake",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-archive-faults-881/artifacts/archive-full-proof/sanitize/dome-sculpt-layered-normal-archive-faults-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-sourceguard-1ce/artifacts/guard-proof/sanitize/outputs/clear-then-rebake.dsculpt"
+            ],
+            "exit_code": 0,
+            "seconds": 48.90157083602389
+          },
+          {
+            "name": "measure-legacy-clear",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-archive-faults-881/artifacts/archive-full-proof/sanitize/dome-sculpt-layered-normal-archive-faults-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-sourceguard-1ce/artifacts/guard-proof/sanitize/outputs/legacy-clear.dsculpt",
+              "--measure"
+            ],
+            "exit_code": 0,
+            "seconds": 0.20803349802736193
+          },
+          {
+            "name": "all-prefixes-legacy-clear",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-archive-faults-881/artifacts/archive-full-proof/sanitize/dome-sculpt-layered-normal-archive-faults-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-sourceguard-1ce/artifacts/guard-proof/sanitize/outputs/legacy-clear.dsculpt"
+            ],
+            "exit_code": 0,
+            "seconds": 67.51076101901708
+          }
+        ],
+        "phase": "all-prefixes-legacy-clear",
+        "child_pid": 1381897,
+        "exit_code": 0,
+        "seconds": 206.77560327301035,
+        "inputs": 2090,
+        "drift": [],
+        "artifacts": {
+          "/home/blux/de-xr/dome-sculpt/artifacts/layered-normal-archive-faults-881/artifacts/archive-full-proof/sanitize/dome-sculpt-layered-normal-archive-faults-test": "4d60f38f8088e82a8aab326ddc1440c0af27fe11ad539e6d7f5f3e7dda99cc5c"
+        }
+      },
+      "manifest_sha256": "cff379b964600c592b703ecaa51a3fd7ddeddd8d703d4fd6b506e5c5a725b119",
+      "artifacts": {
+        "artifacts/archive-full-proof/sanitize/all-prefixes-clear-then-rebake.log": "5a45b891004d5180947e63977305dad9f20758c0e24a3d1e9a5cdce70187bd5d",
+        "artifacts/archive-full-proof/sanitize/all-prefixes-converted-7.log": "5b1118022c8337da0b6896028c960e82dac480ff2a2da1ce3e5cc282e8fcb5b2",
+        "artifacts/archive-full-proof/sanitize/all-prefixes-legacy-clear.log": "88347ae2728d8bcd88ff04672c1f5e53abb31a6905c8ede931505fde92a281ab",
+        "artifacts/archive-full-proof/sanitize/compile.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "artifacts/archive-full-proof/sanitize/consumer.o": "826bc77c6ac94c32cce0bfe186552c4b293feb8c8427bc49c3b73a0214f34d6b",
+        "artifacts/archive-full-proof/sanitize/dome-sculpt-layered-normal-archive-faults-test": "4d60f38f8088e82a8aab326ddc1440c0af27fe11ad539e6d7f5f3e7dda99cc5c",
+        "artifacts/archive-full-proof/sanitize/link.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "artifacts/archive-full-proof/sanitize/measure-clear-then-rebake.log": "a213d004bf178df8a087c94d4156074c836a4e666f6c09e8a8fe6a849343b560",
+        "artifacts/archive-full-proof/sanitize/measure-converted-7.log": "089c59673ba4ce6a6e8bf7d47220df6ac064e2d6b38723d9930c51b22488fceb",
+        "artifacts/archive-full-proof/sanitize/measure-legacy-clear.log": "dfea208f46f61fe84bc35d182c85cfe9c210e1f68c58eae153c3fe8f3bb756e5",
+        "artifacts/archive-full-proof/sanitize/status.json": "380166d288882a05562d1539c11415d53591fd035a2385e6eba9145316bb22bf"
+      }
+    }
+  },
+  "counts_each": {
+    "converted-7": {
+      "decoder": 1695,
+      "encoder": 2897,
+      "file_cancel": 8
+    },
+    "clear-then-rebake": {
+      "decoder": 1082,
+      "encoder": 2060,
+      "file_cancel": 9
+    },
+    "legacy-clear": {
+      "decoder": 1661,
+      "encoder": 2812,
+      "file_cancel": 7
+    }
+  }
+}

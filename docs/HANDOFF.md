@@ -1,5 +1,9 @@
 # Dome Sculpt production handoff
 
+## Private independent normal archive faults — 2026-11-04
+
+Actual three-case R/S sweeps pass4,438 decoder +7,769 encoder persistent C++ allocation prefixes and24 file-load Cancel polls each. Exact Scene/source/field retry and nested codec scopes survive; all2,090 inputs remain exact. Strong global cache is disabled only in this harness; no C/default-cache/caller/IO/full627/main claim. Read LAYERED-NORMAL-ARCHIVE-FAULTS.md and receipt. Full goal and later drawers remain incomplete.
+
 ## Private layered normal runtime, persistence and exports — 2026-11-04
 
 Actual worker Clear now has error0 instead of the preserved7/74, and partial
