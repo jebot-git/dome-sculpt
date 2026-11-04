@@ -60,6 +60,13 @@ void assert_owned(const Scene &before,const Scene &after){
 #ifndef DOME_CANONICAL_OWNING_HELPERS_ONLY
 int main(int argc,char **argv)try{
  if(argc==3&&std::string_view(argv[1])=="--ui-fixture"){legacy_conversion_model(7).save(argv[2]);return 0;}
+ if(argc==3&&std::string_view(argv[1])=="--ui-solo-fixture"){
+  auto scene=legacy_conversion_model(7);scene.erase(2);scene.active().bake_recipe.reset();scene.save(argv[2]);return 0;
+ }
+ if(argc==3&&(std::string_view(argv[1])=="--ui-converted"||std::string_view(argv[1])=="--ui-solo-converted")){
+  auto scene=legacy_conversion_model(7);if(std::string_view(argv[1])=="--ui-solo-converted"){scene.erase(2);scene.active().bake_recipe.reset();}
+  Document doc;doc.replace(scene);settled(doc);doc.convert_baked_normals();settled(doc);doc.save(argv[2]);return 0;
+ }
  if(argc==3&&std::string_view(argv[1])=="--inspect"){
   auto s=Scene::load(argv[2]);auto p=s.active().material_bindings?s.active().material_bindings->normal_preparation:nullptr;
   std::cout<<nlohmann::json{{"scene",s.encode()},{"converted",bool(p&&p->canonical_conversion)}}.dump()<<'\n';return 0;
