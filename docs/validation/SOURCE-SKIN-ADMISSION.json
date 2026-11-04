@@ -1,0 +1,73 @@
+{
+  "scope": "test-only matched-header overlays:ffb1c8e positive read-only coherent core/support;13a86c2 counterfactual separate exact headers/archives. Not fresh whole-project/SAN/solver proof",
+  "positive": {
+    "ordinary_caller_allocation_prefixes": 1007,
+    "all_actual_hits": true,
+    "all_locked_noop": true,
+    "source_fixture": "genuine19part creator;Body target",
+    "worker_preparation": "not swept; preceding real Save held at fsync",
+    "retry": "typed options/locks +exact accepted dependentSave"
+  },
+  "negative": {
+    "old_observed_allocations": 1402,
+    "tested_window": "last32prefixes",
+    "first_tested_failure": 1370,
+    "caller_threw": true,
+    "asset_busy": true,
+    "queued": 1,
+    "fixture_exit": 1
+  },
+  "audit": {
+    "mismatches": 0,
+    "public_headers": 90,
+    "archives": 16
+  },
+  "remaining": [
+    "owned sanitizer caller sweep",
+    "actual worker preparation/publication failures",
+    "newer hardening runtime replay",
+    "UI/export/full source-method admission"
+  ],
+  "files": {
+    "tests/source-visible-admission.cpp": {
+      "sha256": "5ccc5c33e80332324b0efb88ca7751c63f11e335c9fb73973c3ad9a85ecd7615",
+      "bytes": 9514
+    },
+    "artifacts/overlay-before.json": {
+      "sha256": "19967e80dc9cc0d020c1e38e6bd8154ee83125a491ea1b3b1e51af4239d95f38",
+      "bytes": 13472
+    },
+    "artifacts/admission-test.log": {
+      "sha256": "ab3eb971570ab6b53d2272e104a84eace4beb72066c0b0de419821d43d20ac9d",
+      "bytes": 338
+    },
+    "artifacts/run-before.json": {
+      "sha256": "b7421d46e17f63228692859d9e6e2008c9fa9ba538c2c9b3f2501d8cc1b0f352",
+      "bytes": 205
+    },
+    "artifacts/run-status.json": {
+      "sha256": "4c6fc27fc2c063e5befbf9392844d808f2a92f11061f313caf3bca50cf722ce3",
+      "bytes": 73
+    },
+    "artifacts/input-after.json": {
+      "sha256": "3f6bbc59072bf4a7e40ad023de2eaef943623b66b58e6124f50529cbe43b147a",
+      "bytes": 58
+    },
+    "artifacts/old-before.json": {
+      "sha256": "ab0de5717fa166a1040ae6320ee3a921b27a75da5859675f8a7744b284a7702d",
+      "bytes": 4181
+    },
+    "artifacts/old-negative.log": {
+      "sha256": "057b8aaefba04961409350a8bd7ee5a42fa66957149230ea0436606fff5ab99b",
+      "bytes": 165
+    },
+    "artifacts/old-status.json": {
+      "sha256": "e3eba094be5b8d39d76643215c37a697e50749553ee8f614e0be2b389fc4462d",
+      "bytes": 164
+    },
+    "artifacts/old-admission-window.cpp": {
+      "sha256": "12b11c8d57363ca6ab06cab751e173f5dcd269e7cbf946beb3e900d66665395a",
+      "bytes": 9538
+    }
+  }
+}
