@@ -75,7 +75,7 @@ async def main():
   pixels(dialog).save(out/'mirror-top.png');before=pixels(dialog);xtest.fake_input(d,X.MotionNotify,x=g.x+g.width//2,y=g.y+g.height//2)
   for _ in range(40):xtest.fake_input(d,X.ButtonPress,5);xtest.fake_input(d,X.ButtonRelease,5)
   d.sync();await asyncio.sleep(.15);pixels(dialog).save(out/'mirror-bottom.png');check(pixels(dialog).tobytes()!=before.tobytes(),'Actual plane/frame controls scroll into view while Apply remains fixed')
-  tap(dialog,g.width*.5,g.height-row*4-16+(row-4)/2);await asyncio.sleep(.15);key('Down');await asyncio.sleep(.1);key('Return');await asyncio.sleep(.1);pixels(dialog).save(out/'mirror-relative.png')
+  tap(dialog,g.width*.5,g.height-row*4-16+(row-4)/2);await asyncio.sleep(.15);key('Home');key('Down');key('Down');await asyncio.sleep(.1);key('Return');await asyncio.sleep(.1);pixels(dialog).save(out/'mirror-relative.png')
   tap(dialog,g.width*.75,g.height-row*2+24);await wait(lambda:named('Mirror shapekey') is None);await ready('New shapekey...');await command('Save');mirrored=inspect();(out/'mirror-after.dsculpt').write_bytes(project.read_bytes());(out/'mirror-after.json').write_text(json.dumps(mirrored,indent=2))
   def walk(x):
    if isinstance(x,dict):

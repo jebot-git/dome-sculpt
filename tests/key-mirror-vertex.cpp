@@ -21,6 +21,21 @@ int main(int argc,char **argv)try{
   SourceUvBakeOptions options;options.normal_sampling=SourceNormalUvMethod::RetainSource;
   auto adopted=adopt_source_uv_bake(bake_source_uv(input,options));object.painted=adopted.paint;object.material_bindings=adopted.material_bindings;object.deformation=adopted.deformation;object.appearance=adopted.appearance;scene.validate();scene.save(argv[2]);return 0;
  }
+ if(argc==3&&std::string_view(argv[1])=="--ui-fixture"){
+  auto scene=prepared_shape_fixture::model();ShapeKeyEdit create;create.name="Prepared UI source";author_shapekey(scene,scene.active().id,create);scene.save(argv[2]);return 0;
+ }
+ if(argc==3&&std::string_view(argv[1])=="--inspect"){std::cout<<Scene::load(argv[2]).encode().dump()<<'\n';return 0;}
+ if(argc==4&&std::string_view(argv[1])=="--verify-ui-vertex"){
+  auto before=Scene::load(argv[2]),after=Scene::load(argv[3]);const auto &a=before.active(),&b=after.active();const auto &old=*a.deformation->morphs,&current=*b.deformation->morphs;
+  check(a.painted->mesh().positions.size()==4&&current.targets.size()==old.targets.size()+1,"Actual UI fixture has four native vertices and one accepted Mirror");
+  constexpr size_t partners[]{1,0,3,2};bool exact=false;
+  for(size_t v=0;v<4;++v){const auto value=old.targets[0].delta[partners[v]],actual=current.targets.back().delta[v];check(equal(actual,{-value.x,value.y,value.z}),"Actual default GUI method mirrors independent known source POSITION values");exact|=length(actual)>0;}
+  check(exact&&!b.material_bindings->key_derivation,"Nonzero consistent geometry uses its native frame writer without an authored-corner claim");
+  check(a.painted->encode()==b.painted->encode(),"Actual GUI Mirror preserves all prepared paint, hidden layers and baked detail");
+  auto ar=a.deformation->encode(a.painted->mesh()),br=b.deformation->encode(b.painted->mesh());for(auto *value:{&ar,&br}){value->erase("morphs");value->erase("morph_weights");value->erase("expressions");}check(ar==br,"Actual GUI Mirror retains the full current rig and saved pose");
+  ShapeKeyEdit restore;restore.action=ShapeKeyAction::Restore;author_shapekey(before,a.id,restore);author_shapekey(after,b.id,restore);check(before.encode()==after.encode(),"Actual GUI Mirror retains its exact first prepared Restore source");
+  std::cout<<"PASS "<<checks<<" actual vertex Mirror UI endpoint checks\n";return 0;
+ }
  if(argc!=1)return 2;
  const std::array<Vec3,4> values{{{.1f,.2f,.3f},{.4f,.5f,.6f},{.7f,.8f,.9f},{1,1.1f,1.2f}}};
  const std::array<size_t,4> partner{1,0,3,2};
