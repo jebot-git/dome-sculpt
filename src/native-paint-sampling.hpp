@@ -44,6 +44,8 @@ RetainedNativePaint retain_native_paint(const SculptObject &,const Mesh &,
 std::shared_ptr<const SourceMaterialBindings> bind_native_paint(
     const std::shared_ptr<const NativePaintSampling> &,std::shared_ptr<const SourceMaterialBindings>);
 bool native_paint_retention_supported(const SculptObject &) noexcept;
+bool native_paint_source_restorable(const SculptObject &) noexcept;
+void restore_native_paint(Scene &,uint64_t,const std::function<bool()> & = {});
 std::shared_ptr<const PaintSamplingAttachment> material_paint_attachment(const SourceMaterialBindings *);
 class NativePaintSamplingCodec {
   friend class dome::SourceMaterialArchive;

@@ -43,6 +43,7 @@ bool Document::uv_retention_changes_locked() const {
 }
 void Document::edit_uv(UvAction action, float x, float y) {
   std::lock_guard lock(model_mutex_);
+  if(action==UvAction::RestorePaintSource){restore_uv_source_locked();return;}
   if(action==UvAction::RetainNormals||action==UvAction::RetainPaint){
     Transaction transaction(*this);apply_uv_action_locked(action,x,y);publish_locked(false,false);transaction.commit(false);return;
   }
@@ -50,18 +51,27 @@ void Document::edit_uv(UvAction action, float x, float y) {
   catch (...) { publish_locked(); throw; }
   publish_locked();
 }
+void Document::restore_uv_source_locked(){
+    if(!uv_||uv_accept_pending_||uv_solving_||!uv_->view().topology||uv_->view().validating)throw std::logic_error("Wait for UV processing before restoring its source");
+    const auto object=control_object_;if(!detail::native_paint_source_restorable(scene_.object(object)))throw std::logic_error("This UV source cannot yet be restored without changing other authored data");
+    const AssetSource expected{state_.generation,state_.revision,object,state_.edit_authority};
+    Transaction transaction(*this);transaction.finish_uv();desktop_=false;
+    queue_scene_operation_locked("Restore UV and paint source",[object](Scene &scene,const auto &cancelled){detail::restore_native_paint(scene,object,cancelled);},expected,{});
+    transaction.commit(false);
+}
 void Document::apply_uv_action_locked(UvAction action, float x, float y) {
   if (!uv_) throw std::logic_error("Open the UV editor first");
   if (uv_accept_pending_) throw std::logic_error("Wait for the accepted UV edit to finish");
   if (uv_solving_) throw std::logic_error("Wait for UV processing, or cancel the UV editor");
   try {
+    if(action==UvAction::RestorePaintSource){restore_uv_source_locked();return;}
     if(action==UvAction::RetainPaint) {
       const auto &o=scene_.object(control_object_);
-      if(!uv_paint_retention_available_locked())throw std::logic_error("Keep paint detail requires this mesh's own supported prepared corner colours and normal detail");
+      if(!uv_paint_retention_available_locked())throw std::logic_error("This mesh cannot yet keep paint detail with its current geometry and materials");
       if(o.painted->paint_sampling_domain())throw std::logic_error("This project uses retained paint coordinates; restore its source before choosing a different transfer");
       if(!uv_->view().topology||uv_->view().validating)throw std::logic_error("Wait for UV validation before changing paint detail");
       state_.controls.value[3]=uv_paint_retention_requested_locked()?(o.painted->normal_projection()&&o.painted->normal_projection()->version==2?1.f:0.f):2.f;
-      state_.message=uv_paint_retention_requested_locked()?"Paint and normal detail keep their existing coordinates. The UV layout remains editable.":"Paint detail will be transferred into the edited UV layout";
+      state_.message=uv_paint_retention_requested_locked()?(o.painted->normal_projection()?"Paint and normal detail keep their existing coordinates. The UV layout remains editable.":"Paint detail keeps its existing coordinates. The UV layout remains editable."):"Paint detail will be transferred into the edited UV layout";
     }
     else if(action==UvAction::RetainNormals){
       if(uv_paint_retention_requested_locked())throw std::logic_error("Turn off Keep paint detail before changing normal sampling");

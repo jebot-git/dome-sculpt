@@ -74,6 +74,17 @@ bool native_paint_retention_supported(const SculptObject &source) noexcept {
   const auto &b=source.material_bindings;
   return !b?!source.painted->paint_sampling_domain():!b->has_mtoon&&b->normal_frame==SourceMaterialNormalFrame::UvDerivative&&!b->normal_frames&&!b->key_derivation&&!b->normal_preparation&&!b->color_preparation&&b->native_paint_sampling&&b->native_paint_sampling->valid_owner(b->native_paint_sampling)&&b->native_paint_sampling->history_depth()<32&&b->native_paint_sampling->matches_current(*source.painted);
 }
+bool native_paint_source_restorable(const SculptObject &o) noexcept {
+  const auto b=o.material_bindings;const auto p=b?b->native_paint_sampling:nullptr;
+  return o.visible&&!o.locked&&o.mesh_active&&o.painted&&!o.painted->in_stroke()&&!o.appearance&&!o.deformation&&!o.shape_source&&!o.rig_source&&!o.polygon&&!o.retopology&&!o.affine_edit&&!o.bake_recipe&&b&&!b->has_mtoon&&!b->normal_frames&&!b->key_derivation&&!b->normal_preparation&&!b->color_preparation&&p&&p->valid_owner(p)&&p->matches_current(*o.painted);
+}
+void restore_native_paint(Scene &scene,uint64_t object,const std::function<bool()> &cancelled){
+  PaintSamplingLimits limits;limits.cancelled=cancelled;stop(limits);const auto &source=scene.object(object);
+  if(!native_paint_source_restorable(source))throw std::invalid_argument("Restore UV and paint source requires its unchanged supported native geometry and history");
+  source.material_bindings->validate();auto first=source.material_bindings->native_paint_sampling;first->validate_current(*source.painted,limits);
+  while(first->before_material()&&first->before_material()->native_paint_sampling){stop(limits);first=first->before_material()->native_paint_sampling;}
+  auto next=scene;auto &o=next.object(object);o.painted=first->before_paint()->snapshot();o.material=first->before_native_material();o.material_bindings=first->before_material();next.validate();stop(limits);scene=std::move(next);
+}
 std::shared_ptr<const SourceMaterialBindings> bind_native_paint(const std::shared_ptr<const NativePaintSampling> &owner,std::shared_ptr<const SourceMaterialBindings> previous){
   if(!owner)throw std::invalid_argument("Native paint binding needs its real owner");
   SourceMaterialBindings result=previous?*previous:SourceMaterialBindings{};result.has_mtoon=false;result.native_paint_sampling=owner;

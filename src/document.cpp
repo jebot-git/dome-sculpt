@@ -6,6 +6,7 @@
 #include "emission-control-scale.hpp"
 #include "emission-source-info.hpp"
 #include "dome/document.hpp"
+#include "native-paint-sampling.hpp"
 #include "dome/scene-file.hpp"
 #include "dome/native-authoring.hpp"
 #include "dome/source-uv-bake.hpp"
@@ -609,6 +610,7 @@ void Document::publish_locked(bool force,bool checkpoint) {
     view->paint_sampling_available=uv_paint_retention_available_locked();
     view->paint_sampling_required=bool(source.painted&&source.painted->paint_sampling_domain());
     view->retain_paint_sampling=uv_paint_retention_requested_locked();
+    view->can_restore_paint_source=detail::native_paint_source_restorable(source);
     view->committing = uv_accept_pending_;
     view->solving = uv_solving_;
     if (view->solving) { view->can_undo = view->can_redo = false; view->valid = false; }
@@ -2646,7 +2648,7 @@ void Document::control_event_locked(VrControlEvent event) {
         apply_uv_action_locked(UvAction::Move, event.value, event.second);
       else if (event.type == VrControlEventType::UvCommand &&
                event.component >= 0 &&
-               event.component <= int(UvAction::RetainPaint))
+               event.component <= int(UvAction::RestorePaintSource))
         apply_uv_action_locked(UvAction(event.component), event.value, event.second);
       state_.error.clear();
     } catch (const std::exception &e) {

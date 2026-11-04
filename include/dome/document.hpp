@@ -602,6 +602,7 @@ private:
   bool uv_retention_requested_locked() const;
   bool uv_paint_retention_requested_locked() const;
   bool uv_paint_retention_available_locked() const;
+  void restore_uv_source_locked();
   bool uv_retention_changes_locked() const;
   void uv_loop();
   void queue_uv_operation_locked(UvAction);

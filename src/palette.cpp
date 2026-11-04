@@ -192,9 +192,11 @@ void SpatialPalette::raster(const EditorState &s) {
            v.solving || v.committing || !v.topology ? Color{140, 140, 140, 255} : fg);
     }
     rect(8*unit_,249*unit_,94*unit_,42*unit_,v.retain_normal_sampling?accent:(s.light?Color{200,209,220,uint8_t(s.opacity)}:Color{55,65,80,uint8_t(s.opacity)}));
-    text(55*unit_,278*unit_,v.paint_sampling_available?"Keep both":"Keep detail",v.retain_paint_sampling||!v.normal_sampling_available||v.normal_sampling_required||v.solving||v.committing||v.validating||!v.topology?Color{140,140,140,255}:fg);
+    text(55*unit_,278*unit_,v.paint_sampling_available&&v.normal_sampling_available?"Keep both":"Keep detail",v.retain_paint_sampling||!v.normal_sampling_available||v.normal_sampling_required||v.solving||v.committing||v.validating||!v.topology?Color{140,140,140,255}:fg);
     rect(8*unit_,301*unit_,94*unit_,42*unit_,v.retain_paint_sampling?accent:(s.light?Color{200,209,220,uint8_t(s.opacity)}:Color{55,65,80,uint8_t(s.opacity)}));
     text(55*unit_,330*unit_,"Keep paint",!v.paint_sampling_available||v.paint_sampling_required||v.solving||v.committing||v.validating||!v.topology?Color{140,140,140,255}:fg);
+    rect(8*unit_,353*unit_,94*unit_,42*unit_,s.light?Color{200,209,220,uint8_t(s.opacity)}:Color{55,65,80,uint8_t(s.opacity)});
+    text(55*unit_,382*unit_,"Restore",!v.can_restore_paint_source||v.solving||v.committing||v.validating||!v.topology?Color{140,140,140,255}:fg);
     rect(110 * unit_, 110 * unit_, 420 * unit_, 420 * unit_,
          s.light ? Color{208, 208, 208, uint8_t(s.opacity)}
                  : Color{48, 48, 48, uint8_t(s.opacity)});

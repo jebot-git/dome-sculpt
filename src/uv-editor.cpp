@@ -3,6 +3,8 @@
 #include "appearance.h"
 #include "ui-conventions.hpp"
 #include <FL/Fl_Box.H>
+#include <FL/Fl_Menu_Button.H>
+#include <FL/Fl_Check_Button.H>
 #include <FL/fl_draw.H>
 namespace dome {
 namespace {
@@ -168,10 +170,12 @@ void edit_uv(Document &doc) {
     Fl::screen_work_area(sx, sy, sw, sh);
     int width = std::min(std::max(840, dx::size * 46), sw - 40),
         height = std::min(900, sh - 40);
+    const bool compact_tools=width<dx::size*30+64;
+    const int toolbar_height=row*(compact_tools?1:4),status_height=compact_tools?std::max(row,dx::size*2+8):row;
     DomeDialog window(width, height, "UV editor");
     window.begin();
-    UvCanvas canvas(0, row * 3, width, height - row * 5, doc);
-    Fl_Box status(12, height - row * 2, width - 24, row);
+    UvCanvas canvas(0, toolbar_height, width, height-toolbar_height-status_height-row, doc);
+    Fl_Box status(12, height-row-status_height, width-24, status_height);
     status.align(FL_ALIGN_LEFT | FL_ALIGN_INSIDE | FL_ALIGN_WRAP);
     struct Command {
       Document *doc;
@@ -183,6 +187,8 @@ void edit_uv(Document &doc) {
     };
     std::vector<std::unique_ptr<Command>> commands;
     std::vector<Fl_Button *> buttons;
+    Fl_Menu_Button *tools=nullptr;
+    std::vector<std::pair<int,size_t>> tool_items;
     auto refresh = [&] {
       auto state = doc.frame().state;
       auto v = state->uv;
@@ -194,37 +200,31 @@ void edit_uv(Document &doc) {
           v->solving ? state->message.c_str()
           : !state->error.empty() ? state->error.c_str()
           : (v->retain_paint_sampling||(v->retain_normal_sampling&&v->paint_sampling_available))
-              ? "UV layout changes; paint and normal detail keep their existing coordinates."
+              ? (compact_tools?(v->normal_sampling_available?"Paint and normal detail kept. UVs stay editable.":"Paint detail kept. UVs stay editable."):(v->normal_sampling_available?"UV layout changes; paint and normal detail keep their existing coordinates.":"UV layout changes; paint detail keeps its existing coordinates."))
           : v->retain_normal_sampling
-              ? "Original normal detail is kept. Save the native project; glTF/VRM export still needs a sampling conversion."
+              ? (compact_tools?"Normal detail kept; save the native project.":"Original normal detail is kept. Save the native project; glTF/VRM export still needs a sampling conversion.")
           : v->valid
-              ? (v->vertices ? "Vertices: drag | Wheel: scale | Shift+wheel: "
+              ? (compact_tools?"Drag UVs; wheel scales, Shift+wheel turns.":v->vertices ? "Vertices: drag | Wheel: scale | Shift+wheel: "
                                "turn | Orange: pinned/cut"
                              : "Islands: drag | Wheel: scale | Shift+wheel: "
                                "turn | Pick seam edge for Seam/Stitch")
               : v->error.c_str());
       if (buttons.size() > 5) {
-        for (auto button : buttons)
-          if (v->committing || v->solving || !v->topology)
-            button->deactivate();
-          else
-            button->activate();
+        for (auto button : buttons)if(button){
+          if (v->committing || v->solving || !v->topology)button->deactivate();else button->activate();}
+        if(tools){if(v->committing||v->solving||!v->topology)tools->deactivate();else tools->activate();
+          for(auto [entry,action]:tool_items){const bool disabled=v->committing||v->solving||!v->topology||(action==4&&!v->can_undo)||(action==5&&!v->can_redo)||(action==16&&(!v->can_restore_paint_source||v->validating));tools->mode(entry,disabled?FL_MENU_INACTIVE:0);}}
         if(buttons.size()>14){
-          buttons[14]->copy_label(v->paint_sampling_available?"Keep paint + normal":"Keep normal detail");
+          buttons[14]->copy_label(compact_tools?"Keep normal":v->paint_sampling_available&&v->normal_sampling_available?"Keep paint + normal":"Keep normal detail");
           buttons[14]->value(v->retain_normal_sampling&&!v->retain_paint_sampling);
           if(v->retain_paint_sampling||!v->normal_sampling_available||v->normal_sampling_required||v->validating||v->committing||v->solving||!v->topology)buttons[14]->deactivate();
           else buttons[14]->activate();
         }
         if(buttons.size()>15){buttons[15]->value(v->retain_paint_sampling);
           if(!v->paint_sampling_available||v->paint_sampling_required||v->validating||v->committing||v->solving||!v->topology)buttons[15]->deactivate();else buttons[15]->activate();}
-        if (v->can_undo && !v->committing && !v->solving)
-          buttons[4]->activate();
-        else
-          buttons[4]->deactivate();
-        if (v->can_redo && !v->committing && !v->solving)
-          buttons[5]->activate();
-        else
-          buttons[5]->deactivate();
+        if(buttons.size()>16&&buttons[16]&&(!v->can_restore_paint_source||v->validating||v->committing||v->solving||!v->topology))buttons[16]->deactivate();
+        if(buttons[4]){if(v->can_undo&&!v->committing&&!v->solving)buttons[4]->activate();else buttons[4]->deactivate();}
+        if(buttons[5]){if(v->can_redo&&!v->committing&&!v->solving)buttons[5]->activate();else buttons[5]->deactivate();}
       }
       canvas.redraw();
     };
@@ -248,36 +248,28 @@ void edit_uv(Document &doc) {
                             {"Unwrap", UvAction::Conformal, 0},
                             {"Stitch", UvAction::Stitch, 0},
                             {"Keep normal detail",UvAction::RetainNormals,0},
-                            {"Keep paint detail",UvAction::RetainPaint,0}};
+                            {"Keep paint detail",UvAction::RetainPaint,0},
+                            {"Restore UV + paint",UvAction::RestorePaintSource,0}};
     Fl_Button cancel(width / 2 - 180, height - row + 4, 160, row - 8, "Cancel"),
         apply(width / 2 + 20, height - row + 4, 160, row - 8, "Apply");
-    for (size_t i = 0; i < std::size(items); ++i) {
-      int col = i==15?4:i%6, y = (i / 6) * row;
-      auto b = new Fl_Button(col * width / 6 + 4, y + 4, (i>=14?2:1)*width / 6 - 8, row - 8,
-                             items[i].label);
-      if(i>=14)b->type(FL_TOGGLE_BUTTON);
-      buttons.push_back(b);
-      auto c = std::make_unique<Command>(Command{
-          &doc, &canvas, &status, &apply, items[i].action, items[i].value});
-      b->callback(
-          [](Fl_Widget *, void *ptr) {
-            auto &c = *static_cast<Command *>(ptr);
-            try {
-              c.doc->edit_uv(c.action, c.value);
-              auto v = c.doc->frame().state->uv;
-              c.status->copy_label(
-                  v->valid ? (v->vertices ? "Vertex mode" : "Island mode")
-                           : v->error.c_str());
-              if (v->valid && !v->solving && !v->committing)
-                c.apply->activate();
-              else
-                c.apply->deactivate();
-              c.canvas->redraw();
-            } catch (const std::exception &e) {
-              c.status->copy_label(e.what());
-            }
-          },
-          c.get());
+    auto callback=[](Fl_Widget *,void *ptr){
+      auto &c=*static_cast<Command *>(ptr);
+      try{c.doc->edit_uv(c.action,c.value);auto v=c.doc->frame().state->uv;if(!v)return;
+        c.status->copy_label(v->valid?(v->vertices?"Vertex mode":"Island mode"):v->error.c_str());
+        if(v->valid&&!v->solving&&!v->committing)c.apply->activate();else c.apply->deactivate();c.canvas->redraw();
+      }catch(const std::exception &e){c.status->copy_label(e.what());}
+    };
+    buttons.resize(std::size(items),nullptr);
+    if(compact_tools){tools=new Fl_Menu_Button(4,4,width/4-8,row-8,"Tools");tools->textfont(dx::font);tools->textsize(dx::size);}
+    for(size_t i=0;i<std::size(items);++i){
+      auto c=std::make_unique<Command>(Command{&doc,&canvas,&status,&apply,items[i].action,items[i].value});
+      if(compact_tools&&(i<14||i==16))tool_items.push_back({tools->add(items[i].label,0,callback,c.get()),i});
+      else{
+        Fl_Button *button=nullptr;
+        if(compact_tools){const int x=i==14?width/4:width*5/8,w=i==14?width*3/8:width-width*5/8;button=new Fl_Check_Button(x+4,4,w-8,row-8,i==14?"Keep normal":"Keep paint");}
+        else{const int col=i==15?4:i==16?2:i%6,y=(i==16?3:int(i/6))*row;button=new Fl_Button(col*width/6+4,y+4,(i>=14?2:1)*width/6-8,row-8,items[i].label);if(i==14||i==15)button->type(FL_TOGGLE_BUTTON);}
+        buttons[i]=button;button->callback(callback,c.get());
+      }
       commands.push_back(std::move(c));
     }
     struct Result {
@@ -302,7 +294,7 @@ void edit_uv(Document &doc) {
         &result);
     window.end();
     window.resizable(canvas);
-    window.size_range(640, 480);
+    window.size_range(std::min(640,width),std::min(480,height));
     window.set_modal();
     dx::style(&window);
     refresh();
