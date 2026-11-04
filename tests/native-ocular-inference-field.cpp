@@ -5,6 +5,7 @@
 #include "native-head-geometry.hpp"
 #include "rotary-cap-geometry.hpp"
 #include "weight-boundary-sewing.hpp"
+#include "native-carrier-continuation.hpp"
 #include <fstream>
 #include <iostream>
 #include <nlohmann/json.hpp>
@@ -146,29 +147,38 @@ int main(int argc, char **argv) try {
     for (const auto &entry : part.declarations)
       declaration_bytes += entry.joints.capacity() * sizeof(uint32_t) + 64;
   }
+  const auto carrier=detail::native_carrier_plan(analysis,support,*reference_object.deformation->humanoid,construction);
+  std::ofstream(out/"carrier-plan.json")<<nlohmann::json{{"carrier",carrier.carrier},{"targets",carrier.targets},{"policy","geometry-derived carrier plus bounded generated-field continuation"}}.dump(2);
+  const size_t continuation_allowance=20'000'000;
   const size_t wrapper_work = analysis.work + construction.used + 4096 + targets.size() * 32,
                wrapper_bytes =
                    sizeof(support) + sizeof(analysis) + analysis.parts.capacity()*sizeof(detail::NativeHeadGeometryReport::Part) + analysis.contacts.capacity()*sizeof(detail::NativeHeadGeometryReport::Contact)+analysis.seam_endpoints.capacity()*sizeof(detail::NativeHeadGeometryReport::Seam) + declaration_bytes +
-                   targets.size() * sizeof(detail::DeclaredWeightPart) + 4096;
+                   targets.size() * sizeof(detail::DeclaredWeightPart) +
+                   scene.objects().size()*(sizeof(SculptObject)+512)+scene.groups().size()*(sizeof(SceneGroup)+512)+65536;
   if(wrapper_work>=500000000||wrapper_bytes>=256u*1024u*1024u)
     throw std::length_error("Automatic request staging exhausted original resources");
   detail::GeometryWeightBindOptions options;
   options.limits = {4, 1e-5f};
-  options.maximum_work = 500000000 - wrapper_work;
+  options.maximum_work = 500000000 - wrapper_work-continuation_allowance;
   options.maximum_workspace = 256u * 1024u * 1024u - wrapper_bytes;
   detail::GeometryWeightBindReport report;
   const auto start = std::chrono::steady_clock::now();
   scene.save(out / "fitted-unskinned.dsculpt");
-  if (!detail::author_geometry_weight_skin(scene, targets, support, options, {},
+  Scene prepared=scene;
+  if (!detail::author_geometry_weight_skin(prepared, targets, support, options, {},
                                            &report))
     throw std::runtime_error("No actual changes");
   const auto seconds =
       std::chrono::duration<double>(std::chrono::steady_clock::now() - start)
           .count();
+  const size_t continuation_bytes=detail::continue_native_carrier(prepared,carrier,reference,
+                 continuation_allowance,256u*1024u*1024u-wrapper_bytes);
+  if(scene.encode()!=before)throw std::runtime_error("Owning anatomical continuation modified its immutable input before adoption");
+  scene=std::move(prepared);
   scene.save(out / "bound.dsculpt");
   std::ofstream(out / "report.json")
-      << nlohmann::json{{"work", report.work + wrapper_work},
-                        {"workspace", std::max(report.workspace + wrapper_bytes, temporary_peak)},
+      << nlohmann::json{{"work", report.work + wrapper_work+continuation_allowance},
+                        {"workspace", std::max({report.workspace + wrapper_bytes, temporary_peak,continuation_bytes+wrapper_bytes})},
                         {"seconds", seconds},
                         {"analysis_work", analysis.work},
                         {"analysis_workspace", analysis.bytes},
@@ -182,7 +192,7 @@ int main(int argc, char **argv) try {
                                    "geometry-derived boundary hypothesis, original finite axes, no fallback"}}
              .dump(2);
   std::cout << "SAVED candidate contacts=" << report.field.contacts
-            << " work=" << report.work + wrapper_work
+            << " work=" << report.work + wrapper_work+continuation_allowance
             << " bytes=" << report.workspace + wrapper_bytes
             << " seconds=" << seconds << std::endl;
   return 0;
