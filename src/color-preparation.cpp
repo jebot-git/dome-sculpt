@@ -42,6 +42,10 @@ std::optional<detail::ColorBoundMemoKey> bound_key(
     owner=preparation.paint_sampling->domain()->basis();
     current_owner=preparation.paint_sampling->geometry_attachment()->authored_geometry();
   }else if(preparation.original_paint)owner=current_owner=preparation.original_paint->mesh_owner();
+  if(!initial&&!preparation.paint_sampling&&owner.get()!=&mesh){
+    if(const auto context=detail::color_bound_paint_context(&preparation,current_mesh,projection.vertex_rgba))
+      owner=current_owner=context->mesh;
+  }
   if(owner.get()!=&mesh||current_owner.get()!=&current_mesh)return {};
   // A borrowed/evaluated copy is not either genuine COW owner.
   std::shared_ptr<const PaintColorProjection> projected;

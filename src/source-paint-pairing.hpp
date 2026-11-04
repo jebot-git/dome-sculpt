@@ -3,6 +3,7 @@
 #include "dome/normal-preparation.hpp"
 #include "dome/color-paint-sampling.hpp"
 #include "normal-projection-identity.hpp"
+#include "color-bound-memo.hpp"
 namespace dome::detail {
 // Call after holder validation. A retained paint needs its OWN interpretation;
 // a current object or a neighboring Origin cannot authenticate that before-state.
@@ -20,7 +21,7 @@ inline void source_paint_pairing(const PaintedMesh *paint,const SourceMaterialBi
     throw std::invalid_argument("Retained paint domain requires its own current-field material authority");
   if(color_recipe&&color_recipe->paint_sampling&&!color_recipe->paint_sampling->matches_current(*paint))
     throw std::invalid_argument("Retained paint and material lack the exact same geometry attachment");
-  if(color){if(color->vertex_rgba!=color_recipe->projection->vertex_rgba||color->maximum_error!=color_recipe->projection->maximum_error||color->quality_cells!=color_recipe->projection->quality_cells)throw std::invalid_argument("Source PBR color field differs from its own retained receipt");if(deep)color_recipe->validate_current(paint->mesh(),appearance);}
+  if(color){if(color->vertex_rgba!=color_recipe->projection->vertex_rgba||color->maximum_error!=color_recipe->projection->maximum_error||color->quality_cells!=color_recipe->projection->quality_cells)throw std::invalid_argument("Source PBR color field differs from its own retained receipt");if(deep){ColorBoundPaintScope context(*paint,color_recipe.get());color_recipe->validate_current(paint->mesh(),appearance);}}
   if(normal){if(!normal_projection_identity(*normal,*normal_recipe->projection))throw std::invalid_argument("Source normal planes differ from their own retained interpretation");if(normal_recipe->sampling_domain)normal_recipe->sampling_domain->validate_paint(*paint,*binding,deep);if(deep)normal_recipe->validate_current(paint->mesh(),appearance);}
 }
 } // namespace dome::detail

@@ -51,10 +51,16 @@ inline std::array<char,64> color_bound_digest(std::span<const uint8_t> bytes) {
   std::copy_n(text.begin(),out.size(),out.begin());return out;
 }
 struct ColorBoundMemoStats {size_t hits=0,misses=0,full_fallback=0;};
+struct ColorBoundPaintContext {
+  const void *recipe=nullptr;
+  std::shared_ptr<const Mesh> mesh;
+  std::shared_ptr<const PaintColorProjection> projection;
+};
 struct ColorBoundMemoContext {
   struct Entry {ColorBoundMemoKey key;ColorProjectionBound value;};
   std::array<Entry,64> entries{};
-  size_t depth=0,count=0;
+  std::array<ColorBoundPaintContext,64> paints{};
+  size_t depth=0,count=0,paint_count=0;
   ColorBoundMemoStats stats{},last{};
 };
 inline ColorBoundMemoContext &color_bound_context() {
@@ -70,8 +76,35 @@ public:
     c.last=c.stats;
     static_assert(std::is_nothrow_move_assignable_v<ColorBoundMemoContext::Entry>);
     for(size_t n=0;n<c.count;++n)c.entries[n]={};c.count=0;
+    for(size_t n=0;n<c.paint_count;++n)c.paints[n]={};c.paint_count=0;
   }
 };
+// Called only after the ordinary paint/recipe pairing checks. This supplies the
+// real private SurfaceMap owner when a normal-preparation step made a new COW
+// mesh; it does not authenticate a caller's borrowed Mesh or material.
+class ColorBoundPaintScope {
+  size_t index_=SIZE_MAX;
+public:
+  ColorBoundPaintScope(const PaintedMesh &paint,const void *recipe) noexcept {
+    auto &c=color_bound_context();if(!c.depth||c.paint_count==c.paints.size()||!paint.color_projection())return;
+    index_=c.paint_count++;c.paints[index_]={recipe,paint.mesh_owner(),paint.color_projection()};
+  }
+  ColorBoundPaintScope(const ColorBoundPaintScope&)=delete;
+  ColorBoundPaintScope&operator=(const ColorBoundPaintScope&)=delete;
+  ~ColorBoundPaintScope() noexcept {
+    if(index_==SIZE_MAX)return;auto &c=color_bound_context();
+    if(index_>=c.paint_count)return;
+    c.paints[index_]={};if(index_+1==c.paint_count)--c.paint_count;
+  }
+};
+inline const ColorBoundPaintContext *color_bound_paint_context(const void *recipe,
+    const Mesh &mesh,const std::shared_ptr<const Image> &image) noexcept {
+  auto &c=color_bound_context();if(!c.depth)return nullptr;
+  for(size_t n=c.paint_count;n;--n){const auto &p=c.paints[n-1];
+    if(p.recipe==recipe&&p.mesh.get()==&mesh&&p.projection&&
+       color_bound_same_owner(p.projection->vertex_rgba,image))return &p;}
+  return nullptr;
+}
 inline bool color_bound_scope_active() noexcept {return color_bound_context().depth!=0;}
 inline ColorBoundMemoStats last_color_bound_memo_stats() noexcept {return color_bound_context().last;}
 inline std::optional<ColorProjectionBound> find_color_bound(const ColorBoundMemoKey &key) {
