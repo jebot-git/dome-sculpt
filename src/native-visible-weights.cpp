@@ -1,11 +1,14 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/skin-authoring.hpp"
 #include "geometry-weight-authoring.hpp"
+#include "native-weight-context.hpp"
 #include "native-weight-reference.hpp"
 namespace dome {
 void NativeVisibleSkinOptions::validate() const {
   if ((contact_handling != NativeContactHandling::PointwiseOpen &&
        contact_handling != NativeContactHandling::FiniteLineIntegral) ||
+      (support_context != NativeSupportContext::TargetsOnly &&
+       support_context != NativeSupportContext::CompleteReferenceNode) ||
       !maximum_work || maximum_work > 500'000'000 || maximum_workspace < 4096 ||
       maximum_workspace > 512u * 1024u * 1024u)
     throw std::invalid_argument(
@@ -21,6 +24,10 @@ bool author_native_visible_skin(Scene &scene, std::span<const uint64_t> targets,
       !detail::native_weight_reference(scene.object(options.reference)))
     throw std::invalid_argument(
         "Choose editable targets and a genuine native fitted reference rig");
+  if (options.native_visible.support_context ==
+      NativeSupportContext::CompleteReferenceNode)
+    return detail::author_native_context_skin(scene, targets, options,
+                                              cancelled, report);
   const auto &rig = *scene.object(options.reference).deformation->skeleton;
   const size_t permitted =
       std::count_if(rig.bones.begin(), rig.bones.end(),

@@ -38,13 +38,17 @@ struct Driver {
     sector(10);
     sector(11);
   }
-  void value(float t) {
+  void value(float t, int row = 0) {
     auto state = doc.frame().state;
     auto &h = frame.hands[1];
     h.tracked.aimValid = true;
-    h.tracked.aim.position =
-        ob::transform(state->panel, {((100 + 420 * t) / 640.f - .5f) * .6f,
-                                     (.5f - 300 / 640.f) * .6f, .25f});
+    h.tracked.aim.position = ob::transform(
+        state->panel,
+        {((100 + 420 * t) / 640.f - .5f) * .6f,
+         (.5f - (state->controls.components == 1 ? 300.f : 240.f + row * 80.f) /
+                    640.f) *
+             .6f,
+         .25f});
     h.tracked.aim.orientation = state->panel.orientation;
     send(0, 0, false, .8f);
     send();

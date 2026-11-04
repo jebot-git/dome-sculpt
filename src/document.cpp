@@ -2215,7 +2215,10 @@ void Document::finish_control_locked(bool accept) {
       } else if(c.parameter==VrParameter::SkinFalloff) options.falloff=c.value[0];
       else if(c.parameter==VrParameter::SkinInfluences) options.limits.max_influences=uint32_t(std::lround(c.value[0]));
       else if(c.parameter==VrParameter::SkinPrune) options.limits.prune=c.value[0];
-      else if(c.parameter==VrParameter::SkinContacts) options.native_visible.contact_handling=NativeContactHandling(int(std::lround(c.value[0])));
+      else if(c.parameter==VrParameter::SkinContacts) {
+        options.native_visible.contact_handling=NativeContactHandling(int(std::lround(c.value[0])));
+        options.native_visible.support_context=NativeSupportContext(int(std::lround(c.value[1])));
+      }
     }
     control_before_.reset();control_changed_=false;state_.controls={};
     if(accept && c.parameter==VrParameter::SkinMode && input_.menu_open())
@@ -2407,7 +2410,9 @@ void Document::control_event_locked(VrControlEvent event) {
     case VrParameter::SkinMode:
       c.title="Surface / transfer / source-assisted / native handles";c.maximum=3;c.value[0]=int(state_.skin_options.mode);break;
     case VrParameter::SkinContacts:
-      c.title="Surface contacts: strict rays / finite-line integral";c.maximum=1;c.value[0]=int(state_.skin_options.native_visible.contact_handling);break;
+      c.title="Surface contacts / support geometry";c.maximum=1;c.components=2;
+      c.value[0]=int(state_.skin_options.native_visible.contact_handling);
+      c.value[1]=int(state_.skin_options.native_visible.support_context);break;
     case VrParameter::SkinDistances:
       c.title="Seed / margin / transfer (world mm)";c.components=3;
       c.value={skin_distance_slider(state_.skin_options.seed_distance),skin_distance_slider(state_.skin_options.seed_margin),skin_distance_slider(state_.skin_options.transfer_distance),0};break;

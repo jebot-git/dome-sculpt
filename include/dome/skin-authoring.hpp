@@ -11,6 +11,7 @@ enum class SkinAuthoringMode {
 // Explicit native finite-handle surface method. Imported artist rig axes are
 // not interpreted as native handles. No volume PDE or rig recognition claim.
 enum class NativeContactHandling { PointwiseOpen, FiniteLineIntegral };
+enum class NativeSupportContext { TargetsOnly, CompleteReferenceNode };
 struct NativeVisibleSkinOptions {
   size_t maximum_work = 500'000'000;
   size_t maximum_workspace = 256u * 1024u * 1024u;
@@ -18,6 +19,8 @@ struct NativeVisibleSkinOptions {
   // bounded finite-line construction, never an error fallback. Both retain
   // genuine positive-measure blockers and refuse fully coplanar handles.
   NativeContactHandling contact_handling = NativeContactHandling::PointwiseOpen;
+  // Explicit read-only support; never retry a failed targets-only solve.
+  NativeSupportContext support_context = NativeSupportContext::TargetsOnly;
   void validate() const;
 };
 struct NativeVisibleSkinReport {
@@ -73,7 +76,10 @@ bool author_source_visible_skin(Scene &, std::span<const uint64_t> targets,
                                 const SkinAuthoringOptions &,
                                 const std::function<bool()> &cancelled = {},
                                 SourceVisibleSkinReport *report = nullptr);
-// Explicit editable targets supply the support geometry; the distinct native
+// Explicit editable targets supply support, optionally supplemented by the
+// complete current original reference-node primitive collection. Only explicit
+// targets receive weights; readonly support is never silently made editable.
+// The distinct native
 // reference rig stays read-only. REST/full placement is authoritative, current
 // paint/morph/pose and the complete rig/source capsules are preserved. Unknown
 // continuous support or source identity refuses before scene adoption.

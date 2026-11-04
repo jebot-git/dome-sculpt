@@ -93,6 +93,16 @@ void edit_skin_dialog(Document &doc) {
       "Finite-line integral handles isolated exact surface contacts.\n"
       "Fully coplanar handles and unresolved support still refuse.\n"
       "No fallback or topology repair is applied.");
+  Fl_Choice support(label, y, width - label - 40, row - 4, "Support geometry");
+  y += row;
+  support.add("Targets only");
+  support.add("Reference node");
+  support.value(int(options.native_visible.support_context));
+  support.tooltip(
+      "Targets only preserves the original support policy.\n"
+      "Reference node adds all unique current primitives of the chosen\n"
+      "original mesh node as read-only support. Only targets change.\n"
+      "Incomplete/duplicate nodes refuse; there is no failure retry.");
   Fl_Check_Button keep(20, y, width - 50, row, "Preserve checked influences");
   y += row;
   Fl_Check_Browser locks(20, y, width - 64, row * 6);
@@ -120,7 +130,7 @@ void edit_skin_dialog(Document &doc) {
             "Bind / transfer");
   struct Context {
     Fl_Window *window;
-    Fl_Choice *source, *mode, *scope, *contacts;
+    Fl_Choice *source, *mode, *scope, *contacts, *support;
     Fl_Box *hint;
     Fl_Button *apply;
     const Scene *scene;
@@ -171,10 +181,13 @@ void edit_skin_dialog(Document &doc) {
       const bool source_assisted = mode->value() == 2;
       const bool native = mode->value() == 3;
       const bool explicit_parts = source_assisted || native;
-      if (native)
+      if (native) {
         contacts->activate();
-      else
+        support->activate();
+      } else {
         contacts->deactivate();
+        support->deactivate();
+      }
       if (source_assisted) {
         for (auto *field : fields)
           field->deactivate();
@@ -190,7 +203,7 @@ void edit_skin_dialog(Document &doc) {
         fields[4]->activate();
         fields[5]->activate();
         scope->activate();
-        hint->label("Selected parts supply support.\n"
+        hint->label("Choose support geometry.\n"
                     "Keep the full rig and source.\n"
                     "Keep paint, morphs and pose.");
         apply->label(scope->value() == 1 ? "Bind selected" : "Bind active");
@@ -224,21 +237,14 @@ void edit_skin_dialog(Document &doc) {
       else
         apply->activate();
     }
-  } context{&window,
-            &source,
-            &mode,
-            &scope,
-            &contacts,
-            &hint,
-            &apply,
-            &draft.scene,
-            target.id,
-            &options,
-            {},
-            {},
-            {&seed, &margin, &distance, &falloff, &cap, &prune},
-            &keep,
-            &locks};
+  } context{&window,      &source,
+            &mode,        &scope,
+            &contacts,    &support,
+            &hint,        &apply,
+            &draft.scene, target.id,
+            &options,     {},
+            {},           {&seed, &margin, &distance, &falloff, &cap, &prune},
+            &keep,        &locks};
   context.source_ready = !state->shape_sculpt && !state->object_grabbing;
   context.selection_ok =
       !state->selected_objects.empty() && state->selected_objects.size() <= 64;
@@ -274,6 +280,8 @@ void edit_skin_dialog(Document &doc) {
           next.mode = SkinAuthoringMode(c.mode->value());
           next.native_visible.contact_handling =
               NativeContactHandling(c.contacts->value());
+          next.native_visible.support_context =
+              NativeSupportContext(c.support->value());
           next.seed_distance = float(c.fields[0]->value() / 1000);
           next.seed_margin = float(c.fields[1]->value() / 1000);
           next.transfer_distance = float(c.fields[2]->value() / 1000);

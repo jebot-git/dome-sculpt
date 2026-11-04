@@ -1,0 +1,191 @@
+{
+  "base": "7849001ac10cb502119ab49c873d67f81e518eba",
+  "status": "PRIVATE WIP; anatomical head/eye leakage blocks broad/default/main admission",
+  "implemented": [
+    "NativeSupportContext TargetsOnly(default) / CompleteReferenceNode opt-in",
+    "bounded complete current-group/strong asset+node+mesh+unique primitive collection; no source_instance authority",
+    "charged detached Scene staging; all readonly/current group/COW owners and metadata checked before no-throw adoption",
+    "desktop explicit support choice; existing Native31 contact control has contact/support rows; no page or command ID shifts"
+  ],
+  "new_public_field": "NativeVisibleSkinOptions.support_context; all actual consumers rebuilt coherently, not old-layout archives",
+  "initial_builds": {
+    "R": {
+      "code": 0,
+      "seconds": 872.0247632739774
+    },
+    "S": {
+      "code": 0,
+      "seconds": 1430.9752354100056
+    }
+  },
+  "fixed_builds": {
+    "R": {
+      "code": 0,
+      "seconds": 67.193774881016
+    },
+    "S": {
+      "code": 0,
+      "seconds": 125.89649947799626
+    }
+  },
+  "original_registered": {
+    "R": {
+      "code": 8,
+      "seconds": 80.59173722600099,
+      "source_mismatches": [],
+      "binary_mismatches": [],
+      "command": [
+        "ctest",
+        "--test-dir",
+        "build",
+        "--output-on-failure",
+        "--parallel",
+        "2",
+        "-R",
+        "^(native-line-.*|native-context-.*|native-unskinned-fixtures|native-visible-.*|skin-authoring|skin-affine-controller|source-visible-document|rig-source-unskinned|rig-source-unskinned-faults|native-weight-row-workflow|native-weight-handles|bone-shadow-query-cull-regression|emission-controls|xr-editable-export)$"
+      ]
+    },
+    "S": {
+      "code": 8,
+      "seconds": 496.58393803899526,
+      "source_mismatches": [],
+      "binary_mismatches": [],
+      "command": [
+        "ctest",
+        "--test-dir",
+        "build-sanitize",
+        "--output-on-failure",
+        "--parallel",
+        "2",
+        "-R",
+        "^(native-line-.*|native-context-.*|native-unskinned-fixtures|native-visible-.*|skin-authoring|skin-affine-controller|source-visible-document|rig-source-unskinned|rig-source-unskinned-faults|native-weight-row-workflow|native-weight-handles|bone-shadow-query-cull-regression|emission-controls|xr-editable-export)$"
+      ]
+    }
+  },
+  "correction": "copy2 preserved corrected test source mtime older than initial object; original cohorts retained; actual corrected CPP forced/recompiled only after terminal",
+  "corrected_registered": {
+    "R": {
+      "code": 0,
+      "seconds": 22.18169156598742,
+      "command": [
+        "ctest",
+        "--test-dir",
+        "build",
+        "--output-on-failure",
+        "--parallel",
+        "2",
+        "-FA",
+        ".*",
+        "-R",
+        "^native-context-(female|male)$"
+      ]
+    },
+    "S": {
+      "code": 0,
+      "seconds": 155.19532579698716,
+      "command": [
+        "ctest",
+        "--test-dir",
+        "build-sanitize",
+        "--output-on-failure",
+        "--parallel",
+        "2",
+        "-FA",
+        ".*",
+        "-R",
+        "^native-context-(female|male)$"
+      ]
+    }
+  },
+  "san_external_driver": {
+    "steps": [
+      {
+        "code": 0,
+        "seconds": 32.73130579298595,
+        "command": [
+          "/usr/bin/python3",
+          "tests/native-line-xr.py",
+          "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-context-api-7849001/build-sanitize/dome-sculpt",
+          "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-context-api-7849001/build-sanitize/libdome-sculpt-test-runtime.so",
+          "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-context-api-7849001/build-sanitize/dome-sculpt-native-line-xr-fixture",
+          "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-context-api-7849001/artifacts/patched-driver-xr/production"
+        ]
+      },
+      {
+        "code": 0,
+        "seconds": 33.73492376098875,
+        "command": [
+          "/usr/bin/python3",
+          "tests/native-line-xr.py",
+          "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-context-api-7849001/build-sanitize/dome-sculpt-native-line-xr-observer-test",
+          "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-context-api-7849001/build-sanitize/libdome-sculpt-test-runtime.so",
+          "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-context-api-7849001/build-sanitize/dome-sculpt-native-line-xr-fixture",
+          "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-context-api-7849001/artifacts/patched-driver-xr/observed"
+        ]
+      }
+    ],
+    "seconds": 67.31365095399087,
+    "maps": {
+      "3729432": "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-context-api-7849001/artifacts/patched-driver-xr/app-3729432-maps.txt",
+      "3842250": "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-context-api-7849001/artifacts/patched-driver-xr/app-3842250-maps.txt"
+    },
+    "mismatches": [],
+    "source": "8878f64 sealed external Mesa runtime; no suppression/installation/GPU/HMD"
+  },
+  "gui": {
+    "normal": {
+      "code": 0,
+      "seconds": 158.6943698420073
+    },
+    "compact": {
+      "code": 0,
+      "seconds": 163.45072329899995
+    }
+  },
+  "gui_counts": {
+    "normal": 21,
+    "compact": 22
+  },
+  "original_source_maps": "artifacts/source-fixed-before.json",
+  "head_eye_criteria": {
+    "poses": 14,
+    "global_max_height": 0.03,
+    "global_mean_height": 0.01,
+    "local_max_part_diagonal": 0.03,
+    "local_mean_part_diagonal": 0.01,
+    "rigid_oracle_motion_m": 3e-05,
+    "rigid_max_part_diagonal": 0.005,
+    "rigid_mean_part_diagonal": 0.001,
+    "artist_values": "post-solve oracle only"
+  },
+  "head_eye": {
+    "female": {
+      "cohorts": 266,
+      "combined_failures": 166,
+      "global_failures": 0,
+      "local_failures": 166,
+      "rigid_failures": 96,
+      "transport_max": 3.369759797241513e-07,
+      "rest_max": 0.0,
+      "path": "artifacts/full-female-head-eye/quality.json"
+    },
+    "male": {
+      "cohorts": 266,
+      "combined_failures": 172,
+      "global_failures": 0,
+      "local_failures": 168,
+      "rigid_failures": 100,
+      "transport_max": 3.049621303035839e-07,
+      "rest_max": 0.0,
+      "path": "artifacts/full-male-head-eye/quality.json"
+    }
+  },
+  "remaining": [
+    "anatomical/domain/solver correction required, not Face refusal or relaxed criteria",
+    "general coplanar/interior/thin and remaining native source-domain coverage",
+    "new-context small actual preparation/publication OOM gates and independently exported current poses",
+    "fresh OneAPI profile/device/native client gates; no new GPU claim"
+  ],
+  "sealed_inputs": "artifacts/wip-sealed-inputs.json",
+  "sealed_input_count": 606
+}

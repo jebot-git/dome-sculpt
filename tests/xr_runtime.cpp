@@ -1172,7 +1172,8 @@ FN(LocateSpace, XrSpace handle, XrSpace, XrTime, XrSpaceLocation *p) {
   }
   if(auto mode=skin_mode();!mode.empty() && s->action && s->action->name=="aim_pose" && right(s->hand) && (skin_step()==22 || (mode=="native-line" && skin_step()==28))) {
     float t=mode=="fitted"?0.f:(mode=="native" || mode=="native-line")?1.f:1.f/3.f;
-    p->pose.position={.045f+((100+420*t)/640-.5f)*.6f,1.56f+(.5f-300.f/640)*.6f,-.3f};
+    const float y=mode=="native-line" && skin_step()==28 ? 240.f : 300.f;
+    p->pose.position={.045f+((100+420*t)/640-.5f)*.6f,1.56f+(.5f-y/640)*.6f,-.3f};
   }
   if(!cut_mode().empty()&&s->action&&s->action->name=="aim_pose"&&right(s->hand)&&cut_stage()==24){
     p->pose.position={.045f+((100+420*.6f)/640-.5f)*.6f,1.56f+(.5f-300.f/640)*.6f,-.3f};
