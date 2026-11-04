@@ -105,7 +105,7 @@ in vec2 uv;out vec4 result;uniform sampler2D scene;void main(){result=texture(sc
     glUniform1i(loc(uniform), unit);
     return id;
   }
-  void transform(const J &info, const char *x, const char *y,const J &expression_data,size_t material) {
+  void transform(const J &info, const char *x, const char *y,const J &expression_data,size_t material,bool paint_layer=false) {
     J t = J::object();
     if (info.contains("extensions") &&
         info.at("extensions").contains("KHR_texture_transform"))
@@ -115,7 +115,7 @@ in vec2 uv;out vec4 result;uniform sampler2D scene;void main(){result=texture(sc
     double a = t.value("rotation", 0.0);
     const auto initial_scale=scale,initial_offset=offset;
     for(const auto &bind:expression_data.value("textureTransformBinds",J::array()))if(bind.at("material").get<size_t>()==material)for(size_t k=0;k<2;++k){scale[k]+=float((double(bind.value("scale",std::array<float,2>{1,1})[k])-initial_scale[k])*expression);offset[k]+=float((double(bind.value("offset",std::array<float,2>{})[k])-initial_offset[k])*expression);}
-    if(wrong_paint_uv&&std::string_view(x)=="baseX"&&info.value("texCoord",0)>=2){scale=initial_scale;offset=initial_offset;offset[0]+=expression*.2f;offset[1]-=expression*.1f;}
+    if(wrong_paint_uv&&std::string_view(x)=="baseX"&&paint_layer){scale=initial_scale;offset=initial_offset;offset[0]+=expression*.2f;offset[1]-=expression*.1f;}
     glUniform3f(loc(x),scale[0],scale[1],float(a));glUniform3f(loc(y),offset[0],offset[1],0);
   }
   Pixels render(role_consumer::Model &model, double seconds,
@@ -162,7 +162,7 @@ in vec2 uv;out vec4 result;uniform sampler2D scene;void main(){result=texture(sc
         if(blended){glEnable(GL_BLEND);glBlendEquationSeparate(GL_FUNC_ADD,GL_FUNC_ADD);glBlendFuncSeparate(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA,GL_ONE,GL_ONE_MINUS_SRC_ALPHA);glDepthMask(GL_FALSE);glDepthFunc(GL_LEQUAL);}else{glDisable(GL_BLEND);glDepthMask(GL_TRUE);glDepthFunc(GL_LESS);}glUniform1i(loc("blend"),blended);
         const size_t material=size_t(p.material-model.data->materials);
         for(const auto &bind:expression_data.value("materialColorBinds",J::array()))if(bind.at("material").get<size_t>()==material){const std::string type=bind.at("type");J *field=type=="color"?&m["pbrMetallicRoughness"]["baseColorFactor"]:type=="shadeColor"?&m["extensions"]["VRMC_materials_mtoon"]["shadeColorFactor"]:type=="emissionColor"?&m["emissiveFactor"]:nullptr;if(!field)throw std::runtime_error("Independent layer colour type unsupported");for(size_t k=0;k<field->size();++k)(*field)[k]=field->at(k).get<double>()+(bind.at("targetValue").at(k).get<double>()-field->at(k).get<double>())*expression;}
-        if(wrong_base_tint&&blended){const auto &bind=expression_data.at("materialColorBinds").at(0);for(size_t k=0;k<3;++k)m["pbrMetallicRoughness"]["baseColorFactor"][k]=1+(bind.at("targetValue").at(k).get<double>()-1)*expression;}
+        if(wrong_base_tint&&pi>0){const auto &bind=expression_data.at("materialColorBinds").at(0);for(size_t k=0;k<3;++k)m["pbrMetallicRoughness"]["baseColorFactor"][k]=1+(bind.at("targetValue").at(k).get<double>()-1)*expression;}
         // Core occlusion/MR fields are PBR fallbacks, not MToon1 roles.
         for (const char *role :
              {"normalTexture"})
@@ -186,7 +186,7 @@ in vec2 uv;out vec4 result;uniform sampler2D scene;void main(){result=texture(sc
             base.value("baseColorFactor", std::array<float, 4>{1, 1, 1, 1});
         auto shadeColor =
             ext.value("shadeColorFactor", std::array<float, 3>{0, 0, 0});
-        if(wrong_shared_shade&&blended)shadeColor={0,0,0};
+        if(wrong_shared_shade&&pi>0)shadeColor={0,0,0};
         glUniform4fv(loc("baseFactor"), 1, baseColor.data());
         glUniform3fv(loc("shadeFactor"), 1, shadeColor.data());
         scalar("seconds", float(seconds));
@@ -197,7 +197,7 @@ in vec2 uv;out vec4 result;uniform sampler2D scene;void main(){result=texture(sc
         scalar("shift", ext.value("shadingShiftFactor", 0.f));
         scalar("toony", ext.value("shadingToonyFactor", .9f));
         scalar("equalization", ext.value("giEqualizationFactor", .9f));
-        transform(bi, "baseX", "baseY",expression_data,material);
+        transform(bi, "baseX", "baseY",expression_data,material,pi>0);
         transform(si, "shadeX", "shadeY",expression_data,material);
         transform(ei, "emissionX", "emissionY",expression_data,material);
         auto bt = texture(model.data, bi, 0, "baseMap"),
