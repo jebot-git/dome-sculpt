@@ -1,5 +1,17 @@
 # Full objective and completion evidence
 
+## Coherent recipe regression and final fixture repairs — 2026-11-04
+
+The original complete615 Release run finishes613Pass/2Fail. Complete test-only
+repairs now pass eight affected commands each Release/ownedSAN, including73
+post-UV graphical and10 zero-morph checks per profile. The fresh coherent app
+passes actual native normal/compact and nested DomeD Wayland recipe controls;
+168 emitted files have zero Khronos errors, with all messages retained. Read
+COHERENT-RECIPE-FINAL-FIXTURES.md and its receipt for exact scopes and preserved
+failures. This is composed follow-up evidence, not a green original615 or full
+sanitizer invocation. Scene31 conversion/agent work and the full production goal
+remain separate and incomplete; controller drawers remain required after basics.
+
 ## Private bake-recipe regression follow-up — 2026-11-04
 
 The preserved original612 run is578Passed/31Failed/1Timeout/2dependencyNotRun.
