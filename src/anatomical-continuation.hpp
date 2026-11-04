@@ -545,10 +545,13 @@ anatomical_continuation(const Scene &scene, uint64_t group,
           std::span<const uint32_t>(row_owner), options.maximum_bytes - bytes,
           budget);
     out.visibility_seams = incidence.joined_edges;
+    const auto origin_policy = declared && declared->origin_boundary == DeclaredOriginBoundary::NativeOpenSegment
+                                   ? BoneOriginPolicy::NativeOpenSegment
+                                   : BoneOriginPolicy::StrictOwnership;
     BoneShadowQuery shadow_query(query_points, mesh.indices,
                                  options.maximum_bytes - bytes -
                                      incidence.planned_bytes,
-                                 budget, incidence.groups);
+                                 budget, incidence.groups, origin_policy);
     BoneShadowQuery::Scratch shadow_scratch(shadow_query);
     const size_t source_bytes =
         bytes + incidence.planned_bytes + shadow_query.planned_bytes;
@@ -643,9 +646,7 @@ anatomical_continuation(const Scene &scene, uint64_t group,
           conductance = shadow_query.integrate(i, head, tail, s.mass[i], lo, hi,
                                                shadow_scratch, budget,
                                                out.query_report, wall_domain, true, true,
-                                               declared && declared->origin_boundary == DeclaredOriginBoundary::NativeOpenSegment
-                                                   ? BoneOriginPolicy::NativeOpenSegment
-                                                   : BoneOriginPolicy::StrictOwnership);
+                                               origin_policy);
         } catch (const std::length_error &e) {
           throw std::length_error(
               std::string(e.what()) +

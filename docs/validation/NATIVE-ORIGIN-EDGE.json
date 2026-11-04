@@ -1,0 +1,108 @@
+{
+  "status": "private-geometric-certificate-qualified-complex-field-still-refuses",
+  "parent": "4ad7546",
+  "native_scalar_controls_release": 31,
+  "native_scalar_controls_own_inline_O1_SAN": 31,
+  "strict_control": "unchanged128 exact-union/15 allocation/opaque-origin/noalloc controls pass",
+  "workspace": "16KiB Native-only fixed exact arithmetic admission, strict plans unchanged; degree4<908bits<1024, checked arithmetic refuses unsupported ranges",
+  "FEM_incidence_changes": false,
+  "field": {
+    "elapsed": 0.511175256,
+    "error": "Bone query has an unowned origin/coplanar/grazing contact base_work=62810298 source=0 row=5184 face=9012 kind=2",
+    "exact_rollback": true,
+    "targets": [
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19,
+      20
+    ],
+    "work_bound": 500000000
+  },
+  "further_geometry": {
+    "exact_work": 707,
+    "input": {
+      "face": [
+        {
+          "object": 16,
+          "position": [
+            0.03897784650325775,
+            0.9131266474723816,
+            0.1018415316939354
+          ],
+          "source": 5493,
+          "vertex": 845
+        },
+        {
+          "object": 16,
+          "position": [
+            -0.002197608817368746,
+            0.9132011532783508,
+            0.10218673199415207
+          ],
+          "source": 5501,
+          "vertex": 853
+        },
+        {
+          "object": 16,
+          "position": [
+            -0.0008590371580794454,
+            0.9384740591049194,
+            -0.01801494136452675
+          ],
+          "source": 5502,
+          "vertex": 854
+        }
+      ],
+      "face_owner": 16,
+      "head": [
+        0.0002554797101765871,
+        0.9097322225570679,
+        -0.005773227661848068
+      ],
+      "head_side": 1,
+      "local_face": 1280,
+      "row": {
+        "object": 16,
+        "position": [
+          -0.0008590371580794454,
+          0.9384740591049194,
+          -0.01801494136452675
+        ],
+        "source": 5182,
+        "vertex": 536
+      },
+      "row_side": 0,
+      "tail": [
+        0.00025547106633894145,
+        0.9626460075378418,
+        -0.015597852878272533
+      ],
+      "tail_side": -1
+    },
+    "unexpected_open_fan_contact": true
+  },
+  "field_or_pose_quality_produced": false,
+  "hash_mismatches": 0,
+  "scope": "two affected private-header production readers rebuilt against exact421 public-header/core/support; no whole solver/frontend qualification",
+  "hashes": {
+    "src/bone-shadow-query.hpp": "fe71d134566ee9532de99db6ac32ea6197b7b3f180bc20bacee3aca3046635a1",
+    "src/anatomical-continuation.hpp": "86ba872948ddec709837347e769bd695d0a0862012f8cbfefabbd888aab8a591",
+    "tests/native-open-origin.cpp": "5f01d27c8852552a69c592cf946bf0667f1334fee159361e27369e284ee05e03",
+    "artifacts/native-open-origin": "efc0a826f4c6ab9c8129c04a8315d60010c7c09cbec293b8edd676e35d78ad60",
+    "artifacts/native-open-origin-sanitize": "75c2ef960c3964e2f5a0bb257734d991d86159ab47d75abc7a0c327c22578433",
+    "artifacts/predicate-bridge-fixed.log": "b99e38b5f92a67aa2c19a6f080ddbe3b4b70659db63db9de1829a05d81b09b18",
+    "artifacts/predicate-sanitize.log": "b99e38b5f92a67aa2c19a6f080ddbe3b4b70659db63db9de1829a05d81b09b18",
+    "artifacts/original-strict.log": "e77126f71685989add7bf74b545a52484b0d70354cbe4e78dad33c536fe3586b",
+    "artifacts/female-edge.log": "f2e22b47cb7083cfc3e96fcbfc3918cf59a6b0259e5c617872a847a108488ec5",
+    "artifacts/female-edge/failure.json": "249625ae147c401436707579b5efb0463b86dd7fad5248c49674e1caafb4d589",
+    "artifacts/female-third-contact.json": "d8e5813e4ef6783b4d96602a84e17b7104863fecf7b3a84d72d9f5c253cccb34",
+    "artifacts/fan-third-contact.json": "78751bc03b7ffa4b89fcd6c3e3ffb37f4f28204b057bf98cd1f9109386b3a097",
+    "artifacts/field-overlay-before.json": "b566ceb3f6ddaa0761ea39bfc90926dfbfea0ae38518946b3b8f1b0ed52ad40f",
+    "artifacts/field-overlay.map": "e5a216b4fda1f0ad98056a399ff99d98c359a61e0d32fcebd80628a8148f32e7"
+  }
+}

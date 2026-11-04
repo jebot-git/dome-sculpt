@@ -28,26 +28,28 @@ struct Geometry {
                    {-.5f, -.5f, 0}, {.5f, -.5f, 0}, {0, .5f, 0}};
   std::vector<uint32_t> i{0, 1, 2, 3, 4, 5, 1, 3, 4};
 };
-double simpson(P row, P head, P tail, double mass) {
+double simpson(P row, P head, P tail, double mass, double lo = 0,
+               double hi = 1) {
   constexpr int n = 10000;
   long double sum = 0;
   for (int t = 0; t <= n; ++t) {
     long double d = mass;
     for (int k = 0; k < 3; ++k) {
       const long double v = static_cast<long double>(head[k]) +
-                            static_cast<long double>(t) / n *
+                            (lo + static_cast<long double>(t) / n * (hi - lo)) *
                                 (static_cast<long double>(tail[k]) - head[k]) -
                             row[k];
       d += v * v;
     }
     sum += (t == 0 || t == n ? 1 : t & 1 ? 4 : 2) * mass / d;
   }
-  return double(sum / (3 * n));
+  return double(sum * (hi - lo) / (3 * n));
 }
 double query(const Geometry &g, P h, P t, double mass = .1,
              bool filtered = true) {
   Work w;
-  BoneShadowQuery q(g.p, g.i, 16u * 1024u * 1024u, w);
+  BoneShadowQuery q(g.p, g.i, 16u * 1024u * 1024u, w, {},
+                    BoneOriginPolicy::NativeOpenSegment);
   BoneShadowQuery::Scratch s(q);
   BoneQueryReport r;
   return q.integrate(0, h, t, mass, 0, 1, s, w, r,
@@ -73,7 +75,8 @@ int main() try {
   const auto before = g.p;
   const auto indices = g.i;
   Work w;
-  BoneShadowQuery q(g.p, g.i, 16u * 1024u * 1024u, w);
+  BoneShadowQuery q(g.p, g.i, 16u * 1024u * 1024u, w, {},
+                    BoneOriginPolicy::NativeOpenSegment);
   BoneShadowQuery::Scratch scratch(q);
   check(ambiguous(q, scratch, h, t, BoneOriginPolicy::StrictOwnership),
         "Original strict unowned-origin negative remains a refusal");
@@ -141,6 +144,75 @@ int main() try {
           "A genuine interior or arbitrarily thin nearby wall remains opaque "
           "after excluding only origin contact");
   }
+  auto edge = g;
+  edge.p[0] = {0, .5f, 0};
+  const P outward_head{0, 1, -1}, outward_tail{0, 1, 1};
+  const auto outward_expected =
+      simpson(edge.p[0], outward_head, outward_tail, .1);
+  check(std::abs(query(edge, outward_head, outward_tail) - outward_expected) <
+                1e-12 &&
+            query(edge, outward_head, outward_tail) ==
+                query(edge, outward_head, outward_tail, .1, false),
+        "Whole finite source outside an actual supporting edge proves the "
+        "complete open ray fan clear despite triangle-plane straddle");
+  Work ew;
+  BoneShadowQuery eq(edge.p, edge.i, 16u * 1024u * 1024u, ew, {},
+                     BoneOriginPolicy::NativeOpenSegment);
+  BoneShadowQuery::Scratch es(eq);
+  check(ambiguous(eq, es, {0, .75f, -1}, {0, .25f, 1}),
+        "Source crossing the supporting halfspace remains refused");
+  check(
+      ambiguous(eq, es, {0, 0, -1}, {0, 0, 1}),
+      "Source on the inward side remains refused at a genuine boundary origin");
+  check(ambiguous(eq, es, {0, .5f, -1}, {0, .5f, 1}),
+        "Source on the supporting edge is not strictly outward");
+  auto near_edge = edge;
+  near_edge.p[0][1] = .5f - 0x1p-20f;
+  Work nw;
+  BoneShadowQuery nq(near_edge.p, near_edge.i, 16u * 1024u * 1024u, nw, {},
+                     BoneOriginPolicy::NativeOpenSegment);
+  BoneShadowQuery::Scratch ns(nq);
+  check(ambiguous(nq, ns, outward_head, outward_tail),
+        "A nearby but non-boundary origin is never epsilon-promoted onto an "
+        "edge");
+  auto blocked = edge;
+  const auto bv = uint32_t(blocked.p.size());
+  blocked.p.insert(blocked.p.end(),
+                   {{-2, -2, .25f}, {0, 2, .25f}, {2, -2, .25f}});
+  blocked.i.insert(blocked.i.end(), {bv, bv + 1, bv + 2, 1, bv + 2, bv});
+  check(std::abs(query(blocked, outward_head, outward_tail) -
+                 simpson(edge.p[0], outward_head, outward_tail, .1, 0, .625)) <
+            1e-12,
+        "A separate interior wall clips the proved outward fan at the "
+        "independent analytic source interval");
+  Work sw;
+  BoneShadowQuery sq(g.p, g.i, 16u * 1024u * 1024u, sw);
+  check(q.planned_bytes ==
+            sq.planned_bytes + BoneShadowQuery::native_origin_workspace,
+        "Native exact supporting-edge fixed workspace is charged prospectively "
+        "without changing strict allocation plans");
+  bool unadmitted = false;
+  BoneShadowQuery::Scratch ss(sq);
+  BoneQueryReport sr;
+  try {
+    sq.integrate(0, h, t, .1, 0, 1, ss, sw, sr,
+                 BoneWallDomain::ConnectedSourceSurface, true, true,
+                 BoneOriginPolicy::NativeOpenSegment);
+  } catch (const std::invalid_argument &) {
+    unadmitted = true;
+  }
+  check(unadmitted, "A strict-only query cannot borrow unadmitted native "
+                    "arithmetic workspace");
+  bool workspace_refused = false;
+  Work mw;
+  try {
+    BoneShadowQuery no_workspace(g.p, g.i, q.planned_bytes - 1, mw, {},
+                                 BoneOriginPolicy::NativeOpenSegment);
+  } catch (const std::length_error &) {
+    workspace_refused = true;
+  }
+  check(workspace_refused, "Native additional workspace refusal precedes "
+                           "geometry or scratch copies");
   auto reflected = g;
   for (auto &p : reflected.p)
     p[0] = -p[0];
@@ -170,7 +242,8 @@ int main() try {
   limited.maximum = 1;
   bool bounded = false;
   try {
-    BoneShadowQuery denied(g.p, g.i, 16u * 1024u * 1024u, limited);
+    BoneShadowQuery denied(g.p, g.i, 16u * 1024u * 1024u, limited, {},
+                           BoneOriginPolicy::NativeOpenSegment);
   } catch (const std::length_error &) {
     bounded = true;
   }

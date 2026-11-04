@@ -159,6 +159,7 @@ class BoneShadowQuery {
     std::array<std::array<Range, 3>, 6> edge_normals;
   };
   std::shared_ptr<const uint8_t> identity_;
+  const BoneOriginPolicy origin_admission_;
   static size_t cache_slots(size_t points) {
     return points ? std::bit_ceil(std::min(size_t(1) << 19, points * 64)) : 0;
   }
@@ -353,6 +354,64 @@ private:
   // wall domain before any opaque-ray early exit. An opaque wall cannot hide a
   // foreign coincident origin. Only a fully completed pass becomes reusable.
   template <class Budget>
+  bool open_origin_clear(uint32_t row, uint32_t face, P head, P tail,
+                         Scratch &s, Budget &w, BoneQueryReport &r) const {
+    const auto plane = row_plane(row, face, s, w, r);
+    if (plane.side || !plane.inside)
+      return false; // Actual exact p-on-closed-triangle proof is mandatory.
+    auto &source = source_plane(face, head, tail, s, w, r);
+    if (source.head && source.head == source.tail)
+      return true;
+    // At |coordinate|<=10000, each exact binary32 difference has <=225bits.
+    // This degree-four supporting-plane predicate needs <908bits, within the
+    // checked1024-bit arithmetic. Its fixed temporaries are admitted separately
+    // before query geometry/scratch copies; no heap or epsilon is involved.
+    static_assert(4 * 225 + 8 <= sizeof(volume_exact::Integer{}.limb) * 8);
+    w.step(32);
+    volume_exact::Arithmetic exact(w);
+    const auto &ids = faces_[face];
+    using V = std::array<volume_exact::Integer, 3>;
+    auto difference = [&](P a, P b) {
+      V out;
+      for (size_t k = 0; k < 3; ++k)
+        out[k] = exact.subtract(exact.scalar(a[k]), exact.scalar(b[k]));
+      return out;
+    };
+    auto cross = [&](const V &a, const V &b) {
+      V out;
+      for (size_t k = 0; k < 3; ++k)
+        out[k] = exact.subtract(exact.multiply(a[(k + 1) % 3], b[(k + 2) % 3]),
+                                exact.multiply(a[(k + 2) % 3], b[(k + 1) % 3]));
+      return out;
+    };
+    auto dot = [&](const V &a, const V &b) {
+      auto value = exact.multiply(a[0], b[0]);
+      for (size_t k = 1; k < 3; ++k)
+        value = exact.add(value, exact.multiply(a[k], b[k]));
+      return value.sign;
+    };
+    for (size_t k = 0; k < 3; ++k) {
+      const auto a = points_[ids[k]], b = points_[ids[(k + 1) % 3]],
+                 c = points_[ids[(k + 2) % 3]];
+      const auto edge = difference(b, a),
+                 inward = cross(edge, difference(c, a));
+      const int p = dot(cross(edge, difference(points_[row], a)), inward);
+      if (p < 0)
+        throw std::logic_error(
+            "Exact closed-triangle supporting edge mismatch");
+      if (p)
+        continue;
+      // p lies on this actual closed triangle edge. The triangle is in its
+      // closed inward halfspace. Strictly outward BOTH finite endpoints prove
+      // the entire source and every t>0 point of every ray stays outside it.
+      const int h = dot(cross(edge, difference(head, a)), inward);
+      if (h < 0 &&
+          (head == tail || dot(cross(edge, difference(tail, a)), inward) < 0))
+        return true;
+    }
+    return false;
+  }
+  template <class Budget>
   void validate_origin(uint32_t row, BoneWallDomain domain, P head, P tail,
                        BoneOriginPolicy origin_policy, Scratch &s, Budget &w,
                        BoneQueryReport &r) const {
@@ -399,8 +458,7 @@ private:
             // when both exact endpoint signs agree. Each open ray therefore
             // meets this plane only at excluded t=0. This proof belongs to
             // this source epoch, never to source-independent origin_checked.
-            auto &source = source_plane(face, head, tail, s, w, r);
-            if (source.head && source.head == source.tail)
+            if (open_origin_clear(row, face, head, tail, s, w, r))
               continue;
           }
           throw BoneQueryAmbiguity(bone_shadow::Kind::OriginContact, face);
@@ -566,8 +624,7 @@ private:
     }
     if (!row_side.side && row_side.inside) {
       if (origin_policy == BoneOriginPolicy::NativeOpenSegment) {
-        auto &source = source_plane(face, head, tail, s, w, r);
-        if (source.head && source.head == source.tail) {
+        if (open_origin_clear(row, face, head, tail, s, w, r)) {
           ++report.rejected;
           return {};
         }
@@ -660,14 +717,19 @@ private:
   }
 
 public:
+  static constexpr size_t native_origin_workspace = 16u * 1024u;
   size_t planned_bytes = 0, construction_forecast = 0;
   template <class Budget>
-  BoneShadowQuery(std::span<const P> points, std::span<const uint32_t> indices,
-                  size_t maximum_bytes, Budget &w,
-                  std::span<const uint32_t> incidence = {}) {
+  BoneShadowQuery(
+      std::span<const P> points, std::span<const uint32_t> indices,
+      size_t maximum_bytes, Budget &w, std::span<const uint32_t> incidence = {},
+      BoneOriginPolicy origin_admission = BoneOriginPolicy::StrictOwnership)
+      : origin_admission_(origin_admission) {
     w.stop();
     const size_t count = indices.size() / 3;
-    if (points.empty() || points.size() > 2'000'000 || !count ||
+    if ((origin_admission != BoneOriginPolicy::StrictOwnership &&
+         origin_admission != BoneOriginPolicy::NativeOpenSegment) ||
+        points.empty() || points.size() > 2'000'000 || !count ||
         count > 4'000'000 || indices.size() % 3)
       throw std::invalid_argument("Invalid owning bone query dimensions");
     const size_t depth = std::bit_width(count);
@@ -680,6 +742,8 @@ public:
              2 * sizeof(Node) + sizeof(volume_exact::Interval) +
              2 * sizeof(uint32_t) + sizeof(SourcePlane) + sizeof(uint32_t)) +
         cache_slots(points.size()) * sizeof(RowPlane) + 65536;
+    if (origin_admission == BoneOriginPolicy::NativeOpenSegment)
+      planned_bytes += native_origin_workspace;
     if (planned_bytes > maximum_bytes ||
         construction_forecast > w.maximum - w.used)
       throw std::length_error(
@@ -801,7 +865,8 @@ public:
     if ((origin_policy != BoneOriginPolicy::StrictOwnership &&
          origin_policy != BoneOriginPolicy::NativeOpenSegment) ||
         (origin_policy == BoneOriginPolicy::NativeOpenSegment &&
-         domain != BoneWallDomain::ConnectedSourceSurface))
+         (domain != BoneWallDomain::ConnectedSourceSurface ||
+          origin_admission_ != BoneOriginPolicy::NativeOpenSegment)))
       throw std::invalid_argument("Native open-segment origins require their "
                                   "own connected wall component");
     if (scratch.shadows.capacity() < faces_.size() ||
@@ -877,10 +942,7 @@ public:
                 : bone_shadow::triangle_shadow(p, head, tail, wall, w);
         if (!use_filter && shadow.kind == bone_shadow::Kind::OriginContact &&
             origin_policy == BoneOriginPolicy::NativeOpenSegment) {
-          const auto plane = row_plane(row, face, scratch, w, staged);
-          auto &source = source_plane(face, head, tail, scratch, w, staged);
-          if (!plane.side && plane.inside && source.head &&
-              source.head == source.tail)
+          if (open_origin_clear(row, face, head, tail, scratch, w, staged))
             shadow = {};
         }
         staged.predicate_work += w.used - predicate_start;
