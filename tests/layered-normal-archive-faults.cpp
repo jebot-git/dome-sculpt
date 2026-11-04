@@ -29,7 +29,7 @@ int main(int argc,char **argv)try{
   conversion_fault::calls=0;conversion_fault::at=SIZE_MAX;conversion_fault::enabled=true;
   auto positive=produce();conversion_fault::enabled=false;const auto count=conversion_fault::calls;
   require_cage(count>0&&count<200'000,"Measure actual complete Scene33 decoding C++ allocation path");
-  actual_field(positive);require_cage(positive.encode()==expected&&&detail::BakedNormalArchive::writer()==&outer,
+  actual_field(positive);require_cage(positive.encode()==expected&& &detail::BakedNormalArchive::writer()==&outer,
     "Positive owning archive replay preserves exact complete scene and nested codec context");
   std::cout<<"MEASURE persistent_cpp_prefixes="<<count<<std::endl;
   if(measure)return 0;
