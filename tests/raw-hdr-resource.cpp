@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "source-paint-fixtures.hpp"
 #include "dome/native-authoring.hpp"
+#include "dome/humanoid-creator.hpp"
 #include <fstream>
 #include <iostream>
 namespace {
