@@ -3,6 +3,7 @@
 #include "mtoon-render.cpp"
 #undef main
 #include "dome/native-authoring.hpp"
+#include "dome/material-bindings.hpp"
 #include "dome/scene-file.hpp"
 #include "source-color-consumer.hpp"
 #include "source-paint-bake-fixtures.hpp"
@@ -60,7 +61,7 @@ int main(int argc,char **argv)try {
     const auto pristine=scene.encode();check(Scene::decode(pristine).encode()==pristine&&!paint->has_physical_emission(),"Pristine HDR adoption has no fabricated float paint and owning codec restores exactly");
     for(int phase=0;phase<2;++phase){
       if(phase){ink(scene);physical_ink(scene);scene.validate();}
-      const auto exact=scene.encode();Document d;d.replace(scene.snapshot());d.shading(false);imported_endpoint(d);const auto reference=draw(native,d.frame().surface);
+      const auto exact=scene.encode();Document d;d.replace(scene.snapshot());imported_endpoint(d);const auto authored_reference=draw(native,d.frame().surface);d.shading(false);imported_endpoint(d);const auto reference=draw(native,d.frame().surface);
       const auto package=out/("kind"+std::to_string(kind)+"-phase"+std::to_string(phase)+".glb");d.export_asset(package,AssetExportFormat::EditableGlb256).get();
       const auto captured=file(package);auto recovered=extract_native_authoring(captured);
       check(recovered&&recovered->encode()==exact&&d.copy_scene().encode()==exact&&file(input)==raw_bytes,"Actual pristine/painted raw-HDR exporter preserves complete exact native project and raw source");
@@ -68,7 +69,7 @@ int main(int argc,char **argv)try {
       std::cout<<"RAW_HDR kind="<<kind<<" phase="<<phase<<" visible="<<quality.visible<<" mean="<<quality.mean<<" interior="<<quality.interior_maximum<<std::endl;
       check(quality.visible>20&&quality.mean<=2&&quality.interior_maximum<=2,"Actual raw-HDR finite PBR consumer preserves representative two-pixel bounds");
       const auto &j=parsed.json;check(j.at("extras").contains("domeSculptAuthoring")&&!j.at("extras").contains("domeSculptEmission"),"Generic raw-HDR project uses actual native Scene authority without competing HDR records");
-      Document reopened;reopened.open_async(package).get();reopened.shading(false);imported_endpoint(reopened);
+      Document reopened;reopened.open_async(package).get();imported_endpoint(reopened);check(delta(authored_reference,draw(native,reopened.frame().surface))==0,"Native raw-HDR recovery preserves actual default authored/MToon pixels");reopened.shading(false);imported_endpoint(reopened);
       check(reopened.copy_scene().encode()==exact&&delta(reference,draw(native,reopened.frame().surface))==0,"Actual native raw-HDR Open restores exact float/source units and pixels");
       const auto saved=out/("saved"+std::to_string(kind)+"-"+std::to_string(phase)+".dsculpt");reopened.save_async(saved).get();check(Scene::load(saved).encode()==exact,"Following native Save preserves exact raw-HDR project");
       const auto second=out/("second"+std::to_string(kind)+"-"+std::to_string(phase)+".glb");reopened.export_asset(second,AssetExportFormat::EditableGlb256).get();check(file(second)==captured,"Raw-HDR native recovery and second portable cycle are byte-identical");
