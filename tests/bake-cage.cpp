@@ -31,6 +31,7 @@ void controller_cage(Driver &hand,Document &d,uint64_t id){
   hand.value(ids.size()<2?0:float(found-ids.begin())/float(ids.size()-1),1);
 }
 }
+#ifndef DOME_BAKE_CAGE_HELPERS_ONLY
 int main(int argc,char **argv)try{
   if(argc==3&&std::string(argv[1])=="--ui-fixture"){cage_scene(128).save(argv[2]);return 0;}
   if(argc==3&&std::string(argv[1])=="--inspect"){
@@ -100,3 +101,4 @@ int main(int argc,char **argv)try{
     "Document replacement clears document-local cage identity before reused IDs can alias another mesh");
   std::cout<<"PASS "<<cage_checks<<" custom cage workflow checks\n";return 0;
 }catch(const std::exception &e){std::cerr<<"FAIL "<<e.what()<<'\n';return 1;}
+#endif
