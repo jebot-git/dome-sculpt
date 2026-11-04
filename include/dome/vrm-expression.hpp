@@ -32,6 +32,14 @@ struct Vrm1ExpressionEvaluation {
 // serialized ownership authority. Results retain original material/node IDs.
 Vrm1ExpressionEvaluation evaluate_vrm1_expressions(const nlohmann::json &gltf,
     const Vrm1ExpressionWeights &,const std::function<bool()> &cancelled={});
+struct Vrm1ExpressionDescription {
+  std::string name;
+  bool custom=false,binary=false;
+};
+// Authenticated catalog from retained actual source metadata. Call on a worker;
+// parsing/validation may perform bounded allocation and must stay off UI locks.
+std::vector<Vrm1ExpressionDescription> describe_vrm1_expressions(const Scene &,uint64_t object,
+    const std::function<bool()> &cancelled={});
 // Detached atomic static authoring operation on the authenticated source
 // instance containing object. Each invocation uses the supplied Scene as its
 // initial material state. For interactive preview, repeatedly evaluate the

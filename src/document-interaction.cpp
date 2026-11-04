@@ -21,7 +21,7 @@ AffineTransform Document::object_world_matrix_locked(uint64_t id) const {
 }
 bool Document::object_editable_locked(uint64_t id) const {
   auto found=std::find_if(scene_.objects().begin(),scene_.objects().end(),[&](const auto &o){return o.id==id;});
-  return found!=scene_.objects().end() && found->visible && !found->locked &&
+  return !state_.expressions && found!=scene_.objects().end() && found->visible && !found->locked &&
     (!state_.isolate_held || !state_.held_object || state_.held_object==id) &&
     (!state_.selection_focus || std::find(state_.selected_objects.begin(),state_.selected_objects.end(),id)!=state_.selected_objects.end());
 }

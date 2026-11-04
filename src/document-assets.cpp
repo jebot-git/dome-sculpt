@@ -24,6 +24,7 @@ void Document::queue_scene_operation_locked(std::string label, SceneOperation op
                                       AssetSource expected, std::shared_ptr<std::string> report, std::shared_ptr<AssetWork> work, std::shared_ptr<bool> changed,
                                       std::shared_ptr<const MeshSnapshot> rollback_preview, uint64_t retopo_session, uint64_t cut_session, std::shared_ptr<CutHandoff> cut_handoff, std::optional<BakeAdmission> bake_admission) {
   require_authority_locked(expected);
+  if(state_.expressions)throw std::logic_error("Apply or cancel expression preview before starting authoring work");
   if(state_.object_grabbing && !(work&&work->held_weight))throw std::logic_error("Release object motion before starting asset work");
   if(state_.isolate_held && state_.held_object)require_object_editable_locked(scene_.active().id);
   if (label.empty() || label.size() > 256 || label.find('\0') != std::string::npos || !operation)

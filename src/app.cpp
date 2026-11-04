@@ -17,6 +17,7 @@
 #include "rig-editor.hpp"
 #include "rig-fit-editor.hpp"
 #include "shapekey-editor.hpp"
+#include "vrm-expression-editor.hpp"
 #include "weight-editor.hpp"
 #include "skin-editor.hpp"
 #include "sculpt-editor.hpp"
@@ -590,6 +591,14 @@ struct App {
              FL_MENU_RADIO | FL_MENU_VALUE);
     menu.add("&View/Shading/&PBR", 0, command, this, FL_MENU_RADIO);
     menu.add("&View/Shading/&Toon preview", 0, command, this, FL_MENU_RADIO);
+    menu.add("&View/Expressions/Start preview",0,command,this);
+    menu.add("&View/Expressions/Choose expression...",0,command,this);
+    menu.add("&View/Expressions/Weight...",0,command,this);
+    menu.add("&View/Expressions/Weight -",0,command,this);
+    menu.add("&View/Expressions/Weight +",0,command,this);
+    menu.add("&View/Expressions/Reset weights",0,command,this);
+    menu.add("&View/Expressions/Apply static pose",0,command,this);
+    menu.add("&View/Expressions/Cancel preview",0,command,this);
     menu.add("&Sculpt/&Clay", '1', command, this,
              FL_MENU_RADIO | FL_MENU_VALUE);
     menu.add("&Sculpt/Ca&rve", '2', command, this, FL_MENU_RADIO);
@@ -921,6 +930,11 @@ struct App {
     checked("&View/Shading/&Authored material", !s->toon&&!s->pbr_view);
     checked("&View/Shading/&PBR", s->pbr_view);
     checked("&View/Shading/&Toon preview", s->toon);
+    const auto expressions=s->expressions;
+    enable("&View/Expressions/Start preview",!modal&&!expressions&&canvas.document.can_preview_expressions());
+    for(auto path:{"&View/Expressions/Choose expression...","&View/Expressions/Weight...","&View/Expressions/Weight -","&View/Expressions/Weight +","&View/Expressions/Reset weights"})enable(path,!modal&&expressions&&!expressions->entries.empty());
+    enable("&View/Expressions/Apply static pose",!modal&&expressions&&expressions->ready&&expressions->error.empty());
+    enable("&View/Expressions/Cancel preview",!modal&&bool(expressions));
     const char *layer_actions[] = {
         "&Paint/Add layer", "&Paint/Next layer", "&Paint/Layer visible",
         "&Paint/Delete layer", "&Paint/Cycle layer opacity"};
@@ -1007,6 +1021,14 @@ struct App {
     enable("&Mesh/Plane cut/Apply cut",cutting&&!cut->busy&&cut->preview&&cut->preview_request==cut->request&&cut->preview->changed);
     checked("&Mesh/Plane cut/Cap cut",!cut||cut->settings.cap);
     checked("&Mesh/Plane cut/Flip kept side",cut&&cut->settings.flipped);
+    if(expressions){
+      for(int i=0;i<menu.size();++i)if(menu.menu()[i].label()&&!(modes[i]&FL_SUBMENU))modes[i]|=FL_MENU_INACTIVE;
+      for(auto path:views)enable(path,!modal);
+      for(auto path:{"&View/Shading/&Authored material","&View/Shading/&PBR","&View/Shading/&Toon preview"})enable(path,!modal&&s->can_preview);
+      for(auto path:{"&View/Expressions/Choose expression...","&View/Expressions/Weight...","&View/Expressions/Weight -","&View/Expressions/Weight +","&View/Expressions/Reset weights"})enable(path,!modal&&!expressions->entries.empty());
+      enable("&View/Expressions/Apply static pose",!modal&&expressions->ready&&expressions->error.empty());
+      enable("&View/Expressions/Cancel preview",!modal);enable("&File/Cancel background work",!modal);enable("&File/Close &Window",true);
+    }
     for (int i = 0; i < menu.size(); ++i)
       if (menu.mode(i) != modes[i])
         menu.mode(i, modes[i]);
@@ -1039,6 +1061,11 @@ struct App {
       text << "Paint " << channels[int(info->paint.channel)] << " | radius "
            << int(canvas.radius * 1000) << " mm | " << info->paint_layers.size()
            << " layers | Shift+drag: paint | P: painted mesh | Shift+P: source";
+    }
+    if(info->expressions){
+      const auto &view=*info->expressions;text.str("");text<<"Expression preview";
+      if(!view.entries.empty()){const auto &entry=view.entries.at(view.selected);text<<" | "<<entry.name<<" "<<int(std::lround(entry.weight*100))<<"%"<<(entry.binary?" (binary)":"");}
+      text<<(view.ready?" | Apply static pose or Cancel":" | Updating preview");
     }
     if (info->weights.enabled) {
       text.str("");
@@ -1176,7 +1203,14 @@ struct App {
       canvas.document.end_desktop();
       canvas.sculpting = false;
     }
-    if(label=="Humanoid rig fitting..."){edit_humanoid_fit_dialog(canvas.document);
+    if(label=="Start preview"){canvas.document.begin_expression_preview();}
+    else if(label=="Choose expression..."){choose_expression_dialog(canvas.document);}
+    else if(label=="Weight..."){expression_weight_dialog(canvas.document);}
+    else if(label=="Weight -"||label=="Weight +"){canvas.document.expression_action(label=="Weight +"?SpatialCommand::ExpressionIncrease:SpatialCommand::ExpressionDecrease);}
+    else if(label=="Reset weights"){canvas.document.expression_action(SpatialCommand::ExpressionReset);}
+    else if(label=="Apply static pose"){canvas.document.end_expression_preview(true);}
+    else if(label=="Cancel preview"){canvas.document.end_expression_preview(false);}
+    else if(label=="Humanoid rig fitting..."){edit_humanoid_fit_dialog(canvas.document);
     }else if(label=="Load projection image..."){
       const auto state=canvas.document.frame().state;const AssetSource source{state->generation,state->revision,state->active_object,state->edit_authority};
       auto selected=projection_image_dialog();

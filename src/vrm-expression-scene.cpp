@@ -50,6 +50,19 @@ std::array<float,6> uv(std::array<float,6> initial,float rotation,const std::vec
          float(initial[4]*(1-weight)+offset[0]),float(initial[5]*(1-weight)+offset[1])};
 }
 }
+std::vector<Vrm1ExpressionDescription> describe_vrm1_expressions(const Scene &scene,uint64_t object,
+ const std::function<bool()> &cancelled){
+ auto stop=[&]{if(cancelled&&cancelled())throw std::runtime_error("VRM1 expression catalog cancelled");};stop();
+ const auto owner=placement(scene,scene.object(object));const auto json=original(*owner->model,cancelled);
+ const auto evaluated=evaluate_vrm1_expressions(json,{},cancelled);(void)evaluated;
+ std::vector<Vrm1ExpressionDescription> result;
+ const auto definitions=json.at("extensions").at("VRMC_vrm").value("expressions",J::object());
+ for(bool custom:{false,true}){
+  const auto table=definitions.value(custom?"custom":"preset",J::object());
+  for(const auto &entry:table.items()){stop();result.push_back({entry.key(),custom,entry.value().value("isBinary",false)});}
+ }
+ stop();return result;
+}
 Scene bake_vrm1_expression_pose(const Scene &baseline,uint64_t object,
  const Vrm1ExpressionWeights &weights,const std::function<bool()> &cancelled){
  auto stop=[&]{if(cancelled&&cancelled())throw std::runtime_error("Static VRM1 expression authoring cancelled");};stop();

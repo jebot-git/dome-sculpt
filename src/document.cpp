@@ -190,6 +190,7 @@ bool Document::action_active_locked() const {
   return o.mesh_active ? o.painted->in_stroke() : volume().in_stroke();
 }
 bool Document::pending_locked() const {
+  if(state_.expressions)return true;
   if(state_.polygon)return state_.polygon->changed||polygon_stroking_||polygon_pending_.load()!=0;
   if(state_.object_grabbing)return true;
   if(native_stroke_)return true;
@@ -540,6 +541,10 @@ void Document::publish_locked(bool force,bool checkpoint) {
     last_paint_ = paint_revision;
     ++state_.revision;
   }
+  if(state_.expressions&&!expression_source_matches_locked()){
+    if(state_.view_epoch==UINT64_MAX)throw std::overflow_error("Expression view identity exhausted");
+    state_.expressions.reset();++state_.view_epoch;
+  }
   if(state_.rig_fit&&!rig_fit_source_matches_locked())state_.rig_fit.reset();
   if(state_.polygon_handoff&&state_.polygon_handoff_revision==UINT64_MAX)state_.polygon_handoff_revision=state_.revision;
   if(state_.polygon_handoff&&(state_.polygon_handoff_generation!=state_.generation||state_.polygon_handoff_revision!=state_.revision||state_.polygon_handoff_object!=active.id||!object_editable_locked(active.id))) {
@@ -697,7 +702,7 @@ void Document::publish_locked(bool force,bool checkpoint) {
     state_.menu_enabled[i] = parameter ? parameter_enabled_locked(*parameter)
                              : command ? command_enabled_locked(*command)
                                        : true;
-    if(state_.menu_page==26&&i>2&&i!=8)state_.menu_enabled[i]=false;
+    if(state_.menu_page==26&&i>3&&i!=8)state_.menu_enabled[i]=false;
 
   }
   bool weight_preview = weight_stroking_ && !weight_samples_.empty() &&
@@ -714,6 +719,7 @@ void Document::publish_locked(bool force,bool checkpoint) {
     mesh_job->sculpt_mask_view=state_.sculpt_mask_visible;
     mesh_job->pbr_view=state_.pbr_view;
     mesh_job->view_epoch=state_.view_epoch;
+    mesh_job->expressions=state_.expressions;
     if(state_.retopology&&active.retopology){
       mesh_job->scene.object(active.id).visible=false;
       mesh_job->scene.object(active.retopology->source).visible=true;
@@ -752,6 +758,7 @@ void Document::publish_locked(bool force,bool checkpoint) {
 }
 
 void Document::finish_locked() {
+  if(state_.expressions)throw std::logic_error("Apply or cancel expression preview before changing or saving the document");
   if(state_.polygon)throw std::logic_error("Apply or cancel polygon editing before changing the document");
   if(state_.object_grabbing)finish_object_grab_locked(true,false);
   if(native_stroke_)throw std::logic_error("Wait for the accepted desktop stroke, or cancel it, before changing the document");
@@ -1264,6 +1271,7 @@ void Document::begin_spatial() {
 void Document::rebase_space(std::optional<CanvasTransform> old_from_new) {
   std::lock_guard lock(model_mutex_);
   if (!desktop_) {
+    if(state_.expressions)end_expression_preview_locked(false);
     bool accepted_uv = uv_accept_pending_;
     if (!accepted_uv) finish_control_locked(false);
     input_.cancel();
@@ -1298,6 +1306,7 @@ void Document::finish_spatial() {
     throw std::runtime_error("Spatial edit worker did not finish");
   std::lock_guard lock(model_mutex_);
   if (!desktop_) {
+    if(state_.expressions)end_expression_preview_locked(false);
     bool accepted_uv = uv_accept_pending_;
     if (!accepted_uv) finish_control_locked(false);
     input_.cancel();
@@ -1326,6 +1335,7 @@ void Document::process_locked(const SpatialFrame &incoming) {
     if(state_.object_grabbing&&held_weight_pending_locked()){
       input_.cancel();held_preview_transform_=held_start_transform_;object_navigation_.reset();navigation_.reset();state_.hands={};publish_locked(false,false);return;
     }
+    if(state_.expressions)end_expression_preview_locked(false);
     bool accepted_uv = uv_accept_pending_;
     if (!accepted_uv) finish_control_locked(false);
     input_.cancel();
@@ -1448,12 +1458,12 @@ void Document::process_locked(const SpatialFrame &incoming) {
     state_.hands=f.hands;
     // Mask page commands already end their gesture on menu entry. Retain the
     // live page so toggles and Fill can be followed by Resume without losing it.
-    if (!state_.retopology && !state_.cut && !sculpt_mask_command(*c) && !import_command(*c) && !projection_command(*c) && !preview_command(*c) && !rig_fit_command(*c) &&
+    if (!state_.retopology && !state_.cut && !sculpt_mask_command(*c) && !import_command(*c) && !projection_command(*c) && !preview_command(*c) && !rig_fit_command(*c) && !expression_command(*c) &&
         !(input_.menu_page()==15 && *c==SpatialCommand::CancelWork) &&
         input_.menu_page()!=24 && input_.menu_page()!=18 && input_.menu_page()!=20 && input_.menu_page()!=19 && input_.menu_page()!=22 && !state_.polygon) finish_locked();
     auto command_publication=published_.load();
     command_locked(*c);
-    import_published=(import_command(*c)||projection_command(*c)||rig_fit_command(*c))&&published_.load()!=command_publication;
+    import_published=(import_command(*c)||projection_command(*c)||rig_fit_command(*c)||expression_command(*c))&&published_.load()!=command_publication;
     if((command_page==20)||(command_page==24&&*c!=SpatialCommand::ShapeSculpt)){input_.retain_page(command_page,command_owner,command_sector);publish_locked(false,false);}
   }
 
@@ -1577,7 +1587,18 @@ void Document::mesh_loop() {
              (job->weight_gesture && weight_epoch_.load() != job->weight_gesture) ||
              (job->native_gesture && native_epoch_.load()!=job->native_gesture);
     };
+    std::shared_ptr<VrmExpressionView> expression_result;
     try {
+      if(job->expressions){
+        expression_result=std::make_shared<VrmExpressionView>(*job->expressions);
+        if(expression_result->entries.empty()){
+          const auto catalog=describe_vrm1_expressions(*expression_result->baseline_,expression_result->object,cancelled);
+          for(const auto &entry:catalog)expression_result->entries.push_back({entry.name,entry.custom,entry.binary,0});
+          if(expression_result->entries.empty())throw std::logic_error("The actual VRM1 source has no expressions");
+        }
+        job->scene=bake_vrm1_expression_pose(*expression_result->baseline_,expression_result->object,expression_result->weights_,cancelled);
+        expression_result->ready=true;expression_result->error.clear();
+      }
       std::optional<Scene> proposed;
       if (job->weight_gesture) {
         proposed = job->scene.snapshot();
@@ -1847,17 +1868,26 @@ void Document::mesh_loop() {
       if ((has_polygon_colors || !snapshot->paint_coordinates.empty() || job->weight_view || std::any_of(snapshot->ranges.begin(),snapshot->ranges.end(),[](const auto&r){return bool(r.affine_world);}) || ((published_.load()->object_grab_mode&&!published_.load()->object_grabbing)||published_.load()->selection_mode)) && !snapshot->mesh.indices.empty())
         snapshot->picking = std::make_shared<MaterialSurfaceQuery>(snapshot->mesh, snapshot->ranges, cancelled,snapshot->source_colors,PaintVertexCoordinates{snapshot->paint_coordinates});
       snapshot->sculpt_meshing.worker_ms=std::chrono::duration<double,std::milli>(std::chrono::steady_clock::now()-worker_start).count();
-      std::lock_guard lock(mesh_mutex_);
-      if (!cancelled()) {
-        geometry_identity=std::move(identity);
-        mesh_.store(std::move(snapshot));
+      if(expression_result){
+        std::lock_guard model_lock(model_mutex_);
+        if(cancelled()||!state_.expressions||state_.expressions->request!=job->expressions->request)continue;
+        expression_result->selected=state_.expressions->selected;
+        Transaction transaction(*this);state_.expressions=std::move(expression_result);state_.message="Expression preview only; Apply static pose or Cancel";publish_locked(false,false);
+        {std::lock_guard mesh_lock(mesh_mutex_);geometry_identity=std::move(identity);mesh_.store(std::move(snapshot));}
+        transaction.commit(false);
+      }else{
+        std::lock_guard lock(mesh_mutex_);
+        if(!cancelled()){geometry_identity=std::move(identity);mesh_.store(std::move(snapshot));}
       }
     } catch (const std::exception &e) {
       if (!cancelled()) {
         std::lock_guard lock(model_mutex_);
         if (cancelled()) continue;
-        state_.error = e.what();
-        publish_locked();
+        if(job->expressions&&state_.expressions&&state_.expressions->request==job->expressions->request){
+          auto failed=expression_result?expression_result:std::make_shared<VrmExpressionView>(*state_.expressions);
+          failed->selected=state_.expressions->selected;failed->ready=false;failed->error=e.what();state_.expressions=std::move(failed);
+        }
+        state_.error=e.what();publish_locked(false,false);
       }
     }
     mesh_changed_.notify_all();
@@ -1879,6 +1909,7 @@ bool Document::wait_mesh(std::chrono::milliseconds timeout) const {
     return ready() || stopping_.load() || current->generation != wanted->generation || current->pbr_view!=wanted->pbr_view || current->view_epoch!=wanted->view_epoch ||
            (wanted->cut && (!current->cut || current->cut->session!=wanted->cut->session ||
              (!current->cut->busy && !current->cut->error.empty()))) ||
+           (wanted->expressions&&current->expressions&&current->expressions->request==wanted->expressions->request&&!current->expressions->error.empty()) ||
            (wanted->weight_samples && weight_epoch_.load() != wanted->weight_gesture);
   }) && ready();
 }
@@ -2785,6 +2816,8 @@ void Document::control_event_locked(VrControlEvent event) {
 }
 
 bool Document::command_enabled_locked(SpatialCommand command) const {
+  if(expression_command(command))return expression_command_enabled_locked(command);
+  if(state_.expressions&&!preview_command(command)&&command!=SpatialCommand::CancelWork&&command!=SpatialCommand::Center)return false;
   if(editable_avatar_export_command(command))return
       detail::editable_avatar_source(scene_.active())&&command_enabled_locked(SpatialCommand::ExportAvatar);
   if(editable_export_command(command))return command_enabled_locked(SpatialCommand::Export);
@@ -2793,7 +2826,7 @@ bool Document::command_enabled_locked(SpatialCommand command) const {
   if(preview_command(command))return !action_active_locked()&&!state_.object_grabbing&&!navigation_.grabbing()&&!control_before_&&(!state_.projection||!state_.projection->placing)&&(!state_.rig_fit||!state_.rig_fit->placing);
   if(command==SpatialCommand::Save&&state_.asset_busy)return state_.can_save_after_asset;
   if(command==SpatialCommand::CancelWork)
-    return (state_.asset_busy && asset_status().cancellable) ||
+    return bool(state_.expressions) || (state_.asset_busy && asset_status().cancellable) ||
       (projection_load_&&!projection_load_->done.load()&&!projection_load_->cancelled.load()) ||
       std::any_of(exports_.begin(),exports_.end(),[](const auto &work){return work && work->cancellable();});
   if(command==SpatialCommand::SelectionMode||command==SpatialCommand::SelectionFocus)return selection_ready_locked();
@@ -2995,6 +3028,9 @@ void Document::sculpt_command(SpatialCommand command) {
   if(published_.load()==publication)publish_locked();
 }
 void Document::command_locked(SpatialCommand command) {
+  if(expression_command(command)){expression_command_locked(command);return;}
+  if(state_.expressions&&command==SpatialCommand::CancelWork){end_expression_preview_locked(false);return;}
+  if(state_.expressions&&!preview_command(command)&&command!=SpatialCommand::Center)return;
   if(editable_avatar_export_command(command)){
     if(!command_enabled_locked(command))return;
     file_locked(true,command==SpatialCommand::ExportEditableAvatar256?AssetExportFormat::EditableAvatar256:
