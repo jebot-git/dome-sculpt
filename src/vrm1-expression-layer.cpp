@@ -39,16 +39,22 @@ Vrm1ExpressionLayer compile_vrm1_expression_layer(const J &original,const Sculpt
  const auto &base=binding.roles[0],&shade=binding.roles[1];const auto &bt=material.textures[0],&st=material.textures[1];
  if(base.image&&base.image==shade.image&&base.wrap_s==shade.wrap_s&&base.wrap_t==shade.wrap_t&&base.min_filter==shade.min_filter&&base.mag_filter==shade.mag_filter&&mtoon_coordinate(bt)==mtoon_coordinate(st)&&bt.offset==st.offset&&bt.scale==st.scale&&bt.rotation==st.rotation)
   throw std::invalid_argument("VRM1 expression layer shared base/shade needs its distinct painted shade adapter");
- Vrm1ExpressionLayer result;bool found=false;
+ Vrm1ExpressionLayer result;bool found=false,colour=false;
  const auto expressions=original.at("extensions").at("VRMC_vrm").value("expressions",J::object());
  for(const auto *table:{"preset","custom"})if(expressions.contains(table))for(const auto &expression:expressions.at(table)){
-  for(const auto &bind:expression.value("materialColorBinds",J::array()))if(bind.at("material").get<int>()==object.appearance->source_material&&bind.at("type")=="rimColor")throw std::invalid_argument("VRM1 rim colour expression needs its layered lighting adapter");
+  for(const auto &bind:expression.value("materialColorBinds",J::array()))if(bind.at("material").get<int>()==object.appearance->source_material){
+   if(bind.at("type")=="rimColor")throw std::invalid_argument("VRM1 rim colour expression needs its layered lighting adapter");
+   colour|=bind.at("type")=="color";
+  }
   for(const auto &bind:expression.value("textureTransformBinds",J::array()))if(bind.at("material").get<int>()==object.appearance->source_material){
   const auto scale=bind.value("scale",std::array<float,2>{1,1}),offset=bind.value("offset",std::array<float,2>{});
   if(found&&(result.scale!=scale||result.offset!=offset))throw std::invalid_argument("VRM1 painted UV expressions have incompatible texture targets");
   found=true;result.scale=scale;result.offset=offset;
  }}
- if(!found||!std::isfinite(result.scale[0])||!std::isfinite(result.scale[1])||result.scale[0]==0||result.scale[1]==0)
+ // With genuine colour-only bindings, the paint carrier stays identity and
+ // no UV expression is synthesized. The original lower base factor changes;
+ // the independently owned upper colour contribution remains untinted.
+ if((!found&&!colour)||!std::isfinite(result.scale[0])||!std::isfinite(result.scale[1])||result.scale[0]==0||result.scale[1]==0)
   throw std::invalid_argument("VRM1 expression-layer texture target must have two finite nonzero scales");
  const size_t n=packet.resolution(),pixels=size_t(size)*size,native_pixels=n*n;
  if(size<64||size>4096||pixels>limits.max_image_pixels||native_pixels>limits.max_image_pixels)

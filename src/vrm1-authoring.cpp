@@ -49,10 +49,13 @@ std::shared_ptr<const Vrm1AuthoringCompilation> compile_vrm1_authoring(
   if(!object.material_bindings)throw std::invalid_argument("VRM1 painted source lacks its material owner");
   uint32_t resolution=policy.resolution?policy.resolution:object.painted->resolution();if(!policy.resolution){for(const auto &role:object.material_bindings->roles)if(role.image)resolution=std::max({resolution,role.image->width,role.image->height});}
   if(resolution<64||resolution>4096)throw std::length_error("VRM1 portable paint resolution exceeds64..4096");
-  bool dynamic_uv=false;
+  bool dynamic_uv=false,dynamic_colour=false;
   const auto definitions=result->original_.at("extensions").at("VRMC_vrm").value("expressions",J::object());
-  for(const auto *table:{"preset","custom"})if(definitions.contains(table))for(const auto &expression:definitions.at(table))for(const auto &bind:expression.value("textureTransformBinds",J::array()))dynamic_uv|=bind.at("material").get<int>()==surface.appearance->source_material;
-  if(dynamic_uv){
+  for(const auto *table:{"preset","custom"})if(definitions.contains(table))for(const auto &expression:definitions.at(table)){
+   for(const auto &bind:expression.value("textureTransformBinds",J::array()))dynamic_uv|=bind.at("material").get<int>()==surface.appearance->source_material;
+   for(const auto &bind:expression.value("materialColorBinds",J::array()))dynamic_colour|=bind.at("material").get<int>()==surface.appearance->source_material&&bind.at("type")=="color";
+  }
+  if(dynamic_uv||dynamic_colour){
    const auto before=object.painted->source_sampling_original();
    if(!before)throw std::invalid_argument("VRM1 dynamic paint has no original source owner");
    const auto maps=before->source_maps();const size_t arrays=1+(maps?bool(maps->uv1)+maps->extra_uv_sets.size():0);
