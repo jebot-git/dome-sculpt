@@ -29,7 +29,8 @@ int main() try {
   d.skeleton = rig;
   s.set_deformation(1, d);
   const auto before = s.encode();
-  detail::DeclaredWeightSupport input{{{1, {}}}};
+  detail::DeclaredWeightSupport input{
+      detail::DeclaredSupportPolicy::NearestSourceUnion, {{1, {}}}};
   auto out = detail::anatomical_continuation(
       s, 0, {}, detail::BoneWallDomain::ConnectedSourceSurface,
       {500'000'000, 256u * 1024u * 1024u}, &input);

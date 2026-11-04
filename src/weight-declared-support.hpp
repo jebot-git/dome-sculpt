@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #pragma once
 #include "heat-component-intent.hpp"
+#include "weight-nearest-support.hpp"
 #include "weight-surface-system.hpp"
 namespace dome::detail {
 // Private worker input. Empty declarations select geometry-derived connected
@@ -11,7 +12,9 @@ struct DeclaredWeightPart {
   uint64_t object = 0;
   std::vector<HeatComponentDeclaration> declarations;
 };
+enum class DeclaredSupportPolicy { AllDeformControls, NearestSourceUnion };
 struct DeclaredWeightSupport {
+  DeclaredSupportPolicy policy = DeclaredSupportPolicy::AllDeformControls;
   std::vector<DeclaredWeightPart> parts;
   const DeclaredWeightPart *find(uint64_t id) const {
     auto at = std::find_if(parts.begin(), parts.end(),
@@ -50,11 +53,10 @@ declared_weight_profile(const Skeleton &rig, weight_surface::Budget &work) {
     throw std::invalid_argument("Declared weight rig has no deform source");
   return profile;
 }
-inline HeatComponentIntent
-declared_weight_intent(const SculptObject &o, const DeclaredWeightPart &input,
-                       const ImportedHeatProfile &profile,
-                       const HeatBindingOptions &options,
-                       weight_surface::Budget &work) {
+inline HeatComponentIntent declared_weight_intent(
+    const SculptObject &o, const DeclaredWeightPart &input,
+    const ImportedHeatProfile &profile, const HeatBindingOptions &options,
+    weight_surface::Budget &work, DeclaredSupportPolicy policy) {
   if (input.object != o.id || !o.painted || !o.deformation ||
       !o.deformation->skeleton)
     throw std::invalid_argument("Declared weight source lease is incomplete");
@@ -86,6 +88,31 @@ declared_weight_intent(const SculptObject &o, const DeclaredWeightPart &input,
             options.maximum_bytes - components * unit)
       throw std::length_error(
           "Default weight intent declaration budget exceeded");
+    const size_t metadata =
+        parents.size() * (sizeof(uint32_t) + sizeof(HeatJointMask)) +
+        components * unit;
+    if (metadata > options.maximum_bytes)
+      throw std::length_error("Nearest component support metadata exceeded");
+    const size_t intent_bytes =
+        parents.size() * 80 + m.indices.size() * 16 +
+        profile.eligible.size() * profile.eligible.size() * 64 + 8192;
+    if (intent_bytes > options.maximum_bytes - metadata)
+      throw std::length_error("Default intent simultaneous workspace exceeded");
+    std::vector<HeatJointMask> masks(parents.size());
+    if (policy == DeclaredSupportPolicy::NearestSourceUnion) {
+      NearestWeightSources sources(profile.segments, work);
+      for (size_t i = 0; i < parents.size(); ++i) {
+        const auto p = m.positions[i];
+        const auto selected = sources.nearest({p.x, p.y, p.z}, work);
+        for (size_t k = 0; k < 4; ++k)
+          masks[parents[i]][k] |= selected[k];
+      }
+    } else
+      for (size_t i = 0; i < parents.size(); ++i)
+        if (parents[i] == i)
+          for (size_t j = 0; j < profile.eligible.size(); ++j)
+            if (profile.eligible[j])
+              masks[i][j / 64] |= uint64_t(1) << (j % 64);
     generated.reserve(components);
     for (uint32_t i = 0; i < parents.size(); ++i)
       if (parents[i] == i) {
@@ -94,8 +121,11 @@ declared_weight_intent(const SculptObject &o, const DeclaredWeightPart &input,
         d.vertex = i;
         d.joints.reserve(labels);
         for (uint32_t j = 0; j < profile.eligible.size(); ++j)
-          if (profile.eligible[j])
+          if (masks[i][j / 64] & (uint64_t(1) << (j % 64)))
             d.joints.push_back(j);
+        if (d.joints.empty())
+          throw std::invalid_argument(
+              "Default component has no nearest declared source");
         generated.push_back(std::move(d));
       }
     declarations = generated;

@@ -232,7 +232,7 @@ anatomical_continuation(const Scene &scene, uint64_t group,
       std::span<const uint32_t> row_groups;
       if (declared) {
         intent = declared_weight_intent(o, *declared->find(o.id), profile,
-                                        options, budget);
+                                        options, budget, declared->policy);
       } else {
         seams = capture_heat_seams(o, options, cancelled);
         budget.step(seams->work());
