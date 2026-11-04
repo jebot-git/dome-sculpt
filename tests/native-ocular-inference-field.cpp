@@ -4,6 +4,7 @@
 #include "geometry-weight-authoring.hpp"
 #include "native-head-geometry.hpp"
 #include "rotary-cap-geometry.hpp"
+#include "weight-boundary-sewing.hpp"
 #include <fstream>
 #include <iostream>
 #include <nlohmann/json.hpp>
@@ -113,12 +114,21 @@ int main(int argc, char **argv) try {
       part.user_singleton_boundary=true;
     }else part.user_excluded_joints.push_back(head_joint);
     inferred["parts"].push_back({{"object",id},{"choices",choices},{"head_excluded",!at->head_region&&!ocular}});
+    const auto &own=scene.object(id);
+    std::vector<std::vector<Vec3>> deltas;
+    if(own.deformation&&own.deformation->morphs)
+      for(const auto&t:own.deformation->morphs->targets)deltas.push_back(t.delta);
+    const auto sewn=detail::geometric_boundary_sewing(own.painted->mesh(),deltas,
+                          128u*1024u*1024u,construction);
+    temporary_peak=std::max(temporary_peak,sewn.bytes+analysis.bytes);
+    part.geometric_row_groups=sewn.groups;
     support.parts.push_back(std::move(part));
   }
   std::ofstream(out/"automatic-constraints.json")<<inferred.dump(2);
   size_t declaration_bytes = 0;
   for (const auto &part : support.parts) {
     declaration_bytes += part.user_excluded_joints.capacity() * sizeof(uint32_t);
+    declaration_bytes += part.geometric_row_groups.capacity()*sizeof(uint32_t);
     declaration_bytes += part.declarations.capacity() * sizeof(detail::HeatComponentDeclaration);
     for (const auto &entry : part.declarations)
       declaration_bytes += entry.joints.capacity() * sizeof(uint32_t) + 64;

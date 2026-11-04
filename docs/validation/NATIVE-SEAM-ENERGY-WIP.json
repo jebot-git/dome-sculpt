@@ -1,0 +1,848 @@
+{
+  "scope": "Private exact same-owner geometric sewing hypothesis; no raw topology/artist authority",
+  "sources": {
+    "src/weight-boundary-sewing.hpp": "916e8d17e6e73143ddef7d48acbebb7741e3e8702267a793131ab08f972f5960",
+    "src/weight-declared-support.hpp": "e0be3677afdfdd12725a1a57b18ada2e979eddfea926fa51fe43abab05b9b99d",
+    "src/anatomical-continuation.hpp": "022602561eecbb99ca6cb648c9bc617c04890979eeb7d53a607ed7ab1d7e4827",
+    "tests/weight-boundary-sewing.cpp": "cdf71fac1fcb8a16431ff984da46c783e4c54551d3966886b507535c56a8cc0e",
+    "tests/native-ocular-inference-field.cpp": "04c9cbe088d6e661fdb746b84c887bdac3e69ac35d3f08ad0140ea2786d5cdf6"
+  },
+  "controls": "PASS 11 geometric energy sewing controls\n",
+  "results": {
+    "field-status.json": [
+      {
+        "sex": "female",
+        "exit": 0,
+        "seconds": 3.473452783015091,
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-seam-energy-cfa56e9/artifacts/native-ocular-inference-field",
+          "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-context-api-7849001/build/native-line-female/fitted-unskinned.dsculpt",
+          "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-seam-energy-cfa56e9/artifacts/female"
+        ]
+      },
+      {
+        "sex": "male",
+        "exit": 0,
+        "seconds": 3.4755981199559756,
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-seam-energy-cfa56e9/artifacts/native-ocular-inference-field",
+          "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-context-api-7849001/build/native-line-male/fitted-unskinned.dsculpt",
+          "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-seam-energy-cfa56e9/artifacts/male"
+        ]
+      }
+    ],
+    "quality-status.json": [
+      {
+        "sex": "female",
+        "mode": "global",
+        "exit": 0,
+        "seconds": 3.0209342790185474
+      },
+      {
+        "sex": "female",
+        "mode": "head-eye",
+        "exit": 0,
+        "seconds": 6.2909502380061895
+      },
+      {
+        "sex": "female",
+        "mode": "seam",
+        "exit": 1,
+        "seconds": 9.68378899001982
+      },
+      {
+        "sex": "male",
+        "mode": "global",
+        "exit": 0,
+        "seconds": 2.2184816949884407
+      },
+      {
+        "sex": "male",
+        "mode": "head-eye",
+        "exit": 0,
+        "seconds": 6.193231872981414
+      },
+      {
+        "sex": "male",
+        "mode": "seam",
+        "exit": 1,
+        "seconds": 13.943541112006642
+      }
+    ],
+    "female/report.json": {
+      "analysis_work": 76679505,
+      "analysis_workspace": 45976288,
+      "changed": 19,
+      "contacts": 12111,
+      "linear_iterations": 54,
+      "linear_residual": 2.456057132312896e-14,
+      "partition": 2.2870594307278225e-14,
+      "policy": "private AUTOMATIC source-morph Head plus projected ocular-patch candidate with geometry-derived boundary hypothesis, original finite axes, no fallback",
+      "rows": 7942,
+      "seconds": 1.68929428,
+      "work": 441087691,
+      "workspace": 112855865
+    },
+    "male/report.json": {
+      "analysis_work": 74686073,
+      "analysis_workspace": 45795392,
+      "changed": 19,
+      "contacts": 15014,
+      "linear_iterations": 54,
+      "linear_residual": 1.9050042634269456e-14,
+      "partition": 2.3314683517128287e-14,
+      "policy": "private AUTOMATIC source-morph Head plus projected ocular-patch candidate with geometry-derived boundary hypothesis, original finite axes, no fallback",
+      "rows": 8122,
+      "seconds": 1.566201881,
+      "work": 447487172,
+      "workspace": 119335809
+    },
+    "seam-female.json": {
+      "artist_values_after_solve_only": true,
+      "failed_poses": 4,
+      "groups": 1701,
+      "maximum_m": 0.0008389537397674316,
+      "pairs": 2843,
+      "poses": 19,
+      "records": [
+        {
+          "failed_pairs": 0,
+          "family": "global",
+          "maximum_m": 2.384203980840272e-07,
+          "pairs": 2843,
+          "pose": 0,
+          "worst_objects": [
+            12,
+            14
+          ],
+          "worst_vertices": [
+            2417,
+            412
+          ]
+        },
+        {
+          "failed_pairs": 19,
+          "family": "global",
+          "maximum_m": 0.0003993533384306039,
+          "pairs": 2843,
+          "pose": 1,
+          "worst_objects": [
+            17,
+            17
+          ],
+          "worst_vertices": [
+            62,
+            80
+          ]
+        },
+        {
+          "failed_pairs": 5,
+          "family": "global",
+          "maximum_m": 0.00011730801328777447,
+          "pairs": 2843,
+          "pose": 2,
+          "worst_objects": [
+            12,
+            14
+          ],
+          "worst_vertices": [
+            2131,
+            38
+          ]
+        },
+        {
+          "failed_pairs": 19,
+          "family": "global",
+          "maximum_m": 0.0008389537397674316,
+          "pairs": 2843,
+          "pose": 3,
+          "worst_objects": [
+            17,
+            17
+          ],
+          "worst_vertices": [
+            97,
+            144
+          ]
+        },
+        {
+          "failed_pairs": 5,
+          "family": "global",
+          "maximum_m": 0.00011730801328777447,
+          "pairs": 2843,
+          "pose": 4,
+          "worst_objects": [
+            12,
+            14
+          ],
+          "worst_vertices": [
+            2131,
+            38
+          ]
+        },
+        {
+          "failed_pairs": 0,
+          "family": "head-eye",
+          "maximum_m": 2.384203980840272e-07,
+          "pairs": 2843,
+          "pose": 0,
+          "worst_objects": [
+            12,
+            14
+          ],
+          "worst_vertices": [
+            2417,
+            412
+          ]
+        },
+        {
+          "failed_pairs": 0,
+          "family": "head-eye",
+          "maximum_m": 2.384203980840272e-07,
+          "pairs": 2843,
+          "pose": 1,
+          "worst_objects": [
+            12,
+            14
+          ],
+          "worst_vertices": [
+            2417,
+            412
+          ]
+        },
+        {
+          "failed_pairs": 0,
+          "family": "head-eye",
+          "maximum_m": 2.384203980840272e-07,
+          "pairs": 2843,
+          "pose": 2,
+          "worst_objects": [
+            12,
+            14
+          ],
+          "worst_vertices": [
+            2417,
+            412
+          ]
+        },
+        {
+          "failed_pairs": 0,
+          "family": "head-eye",
+          "maximum_m": 2.384203980840272e-07,
+          "pairs": 2843,
+          "pose": 3,
+          "worst_objects": [
+            12,
+            14
+          ],
+          "worst_vertices": [
+            2417,
+            412
+          ]
+        },
+        {
+          "failed_pairs": 0,
+          "family": "head-eye",
+          "maximum_m": 2.384203980840272e-07,
+          "pairs": 2843,
+          "pose": 4,
+          "worst_objects": [
+            12,
+            14
+          ],
+          "worst_vertices": [
+            2417,
+            412
+          ]
+        },
+        {
+          "failed_pairs": 0,
+          "family": "head-eye",
+          "maximum_m": 2.384203980840272e-07,
+          "pairs": 2843,
+          "pose": 5,
+          "worst_objects": [
+            12,
+            14
+          ],
+          "worst_vertices": [
+            2417,
+            412
+          ]
+        },
+        {
+          "failed_pairs": 0,
+          "family": "head-eye",
+          "maximum_m": 2.384203980840272e-07,
+          "pairs": 2843,
+          "pose": 6,
+          "worst_objects": [
+            12,
+            14
+          ],
+          "worst_vertices": [
+            2417,
+            412
+          ]
+        },
+        {
+          "failed_pairs": 0,
+          "family": "head-eye",
+          "maximum_m": 2.384203980840272e-07,
+          "pairs": 2843,
+          "pose": 7,
+          "worst_objects": [
+            12,
+            14
+          ],
+          "worst_vertices": [
+            2417,
+            412
+          ]
+        },
+        {
+          "failed_pairs": 0,
+          "family": "head-eye",
+          "maximum_m": 2.384203980840272e-07,
+          "pairs": 2843,
+          "pose": 8,
+          "worst_objects": [
+            12,
+            14
+          ],
+          "worst_vertices": [
+            2417,
+            412
+          ]
+        },
+        {
+          "failed_pairs": 0,
+          "family": "head-eye",
+          "maximum_m": 2.384203980840272e-07,
+          "pairs": 2843,
+          "pose": 9,
+          "worst_objects": [
+            12,
+            14
+          ],
+          "worst_vertices": [
+            2417,
+            412
+          ]
+        },
+        {
+          "failed_pairs": 0,
+          "family": "head-eye",
+          "maximum_m": 2.384203980840272e-07,
+          "pairs": 2843,
+          "pose": 10,
+          "worst_objects": [
+            12,
+            14
+          ],
+          "worst_vertices": [
+            2417,
+            412
+          ]
+        },
+        {
+          "failed_pairs": 0,
+          "family": "head-eye",
+          "maximum_m": 2.384203980840272e-07,
+          "pairs": 2843,
+          "pose": 11,
+          "worst_objects": [
+            12,
+            14
+          ],
+          "worst_vertices": [
+            2417,
+            412
+          ]
+        },
+        {
+          "failed_pairs": 0,
+          "family": "head-eye",
+          "maximum_m": 2.384203980840272e-07,
+          "pairs": 2843,
+          "pose": 12,
+          "worst_objects": [
+            12,
+            14
+          ],
+          "worst_vertices": [
+            2417,
+            412
+          ]
+        },
+        {
+          "failed_pairs": 0,
+          "family": "head-eye",
+          "maximum_m": 2.384203980840272e-07,
+          "pairs": 2843,
+          "pose": 13,
+          "worst_objects": [
+            12,
+            14
+          ],
+          "worst_vertices": [
+            2417,
+            412
+          ]
+        }
+      ],
+      "seam_threshold_m": 3e-05
+    },
+    "seam-male.json": {
+      "artist_values_after_solve_only": true,
+      "failed_poses": 8,
+      "groups": 1620,
+      "maximum_m": 0.03694085734419875,
+      "pairs": 2577,
+      "poses": 19,
+      "records": [
+        {
+          "failed_pairs": 0,
+          "family": "global",
+          "maximum_m": 1.2067008269388615e-07,
+          "pairs": 2577,
+          "pose": 0,
+          "worst_objects": [
+            12,
+            15
+          ],
+          "worst_vertices": [
+            1374,
+            95
+          ]
+        },
+        {
+          "failed_pairs": 15,
+          "family": "global",
+          "maximum_m": 0.03694085734419875,
+          "pairs": 2577,
+          "pose": 1,
+          "worst_objects": [
+            12,
+            15
+          ],
+          "worst_vertices": [
+            590,
+            18
+          ]
+        },
+        {
+          "failed_pairs": 0,
+          "family": "global",
+          "maximum_m": 1.2067008269388615e-07,
+          "pairs": 2577,
+          "pose": 2,
+          "worst_objects": [
+            12,
+            15
+          ],
+          "worst_vertices": [
+            1374,
+            95
+          ]
+        },
+        {
+          "failed_pairs": 15,
+          "family": "global",
+          "maximum_m": 0.0070162594795019784,
+          "pairs": 2577,
+          "pose": 3,
+          "worst_objects": [
+            12,
+            15
+          ],
+          "worst_vertices": [
+            590,
+            18
+          ]
+        },
+        {
+          "failed_pairs": 0,
+          "family": "global",
+          "maximum_m": 1.2067008269388615e-07,
+          "pairs": 2577,
+          "pose": 4,
+          "worst_objects": [
+            12,
+            15
+          ],
+          "worst_vertices": [
+            1374,
+            95
+          ]
+        },
+        {
+          "failed_pairs": 15,
+          "family": "head-eye",
+          "maximum_m": 0.03433906391223612,
+          "pairs": 2577,
+          "pose": 0,
+          "worst_objects": [
+            12,
+            15
+          ],
+          "worst_vertices": [
+            590,
+            18
+          ]
+        },
+        {
+          "failed_pairs": 15,
+          "family": "head-eye",
+          "maximum_m": 0.03433905181997675,
+          "pairs": 2577,
+          "pose": 1,
+          "worst_objects": [
+            12,
+            15
+          ],
+          "worst_vertices": [
+            553,
+            110
+          ]
+        },
+        {
+          "failed_pairs": 15,
+          "family": "head-eye",
+          "maximum_m": 0.020157901817727593,
+          "pairs": 2577,
+          "pose": 2,
+          "worst_objects": [
+            12,
+            15
+          ],
+          "worst_vertices": [
+            38,
+            1
+          ]
+        },
+        {
+          "failed_pairs": 15,
+          "family": "head-eye",
+          "maximum_m": 0.020157997320587005,
+          "pairs": 2577,
+          "pose": 3,
+          "worst_objects": [
+            12,
+            15
+          ],
+          "worst_vertices": [
+            38,
+            1
+          ]
+        },
+        {
+          "failed_pairs": 15,
+          "family": "head-eye",
+          "maximum_m": 0.024622698331553908,
+          "pairs": 2577,
+          "pose": 4,
+          "worst_objects": [
+            12,
+            15
+          ],
+          "worst_vertices": [
+            553,
+            110
+          ]
+        },
+        {
+          "failed_pairs": 15,
+          "family": "head-eye",
+          "maximum_m": 0.024622603430419755,
+          "pairs": 2577,
+          "pose": 5,
+          "worst_objects": [
+            12,
+            15
+          ],
+          "worst_vertices": [
+            590,
+            18
+          ]
+        },
+        {
+          "failed_pairs": 0,
+          "family": "head-eye",
+          "maximum_m": 1.2067008269388615e-07,
+          "pairs": 2577,
+          "pose": 6,
+          "worst_objects": [
+            12,
+            15
+          ],
+          "worst_vertices": [
+            1374,
+            95
+          ]
+        },
+        {
+          "failed_pairs": 0,
+          "family": "head-eye",
+          "maximum_m": 1.2067008269388615e-07,
+          "pairs": 2577,
+          "pose": 7,
+          "worst_objects": [
+            12,
+            15
+          ],
+          "worst_vertices": [
+            1374,
+            95
+          ]
+        },
+        {
+          "failed_pairs": 0,
+          "family": "head-eye",
+          "maximum_m": 1.2067008269388615e-07,
+          "pairs": 2577,
+          "pose": 8,
+          "worst_objects": [
+            12,
+            15
+          ],
+          "worst_vertices": [
+            1374,
+            95
+          ]
+        },
+        {
+          "failed_pairs": 0,
+          "family": "head-eye",
+          "maximum_m": 1.2067008269388615e-07,
+          "pairs": 2577,
+          "pose": 9,
+          "worst_objects": [
+            12,
+            15
+          ],
+          "worst_vertices": [
+            1374,
+            95
+          ]
+        },
+        {
+          "failed_pairs": 0,
+          "family": "head-eye",
+          "maximum_m": 1.2067008269388615e-07,
+          "pairs": 2577,
+          "pose": 10,
+          "worst_objects": [
+            12,
+            15
+          ],
+          "worst_vertices": [
+            1374,
+            95
+          ]
+        },
+        {
+          "failed_pairs": 0,
+          "family": "head-eye",
+          "maximum_m": 1.2067008269388615e-07,
+          "pairs": 2577,
+          "pose": 11,
+          "worst_objects": [
+            12,
+            15
+          ],
+          "worst_vertices": [
+            1374,
+            95
+          ]
+        },
+        {
+          "failed_pairs": 0,
+          "family": "head-eye",
+          "maximum_m": 1.2067008269388615e-07,
+          "pairs": 2577,
+          "pose": 12,
+          "worst_objects": [
+            12,
+            15
+          ],
+          "worst_vertices": [
+            1374,
+            95
+          ]
+        },
+        {
+          "failed_pairs": 0,
+          "family": "head-eye",
+          "maximum_m": 1.2067008269388615e-07,
+          "pairs": 2577,
+          "pose": 13,
+          "worst_objects": [
+            12,
+            15
+          ],
+          "worst_vertices": [
+            1374,
+            95
+          ]
+        }
+      ],
+      "seam_threshold_m": 3e-05
+    },
+    "field-before-component-union-status.json": [
+      {
+        "sex": "female",
+        "exit": 1,
+        "seconds": 1.7182838160078973,
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-seam-energy-cfa56e9/artifacts/native-ocular-inference-field",
+          "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-context-api-7849001/build/native-line-female/fitted-unskinned.dsculpt",
+          "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-seam-energy-cfa56e9/artifacts/female"
+        ]
+      },
+      {
+        "sex": "male",
+        "exit": 1,
+        "seconds": 1.767964037018828,
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-seam-energy-cfa56e9/artifacts/native-ocular-inference-field",
+          "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-context-api-7849001/build/native-line-male/fitted-unskinned.dsculpt",
+          "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-seam-energy-cfa56e9/artifacts/male"
+        ]
+      }
+    ],
+    "matched-compile-commands.json": [
+      [
+        "src/native-visible-weights.cpp",
+        0,
+        [
+          "/usr/bin/c++",
+          "-DDOME_SCULPT_INSTALLED_ASSETS=\"/usr/local/share/dome-sculpt/assets/humanoid\"",
+          "-DDOME_SCULPT_SOURCE_ASSETS=\"/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-seam-energy-cfa56e9/assets/humanoid\"",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-seam-energy-cfa56e9/third_party",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-seam-energy-cfa56e9/include",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-seam-energy-cfa56e9/third_party/openbrush",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-seam-energy-cfa56e9/third_party/cgltf",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-seam-energy-cfa56e9/third_party/nlohmann",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-seam-energy-cfa56e9/third_party/xatlas",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-seam-energy-cfa56e9/third_party/mikktspace",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-seam-energy-cfa56e9/third_party/ufbx",
+          "-O3",
+          "-DNDEBUG",
+          "-std=gnu++20",
+          "-Wall",
+          "-Wextra",
+          "-Wpedantic",
+          "-o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-seam-energy-cfa56e9/artifacts/native-visible-weights.cpp.o",
+          "-c",
+          "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-seam-energy-cfa56e9/src/native-visible-weights.cpp"
+        ],
+        17.795229156967252
+      ],
+      [
+        "src/source-visible-weights.cpp",
+        0,
+        [
+          "/usr/bin/c++",
+          "-DDOME_SCULPT_INSTALLED_ASSETS=\"/usr/local/share/dome-sculpt/assets/humanoid\"",
+          "-DDOME_SCULPT_SOURCE_ASSETS=\"/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-seam-energy-cfa56e9/assets/humanoid\"",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-seam-energy-cfa56e9/third_party",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-seam-energy-cfa56e9/include",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-seam-energy-cfa56e9/third_party/openbrush",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-seam-energy-cfa56e9/third_party/cgltf",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-seam-energy-cfa56e9/third_party/nlohmann",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-seam-energy-cfa56e9/third_party/xatlas",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-seam-energy-cfa56e9/third_party/mikktspace",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-seam-energy-cfa56e9/third_party/ufbx",
+          "-O3",
+          "-DNDEBUG",
+          "-std=gnu++20",
+          "-Wall",
+          "-Wextra",
+          "-Wpedantic",
+          "-o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-seam-energy-cfa56e9/artifacts/source-visible-weights.cpp.o",
+          "-c",
+          "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-seam-energy-cfa56e9/src/source-visible-weights.cpp"
+        ],
+        15.617529347015079
+      ],
+      [
+        "native-ocular-inference-field",
+        0,
+        [
+          "/usr/bin/c++",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-seam-energy-cfa56e9/src",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-seam-energy-cfa56e9/include",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-seam-energy-cfa56e9/third_party/openbrush",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-seam-energy-cfa56e9/third_party/nlohmann",
+          "-O3",
+          "-DNDEBUG",
+          "-std=gnu++20",
+          "-o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-seam-energy-cfa56e9/artifacts/native-ocular-inference-field.cpp.o",
+          "-c",
+          "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-seam-energy-cfa56e9/tests/native-ocular-inference-field.cpp"
+        ]
+      ],
+      [
+        "link-native-ocular-inference-field",
+        0,
+        [
+          "/usr/bin/c++",
+          "-O3",
+          "-DNDEBUG",
+          "-Wl,--dependency-file=/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-seam-energy-cfa56e9/artifacts/ocular.link.d",
+          "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-seam-energy-cfa56e9/artifacts/native-ocular-inference-field.cpp.o",
+          "-o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-seam-energy-cfa56e9/artifacts/native-ocular-inference-field",
+          "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-seam-energy-cfa56e9/artifacts/libdome-sculpt-core.a",
+          "libdome-sculpt-affine.a",
+          "/usr/lib64/liblapacke.so",
+          "libdome-sculpt-polygon.a",
+          "libxatlas.a",
+          "libmikktspace.a",
+          "libmikktspace-robust.a",
+          "libufbx.a",
+          "/usr/lib64/libpng.so",
+          "/usr/lib64/libjpeg.so",
+          "/usr/lib64/libz.so",
+          "libdome-sculpt-emission-codec.a",
+          "/usr/lib64/libOpenEXR-3_2.so",
+          "/usr/lib64/libOpenEXRUtil-3_2.so",
+          "/usr/lib64/libOpenEXRCore-3_2.so",
+          "/usr/lib64/libIex-3_2.so",
+          "/usr/lib64/libIlmThread-3_2.so",
+          "/usr/lib64/libImath-3_1.so",
+          "-lgcc_s_asneeded",
+          "-lgcc_s_asneeded"
+        ]
+      ],
+      [
+        "weight-boundary-sewing",
+        1,
+        [
+          "/usr/bin/c++",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-seam-energy-cfa56e9/src",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-seam-energy-cfa56e9/include",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-seam-energy-cfa56e9/third_party/openbrush",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-seam-energy-cfa56e9/third_party/nlohmann",
+          "-O3",
+          "-DNDEBUG",
+          "-std=gnu++20",
+          "-o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-seam-energy-cfa56e9/artifacts/weight-boundary-sewing.cpp.o",
+          "-c",
+          "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-seam-energy-cfa56e9/tests/weight-boundary-sewing.cpp"
+        ]
+      ]
+    ]
+  },
+  "not_qualified": [
+    "crosspart/point continuity",
+    "whole solver SAN",
+    "native/UI/history/Save admission",
+    "general source ambiguity"
+  ]
+}

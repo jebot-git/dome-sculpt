@@ -20,6 +20,9 @@ struct DeclaredWeightPart {
   // Optional authored exclusions preserve all other geometry-derived component
   // evidence; they do not replace it with the entire skeleton palette.
   std::vector<uint32_t> user_excluded_joints;
+  // Private exact geometric sewing hypothesis; producer owns/replays evidence.
+  // Never inferred from coordinate proximity or original skin values.
+  std::vector<uint32_t> geometric_row_groups;
 };
 enum class DeclaredSupportPolicy {
   AllDeformControls,
@@ -191,7 +194,7 @@ declared_weight_intent(const SculptObject &o, const DeclaredWeightPart &input,
         "Declared geometry simultaneous mask/source workspace exceeded");
   size_t local_work = 0;
   auto parents = heat_intent_components(
-      m, {}, local_work,
+      m, input.geometric_row_groups, local_work,
       std::min(options.maximum_work, work.maximum - work.used), work.cancel);
   work.step(local_work);
   std::vector<HeatJointMask> masks(n);

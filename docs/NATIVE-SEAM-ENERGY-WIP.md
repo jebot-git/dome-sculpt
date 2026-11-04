@@ -1,0 +1,7 @@
+# Private geometric seam-energy candidate
+
+Unique opposite boundary edges within one exact current source owner, with identical complete REST/morph signatures, generate an explicit virtual energy quotient. Extra triangle contact, orientation disagreement, near positions and ambiguous multiple edge matches do not acquire a seam. No raw topology or artist values are changed or inferred. This is a geometric sewing hypothesis, not authenticated original topology. Component evidence is recomputed on that same quotient; the earlier inconsistent-mask refusal is preserved.
+
+Independent controls11/11 pass for the exact unit-square energy rows/mass, source/morph mismatch, proximity/orientation/ambiguity and prospective bytes/cancel. The actual matched producer and both changed private-header consumers were rebuilt against immutable8a public core/support dependencies. This is not a full project or solver sanitizer qualification. A fixture namespace compile error is preserved alongside its correction.
+
+Both full19 fields pass the same722 independent global/local pose cases. Actual charged work441,087,691 female and447,487,172 male remains below500M; planned peak112,855,865/119,335,809 bytes remains below256MiB. Same-object cracking improves substantially, but the complete independent seam oracle still fails female4/19 poses (maximum0.839mm) and male8/19 (36.941mm). Male Body/scalp crosspart Head transitions and some point contacts remain genuine unfinished work; no admission/default change is proposed.

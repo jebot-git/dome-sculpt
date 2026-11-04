@@ -415,6 +415,12 @@ anatomical_continuation(const Scene &scene, uint64_t group,
         declared_intent = declared_weight_intent(
             o, *declared->find(o.id), profile, options, budget,
             declared->policy, solve_mesh, rig_source->deformation);
+        const auto &groups=declared->find(o.id)->geometric_row_groups;
+        if(!groups.empty()) {
+          if(groups.size()!=solve_mesh.positions.size())
+            throw std::invalid_argument("Geometric sewing row dimensions");
+          row_groups=groups;
+        }
       } else {
         seams = capture_heat_seams(o, options, cancelled);
         budget.step(seams->work());
@@ -450,6 +456,11 @@ anatomical_continuation(const Scene &scene, uint64_t group,
       for (size_t raw = 0; raw < p.raw_to_row.size(); ++raw) {
         budget.step(4);
         p.raw_to_row[raw] += offset;
+        if(raw && !row_groups.empty()) {
+          const auto representative=row_groups[raw];
+          if(representative>=masks.size()||masks[representative]!=masks[raw])
+            throw std::invalid_argument("Geometric sewing joins conflicting component support");
+        }
         usage[p.raw_to_row[raw]] = masks[raw];
         if (declaration && declaration->user_singleton_boundary) {
           uint32_t joint = UINT32_MAX;
