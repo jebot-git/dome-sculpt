@@ -1,0 +1,1736 @@
+{
+  "scope": "PRIVATE native32 physical package3 functional/ownership/mixed/caps/UI checkpoint; NOT complete OOM qualification or main admission",
+  "production_source": "2124ae4588c8cb515381a4aee520f5845edca131",
+  "base_source": "3ef4b7ccd23dbf82eeec9f3e4a260eb8729fd699",
+  "parent_sealed_source": "7a24ea2c5fd4b0a032ebb04e179bee5dbf95950a",
+  "blocking_failure": {
+    "scope": "new warmed calling-thread C++ persistent allocation sweep under wholly-owned ASan/UBSan/leaks",
+    "original_handle": 81849,
+    "exit": 1,
+    "leak_bytes": 5736,
+    "leak_allocations": 142,
+    "location": "system libOpenEXR3.2 Imf::Header::insert/copy, Header constructors, OutputFile constructors; encode_emission_exr lines77/79",
+    "functional_prefixes_completed": 4038,
+    "denied": 4006,
+    "successful_optional_fallbacks": 32,
+    "baseline_calls": 4037,
+    "translated_errors": 0,
+    "source_artifact_drift": false,
+    "no_suppression": true,
+    "required_followup": "genuine owning codec allocation/exception cleanup; do not declare sweep passed from functional terminal log before LeakSanitizer exit"
+  },
+  "implemented": {
+    "schema": "conditional emission-package3 only actual native paint domain images; legacy package1/2 success bytes unchanged",
+    "domain": "explicit native-paint32/version1/actual compiled texCoord, not implicit current UV0; actual current POSITION/N/authored UV0/paint corners checked against decoded owner",
+    "authority": "private factory-minted normalized view proof retains exact original Scene, maps/material/current Paint/corner owners; public ownerless strict path remains refused",
+    "float": "all ten FLOAT32 radiance/relative/physical/coverage planes independently replay from actual current native Paint before attach and after native decode",
+    "mixed": "proof validates actual HDR field IDs, permits genuine nonemitting native32 beside HDR/legacy; exact-data-dedup compiled materials split for all physical fields only in package3 context",
+    "encoded_limits": "encoded stream reserves min(forecast,encoded cap), actual byte/seek bound enforced; original conservative raw+forecast working admission unchanged; no cap increase",
+    "no_public_layout_or_source_schema_append": true
+  },
+  "base_owned_R_S4": {
+    "status": {
+      "source": "3ef4b7ccd23dbf82eeec9f3e4a260eb8729fd699",
+      "scope": "fresh coherent core/render/support/application and newpackage3 consumer; all users of private EmissionExportImage recompiled",
+      "results": [
+        {
+          "profile": "release",
+          "phase": "configure",
+          "command": [
+            "cmake",
+            "-S",
+            ".",
+            "-B",
+            "build-release",
+            "-G",
+            "Ninja",
+            "-DCMAKE_BUILD_TYPE=Release",
+            "-DBUILD_TESTING=ON",
+            "-DDOME_BUILD_UI=ON",
+            "-DDOME_BUILD_XR=ON",
+            "-DDOME_COMPUTE_BACKEND=CPU",
+            "-DCMAKE_EXPORT_COMPILE_COMMANDS=ON",
+            "-DFLTK_DIR=/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-release/share/fltk"
+          ],
+          "exit": 0,
+          "seconds": 1.8605779290082864
+        },
+        {
+          "profile": "release",
+          "phase": "build",
+          "command": [
+            "nice",
+            "-n",
+            "15",
+            "cmake",
+            "--build",
+            "build-release",
+            "-j2",
+            "--target",
+            "dome-sculpt",
+            "dome-sculpt-native-paint32-emission-test",
+            "dome-sculpt-emission-export-test",
+            "dome-sculpt-emission-package-budget-test",
+            "dome-sculpt-source-paint-physical-authoring-test"
+          ],
+          "exit": 0,
+          "seconds": 102.9373010689742
+        },
+        {
+          "profile": "release",
+          "phase": "runtime",
+          "command": [
+            "ctest",
+            "--test-dir",
+            "build-release",
+            "-R",
+            "^(native-paint32-emission|emission-export|emission-package-budget|source-paint-physical-authoring)$",
+            "--output-on-failure"
+          ],
+          "exit": 0,
+          "seconds": 28.636382477998268
+        },
+        {
+          "profile": "sanitize",
+          "phase": "configure",
+          "command": [
+            "cmake",
+            "-S",
+            ".",
+            "-B",
+            "build-sanitize",
+            "-G",
+            "Ninja",
+            "-DCMAKE_BUILD_TYPE=Release",
+            "-DBUILD_TESTING=ON",
+            "-DDOME_BUILD_UI=ON",
+            "-DDOME_BUILD_XR=ON",
+            "-DDOME_COMPUTE_BACKEND=CPU",
+            "-DCMAKE_EXPORT_COMPILE_COMMANDS=ON",
+            "-DFLTK_DIR=/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-sanitize/share/fltk",
+            "-DCMAKE_C_FLAGS_RELEASE=-O1 -g1 -DNDEBUG -fsanitize=address,undefined -fno-omit-frame-pointer",
+            "-DCMAKE_CXX_FLAGS_RELEASE=-O1 -g1 -DNDEBUG -fsanitize=address,undefined -fno-omit-frame-pointer"
+          ],
+          "exit": 0,
+          "seconds": 5.993852960993536
+        },
+        {
+          "profile": "sanitize",
+          "phase": "build",
+          "command": [
+            "nice",
+            "-n",
+            "15",
+            "cmake",
+            "--build",
+            "build-sanitize",
+            "-j2",
+            "--target",
+            "dome-sculpt",
+            "dome-sculpt-native-paint32-emission-test",
+            "dome-sculpt-emission-export-test",
+            "dome-sculpt-emission-package-budget-test",
+            "dome-sculpt-source-paint-physical-authoring-test"
+          ],
+          "exit": 0,
+          "seconds": 843.4358363199863
+        },
+        {
+          "profile": "sanitize",
+          "phase": "runtime",
+          "command": [
+            "ctest",
+            "--test-dir",
+            "build-sanitize",
+            "-R",
+            "^(native-paint32-emission|emission-export|emission-package-budget|source-paint-physical-authoring)$",
+            "--output-on-failure"
+          ],
+          "exit": 0,
+          "seconds": 47.13644257700071
+        }
+      ],
+      "exit": 0,
+      "inputs": 1870,
+      "unchanged": true
+    },
+    "path": "/home/blux/de-xr/dome-sculpt/artifacts/native-paint32-emission-7a24ea2/artifacts/native32-emission-fourth/status.json",
+    "sha256": "8e8055b594faceaf0d5e9a311d4a60a80451069021f48bc420620be6e4cf0ef7"
+  },
+  "current_proofs": {
+    "native32-package3-coherent": {
+      "source": "39c9946487015691e7783d5afdcadd87705c8ee6",
+      "scope": "fresh coherent core/render/support/application/inspector and native32 physical/generic/controller/mixed/transaction consumers; persistent denial sweep separately registered",
+      "results": [
+        {
+          "profile": "release",
+          "phase": "configure",
+          "command": [
+            "cmake",
+            "-S",
+            ".",
+            "-B",
+            "build-release",
+            "-G",
+            "Ninja",
+            "-DCMAKE_BUILD_TYPE=Release",
+            "-DBUILD_TESTING=ON",
+            "-DDOME_BUILD_UI=ON",
+            "-DDOME_BUILD_XR=ON",
+            "-DDOME_COMPUTE_BACKEND=CPU",
+            "-DCMAKE_EXPORT_COMPILE_COMMANDS=ON",
+            "-DFLTK_DIR=/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-release/share/fltk"
+          ],
+          "exit": 0,
+          "seconds": 6.742235201993026
+        },
+        {
+          "profile": "release",
+          "phase": "build",
+          "command": [
+            "nice",
+            "-n",
+            "15",
+            "cmake",
+            "--build",
+            "build-release",
+            "-j2",
+            "--target",
+            "dome-sculpt",
+            "dome-sculpt-native-paint32-emission-test",
+            "dome-sculpt-native-paint32-emission-mixed-test",
+            "dome-sculpt-native-paint32-emission-contracts-test",
+            "dome-sculpt-native-paint32-export-test",
+            "dome-sculpt-xr-editable-export-test",
+            "dome-sculpt-native-physical-contracts-test",
+            "dome-sculpt-native-authoring-inspect",
+            "dome-sculpt-emission-export-test",
+            "dome-sculpt-emission-package-budget-test",
+            "dome-sculpt-source-paint-physical-authoring-test"
+          ],
+          "exit": 0,
+          "seconds": 492.67360123299295
+        },
+        {
+          "profile": "release",
+          "phase": "runtime",
+          "command": [
+            "ctest",
+            "--test-dir",
+            "build-release",
+            "-R",
+            "^(native-paint32-emission|native-paint32-emission-mixed|native-paint32-emission-contracts|native-paint32-export|native-paint32-fixture|xr-native-paint32-export|xr-editable-export|emission-export|emission-package-budget|source-paint-physical-authoring)$",
+            "--output-on-failure"
+          ],
+          "exit": 8,
+          "seconds": 40.6483143310179
+        }
+      ],
+      "exit": 8,
+      "inputs": 1873,
+      "unchanged": true
+    },
+    "native32-package3-bounded": {
+      "source": "ea894e6b76925c4da688caab2b918479aa504397",
+      "scope": "fresh coherent core/render/support/application/inspector and native32 physical/generic/controller/mixed/transaction consumers; persistent denial sweep separately registered",
+      "results": [
+        {
+          "profile": "release",
+          "phase": "configure",
+          "command": [
+            "cmake",
+            "-S",
+            ".",
+            "-B",
+            "build-release",
+            "-G",
+            "Ninja",
+            "-DCMAKE_BUILD_TYPE=Release",
+            "-DBUILD_TESTING=ON",
+            "-DDOME_BUILD_UI=ON",
+            "-DDOME_BUILD_XR=ON",
+            "-DDOME_COMPUTE_BACKEND=CPU",
+            "-DCMAKE_EXPORT_COMPILE_COMMANDS=ON",
+            "-DFLTK_DIR=/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-release/share/fltk"
+          ],
+          "exit": 0,
+          "seconds": 1.1851039620232768
+        },
+        {
+          "profile": "release",
+          "phase": "build",
+          "command": [
+            "nice",
+            "-n",
+            "15",
+            "cmake",
+            "--build",
+            "build-release",
+            "-j2",
+            "--target",
+            "dome-sculpt",
+            "dome-sculpt-native-paint32-emission-test",
+            "dome-sculpt-native-paint32-emission-mixed-test",
+            "dome-sculpt-native-paint32-emission-contracts-test",
+            "dome-sculpt-native-paint32-export-test",
+            "dome-sculpt-xr-editable-export-test",
+            "dome-sculpt-native-physical-contracts-test",
+            "dome-sculpt-native-authoring-inspect",
+            "dome-sculpt-emission-export-test",
+            "dome-sculpt-emission-package-budget-test",
+            "dome-sculpt-source-paint-physical-authoring-test"
+          ],
+          "exit": 0,
+          "seconds": 16.338622459967155
+        },
+        {
+          "profile": "release",
+          "phase": "runtime",
+          "command": [
+            "ctest",
+            "--test-dir",
+            "build-release",
+            "-R",
+            "^(native-paint32-emission|native-paint32-emission-mixed|native-paint32-emission-contracts|native-paint32-export|native-paint32-fixture|xr-native-paint32-export|xr-editable-export|emission-export|emission-package-budget|source-paint-physical-authoring)$",
+            "--output-on-failure"
+          ],
+          "exit": 8,
+          "seconds": 42.26059736398747
+        }
+      ],
+      "exit": 8,
+      "inputs": 1873,
+      "unchanged": true
+    },
+    "native32-package3-caps": {
+      "source": "2124ae4588c8cb515381a4aee520f5845edca131",
+      "scope": "fresh coherent core/render/support/application/inspector and native32 physical/generic/controller/mixed/transaction consumers; persistent denial sweep separately registered",
+      "results": [
+        {
+          "profile": "release",
+          "phase": "configure",
+          "command": [
+            "cmake",
+            "-S",
+            ".",
+            "-B",
+            "build-release",
+            "-G",
+            "Ninja",
+            "-DCMAKE_BUILD_TYPE=Release",
+            "-DBUILD_TESTING=ON",
+            "-DDOME_BUILD_UI=ON",
+            "-DDOME_BUILD_XR=ON",
+            "-DDOME_COMPUTE_BACKEND=CPU",
+            "-DCMAKE_EXPORT_COMPILE_COMMANDS=ON",
+            "-DFLTK_DIR=/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-release/share/fltk"
+          ],
+          "exit": 0,
+          "seconds": 1.1814988770056516
+        },
+        {
+          "profile": "release",
+          "phase": "build",
+          "command": [
+            "nice",
+            "-n",
+            "15",
+            "cmake",
+            "--build",
+            "build-release",
+            "-j2",
+            "--target",
+            "dome-sculpt",
+            "dome-sculpt-native-paint32-emission-test",
+            "dome-sculpt-native-paint32-emission-mixed-test",
+            "dome-sculpt-native-paint32-emission-contracts-test",
+            "dome-sculpt-native-paint32-export-test",
+            "dome-sculpt-xr-editable-export-test",
+            "dome-sculpt-native-physical-contracts-test",
+            "dome-sculpt-native-authoring-inspect",
+            "dome-sculpt-emission-export-test",
+            "dome-sculpt-emission-package-budget-test",
+            "dome-sculpt-source-paint-physical-authoring-test"
+          ],
+          "exit": 0,
+          "seconds": 15.937894515984226
+        },
+        {
+          "profile": "release",
+          "phase": "runtime",
+          "command": [
+            "ctest",
+            "--test-dir",
+            "build-release",
+            "-R",
+            "^(native-paint32-emission|native-paint32-emission-mixed|native-paint32-emission-contracts|native-paint32-export|native-paint32-fixture|xr-native-paint32-export|xr-editable-export|emission-export|emission-package-budget|source-paint-physical-authoring)$",
+            "--output-on-failure"
+          ],
+          "exit": 0,
+          "seconds": 40.10014987899922
+        },
+        {
+          "profile": "sanitize",
+          "phase": "configure",
+          "command": [
+            "cmake",
+            "-S",
+            ".",
+            "-B",
+            "build-sanitize",
+            "-G",
+            "Ninja",
+            "-DCMAKE_BUILD_TYPE=Release",
+            "-DBUILD_TESTING=ON",
+            "-DDOME_BUILD_UI=ON",
+            "-DDOME_BUILD_XR=ON",
+            "-DDOME_COMPUTE_BACKEND=CPU",
+            "-DCMAKE_EXPORT_COMPILE_COMMANDS=ON",
+            "-DFLTK_DIR=/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-sanitize/share/fltk",
+            "-DCMAKE_C_FLAGS_RELEASE=-O1 -g1 -DNDEBUG -fsanitize=address,undefined -fno-omit-frame-pointer",
+            "-DCMAKE_CXX_FLAGS_RELEASE=-O1 -g1 -DNDEBUG -fsanitize=address,undefined -fno-omit-frame-pointer"
+          ],
+          "exit": 0,
+          "seconds": 5.01141021901276
+        },
+        {
+          "profile": "sanitize",
+          "phase": "build",
+          "command": [
+            "nice",
+            "-n",
+            "15",
+            "cmake",
+            "--build",
+            "build-sanitize",
+            "-j2",
+            "--target",
+            "dome-sculpt",
+            "dome-sculpt-native-paint32-emission-test",
+            "dome-sculpt-native-paint32-emission-mixed-test",
+            "dome-sculpt-native-paint32-emission-contracts-test",
+            "dome-sculpt-native-paint32-export-test",
+            "dome-sculpt-xr-editable-export-test",
+            "dome-sculpt-native-physical-contracts-test",
+            "dome-sculpt-native-authoring-inspect",
+            "dome-sculpt-emission-export-test",
+            "dome-sculpt-emission-package-budget-test",
+            "dome-sculpt-source-paint-physical-authoring-test"
+          ],
+          "exit": 0,
+          "seconds": 901.4811614030041
+        },
+        {
+          "profile": "sanitize",
+          "phase": "runtime",
+          "command": [
+            "ctest",
+            "--test-dir",
+            "build-sanitize",
+            "-R",
+            "^(native-paint32-emission|native-paint32-emission-mixed|native-paint32-emission-contracts|native-paint32-export|native-paint32-fixture|xr-native-paint32-export|xr-editable-export|emission-export|emission-package-budget|source-paint-physical-authoring)$",
+            "--output-on-failure"
+          ],
+          "exit": 0,
+          "seconds": 105.39825446996838
+        }
+      ],
+      "exit": 0,
+      "inputs": 1873,
+      "unchanged": true
+    },
+    "native32-package3-oom-release": {
+      "source": "2124ae4588c8cb515381a4aee520f5845edca131",
+      "scope": "warmed public emission_export_surfaces\u2192export_glb physical package3 calling-thread persistent C++ allocation prefixes 0 through measured baseline inclusive; no old sweep restarted",
+      "command": [
+        "nice",
+        "-n",
+        "15",
+        "/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/build-release/dome-sculpt-native-paint32-emission-contracts-test",
+        "/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/artifacts/native32-package3-oom-release/output",
+        "--oom"
+      ],
+      "exit": 0,
+      "seconds": 26.21874600299634,
+      "inputs": 1885,
+      "unchanged": true
+    },
+    "native32-package3-oom-sanitize": {
+      "source": "2124ae4588c8cb515381a4aee520f5845edca131",
+      "scope": "warmed public emission_export_surfaces\u2192export_glb physical package3 calling-thread persistent C++ allocation prefixes 0 through measured baseline inclusive; no old sweep restarted",
+      "command": [
+        "nice",
+        "-n",
+        "15",
+        "/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/build-sanitize/dome-sculpt-native-paint32-emission-contracts-test",
+        "/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/artifacts/native32-package3-oom-sanitize/output",
+        "--oom"
+      ],
+      "exit": 1,
+      "seconds": 171.24689378397306,
+      "inputs": 1885,
+      "unchanged": true
+    },
+    "native32-package3-gui-release": {
+      "source": "2124ae4588c8cb515381a4aee520f5845edca131",
+      "scope": "actual native32 physical package3 desktop export/chooser Cancel/Close/filename ACK/Open/native Save/clean Close, normal Release",
+      "command": [
+        "/home/blux/de-xr/dome-sculpt/artifacts/selection-gui-venv/bin/python",
+        "/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/artifacts/native32-package3-gui/physical-menu.py"
+      ],
+      "exit": 0,
+      "seconds": 32.216126002022065,
+      "inputs": 1888,
+      "unchanged": true
+    },
+    "native32-package3-gui-sanitize-compact": {
+      "source": "2124ae4588c8cb515381a4aee520f5845edca131",
+      "scope": "actual native32 physical package3 desktop export/chooser Cancel/Close/filename ACK/Open/native Save/clean Close, compact whole-owned sanitizer",
+      "command": [
+        "/home/blux/de-xr/dome-sculpt/artifacts/selection-gui-venv/bin/python",
+        "/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/artifacts/native32-package3-gui/physical-menu.py"
+      ],
+      "exit": 0,
+      "seconds": 38.36094736598898,
+      "inputs": 1888,
+      "unchanged": true
+    },
+    "native32-mixed-old": {
+      "scope": "new whole mixed fixture TU against immutable3ef matched owned Release core/render/support; old runtime counterfactual",
+      "results": [
+        {
+          "phase": "compile",
+          "command": [
+            "nice",
+            "-n",
+            "15",
+            "/usr/bin/c++",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/src",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/third_party/cgltf",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/include",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/third_party/openbrush",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/third_party/nlohmann",
+            "-isystem",
+            "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/harfbuzz",
+            "-isystem",
+            "/usr/include/glib-2.0",
+            "-isystem",
+            "/usr/lib64/glib-2.0/include",
+            "-isystem",
+            "/usr/include/sysprof-6",
+            "-isystem",
+            "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/freetype2",
+            "-isystem",
+            "/usr/include/libpng16",
+            "-isystem",
+            "/usr/include/libxml2",
+            "-O3",
+            "-DNDEBUG",
+            "-std=gnu++20",
+            "-pthread",
+            "-DWITH_GZFILEOP",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/artifacts/native32-mixed-old/mixed.o",
+            "-c",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/tests/native-paint32-emission-mixed.cpp"
+          ],
+          "exit": 1,
+          "seconds": 3.8784502309863456
+        }
+      ],
+      "inputs": 1882,
+      "unchanged": true
+    },
+    "native32-mixed-old-fixed-fixture": {
+      "scope": "new whole mixed fixture TU against immutable3ef matched owned Release core/render/support; old runtime counterfactual",
+      "results": [
+        {
+          "phase": "compile",
+          "command": [
+            "nice",
+            "-n",
+            "15",
+            "/usr/bin/c++",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/src",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/third_party/cgltf",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/include",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/third_party/openbrush",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/third_party/nlohmann",
+            "-isystem",
+            "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/harfbuzz",
+            "-isystem",
+            "/usr/include/glib-2.0",
+            "-isystem",
+            "/usr/lib64/glib-2.0/include",
+            "-isystem",
+            "/usr/include/sysprof-6",
+            "-isystem",
+            "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/freetype2",
+            "-isystem",
+            "/usr/include/libpng16",
+            "-isystem",
+            "/usr/include/libxml2",
+            "-O3",
+            "-DNDEBUG",
+            "-std=gnu++20",
+            "-pthread",
+            "-DWITH_GZFILEOP",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/artifacts/native32-mixed-old-fixed-fixture/mixed.o",
+            "-c",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/tests/native-paint32-emission-mixed.cpp"
+          ],
+          "exit": 0,
+          "seconds": 17.544387732981704
+        },
+        {
+          "phase": "link",
+          "command": [
+            "/usr/bin/c++",
+            "-O3",
+            "-DNDEBUG",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/artifacts/native32-mixed-old-fixed-fixture/mixed.o",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/artifacts/native32-mixed-old-fixed-fixture/old-mixed",
+            "-Wl,-rpath,/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native-paint32-emission-7a24ea2/build-release/libdome-sculpt-render.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native-paint32-emission-7a24ea2/build-release/libdome-sculpt-core.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native-paint32-emission-7a24ea2/build-release/libdome-sculpt-affine.a",
+            "/usr/lib64/liblapacke.so",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native-paint32-emission-7a24ea2/build-release/libdome-sculpt-polygon.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native-paint32-emission-7a24ea2/build-release/libxatlas.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native-paint32-emission-7a24ea2/build-release/libmikktspace.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native-paint32-emission-7a24ea2/build-release/libmikktspace-robust.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native-paint32-emission-7a24ea2/build-release/libufbx.a",
+            "/usr/lib64/libpng.so",
+            "/usr/lib64/libjpeg.so",
+            "/usr/lib64/libz.so",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native-paint32-emission-7a24ea2/build-release/libdome-sculpt-emission-codec.a",
+            "/usr/lib64/libOpenEXR-3_2.so",
+            "/usr/lib64/libOpenEXRUtil-3_2.so",
+            "/usr/lib64/libOpenEXRCore-3_2.so",
+            "/usr/lib64/libIex-3_2.so",
+            "/usr/lib64/libIlmThread-3_2.so",
+            "/usr/lib64/libImath-3_1.so",
+            "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libharfbuzz.so",
+            "/usr/lib64/libEGL.so",
+            "/usr/lib64/libGL.so",
+            "/usr/lib64/libfontconfig.so",
+            "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libfreetype.so",
+            "/usr/lib64/libicui18n.so",
+            "/usr/lib64/libicuuc.so",
+            "-lgcc_s_asneeded",
+            "-lgcc_s_asneeded"
+          ],
+          "exit": 0,
+          "seconds": 0.31837398902280256
+        },
+        {
+          "phase": "runtime",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/artifacts/native32-mixed-old-fixed-fixture/old-mixed",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/artifacts/native32-mixed-old-fixed-fixture/output"
+          ],
+          "exit": 1,
+          "seconds": 0.017373930022586137
+        }
+      ],
+      "inputs": 1882,
+      "unchanged": true
+    },
+    "native32-mixed-alias-counterfactual": {
+      "scope": "actual f635 production two-TU overlay on immutable3ef complete owned Release archive; no data layout change, new mixed whole fixture",
+      "results": [
+        {
+          "phase": "compile-emission-export.cpp",
+          "command": [
+            "nice",
+            "-n",
+            "15",
+            "/usr/bin/c++",
+            "-DDOME_SCULPT_INSTALLED_ASSETS=\"/usr/local/share/dome-sculpt/assets/humanoid\"",
+            "-DDOME_SCULPT_SOURCE_ASSETS=\"/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/assets/humanoid\"",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/third_party",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/include",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/third_party/openbrush",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/third_party/cgltf",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/third_party/nlohmann",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/third_party/xatlas",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/third_party/mikktspace",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/third_party/ufbx",
+            "-O3",
+            "-DNDEBUG",
+            "-std=gnu++20",
+            "-Wall",
+            "-Wextra",
+            "-Wpedantic",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/artifacts/native32-mixed-alias-counterfactual/emission-export.cpp.o",
+            "-c",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/src/emission-export.cpp"
+          ],
+          "exit": 0,
+          "seconds": 5.467447450035252
+        },
+        {
+          "phase": "compile-export.cpp",
+          "command": [
+            "nice",
+            "-n",
+            "15",
+            "/usr/bin/c++",
+            "-DDOME_SCULPT_INSTALLED_ASSETS=\"/usr/local/share/dome-sculpt/assets/humanoid\"",
+            "-DDOME_SCULPT_SOURCE_ASSETS=\"/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/assets/humanoid\"",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/third_party",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/include",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/third_party/openbrush",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/third_party/cgltf",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/third_party/nlohmann",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/third_party/xatlas",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/third_party/mikktspace",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/third_party/ufbx",
+            "-O3",
+            "-DNDEBUG",
+            "-std=gnu++20",
+            "-Wall",
+            "-Wextra",
+            "-Wpedantic",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/artifacts/native32-mixed-alias-counterfactual/export.cpp.o",
+            "-c",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/src/export.cpp"
+          ],
+          "exit": 0,
+          "seconds": 22.76676127302926
+        },
+        {
+          "phase": "compile-native-paint32-emission-mixed.cpp",
+          "command": [
+            "nice",
+            "-n",
+            "15",
+            "/usr/bin/c++",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/src",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/third_party/cgltf",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/include",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/third_party/openbrush",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/third_party/nlohmann",
+            "-isystem",
+            "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/harfbuzz",
+            "-isystem",
+            "/usr/include/glib-2.0",
+            "-isystem",
+            "/usr/lib64/glib-2.0/include",
+            "-isystem",
+            "/usr/include/sysprof-6",
+            "-isystem",
+            "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/freetype2",
+            "-isystem",
+            "/usr/include/libpng16",
+            "-isystem",
+            "/usr/include/libxml2",
+            "-O3",
+            "-DNDEBUG",
+            "-std=gnu++20",
+            "-pthread",
+            "-DWITH_GZFILEOP",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/artifacts/native32-mixed-alias-counterfactual/native-paint32-emission-mixed.cpp.o",
+            "-c",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/tests/native-paint32-emission-mixed.cpp"
+          ],
+          "exit": 0,
+          "seconds": 15.928763718984555
+        },
+        {
+          "phase": "archive",
+          "command": [
+            "ar",
+            "r",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/artifacts/native32-mixed-alias-counterfactual/libdome-sculpt-core.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/artifacts/native32-mixed-alias-counterfactual/emission-export.cpp.o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/artifacts/native32-mixed-alias-counterfactual/export.cpp.o"
+          ],
+          "exit": 0,
+          "seconds": 0.13404824602184817
+        },
+        {
+          "phase": "link",
+          "command": [
+            "/usr/bin/c++",
+            "-O3",
+            "-DNDEBUG",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/artifacts/native32-mixed-alias-counterfactual/native-paint32-emission-mixed.cpp.o",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/artifacts/native32-mixed-alias-counterfactual/mixed",
+            "-Wl,-rpath,/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native-paint32-emission-7a24ea2/build-release/libdome-sculpt-render.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/artifacts/native32-mixed-alias-counterfactual/libdome-sculpt-core.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native-paint32-emission-7a24ea2/build-release/libdome-sculpt-affine.a",
+            "/usr/lib64/liblapacke.so",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native-paint32-emission-7a24ea2/build-release/libdome-sculpt-polygon.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native-paint32-emission-7a24ea2/build-release/libxatlas.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native-paint32-emission-7a24ea2/build-release/libmikktspace.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native-paint32-emission-7a24ea2/build-release/libmikktspace-robust.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native-paint32-emission-7a24ea2/build-release/libufbx.a",
+            "/usr/lib64/libpng.so",
+            "/usr/lib64/libjpeg.so",
+            "/usr/lib64/libz.so",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native-paint32-emission-7a24ea2/build-release/libdome-sculpt-emission-codec.a",
+            "/usr/lib64/libOpenEXR-3_2.so",
+            "/usr/lib64/libOpenEXRUtil-3_2.so",
+            "/usr/lib64/libOpenEXRCore-3_2.so",
+            "/usr/lib64/libIex-3_2.so",
+            "/usr/lib64/libIlmThread-3_2.so",
+            "/usr/lib64/libImath-3_1.so",
+            "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libharfbuzz.so",
+            "/usr/lib64/libEGL.so",
+            "/usr/lib64/libGL.so",
+            "/usr/lib64/libfontconfig.so",
+            "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libfreetype.so",
+            "/usr/lib64/libicui18n.so",
+            "/usr/lib64/libicuuc.so",
+            "-lgcc_s_asneeded",
+            "-lgcc_s_asneeded"
+          ],
+          "exit": 0,
+          "seconds": 0.3044134379597381
+        },
+        {
+          "phase": "runtime",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/artifacts/native32-mixed-alias-counterfactual/mixed",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/artifacts/native32-mixed-alias-counterfactual/output"
+          ],
+          "exit": 0,
+          "seconds": 7.735544953029603
+        }
+      ],
+      "inputs": 1882,
+      "unchanged": true
+    },
+    "native32-mixed-real-alias-old": {
+      "scope": "actual f635 production two-TU overlay on immutable3ef complete owned Release archive; no data layout change, new mixed whole fixture",
+      "results": [
+        {
+          "phase": "compile-emission-export.cpp",
+          "command": [
+            "nice",
+            "-n",
+            "15",
+            "/usr/bin/c++",
+            "-DDOME_SCULPT_INSTALLED_ASSETS=\"/usr/local/share/dome-sculpt/assets/humanoid\"",
+            "-DDOME_SCULPT_SOURCE_ASSETS=\"/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/assets/humanoid\"",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/third_party",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/include",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/third_party/openbrush",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/third_party/cgltf",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/third_party/nlohmann",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/third_party/xatlas",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/third_party/mikktspace",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/third_party/ufbx",
+            "-O3",
+            "-DNDEBUG",
+            "-std=gnu++20",
+            "-Wall",
+            "-Wextra",
+            "-Wpedantic",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/artifacts/native32-mixed-real-alias-old/emission-export.cpp.o",
+            "-c",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/src/emission-export.cpp"
+          ],
+          "exit": 0,
+          "seconds": 5.702000199002214
+        },
+        {
+          "phase": "compile-export.cpp",
+          "command": [
+            "nice",
+            "-n",
+            "15",
+            "/usr/bin/c++",
+            "-DDOME_SCULPT_INSTALLED_ASSETS=\"/usr/local/share/dome-sculpt/assets/humanoid\"",
+            "-DDOME_SCULPT_SOURCE_ASSETS=\"/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/assets/humanoid\"",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/third_party",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/include",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/third_party/openbrush",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/third_party/cgltf",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/third_party/nlohmann",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/third_party/xatlas",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/third_party/mikktspace",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/third_party/ufbx",
+            "-O3",
+            "-DNDEBUG",
+            "-std=gnu++20",
+            "-Wall",
+            "-Wextra",
+            "-Wpedantic",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/artifacts/native32-mixed-real-alias-old/export.cpp.o",
+            "-c",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/src/export.cpp"
+          ],
+          "exit": 0,
+          "seconds": 22.99229754100088
+        },
+        {
+          "phase": "compile-native-paint32-emission-mixed.cpp",
+          "command": [
+            "nice",
+            "-n",
+            "15",
+            "/usr/bin/c++",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/src",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/third_party/cgltf",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/include",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/third_party/openbrush",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/third_party/nlohmann",
+            "-isystem",
+            "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/harfbuzz",
+            "-isystem",
+            "/usr/include/glib-2.0",
+            "-isystem",
+            "/usr/lib64/glib-2.0/include",
+            "-isystem",
+            "/usr/include/sysprof-6",
+            "-isystem",
+            "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/freetype2",
+            "-isystem",
+            "/usr/include/libpng16",
+            "-isystem",
+            "/usr/include/libxml2",
+            "-O3",
+            "-DNDEBUG",
+            "-std=gnu++20",
+            "-pthread",
+            "-DWITH_GZFILEOP",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/artifacts/native32-mixed-real-alias-old/native-paint32-emission-mixed.cpp.o",
+            "-c",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/tests/native-paint32-emission-mixed.cpp"
+          ],
+          "exit": 0,
+          "seconds": 15.974345305992756
+        },
+        {
+          "phase": "archive",
+          "command": [
+            "ar",
+            "r",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/artifacts/native32-mixed-real-alias-old/libdome-sculpt-core.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/artifacts/native32-mixed-real-alias-old/emission-export.cpp.o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/artifacts/native32-mixed-real-alias-old/export.cpp.o"
+          ],
+          "exit": 0,
+          "seconds": 0.1453868809621781
+        },
+        {
+          "phase": "link",
+          "command": [
+            "/usr/bin/c++",
+            "-O3",
+            "-DNDEBUG",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/artifacts/native32-mixed-real-alias-old/native-paint32-emission-mixed.cpp.o",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/artifacts/native32-mixed-real-alias-old/mixed",
+            "-Wl,-rpath,/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native-paint32-emission-7a24ea2/build-release/libdome-sculpt-render.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/artifacts/native32-mixed-real-alias-old/libdome-sculpt-core.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native-paint32-emission-7a24ea2/build-release/libdome-sculpt-affine.a",
+            "/usr/lib64/liblapacke.so",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native-paint32-emission-7a24ea2/build-release/libdome-sculpt-polygon.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native-paint32-emission-7a24ea2/build-release/libxatlas.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native-paint32-emission-7a24ea2/build-release/libmikktspace.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native-paint32-emission-7a24ea2/build-release/libmikktspace-robust.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native-paint32-emission-7a24ea2/build-release/libufbx.a",
+            "/usr/lib64/libpng.so",
+            "/usr/lib64/libjpeg.so",
+            "/usr/lib64/libz.so",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native-paint32-emission-7a24ea2/build-release/libdome-sculpt-emission-codec.a",
+            "/usr/lib64/libOpenEXR-3_2.so",
+            "/usr/lib64/libOpenEXRUtil-3_2.so",
+            "/usr/lib64/libOpenEXRCore-3_2.so",
+            "/usr/lib64/libIex-3_2.so",
+            "/usr/lib64/libIlmThread-3_2.so",
+            "/usr/lib64/libImath-3_1.so",
+            "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libharfbuzz.so",
+            "/usr/lib64/libEGL.so",
+            "/usr/lib64/libGL.so",
+            "/usr/lib64/libfontconfig.so",
+            "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libfreetype.so",
+            "/usr/lib64/libicui18n.so",
+            "/usr/lib64/libicuuc.so",
+            "-lgcc_s_asneeded",
+            "-lgcc_s_asneeded"
+          ],
+          "exit": 0,
+          "seconds": 0.29620365699520335
+        },
+        {
+          "phase": "runtime",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/artifacts/native32-mixed-real-alias-old/mixed",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/artifacts/native32-mixed-real-alias-old/output"
+          ],
+          "exit": 1,
+          "seconds": 7.504597232036758
+        }
+      ],
+      "inputs": 1882,
+      "unchanged": true
+    },
+    "native32-mixed-dedup-data-old": {
+      "scope": "actual f635 production two-TU overlay on immutable3ef complete owned Release archive; no data layout change, new mixed whole fixture",
+      "results": [
+        {
+          "phase": "compile-emission-export.cpp",
+          "command": [
+            "nice",
+            "-n",
+            "15",
+            "/usr/bin/c++",
+            "-DDOME_SCULPT_INSTALLED_ASSETS=\"/usr/local/share/dome-sculpt/assets/humanoid\"",
+            "-DDOME_SCULPT_SOURCE_ASSETS=\"/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/assets/humanoid\"",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/third_party",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/include",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/third_party/openbrush",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/third_party/cgltf",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/third_party/nlohmann",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/third_party/xatlas",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/third_party/mikktspace",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/third_party/ufbx",
+            "-O3",
+            "-DNDEBUG",
+            "-std=gnu++20",
+            "-Wall",
+            "-Wextra",
+            "-Wpedantic",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/artifacts/native32-mixed-dedup-data-old/emission-export.cpp.o",
+            "-c",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/src/emission-export.cpp"
+          ],
+          "exit": 0,
+          "seconds": 6.848469364980701
+        },
+        {
+          "phase": "compile-export.cpp",
+          "command": [
+            "nice",
+            "-n",
+            "15",
+            "/usr/bin/c++",
+            "-DDOME_SCULPT_INSTALLED_ASSETS=\"/usr/local/share/dome-sculpt/assets/humanoid\"",
+            "-DDOME_SCULPT_SOURCE_ASSETS=\"/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/assets/humanoid\"",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/third_party",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/include",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/third_party/openbrush",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/third_party/cgltf",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/third_party/nlohmann",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/third_party/xatlas",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/third_party/mikktspace",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/third_party/ufbx",
+            "-O3",
+            "-DNDEBUG",
+            "-std=gnu++20",
+            "-Wall",
+            "-Wextra",
+            "-Wpedantic",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/artifacts/native32-mixed-dedup-data-old/export.cpp.o",
+            "-c",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/src/export.cpp"
+          ],
+          "exit": 0,
+          "seconds": 30.318710524006747
+        },
+        {
+          "phase": "compile-native-paint32-emission-mixed.cpp",
+          "command": [
+            "nice",
+            "-n",
+            "15",
+            "/usr/bin/c++",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/src",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/third_party/cgltf",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/include",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/third_party/openbrush",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/third_party/nlohmann",
+            "-isystem",
+            "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/harfbuzz",
+            "-isystem",
+            "/usr/include/glib-2.0",
+            "-isystem",
+            "/usr/lib64/glib-2.0/include",
+            "-isystem",
+            "/usr/include/sysprof-6",
+            "-isystem",
+            "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/freetype2",
+            "-isystem",
+            "/usr/include/libpng16",
+            "-isystem",
+            "/usr/include/libxml2",
+            "-O3",
+            "-DNDEBUG",
+            "-std=gnu++20",
+            "-pthread",
+            "-DWITH_GZFILEOP",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/artifacts/native32-mixed-dedup-data-old/native-paint32-emission-mixed.cpp.o",
+            "-c",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/tests/native-paint32-emission-mixed.cpp"
+          ],
+          "exit": 0,
+          "seconds": 19.661358113982715
+        },
+        {
+          "phase": "archive",
+          "command": [
+            "ar",
+            "r",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/artifacts/native32-mixed-dedup-data-old/libdome-sculpt-core.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/artifacts/native32-mixed-dedup-data-old/emission-export.cpp.o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/artifacts/native32-mixed-dedup-data-old/export.cpp.o"
+          ],
+          "exit": 0,
+          "seconds": 0.20832484198035672
+        },
+        {
+          "phase": "link",
+          "command": [
+            "/usr/bin/c++",
+            "-O3",
+            "-DNDEBUG",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/artifacts/native32-mixed-dedup-data-old/native-paint32-emission-mixed.cpp.o",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/artifacts/native32-mixed-dedup-data-old/mixed",
+            "-Wl,-rpath,/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native-paint32-emission-7a24ea2/build-release/libdome-sculpt-render.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/artifacts/native32-mixed-dedup-data-old/libdome-sculpt-core.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native-paint32-emission-7a24ea2/build-release/libdome-sculpt-affine.a",
+            "/usr/lib64/liblapacke.so",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native-paint32-emission-7a24ea2/build-release/libdome-sculpt-polygon.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native-paint32-emission-7a24ea2/build-release/libxatlas.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native-paint32-emission-7a24ea2/build-release/libmikktspace.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native-paint32-emission-7a24ea2/build-release/libmikktspace-robust.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native-paint32-emission-7a24ea2/build-release/libufbx.a",
+            "/usr/lib64/libpng.so",
+            "/usr/lib64/libjpeg.so",
+            "/usr/lib64/libz.so",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native-paint32-emission-7a24ea2/build-release/libdome-sculpt-emission-codec.a",
+            "/usr/lib64/libOpenEXR-3_2.so",
+            "/usr/lib64/libOpenEXRUtil-3_2.so",
+            "/usr/lib64/libOpenEXRCore-3_2.so",
+            "/usr/lib64/libIex-3_2.so",
+            "/usr/lib64/libIlmThread-3_2.so",
+            "/usr/lib64/libImath-3_1.so",
+            "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libharfbuzz.so",
+            "/usr/lib64/libEGL.so",
+            "/usr/lib64/libGL.so",
+            "/usr/lib64/libfontconfig.so",
+            "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libfreetype.so",
+            "/usr/lib64/libicui18n.so",
+            "/usr/lib64/libicuuc.so",
+            "-lgcc_s_asneeded",
+            "-lgcc_s_asneeded"
+          ],
+          "exit": 0,
+          "seconds": 0.3808729380252771
+        },
+        {
+          "phase": "runtime",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/artifacts/native32-mixed-dedup-data-old/mixed",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/artifacts/native32-mixed-dedup-data-old/output"
+          ],
+          "exit": 1,
+          "seconds": 10.632678002002649
+        }
+      ],
+      "inputs": 1882,
+      "unchanged": true
+    }
+  },
+  "functional_counts": {
+    "native_package_each": 131,
+    "mixed_current_each": 29,
+    "generic_native_export_each": 400,
+    "native_controller_current_each": 69,
+    "desktop_normal_release": 15,
+    "desktop_compact_owned_sanitize": 15,
+    "R10_runtime_seconds": 40.10014987899922,
+    "S10_runtime_seconds": 105.39825446996838,
+    "S222_build_seconds": 901.4811614030041,
+    "calling_thread_prefixes_each": 4038,
+    "R_persistent_exit": 0,
+    "S_persistent_exit": 1,
+    "native_recovery_and_second_cycle": "exact",
+    "independent_pixel_bound": 2,
+    "physical_contracts_each": 39
+  },
+  "normative": {
+    "validator": "2.0.0-dev.3.10",
+    "maxIssues": 0,
+    "issueFilters": [],
+    "models": 94,
+    "errors": 0,
+    "warnings": 6,
+    "infos": 428,
+    "warning_kind": "MULTIPLE_EXTENSIONS only",
+    "R_S_byte_pairs": 46,
+    "byte_mismatches": [],
+    "legacy_package1_2_byte_controls": [
+      {
+        "profile": "release",
+        "file": "physical.glb",
+        "old_sha256": "85b4a26ce213ec550515686d5ac5b21295df9ef089758aabdae6a0c34b07b764",
+        "current_sha256": "85b4a26ce213ec550515686d5ac5b21295df9ef089758aabdae6a0c34b07b764",
+        "equal": true
+      },
+      {
+        "profile": "release",
+        "file": "subset.glb",
+        "old_sha256": "46ec96696461fe95b30ee5140e1c46ac3f0612a7451477d9f732690b7d315f63",
+        "current_sha256": "46ec96696461fe95b30ee5140e1c46ac3f0612a7451477d9f732690b7d315f63",
+        "equal": true
+      },
+      {
+        "profile": "release",
+        "file": "second-cycle.glb",
+        "old_sha256": "85b4a26ce213ec550515686d5ac5b21295df9ef089758aabdae6a0c34b07b764",
+        "current_sha256": "85b4a26ce213ec550515686d5ac5b21295df9ef089758aabdae6a0c34b07b764",
+        "equal": true
+      },
+      {
+        "profile": "sanitize",
+        "file": "physical.glb",
+        "old_sha256": "85b4a26ce213ec550515686d5ac5b21295df9ef089758aabdae6a0c34b07b764",
+        "current_sha256": "85b4a26ce213ec550515686d5ac5b21295df9ef089758aabdae6a0c34b07b764",
+        "equal": true
+      },
+      {
+        "profile": "sanitize",
+        "file": "subset.glb",
+        "old_sha256": "46ec96696461fe95b30ee5140e1c46ac3f0612a7451477d9f732690b7d315f63",
+        "current_sha256": "46ec96696461fe95b30ee5140e1c46ac3f0612a7451477d9f732690b7d315f63",
+        "equal": true
+      },
+      {
+        "profile": "sanitize",
+        "file": "second-cycle.glb",
+        "old_sha256": "85b4a26ce213ec550515686d5ac5b21295df9ef089758aabdae6a0c34b07b764",
+        "current_sha256": "85b4a26ce213ec550515686d5ac5b21295df9ef089758aabdae6a0c34b07b764",
+        "equal": true
+      }
+    ]
+  },
+  "preserved_counterfactuals": [
+    "old3ef genuine nonemitting-native HDR-proof refusal",
+    "ordinary writer mixed26 succeeds; initial assumed direct material JSON dedup was a fixture construction failure, not product failure",
+    "after exact compiled image/sampler/texture/material-data dedup old finisher produced100-pixel error; package3 mixed now<=2 without authority merging",
+    "39c actual571408-byte container/16116-byte EXR refused because1215692-byte reserve forecast was incorrectly treated as output size; bounded stream now accepts exact caps and refuses one below",
+    "earlier missing GltfExportOptions include and default ExportedObjects-vs-WholeScene fixture mismatch remain preserved in base tree",
+    "new sanitizer OOM codec leak remains a genuine blocker, despite exact rollback and completed measured prefixes"
+  ],
+  "remaining_required": [
+    "repair actual system-codec OOM ownership/exception leak without suppressions or skipping injection",
+    "fresh intentional root normal34/Scene35/material17 composition; no new-layout archives borrowed",
+    "current native32+canonical attributes/UV same-object semantics remain guarded until genuine paired normal transport",
+    "full optimized ALL/regression and integrated GUI/loader/Wayland/hardware before main admission",
+    "general typed/native-only physical domains and physical Source4/normal/key/rig/paint combinations remain required beyond this bare-native slice"
+  ],
+  "integration_files": [
+    "src/emission-export.cpp",
+    "src/emission-export.hpp",
+    "src/emission-exr.cpp",
+    "src/emission-package.cpp",
+    "src/emission-package.hpp",
+    "src/export.cpp",
+    "src/gltf-document.hpp",
+    "CMakeLists.txt",
+    "tests/native-paint32-*",
+    "tests/xr-editable-export.cpp"
+  ],
+  "artifact_evidence": [
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/artifacts/native32-package3-coherent/before.json",
+      "sha256": "5564f20ba069c594416bdc03c7b6ed370138f9112de90e4117ba3fb16262a60a",
+      "bytes": 328007
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/artifacts/native32-package3-coherent/release-build.log",
+      "sha256": "9fa10960a4b8bfad694fcde3d6d887ab121b5c4834adec4ee4d6b685b9e6e29d",
+      "bytes": 263994
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/artifacts/native32-package3-coherent/release-configure.log",
+      "sha256": "13b05c8baaffc618a5f2a5421e8e5b3177e89a58d67bbabd9401ea6d03a8cc53",
+      "bytes": 2343
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/artifacts/native32-package3-coherent/release-runtime.log",
+      "sha256": "3150fee5ad7234ae929b3d41f7662e74eb510eafb1aa688a9207c13ca31a76d3",
+      "bytes": 2436
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/artifacts/native32-package3-coherent/run.py",
+      "sha256": "192b3015ee936a3d573fb822f5f9fa279d646a5ee97670c31fea15b490a1d456",
+      "bytes": 3184
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/artifacts/native32-package3-coherent/status.json",
+      "sha256": "a624ae3e57300ac31c070e5dd58fa9c800c1cb2d85188041c68a0e6dd54aa9b2",
+      "bytes": 2262
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/artifacts/native32-package3-bounded/before.json",
+      "sha256": "507de1b156eb555baf0fb6115ca404921457b222d67d5a86f9c064b0c58d7876",
+      "bytes": 328007
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/artifacts/native32-package3-bounded/release-build.log",
+      "sha256": "6cca89e11761f1d3c9aba444a95564eb75d42f019bca3a102da72db22de91fcb",
+      "bytes": 1061
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/artifacts/native32-package3-bounded/release-configure.log",
+      "sha256": "412f8e18e696a80ef9eca74a1925c1ec81bb3ab058dea925314865808d50c5c6",
+      "bytes": 175
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/artifacts/native32-package3-bounded/release-runtime.log",
+      "sha256": "0def19a83a9142643249ef10f173ab4d6c6c74458ceff35700af149887267d20",
+      "bytes": 3160
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/artifacts/native32-package3-bounded/run.py",
+      "sha256": "5a87a2e2dc7f42b3142002d88fb83a133c01844a48d106ea288d7a74fbe838b6",
+      "bytes": 3183
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/artifacts/native32-package3-bounded/status.json",
+      "sha256": "d4ff5af4660bfdca30a4d6cfc90778d9c9c8fc1cd39211e5093e3c93ee8c164f",
+      "bytes": 2264
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/artifacts/native32-package3-caps/before.json",
+      "sha256": "a2e0cbe165f6cda35152d7c134ab77fbb247ad7e279f194a9f936b351edece87",
+      "bytes": 328007
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/artifacts/native32-package3-caps/release-build.log",
+      "sha256": "4c6c0636de9721d896da436efd284d1250608497bce7f461e97c955ce4f9c02f",
+      "bytes": 218
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/artifacts/native32-package3-caps/release-configure.log",
+      "sha256": "412f8e18e696a80ef9eca74a1925c1ec81bb3ab058dea925314865808d50c5c6",
+      "bytes": 175
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/artifacts/native32-package3-caps/release-runtime.log",
+      "sha256": "16a7a16839bf1f55633426b6bc996e62b3426d5ceeddf5d7132a1db003b6b627",
+      "bytes": 1359
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/artifacts/native32-package3-caps/run.py",
+      "sha256": "f2c820a7f5ec4ed6789e90a97684053e669796878037afffa609ac96ed8b3317",
+      "bytes": 3180
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/artifacts/native32-package3-caps/sanitize-build.log",
+      "sha256": "ac68032c8294ff6dabf1ebbca0d56486187bec9c4ac8688cab8a12b47bfb243a",
+      "bytes": 247350
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/artifacts/native32-package3-caps/sanitize-configure.log",
+      "sha256": "b937b978abb3dba4a0ee1dfdaa9eb54360f03d776923d44d5b575302b40ab09f",
+      "bytes": 2344
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/artifacts/native32-package3-caps/sanitize-runtime.log",
+      "sha256": "32fcd4887da5390455d8f44fd4e09249a6e9681d428e7b9ff3b7b23f0cb95ad6",
+      "bytes": 1360
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/artifacts/native32-package3-caps/status.json",
+      "sha256": "00d0d0fd5bf8f70ef02f49f83c947440058c25d1f032d7fdb49513fac725a25a",
+      "bytes": 4429
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/artifacts/native32-package3-oom-release/before.json",
+      "sha256": "379973a9a4fc870b124b2f8facfa5b40f4bd91b4d4b1643ebd1a36a941e4c382",
+      "bytes": 330188
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/artifacts/native32-package3-oom-release/run.py",
+      "sha256": "bfb98597e275c8b32b8682268008bad63bdbb7c34f3cb06a136876ecc0d4a814",
+      "bytes": 1456
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/artifacts/native32-package3-oom-release/runtime.log",
+      "sha256": "c84ae7955f59eb57803d12fe32e6b39b2dacd8270de26e5956a153b1a0c1b265",
+      "bytes": 1790
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/artifacts/native32-package3-oom-release/status.json",
+      "sha256": "e1a3b39ca0d4bd5b253f937766aa41bd978e07c1e0493926973f370c5d266574",
+      "bytes": 673
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/artifacts/native32-package3-oom-sanitize/before.json",
+      "sha256": "fbbb871b57f2735544edb0abaee0797aadbe6e711660895f4235863aa77ec98e",
+      "bytes": 330200
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/artifacts/native32-package3-oom-sanitize/run.py",
+      "sha256": "595ce7fbc548fe94b9d819dffa7f5dbff6fffcc85248cee01392fe482360e4a9",
+      "bytes": 1556
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/artifacts/native32-package3-oom-sanitize/runtime.log",
+      "sha256": "75f11ce9632153889e3cff64a1271fdfa2ca53f7042545cde75d125716ec8e5e",
+      "bytes": 128127
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/artifacts/native32-package3-oom-sanitize/status.json",
+      "sha256": "33c03e27259fd40369190013f2ad387380e19c8ebc14f9d7606c978ea84a9dfc",
+      "bytes": 676
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/artifacts/native32-package3-gui-release/before.json",
+      "sha256": "b7d343611afb24810dac2c137e9097d7a84b67cb0d080d4421bfb0a575de9dea",
+      "bytes": 330726
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/artifacts/native32-package3-gui-release/output/app.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/artifacts/native32-package3-gui-release/output/chooser-editable.glb.png",
+      "sha256": "7d8fecff9857b482db38c0dd5ce842a9d9f801c3c589b6e7cc86c895e013f4ab",
+      "bytes": 15894
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/artifacts/native32-package3-gui-release/output/chooser-recovered.dsculpt.png",
+      "sha256": "7fe309dac68ce83f1cf0a54d0d234c466ff53d03d501b6193dc167e4b6375167",
+      "bytes": 14706
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/artifacts/native32-package3-gui-release/output/directory-return.json",
+      "sha256": "13247486dc123659c7768c8ea210e07b126a2e5a25ba84e7914a44d03626592c",
+      "bytes": 216
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/artifacts/native32-package3-gui-release/output/report.json",
+      "sha256": "6350e2d6d4a747808dc86fec430d42c30532e773a17fb1608bb31cbc60d9fa65",
+      "bytes": 1999
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/artifacts/native32-package3-gui-release/output/xvfb.log",
+      "sha256": "d236b6348ddfd83fe1d4caa97b7c4b2cf1812f6399d68d81553ef19f904a774d",
+      "bytes": 668
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/artifacts/native32-package3-gui-release/run.py",
+      "sha256": "e3fe68b2a6ae28b5f590977bee98c9b6c2e37c555b4643edd98bf0d3e39e9127",
+      "bytes": 1911
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/artifacts/native32-package3-gui-release/runtime.log",
+      "sha256": "885df7ae51de5647aac3001a246a8accc94cc6fb2d84753b9eb1a7abf733e9fe",
+      "bytes": 1258
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/artifacts/native32-package3-gui-release/status.json",
+      "sha256": "bca67319d532345866f2b879f44631afa6f8c78e502d372b431f2b107b3895b6",
+      "bytes": 507
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/artifacts/native32-package3-gui-sanitize-compact/before.json",
+      "sha256": "4b574d0898cc8839833e66f91403a015a88346b1fe8cdd35d5e210a58bd3058f",
+      "bytes": 330740
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/artifacts/native32-package3-gui-sanitize-compact/output/app.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/artifacts/native32-package3-gui-sanitize-compact/output/chooser-editable.glb.png",
+      "sha256": "be6e53d131aac74410c7bfe861b456504a87096771fecfba421125eac9135231",
+      "bytes": 7219
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/artifacts/native32-package3-gui-sanitize-compact/output/chooser-recovered.dsculpt.png",
+      "sha256": "fe76d768710466b91fce2392af28eb56a5ef38f198ce4930f0b6f36ff5429eca",
+      "bytes": 6151
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/artifacts/native32-package3-gui-sanitize-compact/output/directory-return.json",
+      "sha256": "a528a3207eace52feab6fb4ecd41eb9049f22264a15dadff8181837900a02f2d",
+      "bytes": 216
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/artifacts/native32-package3-gui-sanitize-compact/output/report.json",
+      "sha256": "6350e2d6d4a747808dc86fec430d42c30532e773a17fb1608bb31cbc60d9fa65",
+      "bytes": 1999
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/artifacts/native32-package3-gui-sanitize-compact/output/xvfb.log",
+      "sha256": "cbdd290356a8c5d63f3531331b74b3f059312ba6bfed881de038e3303a9be429",
+      "bytes": 804
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/artifacts/native32-package3-gui-sanitize-compact/run.py",
+      "sha256": "8eca91e0bb7a650fc0e5a77292d104144e4c733468fcb5dc2d28d9ec6449fdd0",
+      "bytes": 1937
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/artifacts/native32-package3-gui-sanitize-compact/runtime.log",
+      "sha256": "885df7ae51de5647aac3001a246a8accc94cc6fb2d84753b9eb1a7abf733e9fe",
+      "bytes": 1258
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/artifacts/native32-package3-gui-sanitize-compact/status.json",
+      "sha256": "a2d3ee430170eea107f9bade3a3e3d706c3382e324319e6a66701df75f808f4e",
+      "bytes": 521
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/artifacts/native32-mixed-old/before.json",
+      "sha256": "48fda561888e39445e717fdf447baae3a185b604b351ff626fd86ead58ea2ad9",
+      "bytes": 329614
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/artifacts/native32-mixed-old/compile.log",
+      "sha256": "728e73d2e6065cb9754b449bbda8765b94aded3d95cf830a8f56f7579a3499f5",
+      "bytes": 3246
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/artifacts/native32-mixed-old/run.py",
+      "sha256": "2abde3cf2b613f12c933c12130c2a76e340ba5624f49ccd4f3058649e27f8a00",
+      "bytes": 2359
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/artifacts/native32-mixed-old/status.json",
+      "sha256": "e04dfea2b66281aa95014c4babc345ca207a560d9a18282093e718ff303673b0",
+      "bytes": 1773
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/artifacts/native32-mixed-old-fixed-fixture/before.json",
+      "sha256": "bf5b5575055514ac02c6ac93a945e34cfa098c6d57c9de66ab7c950752f01563",
+      "bytes": 329614
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/artifacts/native32-mixed-old-fixed-fixture/compile.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/artifacts/native32-mixed-old-fixed-fixture/link.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/artifacts/native32-mixed-old-fixed-fixture/run.py",
+      "sha256": "d39863e0061d081355c48cccf8f3840d4a525f11337295138edd247251a7149c",
+      "bytes": 2373
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/artifacts/native32-mixed-old-fixed-fixture/runtime.log",
+      "sha256": "e344466d198a172010a3b93d16899ead6d8b403b9cd47216daf28d6e1bf2661d",
+      "bytes": 885
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/artifacts/native32-mixed-old-fixed-fixture/status.json",
+      "sha256": "1b155e67526f52ea62f3398b813776ae4504a62013d67c93271212eaea6d354c",
+      "bytes": 4611
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/artifacts/native32-mixed-alias-counterfactual/archive.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/artifacts/native32-mixed-alias-counterfactual/before.json",
+      "sha256": "9783976d1e1e1661cebd04fb46596f21ac268475104a4a52473f4bfc011036f5",
+      "bytes": 329614
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/artifacts/native32-mixed-alias-counterfactual/compile-emission-export.cpp.log",
+      "sha256": "0df60c89df049cfad340919df012500e3cd7a6037ae25bf1bf06135dbfa21a73",
+      "bytes": 2565
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/artifacts/native32-mixed-alias-counterfactual/compile-export.cpp.log",
+      "sha256": "f6c6b58e91b34d13a9fe5755c61fe960789b02f1648349e7e0bc7886e16e2479",
+      "bytes": 9168
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/artifacts/native32-mixed-alias-counterfactual/compile-native-paint32-emission-mixed.cpp.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/artifacts/native32-mixed-alias-counterfactual/link.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/artifacts/native32-mixed-alias-counterfactual/run-base.py",
+      "sha256": "d39863e0061d081355c48cccf8f3840d4a525f11337295138edd247251a7149c",
+      "bytes": 2373
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/artifacts/native32-mixed-alias-counterfactual/run.py",
+      "sha256": "52207921bda09d18bdbb25d8586159c0283b07fbb2f6e415bfcf8a18219b5e81",
+      "bytes": 2828
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/artifacts/native32-mixed-alias-counterfactual/runtime.log",
+      "sha256": "22a751ab468807d867b318a248551aa6e1e58d8c703b3a49d7b692eec70bc33f",
+      "bytes": 1981
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/artifacts/native32-mixed-alias-counterfactual/status.json",
+      "sha256": "d0be6fc0079a5d6e425507c597226654867f4dfb4ae30e801652d39120a59add",
+      "bytes": 8592
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/artifacts/native32-mixed-real-alias-old/archive.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/artifacts/native32-mixed-real-alias-old/before.json",
+      "sha256": "893204d8bdcef71f61a9ae9b7f8fd4bc51fef28487c20a87f974cee243651e1a",
+      "bytes": 329614
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/artifacts/native32-mixed-real-alias-old/compile-emission-export.cpp.log",
+      "sha256": "0df60c89df049cfad340919df012500e3cd7a6037ae25bf1bf06135dbfa21a73",
+      "bytes": 2565
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/artifacts/native32-mixed-real-alias-old/compile-export.cpp.log",
+      "sha256": "f6c6b58e91b34d13a9fe5755c61fe960789b02f1648349e7e0bc7886e16e2479",
+      "bytes": 9168
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/artifacts/native32-mixed-real-alias-old/compile-native-paint32-emission-mixed.cpp.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/artifacts/native32-mixed-real-alias-old/link.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/artifacts/native32-mixed-real-alias-old/run.py",
+      "sha256": "e36e3d91a8ceb993c571bed138da5041b3935de0a889ce625b469ccaab87662e",
+      "bytes": 2822
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/artifacts/native32-mixed-real-alias-old/runtime.log",
+      "sha256": "9baf9eefb42c29b1b94900e7a47d5ea93c1432e7309596d0afc3b50e6345f1d4",
+      "bytes": 1698
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/artifacts/native32-mixed-real-alias-old/status.json",
+      "sha256": "634f8a0d88d50cdc7c48917011a411bf754f16a5cc51f90025dbc12d56c76620",
+      "bytes": 8526
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/artifacts/native32-mixed-dedup-data-old/archive.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/artifacts/native32-mixed-dedup-data-old/before.json",
+      "sha256": "be7f2e00c71dda89fe85199131b527641e20c3cef670a661bd7fa1140a4fb4b4",
+      "bytes": 329614
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/artifacts/native32-mixed-dedup-data-old/compile-emission-export.cpp.log",
+      "sha256": "0df60c89df049cfad340919df012500e3cd7a6037ae25bf1bf06135dbfa21a73",
+      "bytes": 2565
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/artifacts/native32-mixed-dedup-data-old/compile-export.cpp.log",
+      "sha256": "f6c6b58e91b34d13a9fe5755c61fe960789b02f1648349e7e0bc7886e16e2479",
+      "bytes": 9168
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/artifacts/native32-mixed-dedup-data-old/compile-native-paint32-emission-mixed.cpp.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/artifacts/native32-mixed-dedup-data-old/link.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/artifacts/native32-mixed-dedup-data-old/run.py",
+      "sha256": "3afaef65fb36146952d1f0988dab2164cfe83416aafca894a2e7e4678edeff13",
+      "bytes": 2822
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/artifacts/native32-mixed-dedup-data-old/runtime.log",
+      "sha256": "f92149812fbef3e318dddf8e35acb16674d07cf452fba359401d85bfd7e889f2",
+      "bytes": 1883
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/artifacts/native32-mixed-dedup-data-old/status.json",
+      "sha256": "ca0d6c3fdd37fdd5754d79a507dfa30e9331adff37907995cc6480928c8b3e0f",
+      "bytes": 8528
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/artifacts/native32-package3-validation/byte-pairs.json",
+      "sha256": "087bf79eff9f2db6d8d2a4d4896ad64a8f0e22c0ebd6f2810fd99a3972c972c6",
+      "bytes": 9835
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/artifacts/native32-package3-validation/legacy-package-byte-control.json",
+      "sha256": "a61dabd54e30ea90c65de1a25402f08754879b31b808a5216a299e10c4cb75ee",
+      "bytes": 1551
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/artifacts/native32-package3-validation/report.json",
+      "sha256": "755ac54a9429d6f54fcebc5b1e4a393ae5b602df47e6ac6d32214d138af4206b",
+      "bytes": 109721
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/artifacts/native32-package3-validation/runtime.log",
+      "sha256": "3f636ad3305da3299f9eca9e35ab386a105c73c9e1e0d0632523d9b5ad976945",
+      "bytes": 38
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/artifacts/native32-package3-validation/sources.json",
+      "sha256": "7fcc16c5c7065b73cc828571ac19ceaa9a3da63bcd513b069f17bb1fb2b862a6",
+      "bytes": 40721
+    }
+  ],
+  "actual_pass_lines": {
+    "release": [
+      "PASS 70 XR editable export checks",
+      "PASS 400 native32 explicit finite export and independent consumer controls",
+      "PASS 69 XR editable export checks",
+      "PASS 131 native32 owning physical emission checks",
+      "PASS 29 native32 mixed physical checks",
+      "PASS 39 native32 physical contracts"
+    ],
+    "sanitize": [
+      "PASS 70 XR editable export checks",
+      "PASS 400 native32 explicit finite export and independent consumer controls",
+      "PASS 69 XR editable export checks",
+      "PASS 131 native32 owning physical emission checks",
+      "PASS 29 native32 mixed physical checks",
+      "PASS 39 native32 physical contracts"
+    ]
+  },
+  "observer": "tests/native-paint32-emission-menu.py is byte-identical to actually executed ignored physical-menu.py; proof env supplies absolute paths"
+}

@@ -12,6 +12,9 @@ struct EmissionExportImage {
  float fallback_strength=1,maximum_absolute_error=0,maximum_relative_error=0;
  std::array<float,3> fallback_factor{1,1,1};
  size_t erased_nonzero_samples=0;
+ // Genuine native32 field; legacy images retain their implicit UV0 meaning.
+ bool native_paint_domain=false;
+ unsigned texcoord=0;
 };
 void attach_native_emission(GltfDocument &,const NativeEmissionExport &,
                             std::span<const uint64_t> exported_objects,
