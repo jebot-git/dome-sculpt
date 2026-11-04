@@ -367,7 +367,7 @@ void SpatialPalette::raster(const EditorState &s) {
       for (int y = 240 + offset; y < 360; y += 16)
         rect(563 * unit_, y * unit_, 30 * unit_, 3 * unit_, fg);
       rect(556 * unit_, 296 * unit_, 44 * unit_, 8 * unit_, accent);
-    } else if (c.parameter != VrParameter::RigRotation && c.parameter!=VrParameter::CutDirection && c.parameter!=VrParameter::CutOffset && c.parameter!=VrParameter::BakeDistances && c.parameter!=VrParameter::BakeQuality && c.parameter!=VrParameter::BakeProjection && c.parameter!=VrParameter::BakeColors && !skin_parameter(c.parameter) && !sculpt_parameter(c.parameter) && !procedural_parameter(c.parameter) && c.parameter!=VrParameter::SculptResolution && c.parameter!=VrParameter::ImportUnitScale && c.parameter!=VrParameter::ShapeMirror) {
+    } else if (c.parameter != VrParameter::RigRotation && c.parameter!=VrParameter::BakeSource && c.parameter!=VrParameter::CutDirection && c.parameter!=VrParameter::CutOffset && c.parameter!=VrParameter::BakeDistances && c.parameter!=VrParameter::BakeQuality && c.parameter!=VrParameter::BakeProjection && c.parameter!=VrParameter::BakeColors && !skin_parameter(c.parameter) && !sculpt_parameter(c.parameter) && !procedural_parameter(c.parameter) && c.parameter!=VrParameter::SculptResolution && c.parameter!=VrParameter::ImportUnitScale && c.parameter!=VrParameter::ShapeMirror) {
       Color swatch{
           uint8_t(std::clamp(linear_to_srgb(c.value[0]), 0.f, 1.f) * 255),
           uint8_t(std::clamp(linear_to_srgb(c.value[1]), 0.f, 1.f) * 255),
