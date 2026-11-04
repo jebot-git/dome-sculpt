@@ -9,7 +9,7 @@ this is not relabeled as an original13/13 batch. Matching OneAPI native5/5 and c
 Native7 passes on strict PCI03 Intel Arc A770 GL in15.65s.1716source and975
 binary/config/test hashes stay exact; the lease is released. The original
 ownedSAN12/13 remains distinct from corrected2/2. The actual ordinary/compact/
-gated native FLTK sanitizer cohorts pass12/13/18 checks (40.62/40.13/41.75s),
+gated native FLTK sanitizer cohorts pass12/13/18 checks (41.75/40.13/40.62s),
 with no ASan/UBSan/LSan diagnostics. Independent Khronos checks15 current posed
 GLBs:0errors,15warnings retained unfiltered. This patch depends on the four-mode registry,
 not public main's older menu.

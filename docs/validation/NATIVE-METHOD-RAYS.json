@@ -99,7 +99,7 @@
   "actual_SAN_GUI": {
     "normal": {
       "checks": 12,
-      "elapsed_seconds": 40.62
+      "elapsed_seconds": 41.75
     },
     "compact": {
       "checks": 13,
@@ -107,7 +107,7 @@
     },
     "real_preparation_gate": {
       "checks": 18,
-      "elapsed_seconds": 41.75
+      "elapsed_seconds": 40.62
     },
     "ASan_UBSan_LSan_diagnostics": 0
   },
