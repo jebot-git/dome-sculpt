@@ -77,6 +77,21 @@ Scene native_typed_physical(bool legacy,float opacity=.63f,bool mixed=false) {
     object.painted->add_layer("Hidden high radiance");settings.channel=PaintChannel::Emission;settings.emission_units=PaintEmissionUnits::Physical;settings.emission={10000,10000,10000};ink(*object.painted,settings);object.painted->layer_properties("Hidden high radiance",false,1);}
   return scene;
 }
+Scene native_legacy_emission(bool legacy) {
+  auto scene=native_typed_physical(legacy);auto &object=scene.active();
+  object.material.color={0,0,0,1};object.material.emissive={0,0,0};
+  auto binding=std::make_shared<SourceMaterialBindings>(*object.material_bindings);
+  binding->material.parameters.shade_color={0,0,0};binding->material.parameters.emission_strength=legacy?1:100;
+  object.material_bindings=std::move(binding);
+  object.painted=PaintedMesh::from_maps(quad(),object.painted->source_maps(),64);
+  PaintSettings settings;settings.channel=PaintChannel::Emission;settings.emission={1.f/255,1.f/255,1.f/255};
+  ink(*object.painted,settings);object.painted->layer_properties("Visible legacy",true,.63f);return scene;
+}
+void hidden_physical(Scene &scene) {
+  auto &object=scene.active();object.painted=object.painted->snapshot();object.painted->add_layer("Hidden physical");
+  PaintSettings settings;settings.channel=PaintChannel::Emission;settings.emission_units=PaintEmissionUnits::Physical;settings.emission={10000,10000,10000};
+  ink(*object.painted,settings);object.painted->layer_properties("Hidden physical",false,1);
+}
 void ready_native(Document &doc) {check(doc.wait_mesh(std::chrono::seconds(30))&&doc.frame().surface,"Actual Document publishes its own complete typed native preview");if(!doc.frame().state->error.empty())throw std::runtime_error(doc.frame().state->error);}
 }
 extern "C" {
@@ -101,6 +116,16 @@ int main(int argc,char **argv)try {
     const auto exact=scene.encode();const auto path=out/(std::to_string(legacy)+"-"+std::to_string(strength)+"-"+std::to_string(mixed)+"-"+std::to_string(linear)+".dsculpt");scene.save(path);auto restored=Scene::load(path);check(restored.encode()==exact,"Actual native Save/restart preserves every typed/legacy/float/mask/hidden owner");Document reopened;reopened.replace(restored);ready_native(reopened);fbo.bind();check(draw(renderer,reopened.frame().surface)==pixels,"Recovered native MToon float and source-sampler pixels are exact");
     if(!legacy&&strength==1.5f&&mixed&&!linear){const auto cost=renderer.texture_stats();SurfaceTextureLimits limits;std::cout<<"NATIVE_MTOON_GPU_BYTES total="<<cost.bytes<<" packed_subset="<<cost.packed_bytes<<std::endl;limits.max_bytes=cost.bytes-1;bool refused=false;try{SurfaceRenderer small(limits);fbo.bind();draw(small,reopened.frame().surface);}catch(const std::length_error &){refused=true;}check(refused&&reopened.copy_scene().encode()==exact,"Actual aggregate native typed source/float GPU byte budget refuses atomically before allocation");fbo.bind();check(draw(renderer,reopened.frame().surface)==pixels,"Failed native typed GPU budget leaves the original renderer usable");}
 
+  }
+  for(bool legacy:{true,false})for(bool pbr:{false,true}){
+    auto source=native_legacy_emission(legacy);const auto before=source.encode();Document doc;doc.replace(source);if(pbr)doc.shading(false);ready_native(doc);fbo.bind();const auto baseline=draw(renderer,doc.frame().surface);
+    doc.edit_scene("Hidden physical regression",[](Scene &scene){hidden_physical(scene);});ready_native(doc);const auto after=doc.copy_scene().encode();fbo.bind();const auto hidden=draw(renderer,doc.frame().surface);std::cout<<"NATIVE_HIDDEN_REGRESSION legacy="<<legacy<<" pbr="<<pbr<<" max="<<delta(baseline,hidden)<<std::endl;check(hidden==baseline,"Hidden physical metadata preserves the exact accepted legacy MToon/PBR image");
+    const auto saved=out/("hidden-"+std::to_string(legacy)+"-"+std::to_string(pbr)+".dsculpt");doc.save_async(saved).get();check(Scene::load(saved).encode()==after,"Actual queued Save preserves the complete hidden float project and legacy source");
+    check(doc.undo()&&doc.copy_scene().encode()==before,"Hidden physical history Undo restores exact complete legacy input");ready_native(doc);fbo.bind();check(draw(renderer,doc.frame().surface)==baseline,"Actual Undo restores the original legacy pixels exactly");
+    check(doc.redo()&&doc.copy_scene().encode()==after,"Hidden physical Redo restores exact float metadata/source history");ready_native(doc);fbo.bind();check(draw(renderer,doc.frame().surface)==baseline,"Actual Redo preserves the original visible image exactly");
+    doc.edit_scene("Zero opacity physical",[](Scene &scene){auto &paint=scene.active().painted;paint=paint->snapshot();paint->layer_properties("Hidden physical",true,0);});ready_native(doc);fbo.bind();check(draw(renderer,doc.frame().surface)==baseline,"Zero-opacity physical metadata does not reinterpret visible legacy filtering");
+    doc.edit_scene("Visible physical",[](Scene &scene){auto &paint=scene.active().painted;paint=paint->snapshot();paint->layer_properties("Hidden physical",true,.15f);});ready_native(doc);fbo.bind();check(delta(draw(renderer,doc.frame().surface),baseline)>2,"A genuinely visible physical layer still selects the real float field route");
+    doc.edit_scene("Hide physical again",[](Scene &scene){auto &paint=scene.active().painted;paint=paint->snapshot();paint->layer_properties("Hidden physical",false,1);});ready_native(doc);fbo.bind();check(draw(renderer,doc.frame().surface)==baseline,"Hiding the physical layer again restores the exact accepted legacy image");
   }
   check(gpu_copies>0&&gpu_only,"Every production native typed field/source copy stays in GPU buffers");
   std::cout<<"PASS "<<checks<<" native typed physical controls\n";return 0;
