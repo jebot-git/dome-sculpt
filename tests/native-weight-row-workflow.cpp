@@ -130,11 +130,14 @@ int main(int argc, char **argv) try {
   source.validate();
   const auto before = source.encode();
   detail::DeclaredWeightSupport domain{
-      detail::DeclaredSupportPolicy::NearestSourceUnion,
+      detail::DeclaredSupportPolicy::UniqueSourceWitnesses,
       true,
       {{1, {}}},
       reference_id};
   domain.row_anchors = detail::DeclaredRowAnchors::NearestPermitted;
+  domain.source_requirements =
+      detail::DeclaredSourceRequirements::GeometryEvidence;
+  domain.source_span = detail::DeclaredSourceSpan::AuthoredFinite;
   detail::GeometryWeightBindOptions options;
   detail::GeometryWeightBindReport report;
   auto bound = source.snapshot();

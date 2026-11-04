@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #pragma once
 #include "anatomical-continuation.hpp"
+#include "document-authority.hpp"
 #include "polygon-conversion.hpp"
 namespace dome::detail {
 struct GeometryWeightBindOptions {
@@ -14,6 +15,10 @@ struct GeometryWeightBindReport {
 };
 namespace geometry_weight_authoring {
 using Work = weight_surface::Budget;
+template <class A, class B>
+bool same_owner(const std::shared_ptr<A> &a, const std::shared_ptr<B> &b) {
+  return a.get() == b.get() && !a.owner_before(b) && !b.owner_before(a);
+}
 struct Bytes {
   size_t used = 0, maximum;
   void add(size_t count, size_t unit = 1) {
@@ -143,6 +148,33 @@ author_geometry_weight_skin(Scene &scene, std::span<const uint64_t> targets,
     throw std::invalid_argument(
         "Choose the complete current native reference rig");
   const auto source_world = scene.world_matrix(source.id);
+  const auto source_mesh_owner = source.painted->mesh_owner();
+  const auto source_volume_owner = source.volume->geometry_owner();
+  const auto source_paint_revision = source.painted->revision();
+  const auto source_volume_revision = source.volume->revision();
+  auto require_reference = [&] {
+    work.step_items(source.name.size() + source.material.name.size() + 1, 4);
+    work.step(128);
+    const auto &now = scene.object(source.id);
+    if (!now.volume || !now.painted || !same_object_authority(source, now) ||
+        !same_owner(source.painted, now.painted) ||
+        !same_owner(source.volume, now.volume) ||
+        !same_owner(source_mesh_owner, now.painted->mesh_owner()) ||
+        !same_owner(source_volume_owner, now.volume->geometry_owner()) ||
+        now.painted->revision() != source_paint_revision ||
+        now.volume->revision() != source_volume_revision ||
+        !same_owner(source.deformation, now.deformation) ||
+        !same_owner(source.appearance, now.appearance) ||
+        !same_owner(source.material_bindings, now.material_bindings) ||
+        !same_owner(source.polygon, now.polygon) ||
+        !same_owner(source.retopology, now.retopology) ||
+        !same_owner(source.shape_source, now.shape_source) ||
+        !same_owner(source.rig_source, now.rig_source) ||
+        !same_owner(source.affine_edit, now.affine_edit) ||
+        scene.world_matrix(source.id).matrix() != source_world.matrix())
+      throw std::runtime_error(
+          "Native reference source authority changed before adoption");
+  };
   std::set<uint64_t> unique;
   for (auto id : targets) {
     work.step();
@@ -295,6 +327,7 @@ author_geometry_weight_skin(Scene &scene, std::span<const uint64_t> targets,
     changed.emplace_back(id, std::move(d));
   }
   work.stop();
+  require_reference();
   if (changed.empty()) {
     if (report)
       *report = {work.used, planned, 0, fields.report};
@@ -314,9 +347,7 @@ author_geometry_weight_skin(Scene &scene, std::span<const uint64_t> targets,
   for (const auto &part : fields.parts)
     if (!part.matches(scene))
       throw std::runtime_error("Geometry field source changed before adoption");
-  if (scene.object(source.id).deformation != source.deformation ||
-      scene.world_matrix(source.id).matrix() != source_world.matrix())
-    throw std::runtime_error("Native reference changed before adoption");
+  require_reference();
   scene = std::move(staged);
   if (report)
     *report = {work.used, planned, changed.size(), fields.report};
