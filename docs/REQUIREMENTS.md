@@ -14,6 +14,18 @@ retained Khronos tangent warnings. This is not fresh ALL/full612, main admission
 physical headset, GPU baking or full production completion. Broader bake recipes,
 resource/consumer/device work and deferred drawers remain required.
 
+
+## Qualified FBX generated-normal current-layout continuation — 2026-11-04
+
+On published coherentcage2f6, sealedCFBX imported-morph normal generation now
+passes1158 independent checks andfive existingFBX consumers eachR/S, actual
+chooser68assertions,20KHR0errors/0warnings and10R/SexactGLB pairs. Onecomplete
+productTU andwholeconsumerTUs are rebuilt/relinked against exactcurrent-layout
+ownedCage support; no newheader/schema andno609/fullvendor/device claim. Read
+FBX-CURRENT-CAGE-INTEGRATION.md andreceipt. All unfinished original/additional
+goal requirements remain; Scene30recipes/HDR/weights/paintedV1WIP stay separate.
+
+
 ## Private generated FBX morph normals — 2026-11-04
 
 Explicit Generate flat/smooth now imports genuine morph-bearing FBX files through
@@ -27,6 +39,9 @@ resource guards and exact source scopes. No public layout/native schema changes;
 this private milestone awaits coherent main admission. Every unfinished original
 and additional requirement remains active, including controller drawers after
 basic targets. No system, headset or active-session action occurred.
+
+
+
 ## Qualified coherent editable-cage milestone — 2026-11-04
 
 Fresh new-layout application/core/render/support builds and all608 Release
