@@ -8,6 +8,7 @@
 namespace dome::detail {namespace {
 void stop(const PaintSamplingLimits &limits){if(limits.cancelled&&limits.cancelled())throw std::runtime_error("Native paint retention cancelled");}
 bool equal(Vec3 a,Vec3 b){return a.x==b.x&&a.y==b.y&&a.z==b.z;}
+bool native_grid_state(const PaintedMesh &p) noexcept {return !p.source_maps()&&!p.color_projection()&&!p.normal_projection()&&!p.baked()&&!p.source_sampling_prepared()&&p.surface_diagnostics().policy==PaintUvPolicy::Strict;}
 void replay_budget(const PaintedMesh &before,size_t target_vertices,size_t target_indices,size_t pins,size_t seams,const PaintSamplingLimits &limits){
   if(!limits.max_vertices||limits.max_vertices>2'000'000||!limits.max_triangles||limits.max_triangles>2'000'000||
      !limits.max_working_bytes||limits.max_working_bytes>512*1024*1024||!limits.max_work||limits.max_work>256'000'000)
@@ -36,7 +37,7 @@ const Material &NativePaintSampling::original_native_material() const noexcept {
 }
 bool NativePaintSampling::valid_owner(const std::shared_ptr<const NativePaintSampling> &owner) const noexcept {auto actual=self_.lock();return actual&&actual==owner&&!actual.owner_before(owner)&&!owner.owner_before(actual);}
 bool NativePaintSampling::matches_current(const PaintedMesh &paint) const noexcept {
-  return attachment_&&before_&&paint.resolution()==before_->resolution()&&paint.valid_paint_sampling_attachment()&&attachment_->matches(paint.mesh_owner(),paint.paint_sampling_domain());
+  return native_grid_state(paint)&&attachment_&&before_&&paint.resolution()==before_->resolution()&&paint.valid_paint_sampling_attachment()&&attachment_->matches(paint.mesh_owner(),paint.paint_sampling_domain());
 }
 void NativePaintSampling::validate_mesh(const Mesh &mesh,const PaintSamplingLimits &limits) const {
   stop(limits);if(!attachment_)throw std::invalid_argument("Native retained paint has no sealed current geometry");same_mesh(mesh,*attachment_->authored_geometry(),limits);
@@ -45,6 +46,7 @@ void NativePaintSampling::validate(const PaintSamplingLimits &limits) const {
   stop(limits);native_.validate();
   if(!before_||!layout_||!domain_||!attachment_||before_->in_stroke()||attachment_->domain()!=domain_||!depth_||depth_>32)
     throw std::invalid_argument("Native retained paint lacks its independently captured owner");
+  if(!native_grid_state(*before_))throw std::invalid_argument("Native paint history requires its actual unprepared writable grid");
   const auto previous=before_material_?before_material_->native_paint_sampling:nullptr;
   if(bool(previous)!=bool(before_->paint_sampling_domain())||depth_!=(previous?previous->history_depth()+1:1))throw std::invalid_argument("Native paint history lost its exact prior owner");
   if(before_material_){before_material_->validate();if(!previous||!previous->matches_current(*before_))throw std::invalid_argument("Native before-Paint borrowed another material attachment");}
@@ -57,7 +59,7 @@ void NativePaintSampling::validate(const PaintSamplingLimits &limits) const {
   const auto target=layout_->target_mesh(before_->mesh(),limits.cancelled);domain_->validate_current(target,limits);same_mesh(target,*attachment_->authored_geometry(),limits);
 }
 void NativePaintSampling::validate_current(const PaintedMesh &paint,const PaintSamplingLimits &limits) const {
-  validate(limits);if(!matches_current(paint))throw std::invalid_argument("Native retained paint borrowed another current attachment or grid");
+  validate(limits);if(!native_grid_state(paint))throw std::invalid_argument("Native retained paint needs an explicit baked/projection/source transition");if(!matches_current(paint))throw std::invalid_argument("Native retained paint borrowed another current attachment or grid");
 }
 bool native_paint_retention_supported(const SculptObject &source) noexcept {
   if(!source.mesh_active||!source.painted||source.painted->in_stroke()||source.appearance||source.deformation||source.shape_source||source.rig_source||source.polygon||

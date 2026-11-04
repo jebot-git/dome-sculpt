@@ -24,6 +24,8 @@ ObjectBakeReport bake_object(Scene &scene, uint64_t source_id,
   scene.validate();
   auto target = scene.active();
   auto source = scene.object(source_id);
+  if(target.material_bindings&&target.material_bindings->native_paint_sampling)throw std::logic_error("Retained native paint target requires its sampling-aware Bake adapter");
+  if(source.material_bindings&&source.material_bindings->native_paint_sampling)throw std::logic_error("Retained native paint source requires its sampling-aware Bake adapter");
   const bool current_source=source.polygon&&source.polygon->active&&source.polygon->colors;
   const bool current_target=target.polygon&&target.polygon->active&&target.polygon->colors;
   if(!detail::corner_bake_target_supported(target))

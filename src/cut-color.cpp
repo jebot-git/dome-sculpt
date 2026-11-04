@@ -407,6 +407,7 @@ struct PolygonCutAccess {
 };
 namespace detail {
 bool cut_color_supported(const SculptObject &object) noexcept {
+  if(object.material_bindings&&object.material_bindings->native_paint_sampling)return false;
   if (!object.polygon || !object.polygon->active || !object.polygon->colors)
     return true;
   if (!object.mesh_active || !object.painted || object.appearance)
