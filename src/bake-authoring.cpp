@@ -119,9 +119,9 @@ ObjectBakeReport bake_object(Scene &scene, uint64_t source_id,
   }
   BakeOptions options;
   options.resolution = target.painted->resolution();
-  options.front_distance = settings.front_mm * .001f / target_world.scale;
-  options.back_distance = settings.back_mm * .001f / target_world.scale;
-  options.ao_distance = settings.ao_distance_mm * .001f / target_world.scale;
+  options.front_distance = float(double(settings.front_mm) * .001 / double(target_world.scale));
+  options.back_distance = float(double(settings.back_mm) * .001 / double(target_world.scale));
+  options.ao_distance = float(double(settings.ao_distance_mm) * .001 / double(target_world.scale));
   options.ray_bias = .0001f / target_world.scale;
   options.ao_samples = settings.ao_samples;
   options.padding = settings.padding;
