@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Actual saved-recipe ray Recall, control Confirm/Cancel and Bake through loader/GL stereo."""
-import argparse,json,os,signal,subprocess,tempfile
+import argparse,json,os,signal,subprocess,tempfile,time
 from pathlib import Path
 signal.pthread_sigmask(signal.SIG_SETMASK,[])
 p=argparse.ArgumentParser(description=__doc__)
@@ -15,7 +15,20 @@ with tempfile.TemporaryDirectory(prefix='dome-cage-xr-') as directory:
  original_inspection=inspect(source);original=original_inspection['scene'];(out/'source.json').write_text(json.dumps(original,indent=2)+'\n')
  for mode in ['accept','cancel','focus']:
   target=out/(mode+'.dsculpt');report=out/(mode+'.json')
-  with (out/(mode+'.log')).open('w') as log:r=subprocess.run([str(a.binary),'--xr','--open',str(source),'--frames','100','--save',str(target)],env={**env,'DOME_XR_FIXTURE_CAGE':mode,'DOME_XR_FIXTURE_REPORT':str(report)},stdout=log,stderr=subprocess.STDOUT,timeout=180)
+  with (out/(mode+'.log')).open('w') as log:
+   r=subprocess.Popen([str(a.binary),'--xr','--open',str(source),'--frames','100','--save',str(target)],env={**env,'DOME_XR_FIXTURE_CAGE':mode,'DOME_XR_FIXTURE_REPORT':str(report)},stdout=log,stderr=subprocess.STDOUT)
+   deadline=time.monotonic()+180
+   try:
+    while r.poll() is None:
+     try:
+      mappings=Path('/proc',str(r.pid),'maps').read_text()
+      if 'libgallium' in mappings:(out/(mode+'.maps')).write_text(mappings)
+     except FileNotFoundError:pass
+     if time.monotonic()>deadline:raise subprocess.TimeoutExpired(r.args,180)
+     time.sleep(.05)
+   finally:
+    if r.poll() is None:r.terminate();r.wait()
+
   check(r.returncode==0,mode+': actual native XR client exits and ordered Save drains');detail=json.loads(report.read_text());after=inspect(target)
   check('llvmpipe' in detail.get('gl_renderer','').lower(),mode+': explicit software renderer is actually used')
   check(detail.get('acquires',0)>0 and detail.get('acquires')==detail.get('image_waits')==detail.get('releases') and detail.get('left_eye_nonblank',0)>0 and detail.get('right_eye_nonblank',0)>0,mode+': actual stereo ownership balances and both eyes contain rendered output')
