@@ -75,7 +75,7 @@ inline NativeAnatomicalRequest capture_native_anatomical(const Scene&source,
   if(selected.empty()||selected.size()>64||source.objects().size()>128||source.groups().size()>128||!options.maximum_work||options.maximum_work>500'000'000||options.maximum_workspace<65536||options.maximum_workspace>256u*1024u*1024u||options.maximum_total<options.maximum_workspace||options.maximum_total>512u*1024u*1024u||options.locks.size()>256||std::any_of(options.locks.begin(),options.locks.end(),[](auto x){return x>1;}))throw std::invalid_argument("Native anatomical owning options/domain");
   // Pure bounded scan; no user callback and no Scene/JSON snapshot allocation
   // before the exact retained closure plus full working cap has been admitted.
-  const auto retained=native_weight_retention(source,options.maximum_total-options.maximum_workspace);
+  const auto retained=native_weight_retention(source,options.maximum_total-options.maximum_workspace,options.maximum_work);
   geometry_weight_authoring::Bytes capture{65536,options.maximum_workspace};
   weight_surface::Budget capture_work{retained.work,options.maximum_work,{}};
   capture.add(source.objects().size(),2048);capture.add(source.groups().size(),4096);capture.add(options.locks.size()+selected.size()*sizeof(uint64_t));
@@ -85,6 +85,7 @@ inline NativeAnatomicalRequest capture_native_anatomical(const Scene&source,
     if(o.painted)for(const auto&l:o.painted->layers()){capture_work.step_items(l.tiles.size()+l.pbr_tiles.size()+l.emission_tiles.size(),4);capture_work.step(l.name.size()*4+16);}
     capture_work.step_items(o.volume->layers().size(),64);
   }
+  for(const auto&g:source.groups()){capture.text(g.name);capture_work.step(64+g.name.size()*4);if(g.humanoid){capture.text(g.humanoid->baseline);capture_work.step(g.humanoid->baseline.size()*4);}}
   if(capture_work.used>=capture_work.maximum)throw std::length_error("Native anatomical capture exhausted work before staging");
   NativeAnatomicalRequest request;request.capture_bytes_=capture.used;
   request.retained_=retained;request.retained_.work=capture_work.used;request.options_=options;request.reference_=reference;request.identity_=std::make_shared<const uint64_t>(0);
@@ -138,9 +139,11 @@ inline NativeAnatomicalPrepared prepare_native_anatomical(const NativeAnatomical
       DeclaredOriginBoundary::NativeFiniteLineIntegral;
   support.contact_support = DeclaredContactSupport::CommonMask;
   support.rig_geometry = DeclaredRigGeometry::NativeBoneAxes;
+  const size_t analysis_workspace=options.maximum_workspace-request.capture_bytes_;
+  if(analysis_workspace<4096)throw std::length_error("Native anatomical capture leaves no analysis workspace");
   const auto analysis = analyze_native_head_geometry(scene, reference,
       std::min(size_t(100'000'000),options.maximum_work-retained.work),
-      std::min(size_t(128u*1024u*1024u),options.maximum_workspace),cancelled,request.support_);
+      std::min(size_t(128u*1024u*1024u),analysis_workspace),cancelled,request.support_);
   // Research candidate only: the same exact boundary algebra applies these
   // GEOMETRY-GENERATED constraints, with no manual target IDs or role palette.
   // They are not represented as user provenance or original-source authority.
@@ -163,7 +166,7 @@ inline NativeAnatomicalPrepared prepare_native_anatomical(const NativeAnatomical
     if(rig.bones[j].deform)eye_points.push_back({point,point,j});
   }
   NearestWeightSources nearest_eye(eye_points,construction);
-  size_t temporary_peak=analysis.bytes;
+  size_t temporary_peak=analysis.bytes+request.capture_bytes_;
   for(auto id:targets){
     DeclaredWeightPart part{id,{}};
     const auto at=std::find_if(analysis.parts.begin(),analysis.parts.end(),[&](const auto&p){return p.object==id;});
@@ -183,9 +186,9 @@ inline NativeAnatomicalPrepared prepare_native_anatomical(const NativeAnatomical
           Mesh subset;std::vector<uint32_t>map(m.positions.size(),UINT32_MAX);
           for(auto i:rows){construction.step(8);map[i]=subset.positions.size();subset.positions.push_back(metric->positions[i]);}
           for(size_t c=0;c<m.indices.size();c+=3){construction.step(8);if(components[m.indices[c]]!=root)continue;for(size_t k=0;k<3;++k)subset.indices.push_back(map[m.indices[c+k]]);}
-          auto patch=analyze_projected_ocular_patch(subset,128u*1024u*1024u,construction);
+          auto patch=analyze_projected_ocular_patch(subset,std::min(size_t(128u*1024u*1024u),analysis_workspace),construction);
           convex=patch.disk&&patch.convex_boundary;
-          temporary_peak=std::max(temporary_peak,subset.positions.size()*112+subset.indices.size()*160+32768+m.positions.size()*32);
+          temporary_peak=std::max(temporary_peak,subset.positions.size()*112+subset.indices.size()*160+32768+m.positions.size()*32+request.capture_bytes_);
           if(convex){
             uint32_t selected=UINT32_MAX;
             for(auto p:subset.positions){

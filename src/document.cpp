@@ -2073,7 +2073,7 @@ bool Document::parameter_enabled_locked(VrParameter parameter) const {
   if (parameter == VrParameter::RetopoDistance)
     return state_.retopology && state_.retopology->source && !retopo_accepting_ && !state_.asset_busy;
   if (state_.retopology) return false;
-  if(skin_parameter(parameter)) return skin_target_ready_locked() &&
+  if(skin_parameter(parameter)) return (state_.skin_options.mode!=SkinAuthoringMode::Anatomical || parameter==VrParameter::SkinSource || parameter==VrParameter::SkinMode) && skin_target_ready_locked() &&
     (parameter==VrParameter::SkinSource ? !skin_sources_locked(state_.skin_options.mode).empty()
       : !skin_sources_locked(SkinAuthoringMode::Automatic).empty());
   if(parameter==VrParameter::BakeSource || parameter==VrParameter::BakeDistances || parameter==VrParameter::BakeQuality || parameter==VrParameter::BakeProjection || parameter==VrParameter::BakeColors)
@@ -2231,7 +2231,7 @@ void Document::finish_control_locked(bool accept) {
       auto &options=state_.skin_options;
       if(c.parameter==VrParameter::SkinSource) {
         auto ids=skin_sources_locked(options.mode); options.reference=ids.at(size_t(std::lround(c.value[0])));
-      } else if(c.parameter==VrParameter::SkinMode) options.mode=SkinAuthoringMode(int(std::lround(c.value[0])));
+      } else if(c.parameter==VrParameter::SkinMode) options.mode=int(std::lround(c.value[0]))==2?SkinAuthoringMode::Anatomical:SkinAuthoringMode(int(std::lround(c.value[0])));
       else if(c.parameter==VrParameter::SkinDistances) {
         options.seed_distance=skin_distance_metres(c.value[0]);
         options.seed_margin=skin_distance_metres(c.value[1]);
@@ -2435,8 +2435,12 @@ void Document::control_event_locked(VrControlEvent event) {
       auto found=std::find(ids.begin(),ids.end(),state_.skin_options.reference);
       c.value[0]=found==ids.end()?0:float(found-ids.begin());break;
     }
-    case VrParameter::SkinMode:
-      c.title="Automatic bind / weight transfer";c.value[0]=int(state_.skin_options.mode);break;
+    case VrParameter::SkinMode: {
+      const bool anatomical=!skin_sources_locked(SkinAuthoringMode::Anatomical).empty();
+      c.title=anatomical?"Method: Automatic / transfer / anatomical":"Automatic bind / weight transfer";
+      c.maximum=anatomical?2:1;
+      c.value[0]=state_.skin_options.mode==SkinAuthoringMode::Anatomical?(anatomical?2:0):int(state_.skin_options.mode);break;
+    }
     case VrParameter::SkinDistances:
       c.title="Seed / margin / transfer (world mm)";c.components=3;
       c.value={skin_distance_slider(state_.skin_options.seed_distance),skin_distance_slider(state_.skin_options.seed_margin),skin_distance_slider(state_.skin_options.transfer_distance),0};break;

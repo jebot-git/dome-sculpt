@@ -21,8 +21,14 @@ JointTransform root_transform(JointTransform joint,const CanvasTransform &t) {
   return joint;
 }
 }
+void AnatomicalSkinOptions::validate() const {
+  if(!maximum_work||maximum_work>500'000'000||maximum_workspace<65536||
+     maximum_workspace>256u*1024u*1024u||maximum_total<maximum_workspace||
+     maximum_total>512u*1024u*1024u)
+    throw std::invalid_argument("Invalid anatomical work, workspace or owning-request bound");
+}
 void SkinAuthoringOptions::validate() const {
-  if(mode!=SkinAuthoringMode::Automatic && mode!=SkinAuthoringMode::Transfer)
+  if(mode!=SkinAuthoringMode::Automatic && mode!=SkinAuthoringMode::Transfer && mode!=SkinAuthoringMode::Anatomical)
     throw std::invalid_argument("Unknown skin authoring operation");
   if(!reference || !std::isfinite(seed_distance) || seed_distance<0 || seed_distance>10000 ||
      !std::isfinite(seed_margin) || seed_margin<0 || seed_margin>10000 ||
@@ -33,6 +39,7 @@ void SkinAuthoringOptions::validate() const {
      !std::isfinite(limits.prune) || limits.prune<0 || limits.prune>=1 || locks.size()>256 ||
      std::any_of(locks.begin(),locks.end(),[](uint8_t v){return v>1;}))
     throw std::invalid_argument("Invalid skin distance, falloff, influence, lock or work bounds");
+  if(mode==SkinAuthoringMode::Anatomical)anatomical.validate();
   if((mode==SkinAuthoringMode::Automatic && (seed_distance<=0 || seed_margin>seed_distance)) ||
      (mode==SkinAuthoringMode::Transfer && transfer_distance<=0))
     throw std::invalid_argument("Automatic seeds need a positive radius and contained margin; transfer needs a positive radius");
@@ -50,6 +57,7 @@ bool author_skin(Scene &scene,uint64_t target_id,const SkinAuthoringOptions &opt
                  const std::function<bool()> &cancelled) {
   stop(cancelled);
   options.validate();
+  if(options.mode==SkinAuthoringMode::Anatomical)return author_anatomical_skin(scene,std::span<const uint64_t>(&target_id,1),options,cancelled);
   const auto &target=scene.object(target_id), &reference=scene.object(options.reference);
   if(!target.visible || target.locked || !target.mesh_active || !target.painted)
     throw std::invalid_argument("Select a visible, unlocked mesh to bind");

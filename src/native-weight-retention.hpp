@@ -37,9 +37,9 @@ struct Counter {
   struct Entry {std::shared_ptr<const void> owner;const void*address=nullptr;const void*type=nullptr;bool active=false;};
   template<class T>static const void*tag(){static const char t{};return &t;}
   std::array<Entry,4096> seen{};
-  size_t used=sizeof(seen)+65536, maximum, work=0, count=0, active=0;
-  explicit Counter(size_t max):maximum(max) { if(used>maximum)throw std::length_error("Native total admission cannot hold its ownership ledger"); }
-  void step(size_t n=1){if(n>500'000'000-work)throw std::length_error("Native ownership scan work");work+=n;}
+  size_t used=sizeof(seen)+65536, maximum, maximum_work, work=0, count=0, active=0;
+  explicit Counter(size_t max,size_t max_work=500'000'000):maximum(max),maximum_work(max_work) { if(!maximum_work||maximum_work>500'000'000)throw std::invalid_argument("Native ownership work bounds"); if(used>maximum)throw std::length_error("Native total admission cannot hold its ownership ledger"); }
+  void step(size_t n=1){if(n>maximum_work-work)throw std::length_error("Native ownership scan work");work+=n;}
   void add(size_t n,size_t unit=1){step();if(unit&&n>(maximum-used)/unit)throw std::length_error("Native owning input exceeds total request budget before staging");used+=n*unit;}
   template<class T> void vector(const std::vector<T>&v){add(v.capacity(),sizeof(T));if(v.capacity())add(v.capacity()*sizeof(T)>=128u*1024u?4096:64);}
   void text(const std::string&s){add(s.capacity()+1);add(s.capacity()>=128u*1024u?4096:64);}
@@ -85,7 +85,8 @@ struct Counter {
     if(p->expressions)for(auto&[n,v]:p->expressions->visemes){add(128);text(n);vector(v);for(auto&b:v)text(b.shape);}leave(p);
   }
   void frames(const std::shared_ptr<const NormalFrames>&p){if(enter(p)){add(sizeof(*p));vector(p->origin_vertices);vector(p->source_vertices);vector(p->source_corners);vector(p->normals);vector(p->tangents);vector(p->targets);for(auto&t:p->targets){vector(t.normals);vector(t.tangents);}leave(p);}}
-  void frame_set(const std::shared_ptr<const NormalFrameSet>&p){if(enter(p)){add(sizeof(*p));frames(p->pbr);frames(p->mtoon);frames(p->canonical);vector(p->targets);for(auto&t:p->targets)vector(t.positions);vector(p->current_targets);leave(p);}}
+  template<class T> void unsupported(const std::shared_ptr<T>&p,const char*message){std::shared_ptr<const void>empty;if(p||p.owner_before(empty)||empty.owner_before(p))throw std::invalid_argument(message);}
+  void frame_set(const std::shared_ptr<const NormalFrameSet>&p){if(enter(p)){unsupported(p->position_domain,"Native anatomical input has not yet admitted independent frame POSITION domains");add(sizeof(*p));frames(p->pbr);frames(p->mtoon);frames(p->canonical);vector(p->targets);for(auto&t:p->targets)vector(t.positions);vector(p->current_targets);leave(p);}}
   void json(const nlohmann::json&j,size_t depth=0){
     if(depth>64)throw std::length_error("Native material JSON depth");add(sizeof(j));
     if(j.is_object()){for(auto&i:j.items()){add(128);text(i.key());json(i.value(),depth+1);}}
@@ -94,7 +95,7 @@ struct Counter {
     else if(j.is_binary())add(j.get_binary().capacity()+64);
   }
   void material(const std::shared_ptr<const SourceMaterialBindings>&p){if(enter(p)){
-    if(p->color_preparation||p->normal_preparation||p->key_derivation)throw std::invalid_argument("Native anatomical owning budget has not yet admitted prepared colour/normal/key closures");
+    unsupported(p->color_preparation,"Native anatomical budget has not yet admitted prepared colour closures");unsupported(p->normal_preparation,"Native anatomical budget has not yet admitted prepared normal closures");unsupported(p->key_derivation,"Native anatomical budget has not yet admitted key derivation closures");
     add(sizeof(*p));for(auto*j:NativeWeightMaterialAccess::json(p->material))json(*j);vector(p->material.diagnostics);for(auto&s:p->material.diagnostics)text(s);for(auto&t:p->roles)image(t.image);frame_set(p->normal_frames);uv_origin(p->uv_origin);leave(p);
   }}
   void uv_origin(const std::shared_ptr<const SourceUvOrigin>&p){if(enter(p)){
@@ -125,7 +126,7 @@ struct Counter {
     add(64,sizeof(Volume::GeometryChange)+256);add(4096);
     leave(p);
   }
-  void group(const SceneGroup&g){text(g.name);if(enter(g.humanoid)){add(sizeof(*g.humanoid));text(g.humanoid->baseline);leave(g.humanoid);}if(enter(g.source_placement)){add(sizeof(*g.source_placement));model(g.source_placement->model);leave(g.source_placement);}if(enter(g.affine_edit)){add(sizeof(*g.affine_edit));leave(g.affine_edit);}}
+  void group(const SceneGroup&g){step(64);if(g.humanoid)g.humanoid->validate();text(g.name);if(enter(g.humanoid)){add(sizeof(*g.humanoid));text(g.humanoid->baseline);leave(g.humanoid);}if(enter(g.source_placement)){add(sizeof(*g.source_placement));model(g.source_placement->model);leave(g.source_placement);}if(enter(g.affine_edit)){add(sizeof(*g.affine_edit));leave(g.affine_edit);}}
   void placement(const std::shared_ptr<const SourcePlacementCapsule>&p){if(enter(p)){add(sizeof(*p));vector(p->groups);for(auto&g:p->groups)group(g);if(enter(p->object_edit)){add(sizeof(*p->object_edit));leave(p->object_edit);}leave(p);}}
   void bake_recipe(const std::shared_ptr<const ObjectBakeRecipe>&p){if(enter(p)){add(sizeof(*p));text(p->source.name);if(p->cage)text(p->cage->name);leave(p);}}
   void origin(const std::shared_ptr<const PolygonOrigin>&p){if(enter(p)){
@@ -134,9 +135,9 @@ struct Counter {
   }}
 };
 }
-inline NativeWeightRetention native_weight_retention(const Scene&scene,size_t maximum) {
+inline NativeWeightRetention native_weight_retention(const Scene&scene,size_t maximum,size_t maximum_work=500'000'000) {
   using namespace native_weight_retention_impl;
-  Counter c(maximum);c.add(sizeof(Scene));c.add(scene.objects().capacity(),sizeof(SculptObject));c.add(scene.groups().capacity(),sizeof(SceneGroup));
+  Counter c(maximum,maximum_work);c.add(sizeof(Scene));c.add(scene.objects().capacity(),sizeof(SculptObject));c.add(scene.groups().capacity(),sizeof(SceneGroup));
   for(auto&g:scene.groups())c.group(g);
   for(auto&o:scene.objects()){
     if(o.retopology||o.polygon)throw std::invalid_argument("Native anatomical total budget has not yet admitted editable topology");
