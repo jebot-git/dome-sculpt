@@ -250,6 +250,25 @@ int main(int argc, char **argv) try {
   capture("export-dark-native");state.light=true;capture("export-light-native");
   state.font_pixels=32;state.font_file=bdf_fonts::resolve("Unifont", "Sans-Serif", 16, 2).file;
   capture("export-light-double");state.light=false;capture("export-dark-double");
+  // HDR quick actions keep page30 open: the units checkmark must update
+  // even when hover, menu, scene and every numeric brush value stay unchanged.
+  state.menu_page=30;state.light=false;state.font_file=selected.file;state.font_pixels=16;
+  state.paint.emission_units=PaintEmissionUnits::MaterialRelative;
+  auto relative_page=capture("emission-relative-native");
+  state.paint.emission_units=PaintEmissionUnits::Physical;
+  auto physical_page=capture("emission-physical-native");
+  require(relative_page!=physical_page,"Physical units did not invalidate the actual HDR page checkmark");
+  state.light=true;state.font_pixels=32;state.font_file=bdf_fonts::resolve("Unifont", "Sans-Serif",16,2).file;
+  capture("emission-physical-double");
+  state.controls.parameter=VrParameter::InkEmission;state.controls.title="Brush emission RGB";
+  state.controls.components=3;state.controls.value={0.8f,.002f,0.02f,0};state.controls.minimum=0;state.controls.maximum=1;
+  auto relative_panel=capture("emission-rgb-relative");
+  state.controls.maximum=10000;
+  auto physical_panel=capture("emission-rgb-physical");
+  require(relative_panel!=physical_panel,"Radiance bounds did not invalidate the actual numeric HDR panel");
+  state.controls.parameter=VrParameter::EmissionSource;state.controls.title="Retained original emission";
+  state.controls.components=0;state.controls.value={1,.002f,.5f,8};
+  capture("emission-original-double");state.controls={};
   if(!pcf.empty()) {
     state.font_file=pcf.string();state.font_pixels=pcf_pixels;state.opacity=255;state.light=false;state.menu_page=14;
     auto native=capture("skin-pcf-native");state.font_file=pcf_bdf.string();auto reference=capture("skin-pcf-reference");

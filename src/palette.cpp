@@ -652,6 +652,8 @@ void SpatialPalette::draw(const EditorState &s, const Mat4 &vp) {
       std::to_string(s.sculpt_layer_visible) +
       std::to_string(s.sculpt_layer_locked) + std::to_string(s.layer_visible) +
       std::to_string(int(s.paint.channel)) + std::to_string(s.paint.erase);
+  signature+=":emission-units:"+std::to_string(int(s.paint.emission_units));
+  signature+=":control-domain:"+std::to_string(s.controls.minimum)+":"+std::to_string(s.controls.maximum)+":"+std::to_string(s.controls.components)+":"+std::to_string(s.controls.logarithmic);
   signature+=":selection:"+std::to_string(s.can_select_objects)+":"+std::to_string(s.selection_mode)+":"+std::to_string(s.selection_focus)+":"+std::to_string(s.menu)+":"+std::to_string(s.hierarchy_open)+":"+std::to_string(s.hierarchy_offset)+":"+std::to_string(s.hierarchy_hover[0])+":"+std::to_string(s.hierarchy_hover[1]);
   for(const auto &row:s.hierarchy)signature+=":"+std::to_string(row.id)+":"+std::to_string(row.group)+":"+std::to_string(row.depth)+":"+std::to_string(row.expanded)+":"+std::to_string(row.selected)+":"+std::to_string(row.partial)+":"+std::to_string(row.active)+":"+std::to_string(row.visible)+":"+std::to_string(row.locked)+":"+std::to_string(row.name.size())+":"+row.name;
   signature+=":polygon:"+std::to_string(s.polygon_requires_conversion)+":"+std::to_string(s.polygon_has_source)+":"+std::to_string(s.polygon_controls.move_mode)+":"+std::to_string(s.polygon_controls.additive)+":"+std::to_string(s.polygon_controls.distance_mm)+":"+std::to_string(s.polygon_controls.cuts);
