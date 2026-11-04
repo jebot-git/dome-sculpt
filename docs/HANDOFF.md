@@ -216,6 +216,23 @@ retained Khronos tangent warnings. This is not fresh ALL/full612, main admission
 physical headset, GPU baking or full production completion. Broader bake recipes,
 resource/consumer/device work and deferred drawers remain required.
 
+## Private shared base/shade VRM1 expressions — 2026-11-04
+
+Runtime f8f295e adds genuine shared-role independent colour paint using one
+actual image and exact native shade-factor/target division, including zero
+native-factor fallback. R/S worker48, newfactory1567 (all912persistent/all647
+Cancel), independent115/36pairs max1 at unchanged4 and legacy81/762/22 pass.
+StrictArc116/36pairs plus actual software-refusal closed; lease released.
+Current old colour/UV outputs remain byte-identical to5310. Twelve actualwriter
+containers:108officialinstances and KHR0errors/48warnings/208infos;216PNG+29native/
+container profile pairs exact. Three complete directTUs/private-layer struct on
+matching5310support only; public/layout/schema/UI/freshapp/main unchanged.
+Configure637 is registration only. Original selector failures remain preserved;
+current unit quotient limits are staged, not a general VRM targetValue bound.
+MASK/BLEND/differingzeroUV/remainingrole/derived/native/physical/currentrootunion
+and all full-goal work stay open. SAME long SAN64560 remains unfinished.
+Read VRM1-SHARED-SHADE-EXPRESSIONS.md/JSON.
+
 ## Private colour-only VRM1 paint expressions — 2026-11-04
 
 Runtime fa4f1fd extends the genuine independent-paint adapter to base-colour
