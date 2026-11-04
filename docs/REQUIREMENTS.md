@@ -1,5 +1,18 @@
 # Full objective and completion evidence
 
+## Private XR shapekey Mirror controls — 2026-11-04
+
+XR Mirror now exposes method, local-X plane and tolerance through the shared
+joystick/ray panel, with explicit Apply and exact Cancel/focus/source leases.
+Private native Release/SAN59+48 persistent-fault checks each, six legacy commands
+each and actual loader/software stereo40 checks at320px and1024px pass. The
+standalone SAN XR Mesa112-byte report remains unresolved; these checks do not
+qualify a physical headset, complete suite or main admission. Read
+[XR-MIRROR-CONTROLS.md](XR-MIRROR-CONTROLS.md) and its receipt for exact component
+scope and preserved failures. Every unfinished original/additional requirement,
+including controller drawers after basic targets, remains required.
+
+
 ## Complete originally unskinned source Restore — 2026-11-04
 
 The public9987 continuation now restores the complete genuine first source when

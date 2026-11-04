@@ -3228,3 +3228,12 @@ if(BUILD_TESTING)
   add_test(NAME xr-mirror-control-faults COMMAND dome-sculpt-xr-mirror-control-faults-test)
   set_tests_properties(xr-mirror-control-faults PROPERTIES TIMEOUT 600)
 endif()
+
+if(BUILD_TESTING AND TARGET dome-sculpt AND TARGET dome-sculpt-test-runtime)
+  add_test(NAME shapekey-mirror-openxr COMMAND ${Python3_EXECUTABLE}
+    ${CMAKE_CURRENT_SOURCE_DIR}/tests/xr-mirror.py
+    $<TARGET_FILE:dome-sculpt> $<TARGET_FILE:dome-sculpt-test-runtime>
+    $<TARGET_FILE:dome-sculpt-xr-mirror-fixture>
+    ${CMAKE_CURRENT_BINARY_DIR}/shapekey-mirror-xr)
+  set_tests_properties(shapekey-mirror-openxr PROPERTIES TIMEOUT 600)
+endif()

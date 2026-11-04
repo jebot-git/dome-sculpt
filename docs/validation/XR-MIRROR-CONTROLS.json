@@ -1,0 +1,1997 @@
+{
+  "recorded_utc": "2026-11-04T05:53:41.098583+00:00",
+  "scope": "Private XR Mirror controls; same complete production source/API closure with documented changed-TU qualifications. No main admission, system install, physical headset or hardware claim.",
+  "runtime_source": "ddeab6e5bce54d95947288df0ee365d818b887f4",
+  "fixture_checkpoint": "04a8f133e5adf1d79568d954fd6ab51a61529093",
+  "high_resolution_runtime_source": "a3e5ce384088a46ba0cfbcb717b938fbc7869202",
+  "gates": {
+    "fresh_parent_release": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/artifacts/xr-mirror-proof/release/status.json",
+      "sha256": "931dd893f9ae256f400c644f80531615b5c22c13d486ed9d9c971d8b439a31eb",
+      "result": {
+        "state": "terminal",
+        "pid": 295209,
+        "profile": "release",
+        "source": "b82a3dd44a87884ff7cf1bce5fd3e78e474dbace",
+        "scope": "Own fresh native app/core/support/render/FLTK/XR and seven exact affected test targets on canonical27/POLL SDK, no archives/objects reused. Existing enum IDs preserved, no struct/layout/archive append. Not ALL-target or physical-device proof.",
+        "steps": [
+          {
+            "name": "configure",
+            "command": [
+              "cmake",
+              "-S",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b",
+              "-B",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-release",
+              "-G",
+              "Ninja",
+              "-DCMAKE_BUILD_TYPE=Release",
+              "-DDOME_COMPUTE_BACKEND=CPU",
+              "-DDOME_BUILD_UI=ON",
+              "-DDOME_BUILD_XR=ON",
+              "-DCMAKE_EXPORT_COMPILE_COMMANDS=ON",
+              "-DFLTK_DIR=/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-release/share/fltk",
+              "-U*DOME_BITMAP_RUNTIME*",
+              "-U*NATIVEGL*",
+              "-U*RENDERFONTS*"
+            ],
+            "exit_code": 0,
+            "seconds": 3.068534565012669
+          },
+          {
+            "name": "build",
+            "command": [
+              "cmake",
+              "--build",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-release",
+              "--parallel",
+              "2",
+              "--target",
+              "dome-sculpt",
+              "dome-sculpt-test-runtime",
+              "dome-sculpt-xr-mirror-controls-test",
+              "dome-sculpt-shapekey-document-test",
+              "dome-sculpt-shapekey-authoring-test",
+              "dome-sculpt-key-mirror-vertex-test",
+              "dome-sculpt-key-mirror-correspondence-test",
+              "dome-sculpt-key-mirror-relative-test",
+              "dome-sculpt-shapekey-selection-test"
+            ],
+            "exit_code": 0,
+            "seconds": 484.33234484802233
+          },
+          {
+            "name": "ctest",
+            "command": [
+              "ctest",
+              "--test-dir",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-release",
+              "--output-on-failure",
+              "-R",
+              "^(xr-mirror-controls|shapekey-document|shapekey-authoring|key-mirror-vertex|key-mirror-correspondence|key-mirror-relative|shapekey-selection)$"
+            ],
+            "exit_code": 8,
+            "seconds": 2.4745436889934354
+          }
+        ],
+        "phase": "ctest",
+        "child_pid": 378222,
+        "exit_code": 1,
+        "error": "ctest",
+        "seconds": 490.04710483699455,
+        "inputs": 1737,
+        "drift": []
+      }
+    },
+    "fresh_parent_sanitize": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/artifacts/xr-mirror-proof/sanitize/status.json",
+      "sha256": "9bab63cebdd457563942a67811ca05f0252fb193250fd3abcb80ef9283557955",
+      "result": {
+        "state": "terminal",
+        "pid": 295766,
+        "profile": "sanitize",
+        "source": "b82a3dd44a87884ff7cf1bce5fd3e78e474dbace",
+        "scope": "Own fresh native app/core/support/render/FLTK/XR and seven exact affected test targets on canonical27/POLL SDK, no archives/objects reused. Existing enum IDs preserved, no struct/layout/archive append. Not ALL-target or physical-device proof.",
+        "steps": [
+          {
+            "name": "configure",
+            "command": [
+              "cmake",
+              "-S",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b",
+              "-B",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-sanitize",
+              "-G",
+              "Ninja",
+              "-DCMAKE_BUILD_TYPE=Release",
+              "-DDOME_COMPUTE_BACKEND=CPU",
+              "-DDOME_BUILD_UI=ON",
+              "-DDOME_BUILD_XR=ON",
+              "-DCMAKE_EXPORT_COMPILE_COMMANDS=ON",
+              "-DFLTK_DIR=/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-sanitize/share/fltk",
+              "-U*DOME_BITMAP_RUNTIME*",
+              "-U*NATIVEGL*",
+              "-U*RENDERFONTS*",
+              "-DCMAKE_C_FLAGS_RELEASE=-O1 -g1 -fsanitize=address,undefined -fno-omit-frame-pointer",
+              "-DCMAKE_CXX_FLAGS_RELEASE=-O1 -g1 -fsanitize=address,undefined -fno-omit-frame-pointer",
+              "-DCMAKE_EXE_LINKER_FLAGS=-fsanitize=address,undefined",
+              "-DCMAKE_SHARED_LINKER_FLAGS=-fsanitize=address,undefined"
+            ],
+            "exit_code": 0,
+            "seconds": 6.12320694400114
+          },
+          {
+            "name": "build",
+            "command": [
+              "cmake",
+              "--build",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-sanitize",
+              "--parallel",
+              "2",
+              "--target",
+              "dome-sculpt",
+              "dome-sculpt-test-runtime",
+              "dome-sculpt-xr-mirror-controls-test",
+              "dome-sculpt-shapekey-document-test",
+              "dome-sculpt-shapekey-authoring-test",
+              "dome-sculpt-key-mirror-vertex-test",
+              "dome-sculpt-key-mirror-correspondence-test",
+              "dome-sculpt-key-mirror-relative-test",
+              "dome-sculpt-shapekey-selection-test"
+            ],
+            "exit_code": 0,
+            "seconds": 801.2500076730212
+          },
+          {
+            "name": "ctest",
+            "command": [
+              "ctest",
+              "--test-dir",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-sanitize",
+              "--output-on-failure",
+              "-R",
+              "^(xr-mirror-controls|shapekey-document|shapekey-authoring|key-mirror-vertex|key-mirror-correspondence|key-mirror-relative|shapekey-selection)$"
+            ],
+            "exit_code": 8,
+            "seconds": 23.58780222700443
+          }
+        ],
+        "phase": "ctest",
+        "child_pid": 410356,
+        "exit_code": 1,
+        "error": "ctest",
+        "seconds": 831.027108135022,
+        "inputs": 1737,
+        "drift": []
+      }
+    },
+    "corrected_native_release": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-atomic-4b97/artifacts/mirror-atomic-proof/release/status.json",
+      "sha256": "e4b7d3ea7927ea01b7c66d51a78ae6b15a79f4e205b22f45b62a514bbdee9186",
+      "result": {
+        "state": "terminal",
+        "pid": 434074,
+        "source": "ddeab6e5bce54d95947288df0ee365d818b887f4",
+        "profile": "release",
+        "scope": "One complete document TU fixes real persistent-OOM Mirror lease rollback; complete changed native/workflow/fault/fixture/runtime consumers and exact freshly ownedb82 app frontends/core/support reused otherwise after full product/header/ABI closure. Current canonical27SDK; no layout/schema change or freshALLclaim.",
+        "steps": [
+          {
+            "name": "document",
+            "phase": "compile",
+            "command": [
+              "/usr/bin/c++",
+              "-DDOME_SCULPT_INSTALLED_ASSETS=\"/usr/local/share/dome-sculpt/assets/humanoid\"",
+              "-DDOME_SCULPT_SOURCE_ASSETS=\"/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-atomic-4b97/assets/humanoid\"",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-atomic-4b97/third_party",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-atomic-4b97/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-atomic-4b97/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-atomic-4b97/third_party/cgltf",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-atomic-4b97/third_party/nlohmann",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-atomic-4b97/third_party/xatlas",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-atomic-4b97/third_party/mikktspace",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-atomic-4b97/third_party/ufbx",
+              "-O3",
+              "-DNDEBUG",
+              "-std=gnu++20",
+              "-Wall",
+              "-Wextra",
+              "-Wpedantic",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-atomic-4b97/artifacts/mirror-atomic-proof/release/document.cpp.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-atomic-4b97/src/document.cpp"
+            ],
+            "exit_code": 0,
+            "seconds": 19.077660500013735
+          },
+          {
+            "name": "core",
+            "phase": "replace",
+            "command": [
+              "ar",
+              "r",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-atomic-4b97/artifacts/mirror-atomic-proof/release/libdome-sculpt-core.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-atomic-4b97/artifacts/mirror-atomic-proof/release/document.cpp.o"
+            ],
+            "exit_code": 0,
+            "seconds": 0.11229666700819507
+          },
+          {
+            "name": "core",
+            "phase": "index",
+            "command": [
+              "ranlib",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-atomic-4b97/artifacts/mirror-atomic-proof/release/libdome-sculpt-core.a"
+            ],
+            "exit_code": 0,
+            "seconds": 0.10223890299675986
+          },
+          {
+            "name": "app",
+            "phase": "link",
+            "command": [
+              "/usr/bin/c++",
+              "-O3",
+              "-DNDEBUG",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-release/CMakeFiles/dome-sculpt.dir/src/native-display-runtime.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-release/CMakeFiles/dome-sculpt.dir/src/rig-fit-editor.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-release/CMakeFiles/dome-sculpt.dir/src/projection-editor.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-release/CMakeFiles/dome-sculpt.dir/src/spacenav-options.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-release/CMakeFiles/dome-sculpt.dir/src/app.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-release/CMakeFiles/dome-sculpt.dir/src/polygon-editor.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-release/CMakeFiles/dome-sculpt.dir/src/import-editor.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-release/CMakeFiles/dome-sculpt.dir/src/procedural-editor.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-release/CMakeFiles/dome-sculpt.dir/src/resolution-editor.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-release/CMakeFiles/dome-sculpt.dir/src/sculpt-editor.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-release/CMakeFiles/dome-sculpt.dir/src/creator-editor.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-release/CMakeFiles/dome-sculpt.dir/src/rig-editor.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-release/CMakeFiles/dome-sculpt.dir/src/shapekey-editor.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-release/CMakeFiles/dome-sculpt.dir/src/weight-editor.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-release/CMakeFiles/dome-sculpt.dir/src/skin-editor.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-release/CMakeFiles/dome-sculpt.dir/src/mesh-editor.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-release/CMakeFiles/dome-sculpt.dir/src/bake-editor.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-release/CMakeFiles/dome-sculpt.dir/src/object-editor.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-release/CMakeFiles/dome-sculpt.dir/src/paint-editor.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-release/CMakeFiles/dome-sculpt.dir/src/uv-editor.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-release/CMakeFiles/dome-sculpt.dir/src/ui-conventions.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-release/CMakeFiles/dome-sculpt.dir/src/session-appearance.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-release/CMakeFiles/dome-sculpt.dir/src/export-editor.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-release/CMakeFiles/dome-sculpt.dir/third_party/desktop/desktop-menu.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-release/CMakeFiles/dome-sculpt.dir/appmenu-protocol.c.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-atomic-4b97/artifacts/mirror-atomic-proof/release/dome-sculpt",
+              "-L/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-release/lib",
+              "-L/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib",
+              "-Wl,-rpath,/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-release/lib:/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib:",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-release/libdome-sculpt-spacenav.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-atomic-4b97/artifacts/mirror-atomic-proof/release/libdome-sculpt-core.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-release/libdome-sculpt-render.a",
+              "/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-release/lib/libfltk_images.so.1.4.5",
+              "/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-release/lib/libfltk_gl.so.1.4.5",
+              "/usr/lib64/libGLU.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-release/libdome-sculpt-xr.a",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libpng.so",
+              "/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-release/lib/libfltk.so.1.4.5",
+              "-lcairo",
+              "-L/usr/lib64",
+              "-lX11",
+              "-lGLU",
+              "-lGL",
+              "/usr/lib64/libdl.a",
+              "/usr/lib64/libSM.so",
+              "/usr/lib64/libICE.so",
+              "/usr/lib64/libXext.so",
+              "/usr/lib64/libXinerama.so",
+              "/usr/lib64/libXfixes.so",
+              "/usr/lib64/libXcursor.so",
+              "/usr/lib64/libXrender.so",
+              "/usr/lib64/libXft.so",
+              "/usr/lib64/libwayland-egl.so",
+              "/usr/lib64/libwayland-cursor.so",
+              "/usr/lib64/libxkbcommon.so",
+              "/usr/lib64/libGLX.so",
+              "/usr/lib64/libOpenGL.so",
+              "/usr/lib64/libz.so",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libcairo.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-release/libdome-sculpt-render.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-atomic-4b97/artifacts/mirror-atomic-proof/release/libdome-sculpt-core.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-release/libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-release/libdome-sculpt-polygon.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-release/libxatlas.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-release/libmikktspace.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-release/libmikktspace-robust.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-release/libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-release/libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "/usr/lib64/libEGL.so",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libharfbuzz.so",
+              "/usr/lib64/libGL.so",
+              "/usr/lib64/libfontconfig.so",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libfreetype.so",
+              "/usr/lib64/libicui18n.so",
+              "/usr/lib64/libicuuc.so",
+              "/usr/lib64/libopenxr_loader.so",
+              "/usr/lib64/libgio-2.0.so",
+              "/usr/lib64/libgobject-2.0.so",
+              "/usr/lib64/libglib-2.0.so",
+              "/usr/lib64/libX11.so",
+              "/usr/lib64/libwayland-client.so",
+              "-lm",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit_code": 0,
+            "seconds": 0.394926246983232
+          },
+          {
+            "name": "xr-mirror-controls",
+            "phase": "compile",
+            "command": [
+              "/usr/bin/c++",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-atomic-4b97/src",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-atomic-4b97/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-atomic-4b97/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-atomic-4b97/third_party/nlohmann",
+              "-O3",
+              "-DNDEBUG",
+              "-std=gnu++20",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-atomic-4b97/artifacts/mirror-atomic-proof/release/xr-mirror-controls.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-atomic-4b97/tests/xr-mirror-controls.cpp"
+            ],
+            "exit_code": 0,
+            "seconds": 3.6228183039929718
+          },
+          {
+            "name": "xr-mirror-controls",
+            "phase": "link",
+            "command": [
+              "/usr/bin/c++",
+              "-O3",
+              "-DNDEBUG",
+              "-Wl,--wrap=_ZN4dome15author_shapekeyERNS_5SceneEmRKNS_12ShapeKeyEditERKSt8functionIFbvEE",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-atomic-4b97/artifacts/mirror-atomic-proof/release/xr-mirror-controls.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-atomic-4b97/artifacts/mirror-atomic-proof/release/xr-mirror-controls-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-atomic-4b97/artifacts/mirror-atomic-proof/release/libdome-sculpt-core.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-release/libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-release/libdome-sculpt-polygon.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-release/libxatlas.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-release/libmikktspace.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-release/libmikktspace-robust.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-release/libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-release/libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit_code": 0,
+            "seconds": 0.2849218170158565
+          },
+          {
+            "name": "xr-mirror-control-faults",
+            "phase": "compile",
+            "command": [
+              "/usr/bin/c++",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-atomic-4b97/src",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-atomic-4b97/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-atomic-4b97/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-atomic-4b97/third_party/nlohmann",
+              "-O3",
+              "-DNDEBUG",
+              "-std=gnu++20",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-atomic-4b97/artifacts/mirror-atomic-proof/release/xr-mirror-control-faults.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-atomic-4b97/tests/xr-mirror-control-faults.cpp"
+            ],
+            "exit_code": 0,
+            "seconds": 3.7130646479781717
+          },
+          {
+            "name": "xr-mirror-control-faults",
+            "phase": "link",
+            "command": [
+              "/usr/bin/c++",
+              "-O3",
+              "-DNDEBUG",
+              "-Wl,--wrap=_ZN4dome15author_shapekeyERNS_5SceneEmRKNS_12ShapeKeyEditERKSt8functionIFbvEE",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-atomic-4b97/artifacts/mirror-atomic-proof/release/xr-mirror-control-faults.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-atomic-4b97/artifacts/mirror-atomic-proof/release/xr-mirror-control-faults-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-atomic-4b97/artifacts/mirror-atomic-proof/release/libdome-sculpt-core.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-release/libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-release/libdome-sculpt-polygon.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-release/libxatlas.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-release/libmikktspace.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-release/libmikktspace-robust.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-release/libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-release/libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit_code": 0,
+            "seconds": 0.275182508979924
+          },
+          {
+            "name": "xr-mirror-fixture",
+            "phase": "compile",
+            "command": [
+              "/usr/bin/c++",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-atomic-4b97/src",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-atomic-4b97/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-atomic-4b97/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-atomic-4b97/third_party/nlohmann",
+              "-O3",
+              "-DNDEBUG",
+              "-std=gnu++20",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-atomic-4b97/artifacts/mirror-atomic-proof/release/xr-mirror-fixture.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-atomic-4b97/tests/xr-mirror-fixture.cpp"
+            ],
+            "exit_code": 0,
+            "seconds": 5.278825752000557
+          },
+          {
+            "name": "xr-mirror-fixture",
+            "phase": "link",
+            "command": [
+              "/usr/bin/c++",
+              "-O3",
+              "-DNDEBUG",
+              "-Wl,--wrap=_ZN4dome15author_shapekeyERNS_5SceneEmRKNS_12ShapeKeyEditERKSt8functionIFbvEE",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-atomic-4b97/artifacts/mirror-atomic-proof/release/xr-mirror-fixture.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-atomic-4b97/artifacts/mirror-atomic-proof/release/xr-mirror-fixture-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-atomic-4b97/artifacts/mirror-atomic-proof/release/libdome-sculpt-core.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-release/libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-release/libdome-sculpt-polygon.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-release/libxatlas.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-release/libmikktspace.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-release/libmikktspace-robust.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-release/libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-release/libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit_code": 0,
+            "seconds": 0.28107291299966164
+          },
+          {
+            "name": "xr_runtime",
+            "phase": "compile",
+            "command": [
+              "/usr/bin/c++",
+              "-Ddome_sculpt_test_runtime_EXPORTS",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-atomic-4b97/third_party/nlohmann",
+              "-isystem",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/harfbuzz",
+              "-isystem",
+              "/usr/include/glib-2.0",
+              "-isystem",
+              "/usr/lib64/glib-2.0/include",
+              "-isystem",
+              "/usr/include/sysprof-6",
+              "-isystem",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/freetype2",
+              "-isystem",
+              "/usr/include/libpng16",
+              "-isystem",
+              "/usr/include/libxml2",
+              "-O3",
+              "-DNDEBUG",
+              "-std=gnu++20",
+              "-fPIC",
+              "-pthread",
+              "-DWITH_GZFILEOP",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-atomic-4b97/artifacts/mirror-atomic-proof/release/xr_runtime.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-atomic-4b97/tests/xr_runtime.cpp"
+            ],
+            "exit_code": 0,
+            "seconds": 5.67938998399768
+          },
+          {
+            "name": "xr_runtime",
+            "phase": "link",
+            "command": [
+              "/usr/bin/c++",
+              "-fPIC",
+              "-O3",
+              "-DNDEBUG",
+              "-shared",
+              "-Wl,-soname,libdome-sculpt-test-runtime.so",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-atomic-4b97/artifacts/mirror-atomic-proof/release/libxr-runtime.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-atomic-4b97/artifacts/mirror-atomic-proof/release/xr_runtime.o",
+              "-Wl,-rpath,/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libharfbuzz.so",
+              "/usr/lib64/libEGL.so",
+              "/usr/lib64/libGL.so",
+              "/usr/lib64/libfontconfig.so",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libfreetype.so",
+              "/usr/lib64/libicui18n.so",
+              "/usr/lib64/libicuuc.so"
+            ],
+            "exit_code": 0,
+            "seconds": 0.10249035200104117
+          },
+          {
+            "name": "xr-mirror-controls",
+            "phase": "test",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-atomic-4b97/artifacts/mirror-atomic-proof/release/xr-mirror-controls-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-atomic-4b97/artifacts/mirror-atomic-proof/release/xr-mirror-controls-data"
+            ],
+            "exit_code": 0,
+            "seconds": 0.045664664008654654
+          },
+          {
+            "name": "xr-mirror-control-faults",
+            "phase": "test",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-atomic-4b97/artifacts/mirror-atomic-proof/release/xr-mirror-control-faults-test"
+            ],
+            "exit_code": 0,
+            "seconds": 0.14520192198688164
+          }
+        ],
+        "name": "xr-mirror-control-faults",
+        "phase": "test",
+        "child_pid": 437615,
+        "exit_code": 0,
+        "seconds": 39.32337276200997,
+        "inputs": 2298,
+        "drift": [],
+        "outputs": {
+          "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-atomic-4b97/artifacts/mirror-atomic-proof/release/libdome-sculpt-core.a": "ac81298d479eb362271fddd3b8ebe5e15f83e62152878915b0f2d6f7cc51313a",
+          "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-atomic-4b97/artifacts/mirror-atomic-proof/release/dome-sculpt": "0945a14424bd78104ab225ee193b41b1aa5da92412ea000ff5eaf58b4a99989f",
+          "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-atomic-4b97/artifacts/mirror-atomic-proof/release/xr-mirror-controls-test": "7f0c1e78fff91f235d44965b3eae28d8f664adf2d724678d6248303137157735",
+          "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-atomic-4b97/artifacts/mirror-atomic-proof/release/xr-mirror-control-faults-test": "ac43147558f9768896286e74006c69ff9501e132619c9754bffac5facc99409b",
+          "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-atomic-4b97/artifacts/mirror-atomic-proof/release/xr-mirror-fixture-test": "55ae9580592ca76463910e17304a429ff55720c32d30faddd33a7f5c63c0abee",
+          "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-atomic-4b97/artifacts/mirror-atomic-proof/release/libxr-runtime.so": "9346ff93104682b1e006c8b6127878054aac6026a54c045ea45700135d414daa"
+        }
+      }
+    },
+    "corrected_native_sanitize": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-atomic-4b97/artifacts/mirror-atomic-proof/sanitize/status.json",
+      "sha256": "e693636430dac8d0752cf8599d63c62b39fbded245c9a85427549901e3a4166d",
+      "result": {
+        "state": "terminal",
+        "pid": 434191,
+        "source": "ddeab6e5bce54d95947288df0ee365d818b887f4",
+        "profile": "sanitize",
+        "scope": "One complete document TU fixes real persistent-OOM Mirror lease rollback; complete changed native/workflow/fault/fixture/runtime consumers and exact freshly ownedb82 app frontends/core/support reused otherwise after full product/header/ABI closure. Current canonical27SDK; no layout/schema change or freshALLclaim.",
+        "steps": [
+          {
+            "name": "document",
+            "phase": "compile",
+            "command": [
+              "/usr/bin/c++",
+              "-DDOME_SCULPT_INSTALLED_ASSETS=\"/usr/local/share/dome-sculpt/assets/humanoid\"",
+              "-DDOME_SCULPT_SOURCE_ASSETS=\"/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-atomic-4b97/assets/humanoid\"",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-atomic-4b97/third_party",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-atomic-4b97/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-atomic-4b97/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-atomic-4b97/third_party/cgltf",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-atomic-4b97/third_party/nlohmann",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-atomic-4b97/third_party/xatlas",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-atomic-4b97/third_party/mikktspace",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-atomic-4b97/third_party/ufbx",
+              "-O1",
+              "-g1",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "-std=gnu++20",
+              "-Wall",
+              "-Wextra",
+              "-Wpedantic",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-atomic-4b97/artifacts/mirror-atomic-proof/sanitize/document.cpp.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-atomic-4b97/src/document.cpp"
+            ],
+            "exit_code": 0,
+            "seconds": 40.37120918399887
+          },
+          {
+            "name": "core",
+            "phase": "replace",
+            "command": [
+              "ar",
+              "r",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-atomic-4b97/artifacts/mirror-atomic-proof/sanitize/libdome-sculpt-core.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-atomic-4b97/artifacts/mirror-atomic-proof/sanitize/document.cpp.o"
+            ],
+            "exit_code": 0,
+            "seconds": 1.3755445569986477
+          },
+          {
+            "name": "core",
+            "phase": "index",
+            "command": [
+              "ranlib",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-atomic-4b97/artifacts/mirror-atomic-proof/sanitize/libdome-sculpt-core.a"
+            ],
+            "exit_code": 0,
+            "seconds": 0.9943228730116971
+          },
+          {
+            "name": "app",
+            "phase": "link",
+            "command": [
+              "/usr/bin/c++",
+              "-O1",
+              "-g1",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "-fsanitize=address,undefined",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-sanitize/CMakeFiles/dome-sculpt.dir/src/native-display-runtime.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-sanitize/CMakeFiles/dome-sculpt.dir/src/rig-fit-editor.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-sanitize/CMakeFiles/dome-sculpt.dir/src/projection-editor.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-sanitize/CMakeFiles/dome-sculpt.dir/src/spacenav-options.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-sanitize/CMakeFiles/dome-sculpt.dir/src/app.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-sanitize/CMakeFiles/dome-sculpt.dir/src/polygon-editor.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-sanitize/CMakeFiles/dome-sculpt.dir/src/import-editor.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-sanitize/CMakeFiles/dome-sculpt.dir/src/procedural-editor.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-sanitize/CMakeFiles/dome-sculpt.dir/src/resolution-editor.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-sanitize/CMakeFiles/dome-sculpt.dir/src/sculpt-editor.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-sanitize/CMakeFiles/dome-sculpt.dir/src/creator-editor.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-sanitize/CMakeFiles/dome-sculpt.dir/src/rig-editor.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-sanitize/CMakeFiles/dome-sculpt.dir/src/shapekey-editor.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-sanitize/CMakeFiles/dome-sculpt.dir/src/weight-editor.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-sanitize/CMakeFiles/dome-sculpt.dir/src/skin-editor.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-sanitize/CMakeFiles/dome-sculpt.dir/src/mesh-editor.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-sanitize/CMakeFiles/dome-sculpt.dir/src/bake-editor.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-sanitize/CMakeFiles/dome-sculpt.dir/src/object-editor.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-sanitize/CMakeFiles/dome-sculpt.dir/src/paint-editor.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-sanitize/CMakeFiles/dome-sculpt.dir/src/uv-editor.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-sanitize/CMakeFiles/dome-sculpt.dir/src/ui-conventions.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-sanitize/CMakeFiles/dome-sculpt.dir/src/session-appearance.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-sanitize/CMakeFiles/dome-sculpt.dir/src/export-editor.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-sanitize/CMakeFiles/dome-sculpt.dir/third_party/desktop/desktop-menu.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-sanitize/CMakeFiles/dome-sculpt.dir/appmenu-protocol.c.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-atomic-4b97/artifacts/mirror-atomic-proof/sanitize/dome-sculpt",
+              "-L/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-sanitize/lib",
+              "-L/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib",
+              "-Wl,-rpath,/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-sanitize/lib:/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib:",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-sanitize/libdome-sculpt-spacenav.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-atomic-4b97/artifacts/mirror-atomic-proof/sanitize/libdome-sculpt-core.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-sanitize/libdome-sculpt-render.a",
+              "/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-sanitize/lib/libfltk_images.so.1.4.5",
+              "/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-sanitize/lib/libfltk_gl.so.1.4.5",
+              "/usr/lib64/libGLU.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-sanitize/libdome-sculpt-xr.a",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libpng.so",
+              "/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-sanitize/lib/libfltk.so.1.4.5",
+              "-lcairo",
+              "-L/usr/lib64",
+              "-lX11",
+              "-lGLU",
+              "-lGL",
+              "/usr/lib64/libdl.a",
+              "/usr/lib64/libSM.so",
+              "/usr/lib64/libICE.so",
+              "/usr/lib64/libXext.so",
+              "/usr/lib64/libXinerama.so",
+              "/usr/lib64/libXfixes.so",
+              "/usr/lib64/libXcursor.so",
+              "/usr/lib64/libXrender.so",
+              "/usr/lib64/libXft.so",
+              "/usr/lib64/libwayland-egl.so",
+              "/usr/lib64/libwayland-cursor.so",
+              "/usr/lib64/libxkbcommon.so",
+              "/usr/lib64/libGLX.so",
+              "/usr/lib64/libOpenGL.so",
+              "/usr/lib64/libz.so",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libcairo.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-sanitize/libdome-sculpt-render.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-atomic-4b97/artifacts/mirror-atomic-proof/sanitize/libdome-sculpt-core.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-sanitize/libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-sanitize/libdome-sculpt-polygon.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-sanitize/libxatlas.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-sanitize/libmikktspace.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-sanitize/libmikktspace-robust.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-sanitize/libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-sanitize/libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "/usr/lib64/libEGL.so",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libharfbuzz.so",
+              "/usr/lib64/libGL.so",
+              "/usr/lib64/libfontconfig.so",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libfreetype.so",
+              "/usr/lib64/libicui18n.so",
+              "/usr/lib64/libicuuc.so",
+              "/usr/lib64/libopenxr_loader.so",
+              "/usr/lib64/libgio-2.0.so",
+              "/usr/lib64/libgobject-2.0.so",
+              "/usr/lib64/libglib-2.0.so",
+              "/usr/lib64/libX11.so",
+              "/usr/lib64/libwayland-client.so",
+              "-lm",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit_code": 0,
+            "seconds": 2.256860626017442
+          },
+          {
+            "name": "xr-mirror-controls",
+            "phase": "compile",
+            "command": [
+              "/usr/bin/c++",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-atomic-4b97/src",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-atomic-4b97/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-atomic-4b97/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-atomic-4b97/third_party/nlohmann",
+              "-O1",
+              "-g1",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "-std=gnu++20",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-atomic-4b97/artifacts/mirror-atomic-proof/sanitize/xr-mirror-controls.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-atomic-4b97/tests/xr-mirror-controls.cpp"
+            ],
+            "exit_code": 0,
+            "seconds": 4.24099678901257
+          },
+          {
+            "name": "xr-mirror-controls",
+            "phase": "link",
+            "command": [
+              "/usr/bin/c++",
+              "-O1",
+              "-g1",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "-fsanitize=address,undefined",
+              "-Wl,--wrap=_ZN4dome15author_shapekeyERNS_5SceneEmRKNS_12ShapeKeyEditERKSt8functionIFbvEE",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-atomic-4b97/artifacts/mirror-atomic-proof/sanitize/xr-mirror-controls.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-atomic-4b97/artifacts/mirror-atomic-proof/sanitize/xr-mirror-controls-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-atomic-4b97/artifacts/mirror-atomic-proof/sanitize/libdome-sculpt-core.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-sanitize/libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-sanitize/libdome-sculpt-polygon.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-sanitize/libxatlas.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-sanitize/libmikktspace.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-sanitize/libmikktspace-robust.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-sanitize/libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-sanitize/libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit_code": 0,
+            "seconds": 1.9916794680175371
+          },
+          {
+            "name": "xr-mirror-control-faults",
+            "phase": "compile",
+            "command": [
+              "/usr/bin/c++",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-atomic-4b97/src",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-atomic-4b97/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-atomic-4b97/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-atomic-4b97/third_party/nlohmann",
+              "-O1",
+              "-g1",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "-std=gnu++20",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-atomic-4b97/artifacts/mirror-atomic-proof/sanitize/xr-mirror-control-faults.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-atomic-4b97/tests/xr-mirror-control-faults.cpp"
+            ],
+            "exit_code": 0,
+            "seconds": 4.545595934992889
+          },
+          {
+            "name": "xr-mirror-control-faults",
+            "phase": "link",
+            "command": [
+              "/usr/bin/c++",
+              "-O1",
+              "-g1",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "-fsanitize=address,undefined",
+              "-Wl,--wrap=_ZN4dome15author_shapekeyERNS_5SceneEmRKNS_12ShapeKeyEditERKSt8functionIFbvEE",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-atomic-4b97/artifacts/mirror-atomic-proof/sanitize/xr-mirror-control-faults.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-atomic-4b97/artifacts/mirror-atomic-proof/sanitize/xr-mirror-control-faults-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-atomic-4b97/artifacts/mirror-atomic-proof/sanitize/libdome-sculpt-core.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-sanitize/libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-sanitize/libdome-sculpt-polygon.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-sanitize/libxatlas.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-sanitize/libmikktspace.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-sanitize/libmikktspace-robust.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-sanitize/libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-sanitize/libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit_code": 0,
+            "seconds": 1.9494887200125959
+          },
+          {
+            "name": "xr-mirror-fixture",
+            "phase": "compile",
+            "command": [
+              "/usr/bin/c++",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-atomic-4b97/src",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-atomic-4b97/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-atomic-4b97/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-atomic-4b97/third_party/nlohmann",
+              "-O1",
+              "-g1",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "-std=gnu++20",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-atomic-4b97/artifacts/mirror-atomic-proof/sanitize/xr-mirror-fixture.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-atomic-4b97/tests/xr-mirror-fixture.cpp"
+            ],
+            "exit_code": 0,
+            "seconds": 9.103883898991626
+          },
+          {
+            "name": "xr-mirror-fixture",
+            "phase": "link",
+            "command": [
+              "/usr/bin/c++",
+              "-O1",
+              "-g1",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "-fsanitize=address,undefined",
+              "-Wl,--wrap=_ZN4dome15author_shapekeyERNS_5SceneEmRKNS_12ShapeKeyEditERKSt8functionIFbvEE",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-atomic-4b97/artifacts/mirror-atomic-proof/sanitize/xr-mirror-fixture.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-atomic-4b97/artifacts/mirror-atomic-proof/sanitize/xr-mirror-fixture-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-atomic-4b97/artifacts/mirror-atomic-proof/sanitize/libdome-sculpt-core.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-sanitize/libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-sanitize/libdome-sculpt-polygon.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-sanitize/libxatlas.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-sanitize/libmikktspace.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-sanitize/libmikktspace-robust.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-sanitize/libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-sanitize/libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit_code": 0,
+            "seconds": 1.958463146991562
+          },
+          {
+            "name": "xr_runtime",
+            "phase": "compile",
+            "command": [
+              "/usr/bin/c++",
+              "-Ddome_sculpt_test_runtime_EXPORTS",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-atomic-4b97/third_party/nlohmann",
+              "-isystem",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/harfbuzz",
+              "-isystem",
+              "/usr/include/glib-2.0",
+              "-isystem",
+              "/usr/lib64/glib-2.0/include",
+              "-isystem",
+              "/usr/include/sysprof-6",
+              "-isystem",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/freetype2",
+              "-isystem",
+              "/usr/include/libpng16",
+              "-isystem",
+              "/usr/include/libxml2",
+              "-O1",
+              "-g1",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "-std=gnu++20",
+              "-fPIC",
+              "-pthread",
+              "-DWITH_GZFILEOP",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-atomic-4b97/artifacts/mirror-atomic-proof/sanitize/xr_runtime.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-atomic-4b97/tests/xr_runtime.cpp"
+            ],
+            "exit_code": 0,
+            "seconds": 9.29688731697388
+          },
+          {
+            "name": "xr_runtime",
+            "phase": "link",
+            "command": [
+              "/usr/bin/c++",
+              "-fPIC",
+              "-O1",
+              "-g1",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "-shared",
+              "-fsanitize=address,undefined",
+              "-Wl,-soname,libdome-sculpt-test-runtime.so",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-atomic-4b97/artifacts/mirror-atomic-proof/sanitize/libxr-runtime.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-atomic-4b97/artifacts/mirror-atomic-proof/sanitize/xr_runtime.o",
+              "-Wl,-rpath,/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libharfbuzz.so",
+              "/usr/lib64/libEGL.so",
+              "/usr/lib64/libGL.so",
+              "/usr/lib64/libfontconfig.so",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libfreetype.so",
+              "/usr/lib64/libicui18n.so",
+              "/usr/lib64/libicuuc.so"
+            ],
+            "exit_code": 0,
+            "seconds": 0.1345875819970388
+          },
+          {
+            "name": "xr-mirror-controls",
+            "phase": "test",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-atomic-4b97/artifacts/mirror-atomic-proof/sanitize/xr-mirror-controls-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-atomic-4b97/artifacts/mirror-atomic-proof/sanitize/xr-mirror-controls-data"
+            ],
+            "exit_code": 0,
+            "seconds": 0.564430653990712
+          },
+          {
+            "name": "xr-mirror-control-faults",
+            "phase": "test",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-atomic-4b97/artifacts/mirror-atomic-proof/sanitize/xr-mirror-control-faults-test"
+            ],
+            "exit_code": 0,
+            "seconds": 1.754240929003572
+          }
+        ],
+        "name": "xr-mirror-control-faults",
+        "phase": "test",
+        "child_pid": 442218,
+        "exit_code": 0,
+        "seconds": 81.55022071601707,
+        "inputs": 2298,
+        "drift": [],
+        "outputs": {
+          "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-atomic-4b97/artifacts/mirror-atomic-proof/sanitize/libdome-sculpt-core.a": "7d2448365d37d001976bc064f6782345b9bc78cf2e1601456c2ec3fd1d3dd7a0",
+          "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-atomic-4b97/artifacts/mirror-atomic-proof/sanitize/dome-sculpt": "3cf230bf35acecfd92edb5d57036b869bd1009ab6b7feedca2f45a97b04ac6aa",
+          "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-atomic-4b97/artifacts/mirror-atomic-proof/sanitize/xr-mirror-controls-test": "51d40c9445c59194b30a990fed6ccdf693713e5cd8351b49c99cc73ed55d6bfa",
+          "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-atomic-4b97/artifacts/mirror-atomic-proof/sanitize/xr-mirror-control-faults-test": "3cd3c70d8d7ec4161a57ec6eac4fc6f4b2089ff99c3ff18e1041d29c1311252f",
+          "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-atomic-4b97/artifacts/mirror-atomic-proof/sanitize/xr-mirror-fixture-test": "cafaf37f584136a7c313e448ac0b3828ecf8e2121540257e6a05cd77723b0620",
+          "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-atomic-4b97/artifacts/mirror-atomic-proof/sanitize/libxr-runtime.so": "a67a2524d2360b35b1a8f456290a2dcd6b0cfad81fe1d8bcd936cb260d310e7a"
+        }
+      }
+    },
+    "legacy_release": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-checkpoints-dde/artifacts/checkpoint-proof/regression-release/status.json",
+      "sha256": "bf36ab1f9ce8064034564ac023bcdc3c4e7f1a26092c866994aa79947adfaa95",
+      "result": {
+        "state": "terminal",
+        "pid": 563615,
+        "profile": "release",
+        "scope": "Six unchanged genuine consumer TUs from own freshb82 build, exact matching API/source exceptcomplete document rollback fix, relinked over corrected whole document TU core. Explicit relative-kernel registry name, not original observer omission.",
+        "steps": [
+          {
+            "name": "shapekey-document",
+            "phase": "link",
+            "command": [
+              "/usr/bin/c++",
+              "-O3",
+              "-DNDEBUG",
+              "-Wl,--wrap=_ZN4dome15author_shapekeyERNS_5SceneEmRKNS_12ShapeKeyEditERKSt8functionIFbvEE",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-release/CMakeFiles/dome-sculpt-shapekey-document-test.dir/tests/shapekey-document.cpp.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-checkpoints-dde/artifacts/checkpoint-proof/regression-release/shapekey-document-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-atomic-4b97/artifacts/mirror-atomic-proof/release/libdome-sculpt-core.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-release/libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-release/libdome-sculpt-polygon.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-release/libxatlas.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-release/libmikktspace.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-release/libmikktspace-robust.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-release/libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-release/libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit_code": 0,
+            "seconds": 0.19639165999251418
+          },
+          {
+            "name": "shapekey-document",
+            "phase": "test",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-checkpoints-dde/artifacts/checkpoint-proof/regression-release/shapekey-document-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-checkpoints-dde/artifacts/checkpoint-proof/regression-release/shapekey-document-data"
+            ],
+            "exit_code": 0,
+            "seconds": 0.014885321026667953
+          },
+          {
+            "name": "shapekey-authoring",
+            "phase": "link",
+            "command": [
+              "/usr/bin/c++",
+              "-O3",
+              "-DNDEBUG",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-release/CMakeFiles/dome-sculpt-shapekey-authoring-test.dir/tests/shapekey-authoring.cpp.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-checkpoints-dde/artifacts/checkpoint-proof/regression-release/shapekey-authoring-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-atomic-4b97/artifacts/mirror-atomic-proof/release/libdome-sculpt-core.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-release/libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-release/libdome-sculpt-polygon.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-release/libxatlas.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-release/libmikktspace.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-release/libmikktspace-robust.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-release/libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-release/libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit_code": 0,
+            "seconds": 0.15049185999669135
+          },
+          {
+            "name": "shapekey-authoring",
+            "phase": "test",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-checkpoints-dde/artifacts/checkpoint-proof/regression-release/shapekey-authoring-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-checkpoints-dde/artifacts/checkpoint-proof/regression-release/shapekey-authoring-data"
+            ],
+            "exit_code": 0,
+            "seconds": 1.6184974539792165
+          },
+          {
+            "name": "key-mirror-vertex",
+            "phase": "link",
+            "command": [
+              "/usr/bin/c++",
+              "-O3",
+              "-DNDEBUG",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-release/CMakeFiles/dome-sculpt-key-mirror-vertex-test.dir/tests/key-mirror-vertex.cpp.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-checkpoints-dde/artifacts/checkpoint-proof/regression-release/key-mirror-vertex-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-atomic-4b97/artifacts/mirror-atomic-proof/release/libdome-sculpt-core.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-release/libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-release/libdome-sculpt-polygon.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-release/libxatlas.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-release/libmikktspace.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-release/libmikktspace-robust.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-release/libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-release/libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit_code": 0,
+            "seconds": 0.1591929739806801
+          },
+          {
+            "name": "key-mirror-vertex",
+            "phase": "test",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-checkpoints-dde/artifacts/checkpoint-proof/regression-release/key-mirror-vertex-test"
+            ],
+            "exit_code": 0,
+            "seconds": 0.005113246996188536
+          },
+          {
+            "name": "key-mirror-correspondence",
+            "phase": "link",
+            "command": [
+              "/usr/bin/c++",
+              "-O3",
+              "-DNDEBUG",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-release/CMakeFiles/dome-sculpt-key-mirror-correspondence-test.dir/tests/key-mirror-correspondence.cpp.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-checkpoints-dde/artifacts/checkpoint-proof/regression-release/key-mirror-correspondence-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-atomic-4b97/artifacts/mirror-atomic-proof/release/libdome-sculpt-core.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-release/libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-release/libdome-sculpt-polygon.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-release/libxatlas.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-release/libmikktspace.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-release/libmikktspace-robust.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-release/libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-release/libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit_code": 0,
+            "seconds": 0.16185826301807538
+          },
+          {
+            "name": "key-mirror-correspondence",
+            "phase": "test",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-checkpoints-dde/artifacts/checkpoint-proof/regression-release/key-mirror-correspondence-test"
+            ],
+            "exit_code": 0,
+            "seconds": 0.004017088009277359
+          },
+          {
+            "name": "key-mirror-relative-kernel",
+            "phase": "link",
+            "command": [
+              "/usr/bin/c++",
+              "-O3",
+              "-DNDEBUG",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-release/CMakeFiles/dome-sculpt-key-mirror-relative-test.dir/tests/key-mirror-relative.cpp.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-checkpoints-dde/artifacts/checkpoint-proof/regression-release/key-mirror-relative-kernel-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-atomic-4b97/artifacts/mirror-atomic-proof/release/libdome-sculpt-core.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-release/libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-release/libdome-sculpt-polygon.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-release/libxatlas.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-release/libmikktspace.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-release/libmikktspace-robust.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-release/libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-release/libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit_code": 0,
+            "seconds": 0.2049488500051666
+          },
+          {
+            "name": "key-mirror-relative-kernel",
+            "phase": "test",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-checkpoints-dde/artifacts/checkpoint-proof/regression-release/key-mirror-relative-kernel-test"
+            ],
+            "exit_code": 0,
+            "seconds": 0.0034579810162540525
+          },
+          {
+            "name": "shapekey-selection",
+            "phase": "link",
+            "command": [
+              "/usr/bin/c++",
+              "-O3",
+              "-DNDEBUG",
+              "-Wl,--wrap=_ZN4dome15author_shapekeyERNS_5SceneEmRKNS_12ShapeKeyEditERKSt8functionIFbvEE",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-release/CMakeFiles/dome-sculpt-shapekey-selection-test.dir/tests/shapekey-selection.cpp.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-checkpoints-dde/artifacts/checkpoint-proof/regression-release/shapekey-selection-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-atomic-4b97/artifacts/mirror-atomic-proof/release/libdome-sculpt-core.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-release/libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-release/libdome-sculpt-polygon.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-release/libxatlas.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-release/libmikktspace.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-release/libmikktspace-robust.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-release/libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-release/libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit_code": 0,
+            "seconds": 0.3115277269971557
+          },
+          {
+            "name": "shapekey-selection",
+            "phase": "test",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-checkpoints-dde/artifacts/checkpoint-proof/regression-release/shapekey-selection-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-checkpoints-dde/artifacts/checkpoint-proof/regression-release/shapekey-selection-data"
+            ],
+            "exit_code": 0,
+            "seconds": 0.16915115498704836
+          }
+        ],
+        "name": "shapekey-selection",
+        "phase": "test",
+        "child_pid": 563937,
+        "exit_code": 0,
+        "seconds": 3.2072126679995563,
+        "inputs": 1755,
+        "drift": []
+      }
+    },
+    "legacy_sanitize": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-checkpoints-dde/artifacts/checkpoint-proof/regression-sanitize/status.json",
+      "sha256": "b3179f839663f8c9bf61005b8790367bf9b811c32260264c1d22b8f40fcfb4c7",
+      "result": {
+        "state": "terminal",
+        "pid": 563735,
+        "profile": "sanitize",
+        "scope": "Six unchanged genuine consumer TUs from own freshb82 build, exact matching API/source exceptcomplete document rollback fix, relinked over corrected whole document TU core. Explicit relative-kernel registry name, not original observer omission.",
+        "steps": [
+          {
+            "name": "shapekey-document",
+            "phase": "link",
+            "command": [
+              "/usr/bin/c++",
+              "-O1",
+              "-g1",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "-fsanitize=address,undefined",
+              "-Wl,--wrap=_ZN4dome15author_shapekeyERNS_5SceneEmRKNS_12ShapeKeyEditERKSt8functionIFbvEE",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-sanitize/CMakeFiles/dome-sculpt-shapekey-document-test.dir/tests/shapekey-document.cpp.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-checkpoints-dde/artifacts/checkpoint-proof/regression-sanitize/shapekey-document-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-atomic-4b97/artifacts/mirror-atomic-proof/sanitize/libdome-sculpt-core.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-sanitize/libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-sanitize/libdome-sculpt-polygon.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-sanitize/libxatlas.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-sanitize/libmikktspace.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-sanitize/libmikktspace-robust.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-sanitize/libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-sanitize/libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit_code": 0,
+            "seconds": 1.5289620630210266
+          },
+          {
+            "name": "shapekey-document",
+            "phase": "test",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-checkpoints-dde/artifacts/checkpoint-proof/regression-sanitize/shapekey-document-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-checkpoints-dde/artifacts/checkpoint-proof/regression-sanitize/shapekey-document-data"
+            ],
+            "exit_code": 0,
+            "seconds": 0.1496832699922379
+          },
+          {
+            "name": "shapekey-authoring",
+            "phase": "link",
+            "command": [
+              "/usr/bin/c++",
+              "-O1",
+              "-g1",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "-fsanitize=address,undefined",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-sanitize/CMakeFiles/dome-sculpt-shapekey-authoring-test.dir/tests/shapekey-authoring.cpp.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-checkpoints-dde/artifacts/checkpoint-proof/regression-sanitize/shapekey-authoring-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-atomic-4b97/artifacts/mirror-atomic-proof/sanitize/libdome-sculpt-core.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-sanitize/libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-sanitize/libdome-sculpt-polygon.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-sanitize/libxatlas.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-sanitize/libmikktspace.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-sanitize/libmikktspace-robust.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-sanitize/libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-sanitize/libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit_code": 0,
+            "seconds": 1.0429501600156073
+          },
+          {
+            "name": "shapekey-authoring",
+            "phase": "test",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-checkpoints-dde/artifacts/checkpoint-proof/regression-sanitize/shapekey-authoring-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-checkpoints-dde/artifacts/checkpoint-proof/regression-sanitize/shapekey-authoring-data"
+            ],
+            "exit_code": 0,
+            "seconds": 15.801024725980824
+          },
+          {
+            "name": "key-mirror-vertex",
+            "phase": "link",
+            "command": [
+              "/usr/bin/c++",
+              "-O1",
+              "-g1",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "-fsanitize=address,undefined",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-sanitize/CMakeFiles/dome-sculpt-key-mirror-vertex-test.dir/tests/key-mirror-vertex.cpp.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-checkpoints-dde/artifacts/checkpoint-proof/regression-sanitize/key-mirror-vertex-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-atomic-4b97/artifacts/mirror-atomic-proof/sanitize/libdome-sculpt-core.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-sanitize/libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-sanitize/libdome-sculpt-polygon.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-sanitize/libxatlas.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-sanitize/libmikktspace.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-sanitize/libmikktspace-robust.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-sanitize/libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-sanitize/libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit_code": 0,
+            "seconds": 1.044297248008661
+          },
+          {
+            "name": "key-mirror-vertex",
+            "phase": "test",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-checkpoints-dde/artifacts/checkpoint-proof/regression-sanitize/key-mirror-vertex-test"
+            ],
+            "exit_code": 0,
+            "seconds": 0.07267015799880028
+          },
+          {
+            "name": "key-mirror-correspondence",
+            "phase": "link",
+            "command": [
+              "/usr/bin/c++",
+              "-O1",
+              "-g1",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "-fsanitize=address,undefined",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-sanitize/CMakeFiles/dome-sculpt-key-mirror-correspondence-test.dir/tests/key-mirror-correspondence.cpp.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-checkpoints-dde/artifacts/checkpoint-proof/regression-sanitize/key-mirror-correspondence-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-atomic-4b97/artifacts/mirror-atomic-proof/sanitize/libdome-sculpt-core.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-sanitize/libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-sanitize/libdome-sculpt-polygon.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-sanitize/libxatlas.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-sanitize/libmikktspace.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-sanitize/libmikktspace-robust.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-sanitize/libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-sanitize/libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit_code": 0,
+            "seconds": 1.0199915769917425
+          },
+          {
+            "name": "key-mirror-correspondence",
+            "phase": "test",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-checkpoints-dde/artifacts/checkpoint-proof/regression-sanitize/key-mirror-correspondence-test"
+            ],
+            "exit_code": 0,
+            "seconds": 0.0661269859992899
+          },
+          {
+            "name": "key-mirror-relative-kernel",
+            "phase": "link",
+            "command": [
+              "/usr/bin/c++",
+              "-O1",
+              "-g1",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "-fsanitize=address,undefined",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-sanitize/CMakeFiles/dome-sculpt-key-mirror-relative-test.dir/tests/key-mirror-relative.cpp.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-checkpoints-dde/artifacts/checkpoint-proof/regression-sanitize/key-mirror-relative-kernel-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-atomic-4b97/artifacts/mirror-atomic-proof/sanitize/libdome-sculpt-core.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-sanitize/libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-sanitize/libdome-sculpt-polygon.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-sanitize/libxatlas.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-sanitize/libmikktspace.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-sanitize/libmikktspace-robust.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-sanitize/libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-sanitize/libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit_code": 0,
+            "seconds": 1.01717680200818
+          },
+          {
+            "name": "key-mirror-relative-kernel",
+            "phase": "test",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-checkpoints-dde/artifacts/checkpoint-proof/regression-sanitize/key-mirror-relative-kernel-test"
+            ],
+            "exit_code": 0,
+            "seconds": 0.06379630998708308
+          },
+          {
+            "name": "shapekey-selection",
+            "phase": "link",
+            "command": [
+              "/usr/bin/c++",
+              "-O1",
+              "-g1",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "-fsanitize=address,undefined",
+              "-Wl,--wrap=_ZN4dome15author_shapekeyERNS_5SceneEmRKNS_12ShapeKeyEditERKSt8functionIFbvEE",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-sanitize/CMakeFiles/dome-sculpt-shapekey-selection-test.dir/tests/shapekey-selection.cpp.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-checkpoints-dde/artifacts/checkpoint-proof/regression-sanitize/shapekey-selection-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-atomic-4b97/artifacts/mirror-atomic-proof/sanitize/libdome-sculpt-core.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-sanitize/libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-sanitize/libdome-sculpt-polygon.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-sanitize/libxatlas.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-sanitize/libmikktspace.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-sanitize/libmikktspace-robust.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-sanitize/libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-controls-34b/build-xr-mirror-sanitize/libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit_code": 0,
+            "seconds": 1.5573440410080366
+          },
+          {
+            "name": "shapekey-selection",
+            "phase": "test",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-checkpoints-dde/artifacts/checkpoint-proof/regression-sanitize/shapekey-selection-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-checkpoints-dde/artifacts/checkpoint-proof/regression-sanitize/shapekey-selection-data"
+            ],
+            "exit_code": 0,
+            "seconds": 2.66295154299587
+          }
+        ],
+        "name": "shapekey-selection",
+        "phase": "test",
+        "child_pid": 566205,
+        "exit_code": 0,
+        "seconds": 29.85664311601431,
+        "inputs": 1755,
+        "drift": []
+      }
+    },
+    "actual_XR_release": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-checkpoints-dde/artifacts/checkpoint-proof/xr-release/status.json",
+      "sha256": "07ebb412d0ab7796a2f1d8f45b4ce425a12bbb7831a807afaae4eca8e18edbb1",
+      "result": {
+        "state": "terminal",
+        "pid": 467432,
+        "profile": "release",
+        "source": "04a8f133e5adf1d79568d954fd6ab51a61529093",
+        "scope": "Actual standalone OpenXRloader/EGL/GL stereo using synthetic controller settings; exact own freshb82 app + complete document rollback fix TU/current27SDK. All3methods/Cancel/focus. Not physicalheadset.",
+        "command": [
+          "python3",
+          "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-checkpoints-dde/tests/xr-mirror.py",
+          "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-checkpoints-dde/artifacts/checkpoint-proof/release/dome-sculpt",
+          "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-checkpoints-dde/artifacts/checkpoint-proof/release/libxr-runtime.so",
+          "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-checkpoints-dde/artifacts/checkpoint-proof/release/xr-mirror-fixture-test",
+          "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-checkpoints-dde/artifacts/checkpoint-proof/xr-release/actual"
+        ],
+        "child_pid": 468741,
+        "exit_code": 0,
+        "seconds": 33.35900530900108,
+        "inputs": 1743,
+        "drift": [],
+        "report": {
+          "checks": [
+            {
+              "passed": true,
+              "check": "accept-0: actual native XR client exits and ordered Save finishes"
+            },
+            {
+              "passed": true,
+              "check": "accept-0: actual renderer matches the explicit software fixture"
+            },
+            {
+              "passed": true,
+              "check": "accept-0: real stereo swapchain ownership is balanced and both eyes are nonblank"
+            },
+            {
+              "passed": true,
+              "check": "accept-0: both actual GL eyes render the settings after real controller row edits"
+            },
+            {
+              "passed": true,
+              "check": "accept-0: original native project bytes remain untouched"
+            },
+            {
+              "passed": true,
+              "check": "accept-0: explicit Mirror adds one real key while keeping both original targets exact"
+            },
+            {
+              "passed": true,
+              "check": "accept-0: independent off-centre counterpart oracle verifies REST-position mirroring"
+            },
+            {
+              "passed": true,
+              "check": "accept-0: skin pose material paint placement and ultimately restored first source stay exact"
+            },
+            {
+              "passed": true,
+              "check": "accept-0: native first-source and explicit authored-checkpoint Restore semantics remain exact"
+            },
+            {
+              "passed": true,
+              "check": "accept-1: actual native XR client exits and ordered Save finishes"
+            },
+            {
+              "passed": true,
+              "check": "accept-1: actual renderer matches the explicit software fixture"
+            },
+            {
+              "passed": true,
+              "check": "accept-1: real stereo swapchain ownership is balanced and both eyes are nonblank"
+            },
+            {
+              "passed": true,
+              "check": "accept-1: both actual GL eyes render the settings after real controller row edits"
+            },
+            {
+              "passed": true,
+              "check": "accept-1: original native project bytes remain untouched"
+            },
+            {
+              "passed": true,
+              "check": "accept-1: explicit Mirror adds one real key while keeping both original targets exact"
+            },
+            {
+              "passed": true,
+              "check": "accept-1: independent off-centre counterpart oracle verifies REST-position mirroring"
+            },
+            {
+              "passed": true,
+              "check": "accept-1: skin pose material paint placement and ultimately restored first source stay exact"
+            },
+            {
+              "passed": true,
+              "check": "accept-1: native first-source and explicit authored-checkpoint Restore semantics remain exact"
+            },
+            {
+              "passed": true,
+              "check": "accept-2: actual native XR client exits and ordered Save finishes"
+            },
+            {
+              "passed": true,
+              "check": "accept-2: actual renderer matches the explicit software fixture"
+            },
+            {
+              "passed": true,
+              "check": "accept-2: real stereo swapchain ownership is balanced and both eyes are nonblank"
+            },
+            {
+              "passed": true,
+              "check": "accept-2: both actual GL eyes render the settings after real controller row edits"
+            },
+            {
+              "passed": true,
+              "check": "accept-2: original native project bytes remain untouched"
+            },
+            {
+              "passed": true,
+              "check": "accept-2: explicit Mirror adds one real key while keeping both original targets exact"
+            },
+            {
+              "passed": true,
+              "check": "accept-2: independent off-centre counterpart oracle verifies REST-position mirroring"
+            },
+            {
+              "passed": true,
+              "check": "accept-2: skin pose material paint placement and ultimately restored first source stay exact"
+            },
+            {
+              "passed": true,
+              "check": "accept-2: native first-source and explicit authored-checkpoint Restore semantics remain exact"
+            },
+            {
+              "passed": true,
+              "check": "cancel-0: actual native XR client exits and ordered Save finishes"
+            },
+            {
+              "passed": true,
+              "check": "cancel-0: actual renderer matches the explicit software fixture"
+            },
+            {
+              "passed": true,
+              "check": "cancel-0: real stereo swapchain ownership is balanced and both eyes are nonblank"
+            },
+            {
+              "passed": true,
+              "check": "cancel-0: both actual GL eyes render the settings after real controller row edits"
+            },
+            {
+              "passed": true,
+              "check": "cancel-0: original native project bytes remain untouched"
+            },
+            {
+              "passed": true,
+              "check": "cancel-0: actual Cancel/focus loss retains the exact complete native Scene"
+            },
+            {
+              "passed": true,
+              "check": "focus-0: actual native XR client exits and ordered Save finishes"
+            },
+            {
+              "passed": true,
+              "check": "focus-0: actual renderer matches the explicit software fixture"
+            },
+            {
+              "passed": true,
+              "check": "focus-0: real stereo swapchain ownership is balanced and both eyes are nonblank"
+            },
+            {
+              "passed": true,
+              "check": "focus-0: both actual GL eyes render the settings after real controller row edits"
+            },
+            {
+              "passed": true,
+              "check": "focus-0: original native project bytes remain untouched"
+            },
+            {
+              "passed": true,
+              "check": "focus-0: actual Cancel/focus loss retains the exact complete native Scene"
+            },
+            {
+              "passed": true,
+              "check": "focus-0: fixture crosses actual loader focus loss and regain"
+            }
+          ],
+          "physical_headset": false
+        }
+      }
+    },
+    "actual_XR_sanitize": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-checkpoints-dde/artifacts/checkpoint-proof/xr-sanitize/status.json",
+      "sha256": "9766ae1746541c0c30b7c9fbca09759ee8b9c5d4d2cd11bc9b2ac1f9eec2d04f",
+      "result": {
+        "state": "terminal",
+        "pid": 478846,
+        "profile": "sanitize",
+        "source": "04a8f133e5adf1d79568d954fd6ab51a61529093",
+        "scope": "Actual standalone OpenXRloader/EGL/GL stereo using synthetic controller settings; exact own freshb82 app + complete document rollback fix TU/current27SDK. All3methods/Cancel/focus. Not physicalheadset.",
+        "command": [
+          "python3",
+          "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-checkpoints-dde/tests/xr-mirror.py",
+          "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-checkpoints-dde/artifacts/checkpoint-proof/sanitize/dome-sculpt",
+          "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-checkpoints-dde/artifacts/checkpoint-proof/sanitize/libxr-runtime.so",
+          "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-checkpoints-dde/artifacts/checkpoint-proof/sanitize/xr-mirror-fixture-test",
+          "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-checkpoints-dde/artifacts/checkpoint-proof/xr-sanitize/actual"
+        ],
+        "child_pid": 478887,
+        "exit_code": 1,
+        "seconds": 22.45117401398602,
+        "inputs": 1743,
+        "drift": [],
+        "report": {
+          "checks": [
+            {
+              "passed": false,
+              "check": "accept-0: actual native XR client exits and ordered Save finishes"
+            }
+          ],
+          "physical_headset": false
+        }
+      }
+    },
+    "high_resolution_XR_release": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-visual-bounds-736/artifacts/visual-proof/status.json",
+      "sha256": "1550d55c65f78dd3f0c6e10efb57e854d723471839da8bb68c2c708dd778a933",
+      "result": {
+        "state": "terminal",
+        "pid": 24178,
+        "source": "a3e5ce384088a46ba0cfbcb717b938fbc7869202",
+        "scope": "Test-only whole runtime TU 1024px swapchains and exact actual-bound/identity stereo validation. Exact unchanged dde Release app, current helper; software/synthetic, no physical headset or GPU. Old736 error -39 preserved.",
+        "steps": [
+          {
+            "name": "compile",
+            "command": [
+              "/usr/bin/c++",
+              "-Ddome_sculpt_test_runtime_EXPORTS",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-visual-bounds-736/third_party/nlohmann",
+              "-isystem",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/harfbuzz",
+              "-isystem",
+              "/usr/include/glib-2.0",
+              "-isystem",
+              "/usr/lib64/glib-2.0/include",
+              "-isystem",
+              "/usr/include/sysprof-6",
+              "-isystem",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/freetype2",
+              "-isystem",
+              "/usr/include/libpng16",
+              "-isystem",
+              "/usr/include/libxml2",
+              "-O3",
+              "-DNDEBUG",
+              "-std=gnu++20",
+              "-fPIC",
+              "-pthread",
+              "-DWITH_GZFILEOP",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-visual-bounds-736/artifacts/visual-proof/xr_runtime.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-visual-bounds-736/tests/xr_runtime.cpp"
+            ],
+            "exit_code": 0,
+            "seconds": 4.7276900869910605
+          },
+          {
+            "name": "link",
+            "command": [
+              "/usr/bin/c++",
+              "-fPIC",
+              "-O3",
+              "-DNDEBUG",
+              "-shared",
+              "-Wl,-soname,libdome-sculpt-test-runtime.so",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-visual-bounds-736/artifacts/visual-proof/libxr-runtime.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-visual-bounds-736/artifacts/visual-proof/xr_runtime.o",
+              "-Wl,-rpath,/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libharfbuzz.so",
+              "/usr/lib64/libEGL.so",
+              "/usr/lib64/libGL.so",
+              "/usr/lib64/libfontconfig.so",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libfreetype.so",
+              "/usr/lib64/libicui18n.so",
+              "/usr/lib64/libicuuc.so"
+            ],
+            "exit_code": 0,
+            "seconds": 0.0852603410021402
+          },
+          {
+            "name": "actual-XR",
+            "command": [
+              "python3",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-visual-bounds-736/tests/xr-mirror.py",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-checkpoints-dde/artifacts/checkpoint-proof/release/dome-sculpt",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-visual-bounds-736/artifacts/visual-proof/libxr-runtime.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-checkpoints-dde/artifacts/checkpoint-proof/release/xr-mirror-fixture-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-visual-bounds-736/artifacts/visual-proof/actual"
+            ],
+            "exit_code": 0,
+            "seconds": 53.24274875599076
+          }
+        ],
+        "child_pid": 52970,
+        "exit_code": 0,
+        "seconds": 58.059704102022806,
+        "inputs": 1743,
+        "drift": [],
+        "binaries": {
+          "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-checkpoints-dde/artifacts/checkpoint-proof/release/dome-sculpt": "0945a14424bd78104ab225ee193b41b1aa5da92412ea000ff5eaf58b4a99989f",
+          "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-checkpoints-dde/artifacts/checkpoint-proof/release/xr-mirror-fixture-test": "c14abeeffd55f3d8aff2b2009398d7f48f4bd70698efaab38a33ebba1c76f1aa",
+          "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-visual-bounds-736/artifacts/visual-proof/libxr-runtime.so": "f2b9b11f6437f068acf45fe2b7dee9a7e85a80a0838060bfde059880921dd555"
+        }
+      }
+    }
+  },
+  "counts": {
+    "native_each_profile": 59,
+    "persistent_admission_prefixes_each_profile": 48,
+    "legacy_commands_each_profile": 6,
+    "actual_XR_release_assertions_each_resolution": 40,
+    "actual_XR_resolutions": [
+      320,
+      1024
+    ]
+  },
+  "preserved_failures": [
+    "Fresh parent selected5/6 eachprofile: fixture UV/tangent mismatch; no production bounds relaxed.",
+    "Actual persistent admission prefix1 loses lease before noexcept-move fix.",
+    "First actual exact-mode Restore test expected first source instead of existing named intermediate checkpoint. Test now invokes actual successive Restore.",
+    "High-resolution736 error-39 from hardcoded320px runtime submission assertion; a3 validates actual swapchain bounds.",
+    "Actual SAN XR Mesa112B/2allocations remains failure, no suppression."
+  ],
+  "visually_reviewed_capture": {
+    "path": "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-visual-bounds-736/artifacts/visual-proof/actual/accept-2.json.mirror-66-0.png",
+    "sha256": "a233f48cb97ba5d17ce77f15ee4b3a898fa1bcdadb50e0fb0b5bcf814e86250f",
+    "physical_headset": false
+  },
+  "registration": {
+    "configure_exit": 0,
+    "ctest_list_exit": 0,
+    "registered_tests": 3,
+    "scope": "Configure/list only, not an additional execution or fresh build",
+    "command": [
+      "cmake",
+      "-S",
+      "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-milestone-a3",
+      "-B",
+      "/home/blux/de-xr/dome-sculpt/artifacts/xr-mirror-milestone-a3/artifacts/registration",
+      "-G",
+      "Ninja",
+      "-DCMAKE_BUILD_TYPE=Release",
+      "-DDOME_COMPUTE_BACKEND=CPU",
+      "-DDOME_BUILD_UI=ON",
+      "-DDOME_BUILD_XR=ON",
+      "-DCMAKE_EXPORT_COMPILE_COMMANDS=ON",
+      "-DFLTK_DIR=/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-release/share/fltk",
+      "-U*DOME_BITMAP_RUNTIME*",
+      "-U*NATIVEGL*",
+      "-U*RENDERFONTS*"
+    ]
+  }
+}
