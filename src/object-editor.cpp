@@ -1,5 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "object-editor.hpp"
+#include "emission-source-info.hpp"
+#include "dome/material-bindings.hpp"
 #include "appearance.h"
 #include "ui-conventions.hpp"
 #include <FL/Fl_Button.H>
@@ -7,9 +9,11 @@
 #include <FL/Fl_Check_Button.H>
 #include <FL/Fl_Double_Window.H>
 #include <FL/Fl_Input.H>
+#include <FL/Fl_Output.H>
 #include <FL/Fl_Scroll.H>
 #include <FL/Fl_Value_Input.H>
 #include <FL/fl_ask.H>
+#include <cstdio>
 namespace dome {
 bool recover_project(Document &document) {
   auto state = document.frame().state;
@@ -58,6 +62,9 @@ void edit_object(Document &document) {
   if (item == state->objects.end())
     return;
   auto object = *item;
+  const auto captured=document.copy_scene();const auto &own=captured.object(object.id);
+  auto emission_override=own.material_bindings?own.material_bindings->physical_emission:std::nullopt;
+  const auto source_emission=detail::emission_source_info(own);
   int row = std::max(28, dx::size + 12), width = std::max(560, dx::size * 34);
   int sx, sy, sw, sh;
   Fl::screen_work_area(sx, sy, sw, sh);
@@ -72,8 +79,8 @@ void edit_object(Document &document) {
                    double step) {
     auto input =
         new Fl_Value_Input(label, y, width - label - 40, row - 4, name);
-    input->value(value);
     input->bounds(lo, hi);
+    input->value(value);
     input->step(step);
     y += row;
     return input;
@@ -117,15 +124,20 @@ void edit_object(Document &document) {
   auto metallic = field("Metallic", material.metallic, 0, 1, .01),
        roughness = field("Roughness", material.roughness, 0, 1, .01);
   std::array<Fl_Value_Input *, 3> emission;
-  const char *emission_names[] = {"Emission red", "Emission green",
-                                  "Emission blue"};
+  const char *emission_names[] = {"Emission red", "Emission green", "Emission blue"};
+  const char *absolute_names[] = {"Absolute emission red", "Absolute emission green", "Absolute emission blue"};
   for (int i = 0; i < 3; ++i)
-    emission[i] = field(emission_names[i], material.emissive[i], 0, 1, .01);
+    emission[i] = field(emission_override?absolute_names[i]:emission_names[i], emission_override?emission_override->at(i):material.emissive[i], 0, maximum_native_emission, 0);
+  if(source_emission){
+    const char *factor_names[]={"Original red factor","Original green factor","Original blue factor","Original strength"};
+    for(size_t k=0;k<4;++k){auto *value=new Fl_Output(label,y,width-label-40,row-4,factor_names[k]);char text[48];std::snprintf(text,sizeof(text),"%.7g",double(k<3?source_emission->factor[k]:source_emission->strength));value->value(text);y+=row;}
+  }
   Fl_Check_Button toon(20, y, width / 2 - 20, row, "Toon preview"),
       double_sided(width / 2, y, width / 2 - 20, row, "Double sided");
   toon.value(material.toon);
   double_sided.value(material.double_sided);
   y += row;
+  content.size(width-24,y+row);
   content.end();
   scroll.end();
   Fl_Button cancel(width / 2 - 150, height - row * 2 + 8, 140, row, "Cancel"),
@@ -166,11 +178,11 @@ void edit_object(Document &document) {
   for (int i = 0; i < 4; ++i)
     material.color[i] = color[i]->value();
   for (int i = 0; i < 3; ++i)
-    material.emissive[i] = emission[i]->value();
+    if(emission_override)emission_override->at(i)=emission[i]->value();else material.emissive[i] = emission[i]->value();
   material.toon = toon.value();
   material.double_sided = double_sided.value();
   document.object_properties(object.id, name.value(), visible.value(),
-                             locked.value(), t, material,{state->generation,state->revision,object.id,state->edit_authority});
+                             locked.value(), t, material,{state->generation,state->revision,object.id,state->edit_authority},emission_override);
 }
 void edit_sculpt_layer(Document &document) {
   auto state = document.frame().state;

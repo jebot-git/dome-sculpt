@@ -1,0 +1,369 @@
+{
+  "recorded_utc": "2026-11-03T22:26:02.334888+00:00",
+  "qualified_source": "592bc76b67f396b5fc594535722e6528740fc278",
+  "canonical_DomeD": "53b0fcaf533ad867300d65a4178285d0a2dbef58",
+  "canonical_cairo_patch_sha256": "260d2b81b7557a6c01bcda2bddea3864a8cfb4c7bdc40353c908a54b41278fdf",
+  "scope": "Fresh selected native application/core/support/render and 34 test executables /35 registered commands in each profile; not all-target/full-regression or current-device qualification. Existing FLTK source unchanged, new optimized bitmap SDK has153 identical public headers. Owned sanitizer includes matching FLTK; external bitmap libraries optimized, not all instrumented.",
+  "records": {
+    "fresh-release": {
+      "status_sha256": "e5ab370adeb5985d8369d37f3f353d31c4e62413ba11ac2401ba3919c442ba5a",
+      "result": {
+        "profile": "release",
+        "source": "592bc76b67f396b5fc594535722e6528740fc278",
+        "steps": [
+          {
+            "command": [
+              "cmake",
+              "-S",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native-package-sdk-2220",
+              "-B",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native-package-sdk-2220/build-sdk-release",
+              "-DCMAKE_BUILD_TYPE=Release",
+              "-DDOME_COMPUTE_BACKEND=CPU",
+              "-DDOME_BUILD_UI=ON",
+              "-DDOME_BUILD_XR=ON",
+              "-DCMAKE_EXPORT_COMPILE_COMMANDS=ON",
+              "-DFLTK_DIR=/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/toolkit/share/fltk",
+              "-U*DOME_BITMAP_RUNTIME*",
+              "-U*NATIVEGL*",
+              "-U*RENDERFONTS*"
+            ],
+            "exit": 0,
+            "seconds": 3.7346485129965004
+          },
+          {
+            "command": [
+              "cmake",
+              "--build",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native-package-sdk-2220/build-sdk-release",
+              "--parallel",
+              "2",
+              "--target",
+              "dome-sculpt",
+              "dome-sculpt-test-runtime",
+              "dome-sculpt-emission-background-test",
+              "dome-sculpt-emission-scene-test",
+              "dome-sculpt-emission-paint-data-test",
+              "dome-sculpt-paint-overlay-gpu-test",
+              "dome-sculpt-scene-test",
+              "dome-sculpt-source-union-version-test",
+              "dome-sculpt-unlit-fallback-test",
+              "dome-sculpt-paint-test",
+              "dome-sculpt-source-paint-owning-test",
+              "dome-sculpt-source-paint-scene-test",
+              "dome-sculpt-source-paint-resources-test",
+              "dome-sculpt-source-paint-faults-test",
+              "dome-sculpt-source-paint-overlay-test",
+              "dome-sculpt-material-visibility-test",
+              "dome-sculpt-source-paint-native-test",
+              "dome-sculpt-source-paint-sampler-test",
+              "dome-sculpt-source-paint-mtoon-test",
+              "dome-sculpt-mtoon-render-test",
+              "dome-sculpt-source-paint-import-test",
+              "dome-sculpt-source-sampling-transport-test",
+              "dome-sculpt-source-capture-storage-test",
+              "dome-sculpt-source-paint-ui-test",
+              "dome-sculpt-source-paint-export-test",
+              "dome-sculpt-source-paint-bake-test",
+              "dome-sculpt-source-uv-bake-test",
+              "dome-sculpt-source-uv-adopt-test",
+              "dome-sculpt-emission-exr-test",
+              "dome-sculpt-emission-export-test",
+              "dome-sculpt-emission-vrm-test",
+              "dome-sculpt-emission-export-worker-test",
+              "dome-sculpt-emission-linear-test",
+              "dome-sculpt-mtoon-emission-test",
+              "dome-sculpt-scene-file-test",
+              "dome-sculpt-emission-package-budget-test",
+              "dome-sculpt-project-files-test"
+            ],
+            "exit": 0,
+            "seconds": 536.8453552970022
+          }
+        ],
+        "seconds": 540.667392280011,
+        "inputs": 2032,
+        "unchanged": true,
+        "scope": "Fresh whole own native FLTK/OpenXR app/core/support/render and selected consumers for native package Open/budget+canonical592bc SDK migration: Source4 import/pristine export, explicit portable compiler, HDR GLB/VRM package1/2, native package recovery and aggregate decoded-field budget. 37 targets, including34 test executables/35 registered commands. Entire own app/core/render/support/selected consumers rebuilt; new canonical bitmap SDK has153 byte-identical public headers, optimized libraries. Canonical FLTK source remains unchanged; matching owned instrumented FLTK used for sanitizer. SDK sources/headers/libraries/manifest captured alongside application inputs. No preceding archives reused. Build only, no runtime/GUI/hardware/export claim."
+      }
+    },
+    "fresh-sanitize": {
+      "status_sha256": "580b74bde54719bdbdf4d85f3da0e342ae5435fa6c51cec6950750607c26f9b7",
+      "result": {
+        "profile": "sanitize",
+        "source": "592bc76b67f396b5fc594535722e6528740fc278",
+        "steps": [
+          {
+            "command": [
+              "cmake",
+              "-S",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native-package-sdk-2220",
+              "-B",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native-package-sdk-2220/build-sdk-sanitize",
+              "-DCMAKE_BUILD_TYPE=Release",
+              "-DDOME_COMPUTE_BACKEND=CPU",
+              "-DDOME_BUILD_UI=ON",
+              "-DDOME_BUILD_XR=ON",
+              "-DCMAKE_EXPORT_COMPILE_COMMANDS=ON",
+              "-DFLTK_DIR=/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/toolkit-sanitize/share/fltk",
+              "-U*DOME_BITMAP_RUNTIME*",
+              "-U*NATIVEGL*",
+              "-U*RENDERFONTS*",
+              "-DCMAKE_C_FLAGS_RELEASE=-O1 -g1 -fsanitize=address,undefined -fno-omit-frame-pointer",
+              "-DCMAKE_CXX_FLAGS_RELEASE=-O1 -g1 -fsanitize=address,undefined -fno-omit-frame-pointer",
+              "-DCMAKE_EXE_LINKER_FLAGS=-fsanitize=address,undefined",
+              "-DCMAKE_SHARED_LINKER_FLAGS=-fsanitize=address,undefined"
+            ],
+            "exit": 0,
+            "seconds": 3.8877435279719066
+          },
+          {
+            "command": [
+              "cmake",
+              "--build",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native-package-sdk-2220/build-sdk-sanitize",
+              "--parallel",
+              "2",
+              "--target",
+              "dome-sculpt",
+              "dome-sculpt-test-runtime",
+              "dome-sculpt-emission-background-test",
+              "dome-sculpt-emission-scene-test",
+              "dome-sculpt-emission-paint-data-test",
+              "dome-sculpt-paint-overlay-gpu-test",
+              "dome-sculpt-scene-test",
+              "dome-sculpt-source-union-version-test",
+              "dome-sculpt-unlit-fallback-test",
+              "dome-sculpt-paint-test",
+              "dome-sculpt-source-paint-owning-test",
+              "dome-sculpt-source-paint-scene-test",
+              "dome-sculpt-source-paint-resources-test",
+              "dome-sculpt-source-paint-faults-test",
+              "dome-sculpt-source-paint-overlay-test",
+              "dome-sculpt-material-visibility-test",
+              "dome-sculpt-source-paint-native-test",
+              "dome-sculpt-source-paint-sampler-test",
+              "dome-sculpt-source-paint-mtoon-test",
+              "dome-sculpt-mtoon-render-test",
+              "dome-sculpt-source-paint-import-test",
+              "dome-sculpt-source-sampling-transport-test",
+              "dome-sculpt-source-capture-storage-test",
+              "dome-sculpt-source-paint-ui-test",
+              "dome-sculpt-source-paint-export-test",
+              "dome-sculpt-source-paint-bake-test",
+              "dome-sculpt-source-uv-bake-test",
+              "dome-sculpt-source-uv-adopt-test",
+              "dome-sculpt-emission-exr-test",
+              "dome-sculpt-emission-export-test",
+              "dome-sculpt-emission-vrm-test",
+              "dome-sculpt-emission-export-worker-test",
+              "dome-sculpt-emission-linear-test",
+              "dome-sculpt-mtoon-emission-test",
+              "dome-sculpt-scene-file-test",
+              "dome-sculpt-emission-package-budget-test",
+              "dome-sculpt-project-files-test"
+            ],
+            "exit": 0,
+            "seconds": 894.9689373440051
+          }
+        ],
+        "seconds": 900.7077151970007,
+        "inputs": 2032,
+        "unchanged": true,
+        "scope": "Fresh whole own native FLTK/OpenXR app/core/support/render and selected consumers for native package Open/budget+canonical592bc SDK migration: Source4 import/pristine export, explicit portable compiler, HDR GLB/VRM package1/2, native package recovery and aggregate decoded-field budget. 37 targets, including34 test executables/35 registered commands. Entire own app/core/render/support/selected consumers rebuilt; new canonical bitmap SDK has153 byte-identical public headers, optimized libraries. Canonical FLTK source remains unchanged; matching owned instrumented FLTK used for sanitizer. SDK sources/headers/libraries/manifest captured alongside application inputs. No preceding archives reused. Build only, no runtime/GUI/hardware/export claim."
+      }
+    },
+    "selected-release": {
+      "status_sha256": "824022fd4fc84581e8f3630d8baa419bdf354975a0b8759fe2433928dfb42655",
+      "result": {
+        "state": "terminal",
+        "pid": 3833329,
+        "source": "592bc76b67f396b5fc594535722e6528740fc278",
+        "profile": "release",
+        "scope": "35 actual registered commands,34 fresh same-source selected test executables on canonical53b bitmapSDK; original commands/timeouts/properties, fresh owned app/core/support/render. No full-suite, hardware, physical-headset or native GUI claim.",
+        "command": [
+          "ctest",
+          "--test-dir",
+          "/home/blux/de-xr/dome-sculpt/artifacts/native-package-sdk-2220/build-sdk-release",
+          "--output-on-failure",
+          "-R",
+          "^(scene\\-file|emission\\-exr|emission\\-export|emission\\-package\\-budget|emission\\-vrm|emission\\-export\\-worker|emission\\-linear|emission\\-paint\\-data|physical\\-emission\\-background|emission\\-scene|source\\-paint\\-owning|source\\-paint\\-resources|source\\-paint\\-faults|source\\-paint\\-authored\\-faults|source\\-paint\\-scene|source\\-sampling\\-transport|source\\-capture\\-storage|texture\\-painting|scene\\-authoring|source\\-paint\\-overlay|source\\-paint\\-native|source\\-paint\\-sampler|source\\-paint\\-mtoon|source\\-paint\\-import|source\\-paint\\-export|source\\-paint\\-bake|material\\-visibility|paint\\-overlay\\-gpu|unlit\\-fallback|mtoon\\-render|source\\-uv\\-bake|source\\-uv\\-adopt|mtoon\\-emission|project\\-files|source\\-union\\-version)$"
+        ],
+        "selected": 35,
+        "executables": 34,
+        "child_pid": 3833511,
+        "exit_code": 0,
+        "seconds": 139.28461668101954,
+        "inputs": 2112,
+        "drift": []
+      }
+    },
+    "selected-sanitize": {
+      "status_sha256": "bcca24ce2afcb783cf7165b48799579501a3ad2520ce7c200abe0f3eca2f3950",
+      "result": {
+        "state": "terminal",
+        "pid": 3833330,
+        "source": "592bc76b67f396b5fc594535722e6528740fc278",
+        "profile": "sanitize",
+        "scope": "35 actual registered commands,34 fresh same-source selected test executables on canonical53b bitmapSDK; original commands/timeouts/properties, fresh owned app/core/support/render. No full-suite, hardware, physical-headset or native GUI claim.",
+        "command": [
+          "ctest",
+          "--test-dir",
+          "/home/blux/de-xr/dome-sculpt/artifacts/native-package-sdk-2220/build-sdk-sanitize",
+          "--output-on-failure",
+          "-R",
+          "^(scene\\-file|emission\\-exr|emission\\-export|emission\\-package\\-budget|emission\\-vrm|emission\\-export\\-worker|emission\\-linear|emission\\-paint\\-data|physical\\-emission\\-background|emission\\-scene|source\\-paint\\-owning|source\\-paint\\-resources|source\\-paint\\-faults|source\\-paint\\-authored\\-faults|source\\-paint\\-scene|source\\-sampling\\-transport|source\\-capture\\-storage|texture\\-painting|scene\\-authoring|source\\-paint\\-overlay|source\\-paint\\-native|source\\-paint\\-sampler|source\\-paint\\-mtoon|source\\-paint\\-import|source\\-paint\\-export|source\\-paint\\-bake|material\\-visibility|paint\\-overlay\\-gpu|unlit\\-fallback|mtoon\\-render|source\\-uv\\-bake|source\\-uv\\-adopt|mtoon\\-emission|project\\-files|source\\-union\\-version)$"
+        ],
+        "selected": 35,
+        "executables": 34,
+        "child_pid": 3834709,
+        "exit_code": 0,
+        "seconds": 588.3554065210046,
+        "inputs": 2112,
+        "drift": []
+      }
+    },
+    "native-menu-release-wrapper": {
+      "status_sha256": "42e54d24bafc25f5de82eb13d781600ed5297fc03ece9e3844490493727ddde2",
+      "result": {
+        "state": "terminal",
+        "pid": 3921145,
+        "source": "592bc76b67f396b5fc594535722e6528740fc278",
+        "mode": "normal",
+        "scope": "Actual fresh592bc native FLTK app/canonical53b bitmapSDK, package Open via universal menu, native chooser/modal cancel, unsaved identity, Save As to exact native project, reopen and Quit. Private Xvfb/bus/HOME; no native Wayland or physical headset claim.",
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/selection-gui-venv/bin/python",
+          "/home/blux/de-xr/dome-sculpt/artifacts/native-package-sdk-2220/artifacts/union/sdk-menu-release.py"
+        ],
+        "child_pid": 3921171,
+        "exit_code": 0,
+        "seconds": 14.722721436002757,
+        "report": {
+          "checks": [
+            {
+              "passed": true,
+              "check": "Package Open uses the actual native chooser with DomeD modal ownership"
+            },
+            {
+              "passed": true,
+              "check": "Universal Close cancels Open without changing the current project"
+            },
+            {
+              "passed": true,
+              "check": "Actual native Open restores the package as Untitled with an unsaved marker and preserves its source bytes"
+            },
+            {
+              "passed": true,
+              "check": "Ordinary Save after package Open requests a native project destination"
+            },
+            {
+              "passed": true,
+              "check": "Cancelling Save As preserves the unsaved document and original package"
+            },
+            {
+              "passed": true,
+              "check": "Actual FLTK Save writes the exact recovered native scene to a new project without overwriting the GLB"
+            },
+            {
+              "passed": true,
+              "check": "Reopening the saved native project restores its clean project identity"
+            },
+            {
+              "passed": true,
+              "check": "DomeD Close Window exits cleanly after package recovery and leaves both formats intact"
+            }
+          ],
+          "failed": 0
+        },
+        "inputs": 1610,
+        "drift": []
+      }
+    },
+    "native-menu-sanitize-wrapper": {
+      "status_sha256": "9d8225e5e630c20d669031c70401dad95a585d6d7cfb2b51114b90605f65782a",
+      "result": {
+        "state": "terminal",
+        "pid": 3921144,
+        "source": "592bc76b67f396b5fc594535722e6528740fc278",
+        "mode": "normal",
+        "scope": "Actual fresh592bc native FLTK app/canonical53b bitmapSDK, package Open via universal menu, native chooser/modal cancel, unsaved identity, Save As to exact native project, reopen and Quit. Private Xvfb/bus/HOME; no native Wayland or physical headset claim.",
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/selection-gui-venv/bin/python",
+          "/home/blux/de-xr/dome-sculpt/artifacts/native-package-sdk-2220/artifacts/union/sdk-menu-sanitize.py"
+        ],
+        "child_pid": 3921333,
+        "exit_code": 0,
+        "seconds": 25.126651361002587,
+        "report": {
+          "checks": [
+            {
+              "passed": true,
+              "check": "Package Open uses the actual native chooser with DomeD modal ownership"
+            },
+            {
+              "passed": true,
+              "check": "Universal Close cancels Open without changing the current project"
+            },
+            {
+              "passed": true,
+              "check": "Actual native Open restores the package as Untitled with an unsaved marker and preserves its source bytes"
+            },
+            {
+              "passed": true,
+              "check": "Ordinary Save after package Open requests a native project destination"
+            },
+            {
+              "passed": true,
+              "check": "Cancelling Save As preserves the unsaved document and original package"
+            },
+            {
+              "passed": true,
+              "check": "Actual FLTK Save writes the exact recovered native scene to a new project without overwriting the GLB"
+            },
+            {
+              "passed": true,
+              "check": "Reopening the saved native project restores its clean project identity"
+            },
+            {
+              "passed": true,
+              "check": "DomeD Close Window exits cleanly after package recovery and leaves both formats intact"
+            }
+          ],
+          "failed": 0
+        },
+        "inputs": 1610,
+        "drift": []
+      }
+    },
+    "old-SDK-control": {
+      "status_sha256": "91db742cfe5cb4633d2cfbefb0bf340acc860c1dd5d59cb9ada8061758ba2b1e",
+      "result": {
+        "source": "592bc76b67f396b5fc594535722e6528740fc278",
+        "command": [
+          "cmake",
+          "-S",
+          "/home/blux/de-xr/dome-sculpt/artifacts/native-package-sdk-2220",
+          "-B",
+          "/home/blux/de-xr/dome-sculpt/artifacts/native-package-sdk-2220/build-sdk-old-control",
+          "-DCMAKE_BUILD_TYPE=Release",
+          "-DDOME_COMPUTE_BACKEND=CPU",
+          "-DFLTK_DIR=/home/blux/de-xr/dome-sculpt/artifacts/domed-cairo-cleanup-b2f23ce/artifacts/toolkit/share/fltk",
+          "-U*DOME_BITMAP_RUNTIME*",
+          "-U*NATIVEGL*",
+          "-U*RENDERFONTS*"
+        ],
+        "exit": 1,
+        "expected": 1,
+        "specific_guard": true
+      }
+    }
+  },
+  "limits": [
+    "No new native Wayland/compositor qualification.",
+    "No new physical headset or GPU/compute qualification.",
+    "No painted-native producer, generic native append or later agent work in this runtime.",
+    "No system installation/session restart.",
+    "Standalone-XR Mesa112B report remains open; no suppression.",
+    "Complete original production objective remains active/incomplete."
+  ]
+}

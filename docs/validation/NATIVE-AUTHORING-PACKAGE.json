@@ -1,0 +1,327 @@
+{
+  "version": 1,
+  "date": "2026-11-03",
+  "parent": "466d84bc7e011432894bf3149374e10a64254661",
+  "private": true,
+  "publishedMain": false,
+  "fullGoalComplete": false,
+  "sourceSha256": {
+    "CMakeLists.txt": "00713e6cd277ddf76bf915cee798db9d2edaf038ef60c19ba3bf558dfbb9f7a7",
+    "include/dome/native-authoring.hpp": "92784b1b349738fcddd4ecb561944ec6239ddbc4ed96f1a9308916fb2071d631",
+    "src/native-authoring-capture.hpp": "d001c29dc7f5e406e7513cfb8e624ec0f1e32d0e601247a747112a93342d9877",
+    "src/native-authoring.cpp": "62395322ea420755f128246227f5f530a7c3c276bb7ce3d434f43c173de75f7a",
+    "src/native-scene-payload.hpp": "3081447649a05f7b950f627abd2d03914d9bbf72df83eecd7fc4cdfaf33284ca",
+    "src/emission-package.cpp": "a4af54eff729e13556fb67a66e901526a1289be1b8a2bf66859f046bf7243458",
+    "tests/native-authoring.cpp": "c2398cf48c49b9ac92aff87b7ab0f997da484daa7b15a2fb969fc52120a9a2ad",
+    "tests/native-authoring-real.cpp": "d66ef8ffb7f4c8e7f52cb085f63f516a84b1aa824978cbb3f22bb95f0ea64131"
+  },
+  "api": {
+    "additive": "Scene-owner export_glb_authoring +extract_native_authoring/new standalone option+limits types",
+    "existingOptionLayoutAppend": false,
+    "importedOriginalGraphRequired": false,
+    "privateOriginalCapture": true,
+    "arbitraryChangedSurfaceTrustFlag": false,
+    "generalU64Remaps": "canonical decimal strings",
+    "competingOwnersMarkersRefuse": true
+  },
+  "format": {
+    "marker": "domeSculptAuthoring",
+    "version": 1,
+    "encodings": [
+      "scene-cbor",
+      "scene-cbor-deflate"
+    ],
+    "noFakeExrHdrTable": true,
+    "fallback": {
+      "view": "existing-gltf-core",
+      "lossless": false
+    },
+    "limits": {
+      "containerBytes": 268435456,
+      "storedNativeBytes": 134217728,
+      "expandedNativeBytes": 268435456,
+      "jsonBytes": 16777216,
+      "emittedObjects": 256
+    },
+    "actualSceneDecoderOwnsFeatureValidation": true,
+    "hdr1And2ValidBytesPreserved": true
+  },
+  "profiles": {
+    "release": {
+      "result": {
+        "profile": "release",
+        "buildSeconds": 25.261599844990997,
+        "tests": [
+          {
+            "name": "authoring",
+            "exit": 0,
+            "seconds": 0.039686358999460936
+          },
+          {
+            "name": "budget",
+            "exit": 0,
+            "seconds": 0.24829617200884968
+          },
+          {
+            "name": "codec",
+            "exit": 0,
+            "seconds": 0.004570142016746104
+          },
+          {
+            "name": "hdr",
+            "exit": 0,
+            "seconds": 0.09927511800196953
+          }
+        ],
+        "unchanged": true,
+        "inputs": 1543,
+        "scope": "Matched466d immutable8archives over wholly own41b support; one complete runtimeTU replaced plus one complete newTU and4 complete consumers; matching headers/profile flags, old package member removed/linkmaps. Not fresh wholeapp/core build; external shared libs uninstrumented."
+      },
+      "postProofRegistrationOnlyChanges": {
+        "/home/blux/de-xr/dome-sculpt/artifacts/native-authoring-container-466d84b/CMakeLists.txt": {
+          "proofEndSha256": "c531e8f7619fa018bb4e4f312f065672e8bd2c5143b6866d4011c9a0069e3769",
+          "currentSha256": "00713e6cd277ddf76bf915cee798db9d2edaf038ef60c19ba3bf558dfbb9f7a7"
+        }
+      },
+      "actualCc0Compressed": {
+        "exit": 0,
+        "seconds": 13.206221451982856,
+        "unchanged": true,
+        "sha256": {
+          "/home/blux/de-xr/dome-sculpt/artifacts/native-authoring-container-466d84b/artifacts/real-authoring/probe.cpp": "d66ef8ffb7f4c8e7f52cb085f63f516a84b1aa824978cbb3f22bb95f0ea64131",
+          "/home/blux/de-xr/dome-sculpt/artifacts/native-authoring-container-466d84b/artifacts/real-authoring/release/probe": "f57179a0dfc8a5f2cc148e1df85c68575c4afcb9caea4b4b2b2407de08273c24",
+          "/home/blux/de-xr/dome-sculpt/artifacts/native-authoring-container-466d84b/artifacts/authoring-component/release/libraries/libdome-sculpt-core.a": "6be57b160e1274f99c759772410fb4a0920b3470cda65d8353f80b3dc6170a80",
+          "/home/blux/de-xr/dome-sculpt/artifacts/native-authoring-container-466d84b/artifacts/authoring-component/release/libraries/libdome-sculpt-affine.a": "e0363c8a9406b3738feea6a7d2832bf7954914e3f4b7ff8ed5591f9dbf320a33",
+          "/home/blux/de-xr/dome-sculpt/artifacts/native-authoring-container-466d84b/artifacts/authoring-component/release/libraries/libdome-sculpt-polygon.a": "17e545abb995e5b3178a9ffc33909f189acccb3abddb194c589c5fb658d0bb30",
+          "/home/blux/de-xr/dome-sculpt/artifacts/native-authoring-container-466d84b/artifacts/authoring-component/release/libraries/libxatlas.a": "e7fcc969c1c43c6696497e0d891042ce2c41fc97073f080587e0977a185f4558",
+          "/home/blux/de-xr/dome-sculpt/artifacts/native-authoring-container-466d84b/artifacts/authoring-component/release/libraries/libmikktspace.a": "b3a53d9224948763a39444c406626f2704467d6db098d8735e873dac1a7660fd",
+          "/home/blux/de-xr/dome-sculpt/artifacts/native-authoring-container-466d84b/artifacts/authoring-component/release/libraries/libmikktspace-robust.a": "876e9d9a09f5c50389c0ac11a68170c6e0a0cd89ff7ae26153862db0554dd6a5",
+          "/home/blux/de-xr/dome-sculpt/artifacts/native-authoring-container-466d84b/artifacts/authoring-component/release/libraries/libufbx.a": "5fac78d86641bba119ae62beb1de6d0129c89cc3b587247ab30d95bacdc93f02",
+          "/home/blux/de-xr/dome-sculpt/artifacts/native-authoring-container-466d84b/artifacts/authoring-component/release/libraries/libdome-sculpt-emission-codec.a": "2d4b8a401700ef32a32c435821e78b39dd003963f09e6af607adfdca3b709195"
+        },
+        "scope": "Additional complete real-CC0 consumer TU over exact frozen authoring component headers/8libraries, no source/runtime mutation; same profile instrumented-own support."
+      },
+      "artifactsSha256": {
+        "artifacts/authoring-component/release/before.json": "25c63b7a20c70557e9855793b18326c312bc04638f24ad293bee5b37e92dd5b5",
+        "artifacts/authoring-component/release/after.json": "25c63b7a20c70557e9855793b18326c312bc04638f24ad293bee5b37e92dd5b5",
+        "artifacts/authoring-component/release/build.log": "01bb3c81bb4860c5c3995ac674a7435456afe8a90d820c017e36846b59fe69e1",
+        "artifacts/authoring-component/release/authoring.log": "b94a6887949bc34ab88a768c6831f27fab36e82146d35d30efd4a42bf2302840",
+        "artifacts/authoring-component/release/budget.log": "0a6fcd0a52f2cf461237d06b6844b2d3e58b0e0f9a7b2cf6e66e8b0d936feef1",
+        "artifacts/authoring-component/release/codec.log": "a75e59d488824ad55c0eaff8e193e1218b148c6436098c7c3b2c52be35d87a21",
+        "artifacts/authoring-component/release/hdr.log": "ed4c53e5611fe74c9e74928c81527bcc24a8db27d798e1b70b2b97bc7a26bb43",
+        "artifacts/authoring-component/release/status.json": "2db13fb41505601ea9965aa97f3865ce52173fbf35af2e330644b9dfc69ab2bc",
+        "artifacts/real-authoring/release/run.log": "6c553d80d036c48b50457876dffb1777e1f5030645a1da7db0c4e638c881a939",
+        "artifacts/real-authoring/release/status.json": "3ca13bfc10fed9616573bbe7506511c4c973f9db9683245ba3488010155a6c2d"
+      }
+    },
+    "sanitize": {
+      "result": {
+        "profile": "sanitize",
+        "buildSeconds": 52.502095675008604,
+        "tests": [
+          {
+            "name": "authoring",
+            "exit": 0,
+            "seconds": 0.28298455697949976
+          },
+          {
+            "name": "budget",
+            "exit": 0,
+            "seconds": 0.5027564000047278
+          },
+          {
+            "name": "codec",
+            "exit": 0,
+            "seconds": 0.021308718976797536
+          },
+          {
+            "name": "hdr",
+            "exit": 0,
+            "seconds": 0.7296236990077887
+          }
+        ],
+        "unchanged": true,
+        "inputs": 1543,
+        "scope": "Matched466d immutable8archives over wholly own41b support; one complete runtimeTU replaced plus one complete newTU and4 complete consumers; matching headers/profile flags, old package member removed/linkmaps. Not fresh wholeapp/core build; external shared libs uninstrumented."
+      },
+      "postProofRegistrationOnlyChanges": {
+        "/home/blux/de-xr/dome-sculpt/artifacts/native-authoring-container-466d84b/CMakeLists.txt": {
+          "proofEndSha256": "c531e8f7619fa018bb4e4f312f065672e8bd2c5143b6866d4011c9a0069e3769",
+          "currentSha256": "00713e6cd277ddf76bf915cee798db9d2edaf038ef60c19ba3bf558dfbb9f7a7"
+        }
+      },
+      "actualCc0Compressed": {
+        "exit": 0,
+        "seconds": 38.99508939500083,
+        "unchanged": true,
+        "sha256": {
+          "/home/blux/de-xr/dome-sculpt/artifacts/native-authoring-container-466d84b/artifacts/real-authoring/probe.cpp": "d66ef8ffb7f4c8e7f52cb085f63f516a84b1aa824978cbb3f22bb95f0ea64131",
+          "/home/blux/de-xr/dome-sculpt/artifacts/native-authoring-container-466d84b/artifacts/real-authoring/sanitize/probe": "179ec06bad16d5e538d934e8a270650ab8093729da1414c80b74521508ddd295",
+          "/home/blux/de-xr/dome-sculpt/artifacts/native-authoring-container-466d84b/artifacts/authoring-component/sanitize/libraries/libdome-sculpt-core.a": "5e5073f19d0165f453051fcf3b002db12654eb63b7ed9d31d0db37d795f77d40",
+          "/home/blux/de-xr/dome-sculpt/artifacts/native-authoring-container-466d84b/artifacts/authoring-component/sanitize/libraries/libdome-sculpt-affine.a": "df46f0c7d52e540c6e3d8cb4a6fdaaa0faccc1886a79ac5bc42f367eeb8ee48a",
+          "/home/blux/de-xr/dome-sculpt/artifacts/native-authoring-container-466d84b/artifacts/authoring-component/sanitize/libraries/libdome-sculpt-polygon.a": "a84704bd2d09b6163c901e1b30781000339731c99febe4b06be90387ae233ff3",
+          "/home/blux/de-xr/dome-sculpt/artifacts/native-authoring-container-466d84b/artifacts/authoring-component/sanitize/libraries/libxatlas.a": "3dab15ccd6851edb19ec7f9f3917812d3ea704fd5bda90bb55acf82788d3c357",
+          "/home/blux/de-xr/dome-sculpt/artifacts/native-authoring-container-466d84b/artifacts/authoring-component/sanitize/libraries/libmikktspace.a": "df45ff4a9e796df24f58bd4bbfd90bae96f616504e84c2c1b099ee7e68c3bc16",
+          "/home/blux/de-xr/dome-sculpt/artifacts/native-authoring-container-466d84b/artifacts/authoring-component/sanitize/libraries/libmikktspace-robust.a": "71d00db2b82979032e20aefcb9016f0da10074a67bbcdfb0dd01e804f6fba6e8",
+          "/home/blux/de-xr/dome-sculpt/artifacts/native-authoring-container-466d84b/artifacts/authoring-component/sanitize/libraries/libufbx.a": "d5b5a52a5925ae91a0b358c0dcde3c016398c63edad8cf59ef74d5ad87e8e54e",
+          "/home/blux/de-xr/dome-sculpt/artifacts/native-authoring-container-466d84b/artifacts/authoring-component/sanitize/libraries/libdome-sculpt-emission-codec.a": "b4cc3dec7024e915e7111e11b5db18ebf043d3bb59afa2163f4fd002dd5455f0"
+        },
+        "scope": "Additional complete real-CC0 consumer TU over exact frozen authoring component headers/8libraries, no source/runtime mutation; same profile instrumented-own support."
+      },
+      "artifactsSha256": {
+        "artifacts/authoring-component/sanitize/before.json": "bcca1778cef0f86b5ede3e58547785966e1145ca252a7d789c8e682e2c4a6637",
+        "artifacts/authoring-component/sanitize/after.json": "bcca1778cef0f86b5ede3e58547785966e1145ca252a7d789c8e682e2c4a6637",
+        "artifacts/authoring-component/sanitize/build.log": "01bb3c81bb4860c5c3995ac674a7435456afe8a90d820c017e36846b59fe69e1",
+        "artifacts/authoring-component/sanitize/authoring.log": "b94a6887949bc34ab88a768c6831f27fab36e82146d35d30efd4a42bf2302840",
+        "artifacts/authoring-component/sanitize/budget.log": "0a6fcd0a52f2cf461237d06b6844b2d3e58b0e0f9a7b2cf6e66e8b0d936feef1",
+        "artifacts/authoring-component/sanitize/codec.log": "a75e59d488824ad55c0eaff8e193e1218b148c6436098c7c3b2c52be35d87a21",
+        "artifacts/authoring-component/sanitize/hdr.log": "ed4c53e5611fe74c9e74928c81527bcc24a8db27d798e1b70b2b97bc7a26bb43",
+        "artifacts/authoring-component/sanitize/status.json": "a8491e5d51e8ddfb33a2983a375c0473e070c8d0c61ec68fe2488259b12393ce",
+        "artifacts/real-authoring/sanitize/run.log": "6c553d80d036c48b50457876dffb1777e1f5030645a1da7db0c4e638c881a939",
+        "artifacts/real-authoring/sanitize/status.json": "62e476871158d701746684db0f24daa12c172b07b11d0572cd35380545653219"
+      }
+    }
+  },
+  "checksPerProfile": {
+    "authoring": 28,
+    "budget": 4,
+    "codec": 14,
+    "hdr": 32
+  },
+  "pairedSmallFixtureFiles": [
+    {
+      "file": "authoring-output/authoring.glb",
+      "bytes": 52008,
+      "sha256": "ffb7025284bf75a792939d30eb2fbf6dd1fd347c2a6a45b261f780765144905d"
+    },
+    {
+      "file": "authoring-output/restored.dsculpt",
+      "bytes": 42848,
+      "sha256": "a650d62b4fc91084671d1466a3554dcc932fc4a8769093efe5ee57b17c427699"
+    },
+    {
+      "file": "authoring-output/second-cycle.glb",
+      "bytes": 52008,
+      "sha256": "ffb7025284bf75a792939d30eb2fbf6dd1fd347c2a6a45b261f780765144905d"
+    },
+    {
+      "file": "authoring-output/source.glb",
+      "bytes": 3296,
+      "sha256": "9b828fd84ac78d28dcff90a7d4a20e8226e52d792f91c7bcd8ecea6896f21f77"
+    },
+    {
+      "file": "authoring-output/subset.glb",
+      "bytes": 28284,
+      "sha256": "1b1a0dad73a514cdd46358ce0ed0ecfbed7474b4a65d1ae20c58fc52dc25d14e"
+    },
+    {
+      "file": "authoring-output/wide-id.glb",
+      "bytes": 28320,
+      "sha256": "78f9d6ed10cef2bc549dc820c40c364595e1436ff31c1c2f3482c301dc2cf21a"
+    },
+    {
+      "file": "hdr-output/physical.glb",
+      "bytes": 1244176,
+      "sha256": "85b4a26ce213ec550515686d5ac5b21295df9ef089758aabdae6a0c34b07b764"
+    },
+    {
+      "file": "hdr-output/second-cycle.glb",
+      "bytes": 1244176,
+      "sha256": "85b4a26ce213ec550515686d5ac5b21295df9ef089758aabdae6a0c34b07b764"
+    },
+    {
+      "file": "hdr-output/subset.glb",
+      "bytes": 838236,
+      "sha256": "46ec96696461fe95b30ee5140e1c46ac3f0612a7451477d9f732690b7d315f63"
+    },
+    {
+      "file": "budget-output/aggregate-rebound.glb",
+      "bytes": 97076,
+      "sha256": "f033f695c4a6cb277133e2af7494c931c3e759e93cc8403ccad3bcc8f2411a24"
+    },
+    {
+      "file": "budget-output/large-valid.glb",
+      "bytes": 97072,
+      "sha256": "196b57ac2ec29a69792d9c7c01ecda6a97cd42a7c60fae8fbad98a7122159749"
+    },
+    {
+      "file": "budget-output/small-valid.glb",
+      "bytes": 19612,
+      "sha256": "e158abc7d4ee5aaa45a883741129ddce5f8cc49ab2179eeeabbe8ae55d561fb6"
+    },
+    {
+      "file": "codec-output/actual-emission.exr",
+      "bytes": 6296,
+      "sha256": "b251f7d2de189641bf8496db9135dd6543b90423ad84c52d38262453127440b6"
+    }
+  ],
+  "existingHdrGlbsByteIdentical": [
+    {
+      "file": "physical.glb",
+      "bytes": 1244176,
+      "sha256": "85b4a26ce213ec550515686d5ac5b21295df9ef089758aabdae6a0c34b07b764"
+    },
+    {
+      "file": "second-cycle.glb",
+      "bytes": 1244176,
+      "sha256": "85b4a26ce213ec550515686d5ac5b21295df9ef089758aabdae6a0c34b07b764"
+    },
+    {
+      "file": "subset.glb",
+      "bytes": 838236,
+      "sha256": "46ec96696461fe95b30ee5140e1c46ac3f0612a7451477d9f732690b7d315f63"
+    }
+  ],
+  "realCc0Compressed": {
+    "base": "vroid-beta-male",
+    "parts": 19,
+    "realSparseColourStroke": true,
+    "expandedBytes": 138426115,
+    "wholeGlbBytes": 43109764,
+    "nativeRigMorphSourceAndAliasesExact": true,
+    "secondCycleByteIdentical": true,
+    "expandedLimitNegative": true,
+    "registeredConsumerByteIdenticalToCompiledArtifact": true,
+    "pairedOutputs": [
+      {
+        "file": "real-authoring.glb",
+        "bytes": 43109764,
+        "sha256": "242cd165f6542ef52b58519adfc51809260f67a317b1560a86f074518c1c7c0d"
+      },
+      {
+        "file": "second-cycle.glb",
+        "bytes": 43109764,
+        "sha256": "242cd165f6542ef52b58519adfc51809260f67a317b1560a86f074518c1c7c0d"
+      }
+    ]
+  },
+  "standards": {
+    "validator": "2.0.0-dev.3.10",
+    "maxIssues": 0,
+    "smallFiles": 5,
+    "smallErrors": 0,
+    "smallWarningsUnfiltered": 0,
+    "smallInfosUnfiltered": 19,
+    "largeFiles": 2,
+    "largeErrors": 0,
+    "largeWarningsUnfiltered": 38,
+    "largeInfosUnfiltered": 2,
+    "reportSha256": {
+      "artifacts/authoring-khronos.json": "5db481235f52d28894b3c56aa93ce8c8582f1e72ad62f9a1eb896bb051b3bfec",
+      "artifacts/real-authoring/khronos.json": "b7a224b7eca0584316aa8b6c626670e240b10999246a3f9964470c869c835a1b"
+    }
+  },
+  "scope": {
+    "matchedOwnedInstrumentedSupport": true,
+    "freshWholeCoreApp": false,
+    "fullRegression": false,
+    "vendorDeviceGui": false,
+    "externalLibrariesInstrumented": false
+  },
+  "remaining": [
+    "Root Source4 portable compiler must consume genuine sealed original capture; its output/receipt hook is separate.",
+    "Ordinary Source4/HDR compiler guards remain until actual supported composition.",
+    "Root native Open/append/worker/chooser integration and format discrimination remain separate.",
+    "Explicit sampling/animation/resolution policy is a later additive API design, not an equivalence flag."
+  ]
+}

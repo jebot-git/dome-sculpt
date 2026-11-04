@@ -1,5 +1,56 @@
 # Full objective and completion evidence
 
+## Private HDR native/controller controls — 2026-11-04
+
+The physical-producer continuation now has actual desktop and controller radiance
+controls. Final selected R8/SAN8, controller 31 each, actual normal GUI 34 + compact 29
+per profile, six pixel-identical HDR palette captures and four current GUI GLBs
+with 0 Khronos errors/warnings pass. Read [EMISSION-CONTROLS.md](EMISSION-CONTROLS.md)
+and its receipt for exact build/GUI/old-negative scopes. It is private, not main
+admission or completion. Preserving-only raw HDR and retained/native-only physical
+compiler domains, general authoring/interoperability and later spatial drawers
+remain required. No installation, display session or physical HMD changed.
+
+
+## Private physical editable-project continuation — 2026-11-04
+
+Source4 physical paint now has an explicit finite PBR/native-project compiler;
+raw HDR initial adoption uses the real source-aware atlas factory. Foundation128
+and raw127 pass Release/owned sanitizer/strict A770, exact native recovery and
+current legacy controls. The post-publication IO OOM bug is independently fixed
+and qualified through9,387 physical-export denial prefixes perprofile. Read
+[PHYSICAL-EDITABLE-AUTHORING.md](PHYSICAL-EDITABLE-AUTHORING.md) and its receipt
+for component/fresh-build boundaries, zero-error unfiltered Khronos cohorts,
+the retained finite-filter counterexample and remaining domain/import guards.
+This private checkpoint is not main admission or full-goal completion; all
+unfinished rows remain required. No installation or physical session changed.
+
+
+## Private painted native-project GLB producer — 2026-11-03
+
+The native Scene-owned producer/Document worker and Cancel-default FLTK export
+policy now pass131R/SAN/Arc,35selected regressions perCPU profile and15 actual
+normal-layout native GUI checks perprofile. All78 emitted outputs have0Khronos
+errors/warnings with exact cross-profile bytes. Read PAINTED-NATIVE-AUTHORING.md
+for the finite-view minification limitation, matching-component build boundary,
+retained failed input diagnostics and unresolved compact native chooser viewport.
+XR policy and generic painted physical/HDR production remain separate required
+work. This private scope is not main admission or full-goal completion; no system
+or physical session changed. Every unfinished original/additional row remains.
+
+
+## Qualified canonical bitmap SDK continuation — 2026-11-03
+
+Private runtime592bc76 now has fresh native app/core/support/render and selected
+consumer builds on canonical DomeD53b0fca,35 registered Release+35 sanitizer
+passes and actual native package Open/Save/Close8+8 passes. The old bitmap SDK
+is explicitly rejected. See [NATIVE-PACKAGE-SDK.md](NATIVE-PACKAGE-SDK.md) for
+exact build/runtime scopes, uninstrumented external SDK boundary and retained
+negative controls. This is not a full-suite/device or later painted-producer/
+append qualification; every unfinished original and additional requirement stays
+required. No system installation or session changed.
+
+
 ## Private original-coordinate/MToon paint integration — 2026-11-03
 
 Private f040845/d1606ca preserves original logical UVs independently of writable

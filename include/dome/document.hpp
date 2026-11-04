@@ -235,7 +235,7 @@ struct SceneDraft {
   Scene scene;
   AssetSource source;
 };
-enum class AssetExportFormat { Glb, Avatar };
+enum class AssetExportFormat { Glb, Avatar, EditableGlb256, EditableGlb512, EditableGlb1024 };
 struct EditorSnapshot {
   std::shared_ptr<const EditorState> state;
   std::shared_ptr<const MeshSnapshot> surface;
@@ -268,6 +268,9 @@ public:
   void focus_selection(bool);
   void object_properties(uint64_t, std::string, bool visible, bool locked,
                          CanvasTransform, Material, AssetSource expected = {});
+  void object_properties(uint64_t, std::string, bool visible, bool locked,
+                         CanvasTransform, Material, AssetSource,
+                         std::optional<std::array<float,3>> active_emission_override);
   bool object_editable(uint64_t) const;
   void configure_object_grab(bool mode, bool isolate);
   void hold_object(uint64_t);

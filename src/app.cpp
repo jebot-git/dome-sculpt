@@ -2,6 +2,7 @@
 #include "appearance.h"
 #include "desktop-menu.h"
 #include "dome/document.hpp"
+#include "export-editor.hpp"
 #include "dome/frame-clock.hpp"
 #include "desktop-framing.hpp"
 #include "spacenav-options.hpp"
@@ -564,6 +565,7 @@ struct App {
     menu.add("&File/&Save", FL_CTRL + 's', command, this);
     menu.add("&File/Save &As...", FL_CTRL | FL_SHIFT | 's', command, this);
     menu.add("&File/Export &glTF (.glb)...", FL_CTRL + 'e', command, this);
+    menu.add("&File/Export editable project (.glb)...", 0, command, this);
     menu.add("&File/Export selected avatar (.vrm)...", 0, command, this);
     menu.add("&File/Recovery/Refresh recovery", 0, command, this);
     menu.add("&File/Recovery/Recover project...", 0, command, this);
@@ -798,6 +800,7 @@ struct App {
                                       "&File/&Save",
                                       "&File/Save &As...",
                                       "&File/Export &glTF (.glb)...",
+                                      "&File/Export editable project (.glb)...",
                                       "&Scene/New sphere",
                                       "&Scene/New empty sculpt",
                                       "&Scene/Duplicate object",
@@ -1422,6 +1425,12 @@ struct App {
           fl_file_chooser("Export glTF scene", "*.glb", "Sculpt.glb");
       if (chosen) {
         canvas.document.export_asset(chosen);
+      }
+    } else if (label == "Export editable project (.glb)...") {
+      auto format=editable_export_dialog();
+      if(format) {
+        auto chosen=fl_file_chooser("Export editable project", "*.glb", "Project.glb");
+        if(chosen)canvas.document.export_asset(chosen,*format);
       }
     } else if (label == "Export selected avatar (.vrm)...") {
       auto chosen = fl_file_chooser("Export selected avatar", "*.vrm", "Avatar.vrm");

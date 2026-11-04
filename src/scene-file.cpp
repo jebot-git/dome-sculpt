@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/scene-file.hpp"
 #include "dome/emission-native.hpp"
+#include "dome/native-authoring.hpp"
 #include <array>
 #include <fstream>
 #include <nlohmann/json.hpp>
@@ -42,6 +43,12 @@ LoadedSceneFile load_scene_file(const std::filesystem::path &path,
     limits.cancelled = cancelled;
     auto native = extract_native_emission(bytes, limits);
     check();
+    if (!native) {
+      NativeAuthoringReadLimits authoring;
+      authoring.cancelled = cancelled;
+      native = extract_native_authoring(bytes, authoring);
+      check();
+    }
     if (!native)
       throw std::invalid_argument(
           "This model has no editable Dome Sculpt project; use Import mesh");

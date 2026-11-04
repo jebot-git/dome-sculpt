@@ -1,0 +1,382 @@
+{
+  "recorded_utc": "2026-11-03T22:49:13.682267+00:00",
+  "runtime_source": "9cde91a native owner/compiler/Document worker +f96c117 native policy dialog layout",
+  "GUI_test_source": "6911b54 (actual clipboard/menu filename acknowledgment; no runtime change)",
+  "source_ancestry": "2220c94 qualified Open +592bc canonical SDK guard +5d15505 generic native-authoring container (cherry8e67c62)",
+  "component_scope": "Whole changed core/app TUs and all consumers of new native authoring API recompiled against fresh matching592 own support/render/app objects. No existing layout append; appended enum values retain existing numeric values. This is not a fresh wholeapp/ALLtarget proof.",
+  "records": {
+    "component-release": {
+      "path": "artifacts/painted-proof/component-release/status.json",
+      "sha256": "f8ee9424326cfa9ec1de99d5f4c151c7c6cbf1d5f4d08a045b4f735ecd0254cd",
+      "source": "9cde91a9ed589e2483ee0b2ffd37681b7beaaaed",
+      "runtime_source": null,
+      "exit_code": 0,
+      "seconds": 86.93933011300396,
+      "inputs": 3695,
+      "drift": [],
+      "runs": [
+        {
+          "name": "source-paint-authoring",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/painted-authoring-2220/artifacts/painted-proof/component-release/dome-sculpt-source-paint-authoring-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/painted-authoring-2220/artifacts/painted-proof/component-release/source-paint-authoring"
+          ],
+          "exit": 0,
+          "seconds": 7.142403077014023
+        },
+        {
+          "name": "source-paint-bake",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/painted-authoring-2220/artifacts/painted-proof/component-release/dome-sculpt-source-paint-bake-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/painted-authoring-2220/artifacts/painted-proof/component-release/source-paint-bake"
+          ],
+          "exit": 0,
+          "seconds": 3.9992926499980967
+        },
+        {
+          "name": "native-authoring",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/painted-authoring-2220/artifacts/painted-proof/component-release/dome-sculpt-native-authoring-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/painted-authoring-2220/artifacts/painted-proof/component-release/native-authoring"
+          ],
+          "exit": 0,
+          "seconds": 0.06801612698473036
+        }
+      ],
+      "checks": []
+    },
+    "component-sanitize": {
+      "path": "artifacts/painted-proof/component-sanitize/status.json",
+      "sha256": "6359f2089ee1e255900581667b25b7bc192041f8f6526fca04dcb850fd6de1a2",
+      "source": "9cde91a9ed589e2483ee0b2ffd37681b7beaaaed",
+      "runtime_source": null,
+      "exit_code": 0,
+      "seconds": 171.05579298199154,
+      "inputs": 3695,
+      "drift": [],
+      "runs": [
+        {
+          "name": "source-paint-authoring",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/painted-authoring-2220/artifacts/painted-proof/component-sanitize/dome-sculpt-source-paint-authoring-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/painted-authoring-2220/artifacts/painted-proof/component-sanitize/source-paint-authoring"
+          ],
+          "exit": 0,
+          "seconds": 28.098051024018787
+        },
+        {
+          "name": "source-paint-bake",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/painted-authoring-2220/artifacts/painted-proof/component-sanitize/dome-sculpt-source-paint-bake-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/painted-authoring-2220/artifacts/painted-proof/component-sanitize/source-paint-bake"
+          ],
+          "exit": 0,
+          "seconds": 14.84873486799188
+        },
+        {
+          "name": "native-authoring",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/painted-authoring-2220/artifacts/painted-proof/component-sanitize/dome-sculpt-native-authoring-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/painted-authoring-2220/artifacts/painted-proof/component-sanitize/native-authoring"
+          ],
+          "exit": 0,
+          "seconds": 0.39810320900869556
+        }
+      ],
+      "checks": []
+    },
+    "boundaries-release": {
+      "path": "artifacts/painted-proof/boundaries-release/status.json",
+      "sha256": "c71f66e930fc185810a35e12ab0b4dc417890087ff5ebd9e85351b163c5868fa",
+      "source": "115e13871dee6532a7d4d5e7d86ee4036f0aef79",
+      "runtime_source": "9cde91a9ed589e2483ee0b2ffd37681b7beaaaed",
+      "exit_code": 0,
+      "seconds": 35.275191377004376,
+      "inputs": 3697,
+      "drift": [],
+      "runs": [],
+      "checks": []
+    },
+    "boundaries-sanitize": {
+      "path": "artifacts/painted-proof/boundaries-sanitize/status.json",
+      "sha256": "14d649671c729437884ffd0aa31e2a7f4f0fb90a4dff6e02564b289f1566e4a2",
+      "source": "115e13871dee6532a7d4d5e7d86ee4036f0aef79",
+      "runtime_source": "9cde91a9ed589e2483ee0b2ffd37681b7beaaaed",
+      "exit_code": 0,
+      "seconds": 83.35528427799,
+      "inputs": 3697,
+      "drift": [],
+      "runs": [],
+      "checks": []
+    },
+    "hardware-boundaries-release": {
+      "path": "artifacts/painted-proof/hardware-boundaries-release/status.json",
+      "sha256": "2eb6e294f855a32746a5181a9c914802f54c583ff7c2225d37d06d7470c9a167",
+      "source": "71a1ed07793cc5622ce3f9eaa887b5bc4187ebc4",
+      "runtime_source": null,
+      "exit_code": 0,
+      "seconds": null,
+      "inputs": 1613,
+      "drift": [],
+      "runs": [
+        {
+          "name": "source-paint-authoring",
+          "exit": 0,
+          "seconds": 6.061210039013531
+        },
+        {
+          "name": "source-paint-bake",
+          "exit": 0,
+          "seconds": 3.475886837026337
+        },
+        {
+          "name": "authoring-negative",
+          "exit": 1,
+          "seconds": 0.0415505759883672
+        },
+        {
+          "name": "bake-negative",
+          "exit": 1,
+          "seconds": 0.04580809400067665
+        }
+      ],
+      "checks": []
+    },
+    "regressions-release": {
+      "path": "artifacts/painted-proof/regressions-release/status.json",
+      "sha256": "8ca60a9bf6b4e340aa5efc3d744aade05a1c5504208fe82d2cb4ab8893edd027",
+      "source": "c5c1893827921829ce0eeb4bb40f53f58b44ae26",
+      "runtime_source": "9cde91a unchanged core; UI f96c117 excluded from these consumers",
+      "exit_code": 0,
+      "seconds": 128.08175707698683,
+      "inputs": 3742,
+      "drift": [],
+      "runs": [],
+      "checks": []
+    },
+    "regressions-sanitize": {
+      "path": "artifacts/painted-proof/regressions-sanitize/status.json",
+      "sha256": "0b37aca581d35cc6d5f7e5357c1ba2f429acef1848d1e543a436df1246a9573b",
+      "source": "c5c1893827921829ce0eeb4bb40f53f58b44ae26",
+      "runtime_source": "9cde91a unchanged core; UI f96c117 excluded from these consumers",
+      "exit_code": 0,
+      "seconds": 537.528991300991,
+      "inputs": 3742,
+      "drift": [],
+      "runs": [],
+      "checks": []
+    },
+    "gui-acknowledged-release-normal": {
+      "path": "artifacts/painted-proof/gui-acknowledged-release-normal/status.json",
+      "sha256": "ea4a974d158adbfae3514347a58cfdd28c8f9efe727a5458bcfaddd2930f5d87",
+      "source": "6911b54cfe55975c4a1c211e218f7db0642d1f96",
+      "runtime_source": "9cde91a +f96c117 native dialog text measurement",
+      "exit_code": 0,
+      "seconds": 20.487649274000432,
+      "inputs": 1662,
+      "drift": [],
+      "runs": [],
+      "checks": [
+        {
+          "passed": true,
+          "check": "Editable project export is an actual enabled DomeD universal-menu command"
+        },
+        {
+          "passed": true,
+          "check": "Portable policy uses a native FLTK modal with shared document identity"
+        },
+        {
+          "passed": true,
+          "check": "Actual policy modal disables duplicate document export commands"
+        },
+        {
+          "passed": true,
+          "check": "Return on default Cancel submits no export and preserves the project"
+        },
+        {
+          "passed": true,
+          "check": "Universal Close cancels the policy modal without a model edit"
+        },
+        {
+          "passed": true,
+          "check": "Confirmed portable policy opens the actual owned GLB file chooser"
+        },
+        {
+          "passed": true,
+          "check": "Native filename input acknowledges the complete editable.glb destination"
+        },
+        {
+          "passed": true,
+          "check": "Actual GUI output declares complete native project scope and an approximate portable view"
+        },
+        {
+          "passed": true,
+          "check": "Default native policy really emits the selected512-pixel portable paint images"
+        },
+        {
+          "passed": true,
+          "check": "Actual GUI file worker preserves all editable source, paint, metadata and the original project file"
+        },
+        {
+          "passed": true,
+          "check": "Native filename input acknowledges the complete editable.glb destination"
+        },
+        {
+          "passed": true,
+          "check": "Actual Open restores the exported native project as unsaved and preserves the interchange source"
+        },
+        {
+          "passed": true,
+          "check": "Native filename input acknowledges the complete recovered.dsculpt destination"
+        },
+        {
+          "passed": true,
+          "check": "Actual subsequent Save writes the original editable project independently of the portable GLB"
+        },
+        {
+          "passed": true,
+          "check": "Native export/recovery/Save workflow exits cleanly without sanitizer suppression"
+        }
+      ]
+    },
+    "gui-acknowledged-sanitize-normal": {
+      "path": "artifacts/painted-proof/gui-acknowledged-sanitize-normal/status.json",
+      "sha256": "5b02bfae977875cca42d775567e551ed5ae2cf28122080c67f4d8abb1865c141",
+      "source": "6911b54cfe55975c4a1c211e218f7db0642d1f96",
+      "runtime_source": "9cde91a +f96c117 native dialog text measurement",
+      "exit_code": 0,
+      "seconds": 32.029147624998586,
+      "inputs": 1662,
+      "drift": [],
+      "runs": [],
+      "checks": [
+        {
+          "passed": true,
+          "check": "Editable project export is an actual enabled DomeD universal-menu command"
+        },
+        {
+          "passed": true,
+          "check": "Portable policy uses a native FLTK modal with shared document identity"
+        },
+        {
+          "passed": true,
+          "check": "Actual policy modal disables duplicate document export commands"
+        },
+        {
+          "passed": true,
+          "check": "Return on default Cancel submits no export and preserves the project"
+        },
+        {
+          "passed": true,
+          "check": "Universal Close cancels the policy modal without a model edit"
+        },
+        {
+          "passed": true,
+          "check": "Confirmed portable policy opens the actual owned GLB file chooser"
+        },
+        {
+          "passed": true,
+          "check": "Native filename input acknowledges the complete editable.glb destination"
+        },
+        {
+          "passed": true,
+          "check": "Actual GUI output declares complete native project scope and an approximate portable view"
+        },
+        {
+          "passed": true,
+          "check": "Default native policy really emits the selected512-pixel portable paint images"
+        },
+        {
+          "passed": true,
+          "check": "Actual GUI file worker preserves all editable source, paint, metadata and the original project file"
+        },
+        {
+          "passed": true,
+          "check": "Native filename input acknowledges the complete editable.glb destination"
+        },
+        {
+          "passed": true,
+          "check": "Actual Open restores the exported native project as unsaved and preserves the interchange source"
+        },
+        {
+          "passed": true,
+          "check": "Native filename input acknowledges the complete recovered.dsculpt destination"
+        },
+        {
+          "passed": true,
+          "check": "Actual subsequent Save writes the original editable project independently of the portable GLB"
+        },
+        {
+          "passed": true,
+          "check": "Native export/recovery/Save workflow exits cleanly without sanitizer suppression"
+        }
+      ]
+    },
+    "gui-acknowledged-release-compact": {
+      "path": "artifacts/painted-proof/gui-acknowledged-release-compact/status.json",
+      "sha256": "695db28267695b8b58429b985c257f2274a367b9b732656967c0a1b946a3648d",
+      "source": "6911b54cfe55975c4a1c211e218f7db0642d1f96",
+      "runtime_source": "9cde91a +f96c117 native dialog text measurement",
+      "exit_code": 1,
+      "seconds": 15.893781435006531,
+      "inputs": 1662,
+      "drift": [],
+      "runs": [],
+      "checks": [
+        {
+          "passed": true,
+          "check": "Editable project export is an actual enabled DomeD universal-menu command"
+        },
+        {
+          "passed": true,
+          "check": "Portable policy uses a native FLTK modal with shared document identity"
+        },
+        {
+          "passed": true,
+          "check": "Actual policy modal disables duplicate document export commands"
+        },
+        {
+          "passed": true,
+          "check": "Return on default Cancel submits no export and preserves the project"
+        },
+        {
+          "passed": true,
+          "check": "Universal Close cancels the policy modal without a model edit"
+        },
+        {
+          "passed": true,
+          "check": "Confirmed portable policy opens the actual owned GLB file chooser"
+        },
+        {
+          "passed": true,
+          "check": "Native filename input acknowledges the complete editable.glb destination"
+        }
+      ]
+    }
+  },
+  "validator": {
+    "path": "artifacts/painted-proof/khronos-painted.json",
+    "sha256": "04c6fea0f68daab4af6ac6f0420f40ad78ffc5038cbba008a23b1c1452d83731",
+    "version": "2.0.0-dev.3.10",
+    "maxIssues": 0,
+    "files": 78,
+    "uniqueByteContents": 17,
+    "totals": {
+      "numErrors": 0,
+      "numWarnings": 0,
+      "numInfos": 192,
+      "numHints": 0
+    },
+    "profileBytesEqual": true,
+    "excluded": "Each cancel-queued.glb is deliberately preserved24-byte nonGLB prior-output sentinel; input*.glb are fixture inputs outside output cohort."
+  },
+  "scope_limits": [
+    "Compact desktop native chooser remains unqualified: canonical FLTK enforces720x420 min and960x600 initial size on640x360; complete image request fails BadMatch after real filename acknowledgment. Initial failure retained; no fake compact pass.",
+    "Initial no-ack XTest filename workflows timed out. Input-ack diagnostic proved exact native filename and fullSAN12; final versioned15checks pass both profiles. Clipboard service must run concurrently with native clipboard/menu probing. Earlier synchronous diagnostic deadlock cancelled130 and retained; wrong libasan preload46s failure retained.",
+    "No complete XR editable export command yet in this branch; independent f189 continuation under test.",
+    "No generic physical/HDR Source4 painted-container producer; original supported native HDR path retained.",
+    "Finite PBR view is explicitly approximate: minification mean26.0125software/25.6375Arc,max106; recovered native pixels remain exact.",
+    "No nativeWayland/compositor or physicalHMD qualification; GL hardware evidence does not claim compute acceleration.",
+    "No system installation/session restart. Full original objective active/incomplete; private branch not admitted main."
+  ]
+}
