@@ -6,6 +6,7 @@
 #include "dome/material-bindings.hpp"
 #include "dome/scene-file.hpp"
 #include "source-color-consumer.hpp"
+#include "prepared-normal-consumer.hpp"
 #include "source-paint-bake-fixtures.hpp"
 #include <fstream>
 #include "native-authoring-capture.hpp"
@@ -45,7 +46,7 @@ int main(int argc,char **argv)try {
   std::cout<<"GL_VENDOR="<<vendor<<" GL_RENDERER="<<device<<std::endl;
   check(argc<3||std::string_view(argv[2])!="--hardware"||
     (vendor.find("Intel")!=std::string::npos&&device.find("Arc")!=std::string::npos&&device.find("A770")!=std::string::npos),"Raw preserving hardware proof requires actual A770");
-  Fbo fbo;fbo.bind();SurfaceRenderer native;native.set_frame_time(0);color_consumer::Renderer reader;
+  Fbo fbo;fbo.bind();SurfaceRenderer native;native.set_frame_time(0);prepared_normal_consumer::Renderer reader;
   for(int kind=0;kind<8;++kind) {
     auto source=raw_hdr(kind<5?kind:0);auto &m=source.j["materials"][0];
     if(kind==5) {
@@ -125,7 +126,7 @@ int main(int argc,char **argv)try {
       const auto bytes=file(path);const auto restored=extract_native_authoring(bytes);
       check(restored&&restored->encode()==exact&&d.copy_scene().encode()==exact&&file(input)==raw,
         "Raw preserving editable export keeps the ORIGINAL native Scene and source bytes");
-      color_consumer::Model model(path);fbo.bind();reader.render(model.data,nullptr,{},true);
+      color_consumer::Model model(path);fbo.bind();reader.render(model.data,nullptr,{},false);
       const auto quality=fidelity(reference,read());
       std::cout<<"RAW_PRESERVING kind="<<kind<<" phase="<<phase<<" visible="<<quality.visible<<" mean="<<quality.mean<<" interior="<<quality.interior_maximum<<std::endl;
       check(quality.visible>20&&quality.mean<=2&&quality.interior_maximum<=2,
@@ -149,10 +150,10 @@ int main(int argc,char **argv)try {
         "Recovered raw native project re-exports without recapturing the package as source");
       if(kind==5) {
         auto &material=model.data->materials[0];const auto old=material.normal_texture.texture;
-        material.normal_texture.texture=nullptr;fbo.bind();reader.render(model.data,nullptr,{},true);
+        material.normal_texture.texture=nullptr;fbo.bind();reader.render(model.data,nullptr,{},false);
         check(delta(reference,read())>4,"Independent lit raw normal disable counterfactual is visibly sensitive");material.normal_texture.texture=old;
         const auto uv=material.emissive_texture.texcoord;material.emissive_texture.texcoord=0;
-        fbo.bind();reader.render(model.data,nullptr,{},true);
+        fbo.bind();reader.render(model.data,nullptr,{},false);
         check(delta(reference,read())>4,"Independent wrong raw emission UV set is visibly sensitive");material.emissive_texture.texcoord=uv;
       }
     }
