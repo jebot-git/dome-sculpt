@@ -104,7 +104,7 @@ std::optional<CanvasTransform> similarity(const ImportedNode &n) {
   try{validate_transform(out);}catch(const std::invalid_argument&){return {};}
   return out;
 }
-Material native_material(const ImportedMaterial &m) {
+Material native_material(const ImportedMaterial &m, bool prepare_original_sampling) {
   Material out;
   out.name = name(m.name, "Imported material");
   out.color = m.color;
@@ -113,7 +113,7 @@ Material native_material(const ImportedMaterial &m) {
   out.emissive = m.emissive;
   for (auto &value : out.emissive) {
     value *= m.emissive_strength;
-    if (!std::isfinite(value) || value > 1)
+    if (!std::isfinite(value) || (value > 1 && !prepare_original_sampling))
       throw std::invalid_argument(
           "Native HDR emissive authoring requires an explicit material/paint "
           "adapter; original source is retained by preserving import");
@@ -428,7 +428,7 @@ ImportedAuthoring prepare_authoring_import(const Scene &input,
       auto id = output.scene.add(name(p.name, "Imported primitive"), Volume{});
       auto &object = output.scene.object(id);
       object.group = groups[n];
-      object.material = native_material(m);
+      object.material = native_material(m, options.prepare_texture_atlas);
       auto appearance = std::make_shared<CreatorAppearance>();
       appearance->original_bytes = bytes;
       if(captured.original->root.bytes!=bytes || captured.original->format!=ImportSourceFormat::Glb ||
@@ -637,6 +637,8 @@ ImportedAuthoring prepare_authoring_import(const Scene &input,
         for(size_t v=0;v<vertices.size();++v){if((v&1023)==0)stop(options);remapped->source_vertices.push_back(appearance->source_vertices.at(vertices[v]));}
         detail::normal_frame_current_authority(*binding,adopted->mesh(),deformation.get(),options.limits.cancelled);
         object.painted=std::move(adopted);object.appearance=std::move(remapped);object.deformation=std::move(deformation);
+        if(!object.painted->source_sampling_prepared() || !object.painted->valid_source_sampling_attachment())
+          throw std::invalid_argument("Editable import lost its authenticated original sampling adapter");
         output.diagnostics.push_back("Prepared editable paint atlas at "+std::to_string(options.paint_resolution)+" pixels; original image sampling, material roles and source coordinates retained");
       }
       if(options.prepare_texture_atlas)output.scene.validate(false);
