@@ -26,7 +26,16 @@ The versioned executable accepts OUTPUT, PAINT_PROJECT and one or more genuine
 KEY_PROJECT paths, enabling the real-avatar cohorts as an explicit continuation.
 Its CTest entry uses existing key/paint tests as named fixture setup, including
 for filtered runs. It must preserve their existing commands and properties.
-This new target/configuration still needs its own build/CTest qualification;
-current c092 whole-build, selected sanitizer and full589 regression jobs remain
-separate live scopes. No new main admission, install, physical test or completion
+The declared new target now compiles/links as a complete new TU against the
+matching completedc092 archives, after verifying every src/include/third_party
+byte equal. Its real registered CTest command passes1/1 with24 checks;2224
+captured inputs remain exact. This is explicit matched-component scope, not a
+fresh core build. Byte-exact real source fixtures are staged and -FA avoids
+repeating their earlier setup; the filtered CTest graph separately verifies both
+automatic setup tests plus the consumer.590 is registered count, not590passes.
+The three combined worker GLBs pass pinned Khronos with0errors/39 unfiltered
+NODE_SKINNED_MESH_NON_ROOT warnings/10infos. Matching sanitizer/graphics and the
+root full589 regression jobs remain separate scopes. Read
+[the receipt](validation/NATIVE-KEY-PACKAGE-CYCLE.json) for exact commands,
+source/status hashes, staged-data boundaries and preserved original negatives. No new main admission, install, physical test or completion
 is claimed. The original production objective and all outstanding rows remain.
