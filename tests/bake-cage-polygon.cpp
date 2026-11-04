@@ -3,7 +3,12 @@
 #include "bake-cage.cpp"
 #include "dome/polygon-scene.hpp"
 int main(int argc,char **argv)try{
-  const auto out=std::filesystem::path(argc>1?argv[1]:"bake-cage-polygon");
+  if(argc==3&&std::string_view(argv[1])=="--inspect"){
+    auto scene=Scene::load(argv[2]);std::cout<<nlohmann::json{{"scene",scene.encode()},{"baked",bool(scene.active().painted->baked())}}.dump()<<'\n';return 0;
+  }
+  const bool ui_fixture=argc==3&&std::string_view(argv[1])=="--ui-fixture";
+  const auto out=ui_fixture?std::filesystem::absolute(argv[2]).parent_path():
+    std::filesystem::path(argc>1?argv[1]:"bake-cage-polygon");
   std::filesystem::create_directories(out);
   auto scene=cage_scene();
   scene.object(3).painted=std::make_shared<PaintedMesh>(scene.active().painted->mesh(),64);
@@ -25,6 +30,10 @@ int main(int argc,char **argv)try{
     edited.active().painted->mesh().positions.size()==6,
     "Native Apply retains source identity and publishes its real split-corner derivative");
   std::cout<<"CAGE packed vertices "<<edited.active().painted->mesh().positions.size()<<std::endl;
+  if(ui_fixture){
+    auto fixture=edited;fixture.object(3).visible=false;fixture.object(3).locked=true;
+    fixture.select(1);fixture.save(argv[2]);return 0;
+  }
   document.select_object(1);ready_cage(document);
   const auto before=document.copy_scene().encode();
   document.bake_from_object(2,cage_settings());

@@ -3258,6 +3258,12 @@ if(BUILD_TESTING AND TARGET dome-sculpt AND TARGET dome-sculpt-test-runtime)
     $<TARGET_FILE:dome-sculpt-bake-cage-test>
     ${CMAKE_CURRENT_BINARY_DIR}/bake-cage-xr)
   set_tests_properties(bake-cage-openxr PROPERTIES TIMEOUT 600)
+  add_test(NAME bake-polygon-cage-openxr COMMAND ${Python3_EXECUTABLE}
+    ${CMAKE_CURRENT_SOURCE_DIR}/tests/bake-cage-xr.py
+    $<TARGET_FILE:dome-sculpt> $<TARGET_FILE:dome-sculpt-test-runtime>
+    $<TARGET_FILE:dome-sculpt-bake-cage-polygon-test>
+    ${CMAKE_CURRENT_BINARY_DIR}/bake-polygon-cage-xr)
+  set_tests_properties(bake-polygon-cage-openxr PROPERTIES TIMEOUT 600)
 endif()
 
 if(BUILD_TESTING)
