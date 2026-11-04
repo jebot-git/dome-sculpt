@@ -22,13 +22,15 @@ genuine sparse Source4 paint, per-role source coordinates and strict paint-owner
 cut authentication. Release, owned sanitizer and actual Arc each pass85 new
 graphical checks/24 exports; all72 files have zero Khronos errors and24 triples
 are byte-identical. Existing Release authoring workflows and corrected legacy/
-boundary fixtures pass in their explicit component scope. Wider sanitizer and
-allocation-failure cohorts retain live finite handles in the receipt. Relinked
+boundary fixtures pass in their explicit component scope. The wider
+sanitizer cohort has closed7/9 with its two corrected fixture results recorded
+separately; ten workflows/profile are qualified by composed evidence. Relinked
 application Release synthetic-XR21 passes; sanitizer standalone XR retains the
 unresolved Mesa112-byte report. This is not main admission, final27/poll SDK
 application integration, a full589/590 regression or physical-device proof.
-The full Release858 packed plus4397 precommit failure prefixes now pass
-(185.29s,2227 inputs exact); matching sanitizer precommit still runs.
+The full858 packed plus4397 precommit failure prefixes now pass in Release
+and owned sanitizers (185.29s/1658.91s,2227 inputs exact/profile); all own finite
+source-bake proof handles have closed.
 Read SOURCE-AWARE-MESH-BAKE.md and validation/SOURCE-AWARE-MESH-BAKE.json.
 The complete original objective and every unfinished additional row remain
 active; no installation or physical session changed.
