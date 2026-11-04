@@ -17,6 +17,12 @@ struct Bytes {
   void text(const std::string &s) { add(s.size() + 1); }
 };
 void deformation_copy_bytes(const DeformationState &d, Bytes &b, Work &w) {
+  if (d.pose.size() > 256 || d.morph_weights.size() > 128 ||
+      (d.skeleton && d.skeleton->bones.size() > 256) ||
+      (d.skin && d.skin->vertices.size() > 2'000'000) ||
+      (d.morphs && d.morphs->targets.size() > 128))
+    throw std::length_error(
+        "Source-assisted deformation copy dimensions exceeded");
   b.add(sizeof(d));
   b.add(d.pose.size(), sizeof(JointTransform));
   b.add(d.morph_weights.size(), sizeof(float));
@@ -33,13 +39,18 @@ void deformation_copy_bytes(const DeformationState &d, Bytes &b, Work &w) {
   if (d.skin) {
     b.add(d.skin->vertices.size(), sizeof(VertexWeights));
     w.step(d.skin->vertices.size() + 1);
-    for (const auto &row : d.skin->vertices)
+    for (const auto &row : d.skin->vertices) {
+      if (row.size() > 32)
+        throw std::length_error("Source-assisted row copy exceeded");
+      w.step(row.size() + 1);
       b.add(row.size(), sizeof(Influence) + 64);
+    }
   }
   if (d.morphs) {
     b.add(d.morphs->targets.size(), sizeof(MorphTarget));
     w.step(d.morphs->targets.size() + 1);
     for (const auto &target : d.morphs->targets) {
+      w.step(target.delta.size() + 1);
       b.text(target.name);
       b.add(target.delta.size(), sizeof(Vec3));
     }
@@ -94,8 +105,8 @@ bool author_source_visible_skin(Scene &scene, std::span<const uint64_t> targets,
   const auto &reference = scene.object(options.reference);
   if (!reference.group || !reference.deformation ||
       !reference.deformation->skeleton || !reference.appearance ||
-      !reference.appearance->asset ||
-      !reference.appearance->original_bytes || !reference.painted)
+      !reference.appearance->asset || !reference.appearance->original_bytes ||
+      !reference.painted)
     throw std::invalid_argument(
         "Choose an authenticated imported source group/rig");
   Work work{0, options.source_visible.maximum_work, cancelled};
@@ -179,7 +190,8 @@ bool author_source_visible_skin(Scene &scene, std::span<const uint64_t> targets,
       for (const auto &g : scene.groups())
         bytes.text(g.name);
     }
-    d.validate(o.painted->mesh());
+    detail::weight_surface::validate_rest_deformation(d, o.painted->mesh(),
+                                                      work);
     if (!options.locks.empty())
       for (const auto &row : d.skin->vertices) {
         work.step(row.size() + 1);
@@ -260,7 +272,8 @@ bool author_source_visible_skin(Scene &scene, std::span<const uint64_t> targets,
       continue;
     auto next = std::make_shared<DeformationState>(*o.deformation);
     next->skin = std::move(skin);
-    next->validate(o.painted->mesh());
+    detail::weight_surface::validate_rest_deformation(*next, o.painted->mesh(),
+                                                      work);
     changed.emplace_back(o.id, std::move(next));
   }
   work.stop();

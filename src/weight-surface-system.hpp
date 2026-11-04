@@ -2,6 +2,7 @@
 // Shared native positive surface assembly. Extracted unchanged from the pinned
 // heat research assembly; alternative operators remain private controls.
 #pragma once
+#include "dome/deformation.hpp"
 #include "dome/mesh-processing.hpp"
 #include "heat-binding.hpp"
 #include <bit>
@@ -32,11 +33,59 @@ struct Budget {
     if ((used & 1023) < n)
       stop();
   }
+  void step_items(size_t count, size_t unit) {
+    if (unit && count > (maximum - used) / unit)
+      throw std::length_error("Bone heat work forecast exceeded");
+    step(count * unit);
+  }
   void stop() const {
     if (cancel && cancel())
       throw std::runtime_error("Bone heat cancelled");
   }
 };
+// Structural validation is real worker work too. Forecast its bounded
+// mesh/skin/morph passes before invoking the existing exact validator. This
+// never changes the field or substitutes posed coordinates for REST.
+inline void validate_rest_deformation(const DeformationState &d, const Mesh &m,
+                                      Budget &w) {
+  const size_t n = m.positions.size(), corners = m.indices.size(),
+               bones = d.skeleton ? d.skeleton->bones.size() : 0;
+  if (n > 2'000'000 || corners > 6'000'000 || bones > 256 ||
+      d.pose.size() > 256 || d.morph_weights.size() > 128 ||
+      (d.skin && d.skin->vertices.size() > 2'000'000) ||
+      (d.morphs && d.morphs->targets.size() > 128))
+    throw std::length_error("Source-assisted deformation dimensions exceeded");
+  w.step(64 + 16 * (n + corners) + 16 * bones * bones +
+         16 * (d.pose.size() + d.morph_weights.size()));
+  if (d.skin)
+    for (const auto &row : d.skin->vertices) {
+      if (row.size() > 32)
+        throw std::length_error("Source-assisted skin row exceeded");
+      w.step(32 * (row.size() + 1) * std::bit_width(row.size() + 1));
+    }
+  if (d.morphs) {
+    if (d.morphs->targets.size() && n > 8'000'000 / d.morphs->targets.size())
+      throw std::length_error(
+          "Source-assisted morph displacement budget exceeded");
+    for (const auto &target : d.morphs->targets) {
+      if (target.delta.size() != n)
+        throw std::invalid_argument("Source-assisted morph dimensions changed");
+      w.step(16 * (target.delta.size() + 1));
+    }
+  }
+  if (d.humanoid)
+    w.step_items(d.humanoid->joints.size() + 1, 1024);
+  if (d.landmarks)
+    w.step_items(d.landmarks->points.size() + 1, 1024);
+  if (d.expressions)
+    for (const auto &[name, bindings] : d.expressions->visemes) {
+      (void)name;
+      w.step_items(bindings.size() + 1, 1024);
+    }
+  w.stop();
+  d.validate(m);
+  w.stop();
+}
 struct System {
   std::vector<size_t> starts;
   std::vector<uint32_t> columns, parent, raw_to_row, surface_parent;

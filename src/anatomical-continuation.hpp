@@ -126,7 +126,7 @@ anatomical_continuation(const Scene &scene, uint64_t group,
       if (!(scene.world_transform(o.id).scale > 0))
         throw std::invalid_argument(
             "Continuation requires positive similarity placement");
-      o.deformation->validate(o.painted->mesh());
+      validate_rest_deformation(*o.deformation, o.painted->mesh(), budget);
       budget.step(o.deformation->skeleton->bones.size() *
                   o.deformation->skeleton->bones.size());
       objects.push_back(&o);

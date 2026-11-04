@@ -1,0 +1,108 @@
+{
+  "scope": "Private coherent own optimized CPU core/support; headless profile, no main/frontend/solverSAN/interop admission",
+  "quality": {
+    "fixed_cohort_poses": 190,
+    "failures": 0,
+    "rest_placement_checks": 124,
+    "female_charged_work": 2320110992,
+    "male_charged_work": 2013079214
+  },
+  "native_locks": {
+    "checks": 54,
+    "present": 543,
+    "absent": 1875,
+    "different_bits": 0,
+    "changed_held": true,
+    "ordered_save": true,
+    "oneUndo": true,
+    "work": 2195244131,
+    "planned_workspace": 127365611
+  },
+  "caller_admission": {
+    "ordinary_persistent_failure_prefixes": 1007,
+    "all_actual_hit": true,
+    "ctest_passed": 2,
+    "ctest_total": 2,
+    "seconds": 196.24,
+    "input_count": 1618,
+    "mismatches": 0
+  },
+  "preserved_failures": [
+    "initial4/5 (missing positive fixture rows)",
+    "exact1/present0/absent142 diagnostic",
+    "independent-snapshot paint pointer oracle"
+  ],
+  "remaining": [
+    "whole-owned solver/nativeSAN",
+    "worker allocation/cancel",
+    "desktop/compact/actual-loader",
+    "independent export/render/Restore",
+    "broader source and unskinned stress"
+  ],
+  "files": {
+    "artifacts/hardening-tests.log": {
+      "sha256": "2e0523f7cbc84a3160876fdb07a41df8e5dad981959e9d1a374507a40ddec3f9",
+      "bytes": 1055
+    },
+    "artifacts/locks-diagnostic.log": {
+      "sha256": "550248f13b5a3b9601ab04562cff83f295913edfc77d048b23b25f6e3f956e0d",
+      "bytes": 285
+    },
+    "artifacts/locks-coverage-test.log": {
+      "sha256": "b9d7224f92b87d0032c4a2853c163f5b50a29e96a4bfdf5bdc6eaaad143f5f73",
+      "bytes": 523
+    },
+    "artifacts/locks-input-baseline-test.log": {
+      "sha256": "118ca776a5327fce7f763f7a0036dca83462d071d315d76aa6a00c5662e004a3",
+      "bytes": 3746
+    },
+    "artifacts/hardening-admission-tests.log": {
+      "sha256": "aa9d0a6b5d9e1aede12f423c7c894b20dcbe8b94d61ea6d525c1978b6acdf5ee",
+      "bytes": 400
+    },
+    "artifacts/hardening-admission-before.json": {
+      "sha256": "d5c38f26db562df29744da85357bdb448ba1fcfcc17cae3082d75e49161bfb8b",
+      "bytes": 167343
+    },
+    "artifacts/hardening-admission-after.json": {
+      "sha256": "33cc7fd82eaadb69356f76250ec040bf212140e939d731eacec0f79af83b693e",
+      "bytes": 41
+    },
+    "src/weight-surface-system.hpp": {
+      "sha256": "5a308a286f3ec1651b033de5b2ceb0d2a5ce14d7518420e93cad3060c69d16af",
+      "bytes": 9902
+    },
+    "src/source-visible-weights.cpp": {
+      "sha256": "fd4c369c37fe2bbc92b2e4b188cb21198ad889b8b1e9cd810a88f99fd8ba019d",
+      "bytes": 12019
+    },
+    "src/document-skin.cpp": {
+      "sha256": "9d0fe8056756646a0ce480a1c0728e3de1b6f1fddff758c302f4c5da36c435f7",
+      "bytes": 5655
+    },
+    "src/skin-editor.cpp": {
+      "sha256": "56a6a2872fdddfc04c6686b316153ff1b6ab5af1b05278941be874731efc9b00",
+      "bytes": 11121
+    },
+    "tests/source-visible-locks.cpp": {
+      "sha256": "45137905a948cbe6b78e93216ecb193a59df517b1e2f1f26a929b89568b17d81",
+      "bytes": 7192
+    },
+    "tests/source-visible-admission.cpp": {
+      "sha256": "5ccc5c33e80332324b0efb88ca7751c63f11e335c9fb73973c3ad9a85ecd7615",
+      "bytes": 9514
+    },
+    "build/dome-sculpt-source-visible-locks-test": {
+      "sha256": "28cf82268e3163c28562d65cf4e5358f36bfd0fb960963f78d90672eb2f91394",
+      "bytes": 10648592
+    },
+    "build/dome-sculpt-source-visible-admission-test": {
+      "sha256": "e1e04c5abd86c18cd4f7ab8fa96cf1cf85745774c0d4cf1c2d359a74a3f7a55c",
+      "bytes": 10654808
+    },
+    "build/libdome-sculpt-core.a": {
+      "sha256": "73708e75e68f74286302667eed3bfdc7374a74556d1aec6acce936ef224cf1bf",
+      "bytes": 27835864
+    }
+  }
+}

@@ -120,7 +120,8 @@ void edit_skin_dialog(Document &doc) {
     std::array<Fl_Value_Input *, 6> fields;
     Fl_Check_Button *keep;
     Fl_Check_Browser *locks;
-    bool accepted = false, selection_ok = false, selected_scope = false;
+    bool accepted = false, selection_ok = false, selected_scope = false,
+         source_ready = true;
     void refresh() {
       uint64_t previous =
           source->value() >= 0 && size_t(source->value()) < ids.size()
@@ -184,7 +185,10 @@ void edit_skin_dialog(Document &doc) {
           fields[2]->activate();
         }
       }
-      if (ids.empty() ||
+      if (source_assisted && !source_ready)
+        hint->label("Finish shape editing or object motion before binding REST "
+                    "weights.");
+      if (ids.empty() || (source_assisted && !source_ready) ||
           (source_assisted && scope->value() == 1 && !selection_ok))
         apply->deactivate();
       else
@@ -197,6 +201,7 @@ void edit_skin_dialog(Document &doc) {
             &options,     {},
             {},           {&seed, &margin, &distance, &falloff, &cap, &prune},
             &keep,        &locks};
+  context.source_ready = !state->shape_sculpt && !state->object_grabbing;
   context.selection_ok =
       !state->selected_objects.empty() && state->selected_objects.size() <= 64;
   for (auto id : state->selected_objects) {
