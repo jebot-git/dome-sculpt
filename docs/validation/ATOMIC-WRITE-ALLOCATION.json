@@ -1,0 +1,120 @@
+{
+  "inputs": {
+    "src/io.hpp": "9f2330d396b68d2476d6f4ed8134de8e996951bced6e340ede10850e4bd7d870",
+    "tests/atomic-write-allocation.cpp": "5af958391a4d34e94887f22a61ecc07e7e641222445e511b023f731c6fa97d74",
+    "CMakeLists.txt": "c15050c6f89b99525323c6d6a6e555ada9a0a54accbfa6eceead7f19632dca3d"
+  },
+  "scope": "standalone real-filesystem header regression; no static archives or application qualification",
+  "runs": [
+    {
+      "profile": "release",
+      "phase": "compile",
+      "command": [
+        "nice",
+        "-n",
+        "15",
+        "c++",
+        "-std=c++20",
+        "-O3",
+        "-DNDEBUG",
+        "-I",
+        "src",
+        "tests/atomic-write-allocation.cpp",
+        "-o",
+        "/home/blux/de-xr/dome-sculpt/artifacts/atomic-write-precommit-9271172/artifacts/atomic-final/release"
+      ],
+      "exit": 0,
+      "seconds": 1.3864801749878097
+    },
+    {
+      "profile": "release",
+      "phase": "execute",
+      "command": [
+        "/home/blux/de-xr/dome-sculpt/artifacts/atomic-write-precommit-9271172/artifacts/atomic-final/release",
+        "/home/blux/de-xr/dome-sculpt/artifacts/atomic-write-precommit-9271172/artifacts/atomic-final/release-output"
+      ],
+      "exit": 0,
+      "seconds": 0.019741701980819926
+    },
+    {
+      "profile": "sanitize",
+      "phase": "compile",
+      "command": [
+        "nice",
+        "-n",
+        "15",
+        "c++",
+        "-std=c++20",
+        "-O1",
+        "-g1",
+        "-DNDEBUG",
+        "-fsanitize=address,undefined",
+        "-fno-omit-frame-pointer",
+        "-I",
+        "src",
+        "tests/atomic-write-allocation.cpp",
+        "-o",
+        "/home/blux/de-xr/dome-sculpt/artifacts/atomic-write-precommit-9271172/artifacts/atomic-final/sanitize"
+      ],
+      "exit": 0,
+      "seconds": 2.0914970010053366
+    },
+    {
+      "profile": "sanitize",
+      "phase": "execute",
+      "command": [
+        "/home/blux/de-xr/dome-sculpt/artifacts/atomic-write-precommit-9271172/artifacts/atomic-final/sanitize",
+        "/home/blux/de-xr/dome-sculpt/artifacts/atomic-write-precommit-9271172/artifacts/atomic-final/sanitize-output"
+      ],
+      "exit": 0,
+      "seconds": 0.08823267999105155
+    }
+  ],
+  "drift": [],
+  "base": "9271172b27dda0152c6551982bef7b6354510fc3",
+  "runtime": "src/io.hpp only",
+  "regression": "tests/atomic-write-allocation.cpp",
+  "checks_each": 20,
+  "original_failure": {
+    "persistent_cpp_allocation_prefix": 8,
+    "published_new_output": true,
+    "baseline_allocations": 11,
+    "at_commit": 4,
+    "post_commit_allocations": 7
+  },
+  "fixed_success": {
+    "baseline_allocations": 13,
+    "at_commit": 13,
+    "post_commit_allocations": 0
+  },
+  "physical_failure_output_bytes": 364892,
+  "application_rebuild_qualified": false,
+  "gpu_used": false,
+  "system_or_session_changes": false,
+  "matched_final_fixture_counterfactual": {
+    "exit": 1,
+    "persistent_cpp_allocation_prefix": 9,
+    "published_new_output": true,
+    "baseline_allocations": 13,
+    "at_commit": 4,
+    "post_commit_allocations": 9,
+    "header": "git show 9271172:src/io.hpp",
+    "fixture_byte_equal": true
+  },
+  "cmake_ctest": {
+    "exit": 0,
+    "passed": 1,
+    "failed": 0
+  },
+  "artifact_sha256": {
+    "artifacts/atomic-counterfactual/io.hpp": "3103605870173061cc8f007384ac924d27996fd230fd8488dad30f0d75107d64",
+    "artifacts/atomic-counterfactual/fixture.cpp": "5af958391a4d34e94887f22a61ecc07e7e641222445e511b023f731c6fa97d74",
+    "artifacts/atomic-counterfactual/test": "6db5332825a0adbcef42dff66edeeeeef8a2b9a505f0e84234d843666e6cadb3",
+    "artifacts/atomic-counterfactual/run.log": "881c6f6f4b68b49a6cbc12c3497a9c3aff451c0760eab0bc62f5b30b1a5e333c",
+    "artifacts/atomic-final/release": "60b0c51cd590185e2e34b65021d80f4552a7d5ac6079ee94fac2f01fd327cf3d",
+    "artifacts/atomic-final/sanitize": "8bf9434c1360bca69272ffebf7aa8f62b6f13071b546e03e369045d0a438ed32",
+    "artifacts/atomic-final/release-execute.log": "f4adc061da9d55ad192b04f1fb02a3d7db957d3d93e4e751f586e5b42636e12a",
+    "artifacts/atomic-final/sanitize-execute.log": "f4adc061da9d55ad192b04f1fb02a3d7db957d3d93e4e751f586e5b42636e12a",
+    "artifacts/atomic-final/ctest.log": "deca9b94fcceec9b596eb24fb8376a895cad4aeffc25949a1765f42ba5e18abe"
+  }
+}
