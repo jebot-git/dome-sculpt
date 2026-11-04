@@ -6,9 +6,11 @@
 #include "dome/document.hpp"
 #include "dome/scene-file.hpp"
 int main(int argc,char **argv)try{
- if(argc!=3)return 2;const std::filesystem::path source=argv[1],out=argv[2];std::filesystem::create_directories(out);
+ if(argc!=3&&argc!=4)return 2;const std::filesystem::path source=argv[1],out=argv[2];std::filesystem::create_directories(out);
  NativeGraphics graphics;Fbo fbo;SurfaceRenderer native;native.set_frame_time(0);prepared_normal_consumer::Renderer consumer;
- std::cout<<"GPU "<<reinterpret_cast<const char*>(glGetString(GL_RENDERER))<<'\n';
+ const std::string vendor=reinterpret_cast<const char*>(glGetString(GL_VENDOR)),renderer=reinterpret_cast<const char*>(glGetString(GL_RENDERER));
+ std::cout<<"GPU "<<vendor<<" / "<<renderer<<'\n';
+ if(argc==4){if(std::string_view(argv[3])!="--hardware")return 2;check(vendor.find("Intel")!=std::string::npos&&renderer.find("Arc")!=std::string::npos&&renderer.find("A770")!=std::string::npos,"Actual requested Intel Arc A770 device is used rather than software or integrated graphics");}
  for(int variant=0;variant<4;++variant){const auto initial=load_scene_file(source/("fan-"+std::to_string(variant)+".glb")).scene;
   for(int pose=0;pose<2;++pose)for(float weight:{0.f,.35f,1.f}){
    auto scene=initial;auto &object=scene.active();object.transform.scale=5;if(object.deformation){auto d=*object.deformation;if(d.morphs)d.morph_weights={weight};
