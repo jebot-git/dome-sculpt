@@ -1,5 +1,19 @@
 # Dome Sculpt production handoff
 
+## Private static VRM1 CorePBR background/alpha — 2026-11-04
+
+Source-only V1 view now resolves actual typed original background factors while
+keeping independent Source4 paint and absolute physical emission separate. Old
+72-sample query has46 errors; same final valid pixel consumer on oldcore fails74.
+Current R/S eight-command component cohorts pass, PBR97/12pairs max1 at4,
+12native restarts0,101 profile files byteexact; strictA77099/llvmpipe refusal and
+three registered commands/profile pass. No layout/schema/UI/full620/main claim.
+This is separate from Palette native-float packets; semantic union must exclude
+native_geometry and preserve both private draw_range arguments. Interactive,
+normal/prepared/derived/plainPBR authoring and expression-preserving painted
+export remain required. Read VRM1-PBR-EXPRESSION-BACKGROUND.md and its receipt.
+
+
 ## Private authored-view static VRM1 expression graphics — 2026-11-04
 
 Test-only662descendant now qualifies Source4 realpaint +static color/UV/morph

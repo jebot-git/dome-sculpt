@@ -1,5 +1,17 @@
 # Full objective and completion evidence
 
+## Private static V1 CorePBR view checkpoint — 2026-11-04
+
+Actual Source4 original background/alpha follows static V1 color/UV bindings,
+without tinting/moving paint or scaling absolute physical contribution. Qualified
+component R/S eight-command scopes,97 PBR checks/twelve max1 pairs and strict
+A77099 are recorded in VRM1-PBR-EXPRESSION-BACKGROUND.md. The old74 pixel and
+46/72 visibility negatives stay explicit. No new schema/layout/UI/main claim;
+interactive state, normal/prepared/derived/plainPBR authoring, real native-float
+union and expression-preserving painted export remain open, along with all other
+unfinished requirements. Static baking never replaces the full VRM objective.
+
+
 ## Private authored-view static VRM1 expression graphics — 2026-11-04
 
 Test-only662descendant now qualifies Source4 realpaint +static color/UV/morph

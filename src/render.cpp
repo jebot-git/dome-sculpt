@@ -19,6 +19,7 @@
 #include "render-paint-overlay.hpp"
 #include "render-buffer-size.hpp"
 #include "prepared-color-state.hpp"
+#include "source-vrm1-background.hpp"
 #include <chrono>
 #include <unordered_set>
 namespace dome {
@@ -508,7 +509,7 @@ SurfaceRenderer::SurfaceRenderer(SurfaceTextureLimits limits):textures_(std::mak
   textures_->vertex_attributes=attributes;
   auto vertex=mtoon_renderer_vertex(true);
   std::string fragment="#version 330 core\n"+mtoon_renderer_common()+R"GLSL(
-in vec3 world,n,canonical_t,canonical_b,cut_position,canonical_n,source_n,source_t,source_b;in vec4 source_color,normal_coordinates,source_uv23,source_uv45,source_uv67;in float source_w;in vec2 texcoord,texcoord1,paintcoord;in float weight_value,mask_value;uniform int weight_pass;uniform float ghost_opacity;uniform vec3 selection_color;uniform float selection_amount;uniform int clip_enabled;uniform vec4 clip_plane;out vec4 color;uniform vec3 camera;uniform int toon,unlit,alpha_mode;uniform float alpha_cutoff;uniform vec4 base_color;uniform float metallic,roughness;uniform vec3 emission;uniform int source_uv1_is_uv0;uniform int overlay_mode;uniform int map_mode,slots[5],source_coordinates[5],baked_normal;uniform vec3 uv_x[5],uv_y[5];uniform float normal_scale,ao_strength;uniform int source_baked_frame,original_normal_present;uniform vec3 original_normal_x,original_normal_y;uniform int original_normal_coordinate;
+in vec3 world,n,canonical_t,canonical_b,cut_position,canonical_n,source_n,source_t,source_b;in vec4 source_color,normal_coordinates,source_uv23,source_uv45,source_uv67;in float source_w;in vec2 texcoord,texcoord1,paintcoord;in float weight_value,mask_value;uniform int weight_pass;uniform float ghost_opacity;uniform vec3 selection_color;uniform float selection_amount;uniform int clip_enabled;uniform vec4 clip_plane;out vec4 color;uniform vec3 camera;uniform int toon,unlit,alpha_mode;uniform float alpha_cutoff;uniform vec4 base_color;uniform float metallic,roughness;uniform vec3 emission;uniform int source_uv1_is_uv0;uniform int overlay_mode;uniform float relative_emission_strength;uniform int map_mode,slots[5],source_coordinates[5],baked_normal;uniform vec3 uv_x[5],uv_y[5];uniform float normal_scale,ao_strength;uniform int source_baked_frame,original_normal_present;uniform vec3 original_normal_x,original_normal_y;uniform int original_normal_coordinate;
 )GLSL"+mtoon_renderer_fragment()+R"GLSL(
 const float PI=3.141592653589793;
 vec3 shade(vec3 N,vec3 V,vec3 L,vec3 power,vec3 base,float roughness,float metallic){
@@ -559,7 +560,7 @@ if(slots[2]==1)glow*=texture(tex2,source_uv(2)).rgb;
 if(map_mode==2&&slots[4]==1)ao=mix(1.0,texture(tex4,source_uv(4)).r,ao_strength);
 if(overlay_mode==1){vec4 contribution=texture(tex7,paintcoord),orm=texture(tex8,paintcoord),coverage=texture(tex10,paintcoord);
  base=base*(1-coverage.r)+contribution;metal=metal*(1-coverage.g)+orm.b;rough=rough*(1-coverage.b)+orm.g;ao=ao*(1-orm.a)+orm.r;
- glow=glow*(1-coverage.a)+texture(tex9,paintcoord).rgb+texture(tex13,paintcoord).rgb;}
+ glow=glow*(1-coverage.a)+texture(tex9,paintcoord).rgb*relative_emission_strength+texture(tex13,paintcoord).rgb;}
 base*=source_color;
 if(alpha_mode==1)base.a=1.0;else if(alpha_mode==2){if(base.a<alpha_cutoff)discard;base.a=1.0;}
 if(unlit==1){color=ghost_color(vec4(sculpt_mask_color(base.rgb),base.a));return;}
@@ -759,15 +760,16 @@ void SurfaceRenderer::draw(std::shared_ptr<const MeshSnapshot> mesh,
   glUniform1f(glGetUniformLocation(program_,"mt_aspect"),float(width)/height);
   auto seconds=textures_->frame_time.value_or(std::chrono::duration<double>(std::chrono::steady_clock::now()-textures_->started).count());glUniform1f(glGetUniformLocation(program_,"mt_time"),float(seconds));
   glBindVertexArray(vao_);
-  auto blended = [&](const Material &m, const TextureMaps *maps,uint64_t id) {
+  auto blended = [&](const Material &m, const TextureMaps *maps,uint64_t id,std::optional<float> alpha={}) {
     if (m.alpha == Material::AlphaMode::Blend) return true;
     if (m.alpha != Material::AlphaMode::Automatic) return false;
-    return m.color[3] < 1 || (maps && (maps->color_projection?maps->pbr_transparent:maps->transparent)) || textures_->vertex_alpha.contains(id);
+    return alpha.value_or(m.color[3]) < 1 || (maps && (maps->color_projection?maps->pbr_transparent:maps->transparent)) || textures_->vertex_alpha.contains(id);
   };
   bool ghost_pass=false;
   auto draw_range = [&](const Material &original, size_t first, size_t count,
-                        uint64_t id, const TextureMaps *maps,bool use_source=false,bool use_canonical=false,bool force_pbr=false,bool paint_domain=false) {
-    Material material = original;
+                        uint64_t id, const TextureMaps *maps,bool use_source=false,bool use_canonical=false,bool force_pbr=false,bool paint_domain=false,const detail::Vrm1SourceBackground *background=nullptr) {
+    Material material = original;if(background){material.color=background->color;material.emissive=background->emission;}
+    glUniform1f(glGetUniformLocation(program_,"relative_emission_strength"),background?background->relative_emission_strength:1);
     glDepthFunc(GL_LESS);glBlendEquationSeparate(GL_FUNC_ADD,GL_FUNC_ADD);glDisable(GL_SAMPLE_ALPHA_TO_COVERAGE);
     glUniform1i(glGetUniformLocation(program_,"source_frame"),use_source);glUniform1i(glGetUniformLocation(program_,"canonical_frame"),use_canonical);
     glUniform1i(glGetUniformLocation(program_,"prepared_pbr_frame"),maps&&maps->normal_projection);
@@ -917,7 +919,7 @@ void SurfaceRenderer::draw(std::shared_ptr<const MeshSnapshot> mesh,
   else {
     std::vector<const SurfaceRange*> ordered;for(auto &r:cached_->ranges)ordered.push_back(&r);
     auto is_ghost=[&](uint64_t id){auto i=std::find_if(display.begin(),display.end(),[&](const auto &o){return o.id==id;});return i!=display.end() && i->ghost;};
-    auto queue=[&](const SurfaceRange&r){if(is_ghost(r.object))return 3500;auto toon=textures_->toons.find(r.object);if(toon!=textures_->toons.end())return toon_state(r,toon->second,false).queue;return blended(r.material,r.textures.get(),r.object)?3000:r.material.alpha==Material::AlphaMode::Mask?2450:2000;};
+    auto queue=[&](const SurfaceRange&r){if(is_ghost(r.object))return 3500;auto toon=textures_->toons.find(r.object);if(toon!=textures_->toons.end())return toon_state(r,toon->second,false).queue;const auto background=detail::vrm1_source_background(r.material,r.material_bindings.get(),r.appearance.get(),r.textures.get(),r.pbr_view);return blended(r.material,r.textures.get(),r.object,background?std::optional<float>(background->color[3]):std::nullopt)?3000:r.material.alpha==Material::AlphaMode::Mask?2450:2000;};
     std::stable_sort(ordered.begin(),ordered.end(),[&](auto a,auto b){return queue(*a)<queue(*b);});
     for(auto r:ordered){
       if(replaced_object&&r->object==replaced_object)continue;
@@ -954,7 +956,7 @@ void SurfaceRenderer::draw(std::shared_ptr<const MeshSnapshot> mesh,
       bool weighted=!ghost_pass && textures_->weighted.contains(r->object);
       glUniform1i(glGetUniformLocation(program_,"weight_pass"),weighted);
       auto typed=textures_->toons.find(r->object);
-      if(typed==textures_->toons.end())draw_range(r->material,r->first,r->count,r->object,r->textures.get(),r->source_frame,r->canonical_frame,r->pbr_view,bool(r->paint_sampling_attachment));
+      if(typed==textures_->toons.end()){const auto background=detail::vrm1_source_background(r->material,r->material_bindings.get(),r->appearance.get(),r->textures.get(),r->pbr_view);draw_range(r->material,r->first,r->count,r->object,r->textures.get(),r->source_frame,r->canonical_frame,r->pbr_view,bool(r->paint_sampling_attachment),background?&*background:nullptr);}
       else{
         draw_toon(*r,typed->second,false);
         if(!ghost_pass&&!weighted&&typed->second.material.parameters.outline!=MToonOutline::None&&typed->second.material.parameters.outline_width>0)

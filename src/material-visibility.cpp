@@ -10,6 +10,7 @@
 #include "dome/color-paint-sampling.hpp"
 #include "prepared-color-state.hpp"
 #include "paint-overlay-alpha.hpp"
+#include "source-vrm1-background.hpp"
 namespace dome {
 std::optional<MToonMaterial> retained_mtoon(const CreatorAppearance *appearance){
   if(!appearance)return {};
@@ -122,6 +123,7 @@ struct Visibility {
       if(r.material_bindings->has_mtoon&&!r.pbr_view)toon=r.material_bindings->material;
     } else if(!r.pbr_view)toon = retained_mtoon(r.appearance.get());
     if (!toon) {
+      if(const auto background=detail::vrm1_source_background(r.material,r.material_bindings.get(),r.appearance.get(),maps.get(),r.pbr_view))factor=background->color[3];
       color.validate(maps&&maps->source_maps?maps->source_maps->coordinate_count():owned_uv1?2:1);
       if(prepared){color=derived_view(maps,maps->pbr_color);color.wrap_s=color.wrap_t=33071;color.min_filter=color.mag_filter=9729;}
       if(explicit_colors) {
