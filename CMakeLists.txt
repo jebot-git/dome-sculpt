@@ -3299,3 +3299,13 @@ if(BUILD_TESTING)
   add_test(NAME bake-source-control-faults COMMAND dome-sculpt-bake-source-control-faults-test)
   set_tests_properties(bake-source-control-faults PROPERTIES TIMEOUT 600)
 endif()
+
+if(BUILD_TESTING)
+  add_executable(dome-sculpt-fbx-morph-generated-normals-test tests/fbx-morph-generated-normals.cpp)
+  target_include_directories(dome-sculpt-fbx-morph-generated-normals-test PRIVATE third_party/cgltf third_party/ufbx)
+  target_link_libraries(dome-sculpt-fbx-morph-generated-normals-test PRIVATE dome-sculpt-core ufbx)
+  target_compile_definitions(dome-sculpt-fbx-morph-generated-normals-test PRIVATE
+    DOME_FBX_FIXTURE_DIRECTORY="${CMAKE_CURRENT_SOURCE_DIR}/tests/data/ufbx-deformers")
+  add_test(NAME fbx-morph-generated-normals COMMAND dome-sculpt-fbx-morph-generated-normals-test ${CMAKE_CURRENT_BINARY_DIR}/fbx-morph-generated-normals)
+  set_tests_properties(fbx-morph-generated-normals PROPERTIES TIMEOUT 300)
+endif()

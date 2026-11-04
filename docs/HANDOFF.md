@@ -1,5 +1,19 @@
 # Dome Sculpt production handoff
 
+## Private generated FBX morph normals — 2026-11-04
+
+Explicit Generate flat/smooth now imports genuine morph-bearing FBX files through
+the existing options and native worker, preserving original data and a distinct
+conversion receipt. Exact matching-component Release/SAN each pass1158 endpoint/
+owning checks and four original FBX commands, including75 unit/axis rows. Real
+FLTK chooser17 checks per mode/profile,20 Khronos files with0 errors/0 warnings,
+and10 byte-identical profile pairs pass. Read FBX-MORPH-GENERATED-NORMALS.md and
+its receipt for the retained old rejection, test-only mesh/node oracle failure,
+resource guards and exact source scopes. No public layout/native schema changes;
+this private milestone awaits coherent main admission. Every unfinished original
+and additional requirement remains active, including controller drawers after
+basic targets. No system, headset or active-session action occurred.
+
 ## Qualified coherent editable-cage milestone — 2026-11-04
 
 Fresh new-layout application/core/render/support builds and all608 Release

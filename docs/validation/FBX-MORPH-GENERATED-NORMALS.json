@@ -1,0 +1,3002 @@
+{
+  "recorded_utc": "2026-11-04T08:43:31.758516+00:00",
+  "goal_status": "active/incomplete",
+  "scope": "Private explicit generated flat/smooth morph normal import component and actual native app workflows. Exact owned afc/cage-layout parent, one complete changed product TU, complete consumers/app relink. No fresh whole-project/vendor, positive GPU, XR/Wayland, physical-device or system-install claim.",
+  "sources": {
+    "product": "e68522b4494485bba060314c65a9524d4b28baed",
+    "corrected_native_oracle": "bc1593df8e436c1ab48cd3b54124e9f8cbca8de1",
+    "native_GUI": "bbbdfdb6386b2707d56926e5fdcc9547b152f07a",
+    "owned_core_parent": "8f718d97c10657ce3fedac5ce38420abc79b33b2"
+  },
+  "product_changes": {
+    "src/import-native.cpp": "bcdfed5d37cd93cac8afeb1a1f2413e498d51683bbac0857b401d0bd6c9eef79"
+  },
+  "public_CXX_layout_append": false,
+  "native_schema_append": false,
+  "new_dependency": false,
+  "gates": {
+    "native_normal_release": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/artifacts/normal-proof/release/status.json",
+      "sha256": "f55fe104b2e89055a9543f472d556ebfc153254e84c8b8a326ae94942739254a",
+      "result": {
+        "state": "terminal",
+        "pid": 2783457,
+        "source": "bc1593df8e436c1ab48cd3b54124e9f8cbca8de1",
+        "profile": "release",
+        "scope": "Complete import-native TU and independent actual FBX source/target normal consumer; exact owned new-layout core/support; no fresh app/fullbuild claim",
+        "product_differences": [
+          "src/import-native.cpp"
+        ],
+        "steps": [
+          {
+            "name": "consumer-compile",
+            "command": [
+              "/usr/bin/c++",
+              "-std=gnu++20",
+              "-O3",
+              "-DNDEBUG",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/third_party/nlohmann",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/third_party/cgltf",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/third_party/ufbx",
+              "-DDOME_FBX_FIXTURE_DIRECTORY=\"/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/tests/data/ufbx-deformers\"",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/artifacts/normal-proof/release/test.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/tests/fbx-morph-generated-normals.cpp"
+            ],
+            "exit_code": 0,
+            "seconds": 4.7905726629833225
+          },
+          {
+            "name": "old-link",
+            "command": [
+              "/usr/bin/c++",
+              "-O3",
+              "-DNDEBUG",
+              "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/artifacts/normal-proof/release/test.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/artifacts/normal-proof/release/old-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/bake-cage-polygon-closure-064/artifacts/component-proof/release/libdome-sculpt-core.a",
+              "libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "libdome-sculpt-polygon.a",
+              "libxatlas.a",
+              "libmikktspace.a",
+              "libmikktspace-robust.a",
+              "libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit_code": 0,
+            "seconds": 0.1821142400149256
+          },
+          {
+            "name": "old-preserve",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/artifacts/normal-proof/release/old-test",
+              "--preserve",
+              "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/artifacts/normal-proof/release/old-default"
+            ],
+            "exit_code": 0,
+            "seconds": 0.004530099977273494
+          },
+          {
+            "name": "original-refusal",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/artifacts/normal-proof/release/old-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/artifacts/normal-proof/release/counterfactual"
+            ],
+            "exit_code": 1,
+            "seconds": 0.005383495998103172
+          },
+          {
+            "name": "import-compile",
+            "command": [
+              "/usr/bin/c++",
+              "-DDOME_SCULPT_INSTALLED_ASSETS=\"/usr/local/share/dome-sculpt/assets/humanoid\"",
+              "-DDOME_SCULPT_SOURCE_ASSETS=\"/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/assets/humanoid\"",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/third_party",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/third_party/cgltf",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/third_party/nlohmann",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/third_party/xatlas",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/third_party/mikktspace",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/third_party/ufbx",
+              "-O3",
+              "-DNDEBUG",
+              "-std=gnu++20",
+              "-Wall",
+              "-Wextra",
+              "-Wpedantic",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/artifacts/normal-proof/release/import-native.cpp.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/src/import-native.cpp"
+            ],
+            "exit_code": 0,
+            "seconds": 8.379605720983818
+          },
+          {
+            "name": "core-replace",
+            "command": [
+              "ar",
+              "r",
+              "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/artifacts/normal-proof/release/libdome-sculpt-core.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/artifacts/normal-proof/release/import-native.cpp.o"
+            ],
+            "exit_code": 0,
+            "seconds": 0.10889633200713433
+          },
+          {
+            "name": "core-index",
+            "command": [
+              "ar",
+              "s",
+              "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/artifacts/normal-proof/release/libdome-sculpt-core.a"
+            ],
+            "exit_code": 0,
+            "seconds": 0.07569784900988452
+          },
+          {
+            "name": "new-link",
+            "command": [
+              "/usr/bin/c++",
+              "-O3",
+              "-DNDEBUG",
+              "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/artifacts/normal-proof/release/test.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/artifacts/normal-proof/release/test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/artifacts/normal-proof/release/libdome-sculpt-core.a",
+              "libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "libdome-sculpt-polygon.a",
+              "libxatlas.a",
+              "libmikktspace.a",
+              "libmikktspace-robust.a",
+              "libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit_code": 0,
+            "seconds": 0.1579152219928801
+          },
+          {
+            "name": "new-workflow",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/artifacts/normal-proof/release/test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/artifacts/normal-proof/release/actual"
+            ],
+            "exit_code": 0,
+            "seconds": 0.0359985789982602
+          }
+        ],
+        "child_pid": 2784980,
+        "original_refusal": 1,
+        "default_canonical_files_byte_identical": 2,
+        "exit_code": 0,
+        "seconds": 13.827152440993814,
+        "inputs": 1768,
+        "drift": []
+      }
+    },
+    "original_four_regressions_release": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/artifacts/regressions/release/status.json",
+      "sha256": "a0ea47e28473d06256e47f676639b8ba5f03775f0666c3dab829d9a8faca99e4",
+      "result": {
+        "state": "terminal",
+        "pid": 2815508,
+        "source": "bc1593df8e436c1ab48cd3b54124e9f8cbca8de1",
+        "profile": "release",
+        "scope": "Four actual original native FBX suites with complete matching consumers/new import TU; same owned core/support, not a whole build or GUI claim",
+        "steps": [
+          {
+            "name": "fbx-deformation-compile",
+            "command": [
+              "/usr/bin/c++",
+              "-DDOME_FBX_FIXTURE_DIRECTORY=\"/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/tests/data/ufbx-deformers\"",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/third_party/cgltf",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/third_party/nlohmann",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/third_party/ufbx",
+              "-O3",
+              "-DNDEBUG",
+              "-std=gnu++20",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/artifacts/regressions/release/fbx-deformation.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/tests/fbx-deformation.cpp"
+            ],
+            "exit_code": 0,
+            "seconds": 9.099480971985031
+          },
+          {
+            "name": "fbx-deformation-link",
+            "command": [
+              "/usr/bin/c++",
+              "-O3",
+              "-DNDEBUG",
+              "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/artifacts/regressions/release/fbx-deformation.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/artifacts/regressions/release/fbx-deformation",
+              "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/artifacts/normal-proof/release/libdome-sculpt-core.a",
+              "libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "libdome-sculpt-polygon.a",
+              "libxatlas.a",
+              "libmikktspace.a",
+              "libmikktspace-robust.a",
+              "libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit_code": 0,
+            "seconds": 0.6074690129898954
+          },
+          {
+            "name": "fbx-deformation",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/artifacts/regressions/release/fbx-deformation",
+              "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/artifacts/regressions/release/fbx-deformation-actual"
+            ],
+            "exit_code": 0,
+            "seconds": 0.36323588600498624
+          },
+          {
+            "name": "fbx-import-document-compile",
+            "command": [
+              "/usr/bin/c++",
+              "-DDOME_FBX_FIXTURE_DIRECTORY=\"/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/tests/data/ufbx-deformers\"",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/third_party/nlohmann",
+              "-O3",
+              "-DNDEBUG",
+              "-std=gnu++20",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/artifacts/regressions/release/fbx-import-document.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/tests/fbx-import-document.cpp"
+            ],
+            "exit_code": 0,
+            "seconds": 5.746014640986687
+          },
+          {
+            "name": "fbx-import-document-link",
+            "command": [
+              "/usr/bin/c++",
+              "-O3",
+              "-DNDEBUG",
+              "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/artifacts/regressions/release/fbx-import-document.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/artifacts/regressions/release/fbx-import-document",
+              "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/artifacts/normal-proof/release/libdome-sculpt-core.a",
+              "libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "libdome-sculpt-polygon.a",
+              "libxatlas.a",
+              "libmikktspace.a",
+              "libmikktspace-robust.a",
+              "libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded",
+              "-Wl,--wrap=read"
+            ],
+            "exit_code": 0,
+            "seconds": 0.4929307890124619
+          },
+          {
+            "name": "fbx-import-document",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/artifacts/regressions/release/fbx-import-document",
+              "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/artifacts/regressions/release/fbx-import-document-actual"
+            ],
+            "exit_code": 0,
+            "seconds": 0.22007387300254777
+          },
+          {
+            "name": "fbx-named-uv-compile",
+            "command": [
+              "/usr/bin/c++",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/third_party/nlohmann",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/third_party/ufbx",
+              "-O3",
+              "-DNDEBUG",
+              "-std=gnu++20",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/artifacts/regressions/release/fbx-named-uv.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/tests/fbx-named-uv.cpp"
+            ],
+            "exit_code": 0,
+            "seconds": 7.012499140982982
+          },
+          {
+            "name": "fbx-named-uv-link",
+            "command": [
+              "/usr/bin/c++",
+              "-O3",
+              "-DNDEBUG",
+              "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/artifacts/regressions/release/fbx-named-uv.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/artifacts/regressions/release/fbx-named-uv",
+              "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/artifacts/normal-proof/release/libdome-sculpt-core.a",
+              "libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "libdome-sculpt-polygon.a",
+              "libxatlas.a",
+              "libmikktspace.a",
+              "libmikktspace-robust.a",
+              "libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit_code": 0,
+            "seconds": 0.4048621810215991
+          },
+          {
+            "name": "fbx-named-uv",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/artifacts/regressions/release/fbx-named-uv",
+              "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/tests/fixtures/import-named-uv.fbx",
+              "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/artifacts/regressions/release/fbx-named-uv-actual"
+            ],
+            "exit_code": 0,
+            "seconds": 0.032809068012284115
+          },
+          {
+            "name": "fbx-options-deformation-compile",
+            "command": [
+              "/usr/bin/c++",
+              "-DDOME_FBX_FIXTURE_DIRECTORY=\"/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/tests/data/ufbx-deformers\"",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/third_party/cgltf",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/third_party/ufbx",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/third_party/nlohmann",
+              "-O3",
+              "-DNDEBUG",
+              "-std=gnu++20",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/artifacts/regressions/release/fbx-options-deformation.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/tests/fbx-options-deformation.cpp"
+            ],
+            "exit_code": 0,
+            "seconds": 10.07772756498889
+          },
+          {
+            "name": "fbx-options-deformation-link",
+            "command": [
+              "/usr/bin/c++",
+              "-O3",
+              "-DNDEBUG",
+              "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/artifacts/regressions/release/fbx-options-deformation.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/artifacts/regressions/release/fbx-options-deformation",
+              "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/artifacts/normal-proof/release/libdome-sculpt-core.a",
+              "libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "libdome-sculpt-polygon.a",
+              "libxatlas.a",
+              "libmikktspace.a",
+              "libmikktspace-robust.a",
+              "libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit_code": 0,
+            "seconds": 0.3865646029880736
+          },
+          {
+            "name": "fbx-options-deformation",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/artifacts/regressions/release/fbx-options-deformation",
+              "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/artifacts/regressions/release/fbx-options-deformation-actual"
+            ],
+            "exit_code": 0,
+            "seconds": 1.2717892559885513
+          },
+          {
+            "name": "GUI-helper-compile",
+            "command": [
+              "/usr/bin/c++",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/third_party/nlohmann",
+              "-O3",
+              "-DNDEBUG",
+              "-std=gnu++20",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/artifacts/regressions/release/import-authoring.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/tests/import-authoring.cpp"
+            ],
+            "exit_code": 0,
+            "seconds": 13.561970916984137
+          },
+          {
+            "name": "GUI-helper-link",
+            "command": [
+              "/usr/bin/c++",
+              "-O3",
+              "-DNDEBUG",
+              "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/artifacts/regressions/release/import-authoring.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/artifacts/regressions/release/dome-sculpt-import-authoring-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/artifacts/normal-proof/release/libdome-sculpt-core.a",
+              "libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "libdome-sculpt-polygon.a",
+              "libxatlas.a",
+              "libmikktspace.a",
+              "libmikktspace-robust.a",
+              "libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit_code": 0,
+            "seconds": 0.49527475200011395
+          },
+          {
+            "name": "app-link",
+            "command": [
+              "/usr/bin/c++",
+              "-O3",
+              "-DNDEBUG",
+              "CMakeFiles/dome-sculpt.dir/src/native-display-runtime.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/rig-fit-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/projection-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/spacenav-options.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/app.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/polygon-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/import-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/procedural-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/resolution-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/sculpt-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/creator-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/rig-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/shapekey-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/weight-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/skin-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/mesh-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/bake-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/object-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/paint-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/uv-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/ui-conventions.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/session-appearance.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/export-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/third_party/desktop/desktop-menu.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/appmenu-protocol.c.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/artifacts/regressions/release/dome-sculpt",
+              "-L/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-release/lib",
+              "-L/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib",
+              "-Wl,-rpath,/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-release/lib:/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib:",
+              "libdome-sculpt-spacenav.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/artifacts/normal-proof/release/libdome-sculpt-core.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/bake-cage-panel-9c/artifacts/panel-proof/release/libdome-sculpt-render.a",
+              "/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-release/lib/libfltk_images.so.1.4.5",
+              "/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-release/lib/libfltk_gl.so.1.4.5",
+              "/usr/lib64/libGLU.so",
+              "libdome-sculpt-xr.a",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libpng.so",
+              "/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-release/lib/libfltk.so.1.4.5",
+              "-lcairo",
+              "-L/usr/lib64",
+              "-lX11",
+              "-lGLU",
+              "-lGL",
+              "/usr/lib64/libdl.a",
+              "/usr/lib64/libSM.so",
+              "/usr/lib64/libICE.so",
+              "/usr/lib64/libXext.so",
+              "/usr/lib64/libXinerama.so",
+              "/usr/lib64/libXfixes.so",
+              "/usr/lib64/libXcursor.so",
+              "/usr/lib64/libXrender.so",
+              "/usr/lib64/libXft.so",
+              "/usr/lib64/libwayland-egl.so",
+              "/usr/lib64/libwayland-cursor.so",
+              "/usr/lib64/libxkbcommon.so",
+              "/usr/lib64/libGLX.so",
+              "/usr/lib64/libOpenGL.so",
+              "/usr/lib64/libz.so",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libcairo.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/bake-cage-panel-9c/artifacts/panel-proof/release/libdome-sculpt-render.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/artifacts/normal-proof/release/libdome-sculpt-core.a",
+              "libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "libdome-sculpt-polygon.a",
+              "libxatlas.a",
+              "libmikktspace.a",
+              "libmikktspace-robust.a",
+              "libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "/usr/lib64/libEGL.so",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libharfbuzz.so",
+              "/usr/lib64/libGL.so",
+              "/usr/lib64/libfontconfig.so",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libfreetype.so",
+              "/usr/lib64/libicui18n.so",
+              "/usr/lib64/libicuuc.so",
+              "/usr/lib64/libopenxr_loader.so",
+              "/usr/lib64/libgio-2.0.so",
+              "/usr/lib64/libgobject-2.0.so",
+              "/usr/lib64/libglib-2.0.so",
+              "/usr/lib64/libX11.so",
+              "/usr/lib64/libwayland-client.so",
+              "-lm",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit_code": 0,
+            "seconds": 0.9270833039772697
+          }
+        ],
+        "child_pid": 2820489,
+        "exit_code": 0,
+        "seconds": 51.12344774900703,
+        "inputs": 1768,
+        "drift": []
+      }
+    },
+    "actual_native_GUI_release": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-ui-bc15/artifacts/gui/release/status.json",
+      "sha256": "3038920e0432a112821aa33059bd3f1f2960fef93f0ac2bb0c29d284614bf0f9",
+      "result": {
+        "state": "terminal",
+        "pid": 2845598,
+        "source": "bbbdfdb6386b2707d56926e5fdcc9547b152f07a",
+        "profile": "release",
+        "scope": "Actual native FLTK chooser selects Generate flat/smooth on genuine morph-bearing FBX, native Save and frame authority plus exact Undo/Redo/close; matched component app and canonical27SDK, no HMD/GPU/full-build claim",
+        "steps": [
+          {
+            "name": "flat",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/selection-gui-venv/bin/python",
+              "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-ui-bc15/tests/fbx-morph-normals-menu.py"
+            ],
+            "extra": {
+              "DOME_FBX_NORMAL_MODE": "1",
+              "DOME_FBX_GUI_KIND": "morph-flat",
+              "DOME_FBX_NORMAL_OUT": "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-ui-bc15/artifacts/gui/release/flat"
+            },
+            "exit_code": 0,
+            "seconds": 26.586872798012337
+          },
+          {
+            "name": "smooth",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/selection-gui-venv/bin/python",
+              "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-ui-bc15/tests/fbx-morph-normals-menu.py"
+            ],
+            "extra": {
+              "DOME_FBX_NORMAL_MODE": "2",
+              "DOME_FBX_GUI_KIND": "morph-smooth",
+              "DOME_FBX_NORMAL_OUT": "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-ui-bc15/artifacts/gui/release/smooth"
+            },
+            "exit_code": 0,
+            "seconds": 24.55320718200528
+          }
+        ],
+        "child_pid": 2848451,
+        "exit_code": 0,
+        "seconds": 51.14127125201048,
+        "inputs": 1760,
+        "drift": []
+      }
+    },
+    "native_normal_sanitize": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/artifacts/normal-proof/sanitize/status.json",
+      "sha256": "94e0ec409f8db91a2b65e4edad46a213a5433f075494afd9fc45d5dff4ce3535",
+      "result": {
+        "state": "terminal",
+        "pid": 2786541,
+        "source": "bc1593df8e436c1ab48cd3b54124e9f8cbca8de1",
+        "profile": "sanitize",
+        "scope": "Complete import-native TU and independent actual FBX source/target normal consumer; exact owned new-layout core/support; no fresh app/fullbuild claim",
+        "product_differences": [
+          "src/import-native.cpp"
+        ],
+        "steps": [
+          {
+            "name": "consumer-compile",
+            "command": [
+              "/usr/bin/c++",
+              "-std=gnu++20",
+              "-O3",
+              "-DNDEBUG",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/third_party/nlohmann",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/third_party/cgltf",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/third_party/ufbx",
+              "-DDOME_FBX_FIXTURE_DIRECTORY=\"/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/tests/data/ufbx-deformers\"",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/artifacts/normal-proof/sanitize/test.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/tests/fbx-morph-generated-normals.cpp",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "-O1",
+              "-g1"
+            ],
+            "exit_code": 0,
+            "seconds": 7.109264994011028
+          },
+          {
+            "name": "old-link",
+            "command": [
+              "/usr/bin/c++",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "-O1",
+              "-g1",
+              "-O3",
+              "-DNDEBUG",
+              "-fsanitize=address,undefined",
+              "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/artifacts/normal-proof/sanitize/test.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/artifacts/normal-proof/sanitize/old-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/bake-cage-polygon-closure-064/artifacts/component-proof/sanitize/libdome-sculpt-core.a",
+              "libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "libdome-sculpt-polygon.a",
+              "libxatlas.a",
+              "libmikktspace.a",
+              "libmikktspace-robust.a",
+              "libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit_code": 0,
+            "seconds": 1.104594607022591
+          },
+          {
+            "name": "old-preserve",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/artifacts/normal-proof/sanitize/old-test",
+              "--preserve",
+              "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/artifacts/normal-proof/sanitize/old-default"
+            ],
+            "exit_code": 0,
+            "seconds": 0.074229944992112
+          },
+          {
+            "name": "original-refusal",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/artifacts/normal-proof/sanitize/old-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/artifacts/normal-proof/sanitize/counterfactual"
+            ],
+            "exit_code": 1,
+            "seconds": 0.07435531698865816
+          },
+          {
+            "name": "import-compile",
+            "command": [
+              "/usr/bin/c++",
+              "-DDOME_SCULPT_INSTALLED_ASSETS=\"/usr/local/share/dome-sculpt/assets/humanoid\"",
+              "-DDOME_SCULPT_SOURCE_ASSETS=\"/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/assets/humanoid\"",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/third_party",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/third_party/cgltf",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/third_party/nlohmann",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/third_party/xatlas",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/third_party/mikktspace",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/third_party/ufbx",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "-O1",
+              "-g1",
+              "-O3",
+              "-DNDEBUG",
+              "-std=gnu++20",
+              "-Wall",
+              "-Wextra",
+              "-Wpedantic",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/artifacts/normal-proof/sanitize/import-native.cpp.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/src/import-native.cpp"
+            ],
+            "exit_code": 0,
+            "seconds": 22.88459384001908
+          },
+          {
+            "name": "core-replace",
+            "command": [
+              "ar",
+              "r",
+              "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/artifacts/normal-proof/sanitize/libdome-sculpt-core.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/artifacts/normal-proof/sanitize/import-native.cpp.o"
+            ],
+            "exit_code": 0,
+            "seconds": 1.3605262659839354
+          },
+          {
+            "name": "core-index",
+            "command": [
+              "ar",
+              "s",
+              "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/artifacts/normal-proof/sanitize/libdome-sculpt-core.a"
+            ],
+            "exit_code": 0,
+            "seconds": 0.9077681049820967
+          },
+          {
+            "name": "new-link",
+            "command": [
+              "/usr/bin/c++",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "-O1",
+              "-g1",
+              "-O3",
+              "-DNDEBUG",
+              "-fsanitize=address,undefined",
+              "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/artifacts/normal-proof/sanitize/test.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/artifacts/normal-proof/sanitize/test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/artifacts/normal-proof/sanitize/libdome-sculpt-core.a",
+              "libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "libdome-sculpt-polygon.a",
+              "libxatlas.a",
+              "libmikktspace.a",
+              "libmikktspace-robust.a",
+              "libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit_code": 0,
+            "seconds": 1.2700808900117408
+          },
+          {
+            "name": "new-workflow",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/artifacts/normal-proof/sanitize/test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/artifacts/normal-proof/sanitize/actual"
+            ],
+            "exit_code": 0,
+            "seconds": 0.2825412590173073
+          }
+        ],
+        "child_pid": 2790507,
+        "original_refusal": 1,
+        "default_canonical_files_byte_identical": 2,
+        "exit_code": 0,
+        "seconds": 36.419507678976515,
+        "inputs": 1768,
+        "drift": []
+      }
+    },
+    "original_four_regressions_sanitize": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/artifacts/regressions/sanitize/status.json",
+      "sha256": "252713d5b6ed09ad18d00497c83db629b7d4e611070ad324800d54ef0138e32c",
+      "result": {
+        "state": "terminal",
+        "pid": 2815618,
+        "source": "bc1593df8e436c1ab48cd3b54124e9f8cbca8de1",
+        "profile": "sanitize",
+        "scope": "Four actual original native FBX suites with complete matching consumers/new import TU; same owned core/support, not a whole build or GUI claim",
+        "steps": [
+          {
+            "name": "fbx-deformation-compile",
+            "command": [
+              "/usr/bin/c++",
+              "-DDOME_FBX_FIXTURE_DIRECTORY=\"/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/tests/data/ufbx-deformers\"",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/third_party/cgltf",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/third_party/nlohmann",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/third_party/ufbx",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "-O1",
+              "-g1",
+              "-O3",
+              "-DNDEBUG",
+              "-std=gnu++20",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/artifacts/regressions/sanitize/fbx-deformation.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/tests/fbx-deformation.cpp"
+            ],
+            "exit_code": 0,
+            "seconds": 32.250648490997264
+          },
+          {
+            "name": "fbx-deformation-link",
+            "command": [
+              "/usr/bin/c++",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "-O1",
+              "-g1",
+              "-O3",
+              "-DNDEBUG",
+              "-fsanitize=address,undefined",
+              "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/artifacts/regressions/sanitize/fbx-deformation.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/artifacts/regressions/sanitize/fbx-deformation",
+              "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/artifacts/normal-proof/sanitize/libdome-sculpt-core.a",
+              "libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "libdome-sculpt-polygon.a",
+              "libxatlas.a",
+              "libmikktspace.a",
+              "libmikktspace-robust.a",
+              "libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit_code": 0,
+            "seconds": 2.5824193219887093
+          },
+          {
+            "name": "fbx-deformation",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/artifacts/regressions/sanitize/fbx-deformation",
+              "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/artifacts/regressions/sanitize/fbx-deformation-actual"
+            ],
+            "exit_code": 0,
+            "seconds": 1.6402909199823625
+          },
+          {
+            "name": "fbx-import-document-compile",
+            "command": [
+              "/usr/bin/c++",
+              "-DDOME_FBX_FIXTURE_DIRECTORY=\"/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/tests/data/ufbx-deformers\"",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/third_party/nlohmann",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "-O1",
+              "-g1",
+              "-O3",
+              "-DNDEBUG",
+              "-std=gnu++20",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/artifacts/regressions/sanitize/fbx-import-document.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/tests/fbx-import-document.cpp"
+            ],
+            "exit_code": 0,
+            "seconds": 10.545137865992729
+          },
+          {
+            "name": "fbx-import-document-link",
+            "command": [
+              "/usr/bin/c++",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "-O1",
+              "-g1",
+              "-O3",
+              "-DNDEBUG",
+              "-fsanitize=address,undefined",
+              "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/artifacts/regressions/sanitize/fbx-import-document.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/artifacts/regressions/sanitize/fbx-import-document",
+              "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/artifacts/normal-proof/sanitize/libdome-sculpt-core.a",
+              "libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "libdome-sculpt-polygon.a",
+              "libxatlas.a",
+              "libmikktspace.a",
+              "libmikktspace-robust.a",
+              "libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded",
+              "-Wl,--wrap=read"
+            ],
+            "exit_code": 0,
+            "seconds": 3.313183891994413
+          },
+          {
+            "name": "fbx-import-document",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/artifacts/regressions/sanitize/fbx-import-document",
+              "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/artifacts/regressions/sanitize/fbx-import-document-actual"
+            ],
+            "exit_code": 0,
+            "seconds": 1.1321805519983172
+          },
+          {
+            "name": "fbx-named-uv-compile",
+            "command": [
+              "/usr/bin/c++",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/third_party/nlohmann",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/third_party/ufbx",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "-O1",
+              "-g1",
+              "-O3",
+              "-DNDEBUG",
+              "-std=gnu++20",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/artifacts/regressions/sanitize/fbx-named-uv.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/tests/fbx-named-uv.cpp"
+            ],
+            "exit_code": 0,
+            "seconds": 22.301811639015796
+          },
+          {
+            "name": "fbx-named-uv-link",
+            "command": [
+              "/usr/bin/c++",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "-O1",
+              "-g1",
+              "-O3",
+              "-DNDEBUG",
+              "-fsanitize=address,undefined",
+              "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/artifacts/regressions/sanitize/fbx-named-uv.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/artifacts/regressions/sanitize/fbx-named-uv",
+              "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/artifacts/normal-proof/sanitize/libdome-sculpt-core.a",
+              "libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "libdome-sculpt-polygon.a",
+              "libxatlas.a",
+              "libmikktspace.a",
+              "libmikktspace-robust.a",
+              "libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit_code": 0,
+            "seconds": 2.2736195049947128
+          },
+          {
+            "name": "fbx-named-uv",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/artifacts/regressions/sanitize/fbx-named-uv",
+              "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/tests/fixtures/import-named-uv.fbx",
+              "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/artifacts/regressions/sanitize/fbx-named-uv-actual"
+            ],
+            "exit_code": 0,
+            "seconds": 0.279552658990724
+          },
+          {
+            "name": "fbx-options-deformation-compile",
+            "command": [
+              "/usr/bin/c++",
+              "-DDOME_FBX_FIXTURE_DIRECTORY=\"/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/tests/data/ufbx-deformers\"",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/third_party/cgltf",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/third_party/ufbx",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/third_party/nlohmann",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "-O1",
+              "-g1",
+              "-O3",
+              "-DNDEBUG",
+              "-std=gnu++20",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/artifacts/regressions/sanitize/fbx-options-deformation.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/tests/fbx-options-deformation.cpp"
+            ],
+            "exit_code": 0,
+            "seconds": 30.8605703820067
+          },
+          {
+            "name": "fbx-options-deformation-link",
+            "command": [
+              "/usr/bin/c++",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "-O1",
+              "-g1",
+              "-O3",
+              "-DNDEBUG",
+              "-fsanitize=address,undefined",
+              "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/artifacts/regressions/sanitize/fbx-options-deformation.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/artifacts/regressions/sanitize/fbx-options-deformation",
+              "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/artifacts/normal-proof/sanitize/libdome-sculpt-core.a",
+              "libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "libdome-sculpt-polygon.a",
+              "libxatlas.a",
+              "libmikktspace.a",
+              "libmikktspace-robust.a",
+              "libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit_code": 0,
+            "seconds": 3.441005942004267
+          },
+          {
+            "name": "fbx-options-deformation",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/artifacts/regressions/sanitize/fbx-options-deformation",
+              "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/artifacts/regressions/sanitize/fbx-options-deformation-actual"
+            ],
+            "exit_code": 0,
+            "seconds": 9.108601963002002
+          },
+          {
+            "name": "GUI-helper-compile",
+            "command": [
+              "/usr/bin/c++",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/third_party/nlohmann",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "-O1",
+              "-g1",
+              "-O3",
+              "-DNDEBUG",
+              "-std=gnu++20",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/artifacts/regressions/sanitize/import-authoring.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/tests/import-authoring.cpp"
+            ],
+            "exit_code": 0,
+            "seconds": 37.198320285999216
+          },
+          {
+            "name": "GUI-helper-link",
+            "command": [
+              "/usr/bin/c++",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "-O1",
+              "-g1",
+              "-O3",
+              "-DNDEBUG",
+              "-fsanitize=address,undefined",
+              "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/artifacts/regressions/sanitize/import-authoring.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/artifacts/regressions/sanitize/dome-sculpt-import-authoring-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/artifacts/normal-proof/sanitize/libdome-sculpt-core.a",
+              "libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "libdome-sculpt-polygon.a",
+              "libxatlas.a",
+              "libmikktspace.a",
+              "libmikktspace-robust.a",
+              "libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit_code": 0,
+            "seconds": 3.789470365998568
+          },
+          {
+            "name": "app-link",
+            "command": [
+              "/usr/bin/c++",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "-O1",
+              "-g1",
+              "-O3",
+              "-DNDEBUG",
+              "-fsanitize=address,undefined",
+              "CMakeFiles/dome-sculpt.dir/src/native-display-runtime.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/rig-fit-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/projection-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/spacenav-options.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/app.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/polygon-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/import-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/procedural-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/resolution-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/sculpt-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/creator-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/rig-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/shapekey-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/weight-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/skin-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/mesh-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/bake-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/object-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/paint-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/uv-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/ui-conventions.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/session-appearance.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/export-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/third_party/desktop/desktop-menu.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/appmenu-protocol.c.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/artifacts/regressions/sanitize/dome-sculpt",
+              "-L/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-sanitize/lib",
+              "-L/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib",
+              "-Wl,-rpath,/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-sanitize/lib:/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib:",
+              "libdome-sculpt-spacenav.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/artifacts/normal-proof/sanitize/libdome-sculpt-core.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/bake-cage-panel-9c/artifacts/panel-proof/sanitize/libdome-sculpt-render.a",
+              "/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-sanitize/lib/libfltk_images.so.1.4.5",
+              "/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-sanitize/lib/libfltk_gl.so.1.4.5",
+              "/usr/lib64/libGLU.so",
+              "libdome-sculpt-xr.a",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libpng.so",
+              "/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-sanitize/lib/libfltk.so.1.4.5",
+              "-lcairo",
+              "-L/usr/lib64",
+              "-lX11",
+              "-lGLU",
+              "-lGL",
+              "/usr/lib64/libdl.a",
+              "/usr/lib64/libSM.so",
+              "/usr/lib64/libICE.so",
+              "/usr/lib64/libXext.so",
+              "/usr/lib64/libXinerama.so",
+              "/usr/lib64/libXfixes.so",
+              "/usr/lib64/libXcursor.so",
+              "/usr/lib64/libXrender.so",
+              "/usr/lib64/libXft.so",
+              "/usr/lib64/libwayland-egl.so",
+              "/usr/lib64/libwayland-cursor.so",
+              "/usr/lib64/libxkbcommon.so",
+              "/usr/lib64/libGLX.so",
+              "/usr/lib64/libOpenGL.so",
+              "/usr/lib64/libz.so",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libcairo.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/bake-cage-panel-9c/artifacts/panel-proof/sanitize/libdome-sculpt-render.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/artifacts/normal-proof/sanitize/libdome-sculpt-core.a",
+              "libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "libdome-sculpt-polygon.a",
+              "libxatlas.a",
+              "libmikktspace.a",
+              "libmikktspace-robust.a",
+              "libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "/usr/lib64/libEGL.so",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libharfbuzz.so",
+              "/usr/lib64/libGL.so",
+              "/usr/lib64/libfontconfig.so",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libfreetype.so",
+              "/usr/lib64/libicui18n.so",
+              "/usr/lib64/libicuuc.so",
+              "/usr/lib64/libopenxr_loader.so",
+              "/usr/lib64/libgio-2.0.so",
+              "/usr/lib64/libgobject-2.0.so",
+              "/usr/lib64/libglib-2.0.so",
+              "/usr/lib64/libX11.so",
+              "/usr/lib64/libwayland-client.so",
+              "-lm",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit_code": 0,
+            "seconds": 4.678715623012977
+          }
+        ],
+        "child_pid": 2832356,
+        "exit_code": 0,
+        "seconds": 167.81694411899662,
+        "inputs": 1768,
+        "drift": []
+      }
+    },
+    "actual_native_GUI_sanitize": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-ui-bc15/artifacts/gui/sanitize/status.json",
+      "sha256": "7d64cbb4baf778513c16ae08a04e5787fcff408ff8c8e91281187f04a50dade1",
+      "result": {
+        "state": "terminal",
+        "pid": 2845737,
+        "source": "bbbdfdb6386b2707d56926e5fdcc9547b152f07a",
+        "profile": "sanitize",
+        "scope": "Actual native FLTK chooser selects Generate flat/smooth on genuine morph-bearing FBX, native Save and frame authority plus exact Undo/Redo/close; matched component app and canonical27SDK, no HMD/GPU/full-build claim",
+        "steps": [
+          {
+            "name": "flat",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/selection-gui-venv/bin/python",
+              "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-ui-bc15/tests/fbx-morph-normals-menu.py"
+            ],
+            "extra": {
+              "DOME_FBX_NORMAL_MODE": "1",
+              "DOME_FBX_GUI_KIND": "morph-flat",
+              "DOME_FBX_NORMAL_OUT": "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-ui-bc15/artifacts/gui/sanitize/flat"
+            },
+            "exit_code": 0,
+            "seconds": 47.78018617798807
+          },
+          {
+            "name": "smooth",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/selection-gui-venv/bin/python",
+              "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-ui-bc15/tests/fbx-morph-normals-menu.py"
+            ],
+            "extra": {
+              "DOME_FBX_NORMAL_MODE": "2",
+              "DOME_FBX_GUI_KIND": "morph-smooth",
+              "DOME_FBX_NORMAL_OUT": "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-ui-bc15/artifacts/gui/sanitize/smooth"
+            },
+            "exit_code": 0,
+            "seconds": 35.52477919901139
+          }
+        ],
+        "child_pid": 2850996,
+        "exit_code": 0,
+        "seconds": 83.30617346099461,
+        "inputs": 1760,
+        "drift": []
+      }
+    },
+    "unfiltered_Khronos": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-ui-bc15/artifacts/interop/status.json",
+      "sha256": "18eeae265340a893995141640131396923683cc8e984af191789e46f9df9a36f",
+      "result": {
+        "state": "terminal",
+        "exit_code": 0,
+        "source": "bbbdfdb6386b2707d56926e5fdcc9547b152f07a",
+        "scope": "Unfiltered pinned Khronos validator for actual generated FBX canonical and emitted native-worker data; profile byte comparison, no GPU/app claim",
+        "seconds": 0.293,
+        "validator": "2.0.0-dev.3.10",
+        "validator_entry_sha256": "78deff9ea85743e86461c2d14fae76e7fc3ca0432e652f62948066b55fa16f0d",
+        "errors": 0,
+        "files": [
+          {
+            "profile": "release",
+            "file": "blender_279_shape_weights_7400_binary.fbx-1-canonical.glb",
+            "path": "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/artifacts/normal-proof/release/actual/blender_279_shape_weights_7400_binary.fbx-1-canonical.glb",
+            "sha256": "4703dd83f001dca1dd1d199eef59ffbf492068bf5da4521d86f32da9d4e49981",
+            "issues": {
+              "numErrors": 0,
+              "numWarnings": 0,
+              "numInfos": 0,
+              "numHints": 4,
+              "messages": [
+                {
+                  "code": "BUFFER_VIEW_TARGET_MISSING",
+                  "message": "bufferView.target should be set for vertex or index data.",
+                  "severity": 3,
+                  "pointer": "/meshes/0/primitives/0/attributes/NORMAL"
+                },
+                {
+                  "code": "BUFFER_VIEW_TARGET_MISSING",
+                  "message": "bufferView.target should be set for vertex or index data.",
+                  "severity": 3,
+                  "pointer": "/meshes/0/primitives/0/attributes/POSITION"
+                },
+                {
+                  "code": "BUFFER_VIEW_TARGET_MISSING",
+                  "message": "bufferView.target should be set for vertex or index data.",
+                  "severity": 3,
+                  "pointer": "/meshes/0/primitives/0/targets/0/NORMAL"
+                },
+                {
+                  "code": "BUFFER_VIEW_TARGET_MISSING",
+                  "message": "bufferView.target should be set for vertex or index data.",
+                  "severity": 3,
+                  "pointer": "/meshes/0/primitives/0/targets/0/POSITION"
+                }
+              ],
+              "truncated": false
+            }
+          },
+          {
+            "profile": "release",
+            "file": "blender_279_shape_weights_7400_binary.fbx-1.glb",
+            "path": "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/artifacts/normal-proof/release/actual/blender_279_shape_weights_7400_binary.fbx-1.glb",
+            "sha256": "4465c74b051692f54e6a02ec0a26e77f817c4d7422d1fcde66c761833aed4008",
+            "issues": {
+              "numErrors": 0,
+              "numWarnings": 0,
+              "numInfos": 0,
+              "numHints": 0,
+              "messages": [],
+              "truncated": false
+            }
+          },
+          {
+            "profile": "release",
+            "file": "blender_279_shape_weights_7400_binary.fbx-2-canonical.glb",
+            "path": "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/artifacts/normal-proof/release/actual/blender_279_shape_weights_7400_binary.fbx-2-canonical.glb",
+            "sha256": "6b2d80b04aa104661f2ff8083241f7e04c78bf7b14698b821951ecb1f1fe9ed9",
+            "issues": {
+              "numErrors": 0,
+              "numWarnings": 0,
+              "numInfos": 0,
+              "numHints": 4,
+              "messages": [
+                {
+                  "code": "BUFFER_VIEW_TARGET_MISSING",
+                  "message": "bufferView.target should be set for vertex or index data.",
+                  "severity": 3,
+                  "pointer": "/meshes/0/primitives/0/attributes/NORMAL"
+                },
+                {
+                  "code": "BUFFER_VIEW_TARGET_MISSING",
+                  "message": "bufferView.target should be set for vertex or index data.",
+                  "severity": 3,
+                  "pointer": "/meshes/0/primitives/0/attributes/POSITION"
+                },
+                {
+                  "code": "BUFFER_VIEW_TARGET_MISSING",
+                  "message": "bufferView.target should be set for vertex or index data.",
+                  "severity": 3,
+                  "pointer": "/meshes/0/primitives/0/targets/0/NORMAL"
+                },
+                {
+                  "code": "BUFFER_VIEW_TARGET_MISSING",
+                  "message": "bufferView.target should be set for vertex or index data.",
+                  "severity": 3,
+                  "pointer": "/meshes/0/primitives/0/targets/0/POSITION"
+                }
+              ],
+              "truncated": false
+            }
+          },
+          {
+            "profile": "release",
+            "file": "blender_279_shape_weights_7400_binary.fbx-2.glb",
+            "path": "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/artifacts/normal-proof/release/actual/blender_279_shape_weights_7400_binary.fbx-2.glb",
+            "sha256": "a5f2e00c060e2b04f6827a1ee3319f098e2b4eacc725050c9fea1cb66eb71cf2",
+            "issues": {
+              "numErrors": 0,
+              "numWarnings": 0,
+              "numInfos": 0,
+              "numHints": 0,
+              "messages": [],
+              "truncated": false
+            }
+          },
+          {
+            "profile": "release",
+            "file": "blender_279_shape_weights_7400_binary.fbx-preserve.glb",
+            "path": "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/artifacts/normal-proof/release/actual/blender_279_shape_weights_7400_binary.fbx-preserve.glb",
+            "sha256": "581e735632d62c95881296d16c82a6c1546928dac103fad630fa78d5c25f6744",
+            "issues": {
+              "numErrors": 0,
+              "numWarnings": 0,
+              "numInfos": 0,
+              "numHints": 4,
+              "messages": [
+                {
+                  "code": "BUFFER_VIEW_TARGET_MISSING",
+                  "message": "bufferView.target should be set for vertex or index data.",
+                  "severity": 3,
+                  "pointer": "/meshes/0/primitives/0/attributes/NORMAL"
+                },
+                {
+                  "code": "BUFFER_VIEW_TARGET_MISSING",
+                  "message": "bufferView.target should be set for vertex or index data.",
+                  "severity": 3,
+                  "pointer": "/meshes/0/primitives/0/attributes/POSITION"
+                },
+                {
+                  "code": "BUFFER_VIEW_TARGET_MISSING",
+                  "message": "bufferView.target should be set for vertex or index data.",
+                  "severity": 3,
+                  "pointer": "/meshes/0/primitives/0/targets/0/NORMAL"
+                },
+                {
+                  "code": "BUFFER_VIEW_TARGET_MISSING",
+                  "message": "bufferView.target should be set for vertex or index data.",
+                  "severity": 3,
+                  "pointer": "/meshes/0/primitives/0/targets/0/POSITION"
+                }
+              ],
+              "truncated": false
+            }
+          },
+          {
+            "profile": "release",
+            "file": "maya_blend_shape_cube_7700_ascii.fbx-1-canonical.glb",
+            "path": "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/artifacts/normal-proof/release/actual/maya_blend_shape_cube_7700_ascii.fbx-1-canonical.glb",
+            "sha256": "df75d3ba4a7cb59f733a239f6166ba49aa4c4511f7d155cef6495fa213fb2cf6",
+            "issues": {
+              "numErrors": 0,
+              "numWarnings": 0,
+              "numInfos": 2,
+              "numHints": 7,
+              "messages": [
+                {
+                  "code": "BUFFER_VIEW_TARGET_MISSING",
+                  "message": "bufferView.target should be set for vertex or index data.",
+                  "severity": 3,
+                  "pointer": "/meshes/0/primitives/0/attributes/NORMAL"
+                },
+                {
+                  "code": "BUFFER_VIEW_TARGET_MISSING",
+                  "message": "bufferView.target should be set for vertex or index data.",
+                  "severity": 3,
+                  "pointer": "/meshes/0/primitives/0/attributes/POSITION"
+                },
+                {
+                  "code": "BUFFER_VIEW_TARGET_MISSING",
+                  "message": "bufferView.target should be set for vertex or index data.",
+                  "severity": 3,
+                  "pointer": "/meshes/0/primitives/0/attributes/TEXCOORD_0"
+                },
+                {
+                  "code": "UNUSED_OBJECT",
+                  "message": "This object may be unused.",
+                  "severity": 2,
+                  "pointer": "/meshes/0/primitives/0/attributes/TEXCOORD_0"
+                },
+                {
+                  "code": "BUFFER_VIEW_TARGET_MISSING",
+                  "message": "bufferView.target should be set for vertex or index data.",
+                  "severity": 3,
+                  "pointer": "/meshes/0/primitives/0/targets/0/NORMAL"
+                },
+                {
+                  "code": "BUFFER_VIEW_TARGET_MISSING",
+                  "message": "bufferView.target should be set for vertex or index data.",
+                  "severity": 3,
+                  "pointer": "/meshes/0/primitives/0/targets/0/POSITION"
+                },
+                {
+                  "code": "BUFFER_VIEW_TARGET_MISSING",
+                  "message": "bufferView.target should be set for vertex or index data.",
+                  "severity": 3,
+                  "pointer": "/meshes/0/primitives/0/targets/1/NORMAL"
+                },
+                {
+                  "code": "BUFFER_VIEW_TARGET_MISSING",
+                  "message": "bufferView.target should be set for vertex or index data.",
+                  "severity": 3,
+                  "pointer": "/meshes/0/primitives/0/targets/1/POSITION"
+                },
+                {
+                  "code": "UNUSED_OBJECT",
+                  "message": "This object may be unused.",
+                  "severity": 2,
+                  "pointer": "/materials/0"
+                }
+              ],
+              "truncated": false
+            }
+          },
+          {
+            "profile": "release",
+            "file": "maya_blend_shape_cube_7700_ascii.fbx-1.glb",
+            "path": "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/artifacts/normal-proof/release/actual/maya_blend_shape_cube_7700_ascii.fbx-1.glb",
+            "sha256": "61291747ce463705df23d6b3c484e326d4af365c161720885b5ba86b227d83a4",
+            "issues": {
+              "numErrors": 0,
+              "numWarnings": 0,
+              "numInfos": 0,
+              "numHints": 0,
+              "messages": [],
+              "truncated": false
+            }
+          },
+          {
+            "profile": "release",
+            "file": "maya_blend_shape_cube_7700_ascii.fbx-2-canonical.glb",
+            "path": "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/artifacts/normal-proof/release/actual/maya_blend_shape_cube_7700_ascii.fbx-2-canonical.glb",
+            "sha256": "025adbf5d4ec7772813b2bf2b20179e41726ef50a1b597fc2c6770e27a3d043e",
+            "issues": {
+              "numErrors": 0,
+              "numWarnings": 0,
+              "numInfos": 2,
+              "numHints": 7,
+              "messages": [
+                {
+                  "code": "BUFFER_VIEW_TARGET_MISSING",
+                  "message": "bufferView.target should be set for vertex or index data.",
+                  "severity": 3,
+                  "pointer": "/meshes/0/primitives/0/attributes/NORMAL"
+                },
+                {
+                  "code": "BUFFER_VIEW_TARGET_MISSING",
+                  "message": "bufferView.target should be set for vertex or index data.",
+                  "severity": 3,
+                  "pointer": "/meshes/0/primitives/0/attributes/POSITION"
+                },
+                {
+                  "code": "BUFFER_VIEW_TARGET_MISSING",
+                  "message": "bufferView.target should be set for vertex or index data.",
+                  "severity": 3,
+                  "pointer": "/meshes/0/primitives/0/attributes/TEXCOORD_0"
+                },
+                {
+                  "code": "UNUSED_OBJECT",
+                  "message": "This object may be unused.",
+                  "severity": 2,
+                  "pointer": "/meshes/0/primitives/0/attributes/TEXCOORD_0"
+                },
+                {
+                  "code": "BUFFER_VIEW_TARGET_MISSING",
+                  "message": "bufferView.target should be set for vertex or index data.",
+                  "severity": 3,
+                  "pointer": "/meshes/0/primitives/0/targets/0/NORMAL"
+                },
+                {
+                  "code": "BUFFER_VIEW_TARGET_MISSING",
+                  "message": "bufferView.target should be set for vertex or index data.",
+                  "severity": 3,
+                  "pointer": "/meshes/0/primitives/0/targets/0/POSITION"
+                },
+                {
+                  "code": "BUFFER_VIEW_TARGET_MISSING",
+                  "message": "bufferView.target should be set for vertex or index data.",
+                  "severity": 3,
+                  "pointer": "/meshes/0/primitives/0/targets/1/NORMAL"
+                },
+                {
+                  "code": "BUFFER_VIEW_TARGET_MISSING",
+                  "message": "bufferView.target should be set for vertex or index data.",
+                  "severity": 3,
+                  "pointer": "/meshes/0/primitives/0/targets/1/POSITION"
+                },
+                {
+                  "code": "UNUSED_OBJECT",
+                  "message": "This object may be unused.",
+                  "severity": 2,
+                  "pointer": "/materials/0"
+                }
+              ],
+              "truncated": false
+            }
+          },
+          {
+            "profile": "release",
+            "file": "maya_blend_shape_cube_7700_ascii.fbx-2.glb",
+            "path": "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/artifacts/normal-proof/release/actual/maya_blend_shape_cube_7700_ascii.fbx-2.glb",
+            "sha256": "c338db696f250552a555915f053df3941b203d924277c63e4db8cef827a72d0c",
+            "issues": {
+              "numErrors": 0,
+              "numWarnings": 0,
+              "numInfos": 0,
+              "numHints": 0,
+              "messages": [],
+              "truncated": false
+            }
+          },
+          {
+            "profile": "release",
+            "file": "maya_blend_shape_cube_7700_ascii.fbx-preserve.glb",
+            "path": "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/artifacts/normal-proof/release/actual/maya_blend_shape_cube_7700_ascii.fbx-preserve.glb",
+            "sha256": "f914205a2907e495d53e606164c4b4432839bb354c1ac396b0207cbcb4c6b210",
+            "issues": {
+              "numErrors": 0,
+              "numWarnings": 0,
+              "numInfos": 2,
+              "numHints": 5,
+              "messages": [
+                {
+                  "code": "BUFFER_VIEW_TARGET_MISSING",
+                  "message": "bufferView.target should be set for vertex or index data.",
+                  "severity": 3,
+                  "pointer": "/meshes/0/primitives/0/attributes/NORMAL"
+                },
+                {
+                  "code": "BUFFER_VIEW_TARGET_MISSING",
+                  "message": "bufferView.target should be set for vertex or index data.",
+                  "severity": 3,
+                  "pointer": "/meshes/0/primitives/0/attributes/POSITION"
+                },
+                {
+                  "code": "BUFFER_VIEW_TARGET_MISSING",
+                  "message": "bufferView.target should be set for vertex or index data.",
+                  "severity": 3,
+                  "pointer": "/meshes/0/primitives/0/attributes/TEXCOORD_0"
+                },
+                {
+                  "code": "UNUSED_OBJECT",
+                  "message": "This object may be unused.",
+                  "severity": 2,
+                  "pointer": "/meshes/0/primitives/0/attributes/TEXCOORD_0"
+                },
+                {
+                  "code": "BUFFER_VIEW_TARGET_MISSING",
+                  "message": "bufferView.target should be set for vertex or index data.",
+                  "severity": 3,
+                  "pointer": "/meshes/0/primitives/0/targets/0/POSITION"
+                },
+                {
+                  "code": "BUFFER_VIEW_TARGET_MISSING",
+                  "message": "bufferView.target should be set for vertex or index data.",
+                  "severity": 3,
+                  "pointer": "/meshes/0/primitives/0/targets/1/POSITION"
+                },
+                {
+                  "code": "UNUSED_OBJECT",
+                  "message": "This object may be unused.",
+                  "severity": 2,
+                  "pointer": "/materials/0"
+                }
+              ],
+              "truncated": false
+            }
+          },
+          {
+            "profile": "sanitize",
+            "file": "blender_279_shape_weights_7400_binary.fbx-1-canonical.glb",
+            "path": "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/artifacts/normal-proof/sanitize/actual/blender_279_shape_weights_7400_binary.fbx-1-canonical.glb",
+            "sha256": "4703dd83f001dca1dd1d199eef59ffbf492068bf5da4521d86f32da9d4e49981",
+            "issues": {
+              "numErrors": 0,
+              "numWarnings": 0,
+              "numInfos": 0,
+              "numHints": 4,
+              "messages": [
+                {
+                  "code": "BUFFER_VIEW_TARGET_MISSING",
+                  "message": "bufferView.target should be set for vertex or index data.",
+                  "severity": 3,
+                  "pointer": "/meshes/0/primitives/0/attributes/NORMAL"
+                },
+                {
+                  "code": "BUFFER_VIEW_TARGET_MISSING",
+                  "message": "bufferView.target should be set for vertex or index data.",
+                  "severity": 3,
+                  "pointer": "/meshes/0/primitives/0/attributes/POSITION"
+                },
+                {
+                  "code": "BUFFER_VIEW_TARGET_MISSING",
+                  "message": "bufferView.target should be set for vertex or index data.",
+                  "severity": 3,
+                  "pointer": "/meshes/0/primitives/0/targets/0/NORMAL"
+                },
+                {
+                  "code": "BUFFER_VIEW_TARGET_MISSING",
+                  "message": "bufferView.target should be set for vertex or index data.",
+                  "severity": 3,
+                  "pointer": "/meshes/0/primitives/0/targets/0/POSITION"
+                }
+              ],
+              "truncated": false
+            }
+          },
+          {
+            "profile": "sanitize",
+            "file": "blender_279_shape_weights_7400_binary.fbx-1.glb",
+            "path": "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/artifacts/normal-proof/sanitize/actual/blender_279_shape_weights_7400_binary.fbx-1.glb",
+            "sha256": "4465c74b051692f54e6a02ec0a26e77f817c4d7422d1fcde66c761833aed4008",
+            "issues": {
+              "numErrors": 0,
+              "numWarnings": 0,
+              "numInfos": 0,
+              "numHints": 0,
+              "messages": [],
+              "truncated": false
+            }
+          },
+          {
+            "profile": "sanitize",
+            "file": "blender_279_shape_weights_7400_binary.fbx-2-canonical.glb",
+            "path": "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/artifacts/normal-proof/sanitize/actual/blender_279_shape_weights_7400_binary.fbx-2-canonical.glb",
+            "sha256": "6b2d80b04aa104661f2ff8083241f7e04c78bf7b14698b821951ecb1f1fe9ed9",
+            "issues": {
+              "numErrors": 0,
+              "numWarnings": 0,
+              "numInfos": 0,
+              "numHints": 4,
+              "messages": [
+                {
+                  "code": "BUFFER_VIEW_TARGET_MISSING",
+                  "message": "bufferView.target should be set for vertex or index data.",
+                  "severity": 3,
+                  "pointer": "/meshes/0/primitives/0/attributes/NORMAL"
+                },
+                {
+                  "code": "BUFFER_VIEW_TARGET_MISSING",
+                  "message": "bufferView.target should be set for vertex or index data.",
+                  "severity": 3,
+                  "pointer": "/meshes/0/primitives/0/attributes/POSITION"
+                },
+                {
+                  "code": "BUFFER_VIEW_TARGET_MISSING",
+                  "message": "bufferView.target should be set for vertex or index data.",
+                  "severity": 3,
+                  "pointer": "/meshes/0/primitives/0/targets/0/NORMAL"
+                },
+                {
+                  "code": "BUFFER_VIEW_TARGET_MISSING",
+                  "message": "bufferView.target should be set for vertex or index data.",
+                  "severity": 3,
+                  "pointer": "/meshes/0/primitives/0/targets/0/POSITION"
+                }
+              ],
+              "truncated": false
+            }
+          },
+          {
+            "profile": "sanitize",
+            "file": "blender_279_shape_weights_7400_binary.fbx-2.glb",
+            "path": "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/artifacts/normal-proof/sanitize/actual/blender_279_shape_weights_7400_binary.fbx-2.glb",
+            "sha256": "a5f2e00c060e2b04f6827a1ee3319f098e2b4eacc725050c9fea1cb66eb71cf2",
+            "issues": {
+              "numErrors": 0,
+              "numWarnings": 0,
+              "numInfos": 0,
+              "numHints": 0,
+              "messages": [],
+              "truncated": false
+            }
+          },
+          {
+            "profile": "sanitize",
+            "file": "blender_279_shape_weights_7400_binary.fbx-preserve.glb",
+            "path": "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/artifacts/normal-proof/sanitize/actual/blender_279_shape_weights_7400_binary.fbx-preserve.glb",
+            "sha256": "581e735632d62c95881296d16c82a6c1546928dac103fad630fa78d5c25f6744",
+            "issues": {
+              "numErrors": 0,
+              "numWarnings": 0,
+              "numInfos": 0,
+              "numHints": 4,
+              "messages": [
+                {
+                  "code": "BUFFER_VIEW_TARGET_MISSING",
+                  "message": "bufferView.target should be set for vertex or index data.",
+                  "severity": 3,
+                  "pointer": "/meshes/0/primitives/0/attributes/NORMAL"
+                },
+                {
+                  "code": "BUFFER_VIEW_TARGET_MISSING",
+                  "message": "bufferView.target should be set for vertex or index data.",
+                  "severity": 3,
+                  "pointer": "/meshes/0/primitives/0/attributes/POSITION"
+                },
+                {
+                  "code": "BUFFER_VIEW_TARGET_MISSING",
+                  "message": "bufferView.target should be set for vertex or index data.",
+                  "severity": 3,
+                  "pointer": "/meshes/0/primitives/0/targets/0/NORMAL"
+                },
+                {
+                  "code": "BUFFER_VIEW_TARGET_MISSING",
+                  "message": "bufferView.target should be set for vertex or index data.",
+                  "severity": 3,
+                  "pointer": "/meshes/0/primitives/0/targets/0/POSITION"
+                }
+              ],
+              "truncated": false
+            }
+          },
+          {
+            "profile": "sanitize",
+            "file": "maya_blend_shape_cube_7700_ascii.fbx-1-canonical.glb",
+            "path": "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/artifacts/normal-proof/sanitize/actual/maya_blend_shape_cube_7700_ascii.fbx-1-canonical.glb",
+            "sha256": "df75d3ba4a7cb59f733a239f6166ba49aa4c4511f7d155cef6495fa213fb2cf6",
+            "issues": {
+              "numErrors": 0,
+              "numWarnings": 0,
+              "numInfos": 2,
+              "numHints": 7,
+              "messages": [
+                {
+                  "code": "BUFFER_VIEW_TARGET_MISSING",
+                  "message": "bufferView.target should be set for vertex or index data.",
+                  "severity": 3,
+                  "pointer": "/meshes/0/primitives/0/attributes/NORMAL"
+                },
+                {
+                  "code": "BUFFER_VIEW_TARGET_MISSING",
+                  "message": "bufferView.target should be set for vertex or index data.",
+                  "severity": 3,
+                  "pointer": "/meshes/0/primitives/0/attributes/POSITION"
+                },
+                {
+                  "code": "BUFFER_VIEW_TARGET_MISSING",
+                  "message": "bufferView.target should be set for vertex or index data.",
+                  "severity": 3,
+                  "pointer": "/meshes/0/primitives/0/attributes/TEXCOORD_0"
+                },
+                {
+                  "code": "UNUSED_OBJECT",
+                  "message": "This object may be unused.",
+                  "severity": 2,
+                  "pointer": "/meshes/0/primitives/0/attributes/TEXCOORD_0"
+                },
+                {
+                  "code": "BUFFER_VIEW_TARGET_MISSING",
+                  "message": "bufferView.target should be set for vertex or index data.",
+                  "severity": 3,
+                  "pointer": "/meshes/0/primitives/0/targets/0/NORMAL"
+                },
+                {
+                  "code": "BUFFER_VIEW_TARGET_MISSING",
+                  "message": "bufferView.target should be set for vertex or index data.",
+                  "severity": 3,
+                  "pointer": "/meshes/0/primitives/0/targets/0/POSITION"
+                },
+                {
+                  "code": "BUFFER_VIEW_TARGET_MISSING",
+                  "message": "bufferView.target should be set for vertex or index data.",
+                  "severity": 3,
+                  "pointer": "/meshes/0/primitives/0/targets/1/NORMAL"
+                },
+                {
+                  "code": "BUFFER_VIEW_TARGET_MISSING",
+                  "message": "bufferView.target should be set for vertex or index data.",
+                  "severity": 3,
+                  "pointer": "/meshes/0/primitives/0/targets/1/POSITION"
+                },
+                {
+                  "code": "UNUSED_OBJECT",
+                  "message": "This object may be unused.",
+                  "severity": 2,
+                  "pointer": "/materials/0"
+                }
+              ],
+              "truncated": false
+            }
+          },
+          {
+            "profile": "sanitize",
+            "file": "maya_blend_shape_cube_7700_ascii.fbx-1.glb",
+            "path": "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/artifacts/normal-proof/sanitize/actual/maya_blend_shape_cube_7700_ascii.fbx-1.glb",
+            "sha256": "61291747ce463705df23d6b3c484e326d4af365c161720885b5ba86b227d83a4",
+            "issues": {
+              "numErrors": 0,
+              "numWarnings": 0,
+              "numInfos": 0,
+              "numHints": 0,
+              "messages": [],
+              "truncated": false
+            }
+          },
+          {
+            "profile": "sanitize",
+            "file": "maya_blend_shape_cube_7700_ascii.fbx-2-canonical.glb",
+            "path": "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/artifacts/normal-proof/sanitize/actual/maya_blend_shape_cube_7700_ascii.fbx-2-canonical.glb",
+            "sha256": "025adbf5d4ec7772813b2bf2b20179e41726ef50a1b597fc2c6770e27a3d043e",
+            "issues": {
+              "numErrors": 0,
+              "numWarnings": 0,
+              "numInfos": 2,
+              "numHints": 7,
+              "messages": [
+                {
+                  "code": "BUFFER_VIEW_TARGET_MISSING",
+                  "message": "bufferView.target should be set for vertex or index data.",
+                  "severity": 3,
+                  "pointer": "/meshes/0/primitives/0/attributes/NORMAL"
+                },
+                {
+                  "code": "BUFFER_VIEW_TARGET_MISSING",
+                  "message": "bufferView.target should be set for vertex or index data.",
+                  "severity": 3,
+                  "pointer": "/meshes/0/primitives/0/attributes/POSITION"
+                },
+                {
+                  "code": "BUFFER_VIEW_TARGET_MISSING",
+                  "message": "bufferView.target should be set for vertex or index data.",
+                  "severity": 3,
+                  "pointer": "/meshes/0/primitives/0/attributes/TEXCOORD_0"
+                },
+                {
+                  "code": "UNUSED_OBJECT",
+                  "message": "This object may be unused.",
+                  "severity": 2,
+                  "pointer": "/meshes/0/primitives/0/attributes/TEXCOORD_0"
+                },
+                {
+                  "code": "BUFFER_VIEW_TARGET_MISSING",
+                  "message": "bufferView.target should be set for vertex or index data.",
+                  "severity": 3,
+                  "pointer": "/meshes/0/primitives/0/targets/0/NORMAL"
+                },
+                {
+                  "code": "BUFFER_VIEW_TARGET_MISSING",
+                  "message": "bufferView.target should be set for vertex or index data.",
+                  "severity": 3,
+                  "pointer": "/meshes/0/primitives/0/targets/0/POSITION"
+                },
+                {
+                  "code": "BUFFER_VIEW_TARGET_MISSING",
+                  "message": "bufferView.target should be set for vertex or index data.",
+                  "severity": 3,
+                  "pointer": "/meshes/0/primitives/0/targets/1/NORMAL"
+                },
+                {
+                  "code": "BUFFER_VIEW_TARGET_MISSING",
+                  "message": "bufferView.target should be set for vertex or index data.",
+                  "severity": 3,
+                  "pointer": "/meshes/0/primitives/0/targets/1/POSITION"
+                },
+                {
+                  "code": "UNUSED_OBJECT",
+                  "message": "This object may be unused.",
+                  "severity": 2,
+                  "pointer": "/materials/0"
+                }
+              ],
+              "truncated": false
+            }
+          },
+          {
+            "profile": "sanitize",
+            "file": "maya_blend_shape_cube_7700_ascii.fbx-2.glb",
+            "path": "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/artifacts/normal-proof/sanitize/actual/maya_blend_shape_cube_7700_ascii.fbx-2.glb",
+            "sha256": "c338db696f250552a555915f053df3941b203d924277c63e4db8cef827a72d0c",
+            "issues": {
+              "numErrors": 0,
+              "numWarnings": 0,
+              "numInfos": 0,
+              "numHints": 0,
+              "messages": [],
+              "truncated": false
+            }
+          },
+          {
+            "profile": "sanitize",
+            "file": "maya_blend_shape_cube_7700_ascii.fbx-preserve.glb",
+            "path": "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/artifacts/normal-proof/sanitize/actual/maya_blend_shape_cube_7700_ascii.fbx-preserve.glb",
+            "sha256": "f914205a2907e495d53e606164c4b4432839bb354c1ac396b0207cbcb4c6b210",
+            "issues": {
+              "numErrors": 0,
+              "numWarnings": 0,
+              "numInfos": 2,
+              "numHints": 5,
+              "messages": [
+                {
+                  "code": "BUFFER_VIEW_TARGET_MISSING",
+                  "message": "bufferView.target should be set for vertex or index data.",
+                  "severity": 3,
+                  "pointer": "/meshes/0/primitives/0/attributes/NORMAL"
+                },
+                {
+                  "code": "BUFFER_VIEW_TARGET_MISSING",
+                  "message": "bufferView.target should be set for vertex or index data.",
+                  "severity": 3,
+                  "pointer": "/meshes/0/primitives/0/attributes/POSITION"
+                },
+                {
+                  "code": "BUFFER_VIEW_TARGET_MISSING",
+                  "message": "bufferView.target should be set for vertex or index data.",
+                  "severity": 3,
+                  "pointer": "/meshes/0/primitives/0/attributes/TEXCOORD_0"
+                },
+                {
+                  "code": "UNUSED_OBJECT",
+                  "message": "This object may be unused.",
+                  "severity": 2,
+                  "pointer": "/meshes/0/primitives/0/attributes/TEXCOORD_0"
+                },
+                {
+                  "code": "BUFFER_VIEW_TARGET_MISSING",
+                  "message": "bufferView.target should be set for vertex or index data.",
+                  "severity": 3,
+                  "pointer": "/meshes/0/primitives/0/targets/0/POSITION"
+                },
+                {
+                  "code": "BUFFER_VIEW_TARGET_MISSING",
+                  "message": "bufferView.target should be set for vertex or index data.",
+                  "severity": 3,
+                  "pointer": "/meshes/0/primitives/0/targets/1/POSITION"
+                },
+                {
+                  "code": "UNUSED_OBJECT",
+                  "message": "This object may be unused.",
+                  "severity": 2,
+                  "pointer": "/materials/0"
+                }
+              ],
+              "truncated": false
+            }
+          }
+        ],
+        "pairs": [
+          {
+            "file": "blender_279_shape_weights_7400_binary.fbx-1-canonical.glb",
+            "identical": true
+          },
+          {
+            "file": "blender_279_shape_weights_7400_binary.fbx-1.glb",
+            "identical": true
+          },
+          {
+            "file": "blender_279_shape_weights_7400_binary.fbx-2-canonical.glb",
+            "identical": true
+          },
+          {
+            "file": "blender_279_shape_weights_7400_binary.fbx-2.glb",
+            "identical": true
+          },
+          {
+            "file": "blender_279_shape_weights_7400_binary.fbx-preserve.glb",
+            "identical": true
+          },
+          {
+            "file": "maya_blend_shape_cube_7700_ascii.fbx-1-canonical.glb",
+            "identical": true
+          },
+          {
+            "file": "maya_blend_shape_cube_7700_ascii.fbx-1.glb",
+            "identical": true
+          },
+          {
+            "file": "maya_blend_shape_cube_7700_ascii.fbx-2-canonical.glb",
+            "identical": true
+          },
+          {
+            "file": "maya_blend_shape_cube_7700_ascii.fbx-2.glb",
+            "identical": true
+          },
+          {
+            "file": "maya_blend_shape_cube_7700_ascii.fbx-preserve.glb",
+            "identical": true
+          }
+        ]
+      }
+    },
+    "CMake_registration": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-ui-bc15/artifacts/registration/status.json",
+      "sha256": "5d0a98e3ca3285e8c2eee23b2bf5f50e29786d1dd31dff24e407331d53e31a3d",
+      "result": {
+        "state": "terminal",
+        "pid": 2873451,
+        "scope": "Fresh configuration and exact one new CTest registration, no build or executed test claim",
+        "source": "bbbdfdb6386b2707d56926e5fdcc9547b152f07a",
+        "steps": [
+          {
+            "name": "configure",
+            "command": [
+              "cmake",
+              "-S",
+              "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-ui-bc15",
+              "-B",
+              "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-ui-bc15/build-registration",
+              "-G",
+              "Ninja",
+              "-DCMAKE_BUILD_TYPE=Release",
+              "-DDOME_COMPUTE_BACKEND=CPU",
+              "-DFLTK_DIR=/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-release/share/fltk",
+              "-U*DOME_BITMAP_RUNTIME*",
+              "-U*NATIVEGL*",
+              "-U*RENDERFONTS*"
+            ],
+            "exit_code": 0,
+            "seconds": 5.352984133001883
+          },
+          {
+            "name": "registration",
+            "command": [
+              "ctest",
+              "--test-dir",
+              "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-ui-bc15/build-registration",
+              "-N",
+              "-R",
+              "^fbx-morph-generated-normals$"
+            ],
+            "exit_code": 0,
+            "seconds": 0.01603801699820906
+          }
+        ],
+        "child_pid": 2874482,
+        "exit_code": 0,
+        "seconds": 5.3698253740149084,
+        "inputs": 1756,
+        "drift": []
+      }
+    }
+  },
+  "GUI_reports": {
+    "release_flat": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-ui-bc15/artifacts/gui/release/flat/report.json",
+      "sha256": "16cca5bad6408ac9bb1dbc23495ad5ae03470e3863df5069ddc1e1cd9eaefc4d",
+      "result": {
+        "checks": [
+          {
+            "passed": true,
+            "check": "Import uses the real native chooser with DomeD identity and document ownership"
+          },
+          {
+            "passed": true,
+            "check": "Universal Close cancels native import without touching source or scene"
+          },
+          {
+            "passed": true,
+            "check": "Import options use DomeD native modal ownership and appearance identity"
+          },
+          {
+            "passed": true,
+            "check": "Return on the default Cancel discards native import options without submitting asset work"
+          },
+          {
+            "passed": true,
+            "check": "Actual native FLTK normal choice selects the requested generated morph basis"
+          },
+          {
+            "passed": true,
+            "check": "Explicit native options Import submits the source-retaining model on a background worker as one history operation"
+          },
+          {
+            "passed": true,
+            "check": "Actual native import and Save preserve all objects and editable node hierarchy"
+          },
+          {
+            "passed": true,
+            "check": "Native Save includes canonical source, frame, image, material and deformation archives"
+          },
+          {
+            "passed": true,
+            "check": "Actual native FBX chooser creates editable weighted shape targets"
+          },
+          {
+            "passed": true,
+            "check": "Native Save keeps original format bytes separately from canonical GLB"
+          },
+          {
+            "passed": true,
+            "check": "Real native unit choice reaches the background importer and persisted receipt"
+          },
+          {
+            "passed": true,
+            "check": "Selected generated normal mode reaches the real worker and persists its explicit adapter identity"
+          },
+          {
+            "passed": true,
+            "check": "Native project retains complete generated target normals in the real original-frame authority"
+          },
+          {
+            "passed": true,
+            "check": "One universal Undo restores exact pre-import scene with no partial groups"
+          },
+          {
+            "passed": true,
+            "check": "One universal Redo restores exact imported editable source state"
+          },
+          {
+            "passed": true,
+            "check": "The original input file remains byte-exact and the native application remains responsive"
+          },
+          {
+            "passed": true,
+            "check": "Actual native FBX import/Save/Undo/Redo closes through complete App/GL/font teardown"
+          }
+        ],
+        "failed": 0
+      }
+    },
+    "release_smooth": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-ui-bc15/artifacts/gui/release/smooth/report.json",
+      "sha256": "16cca5bad6408ac9bb1dbc23495ad5ae03470e3863df5069ddc1e1cd9eaefc4d",
+      "result": {
+        "checks": [
+          {
+            "passed": true,
+            "check": "Import uses the real native chooser with DomeD identity and document ownership"
+          },
+          {
+            "passed": true,
+            "check": "Universal Close cancels native import without touching source or scene"
+          },
+          {
+            "passed": true,
+            "check": "Import options use DomeD native modal ownership and appearance identity"
+          },
+          {
+            "passed": true,
+            "check": "Return on the default Cancel discards native import options without submitting asset work"
+          },
+          {
+            "passed": true,
+            "check": "Actual native FLTK normal choice selects the requested generated morph basis"
+          },
+          {
+            "passed": true,
+            "check": "Explicit native options Import submits the source-retaining model on a background worker as one history operation"
+          },
+          {
+            "passed": true,
+            "check": "Actual native import and Save preserve all objects and editable node hierarchy"
+          },
+          {
+            "passed": true,
+            "check": "Native Save includes canonical source, frame, image, material and deformation archives"
+          },
+          {
+            "passed": true,
+            "check": "Actual native FBX chooser creates editable weighted shape targets"
+          },
+          {
+            "passed": true,
+            "check": "Native Save keeps original format bytes separately from canonical GLB"
+          },
+          {
+            "passed": true,
+            "check": "Real native unit choice reaches the background importer and persisted receipt"
+          },
+          {
+            "passed": true,
+            "check": "Selected generated normal mode reaches the real worker and persists its explicit adapter identity"
+          },
+          {
+            "passed": true,
+            "check": "Native project retains complete generated target normals in the real original-frame authority"
+          },
+          {
+            "passed": true,
+            "check": "One universal Undo restores exact pre-import scene with no partial groups"
+          },
+          {
+            "passed": true,
+            "check": "One universal Redo restores exact imported editable source state"
+          },
+          {
+            "passed": true,
+            "check": "The original input file remains byte-exact and the native application remains responsive"
+          },
+          {
+            "passed": true,
+            "check": "Actual native FBX import/Save/Undo/Redo closes through complete App/GL/font teardown"
+          }
+        ],
+        "failed": 0
+      }
+    },
+    "sanitize_flat": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-ui-bc15/artifacts/gui/sanitize/flat/report.json",
+      "sha256": "16cca5bad6408ac9bb1dbc23495ad5ae03470e3863df5069ddc1e1cd9eaefc4d",
+      "result": {
+        "checks": [
+          {
+            "passed": true,
+            "check": "Import uses the real native chooser with DomeD identity and document ownership"
+          },
+          {
+            "passed": true,
+            "check": "Universal Close cancels native import without touching source or scene"
+          },
+          {
+            "passed": true,
+            "check": "Import options use DomeD native modal ownership and appearance identity"
+          },
+          {
+            "passed": true,
+            "check": "Return on the default Cancel discards native import options without submitting asset work"
+          },
+          {
+            "passed": true,
+            "check": "Actual native FLTK normal choice selects the requested generated morph basis"
+          },
+          {
+            "passed": true,
+            "check": "Explicit native options Import submits the source-retaining model on a background worker as one history operation"
+          },
+          {
+            "passed": true,
+            "check": "Actual native import and Save preserve all objects and editable node hierarchy"
+          },
+          {
+            "passed": true,
+            "check": "Native Save includes canonical source, frame, image, material and deformation archives"
+          },
+          {
+            "passed": true,
+            "check": "Actual native FBX chooser creates editable weighted shape targets"
+          },
+          {
+            "passed": true,
+            "check": "Native Save keeps original format bytes separately from canonical GLB"
+          },
+          {
+            "passed": true,
+            "check": "Real native unit choice reaches the background importer and persisted receipt"
+          },
+          {
+            "passed": true,
+            "check": "Selected generated normal mode reaches the real worker and persists its explicit adapter identity"
+          },
+          {
+            "passed": true,
+            "check": "Native project retains complete generated target normals in the real original-frame authority"
+          },
+          {
+            "passed": true,
+            "check": "One universal Undo restores exact pre-import scene with no partial groups"
+          },
+          {
+            "passed": true,
+            "check": "One universal Redo restores exact imported editable source state"
+          },
+          {
+            "passed": true,
+            "check": "The original input file remains byte-exact and the native application remains responsive"
+          },
+          {
+            "passed": true,
+            "check": "Actual native FBX import/Save/Undo/Redo closes through complete App/GL/font teardown"
+          }
+        ],
+        "failed": 0
+      }
+    },
+    "sanitize_smooth": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-ui-bc15/artifacts/gui/sanitize/smooth/report.json",
+      "sha256": "16cca5bad6408ac9bb1dbc23495ad5ae03470e3863df5069ddc1e1cd9eaefc4d",
+      "result": {
+        "checks": [
+          {
+            "passed": true,
+            "check": "Import uses the real native chooser with DomeD identity and document ownership"
+          },
+          {
+            "passed": true,
+            "check": "Universal Close cancels native import without touching source or scene"
+          },
+          {
+            "passed": true,
+            "check": "Import options use DomeD native modal ownership and appearance identity"
+          },
+          {
+            "passed": true,
+            "check": "Return on the default Cancel discards native import options without submitting asset work"
+          },
+          {
+            "passed": true,
+            "check": "Actual native FLTK normal choice selects the requested generated morph basis"
+          },
+          {
+            "passed": true,
+            "check": "Explicit native options Import submits the source-retaining model on a background worker as one history operation"
+          },
+          {
+            "passed": true,
+            "check": "Actual native import and Save preserve all objects and editable node hierarchy"
+          },
+          {
+            "passed": true,
+            "check": "Native Save includes canonical source, frame, image, material and deformation archives"
+          },
+          {
+            "passed": true,
+            "check": "Actual native FBX chooser creates editable weighted shape targets"
+          },
+          {
+            "passed": true,
+            "check": "Native Save keeps original format bytes separately from canonical GLB"
+          },
+          {
+            "passed": true,
+            "check": "Real native unit choice reaches the background importer and persisted receipt"
+          },
+          {
+            "passed": true,
+            "check": "Selected generated normal mode reaches the real worker and persists its explicit adapter identity"
+          },
+          {
+            "passed": true,
+            "check": "Native project retains complete generated target normals in the real original-frame authority"
+          },
+          {
+            "passed": true,
+            "check": "One universal Undo restores exact pre-import scene with no partial groups"
+          },
+          {
+            "passed": true,
+            "check": "One universal Redo restores exact imported editable source state"
+          },
+          {
+            "passed": true,
+            "check": "The original input file remains byte-exact and the native application remains responsive"
+          },
+          {
+            "passed": true,
+            "check": "Actual native FBX import/Save/Undo/Redo closes through complete App/GL/font teardown"
+          }
+        ],
+        "failed": 0
+      }
+    }
+  },
+  "counts": {
+    "genuine_files": 2,
+    "normal_modes": 2,
+    "native_checks_each_profile": 1158,
+    "independent_target_normal_corners_each_profile": 216,
+    "normal_max_component_error": 1.53527e-08,
+    "fixed_normal_limit": 2e-06,
+    "largest_normal_delta": 0.779345,
+    "original_native_commands_each_profile": 4,
+    "original_options_rows_each_profile": 75,
+    "actual_GUI_checks_mode_profile": 17,
+    "actual_GUI_checks_total": 68,
+    "Khronos_files": 20,
+    "Khronos_errors": 0,
+    "Khronos_warnings": 0,
+    "Khronos_retained_infos": 12,
+    "Khronos_retained_hints": 62,
+    "cross_profile_byte_identical_pairs": 10,
+    "default_canonical_files_identical_to_old_core_each_profile": 2
+  },
+  "artifacts": {
+    "release": {
+      "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/artifacts/normal-proof/release/libdome-sculpt-core.a": "be31df949b6e7cc249aa2b951ef89937f6ebb5acb50a541e445be36c637787a4",
+      "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/artifacts/normal-proof/release/test": "a43c852d2cdc40f9b21a22ed81f946fc262b75359b0dbe346123ef6529477cea",
+      "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/artifacts/regressions/release/dome-sculpt": "1ad0221802bdc2c792d32bcf671a5141fec1699c32f97a52ccd30ecca26a1a5f",
+      "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/artifacts/regressions/release/dome-sculpt-import-authoring-test": "166d6bd001ff42741e78be90d68dd72baed2c392b8002ff5878a31be4ee922b7"
+    },
+    "sanitize": {
+      "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/artifacts/normal-proof/sanitize/libdome-sculpt-core.a": "a7d979b3770dfdfaf5a1966391745f315845051d3701cd62e2877fb92ea07624",
+      "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/artifacts/normal-proof/sanitize/test": "db40c91e330afcd751fb17c0967c5585f12257b481774ed010d9dd0356d44a8e",
+      "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/artifacts/regressions/sanitize/dome-sculpt": "9e2f13868326f21434d03cf8e2d7ea33e645a1a85b1aaff408e810c0fd824576",
+      "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-oracle-e685/artifacts/regressions/sanitize/dome-sculpt-import-authoring-test": "0b1c1a1d0673fc4a9dba1dac69b78b26c3030545e91c0b112336ff829836829b"
+    }
+  },
+  "old_guard_counterfactual": "Each native_normal profile raw steps original-refusal terminal1 with exact old morph-normal guard; prior default canonical outputs captured with unchanged owned core and compared to new core.",
+  "test_oracle_failure": {
+    "release": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normals-afc/artifacts/normal-proof/release/status.json",
+      "sha256": "c24fb55f4d7ae7bcc15bd20517bb7549f2fa6721f5f1f7f9c804310b60f70ad1",
+      "result": {
+        "state": "terminal",
+        "pid": 2769038,
+        "source": "e68522b4494485bba060314c65a9524d4b28baed",
+        "profile": "release",
+        "scope": "Complete import-native TU and independent actual FBX source/target normal consumer; exact owned new-layout core/support; no fresh app/fullbuild claim",
+        "product_differences": [
+          "src/import-native.cpp"
+        ],
+        "steps": [
+          {
+            "name": "consumer-compile",
+            "command": [
+              "/usr/bin/c++",
+              "-std=gnu++20",
+              "-O3",
+              "-DNDEBUG",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normals-afc/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normals-afc/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normals-afc/third_party/nlohmann",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normals-afc/third_party/cgltf",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normals-afc/third_party/ufbx",
+              "-DDOME_FBX_FIXTURE_DIRECTORY=\"/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normals-afc/tests/data/ufbx-deformers\"",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normals-afc/artifacts/normal-proof/release/test.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normals-afc/tests/fbx-morph-generated-normals.cpp"
+            ],
+            "exit_code": 0,
+            "seconds": 3.8910721099819057
+          },
+          {
+            "name": "old-link",
+            "command": [
+              "/usr/bin/c++",
+              "-O3",
+              "-DNDEBUG",
+              "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normals-afc/artifacts/normal-proof/release/test.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normals-afc/artifacts/normal-proof/release/old-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/bake-cage-polygon-closure-064/artifacts/component-proof/release/libdome-sculpt-core.a",
+              "libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "libdome-sculpt-polygon.a",
+              "libxatlas.a",
+              "libmikktspace.a",
+              "libmikktspace-robust.a",
+              "libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit_code": 0,
+            "seconds": 0.1501205489912536
+          },
+          {
+            "name": "old-preserve",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normals-afc/artifacts/normal-proof/release/old-test",
+              "--preserve",
+              "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normals-afc/artifacts/normal-proof/release/old-default"
+            ],
+            "exit_code": 0,
+            "seconds": 0.005397600994911045
+          },
+          {
+            "name": "original-refusal",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normals-afc/artifacts/normal-proof/release/old-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normals-afc/artifacts/normal-proof/release/counterfactual"
+            ],
+            "exit_code": 1,
+            "seconds": 0.003703412978211418
+          },
+          {
+            "name": "import-compile",
+            "command": [
+              "/usr/bin/c++",
+              "-DDOME_SCULPT_INSTALLED_ASSETS=\"/usr/local/share/dome-sculpt/assets/humanoid\"",
+              "-DDOME_SCULPT_SOURCE_ASSETS=\"/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normals-afc/assets/humanoid\"",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normals-afc/third_party",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normals-afc/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normals-afc/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normals-afc/third_party/cgltf",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normals-afc/third_party/nlohmann",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normals-afc/third_party/xatlas",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normals-afc/third_party/mikktspace",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normals-afc/third_party/ufbx",
+              "-O3",
+              "-DNDEBUG",
+              "-std=gnu++20",
+              "-Wall",
+              "-Wextra",
+              "-Wpedantic",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normals-afc/artifacts/normal-proof/release/import-native.cpp.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normals-afc/src/import-native.cpp"
+            ],
+            "exit_code": 0,
+            "seconds": 6.8832608059747145
+          },
+          {
+            "name": "core-replace",
+            "command": [
+              "ar",
+              "r",
+              "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normals-afc/artifacts/normal-proof/release/libdome-sculpt-core.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normals-afc/artifacts/normal-proof/release/import-native.cpp.o"
+            ],
+            "exit_code": 0,
+            "seconds": 0.10715183499269187
+          },
+          {
+            "name": "core-index",
+            "command": [
+              "ar",
+              "s",
+              "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normals-afc/artifacts/normal-proof/release/libdome-sculpt-core.a"
+            ],
+            "exit_code": 0,
+            "seconds": 0.0778430060017854
+          },
+          {
+            "name": "new-link",
+            "command": [
+              "/usr/bin/c++",
+              "-O3",
+              "-DNDEBUG",
+              "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normals-afc/artifacts/normal-proof/release/test.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normals-afc/artifacts/normal-proof/release/test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normals-afc/artifacts/normal-proof/release/libdome-sculpt-core.a",
+              "libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "libdome-sculpt-polygon.a",
+              "libxatlas.a",
+              "libmikktspace.a",
+              "libmikktspace-robust.a",
+              "libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit_code": 0,
+            "seconds": 0.1700150099932216
+          },
+          {
+            "name": "new-workflow",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normals-afc/artifacts/normal-proof/release/test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normals-afc/artifacts/normal-proof/release/actual"
+            ],
+            "exit_code": -11,
+            "seconds": 0.05590461898827925
+          }
+        ],
+        "child_pid": 2770189,
+        "original_refusal": 1,
+        "exit_code": -11,
+        "seconds": 11.436332498007687,
+        "inputs": 1768,
+        "drift": []
+      },
+      "cause": "Independent raw glTF mesh has no node instance; test indexed source.nodes[-1]. Corrected only test to use retained parser mesh element identity; production TU unchanged."
+    },
+    "sanitize": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normals-afc/artifacts/normal-proof/sanitize/status.json",
+      "sha256": "7e1fc030dfb7c48cf2df64ce4c1971947961b6f87be9cdea35ee9bf69af8a005",
+      "result": {
+        "state": "terminal",
+        "pid": 2773134,
+        "source": "e68522b4494485bba060314c65a9524d4b28baed",
+        "profile": "sanitize",
+        "scope": "Complete import-native TU and independent actual FBX source/target normal consumer; exact owned new-layout core/support; no fresh app/fullbuild claim",
+        "product_differences": [
+          "src/import-native.cpp"
+        ],
+        "steps": [
+          {
+            "name": "consumer-compile",
+            "command": [
+              "/usr/bin/c++",
+              "-std=gnu++20",
+              "-O3",
+              "-DNDEBUG",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normals-afc/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normals-afc/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normals-afc/third_party/nlohmann",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normals-afc/third_party/cgltf",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normals-afc/third_party/ufbx",
+              "-DDOME_FBX_FIXTURE_DIRECTORY=\"/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normals-afc/tests/data/ufbx-deformers\"",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normals-afc/artifacts/normal-proof/sanitize/test.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normals-afc/tests/fbx-morph-generated-normals.cpp",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "-O1",
+              "-g1"
+            ],
+            "exit_code": 0,
+            "seconds": 7.221996229985962
+          },
+          {
+            "name": "old-link",
+            "command": [
+              "/usr/bin/c++",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "-O1",
+              "-g1",
+              "-O3",
+              "-DNDEBUG",
+              "-fsanitize=address,undefined",
+              "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normals-afc/artifacts/normal-proof/sanitize/test.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normals-afc/artifacts/normal-proof/sanitize/old-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/bake-cage-polygon-closure-064/artifacts/component-proof/sanitize/libdome-sculpt-core.a",
+              "libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "libdome-sculpt-polygon.a",
+              "libxatlas.a",
+              "libmikktspace.a",
+              "libmikktspace-robust.a",
+              "libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit_code": 0,
+            "seconds": 1.0952270969864912
+          },
+          {
+            "name": "old-preserve",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normals-afc/artifacts/normal-proof/sanitize/old-test",
+              "--preserve",
+              "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normals-afc/artifacts/normal-proof/sanitize/old-default"
+            ],
+            "exit_code": 0,
+            "seconds": 0.07622937200358137
+          },
+          {
+            "name": "original-refusal",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normals-afc/artifacts/normal-proof/sanitize/old-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normals-afc/artifacts/normal-proof/sanitize/counterfactual"
+            ],
+            "exit_code": 1,
+            "seconds": 0.07654811700922437
+          },
+          {
+            "name": "import-compile",
+            "command": [
+              "/usr/bin/c++",
+              "-DDOME_SCULPT_INSTALLED_ASSETS=\"/usr/local/share/dome-sculpt/assets/humanoid\"",
+              "-DDOME_SCULPT_SOURCE_ASSETS=\"/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normals-afc/assets/humanoid\"",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normals-afc/third_party",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normals-afc/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normals-afc/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normals-afc/third_party/cgltf",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normals-afc/third_party/nlohmann",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normals-afc/third_party/xatlas",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normals-afc/third_party/mikktspace",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normals-afc/third_party/ufbx",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "-O1",
+              "-g1",
+              "-O3",
+              "-DNDEBUG",
+              "-std=gnu++20",
+              "-Wall",
+              "-Wextra",
+              "-Wpedantic",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normals-afc/artifacts/normal-proof/sanitize/import-native.cpp.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normals-afc/src/import-native.cpp"
+            ],
+            "exit_code": 0,
+            "seconds": 25.152591229008976
+          },
+          {
+            "name": "core-replace",
+            "command": [
+              "ar",
+              "r",
+              "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normals-afc/artifacts/normal-proof/sanitize/libdome-sculpt-core.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normals-afc/artifacts/normal-proof/sanitize/import-native.cpp.o"
+            ],
+            "exit_code": 0,
+            "seconds": 1.4573652560065966
+          },
+          {
+            "name": "core-index",
+            "command": [
+              "ar",
+              "s",
+              "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normals-afc/artifacts/normal-proof/sanitize/libdome-sculpt-core.a"
+            ],
+            "exit_code": 0,
+            "seconds": 1.2491458139847964
+          },
+          {
+            "name": "new-link",
+            "command": [
+              "/usr/bin/c++",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "-O1",
+              "-g1",
+              "-O3",
+              "-DNDEBUG",
+              "-fsanitize=address,undefined",
+              "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normals-afc/artifacts/normal-proof/sanitize/test.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normals-afc/artifacts/normal-proof/sanitize/test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normals-afc/artifacts/normal-proof/sanitize/libdome-sculpt-core.a",
+              "libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "libdome-sculpt-polygon.a",
+              "libxatlas.a",
+              "libmikktspace.a",
+              "libmikktspace-robust.a",
+              "libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit_code": 0,
+            "seconds": 1.2017530800076202
+          },
+          {
+            "name": "new-workflow",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normals-afc/artifacts/normal-proof/sanitize/test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normals-afc/artifacts/normal-proof/sanitize/actual"
+            ],
+            "exit_code": 1,
+            "seconds": 0.09677148898481391
+          }
+        ],
+        "child_pid": 2777791,
+        "original_refusal": 1,
+        "exit_code": 1,
+        "seconds": 38.88596141900052,
+        "inputs": 1768,
+        "drift": []
+      },
+      "cause": "Independent raw glTF mesh has no node instance; test indexed source.nodes[-1]. Corrected only test to use retained parser mesh element identity; production TU unchanged."
+    }
+  },
+  "preserved_observer_failure": "Initial proof script chose link argument by numeric index and overwrote -o; failed before compiling/running anything. Tool selection corrected by actual object suffix, no source/runtime change.",
+  "visually_reviewed": {
+    "path": "/home/blux/de-xr/dome-sculpt/artifacts/fbx-morph-normal-ui-bc15/artifacts/gui/release/smooth/options-after-keys.png",
+    "sha256": "64e0cc2e59ffb4d89cefe57f6b5d210833b2a2dc57d2bba073fbb1a5ca54535a"
+  },
+  "canonical_toolkit": "DomeD canonical27/POLL release and sanitizer SDKs, existing bitmap runtime; same own parent/application support, no new DomeD whole build claim",
+  "remaining_full_goal": [
+    "Coherent main admission and appropriate combined regression",
+    "Broader production/degenerate target and normal-map/tangent/curved/mixed-material consumers",
+    "New-domain resource/failure-prefix/device coverage beyond the implemented guards and existing import cancellation suite",
+    "All remaining FBX/glTF/VRM and original/additional authoring requirements; controller drawers after basic targets"
+  ],
+  "main_admitted": false,
+  "physical_HMD": false,
+  "system_install": false,
+  "active_session_restart": false
+}
