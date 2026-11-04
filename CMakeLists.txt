@@ -3382,9 +3382,12 @@ if(BUILD_TESTING)
     add_executable(dome-sculpt-layered-normal-render-test tests/layered-normal-render.cpp)
     target_include_directories(dome-sculpt-layered-normal-render-test PRIVATE third_party/desktop third_party/cgltf)
     target_link_libraries(dome-sculpt-layered-normal-render-test PRIVATE dome-sculpt-render)
+    add_test(NAME layered-normal-render COMMAND dome-sculpt-layered-normal-render-test
+      ${CMAKE_CURRENT_BINARY_DIR}/layered-normal-native ${CMAKE_CURRENT_BINARY_DIR}/layered-normal-render)
+    set_tests_properties(layered-normal-render PROPERTIES FIXTURES_REQUIRED layered_normal_files TIMEOUT 1200 ENVIRONMENT "LIBGL_ALWAYS_SOFTWARE=1;LP_NUM_THREADS=2")
     add_test(NAME layered-normal-native COMMAND dome-sculpt-layered-normal-native-test
       ${CMAKE_CURRENT_SOURCE_DIR}/tests/fixtures/layered-normal ${CMAKE_CURRENT_BINARY_DIR}/layered-normal-native)
-    set_tests_properties(layered-normal-native PROPERTIES TIMEOUT 600 ENVIRONMENT "LIBGL_ALWAYS_SOFTWARE=1;LP_NUM_THREADS=2")
+    set_tests_properties(layered-normal-native PROPERTIES FIXTURES_SETUP layered_normal_files TIMEOUT 600 ENVIRONMENT "LIBGL_ALWAYS_SOFTWARE=1;LP_NUM_THREADS=2")
     add_executable(dome-sculpt-canonical-normal-owning-render-test tests/canonical-normal-owning-render.cpp)
     target_include_directories(dome-sculpt-canonical-normal-owning-render-test PRIVATE third_party/desktop third_party/cgltf)
     target_link_libraries(dome-sculpt-canonical-normal-owning-render-test PRIVATE dome-sculpt-render)
