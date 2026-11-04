@@ -14,6 +14,7 @@ inline std::optional<GeneratedBakedNormalExport> baked_normal_export(
  const ObjectSurface &input,SourceMorphSpace space,bool recompute_normals,
  const std::function<bool()> &cancelled={}){
  if(space!=SourceMorphSpace::Native||!input.textures||!input.textures->baked_base||
+    input.textures->baked_base->normal_interpretation!=BakedNormalInterpretation::CanonicalMikk||
     input.textures->baked_base->maps.normal.rgba.empty()||input.textures->normal.rgba.empty()||
     (input.material_bindings&&input.material_bindings->normal_frames))return {};
  auto stop=[&]{if(cancelled&&cancelled())throw std::runtime_error("Baked normal tangent export cancelled");};stop();
@@ -73,8 +74,18 @@ inline std::optional<GeneratedBakedNormalExport> baked_normal_export(
   if(coordinates!=input.paint_corner_coordinates)throw std::invalid_argument("Baked normal export paint coordinates differ from their domain proof");
   auto split=split_frame_corner_coordinates(mesh,layout,coordinates,cancelled);layout=std::move(split.frames);out.paint_coordinates=std::move(split.coordinates);
  }
- out.surface=input;out.surface.mesh={};out.rest_vertices=layout.vertices;out.input_polygon_colors=input.polygon_colors;out.surface.polygon_colors.reset();out.source=source.source();
- auto &emitted=out.surface.mesh;out.normal_targets.resize(count);out.tangent_targets.resize(count);
+ // Copy document properties without copying and then discarding its mesh.
+ // Geometry-bound preview/sampling proofs stay with the original input; only
+ // their authenticated derived coordinates enter this transient frame.
+ out.surface={input.id,input.name,input.transform,input.material,{},input.textures,input.deformation,input.groups,input.appearance,input.material_bindings,input.source_dormant};
+ out.surface.affine_edit=input.affine_edit;out.surface.rig_source=input.rig_source;
+ out.rest_vertices=layout.vertices;out.input_polygon_colors=input.polygon_colors;out.source=source.source();
+ auto &emitted=out.surface.mesh;const auto vertices=layout.vertices.size();
+ emitted.positions.reserve(vertices);emitted.normals.reserve(vertices);
+ if(!mesh.uv.empty())emitted.uv.reserve(vertices);
+ if(!mesh.uv_pins.empty())emitted.uv_pins.reserve(vertices);
+ out.tangents.reserve(vertices);out.normal_targets.resize(count);out.tangent_targets.resize(count);
+ for(size_t t=0;t<count;++t){if(!directions->targets[t].normals.empty())out.normal_targets[t].reserve(vertices);out.tangent_targets[t].reserve(vertices);}
  for(size_t v=0;v<layout.vertices.size();++v){
   if((v&1023)==0)stop();const auto original=layout.vertices[v],corner=layout.corners[v];emitted.positions.push_back(mesh.positions.at(original));emitted.normals.push_back(mesh.normals.at(original));
   if(!mesh.uv.empty())emitted.uv.push_back(mesh.uv.at(original));if(!mesh.uv_pins.empty())emitted.uv_pins.push_back(mesh.uv_pins.at(original));out.tangents.push_back(directions->tangents.at(corner));
