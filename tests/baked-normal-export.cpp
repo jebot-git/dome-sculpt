@@ -37,6 +37,8 @@ int main(int argc,char **argv)try{
   std::unique_ptr<cgltf_data,decltype(&cgltf_free)> data(raw,cgltf_free);
   if(cgltf_load_buffers(&options,raw,file.c_str())!=cgltf_result_success||cgltf_validate(raw)!=cgltf_result_success)throw std::runtime_error("Independent cgltf validation failed");
   require_cage(raw->meshes_count==1&&raw->meshes[0].primitives_count==1,"Portable view contains precisely the visible native target");const auto &primitive=raw->meshes[0].primitives[0];
+  require_cage(primitive.material&&primitive.material->normal_texture.texture&&primitive.material->normal_texture.texcoord==0&&primitive.material->normal_texture.scale==1,
+    "Real canonical normal texture remains bound to UV0 at unit strength alongside explicit tangents");
   const auto p=attribute(primitive.attributes,primitive.attributes_count,cgltf_attribute_type_position),n=attribute(primitive.attributes,primitive.attributes_count,cgltf_attribute_type_normal),t=attribute(primitive.attributes,primitive.attributes_count,cgltf_attribute_type_tangent);
   require_cage(p&&n&&t&&p->count==6&&t->count==6&&primitive.indices->count==6,"Shared vertex is split into two genuine tangent handedness domains");
   std::array<bool,2> origin_signs{};
