@@ -15,6 +15,8 @@ class NativeAuthoringCapture final {
 public:
   static std::shared_ptr<const NativeAuthoringCapture>
   create(const NativeAuthoringExport &,const std::function<bool()> &);
+  static std::shared_ptr<const NativeAuthoringCapture>
+  create(const NativeAuthoringExport &,const std::function<bool()> &,const SourceUvBakeOptions &);
   const Scene &scene() const { return *scene_; }
   const std::shared_ptr<const Scene> &scene_owner() const { return scene_; }
   const std::vector<ObjectSurface> &originals() const { return originals_; }

@@ -171,7 +171,7 @@ struct SurfaceRenderer::TextureState {
     if(geometry_changed)for(auto t:mesh.source_tangents){float n=length(Vec3{t[0],t[1],t[2]});if(!finite(Vec3{t[0],t[1],t[2]})||!std::isfinite(n)||n<1e-8f||(t[3]!=-1&&t[3]!=1))throw std::invalid_argument("Retained tangent frame is invalid");}
     for(const auto &range:mesh.ranges) {
       if(range.material_bindings&&range.material_bindings->physical_emission&&
-         (range.textures&&!range.textures->source_only))
+         (range.textures&&!range.textures->source_only&&(!range.textures->overlay||!range.textures->overlay->native_geometry())))
         throw std::invalid_argument("Derived absolute emission requires its physical overlay adapter");
       if(range.material_bindings && range.material_bindings->normal_frames && !range.source_frame)throw std::invalid_argument("Retained material frames require complete worker frame publication");
       if(range.source_frame && (mesh.source_normals.size()!=count || (!range.source_normal_only && mesh.source_tangents.size()!=count)))throw std::invalid_argument("Source frame arrays are unavailable");
@@ -206,7 +206,25 @@ struct SurfaceRenderer::TextureState {
       auto maps=range.textures;auto &plan=planned[range.object];
       if(range.material_bindings&&range.material_bindings->physical_emission)
         next_physical_backgrounds.emplace(range.object,*range.material_bindings->physical_emission);
-      if(maps&&maps->overlay){
+      if(maps&&maps->overlay&&maps->overlay->native_geometry()){
+        const auto &packet=*maps->overlay;const auto &owner=packet.source_maps();
+        if(maps->source_only||owner!=maps->source_maps||owner.owner_before(maps->source_maps)||maps->source_maps.owner_before(owner)||
+           packet.native_domain()!=(range.paint_sampling_attachment?range.paint_sampling_attachment->domain():nullptr))
+          throw std::invalid_argument("Native emission packet lost its actual independent paint owners");
+        const auto &basis=*packet.native_geometry();
+        if(basis.indices.size()!=range.count)throw std::invalid_argument("Native emission packet corner layout differs from the displayed geometry");
+        if(range.paint_sampling_attachment&&!range.paint_sampling_attachment->matches(packet.native_geometry(),packet.native_domain()))
+          throw std::invalid_argument("Native emission packet borrowed another current geometry attachment");
+        if(geometry_changed)for(size_t c=0;c<range.count;++c){
+          const auto logical=range.paint_winding_reversed&&c%3?c+(c%3==1?1:-1):c;
+          const auto expected=packet.native_domain()?packet.native_domain()->basis()->uv.at(packet.native_domain()->basis()->indices.at(packet.native_domain()->source_corners()[logical])):basis.uv.at(basis.indices.at(logical));
+          const auto vertex=mesh.mesh.indices.at(range.first+c);
+          const auto actual=mesh.paint_coordinates.empty()?mesh.mesh.uv.at(vertex):mesh.paint_coordinates.at(vertex);
+          if(actual!=expected)throw std::invalid_argument("Native emission stream lost exact ordered paint coordinates");
+        }
+        if(!packet.empty())overlay_inputs.push_back({maps->overlay,true});
+      }
+      if(maps&&maps->overlay&&!maps->overlay->native_geometry()){
         const auto &owner=maps->overlay->source_maps();
         if(!maps->source_only||!owner||owner!=maps->source_maps||owner.owner_before(maps->source_maps)||maps->source_maps.owner_before(owner))
           throw std::invalid_argument("GPU overlay lost its exact original sampling owner");
@@ -316,6 +334,8 @@ struct SurfaceRenderer::TextureState {
           (!typed && maps && maps->source_maps && maps->source_maps->normal.image && maps->source_maps->normal_scale!=0)))
         throw std::invalid_argument("Normal-mapped source material requires retained tangent authority");
       if(typed){
+        if(maps&&maps->overlay&&maps->overlay->native_geometry())
+          throw std::invalid_argument("Native physical MToon preview needs its actual typed float adapter; choose Core PBR for this view");
         Toon toon;toon.appearance=range.appearance;toon.source=range.material_bindings;toon.material=*typed;
         toon.derived=maps&&!maps->source_only;
         if(maps&&maps->overlay&&!maps->overlay->empty())toon.overlay=maps->overlay;
@@ -403,7 +423,14 @@ struct SurfaceRenderer::TextureState {
         auto color=view,emission=view;if(maps->source_maps){if(maps->source_maps->color.image)color=maps->source_maps->color;if(maps->source_maps->emission.image)emission=maps->source_maps->emission;}
         color.uv_transform=emission.uv_transform={1,0,0,1,0,0};
         if(prepared_color){color=view;color.min_filter=color.mag_filter=GL_LINEAR;}
-        slot(0,std::shared_ptr<const Image>(maps,prepared_color?&maps->pbr_color:&maps->color),color,true);slot(1,std::shared_ptr<const Image>(maps,&maps->metal_rough),view,false);slot(2,std::shared_ptr<const Image>(maps,&maps->emission),emission,true);
+        slot(0,std::shared_ptr<const Image>(maps,prepared_color?&maps->pbr_color:&maps->color),color,true);slot(1,std::shared_ptr<const Image>(maps,&maps->metal_rough),view,false);
+        if(maps->overlay&&maps->overlay->native_geometry()){
+          if(maps->source_maps&&maps->source_maps->emission.image&&!(range.material_bindings&&range.material_bindings->physical_emission)){
+            const auto &source=maps->source_maps->emission;
+            if(source.texcoord!=0)throw std::invalid_argument("Native float emission requires its actual alternate source-coordinate adapter");
+            slot(2,source.image,source,true);
+          }
+        }else slot(2,std::shared_ptr<const Image>(maps,&maps->emission),emission,true);
         if(!maps->normal.rgba.empty()){
           if(!prepared_normal&&mesh.tangents.size()!=mesh.mesh.positions.size())throw std::invalid_argument("Normal-mapped snapshots require worker-generated tangent corners");
           auto image=std::shared_ptr<const Image>(maps,&maps->normal);
@@ -560,6 +587,7 @@ if(map_mode==2&&slots[4]==1)ao=mix(1.0,texture(tex4,source_uv(4)).r,ao_strength)
 if(overlay_mode==1){vec4 contribution=texture(tex7,paintcoord),orm=texture(tex8,paintcoord),coverage=texture(tex10,paintcoord);
  base=base*(1-coverage.r)+contribution;metal=metal*(1-coverage.g)+orm.b;rough=rough*(1-coverage.b)+orm.g;ao=ao*(1-orm.a)+orm.r;
  glow=glow*(1-coverage.a)+texture(tex9,paintcoord).rgb+texture(tex13,paintcoord).rgb;}
+if(overlay_mode==2){float coverage=texture(tex10,paintcoord).a;glow=glow*(1-coverage)+texture(tex9,paintcoord).rgb+texture(tex13,paintcoord).rgb;}
 base*=source_color;
 if(alpha_mode==1)base.a=1.0;else if(alpha_mode==2){if(base.a<alpha_cutoff)discard;base.a=1.0;}
 if(unlit==1){color=ghost_color(vec4(sculpt_mask_color(base.rgb),base.a));return;}
@@ -779,7 +807,8 @@ void SurfaceRenderer::draw(std::shared_ptr<const MeshSnapshot> mesh,
     glUniform1i(glGetUniformLocation(program_,"source_uv1_is_uv0"),overlay&&overlay->original_uv1()&&uv0&&uv0==carrier&&!uv0.owner_before(carrier)&&!carrier.owner_before(uv0));
     glUniform1i(glGetUniformLocation(program_,"mt_mode"),0);glUniform1i(glGetUniformLocation(program_,"mt_outline"),0);
     if (maps&&!maps->source_only) {
-      material.color={1,1,1,1};material.metallic=material.roughness=1;material.emissive={1,1,1};
+      material.color={1,1,1,1};material.metallic=material.roughness=1;
+      material.emissive=maps->overlay&&maps->overlay->native_geometry()?original.emissive:std::array<float,3>{1,1,1};
     }
     std::array<GLint,5> present{},coordinates{};std::array<float,15> ux{},uy{};
     for(int n=0;n<5;++n){
@@ -798,7 +827,7 @@ void SurfaceRenderer::draw(std::shared_ptr<const MeshSnapshot> mesh,
       const auto &view=binding[5];glUniform1i(glGetUniformLocation(program_,"original_normal_coordinate"),view.coordinate);glUniform1i(glGetUniformLocation(program_,"original_normal_present"),view.image!=0);
       glUniform3f(glGetUniformLocation(program_,"original_normal_x"),view.uv[0],view.uv[1],view.uv[4]);glUniform3f(glGetUniformLocation(program_,"original_normal_y"),view.uv[2],view.uv[3],view.uv[5]);}
     const bool visible_overlay=maps&&maps->overlay&&!maps->overlay->empty();
-    glUniform1i(glGetUniformLocation(program_,"overlay_mode"),visible_overlay?1:0);
+    glUniform1i(glGetUniformLocation(program_,"overlay_mode"),visible_overlay?(maps->overlay->native_geometry()?2:1):0);
     if(visible_overlay){const auto &overlay=textures_->paint_overlays.at(maps->overlay,true);
       constexpr std::array<int,5> slots{7,8,9,10,13};
       for(size_t n=0;n<slots.size();++n){glActiveTexture(GL_TEXTURE0+slots[n]);glBindTexture(GL_TEXTURE_2D,overlay.planes[n]);glBindSampler(slots[n],0);}}

@@ -55,7 +55,15 @@ struct Visibility {
     cull = r.material.double_sided ? MToonCull::Off : MToonCull::Back;
     alpha = r.material.alpha; cutoff = r.material.alpha_cutoff; factor = r.material.color[3];
     auto maps = r.textures;
-    if(maps&&maps->overlay){
+    if(maps&&maps->overlay&&maps->overlay->native_geometry()){
+      const auto &packet=*maps->overlay;
+      if(maps->source_only||packet.native_domain()!=(r.paint_sampling_attachment?r.paint_sampling_attachment->domain():nullptr)||
+         (r.paint_sampling_attachment&&!r.paint_sampling_attachment->matches(packet.native_geometry(),packet.native_domain())))
+        throw std::invalid_argument("Native emission visibility lost its actual independent paint attachment");
+      // Native emission does not change alpha. Colour/masks already belong to
+      // the derived RGBA field, so do not apply the full Source4 overlay twice.
+    }
+    if(maps&&maps->overlay&&!maps->overlay->native_geometry()){
       const auto &source=maps->overlay->source_maps();
       if(!maps->source_only||!source||source!=maps->source_maps||source.owner_before(maps->source_maps)||maps->source_maps.owner_before(source))
         throw std::invalid_argument("Visibility overlay lost its exact original source sampling owner");

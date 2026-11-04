@@ -176,6 +176,9 @@ struct PaintedMesh::CompositeCache {
   uint64_t preview_token=0;
   bool source_eligible=false;
   std::shared_ptr<const TextureMaps> source_preview;
+  uint64_t native_emission_token=0;
+  CompositeFactors native_emission_factors{};
+  std::weak_ptr<const TextureMaps> native_emission_preview;
 };
 PaintCompositeCacheStats paint_composite_cache_stats(){
   auto &cache=composite_retention();std::lock_guard lock(cache.mutex);
@@ -869,6 +872,16 @@ std::shared_ptr<const detail::PaintOverlayPacket> detail::PaintOverlayFactory::c
   }
   paint_compute::checkpoint(cancelled);return packet;
 }
+std::shared_ptr<const detail::PaintOverlayPacket> detail::PaintOverlayFactory::capture_native_emission(
+    const PaintedMesh &paint,const std::function<bool()> &cancelled) {
+  if(paint.source_sampling_prepared()||paint.surface_diagnostics().policy==PaintUvPolicy::SourceAuthored)
+    throw std::invalid_argument("Native emission packet cannot impersonate original source sampling");
+  if(paint.paint_sampling_domain()&&!paint.valid_paint_sampling_attachment())
+    throw std::invalid_argument("Native emission lost its exact writable geometry attachment");
+  auto packet=std::const_pointer_cast<PaintOverlayPacket>(capture(paint,cancelled));
+  packet->native_geometry_=paint.mesh_owner();packet->native_domain_=paint.paint_sampling_domain();
+  return packet;
+}
 std::shared_ptr<const detail::PaintOverlayPacket> detail::PaintOverlayFactory::pack_source_maps(
     const std::shared_ptr<const PaintOverlayPacket> &packet,std::shared_ptr<const PaintSourceMaps> packed,
     std::span<const uint32_t> vertices,const std::function<bool()> &cancelled) {
@@ -1227,6 +1240,34 @@ bool PaintedMesh::redo() {
   composite_token_=token;
   ++revision_;
   return true;
+}
+bool detail::EmissionExportAccess::requires_preview(const PaintedMesh &paint,const Material &material,
+    const SourceMaterialBindings *binding) {
+  return !paint.source_sampling_prepared()&&paint.surface_diagnostics().policy!=PaintUvPolicy::SourceAuthored&&
+    (paint.has_physical_emission()||std::any_of(material.emissive.begin(),material.emissive.end(),[](float v){return v>1;})||
+     (binding&&(binding->physical_emission||std::any_of(binding->native_reference.emission.begin(),binding->native_reference.emission.end(),[](float v){return v>1;}))));
+}
+std::shared_ptr<const TextureMaps> detail::EmissionExportAccess::preview(const PaintedMesh &paint,const Material &material,
+    const std::function<bool()> &cancelled) {
+  paint_compute::checkpoint(cancelled);material.validate();
+  const CompositeFactors factors{material.color,material.emissive,material.metallic,material.roughness};
+  auto &cache=*paint.composite_cache_;
+  {std::lock_guard lock(cache.mutex);
+    if(cache.native_emission_token==paint.composite_token_&&cache.native_emission_factors==factors)
+      if(auto previous=cache.native_emission_preview.lock())return previous;
+  }
+  // Deep normal replay may legitimately visit a before-Paint that shares this
+  // metadata cache. Build without holding its mutex, then publish completed maps.
+  auto detached=without_emission(paint);auto safe=material;safe.emissive={};
+  auto maps=std::make_shared<TextureMaps>(*detached->composite(safe,cancelled));
+  maps->overlay=PaintOverlayFactory::capture_native_emission(paint,cancelled);
+  // The existing compositor refuses unresolved alternate original coordinates.
+  // Do not silently reinterpret those coordinates as the native writable grid.
+  paint_compute::checkpoint(cancelled);
+  {std::lock_guard lock(cache.mutex);
+    cache.native_emission_token=paint.composite_token_;cache.native_emission_factors=factors;cache.native_emission_preview=maps;
+  }
+  return maps;
 }
 std::shared_ptr<PaintedMesh> detail::EmissionExportAccess::without_emission(const PaintedMesh &paint) {
   // An altered temporary may never publish maps under the original's visual
@@ -1688,6 +1729,8 @@ std::shared_ptr<PaintedMesh> PaintedMesh::from_maps(Mesh mesh,
 std::shared_ptr<const TextureMaps> PaintedMesh::preview(const Material &material) const {return preview(material,{});}
 std::shared_ptr<const TextureMaps> PaintedMesh::preview(const Material &material,const std::function<bool()> &cancelled) const {
   paint_compute::checkpoint(cancelled);material.validate();
+  if(detail::EmissionExportAccess::requires_preview(*this,material,nullptr))
+    return detail::EmissionExportAccess::preview(*this,material,cancelled);
   if(baked_&&baked_->normal_authority&&(!normal_projection_||normal_projection_->version!=2))
     throw std::invalid_argument("Retained normal identity requires its own source sampling interpretation");
   if(source_maps_ && !baked_ && !color_projection_ && !normal_projection_){

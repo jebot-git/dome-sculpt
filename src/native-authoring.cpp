@@ -65,7 +65,10 @@ void attach(detail::GltfDocument &document,const detail::NativeAuthoringCapture 
 namespace detail {
 NativeAuthoringCapture::NativeAuthoringCapture(std::shared_ptr<const Scene> scene,std::vector<ObjectSurface> originals,std::vector<uint64_t> ids,NativeAuthoringExport::Scope scope):scene_(std::move(scene)),originals_(std::move(originals)),ids_(std::move(ids)),scope_(scope){}
 std::shared_ptr<const NativeAuthoringCapture> NativeAuthoringCapture::create(const NativeAuthoringExport &options,const std::function<bool()> &cancelled){
- stop(cancelled);if(!options.scene||!options.allow_portable_fallback)throw std::invalid_argument("Native authoring requires an immutable Scene and explicit portable-view permission");
+ return create(options,cancelled,SourceUvBakeOptions{});
+}
+std::shared_ptr<const NativeAuthoringCapture> NativeAuthoringCapture::create(const NativeAuthoringExport &options,const std::function<bool()> &cancelled,const SourceUvBakeOptions &policy){
+ stop(cancelled);if(!policy.max_working_bytes||policy.max_working_bytes>512*1024*1024)throw std::invalid_argument("Invalid native authoring working budget");if(!options.scene||!options.allow_portable_fallback)throw std::invalid_argument("Native authoring requires an immutable Scene and explicit portable-view permission");
  if(options.scope!=NativeAuthoringExport::Scope::WholeScene&&options.scope!=NativeAuthoringExport::Scope::ExportedObjects)throw std::invalid_argument("Unknown native authoring export scope");
  if((options.scope==NativeAuthoringExport::Scope::WholeScene&&!options.objects.empty())||(options.scope==NativeAuthoringExport::Scope::ExportedObjects&&options.objects.empty()))throw std::invalid_argument("Native authoring scope and object selection disagree");
  auto scene=options.scene->snapshot();if(options.scope==NativeAuthoringExport::Scope::ExportedObjects)scene=emission_export_subset(scene,options.objects);scene.validate();scene.require_exportable_sources();stop(cancelled);
@@ -73,7 +76,7 @@ std::shared_ptr<const NativeAuthoringCapture> NativeAuthoringCapture::create(con
  // These are actual native preview/source owners, not an offline UV0 HDR
  // raster. A pristine raw source has no writable padding or sparse overlay;
  // only Source4 paint owns that independently authenticated GPU contribution.
- auto originals=native_authoring_surfaces(scene,cancelled);if(originals.empty()||originals.size()>256)throw std::length_error("Native authoring requires1..256 emitted objects");std::vector<uint64_t> ids;std::set<uint64_t> unique;
+ auto originals=native_authoring_surfaces(scene,cancelled,policy);if(originals.empty()||originals.size()>256)throw std::length_error("Native authoring requires1..256 emitted objects");std::vector<uint64_t> ids;std::set<uint64_t> unique;
  for(const auto &object:originals){stop(cancelled);scene.object(object.id);if(!unique.insert(object.id).second)throw std::invalid_argument("Duplicate native authoring original identity");ids.push_back(object.id);}
  if(options.scope==NativeAuthoringExport::Scope::ExportedObjects&&unique!=std::set<uint64_t>(options.objects.begin(),options.objects.end()))throw std::invalid_argument("Native authoring subset contains hidden or empty nonexported objects");
  return std::shared_ptr<const NativeAuthoringCapture>(new NativeAuthoringCapture(std::make_shared<const Scene>(std::move(scene)),std::move(originals),std::move(ids),options.scope));
@@ -85,7 +88,7 @@ GltfExportReport export_glb_authoring(const NativeAuthoringExport &owner,const s
 GltfExportReport export_glb_authoring(const NativeAuthoringExport &owner,const std::filesystem::path &path,const GltfExportOptions &requested,const SourceUvBakeOptions &paint_policy){
  auto options=requested;options.cancelled=[first=requested.cancelled,second=paint_policy.cancelled]{return (first&&first())||(second&&second());};
  stop(options.cancelled);if(options.emission)throw std::invalid_argument("Competing native HDR and authoring export owners");if(path.extension()!=".glb")throw std::invalid_argument("Native authoring export requires.glb");if(!options.max_output_bytes||options.max_output_bytes>container_cap)throw std::invalid_argument("Invalid native authoring output limit");
- const auto capture=detail::NativeAuthoringCapture::create(owner,options.cancelled);
+ const auto capture=detail::NativeAuthoringCapture::create(owner,options.cancelled,paint_policy);
  auto compiler_policy=paint_policy;compiler_policy.cancelled={};
  auto compiled=detail::compile_native_authoring(*capture,compiler_policy,options.max_output_bytes,options.cancelled);
  auto document=detail::make_gltf_authoring(*capture,compiled.surfaces,options.recompute_changed_normals,options.cancelled);

@@ -25,6 +25,46 @@ bool native_physical(const SculptObject &o) {
     !o.painted->source_sampling_prepared()&&
     o.painted->surface_diagnostics().policy!=PaintUvPolicy::SourceAuthored));
 }
+struct NativeExtractionCost {size_t bytes=0,samples=0,raster=0;};
+NativeExtractionCost native_extraction_cost(const Scene &scene,const SourceUvBakeOptions &policy,
+    const std::function<bool()> &cancelled) {
+  NativeExtractionCost cost;
+  auto charge=[](size_t &total,size_t n,size_t unit,size_t cap,const char *message){
+    if(total>cap||n>(cap-total)/unit)throw std::length_error(message);total+=n*unit;};
+  for(const auto &o:scene.objects())if(o.visible&&native_physical(o)&&o.mesh_active){
+    if(cancelled&&cancelled())throw std::runtime_error("Native physical extraction cancelled");
+    const auto &p=*o.painted;const auto r=p.resolution();const size_t grid=size_t(r)*r;
+    auto bytes=[&](size_t n,size_t unit){charge(cost.bytes,n,unit,policy.max_working_bytes,"Native physical extraction exceeds working budget before allocation");};
+    bytes(1,sizeof(PaintedMesh)+sizeof(TextureMaps)+sizeof(SourceMaterialBindings)+4096);
+    const auto maps=p.source_maps();
+    auto pixels=[&](std::initializer_list<const PaintSourceTexture*> roles){uint32_t w=r,h=r;
+      for(auto role:roles)if(role&&role->image){w=std::max(w,role->image->width);h=std::max(h,role->image->height);}
+      const size_t n=size_t(w)*h;if(n>policy.max_image_pixels||n>16*1024*1024)throw std::length_error("Native physical composite image exceeds pixel budget before allocation");return n;};
+    const PaintSourceMaps empty;const auto &m=maps?*maps:empty;
+    const size_t color=pixels({&m.color}),orm=pixels({&m.metal_rough,&m.occlusion}),emission=pixels({&m.emission});
+    // Colour/emission coverage are conservatively charged at full extent;
+    // the compositor may use a singleton when no corresponding coverage exists.
+    bytes(color,8);bytes(orm,4);bytes(emission,8);
+    if(p.color_projection())bytes(color,4);
+    if(p.normal_projection())bytes(grid,8);
+    else if(p.baked()&&!p.baked()->maps.normal.rgba.empty())bytes(grid,12);
+    for(const auto &layer:p.layers()){
+      bytes(layer.tiles.capacity()+layer.pbr_tiles.capacity()+layer.emission_tiles.capacity(),sizeof(void*)*2);
+      bytes(layer.name.capacity()+1,1);
+      for(const auto &tile:layer.tiles)if(tile&&std::any_of(tile->pixels.begin(),tile->pixels.end(),[](const auto &q){return q.data[6]||q.data[7]||q.data[8]||q.data[12];}))bytes(1,sizeof(PaintTile));
+    }
+    const size_t per_pixel=16+8*p.layers().size();
+    charge(cost.samples,color+orm+emission,per_pixel,policy.max_sample_operations,"Native nonemission compilation exceeds cumulative sample budget");
+    charge(cost.raster,color+orm+emission,1,policy.max_raster_samples,"Native nonemission compilation exceeds cumulative raster budget");
+  }
+  return cost;
+}
+size_t texture_bytes(const TextureMaps &maps) {
+  size_t n=sizeof(TextureMaps);
+  for(const auto *image:{&maps.color,&maps.pbr_color,&maps.metal_rough,&maps.emission,&maps.normal,&maps.mtoon_normal,&maps.color_coverage,&maps.emission_coverage,&maps.baked_normal,&maps.baked_coverage}){
+    if(image->rgba.size()>SIZE_MAX-n)throw std::length_error("Native physical texture storage overflow");n+=image->rgba.size();}
+  return n;
+}
 // Compilation changes only this temporary view's current emission. Complete
 // original float planes and every historical material remain in the capture.
 void omit_current_emission(SculptObject &o) {
@@ -48,7 +88,10 @@ NativePhysicalField native_physical_field(const SculptObject &o,
     background=*o.material_bindings->physical_emission;
   if(!o.mesh_active){
     out.emission.strength=std::max({1.f,background[0],background[1],background[2]});
-    for(size_t k=0;k<3;++k)out.emission.factor[k]=background[k]/out.emission.strength;
+    for(size_t k=0;k<3;++k){out.emission.factor[k]=background[k]/out.emission.strength;
+      const double error=std::abs(double(background[k])-double(out.emission.factor[k])*out.emission.strength);
+      out.emission.maximum_absolute_error=std::max(out.emission.maximum_absolute_error,error);
+      if(background[k]>0)out.emission.maximum_relative_error=std::max(out.emission.maximum_relative_error,error/background[k]);}
     return out;
   }
   if(!o.painted)throw std::invalid_argument("Native physical view requires its actual paint owner");
@@ -112,15 +155,22 @@ NativePhysicalField native_physical_field(const SculptObject &o,
 }
 }
 std::vector<ObjectSurface> native_authoring_surfaces(const Scene &scene,
-    const std::function<bool()> &cancelled) {
-  auto detached=scene.snapshot();
+    const std::function<bool()> &cancelled,const SourceUvBakeOptions &policy) {
+  native_extraction_cost(scene,policy,cancelled);
+  // The capture owns the immutable snapshot. Only explicitly replaced metadata
+  // is copied; read-only mesh/Volume/paint owners remain shared.
+  auto detached=scene;
   for(const auto &original:scene.objects()){
     if(cancelled&&cancelled())throw std::runtime_error("Native physical surface extraction cancelled");
-    if(native_physical(original))omit_current_emission(detached.object(original.id));
+    if(original.visible&&native_physical(original))omit_current_emission(detached.object(original.id));
   }
   auto surfaces=detached.preview_surfaces(cancelled);
   for(auto &surface:surfaces){const auto &original=scene.object(surface.id);
-    if(native_physical(original)){surface.material=original.material;surface.material_bindings=original.material_bindings;}}
+    if(native_physical(original)){surface.material=original.material;surface.material_bindings=original.material_bindings;
+      // The temporary's normal proof is paired with its temporary binding.
+      // Export replays the actual normal recipe; it must not advertise this
+      // preview-only proof under the restored original binding identity.
+      surface.normal_preview_proof.reset();}}
   return surfaces;
 }
 NativeAuthoringCompilation compile_native_authoring(
@@ -161,7 +211,13 @@ NativeAuthoringCompilation compile_native_authoring(
     reserve(surface.groups.size(),sizeof(SceneGroup));
     for(const auto &group:surface.groups)reserve(group.name.size()+1,sizeof(char));
     const auto &object = capture.scene().object(surface.id);
-    if(native_physical(object))painted=true;
+    if(native_physical(object)){
+      painted=true;
+      if(surface.textures)reserve(texture_bytes(*surface.textures),1);
+      // The final emitted mesh is a distinct copy of the captured geometry.
+      reserve(mesh.positions.size()+mesh.normals.size(),sizeof(Vec3));
+      reserve(mesh.uv.size(),sizeof(std::array<float,2>));reserve(mesh.indices.size(),sizeof(uint32_t));
+    }
     else if(physical(object)&&(!object.painted||!object.painted->source_sampling_prepared())) {
       if(object.appearance){const auto scratch=raw_emission_proof_bytes(*object.appearance,stop);
         if(scratch>policy.max_working_bytes-fixed)throw std::length_error("Raw source material proof exceeds available working budget");
@@ -218,7 +274,8 @@ NativeAuthoringCompilation compile_native_authoring(
     std::shared_ptr<const SourceMaterialBindings> material;
   };
   std::map<uint64_t,View> views;
-  size_t retained_images = 0, retained_memory = 0, samples = 0, raster = 0;
+  const auto native_cost=native_extraction_cost(capture.scene(),policy,stop);
+  size_t retained_images = 0, retained_memory = 0, samples = native_cost.samples, raster = native_cost.raster;
   const size_t maximum_images = std::min(policy.max_output_bytes,output_limit);
   for (const auto &surface : capture.originals()) {
     check();
@@ -285,11 +342,18 @@ NativeAuthoringCompilation compile_native_authoring(
   }
   check();
   staged.validate();
-  result.surfaces = native_authoring_surfaces(staged,stop);
-  for(auto &surface:result.surfaces){const auto &object=staged.object(surface.id);
-    if(object.mesh_active&&object.painted->source_sampling_prepared())
-      source_paint_export(*object.painted,surface,stop);
+  // Reuse the capture's completed native nonemission maps and actual geometry;
+  // do not rerasterize/duplicate those buffers during Source4 staging.
+  auto extraction=staged;
+  for(const auto &surface:capture.originals())if(native_physical(capture.scene().object(surface.id)))
+    extraction.object(surface.id).visible=false;
+  auto changed=extraction.export_surfaces(stop);size_t next=0;
+  result.surfaces.reserve(capture.ids().size());
+  for(const auto &surface:capture.originals()){
+    if(native_physical(capture.scene().object(surface.id)))result.surfaces.push_back(surface);
+    else {if(next>=changed.size()||changed[next].id!=surface.id)throw std::logic_error("Native authoring staging lost exact object order");result.surfaces.push_back(std::move(changed[next++]));}
   }
+  if(next!=changed.size())throw std::logic_error("Native authoring staging added an uncaptured object");
   for (auto &surface : result.surfaces) {
     check();
     const auto &object=capture.scene().object(surface.id);
@@ -401,6 +465,11 @@ void finish_native_authoring_emission(GltfDocument &document,
       {"erasedNonzeroTexelSamples",entry.erased_nonzero_samples},{"clampedTexelSamples",0},
       {"unlitIgnoredNonzeroTexelSamples",entry.unlit_ignored_samples},
       {"maximumUnlitIgnoredRadiance",entry.unlit?double(entry.strength)*std::max({entry.factor[0],entry.factor[1],entry.factor[2]}):0.}};
+    if(!entry.image.width){auto &report=material["extras"]["domeSculptPortableEmission"];
+      report["errorScope"]="constant-factor-product";report["maximumAbsoluteFactorProductError"]=entry.maximum_absolute_error;
+      report["maximumRelativeFactorProductError"]=entry.maximum_relative_error;
+      for(const char *key:{"maximumAbsoluteTexelQuantizationError","maximumRelativeTexelQuantizationError","erasedNonzeroTexelSamples","clampedTexelSamples","unlitIgnoredNonzeroTexelSamples","betweenTexelErrorBound"})report.erase(key);
+    }
   }
   stop();
 }

@@ -1,3 +1,4 @@
+#include "emission-paint-access.hpp"
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/normal-preview.hpp"
 #include "dome/material-bindings.hpp"
@@ -32,7 +33,7 @@ std::shared_ptr<const NormalPreviewProof> prepare_normal_preview(const PaintedMe
  // render proof; a staged colour/UV derivative may still carry the old normal.
  node->validate_current(paint.mesh(),nullptr,cancelled);
  node->validate_paint(paint,*binding,true,cancelled);
- auto maps=paint.preview(material);
+ auto maps=detail::EmissionExportAccess::requires_preview(paint,material,binding.get())?detail::EmissionExportAccess::preview(paint,material,cancelled):paint.preview(material);
  detail::prepared_normal_state(binding.get(),maps.get(),false);
  if(!detail::normal_projection_identity(*maps->normal_projection,*node->projection))throw std::invalid_argument("Normal preview differs from its independently sealed field");
  const auto &domain=*node->projection->sampling_domain;

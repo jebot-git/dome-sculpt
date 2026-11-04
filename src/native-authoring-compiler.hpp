@@ -7,7 +7,7 @@ struct GltfDocument;
 // Selectively extract native float-paint geometry/other channels. Raw original
 // SourceAuthored surfaces keep their actual source-only interpretation.
 std::vector<ObjectSurface> native_authoring_surfaces(
-    const Scene &,const std::function<bool()> &);
+    const Scene &,const std::function<bool()> &,const SourceUvBakeOptions &);
 struct NativeAuthoringEmission {
   uint64_t object=0;
   Image image;
