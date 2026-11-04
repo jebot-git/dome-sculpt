@@ -55,9 +55,7 @@ void Document::restore_uv_source_locked(){
     if(!uv_||uv_accept_pending_||uv_solving_||!uv_->view().topology||uv_->view().validating)throw std::logic_error("Wait for UV processing before restoring its source");
     const auto object=control_object_;if(!detail::native_paint_source_restorable(scene_.object(object)))throw std::logic_error("This UV source cannot yet be restored without changing other authored data");
     const AssetSource expected{state_.generation,state_.revision,object,state_.edit_authority};
-    Transaction transaction(*this);transaction.finish_uv();desktop_=false;
-    queue_scene_operation_locked("Restore UV and paint source",[object](Scene &scene,const auto &cancelled){detail::restore_native_paint(scene,object,cancelled);},expected,{});
-    transaction.commit(false);
+    queue_scene_operation_locked("Restore UV and paint source",[object](Scene &scene,const auto &cancelled){detail::restore_native_paint(scene,object,cancelled);},expected,{},{},{},{},0,0,{},{},uv_session_);
 }
 void Document::apply_uv_action_locked(UvAction action, float x, float y) {
   if (!uv_) throw std::logic_error("Open the UV editor first");
