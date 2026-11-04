@@ -3769,3 +3769,19 @@ if(BUILD_TESTING)
     set_target_properties(dome-sculpt-native-rig-pose-ui-test PROPERTIES BUILD_RPATH "$<TARGET_FILE_DIR:fltk::fltk-shared>")
   endif()
 endif()
+
+# Both pools must recover together at every C++ allocation boundary. The global
+# strong Paint cache is disabled only inside this fault harness, as in the
+# separately qualified normal archive test; C/default-cache/IO are not implied.
+if(BUILD_TESTING AND TARGET dome-sculpt-authoring-native-normal-union-test)
+  add_executable(dome-sculpt-authoring-union-archive-faults-test tests/authoring-union-archive-faults.cpp)
+  target_include_directories(dome-sculpt-authoring-union-archive-faults-test PRIVATE src tests)
+  target_link_libraries(dome-sculpt-authoring-union-archive-faults-test PRIVATE dome-sculpt-core)
+  set_tests_properties(authoring-native-normal-union PROPERTIES FIXTURES_SETUP authoring_native_normal_union_files)
+  foreach(state IN ITEMS 0 2 4 6)
+    add_test(NAME authoring-union-archive-${state} COMMAND dome-sculpt-authoring-union-archive-faults-test
+      ${CMAKE_CURRENT_BINARY_DIR}/authoring-native-normal-union/${state}.dsculpt)
+    set_tests_properties(authoring-union-archive-${state} PROPERTIES
+      FIXTURES_REQUIRED authoring_native_normal_union_files TIMEOUT 1200)
+  endforeach()
+endif()
