@@ -900,13 +900,20 @@ Mesh MorphSet::evaluate(const Mesh &m, std::span<const float> weights) const {
   if (weights.size() != targets.size())
     throw std::invalid_argument("Morph value count mismatch");
   Mesh out = m;
+  bool active = false;
   for (size_t t = 0; t < targets.size(); t++) {
     if (!std::isfinite(weights[t]) || std::abs(weights[t]) > 10)
       throw std::invalid_argument("Invalid morph weight");
+    // Zero-weight targets are the exact authored rest surface. Recomputing
+    // its normals would discard artist shading even without a position edit.
+    if (weights[t] == 0)
+      continue;
+    active = true;
     for (size_t v = 0; v < m.positions.size(); v++)
       out.positions[v] += targets[t].delta[v] * weights[t];
   }
-  normals(out);
+  if (active)
+    normals(out);
   out.validate();
   return out;
 }

@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/rig.hpp"
+#include <cstring>
 #include <iostream>
 #include <nlohmann/json.hpp>
 using namespace dome;
@@ -201,6 +202,27 @@ int main() try {
   edited[0].z = .2f;
   morph.set_target(mesh, "Raise.L", edited);
   morph.mirror_target(mesh, 0, "Raise.R");
+  auto authored = mesh;
+  for (size_t v = 0; v < authored.normals.size(); ++v)
+    authored.normals[v] = normalized(Vec3{float(v + 1) * .1f, -.3f, 1});
+  auto morph_rest = morph.evaluate(authored, std::array<float, 2>{0.f, -0.f});
+  bool exact_rest = morph_rest.indices == authored.indices && morph_rest.uv == authored.uv &&
+                    morph_rest.uv_pins == authored.uv_pins && morph_rest.uv_seams == authored.uv_seams;
+  for (size_t v = 0; v < authored.positions.size(); ++v)
+    exact_rest &= std::memcmp(&morph_rest.positions[v], &authored.positions[v], sizeof(Vec3)) == 0 &&
+                  std::memcmp(&morph_rest.normals[v], &authored.normals[v], sizeof(Vec3)) == 0;
+  require(exact_rest, "Zero and signed-zero morph weights preserve every authored rest attribute exactly");
+  auto empty_rest = MorphSet(authored).evaluate(authored, {});
+  require(std::memcmp(empty_rest.normals.data(), authored.normals.data(), authored.normals.size() * sizeof(Vec3)) == 0,
+          "An empty morph set preserves authored rest shading");
+  rejects([&] { morph.evaluate(authored, std::array<float, 2>{0, std::numeric_limits<float>::quiet_NaN()}); },
+          "Zero-weight optimization still checks a later nonfinite weight");
+  rejects([&] { morph.evaluate(authored, std::array<float, 2>{0, 11}); },
+          "Zero-weight optimization still checks a later out-of-range weight");
+  auto invalid_rest = authored;
+  invalid_rest.normals[0].x = std::numeric_limits<float>::quiet_NaN();
+  rejects([&] { morph.evaluate(invalid_rest, std::array<float, 2>{0, 0}); },
+          "Zero-weight optimization still validates the complete rest mesh");
   auto shaped = morph.evaluate(mesh, std::array<float, 2>{.5f, 1});
   require(std::abs(shaped.positions[0].z - .1f) < 1e-6 &&
               std::abs(shaped.positions[1].z - .2f) < 1e-6 &&
