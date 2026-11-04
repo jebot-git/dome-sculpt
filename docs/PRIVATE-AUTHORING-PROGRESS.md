@@ -1,25 +1,69 @@
-# Current private authoring progress — 2026-11-04
+# Current private authoring progress — 2026-11-05
 
-The repaired [mixed authoring foundation44b3604](https://github.com/jebot-git/dome-sculpt/tree/44b36049c1af0c239633da7636b8cb1816fea8b6) now passes152 actual workflow checks each Release/sanitizer and strict Arc, across converted/UV/Clear/rebake states in both append orders.48 actual Khronos files have0 errors/30 warnings/150 infos;33 R/S artifacts and17 R/S/Arc native/container triples are byte-identical. Cross-device PNG differences are at most1, not byte-identical. Original44 owning R/S270-task builds pass but original27 tests each finish23Pass/4Fail. Three product-TU repairs fix the real orphan/context/export crash; original follow-up30 each finishes28Pass/2fixtureFail. Actual-owner mesh selection and [camera9c8bb2d](https://github.com/jebot-git/dome-sculpt/tree/9c8bb2d4bd3d2cbd7e03b5245c78da4d514b4c6f) correct those test setups; the latter passes83 checks each profile with visible palette captures. No original invocation is relabeled green.
+The full production objective remains active and incomplete. No new runtime code
+is admitted to main by this documentation checkpoint. Controller drawers remain
+required after the basic targets.
 
-A [new coherent source1d573f2](https://github.com/jebot-git/dome-sculpt/tree/1d573f2aa1f17f83bcc78533e130627c607fcf48) adds qualified colour-only VRM15310 and bounded anatomical packing319/current44 port to that foundation. Fresh Release ALL1,397 tasks and fresh owning sanitizer276 tasks are now running against its actual source and current DomeD SDK;689 tests are registered,32 selected with their fixtures. None is declared passed yet. Full original/additional requirements and later drawers remain unfinished.
+The [repaired mixed authoring foundation1299fb4](https://github.com/jebot-git/dome-sculpt/tree/1299fb4) combines actual normalUV34 and native32 ownership in Scene35/material17.
+Actual append, UV edits, Clear/rebake, Save/restart, editable export/recovery and
+Undo/Redo pass152 checks each Release/sanitizer/Arc.48 Khronos files have0 errors,
+30 retained warnings and150 infos.33 R/S artifacts and17 native/container triples
+across R/S/Arc are byte-identical; cross-device PNG differences are at most1,
+with no byte-identical image claim. Both archive profiles finish12,149 decoder
+and24,003 encoder persistent C++ denial prefixes plus84 load-cancellation polls
+on five actual mixed files. Default-cache/C/caller/IO remain separate. Read the
+[precise scope and negatives](https://github.com/jebot-git/dome-sculpt/blob/1299fb4/docs/COHERENT-AUTHORING-MIXED-REPAIR.md).
 
-HDR [functional milestone66e2e51](https://github.com/jebot-git/dome-sculpt/tree/66e2e5185759046578e730e843eb5227583ede48) is deliberately separate: R/S10 functional gates, native GUI, exact output caps and persistence pass, but actual sanitizer OOM injection exposes5,736 bytes/142 leaks in system OpenEXR C++ constructors. This is a real unresolved codec ownership defect. A new owning Core C codec implementation is underway; no suppression, failure disabling, cap increase or full qualification claim is accepted.
+Original44 owning R/S application/core/render/support builds complete270 tasks,
+but original27 commands each finish23Pass/4Fail. Three complete product-TU
+repairs restore orphan rejection, actual normal codec context and the genuine
+normal-frame guard that fixes native export crashes. Original follow-up30 each
+finishes28Pass/2fixtureFail. Actual paint-owner selection fixes the hidden-object
+assumption; [camera9c8bb2d](https://github.com/jebot-git/dome-sculpt/tree/9c8bb2d4bd3d2cbd7e03b5245c78da4d514b4c6f)
+frames the real controller panel and requires visible pixels, passing83 checks
+each profile. No original invocation is relabeled green.
 
-The original f2 full630 handle actually ended143 after131 passing tests, with no final summary; both original processes are gone. Its raw partial log and stale running-status file remain intact. A separately named exact-source continuation now runs remaining132..630 in explicit batches after verifying the original sources/SDK/application/archive hashes. Neither partial131 nor the continuation is a complete original full-suite pass. The new mixed archive R sweep passes12,149 decoder/24,003 encoder persistent C++ denial prefixes and84 load-cancellation polls across five actual files; same sanitizer sweep remains live in its last case. Default-cache/C/caller/IO remain separate.
+The [new coherent source1d573f2](https://github.com/jebot-git/dome-sculpt/tree/1d573f2aa1f17f83bcc78533e130627c607fcf48)
+adds qualified colour-only VRM15310 and anatomical packing319 to that foundation.
+Fresh optimized Release ALL1,397 tasks and fresh owning sanitizer276 tasks are
+running, with689 registered and32 selected tests plus fixtures. They have not
+passed yet. The [current44 anatomical portaca9dd2](https://github.com/jebot-git/dome-sculpt/tree/aca9dd22efa990342e3a62aece7dcce4c01c79ea)
+has actual female/male public19, locks/Save/history, linked poses, worker Cancel,
+sampled caller rollback and independent export evidence. Its new
+[repository-asset fixture chain4a1dfc8](https://github.com/jebot-git/dome-sculpt/tree/4a1dfc8c46cc82cf0380d875f53d3c3ca82bd3d0)
+registers17 reproducible endpoints; full coherent execution is still pending.
 
-This documentation checkpoint does not admit new runtime code. The full production objective remains active and incomplete; controller drawers remain required after the basic targets.
+Typed VRM1 expression paint progresses through qualified
+[colour-only5310](https://github.com/jebot-git/dome-sculpt/tree/5310acba0495384e3ba654d70355f95a9e28c201)
+and separate [shared-shadeccc109e](https://github.com/jebot-git/dome-sculpt/tree/ccc109e540704121d5dc439c407efe7bd439b20d)
+milestones with independent Release/sanitizer/Arc evidence. The latter changes a
+private struct and needs its real dependency rebuild at integration. Further
+UV-role/alpha/coefficient adapters remain; source/model/guard restrictions are
+explicit, and the original long source-world sanitizer sweep remains separate.
 
-The native converted-normal UV milestone is pushed at [f2dc466](https://github.com/jebot-git/dome-sculpt/tree/f2dc46652947365af65312a99d610e303dc85bf5). It implements actual UV Apply/Cancel/history/ordered Save, Scene34/material16 correspondence, retained GPU coordinates, independent GLB export, Clear and root-domain rebake. Scoped Release/sanitizer qualification includes225 new workflow assertions each, actualArc226,324 Khronos files with zero errors and108 identical profile/device triples,15 normal/15 compact native menu checks per profile,20 synthetic OpenXR checks per profile, and real archive5,439 decoder/8,959 encoder allocation-denial prefixes plus24 cancellation polls per profile. Read its [full evidence and limitations](https://github.com/jebot-git/dome-sculpt/blob/f2dc46652947365af65312a99d610e303dc85bf5/docs/LAYERED-NORMAL-UV-NATIVE.md). Default-cache/C allocation/caller/IO, physical headset and GPU-baking claims are excluded. The fresh complete optimized ALL build finishes1,243 tasks successfully. Its original registered full630 regression is running (61 passed at the latest process/log observation) and has not passed overall.
+HDR [functional milestone66e2e51](https://github.com/jebot-git/dome-sculpt/tree/66e2e5185759046578e730e843eb5227583ede48)
+remains separate. Its R/S10 functional gates, native GUI, exact byte limits and
+persistence pass, but actual sanitizer OOM injection finds5,736 bytes/142 leaks
+in system OpenEXR C++ constructors. An owning Core C codec replacement is being
+implemented and tested, without suppression, disabled failures or increased
+limits. No complete codec-memory-safety or new HDR admission claim is made.
 
-A separate direct original-source audit is pushed at [9dabf78](https://github.com/jebot-git/dome-sculpt/blob/9dabf78887545aff7d9edadc5167c218735537d1/docs/CANONICAL-DEFORMED-SOURCE-AUDIT.md). Four of nine curved skin/morph states differ from original legacy canonical shading beyond the unchanged4 image limit, maximum9, in both profiles. The UV milestone compares against the already converted pre-UV scene and does not resolve this original-source conversion gap. The predating [conversion contract](https://github.com/jebot-git/dome-sculpt/blob/f2dc46652947365af65312a99d610e303dc85bf5/docs/CANONICAL-NORMAL-CONVERSION.md) explicitly authors a new portable normal/tangent target model and disclaims equality with legacy dynamic evaluation at every pose. Treating this different-model measurement as a new regression gate was too broad. Preserve the measured images; the actual within-model UV/glTF bound4 remains unchanged. The qualified [portable model UI milestone](https://github.com/jebot-git/dome-sculpt/tree/e1ed5259cd9d53f78f0f75ec16fc137213568a01) now makes target authoring and rest-space quality explicit: actual normal/compact12+12, nested Wayland11 and actual-loader syntheticXR30 each Release/sanitizer. Screenshot review found and repaired a clipped compact quality label. No shading math or archive change.
+The original frozen f2 full630 handle ended143 after131 passing tests without a
+final summary. Both original processes are gone; its raw partial log and stale
+running-status file remain intact. A separately named exact-source continuation
+runs remaining132..630 in explicit batches after source/SDK/application/archive
+hash verification. Neither partial131 nor that continuation is a complete
+original full-suite pass.
 
-The native32 painting/export milestone [7a24ea2](https://github.com/jebot-git/dome-sculpt/tree/7a24ea2c5fd4b0a032ebb04e179bee5dbf95950a) has fresh owning Release/sanitizer application and selected regression, actual Arc, native menu/controller, native recovery, independent consumer and allocation-failure evidence. It remains separate from normal34; emission package3 and broader material/normal/key adapters are ongoing.
-
-The anatomical linked-pose repair [04e6670](https://github.com/jebot-git/dome-sculpt/tree/04e6670f75a9f390c9e29e14127c42c47eecfbfe) fixes the real10/19 partial-pose counterexample and passes51 checks per actual avatar/profile on matching module builds. Its allocation sampling is explicitly partial. Qualified [native rig UI](https://github.com/jebot-git/dome-sculpt/tree/04e3268cce7b714ec9a2f660f8bab05fd8ab9552) adds34 normal/34 compact checks and independent current-pose export evidence. Full locked-weight rebinding remains under repair; new packing/replay work is not yet sealed. The qualified [VRM1 dynamic painted expression milestone](https://github.com/jebot-git/dome-sculpt/tree/c2f1705f07351bbb9633eca552667d23e1f5bfac) now has actual worker44, independent render112, factory1556 and Arc113 checks. All15 actual native-writer containers have zero Khronos errors; five inherited raw controls retain20 empty-child-array errors. Broader typed/material/normal/prepared adapters remain.
-
-A new [authentic native source-pose producer](https://github.com/jebot-git/dome-sculpt/blob/f80678f/docs/CANONICAL-NATIVE-POSE.md) now matches original POSITION/NORMAL/Mikk directions exactly through18 curved skin/morph/UV states and108 corners per profile;44 checks,161 persistent C++ allocation prefixes and16 cancellation polls pass each Release/sanitizer. It is a source-basis helper, with no new renderer/schema admission.
-
-A new [combined authoring draft](https://github.com/jebot-git/dome-sculpt/tree/44efeb7fec2d79a820a1a64b04c70affb192edf3) merges normalUV34, native32 painting/export, VRM1 expression authoring, anatomical linked-pose controls and the qualified portable model UI. Scene35/material17 represents genuine simultaneous native/canonical capabilities, with actual pool replay and downgrade/refusal guards. Its new mixed workflow test exercises native append, Save/restart, editable export, independent images, deletion back to minimal format and worker UV history. Fresh owning Release/sanitizer app/core/render/support plus selected consumers are currently compiling; neither the draft nor the new test is declared qualified. Initial test-driver command discovery failed before compilation and is retained separately; the corrected run reads actual generated CMake command records.
-
-Next finish the coherent builds and actual mixed tests, close each lane's remaining gates, and qualify the final combined cohort before runtime admission. A passing older620 run, a scoped component pass or a configured630 graph cannot establish a green latest combined candidate. Broader original/additional requirement rows remain unfinished. No installation, physical-headset test or session restart is included in this documentation checkpoint.
+The original [legacy/portable deformation audit9dabf78](https://github.com/jebot-git/dome-sculpt/tree/9dabf78887545aff7d9edadc5167c218735537d1)
+retains four curved-state differences above4, maximum9. The predating conversion
+contract explicitly authors a new portable normal/tangent model and disclaims
+legacy dynamic equality at every pose, so this is a different-model measurement,
+not a new within-model regression gate. The actual within-model bound4 remains.
+[Portable model UIe1ed525](https://github.com/jebot-git/dome-sculpt/tree/e1ed5259cd9d53f78f0f75ec16fc137213568a01)
+makes authoring/rest-space quality explicit and retains the source. Native/compact,
+Wayland and synthetic OpenXR checks pass in their declared scopes. Broader
+normal/key/corner/typed/current-native/prepared/rig adapters, full interoperability,
+device/accelerator/performance and every unfinished original/additional row
+remain required. No installation, physical headset launch or session restart is
+included here.

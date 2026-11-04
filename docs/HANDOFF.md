@@ -1,5 +1,15 @@
 # Dome Sculpt production handoff
 
+## Qualified mixed archive endpoints — 2026-11-05
+
+Private1299fb4 seals actual mixed152 R/S/Arc and both complete archive profiles:
+12,149decoder/24,003encoder persistent C++ prefixes plus84loadCancel each.
+48 Khronos files0errors; original failures and scope limits remain preserved.
+Read PRIVATE-AUTHORING-PROGRESS.md for the reconciled current state, live1d full
+builds, separate HDR ownership defect, current rig/VRM/fixture milestones and
+interrupted original f2 regression continuation. No main runtime or full-goal
+completion; all remaining original/additional rows and later drawers remain.
+
 ## Repaired mixed workflows and new coherent build — 2026-11-04
 
 Private44b actual mixed scene/export/recovery/history passes152 each R/S/Arc;
