@@ -12,7 +12,7 @@ the actual adoption guard already requires the captured strong owner.
 
 Three complete workflows pass each Release and ASan/UBSan/leak: extra-UV native
 import54, generated UV2 tangents26 and lossless native/controller editing49.
-Both actual nine-state pose/morph/GLB consumers keep their original four-channel
+Both actual nine-state pose/morph/GLB consumers keep their original four-level
 pixel bound and wrong-UV sensitivity. Save/restart, exact Undo/Redo, native paint,
 mid-import cancellation/retry, physical quota and source/tamper protections stay
 active. Release takes80.568s; sanitizer486.660s;2238 captured inputs are unchanged
