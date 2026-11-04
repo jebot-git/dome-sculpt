@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #pragma once
 #include "dome/bake-recipe.hpp"
+#include "dome/scene.hpp"
 #include <nlohmann/json.hpp>
 namespace bake_fixture {
 // Encode the actual independently owned source scene, so a target's new outer
