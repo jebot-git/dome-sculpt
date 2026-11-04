@@ -2,7 +2,21 @@
 #pragma once
 #include "dome/normal-preparation.hpp"
 namespace dome::normal_preparation_fixture {
-Mesh quad(){Mesh m;m.positions={{0,0,0},{1,0,0},{1,1,.08f},{0,1,0}};m.normals.assign(4,{0,0,1});m.uv={{0,0},{1,0},{1,1},{0,1}};m.indices={0,1,2,0,2,3};MorphSet morphs(m);return morphs.evaluate(m,{});}
+Mesh quad(){
+  Mesh m;m.positions={{0,0,0},{1,0,0},{1,1,.08f},{0,1,0}};
+  m.uv={{0,0},{1,0},{1,1},{0,1}};m.indices={0,1,2,0,2,3};
+  // This fixture's analytic oracle deliberately starts with geometric normals.
+  // Empty morph evaluation must preserve authored REST data, so generate these
+  // explicitly rather than relying on an unrelated evaluator side effect.
+  m.normals.resize(m.positions.size());
+  for(size_t c=0;c<m.indices.size();c+=3){
+    const auto a=m.indices[c],b=m.indices[c+1],d=m.indices[c+2];
+    const auto n=cross(m.positions[b]-m.positions[a],m.positions[d]-m.positions[a]);
+    for(auto v:{a,b,d})m.normals[v]+=n;
+  }
+  for(auto &n:m.normals)n=normalized(n);
+  return m;
+}
 Scene model(){
   auto mesh=quad();Scene scene;auto &target=scene.active();target.mesh_active=true;target.painted=std::make_shared<PaintedMesh>(mesh,64);
   auto deform=std::make_shared<DeformationState>(mesh);deform->morphs=MorphSet(mesh);auto key=mesh.positions;key[1].z+=.06f;deform->morphs->set_target(mesh,"raised native key",key);

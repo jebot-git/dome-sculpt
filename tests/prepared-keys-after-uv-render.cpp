@@ -8,6 +8,69 @@ const NormalFrameTarget &key_frame(const NormalFrames &frames, uint64_t id) {
   for (const auto &target : frames.targets) if (target.id == id) return target;
   throw std::runtime_error("Missing explicit post-UV key frame");
 }
+Scene artist_prepared() {
+  auto scene = normal_preparation_fixture::model();
+  auto &object = scene.active();
+  auto mesh = object.painted->mesh();
+  mesh.normals.assign(mesh.positions.size(), {0, 0, 1});
+  object.painted = std::make_shared<PaintedMesh>(mesh, 64);
+  auto deformation = std::make_shared<DeformationState>(*object.deformation);
+  const auto old_targets = deformation->morphs->targets;
+  deformation->morphs = MorphSet(mesh);
+  for (const auto &target : old_targets) {
+    auto positions = mesh.positions;
+    for (size_t v = 0; v < positions.size(); ++v) positions[v] += target.delta[v];
+    deformation->morphs->set_target(mesh, target.name, positions);
+  }
+  object.deformation = std::move(deformation);
+  ObjectBakeSettings settings;
+  settings.prepare_normals = true;
+  settings.front_mm = settings.back_mm = 500;
+  settings.ao_samples = 0;
+  settings.padding = 4;
+  settings.allow_partial = true;
+  Document document;
+  document.replace(scene);
+  document.bake_from_object(scene.objects().back().id, settings);
+  settled(document);
+  scene = document.copy_scene();
+  scene.active().transform.position = {-.6f, -.6f, 0};
+  scene.active().transform.scale = 1.2f;
+  return scene;
+}
+void artist_offset_oracle(const Scene &scene, size_t slot) {
+  const auto &object = scene.active();
+  const auto &mesh = object.painted->mesh();
+  const auto &frames = *object.material_bindings->normal_frames;
+  const auto &attributes = *frames.pbr;
+  const auto &target = key_frame(attributes, frames.current_targets.at(slot));
+  auto changed = mesh.positions;
+  for (size_t v = 0; v < changed.size(); ++v)
+    changed[v] += object.deformation->morphs->targets.at(slot).delta[v];
+  auto geometry = [&](const auto &positions) {
+    std::vector<Vec3> result(positions.size());
+    for (size_t c = 0; c < mesh.indices.size(); c += 3) {
+      const auto a = mesh.indices[c], b = mesh.indices[c + 1], d = mesh.indices[c + 2];
+      const auto n = cross(positions[b] - positions[a], positions[d] - positions[a]);
+      for (auto v : {a, b, d}) result[v] += n;
+    }
+    for (auto &n : result) n = normalized(n);
+    return result;
+  };
+  const auto before = geometry(mesh.positions), after = geometry(changed);
+  bool retained = true;
+  float offset = 0;
+  for (size_t c = 0; c < mesh.indices.size(); ++c) {
+    const auto vertex = mesh.indices[c];
+    const auto artist = attributes.normals[c];
+    const auto actual = artist + target.normals.at(c);
+    retained &= std::abs(length(actual) - length(artist)) < 1e-5f &&
+                std::abs(dot(actual, after[vertex]) - dot(artist, before[vertex])) < 1e-5f;
+    offset = std::max(offset, length(artist - before[vertex]));
+  }
+  check(offset > .02f && retained,
+        "Independent cross-product frames prove post-UV key authoring retains non-geometric artist-normal offsets instead of replacing them with geometry normals");
+}
 void geometric_oracle(const Scene &scene, size_t slot) {
   const auto &object = scene.active();
   const auto &mesh = object.painted->mesh();
@@ -129,6 +192,17 @@ int main(int argc, char **argv) try {
     check(original.encode() == exact,
           "Post-UV authored normal keys and all graphical consumers retain the complete original source");
   }
+  const auto artist = artist_prepared();
+  const auto artist_exact = artist.encode();
+  const auto name = prefix.string() + "-artist";
+  auto changed = transfer(artist, name + "-first.dsculpt");
+  changed = transfer(changed, name + "-repeat.dsculpt");
+  const auto slot = changed.active().deformation->morphs->targets.size();
+  changed = authored(changed, name + "-authored.dsculpt", false);
+  artist_offset_oracle(changed, slot);
+  consumers(changed, false, name, native, framebuffer, independent);
+  check(artist.encode() == artist_exact,
+        "Authored-normal post-UV consumer checks leave the complete artist source unchanged");
   std::cout << "PASS " << checks << " post-UV authored key graphical checks\n";
   return 0;
 } catch (const std::exception &error) {
