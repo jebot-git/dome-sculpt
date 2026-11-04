@@ -1,3 +1,4 @@
+#include "native-paint-sampling.hpp"
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/retopo-authoring.hpp"
 #include "dome/bake-recipe.hpp"
@@ -413,6 +414,7 @@ void PolygonSceneArchive::preflight(const nlohmann::json &j,const nlohmann::json
       const auto &binding=bindings[id];
       if(!binding.at("origin").is_null()){auto origin=polygon_archive_index(binding.at("origin"),origins.size());used_origin[origin]=1;paint(origins[origin].at("paint"));}
       auto predecessor=[&](const nlohmann::json &ref){if(ref.is_null())return;auto prior=polygon_archive_index(ref,bindings.size());if(prior>=id)throw std::invalid_argument("Corner preparation material history must be acyclic and ordered");before(ref,prior);};
+      if(materials->at("version")==14&&!binding.at("native_paint_sampling").is_null()){const auto &n=materials->at("native_paints").at(polygon_archive_index(binding.at("native_paint_sampling"),materials->at("native_paints").size()));paint(n.at("paint"));predecessor(n.at("before_binding"));}
       if(keys&&!binding.at("key_derivation").is_null()){const auto k=polygon_archive_index(binding.at("key_derivation"),keys->size());used_key[k]=1;paint(keys->at(k).at("paint"));predecessor(keys->at(k).at("before_binding"));}
       if(!binding.at("color_preparation").is_null()){
         auto p=polygon_archive_index(binding.at("color_preparation"),preparations.size());used_preparation[p]=1;
@@ -613,10 +615,9 @@ PolygonSceneArchive PolygonSceneArchive::decode(const nlohmann::json &j,const Pa
       value->material_bindings = materials.at(polygon_archive_index(
           o.at("material_bindings"), materials.bindings().size()));
     if(value->paint&&value->paint->paint_sampling_domain()){
-      const auto colors=value->material_bindings?value->material_bindings->color_preparation:nullptr;
-      if(!colors||!colors->paint_sampling)throw std::invalid_argument("Retained polygon paint lacks its own sampling material");
+      const auto attachment=material_paint_attachment(value->material_bindings.get());
+      if(!attachment)throw std::invalid_argument("Retained polygon paint lacks its own sampling material");
       const auto id=polygon_archive_index(o.at("painted"),out.paints_.size());
-      const auto &attachment=colors->paint_sampling->geometry_attachment();
       if(bound_paints[id]&&bound_paints[id]!=attachment)throw std::invalid_argument("One polygon paint record cannot acquire conflicting immutable material owners");
       if(!bound_paints[id]){out.paints_[id]=rebind_paint_sampling_geometry(*value->paint,attachment);bound_paints[id]=attachment;}
       value->paint=out.paints_[id];

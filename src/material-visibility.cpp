@@ -1,3 +1,4 @@
+#include "native-paint-sampling.hpp"
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/material-visibility.hpp"
 #include "dome/document.hpp"
@@ -77,13 +78,12 @@ struct Visibility {
         paint_corners.push_back(mesh.uv.at(v));
       }
     }
-    const auto paint_node=r.material_bindings&&r.material_bindings->color_preparation?r.material_bindings->color_preparation->paint_sampling:nullptr;
+    const auto paint_node=detail::material_paint_attachment(r.material_bindings.get());
     if(bool(paint_node)!=bool(r.paint_sampling_attachment))throw std::invalid_argument("Visibility paint range omitted or fabricated its own sampling attachment");
     if(r.paint_sampling_attachment) {
       if(!maps||maps->source_only||!r.material_bindings||r.material_bindings->has_mtoon)
         throw std::invalid_argument("Visibility paint domain requires its paired derived material");
-      const auto node=r.material_bindings->color_preparation?r.material_bindings->color_preparation->paint_sampling:nullptr;
-      const auto expected=node?node->geometry_attachment():nullptr;
+      const auto expected=detail::material_paint_attachment(r.material_bindings.get());
       if(!expected||expected!=r.paint_sampling_attachment||expected.owner_before(r.paint_sampling_attachment)||r.paint_sampling_attachment.owner_before(expected))
         throw std::invalid_argument("Visibility paint range differs from its own immutable material attachment");
       const auto &domain=*r.paint_sampling_attachment->domain();

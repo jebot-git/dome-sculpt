@@ -1248,7 +1248,7 @@ bool detail::EmissionExportAccess::requires_preview(const PaintedMesh &paint,con
     const SourceMaterialBindings *binding) {
   return !paint.source_sampling_prepared()&&paint.surface_diagnostics().policy!=PaintUvPolicy::SourceAuthored&&
     (paint.has_physical_emission()||std::any_of(material.emissive.begin(),material.emissive.end(),[](float v){return v>1;})||
-     (binding&&(binding->physical_emission||std::any_of(binding->native_reference.emission.begin(),binding->native_reference.emission.end(),[](float v){return v>1;}))));
+     (binding&&(binding->physical_emission||(!binding->native_paint_sampling&&std::any_of(binding->native_reference.emission.begin(),binding->native_reference.emission.end(),[](float v){return v>1;})))));
 }
 std::shared_ptr<const TextureMaps> detail::EmissionExportAccess::preview(const PaintedMesh &paint,const Material &material,
     const std::function<bool()> &cancelled) {

@@ -1,0 +1,37 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+#include "dome/document.hpp"
+#include "dome/scene-file.hpp"
+#include "native-paint-sampling.hpp"
+#include <nlohmann/json.hpp>
+#include <filesystem>
+#include <iostream>
+#include <numeric>
+using namespace dome;
+namespace {
+size_t checks=0;
+void check(bool value,const char *message){if(!value)throw std::runtime_error(message);++checks;}
+template<class F>void refuses(F f,const char *message){bool refused=false;try{f();}catch(const std::exception &e){refused=true;std::cout<<"EXPECTED "<<e.what()<<'\n';}check(refused,message);}
+Mesh quad(){Mesh m;m.positions={{-.8f,-.8f,0},{.8f,-.8f,0},{.8f,.8f,0},{-.8f,.8f,0}};m.normals.assign(4,{0,0,1});m.uv={{{0,0}},{{1,0}},{{1,1}},{{0,1}}};m.indices={0,1,2,0,2,3};m.validate();return m;}
+Scene source(){Scene s;s.active().visible=false;auto id=s.add("Native independent paint",Volume{});s.select(id);auto &o=s.active();o.mesh_active=true;o.material.color={.4f,.6f,.8f,1};o.material.emissive={8,.016f,.16f};o.painted=std::make_shared<PaintedMesh>(quad(),64);Brush b;b.from=b.to={0,0,0};b.normal={0,0,1};b.radius=2;b.strength=.8f;PaintSettings p;p.channel=PaintChannel::Emission;p.emission_units=PaintEmissionUnits::Physical;p.emission={12,.002f,3};p.front_only=false;o.painted->begin_stroke();o.painted->stamp(b,p);check(o.painted->end_stroke(),"Actual native float stroke");o.painted->layer_properties("Native float",true,.63f);return s;}
+void ready(Document &d){check(d.wait_asset(std::chrono::seconds(30)),"Native asset endpoint");check(d.wait_mesh(std::chrono::seconds(30))&&d.frame().surface,"Native mesh endpoint");if(!d.frame().state->error.empty())throw std::runtime_error(d.frame().state->error);}
+void apply(Document &d){d.begin_uv();check(d.wait_uv(),"Actual UV workspace");check(d.frame().state->uv->paint_sampling_available,"Native KeepPaint is a real eligible action");if(!d.frame().state->uv->retain_paint_sampling)d.edit_uv(UvAction::RetainPaint);d.edit_uv(UvAction::Pick,2.f/3,1.f/3);d.edit_uv(UvAction::Scale,.7f);d.edit_uv(UvAction::Rotate,1.57079632679f);check(d.wait_uv()&&d.frame().state->uv->valid,"Actual .7/90 UV draft");d.end_uv(true);ready(d);}
+}
+int main(int argc,char **argv)try{
+ if(argc!=2)return 2;const std::filesystem::path out=argv[1];std::filesystem::create_directories(out);
+ auto original=source();const auto exact=original.encode();const auto &old=original.active().painted->mesh();Mesh target;std::vector<uint32_t> vertices;
+ for(auto v:old.indices){vertices.push_back(v);target.positions.push_back(old.positions[v]);target.normals.push_back(old.normals[v]);const auto uv=old.uv[v];target.uv.push_back({.5f-.7f*(uv[1]-.5f),.5f+.7f*(uv[0]-.5f)});target.indices.push_back(uint32_t(target.indices.size()));}
+ auto retained=detail::retain_native_paint(original.active(),target,vertices);auto binding=detail::bind_native_paint(retained.owner,{});
+ auto current=original;current.active().painted=retained.paint;current.active().material_bindings=binding;current.validate();
+ check(old.positions.size()==4&&retained.paint->mesh().positions.size()==6,"Actual source4/current6 remain distinct");
+ check(!retained.paint->color_projection()&&!retained.paint->normal_projection()&&!binding->normal_preparation&&!binding->color_preparation,"No invented colour/normal authority");
+ const auto encoded=current.encode();check(encoded.at("version")==32&&encoded.at("source_materials").at("version")==14&&encoded.at("source_materials").at("base_version")==1,"Conditional Scene32/material14 preserves actual base1");
+ auto restored=Scene::decode(encoded);check(restored.encode()==encoded,"Owning native32 complete graph roundtrip");check(restored.active().material_bindings->native_paint_sampling->matches_current(*restored.active().painted),"Decoded attachment replay is exact");
+ check(restored.active().material_bindings->uv_origin->paint==restored.active().material_bindings->native_paint_sampling->original_paint(),"Decoded original Paint alias is real");
+ const auto frozen=retained.owner->before_paint()->encode();original.active().painted->layer_properties("Mutable original alias",false,.2f);current.active().painted->layer_properties("Mutable current alias",true,.3f);check(retained.owner->before_paint()->encode()==frozen,"Immutable metadata capture survives both caller aliases");
+ auto bad=encoded;bad["version"]=30;refuses([&]{Scene::decode(bad);},"Older Scene must refuse native32");bad=encoded;bad["source_materials"]["native_paints"][0]["depth"]=2;refuses([&]{Scene::decode(bad);},"False history depth refuses");bad=encoded;bad["source_materials"]["native_paints"][0]["before_binding"]=0;refuses([&]{Scene::decode(bad);},"Self history refuses before replay");bad=encoded;bad["source_materials"]["native_paints"].push_back(bad["source_materials"]["native_paints"][0]);refuses([&]{Scene::decode(bad);},"Orphan native record refuses");bad=encoded;bad["source_materials"]["physical_emission"]=false;refuses([&]{Scene::decode(bad);},"Physical flag cannot erase reachable float");bad=encoded;bad["source_materials"]["canonical_normals"]=true;refuses([&]{Scene::decode(bad);},"Uncomposed canonical31 refuses");
+ auto foreign=Scene::decode(encoded);auto borrowed=Scene::decode(encoded);borrowed.active().material_bindings=foreign.active().material_bindings;refuses([&]{borrowed.validate();},"Equal-valued foreign current attachment refuses");
+ // Actual public worker, ordered Save and repeat do not depend on detached-only admission.
+ Document doc;doc.replace(source());ready(doc);const auto before=doc.copy_scene().encode();apply(doc);const auto first=doc.copy_scene().encode();check(first.at("version")==32,"Actual worker publishes native Scene32");doc.save_async(out/"first.dsculpt").get();check(Scene::load(out/"first.dsculpt").encode()==first,"Actual ordered native Save/reopen exact");
+ auto first_owner=doc.copy_scene().active().material_bindings->native_paint_sampling;apply(doc);auto twice=doc.copy_scene();check(twice.active().material_bindings->native_paint_sampling->history_depth()==2,"Repeated actual UV has two genuine owners");check(twice.active().material_bindings->native_paint_sampling->domain()->basis()==first_owner->domain()->basis(),"Repeated native UV shares actual original basis owner");const auto second=twice.encode();auto repeat=Scene::decode(second);check(repeat.encode()==second,"Repeated native history restart exact");const auto node=repeat.active().material_bindings->native_paint_sampling;check(node->before_material()->native_paint_sampling->domain()->basis()==node->domain()->basis(),"Restart preserves genuine repeated basis aliases");doc.undo();ready(doc);check(doc.copy_scene().encode()==first,"Native UV Undo exact");doc.redo();ready(doc);check(doc.copy_scene().encode()==second,"Native UV Redo exact");doc.begin_uv();check(doc.wait_uv(),"Cancel workspace ready");doc.edit_uv(UvAction::Scale,.8f);doc.end_uv(false);check(doc.copy_scene().encode()==second,"Native UV draft Cancel exact");doc.save_async(out/"repeat.dsculpt").get();check(Scene::load(out/"repeat.dsculpt").encode()==second,"Following Save retains repeated history");
+ check(before!=first&&exact.at("version")!=32,"Old no-node writer remains conditional");std::cout<<"PASS "<<checks<<" native paint32 controls\n";return 0;
+}catch(const std::exception &e){std::cerr<<"FAIL "<<e.what()<<'\n';return 1;}

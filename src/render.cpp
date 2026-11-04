@@ -1,3 +1,4 @@
+#include "native-paint-sampling.hpp"
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Matrix helpers adapted from OpenBrush Native (Apache-2.0).
 #include "dome/render.hpp"
@@ -121,7 +122,7 @@ struct SurfaceRenderer::TextureState {
     if(!maps||!maps->overlay||!maps->overlay->native_geometry())return false;
     auto hdr=[](const auto &values){return std::any_of(values.begin(),values.end(),[](float value){return value>1;});};
     return detail::overlay_uses_float_emission(*maps->overlay)||hdr(material.emissive)||
-      (binding&&(binding->physical_emission||hdr(binding->native_reference.emission)));
+      (binding&&(binding->physical_emission||(!binding->native_paint_sampling&&hdr(binding->native_reference.emission))));
   }
   static bool native_float(const SurfaceRange &range) noexcept {
     return native_float(range.material,range.textures.get(),range.material_bindings.get());
@@ -268,13 +269,12 @@ struct SurfaceRenderer::TextureState {
         }
       }
 
-      const auto paint_node=range.material_bindings&&range.material_bindings->color_preparation?range.material_bindings->color_preparation->paint_sampling:nullptr;
+      const auto paint_node=detail::material_paint_attachment(range.material_bindings.get());
       if(bool(paint_node)!=bool(range.paint_sampling_attachment))throw std::invalid_argument("Paint GPU range omitted or fabricated its own sampling attachment");
       if(range.paint_sampling_attachment) {
         if(!maps||maps->source_only||!range.material_bindings||range.material_bindings->has_mtoon)
           throw std::invalid_argument("Paint sampling requires its own derived untyped material");
-        const auto node=range.material_bindings->color_preparation?range.material_bindings->color_preparation->paint_sampling:nullptr;
-        const auto expected=node?node->geometry_attachment():nullptr;
+        const auto expected=detail::material_paint_attachment(range.material_bindings.get());
         if(!expected||expected!=range.paint_sampling_attachment||expected.owner_before(range.paint_sampling_attachment)||range.paint_sampling_attachment.owner_before(expected))
           throw std::invalid_argument("Paint GPU range differs from its own immutable material attachment");
         const auto &domain=*range.paint_sampling_attachment->domain();

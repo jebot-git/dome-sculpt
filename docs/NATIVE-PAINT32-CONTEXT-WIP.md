@@ -3,7 +3,7 @@
 This isolated context merges root `aa9906f` and the qualified private native
 MToon component `e52f5be`. It has not been compiled or admitted. Both parents,
 the old native counterfactuals, and the source-frozen component proofs remain
-unchanged. No Scene32 owner or codec has been implemented here.
+unchanged. The first connected Scene32 owner/codec/native-worker draft is now implemented, but has not yet been built or qualified.
 
 The merge keeps root native append/cage/recipe/Mirror behavior, Bake distance
 zero/logarithmic mapping, HDR radiance mapping and page30, historical parameter
@@ -29,3 +29,25 @@ The retained editable grid cannot borrow a color receipt, dummy normal
 preparation, original Source4 authority, or a conversion claim. Native old-role
 normal/baked-frame transport is independent required work. Public ABI changes
 will require fresh coherent owned consumers before any run.
+
+
+The first connected draft appends a distinct opaque native-paint owner to the
+material binding. It retains an immutable full native Paint metadata snapshot,
+full native Material, exact layout and geometry-only writable-domain witness,
+and an ordered before-binding chain. Conditional material14 owns a deduplicated
+native table and explicit physical/Mirror/canonical/native capability flags over
+an actual base1..10; the current draft rejects canonical=true until root31 is
+intentionally composed. Scene32 requires a real native table and validates all
+current/retained paint pairings. Earlier wires remain unchanged when unused.
+
+Initial native admission is deliberately limited to strict, unprepared native
+grids without source maps, baked/normal/color projections, typed roles, rig,
+keys or polygon authority. Repeated native UV edits retain the same genuine
+basis and independently captured metadata, with bounded depth32. This is a
+first implementation slice, not full native/retained authoring completion.
+The new public field requires fresh matching core/render/native/XR consumers.
+Export, explicit source Restore, complex normal/rig/key transport and the
+qualified canonical31 composition remain pending. No new-header/old-library
+execution is permitted. The focused native-paint-sampling fixture is new and
+unrun; its direct and actual-worker checks must expose real implementation
+failures without changing quality or resource limits.

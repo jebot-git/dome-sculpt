@@ -59,6 +59,8 @@ struct SourceMaterialBindings {
   // Explicit absolute background radiance (linear cd/m^2), including zero.
   // Absent preserves historical typed-strength/native-factor correction.
   std::optional<std::array<float,3>> physical_emission;
+  // Scene32/wire14: independent native writable-grid authority.
+  std::shared_ptr<const detail::NativePaintSampling> native_paint_sampling;
   std::shared_ptr<const detail::SourceKeyDerivation> key_derivation;
   void validate(bool deep=true) const;
 };
