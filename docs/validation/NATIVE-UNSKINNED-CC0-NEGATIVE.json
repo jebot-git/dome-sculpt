@@ -1,0 +1,123 @@
+{
+  "status": "genuine-native-refusal-not-qualified-field",
+  "parent": "421cedcf03959ce5137a62f733d75e8bef8f2a9b",
+  "scope": "one own test TU plus exact matched parent CPU core/support archives; no new runtime and no fresh whole-project claim",
+  "original_weights": "Original GLB JSON only read for explicit VRM0-mapped landmark node coordinates; original BIN never read by test. Static input has no skins or influence arrays.",
+  "parts": 19,
+  "fitted_native_bones": 54,
+  "explicit_body_targets": 9,
+  "charged_work_at_source": 62810298,
+  "maximum_work": 500000000,
+  "failure": {
+    "elapsed": 0.873381847,
+    "error": "Bone query has an unowned origin/coplanar/grazing contact base_work=62810298 source=0 row=107 face=945 kind=2",
+    "exact_rollback": true,
+    "targets": [
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19,
+      20
+    ],
+    "work_bound": 500000000
+  },
+  "contact": {
+    "face": [
+      {
+        "position": [
+          0.00025546556571498513,
+          0.9670072197914124,
+          0.05119895935058594
+        ],
+        "source": 542,
+        "vertex": 542
+      },
+      {
+        "position": [
+          0.00025546859251335263,
+          0.9484604597091675,
+          0.056915879249572754
+        ],
+        "source": 541,
+        "vertex": 541
+      },
+      {
+        "position": [
+          0.006508913356810808,
+          0.9509668946266174,
+          0.06053085997700691
+        ],
+        "source": 540,
+        "vertex": 540
+      }
+    ],
+    "incident_faces": [
+      [
+        107,
+        104,
+        106
+      ],
+      [
+        107,
+        106,
+        108
+      ],
+      [
+        108,
+        109,
+        107
+      ]
+    ],
+    "row": {
+      "position": [
+        0.00025546556571498513,
+        0.9670072197914124,
+        0.05119895935058594
+      ],
+      "source": 107,
+      "vertex": 107
+    },
+    "same_position": [
+      {
+        "position": [
+          0.00025546556571498513,
+          0.9670072197914124,
+          0.05119895935058594
+        ],
+        "source": 107,
+        "vertex": 107
+      },
+      {
+        "position": [
+          0.00025546556571498513,
+          0.9670072197914124,
+          0.05119895935058594
+        ],
+        "source": 542,
+        "vertex": 542
+      }
+    ]
+  },
+  "overlay_before_after_mismatches": 0,
+  "hashes": {
+    "tests/native-visible-unskinned.cpp": "f41d4c4611805e3eb5865932d400f6d8b8fd7747385de0404bea984358aabd88",
+    "artifacts/native-visible-unskinned": "0558fcaf8fbde2fbc4c17d8f87b3cffe59b6174be11b31a47281a230f86523ae",
+    "artifacts/female-body-canonical.log": "af47e6e13906dcf271bba739d08dcc4cfb65608c73c98b170c3a5ea932eace09",
+    "artifacts/female-body-canonical.time": "3e5bfd99827747cc10476989e9b4c0b92c32e1aaea02161a1c308380da16bf7c",
+    "artifacts/female-body-contact.json": "cff73d47a1f45dfc769602edfb74edcc7bb010eff74fb3376574ef2ac4c73dbd",
+    "artifacts/female-body-canonical/original-unskinned.dsculpt": "4be2badfb974984d8c3069503c9470cba9c4fc931eb8d81003175266fa07f8d7",
+    "artifacts/female-body-canonical/fitted-unskinned.dsculpt": "8a434ec3c143a72b54f907173132afdf536e3e7df75d13bc82d2c8e3236fd978",
+    "artifacts/female-body-canonical/failure.json": "9efd29334cd9823e0b1bc6e8e33a38ecd91c7e2a549ca0ed6f96d03abe894c80",
+    "artifacts/overlay-before.json": "09a36b315737a8acefca7c062d740caa209eb31438d80e8443bd46cef7ad3618",
+    "artifacts/initial-vrm0-role/source.cpp": "de8da3bf4e15ede4f90a0d04480f7a61253f448de87d35e84a17588e304cc181",
+    "artifacts/initial-vrm0-role/probe": "fd08d993fbbdedf71471312ec04f1e7b76fe6ca995cc67a49f29643c1b797253",
+    "../automatic-weights-native-api-18ddcff/artifacts/static-vroid/female-static.glb": "b7406712ed3e640ccf1904ea6b81e27230069412fe91ddd87731addba08427af",
+    "assets/humanoid/vroid/base-female.vrm": "1995f174f6c8f2211f3c56c9e5fe4f9daf27ee5e648f129479582a259238149b"
+  },
+  "field_produced": false,
+  "deformation_quality": "not reached"
+}
