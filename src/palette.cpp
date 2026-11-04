@@ -333,7 +333,7 @@ void SpatialPalette::raster(const EditorState &s) {
         auto found=std::find_if(s.objects.begin(),s.objects.end(),[&](const auto &o){return o.id==id;});
         label=found==s.objects.end()?"No reference":found->name+(found->visible?"":" [hidden]");
       }
-      else if(c.parameter==VrParameter::SkinMode)label=value<.5f?"Automatic binding":value<1.5f?"Barycentric transfer":"Source-assisted (fixed4)";
+      else if(c.parameter==VrParameter::SkinMode)label=value<.5f?"Automatic binding":value<1.5f?"Barycentric transfer":value<2.5f?"Source-assisted (fixed4)":"Native finite handles";
       else if(c.parameter==VrParameter::SkinDistances){char size[48];snprintf(size,sizeof(size),"%.2f mm",double(skin_distance_metres(value))*1000);label+=size;}
       else if(c.parameter==VrParameter::SkinFalloff){char size[48];snprintf(size,sizeof(size),"Falloff %.2f",double(value));label=size;}
       else if(c.parameter==VrParameter::SkinInfluences)label="Max influences "+std::to_string(int(std::lround(value)));
@@ -592,11 +592,11 @@ void SpatialPalette::raster(const EditorState &s) {
     for(int k=0;k<3;++k) if(s.sculpt_settings.symmetry_axes&(1u<<k)) axes+="XYZ"[k];
     text(320*unit_,318*unit_,axes.empty()?"No mirrored axes":"Mirror "+axes,fg);
   }
-  if(s.menu_page==14 || s.menu_page==29) {
+  if(s.menu_page==14 || s.menu_page==29 || s.menu_page==31) {
     auto source=std::find_if(s.objects.begin(),s.objects.end(),[&](const auto &o){return o.id==s.skin_options.reference;});
     text(320*unit_,285*unit_,source==s.objects.end()?"Choose reference rig":source->name,fg);
     size_t locks=s.skin_use_locks?size_t(std::count(s.weights.locks.begin(),s.weights.locks.end(),uint8_t(1))):0;
-    text(320*unit_,318*unit_,std::string(s.skin_options.mode==SkinAuthoringMode::Automatic?"Automatic":s.skin_options.mode==SkinAuthoringMode::Transfer?"Transfer":"Source-assisted / fixed4")+" / "+std::to_string(locks)+" locked",fg);
+    text(320*unit_,318*unit_,std::string(s.skin_options.mode==SkinAuthoringMode::Automatic?"Automatic":s.skin_options.mode==SkinAuthoringMode::Transfer?"Transfer":s.skin_options.mode==SkinAuthoringMode::SourceVisible?"Source-assisted / fixed4":"Native finite handles")+" / "+std::to_string(locks)+" locked",fg);
   }
   if (s.menu_page == 16) {
     auto r = s.retopology;

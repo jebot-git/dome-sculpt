@@ -5,6 +5,8 @@ namespace dome {
 const std::array<const char *, 12> &spatial_labels(int page) {
   static const std::array<const char *,12> source_skin={"Source","Method","Bind active","Bind selected","Use locks","Undo","Redo","Cancel work","Back","Source-assisted","Own surfaces","Fixed4 influences"};
   if(page==29)return source_skin;
+  static const std::array<const char *,12> native_skin={"Source","Method","Bind active","Bind selected","Use locks","Undo","Redo","Cancel work","Back","Influences","Prune","Native handles"};
+  if(page==31)return native_skin;
   static const std::array<const char*,12> emission={"Brush RGB","Brush units","Material radiance","Source factors","Relative / normalize","Physical brush","Brush black","Paint emission","Back","Undo","Redo","Close"};
   if(page==30)return emission;
   static const std::array<const char *,12> exporting={"Strict glTF","Editable 256","Editable 512","Editable 1024","Avatar VRM","Native Save","","Cancel work","Back","Close","",""};
@@ -88,7 +90,9 @@ const std::array<const char *, 12> &spatial_labels(int page) {
                      : root;
 }
 std::optional<VrParameter> spatial_parameter(int page, int sector) {
-  if(page==29&&sector>=0&&sector<2)return sector==0?VrParameter::SkinSource:VrParameter::SkinMode;
+  if((page==29||page==31)&&sector>=0&&sector<2)return sector==0?VrParameter::SkinSource:VrParameter::SkinMode;
+  if(page==31&&sector==9)return VrParameter::SkinInfluences;
+  if(page==31&&sector==10)return VrParameter::SkinPrune;
   if(page==30){if(sector==0)return VrParameter::InkEmission;if(sector==1)return VrParameter::InkEmissionUnits;if(sector==2)return VrParameter::MaterialEmission;if(sector==3)return VrParameter::EmissionSource;return {};}
   if(page==24&&sector==4)return VrParameter::MorphWeight;
   if(page==24&&sector==7)return VrParameter::ShapeRestore;
@@ -173,7 +177,7 @@ std::optional<SpatialCommand> spatial_action(int page, int index) {
   if (index < 0 || index >= 12 || page < 0 || page >= spatial_page_count || page == 5 ||
       spatial_parameter(page, index))
     return {};
-  if(page==29){
+  if(page==29||page==31){
     if(index<2||index>=8)return {};
     static const SpatialCommand commands[]={SpatialCommand::BindSkin,SpatialCommand::BindSkinSelected,SpatialCommand::SkinUseLocks,SpatialCommand::Undo,SpatialCommand::Redo,SpatialCommand::CancelWork};return commands[index-2];
   }
@@ -750,7 +754,7 @@ void SpatialInput::update(const SpatialSample &s) {
       controls_.push_back({VrControlEventType::Begin, parameter_});
     } else if (page_ != 0 && page_ != 27 && selected_ == 8) {
       const bool export_back=page_==28||page_==30;
-      page_ = page_==29 ? 14 : page_==30 ? 6 : page_==25 ? 3 : page_==24 ? 10 : page_==22 ? 19 : page_==19 ? 10 : page_==23 ? 21 : (page_ == 16 || page_ == 17 || page_==20 || page_==21) ? 10 : (page_ == 18 || page_ == 15) ? 7 : page_ == 14 ? 13 : page_ == 13 ? 11
+      page_ = (page_==29||page_==31) ? 14 : page_==30 ? 6 : page_==25 ? 3 : page_==24 ? 10 : page_==22 ? 19 : page_==19 ? 10 : page_==23 ? 21 : (page_ == 16 || page_ == 17 || page_==20 || page_==21) ? 10 : (page_ == 18 || page_ == 15) ? 7 : page_ == 14 ? 13 : page_ == 13 ? 11
               : page_ == 12 ? 10
               : page_ == 11 ? 9
               : (page_ == 9 || page_ == 10) ? 1
@@ -787,7 +791,7 @@ void SpatialInput::update(const SpatialSample &s) {
       const bool resume_mask = page_ == 15 && command_ && *command_ == SpatialCommand::SculptMaskResume;
       const bool resume_polygon=(page_==19||page_==22)&&command_&&
         (*command_==SpatialCommand::PolygonBegin||*command_==SpatialCommand::PolygonMoveMode||*command_==SpatialCommand::PolygonApply||*command_==SpatialCommand::PolygonCancel);
-      if((page_!=19 && page_!=22 && page_!=12 && page_!=14 && page_!=15 && page_!=16 && page_!=18 && page_!=20 && page_!=21 && page_!=23 && page_!=25 && page_!=27 && page_!=29 && page_!=30) || resume_retopology || resume_mask || resume_polygon){menu_ = false;device_ = 0;}
+      if((page_!=19 && page_!=22 && page_!=12 && page_!=14 && page_!=15 && page_!=16 && page_!=18 && page_!=20 && page_!=21 && page_!=23 && page_!=25 && page_!=27 && page_!=29 && page_!=30 && page_!=31) || resume_retopology || resume_mask || resume_polygon){menu_ = false;device_ = 0;}
       d.armed = false;
     }
     d.pressed = s.trigger;

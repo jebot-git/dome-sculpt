@@ -6,7 +6,7 @@
 #include <optional>
 namespace dome {
 // Shared page registry:18 procedural,19/22 polygon,20 holding,21/23 import.
-inline constexpr int spatial_page_count=31; //28 export;29 source bind;30 emission.
+inline constexpr int spatial_page_count=32; //28 export;29 source bind;30 emission;31 native handles.
 inline constexpr int spatial_max_page=spatial_page_count-1;
 enum class DeviceKind { Controller, SpatialStylus };
 enum class SpatialCommand {

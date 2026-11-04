@@ -2,6 +2,7 @@
 #include "skin-editor.hpp"
 #include "appearance.h"
 #include "dome/humanoid-creator.hpp"
+#include "native-weight-reference.hpp"
 #include "ui-conventions.hpp"
 #include <FL/Fl_Box.H>
 #include <FL/Fl_Check_Browser.H>
@@ -39,13 +40,14 @@ void edit_skin_dialog(Document &doc) {
   mode.add("Automatic bind");
   mode.add("Transfer skin weights");
   mode.add("Source-assisted (fixed4)");
+  mode.add("Native finite handles");
   mode.value(int(options.mode));
   Fl_Choice source(label, y, width - label - 40, row - 4, "Reference mesh");
   y += row;
   Fl_Choice scope(label, y, width - label - 40, row - 4, "Bind targets");
   y += row;
   scope.add("Active part");
-  scope.add("Selected source parts");
+  scope.add("Selected editable parts");
   scope.value(0);
   Fl_Value_Input seed(label, y, width - label - 40, row - 4,
                       "Seed radius (mm)");
@@ -120,8 +122,8 @@ void edit_skin_dialog(Document &doc) {
     std::array<Fl_Value_Input *, 6> fields;
     Fl_Check_Button *keep;
     Fl_Check_Browser *locks;
-    bool accepted = false, selection_ok = false, selected_scope = false,
-         source_ready = true;
+    bool accepted = false, selection_ok = false, source_selection_ok = false,
+         selected_scope = false, source_ready = true;
     void refresh() {
       uint64_t previous =
           source->value() >= 0 && size_t(source->value()) < ids.size()
@@ -137,6 +139,7 @@ void edit_skin_dialog(Document &doc) {
         if (o.mesh_active && o.painted && o.deformation &&
             o.deformation->skeleton &&
             (mode->value() != 1 || (o.deformation->skin && o.id != target)) &&
+            (mode->value() != 3 || detail::native_weight_reference(o)) &&
             (mode->value() != 2 ||
              (o.group == active.group && o.appearance && active.appearance &&
               o.appearance->asset &&
@@ -157,6 +160,8 @@ void edit_skin_dialog(Document &doc) {
       auto found = std::find(ids.begin(), ids.end(), previous);
       source->value(found == ids.end() ? 0 : int(found - ids.begin()));
       const bool source_assisted = mode->value() == 2;
+      const bool native = mode->value() == 3;
+      const bool explicit_parts = source_assisted || native;
       if (source_assisted) {
         for (auto *field : fields)
           field->deactivate();
@@ -165,6 +170,16 @@ void edit_skin_dialog(Document &doc) {
             "Imported-rig joint membership; connected-surface visibility.\n"
             "The source group supplies read-only support.\n"
             "Fixed4 influences; checked weights and originals are retained.");
+        apply->label(scope->value() == 1 ? "Bind selected" : "Bind active");
+      } else if (native) {
+        for (auto *field : fields)
+          field->deactivate();
+        fields[4]->activate();
+        fields[5]->activate();
+        scope->activate();
+        hint->label("Native finite handles; connected-surface visibility.\n"
+                    "Selected geometry supplies support; the full rig stays.\n"
+                    "Paint, morphs and pose stay; unused controls need proof.");
         apply->label(scope->value() == 1 ? "Bind selected" : "Bind active");
       } else {
         scope->deactivate();
@@ -185,11 +200,13 @@ void edit_skin_dialog(Document &doc) {
           fields[2]->activate();
         }
       }
-      if (source_assisted && !source_ready)
+      if (explicit_parts && !source_ready)
         hint->label("Finish shape editing or object motion before binding REST "
                     "weights.");
-      if (ids.empty() || (source_assisted && !source_ready) ||
-          (source_assisted && scope->value() == 1 && !selection_ok))
+      const bool targets_ready =
+          source_assisted ? source_selection_ok : selection_ok;
+      if (ids.empty() || (explicit_parts && !source_ready) ||
+          (explicit_parts && scope->value() == 1 && !targets_ready))
         apply->deactivate();
       else
         apply->activate();
@@ -204,13 +221,16 @@ void edit_skin_dialog(Document &doc) {
   context.source_ready = !state->shape_sculpt && !state->object_grabbing;
   context.selection_ok =
       !state->selected_objects.empty() && state->selected_objects.size() <= 64;
+  context.source_selection_ok = context.selection_ok;
   for (auto id : state->selected_objects) {
     auto info = std::find_if(state->objects.begin(), state->objects.end(),
                              [&](const auto &o) { return o.id == id; });
     const auto &o = draft.scene.object(id);
-    context.selection_ok &= info != state->objects.end() && info->editable &&
-                            o.group == target.group && o.mesh_active &&
-                            o.painted && o.deformation && o.deformation->skin;
+    const bool editable = info != state->objects.end() && info->editable &&
+                          o.mesh_active && o.painted;
+    context.selection_ok &= editable;
+    context.source_selection_ok &= editable && o.group == target.group &&
+                                   o.deformation && o.deformation->skin;
   }
   context.refresh();
   mode.callback(
@@ -246,11 +266,15 @@ void edit_skin_dialog(Document &doc) {
           if (c.keep->value())
             for (int i = 1; i <= c.locks->nitems(); ++i)
               next.locks.push_back(c.locks->checked(i));
-          c.selected_scope = next.mode == SkinAuthoringMode::SourceVisible &&
+          c.selected_scope = (next.mode == SkinAuthoringMode::SourceVisible ||
+                              next.mode == SkinAuthoringMode::NativeVisible) &&
                              c.scope->value() == 1;
-          if (c.selected_scope && !c.selection_ok)
-            throw std::invalid_argument(
-                "Select editable parts of the same source group");
+          if (c.selected_scope &&
+              !(next.mode == SkinAuthoringMode::SourceVisible
+                    ? c.source_selection_ok
+                    : c.selection_ok))
+            throw std::invalid_argument("Select editable native parts or parts "
+                                        "of the same source group");
           next.validate();
           *c.options = std::move(next);
           c.accepted = true;

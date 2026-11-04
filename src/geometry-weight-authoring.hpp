@@ -29,7 +29,8 @@ struct Bytes {
   }
   void text(const std::string &s) { add(s.size() + 1); }
 };
-void deformation_copy_bytes(const DeformationState &d, Bytes &b, Work &w) {
+inline void deformation_copy_bytes(const DeformationState &d, Bytes &b,
+                                   Work &w) {
   if (d.pose.size() > 256 || d.morph_weights.size() > 128 ||
       (d.skeleton && d.skeleton->bones.size() > 256) ||
       (d.skin && d.skin->vertices.size() > 2'000'000) ||
@@ -92,7 +93,7 @@ void deformation_copy_bytes(const DeformationState &d, Bytes &b, Work &w) {
         b.text(binding.shape);
     }
 }
-bool equal_row(const VertexWeights &a, const VertexWeights &b) {
+inline bool equal_row(const VertexWeights &a, const VertexWeights &b) {
   if (a.size() != b.size())
     return false;
   for (const auto &x : a)

@@ -130,7 +130,7 @@ int main(int argc, char **argv) try {
         "Legacy influence preference staged before explicit fixed4 method");
   const auto before = doc.copy_scene().encode();
   hand.sector(1);
-  hand.value(1);
+  hand.value(2.f / 3);
   hand.confirm();
   check(doc.frame().state->skin_options.mode ==
                 SkinAuthoringMode::SourceVisible &&

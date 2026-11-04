@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/document.hpp"
 #include "dome/humanoid-creator.hpp"
+#include "native-weight-reference.hpp"
 namespace dome {
 bool Document::skin_target_ready_locked() const {
   const auto &o = scene_.active();
@@ -13,7 +14,9 @@ std::vector<uint64_t>
 Document::skin_sources_locked(SkinAuthoringMode mode) const {
   std::vector<uint64_t> ids;
   for (const auto &o : scene_.objects())
-    if ((mode != SkinAuthoringMode::SourceVisible ||
+    if ((mode != SkinAuthoringMode::NativeVisible ||
+         detail::native_weight_reference(o)) &&
+        (mode != SkinAuthoringMode::SourceVisible ||
          (o.group == scene_.active().group && o.appearance &&
           o.appearance->asset && scene_.active().appearance &&
           o.appearance->asset == scene_.active().appearance->asset &&
@@ -30,18 +33,20 @@ Document::skin_sources_locked(SkinAuthoringMode mode) const {
   return ids;
 }
 bool Document::selected_skin_ready_locked(SkinAuthoringMode mode) const {
-  if (!skin_target_ready_locked() || mode != SkinAuthoringMode::SourceVisible ||
+  if (!skin_target_ready_locked() ||
+      (mode != SkinAuthoringMode::SourceVisible &&
+       mode != SkinAuthoringMode::NativeVisible) ||
       state_.shape_sculpt || state_.selected_objects.empty() ||
-      state_.selected_objects.size() > 64 ||
-      skin_sources_locked(SkinAuthoringMode::SourceVisible).empty())
+      state_.selected_objects.size() > 64 || skin_sources_locked(mode).empty())
     return false;
   for (auto id : state_.selected_objects) {
     auto found = std::find_if(scene_.objects().begin(), scene_.objects().end(),
                               [&](const auto &o) { return o.id == id; });
-    if (found == scene_.objects().end() ||
-        found->group != scene_.active().group || !object_editable_locked(id) ||
-        !found->mesh_active || !found->painted || !found->deformation ||
-        !found->deformation->skin)
+    if (found == scene_.objects().end() || !object_editable_locked(id) ||
+        !found->mesh_active || !found->painted ||
+        (mode == SkinAuthoringMode::SourceVisible &&
+         (found->group != scene_.active().group || !found->deformation ||
+          !found->deformation->skin)))
       return false;
   }
   return true;
@@ -54,7 +59,9 @@ void Document::queue_bind_skin_locked(
       expected_selection != state_.selected_objects)
     throw std::logic_error(
         "Selected bind targets changed while choosing options");
-  if (options.mode == SkinAuthoringMode::SourceVisible && state_.shape_sculpt)
+  if ((options.mode == SkinAuthoringMode::SourceVisible ||
+       options.mode == SkinAuthoringMode::NativeVisible) &&
+      state_.shape_sculpt)
     throw std::logic_error(
         "Finish shape-key editing before binding REST weights");
   auto ids = skin_sources_locked(options.mode);
@@ -62,10 +69,9 @@ void Document::queue_bind_skin_locked(
       std::find(ids.begin(), ids.end(), options.reference) == ids.end())
     throw std::logic_error(
         "Select an editable mesh and an eligible skeleton/skin reference");
-  if (selected && (options.mode != SkinAuthoringMode::SourceVisible ||
-                   !selected_skin_ready_locked(options.mode)))
-    throw std::logic_error(
-        "Select editable parts of the same imported source group");
+  if (selected && !selected_skin_ready_locked(options.mode))
+    throw std::logic_error("Select editable native parts or parts of the same "
+                           "imported source group");
   const std::vector<uint64_t> targets =
       selected ? state_.selected_objects
                : std::vector<uint64_t>{scene_.active().id};
@@ -79,12 +85,14 @@ void Document::queue_bind_skin_locked(
     admission.locks = options.locks;
   auto changed = std::make_shared<bool>(false);
   auto report = std::make_shared<std::string>();
-  const std::string label = options.mode == SkinAuthoringMode::SourceVisible
-                                ? (selected ? "Source-assisted selected bind"
-                                            : "Source-assisted bind")
-                            : options.mode == SkinAuthoringMode::Transfer
-                                ? "Transfer skin weights"
-                                : "Automatic skin bind";
+  const std::string label =
+      options.mode == SkinAuthoringMode::SourceVisible
+          ? (selected ? "Source-assisted selected bind"
+                      : "Source-assisted bind")
+      : options.mode == SkinAuthoringMode::NativeVisible
+          ? (selected ? "Native visible selected bind" : "Native visible bind")
+      : options.mode == SkinAuthoringMode::Transfer ? "Transfer skin weights"
+                                                    : "Automatic skin bind";
   queue_scene_operation_locked(
       label,
       [targets, options, changed, report](Scene &scene, const auto &cancelled) {
@@ -94,6 +102,12 @@ void Document::queue_bind_skin_locked(
           *report = *changed
                         ? "Source-assisted weights updated; originals retained"
                         : "No skin changes; original weights retained";
+        } else if (options.mode == SkinAuthoringMode::NativeVisible) {
+          *changed =
+              author_native_visible_skin(scene, targets, options, cancelled);
+          *report = *changed ? "Native handle weights updated; full rig and "
+                               "originals retained"
+                             : "No skin changes; original weights retained";
         } else {
           *changed = author_skin(scene, targets.front(), options, cancelled);
           *report =

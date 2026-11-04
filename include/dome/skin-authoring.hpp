@@ -2,7 +2,23 @@
 #pragma once
 #include "scene.hpp"
 namespace dome {
-enum class SkinAuthoringMode { Automatic, Transfer, SourceVisible };
+enum class SkinAuthoringMode {
+  Automatic,
+  Transfer,
+  SourceVisible,
+  NativeVisible
+};
+// Explicit native finite-handle surface method. Imported artist rig axes are
+// not interpreted as native handles. No volume PDE or rig recognition claim.
+struct NativeVisibleSkinOptions {
+  size_t maximum_work = 500'000'000;
+  size_t maximum_workspace = 256u * 1024u * 1024u;
+  void validate() const;
+};
+struct NativeVisibleSkinReport {
+  size_t work = 0, planned_workspace = 0, parts = 0, changed_parts = 0,
+         rows = 0, permitted_controls = 0, supported_controls = 0;
+};
 // Explicit source-assisted imported-rig method: original positive component
 // membership, connected-surface entry-wall visibility, fixed4-influence output.
 // This is not a volume PDE or general unskinned/native intent solver.
@@ -30,6 +46,7 @@ struct SkinAuthoringOptions {
   // Separate opt-in resources/policy; legacy maximum_work/limits remain
   // Automatic/Transfer settings and are never silently reset by mode changes.
   SourceVisibleSkinOptions source_visible;
+  NativeVisibleSkinOptions native_visible;
   void validate() const;
 };
 // Zero-capable logarithmic slider over0..10000 world metres (displayed as mm).
@@ -50,4 +67,12 @@ bool author_source_visible_skin(Scene &, std::span<const uint64_t> targets,
                                 const SkinAuthoringOptions &,
                                 const std::function<bool()> &cancelled = {},
                                 SourceVisibleSkinReport *report = nullptr);
+// Explicit editable targets supply the support geometry; the distinct native
+// reference rig stays read-only. REST/full placement is authoritative, current
+// paint/morph/pose and the complete rig/source capsules are preserved. Unknown
+// continuous support or source identity refuses before scene adoption.
+bool author_native_visible_skin(Scene &, std::span<const uint64_t> targets,
+                                const SkinAuthoringOptions &,
+                                const std::function<bool()> &cancelled = {},
+                                NativeVisibleSkinReport *report = nullptr);
 } // namespace dome

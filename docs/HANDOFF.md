@@ -2,6 +2,12 @@
 
 This is a private unqualified Native-weights/HDR union. Public-main and component records below retain their original scope; no new combined qualification is claimed.
 
+The native finite-handle API/controller/desktop/software-loader workflow now has
+scoped CPU positives and real caller/preparation/publication failure evidence.
+Read [NATIVE-VISIBLE-WORKFLOW-WIP.md](NATIVE-VISIBLE-WORKFLOW-WIP.md). Fresh
+whole-owned SAN/OneAPI ABI qualification and wider unskinned geometry remain
+required; no main admission is claimed.
+
 ## Portable atomic save and final canonical picker SDK — 2026-11-04
 
 A qualified private public-main candidate carries c13909f atomic-output resource
