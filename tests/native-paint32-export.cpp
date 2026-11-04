@@ -10,7 +10,8 @@ namespace {
 std::vector<uint8_t> native32_bytes(const std::filesystem::path &p){std::ifstream f(p,std::ios::binary);return {std::istreambuf_iterator<char>(f),{}};}
 }
 int main(int argc,char **argv)try{
- if(argc!=2)return 2;const std::filesystem::path out=argv[1];std::filesystem::create_directories(out);NativeGraphics graphics;Fbo fbo;SurfaceRenderer renderer;prepared_normal_consumer::Renderer independent;unsigned number=0;
+ if(argc==3&&std::string_view(argv[2])=="--fixture-only"){const std::filesystem::path file=argv[1];std::filesystem::create_directories(file.parent_path());auto scene=native_grid(Material::AlphaMode::Opaque);scene.active().material.emissive={8,.016f,.16f};native_split(scene).save(file);return 0;}
+ if(argc<2||argc>3)return 2;const std::filesystem::path out=argv[1];std::filesystem::create_directories(out);NativeGraphics graphics;const std::string device=reinterpret_cast<const char*>(glGetString(GL_RENDERER));std::cout<<"GPU "<<device<<std::endl;const bool actual=device.find("Intel")!=std::string::npos&&device.find("Arc")!=std::string::npos&&device.find("A770")!=std::string::npos&&device.find("llvmpipe")==std::string::npos&&device.find("softpipe")==std::string::npos;check(argc<3||std::string_view(argv[2])!="--hardware"||actual,"Native32 export strict device identity is actual Intel Arc A770");Fbo fbo;SurfaceRenderer renderer;prepared_normal_consumer::Renderer independent;unsigned number=0;
  for(bool hdr:{false,true})for(bool unlit:{false,true})for(auto alpha:{Material::AlphaMode::Opaque,Material::AlphaMode::Mask,Material::AlphaMode::Blend}){
   auto source=native_grid(alpha);source.active().material.unlit=unlit;if(hdr)source.active().material.emissive={8,.016f,.16f};auto scene=native_split(source);const auto exact=scene.encode();Document doc;doc.replace(scene);doc.shading(false);settled(doc);fbo.bind();const auto native=draw(renderer,doc.frame().surface);
   scene.save(out/(std::to_string(number)+"-input.dsculpt"));
