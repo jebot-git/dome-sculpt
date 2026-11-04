@@ -24,7 +24,7 @@ int main(int argc,char**argv)try{
    size_t boundary=0,nonmanifold=0,orientation=0;for(const auto&[e,n]:edges){boundary+=n[0]==1;nonmanifold+=n[0]!=1&&n[0]!=2;orientation+=n[0]==2&&n[1]!=0;}
    comp.push_back({{"root",root},{"vertices",vertices.size()},{"faces",faces},{"mask",names},{"lo",lo},{"hi",hi},{"position_only_boundary_edges",boundary},{"position_only_nonmanifold_edges",nonmanifold},{"position_only_orientation_errors",orientation},{"diagnostic_only_no_topology_weld",true}});
   }
-  if(!comp.empty()){std::string material;const auto&a=*o.appearance;if(a.source_material>=0&&size_t(a.source_material)<a.asset->materials.size())material=a.asset->materials[a.source_material].name;result["parts"].push_back({{"id",o.id},{"name",o.name},{"material_diagnostic_only",material},{"all_index_components",parts.size()},{"eye_components",comp}});}
+  if(!comp.empty()){std::string material;const auto&a=*o.appearance;if(a.material>=0&&size_t(a.material)<a.asset->materials.size())material=a.asset->materials[a.material].name;result["parts"].push_back({{"id",o.id},{"name",o.name},{"material_diagnostic_only",material},{"all_index_components",parts.size()},{"eye_components",comp}});}
  }
  std::ofstream(argv[2])<<result.dump(2);return 0;
 }catch(const std::exception&e){std::cerr<<e.what()<<std::endl;return 1;}
