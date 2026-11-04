@@ -31,7 +31,7 @@ int main(int argc,char **argv)try{
  for(int quota=0;quota<4;++quota){auto bounded=options;switch(quota){case 0:bounded.max_raster_samples=1;break;case 1:bounded.max_sample_operations=1;break;case 2:bounded.max_working_bytes=1;break;case 3:bounded.max_output_bytes=1;break;}check(refuses([&]{bake_source_uv(input,bounded);}),"Lossless source transfer respects caller raster/work/scratch/image quotas before publication");}
  options.cancelled=[]{return true;};check(refuses([&]{bake_source_uv(input,options);}),"Cancelled lossless preparation publishes no detached result");options.cancelled={};
  auto bad=result;auto maps=std::make_shared<PaintSourceMaps>(*bad.maps);bad.maps=maps;
- check(!adopt_source_uv_bake(bad).paint->source_maps(),"An empty structural source table does not invent sampling authority");
+ check(result.maps&&result.maps->empty()&&refuses([&]{adopt_source_uv_bake(bad);}),"An equal-valued foreign empty role table cannot replace the authentic retained source owner");
  maps->color.image=std::make_shared<const Image>(Image{1,1,{255,0,0,255}});
  check(refuses([&]{adopt_source_uv_bake(bad);}),"A newly supplied source image cannot borrow retained coordinate authority");
  bad=result;auto baked=std::make_shared<BakedTextures>(*bad.baked);baked->maps.color.rgba[0]^=1;bad.baked=baked;
