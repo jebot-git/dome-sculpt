@@ -964,8 +964,8 @@
   },
   "live_source_manifest_sha256": "8f6ded959edb5d96c6b053c4b331ce43b05534b117137b93b635ed75cc0589f7",
   "release_glb_validation": {
-    "path": "/home/blux/de-xr/dome-sculpt/artifacts/source4-key-workflow-b6/artifacts/key-workflow-proof/release-v2/khronos.json",
-    "sha256": "7c38efd5792c5285afed53bfa5488012b0a6f3602712b82eb21a662189555ccf",
+    "path": "/home/blux/de-xr/dome-sculpt/artifacts/source4-key-workflow-b6/artifacts/key-workflow-proof/release-v4/khronos.json",
+    "sha256": "28433149bebc4875b29cd845aed4b4d0d48ee718ac028d723f0ec0379319964c",
     "totals": {
       "files": 4,
       "errors": 0,
@@ -973,6 +973,38 @@
       "infos": 22,
       "hints": 31
     },
-    "scope": "Four GLBs: one actual complete native export plus three constructed inputs; final helper changes no exporter/data"
+    "scope": "Final revised-helper actual native GLB +three constructed inputs, unfiltered maxIssues0"
+  },
+  "export_comparison": {
+    "pairs": [
+      {
+        "file": "admission/artist-uv2.glb",
+        "original": "4be00394df3f67b4962fae42af23b9189d8ab03782ce68f99d0b455aaf29a4db",
+        "revised": "4be00394df3f67b4962fae42af23b9189d8ab03782ce68f99d0b455aaf29a4db",
+        "exact": true
+      },
+      {
+        "file": "admission/generated-uv2.glb",
+        "original": "ede104999d53fcf0a14c205ad027f0b319fc79faaabee2f3dcdef3f1b258d11b",
+        "revised": "ede104999d53fcf0a14c205ad027f0b319fc79faaabee2f3dcdef3f1b258d11b",
+        "exact": true
+      },
+      {
+        "file": "workflow/raw-uv2.glb",
+        "original": "69f0ac081ffa140f0b2805e236ca267d79dc950d5e4d763a43084fe3a27e711b",
+        "revised": "69f0ac081ffa140f0b2805e236ca267d79dc950d5e4d763a43084fe3a27e711b",
+        "exact": true
+      },
+      {
+        "file": "workflow/union-final.glb",
+        "original": "3ea33cd22a38cdfac00dbe4bf69747d6c1ce780638cdc90c427b99459fd42eb9",
+        "revised": "28871e2bc69e725237897265f5539b71e6244c2cdb6dafb0b247c044d779fd2a",
+        "exact": false
+      }
+    ],
+    "native_export_BIN_exact": true,
+    "native_export_BIN_sha256": "a4d34fe66064a8745011b321bc934d63715dacaf7b46d3ef2825cd346a03dbee",
+    "JSON_difference": "Only generated dome-cut-color-source-PID node label1367213 versus1631302; not whole-file equality.",
+    "diff_sha256": "10be6dcf210848c7a2367532b89337942e690d15bd89f5c3a50387eb4c6ea0f9"
   }
 }

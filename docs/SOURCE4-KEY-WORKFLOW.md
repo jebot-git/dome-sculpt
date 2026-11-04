@@ -41,8 +41,9 @@ Its source files were exact-copied from the separate frozen live run; no source
 there was edited. The pipeline uses complete consumer TUs against byte-matching
 own coherent Release/whole-owned sanitizer archives, not a new whole app build.
 The one actual complete native GLB and three constructed input GLBs validate
-with zero Khronos errors,22 warnings/22 infos/31 hints unfiltered. Final helper
-changes do not change exported data. Focused Source4 key image proof40c6851 is a
+with zero Khronos errors,22 warnings/22 infos/31 hints unfiltered. The original and revised exports have identical BIN; JSON differs only in the
+generated dome-cut-color-source-PID node label. Whole GLB bytes differ and are
+not claimed equal. Final revised outputs themselves were validated. Focused Source4 key image proof40c6851 is a
 separate nine-image R/S/Arc endpoint; no GPU or physical headset was used here.
 
 Read [the receipt](validation/SOURCE4-KEY-WORKFLOW.json) for exact source and
