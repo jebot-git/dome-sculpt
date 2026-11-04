@@ -90,5 +90,13 @@ int main(int argc,char **argv)try{
     bad=valid;bad["baked_normal_fields"]["fields"].push_back(bad["baked_normal_fields"]["fields"][0]);check(refuses(bad),"Unreachable owning field records are rejected");
     check(document.copy_scene().encode()==valid,"Malformed independent graphs preserve complete live document and exact retry");
   }
+  {
+    auto raw=Scene::load(source/"original-7.dsculpt");Document document;document.replace(raw);settled_layers(document);
+    document.convert_baked_normals();settled_layers(document);auto scene=document.copy_scene();const auto mesh=scene.active().painted->mesh();
+    scene.add("Prepared source guard target",Volume{});scene.active().mesh_active=true;scene.active().painted=std::make_shared<PaintedMesh>(mesh,64);
+    const auto exact=scene.encode();ObjectBakeSettings options;options.ao_samples=0;options.allow_partial=true;options.front_mm=options.back_mm=1000;
+    bool refused=false;try{bake_object(scene,1,options);}catch(const std::exception &e){refused=std::string_view(e.what()).find("source-frame transport")!=std::string_view::npos;}
+    check(refused&&scene.encode()==exact,"Independent prepared source cannot bypass genuine source-frame transport or mutate either object");
+  }
   return 0;
 }catch(const std::exception &e){std::cerr<<"FAIL "<<e.what()<<'\n';return 1;}
