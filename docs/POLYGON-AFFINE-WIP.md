@@ -1,9 +1,10 @@
 # Affine polygon workspace draft
 
-This isolated child of main10944ab is a source prototype, not a runtime-qualified
-milestone. Twelve own-header syntax checks pass (including all seven affected
-product TUs, new consumer and older polygon/render/framing consumers). No native
-runtime, GUI, pixels or hardware result is claimed by that syntax evidence.
+This isolated child of main10944ab now has a scoped matching Release/owned
+ASan/UBSan runtime milestone263c753. Twelve own-header syntax checks also pass
+(including all seven affected product TUs, new consumer and older polygon/render/
+framing consumers). This is not full-build, all-regression, graphical or main
+admission; those scopes remain explicitly separate.
 
 The local polygon authority and its immutable history remain local. Real affine
 placement is used independently for world-metre operations and pointer metrics:
@@ -95,3 +96,27 @@ The next child removes only that superseded affine capability exclusion,
 retaining all modal/source/editability/factory guards, and asserts actual
 can_polygon before controller entry. Tagged proof directories preserve earlier
 attempts. Whole-TU closure remains unchanged.
+
+## Closed bounded phase1
+
+Tagged Release handle7849 and owned sanitizer handle34005 both completed0 on
+frozen263c753, with exact source/support/runtime-map hashes before/after. Each
+profile passes160 basic native checks,32 actual-controller checks and9265
+detached-kernel failure assertions (all3283 measured persistent C++ prefixes with
+retry plus all2699 callbackCancel sites). There are no sanitizer diagnostics.
+The real sheared/reflected native worker Save/reopen outputs are53117 bytes each
+and R/S byte-identical. App--version also exits0; it is not GUI execution.
+
+All seven whole changed/affected product TUs were compiled/profile; remaining
+current-main/C179 objects and complete owned supporting archives were reused
+with exact source/body/layout/symbol/link-trace closure. No archive was copied or
+modified, and no old replaced member was selected. This is an incremental matched
+qualification, not a claim of a fresh whole-source app/core build.
+
+Cumulative allocated bytes at closure are approximately1,044,189,184 (996MiB),
+below the approved1.25GiB cap. Actualfree is approximately22.78GiB at that sample;
+no extension/new target has started. Independent preview pixels, real FLTK
+normal/compact and actual app-loader workflows, affine posed/colored/imported
+combinations and full native worker/queuedCancel OOM remain required. Existing
+app binaries can support a later bounded GUI cohort; further consumer links
+require root review. POLYGON-AFFINE-PHASE1.json contains exact per-profile receipts.
