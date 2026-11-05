@@ -8,7 +8,7 @@
 struct V1ExpressionLayerConsumer {
   using J=nlohmann::json;
   float expression=0;int pose=0,selected_node=-1;bool wrong_mask_cutoff=false,wrong_paint_uv=false,wrong_base_tint=false,wrong_shared_shade=false;
-  bool wrong_source_uv=false;
+  bool wrong_source_uv=false,wrong_matcap_view=false,wrong_matcap_uv_target=false,wrong_matcap_color=false;
   std::map<std::string,float> weights;
   struct WeightedExpression {const J *value;float weight;};
   std::vector<WeightedExpression> active;
@@ -17,27 +17,37 @@ struct V1ExpressionLayerConsumer {
     const char *vs = R"GLSL(#version 330 core
 layout(location=0)in vec3 p;layout(location=1)in vec3 N;
 layout(location=2)in vec2 UV;layout(location=3)in vec2 SU;layout(location=4)in vec2 EU;
-uniform mat4 camera;out vec3 n;out vec2 uv,shadeUV,emissionUV;
-void main(){n=N;uv=UV;shadeUV=SU;emissionUV=EU;gl_Position=camera*vec4(p,1);})GLSL";
+uniform mat4 camera;out vec3 n,world;out vec2 uv,shadeUV,emissionUV;
+void main(){n=N;world=p;uv=UV;shadeUV=SU;emissionUV=EU;gl_Position=camera*vec4(p,1);})GLSL";
     const char *fs = R"GLSL(#version 330 core
-in vec3 n;in vec2 uv,shadeUV,emissionUV;out vec4 result;
-uniform sampler2D baseMap,shadeMap,emissionMap;uniform int basePresent,shadePresent,emissionPresent;
+in vec3 n,world;in vec2 uv,shadeUV,emissionUV;out vec4 result;
+uniform sampler2D baseMap,shadeMap,emissionMap,matcapMap;uniform int basePresent,shadePresent,emissionPresent,matcapPresent,wrongMatcapView;
+uniform vec3 matcapFactor,viewOrigin;uniform float rimLightingMix;
 uniform vec3 emissionFactor;uniform float emissionStrength;
 uniform int blend;uniform float alphaCutoff;uniform vec4 baseFactor;uniform vec3 shadeFactor;
 uniform vec2 scroll;uniform float speed,seconds,shift,toony,equalization;
-uniform vec3 baseX,baseY,shadeX,shadeY,emissionX,emissionY;
+uniform vec3 baseX,baseY,shadeX,shadeY,emissionX,emissionY,matcapX,matcapY;
 vec2 animated(vec2 u){float a=speed*seconds;vec2 q=u-.5;
 return vec2(cos(a)*q.x+sin(a)*q.y,-sin(a)*q.x+cos(a)*q.y)+.5+scroll*seconds;}
 vec2 mapped(vec2 u,vec3 X,vec3 Y){vec2 q=animated(u)*X.xy;float c=cos(X.z),s=sin(X.z);return mat2(c,s,-s,c)*q+Y.xy;}
+// Independent pinned UniVRM view-normal lookup, in its left-handed frame.
+// Reflect X for glTF -> Unity, then flip texture V back to glTF's top row.
+// This expresses coordinate conversion, not a call to the native UV helper.
+vec2 viewLookup(vec3 N,vec3 V){vec3 L=vec3(-N.x,N.y,N.z),W=vec3(-V.x,V.y,V.z);
+vec3 X=normalize(cross(W,vec3(0,1,0))),Y=normalize(cross(X,W));
+vec2 q=.5+.5*vec2(dot(X,L),dot(Y,L));return vec2(q.x,1-q.y);}
 void main(){vec3 N=normalize(n);if(!gl_FrontFacing)N=-N;
 vec4 lit=(basePresent==1?texture(baseMap,mapped(uv,baseX,baseY)):vec4(1))*baseFactor;
 if(blend==2&&lit.a<alphaCutoff)discard;
 vec3 shade=(shadePresent==1?texture(shadeMap,mapped(shadeUV,shadeX,shadeY)).rgb:vec3(1))*shadeFactor;
 float width=1-toony,x=dot(N,normalize(vec3(-.4,.8,.7)))+shift;
 float ratio=width<=.0000001?step(0,x):clamp((x+width)/(2*width),0,1);
-float gi=mix(mix(.1,.25,.5+.5*N.y),.175,equalization);
+float rawGi=mix(.1,.25,.5+.5*N.y),gi=mix(rawGi,.175,equalization);
 vec3 emission=(emissionPresent==1?texture(emissionMap,mapped(emissionUV,emissionX,emissionY)).rgb:vec3(1))*emissionFactor*emissionStrength;
-result=vec4(mix(shade,lit.rgb,ratio)+gi*lit.rgb+emission,blend==1?lit.a:1);})GLSL";
+vec2 M=wrongMatcapView==1?uv:viewLookup(N,normalize(viewOrigin-world));
+vec3 matcap=matcapPresent==1?texture(matcapMap,mapped(M,matcapX,matcapY)).rgb*matcapFactor:vec3(0);
+matcap*=mix(1.,1.+rawGi,rimLightingMix);
+result=vec4(mix(shade,lit.rgb,ratio)+gi*lit.rgb+emission+matcap,blend==1?lit.a:1);})GLSL";
     auto v = role_consumer::shader(GL_VERTEX_SHADER, vs);
     auto f = role_consumer::shader(GL_FRAGMENT_SHADER, fs);
     program = glCreateProgram();
@@ -86,7 +96,7 @@ in vec2 uv;out vec4 result;uniform sampler2D scene;void main(){result=texture(sc
   }
   GLuint texture(cgltf_data *data, const J &info, unsigned unit,
                  const char *uniform) {
-    const char *presence=unit==0?"basePresent":unit==1?"shadePresent":"emissionPresent";
+    const char *presence=unit==0?"basePresent":unit==1?"shadePresent":unit==2?"emissionPresent":"matcapPresent";
     glUniform1i(loc(presence),!info.is_null());glUniform1i(loc(uniform),unit);
     if(info.is_null()){glActiveTexture(GL_TEXTURE0+unit);glBindSampler(unit,0);glBindTexture(GL_TEXTURE_2D,0);return 0;}
     int index = info.at("index").get<int>();
@@ -115,7 +125,7 @@ in vec2 uv;out vec4 result;uniform sampler2D scene;void main(){result=texture(sc
     glUniform1i(loc(uniform), unit);
     return id;
   }
-  void transform(const J &info, const char *x, const char *y,const J &expression_data,size_t material,bool paint_layer=false) {
+  void transform(const J &info, const char *x, const char *y,const J &expression_data,size_t material,bool paint_layer=false,bool screen_mapped=false) {
     J t = J::object();
     if (info.contains("extensions") &&
         info.at("extensions").contains("KHR_texture_transform"))
@@ -124,10 +134,11 @@ in vec2 uv;out vec4 result;uniform sampler2D scene;void main(){result=texture(sc
          scale = t.value("scale", std::array<float, 2>{1, 1});
     double a = t.value("rotation", 0.0);
     const auto initial_scale=scale,initial_offset=offset;
-    if(weights.empty()){
+    if(!screen_mapped){if(weights.empty()){
       for(const auto &bind:expression_data.value("textureTransformBinds",J::array()))if(bind.at("material").get<size_t>()==material)for(size_t k=0;k<2;++k){scale[k]+=float((double(bind.value("scale",std::array<float,2>{1,1})[k])-initial_scale[k])*expression);offset[k]+=float((double(bind.value("offset",std::array<float,2>{})[k])-initial_offset[k])*expression);}
     }else{double total=0;std::array<double,2> scales{},offsets{};for(const auto &e:active)for(const auto &bind:e.value->value("textureTransformBinds",J::array()))if(bind.at("material").get<size_t>()==material){total+=e.weight;const auto target_scale=bind.value("scale",std::array<float,2>{1,1}),target_offset=bind.value("offset",std::array<float,2>{});for(size_t k=0;k<2;++k){scales[k]+=double(target_scale[k])*e.weight;offsets[k]+=double(target_offset[k])*e.weight;}}for(size_t k=0;k<2;++k){scale[k]=float(initial_scale[k]*(1-total)+scales[k]);offset[k]=float(initial_offset[k]*(1-total)+offsets[k]);}}
-    if(wrong_source_uv&&!paint_layer){scale=initial_scale;offset=initial_offset;}
+    }
+    if(wrong_source_uv&&!paint_layer&&!screen_mapped){scale=initial_scale;offset=initial_offset;}
     if(wrong_paint_uv&&std::string_view(x)=="baseX"&&paint_layer){scale=initial_scale;offset=initial_offset;offset[0]+=expression*.2f;offset[1]-=expression*.1f;}
     glUniform3f(loc(x),scale[0],scale[1],float(a));glUniform3f(loc(y),offset[0],offset[1],0);
   }
@@ -176,8 +187,8 @@ in vec2 uv;out vec4 result;uniform sampler2D scene;void main(){result=texture(sc
         if(blended){glEnable(GL_BLEND);glBlendEquationSeparate(GL_FUNC_ADD,GL_FUNC_ADD);glBlendFuncSeparate(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA,GL_ONE,GL_ONE_MINUS_SRC_ALPHA);glDepthMask(GL_FALSE);glDepthFunc(GL_LEQUAL);}else{glDisable(GL_BLEND);glDepthMask(GL_TRUE);glDepthFunc(GL_LESS);}glUniform1i(loc("blend"),blended?1:masked?2:0);scalar("alphaCutoff",wrong_mask_cutoff?.99f:m.value("alphaCutoff",.5f));
         const size_t material=size_t(p.material-model.data->materials);
         if(weights.empty()){
-         for(const auto &bind:expression_data.value("materialColorBinds",J::array()))if(bind.at("material").get<size_t>()==material){const std::string type=bind.at("type");J *field=type=="color"?&m["pbrMetallicRoughness"]["baseColorFactor"]:type=="shadeColor"?&m["extensions"]["VRMC_materials_mtoon"]["shadeColorFactor"]:type=="emissionColor"?&m["emissiveFactor"]:nullptr;if(!field)throw std::runtime_error("Independent layer colour type unsupported");for(size_t k=0;k<field->size();++k)(*field)[k]=field->at(k).get<double>()+(bind.at("targetValue").at(k).get<double>()-field->at(k).get<double>())*expression;}
-        }else{for(const char *type:{"color","shadeColor","emissionColor"}){J &field=std::string_view(type)=="color"?m["pbrMetallicRoughness"]["baseColorFactor"]:std::string_view(type)=="shadeColor"?m["extensions"]["VRMC_materials_mtoon"]["shadeColorFactor"]:m["emissiveFactor"];const auto initial=field;for(size_t k=0;k<field.size();++k){double value=initial.at(k).get<double>();for(const auto &e:active)for(const auto &bind:e.value->value("materialColorBinds",J::array()))if(bind.at("material").get<size_t>()==material&&bind.at("type")==type)value+=(bind.at("targetValue").at(k).get<double>()-initial.at(k).get<double>())*e.weight;field[k]=float(value);}}}
+         for(const auto &bind:expression_data.value("materialColorBinds",J::array()))if(bind.at("material").get<size_t>()==material){const std::string type=bind.at("type");J *field=type=="color"?&m["pbrMetallicRoughness"]["baseColorFactor"]:type=="shadeColor"?&m["extensions"]["VRMC_materials_mtoon"]["shadeColorFactor"]:type=="emissionColor"?&m["emissiveFactor"]:type=="matcapColor"?&m["extensions"]["VRMC_materials_mtoon"]["matcapFactor"]:nullptr;if(!field)throw std::runtime_error("Independent layer colour type unsupported");for(size_t k=0;k<field->size();++k)(*field)[k]=field->at(k).get<double>()+(bind.at("targetValue").at(k).get<double>()-field->at(k).get<double>())*expression;}
+        }else{for(const char *type:{"color","shadeColor","emissionColor","matcapColor"}){J &field=std::string_view(type)=="color"?m["pbrMetallicRoughness"]["baseColorFactor"]:std::string_view(type)=="shadeColor"?m["extensions"]["VRMC_materials_mtoon"]["shadeColorFactor"]:std::string_view(type)=="emissionColor"?m["emissiveFactor"]:m["extensions"]["VRMC_materials_mtoon"]["matcapFactor"];const auto initial=field;for(size_t k=0;k<field.size();++k){double value=initial.at(k).get<double>();for(const auto &e:active)for(const auto &bind:e.value->value("materialColorBinds",J::array()))if(bind.at("material").get<size_t>()==material&&bind.at("type")==type)value+=(bind.at("targetValue").at(k).get<double>()-initial.at(k).get<double>())*e.weight;field[k]=float(value);}}}
         if(wrong_base_tint&&pi>0){const auto &bind=expression_data.at("materialColorBinds").at(0);for(size_t k=0;k<3;++k)m["pbrMetallicRoughness"]["baseColorFactor"][k]=1+(bind.at("targetValue").at(k).get<double>()-1)*expression;}
         // Core occlusion/MR fields are PBR fallbacks, not MToon1 roles.
         for (const char *role :
@@ -185,7 +196,7 @@ in vec2 uv;out vec4 result;uniform sampler2D scene;void main(){result=texture(sc
           if (m.contains(role))
             throw std::runtime_error("Unexpected independent V1 role");
         for (const char *role :
-             {"matcapTexture", "rimMultiplyTexture",
+             {"rimMultiplyTexture",
               "outlineWidthMultiplyTexture", "shadingShiftTexture",
               "uvAnimationMaskTexture"})
           if (ext.contains(role))
@@ -193,7 +204,7 @@ in vec2 uv;out vec4 result;uniform sampler2D scene;void main(){result=texture(sc
         auto &base = m.at("pbrMetallicRoughness");
         const auto bi = base.value("baseColorTexture",J());
         const auto si = ext.value("shadeMultiplyTexture",J());
-        const auto ei=m.value("emissiveTexture",J());
+        const auto ei=m.value("emissiveTexture",J()),mi=ext.value("matcapTexture",J());
         const auto ef=m.value("emissiveFactor",std::array<float,3>{});
         glUniform3fv(loc("emissionFactor"),1,ef.data());
         float strength=1;if(m.contains("extensions")&&m.at("extensions").contains("KHR_materials_emissive_strength"))strength=m.at("extensions").at("KHR_materials_emissive_strength").value("emissiveStrength",1.f);
@@ -205,6 +216,7 @@ in vec2 uv;out vec4 result;uniform sampler2D scene;void main(){result=texture(sc
         if(wrong_shared_shade&&pi>0)shadeColor={0,0,0};
         glUniform4fv(loc("baseFactor"), 1, baseColor.data());
         glUniform3fv(loc("shadeFactor"), 1, shadeColor.data());
+        auto mf=ext.value("matcapFactor",std::array<float,3>{1,1,1});if(wrong_matcap_color)mf={0,0,0};glUniform3fv(loc("matcapFactor"),1,mf.data());glUniform3f(loc("viewOrigin"),0,0,2);scalar("rimLightingMix",ext.value("rimLightingMixFactor",1.f));glUniform1i(loc("wrongMatcapView"),wrong_matcap_view);
         scalar("seconds", float(seconds));
         scalar("speed", ext.value("uvAnimationRotationSpeedFactor", 0.f));
         glUniform2f(loc("scroll"),
@@ -216,9 +228,11 @@ in vec2 uv;out vec4 result;uniform sampler2D scene;void main(){result=texture(sc
         transform(bi, "baseX", "baseY",expression_data,material,pi>0);
         transform(si, "shadeX", "shadeY",expression_data,material);
         transform(ei, "emissionX", "emissionY",expression_data,material);
+        transform(mi,"matcapX","matcapY",expression_data,material,false,!wrong_matcap_uv_target);
         auto bt = texture(model.data, bi, 0, "baseMap"),
              st = texture(model.data, si, 1, "shadeMap"),
-             et = texture(model.data, ei, 2, "emissionMap");
+             et = texture(model.data, ei, 2, "emissionMap"),
+             mt = texture(model.data,mi,3,"matcapMap");
         auto P = role_consumer::attr(p.attributes, p.attributes_count,
                                      cgltf_attribute_type_position);
         auto N = role_consumer::attr(p.attributes, p.attributes_count,
@@ -277,6 +291,7 @@ in vec2 uv;out vec4 result;uniform sampler2D scene;void main(){result=texture(sc
         glDeleteTextures(1, &bt);
         glDeleteTextures(1, &st);
         glDeleteTextures(1, &et);
+        glDeleteTextures(1,&mt);
       }
     }
     glBindFramebuffer(GL_FRAMEBUFFER,GLuint(destination));glViewport(0,0,96,96);glDisable(GL_DEPTH_TEST);glDepthMask(GL_TRUE);glDisable(GL_BLEND);glUseProgram(resolve);glUniform1i(glGetUniformLocation(resolve,"scene"),0);glActiveTexture(GL_TEXTURE0);glBindTexture(GL_TEXTURE_2D,color);glBindSampler(0,0);glBindVertexArray(vao);glDrawArrays(GL_TRIANGLES,0,3);

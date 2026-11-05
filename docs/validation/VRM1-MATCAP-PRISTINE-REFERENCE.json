@@ -1,0 +1,436 @@
+{
+  "format": 1,
+  "runtime": "unchanged sealedbd3/a78, exact existing MatCap native helpers",
+  "scope": "Prerequisite RAW GLB vs native pristine MatCap reference, BEFORE lifting painted export guard. Whole worker and new independent renderer on immutable matchedbd3 support; no native renderer/helper edit.",
+  "primary": {
+    "commit": "efd20f62f1bf0ac3fcc34de1e497324c5197d146",
+    "source_audit_only_not_copied_into_runtime": true,
+    "files": [
+      {
+        "url": "https://raw.githubusercontent.com/vrm-c/UniVRM/efd20f62f1bf0ac3fcc34de1e497324c5197d146/Packages/VRM10/MToon10/Shaders/vrmc_materials_mtoon_lighting_mtoon.hlsl",
+        "sha256": "9450a91f375b30fde1e0a7e85d133fefb3eca5e80c72bfe9f4bb2370bfd45ba9",
+        "bytes": 7485
+      },
+      {
+        "url": "https://raw.githubusercontent.com/vrm-c/UniVRM/efd20f62f1bf0ac3fcc34de1e497324c5197d146/Packages/VRM10/MToon10/Shaders/vrmc_materials_mtoon_geometry_uv.hlsl",
+        "sha256": "4f9d3d49569c59003ca103492dc5258675f37b94ce8d547a1c20578e29838a9c",
+        "bytes": 1202
+      },
+      {
+        "url": "https://raw.githubusercontent.com/vrm-c/UniVRM/efd20f62f1bf0ac3fcc34de1e497324c5197d146/Packages/VRM10/MToon10/Shaders/vrmc_materials_mtoon_input.hlsl",
+        "sha256": "aa27df0349179ed4bf553242bb47df015fd329234d0297be5786e2c6d6547aad",
+        "bytes": 1265
+      },
+      {
+        "url": "https://raw.githubusercontent.com/vrm-c/UniVRM/efd20f62f1bf0ac3fcc34de1e497324c5197d146/Packages/UniGLTF/Runtime/UniGLTF/IO/Axes.cs",
+        "sha256": "d88a312fa944054938e0fd9c290836643c0ea7fb133cdc3a8a9e771bfbadfd04",
+        "bytes": 1676
+      },
+      {
+        "url": "https://raw.githubusercontent.com/vrm-c/UniVRM/efd20f62f1bf0ac3fcc34de1e497324c5197d146/Packages/UniGLTF/Runtime/UniGLTF/IO/MaterialIO/TextureTransform.cs",
+        "sha256": "65d828bba93a79b5c8dca91ca045b4bda20f8292e58ff3b92d56fb5f5841817e",
+        "bytes": 641
+      },
+      {
+        "url": "https://raw.githubusercontent.com/vrm-c/UniVRM/efd20f62f1bf0ac3fcc34de1e497324c5197d146/Packages/VRM10/Runtime/IO/Vrm10ImportData.cs",
+        "sha256": "b4a25898e3851bdf0a64d078bf737fb96547e373f77e66c07c96920a9e3c99df",
+        "bytes": 18934
+      },
+      {
+        "url": "https://raw.githubusercontent.com/vrm-c/UniVRM/efd20f62f1bf0ac3fcc34de1e497324c5197d146/Packages/VRM10/vrmlib/Runtime/Coordinates.cs",
+        "sha256": "0d4c745a149c53b23bb525e40d5dd72b7de7c361a5fe2bd6fd80453097fa403a",
+        "bytes": 1229
+      }
+    ]
+  },
+  "stages": {
+    "release": {
+      "status": {
+        "state": "terminal",
+        "pid": 1530994,
+        "steps": [
+          {
+            "name": "compile-vrm1-expression-layer-authoring",
+            "command": [
+              "/usr/bin/c++",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-role-audit-43e/src",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-role-audit-43e/third_party/cgltf",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-role-audit-43e/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-role-audit-43e/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-role-audit-43e/third_party/nlohmann",
+              "-O3",
+              "-DNDEBUG",
+              "-std=gnu++20",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-role-audit-43e/artifacts/role-audit/pristine-release/stage/vrm1-expression-layer-authoring.cpp.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-role-audit-43e/tests/vrm1-expression-layer-authoring.cpp"
+            ],
+            "exit": 0,
+            "seconds": 12.501607423007954
+          },
+          {
+            "name": "link-worker",
+            "command": [
+              "/usr/bin/c++",
+              "-O3",
+              "-DNDEBUG",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-role-audit-43e/artifacts/role-audit/pristine-release/stage/vrm1-expression-layer-authoring.cpp.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-role-audit-43e/artifacts/role-audit/pristine-release/stage/worker",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-role-audit-43e/artifacts/role-audit/pristine-release/stage/libdome-sculpt-core.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-role-audit-43e/artifacts/role-audit/pristine-release/stage/libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-role-audit-43e/artifacts/role-audit/pristine-release/stage/libdome-sculpt-polygon.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-role-audit-43e/artifacts/role-audit/pristine-release/stage/libxatlas.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-role-audit-43e/artifacts/role-audit/pristine-release/stage/libmikktspace.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-role-audit-43e/artifacts/role-audit/pristine-release/stage/libmikktspace-robust.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-role-audit-43e/artifacts/role-audit/pristine-release/stage/libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-role-audit-43e/artifacts/role-audit/pristine-release/stage/libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded",
+              "-Wl,--wrap=fsync"
+            ],
+            "exit": 0,
+            "seconds": 0.4671465600258671
+          },
+          {
+            "name": "actual-role-refusal",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-role-audit-43e/artifacts/role-audit/pristine-release/stage/worker",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-preview-1853cc3/build-preview-release/vrm1-background-fixture/source.vrm",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-role-audit-43e/artifacts/role-audit/pristine-release/run",
+              "--old-refusal",
+              "--matcap"
+            ],
+            "exit": 0,
+            "seconds": 0.19608018500730395
+          },
+          {
+            "name": "compile-vrm1-matcap-pristine-render",
+            "command": [
+              "/usr/bin/c++",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-role-audit-43e/src",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-role-audit-43e/third_party/cgltf",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-role-audit-43e/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-role-audit-43e/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-role-audit-43e/third_party/nlohmann",
+              "-isystem",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/harfbuzz",
+              "-isystem",
+              "/usr/include/glib-2.0",
+              "-isystem",
+              "/usr/lib64/glib-2.0/include",
+              "-isystem",
+              "/usr/include/sysprof-6",
+              "-isystem",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/freetype2",
+              "-isystem",
+              "/usr/include/libpng16",
+              "-isystem",
+              "/usr/include/libxml2",
+              "-O3",
+              "-DNDEBUG",
+              "-std=gnu++20",
+              "-pthread",
+              "-DWITH_GZFILEOP",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-role-audit-43e/artifacts/role-audit/pristine-release/stage/vrm1-matcap-pristine-render.cpp.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-role-audit-43e/tests/vrm1-matcap-pristine-render.cpp"
+            ],
+            "exit": 0,
+            "seconds": 23.39289837895194
+          },
+          {
+            "name": "link-render",
+            "command": [
+              "/usr/bin/c++",
+              "-O3",
+              "-DNDEBUG",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-role-audit-43e/artifacts/role-audit/pristine-release/stage/vrm1-matcap-pristine-render.cpp.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-role-audit-43e/artifacts/role-audit/pristine-release/stage/render",
+              "-Wl,-rpath,/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-role-audit-43e/artifacts/role-audit/pristine-release/stage/libdome-sculpt-render.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-role-audit-43e/artifacts/role-audit/pristine-release/stage/libdome-sculpt-core.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-role-audit-43e/artifacts/role-audit/pristine-release/stage/libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-role-audit-43e/artifacts/role-audit/pristine-release/stage/libdome-sculpt-polygon.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-role-audit-43e/artifacts/role-audit/pristine-release/stage/libxatlas.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-role-audit-43e/artifacts/role-audit/pristine-release/stage/libmikktspace.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-role-audit-43e/artifacts/role-audit/pristine-release/stage/libmikktspace-robust.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-role-audit-43e/artifacts/role-audit/pristine-release/stage/libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-role-audit-43e/artifacts/role-audit/pristine-release/stage/libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libharfbuzz.so",
+              "/usr/lib64/libEGL.so",
+              "/usr/lib64/libGL.so",
+              "/usr/lib64/libfontconfig.so",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libfreetype.so",
+              "/usr/lib64/libicui18n.so",
+              "/usr/lib64/libicuuc.so",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit": 0,
+            "seconds": 0.5380197549820878
+          },
+          {
+            "name": "pristine-independent-render",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-role-audit-43e/artifacts/role-audit/pristine-release/stage/render",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-role-audit-43e/artifacts/role-audit/pristine-release/run",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-role-audit-43e/artifacts/role-audit/pristine-release/images"
+            ],
+            "exit": 0,
+            "seconds": 5.369872997980565
+          }
+        ],
+        "scope": "Pristine independent MatCap reference and actual old role refusal only; untouched sealedbd3 runtime/matching headers and copied support, whole changed worker and whole new independent renderer. No shared shader/helper or production change. Counter15 includes extra pristine Save witness; originalcounter14 retained.",
+        "child_pid": 1534458,
+        "exit": 0,
+        "seconds": 42.73122056899592,
+        "inputs": 1903,
+        "drift": []
+      },
+      "logs": {
+        "compile-vrm1-expression-layer-authoring.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "link-worker.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "actual-role-refusal.log": "4fe2a0554c7141ce7d7432cde1458ae15d20a38c89781e68619ad8789487cb38",
+        "compile-vrm1-matcap-pristine-render.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "link-render.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "pristine-independent-render.log": "6025712a99086fcbd3400f77a14ab9df9129e5cb3413cf7cc6f7930284bc30be"
+      },
+      "source_manifest_sha256": "4c6d08331714746de054dae6e1c70f3a617e0e657dc8267d9cb6b5558949619f"
+    },
+    "sanitize": {
+      "status": {
+        "state": "terminal",
+        "pid": 1544949,
+        "steps": [
+          {
+            "name": "compile-vrm1-expression-layer-authoring",
+            "command": [
+              "/usr/bin/c++",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-role-audit-43e/src",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-role-audit-43e/third_party/cgltf",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-role-audit-43e/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-role-audit-43e/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-role-audit-43e/third_party/nlohmann",
+              "-O1",
+              "-g1",
+              "-UNDEBUG",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "-std=gnu++20",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-role-audit-43e/artifacts/role-audit/pristine-sanitize/stage/vrm1-expression-layer-authoring.cpp.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-role-audit-43e/tests/vrm1-expression-layer-authoring.cpp"
+            ],
+            "exit": 0,
+            "seconds": 18.287402399990242
+          },
+          {
+            "name": "link-worker",
+            "command": [
+              "/usr/bin/c++",
+              "-O1",
+              "-g1",
+              "-UNDEBUG",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "-fsanitize=address,undefined",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-role-audit-43e/artifacts/role-audit/pristine-sanitize/stage/vrm1-expression-layer-authoring.cpp.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-role-audit-43e/artifacts/role-audit/pristine-sanitize/stage/worker",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-role-audit-43e/artifacts/role-audit/pristine-sanitize/stage/libdome-sculpt-core.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-role-audit-43e/artifacts/role-audit/pristine-sanitize/stage/libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-role-audit-43e/artifacts/role-audit/pristine-sanitize/stage/libdome-sculpt-polygon.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-role-audit-43e/artifacts/role-audit/pristine-sanitize/stage/libxatlas.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-role-audit-43e/artifacts/role-audit/pristine-sanitize/stage/libmikktspace.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-role-audit-43e/artifacts/role-audit/pristine-sanitize/stage/libmikktspace-robust.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-role-audit-43e/artifacts/role-audit/pristine-sanitize/stage/libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-role-audit-43e/artifacts/role-audit/pristine-sanitize/stage/libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded",
+              "-Wl,--wrap=fsync"
+            ],
+            "exit": 0,
+            "seconds": 3.455516104993876
+          },
+          {
+            "name": "actual-role-refusal",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-role-audit-43e/artifacts/role-audit/pristine-sanitize/stage/worker",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-preview-1853cc3/build-preview-release/vrm1-background-fixture/source.vrm",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-role-audit-43e/artifacts/role-audit/pristine-sanitize/run",
+              "--old-refusal",
+              "--matcap"
+            ],
+            "exit": 0,
+            "seconds": 1.7721427779761143
+          },
+          {
+            "name": "compile-vrm1-matcap-pristine-render",
+            "command": [
+              "/usr/bin/c++",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-role-audit-43e/src",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-role-audit-43e/third_party/cgltf",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-role-audit-43e/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-role-audit-43e/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-role-audit-43e/third_party/nlohmann",
+              "-isystem",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/harfbuzz",
+              "-isystem",
+              "/usr/include/glib-2.0",
+              "-isystem",
+              "/usr/lib64/glib-2.0/include",
+              "-isystem",
+              "/usr/include/sysprof-6",
+              "-isystem",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/freetype2",
+              "-isystem",
+              "/usr/include/libpng16",
+              "-isystem",
+              "/usr/include/libxml2",
+              "-O1",
+              "-g1",
+              "-UNDEBUG",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "-std=gnu++20",
+              "-pthread",
+              "-DWITH_GZFILEOP",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-role-audit-43e/artifacts/role-audit/pristine-sanitize/stage/vrm1-matcap-pristine-render.cpp.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-role-audit-43e/tests/vrm1-matcap-pristine-render.cpp"
+            ],
+            "exit": 0,
+            "seconds": 31.49316536297556
+          },
+          {
+            "name": "link-render",
+            "command": [
+              "/usr/bin/c++",
+              "-O1",
+              "-g1",
+              "-UNDEBUG",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "-fsanitize=address,undefined",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-role-audit-43e/artifacts/role-audit/pristine-sanitize/stage/vrm1-matcap-pristine-render.cpp.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-role-audit-43e/artifacts/role-audit/pristine-sanitize/stage/render",
+              "-Wl,-rpath,/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-role-audit-43e/artifacts/role-audit/pristine-sanitize/stage/libdome-sculpt-render.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-role-audit-43e/artifacts/role-audit/pristine-sanitize/stage/libdome-sculpt-core.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-role-audit-43e/artifacts/role-audit/pristine-sanitize/stage/libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-role-audit-43e/artifacts/role-audit/pristine-sanitize/stage/libdome-sculpt-polygon.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-role-audit-43e/artifacts/role-audit/pristine-sanitize/stage/libxatlas.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-role-audit-43e/artifacts/role-audit/pristine-sanitize/stage/libmikktspace.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-role-audit-43e/artifacts/role-audit/pristine-sanitize/stage/libmikktspace-robust.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-role-audit-43e/artifacts/role-audit/pristine-sanitize/stage/libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-role-audit-43e/artifacts/role-audit/pristine-sanitize/stage/libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libharfbuzz.so",
+              "/usr/lib64/libEGL.so",
+              "/usr/lib64/libGL.so",
+              "/usr/lib64/libfontconfig.so",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libfreetype.so",
+              "/usr/lib64/libicui18n.so",
+              "/usr/lib64/libicuuc.so",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit": 0,
+            "seconds": 2.434002650959883
+          },
+          {
+            "name": "pristine-independent-render",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-role-audit-43e/artifacts/role-audit/pristine-sanitize/stage/render",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-role-audit-43e/artifacts/role-audit/pristine-sanitize/run",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-role-audit-43e/artifacts/role-audit/pristine-sanitize/images"
+            ],
+            "exit": 0,
+            "seconds": 2.2402033869875595
+          }
+        ],
+        "scope": "Pristine independent MatCap reference and actual old role refusal only; untouched sealedbd3 runtime/matching headers and copied support, whole changed worker and whole new independent renderer. No shared shader/helper or production change. Counter15 includes extra pristine Save witness; originalcounter14 retained.",
+        "child_pid": 1550513,
+        "exit": 0,
+        "seconds": 60.5835477639921,
+        "inputs": 1903,
+        "drift": []
+      },
+      "logs": {
+        "compile-vrm1-expression-layer-authoring.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "link-worker.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "actual-role-refusal.log": "4fe2a0554c7141ce7d7432cde1458ae15d20a38c89781e68619ad8789487cb38",
+        "compile-vrm1-matcap-pristine-render.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "link-render.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "pristine-independent-render.log": "6025712a99086fcbd3400f77a14ab9df9129e5cb3413cf7cc6f7930284bc30be"
+      },
+      "source_manifest_sha256": "e391196e8d18669dc46330947974084f0f851369268326ce8bd1ab44efa30ef3"
+    }
+  },
+  "observed_each": {
+    "old_role_refusal_with_pristine_save": 15,
+    "independent_pristine_checks": 58,
+    "independent_image_pairs": 12,
+    "max_pixel_error": 1,
+    "fixed_bound": 4,
+    "counterfactuals": {
+      "frozen_source_uv": 124,
+      "matcap_using_mesh_uv": 76,
+      "incorrect_matcap_vrm_uv_bind": 76,
+      "missing_matcap_color": 78
+    }
+  },
+  "derivation": "Pinned actual UniVRM uses .5. Reflecting a glTF frame into a left-handed frame and flipping texture V back to glTF top-row convention yields the existing native sign convention. GLSL independent consumer explicitly performs those conversions. KHR texture transform is separate; MatCap is excluded from VRM textureTransformBinds as primary1.0 expressions rules require.",
+  "limits": "Not Unity execution, not a universal normative demand for the README illustrative .495 inset, not painted export admission. Source-normal/prepared/native/physical guards remain.",
+  "consumer_sources": {
+    "tests/vrm1-expression-layer-consumer.hpp": "c2d8287a1bf9c24e34fa8a4e851582ed27aadefcf3911093ad320972269823c8",
+    "tests/vrm1-matcap-pristine-render.cpp": "da4d0784441eb556569f090e2cfa85a9e7384c6ba565068b53f9a80cf9c3b330",
+    "tests/vrm1-expression-layer-authoring.cpp": "996ccd894651225a65b9098fb82ac6dd6dd3ed241f4e40edd112ccf436eedec9"
+  }
+}
