@@ -75,6 +75,10 @@ required later phase after the basic targets. Texture-set workflows, remaining
 avatar/VRM authoring, production geometry and rig quality, broader GPU work and
 physical controller/headset qualification remain part of the original objective.
 
+Parallel polygon-field and texture-set implementations coordinate their new
+capabilities in [FORMAT-RESERVATIONS.md](FORMAT-RESERVATIONS.md). These are source
+reservations, not newly accepted file formats or completed workflows.
+
 Checkpoint evidence:
 
 - [Matching retopology clients](https://github.com/jebot-git/dome-sculpt/blob/a852855088ddd10ad6c7479e8f1bdcb9efdc38e7/docs/RETOPO-AFFINE-UI.md).
