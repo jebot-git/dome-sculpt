@@ -2,6 +2,9 @@
 #define DOME_RIG_AFTER_AUTHORING_HELPERS_ONLY
 #include "rig-after-authoring.cpp"
 #include "native-paint-model.hpp"
+#ifdef DOME_NATIVE_KEY_UV_WORKER
+#include "dome/shapekey-authoring.hpp"
+#endif
 #include <thread>
 #include <new>
 #include <cstdlib>
@@ -20,7 +23,12 @@ extern "C" RetainedNativePaintModel real_model(const SculptObject&,const Mesh&,s
 extern "C" RetainedNativePaintModel wrap_model(const SculptObject&,const Mesh&,std::span<const uint32_t>,const PaintSamplingLimits&) asm("__wrap__ZN4dome6detail25retain_native_paint_modelERKNS_12SculptObjectERKNS_4MeshESt4spanIKjLm18446744073709551615EERKNS_19PaintSamplingLimitsE");
 extern "C" RetainedNativePaintModel wrap_model(const SculptObject&s,const Mesh&m,std::span<const uint32_t>v,const PaintSamplingLimits&limits){auto g=current_gate.load();size_t polls=0;auto options=limits;options.cancelled=[&]{if(g&&!g->after&&++polls==3)hold(g,limits.cancelled);return limits.cancelled&&limits.cancelled();};auto result=real_model(s,m,v,options);if(g&&g->after)hold(g,limits.cancelled);return result;}
 int main(int argc,char**argv)try{if(argc!=2)return 2;const std::filesystem::path root=argv[1];std::filesystem::create_directories(root);setenv("XDG_STATE_HOME",(root/"state").c_str(),1);setenv("XDG_CONFIG_HOME",(root/"config").c_str(),1);
- auto input=with_reference(native_case(false));demand(author_skin(input.scene,input.target,input.options),"Actual changed native32 bind precedes UV worker faults");const auto before=input.scene.encode();const auto &source=input.scene.active();auto target=source.painted->mesh();for(auto&uv:target.uv)uv={.5f+.8f*(uv[0]-.5f),.5f+.8f*(uv[1]-.5f)};std::vector<uint32_t>map(target.positions.size());std::iota(map.begin(),map.end(),0u);
+ auto input=with_reference(native_case(false));demand(author_skin(input.scene,input.target,input.options),"Actual changed native32 bind precedes UV worker faults");
+#ifdef DOME_NATIVE_KEY_UV_WORKER
+ ShapeKeyEdit key;key.name="Actual fault-tested current seam";author_shapekey(input.scene,input.target,key);key.action=ShapeKeyAction::Replace;key.target=0;key.positions=input.scene.active().painted->mesh().positions;key.positions[0].z+=.01f;author_shapekey(input.scene,input.target,key);
+ auto posed=std::make_shared<DeformationState>(*input.scene.active().deformation);posed->morph_weights={.35f};for(const auto&bone:posed->skeleton->bones)posed->pose.push_back(bone.rest);posed->pose[1].rotation=arcball({0,1,0},{.3f,.9539392f,0});input.scene.active().deformation=posed;input.scene.validate();
+#endif
+ const auto before=input.scene.encode();const auto &source=input.scene.active();auto target=source.painted->mesh();for(auto&uv:target.uv)uv={.5f+.8f*(uv[0]-.5f),.5f+.8f*(uv[1]-.5f)};std::vector<uint32_t>map(target.positions.size());std::iota(map.begin(),map.end(),0u);
  auto complete=[&](RetainedNativePaintModel result){auto out=input.scene;out.active().painted=std::move(result.sampling.paint);out.active().material_bindings=detail::bind_native_paint(result.sampling.owner,source.material_bindings);out.active().deformation=std::move(result.deformation);out.validate();return out;};
  const auto expected=complete(real_model(source,target,map,{})).encode();fault_calls=0;fault_at=SIZE_MAX;fault=true;auto measured=real_model(source,target,map,{});fault=false;const auto count=fault_calls;demand(count>16,"Measure actual paired paint/model preparation allocations");
  for(size_t prefix=1;prefix<=count;++prefix){fault_calls=0;fault_at=prefix;bool caught=false;fault=true;try{real_model(source,target,map,{});}catch(const std::bad_alloc&){caught=true;}catch(...){fault=false;throw;}fault=false;demand(caught&&fault_calls>=prefix&&input.scene.encode()==before,"Every small paired-helper permanent denial preserves complete genuine input");demand(complete(real_model(source,target,map,{})).encode()==expected,"Actual paired-helper retry reproduces exact complete paint/model/source endpoint");}

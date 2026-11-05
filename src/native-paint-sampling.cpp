@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "native-paint-model.hpp"
+#include "native-paint-frame-source.hpp"
 #include "paint-sampling-access.hpp"
 #include "normal-frame-runtime.hpp"
 #include "dome/color-paint-sampling.hpp"
@@ -70,11 +71,14 @@ void NativePaintSampling::validate_current(const PaintedMesh &paint,const PaintS
   validate(limits);if(!native_grid_state(paint))throw std::invalid_argument("Native retained paint needs an explicit baked/projection/source transition");if(!matches_current(paint))throw std::invalid_argument("Native retained paint borrowed another current attachment or grid");
 }
 bool native_paint_retention_supported(const SculptObject &source) noexcept {
-  if(!source.mesh_active||!source.painted||source.painted->in_stroke()||source.appearance||source.shape_source||source.polygon||
-     (source.deformation&&source.deformation->morphs&&!source.deformation->morphs->targets.empty())||
+  const auto &b=source.material_bindings;const bool paired=b&&b->native_paint_frames;
+  if(!source.mesh_active||!source.painted||source.painted->in_stroke()||source.appearance||source.polygon||
+     (source.shape_source&&!paired)||(source.deformation&&source.deformation->morphs&&!source.deformation->morphs->targets.empty()&&!paired)||
      source.painted->source_maps()||source.painted->color_projection()||source.painted->normal_projection()||source.painted->baked()||source.painted->source_sampling_prepared()||source.painted->surface_diagnostics().policy!=PaintUvPolicy::Strict)return false;
-  const auto &b=source.material_bindings;
-  return !b?!source.painted->paint_sampling_domain():!b->has_mtoon&&b->normal_frame==SourceMaterialNormalFrame::UvDerivative&&!b->normal_frames&&!b->key_derivation&&!b->normal_preparation&&!b->color_preparation&&b->native_paint_sampling&&b->native_paint_sampling->valid_owner(b->native_paint_sampling)&&b->native_paint_sampling->history_depth()<32&&b->native_paint_sampling->matches_current(*source.painted);
+  if(!b)return !source.painted->paint_sampling_domain();
+  if(b->has_mtoon||b->normal_preparation||b->color_preparation||b->canonical_attributes||b->canonical_uv||!b->native_paint_sampling||!b->native_paint_sampling->valid_owner(b->native_paint_sampling)||b->native_paint_sampling->history_depth()>=32||!b->native_paint_sampling->matches_current(*source.painted))return false;
+  if(paired){try{b->native_paint_frames->validate_binding(*b,false);return true;}catch(...){return false;}}
+  return b->normal_frame==SourceMaterialNormalFrame::UvDerivative&&!b->normal_frames&&!b->key_derivation;
 }
 bool native_paint_source_restorable(const SculptObject &o) noexcept {
   const auto b=o.material_bindings;const auto p=b?b->native_paint_sampling:nullptr;
@@ -171,6 +175,12 @@ RetainedNativePaintModel retain_native_paint_model(const SculptObject &source,co
   auto visit=[&](size_t n){if(work>budget.max_work||n>budget.max_work-work)throw std::length_error("Native UV model exceeds combined remap work budget");work+=n;stop(limits);};
   if(const auto &d=source.deformation){
     d->resource_entries();visit(source.painted->mesh().positions.size()+vertices.size());
+    if(source.material_bindings&&source.material_bindings->native_paint_frames){
+      const auto corners=source.painted->mesh().indices.size(),targets=d->morphs?d->morphs->targets.size():0;
+      if(corners&&(targets+1)>(budget.max_work-work)/corners)throw std::length_error("Native frame/model authority exceeds combined work budget before remap");visit(corners*(targets+1));
+      normal_frame_current_authority(*source.material_bindings,source.painted->mesh(),d.get(),limits.cancelled);
+    }
+    if(d->morphs){charge(d->morphs->targets.size(),sizeof(MorphTarget));for(const auto &target:d->morphs->targets){charge(target.name.size()+1,1);charge(vertices.size(),sizeof(Vec3));visit(vertices.size());}}
     charge(d->pose.size(),sizeof(JointTransform));charge(d->morph_weights.size(),sizeof(float));
     if(d->skeleton){charge(d->skeleton->bones.size(),sizeof(Bone));for(const auto &b:d->skeleton->bones)charge(b.name.size()+1,1);if(d->skeleton->inverse_bind_override)charge(d->skeleton->inverse_bind_override->size(),sizeof(RigMatrix));}
     if(d->humanoid)for(const auto &[name,joint]:d->humanoid->joints)charge(1,sizeof(std::pair<const std::string,uint32_t>)+64+name.size()+1);
