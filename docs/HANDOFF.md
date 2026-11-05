@@ -1,3 +1,15 @@
+## Private current SurfaceHeat5 qualification — 2026-11-05
+
+Current615-compatible runtime9a now rebuilds all55actual affected product TUs
+per profile incl whole native app. Generic native25R/S and actual public/joystick
+34 per avatar/profile pass. Fresh repository producer→public5→independent quality
+CTest11/11R50.41s+11/11S449.53s reproduces874/874 fixed global/local outcomes each.
+No sanitizer diagnostics/input drift, no55object mixing. Source/schema/physical
+layout unchanged except additive mode/default code in this PRIVATE candidate;
+old0/1/reserved2/3/4 semantics retained. Actual FLTK/fault/edited-domain/adapters
+remain, no default/main/fullgoal admission. Read SURFACE-HEAT-MODE5-CURRENT.md and
+receipt. Parent frozen source/long sweeps are untouched; no GPU/HMD/install.
+
 ## Admitted expression preflight repair — 2026-11-05
 
 Main now incorporates62ec13e/sealc17945d over qualified0b6. Only one complete
