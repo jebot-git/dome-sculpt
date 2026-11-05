@@ -4,6 +4,7 @@
 #include <map>
 #include <span>
 namespace dome {
+class AffineTransform;
 using TopologyID = uint64_t;
 struct RetopoVertex {
   Vec3 position{};
@@ -64,6 +65,9 @@ public:
   void remove_vertex(TopologyID); // Must have no incident edge/face.
   void erase_vertices(std::span<const TopologyID>); // Atomic incident removal.
   void move_vertex(TopologyID, Vec3);
+  // Atomic change of coordinate frame; IDs, allocation cursor, pins, seams and
+  // materials survive. Reflections reverse face loops to retain outwardness.
+  void transform(const AffineTransform &, const std::function<bool()> & = {});
   void set_pinned(TopologyID, bool);
   void set_seam(TopologyID, bool);
   void project(std::span<const TopologyID>, const SurfaceQuery &,

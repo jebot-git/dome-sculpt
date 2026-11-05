@@ -223,4 +223,5 @@ int main(int argc, char **argv) try {
   check(!xr.frame().state->retopology&&xr.wait_mesh()&&extent()<.21f&&xr.copy_scene().encode()==xr_scene,
         "XR Cancel restores the authored target preview and exact scene after reopening its reference");
   std::cout<<checks<<" checks passed\n";
+  return 0;
 } catch(const std::exception &e) {std::cerr<<"FAIL "<<e.what()<<'\n';return 1;}

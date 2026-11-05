@@ -1,0 +1,937 @@
+{
+  "recorded_utc": "2026-11-05T17:59:55.150160+00:00",
+  "base": "a852855088ddd10ad6c7479e8f1bdcb9efdc38e7",
+  "admitted_main": false,
+  "scope": "One whole DocumentRetopo product TU; no header/layout/format changes. Standalone complete new consumer plus immutable qualified4/C179 support; actualapps pending semanticcomposition.",
+  "defect": {
+    "original_native_exit": 1,
+    "original_measured_held_boundaries": 67,
+    "failing_prefix": 2,
+    "message": "Rejected held Apply committed the input gesture at prefix 2",
+    "status": {
+      "state": "terminal",
+      "pid": 547288,
+      "steps": [
+        {
+          "name": "compile-test",
+          "args": [
+            "/usr/bin/c++",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-input-a852/include",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-input-a852/third_party/openbrush",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-input-a852/third_party/nlohmann",
+            "-O3",
+            "-DNDEBUG",
+            "-std=gnu++20",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/retopo-input-a852/artifacts/held-proof/release-original/test.o",
+            "-c",
+            "/home/blux/de-xr/dome-sculpt/artifacts/retopo-input-a852/tests/retopo-held-admission.cpp"
+          ],
+          "exit": 0,
+          "expected_exit": 0,
+          "seconds": 5.162137973005883
+        },
+        {
+          "name": "link",
+          "args": [
+            "/usr/bin/c++",
+            "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/handoff-proof/release/document.cpp.o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/handoff-proof/release/document-retopo.cpp.o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/handoff-proof/release/document-baking.cpp.o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/affine-proof/release/retopo.cpp.o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/affine-proof/release/retopo-authoring.cpp.o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/retopo-input-a852/artifacts/held-proof/release-original/test.o",
+            "-Wl,-Map=/home/blux/de-xr/dome-sculpt/artifacts/retopo-input-a852/artifacts/held-proof/release-original/native.map",
+            "-Wl,-t,-t",
+            "-Wl,--wrap=_ZN4dome6unwrapERNS_4MeshEjjRKSt8functionIFbvEE",
+            "-Wl,--wrap=_ZN4dome15RetopoWorkspace4editENS_12RetopoActionENS_4Vec3EfRKSt8functionIFbvEE",
+            "-O3",
+            "-DNDEBUG",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/retopo-input-a852/artifacts/held-proof/release-original/native",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-preflight-qualified-0b6/artifacts/final-preflight/release/stage/libdome-sculpt-core.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-preflight-qualified-0b6/artifacts/final-preflight/release/stage/libdome-sculpt-affine.a",
+            "/usr/lib64/liblapacke.so",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-preflight-qualified-0b6/artifacts/final-preflight/release/stage/libdome-sculpt-polygon.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-preflight-qualified-0b6/artifacts/final-preflight/release/stage/libxatlas.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-preflight-qualified-0b6/artifacts/final-preflight/release/stage/libmikktspace.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-preflight-qualified-0b6/artifacts/final-preflight/release/stage/libmikktspace-robust.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-preflight-qualified-0b6/artifacts/final-preflight/release/stage/libufbx.a",
+            "/usr/lib64/libpng.so",
+            "/usr/lib64/libjpeg.so",
+            "/usr/lib64/libz.so",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-preflight-qualified-0b6/artifacts/final-preflight/release/stage/libdome-sculpt-emission-codec.a",
+            "/usr/lib64/libOpenEXR-3_2.so",
+            "/usr/lib64/libOpenEXRUtil-3_2.so",
+            "/usr/lib64/libOpenEXRCore-3_2.so",
+            "/usr/lib64/libIex-3_2.so",
+            "/usr/lib64/libIlmThread-3_2.so",
+            "/usr/lib64/libImath-3_1.so",
+            "-lgcc_s_asneeded",
+            "-lgcc_s_asneeded"
+          ],
+          "exit": 0,
+          "expected_exit": 0,
+          "seconds": 0.3266983450157568
+        },
+        {
+          "name": "actual-held-admission",
+          "args": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/retopo-input-a852/artifacts/held-proof/release-original/native",
+            "/home/blux/de-xr/dome-sculpt/artifacts/retopo-input-a852/artifacts/held-proof/release-original/run"
+          ],
+          "exit": 1,
+          "expected_exit": 1,
+          "seconds": 0.07598905899794772
+        }
+      ],
+      "allocated_bytes": 131964928,
+      "actual_free_bytes": 24287744000,
+      "phase": "actual-held-admission",
+      "child_pid": 553756,
+      "exit": 0,
+      "seconds": 5.781638702959754,
+      "drift": []
+    },
+    "log_sha256": "074089886a52d590d5fcb78c42e8b0de695bcaf86293d054b3acba3929142324",
+    "original_test_source_sha256": "4a176087b30606580a2485014d1bfe932982b9de2fde560477d60e22b0bae6a1"
+  },
+  "fix": [
+    "Prepare immutable input view before accepting/replacing a queued input event.",
+    "Let only the already-accepted Apply job finalize the active gesture.",
+    "Stage held/desktop flags beforequeue admission and restore them onfailure; defer inputcancel untilaccepted."
+  ],
+  "profiles": {
+    "release": {
+      "status": {
+        "state": "terminal",
+        "pid": 2005821,
+        "steps": [
+          {
+            "name": "compile-document-retopo",
+            "args": [
+              "/usr/bin/c++",
+              "-DDOME_SCULPT_INSTALLED_ASSETS=\"/usr/local/share/dome-sculpt/assets/humanoid\"",
+              "-DDOME_SCULPT_SOURCE_ASSETS=\"/home/blux/de-xr/dome-sculpt/artifacts/retopo-input-a852/assets/humanoid\"",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-input-a852/third_party",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-input-a852/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-input-a852/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-input-a852/third_party/cgltf",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-input-a852/third_party/nlohmann",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-input-a852/third_party/xatlas",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-input-a852/third_party/mikktspace",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-input-a852/third_party/ufbx",
+              "-O3",
+              "-DNDEBUG",
+              "-std=gnu++20",
+              "-Wall",
+              "-Wextra",
+              "-Wpedantic",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/retopo-input-a852/artifacts/held-proof/release-sample-v2/document-retopo.cpp.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/retopo-input-a852/src/document-retopo.cpp"
+            ],
+            "exit": 0,
+            "expected_exit": 0,
+            "seconds": 2.531736892997287
+          },
+          {
+            "name": "compile-test",
+            "args": [
+              "/usr/bin/c++",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-input-a852/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-input-a852/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-input-a852/third_party/nlohmann",
+              "-O3",
+              "-DNDEBUG",
+              "-std=gnu++20",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/retopo-input-a852/artifacts/held-proof/release-sample-v2/test.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/retopo-input-a852/tests/retopo-held-admission.cpp"
+            ],
+            "exit": 0,
+            "expected_exit": 0,
+            "seconds": 4.688778237032238
+          },
+          {
+            "name": "link",
+            "args": [
+              "/usr/bin/c++",
+              "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/handoff-proof/release/document.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/retopo-input-a852/artifacts/held-proof/release-sample-v2/document-retopo.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/handoff-proof/release/document-baking.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/affine-proof/release/retopo.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/affine-proof/release/retopo-authoring.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/retopo-input-a852/artifacts/held-proof/release-sample-v2/test.o",
+              "-Wl,-Map=/home/blux/de-xr/dome-sculpt/artifacts/retopo-input-a852/artifacts/held-proof/release-sample-v2/native.map",
+              "-Wl,-t,-t",
+              "-Wl,--wrap=_ZN4dome6unwrapERNS_4MeshEjjRKSt8functionIFbvEE",
+              "-Wl,--wrap=_ZN4dome15RetopoWorkspace4editENS_12RetopoActionENS_4Vec3EfRKSt8functionIFbvEE",
+              "-O3",
+              "-DNDEBUG",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/retopo-input-a852/artifacts/held-proof/release-sample-v2/native",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-preflight-qualified-0b6/artifacts/final-preflight/release/stage/libdome-sculpt-core.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-preflight-qualified-0b6/artifacts/final-preflight/release/stage/libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-preflight-qualified-0b6/artifacts/final-preflight/release/stage/libdome-sculpt-polygon.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-preflight-qualified-0b6/artifacts/final-preflight/release/stage/libxatlas.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-preflight-qualified-0b6/artifacts/final-preflight/release/stage/libmikktspace.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-preflight-qualified-0b6/artifacts/final-preflight/release/stage/libmikktspace-robust.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-preflight-qualified-0b6/artifacts/final-preflight/release/stage/libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-preflight-qualified-0b6/artifacts/final-preflight/release/stage/libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit": 0,
+            "expected_exit": 0,
+            "seconds": 0.3433274310082197
+          },
+          {
+            "name": "actual-held-admission",
+            "args": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/retopo-input-a852/artifacts/held-proof/release-sample-v2/native",
+              "/home/blux/de-xr/dome-sculpt/artifacts/retopo-input-a852/artifacts/held-proof/release-sample-v2/run"
+            ],
+            "exit": 0,
+            "expected_exit": 0,
+            "seconds": 2.166083675052505
+          }
+        ],
+        "allocated_bytes": 482615296,
+        "actual_free_bytes": 23626526720,
+        "phase": "actual-held-admission",
+        "child_pid": 2014944,
+        "exit": 0,
+        "seconds": 9.929661453003064,
+        "drift": []
+      },
+      "log_sha256": "2d64e8b6263cb7fd77762c4ec8b73d99a883fe32731727d50d88c638c0c8664d",
+      "before_manifest_sha256": "23ffa02754994534ce9eb630ee6b869cf149d5e626926aeeec6d6a28c2a7befe",
+      "binary_sha256": "22e9ffac72670a494efa60779fbe35ab60787dbd171d193d69881150b37a65fa",
+      "map_sha256": "c307630aba162522ccdcaf5d96daaabba797c4d3cf9f4c738f94c8fc19424294",
+      "assertions": 1267,
+      "held_persistent_prefixes": 65,
+      "sample_view_fault": "First preparation allocation; rejectedview/sourceowner exact then realretry/cancel"
+    },
+    "sanitize": {
+      "status": {
+        "state": "terminal",
+        "pid": 2087035,
+        "steps": [
+          {
+            "name": "compile-document-retopo",
+            "args": [
+              "/usr/bin/c++",
+              "-gz=zstd",
+              "-DDOME_SCULPT_INSTALLED_ASSETS=\"/usr/local/share/dome-sculpt/assets/humanoid\"",
+              "-DDOME_SCULPT_SOURCE_ASSETS=\"/home/blux/de-xr/dome-sculpt/artifacts/retopo-input-a852/assets/humanoid\"",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-input-a852/third_party",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-input-a852/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-input-a852/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-input-a852/third_party/cgltf",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-input-a852/third_party/nlohmann",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-input-a852/third_party/xatlas",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-input-a852/third_party/mikktspace",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-input-a852/third_party/ufbx",
+              "-O1",
+              "-g1",
+              "-DNDEBUG",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "-std=gnu++20",
+              "-Wall",
+              "-Wextra",
+              "-Wpedantic",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/retopo-input-a852/artifacts/held-proof/sanitize-sample-v2/document-retopo.cpp.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/retopo-input-a852/src/document-retopo.cpp"
+            ],
+            "exit": 0,
+            "expected_exit": 0,
+            "seconds": 3.873489078017883
+          },
+          {
+            "name": "compile-test",
+            "args": [
+              "/usr/bin/c++",
+              "-gz=zstd",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-input-a852/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-input-a852/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-input-a852/third_party/nlohmann",
+              "-O1",
+              "-g1",
+              "-DNDEBUG",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "-std=gnu++20",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/retopo-input-a852/artifacts/held-proof/sanitize-sample-v2/test.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/retopo-input-a852/tests/retopo-held-admission.cpp"
+            ],
+            "exit": 0,
+            "expected_exit": 0,
+            "seconds": 8.139250256994274
+          },
+          {
+            "name": "link",
+            "args": [
+              "/usr/bin/c++",
+              "-Wl,--compress-debug-sections=zstd",
+              "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/handoff-proof/sanitize/document.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/retopo-input-a852/artifacts/held-proof/sanitize-sample-v2/document-retopo.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/handoff-proof/sanitize/document-baking.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/affine-proof/sanitize/retopo.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/affine-proof/sanitize/retopo-authoring.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/retopo-input-a852/artifacts/held-proof/sanitize-sample-v2/test.o",
+              "-Wl,-Map=/home/blux/de-xr/dome-sculpt/artifacts/retopo-input-a852/artifacts/held-proof/sanitize-sample-v2/native.map",
+              "-Wl,-t,-t",
+              "-Wl,--wrap=_ZN4dome6unwrapERNS_4MeshEjjRKSt8functionIFbvEE",
+              "-Wl,--wrap=_ZN4dome15RetopoWorkspace4editENS_12RetopoActionENS_4Vec3EfRKSt8functionIFbvEE",
+              "-O1",
+              "-g1",
+              "-DNDEBUG",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/retopo-input-a852/artifacts/held-proof/sanitize-sample-v2/native",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-preflight-qualified-0b6/artifacts/final-preflight/sanitize/stage/libdome-sculpt-core.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-preflight-qualified-0b6/artifacts/final-preflight/sanitize/stage/libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-preflight-qualified-0b6/artifacts/final-preflight/sanitize/stage/libdome-sculpt-polygon.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-preflight-qualified-0b6/artifacts/final-preflight/sanitize/stage/libxatlas.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-preflight-qualified-0b6/artifacts/final-preflight/sanitize/stage/libmikktspace.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-preflight-qualified-0b6/artifacts/final-preflight/sanitize/stage/libmikktspace-robust.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-preflight-qualified-0b6/artifacts/final-preflight/sanitize/stage/libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-preflight-qualified-0b6/artifacts/final-preflight/sanitize/stage/libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit": 0,
+            "expected_exit": 0,
+            "seconds": 2.5476847249665298
+          },
+          {
+            "name": "actual-held-admission",
+            "args": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/retopo-input-a852/artifacts/held-proof/sanitize-sample-v2/native",
+              "/home/blux/de-xr/dome-sculpt/artifacts/retopo-input-a852/artifacts/held-proof/sanitize-sample-v2/run"
+            ],
+            "exit": 0,
+            "expected_exit": 0,
+            "seconds": 15.011605550011154
+          }
+        ],
+        "allocated_bytes": 839704576,
+        "actual_free_bytes": 23498964992,
+        "phase": "actual-held-admission",
+        "child_pid": 2105283,
+        "exit": 0,
+        "seconds": 30.5687254749937,
+        "drift": []
+      },
+      "log_sha256": "2d64e8b6263cb7fd77762c4ec8b73d99a883fe32731727d50d88c638c0c8664d",
+      "before_manifest_sha256": "71563ef2f31d0f6445477d729438579221bb8fe329a766e21baaf49d97bed77b",
+      "binary_sha256": "190d4e1914f6c1229d1a3eae5b2a55cb22ae628350ea397b787f63d09e567e44",
+      "map_sha256": "67d1be264bbe9b4a89f960fc5df8729ae07e0956b58e411570ce1c0d214d1668",
+      "assertions": 1267,
+      "held_persistent_prefixes": 65,
+      "sample_view_fault": "First preparation allocation; rejectedview/sourceowner exact then realretry/cancel"
+    }
+  },
+  "prior_completed_draft_regressions": {
+    "status": {
+      "state": "terminal",
+      "pid": 1256728,
+      "steps": [
+        {
+          "name": "release-composed-link",
+          "args": [
+            "/usr/bin/c++",
+            "-Wl,-Map=/home/blux/de-xr/dome-sculpt/artifacts/retopo-input-a852/artifacts/held-proof/regressions/release-composed.map",
+            "-Wl,-t,-t",
+            "-Wl,--wrap=_ZN4dome6unwrapERNS_4MeshEjjRKSt8functionIFbvEE",
+            "-Wl,--wrap=_ZN4dome15RetopoWorkspace4editENS_12RetopoActionENS_4Vec3EfRKSt8functionIFbvEE",
+            "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/handoff-proof/release/document.cpp.o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/retopo-input-a852/artifacts/held-proof/release-corrected/document-retopo.cpp.o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/handoff-proof/release/document-baking.cpp.o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/affine-proof/release/retopo.cpp.o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/affine-proof/release/retopo-authoring.cpp.o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/handoff-proof/release/retopo-save-handoff.o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/handoff-proof/release/retopo-authoring.o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/handoff-proof/release/retopo-edges.o",
+            "-O3",
+            "-DNDEBUG",
+            "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/handoff-proof/release/driver.o",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/retopo-input-a852/artifacts/held-proof/regressions/release-composed",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-preflight-qualified-0b6/artifacts/final-preflight/release/stage/libdome-sculpt-core.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-preflight-qualified-0b6/artifacts/final-preflight/release/stage/libdome-sculpt-affine.a",
+            "/usr/lib64/liblapacke.so",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-preflight-qualified-0b6/artifacts/final-preflight/release/stage/libdome-sculpt-polygon.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-preflight-qualified-0b6/artifacts/final-preflight/release/stage/libxatlas.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-preflight-qualified-0b6/artifacts/final-preflight/release/stage/libmikktspace.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-preflight-qualified-0b6/artifacts/final-preflight/release/stage/libmikktspace-robust.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-preflight-qualified-0b6/artifacts/final-preflight/release/stage/libufbx.a",
+            "/usr/lib64/libpng.so",
+            "/usr/lib64/libjpeg.so",
+            "/usr/lib64/libz.so",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-preflight-qualified-0b6/artifacts/final-preflight/release/stage/libdome-sculpt-emission-codec.a",
+            "/usr/lib64/libOpenEXR-3_2.so",
+            "/usr/lib64/libOpenEXRUtil-3_2.so",
+            "/usr/lib64/libOpenEXRCore-3_2.so",
+            "/usr/lib64/libIex-3_2.so",
+            "/usr/lib64/libIlmThread-3_2.so",
+            "/usr/lib64/libImath-3_1.so",
+            "-lgcc_s_asneeded",
+            "-lgcc_s_asneeded"
+          ],
+          "exit": 0,
+          "seconds": 0.38146964501356706
+        },
+        {
+          "name": "release-composed-actual",
+          "args": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/retopo-input-a852/artifacts/held-proof/regressions/release-composed",
+            "/home/blux/de-xr/dome-sculpt/artifacts/retopo-input-a852/artifacts/held-proof/regressions/release-run"
+          ],
+          "exit": 0,
+          "seconds": 3.082454268995207
+        },
+        {
+          "name": "release-boundaries-link",
+          "args": [
+            "/usr/bin/c++",
+            "-Wl,-Map=/home/blux/de-xr/dome-sculpt/artifacts/retopo-input-a852/artifacts/held-proof/regressions/release-boundaries.map",
+            "-Wl,-t,-t",
+            "-Wl,--wrap=_ZN4dome15RetopoWorkspace4editENS_12RetopoActionENS_4Vec3EfRKSt8functionIFbvEE",
+            "-Wl,--wrap=fsync",
+            "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/handoff-proof/release/document.cpp.o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/retopo-input-a852/artifacts/held-proof/release-corrected/document-retopo.cpp.o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/handoff-proof/release/document-baking.cpp.o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/affine-proof/release/retopo.cpp.o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/affine-proof/release/retopo-authoring.cpp.o",
+            "-O3",
+            "-DNDEBUG",
+            "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/affine-ui-proof/release/retopo-boundaries.o",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/retopo-input-a852/artifacts/held-proof/regressions/release-boundaries",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-preflight-qualified-0b6/artifacts/final-preflight/release/stage/libdome-sculpt-core.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-preflight-qualified-0b6/artifacts/final-preflight/release/stage/libdome-sculpt-affine.a",
+            "/usr/lib64/liblapacke.so",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-preflight-qualified-0b6/artifacts/final-preflight/release/stage/libdome-sculpt-polygon.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-preflight-qualified-0b6/artifacts/final-preflight/release/stage/libxatlas.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-preflight-qualified-0b6/artifacts/final-preflight/release/stage/libmikktspace.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-preflight-qualified-0b6/artifacts/final-preflight/release/stage/libmikktspace-robust.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-preflight-qualified-0b6/artifacts/final-preflight/release/stage/libufbx.a",
+            "/usr/lib64/libpng.so",
+            "/usr/lib64/libjpeg.so",
+            "/usr/lib64/libz.so",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-preflight-qualified-0b6/artifacts/final-preflight/release/stage/libdome-sculpt-emission-codec.a",
+            "/usr/lib64/libOpenEXR-3_2.so",
+            "/usr/lib64/libOpenEXRUtil-3_2.so",
+            "/usr/lib64/libOpenEXRCore-3_2.so",
+            "/usr/lib64/libIex-3_2.so",
+            "/usr/lib64/libIlmThread-3_2.so",
+            "/usr/lib64/libImath-3_1.so",
+            "-lgcc_s_asneeded",
+            "-lgcc_s_asneeded"
+          ],
+          "exit": 0,
+          "seconds": 0.340346087992657
+        },
+        {
+          "name": "release-boundaries-actual",
+          "args": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/retopo-input-a852/artifacts/held-proof/regressions/release-boundaries"
+          ],
+          "exit": 0,
+          "seconds": 0.007783781038597226
+        },
+        {
+          "name": "sanitize-composed-link",
+          "args": [
+            "/usr/bin/c++",
+            "-Wl,--compress-debug-sections=zstd",
+            "-Wl,-Map=/home/blux/de-xr/dome-sculpt/artifacts/retopo-input-a852/artifacts/held-proof/regressions/sanitize-composed.map",
+            "-Wl,-t,-t",
+            "-Wl,--wrap=_ZN4dome6unwrapERNS_4MeshEjjRKSt8functionIFbvEE",
+            "-Wl,--wrap=_ZN4dome15RetopoWorkspace4editENS_12RetopoActionENS_4Vec3EfRKSt8functionIFbvEE",
+            "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/handoff-proof/sanitize/document.cpp.o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/retopo-input-a852/artifacts/held-proof/sanitize-corrected/document-retopo.cpp.o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/handoff-proof/sanitize/document-baking.cpp.o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/affine-proof/sanitize/retopo.cpp.o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/affine-proof/sanitize/retopo-authoring.cpp.o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/handoff-proof/sanitize/retopo-save-handoff.o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/handoff-proof/sanitize/retopo-authoring.o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/handoff-proof/sanitize/retopo-edges.o",
+            "-O1",
+            "-g1",
+            "-DNDEBUG",
+            "-fsanitize=address,undefined",
+            "-fno-omit-frame-pointer",
+            "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/handoff-proof/sanitize/driver.o",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/retopo-input-a852/artifacts/held-proof/regressions/sanitize-composed",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-preflight-qualified-0b6/artifacts/final-preflight/sanitize/stage/libdome-sculpt-core.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-preflight-qualified-0b6/artifacts/final-preflight/sanitize/stage/libdome-sculpt-affine.a",
+            "/usr/lib64/liblapacke.so",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-preflight-qualified-0b6/artifacts/final-preflight/sanitize/stage/libdome-sculpt-polygon.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-preflight-qualified-0b6/artifacts/final-preflight/sanitize/stage/libxatlas.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-preflight-qualified-0b6/artifacts/final-preflight/sanitize/stage/libmikktspace.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-preflight-qualified-0b6/artifacts/final-preflight/sanitize/stage/libmikktspace-robust.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-preflight-qualified-0b6/artifacts/final-preflight/sanitize/stage/libufbx.a",
+            "/usr/lib64/libpng.so",
+            "/usr/lib64/libjpeg.so",
+            "/usr/lib64/libz.so",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-preflight-qualified-0b6/artifacts/final-preflight/sanitize/stage/libdome-sculpt-emission-codec.a",
+            "/usr/lib64/libOpenEXR-3_2.so",
+            "/usr/lib64/libOpenEXRUtil-3_2.so",
+            "/usr/lib64/libOpenEXRCore-3_2.so",
+            "/usr/lib64/libIex-3_2.so",
+            "/usr/lib64/libIlmThread-3_2.so",
+            "/usr/lib64/libImath-3_1.so",
+            "-lgcc_s_asneeded",
+            "-lgcc_s_asneeded"
+          ],
+          "exit": 0,
+          "seconds": 2.593606159032788
+        },
+        {
+          "name": "sanitize-composed-actual",
+          "args": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/retopo-input-a852/artifacts/held-proof/regressions/sanitize-composed",
+            "/home/blux/de-xr/dome-sculpt/artifacts/retopo-input-a852/artifacts/held-proof/regressions/sanitize-run"
+          ],
+          "exit": 0,
+          "seconds": 19.013375160982832
+        },
+        {
+          "name": "sanitize-boundaries-link",
+          "args": [
+            "/usr/bin/c++",
+            "-Wl,--compress-debug-sections=zstd",
+            "-Wl,-Map=/home/blux/de-xr/dome-sculpt/artifacts/retopo-input-a852/artifacts/held-proof/regressions/sanitize-boundaries.map",
+            "-Wl,-t,-t",
+            "-Wl,--wrap=_ZN4dome15RetopoWorkspace4editENS_12RetopoActionENS_4Vec3EfRKSt8functionIFbvEE",
+            "-Wl,--wrap=fsync",
+            "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/handoff-proof/sanitize/document.cpp.o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/retopo-input-a852/artifacts/held-proof/sanitize-corrected/document-retopo.cpp.o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/handoff-proof/sanitize/document-baking.cpp.o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/affine-proof/sanitize/retopo.cpp.o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/affine-proof/sanitize/retopo-authoring.cpp.o",
+            "-O1",
+            "-g1",
+            "-DNDEBUG",
+            "-fsanitize=address,undefined",
+            "-fno-omit-frame-pointer",
+            "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/affine-ui-proof/sanitize/retopo-boundaries.o",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/retopo-input-a852/artifacts/held-proof/regressions/sanitize-boundaries",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-preflight-qualified-0b6/artifacts/final-preflight/sanitize/stage/libdome-sculpt-core.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-preflight-qualified-0b6/artifacts/final-preflight/sanitize/stage/libdome-sculpt-affine.a",
+            "/usr/lib64/liblapacke.so",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-preflight-qualified-0b6/artifacts/final-preflight/sanitize/stage/libdome-sculpt-polygon.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-preflight-qualified-0b6/artifacts/final-preflight/sanitize/stage/libxatlas.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-preflight-qualified-0b6/artifacts/final-preflight/sanitize/stage/libmikktspace.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-preflight-qualified-0b6/artifacts/final-preflight/sanitize/stage/libmikktspace-robust.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-preflight-qualified-0b6/artifacts/final-preflight/sanitize/stage/libufbx.a",
+            "/usr/lib64/libpng.so",
+            "/usr/lib64/libjpeg.so",
+            "/usr/lib64/libz.so",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-preflight-qualified-0b6/artifacts/final-preflight/sanitize/stage/libdome-sculpt-emission-codec.a",
+            "/usr/lib64/libOpenEXR-3_2.so",
+            "/usr/lib64/libOpenEXRUtil-3_2.so",
+            "/usr/lib64/libOpenEXRCore-3_2.so",
+            "/usr/lib64/libIex-3_2.so",
+            "/usr/lib64/libIlmThread-3_2.so",
+            "/usr/lib64/libImath-3_1.so",
+            "-lgcc_s_asneeded",
+            "-lgcc_s_asneeded"
+          ],
+          "exit": 0,
+          "seconds": 2.575726330978796
+        },
+        {
+          "name": "sanitize-boundaries-actual",
+          "args": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/retopo-input-a852/artifacts/held-proof/regressions/sanitize-boundaries"
+          ],
+          "exit": 0,
+          "seconds": 0.17588069598423317
+        }
+      ],
+      "scope": "Same qualified complete original regression consumers with one new whole DocumentRetopo TU, immutable other4/current-main support; not app/UI proof",
+      "phase": "sanitize-boundaries-actual",
+      "allocated_bytes": 993669120,
+      "child_pid": 1293058,
+      "exit": 0,
+      "seconds": 29.203356541052926,
+      "drift": []
+    },
+    "assertions_per_profile": 1445,
+    "completed_draft_admission_prefixes": 63,
+    "boundary_assertions_per_profile": 26,
+    "counter_note": "Affine driver shares counter withhandoff; printed1252=858handoff+394affine, plus62legacy+131edges=1445.",
+    "logs": {
+      "release-composed-actual.log": "f27c21b499ca711e6d0edfcfb5612070574c04bb23a93c2c0bc02c53213ed9af",
+      "release-boundaries-actual.log": "7363ae36e70d6c3720ca0f0f7a465bc620e6caf2ea081788196ed6ff98ce4f1e",
+      "sanitize-composed-actual.log": "f27c21b499ca711e6d0edfcfb5612070574c04bb23a93c2c0bc02c53213ed9af",
+      "sanitize-boundaries-actual.log": "7363ae36e70d6c3720ca0f0f7a465bc620e6caf2ea081788196ed6ff98ce4f1e"
+    }
+  },
+  "paired_files": [
+    {
+      "file": "0-posed.dsculpt",
+      "release": "cd45ad1510223ff4c642adeb3b4b4b654b0486ad4923eda21e4591243c4c85d1",
+      "sanitize": "cd45ad1510223ff4c642adeb3b4b4b654b0486ad4923eda21e4591243c4c85d1"
+    },
+    {
+      "file": "0-rest.dsculpt",
+      "release": "eda1e176e4bf5fe5328b111bbd99a8ad16f4615f16bd60a73fe805c17d70982f",
+      "sanitize": "eda1e176e4bf5fe5328b111bbd99a8ad16f4615f16bd60a73fe805c17d70982f"
+    },
+    {
+      "file": "1-posed.dsculpt",
+      "release": "711f37d469444f78eb02c115a3b93c1281b7ff18a799657f137f4e01f07a7ef7",
+      "sanitize": "711f37d469444f78eb02c115a3b93c1281b7ff18a799657f137f4e01f07a7ef7"
+    },
+    {
+      "file": "1-rest.dsculpt",
+      "release": "8fa1aa7badb4bed8c1262a4208c7e127f6132f3aff329e25c1b717ba6a399a3f",
+      "sanitize": "8fa1aa7badb4bed8c1262a4208c7e127f6132f3aff329e25c1b717ba6a399a3f"
+    },
+    {
+      "file": "2-posed.dsculpt",
+      "release": "c952538a3c172f5de1196d099f929c6f4e5f71770218301ab573bfb18c8cf17c",
+      "sanitize": "c952538a3c172f5de1196d099f929c6f4e5f71770218301ab573bfb18c8cf17c"
+    },
+    {
+      "file": "2-rest.dsculpt",
+      "release": "435f58c1cb2dbf2641971cd38101521195853ec09e6b22a1033f1b51a1c43345",
+      "sanitize": "435f58c1cb2dbf2641971cd38101521195853ec09e6b22a1033f1b51a1c43345"
+    },
+    {
+      "file": "3-posed.dsculpt",
+      "release": "949b89ceac43aefc6a8f7c6132c4eebec7a50c0efca546456c65368c768b3ece",
+      "sanitize": "949b89ceac43aefc6a8f7c6132c4eebec7a50c0efca546456c65368c768b3ece"
+    },
+    {
+      "file": "3-rest.dsculpt",
+      "release": "757cc0e0de166e28e1baa07cf4dd552b769a6d1a99d1d9e2233807f082111722",
+      "sanitize": "757cc0e0de166e28e1baa07cf4dd552b769a6d1a99d1d9e2233807f082111722"
+    },
+    {
+      "file": "calibration.dsculpt",
+      "release": "90c2bd9c766fbaabf5c96756d8dd422c02d569557c092aafc5210913659cf25c",
+      "sanitize": "90c2bd9c766fbaabf5c96756d8dd422c02d569557c092aafc5210913659cf25c"
+    },
+    {
+      "file": "cancel.dsculpt",
+      "release": "56be03a0a42ca6b4008c851f440f7233588f458b2836c890cb9f01c9b5a4623b",
+      "sanitize": "56be03a0a42ca6b4008c851f440f7233588f458b2836c890cb9f01c9b5a4623b"
+    },
+    {
+      "file": "immediate.dsculpt",
+      "release": "90c2bd9c766fbaabf5c96756d8dd422c02d569557c092aafc5210913659cf25c",
+      "sanitize": "90c2bd9c766fbaabf5c96756d8dd422c02d569557c092aafc5210913659cf25c"
+    },
+    {
+      "file": "injected-error.dsculpt",
+      "release": "56be03a0a42ca6b4008c851f440f7233588f458b2836c890cb9f01c9b5a4623b",
+      "sanitize": "56be03a0a42ca6b4008c851f440f7233588f458b2836c890cb9f01c9b5a4623b"
+    },
+    {
+      "file": "invalid-face.dsculpt",
+      "release": "56be03a0a42ca6b4008c851f440f7233588f458b2836c890cb9f01c9b5a4623b",
+      "sanitize": "56be03a0a42ca6b4008c851f440f7233588f458b2836c890cb9f01c9b5a4623b"
+    },
+    {
+      "file": "noop.dsculpt",
+      "release": "90c2bd9c766fbaabf5c96756d8dd422c02d569557c092aafc5210913659cf25c",
+      "sanitize": "90c2bd9c766fbaabf5c96756d8dd422c02d569557c092aafc5210913659cf25c"
+    },
+    {
+      "file": "overflow.dsculpt",
+      "release": "56be03a0a42ca6b4008c851f440f7233588f458b2836c890cb9f01c9b5a4623b",
+      "sanitize": "56be03a0a42ca6b4008c851f440f7233588f458b2836c890cb9f01c9b5a4623b"
+    },
+    {
+      "file": "queued-0.dsculpt",
+      "release": "90c2bd9c766fbaabf5c96756d8dd422c02d569557c092aafc5210913659cf25c",
+      "sanitize": "90c2bd9c766fbaabf5c96756d8dd422c02d569557c092aafc5210913659cf25c"
+    },
+    {
+      "file": "queued-1.dsculpt",
+      "release": "90c2bd9c766fbaabf5c96756d8dd422c02d569557c092aafc5210913659cf25c",
+      "sanitize": "90c2bd9c766fbaabf5c96756d8dd422c02d569557c092aafc5210913659cf25c"
+    },
+    {
+      "file": "queued-2.dsculpt",
+      "release": "90c2bd9c766fbaabf5c96756d8dd422c02d569557c092aafc5210913659cf25c",
+      "sanitize": "90c2bd9c766fbaabf5c96756d8dd422c02d569557c092aafc5210913659cf25c"
+    },
+    {
+      "file": "queued-3.dsculpt",
+      "release": "90c2bd9c766fbaabf5c96756d8dd422c02d569557c092aafc5210913659cf25c",
+      "sanitize": "90c2bd9c766fbaabf5c96756d8dd422c02d569557c092aafc5210913659cf25c"
+    },
+    {
+      "file": "queued-4.dsculpt",
+      "release": "90c2bd9c766fbaabf5c96756d8dd422c02d569557c092aafc5210913659cf25c",
+      "sanitize": "90c2bd9c766fbaabf5c96756d8dd422c02d569557c092aafc5210913659cf25c"
+    },
+    {
+      "file": "queued-5.dsculpt",
+      "release": "90c2bd9c766fbaabf5c96756d8dd422c02d569557c092aafc5210913659cf25c",
+      "sanitize": "90c2bd9c766fbaabf5c96756d8dd422c02d569557c092aafc5210913659cf25c"
+    },
+    {
+      "file": "queued-6.dsculpt",
+      "release": "90c2bd9c766fbaabf5c96756d8dd422c02d569557c092aafc5210913659cf25c",
+      "sanitize": "90c2bd9c766fbaabf5c96756d8dd422c02d569557c092aafc5210913659cf25c"
+    },
+    {
+      "file": "queued-7.dsculpt",
+      "release": "90c2bd9c766fbaabf5c96756d8dd422c02d569557c092aafc5210913659cf25c",
+      "sanitize": "90c2bd9c766fbaabf5c96756d8dd422c02d569557c092aafc5210913659cf25c"
+    },
+    {
+      "file": "retry.dsculpt",
+      "release": "90c2bd9c766fbaabf5c96756d8dd422c02d569557c092aafc5210913659cf25c",
+      "sanitize": "90c2bd9c766fbaabf5c96756d8dd422c02d569557c092aafc5210913659cf25c"
+    },
+    {
+      "file": "shutdown.dsculpt",
+      "release": "90c2bd9c766fbaabf5c96756d8dd422c02d569557c092aafc5210913659cf25c",
+      "sanitize": "90c2bd9c766fbaabf5c96756d8dd422c02d569557c092aafc5210913659cf25c"
+    },
+    {
+      "file": "stale.dsculpt",
+      "release": "56be03a0a42ca6b4008c851f440f7233588f458b2836c890cb9f01c9b5a4623b",
+      "sanitize": "56be03a0a42ca6b4008c851f440f7233588f458b2836c890cb9f01c9b5a4623b"
+    },
+    {
+      "file": "held-retry.dsculpt",
+      "release": "c65fc550df3f24bb9488da88b565b4c211fb87bdda24f415ad1b5a0ece010795",
+      "sanitize": "c65fc550df3f24bb9488da88b565b4c211fb87bdda24f415ad1b5a0ece010795"
+    },
+    {
+      "file": "held-sample-v2-retry.dsculpt",
+      "release": "c65fc550df3f24bb9488da88b565b4c211fb87bdda24f415ad1b5a0ece010795",
+      "sanitize": "c65fc550df3f24bb9488da88b565b4c211fb87bdda24f415ad1b5a0ece010795"
+    }
+  ],
+  "ctest": [
+    {
+      "profile": "release",
+      "exit": 0,
+      "binary_sha256": "22e9ffac72670a494efa60779fbe35ab60787dbd171d193d69881150b37a65fa",
+      "log": "/home/blux/de-xr/dome-sculpt/artifacts/retopo-input-a852/artifacts/held-proof/ctest-release.log",
+      "scope": "Fresh CMake registration, manually whole-compiled matching consumer symlink, not fresh wholecorebuild"
+    },
+    {
+      "profile": "sanitize",
+      "exit": 0,
+      "binary_sha256": "190d4e1914f6c1229d1a3eae5b2a55cb22ae628350ea397b787f63d09e567e44",
+      "log": "/home/blux/de-xr/dome-sculpt/artifacts/retopo-input-a852/artifacts/held-proof/ctest-sanitize.log",
+      "scope": "Fresh CMake registration, manually whole-compiled matching consumer symlink, not fresh wholecorebuild"
+    }
+  ],
+  "product_sha256": "eb970e00a5639967383b19d4b90f5df9a7cf19051398887a604a13249a73e2a0",
+  "test_sha256": "99b2d82aa5ff57a864bb4a2edf95a442c130ec84d9a6e8c445f9dc3cdf7fcd9b",
+  "cmake_sha256": "68a11c1cfd5cfa218390889e58e0765eea2ad1ff44023caa774f496bd68f96b0",
+  "original_budget_stop": {
+    "status": {
+      "state": "terminal",
+      "pid": 730391,
+      "steps": [
+        {
+          "name": "compile-document-retopo",
+          "args": [
+            "/usr/bin/c++",
+            "-gz=zstd",
+            "-DDOME_SCULPT_INSTALLED_ASSETS=\"/usr/local/share/dome-sculpt/assets/humanoid\"",
+            "-DDOME_SCULPT_SOURCE_ASSETS=\"/home/blux/de-xr/dome-sculpt/artifacts/retopo-input-a852/assets/humanoid\"",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-input-a852/third_party",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-input-a852/include",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-input-a852/third_party/openbrush",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-input-a852/third_party/cgltf",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-input-a852/third_party/nlohmann",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-input-a852/third_party/xatlas",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-input-a852/third_party/mikktspace",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-input-a852/third_party/ufbx",
+            "-O1",
+            "-g1",
+            "-DNDEBUG",
+            "-fsanitize=address,undefined",
+            "-fno-omit-frame-pointer",
+            "-std=gnu++20",
+            "-Wall",
+            "-Wextra",
+            "-Wpedantic",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/retopo-input-a852/artifacts/held-proof/sanitize-corrected/document-retopo.cpp.o",
+            "-c",
+            "/home/blux/de-xr/dome-sculpt/artifacts/retopo-input-a852/src/document-retopo.cpp"
+          ],
+          "exit": 0,
+          "expected_exit": 0,
+          "seconds": 3.8167639530147426
+        },
+        {
+          "name": "compile-test",
+          "args": [
+            "/usr/bin/c++",
+            "-gz=zstd",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-input-a852/include",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-input-a852/third_party/openbrush",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-input-a852/third_party/nlohmann",
+            "-O1",
+            "-g1",
+            "-DNDEBUG",
+            "-fsanitize=address,undefined",
+            "-fno-omit-frame-pointer",
+            "-std=gnu++20",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/retopo-input-a852/artifacts/held-proof/sanitize-corrected/test.o",
+            "-c",
+            "/home/blux/de-xr/dome-sculpt/artifacts/retopo-input-a852/tests/retopo-held-admission.cpp"
+          ],
+          "exit": 0,
+          "expected_exit": 0,
+          "seconds": 8.467908505990636
+        },
+        {
+          "name": "link",
+          "args": [
+            "/usr/bin/c++",
+            "-Wl,--compress-debug-sections=zstd",
+            "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/handoff-proof/sanitize/document.cpp.o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/retopo-input-a852/artifacts/held-proof/sanitize-corrected/document-retopo.cpp.o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/handoff-proof/sanitize/document-baking.cpp.o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/affine-proof/sanitize/retopo.cpp.o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/affine-proof/sanitize/retopo-authoring.cpp.o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/retopo-input-a852/artifacts/held-proof/sanitize-corrected/test.o",
+            "-Wl,-Map=/home/blux/de-xr/dome-sculpt/artifacts/retopo-input-a852/artifacts/held-proof/sanitize-corrected/native.map",
+            "-Wl,-t,-t",
+            "-Wl,--wrap=_ZN4dome6unwrapERNS_4MeshEjjRKSt8functionIFbvEE",
+            "-Wl,--wrap=_ZN4dome15RetopoWorkspace4editENS_12RetopoActionENS_4Vec3EfRKSt8functionIFbvEE",
+            "-O1",
+            "-g1",
+            "-DNDEBUG",
+            "-fsanitize=address,undefined",
+            "-fno-omit-frame-pointer",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/retopo-input-a852/artifacts/held-proof/sanitize-corrected/native",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-preflight-qualified-0b6/artifacts/final-preflight/sanitize/stage/libdome-sculpt-core.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-preflight-qualified-0b6/artifacts/final-preflight/sanitize/stage/libdome-sculpt-affine.a",
+            "/usr/lib64/liblapacke.so",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-preflight-qualified-0b6/artifacts/final-preflight/sanitize/stage/libdome-sculpt-polygon.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-preflight-qualified-0b6/artifacts/final-preflight/sanitize/stage/libxatlas.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-preflight-qualified-0b6/artifacts/final-preflight/sanitize/stage/libmikktspace.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-preflight-qualified-0b6/artifacts/final-preflight/sanitize/stage/libmikktspace-robust.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-preflight-qualified-0b6/artifacts/final-preflight/sanitize/stage/libufbx.a",
+            "/usr/lib64/libpng.so",
+            "/usr/lib64/libjpeg.so",
+            "/usr/lib64/libz.so",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-preflight-qualified-0b6/artifacts/final-preflight/sanitize/stage/libdome-sculpt-emission-codec.a",
+            "/usr/lib64/libOpenEXR-3_2.so",
+            "/usr/lib64/libOpenEXRUtil-3_2.so",
+            "/usr/lib64/libOpenEXRCore-3_2.so",
+            "/usr/lib64/libIex-3_2.so",
+            "/usr/lib64/libIlmThread-3_2.so",
+            "/usr/lib64/libImath-3_1.so",
+            "-lgcc_s_asneeded",
+            "-lgcc_s_asneeded"
+          ],
+          "exit": 0,
+          "expected_exit": 0,
+          "seconds": 2.591444624005817
+        }
+      ],
+      "allocated_bytes": 164753408,
+      "actual_free_bytes": 24090660864,
+      "phase": "link",
+      "child_pid": 746390,
+      "exit": 1,
+      "error": "AssertionError('0.25GiB held-admission scope')",
+      "seconds": 15.777430928021204,
+      "drift": []
+    },
+    "note": "Compile/link complete; runtime not launched beforeinitial.25GiB scope guard. Same exact ELF laterpassed inruntimev2. Rootscope explicitlyraised1GiB forASan data footprint, existingnegative unchanged."
+  },
+  "archived_generated_closed_ELFs": [
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/retopo-input-a852/artifacts/held-proof/sanitize-corrected/native",
+      "sha256": "176fe845bf630a6467969f613f949ceecef1bad0d70489c1aaf9b5ee130394a1",
+      "size": 321501880,
+      "mode": 448,
+      "uid": 1000,
+      "gid": 1001,
+      "mtime_ns": 1793900110172971674,
+      "archive": "/home/blux/de-xr/dome-sculpt/artifacts/retopo-input-a852/artifacts/held-proof/closed-sanitize-held-elf/native.zst",
+      "archive_sha256": "a31a4608a0dda2b25abd2a090c3c4b389238646fb3cd0fc157433c939740084b",
+      "archive_bytes": 54392730,
+      "restore_control": "Full decompression byte/metadata exact before unlink; original unchanged until verification"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/retopo-input-a852/artifacts/held-proof/regressions/sanitize-composed",
+      "sha256": "d388cedf2db548269863f60a041ad6755a321cd9db2a570554e4500505ed0e88",
+      "size": 324084224,
+      "mode": 448,
+      "uid": 1000,
+      "gid": 1001,
+      "mtime_ns": 1793900520659085878,
+      "archive": "/home/blux/de-xr/dome-sculpt/artifacts/retopo-input-a852/artifacts/held-proof/regressions/sanitize-composed-archive/native.zst",
+      "archive_sha256": "390e521cd121072b2a0d2b49a251ef1b934f7dab593f4f46b6599695455d59d1",
+      "archive_bytes": 54756024,
+      "control": "All decompressed bytes hashed before unlink; actual original-path restoration metadata/SHA checked before removing duplicate again"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/retopo-input-a852/artifacts/held-proof/regressions/sanitize-boundaries",
+      "sha256": "40de66830674d1008e7ec4b6db0d922f718bd5b1d0bd4f20844a3c360448747a",
+      "size": 319874080,
+      "mode": 448,
+      "uid": 1000,
+      "gid": 1001,
+      "mtime_ns": 1793900542301777319,
+      "archive": "/home/blux/de-xr/dome-sculpt/artifacts/retopo-input-a852/artifacts/held-proof/regressions/sanitize-boundaries-archive/native.zst",
+      "archive_sha256": "06f1a655aa608ef9afd510094a72445c99d50c01c9350bc2f9073132dba1ef1b",
+      "archive_bytes": 54064059,
+      "control": "All decompressed bytes hashed before unlink; actual original-path restoration metadata/SHA checked before removing duplicate again"
+    }
+  ],
+  "remaining": [
+    "Matched semantic FLTK/syntheticXR app qualification with screen-marker fix.",
+    "Broader ordinary input-publication failure paths are not exhaustively injected bythis held-Apply scope.",
+    "Main admission and full production matrix remain separate."
+  ],
+  "no_claim": [
+    "No fresh wholecore/app build",
+    "No HMD/install/session change",
+    "No full-goal completion"
+  ]
+}

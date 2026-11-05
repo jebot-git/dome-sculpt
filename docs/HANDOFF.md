@@ -1,3 +1,55 @@
+## Private marker device closure — 2026-11-05
+
+Exacted5renderer andwhole55scenario consumer nowpass observedPCI03ArcA770 with
+actualEGLdevice/renderD129/rdev226:129/sysfs8086:56a0/i915/openFDs andimmutableDSO
+maps; samebinaryforcedllvmpipe refuses1 afteractualrenderer observation. All30
+hardwarePPMs retained, no limits/source/tolerance changes. Finite7491closed0 and
+GPUlease explicitlyreleased; noSANhardwaredup/compute/HMD claim. See
+RETOPO-SCREEN-MARKERS.md/JSON. Rootheld-gesture repair/integration remainsrequired
+beforemainretopo admission; fullgoal staysactive.
+
+## Private default-view retopology marker repair — 2026-11-05
+
+Shader-only screen floor fixes the preserved unzoomed compact marker failure.
+Whole renderTU/consumer R/S pass55new scenarios plus every original cache/state/
+occlusion/linear/BDF/PBR assertion; actualnormal15+unzoomedcompact16 eachprofile
+pass cleanly,30renderer+2native pairs exact. Release isordinaryapp; SANexplicitly
+composes actualappmain andwhole renderer-test entry intooneELF undera mainwrapper,
+not anordinaryproductELF. No headers/layout/schema/archive change. Read
+RETOPO-SCREEN-MARKERS.md/receipt. Mainretopo stillrequiresroot's newlyidentified
+held-gesture admission/OOMrepair; earlier63prefixes covercompleted drafts only.
+No GPU/HMD/fullsuite/fullgoal claim.
+
+## Private matching affine retopology clients — 2026-11-05
+
+The fd66 production bytes now pass actual matched FLTK normal/compact and
+real-loader software clients: Release76/SAN59 UI/controller assertions, corrected
+whole cancellation-boundaries each0, six native pairs byte-identical, clean close
+and fresh-process reopen. Explicit canonical SDK/driver mappings and all inputs
+are pinned. No fresh whole-app build/main/GPU/HMD claim. Initial compact subpixel
+marker feedback remains an unresolved usability gap; positive compact editing
+uses real existing wheel zoom with all pixel/Cancel/history assertions retained.
+The first stale-/opt-Cairo800B setup failure is preserved; samebytes canonical
+runs are clean. Read RETOPO-AFFINE-UI.md/receipt. Full goal remains active.
+
+## Private immediate retopology Save repair — 2026-11-05
+
+The real affine-checkpoint Apply-to-Save gap now has an explicit independent-
+queue handoff:1445Release/1445ownedSAN including63persistent admission denials
+each,21native+5sentinel pairs exact and actual public layout equality. Read
+RETOPO-SAVE-HANDOFF.md/receipt. Original failures remain; no app/UI/main/fullgoal
+admission follows. Downstream fault/device/production and remesh/CATS/texture-set
+requirements remain open.
+
+## Private affine retopology component — 2026-11-05
+
+Exact main10944 child now qualifies full-affine manual retopo geometry/native
+controls:587Release/587ownedSAN, eight native pairs byte-identical, no layout/
+format or archive change. Read RETOPO-AFFINE.md/receipt for scope and preserved
+failed originals. Immediate accepted-input-to-Save still has a genuine gap;
+the positive gated Save covers only later accepted AssetWork. No app/frontend/
+main admission or full-goal claim; other production rows remain required.
+
 ## Exhaustive private physical-package fault closure — 2026-11-05
 
 Private frozen1f9fd48/owning5df now closes all128 partitions/profile:90,261

@@ -1,0 +1,79 @@
+{
+  "recorded_utc": "2026-11-05T18:25:40.883472+00:00",
+  "baseline_main": "d4b62f985f725d1b9a88e7103a986129018d7e01",
+  "qualified_runtime_source": "71270a9b02a68d1f3ca24ce44a37f89caa85230e",
+  "admitted_main_runtime": true,
+  "main_product_files_byte_equal_candidate": true,
+  "product_files": {
+    "include/dome/document.hpp": "3b65f782b9c1072b326eda0304167ae5c4f373a2f3106a69a6f355b340f6a7e6",
+    "include/dome/retopo.hpp": "bd007f09e2ab35717bc3e894ae2f8b0246968102a1590ad1f860b8b36ca247c1",
+    "src/document-baking.cpp": "8522960263401f889cd32a96feffcf6cd6e1b71f45dde4610b4978355214c899",
+    "src/document-retopo.cpp": "eb970e00a5639967383b19d4b90f5df9a7cf19051398887a604a13249a73e2a0",
+    "src/document.cpp": "db15a9ad05270b5665eca8d7740fea247dd951aa81eb4b2c3a6fbab24a9730ee",
+    "src/render.cpp": "82874f8880983a44a65755077940ddcdb4d9c060a7fa67a9158057626f25edf8",
+    "src/retopo-authoring.cpp": "8bd68dacd40be7cac96ee606acae26bddb9639cfd8ef83b996d618642e50384e",
+    "src/retopo.cpp": "e3f4596431ff09bf2121b3272130dc6ddc69fa46dde4939b730b673e8119f524"
+  },
+  "public_layouts": "Document6968/8, EditorState1896/8, Scene72/8 unchanged. Private deque payload sizeof changes have actual element/ctor/dtor object closure; no persistence/schema change.",
+  "app_scope": "Matched ordinary R/S application relinks: exact6complete productTU objects beforeimmutable matching source support,26unchanged frontendobjects; separateRactualinputgate app. Not freshwholeproject build.",
+  "semantic_audit": {
+    "path": "docs/validation/RETOPO-SEMANTIC-CLIENTS.json",
+    "sha256": "5e7c0ffbb2ee9f0c62072438609f636f43fb38ca6e2bfa28de380b01334b4949",
+    "counts": {
+      "release": 75,
+      "sanitize": 58
+    },
+    "actual_process_maps": 16,
+    "unprotected_mapped_ELFs": 0,
+    "native_byte_equal_pairs": 6,
+    "ordinary_entries": {
+      "release": {
+        "actual_main": [
+          "000000000052cfc0 T main"
+        ],
+        "dispatcher_symbols": []
+      },
+      "sanitize": {
+        "actual_main": [
+          "0000000000caaea2 T main"
+        ],
+        "dispatcher_symbols": []
+      }
+    },
+    "source_drift": [],
+    "generated_elf_drift": [],
+    "original_status_sha256": "207577e149cf53f5da2bd772922242b28ec0b020bef12a5c8a9e0f10166e9770"
+  },
+  "component_receipts": {
+    "docs/validation/RETOPO-AFFINE.json": "86c4491123789b1cdd6885acbfb9f3f298fce90e2e4788e3d1eff4c2829562c7",
+    "docs/validation/RETOPO-SAVE-HANDOFF.json": "2732ee0d983762da002ce39b8605a9e67daeced616aaa9678168cb2b6c2b39ea",
+    "docs/validation/RETOPO-AFFINE-UI.json": "5342e458ec0d2e376663e4643e8baadf274265cd8735a5989e304dd5e7f89b00",
+    "docs/validation/RETOPO-HELD-ADMISSION.json": "b73e045f17373ff012272c61263d41cb5a85ad78f2825f94b7666ab0e75db744",
+    "docs/validation/RETOPO-SCREEN-MARKERS.json": "e8a1898bb7dd6919538eb555fe93108ff9f0bb28aed67f48a9503637815d7638"
+  },
+  "native_scope": {
+    "held_assertions_per_profile": 1267,
+    "held_persistent_denials_per_profile": 65,
+    "original_composed_assertions_per_profile": 1445,
+    "boundary_assertions_per_profile": 26,
+    "completed_draft_denials_separate": 63,
+    "native_sentinel_pairs": 28
+  },
+  "marker_scope": {
+    "new_scenarios_each_profile": 55,
+    "legacy_renderer_checks": "unchanged allpass",
+    "hardware": "Same exact componentRelease observer actualIntelArcA770 PCI0000:03:00.0/renderD129/8086:56a0/i915/openFD/map proof; samebinaryactualllvmpipe rejects1",
+    "hardware_positive": true
+  },
+  "canonical_DomeD": "341152b2429d28e70834917bc65c371b044481e8 remoteHEAD reverified; canonicalpoll-final SDK/currentbitmap preserved",
+  "original_failures": "All component counterexamples/setup/observer/budget negatives retained inreferencedreceipts; no failed invocation relabeled",
+  "remaining": [
+    "Freshwholeproject/currentaccelerator regression beforefull release qualification",
+    "Broadergeometry/ordinaryinput/worker failure qualification",
+    "Sustainedphysicalcontroller/headset workflows",
+    "EveryotherunfinishedREQUIREMENTS row including owning37/weights/material/remesh/interoperability andcontrollerdrawers"
+  ],
+  "system_install": false,
+  "physical_headset": false,
+  "full_goal_complete": false
+}

@@ -1,13 +1,14 @@
 # Production integration progress — 2026-11-05
 
-The full REQUIREMENTS/HANDOFF objective remains active and incomplete. Main10944
-still uses the qualified native36/c179 runtime. The checkpoints below are private
-continuations; their evidence does not admit their runtime to main or establish
-full regression, interoperability, accelerator or physical-device completion.
+The full REQUIREMENTS/HANDOFF objective remains active and incomplete. Main now integrates the retopology composition71270a9 on its qualified
+native36/c179 foundation; read [RETOPO-INTEGRATION.md](RETOPO-INTEGRATION.md).
+The other checkpoints below remain private continuations. No checkpoint alone
+establishes full regression, interoperability, accelerator or physical-device
+completion.
 
 | Workstream | Verified checkpoint | Remaining integration |
 | --- | --- | --- |
-| Retopology | fd66d290 native1445/profile; matching a852855 closes Release76/sanitizer59 FLTK/software-loader checks plus corrected cancellation-boundaries consumers; six UI/loader native file pairs exact | Default compact-view point markers can be subpixel and need a usability fix; broader coherent integration and physical-device qualification remain |
+| Retopology | Admitted71270a9: affine workspace/ordered Save/held-admission rollback and GPU marker floor; native1267+1445+26/profile, matched final Release75/sanitizer58 clients, actual Arc marker proof | Fresh full-project/accelerator regression, broader geometry/input/worker stress and physical-device qualification remain |
 | Automatic weights | 789a2dd: explicit SurfaceHeat5 on the current Automatic0 default;14 whole production TU compiles/two app links and selected native/controller regressions pass | Fresh current-runtime independent quality, factory/publication and explicit-choice GUI qualification; complex-source compatibility remains required |
 | Opaque unlit world outlines | 4ae4574: matching worker/render/factory, normal/compact FLTK, synthetic-XR, actual Arc and schema scopes pass | Main owning37 integration and remaining material/outline domains; no general Normal/Width-image/lit/screen/MASK/BLEND outline completion |
 | Physical-package fault coverage | 1f9fd48: all90262 points per profile close, including90261 persistent denials and one successful endpoint | The original whole-test sanitizer timeout remains failed; the integrated93c candidate has separate40-point smoke evidence, not a second exhaustive sweep |
@@ -16,8 +17,9 @@ full regression, interoperability, accelerator or physical-device completion.
 
 Retopology client scope includes normal/compact FLTK, actual-process close and
 fresh reopen, four software-loader app runs/profile and a separate Release
-EndGesture-gated immediate Save. The compact positive uses existing viewport
-zoom; it does not fix the initial subpixel marker. A prior sanitizer UI run
+EndGesture-gated immediate Save. The oldera852 compact positive uses existing viewport
+zoom. The admitted composition now passes unzoomed compact cases and fixes the
+initial subpixel marker; both historical scopes stay distinct. A prior sanitizer UI run
 loaded old `/opt` Cairo and leaked800bytes. Its failed invocation remains
 preserved; final unchanged app binaries map the canonical libraries and exit
 cleanly without suppressions. This is a component relink, not a fresh whole-app

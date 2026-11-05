@@ -557,6 +557,26 @@ if(BUILD_TESTING)
   add_executable(dome-sculpt-retopo-authoring-test tests/retopo-authoring.cpp)
   target_link_libraries(dome-sculpt-retopo-authoring-test PRIVATE dome-sculpt-core)
   add_test(NAME retopology-authoring COMMAND dome-sculpt-retopo-authoring-test)
+  add_executable(dome-sculpt-retopo-affine-test tests/retopo-affine.cpp)
+  target_link_libraries(dome-sculpt-retopo-affine-test PRIVATE dome-sculpt-core)
+  target_link_options(dome-sculpt-retopo-affine-test PRIVATE -Wl,--wrap=_ZN4dome6unwrapERNS_4MeshEjjRKSt8functionIFbvEE)
+  add_test(NAME retopology-affine COMMAND dome-sculpt-retopo-affine-test ${CMAKE_CURRENT_BINARY_DIR}/retopology-affine)
+  add_executable(dome-sculpt-retopo-save-handoff-test tests/retopo-save-handoff.cpp)
+  target_link_libraries(dome-sculpt-retopo-save-handoff-test PRIVATE dome-sculpt-core)
+  target_link_options(dome-sculpt-retopo-save-handoff-test PRIVATE
+    -Wl,--wrap=_ZN4dome6unwrapERNS_4MeshEjjRKSt8functionIFbvEE
+    -Wl,--wrap=_ZN4dome15RetopoWorkspace4editENS_12RetopoActionENS_4Vec3EfRKSt8functionIFbvEE)
+  add_test(NAME retopology-save-handoff COMMAND dome-sculpt-retopo-save-handoff-test ${CMAKE_CURRENT_BINARY_DIR}/retopology-save-handoff)
+  add_executable(dome-sculpt-retopo-held-admission-test tests/retopo-held-admission.cpp)
+  target_link_libraries(dome-sculpt-retopo-held-admission-test PRIVATE dome-sculpt-core)
+  target_link_options(dome-sculpt-retopo-held-admission-test PRIVATE
+    -Wl,--wrap=_ZN4dome6unwrapERNS_4MeshEjjRKSt8functionIFbvEE
+    -Wl,--wrap=_ZN4dome15RetopoWorkspace4editENS_12RetopoActionENS_4Vec3EfRKSt8functionIFbvEE)
+  add_test(NAME retopology-held-admission COMMAND dome-sculpt-retopo-held-admission-test ${CMAKE_CURRENT_BINARY_DIR}/retopology-held-admission)
+  add_executable(dome-sculpt-retopo-affine-ui-fixture tests/retopo-affine-ui-fixture.cpp)
+  target_link_libraries(dome-sculpt-retopo-affine-ui-fixture PRIVATE dome-sculpt-core)
+  add_test(NAME retopology-affine-ui-fixture COMMAND dome-sculpt-retopo-affine-ui-fixture ${CMAKE_CURRENT_BINARY_DIR}/retopology-affine-ui.dsculpt)
+  set_tests_properties(retopology-affine-ui-fixture PROPERTIES FIXTURES_SETUP retopology_affine_ui)
   add_executable(dome-sculpt-cut-color-publication-test tests/cut-color-publication.cpp)
   target_include_directories(dome-sculpt-cut-color-publication-test PRIVATE src)
   target_link_libraries(dome-sculpt-cut-color-publication-test PRIVATE dome-sculpt-core)
@@ -4236,4 +4256,11 @@ if(BUILD_TESTING)
   unset(_native_frame_fault_timeout)
   unset(_native_frame_fault_config)
   unset(_native_frame_fault_flags)
+endif()
+if(BUILD_TESTING AND TARGET dome-sculpt AND TARGET dome-sculpt-test-runtime AND TARGET dome-sculpt-native-authoring-inspect AND Python3_Interpreter_FOUND)
+  add_test(NAME retopology-affine-openxr COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/tests/retopo-affine-xr.py
+    $<TARGET_FILE:dome-sculpt> $<TARGET_FILE:dome-sculpt-test-runtime> $<TARGET_FILE:dome-sculpt-native-authoring-inspect>
+    ${CMAKE_CURRENT_BINARY_DIR}/retopology-affine-ui.dsculpt ${CMAKE_CURRENT_BINARY_DIR}/retopology-affine-openxr)
+  set_tests_properties(retopology-affine-openxr PROPERTIES FIXTURES_REQUIRED retopology_affine_ui TIMEOUT 600
+    ENVIRONMENT "LIBGL_ALWAYS_SOFTWARE=1;LP_NUM_THREADS=2")
 endif()

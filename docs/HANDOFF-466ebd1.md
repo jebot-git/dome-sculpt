@@ -1,3 +1,7 @@
+> Current source admission adds affine/ordered retopology, held-admission
+> rollback and visible compact markers. Read RETOPO-INTEGRATION.md for its
+> exact matched native/FLTK/software-loader/Arc scope; full goal remains open.
+>
 > Latest integration record: PRODUCTION-PROGRESS-2026-11-05.md distinguishes
 > sealed private native milestones, failed remesh affine-editor runs and live
 > qualification from admitted main behavior. The full goal remains active.

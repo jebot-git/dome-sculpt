@@ -1,0 +1,1045 @@
+{
+  "scope": "Private matched-main component/native proof, not fresh whole-app build or frontend admission. Whole3product TUs override immutable159-member qualified mainc179 core; no archive write, fields/layout/schema/GPU/HMD claim. Additive RetopoMesh::transform method only. Root current app links held.",
+  "base": "10944ab4ec69b5958ee09a546f55bdec3d7be2e3",
+  "source_sha256": {
+    "include/dome/retopo.hpp": "bd007f09e2ab35717bc3e894ae2f8b0246968102a1590ad1f860b8b36ca247c1",
+    "src/retopo.cpp": "e3f4596431ff09bf2121b3272130dc6ddc69fa46dde4939b730b673e8119f524",
+    "src/retopo-authoring.cpp": "8bd68dacd40be7cac96ee606acae26bddb9639cfd8ef83b996d618642e50384e",
+    "src/document.cpp": "db15a9ad05270b5665eca8d7740fea247dd951aa81eb4b2c3a6fbab24a9730ee",
+    "tests/retopo-affine.cpp": "ce52bd1fc794222aeff59fab50ddf8939227ac6c0a9624b98b61a51c356ba8ed",
+    "tests/retopo-authoring.cpp": "324ca754e20514dcd9f17b5c88117fb9bf94832ceff83bef887d66a28c039fe9",
+    "CMakeLists.txt": "75311fdd66f5f77a40fe7e81cd9d53bab26372bfcb62e5cccbaf5814f7cb7dc4"
+  },
+  "release": {
+    "state": "terminal",
+    "profile": "release",
+    "pid": 1373494,
+    "steps": [
+      {
+        "name": "compile-retopo-affine",
+        "args": [
+          "/usr/bin/c++",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/include",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/third_party/openbrush",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/third_party/nlohmann",
+          "-O3",
+          "-DNDEBUG",
+          "-std=gnu++20",
+          "-o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/affine-proof/release-v3/retopo-affine.o",
+          "-c",
+          "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/tests/retopo-affine.cpp"
+        ],
+        "exit": 0,
+        "expected": 0,
+        "seconds": 2.9047209299751557
+      },
+      {
+        "name": "link-retopo-affine",
+        "args": [
+          "/usr/bin/c++",
+          "-Wl,--wrap=_ZN4dome6unwrapERNS_4MeshEjjRKSt8functionIFbvEE",
+          "-Wl,-Map=/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/affine-proof/release-v3/retopo-affine.map",
+          "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/affine-proof/release/retopo.cpp.o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/affine-proof/release/retopo-authoring.cpp.o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/affine-proof/release/document.cpp.o",
+          "-O3",
+          "-DNDEBUG",
+          "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/affine-proof/release-v3/retopo-affine.o",
+          "-o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/affine-proof/release-v3/retopo-affine",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-preflight-qualified-0b6/artifacts/final-preflight/release/stage/libdome-sculpt-core.a",
+          "libdome-sculpt-affine.a",
+          "/usr/lib64/liblapacke.so",
+          "libdome-sculpt-polygon.a",
+          "libxatlas.a",
+          "libmikktspace.a",
+          "libmikktspace-robust.a",
+          "libufbx.a",
+          "/usr/lib64/libpng.so",
+          "/usr/lib64/libjpeg.so",
+          "/usr/lib64/libz.so",
+          "libdome-sculpt-emission-codec.a",
+          "/usr/lib64/libOpenEXR-3_2.so",
+          "/usr/lib64/libOpenEXRUtil-3_2.so",
+          "/usr/lib64/libOpenEXRCore-3_2.so",
+          "/usr/lib64/libIex-3_2.so",
+          "/usr/lib64/libIlmThread-3_2.so",
+          "/usr/lib64/libImath-3_1.so",
+          "-lgcc_s_asneeded",
+          "-lgcc_s_asneeded"
+        ],
+        "exit": 0,
+        "expected": 0,
+        "seconds": 0.23353815695736557
+      },
+      {
+        "name": "actual-affine-native",
+        "args": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/affine-proof/release-v3/retopo-affine",
+          "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/affine-proof/release-v3/run"
+        ],
+        "exit": 0,
+        "expected": 0,
+        "seconds": 0.19332596397725865
+      },
+      {
+        "name": "compile-retopo-authoring",
+        "args": [
+          "/usr/bin/c++",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/include",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/third_party/openbrush",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/third_party/nlohmann",
+          "-O3",
+          "-DNDEBUG",
+          "-std=gnu++20",
+          "-o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/affine-proof/release-v3/retopo-authoring.o",
+          "-c",
+          "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/tests/retopo-authoring.cpp"
+        ],
+        "exit": 0,
+        "expected": 0,
+        "seconds": 3.04634994501248
+      },
+      {
+        "name": "link-retopo-authoring",
+        "args": [
+          "/usr/bin/c++",
+          "-Wl,-Map=/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/affine-proof/release-v3/retopo-authoring.map",
+          "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/affine-proof/release/retopo.cpp.o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/affine-proof/release/retopo-authoring.cpp.o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/affine-proof/release/document.cpp.o",
+          "-O3",
+          "-DNDEBUG",
+          "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/affine-proof/release-v3/retopo-authoring.o",
+          "-o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/affine-proof/release-v3/retopo-authoring",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-preflight-qualified-0b6/artifacts/final-preflight/release/stage/libdome-sculpt-core.a",
+          "libdome-sculpt-affine.a",
+          "/usr/lib64/liblapacke.so",
+          "libdome-sculpt-polygon.a",
+          "libxatlas.a",
+          "libmikktspace.a",
+          "libmikktspace-robust.a",
+          "libufbx.a",
+          "/usr/lib64/libpng.so",
+          "/usr/lib64/libjpeg.so",
+          "/usr/lib64/libz.so",
+          "libdome-sculpt-emission-codec.a",
+          "/usr/lib64/libOpenEXR-3_2.so",
+          "/usr/lib64/libOpenEXRUtil-3_2.so",
+          "/usr/lib64/libOpenEXRCore-3_2.so",
+          "/usr/lib64/libIex-3_2.so",
+          "/usr/lib64/libIlmThread-3_2.so",
+          "/usr/lib64/libImath-3_1.so",
+          "-lgcc_s_asneeded",
+          "-lgcc_s_asneeded"
+        ],
+        "exit": 0,
+        "expected": 0,
+        "seconds": 0.23180353903444484
+      },
+      {
+        "name": "unchanged-legacy-authoring",
+        "args": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/affine-proof/release-v3/retopo-authoring"
+        ],
+        "exit": 0,
+        "expected": 0,
+        "seconds": 0.16366640699561685
+      },
+      {
+        "name": "compile-retopo-edges",
+        "args": [
+          "/usr/bin/c++",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/include",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/third_party/openbrush",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/third_party/nlohmann",
+          "-O3",
+          "-DNDEBUG",
+          "-std=gnu++20",
+          "-o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/affine-proof/release-v3/retopo-edges.o",
+          "-c",
+          "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/tests/retopo-edges.cpp"
+        ],
+        "exit": 0,
+        "expected": 0,
+        "seconds": 2.641619884991087
+      },
+      {
+        "name": "link-retopo-edges",
+        "args": [
+          "/usr/bin/c++",
+          "-Wl,-Map=/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/affine-proof/release-v3/retopo-edges.map",
+          "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/affine-proof/release/retopo.cpp.o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/affine-proof/release/retopo-authoring.cpp.o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/affine-proof/release/document.cpp.o",
+          "-O3",
+          "-DNDEBUG",
+          "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/affine-proof/release-v3/retopo-edges.o",
+          "-o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/affine-proof/release-v3/retopo-edges",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-preflight-qualified-0b6/artifacts/final-preflight/release/stage/libdome-sculpt-core.a",
+          "libdome-sculpt-affine.a",
+          "/usr/lib64/liblapacke.so",
+          "libdome-sculpt-polygon.a",
+          "libxatlas.a",
+          "libmikktspace.a",
+          "libmikktspace-robust.a",
+          "libufbx.a",
+          "/usr/lib64/libpng.so",
+          "/usr/lib64/libjpeg.so",
+          "/usr/lib64/libz.so",
+          "libdome-sculpt-emission-codec.a",
+          "/usr/lib64/libOpenEXR-3_2.so",
+          "/usr/lib64/libOpenEXRUtil-3_2.so",
+          "/usr/lib64/libOpenEXRCore-3_2.so",
+          "/usr/lib64/libIex-3_2.so",
+          "/usr/lib64/libIlmThread-3_2.so",
+          "/usr/lib64/libImath-3_1.so",
+          "-lgcc_s_asneeded",
+          "-lgcc_s_asneeded"
+        ],
+        "exit": 0,
+        "expected": 0,
+        "seconds": 0.24105331400642172
+      },
+      {
+        "name": "unchanged-legacy-edges",
+        "args": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/affine-proof/release-v3/retopo-edges"
+        ],
+        "exit": 0,
+        "expected": 0,
+        "seconds": 0.1379622649983503
+      }
+    ],
+    "scope": "Three whole main10944 product TUs before immutable qualified mainc179 core/support; additive RetopoMesh method nofields/layout. New whole native/geometry test and unchanged legacy authoring/edge geometry. No archive rewrite/app/fullbuild/GPU claim.",
+    "additional_physical_cap_bytes": 805306368,
+    "tree_st_blocks_bytes": 240144384,
+    "free_bytes": 25926479872,
+    "phase": "unchanged-legacy-edges",
+    "child_pid": 1374765,
+    "exit": 0,
+    "seconds": 9.882794551027473,
+    "drift": []
+  },
+  "sanitize": {
+    "state": "terminal",
+    "pid": 1443540,
+    "steps": [
+      {
+        "name": "compile-whole-explicit-return-legacy",
+        "args": [
+          "/usr/bin/c++",
+          "-Dmain=legacy_authoring_main",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/include",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/third_party/openbrush",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/third_party/nlohmann",
+          "-O1",
+          "-g1",
+          "-DNDEBUG",
+          "-fsanitize=address,undefined",
+          "-fno-omit-frame-pointer",
+          "-std=gnu++20",
+          "-o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/affine-proof/sanitize-v2/retopo-authoring.o",
+          "-c",
+          "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/tests/retopo-authoring.cpp"
+        ],
+        "exit": 0,
+        "seconds": 5.364676935016178
+      },
+      {
+        "name": "link-corrected-composed",
+        "args": [
+          "/usr/bin/c++",
+          "-Wl,-t,-t",
+          "-Wl,--wrap=_ZN4dome6unwrapERNS_4MeshEjjRKSt8functionIFbvEE",
+          "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/affine-proof/sanitize/retopo-affine.o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/affine-proof/sanitize-v2/retopo-authoring.o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/affine-proof/sanitize/retopo-edges.o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/affine-proof/sanitize/retopo.cpp.o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/affine-proof/sanitize/retopo-authoring.cpp.o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/affine-proof/sanitize/document.cpp.o",
+          "-O1",
+          "-g1",
+          "-DNDEBUG",
+          "-fsanitize=address,undefined",
+          "-fno-omit-frame-pointer",
+          "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/affine-proof/sanitize/native-driver.o",
+          "-o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/affine-proof/sanitize-v2/retopo-composed",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-preflight-qualified-0b6/artifacts/final-preflight/sanitize/stage/libdome-sculpt-core.a",
+          "libdome-sculpt-affine.a",
+          "/usr/lib64/liblapacke.so",
+          "libdome-sculpt-polygon.a",
+          "libxatlas.a",
+          "libmikktspace.a",
+          "libmikktspace-robust.a",
+          "libufbx.a",
+          "/usr/lib64/libpng.so",
+          "/usr/lib64/libjpeg.so",
+          "/usr/lib64/libz.so",
+          "libdome-sculpt-emission-codec.a",
+          "/usr/lib64/libOpenEXR-3_2.so",
+          "/usr/lib64/libOpenEXRUtil-3_2.so",
+          "/usr/lib64/libOpenEXRCore-3_2.so",
+          "/usr/lib64/libIex-3_2.so",
+          "/usr/lib64/libIlmThread-3_2.so",
+          "/usr/lib64/libImath-3_1.so",
+          "-lgcc_s_asneeded",
+          "-lgcc_s_asneeded"
+        ],
+        "exit": 0,
+        "seconds": 1.7164818230085075
+      },
+      {
+        "name": "actual-full-composed-native",
+        "args": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/affine-proof/sanitize-v2/retopo-composed",
+          "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/affine-proof/sanitize-v2/run"
+        ],
+        "exit": 0,
+        "seconds": 2.8216822980321012
+      }
+    ],
+    "scope": "Correct ONLY legacy test explicit return0 after main renaming. Reuse exact full3product objects +newaffine394/legacyedge wholeTUs/native driver +immutable qualified main support. Prior actualSAN harness UB and394passes preserved. No assertion change/sanitizer suppression/product mutation. Link membertrace replaces redundant26MB section map under0.75GiB cap.",
+    "tree_st_blocks_bytes": 776364032,
+    "free_bytes": 25834315776,
+    "phase": "actual-full-composed-native",
+    "child_pid": 1444314,
+    "exit": 0,
+    "seconds": 9.915409180975985,
+    "drift": []
+  },
+  "counts": {
+    "affine_native_each_profile": 394,
+    "legacy_authoring_each_profile": 62,
+    "legacy_bridge_extrusion_each_profile": 131,
+    "total_each_profile": 587
+  },
+  "unchanged_legacy_return_detail": "Release ran original standalone main with C++ implicit return0; composed sanitizer renamed it, preserving a real missing-return UB negative, then whole-TU explicit return0 restores identical successful-entry semantics without suppressions/assertion changes.",
+  "negative_runs": {
+    "release": {
+      "state": "terminal",
+      "profile": "release",
+      "pid": 1347594,
+      "steps": [
+        {
+          "name": "compile-entry-counter",
+          "args": [
+            "/usr/bin/c++",
+            "-I/home/blux/de-xr/dome-sculpt/include",
+            "-I/home/blux/de-xr/dome-sculpt/third_party/openbrush",
+            "-I/home/blux/de-xr/dome-sculpt/third_party/nlohmann",
+            "-O3",
+            "-DNDEBUG",
+            "-std=gnu++20",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/affine-proof/release/entry-counter.o",
+            "-c",
+            "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/affine-proof/entry-counter.cpp"
+          ],
+          "exit": 0,
+          "expected": 0,
+          "seconds": 1.6779103489825502
+        },
+        {
+          "name": "link-entry-counter",
+          "args": [
+            "/usr/bin/c++",
+            "-Wl,-Map=/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/affine-proof/release/entry-counter.map",
+            "-O3",
+            "-DNDEBUG",
+            "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/affine-proof/release/entry-counter.o",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/affine-proof/release/entry-counter",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-preflight-qualified-0b6/artifacts/final-preflight/release/stage/libdome-sculpt-core.a",
+            "libdome-sculpt-affine.a",
+            "/usr/lib64/liblapacke.so",
+            "libdome-sculpt-polygon.a",
+            "libxatlas.a",
+            "libmikktspace.a",
+            "libmikktspace-robust.a",
+            "libufbx.a",
+            "/usr/lib64/libpng.so",
+            "/usr/lib64/libjpeg.so",
+            "/usr/lib64/libz.so",
+            "libdome-sculpt-emission-codec.a",
+            "/usr/lib64/libOpenEXR-3_2.so",
+            "/usr/lib64/libOpenEXRUtil-3_2.so",
+            "/usr/lib64/libOpenEXRCore-3_2.so",
+            "/usr/lib64/libIex-3_2.so",
+            "/usr/lib64/libIlmThread-3_2.so",
+            "/usr/lib64/libImath-3_1.so",
+            "-lgcc_s_asneeded",
+            "-lgcc_s_asneeded"
+          ],
+          "exit": 0,
+          "expected": 0,
+          "seconds": 0.1661171710002236
+        },
+        {
+          "name": "actual-old-entry-counter",
+          "args": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/affine-proof/release/entry-counter"
+          ],
+          "exit": 1,
+          "expected": 1,
+          "seconds": 0.004178689967375249
+        },
+        {
+          "name": "compile-retopo.cpp",
+          "args": [
+            "/usr/bin/c++",
+            "-DDOME_SCULPT_INSTALLED_ASSETS=\"/usr/local/share/dome-sculpt/assets/humanoid\"",
+            "-DDOME_SCULPT_SOURCE_ASSETS=\"/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/assets/humanoid\"",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/third_party",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/include",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/third_party/openbrush",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/third_party/cgltf",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/third_party/nlohmann",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/third_party/xatlas",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/third_party/mikktspace",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/third_party/ufbx",
+            "-O3",
+            "-DNDEBUG",
+            "-std=gnu++20",
+            "-Wall",
+            "-Wextra",
+            "-Wpedantic",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/affine-proof/release/retopo.cpp.o",
+            "-c",
+            "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/src/retopo.cpp"
+          ],
+          "exit": 0,
+          "expected": 0,
+          "seconds": 5.777255691995379
+        },
+        {
+          "name": "compile-retopo-authoring.cpp",
+          "args": [
+            "/usr/bin/c++",
+            "-DDOME_SCULPT_INSTALLED_ASSETS=\"/usr/local/share/dome-sculpt/assets/humanoid\"",
+            "-DDOME_SCULPT_SOURCE_ASSETS=\"/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/assets/humanoid\"",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/third_party",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/include",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/third_party/openbrush",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/third_party/cgltf",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/third_party/nlohmann",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/third_party/xatlas",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/third_party/mikktspace",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/third_party/ufbx",
+            "-O3",
+            "-DNDEBUG",
+            "-std=gnu++20",
+            "-Wall",
+            "-Wextra",
+            "-Wpedantic",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/affine-proof/release/retopo-authoring.cpp.o",
+            "-c",
+            "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/src/retopo-authoring.cpp"
+          ],
+          "exit": 0,
+          "expected": 0,
+          "seconds": 2.008193810004741
+        },
+        {
+          "name": "compile-document.cpp",
+          "args": [
+            "/usr/bin/c++",
+            "-DDOME_SCULPT_INSTALLED_ASSETS=\"/usr/local/share/dome-sculpt/assets/humanoid\"",
+            "-DDOME_SCULPT_SOURCE_ASSETS=\"/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/assets/humanoid\"",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/third_party",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/include",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/third_party/openbrush",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/third_party/cgltf",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/third_party/nlohmann",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/third_party/xatlas",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/third_party/mikktspace",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/third_party/ufbx",
+            "-O3",
+            "-DNDEBUG",
+            "-std=gnu++20",
+            "-Wall",
+            "-Wextra",
+            "-Wpedantic",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/affine-proof/release/document.cpp.o",
+            "-c",
+            "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/src/document.cpp"
+          ],
+          "exit": 0,
+          "expected": 0,
+          "seconds": 13.380935207009315
+        },
+        {
+          "name": "compile-retopo-affine",
+          "args": [
+            "/usr/bin/c++",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/include",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/third_party/openbrush",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/third_party/nlohmann",
+            "-O3",
+            "-DNDEBUG",
+            "-std=gnu++20",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/affine-proof/release/retopo-affine.o",
+            "-c",
+            "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/tests/retopo-affine.cpp"
+          ],
+          "exit": 0,
+          "expected": 0,
+          "seconds": 2.78986072196858
+        },
+        {
+          "name": "link-retopo-affine",
+          "args": [
+            "/usr/bin/c++",
+            "-Wl,-Map=/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/affine-proof/release/retopo-affine.map",
+            "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/affine-proof/release/retopo.cpp.o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/affine-proof/release/retopo-authoring.cpp.o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/affine-proof/release/document.cpp.o",
+            "-O3",
+            "-DNDEBUG",
+            "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/affine-proof/release/retopo-affine.o",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/affine-proof/release/retopo-affine",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-preflight-qualified-0b6/artifacts/final-preflight/release/stage/libdome-sculpt-core.a",
+            "libdome-sculpt-affine.a",
+            "/usr/lib64/liblapacke.so",
+            "libdome-sculpt-polygon.a",
+            "libxatlas.a",
+            "libmikktspace.a",
+            "libmikktspace-robust.a",
+            "libufbx.a",
+            "/usr/lib64/libpng.so",
+            "/usr/lib64/libjpeg.so",
+            "/usr/lib64/libz.so",
+            "libdome-sculpt-emission-codec.a",
+            "/usr/lib64/libOpenEXR-3_2.so",
+            "/usr/lib64/libOpenEXRUtil-3_2.so",
+            "/usr/lib64/libOpenEXRCore-3_2.so",
+            "/usr/lib64/libIex-3_2.so",
+            "/usr/lib64/libIlmThread-3_2.so",
+            "/usr/lib64/libImath-3_1.so",
+            "-lgcc_s_asneeded",
+            "-lgcc_s_asneeded"
+          ],
+          "exit": 0,
+          "expected": 0,
+          "seconds": 0.23400490102358162
+        },
+        {
+          "name": "actual-affine-native",
+          "args": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/affine-proof/release/retopo-affine",
+            "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/affine-proof/release/run"
+          ],
+          "exit": 1,
+          "expected": 0,
+          "seconds": 0.003816633950918913
+        }
+      ],
+      "scope": "Three whole main10944 product TUs before immutable qualified mainc179 core/support; additive RetopoMesh method nofields/layout. New whole native/geometry test and unchanged legacy authoring/edge geometry. No archive rewrite/app/fullbuild/GPU claim.",
+      "additional_physical_cap_bytes": 805306368,
+      "tree_st_blocks_bytes": 147214336,
+      "free_bytes": 25947262976,
+      "phase": "actual-affine-native",
+      "child_pid": 1349987,
+      "exit": 1,
+      "error": "AssertionError('actual-affine-native failed')",
+      "seconds": 26.11991621099878,
+      "drift": []
+    },
+    "release-v2": {
+      "state": "terminal",
+      "profile": "release",
+      "pid": 1358283,
+      "steps": [
+        {
+          "name": "compile-retopo-affine",
+          "args": [
+            "/usr/bin/c++",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/include",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/third_party/openbrush",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/third_party/nlohmann",
+            "-O3",
+            "-DNDEBUG",
+            "-std=gnu++20",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/affine-proof/release-v2/retopo-affine.o",
+            "-c",
+            "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/tests/retopo-affine.cpp"
+          ],
+          "exit": 0,
+          "expected": 0,
+          "seconds": 2.7486624129815027
+        },
+        {
+          "name": "link-retopo-affine",
+          "args": [
+            "/usr/bin/c++",
+            "-Wl,-Map=/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/affine-proof/release-v2/retopo-affine.map",
+            "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/affine-proof/release/retopo.cpp.o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/affine-proof/release/retopo-authoring.cpp.o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/affine-proof/release/document.cpp.o",
+            "-O3",
+            "-DNDEBUG",
+            "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/affine-proof/release-v2/retopo-affine.o",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/affine-proof/release-v2/retopo-affine",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-preflight-qualified-0b6/artifacts/final-preflight/release/stage/libdome-sculpt-core.a",
+            "libdome-sculpt-affine.a",
+            "/usr/lib64/liblapacke.so",
+            "libdome-sculpt-polygon.a",
+            "libxatlas.a",
+            "libmikktspace.a",
+            "libmikktspace-robust.a",
+            "libufbx.a",
+            "/usr/lib64/libpng.so",
+            "/usr/lib64/libjpeg.so",
+            "/usr/lib64/libz.so",
+            "libdome-sculpt-emission-codec.a",
+            "/usr/lib64/libOpenEXR-3_2.so",
+            "/usr/lib64/libOpenEXRUtil-3_2.so",
+            "/usr/lib64/libOpenEXRCore-3_2.so",
+            "/usr/lib64/libIex-3_2.so",
+            "/usr/lib64/libIlmThread-3_2.so",
+            "/usr/lib64/libImath-3_1.so",
+            "-lgcc_s_asneeded",
+            "-lgcc_s_asneeded"
+          ],
+          "exit": 0,
+          "expected": 0,
+          "seconds": 0.22686805902048945
+        },
+        {
+          "name": "actual-affine-native",
+          "args": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/affine-proof/release-v2/retopo-affine",
+            "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/affine-proof/release-v2/run"
+          ],
+          "exit": 1,
+          "expected": 0,
+          "seconds": 0.15645884803961962
+        }
+      ],
+      "scope": "Three whole main10944 product TUs before immutable qualified mainc179 core/support; additive RetopoMesh method nofields/layout. New whole native/geometry test and unchanged legacy authoring/edge geometry. No archive rewrite/app/fullbuild/GPU claim.",
+      "additional_physical_cap_bytes": 805306368,
+      "tree_st_blocks_bytes": 170758144,
+      "free_bytes": 26002444288,
+      "phase": "actual-affine-native",
+      "child_pid": 1358587,
+      "exit": 1,
+      "error": "AssertionError('actual-affine-native failed')",
+      "seconds": 3.160748293972574,
+      "drift": []
+    },
+    "sanitize": {
+      "state": "terminal",
+      "profile": "sanitize",
+      "pid": 1398811,
+      "steps": [
+        {
+          "name": "compile-retopo.cpp",
+          "args": [
+            "/usr/bin/c++",
+            "-DDOME_SCULPT_INSTALLED_ASSETS=\"/usr/local/share/dome-sculpt/assets/humanoid\"",
+            "-DDOME_SCULPT_SOURCE_ASSETS=\"/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/assets/humanoid\"",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/third_party",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/include",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/third_party/openbrush",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/third_party/cgltf",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/third_party/nlohmann",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/third_party/xatlas",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/third_party/mikktspace",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/third_party/ufbx",
+            "-O1",
+            "-g1",
+            "-DNDEBUG",
+            "-fsanitize=address,undefined",
+            "-fno-omit-frame-pointer",
+            "-std=gnu++20",
+            "-Wall",
+            "-Wextra",
+            "-Wpedantic",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/affine-proof/sanitize/retopo.cpp.o",
+            "-c",
+            "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/src/retopo.cpp"
+          ],
+          "exit": 0,
+          "expected": 0,
+          "seconds": 11.751618070993572
+        },
+        {
+          "name": "compile-retopo-authoring.cpp",
+          "args": [
+            "/usr/bin/c++",
+            "-DDOME_SCULPT_INSTALLED_ASSETS=\"/usr/local/share/dome-sculpt/assets/humanoid\"",
+            "-DDOME_SCULPT_SOURCE_ASSETS=\"/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/assets/humanoid\"",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/third_party",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/include",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/third_party/openbrush",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/third_party/cgltf",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/third_party/nlohmann",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/third_party/xatlas",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/third_party/mikktspace",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/third_party/ufbx",
+            "-O1",
+            "-g1",
+            "-DNDEBUG",
+            "-fsanitize=address,undefined",
+            "-fno-omit-frame-pointer",
+            "-std=gnu++20",
+            "-Wall",
+            "-Wextra",
+            "-Wpedantic",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/affine-proof/sanitize/retopo-authoring.cpp.o",
+            "-c",
+            "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/src/retopo-authoring.cpp"
+          ],
+          "exit": 0,
+          "expected": 0,
+          "seconds": 3.1690329519915394
+        },
+        {
+          "name": "compile-document.cpp",
+          "args": [
+            "/usr/bin/c++",
+            "-DDOME_SCULPT_INSTALLED_ASSETS=\"/usr/local/share/dome-sculpt/assets/humanoid\"",
+            "-DDOME_SCULPT_SOURCE_ASSETS=\"/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/assets/humanoid\"",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/third_party",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/include",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/third_party/openbrush",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/third_party/cgltf",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/third_party/nlohmann",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/third_party/xatlas",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/third_party/mikktspace",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/third_party/ufbx",
+            "-O1",
+            "-g1",
+            "-DNDEBUG",
+            "-fsanitize=address,undefined",
+            "-fno-omit-frame-pointer",
+            "-std=gnu++20",
+            "-Wall",
+            "-Wextra",
+            "-Wpedantic",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/affine-proof/sanitize/document.cpp.o",
+            "-c",
+            "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/src/document.cpp"
+          ],
+          "exit": 0,
+          "expected": 0,
+          "seconds": 28.423744022962637
+        },
+        {
+          "name": "compile-retopo-affine",
+          "args": [
+            "/usr/bin/c++",
+            "-Dmain=affine_native_main",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/include",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/third_party/openbrush",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/third_party/nlohmann",
+            "-O1",
+            "-g1",
+            "-DNDEBUG",
+            "-fsanitize=address,undefined",
+            "-fno-omit-frame-pointer",
+            "-std=gnu++20",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/affine-proof/sanitize/retopo-affine.o",
+            "-c",
+            "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/tests/retopo-affine.cpp"
+          ],
+          "exit": 0,
+          "expected": 0,
+          "seconds": 4.466442106000613
+        },
+        {
+          "name": "compile-retopo-authoring",
+          "args": [
+            "/usr/bin/c++",
+            "-Dmain=legacy_authoring_main",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/include",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/third_party/openbrush",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/third_party/nlohmann",
+            "-O1",
+            "-g1",
+            "-DNDEBUG",
+            "-fsanitize=address,undefined",
+            "-fno-omit-frame-pointer",
+            "-std=gnu++20",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/affine-proof/sanitize/retopo-authoring.o",
+            "-c",
+            "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/tests/retopo-authoring.cpp"
+          ],
+          "exit": 0,
+          "expected": 0,
+          "seconds": 5.179836662020534
+        },
+        {
+          "name": "compile-retopo-edges",
+          "args": [
+            "/usr/bin/c++",
+            "-Dmain=legacy_edges_main",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/include",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/third_party/openbrush",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/third_party/nlohmann",
+            "-O1",
+            "-g1",
+            "-DNDEBUG",
+            "-fsanitize=address,undefined",
+            "-fno-omit-frame-pointer",
+            "-std=gnu++20",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/affine-proof/sanitize/retopo-edges.o",
+            "-c",
+            "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/tests/retopo-edges.cpp"
+          ],
+          "exit": 0,
+          "expected": 0,
+          "seconds": 3.715111780038569
+        },
+        {
+          "name": "compile-native-driver",
+          "args": [
+            "/usr/bin/c++",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/include",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/third_party/openbrush",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/third_party/nlohmann",
+            "-O1",
+            "-g1",
+            "-DNDEBUG",
+            "-fsanitize=address,undefined",
+            "-fno-omit-frame-pointer",
+            "-std=gnu++20",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/affine-proof/sanitize/native-driver.o",
+            "-c",
+            "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/affine-proof/native-driver.cpp"
+          ],
+          "exit": 0,
+          "expected": 0,
+          "seconds": 0.17978789703920484
+        },
+        {
+          "name": "link-retopo-composed",
+          "args": [
+            "/usr/bin/c++",
+            "-Wl,--wrap=_ZN4dome6unwrapERNS_4MeshEjjRKSt8functionIFbvEE",
+            "-Wl,-Map=/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/affine-proof/sanitize/retopo-composed.map",
+            "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/affine-proof/sanitize/retopo-affine.o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/affine-proof/sanitize/retopo-authoring.o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/affine-proof/sanitize/retopo-edges.o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/affine-proof/sanitize/retopo.cpp.o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/affine-proof/sanitize/retopo-authoring.cpp.o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/affine-proof/sanitize/document.cpp.o",
+            "-O1",
+            "-g1",
+            "-DNDEBUG",
+            "-fsanitize=address,undefined",
+            "-fno-omit-frame-pointer",
+            "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/affine-proof/sanitize/native-driver.o",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/affine-proof/sanitize/retopo-composed",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-preflight-qualified-0b6/artifacts/final-preflight/sanitize/stage/libdome-sculpt-core.a",
+            "libdome-sculpt-affine.a",
+            "/usr/lib64/liblapacke.so",
+            "libdome-sculpt-polygon.a",
+            "libxatlas.a",
+            "libmikktspace.a",
+            "libmikktspace-robust.a",
+            "libufbx.a",
+            "/usr/lib64/libpng.so",
+            "/usr/lib64/libjpeg.so",
+            "/usr/lib64/libz.so",
+            "libdome-sculpt-emission-codec.a",
+            "/usr/lib64/libOpenEXR-3_2.so",
+            "/usr/lib64/libOpenEXRUtil-3_2.so",
+            "/usr/lib64/libOpenEXRCore-3_2.so",
+            "/usr/lib64/libIex-3_2.so",
+            "/usr/lib64/libIlmThread-3_2.so",
+            "/usr/lib64/libImath-3_1.so",
+            "-lgcc_s_asneeded",
+            "-lgcc_s_asneeded"
+          ],
+          "exit": 0,
+          "expected": 0,
+          "seconds": 1.8787139690248296
+        },
+        {
+          "name": "actual-affine-and-two-legacy-native",
+          "args": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/affine-proof/sanitize/retopo-composed",
+            "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/affine-proof/sanitize/run"
+          ],
+          "exit": 1,
+          "expected": 0,
+          "seconds": 2.172137365967501
+        }
+      ],
+      "scope": "Three whole main10944 product TUs before immutable qualified mainc179 core/support; additive RetopoMesh method nofields/layout. New whole native/geometry test and unchanged legacy authoring/edge geometry. No archive rewrite/app/fullbuild/GPU claim.",
+      "additional_physical_cap_bytes": 805306368,
+      "tree_st_blocks_bytes": 716025856,
+      "free_bytes": 25893625856,
+      "phase": "actual-affine-and-two-legacy-native",
+      "child_pid": 1404877,
+      "exit": 1,
+      "error": "AssertionError('actual-affine-and-two-legacy-native failed')",
+      "seconds": 60.99719843897037,
+      "drift": []
+    }
+  },
+  "old_entry_counter": {
+    "exit": 1,
+    "message": "ACTUAL_OLD_ENTRY_REFUSAL This object has exact affine placement; use world_matrix\n"
+  },
+  "failed_sanitizer_archival": {
+    "state": "terminal",
+    "original_path": "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/affine-proof/sanitize/retopo-composed",
+    "original_sha256": "c8f339d795ab82e8c7dd194973884aa8e1d82577e5ae46f05c6979bd783919b1",
+    "original_bytes": 382194432,
+    "original_mode": 448,
+    "original_mtime_ns": 1793890526971369259,
+    "original_atime_ns": 1793890526989465154,
+    "archive_path": "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/affine-proof/sanitize/archived-closed-driver/retopo-composed.zst",
+    "archive_sha256": "d32b8c827dca5ec6070c1143a0b71534266c96ba963ec4ca06f6eb40923bb8fe",
+    "archive_bytes": 53208183,
+    "complete_decompressed_sha256": "c8f339d795ab82e8c7dd194973884aa8e1d82577e5ae46f05c6979bd783919b1",
+    "source_provenance": {
+      "include/dome/retopo.hpp": {
+        "original_sha256": "bd007f09e2ab35717bc3e894ae2f8b0246968102a1590ad1f860b8b36ca247c1",
+        "preserved_copy": "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/affine-proof/sanitize/archived-closed-driver/source/include/dome/retopo.hpp",
+        "copy_sha256": "bd007f09e2ab35717bc3e894ae2f8b0246968102a1590ad1f860b8b36ca247c1"
+      },
+      "src/retopo.cpp": {
+        "original_sha256": "e3f4596431ff09bf2121b3272130dc6ddc69fa46dde4939b730b673e8119f524",
+        "preserved_copy": "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/affine-proof/sanitize/archived-closed-driver/source/src/retopo.cpp",
+        "copy_sha256": "e3f4596431ff09bf2121b3272130dc6ddc69fa46dde4939b730b673e8119f524"
+      },
+      "src/retopo-authoring.cpp": {
+        "original_sha256": "8bd68dacd40be7cac96ee606acae26bddb9639cfd8ef83b996d618642e50384e",
+        "preserved_copy": "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/affine-proof/sanitize/archived-closed-driver/source/src/retopo-authoring.cpp",
+        "copy_sha256": "8bd68dacd40be7cac96ee606acae26bddb9639cfd8ef83b996d618642e50384e"
+      },
+      "src/document.cpp": {
+        "original_sha256": "db15a9ad05270b5665eca8d7740fea247dd951aa81eb4b2c3a6fbab24a9730ee",
+        "preserved_copy": "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/affine-proof/sanitize/archived-closed-driver/source/src/document.cpp",
+        "copy_sha256": "db15a9ad05270b5665eca8d7740fea247dd951aa81eb4b2c3a6fbab24a9730ee"
+      },
+      "CMakeLists.txt": {
+        "original_sha256": "75311fdd66f5f77a40fe7e81cd9d53bab26372bfcb62e5cccbaf5814f7cb7dc4",
+        "preserved_copy": "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/affine-proof/sanitize/archived-closed-driver/source/CMakeLists.txt",
+        "copy_sha256": "75311fdd66f5f77a40fe7e81cd9d53bab26372bfcb62e5cccbaf5814f7cb7dc4"
+      },
+      "tests/retopo-affine.cpp": {
+        "original_sha256": "ce52bd1fc794222aeff59fab50ddf8939227ac6c0a9624b98b61a51c356ba8ed",
+        "preserved_copy": "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/affine-proof/sanitize/archived-closed-driver/source/tests/retopo-affine.cpp",
+        "copy_sha256": "ce52bd1fc794222aeff59fab50ddf8939227ac6c0a9624b98b61a51c356ba8ed"
+      },
+      "tests/retopo-authoring.cpp": {
+        "original_sha256": "9ce774fd06b8ba49d5777950af0b9d74980add136ac9381fab54b10614df36b4",
+        "preserved_copy": "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/affine-proof/sanitize/archived-closed-driver/source/tests/retopo-authoring.cpp",
+        "copy_sha256": "9ce774fd06b8ba49d5777950af0b9d74980add136ac9381fab54b10614df36b4"
+      },
+      "tests/retopo-edges.cpp": {
+        "original_sha256": "2cda311bfaff318504cbe68de287ab5137eef5594e34f269a848f5e81ca655a3",
+        "preserved_copy": "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/affine-proof/sanitize/archived-closed-driver/source/tests/retopo-edges.cpp",
+        "copy_sha256": "2cda311bfaff318504cbe68de287ab5137eef5594e34f269a848f5e81ca655a3"
+      },
+      "artifacts/affine-proof/native-driver.cpp": {
+        "original_sha256": "8f3d7b6d33f0e8746d4e5fe60662a5674010826ffb05ed893d7e53b8b421024e",
+        "preserved_copy": "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/affine-proof/sanitize/archived-closed-driver/source/artifacts/affine-proof/native-driver.cpp",
+        "copy_sha256": "8f3d7b6d33f0e8746d4e5fe60662a5674010826ffb05ed893d7e53b8b421024e"
+      },
+      "artifacts/affine-proof/run.py": {
+        "original_sha256": "63de7e8c8820ed9afdd13ff3c667f8aa1dd1e0da12d47c1701204d6420fb1053",
+        "preserved_copy": "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/affine-proof/sanitize/archived-closed-driver/source/artifacts/affine-proof/run.py",
+        "copy_sha256": "63de7e8c8820ed9afdd13ff3c667f8aa1dd1e0da12d47c1701204d6420fb1053"
+      }
+    },
+    "failure_status": "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/affine-proof/sanitize/status.json",
+    "failure_log": "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/affine-proof/sanitize/actual-affine-and-two-legacy-native.log",
+    "scope": "Closed composed-consumer harness missing-return failure preserved. Product/native394 passed; legacy authoring reached final checks but emitted UB; edge cases notrun in this old execution. Archive restoration required before replay.",
+    "exit": 0,
+    "seconds": 2.8958559919847175,
+    "original_absent": true,
+    "restoration_command": [
+      "python3",
+      "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/affine-proof/restore-closed-sanitizer.py"
+    ]
+  },
+  "native_R_S_pairs": [
+    {
+      "name": "0-posed.dsculpt",
+      "release_sha256": "cd45ad1510223ff4c642adeb3b4b4b654b0486ad4923eda21e4591243c4c85d1",
+      "sanitize_sha256": "cd45ad1510223ff4c642adeb3b4b4b654b0486ad4923eda21e4591243c4c85d1",
+      "byte_identical": true
+    },
+    {
+      "name": "0-rest.dsculpt",
+      "release_sha256": "eda1e176e4bf5fe5328b111bbd99a8ad16f4615f16bd60a73fe805c17d70982f",
+      "sanitize_sha256": "eda1e176e4bf5fe5328b111bbd99a8ad16f4615f16bd60a73fe805c17d70982f",
+      "byte_identical": true
+    },
+    {
+      "name": "1-posed.dsculpt",
+      "release_sha256": "711f37d469444f78eb02c115a3b93c1281b7ff18a799657f137f4e01f07a7ef7",
+      "sanitize_sha256": "711f37d469444f78eb02c115a3b93c1281b7ff18a799657f137f4e01f07a7ef7",
+      "byte_identical": true
+    },
+    {
+      "name": "1-rest.dsculpt",
+      "release_sha256": "8fa1aa7badb4bed8c1262a4208c7e127f6132f3aff329e25c1b717ba6a399a3f",
+      "sanitize_sha256": "8fa1aa7badb4bed8c1262a4208c7e127f6132f3aff329e25c1b717ba6a399a3f",
+      "byte_identical": true
+    },
+    {
+      "name": "2-posed.dsculpt",
+      "release_sha256": "c952538a3c172f5de1196d099f929c6f4e5f71770218301ab573bfb18c8cf17c",
+      "sanitize_sha256": "c952538a3c172f5de1196d099f929c6f4e5f71770218301ab573bfb18c8cf17c",
+      "byte_identical": true
+    },
+    {
+      "name": "2-rest.dsculpt",
+      "release_sha256": "435f58c1cb2dbf2641971cd38101521195853ec09e6b22a1033f1b51a1c43345",
+      "sanitize_sha256": "435f58c1cb2dbf2641971cd38101521195853ec09e6b22a1033f1b51a1c43345",
+      "byte_identical": true
+    },
+    {
+      "name": "3-posed.dsculpt",
+      "release_sha256": "949b89ceac43aefc6a8f7c6132c4eebec7a50c0efca546456c65368c768b3ece",
+      "sanitize_sha256": "949b89ceac43aefc6a8f7c6132c4eebec7a50c0efca546456c65368c768b3ece",
+      "byte_identical": true
+    },
+    {
+      "name": "3-rest.dsculpt",
+      "release_sha256": "757cc0e0de166e28e1baa07cf4dd552b769a6d1a99d1d9e2233807f082111722",
+      "sanitize_sha256": "757cc0e0de166e28e1baa07cf4dd552b769a6d1a99d1d9e2233807f082111722",
+      "byte_identical": true
+    }
+  ],
+  "old_override_archive_members_extracted": [],
+  "limits": {
+    "maximum_task_bytes": 805306368,
+    "final_task_st_blocks_bytes": 776364032,
+    "free_floor_bytes": 21474836480
+  },
+  "remaining": [
+    "Immediate end_retopology(true)->save_async before input-to-AssetWork handoff remains a real product refusal. Passing gated Save occurs AFTER real atlas on accepted AssetWork; it does not repair that gap.",
+    "No new actual FLTK/XR-runtime/client app links yet; three existing native/controller test TU coverage only.",
+    "Current matrix fixture uses genuine native affine owners, skin, morph, sparse paint and viseme metadata; real external avatar imported source-graph and larger production/aggregate fault coverage remain required.",
+    "Adaptive remesh authoring, CATS prep/material consolidation, texture sets and all other original goal rows remain required."
+  ]
+}

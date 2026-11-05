@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/retopo-authoring.hpp"
+#include "dome/affine.hpp"
 #include "text-utf8.hpp"
 #include <limits>
 #include <type_traits>
@@ -49,21 +50,52 @@ RetopoWorkspace::RetopoWorkspace(const Scene &scene, const std::function<bool()>
   if (source_it == scene.objects().end())
     throw std::logic_error("Retopology reference deleted or unavailable; restore or choose a source");
   const auto &source = *source_it;
-  view_.transform = scene.world_transform(active.id);
-  auto source_transform = scene.world_transform(source.id);
+  const bool affine = scene.has_affine_placement(active.id) ||
+                      scene.has_affine_placement(source.id);
+  // An affine workspace uses actual world metres, so its existing similarity
+  // view can remain identity. No approximate TRS factorization is permitted.
+  view_.transform = affine ? CanvasTransform{} : scene.world_transform(active.id);
   auto mesh = source.mesh_active ? (source.deformation ? source.deformation->preview(source.painted->mesh())
                                                       : source.painted->mesh())
                                 : surface_mesh(*source.volume, cancelled);
   if (mesh.indices.empty()) throw std::runtime_error("The retopology source has no surface");
   // Both projection and editable points use the active object's local space,
   // including differently grouped/transformed or currently posed sources.
-  auto relative = ob::compose(ob::inverse(view_.transform), source_transform);
-  for (auto &p : mesh.positions) p = vec(ob::transform(relative, obv(p)));
-  for (auto &n : mesh.normals) n = vec(ob::rotate(relative.orientation, obv(n)));
+  if (affine) {
+    const auto matrix = scene.world_matrix(source.id);
+    for (auto &p : mesh.positions) {
+      stop(cancelled);
+      const auto q = matrix.point({p.x, p.y, p.z});
+      p = {float(q[0]), float(q[1]), float(q[2])};
+      if (!finite(p) || (q[0] != 0 && p.x == 0) ||
+          (q[1] != 0 && p.y == 0) || (q[2] != 0 && p.z == 0))
+        throw std::invalid_argument("Affine retopology source exceeds float geometry");
+    }
+    for (auto &n : mesh.normals) {
+      stop(cancelled);
+      const auto q = matrix.normal({n.x, n.y, n.z});
+      const double magnitude = std::hypot(q[0], q[1], q[2]);
+      if (!std::isfinite(magnitude) || magnitude == 0)
+        throw std::invalid_argument("Affine retopology source has an invalid world normal");
+      n = {float(q[0] / magnitude), float(q[1] / magnitude), float(q[2] / magnitude)};
+    }
+    if (matrix.orientation() == AffineOrientation::Reversing)
+      for (size_t i = 0; i < mesh.indices.size(); i += 3) {
+        stop(cancelled);
+        std::swap(mesh.indices[i + 1], mesh.indices[i + 2]);
+        if (!mesh.uv_seams.empty()) std::swap(mesh.uv_seams[i], mesh.uv_seams[i + 2]);
+      }
+  } else {
+    const auto relative = ob::compose(ob::inverse(view_.transform), scene.world_transform(source.id));
+    for (auto &p : mesh.positions) p = vec(ob::transform(relative, obv(p)));
+    for (auto &n : mesh.normals) n = vec(ob::rotate(relative.orientation, obv(n)));
+  }
   view_.source = std::make_shared<const SurfaceQuery>(mesh, cancelled);
-  view_.topology = active.retopology
-      ? std::make_shared<const RetopoMesh>(active.retopology->topology)
-      : std::make_shared<const RetopoMesh>();
+  if (active.retopology) {
+    auto topology = active.retopology->topology;
+    if (affine) topology.transform(scene.world_matrix(active.id), cancelled);
+    view_.topology = std::make_shared<const RetopoMesh>(std::move(topology));
+  } else view_.topology = std::make_shared<const RetopoMesh>();
   view_.topology->validate(cancelled);
   original_ = view_.topology;
 }

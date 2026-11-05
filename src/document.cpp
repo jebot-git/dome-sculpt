@@ -896,7 +896,8 @@ void Document::stamp_desktop(Brush b) {
   std::lock_guard lock(model_mutex_);
   if (!desktop_)
     throw std::logic_error("Desktop does not own the active stroke");
-  auto t = object_world_transform_locked(scene_.active().id);
+  auto t = state_.retopology ? state_.retopology->transform
+                            : object_world_transform_locked(scene_.active().id);
   b.from = world_to_model(t, b.from);
   b.to = world_to_model(t, b.to);
   b.radius /= t.scale;
@@ -934,7 +935,7 @@ std::optional<Vec3> Document::raycast(Vec3 p, Vec3 d, double material_time) cons
   if (!std::isfinite(material_time)) throw std::invalid_argument("Invalid material pick time");
   std::lock_guard lock(model_mutex_);
   if(scene_.active().polygon&&scene_.active().polygon->active&&!scene_.active().mesh_active)return {};
-  if(scene_.has_affine_placement(scene_.active().id)) {
+  if(!state_.retopology && scene_.has_affine_placement(scene_.active().id)) {
     auto snapshot=mesh_.load();
     if(!object_editable_locked(scene_.active().id)||snapshot->generation!=state_.generation||snapshot->revision!=state_.revision||!snapshot->picking)return {};
     auto hit=snapshot->picking->raycast(p,d,10,material_time,scene_.active().id);
@@ -965,7 +966,8 @@ std::optional<Vec3> Document::raycast(Vec3 p, Vec3 d, double material_time) cons
     if(!hit)return {};
     return held?std::optional<Vec3>(vec(ob::transform(delta,obv(hit->position)))):std::optional<Vec3>(hit->position);
   }
-  auto t = object_world_transform_locked(scene_.active().id);
+  auto t = state_.retopology ? state_.retopology->transform
+                            : object_world_transform_locked(scene_.active().id);
   if (state_.retopology) {
     if (!state_.retopology->source || retopo_accepting_) return {};
     auto direction = vec(ob::rotate(ob::conjugate(t.orientation), obv(d)));
@@ -986,6 +988,14 @@ std::optional<Vec3> Document::raycast(Vec3 p, Vec3 d, double material_time) cons
 }
 Vec3 Document::gradient(Vec3 p) const {
   std::lock_guard lock(model_mutex_);
+  if (state_.retopology) {
+    if (!state_.retopology->source || retopo_accepting_)
+      throw std::logic_error("Wait for the retopology source before querying its normal");
+    const auto &t = state_.retopology->transform;
+    SurfaceQueryOptions options; options.max_triangle_tests = 65'536;
+    const auto hit = state_.retopology->source->closest(world_to_model(t, p), options);
+    return vec(ob::rotate(t.orientation, obv(hit.normal)));
+  }
   if(scene_.has_affine_placement(scene_.active().id)) {
     auto snapshot=mesh_.load();
     if(snapshot->generation!=state_.generation||snapshot->revision!=state_.revision||!snapshot->picking)
@@ -1419,7 +1429,9 @@ void Document::process_locked(const SpatialFrame &incoming) {
   }
   if(!state_.selection_mode&&process_affine_paint_spatial_locked(f))return;
   const bool affine_target=scene_.has_affine_placement(scene_.active().id);
-  auto object_canvas = affine_target?state_.canvas:ob::compose(state_.canvas, object_world_transform_locked(scene_.active().id));
+  auto object_canvas = state_.retopology
+      ? ob::compose(state_.canvas, state_.retopology->transform)
+      : affine_target ? state_.canvas : ob::compose(state_.canvas, object_world_transform_locked(scene_.active().id));
   input_.radius = state_.radius / object_canvas.scale;
   input_.edit_allowed =
       !affine_target && (!scene_.active().mesh_active||!scene_.active().deformation||state_.weights.enabled) && !state_.asset_busy && object_editable_locked(scene_.active().id) &&
