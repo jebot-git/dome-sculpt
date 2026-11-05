@@ -5,8 +5,8 @@ namespace dome::detail {
 // Private transport prototype. The caller supplies complete evaluated world
 // position/N/T/B, not raw source attributes or an ownership certificate.
 // Four RGBA32F texels per logical output vertex; no vertex attribute slots.
-inline std::string refined_vertex_buffer_shader(bool canonical) {
- const std::string n=canonical?"canonical_":"source_";
+inline std::string refined_vertex_buffer_shader(bool canonical,bool geometric=false) {
+ const std::string n=geometric?"":canonical?"canonical_":"source_";
  return "#version 330 core\n"
  "uniform samplerBuffer columns; uniform mat4 view_projection;\n"
  "out vec3 world; out vec3 "+n+"n; out vec3 "+n+"t; out vec3 "+n+"b;\n"

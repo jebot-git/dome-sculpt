@@ -4,7 +4,7 @@
 #include "dome/affine.hpp"
 namespace dome::detail {
 enum class VertexBitangentPolicy { RawCross, UnitCross };
-enum class VertexColumnPath { Source, Canonical };
+enum class VertexColumnPath { Source, Canonical, Geometric };
 struct VertexStageMatrices {
  std::array<float,16> model{};
  std::array<float,9> normal{};
