@@ -537,6 +537,7 @@ private:
     uint64_t content = 0, revision = 0, isolation_target = 0;
     RecoverySource recovery_source;
     CanvasTransform pose{};
+    std::shared_ptr<const NativeAffineEdit> affine_pose;
     std::array<bool,2> grips{};
     std::exception_ptr error;
   };
@@ -549,6 +550,7 @@ private:
     std::shared_ptr<PolygonAccept> acceptance;
     std::optional<PolygonAction> action;
     Vec3 origin{}, direction{};
+    std::optional<AffineTransform> world; // True metric/pointer frame, including held/XR placement.
     float radius = .015f, amount = .01f, maximum = 100;
     unsigned cuts = 1;
     bool accept = false, convert_source = false, additive = false;

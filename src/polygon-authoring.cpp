@@ -1,5 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/polygon-authoring.hpp"
+#include "affine-interaction.hpp"
+#include "polygon-affine.hpp"
 #include <map>
 #include <set>
 namespace dome {
@@ -350,6 +352,74 @@ bool PolygonWorkspace::select_ray(Vec3 origin, Vec3 direction, float maximum,
   pick(best);
   return true;
 }
+bool PolygonWorkspace::select_ray_affine(const AffineTransform &world,
+    Vec3 origin,Vec3 direction,float maximum,float radius,bool additive,bool toggle,
+    const PolygonLimits &limits,bool preserve_selected_group) {
+  if(gesture_)throw std::logic_error("Finish the component move before picking");
+  if(!finite(origin)||!finite(direction)||!std::isfinite(maximum)||maximum<=0||
+     !std::isfinite(radius)||radius<=0)throw std::invalid_argument("Invalid affine polygon component pick");
+  stop(limits);
+  const detail::AffineInteractionFrame frame(world);
+  const auto ray=detail::affine_local_ray(frame,{origin.x,origin.y,origin.z},
+                                         {direction.x,direction.y,direction.z},maximum);
+  const auto &surface=current_.view->surface->mesh;
+  auto subtract=[](AffineVector a,AffineVector b){for(size_t k=0;k<3;++k)a[k]-=b[k];return a;};
+  auto dot=[](AffineVector a,AffineVector b){return a[0]*b[0]+a[1]*b[1]+a[2]*b[2];};
+  auto vector=[](Vec3 p){return AffineVector{p.x,p.y,p.z};};
+  size_t work=0;auto visit=[&]{stop(limits);if(++work>limits.maximum_work)throw std::length_error("Affine polygon pick exceeds work budget");};
+  size_t best=SIZE_MAX;double nearest=ray.maximum_distance;AffineVector hit{};
+  // Intersections stay double/local, without the legacy float-ray origin/range
+  // ceiling or rebuilding a transformed BVH for every pointer. World metric is
+  // applied only to the hit/component distances; translation cannot alter it.
+  // Same dominant-axis watertight edge expressions as SurfaceRay in
+  // mesh-processing.cpp (pinned Blender math_geom reference), extended to
+  // the actual double affine-local origin/direction. Shared edges do not
+  // acquire independent epsilon gaps and no nearest-surface fallback exists.
+  size_t z=std::abs(ray.direction[0])>std::abs(ray.direction[1])?0:1;
+  if(std::abs(ray.direction[2])>std::abs(ray.direction[z]))z=2;
+  size_t x=(z+1)%3,y=(x+1)%3;if(ray.direction[z]<0)std::swap(x,y);
+  const auto sz=1/ray.direction[z],sx=ray.direction[x]*sz,sy=ray.direction[y]*sz;
+  auto shear=[&](AffineVector p){p=subtract(p,ray.origin);return AffineVector{p[x]-sx*p[z],p[y]-sy*p[z],p[z]};};
+  for(size_t i=0;i<surface.indices.size();i+=3){
+    visit();auto a=vector(surface.positions[surface.indices[i]]),b=vector(surface.positions[surface.indices[i+1]]),c=vector(surface.positions[surface.indices[i+2]]);
+    const auto av=shear(a),bv=shear(b),cv=shear(c);
+    const auto u=cv[0]*bv[1]-cv[1]*bv[0],v=av[0]*cv[1]-av[1]*cv[0],w=bv[0]*av[1]-bv[1]*av[0],det=u+v+w;
+    if(((u<0||v<0||w<0)&&(u>0||v>0||w>0))||det==0||!std::isfinite(det))continue;
+    const auto distance=(u*av[2]+v*bv[2]+w*cv[2])*sz/det;
+    if(!std::isfinite(distance)||distance<0||distance>nearest)continue;
+    if(distance==nearest&&best!=SIZE_MAX&&i/3>best)continue;
+    best=i/3;nearest=distance;
+    for(size_t k=0;k<3;++k)hit[k]=(a[k]*u+b[k]*v+c[k]*w)/det;
+  }
+  if(best==SIZE_MAX)return false;
+  const auto &mesh=*current_.view->topology;
+  const auto face_id=current_.view->surface->triangle_faces.at(best);
+  auto pick=[&](PolygonId id){const auto &selection=*current_.view->selection;
+    if(preserve_selected_group&&std::find(selection.ids.begin(),selection.ids.end(),id)!=selection.ids.end())return;
+    select(id,additive,toggle,limits);};
+  if(current_.view->selection->mode==PolygonSelectionMode::Face){pick(face_id);return true;}
+  const auto &face=*std::find_if(mesh.faces().begin(),mesh.faces().end(),[&](const auto &f){return f.id==face_id;});
+  std::map<PolygonId,AffineVector> positions;
+  for(const auto &v:mesh.vertices()){visit();positions.emplace(v.id,vector(v.position));}
+  PolygonId chosen=0;double closest=radius;
+  auto consider=[&](PolygonId id,double d){if(d<closest||(d==closest&&(!chosen||id<chosen))){closest=d;chosen=id;}};
+  if(current_.view->selection->mode==PolygonSelectionMode::Vertex){
+    for(const auto &c:face.corners){visit();auto delta=world.direction(subtract(positions.at(c.vertex),hit));consider(c.vertex,std::hypot(delta[0],delta[1],delta[2]));}
+  }else{
+    std::map<std::pair<PolygonId,PolygonId>,PolygonId> edges;
+    for(const auto &e:mesh.edges()){visit();edges.emplace(std::minmax(e.a,e.b),e.id);}
+    for(size_t i=0;i<face.corners.size();++i){visit();auto a=face.corners[i].vertex,b=face.corners[(i+1)%face.corners.size()].vertex;
+      auto from=world.direction(subtract(positions.at(a),hit)),along=world.direction(subtract(positions.at(b),positions.at(a)));
+      auto size=std::hypot(along[0],along[1],along[2]);if(size==0)continue;
+      for(auto &x:along)x/=size;
+      auto t=std::clamp(-dot(from,along),0.,size);
+      for(size_t k=0;k<3;++k)from[k]+=along[k]*t;
+      consider(edges.at(std::minmax(a,b)),std::hypot(from[0],from[1],from[2]));
+    }
+  }
+  if(!chosen)return false;
+  stop(limits);pick(chosen);return true;
+}
 void PolygonWorkspace::trim_history() {
   size_t components = 0;
   for (auto i = undo_.rbegin(); i != undo_.rend(); ++i) {
@@ -430,6 +500,30 @@ void PolygonWorkspace::apply(PolygonOperation operation, Vec3 delta,
   auto next = prepare(std::move(*result.replacement), *current_.view->selection,
                       limits, std::move(colors));
   commit(std::move(next), current_);
+}
+void PolygonWorkspace::apply_affine(const AffineTransform &world,
+                                    PolygonOperation operation,float amount,
+                                    unsigned cuts,const PolygonLimits &limits) {
+  if(gesture_)throw std::logic_error("Finish the component move before another operation");
+  // Only metric-dependent operations need a detached world-domain kernel.
+  // Topological operations retain the legacy exact local authority/arithmetic.
+  if(operation!=PolygonOperation::Extrude&&operation!=PolygonOperation::Inset){
+    apply(operation,{},amount,cuts,limits);return;
+  }
+  const auto frame=PolygonAffineAccess::linear(world);
+  const auto &source=*current_.view->topology;
+  auto placed=PolygonAffineAccess::placed(source,frame,limits);
+  PolygonEdit edit{operation,*current_.view->selection,{},amount,cuts,high_water_};
+  PolygonEditResult result;std::shared_ptr<const PolygonColorField> colors;
+  if(current_.view->colors){
+    auto colored=edit_colored_polygon(placed,*current_.view->colors,edit,limits);
+    result=std::move(colored.geometry);
+    if(colored.colors)colors=std::make_shared<const PolygonColorField>(std::move(*colored.colors));
+  }else result=edit_polygon(placed,edit,limits);
+  if(!result.replacement)return;
+  auto local=PolygonAffineAccess::returned(std::move(*result.replacement),source,placed,frame,limits);
+  auto next=prepare(std::move(local),*current_.view->selection,limits,std::move(colors));
+  commit(std::move(next),current_);
 }
 void PolygonWorkspace::begin_move() {
   if (gesture_)

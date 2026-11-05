@@ -56,7 +56,8 @@ inline std::optional<DesktopFraming> desktop_framing(const EditorSnapshot &frame
   if(preview.view&&preview.view->display&&desktop_range_eligible(state,SurfaceRange{preview.object,0,1,{}},selected)){
     const auto &view=*preview.view;const auto &surface=view.surface->mesh;
     for(auto vertex:surface.indices){auto p=surface.positions.at(vertex)+view.move_delta*view.display->move_weights.at(vertex);
-      auto q=ob::transform(preview.world,{p.x,p.y,p.z});add({q.x,q.y,q.z});}
+      if(preview.affine_world){auto q=preview.affine_world->point({p.x,p.y,p.z});add({float(q[0]),float(q[1]),float(q[2])});}
+      else {auto q=ob::transform(preview.world,{p.x,p.y,p.z});add({q.x,q.y,q.z});}}
   }
   if(state.retopology&&state.retopology->topology&&desktop_range_eligible(state,SurfaceRange{state.active_object,0,1,{}},selected)){
     for(const auto &[id,vertex]:state.retopology->topology->vertices()){
