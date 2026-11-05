@@ -37,14 +37,17 @@ Vrm1ExpressionLayer compile_vrm1_expression_layer(const J &original,const Sculpt
  for(auto role:{MToonSlot::Normal,MToonSlot::Matcap,MToonSlot::Rim,MToonSlot::OutlineWidth,MToonSlot::Shift,MToonSlot::UvMask})
   if(binding.roles[size_t(role)].image)throw std::invalid_argument("VRM1 expression layer role needs its independent consumer adapter");
  const auto &base=binding.roles[0],&shade=binding.roles[1];const auto &bt=material.textures[0],&st=material.textures[1];
- if(base.image&&base.image==shade.image&&base.wrap_s==shade.wrap_s&&base.wrap_t==shade.wrap_t&&base.min_filter==shade.min_filter&&base.mag_filter==shade.mag_filter&&mtoon_coordinate(bt)==mtoon_coordinate(st)&&bt.offset==st.offset&&bt.scale==st.scale&&bt.rotation==st.rotation)
-  throw std::invalid_argument("VRM1 expression layer shared base/shade needs its distinct painted shade adapter");
  Vrm1ExpressionLayer result;bool found=false,colour=false;
+ result.shade_alias=base.image&&base.image==shade.image&&base.wrap_s==shade.wrap_s&&base.wrap_t==shade.wrap_t&&base.min_filter==shade.min_filter&&base.mag_filter==shade.mag_filter&&mtoon_coordinate(bt)==mtoon_coordinate(st)&&bt.offset==st.offset&&bt.scale==st.scale&&bt.rotation==st.rotation;
+ if(result.shade_alias)for(size_t k=0;k<3;++k)result.shade_divisor[k]=object.material.color[k]!=0?object.material.color[k]:1;
+ auto shade_factor=[&](const std::array<float,3> &factor){if(result.shade_alias)for(size_t k=0;k<3;++k){const double value=double(factor[k])/result.shade_divisor[k];if(!std::isfinite(value)||value<0||value>1)throw std::invalid_argument("VRM1 shared painted shade factor exceeds standard unit representation");}};
+ shade_factor({material.parameters.shade_color.x,material.parameters.shade_color.y,material.parameters.shade_color.z});
  const auto expressions=original.at("extensions").at("VRMC_vrm").value("expressions",J::object());
  for(const auto *table:{"preset","custom"})if(expressions.contains(table))for(const auto &expression:expressions.at(table)){
   for(const auto &bind:expression.value("materialColorBinds",J::array()))if(bind.at("material").get<int>()==object.appearance->source_material){
    if(bind.at("type")=="rimColor")throw std::invalid_argument("VRM1 rim colour expression needs its layered lighting adapter");
    colour|=bind.at("type")=="color";
+   if(bind.at("type")=="shadeColor"){const auto target=bind.at("targetValue").get<std::array<float,4>>();shade_factor({target[0],target[1],target[2]});}
   }
   for(const auto &bind:expression.value("textureTransformBinds",J::array()))if(bind.at("material").get<int>()==object.appearance->source_material){
   const auto scale=bind.value("scale",std::array<float,2>{1,1}),offset=bind.value("offset",std::array<float,2>{});

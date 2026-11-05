@@ -18,12 +18,11 @@ inspected. See validation/CURRENT-AUTHORING-UI.json and the foundation's
 COHERENT-AUTHORING-BUILDS.md. The complete 689-test Release regression is running
 in explicit batches; it is not yet a full-suite pass.
 
-The next source 1f4f55c combines the genuine repository-backed anatomical fixture
-chain and shared-shade VRM expressions with that foundation. Its fresh optimized
-application/core/render/support build completes 294 tasks and all 52 selected
-tests pass, including all 17 female/male/caller anatomical endpoints. Its separate
-fresh sanitizer build and selected tests remain running. The graph has 709
-registered tests. New private expression fields require matching dependent TUs;
+The [qualified source 1f4f55c / seal 9ea61b8](https://github.com/jebot-git/dome-sculpt/tree/9ea61b8) combines the genuine repository-backed anatomical fixture chain and shared-shade
+VRM expressions with that foundation. Fresh owning application/core/render/support
+builds complete 294 tasks and all 52 selected tests pass in both Release and
+sanitizer, including all 17 female/male/caller anatomical endpoints. This source
+is now integrated on main. The graph has 709 registered tests. New private expression fields require matching dependent TUs;
 this candidate rebuilds the complete owning cohort. It is not a full 709-test
 runtime result. The [frontend-off correction 26a0704](https://github.com/jebot-git/dome-sculpt/tree/26a0704) separately passes a fresh 191-task offscreen build and four real tests;
 default frontend commands/properties remain identical. FLTK remains the default.
@@ -57,8 +56,10 @@ paint but failed to capture the first complete rig source. The [first-source rep
 changes one production TU and passes 164 owning/history checks and 1,424 worker
 checks per profile, including all measured small-fixture helper failures, real
 mid-helper Cancel, stale-generation discard and dependent Save. Broader legacy
-and original-source controls also pass. Actual native32 post-bind UV and key
-editing are the next adapter work. Scene36/material18 is reserved for genuine
+and original-source controls also pass. The [pure-skin UV continuation d3dadbc](https://github.com/jebot-git/dome-sculpt/tree/d3dadbc74444e700db50d2e73dec9f72fd4b56a8) now passes 72 workflow, 74 legacy and 332 actual worker checks each profile,
+including all 157 measured small paired-helper failures and exact affine
+rest/pose/space/inverse binds. Its combined qualification is running. Native32
+key/frame composition remains active. Scene36/material18 is reserved for genuine
 native-paint/key-frame composition if required; version numbers alone grant no
 authority.
 
@@ -73,10 +74,9 @@ disabled failures or increased caps are used. Actual current canonical-normal,
 UV, key and physical-emission composition is being implemented in a new child.
 
 Typed VRM1 expression work includes qualified [colour-only 5310](https://github.com/jebot-git/dome-sculpt/tree/5310acba0495384e3ba654d70355f95a9e28c201) and
-[shared-shade ccc109e](https://github.com/jebot-git/dome-sculpt/tree/ccc109e540704121d5dc439c407efe7bd439b20d) milestones with independent Release/sanitizer/Arc evidence. A further
-UV-invariant upper-role adapter now passes its actual worker, mixed-expression
-image and failure/cancellation checks in Release/sanitizer; hardware and final
-schema/cohort sealing are in progress. Full MASK/BLEND, wider coefficient and
+[shared-shade ccc109e](https://github.com/jebot-git/dome-sculpt/tree/ccc109e540704121d5dc439c407efe7bd439b20d) milestones with independent Release/sanitizer/Arc evidence. The [UV-invariant upper-role adapter 196ea93](https://github.com/jebot-git/dome-sculpt/tree/196ea9373dbb053c064a5c28783f1eb374a78987) is sealed after actual Release/sanitizer/Arc worker, mixed-expression image,
+failure/cancellation and official/Khronos checks. It is in the next combined
+qualification. Full MASK/BLEND, wider coefficient and
 remaining role adapters stay required. The separate original long source-world
 sanitizer sweep remains live and incomplete.
 

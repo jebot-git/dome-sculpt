@@ -1,0 +1,1497 @@
+{
+  "source_built": "da0b34c10dc4297bdceb34250307d40efea9673a",
+  "base_repair": "f7f1e13e9121184affe9b4863a82ec46d9b927d2",
+  "qualified_component": "31918d1190a42bf4aa77b0eabeead41208f48888",
+  "original_complete_support": "44efeb7fec2d79a820a1a64b04c70affb192edf3",
+  "scope": "Current44 matched-source component, no765/header mixing; not fresh ALL/main/general default admission",
+  "runtime_and_new_fixture_sha256": {
+    "src/anatomical-continuation.hpp": "935a7db3525b41513b273cd356712e27fbaf06e000b8beddb6e68f13f3f4eed9",
+    "src/geometry-reference-replay.hpp": "22caf09b83c85e45ed50013f4c6631db07835ffa04eae1eb41190221cc9a06a7",
+    "src/geometry-field-packing.hpp": "b540acc0d6a32bb3633677dffe4402b4a50d0b94c7a466b0ee8ff2a7d7c29b48",
+    "src/geometry-weight-authoring.hpp": "7a97deb5e1a92fef6f5f02ee75595d92fe117e477db3fa69a06347accc432b60",
+    "src/rig-edit.cpp": "88ce2252381844b04375859c482ac87efd33263ea0ad7f5a18d439b8b49ce9c3",
+    "src/scene.cpp": "ab2a25c7a435d18ec0e7220aca44e53c304d46f9932be45f7676d1ecba83eb60",
+    "src/material-bindings.cpp": "59d35be00767bb77899e56c1a5196fb632439addc3f67944430f48c23c6d1404",
+    "src/export.cpp": "41a5589abb94b0899ae8dd9c0e28ca0baabcc284c82e7fa30a8111f92e477309",
+    "tests/anatomical-caller-faults.cpp": "e8150c3c27fb1f09d1184c8e5a83ea345480999b32e286005dc1e9d32507ce77"
+  },
+  "caller_committed_source_equals_executed_artifact": true,
+  "compiler_archive_closure": {
+    "release": {
+      "archive_members": 157,
+      "rebuilt_product_members": [
+        "anatomical-authoring.cpp.o",
+        "export.cpp.o",
+        "material-bindings.cpp.o",
+        "rig-edit.cpp.o",
+        "scene.cpp.o"
+      ],
+      "byte_different_members": [
+        "scene.cpp.o",
+        "material-bindings.cpp.o",
+        "export.cpp.o",
+        "anatomical-authoring.cpp.o"
+      ],
+      "rebuilt_byte_identical_members": [
+        "rig-edit.cpp.o"
+      ],
+      "product_and_first9_fixture_depfiles": 14,
+      "unique_current_owned_headers_and_sources": 199,
+      "foreign_project_compiler_inputs": [],
+      "original_core": "aeda2c2ae05b1db83e13cbc682717eeae377ca8c7423244e3fa2819e4c0833d1",
+      "component_core": "72f5be39475f5bae765ea76de84566467a25e7c49c1b9b1adfc034f9a715bf5b"
+    },
+    "sanitize": {
+      "archive_members": 157,
+      "rebuilt_product_members": [
+        "anatomical-authoring.cpp.o",
+        "export.cpp.o",
+        "material-bindings.cpp.o",
+        "rig-edit.cpp.o",
+        "scene.cpp.o"
+      ],
+      "byte_different_members": [
+        "scene.cpp.o",
+        "material-bindings.cpp.o",
+        "export.cpp.o",
+        "rig-edit.cpp.o",
+        "anatomical-authoring.cpp.o"
+      ],
+      "rebuilt_byte_identical_members": [],
+      "product_and_first9_fixture_depfiles": 14,
+      "unique_current_owned_headers_and_sources": 199,
+      "foreign_project_compiler_inputs": [],
+      "original_core": "d2a7aab979bc7905dfa923de17af0a8a774254dbb22c25f5dfb92c98a2859c08",
+      "component_core": "08ba662ff8c50164dc8fce3f3d8f7069972bce8f6b1d62796b9f53d2871625ef"
+    }
+  },
+  "proofs": {
+    "release/build-status.json": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/release/build-status.json",
+      "sha256": "b52d03f7b2e2c154ac47eba896d64495d5e33a62137904f8216098db26e41c8d",
+      "record": {
+        "state": "terminal",
+        "pid": 2476293,
+        "source": "da0b34c10dc4297bdceb34250307d40efea9673a",
+        "profile": "release",
+        "scope": "Matched-source current44 component: original completed44 whole-owned support, all changed-header product consumers and three f7 repair product TUs rebuilt; all used test TUs freshly rebuilt from own current44 headers. Not fresh ALL. No765/archive overlay.",
+        "header_closure": {
+          "headers": [
+            "src/anatomical-continuation.hpp",
+            "src/geometry-weight-authoring.hpp",
+            "src/geometry-reference-replay.hpp",
+            "src/geometry-field-packing.hpp"
+          ],
+          "product_tus": [
+            "src/rig-edit.cpp",
+            "src/anatomical-authoring.cpp"
+          ],
+          "existing_built_test_tus": [
+            "tests/anatomical-admission-controls.cpp",
+            "tests/authoring-native-normal-union.cpp"
+          ],
+          "repair_tus": [
+            "src/scene.cpp",
+            "src/material-bindings.cpp",
+            "src/export.cpp"
+          ],
+          "changed_sources": [
+            "src/anatomical-continuation.hpp",
+            "src/export.cpp",
+            "src/geometry-field-packing.hpp",
+            "src/geometry-reference-replay.hpp",
+            "src/geometry-weight-authoring.hpp",
+            "src/material-bindings.cpp",
+            "src/scene.cpp"
+          ]
+        },
+        "source_inputs": 4617,
+        "phase": "link-union",
+        "drift": [],
+        "exit": 0,
+        "seconds": 254.93088039499708
+      }
+    },
+    "release/run-status.json": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/release/run-status.json",
+      "sha256": "b4de6897fcbd67431a62e50207ebb69158c716c57f261ccdba26ea891312a524",
+      "record": {
+        "state": "terminal",
+        "profile": "release",
+        "pid": 2503669,
+        "source": "da0b34c10dc4297bdceb34250307d40efea9673a",
+        "steps": [
+          {
+            "name": "reference",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/release/reference"
+            ],
+            "exit": 0,
+            "seconds": 0.009002030012197793
+          },
+          {
+            "name": "packing",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/release/packing"
+            ],
+            "exit": 0,
+            "seconds": 0.11505046405363828
+          },
+          {
+            "name": "kernel-faults",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/release/kernel-faults"
+            ],
+            "exit": 0,
+            "seconds": 0.01652554504107684
+          },
+          {
+            "name": "controls",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/release/controls"
+            ],
+            "exit": 0,
+            "seconds": 0.008899414038751274
+          },
+          {
+            "name": "female-public",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/release/workflow",
+              "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-main-38e8c60/artifacts/female-owning-release/fitted-unskinned.dsculpt",
+              "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-main-38e8c60/artifacts/female-owning-release/bound.dsculpt",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/release/female-public"
+            ],
+            "exit": 0,
+            "seconds": 20.775787207996473
+          },
+          {
+            "name": "male-public",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/release/workflow",
+              "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-main-38e8c60/artifacts/male-owning-release/fitted-unskinned.dsculpt",
+              "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-main-38e8c60/artifacts/male-owning-release/bound.dsculpt",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/release/male-public"
+            ],
+            "exit": 0,
+            "seconds": 20.76898794801673
+          },
+          {
+            "name": "worker-female",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/release/worker",
+              "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-main-38e8c60/artifacts/female-owning-release/fitted-unskinned.dsculpt",
+              "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-main-38e8c60/artifacts/female-owning-release/bound.dsculpt",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/release/worker-female"
+            ],
+            "exit": 0,
+            "seconds": 23.025280871021096
+          },
+          {
+            "name": "native32-fixture",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/release/native32-export",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/release/native32-fixture.dsculpt",
+              "--fixture-only"
+            ],
+            "exit": 0,
+            "seconds": 0.032640549005009234
+          },
+          {
+            "name": "native32-export-software",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/release/native32-export",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/release/native32-export-data"
+            ],
+            "exit": 0,
+            "seconds": 1.36765262496192
+          },
+          {
+            "name": "native32-contracts",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/release/native32-contracts",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/release/native32-contract-data",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/release/native32-fixture.dsculpt"
+            ],
+            "exit": 0,
+            "seconds": 0.2653610500274226
+          }
+        ],
+        "phase": "native32-contracts",
+        "child": 2511087,
+        "drift": [],
+        "exit": 0,
+        "seconds": 67.37500162702054,
+        "inputs": 4670
+      }
+    },
+    "release/pose/status.json": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/release/pose/status.json",
+      "sha256": "4200f047b7e3f6f94f43b9ff6d929f7013516766f922dd78b119041788886e9a",
+      "record": {
+        "state": "terminal",
+        "pid": 2512665,
+        "profile": "release",
+        "steps": [
+          {
+            "name": "compile-scope",
+            "command": [
+              "/usr/bin/c++",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/src",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/third_party/nlohmann",
+              "-O3",
+              "-DNDEBUG",
+              "-std=gnu++20",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/release/pose/scope.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/tests/native-rig-pose-scope.cpp",
+              "-MMD",
+              "-MF",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/release/pose/scope.o.d"
+            ],
+            "exit": 0,
+            "seconds": 7.481082448037341
+          },
+          {
+            "name": "link-scope",
+            "command": [
+              "/usr/bin/c++",
+              "-O3",
+              "-DNDEBUG",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/release/pose/scope.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/release/pose/scope",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/release/libdome-sculpt-core.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/release/libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/release/libdome-sculpt-polygon.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/release/libxatlas.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/release/libmikktspace.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/release/libmikktspace-robust.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/release/libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/release/libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit": 0,
+            "seconds": 0.5655677529866807
+          },
+          {
+            "name": "compile-faults",
+            "command": [
+              "/usr/bin/c++",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/src",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/third_party/nlohmann",
+              "-O3",
+              "-DNDEBUG",
+              "-std=gnu++20",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/release/pose/faults.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/tests/native-rig-pose-faults.cpp",
+              "-MMD",
+              "-MF",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/release/pose/faults.o.d"
+            ],
+            "exit": 0,
+            "seconds": 3.3225957350223325
+          },
+          {
+            "name": "link-faults",
+            "command": [
+              "/usr/bin/c++",
+              "-O3",
+              "-DNDEBUG",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/release/pose/faults.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/release/pose/faults",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/release/libdome-sculpt-core.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/release/libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/release/libdome-sculpt-polygon.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/release/libxatlas.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/release/libmikktspace.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/release/libmikktspace-robust.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/release/libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/release/libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit": 0,
+            "seconds": 0.26508776599075645
+          },
+          {
+            "name": "compile-export",
+            "command": [
+              "/usr/bin/c++",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/third_party/cgltf",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/third_party/nlohmann",
+              "-O3",
+              "-DNDEBUG",
+              "-std=gnu++20",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/release/pose/export.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/tests/native-linked-pose-export.cpp",
+              "-MMD",
+              "-MF",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/release/pose/export.o.d"
+            ],
+            "exit": 0,
+            "seconds": 3.9731814789702184
+          },
+          {
+            "name": "link-export",
+            "command": [
+              "/usr/bin/c++",
+              "-O3",
+              "-DNDEBUG",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/release/pose/export.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/release/pose/export",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/release/libdome-sculpt-core.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/release/libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/release/libdome-sculpt-polygon.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/release/libxatlas.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/release/libmikktspace.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/release/libmikktspace-robust.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/release/libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/release/libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit": 0,
+            "seconds": 0.3155081029981375
+          },
+          {
+            "name": "female-scope",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/release/pose/scope",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/release/female-public/full.dsculpt",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/release/pose/female-scope"
+            ],
+            "exit": 0,
+            "seconds": 9.239334877987858
+          },
+          {
+            "name": "female-faults",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/release/pose/faults",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/release/female-public/full.dsculpt"
+            ],
+            "exit": 0,
+            "seconds": 6.328699041041546
+          },
+          {
+            "name": "female-linked-export",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/release/pose/export",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/release/pose/female-scope/linked.dsculpt",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/release/pose/female-linked-export"
+            ],
+            "exit": 0,
+            "seconds": 4.475978200032841
+          },
+          {
+            "name": "female-controller-export",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/release/pose/export",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/release/pose/female-scope/controller.dsculpt",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/release/pose/female-controller-export"
+            ],
+            "exit": 0,
+            "seconds": 4.625343469029758
+          },
+          {
+            "name": "male-scope",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/release/pose/scope",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/release/male-public/full.dsculpt",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/release/pose/male-scope"
+            ],
+            "exit": 0,
+            "seconds": 8.944369834964164
+          },
+          {
+            "name": "male-faults",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/release/pose/faults",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/release/male-public/full.dsculpt"
+            ],
+            "exit": 0,
+            "seconds": 6.380552047980018
+          },
+          {
+            "name": "male-linked-export",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/release/pose/export",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/release/pose/male-scope/linked.dsculpt",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/release/pose/male-linked-export"
+            ],
+            "exit": 0,
+            "seconds": 5.226588035002351
+          },
+          {
+            "name": "male-controller-export",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/release/pose/export",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/release/pose/male-scope/controller.dsculpt",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/release/pose/male-controller-export"
+            ],
+            "exit": 0,
+            "seconds": 5.326894469035324
+          }
+        ],
+        "phase": "male-controller-export",
+        "child": 2518424,
+        "drift": [],
+        "exit": 0,
+        "seconds": 67.88067980896449,
+        "inputs": 4668,
+        "artifacts": {
+          "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/release/pose/scope.o.d": "47403b451047c7c2dfe8fd8c7489d06619b1bad969e890e4a4a76afc317b3343",
+          "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/release/pose/scope.o": "52c155a02567ac34e3c0d136ce1587d1661f39c6aa504ec0fdae6867e32e75a0",
+          "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/release/pose/scope": "e5020fade7a3358e719ec5aa4634c54d4bb092e25371aa4fe5ec18f2e21870dd",
+          "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/release/pose/faults.o.d": "3c98857a8877171f6b0c3b10e4f68ce726dee0a928cd6a43bb5447e1e7030552",
+          "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/release/pose/faults.o": "3e8bb43722d496f35156ee28ff6b669e0a7ff7aea034cddd69b0879068da759c",
+          "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/release/pose/faults": "6ccf6b7d823f2748cc6962126210dc783986a8cfa656d2ba26e4cc9bf6b26a0b",
+          "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/release/pose/export.o.d": "b3ab70b2aa660695aff2efe3d54a21075b6c29a10c3adfd4523a8de6f387109c",
+          "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/release/pose/export.o": "ddd5c1f3025bab9deac316260b833fb66e0f61db8e7fd9a60108c50333cb819e",
+          "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/release/pose/export": "94e7b9db54bb25a8a83a5584e2aaa9d3d0c3acf1d182ba98bee6e7cf37777819"
+        }
+      }
+    },
+    "release/admission/status.json": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/release/admission/status.json",
+      "sha256": "186516b5c446f6b4404eadd6948d7554c330373f53c126aabc81a0c819d35db4",
+      "record": {
+        "state": "terminal",
+        "pid": 2540813,
+        "profile": "release",
+        "steps": [
+          {
+            "name": "compile",
+            "command": [
+              "/usr/bin/c++",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/src",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/third_party/nlohmann",
+              "-O3",
+              "-DNDEBUG",
+              "-std=gnu++20",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/release/admission/admission.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/admission.cpp",
+              "-MMD",
+              "-MF",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/release/admission/admission.o.d"
+            ],
+            "exit": 0,
+            "seconds": 6.982339453010354
+          },
+          {
+            "name": "link",
+            "command": [
+              "/usr/bin/c++",
+              "-O3",
+              "-DNDEBUG",
+              "-Wl,--wrap=_ZN4dome22author_anatomical_skinERNS_5SceneESt4spanIKmLm18446744073709551615EERKNS_20SkinAuthoringOptionsERKSt8functionIFbvEE",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/release/admission/admission.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/release/admission/admission",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/release/libdome-sculpt-core.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/release/libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/release/libdome-sculpt-polygon.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/release/libxatlas.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/release/libmikktspace.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/release/libmikktspace-robust.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/release/libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/release/libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit": 0,
+            "seconds": 0.3653236459940672
+          },
+          {
+            "name": "actual-caller",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/release/admission/admission",
+              "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-main-38e8c60/artifacts/female-owning-release/fitted-unskinned.dsculpt",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/release/admission/data"
+            ],
+            "exit": 0,
+            "seconds": 12.141755571996327
+          }
+        ],
+        "phase": "actual-caller",
+        "child": 2541553,
+        "exit": 0,
+        "seconds": 20.152072925004177,
+        "drift": [],
+        "inputs": 4669,
+        "artifacts": {
+          "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/release/admission/admission.o.d": "1b2e13b4b95d2dacd0c5db90710c1da009c49264f095c249ec75142ae5731e09",
+          "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/release/admission/admission.o": "57d8836afacebbebd8845fb361b49322c8e1d486e31a027795aac5c27094e063",
+          "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/release/admission/admission": "0540b8920a9c518f825764a26ed7a018320b9f1f8182ed24134a399d0340ba88"
+        }
+      }
+    },
+    "release/pose-khronos.json": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/release/pose-khronos.json",
+      "sha256": "4f87a7206d680dc4311ca16a2ee95e59d1c7964af9f25237b255dfe50d98a68f",
+      "record": {
+        "version": "2.0.0-dev.3.10",
+        "scope": "Independent pinned Khronos validator, all issues retained without filtering",
+        "files": 4,
+        "totals": {
+          "errors": 0,
+          "warnings": 76,
+          "infos": 8,
+          "hints": 0
+        },
+        "drift": []
+      }
+    },
+    "release/native32-khronos.json": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/release/native32-khronos.json",
+      "sha256": "fe3035f4b0dcd7bdb42640739dc927c2c852d38d47921e0105ccf0af1fbb838d",
+      "record": {
+        "version": "2.0.0-dev.3.10",
+        "scope": "Independent pinned Khronos validator, all issues retained without filtering",
+        "files": 14,
+        "totals": {
+          "errors": 0,
+          "warnings": 3,
+          "infos": 40,
+          "hints": 0
+        },
+        "drift": [],
+        "deliberatelyRejected": [
+          {
+            "file": "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/release/native32-export-data/strict-hdr-refused.glb",
+            "sha256": "7476c0cbc8af8346e2efa698950d3c30f3e9917a34420193120c76dcc820a837",
+            "reason": "Untouched prior-file sentinel at deliberately refused strict-HDR export path; not an emitted glTF"
+          }
+        ]
+      }
+    },
+    "release/contracts-khronos.json": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/release/contracts-khronos.json",
+      "sha256": "b4a3407c7b3526c9e1cf3f308bc70db19a6d4857d6ebbedcfb0a41cc6873d346",
+      "record": {
+        "version": "2.0.0-dev.3.10",
+        "scope": "Independent pinned Khronos validator, all issues retained without filtering",
+        "files": 2,
+        "totals": {
+          "errors": 0,
+          "warnings": 0,
+          "infos": 6,
+          "hints": 0
+        },
+        "drift": [],
+        "deliberatelyRejected": [
+          {
+            "file": "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/release/native32-contract-data/queued.glb",
+            "sha256": "4ed20751a26ee2d622db2c4e1912b7ae2834ee3fe44d60dcd6836149956c866f",
+            "reason": "Untouched prior-file sentinel at deliberately refused or cancelled export path; not an emitted glTF"
+          }
+        ]
+      }
+    },
+    "sanitize/build-status.json": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/sanitize/build-status.json",
+      "sha256": "f2e34144d0889cfe861a9a2700cfe04e6939ba284f78a6c609b7c9c56c82ac8e",
+      "record": {
+        "state": "terminal",
+        "pid": 2477073,
+        "source": "da0b34c10dc4297bdceb34250307d40efea9673a",
+        "profile": "sanitize",
+        "scope": "Matched-source current44 component: original completed44 whole-owned support, all changed-header product consumers and three f7 repair product TUs rebuilt; all used test TUs freshly rebuilt from own current44 headers. Not fresh ALL. No765/archive overlay.",
+        "header_closure": {
+          "headers": [
+            "src/anatomical-continuation.hpp",
+            "src/geometry-weight-authoring.hpp",
+            "src/geometry-reference-replay.hpp",
+            "src/geometry-field-packing.hpp"
+          ],
+          "product_tus": [
+            "src/rig-edit.cpp",
+            "src/anatomical-authoring.cpp"
+          ],
+          "existing_built_test_tus": [
+            "tests/anatomical-admission-controls.cpp",
+            "tests/authoring-native-normal-union.cpp"
+          ],
+          "repair_tus": [
+            "src/scene.cpp",
+            "src/material-bindings.cpp",
+            "src/export.cpp"
+          ],
+          "changed_sources": [
+            "src/anatomical-continuation.hpp",
+            "src/export.cpp",
+            "src/geometry-field-packing.hpp",
+            "src/geometry-reference-replay.hpp",
+            "src/geometry-weight-authoring.hpp",
+            "src/material-bindings.cpp",
+            "src/scene.cpp"
+          ]
+        },
+        "source_inputs": 4617,
+        "phase": "link-union",
+        "drift": [],
+        "exit": 0,
+        "seconds": 463.83281782397535
+      }
+    },
+    "sanitize/run-status.json": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/sanitize/run-status.json",
+      "sha256": "e09cac91b07c5e6b23a865bd3bb380ac383803695b4d3eaff0f5fb273df98432",
+      "record": {
+        "state": "terminal",
+        "profile": "sanitize",
+        "pid": 2527714,
+        "source": "da0b34c10dc4297bdceb34250307d40efea9673a",
+        "steps": [
+          {
+            "name": "reference",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/sanitize/reference"
+            ],
+            "exit": 0,
+            "seconds": 0.03240830794675276
+          },
+          {
+            "name": "packing",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/sanitize/packing"
+            ],
+            "exit": 0,
+            "seconds": 0.4656345720286481
+          },
+          {
+            "name": "kernel-faults",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/sanitize/kernel-faults"
+            ],
+            "exit": 0,
+            "seconds": 0.06453119596699253
+          },
+          {
+            "name": "controls",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/sanitize/controls"
+            ],
+            "exit": 0,
+            "seconds": 0.11447218601824716
+          },
+          {
+            "name": "female-public",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/sanitize/workflow",
+              "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-main-38e8c60/artifacts/female-owning-release/fitted-unskinned.dsculpt",
+              "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-main-38e8c60/artifacts/female-owning-release/bound.dsculpt",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/sanitize/female-public"
+            ],
+            "exit": 0,
+            "seconds": 136.25776489696
+          },
+          {
+            "name": "male-public",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/sanitize/workflow",
+              "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-main-38e8c60/artifacts/male-owning-release/fitted-unskinned.dsculpt",
+              "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-main-38e8c60/artifacts/male-owning-release/bound.dsculpt",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/sanitize/male-public"
+            ],
+            "exit": 0,
+            "seconds": 143.78122316702502
+          },
+          {
+            "name": "worker-female",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/sanitize/worker",
+              "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-main-38e8c60/artifacts/female-owning-release/fitted-unskinned.dsculpt",
+              "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-main-38e8c60/artifacts/female-owning-release/bound.dsculpt",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/sanitize/worker-female"
+            ],
+            "exit": 0,
+            "seconds": 167.33273471798748
+          },
+          {
+            "name": "native32-fixture",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/sanitize/native32-export",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/sanitize/native32-fixture.dsculpt",
+              "--fixture-only"
+            ],
+            "exit": 0,
+            "seconds": 0.21500143100274727
+          },
+          {
+            "name": "native32-export-software",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/sanitize/native32-export",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/sanitize/native32-export-data"
+            ],
+            "exit": 0,
+            "seconds": 6.528423223993741
+          },
+          {
+            "name": "native32-contracts",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/sanitize/native32-contracts",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/sanitize/native32-contract-data",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/sanitize/native32-fixture.dsculpt"
+            ],
+            "exit": 0,
+            "seconds": 1.6178064729901962
+          }
+        ],
+        "phase": "native32-contracts",
+        "child": 2573881,
+        "drift": [],
+        "exit": 0,
+        "seconds": 461.55944084899966,
+        "inputs": 4670
+      }
+    },
+    "sanitize/pose/status.json": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/sanitize/pose/status.json",
+      "sha256": "8b12c77f182a10ce1632e05e7790c6ea0b2731340af77762228b0ae4cc65e6f4",
+      "record": {
+        "state": "terminal",
+        "pid": 2558386,
+        "profile": "sanitize",
+        "steps": [
+          {
+            "name": "compile-scope",
+            "command": [
+              "/usr/bin/c++",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/src",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/third_party/nlohmann",
+              "-O1",
+              "-g1",
+              "-DNDEBUG",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "-std=gnu++20",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/sanitize/pose/scope.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/tests/native-rig-pose-scope.cpp",
+              "-MMD",
+              "-MF",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/sanitize/pose/scope.o.d"
+            ],
+            "exit": 0,
+            "seconds": 10.036032536998391
+          },
+          {
+            "name": "link-scope",
+            "command": [
+              "/usr/bin/c++",
+              "-O1",
+              "-g1",
+              "-DNDEBUG",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/sanitize/pose/scope.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/sanitize/pose/scope",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/sanitize/libdome-sculpt-core.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/sanitize/libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/sanitize/libdome-sculpt-polygon.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/sanitize/libxatlas.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/sanitize/libmikktspace.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/sanitize/libmikktspace-robust.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/sanitize/libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/sanitize/libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit": 0,
+            "seconds": 3.0711555509478785
+          },
+          {
+            "name": "compile-faults",
+            "command": [
+              "/usr/bin/c++",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/src",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/third_party/nlohmann",
+              "-O1",
+              "-g1",
+              "-DNDEBUG",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "-std=gnu++20",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/sanitize/pose/faults.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/tests/native-rig-pose-faults.cpp",
+              "-MMD",
+              "-MF",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/sanitize/pose/faults.o.d"
+            ],
+            "exit": 0,
+            "seconds": 3.825289606989827
+          },
+          {
+            "name": "link-faults",
+            "command": [
+              "/usr/bin/c++",
+              "-O1",
+              "-g1",
+              "-DNDEBUG",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/sanitize/pose/faults.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/sanitize/pose/faults",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/sanitize/libdome-sculpt-core.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/sanitize/libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/sanitize/libdome-sculpt-polygon.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/sanitize/libxatlas.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/sanitize/libmikktspace.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/sanitize/libmikktspace-robust.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/sanitize/libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/sanitize/libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit": 0,
+            "seconds": 1.868638699001167
+          },
+          {
+            "name": "compile-export",
+            "command": [
+              "/usr/bin/c++",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/third_party/cgltf",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/third_party/nlohmann",
+              "-O1",
+              "-g1",
+              "-DNDEBUG",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "-std=gnu++20",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/sanitize/pose/export.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/tests/native-linked-pose-export.cpp",
+              "-MMD",
+              "-MF",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/sanitize/pose/export.o.d"
+            ],
+            "exit": 0,
+            "seconds": 7.080765751015861
+          },
+          {
+            "name": "link-export",
+            "command": [
+              "/usr/bin/c++",
+              "-O1",
+              "-g1",
+              "-DNDEBUG",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/sanitize/pose/export.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/sanitize/pose/export",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/sanitize/libdome-sculpt-core.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/sanitize/libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/sanitize/libdome-sculpt-polygon.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/sanitize/libxatlas.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/sanitize/libmikktspace.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/sanitize/libmikktspace-robust.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/sanitize/libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/sanitize/libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit": 0,
+            "seconds": 1.819011261977721
+          },
+          {
+            "name": "female-scope",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/sanitize/pose/scope",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/sanitize/female-public/full.dsculpt",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/sanitize/pose/female-scope"
+            ],
+            "exit": 0,
+            "seconds": 81.0962588940165
+          },
+          {
+            "name": "female-faults",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/sanitize/pose/faults",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/sanitize/female-public/full.dsculpt"
+            ],
+            "exit": 0,
+            "seconds": 56.03639759705402
+          },
+          {
+            "name": "female-linked-export",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/sanitize/pose/export",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/sanitize/pose/female-scope/linked.dsculpt",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/sanitize/pose/female-linked-export"
+            ],
+            "exit": 0,
+            "seconds": 15.14701115700882
+          },
+          {
+            "name": "female-controller-export",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/sanitize/pose/export",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/sanitize/pose/female-scope/controller.dsculpt",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/sanitize/pose/female-controller-export"
+            ],
+            "exit": 0,
+            "seconds": 14.745663229958154
+          },
+          {
+            "name": "male-scope",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/sanitize/pose/scope",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/sanitize/male-public/full.dsculpt",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/sanitize/pose/male-scope"
+            ],
+            "exit": 0,
+            "seconds": 75.77547902101651
+          },
+          {
+            "name": "male-faults",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/sanitize/pose/faults",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/sanitize/male-public/full.dsculpt"
+            ],
+            "exit": 0,
+            "seconds": 60.154954609985
+          },
+          {
+            "name": "male-linked-export",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/sanitize/pose/export",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/sanitize/pose/male-scope/linked.dsculpt",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/sanitize/pose/male-linked-export"
+            ],
+            "exit": 0,
+            "seconds": 15.99902407603804
+          },
+          {
+            "name": "male-controller-export",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/sanitize/pose/export",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/sanitize/pose/male-scope/controller.dsculpt",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/sanitize/pose/male-controller-export"
+            ],
+            "exit": 0,
+            "seconds": 15.146521301998291
+          }
+        ],
+        "phase": "male-controller-export",
+        "child": 2593670,
+        "drift": [],
+        "exit": 0,
+        "seconds": 371.60446763096843,
+        "inputs": 4668,
+        "artifacts": {
+          "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/sanitize/pose/scope.o.d": "f7f7f55eaaf056bfe84acd17acc219c3f70828012dfedbb8ab38c550ef5ef25d",
+          "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/sanitize/pose/scope.o": "6ba3543a62ce67c36667ff72e6d85e8b605158e138d6596cf9cc387c4e20ed37",
+          "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/sanitize/pose/scope": "8f2f132568a7ff57506c3dcd981dd1a62e08eb47a2373a212da202dbf1627466",
+          "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/sanitize/pose/faults.o.d": "4b5246da046af41547a83dba2973f1afd24d513a892a8ca6b13fac23ee45a9d4",
+          "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/sanitize/pose/faults.o": "00f897407f36c3b634f51234c80d442933368e70f918e3b96d103a1089618d28",
+          "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/sanitize/pose/faults": "da706deb1d533041166540e9a8d7813ff45da3a95b5514a34b566e87af8551b4",
+          "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/sanitize/pose/export.o.d": "142ba275e3a487b96bea09d3950bda6903620cf6821aa07a9845a9b18b1cd51b",
+          "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/sanitize/pose/export.o": "844688de9cf3b83436a21ed54b2bebd6cfe3d2412692fd5888e67c7d1dd3e1ee",
+          "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/sanitize/pose/export": "4c357535bf6b9deb309df68f51abb7a15f14f90a145a7ee8d15c5e32dd946b8a"
+        }
+      }
+    },
+    "sanitize/admission/status.json": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/sanitize/admission/status.json",
+      "sha256": "55ee5b56bde5839ffa51897d3af4e8369a172d390f4aba6d96795cec481dc56a",
+      "record": {
+        "state": "terminal",
+        "pid": 2545304,
+        "profile": "sanitize",
+        "steps": [
+          {
+            "name": "compile",
+            "command": [
+              "/usr/bin/c++",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/src",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/third_party/nlohmann",
+              "-O1",
+              "-g1",
+              "-DNDEBUG",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "-std=gnu++20",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/sanitize/admission/admission.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/admission.cpp",
+              "-MMD",
+              "-MF",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/sanitize/admission/admission.o.d"
+            ],
+            "exit": 0,
+            "seconds": 7.7807084009982646
+          },
+          {
+            "name": "link",
+            "command": [
+              "/usr/bin/c++",
+              "-O1",
+              "-g1",
+              "-DNDEBUG",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "-Wl,--wrap=_ZN4dome22author_anatomical_skinERNS_5SceneESt4spanIKmLm18446744073709551615EERKNS_20SkinAuthoringOptionsERKSt8functionIFbvEE",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/sanitize/admission/admission.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/sanitize/admission/admission",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/sanitize/libdome-sculpt-core.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/sanitize/libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/sanitize/libdome-sculpt-polygon.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/sanitize/libxatlas.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/sanitize/libmikktspace.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/sanitize/libmikktspace-robust.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/sanitize/libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/sanitize/libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit": 0,
+            "seconds": 2.8201463450095616
+          },
+          {
+            "name": "actual-caller",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/sanitize/admission/admission",
+              "/home/blux/de-xr/dome-sculpt/artifacts/automatic-weights-native-main-38e8c60/artifacts/female-owning-release/fitted-unskinned.dsculpt",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/sanitize/admission/data"
+            ],
+            "exit": 0,
+            "seconds": 90.31750505696982
+          }
+        ],
+        "phase": "actual-caller",
+        "child": 2546817,
+        "exit": 0,
+        "seconds": 106.13531728996895,
+        "drift": [],
+        "inputs": 4669,
+        "artifacts": {
+          "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/sanitize/admission/admission.o.d": "a1ea1d2b06396caa638e7a3db442f2d84a9e5736ca26501bb357c78f6dcb543a",
+          "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/sanitize/admission/admission.o": "a5e703fbb8f29ff1d842324163a7256fd27e1cf190bbf1d810465a5c72e6c65f",
+          "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/sanitize/admission/admission": "8fc17fc23a620466f65c5d5e6b9c673a24595ed12b275ff53d4dc1f8afb0d635"
+        }
+      }
+    },
+    "sanitize/pose-khronos.json": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/sanitize/pose-khronos.json",
+      "sha256": "fdb70ff311ff98a4c47a4002282a7e31e013444efcdc3f61d1bc2997d5ab7cc1",
+      "record": {
+        "version": "2.0.0-dev.3.10",
+        "scope": "Independent pinned Khronos validator, all issues retained without filtering",
+        "files": 4,
+        "totals": {
+          "errors": 0,
+          "warnings": 76,
+          "infos": 8,
+          "hints": 0
+        },
+        "drift": [],
+        "deliberatelyRejected": []
+      }
+    },
+    "sanitize/native32-khronos.json": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/sanitize/native32-khronos.json",
+      "sha256": "321adc9e459cc641c0d0971e4968aa05a3bda5792c23acd0ee217e257a1b8db6",
+      "record": {
+        "version": "2.0.0-dev.3.10",
+        "scope": "Independent pinned Khronos validator, all issues retained without filtering",
+        "files": 14,
+        "totals": {
+          "errors": 0,
+          "warnings": 3,
+          "infos": 40,
+          "hints": 0
+        },
+        "drift": [],
+        "deliberatelyRejected": [
+          {
+            "file": "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/sanitize/native32-export-data/strict-hdr-refused.glb",
+            "sha256": "7476c0cbc8af8346e2efa698950d3c30f3e9917a34420193120c76dcc820a837",
+            "reason": "Untouched prior-file sentinel at deliberately refused strict-HDR export path; not an emitted glTF"
+          }
+        ]
+      }
+    },
+    "sanitize/contracts-khronos.json": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/sanitize/contracts-khronos.json",
+      "sha256": "01cbc2c481ec25bc4f8f1b9ab50b958f8df979080febf88b5331598f5517d302",
+      "record": {
+        "version": "2.0.0-dev.3.10",
+        "scope": "Independent pinned Khronos validator, all issues retained without filtering",
+        "files": 2,
+        "totals": {
+          "errors": 0,
+          "warnings": 0,
+          "infos": 6,
+          "hints": 0
+        },
+        "drift": [],
+        "deliberatelyRejected": [
+          {
+            "file": "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/sanitize/native32-contract-data/queued.glb",
+            "sha256": "4ed20751a26ee2d622db2c4e1912b7ae2834ee3fe44d60dcd6836149956c866f",
+            "reason": "Untouched prior-file sentinel at deliberately refused or cancelled export path; not an emitted glTF"
+          }
+        ]
+      }
+    }
+  },
+  "native_pairs": [
+    {
+      "actor": "female",
+      "file": "full.dsculpt",
+      "release": "42858680b2a721109362d43178629522d6e0a4a0fcb92e462b680c1d85af3af1",
+      "sanitize": "42858680b2a721109362d43178629522d6e0a4a0fcb92e462b680c1d85af3af1",
+      "equal": true
+    },
+    {
+      "actor": "female",
+      "file": "locked-prior.dsculpt",
+      "release": "61096cedc078b5afb1ef8f196e3654e05c79be258f4e32406dd364b70a313232",
+      "sanitize": "61096cedc078b5afb1ef8f196e3654e05c79be258f4e32406dd364b70a313232",
+      "equal": true
+    },
+    {
+      "actor": "female",
+      "file": "locked.dsculpt",
+      "release": "61096cedc078b5afb1ef8f196e3654e05c79be258f4e32406dd364b70a313232",
+      "sanitize": "61096cedc078b5afb1ef8f196e3654e05c79be258f4e32406dd364b70a313232",
+      "equal": true
+    },
+    {
+      "actor": "female",
+      "file": "restored.dsculpt",
+      "release": "8a434ec3c143a72b54f907173132afdf536e3e7df75d13bc82d2c8e3236fd978",
+      "sanitize": "8a434ec3c143a72b54f907173132afdf536e3e7df75d13bc82d2c8e3236fd978",
+      "equal": true
+    },
+    {
+      "actor": "female",
+      "file": "unlocked-retry.dsculpt",
+      "release": "7ed1011bbe2555467d8ec95367b470c1db4014a5137174f3f796778e226c62a7",
+      "sanitize": "7ed1011bbe2555467d8ec95367b470c1db4014a5137174f3f796778e226c62a7",
+      "equal": true
+    },
+    {
+      "actor": "male",
+      "file": "full.dsculpt",
+      "release": "d2cf91a613fa8839027bf64875dbf7cd46719b9f495e7c303a6d19c3700ede25",
+      "sanitize": "d2cf91a613fa8839027bf64875dbf7cd46719b9f495e7c303a6d19c3700ede25",
+      "equal": true
+    },
+    {
+      "actor": "male",
+      "file": "locked-prior.dsculpt",
+      "release": "eca651c6b6aa462e55d48d5f1b84b27debba844e6550bfd7775e1256f1007cc7",
+      "sanitize": "eca651c6b6aa462e55d48d5f1b84b27debba844e6550bfd7775e1256f1007cc7",
+      "equal": true
+    },
+    {
+      "actor": "male",
+      "file": "locked.dsculpt",
+      "release": "eca651c6b6aa462e55d48d5f1b84b27debba844e6550bfd7775e1256f1007cc7",
+      "sanitize": "eca651c6b6aa462e55d48d5f1b84b27debba844e6550bfd7775e1256f1007cc7",
+      "equal": true
+    },
+    {
+      "actor": "male",
+      "file": "restored.dsculpt",
+      "release": "d2c2f8cff859a8403ab4c92ac8221964fe460002ab15b78baa47b3708680644f",
+      "sanitize": "d2c2f8cff859a8403ab4c92ac8221964fe460002ab15b78baa47b3708680644f",
+      "equal": true
+    },
+    {
+      "actor": "male",
+      "file": "unlocked-retry.dsculpt",
+      "release": "41a35babadcf3541b25d760e5f3d90102a6e751c7657c8b1f60c53a2cbbdc9a5",
+      "sanitize": "41a35babadcf3541b25d760e5f3d90102a6e751c7657c8b1f60c53a2cbbdc9a5",
+      "equal": true
+    }
+  ],
+  "export_pairs": [
+    {
+      "path": "native32-contract-data/direct.glb",
+      "release": "7776ff83cf4d649bd96ede3907fef3b2e8e06c6a63b3dc7fadfe6798fb19ee68",
+      "sanitize": "7776ff83cf4d649bd96ede3907fef3b2e8e06c6a63b3dc7fadfe6798fb19ee68",
+      "equal": true,
+      "kind": "actualGLB"
+    },
+    {
+      "path": "native32-contract-data/queued.glb",
+      "release": "4ed20751a26ee2d622db2c4e1912b7ae2834ee3fe44d60dcd6836149956c866f",
+      "sanitize": "4ed20751a26ee2d622db2c4e1912b7ae2834ee3fe44d60dcd6836149956c866f",
+      "equal": true,
+      "kind": "retained prior-file sentinel"
+    },
+    {
+      "path": "native32-contract-data/running.glb",
+      "release": "8690abbe7eb7c8476ad9c9974065563070847cf44bc64945901888c864849a8e",
+      "sanitize": "8690abbe7eb7c8476ad9c9974065563070847cf44bc64945901888c864849a8e",
+      "equal": true,
+      "kind": "actualGLB"
+    },
+    {
+      "path": "native32-export-data/0.glb",
+      "release": "d1db7501bd9aef47036e18c769c58cde51eb6c6d639f9f9618ceef5588968128",
+      "sanitize": "d1db7501bd9aef47036e18c769c58cde51eb6c6d639f9f9618ceef5588968128",
+      "equal": true,
+      "kind": "actualGLB"
+    },
+    {
+      "path": "native32-export-data/1.glb",
+      "release": "50ce4232b65fa4c862f829d5d005b9df0cf38bbf42953b423820e5c8b5881781",
+      "sanitize": "50ce4232b65fa4c862f829d5d005b9df0cf38bbf42953b423820e5c8b5881781",
+      "equal": true,
+      "kind": "actualGLB"
+    },
+    {
+      "path": "native32-export-data/10.glb",
+      "release": "629e09529be7381572cbb57be0f82d5e8acc7fbd5c68b3a389b8add93e7f639d",
+      "sanitize": "629e09529be7381572cbb57be0f82d5e8acc7fbd5c68b3a389b8add93e7f639d",
+      "equal": true,
+      "kind": "actualGLB"
+    },
+    {
+      "path": "native32-export-data/11.glb",
+      "release": "74e41e8d3735c2416b45bcedf86970c7a02b7979e97951105e5ff5dad6c529aa",
+      "sanitize": "74e41e8d3735c2416b45bcedf86970c7a02b7979e97951105e5ff5dad6c529aa",
+      "equal": true,
+      "kind": "actualGLB"
+    },
+    {
+      "path": "native32-export-data/2.glb",
+      "release": "86a0d28def93d035417533f8e58283ac0c221b32584212cc36ed4ec8f70e8895",
+      "sanitize": "86a0d28def93d035417533f8e58283ac0c221b32584212cc36ed4ec8f70e8895",
+      "equal": true,
+      "kind": "actualGLB"
+    },
+    {
+      "path": "native32-export-data/3.glb",
+      "release": "c980f05cc6a53ec14091a6f2b53da09443c948af8e46beb4ce5e08a0057543ab",
+      "sanitize": "c980f05cc6a53ec14091a6f2b53da09443c948af8e46beb4ce5e08a0057543ab",
+      "equal": true,
+      "kind": "actualGLB"
+    },
+    {
+      "path": "native32-export-data/4.glb",
+      "release": "1caf23fd06ce35d1528e04f69165beeb52c14dbaafbbc4324aed1e7ebda88193",
+      "sanitize": "1caf23fd06ce35d1528e04f69165beeb52c14dbaafbbc4324aed1e7ebda88193",
+      "equal": true,
+      "kind": "actualGLB"
+    },
+    {
+      "path": "native32-export-data/5.glb",
+      "release": "ecf666e4a2757db8507fad072f5cf18088f807855eb5e089fe4fda4ade1fe78e",
+      "sanitize": "ecf666e4a2757db8507fad072f5cf18088f807855eb5e089fe4fda4ade1fe78e",
+      "equal": true,
+      "kind": "actualGLB"
+    },
+    {
+      "path": "native32-export-data/6.glb",
+      "release": "8690abbe7eb7c8476ad9c9974065563070847cf44bc64945901888c864849a8e",
+      "sanitize": "8690abbe7eb7c8476ad9c9974065563070847cf44bc64945901888c864849a8e",
+      "equal": true,
+      "kind": "actualGLB"
+    },
+    {
+      "path": "native32-export-data/7.glb",
+      "release": "c9d528b75d7a0afe380232711a4cd26157ebebad8bbbf3bb60a4c75d3c27fb2c",
+      "sanitize": "c9d528b75d7a0afe380232711a4cd26157ebebad8bbbf3bb60a4c75d3c27fb2c",
+      "equal": true,
+      "kind": "actualGLB"
+    },
+    {
+      "path": "native32-export-data/8.glb",
+      "release": "ba967469b4710a080bbdbd2fd83708c9cf84c6543620e525afea446badc9862f",
+      "sanitize": "ba967469b4710a080bbdbd2fd83708c9cf84c6543620e525afea446badc9862f",
+      "equal": true,
+      "kind": "actualGLB"
+    },
+    {
+      "path": "native32-export-data/9.glb",
+      "release": "d46088fd08374cb2f3bf704f53a471e5ecda6ed0bff1ccb0b2bfb1eec02a07fa",
+      "sanitize": "d46088fd08374cb2f3bf704f53a471e5ecda6ed0bff1ccb0b2bfb1eec02a07fa",
+      "equal": true,
+      "kind": "actualGLB"
+    },
+    {
+      "path": "native32-export-data/ldr-editable.glb",
+      "release": "d0418a256e55b4f014ff43f3905fe7df3c1916f3f32f01522fd038b4cdf8e883",
+      "sanitize": "d0418a256e55b4f014ff43f3905fe7df3c1916f3f32f01522fd038b4cdf8e883",
+      "equal": true,
+      "kind": "actualGLB"
+    },
+    {
+      "path": "native32-export-data/ldr-standard.glb",
+      "release": "0fe26c385c3394e161f24a5379097c2a9f40fb4a6ec09110e4dde12230e240ce",
+      "sanitize": "0fe26c385c3394e161f24a5379097c2a9f40fb4a6ec09110e4dde12230e240ce",
+      "equal": true,
+      "kind": "actualGLB"
+    },
+    {
+      "path": "pose/female-controller-export/pose-0.glb",
+      "release": "161a232fbac293160bf417604fb476cb4a47129d2ab69fa19a50ac58d60c105c",
+      "sanitize": "161a232fbac293160bf417604fb476cb4a47129d2ab69fa19a50ac58d60c105c",
+      "equal": true,
+      "kind": "actualGLB"
+    },
+    {
+      "path": "pose/female-linked-export/pose-0.glb",
+      "release": "92bbe58096dc40f1b80731a2815cfce7dc8069e6fe8a24919b689bd6ea0aee9c",
+      "sanitize": "92bbe58096dc40f1b80731a2815cfce7dc8069e6fe8a24919b689bd6ea0aee9c",
+      "equal": true,
+      "kind": "actualGLB"
+    },
+    {
+      "path": "pose/male-controller-export/pose-0.glb",
+      "release": "903192c2fdb7233da9d94ea2b396b2e69ee1f7d431a5face77180ae00e9c4f4d",
+      "sanitize": "903192c2fdb7233da9d94ea2b396b2e69ee1f7d431a5face77180ae00e9c4f4d",
+      "equal": true,
+      "kind": "actualGLB"
+    },
+    {
+      "path": "pose/male-linked-export/pose-0.glb",
+      "release": "10402405ad418a564c96ee65292c74ded1df6d67f82a5500665f9bb27926fa15",
+      "sanitize": "10402405ad418a564c96ee65292c74ded1df6d67f82a5500665f9bb27926fa15",
+      "equal": true,
+      "kind": "actualGLB"
+    }
+  ],
+  "retained_fixture_diagnostics": {
+    "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/release/native32-khronos-v1-negative-sentinel.log": "ce7909e14ede644c2a3327199a67650dafbe06822de99c8a9539d21cf98168cc",
+    "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/release/contracts-khronos-v1-omitted-retry.json": "85d27147c6173cc913e1b6d3fcdce79e6793819fc157b0dff06c4911b08c8467",
+    "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/release/contracts-khronos-v1-omitted-retry.log": "bcccc32eab5ac6e8199e2b46e0613c09b74f21f0004d4395215eedf1265d2b09",
+    "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/release/admission-v1-compile-negative/status.json": "ff6f66b895e77e4cd26064457b1bbcf65011eaf686f02b71d87e1fa82d5e097a",
+    "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/release/admission-v1-compile-negative/before.json": "170b034a69a25dbabb911f69f3605492174c50f92172d6950a4abbdb7aab5801",
+    "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/release/admission-v1-compile-negative/compile.log": "19405ffdab5577685b16b3420ad3d546a9f29400e7b5c0dd0c0bd543063b72bf",
+    "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/release/admission-v2-wrapper-identity-negative/status.json": "6f87b546ae24a7c873a994a925796e5b58674970458e36dea55736aec0f37a7d",
+    "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/release/admission-v2-wrapper-identity-negative/before.json": "de55f5dfab5c0c273a37cdcf737f5dcbbeaf3a5b29d578d3e88e49a08baca185",
+    "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/release/admission-v2-wrapper-identity-negative/compile.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/release/admission-v2-wrapper-identity-negative/link.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/release/admission-v2-wrapper-identity-negative/actual-caller.log": "8d9a8909397d80113dcdab6672b5f307d2dad1283d05298e2dc465eabc85d749"
+  },
+  "remaining": [
+    "repository-asset producer and meaningful manual endpoint CTest fixtures",
+    "broader owning helper/post-helper publication faults",
+    "current native app/desktop/loader and anatomical page32",
+    "general native/edited/prepared/relative-affine automatic binding"
+  ],
+  "source_manifest_paths": {
+    "release": "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/release/before.json",
+    "sanitize": "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/sanitize/before.json"
+  }
+}
