@@ -1,5 +1,17 @@
 # Dome Sculpt production handoff
 
+## Combined native36 and MASK/cutoff qualification candidate — 2026-11-05
+
+This new isolated candidate composes ab37175 with qualified frame36/f2a and
+key-export7c9 (runtime97f), plus MASK/source-cutoff296 (runtime9ef). Its public
+layout includes the real native frame owner; it requires fresh whole owning
+Release and sanitizer application/core/render/support and complete consumers.
+No previously sized35 archive can qualify this source. Source37/public paint
+owner work, unsealed post-key UV/new-key and canonical-key/UV adapters are absent.
+Original ab37175 SAN92 and currentfull689 stay untouched and frozen; separate
+oldf2 continuation failures remain preserved. All original production/device/
+accelerator requirements and later controller drawers remain unfinished.
+
 ## Combined physical skin and wider expression candidate — 2026-11-05
 
 This isolated candidate merges qualified physical skin export c1354a6 and wider
@@ -311,6 +323,23 @@ receipt for original failures, own fresh-parent/completed-TU build scope and fou
 retained Khronos tangent warnings. This is not fresh ALL/full612, main admission,
 physical headset, GPU baking or full production completion. Broader bake recipes,
 resource/consumer/device work and deferred drawers remain required.
+## Private proven MASK and current cutoff — 2026-11-05
+
+Runtime9ef186b follows e84: owned MASK alpha proof across declared future weights,
+real source alpha/native paint fields, no public/private header/layout/schema/UI
+change. Source-only writer now preserves typed cutoff .3 when original/unchanged
+inspector is .5; old sealed producer really emits .5 and fails independent255>4.
+R142.960s/S597.353s all0/1886exact: painted49, typed-source23, independent175+166
+checks/72pairs max1 at unchanged4; NEW1762 full916persistent/839Cancel+7controls.
+Changing-membership worker18 refuses exactly; actual native11 proves filled261
+vs same-geometry3777, Save guard/Cancel/Save exact. StrictArc355/72pairs plus2
+actualsoftware refusals,10.733s/1901exact, lease released.148PNG+22data/control
+pairs exact;29ordinary old files/profile byte-identical;22files166official/KHR
+0errors95warnings334infos84hints. Configure663/7new registration only. Matched2TUs
+on immutablee84 support, no freshwholeapp/main/fullVRM claim. General MASK/BLEND,
+other owners/roles/currentroot/external remain required; SAME64560 still live.
+Read VRM1-MASK-EXPRESSIONS.md/JSON; source877counter and two observer negatives kept.
+
 ## Private wider VRM1 shade targets — 2026-11-05
 
 Runtime86ea09e follows196 with actual target>1 and simultaneous shade deltas,

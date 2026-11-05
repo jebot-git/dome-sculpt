@@ -7,7 +7,7 @@
 #include <map>
 struct V1ExpressionLayerConsumer {
   using J=nlohmann::json;
-  float expression=0;int pose=0,selected_node=-1;bool wrong_paint_uv=false,wrong_base_tint=false,wrong_shared_shade=false;
+  float expression=0;int pose=0,selected_node=-1;bool wrong_mask_cutoff=false,wrong_paint_uv=false,wrong_base_tint=false,wrong_shared_shade=false;
   bool wrong_source_uv=false;
   std::map<std::string,float> weights;
   struct WeightedExpression {const J *value;float weight;};
@@ -23,7 +23,7 @@ void main(){n=N;uv=UV;shadeUV=SU;emissionUV=EU;gl_Position=camera*vec4(p,1);})GL
 in vec3 n;in vec2 uv,shadeUV,emissionUV;out vec4 result;
 uniform sampler2D baseMap,shadeMap,emissionMap;uniform int basePresent,shadePresent,emissionPresent;
 uniform vec3 emissionFactor;uniform float emissionStrength;
-uniform int blend;uniform vec4 baseFactor;uniform vec3 shadeFactor;
+uniform int blend;uniform float alphaCutoff;uniform vec4 baseFactor;uniform vec3 shadeFactor;
 uniform vec2 scroll;uniform float speed,seconds,shift,toony,equalization;
 uniform vec3 baseX,baseY,shadeX,shadeY,emissionX,emissionY;
 vec2 animated(vec2 u){float a=speed*seconds;vec2 q=u-.5;
@@ -31,6 +31,7 @@ return vec2(cos(a)*q.x+sin(a)*q.y,-sin(a)*q.x+cos(a)*q.y)+.5+scroll*seconds;}
 vec2 mapped(vec2 u,vec3 X,vec3 Y){vec2 q=animated(u)*X.xy;float c=cos(X.z),s=sin(X.z);return mat2(c,s,-s,c)*q+Y.xy;}
 void main(){vec3 N=normalize(n);if(!gl_FrontFacing)N=-N;
 vec4 lit=(basePresent==1?texture(baseMap,mapped(uv,baseX,baseY)):vec4(1))*baseFactor;
+if(blend==2&&lit.a<alphaCutoff)discard;
 vec3 shade=(shadePresent==1?texture(shadeMap,mapped(shadeUV,shadeX,shadeY)).rgb:vec3(1))*shadeFactor;
 float width=1-toony,x=dot(N,normalize(vec3(-.4,.8,.7)))+shift;
 float ratio=width<=.0000001?step(0,x):clamp((x+width)/(2*width),0,1);
@@ -170,9 +171,9 @@ in vec2 uv;out vec4 result;uniform sampler2D scene;void main(){result=texture(sc
         auto m = model.json.at("materials")
                       .at(size_t(p.material - model.data->materials));
         auto &ext = m.at("extensions").at("VRMC_materials_mtoon");
-        const bool blended=m.value("alphaMode",std::string("OPAQUE"))=="BLEND";
-        if((!blended&&m.value("alphaMode",std::string("OPAQUE"))!="OPAQUE")||!m.value("doubleSided",false))throw std::runtime_error("Independent expression-layer oracle requires opaque/blend double-sided source");
-        if(blended){glEnable(GL_BLEND);glBlendEquationSeparate(GL_FUNC_ADD,GL_FUNC_ADD);glBlendFuncSeparate(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA,GL_ONE,GL_ONE_MINUS_SRC_ALPHA);glDepthMask(GL_FALSE);glDepthFunc(GL_LEQUAL);}else{glDisable(GL_BLEND);glDepthMask(GL_TRUE);glDepthFunc(GL_LESS);}glUniform1i(loc("blend"),blended);
+        const auto alpha=m.value("alphaMode",std::string("OPAQUE"));const bool blended=alpha=="BLEND",masked=alpha=="MASK";
+        if((!blended&&!masked&&alpha!="OPAQUE")||!m.value("doubleSided",false))throw std::runtime_error("Independent expression-layer oracle requires opaque/blend double-sided source");
+        if(blended){glEnable(GL_BLEND);glBlendEquationSeparate(GL_FUNC_ADD,GL_FUNC_ADD);glBlendFuncSeparate(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA,GL_ONE,GL_ONE_MINUS_SRC_ALPHA);glDepthMask(GL_FALSE);glDepthFunc(GL_LEQUAL);}else{glDisable(GL_BLEND);glDepthMask(GL_TRUE);glDepthFunc(GL_LESS);}glUniform1i(loc("blend"),blended?1:masked?2:0);scalar("alphaCutoff",wrong_mask_cutoff?.99f:m.value("alphaCutoff",.5f));
         const size_t material=size_t(p.material-model.data->materials);
         if(weights.empty()){
          for(const auto &bind:expression_data.value("materialColorBinds",J::array()))if(bind.at("material").get<size_t>()==material){const std::string type=bind.at("type");J *field=type=="color"?&m["pbrMetallicRoughness"]["baseColorFactor"]:type=="shadeColor"?&m["extensions"]["VRMC_materials_mtoon"]["shadeColorFactor"]:type=="emissionColor"?&m["emissiveFactor"]:nullptr;if(!field)throw std::runtime_error("Independent layer colour type unsupported");for(size_t k=0;k<field->size();++k)(*field)[k]=field->at(k).get<double>()+(bind.at("targetValue").at(k).get<double>()-field->at(k).get<double>())*expression;}

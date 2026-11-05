@@ -481,7 +481,8 @@ static VrmExportReport export_vrm1_impl(const std::vector<ObjectSurface> &object
             : object.material.alpha == Material::AlphaMode::Mask
                 ? MToonAlpha::Mask
                 : MToonAlpha::Blend;
-      material.parameters.alpha_cutoff = object.material.alpha_cutoff;
+      if(object.material.alpha_cutoff!=binding.native_reference.alpha_cutoff)
+        material.parameters.alpha_cutoff = object.material.alpha_cutoff;
       for (size_t role = 0; role < roles.size(); ++role)
         if (*slots[role]) {
           if (roles[role].image) {
