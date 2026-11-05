@@ -44,7 +44,7 @@ Vrm1ExpressionLayer compile_vrm1_expression_layer(const J &original,const Sculpt
  result.shade_alias=base.image&&base.image==shade.image&&base.wrap_s==shade.wrap_s&&base.wrap_t==shade.wrap_t&&base.min_filter==shade.min_filter&&base.mag_filter==shade.mag_filter&&mtoon_coordinate(bt)==mtoon_coordinate(st)&&bt.offset==st.offset&&bt.scale==st.scale&&bt.rotation==st.rotation;
  if(result.shade_alias)for(size_t k=0;k<3;++k)result.shade_divisor[k]=object.material.color[k]!=0?object.material.color[k]:1;
  const std::array<float,3> initial_shade{material.parameters.shade_color.x,material.parameters.shade_color.y,material.parameters.shade_color.z};
- auto shade_factor=[&](const std::array<float,3> &factor,bool initial){if(result.shade_alias)for(size_t k=0;k<3;++k){const double value=double(factor[k])/result.shade_divisor[k];if(!std::isfinite(value)||value<0||value>(initial?1.:1e20))throw std::invalid_argument(initial?"VRM1 shared painted initial shade factor exceeds standard unit representation":"VRM1 shared painted shade target exceeds finite nonnegative source representation");}};
+ auto shade_factor=[&](const std::array<float,3> &factor,bool initial){if(result.shade_alias)for(size_t k=0;k<3;++k){const double value=double(factor[k])/result.shade_divisor[k];if(!std::isfinite(value)||value<0||value>1e20)throw std::invalid_argument(initial?"VRM1 shared painted initial shade coefficient exceeds finite source bounds":"VRM1 shared painted shade target exceeds finite nonnegative source representation");if(initial){double scale=1;while(scale<value)scale*=2;result.paint_rgb_scale[k]=float(scale);}}};
  shade_factor(initial_shade,true);
  std::array<double,3> shade_low{},shade_high{};if(result.shade_alias)for(size_t k=0;k<3;++k)shade_low[k]=shade_high[k]=double(initial_shade[k])/result.shade_divisor[k];
  const double initial_alpha=masked?vrm_native_factor(material.parameters.base_color[3],binding.native_reference.color[3],object.material.color[3]):1;
@@ -155,7 +155,7 @@ Vrm1ExpressionLayer compile_vrm1_expression_layer(const J &original,const Sculpt
  std::vector<Pixel> native(native_pixels),decoded(size_t(logical_size)*logical_size);auto image=std::make_shared<Image>(Image{size,size,std::vector<uint8_t>(pixels*4)});
  for(size_t y=0;y<n;++y){stop();for(size_t x=0;x<n;++x){work(1+packet.layers().size());const auto v=sample_overlay_texel_values(packet,int(x),int(y),false);
   if(v[3][1]!=0||v[3][2]!=0||v[3][3]!=0||v[4]!=std::array<float,4>{})throw std::invalid_argument("VRM1 expression layers currently transport colour paint only");
-  auto &p=native[y*n+x];for(size_t k=0;k<3;++k)p[k]=v[0][k];p[3]=v[3][0];
+  auto &p=native[y*n+x];for(size_t k=0;k<3;++k){p[k]=v[0][k];if(double(v[0][k])*result.paint_rgb_scale[k]>double(v[3][0])*(1+1e-6))throw std::invalid_argument("VRM1 initial shade factorization exceeds actual unit paint-image range");}p[3]=v[3][0];
  }}
  for(uint32_t y=0;y<logical_size;++y){stop();for(uint32_t x=0;x<logical_size;++x){work(1);auto p=bilinear(native,uint32_t(n),(x+.5)/logical_size,(y+.5)/logical_size);
   if(compensate_tent){
@@ -169,9 +169,9 @@ Vrm1ExpressionLayer compile_vrm1_expression_layer(const J &original,const Sculpt
    p[3]=std::clamp(p[3],0.,1.);for(size_t k=0;k<3;++k)p[k]=std::clamp(p[k],0.,p[3]);
   }
   auto &q=decoded[size_t(y)*logical_size+x];const size_t at=(size_t(y+inset)*size+x+inset)*4;
-  for(size_t k=0;k<4;++k){const double value=k==3?p[3]:p[3]>0?p[k]/p[3]:0;
+  for(size_t k=0;k<4;++k){const double value=k==3?p[3]:p[3]>0?p[k]/p[3]*result.paint_rgb_scale[k]:0;
    if(!std::isfinite(value)||value<0||value>1+1e-6)throw std::invalid_argument("VRM1 expression layer exceeds standard unit texture representation");
-   const auto byte=uint8_t(std::clamp(std::lround((k==3?std::clamp(value,0.,1.):srgb(std::clamp(value,0.,1.)))*255),0l,255l));image->rgba[at+k]=byte;q[k]=k==3?byte/255.:linear(byte/255.);
+   const auto byte=uint8_t(std::clamp(std::lround((k==3?std::clamp(value,0.,1.):srgb(std::clamp(value,0.,1.)))*255),0l,255l));image->rgba[at+k]=byte;q[k]=k==3?byte/255.:linear(byte/255.)/result.paint_rgb_scale[k];
   }
  }}
  // RGB at genuinely zero native coverage has no pointwise contribution.
@@ -182,7 +182,7 @@ Vrm1ExpressionLayer compile_vrm1_expression_layer(const J &original,const Sculpt
  if(wide_shade||support_reconstruction)for(uint32_t y=0;y<logical_size;++y){stop();for(uint32_t x=0;x<logical_size;++x){
   const double u=(x+.5)/logical_size,v=(y+.5)/logical_size;if(bilinear(native,uint32_t(n),u,v)[3]!=0)continue;
   Pixel sum{};for(int j=-1;j<=1;++j)for(int i=-1;i<=1;++i)if(i||j){const auto p=bilinear(native,uint32_t(n),(double(x)+i+.5)/logical_size,(double(y)+j+.5)/logical_size);for(size_t k=0;k<4;++k)sum[k]+=p[k];}
-  if(sum[3]>0)for(size_t k=0;k<3;++k){const double value=std::clamp(sum[k]/sum[3],0.,1.);const auto byte=uint8_t(std::clamp(std::lround(srgb(value)*255),0l,255l));const size_t at=size_t(y)*logical_size+x,image_at=(size_t(y+inset)*size+x+inset)*4;image->rgba[image_at+k]=byte;decoded[at][k]=linear(byte/255.);}
+  if(sum[3]>0)for(size_t k=0;k<3;++k){const double value=std::clamp(sum[k]/sum[3]*result.paint_rgb_scale[k],0.,1.);const auto byte=uint8_t(std::clamp(std::lround(srgb(value)*255),0l,255l));const size_t at=size_t(y)*logical_size+x,image_at=(size_t(y+inset)*size+x+inset)*4;image->rgba[image_at+k]=byte;decoded[at][k]=linear(byte/255.)/result.paint_rgb_scale[k];}
  }}
  if(logical_size!=size){work(pixels);for(uint32_t y=0;y<size;++y){stop();for(uint32_t x=0;x<size;++x)if(x<inset||x>=inset+logical_size||y<inset||y>=inset+logical_size){const auto sx=uint32_t(std::clamp(int(x)-int(inset),0,int(logical_size)-1))+inset,sy=uint32_t(std::clamp(int(y)-int(inset),0,int(logical_size)-1))+inset;std::copy_n(image->rgba.data()+(size_t(sy)*size+sx)*4,4,image->rgba.data()+(size_t(y)*size+x)*4);}}}
  std::vector<double> knots{0,1};knots.reserve(n+logical_size+2);for(auto count:{n,size_t(logical_size)})for(size_t i=0;i<count;++i)knots.push_back((i+.5)/count);std::sort(knots.begin(),knots.end());knots.erase(std::unique(knots.begin(),knots.end()),knots.end());if(knots.size()!=proof_knot_count)throw std::logic_error("VRM1 expression-layer exact centre-knot forecast differs");
@@ -208,6 +208,7 @@ Vrm1ExpressionLayer compile_vrm1_expression_layer(const J &original,const Sculpt
   const double forward_error=16*std::numeric_limits<float>::epsilon()*(std::abs(double(result.scale[k]))*maximum+std::abs(double(result.offset[k]))+1+(support_reconstruction?image_scale+image_offset:0))/image_scale;
   if(forward_error>1./(n*1024))throw std::invalid_argument("VRM1 expression carrier exceeds bounded native-field float precision");
  }
+ for(size_t k=0;k<3;++k)result.shade_divisor[k]*=result.paint_rgb_scale[k];
  result.image=std::move(image);stop();return result;
 }
 void vrm1_expression_background(const PaintedMesh &paint,ObjectSurface &out,const std::function<bool()> &cancelled){

@@ -14,6 +14,9 @@ struct Vrm1ExpressionLayer {
  bool forward_uv=true,shade_alias=false;std::array<float,3> shade_divisor{1,1,1};
  double maximum_color_error=0,maximum_coverage_error=0,maximum_shade_coefficient=1;
  size_t working_bytes=0,sample_operations=0;
+ // Actual paint image channels are scaled by these exact powers of two.
+ // The upper base factor is reciprocal; shared shade divides by them too.
+ std::array<float,3> paint_rgb_scale{1,1,1};
 };
 Vrm1ExpressionLayer compile_vrm1_expression_layer(const nlohmann::json &original,
  const SculptObject &,const PaintOverlayPacket &,uint32_t resolution,
