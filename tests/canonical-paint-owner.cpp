@@ -20,7 +20,7 @@ void boundaries(){
  Scene plain;auto &o=plain.active();Mesh mesh;mesh.positions.resize(31250);mesh.normals.assign(31250,{0,0,1});mesh.uv.assign(31250,{0,0});mesh.positions[1]={1,0,0};mesh.positions[2]={0,1,0};mesh.uv[1]={1,0};mesh.uv[2]={0,1};mesh.indices={0,1,2};
  o.painted=std::make_shared<PaintedMesh>(mesh,64);o.mesh_active=true;
  auto model=std::make_shared<DeformationState>(mesh);model->morphs=MorphSet(mesh);for(size_t i=0;i<128;++i){MorphTarget t;t.name="quota-"+std::to_string(i);t.delta.resize(mesh.positions.size());model->morphs->targets.push_back(std::move(t));}model->validate(mesh);o.deformation=model;
- check(model->resource_entries()==4'000'000,"Genuine 128-target model has exact four-million count");
+ plain.validate();check(model->resource_entries()==4'000'000,"Genuine 128-target model has exact four-million count");
  const auto at=detail::preflight_canonical_paint_models(plain,o.id,4'000'000);
  check(at.deformation_entries==8'000'000&&at.deformation_slots==2,"Exact-cap current and new before slots retain both models");
  check(refuses([&]{detail::preflight_canonical_paint_models(plain,o.id,4'000'001);},"before allocation"),"Cap plus one must refuse before copying future model arrays");
