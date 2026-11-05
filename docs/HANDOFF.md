@@ -1,3 +1,33 @@
+## Private opt-in mode 5 + current polygon/retopology integration — 2026-11-05
+
+This private candidate combines main `c55dc2f` (polygon + transactional
+retopology worker) with qualified opt-in weights `1e6d76d`. Automatic0 remains
+the default. All legacy methods, resource/quality limits and unsupported complex
+37/38 owner guards remain intact. The second bounded Release component phase now passes surface25, legacy38,
+combined affine polygon/retopology248 and worker251 one-shot-prefix/4,308 checks, with
+actual polygon payload/default parity. See [the R2 receipt](validation/MODE5-MAIN-POLY-INITIAL-R.json).
+The matched merged Release/SAN application phase now passes four native controls,
+152 actual normal/compact FLTK checks and 56 software synthetic-OpenXR loader
+checks. Fresh current worker publication remeasures 373 regular prefixes per
+profile and long-path 377 with the five tail controls 373..377, all passing
+real preparation/rollback/retry/ordered Save. The historical full-381 scope is
+separate. See [the application receipt](validation/MODE5-MAIN-APPLICATION-QUALIFICATION.json).
+This remains a private candidate; no main admission or default promotion.
+
+The initial merged Release proof on `8f43cae` covered the earlier `9dd63f9`
+retopology baseline only. Its 25 surface-heat checks, 38 legacy skin checks and
+251-one-shot-prefix/4,308-check worker result stay separate; they do not qualify the new
+polygon job/world payload. The second Release and sanitizer cohorts freshly compiled the complete merged
+Document and used qualified complete polygon providers. No old provider is
+accepted merely because outer Document size happens to match.
+
+The weight component's complete caller 1,052 and long-basename publication 381
+prefixes passed in both profiles, with timing variance and previous sampled
+scopes retained in [the component receipt](MODE5-COMPLETE-ADMISSION.md).
+Main's polygon/retopology changes and all current documentation remain below.
+No generic post-enqueue caller fix, default promotion or full-goal completion
+is implied by those component proofs.
+
 ## Affine polygon admission — 2026-11-05
 
 Main now also admits qualified polygon/retopology composition8750f20 (runtime0567)

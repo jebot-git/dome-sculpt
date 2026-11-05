@@ -1,0 +1,178 @@
+{
+  "runtime": "a4a734d",
+  "scope": "Actual native same-geometry owner-grouping counterexample; no source/artist values, independent per-component analytic pose3%/1% bounds",
+  "proof": {
+    "state": "terminal",
+    "scope": "Actual public native single-owner disconnected head+eye components with exact current atlas corner map and independent per-component rigid-pose oracle, no artist/source values",
+    "source_before": "74476020887e5d8c3b56dc3bed90bcdb909dfa75d56103f2a4aed28b8ccd3777",
+    "input": "/home/blux/de-xr/dome-sculpt/artifacts/weights-mode5-native-tests-9a08f5c/build-registration/anatomical-native/female/fitted-unskinned.dsculpt",
+    "input_before": "22e2b3dcd13e2646017a827abad0e79e720c6cbe9b2ebcba1185762b08e152e8",
+    "steps": [
+      {
+        "profile": "release",
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-mode5-component-counter-0a68a6e/artifacts/weights-mode5/release-component-counter",
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-mode5-component-counter-0a68a6e/artifacts/weights-mode5/release-component-output"
+        ],
+        "exit": 1,
+        "seconds": 0.03220762999262661,
+        "binary_before": "c75f43cded8d8edf79281b6c1feee3d22122565185afe01d45c71bb3a17035c2",
+        "binary_after": "c75f43cded8d8edf79281b6c1feee3d22122565185afe01d45c71bb3a17035c2"
+      },
+      {
+        "profile": "sanitize",
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-mode5-component-counter-0a68a6e/artifacts/weights-mode5/sanitize-component-counter",
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-mode5-component-counter-0a68a6e/artifacts/weights-mode5/sanitize-component-output"
+        ],
+        "exit": 1,
+        "seconds": 0.21452814200893044,
+        "binary_before": "5f57011be2dcea89f82585f018875b19305cbc1042d36ad895e93bb93a05a133",
+        "binary_after": "5f57011be2dcea89f82585f018875b19305cbc1042d36ad895e93bb93a05a133"
+      }
+    ],
+    "seconds": 0.6373976760078222,
+    "exit": 1,
+    "source_drift": false,
+    "input_drift": false
+  },
+  "reports": {
+    "release": {
+      "eye_rows": 17,
+      "foreign_weight": 1.0,
+      "local_max": 0.14048049492803769,
+      "local_mean": 0.13221685247071582,
+      "max_bound": 0.03,
+      "max_m": 0.004768066108226776,
+      "mean_bound": 0.01,
+      "mean_m": 0.004487588782520855,
+      "pass": false,
+      "same_geometry_as_separate_qualified_components": true
+    },
+    "sanitize": {
+      "eye_rows": 17,
+      "foreign_weight": 1.0,
+      "local_max": 0.14048049492803769,
+      "local_mean": 0.13221685247071582,
+      "max_bound": 0.03,
+      "max_m": 0.004768066108226776,
+      "mean_bound": 0.01,
+      "mean_m": 0.004487588782520855,
+      "pass": false,
+      "same_geometry_as_separate_qualified_components": true
+    }
+  },
+  "build": {
+    "scope": "Fresh testTUs on exact matching9a/current615 fullchanged product closure+entire actual native app. No55objects/default admission.",
+    "source": "74476020887e5d8c3b56dc3bed90bcdb909dfa75d56103f2a4aed28b8ccd3777",
+    "steps": [
+      {
+        "profile": "release",
+        "compile": [
+          "/usr/bin/c++",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/weights-mode5-component-counter-0a68a6e/third_party/cgltf",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/weights-mode5-component-counter-0a68a6e/src",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/weights-mode5-component-counter-0a68a6e/include",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/weights-mode5-component-counter-0a68a6e/third_party/openbrush",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/weights-mode5-component-counter-0a68a6e/third_party/nlohmann",
+          "-O3",
+          "-DNDEBUG",
+          "-std=gnu++20",
+          "-o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-mode5-component-counter-0a68a6e/artifacts/weights-mode5/release-component-counter.o",
+          "-c",
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-mode5-component-counter-0a68a6e/tests/surface-heat-component-counter.cpp"
+        ],
+        "link": [
+          "/usr/bin/c++",
+          "-O3",
+          "-DNDEBUG",
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-mode5-component-counter-0a68a6e/artifacts/weights-mode5/release-component-counter.o",
+          "-o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-mode5-component-counter-0a68a6e/artifacts/weights-mode5/release-component-counter",
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-mode5-closed-eye-99e4ae1/artifacts/weights-mode5/current-release/libdome-sculpt-core.a",
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-surface-mode5-615bd42/artifacts/weights-mode5/release/stage/libdome-sculpt-affine.a",
+          "/usr/lib64/liblapacke.so",
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-surface-mode5-615bd42/artifacts/weights-mode5/release/stage/libdome-sculpt-polygon.a",
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-surface-mode5-615bd42/artifacts/weights-mode5/release/stage/libxatlas.a",
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-surface-mode5-615bd42/artifacts/weights-mode5/release/stage/libmikktspace.a",
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-surface-mode5-615bd42/artifacts/weights-mode5/release/stage/libmikktspace-robust.a",
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-surface-mode5-615bd42/artifacts/weights-mode5/release/stage/libufbx.a",
+          "/usr/lib64/libpng.so",
+          "/usr/lib64/libjpeg.so",
+          "/usr/lib64/libz.so",
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-surface-mode5-615bd42/artifacts/weights-mode5/release/stage/libdome-sculpt-emission-codec.a",
+          "/usr/lib64/libOpenEXR-3_2.so",
+          "/usr/lib64/libOpenEXRUtil-3_2.so",
+          "/usr/lib64/libOpenEXRCore-3_2.so",
+          "/usr/lib64/libIex-3_2.so",
+          "/usr/lib64/libIlmThread-3_2.so",
+          "/usr/lib64/libImath-3_1.so",
+          "-lgcc_s_asneeded",
+          "-lgcc_s_asneeded"
+        ],
+        "exit": 0,
+        "phase": "link",
+        "seconds": 5.016590662999079,
+        "binary": "c75f43cded8d8edf79281b6c1feee3d22122565185afe01d45c71bb3a17035c2"
+      },
+      {
+        "profile": "sanitize",
+        "compile": [
+          "/usr/bin/c++",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/weights-mode5-component-counter-0a68a6e/third_party/cgltf",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/weights-mode5-component-counter-0a68a6e/src",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/weights-mode5-component-counter-0a68a6e/include",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/weights-mode5-component-counter-0a68a6e/third_party/openbrush",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/weights-mode5-component-counter-0a68a6e/third_party/nlohmann",
+          "-O1",
+          "-g",
+          "-UNDEBUG",
+          "-fsanitize=address,undefined",
+          "-fno-omit-frame-pointer",
+          "-std=gnu++20",
+          "-o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-mode5-component-counter-0a68a6e/artifacts/weights-mode5/sanitize-component-counter.o",
+          "-c",
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-mode5-component-counter-0a68a6e/tests/surface-heat-component-counter.cpp"
+        ],
+        "link": [
+          "/usr/bin/c++",
+          "-O1",
+          "-g",
+          "-UNDEBUG",
+          "-fsanitize=address,undefined",
+          "-fno-omit-frame-pointer",
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-mode5-component-counter-0a68a6e/artifacts/weights-mode5/sanitize-component-counter.o",
+          "-o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-mode5-component-counter-0a68a6e/artifacts/weights-mode5/sanitize-component-counter",
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-mode5-closed-eye-99e4ae1/artifacts/weights-mode5/current-sanitize/libdome-sculpt-core.a",
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-surface-mode5-615bd42/artifacts/weights-mode5/sanitize/stage/libdome-sculpt-affine.a",
+          "/usr/lib64/liblapacke.so",
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-surface-mode5-615bd42/artifacts/weights-mode5/sanitize/stage/libdome-sculpt-polygon.a",
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-surface-mode5-615bd42/artifacts/weights-mode5/sanitize/stage/libxatlas.a",
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-surface-mode5-615bd42/artifacts/weights-mode5/sanitize/stage/libmikktspace.a",
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-surface-mode5-615bd42/artifacts/weights-mode5/sanitize/stage/libmikktspace-robust.a",
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-surface-mode5-615bd42/artifacts/weights-mode5/sanitize/stage/libufbx.a",
+          "/usr/lib64/libpng.so",
+          "/usr/lib64/libjpeg.so",
+          "/usr/lib64/libz.so",
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-surface-mode5-615bd42/artifacts/weights-mode5/sanitize/stage/libdome-sculpt-emission-codec.a",
+          "/usr/lib64/libOpenEXR-3_2.so",
+          "/usr/lib64/libOpenEXRUtil-3_2.so",
+          "/usr/lib64/libOpenEXRCore-3_2.so",
+          "/usr/lib64/libIex-3_2.so",
+          "/usr/lib64/libIlmThread-3_2.so",
+          "/usr/lib64/libImath-3_1.so",
+          "-lgcc_s_asneeded",
+          "-lgcc_s_asneeded"
+        ],
+        "exit": 0,
+        "phase": "link",
+        "seconds": 15.091976320021786,
+        "binary": "5f57011be2dcea89f82585f018875b19305cbc1042d36ad895e93bb93a05a133"
+      }
+    ],
+    "exit": 0
+  }
+}

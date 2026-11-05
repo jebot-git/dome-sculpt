@@ -4,6 +4,7 @@
 // (Apache-2.0).
 
 #include "sculpt-ui-values.hpp"
+#include "skin-methods.hpp"
 #include "shapekey-mirror-controls.hpp"
 #include "dome/palette.hpp"
 #include <cstdio>
@@ -341,7 +342,7 @@ void SpatialPalette::raster(const EditorState &s) {
         auto found=std::find_if(s.objects.begin(),s.objects.end(),[&](const auto &o){return o.id==id;});
         label=found==s.objects.end()?"No reference":found->name+(found->visible?"":" [hidden]");
       }
-      else if(c.parameter==VrParameter::SkinMode)label=value<.5f?"Automatic binding":"Barycentric transfer";
+      else if(c.parameter==VrParameter::SkinMode)label=detail::skin_method_label(detail::skin_method_mode(int(std::lround(value))));
       else if(c.parameter==VrParameter::SkinDistances){char size[48];snprintf(size,sizeof(size),"%.2f mm",double(skin_distance_metres(value))*1000);label+=size;}
       else if(c.parameter==VrParameter::SkinFalloff){char size[48];snprintf(size,sizeof(size),"Falloff %.2f",double(value));label=size;}
       else if(c.parameter==VrParameter::SkinInfluences)label="Max influences "+std::to_string(int(std::lround(value)));
@@ -498,7 +499,7 @@ void SpatialPalette::raster(const EditorState &s) {
     if (!s.menu_enabled[i])
       for (int c = 0; c < 3; ++c)
         label_color[c] = uint8_t((int(fg[c]) + bg[c]) / 2);
-    const std::string label = s.menu_page==16 && s.retopology && i==3 && s.retopology->selected.size()==4 ? "Bridge edges" : s.menu_page==16 && s.retopology && i==1 ? (s.retopology->extruding?"Extrude edge":s.retopology->moving?"Move points":"Place points") : s.menu_page==27?rig_fit_tool_label(s.rig_fit.get(),i):s.menu_page==25?projection_tool_label(s.projection.get(),i):s.menu_page==19&&i==0 ? (s.polygon?"Resume editing":s.polygon_has_source?"Edit / original":s.polygon_requires_conversion?"Convert / source":"Start editing") : s.menu_page == 16 && i == 0 && s.retopology ? "Resume patch" : s.menu_page == 15 && i == 0 && s.sculpt_settings.mask_edit ? "Resume mask" : labels[i];
+    const std::string label = s.menu_page==14&&i==7&&s.skin_options.mode==SkinAuthoringMode::SurfaceHeat&&s.selected_objects.size()>1 ? "Bind selected" : s.menu_page==16 && s.retopology && i==3 && s.retopology->selected.size()==4 ? "Bridge edges" : s.menu_page==16 && s.retopology && i==1 ? (s.retopology->extruding?"Extrude edge":s.retopology->moving?"Move points":"Place points") : s.menu_page==27?rig_fit_tool_label(s.rig_fit.get(),i):s.menu_page==25?projection_tool_label(s.projection.get(),i):s.menu_page==19&&i==0 ? (s.polygon?"Resume editing":s.polygon_has_source?"Edit / original":s.polygon_requires_conversion?"Convert / source":"Start editing") : s.menu_page == 16 && i == 0 && s.retopology ? "Resume patch" : s.menu_page == 15 && i == 0 && s.sculpt_settings.mask_edit ? "Resume mask" : labels[i];
     int cell = 102 * unit_;
     auto fitted = text_font_->layout(label, cell);
     size_t split = std::string::npos;
@@ -621,7 +622,7 @@ void SpatialPalette::raster(const EditorState &s) {
     auto source=std::find_if(s.objects.begin(),s.objects.end(),[&](const auto &o){return o.id==s.skin_options.reference;});
     text(320*unit_,285*unit_,source==s.objects.end()?"Choose reference rig":source->name,fg);
     size_t locks=s.skin_use_locks?size_t(std::count(s.weights.locks.begin(),s.weights.locks.end(),uint8_t(1))):0;
-    text(320*unit_,318*unit_,std::string(s.skin_options.mode==SkinAuthoringMode::Automatic?"Automatic":"Transfer")+" / "+std::to_string(locks)+" locked",fg);
+    text(320*unit_,318*unit_,std::string(detail::skin_method_label(s.skin_options.mode))+(s.skin_options.mode==SkinAuthoringMode::SurfaceHeat&&s.selected_objects.size()>1?" / "+std::to_string(s.selected_objects.size())+" selected":"")+" / "+std::to_string(locks)+" locked",fg);
   }
   if (s.menu_page == 16) {
     auto r = s.retopology;
