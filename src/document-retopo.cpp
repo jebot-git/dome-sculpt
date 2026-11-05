@@ -41,6 +41,10 @@ void Document::queue_retopology_locked(RetopoAction action, Vec3 point, bool coa
     throw std::logic_error("Wait for the retopology source before editing");
   std::lock_guard lock(retopo_mutex_);
   RetopoJob job{retopo_session_.load(), {}, action, point, retopo_snap_mm_, false, coalescible};
+  // Prepare the view before accepting an input job. A failed view allocation
+  // must not leave a hidden Sample/EndGesture in the worker queue.
+  auto view = std::make_shared<RetopoView>(*state_.retopology);
+  view->busy = true;
   if (coalescible && !retopo_jobs_.empty() && retopo_jobs_.back().coalescible)
     retopo_jobs_.back() = std::move(job);
   else {
@@ -48,8 +52,7 @@ void Document::queue_retopology_locked(RetopoAction action, Vec3 point, bool coa
       throw std::length_error("Retopology input queue is full");
     retopo_jobs_.push_back(std::move(job)); ++retopo_pending_;
   }
-  auto view = std::make_shared<RetopoView>(*state_.retopology);
-  view->busy = true; state_.retopology = std::move(view);
+  state_.retopology = std::move(view);
   retopo_changed_.notify_one();
 }
 void Document::edit_retopology(RetopoAction action) {
@@ -100,7 +103,8 @@ void Document::end_retopology_locked(bool accept) {
     publish_locked(true); return;
   }
   if (!state_.retopology->source) throw std::logic_error("Wait for the source surface");
-  if (retopo_stroking_) { end_action_locked(); desktop_ = false; input_.cancel(); }
+  // The accepted input job already finalizes the live gesture. Do not enqueue
+  // a separate EndGesture before acceptance allocations can still fail.
   auto acceptance = std::make_shared<RetopoAcceptance>();
   acceptance->work = std::make_shared<AssetWork>();
   acceptance->changed = std::make_shared<bool>(true);
@@ -116,8 +120,10 @@ void Document::end_retopology_locked(bool accept) {
   }
   const auto previous = state_.retopology;
   const auto pending = retopo_pending_;
+  const auto stroking = retopo_stroking_, sampled = retopo_sampled_, desktop = desktop_;
   ++retopo_pending_; retopo_accepting_ = true;
   state_.retopology = std::move(view);
+  retopo_stroking_ = retopo_sampled_ = false; desktop_ = false;
   try {
     queue_scene_operation_locked("Apply retopology", [this, acceptance](Scene &scene, const auto &cancelled) {
       std::unique_lock lock(retopo_mutex_);
@@ -140,6 +146,7 @@ void Document::end_retopology_locked(bool accept) {
     }
     retopo_pending_ = pending;retopo_accepting_ = false;
     state_.retopology = previous;
+    retopo_stroking_ = stroking; retopo_sampled_ = sampled; desktop_ = desktop;
     retopo_changed_.notify_all();
     throw;
   }
@@ -147,6 +154,7 @@ void Document::end_retopology_locked(bool accept) {
     std::lock_guard lock(retopo_mutex_);
     acceptance->admission = RetopoAcceptance::Admission::Accepted;
   }
+  if (stroking) input_.cancel();
   // Both the input queue and accepted-result waiter use this condition.
   retopo_changed_.notify_all();
 }

@@ -567,6 +567,12 @@ if(BUILD_TESTING)
     -Wl,--wrap=_ZN4dome6unwrapERNS_4MeshEjjRKSt8functionIFbvEE
     -Wl,--wrap=_ZN4dome15RetopoWorkspace4editENS_12RetopoActionENS_4Vec3EfRKSt8functionIFbvEE)
   add_test(NAME retopology-save-handoff COMMAND dome-sculpt-retopo-save-handoff-test ${CMAKE_CURRENT_BINARY_DIR}/retopology-save-handoff)
+  add_executable(dome-sculpt-retopo-held-admission-test tests/retopo-held-admission.cpp)
+  target_link_libraries(dome-sculpt-retopo-held-admission-test PRIVATE dome-sculpt-core)
+  target_link_options(dome-sculpt-retopo-held-admission-test PRIVATE
+    -Wl,--wrap=_ZN4dome6unwrapERNS_4MeshEjjRKSt8functionIFbvEE
+    -Wl,--wrap=_ZN4dome15RetopoWorkspace4editENS_12RetopoActionENS_4Vec3EfRKSt8functionIFbvEE)
+  add_test(NAME retopology-held-admission COMMAND dome-sculpt-retopo-held-admission-test ${CMAKE_CURRENT_BINARY_DIR}/retopology-held-admission)
   add_executable(dome-sculpt-retopo-affine-ui-fixture tests/retopo-affine-ui-fixture.cpp)
   target_link_libraries(dome-sculpt-retopo-affine-ui-fixture PRIVATE dome-sculpt-core)
   add_test(NAME retopology-affine-ui-fixture COMMAND dome-sculpt-retopo-affine-ui-fixture ${CMAKE_CURRENT_BINARY_DIR}/retopology-affine-ui.dsculpt)
