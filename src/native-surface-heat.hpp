@@ -75,7 +75,8 @@ inline NativeSurfaceHeatRequest capture_native_surface_heat(const Scene&source,
   // A complete authenticated humanoid source uses its existing geometry-only
   // head/ocular domain; ordinary native geometry uses each actual requested
   // one-owner surface and the same exact visibility/screened energy.
-  request.source_head_=bool(ref.deformation->humanoid)&&source.object(selected.front()).appearance&&
+  bool any_source=false;for(auto id:selected){capture_work.step(16);any_source|=bool(source.object(id).appearance);}
+  request.source_head_=bool(ref.deformation->humanoid)&&any_source&&
     ref.deformation->humanoid->joints.contains("head")&&ref.deformation->humanoid->joints.contains("leftEye")&&ref.deformation->humanoid->joints.contains("rightEye");
   if(request.source_head_){auto domain=native_anatomical_domain(source,selected,capture_work);request.support_=std::move(domain.objects);}
   else request.support_=request.targets_;
