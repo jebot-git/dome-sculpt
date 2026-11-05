@@ -1,3 +1,20 @@
+## Unpublished exact mode5 integration option — 2026-11-05
+
+This private merge combines public10944ab with qualified d464/516/e06 and keeps
+all631 production/header/assets/thirdparty/CMake files byte-identical to d464,
+including its initializer5. Main itself is unchanged at109/default0. Root is
+reviewing default/admission policy; this is not a default promotion or main push.
+Later main validators/docs and the corrected official-schema helper are retained.
+No tests were adapted to erase the qualified default. Existing d464 proof scopes
+remain exact, without a freshALL claim; old implicit0 caller/regression contracts
+need policy-specific qualification before promotion. Actual matched5 probes show
+unsupported native36/32 and canonical34 Bind refuses atomically while Method
+remains accessible. Legacy0 succeeds on36/34 and retains a separate seed refusal
+on32; immutable owners and following Save remain exact. Original negatives and
+unimplemented complex37/38 owner guards remain; full project/weights goals stay
+open. Read MODE5-MAIN-CANDIDATE.md and its audit receipt. No large build/archive
+copy/GPU/HMD/session/system action occurred.
+
 ## Exhaustive private physical-package fault closure — 2026-11-05
 
 Private frozen1f9fd48/owning5df now closes all128 partitions/profile:90,261

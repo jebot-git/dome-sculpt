@@ -1,0 +1,2754 @@
+{
+  "state": "private WIP; native candidate optimized checks only, actual-avatar adapter refused, no production admission",
+  "base": "55b1c89717177f3ce1cc01a6f330399345d29b9d",
+  "native_legacy": {
+    "fixture": "two disconnected closed2mm limbs with1mm gap, genuine independent authored bone segments",
+    "height_m": 0.2,
+    "max_bound": 0.03,
+    "max_fraction": 0.48358388245105743,
+    "max_pose_error_m": 0.09671677649021149,
+    "maximum_foreign_weight": 0.48358383774757385,
+    "mean_bound": 0.01,
+    "mean_fraction": 0.412836701143533,
+    "mean_pose_error_m": 0.0825673402287066,
+    "pass": false,
+    "vertices": 32,
+    "weights": {
+      "version": 1,
+      "vertices": [
+        [
+          [
+            0,
+            0.552015483379364
+          ],
+          [
+            1,
+            0.447984516620636
+          ]
+        ],
+        [
+          [
+            0,
+            0.5164161324501038
+          ],
+          [
+            1,
+            0.48358383774757385
+          ]
+        ],
+        [
+          [
+            0,
+            0.5164161324501038
+          ],
+          [
+            1,
+            0.48358383774757385
+          ]
+        ],
+        [
+          [
+            0,
+            0.5183708071708679
+          ],
+          [
+            1,
+            0.48162922263145447
+          ]
+        ],
+        [
+          [
+            0,
+            0.7158129215240479
+          ],
+          [
+            1,
+            0.28418707847595215
+          ]
+        ],
+        [
+          [
+            0,
+            0.5812310576438904
+          ],
+          [
+            1,
+            0.4187689423561096
+          ]
+        ],
+        [
+          [
+            0,
+            0.5812310576438904
+          ],
+          [
+            1,
+            0.4187689423561096
+          ]
+        ],
+        [
+          [
+            0,
+            0.7158129215240479
+          ],
+          [
+            1,
+            0.28418707847595215
+          ]
+        ],
+        [
+          [
+            0,
+            0.7158129215240479
+          ],
+          [
+            1,
+            0.28418707847595215
+          ]
+        ],
+        [
+          [
+            0,
+            0.5812310576438904
+          ],
+          [
+            1,
+            0.4187689423561096
+          ]
+        ],
+        [
+          [
+            0,
+            0.5812310576438904
+          ],
+          [
+            1,
+            0.4187689423561096
+          ]
+        ],
+        [
+          [
+            0,
+            0.7158129215240479
+          ],
+          [
+            1,
+            0.28418707847595215
+          ]
+        ],
+        [
+          [
+            0,
+            0.5183708071708679
+          ],
+          [
+            1,
+            0.48162922263145447
+          ]
+        ],
+        [
+          [
+            0,
+            0.5164161324501038
+          ],
+          [
+            1,
+            0.48358383774757385
+          ]
+        ],
+        [
+          [
+            0,
+            0.5164161324501038
+          ],
+          [
+            1,
+            0.48358383774757385
+          ]
+        ],
+        [
+          [
+            0,
+            0.552015483379364
+          ],
+          [
+            1,
+            0.447984516620636
+          ]
+        ],
+        [
+          [
+            0,
+            0.48358383774757385
+          ],
+          [
+            1,
+            0.5164161324501038
+          ]
+        ],
+        [
+          [
+            0,
+            0.48162922263145447
+          ],
+          [
+            1,
+            0.5183708071708679
+          ]
+        ],
+        [
+          [
+            0,
+            0.447984516620636
+          ],
+          [
+            1,
+            0.552015483379364
+          ]
+        ],
+        [
+          [
+            0,
+            0.48358383774757385
+          ],
+          [
+            1,
+            0.5164161324501038
+          ]
+        ],
+        [
+          [
+            0,
+            0.4187689423561096
+          ],
+          [
+            1,
+            0.5812310576438904
+          ]
+        ],
+        [
+          [
+            0,
+            0.28418707847595215
+          ],
+          [
+            1,
+            0.7158129215240479
+          ]
+        ],
+        [
+          [
+            0,
+            0.28418707847595215
+          ],
+          [
+            1,
+            0.7158129215240479
+          ]
+        ],
+        [
+          [
+            0,
+            0.4187689423561096
+          ],
+          [
+            1,
+            0.5812310576438904
+          ]
+        ],
+        [
+          [
+            0,
+            0.4187689423561096
+          ],
+          [
+            1,
+            0.5812310576438904
+          ]
+        ],
+        [
+          [
+            0,
+            0.28418707847595215
+          ],
+          [
+            1,
+            0.7158129215240479
+          ]
+        ],
+        [
+          [
+            0,
+            0.28418707847595215
+          ],
+          [
+            1,
+            0.7158129215240479
+          ]
+        ],
+        [
+          [
+            0,
+            0.4187689423561096
+          ],
+          [
+            1,
+            0.5812310576438904
+          ]
+        ],
+        [
+          [
+            0,
+            0.48358383774757385
+          ],
+          [
+            1,
+            0.5164161324501038
+          ]
+        ],
+        [
+          [
+            0,
+            0.447984516620636
+          ],
+          [
+            1,
+            0.552015483379364
+          ]
+        ],
+        [
+          [
+            0,
+            0.48162922263145447
+          ],
+          [
+            1,
+            0.5183708071708679
+          ]
+        ],
+        [
+          [
+            0,
+            0.48358383774757385
+          ],
+          [
+            1,
+            0.5164161324501038
+          ]
+        ]
+      ]
+    }
+  },
+  "candidate_native": {
+    "max_pose_error_m": 0.0,
+    "maximum_foreign_weight": 0.0,
+    "mean_pose_error_m": 0.0,
+    "occluded_candidates": 32,
+    "visible_seeds": 16,
+    "weights": {
+      "version": 1,
+      "vertices": [
+        [
+          [
+            0,
+            1.0
+          ]
+        ],
+        [
+          [
+            0,
+            1.0
+          ]
+        ],
+        [
+          [
+            0,
+            1.0
+          ]
+        ],
+        [
+          [
+            0,
+            1.0
+          ]
+        ],
+        [
+          [
+            0,
+            1.0
+          ]
+        ],
+        [
+          [
+            0,
+            1.0
+          ]
+        ],
+        [
+          [
+            0,
+            1.0
+          ]
+        ],
+        [
+          [
+            0,
+            1.0
+          ]
+        ],
+        [
+          [
+            0,
+            1.0
+          ]
+        ],
+        [
+          [
+            0,
+            1.0
+          ]
+        ],
+        [
+          [
+            0,
+            1.0
+          ]
+        ],
+        [
+          [
+            0,
+            1.0
+          ]
+        ],
+        [
+          [
+            0,
+            1.0
+          ]
+        ],
+        [
+          [
+            0,
+            1.0
+          ]
+        ],
+        [
+          [
+            0,
+            1.0
+          ]
+        ],
+        [
+          [
+            0,
+            1.0
+          ]
+        ],
+        [
+          [
+            1,
+            1.0
+          ]
+        ],
+        [
+          [
+            1,
+            1.0
+          ]
+        ],
+        [
+          [
+            1,
+            1.0
+          ]
+        ],
+        [
+          [
+            1,
+            1.0
+          ]
+        ],
+        [
+          [
+            1,
+            1.0
+          ]
+        ],
+        [
+          [
+            1,
+            1.0
+          ]
+        ],
+        [
+          [
+            1,
+            1.0
+          ]
+        ],
+        [
+          [
+            1,
+            1.0
+          ]
+        ],
+        [
+          [
+            1,
+            1.0
+          ]
+        ],
+        [
+          [
+            1,
+            1.0
+          ]
+        ],
+        [
+          [
+            1,
+            1.0
+          ]
+        ],
+        [
+          [
+            1,
+            1.0
+          ]
+        ],
+        [
+          [
+            1,
+            1.0
+          ]
+        ],
+        [
+          [
+            1,
+            1.0
+          ]
+        ],
+        [
+          [
+            1,
+            1.0
+          ]
+        ],
+        [
+          [
+            1,
+            1.0
+          ]
+        ]
+      ]
+    },
+    "work": 254608,
+    "workspace": 319504
+  },
+  "candidate_checks": 76,
+  "candidate_log": {
+    "path": "/home/blux/de-xr/dome-sculpt/artifacts/weights-current-55b1c89/artifacts/weights-audit/candidate-native-v3.log",
+    "sha256": "9d44f5bcbf06fb43076941e7b2f450fbd811f73522cbce0fba236d379c714733"
+  },
+  "full19_baselines": {
+    "female": {
+      "parts": 19,
+      "cohorts": 95,
+      "failures": 4,
+      "max_fraction_bound": 0.03,
+      "mean_fraction_bound": 0.01,
+      "records": [
+        {
+          "max_fraction": 3.904694644407105e-08,
+          "maximum_m": 6.238988514969175e-08,
+          "mean_fraction": 9.986104009036231e-09,
+          "mean_m": 1.5955969389541056e-08,
+          "name": "Face.baked / 0",
+          "object": 2,
+          "pass": true,
+          "pose": 0,
+          "vertices": 386
+        },
+        {
+          "max_fraction": 2.6796819083855322e-08,
+          "maximum_m": 4.281642016267466e-08,
+          "mean_fraction": 7.387398481111975e-09,
+          "mean_m": 1.1803712831981691e-08,
+          "name": "Face.baked / 1",
+          "object": 3,
+          "pass": true,
+          "pose": 0,
+          "vertices": 74
+        },
+        {
+          "max_fraction": 2.7171694750908103e-08,
+          "maximum_m": 4.341540297548789e-08,
+          "mean_fraction": 8.378141996873962e-09,
+          "mean_m": 1.3386739926039589e-08,
+          "name": "Face.baked / 2",
+          "object": 4,
+          "pass": true,
+          "pose": 0,
+          "vertices": 260
+        },
+        {
+          "max_fraction": 2.7264020766083357e-08,
+          "maximum_m": 4.3562923076486397e-08,
+          "mean_fraction": 7.240519880453055e-09,
+          "mean_m": 1.1569027668080766e-08,
+          "name": "Face.baked / 3",
+          "object": 5,
+          "pass": true,
+          "pose": 0,
+          "vertices": 150
+        },
+        {
+          "max_fraction": 4.2074420437419836e-08,
+          "maximum_m": 6.722723536372851e-08,
+          "mean_fraction": 9.511967135741176e-09,
+          "mean_m": 1.5198385307710657e-08,
+          "name": "Face.baked / 4",
+          "object": 6,
+          "pass": true,
+          "pose": 0,
+          "vertices": 110
+        },
+        {
+          "max_fraction": 2.7203701463895928e-08,
+          "maximum_m": 4.346654385407592e-08,
+          "mean_fraction": 7.811623583422867e-09,
+          "mean_m": 1.2481547024437774e-08,
+          "name": "Face.baked / 5",
+          "object": 7,
+          "pass": true,
+          "pose": 0,
+          "vertices": 122
+        },
+        {
+          "max_fraction": 2.7202522054353686e-08,
+          "maximum_m": 4.3464659373147547e-08,
+          "mean_fraction": 9.249975542978773e-09,
+          "mean_m": 1.4779770617672248e-08,
+          "name": "Face.baked / 6",
+          "object": 8,
+          "pass": true,
+          "pose": 0,
+          "vertices": 122
+        },
+        {
+          "max_fraction": 4.1719119490645164e-08,
+          "maximum_m": 6.665952937692107e-08,
+          "mean_fraction": 1.1340186721453681e-08,
+          "mean_m": 1.8119546124841328e-08,
+          "name": "Face.baked / 7",
+          "object": 9,
+          "pass": true,
+          "pose": 0,
+          "vertices": 588
+        },
+        {
+          "max_fraction": 2.740654113871518e-08,
+          "maximum_m": 4.379064458840352e-08,
+          "mean_fraction": 7.895226636316658e-09,
+          "mean_m": 1.261512942570642e-08,
+          "name": "Face.baked / 8",
+          "object": 10,
+          "pass": true,
+          "pose": 0,
+          "vertices": 192
+        },
+        {
+          "max_fraction": 4.0180292961791115e-08,
+          "maximum_m": 6.42007657822308e-08,
+          "mean_fraction": 1.2152689120917884e-08,
+          "mean_m": 1.941777648605611e-08,
+          "name": "Face.baked / 9",
+          "object": 11,
+          "pass": true,
+          "pose": 0,
+          "vertices": 50
+        },
+        {
+          "max_fraction": 0.019324857211087957,
+          "maximum_m": 0.030877590483571388,
+          "mean_fraction": 0.0007668711731154403,
+          "mean_m": 0.0012253199999598574,
+          "name": "Body.baked / 0",
+          "object": 12,
+          "pass": true,
+          "pose": 0,
+          "vertices": 2418
+        },
+        {
+          "max_fraction": 0.07173857718210017,
+          "maximum_m": 0.1146251371436788,
+          "mean_fraction": 0.034104444189753294,
+          "mean_m": 0.05449266971850149,
+          "name": "Body.baked / 1",
+          "object": 13,
+          "pass": false,
+          "pose": 0,
+          "vertices": 508
+        },
+        {
+          "max_fraction": 7.642685866892611e-08,
+          "maximum_m": 1.221161542436065e-07,
+          "mean_fraction": 1.6443980328645798e-08,
+          "mean_m": 2.6274475664249583e-08,
+          "name": "Body.baked / 2",
+          "object": 14,
+          "pass": true,
+          "pose": 0,
+          "vertices": 1580
+        },
+        {
+          "max_fraction": 2.9691173238314543e-08,
+          "maximum_m": 4.7441069199902085e-08,
+          "mean_fraction": 1.0059792524379015e-08,
+          "mean_m": 1.6073710171542352e-08,
+          "name": "Body.baked / 3",
+          "object": 15,
+          "pass": true,
+          "pose": 0,
+          "vertices": 142
+        },
+        {
+          "max_fraction": 0.012393034600856667,
+          "maximum_m": 0.019801804643318204,
+          "mean_fraction": 0.001822705363604093,
+          "mean_m": 0.0029123500978462213,
+          "name": "Body.baked / 4",
+          "object": 16,
+          "pass": true,
+          "pose": 0,
+          "vertices": 1425
+        },
+        {
+          "max_fraction": 2.444608849963174e-08,
+          "maximum_m": 3.9060382251294105e-08,
+          "mean_fraction": 6.963728359999258e-09,
+          "mean_m": 1.112676539806546e-08,
+          "name": "Body.baked / 5",
+          "object": 17,
+          "pass": true,
+          "pose": 0,
+          "vertices": 215
+        },
+        {
+          "max_fraction": 0.016094483497870387,
+          "maximum_m": 0.025716043594190236,
+          "mean_fraction": 0.0023295708029688936,
+          "mean_m": 0.003722228447581292,
+          "name": "Body.baked / 6",
+          "object": 18,
+          "pass": true,
+          "pose": 0,
+          "vertices": 742
+        },
+        {
+          "max_fraction": 0.09475280434632405,
+          "maximum_m": 0.15139766663305881,
+          "mean_fraction": 0.037395187374395074,
+          "mean_m": 0.05975067599156579,
+          "name": "Body.baked / 7",
+          "object": 19,
+          "pass": false,
+          "pose": 0,
+          "vertices": 542
+        },
+        {
+          "max_fraction": 4.070318614025629e-08,
+          "maximum_m": 6.503625353020944e-08,
+          "mean_fraction": 1.1395638435397234e-08,
+          "mean_m": 1.8208147830719848e-08,
+          "name": "Body.baked / 8",
+          "object": 20,
+          "pass": true,
+          "pose": 0,
+          "vertices": 225
+        },
+        {
+          "max_fraction": 0.003329736323991676,
+          "maximum_m": 0.005320310184309977,
+          "mean_fraction": 0.00091238318533107,
+          "mean_m": 0.00145782160525279,
+          "name": "Face.baked / 0",
+          "object": 2,
+          "pass": true,
+          "pose": 1,
+          "vertices": 386
+        },
+        {
+          "max_fraction": 0.004527232446072192,
+          "maximum_m": 0.007233690162199361,
+          "mean_fraction": 0.003384732241879453,
+          "mean_m": 0.00540818361138154,
+          "name": "Face.baked / 1",
+          "object": 3,
+          "pass": true,
+          "pose": 1,
+          "vertices": 74
+        },
+        {
+          "max_fraction": 0.006672877478276666,
+          "maximum_m": 0.010662038837888707,
+          "mean_fraction": 0.0038228158210725336,
+          "mean_m": 0.006108161117458005,
+          "name": "Face.baked / 2",
+          "object": 4,
+          "pass": true,
+          "pose": 1,
+          "vertices": 260
+        },
+        {
+          "max_fraction": 0.006067173515384234,
+          "maximum_m": 0.009694234588875271,
+          "mean_fraction": 0.004102154464697685,
+          "mean_m": 0.0065544932248510065,
+          "name": "Face.baked / 3",
+          "object": 5,
+          "pass": true,
+          "pose": 1,
+          "vertices": 150
+        },
+        {
+          "max_fraction": 0.0053386594431399734,
+          "maximum_m": 0.008530202226898983,
+          "mean_fraction": 0.004144478431108127,
+          "mean_m": 0.006622119189078686,
+          "name": "Face.baked / 4",
+          "object": 6,
+          "pass": true,
+          "pose": 1,
+          "vertices": 110
+        },
+        {
+          "max_fraction": 0.0039207420830568735,
+          "maximum_m": 0.006264629389492867,
+          "mean_fraction": 0.0032218350909240683,
+          "mean_m": 0.0051479037312665695,
+          "name": "Face.baked / 5",
+          "object": 7,
+          "pass": true,
+          "pose": 1,
+          "vertices": 122
+        },
+        {
+          "max_fraction": 0.003971006546523665,
+          "maximum_m": 0.006344942817004948,
+          "mean_fraction": 0.003240054095614201,
+          "mean_m": 0.0051770143715003,
+          "name": "Face.baked / 6",
+          "object": 8,
+          "pass": true,
+          "pose": 1,
+          "vertices": 122
+        },
+        {
+          "max_fraction": 0.013513915404446216,
+          "maximum_m": 0.02159276734260668,
+          "mean_fraction": 0.004320643839060866,
+          "mean_m": 0.00690359931929227,
+          "name": "Face.baked / 7",
+          "object": 9,
+          "pass": true,
+          "pose": 1,
+          "vertices": 588
+        },
+        {
+          "max_fraction": 0.009120230603967041,
+          "maximum_m": 0.01457246191415326,
+          "mean_fraction": 0.0074204880381960854,
+          "mean_m": 0.011856583897561399,
+          "name": "Face.baked / 8",
+          "object": 10,
+          "pass": true,
+          "pose": 1,
+          "vertices": 192
+        },
+        {
+          "max_fraction": 0.0029305336667969405,
+          "maximum_m": 0.004682457286657512,
+          "mean_fraction": 0.00223090556135877,
+          "mean_m": 0.003564579421142327,
+          "name": "Face.baked / 9",
+          "object": 11,
+          "pass": true,
+          "pose": 1,
+          "vertices": 50
+        },
+        {
+          "max_fraction": 0.008619104397077115,
+          "maximum_m": 0.013771753809150838,
+          "mean_fraction": 0.0010872966310800296,
+          "mean_m": 0.0017373013286428231,
+          "name": "Body.baked / 0",
+          "object": 12,
+          "pass": true,
+          "pose": 1,
+          "vertices": 2418
+        },
+        {
+          "max_fraction": 4.275230648025171e-09,
+          "maximum_m": 6.831037338624811e-09,
+          "mean_fraction": 1.2334395481378817e-09,
+          "mean_m": 1.97081100458484e-09,
+          "name": "Body.baked / 1",
+          "object": 13,
+          "pass": true,
+          "pose": 1,
+          "vertices": 508
+        },
+        {
+          "max_fraction": 7.954292805718455e-08,
+          "maximum_m": 1.2709506370917455e-07,
+          "mean_fraction": 1.3878879575159491e-08,
+          "mean_m": 2.2175913395452798e-08,
+          "name": "Body.baked / 2",
+          "object": 14,
+          "pass": true,
+          "pose": 1,
+          "vertices": 1580
+        },
+        {
+          "max_fraction": 0.02527738663117258,
+          "maximum_m": 0.04038864475771761,
+          "mean_fraction": 0.01253674481343135,
+          "mean_m": 0.020031427302037875,
+          "name": "Body.baked / 3",
+          "object": 15,
+          "pass": false,
+          "pose": 1,
+          "vertices": 142
+        },
+        {
+          "max_fraction": 0.01625632457457073,
+          "maximum_m": 0.02597463606062803,
+          "mean_fraction": 0.0038840640800357814,
+          "mean_m": 0.006206024643042753,
+          "name": "Body.baked / 4",
+          "object": 16,
+          "pass": true,
+          "pose": 1,
+          "vertices": 1425
+        },
+        {
+          "max_fraction": 0.009154546798916608,
+          "maximum_m": 0.014627292922891536,
+          "mean_fraction": 0.0033466008121811083,
+          "mean_m": 0.005347256554693999,
+          "name": "Body.baked / 5",
+          "object": 17,
+          "pass": true,
+          "pose": 1,
+          "vertices": 215
+        },
+        {
+          "max_fraction": 5.646120338409416e-08,
+          "maximum_m": 9.021468553482495e-08,
+          "mean_fraction": 1.2756629682418497e-08,
+          "mean_m": 2.0382763141881663e-08,
+          "name": "Body.baked / 6",
+          "object": 18,
+          "pass": true,
+          "pose": 1,
+          "vertices": 742
+        },
+        {
+          "max_fraction": 4.227439581951481e-09,
+          "maximum_m": 6.754675948169102e-09,
+          "mean_fraction": 1.075315366271393e-09,
+          "mean_m": 1.7181574568824649e-09,
+          "name": "Body.baked / 7",
+          "object": 19,
+          "pass": true,
+          "pose": 1,
+          "vertices": 542
+        },
+        {
+          "max_fraction": 0.030883576595352003,
+          "maximum_m": 0.04934631186988224,
+          "mean_fraction": 0.008998663266928764,
+          "mean_m": 0.014378219524248694,
+          "name": "Body.baked / 8",
+          "object": 20,
+          "pass": false,
+          "pose": 1,
+          "vertices": 225
+        },
+        {
+          "max_fraction": 3.904694644407105e-08,
+          "maximum_m": 6.238988514969175e-08,
+          "mean_fraction": 9.986104009036231e-09,
+          "mean_m": 1.5955969389541056e-08,
+          "name": "Face.baked / 0",
+          "object": 2,
+          "pass": true,
+          "pose": 2,
+          "vertices": 386
+        },
+        {
+          "max_fraction": 2.6796819083855322e-08,
+          "maximum_m": 4.281642016267466e-08,
+          "mean_fraction": 7.387398481111975e-09,
+          "mean_m": 1.1803712831981691e-08,
+          "name": "Face.baked / 1",
+          "object": 3,
+          "pass": true,
+          "pose": 2,
+          "vertices": 74
+        },
+        {
+          "max_fraction": 2.7171694750908103e-08,
+          "maximum_m": 4.341540297548789e-08,
+          "mean_fraction": 8.378141996873962e-09,
+          "mean_m": 1.3386739926039589e-08,
+          "name": "Face.baked / 2",
+          "object": 4,
+          "pass": true,
+          "pose": 2,
+          "vertices": 260
+        },
+        {
+          "max_fraction": 2.7264020766083357e-08,
+          "maximum_m": 4.3562923076486397e-08,
+          "mean_fraction": 7.240519880453055e-09,
+          "mean_m": 1.1569027668080766e-08,
+          "name": "Face.baked / 3",
+          "object": 5,
+          "pass": true,
+          "pose": 2,
+          "vertices": 150
+        },
+        {
+          "max_fraction": 4.2074420437419836e-08,
+          "maximum_m": 6.722723536372851e-08,
+          "mean_fraction": 9.511967135741176e-09,
+          "mean_m": 1.5198385307710657e-08,
+          "name": "Face.baked / 4",
+          "object": 6,
+          "pass": true,
+          "pose": 2,
+          "vertices": 110
+        },
+        {
+          "max_fraction": 2.7203701463895928e-08,
+          "maximum_m": 4.346654385407592e-08,
+          "mean_fraction": 7.811623583422867e-09,
+          "mean_m": 1.2481547024437774e-08,
+          "name": "Face.baked / 5",
+          "object": 7,
+          "pass": true,
+          "pose": 2,
+          "vertices": 122
+        },
+        {
+          "max_fraction": 2.7202522054353686e-08,
+          "maximum_m": 4.3464659373147547e-08,
+          "mean_fraction": 9.249975542978773e-09,
+          "mean_m": 1.4779770617672248e-08,
+          "name": "Face.baked / 6",
+          "object": 8,
+          "pass": true,
+          "pose": 2,
+          "vertices": 122
+        },
+        {
+          "max_fraction": 4.1719119490645164e-08,
+          "maximum_m": 6.665952937692107e-08,
+          "mean_fraction": 1.1340186721453681e-08,
+          "mean_m": 1.8119546124841328e-08,
+          "name": "Face.baked / 7",
+          "object": 9,
+          "pass": true,
+          "pose": 2,
+          "vertices": 588
+        },
+        {
+          "max_fraction": 2.740654113871518e-08,
+          "maximum_m": 4.379064458840352e-08,
+          "mean_fraction": 7.895226636316658e-09,
+          "mean_m": 1.261512942570642e-08,
+          "name": "Face.baked / 8",
+          "object": 10,
+          "pass": true,
+          "pose": 2,
+          "vertices": 192
+        },
+        {
+          "max_fraction": 4.0180292961791115e-08,
+          "maximum_m": 6.42007657822308e-08,
+          "mean_fraction": 1.2152689120917884e-08,
+          "mean_m": 1.941777648605611e-08,
+          "name": "Face.baked / 9",
+          "object": 11,
+          "pass": true,
+          "pose": 2,
+          "vertices": 50
+        },
+        {
+          "max_fraction": 0.015340548287268385,
+          "maximum_m": 0.024511392898465732,
+          "mean_fraction": 0.0006406115313973395,
+          "mean_m": 0.0010235801646281335,
+          "name": "Body.baked / 0",
+          "object": 12,
+          "pass": true,
+          "pose": 2,
+          "vertices": 2418
+        },
+        {
+          "max_fraction": 0.01330669953945055,
+          "maximum_m": 0.02126167425606299,
+          "mean_fraction": 0.0047191344855706755,
+          "mean_m": 0.007540314553979937,
+          "name": "Body.baked / 1",
+          "object": 13,
+          "pass": true,
+          "pose": 2,
+          "vertices": 508
+        },
+        {
+          "max_fraction": 0.005176263750877408,
+          "maximum_m": 0.008270723586140775,
+          "mean_fraction": 0.0002984093940427552,
+          "mean_m": 0.00047680368165494666,
+          "name": "Body.baked / 2",
+          "object": 14,
+          "pass": true,
+          "pose": 2,
+          "vertices": 1580
+        },
+        {
+          "max_fraction": 2.9691173238314543e-08,
+          "maximum_m": 4.7441069199902085e-08,
+          "mean_fraction": 1.0059792524379015e-08,
+          "mean_m": 1.6073710171542352e-08,
+          "name": "Body.baked / 3",
+          "object": 15,
+          "pass": true,
+          "pose": 2,
+          "vertices": 142
+        },
+        {
+          "max_fraction": 0.006082838152390951,
+          "maximum_m": 0.009719263816324862,
+          "mean_fraction": 0.0002032665809085973,
+          "mean_m": 0.0003247828522474267,
+          "name": "Body.baked / 4",
+          "object": 16,
+          "pass": true,
+          "pose": 2,
+          "vertices": 1425
+        },
+        {
+          "max_fraction": 2.444608849963174e-08,
+          "maximum_m": 3.9060382251294105e-08,
+          "mean_fraction": 6.963728359999258e-09,
+          "mean_m": 1.112676539806546e-08,
+          "name": "Body.baked / 5",
+          "object": 17,
+          "pass": true,
+          "pose": 2,
+          "vertices": 215
+        },
+        {
+          "max_fraction": 5.646120338409416e-08,
+          "maximum_m": 9.021468553482495e-08,
+          "mean_fraction": 1.2756629682418497e-08,
+          "mean_m": 2.0382763141881663e-08,
+          "name": "Body.baked / 6",
+          "object": 18,
+          "pass": true,
+          "pose": 2,
+          "vertices": 742
+        },
+        {
+          "max_fraction": 0.01869233822497445,
+          "maximum_m": 0.02986694072751055,
+          "mean_fraction": 0.005466697290558423,
+          "mean_m": 0.008734783309998346,
+          "name": "Body.baked / 7",
+          "object": 19,
+          "pass": true,
+          "pose": 2,
+          "vertices": 542
+        },
+        {
+          "max_fraction": 4.070318614025629e-08,
+          "maximum_m": 6.503625353020944e-08,
+          "mean_fraction": 1.1395638435397234e-08,
+          "mean_m": 1.8208147830719848e-08,
+          "name": "Body.baked / 8",
+          "object": 20,
+          "pass": true,
+          "pose": 2,
+          "vertices": 225
+        },
+        {
+          "max_fraction": 4.2265195801898705e-08,
+          "maximum_m": 6.75320595347114e-08,
+          "mean_fraction": 1.2040742198130263e-08,
+          "mean_m": 1.9238905760131738e-08,
+          "name": "Face.baked / 0",
+          "object": 2,
+          "pass": true,
+          "pose": 3,
+          "vertices": 386
+        },
+        {
+          "max_fraction": 3.0460834986723706e-08,
+          "maximum_m": 4.867084802924381e-08,
+          "mean_fraction": 9.46364191798948e-09,
+          "mean_m": 1.5121170440482032e-08,
+          "name": "Face.baked / 1",
+          "object": 3,
+          "pass": true,
+          "pose": 3,
+          "vertices": 74
+        },
+        {
+          "max_fraction": 3.241080778671479e-08,
+          "maximum_m": 5.178654823414266e-08,
+          "mean_fraction": 1.0811077421360722e-08,
+          "mean_m": 1.7274126150408322e-08,
+          "name": "Face.baked / 2",
+          "object": 4,
+          "pass": true,
+          "pose": 3,
+          "vertices": 260
+        },
+        {
+          "max_fraction": 3.255369591280888e-08,
+          "maximum_m": 5.201485734889083e-08,
+          "mean_fraction": 9.904222097598763e-09,
+          "mean_m": 1.5825137057805765e-08,
+          "name": "Face.baked / 3",
+          "object": 5,
+          "pass": true,
+          "pose": 3,
+          "vertices": 150
+        },
+        {
+          "max_fraction": 3.585736395274879e-08,
+          "maximum_m": 5.72935151788901e-08,
+          "mean_fraction": 1.1399703269082327e-08,
+          "mean_m": 1.8214642692158726e-08,
+          "name": "Face.baked / 4",
+          "object": 6,
+          "pass": true,
+          "pose": 3,
+          "vertices": 110
+        },
+        {
+          "max_fraction": 3.273042802956502e-08,
+          "maximum_m": 5.229724297621436e-08,
+          "mean_fraction": 9.78675035703383e-09,
+          "mean_m": 1.5637438682654246e-08,
+          "name": "Face.baked / 5",
+          "object": 7,
+          "pass": true,
+          "pose": 3,
+          "vertices": 122
+        },
+        {
+          "max_fraction": 3.292447427612493e-08,
+          "maximum_m": 5.260729341905609e-08,
+          "mean_fraction": 1.058457729747757e-08,
+          "mean_m": 1.6912220342083418e-08,
+          "name": "Face.baked / 6",
+          "object": 8,
+          "pass": true,
+          "pose": 3,
+          "vertices": 122
+        },
+        {
+          "max_fraction": 0.0032869003223380796,
+          "maximum_m": 0.005251866081330813,
+          "mean_fraction": 8.932981211216354e-05,
+          "mean_m": 0.0001427327160167138,
+          "name": "Face.baked / 7",
+          "object": 9,
+          "pass": true,
+          "pose": 3,
+          "vertices": 588
+        },
+        {
+          "max_fraction": 3.2747073173496484e-08,
+          "maximum_m": 5.232383887455615e-08,
+          "mean_fraction": 1.0301530958127419e-08,
+          "mean_m": 1.645996401444994e-08,
+          "name": "Face.baked / 8",
+          "object": 10,
+          "pass": true,
+          "pose": 3,
+          "vertices": 192
+        },
+        {
+          "max_fraction": 4.0460207178740075e-08,
+          "maximum_m": 6.464801755061749e-08,
+          "mean_fraction": 1.3309258335465752e-08,
+          "mean_m": 2.126576274451211e-08,
+          "name": "Face.baked / 9",
+          "object": 11,
+          "pass": true,
+          "pose": 3,
+          "vertices": 50
+        },
+        {
+          "max_fraction": 0.018844089384704842,
+          "maximum_m": 0.030109411350417583,
+          "mean_fraction": 0.0026603503344646492,
+          "mean_m": 0.004250753693709025,
+          "name": "Body.baked / 0",
+          "object": 12,
+          "pass": true,
+          "pose": 3,
+          "vertices": 2418
+        },
+        {
+          "max_fraction": 6.844068994230295e-09,
+          "maximum_m": 1.0935571597594946e-08,
+          "mean_fraction": 2.1474095372452476e-09,
+          "mean_m": 3.4311680323065803e-09,
+          "name": "Body.baked / 1",
+          "object": 13,
+          "pass": true,
+          "pose": 3,
+          "vertices": 508
+        },
+        {
+          "max_fraction": 8.001078025274892e-08,
+          "maximum_m": 1.278426060244258e-07,
+          "mean_fraction": 2.1851620071372886e-08,
+          "mean_m": 3.4914895804731025e-08,
+          "name": "Body.baked / 2",
+          "object": 14,
+          "pass": true,
+          "pose": 3,
+          "vertices": 1580
+        },
+        {
+          "max_fraction": 0.006238181290451102,
+          "maximum_m": 0.009967473764220473,
+          "mean_fraction": 0.0007839155445477442,
+          "mean_m": 0.0012525537908949125,
+          "name": "Body.baked / 3",
+          "object": 15,
+          "pass": true,
+          "pose": 3,
+          "vertices": 142
+        },
+        {
+          "max_fraction": 0.026825524728286917,
+          "maximum_m": 0.042862286536932644,
+          "mean_fraction": 0.0025755445123533077,
+          "mean_m": 0.00411524948701951,
+          "name": "Body.baked / 4",
+          "object": 16,
+          "pass": true,
+          "pose": 3,
+          "vertices": 1425
+        },
+        {
+          "max_fraction": 0.006927674155400216,
+          "maximum_m": 0.011069157367503591,
+          "mean_fraction": 0.001548302837591048,
+          "mean_m": 0.0024739050043928587,
+          "name": "Body.baked / 5",
+          "object": 17,
+          "pass": true,
+          "pose": 3,
+          "vertices": 215
+        },
+        {
+          "max_fraction": 0.013550195162395157,
+          "maximum_m": 0.02165073576620506,
+          "mean_fraction": 0.005266495443679947,
+          "mean_m": 0.008414897342694983,
+          "name": "Body.baked / 6",
+          "object": 18,
+          "pass": true,
+          "pose": 3,
+          "vertices": 742
+        },
+        {
+          "max_fraction": 7.508735648821516e-09,
+          "maximum_m": 1.1997587453359074e-08,
+          "mean_fraction": 2.5025587726920124e-09,
+          "mean_m": 3.998631612135085e-09,
+          "name": "Body.baked / 7",
+          "object": 19,
+          "pass": true,
+          "pose": 3,
+          "vertices": 542
+        },
+        {
+          "max_fraction": 0.00800400978628439,
+          "maximum_m": 0.012788945020798593,
+          "mean_fraction": 0.0003750446676170603,
+          "mean_m": 0.0005992528448325221,
+          "name": "Body.baked / 8",
+          "object": 20,
+          "pass": true,
+          "pose": 3,
+          "vertices": 225
+        },
+        {
+          "max_fraction": 3.904694644407105e-08,
+          "maximum_m": 6.238988514969175e-08,
+          "mean_fraction": 9.986188711362752e-09,
+          "mean_m": 1.5956104728380705e-08,
+          "name": "Face.baked / 0",
+          "object": 2,
+          "pass": true,
+          "pose": 4,
+          "vertices": 386
+        },
+        {
+          "max_fraction": 2.6796819083855322e-08,
+          "maximum_m": 4.281642016267466e-08,
+          "mean_fraction": 7.387399864887058e-09,
+          "mean_m": 1.1803715043001409e-08,
+          "name": "Face.baked / 1",
+          "object": 3,
+          "pass": true,
+          "pose": 4,
+          "vertices": 74
+        },
+        {
+          "max_fraction": 2.7171694750908103e-08,
+          "maximum_m": 4.341540297548789e-08,
+          "mean_fraction": 8.378141996873962e-09,
+          "mean_m": 1.3386739926039589e-08,
+          "name": "Face.baked / 2",
+          "object": 4,
+          "pass": true,
+          "pose": 4,
+          "vertices": 260
+        },
+        {
+          "max_fraction": 2.7264020766083357e-08,
+          "maximum_m": 4.3562923076486397e-08,
+          "mean_fraction": 7.240519880453055e-09,
+          "mean_m": 1.1569027668080766e-08,
+          "name": "Face.baked / 3",
+          "object": 5,
+          "pass": true,
+          "pose": 4,
+          "vertices": 150
+        },
+        {
+          "max_fraction": 4.2074420437419836e-08,
+          "maximum_m": 6.722723536372851e-08,
+          "mean_fraction": 9.511967135741176e-09,
+          "mean_m": 1.5198385307710657e-08,
+          "name": "Face.baked / 4",
+          "object": 6,
+          "pass": true,
+          "pose": 4,
+          "vertices": 110
+        },
+        {
+          "max_fraction": 2.7203701463895928e-08,
+          "maximum_m": 4.346654385407592e-08,
+          "mean_fraction": 7.811623583422867e-09,
+          "mean_m": 1.2481547024437774e-08,
+          "name": "Face.baked / 5",
+          "object": 7,
+          "pass": true,
+          "pose": 4,
+          "vertices": 122
+        },
+        {
+          "max_fraction": 2.7202522054353686e-08,
+          "maximum_m": 4.3464659373147547e-08,
+          "mean_fraction": 9.249975542978773e-09,
+          "mean_m": 1.4779770617672248e-08,
+          "name": "Face.baked / 6",
+          "object": 8,
+          "pass": true,
+          "pose": 4,
+          "vertices": 122
+        },
+        {
+          "max_fraction": 4.1719119490645164e-08,
+          "maximum_m": 6.665952937692107e-08,
+          "mean_fraction": 1.1340202181449888e-08,
+          "mean_m": 1.8119570827090177e-08,
+          "name": "Face.baked / 7",
+          "object": 9,
+          "pass": true,
+          "pose": 4,
+          "vertices": 588
+        },
+        {
+          "max_fraction": 2.740654113871518e-08,
+          "maximum_m": 4.379064458840352e-08,
+          "mean_fraction": 7.895226636316658e-09,
+          "mean_m": 1.261512942570642e-08,
+          "name": "Face.baked / 8",
+          "object": 10,
+          "pass": true,
+          "pose": 4,
+          "vertices": 192
+        },
+        {
+          "max_fraction": 4.0180292961791115e-08,
+          "maximum_m": 6.42007657822308e-08,
+          "mean_fraction": 1.2152689120917884e-08,
+          "mean_m": 1.941777648605611e-08,
+          "name": "Face.baked / 9",
+          "object": 11,
+          "pass": true,
+          "pose": 4,
+          "vertices": 50
+        },
+        {
+          "max_fraction": 0.015340548287268385,
+          "maximum_m": 0.024511392898465732,
+          "mean_fraction": 0.0006406115313973395,
+          "mean_m": 0.0010235801646281335,
+          "name": "Body.baked / 0",
+          "object": 12,
+          "pass": true,
+          "pose": 4,
+          "vertices": 2418
+        },
+        {
+          "max_fraction": 0.01330669953945055,
+          "maximum_m": 0.02126167425606299,
+          "mean_fraction": 0.0047191344855706755,
+          "mean_m": 0.007540314553979937,
+          "name": "Body.baked / 1",
+          "object": 13,
+          "pass": true,
+          "pose": 4,
+          "vertices": 508
+        },
+        {
+          "max_fraction": 0.005176263750877408,
+          "maximum_m": 0.008270723586140775,
+          "mean_fraction": 0.0002984093940427552,
+          "mean_m": 0.00047680368165494666,
+          "name": "Body.baked / 2",
+          "object": 14,
+          "pass": true,
+          "pose": 4,
+          "vertices": 1580
+        },
+        {
+          "max_fraction": 2.9691173238314543e-08,
+          "maximum_m": 4.7441069199902085e-08,
+          "mean_fraction": 1.0059792524379015e-08,
+          "mean_m": 1.6073710171542352e-08,
+          "name": "Body.baked / 3",
+          "object": 15,
+          "pass": true,
+          "pose": 4,
+          "vertices": 142
+        },
+        {
+          "max_fraction": 0.006082838152390951,
+          "maximum_m": 0.009719263816324862,
+          "mean_fraction": 0.0002032665809085973,
+          "mean_m": 0.0003247828522474267,
+          "name": "Body.baked / 4",
+          "object": 16,
+          "pass": true,
+          "pose": 4,
+          "vertices": 1425
+        },
+        {
+          "max_fraction": 2.444608849963174e-08,
+          "maximum_m": 3.9060382251294105e-08,
+          "mean_fraction": 6.963728359999258e-09,
+          "mean_m": 1.112676539806546e-08,
+          "name": "Body.baked / 5",
+          "object": 17,
+          "pass": true,
+          "pose": 4,
+          "vertices": 215
+        },
+        {
+          "max_fraction": 5.646120338409416e-08,
+          "maximum_m": 9.021468553482495e-08,
+          "mean_fraction": 1.2756629682418497e-08,
+          "mean_m": 2.0382763141881663e-08,
+          "name": "Body.baked / 6",
+          "object": 18,
+          "pass": true,
+          "pose": 4,
+          "vertices": 742
+        },
+        {
+          "max_fraction": 0.01869233822497445,
+          "maximum_m": 0.02986694072751055,
+          "mean_fraction": 0.005466697290558423,
+          "mean_m": 0.008734783309998346,
+          "name": "Body.baked / 7",
+          "object": 19,
+          "pass": true,
+          "pose": 4,
+          "vertices": 542
+        },
+        {
+          "max_fraction": 4.070318614025629e-08,
+          "maximum_m": 6.503625353020944e-08,
+          "mean_fraction": 1.1395638435397234e-08,
+          "mean_m": 1.8208147830719848e-08,
+          "name": "Body.baked / 8",
+          "object": 20,
+          "pass": true,
+          "pose": 4,
+          "vertices": 225
+        }
+      ]
+    },
+    "male": {
+      "parts": 19,
+      "cohorts": 95,
+      "failures": 5,
+      "max_fraction_bound": 0.03,
+      "mean_fraction_bound": 0.01,
+      "records": [
+        {
+          "max_fraction": 2.8113937048136422e-08,
+          "maximum_m": 4.9386433563119036e-08,
+          "mean_fraction": 9.086219766091913e-09,
+          "mean_m": 1.596133576203417e-08,
+          "name": "Face.baked / 0",
+          "object": 2,
+          "pass": true,
+          "pose": 0,
+          "vertices": 110
+        },
+        {
+          "max_fraction": 2.63801950501956e-08,
+          "maximum_m": 4.634085037602254e-08,
+          "mean_fraction": 1.1410338150640847e-08,
+          "mean_m": 2.004400543561366e-08,
+          "name": "Face.baked / 1",
+          "object": 3,
+          "pass": true,
+          "pose": 0,
+          "vertices": 384
+        },
+        {
+          "max_fraction": 2.7228263507546455e-08,
+          "maximum_m": 4.78306124272864e-08,
+          "mean_fraction": 7.710198535750656e-09,
+          "mean_m": 1.3544143856207007e-08,
+          "name": "Face.baked / 2",
+          "object": 4,
+          "pass": true,
+          "pose": 0,
+          "vertices": 122
+        },
+        {
+          "max_fraction": 2.7352083241631073e-08,
+          "maximum_m": 4.8048120742137604e-08,
+          "mean_fraction": 7.996188035066414e-09,
+          "mean_m": 1.4046528185499784e-08,
+          "name": "Face.baked / 3",
+          "object": 5,
+          "pass": true,
+          "pose": 0,
+          "vertices": 122
+        },
+        {
+          "max_fraction": 2.717358616885091e-08,
+          "maximum_m": 4.773456331291753e-08,
+          "mean_fraction": 8.916966272636624e-09,
+          "mean_m": 1.5664016094726688e-08,
+          "name": "Face.baked / 4",
+          "object": 6,
+          "pass": true,
+          "pose": 0,
+          "vertices": 74
+        },
+        {
+          "max_fraction": 4.039434983800302e-08,
+          "maximum_m": 7.095885827674077e-08,
+          "mean_fraction": 1.0513509314619681e-08,
+          "mean_m": 1.846858831591912e-08,
+          "name": "Face.baked / 5",
+          "object": 7,
+          "pass": true,
+          "pose": 0,
+          "vertices": 596
+        },
+        {
+          "max_fraction": 2.74072719364749e-08,
+          "maximum_m": 4.8145068131849453e-08,
+          "mean_fraction": 8.097510275277578e-09,
+          "mean_m": 1.422451620888076e-08,
+          "name": "Face.baked / 6",
+          "object": 8,
+          "pass": true,
+          "pose": 0,
+          "vertices": 150
+        },
+        {
+          "max_fraction": 2.7500929131012243e-08,
+          "maximum_m": 4.8309591329287326e-08,
+          "mean_fraction": 7.010421780767643e-09,
+          "mean_m": 1.2314878877779716e-08,
+          "name": "Face.baked / 7",
+          "object": 9,
+          "pass": true,
+          "pose": 0,
+          "vertices": 260
+        },
+        {
+          "max_fraction": 4.0043972545457853e-08,
+          "maximum_m": 7.034336693340171e-08,
+          "mean_fraction": 7.20468084686127e-09,
+          "mean_m": 1.2656124660796165e-08,
+          "name": "Face.baked / 8",
+          "object": 10,
+          "pass": true,
+          "pose": 0,
+          "vertices": 188
+        },
+        {
+          "max_fraction": 3.41668193417277e-08,
+          "maximum_m": 6.001924777003711e-08,
+          "mean_fraction": 1.4250320045220513e-08,
+          "mean_m": 2.503286832297709e-08,
+          "name": "Face.baked / 9",
+          "object": 11,
+          "pass": true,
+          "pose": 0,
+          "vertices": 50
+        },
+        {
+          "max_fraction": 0.010842962800029395,
+          "maximum_m": 0.019047323789412804,
+          "mean_fraction": 0.0006604855969504059,
+          "mean_m": 0.0011602440454120048,
+          "name": "Body.baked / 0",
+          "object": 12,
+          "pass": true,
+          "pose": 0,
+          "vertices": 2233
+        },
+        {
+          "max_fraction": 0.08741905906132572,
+          "maximum_m": 0.15356495766105166,
+          "mean_fraction": 0.040723659278965686,
+          "mean_m": 0.07153734071411569,
+          "name": "Body.baked / 1",
+          "object": 13,
+          "pass": false,
+          "pose": 0,
+          "vertices": 508
+        },
+        {
+          "max_fraction": 7.94698912326357e-08,
+          "maximum_m": 1.3960102766499638e-07,
+          "mean_fraction": 1.9151294693542807e-08,
+          "mean_m": 3.364218043922314e-08,
+          "name": "Body.baked / 2",
+          "object": 14,
+          "pass": true,
+          "pose": 0,
+          "vertices": 1580
+        },
+        {
+          "max_fraction": 2.949432285031475e-08,
+          "maximum_m": 5.181129250742231e-08,
+          "mean_fraction": 1.0633530316520951e-08,
+          "mean_m": 1.867942357625378e-08,
+          "name": "Body.baked / 3",
+          "object": 15,
+          "pass": true,
+          "pose": 0,
+          "vertices": 145
+        },
+        {
+          "max_fraction": 0.01346829581898026,
+          "maximum_m": 0.023659123072433327,
+          "mean_fraction": 0.0029017755083250102,
+          "mean_m": 0.005097412828079108,
+          "name": "Body.baked / 4",
+          "object": 16,
+          "pass": true,
+          "pose": 0,
+          "vertices": 1399
+        },
+        {
+          "max_fraction": 4.271063848049822e-08,
+          "maximum_m": 7.502777380997732e-08,
+          "mean_fraction": 1.1355537308764954e-08,
+          "mean_m": 1.9947739369005027e-08,
+          "name": "Body.baked / 5",
+          "object": 17,
+          "pass": true,
+          "pose": 0,
+          "vertices": 77
+        },
+        {
+          "max_fraction": 0.013970339103962523,
+          "maximum_m": 0.02454103894558671,
+          "mean_fraction": 0.0013446986724089146,
+          "mean_m": 0.0023621690385672725,
+          "name": "Body.baked / 6",
+          "object": 18,
+          "pass": true,
+          "pose": 0,
+          "vertices": 1095
+        },
+        {
+          "max_fraction": 0.13227873943642932,
+          "maximum_m": 0.2323678524926976,
+          "mean_fraction": 0.05117443212658709,
+          "mean_m": 0.08989572282326659,
+          "name": "Body.baked / 7",
+          "object": 19,
+          "pass": false,
+          "pose": 0,
+          "vertices": 536
+        },
+        {
+          "max_fraction": 2.955174581293886e-08,
+          "maximum_m": 5.191216473046874e-08,
+          "mean_fraction": 1.0036914417596165e-08,
+          "mean_m": 1.7631376431362608e-08,
+          "name": "Body.baked / 8",
+          "object": 20,
+          "pass": true,
+          "pose": 0,
+          "vertices": 249
+        },
+        {
+          "max_fraction": 0.004501963814327647,
+          "maximum_m": 0.00790838851346849,
+          "mean_fraction": 0.0035129078144316025,
+          "mean_m": 0.006170960264076144,
+          "name": "Face.baked / 0",
+          "object": 2,
+          "pass": true,
+          "pose": 1,
+          "vertices": 110
+        },
+        {
+          "max_fraction": 0.004759794985515438,
+          "maximum_m": 0.008361308429471897,
+          "mean_fraction": 0.0013781759432088384,
+          "mean_m": 0.0024209769887808684,
+          "name": "Face.baked / 1",
+          "object": 3,
+          "pass": true,
+          "pose": 1,
+          "vertices": 384
+        },
+        {
+          "max_fraction": 0.003478795177440835,
+          "maximum_m": 0.006111036195898756,
+          "mean_fraction": 0.002898251352368294,
+          "mean_m": 0.005091222108731461,
+          "name": "Face.baked / 2",
+          "object": 4,
+          "pass": true,
+          "pose": 1,
+          "vertices": 122
+        },
+        {
+          "max_fraction": 0.0035186712317478073,
+          "maximum_m": 0.006181084588744579,
+          "mean_fraction": 0.002903032972993623,
+          "mean_m": 0.0050996217572379125,
+          "name": "Face.baked / 3",
+          "object": 5,
+          "pass": true,
+          "pose": 1,
+          "vertices": 122
+        },
+        {
+          "max_fraction": 0.003970133762424618,
+          "maximum_m": 0.006974147625036248,
+          "mean_fraction": 0.003013060479781795,
+          "mean_m": 0.005292901913795348,
+          "name": "Face.baked / 4",
+          "object": 6,
+          "pass": true,
+          "pose": 1,
+          "vertices": 74
+        },
+        {
+          "max_fraction": 0.016433514683203688,
+          "maximum_m": 0.028867983865830626,
+          "mean_fraction": 0.004880965527846621,
+          "mean_m": 0.008574163033521126,
+          "name": "Face.baked / 5",
+          "object": 7,
+          "pass": true,
+          "pose": 1,
+          "vertices": 596
+        },
+        {
+          "max_fraction": 0.005744039964681089,
+          "maximum_m": 0.010090285384573244,
+          "mean_fraction": 0.0037537899654949075,
+          "mean_m": 0.0065941066320024996,
+          "name": "Face.baked / 6",
+          "object": 8,
+          "pass": true,
+          "pose": 1,
+          "vertices": 150
+        },
+        {
+          "max_fraction": 0.006100600784070044,
+          "maximum_m": 0.010716639039268193,
+          "mean_fraction": 0.003474090084490599,
+          "mean_m": 0.006102770979966982,
+          "name": "Face.baked / 7",
+          "object": 9,
+          "pass": true,
+          "pose": 1,
+          "vertices": 260
+        },
+        {
+          "max_fraction": 0.00855597003330429,
+          "maximum_m": 0.015029870946012842,
+          "mean_fraction": 0.006880899617260801,
+          "mean_m": 0.012087353372830699,
+          "name": "Face.baked / 8",
+          "object": 10,
+          "pass": true,
+          "pose": 1,
+          "vertices": 188
+        },
+        {
+          "max_fraction": 0.0031382178812013285,
+          "maximum_m": 0.0055127600460645925,
+          "mean_fraction": 0.0021382199292802185,
+          "mean_m": 0.003756110583157701,
+          "name": "Face.baked / 9",
+          "object": 11,
+          "pass": true,
+          "pose": 1,
+          "vertices": 50
+        },
+        {
+          "max_fraction": 0.00950651437669129,
+          "maximum_m": 0.016699647576127068,
+          "mean_fraction": 0.0008267905569143647,
+          "mean_m": 0.0014523841623374513,
+          "name": "Body.baked / 0",
+          "object": 12,
+          "pass": true,
+          "pose": 1,
+          "vertices": 2233
+        },
+        {
+          "max_fraction": 5.084081152202673e-09,
+          "maximum_m": 8.930966716716276e-09,
+          "mean_fraction": 1.3237065591166734e-09,
+          "mean_m": 2.3252931785025058e-09,
+          "name": "Body.baked / 1",
+          "object": 13,
+          "pass": true,
+          "pose": 1,
+          "vertices": 508
+        },
+        {
+          "max_fraction": 7.412632857006196e-08,
+          "maximum_m": 1.3021424195889924e-07,
+          "mean_fraction": 1.4777523748891078e-08,
+          "mean_m": 2.5958982322627046e-08,
+          "name": "Body.baked / 2",
+          "object": 14,
+          "pass": true,
+          "pose": 1,
+          "vertices": 1580
+        },
+        {
+          "max_fraction": 0.021846286635534326,
+          "maximum_m": 0.03837634628260607,
+          "mean_fraction": 0.010623236271561098,
+          "mean_m": 0.01866134051066837,
+          "name": "Body.baked / 3",
+          "object": 15,
+          "pass": false,
+          "pose": 1,
+          "vertices": 145
+        },
+        {
+          "max_fraction": 0.0346604700321464,
+          "maximum_m": 0.06088642076626344,
+          "mean_fraction": 0.008838480113123685,
+          "mean_m": 0.015526143142397975,
+          "name": "Body.baked / 4",
+          "object": 16,
+          "pass": false,
+          "pose": 1,
+          "vertices": 1399
+        },
+        {
+          "max_fraction": 0.006352518252338037,
+          "maximum_m": 0.011159170630937637,
+          "mean_fraction": 0.0030999919714321316,
+          "mean_m": 0.005445610384671602,
+          "name": "Body.baked / 5",
+          "object": 17,
+          "pass": true,
+          "pose": 1,
+          "vertices": 77
+        },
+        {
+          "max_fraction": 4.369405946770665e-08,
+          "maximum_m": 7.675530329708504e-08,
+          "mean_fraction": 7.808108627639455e-09,
+          "mean_m": 1.371613791879404e-08,
+          "name": "Body.baked / 6",
+          "object": 18,
+          "pass": true,
+          "pose": 1,
+          "vertices": 1095
+        },
+        {
+          "max_fraction": 5.215870405212443e-09,
+          "maximum_m": 9.162474711379425e-09,
+          "mean_fraction": 1.1216944581473322e-09,
+          "mean_m": 1.9704280030421453e-09,
+          "name": "Body.baked / 7",
+          "object": 19,
+          "pass": true,
+          "pose": 1,
+          "vertices": 536
+        },
+        {
+          "max_fraction": 0.021312615777457036,
+          "maximum_m": 0.03743887173637371,
+          "mean_fraction": 0.007706131892428937,
+          "mean_m": 0.013537000174769252,
+          "name": "Body.baked / 8",
+          "object": 20,
+          "pass": true,
+          "pose": 1,
+          "vertices": 249
+        },
+        {
+          "max_fraction": 2.8113937048136422e-08,
+          "maximum_m": 4.9386433563119036e-08,
+          "mean_fraction": 9.086219766091913e-09,
+          "mean_m": 1.596133576203417e-08,
+          "name": "Face.baked / 0",
+          "object": 2,
+          "pass": true,
+          "pose": 2,
+          "vertices": 110
+        },
+        {
+          "max_fraction": 2.63801950501956e-08,
+          "maximum_m": 4.634085037602254e-08,
+          "mean_fraction": 1.1410338150640847e-08,
+          "mean_m": 2.004400543561366e-08,
+          "name": "Face.baked / 1",
+          "object": 3,
+          "pass": true,
+          "pose": 2,
+          "vertices": 384
+        },
+        {
+          "max_fraction": 2.7228263507546455e-08,
+          "maximum_m": 4.78306124272864e-08,
+          "mean_fraction": 7.710198535750656e-09,
+          "mean_m": 1.3544143856207007e-08,
+          "name": "Face.baked / 2",
+          "object": 4,
+          "pass": true,
+          "pose": 2,
+          "vertices": 122
+        },
+        {
+          "max_fraction": 2.7352083241631073e-08,
+          "maximum_m": 4.8048120742137604e-08,
+          "mean_fraction": 7.996188035066414e-09,
+          "mean_m": 1.4046528185499784e-08,
+          "name": "Face.baked / 3",
+          "object": 5,
+          "pass": true,
+          "pose": 2,
+          "vertices": 122
+        },
+        {
+          "max_fraction": 2.717358616885091e-08,
+          "maximum_m": 4.773456331291753e-08,
+          "mean_fraction": 8.916966272636624e-09,
+          "mean_m": 1.5664016094726688e-08,
+          "name": "Face.baked / 4",
+          "object": 6,
+          "pass": true,
+          "pose": 2,
+          "vertices": 74
+        },
+        {
+          "max_fraction": 4.039434983800302e-08,
+          "maximum_m": 7.095885827674077e-08,
+          "mean_fraction": 1.0513509314619681e-08,
+          "mean_m": 1.846858831591912e-08,
+          "name": "Face.baked / 5",
+          "object": 7,
+          "pass": true,
+          "pose": 2,
+          "vertices": 596
+        },
+        {
+          "max_fraction": 2.74072719364749e-08,
+          "maximum_m": 4.8145068131849453e-08,
+          "mean_fraction": 8.097510275277578e-09,
+          "mean_m": 1.422451620888076e-08,
+          "name": "Face.baked / 6",
+          "object": 8,
+          "pass": true,
+          "pose": 2,
+          "vertices": 150
+        },
+        {
+          "max_fraction": 2.7500929131012243e-08,
+          "maximum_m": 4.8309591329287326e-08,
+          "mean_fraction": 7.010421780767643e-09,
+          "mean_m": 1.2314878877779716e-08,
+          "name": "Face.baked / 7",
+          "object": 9,
+          "pass": true,
+          "pose": 2,
+          "vertices": 260
+        },
+        {
+          "max_fraction": 4.0043972545457853e-08,
+          "maximum_m": 7.034336693340171e-08,
+          "mean_fraction": 7.20468084686127e-09,
+          "mean_m": 1.2656124660796165e-08,
+          "name": "Face.baked / 8",
+          "object": 10,
+          "pass": true,
+          "pose": 2,
+          "vertices": 188
+        },
+        {
+          "max_fraction": 3.41668193417277e-08,
+          "maximum_m": 6.001924777003711e-08,
+          "mean_fraction": 1.4250320045220513e-08,
+          "mean_m": 2.503286832297709e-08,
+          "name": "Face.baked / 9",
+          "object": 11,
+          "pass": true,
+          "pose": 2,
+          "vertices": 50
+        },
+        {
+          "max_fraction": 0.0174324880475103,
+          "maximum_m": 0.030622833483768586,
+          "mean_fraction": 0.0009346010944450631,
+          "mean_m": 0.0016417698730633323,
+          "name": "Body.baked / 0",
+          "object": 12,
+          "pass": true,
+          "pose": 2,
+          "vertices": 2233
+        },
+        {
+          "max_fraction": 0.01682786334289264,
+          "maximum_m": 0.029560717645844704,
+          "mean_fraction": 0.005959236464697809,
+          "mean_m": 0.01046831097497329,
+          "name": "Body.baked / 1",
+          "object": 13,
+          "pass": true,
+          "pose": 2,
+          "vertices": 508
+        },
+        {
+          "max_fraction": 0.005211794100037147,
+          "maximum_m": 0.009155314057417012,
+          "mean_fraction": 0.00028396790242145737,
+          "mean_m": 0.0004988330849209605,
+          "name": "Body.baked / 2",
+          "object": 14,
+          "pass": true,
+          "pose": 2,
+          "vertices": 1580
+        },
+        {
+          "max_fraction": 2.949432285031475e-08,
+          "maximum_m": 5.181129250742231e-08,
+          "mean_fraction": 1.0633530316520951e-08,
+          "mean_m": 1.867942357625378e-08,
+          "name": "Body.baked / 3",
+          "object": 15,
+          "pass": true,
+          "pose": 2,
+          "vertices": 145
+        },
+        {
+          "max_fraction": 8.446325002385246e-08,
+          "maximum_m": 1.4837262666861546e-07,
+          "mean_fraction": 1.6980040732418176e-08,
+          "mean_m": 2.9828040522919655e-08,
+          "name": "Body.baked / 4",
+          "object": 16,
+          "pass": true,
+          "pose": 2,
+          "vertices": 1399
+        },
+        {
+          "max_fraction": 4.271063848049822e-08,
+          "maximum_m": 7.502777380997732e-08,
+          "mean_fraction": 1.1355537308764954e-08,
+          "mean_m": 1.9947739369005027e-08,
+          "name": "Body.baked / 5",
+          "object": 17,
+          "pass": true,
+          "pose": 2,
+          "vertices": 77
+        },
+        {
+          "max_fraction": 0.01684883454738079,
+          "maximum_m": 0.029597556776394772,
+          "mean_fraction": 0.00149483339801408,
+          "mean_m": 0.002625903663814578,
+          "name": "Body.baked / 6",
+          "object": 18,
+          "pass": true,
+          "pose": 2,
+          "vertices": 1095
+        },
+        {
+          "max_fraction": 0.027147678168695955,
+          "maximum_m": 0.04768905194514946,
+          "mean_fraction": 0.007279957852005232,
+          "mean_m": 0.012788360242280448,
+          "name": "Body.baked / 7",
+          "object": 19,
+          "pass": true,
+          "pose": 2,
+          "vertices": 536
+        },
+        {
+          "max_fraction": 2.955174581293886e-08,
+          "maximum_m": 5.191216473046874e-08,
+          "mean_fraction": 1.0036914417596165e-08,
+          "mean_m": 1.7631376431362608e-08,
+          "name": "Body.baked / 8",
+          "object": 20,
+          "pass": true,
+          "pose": 2,
+          "vertices": 249
+        },
+        {
+          "max_fraction": 6.219061348041671e-08,
+          "maximum_m": 1.0924733151537756e-07,
+          "mean_fraction": 3.253771583184332e-08,
+          "mean_m": 5.715747810324893e-08,
+          "name": "Face.baked / 0",
+          "object": 2,
+          "pass": true,
+          "pose": 3,
+          "vertices": 110
+        },
+        {
+          "max_fraction": 5.567655228378362e-08,
+          "maximum_m": 9.780438597691423e-08,
+          "mean_fraction": 2.8447500312051637e-08,
+          "mean_m": 4.997238849160309e-08,
+          "name": "Face.baked / 1",
+          "object": 3,
+          "pass": true,
+          "pose": 3,
+          "vertices": 384
+        },
+        {
+          "max_fraction": 4.358161988712417e-08,
+          "maximum_m": 7.655778596371427e-08,
+          "mean_fraction": 1.6379066532251968e-08,
+          "mean_m": 2.8772337354813412e-08,
+          "name": "Face.baked / 2",
+          "object": 4,
+          "pass": true,
+          "pose": 3,
+          "vertices": 122
+        },
+        {
+          "max_fraction": 4.913783214695305e-08,
+          "maximum_m": 8.631812323568008e-08,
+          "mean_fraction": 1.616766466543014e-08,
+          "mean_m": 2.84009776184293e-08,
+          "name": "Face.baked / 3",
+          "object": 5,
+          "pass": true,
+          "pose": 3,
+          "vertices": 122
+        },
+        {
+          "max_fraction": 5.605395027039797e-08,
+          "maximum_m": 9.846734330519138e-08,
+          "mean_fraction": 3.087137495499404e-08,
+          "mean_m": 5.4230295301810546e-08,
+          "name": "Face.baked / 4",
+          "object": 6,
+          "pass": true,
+          "pose": 3,
+          "vertices": 74
+        },
+        {
+          "max_fraction": 0.0037000029377764624,
+          "maximum_m": 0.0064996214851365,
+          "mean_fraction": 0.00020258935920002254,
+          "mean_m": 0.0003558792178980845,
+          "name": "Face.baked / 5",
+          "object": 7,
+          "pass": true,
+          "pose": 3,
+          "vertices": 596
+        },
+        {
+          "max_fraction": 6.342507905288053e-08,
+          "maximum_m": 1.1141585924153903e-07,
+          "mean_fraction": 3.1187372131311964e-08,
+          "mean_m": 5.4785392708752803e-08,
+          "name": "Face.baked / 6",
+          "object": 8,
+          "pass": true,
+          "pose": 3,
+          "vertices": 150
+        },
+        {
+          "max_fraction": 5.536515103988003e-08,
+          "maximum_m": 9.725736202871424e-08,
+          "mean_fraction": 3.187416106079627e-08,
+          "mean_m": 5.599184258376633e-08,
+          "name": "Face.baked / 7",
+          "object": 9,
+          "pass": true,
+          "pose": 3,
+          "vertices": 260
+        },
+        {
+          "max_fraction": 6.509647854513115e-08,
+          "maximum_m": 1.1435192827520494e-07,
+          "mean_fraction": 3.0868536032779455e-08,
+          "mean_m": 5.4225308300413294e-08,
+          "name": "Face.baked / 8",
+          "object": 10,
+          "pass": true,
+          "pose": 3,
+          "vertices": 188
+        },
+        {
+          "max_fraction": 7.50335267258713e-08,
+          "maximum_m": 1.3180787437593676e-07,
+          "mean_fraction": 3.601873575825776e-08,
+          "mean_m": 6.32724224112414e-08,
+          "name": "Face.baked / 9",
+          "object": 11,
+          "pass": true,
+          "pose": 3,
+          "vertices": 50
+        },
+        {
+          "max_fraction": 0.030246665132759757,
+          "maximum_m": 0.05313289688055149,
+          "mean_fraction": 0.003725029900263576,
+          "mean_m": 0.006543585175388784,
+          "name": "Body.baked / 0",
+          "object": 12,
+          "pass": false,
+          "pose": 3,
+          "vertices": 2233
+        },
+        {
+          "max_fraction": 5.355442325177538e-09,
+          "maximum_m": 9.40765415176983e-09,
+          "mean_fraction": 1.6508664395774496e-09,
+          "mean_m": 2.8999995838426676e-09,
+          "name": "Body.baked / 1",
+          "object": 13,
+          "pass": true,
+          "pose": 3,
+          "vertices": 508
+        },
+        {
+          "max_fraction": 7.861319672977582e-08,
+          "maximum_m": 1.380961126444876e-07,
+          "mean_fraction": 2.2087001086730587e-08,
+          "mean_m": 3.8799198060047707e-08,
+          "name": "Body.baked / 2",
+          "object": 14,
+          "pass": true,
+          "pose": 3,
+          "vertices": 1580
+        },
+        {
+          "max_fraction": 0.005796447843992902,
+          "maximum_m": 0.010182347846169615,
+          "mean_fraction": 0.0006344547370572331,
+          "mean_m": 0.0011145168557087663,
+          "name": "Body.baked / 3",
+          "object": 15,
+          "pass": true,
+          "pose": 3,
+          "vertices": 145
+        },
+        {
+          "max_fraction": 0.019759359445398653,
+          "maximum_m": 0.034710339246656834,
+          "mean_fraction": 0.003159189790193823,
+          "mean_m": 0.00554960041418437,
+          "name": "Body.baked / 4",
+          "object": 16,
+          "pass": true,
+          "pose": 3,
+          "vertices": 1399
+        },
+        {
+          "max_fraction": 0.0029243257874632693,
+          "maximum_m": 0.005137025844946315,
+          "mean_fraction": 0.0013665198090863047,
+          "mean_m": 0.0024005012050989285,
+          "name": "Body.baked / 5",
+          "object": 17,
+          "pass": true,
+          "pose": 3,
+          "vertices": 77
+        },
+        {
+          "max_fraction": 0.028705948955351737,
+          "maximum_m": 0.05042639309188246,
+          "mean_fraction": 0.004789540897579184,
+          "mean_m": 0.008413561676941125,
+          "name": "Body.baked / 6",
+          "object": 18,
+          "pass": true,
+          "pose": 3,
+          "vertices": 1095
+        },
+        {
+          "max_fraction": 4.987245232465127e-09,
+          "maximum_m": 8.760859601926429e-09,
+          "mean_fraction": 1.8202885848813893e-09,
+          "mean_m": 3.1976155139362705e-09,
+          "name": "Body.baked / 7",
+          "object": 19,
+          "pass": true,
+          "pose": 3,
+          "vertices": 536
+        },
+        {
+          "max_fraction": 0.0060810507795169885,
+          "maximum_m": 0.010682296463933936,
+          "mean_fraction": 0.0002609081068529947,
+          "mean_m": 0.0004583250244571743,
+          "name": "Body.baked / 8",
+          "object": 20,
+          "pass": true,
+          "pose": 3,
+          "vertices": 249
+        },
+        {
+          "max_fraction": 2.8113937048136422e-08,
+          "maximum_m": 4.9386433563119036e-08,
+          "mean_fraction": 9.086219766091913e-09,
+          "mean_m": 1.596133576203417e-08,
+          "name": "Face.baked / 0",
+          "object": 2,
+          "pass": true,
+          "pose": 4,
+          "vertices": 110
+        },
+        {
+          "max_fraction": 2.63801950501956e-08,
+          "maximum_m": 4.634085037602254e-08,
+          "mean_fraction": 1.141088822047994e-08,
+          "mean_m": 2.0044971717480084e-08,
+          "name": "Face.baked / 1",
+          "object": 3,
+          "pass": true,
+          "pose": 4,
+          "vertices": 384
+        },
+        {
+          "max_fraction": 2.7228263507546455e-08,
+          "maximum_m": 4.78306124272864e-08,
+          "mean_fraction": 7.710198535750656e-09,
+          "mean_m": 1.3544143856207007e-08,
+          "name": "Face.baked / 2",
+          "object": 4,
+          "pass": true,
+          "pose": 4,
+          "vertices": 122
+        },
+        {
+          "max_fraction": 2.7352083241631073e-08,
+          "maximum_m": 4.8048120742137604e-08,
+          "mean_fraction": 7.996188035066414e-09,
+          "mean_m": 1.4046528185499784e-08,
+          "name": "Face.baked / 3",
+          "object": 5,
+          "pass": true,
+          "pose": 4,
+          "vertices": 122
+        },
+        {
+          "max_fraction": 2.717358616885091e-08,
+          "maximum_m": 4.773456331291753e-08,
+          "mean_fraction": 8.916966272636624e-09,
+          "mean_m": 1.5664016094726688e-08,
+          "name": "Face.baked / 4",
+          "object": 6,
+          "pass": true,
+          "pose": 4,
+          "vertices": 74
+        },
+        {
+          "max_fraction": 4.039434983800302e-08,
+          "maximum_m": 7.095885827674077e-08,
+          "mean_fraction": 1.0514230230428285e-08,
+          "mean_m": 1.846985471488079e-08,
+          "name": "Face.baked / 5",
+          "object": 7,
+          "pass": true,
+          "pose": 4,
+          "vertices": 596
+        },
+        {
+          "max_fraction": 2.74072719364749e-08,
+          "maximum_m": 4.8145068131849453e-08,
+          "mean_fraction": 8.097510275277578e-09,
+          "mean_m": 1.422451620888076e-08,
+          "name": "Face.baked / 6",
+          "object": 8,
+          "pass": true,
+          "pose": 4,
+          "vertices": 150
+        },
+        {
+          "max_fraction": 2.7500929131012243e-08,
+          "maximum_m": 4.8309591329287326e-08,
+          "mean_fraction": 7.010421780767643e-09,
+          "mean_m": 1.2314878877779716e-08,
+          "name": "Face.baked / 7",
+          "object": 9,
+          "pass": true,
+          "pose": 4,
+          "vertices": 260
+        },
+        {
+          "max_fraction": 4.0043972545457853e-08,
+          "maximum_m": 7.034336693340171e-08,
+          "mean_fraction": 7.20468084686127e-09,
+          "mean_m": 1.2656124660796165e-08,
+          "name": "Face.baked / 8",
+          "object": 10,
+          "pass": true,
+          "pose": 4,
+          "vertices": 188
+        },
+        {
+          "max_fraction": 3.41668193417277e-08,
+          "maximum_m": 6.001924777003711e-08,
+          "mean_fraction": 1.4250320045220513e-08,
+          "mean_m": 2.503286832297709e-08,
+          "name": "Face.baked / 9",
+          "object": 11,
+          "pass": true,
+          "pose": 4,
+          "vertices": 50
+        },
+        {
+          "max_fraction": 0.0174324880475103,
+          "maximum_m": 0.030622833483768586,
+          "mean_fraction": 0.0009346010944450631,
+          "mean_m": 0.0016417698730633323,
+          "name": "Body.baked / 0",
+          "object": 12,
+          "pass": true,
+          "pose": 4,
+          "vertices": 2233
+        },
+        {
+          "max_fraction": 0.01682786334289264,
+          "maximum_m": 0.029560717645844704,
+          "mean_fraction": 0.005959236464697809,
+          "mean_m": 0.01046831097497329,
+          "name": "Body.baked / 1",
+          "object": 13,
+          "pass": true,
+          "pose": 4,
+          "vertices": 508
+        },
+        {
+          "max_fraction": 0.005211794100037147,
+          "maximum_m": 0.009155314057417012,
+          "mean_fraction": 0.00028396790242145737,
+          "mean_m": 0.0004988330849209605,
+          "name": "Body.baked / 2",
+          "object": 14,
+          "pass": true,
+          "pose": 4,
+          "vertices": 1580
+        },
+        {
+          "max_fraction": 2.949432285031475e-08,
+          "maximum_m": 5.181129250742231e-08,
+          "mean_fraction": 1.0633530316520951e-08,
+          "mean_m": 1.867942357625378e-08,
+          "name": "Body.baked / 3",
+          "object": 15,
+          "pass": true,
+          "pose": 4,
+          "vertices": 145
+        },
+        {
+          "max_fraction": 8.446325002385246e-08,
+          "maximum_m": 1.4837262666861546e-07,
+          "mean_fraction": 1.6980040732418176e-08,
+          "mean_m": 2.9828040522919655e-08,
+          "name": "Body.baked / 4",
+          "object": 16,
+          "pass": true,
+          "pose": 4,
+          "vertices": 1399
+        },
+        {
+          "max_fraction": 4.271063848049822e-08,
+          "maximum_m": 7.502777380997732e-08,
+          "mean_fraction": 1.1355537308764954e-08,
+          "mean_m": 1.9947739369005027e-08,
+          "name": "Body.baked / 5",
+          "object": 17,
+          "pass": true,
+          "pose": 4,
+          "vertices": 77
+        },
+        {
+          "max_fraction": 0.01684883454738079,
+          "maximum_m": 0.029597556776394772,
+          "mean_fraction": 0.00149483339801408,
+          "mean_m": 0.002625903663814578,
+          "name": "Body.baked / 6",
+          "object": 18,
+          "pass": true,
+          "pose": 4,
+          "vertices": 1095
+        },
+        {
+          "max_fraction": 0.027147678168695955,
+          "maximum_m": 0.04768905194514946,
+          "mean_fraction": 0.007279957852005232,
+          "mean_m": 0.012788360242280448,
+          "name": "Body.baked / 7",
+          "object": 19,
+          "pass": true,
+          "pose": 4,
+          "vertices": 536
+        },
+        {
+          "max_fraction": 2.955174581293886e-08,
+          "maximum_m": 5.191216473046874e-08,
+          "mean_fraction": 1.0036914417596165e-08,
+          "mean_m": 1.7631376431362608e-08,
+          "name": "Body.baked / 8",
+          "object": 20,
+          "pass": true,
+          "pose": 4,
+          "vertices": 249
+        }
+      ]
+    }
+  },
+  "same_input_anatomical_controls": {
+    "female": {
+      "parts": 19,
+      "cohorts": 95,
+      "failures": 0
+    },
+    "male": {
+      "parts": 19,
+      "cohorts": 95,
+      "failures": 0
+    }
+  },
+  "partial_body9_preserved": "artifacts/weights-audit/baseline-body-group9; separate45cohorts per avatar, not full19",
+  "first_avatar_refusal": {
+    "completed": [],
+    "input_exact": true,
+    "name": "Face.baked / 0",
+    "object": 2,
+    "reason": "Bone query has an unowned origin/coplanar/grazing contact",
+    "work_of_completed_parts": 0
+  },
+  "build_scope": "Fresh whole native test TUs+private headers linked to the immutable exact55 current owning headless core/support from c28 proof; no old-layout library substitution, fresh ALL or sanitizer claim",
+  "unqualified": [
+    "All-avatar new candidate fields/quality",
+    "Authentic topology/seams and open/point contacts",
+    "Native public worker/locks/Cancel/history/Save/UI/export",
+    "OOM/full owned sanitizer",
+    "Method enum5/default behavior"
+  ],
+  "sources": {
+    "src/visibility-geodesic-bind.hpp": "81743ac0a694a765bab36c07f4c6dd5b57e206c55fe6e225f57812c8293335b8",
+    "tests/automatic-visibility-audit.cpp": "5819494f1231d4df32b27301f826bea64e7be310fdc43b27dc0dabd5a3264e6f",
+    "tests/visibility-geodesic.cpp": "db484a225d059e6d52d20ff135aa1ec8d4f54a14b8896fc89ce49461dea4a2ee",
+    "tests/visibility-geodesic-avatar.cpp": "02559cf88987f93baa654aba0e52fcb0209ac52f2583f3dfd04f8dee566f5fb0"
+  },
+  "binaries": {
+    "audit": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/weights-current-55b1c89/artifacts/weights-audit/audit",
+      "sha256": "f66b3cb1a3e5516868b87255dee36feefd8eddf13db9710a86b87c51fca3663d"
+    },
+    "audit-full": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/weights-current-55b1c89/artifacts/weights-audit/audit-full",
+      "sha256": "65361212cb70b14993025d8e6a9ea50650a2446364b736c3ae848db945eeb7f0"
+    },
+    "fixture": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/weights-current-55b1c89/artifacts/weights-audit/fixture",
+      "sha256": "6cf7e31c292290d37a03997edbbde05d03e835a88a148d42370de1b78cec68da"
+    },
+    "quality": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/weights-current-55b1c89/artifacts/weights-audit/quality",
+      "sha256": "5c4e9e84130cc87b7a1a9e7fe1b46e018d6f42d3e894ca8a9521eb56163b2dab"
+    },
+    "candidate": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/weights-current-55b1c89/artifacts/weights-audit/candidate",
+      "sha256": "4529b21a5e9297210646f68e5527721165843f259125394739ab68e75b7725a1"
+    },
+    "candidate-avatar": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/weights-current-55b1c89/artifacts/weights-audit/candidate-avatar",
+      "sha256": "b1abee4bbd1fb5b3b2b17f99f7cda446058d738319bcfb8866b1d7a6de127b63"
+    }
+  },
+  "evidence": {
+    "full-status.json": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/weights-current-55b1c89/artifacts/weights-audit/full-status.json",
+      "sha256": "0cfcbd14679471b6a02707a42f4bd1086419fece9dc6efb8ced6625e1a3a34d1"
+    },
+    "avatars-status.json": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/weights-current-55b1c89/artifacts/weights-audit/avatars-status.json",
+      "sha256": "11e51be40285aa684094959819a539a02fc687c5a916bc448ee6b1934c603521"
+    },
+    "candidate-native-v3.log": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/weights-current-55b1c89/artifacts/weights-audit/candidate-native-v3.log",
+      "sha256": "9d44f5bcbf06fb43076941e7b2f450fbd811f73522cbce0fba236d379c714733"
+    },
+    "female-candidate-first.log": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/weights-current-55b1c89/artifacts/weights-audit/female-candidate-first.log",
+      "sha256": "a042b8fcc4f8b735cfe4b3de530c605f7c2d8fa8f3ea857624d6d2d0eee8db7c"
+    },
+    "relink-status.json": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/weights-current-55b1c89/artifacts/weights-audit/relink-status.json",
+      "sha256": "99bcc025ae25723b28c6d63551c497dcf1fb848dab491ea2ac5df814cfd2a2b3"
+    }
+  },
+  "primary_reference": {
+    "url": "https://raw.githubusercontent.com/blender/blender/3a4070ad41ff715f9c2e1a27f1003fbd01b80cd2/source/blender/editors/armature/meshlaplacian.cc",
+    "local": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/weights-current-55b1c89/artifacts/weights-audit/meshlaplacian-3a4070ad.cc",
+      "sha256": "0a8d9f46006ae9c7c25fd34da11355789894a66caf03c4313bf4db4c3ef4d6d7"
+    },
+    "used": "Read-only source-visibility construction reference; no shifted-origin/epsilon or upstream source code linked"
+  }
+}
