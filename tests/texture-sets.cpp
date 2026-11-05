@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/texture-sets.hpp"
 #include "dome/polygon-scene.hpp"
+#include "texture-set-surface.hpp"
 #include <nlohmann/json.hpp>
 #include <filesystem>
 #include <iostream>
@@ -12,6 +13,25 @@ void check(bool v,const char*message){if(!v)throw std::runtime_error(message);++
 template<class F>void refuses(F&&f,const char*message){bool caught=false;try{f();}catch(const std::exception&e){caught=true;std::cout<<"EXPECTED "<<e.what()<<'\n';}check(caught,message);}
 Mesh mesh(){Mesh m;m.positions={{-1,-1,0},{0,-1,0},{0,1,0},{-1,1,0},{0,-1,0},{1,-1,0},{1,1,0},{0,1,0}};m.normals.assign(8,{0,0,1});m.uv={{{.05f,.05f}},{{.45f,.05f}},{{.45f,.95f}},{{.05f,.95f}},{{.55f,.05f}},{{.95f,.05f}},{{.95f,.95f}},{{.55f,.95f}}};m.indices={0,1,2,0,2,3,4,5,6,4,6,7};m.validate();return m;}
 Scene fixture(){Scene s;s.active().mesh_active=true;s.active().painted=std::make_shared<PaintedMesh>(mesh(),64);s.active().material.color={.1f,.2f,.3f,1};return s;}
+void plan_controls(){
+ auto s=fixture();const auto id=create_texture_set(s,s.active().id,std::array<uint64_t,1>{3},"One actual triangle");
+ const auto exact=s.encode();const auto plan=detail::prepare_texture_set_surface(s.active());
+ check(plan->geometry()==s.active().painted->mesh_owner()&&plan->indices().size()==12&&plan->logical_corners().size()==12,"Partition packet retains one immutable mesh and exactly one complete corner stream");
+ check(plan->draws().size()==2&&plan->draws()[0].count==9&&plan->draws()[1].count==3,"Unselected and selected set triangles are both retained exactly once");
+ for(size_t c=0;c<plan->indices().size();++c)check(plan->indices()[c]==plan->geometry()->indices.at(plan->logical_corners()[c]),"Every packed corner has its actual logical REST identity");
+ check(plan->logical_corners()[6]==9&&plan->logical_corners()[9]==6,"Noncontiguous source faces have explicit current corner remaps");
+ plan->authenticate_rest(s.active().painted->mesh(),{});check(true,"Actual REST replay accepts the owning source");
+ auto changed=s.active().painted->mesh();changed.positions[0].x+=.1f;refuses([&]{plan->authenticate_rest(changed,{});},"Posed or foreign geometry cannot replace REST authentication");
+ changed=s.active().painted->mesh();changed.normals[0].x=-0.f;refuses([&]{plan->authenticate_rest(changed,{});},"Authored normal bit changes cannot borrow the source plan");
+ refuses([&]{plan->authenticate_rest(s.active().painted->mesh(),std::make_shared<const DeformationState>());},"A foreign deformation owner cannot borrow the source plan");
+ const auto layer_count=plan->fields()[1].painted->layers().size();
+ edit_texture_set(s,s.active().id,id,[](PaintedMesh&p,Material&){p.add_layer("Later edit");return true;});
+ check(plan->fields()[1].painted->layers().size()==layer_count&&plan->collection()!=s.active().texture_sets,"Plan fields remain immutable across later actual set edits");
+ TextureSetLimits small;small.maximum_bytes=1;refuses([&]{detail::prepare_texture_set_surface(s.active(),small);},"Geometry packet allocation refuses its byte forecast before staging");
+ small=TextureSetLimits{};small.maximum_work=1;refuses([&]{detail::prepare_texture_set_surface(s.active(),small);},"Exact geometry packet work is bounded before replay");
+ small=TextureSetLimits{};small.cancelled=[] {return true;};refuses([&]{detail::prepare_texture_set_surface(s.active(),small);},"Actual packet cancellation refuses before publication");
+ check(exact!=s.encode(),"Independent field edit is actual rather than a no-op");
+}
 void polygon_controls(){
  auto authority=std::make_shared<PolygonAuthority>();authority->topology=PolygonMesh::from_triangles(mesh());
  Scene s;s.active().polygon=authority;s.active().mesh_active=true;s.active().painted=std::make_shared<PaintedMesh>(authority->topology.triangulate().mesh,64);
@@ -29,6 +49,7 @@ void polygon_controls(){
 }
 }
 int main(int argc,char**argv)try{
+ if(argc==3&&std::string_view(argv[2])=="--plan"){plan_controls();std::cout<<"PASS "<<checks<<" texture-set partition plan controls\n";return 0;}
  if(argc==3&&std::string_view(argv[2])=="--polygon"){polygon_controls();std::cout<<"PASS "<<checks<<" texture-set polygon controls\n";return 0;}
  if(argc!=2)return 2;const std::filesystem::path out=argv[1];std::filesystem::create_directories(out);
  static_assert(std::is_same_v<decltype(TextureSetRecord{}.painted),std::shared_ptr<const PaintedMesh>>);

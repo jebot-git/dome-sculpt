@@ -1431,11 +1431,15 @@ std::shared_ptr<PaintedMesh>detail::TextureSetPaintAccess::bind(const PaintedMes
   if(working_bytes(before,r)>limits.maximum_bytes)throw std::length_error("Texture-set paint binding exceeds its working-byte budget");
   if(r!=before.resolution()&&(before.has_paint_data()||before.color_projection_||before.normal_projection_))throw std::logic_error("Changing a painted texture-set resolution requires the measured all-channel resampling worker");
   auto result=before.snapshot();
+  // Independent sets must not share the single native-emission metadata slot:
+  // different material factors/tokens would evict each other's live preview.
+  // Pixel COW ownership and the generic value token remain unchanged.
+  result->composite_cache_=std::make_shared<PaintedMesh::CompositeCache>();
   if(r!=before.resolution()){
     auto options=before.surface_->options;options.cancelled=limits.cancelled;
     result->surface_=std::make_shared<PaintedMesh::SurfaceMap>(before.surface_->geometry,r,std::move(options));
     for(auto&layer:result->layers_){layer.tiles.assign(result->surface_->tiles.size(),{});layer.pbr_tiles.clear();layer.emission_tiles.clear();}
-    result->composite_cache_=std::make_shared<PaintedMesh::CompositeCache>();result->composite_token_=next_composite_token();
+    result->composite_token_=next_composite_token();
     if(result->revision_==UINT64_MAX)throw std::overflow_error("Texture-set paint revision exhausted");++result->revision_;
   }
   // Membership only changes eligible stroke candidates. Same-grid forks retain

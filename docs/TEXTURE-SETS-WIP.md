@@ -81,3 +81,15 @@ model consumer, then linked the app and consumer before the immutable984 core.
 No public/private header changed, no archive was rewritten or copied, and all223
 original binary hashes remain exact. Current total phase178,298,880B is below
 the384MiB cap; the component/counter increment48,394,240B is below48MiB.
+
+Current source-only continuation includes main537c98b through real merge9ac0af7.
+Its Document header changes make the prior984/769 app and support past-scope;
+they are not runtime inputs for new UI/layout consumers. The new private
+TextureSetSurfacePlan retains one geometry/DF owner, partitions an EBO with
+explicit logical corners, captures immutable fields and bounds preparation/REST
+replay. It allocates no per-set Mesh or pixel/image copies. The source test has
+new plan controls, not yet executed. Per-set native preview cache metadata is
+now isolated at bind; same-frame/no-op image/cache evidence is still required.
+The three-TU syntax-only result is in validation/TEXTURE-SETS-PARTITION-SOURCE.json.
+The plan is not yet attached to drawing/query/native controls; full complex
+attribute ownership and all previously listed workflow adapters remain required.

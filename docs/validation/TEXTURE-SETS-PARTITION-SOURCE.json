@@ -1,0 +1,88 @@
+{
+  "scope": "Source-only partition plan/cache stage; no object/link/run evidence",
+  "base_merge": "9ac0af7",
+  "main_included": "537c98b",
+  "prior_runtime_qualification": "984 fresh225/model32 and769 matched2TU/model32+polygon6 remain historical scopes",
+  "source_hashes": {
+    "src/texture-set-surface.hpp": "434d1358613f2e3add68c669166f3b3b717bd1de8af097e371c5e6cc8566f9ba",
+    "src/texture-set-surface.cpp": "04c9416bad46e4c146ecc3d9ff15ec6843bda380321bcb9c04c40dce55739547",
+    "src/paint.cpp": "898f9217bfd0297aafa5a2067364b38175a55683a83eb281c72dbc60e3225e85",
+    "tests/texture-sets.cpp": "2ba077201ca82ab26c56191fb0fef19998e7e8e7594386d77a757cbc45ccd7da",
+    "CMakeLists.txt": "204b95651770d91cfe4298186e069b18582966c780659c834b396bce7ff3f63a"
+  },
+  "syntax": {
+    "scope": "Syntax only; no objects, link, build or execution evidence",
+    "compiler": "g++ (GCC) 16.2.1 20260819 (Red Hat 16.2.1-2)\nCopyright (C) 2026 Free Software Foundation, Inc.\nThis is free software; see the source for copying conditions.  There is NO\nwarranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\n",
+    "results": [
+      {
+        "source": "src/texture-set-surface.cpp",
+        "args": [
+          "/usr/bin/g++",
+          "-std=c++20",
+          "-fsyntax-only",
+          "-Iinclude",
+          "-Isrc",
+          "-Ithird_party",
+          "-Ithird_party/openbrush",
+          "-Ithird_party/nlohmann",
+          "src/texture-set-surface.cpp"
+        ],
+        "returncode": 0,
+        "seconds": 0.8097175210132264
+      },
+      {
+        "source": "src/paint.cpp",
+        "args": [
+          "/usr/bin/g++",
+          "-std=c++20",
+          "-fsyntax-only",
+          "-Iinclude",
+          "-Isrc",
+          "-Ithird_party",
+          "-Ithird_party/openbrush",
+          "-Ithird_party/nlohmann",
+          "src/paint.cpp"
+        ],
+        "returncode": 0,
+        "seconds": 2.9009729999816045
+      },
+      {
+        "source": "tests/texture-sets.cpp",
+        "args": [
+          "/usr/bin/g++",
+          "-std=c++20",
+          "-fsyntax-only",
+          "-Iinclude",
+          "-Isrc",
+          "-Ithird_party",
+          "-Ithird_party/openbrush",
+          "-Ithird_party/nlohmann",
+          "tests/texture-sets.cpp"
+        ],
+        "returncode": 0,
+        "seconds": 1.3677269630134106
+      }
+    ],
+    "drift": []
+  },
+  "syntax_path": "artifacts/texture-set-syntax/partition-final/status.json",
+  "syntax_sha256": "ab96e59ca128680f63e584b1e811c46a17f13a25085922e793faf3069d5a6af8",
+  "implementation": [
+    "One immutable geometry/deformation owner; no per-set Mesh copies",
+    "Partitioned EBO and exact logical triangle-corner stream",
+    "Snapshot primary paint and retain immutable additional set fields",
+    "Conservative preflight work/staging/scratch and cancellation",
+    "Bit-exact REST geometry/normal/UV plus exact deformation-owner replay",
+    "Independent per-set single-slot native-emission metadata caches at binding"
+  ],
+  "not_implemented": [
+    "No existing public ABI append for the plan yet",
+    "No subset SurfaceRange producer or renderer/cache key integration",
+    "No material-aware subset query/stencil/active-only input route",
+    "No full complex per-corner attribute/frame/sampling support",
+    "No image/GPU packet resource qualification or UI/export admission"
+  ],
+  "new_plan_test": "--plan registered in source but not executed",
+  "source_budget_limit": 268435456,
+  "no_device_or_installation": true
+}
