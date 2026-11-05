@@ -37,7 +37,12 @@ int main(int argc,char **argv)try{
    size_t happy=session->entries.size(),cross=happy;
    for(size_t i=0;i<session->entries.size();++i){const auto &e=session->entries[i];if(!e.custom&&e.name=="happy")happy=i;if(e.custom&&e.name=="cross")cross=i;}
    check(happy<session->entries.size(),"Native target preview resolves genuine preset expression identity");
-   std::vector<std::array<float,2>> weights{{0,0},{.35f,0},{1,0}};if(cross<session->entries.size()){weights.push_back({0,.35f});weights.push_back({0,1});weights.push_back({.35f,.6f});}
+   const bool binary=session->entries[happy].binary;
+   check(binary==model.json.at("extensions").at("VRMC_vrm").at("expressions").at("preset").at("happy").value("isBinary",false),"Independent emitted and native expression binary flags agree");
+   std::vector<std::array<float,2>> weights{{0,0},{.35f,0},{1,0}};
+   if(binary){weights.push_back({std::nextafter(.5f,0.f),0});weights.push_back({.5f,0});weights.push_back({std::nextafter(.5f,1.f),0});}
+   std::array<Pixels,2> binary_off,binary_on;
+   if(cross<session->entries.size()){weights.push_back({0,.35f});weights.push_back({0,1});weights.push_back({.35f,.6f});}
    for(const auto &w:weights){
     doc.configure_expression_preview(happy,w[0],session->session);check(doc.wait_mesh()&&doc.frame().state->error.empty(),"Actual preset weight worker publishes");
     if(cross<session->entries.size()){doc.configure_expression_preview(cross,w[1],session->session);check(doc.wait_mesh()&&doc.frame().state->error.empty(),"Actual custom weight worker publishes independently of the preset");}
@@ -49,12 +54,21 @@ int main(int argc,char **argv)try{
      fbo.bind();renderer.draw(frame.surface,{},view,{0,0,2},96,96,true);const auto native=read();
      if(!eye){first_buffer=renderer.buffer_stats();first_texture=renderer.texture_stats();}
      else check(stable(first_buffer,renderer.buffer_stats(),first_texture,renderer.texture_stats()),"Actual second eye reuses all immutable geometry and image uploads");
-     fbo.bind();const auto independent=consumer.render(model,0,view);const auto name="p"+std::to_string(pose)+"-h"+std::to_string(w[0])+"-c"+std::to_string(w[1])+"-e"+std::to_string(eye);image(name+"-native",native);image(name+"-parsed",independent);const auto maximum=delta(native,independent);size_t coverage=0;for(size_t i=3;i<native.size();i+=4)coverage+=native[i]!=0;
+     fbo.bind();const auto independent=consumer.render(model,0,view);
+     if(binary&&w[1]==0){
+      const bool enabled=w[0]>.5f;
+      if(w[0]==0)binary_off[eye]=native;
+      if(w[0]==1)binary_on[eye]=native;
+      if(w[0]!=0&&w[0]!=1)check(native==(enabled?binary_on[eye]:binary_off[eye]),"Native binary expression preserves exact off/on images at half and both adjacent floating-point inputs");
+      check(!consumer.active.empty()&&consumer.active.front().weight==float(enabled),"Independent binary expression normalizes before morph, colour and texture target evaluation");
+      if(w[0]==.5f){consumer.wrong_binary_threshold=true;fbo.bind();const auto wrong=consumer.render(model,0,view);consumer.wrong_binary_threshold=false;check(delta(independent,wrong)>2,"Independent binary consumer detects incorrect inclusive half threshold");}
+     }
+     const auto name="p"+std::to_string(pose)+"-h"+std::to_string(w[0])+"-i"+std::to_string(size_t(&w-weights.data()))+"-c"+std::to_string(w[1])+"-e"+std::to_string(eye);image(name+"-native",native);image(name+"-parsed",independent);const auto maximum=delta(native,independent);size_t coverage=0;for(size_t i=3;i<native.size();i+=4)coverage+=native[i]!=0;
      std::cout<<"UV_TARGET_IMAGE "<<asset<<" "<<name<<" max="<<maximum<<" coverage="<<coverage<<std::endl;
      check(coverage>300&&maximum<=4,"Actual painted native source matches independent varying/zero/mixed target semantics at unchanged4");
      if(!pose&&!eye&&((w[0]==1&&w[1]==0)||(w[0]==0&&w[1]==1))){
       bool layered=false;for(const auto &mesh:model.json.at("meshes"))layered|=mesh.at("primitives").size()>1;
-      std::vector<std::pair<bool*,const char*>> controls{{&consumer.wrong_source_uv,"frozen-source"}};if(layered)controls.push_back({&consumer.wrong_paint_uv,"moving-paint"});if(layered&&w[0]==1)controls.push_back({&consumer.wrong_base_tint,"tinted-paint"});if(binding.material.parameters.alpha==MToonAlpha::Mask)controls.push_back({&consumer.wrong_mask_cutoff,"wrong-mask-cutoff"});if(shared&&layered)controls.push_back({&consumer.wrong_shared_shade,"missing-shade-paint"});
+      std::vector<std::pair<bool*,const char*>> controls{{&consumer.wrong_source_uv,"frozen-source"}};if(layered)controls.push_back({&consumer.wrong_paint_uv,"moving-paint"});if(layered&&w[0]==1)controls.push_back({&consumer.wrong_base_tint,"tinted-paint"});if(binding.material.parameters.alpha==MToonAlpha::Mask)controls.push_back({&consumer.wrong_mask_cutoff,"wrong-mask-cutoff"});if(shared&&layered)controls.push_back({&consumer.wrong_shared_shade,"missing-shade-paint"});if(binding.roles[size_t(MToonSlot::Matcap)].image){controls.push_back({&consumer.wrong_matcap_view,"matcap-mesh-UV"});controls.push_back({&consumer.wrong_matcap_uv_target,"matcap-UV-binding"});controls.push_back({&consumer.wrong_matcap_color,"missing-matcap"});}
       for(const auto &[flag,label]:controls){*flag=true;fbo.bind();const auto wrong=consumer.render(model,0,view);*flag=false;const auto effect=delta(independent,wrong);std::cout<<"UV_TARGET_SENSITIVITY "<<label<<" "<<effect<<std::endl;check(effect>2,"Independent target consumer detects the genuine source/paint counterfactual");}
      }
      if(eye){fbo.bind();renderer.draw(frame.surface,{},view,{0,0,2},96,96,true);check(read()==native&&stable(first_buffer,renderer.buffer_stats(),first_texture,renderer.texture_stats()),"Actual no-op view preserves every native pixel and performs no geometry or image reupload");}

@@ -14,6 +14,29 @@ using J=nlohmann::json;
 using Pixel=std::array<double,4>;
 double linear(double v){return v<=.04045?v/12.92:std::pow((v+.055)/1.055,2.4);}
 double srgb(double v){return v<=.0031308?12.92*v:1.055*std::pow(v,1/2.4)-.055;}
+// MatCap is an additive view-normal term, independent of native colour paint.
+// Its same genuine field occurs in lower/upper primitives. Require a finite
+// nonnegative future coefficient box and reserve a conservative F32 composition
+// margin at the existing native lighting range; this is not a VRM schema limit.
+double matcap_margin(const J &expressions,const SculptObject &object,
+ Vrm1ExpressionLayer &stats,const SourceUvBakeOptions &limits,
+ const std::function<bool()> &cancelled){
+ const auto &binding=*object.material_bindings;if(!binding.roles[size_t(MToonSlot::Matcap)].image)return 0;
+ if(stats.working_bytes>limits.max_working_bytes||64>limits.max_working_bytes-stats.working_bytes)throw std::length_error("VRM1 MatCap prospective working limit exceeded");
+ stats.working_bytes+=64;
+ const auto &factor=binding.material.parameters.matcap_color;const std::array<double,3> initial{factor.x,factor.y,factor.z};auto low=initial,high=initial;
+ auto work=[&]{if(stats.sample_operations>limits.max_sample_operations||4>limits.max_sample_operations-stats.sample_operations)throw std::length_error("VRM1 MatCap prospective parameter work limit exceeded");stats.sample_operations+=4;};
+ for(const char *table:{"preset","custom"})if(expressions.contains(table))for(const auto &expression:expressions.at(table)){
+  if(cancelled&&cancelled())throw std::runtime_error("VRM1 MatCap parameter compilation cancelled");
+  work();std::array<double,3> delta{};
+  if(expression.contains("materialColorBinds"))for(const auto &bind:expression.at("materialColorBinds")){work();if(bind.at("material").get<int>()!=object.appearance->source_material||bind.at("type")!="matcapColor")continue;for(size_t k=0;k<3;++k){const double target=bind.at("targetValue").at(k).get<double>();if(!std::isfinite(target)||std::abs(target)>1e20)throw std::invalid_argument("VRM1 MatCap target exceeds finite source metadata bounds");delta[k]+=target-initial[k];}}
+  for(size_t k=0;k<3;++k){low[k]+=std::min(0.,delta[k]);high[k]+=std::max(0.,delta[k]);}
+ }
+ double maximum=0;for(size_t k=0;k<3;++k){if(!std::isfinite(low[k])||!std::isfinite(high[k])||low[k]<0||high[k]>1e20)throw std::invalid_argument("VRM1 MatCap future coefficients need a nonnegative finite adapter");maximum=std::max(maximum,high[k]);}
+ const double error=32*std::numeric_limits<float>::epsilon()*1.25*maximum;
+ if(error>=3./255)throw std::invalid_argument("VRM1 MatCap float composition exceeds fixed portable budget");
+ return error;
+}
 Pixel bilinear(const std::vector<Pixel> &values,uint32_t n,double u,double v){
  const double x=std::clamp(u,0.,1.)*n-.5,y=std::clamp(v,0.,1.)*n-.5;
  const int ix=int(std::floor(x)),iy=int(std::floor(y));const double a=x-ix,b=y-iy;
@@ -37,7 +60,7 @@ Vrm1ExpressionLayer compile_vrm1_expression_layer(const J &original,const Sculpt
   throw std::invalid_argument("VRM1 rim expression layers need their independent lighting adapter");
  if(binding.canonical_attributes||binding.canonical_uv||binding.native_paint_sampling||binding.normal_preparation||binding.color_preparation||binding.key_derivation||binding.physical_emission)
   throw std::invalid_argument("VRM1 prepared/absolute expression layers need their owning adapter");
- for(auto role:{MToonSlot::Normal,MToonSlot::Matcap,MToonSlot::Rim,MToonSlot::OutlineWidth,MToonSlot::Shift,MToonSlot::UvMask})
+ for(auto role:{MToonSlot::Normal,MToonSlot::Rim,MToonSlot::OutlineWidth,MToonSlot::Shift,MToonSlot::UvMask})
   if(binding.roles[size_t(role)].image)throw std::invalid_argument("VRM1 expression layer role needs its independent consumer adapter");
  const auto &base=binding.roles[0],&shade=binding.roles[1];const auto &bt=material.textures[0],&st=material.textures[1];
  Vrm1ExpressionLayer result;bool found=false,colour=false,same_target=true;
@@ -51,6 +74,7 @@ Vrm1ExpressionLayer compile_vrm1_expression_layer(const J &original,const Sculpt
  double alpha_low=initial_alpha,alpha_high=initial_alpha;
  const double cutoff=object.material.alpha_cutoff!=binding.native_reference.alpha_cutoff?object.material.alpha_cutoff:material.parameters.alpha_cutoff;
  const auto expressions=original.at("extensions").at("VRMC_vrm").value("expressions",J::object());
+ const double matcap_error=matcap_margin(expressions,object,result,limits,cancelled);
  for(const auto *table:{"preset","custom"})if(expressions.contains(table))for(const auto &expression:expressions.at(table)){
   std::array<double,3> shade_delta{};double alpha_delta=0;
   for(const auto &bind:expression.value("materialColorBinds",J::array()))if(bind.at("material").get<int>()==object.appearance->source_material){
@@ -198,7 +222,7 @@ Vrm1ExpressionLayer compile_vrm1_expression_layer(const J &original,const Sculpt
    auto &maximum=k==3?result.maximum_coverage_error:result.maximum_color_error;maximum=std::max(maximum,error);
   }
  }}
- if(result.maximum_color_error+result.maximum_coverage_error>3./(255*lighting_bound))throw std::invalid_argument("VRM1 straight-alpha PNG reconstruction exceeds fixed portable expression-layer error budget: RGB="+std::to_string(result.maximum_color_error)+" coverage="+std::to_string(result.maximum_coverage_error)+" light="+std::to_string(lighting_bound));
+ if(result.maximum_color_error+result.maximum_coverage_error>3./(255*lighting_bound)-matcap_error/lighting_bound)throw std::invalid_argument("VRM1 straight-alpha PNG reconstruction exceeds fixed portable expression-layer error budget: RGB="+std::to_string(result.maximum_color_error)+" coverage="+std::to_string(result.maximum_coverage_error)+" light="+std::to_string(lighting_bound));
  result.paint_coordinates.reserve(object.painted->mesh().uv.size());for(auto uv:object.painted->mesh().uv){stop();for(size_t k=0;k<2;++k){uv[k]=((support_reconstruction?float(uv[k]*image_scale+image_offset):uv[k])-result.offset[k])/result.scale[k];if(!std::isfinite(uv[k]))throw std::invalid_argument("VRM1 expression-layer carrier coordinate is nonfinite");}result.paint_coordinates.push_back(uv);}
  if(result.paint_coordinates.size()!=object.painted->mesh().positions.size())throw std::invalid_argument("VRM1 expression layer has no complete writable coordinate owner");
  // Bound ordinary F32 interpolation/scale/add cancellation relative to the

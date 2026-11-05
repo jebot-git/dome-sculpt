@@ -2,6 +2,9 @@
 #include "emission-package.hpp"
 #include "emission-export.hpp"
 #include "native-paint-sampling.hpp"
+#include "native-paint-frame-export-policy.hpp"
+#include "normal-frame-export.hpp"
+#include "emission-paint-access.hpp"
 #include <bit>
 #include "emission-exr-access.hpp"
 #include "native-scene-payload.hpp"
@@ -102,16 +105,48 @@ void native_domain(const Json &j,std::span<const uint8_t> binary,const Json &ent
  PaintSamplingLimits limits;limits.cancelled=cancelled;owner->validate_current(*object.painted,limits);const auto &mesh=object.painted->mesh();auto corners=owner->domain()->corner_coordinates(mesh,limits);
  const auto node=integer(entry.at("node"),j.at("nodes").size(),"Native HDR coordinate node invalid");const auto material=integer(entry.at("material"),j.at("materials").size(),"Native HDR coordinate material invalid");if(node>=j.at("nodes").size()||material>=j.at("materials").size())throw std::invalid_argument("Native HDR coordinate binding invalid");
  const auto m=integer(j.at("nodes")[node].at("mesh"),j.at("meshes").size(),"Native HDR coordinate mesh invalid");if(m>=j.at("meshes").size())throw std::invalid_argument("Native HDR coordinate mesh invalid");const auto &primitives=j.at("meshes")[m].at("primitives");if(primitives.size()!=1)throw std::invalid_argument("Native HDR coordinate primitive differs");const auto &primitive=primitives[0];
- if(primitive.at("material")!=material||primitive.value("mode",4)!=4||primitive.contains("targets"))throw std::invalid_argument("Native HDR coordinate primitive ownership differs");const auto &attributes=primitive.at("attributes");
+ std::optional<detail::NormalFrameExport> frame;
+ if(object.material_bindings->native_paint_frames){
+  // Package3 still describes the genuine writable paint domain. A current
+  // key adds its own independently sealed shading/REST map; never compare its
+  // emitted normals to the older paint mesh or admit arbitrary target arrays.
+  object.material_bindings->native_paint_frames->validate_binding(*object.material_bindings,true,cancelled);
+  detail::native_paint_frame_export_working_bytes(object,512*1024*1024,cancelled);
+  ObjectSurface source;source.id=object.id;source.name=object.name;source.transform=object.transform;
+  source.mesh=mesh;source.material=object.material;source.material.emissive={};
+  source.textures=detail::EmissionExportAccess::other_channels(*object.painted,source.material,cancelled);
+  source.deformation=object.deformation;source.material_bindings=object.material_bindings;
+  source.rig_source=object.rig_source;source.affine_edit=object.affine_edit;
+  source.paint_sampling_attachment=owner->attachment();source.paint_corner_coordinates=corners;
+  frame=detail::normal_frame_export(source,detail::SourceMorphSpace::Native,cancelled,true);
+ }
+ if(primitive.at("material")!=material||primitive.value("mode",4)!=4||(!frame&&primitive.contains("targets")))throw std::invalid_argument("Native HDR coordinate primitive ownership differs");const auto &attributes=primitive.at("attributes");
  const auto &info=j.at("materials")[material].at("emissiveTexture");if(info.value("texCoord",0u)!=coordinate||info.contains("extensions"))throw std::invalid_argument("Native HDR emission binds a different coordinate domain");
  const auto indices=domain_accessor(j,binary,primitive.at("indices"),"SCALAR",1,6'000'000,5125);
  const auto positions=domain_accessor(j,binary,attributes.at("POSITION"),"VEC3",3,2'000'000,5126);
  const auto normals=domain_accessor(j,binary,attributes.at("NORMAL"),"VEC3",3,2'000'000,5126);
  const auto authored=domain_accessor(j,binary,attributes.at("TEXCOORD_0"),"VEC2",2,2'000'000,5126);
  const auto paint=domain_accessor(j,binary,attributes.at("TEXCOORD_"+std::to_string(coordinate)),"VEC2",2,2'000'000,5126);
- if(indices.count!=mesh.indices.size()||positions.count!=normals.count||positions.count!=authored.count||positions.count!=paint.count)throw std::invalid_argument("Native HDR emitted corner dimensions differ");
- for(size_t c=0;c<indices.count;++c){if((c&1023)==0)stop(cancelled);const auto v=indices.index(c),source=mesh.indices[c];if(v>=positions.count)throw std::invalid_argument("Native HDR emitted index exceeds coordinates");const auto p=mesh.positions[source],n=mesh.normals[source];
-  if(positions.scalar(v,0)!=p.x||positions.scalar(v,1)!=p.y||positions.scalar(v,2)!=p.z||normals.scalar(v,0)!=n.x||normals.scalar(v,1)!=n.y||normals.scalar(v,2)!=n.z||authored.scalar(v,0)!=mesh.uv[source][0]||authored.scalar(v,1)!=mesh.uv[source][1]||paint.scalar(v,0)!=corners[c][0]||paint.scalar(v,1)!=corners[c][1])throw std::invalid_argument("Native HDR emitted corners differ from their exact owning domain");
+ const auto &expected=frame?frame->surface.mesh:mesh;
+ if(indices.count!=expected.indices.size()||positions.count!=normals.count||positions.count!=authored.count||positions.count!=paint.count||(frame&&positions.count!=expected.positions.size()))throw std::invalid_argument("Native HDR emitted corner dimensions differ");
+ for(size_t c=0;c<indices.count;++c){if((c&1023)==0)stop(cancelled);const auto v=indices.index(c),source=expected.indices[c];if(v>=positions.count)throw std::invalid_argument("Native HDR emitted index exceeds coordinates");const auto p=expected.positions[source],n=expected.normals[source];
+  if(frame&&v!=source)throw std::invalid_argument("Native HDR key index layout differs from its exact target correspondence");
+  if(positions.scalar(v,0)!=p.x||positions.scalar(v,1)!=p.y||positions.scalar(v,2)!=p.z||normals.scalar(v,0)!=n.x||normals.scalar(v,1)!=n.y||normals.scalar(v,2)!=n.z||authored.scalar(v,0)!=expected.uv[source][0]||authored.scalar(v,1)!=expected.uv[source][1]||paint.scalar(v,0)!=corners[c][0]||paint.scalar(v,1)!=corners[c][1])throw std::invalid_argument("Native HDR emitted corners differ from their exact owning domain");
+ }
+ if(frame){
+  auto directions=[&](const Json &channels,const char *name,const std::vector<Vec3> &values){
+   if(values.empty()){if(channels.contains(name))throw std::invalid_argument("Native HDR key invented a direction channel");return;}
+   const auto view=domain_accessor(j,binary,channels.at(name),"VEC3",3,2'000'000,5126);
+   if(view.count!=values.size())throw std::invalid_argument("Native HDR key direction dimensions differ");
+   for(size_t v=0;v<values.size();++v){if((v&1023)==0)stop(cancelled);const auto &p=values[v];if(view.scalar(v,0)!=p.x||view.scalar(v,1)!=p.y||view.scalar(v,2)!=p.z)throw std::invalid_argument("Native HDR key attributes differ from the actual current frame");}
+  };
+  if(frame->tangents.empty()){if(attributes.contains("TANGENT"))throw std::invalid_argument("Native HDR key invented its base tangent frame");}
+  else{const auto view=domain_accessor(j,binary,attributes.at("TANGENT"),"VEC4",4,2'000'000,5126);if(view.count!=frame->tangents.size())throw std::invalid_argument("Native HDR key tangent dimensions differ");for(size_t v=0;v<view.count;++v){if((v&1023)==0)stop(cancelled);for(size_t k=0;k<4;++k)if(view.scalar(v,k)!=frame->tangents[v][k])throw std::invalid_argument("Native HDR key base tangents differ");}}
+  const auto deformation=frame->surface.deformation;const size_t count=deformation&&deformation->morphs?deformation->morphs->targets.size():0;
+  if(primitive.value("targets",Json::array()).size()!=count||frame->normal_targets.size()!=count||frame->tangent_targets.size()!=count||j.at("nodes")[node].contains("weights"))throw std::invalid_argument("Native HDR key target identities differ");
+  if(count){const auto &weights=j.at("meshes")[m].at("weights"),&names=j.at("meshes")[m].at("extras").at("targetNames");if(!weights.is_array()||!names.is_array()||weights.size()!=count||names.size()!=count)throw std::invalid_argument("Native HDR key names/weights dimensions differ");
+   for(size_t t=0;t<count;++t){stop(cancelled);const auto &target=deformation->morphs->targets[t];const auto &channels=primitive.at("targets").at(t);if(!channels.is_object()||channels.size()!=1+size_t(!frame->normal_targets[t].empty())+size_t(!frame->tangent_targets[t].empty())||names[t]!=target.name||weights[t].get<float>()!=(deformation->morph_weights.empty()?0:deformation->morph_weights.at(t)))throw std::invalid_argument("Native HDR key target order or current weights differ");directions(channels,"POSITION",target.delta);directions(channels,"NORMAL",frame->normal_targets[t]);directions(channels,"TANGENT",frame->tangent_targets[t]);}
+  }
  }
 }
 // Our native writer uses definite CBOR. Authenticate its framing/depth/counts

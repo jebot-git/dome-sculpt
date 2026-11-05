@@ -6,6 +6,7 @@
 #include "paint-overlay-packet.hpp"
 #include "native-paint-sampling.hpp"
 #include "native-paint-export-policy.hpp"
+#include "native-paint-frame-export-policy.hpp"
 #include "dome/paint-sampling.hpp"
 #include "dome/material-bindings.hpp"
 #include "dome/source-maps.hpp"
@@ -66,14 +67,19 @@ void validate_native_emission_surfaces(const EmissionExportPrepared &prepared,co
 }
 EmissionInterchangeImage native_paint_emission_field(const SculptObject &object,const std::function<bool()> &cancelled){
  const auto binding=object.material_bindings;const auto owner=binding?binding->native_paint_sampling:nullptr;
- if(!object.mesh_active||!object.painted||!owner||!owner->valid_owner(owner)||binding->has_mtoon||binding->canonical_attributes||binding->canonical_uv||binding->normal_frames||binding->normal_preparation||binding->color_preparation||binding->key_derivation||object.appearance||object.polygon)
+ const auto frame=binding?binding->native_paint_frames:nullptr;
+ if(!object.mesh_active||!object.painted||!owner||!owner->valid_owner(owner)||binding->has_mtoon||binding->canonical_attributes||binding->canonical_uv||(!frame&&(binding->normal_frames||binding->key_derivation))||binding->normal_preparation||binding->color_preparation||object.appearance||object.polygon)
   throw std::invalid_argument("Native HDR field requires its own supported native paint owner");
  // A physical field is intrinsic to the same writable REST grid. Skinning
  // changes the emitted geometry, not these radiance/coverage coefficients.
- // The coordinate compiler remaps the exact native model; its existing morph
- // shading and aggregate geometry/deformation bounds still apply.
- native_paint_export_working_bytes(object.painted->mesh(),object.deformation.get());
  PaintSamplingLimits limits;limits.cancelled=cancelled;binding->validate();owner->validate_current(*object.painted,limits);
+ if(frame){
+  // A real captured current key frame supplies the normal/morph authority;
+  // its older writable paint grid continues to own the radiance field. The
+  // downstream normal/paint coordinate compiler refines both exact domains.
+  frame->validate_binding(*binding,true,cancelled);
+  native_paint_frame_export_working_bytes(object,512*1024*1024,cancelled);
+ }else native_paint_export_working_bytes(object.painted->mesh(),object.deformation.get());
  return field(object,cancelled,false,true);
 }
 std::shared_ptr<const TextureMaps> EmissionExportAccess::other_channels(const PaintedMesh &paint,Material material,const std::function<bool()> &cancelled){auto detached=without_emission(paint);material.emissive={};return detached->composite(material,cancelled);}

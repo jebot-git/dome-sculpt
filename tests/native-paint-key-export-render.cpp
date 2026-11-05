@@ -15,6 +15,7 @@ void finish(Document&d){check(d.wait_asset(std::chrono::seconds(120))&&d.wait_me
 void capture(const std::filesystem::path&path,const Pixels&p){auto png=Image{96,96,p}.png();std::ofstream f(path,std::ios::binary);f.write(reinterpret_cast<const char*>(png.data()),png.size());}
 const cgltf_accessor* field(const cgltf_attribute*a,size_t n,cgltf_attribute_type t,int set=0){for(size_t i=0;i<n;++i)if(a[i].type==t&&a[i].index==set)return a[i].data;return nullptr;}
 }
+#ifndef DOME_NATIVE_KEY_EXPORT_NO_MAIN
 int main(int argc,char**argv)try{
  if(argc<3||argc>4||(argc==4&&std::string_view(argv[3])!="--hardware"))return 2;const bool strict=argc==4;const auto source=Scene::load(argv[1]);const std::filesystem::path out=argv[2];std::filesystem::create_directories(out);setenv("XDG_STATE_HOME",(out/"state").c_str(),1);setenv("XDG_CONFIG_HOME",(out/"config").c_str(),1);NativeGraphics graphics;const std::string gpu=reinterpret_cast<const char*>(glGetString(GL_RENDERER));std::cout<<"GPU "<<gpu<<"\nGL_VENDOR "<<reinterpret_cast<const char*>(glGetString(GL_VENDOR))<<"\nGL_VERSION "<<reinterpret_cast<const char*>(glGetString(GL_VERSION))<<std::endl;check(!strict||(gpu.find("Intel")!=std::string::npos&&gpu.find("Arc")!=std::string::npos&&gpu.find("A770")!=std::string::npos&&gpu.find("llvmpipe")==std::string::npos),"Strict native key export consumer requires actual Intel Arc A770");Fbo fbo;SurfaceRenderer native;prepared_normal_consumer::Renderer consumer;unsigned number=0;Pixels zero;
  for(bool posed:{false,true})for(float weight:{0.f,.37f,1.f}){
@@ -34,3 +35,4 @@ int main(int argc,char**argv)try{
  }
  std::cout<<"PASS "<<checks<<" actual native36 key export graphical controls"<<std::endl;return 0;
 }catch(const std::exception&e){std::cerr<<"FAIL "<<e.what()<<std::endl;return 1;}
+#endif
