@@ -35,6 +35,12 @@ controls pass each R/S. Original direct factory/decoder/Restore probes remain,
 with65/541/17/73 measured allocation prefixes and unchanged callback checks.
 No timeout, publication or cancellation behavior is weakened.
 
+Nine existing affected HDR/native export consumers are additionally relinked to
+the same complete emission adapter and pass each Release/sanitizer: ordinary
+emission, exact package budgets, original-source physical painting, physical
+contracts, finite native32 export, native skin export and all three package3
+producer/mixed/contract commands. All recorded inputs remain exact.
+
 This is scoped component qualification, not a complete combined84/full734 or
 main admission. General morph shading and canonical37 physical-domain retention
 remain required. Read validation/NATIVE-PAINT32-SKIN-PHYSICAL.json for exact

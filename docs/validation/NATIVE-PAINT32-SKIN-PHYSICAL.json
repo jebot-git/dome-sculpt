@@ -6423,8 +6423,1097 @@
     "artifacts/paired-hook/sanitize/actual-runtime.log": {
       "sha256": "afff7a98dca52f3dc1510febd903cc33e100bd4a768e9c1d97e843f0831c0ec9",
       "bytes": 355
+    },
+    "artifacts/skin-hdr-regression/release/link-dome-sculpt-emission-export-test.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/skin-hdr-regression/release/link-dome-sculpt-emission-package-budget-test.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/skin-hdr-regression/release/link-dome-sculpt-source-paint-physical-authoring-test.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/skin-hdr-regression/release/link-dome-sculpt-native-physical-contracts-test.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/skin-hdr-regression/release/link-dome-sculpt-native-paint32-export-test.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/skin-hdr-regression/release/link-dome-sculpt-native-paint32-skin-export-test.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/skin-hdr-regression/release/link-dome-sculpt-native-paint32-emission-test.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/skin-hdr-regression/release/link-dome-sculpt-native-paint32-emission-mixed-test.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/skin-hdr-regression/release/link-dome-sculpt-native-paint32-emission-contracts-test.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/skin-hdr-regression/release/run-emission-export.log": {
+      "sha256": "ed4c53e5611fe74c9e74928c81527bcc24a8db27d798e1b70b2b97bc7a26bb43",
+      "bytes": 3165
+    },
+    "artifacts/skin-hdr-regression/release/run-emission-package-budget.log": {
+      "sha256": "0a6fcd0a52f2cf461237d06b6844b2d3e58b0e0f9a7b2cf6e66e8b0d936feef1",
+      "bytes": 618
+    },
+    "artifacts/skin-hdr-regression/release/run-source-paint-physical-authoring.log": {
+      "sha256": "a5b1abe1273aa36c2b5e7fdbd63f29b71b2eaecc1dd3ed0d896b8d64e0a334b6",
+      "bytes": 11289
+    },
+    "artifacts/skin-hdr-regression/release/run-native-physical-contracts.log": {
+      "sha256": "2d1cd4783e32a6f0832df35e856c0edc4eb80a01cbfc539c6f6e398c6b270297",
+      "bytes": 2927
+    },
+    "artifacts/skin-hdr-regression/release/run-native-paint32-export.log": {
+      "sha256": "4ad603c8c581067522ef17a885c6e3e9ef301048952cbb2168f5ed6042520318",
+      "bytes": 32806
+    },
+    "artifacts/skin-hdr-regression/release/run-native-paint32-skin-export.log": {
+      "sha256": "e8a7cb3afb682e7e3296f3ab3b4c001db8a4354af3396e552e905a2e65e0b90e",
+      "bytes": 7360
+    },
+    "artifacts/skin-hdr-regression/release/run-native-paint32-emission.log": {
+      "sha256": "5e3c162a1ea67b76ada399c7391337b45868591b23d2a948e1496910a15ca88a",
+      "bytes": 9851
+    },
+    "artifacts/skin-hdr-regression/release/run-native-paint32-emission-mixed.log": {
+      "sha256": "7a3736c7936ce86f7c93ba5e52cd2397853900d9ce5ddff555309149e840aeb9",
+      "bytes": 2262
+    },
+    "artifacts/skin-hdr-regression/release/run-native-paint32-emission-contracts.log": {
+      "sha256": "6f324886fc9e7c896065759096bcafeba0d52f616b6f0d4fdd8cd4aaccb51c7d",
+      "bytes": 3553
+    },
+    "artifacts/skin-hdr-regression/sanitize/link-dome-sculpt-emission-export-test.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/skin-hdr-regression/sanitize/link-dome-sculpt-emission-package-budget-test.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/skin-hdr-regression/sanitize/link-dome-sculpt-source-paint-physical-authoring-test.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/skin-hdr-regression/sanitize/link-dome-sculpt-native-physical-contracts-test.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/skin-hdr-regression/sanitize/link-dome-sculpt-native-paint32-export-test.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/skin-hdr-regression/sanitize/link-dome-sculpt-native-paint32-skin-export-test.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/skin-hdr-regression/sanitize/link-dome-sculpt-native-paint32-emission-test.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/skin-hdr-regression/sanitize/link-dome-sculpt-native-paint32-emission-mixed-test.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/skin-hdr-regression/sanitize/link-dome-sculpt-native-paint32-emission-contracts-test.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/skin-hdr-regression/sanitize/run-emission-export.log": {
+      "sha256": "ed4c53e5611fe74c9e74928c81527bcc24a8db27d798e1b70b2b97bc7a26bb43",
+      "bytes": 3165
+    },
+    "artifacts/skin-hdr-regression/sanitize/run-emission-package-budget.log": {
+      "sha256": "0a6fcd0a52f2cf461237d06b6844b2d3e58b0e0f9a7b2cf6e66e8b0d936feef1",
+      "bytes": 618
+    },
+    "artifacts/skin-hdr-regression/sanitize/run-source-paint-physical-authoring.log": {
+      "sha256": "a5b1abe1273aa36c2b5e7fdbd63f29b71b2eaecc1dd3ed0d896b8d64e0a334b6",
+      "bytes": 11289
+    },
+    "artifacts/skin-hdr-regression/sanitize/run-native-physical-contracts.log": {
+      "sha256": "2d1cd4783e32a6f0832df35e856c0edc4eb80a01cbfc539c6f6e398c6b270297",
+      "bytes": 2927
+    },
+    "artifacts/skin-hdr-regression/sanitize/run-native-paint32-export.log": {
+      "sha256": "4ad603c8c581067522ef17a885c6e3e9ef301048952cbb2168f5ed6042520318",
+      "bytes": 32806
+    },
+    "artifacts/skin-hdr-regression/sanitize/run-native-paint32-skin-export.log": {
+      "sha256": "e8a7cb3afb682e7e3296f3ab3b4c001db8a4354af3396e552e905a2e65e0b90e",
+      "bytes": 7360
+    },
+    "artifacts/skin-hdr-regression/sanitize/run-native-paint32-emission.log": {
+      "sha256": "5e3c162a1ea67b76ada399c7391337b45868591b23d2a948e1496910a15ca88a",
+      "bytes": 9851
+    },
+    "artifacts/skin-hdr-regression/sanitize/run-native-paint32-emission-mixed.log": {
+      "sha256": "7a3736c7936ce86f7c93ba5e52cd2397853900d9ce5ddff555309149e840aeb9",
+      "bytes": 2262
+    },
+    "artifacts/skin-hdr-regression/sanitize/run-native-paint32-emission-contracts.log": {
+      "sha256": "6f324886fc9e7c896065759096bcafeba0d52f616b6f0d4fdd8cd4aaccb51c7d",
+      "bytes": 3553
     }
   },
   "originals": "Original combinedR/S build1 solely nested main macro redefinition; own support completion/guard-only continuation explicit. Original actual67publiccounterchecks each profile pass with all six genuine HDR refusals/file/Scene/history/Save. Originalcombined84 Release83Pass/1testhookFail retained, actual gate now follows realpaired helper1797 each. SAN84stillrunning at seal; no complete84claim. Initial sanitizer manual preflight refusal of incomplete archives preserved separately.",
-  "limits": "Component newR/S115, actualArc109 plus same-capture coverage audits (min5001visible/122colours); finalR/S files equal every validated corresponding initial artifact.36successfulGLBs unfiltered0errors36warnings144infos;24R/Spairs exact/12container device triples exact,12crossdevicePNGpairsmax1. Not fullapp/all734/main admission, generalmorph/typed/canonical37 domains, compute or physicalHMD. No GPUlease remains. No install/session actions."
+  "limits": "Component newR/S115, actualArc109 plus same-capture coverage audits (min5001visible/122colours); finalR/S files equal every validated corresponding initial artifact.36successfulGLBs unfiltered0errors36warnings144infos;24R/Spairs exact/12container device triples exact,12crossdevicePNGpairsmax1. Not fullapp/all734/main admission, generalmorph/typed/canonical37 domains, compute or physicalHMD. No GPUlease remains. No install/session actions.",
+  "affected_regressions": {
+    "release": {
+      "state": "terminal",
+      "pid": 4021799,
+      "source": "c2f5aa8ed3bfcc02632112d3087f261b1aea70a8",
+      "scope": "Nine existing affected HDR/native export consumers relinked to same complete emission-TU adapter over exact current owning product/test support. Original test commands/arguments retained, outputs private. No extra product/header change or full84/full734 claim.",
+      "steps": [
+        {
+          "name": "link-dome-sculpt-emission-export-test",
+          "command": [
+            "/usr/bin/c++",
+            "-O3",
+            "-DNDEBUG",
+            "CMakeFiles/dome-sculpt-emission-export-test.dir/tests/emission-export.cpp.o",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native32-skin-hdr-b0de/artifacts/skin-hdr-regression/release/dome-sculpt-emission-export-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native32-skin-hdr-b0de/artifacts/skin-hdr-first/libdome-sculpt-core.a",
+            "/usr/lib64/libpng.so",
+            "libdome-sculpt-affine.a",
+            "/usr/lib64/liblapacke.so",
+            "libdome-sculpt-polygon.a",
+            "libxatlas.a",
+            "libmikktspace.a",
+            "libmikktspace-robust.a",
+            "libufbx.a",
+            "/usr/lib64/libjpeg.so",
+            "/usr/lib64/libz.so",
+            "libdome-sculpt-emission-codec.a",
+            "/usr/lib64/libOpenEXR-3_2.so",
+            "/usr/lib64/libOpenEXRUtil-3_2.so",
+            "/usr/lib64/libOpenEXRCore-3_2.so",
+            "/usr/lib64/libIex-3_2.so",
+            "/usr/lib64/libIlmThread-3_2.so",
+            "/usr/lib64/libImath-3_1.so",
+            "-lgcc_s_asneeded",
+            "-lgcc_s_asneeded"
+          ],
+          "exit_code": 0,
+          "seconds": 0.20971713500330225
+        },
+        {
+          "name": "link-dome-sculpt-emission-package-budget-test",
+          "command": [
+            "/usr/bin/c++",
+            "-O3",
+            "-DNDEBUG",
+            "CMakeFiles/dome-sculpt-emission-package-budget-test.dir/tests/emission-package-budget.cpp.o",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native32-skin-hdr-b0de/artifacts/skin-hdr-regression/release/dome-sculpt-emission-package-budget-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native32-skin-hdr-b0de/artifacts/skin-hdr-first/libdome-sculpt-core.a",
+            "libdome-sculpt-affine.a",
+            "/usr/lib64/liblapacke.so",
+            "libdome-sculpt-polygon.a",
+            "libxatlas.a",
+            "libmikktspace.a",
+            "libmikktspace-robust.a",
+            "libufbx.a",
+            "/usr/lib64/libpng.so",
+            "/usr/lib64/libjpeg.so",
+            "/usr/lib64/libz.so",
+            "libdome-sculpt-emission-codec.a",
+            "/usr/lib64/libOpenEXR-3_2.so",
+            "/usr/lib64/libOpenEXRUtil-3_2.so",
+            "/usr/lib64/libOpenEXRCore-3_2.so",
+            "/usr/lib64/libIex-3_2.so",
+            "/usr/lib64/libIlmThread-3_2.so",
+            "/usr/lib64/libImath-3_1.so",
+            "-lgcc_s_asneeded",
+            "-lgcc_s_asneeded"
+          ],
+          "exit_code": 0,
+          "seconds": 0.2123109280364588
+        },
+        {
+          "name": "link-dome-sculpt-source-paint-physical-authoring-test",
+          "command": [
+            "/usr/bin/c++",
+            "-O3",
+            "-DNDEBUG",
+            "CMakeFiles/dome-sculpt-source-paint-physical-authoring-test.dir/tests/source-paint-physical-authoring.cpp.o",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native32-skin-hdr-b0de/artifacts/skin-hdr-regression/release/dome-sculpt-source-paint-physical-authoring-test",
+            "-Wl,-rpath,/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib",
+            "libdome-sculpt-render.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native32-skin-hdr-b0de/artifacts/skin-hdr-first/libdome-sculpt-core.a",
+            "libdome-sculpt-affine.a",
+            "/usr/lib64/liblapacke.so",
+            "libdome-sculpt-polygon.a",
+            "libxatlas.a",
+            "libmikktspace.a",
+            "libmikktspace-robust.a",
+            "libufbx.a",
+            "/usr/lib64/libpng.so",
+            "/usr/lib64/libjpeg.so",
+            "/usr/lib64/libz.so",
+            "libdome-sculpt-emission-codec.a",
+            "/usr/lib64/libOpenEXR-3_2.so",
+            "/usr/lib64/libOpenEXRUtil-3_2.so",
+            "/usr/lib64/libOpenEXRCore-3_2.so",
+            "/usr/lib64/libIex-3_2.so",
+            "/usr/lib64/libIlmThread-3_2.so",
+            "/usr/lib64/libImath-3_1.so",
+            "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libharfbuzz.so",
+            "/usr/lib64/libEGL.so",
+            "/usr/lib64/libGL.so",
+            "/usr/lib64/libfontconfig.so",
+            "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libfreetype.so",
+            "/usr/lib64/libicui18n.so",
+            "/usr/lib64/libicuuc.so",
+            "-lgcc_s_asneeded",
+            "-lgcc_s_asneeded"
+          ],
+          "exit_code": 0,
+          "seconds": 0.38122879003640264
+        },
+        {
+          "name": "link-dome-sculpt-native-physical-contracts-test",
+          "command": [
+            "/usr/bin/c++",
+            "-O3",
+            "-DNDEBUG",
+            "-Wl,--wrap=fsync",
+            "CMakeFiles/dome-sculpt-native-physical-contracts-test.dir/tests/native-physical-contracts.cpp.o",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native32-skin-hdr-b0de/artifacts/skin-hdr-regression/release/dome-sculpt-native-physical-contracts-test",
+            "-Wl,-rpath,/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib",
+            "libdome-sculpt-render.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native32-skin-hdr-b0de/artifacts/skin-hdr-first/libdome-sculpt-core.a",
+            "libdome-sculpt-affine.a",
+            "/usr/lib64/liblapacke.so",
+            "libdome-sculpt-polygon.a",
+            "libxatlas.a",
+            "libmikktspace.a",
+            "libmikktspace-robust.a",
+            "libufbx.a",
+            "/usr/lib64/libpng.so",
+            "/usr/lib64/libjpeg.so",
+            "/usr/lib64/libz.so",
+            "libdome-sculpt-emission-codec.a",
+            "/usr/lib64/libOpenEXR-3_2.so",
+            "/usr/lib64/libOpenEXRUtil-3_2.so",
+            "/usr/lib64/libOpenEXRCore-3_2.so",
+            "/usr/lib64/libIex-3_2.so",
+            "/usr/lib64/libIlmThread-3_2.so",
+            "/usr/lib64/libImath-3_1.so",
+            "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libharfbuzz.so",
+            "/usr/lib64/libEGL.so",
+            "/usr/lib64/libGL.so",
+            "/usr/lib64/libfontconfig.so",
+            "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libfreetype.so",
+            "/usr/lib64/libicui18n.so",
+            "/usr/lib64/libicuuc.so",
+            "-lgcc_s_asneeded",
+            "-lgcc_s_asneeded"
+          ],
+          "exit_code": 0,
+          "seconds": 0.43204740999499336
+        },
+        {
+          "name": "link-dome-sculpt-native-paint32-export-test",
+          "command": [
+            "/usr/bin/c++",
+            "-O3",
+            "-DNDEBUG",
+            "CMakeFiles/dome-sculpt-native-paint32-export-test.dir/tests/native-paint32-export.cpp.o",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native32-skin-hdr-b0de/artifacts/skin-hdr-regression/release/dome-sculpt-native-paint32-export-test",
+            "-Wl,-rpath,/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib",
+            "libdome-sculpt-render.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native32-skin-hdr-b0de/artifacts/skin-hdr-first/libdome-sculpt-core.a",
+            "libdome-sculpt-affine.a",
+            "/usr/lib64/liblapacke.so",
+            "libdome-sculpt-polygon.a",
+            "libxatlas.a",
+            "libmikktspace.a",
+            "libmikktspace-robust.a",
+            "libufbx.a",
+            "/usr/lib64/libpng.so",
+            "/usr/lib64/libjpeg.so",
+            "/usr/lib64/libz.so",
+            "libdome-sculpt-emission-codec.a",
+            "/usr/lib64/libOpenEXR-3_2.so",
+            "/usr/lib64/libOpenEXRUtil-3_2.so",
+            "/usr/lib64/libOpenEXRCore-3_2.so",
+            "/usr/lib64/libIex-3_2.so",
+            "/usr/lib64/libIlmThread-3_2.so",
+            "/usr/lib64/libImath-3_1.so",
+            "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libharfbuzz.so",
+            "/usr/lib64/libEGL.so",
+            "/usr/lib64/libGL.so",
+            "/usr/lib64/libfontconfig.so",
+            "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libfreetype.so",
+            "/usr/lib64/libicui18n.so",
+            "/usr/lib64/libicuuc.so",
+            "-lgcc_s_asneeded",
+            "-lgcc_s_asneeded"
+          ],
+          "exit_code": 0,
+          "seconds": 0.3681629889761098
+        },
+        {
+          "name": "link-dome-sculpt-native-paint32-skin-export-test",
+          "command": [
+            "/usr/bin/c++",
+            "-O3",
+            "-DNDEBUG",
+            "CMakeFiles/dome-sculpt-native-paint32-skin-export-test.dir/tests/native-paint32-skin-export.cpp.o",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native32-skin-hdr-b0de/artifacts/skin-hdr-regression/release/dome-sculpt-native-paint32-skin-export-test",
+            "-Wl,-rpath,/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib",
+            "libdome-sculpt-render.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native32-skin-hdr-b0de/artifacts/skin-hdr-first/libdome-sculpt-core.a",
+            "libdome-sculpt-affine.a",
+            "/usr/lib64/liblapacke.so",
+            "libdome-sculpt-polygon.a",
+            "libxatlas.a",
+            "libmikktspace.a",
+            "libmikktspace-robust.a",
+            "libufbx.a",
+            "/usr/lib64/libpng.so",
+            "/usr/lib64/libjpeg.so",
+            "/usr/lib64/libz.so",
+            "libdome-sculpt-emission-codec.a",
+            "/usr/lib64/libOpenEXR-3_2.so",
+            "/usr/lib64/libOpenEXRUtil-3_2.so",
+            "/usr/lib64/libOpenEXRCore-3_2.so",
+            "/usr/lib64/libIex-3_2.so",
+            "/usr/lib64/libIlmThread-3_2.so",
+            "/usr/lib64/libImath-3_1.so",
+            "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libharfbuzz.so",
+            "/usr/lib64/libEGL.so",
+            "/usr/lib64/libGL.so",
+            "/usr/lib64/libfontconfig.so",
+            "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libfreetype.so",
+            "/usr/lib64/libicui18n.so",
+            "/usr/lib64/libicuuc.so",
+            "-lgcc_s_asneeded",
+            "-lgcc_s_asneeded"
+          ],
+          "exit_code": 0,
+          "seconds": 0.38259685499360785
+        },
+        {
+          "name": "link-dome-sculpt-native-paint32-emission-test",
+          "command": [
+            "/usr/bin/c++",
+            "-O3",
+            "-DNDEBUG",
+            "CMakeFiles/dome-sculpt-native-paint32-emission-test.dir/tests/native-paint32-emission.cpp.o",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native32-skin-hdr-b0de/artifacts/skin-hdr-regression/release/dome-sculpt-native-paint32-emission-test",
+            "-Wl,-rpath,/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib",
+            "libdome-sculpt-render.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native32-skin-hdr-b0de/artifacts/skin-hdr-first/libdome-sculpt-core.a",
+            "libdome-sculpt-affine.a",
+            "/usr/lib64/liblapacke.so",
+            "libdome-sculpt-polygon.a",
+            "libxatlas.a",
+            "libmikktspace.a",
+            "libmikktspace-robust.a",
+            "libufbx.a",
+            "/usr/lib64/libpng.so",
+            "/usr/lib64/libjpeg.so",
+            "/usr/lib64/libz.so",
+            "libdome-sculpt-emission-codec.a",
+            "/usr/lib64/libOpenEXR-3_2.so",
+            "/usr/lib64/libOpenEXRUtil-3_2.so",
+            "/usr/lib64/libOpenEXRCore-3_2.so",
+            "/usr/lib64/libIex-3_2.so",
+            "/usr/lib64/libIlmThread-3_2.so",
+            "/usr/lib64/libImath-3_1.so",
+            "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libharfbuzz.so",
+            "/usr/lib64/libEGL.so",
+            "/usr/lib64/libGL.so",
+            "/usr/lib64/libfontconfig.so",
+            "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libfreetype.so",
+            "/usr/lib64/libicui18n.so",
+            "/usr/lib64/libicuuc.so",
+            "-lgcc_s_asneeded",
+            "-lgcc_s_asneeded"
+          ],
+          "exit_code": 0,
+          "seconds": 0.3842425100156106
+        },
+        {
+          "name": "link-dome-sculpt-native-paint32-emission-mixed-test",
+          "command": [
+            "/usr/bin/c++",
+            "-O3",
+            "-DNDEBUG",
+            "CMakeFiles/dome-sculpt-native-paint32-emission-mixed-test.dir/tests/native-paint32-emission-mixed.cpp.o",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native32-skin-hdr-b0de/artifacts/skin-hdr-regression/release/dome-sculpt-native-paint32-emission-mixed-test",
+            "-Wl,-rpath,/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib",
+            "libdome-sculpt-render.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native32-skin-hdr-b0de/artifacts/skin-hdr-first/libdome-sculpt-core.a",
+            "libdome-sculpt-affine.a",
+            "/usr/lib64/liblapacke.so",
+            "libdome-sculpt-polygon.a",
+            "libxatlas.a",
+            "libmikktspace.a",
+            "libmikktspace-robust.a",
+            "libufbx.a",
+            "/usr/lib64/libpng.so",
+            "/usr/lib64/libjpeg.so",
+            "/usr/lib64/libz.so",
+            "libdome-sculpt-emission-codec.a",
+            "/usr/lib64/libOpenEXR-3_2.so",
+            "/usr/lib64/libOpenEXRUtil-3_2.so",
+            "/usr/lib64/libOpenEXRCore-3_2.so",
+            "/usr/lib64/libIex-3_2.so",
+            "/usr/lib64/libIlmThread-3_2.so",
+            "/usr/lib64/libImath-3_1.so",
+            "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libharfbuzz.so",
+            "/usr/lib64/libEGL.so",
+            "/usr/lib64/libGL.so",
+            "/usr/lib64/libfontconfig.so",
+            "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libfreetype.so",
+            "/usr/lib64/libicui18n.so",
+            "/usr/lib64/libicuuc.so",
+            "-lgcc_s_asneeded",
+            "-lgcc_s_asneeded"
+          ],
+          "exit_code": 0,
+          "seconds": 0.4005441110348329
+        },
+        {
+          "name": "link-dome-sculpt-native-paint32-emission-contracts-test",
+          "command": [
+            "/usr/bin/c++",
+            "-O3",
+            "-DNDEBUG",
+            "-Wl,--wrap=fsync",
+            "CMakeFiles/dome-sculpt-native-paint32-emission-contracts-test.dir/tests/native-paint32-emission-contracts.cpp.o",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native32-skin-hdr-b0de/artifacts/skin-hdr-regression/release/dome-sculpt-native-paint32-emission-contracts-test",
+            "-Wl,-rpath,/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib",
+            "libdome-sculpt-render.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native32-skin-hdr-b0de/artifacts/skin-hdr-first/libdome-sculpt-core.a",
+            "libdome-sculpt-affine.a",
+            "/usr/lib64/liblapacke.so",
+            "libdome-sculpt-polygon.a",
+            "libxatlas.a",
+            "libmikktspace.a",
+            "libmikktspace-robust.a",
+            "libufbx.a",
+            "/usr/lib64/libpng.so",
+            "/usr/lib64/libjpeg.so",
+            "/usr/lib64/libz.so",
+            "libdome-sculpt-emission-codec.a",
+            "/usr/lib64/libOpenEXR-3_2.so",
+            "/usr/lib64/libOpenEXRUtil-3_2.so",
+            "/usr/lib64/libOpenEXRCore-3_2.so",
+            "/usr/lib64/libIex-3_2.so",
+            "/usr/lib64/libIlmThread-3_2.so",
+            "/usr/lib64/libImath-3_1.so",
+            "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libharfbuzz.so",
+            "/usr/lib64/libEGL.so",
+            "/usr/lib64/libGL.so",
+            "/usr/lib64/libfontconfig.so",
+            "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libfreetype.so",
+            "/usr/lib64/libicui18n.so",
+            "/usr/lib64/libicuuc.so",
+            "-lgcc_s_asneeded",
+            "-lgcc_s_asneeded"
+          ],
+          "exit_code": 0,
+          "seconds": 0.40542038797866553
+        },
+        {
+          "name": "run-emission-export",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/native32-skin-hdr-b0de/artifacts/skin-hdr-regression/release/dome-sculpt-emission-export-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native32-skin-hdr-b0de/artifacts/skin-hdr-regression/release/emission-export"
+          ],
+          "exit_code": 0,
+          "seconds": 0.13474754296476021
+        },
+        {
+          "name": "run-emission-package-budget",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/native32-skin-hdr-b0de/artifacts/skin-hdr-regression/release/dome-sculpt-emission-package-budget-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native32-skin-hdr-b0de/artifacts/skin-hdr-regression/release/emission-package-budget"
+          ],
+          "exit_code": 0,
+          "seconds": 0.2880627299891785
+        },
+        {
+          "name": "run-source-paint-physical-authoring",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/native32-skin-hdr-b0de/artifacts/skin-hdr-regression/release/dome-sculpt-source-paint-physical-authoring-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native32-skin-hdr-b0de/artifacts/skin-hdr-regression/release/source-paint-physical-authoring"
+          ],
+          "exit_code": 0,
+          "seconds": 7.810367263969965
+        },
+        {
+          "name": "run-native-physical-contracts",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/native32-skin-hdr-b0de/artifacts/skin-hdr-regression/release/dome-sculpt-native-physical-contracts-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native32-skin-hdr-b0de/artifacts/skin-hdr-regression/release/native-physical-contracts",
+            "--plain"
+          ],
+          "exit_code": 0,
+          "seconds": 0.10062791395466775
+        },
+        {
+          "name": "run-native-paint32-export",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/native32-skin-hdr-b0de/artifacts/skin-hdr-regression/release/dome-sculpt-native-paint32-export-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native32-skin-hdr-b0de/artifacts/skin-hdr-regression/release/native-paint32-export"
+          ],
+          "exit_code": 0,
+          "seconds": 1.4356795349740423
+        },
+        {
+          "name": "run-native-paint32-skin-export",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/native32-skin-hdr-b0de/artifacts/skin-hdr-regression/release/dome-sculpt-native-paint32-skin-export-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native32-skin-hdr-b0de/artifacts/skin-hdr-regression/release/native-paint32-skin-export"
+          ],
+          "exit_code": 0,
+          "seconds": 0.25124189001508057
+        },
+        {
+          "name": "run-native-paint32-emission",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/native32-skin-hdr-b0de/artifacts/skin-hdr-regression/release/dome-sculpt-native-paint32-emission-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native32-skin-hdr-b0de/artifacts/skin-hdr-regression/release/native-paint32-emission"
+          ],
+          "exit_code": 0,
+          "seconds": 0.7198968879529275
+        },
+        {
+          "name": "run-native-paint32-emission-mixed",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/native32-skin-hdr-b0de/artifacts/skin-hdr-regression/release/dome-sculpt-native-paint32-emission-mixed-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native32-skin-hdr-b0de/artifacts/skin-hdr-regression/release/native-paint32-emission-mixed"
+          ],
+          "exit_code": 0,
+          "seconds": 0.5581904040300287
+        },
+        {
+          "name": "run-native-paint32-emission-contracts",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/native32-skin-hdr-b0de/artifacts/skin-hdr-regression/release/dome-sculpt-native-paint32-emission-contracts-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native32-skin-hdr-b0de/artifacts/skin-hdr-regression/release/native-paint32-emission-contracts"
+          ],
+          "exit_code": 0,
+          "seconds": 0.23798006301512942
+        }
+      ],
+      "phase": "run-native-paint32-emission-contracts",
+      "child_pid": 4023815,
+      "exit_code": 0,
+      "seconds": 14.764253640023526,
+      "inputs": 2607,
+      "drift": []
+    },
+    "sanitize": {
+      "state": "terminal",
+      "pid": 4021919,
+      "source": "c2f5aa8ed3bfcc02632112d3087f261b1aea70a8",
+      "scope": "Nine existing affected HDR/native export consumers relinked to same complete emission-TU adapter over exact current owning product/test support. Original test commands/arguments retained, outputs private. No extra product/header change or full84/full734 claim.",
+      "steps": [
+        {
+          "name": "link-dome-sculpt-emission-export-test",
+          "command": [
+            "/usr/bin/c++",
+            "-O1",
+            "-g1",
+            "-DNDEBUG",
+            "-fsanitize=address,undefined",
+            "-fno-omit-frame-pointer",
+            "CMakeFiles/dome-sculpt-emission-export-test.dir/tests/emission-export.cpp.o",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native32-skin-hdr-b0de/artifacts/skin-hdr-regression/sanitize/dome-sculpt-emission-export-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native32-skin-hdr-b0de/artifacts/skin-hdr-sanitize/libdome-sculpt-core.a",
+            "/usr/lib64/libpng.so",
+            "libdome-sculpt-affine.a",
+            "/usr/lib64/liblapacke.so",
+            "libdome-sculpt-polygon.a",
+            "libxatlas.a",
+            "libmikktspace.a",
+            "libmikktspace-robust.a",
+            "libufbx.a",
+            "/usr/lib64/libjpeg.so",
+            "/usr/lib64/libz.so",
+            "libdome-sculpt-emission-codec.a",
+            "/usr/lib64/libOpenEXR-3_2.so",
+            "/usr/lib64/libOpenEXRUtil-3_2.so",
+            "/usr/lib64/libOpenEXRCore-3_2.so",
+            "/usr/lib64/libIex-3_2.so",
+            "/usr/lib64/libIlmThread-3_2.so",
+            "/usr/lib64/libImath-3_1.so",
+            "-lgcc_s_asneeded",
+            "-lgcc_s_asneeded"
+          ],
+          "exit_code": 0,
+          "seconds": 1.413240763999056
+        },
+        {
+          "name": "link-dome-sculpt-emission-package-budget-test",
+          "command": [
+            "/usr/bin/c++",
+            "-O1",
+            "-g1",
+            "-DNDEBUG",
+            "-fsanitize=address,undefined",
+            "-fno-omit-frame-pointer",
+            "CMakeFiles/dome-sculpt-emission-package-budget-test.dir/tests/emission-package-budget.cpp.o",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native32-skin-hdr-b0de/artifacts/skin-hdr-regression/sanitize/dome-sculpt-emission-package-budget-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native32-skin-hdr-b0de/artifacts/skin-hdr-sanitize/libdome-sculpt-core.a",
+            "libdome-sculpt-affine.a",
+            "/usr/lib64/liblapacke.so",
+            "libdome-sculpt-polygon.a",
+            "libxatlas.a",
+            "libmikktspace.a",
+            "libmikktspace-robust.a",
+            "libufbx.a",
+            "/usr/lib64/libpng.so",
+            "/usr/lib64/libjpeg.so",
+            "/usr/lib64/libz.so",
+            "libdome-sculpt-emission-codec.a",
+            "/usr/lib64/libOpenEXR-3_2.so",
+            "/usr/lib64/libOpenEXRUtil-3_2.so",
+            "/usr/lib64/libOpenEXRCore-3_2.so",
+            "/usr/lib64/libIex-3_2.so",
+            "/usr/lib64/libIlmThread-3_2.so",
+            "/usr/lib64/libImath-3_1.so",
+            "-lgcc_s_asneeded",
+            "-lgcc_s_asneeded"
+          ],
+          "exit_code": 0,
+          "seconds": 1.551167252997402
+        },
+        {
+          "name": "link-dome-sculpt-source-paint-physical-authoring-test",
+          "command": [
+            "/usr/bin/c++",
+            "-O1",
+            "-g1",
+            "-DNDEBUG",
+            "-fsanitize=address,undefined",
+            "-fno-omit-frame-pointer",
+            "CMakeFiles/dome-sculpt-source-paint-physical-authoring-test.dir/tests/source-paint-physical-authoring.cpp.o",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native32-skin-hdr-b0de/artifacts/skin-hdr-regression/sanitize/dome-sculpt-source-paint-physical-authoring-test",
+            "-Wl,-rpath,/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib",
+            "libdome-sculpt-render.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native32-skin-hdr-b0de/artifacts/skin-hdr-sanitize/libdome-sculpt-core.a",
+            "libdome-sculpt-affine.a",
+            "/usr/lib64/liblapacke.so",
+            "libdome-sculpt-polygon.a",
+            "libxatlas.a",
+            "libmikktspace.a",
+            "libmikktspace-robust.a",
+            "libufbx.a",
+            "/usr/lib64/libpng.so",
+            "/usr/lib64/libjpeg.so",
+            "/usr/lib64/libz.so",
+            "libdome-sculpt-emission-codec.a",
+            "/usr/lib64/libOpenEXR-3_2.so",
+            "/usr/lib64/libOpenEXRUtil-3_2.so",
+            "/usr/lib64/libOpenEXRCore-3_2.so",
+            "/usr/lib64/libIex-3_2.so",
+            "/usr/lib64/libIlmThread-3_2.so",
+            "/usr/lib64/libImath-3_1.so",
+            "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libharfbuzz.so",
+            "/usr/lib64/libEGL.so",
+            "/usr/lib64/libGL.so",
+            "/usr/lib64/libfontconfig.so",
+            "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libfreetype.so",
+            "/usr/lib64/libicui18n.so",
+            "/usr/lib64/libicuuc.so",
+            "-lgcc_s_asneeded",
+            "-lgcc_s_asneeded"
+          ],
+          "exit_code": 0,
+          "seconds": 2.5080852499813773
+        },
+        {
+          "name": "link-dome-sculpt-native-physical-contracts-test",
+          "command": [
+            "/usr/bin/c++",
+            "-O1",
+            "-g1",
+            "-DNDEBUG",
+            "-fsanitize=address,undefined",
+            "-fno-omit-frame-pointer",
+            "-Wl,--wrap=fsync",
+            "CMakeFiles/dome-sculpt-native-physical-contracts-test.dir/tests/native-physical-contracts.cpp.o",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native32-skin-hdr-b0de/artifacts/skin-hdr-regression/sanitize/dome-sculpt-native-physical-contracts-test",
+            "-Wl,-rpath,/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib",
+            "libdome-sculpt-render.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native32-skin-hdr-b0de/artifacts/skin-hdr-sanitize/libdome-sculpt-core.a",
+            "libdome-sculpt-affine.a",
+            "/usr/lib64/liblapacke.so",
+            "libdome-sculpt-polygon.a",
+            "libxatlas.a",
+            "libmikktspace.a",
+            "libmikktspace-robust.a",
+            "libufbx.a",
+            "/usr/lib64/libpng.so",
+            "/usr/lib64/libjpeg.so",
+            "/usr/lib64/libz.so",
+            "libdome-sculpt-emission-codec.a",
+            "/usr/lib64/libOpenEXR-3_2.so",
+            "/usr/lib64/libOpenEXRUtil-3_2.so",
+            "/usr/lib64/libOpenEXRCore-3_2.so",
+            "/usr/lib64/libIex-3_2.so",
+            "/usr/lib64/libIlmThread-3_2.so",
+            "/usr/lib64/libImath-3_1.so",
+            "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libharfbuzz.so",
+            "/usr/lib64/libEGL.so",
+            "/usr/lib64/libGL.so",
+            "/usr/lib64/libfontconfig.so",
+            "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libfreetype.so",
+            "/usr/lib64/libicui18n.so",
+            "/usr/lib64/libicuuc.so",
+            "-lgcc_s_asneeded",
+            "-lgcc_s_asneeded"
+          ],
+          "exit_code": 0,
+          "seconds": 2.594500374980271
+        },
+        {
+          "name": "link-dome-sculpt-native-paint32-export-test",
+          "command": [
+            "/usr/bin/c++",
+            "-O1",
+            "-g1",
+            "-DNDEBUG",
+            "-fsanitize=address,undefined",
+            "-fno-omit-frame-pointer",
+            "CMakeFiles/dome-sculpt-native-paint32-export-test.dir/tests/native-paint32-export.cpp.o",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native32-skin-hdr-b0de/artifacts/skin-hdr-regression/sanitize/dome-sculpt-native-paint32-export-test",
+            "-Wl,-rpath,/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib",
+            "libdome-sculpt-render.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native32-skin-hdr-b0de/artifacts/skin-hdr-sanitize/libdome-sculpt-core.a",
+            "libdome-sculpt-affine.a",
+            "/usr/lib64/liblapacke.so",
+            "libdome-sculpt-polygon.a",
+            "libxatlas.a",
+            "libmikktspace.a",
+            "libmikktspace-robust.a",
+            "libufbx.a",
+            "/usr/lib64/libpng.so",
+            "/usr/lib64/libjpeg.so",
+            "/usr/lib64/libz.so",
+            "libdome-sculpt-emission-codec.a",
+            "/usr/lib64/libOpenEXR-3_2.so",
+            "/usr/lib64/libOpenEXRUtil-3_2.so",
+            "/usr/lib64/libOpenEXRCore-3_2.so",
+            "/usr/lib64/libIex-3_2.so",
+            "/usr/lib64/libIlmThread-3_2.so",
+            "/usr/lib64/libImath-3_1.so",
+            "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libharfbuzz.so",
+            "/usr/lib64/libEGL.so",
+            "/usr/lib64/libGL.so",
+            "/usr/lib64/libfontconfig.so",
+            "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libfreetype.so",
+            "/usr/lib64/libicui18n.so",
+            "/usr/lib64/libicuuc.so",
+            "-lgcc_s_asneeded",
+            "-lgcc_s_asneeded"
+          ],
+          "exit_code": 0,
+          "seconds": 2.64817692496581
+        },
+        {
+          "name": "link-dome-sculpt-native-paint32-skin-export-test",
+          "command": [
+            "/usr/bin/c++",
+            "-O1",
+            "-g1",
+            "-DNDEBUG",
+            "-fsanitize=address,undefined",
+            "-fno-omit-frame-pointer",
+            "CMakeFiles/dome-sculpt-native-paint32-skin-export-test.dir/tests/native-paint32-skin-export.cpp.o",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native32-skin-hdr-b0de/artifacts/skin-hdr-regression/sanitize/dome-sculpt-native-paint32-skin-export-test",
+            "-Wl,-rpath,/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib",
+            "libdome-sculpt-render.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native32-skin-hdr-b0de/artifacts/skin-hdr-sanitize/libdome-sculpt-core.a",
+            "libdome-sculpt-affine.a",
+            "/usr/lib64/liblapacke.so",
+            "libdome-sculpt-polygon.a",
+            "libxatlas.a",
+            "libmikktspace.a",
+            "libmikktspace-robust.a",
+            "libufbx.a",
+            "/usr/lib64/libpng.so",
+            "/usr/lib64/libjpeg.so",
+            "/usr/lib64/libz.so",
+            "libdome-sculpt-emission-codec.a",
+            "/usr/lib64/libOpenEXR-3_2.so",
+            "/usr/lib64/libOpenEXRUtil-3_2.so",
+            "/usr/lib64/libOpenEXRCore-3_2.so",
+            "/usr/lib64/libIex-3_2.so",
+            "/usr/lib64/libIlmThread-3_2.so",
+            "/usr/lib64/libImath-3_1.so",
+            "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libharfbuzz.so",
+            "/usr/lib64/libEGL.so",
+            "/usr/lib64/libGL.so",
+            "/usr/lib64/libfontconfig.so",
+            "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libfreetype.so",
+            "/usr/lib64/libicui18n.so",
+            "/usr/lib64/libicuuc.so",
+            "-lgcc_s_asneeded",
+            "-lgcc_s_asneeded"
+          ],
+          "exit_code": 0,
+          "seconds": 2.4187260530306958
+        },
+        {
+          "name": "link-dome-sculpt-native-paint32-emission-test",
+          "command": [
+            "/usr/bin/c++",
+            "-O1",
+            "-g1",
+            "-DNDEBUG",
+            "-fsanitize=address,undefined",
+            "-fno-omit-frame-pointer",
+            "CMakeFiles/dome-sculpt-native-paint32-emission-test.dir/tests/native-paint32-emission.cpp.o",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native32-skin-hdr-b0de/artifacts/skin-hdr-regression/sanitize/dome-sculpt-native-paint32-emission-test",
+            "-Wl,-rpath,/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib",
+            "libdome-sculpt-render.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native32-skin-hdr-b0de/artifacts/skin-hdr-sanitize/libdome-sculpt-core.a",
+            "libdome-sculpt-affine.a",
+            "/usr/lib64/liblapacke.so",
+            "libdome-sculpt-polygon.a",
+            "libxatlas.a",
+            "libmikktspace.a",
+            "libmikktspace-robust.a",
+            "libufbx.a",
+            "/usr/lib64/libpng.so",
+            "/usr/lib64/libjpeg.so",
+            "/usr/lib64/libz.so",
+            "libdome-sculpt-emission-codec.a",
+            "/usr/lib64/libOpenEXR-3_2.so",
+            "/usr/lib64/libOpenEXRUtil-3_2.so",
+            "/usr/lib64/libOpenEXRCore-3_2.so",
+            "/usr/lib64/libIex-3_2.so",
+            "/usr/lib64/libIlmThread-3_2.so",
+            "/usr/lib64/libImath-3_1.so",
+            "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libharfbuzz.so",
+            "/usr/lib64/libEGL.so",
+            "/usr/lib64/libGL.so",
+            "/usr/lib64/libfontconfig.so",
+            "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libfreetype.so",
+            "/usr/lib64/libicui18n.so",
+            "/usr/lib64/libicuuc.so",
+            "-lgcc_s_asneeded",
+            "-lgcc_s_asneeded"
+          ],
+          "exit_code": 0,
+          "seconds": 2.632804919965565
+        },
+        {
+          "name": "link-dome-sculpt-native-paint32-emission-mixed-test",
+          "command": [
+            "/usr/bin/c++",
+            "-O1",
+            "-g1",
+            "-DNDEBUG",
+            "-fsanitize=address,undefined",
+            "-fno-omit-frame-pointer",
+            "CMakeFiles/dome-sculpt-native-paint32-emission-mixed-test.dir/tests/native-paint32-emission-mixed.cpp.o",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native32-skin-hdr-b0de/artifacts/skin-hdr-regression/sanitize/dome-sculpt-native-paint32-emission-mixed-test",
+            "-Wl,-rpath,/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib",
+            "libdome-sculpt-render.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native32-skin-hdr-b0de/artifacts/skin-hdr-sanitize/libdome-sculpt-core.a",
+            "libdome-sculpt-affine.a",
+            "/usr/lib64/liblapacke.so",
+            "libdome-sculpt-polygon.a",
+            "libxatlas.a",
+            "libmikktspace.a",
+            "libmikktspace-robust.a",
+            "libufbx.a",
+            "/usr/lib64/libpng.so",
+            "/usr/lib64/libjpeg.so",
+            "/usr/lib64/libz.so",
+            "libdome-sculpt-emission-codec.a",
+            "/usr/lib64/libOpenEXR-3_2.so",
+            "/usr/lib64/libOpenEXRUtil-3_2.so",
+            "/usr/lib64/libOpenEXRCore-3_2.so",
+            "/usr/lib64/libIex-3_2.so",
+            "/usr/lib64/libIlmThread-3_2.so",
+            "/usr/lib64/libImath-3_1.so",
+            "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libharfbuzz.so",
+            "/usr/lib64/libEGL.so",
+            "/usr/lib64/libGL.so",
+            "/usr/lib64/libfontconfig.so",
+            "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libfreetype.so",
+            "/usr/lib64/libicui18n.so",
+            "/usr/lib64/libicuuc.so",
+            "-lgcc_s_asneeded",
+            "-lgcc_s_asneeded"
+          ],
+          "exit_code": 0,
+          "seconds": 2.518083019007463
+        },
+        {
+          "name": "link-dome-sculpt-native-paint32-emission-contracts-test",
+          "command": [
+            "/usr/bin/c++",
+            "-O1",
+            "-g1",
+            "-DNDEBUG",
+            "-fsanitize=address,undefined",
+            "-fno-omit-frame-pointer",
+            "-Wl,--wrap=fsync",
+            "CMakeFiles/dome-sculpt-native-paint32-emission-contracts-test.dir/tests/native-paint32-emission-contracts.cpp.o",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native32-skin-hdr-b0de/artifacts/skin-hdr-regression/sanitize/dome-sculpt-native-paint32-emission-contracts-test",
+            "-Wl,-rpath,/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib",
+            "libdome-sculpt-render.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native32-skin-hdr-b0de/artifacts/skin-hdr-sanitize/libdome-sculpt-core.a",
+            "libdome-sculpt-affine.a",
+            "/usr/lib64/liblapacke.so",
+            "libdome-sculpt-polygon.a",
+            "libxatlas.a",
+            "libmikktspace.a",
+            "libmikktspace-robust.a",
+            "libufbx.a",
+            "/usr/lib64/libpng.so",
+            "/usr/lib64/libjpeg.so",
+            "/usr/lib64/libz.so",
+            "libdome-sculpt-emission-codec.a",
+            "/usr/lib64/libOpenEXR-3_2.so",
+            "/usr/lib64/libOpenEXRUtil-3_2.so",
+            "/usr/lib64/libOpenEXRCore-3_2.so",
+            "/usr/lib64/libIex-3_2.so",
+            "/usr/lib64/libIlmThread-3_2.so",
+            "/usr/lib64/libImath-3_1.so",
+            "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libharfbuzz.so",
+            "/usr/lib64/libEGL.so",
+            "/usr/lib64/libGL.so",
+            "/usr/lib64/libfontconfig.so",
+            "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libfreetype.so",
+            "/usr/lib64/libicui18n.so",
+            "/usr/lib64/libicuuc.so",
+            "-lgcc_s_asneeded",
+            "-lgcc_s_asneeded"
+          ],
+          "exit_code": 0,
+          "seconds": 2.4621787409996614
+        },
+        {
+          "name": "run-emission-export",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/native32-skin-hdr-b0de/artifacts/skin-hdr-regression/sanitize/dome-sculpt-emission-export-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native32-skin-hdr-b0de/artifacts/skin-hdr-regression/sanitize/emission-export"
+          ],
+          "exit_code": 0,
+          "seconds": 0.9720678110024892
+        },
+        {
+          "name": "run-emission-package-budget",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/native32-skin-hdr-b0de/artifacts/skin-hdr-regression/sanitize/dome-sculpt-emission-package-budget-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native32-skin-hdr-b0de/artifacts/skin-hdr-regression/sanitize/emission-package-budget"
+          ],
+          "exit_code": 0,
+          "seconds": 0.6992280170088634
+        },
+        {
+          "name": "run-source-paint-physical-authoring",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/native32-skin-hdr-b0de/artifacts/skin-hdr-regression/sanitize/dome-sculpt-source-paint-physical-authoring-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native32-skin-hdr-b0de/artifacts/skin-hdr-regression/sanitize/source-paint-physical-authoring"
+          ],
+          "exit_code": 0,
+          "seconds": 19.372416298021562
+        },
+        {
+          "name": "run-native-physical-contracts",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/native32-skin-hdr-b0de/artifacts/skin-hdr-regression/sanitize/dome-sculpt-native-physical-contracts-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native32-skin-hdr-b0de/artifacts/skin-hdr-regression/sanitize/native-physical-contracts",
+            "--plain"
+          ],
+          "exit_code": 0,
+          "seconds": 0.6241974189761095
+        },
+        {
+          "name": "run-native-paint32-export",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/native32-skin-hdr-b0de/artifacts/skin-hdr-regression/sanitize/dome-sculpt-native-paint32-export-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native32-skin-hdr-b0de/artifacts/skin-hdr-regression/sanitize/native-paint32-export"
+          ],
+          "exit_code": 0,
+          "seconds": 6.397043229022529
+        },
+        {
+          "name": "run-native-paint32-skin-export",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/native32-skin-hdr-b0de/artifacts/skin-hdr-regression/sanitize/dome-sculpt-native-paint32-skin-export-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native32-skin-hdr-b0de/artifacts/skin-hdr-regression/sanitize/native-paint32-skin-export"
+          ],
+          "exit_code": 0,
+          "seconds": 0.8592730360105634
+        },
+        {
+          "name": "run-native-paint32-emission",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/native32-skin-hdr-b0de/artifacts/skin-hdr-regression/sanitize/dome-sculpt-native-paint32-emission-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native32-skin-hdr-b0de/artifacts/skin-hdr-regression/sanitize/native-paint32-emission"
+          ],
+          "exit_code": 0,
+          "seconds": 4.087636296986602
+        },
+        {
+          "name": "run-native-paint32-emission-mixed",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/native32-skin-hdr-b0de/artifacts/skin-hdr-regression/sanitize/dome-sculpt-native-paint32-emission-mixed-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native32-skin-hdr-b0de/artifacts/skin-hdr-regression/sanitize/native-paint32-emission-mixed"
+          ],
+          "exit_code": 0,
+          "seconds": 2.340885626967065
+        },
+        {
+          "name": "run-native-paint32-emission-contracts",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/native32-skin-hdr-b0de/artifacts/skin-hdr-regression/sanitize/dome-sculpt-native-paint32-emission-contracts-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native32-skin-hdr-b0de/artifacts/skin-hdr-regression/sanitize/native-paint32-emission-contracts"
+          ],
+          "exit_code": 0,
+          "seconds": 1.6465745239984244
+        }
+      ],
+      "phase": "run-native-paint32-emission-contracts",
+      "child_pid": 4028794,
+      "exit_code": 0,
+      "seconds": 57.8594474659767,
+      "inputs": 2607,
+      "drift": []
+    }
+  }
 }
