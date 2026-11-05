@@ -1,5 +1,19 @@
 # Dome Sculpt production handoff
 
+## Private native writable-paint UV after skin binding — 2026-11-05
+
+A paired factory now transports actual REST-indexed pure skin/pose/IBM together
+with native32 writable paint and immutable first-source capsules. R/S72 new and
+legacy74 controls pass each; real worker332 each covers all157 SMALL helper C++
+allocation prefixes, Cancel/stale/dependent Save and exact retry/oneUndo. Exact
+local affine/space/rest/IBM and posed-corner POS/N preserved. Only two product TUs
+changed; new private header adds no existing record/public layout or schema/cap
+change. Read NATIVE-PAINT-RIG-UV.md and receipt for matching current44 component
+scope and preserved fixture-link/local-Undo negatives. No freshALL/UI/GPU/main
+claim. Genuine native32 key/frame composition and reverse-source row adapters,
+full current visual/export/UI and broader domains remain required; goal incomplete.
+
+
 ## Private ordinary rig Restore after authoring — 2026-11-05
 
 Ordinary bind/rebind now stages its complete first source and verifies current

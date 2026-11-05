@@ -3907,3 +3907,21 @@ if(BUILD_TESTING)
   set_tests_properties(rig-after-authoring-worker PROPERTIES TIMEOUT 600
     ENVIRONMENT "LIBGL_ALWAYS_SOFTWARE=1;XR_RUNTIME_JSON=${CMAKE_CURRENT_BINARY_DIR}/rig-after-authoring-no-physical-runtime.json")
 endif()
+
+if(BUILD_TESTING)
+  add_executable(dome-sculpt-native-paint-rig-uv-test tests/native-paint-rig-uv.cpp)
+  target_include_directories(dome-sculpt-native-paint-rig-uv-test PRIVATE src)
+  target_link_libraries(dome-sculpt-native-paint-rig-uv-test PRIVATE dome-sculpt-core)
+  add_test(NAME native-paint-rig-uv COMMAND dome-sculpt-native-paint-rig-uv-test ${CMAKE_CURRENT_BINARY_DIR}/native-paint-rig-uv)
+  set_tests_properties(native-paint-rig-uv PROPERTIES TIMEOUT 600
+    ENVIRONMENT "LIBGL_ALWAYS_SOFTWARE=1;XR_RUNTIME_JSON=${CMAKE_CURRENT_BINARY_DIR}/native-paint-rig-no-physical-runtime.json")
+endif()
+if(BUILD_TESTING)
+  add_executable(dome-sculpt-native-paint-rig-uv-worker-test tests/native-paint-rig-uv-worker.cpp)
+  target_include_directories(dome-sculpt-native-paint-rig-uv-worker-test PRIVATE src)
+  target_link_libraries(dome-sculpt-native-paint-rig-uv-worker-test PRIVATE dome-sculpt-core)
+  target_link_options(dome-sculpt-native-paint-rig-uv-worker-test PRIVATE "-Wl,--wrap=_ZN4dome6detail25retain_native_paint_modelERKNS_12SculptObjectERKNS_4MeshESt4spanIKjLm18446744073709551615EERKNS_19PaintSamplingLimitsE")
+  add_test(NAME native-paint-rig-uv-worker COMMAND dome-sculpt-native-paint-rig-uv-worker-test ${CMAKE_CURRENT_BINARY_DIR}/native-paint-rig-uv-worker)
+  set_tests_properties(native-paint-rig-uv-worker PROPERTIES TIMEOUT 600
+    ENVIRONMENT "LIBGL_ALWAYS_SOFTWARE=1;XR_RUNTIME_JSON=${CMAKE_CURRENT_BINARY_DIR}/native-paint-rig-no-physical-runtime.json")
+endif()
