@@ -17,6 +17,7 @@ if os.environ.get("DOME_SCULPT_MENU_BUS") != "1":
         {**os.environ, "DOME_SCULPT_MENU_BUS": "1"},
     )
 root = Path(__file__).resolve().parents[1]
+binary = Path(os.environ.get("DOME_SCULPT_TEST_APP", root / "build/dome-sculpt")).resolve()
 creator_flow=os.environ.get("DOME_MENU_CREATOR_ONLY")=="1"
 bake_compact=os.environ.get("DOME_MENU_BAKE_COMPACT")=="1"
 rig_compact = os.environ.get("DOME_MENU_RIG_COMPACT") == "1"
@@ -42,6 +43,7 @@ if cut_flow:
     out = root / (("artifacts/menu-colored-held-cut-compact" if held_cut and cut_compact else "artifacts/menu-colored-held-cut" if held_cut else "artifacts/menu-colored-key-cut" if key_cut else "artifacts/menu-colored-cut-compact" if cut_compact else "artifacts/menu-colored-cut") if colored_cut else ("artifacts/menu-cut-compact" if cut_compact else "artifacts/menu-cut"))
 if creator_flow:
     out = root / ("artifacts/menu-vroid-only-compact" if compact else "artifacts/menu-vroid-only")
+out = Path(os.environ.get("DOME_MENU_OUTPUT", out)).resolve()
 out.mkdir(parents=True, exist_ok=True)
 checks = []
 processes = []
@@ -116,7 +118,7 @@ async def main():
             config.write_text(json.dumps({"font": "Unifont / Sans-Serif",
                                          "font_size": 16, "font_scale": 2}))
         log = (out / "app.log").open("w")
-        arguments = [str(root / "build/dome-sculpt")]
+        arguments = [str(binary)]
         fixture = Path(home, "rig.dsculpt")
         if creator_flow:
             fixture=Path(home,"legacy.dsculpt")
@@ -132,7 +134,11 @@ async def main():
             arguments.append(str(fixture))
         elif retopo_flow:
             fixture = Path(home, "retopo.dsculpt")
-            subprocess.run([str(root / "build/dome-sculpt-retopo-authoring-test"), "--ui-fixture", str(fixture)], check=True)
+            if os.environ.get("DOME_MENU_RETOPO_SOURCE"):
+                import shutil
+                shutil.copyfile(os.environ["DOME_MENU_RETOPO_SOURCE"], fixture)
+            else:
+                subprocess.run([str(root / "build/dome-sculpt-retopo-authoring-test"), "--ui-fixture", str(fixture)], check=True)
             arguments.append(str(fixture))
         elif rig_flow or export_flow:
             fixture_tool = "dome-sculpt-document-export-test" if export_flow else "dome-sculpt-rig-edit-test"
@@ -161,6 +167,8 @@ async def main():
         window = await wait(lambda: named("Dome Sculpt"),90)
         window.set_input_focus(X.RevertToParent, X.CurrentTime)
         d.sync()
+        if retopo_flow:
+            (out/"app-maps.txt").write_text(Path("/proc/"+str(app.pid)+"/maps").read_text())
 
         def prop(name):
             p = window.get_full_property(d.intern_atom(name), X.AnyPropertyType)
@@ -208,7 +216,7 @@ async def main():
         await asyncio.sleep(0.6)
         if creator_flow:
             def info():
-                return json.loads(subprocess.check_output([str(root/"build/dome-sculpt"),"--project-info",str(fixture)],env=env))
+                return json.loads(subprocess.check_output([str(binary),"--project-info",str(fixture)],env=env))
             def recipes():
                 return json.loads(subprocess.check_output([str(root/"build/dome-sculpt-humanoid-creator-test"),"--inspect",str(fixture)],env=env))
             async def ready():
@@ -238,7 +246,7 @@ async def main():
             d.close();bus.disconnect();return
         if cut_flow:
             def info():
-                return json.loads(subprocess.check_output([str(root / "build/dome-sculpt"), "--project-info", str(fixture)], env=env))
+                return json.loads(subprocess.check_output([str(binary), "--project-info", str(fixture)], env=env))
             baseline=info();g=window.get_geometry()
             def pixels():
                 raw=window.get_image(0,0,g.width,g.height-60,X.ZPixmap,0xFFFFFFFF)
@@ -342,7 +350,7 @@ async def main():
             d.close();bus.disconnect();return
         if retopo_flow:
             def info():
-                return json.loads(subprocess.check_output([str(root / "build/dome-sculpt"), "--project-info", str(fixture)], env=env))
+                return json.loads(subprocess.check_output([str(binary), "--project-info", str(fixture)], env=env))
             baseline = info()
             nodes, _ = await layout()
             check(nodes["Start patch"][1].get("enabled") is True and nodes["Apply patch"][1].get("enabled") is False,
@@ -374,11 +382,6 @@ async def main():
             nodes,_=await layout()
             check(nodes["Cancel patch"][1].get("enabled") is True and info()["scene_hash"]==baseline["scene_hash"],
                   "Universal Close cancels projection settings while preserving the patch workspace and source")
-            if retopo_compact:
-                await click("Cancel patch")
-                check(info()["scene_hash"]==baseline["scene_hash"] and app.poll() is None,
-                      "Compact cancellation preserves the complete native scene")
-                d.close();bus.disconnect();return
             window.set_input_focus(X.RevertToParent,X.CurrentTime);d.sync()
             g=window.get_geometry()
             def pixels():
@@ -389,8 +392,21 @@ async def main():
                 key("Shift_L",True);xtest.fake_input(d,X.ButtonPress,1);d.sync()
             def release():
                 xtest.fake_input(d,X.ButtonRelease,1);d.sync();key("Shift_L",False)
-            before=pixels()
+            if retopo_compact:
+                before_zoom=pixels()
+                xtest.fake_input(d,X.MotionNotify,x=g.x+g.width//2,y=g.y+g.height//2);d.sync()
+                for _ in range(10):
+                    xtest.fake_input(d,X.ButtonPress,4);xtest.fake_input(d,X.ButtonRelease,4);d.sync()
+                await wait(lambda:pixels().tobytes()!=before_zoom.tobytes())
+                check(info()["scene_hash"]==baseline["scene_hash"],
+                      "Actual compact viewport wheel zoom changes only the view before editing")
+            before=pixels();before.save(out/"retopo-before-placement.png")
+            (out/"viewport-geometry.json").write_text(json.dumps({'x':g.x,'y':g.y,'width':g.width,'height':g.height,'screen_width':d.screen().width_in_pixels,'screen_height':d.screen().height_in_pixels},indent=2)+'\n')
             press(g.width*.5,g.height*.5)
+            await asyncio.sleep(.5)
+            raw=window.get_image(0,0,g.width,g.height,X.ZPixmap,0xFFFFFFFF)
+            Image.frombytes("RGB",(g.width,g.height),raw.data,"raw","BGRX").save(out/"held-full-window.png")
+            (out/"held-menu.json").write_text(json.dumps((await layout())[0],indent=2)+'\n')
             await wait(lambda:pixels().tobytes()!=before.tobytes())
             pixels().save(out/"held-point.png")
             check(info()["scene_hash"]==baseline["scene_hash"],"Held native placement shows real point feedback without editing the scene")
@@ -421,7 +437,26 @@ async def main():
             nodes,_=await layout()
             check(nodes["Move points"][1].get("toggle-state")==1 and nodes["Place points"][1].get("toggle-state")==0,
                   "Actual retopology tool switching updates exported radio feedback")
-            await click("Apply patch");await ready("Save");await click("Save")
+            gate = Path(os.environ["DOME_RETOPO_UI_INPUT_GATE"]) if os.environ.get("DOME_RETOPO_UI_INPUT_GATE") else None
+            if gate:
+                gate.mkdir(parents=True,exist_ok=True)
+                for marker in ("arm","entered","release"):
+                    (gate/marker).unlink(missing_ok=True)
+                prior=fixture.read_bytes();saved=fixture.stat().st_mtime_ns
+                (gate/"arm").write_text("actual Apply before real EndGesture\n")
+                await click("Apply patch")
+                await wait(lambda:(gate/"entered").exists())
+                nodes=await ready("Save")
+                check(nodes["Save"][1].get("enabled") is True and fixture.read_bytes()==prior,
+                      "Actual Apply enables ordered Save while its genuine input finalization is held")
+                await menu.call_event(nodes["Save"][0], "clicked", Variant("i",0),0)
+                await asyncio.sleep(.3)
+                check(fixture.read_bytes()==prior and not (gate/"release").exists(),
+                      "Immediate native Save preserves the prior file before real unwrap completes")
+                (gate/"release").write_text("release actual independent worker\n")
+                await wait(lambda:fixture.stat().st_mtime_ns!=saved,90)
+            else:
+                await click("Apply patch");await ready("Save");await click("Save")
             accepted=info()
             (out / "accepted-scene.json").write_text(json.dumps({"baseline": baseline, "accepted": accepted}, indent=2))
             check(len(accepted["objects"])==2 and accepted["retopology_vertices"]==(6 if retopo_edges else 4) and accepted["retopology_faces"]==(2 if retopo_edges else 1)
@@ -435,6 +470,25 @@ async def main():
             await click("Start patch");await ready("Place points");await click("Cancel patch");await click("Save")
             check(info()["scene_hash"]==accepted["scene_hash"] and app.poll() is None,
                   "Reopen and cancellation retain saved topology and leave the native application responsive")
+            import shutil
+            shutil.copy2(fixture,out/"accepted.dsculpt")
+            await click("Close Window")
+            await wait(lambda:app.poll() is not None,90)
+            check(app.returncode==0,"Actual retopology desktop closes cleanly with no sanitizer suppression")
+            reopen_log=(out/"reopen.log").open("w")
+            reopened=subprocess.Popen([str(binary),str(fixture)],env=env,cwd=home,stdout=reopen_log,stderr=reopen_log)
+            processes.append(reopened)
+            window=await wait(lambda:named("Dome Sculpt"),90)
+            service=await wait(lambda:prop("_KDE_NET_WM_APPMENU_SERVICE_NAME"))
+            path=await wait(lambda:prop("_KDE_NET_WM_APPMENU_OBJECT_PATH"))
+            proxy=bus.get_proxy_object(service,path,await bus.introspect(service,path))
+            menu=proxy.get_interface("com.canonical.dbusmenu")
+            await ready("Start patch")
+            (out/"reopen-maps.txt").write_text(Path("/proc/"+str(reopened.pid)+"/maps").read_text())
+            check(info()["scene_hash"]==accepted["scene_hash"],
+                  "A fresh actual native app reopens the exact saved affine retopology project")
+            await click("Close Window");await wait(lambda:reopened.poll() is not None,90)
+            check(reopened.returncode==0,"Reopened native project closes cleanly")
             d.close();bus.disconnect();return
         if export_flow:
             import hashlib, struct
@@ -468,7 +522,7 @@ async def main():
             d.close(); bus.disconnect(); return
         if bake_flow:
             def info():
-                return json.loads(subprocess.check_output([str(root / "build/dome-sculpt"),"--project-info",str(fixture)],env=env))
+                return json.loads(subprocess.check_output([str(binary),"--project-info",str(fixture)],env=env))
             def tap(w,x,y):
                 g=w.get_geometry();xtest.fake_input(d,X.MotionNotify,x=g.x+int(x),y=g.y+int(y));xtest.fake_input(d,X.ButtonPress,1);xtest.fake_input(d,X.ButtonRelease,1);d.sync()
             baseline=info();nodes,_=await layout()
@@ -565,7 +619,7 @@ async def main():
 
         if rig_flow:
             def info():
-                return json.loads(subprocess.check_output([str(root / "build/dome-sculpt"), "--project-info", str(fixture)], env=env))
+                return json.loads(subprocess.check_output([str(binary), "--project-info", str(fixture)], env=env))
             def tap(w, x, y):
                 g = w.get_geometry()
                 xtest.fake_input(d, X.MotionNotify, x=g.x+int(x), y=g.y+int(y))
@@ -907,7 +961,7 @@ async def main():
         await wait(lambda: named("Voxel remesh") is None)
         files = await wait(lambda: set(recovery_root.glob("*.dsculpt"))-before_files)
         info = json.loads(subprocess.check_output(
-            [str(root / "build/dome-sculpt"), "--project-info", str(next(iter(files)))],
+            [str(binary), "--project-info", str(next(iter(files)))],
             env=env, text=True))
         nodes, _ = await layout()
         check(info["object_count"] == 2 and not info["painted"] and

@@ -30,12 +30,16 @@ int main()try {
   {
     Document d;Release cleanup;d.replace(source.snapshot());patch(d);
     topology_gate.arm();d.end_retopology(true);topology_gate.wait();
-    check(d.frame().state->retopology->committing&&!d.frame().state->asset_busy,
-          "Accepted Apply pauses in the real topology drain before any asset lease exists");
+    check(d.frame().state->retopology->committing&&d.frame().state->asset_busy&&d.asset_status().cancellable,
+          "Accepted Apply owns its cancellable ordered lease before the real topology drain");
     d.end_retopology(false);
-    check(!d.frame().state->retopology&&d.copy_scene().encode()==original,
-          "Explicit Cancel closes a pre-asset accepted draft without changing the committed scene");
+    check(d.asset_status().cancelling&&d.copy_scene().encode()==original,
+          "Explicit Cancel revokes early acceptance without changing the committed scene");
     topology_gate.release();check(d.wait_asset(),"Cancelled topology drain does not strand final-save waiting");
+    check(d.frame().state->retopology&&!d.frame().state->retopology->committing&&d.copy_scene().encode()==original,
+          "Cancelled early lease retains its exact editable draft and source");
+    d.end_retopology(false);check(!d.frame().state->retopology,
+          "A subsequent explicit Cancel closes the retained early-lease draft");
   }
   {
     Document d;Release cleanup;d.replace(source.snapshot());

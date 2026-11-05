@@ -1,3 +1,15 @@
+## Private matching affine retopology clients — 2026-11-05
+
+The fd66 production bytes now pass actual matched FLTK normal/compact and
+real-loader software clients: Release76/SAN59 UI/controller assertions, corrected
+whole cancellation-boundaries each0, six native pairs byte-identical, clean close
+and fresh-process reopen. Explicit canonical SDK/driver mappings and all inputs
+are pinned. No fresh whole-app build/main/GPU/HMD claim. Initial compact subpixel
+marker feedback remains an unresolved usability gap; positive compact editing
+uses real existing wheel zoom with all pixel/Cancel/history assertions retained.
+The first stale-/opt-Cairo800B setup failure is preserved; samebytes canonical
+runs are clean. Read RETOPO-AFFINE-UI.md/receipt. Full goal remains active.
+
 ## Private immediate retopology Save repair — 2026-11-05
 
 The real affine-checkpoint Apply-to-Save gap now has an explicit independent-
