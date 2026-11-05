@@ -134,6 +134,37 @@ core-only0 without render/fonts, no Qt. Read CURRENT-HEADLESS-QUALIFICATION.md a
 receipt for exact scope and preserved older e77/observer negatives. Metadata only,
 no current full714/default740/SAN/frontend/hardware claim. Private36/37 integration
 and the complete original goal remain unfinished.
+## Private current surface-heat export — 2026-11-05
+
+Actual female worker/male owning results now pass independent emittedGLB
+228part-pose comparisons each Release/sanitizer (456total), max4.30e-7m against
+unchanged3e-5m; missingIBM sensitivity1.45/1.61m. All24emitted files have0KHR
+errors/456unfiltered nonroot-skin warnings, independently checked world transport.
+No production/default/layout/UI/GPU change; current615 port, fault coverage and
+general-native automatic admission remain. Read SURFACE-HEAT-CURRENT-EXPORT-WIP
+and receipt for actual matched55 scope and exact inputs.
+
+## Private owning new-bind surface heat — 2026-11-05
+
+Actual genuinely unskinned female/male19 owning binds now equal the qualified
+563 fields byte-for-byte in Release/sanitizer. Work331M/310M and total admission
+490.7/495.2MB stay within original500M/512MiB; actual all19 Document worker24
+checks/profile pass Cancel/stale/orderedSave/oneUndo/locks/fullRestore. No
+sanitizer diagnostics or input drift. Read NATIVE-SURFACE-HEAT-WIP.md/receipt
+for matched-source component scope. New public/default/controller/UI/general
+native admission, export/fault/full-affine robustness remain required.
+
+## Private component-supported surface heat — 2026-11-05
+
+Distinct private policy now passes874/874 actual female/male global/local pose
+comparisons each optimized/sanitizer, unchanged limits and500M work. Current
+R29+10+7/S29+10+7 native controls pass; no sanitizer diagnostics. Exact whole
+finite control support corrects shoe truncation; male genuine self-contact is
+prospectively intrinsic, never repaired or given solid authority. Original
+strict-policy negatives remain. Read COMPONENT-HANDLE-HEAT-WIP.md/receipt for
+matched-source support scope. Public modes/default are unchanged; owning
+Document/new-bind/affine/locks/history/Save/UI/export and broader robustness
+remain required. No main admission, GPU or physical-device claim.
 
 ## Controller report regression — 2026-11-05
 
