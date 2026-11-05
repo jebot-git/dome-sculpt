@@ -38,7 +38,6 @@ vec3 X=normalize(cross(W,vec3(0,1,0))),Y=normalize(cross(X,W));
 vec2 q=.5+.5*vec2(dot(X,L),dot(Y,L));return vec2(q.x,1-q.y);}
 void main(){vec3 N=normalize(n);if(!gl_FrontFacing)N=-N;
 vec4 lit=(basePresent==1?texture(baseMap,mapped(uv,baseX,baseY)):vec4(1))*baseFactor;
-if(blend==2&&lit.a<alphaCutoff)discard;
 vec3 shade=(shadePresent==1?texture(shadeMap,mapped(shadeUV,shadeX,shadeY)).rgb:vec3(1))*shadeFactor;
 float width=1-toony,x=dot(N,normalize(vec3(-.4,.8,.7)))+shift;
 float ratio=width<=.0000001?step(0,x):clamp((x+width)/(2*width),0,1);
@@ -48,6 +47,9 @@ vec3 V=normalize(viewOrigin-world);vec2 M=wrongMatcapView==1?uv:viewLookup(N,V);
 vec3 matcap=matcapPresent==1?texture(matcapMap,mapped(M,matcapX,matcapY)).rgb*matcapFactor:vec3(0);
 vec3 rim=rimFactor*pow(clamp(1-dot(N,V)+rimLift,0.,1.),max(rimPower,.00001));
 matcap=(matcap+rim)*(rimPresent==1?texture(rimMap,mapped(rimUV,rimX,rimY)).rgb:vec3(1))*mix(1.,1.+rawGi,rimLightingMix);
+// Evaluate all implicitly filtered role textures before divergent discard.
+// A removed quad lane cannot define the mip derivatives of later samples.
+if(blend==2&&lit.a<alphaCutoff)discard;
 result=vec4(mix(shade,lit.rgb,ratio)+gi*lit.rgb+emission+matcap,blend==1?lit.a:1);})GLSL";
     auto v = role_consumer::shader(GL_VERTEX_SHADER, vs);
     auto f = role_consumer::shader(GL_FRAGMENT_SHADER, fs);

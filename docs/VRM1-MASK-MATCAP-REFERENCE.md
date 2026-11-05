@@ -1,0 +1,13 @@
+# Independent MatCap and cutout reference
+
+This test-only child qualifies genuine MatCap plus source cutout holes outside native paint support on the same mesh. Production remains the exact sealed662 MatCap runtime (`d70e511`); no native shader, source owner, source images/samplers, camera, geometry, paint gesture, output data, pixel bound or error allowance changed.
+
+The former independent consumer discarded MASK fragments before sampling subsequent mipmapped role textures. The actual raw/pristine source comparison and painted comparison both failed at19 in Release and owned sanitizer profiles. Only28 pristine boundary pixels differed and their alpha was identical. Moving discard after all role samples fixes the independent shader's derivative semantics. GLSL4.60 specifies that subsequent derivatives after nonuniform discard are undefined; see the [primary language specification](https://registry.khronos.org/OpenGL/specs/gl/GLSLangSpec.4.60.html). The native shader already samples before discard.
+
+Actual workers pass52 checks/profile, including immutable native source/paint, running/queued export Cancel, ordered Save and recovery. Independent painted output passes184 checks/36pairs/profile, and pristine raw source passes58 checks/12pairs/profile. All images have maximum error1 against the unchanged4 bound and coverage>300. Second-eye/no-op upload and exact complete native Scene/Cancel checks remain. Release/SAN72 painted PNGs,24 pristine PNGs and11 native/worker files are byte-identical.
+
+Actual A770 passes185 painted plus59 pristine checks/48pairs, observed PCI03/renderD129/vendor8086/device56a0 with mapped-DSO hashes. Both same-binary forced-software hardware controls refuse. Handle81996 terminates0 in7.121s;1920 inputs unchanged; lease released. There is no compute, headset, current-app/UI or fresh-whole-build claim.
+
+All five actual positive outputs/raw input pass42 official schema instances with zero errors; pinned unfiltered Khronos reports0errors/21warnings/84infos/12hints. Configuration registers680 tests with three genuine new fixture dependencies; this is configuration evidence, not CTest execution. The old R/S19-pixel negatives and raw-source counter remain preserved. No factory sweep is repeated for this test-only input extension. The JSON receipt records actual commands, hashes and distinct finite scopes; inherited runner scope text is superseded by this explicit scope.
+
+Full MASK/BLEND, independent normal/prepared/key/canonical/native-float owner adapters, singular view behavior and coherent application integration remain required. This does not qualify every cutout or every external VRM reader.
