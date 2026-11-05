@@ -8,6 +8,15 @@ inline const nlohmann::json &material_archive_base_version(const nlohmann::json 
   if(!input.is_object()||!input.contains("version")||!input.at("version").is_number_integer())
     throw std::invalid_argument("Invalid material archive version");
   const auto &wire=input.at("version");
+  if(wire!=18&&(input.contains("native_frame_sources")||input.contains("native_paint_frames")))throw std::invalid_argument("Native frame capture requires material18");
+  if(wire==18){
+    if(!input.contains("base_version")||!input.at("base_version").is_number_integer()||input.at("base_version").get<int64_t>()<1||input.at("base_version").get<int64_t>()>10)throw std::invalid_argument("Material18 requires its actual historical layout");
+    for(const char *field:{"physical_emission","explicit_mirror","canonical_normals","native_paint_sampling","layered_normals","retained_canonical_uv","native_paint_frames"})if(!input.contains(field)||!input.at(field).is_boolean())throw std::invalid_argument("Material18 capability flags incomplete");
+    if(!input.at("native_paint_frames").get<bool>()||!input.at("native_paint_sampling").get<bool>()||(input.at("retained_canonical_uv").get<bool>()&&!input.at("layered_normals").get<bool>())||(input.at("explicit_mirror").get<bool>()&&input.at("base_version")!=10))throw std::invalid_argument("Material18 lacks genuine native frame/paint context");
+    for(const char *pool:{"native_paints","native_frame_sources"})if(!input.contains(pool)||!input.at(pool).is_array()||input.at(pool).empty()||input.at(pool).size()>128)throw std::invalid_argument("Material18 requires bounded owning native pools");
+    if(input.contains("canonical_conversions")!=input.at("canonical_normals").get<bool>()||(input.at("canonical_normals").get<bool>()&&(!input.at("canonical_conversions").is_array()||input.at("canonical_conversions").empty()||input.at("canonical_conversions").size()>256)))throw std::invalid_argument("Material18 canonical capability differs from actual pool");
+    return input.at("base_version");
+  }
   if(wire==17){
     if(!input.contains("base_version")||!input.at("base_version").is_number_integer()||input.at("base_version").get<int64_t>()<1||input.at("base_version").get<int64_t>()>10)
       throw std::invalid_argument("Combined material17 requires its real historical base layout");
@@ -80,15 +89,16 @@ inline const nlohmann::json &material_archive_base_version(const nlohmann::json 
   return wire;
 }
 inline bool physical_material_archive(const nlohmann::json &input){
-  material_archive_base_version(input);return input.at("version")==11||((input.at("version")==12||input.at("version")==13||input.at("version")==14||(input.at("version")==15||input.at("version")==16||input.at("version")==17))&&input.at("physical_emission").get<bool>());
+  material_archive_base_version(input);return input.at("version")==11||((input.at("version")==12||input.at("version")==13||input.at("version")==14||(input.at("version")==15||input.at("version")==16||(input.at("version")==17||input.at("version")==18)))&&input.at("physical_emission").get<bool>());
 }
 inline bool explicit_mirror_material_archive(const nlohmann::json &input){
-  material_archive_base_version(input);return input.at("version")==12||((input.at("version")==13||input.at("version")==14||(input.at("version")==15||input.at("version")==16||input.at("version")==17))&&input.at("explicit_mirror").get<bool>());
+  material_archive_base_version(input);return input.at("version")==12||((input.at("version")==13||input.at("version")==14||(input.at("version")==15||input.at("version")==16||(input.at("version")==17||input.at("version")==18)))&&input.at("explicit_mirror").get<bool>());
 }
-inline bool canonical_material_archive(const nlohmann::json &input){material_archive_base_version(input);return input.at("version")==13||((input.at("version")==15||input.at("version")==16||input.at("version")==17)&&input.at("canonical_normals").get<bool>());}
-inline bool canonical_uv_material_archive(const nlohmann::json &input){material_archive_base_version(input);return input.at("version")==16||(input.at("version")==17&&input.at("retained_canonical_uv").get<bool>());}
-inline bool layered_material_archive(const nlohmann::json &input){material_archive_base_version(input);return input.at("version")==15||input.at("version")==16||(input.at("version")==17&&input.at("layered_normals").get<bool>());}
-inline bool native_paint_material_archive(const nlohmann::json &input){material_archive_base_version(input);return input.at("version")==14||input.at("version")==17;}
+inline bool canonical_material_archive(const nlohmann::json &input){material_archive_base_version(input);return input.at("version")==13||((input.at("version")==15||input.at("version")==16||(input.at("version")==17||input.at("version")==18))&&input.at("canonical_normals").get<bool>());}
+inline bool canonical_uv_material_archive(const nlohmann::json &input){material_archive_base_version(input);return input.at("version")==16||((input.at("version")==17||input.at("version")==18)&&input.at("retained_canonical_uv").get<bool>());}
+inline bool layered_material_archive(const nlohmann::json &input){material_archive_base_version(input);return input.at("version")==15||input.at("version")==16||((input.at("version")==17||input.at("version")==18)&&input.at("layered_normals").get<bool>());}
+inline bool native_paint_material_archive(const nlohmann::json &input){material_archive_base_version(input);return input.at("version")==14||input.at("version")==17||input.at("version")==18;}
+inline bool native_frame_material_archive(const nlohmann::json &input){material_archive_base_version(input);return input.at("version")==18;}
 inline const nlohmann::json &normal_preparation_base_version(const nlohmann::json &p,const nlohmann::json &archive){
   if(!p.is_object()||!p.contains("version")||!p.at("version").is_number_integer())throw std::invalid_argument("Invalid normal preparation version");
   if(p.at("version")==7){

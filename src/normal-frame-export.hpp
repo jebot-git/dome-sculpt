@@ -3,6 +3,7 @@
 #include "normal-frame-runtime.hpp"
 #include "export-corner-coordinates.hpp"
 #include "native-paint-sampling.hpp"
+#include "native-paint-frame-source.hpp"
 #include "native-paint-export-policy.hpp"
 #include "dome/color-paint-sampling.hpp"
 #include "source-morph.hpp"
@@ -135,6 +136,8 @@ inline NormalFrameExport normal_frame_export(const ObjectSurface &input,SourceMo
     const std::function<bool()> &cancelled={},bool retain_pbr_sampling=false) {
   if(!input.material_bindings || !input.material_bindings->normal_frames)throw std::invalid_argument("Missing original frame export payload");
   const auto &binding=*input.material_bindings;binding.validate();const auto &set=*binding.normal_frames;
+  if(binding.native_paint_frames&&(!input.paint_sampling_attachment||input.paint_corner_coordinates.empty()))
+    throw std::invalid_argument("Native key export requires its complete independent paint stream");
   const auto normal_domain=retained_normal_coordinates(&binding,input.textures.get());
   const bool retained=bool(normal_domain);
   if(retained&&(!retain_pbr_sampling||space!=SourceMorphSpace::Native))throw std::invalid_argument("Retained normal domains require an explicitly compiled format-specific sampling export; original source retained");
@@ -172,12 +175,23 @@ inline NormalFrameExport normal_frame_export(const ObjectSurface &input,SourceMo
   auto layout=normal_frame_layout(input.mesh,set,cancelled);NormalFrameExport out;
   if(input.paint_sampling_attachment||!input.paint_corner_coordinates.empty()) {
     const auto node=binding.color_preparation?binding.color_preparation->paint_sampling:nullptr;
-    const auto expected=node?node->geometry_attachment():nullptr;
-    if(legacy||binding.has_mtoon||!retained||!expected||expected!=input.paint_sampling_attachment||
+    const auto native=binding.native_paint_frames;
+    const auto sampling=native?binding.native_paint_sampling:nullptr;
+    const auto expected=sampling?sampling->attachment():node?node->geometry_attachment():nullptr;
+    if(legacy||binding.has_mtoon||(!native&&!retained)||!expected||expected!=input.paint_sampling_attachment||
         expected.owner_before(input.paint_sampling_attachment)||input.paint_sampling_attachment.owner_before(expected))
       throw std::invalid_argument("Paint sampling export requires its own supported native colour/normal attachment");
-    node->validate_current(input.mesh,cancelled);
     PaintSamplingLimits limits;limits.cancelled=cancelled;
+    if(native){
+      // The normal source was captured from the CURRENT geometry at key
+      // creation. Its older writable paint source is an independent domain;
+      // never reinterpret either origin as the other one's UV coordinates.
+      if(node||retained||!retain_pbr_sampling||input.appearance||input.polygon_colors||
+          !sampling->valid_owner(sampling))
+        throw std::invalid_argument("Native key export requires its exact independent frame and paint owners");
+      native->validate_binding(binding,true,cancelled);
+      sampling->validate(limits);sampling->validate_mesh(input.mesh,limits);
+    }else node->validate_current(input.mesh,cancelled);
     auto corners=expected->domain()->corner_coordinates(input.mesh,limits);
     if(corners!=input.paint_corner_coordinates)throw std::invalid_argument("Paint export corner stream differs from its own REST/domain proof");
     auto split=split_frame_corner_coordinates(input.mesh,layout,corners,cancelled);
@@ -193,6 +207,12 @@ inline NormalFrameExport normal_frame_export(const ObjectSurface &input,SourceMo
   out.surface={input.id,input.name,input.transform,input.material,{},input.textures,input.deformation,input.groups,input.appearance,input.material_bindings,input.source_dormant};out.surface.affine_edit=input.affine_edit;out.surface.rig_source=input.rig_source;auto &mesh=out.surface.mesh;
   Quat from_native=legacy?to_native.inverse():Quat{};
   std::vector<size_t> targets;for(auto id:set.current_targets){auto t=std::find_if(selected->targets.begin(),selected->targets.end(),[&](const auto &t){return t.id==id;});if(t==selected->targets.end())throw std::invalid_argument("Export target normal identity is missing");targets.push_back(size_t(t-selected->targets.begin()));}
+  if(binding.native_paint_frames){
+    size_t directions=0;
+    for(auto slot:targets){directions+=!selected->targets.at(slot).normals.empty();directions+=!tangent_source->targets.at(slot).tangents.empty();}
+    if(directions&&layout.vertices.size()>8'000'000/directions)
+      throw std::length_error("Native paint key export exceeds expanded shading resource policy before allocation");
+  }
   out.normal_targets.resize(targets.size());out.tangent_targets.resize(targets.size());
   for(size_t v=0;v<layout.vertices.size();++v) {
     if((v&1023)==0 && cancelled && cancelled())throw std::runtime_error("Normal frame export cancelled");

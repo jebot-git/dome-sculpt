@@ -82,6 +82,18 @@ fixture integration and broader authoring/interop/device work remain. Next fresh
 optimized ALL and selected owning SAN qualification must use this actual combined
 source. A component pass does not qualify the whole candidate or complete the
 original/additional goal. Controller drawers remain required after basic targets.
+## Private current native key export adapter — 2026-11-05
+
+Runtime97f4f2c on genuine frame36/af8 now passes151 each Release/sanitizer/strict
+Arc for independent current-frame/writable-paint export,6pose/weight states,
+ordinary/editable GLB and exact recovery/Save. Complete3 changed-header TUs and
+whole consumers use matching own36 support. Actual prior missing-stream negative
+is repaired without changing valid writer bytes.36KHR0errors/36warnings/108infos,
+18container/native triples exact,19R/S PNG exact andArcmax1;2legacy consumers pass
+each profile. New fixture-dependent CTest is configured, not a fresh owning app
+or complete registered-suite result. Read NATIVE-PAINT-KEY-EXPORT.md and receipt.
+Full36 composition/fault/device/typed/postUV/physical-key work and the original
+production requirements/controller drawers remain incomplete; no main admission.
 
 ## Explicit portable normal model controls — 2026-11-04
 

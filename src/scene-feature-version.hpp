@@ -12,6 +12,7 @@
 #include "dome/source-placement.hpp"
 #include "emission-authority.hpp"
 #include "native-paint-sampling.hpp"
+#include "native-paint-frame-source.hpp"
 #include <set>
 #include <nlohmann/json.hpp>
 namespace dome { struct PolygonAuthority; }
@@ -55,6 +56,7 @@ inline unsigned minimum_scene_version(const SourceMaterialBindings *binding) {
   unsigned result=binding->uv_origin
              ? std::max({minimum_scene_version(binding->uv_origin->paint.get()),minimum_scene_version(binding->uv_origin->deformation.get()),minimum_scene_version(binding->uv_origin->appearance.get())})
              : 0u;
+  if(binding->native_paint_frames){const auto &f=*binding->native_paint_frames;result=std::max({result,36u,minimum_scene_version(f.before_paint().get()),minimum_scene_version(f.before_material().get()),minimum_scene_version(f.origin()->deformation.get())});}
   if(binding->native_paint_sampling){const auto &p=*binding->native_paint_sampling;result=std::max({result,32u,minimum_scene_version(p.before_paint().get()),minimum_scene_version(p.before_material().get())});}
   if(physical_emission(*binding))result=std::max(result,27u);
   if(binding->canonical_attributes)result=std::max(result,33u);
@@ -124,6 +126,7 @@ inline unsigned minimum_deformation_scene_version(const nlohmann::json &d) {
 // Scan actual reachable material owners, including histories. Separate objects
 // can require the two capabilities even when neither individual binding does.
 inline unsigned composed_material_scene_version(const SourceMaterialArchive &materials){
+  if(std::any_of(materials.bindings().begin(),materials.bindings().end(),[](const auto &b){return bool(b->native_paint_frames);}))return 36u;
   bool native=false,canonical=false;
   for(const auto &b:materials.bindings()){
     native|=bool(b->native_paint_sampling);
