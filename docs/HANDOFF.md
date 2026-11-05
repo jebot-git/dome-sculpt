@@ -1,5 +1,20 @@
 # Dome Sculpt production handoff
 
+## Current physical-skin and expression integration work — 2026-11-05
+
+Main runtime f9da354 includes the qualified 1f foundation (52 selected tests
+per Release/sanitizer profile). Physical skin export c1354a6, wider shade
+expressions e84d919 and canonical paint/UV foundation d9163a8 are separately
+sealed/pushed with scoped evidence. New isolated ab37175 composes the first two
+with the full b37 adapter source; fresh own 337-task application/core/render/
+support/consumer builds and 92 selected commands per profile are running.
+Registered739 is not a full runtime result. Original b37 Release83/84 and frozen
+SAN84 remain separate; corrected paired-helper interception passes1797/profile.
+Native key/UV owners, transparency/cutoff repairs and canonical paint-domain
+ownership are still active. Read PRIVATE-AUTHORING-PROGRESS.md for actual scopes.
+The complete production goal, physical devices, accelerators and later controller
+drawers remain unfinished. No installation or physical HMD/session action.
+
 ## Qualified combined authoring foundation — 2026-11-05
 
 Foundation4b37f11 completes fresh Release ALL1397 and owning SAN276 builds;

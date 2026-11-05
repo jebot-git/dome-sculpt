@@ -4,9 +4,10 @@ The full Dome Sculpt objective remains active and incomplete. The accepted XR
 selection interface is preserved. Controller drawers remain required after the
 basic authoring targets. Animation and final scene rendering remain excluded.
 
-The combined foundation is integrated on main at ae075b1. All 1,326 tracked
-code/build/test/asset files match the qualified tree at that merge; the following
-cleanup changes only trailing whitespace in four test files.
+Main runtime is integrated at f9da354: qualified 1f authoring source, including
+genuine anatomical fixture endpoints and shared-shade VRM expressions. The tree
+was clean and the remote hash verified on 2026-11-05. The earlier ae075b1
+foundation and its four trailing-whitespace-only test fixes are preserved.
 
 The qualified combined foundation is [4b37f11](https://github.com/jebot-git/dome-sculpt/tree/4b37f119f5c5274b118aa5a55ec8e5a689ef809f), with runtime source 1d573f2. Fresh optimized Release ALL completes 1,397
 build tasks; the separate owning sanitizer application/core/render/support and
@@ -76,9 +77,57 @@ UV, key and physical-emission composition is being implemented in a new child.
 Typed VRM1 expression work includes qualified [colour-only 5310](https://github.com/jebot-git/dome-sculpt/tree/5310acba0495384e3ba654d70355f95a9e28c201) and
 [shared-shade ccc109e](https://github.com/jebot-git/dome-sculpt/tree/ccc109e540704121d5dc439c407efe7bd439b20d) milestones with independent Release/sanitizer/Arc evidence. The [UV-invariant upper-role adapter 196ea93](https://github.com/jebot-git/dome-sculpt/tree/196ea9373dbb053c064a5c28783f1eb374a78987) is sealed after actual Release/sanitizer/Arc worker, mixed-expression image,
 failure/cancellation and official/Khronos checks. It is in the next combined
-qualification. Full MASK/BLEND, wider coefficient and
-remaining role adapters stay required. The separate original long source-world
+qualification. Full MASK/BLEND and remaining role adapters stay required. The separate original long source-world
 sanitizer sweep remains live and incomplete.
+
+## New sealed components and current combined candidate
+
+[Physical native skin export c1354a6](https://github.com/jebot-git/dome-sculpt/tree/c1354a666414dc1dc02e6fdce008f931e416835c)
+uses the real public binding factory and complete first-rig source. The finalized
+nonblank consumer passes 115 checks each Release/sanitizer; actual PCI03 Arc
+passes the prior 109-check consumer. All 36 emitted GLBs have zero Khronos errors
+with 36 warnings and 144 infos retained. Native recovery, actual pose/inverse
+binds and exact owner/control blocks are checked; cross-device pixels differ by
+at most one. Nine affected existing export consumers pass each profile. This is
+separately qualified component evidence, not current main or general morph export.
+The obsolete UV worker interception test is repaired at the actual paired model
+helper and passes 1,797 checks each profile without changing product cancellation
+or timeouts. Original b37 selected Release remains 83/84; its sanitizer run is
+still active and frozen. That original failure is not relabeled green.
+
+[Wider VRM1 shade expressions e84d919](https://github.com/jebot-git/dome-sculpt/tree/e84d919848499a0fce7bda1c84101ae49565d582)
+are sealed/pushed: actual Release/sanitizer factories, cancellation, independent
+image rendering, strict Arc and pinned schema/Khronos checks pass. Targets above
+one and simultaneous deltas retain a bounded reconstruction of the original
+field. Initial material factors retain their own format bounds. Full transparency
+and remaining roles are unfinished; a genuine source-only edited-alpha-cutoff
+export mismatch is now reproduced and its repair is being qualified separately.
+
+[Canonical paint/UV foundation d9163a8](https://github.com/jebot-git/dome-sculpt/tree/d9163a87aeee9c650dd7d16979e58bca5e4a0fc8)
+passes 107 current-format workflow checks and 2,084 detached geometry-kernel
+checks each profile, with independent posed exports and all measured small kernel
+failure/cancellation boundaries. It does not yet connect the new independent
+paint domain to document ownership or persistence. The two genuine physical-
+paint-before-UV operations still refuse exactly; a detached kernel pass does not
+complete that requirement.
+
+Combined source ab37175 in artifacts/authoring-wide-skin-b37 merges b37 with
+c1354a6 and e84d919. New own Release and sanitizer builds each target 337 tasks,
+including the complete application/core/render/support and whole consumers.
+739 tests are registered; 92 are selected for actual runtime validation,
+including positive physical skin export, the corrected worker hook, all five
+coefficient cases and legacy expression fault tests. Both jobs are live and all
+tracked inputs plus their orchestration script are frozen. No pass, full-suite
+or main admission claim follows. Static merge parity proves all seven expected
+unchanged files exact and the expression compiler equal to e84 plus existing
+canonical/UV/native owner guards. Public headers are unchanged.
+
+Native paint with current key frames and subsequent UV editing is active in the
+contracts lane. Its appended-layout candidate passes seven selected Release
+commands, but whole-owning sanitizer validation and independent exports remain
+unfinished. Its format reservation and the canonical paint-domain reservation
+remain separate until their genuine owners and codecs are proven. No source
+from either in-progress append is included in ab37175.
 
 The original frozen f2 full630 invocation ended 143 after 131 passing tests and
 no final summary. Its original partial log and stale running-status file are
