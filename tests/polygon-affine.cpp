@@ -98,7 +98,7 @@ void native(bool reflect,const std::filesystem::path &out){
  check(!d.frame().state->object_grabbing&&d.undo()&&d.copy_scene().encode()==original,"Held affine placement and geometry form one exactly undoable publication");
 }
 void controller(bool reflect){
- auto source=fixture(reflect);const auto original=source.encode();Document d;d.replace(source);check(d.wait_mesh(),"Affine controller source publishes real packed geometry");ImportDriver hand(d);
+ auto source=fixture(reflect);const auto original=source.encode();Document d;d.replace(source);check(d.wait_mesh(),"Affine controller source publishes real packed geometry");check(d.frame().state->can_polygon,"Native and XR capability exposes actual supported affine polygon editing");ImportDriver hand(d);
  hand.open();hand.sector(8);hand.sector(9);hand.sector(2);hand.sector(0);ready(d);
  check(d.frame().state->polygon&&!d.frame().state->menu,"Actual joystick opens editable affine workspace without disabling tools");
  auto aim=[&](Vec3 offset,float pressure){

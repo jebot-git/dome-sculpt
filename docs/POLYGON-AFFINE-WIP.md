@@ -80,3 +80,18 @@ immutable currentmain10944/C179 support, pins archive/frontend/runtime inputs,
 captures dependencies/link traces and actual ELF maps, and refuses old member
 selection or drift. No archive copies, full build, GPU work, installation,
 headset/session action or new Scene38 reserve is authorized by this cohort.
+
+## First Release runtime advance and preserved capability negative
+
+7849cb5 first Release cohort82003 completed compile/link/app-version and all160
+basic controls with no source/input drift. The controller case failed at actual
+workspace entry: publish_locked still excluded every affine object from
+can_polygon, so shared XR/FLTK commands remained disabled despite the proven
+real direct-native adapter. This initial binary/status/log remains untouched in
+artifacts/affine-proof/release. Its fault mode was not reached; no sanitizer or
+graphical admission follows this partial result.
+
+The next child removes only that superseded affine capability exclusion,
+retaining all modal/source/editability/factory guards, and asserts actual
+can_polygon before controller entry. Tagged proof directories preserve earlier
+attempts. Whole-TU closure remains unchanged.

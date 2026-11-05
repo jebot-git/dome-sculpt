@@ -54,8 +54,8 @@ def run_step(state,name,cmd,env=None,prospective=0):
  if row['exit']:raise RuntimeError(f"{name} failed with {row['exit']}; preserved {log}")
  return row
 
-def profile(which):
- directory=OUT/which;directory.mkdir(exist_ok=False)
+def profile(which,tag=""):
+ directory=OUT/(which+tag);directory.mkdir(exist_ok=False)
  state=dict(state='running',profile=which,directory=str(directory),steps=[],pid=os.getpid(),cap_bytes=CAP,floor_bytes=FLOOR)
  before=sources();save(directory/'source-before.json',before)
  db=json.loads((OLD/f'build-next36-{which}/compile_commands.json').read_text())
@@ -138,5 +138,7 @@ def profile(which):
   save(directory/'status.json',state)
  return state['exit']
 if __name__=='__main__':
- if len(sys.argv)!=2 or sys.argv[1] not in ('release','sanitize'):raise SystemExit('Use release first, then sanitize after review')
- raise SystemExit(profile(sys.argv[1]))
+ if len(sys.argv) not in (2,3) or sys.argv[1] not in ('release','sanitize'):raise SystemExit('Use release first, then sanitize after review; optional unique suffix preserves earlier attempts')
+ tag=sys.argv[2] if len(sys.argv)==3 else ''
+ if tag and (not tag.startswith('-') or '/' in tag or '..' in tag):raise SystemExit('Suffix must be a simple -tag')
+ raise SystemExit(profile(sys.argv[1],tag))
