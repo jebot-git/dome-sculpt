@@ -1321,16 +1321,20 @@ void Document::prepare_locked(uint32_t resolution) {
 
 }
 void Document::begin_spatial() {
-  rebase_space({});
-  {
-    std::lock_guard lock(input_mutex_);
-    spatial_accepting_ = true;
-  }
-  report_error({});
+  std::lock_guard lock(model_mutex_);
+  RetopoInputScope admission(*this,bool(state_.retopology)||input_.menu_page()==16);
+  rebase_space_locked({},admission);
+  state_.error.clear();publish_locked();admission.commit();
+  // There is no fallible second publication after accepting the rebase or
+  // exposing its producer. A refusal leaves the producer's old policy intact.
+  {std::lock_guard input_lock(input_mutex_);spatial_accepting_ = true;}
 }
 void Document::rebase_space(std::optional<CanvasTransform> old_from_new) {
   std::lock_guard lock(model_mutex_);
   RetopoInputScope admission(*this,bool(state_.retopology)||input_.menu_page()==16);
+  rebase_space_locked(old_from_new,admission);publish_locked();admission.commit();
+}
+void Document::rebase_space_locked(std::optional<CanvasTransform> old_from_new,RetopoInputScope &admission) {
   if (!desktop_) {
     if(state_.expressions)end_expression_preview_locked(false);
     bool accepted_uv = uv_accept_pending_;
@@ -1353,7 +1357,6 @@ void Document::rebase_space(std::optional<CanvasTransform> old_from_new) {
     state_.hierarchy_panel=ob::compose(inverse,state_.hierarchy_panel);
   } else {anchored_ = false;state_.hierarchy_anchored=false;}
   state_.selection_pressed={true,true};state_.selection_release={true,true};state_.selection_hover={};
-  publish_locked();admission.commit();
 }
 void Document::finish_spatial() {
   {

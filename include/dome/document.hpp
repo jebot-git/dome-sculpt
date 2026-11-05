@@ -582,6 +582,7 @@ private:
   // Shared independent-input/file-queue handoff, protected by retopo_mutex_.
   // This is a deque element payload, not a new Document/EditorState field.
   class RetopoInputScope;
+  void rebase_space_locked(std::optional<CanvasTransform>, RetopoInputScope &);
   struct RetopoStep {
     RetopoAction action;
     Vec3 point{};

@@ -8,10 +8,24 @@
 namespace caller_fault {
 thread_local bool enabled = false, hit = false;
 thread_local size_t calls = 0, boundary = 0;
-thread_local bool deny_publication = false, worker_publication = false;
+thread_local bool deny_publication = false, worker_publication = false, input_thread = false;
+std::atomic<bool> input_enabled{false}, input_hit{false};
+std::atomic<size_t> input_calls{0}, input_boundary{0};
 std::atomic<bool> deny_after_face{false}, worker_hit{false};
+std::atomic<int> deny_after_action{-1}, gate_action{-1};
+std::atomic<bool> observe_actions{false};
+std::atomic<size_t> observed_ends{0}, observed_undos{0};
+std::mutex gate_mutex;std::condition_variable gate_changed;
+bool gate_entered=false,gate_released=false;
+void release_gate(){std::lock_guard lock(gate_mutex);gate_released=true;gate_changed.notify_all();}
+struct GateRelease {~GateRelease(){release_gate();}};
+
 void *allocate(size_t n, size_t alignment = 0) {
   if (enabled && ++calls >= boundary && boundary) { hit = true; throw std::bad_alloc(); }
+  if (input_thread && input_enabled.load()) {
+    const auto n = input_calls.fetch_add(1) + 1;
+    if (input_boundary.load() && n >= input_boundary.load()) {input_hit = true;throw std::bad_alloc();}
+  }
   void *p = nullptr;
   if (alignment) { if (posix_memalign(&p, alignment, n ? n : 1)) p = nullptr; }
   else p = std::malloc(n ? n : 1);
@@ -44,7 +58,18 @@ extern "C" void real_edit(RetopoWorkspace &, RetopoAction, Vec3, float, const st
 extern "C" void wrapped_edit(RetopoWorkspace &, RetopoAction, Vec3, float, const std::function<bool()> &)
   asm("__wrap__ZN4dome15RetopoWorkspace4editENS_12RetopoActionENS_4Vec3EfRKSt8functionIFbvEE");
 extern "C" void wrapped_edit(RetopoWorkspace &w, RetopoAction a, Vec3 p, float mm, const std::function<bool()> &c) {
+  if(caller_fault::gate_action.load()==int(a)&&caller_fault::gate_action.exchange(-1)==int(a)) {
+    std::unique_lock lock(caller_fault::gate_mutex);caller_fault::gate_entered=true;caller_fault::gate_changed.notify_all();
+    if(!caller_fault::gate_changed.wait_for(lock,std::chrono::seconds(120),[]{return caller_fault::gate_released;}))
+      throw std::runtime_error("Actual retopo edit gate timed out");
+  }
   real_edit(w,a,p,mm,c);
+  if(caller_fault::observe_actions) {
+    if(a==RetopoAction::EndGesture)++caller_fault::observed_ends;
+    if(a==RetopoAction::Undo)++caller_fault::observed_undos;
+  }
+  if(caller_fault::deny_after_action.load()==int(a)&&caller_fault::deny_after_action.exchange(-1)==int(a))
+    caller_fault::worker_publication=true;
   if (a == RetopoAction::Face && caller_fault::deny_after_face.exchange(false))
     caller_fault::worker_publication = true;
 }
@@ -125,7 +150,10 @@ void worker_batch(const Scene &scene,const std::filesystem::path &path) {
   d.edit_retopology(RetopoAction::Undo);ready(d);retry(d,scene,path);
 }
 }
-int main(int argc,char **argv)try {
+#ifndef DOME_RETOPO_CALLER_ENTRY
+#define DOME_RETOPO_CALLER_ENTRY main
+#endif
+int DOME_RETOPO_CALLER_ENTRY(int argc,char **argv)try {
   if(argc!=2)return 2;const std::filesystem::path out=argv[1];std::filesystem::create_directories(out);
   const auto scene=source(matrix,true);
   // All public discrete dispatch branches share this one transaction. Include
