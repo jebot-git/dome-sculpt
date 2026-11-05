@@ -97,7 +97,7 @@ int main() try {
           std::abs(closest.barycentric[0] + closest.barycentric[1] +
                    closest.barycentric[2] - 1) < 1e-6f,
       "Reusable BVH closest queries expose triangle identity and barycentrics");
-  bool thin_interior=true,thin_edges=true,thin_filters=true,thin_ranges=true;
+  bool thin_interior=true,thin_edges=true,thin_filters=true,thin_ranges=true,thin_normals=true;
   for(float scale:{std::ldexp(1.f,-20),1.f,32.f})
     for(float ratio:{std::ldexp(1.f,-10),std::ldexp(1.f,-30),std::ldexp(1.f,-60)})
       for(int axis=0;axis<3;++axis)for(bool flipped:{false,true}) {
@@ -121,11 +121,22 @@ int main() try {
         thin_ranges &= surface.nearest(rotate({scale*.75f,h*.25f,d}),options).has_value();
         options.closest_maximum=d*.5f;
         thin_ranges &= !surface.nearest(rotate({scale*.75f,h*.25f,d}),options);
+        const auto expected_normal=rotate({0,0,flipped?-1.f:1.f});
+        for(bool cancelling:{false,true}) {
+          auto fallback=thin;
+          fallback.normals=cancelling?std::vector<Vec3>{rotate({1,0,0}),rotate({-1,0,0}),rotate({1,0,0})}:std::vector<Vec3>(3);
+          SurfaceQuery geometric(fallback);
+          const auto nearest=geometric.closest(rotate({scale*.75f,h*.25f,d}));
+          const auto ray=geometric.raycast(rotate({scale*.75f,h*.25f,d}),rotate({0,0,-1}),d*2);
+          thin_normals &= finite(nearest.normal)&&length(nearest.normal-expected_normal)<1e-6f;
+          thin_normals &= ray&&finite(ray->normal)&&length(ray->normal-expected_normal)<1e-6f;
+        }
       }
   require(thin_interior,"Thin valid triangles preserve interior barycentrics across scales, axes and winding");
   require(thin_edges,"Thin triangle exterior queries retain the correct edge and vertex regions");
   require(thin_filters,"Closest filters receive actual thin-triangle barycentrics without rounded-point reconstruction");
   require(thin_ranges,"Thin triangle nearest queries obey exact inclusive physical distance bounds");
+  require(thin_normals,"Missing or cancelling normals use scale-independent geometric winding for nearest and ray hits");
   Mesh tiny_range;tiny_range.positions={{0,0,0},{1,0,0},{0,1,0}};
   tiny_range.normals.assign(3,{0,0,1});tiny_range.indices={0,1,2};
   SurfaceQuery tiny_surface(tiny_range);SurfaceQueryOptions tiny_options;
