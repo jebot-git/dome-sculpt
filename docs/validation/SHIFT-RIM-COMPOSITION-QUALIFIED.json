@@ -1,0 +1,563 @@
+{
+  "recorded_utc": "2026-11-05T11:45:36.748521+00:00",
+  "runtime_source": "eacfba7a26b06550d5d6da89987dd2929065e227",
+  "scope": "Completed matching one-Layer-TU Shift/RimMASK component, whole current app relink from unchanged exact5df26appobjects and own11archives; no publicheader/layout/shader/writer change. Not main runtime/37admission/all837regression/physicalHMD/compute/fullgoal.",
+  "component": "Earlier27actualcommands eachR/S, strictArc1765+3software/1UHD controls,737R/S exactfiles,84containers0KHR/684official instances recorded in rootmain MATERIAL-SHIFT-RIM-COMPOSITION.json",
+  "full_factories": {
+    "status": {
+      "state": "terminal",
+      "pid": 4087874,
+      "source": "eacfba7a26b06550d5d6da89987dd2929065e227",
+      "steps": [
+        {
+          "name": "release-shift",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/stage/vrm1-shift-faults",
+            "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/shift/nonuniform-source.dsculpt"
+          ],
+          "exit_code": 0,
+          "seconds": 23.768690837023314
+        },
+        {
+          "name": "release-mask-support",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/stage/vrm1-mask-support-faults",
+            "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/rim-mask/nonuniform-source.dsculpt"
+          ],
+          "exit_code": 0,
+          "seconds": 19.12034873297671
+        },
+        {
+          "name": "release-rim",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/stage/vrm1-rim-faults",
+            "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/rim-mask/nonuniform-source.dsculpt"
+          ],
+          "exit_code": 0,
+          "seconds": 18.716229240002576
+        },
+        {
+          "name": "release-normal",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/stage/vrm1-normal-faults",
+            "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/normal/nonuniform-source.dsculpt"
+          ],
+          "exit_code": 0,
+          "seconds": 23.375975880015176
+        },
+        {
+          "name": "sanitize-shift",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/stage/vrm1-shift-faults",
+            "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/shift/nonuniform-source.dsculpt"
+          ],
+          "exit_code": 0,
+          "seconds": 246.2462361640064
+        },
+        {
+          "name": "sanitize-mask-support",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/stage/vrm1-mask-support-faults",
+            "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/rim-mask/nonuniform-source.dsculpt"
+          ],
+          "exit_code": 0,
+          "seconds": 255.3853920729598
+        },
+        {
+          "name": "sanitize-rim",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/stage/vrm1-rim-faults",
+            "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/rim-mask/nonuniform-source.dsculpt"
+          ],
+          "exit_code": 0,
+          "seconds": 270.67481047898764
+        },
+        {
+          "name": "sanitize-normal",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/stage/vrm1-normal-faults",
+            "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/normal/nonuniform-source.dsculpt"
+          ],
+          "exit_code": 0,
+          "seconds": 273.3388287340058
+        }
+      ],
+      "scope": "Actual complete persistent C++/Cancel factory CLI for Shift, genuine RimMASK support/Rim, and authored Normal on combined oneTU. Sequential one native worker, not sampled controls; exact native rollback/retry/poll/resource checks retained.",
+      "phase": "sanitize-normal",
+      "child_pid": 22084,
+      "exit_code": 0,
+      "seconds": 1130.6307706680382,
+      "inputs": 2367,
+      "drift": []
+    },
+    "status_sha256": "782c58d6c03213d1de3ad50c64e21f94abbbff199422fa7da2829ac14a39eb05",
+    "before_manifest_sha256": "d4587112dca1e1f15187c4717a773a986380b85a8241b31bc8d8722364dac54c",
+    "summary": {
+      "release": {
+        "checks": 10198,
+        "cpp_prefixes": 6150,
+        "cancel_prefixes": 3988,
+        "commands": 4
+      },
+      "sanitize": {
+        "checks": 10198,
+        "cpp_prefixes": 6150,
+        "cancel_prefixes": 3988,
+        "commands": 4
+      }
+    }
+  },
+  "native_clients": {
+    "release": {
+      "status": {
+        "state": "terminal",
+        "pid": 120181,
+        "source": "eacfba7a26b06550d5d6da89987dd2929065e227",
+        "profile": "release",
+        "steps": [
+          {
+            "name": "expected-shift",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-ui/release-v3/stage/dome-sculpt-vrm1-expression-preview-test",
+              "--expected",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/shift/nonuniform-source.dsculpt",
+              ".35",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-ui/release-v4/shift-expected.dsculpt"
+            ],
+            "exit_code": 0,
+            "seconds": 0.10146298498148099
+          },
+          {
+            "name": "menu-shift-normal",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/selection-gui-venv/bin/python",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/tests/vrm1-expression-menu.py"
+            ],
+            "exit_code": 0,
+            "seconds": 29.168669411039446,
+            "actual_app_elf_files": 98
+          },
+          {
+            "name": "menu-shift-compact",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/selection-gui-venv/bin/python",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/tests/vrm1-expression-menu.py"
+            ],
+            "exit_code": 0,
+            "seconds": 28.742359407013282,
+            "actual_app_elf_files": 98
+          },
+          {
+            "name": "xr-shift",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/selection-gui-venv/bin/python",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/tests/vrm1-expression-xr.py",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-ui/release-v3/stage/dome-sculpt",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-ui/release-v3/stage/libdome-sculpt-test-runtime.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-ui/release-v3/stage/dome-sculpt-vrm1-expression-preview-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-ui/release-v3/stage/dome-sculpt-native-authoring-inspect",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/shift/nonuniform-source.dsculpt",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-ui/release-v4/shift-xr"
+            ],
+            "exit_code": 0,
+            "seconds": 52.72940458502853,
+            "actual_app_elf_files": 97
+          },
+          {
+            "name": "expected-rim-mask",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-ui/release-v3/stage/dome-sculpt-vrm1-expression-preview-test",
+              "--expected",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/rim-mask/nonuniform-source.dsculpt",
+              ".35",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-ui/release-v4/rim-mask-expected.dsculpt"
+            ],
+            "exit_code": 0,
+            "seconds": 0.10114886902738363
+          },
+          {
+            "name": "menu-rim-mask-normal",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/selection-gui-venv/bin/python",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/tests/vrm1-expression-menu.py"
+            ],
+            "exit_code": 0,
+            "seconds": 28.638974327011965,
+            "actual_app_elf_files": 98
+          },
+          {
+            "name": "menu-rim-mask-compact",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/selection-gui-venv/bin/python",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/tests/vrm1-expression-menu.py"
+            ],
+            "exit_code": 0,
+            "seconds": 28.935238261998165,
+            "actual_app_elf_files": 98
+          },
+          {
+            "name": "xr-rim-mask",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/selection-gui-venv/bin/python",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/tests/vrm1-expression-xr.py",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-ui/release-v3/stage/dome-sculpt",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-ui/release-v3/stage/libdome-sculpt-test-runtime.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-ui/release-v3/stage/dome-sculpt-vrm1-expression-preview-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-ui/release-v3/stage/dome-sculpt-native-authoring-inspect",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/rim-mask/nonuniform-source.dsculpt",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-ui/release-v4/rim-mask-xr"
+            ],
+            "exit_code": 0,
+            "seconds": 51.53317479795078,
+            "actual_app_elf_files": 97
+          },
+          {
+            "name": "expected-shift-mask",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-ui/release-v3/stage/dome-sculpt-vrm1-expression-preview-test",
+              "--expected",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/shift-mask/nonuniform-source.dsculpt",
+              ".35",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-ui/release-v4/shift-mask-expected.dsculpt"
+            ],
+            "exit_code": 0,
+            "seconds": 0.10123051900882274
+          },
+          {
+            "name": "menu-shift-mask-normal",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/selection-gui-venv/bin/python",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/tests/vrm1-expression-menu.py"
+            ],
+            "exit_code": 0,
+            "seconds": 28.741776617011055,
+            "actual_app_elf_files": 98
+          },
+          {
+            "name": "menu-shift-mask-compact",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/selection-gui-venv/bin/python",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/tests/vrm1-expression-menu.py"
+            ],
+            "exit_code": 0,
+            "seconds": 29.786615871998947,
+            "actual_app_elf_files": 98
+          },
+          {
+            "name": "xr-shift-mask",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/selection-gui-venv/bin/python",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/tests/vrm1-expression-xr.py",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-ui/release-v3/stage/dome-sculpt",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-ui/release-v3/stage/libdome-sculpt-test-runtime.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-ui/release-v3/stage/dome-sculpt-vrm1-expression-preview-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-ui/release-v3/stage/dome-sculpt-native-authoring-inspect",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/shift-mask/nonuniform-source.dsculpt",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-ui/release-v4/shift-mask-xr"
+            ],
+            "exit_code": 0,
+            "seconds": 53.96809126401786,
+            "actual_app_elf_files": 97
+          }
+        ],
+        "scope": "Relink actual26-TU native FLTK app plus whole inspector/preview helper from unchanged exact5df objects and own11archives with combinedLayer. Three genuine Shift/RimMASK/zeroRimMASK native menu normal+compact and actual loader syntheticXR. X11 explicit private test backend; physical headset/compute/fullregression not claimed. SprivateMesa patch only syntheticXR, no suppressions/systemchanges.",
+        "relink_origin": {
+          "status_sha256": "2d12958833eec375bb2083810fc71b93ed919a3c1a00a046261b2748f363bc89",
+          "scope": "All three V3 relinks0 with identical sources/objects/libs; V3 observation fails remain exit1",
+          "artifact_sha256": {
+            "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-ui/release-v3/stage/libdome-sculpt-affine.a": "76ab5779629d0a001206e53c1cdea390acb682b3e6f12511f54d8de912faa0dc",
+            "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-ui/release-v3/stage/libxatlas.a": "c970630276d99910016840c492cf61e5e383cbf2ce27ac58350ebb307aad3823",
+            "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-ui/release-v3/stage/libufbx.a": "281e2b77b06510d6302285d2bea3ce6a049cb43aa42a4b90fe08e70e0337e903",
+            "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-ui/release-v3/stage/libmikktspace.a": "9a0c148f7879a22dbb08c2950ff5dde83a0040610a4a15a84d656112d983790d",
+            "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-ui/release-v3/stage/libdome-sculpt-polygon.a": "75b9cef1b3d64e94c02f1efa56a92269be4b0073d70beb02a759f1e6b239a0f4",
+            "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-ui/release-v3/stage/libmikktspace-robust.a": "2a2719ec5921faf10c4a954d59e7be125df328009bcc78d293cb50b48388fd72",
+            "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-ui/release-v3/stage/libdome-sculpt-emission-codec.a": "f38ab7ee1d83f9b947b61402efee746a559d88991c96e8ff9a4f0d63bd149a83",
+            "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-ui/release-v3/stage/libdome-sculpt-render.a": "d7ba825f423ee92ecff391d3e71a78d6625472914fa3d19fa6fc0647ca911b1e",
+            "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-ui/release-v3/stage/libdome-sculpt-spacenav.a": "ccab871e37afdaf6a4eec6db8419e46a597d3d248f50bec6ee2d565cccde1a39",
+            "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-ui/release-v3/stage/libdome-sculpt-xr.a": "0977359f1bc881e68ebe29e54692b9137179f918b4b09c9ef7b67396d8943be6",
+            "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-ui/release-v3/stage/libdome-sculpt-core.a": "61b9fb635f79302f38b998fe1dba36bfb14cb5ca0b0ddda5ef7f74721afdfc83",
+            "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-ui/release-v3/stage/dome-sculpt": "9f483bd01a4304d5bcbc80cfbaca58d8eae9f6fb8e20d0d46d27090e3c22e6ed",
+            "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-ui/release-v3/stage/dome-sculpt.link.d": "7173c0bfd6b83795291afaa3f294593d9ae7b1bdc838f642e2de08064124bba1",
+            "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-ui/release-v3/stage/dome-sculpt-native-authoring-inspect": "f5687f1f64f0e96930968f4f96b5de334b44c88be45cf27a935dec771a8840a1",
+            "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-ui/release-v3/stage/dome-sculpt-native-authoring-inspect.link.d": "48cc3257c86a7e6eec08f6051a670bb462e6906f5aab1bc3efb79b7fe353555b",
+            "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-ui/release-v3/stage/dome-sculpt-vrm1-expression-preview-test": "188e55f2d0aa49d929e7a5a92c1dcb214dc7d3e6cb5255aec7901ccd09f35761",
+            "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-ui/release-v3/stage/dome-sculpt-vrm1-expression-preview-test.link.d": "09b6f5b16cfb87be11a1459321ab06d3daa149855235cc8acbde845e7bcfde1b",
+            "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-ui/release-v3/stage/libdome-sculpt-test-runtime.so": "400f02ae0f995d8a9e32e83d7e57cb525047b13e66bcd952900fb6bfb923b4b7"
+          }
+        },
+        "phase": "xr-shift-mask",
+        "child_pid": 167872,
+        "artifact_drift": [],
+        "exit_code": 0,
+        "seconds": 346.2267190919956,
+        "inputs": 2862,
+        "drift": []
+      },
+      "status_sha256": "fb4d03fdbd1bbac3dc1cb68dcc352aaf5919dd79db49c80a24a1a08cbb61e55b",
+      "before_manifest_sha256": "37412e7d5bce7098ca46a37bd6dec6e79e7fcfdf2cf203fa9d57cadfc5ad7975",
+      "checks": 198,
+      "menus": "6 genuine normal/compact workflows,132checks",
+      "syntheticXR": "Three actual-loader accept/cancel/focus workflows,66checks; no physical headset",
+      "actual_app_map_reports": {
+        "menu-shift-normal-app-elf.json": "46a617d4c91f6d8ed500bb4cae09fdf29aa1a2000f5aafe5a7ac3a2726393b98",
+        "menu-shift-compact-app-elf.json": "570f53c9a9b85f6c1ce49dae745cd098946636e7f70c6d160cbc4c745a860667",
+        "xr-shift-app-elf.json": "d2d8f7cd75391cb2684fc1ab90d56747dff46b05c2c36cff9255813970b8bd04",
+        "menu-rim-mask-normal-app-elf.json": "3b483b2a293d2819cd19de4a0f430ccf60fb310d92e6b3726206b2bbe2e1dcbf",
+        "menu-rim-mask-compact-app-elf.json": "8c3f3d36b55eef6ef8eb20e77c69e2f37154325700cf2e27c8d188dddd381ca4",
+        "xr-rim-mask-app-elf.json": "2c54978e8e67af27d33484449627e0721621b43a6bcc9a5014f69ee3d4e109c6",
+        "menu-shift-mask-normal-app-elf.json": "c7c241862d066e507f5f12e504f2ae6f0589a18de4c5cfdc4de1015ee6868fcb",
+        "menu-shift-mask-compact-app-elf.json": "e830bce209296349b6c37b3cb590302e2f6df2f07bdaa96ce5def6685a28684b",
+        "xr-shift-mask-app-elf.json": "fcff5115ac26dacf6a85594c0301baa73d2bf64aec9194048f34532e3a269e3c"
+      }
+    },
+    "sanitize": {
+      "status": {
+        "state": "terminal",
+        "pid": 120183,
+        "source": "eacfba7a26b06550d5d6da89987dd2929065e227",
+        "profile": "sanitize",
+        "steps": [
+          {
+            "name": "expected-shift",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-ui/sanitize-v3/stage/dome-sculpt-vrm1-expression-preview-test",
+              "--expected",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/shift/nonuniform-source.dsculpt",
+              ".35",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-ui/sanitize-v4/shift-expected.dsculpt"
+            ],
+            "exit_code": 0,
+            "seconds": 0.5046441780286841
+          },
+          {
+            "name": "menu-shift-normal",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/selection-gui-venv/bin/python",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/tests/vrm1-expression-menu.py"
+            ],
+            "exit_code": 0,
+            "seconds": 40.66931941197254,
+            "actual_app_elf_files": 100
+          },
+          {
+            "name": "menu-shift-compact",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/selection-gui-venv/bin/python",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/tests/vrm1-expression-menu.py"
+            ],
+            "exit_code": 0,
+            "seconds": 41.66912219801452,
+            "actual_app_elf_files": 100
+          },
+          {
+            "name": "xr-shift",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/selection-gui-venv/bin/python",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/tests/vrm1-expression-xr.py",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-ui/sanitize-v3/stage/dome-sculpt",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-ui/sanitize-v3/stage/libdome-sculpt-test-runtime.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-ui/sanitize-v3/stage/dome-sculpt-vrm1-expression-preview-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-ui/sanitize-v3/stage/dome-sculpt-native-authoring-inspect",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/shift/nonuniform-source.dsculpt",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-ui/sanitize-v4/shift-xr"
+            ],
+            "exit_code": 0,
+            "seconds": 79.48677819396835,
+            "actual_app_elf_files": 86
+          },
+          {
+            "name": "expected-rim-mask",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-ui/sanitize-v3/stage/dome-sculpt-vrm1-expression-preview-test",
+              "--expected",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/rim-mask/nonuniform-source.dsculpt",
+              ".35",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-ui/sanitize-v4/rim-mask-expected.dsculpt"
+            ],
+            "exit_code": 0,
+            "seconds": 0.403824937005993
+          },
+          {
+            "name": "menu-rim-mask-normal",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/selection-gui-venv/bin/python",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/tests/vrm1-expression-menu.py"
+            ],
+            "exit_code": 0,
+            "seconds": 40.351373652985785,
+            "actual_app_elf_files": 100
+          },
+          {
+            "name": "menu-rim-mask-compact",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/selection-gui-venv/bin/python",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/tests/vrm1-expression-menu.py"
+            ],
+            "exit_code": 0,
+            "seconds": 41.6593064009794,
+            "actual_app_elf_files": 100
+          },
+          {
+            "name": "xr-rim-mask",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/selection-gui-venv/bin/python",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/tests/vrm1-expression-xr.py",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-ui/sanitize-v3/stage/dome-sculpt",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-ui/sanitize-v3/stage/libdome-sculpt-test-runtime.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-ui/sanitize-v3/stage/dome-sculpt-vrm1-expression-preview-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-ui/sanitize-v3/stage/dome-sculpt-native-authoring-inspect",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/rim-mask/nonuniform-source.dsculpt",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-ui/sanitize-v4/rim-mask-xr"
+            ],
+            "exit_code": 0,
+            "seconds": 81.75888819200918,
+            "actual_app_elf_files": 86
+          },
+          {
+            "name": "expected-shift-mask",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-ui/sanitize-v3/stage/dome-sculpt-vrm1-expression-preview-test",
+              "--expected",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/shift-mask/nonuniform-source.dsculpt",
+              ".35",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-ui/sanitize-v4/shift-mask-expected.dsculpt"
+            ],
+            "exit_code": 0,
+            "seconds": 0.40189529000781476
+          },
+          {
+            "name": "menu-shift-mask-normal",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/selection-gui-venv/bin/python",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/tests/vrm1-expression-menu.py"
+            ],
+            "exit_code": 0,
+            "seconds": 39.794687246961985,
+            "actual_app_elf_files": 100
+          },
+          {
+            "name": "menu-shift-mask-compact",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/selection-gui-venv/bin/python",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/tests/vrm1-expression-menu.py"
+            ],
+            "exit_code": 0,
+            "seconds": 42.3921130640083,
+            "actual_app_elf_files": 100
+          },
+          {
+            "name": "xr-shift-mask",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/selection-gui-venv/bin/python",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/tests/vrm1-expression-xr.py",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-ui/sanitize-v3/stage/dome-sculpt",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-ui/sanitize-v3/stage/libdome-sculpt-test-runtime.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-ui/sanitize-v3/stage/dome-sculpt-vrm1-expression-preview-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-ui/sanitize-v3/stage/dome-sculpt-native-authoring-inspect",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/shift-mask/nonuniform-source.dsculpt",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-ui/sanitize-v4/shift-mask-xr"
+            ],
+            "exit_code": 0,
+            "seconds": 78.88126181799453,
+            "actual_app_elf_files": 86
+          }
+        ],
+        "scope": "Relink actual26-TU native FLTK app plus whole inspector/preview helper from unchanged exact5df objects and own11archives with combinedLayer. Three genuine Shift/RimMASK/zeroRimMASK native menu normal+compact and actual loader syntheticXR. X11 explicit private test backend; physical headset/compute/fullregression not claimed. SprivateMesa patch only syntheticXR, no suppressions/systemchanges.",
+        "relink_origin": {
+          "status_sha256": "2fb5557212fd6686fd13c32b65ee94e9cc6a04ea7efe342a84dcb7d6623ff458",
+          "scope": "All three V3 relinks0 with identical sources/objects/libs; V3 observation fails remain exit1",
+          "artifact_sha256": {
+            "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-ui/sanitize-v3/stage/libdome-sculpt-affine.a": "6595753ce913867cf9bdea91992d74c3e00cb0d2db9b169d3090661fefb0bd62",
+            "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-ui/sanitize-v3/stage/libxatlas.a": "d1c191c14fe4b26ed26458132166d18985a6c70cf96c50f1bc4f4164f5202283",
+            "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-ui/sanitize-v3/stage/libufbx.a": "32f18a16afed0d8128be45fde8d80b38c991511f7d9005a3e849658599f9cc79",
+            "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-ui/sanitize-v3/stage/libmikktspace.a": "0c0f0df3483781fd0ae54236a33130c12713b8fd49ba057373a8673b5560dc36",
+            "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-ui/sanitize-v3/stage/libmikktspace-robust.a": "e759f570457f686428e8f533efe9efbb6ac39c7b11f37b3540c2b6f9261181d5",
+            "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-ui/sanitize-v3/stage/libdome-sculpt-polygon.a": "c95bbf24b5dfdd11b356e1b2d7159ecad7704fecc63547cc0a809be6ed821568",
+            "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-ui/sanitize-v3/stage/libdome-sculpt-emission-codec.a": "1424a1a2c9408374deebe8f99622437fc3f258d6493cf0bfc4d3e368a37267bc",
+            "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-ui/sanitize-v3/stage/libdome-sculpt-render.a": "b5d8b942f2e6145c680e0cf941232d1b190cb7c771ba2e5ae364e9ae2cf99faf",
+            "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-ui/sanitize-v3/stage/libdome-sculpt-spacenav.a": "d6697742a563bfbc8ffe9f0aeddb6886a6942952041c6dd4d66d0930e314948a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-ui/sanitize-v3/stage/libdome-sculpt-xr.a": "7b85b0001ae66745f046ea33ab9c56bf8f483d891992f1459eac030e61a3497f",
+            "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-ui/sanitize-v3/stage/libdome-sculpt-core.a": "97d3e914a239195645b39ca10ee1f0c2694bfdbda51afc35c8e11babb08c7fce",
+            "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-ui/sanitize-v3/stage/dome-sculpt": "4e8814de5cc04aa5ae82f62660c2020fb506a45fd2c6064903913f7de3383dbb",
+            "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-ui/sanitize-v3/stage/dome-sculpt.link.d": "13d2b1a2b930f7132238055b50c810a75c6eb358e194794505b5c1c9f019322c",
+            "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-ui/sanitize-v3/stage/dome-sculpt-native-authoring-inspect": "f4a319f9f98be568f2945b6c9da964d4f175fb28a8823e0225f7f3122d3171ae",
+            "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-ui/sanitize-v3/stage/dome-sculpt-native-authoring-inspect.link.d": "5f4cd07ed826c13a077562196581b68f52c7e151f1717d04722bb3fd5e23a79c",
+            "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-ui/sanitize-v3/stage/dome-sculpt-vrm1-expression-preview-test": "08df82ae19d353c19327d5a64bdf96598516f54d1fade791625d285c77034dff",
+            "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-ui/sanitize-v3/stage/dome-sculpt-vrm1-expression-preview-test.link.d": "869f69b3cfbaf51a2fc99d6ad882a527c1c5084a7896fc788e54e3f7968c95b3",
+            "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-ui/sanitize-v3/stage/libdome-sculpt-test-runtime.so": "67c45abae149b958d8e351e8b1363903b2cb96e799253426b5f137fd67e8955c"
+          }
+        },
+        "phase": "xr-shift-mask",
+        "child_pid": 195716,
+        "artifact_drift": [],
+        "exit_code": 0,
+        "seconds": 519.0059219090035,
+        "inputs": 2865,
+        "drift": []
+      },
+      "status_sha256": "4e8379360c2630e8f361698016089f9c33c150636c54a049f8341bc31a329f62",
+      "before_manifest_sha256": "4e2100d1d13d875db357a6d886e6f338818c1a48c713f2266e49cb0decafc045",
+      "checks": 198,
+      "menus": "6 genuine normal/compact workflows,132checks",
+      "syntheticXR": "Three actual-loader accept/cancel/focus workflows,66checks; no physical headset",
+      "actual_app_map_reports": {
+        "menu-shift-normal-app-elf.json": "b0361d7158b9bd51a57b5574c8cf5087e45984c84f8f2d4ebce09e52c7a402b1",
+        "menu-shift-compact-app-elf.json": "d81bca04d80810eea82943ae7723f68a2f9b4d9cacf51ee3478dfcff8763adb5",
+        "xr-shift-app-elf.json": "91d0445c9eb348e901d2f3f80fb59f054f0044faf3dd499abcce85733d806549",
+        "menu-rim-mask-normal-app-elf.json": "16390f3a70d7b6dfaac433ca794a4819733db6e50948e7aa09083546f9849055",
+        "menu-rim-mask-compact-app-elf.json": "e843e566ff26326ef0e4437a5fa3b9dba592d1ddfa57f8b42cafa6eb0dc8b515",
+        "xr-rim-mask-app-elf.json": "0264a9968f785925f1c1725496298ecf37a4b0777e7bdf57fbbaf4d21ff30bac",
+        "menu-shift-mask-normal-app-elf.json": "d5a80f74e174dd43f68575f62b632deb3c57d7716fb00e2f9b85c8288b7125f5",
+        "menu-shift-mask-compact-app-elf.json": "4b6d62fb98595c27abbf47c8d4279434d416b015b0874e593dbbf92d7bb216e2",
+        "xr-shift-mask-app-elf.json": "b9a8f78921b79a557f6f767c01feb21bfad1b5392c82f83c54e6127d16422df5"
+      }
+    }
+  },
+  "preserved_failed_wrappers": [
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-ui/release/status.json",
+      "sha256": "385d621cc339e00ef969db5e094ea29ea89eb95a3677ab61280b881fb48b3a1f",
+      "phase": "relink-dome-sculpt",
+      "error": "RuntimeError('relink-dome-sculpt failed 1')",
+      "exit_code": 1
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-ui/sanitize/status.json",
+      "sha256": "fd9e45a10891a951e11cab581997d46773a11bed15b900e1bc3cf0b95cae0603",
+      "phase": "relink-dome-sculpt",
+      "error": "RuntimeError('relink-dome-sculpt failed 1')",
+      "exit_code": 1
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-ui/release-v2/status.json",
+      "sha256": "db67f5efe8f08df9475c3502470324489766331113b5a8149a7f1a5bbf5a7b2a",
+      "phase": "menu-shift-normal",
+      "error": "AssertionError(['/usr/lib64/libxcb-sync.so.1.0.0', '/usr/lib64/libdrm_intel.so.1.134.0', '/usr/lib64/libtinfo.so.6.6', '/usr/lib64/libdrm_amdgpu.so.1.134.0', '/usr/lib64/libxcb-xfixes.so.0.0.0', '/usr/lib64/libxcb-randr.so.0.1.0', '/usr/lib64/libxcb-present.so.0.0.0', '/usr/lib64/libsensors.so.4.5.0', '/usr/lib64/libdrm.so.2.134.0', '/usr/lib64/libgallium-26.2.5.so', '/usr/lib64/libSPIRV-Tools.so', '/usr/lib64/libXxf86vm.so.1.0.0', '/usr/lib64/libLLVM.so.22.1', '/usr/lib64/libxcb-dri3.so.0.1.0', '/usr/lib64/libxcb-glx.so.0.0.0', '/usr/lib64/libxshmfence.so.1.0.0', '/usr/lib64/libXrandr.so.2.2.0', '/usr/lib64/libpciaccess.so.0.11.1', '/usr/lib64/libexpat.so.1.12.5', '/usr/lib64/libedit.so.0.0.78', '/usr/lib64/libGLX_mesa.so.0.0.0', '/usr/lib64/libzstd.so.1.5.7', '/usr/lib64/libelf-0.196.so', '/usr/lib64/libX11-xcb.so.1.0.0'])",
+      "exit_code": 1
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-ui/sanitize-v2/status.json",
+      "sha256": "9830c9618230218b38d30e5536131e5703facf7150a0ba92bf4b40fd91ae2eb8",
+      "phase": "menu-shift-normal",
+      "error": "AssertionError(['/usr/lib64/libdrm_amdgpu.so.1.134.0', '/usr/lib64/libxcb-xfixes.so.0.0.0', '/usr/lib64/libX11-xcb.so.1.0.0', '/usr/lib64/libxcb-glx.so.0.0.0', '/usr/lib64/libxcb-present.so.0.0.0', '/usr/lib64/libxcb-dri3.so.0.1.0', '/usr/lib64/libSPIRV-Tools.so', '/usr/lib64/libGLX_mesa.so.0.0.0', '/usr/lib64/libLLVM.so.22.1', '/usr/lib64/libpciaccess.so.0.11.1', '/usr/lib64/libxcb-randr.so.0.1.0', '/usr/lib64/libXxf86vm.so.1.0.0', '/usr/lib64/libXrandr.so.2.2.0', '/usr/lib64/libelf-0.196.so', '/usr/lib64/libdrm_intel.so.1.134.0', '/usr/lib64/libgallium-26.2.5.so', '/usr/lib64/libxcb-sync.so.1.0.0', '/usr/lib64/libxshmfence.so.1.0.0'])",
+      "exit_code": 1
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-ui/release-v3/status.json",
+      "sha256": "2d12958833eec375bb2083810fc71b93ed919a3c1a00a046261b2748f363bc89",
+      "phase": "xr-shift",
+      "error": "AssertionError(['/usr/lib64/python3.14/lib-dynload/_posixsubprocess.cpython-314-x86_64-linux-gnu.so', '/usr/lib64/libpython3.14.so.1.0', '/usr/lib64/python3.14/lib-dynload/_bz2.cpython-314-x86_64-linux-gnu.so', '/usr/lib64/libgbm.so.1.0.0', '/usr/bin/python3.14', '/usr/lib64/python3.14/lib-dynload/_lzma.cpython-314-x86_64-linux-gnu.so', '/usr/lib64/libEGL_mesa.so.0.0.0', '/usr/lib64/python3.14/lib-dynload/zlib.cpython-314-x86_64-linux-gnu.so', '/usr/lib64/python3.14/lib-dynload/_random.cpython-314-x86_64-linux-gnu.so', '/usr/lib64/python3.14/lib-dynload/grp.cpython-314-x86_64-linux-gnu.so', '/usr/lib64/python3.14/lib-dynload/_json.cpython-314-x86_64-linux-gnu.so', '/usr/lib64/python3.14/lib-dynload/math.cpython-314-x86_64-linux-gnu.so', '/usr/lib64/python3.14/lib-dynload/select.cpython-314-x86_64-linux-gnu.so', '/usr/lib64/python3.14/lib-dynload/_bisect.cpython-314-x86_64-linux-gnu.so', '/usr/lib64/python3.14/lib-dynload/_zstd.cpython-314-x86_64-linux-gnu.so', '/usr/lib64/python3.14/lib-dynload/fcntl.cpython-314-x86_64-linux-gnu.so'])",
+      "exit_code": 1
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-ui/sanitize-v3/status.json",
+      "sha256": "2fb5557212fd6686fd13c32b65ee94e9cc6a04ea7efe342a84dcb7d6623ff458",
+      "phase": "xr-shift",
+      "error": "AssertionError(['/usr/bin/python3.14', '/usr/lib64/python3.14/lib-dynload/_bz2.cpython-314-x86_64-linux-gnu.so', '/usr/lib64/python3.14/lib-dynload/zlib.cpython-314-x86_64-linux-gnu.so', '/usr/lib64/python3.14/lib-dynload/grp.cpython-314-x86_64-linux-gnu.so', '/usr/lib64/python3.14/lib-dynload/_posixsubprocess.cpython-314-x86_64-linux-gnu.so', '/usr/lib64/libpython3.14.so.1.0', '/usr/lib64/python3.14/lib-dynload/math.cpython-314-x86_64-linux-gnu.so', '/usr/lib64/python3.14/lib-dynload/_json.cpython-314-x86_64-linux-gnu.so', '/usr/lib64/python3.14/lib-dynload/_lzma.cpython-314-x86_64-linux-gnu.so', '/usr/lib64/python3.14/lib-dynload/select.cpython-314-x86_64-linux-gnu.so', '/usr/lib64/python3.14/lib-dynload/_zstd.cpython-314-x86_64-linux-gnu.so', '/usr/lib64/python3.14/lib-dynload/fcntl.cpython-314-x86_64-linux-gnu.so', '/usr/lib64/python3.14/lib-dynload/_bisect.cpython-314-x86_64-linux-gnu.so', '/usr/lib64/python3.14/lib-dynload/_random.cpython-314-x86_64-linux-gnu.so'])",
+      "exit_code": 1
+    }
+  ],
+  "observation_correction": "V1 incorrectly remapped systemlibdl.a; V2 dynamicGLX/EGL plugins absent from beforemanifest; V3 recorder matched Python parent argument, not only argv0. Each remains exit1/drift[]. V4 reuses exact successfulV3relinks, pins prior observed module bytes before run, filters actual app argv0 and checks all mapped ELF against before hashes.",
+  "DomeD": "remote341152b2429d28e70834917bc65c371b044481e8 reverified; locala5c444c preserved; canonical toolkit-poll-final SDK R/S. NativeX11 explicit private-test backend; SprivateMesa used onlysyntheticXR and actualmaps verified.",
+  "remaining": "Full-package SAN43091 and separate fresh-key SANpartitions stilllive; broader source/paint37 admission, weights/nativehead-eye, Mirror38, UVanimation/outline/BLEND and fullrequirements/device/accelerator matrix remain."
+}
