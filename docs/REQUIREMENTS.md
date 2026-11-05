@@ -1,3 +1,12 @@
+## Production integration update — 2026-11-05
+
+Read [the current progress checkpoint](PRODUCTION-PROGRESS-2026-11-05.md) for
+the sealed private retopology, Automatic0/explicit5 weights, outline and remesh
+scopes and remaining gates. Main runtime remains native36/c179. Remesh source
+geometry/worker checks pass within full runs that still fail affine polygon
+editing; its complete allocation sweeps and matching retopology UI qualification
+are in progress. These updates preserve every unfinished requirement below.
+
 ## Exhaustive private physical-package fault closure — 2026-11-05
 
 Private frozen1f9fd48/owning5df now closes all128 partitions/profile:90,261
