@@ -1,0 +1,9 @@
+# Original full source-world sanitizer closure
+
+The original source-eye/source-world sanitizer run has actually finished, on the same exec handle64560 and native PID1141482. It exits0 after43,388.470735s overall (native consumer43,293.562323s). All66,187 persistent C++new prefixes,908 actual cancellation points and the original ownership/native tail complete:133,316 checks. The original Release command also exits0 (1390.078033s) with the same complete counts. Both independently captured1857 input hashes remain exact after execution.
+
+The tail retains the actual6000-node import/resource negative, source-world positions/query agreement, genuine native paint, immediate ordered Save/restart, exact source/skin/morph/material owners, one Undo/Redo and actual Cancel. No run was restarted, killed, deadline-extended, sampled, replaced or relabeled. Leak/undefined/address sanitizers remain enabled without suppression. The original sanitizer binary SHA256 is0fa0291b39385e01e692b220cf0dccd297fa9f00f2d740d6976776fa4960aaf3.
+
+This receipt closes the old unoptimized authenticated source-world document/native component cohort in `artifacts/vrm1-source-eye-precision-6a9252f/artifacts/precision-proof/joined-v2-sanitize`. It does not claim a fresh whole app/current root ABI, hardware run, external application or new feature. The later ed56 bounded-rig optimization's separately qualified2208-prefix/908Cancel proof remains distinct and never replaced this full original sweep. Existing independent precision/consumer bounds and limitations remain unchanged.
+
+The [machine receipt](validation/VRM1-SOURCE-WORLD-ORIGINAL-SAN.json) preserves both actual terminal statuses, command/timing records, complete before/after input ledger values and exact log/binary/archive hashes. The original worktree and evidence stay immutable; this milestone changes documentation only.
