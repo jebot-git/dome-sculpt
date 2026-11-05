@@ -1,3 +1,40 @@
+## Private polygon39 source boundary — 2026-11-06
+
+This source merges admitted main537c98b caller/input repair before the first
+fresh all-own Release39 gate. Public layouts include the unqualified typed
+polygon owner and domain3; no old-size own support may run with these headers.
+Only the earlier private math/source-owner slices are qualified; current Scene39
+codec/publication/render/query/export remain guarded and required. All historical
+receipts below retain their original scope. See POLYGON-SURFACE-TRANSFER39-PLAN.md.
+
+## Caller and real XR input admission — 2026-11-06
+
+Main integrates qualified0cbc089 on5b02bfc: atomic caller/frame retopology
+admission, no retired-workspace revival, actual XR button levels and history
+consumption across focus/reference changes. Each R/S profile passes native13442
+with710 persistent boundaries, distinct current worker/held/composed/authority
+controls, actual-loader161Apply+156Cancel and ordinary app58.44 native/sentinel
+pairs are exact. Root source parity and receipt/archive/file rehash review pass.
+Read RETOPO-CALLER-INTEGRATION.md and the original admission receipt for scope.
+This is a matched component/application qualification, not fresh ALL or physical
+headset/accelerator completion. Full goal, polygon fields, texture sets, remaining
+geometry/rig/avatar/interoperability and controller drawers remain required.
+
+## Private qualified retopology caller/input repair — 2026-11-05
+
+This private descendant of main5b02 repairs the real post-enqueue caller refusal,
+whole-frame batch publication and retired-view resurrection, and supplies actual
+XR history levels with focus/rebase latches. R/S native13442/710 persistent,
+worker4308/251+42+97, held1419/73, composed1541/71 and26 boundaries pass.
+Real-loader observer161+156 per profile and ordinary app15normal+16unzoomedcompact+
+27loader per profile pass;44 R/S native/sentinel pairs are exact. Read
+[RETOPO-CALLER-ADMISSION.md](RETOPO-CALLER-ADMISSION.md) and its precise receipt.
+Matching whole-TU components and ordinary app relinks are qualified, not a fresh
+ALL build. The failed standalone Fontconfig leak/ELF and all old counterexamples
+remain preserved; fixed fixture uses the ordinary app's existing process owner.
+Main review/publication is separate; full sculpt/paint/retopo/rig/avatar/GPU and
+physical production requirements remain active. No new schema/outer layout.
+
 ## Owning37 continuation with current main — 2026-11-05
 
 This private tree now combines owning37 candidate c6e6cd5 with admitted main

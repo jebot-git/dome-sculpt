@@ -433,8 +433,8 @@ void XrSculpt::input(XrTime time) {
     auto a = axes(i ? rightStick : leftStick, i);
     h.x = a.x;
     h.y = a.y;
-    h.undo = boolean(undo, i, true);
-    h.redo = boolean(redo, i, true);
+    h.undo = boolean(undo, i);
+    h.redo = boolean(redo, i);
     if (h.tracked.valid)
       ++trackedFrames[i];
   }

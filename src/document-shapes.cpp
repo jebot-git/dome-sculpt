@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/document.hpp"
+#include "spatial-history-levels.hpp"
 #include "document-transaction.hpp"
 namespace dome {
 void Document::select_shape_target(uint32_t target,AssetSource expected){
@@ -56,7 +57,7 @@ void Document::author_shape(ShapeKeyEdit edit,AssetSource expected){
 }
 void Document::process_shape_spatial_locked(const SpatialFrame &f){
  const bool valid=f.focused&&f.head_valid&&ob::finite(f.head)&&std::isfinite(f.time)&&f.time>=0;
- state_.hands=valid?f.hands:std::array<SpatialHand,2>{};
+ state_.hands=valid?f.hands:detail::history_only_hands(state_.hands);
  auto sample=[&](size_t i){
   const auto &h=f.hands[i];const auto &pose=h.tracked.aimValid?h.tracked.aim:h.tracked.grip;
   NativeStrokeSample s;auto p=ob::transform(ob::inverse(state_.canvas),pose.position);s.origin={p.x,p.y,p.z};
