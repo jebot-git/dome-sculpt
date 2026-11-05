@@ -11,12 +11,14 @@ int main(int argc,char **argv)try{
  check(detail::canonical_paint_retention_supported(source.active()),"Actual canonical actor has a supported owning paint transition");
  {
   auto large=source;auto holder=std::make_shared<SourceMaterialBindings>(*source.active().material_bindings);
-  nlohmann::json material={{"extensions",{{"VRMC_materials_mtoon",{{"specVersion","1.0"}}}}},{"extras",{{"inactive-copy-canary",std::string(8*1024*1024,'x')}}}};
-  holder->material=MToonMaterial::from_vrm1(material);large.active().material_bindings=holder;large.validate();
+  nlohmann::json material={{"extensions",{{"VRMC_materials_mtoon",{{"specVersion","1.0"}}}}},{"extras",{{"inactive-copy-canary",std::string(1024*1024,'x')}}}};
+  holder->material=MToonMaterial::from_vrm1(material);
+  check(refuses([&]{holder->material.copy_working_bytes(512*1024);}),"Legal retained JSON alone is counted before a value copy");
+  holder->material.diagnostics.emplace_back(8*1024*1024,'d');large.active().material_bindings=holder;large.validate();
   auto target=large.active().painted->mesh();for(auto &uv:target.uv)for(auto &v:uv)v=.5f+.8f*(v-.5f);
   std::vector<uint32_t> ids(target.positions.size());for(size_t i=0;i<ids.size();++i)ids[i]=uint32_t(i);PaintSamplingLimits tiny;tiny.max_working_bytes=4*1024*1024;
   check(refuses([&]{detail::CanonicalPaintSampling::create(large,large.active().id,target,ids,tiny);}),"Actual inactive retained JSON copy refuses before output allocations at unchanged working cap");
-  check(!holder->has_mtoon&&holder->material.source_json().at("extras").at("inactive-copy-canary").get_ref<const std::string&>().size()==8*1024*1024,"Copy preflight neither erases inactive material source nor changes its role authority");
+  check(!holder->has_mtoon&&holder->material.source_json().at("extras").at("inactive-copy-canary").get_ref<const std::string&>().size()==1024*1024&&holder->material.diagnostics.back().size()==8*1024*1024,"Copy preflight neither erases inactive material source nor changes its role authority");
  }
  source.save(out/"legacy-copy.dsculpt");
  auto bytes=[](const std::filesystem::path &p){std::ifstream f(p,std::ios::binary);return std::vector<char>(std::istreambuf_iterator<char>(f),{});};
