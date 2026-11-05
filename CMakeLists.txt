@@ -3967,3 +3967,10 @@ if(BUILD_TESTING AND TARGET dome-sculpt-render)
   set_tests_properties(native-key-uv-render PROPERTIES FIXTURES_REQUIRED native_key_uv TIMEOUT 600
     ENVIRONMENT "LIBGL_ALWAYS_SOFTWARE=1;LP_NUM_THREADS=2;XR_RUNTIME_JSON=${CMAKE_CURRENT_BINARY_DIR}/native-key-uv-no-physical-runtime.json")
 endif()
+if(BUILD_TESTING AND TARGET dome-sculpt AND TARGET dome-sculpt-test-runtime AND Python3_Interpreter_FOUND)
+  add_test(NAME native-key-uv-openxr COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/tests/native-key-uv-xr.py
+    $<TARGET_FILE:dome-sculpt> $<TARGET_FILE:dome-sculpt-test-runtime> $<TARGET_FILE:dome-sculpt-native-authoring-inspect>
+    ${CMAKE_CURRENT_BINARY_DIR}/native-key-uv/before.dsculpt ${CMAKE_CURRENT_BINARY_DIR}/native-key-uv-openxr)
+  set_tests_properties(native-key-uv-openxr PROPERTIES FIXTURES_REQUIRED native_key_uv TIMEOUT 300
+    ENVIRONMENT "LIBGL_ALWAYS_SOFTWARE=1;LP_NUM_THREADS=2")
+endif()
