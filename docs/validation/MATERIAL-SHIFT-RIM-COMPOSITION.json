@@ -2,7 +2,7 @@
   "recorded_utc": "2026-11-05T11:07:27.579873+00:00",
   "source": "eacfba7a26b06550d5d6da89987dd2929065e227",
   "base": "5a6fa080593fe0309b9caa926e86834df85720ff",
-  "scope": "Private component only, not main runtime/full application/full regression/physicaldevice/compute admission. One Layer member of164 on exact5df supports. No header/layout/schema/shader change. Full sanitizer factories are still running.",
+  "scope": "Private component only, not main runtime/full regression/physicaldevice/compute admission. One Layer member of164 on exact5df supports; no header/layout/schema/shader change. Full R/S factories and matching native clients now closed0; latest paired closure supersedes priorlive status.",
   "profiles": {
     "release": {
       "status": {
@@ -2613,7 +2613,32 @@
     "official_report_sha256": "b24bee5a65caacf5494cafd988d0b8d972a1ed0d5ba85bb705b78e05735e6d28"
   },
   "configured_tests": 837,
-  "full_factories": "Handle60702 live, Release4domains0; sanitizer still running; no completed full sanitizer claim",
+  "full_factories": "Same handle60702 CLOSED0/1130.63077s; fourdomains/profile:10198checks=6150Cpp+3988Cancel+60controls each, all2367protectedinputs exact",
   "preserved_originals": "Original c9 zeroRim MASK guard remains separate; genuine case29 now positive with independent source/native/export images under combined membership proof. No old negative relabel.",
-  "remaining": "Full SANfactory closure, eventual wider owning37 admission/currentapp validation, UVanimation/generalBLEND/outline/remainingMirror/weight/production requirements."
+  "remaining": "Full SANfactory closure, eventual wider owning37 admission/currentapp validation, UVanimation/generalBLEND/outline/remainingMirror/weight/production requirements.",
+  "qualified_closure": {
+    "seal": "227c11cb699a58c4575b00c99f4e37505dedc319",
+    "runtime_source": "eacfba7a26b06550d5d6da89987dd2929065e227",
+    "receipt": "docs/validation/SHIFT-RIM-COMPOSITION-QUALIFIED.json",
+    "receipt_sha256": "3ae081f6e76079573afb4b65837c304ededf5da79b922e9a2b14df0ca8378ba6",
+    "full_factories": {
+      "release": {
+        "checks": 10198,
+        "cpp_prefixes": 6150,
+        "cancel_prefixes": 3988,
+        "commands": 4
+      },
+      "sanitize": {
+        "checks": 10198,
+        "cpp_prefixes": 6150,
+        "cancel_prefixes": 3988,
+        "commands": 4
+      }
+    },
+    "native_clients": {
+      "release": 198,
+      "sanitize": 198
+    },
+    "scope": "Same runtimeeacf, fullfactoryandmatchingclientclosure only; no mainruntime/larger37/physicalHMD/compute/fullregression admission"
+  }
 }

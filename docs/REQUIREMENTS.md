@@ -106,6 +106,16 @@ finishes successfully after43,388seconds, including66,187 persistent denial
 prefixes and908 cancellation points; its closure is preserved separately.
 The full objective remains active and incomplete.
 
+## Matching component-client closure — 2026-11-05
+
+Same private material runtimeeacfba7/seal227c11c closes all four factory domains
+per profile (10,198checks/6,150Cpp/3,988Cancel each) and matching actual native
+clients198/profile (132FLTK+66syntheticXR), with exact source/artifact/module
+hashes. Read MATERIAL-SHIFT-RIM-COMPOSITION.md/qualifiedJSON. Initial observation
+failures remain preserved. This does not admit larger37 or full837regression.
+Package/key sanitizer partitions stillrun; mode5 genericnative19 head/eye quality
+and allother remaining production/device/accelerator rows remain unresolved.
+
 ## Latest qualification boundary — 2026-11-05
 
 The private physical-package Release sweep now closes all90,262points and its

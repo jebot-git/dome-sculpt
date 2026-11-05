@@ -20,8 +20,20 @@ lease is released.84 real containers pass Khronos with0errors,466warnings,
 1424infos/288hints, plus684 pinned official instances and two negative controls.
 Intentional prior-output sentinels are recorded and excluded from container proof.
 
-Four complete factory domains pass Release; the complete sanitizer factory job
-60702 remains live. Controls-only calls in the earlier27 are explicitly separate.
-This is component evidence, not main runtime, whole application, full regression,
-physical-device, accelerator or production-goal admission. The paired JSON records
-commands/status/hashes and remaining work; later live results must be inspected.
+The same full-factory handle60702 now closes0 in1130.631s: four domains per
+profile,10,198checks including6,150persistent C++new and3,988cancellation points
+each. All2367 protected hashes remain exact. Controls-only calls in the earlier27
+remain explicitly separate.
+
+Matching app/inspector/preview relinks from unchanged exact5df26app objects and
+the own11archives now pass198native-client checks per profile:132real universal
+menu checks (normal+compact Shift,RimMASK,zeroRimMASK) plus66actual-loader synthetic
+XR checks. Actual app-only ELF maps and all before/after hashes pass. The GUI is
+explicit privateX11/GLX; SprivateMesa patch applies only tosyntheticXR. Three
+initial wrapper/observation failures remain exit1, not relabeled; the correctedV4
+reuses identical successfulV3 relinks and pins dynamicmodules before execution.
+Read SHIFT-RIM-COMPOSITION-QUALIFIED.json for exact failed/positive receipts.
+
+This is completed matching component/application evidence, not main runtime,
+full837regression,physical-device,accelerator or production-goal admission. The
+larger37 package/key sanitizer gates and fullremaining matrix remain open.

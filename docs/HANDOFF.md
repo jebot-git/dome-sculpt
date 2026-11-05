@@ -1,3 +1,25 @@
+## Matching material clients and exhaustive factories closed — 2026-11-05
+
+Private component seal227c11c (runtimecodeeacfba7) now closes the same fullfactory
+handle60702 at0: fourdomains/profile,10,198checks including6,150Cpp+3,988Cancel
+points each; all2367inputs exact. Matching actualapp/inspector/preview relinks
+then pass198checks/profile:132native normal/compact menus plus66actual-loader
+syntheticXR. Actual app-only modules are pinned/mapped/hash-checked; no suppressions.
+Initial wrapper/module-observer failures remain exit1 and do not alter product
+qualification. Read MATERIAL-SHIFT-RIM-COMPOSITION.md and its new qualifiedreceipt.
+
+Main production still matches admittedc179/615. This component is pushed separately;
+837configured is not a fullruntime pass. Rootpackage SAN43091 and separate key
+cold-caller partitions are stilllive. Do not alter/restart frozen inputs after an
+observation timeout. The fullgoal stays active/incomplete. Currentmode5 passes
+source-associated quality/native/UI/fault controls but genuine no-source native19
+head/eye poses expose a default blocker; no method5/default promotion is admitted.
+The next isolated Mirror38 owning work has a12GiB coordinator reserve and must
+leave20GiB outside it, build allreachable ownconsumers freshly, and retain strict
+oldformat/typedexport guards. No mainpublic38/wire capability is admitted.
+DomeD remote341152b is reverified; locala5c444c remains preserved and canonical
+poll-final SDKs are used. No systeminstall/headsetlaunch/sessionrestart.
+
 ## Release exhaustive coverage and combined material component — 2026-11-05
 
 Fullgoal active/incomplete. Release partition70713 is now CLOSED0:128partitions,
