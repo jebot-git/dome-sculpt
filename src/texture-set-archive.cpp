@@ -144,7 +144,7 @@ void TextureSetArchive::decode(SculptObject&o,const Json&j,const PaintImageArchi
  plain(*primary,o.material_bindings.get(),o.appearance.get(),o.bake_recipe.get());
  for(const auto&v:j.at("additional")){TextureSetRecord r;r.id=TextureSetId(integer(v.at("id"),UINT32_MAX));r.name=v.at("name").get<std::string>();r.material=material(v.at("material"));r.domain=domain(r.id);r.painted=TextureSetPaintAccess::decode(v.at("painted"),&images,bool(o.polygon),normals,sampling,context,r.domain);plain(*r.painted,nullptr,nullptr,nullptr);c->additional_.push_back(std::move(r));}
  // No mutable draft or partially decoded collection escapes a failure.
- auto candidate=o;candidate.painted=std::move(primary);candidate.texture_sets=c;c->validate(candidate,true,limits_);o=std::move(candidate);reached_.insert(id);
+ auto candidate=o;candidate.painted=std::move(primary);candidate.texture_sets=c;c->validate(candidate,true,limits_);reached_.insert(id);o=std::move(candidate);
 }
 void TextureSetArchive::require_reachable()const{if(reached_.size()!=topology_.size())throw std::invalid_argument("Unreachable texture-set geometry records");}
 } // namespace dome::detail

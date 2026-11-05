@@ -4426,5 +4426,7 @@ if(BUILD_TESTING)
   target_link_libraries(dome-sculpt-texture-sets-test PRIVATE dome-sculpt-core)
   add_test(NAME dome-sculpt-texture-sets
     COMMAND dome-sculpt-texture-sets-test ${CMAKE_CURRENT_BINARY_DIR}/texture-set-model-output)
-  set_tests_properties(dome-sculpt-texture-sets PROPERTIES TIMEOUT 180)
+  add_test(NAME dome-sculpt-texture-sets-polygon
+    COMMAND dome-sculpt-texture-sets-test ${CMAKE_CURRENT_BINARY_DIR}/texture-set-polygon-output --polygon)
+  set_tests_properties(dome-sculpt-texture-sets dome-sculpt-texture-sets-polygon PROPERTIES TIMEOUT 180)
 endif()

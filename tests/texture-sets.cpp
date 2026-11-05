@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/texture-sets.hpp"
+#include "dome/polygon-scene.hpp"
 #include <nlohmann/json.hpp>
 #include <filesystem>
 #include <iostream>
@@ -11,8 +12,24 @@ void check(bool v,const char*message){if(!v)throw std::runtime_error(message);++
 template<class F>void refuses(F&&f,const char*message){bool caught=false;try{f();}catch(const std::exception&e){caught=true;std::cout<<"EXPECTED "<<e.what()<<'\n';}check(caught,message);}
 Mesh mesh(){Mesh m;m.positions={{-1,-1,0},{0,-1,0},{0,1,0},{-1,1,0},{0,-1,0},{1,-1,0},{1,1,0},{0,1,0}};m.normals.assign(8,{0,0,1});m.uv={{{.05f,.05f}},{{.45f,.05f}},{{.45f,.95f}},{{.05f,.95f}},{{.55f,.05f}},{{.95f,.05f}},{{.95f,.95f}},{{.55f,.95f}}};m.indices={0,1,2,0,2,3,4,5,6,4,6,7};m.validate();return m;}
 Scene fixture(){Scene s;s.active().mesh_active=true;s.active().painted=std::make_shared<PaintedMesh>(mesh(),64);s.active().material.color={.1f,.2f,.3f,1};return s;}
+void polygon_controls(){
+ auto authority=std::make_shared<PolygonAuthority>();authority->topology=PolygonMesh::from_triangles(mesh());
+ Scene s;s.active().polygon=authority;s.active().mesh_active=true;s.active().painted=std::make_shared<PaintedMesh>(authority->topology.triangulate().mesh,64);
+ const auto face=authority->topology.faces().at(2).id;const auto id=create_texture_set(s,s.active().id,std::span<const uint64_t>(&face,1),"Actual polygon face");
+ check(id==1&&s.active().texture_sets->topology()->polygon_ids(),"Actual polygon membership uses authentic topology IDs");
+ const auto encoded=s.encode();check(Scene::decode(encoded).encode()==encoded,"Genuine polygon face/corner set roundtrip");
+ auto bad=encoded;bad["texture_set_geometry"]["topologies"][0]["polygon_ids"]=false;
+ refuses([&]{Scene::decode(bad);},"Forged raw identity marker must not reinterpret genuine polygon IDs");
+ bad=encoded;auto &faces=bad["texture_set_geometry"]["topologies"][0]["faces"].get_binary();faces[0]^=128;
+ refuses([&]{Scene::decode(bad);},"Foreign polygon face identity refuses");
+ bad=encoded;auto &corners=bad["texture_set_geometry"]["topologies"][0]["corners"].get_binary();corners[0]^=128;
+ refuses([&]{Scene::decode(bad);},"Foreign polygon corner identity refuses");
+ auto raw=fixture();create_texture_set(raw,raw.active().id,std::array<uint64_t,1>{1},"Triangle source");bad=raw.encode();bad["texture_set_geometry"]["topologies"][0]["polygon_ids"]=true;
+ refuses([&]{Scene::decode(bad);},"Invented polygon marker cannot borrow a missing authority");
+}
 }
 int main(int argc,char**argv)try{
+ if(argc==3&&std::string_view(argv[2])=="--polygon"){polygon_controls();std::cout<<"PASS "<<checks<<" texture-set polygon controls\n";return 0;}
  if(argc!=2)return 2;const std::filesystem::path out=argv[1];std::filesystem::create_directories(out);
  static_assert(std::is_same_v<decltype(TextureSetRecord{}.painted),std::shared_ptr<const PaintedMesh>>);
  auto s=fixture();const auto legacy=s.encode();const auto object=s.active().id;const auto original_mesh=s.active().painted->mesh_owner();
