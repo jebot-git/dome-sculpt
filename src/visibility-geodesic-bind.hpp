@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #pragma once
 #include "bone-shadow-query.hpp"
+#include "closest-ray-visibility.hpp"
 #include "weight-surface-system.hpp"
 #include "dome/rig.hpp"
 #include <numeric>
@@ -64,28 +65,10 @@ inline float distance(Point p,Point a,Point b) {
 }
 // The closest parameter is a genuine exact rational of captured binary32
 // endpoints. Never cast a projected point to float or shift its ray origin.
-inline bool closest_visible(const BoneShadowQuery&q,uint32_t row,Point p,
-                            Point a,Point b,BoneShadowQuery::Scratch&scratch,
-                            Budget&work,BoneQueryReport&report) {
-  q.integrate(row,a,b,1.,0.,1.,scratch,work,report,
-              BoneWallDomain::WholeGroup,true,true,BoneOriginPolicy::StrictOwnership);
-  volume_exact::Arithmetic exact(work);
-  volume_exact::Integer numerator,denominator;
-  for(size_t k=0;k<3;++k){
-    auto delta=exact.subtract(exact.scalar(b[k]),exact.scalar(a[k]));
-    auto offset=exact.subtract(exact.scalar(p[k]),exact.scalar(a[k]));
-    numerator=exact.add(numerator,exact.multiply(offset,delta));
-    denominator=exact.add(denominator,exact.multiply(delta,delta));
-  }
-  auto t=exact.zero();
-  if(numerator.sign>0&&denominator.sign)
-    t=exact.subtract(numerator,denominator).sign>=0?exact.one():exact.fraction(numerator,denominator);
-  for(const auto&interval:scratch.shadows){
-    work.step();
-    // Closed shadow boundaries conservatively include edge/grazing contact.
-    if(exact.compare(t,interval.enter)>=0&&exact.compare(t,interval.exit)<=0)return false;
-  }
-  return true;
+inline bool closest_visible(const ClosestRayVisibility&q,uint32_t row,
+                            Point a,Point b,ClosestRayVisibility::Scratch&scratch,
+                            Budget&work) {
+  return q.visible(row,a,b,scratch,work);
 }
 } // namespace visibility_geodesic
 // Private candidate, not a public method or an alteration of Automatic0.
@@ -113,16 +96,11 @@ inline VisibilityGeodesicResult visibility_geodesic_bind(
   bytes.add(n,sizeof(Point)+3*sizeof(size_t)+7*sizeof(uint32_t)+3*sizeof(float)+2*sizeof(uint8_t));
   bytes.add(n,sizeof(VertexWeights)+options.limits.max_influences*sizeof(Influence)+64);
   bytes.add(corners,2*(sizeof(uint32_t)+sizeof(float)));
-  bytes.add(corners,2*sizeof(uint32_t)); // explicit two-sided wall overlay
   bytes.add(bones,2*sizeof(Point)+4*sizeof(RigMatrix)+512);
   std::vector<Point>points;points.reserve(n);
   for(auto p:m.positions){work.step(3);if(std::max({std::abs(p.x),std::abs(p.y),std::abs(p.z)})>10000)throw std::invalid_argument("Visibility mesh exceeds metric workspace");points.push_back({p.x,p.y,p.z});}
-  // Both orientations implement two-sided intersection without altering the
-  // caller mesh or the existing entry-wall query semantics.
-  std::vector<uint32_t>two_sided;two_sided.reserve(corners*2);
-  for(size_t t=0;t<corners;t+=3){work.step(6);auto a=m.indices[t],b=m.indices[t+1],c=m.indices[t+2];two_sided.insert(two_sided.end(),{a,b,c,a,c,b});}
-  BoneShadowQuery query(points,two_sided,maximum_bytes-bytes.used,work);
-  bytes.add(query.planned_bytes);BoneShadowQuery::Scratch scratch(query);BoneQueryReport query_report;
+  ClosestRayVisibility query(points,m.indices,maximum_bytes-bytes.used,work);
+  bytes.add(query.planned_bytes);ClosestRayVisibility::Scratch scratch(query);
   std::vector<size_t>starts(n+1),cursor(n);
   std::vector<uint32_t>parent(n);std::iota(parent.begin(),parent.end(),0);
   auto root=[&](uint32_t a){while(parent[a]!=a){work.step();parent[a]=parent[parent[a]];a=parent[a];}return a;};
@@ -150,7 +128,7 @@ inline VisibilityGeodesicResult visibility_geodesic_bind(
     std::sort(order.begin(),order.end(),[&](auto x,auto y){work.step();return direct[x]<direct[y]||(direct[x]==direct[y]&&x<y);});
     for(auto v:order){work.step();if(direct[v]>options.maximum_seed_distance)break;auto component=parent[v];
       if(direct[v]>best[component]+options.seed_margin)continue;
-      if(!closest_visible(query,v,points[v],a,b,scratch,work,query_report)){++result.occluded_candidates;continue;}
+      if(!closest_visible(query,v,a,b,scratch,work)){++result.occluded_candidates;continue;}
       best[component]=std::min(best[component],direct[v]);seeded[component]=1;dist[v]=direct[v];heap.decrease(v);++result.visible_seeds;
     }
     while(!heap.empty()){
@@ -163,5 +141,66 @@ inline VisibilityGeodesicResult visibility_geodesic_bind(
   result.weights.vertices.reserve(n);
   for(auto&row:candidate){work.step(64+row.size()*8);float nearest=INFINITY;for(auto i:row)nearest=std::min(nearest,i.weight);for(auto&i:row)i.weight=std::pow((nearest+scale)/(i.weight+scale),options.falloff);result.weights.vertices.push_back(normalize_weights(std::move(row),bones,{},options.limits));}
   work.step_items(n,options.limits.max_influences+1);result.weights.validate(n,bones);work.stop();result.work=work.used;result.workspace=bytes.used;return result;
+}
+} // namespace dome::detail
+
+#include "dome/scene.hpp"
+#include "weight-boundary-sewing.hpp"
+namespace dome::detail {
+// Explicit geometric construction for ONE captured actor. The existing sewing
+// primitive pairs only unique opposite boundary edges co-moving through every
+// current morph. It does not establish original topology/skin authority and
+// never edits raw topology, UVs, normals, paint, frame owners or source IDs.
+inline VisibilityGeodesicResult visibility_geodesic_bind_object(
+    const SculptObject&object,const Skeleton&target_local_rig,
+    BindOptions options={},const std::function<bool()>&cancelled={},
+    size_t maximum_bytes=256u*1024u*1024u) {
+  if(!object.id||!object.painted||maximum_bytes<65536||maximum_bytes>256u*1024u*1024u||
+     !options.maximum_work||options.maximum_work>500'000'000||
+     !options.limits.max_influences||options.limits.max_influences>32)
+    throw std::invalid_argument("Invalid one-owner sewn visibility input");
+  const auto paint=object.painted;const auto owner=paint->mesh_owner();
+  const auto deformation=object.deformation;const auto&mesh=*owner;
+  const size_t n=mesh.positions.size(),corners=mesh.indices.size();
+  const size_t morphs=deformation&&deformation->morphs?deformation->morphs->targets.size():0;
+  if(!n||n>2'000'000||corners>6'000'000||morphs>128)
+    throw std::length_error("One-owner sewing geometry dimensions");
+  visibility_geodesic::Budget work{0,options.maximum_work,cancelled};work.stop();
+  visibility_geodesic::Bytes preparation{0,maximum_bytes};preparation.add(65536);
+  preparation.add(morphs,sizeof(std::vector<Vec3>)+64);
+  preparation.add(n,morphs*sizeof(Vec3));
+  const size_t copies=preparation.used;
+  preparation.add(n,16);preparation.add(corners,256+48*morphs);preparation.add(4096);
+  work.step_items(n,4);work.step_items(corners,1);mesh.validate();
+  GeometricBoundarySewing sewn;
+  {
+    std::vector<std::vector<Vec3>>deltas;deltas.reserve(morphs);
+    if(deformation&&deformation->morphs){
+      work.step_items(n,morphs*4);deformation->morphs->validate(mesh);
+      for(const auto&target:deformation->morphs->targets){work.step_items(n,3);deltas.push_back(target.delta);}
+    }
+    sewn=geometric_boundary_sewing(mesh,deltas,maximum_bytes-copies,work);
+  }
+  visibility_geodesic::Bytes retained{0,maximum_bytes};retained.add(65536);
+  retained.add(n,3*sizeof(uint32_t)+2*sizeof(Vec3));retained.add(corners,sizeof(uint32_t));
+  // Reserve full raw output while the canonical result is still held. It is
+  // copied exactly per row, never averaged or independently renormalized.
+  retained.add(n,sizeof(VertexWeights)+options.limits.max_influences*sizeof(Influence)+64);
+  if(retained.used>maximum_bytes-65536)
+    throw std::length_error("Sewn visibility leaves no field workspace");
+  Mesh domain;domain.positions.reserve(n);domain.normals.reserve(n);domain.indices.reserve(corners);
+  std::vector<uint32_t>representatives(n,UINT32_MAX),raw_to_domain(n);
+  for(uint32_t v=0;v<n;++v){work.step(8);auto root=sewn.groups.at(v);if(root>=n||sewn.groups[root]!=root)throw std::logic_error("Geometric sewing root changed");auto&index=representatives[root];if(index==UINT32_MAX){index=uint32_t(domain.positions.size());domain.positions.push_back(mesh.positions[root]);domain.normals.push_back(mesh.normals[root]);}raw_to_domain[v]=index;}
+  for(auto v:mesh.indices){work.step();domain.indices.push_back(raw_to_domain[v]);}
+  const size_t expansion=n*(options.limits.max_influences+2);
+  if(work.used>=options.maximum_work||expansion>options.maximum_work-work.used)
+    throw std::length_error("Sewn visibility field work forecast exceeded");
+  auto field_options=options;field_options.maximum_work-=work.used+expansion;
+  auto result=visibility_geodesic_bind(domain,target_local_rig,field_options,cancelled,maximum_bytes-retained.used);
+  SkinWeights raw;raw.vertices.reserve(n);
+  for(auto v:raw_to_domain){work.step(options.limits.max_influences+2);raw.vertices.push_back(result.weights.vertices.at(v));}
+  result.weights=std::move(raw);result.work+=work.used;
+  result.workspace=std::max(preparation.used,result.workspace+retained.used);
+  work.stop();return result;
 }
 } // namespace dome::detail

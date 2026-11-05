@@ -18,14 +18,29 @@ void heap_oracle(){
  check(expected==actual,"Bounded indexed queue matches independent full edge-relaxation solution exactly");
 }
 void exact_occlusion(){
- using P=bone_shadow::Point;std::vector<P>p{{0,0,0},{0,-1,1},{0,1,1},{.5f,-.5f,-.5f},{.5f,.5f,-.5f},{.5f,0,.5f}};std::vector<uint32_t>tri{0,1,2,3,4,5};std::function<bool()>cancel;weight_surface::Budget work{0,50'000'000,cancel};BoneShadowQuery entry(p,tri,16u*1024u*1024u,work);BoneShadowQuery::Scratch entry_scratch(entry);BoneQueryReport report;check(visibility_geodesic::closest_visible(entry,0,p[0],P{1,0,0},P{1,2,0},entry_scratch,work,report),"Existing entry-wall query retains its explicit outgoing-wall semantics");const auto original=tri;for(size_t t=0;t<original.size();t+=3)tri.insert(tri.end(),{original[t],original[t+2],original[t+1]});BoneShadowQuery q(p,tri,16u*1024u*1024u,work);BoneShadowQuery::Scratch scratch(q);
+ using P=bone_shadow::Point;std::vector<P>p{{0,0,0},{0,-1,1},{0,1,1},{.5f,-.5f,-.5f},{.5f,.5f,-.5f},{.5f,0,.5f}};std::vector<uint32_t>tri{0,1,2,3,4,5};std::function<bool()>cancel;weight_surface::Budget work{0,50'000'000,cancel};
+ BoneShadowQuery entry(p,tri,16u*1024u*1024u,work);BoneShadowQuery::Scratch entry_scratch(entry);BoneQueryReport report;check(entry.integrate(0,P{1,0,0},P{1,2,0},1.,0.,1.,entry_scratch,work,report)>0,"Existing entry-wall query retains its explicit outgoing-wall semantics");
+ visibility_geodesic::ClosestRayVisibility q(p,tri,16u*1024u*1024u,work);visibility_geodesic::ClosestRayVisibility::Scratch scratch(q);
  for(auto source:{std::array<P,2>{P{1,0,0},P{1,2,0}},std::array<P,2>{P{1,-1,0},P{1,1,0}},std::array<P,2>{P{1,-2,0},P{1,0,0}}}){
-  check(!visibility_geodesic::closest_visible(q,0,p[0],source[0],source[1],scratch,work,report),"Actual blocker rejects head/interior/tip closest finite-source ray");
-  check(!visibility_geodesic::closest_visible(q,0,p[0],source[1],source[0],scratch,work,report),"Exact closest-ray shadow test is endpoint-order invariant");
+  check(!q.visible(0,source[0],source[1],scratch,work),"Actual two-sided blocker rejects head/interior/tip closest finite-source ray");
+  check(!q.visible(0,source[1],source[0],scratch,work),"Exact closest-ray shadow test is endpoint-order invariant");
  }
- P a{1,-2,0},b{1,2,0};double value=q.integrate(0,a,b,1,0,1,scratch,work,report);
- check(value>0&&!visibility_geodesic::closest_visible(q,0,p[0],a,b,scratch,work,report),"Visible distant source portions never authorize an occluded closest source point");
- check(visibility_geodesic::closest_visible(q,0,p[0],P{1,2,0},P{1,3,0},scratch,work,report),"Independent clear closest ray survives a real nearby blocker");
+ auto overlay=tri;for(size_t t=0;t<tri.size();t+=3)overlay.insert(overlay.end(),{tri[t],tri[t+2],tri[t+1]});BoneShadowQuery family(p,overlay,16u*1024u*1024u,work);BoneShadowQuery::Scratch family_scratch(family);P a{1,-2,0},b{1,2,0};double value=family.integrate(0,a,b,1,0,1,family_scratch,work,report);
+ check(value>0&&!q.visible(0,a,b,scratch,work),"Visible distant source portions never authorize an occluded closest source point");
+ check(q.visible(0,P{1,2,0},P{1,3,0},scratch,work),"Independent clear closest ray survives a real nearby blocker");
+ // A genuine duplicate source-origin position does not fabricate incidence:
+ // only exact t=0 is excluded, and positive coplanar intersections still block.
+ std::vector<P>origin{{0,0,0},{0,0,0},{-1,-1,0},{-1,1,0}};std::vector<uint32_t>origin_face{1,2,3};visibility_geodesic::ClosestRayVisibility contact(origin,origin_face,16u*1024u*1024u,work);visibility_geodesic::ClosestRayVisibility::Scratch contact_scratch(contact);
+ check(contact.visible(0,P{0,0,1},P{0,0,2},contact_scratch,work),"Unowned exact origin-plane contact alone never blocks a positive noncoplanar ray");
+ check(contact.visible(0,P{1,0,0},P{2,0,0},contact_scratch,work),"Coplanar outward ray excludes only its exact starting contact");
+ check(!contact.visible(0,P{-.5f,0,0},P{-.75f,0,0},contact_scratch,work),"Actual positive coplanar material overlap remains blocked");
+ check(!contact.visible(0,P{-1,1,0},P{-2,2,0},contact_scratch,work),"Positive edge-grazing contact is conservatively blocked");
+ auto fractional=[&](float bottom){std::vector<P>v{{0,0,0},{.5f,bottom,-.5f},{.5f,bottom,.5f},{.5f,.75f,0}};std::vector<uint32_t>f{1,2,3};visibility_geodesic::ClosestRayVisibility model(v,f,16u*1024u*1024u,work);visibility_geodesic::ClosestRayVisibility::Scratch s(model);return model.visible(0,P{1,-1,0},P{2,1,0},s,work);};
+ check(!fractional(-.25f),"Exact one-fifth closest parameter detects genuine rational edge contact");
+ check(fractional(std::nextafter(-.25f,INFINITY)),"One-ULP real gap stays clear without rounded source-point substitution");
+ check(!fractional(std::nextafter(-.25f,-INFINITY)),"One-ULP real overlap stays blocked with unchanged boundary policy");
+ const float tiny=std::numeric_limits<float>::denorm_min();std::vector<P>near{{0,0,0},{tiny,-1,-1},{tiny,1,-1},{tiny,0,1}};std::vector<uint32_t>near_face{1,2,3};visibility_geodesic::ClosestRayVisibility wall(near,near_face,16u*1024u*1024u,work);visibility_geodesic::ClosestRayVisibility::Scratch wall_scratch(wall);
+ check(!wall.visible(0,P{1,0,0},P{2,0,0},wall_scratch,work),"Positive subnormal-distance wall is not discarded as an origin epsilon");
 }
 }
 int main(int argc,char**argv)try{

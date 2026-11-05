@@ -13,7 +13,7 @@ int main(int argc,char**argv)try{
  if(argc!=3)return 2;const std::filesystem::path input=argv[1],out=argv[2];std::filesystem::create_directories(out);auto scene=Scene::load(input);const auto before=scene.encode();std::vector<std::pair<uint64_t,SkinWeights>>weights;nlohmann::json records=nlohmann::json::array();size_t total=0;
  for(const auto&o:scene.objects())if(o.mesh_active&&o.painted&&o.deformation&&o.deformation->skeleton&&o.deformation->skin&&o.rig_source){
   BindOptions options;options.maximum_work=500'000'000;std::cout<<"CANDIDATE object="<<o.id<<" vertices="<<o.painted->mesh().positions.size()<<std::endl;
-  try{auto result=detail::visibility_geodesic_bind(o.painted->mesh(),*o.deformation->skeleton,options);total+=result.work;records.push_back({{"object",o.id},{"work",result.work},{"workspace",result.workspace},{"visible_seeds",result.visible_seeds},{"occluded_candidates",result.occluded_candidates}});weights.emplace_back(o.id,std::move(result.weights));}
+  try{auto result=detail::visibility_geodesic_bind_object(o,*o.deformation->skeleton,options);total+=result.work;records.push_back({{"object",o.id},{"work",result.work},{"workspace",result.workspace},{"visible_seeds",result.visible_seeds},{"occluded_candidates",result.occluded_candidates}});weights.emplace_back(o.id,std::move(result.weights));}
   catch(const std::exception&e){std::ofstream(out/"first-refusal.json")<<nlohmann::json{{"object",o.id},{"name",o.name},{"reason",e.what()},{"completed",records},{"work_of_completed_parts",total},{"input_exact",scene.encode()==before}}.dump(2);throw;}
  }
  if(weights.size()!=19||scene.encode()!=before)throw std::runtime_error("Diagnostic must stage all nineteen unchanged inputs before adoption");
