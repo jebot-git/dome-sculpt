@@ -1,3 +1,15 @@
+## Integrated admission candidate — 2026-11-05
+
+This branch integrates227c11c material qualification,1f9fd48 package partitions
+andmainb3b4d00 standards/handoff by real merges. Production/header/assets remain
+exact eacfba7; whole new package consumers R/S contracts and40explicit smoke
+points/profile pass with exact hashes.28verifiercontrols pass;967registered is
+not fullruntime. Read ADMISSION-CANDIDATE-37.md/receipt. Parent5df packageSAN43091
+andfresh-key sanitizer partitions remainlive andoutside this smoke scope.
+No main37/public38/default-weight/fullgoal claim. Preserve frozen original job
+inputs and inspect actualhandles before restart. Controllerdrawers remain after
+basic targets; allfullmatrix/device/accelerator work stays required.
+
 ## Matching material clients and exhaustive factories closed — 2026-11-05
 
 Private component seal227c11c (runtimecodeeacfba7) now closes the same fullfactory
