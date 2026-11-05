@@ -1,0 +1,686 @@
+{
+  "status": "qualified detached kernel and bounded current35 existing workflow foundation only; physical-beforeUV still fails; no37 owner/publication/codec",
+  "runtime": "6e0487c0ea64f29bfeef2bccc1c2c1e93d117330",
+  "base": "1f4f55ca3e67f7b92c5bffb2ddbf75a463886dbb",
+  "hdr_codec": "e29defb1bd24489d8ee02dc43cad8eab11db61cf",
+  "schema_changes": false,
+  "public_layout_changes": false,
+  "build_and_run": {
+    "source": "6e0487c0ea64f29bfeef2bccc1c2c1e93d117330",
+    "scope": "matching current35 own app/core/render/export and detached37 prototype; no37 publication/schema admission",
+    "results": [
+      {
+        "profile": "release",
+        "phase": "configure",
+        "command": [
+          "cmake",
+          "-S",
+          ".",
+          "-B",
+          "build-release",
+          "-G",
+          "Ninja",
+          "-DCMAKE_BUILD_TYPE=Release",
+          "-DBUILD_TESTING=ON",
+          "-DDOME_BUILD_UI=ON",
+          "-DDOME_BUILD_XR=ON",
+          "-DDOME_COMPUTE_BACKEND=CPU",
+          "-DFLTK_DIR=/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-release/share/fltk"
+        ],
+        "exit": 0,
+        "seconds": 1.9226054709870368
+      },
+      {
+        "profile": "release",
+        "phase": "build",
+        "command": [
+          "nice",
+          "-n",
+          "15",
+          "cmake",
+          "--build",
+          "build-release",
+          "-j2",
+          "--target",
+          "dome-sculpt",
+          "dome-sculpt-canonical-paint-uv-kernel-test",
+          "dome-sculpt-native35-physical-counterexample-test",
+          "dome-sculpt-native35-physical-render-test"
+        ],
+        "exit": 0,
+        "seconds": 5.218440358992666
+      },
+      {
+        "profile": "release",
+        "phase": "kernel-0-0",
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/native35-physical-1f4f55c/build-release/dome-sculpt-canonical-paint-uv-kernel-test",
+          "/home/blux/de-xr/dome-sculpt/artifacts/native35-physical-1f4f55c/artifacts/canonical-physical-controls/output/0-0.dsculpt",
+          "--oom"
+        ],
+        "exit": 0,
+        "seconds": 0.06640596297802404
+      },
+      {
+        "profile": "release",
+        "phase": "kernel-7-0",
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/native35-physical-1f4f55c/build-release/dome-sculpt-canonical-paint-uv-kernel-test",
+          "/home/blux/de-xr/dome-sculpt/artifacts/native35-physical-1f4f55c/artifacts/canonical-physical-controls/output/7-0.dsculpt",
+          "--oom"
+        ],
+        "exit": 0,
+        "seconds": 0.11863639199873433
+      },
+      {
+        "profile": "release",
+        "phase": "kernel-0-1",
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/native35-physical-1f4f55c/build-release/dome-sculpt-canonical-paint-uv-kernel-test",
+          "/home/blux/de-xr/dome-sculpt/artifacts/native35-physical-1f4f55c/artifacts/canonical-physical-controls/output/0-1.dsculpt",
+          "--oom"
+        ],
+        "exit": 0,
+        "seconds": 0.07931661198381335
+      },
+      {
+        "profile": "release",
+        "phase": "kernel-7-1",
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/native35-physical-1f4f55c/build-release/dome-sculpt-canonical-paint-uv-kernel-test",
+          "/home/blux/de-xr/dome-sculpt/artifacts/native35-physical-1f4f55c/artifacts/canonical-physical-controls/output/7-1.dsculpt",
+          "--oom"
+        ],
+        "exit": 0,
+        "seconds": 0.12204399501206353
+      },
+      {
+        "profile": "release",
+        "phase": "counterexample",
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/native35-physical-1f4f55c/build-release/dome-sculpt-native35-physical-counterexample-test",
+          "/home/blux/de-xr/dome-sculpt/artifacts/native35-physical-1f4f55c/tests/fixtures/layered-normal",
+          "/home/blux/de-xr/dome-sculpt/artifacts/native35-physical-1f4f55c/artifacts/canonical-paint-kernel-owned/release-output"
+        ],
+        "exit": 1,
+        "seconds": 0.6231894110096619
+      },
+      {
+        "profile": "release",
+        "phase": "render",
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/native35-physical-1f4f55c/build-release/dome-sculpt-native35-physical-render-test",
+          "/home/blux/de-xr/dome-sculpt/artifacts/native35-physical-1f4f55c/artifacts/canonical-paint-kernel-owned/release-output",
+          "/home/blux/de-xr/dome-sculpt/artifacts/native35-physical-1f4f55c/artifacts/canonical-paint-kernel-owned/release-images"
+        ],
+        "exit": 0,
+        "seconds": 9.590979079017416
+      },
+      {
+        "profile": "sanitize",
+        "phase": "configure",
+        "command": [
+          "cmake",
+          "-S",
+          ".",
+          "-B",
+          "build-sanitize",
+          "-G",
+          "Ninja",
+          "-DCMAKE_BUILD_TYPE=Release",
+          "-DBUILD_TESTING=ON",
+          "-DDOME_BUILD_UI=ON",
+          "-DDOME_BUILD_XR=ON",
+          "-DDOME_COMPUTE_BACKEND=CPU",
+          "-DFLTK_DIR=/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-sanitize/share/fltk",
+          "-DCMAKE_C_FLAGS_RELEASE=-O1 -g1 -DNDEBUG -fsanitize=address,undefined -fno-omit-frame-pointer",
+          "-DCMAKE_CXX_FLAGS_RELEASE=-O1 -g1 -DNDEBUG -fsanitize=address,undefined -fno-omit-frame-pointer"
+        ],
+        "exit": 0,
+        "seconds": 7.571574283007067
+      },
+      {
+        "profile": "sanitize",
+        "phase": "build",
+        "command": [
+          "nice",
+          "-n",
+          "15",
+          "cmake",
+          "--build",
+          "build-sanitize",
+          "-j2",
+          "--target",
+          "dome-sculpt",
+          "dome-sculpt-canonical-paint-uv-kernel-test",
+          "dome-sculpt-native35-physical-counterexample-test",
+          "dome-sculpt-native35-physical-render-test"
+        ],
+        "exit": 0,
+        "seconds": 1051.536622354004
+      },
+      {
+        "profile": "sanitize",
+        "phase": "kernel-0-0",
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/native35-physical-1f4f55c/build-sanitize/dome-sculpt-canonical-paint-uv-kernel-test",
+          "/home/blux/de-xr/dome-sculpt/artifacts/native35-physical-1f4f55c/artifacts/canonical-physical-controls/output/0-0.dsculpt",
+          "--oom"
+        ],
+        "exit": 0,
+        "seconds": 1.0632679259870201
+      },
+      {
+        "profile": "sanitize",
+        "phase": "kernel-7-0",
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/native35-physical-1f4f55c/build-sanitize/dome-sculpt-canonical-paint-uv-kernel-test",
+          "/home/blux/de-xr/dome-sculpt/artifacts/native35-physical-1f4f55c/artifacts/canonical-physical-controls/output/7-0.dsculpt",
+          "--oom"
+        ],
+        "exit": 0,
+        "seconds": 1.8207886749878526
+      },
+      {
+        "profile": "sanitize",
+        "phase": "kernel-0-1",
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/native35-physical-1f4f55c/build-sanitize/dome-sculpt-canonical-paint-uv-kernel-test",
+          "/home/blux/de-xr/dome-sculpt/artifacts/native35-physical-1f4f55c/artifacts/canonical-physical-controls/output/0-1.dsculpt",
+          "--oom"
+        ],
+        "exit": 0,
+        "seconds": 1.074688819993753
+      },
+      {
+        "profile": "sanitize",
+        "phase": "kernel-7-1",
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/native35-physical-1f4f55c/build-sanitize/dome-sculpt-canonical-paint-uv-kernel-test",
+          "/home/blux/de-xr/dome-sculpt/artifacts/native35-physical-1f4f55c/artifacts/canonical-physical-controls/output/7-1.dsculpt",
+          "--oom"
+        ],
+        "exit": 0,
+        "seconds": 1.741306746029295
+      },
+      {
+        "profile": "sanitize",
+        "phase": "counterexample",
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/native35-physical-1f4f55c/build-sanitize/dome-sculpt-native35-physical-counterexample-test",
+          "/home/blux/de-xr/dome-sculpt/artifacts/native35-physical-1f4f55c/tests/fixtures/layered-normal",
+          "/home/blux/de-xr/dome-sculpt/artifacts/native35-physical-1f4f55c/artifacts/canonical-paint-kernel-owned/sanitize-output"
+        ],
+        "exit": 1,
+        "seconds": 3.8370428209891543
+      },
+      {
+        "profile": "sanitize",
+        "phase": "render",
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/native35-physical-1f4f55c/build-sanitize/dome-sculpt-native35-physical-render-test",
+          "/home/blux/de-xr/dome-sculpt/artifacts/native35-physical-1f4f55c/artifacts/canonical-paint-kernel-owned/sanitize-output",
+          "/home/blux/de-xr/dome-sculpt/artifacts/native35-physical-1f4f55c/artifacts/canonical-paint-kernel-owned/sanitize-images"
+        ],
+        "exit": 0,
+        "seconds": 15.842628685000818
+      }
+    ],
+    "exit": 0,
+    "inputs": 2108,
+    "unchanged": true,
+    "counterexamples_are_expected_failures": true
+  },
+  "profiles": {
+    "release": {
+      "existing_positive_scenes": [
+        {
+          "control_export": true,
+          "native_roundtrip": true,
+          "operation": 0,
+          "physical_export": true,
+          "scene_version": 33,
+          "variant": 0
+        },
+        {
+          "control_export": true,
+          "native_roundtrip": true,
+          "operation": 1,
+          "physical_export": true,
+          "scene_version": 34,
+          "variant": 0
+        },
+        {
+          "control_export": true,
+          "key_history_restore": true,
+          "key_owner": true,
+          "native_roundtrip": true,
+          "operation": 3,
+          "physical_export": true,
+          "scene_version": 33,
+          "variant": 0
+        },
+        {
+          "control_export": true,
+          "key_history_restore": true,
+          "key_owner": true,
+          "native_roundtrip": true,
+          "operation": 4,
+          "physical_export": true,
+          "scene_version": 34,
+          "variant": 0
+        },
+        {
+          "control_export": true,
+          "native_roundtrip": true,
+          "operation": 0,
+          "physical_export": true,
+          "scene_version": 33,
+          "variant": 7
+        },
+        {
+          "control_export": true,
+          "native_roundtrip": true,
+          "operation": 1,
+          "physical_export": true,
+          "scene_version": 34,
+          "variant": 7
+        },
+        {
+          "control_export": true,
+          "key_history_restore": true,
+          "key_owner": true,
+          "native_roundtrip": true,
+          "operation": 3,
+          "physical_export": true,
+          "scene_version": 33,
+          "variant": 7
+        },
+        {
+          "control_export": true,
+          "key_history_restore": true,
+          "key_owner": true,
+          "native_roundtrip": true,
+          "operation": 4,
+          "physical_export": true,
+          "scene_version": 34,
+          "variant": 7
+        }
+      ],
+      "actual_refusals": [
+        {
+          "actual_uv_diagnostic": "Physical emission requires an exact UV transfer adapter; source retained",
+          "control_export": true,
+          "diagnostic": "Physical emission requires an exact UV transfer adapter; source retained",
+          "failed_uv_file_exact": true,
+          "failed_uv_history_exact": true,
+          "failed_uv_scene_exact": true,
+          "failure_stage": "physical-before-uv",
+          "operation": 2,
+          "variant": 0
+        },
+        {
+          "actual_uv_diagnostic": "Physical emission requires an exact UV transfer adapter; source retained",
+          "control_export": true,
+          "diagnostic": "Physical emission requires an exact UV transfer adapter; source retained",
+          "failed_uv_file_exact": true,
+          "failed_uv_history_exact": true,
+          "failed_uv_scene_exact": true,
+          "failure_stage": "physical-before-uv",
+          "operation": 2,
+          "variant": 7
+        }
+      ],
+      "independent_checks": 107,
+      "independent_posed_exports": 24,
+      "maximum_pixel_error": 1,
+      "unchanged_bound": 4,
+      "wrong_normal_error": 66,
+      "wrong_paint_uv_error": 53,
+      "wrong_units_error": 63,
+      "kernels": [
+        {
+          "fixture": "0-0",
+          "checks": 430,
+          "persistent_cpp_prefixes": [
+            78,
+            75
+          ],
+          "cancel_points": [
+            40,
+            40
+          ],
+          "actual_geometry": [
+            "ACTUAL_GEOMETRY before=5 current=5 split=0",
+            "ACTUAL_GEOMETRY before=5 current=6 split=1"
+          ]
+        },
+        {
+          "fixture": "7-0",
+          "checks": 622,
+          "persistent_cpp_prefixes": [
+            126,
+            123
+          ],
+          "cancel_points": [
+            40,
+            40
+          ],
+          "actual_geometry": [
+            "ACTUAL_GEOMETRY before=5 current=5 split=0",
+            "ACTUAL_GEOMETRY before=5 current=6 split=1"
+          ]
+        },
+        {
+          "fixture": "0-1",
+          "checks": 452,
+          "persistent_cpp_prefixes": [
+            82,
+            76
+          ],
+          "cancel_points": [
+            46,
+            46
+          ],
+          "actual_geometry": [
+            "ACTUAL_GEOMETRY before=5 current=5 split=0",
+            "ACTUAL_GEOMETRY before=5 current=6 split=1"
+          ]
+        },
+        {
+          "fixture": "7-1",
+          "checks": 580,
+          "persistent_cpp_prefixes": [
+            114,
+            108
+          ],
+          "cancel_points": [
+            46,
+            46
+          ],
+          "actual_geometry": [
+            "ACTUAL_GEOMETRY before=5 current=5 split=0",
+            "ACTUAL_GEOMETRY before=5 current=6 split=1"
+          ]
+        }
+      ],
+      "total_kernel_checks": 2084,
+      "total_persistent_cpp_prefixes": 782,
+      "total_cancel_points": 344
+    },
+    "sanitize": {
+      "existing_positive_scenes": [
+        {
+          "control_export": true,
+          "native_roundtrip": true,
+          "operation": 0,
+          "physical_export": true,
+          "scene_version": 33,
+          "variant": 0
+        },
+        {
+          "control_export": true,
+          "native_roundtrip": true,
+          "operation": 1,
+          "physical_export": true,
+          "scene_version": 34,
+          "variant": 0
+        },
+        {
+          "control_export": true,
+          "key_history_restore": true,
+          "key_owner": true,
+          "native_roundtrip": true,
+          "operation": 3,
+          "physical_export": true,
+          "scene_version": 33,
+          "variant": 0
+        },
+        {
+          "control_export": true,
+          "key_history_restore": true,
+          "key_owner": true,
+          "native_roundtrip": true,
+          "operation": 4,
+          "physical_export": true,
+          "scene_version": 34,
+          "variant": 0
+        },
+        {
+          "control_export": true,
+          "native_roundtrip": true,
+          "operation": 0,
+          "physical_export": true,
+          "scene_version": 33,
+          "variant": 7
+        },
+        {
+          "control_export": true,
+          "native_roundtrip": true,
+          "operation": 1,
+          "physical_export": true,
+          "scene_version": 34,
+          "variant": 7
+        },
+        {
+          "control_export": true,
+          "key_history_restore": true,
+          "key_owner": true,
+          "native_roundtrip": true,
+          "operation": 3,
+          "physical_export": true,
+          "scene_version": 33,
+          "variant": 7
+        },
+        {
+          "control_export": true,
+          "key_history_restore": true,
+          "key_owner": true,
+          "native_roundtrip": true,
+          "operation": 4,
+          "physical_export": true,
+          "scene_version": 34,
+          "variant": 7
+        }
+      ],
+      "actual_refusals": [
+        {
+          "actual_uv_diagnostic": "Physical emission requires an exact UV transfer adapter; source retained",
+          "control_export": true,
+          "diagnostic": "Physical emission requires an exact UV transfer adapter; source retained",
+          "failed_uv_file_exact": true,
+          "failed_uv_history_exact": true,
+          "failed_uv_scene_exact": true,
+          "failure_stage": "physical-before-uv",
+          "operation": 2,
+          "variant": 0
+        },
+        {
+          "actual_uv_diagnostic": "Physical emission requires an exact UV transfer adapter; source retained",
+          "control_export": true,
+          "diagnostic": "Physical emission requires an exact UV transfer adapter; source retained",
+          "failed_uv_file_exact": true,
+          "failed_uv_history_exact": true,
+          "failed_uv_scene_exact": true,
+          "failure_stage": "physical-before-uv",
+          "operation": 2,
+          "variant": 7
+        }
+      ],
+      "independent_checks": 107,
+      "independent_posed_exports": 24,
+      "maximum_pixel_error": 1,
+      "unchanged_bound": 4,
+      "wrong_normal_error": 66,
+      "wrong_paint_uv_error": 53,
+      "wrong_units_error": 63,
+      "kernels": [
+        {
+          "fixture": "0-0",
+          "checks": 430,
+          "persistent_cpp_prefixes": [
+            78,
+            75
+          ],
+          "cancel_points": [
+            40,
+            40
+          ],
+          "actual_geometry": [
+            "ACTUAL_GEOMETRY before=5 current=5 split=0",
+            "ACTUAL_GEOMETRY before=5 current=6 split=1"
+          ]
+        },
+        {
+          "fixture": "7-0",
+          "checks": 622,
+          "persistent_cpp_prefixes": [
+            126,
+            123
+          ],
+          "cancel_points": [
+            40,
+            40
+          ],
+          "actual_geometry": [
+            "ACTUAL_GEOMETRY before=5 current=5 split=0",
+            "ACTUAL_GEOMETRY before=5 current=6 split=1"
+          ]
+        },
+        {
+          "fixture": "0-1",
+          "checks": 452,
+          "persistent_cpp_prefixes": [
+            82,
+            76
+          ],
+          "cancel_points": [
+            46,
+            46
+          ],
+          "actual_geometry": [
+            "ACTUAL_GEOMETRY before=5 current=5 split=0",
+            "ACTUAL_GEOMETRY before=5 current=6 split=1"
+          ]
+        },
+        {
+          "fixture": "7-1",
+          "checks": 580,
+          "persistent_cpp_prefixes": [
+            114,
+            108
+          ],
+          "cancel_points": [
+            46,
+            46
+          ],
+          "actual_geometry": [
+            "ACTUAL_GEOMETRY before=5 current=5 split=0",
+            "ACTUAL_GEOMETRY before=5 current=6 split=1"
+          ]
+        }
+      ],
+      "total_kernel_checks": 2084,
+      "total_persistent_cpp_prefixes": 782,
+      "total_cancel_points": 344
+    }
+  },
+  "validation": {
+    "files": 84,
+    "errors": 0,
+    "warnings": 42,
+    "infos": 212,
+    "warning_codes": [
+      "NODE_SKINNED_MESH_NON_ROOT"
+    ],
+    "maxIssues": 0,
+    "issueFilters": [],
+    "R_S_byte_equal_pairs": 42
+  },
+  "preserved_initial_negative": {
+    "source": "41cee020b99b6f0704f22aaeff341fea7a911010",
+    "build_exit": 1,
+    "reason": "New fixture omitted required Document::edit_scene label/cancellation arguments; production core/render/XR compiled before fixture failure",
+    "path": "/home/blux/de-xr/dome-sculpt/artifacts/native35-physical-1f4f55c/artifacts/counterexample-first/status.json"
+  },
+  "kernel_contract": "Detached immutable beforePaint metadata +new current authored geometry, genuine independent CanonicalNormalUv and actual retained paint domain/attachment; every editable layer/float/baked/normal owner retained; old normal field unchanged; no Scene admission or invented source/frame authority",
+  "geometry": "Actual native source5\u2192current5 or deindexed6, not historical4\u21926 and not raw asset ID relabeling",
+  "limitations": [
+    "Initial detached kernel guards new key derivation and original source-map/appearance/polygon contexts; existing artist morph/skin state is not remapped or published by this geometry-only stage",
+    "Scene37/material19 and canonical_paint_sampling pointer are reserved but NOT implemented/admitted here",
+    "Connected immutable full before-model/material/rig/source capture, prospective full inline-model/frame/geometry owner budgets, current deformation remap, owning reader/writer and actual publication remain required",
+    "Root normal34/native32 plus36 mixed actors must compose by actual pools/flags; no numeric authority",
+    "Existing canonical+F32+true key/UV-afterwards positive uses genuine Scene33/34 owners; real physical-beforeUV refusal remains in both R/S and is not completion",
+    "No GPU, physical HMD, whole ALL/full regression, Wayland or new37 UI/export claim"
+  ],
+  "artifacts": [
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/native35-physical-1f4f55c/artifacts/canonical-paint-kernel-owned/status.json",
+      "sha256": "2e3562e6d66be4302458c72e402b52bd35bfb01657a7bce4154772f51d43f2f5"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/native35-physical-1f4f55c/artifacts/canonical-paint-kernel-owned/before.json",
+      "sha256": "d3f0b90e5479844e52df4abcf1c7bff18c4efdb720bf4e86fdbe64791a0de963"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/native35-physical-1f4f55c/artifacts/canonical-paint-foundation-validation/report.json",
+      "sha256": "6f4fa032b99fcd6fd2e3d6d462d5148980b7ad4f3e3ceb3c1dd3f344a49bef4a"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/native35-physical-1f4f55c/artifacts/canonical-paint-foundation-validation/sources.json",
+      "sha256": "2f7e885869e9bdc8cba8c75522b7d1ec6b8fe142753354486a7c2318226c8ecd"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/native35-physical-1f4f55c/artifacts/canonical-paint-foundation-validation/pairs.json",
+      "sha256": "a62fa94c9b168a2bbc929b3e41ae947fa5fcc88bcee58d5402822a0924a38f85"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/native35-physical-1f4f55c/artifacts/canonical-paint-kernel-owned/release-render.log",
+      "sha256": "80e085e7f417f57a1cc1ad1be124be7fbf91ebd72c688675fc70fcb165dcffd7"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/native35-physical-1f4f55c/artifacts/canonical-paint-kernel-owned/release-counterexample.log",
+      "sha256": "fcaf255fab900568665d4728bad0464d1a184b309c1e73665d29f4a64fbd02fa"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/native35-physical-1f4f55c/artifacts/canonical-paint-kernel-owned/release-kernel-0-0.log",
+      "sha256": "2dd80b7435d25a36310db19ef89ddebc0919ca6a3dc652224ea51c1b269dc187"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/native35-physical-1f4f55c/artifacts/canonical-paint-kernel-owned/release-kernel-7-0.log",
+      "sha256": "2cb9349519f50edbf9eed970c804e847c059d1ecee9f977e264d6a11852eadd3"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/native35-physical-1f4f55c/artifacts/canonical-paint-kernel-owned/release-kernel-0-1.log",
+      "sha256": "cc3e8e5e44e542e1b733cdf13b1c11fcd05959f1ff87ef8b884a2e874ca635d8"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/native35-physical-1f4f55c/artifacts/canonical-paint-kernel-owned/release-kernel-7-1.log",
+      "sha256": "a078d1bc0ec868447f556f27e165931ff99a83db54bea616d9250c3ce4ebeb27"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/native35-physical-1f4f55c/artifacts/canonical-paint-kernel-owned/sanitize-render.log",
+      "sha256": "80e085e7f417f57a1cc1ad1be124be7fbf91ebd72c688675fc70fcb165dcffd7"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/native35-physical-1f4f55c/artifacts/canonical-paint-kernel-owned/sanitize-counterexample.log",
+      "sha256": "fcaf255fab900568665d4728bad0464d1a184b309c1e73665d29f4a64fbd02fa"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/native35-physical-1f4f55c/artifacts/canonical-paint-kernel-owned/sanitize-kernel-0-0.log",
+      "sha256": "2dd80b7435d25a36310db19ef89ddebc0919ca6a3dc652224ea51c1b269dc187"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/native35-physical-1f4f55c/artifacts/canonical-paint-kernel-owned/sanitize-kernel-7-0.log",
+      "sha256": "2cb9349519f50edbf9eed970c804e847c059d1ecee9f977e264d6a11852eadd3"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/native35-physical-1f4f55c/artifacts/canonical-paint-kernel-owned/sanitize-kernel-0-1.log",
+      "sha256": "cc3e8e5e44e542e1b733cdf13b1c11fcd05959f1ff87ef8b884a2e874ca635d8"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/native35-physical-1f4f55c/artifacts/canonical-paint-kernel-owned/sanitize-kernel-7-1.log",
+      "sha256": "a078d1bc0ec868447f556f27e165931ff99a83db54bea616d9250c3ce4ebeb27"
+    }
+  ]
+}
