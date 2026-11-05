@@ -86,8 +86,15 @@ Vrm1ExpressionLayer compile_vrm1_expression_layer(const J &original,const Sculpt
  const bool opaque=material.parameters.alpha==MToonAlpha::Opaque&&(object.material.alpha==Material::AlphaMode::Automatic||object.material.alpha==Material::AlphaMode::Opaque);
  const bool masked=material.parameters.alpha==MToonAlpha::Mask&&(object.material.alpha==Material::AlphaMode::Automatic||object.material.alpha==Material::AlphaMode::Mask||int(object.material.alpha)==binding.native_reference.alpha);
  if(material.version()!=MToonVersion::V1||(!opaque&&!masked)||
-    material.parameters.outline!=MToonOutline::None||material.parameters.scroll!=std::array<float,2>{}||material.parameters.rotation_speed!=0)
+    material.parameters.scroll!=std::array<float,2>{}||material.parameters.rotation_speed!=0)
   throw std::invalid_argument("VRM1 expression layer currently requires opaque outline-free nonanimated MToon1 source");
+ // An opaque unlit world-space outline is an independent original hull.
+ // The existing writer disables outlines only on the derived paint primitive;
+ // source outlineColor bindings remain on their actual lower material.
+ if(material.parameters.outline!=MToonOutline::None&&
+    !(opaque&&material.parameters.outline==MToonOutline::World&&material.parameters.outline_mix==0&&
+      !binding.roles[size_t(MToonSlot::Normal)].image&&!binding.roles[size_t(MToonSlot::OutlineWidth)].image))
+  throw std::invalid_argument("VRM1 outlined paint needs its independent unlit world-space source proof");
  if(binding.canonical_attributes||binding.canonical_uv||binding.native_paint_sampling||binding.normal_preparation||binding.color_preparation||binding.key_derivation||binding.physical_emission)
   throw std::invalid_argument("VRM1 prepared/absolute expression layers need their owning adapter");
  if(binding.roles[size_t(MToonSlot::Normal)].image&&!opaque)throw std::invalid_argument("VRM1 masked normal expression layers need their independent membership adapter");
