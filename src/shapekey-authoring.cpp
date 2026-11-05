@@ -12,6 +12,7 @@
 #include "shapekey-source-uv.hpp"
 #include "shapekey-attributes.hpp"
 #include "normal-key-derivation.hpp"
+#include "native-paint-frame-source.hpp"
 #include "key-mirror-correspondence.hpp"
 #include <vector>
 namespace dome {
@@ -128,6 +129,15 @@ ShapeKeyResult author_shapekey(Scene &scene,uint64_t object,const ShapeKeyEdit &
  const size_t slot=replace?edit.target:count;
  if(!replace && count>=128)throw std::length_error("Shapekey target budget exceeded");
  std::string name=edit.action==ShapeKeyAction::Replace?keys.targets[slot].name:key_name(keys,edit.name);
+ // Capturing a native32 frame is a distinct operation from its historical
+ // writable UV basis. Preserve both real owners in a detached paired state.
+ if(source.material_bindings&&source.material_bindings->native_paint_sampling&&!source.material_bindings->native_paint_frames){
+  auto captured=detail::capture_native_paint_frames(source,{128*1024*1024,128*1024*1024,cancelled});
+  Scene paired=scene;auto &o=paired.object(object);const auto first=source.shape_source?source.shape_source:capture_polygon_origin(scene,object);
+  auto b=std::make_shared<SourceMaterialBindings>(*source.material_bindings);b->native_paint_frames=captured;b->uv_origin=captured->origin();b->normal_frames=captured->frames();b->normal_frame=SourceMaterialNormalFrame::OriginalAttributes;b->validate();o.material_bindings=b;o.shape_source=first;
+  auto result=detail::author_derived_normal_shapekey(paired,object,edit,cancelled);
+  paired.object(object).shape_source=first;paired.validate();stop(cancelled);scene=std::move(paired);return result;
+ }
  if(detail::needs_independent_key_domain(source,edit,cancelled))return detail::author_derived_normal_shapekey(scene,object,edit,cancelled);
  if(edit.action==ShapeKeyAction::Mirror&&edit.mirror_frames!=ShapeKeyMirrorFrames::VertexPositions&&(edit.mirror_plane!=0||edit.mirror_frames!=ShapeKeyMirrorFrames::ExactAuthored))throw std::invalid_argument("Explicit-plane frame conversion requires genuine owning native frame authority");
  if(source.material_bindings&&source.material_bindings->normal_preparation)

@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "normal-key-derivation.hpp"
+#include "native-paint-frame-source.hpp"
 #include "dome/normal-preparation.hpp"
 #include "normal-frame-runtime.hpp"
 #include "normal-projection-identity.hpp"
@@ -194,7 +195,7 @@ void SourceKeyDerivation::validate(bool deep,const std::function<bool()> &cancel
 bool needs_independent_key_domain(const SculptObject &o,const ShapeKeyEdit &edit,
     const std::function<bool()> &cancelled){
   if(!o.material_bindings||!o.material_bindings->normal_frames||!o.material_bindings->uv_origin)return false;
-  if(o.material_bindings->key_derivation)return true;
+  if(o.material_bindings->key_derivation||o.material_bindings->native_paint_frames)return true;
   if(o.material_bindings->canonical_attributes||(o.material_bindings->normal_preparation&&o.material_bindings->normal_preparation->canonical_conversion))return true;
   const bool vertex_mirror=edit.action==ShapeKeyAction::Mirror&&edit.mirror_frames==ShapeKeyMirrorFrames::VertexPositions;
   if(edit.action==ShapeKeyAction::Mirror&&!vertex_mirror)return true;
@@ -256,7 +257,7 @@ ShapeKeyResult author_derived_normal_shapekey(Scene &scene,uint64_t object,const
   staged->current_targets=node->current_targets_;staged->next_target=node->next_target_;node->frames_=std::move(staged);
   node->frames_=node->replay(cancelled);node->validate(true,cancelled);
   deform->morphs->set_target(source.painted->mesh(),name,endpoint);if(duplicate)deform->morphs->targets.back().delta=original_keys->targets.at(edit.target).delta;if(mirror)deform->morphs->targets.back().delta=mirrored_delta;if(create&&!deform->morph_weights.empty())deform->morph_weights.push_back(0);deform->validate(source.painted->mesh());std::shared_ptr<const SourceNormalPreparation> next_recipe;if(recipe){auto prepared=std::make_shared<SourceNormalPreparation>(*recipe);prepared->target_frames=node->frames_;prepared->key_derivation=node;next_recipe=std::move(prepared);}
-  auto next_binding=std::make_shared<SourceMaterialBindings>(*binding);next_binding->normal_frames=node->frames_;next_binding->normal_preparation=next_recipe;next_binding->key_derivation=node;next_binding->validate();normal_frame_current_authority(*next_binding,source.painted->mesh(),deform.get(),cancelled);
+  auto next_binding=std::make_shared<SourceMaterialBindings>(*binding);next_binding->normal_frames=node->frames_;next_binding->normal_preparation=next_recipe;next_binding->key_derivation=node;seal_native_paint_frames(*next_binding,cancelled);next_binding->validate();normal_frame_current_authority(*next_binding,source.painted->mesh(),deform.get(),cancelled);
   Scene next=scene;auto &output=next.object(object);output.material_bindings=next_binding;output.deformation=deform;if(!reuse)output.shape_source=capture_polygon_origin(scene,object);next.validate();stop(cancelled);scene=std::move(next);return{slot,true};
 }
 } // namespace dome::detail

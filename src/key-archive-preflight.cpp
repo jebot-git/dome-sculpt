@@ -2,6 +2,7 @@
 #include "key-archive-preflight.hpp"
 #include "normal-key-derivation.hpp"
 #include "frame-position-domain.hpp"
+#include "native-paint-frame-source.hpp"
 #include "dome/color-paint-sampling.hpp"
 #include "dome/polygon-scene.hpp"
 #include <set>
@@ -27,6 +28,7 @@ class Prospect {
   std::set<NormalKey> normals_,normal_path_;
   std::set<const SourceColorPreparation*> colors_,color_path_;
   std::set<const SourceUvOrigin*> uv_origins_;
+  std::set<std::pair<const NativePaintFrameSource*,bool>> native_frames_;
   std::set<const SourceKeyDerivation*> keys_,key_path_;
   std::set<const PolygonOrigin*> origins_,origin_path_;
   std::set<const PolygonAuthority*> authorities_,authority_path_;
@@ -91,6 +93,8 @@ class Prospect {
     size_t h=0;auto take=[&](const std::shared_ptr<const SourceMaterialBindings>&b,size_t plus=0){if(b)h=std::max(h,plus+key_heights_.at({b.get(),false}));};
     if(p.color_preparation){const auto &c=*p.color_preparation;take(c.original_material);if(c.uv_reprojection)take(c.uv_reprojection->before_material);if(c.paint_sampling)take(c.paint_sampling->before_material());}
     if(p.normal_preparation){const auto &n=*p.normal_preparation;take(n.original_material);if(n.uv_reprojection)take(n.uv_reprojection->before_material);if(n.sampling_domain){take(n.sampling_domain->before_material);take(n.sampling_domain->sampling_material);}}
+    if(p.native_paint_sampling)take(p.native_paint_sampling->before_material());
+    if(p.native_paint_frames)take(p.native_paint_frames->before_material());
     if(future)take(plan_.reused_anchor?plan_.reused_anchor->before_material():current_.material_bindings,1);else if(p.key_derivation)take(p.key_derivation->before_material(),1);
     return h;
   }
@@ -105,6 +109,11 @@ public:
     // Reserve before following edges; the path check still precedes completed
     // hits, so this bounded per-call visitation never certifies a cycle.
     materials_.insert(id);uv(p->uv_origin);color(p->color_preparation);normal(p->normal_preparation,future);
+    if(p->native_paint_sampling)material(p->native_paint_sampling->before_material());
+    if(const auto &capture=p->native_paint_frames;capture){
+      if(native_frames_.insert({capture.get(),future}).second){if(native_frames_.size()>128)throw std::length_error("Prospective native normal captures exceed owning source count before allocation");frame_bytes(future?65536:capture->metadata_bytes());}
+      frame(capture->base_frames());material(capture->before_material());
+    }
     if(future){
       const auto *anchor=plan_.reused_anchor;
       deform(anchor?anchor->before_deformation():current_.deformation);
