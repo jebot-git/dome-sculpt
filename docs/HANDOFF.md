@@ -3,8 +3,10 @@
 This private candidate combines main `c55dc2f` (polygon + transactional
 retopology worker) with qualified opt-in weights `1e6d76d`. Automatic0 remains
 the default. All legacy methods, resource/quality limits and unsupported complex
-37/38 owner guards remain intact. This source is not yet a qualified merged
-application or main admission.
+37/38 owner guards remain intact. The second bounded Release component phase now passes surface25, legacy38,
+combined affine polygon/retopology248 and worker251-prefix/4,308 checks, with
+actual polygon payload/default parity. See [the R2 receipt](validation/MODE5-MAIN-POLY-INITIAL-R.json).
+This source is not yet a qualified merged application or main admission.
 
 The initial merged Release proof on `8f43cae` covered the earlier `9dd63f9`
 retopology baseline only. Its 25 surface-heat checks, 38 legacy skin checks and
