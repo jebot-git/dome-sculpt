@@ -94,9 +94,9 @@ struct Bounds {
     add(b.hi);
   }
   double distance2(Vec3 p) const {
-    double x = std::max({double(lo.x - p.x), 0., double(p.x - hi.x)}),
-           y = std::max({double(lo.y - p.y), 0., double(p.y - hi.y)}),
-           z = std::max({double(lo.z - p.z), 0., double(p.z - hi.z)});
+    double x = std::max({double(lo.x) - p.x, 0., double(p.x) - hi.x}),
+           y = std::max({double(lo.y) - p.y, 0., double(p.y) - hi.y}),
+           z = std::max({double(lo.z) - p.z, 0., double(p.z) - hi.z});
     return x * x + y * y + z * z;
   }
   bool ray(Vec3 p, Vec3 d) const {
@@ -153,51 +153,61 @@ struct SurfaceRay {
     return true;
   }
 };
-// Region classification adapted from Blender's pinned
-// closest_on_tri_to_point_v3 (math_geom.cc.reference1045..1178), itself adapted
-// from Ericson's RTCD.
-Vec3 closest(Vec3 p, Vec3 a, Vec3 b, Vec3 c) {
-  Vec3 ab = b - a, ac = c - a, ap = p - a;
-  double d1 = dot(ab, ap), d2 = dot(ac, ap);
-  if (d1 <= 0 && d2 <= 0)
-    return a;
-  Vec3 bp = p - b;
-  double d3 = dot(ab, bp), d4 = dot(ac, bp);
-  if (d3 >= 0 && d4 <= d3)
-    return b;
-  double vc = d1 * d4 - d3 * d2;
-  if (vc <= 0 && d1 >= 0 && d3 <= 0)
-    return a + ab * float(d1 / (d1 - d3));
-  Vec3 cp = p - c;
-  double d5 = dot(ab, cp), d6 = dot(ac, cp);
-  if (d6 >= 0 && d5 <= d6)
-    return c;
-  double vb = d5 * d2 - d1 * d6;
-  if (vb <= 0 && d2 >= 0 && d6 <= 0)
-    return a + ac * float(d2 / (d2 - d6));
-  double va = d3 * d6 - d5 * d4;
-  if (va <= 0 && d4 - d3 >= 0 && d5 - d6 >= 0)
-    return b + (c - b) * float((d4 - d3) / ((d4 - d3) + (d5 - d6)));
-  double denom = 1 / (va + vb + vc);
-  return a + ab * float(vb * denom) + ac * float(vc * denom);
+using PrecisePoint = std::array<double, 3>;
+PrecisePoint difference(Vec3 a, Vec3 b) {
+  return {double(a.x)-b.x, double(a.y)-b.y, double(a.z)-b.z};
 }
-std::array<float,3> closest_coordinates(Vec3 position,Vec3 a,Vec3 b,Vec3 c){
-  auto ab = b - a, ac = c - a, ap = position - a;
-  auto dp = [](Vec3 x, Vec3 y) {
-    return double(x.x) * y.x + double(x.y) * y.y + double(x.z) * y.z;
+double precise_dot(const PrecisePoint &a, const PrecisePoint &b) {
+  return a[0]*b[0]+a[1]*b[1]+a[2]*b[2];
+}
+PrecisePoint precise_cross(const PrecisePoint &a, const PrecisePoint &b) {
+  return {a[1]*b[2]-a[2]*b[1], a[2]*b[0]-a[0]*b[2],
+          a[0]*b[1]-a[1]*b[0]};
+}
+struct ClosestPoint {
+  Vec3 position;
+  std::array<float,3> bary;
+  double distance2, planar_distance2;
+};
+// Project onto the plane, then test its interior or the three closed segments.
+// Cross products avoid the cancellation in |AB|²|AC|²-(AB.AC)² for valid thin
+// faces. Keep the actual barycentrics: recovering them from the rounded output
+// point can lose a seam side or collapse an interior hit onto an edge.
+ClosestPoint closest(Vec3 p, Vec3 a, Vec3 b, Vec3 c) {
+  const auto ab=difference(b,a), ac=difference(c,a), ap=difference(p,a);
+  const auto n=precise_cross(ab,ac);
+  const double area2=precise_dot(n,n);
+  if(!(area2>0))throw std::runtime_error("Degenerate closest triangle");
+  const double plane_factor=precise_dot(ap,n)/area2;
+  PrecisePoint projection;
+  for(size_t k=0;k<3;++k)projection[k]=ap[k]-n[k]*plane_factor;
+  auto candidate=[&](const std::array<double,3> &bary) {
+    PrecisePoint q,delta,planar_delta;
+    for(size_t k=0;k<3;++k) {
+      q[k]=ab[k]*bary[1]+ac[k]*bary[2];
+      delta[k]=ap[k]-q[k];
+      planar_delta[k]=projection[k]-q[k];
+    }
+    return ClosestPoint{{float(double(a.x)+q[0]),float(double(a.y)+q[1]),float(double(a.z)+q[2])},
+      {float(bary[0]),float(bary[1]),float(bary[2])},precise_dot(delta,delta),precise_dot(planar_delta,planar_delta)};
   };
-  double aa = dp(ab, ab), cc = dp(ac, ac), xy = dp(ab, ac),
-         denom = aa * cc - xy * xy;
-  if (denom <= 0)
-    throw std::runtime_error("Ill-conditioned closest triangle");
-  double v = (cc * dp(ap, ab) - xy * dp(ap, ac)) / denom,
-         w = (aa * dp(ap, ac) - xy * dp(ap, ab)) / denom;
-  std::array<float, 3> bary = {float(std::max(0., 1 - v - w)),
-                               float(std::max(0., v)), float(std::max(0., w))};
-  float sum = bary[0] + bary[1] + bary[2];
-  for (auto &f : bary)
-    f /= sum;
-  return bary;
+  const double v=precise_dot(precise_cross(ap,ac),n)/area2;
+  const double w=precise_dot(precise_cross(ab,ap),n)/area2;
+  const double u=1-v-w;
+  if(u>=0&&v>=0&&w>=0)return candidate({u,v,w});
+  const std::array<Vec3,3> vertices{a,b,c};
+  ClosestPoint best{{},{},INFINITY,INFINITY};
+  for(size_t i=0;i<3;++i) {
+    const size_t j=(i+1)%3;
+    const auto edge=difference(vertices[j],vertices[i]);
+    const double t=std::clamp(precise_dot(difference(p,vertices[i]),edge)/precise_dot(edge,edge),0.,1.);
+    std::array<double,3> bary{};bary[i]=1-t;bary[j]=t;
+    const auto hit=candidate(bary);
+    // Every edge shares the same plane-normal distance. Comparing totals can
+    // round distinct tiny in-plane distances to a tie for an off-plane query.
+    if(hit.planar_distance2<best.planar_distance2)best=hit;
+  }
+  return best;
 }
 struct Bvh {
   const Mesh &m;
@@ -262,8 +272,7 @@ struct Bvh {
       for (size_t i = node.start; i < node.start + node.count; i++) {
         auto t = order[i];
         auto q = closest(p, point(t, 0), point(t, 1), point(t, 2));
-        auto d = p - q;
-        best = std::min(best, double(dot(d, d)));
+        best = std::min(best, q.distance2);
       }
       return best;
     }
@@ -274,7 +283,8 @@ struct Bvh {
     return nearest(p, b, best);
   }
   double closest_hit(Vec3 p, int n, double best, uint32_t &triangle,
-                     Vec3 &position, const SurfaceQueryOptions &options,
+                     Vec3 &position, std::array<float,3> &bary,
+                     const SurfaceQueryOptions &options,
                      size_t &visited) const {
     cancel(options.cancelled);
     auto &node = nodes[n];
@@ -289,13 +299,13 @@ struct Bvh {
         if (options.triangle_filter && !options.triangle_filter(t))
           continue;
         auto q = closest(p, point(t, 0), point(t, 1), point(t, 2));
-        auto d = p - q;
-        double distance = dot(d, d);
+        const double distance = q.distance2;
         if (distance < best) {
-          if(options.closest_filter&&!options.closest_filter(t,closest_coordinates(q,point(t,0),point(t,1),point(t,2))))continue;
+          if(options.closest_filter&&!options.closest_filter(t,q.bary))continue;
           best = distance;
           triangle = t;
-          position = q;
+          position = q.position;
+          bary = q.bary;
         }
       }
       return best;
@@ -303,8 +313,8 @@ struct Bvh {
     int a = node.left, b = node.right;
     if (nodes[a].box.distance2(p) > nodes[b].box.distance2(p))
       std::swap(a, b);
-    best = closest_hit(p, a, best, triangle, position, options, visited);
-    return closest_hit(p, b, best, triangle, position, options, visited);
+    best = closest_hit(p, a, best, triangle, position, bary, options, visited);
+    return closest_hit(p, b, best, triangle, position, bary, options, visited);
   }
   void ray_hit(Vec3 p, Vec3 d, const SurfaceRay &ray, int n, double &best, uint32_t &triangle,
                std::array<float, 3> &bary, const SurfaceQueryOptions &options, size_t &visited) const {
@@ -435,15 +445,13 @@ std::optional<SurfaceHit> SurfaceQuery::nearest(Vec3 p,const SurfaceQueryOptions
   if(std::isnan(options.closest_maximum)||options.closest_maximum<=0)throw std::invalid_argument("Invalid closest surface range");
   uint32_t triangle = UINT32_MAX;
   Vec3 position;
+  std::array<float,3> bary{};
   size_t visited = 0;
-  const double maximum=std::nextafter(double(options.closest_maximum*options.closest_maximum),INFINITY);
+  const double maximum=std::nextafter(double(options.closest_maximum)*options.closest_maximum,INFINITY);
   double d2 = impl_->tree.closest_hit(p, 0, maximum, triangle, position,
-                                      options, visited);
+                                      bary, options, visited);
   if (triangle == UINT32_MAX)
     return {};
-  auto a = impl_->tree.point(triangle, 0), b = impl_->tree.point(triangle, 1),
-       c = impl_->tree.point(triangle, 2);
-  auto bary=closest_coordinates(position,a,b,c);
   cancel(options.cancelled);
   return impl_->hit(triangle, position, bary, float(std::sqrt(d2)));
 }

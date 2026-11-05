@@ -12,7 +12,7 @@ meanings and reject unsupported capabilities explicitly.
 | 37: canonical writable-paint ownership | Private owning37 source, currently `bf9e6f3`; earlier fresh Release evidence is exact `c6e6cd5` | Material19; see `OWNING37-CURRENT-MAIN-COMPOSITION.md` in that branch |
 | 38: anchored field and derived POSITION prototype | Existing source-only `4ee2902` continuation; not admitted | Material20, FrameSet3, Paint5/domain2 and conditional color5. Its reader/writer and full owning workflow remain unfinished. |
 | 39: polygon surface transfer | Reserved for the current normal/paint polygon conversion implementation in `work/owning37-main-9dd` | Material21, Paint6/domain3 if the actual representation needs them; finalize the typed definitions before enabling a codec. |
-| 40: same-mesh texture sets | Reserved for the texture-set implementation; not an object-picker alias | Nested material/paint versions must be allocated explicitly if new semantics require them. Do not reuse the reservations above. |
+| 40: same-mesh texture sets | Reserved for the texture-set implementation; not an object-picker alias | Paint7 for an actual membership envelope; Material22 if a new material envelope is needed. Existing nested records keep their own meanings. |
 
 The existing FrameSet3 prototype only authorizes its stated baseline-expansion
 semantics. It does not by itself authenticate changed polygon topology, pose,

@@ -1189,7 +1189,7 @@ if(BUILD_TESTING)
 endif()
 
 if(BUILD_TESTING)
-  foreach(component import-skin authored-bind import-authoring mesh-import mesh-processing document-recovery document-assets voxel-authoring deformation retopo remesh bake baked-textures bake-workflow bake-controls groups humanoid-creator projection source-maps vroid-creator creator-archive source-uv composite-cache mtoon vroid-groom vrm weight-edit uv-solve source-morph material-visibility)
+  foreach(component import-skin authored-bind import-authoring mesh-import mesh-processing surface-query-oblique document-recovery document-assets voxel-authoring deformation retopo remesh bake baked-textures bake-workflow bake-controls groups humanoid-creator projection source-maps vroid-creator creator-archive source-uv composite-cache mtoon vroid-groom vrm weight-edit uv-solve source-morph material-visibility)
     add_executable(dome-sculpt-${component}-test tests/${component}.cpp)
     target_link_libraries(dome-sculpt-${component}-test PRIVATE dome-sculpt-core)
     if(component STREQUAL "authored-bind")
