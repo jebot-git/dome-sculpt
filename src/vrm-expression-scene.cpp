@@ -5,6 +5,7 @@
 #include "source-paint-parameters.hpp"
 #include "import-texture-transform.hpp"
 #include "vrm-painted.hpp"
+#include "vrm1-normal-authority.hpp"
 #include <set>
 #include <limits>
 namespace dome {
@@ -126,8 +127,7 @@ Scene bake_vrm1_expression_pose(const Scene &baseline,uint64_t object,
   parameters.outline_color=vector(color(array(parameters.outline_color),evaluated.colors,material,"outlineColor"));
   edited->native_reference.color=entry.material.color;edited->native_reference.emission=entry.material.emissive;
   if(textures){
-   if(binding->roles[size_t(MToonSlot::Normal)].image)
-    throw std::invalid_argument("Static VRM1 normal-texture expressions require exact tangent-frame transport");
+   if(binding->roles[size_t(MToonSlot::Normal)].image)detail::require_vrm1_authored_normal_frame(entry,cancelled);
    if(!entry.painted->source_sampling_prepared())throw std::invalid_argument("Static VRM1 UV authoring requires a genuine independent source paint owner");
    for(size_t slot=0;slot<edited->material.textures.size();++slot){if(slot==size_t(MToonSlot::Matcap))continue;auto &texture=edited->material.textures[slot];
     const auto initial=texture;double w=0;std::array<double,2> scale{},offset{};
@@ -138,7 +138,7 @@ Scene bake_vrm1_expression_pose(const Scene &baseline,uint64_t object,
    const auto &raw=owner->model->asset->materials.at(size_t(a.source_material)+1);
    const std::array<float,5> rotation{raw.color_transform.rotation,raw.metal_rough_transform.rotation,raw.emissive_transform.rotation,raw.normal_transform.rotation,raw.occlusion_transform.rotation};
    const std::array<const PaintSourceTexture*,5> views{&maps->color,&maps->metal_rough,&maps->emission,&maps->normal,&maps->occlusion};
-   if(maps->normal.image)throw std::invalid_argument("Static VRM1 PBR normal-texture expressions require exact tangent-frame transport");
+   if(maps->normal.image&&!binding->roles[size_t(MToonSlot::Normal)].image)throw std::invalid_argument("Static VRM1 PBR normal-texture expressions require their actual typed frame owner");
    std::array<std::array<float,6>,5> transforms;for(size_t k=0;k<5;++k)transforms[k]=views[k]->image?uv(views[k]->uv_transform,rotation[k],evaluated.textures,material):views[k]->uv_transform;
    SourcePaintOptions options;options.cancelled=cancelled;current.painted=detail::rebind_source_paint_transforms(*entry.painted,transforms,options);
   }
