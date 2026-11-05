@@ -37,14 +37,25 @@ public canonical owner and private physical-image owner, so all users rebuild
 together. InitialSAN stops on a private cgltf test include; ReleaseALL is then
 explicitly interrupted for that confirmed error. After that boundary, corrected
 includes and visible-chooser observer continue the same owning objects asf95c87d;
-production/header/C++ test bytes stay exact541. The actual native FLOAT fixture
-target compiles in both profiles. Remaining builds, self-contained UV/Save/
-package4 and complete160 selected gates are live, not passed.798registered is
-not a full runtime result;37 and physical4 remain outside main.
+production/header/C++ test bytes stay exact541. Whole Release ALL and owning
+sanitizer builds now complete. Their first20 gate passes11, then correctly
+refuses a hidden-active-layer stroke in the new fixture; eight dependents do not
+run. The original exit8 results remain. Test-only14c3 uses real Paint/Add layer
+before its native FLOAT gesture; that complete producer and all nine previously
+dependent pipeline tests now pass per profile. Together20 actual first-stage
+tests pass per profile on product-exact541 support, with no fixture guard lifted.
+Currentf36570c also passes actual whole-app ordinary package4/Open/Save GUI12normal
++12compact/profile and scoped Arc1506 with six software controls. The initial Arc
+manifest omits one native36 input; a separate protected same-binary115 follow-up
+closes that input scope. Remaining140 selected regressions are live, not passed.
+798registered is not a full runtime result;37 and physical4 remain outside main.
 
-Automatic weights remain experimental: stronger local head/toe and affine seed
-controls still fail, so no new automatic default is admitted. A source-owned
-Normal adapter is independently qualifying. Full regression, remaining authoring/
+Automatic weights remain experimental. Source-aware heat/role helpers now pass
+874 original+local avatar comparisons, but general closed-affine/edited domains
+and actual native publication/default integration remain open. Default weights
+are unchanged. Normal milestone6826452 is sealed separately with real worker,
+Apply/history, factory, independent and hardware proof; it is not yet integrated
+with the current source/paint37 cohort. Full regression, remaining authoring/
 interoperability, physical devices and accelerator evidence remain required.
 Older full689 failures remain preserved; converter-consumer migration is in the
 separate37 candidate. Accepted XR selection remains; controller drawers follow
