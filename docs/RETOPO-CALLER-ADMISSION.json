@@ -505,5 +505,129 @@
     "stream_verified_before_unlink": true,
     "actual_original_path_restore_control": true,
     "reclaimed_allocated_bytes": 273264640
+  },
+  "authority_followup": {
+    "classification": "Four complete current-mode5 product TUs and exact focused consumer; not final SAN/app/XR admission",
+    "previous_qualified_native_source": "9316b9a149b75f3a070c719628e59d3d8670f7c7",
+    "current_parent": "e5ab51e",
+    "old_counters": {
+      "status": "/home/blux/de-xr/dome-sculpt/artifacts/retopo-caller-9dd/artifacts/caller-proof/authority-counter-v2/status.json",
+      "sha256": "42cb89a65f3e66f4847ed261db60af5c121fa817e4e57c16ddb76711ab431b7e",
+      "state": "terminal",
+      "exit": 0,
+      "seconds": 4.707458237011451,
+      "drift": [],
+      "steps": [
+        {
+          "name": "compile",
+          "exit": 0
+        },
+        {
+          "name": "link",
+          "exit": 0
+        },
+        {
+          "name": "grab",
+          "exit": 1
+        },
+        {
+          "name": "focus",
+          "exit": 1
+        }
+      ],
+      "logs": {
+        "/home/blux/de-xr/dome-sculpt/artifacts/retopo-caller-9dd/artifacts/caller-proof/authority-counter-v2/grab.log": "309c6c36c446167288fec7032a07921b8249d0fe5ce9e61690e03cacc64dcd08",
+        "/home/blux/de-xr/dome-sculpt/artifacts/retopo-caller-9dd/artifacts/caller-proof/authority-counter-v2/focus.log": "04caf1c798cf3497fc08cfcf1ad5a1d059eaecfc6f4f2c4e29109b8123c59f68"
+      }
+    },
+    "fixed": {
+      "status": "/home/blux/de-xr/dome-sculpt/artifacts/retopo-caller-9dd/artifacts/caller-proof/authority-fixed-r/status.json",
+      "sha256": "71f6721d4af9ea9472f63b77af2a6ccaa9b6b5b7fa4872c4ba024dc832a1274e",
+      "state": "terminal",
+      "exit": 0,
+      "seconds": 41.43562165199546,
+      "drift": [],
+      "steps": [
+        {
+          "name": "compile-document.cpp",
+          "exit": 0
+        },
+        {
+          "name": "compile-document-retopo.cpp",
+          "exit": 0
+        },
+        {
+          "name": "compile-document-worker-errors.cpp",
+          "exit": 0
+        },
+        {
+          "name": "compile-document-interaction.cpp",
+          "exit": 0
+        },
+        {
+          "name": "syntax-document-shapes.cpp",
+          "exit": 0
+        },
+        {
+          "name": "syntax-document-contact.cpp",
+          "exit": 0
+        },
+        {
+          "name": "syntax-document-rig-fit.cpp",
+          "exit": 0
+        },
+        {
+          "name": "syntax-document-projection.cpp",
+          "exit": 0
+        },
+        {
+          "name": "compile-counter",
+          "exit": 0
+        },
+        {
+          "name": "link",
+          "exit": 0
+        },
+        {
+          "name": "grab",
+          "exit": 0
+        },
+        {
+          "name": "focus",
+          "exit": 0
+        }
+      ],
+      "logs": {
+        "/home/blux/de-xr/dome-sculpt/artifacts/retopo-caller-9dd/artifacts/caller-proof/authority-fixed-r/grab.log": "de3925abcf91709c0c2a5fcbab9a3b64a62cb22c0fa43d2d313becdc0a2ae4fa",
+        "/home/blux/de-xr/dome-sculpt/artifacts/retopo-caller-9dd/artifacts/caller-proof/authority-fixed-r/focus.log": "f6f575a39e5e14281b5cb84d11ecbb612b7fa6d3b7794353ebdd5060b100f56e"
+      },
+      "grab_checks": 31,
+      "focus_checks": 55,
+      "allocated_bytes": 450932736,
+      "free_bytes": 24484442112
+    },
+    "source_hashes": {
+      "include/dome/document.hpp": "bcee0d52b8bff92b7b89b500bbbf5a8f9d3b6604a15020ae0979200f70868c0f",
+      "src/document.cpp": "3a2d64e08ae82c2eafbf31396106320089aa0da2de95f84c3191356134cd8565",
+      "src/document-retopo.cpp": "8394eb150ffe50e7b6f70a00bcf055b24de31d1f4d05eeaa8e2dfbdbe579b021",
+      "src/document-interaction.cpp": "e64143e34f176d7f69cf811c7a6b602cd1853935dd5e3563b3a4fbdd91a99421",
+      "src/document-retopo-input.hpp": "1aa1d927f1f3173138c53b0cda1c396e34973b714e026500af4eb41098f525c4",
+      "src/spatial-history-levels.hpp": "1e46e3a0427790781d2a5dc066408aa008f5a5e5c3db4713ec97d478588b3992",
+      "src/document-contact.cpp": "68a3dde191afb72a34226832a7832e0e0d94b85ece000b5257716ef4c448ada6",
+      "src/document-projection.cpp": "54dbfad13e6d84c3833a228e4d8a02b785ea865f782ebd75f4084a99b439fab8",
+      "src/document-rig-fit.cpp": "ca802feaa504bd0b2fa301d1a55159b18e5b64be06981d79505bdd086c320f17",
+      "src/document-shapes.cpp": "2ca8fa4768711785c2af7c8a4e353acbd565aeccc72e168af3947171c407dcb3",
+      "src/xr.cpp": "29fd71193571d09bf2f90555b99b040f8796a28281ed4d9ba2d02b6fa918d0bd"
+    },
+    "pending": [
+      "Final source full native allocation/worker/legacy cohorts",
+      "Actual XR level/focus/rebase runtime path",
+      "Matching ordinary app normal/compact/loader",
+      "Current helper/handler whole compilation beyond four core TUs",
+      "Generated CTest execution"
+    ],
+    "registered_consumer_sha256": "a3c3107d7423df14418a5bad76db1c3d8f38a6ed3630b86bba62e12f538f9764",
+    "tested_consumer_sha256": "a3c3107d7423df14418a5bad76db1c3d8f38a6ed3630b86bba62e12f538f9764",
+    "same_consumer_bytes": true
   }
 }

@@ -46,6 +46,7 @@
 #include "geometry-identity.hpp"
 #include "document-transaction.hpp"
 #include "document-retopo-input.hpp"
+#include "spatial-history-levels.hpp"
 #include <unistd.h>
 #include <utility>
 #include <numeric>
@@ -1324,7 +1325,7 @@ void Document::prepare_locked(uint32_t resolution) {
 }
 void Document::begin_spatial() {
   std::lock_guard lock(model_mutex_);
-  RetopoInputScope admission(*this,bool(state_.retopology)||input_.menu_page()==16);
+  RetopoInputScope admission(*this,bool(state_.retopology)||(input_.menu_open()&&input_.menu_page()==16));
   rebase_space_locked({},admission);
   state_.error.clear();publish_locked();admission.commit();
   // There is no fallible second publication after accepting the rebase or
@@ -1333,7 +1334,7 @@ void Document::begin_spatial() {
 }
 void Document::rebase_space(std::optional<CanvasTransform> old_from_new) {
   std::lock_guard lock(model_mutex_);
-  RetopoInputScope admission(*this,bool(state_.retopology)||input_.menu_page()==16);
+  RetopoInputScope admission(*this,bool(state_.retopology)||(input_.menu_open()&&input_.menu_page()==16));
   rebase_space_locked(old_from_new,admission);publish_locked();admission.commit();
 }
 void Document::rebase_space_locked(std::optional<CanvasTransform> old_from_new,RetopoInputScope &admission) {
@@ -1345,7 +1346,7 @@ void Document::rebase_space_locked(std::optional<CanvasTransform> old_from_new,R
     if (accepted_uv) input_.take_controls();
   }
   navigation_.reset();object_navigation_.reset();
-  state_.hands = {};
+  state_.hands = detail::history_only_hands(state_.hands);
   ++state_.input_epoch;
   if(admission.active())admission.retire_inputs();
   else {
@@ -1370,7 +1371,7 @@ void Document::finish_spatial() {
   if (!wait_input())
     throw std::runtime_error("Spatial edit worker did not finish");
   std::lock_guard lock(model_mutex_);
-  RetopoInputScope admission(*this,bool(state_.retopology)||input_.menu_page()==16);
+  RetopoInputScope admission(*this,bool(state_.retopology)||(input_.menu_open()&&input_.menu_page()==16));
   if (!desktop_) {
     if(state_.expressions)end_expression_preview_locked(false);
     bool accepted_uv = uv_accept_pending_;
@@ -1401,10 +1402,10 @@ void Document::process_locked(const SpatialFrame &incoming) {
   if (!f.focused || !f.head_valid || !ob::finite(f.head) ||
       !std::isfinite(f.time) || f.time < 0) {
     if(held_polygon_pending_locked()){
-      input_.cancel();object_navigation_.reset();navigation_.reset();state_.hands={};publish_locked(false,false);return;
+      input_.cancel();object_navigation_.reset();navigation_.reset();state_.hands=detail::history_only_hands(state_.hands);publish_locked(false,false);return;
     }
     if(state_.object_grabbing&&held_weight_pending_locked()){
-      input_.cancel();held_preview_transform_=held_start_transform_;object_navigation_.reset();navigation_.reset();state_.hands={};publish_locked(false,false);return;
+      input_.cancel();held_preview_transform_=held_start_transform_;object_navigation_.reset();navigation_.reset();state_.hands=detail::history_only_hands(state_.hands);publish_locked(false,false);return;
     }
     if(state_.expressions)end_expression_preview_locked(false);
     bool accepted_uv = uv_accept_pending_;
@@ -1413,7 +1414,7 @@ void Document::process_locked(const SpatialFrame &incoming) {
     if (accepted_uv) input_.take_controls();
     if(state_.held_object||state_.object_grabbing){invalidate_object_authority_locked();state_.held_object=0;}
     navigation_.reset();
-    state_.hands = {};state_.selection_hover={};state_.hierarchy_hover={-1,-1};
+    state_.hands = detail::history_only_hands(state_.hands);state_.selection_hover={};state_.hierarchy_hover={-1,-1};
     state_.selection_pressed={true,true};state_.selection_release={true,true};
     publish_locked();
     return;
@@ -1431,7 +1432,14 @@ void Document::process_locked(const SpatialFrame &incoming) {
     state_.hands=f.hands;publish_locked(false,false);return;
   }
   std::array<TrackedHand, 2> hands{f.hands[0].tracked, f.hands[1].tracked};
-  if(!state_.selection_mode&&state_.object_grab_mode && !input_.menu_open())update_object_grab_locked(f);
+  if(!state_.selection_mode&&state_.object_grab_mode && !input_.menu_open()) {
+    const auto session=retopo_session_.load();
+    update_object_grab_locked(f);
+    // A real authority publication already consumed this frame and retired
+    // its old tool. Do not add a second fallible publication or reinterpret
+    // the same physical event in the new namespace.
+    if(retopo_session_.load()!=session)return;
+  }
   if (!state_.selection_mode && !state_.object_grab_mode && !input_.menu_open()) {
     if (auto transform = navigation_.update(hands, state_.canvas)) {
       if (action_active_locked())
@@ -1586,7 +1594,7 @@ void Document::process_locked(const SpatialFrame &incoming) {
 }
 void Document::cancel_spatial_menu() {
   std::lock_guard lock(model_mutex_);
-  RetopoInputScope admission(*this,bool(state_.retopology)||input_.menu_page()==16);
+  RetopoInputScope admission(*this,bool(state_.retopology)||(input_.menu_open()&&input_.menu_page()==16));
   finish_control_locked(false);
   if (!desktop_)
     input_.cancel();
@@ -1616,7 +1624,8 @@ void Document::input_loop() {
       std::lock_guard lock(model_mutex_);
       try {
         RetopoInputScope admission(*this,generation==state_.input_epoch &&
-                                        (bool(state_.retopology)||input_.menu_page()==16));
+                                        (bool(state_.retopology)||(input_.menu_open()&&input_.menu_page()==16)));
+        if(!state_.retopology)admission.opening_only();
         if (generation == state_.input_epoch) {
           // Resume only after this worker has cancelled/reported its failed
           // control. Recovery is independent of long file/authoring jobs.

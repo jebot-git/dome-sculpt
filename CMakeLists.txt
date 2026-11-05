@@ -618,6 +618,17 @@ if(BUILD_TESTING)
   add_test(NAME retopology-input-admission COMMAND dome-sculpt-retopo-input-admission-test
     ${CMAKE_CURRENT_BINARY_DIR}/retopology-input-admission)
   set_tests_properties(retopology-input-admission PROPERTIES TIMEOUT 600)
+  add_executable(dome-sculpt-retopo-authority-admission-test tests/retopo-authority-admission.cpp)
+  target_link_libraries(dome-sculpt-retopo-authority-admission-test PRIVATE dome-sculpt-core)
+  target_link_options(dome-sculpt-retopo-authority-admission-test PRIVATE
+    -Wl,--wrap=_ZN4dome6unwrapERNS_4MeshEjjRKSt8functionIFbvEE
+    -Wl,--wrap=_ZN4dome12SpatialInput6updateERKNS_13SpatialSampleE
+    -Wl,--wrap=_ZN4dome8Document14publish_lockedEbb)
+  foreach(authority_case grab focus)
+    add_test(NAME retopology-authority-${authority_case} COMMAND dome-sculpt-retopo-authority-admission-test
+      ${authority_case} fixed ${CMAKE_CURRENT_BINARY_DIR}/retopology-authority-${authority_case}.dsculpt)
+    set_tests_properties(retopology-authority-${authority_case} PROPERTIES TIMEOUT 120)
+  endforeach()
   add_executable(dome-sculpt-retopo-affine-ui-fixture tests/retopo-affine-ui-fixture.cpp)
   target_link_libraries(dome-sculpt-retopo-affine-ui-fixture PRIVATE dome-sculpt-core)
   add_test(NAME retopology-affine-ui-fixture COMMAND dome-sculpt-retopo-affine-ui-fixture ${CMAKE_CURRENT_BINARY_DIR}/retopology-affine-ui.dsculpt)

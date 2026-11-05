@@ -20,16 +20,16 @@ struct Document::RetopoInputScope::State {
   CanvasNavigation navigation, object_navigation;
   std::optional<Scene> control_before;
   AssetSource source, control_source;
-  uint64_t control_object;
+  uint64_t control_object, session;
   size_t pending;
   float snap, control_snap;
   bool stroking, sampled, accepting, desktop, anchored, control_changed;
-  bool retire_inputs = false;
+  bool retire_inputs = false, opening_only = false;
   std::shared_ptr<RetopoAcceptance> admission;
   explicit State(Document &d)
       : view(d.state_), input(d.input_), navigation(d.navigation_), object_navigation(d.object_navigation_),
         control_before(d.control_before_), source(d.retopo_source_), control_source(d.control_source_),
-        control_object(d.control_object_), pending(d.retopo_pending_), snap(d.retopo_snap_mm_),
+        control_object(d.control_object_), session(d.retopo_session_.load()), pending(d.retopo_pending_), snap(d.retopo_snap_mm_),
         control_snap(d.control_retopo_mm_), stroking(d.retopo_stroking_), sampled(d.retopo_sampled_),
         accepting(d.retopo_accepting_), desktop(d.desktop_), anchored(d.anchored_),
         control_changed(d.control_changed_), admission(std::make_shared<RetopoAcceptance>()) {}
@@ -49,6 +49,9 @@ Document::RetopoInputScope::RetopoInputScope(Document &d, bool active) : d_(d) {
     d.retopo_jobs_.push_back(std::move(job));
   }
   state_ = std::move(state);
+}
+void Document::RetopoInputScope::opening_only() noexcept {
+  if(state_)state_->opening_only = true;
 }
 void Document::RetopoInputScope::retire_inputs() noexcept {
   if(state_)state_->retire_inputs = true;
@@ -82,6 +85,13 @@ Document::RetopoInputScope::~RetopoInputScope() noexcept {
     state_->admission->admission = RetopoAcceptance::Admission::Rejected;
     std::erase_if(d_.retopo_jobs_,[&](const auto &j){return j.acceptance == state_->admission;});
   }
+  // A permission/source transition deliberately retires the old namespace.
+  // Its own authority transaction owns selection/held-pose rollback. Restoring
+  // this pre-frame tool view would resurrect a session whose worker was retired.
+  if(d_.retopo_session_.load()!=state_->session ||
+     (state_->opening_only&&!state_->admission->opening)) {
+    d_.retopo_changed_.notify_all();return;
+  }
   static_assert(std::is_nothrow_move_assignable_v<EditorState>);
   static_assert(std::is_nothrow_move_assignable_v<SpatialInput>);
   static_assert(std::is_nothrow_move_assignable_v<CanvasNavigation>);
@@ -104,6 +114,12 @@ void Document::begin_retopology() {
   admission.commit();
 }
 void Document::begin_retopology_locked() {
+  {
+    std::lock_guard lock(retopo_mutex_);
+    if(!retopo_jobs_.empty()&&retopo_jobs_.back().acceptance&&
+       retopo_jobs_.back().acceptance->input_batch)
+      retopo_jobs_.back().acceptance->opening=true;
+  }
   auto &o = scene_.active();
   if (state_.retopology || state_.asset_busy || state_.recovery_busy || control_before_ ||
       action_active_locked() || !object_editable_locked(o.id) || scene_.objects().size() >= 256)

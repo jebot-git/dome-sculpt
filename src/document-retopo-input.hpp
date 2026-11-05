@@ -15,5 +15,6 @@ public:
   void commit() noexcept;
   bool active() const noexcept { return bool(state_); }
   void retire_inputs() noexcept;
+  void opening_only() noexcept;
 };
 }

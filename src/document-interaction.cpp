@@ -133,6 +133,10 @@ void Document::update_object_grab_locked(const SpatialFrame &frame){
       for(const auto&r:snapshot->ranges)if(corner>=r.first&&corner-r.first<r.count){target=r.object;break;}
       if(!target)return;
     }
+    // Edge detection above used the previous hands. The accepted authority
+    // publication must carry this frame's current levels/pose, including modal
+    // history consumption if the retopology namespace is retired.
+    state_.hands=frame.hands;
     if(!begin_object_grab_locked(target))return;
   }
   const auto navigation=object_navigation_;

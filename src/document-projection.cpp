@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/document.hpp"
+#include "spatial-history-levels.hpp"
 #include "document-transaction.hpp"
 #include "text-utf8.hpp"
 #include <cstdlib>
@@ -190,7 +191,7 @@ bool Document::process_projection_spatial_locked(const SpatialFrame &f){
     if(valid){input_.retain_page(25,uint32_t(hand+1),7);state_.panel={h.tracked.grip.position,f.head.orientation,1};state_.panel.position=state_.panel.position+ob::rotate(f.head.orientation,{0,.08f,-.18f});}
     else input_.cancel();
   }
-  state_.hands=valid?f.hands:std::array<SpatialHand,2>{};
+  state_.hands=valid?f.hands:detail::history_only_hands(state_.hands);
   state_.projection=std::move(next);publish_locked(false,false);transaction.commit(false);return true;
 }
 } // namespace dome

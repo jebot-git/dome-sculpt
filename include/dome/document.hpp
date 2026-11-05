@@ -32,7 +32,10 @@ namespace dome {
 class MaterialSurfaceQuery;
 struct SpatialHand {
   TrackedHand tracked;
-  bool joystick = false, undo = false, redo = false;
+  bool joystick = false;
+  // Current button levels. Document owns press edges and modal consumption;
+  // providers must not pre-filter these with changedSinceLastSync.
+  bool undo = false, redo = false;
   float x = 0, y = 0;
   DeviceKind kind = DeviceKind::Controller;
 };
@@ -601,7 +604,7 @@ private:
     bool ready = false;
     // A pending batch stays in the deque until its caller publishes. No
     // accepted payload is coalesced or otherwise modified by a later caller.
-    bool input_batch = false, counted = false, cancel_workspace = false;
+    bool input_batch = false, counted = false, cancel_workspace = false, opening = false;
     std::optional<uint64_t> next_session;
     std::vector<RetopoStep> steps;
     std::shared_ptr<AssetWork> cancel_work;
