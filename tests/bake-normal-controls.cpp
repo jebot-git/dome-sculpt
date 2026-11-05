@@ -14,7 +14,10 @@ int main()try{
   hand.sector(9);hand.point(100,350);hand.f.focused=false;hand.send();
   check(document.frame().state->controls.parameter==VrParameter::None&&document.frame().state->bake_settings.prepare_normals&&document.copy_scene().encode()==original,"Controller focus loss discards only the unconfirmed normal policy");
   document.bake_from_object(fixture.full,settings);ready(document);check(document.frame().state->error.empty()&&document.copy_scene().active().material_bindings->normal_preparation&&document.copy_scene().active().painted->baked()->normal_interpretation==BakedNormalInterpretation::PreparedAttributes,"Actual accepted controller normal choices feed native preparation and same-hit dual normal bake");
-  check(document.frame().state->message.find("normal attributes prepared")!=std::string::npos,"Native completion reports the explicit new normal interpretation and initial measured quantization");
+  const auto message=document.frame().state->message;const std::string marker="rest quantization ";const auto at=message.find(marker);
+  check(message.find("portable normal attributes authored")!=std::string::npos&&at!=std::string::npos&&message.find(" deg)",at)!=std::string::npos,"Native completion names portable normal authoring and its rest-space quantization units");
+  const auto degrees=std::stod(message.substr(at+marker.size()));const auto measured=document.copy_scene().active().material_bindings->normal_preparation->receipt.observed_initial_error;
+  check(std::isfinite(degrees)&&std::abs(degrees-measured*57.29577951308232)<=.00051,"Controller completion displays the actual persisted rest quantization within its decimal precision");
   check(document.undo()&&document.copy_scene().encode()==original&&document.redo(),"Controller-configured normal authoring and bake remain one exact reversible action");
   std::cout<<checks<<" controller normal preparation checks passed\n";return 0;
 }catch(const std::exception &e){std::cerr<<"FAIL "<<e.what()<<'\n';return 1;}

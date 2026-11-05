@@ -1,5 +1,15 @@
 # Dome Sculpt production handoff
 
+## Controller report regression — 2026-11-05
+
+The stale bake-normal-controller status assertion from the older full689 run is
+corrected and now checks the actual persisted rest-quantization number/units.
+Complete current main owning Release/sanitizer consumers each pass9 checks.
+No production/header/schema change; original test439/batch failure remains. Read
+BAKE-CONTROLLER-REPORT.md/receipt. Current coherent native36 c31 fresh ReleaseALL
+1460 tasks and owningSAN383 tasks/120selected are still running, not qualified.
+Full goal and controller drawers remain incomplete.
+
 ## Qualified PBR renderer specialization — 2026-11-05
 
 Runtime79abe8e keeps authored sampling/math unchanged while specializing actual
