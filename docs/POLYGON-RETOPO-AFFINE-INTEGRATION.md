@@ -45,3 +45,34 @@ application retains its correct software support. Actual source/binary/ELF maps
 remain unchanged, and the lease is released. Original observer/setup failures
 remain explicit. This is not main admission: published9dd worker composition and
 its current-body closure are the next required stage.
+
+
+The admitted transactional retopology worker is now composed in runtime source
+`0567c46f5068a1d20e3f35fe49f04ac2cd19710d`, based on main9dd63f9. The only
+product delta from qualified4d1eede is the complete `document-retopo.cpp` body,
+byte-identical to admitted main. Headers, polygon bodies and merged Document
+constructor/destructor remain unchanged. The matching complete qualified worker
+object replaces its predecessor in each profile; actual symbol/header/offset and
+body audits establish that it does not reference the changed Polygon payload.
+This followup is a component relink, not a fresh whole-project build.
+
+`validation/POLYGON-RETOPO-WORKER9DD.json` seals the current-body result:
+248 native checks per profile,16 byte-identical native pairs, and77 actual
+ordinary-app checks in each Release/SAN normal/compact case. Both operation
+orders, held Cancel, Apply/immediate Save, Undo/Redo and retopology-to-polygon
+full source Restore remain covered. The current ordinary Release app also
+passes the genuine posed/painted affine Apply/Restore workflows on observed
+PCI03 Arc A770. Actual llvmpipe and UHD770 correctly fail the strict hardware
+observer while the ordinary app retains software support. All functional
+stereo cases require nonblank images in both eyes and balanced frame/image
+ownership; full source Restore and fixed world positions remain exact at the
+unchanged tolerances. The GPU lease is released and all finite jobs are closed.
+
+Actual source, loaded ELF and protected input hashes remain unchanged through
+these runs. The cumulative new phase uses753,397,760 allocated bytes under its
+1GiB cap, with more than20GiB actual free. Only approved new closed passed SAN
+ELFs were reversibly archived, with full byte and metadata checks and actual
+original-path restore controls. Shared object/archive/source inputs remain
+untouched. Original failed observers are retained. This private candidate is
+ready for coordinator integration review; full-project regression, general
+paint transfer and the independent Frame38/refinement work are separate gates.
