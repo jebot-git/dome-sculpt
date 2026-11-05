@@ -1,3 +1,119 @@
+## Matching material clients and exhaustive factories closed — 2026-11-05
+
+Private component seal227c11c (runtimecodeeacfba7) now closes the same fullfactory
+handle60702 at0: fourdomains/profile,10,198checks including6,150Cpp+3,988Cancel
+points each; all2367inputs exact. Matching actualapp/inspector/preview relinks
+then pass198checks/profile:132native normal/compact menus plus66actual-loader
+syntheticXR. Actual app-only modules are pinned/mapped/hash-checked; no suppressions.
+Initial wrapper/module-observer failures remain exit1 and do not alter product
+qualification. Read MATERIAL-SHIFT-RIM-COMPOSITION.md and its new qualifiedreceipt.
+
+Main production still matches admittedc179/615. This component is pushed separately;
+837configured is not a fullruntime pass. Rootpackage SAN43091 and separate key
+cold-caller partitions are stilllive. Do not alter/restart frozen inputs after an
+observation timeout. The fullgoal stays active/incomplete. Currentmode5 passes
+source-associated quality/native/UI/fault controls but genuine no-source native19
+head/eye poses expose a default blocker; no method5/default promotion is admitted.
+The next isolated Mirror38 owning work has a12GiB coordinator reserve and must
+leave20GiB outside it, build allreachable ownconsumers freshly, and retain strict
+oldformat/typedexport guards. No mainpublic38/wire capability is admitted.
+DomeD remote341152b is reverified; locala5c444c remains preserved and canonical
+poll-final SDKs are used. No systeminstall/headsetlaunch/sessionrestart.
+
+## Release exhaustive coverage and combined material component — 2026-11-05
+
+Fullgoal active/incomplete. Release partition70713 is now CLOSED0:128partitions,
+all90,262absolute points (90,261denials+one successful endpoint), exact aggregate.
+Sanitizer43091 is still running on frozen1f9fd48; do not mutate/restart it.
+Read PHYSICAL-ALLOCATION-PARTITIONS.md/receipt. Originalf365 actual timeout stays
+separate. Palette's old key24732 is now terminal143 with unchanged2186protected
+hashes and incomplete Replace coverage, cause unestablished; its fresh-caller
+partition work is separate. Original package4 handle67604 remains live.
+
+Private Shift/Rim compositioneacfba7 passes27actualcommands/profile,1765strictArc
+checks+3software/1UHD refusal controls,737R/S exact data/PNG pairs and84containers
+0KHRerrors/684officialinstances. Only oneLayerTU, no publiclayout/shader change.
+Four full Release factory domains pass; full sanitizer60702 is live. Read
+MATERIAL-SHIFT-RIM-COMPOSITION.md/receipt; no larger/main admission yet. GPUfree.
+Mode5 actualnative136controls plusR25/S25 pass separately, currentapp/remaining
+faultstress still open. UVanimation/Mirror/newweight andfullremaining matrix,
+physicaldevices/accelerators andlater controllerdrawers remain unfinished.
+
+## Exhaustive allocation partitions and historical schema audit — 2026-11-05
+
+The full goal remains active and incomplete. Main's production code still matches
+qualified c179/615; the new historical schema utility/audit is test-only. Root
+independently repeated the declared-dialect validation on 240 unchanged files:
+957 extension instances and three negative controls pass, all 308 protected
+inputs exact. Read VRM-HISTORICAL-DIALECT-AUDIT.md. Missing/unhashed historical
+outputs remain explicitly unqualified.
+
+The test-only partition branch work/physical-oom-shards-5df is pushed at
+1f9fd48501aeba4db77eabb0e86679efad7923bf, based on private combined candidate
+5df649d. Both complete changed test consumers compile/link/measure successfully;
+28 synthetic coverage-verifier controls pass. The configured CTest graph has
+944 entries, including 128 actual partitions plus plan, verifier and aggregate;
+this is registration, not full runtime evidence. The original --oom CLI remains.
+
+Same frozen binaries measure 90,257 allocations in the initial measurement path,
+and 90,261 in the new longer partition path, three stable repeats each profile.
+This demonstrates path-sensitive allocation counts. Every partition repeats the
+full calibration and must agree with its own plan, fixture/scene/package hashes,
+profile, binary/source/dependency hashes, actual mapped ELF files and environment.
+Same-length case directories keep each plan coherent. Both final 32-point pilots
+pass (31 denials, one successful endpoint), in 0.697s Release and 7.520s sanitizer.
+128 partitions cover every absolute point in [0,90262); the tail pilot is a real
+covered partition. Native per-prefix exact rollback/recovery and the original
+early/middle/final retries remain. No timeout increase or prefix sampling.
+
+Actual Release and sanitizer exhaustive batches are now running with one native
+worker each (tool handles 70713 and 43091). Inspect their real process/handle and
+artifacts/physical-oom-shards-5df/artifacts/partition-native before changing the
+frozen tracked inputs; an observation timeout is not a terminal result. The
+aggregator must reject incomplete, overlapping, mixed-input, failed, timed-out or
+stray receipts. These ongoing runs are not yet full coverage or larger37 admission.
+The original f365 3600.04s timeout/90,259 baseline/11,750 completion marker and
+Palette's separate original long sweeps stay preserved, without success relabel.
+
+Shift c9ae484, Rim-MASK 5a6fa08, source-aware weight mode5 and mirrored before-VS
+work remain separate agent candidates. Full requirement coverage, physical-device
+and accelerator evidence and later controller drawers remain unfinished. No
+system installation, headset launch or session restart in this checkpoint.
+
+## Latest finite-job closure — 2026-11-05
+
+Main runtime remains admittedc179/615bd42; current637 adds corrected optional
+schema tooling/docs only. Private current5df649d has now passed all33 selected
+registered tests in both profiles (11real key/history/quota/repeatedUV plus22
+normal/six strictpreflight commands), actualkey GUI34normal+36compact/profile,
+and strictArc226/63views with software/UHD refusals.164-member audits change
+exactly4 expected TUs; all unchanged production objects/input hashes stay exact.
+Its source is pushed on work/authoring37-normal-f365, outside main.
+
+Original f365 sanitizer handle10303 is now AUTHORITATIVELY CLOSED8 after9302.676s,
+not live. It finishes153/160selected: original six failures plus the final package4
+allocation sweep's actual CTest3600.04s timeout. That genuine fixture measures90259
+C++ allocations and prints completion through11750 before timeout. No drift,
+no success relabel, no restart-on-observation-timeout. Complete prefix coverage
+remains required before larger37 admission. Next work must preserve that failure
+and all per-prefix source/file/recovery checks, using deterministic exhaustive
+partitions and coverage aggregation or a demonstrated performance repair rather
+than sampled prefixes or a blind time-limit increase. Palette's two original
+long sanitizer sweeps are separate and must not be disturbed. All root jobs from
+this checkpoint are closed; verify new agent state independently.
+
+## Corrected official-schema reference validation — 2026-11-05
+
+Main includes optional tests/vrm-official-texture-schemas.py with explicit pinned
+--spec and jsonschema4.26.0, declared Draft4/2020 resource dispatch and actual
+missing-index/wrong-coordinate negative controls. The old forced Draft4 recipe
+accepts those real MatCap negatives.44 unchanged files (20admittedRim/cutout,
+24privateNormal) now pass354 corrected extension instances, no schema/output
+rewrite. Read VRM-SCHEMA-DIALECT-AUDIT.md/receipt. This does not qualify unrelated
+historical reports or add a Python runtime. Runtime/header/C++tests/build/assets
+still match admitted preflightc179; only optional test tooling/docs are added.
+The original full objective remains active; newer private candidates stay separate.
+
 ## Admitted expression preflight repair — 2026-11-05
 
 Main now incorporates62ec13e/sealc17945d over qualified0b6. Only one complete

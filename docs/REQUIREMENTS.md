@@ -13,6 +13,14 @@ change only Layer. Read VRM1-EXPRESSION-PREFLIGHT.md for exact scope and retaine
 original failures. No Scene37/public canonical-owner append is admitted. FLTK
 remains the default with canonical DomeD bitmap/menu conventions.
 
+Official texture-schema validation now dispatches each pinned resource to its
+actual Draft4/2020 dialect. The old recipe demonstrably accepts missing-index
+and wrong-coordinate negatives. The same20 admitted Rim/cutout files pass168
+corrected instances;24 private Normal files pass186, with actual resolver negative
+controls and unchanged bytes. Read VRM-SCHEMA-DIALECT-AUDIT.md. This44-file scope
+does not retroactively qualify every historical official report or add runtime
+Python. Original Khronos and legacy-tool results remain preserved.
+
 The native36 ABI foundation completes Release ALL and owning sanitizer builds
 and125/125 selected tests per profile, including all four actual frame allocation/
 codec fault phases. Its actual native/Wayland/synthetic-XR workflows pass200UI
@@ -97,6 +105,61 @@ qualification are outside main. The original source-world sanitizer process now
 finishes successfully after43,388seconds, including66,187 persistent denial
 prefixes and908 cancellation points; its closure is preserved separately.
 The full objective remains active and incomplete.
+
+## Matching component-client closure — 2026-11-05
+
+Same private material runtimeeacfba7/seal227c11c closes all four factory domains
+per profile (10,198checks/6,150Cpp/3,988Cancel each) and matching actual native
+clients198/profile (132FLTK+66syntheticXR), with exact source/artifact/module
+hashes. Read MATERIAL-SHIFT-RIM-COMPOSITION.md/qualifiedJSON. Initial observation
+failures remain preserved. This does not admit larger37 or full837regression.
+Package/key sanitizer partitions stillrun; mode5 genericnative19 head/eye quality
+and allother remaining production/device/accelerator rows remain unresolved.
+
+## Latest qualification boundary — 2026-11-05
+
+The private physical-package Release sweep now closes all90,262points and its
+128-part aggregate0; full sanitizer43091 remains live. Originalf365 timeout is
+not relabeled. Read PHYSICAL-ALLOCATION-PARTITIONS.md. Separately, private
+Shift/Rim-MASK union eacfba7 passes27actual commands each profile,1765strictArc
+checks with actual software/UHD negatives,737byteexact R/S data/PNG pairs,
+84containers0KHRerrors and684declared official instances. Full Release factories
+pass; full sanitizer60702 remains live. Read MATERIAL-SHIFT-RIM-COMPOSITION.md.
+These do not admit the larger37 cohort to main or finish the production matrix.
+
+## Exhaustive allocation coverage in progress — 2026-11-05
+
+Private test-only branch1f9fd48 adds deterministic partitions for the actual
+physical-package denial loop, not sampled allocation points. Both consumers
+compile and measure successfully;28 synthetic verifier controls reject incomplete
+or mixed evidence. The configured graph is944 entries, not a full runtime pass.
+Both final32 pilots pass, including complete package recovery at the endpoint.
+The longer output path measures90,261 allocations stably in both profiles, versus
+90,257 with the same binary in the earlier path; path-dependent counts are now
+explicit. Each partition recalibrates three times and asserts its frozen plan.
+All90,262 points, exact source/prior-file/success recovery and the early/mid/final
+retry checks remain required. Actual exhaustive batches are running, one worker
+per profile; no full-coverage/admission claim yet. Originalf365 timeout evidence
+remains separate. Read the newest HANDOFF entry before changing live inputs.
+
+The optional historical VRM schema tool now handles pinned VRM0 as well as VRM1.
+240 actual unchanged files pass957 declared-dialect instances and real negative
+controls, independently repeated by root with308 exact protected hashes. Read
+VRM-HISTORICAL-DIALECT-AUDIT.md. Missing/unhashed historical paths remain outside
+that evidence. Production runtime/layout/schema/asset bytes are unchanged.
+
+## Current combined candidate closure — 2026-11-05
+
+Private5df649d now passes33/33 selected commands per Release/sanitizer, actual
+key UI70/profile andstrictArc226/63views with actualsoftware/UHD refusals. Source,
+SDK and unchangedproduction objects remain exact; core164members changeonly4
+expected TUs. Publicheaders/layouts are unchanged from the owningd6cohort. This
+is not814runtime ormainadmission. Originalf365SAN has nowclosed153/160 after
+9302.676s: its sixoriginalfailures plus the actualpackage4 allocation test's
+3600.04s timeout (baseline90259, lastcompletedprefix11750). Fullcoverage remains
+open. Deterministic exhaustive partitions with coverage aggregation must retain
+every prefix/exactsource/priorfile/recovery check; no sample or blindtimeoutraise
+counts as closing it. Original failed logs andseparateliveagent sweeps remain.
 
 ## Qualified PBR renderer specialization — 2026-11-05
 
