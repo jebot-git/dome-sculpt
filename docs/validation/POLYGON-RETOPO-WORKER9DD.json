@@ -1,0 +1,663 @@
+{
+  "status": "Qualified scoped PRIVATE polygon + admitted main9dd transactional retopology worker composition; ready for main review, not main admission",
+  "runtime_source": "0567c46f5068a1d20e3f35fe49f04ac2cd19710d",
+  "main_parent": "9dd63f90f6062b366276b4ce8192a46892de9e81",
+  "prior_qualified": "4d1eede1ea58c0c29832ef03c85beeb3fad6d06f",
+  "product_delta_from_prior": [
+    "src/document-retopo.cpp exact admitted9dd"
+  ],
+  "all_headers_and_other_product_bodies_unchanged": true,
+  "scope": "Component relinks with one whole qualified9dd worker object/profile substituted; complete prior fresh mergedDocument ctor/dtor + native consumer retained, exact main5/poly6 providers and immutable matching C179 support. No new source compilation/full project build/archive copying/partial-function overrides.",
+  "provider_audit": {
+    "path": "artifacts/integration-plan/worker9dd-audit.json",
+    "sha256": "dcc9e1a8a7f2cd467f694370e6d8a427e964b0423e5dc2bc15fbd4b2b6423357",
+    "no_Polygon_payload_refs": true,
+    "own_header_sizes_offsets_and_body_closure": "docs/validation/POLYGON-RETOPO-AFFINE.json unchanged actual audit"
+  },
+  "native": {
+    "release": 248,
+    "sanitize": 248,
+    "byte_exact_R_S_pairs": [
+      {
+        "path": "reflected-polygon-first/polygon.dsculpt",
+        "sha256": "629a41cf6f9e977cb169ba123213c3562336051d132b7b7f446ba2b381eee3dc"
+      },
+      {
+        "path": "reflected-polygon-first/restored.dsculpt",
+        "sha256": "f1ec008f0da4cb7ba94d2b3aae58f586d51cd3824f9166241550a62e463a7538"
+      },
+      {
+        "path": "reflected-polygon-first/retopo.dsculpt",
+        "sha256": "0cb4439fbc349a40c70e767541dd78ac63cc718dc9d2a7ebbf12e50d250cbe00"
+      },
+      {
+        "path": "reflected-polygon-first/retopo.dsculpt-polygon.dsculpt",
+        "sha256": "b863c0808e6c3910edd82b6a39d99625d7773734d129c5c7d8698ef6721d8fe4"
+      },
+      {
+        "path": "reflected-retopo-first/polygon.dsculpt",
+        "sha256": "629a41cf6f9e977cb169ba123213c3562336051d132b7b7f446ba2b381eee3dc"
+      },
+      {
+        "path": "reflected-retopo-first/restored.dsculpt",
+        "sha256": "f1ec008f0da4cb7ba94d2b3aae58f586d51cd3824f9166241550a62e463a7538"
+      },
+      {
+        "path": "reflected-retopo-first/retopo.dsculpt",
+        "sha256": "0cb4439fbc349a40c70e767541dd78ac63cc718dc9d2a7ebbf12e50d250cbe00"
+      },
+      {
+        "path": "reflected-retopo-first/retopo.dsculpt-polygon.dsculpt",
+        "sha256": "b863c0808e6c3910edd82b6a39d99625d7773734d129c5c7d8698ef6721d8fe4"
+      },
+      {
+        "path": "sheared-polygon-first/polygon.dsculpt",
+        "sha256": "b091189a83f67402ce892ca89f2e1b31c55c2c91a4e2e1cc2819d2ff4d02ed77"
+      },
+      {
+        "path": "sheared-polygon-first/restored.dsculpt",
+        "sha256": "920477d3b6ffe42868f936d782a4e641e4976f3c2c25bf925f1894f52ae47f05"
+      },
+      {
+        "path": "sheared-polygon-first/retopo.dsculpt",
+        "sha256": "125e75ca73ec1d6ec5a89b45a7251c49c4d345b7815c3c6272a3d92156297b92"
+      },
+      {
+        "path": "sheared-polygon-first/retopo.dsculpt-polygon.dsculpt",
+        "sha256": "3ab9f0addc049abb071931e870a16b6e8b6623aedae35ae081bd7769ada27b36"
+      },
+      {
+        "path": "sheared-retopo-first/polygon.dsculpt",
+        "sha256": "b091189a83f67402ce892ca89f2e1b31c55c2c91a4e2e1cc2819d2ff4d02ed77"
+      },
+      {
+        "path": "sheared-retopo-first/restored.dsculpt",
+        "sha256": "920477d3b6ffe42868f936d782a4e641e4976f3c2c25bf925f1894f52ae47f05"
+      },
+      {
+        "path": "sheared-retopo-first/retopo.dsculpt",
+        "sha256": "125e75ca73ec1d6ec5a89b45a7251c49c4d345b7815c3c6272a3d92156297b92"
+      },
+      {
+        "path": "sheared-retopo-first/retopo.dsculpt-polygon.dsculpt",
+        "sha256": "3ab9f0addc049abb071931e870a16b6e8b6623aedae35ae081bd7769ada27b36"
+      }
+    ],
+    "both_mode_orders": true,
+    "coverage": "affine shear/reflection, real pose/skin/morph/sparse paint, both private payloads, held Cancel/mode authority, Apply/immediateSave/UndoRedo, retopo-to-polygon and full current source Restore"
+  },
+  "gui": [
+    {
+      "path": "artifacts/integration-proof/worker9dd/gui-release-compact-combined-v3-expose-ack/workflow/report.json",
+      "sha256": "8c4b59df6607accecbfbbb50a8b3fb69e64c1a63212f7729f95d67f0e760f299",
+      "checks": 77,
+      "complete": true
+    },
+    {
+      "path": "artifacts/integration-proof/worker9dd/gui-release-normal-combined-v3-expose-ack/workflow/report.json",
+      "sha256": "767e814072065e4c267d064799af5eb9c395b3012956594e39f4d78e7a738a4e",
+      "checks": 77,
+      "complete": true
+    },
+    {
+      "path": "artifacts/integration-proof/worker9dd/gui-sanitize-compact-combined-v3-expose-ack/workflow/report.json",
+      "sha256": "86517aaa31ddb39dcf6b49895896b6d908fc73b930217f16dcd4245736fe378a",
+      "checks": 77,
+      "complete": true
+    },
+    {
+      "path": "artifacts/integration-proof/worker9dd/gui-sanitize-normal-combined-v3-expose-ack/workflow/report.json",
+      "sha256": "24316779e9109210679c27986fe496b1aa4b5fe15523b51d5f772ec73fdc7a02",
+      "checks": 77,
+      "complete": true
+    }
+  ],
+  "hardware": {
+    "lease_handle": 53517,
+    "terminal_exit": 0,
+    "released": true,
+    "steps": [
+      {
+        "name": "arc-identity",
+        "application_exit": 0,
+        "qualification_exit": 0,
+        "actual_renderer": "Mesa Intel(R) Arc(tm) A770 Graphics (DG2)",
+        "actual_vendor": "Intel",
+        "seconds": 7.892914772033691,
+        "actual_DRM_FDs": {
+          "3:57985": {
+            "path": "/dev/dri/renderD129",
+            "rdev": [
+              226,
+              129
+            ],
+            "pci": "/sys/devices/pci0000:00/0000:00:01.0/0000:01:00.0/0000:02:01.0/0000:03:00.0",
+            "vendor": "0x8086",
+            "device": "0x56a0",
+            "driver": "/sys/bus/pci/drivers/i915",
+            "fdinfo": "pos:\t0\nflags:\t02100002\nmnt_id:\t43\nino:\t1182\ndrm-driver:\ti915\ndrm-client-id:\t18087\ndrm-pdev:\t0000:03:00.0\ndrm-total-system0:\t3648 KiB\ndrm-shared-system0:\t0\ndrm-active-system0:\t2564 KiB\ndrm-resident-system0:\t2620 KiB\ndrm-purgeable-system0:\t52 KiB\ndrm-total-local0:\t12228 KiB\ndrm-shared-local0:\t0\ndrm-active-local0:\t9 MiB\ndrm-resident-local0:\t12164 KiB\ndrm-purgeable-local0:\t576 KiB\ndrm-total-stolen-local0:\t0\ndrm-shared-stolen-local0:\t0\ndrm-active-stolen-local0:\t0\ndrm-resident-stolen-local0:\t0\ndrm-purgeable-stolen-local0:\t0\ndrm-engine-render:\t155532 ns\ndrm-engine-copy:\t0 ns\ndrm-engine-video:\t0 ns\ndrm-engine-capacity-video:\t2\ndrm-engine-video-enhance:\t0 ns\ndrm-engine-capacity-video-enhance:\t2\ndrm-engine-compute:\t64740 ns\n"
+          },
+          "4:57985": {
+            "path": "/dev/dri/renderD129",
+            "rdev": [
+              226,
+              129
+            ],
+            "pci": "/sys/devices/pci0000:00/0000:00:01.0/0000:01:00.0/0000:02:01.0/0000:03:00.0",
+            "vendor": "0x8086",
+            "device": "0x56a0",
+            "driver": "/sys/bus/pci/drivers/i915",
+            "fdinfo": "pos:\t0\nflags:\t02100002\nmnt_id:\t43\nino:\t1182\ndrm-driver:\ti915\ndrm-client-id:\t18087\ndrm-pdev:\t0000:03:00.0\ndrm-total-system0:\t3648 KiB\ndrm-shared-system0:\t0\ndrm-active-system0:\t0\ndrm-resident-system0:\t2620 KiB\ndrm-purgeable-system0:\t52 KiB\ndrm-total-local0:\t12228 KiB\ndrm-shared-local0:\t0\ndrm-active-local0:\t0\ndrm-resident-local0:\t12164 KiB\ndrm-purgeable-local0:\t832 KiB\ndrm-total-stolen-local0:\t0\ndrm-shared-stolen-local0:\t0\ndrm-active-stolen-local0:\t0\ndrm-resident-stolen-local0:\t0\ndrm-purgeable-stolen-local0:\t0\ndrm-engine-render:\t252304 ns\ndrm-engine-copy:\t0 ns\ndrm-engine-video:\t0 ns\ndrm-engine-capacity-video:\t2\ndrm-engine-video-enhance:\t0 ns\ndrm-engine-capacity-video-enhance:\t2\ndrm-engine-compute:\t64740 ns\n"
+          },
+          "5:57985": {
+            "path": "/dev/dri/renderD129",
+            "rdev": [
+              226,
+              129
+            ],
+            "pci": "/sys/devices/pci0000:00/0000:00:01.0/0000:01:00.0/0000:02:01.0/0000:03:00.0",
+            "vendor": "0x8086",
+            "device": "0x56a0",
+            "driver": "/sys/bus/pci/drivers/i915",
+            "fdinfo": "pos:\t0\nflags:\t02100002\nmnt_id:\t43\nino:\t1182\ndrm-driver:\ti915\ndrm-client-id:\t18087\ndrm-pdev:\t0000:03:00.0\ndrm-total-system0:\t3648 KiB\ndrm-shared-system0:\t0\ndrm-active-system0:\t0\ndrm-resident-system0:\t2620 KiB\ndrm-purgeable-system0:\t52 KiB\ndrm-total-local0:\t12228 KiB\ndrm-shared-local0:\t0\ndrm-active-local0:\t0\ndrm-resident-local0:\t12164 KiB\ndrm-purgeable-local0:\t832 KiB\ndrm-total-stolen-local0:\t0\ndrm-shared-stolen-local0:\t0\ndrm-active-stolen-local0:\t0\ndrm-resident-stolen-local0:\t0\ndrm-purgeable-stolen-local0:\t0\ndrm-engine-render:\t252304 ns\ndrm-engine-copy:\t0 ns\ndrm-engine-video:\t0 ns\ndrm-engine-capacity-video:\t2\ndrm-engine-video-enhance:\t0 ns\ndrm-engine-capacity-video-enhance:\t2\ndrm-engine-compute:\t64740 ns\n"
+          },
+          "6:57985": {
+            "path": "/dev/dri/renderD129",
+            "rdev": [
+              226,
+              129
+            ],
+            "pci": "/sys/devices/pci0000:00/0000:00:01.0/0000:01:00.0/0000:02:01.0/0000:03:00.0",
+            "vendor": "0x8086",
+            "device": "0x56a0",
+            "driver": "/sys/bus/pci/drivers/i915",
+            "fdinfo": "pos:\t0\nflags:\t02100002\nmnt_id:\t43\nino:\t1182\ndrm-driver:\ti915\ndrm-client-id:\t18087\ndrm-pdev:\t0000:03:00.0\ndrm-total-system0:\t3648 KiB\ndrm-shared-system0:\t0\ndrm-active-system0:\t0\ndrm-resident-system0:\t2620 KiB\ndrm-purgeable-system0:\t52 KiB\ndrm-total-local0:\t12228 KiB\ndrm-shared-local0:\t0\ndrm-active-local0:\t0\ndrm-resident-local0:\t12164 KiB\ndrm-purgeable-local0:\t832 KiB\ndrm-total-stolen-local0:\t0\ndrm-shared-stolen-local0:\t0\ndrm-active-stolen-local0:\t0\ndrm-resident-stolen-local0:\t0\ndrm-purgeable-stolen-local0:\t0\ndrm-engine-render:\t252304 ns\ndrm-engine-copy:\t0 ns\ndrm-engine-video:\t0 ns\ndrm-engine-capacity-video:\t2\ndrm-engine-video-enhance:\t0 ns\ndrm-engine-capacity-video-enhance:\t2\ndrm-engine-compute:\t64740 ns\n"
+          }
+        }
+      },
+      {
+        "name": "software-identity",
+        "application_exit": 0,
+        "qualification_exit": 1,
+        "actual_renderer": "llvmpipe (LLVM 22.1.8, 256 bits)",
+        "actual_vendor": "Mesa",
+        "seconds": 2.936521291732788,
+        "actual_DRM_FDs": {
+          "3:57857": {
+            "path": "/dev/dri/card1",
+            "rdev": [
+              226,
+              1
+            ],
+            "pci": "/sys/devices/pci0000:00/0000:00:02.0",
+            "vendor": "0x8086",
+            "device": "0x4680",
+            "driver": "/sys/bus/pci/drivers/i915",
+            "fdinfo": "pos:\t24576\nflags:\t0100000\nmnt_id:\t46\nino:\t110596109\n"
+          }
+        }
+      },
+      {
+        "name": "uhd-identity",
+        "application_exit": 0,
+        "qualification_exit": 1,
+        "actual_renderer": "Mesa Intel(R) UHD Graphics 770 (ADL-S GT1)",
+        "actual_vendor": "Intel",
+        "seconds": 2.6835241317749023,
+        "actual_DRM_FDs": {
+          "3:57985": {
+            "path": "/dev/dri/renderD129",
+            "rdev": [
+              226,
+              129
+            ],
+            "pci": "/sys/devices/pci0000:00/0000:00:01.0/0000:01:00.0/0000:02:01.0/0000:03:00.0",
+            "vendor": "0x8086",
+            "device": "0x56a0",
+            "driver": "/sys/bus/pci/drivers/i915",
+            "fdinfo": "pos:\t0\nflags:\t02100002\nmnt_id:\t43\nino:\t1182\ndrm-driver:\ti915\ndrm-client-id:\t18090\ndrm-pdev:\t0000:03:00.0\ndrm-total-system0:\t384 KiB\ndrm-shared-system0:\t0\ndrm-active-system0:\t0\ndrm-resident-system0:\t0\ndrm-purgeable-system0:\t0\ndrm-total-local0:\t0\ndrm-shared-local0:\t0\ndrm-active-local0:\t0\ndrm-resident-local0:\t0\ndrm-purgeable-local0:\t0\ndrm-total-stolen-local0:\t0\ndrm-shared-stolen-local0:\t0\ndrm-active-stolen-local0:\t0\ndrm-resident-stolen-local0:\t0\ndrm-purgeable-stolen-local0:\t0\ndrm-engine-render:\t0 ns\ndrm-engine-copy:\t0 ns\ndrm-engine-video:\t0 ns\ndrm-engine-capacity-video:\t2\ndrm-engine-video-enhance:\t0 ns\ndrm-engine-capacity-video-enhance:\t2\ndrm-engine-compute:\t0 ns\n"
+          },
+          "4:57984": {
+            "path": "/dev/dri/renderD128",
+            "rdev": [
+              226,
+              128
+            ],
+            "pci": "/sys/devices/pci0000:00/0000:00:02.0",
+            "vendor": "0x8086",
+            "device": "0x4680",
+            "driver": "/sys/bus/pci/drivers/i915",
+            "fdinfo": "pos:\t0\nflags:\t02100002\nmnt_id:\t43\nino:\t1153\ndrm-driver:\ti915\ndrm-client-id:\t18091\ndrm-pdev:\t0000:00:02.0\ndrm-total-system0:\t15404 KiB\ndrm-shared-system0:\t0\ndrm-active-system0:\t0\ndrm-resident-system0:\t15404 KiB\ndrm-purgeable-system0:\t1028 KiB\ndrm-total-stolen-system0:\t0\ndrm-shared-stolen-system0:\t0\ndrm-active-stolen-system0:\t0\ndrm-resident-stolen-system0:\t0\ndrm-purgeable-stolen-system0:\t0\ndrm-engine-render:\t774124 ns\ndrm-engine-copy:\t0 ns\ndrm-engine-video:\t0 ns\ndrm-engine-capacity-video:\t2\ndrm-engine-video-enhance:\t0 ns\n"
+          },
+          "5:57985": {
+            "path": "/dev/dri/renderD129",
+            "rdev": [
+              226,
+              129
+            ],
+            "pci": "/sys/devices/pci0000:00/0000:00:01.0/0000:01:00.0/0000:02:01.0/0000:03:00.0",
+            "vendor": "0x8086",
+            "device": "0x56a0",
+            "driver": "/sys/bus/pci/drivers/i915",
+            "fdinfo": "pos:\t0\nflags:\t02100002\nmnt_id:\t43\nino:\t1182\ndrm-driver:\ti915\ndrm-client-id:\t18090\ndrm-pdev:\t0000:03:00.0\ndrm-total-system0:\t384 KiB\ndrm-shared-system0:\t0\ndrm-active-system0:\t0\ndrm-resident-system0:\t0\ndrm-purgeable-system0:\t0\ndrm-total-local0:\t0\ndrm-shared-local0:\t0\ndrm-active-local0:\t0\ndrm-resident-local0:\t0\ndrm-purgeable-local0:\t0\ndrm-total-stolen-local0:\t0\ndrm-shared-stolen-local0:\t0\ndrm-active-stolen-local0:\t0\ndrm-resident-stolen-local0:\t0\ndrm-purgeable-stolen-local0:\t0\ndrm-engine-render:\t0 ns\ndrm-engine-copy:\t0 ns\ndrm-engine-video:\t0 ns\ndrm-engine-capacity-video:\t2\ndrm-engine-video-enhance:\t0 ns\ndrm-engine-capacity-video-enhance:\t2\ndrm-engine-compute:\t0 ns\n"
+          },
+          "6:57985": {
+            "path": "/dev/dri/renderD129",
+            "rdev": [
+              226,
+              129
+            ],
+            "pci": "/sys/devices/pci0000:00/0000:00:01.0/0000:01:00.0/0000:02:01.0/0000:03:00.0",
+            "vendor": "0x8086",
+            "device": "0x56a0",
+            "driver": "/sys/bus/pci/drivers/i915",
+            "fdinfo": "pos:\t0\nflags:\t02100002\nmnt_id:\t43\nino:\t1182\ndrm-driver:\ti915\ndrm-client-id:\t18090\ndrm-pdev:\t0000:03:00.0\ndrm-total-system0:\t384 KiB\ndrm-shared-system0:\t0\ndrm-active-system0:\t0\ndrm-resident-system0:\t0\ndrm-purgeable-system0:\t0\ndrm-total-local0:\t0\ndrm-shared-local0:\t0\ndrm-active-local0:\t0\ndrm-resident-local0:\t0\ndrm-purgeable-local0:\t0\ndrm-total-stolen-local0:\t0\ndrm-shared-stolen-local0:\t0\ndrm-active-stolen-local0:\t0\ndrm-resident-stolen-local0:\t0\ndrm-purgeable-stolen-local0:\t0\ndrm-engine-render:\t0 ns\ndrm-engine-copy:\t0 ns\ndrm-engine-video:\t0 ns\ndrm-engine-capacity-video:\t2\ndrm-engine-video-enhance:\t0 ns\ndrm-engine-capacity-video-enhance:\t2\ndrm-engine-compute:\t0 ns\n"
+          },
+          "7:57985": {
+            "path": "/dev/dri/renderD129",
+            "rdev": [
+              226,
+              129
+            ],
+            "pci": "/sys/devices/pci0000:00/0000:00:01.0/0000:01:00.0/0000:02:01.0/0000:03:00.0",
+            "vendor": "0x8086",
+            "device": "0x56a0",
+            "driver": "/sys/bus/pci/drivers/i915",
+            "fdinfo": "pos:\t0\nflags:\t02100002\nmnt_id:\t43\nino:\t1182\ndrm-driver:\ti915\ndrm-client-id:\t18090\ndrm-pdev:\t0000:03:00.0\ndrm-total-system0:\t384 KiB\ndrm-shared-system0:\t0\ndrm-active-system0:\t0\ndrm-resident-system0:\t0\ndrm-purgeable-system0:\t0\ndrm-total-local0:\t0\ndrm-shared-local0:\t0\ndrm-active-local0:\t0\ndrm-resident-local0:\t0\ndrm-purgeable-local0:\t0\ndrm-total-stolen-local0:\t0\ndrm-shared-stolen-local0:\t0\ndrm-active-stolen-local0:\t0\ndrm-resident-stolen-local0:\t0\ndrm-purgeable-stolen-local0:\t0\ndrm-engine-render:\t0 ns\ndrm-engine-copy:\t0 ns\ndrm-engine-video:\t0 ns\ndrm-engine-capacity-video:\t2\ndrm-engine-video-enhance:\t0 ns\ndrm-engine-capacity-video-enhance:\t2\ndrm-engine-compute:\t0 ns\n"
+          },
+          "8:57984": {
+            "path": "/dev/dri/renderD128",
+            "rdev": [
+              226,
+              128
+            ],
+            "pci": "/sys/devices/pci0000:00/0000:00:02.0",
+            "vendor": "0x8086",
+            "device": "0x4680",
+            "driver": "/sys/bus/pci/drivers/i915",
+            "fdinfo": "pos:\t0\nflags:\t02100002\nmnt_id:\t43\nino:\t1153\ndrm-driver:\ti915\ndrm-client-id:\t18091\ndrm-pdev:\t0000:00:02.0\ndrm-total-system0:\t15404 KiB\ndrm-shared-system0:\t0\ndrm-active-system0:\t0\ndrm-resident-system0:\t15404 KiB\ndrm-purgeable-system0:\t412 KiB\ndrm-total-stolen-system0:\t0\ndrm-shared-stolen-system0:\t0\ndrm-active-stolen-system0:\t0\ndrm-resident-stolen-system0:\t0\ndrm-purgeable-stolen-system0:\t0\ndrm-engine-render:\t343252 ns\ndrm-engine-copy:\t0 ns\ndrm-engine-video:\t0 ns\ndrm-engine-capacity-video:\t2\ndrm-engine-video-enhance:\t0 ns\n"
+          },
+          "9:57984": {
+            "path": "/dev/dri/renderD128",
+            "rdev": [
+              226,
+              128
+            ],
+            "pci": "/sys/devices/pci0000:00/0000:00:02.0",
+            "vendor": "0x8086",
+            "device": "0x4680",
+            "driver": "/sys/bus/pci/drivers/i915",
+            "fdinfo": "pos:\t0\nflags:\t02100002\nmnt_id:\t43\nino:\t1153\ndrm-driver:\ti915\ndrm-client-id:\t18091\ndrm-pdev:\t0000:00:02.0\ndrm-total-system0:\t15404 KiB\ndrm-shared-system0:\t0\ndrm-active-system0:\t7496 KiB\ndrm-resident-system0:\t15404 KiB\ndrm-purgeable-system0:\t412 KiB\ndrm-total-stolen-system0:\t0\ndrm-shared-stolen-system0:\t0\ndrm-active-stolen-system0:\t0\ndrm-resident-stolen-system0:\t0\ndrm-purgeable-stolen-system0:\t0\ndrm-engine-render:\t343252 ns\ndrm-engine-copy:\t0 ns\ndrm-engine-video:\t0 ns\ndrm-engine-capacity-video:\t2\ndrm-engine-video-enhance:\t0 ns\n"
+          },
+          "10:57984": {
+            "path": "/dev/dri/renderD128",
+            "rdev": [
+              226,
+              128
+            ],
+            "pci": "/sys/devices/pci0000:00/0000:00:02.0",
+            "vendor": "0x8086",
+            "device": "0x4680",
+            "driver": "/sys/bus/pci/drivers/i915",
+            "fdinfo": "pos:\t0\nflags:\t02100002\nmnt_id:\t43\nino:\t1153\ndrm-driver:\ti915\ndrm-client-id:\t18091\ndrm-pdev:\t0000:00:02.0\ndrm-total-system0:\t15404 KiB\ndrm-shared-system0:\t0\ndrm-active-system0:\t0\ndrm-resident-system0:\t15404 KiB\ndrm-purgeable-system0:\t412 KiB\ndrm-total-stolen-system0:\t0\ndrm-shared-stolen-system0:\t0\ndrm-active-stolen-system0:\t0\ndrm-resident-stolen-system0:\t0\ndrm-purgeable-stolen-system0:\t0\ndrm-engine-render:\t502372 ns\ndrm-engine-copy:\t0 ns\ndrm-engine-video:\t0 ns\ndrm-engine-capacity-video:\t2\ndrm-engine-video-enhance:\t0 ns\n"
+          }
+        }
+      },
+      {
+        "name": "retopo-committed",
+        "application_exit": 0,
+        "qualification_exit": 0,
+        "actual_renderer": "Mesa Intel(R) Arc(tm) A770 Graphics (DG2)",
+        "actual_vendor": "Intel",
+        "seconds": 3.1326022148132324,
+        "actual_DRM_FDs": {
+          "3:57985": {
+            "path": "/dev/dri/renderD129",
+            "rdev": [
+              226,
+              129
+            ],
+            "pci": "/sys/devices/pci0000:00/0000:00:01.0/0000:01:00.0/0000:02:01.0/0000:03:00.0",
+            "vendor": "0x8086",
+            "device": "0x56a0",
+            "driver": "/sys/bus/pci/drivers/i915",
+            "fdinfo": "pos:\t0\nflags:\t02100002\nmnt_id:\t43\nino:\t1182\ndrm-driver:\ti915\ndrm-client-id:\t18092\ndrm-pdev:\t0000:03:00.0\ndrm-total-system0:\t5188 KiB\ndrm-shared-system0:\t0\ndrm-active-system0:\t0\ndrm-resident-system0:\t4932 KiB\ndrm-purgeable-system0:\t4668 KiB\ndrm-total-local0:\t14284 KiB\ndrm-shared-local0:\t0\ndrm-active-local0:\t0\ndrm-resident-local0:\t14284 KiB\ndrm-purgeable-local0:\t5696 KiB\ndrm-total-stolen-local0:\t0\ndrm-shared-stolen-local0:\t0\ndrm-active-stolen-local0:\t0\ndrm-resident-stolen-local0:\t0\ndrm-purgeable-stolen-local0:\t0\ndrm-engine-render:\t3622372 ns\ndrm-engine-copy:\t0 ns\ndrm-engine-video:\t0 ns\ndrm-engine-capacity-video:\t2\ndrm-engine-video-enhance:\t0 ns\ndrm-engine-capacity-video-enhance:\t2\ndrm-engine-compute:\t63596 ns\n"
+          },
+          "4:57985": {
+            "path": "/dev/dri/renderD129",
+            "rdev": [
+              226,
+              129
+            ],
+            "pci": "/sys/devices/pci0000:00/0000:00:01.0/0000:01:00.0/0000:02:01.0/0000:03:00.0",
+            "vendor": "0x8086",
+            "device": "0x56a0",
+            "driver": "/sys/bus/pci/drivers/i915",
+            "fdinfo": "pos:\t0\nflags:\t02100002\nmnt_id:\t43\nino:\t1182\ndrm-driver:\ti915\ndrm-client-id:\t18092\ndrm-pdev:\t0000:03:00.0\ndrm-total-system0:\t4 MiB\ndrm-shared-system0:\t0\ndrm-active-system0:\t0\ndrm-resident-system0:\t4 MiB\ndrm-purgeable-system0:\t4 MiB\ndrm-total-local0:\t14284 KiB\ndrm-shared-local0:\t0\ndrm-active-local0:\t0\ndrm-resident-local0:\t14284 KiB\ndrm-purgeable-local0:\t14080 KiB\ndrm-total-stolen-local0:\t0\ndrm-shared-stolen-local0:\t0\ndrm-active-stolen-local0:\t0\ndrm-resident-stolen-local0:\t0\ndrm-purgeable-stolen-local0:\t0\ndrm-engine-render:\t3622372 ns\ndrm-engine-copy:\t0 ns\ndrm-engine-video:\t0 ns\ndrm-engine-capacity-video:\t2\ndrm-engine-video-enhance:\t0 ns\ndrm-engine-capacity-video-enhance:\t2\ndrm-engine-compute:\t63596 ns\n"
+          },
+          "5:57985": {
+            "path": "/dev/dri/renderD129",
+            "rdev": [
+              226,
+              129
+            ],
+            "pci": "/sys/devices/pci0000:00/0000:00:01.0/0000:01:00.0/0000:02:01.0/0000:03:00.0",
+            "vendor": "0x8086",
+            "device": "0x56a0",
+            "driver": "/sys/bus/pci/drivers/i915",
+            "fdinfo": "pos:\t0\nflags:\t02100002\nmnt_id:\t43\nino:\t1182\ndrm-driver:\ti915\ndrm-client-id:\t18092\ndrm-pdev:\t0000:03:00.0\ndrm-total-system0:\t5960 KiB\ndrm-shared-system0:\t0\ndrm-active-system0:\t0\ndrm-resident-system0:\t4932 KiB\ndrm-purgeable-system0:\t2100 KiB\ndrm-total-local0:\t14348 KiB\ndrm-shared-local0:\t0\ndrm-active-local0:\t0\ndrm-resident-local0:\t14284 KiB\ndrm-purgeable-local0:\t896 KiB\ndrm-total-stolen-local0:\t0\ndrm-shared-stolen-local0:\t0\ndrm-active-stolen-local0:\t0\ndrm-resident-stolen-local0:\t0\ndrm-purgeable-stolen-local0:\t0\ndrm-engine-render:\t3622372 ns\ndrm-engine-copy:\t0 ns\ndrm-engine-video:\t0 ns\ndrm-engine-capacity-video:\t2\ndrm-engine-video-enhance:\t0 ns\ndrm-engine-capacity-video-enhance:\t2\ndrm-engine-compute:\t63596 ns\n"
+          },
+          "6:57985": {
+            "path": "/dev/dri/renderD129",
+            "rdev": [
+              226,
+              129
+            ],
+            "pci": "/sys/devices/pci0000:00/0000:00:01.0/0000:01:00.0/0000:02:01.0/0000:03:00.0",
+            "vendor": "0x8086",
+            "device": "0x56a0",
+            "driver": "/sys/bus/pci/drivers/i915",
+            "fdinfo": "pos:\t0\nflags:\t02100002\nmnt_id:\t43\nino:\t1182\ndrm-driver:\ti915\ndrm-client-id:\t18092\ndrm-pdev:\t0000:03:00.0\ndrm-total-system0:\t5960 KiB\ndrm-shared-system0:\t0\ndrm-active-system0:\t0\ndrm-resident-system0:\t4932 KiB\ndrm-purgeable-system0:\t2100 KiB\ndrm-total-local0:\t14348 KiB\ndrm-shared-local0:\t0\ndrm-active-local0:\t0\ndrm-resident-local0:\t14284 KiB\ndrm-purgeable-local0:\t896 KiB\ndrm-total-stolen-local0:\t0\ndrm-shared-stolen-local0:\t0\ndrm-active-stolen-local0:\t0\ndrm-resident-stolen-local0:\t0\ndrm-purgeable-stolen-local0:\t0\ndrm-engine-render:\t3622372 ns\ndrm-engine-copy:\t0 ns\ndrm-engine-video:\t0 ns\ndrm-engine-capacity-video:\t2\ndrm-engine-video-enhance:\t0 ns\ndrm-engine-capacity-video-enhance:\t2\ndrm-engine-compute:\t63596 ns\n"
+          }
+        }
+      },
+      {
+        "name": "retopo-accept",
+        "application_exit": 0,
+        "qualification_exit": 0,
+        "actual_renderer": "Mesa Intel(R) Arc(tm) A770 Graphics (DG2)",
+        "actual_vendor": "Intel",
+        "seconds": 5.488909959793091,
+        "actual_DRM_FDs": {
+          "3:57985": {
+            "path": "/dev/dri/renderD129",
+            "rdev": [
+              226,
+              129
+            ],
+            "pci": "/sys/devices/pci0000:00/0000:00:01.0/0000:01:00.0/0000:02:01.0/0000:03:00.0",
+            "vendor": "0x8086",
+            "device": "0x56a0",
+            "driver": "/sys/bus/pci/drivers/i915",
+            "fdinfo": "pos:\t0\nflags:\t02100002\nmnt_id:\t43\nino:\t1182\ndrm-driver:\ti915\ndrm-client-id:\t18093\ndrm-pdev:\t0000:03:00.0\ndrm-total-system0:\t12052 KiB\ndrm-shared-system0:\t0\ndrm-active-system0:\t0\ndrm-resident-system0:\t11024 KiB\ndrm-purgeable-system0:\t8 MiB\ndrm-total-local0:\t20772 KiB\ndrm-shared-local0:\t0\ndrm-active-local0:\t0\ndrm-resident-local0:\t20708 KiB\ndrm-purgeable-local0:\t1088 KiB\ndrm-total-stolen-local0:\t0\ndrm-shared-stolen-local0:\t0\ndrm-active-stolen-local0:\t0\ndrm-resident-stolen-local0:\t0\ndrm-purgeable-stolen-local0:\t0\ndrm-engine-render:\t26082680 ns\ndrm-engine-copy:\t0 ns\ndrm-engine-video:\t0 ns\ndrm-engine-capacity-video:\t2\ndrm-engine-video-enhance:\t0 ns\ndrm-engine-capacity-video-enhance:\t2\ndrm-engine-compute:\t65520 ns\n"
+          },
+          "4:57985": {
+            "path": "/dev/dri/renderD129",
+            "rdev": [
+              226,
+              129
+            ],
+            "pci": "/sys/devices/pci0000:00/0000:00:01.0/0000:01:00.0/0000:02:01.0/0000:03:00.0",
+            "vendor": "0x8086",
+            "device": "0x56a0",
+            "driver": "/sys/bus/pci/drivers/i915",
+            "fdinfo": "pos:\t0\nflags:\t02100002\nmnt_id:\t43\nino:\t1182\ndrm-driver:\ti915\ndrm-client-id:\t18093\ndrm-pdev:\t0000:03:00.0\ndrm-total-system0:\t12052 KiB\ndrm-shared-system0:\t0\ndrm-active-system0:\t0\ndrm-resident-system0:\t11024 KiB\ndrm-purgeable-system0:\t8704 KiB\ndrm-total-local0:\t20708 KiB\ndrm-shared-local0:\t0\ndrm-active-local0:\t0\ndrm-resident-local0:\t20708 KiB\ndrm-purgeable-local0:\t9344 KiB\ndrm-total-stolen-local0:\t0\ndrm-shared-stolen-local0:\t0\ndrm-active-stolen-local0:\t0\ndrm-resident-stolen-local0:\t0\ndrm-purgeable-stolen-local0:\t0\ndrm-engine-render:\t26082680 ns\ndrm-engine-copy:\t0 ns\ndrm-engine-video:\t0 ns\ndrm-engine-capacity-video:\t2\ndrm-engine-video-enhance:\t0 ns\ndrm-engine-capacity-video-enhance:\t2\ndrm-engine-compute:\t65520 ns\n"
+          },
+          "5:57985": {
+            "path": "/dev/dri/renderD129",
+            "rdev": [
+              226,
+              129
+            ],
+            "pci": "/sys/devices/pci0000:00/0000:00:01.0/0000:01:00.0/0000:02:01.0/0000:03:00.0",
+            "vendor": "0x8086",
+            "device": "0x56a0",
+            "driver": "/sys/bus/pci/drivers/i915",
+            "fdinfo": "pos:\t0\nflags:\t02100002\nmnt_id:\t43\nino:\t1182\ndrm-driver:\ti915\ndrm-client-id:\t18093\ndrm-pdev:\t0000:03:00.0\ndrm-total-system0:\t12052 KiB\ndrm-shared-system0:\t0\ndrm-active-system0:\t0\ndrm-resident-system0:\t11024 KiB\ndrm-purgeable-system0:\t8704 KiB\ndrm-total-local0:\t20708 KiB\ndrm-shared-local0:\t0\ndrm-active-local0:\t0\ndrm-resident-local0:\t20708 KiB\ndrm-purgeable-local0:\t9344 KiB\ndrm-total-stolen-local0:\t0\ndrm-shared-stolen-local0:\t0\ndrm-active-stolen-local0:\t0\ndrm-resident-stolen-local0:\t0\ndrm-purgeable-stolen-local0:\t0\ndrm-engine-render:\t26082680 ns\ndrm-engine-copy:\t0 ns\ndrm-engine-video:\t0 ns\ndrm-engine-capacity-video:\t2\ndrm-engine-video-enhance:\t0 ns\ndrm-engine-capacity-video-enhance:\t2\ndrm-engine-compute:\t65520 ns\n"
+          },
+          "6:57985": {
+            "path": "/dev/dri/renderD129",
+            "rdev": [
+              226,
+              129
+            ],
+            "pci": "/sys/devices/pci0000:00/0000:00:01.0/0000:01:00.0/0000:02:01.0/0000:03:00.0",
+            "vendor": "0x8086",
+            "device": "0x56a0",
+            "driver": "/sys/bus/pci/drivers/i915",
+            "fdinfo": "pos:\t0\nflags:\t02100002\nmnt_id:\t43\nino:\t1182\ndrm-driver:\ti915\ndrm-client-id:\t18093\ndrm-pdev:\t0000:03:00.0\ndrm-total-system0:\t11540 KiB\ndrm-shared-system0:\t0\ndrm-active-system0:\t0\ndrm-resident-system0:\t11024 KiB\ndrm-purgeable-system0:\t8704 KiB\ndrm-total-local0:\t20708 KiB\ndrm-shared-local0:\t0\ndrm-active-local0:\t0\ndrm-resident-local0:\t20708 KiB\ndrm-purgeable-local0:\t9408 KiB\ndrm-total-stolen-local0:\t0\ndrm-shared-stolen-local0:\t0\ndrm-active-stolen-local0:\t0\ndrm-resident-stolen-local0:\t0\ndrm-purgeable-stolen-local0:\t0\ndrm-engine-render:\t26082680 ns\ndrm-engine-copy:\t0 ns\ndrm-engine-video:\t0 ns\ndrm-engine-capacity-video:\t2\ndrm-engine-video-enhance:\t0 ns\ndrm-engine-capacity-video-enhance:\t2\ndrm-engine-compute:\t65520 ns\n"
+          }
+        }
+      },
+      {
+        "name": "polygon-accept",
+        "application_exit": 0,
+        "qualification_exit": 0,
+        "actual_renderer": "Mesa Intel(R) Arc(tm) A770 Graphics (DG2)",
+        "actual_vendor": "Intel",
+        "seconds": 3.7875747680664062,
+        "actual_DRM_FDs": {
+          "3:57985": {
+            "path": "/dev/dri/renderD129",
+            "rdev": [
+              226,
+              129
+            ],
+            "pci": "/sys/devices/pci0000:00/0000:00:01.0/0000:01:00.0/0000:02:01.0/0000:03:00.0",
+            "vendor": "0x8086",
+            "device": "0x56a0",
+            "driver": "/sys/bus/pci/drivers/i915",
+            "fdinfo": "pos:\t0\nflags:\t02100002\nmnt_id:\t43\nino:\t1182\ndrm-driver:\ti915\ndrm-client-id:\t18094\ndrm-pdev:\t0000:03:00.0\ndrm-total-system0:\t5968 KiB\ndrm-shared-system0:\t0\ndrm-active-system0:\t0\ndrm-resident-system0:\t4940 KiB\ndrm-purgeable-system0:\t2620 KiB\ndrm-total-local0:\t14476 KiB\ndrm-shared-local0:\t0\ndrm-active-local0:\t0\ndrm-resident-local0:\t14412 KiB\ndrm-purgeable-local0:\t2944 KiB\ndrm-total-stolen-local0:\t0\ndrm-shared-stolen-local0:\t0\ndrm-active-stolen-local0:\t0\ndrm-resident-stolen-local0:\t0\ndrm-purgeable-stolen-local0:\t0\ndrm-engine-render:\t10745488 ns\ndrm-engine-copy:\t0 ns\ndrm-engine-video:\t0 ns\ndrm-engine-capacity-video:\t2\ndrm-engine-video-enhance:\t0 ns\ndrm-engine-capacity-video-enhance:\t2\ndrm-engine-compute:\t64428 ns\n"
+          },
+          "4:57985": {
+            "path": "/dev/dri/renderD129",
+            "rdev": [
+              226,
+              129
+            ],
+            "pci": "/sys/devices/pci0000:00/0000:00:01.0/0000:01:00.0/0000:02:01.0/0000:03:00.0",
+            "vendor": "0x8086",
+            "device": "0x56a0",
+            "driver": "/sys/bus/pci/drivers/i915",
+            "fdinfo": "pos:\t0\nflags:\t02100002\nmnt_id:\t43\nino:\t1182\ndrm-driver:\ti915\ndrm-client-id:\t18094\ndrm-pdev:\t0000:03:00.0\ndrm-total-system0:\t5968 KiB\ndrm-shared-system0:\t0\ndrm-active-system0:\t0\ndrm-resident-system0:\t4940 KiB\ndrm-purgeable-system0:\t2620 KiB\ndrm-total-local0:\t14412 KiB\ndrm-shared-local0:\t0\ndrm-active-local0:\t0\ndrm-resident-local0:\t14412 KiB\ndrm-purgeable-local0:\t3136 KiB\ndrm-total-stolen-local0:\t0\ndrm-shared-stolen-local0:\t0\ndrm-active-stolen-local0:\t0\ndrm-resident-stolen-local0:\t0\ndrm-purgeable-stolen-local0:\t0\ndrm-engine-render:\t10745488 ns\ndrm-engine-copy:\t0 ns\ndrm-engine-video:\t0 ns\ndrm-engine-capacity-video:\t2\ndrm-engine-video-enhance:\t0 ns\ndrm-engine-capacity-video-enhance:\t2\ndrm-engine-compute:\t64428 ns\n"
+          },
+          "5:57985": {
+            "path": "/dev/dri/renderD129",
+            "rdev": [
+              226,
+              129
+            ],
+            "pci": "/sys/devices/pci0000:00/0000:00:01.0/0000:01:00.0/0000:02:01.0/0000:03:00.0",
+            "vendor": "0x8086",
+            "device": "0x56a0",
+            "driver": "/sys/bus/pci/drivers/i915",
+            "fdinfo": "pos:\t0\nflags:\t02100002\nmnt_id:\t43\nino:\t1182\ndrm-driver:\ti915\ndrm-client-id:\t18094\ndrm-pdev:\t0000:03:00.0\ndrm-total-system0:\t5968 KiB\ndrm-shared-system0:\t0\ndrm-active-system0:\t0\ndrm-resident-system0:\t4940 KiB\ndrm-purgeable-system0:\t2620 KiB\ndrm-total-local0:\t14412 KiB\ndrm-shared-local0:\t0\ndrm-active-local0:\t0\ndrm-resident-local0:\t14412 KiB\ndrm-purgeable-local0:\t3136 KiB\ndrm-total-stolen-local0:\t0\ndrm-shared-stolen-local0:\t0\ndrm-active-stolen-local0:\t0\ndrm-resident-stolen-local0:\t0\ndrm-purgeable-stolen-local0:\t0\ndrm-engine-render:\t10745488 ns\ndrm-engine-copy:\t0 ns\ndrm-engine-video:\t0 ns\ndrm-engine-capacity-video:\t2\ndrm-engine-video-enhance:\t0 ns\ndrm-engine-capacity-video-enhance:\t2\ndrm-engine-compute:\t64428 ns\n"
+          },
+          "6:57985": {
+            "path": "/dev/dri/renderD129",
+            "rdev": [
+              226,
+              129
+            ],
+            "pci": "/sys/devices/pci0000:00/0000:00:01.0/0000:01:00.0/0000:02:01.0/0000:03:00.0",
+            "vendor": "0x8086",
+            "device": "0x56a0",
+            "driver": "/sys/bus/pci/drivers/i915",
+            "fdinfo": "pos:\t0\nflags:\t02100002\nmnt_id:\t43\nino:\t1182\ndrm-driver:\ti915\ndrm-client-id:\t18094\ndrm-pdev:\t0000:03:00.0\ndrm-total-system0:\t5968 KiB\ndrm-shared-system0:\t0\ndrm-active-system0:\t0\ndrm-resident-system0:\t4940 KiB\ndrm-purgeable-system0:\t2620 KiB\ndrm-total-local0:\t14412 KiB\ndrm-shared-local0:\t0\ndrm-active-local0:\t0\ndrm-resident-local0:\t14412 KiB\ndrm-purgeable-local0:\t3136 KiB\ndrm-total-stolen-local0:\t0\ndrm-shared-stolen-local0:\t0\ndrm-active-stolen-local0:\t0\ndrm-resident-stolen-local0:\t0\ndrm-purgeable-stolen-local0:\t0\ndrm-engine-render:\t10745488 ns\ndrm-engine-copy:\t0 ns\ndrm-engine-video:\t0 ns\ndrm-engine-capacity-video:\t2\ndrm-engine-video-enhance:\t0 ns\ndrm-engine-capacity-video-enhance:\t2\ndrm-engine-compute:\t64428 ns\n"
+          }
+        }
+      },
+      {
+        "name": "polygon-restore",
+        "application_exit": 0,
+        "qualification_exit": 0,
+        "actual_renderer": "Mesa Intel(R) Arc(tm) A770 Graphics (DG2)",
+        "actual_vendor": "Intel",
+        "seconds": 3.6804587841033936,
+        "actual_DRM_FDs": {
+          "3:57985": {
+            "path": "/dev/dri/renderD129",
+            "rdev": [
+              226,
+              129
+            ],
+            "pci": "/sys/devices/pci0000:00/0000:00:01.0/0000:01:00.0/0000:02:01.0/0000:03:00.0",
+            "vendor": "0x8086",
+            "device": "0x56a0",
+            "driver": "/sys/bus/pci/drivers/i915",
+            "fdinfo": "pos:\t0\nflags:\t02100002\nmnt_id:\t43\nino:\t1182\ndrm-driver:\ti915\ndrm-client-id:\t18095\ndrm-pdev:\t0000:03:00.0\ndrm-total-system0:\t5456 KiB\ndrm-shared-system0:\t0\ndrm-active-system0:\t0\ndrm-resident-system0:\t4940 KiB\ndrm-purgeable-system0:\t2620 KiB\ndrm-total-local0:\t14412 KiB\ndrm-shared-local0:\t0\ndrm-active-local0:\t0\ndrm-resident-local0:\t14412 KiB\ndrm-purgeable-local0:\t3200 KiB\ndrm-total-stolen-local0:\t0\ndrm-shared-stolen-local0:\t0\ndrm-active-stolen-local0:\t0\ndrm-resident-stolen-local0:\t0\ndrm-purgeable-stolen-local0:\t0\ndrm-engine-render:\t8887632 ns\ndrm-engine-copy:\t0 ns\ndrm-engine-video:\t0 ns\ndrm-engine-capacity-video:\t2\ndrm-engine-video-enhance:\t0 ns\ndrm-engine-capacity-video-enhance:\t2\ndrm-engine-compute:\t65520 ns\n"
+          },
+          "4:57985": {
+            "path": "/dev/dri/renderD129",
+            "rdev": [
+              226,
+              129
+            ],
+            "pci": "/sys/devices/pci0000:00/0000:00:01.0/0000:01:00.0/0000:02:01.0/0000:03:00.0",
+            "vendor": "0x8086",
+            "device": "0x56a0",
+            "driver": "/sys/bus/pci/drivers/i915",
+            "fdinfo": "pos:\t0\nflags:\t02100002\nmnt_id:\t43\nino:\t1182\ndrm-driver:\ti915\ndrm-client-id:\t18095\ndrm-pdev:\t0000:03:00.0\ndrm-total-system0:\t5196 KiB\ndrm-shared-system0:\t0\ndrm-active-system0:\t0\ndrm-resident-system0:\t4940 KiB\ndrm-purgeable-system0:\t4676 KiB\ndrm-total-local0:\t14412 KiB\ndrm-shared-local0:\t0\ndrm-active-local0:\t0\ndrm-resident-local0:\t14412 KiB\ndrm-purgeable-local0:\t5824 KiB\ndrm-total-stolen-local0:\t0\ndrm-shared-stolen-local0:\t0\ndrm-active-stolen-local0:\t0\ndrm-resident-stolen-local0:\t0\ndrm-purgeable-stolen-local0:\t0\ndrm-engine-render:\t8887632 ns\ndrm-engine-copy:\t0 ns\ndrm-engine-video:\t0 ns\ndrm-engine-capacity-video:\t2\ndrm-engine-video-enhance:\t0 ns\ndrm-engine-capacity-video-enhance:\t2\ndrm-engine-compute:\t65520 ns\n"
+          },
+          "5:57985": {
+            "path": "/dev/dri/renderD129",
+            "rdev": [
+              226,
+              129
+            ],
+            "pci": "/sys/devices/pci0000:00/0000:00:01.0/0000:01:00.0/0000:02:01.0/0000:03:00.0",
+            "vendor": "0x8086",
+            "device": "0x56a0",
+            "driver": "/sys/bus/pci/drivers/i915",
+            "fdinfo": "pos:\t0\nflags:\t02100002\nmnt_id:\t43\nino:\t1182\ndrm-driver:\ti915\ndrm-client-id:\t18095\ndrm-pdev:\t0000:03:00.0\ndrm-total-system0:\t5968 KiB\ndrm-shared-system0:\t0\ndrm-active-system0:\t0\ndrm-resident-system0:\t4940 KiB\ndrm-purgeable-system0:\t2108 KiB\ndrm-total-local0:\t14476 KiB\ndrm-shared-local0:\t0\ndrm-active-local0:\t0\ndrm-resident-local0:\t14412 KiB\ndrm-purgeable-local0:\t896 KiB\ndrm-total-stolen-local0:\t0\ndrm-shared-stolen-local0:\t0\ndrm-active-stolen-local0:\t0\ndrm-resident-stolen-local0:\t0\ndrm-purgeable-stolen-local0:\t0\ndrm-engine-render:\t8887632 ns\ndrm-engine-copy:\t0 ns\ndrm-engine-video:\t0 ns\ndrm-engine-capacity-video:\t2\ndrm-engine-video-enhance:\t0 ns\ndrm-engine-capacity-video-enhance:\t2\ndrm-engine-compute:\t65520 ns\n"
+          },
+          "6:57985": {
+            "path": "/dev/dri/renderD129",
+            "rdev": [
+              226,
+              129
+            ],
+            "pci": "/sys/devices/pci0000:00/0000:00:01.0/0000:01:00.0/0000:02:01.0/0000:03:00.0",
+            "vendor": "0x8086",
+            "device": "0x56a0",
+            "driver": "/sys/bus/pci/drivers/i915",
+            "fdinfo": "pos:\t0\nflags:\t02100002\nmnt_id:\t43\nino:\t1182\ndrm-driver:\ti915\ndrm-client-id:\t18095\ndrm-pdev:\t0000:03:00.0\ndrm-total-system0:\t5968 KiB\ndrm-shared-system0:\t0\ndrm-active-system0:\t0\ndrm-resident-system0:\t4940 KiB\ndrm-purgeable-system0:\t2108 KiB\ndrm-total-local0:\t14476 KiB\ndrm-shared-local0:\t0\ndrm-active-local0:\t0\ndrm-resident-local0:\t14412 KiB\ndrm-purgeable-local0:\t896 KiB\ndrm-total-stolen-local0:\t0\ndrm-shared-stolen-local0:\t0\ndrm-active-stolen-local0:\t0\ndrm-resident-stolen-local0:\t0\ndrm-purgeable-stolen-local0:\t0\ndrm-engine-render:\t8887632 ns\ndrm-engine-copy:\t0 ns\ndrm-engine-video:\t0 ns\ndrm-engine-capacity-video:\t2\ndrm-engine-video-enhance:\t0 ns\ndrm-engine-capacity-video-enhance:\t2\ndrm-engine-compute:\t65520 ns\n"
+          }
+        }
+      }
+    ],
+    "identity_method": "Actual current context vendor/renderer from unchanged synthetic runtime plus live renderD129/rdev226:129/PCI03/8086:56a0/i915 FDs/sysfs/fdinfo and loaded ELF maps. No new compiled EGLDevice query in this ordinary app.",
+    "observer_policy": "Strict qualification observer rejects actual llvmpipe/UHD with1; ordinary app intentionally supports these and exits0.",
+    "both_eye_nonblank": "Required for all functional cases; one-frame identity only does not assert asynchronous mesh readiness.",
+    "world_points_tolerance": 1e-05,
+    "full_scene_restore": "Exact semantics; only unordered Volume samples/sculpt layer deltas/sculpt masks sorted as existing comparator, no values dropped.",
+    "extra_allocated_bytes": 5804032,
+    "compute_claim": false,
+    "physical_HMD": false
+  },
+  "records": [
+    {
+      "path": "artifacts/integration-proof/worker9dd/device/status.json",
+      "sha256": "a1166b1978e1b56986b3fc37b6d75edb9be2c98e3b9d4d515d03d629f1a4a2a0",
+      "exit": 0,
+      "source_drift": [],
+      "input_drift": [],
+      "ELF_drift": []
+    },
+    {
+      "path": "artifacts/integration-proof/worker9dd/gui-release-compact-combined-v3-expose-ack/status.json",
+      "sha256": "4dce20c9ad395577fa64815f93f316895b7b4a477532a9ead065f761daab7ba9",
+      "exit": 0,
+      "source_drift": [],
+      "input_drift": [],
+      "ELF_drift": []
+    },
+    {
+      "path": "artifacts/integration-proof/worker9dd/gui-release-normal-combined-v3-expose-ack/status.json",
+      "sha256": "759bb9fea90ea3dab47dbcf05bc0718fd6daacc002c3a94be3105ab97569afbb",
+      "exit": 0,
+      "source_drift": [],
+      "input_drift": [],
+      "ELF_drift": []
+    },
+    {
+      "path": "artifacts/integration-proof/worker9dd/gui-sanitize-compact-combined-v3-expose-ack/status.json",
+      "sha256": "76ab026a420eff1d2db7b176927240d13ce0a5d7b271ee6212aec6c1ec6294c9",
+      "exit": 0,
+      "source_drift": [],
+      "input_drift": [],
+      "ELF_drift": []
+    },
+    {
+      "path": "artifacts/integration-proof/worker9dd/gui-sanitize-normal-combined-v3-expose-ack/status.json",
+      "sha256": "abe1029b090a2b98ed00805985e761ad39ec12824714d0a605e8620b8a6420d2",
+      "exit": 0,
+      "source_drift": [],
+      "input_drift": [],
+      "ELF_drift": []
+    },
+    {
+      "path": "artifacts/integration-proof/worker9dd/release/app/status.json",
+      "sha256": "22a534525f31a67532be6c1d5d2c310b3abaceecbcf9bb79972145da15543beb",
+      "exit": 0,
+      "source_drift": [],
+      "input_drift": [],
+      "ELF_drift": []
+    },
+    {
+      "path": "artifacts/integration-proof/worker9dd/release/consumer/status.json",
+      "sha256": "9d4fb387bd760716fcc59ad011435002a36cb52e481d0dd1d8f8b5e8ea6c1f22",
+      "exit": 0,
+      "source_drift": [],
+      "input_drift": [],
+      "ELF_drift": []
+    },
+    {
+      "path": "artifacts/integration-proof/worker9dd/sanitize/app/status.json",
+      "sha256": "9682a55efd754b9ccf1a0e3b434048a655e829183ab70a5f0ddb9692ff9ac421",
+      "exit": 0,
+      "source_drift": [],
+      "input_drift": [],
+      "ELF_drift": []
+    },
+    {
+      "path": "artifacts/integration-proof/worker9dd/sanitize/consumer/status.json",
+      "sha256": "f1f86aa71699271877a35adfd80386dafae9eed5ab8886dbd469f7c842cc7c10",
+      "exit": 0,
+      "source_drift": [],
+      "input_drift": [],
+      "ELF_drift": []
+    }
+  ],
+  "proof_scripts": {
+    "artifacts/integration-plan/combined-menu.py": "4387d718256cde6eab559d1bbd0954ecb0f1726c964fda9a270f3c604a0a33ba",
+    "artifacts/integration-plan/archive-own-san.py": "32755ef07195efc6b94d424c6339b5b77b958dbf0fc097675db2afba7fce2330",
+    "artifacts/integration-plan/worker9dd.py": "72d6a1188db98188617cb7ffe6db5107cbef11f4753858eb8e23c637984a4728",
+    "artifacts/integration-plan/run-gui-worker9dd.py": "2e6065b47429674dd10336a242909f2c9cd3d91b5dd026512bb9bdaf77edaccc",
+    "artifacts/integration-plan/device-worker9dd.py": "957b785929b55688124c8309b2141521f07d5dcd87c071492af63e3f889fb859"
+  },
+  "restoration_ledgers": [
+    {
+      "path": "artifacts/new-san-archive/app.json",
+      "sha256": "bbdbf608a4d2e908290d66f6897087a29e152e688d1cad7313cd4ddbe02a8d59"
+    },
+    {
+      "path": "artifacts/new-san-archive/consumer.json",
+      "sha256": "52c4e826089f0c65a4c8432d332f14c2b00d404c2683502a5ff4c93bed4dc7f9"
+    },
+    {
+      "path": "artifacts/new-san-archive/worker9dd-consumer.json",
+      "sha256": "f39722928003cdb7795207ca51e905dcc4601d4315ff883fe7b8de3dbf560bd7"
+    }
+  ],
+  "archive_scope": "Only NEW closed passed SAN ELFs archived, full original byteSHA/mode/UID/GID/nsmtime/path restored and verified before duplicate removal. Sources/.o/.a/.so/support remain untouched.",
+  "restore_commands": [
+    "python3 artifacts/integration-plan/archive-own-san.py restore consumer",
+    "python3 artifacts/integration-plan/archive-own-san.py restore app",
+    "python3 artifacts/integration-plan/archive-own-san.py restore worker9dd-consumer"
+  ],
+  "preserved_original_failures": "Prior layout parser, projection-modal expose observer and one-frame nonblank observer failures remain exactly recorded in POLYGON-RETOPO-AFFINE.json; no product/quality/deadline relaxation.",
+  "space": {
+    "allocated": 753397760,
+    "actual_free": 22679830528,
+    "cumulative_cap": 1073741824,
+    "minimum_actual_free": 21474836480
+  },
+  "remaining": [
+    "Main coordinator review/admission",
+    "No full project/current backend regression or general paint transfer/Frame38/refinement capability claimed"
+  ],
+  "full_build": false,
+  "main_admission": false,
+  "full_goal_complete": false
+}

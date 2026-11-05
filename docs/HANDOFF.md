@@ -1,25 +1,39 @@
-## Private explicit SurfaceHeat5 integration candidate — 2026-11-05
+## Private opt-in mode 5 + current polygon/retopology integration — 2026-11-05
 
-This private source merge combines qualified main `9dd63f9` with opt-in weights
-checkpoint `1e6d76d`. It preserves Automatic0 as the default and keeps method5
-explicit. Reserved2/3, existing methods, all resource/quality limits and complex
-prepared37/38 refusal guards remain unchanged. Initial merged Release component checks now pass: native surface25, legacy
-skin38 and retopology-worker251 prefixes/4,308 checks. Main and merged type/default
-probes match. This is not yet a qualified coherent application or main admission.
-See [initial merged R receipt](validation/MODE5-MAIN-INITIAL-R.json).
+This private candidate combines main `c55dc2f` (polygon + transactional
+retopology worker) with qualified opt-in weights `1e6d76d`. Automatic0 remains
+the default. All legacy methods, resource/quality limits and unsupported complex
+37/38 owner guards remain intact. This source is not yet a qualified merged
+application or main admission.
 
-The weight component passed current opt-in public/controller and independent
-pose checks, actual normal/compact FLTK, and complete real caller1052 and
-long-basename publication381 faults in Release and sanitizer profiles. See
-[complete admission evidence](MODE5-COMPLETE-ADMISSION.md) and its preceding
-phaseA/B/C receipts for exact scopes, original negatives and cost uncertainty.
-Those are component proofs, not fresh merged-ABI results.
+The initial merged Release proof on `8f43cae` covered the earlier `9dd63f9`
+retopology baseline only. Its 25 surface-heat checks, 38 legacy skin checks and
+251-prefix/4,308-check worker result stay separate; they do not qualify the new
+polygon job/world payload. Fresh whole merged Document and qualified complete
+polygon providers are required before the next bounded Release checks. No old
+provider is accepted merely because outer Document size happens to match.
 
-Main's affine retopology, visible markers, active avatar assertions and
-transactional worker remain intact below. The separately observed generic
-post-enqueue caller publication gap is not claimed fixed by direct skin caller
-coverage. Fresh merged Document/closure checks and coordinated coherent
-application qualification remain required. No default promotion is authorized.
+The weight component's complete caller 1,052 and long-basename publication 381
+prefixes passed in both profiles, with timing variance and previous sampled
+scopes retained in [the component receipt](MODE5-COMPLETE-ADMISSION.md).
+Main's polygon/retopology changes and all current documentation remain below.
+No generic post-enqueue caller fix, default promotion or full-goal completion
+is implied by those component proofs.
+
+## Affine polygon admission — 2026-11-05
+
+Main now also admits qualified polygon/retopology composition8750f20 (runtime0567)
+via37c46b9, with exact source/header/test/CMake parity. True-affine polygon tools,
+held placement, source restoration and reflection-correct normals coexist with
+the admitted transactional retopology worker. Native248/profile,16 exact file
+pairs, ordinary normal+compact GUI77each/profile and actual Arc stereo flows pass.
+Read POLYGON-AFFINE-ADMISSION.md and its receipt. This is component qualification,
+not a fresh full-project build, physical headset test or full-goal completion.
+
+The caller-admission repair and automatic weights are separate continuations and
+must merge this current source before their final qualification. Remesh remains
+private until its frozen sweep and coherent integration close. Older private
+entries below retain their historical scope; the full goal remains active.
 
 ## Current production admission — 2026-11-05
 

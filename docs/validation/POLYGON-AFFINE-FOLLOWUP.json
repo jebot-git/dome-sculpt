@@ -1,0 +1,474 @@
+{
+  "status": "qualified scoped software followup; no hardware or main admission",
+  "runtime": "263c753",
+  "prior_seal": "e0e9de5aba6761b8328d625894dd2f0c659b02e0",
+  "test_source_head": "8a5957b8065e7dd3d9cc3bf425cda13d9ad7f6ee",
+  "production_diff_since_prior_seal": [],
+  "scope": "Seven-whole-TU matched incremental application; complete own sectioned PolygonWorkspace/render TUs for sanitizer consumer. Immutable CURRENTMAIN10944/C179 libraries reused without copying. No fresh full source build.",
+  "renderer": {
+    "release_checks": 231,
+    "sanitize_checks": 231,
+    "pairs_each": 36,
+    "max_pixel": 0,
+    "unchanged_limit": 1,
+    "wrong_A_times_N": 23,
+    "wrong_reflection": 50,
+    "actual_sanitizer_workspace": true,
+    "readbacks": 0,
+    "geometry_uploads": "first geometry only; all subsequent eye/component/held changes no upload",
+    "S_executable_bytes": 20578456,
+    "R_sanitizer_PNG_sha_equal": true
+  },
+  "native_GUI": {
+    "release_checks": 78,
+    "sanitize_checks": 78,
+    "cases_each": [
+      "native-sheared normal",
+      "native-sheared640x360 bitmapfont32",
+      "posed-color-reflected normal",
+      "posed-color-reflected640x360 bitmapfont32"
+    ],
+    "actual_source_conversion_cancel": true,
+    "full_edit_cancel_apply_immediateSave_UndoRedo_Restore": true,
+    "clean_application_exit": true,
+    "sanitizer_actual_child_ELF_maps_pinned": true,
+    "release_gui_pin_scope": "Exact executable and fixture SHA pinned; original wrapper observed dbus parent only. Matching R app--version/runtime SDK libraries are independently pinned in phase1. S GUI final wrapper captures actual app/driver descendants.",
+    "observer": "Release Scene observer always uses own Release SDK; actual SAN app uses own SAN SDK. No old archive linkage."
+  },
+  "failures_preserved": [
+    "First thin Release link caught old polygon-conversion member; executable not run.",
+    "Forced unnecessary whole conversion object caused two hard96MiB sanitizer SIGXFSZ links; no runtime.",
+    "Real minimal S renderer all231 passed but generic map observer incorrectly treated writable Mesa cache index as immutable; same executable cache-disabled replay closes with all original immutable map checks.",
+    "Initial SAN GUI failed before app start because separate Release observer inherited sanitizer FLTK DSOs; actual ASan order guard remained enabled, corrected observer environment only.",
+    "Outer GUI observer first finalizer redundantly rehashed all1378sources1378times; completed naturally0; attempted diagnostic found process already gone and sent no signal. Future wrapper single collection."
+  ],
+  "count_correction": "Earlier messages inferred22/25 posed GUI checks; exact reports21/24, so total78 perprofile.",
+  "fixture_sha256": {
+    "artifacts/followup-proof/release-own-conversion/fixtures/native-reflected.dsculpt": "9616f68e70246c2ba43b518c40e450d62fc255922a949dcde62ae11ee13f98f5",
+    "artifacts/followup-proof/release-own-conversion/fixtures/native-sheared.dsculpt": "37c11d3726d5bf6aa9457bf92307b727b02071fde5c01fd956c44d36cfbb267b",
+    "artifacts/followup-proof/release-own-conversion/fixtures/posed-color-reflected.dsculpt": "b2ba13ca1aa5b6c3b4dee86314d866757fbbcf607d93ff5c34d6b97d1c3a4989",
+    "artifacts/followup-proof/release-own-conversion/fixtures/posed-color-sheared.dsculpt": "a18427ea9eb5b064c30f8d7a98a374a3e3a7f8415d40d70d558e8ad425b790d0"
+  },
+  "records": [
+    {
+      "path": "artifacts/followup-proof/gui-release-compact-native/status.json",
+      "sha256": "d78f150582e0a05c63777779c3c40c87caa8db39e05edaab910f8cca3c009b1b",
+      "state": "terminal",
+      "exit": 0,
+      "error": null,
+      "steps": [
+        {
+          "name": "actual-gui",
+          "exit": 0,
+          "seconds": 14.310554027557373,
+          "actual_map_drift": []
+        }
+      ],
+      "gui_checks": 18,
+      "gui_complete": true,
+      "source_drift": [],
+      "input_drift": [],
+      "actual_child_ELF_map_drift": null,
+      "actual_app_pids": null
+    },
+    {
+      "path": "artifacts/followup-proof/gui-release-compact-posed-color/status.json",
+      "sha256": "c2e0de2524d0b115e4a9d47b6507f789077a80448b5dd73c084255b2a77424cd",
+      "state": "terminal",
+      "exit": 0,
+      "error": null,
+      "steps": [
+        {
+          "name": "actual-gui",
+          "exit": 0,
+          "seconds": 14.43833065032959,
+          "actual_map_drift": []
+        }
+      ],
+      "gui_checks": 24,
+      "gui_complete": true,
+      "source_drift": [],
+      "input_drift": [],
+      "actual_child_ELF_map_drift": null,
+      "actual_app_pids": null
+    },
+    {
+      "path": "artifacts/followup-proof/gui-release-normal-native/status.json",
+      "sha256": "95e97c54a1ecbb3116d2df578a90952d3c1431b560aa11a0051eb474a37916f4",
+      "state": "terminal",
+      "exit": 0,
+      "error": null,
+      "steps": [
+        {
+          "name": "actual-gui",
+          "exit": 0,
+          "seconds": 14.2039635181427,
+          "actual_map_drift": []
+        }
+      ],
+      "gui_checks": 15,
+      "gui_complete": true,
+      "source_drift": [],
+      "input_drift": [],
+      "actual_child_ELF_map_drift": null,
+      "actual_app_pids": null
+    },
+    {
+      "path": "artifacts/followup-proof/gui-release-normal-posed-color/status.json",
+      "sha256": "fec0d09e95f4d6a90fa38fc97ea7f6f18b186066d85bb177a045216e85dbc4cb",
+      "state": "terminal",
+      "exit": 0,
+      "error": null,
+      "steps": [
+        {
+          "name": "actual-gui",
+          "exit": 0,
+          "seconds": 14.732914924621582,
+          "actual_map_drift": []
+        }
+      ],
+      "gui_checks": 21,
+      "gui_complete": true,
+      "source_drift": [],
+      "input_drift": [],
+      "actual_child_ELF_map_drift": null,
+      "actual_app_pids": null
+    },
+    {
+      "path": "artifacts/followup-proof/gui-sanitize-compact-native-observer-sdk/status.json",
+      "sha256": "632885f17aa1df06cbac87eb286f75480bdd8c431659b8f624fd7c795f37113e",
+      "state": "terminal",
+      "exit": 0,
+      "error": null,
+      "steps": [
+        {
+          "name": "actual-gui",
+          "exit": 0,
+          "seconds": 22.981730461120605,
+          "actual_map_drift": []
+        }
+      ],
+      "gui_checks": 18,
+      "gui_complete": true,
+      "source_drift": [],
+      "input_drift": [],
+      "actual_child_ELF_map_drift": [],
+      "actual_app_pids": [
+        2728776,
+        2733936
+      ]
+    },
+    {
+      "path": "artifacts/followup-proof/gui-sanitize-compact-posed-color-observer-sdk/status.json",
+      "sha256": "7745d3282e4a994aa0153d0d1d30d81170baa220ad7c0b6865fc126fe837007b",
+      "state": "terminal",
+      "exit": 0,
+      "error": null,
+      "steps": [
+        {
+          "name": "actual-gui",
+          "exit": 0,
+          "seconds": 23.042035818099976,
+          "actual_map_drift": []
+        }
+      ],
+      "gui_checks": 24,
+      "gui_complete": true,
+      "source_drift": [],
+      "input_drift": [],
+      "actual_child_ELF_map_drift": [],
+      "actual_app_pids": [
+        2739959,
+        2745521
+      ]
+    },
+    {
+      "path": "artifacts/followup-proof/gui-sanitize-normal-native/status.json",
+      "sha256": "b4490d2cdec03074045df2612d4d173394b7bc8e2c73b4f1a64d2da560ecc824",
+      "state": "terminal",
+      "exit": 1,
+      "error": "RuntimeError('actual-gui failed with 1; preserved /home/blux/de-xr/dome-sculpt/artifacts/polygon-affine-10944/artifacts/followup-proof/gui-sanitize-normal-native/actual-gui.log')",
+      "steps": [
+        {
+          "name": "actual-gui",
+          "exit": 1,
+          "seconds": 0.34845972061157227,
+          "actual_map_drift": []
+        }
+      ],
+      "gui_checks": 0,
+      "gui_complete": false,
+      "source_drift": [],
+      "input_drift": [],
+      "actual_child_ELF_map_drift": [],
+      "actual_app_pids": []
+    },
+    {
+      "path": "artifacts/followup-proof/gui-sanitize-normal-native-observer-sdk/status.json",
+      "sha256": "6feb40801e52b5c4c4cd6709016f9a54dc14b825693ca6453875c06215fcecca",
+      "state": "terminal",
+      "exit": 0,
+      "error": null,
+      "steps": [
+        {
+          "name": "actual-gui",
+          "exit": 0,
+          "seconds": 21.56941270828247,
+          "actual_map_drift": []
+        }
+      ],
+      "gui_checks": 15,
+      "gui_complete": true,
+      "source_drift": [],
+      "input_drift": [],
+      "actual_child_ELF_map_drift": [],
+      "actual_app_pids": [
+        2719385,
+        2724093
+      ]
+    },
+    {
+      "path": "artifacts/followup-proof/gui-sanitize-normal-posed-color-observer-sdk/status.json",
+      "sha256": "f48ff37919033c4d65ce4b9f3cd9f4b4829d7a9b6336a296003cec90af49ea92",
+      "state": "terminal",
+      "exit": 0,
+      "error": null,
+      "steps": [
+        {
+          "name": "actual-gui",
+          "exit": 0,
+          "seconds": 21.564998388290405,
+          "actual_map_drift": []
+        }
+      ],
+      "gui_checks": 21,
+      "gui_complete": true,
+      "source_drift": [],
+      "input_drift": [],
+      "actual_child_ELF_map_drift": [],
+      "actual_app_pids": [
+        2734488,
+        2739438
+      ]
+    },
+    {
+      "path": "artifacts/followup-proof/release/status.json",
+      "sha256": "bd3967aef5355e0f816d44379d7ea952ff1a2e25bc3225ae4ea8d609ba2e0358",
+      "state": "terminal",
+      "exit": 1,
+      "error": "AssertionError(('Unexpected changed/heavy old member selected', ['polygon-conversion.cpp.o']))",
+      "steps": [
+        {
+          "name": "compile",
+          "exit": 0,
+          "seconds": 9.25478982925415,
+          "actual_map_drift": null
+        },
+        {
+          "name": "link",
+          "exit": 0,
+          "seconds": 0.26669859886169434,
+          "actual_map_drift": null
+        }
+      ],
+      "gui_checks": 0,
+      "gui_complete": null,
+      "source_drift": [],
+      "input_drift": [],
+      "actual_child_ELF_map_drift": null,
+      "actual_app_pids": null
+    },
+    {
+      "path": "artifacts/followup-proof/release-own-conversion/status.json",
+      "sha256": "6332eeb5fe2b71ac1b0824d5352f86258411a7bb56a97c20a506a59db64ad437",
+      "state": "terminal",
+      "exit": 0,
+      "error": null,
+      "steps": [
+        {
+          "name": "compile",
+          "exit": 0,
+          "seconds": 9.497231721878052,
+          "actual_map_drift": null
+        },
+        {
+          "name": "link",
+          "exit": 0,
+          "seconds": 0.2755725383758545,
+          "actual_map_drift": null
+        },
+        {
+          "name": "fixtures",
+          "exit": 0,
+          "seconds": 0.10763955116271973,
+          "actual_map_drift": []
+        },
+        {
+          "name": "render",
+          "exit": 0,
+          "seconds": 0.2638895511627197,
+          "actual_map_drift": []
+        }
+      ],
+      "gui_checks": 0,
+      "gui_complete": null,
+      "source_drift": [],
+      "input_drift": [],
+      "actual_child_ELF_map_drift": null,
+      "actual_app_pids": null
+    },
+    {
+      "path": "artifacts/followup-proof/sanitize-gc-minimal/status.json",
+      "sha256": "04cfb4bd99bc2986e7fb3a4fbd2fa2b630d7b9e377c49004ddd70834d165a362",
+      "state": "terminal",
+      "exit": 1,
+      "error": "RuntimeError('render failed with 1; preserved /home/blux/de-xr/dome-sculpt/artifacts/polygon-affine-10944/artifacts/followup-proof/sanitize-gc-minimal/render.log')",
+      "steps": [
+        {
+          "name": "compile",
+          "exit": 0,
+          "seconds": 5.369117975234985,
+          "actual_map_drift": null
+        },
+        {
+          "name": "compile-whole-polygon-authoring.cpp",
+          "exit": 0,
+          "seconds": 5.692372560501099,
+          "actual_map_drift": null
+        },
+        {
+          "name": "compile-whole-polygon-render.cpp",
+          "exit": 0,
+          "seconds": 1.3225760459899902,
+          "actual_map_drift": null
+        },
+        {
+          "name": "link",
+          "exit": 0,
+          "seconds": 0.43888139724731445,
+          "actual_map_drift": null
+        },
+        {
+          "name": "render",
+          "exit": 1,
+          "seconds": 0.6229796409606934,
+          "actual_map_drift": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/polygon-affine-10944/artifacts/followup-proof/sanitize-gc-minimal/private/mesa/mesa_shader_cache/index"
+          ]
+        }
+      ],
+      "gui_checks": 0,
+      "gui_complete": null,
+      "source_drift": [],
+      "input_drift": [],
+      "actual_child_ELF_map_drift": null,
+      "actual_app_pids": null
+    },
+    {
+      "path": "artifacts/followup-proof/sanitize-gc-whole/status.json",
+      "sha256": "5ff9e42c9d49fe8c90cac8ab429ca34623e4c5cfe19a983dd685400cfbb8a46a",
+      "state": "terminal",
+      "exit": 1,
+      "error": "RuntimeError('Link failed; original output/log retained')",
+      "steps": [
+        {
+          "name": "compile",
+          "exit": 0,
+          "seconds": 5.410739898681641,
+          "actual_map_drift": null
+        },
+        {
+          "name": "compile-whole-polygon-authoring.cpp",
+          "exit": 0,
+          "seconds": 5.68169641494751,
+          "actual_map_drift": null
+        },
+        {
+          "name": "compile-whole-polygon-conversion.cpp",
+          "exit": 0,
+          "seconds": 7.397091627120972,
+          "actual_map_drift": null
+        },
+        {
+          "name": "compile-whole-polygon-render.cpp",
+          "exit": 0,
+          "seconds": 1.4033784866333008,
+          "actual_map_drift": null
+        },
+        {
+          "name": "link",
+          "exit": 1,
+          "seconds": 1.6856791973114014,
+          "actual_map_drift": null
+        }
+      ],
+      "gui_checks": 0,
+      "gui_complete": null,
+      "source_drift": [],
+      "input_drift": [],
+      "actual_child_ELF_map_drift": null,
+      "actual_app_pids": null
+    },
+    {
+      "path": "artifacts/followup-proof/sanitize-own-conversion/status.json",
+      "sha256": "e1fc1193b056f4277321384a5f5ac5061b3cd5e528ac673944a10e30062efc96",
+      "state": "terminal",
+      "exit": 1,
+      "error": "RuntimeError('Link failed; original output/log retained')",
+      "steps": [
+        {
+          "name": "compile",
+          "exit": 0,
+          "seconds": 5.4098899364471436,
+          "actual_map_drift": null
+        },
+        {
+          "name": "link",
+          "exit": 1,
+          "seconds": 1.3740079402923584,
+          "actual_map_drift": null
+        }
+      ],
+      "gui_checks": 0,
+      "gui_complete": null,
+      "source_drift": [],
+      "input_drift": [],
+      "actual_child_ELF_map_drift": null,
+      "actual_app_pids": null
+    },
+    {
+      "path": "artifacts/followup-proof/sanitize-same-binary-cache-disabled/status.json",
+      "sha256": "00917a2a6621563978d96243b00d7b4b3f957bd43a1cc2fdb622757768405f17",
+      "state": "terminal",
+      "exit": 0,
+      "error": null,
+      "steps": [
+        {
+          "name": "render",
+          "exit": 0,
+          "seconds": 0.7153434753417969,
+          "actual_map_drift": []
+        }
+      ],
+      "gui_checks": 0,
+      "gui_complete": null,
+      "source_drift": [],
+      "input_drift": [],
+      "actual_child_ELF_map_drift": null,
+      "actual_app_pids": null
+    }
+  ],
+  "space": {
+    "allocated": 1132158976,
+    "free": 22946238464,
+    "prospective": 0
+  },
+  "allocation_cap_bytes": 1342177280,
+  "minimum_actual_free_bytes": 21474836480,
+  "remaining": [
+    "Coherent semantic main/triangle-remesh/retopo integration remains root-owned; this private branch is not main.",
+    "Full Document acceptance allocation sweep/fresh full application build/Wayland/new loader not claimed by this scoped cohort."
+  ],
+  "hardware_continuation": "POLYGON-AFFINE-HARDWARE.json",
+  "runner_note": "Tracked render proof now explicitly disables writable Mesa cache, matching the successful same-binary S and strict hardware runtime controls; original cache-index observer failure retained."
+}
