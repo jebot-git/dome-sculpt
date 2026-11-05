@@ -132,6 +132,8 @@ inline NormalFrameExport normal_frame_export(const ObjectSurface &input,SourceMo
     const std::function<bool()> &cancelled={},bool retain_pbr_sampling=false) {
   if(!input.material_bindings || !input.material_bindings->normal_frames)throw std::invalid_argument("Missing original frame export payload");
   const auto &binding=*input.material_bindings;binding.validate();const auto &set=*binding.normal_frames;
+  if(binding.native_paint_frames&&(!input.paint_sampling_attachment||input.paint_corner_coordinates.empty()))
+    throw std::invalid_argument("Native key export requires its complete independent paint stream");
   const auto normal_domain=retained_normal_coordinates(&binding,input.textures.get());
   const bool retained=bool(normal_domain);
   if(retained&&(!retain_pbr_sampling||space!=SourceMorphSpace::Native))throw std::invalid_argument("Retained normal domains require an explicitly compiled format-specific sampling export; original source retained");
