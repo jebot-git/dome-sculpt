@@ -20,3 +20,22 @@ milestone remains separate. Original69fa Release105/107 and its live sanitizer,
 older full689 source regression and component failures remain untouched. No main
 admission, completed combined tests, installation, headset or compute claim is
 made here. The full production goal and later controller drawers remain open.
+
+## Native target include correction
+
+The initial sanitizer owning build stops at255/383 because the newly registered
+initial-shade-render target lacks its cgltf include path. Release ALL is then
+explicitly interrupted with130 before reaching the same known bad target;
+completed tasks and original logs/statuses remain. Both source manifests have
+no drift. All four queued native/physical GUI waiters close before UI execution
+because no successful complete build artifacts were published. No selected120
+runtime or combined GUI pass follows from these failed/cancelled builds.
+
+The correction adds src, third_party/cgltf and third_party/desktop private
+includes to that test target, matching its real consumer headers. Production,
+public/private headers, native schema and every C++ source remain byte-identical
+to c31. A separately named continuation reconfigures the same owning build
+directories and retains every successfully compiled matching object, then
+completes Release ALL/selected sanitizer and the120 runtime commands. This is
+an explicit incremental continuation after an evidenced build-system failure,
+not a restart caused by observation timeout or a green original invocation.
