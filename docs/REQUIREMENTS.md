@@ -56,6 +56,19 @@ Together154/160 selected Release tests pass. The same owning sanitizer remainder
 is still running.798registered is not a full runtime result;37 and physical4
 remain outside main until the regressions and remaining admission controls close.
 
+Private test-only mixed-consumer migration81c2e30 now checks genuine conversion,
+normal-UV and writable-paint owners, derives the format from those owners, and
+rejects five additional missing/downgraded/foreign-owner cases per retained state
+and append order. It passes229 controls/eight comparisons each Release, actual
+same-profile sanitizer worker inputs and strict Arc, maximum1 within unchanged4;
+32 validated GLBs have zero errors and corresponding bytes are exact. Read
+MIXED-NORMAL-PAINT37-CONSUMER.md. Original failed tests remain recorded. A separate
+normal-expression compositiond6d40ca retains the current native/HDR/paint export
+paths and sealed typed normal proof; its fresh owning app/core/render/support/XR
+and110 explicit targets are building in Release/sanitizer. That source still
+needs the stricter inactive-Rim preflight correction and runtime qualification;
+neither candidate is admitted to main and807registered is not a runtime result.
+
 Automatic weights remain experimental. Source-aware heat/role helpers now pass
 874 original+local avatar comparisons, but general closed-affine/edited domains
 and actual native publication/default integration remain open. The fresh owning
