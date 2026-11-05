@@ -23,7 +23,6 @@ public:
  const auto &normal_uv() const noexcept{return normal_uv_;}
  const auto &attachment() const noexcept{return attachment_;}
  const auto &current_sources() const noexcept{return current_sources_;}
- const auto &deformation() const noexcept{return deformation_;}
 private:
  CanonicalPaintSampling()=default;
  CanonicalPaintSampling(const CanonicalPaintSampling&)=delete;
@@ -32,7 +31,6 @@ private:
  std::shared_ptr<const PolygonOrigin> before_;
  std::shared_ptr<const CanonicalNormalUv> normal_uv_;
  std::shared_ptr<const PaintSamplingAttachment> attachment_;
- std::shared_ptr<const DeformationState> deformation_;
  std::vector<uint32_t> current_sources_;
 };
 }

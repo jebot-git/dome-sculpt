@@ -38,7 +38,7 @@ void CanonicalPaintSampling::validate_current(const PaintedMesh &paint,const Pai
  attachment_->domain()->validate_current(current,limits);
  if(paint.baked()&&paint.baked()->normal_field&&paint.baked()->normal_field->origin()!=normal_uv_->origin())
   throw std::invalid_argument("Canonical paint borrowed another baked normal field origin");
- if(deformation_)deformation_->validate(current);stop(limits);
+ stop(limits);
 }
 CanonicalPaintTransition CanonicalPaintSampling::create(const Scene &scene,uint64_t id,
  const Mesh &target,std::span<const uint32_t> map,const PaintSamplingLimits &limits){
@@ -71,10 +71,9 @@ CanonicalPaintTransition CanonicalPaintSampling::create(const Scene &scene,uint6
  auto model=normal_frame_remap_deformation(before->deformation,before->paint->mesh(),geometry.paint->mesh(),map,limits.cancelled);
  auto owner=std::shared_ptr<CanonicalPaintSampling>(new CanonicalPaintSampling);
  owner->before_=std::move(before);owner->normal_uv_=std::move(geometry.normal_uv);
- owner->attachment_=geometry.paint->paint_sampling_attachment();owner->deformation_=std::move(model);
+ owner->attachment_=geometry.paint->paint_sampling_attachment();
  owner->current_sources_=std::move(geometry.current_sources);owner->self_=owner;
  owner->validate_current(*geometry.paint,limits);stop(limits);
- auto current_deformation=owner->deformation_;
- return {std::move(owner),std::move(geometry.paint),std::move(current_deformation)};
+ return {std::move(owner),std::move(geometry.paint),std::move(model)};
 }
 }
