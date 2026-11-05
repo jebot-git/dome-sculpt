@@ -13,8 +13,9 @@ Merge obligations preserved:
   retention is added separately. No canonical/UV/native role guard is removed.
 - Normal-frame export combines the genuine native frame/paint path with exact
   canonical corner refinement; the shared header equals the independently
-  composed39f0b4f version. Both owner types retain their separate proof. No
-  physical package4 adapter is included yet.
+  composed39f0b4f version. Both owner types retain their separate proof. The corrected cdbd7ea physical package4 adapter is included as unqualified
+  combined source, with a strong genuine canonical owner distinct from native32
+  package3. All transitive users of its appended private image pointer rebuild.
 - Material19/Scene37 are selected only by genuine CPS graph ownership and real
   capability pools. Existing material18/native36 frame/history tables retain
   their independent conditional meaning. No-CPS legacy bytes must stay exact.
@@ -31,3 +32,13 @@ The original failed full689/630 results remain untouched. The previous a0
 sanitizer125 process is separate and remains frozen until terminal. This candidate
 is not main admission, full regression/device/compute proof or full production
 completion. Accepted selection UI and later controller drawers remain required.
+
+The new self-contained CTest fixture chain uses current public Convert, Create/
+Replace and actual native physical pointer/controller gestures, then ordered Save.
+It generates flat/curved/skinned/morphed/current-key FLOAT inputs from the owning
+conversion cases, not ignored worktree data or borrowed executables. Actual UV
+Apply creates its own37 package4 input. The public worker,27 alpha/pose/morph
+independent views, foreign/missing-domain negatives, exact caps, allocation sweep
+and fsync-gated running/queued Cancel consume that authenticated current data.
+The original39f omission counterexample remains preserved by its agent; the new
+reader must reject a rehashed legacy1 package omitting the actual37 witness.
