@@ -146,6 +146,37 @@ void terminal_cases(const Scene &scene,const std::filesystem::path &out) {
     }
   }
 }
+void history_level_focus_rebase(const Scene &scene) {
+  Document d;points(d,scene);InputHand hand(d);
+  const auto original=d.copy_scene().encode();
+  auto count=[&]{ready(d);return d.frame().state->retopology->topology->vertices().size();};
+  auto processed=[&]{
+    static uint64_t marker=900000;const auto next=++marker;
+    hand.f.hands[1].tracked.timeMs=next;
+    const auto until=std::chrono::steady_clock::now()+std::chrono::seconds(10);
+    do{hand.send();}while(d.frame().state->hands[1].tracked.timeMs!=next&&std::chrono::steady_clock::now()<until);
+    check(d.frame().state->hands[1].tracked.timeMs==next,"History-level probe observes a genuinely processed frame");
+  };
+  check(count()==3,"History focus/rebase probe starts with three independent accepted points");
+  hand.f.hands[1].undo=true;processed();check(count()==2,"First history level press removes exactly one real point");
+  processed();check(count()==2,"Held history level does not repeat");
+  hand.f.focused=false;hand.send();check(count()==2,"Actual focus loss preserves draft history");
+  hand.f.focused=true;processed();check(count()==2,"Focus regain with held button is not a new history edge");
+  d.rebase_space(CanvasTransform{{.1f,0,0},{},1});processed();
+  check(count()==2,"Real spatial epoch rebase retains consumed history levels");
+  d.begin_spatial();processed();check(count()==2,"Spatial startup cannot manufacture a held history press");
+  hand.f.hands[1].undo=false;processed();hand.f.hands[1].undo=true;processed();
+  check(count()==1,"A genuine release then second press performs the next Undo");
+  hand.f.hands[1].undo=false;processed();hand.f.hands[1].redo=true;processed();
+  check(count()==2,"Fresh Redo level restores exactly one point");
+  processed();check(count()==2,"Held Redo cannot repeat");
+  hand.f.focused=false;hand.send();hand.f.focused=true;processed();
+  check(count()==2,"Focus regain preserves the independently consumed Redo latch");
+  hand.f.hands[1].redo=false;processed();hand.f.hands[1].redo=true;processed();
+  check(count()==3,"Second genuine Redo press restores the exact three-point draft");
+  check(d.copy_scene().encode()==original,"History focus/rebase never mutates original affine paint/skin/morph/source");
+  d.end_retopology(false);
+}
 void hold_controller(InputHand &hand) {
   hand.position(point(matrix,evaluated({.22f,.17f,.061f},true)));hand.send(.7f);ready(hand.d);
   check(hand.d.frame().state->retopology->topology->vertices().size()==4,"Actual tracked pressure holds a real fourth point");
@@ -278,6 +309,7 @@ int main(int argc,char **argv)try {
   std::cout<<"INPUT Face allocations="<<input_count<<std::endl;
   for(size_t at=1;at<=input_count;++at){input_face(scene,at,false,count);++denials;}
   terminal_cases(scene,out);
+  history_level_focus_rebase(scene);
   std::cout<<"TAIL spatial cancellation"<<std::endl;spatial_cancel_routes(scene);
   std::cout<<"TAIL atomic frame"<<std::endl;frame_batch(scene,out/"frame-retry.dsculpt");
   std::cout<<"TAIL immutable queue budget"<<std::endl;queue_budget(scene);

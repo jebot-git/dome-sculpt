@@ -987,6 +987,17 @@ if(DOME_BUILD_UI OR DOME_BUILD_XR OR BUILD_TESTING)
     if(BUILD_TESTING)
         add_library(dome-sculpt-test-runtime SHARED tests/xr_runtime.cpp)
       target_link_libraries(dome-sculpt-test-runtime PRIVATE dome-sculpt-json PkgConfig::NATIVEGL)
+      add_executable(dome-sculpt-retopo-history-openxr-test tests/retopo-history-openxr.cpp)
+      target_link_libraries(dome-sculpt-retopo-history-openxr-test PRIVATE dome-sculpt-xr)
+      target_link_options(dome-sculpt-retopo-history-openxr-test PRIVATE
+        -Wl,--wrap=_ZN4dome6unwrapERNS_4MeshEjjRKSt8functionIFbvEE
+        -Wl,--wrap=_ZN4dome8Document6submitENS_12SpatialFrameE)
+      foreach(history_case apply cancel)
+        add_test(NAME retopology-history-openxr-${history_case} COMMAND dome-sculpt-retopo-history-openxr-test
+          $<TARGET_FILE:dome-sculpt-test-runtime> ${CMAKE_CURRENT_BINARY_DIR}/retopology-history-openxr-${history_case} history-${history_case})
+        set_tests_properties(retopology-history-openxr-${history_case} PROPERTIES TIMEOUT 180
+          ENVIRONMENT "LIBGL_ALWAYS_SOFTWARE=1;LP_NUM_THREADS=2")
+      endforeach()
       if(DOME_BUILD_UI)
         find_package(Python3 REQUIRED COMPONENTS Interpreter)
         add_test(NAME corner-color-uv23-xr COMMAND ${Python3_EXECUTABLE}
