@@ -1,0 +1,193 @@
+{
+  "source": "1b9b942600caa22e6b176b225a59868f69cc6a6d",
+  "production_base": "eacfba7",
+  "scope": "Private fresh-layout geometry and weighted paint-domain factory only; owning Scene38 codec/native/renderer publication remain refused",
+  "profiles": {
+    "release": {
+      "status": {
+        "profile": "release",
+        "head": "1b9b942600caa22e6b176b225a59868f69cc6a6d",
+        "source_inputs": 2289,
+        "protected_inputs": 2772,
+        "free_before": 34900729856,
+        "steps": [
+          {
+            "name": "configure",
+            "command": [
+              "cmake",
+              "-S",
+              "/home/blux/de-xr/dome-sculpt/artifacts/refinement38-owning-eacf",
+              "-B",
+              "/home/blux/de-xr/dome-sculpt/artifacts/refinement38-owning-eacf/build-owning38-release",
+              "-G",
+              "Ninja",
+              "-DCMAKE_BUILD_TYPE=Release",
+              "-DCMAKE_EXPORT_COMPILE_COMMANDS=ON",
+              "-DBUILD_TESTING=ON",
+              "-DDOME_BUILD_UI=ON",
+              "-DDOME_BUILD_XR=ON",
+              "-DDOME_COMPUTE_BACKEND=CPU",
+              "-DFLTK_DIR=/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-release/share/fltk",
+              "-U*DOME_BITMAP_RUNTIME*",
+              "-U*NATIVEGL*",
+              "-U*RENDERFONTS*"
+            ],
+            "exit": 0,
+            "seconds": 5.887806712999009
+          },
+          {
+            "name": "build",
+            "command": [
+              "nice",
+              "-n",
+              "15",
+              "cmake",
+              "--build",
+              "/home/blux/de-xr/dome-sculpt/artifacts/refinement38-owning-eacf/build-owning38-release",
+              "-j2",
+              "--target",
+              "dome-sculpt",
+              "dome-sculpt-refinement38-geometry-test",
+              "dome-sculpt-paint-sampling-test",
+              "dome-sculpt-normal-frame-archive-test",
+              "dome-sculpt-scene-file-test",
+              "dome-sculpt-key-mirror-refinement-test"
+            ],
+            "exit": 0,
+            "seconds": 456.9727257100167
+          },
+          {
+            "name": "tests",
+            "command": [
+              "nice",
+              "-n",
+              "15",
+              "ctest",
+              "--test-dir",
+              "/home/blux/de-xr/dome-sculpt/artifacts/refinement38-owning-eacf/build-owning38-release",
+              "--output-on-failure",
+              "-R",
+              "^(refinement38-geometry|paint-sampling|normal-frame-archive|scene-file|key-mirror-refinement)$",
+              "-j1"
+            ],
+            "exit": 0,
+            "seconds": 0.1595910420292057
+          }
+        ],
+        "artifact_drift": [],
+        "source_drift": [],
+        "free_after": 33382125568,
+        "build_allocated_bytes": 143695872,
+        "result": 0
+      },
+      "geometry_summary": [
+        "REFINEMENT38_GEOMETRY working=13616 retained=6840 callbacks=76 allocation_prefixes=31 uv_error=1.98682e-08",
+        "PASS 123 detached geometry/domain checks; native38 writer/publication still unsupported"
+      ],
+      "receipts": {
+        "artifacts/refinement38-proof/release/status.json": "adde11cb7967f968515276947d92edc2609198e1ef018211859dbc40316340b1",
+        "artifacts/refinement38-proof/release/before.json": "23fe992c47509094144b18bb0fe08de13fb0dc6e7bcc50f89b5ceb381401a78b",
+        "artifacts/refinement38-proof/release/binaries-before.json": "418fc14f68bab6fdd74fe30d1a90436f5dc4633ced2c96ae0ecdcfba9a6361b9",
+        "artifacts/refinement38-proof/release/tests.log": "7562d65490bf31fe388a7e80cd4979c6affa10dd3eb82e4aa996076f1fa08896",
+        "build-owning38-release/Testing/Temporary/LastTest.log": "9b3c64e17403941037f50f0cbbe0ca6c39d74b73529c941e1b8a898e1dc727bc"
+      }
+    },
+    "sanitize": {
+      "status": {
+        "profile": "sanitize",
+        "head": "1b9b942600caa22e6b176b225a59868f69cc6a6d",
+        "source_inputs": 2289,
+        "protected_inputs": 2772,
+        "free_before": 34900729856,
+        "steps": [
+          {
+            "name": "configure",
+            "command": [
+              "cmake",
+              "-S",
+              "/home/blux/de-xr/dome-sculpt/artifacts/refinement38-owning-eacf",
+              "-B",
+              "/home/blux/de-xr/dome-sculpt/artifacts/refinement38-owning-eacf/build-owning38-sanitize",
+              "-G",
+              "Ninja",
+              "-DCMAKE_BUILD_TYPE=Release",
+              "-DCMAKE_EXPORT_COMPILE_COMMANDS=ON",
+              "-DBUILD_TESTING=ON",
+              "-DDOME_BUILD_UI=ON",
+              "-DDOME_BUILD_XR=ON",
+              "-DDOME_COMPUTE_BACKEND=CPU",
+              "-DFLTK_DIR=/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-sanitize/share/fltk",
+              "-U*DOME_BITMAP_RUNTIME*",
+              "-U*NATIVEGL*",
+              "-U*RENDERFONTS*",
+              "-DCMAKE_C_FLAGS_RELEASE=-O1 -g1 -DNDEBUG -fsanitize=address,undefined -fno-omit-frame-pointer",
+              "-DCMAKE_CXX_FLAGS_RELEASE=-O1 -g1 -DNDEBUG -fsanitize=address,undefined -fno-omit-frame-pointer"
+            ],
+            "exit": 0,
+            "seconds": 5.8909971410175785
+          },
+          {
+            "name": "build",
+            "command": [
+              "nice",
+              "-n",
+              "15",
+              "cmake",
+              "--build",
+              "/home/blux/de-xr/dome-sculpt/artifacts/refinement38-owning-eacf/build-owning38-sanitize",
+              "-j2",
+              "--target",
+              "dome-sculpt",
+              "dome-sculpt-refinement38-geometry-test",
+              "dome-sculpt-paint-sampling-test",
+              "dome-sculpt-normal-frame-archive-test",
+              "dome-sculpt-scene-file-test",
+              "dome-sculpt-key-mirror-refinement-test"
+            ],
+            "exit": 0,
+            "seconds": 720.1748578950064
+          },
+          {
+            "name": "tests",
+            "command": [
+              "nice",
+              "-n",
+              "15",
+              "ctest",
+              "--test-dir",
+              "/home/blux/de-xr/dome-sculpt/artifacts/refinement38-owning-eacf/build-owning38-sanitize",
+              "--output-on-failure",
+              "-R",
+              "^(refinement38-geometry|paint-sampling|normal-frame-archive|scene-file|key-mirror-refinement)$",
+              "-j1"
+            ],
+            "exit": 0,
+            "seconds": 1.3788833790458739
+          }
+        ],
+        "artifact_drift": [],
+        "source_drift": [],
+        "free_after": 32648708096,
+        "build_allocated_bytes": 3631943680,
+        "result": 0
+      },
+      "geometry_summary": [
+        "REFINEMENT38_GEOMETRY working=13616 retained=6840 callbacks=76 allocation_prefixes=31 uv_error=1.98682e-08",
+        "PASS 123 detached geometry/domain checks; native38 writer/publication still unsupported"
+      ],
+      "receipts": {
+        "artifacts/refinement38-proof/sanitize/status.json": "8d991a10c304b748049806f4a56f3e5431a2f41ceb4a69545ffef26b14d45f3f",
+        "artifacts/refinement38-proof/sanitize/before.json": "7ca4b4c8e7b3820c50474ff01e8c903e4ac38ff1151b7e1c922b3f47a7ad3924",
+        "artifacts/refinement38-proof/sanitize/binaries-before.json": "3c4dd9cb29319124deaf03812ec4a6cc88b5ce0465c38f4c92ca9be074d08df7",
+        "artifacts/refinement38-proof/sanitize/tests.log": "463ad04a52605ad9a5fae10e56d11abc5e27947f77aa0c8599b5f9e0a03eaa08",
+        "build-owning38-sanitize/Testing/Temporary/LastTest.log": "54d567737a6c6003ccf8c0a974e1268b004357afb390def3cd706c393dce5fe5"
+      }
+    }
+  },
+  "boundary_storage": {
+    "allocated": 3775639552,
+    "free": 32095248384,
+    "remaining_reserve": 9109262336,
+    "outside_remaining_reserve": 22985986048
+  }
+}
