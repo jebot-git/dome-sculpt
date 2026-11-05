@@ -24,6 +24,7 @@ class PaintSamplingDomain {
 public:
   uint32_t version() const noexcept;
   std::span<const PaintSamplingPoint> weighted_corners() const noexcept;
+  std::span<const uint32_t> geometry_corners() const noexcept;
   const std::shared_ptr<const detail::RefinementGeometry> &refined_geometry() const noexcept;
   const std::shared_ptr<const PaintSamplingDomain> &previous_domain() const noexcept;
   const std::shared_ptr<const Mesh> &basis() const noexcept { return basis_; }

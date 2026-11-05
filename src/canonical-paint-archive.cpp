@@ -26,6 +26,7 @@ CanonicalPaintArchive &CanonicalPaintArchive::writer(){if(!current_||!current_->
 CanonicalPaintArchive &CanonicalPaintArchive::reader(){if(!current_||!current_->input_)throw std::invalid_argument("Canonical paint requires its owning Scene37 reader");return *current_;}
 uint32_t CanonicalPaintArchive::add(std::shared_ptr<const CanonicalPaintSampling> p){
  if(!write_origins_||!write_domains_||!p||!p->valid_owner(p))throw std::invalid_argument("Canonical paint writer requires a genuine factory lease");
+ if(p->kind()!=CanonicalPaintKind::CanonicalUv)throw std::invalid_argument("Independent paint geometry requires its owning Scene38 codec");
  const auto found=std::find(nodes_.begin(),nodes_.end(),p);if(found!=nodes_.end())return uint32_t(found-nodes_.begin());
  if(nodes_.size()>=128)throw std::length_error("Canonical paint node count exceeds its owning pool limit");
  p->validate();write_origins_->add_origin(p->before());normals_.add_uv(p->normal_uv());write_domains_->add(p->attachment()->domain());

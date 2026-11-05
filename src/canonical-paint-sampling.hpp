@@ -5,6 +5,11 @@
 namespace dome::detail {
 class CanonicalPaintSampling;
 class CanonicalPaintSamplingCodec;
+enum class CanonicalPaintKind { CanonicalUv=1, IndependentGeometry=2 };
+struct CanonicalPaintGeometryTransition {
+ std::shared_ptr<const CanonicalPaintSampling> owner;
+ std::shared_ptr<PaintedMesh> paint;
+};
 struct CanonicalPaintTransition {
  std::shared_ptr<const CanonicalPaintSampling> owner;
  std::shared_ptr<PaintedMesh> paint;
@@ -18,6 +23,11 @@ class CanonicalPaintSampling final {
 public:
  static CanonicalPaintTransition create(const Scene &,uint64_t,const Mesh &,
      std::span<const uint32_t>,const PaintSamplingLimits & = {});
+ // Owns the exact before control and writable geometry only. This is not a
+ // current normal/material/frame pairing or authority to publish a Scene.
+ static CanonicalPaintGeometryTransition stage_refinement(const Scene &,uint64_t,
+     std::shared_ptr<const RefinementGeometry>,const PaintSamplingLimits & = {});
+ CanonicalPaintKind kind() const noexcept{return kind_;}
  bool valid_owner(const std::shared_ptr<const CanonicalPaintSampling> &) const noexcept;
  bool matches_current(const PaintedMesh &) const noexcept;
  void validate(const PaintSamplingLimits & = {},bool deep=true) const;
@@ -37,6 +47,7 @@ private:
  std::shared_ptr<const CanonicalNormalUv> normal_uv_;
  std::shared_ptr<const PaintSamplingAttachment> attachment_;
  std::vector<uint32_t> current_sources_;
+ CanonicalPaintKind kind_=CanonicalPaintKind::CanonicalUv;
 };
 // Only an actual owning decoder can provide these independently decoded pools.
 // Replay mints a new private lease; a structural domain alone is insufficient.

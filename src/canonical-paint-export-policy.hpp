@@ -14,6 +14,8 @@ inline size_t canonical_paint_export_working_bytes(const SculptObject &object,
   stop();
   const auto binding=object.material_bindings;
   const auto sampling=binding?binding->canonical_paint_sampling:nullptr;
+  if(sampling&&sampling->kind()!=CanonicalPaintKind::CanonicalUv)
+    throw std::invalid_argument("Refined paint export budget requires its actual Scene38 attribute and field adapter");
   if(!object.mesh_active||!object.painted||object.appearance||!sampling||
       !sampling->valid_owner(sampling)||!sampling->matches_current(*object.painted)||!binding->normal_frames)
     throw std::invalid_argument("Canonical export budget requires genuine current normal and paint owners");

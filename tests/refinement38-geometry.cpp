@@ -2,9 +2,12 @@
 #include "refinement-geometry.hpp"
 #include "paint-sampling-access.hpp"
 #include "dome/paint.hpp"
+#include "canonical-paint-sampling.hpp"
+#include "canonical-paint-archive.hpp"
 #include "persistent-cpp-allocation.hpp"
 #include <nlohmann/json.hpp>
 #include <iostream>
+#include <numeric>
 using namespace dome;
 namespace {
 size_t checks=0;void check(bool value,const char*message){if(!value)throw std::runtime_error(message);++checks;std::cout<<"PASS "<<message<<std::endl;}
@@ -21,8 +24,49 @@ int main()try{
  auto domain=retain_refined_paint_sampling(first,geometry);check(domain->version()==2&&domain->source_corners().empty()&&domain->weighted_corners().size()==36&&domain->basis()==first->basis(),"Weighted domain owns true barycentric corners while preserving original editable grid basis");domain->validate_current(*geometry->mesh());const auto coordinates=domain->corner_coordinates(*geometry->mesh());double error=0;for(size_t c=0;c<coordinates.size();++c){std::array<double,2> expected{};const auto&p=geometry->refinement().corners[c].current;for(size_t k=0;k<3;++k)for(size_t d=0;d<2;++d)expected[d]+=mesh.uv[mesh.indices[p.triangle*3+k]][d]*p.barycentric[k];for(size_t d=0;d<2;++d)error=std::max(error,std::abs(double(coordinates[c][d])-expected[d]));}check(error<1e-7,"Independent original grid samples agree with all true derived corner coordinates");
  auto after=retain_paint_grid_borrowed(*before,*geometry->mesh(),domain);check(after->valid_paint_sampling_attachment()&&after->paint_sampling_attachment()->domain()==domain&&values(*before,*after),"Detached raster attachment preserves every sparse float/RGBA/PBR/mask owner and metadata");check(original.encode()==original_values,"Geometry staging preserves complete original native paint values");
  PaintSamplingLimits basis_limit;basis_limit.max_basis_bytes=domain->storage_bytes();check(retain_refined_paint_sampling(first,geometry,basis_limit)->weighted_corners().size()==36,"Exact retained geometry/stencil/grid cap succeeds");--basis_limit.max_basis_bytes;check(refuses([&]{retain_refined_paint_sampling(first,geometry,basis_limit);},"byte limit"),"One below retained geometry/stencil/grid cap refuses before output allocation");
+ Mesh uv_current=*geometry->mesh();auto uv_domain=domain;auto uv_paint=after;
+ for(size_t turn=0;turn<3;++turn){
+  auto target=uv_current;for(auto &uv:target.uv)uv={.1f+.8f*(1-uv[1]),.1f+.8f*uv[0]};
+  std::vector<uint32_t> map(target.indices.size());std::iota(map.begin(),map.end(),0u);
+  auto next_domain=retain_paint_sampling(uv_current,uv_domain,target,map);
+  check(next_domain->version()==2&&next_domain->previous_domain()==first&&next_domain->refined_geometry()==geometry&&next_domain->basis()==domain->basis(),"Repeated UV keeps exact root geometry and original grid without accumulating UV nodes");
+  check(next_domain->weighted_corners().data()==domain->weighted_corners().data()&&next_domain->geometry_corners().data()==domain->geometry_corners().data(),"Identity logical-corner UV transport shares immutable stencil buffers");
+  check(next_domain->corner_coordinates(target)==coordinates,"Later authored UV rotation/scale does not move original editable grid samples");
+  auto next_paint=retain_paint_grid_borrowed(*uv_paint,target,next_domain);
+  check(values(*before,*next_paint)&&next_paint->valid_paint_sampling_attachment()&&next_paint->mesh().uv==target.uv,"Later attachment advances authored geometry while retaining actual float/RGBA/mask planes");
+  uv_current=std::move(target);uv_domain=std::move(next_domain);uv_paint=std::move(next_paint);
+ }
+ auto permuted=uv_current;std::vector<uint32_t> permutation(permuted.indices.size());
+ for(size_t c=0;c<permutation.size();++c)permutation[c]=uint32_t((c+3)%permutation.size());
+ for(size_t c=0;c<permutation.size();++c)permuted.indices[c]=uv_current.indices[permutation[c]];
+ auto permuted_domain=retain_paint_sampling(uv_current,uv_domain,permuted,permutation);auto permuted_uv=permuted_domain->corner_coordinates(permuted);
+ bool exact_permutation=true;for(size_t c=0;c<permutation.size();++c)exact_permutation&=permuted_domain->geometry_corners()[c]==permutation[c]&&permuted_uv[c]==coordinates[permutation[c]];
+ check(exact_permutation&&permuted_domain->previous_domain()==first,"Whole-triangle permutation flattens actual original geometry and paint corners exactly");
+ auto wrong=permuted;wrong.positions[wrong.indices[0]].x+=.001f;check(refuses([&]{permuted_domain->validate_current(wrong);},"REST"),"Current geometry cannot borrow a weighted UV-only witness after a true position edit");
+ auto reversed=permutation;std::swap(reversed[1],reversed[2]);check(refuses([&]{retain_paint_sampling(uv_current,uv_domain,permuted,reversed);},"reversed"),"UV transport still rejects reversed logical corners");
+ size_t uv_allocations=0;{allocation_probe::Guard guard(SIZE_MAX);retain_paint_sampling(uv_current,uv_domain,permuted,permutation);uv_allocations=allocation_probe::calls;}
+ for(size_t cut=0;cut<uv_allocations;++cut){bool denied=false;{allocation_probe::Guard guard(cut);try{retain_paint_sampling(uv_current,uv_domain,permuted,permutation);}catch(const std::bad_alloc&){denied=true;}}check(denied&&original.encode()==original_values&&values(*before,*uv_paint),"Every persistent UV transport allocation denial preserves original source and current paint planes");}
  PaintSamplingArchive legacy;check(refuses([&]{legacy.add(domain);},"owning refinement pool"),"Legacy pool writer refuses weighted domain until genuine owning codec is installed");
  size_t polls=0;PaintSamplingLimits counted;counted.cancelled=[&]{++polls;return false;};retain_refined_paint_sampling(first,geometry,counted);for(size_t cut=1;cut<=polls;++cut){size_t at=0;auto cancelled=counted;cancelled.cancelled=[&]{return ++at>=cut;};check(refuses([&]{retain_refined_paint_sampling(first,geometry,cancelled);},"cancel")&&original.encode()==original_values,"Every measured weighted-domain Cancel keeps complete source exact");}
  size_t count=0;{allocation_probe::Guard guard(SIZE_MAX);retain_refined_paint_sampling(first,geometry);count=allocation_probe::calls;}for(size_t cut=0;cut<count;++cut){bool denied=false;{allocation_probe::Guard guard(cut);try{retain_refined_paint_sampling(first,geometry);}catch(const std::bad_alloc&){denied=true;}}check(denied&&original.encode()==original_values,"Every persistent new-domain C++ allocation prefix cleans partial result and preserves source");}check(retain_refined_paint_sampling(first,geometry)->weighted_corners().size()==36,"Fresh allocation/Cancel retry retains exact source geometry and grid");
+ Scene control;control.active().mesh_active=true;control.active().painted=original.snapshot();
+ auto model=std::make_shared<DeformationState>(mesh);model->morphs=MorphSet(mesh);MorphTarget old_target;old_target.name="Actual current plain target";old_target.delta.assign(mesh.positions.size(),{});old_target.delta[0].z=.005f;model->morphs->targets.push_back(old_target);model->morph_weights={.25f};control.active().deformation=model;control.validate();const auto control_bytes=control.encode();
+ auto owned_geometry=detail::RefinementGeometry::create(control.active().painted->mesh_owner(),detail::KeyMirrorPlane{0},.0001f);
+ auto transition=detail::CanonicalPaintSampling::stage_refinement(control,control.active().id,owned_geometry);
+ check(transition.owner->kind()==detail::CanonicalPaintKind::IndependentGeometry&&!transition.owner->normal_uv()&&transition.owner->before()->material_bindings==nullptr,"Actual no-normal Scene capture owns independent paint geometry without inventing a normal map or UV owner");
+ check(transition.owner->matches_current(*transition.paint)&&transition.owner->before()->deformation!=model&&transition.owner->before()->deformation->encode(mesh)==model->encode(mesh)&&values(original,*transition.paint),"Owning geometry stage freezes complete actual before model and preserves every current physical paint plane");
+ transition.owner->validate_current(*transition.paint);
+ SourceMaterialBindings unsupported;unsupported.has_mtoon=false;unsupported.canonical_paint_sampling=transition.owner;
+ check(refuses([&]{transition.owner->validate_binding(unsupported);},"Scene38 field pairing"),"An independent geometry owner cannot impersonate current normal/material authority");
+ {detail::PolygonSceneArchive origins;PaintImageArchive images;detail::BakedNormalArchive normals(images);PaintSamplingArchive domains;detail::CanonicalPaintArchive writer(origins,normals,domains);check(refuses([&]{writer.add(transition.owner);},"Scene38 codec"),"Legacy canonical37 writer refuses actual kind2 before normal UV access or pool mutation");}
+ auto borrowed=std::shared_ptr<const detail::RefinementGeometry>(owned_geometry.get(),[](const auto*){});
+ check(refuses([&]{detail::CanonicalPaintSampling::stage_refinement(control,control.active().id,borrowed);},"foreign geometry owner"),"Equal-address foreign geometry control block cannot acquire a genuine paint owner");
+ size_t owner_calls=0;{allocation_probe::Guard guard(SIZE_MAX);detail::CanonicalPaintSampling::stage_refinement(control,control.active().id,owned_geometry);owner_calls=allocation_probe::calls;}
+ for(size_t cut=0;cut<owner_calls;++cut){bool denied=false;{allocation_probe::Guard guard(cut);try{detail::CanonicalPaintSampling::stage_refinement(control,control.active().id,owned_geometry);}catch(const std::bad_alloc&){denied=true;}}check(denied&&control.encode()==control_bytes,"Every owning-stage persistent C++ denial preserves exact complete source Scene/model/paint");}
+ size_t owner_polls=0;PaintSamplingLimits owner_count;owner_count.cancelled=[&]{++owner_polls;return false;};detail::CanonicalPaintSampling::stage_refinement(control,control.active().id,owned_geometry,owner_count);
+ for(size_t cut=1;cut<=owner_polls;++cut){size_t at=0;auto cancel=owner_count;cancel.cancelled=[&]{return ++at>=cut;};check(refuses([&]{detail::CanonicalPaintSampling::stage_refinement(control,control.active().id,owned_geometry,cancel);},"cancel")&&control.encode()==control_bytes,"Every owning-stage measured Cancel preserves complete exact source Scene");}
+ const auto captured_paint=transition.owner->before()->paint->encode();const auto captured_model=transition.owner->before()->deformation->encode(mesh);control.active().painted->layer_properties("Later current style",false,.2f);model->morphs->targets[0].delta[0].z=.02f;
+ check(transition.owner->before()->paint->encode()==captured_paint&&transition.owner->before()->deformation->encode(mesh)==captured_model,"Later legal mutable current paint/model edits cannot alter captured native source metadata");transition.owner->validate_current(*transition.paint);
+ std::cout<<"REFINEMENT38_OWNER uv_prefixes="<<uv_allocations<<" capture_prefixes="<<owner_calls<<" callbacks="<<owner_polls<<'\n';
  std::cout<<"REFINEMENT38_GEOMETRY working="<<geometry->working_bytes()<<" retained="<<domain->storage_bytes()<<" callbacks="<<polls<<" allocation_prefixes="<<count<<" uv_error="<<error<<'\n';std::cout<<"PASS "<<checks<<" detached geometry/domain checks; native38 writer/publication still unsupported\n";return 0;
 }catch(const std::exception&e){allocation_probe::active=false;std::cerr<<"FAIL "<<e.what()<<'\n';return 1;}

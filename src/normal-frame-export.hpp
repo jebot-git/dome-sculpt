@@ -195,6 +195,8 @@ inline NormalFrameExport normal_frame_export_impl(const ObjectSurface &input,Sou
       native->validate_binding(binding,true,cancelled);
       sampling->validate(limits);sampling->validate_mesh(input.mesh,limits);
     }else if(canonical){
+      if(canonical->kind()!=CanonicalPaintKind::CanonicalUv)
+        throw std::invalid_argument("Refined paint export requires its actual Scene38 attribute and field adapter");
       canonical->validate_binding(binding,true);
       canonical->normal_uv()->validate_current(input.mesh,cancelled);
     }else node->validate_current(input.mesh,cancelled);

@@ -10,6 +10,7 @@ bool canonical_paint_retention_supported(const SculptObject &o) noexcept {
  if(b->key_derivation){if(!b->key_derivation->valid_owner(b->key_derivation)||b->key_derivation->frames()!=b->normal_frames)return false;}
  else if(b->normal_frames!=c->frames())return false;
  const auto retained=b->canonical_paint_sampling;
+ if(retained&&retained->kind()!=CanonicalPaintKind::CanonicalUv)return false;
  return !retained?!p->paint_sampling_domain():retained->valid_owner(retained)&&retained->matches_current(*p)&&retained->normal_uv()==b->canonical_uv;
 }
 bool canonical_paint_source_restorable(const SculptObject &o) noexcept {
