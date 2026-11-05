@@ -4,6 +4,7 @@
 #include "export-corner-coordinates.hpp"
 #include "native-paint-sampling.hpp"
 #include "canonical-paint-sampling.hpp"
+#include "native-paint-frame-source.hpp"
 #include "native-paint-export-policy.hpp"
 #include "dome/color-paint-sampling.hpp"
 #include "source-morph.hpp"
@@ -31,13 +32,13 @@ struct NormalFrameExport {
 inline NormalFrameExport native_paint_export(const ObjectSurface &input,SourceMorphSpace space,
     const std::function<bool()> &cancelled={}) {
   auto stop=[&]{if(cancelled&&cancelled())throw std::runtime_error("Native paint coordinate export cancelled");};
-  stop();native_paint_export_working_bytes(input.mesh);input.mesh.validate();
+  stop();native_paint_export_working_bytes(input.mesh,input.deformation.get());input.mesh.validate();
   const auto binding=input.material_bindings;const auto owner=binding?binding->native_paint_sampling:nullptr;
   const auto attachment=owner?owner->attachment():nullptr;
   if(space!=SourceMorphSpace::Native||!owner||!owner->valid_owner(owner)||!attachment||
       attachment!=input.paint_sampling_attachment||attachment.owner_before(input.paint_sampling_attachment)||input.paint_sampling_attachment.owner_before(attachment)||
       binding->has_mtoon||binding->normal_frames||binding->normal_preparation||binding->color_preparation||binding->key_derivation||
-      input.appearance||input.deformation||input.polygon_colors)
+      input.appearance||input.polygon_colors)
     throw std::invalid_argument("Native paint export requires its own supported geometry, material and coordinate owners");
   if(input.textures&&(input.textures->source_maps||input.textures->normal_projection||input.textures->color_projection||input.textures->baked_base||
       !input.textures->normal.rgba.empty()||!input.textures->mtoon_normal.rgba.empty()||!input.textures->baked_normal.rgba.empty()))
@@ -56,7 +57,11 @@ inline NormalFrameExport native_paint_export(const ObjectSurface &input,SourceMo
   auto &mesh=out.surface.mesh;mesh.positions.reserve(out.rest_vertices.size());mesh.normals.reserve(out.rest_vertices.size());mesh.uv.reserve(out.rest_vertices.size());
   if(!input.mesh.uv_pins.empty())mesh.uv_pins.reserve(out.rest_vertices.size());
   for(size_t v=0;v<out.rest_vertices.size();++v){if((v&1023)==0)stop();const auto from=out.rest_vertices[v];mesh.positions.push_back(input.mesh.positions[from]);mesh.normals.push_back(input.mesh.normals[from]);mesh.uv.push_back(input.mesh.uv.at(from));if(!input.mesh.uv_pins.empty())mesh.uv_pins.push_back(input.mesh.uv_pins[from]);}
-  mesh.indices=std::move(split.frames.indices);mesh.uv_seams=input.mesh.uv_seams;mesh.validate();stop();return out;
+  mesh.indices=std::move(split.frames.indices);mesh.uv_seams=input.mesh.uv_seams;mesh.validate();
+  // This is only a coordinate split. Carry the actual native skin/pose/IBM
+  // through its exact REST vertex map without inventing normal-frame authority.
+  out.surface.deformation=normal_frame_remap_deformation(input.deformation,input.mesh,mesh,out.rest_vertices,cancelled);
+  stop();return out;
 }
 inline bool normal_frame_attribute_equal(const NormalFrames &a,const NormalFrames &b,bool compare_tangent,
     const std::function<bool()> &cancelled={}) {
@@ -132,6 +137,8 @@ inline NormalFrameExport normal_frame_export(const ObjectSurface &input,SourceMo
     const std::function<bool()> &cancelled={},bool retain_pbr_sampling=false) {
   if(!input.material_bindings || !input.material_bindings->normal_frames)throw std::invalid_argument("Missing original frame export payload");
   const auto &binding=*input.material_bindings;binding.validate();const auto &set=*binding.normal_frames;
+  if(binding.native_paint_frames&&(!input.paint_sampling_attachment||input.paint_corner_coordinates.empty()))
+    throw std::invalid_argument("Native key export requires its complete independent paint stream");
   const auto normal_domain=retained_normal_coordinates(&binding,input.textures.get());
   const bool retained=bool(normal_domain);
   if(retained&&(!retain_pbr_sampling||space!=SourceMorphSpace::Native))throw std::invalid_argument("Retained normal domains require an explicitly compiled format-specific sampling export; original source retained");
@@ -169,19 +176,27 @@ inline NormalFrameExport normal_frame_export(const ObjectSurface &input,SourceMo
   auto layout=normal_frame_layout(input.mesh,set,cancelled);NormalFrameExport out;
   if(input.paint_sampling_attachment||!input.paint_corner_coordinates.empty()) {
     const auto node=binding.color_preparation?binding.color_preparation->paint_sampling:nullptr;
+    const auto native=binding.native_paint_frames;
+    const auto sampling=native?binding.native_paint_sampling:nullptr;
     const auto canonical=binding.canonical_paint_sampling;
-    const auto expected=node?node->geometry_attachment():canonical?canonical->attachment():nullptr;
-    if(legacy||binding.has_mtoon||(!canonical&&!retained)||!expected||expected!=input.paint_sampling_attachment||
+    const auto expected=sampling?sampling->attachment():canonical?canonical->attachment():node?node->geometry_attachment():nullptr;
+    if(legacy||binding.has_mtoon||(!native&&!canonical&&!retained)||!expected||expected!=input.paint_sampling_attachment||
         expected.owner_before(input.paint_sampling_attachment)||input.paint_sampling_attachment.owner_before(expected))
       throw std::invalid_argument("Paint sampling export requires its own supported native colour/normal attachment");
-    if(canonical){
-      // The normal frame/current key proof above is independent of writable
-      // paint. Authenticate this actual material owner and exact current UV
-      // geometry before using its ordered paint-corner stream.
+    PaintSamplingLimits limits;limits.cancelled=cancelled;
+    if(native){
+      // The normal source was captured from the CURRENT geometry at key
+      // creation. Its older writable paint source is an independent domain;
+      // never reinterpret either origin as the other one's UV coordinates.
+      if(canonical||node||retained||!retain_pbr_sampling||input.appearance||input.polygon_colors||
+          !sampling->valid_owner(sampling))
+        throw std::invalid_argument("Native key export requires its exact independent frame and paint owners");
+      native->validate_binding(binding,true,cancelled);
+      sampling->validate(limits);sampling->validate_mesh(input.mesh,limits);
+    }else if(canonical){
       canonical->validate_binding(binding,true);
       canonical->normal_uv()->validate_current(input.mesh,cancelled);
     }else node->validate_current(input.mesh,cancelled);
-    PaintSamplingLimits limits;limits.cancelled=cancelled;
     auto corners=expected->domain()->corner_coordinates(input.mesh,limits);
     if(corners!=input.paint_corner_coordinates)throw std::invalid_argument("Paint export corner stream differs from its own REST/domain proof");
     auto split=split_frame_corner_coordinates(input.mesh,layout,corners,cancelled);
@@ -197,6 +212,12 @@ inline NormalFrameExport normal_frame_export(const ObjectSurface &input,SourceMo
   out.surface={input.id,input.name,input.transform,input.material,{},input.textures,input.deformation,input.groups,input.appearance,input.material_bindings,input.source_dormant};out.surface.affine_edit=input.affine_edit;out.surface.rig_source=input.rig_source;auto &mesh=out.surface.mesh;
   Quat from_native=legacy?to_native.inverse():Quat{};
   std::vector<size_t> targets;for(auto id:set.current_targets){auto t=std::find_if(selected->targets.begin(),selected->targets.end(),[&](const auto &t){return t.id==id;});if(t==selected->targets.end())throw std::invalid_argument("Export target normal identity is missing");targets.push_back(size_t(t-selected->targets.begin()));}
+  if(binding.native_paint_frames){
+    size_t directions=0;
+    for(auto slot:targets){directions+=!selected->targets.at(slot).normals.empty();directions+=!tangent_source->targets.at(slot).tangents.empty();}
+    if(directions&&layout.vertices.size()>8'000'000/directions)
+      throw std::length_error("Native paint key export exceeds expanded shading resource policy before allocation");
+  }
   out.normal_targets.resize(targets.size());out.tangent_targets.resize(targets.size());
   for(size_t v=0;v<layout.vertices.size();++v) {
     if((v&1023)==0 && cancelled && cancelled())throw std::runtime_error("Normal frame export cancelled");
