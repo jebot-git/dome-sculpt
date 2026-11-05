@@ -8,6 +8,15 @@ namespace {size_t checks=0;void check(bool b,const char *s){++checks;if(!b)throw
 int main(int argc,char **argv)try{
  if(argc!=3)return 2;const auto source=Scene::load(argv[1]);const auto original=source.encode();const std::filesystem::path out=argv[2];std::filesystem::create_directories(out);Document d;d.replace(source);settle(d);
  check(detail::canonical_paint_retention_supported(source.active()),"Actual canonical actor has a supported owning paint transition");
+ {
+  auto large=source;auto holder=std::make_shared<SourceMaterialBindings>(*source.active().material_bindings);
+  nlohmann::json material={{"extensions",{{"VRMC_materials_mtoon",{{"specVersion","1.0"}}}}},{"extras",{{"inactive-copy-canary",std::string(8*1024*1024,'x')}}}};
+  holder->material=MToonMaterial::from_vrm1(material);large.active().material_bindings=holder;large.validate();
+  auto target=large.active().painted->mesh();for(auto &uv:target.uv)for(auto &v:uv)v=.5f+.8f*(v-.5f);
+  std::vector<uint32_t> ids(target.positions.size());for(size_t i=0;i<ids.size();++i)ids[i]=uint32_t(i);PaintSamplingLimits tiny;tiny.max_working_bytes=4*1024*1024;
+  check(refuses([&]{detail::CanonicalPaintSampling::create(large,large.active().id,target,ids,tiny);}),"Actual inactive retained JSON copy refuses before output allocations at unchanged working cap");
+  check(!holder->has_mtoon&&holder->material.source_json().at("extras").at("inactive-copy-canary").get_ref<const std::string&>().size()==8*1024*1024,"Copy preflight neither erases inactive material source nor changes its role authority");
+ }
  const auto revision=d.frame().state->revision;d.begin_uv();check(d.wait_uv(),"Initial actual UV workspace settles");auto view=d.frame().state->uv;
  check(view&&view->retain_paint_sampling&&view->retain_normal_sampling&&view->paint_sampling_required,"Supported canonical authoring explicitly keeps both fields by default");
  check(refuses([&]{d.edit_uv(UvAction::RetainPaint);}),"Required converted-normal writable basis cannot silently switch to lossy raster");d.end_uv(true);settle(d);check(d.copy_scene().encode()==original&&d.frame().state->revision==revision,"Untouched Accept is a genuine Scene/history no-op");

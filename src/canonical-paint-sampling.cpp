@@ -79,6 +79,10 @@ CanonicalPaintTransition CanonicalPaintSampling::create(const Scene &scene,uint6
  scene.validate();stop(limits);
  size_t reserved=0;auto charge=[&](size_t n,size_t unit){if(reserved>limits.max_working_bytes||n>(limits.max_working_bytes-reserved)/unit)throw std::length_error("Canonical paint full capture/remap exceeds aggregate working quota");reserved+=n*unit;};
  charge(1,sizeof(CanonicalPaintSampling)+2*sizeof(PolygonOrigin)+sizeof(Volume)+sizeof(DeformationState)+sizeof(PaintedMesh));
+ charge(1,sizeof(SourceMaterialBindings)+64);
+ // has_mtoon=false is not proof that inactive retained JSON is empty. Count
+ // its actual value-copy footprint without allocating an encoded clone.
+ charge(source.material_bindings->material.copy_working_bytes(limits.max_working_bytes-reserved,limits.cancelled),1);
  charge(entries,sizeof(Vec3));charge(target.positions.size(),sizeof(VertexWeights));
  charge(source.volume->layers().size(),sizeof(Volume::Layer));
  for(const auto &layer:source.volume->layers())charge(layer.name.size()+1,1);
