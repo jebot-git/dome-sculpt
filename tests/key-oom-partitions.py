@@ -24,7 +24,7 @@ import uuid
 
 FORMAT = 1
 TIMEOUT = 3500
-COMMON = ("format", "operation", "baseline", "baseline_counts", "stable_baseline",
+COMMON = ("format", "operation", "caller", "baseline", "baseline_counts", "stable_baseline",
           "fixture_sha256", "scene_sha256", "baseline_result_sha256",
           "cache_budget", "profile")
 ENV_KEYS = {"PATH", "LC_ALL", "LANG", "LOCPATH", "TZ", "LP_NUM_THREADS",
@@ -189,7 +189,7 @@ def measurement_ok(native, plan=None):
     n = native["baseline"]
     require(type(n) is int and n > 0 and native["baseline_counts"] == [n, n, n]
             and native["stable_baseline"] is True, "Unstable allocation baseline")
-    require(native["cache_budget"] == 512*1024*1024 and native["operation"] in ("Create", "Replace") and native["profile"] in ("release", "asan-ubsan"),
+    require(native["cache_budget"] == 512*1024*1024 and native["operation"] in ("Create", "Replace") and native["caller"]=="fresh-sequential-thread" and native["profile"] in ("release", "asan-ubsan"),
             "Wrong profile or allocation cache policy")
     if plan:
         require({k: native[k] for k in COMMON} == plan["measurement"],
@@ -282,7 +282,7 @@ def prepare(args):
         require(plan["measurement"]["fixture_sha256"] == inputs[plan["fixture"]],
                 "Native fixture digest differs from protected input")
         n = plan["measurement"]["baseline"]
-        require(n == args.expect_baseline, "Actual baseline differs from the explicitly pinned original operation; preserve and investigate")
+        require(n == args.expect_baseline, "Actual baseline differs from the explicitly pinned fresh-caller operation; preserve and investigate")
         tail = min(32, n)
         split = n + 1 - tail
         require(split >= args.partitions - 1, "Too many partitions for the measured baseline")
@@ -466,7 +466,7 @@ def run_all(args):
 
 def controls(args):
     """Synthetic verifier controls; these do not claim native package coverage."""
-    measure = {"format": 1, "operation": "Create", "baseline": 8, "baseline_counts": [8, 8, 8],
+    measure = {"format": 1, "operation": "Create", "caller": "fresh-sequential-thread", "baseline": 8, "baseline_counts": [8, 8, 8],
                "stable_baseline": True, "fixture_sha256": "fixture", "scene_sha256": "scene",
                "baseline_result_sha256": "package", "cache_budget": 512*1024*1024, "profile": "release"}
     plan = {"format": 1, "measurement": measure, "inputs_digest": "inputs", "environment": {},
@@ -513,7 +513,7 @@ def controls(args):
     negative("unprotected library", lambda p,r: r[0].update(unprotected_elf=["unknown"]))
     for key, value in (("baseline", 9), ("baseline_counts", [8,9,8]), ("profile", "asan-ubsan"),
                        ("fixture_sha256", "other"), ("scene_sha256", "other"),
-                       ("baseline_result_sha256", "other"), ("cache_budget", 1), ("operation", "Replace"),
+                       ("baseline_result_sha256", "other"), ("cache_budget", 1), ("operation", "Replace"), ("caller", "warm"),
                        ("completed", 3), ("successful", 2), ("terminal_exit", 1),
                        ("retried_prefixes", []), ("first_completed", 1)):
         negative("wrong " + key, lambda p,r,k=key,v=value: r[0]["native"].update({k:v}))
