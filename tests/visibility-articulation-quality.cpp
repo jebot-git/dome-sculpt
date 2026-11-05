@@ -5,7 +5,9 @@
 #include "dome/humanoid-creator.hpp"
 #include "dome/scene.hpp"
 #include "dome/source-placement.hpp"
+#include <cstdlib>
 #include <fstream>
+#include <string_view>
 #include <iostream>
 #include <nlohmann/json.hpp>
 #include <numbers>
@@ -174,7 +176,13 @@ int main(int argc, char **argv) try {
   const bool local = argc == 5 && std::string(argv[4]) == "local";
   if (argc == 5 && !local) throw std::invalid_argument("Unknown quality cohort");
   const int poses = local ? 18 : 5;
+  const char *diagnostic_option = std::getenv("DOME_WEIGHT_POSE_DIAGNOSTICS");
+  const std::string_view diagnostic_policy = diagnostic_option ? diagnostic_option : "all";
+  if (diagnostic_policy != "all" && diagnostic_policy != "first-last")
+    throw std::invalid_argument("Unknown pose diagnostic retention policy");
+  size_t native_codec_roundtrips = 0, diagnostic_files_written = 0;
   for (int pose = 0; pose < poses; ++pose) {
+    const auto failures_before_pose = failures;
     for (size_t n = 0; n < raw->nodes_count; ++n)
       std::copy(rotations[n].begin(), rotations[n].end(),
                 raw->nodes[n].rotation);
@@ -344,7 +352,17 @@ int main(int argc, char **argv) try {
                 << " pass=" << pass << std::endl;
       posed_scene.set_deformation(id, d);
     }
-    posed_scene.save(out / ("pose-" + std::to_string(pose) + ".dsculpt"));
+    // Every pose still traverses the actual native codec. Intermediate files
+    // are write-only diagnostics, never inputs to the numerical oracle.
+    const auto encoded_pose = posed_scene.encode();
+    if (Scene::decode(encoded_pose).encode() != encoded_pose)
+      throw std::runtime_error("Every posed Scene native codec roundtrip must be exact");
+    ++native_codec_roundtrips;
+    if (diagnostic_policy == "all" || pose == 0 || pose == poses - 1 ||
+        failures != failures_before_pose) {
+      posed_scene.save(out / ("pose-" + std::to_string(pose) + ".dsculpt"));
+      ++diagnostic_files_written;
+    }
   }
   if (source.encode() != input)
     throw std::runtime_error("Independent oracle mutated saved field Scene");
@@ -352,6 +370,11 @@ int main(int argc, char **argv) try {
       {"height_m", height},
       {"parts", targets.size()},
       {"poses", poses},
+      {"native_codec_roundtrips", native_codec_roundtrips},
+      {"diagnostic_policy", diagnostic_policy},
+      {"diagnostic_files_written", diagnostic_files_written},
+      {"diagnostic_files_omitted", size_t(poses) - diagnostic_files_written},
+      {"failing_pose_diagnostics_always_retained", true},
       {"local_part_bounds", local},
       {"cohorts", records.size()},
       {"failures", failures},
