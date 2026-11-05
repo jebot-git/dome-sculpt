@@ -1,3 +1,19 @@
+## Private procedural VRM1 UV-motion checkpoint — 2026-11-05
+
+Code `567b38e` adds genuine source UV motion with independently owned native paint,
+including motion without fabricated material/UV binds. Source motion stays on
+its actual lower material; only a proved invariant upper contribution is static.
+R/S full factory 976 persistent C++ prefixes + 651 Cancel each, native 39 and final
+37 component consumer steps/profile pass; 14 new fixture-dependent tests register.
+Final strict A770 108-state incremental certificate max 1.11877 ≤ 4 passes, but the
+absolute hardware image gates remain failed/open: original pristine 85 and
+painted 84 at the same nearest-sampler discontinuity. This is private software/
+added-adapter qualification, not main/full-device/whole-app admission. Read
+VRM1-UV-MOTION-INTEROPERABILITY.md/JSON for unchanged descriptors, exact source/
+Cancel/save evidence, all preserved failures, private-header consumer closure,
+and the distinction between absolute and incremental error. Root owns outline;
+general BLEND, animated masks/coupled upper roles and the full goal stay open.
+
 # Full objective and completion evidence
 
 ## Current production state — 2026-11-05
