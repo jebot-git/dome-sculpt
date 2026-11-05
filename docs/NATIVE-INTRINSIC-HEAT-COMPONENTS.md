@@ -53,13 +53,23 @@ A fresh checkout can build these targets and run:
 ctest --test-dir build -R '^surface-heat-current-' --output-on-failure
 ```
 
-At this initial source seal, the original source/native avatar worker and
-independent quality cohorts and the new exhaustive sanitizer factory sweep are
-still running. Release has completed all 7,667 measured actual factory allocation
-prefixes with same-recipient real retry, exact rollback and owner checks; no
-helper preparation is replayed. The final metadata receipt must close those
-finite jobs before this candidate is proposed for broader integration. Existing
-874-per-domain source/native gates and all original failures remain required.
+The final same-source cohort completed all 24 phases in 633.84 seconds: 272
+actual public worker/controller checks and 3,496 independent global/local
+comparisons across native/source, female/male and both profiles. Source, binary
+and every input hash remain unchanged. These retain the original fixed quality
+limits; neither pose selection nor tolerance changed.
+
+The actual complete mixed factory passes all 7,667 measured permanent allocation
+prefixes in each profile, with full real preparation and same-recipient real
+retry after every failure. Complete encoded Scene and authoritative owners remain
+exact, with no preparation replay and no sanitizer diagnostic. This is the new
+mixed fixture's full factory trace, not exhaustive helper coverage for all19
+avatars or all possible authoring graphs. Separate older sweeps keep their scope.
+
+The final receipt records elapsed times, every command, complete source/binary
+and immutable support audits. The initial test-only initializer-list-to-span
+compile failure and its correction to the actual existing target array remain
+preserved in mixed-worker-span-negative; no runtime guard was changed for it.
 
 No main/default promotion, complex paint/frame-domain admission or full robust
 automatic-weight completion is claimed. The prior exact closed-eye UI milestone
