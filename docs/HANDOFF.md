@@ -1,5 +1,16 @@
 # Dome Sculpt production handoff
 
+## Private physical native key export component — 2026-11-05
+
+Runtime68a11b0 extends actual native36 frame/HDR ordinary export and authenticates
+its true current target/index carrier in package3. Matched69 two-complete-TU
+Release/sanitizer/Arc381each pass (115new+151key+115skin),72newGLBs0KHRerrors,
+30native/GLB triples exact and18R/S PNGpairs exact/Arcmax1. Actual CMake new
+consumer compiles and115 passes. This is separate component evidence, not whole
+c31/privateLayer/37/main orphysicalHMD/compute admission. Existing canonical/CPS
+and other unsupported guards remain; package4 stays separate. Original failures
+remain in NATIVE-KEY-PHYSICAL-EXPORT.md/receipt. Full goal and drawers stay open.
+
 ## Combined native36 and MASK/cutoff qualification candidate — 2026-11-05
 
 This new isolated candidate composes ab37175 with qualified frame36/f2a and
