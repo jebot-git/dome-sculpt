@@ -3,6 +3,7 @@
 #include "normal-frame-runtime.hpp"
 #include "export-corner-coordinates.hpp"
 #include "native-paint-sampling.hpp"
+#include "canonical-paint-sampling.hpp"
 #include "native-paint-frame-source.hpp"
 #include "native-paint-export-policy.hpp"
 #include "dome/color-paint-sampling.hpp"
@@ -177,8 +178,9 @@ inline NormalFrameExport normal_frame_export(const ObjectSurface &input,SourceMo
     const auto node=binding.color_preparation?binding.color_preparation->paint_sampling:nullptr;
     const auto native=binding.native_paint_frames;
     const auto sampling=native?binding.native_paint_sampling:nullptr;
-    const auto expected=sampling?sampling->attachment():node?node->geometry_attachment():nullptr;
-    if(legacy||binding.has_mtoon||(!native&&!retained)||!expected||expected!=input.paint_sampling_attachment||
+    const auto canonical=binding.canonical_paint_sampling;
+    const auto expected=sampling?sampling->attachment():canonical?canonical->attachment():node?node->geometry_attachment():nullptr;
+    if(legacy||binding.has_mtoon||(!native&&!canonical&&!retained)||!expected||expected!=input.paint_sampling_attachment||
         expected.owner_before(input.paint_sampling_attachment)||input.paint_sampling_attachment.owner_before(expected))
       throw std::invalid_argument("Paint sampling export requires its own supported native colour/normal attachment");
     PaintSamplingLimits limits;limits.cancelled=cancelled;
@@ -186,11 +188,14 @@ inline NormalFrameExport normal_frame_export(const ObjectSurface &input,SourceMo
       // The normal source was captured from the CURRENT geometry at key
       // creation. Its older writable paint source is an independent domain;
       // never reinterpret either origin as the other one's UV coordinates.
-      if(node||retained||!retain_pbr_sampling||input.appearance||input.polygon_colors||
+      if(canonical||node||retained||!retain_pbr_sampling||input.appearance||input.polygon_colors||
           !sampling->valid_owner(sampling))
         throw std::invalid_argument("Native key export requires its exact independent frame and paint owners");
       native->validate_binding(binding,true,cancelled);
       sampling->validate(limits);sampling->validate_mesh(input.mesh,limits);
+    }else if(canonical){
+      canonical->validate_binding(binding,true);
+      canonical->normal_uv()->validate_current(input.mesh,cancelled);
     }else node->validate_current(input.mesh,cancelled);
     auto corners=expected->domain()->corner_coordinates(input.mesh,limits);
     if(corners!=input.paint_corner_coordinates)throw std::invalid_argument("Paint export corner stream differs from its own REST/domain proof");

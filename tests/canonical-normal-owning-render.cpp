@@ -46,7 +46,7 @@ int main(int argc,char**argv)try{
    if(pose==0&&weight==0){auto &normal=file.data->meshes[0].primitives[0].material->normal_texture;const auto saved=normal.texture;normal.texture=nullptr;fbo.bind();independent.render(file.data);const auto absent=read();normal.texture=saved;
     check(delta(absent,actual)>2,"Independent emitted pixels visibly require the actual converted normal image");
     std::ifstream input(path,std::ios::binary);std::vector<uint8_t> bytes{std::istreambuf_iterator<char>(input),{}};auto embedded=extract_native_authoring(bytes);
-    check(embedded&&embedded->encode()==scene.encode(),"Actual editable GLB recovers complete Scene31 conversion and original normal source");
+    check(embedded&&embedded->encode()==scene.encode(),"Actual editable GLB recovers complete independent-field conversion and original normal source");
    }
   }
  }
