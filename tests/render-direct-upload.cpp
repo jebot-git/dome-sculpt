@@ -87,6 +87,19 @@ int main(int argc,char**argv)try{
   glGetVertexAttribfv(8,GL_CURRENT_VERTEX_ATTRIB,values);check(values[0]==1&&values[1]==0&&values[2]==0&&values[3]==1,"Missing source tangent restores its actual per-draw default");
  }
  auto masked=std::make_shared<MeshSnapshot>(*partial);masked->sculpt_masks.assign(n,.5f);render(masked,"mask");
+ if(direct)for(int field=0;field<6;++field){
+  auto bad=std::make_shared<MeshSnapshot>(*scene);bad->geometry_identity=std::make_shared<const int>(20+field);
+  switch(field){
+   case 0:bad->tangents.assign(n-1,{1,0,0,1});break;
+   case 1:bad->source_normals.assign(n-1,{0,0,1});break;
+   case 2:bad->canonical_normals.assign(n-1,{0,0,1});break;
+   case 3:bad->source_tangents.assign(n-1,{1,0,0,1});break;
+   case 4:bad->source_colors.assign(n-1,{1,1,1,1});break;
+   case 5:bad->normal_coordinates.assign(n-1,{0,0,0,0});break;
+  }
+  check(rejects([&]{renderer.draw(bad,{},identity,{0,0,2},Fbo::size,Fbo::size,true);}),"Malformed optional stream count refuses before out-of-range source reads");
+  check(render(scene,"recovered-"+std::to_string(field))==baseline,"A real valid draw recovers exact cached/default pixels after stream refusal");
+ }
  check(glGetError()==GL_NO_ERROR,"Direct-buffer rendering leaves actual GL state error-free");
  std::cout<<"PASS "<<checks<<" direct-upload checks\n";return 0;
 }catch(const std::exception&e){capture=false;std::cerr<<"FAIL "<<e.what()<<'\n';return 1;}

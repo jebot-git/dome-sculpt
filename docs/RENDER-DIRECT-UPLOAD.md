@@ -1,33 +1,19 @@
-# Direct immutable geometry uploads — private Release component
+# Direct immutable geometry uploads — qualified private component
 
-The renderer uploads existing position, normal, UV, tangent and source-field
-arrays directly into one GPU buffer. A fixed descriptor table replaces the
-mesh-sized interleaved Vertex/FrameVertex temporaries. Missing source directions
-alias the native normal stream; missing UV/tangent values use per-draw constants.
-This keeps immutable geometry reuse and scalar-only updates intact while reducing
-temporary CPU memory and unused default-attribute storage. Plain sculpt storage
-is 24 bytes per vertex; the previous interleaved layout was 56 bytes. This is not
-a frame-time benchmark or completed local-tile upload implementation.
+The renderer uploads existing position, normal, UV, tangent and source-field arrays directly into one GPU buffer. A fixed 14-entry descriptor table replaces the mesh-sized interleaved Vertex/FrameVertex temporaries. Missing source directions alias the native normal stream; missing UV/tangent values use per-draw constants. Immutable geometry reuse and scalar updates remain intact. Plain sculpt geometry stores 24 rather than 56 bytes per vertex, excluding indices/scalars. Other existing texture/source-coordinate preparation remains separate; this is not a frame-time benchmark or completed local extraction/tile-upload pipeline.
 
-On the actual Arc A770 at PCI03/renderD129, the old whole renderer passes the
-reference workflow and fails the new direct-array contract. The new whole
-renderer passes 37 checks, including actual GPU block/source-byte equality,
-19,200-vertex geometry, stereo reuse, partial frame aliases, default restoration
-and scalar updates. All six framebuffer outputs are byte-identical to the old
-renderer. Existing buffer24, material81, normal-frame47, ghost36 and complete
-render suites pass on the same actual hardware with unchanged predicates.
+The product body is exact private `3547fc4`, composed with admitted main `537c98b`. Public layouts, scene formats, frontends, existing quality bounds and defaults are unchanged. This is a transparent matching component rebuild and ordinary app relink, not a new ALL/core build or full-goal completion.
 
-The unchanged strict device observer checks current EGL device, PCI IDs and open
-DRM descriptors. Software and UHD controls fail that strict witness after actual
-renderer observation; this does not change the product's supported device policy.
-All 68 actual mapped DSOs retain their recorded inodes and pre-baseline change
-times. Actual source/support hashes remain unchanged during these finite runs.
+Both current-main profiles freshly compile the whole renderer and selected whole consumers against all 98 current Sculpt headers. The exact nine admitted input/query providers and matched mode5, current polygon, other frontend, canonical SDK and immutable supports are used; old C179 Doc112 objects are not substituted under the new acceptance headers. Both direct production SurfaceRenderer consumers—whole app.cpp and XR TUs—are freshly compiled in Release and sanitizer profiles. Link traces exclude superseded render/XR/core members. Provider/test object paths are disjoint and their hashes are checked before every link.
 
-This is a whole-render-provider Release component with compatible c179 support,
-not a new full application/ABI build. Public layouts, scene formats and runtime
-frontends are unchanged. The CMake test registration is source only at this
-checkpoint. Sanitizer, matching current-main/caller composition and ordinary
-application checks remain pending. No installation, headset launch or session
-restart occurred. The full production objective remains active.
+Current software R/S pass **73 direct-upload checks**, buffer24, material81, normal-frame47, ghost36, the unchanged complete render suite and native input13,442. The direct test covers actual GPU bytes from immutable source arrays, 19,200 vertices, stereo reuse, partial frame aliases, default restoration, scalar updates and six malformed optional-stream count refusals followed by actual valid-draw/cache recovery. Its original six framebuffer outputs remain byte-identical to the old whole renderer in each profile; the six new failure/recovery cases do not change those predicates.
 
-See [the exact receipt](validation/RENDER-DIRECT-UPLOAD-R.json).
+The current R/S outputs include **58 exact frame/native pairs**: six old-reference images, 12 direct/recovery images, 30 full-render images, four native files and six ordinary-app native projects. Ordinary product apps, without a gate, test dispatcher or observer, each pass **15 normal +16 unzoomed compact +27 actual software OpenXR loader checks**. Apply/Cancel/history/Save/reopen/clean close and complete source retention pass. Source/support hashes and actual mapped ELF inputs remain exact. Software EGL uses the existing exact private patched Mesa; sanitizer leak detection stays enabled with no suppression. No installation, active-session/headset action or new hardware execution occurred.
+
+The initial actual Arc A770 proof remains separately scoped: 37 checks, six old-framebuffer pairs, unchanged renderer regressions, 68 DSO inode/change-time records, and actual software/UHD strict-observer refusals on old5b compatible support. That is not a current-main73 hardware claim. Its exact receipt remains [RENDER-DIRECT-UPLOAD-R.json](validation/RENDER-DIRECT-UPLOAD-R.json).
+
+Two orchestration failures are preserved. The first current Release phase passed five actual consumers, then a test/render.o basename collision overwrote that phase's newly built renderer object and caused duplicate-main link failure. Corrected product-/test- names and output-exists guards rerun the full phase successfully; the original root proof inputs were untouched. The first fresh configuration passed SDK checks but failed generation because the inherited sparse checkout omitted two existing tracked tools sources. Only their exact HEAD blobs were materialized; fresh configuration-v2 succeeds. The registered `render-direct-upload` command was run as a transparent manual matching whole consumer in R/S; no CTest runner or ALL result is inferred from configuration.
+
+Eight newly CLOSED0 standalone sanitizer ELFs were losslessly archived sequentially. Every complete decompressed stream was verified before unlinking; each actual original path was then restored and its whole SHA, size, mode, UID/GID, nanosecond mtime and xattrs verified before reclaiming the restored duplicate. Ledgers contain exact restore commands. Sources, objects, libraries, ordinary apps, failures and all older artifacts remain untouched. The cumulative 1.5 GiB task allocation and 20 GiB actual-free floor were guarded prospectively.
+
+See [RENDER-DIRECT-UPLOAD-CURRENT.json](validation/RENDER-DIRECT-UPLOAD-CURRENT.json) for the matched R/S/app receipt. Main review/admission remains separate. The full production objective, especially genuinely bounded local sculpt extraction/upload, remains active.
