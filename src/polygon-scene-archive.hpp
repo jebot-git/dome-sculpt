@@ -31,6 +31,7 @@ public:
   nlohmann::json encode(PaintImageArchive &,CreatorAssetArchive &,SourceMaterialArchive &,SourcePlacementArchive *,PolygonColorArchive *,NormalSamplingArchive *,PaintSamplingArchive *) const;
   static void preflight(const nlohmann::json &, const nlohmann::json &objects);
   static void preflight(const nlohmann::json &, const nlohmann::json &objects,const nlohmann::json *materials);
+  static void preflight(const nlohmann::json &,const nlohmann::json &objects,const nlohmann::json *materials,const nlohmann::json *canonical_paint);
   static PolygonSceneArchive decode(const nlohmann::json &,
                                     const PaintImageArchive &,
                                     const CreatorAssetArchive &,
@@ -77,6 +78,7 @@ public:
   const std::shared_ptr<const PolygonOrigin> &origin_at(uint32_t);
   const std::shared_ptr<const PolygonAuthority> &authority_at(uint32_t);
   MaterialResolver material_resolver(MaterialResolver);
+  void restore_material_resolver(MaterialResolver) noexcept;
   PolygonSceneArchive finish();
 private:
   struct Impl;

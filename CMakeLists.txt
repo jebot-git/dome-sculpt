@@ -3947,7 +3947,7 @@ if(BUILD_TESTING AND TARGET dome-sculpt-render)
 endif()
 
 target_sources(dome-sculpt-core PRIVATE src/canonical-paint-uv.cpp)
-target_sources(dome-sculpt-core PRIVATE src/canonical-paint-prospect.cpp src/canonical-paint-sampling.cpp)
+target_sources(dome-sculpt-core PRIVATE src/canonical-paint-prospect.cpp src/canonical-paint-sampling.cpp src/canonical-paint-archive.cpp)
 if(BUILD_TESTING)
   add_executable(dome-sculpt-canonical-paint-uv-kernel-test tests/canonical-paint-uv-kernel.cpp)
   target_include_directories(dome-sculpt-canonical-paint-uv-kernel-test PRIVATE src)

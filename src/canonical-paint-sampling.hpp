@@ -4,6 +4,7 @@
 #include "dome/polygon-scene.hpp"
 namespace dome::detail {
 class CanonicalPaintSampling;
+class CanonicalPaintSamplingCodec;
 struct CanonicalPaintTransition {
  std::shared_ptr<const CanonicalPaintSampling> owner;
  std::shared_ptr<PaintedMesh> paint;
@@ -30,10 +31,20 @@ private:
  CanonicalPaintSampling()=default;
  CanonicalPaintSampling(const CanonicalPaintSampling&)=delete;
  CanonicalPaintSampling &operator=(const CanonicalPaintSampling&)=delete;
+ friend class CanonicalPaintSamplingCodec;
  std::weak_ptr<const CanonicalPaintSampling> self_;
  std::shared_ptr<const PolygonOrigin> before_;
  std::shared_ptr<const CanonicalNormalUv> normal_uv_;
  std::shared_ptr<const PaintSamplingAttachment> attachment_;
  std::vector<uint32_t> current_sources_;
+};
+// Only an actual owning decoder can provide these independently decoded pools.
+// Replay mints a new private lease; a structural domain alone is insufficient.
+class CanonicalPaintSamplingCodec {
+public:
+ static std::shared_ptr<const CanonicalPaintSampling> replay(
+     std::shared_ptr<const PolygonOrigin>,std::shared_ptr<const CanonicalNormalUv>,
+     std::shared_ptr<const PaintSamplingDomain>,std::span<const uint32_t>,
+     const PaintSamplingLimits & = {});
 };
 }

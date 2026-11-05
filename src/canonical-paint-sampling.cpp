@@ -4,6 +4,9 @@
 #include "polygon-conversion.hpp"
 #include "normal-frame-runtime.hpp"
 #include "source-paint-pairing.hpp"
+#include "canonical-key-uv.hpp"
+#include "paint-sampling-access.hpp"
+#include <cstring>
 namespace dome::detail {
 namespace {
 void stop(const PaintSamplingLimits &limits){if(limits.cancelled&&limits.cancelled())throw std::runtime_error("Canonical paint sampling cancelled");}
@@ -21,12 +24,13 @@ void CanonicalPaintSampling::validate(const PaintSamplingLimits &limits,bool dee
   !normal_uv_||!normal_uv_->valid_owner(normal_uv_)||!attachment_||!attachment_->authored_geometry()||!attachment_->domain())
   throw std::invalid_argument("Canonical paint sampling lost its own exact before/current owners");
  const auto &b=*before_->material_bindings;
- if(normal_uv_->origin()!=b.canonical_attributes||b.normal_frames!=b.canonical_attributes->frames())
+ if(normal_uv_->origin()!=b.canonical_attributes||(!b.key_derivation&&b.normal_frames!=b.canonical_attributes->frames()))
   throw std::invalid_argument("Canonical paint sampling borrowed a different normal attribute origin");
  // A geometry seal does not certify the caller's legally mutable material DTO.
  // Revalidate that actual before holder on each call, including its complete
  // before-binding graph; no pointer/scalar validity survives this invocation.
  b.validate(deep);
+ if(b.key_derivation)canonical_key_uv_authority(*before_->paint,b,before_->deformation.get(),64'000'000,limits.max_working_bytes,limits.cancelled);
  if(b.canonical_paint_sampling){
   // The holder validation above already descended through this exact older
   // owner. Pair the immutable before Paint without recursively validating that
@@ -47,10 +51,11 @@ void CanonicalPaintSampling::validate(const PaintSamplingLimits &limits,bool dee
  stop(limits);
 }
 void CanonicalPaintSampling::validate_binding(const SourceMaterialBindings &binding,bool deep) const{
+ auto own=[](const auto &a,const auto &b){return a==b&&!a.owner_before(b)&&!b.owner_before(a);};
  if(!valid_owner(binding.canonical_paint_sampling)||binding.has_mtoon||binding.native_paint_sampling||binding.native_paint_frames||
-    binding.color_preparation||binding.normal_preparation||binding.key_derivation||!binding.sampling_reparameterized||
-    binding.canonical_uv!=normal_uv_||binding.canonical_attributes!=normal_uv_->origin()||
-    binding.normal_frames!=before_->material_bindings->normal_frames||binding.uv_origin!=before_->material_bindings->uv_origin)
+    binding.color_preparation||binding.normal_preparation||!own(binding.key_derivation,before_->material_bindings->key_derivation)||!binding.sampling_reparameterized||
+    !own(binding.canonical_uv,normal_uv_)||!own(binding.canonical_attributes,normal_uv_->origin())||
+    !own(binding.normal_frames,before_->material_bindings->normal_frames)||!own(binding.uv_origin,before_->material_bindings->uv_origin))
   throw std::invalid_argument("Canonical writable paint binding lost its actual independent normal/paint source owners");
  validate({},deep);
 }
@@ -100,5 +105,37 @@ CanonicalPaintTransition CanonicalPaintSampling::create(const Scene &scene,uint6
  binding->canonical_uv=owner->normal_uv_;binding->canonical_paint_sampling=owner;binding->sampling_reparameterized=true;
  binding->validate();source_paint_pairing(geometry.paint.get(),binding.get(),nullptr,true);stop(limits);
  return {std::move(owner),std::move(geometry.paint),std::move(model),std::move(binding)};
+}
+std::shared_ptr<const CanonicalPaintSampling> CanonicalPaintSamplingCodec::replay(
+ std::shared_ptr<const PolygonOrigin> before,std::shared_ptr<const CanonicalNormalUv> uv,
+ std::shared_ptr<const PaintSamplingDomain> domain,std::span<const uint32_t> map,const PaintSamplingLimits &limits){
+ stop(limits);if(!before||!before->paint||!before->volume||!before->material_bindings||!uv||!uv->valid_owner(uv)||!domain)
+  throw std::invalid_argument("Canonical paint replay requires complete actual before/normal/paint pools");
+ SculptObject source;source.volume.reset();source.id=before->source_object;source.mesh_active=before->mesh_active;
+ source.painted=before->paint->snapshot();source.material=before->material;source.deformation=before->deformation;
+ source.appearance=before->appearance;source.material_bindings=before->material_bindings;source.polygon=before->polygon;
+ source.retopology=before->retopology;source.shape_source=before->shape_source;source.rig_source=before->rig_source;source.bake_recipe=before->bake_recipe;
+ auto actual=stage_canonical_paint_uv(source,*uv->mesh(),map,limits);
+ const auto &a=*actual.normal_uv->layout(),&b=*uv->layout();
+ auto own=[](const auto &x,const auto &y){return x==y&&!x.owner_before(y)&&!y.owner_before(x);};
+ if(!own(actual.normal_uv->origin(),uv->origin())||a.source_vertices!=b.source_vertices||a.indices!=b.indices||a.pins!=b.pins||a.seams!=b.seams)
+  throw std::invalid_argument("Canonical paint replay changed its genuine current-to-normal root correspondence");
+ uv->validate_current(actual.paint->mesh(),limits.cancelled);domain->validate_current(actual.paint->mesh(),limits);
+ auto bytes=[](const auto &x,const auto &y){return x.size()==y.size()&&(x.empty()||std::memcmp(x.data(),y.data(),x.size()*sizeof(x[0]))==0);};
+ const auto &basis=*actual.domain->basis(),&expected=*domain->basis();
+ if(actual.domain->source_corners().size()!=domain->source_corners().size()||
+    !std::equal(actual.domain->source_corners().begin(),actual.domain->source_corners().end(),domain->source_corners().begin())||
+    !bytes(basis.positions,expected.positions)||!bytes(basis.normals,expected.normals)||!bytes(basis.uv,expected.uv)||
+    basis.indices!=expected.indices||basis.uv_pins!=expected.uv_pins||basis.uv_seams!=expected.uv_seams)
+  throw std::invalid_argument("Canonical paint replay changed its actual retained writable basis/corners");
+ // Drop the temporary replay grid before attaching the independently decoded
+ // domain. The old basis must still pass the normal retain helper's strong
+ // previous-basis checks; equal dimensions never authenticate another field.
+ actual.paint.reset();actual.domain.reset();actual.before_paint.reset();
+ auto paint=retain_paint_grid_borrowed(*before->paint,*uv->mesh(),domain,limits);
+ auto owner=std::shared_ptr<CanonicalPaintSampling>(new CanonicalPaintSampling);
+ owner->before_=std::move(before);owner->normal_uv_=std::move(uv);owner->attachment_=paint->paint_sampling_attachment();
+ owner->current_sources_=std::move(actual.current_sources);owner->self_=owner;
+ owner->validate_current(*paint,limits);stop(limits);return owner;
 }
 }

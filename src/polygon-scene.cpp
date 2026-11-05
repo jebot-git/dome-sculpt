@@ -375,6 +375,9 @@ void PolygonSceneArchive::preflight(const nlohmann::json &j,
   preflight(j,objects,nullptr);
 }
 void PolygonSceneArchive::preflight(const nlohmann::json &j,const nlohmann::json &objects,const nlohmann::json *materials) {
+  preflight(j,objects,materials,nullptr);
+}
+void PolygonSceneArchive::preflight(const nlohmann::json &j,const nlohmann::json &objects,const nlohmann::json *materials,const nlohmann::json *canonical_paint) {
   if (!j.is_object() || !j.at("version").is_number_integer() ||
       (j.at("version") != 1 && j.at("version") != 2 && j.at("version") != 3 && j.at("version") != 4 && j.at("version") != 5 && j.at("version") != 6 && j.at("version") != 7))
     throw std::invalid_argument("Unsupported polygon source archive");
@@ -537,6 +540,13 @@ void PolygonSceneArchive::preflight(const nlohmann::json &j,const nlohmann::json
     if(o.contains("rig_source")&&!o.at("rig_source").is_null()){
       if(!rigs)throw std::invalid_argument("Direct rig source requires archive version six");
       origin(polygon_archive_index(o.at("rig_source"),oo.size()),1);
+    }
+  }
+  if(canonical_paint){
+    if(!materials||!canonical_paint_material_archive(*materials))throw std::invalid_argument("Canonical before-origin roots need their actual owning material19");
+    for(const auto &binding:materials->at("bindings"))if(!binding.at("canonical_paint_sampling").is_null()){
+      const auto &node=canonical_paint->at("nodes").at(polygon_archive_index(binding.at("canonical_paint_sampling"),canonical_paint->at("nodes").size()));
+      origin(polygon_archive_index(node.at("before_origin"),oo.size()),1);
     }
   }
   auto all = [](const auto &v) {
@@ -772,6 +782,9 @@ const std::shared_ptr<const PolygonAuthority> &PolygonSceneReader::authority_at(
 PolygonSceneReader::MaterialResolver PolygonSceneReader::material_resolver(MaterialResolver next){
   impl_->open();if(!next)throw std::invalid_argument("Polygon owning reader needs a complete material context");
   auto previous=std::move(impl_->material);impl_->material=std::move(next);return previous;
+}
+void PolygonSceneReader::restore_material_resolver(MaterialResolver previous) noexcept{
+  impl_->material=std::move(previous);
 }
 PolygonSceneArchive PolygonSceneReader::finish(){
   impl_->open();for(size_t id=0;id<impl_->out.origins_.size();++id)impl_->origin(uint32_t(id),1);

@@ -3,6 +3,7 @@
 #include "paint-sampling-access.hpp"
 #include "source-paint-pairing.hpp"
 #include "baked-normal-field.hpp"
+#include "canonical-key-uv.hpp"
 #include <numeric>
 namespace dome::detail {
 CanonicalPaintUvGeometry stage_canonical_paint_uv(const SculptObject &source,const Mesh &target,
@@ -13,9 +14,10 @@ CanonicalPaintUvGeometry stage_canonical_paint_uv(const SculptObject &source,con
  const auto paint_source=source.painted;const auto binding=source.material_bindings;const auto origin=binding?binding->canonical_attributes:nullptr;
  if(!source.mesh_active||!paint_source||paint_source->in_stroke()||!origin||!origin->valid_owner(origin)||
     binding->has_mtoon||binding->normal_preparation||binding->color_preparation||binding->native_paint_sampling||
-    binding->key_derivation||binding->normal_frames!=origin->frames()||source.appearance||source.polygon||
+    (!binding->key_derivation&&binding->normal_frames!=origin->frames())||source.appearance||source.polygon||
     paint_source->surface_diagnostics().policy!=PaintUvPolicy::Strict||paint_source->source_maps()||paint_source->source_sampling_prepared()||paint_source->normal_projection()||paint_source->color_projection())
   throw std::invalid_argument("Canonical writable UV stage needs its genuine supported current normal/grid owners");
+ if(binding->key_derivation)canonical_key_uv_authority(*paint_source,*binding,source.deformation.get(),64'000'000,limits.max_working_bytes,limits.cancelled);
  const auto &live=*paint_source;const auto &mesh=live.mesh();
  if(vertices.size()!=target.positions.size()||target.positions.size()>limits.max_vertices||target.indices.size()/3>limits.max_triangles||target.indices.size()!=mesh.indices.size()||target.indices.size()%3)
   throw std::invalid_argument("Canonical writable UV correspondence dimensions differ");

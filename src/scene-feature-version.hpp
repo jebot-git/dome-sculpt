@@ -130,6 +130,7 @@ inline unsigned minimum_deformation_scene_version(const nlohmann::json &d) {
 // Scan actual reachable material owners, including histories. Separate objects
 // can require the two capabilities even when neither individual binding does.
 inline unsigned composed_material_scene_version(const SourceMaterialArchive &materials){
+  if(std::any_of(materials.bindings().begin(),materials.bindings().end(),[](const auto &b){return bool(b->canonical_paint_sampling);}))return 37u;
   if(std::any_of(materials.bindings().begin(),materials.bindings().end(),[](const auto &b){return bool(b->native_paint_frames);}))return 36u;
   bool native=false,canonical=false;
   for(const auto &b:materials.bindings()){

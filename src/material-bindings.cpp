@@ -23,6 +23,7 @@
 #include "canonical-normal-uv.hpp"
 #include "canonical-paint-sampling.hpp"
 #include "polygon-scene-archive.hpp"
+#include "canonical-paint-archive.hpp"
 #include "dome/normal-sampling.hpp"
 #include "dome/creator-archive.hpp"
 #include "dome/paint.hpp"
@@ -136,12 +137,12 @@ unsigned material_shape_version(const std::vector<std::shared_ptr<const SourceMa
 }
 std::set<const PaintedMesh*> material_paint_owners(
     const std::vector<std::shared_ptr<const SourceMaterialBindings>> &bindings,
-    const std::vector<std::shared_ptr<const SourceUvOrigin>> &origins) {
+    const std::vector<std::shared_ptr<const SourceUvOrigin>> &origins,bool controls=false) {
   std::set<const PaintedMesh*> owners;
   auto add=[&](const auto &p){if(p)owners.insert(p.get());};
   for(const auto &o:origins)add(o->paint);
   for(const auto &b:bindings){
-    if(b->canonical_paint_sampling)add(b->canonical_paint_sampling->before()->paint);
+    if(controls&&b->canonical_paint_sampling){detail::PolygonSceneArchive roots;roots.add_origin(b->canonical_paint_sampling->before(),false);for(const auto &p:roots.origins())add(p->paint);}
     if(b->canonical_attributes)add(b->canonical_attributes->before_paint());
     if(b->native_paint_frames)add(b->native_paint_frames->before_paint());
     if(b->key_derivation)add(b->key_derivation->before_paint());
@@ -150,6 +151,13 @@ std::set<const PaintedMesh*> material_paint_owners(
     if(const auto &p=b->normal_preparation){add(p->original_paint);if(p->uv_reprojection)add(p->uv_reprojection->before_paint);if(p->sampling_domain)add(p->sampling_domain->before_paint);}
   }
   return owners;
+}
+bool material_physical_graph(const std::vector<std::shared_ptr<const SourceMaterialBindings>> &bindings,
+    const std::vector<std::shared_ptr<const SourceUvOrigin>> &origins){
+ if(physical_material_state(material_paint_owners(bindings,origins,true),bindings))return true;
+ detail::PolygonSceneArchive controls;for(const auto &b:bindings)if(b->canonical_paint_sampling)controls.add_origin(b->canonical_paint_sampling->before(),false);
+ for(const auto &p:controls.origins())if(std::any_of(p->material.emissive.begin(),p->material.emissive.end(),[](float n){return n>1;}))return true;
+ return false;
 }
 bool physical_material_state(const std::set<const PaintedMesh*> &paints,const std::vector<std::shared_ptr<const SourceMaterialBindings>> &bindings){
   return std::any_of(paints.begin(),paints.end(),[](const auto *p){return p->has_physical_emission();})||std::any_of(bindings.begin(),bindings.end(),[](const auto &b){return detail::physical_emission(*b)||(b->native_paint_sampling&&detail::hdr_emission(b->native_paint_sampling->before_native_material().emissive));});
@@ -319,8 +327,8 @@ nlohmann::json SourceMaterialArchive::encode(PaintImageArchive &images,CreatorAs
 }
 nlohmann::json SourceMaterialArchive::encode(PaintImageArchive &images,CreatorAssetArchive &models,
     detail::PolygonColorArchive *colors,NormalSamplingArchive *domains,PaintSamplingArchive *paint_domains) const {
-  if(std::any_of(bindings_.begin(),bindings_.end(),[](const auto &b){return bool(b->canonical_paint_sampling);}))
-    throw std::invalid_argument("Canonical paint persistence requires its actual owning Scene37 writer");
+  const bool canonical_paint=std::any_of(bindings_.begin(),bindings_.end(),[](const auto &b){return bool(b->canonical_paint_sampling);});
+  if(canonical_paint)(void)detail::CanonicalPaintArchive::writer();
   const bool native_frames=std::any_of(bindings_.begin(),bindings_.end(),[](const auto &b){return bool(b->native_paint_frames);});
   const bool keyed=std::any_of(bindings_.begin(),bindings_.end(),[](const auto&b){return bool(b->key_derivation);});
   const bool canonical_uv=std::any_of(bindings_.begin(),bindings_.end(),[](const auto &b){return bool(b->canonical_uv);});
@@ -328,7 +336,7 @@ nlohmann::json SourceMaterialArchive::encode(PaintImageArchive &images,CreatorAs
   const bool corners=std::any_of(bindings_.begin(),bindings_.end(),[](const auto &b){return b->color_preparation&&b->color_preparation->polygon_colors;});
   if(corners&&!colors)throw std::invalid_argument("Current corner color preparation requires its shared Scene20 archive");
   const bool native_paint=std::any_of(bindings_.begin(),bindings_.end(),[](const auto &b){return bool(b->native_paint_sampling);});
-  const bool paint_sampling=std::any_of(bindings_.begin(),bindings_.end(),[](const auto &b){return b->native_paint_sampling||(b->color_preparation&&b->color_preparation->paint_sampling)||(b->normal_preparation&&b->normal_preparation->sampling_domain&&b->normal_preparation->sampling_domain->metadata_sampling_domain);});
+  const bool paint_sampling=std::any_of(bindings_.begin(),bindings_.end(),[](const auto &b){return b->canonical_paint_sampling||b->native_paint_sampling||(b->color_preparation&&b->color_preparation->paint_sampling)||(b->normal_preparation&&b->normal_preparation->sampling_domain&&b->normal_preparation->sampling_domain->metadata_sampling_domain);});
   if(paint_sampling&&!paint_domains)
     throw std::invalid_argument("Retained writable paint requires its complete material9/Scene24 context");
   const bool prepared=std::any_of(bindings_.begin(),bindings_.end(),[](const auto &b){return bool(b->color_preparation);});
@@ -500,6 +508,7 @@ nlohmann::json SourceMaterialArchive::encode(PaintImageArchive &images,CreatorAs
     if(layered)output["bindings"].back()["canonical_attributes"]=binding->canonical_attributes?
       nlohmann::json(detail::BakedNormalArchive::writer().add_origin(binding->canonical_attributes)):nlohmann::json(nullptr);
     if(native_frames){const auto found=std::find(native_frame_sources.begin(),native_frame_sources.end(),binding->native_paint_frames);output["bindings"].back()["native_paint_frames"]=binding->native_paint_frames?nlohmann::json(size_t(found-native_frame_sources.begin())):nlohmann::json(nullptr);}
+    if(canonical_paint)output["bindings"].back()["canonical_paint_sampling"]=binding->canonical_paint_sampling?nlohmann::json(detail::CanonicalPaintArchive::writer().add(binding->canonical_paint_sampling)):nlohmann::json(nullptr);
     if(native_paint){const auto found=std::find(native_paints.begin(),native_paints.end(),binding->native_paint_sampling);
       output["bindings"].back()["native_paint_sampling"]=binding->native_paint_sampling?nlohmann::json(size_t(found-native_paints.begin())):nlohmann::json(nullptr);}
 
@@ -514,7 +523,7 @@ nlohmann::json SourceMaterialArchive::encode(PaintImageArchive &images,CreatorAs
     if(extended){output["bindings"].back()["frames"]=binding->normal_frames?nlohmann::json(frames.add(binding->normal_frames)):nlohmann::json(nullptr);output["bindings"].back()["sampling_reparameterized"]=binding->sampling_reparameterized;}
   }
   if(extended)output["normal_frames"]=keyed?detail::KeyFrameArchive::encode(frames):frames.encode();
-  const bool physical=physical_material_state(material_paint_owners(bindings_,origins_),bindings_);
+  const bool physical=material_physical_graph(bindings_,origins_);
   const bool explicit_mirror=std::any_of(bindings_.begin(),bindings_.end(),[](const auto &b){return b->key_derivation&&b->key_derivation->uses_explicit_mirror();});
   if(native_paint){output["base_version"]=output.at("version");output["version"]=14;output["physical_emission"]=physical;output["explicit_mirror"]=explicit_mirror;output["canonical_normals"]=false;output["native_paint_sampling"]=true;}
   else if(explicit_mirror){output["base_version"]=10;output["version"]=12;output["physical_emission"]=physical;}
@@ -537,6 +546,14 @@ nlohmann::json SourceMaterialArchive::encode(PaintImageArchive &images,CreatorAs
     output["layered_normals"]=layered;output["retained_canonical_uv"]=canonical_uv;
   }
   if(native_frames){output["version"]=18;output["native_paint_frames"]=true;output["native_paint_sampling"]=true;output["layered_normals"]=layered;output["retained_canonical_uv"]=canonical_uv;}
+  if(canonical_paint){
+    const auto base=output.contains("base_version")?output.at("base_version"):output.at("version");
+    output["base_version"]=base;output["version"]=19;
+    output["physical_emission"]=physical;output["explicit_mirror"]=explicit_mirror;
+    output["canonical_normals"]=!canonical_conversions.empty();output["native_paint_sampling"]=native_paint;
+    output["layered_normals"]=layered;output["retained_canonical_uv"]=canonical_uv;
+    output["native_paint_frames"]=native_frames;output["canonical_paint_sampling"]=true;
+  }
   return output;
 }
 size_t SourceMaterialArchive::deformation_entries(const nlohmann::json &input) {
@@ -622,6 +639,9 @@ SourceMaterialArchive SourceMaterialArchive::decode(const nlohmann::json &input,
   const bool physical=detail::physical_material_archive(input);
   const bool layered=detail::layered_material_archive(input);
   const bool canonical_uv=detail::canonical_uv_material_archive(input);
+  const bool canonical_paint=detail::canonical_paint_material_archive(input);
+  if(canonical_paint)(void)detail::CanonicalPaintArchive::reader();
+  else for(const auto &b:input.at("bindings"))if(b.contains("canonical_paint_sampling"))throw std::invalid_argument("Canonical paint reference requires actual material19/Scene37");
   if(!canonical_uv)for(const auto &b:input.at("bindings"))if(b.contains("canonical_uv"))
     throw std::invalid_argument("Retained canonical UV reference requires actual material16/Scene34");
   if(layered)(void)detail::BakedNormalArchive::reader();
@@ -758,6 +778,16 @@ SourceMaterialArchive SourceMaterialArchive::decode(const nlohmann::json &input,
   };
   for(const auto &record:input.at("paints"))preflight_paint(record);
   SourceMaterialArchive output;
+  struct ResolverRestore {
+    detail::CanonicalPaintArchive *archive=nullptr;
+    detail::PolygonSceneReader::MaterialResolver previous;
+    ~ResolverRestore(){if(archive)archive->restore_material_resolver(std::move(previous));}
+  } resolver_restore;
+  if(canonical_paint){
+    auto &archive=detail::CanonicalPaintArchive::reader();
+    auto previous=archive.material_resolver([&output](uint32_t id){return output.at(id);});
+    resolver_restore.previous=std::move(previous);resolver_restore.archive=&archive;
+  }
   std::vector<std::shared_ptr<const PaintedMesh>> paints(input.at("paints").size());
   std::vector<uint8_t> decoding_paint(paints.size());
   std::function<std::shared_ptr<const PaintedMesh>(uint32_t)> decode_paint=[&](uint32_t id){
@@ -984,6 +1014,9 @@ SourceMaterialArchive SourceMaterialArchive::decode(const nlohmann::json &input,
       }
       binding->normal_preparation=normal_preparations[id];
     }
+    if(canonical_paint&&!value.at("canonical_paint_sampling").is_null()){
+      binding->canonical_paint_sampling=detail::CanonicalPaintArchive::reader().at(uint32_t(index(value.at("canonical_paint_sampling"),detail::CanonicalPaintArchive::reader().size())));
+    }
     binding->validate();if(native_paint)output.bindings_.push_back(std::make_shared<const SourceMaterialBindings>(*binding));else output.bindings_.push_back(std::move(binding));
   }
   if(detail::material_archive_base_version(input)==9&&!std::any_of(preparations.begin(),preparations.end(),[](const auto &p){return p&&p->paint_sampling;}))throw std::invalid_argument("Material9 requires actual retained current-colour paint authority");
@@ -995,6 +1028,7 @@ SourceMaterialArchive SourceMaterialArchive::decode(const nlohmann::json &input,
   if(native_frames&&std::any_of(native_frame_sources.begin(),native_frame_sources.end(),[](const auto &p){return !p;}))throw std::invalid_argument("Unreferenced native frame source record");
   if(native_paint&&std::any_of(native_paints.begin(),native_paints.end(),[](const auto &p){return !p;}))
     throw std::invalid_argument("Unreferenced native paint owner");
+  if(canonical_paint)detail::CanonicalPaintArchive::reader().require_complete();
   if(std::any_of(canonical_conversions.begin(),canonical_conversions.end(),[](const auto &p){return !p;}))throw std::invalid_argument("Unreferenced canonical conversion lease");
   if(physical||detail::explicit_mirror_material_archive(input)||detail::canonical_material_archive(input)||layered||native_paint){
     if(native_paint&&input.at("explicit_mirror").get<bool>()!=std::any_of(output.bindings_.begin(),output.bindings_.end(),[](const auto &b){return b->key_derivation&&b->key_derivation->uses_explicit_mirror();}))throw std::invalid_argument("Native paint explicit-Mirror capability differs from actual graph");
@@ -1003,7 +1037,7 @@ SourceMaterialArchive SourceMaterialArchive::decode(const nlohmann::json &input,
     if(reachable.origins_.size()!=output.origins_.size())throw std::invalid_argument("HDR archive has unreferenced source origins");
     const auto owners=material_paint_owners(reachable.bindings_,reachable.origins_);
     if(owners.size()!=paints.size())throw std::invalid_argument("HDR archive has unreferenced paint owners");
-    if(physical_material_state(owners,reachable.bindings_)!=physical)throw std::invalid_argument("Material physical capability differs from actual reachable emission state");
+    if(material_physical_graph(reachable.bindings_,reachable.origins_)!=physical)throw std::invalid_argument("Material physical capability differs from actual reachable emission state");
     if(material_shape_version(reachable.bindings_,reachable.origins_)!=detail::material_archive_base_version(input).get<unsigned>())
       throw std::invalid_argument("HDR material base layout differs from its actual owning features");
   }
