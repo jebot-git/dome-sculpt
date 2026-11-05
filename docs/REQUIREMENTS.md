@@ -1,5 +1,20 @@
 # Full objective and completion evidence
 
+## Private wider VRM1 shade targets — 2026-11-05
+
+Runtime86ea09e follows196 with actual target>1 and simultaneous shade deltas,
+coefficient-aware continuous reconstruction, bounded compensation/padding and
+complete prospective work forecast. No public/schema/UI change; all3 directTUs
+and whole focused consumers rebuilt on matching196 support. R165.909s/S817.662s
+all0/1880exact: workers49+49, independent515/108pairs max1 at unchanged4, NEW
+full1874 (964persistent+903Cancel+7controls), legacy8/5/5 and coupled18. Strict
+PCI03 Arc517/108pairs0 plusactualsoftware1,9.351s/1894exact; lease released.
+90official instances0errors/KHR0errors47warnings173infos36hints;216PNG+20native/
+container/control R/S pairs exact;29oldwriter files/profile byte-identical.
+Configure656/5new is registration only. Initial-factor/MASK/BLEND/other owning
+roles/root composition/external/fullVRM remain open; SAME original64560 unfinished.
+Read VRM1-WIDE-SHADE-EXPRESSIONS.md/JSON; counterad0 and draft negatives retained.
+
 ## Private invariant-role VRM1 UV targets — 2026-11-05
 
 Runtime7e5f869 supports differing/zero targets only when actual upper roles are
