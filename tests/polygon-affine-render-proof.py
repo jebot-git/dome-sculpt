@@ -39,6 +39,20 @@ def profile(which,tag=""):
  save(directory/'immutable-inputs.json',protected)
  try:
   A['run_step'](state,'compile',cmd,prospective=(32 if which=='sanitize' else 8)*2**20)
+  if which=='sanitize':
+   overridden=[]
+   for source in ('polygon-authoring.cpp','polygon-conversion.cpp','polygon-render.cpp'):
+    ownentry=next(x for x in db if x['file'].endswith('/src/'+source));whole=[];skip=False
+    for a in shlex.split(ownentry['command']):
+     if skip:skip=False;continue
+     if a in ('-o','-MF','-MT','-MQ'):skip=True;continue
+     if a in ('-c','-MD','-MMD','-MP') or a==ownentry['file']:continue
+     whole.append(a.replace(str(old),str(ROOT)))
+    target=directory/(source+'.o');whole+=['-ffunction-sections','-fdata-sections','-MMD','-MF',str(directory/(source+'.d')),'-o',str(target),'-c',str(ROOT/'src'/source)]
+    A['run_step'](state,'compile-whole-'+source,whole,prospective=16*2**20);overridden.append(target)
+   old_override={str(ROOT/f'artifacts/affine-proof/{which}-capability/{s}.o') for s in ('polygon-authoring.cpp','polygon-conversion.cpp','polygon-render.cpp')}
+   link=[a for a in link if a not in old_override];link=link[:2]+[str(p) for p in overridden]+link[2:]+['-Wl,--gc-sections']
+   protected={a:sha(a) for a in link if a.endswith(('.o','.a')) and a!=str(obj) and not a.startswith('-')};save(directory/'immutable-inputs.json',protected)
   estimate=(96 if which=='sanitize' else 24)*2**20
   pre=A['guard'](estimate);start=time.time()
   def limit():resource.setrlimit(resource.RLIMIT_FSIZE,(estimate,estimate))
