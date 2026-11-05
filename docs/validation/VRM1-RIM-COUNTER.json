@@ -1,0 +1,90 @@
+{
+  "scope": "Genuine source MatCap+parametric Rim+Rim image and rimColor target after real native paint, old sealed662 actual export refusal; runtime unchanged.",
+  "status": {
+    "state": "terminal",
+    "pid": 1830342,
+    "steps": [
+      {
+        "name": "compile-vrm1-expression-layer-authoring",
+        "command": [
+          "/usr/bin/c++",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-rim-662/src",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-rim-662/third_party/cgltf",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-rim-662/include",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-rim-662/third_party/openbrush",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-rim-662/third_party/nlohmann",
+          "-O3",
+          "-DNDEBUG",
+          "-std=gnu++20",
+          "-o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-rim-662/artifacts/rim-proof/counter-release/stage/vrm1-expression-layer-authoring.cpp.o",
+          "-c",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-rim-662/tests/vrm1-expression-layer-authoring.cpp"
+        ],
+        "exit": 0,
+        "seconds": 8.894871309050359
+      },
+      {
+        "name": "link-worker",
+        "command": [
+          "/usr/bin/c++",
+          "-O3",
+          "-DNDEBUG",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-rim-662/artifacts/rim-proof/counter-release/stage/vrm1-expression-layer-authoring.cpp.o",
+          "-o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-rim-662/artifacts/rim-proof/counter-release/stage/worker",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-rim-662/artifacts/rim-proof/counter-release/stage/libdome-sculpt-core.a",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-rim-662/artifacts/rim-proof/counter-release/stage/libdome-sculpt-affine.a",
+          "/usr/lib64/liblapacke.so",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-rim-662/artifacts/rim-proof/counter-release/stage/libdome-sculpt-polygon.a",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-rim-662/artifacts/rim-proof/counter-release/stage/libxatlas.a",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-rim-662/artifacts/rim-proof/counter-release/stage/libmikktspace.a",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-rim-662/artifacts/rim-proof/counter-release/stage/libmikktspace-robust.a",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-rim-662/artifacts/rim-proof/counter-release/stage/libufbx.a",
+          "/usr/lib64/libpng.so",
+          "/usr/lib64/libjpeg.so",
+          "/usr/lib64/libz.so",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-rim-662/artifacts/rim-proof/counter-release/stage/libdome-sculpt-emission-codec.a",
+          "/usr/lib64/libOpenEXR-3_2.so",
+          "/usr/lib64/libOpenEXRUtil-3_2.so",
+          "/usr/lib64/libOpenEXRCore-3_2.so",
+          "/usr/lib64/libIex-3_2.so",
+          "/usr/lib64/libIlmThread-3_2.so",
+          "/usr/lib64/libImath-3_1.so",
+          "-lgcc_s_asneeded",
+          "-lgcc_s_asneeded",
+          "-Wl,--wrap=fsync"
+        ],
+        "exit": 0,
+        "seconds": 0.3028435449814424
+      },
+      {
+        "name": "initial-factor-refusal",
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-rim-662/artifacts/rim-proof/counter-release/stage/worker",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-preview-1853cc3/build-preview-release/vrm1-background-fixture/source.vrm",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-rim-662/artifacts/rim-proof/counter-release/run",
+          "--old-refusal",
+          "--rim"
+        ],
+        "exit": 0,
+        "seconds": 0.12799494597129524
+      }
+    ],
+    "scope": "Untouched sealedbd3 runtime on copied immutable own matching support, whole NEW counter consumer only. Genuine two-stroke native paint plus actual source MatCap image and color target; Save and actual editable Avatar worker refusal, no product changes or full newbuild claim.",
+    "child_pid": 1831474,
+    "exit": 0,
+    "seconds": 9.441609569010325,
+    "inputs": 1908,
+    "drift": []
+  },
+  "actual_log": "PASS Actual original source retains both skins and rigid part\nPASS Actual source mesh: \nPASS Actual pristine MatCap source persists before genuine paint\nPASS Actual visible active source part supplies the native paint ray\nPASS Genuine independent colour/coverage stroke enters actual native worker\nPASS Genuine nonuniform paint worker retires\nPASS Actual source mesh: \nPASS Actual visible active source part supplies the native paint ray\nPASS Genuine independent colour/coverage stroke enters actual native worker\nPASS Genuine nonuniform paint worker retires\nPASS Actual source mesh: \nPASS Real source/paint owner persists before export counterfactual\nPASS Actual EditableAvatar file worker reaches its failure endpoint\nOLD_DYNAMIC_EXPRESSION_REFUSAL VRM1 rim expression layers need their independent lighting adapter\nPASS Actual painted worker refuses unresolved source/paint expression coupling\nPASS Genuine refusal preserves prior output and complete original source/paint Scene\nPASS 15 actual old dynamic counterfactual checks\n",
+  "source_sha256": "2e0590880f959bd197bc7aee1eb236692221b3fccf6045f69eabd75c00b86cf2",
+  "outputs": {
+    "artifacts/rim-proof/counter-release/run/source-rim.vrm": "f91137fa0860ea11ff367e5fe160c15d43dbc6ecd7f951defc608fffb78c385b",
+    "artifacts/rim-proof/counter-release/run/pristine-source.dsculpt": "b1a0eac00d5f7806f64eb3a5888471e5465a23294944c0d2974672d2227ad221",
+    "artifacts/rim-proof/counter-release/run/nonuniform-source.dsculpt": "74ace5bff9cb1c2ce34ae17f2428830229c64d438842c05e5f70534d8ba41126",
+    "artifacts/rim-proof/counter-release/run/dynamic.vrm": "db36251b3c135816ae9671421f0013791db8790de3cf74d2982da66e5293ed60"
+  },
+  "note": "Inherited runner step name initial-factor-refusal; actual --rim mode and precise Rim lighting-adapter refusal recorded."
+}
