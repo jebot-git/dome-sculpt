@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/scene.hpp"
 #include "dome/source-maps.hpp"
+#include "dome/source-paint.hpp"
 #include "dome/normal-sampling.hpp"
 #include "dome/paint-sampling.hpp"
 #include "polygon-scene-archive.hpp"
@@ -39,7 +40,7 @@ int main(int argc,char **argv)try{
  auto reader=[&](const nlohmann::json &input,std::function<bool()> cancelled={}){return detail::PolygonSceneReader(input,images,models,resolver,&placements,j.contains("color_bases")?&colors:nullptr,encoded.contains("normal_sampling")?&normals:nullptr,encoded.contains("paint_sampling")?&domains:nullptr,context,std::move(cancelled));};
  auto lazy=reader(j);for(size_t i=old.origins().size();i>0;--i){const auto &o=lazy.origin_at(uint32_t(i-1));check(o==lazy.origin_at(uint32_t(i-1)),"Repeated before ID preserves one actual strong origin owner");}
  auto current=lazy.finish();check(current.origins().size()==old.origins().size()&&current.authorities().size()==old.authorities().size(),"Lazy completion retains exact declared pool counts");
- for(size_t i=0;i<old.origins().size();++i){const auto &a=*old.origins()[i],&b=*current.origins()[i];
+ for(size_t i=0;i<old.origins().size();++i){const auto &a=*old.origins()[i];const auto &b=*current.origins()[i];
   check(a.source_object==b.source_object&&a.name==b.name&&a.mesh_active==b.mesh_active&&a.material_bindings==b.material_bindings,"Source IDs and actual immutable material authority do not relabel or clone");
   check(a.volume->encode()==b.volume->encode()&&paint_value(a.paint)==paint_value(b.paint),"Every before volume, Paint float/layer/bake/domain/image value equals existing owning decoder");
   check((a.deformation?a.deformation->encode(a.paint->mesh()):nlohmann::json(nullptr))==(b.deformation?b.deformation->encode(b.paint->mesh()):nlohmann::json(nullptr)),"Exact before skin/morph/pose16 values survive lazy resolution");
