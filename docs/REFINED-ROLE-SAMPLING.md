@@ -1,0 +1,9 @@
+# Detached raw artist-role field refinement
+
+Private c6a7dd9 kernel and whole consumers pass330 optimized/330 matching whole-owned sanitizer checks. Public and legacy headers stay exact; new role/kernel TUs are compiled separately against complete immutable39+cdbd+three4df support. No new full application or owning refinement admission is claimed.
+
+The genuine square producer supplies actual converted37 fields. Raw barycentric base/target N/T values remain exact (maximum error0), including actual target IDs, absent arrays and W. Minimum interpolated base-normal length0.970143 demonstrates why inserted values cannot be normalized: that changes interior direction by0.00140105. These raw outputs are deliberately not a NormalFrames DTO or Scene authority.
+
+Forecast includes real borrowed capacities and metadata, input geometry/provenance and output storage; output target metadata is reserved once. Exact working/work caps succeed, one below refuses. Every measured cancellation and14 persistent C++ allocation prefixes/profile clean output and retry with exact complete caller Scene. The prior9c role object linked with the same new whole consumer genuinely fails capacity accounting; all16 inputs remain exact. Initial missing test include and counterfactual link-path mistakes are preserved separately.
+
+Two fixture-linked CMake targets are added for later owning builds; their registry addition was not reconfigured locally. Current evidence is the actual direct whole consumers described above. Connected record4 common-refinement/frame-position3/Paint5/domain2 plus38/20 ownership, public/native/render/pick/codec/export/UI, dynamic skin/morph and actual avatar/general cases remain required. Normalization sensitivity is an attribute-field control, not a pixel or standard-glTF fidelity claim.
