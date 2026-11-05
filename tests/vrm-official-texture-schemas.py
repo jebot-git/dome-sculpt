@@ -10,7 +10,7 @@ import jsonschema
 from jsonschema import validators
 from referencing import Registry,Resource
 from referencing.jsonschema import DRAFT4
-parser=argparse.ArgumentParser();parser.add_argument('--output',type=pathlib.Path,required=True);parser.add_argument('--spec',type=pathlib.Path,required=True,help='Pinned VRM specification root; remote references are refused');parser.add_argument('files',type=pathlib.Path,nargs='+');args=parser.parse_args();spec=args.spec;reports=[];selftests=[];schema_hashes={};assert importlib.metadata.version('jsonschema')=='4.26.0'
+parser=argparse.ArgumentParser();parser.add_argument('--output',type=pathlib.Path,required=True);parser.add_argument('--spec',type=pathlib.Path,required=True,help='Pinned VRM specification root; remote references are refused');parser.add_argument('--vrm0-spec',type=pathlib.Path);parser.add_argument('files',type=pathlib.Path,nargs='+');args=parser.parse_args();spec=args.spec;reports=[];selftests=[];schema_hashes={};vrm0_controls=[];assert importlib.metadata.version('jsonschema')=='4.26.0'
 def unpinned(uri):raise RuntimeError('Unpinned schema reference '+uri)
 def mixed_ref(validator,ref,instance,schema):
  resolved=validator._resolver.lookup(ref)
@@ -24,7 +24,7 @@ def mixed_ref(validator,ref,instance,schema):
 Legacy=validators.extend(jsonschema.Draft4Validator,{'$ref':mixed_ref})
 Modern=validators.extend(jsonschema.Draft202012Validator,{'$ref':mixed_ref})
 def validator(kind,name):
- directory=spec/kind/'schema';registry=Registry(retrieve=unpinned)
+ directory=args.vrm0_spec if kind=='VRM0' else spec/kind/'schema';assert directory is not None;registry=Registry(retrieve=unpinned)
  for file in directory.glob('*.json'):
   digest=hashlib.sha256(file.read_bytes()).hexdigest();assert schema_hashes.setdefault(str(file),digest)==digest;data=json.loads(file.read_text());resource=Resource.from_contents(data,default_specification=DRAFT4);registry=registry.with_resource(file.resolve().as_uri(),resource)
   if '$id'in data:registry=registry.with_resource(data['$id'],resource)
@@ -35,6 +35,11 @@ for path in args.files:
  b=path.read_bytes();j=json.loads(b[20:20+struct.unpack_from('<I',b,12)[0]]);checks=[]
  def validate(kind,name,value):
   errors=[{'path':list(e.absolute_path),'message':e.message}for e in validator(kind,name).iter_errors(value)];checks.append({'kind':kind,'schema':name,'errors':errors})
+ if 'VRM'in j.get('extensions',{}):
+  value=j['extensions']['VRM'];validate('VRM0','vrm.schema.json',value)
+  if not vrm0_controls:
+   bones=value.get('humanoid',{}).get('humanBones',[]);assert bones,'Actual VRM0 humanoid bone is required for resolver control'
+   bad=json.loads(json.dumps(value));bad['humanoid']['humanBones'][0]['node']='not an integer';assert list(validator('VRM0','vrm.schema.json').iter_errors(bad));vrm0_controls.append({'source_file':str(path),'control':'Actual VRM0 nested human-bone node rejects a string through pinned Draft4 sibling reference'})
  for key,kind,name in [('VRMC_vrm','VRMC_vrm-1.0','VRMC_vrm.schema.json'),('VRMC_springBone','VRMC_springBone-1.0','VRMC_springBone.schema.json')]:
   if key in j.get('extensions',{}):validate(kind,name,j['extensions'][key])
  for node in j.get('nodes',[]):
@@ -52,6 +57,6 @@ for path in args.files:
       bad=json.loads(json.dumps(value));bad[role]['scale']='not a number';assert list(v.iter_errors(bad));selftests.append({'source_file':str(path),'role':role,'control':'Actual Shift scale wrong type rejects via pinned Draft4 child schema'})
  reports.append({'file':str(path),'checks':checks})
  print(path,len(checks),sum(len(c['errors'])for c in checks),'schema errors')
-assert selftests,'Actual role-bearing input is required for resolver controls'
+assert selftests or vrm0_controls,'Actual role-bearing VRM1 or humanoid VRM0 input is required for resolver controls'
 drift=[p for p,h in schema_hashes.items()if hashlib.sha256(pathlib.Path(p).read_bytes()).hexdigest()!=h];assert not drift
-args.output.write_text(json.dumps({'files':reports,'resolver_controls':selftests,'schema_bytes_rewritten':False,'network_references_allowed':False,'mixed_dialect_dispatch':'Declared Draft4 or2020 perresource; unspecifiedVRM defaultsDraft4','jsonschema_version':'4.26.0','consumed_schema_sha256':schema_hashes,'schema_drift':drift},indent=2)+'\n');raise SystemExit(any(c['errors']for r in reports for c in r['checks']))
+args.output.write_text(json.dumps({'files':reports,'resolver_controls':selftests+vrm0_controls,'schema_bytes_rewritten':False,'network_references_allowed':False,'mixed_dialect_dispatch':'Declared Draft4 or2020 perresource; unspecifiedVRM defaultsDraft4','jsonschema_version':'4.26.0','consumed_schema_sha256':schema_hashes,'schema_drift':drift},indent=2)+'\n');raise SystemExit(any(c['errors']for r in reports for c in r['checks']))
