@@ -589,6 +589,9 @@ private:
     CanvasTransform transform{};
     std::exception_ptr error;
     bool ready = false;
+    // A discrete command cancels a held gesture on its detached candidate,
+    // in the same publication as the command, never as an earlier queue job.
+    bool cancel_gesture = false;
   };
   struct RetopoJob {
     uint64_t session = 0;

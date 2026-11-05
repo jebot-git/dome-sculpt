@@ -60,9 +60,48 @@ void Document::edit_retopology(RetopoAction action) {
       action == RetopoAction::EndGesture || action == RetopoAction::CancelGesture)
     throw std::invalid_argument("Use the input gesture interface for retopology points");
   std::lock_guard lock(model_mutex_);
-  if (retopo_stroking_) { cancel_action_locked(); desktop_ = false; input_.cancel(); }
-  queue_retopology_locked(action);
-  state_.error.clear(); publish_locked();
+  if (!state_.retopology || !state_.retopology->source || retopo_accepting_)
+    throw std::logic_error("Wait for the retopology source before editing");
+  auto admission = std::make_shared<RetopoAcceptance>();
+  admission->cancel_gesture = retopo_stroking_;
+  auto view = std::make_shared<RetopoView>(*state_.retopology);
+  view->busy = true;
+  const auto previous = state_.retopology;
+  auto previous_error = state_.error;
+  const auto pending = retopo_pending_;
+  const auto stroking = retopo_stroking_, sampled = retopo_sampled_, desktop = desktop_;
+  RetopoJob job{retopo_session_.load(), {}, action, {}, retopo_snap_mm_};
+  job.acceptance = admission;
+  {
+    std::lock_guard lock(retopo_mutex_);
+    if (retopo_jobs_.size() >= 254) throw std::length_error("Retopology input queue is full");
+    retopo_jobs_.push_back(std::move(job));
+  }
+  ++retopo_pending_;
+  state_.retopology = std::move(view);
+  retopo_stroking_ = retopo_sampled_ = false; desktop_ = false;
+  try {
+    state_.error.clear(); publish_locked();
+  } catch (...) {
+    {
+      std::lock_guard lock(retopo_mutex_);
+      admission->admission = RetopoAcceptance::Admission::Rejected;
+      std::erase_if(retopo_jobs_, [&](const auto &queued) { return queued.acceptance == admission; });
+    }
+    retopo_pending_ = pending;
+    state_.retopology = previous; state_.error = std::move(previous_error);
+    retopo_stroking_ = stroking; retopo_sampled_ = sampled; desktop_ = desktop;
+    retopo_changed_.notify_all();
+    throw;
+  }
+  {
+    std::lock_guard lock(retopo_mutex_);
+    admission->admission = RetopoAcceptance::Admission::Accepted;
+  }
+  // Publication has accepted ownership; physical input cannot be cancelled
+  // before a throwing caller publication can still reject this transaction.
+  if (stroking) input_.cancel();
+  retopo_changed_.notify_all();
 }
 void Document::retopology_distance(float mm) {
   if (!std::isfinite(mm) || mm < 1 || mm > 200) throw std::invalid_argument("Projection distance must be 1 to 200 mm");
@@ -183,7 +222,8 @@ void Document::retopo_loop() {
       job = std::move(retopo_jobs_.front()); retopo_jobs_.pop_front();
     }
     const auto obsolete = [&] { return stopping_.load() || job.session != retopo_session_.load(); };
-    auto cancelled = [&] { return obsolete() || (job.acceptance && job.acceptance->work->cancelled.load()); };
+    auto cancelled = [&] { return obsolete() || (job.accept && job.acceptance &&
+                                                job.acceptance->work->cancelled.load()); };
     bool retired = false;
     try {
       if (job.acceptance) {
@@ -194,7 +234,7 @@ void Document::retopo_loop() {
         if (job.acceptance->admission != RetopoAcceptance::Admission::Accepted) continue;
       }
       if (cancelled()) {
-        if (job.acceptance) throw std::runtime_error("Retopology acceptance cancelled");
+        if (job.accept) throw std::runtime_error("Retopology acceptance cancelled");
         continue;
       }
       // Draft geometry and local history cannot advance before the immutable
@@ -205,13 +245,15 @@ void Document::retopo_loop() {
         if (!workspace || session != job.session) throw std::logic_error("Retopology workspace is unavailable");
         candidate = std::make_unique<RetopoWorkspace>(*workspace);
       }
+      if (job.acceptance && job.acceptance->cancel_gesture)
+        candidate->edit(RetopoAction::CancelGesture, {}, job.snap_mm, cancelled);
       if (job.action) candidate->edit(*job.action, job.point, job.snap_mm, cancelled);
       if (job.accept) {
         if (!job.acceptance) throw std::logic_error("Retopology acceptance lost its ordered asset owner");
         candidate->edit(RetopoAction::EndGesture, {}, job.snap_mm, cancelled);
         if (candidate->view().topology->faces().empty()) throw std::logic_error("Make at least one face before applying the patch");
       }
-      if (!job.acceptance && cancelled()) continue;
+      if (!job.accept && cancelled()) continue;
       std::lock_guard lock(model_mutex_);
       if (obsolete() || !state_.retopology) continue;
       if (retopo_source_.generation != state_.generation || retopo_source_.revision != state_.revision ||
@@ -237,7 +279,7 @@ void Document::retopo_loop() {
       // Swap without destroying the old BVH/history under the model lock.
       // candidate is destroyed after this lock guard leaves scope.
       workspace.swap(candidate); session = job.session;
-      if (job.acceptance) {
+      if (job.accept) {
         // Only hand the file owner a draft whose immutable view succeeded.
         // A failed preview must fail the dependent Save, retaining the exact
         // pre-Apply workspace (including any unfinished held gesture).
@@ -249,7 +291,7 @@ void Document::retopo_loop() {
         job.acceptance->ready = true;
       }
     } catch (const std::exception &e) {
-      if (job.acceptance) {
+      if (job.accept) {
         {
           std::lock_guard lock(retopo_mutex_);
           if (!job.acceptance->ready) {

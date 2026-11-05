@@ -1,0 +1,170 @@
+{
+  "milestone": "Retopology public discrete caller admission: Release checkpoint, broader routes pending",
+  "base": "9dd63f90f6062b366276b4ce8192a46892de9e81",
+  "scope": {
+    "product": [
+      "include/dome/document.hpp",
+      "src/document-retopo.cpp"
+    ],
+    "registered_consumer": "tests/retopo-caller-admission.cpp",
+    "changed_private_pointee": "RetopoAcceptance.cancel_gesture",
+    "outer_layout_changed": false,
+    "fresh_whole_translation_units": [
+      "src/document-retopo.cpp",
+      "tests/retopo-caller-admission.cpp"
+    ],
+    "support": "Explicit matching main9dd component closure; immutable original archives and four complete override TUs. No whole-core/app rebuild claim.",
+    "sanitizer": "Pending; no sanitizer slot or app qualification performed."
+  },
+  "evidence": {
+    "counter": {
+      "status_path": "/home/blux/de-xr/dome-sculpt/artifacts/retopo-caller-9dd/artifacts/caller-proof/counter/status.json",
+      "status_sha256": "f4b7f5f5d01793c9b4d9bddcf3085ae2798b8da906f3012fb64d05a60f67c139",
+      "state": "terminal",
+      "exit": 0,
+      "seconds": 5.469349124992732,
+      "drift": [],
+      "steps": [
+        {
+          "name": "compile",
+          "exit": 0
+        },
+        {
+          "name": "link",
+          "exit": 0
+        },
+        {
+          "name": "actual",
+          "exit": 1
+        }
+      ]
+    },
+    "release-v1": {
+      "status_path": "/home/blux/de-xr/dome-sculpt/artifacts/retopo-caller-9dd/artifacts/caller-proof/release-v1/status.json",
+      "status_sha256": "3837db546a20dec7df3d7e18c24a74251092dda2c372993a8c74e20b6618c410",
+      "state": "terminal",
+      "exit": 0,
+      "seconds": 13.178807885036804,
+      "drift": [],
+      "steps": [
+        {
+          "name": "compile-product",
+          "exit": 0
+        },
+        {
+          "name": "compile-test",
+          "exit": 0
+        },
+        {
+          "name": "link",
+          "exit": 0
+        },
+        {
+          "name": "native",
+          "exit": 0
+        }
+      ]
+    },
+    "worker-controls": {
+      "status_path": "/home/blux/de-xr/dome-sculpt/artifacts/retopo-caller-9dd/artifacts/caller-proof/worker-controls/status.json",
+      "status_sha256": "1a9d3ad0515c94aa2fb87e088174ceeca0979b05815fe447513a3634a095661e",
+      "state": "terminal",
+      "exit": 0,
+      "seconds": 0.7627580330008641,
+      "drift": [],
+      "steps": [
+        {
+          "name": "link",
+          "exit": 0
+        },
+        {
+          "name": "worker",
+          "exit": 0
+        },
+        {
+          "name": "reporter",
+          "exit": 0
+        },
+        {
+          "name": "acceptance",
+          "exit": 0
+        }
+      ]
+    }
+  },
+  "checks": {
+    "public_caller": 4031,
+    "persistent_caller_denials": 152,
+    "actual_caller_publish_throws": 8,
+    "worker": 4308,
+    "worker_one_shot_denials": 251,
+    "persistent_reporter": 42,
+    "accepted_publication": 97
+  },
+  "layouts": {
+    "old": {
+      "dome::Document": {
+        "size": 6968,
+        "align": 8
+      },
+      "dome::Document::RetopoJob": {
+        "size": 72,
+        "align": 8
+      },
+      "dome::Document::RetopoAcceptance": {
+        "size": 112,
+        "align": 8
+      },
+      "dome::EditorState": {
+        "size": 1896,
+        "align": 8
+      },
+      "dome::Scene": {
+        "size": 72,
+        "align": 8
+      }
+    },
+    "new": {
+      "dome::Document": {
+        "size": 6968,
+        "align": 8
+      },
+      "dome::Document::RetopoJob": {
+        "size": 72,
+        "align": 8
+      },
+      "dome::Document::RetopoAcceptance": {
+        "size": 112,
+        "align": 8
+      },
+      "dome::EditorState": {
+        "size": 1896,
+        "align": 8
+      },
+      "dome::Scene": {
+        "size": 72,
+        "align": 8
+      }
+    }
+  },
+  "files": {
+    "src/document-retopo.cpp": "5f821752467d6f97787f1af5042753d0cee06a7dccbf1680fac3bf17b25639f5",
+    "include/dome/document.hpp": "c82f978d0e072bd0af2d9765bcad5d0486a4628d155fda62712ad741c909e7d5",
+    "tests/retopo-caller-admission.cpp": "ffc384ea98c19f298c5fa24105c3ca504c1e720a43b994bb19338e8782ad7d82",
+    "artifacts/caller-proof/closure/immutable-object-access.json": "3ab38efa5fdec73885e8700fd1fa41e743fde6ba96c6b0583b2a9ba920b950a4",
+    "artifacts/caller-proof/closure/nested-type-access.txt": "7793cdfd831ed0c55e7529e4308276ca0dd381ce7033f39918d2ea61cbde2202",
+    "artifacts/caller-proof/release-v1/native": "cf98174ee7adc04e9f72685b7bc6ccd05a938787afe3fee8c8cc360539dbfb62",
+    "artifacts/caller-proof/worker-controls/native": "d90df3f1a9bd31c5cd4ef93ada80aef2cbd4630b30a0d9b9fbe44c5da7e74e23"
+  },
+  "storage": {
+    "initial_new_growth_limit_bytes": 67108864,
+    "original_reflink_source_du_bytes": 109006848,
+    "growth_bytes_at_worker_endpoint": 44711936,
+    "minimum_actual_free_bytes": 21474836480
+  },
+  "remaining": [
+    "Fresh sanitizer consumer qualification and ordinary matched app proof before main admission.",
+    "Shared XR commands and hand history, Document undo/redo, desktop and XR gesture queue publication, workspace lifecycle and distance require explicit transaction audit/repair.",
+    "CMake target added in source; no generated CTest invocation claimed in this checkpoint."
+  ]
+}

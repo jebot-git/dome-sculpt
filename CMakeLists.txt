@@ -586,6 +586,15 @@ if(BUILD_TESTING)
     --acceptance ${CMAKE_CURRENT_BINARY_DIR}/retopology-worker-accepted-publication)
   set_tests_properties(retopology-worker-faults retopology-worker-reporter-recovery
     retopology-worker-accepted-publication PROPERTIES TIMEOUT 120)
+  add_executable(dome-sculpt-retopo-caller-admission-test tests/retopo-caller-admission.cpp)
+  target_link_libraries(dome-sculpt-retopo-caller-admission-test PRIVATE dome-sculpt-core)
+  target_link_options(dome-sculpt-retopo-caller-admission-test PRIVATE
+    -Wl,--wrap=_ZN4dome6unwrapERNS_4MeshEjjRKSt8functionIFbvEE
+    -Wl,--wrap=_ZN4dome15RetopoWorkspace4editENS_12RetopoActionENS_4Vec3EfRKSt8functionIFbvEE
+    -Wl,--wrap=_ZN4dome8Document14publish_lockedEbb)
+  add_test(NAME retopology-caller-admission COMMAND dome-sculpt-retopo-caller-admission-test
+    ${CMAKE_CURRENT_BINARY_DIR}/retopology-caller-admission)
+  set_tests_properties(retopology-caller-admission PROPERTIES TIMEOUT 300)
   add_executable(dome-sculpt-retopo-affine-ui-fixture tests/retopo-affine-ui-fixture.cpp)
   target_link_libraries(dome-sculpt-retopo-affine-ui-fixture PRIVATE dome-sculpt-core)
   add_test(NAME retopology-affine-ui-fixture COMMAND dome-sculpt-retopo-affine-ui-fixture ${CMAKE_CURRENT_BINARY_DIR}/retopology-affine-ui.dsculpt)
