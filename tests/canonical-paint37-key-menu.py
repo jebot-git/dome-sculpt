@@ -130,7 +130,18 @@ async def main():
   async def select_existing(label):
    mark('native-existing-target-selection-'+label);await command('Choose shapekey...');dialog=await wait(lambda:named('Choose shapekey'));dialog.set_input_focus(X.RevertToParent,X.CurrentTime);d.sync();g=dialog.get_geometry();row=46 if compact else 32
    check(dialog.get_wm_transient_for().id==window.id,'Current target selection uses its actual document-owned native selector')
-   pixels(dialog).save(out/('target-choice-before-'+label+'.png'));tap(dialog,g.width*.5,row*3+(row-4)/2);await asyncio.sleep(.15);key('End');key('Return');await asyncio.sleep(.1);pixels(dialog).save(out/('selected-existing-target-'+label+'.png'));tap(dialog,g.width*.75,g.height-row*2+24);await wait(lambda:named('Choose shapekey') is None);check(await save()==created,'Choosing existing new key changes no Scene/normal/F32/source or Undo history')
+   before_choice=pixels(dialog);before_choice.save(out/('target-choice-before-'+label+'.png'));visible={w.id for w in d.screen().root.query_tree().children if w.get_attributes().map_state==X.IsViewable};tap(dialog,g.width*.5,row*3+(row-4)/2)
+   def popup_window():
+    for w in d.screen().root.query_tree().children:
+     try:
+      a=w.get_attributes()
+      if w.id not in visible and a.map_state==X.IsViewable and a.override_redirect:return w
+     except error.BadWindow:pass
+   popup=await wait(popup_window,10,'actual current-target popup');pg=popup.get_geometry();pixels(popup).save(out/('target-popup-'+label+'.png'));tap(popup,pg.width*.5,pg.height*(len(targets(created))-.5)/len(targets(created)))
+   def popup_closed():
+    try:return popup.get_attributes().map_state!=X.IsViewable
+    except error.BadWindow:return True
+   await wait(popup_closed);await wait(lambda:pixels(dialog).tobytes()!=before_choice.tobytes(),10,'actual chosen target display ACK');pixels(dialog).save(out/('selected-existing-target-'+label+'.png'));tap(dialog,g.width*.75,g.height-row*2+24);await wait(lambda:named('Choose shapekey') is None);check(await save()==created,'Choosing existing new key changes no Scene/normal/F32/source or Undo history')
   await select_existing('history');await command('Undo');check(await save()==original,'Existing-target selection adds no Undo entry: one Undo still removes the real Create');await command('Redo');check(await save()==created,'Redo after the selection-only history check restores the exact real Create');await select_existing('for-stroke')
   mark('native-selected-key-replace');await command('Sculpt selected shapekey');check(await save()==created,'Entering actual selected-key sculpt mode changes no saved weights, paint or source')
   for _ in range(8):await command('Larger brush')
