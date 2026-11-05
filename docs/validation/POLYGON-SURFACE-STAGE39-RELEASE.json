@@ -1,0 +1,144 @@
+{
+  "scope": "Fresh all-reachable owning CPU Release12 layout plus detached polygon original-field/current Paint staging; guarded production formats remain unfinished",
+  "source": "8f1892b9add90576d170e2ce75befd06585b9836",
+  "build_handle": "83572",
+  "runtime_handle": "59609",
+  "build_exit": 0,
+  "build_steps": 254,
+  "targets": [
+    "dome-sculpt",
+    "dome-sculpt-native-authoring-inspect",
+    "dome-sculpt-polygon-surface-transfer-test",
+    "dome-sculpt-polygon-surface-owner-test",
+    "dome-sculpt-polygon-retopo-affine-test",
+    "dome-sculpt-canonical-normal-owning-test",
+    "dome-sculpt-canonical-paint-fixture-test",
+    "dome-sculpt-canonical-paint-native-test",
+    "dome-sculpt-canonical-paint-codec-test",
+    "dome-sculpt-canonical-paint-owner-test",
+    "dome-sculpt-canonical-paint37-key-controls-test",
+    "dome-sculpt-canonical-paint37-emission-contracts-test"
+  ],
+  "runtime": [
+    {
+      "name": "app-version",
+      "exit": 0,
+      "seconds": 0.31912533700233325,
+      "elf_drift": []
+    },
+    {
+      "name": "native-codec-owner-polygon",
+      "exit": 0,
+      "seconds": 2.510431402013637,
+      "elf_drift": []
+    },
+    {
+      "name": "math-transfer",
+      "exit": 0,
+      "seconds": 0.32009952497901395,
+      "elf_drift": []
+    },
+    {
+      "name": "actual-owner-stage",
+      "exit": 0,
+      "seconds": 0.3492140019661747,
+      "elf_drift": []
+    },
+    {
+      "name": "package-contracts",
+      "exit": 0,
+      "seconds": 0.7237758580013178,
+      "elf_drift": []
+    },
+    {
+      "name": "key-controls",
+      "exit": 0,
+      "seconds": 0.716947826964315,
+      "elf_drift": []
+    }
+  ],
+  "checks": {
+    "legacy_ctest": {
+      "passed": 8,
+      "total": 8,
+      "polygon_semantics": 248
+    },
+    "math": 1097,
+    "math_persistent_denials": 789,
+    "math_successful_endpoint": 1,
+    "math_cancel_polls": 175,
+    "real_polygon_source_paint_stage": 182,
+    "legacy_current37_key_controls": 29,
+    "legacy_package4_contracts": 28
+  },
+  "own_input_count": 252,
+  "source_drift": [],
+  "input_drift": [],
+  "fixture_drift": [],
+  "native_fixture_inputs": {
+    "/home/blux/de-xr/dome-sculpt/artifacts/owning37-main-9dd/artifacts/owning37-initial-release/poly37-proof/data-v3/sheared/prior.dsculpt": "c23f1ca46f30877b3630260254b144f5d3f3b10f1629e04ba3cdfb84efb26dac",
+    "/home/blux/de-xr/dome-sculpt/artifacts/owning37-main-9dd/artifacts/owning37-initial-release/poly37-proof/data-v3/reflected/prior.dsculpt": "093fed431da8456c8a5a0ada92c874f022785a96c8e9679ada658c599fe36dac",
+    "/home/blux/de-xr/dome-sculpt/artifacts/owning37-main-9dd/artifacts/owning37-initial-release/poly37-proof/data-v3/sheared/before-only.dsculpt": "d3a3ed3b4f9aa9b5db3c7da32b6d2b883307808a6e75c33d2a4c9115924b3059",
+    "/home/blux/de-xr/dome-sculpt/artifacts/owning37-main-9dd/artifacts/owning37-initial-release/poly37-proof/data-v3/reflected/before-only.dsculpt": "a6bd08912263f93f67d966fa2e2d93bc4354b57aa11be5e5dc06e3bf0d9f70ea",
+    "/home/blux/de-xr/dome-sculpt/artifacts/owning37-main-9dd/artifacts/owning37-initial-release/build/canonical-paint37-key-author/created.dsculpt": "1e2a81e521d5d491d1dbca9aabd486f836162853ea3e55652c1f3a7bbf3c3753"
+  },
+  "runtime_artifacts": "artifacts/polygon-transfer39-initial-release/runtime-status.json",
+  "build_artifacts": "artifacts/polygon-transfer39-initial-release/status.json",
+  "new_public_layout": {
+    "SourceMaterialBindings": [
+      1704,
+      1720
+    ],
+    "PaintSamplingDomain": [
+      48,
+      72
+    ]
+  },
+  "guards": "Existing literal domain1/CPS/normal semantics retained. New domain3/material edge cannot serialize in legacy pools; Scene publication/render/query stays explicitly refused until real owning adapters. Connected owner advance refuses until actual current paint-value capture, preventing silent reset. Raw baked normals/source/typed/prepared roles stay unsupported until genuine adapters.",
+  "positive_scope": [
+    "Actual saved affine/reflected preUV and current CPS37/newkey field sources",
+    "Real current SurfaceMap/domain3/attachment and typed material edge",
+    "All sparse legacy/PBR/physical emission layer metadata/tile owners and baked normal field unchanged",
+    "Independent current/source coordinates and actual source attribute/four-texel zero-edit normal oracle",
+    "Native N-only artist direction with declared geometric chart, no invented normal UV2/T/W",
+    "Cycle/current-mesh/inner recipe/writer/foreign-control-block/cancel/quota controls"
+  ],
+  "not_qualified": [
+    "Scene39/material21/Paint6/domain3 owning wire",
+    "Actual changed polygon Apply/user workflow",
+    "Current renderer/query exact field transport",
+    "New-owner exhaustive allocation/cancel/publication/queuedSave",
+    "Whole-owned sanitizer",
+    "UI/hardware/independent portable consumers",
+    "Repeated current paint edits/UV/key/Clear/rebake",
+    "General topology/refinement and typed/source/texture-set field adapters"
+  ],
+  "outputs": {
+    "artifacts/polygon-transfer39-initial-release/build/canonical-paint37-fixture/0-0.dsculpt": "6200286a792902ceceda0ba1f0be5171478c851b3bf4b1b68d14737a4fdc4aa1",
+    "artifacts/polygon-transfer39-initial-release/build/canonical-paint37-fixture/0-3.dsculpt": "2a83d7c35292cd9adbccbde36af59cc14798052f110bb6db2a0b9d7730a67c7a",
+    "artifacts/polygon-transfer39-initial-release/build/canonical-paint37-fixture/7-0.dsculpt": "9573cbc89256b3eb75ed76efe4d406efa206148b782d306804477e9a7dacb5ca",
+    "artifacts/polygon-transfer39-initial-release/build/canonical-paint37-fixture/7-4.dsculpt": "ecab8722706dd84477b3131636c57ef9d9ac00d4828674ad5c9e824c55e9d47f",
+    "artifacts/polygon-transfer39-initial-release/build/canonical-paint37-native-0-0/legacy-copy.dsculpt": "6200286a792902ceceda0ba1f0be5171478c851b3bf4b1b68d14737a4fdc4aa1",
+    "artifacts/polygon-transfer39-initial-release/build/canonical-paint37-native-0-0/0.dsculpt": "8d8c0f9d34779eebe7237033698d04e1c674001f7b5b32b292c5f67771c9420a",
+    "artifacts/polygon-transfer39-initial-release/build/canonical-paint37-native-0-0/1.dsculpt": "d20a458937084c8240a0c0bd2cabdbe2daa0b08b2aac06ee6a1aae771abf9784",
+    "artifacts/polygon-transfer39-initial-release/build/canonical-paint37-native-7-4/legacy-copy.dsculpt": "ecab8722706dd84477b3131636c57ef9d9ac00d4828674ad5c9e824c55e9d47f",
+    "artifacts/polygon-transfer39-initial-release/build/canonical-paint37-native-7-4/0.dsculpt": "4c517c1989d613c6c459f96ccaeb480db77fbe1170e5f1fe3c69f46ac9b1b512",
+    "artifacts/polygon-transfer39-initial-release/build/canonical-paint37-native-7-4/1.dsculpt": "c88483b9a417561a97be80f7cbe471fe4a1aea83bbcb7813713b1530d0d0095a",
+    "artifacts/polygon-transfer39-initial-release/build/canonical-paint37-codec-0-0/same.dsculpt": "8f69d0daa1dba461be1f8e5a0d4a958d93d68873262d723d5fd81f7826589e9e",
+    "artifacts/polygon-transfer39-initial-release/build/canonical-paint37-codec-0-0/split.dsculpt": "21269ac67842ffcea6cb807927f7be4bdf15ebf68181c0e0af323e6c6ae3e65e",
+    "artifacts/polygon-transfer39-initial-release/build/canonical-paint37-codec-7-4/same.dsculpt": "2558c28194c84c4a707d893aa1e3a0aa2aa09f00f2c977205ad5609a606ccf60",
+    "artifacts/polygon-transfer39-initial-release/build/canonical-paint37-codec-7-4/split.dsculpt": "40a715b59be9dcfdb92e820a3b2eaa90350f57a871d88c14c80a8ac43d165ada",
+    "artifacts/polygon-transfer39-initial-release/package-contracts/direct.glb": "bbda94a4db56ace79ee83622bc8af54fab39cb5cccf6c66078916197eafc4a1b",
+    "artifacts/polygon-transfer39-initial-release/package-contracts/queued.glb": "4ed20751a26ee2d622db2c4e1912b7ae2834ee3fe44d60dcd6836149956c866f",
+    "artifacts/polygon-transfer39-initial-release/package-contracts/ordered.dsculpt": "653ae054766980fee87c23aef550c50c95a45ced0a04a2f6ad89641cb702993c",
+    "artifacts/polygon-transfer39-initial-release/package-contracts/running.glb": "06562d715b3a0dbf1d1650fc110323b6891eff07af142cf87d8fd5ac0bb6e838",
+    "artifacts/polygon-transfer39-initial-release/key-controls/create.dsculpt": "1e2a81e521d5d491d1dbca9aabd486f836162853ea3e55652c1f3a7bbf3c3753",
+    "artifacts/polygon-transfer39-initial-release/key-controls/replace.dsculpt": "1e2a81e521d5d491d1dbca9aabd486f836162853ea3e55652c1f3a7bbf3c3753"
+  },
+  "space": {
+    "phase": 253771776,
+    "cumulative": 1067814912,
+    "free": 22649618432,
+    "prospective": 0
+  }
+}

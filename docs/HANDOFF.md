@@ -1,3 +1,14 @@
+## Private polygon39 first owning Release gate — 2026-11-06
+
+Frozen8f1892b (including admitted main537c98b) now passes a fully fresh reachable
+CPU Release12 build:254 steps, app/core/support/render/XR/frontend/inspector.
+Runtime8/8 old native/codec/owner/poly,math1097,new actual source/paint-stage182,
+legacy keycontrols29 andpackage4contracts28 all0. All252 own inputs,source,actual
+ELF maps and native fixture hashes remain exact. See
+validation/POLYGON-SURFACE-STAGE39-RELEASE.json. This is actual typed/current
+Paint staging only: Scene39/publication/render/query/codec/export stay guarded
+and required; SAN/UI/hardware are not run or reserved. Full goal remains active.
+
 ## Private polygon39 source boundary — 2026-11-06
 
 This source merges admitted main537c98b caller/input repair before the first

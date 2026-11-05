@@ -1,6 +1,8 @@
 # Polygon original-field transfer39: source checkpoint
 
-This source is unqualified after its public layout changes. The preceding
+The exact8f1892b source now has a fresh all-own CPU Release12 build and scoped
+runtime qualification after its public layout changes. Current production
+formats/workflows remain unqualified. The preceding
 02c7cfd milestone qualified only the private mathematical/source-owner slice
 (1,097 primitive and107 detached owner checks), with exact separate receipts.
 No Scene39, changed polygon Apply, current shader, codec, export or sanitizer
@@ -71,3 +73,13 @@ prospective links and20GiB actual-free floor. No SAN/UI/GPU reserve is granted.
 The exact initial proposal is under artifacts/polygon-transfer39-plan; it must
 be updated to the frozen source after merging current main537c98b. It qualifies
 only executed scopes; the production connections above remain required.
+
+The first gate closed with254 complete build steps and all12 targets,8/8 legacy
+producer/native/codec/owner/poly tests,1,097 math checks (all789 persistent
+denials plus endpoint and175 cancellation polls),182 real detached source/paint
+stage checks,29 existing current37 key controls and28 existing package4 contracts.
+All252 fresh own inputs, source, actual ELF maps and five native fixture bytes
+remain exact. Actual phase253,771,776B/cumulative1,067,814,912B stayed within
+limits. This proves executed CPU staging and compatibility scopes, not the
+remaining Scene39/current shader/native/export/SAN/UI work above. See
+validation/POLYGON-SURFACE-STAGE39-RELEASE.json.
