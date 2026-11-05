@@ -4,7 +4,7 @@
 #include <iostream>
 #include <filesystem>
 using namespace dome;
-namespace {size_t checks=0;void check(bool b,const char *s){++checks;if(!b)throw std::runtime_error(s);}void settle(Document &d){if(!d.wait_asset()||!d.wait_mesh()||!d.frame().state->error.empty())throw std::runtime_error("Native37: "+d.frame().state->error);}template<class F>bool refuses(F f){try{f();return false;}catch(const std::exception&){return true;}}}
+namespace {size_t checks=0;void check(bool b,const char *s){++checks;if(!b)throw std::runtime_error(s);std::cout<<"PASS "<<s<<std::endl;}void settle(Document &d){if(!d.wait_asset()||!d.wait_mesh()||!d.frame().state->error.empty())throw std::runtime_error("Native37: "+d.frame().state->error);}template<class F>bool refuses(F f){try{f();return false;}catch(const std::exception&){return true;}}}
 int main(int argc,char **argv)try{
  if(argc!=3)return 2;const auto source=Scene::load(argv[1]);const auto original=source.encode();const std::filesystem::path out=argv[2];std::filesystem::create_directories(out);Document d;d.replace(source);settle(d);
  check(detail::canonical_paint_retention_supported(source.active()),"Actual canonical actor has a supported owning paint transition");
