@@ -1,5 +1,27 @@
 # Full objective and completion evidence
 
+## Private real cutouts outside painted support — 2026-11-05
+
+Runtime a4ad6ce extends qualified296 with an owning, per-triangle MASK paint
+support bound and aligned logical PNG tile/carrier. Actual source holes remain;
+source RGB/samplers/geometry and independent paint stay separate. R/S worker45
+and independent175/36pairs each max1 at unchanged4; strictPCI03 Arc176/36pairs
+and actualsoftware refusal close0/1,78629/3.822s/1898exact, lease released.
+Both original candidate consumers completed915persistent+1337Cancel then exited1
+at a wrong legal-image-copy oracle; exits85.267/466.089s are retained. Corrected
+whole tail16 each is0/8.908+40.430s; original completed prefixes plus tails are
+composed, not relabeled full-test0 or sampled replacements. Default registration
+retains full sweeps.72PNG+10worker files R/S exact; prior296 MASK files and29old
+ordinary files/profile byte-identical. Four actual outputs+source pass42official
+instances, Khronos0errors21warnings84infos12hints. Three real fixture-dependent
+registrations:666 configure-only. One full changedLayer TU/newprivatehelper on
+copied matching296 archives; member audit proves only that member changed, no
+public/private-existing layout/schema/UI/freshapp/main claim. Full MASK/BLEND,
+wrapped/mip/rotation/retained/prepared/native/physical owners and remaining VRM
+roles/adapters remain required. SAME original64560 is separately unfinished.
+Read VRM1-MASK-PAINT-SUPPORT.md/JSON; all PNG precision and invalid-oracle negatives
+are preserved. Root canonical/native owning guards must remain at future union.
+
 ## Private proven MASK and current cutoff — 2026-11-05
 
 Runtime9ef186b follows e84: owned MASK alpha proof across declared future weights,
