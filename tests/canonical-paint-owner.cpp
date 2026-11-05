@@ -40,6 +40,13 @@ int main(int argc,char **argv)try{
  const auto expected=encoded_entries(original)+(o.deformation?o.deformation->resource_entries():0);
  std::cout<<"ARCHIVE_COUNT planned="<<usage.deformation_entries<<" expected="<<expected<<" slots="<<usage.deformation_slots<<std::endl;
  check(usage.deformation_entries==expected,"Before-capture planner equals real owning serialized inline model slots");
+ {
+  auto mutable_holder=std::make_shared<SourceMaterialBindings>(*o.material_bindings);auto detached=source;detached.active().material_bindings=mutable_holder;
+  auto [mesh,map]=target(o.painted->mesh(),false);auto retained=detail::CanonicalPaintSampling::create(detached,o.id,mesh,map);
+  mutable_holder->has_mtoon=true;
+  check(refuses([&]{retained.owner->validate_current(*retained.paint);},"Canonical attributes"),"Fresh owner validation must reject actual same-address before-material scalar mutation");
+  mutable_holder->has_mtoon=false;retained.owner->validate_current(*retained.paint);check(detached.encode()==original,"Exception retry retains genuine original before graph after material restoration");
+ }
  for(bool split:{false,true}){auto [mesh,map]=target(o.painted->mesh(),split);auto result=detail::CanonicalPaintSampling::create(source,o.id,mesh,map);
   check(result.owner->valid_owner(result.owner)&&result.owner->matches_current(*result.paint),"Only genuine immutable factory owner authenticates current writable attachment");
   auto foreign=std::shared_ptr<const detail::CanonicalPaintSampling>(result.owner.get(),[](auto*){});check(!result.owner->valid_owner(foreign),"Same-address foreign control block cannot borrow factory certificate");

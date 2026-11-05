@@ -24,6 +24,10 @@ void CanonicalPaintSampling::validate_current(const PaintedMesh &paint,const Pai
  const auto &b=*before_->material_bindings;
  if(normal_uv_->origin()!=b.canonical_attributes||b.normal_frames!=b.canonical_attributes->frames())
   throw std::invalid_argument("Canonical paint sampling borrowed a different normal attribute origin");
+ // A geometry seal does not certify the caller's legally mutable material DTO.
+ // Revalidate that actual before holder on each call, including its complete
+ // before-binding graph; no pointer/scalar validity survives this invocation.
+ b.validate();
  source_paint_pairing(before_->paint.get(),before_->material_bindings.get(),before_->appearance.get(),true);
  normal_uv_->validate_current(paint.mesh(),limits.cancelled);
  if(current_sources_.size()!=paint.mesh().positions.size())throw std::invalid_argument("Canonical paint source dimensions differ");
