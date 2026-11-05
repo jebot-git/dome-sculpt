@@ -33,16 +33,21 @@ inline HumanoidHeatDomains current_humanoid_heat_domains(const Scene&scene,
   auto sewn=geometric_boundary_sewing(m,deltas,maximum_bytes-retained.used,work);
   SkinGeometryWork geometry(work.maximum-work.used,work.cancel);const auto before=geometry.remaining();const auto metric=skin_world_mesh(m,origin*scene.world_matrix(id),geometry);work.step(before-geometry.remaining());
   DeclaredWeightPart input;input.object=id;input.geometric_row_groups=std::move(sewn.groups);HeatBindingOptions options;options.maximum_work=work.maximum-work.used;options.maximum_bytes=maximum_bytes-retained.used;
-  const auto intent=declared_weight_intent(o,input,profile,options,work,DeclaredSupportPolicy::UniqueSourceWitnesses,metric,ref.deformation);HeatJointMask aggregate{};for(const auto&mask:intent.masks(o))for(size_t k=0;k<4;++k){work.step();aggregate[k]|=mask[k];}
-  bool primary=(aggregate[head/64]&(uint64_t(1)<<(head%64)))!=0,ocular=aggregate!=HeatJointMask{};for(size_t k=0;k<4;++k){work.step(4);primary&=(aggregate[k]&~branch[k])==0;ocular&=(aggregate[k]&~eyes[k])==0;}
-  HumanoidHeatDomains::Part part{id,o.painted->mesh_owner(),{},primary,ocular};if(primary||ocular)part.fixed.assign(m.positions.size(),head);
-  if(ocular){
+  const auto intent=declared_weight_intent(o,input,profile,options,work,DeclaredSupportPolicy::UniqueSourceWitnesses,metric,ref.deformation);
+  // Ownership of one paint object is not an anatomical component boundary.
+  // Analyze the exact intrinsic quotient before assigning ANY hard labels.
    // Analyze intrinsic components of the exact one-owner boundary quotient,
    // rather than treating newly cut UV charts as separate anatomical parts.
-   Mesh intrinsic;std::vector<uint32_t>dense(m.positions.size(),UINT32_MAX),to_intrinsic(m.positions.size());intrinsic.positions.reserve(m.positions.size());intrinsic.indices.reserve(m.indices.size());
-   for(uint32_t i=0;i<m.positions.size();++i){work.step(8);auto root=input.geometric_row_groups.at(i);auto&v=dense.at(root);if(v==UINT32_MAX){v=uint32_t(intrinsic.positions.size());intrinsic.positions.push_back(metric.positions.at(root));}to_intrinsic[i]=v;}for(auto i:m.indices){work.step();intrinsic.indices.push_back(to_intrinsic.at(i));}
-   size_t local=0;const auto components=heat_intent_components(intrinsic,{},local,work.maximum-work.used,work.cancel);work.step(local);std::map<uint32_t,std::vector<uint32_t>>vertices;for(uint32_t i=0;i<components.size();++i){work.step(16);vertices[components[i]].push_back(i);}std::vector<uint32_t>fixed(intrinsic.positions.size(),head);
+   Mesh intrinsic;std::vector<uint32_t>dense(m.positions.size(),UINT32_MAX),to_intrinsic(m.positions.size()),canonical_raw;canonical_raw.reserve(m.positions.size());intrinsic.positions.reserve(m.positions.size());intrinsic.indices.reserve(m.indices.size());
+   for(uint32_t i=0;i<m.positions.size();++i){work.step(8);auto root=input.geometric_row_groups.at(i);auto&v=dense.at(root);if(v==UINT32_MAX){v=uint32_t(intrinsic.positions.size());intrinsic.positions.push_back(metric.positions.at(root));canonical_raw.push_back(root);}to_intrinsic[i]=v;}for(auto i:m.indices){work.step();intrinsic.indices.push_back(to_intrinsic.at(i));}
+   size_t local=0;const auto components=heat_intent_components(intrinsic,{},local,work.maximum-work.used,work.cancel);work.step(local);std::map<uint32_t,std::vector<uint32_t>>vertices;for(uint32_t i=0;i<components.size();++i){work.step(16);vertices[components[i]].push_back(i);}std::vector<uint32_t>fixed(intrinsic.positions.size(),UINT32_MAX);bool any_fixed=false,has_head=false,has_ocular=false;
    for(const auto&[root,rows]:vertices){
+    const auto masks=intent.masks(o);const auto aggregate=masks[canonical_raw.at(rows.front())];
+    for(auto row:rows){work.step(8);if(masks[canonical_raw.at(row)]!=aggregate)throw std::logic_error("Current intrinsic intent changed within a component");}
+    bool primary=(aggregate[head/64]&(uint64_t(1)<<(head%64)))!=0,ocular=aggregate!=HeatJointMask{};for(size_t k=0;k<4;++k){work.step(4);primary&=(aggregate[k]&~branch[k])==0;ocular&=(aggregate[k]&~eyes[k])==0;}
+    if(!primary&&!ocular)continue;
+    any_fixed=true;has_head|=primary;has_ocular|=ocular;uint32_t joint=head;
+    if(ocular){
     Mesh subset;std::vector<uint32_t>map(intrinsic.positions.size(),UINT32_MAX);subset.positions.reserve(rows.size());subset.indices.reserve(intrinsic.indices.size());for(auto i:rows){work.step(8);map[i]=uint32_t(subset.positions.size());subset.positions.push_back(intrinsic.positions[i]);}for(size_t c=0;c<intrinsic.indices.size();c+=3){work.step(8);if(components[intrinsic.indices[c]]!=root)continue;for(size_t k=0;k<3;++k)subset.indices.push_back(map[intrinsic.indices[c+k]]);}
     // Large/non-disk regions are not silently reinterpreted as eye caps.
     if(subset.positions.size()>4096||subset.indices.size()/3>16384)throw std::length_error("Current ocular patch exceeds certified geometric descriptor");
@@ -54,7 +59,6 @@ inline HumanoidHeatDomains current_humanoid_heat_domains(const Scene&scene,
     visibility_geodesic::ClosestRayVisibility::Scratch scratch(*query);
     if(query->planned_bytes>maximum_bytes-retained.used)throw std::length_error("Current ocular owning BVH workspace");
     visibility_geodesic::ClosedMeshSourceDomain closed(query,maximum_bytes-retained.used-query->planned_bytes,work);
-    uint32_t joint=head;
     if(closed.closed(0)){
       size_t inside=0;for(const auto&eye:eye_points){work.step(8);const auto p=eye.head;const bone_shadow::Point pivot{float(p[0]),float(p[1]),float(p[2])};const auto location=closed.closest(0,pivot,pivot,scratch,work);if(location==visibility_geodesic::ClosedMeshSourceDomain::Location::Boundary)throw std::invalid_argument("Current ocular pivot lies on the closed boundary");if(location==visibility_geodesic::ClosedMeshSourceDomain::Location::Inside){joint=eye.bone;++inside;}}
       if(inside>1)throw std::invalid_argument("Current closed ocular component contains multiple eye pivots");if(inside==1&&!rig.bones.at(joint).deform)joint=head;
@@ -64,10 +68,13 @@ inline HumanoidHeatDomains current_humanoid_heat_domains(const Scene&scene,
     const auto patch=analyze_projected_ocular_patch(subset,maximum_bytes-retained.used,work);
     if(patch.disk&&patch.convex_boundary){uint32_t selected_eye=UINT32_MAX;for(auto p:subset.positions){const auto mask=nearest_eye.nearest({p.x,p.y,p.z},work);uint32_t selected_joint=UINT32_MAX;size_t count=0;for(size_t k=0;k<4;++k){work.step();const auto bits=mask[k];count+=std::popcount(bits);if(bits)selected_joint=uint32_t(k*64+std::countr_zero(bits));}if(count!=1||(selected_eye!=UINT32_MAX&&selected_eye!=selected_joint))throw std::runtime_error("Current convex ocular patch lacks a unique actual eye control");selected_eye=selected_joint;}joint=rig.bones.at(selected_eye).deform?selected_eye:head;}
     }
+    }
     for(auto i:rows){work.step();fixed[i]=joint;}
    }
-   for(size_t i=0;i<m.positions.size();++i){work.step();part.fixed[i]=fixed.at(to_intrinsic[i]);}
-  }
+  HumanoidHeatDomains::Part part{id,o.painted->mesh_owner(),{},has_head,has_ocular};
+  // UINT32_MAX deliberately means this independent component retains the
+  // actual generic heat energy; it is not a bone or an abandoned fixed label.
+  if(any_fixed){part.fixed.resize(m.positions.size());for(size_t i=0;i<m.positions.size();++i){work.step();part.fixed[i]=fixed.at(to_intrinsic[i]);}}
   result.parts.push_back(std::move(part));
  }
  result.analysis_work=work.used-initial_work;return result;

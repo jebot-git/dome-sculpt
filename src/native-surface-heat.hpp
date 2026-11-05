@@ -5,6 +5,7 @@
 #include "humanoid-heat-sources.hpp"
 #include "humanoid-heat-domains.hpp"
 #include "current-humanoid-heat-domains.hpp"
+#include "partial-current-surface-heat.hpp"
 #include "normal-frame-runtime.hpp"
 namespace dome::detail {
 // Private owning source-informed SURFACE heat route. No public method/default
@@ -167,7 +168,10 @@ inline NativeSurfaceHeatPrepared prepare_native_surface_heat(const NativeSurface
       for(const auto&row:before.deformation->skin->vertices){work.step(64);if(row.size()>options.limits.max_influences)throw std::invalid_argument("Locked influences exceed the surface heat cap");}continue;
     }
     VisibilityGeodesicResult field;
-    if(!found->fixed.empty()){
+    if(!found->fixed.empty()&&std::any_of(found->fixed.begin(),found->fixed.end(),[](auto j){return j==UINT32_MAX;})){
+      BindOptions bind;bind.maximum_work=work.maximum-work.used;bind.limits=options.limits;bind.maximum_seed_distance=options.seed_distance;
+      field=partial_current_surface_heat(before,world_rig,origin*input.world_matrix(id),bind,profile,found->fixed,cancelled,options.maximum_workspace-bytes.used);work.step(field.work);
+    }else if(!found->fixed.empty()){
       if(found->fixed.size()!=mesh.positions.size())throw std::runtime_error("Surface heat fixed boundary dimensions");
       field.weights.vertices.reserve(found->fixed.size());for(auto joint:found->fixed){work.step(16);if(joint>=world_rig.bones.size()||!world_rig.bones[joint].deform)throw std::invalid_argument("Surface heat boundary references a nondeform joint");field.weights.vertices.push_back({{joint,1}});}
     }else{
