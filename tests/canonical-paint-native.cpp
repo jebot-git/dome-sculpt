@@ -3,6 +3,7 @@
 #include "dome/document.hpp"
 #include <iostream>
 #include <filesystem>
+#include <fstream>
 using namespace dome;
 namespace {size_t checks=0;void check(bool b,const char *s){++checks;if(!b)throw std::runtime_error(s);std::cout<<"PASS "<<s<<std::endl;}void settle(Document &d){if(!d.wait_asset()||!d.wait_mesh()||!d.frame().state->error.empty())throw std::runtime_error("Native37: "+d.frame().state->error);}template<class F>bool refuses(F f){try{f();return false;}catch(const std::exception&){return true;}}}
 int main(int argc,char **argv)try{
@@ -17,6 +18,9 @@ int main(int argc,char **argv)try{
   check(refuses([&]{detail::CanonicalPaintSampling::create(large,large.active().id,target,ids,tiny);}),"Actual inactive retained JSON copy refuses before output allocations at unchanged working cap");
   check(!holder->has_mtoon&&holder->material.source_json().at("extras").at("inactive-copy-canary").get_ref<const std::string&>().size()==8*1024*1024,"Copy preflight neither erases inactive material source nor changes its role authority");
  }
+ source.save(out/"legacy-copy.dsculpt");
+ auto bytes=[](const std::filesystem::path &p){std::ifstream f(p,std::ios::binary);return std::vector<char>(std::istreambuf_iterator<char>(f),{});};
+ check(bytes(argv[1])==bytes(out/"legacy-copy.dsculpt"),"Actual pre37 saved project bytes stay exact when no new owner exists");
  const auto revision=d.frame().state->revision;d.begin_uv();check(d.wait_uv(),"Initial actual UV workspace settles");auto view=d.frame().state->uv;
  check(view&&view->retain_paint_sampling&&view->retain_normal_sampling&&view->paint_sampling_required,"Supported canonical authoring explicitly keeps both fields by default");
  check(refuses([&]{d.edit_uv(UvAction::RetainPaint);}),"Required converted-normal writable basis cannot silently switch to lossy raster");d.end_uv(true);settle(d);check(d.copy_scene().encode()==original&&d.frame().state->revision==revision,"Untouched Accept is a genuine Scene/history no-op");
