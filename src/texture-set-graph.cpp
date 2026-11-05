@@ -15,6 +15,7 @@ struct Ledger {
  using Key=std::pair<unsigned,const void*>;
  std::set<Key>active,done;
  std::set<const TextureSetFaceDomain*>domains;
+ std::set<const TextureSetFaceDomain*>associated_domains,paint_domains;
  std::set<const TextureSetTopology*>topologies;
  std::set<const Mesh*>geometry;
  std::set<const TextureSetId*>assignments;
@@ -31,7 +32,7 @@ struct Ledger {
   auto&t=d->topology();if(!t||t->triangle_faces().size()>limits.maximum_triangles||t->triangle_corners().size()>limits.maximum_corners)throw std::invalid_argument("Texture-set domain omitted or exceeded its owning topology");
   if(topologies.insert(t.get()).second){++stats.topologies;charge(stats.membership_bytes,1,sizeof(TextureSetTopology));charge(stats.membership_bytes,t->triangle_faces().size()+t->triangle_corners().size(),sizeof(uint64_t));auto&m=t->geometry();if(!m)throw std::invalid_argument("Texture-set topology omitted its owning geometry");if(geometry.insert(m.get()).second){charge(stats.geometry_bytes,1,sizeof(Mesh));charge(stats.geometry_bytes,m->positions.capacity()+m->normals.capacity(),sizeof(Vec3));charge(stats.geometry_bytes,m->uv.capacity(),sizeof(std::array<float,2>));charge(stats.geometry_bytes,m->indices.capacity(),sizeof(uint32_t));charge(stats.geometry_bytes,m->uv_pins.capacity()+m->uv_seams.capacity(),1);}}
  }
- void paint(const std::shared_ptr<const PaintedMesh>&p,size_t depth){node(1,p.get(),depth,[&]{auto&d=TextureSetPaintAccess::domain(*p);if(d&&!d->matches(p->mesh_owner()))throw std::invalid_argument("Retained set paint lost its own immutable mesh owner");domain(d);paint(p->source_sampling_original(),depth+1);});}
+ void paint(const std::shared_ptr<const PaintedMesh>&p,size_t depth){node(1,p.get(),depth,[&]{auto&d=TextureSetPaintAccess::domain(*p);if(d&&!d->matches(p->mesh_owner()))throw std::invalid_argument("Retained set paint lost its own immutable mesh owner");domain(d);if(d)paint_domains.insert(d.get());paint(p->source_sampling_original(),depth+1);});}
  void conversion(const std::shared_ptr<const CanonicalNormalConversion>&p,size_t depth){if(p){paint(p->before_paint(),depth+1);material(p->before_material(),depth+1);}}
  void key(const std::shared_ptr<const SourceKeyDerivation>&p,size_t depth){if(p){paint(p->before_paint(),depth+1);material(p->before_material(),depth+1);}}
  void uv_origin(const std::shared_ptr<const SourceUvOrigin>&p,size_t depth){if(p)paint(p->paint,depth+1);}
@@ -44,12 +45,15 @@ struct Ledger {
  });}
  void collection(const std::shared_ptr<const TextureSetCollection>&p,size_t depth){node(3,p.get(),depth,[&]{
   if(p->additional().empty()||p->additional().size()+1>limits.maximum_sets_per_object)throw std::length_error("Retained object texture-set count exceeds bounds");
-  ++stats.collections;charge(stats.metadata_bytes,1,sizeof(TextureSetCollection));charge(stats.metadata_bytes,p->additional().size(),sizeof(TextureSetRecord));auto slots=p->triangle_sets();if(assignments.insert(slots.data()).second)charge(stats.membership_bytes,slots.size(),sizeof(TextureSetId));domain(p->primary_domain());
-  for(auto&s:p->additional()){charge(stats.metadata_bytes,s.name.capacity()+s.material.name.capacity()+2,1);if(!s.painted||s.domain!=TextureSetPaintAccess::domain(*s.painted)||!s.domain||s.id!=s.domain->set())throw std::invalid_argument("Retained texture-set record lost its own paint/member identity");domain(s.domain);paint(s.painted,depth+1);material(s.material_bindings,depth+1);}
+  ++stats.collections;charge(stats.metadata_bytes,1,sizeof(TextureSetCollection));charge(stats.metadata_bytes,p->additional().size(),sizeof(TextureSetRecord));auto slots=p->triangle_sets();if(assignments.insert(slots.data()).second)charge(stats.membership_bytes,slots.size(),sizeof(TextureSetId));domain(p->primary_domain());associated_domains.insert(p->primary_domain().get());
+  for(auto&s:p->additional()){charge(stats.metadata_bytes,s.name.capacity()+s.material.name.capacity()+2,1);if(!s.painted||s.domain!=TextureSetPaintAccess::domain(*s.painted)||!s.domain||s.id!=s.domain->set())throw std::invalid_argument("Retained texture-set record lost its own paint/member identity");domain(s.domain);associated_domains.insert(s.domain.get());paint(s.painted,depth+1);material(s.material_bindings,depth+1);}
  });}
- void origin(const std::shared_ptr<const PolygonOrigin>&p,size_t depth){node(4,p.get(),depth,[&]{collection(p->texture_sets,depth+1);paint(p->paint,depth+1);material(p->material_bindings,depth+1);polygon(p->polygon,depth+1);origin(p->shape_source,depth+1);origin(p->rig_source,depth+1);});}
+ void origin(const std::shared_ptr<const PolygonOrigin>&p,size_t depth){node(4,p.get(),depth,[&]{
+  if(p->texture_sets&&(!p->paint||TextureSetPaintAccess::domain(*p->paint)!=p->texture_sets->primary_domain()||!p->texture_sets->primary_domain()->matches(p->paint->mesh_owner())))throw std::invalid_argument("Retained texture-set history lost its actual primary paint/geometry owner");
+  collection(p->texture_sets,depth+1);paint(p->paint,depth+1);material(p->material_bindings,depth+1);polygon(p->polygon,depth+1);origin(p->shape_source,depth+1);origin(p->rig_source,depth+1);});}
  void polygon(const std::shared_ptr<const PolygonAuthority>&p,size_t depth){node(5,p.get(),depth,[&]{origin(p->origin,depth+1);});}
  void object(const SculptObject&o){
+  if(o.painted&&TextureSetPaintAccess::domain(*o.painted)&&(!o.texture_sets||TextureSetPaintAccess::domain(*o.painted)!=o.texture_sets->primary_domain()))throw std::invalid_argument("Current set-bound paint requires its own complete collection");
   if(o.mesh_active&&o.painted){const auto count=o.texture_sets?o.texture_sets->additional().size()+1:1;if(count>limits.maximum_sets_per_scene-stats.live_sets)throw std::length_error("Live texture sets exceed the Scene bound");stats.live_sets+=count;}
   collection(o.texture_sets,1);paint(o.painted,1);material(o.material_bindings,1);polygon(o.polygon,1);origin(o.shape_source,1);origin(o.rig_source,1);
  }
@@ -57,6 +61,7 @@ struct Ledger {
 }
 TextureSetGraphStats validate_texture_set_graph(const Scene&scene,const TextureSetLimits&limits){
  Ledger ledger(limits);for(const auto&o:scene.objects())ledger.object(o);
+ for(auto domain:ledger.paint_domains)if(!ledger.associated_domains.contains(domain))throw std::invalid_argument("Set-bound retained paint lacks its actual owning collection");
  size_t total=0;ledger.charge(total,ledger.stats.geometry_bytes,1);ledger.charge(total,ledger.stats.membership_bytes,1);ledger.charge(total,ledger.stats.metadata_bytes,1);return ledger.stats;
 }
 } // namespace dome::detail

@@ -89,7 +89,8 @@ add_library(dome-sculpt-core src/source-rest-graph.cpp src/source-rest-plan.cpp 
   src/key-mirror-relative.cpp ${compute_source})
 target_include_directories(dome-sculpt-core PRIVATE third_party)
 target_include_directories(dome-sculpt-core PUBLIC include third_party/openbrush)
-target_sources(dome-sculpt-core PRIVATE src/retopo-authoring.cpp src/document-retopo.cpp src/document-sculpt.cpp src/document-native.cpp src/document-contact.cpp src/document-transaction.cpp src/texture-sets.cpp src/texture-set-graph.cpp)
+target_sources(dome-sculpt-core PRIVATE src/retopo-authoring.cpp src/document-retopo.cpp src/document-sculpt.cpp src/document-native.cpp src/document-contact.cpp src/document-transaction.cpp src/texture-sets.cpp src/texture-set-graph.cpp
+  src/texture-set-archive.cpp)
 target_sources(dome-sculpt-core PRIVATE src/cut-authoring.cpp src/cut-color.cpp src/document-cut.cpp src/document-worker-errors.cpp)
 target_sources(dome-sculpt-core PRIVATE src/object-selection.cpp)
 target_sources(dome-sculpt-core PRIVATE src/source-sampling-transport.cpp)
@@ -4417,4 +4418,13 @@ if(BUILD_TESTING)
   add_test(NAME surface-heat-real-publication-long-name-all COMMAND dome-sculpt-surface-heat-worker-faults-test
     ${CMAKE_CURRENT_BINARY_DIR}/surface-heat/real-publication-long-name-all long-name-all)
   set_tests_properties(surface-heat-real-publication-long-name-all PROPERTIES TIMEOUT 600)
+endif()
+
+# Scene40 model/codec proof is a native core test, also available without a UI.
+if(BUILD_TESTING)
+  add_executable(dome-sculpt-texture-sets-test tests/texture-sets.cpp)
+  target_link_libraries(dome-sculpt-texture-sets-test PRIVATE dome-sculpt-core)
+  add_test(NAME dome-sculpt-texture-sets
+    COMMAND dome-sculpt-texture-sets-test ${CMAKE_CURRENT_BINARY_DIR}/texture-set-model-output)
+  set_tests_properties(dome-sculpt-texture-sets PROPERTIES TIMEOUT 180)
 endif()

@@ -43,7 +43,7 @@ struct PolygonSceneBudget {
     add(samples, n, 4'000'000,
         "Scene retained polygon sculpt storage exceeds budget");
   }
-  void paint(const nlohmann::json &input, bool retained=false,unsigned version=std::numeric_limits<unsigned>::max()) {
+  void paint(const nlohmann::json &input, bool retained=false,unsigned version=std::numeric_limits<unsigned>::max(),bool shared_set_geometry=false) {
     if (input.is_null())
       return;
     const auto &p=paint_archive_payload(input,owning_paint_domain,SourcePaintDecodeContext{independent_source_paint,owning_physical_emission&&version>=27});
@@ -89,6 +89,9 @@ struct PolygonSceneBudget {
         add(paint_bytes,tiles.size()*sizeof(PaintEmissionTile),256*1024*1024,"Scene retained physical paint storage exceeded");
       }
     }
+    if(shared_set_geometry){
+      if(version!=40||p.contains("mesh"))throw std::invalid_argument("Paint7 must use its owning geometry table");
+    }else{
     const auto &mesh = p.at("mesh");
     if(retained && mesh.at("positions").is_binary())
       add(retained_vertices,mesh.at("positions").get_binary().size()/12,8'000'000,
@@ -97,6 +100,7 @@ struct PolygonSceneBudget {
       if (item.value().is_binary())
         add(paint_bytes, item.value().get_binary().size(), 256 * 1024 * 1024,
             "Scene retained mesh storage exceeded");
+    }
     if (p.contains("baked"))
       for (const auto *key :
            {"color", "orm", "emission", "normal", "coverage"}) {

@@ -1,5 +1,6 @@
 #include "dome/texture-sets.hpp"
 #include "texture-set-graph.hpp"
+#include "texture-set-archive.hpp"
 #include "color-bound-memo.hpp"
 #include "emission-paint-access.hpp"
 // SPDX-License-Identifier: GPL-3.0-or-later
@@ -291,6 +292,37 @@ void Scene::validate(bool deep_sources) const {
     if(paint_bytes>256*1024*1024)throw std::length_error("Scene paint storage budget exceeded");
     if(texels>16*1024*1024)throw std::length_error("Scene paint-map budget exceeded");
   };
+  auto retain_surface_field=[&](const std::shared_ptr<const PaintedMesh>&paint,
+      const std::shared_ptr<const SourceMaterialBindings>&binding,
+      const std::shared_ptr<const CreatorAppearance>&appearance,
+      const std::shared_ptr<const DeformationState>&deformation,
+      const std::shared_ptr<const PolygonAuthority>&polygon){
+    const auto projection=paint?paint->color_projection():nullptr;
+    const auto preparation=binding?binding->color_preparation:nullptr;
+    detail::polygon_color_owner(polygon.get(),preparation.get(),deep_sources);
+    const auto normal_projection=paint?paint->normal_projection():nullptr;
+    const auto normal_preparation=binding?binding->normal_preparation:nullptr;
+    if(paint&&paint->baked()&&paint->baked()->normal_field)
+      detail::source_paint_pairing(paint.get(),binding.get(),appearance.get(),deep_sources);
+    if(bool(normal_projection)!=bool(normal_preparation))throw std::invalid_argument("Current normal projection and retained interpretation differ");
+    if(normal_projection){
+      if(!detail::normal_projection_identity(*normal_projection,*normal_preparation->projection))throw std::invalid_argument("Prepared normal planes are not their recorded current intrinsic field");
+      if(deep_sources)normal_preparation->validate_current(paint->mesh(),appearance.get());
+    }
+    if(bool(projection)!=bool(preparation))throw std::invalid_argument("Current color projection and retained preparation differ");
+    if(projection) {
+      if(projection->vertex_rgba!=preparation->projection->vertex_rgba || projection->maximum_error!=preparation->projection->maximum_error || projection->quality_cells!=preparation->projection->quality_cells)
+        throw std::invalid_argument("Current color projection is not the recorded prepared field");
+      projection->validate(paint->resolution());source_images.add(projection->vertex_rgba);
+      if(deep_sources)preparation->validate_current(paint->mesh(),appearance.get());
+    }
+    if(binding) {
+      if(!paint)throw std::invalid_argument("Resolved material has no persisted painting mesh");
+      source_materials.add(binding,deep_sources);
+      if(deep_sources && binding->normal_frames)detail::normal_frame_current_authority(*binding,paint->mesh(),deformation.get());
+    }
+    pair_domain(paint,binding,appearance.get());
+  };
   for(const auto &g:groups_)if(g.source_placement)retain_model(g.source_placement->model);
   for (auto &o : objects_) {
     if (!o.id || o.id >= next_ || !ids.insert(o.id).second || !o.volume ||
@@ -332,31 +364,12 @@ void Scene::validate(bool deep_sources) const {
       retain_appearance(*o.appearance,*o.painted);
     }
     retain_paint(o.painted,false);
-    const auto projection=o.painted?o.painted->color_projection():nullptr;
-    const auto preparation=o.material_bindings?o.material_bindings->color_preparation:nullptr;
-    detail::polygon_color_owner(o.polygon.get(),preparation.get(),deep_sources);
-    const auto normal_projection=o.painted?o.painted->normal_projection():nullptr;
-    const auto normal_preparation=o.material_bindings?o.material_bindings->normal_preparation:nullptr;
-    if(o.painted&&o.painted->baked()&&o.painted->baked()->normal_field)
-      detail::source_paint_pairing(o.painted.get(),o.material_bindings.get(),o.appearance.get(),deep_sources);
-    if(bool(normal_projection)!=bool(normal_preparation))throw std::invalid_argument("Current normal projection and retained interpretation differ");
-    if(normal_projection){
-      if(!detail::normal_projection_identity(*normal_projection,*normal_preparation->projection))throw std::invalid_argument("Prepared normal planes are not their recorded current intrinsic field");
-      if(deep_sources)normal_preparation->validate_current(o.painted->mesh(),o.appearance.get());
+    if(o.texture_sets)for(const auto &set:o.texture_sets->additional())retain_paint(set.painted,false);
+    retain_surface_field(o.painted,o.material_bindings,o.appearance,o.deformation,o.polygon);
+    if(o.texture_sets)for(const auto &set:o.texture_sets->additional()){
+      if(set.appearance)retain_appearance(*set.appearance,*set.painted);
+      retain_surface_field(set.painted,set.material_bindings,set.appearance,o.deformation,o.polygon);
     }
-    if(bool(projection)!=bool(preparation))throw std::invalid_argument("Current color projection and retained preparation differ");
-    if(projection) {
-      if(projection->vertex_rgba!=preparation->projection->vertex_rgba || projection->maximum_error!=preparation->projection->maximum_error || projection->quality_cells!=preparation->projection->quality_cells)
-        throw std::invalid_argument("Current color projection is not the recorded prepared field");
-      projection->validate(o.painted->resolution());source_images.add(projection->vertex_rgba);
-      if(deep_sources)preparation->validate_current(o.painted->mesh(),o.appearance.get());
-    }
-    if(o.material_bindings) {
-      if(!o.painted)throw std::invalid_argument("Resolved material has no persisted painting mesh");
-      source_materials.add(o.material_bindings,deep_sources);
-      if(deep_sources && o.material_bindings->normal_frames)detail::normal_frame_current_authority(*o.material_bindings,o.painted->mesh(),o.deformation.get());
-    }
-    pair_domain(o.painted,o.material_bindings,o.appearance.get());
     const auto mask_samples=o.volume->mask_values().size();
     count += std::max(o.volume->voxels().size(), o.volume->stored_samples()-mask_samples)+mask_samples;
     if (count > 4'000'000)
@@ -380,8 +393,8 @@ void Scene::validate(bool deep_sources) const {
       if(ref&&ref!=unavailable_bake_object&&(!ids.contains(ref)||(target&&ref==target)))
         throw std::invalid_argument("Bake recipe has a missing or self live reference");
   };
-  for(const auto &o:objects_)recipe_references(o.bake_recipe,o.id);
-  for(const auto &o:polygons.origins())recipe_references(o->bake_recipe,0);
+  for(const auto &o:objects_){recipe_references(o.bake_recipe,o.id);if(o.texture_sets)for(const auto &set:o.texture_sets->additional())recipe_references(set.bake_recipe,o.id);}
+  for(const auto &o:polygons.origins()){recipe_references(o->bake_recipe,0);if(o->texture_sets)for(const auto &set:o->texture_sets->additional())recipe_references(set.bake_recipe,0);}
   for (const auto &origin : polygons.origins()) {
     if(origin->placement) {
       origin->placement->validate();
@@ -398,6 +411,10 @@ void Scene::validate(bool deep_sources) const {
     if (origin->material_bindings)
       source_materials.add(origin->material_bindings, deep_sources);
     pair_domain(origin->paint,origin->material_bindings,origin->appearance.get());
+    if(origin->texture_sets)for(const auto &set:origin->texture_sets->additional()){
+      retain_paint(set.painted,true);if(set.appearance)retain_appearance(*set.appearance,*set.painted);
+      retain_surface_field(set.painted,set.material_bindings,set.appearance,origin->deformation,origin->polygon);
+    }
     if (origin->retopology) {
       const auto &t = origin->retopology->topology;
       topology_entries +=
@@ -523,6 +540,9 @@ nlohmann::json Scene::encode() const {
   bool retopology=std::any_of(objects_.begin(),objects_.end(),[](const auto &o){return bool(o.retopology);});
   const bool framed=std::any_of(objects_.begin(),objects_.end(),[](const auto &o){if(!o.material_bindings)return false;const auto &b=*o.material_bindings;return bool(b.normal_frames) || (b.uv_origin && (b.uv_origin->deformation || !b.uv_origin->creator_kind.empty() || !b.sampling_reparameterized));});
   unsigned feature_version=detail::minimum_scene_version(*this);
+  const auto set_graph=detail::validate_texture_set_graph(*this);
+  const bool texture_sets=set_graph.collections!=0;
+  if(texture_sets)feature_version=std::max(feature_version,40u);
   if(std::any_of(groups_.begin(),groups_.end(),[](const auto&g){return bool(g.source_placement)||bool(g.affine_edit);}) ||
       std::any_of(objects_.begin(),objects_.end(),[](const auto&o){return bool(o.affine_edit);}))feature_version=std::max(feature_version,13u);
   for(const auto&o:objects_)feature_version=std::max({feature_version,detail::minimum_scene_version(o.polygon.get()),detail::minimum_scene_version(o.shape_source.get()),o.rig_source?25u:0u,detail::minimum_scene_version(o.rig_source.get())});
@@ -539,6 +559,7 @@ nlohmann::json Scene::encode() const {
   CreatorAssetArchive source_models;
   SourceMaterialArchive source_materials;
   detail::PolygonSceneArchive polygons;
+  detail::TextureSetArchive texture_archive;
   NormalSamplingArchive normal_domains;PaintSamplingArchive writable_domains;
   detail::SourcePlacementArchive placements;
   for(const auto &o:objects_){if(o.polygon)polygons.add(o.polygon,false);if(o.shape_source)polygons.add_origin(o.shape_source,false);if(o.rig_source)polygons.add_rig_origin(o.rig_source,false);}
@@ -590,10 +611,11 @@ nlohmann::json Scene::encode() const {
            {"alpha", int(m.alpha)}, {"alpha_cutoff", m.alpha_cutoff}, {"unlit", m.unlit}}},
          {"volume", o.volume->encode()},
          {"mesh_active", o.mesh_active},
-         {"painted", o.painted ? o.painted->encode(&source_images,feature_version>=21?&normal_domains:nullptr,feature_version>=24?&writable_domains:nullptr) : nlohmann::json(nullptr)},
+         {"painted", o.painted&&!o.texture_sets ? o.painted->encode(&source_images,feature_version>=21?&normal_domains:nullptr,feature_version>=24?&writable_domains:nullptr) : nlohmann::json(nullptr)},
          {"deformation", o.deformation
                              ? o.deformation->encode(o.painted->mesh())
                              : nlohmann::json(nullptr)}});
+    if(texture_sets)j["objects"].back()["texture_sets"]=o.texture_sets?texture_archive.encode(o,source_images,&normal_domains,&writable_domains):nlohmann::json(nullptr);
     if(polygon_fields)j["objects"].back()["polygon"]=o.polygon?nlohmann::json(polygons.add(o.polygon)):nlohmann::json(nullptr);
     if(o.affine_edit)j["objects"].back()["affine_edit"]=placements.add_edit(o.affine_edit);
     if(feature_version>=30)j["objects"].back()["bake_recipe"]=o.bake_recipe?o.bake_recipe->encode():nlohmann::json(nullptr);
@@ -615,7 +637,12 @@ nlohmann::json Scene::encode() const {
   }
   if(polygon_fields)j["polygon_sources"]=polygons.encode(source_images,source_models,source_materials,&placements,corner_prepared?&color_archive:nullptr,feature_version>=21?&normal_domains:nullptr,feature_version>=24?&writable_domains:nullptr);
   if(extended)j["source_materials"]=source_materials.encode(source_images,source_models,corner_prepared?&color_archive:nullptr,feature_version>=21?&normal_domains:nullptr,feature_version>=24?&writable_domains:nullptr);
-  if(const auto composed=detail::composed_material_scene_version(source_materials))j["version"]=composed;
+  if(const auto composed=detail::composed_material_scene_version(source_materials))j["version"]=std::max(j["version"].get<unsigned>(),composed);
+  if(texture_sets){
+    auto geometry=texture_archive.geometry_records();
+    if(geometry.at("topologies").empty())throw std::invalid_argument("Retained texture-set history needs its polygon8 owning archive adapter");
+    j["texture_set_geometry"]=std::move(geometry);
+  }
   if(corner_prepared){auto records=color_archive.encode();j["polygon_sources"]["color_bases"]=std::move(records["color_bases"]);j["polygon_sources"]["color_fields"]=std::move(records["color_fields"]);}
   if(!placements.empty())j["affine_state"]=placements.encode(source_images,source_models);
   if(normal_domains.size())j["normal_sampling"]=normal_domains.encode(source_images);
@@ -631,11 +658,11 @@ Scene Scene::decode(const nlohmann::json &j) {
     throw std::runtime_error("Unsupported scene format or version type");
   const auto version=j.at("version").get<int64_t>();
   const bool normal_context=j.contains("normal_sampling"),paint_context=j.contains("paint_sampling");
-  const bool native_paint_context=(version==32||version==35||version==36)&&paint_context&&j.contains("source_materials")&&detail::native_paint_material_archive(j.at("source_materials"));
+  const bool native_paint_context=(version==32||version==35||version==36||version==40)&&paint_context&&j.contains("source_materials")&&detail::native_paint_material_archive(j.at("source_materials"));
   if((version==32||version==35||version==36)&&!native_paint_context)throw std::invalid_argument("Scene32 requires its actual native paint owning capability");
-  if(version!=32&&j.contains("source_materials")&&j.at("source_materials").at("version")==14)throw std::invalid_argument("Native paint material14 requires Scene32");
-  if((version==36)!=(j.contains("source_materials")&&j.at("source_materials").at("version")==18))throw std::invalid_argument("Scene36 requires exactly material18 native frame ownership");
-  if((version==35)!=(j.contains("source_materials")&&j.at("source_materials").at("version")==17))
+  if(version!=32&&version!=40&&j.contains("source_materials")&&j.at("source_materials").at("version")==14)throw std::invalid_argument("Native paint material14 requires Scene32");
+  if(version!=40&&(version==36)!=(j.contains("source_materials")&&j.at("source_materials").at("version")==18))throw std::invalid_argument("Scene36 requires exactly material18 native frame ownership");
+  if(version!=40&&(version==35)!=(j.contains("source_materials")&&j.at("source_materials").at("version")==17))
     throw std::invalid_argument("Scene35 requires exactly the composed material17 owning context");
   const bool explicit_mirror_context=version>=29&&j.contains("source_materials")&&detail::explicit_mirror_material_archive(j.at("source_materials"))&&detail::encoded_key_context(j.at("source_materials"));
   if(version==29&&!explicit_mirror_context)throw std::invalid_argument("Scene29 requires its actual owning explicit Mirror capability");
@@ -648,14 +675,14 @@ Scene Scene::decode(const nlohmann::json &j) {
     if(j.contains("objects"))throw std::runtime_error("Mixed flat Volume and Scene fields");
     result.active().volume=std::make_shared<Volume>(Volume::decode(j));return result;
   }
-  if(version<2 || (version>21&&version!=22&&version!=23&&version!=24&&version!=25&&version!=26&&version!=27&&version!=28&&version!=29&&version!=30&&version!=31&&version!=32&&version!=33&&version!=34&&version!=35&&version!=36))throw std::runtime_error("Unsupported scene version");
+  if(version<2 || (version>21&&version!=22&&version!=23&&version!=24&&version!=25&&version!=26&&version!=27&&version!=28&&version!=29&&version!=30&&version!=31&&version!=32&&version!=33&&version!=34&&version!=35&&version!=36&&version!=40))throw std::runtime_error("Unsupported scene version");
   size_t layered_normal_bytes=0;
   const bool layered_context=version==33||version==34||
-    ((version==35||version==36)&&detail::layered_material_archive(j.at("source_materials")));
+    ((version==35||version==36||version==40)&&detail::layered_material_archive(j.at("source_materials")));
   if(layered_context){
     if(!j.contains("baked_normal_fields")||!j.contains("source_materials")||!detail::layered_material_archive(j.at("source_materials")))
       throw std::invalid_argument("Scene33 requires its complete material15/normal-field ownership graph");
-    if(version!=35&&version!=36&&(version==34)!=detail::canonical_uv_material_archive(j.at("source_materials")))throw std::invalid_argument("Scene34 requires actual material16 UV capability");
+    if(version!=35&&version!=36&&version!=40&&(version==34)!=detail::canonical_uv_material_archive(j.at("source_materials")))throw std::invalid_argument("Scene34 requires actual material16 UV capability");
     layered_normal_bytes=detail::BakedNormalArchive::preflight(j.at("baked_normal_fields"),j.at("source_materials"));
   }else if(j.contains("baked_normal_fields")||(j.contains("source_materials")&&detail::layered_material_archive(j.at("source_materials"))))
     throw std::invalid_argument("Independent baked normal ownership requires actual Scene33");
@@ -696,6 +723,24 @@ Scene Scene::decode(const nlohmann::json &j) {
   const auto &objects = j.at("objects");
   if (!objects.is_array() || objects.empty() || objects.size() > 256)
     throw std::length_error("Invalid scene object count");
+  if((version==40)!=j.contains("texture_set_geometry"))throw std::invalid_argument("Texture sets require exactly their Scene40 owning geometry archive");
+  size_t texture_slots=0;
+  for(const auto&o:objects){
+    if(version==40&&!o.contains("texture_sets"))throw std::invalid_argument("Incomplete Scene40 texture-set fields");
+    if(version<40&&o.contains("texture_sets"))throw std::invalid_argument("Texture-set membership requires Scene40");
+    if(version==40&&!o.at("texture_sets").is_null()&&(!o.at("painted").is_null()||o.at("mesh_active")!=true))throw std::invalid_argument("Texture-set geometry cannot have a second mutable primary owner");
+  }
+  if(version==40)for(const auto&o:objects){
+    size_t count=1;
+    if(!o.at("texture_sets").is_null()){
+      const auto &extra=o.at("texture_sets").at("additional");
+      if(!extra.is_array()||extra.empty()||extra.size()>63)throw std::invalid_argument("Incomplete texture-set collection");
+      count+=extra.size();
+    }
+    if(count>256-texture_slots)throw std::length_error("Scene texture-set count exceeds bounds");texture_slots+=count;
+  }
+  std::optional<detail::TextureSetArchive> texture_archive;
+
   // Admit newly meaningful implicit-default identity before decoding any
   // retained appearance/remap, including dormant and before-state owners.
   auto appearance_feature=[&](const nlohmann::json &a){if(detail::minimum_appearance_scene_version(a)>version)throw std::invalid_argument("Implicit default material authority requires Scene17");};
@@ -756,9 +801,29 @@ Scene Scene::decode(const nlohmann::json &j) {
     budget.paint_bytes=layered_normal_bytes;
     if(layered_context)for(const auto &c:j.at("baked_normal_fields").at("origins"))budget.deformation(c.at("deformation"),unsigned(version));
     budget.independent_source_paint=source_paint_context.independent_source;budget.owning_physical_emission=version>=27;
+    if(version==40){
+      const auto &geometries=j.at("texture_set_geometry").at("topologies");
+      if(!geometries.is_array()||geometries.empty()||geometries.size()>256)throw std::length_error("Invalid texture-set geometry table count");
+      for(const auto &geometry:geometries)for(const auto &field:geometry.items())if(field.value().is_binary())
+        detail::PolygonSceneBudget::add(budget.paint_bytes,field.value().get_binary().size(),256*1024*1024,"Shared texture-set geometry/identity exceeds whole Scene paint storage budget");
+      for(const auto &object:objects)if(!object.at("texture_sets").is_null()){
+        const auto &slots=object.at("texture_sets").at("slots");
+        if(!slots.is_binary()||slots.get_binary().size()%4||slots.get_binary().size()>8'000'000)throw std::invalid_argument("Invalid texture-set assignment storage");
+        detail::PolygonSceneBudget::add(budget.paint_bytes,slots.get_binary().size(),256*1024*1024,"Texture-set assignment exceeds whole Scene storage budget");
+      }
+    }
     for (const auto &o : objects) {
       budget.volume(o.at("volume"));
       budget.paint(o.at("painted"),false,unsigned(version));
+      if(version==40&&!o.at("texture_sets").is_null()){
+        const auto &sets=o.at("texture_sets");
+        auto member=[&](const nlohmann::json &paint){
+          if(!paint.is_object()||paint.size()!=3||!paint.at("version").is_number_integer()||paint.at("version")!=7||!paint.at("payload").is_object())throw std::invalid_argument("Scene40 needs actual membership-required Paint7");
+          budget.paint(paint.at("payload"),false,unsigned(version),true);
+        };
+        if(!sets.at("additional").is_array()||sets.at("additional").size()>63)throw std::length_error("Too many texture sets");
+        member(sets.at("primary"));for(const auto &set:sets.at("additional"))member(set.at("painted"));
+      }
       budget.deformation(o.at("deformation"), unsigned(version));
       budget.appearance(o.at("appearance"));
       budget.retopology(o.at("retopology"));
@@ -933,8 +998,22 @@ Scene Scene::decode(const nlohmann::json &j) {
     }
     if(!j.at("objects").is_array() || j.at("objects").empty() || j.at("objects").size()>256)
       throw std::runtime_error("Invalid scene object count");
-    for(const auto &object:j.at("objects"))preflight(object.at("painted"));
+    for(const auto &object:j.at("objects")){
+      preflight(object.at("painted"));
+      if(version==40&&!object.at("texture_sets").is_null()){
+        const auto &sets=object.at("texture_sets");
+        auto member=[&](const nlohmann::json &paint){
+          if(!paint.is_object()||paint.size()!=3||!paint.at("version").is_number_integer()||paint.at("version")!=7||!paint.at("payload").is_object())throw std::invalid_argument("Scene40 needs actual membership-required Paint7");
+          preflight(paint.at("payload"));
+        };
+        if(!sets.at("additional").is_array()||sets.at("additional").size()>63)throw std::length_error("Too many texture sets");
+        member(sets.at("primary"));for(const auto &set:sets.at("additional"))member(set.at("painted"));
+      }
+    }
   }
+  // Aggregate paint/deformation/sculpt preflight precedes all current geometry
+  // reconstruction as well as every SurfaceMap allocation.
+  if(version==40)texture_archive=detail::TextureSetArchive::decode_geometry(j.at("texture_set_geometry"));
   auto id = [](const nlohmann::json &v) {
     if (!v.is_number_unsigned() &&
         (!v.is_number_integer() || v.get<int64_t>() <= 0))
@@ -957,7 +1036,7 @@ Scene Scene::decode(const nlohmann::json &j) {
       const auto &patch=object.at("retopology");
       if(!patch.is_object() || patch.size()!=2 || !patch.at("topology").is_string())
         throw std::runtime_error("Invalid retopology record");
-      if(object.at("painted").is_null())throw std::runtime_error("Retopology has no retained display mesh");
+      if(object.at("painted").is_null()&&!(version==40&&!object.at("texture_sets").is_null()))throw std::runtime_error("Retopology has no retained display mesh");
       const auto source=id(patch.at("source")),object_id=id(object.at("id"));
       if(source>=next_id || source==object_id)throw std::runtime_error("Invalid retopology source reference");
       references.emplace(object_id,source);
@@ -1112,6 +1191,16 @@ Scene Scene::decode(const nlohmann::json &j) {
         if (paint_bytes > 256 * 1024 * 1024) throw std::length_error("Scene paint storage budget exceeded");
       }
     }
+    if(version==40&&!v.at("texture_sets").is_null()){
+      // Material/source decoding below authenticates complex graphs. The initial
+      // connected membership codec deliberately admits only its plain slice.
+      if(!v.at("material_bindings").is_null()||!v.at("appearance").is_null()||!v.at("bake_recipe").is_null())throw std::invalid_argument("Texture-set source/normal/recipe graph needs its owning Scene40 adapter");
+      if(polygon_fields&&!v.at("polygon").is_null())o.polygon=polygons.at(detail::polygon_archive_index(v.at("polygon"),polygons.authorities().size()));
+      texture_archive->decode(o,v.at("texture_sets"),source_images,normal_context?&normal_domains:nullptr,paint_context?&writable_domains:nullptr,source_paint_context);
+      texels+=size_t(o.painted->resolution())*o.painted->resolution();paint_bytes+=o.painted->storage_bytes();
+      for(const auto &set:o.texture_sets->additional()){texels+=size_t(set.painted->resolution())*set.painted->resolution();paint_bytes+=set.painted->storage_bytes();}
+      if(texels>16*1024*1024||paint_bytes>256*1024*1024)throw std::length_error("Scene texture-set paint budget exceeded");
+    }
     if(retopology_fields && !v.at("retopology").is_null()) {
       const auto &patch=v.at("retopology");
       o.retopology=std::make_shared<const RetopoPatch>(RetopoPatch{
@@ -1159,8 +1248,11 @@ Scene Scene::decode(const nlohmann::json &j) {
   placements.require_reachable();
   if(normal_context)normal_domains.require_reachable();if(paint_context)writable_domains.require_reachable();
   layered_normals.require_reachable();
+  if(texture_archive)texture_archive->require_reachable();
   unsigned actual_feature=0;
   for(const auto &o:result.objects_)actual_feature=std::max({actual_feature,o.bake_recipe?30u:0u,detail::hdr_emission(o.material.emissive)?27u:0u,detail::minimum_scene_version(o.painted.get()),detail::minimum_scene_version(o.appearance.get()),detail::minimum_scene_version(o.deformation.get()),detail::minimum_scene_version(o.material_bindings.get()),detail::minimum_scene_version(o.polygon.get()),detail::minimum_scene_version(o.shape_source.get()),o.rig_source?25u:0u,detail::minimum_scene_version(o.rig_source.get())});
+  if(std::any_of(result.objects_.begin(),result.objects_.end(),[](const auto&o){return bool(o.texture_sets);}))actual_feature=std::max(actual_feature,40u);
+  if(version==40&&actual_feature!=40)throw std::invalid_argument("Scene40 lacks actual decoded texture-set membership");
   actual_feature=std::max(actual_feature,detail::composed_material_scene_version(source_materials));
   if(version==36&&actual_feature!=36)throw std::invalid_argument("Scene36 lacks genuine current native paint/frame source");
   if(version==35&&actual_feature!=35)throw std::invalid_argument("Scene35 lacks genuine decoded native/canonical composition");

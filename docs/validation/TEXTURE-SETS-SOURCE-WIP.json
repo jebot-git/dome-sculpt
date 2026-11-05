@@ -1,0 +1,398 @@
+{
+  "scope": "Private source-only WIP, not a product build, runtime test or admission",
+  "base": "753240cbccd3e1eda572d77b50b276e93207f375",
+  "source_hashes": {
+    "CMakeLists.txt": "b5cefb02abe1b77ae31cb658c478f2db2ab1cae8f5eb0c4fba40634dbef7351e",
+    "include/dome/paint.hpp": "c71cc0a512bdda44d35f0170317518e7eafacdc65df5478cb19dc7c8f68fdd44",
+    "include/dome/texture-sets.hpp": "01a846b09415fd2513afdb2774787f544a13cde133b5c8584aa44fd2f382fbcf",
+    "src/paint.cpp": "12df1394127ff237f3b5317d3f473de85ac95cb95a9e7514d6ec77a8ad975c90",
+    "src/polygon-scene-budget.hpp": "1d4394248f545fdcfdaa330cf1a41cd73eb9def74ae4db666c8c717e71a3d4bc",
+    "src/scene.cpp": "673b3addc5a3214e2790bcd860b72da9ed81ba5f395d17e8a115f281a9112945",
+    "src/texture-set-paint-access.hpp": "db4d0ae6a06b74ad7cecad8a68438fa0c6a7867e79f877f6bf471755b39f1b24",
+    "src/texture-sets.cpp": "f35d8878bbb30fc95afb20b4ccb7ed4b9d6d0661b64a552a4acc846d5973a15d",
+    "src/texture-set-graph.cpp": "9d431a8b63175a36486fafcb45d04a43e1f7518accc0f1330ad86ee38578922e",
+    "src/texture-set-archive.cpp": "b946aabd04d2c9fda9c08ed9e08aebd9c9143f5515e1c8ddc408d0ee156d15d0",
+    "src/texture-set-archive.hpp": "a6c1c332d4373df91ab84a0a6806ef50960316750cd39521046c70b264171126",
+    "tests/texture-sets.cpp": "1d88a15bc3e0689e0f88eec9363f7e88364b35871438cf0ad1c23dfc0375134e"
+  },
+  "checks": {
+    "foundation": {
+      "path": "artifacts/texture-set-syntax/status.json",
+      "sha256": "50365f99c6766a3605413ea64a0c6f7c2d67a5c6316aa5e1c37d6ed92c23a230",
+      "status": {
+        "scope": "Syntax only; no objects, link, build or execution evidence",
+        "compiler": "g++ (GCC) 16.2.1 20260819 (Red Hat 16.2.1-2)\nCopyright (C) 2026 Free Software Foundation, Inc.\nThis is free software; see the source for copying conditions.  There is NO\nwarranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\n",
+        "results": [
+          {
+            "source": "src/texture-sets.cpp",
+            "args": [
+              "/usr/bin/g++",
+              "-std=c++20",
+              "-fsyntax-only",
+              "-Iinclude",
+              "-Isrc",
+              "-Ithird_party",
+              "-Ithird_party/openbrush",
+              "-Ithird_party/nlohmann",
+              "src/texture-sets.cpp"
+            ],
+            "returncode": 0,
+            "seconds": 0.8635034280014224
+          },
+          {
+            "source": "src/texture-set-graph.cpp",
+            "args": [
+              "/usr/bin/g++",
+              "-std=c++20",
+              "-fsyntax-only",
+              "-Iinclude",
+              "-Isrc",
+              "-Ithird_party",
+              "-Ithird_party/openbrush",
+              "-Ithird_party/nlohmann",
+              "src/texture-set-graph.cpp"
+            ],
+            "returncode": 0,
+            "seconds": 1.2825715810176916
+          },
+          {
+            "source": "src/texture-set-archive.cpp",
+            "args": [
+              "/usr/bin/g++",
+              "-std=c++20",
+              "-fsyntax-only",
+              "-Iinclude",
+              "-Isrc",
+              "-Ithird_party",
+              "-Ithird_party/openbrush",
+              "-Ithird_party/nlohmann",
+              "src/texture-set-archive.cpp"
+            ],
+            "returncode": 0,
+            "seconds": 1.7141148560331203
+          }
+        ],
+        "drift": []
+      }
+    },
+    "initial_core": {
+      "path": "artifacts/texture-set-syntax/core/status.json",
+      "sha256": "ecc3a6d819b8124e508412a6afc64ca4ab8d8cdc4b871666e7951d1b26856347",
+      "status": {
+        "scope": "Syntax only; no objects, link, build or execution evidence",
+        "compiler": "g++ (GCC) 16.2.1 20260819 (Red Hat 16.2.1-2)\nCopyright (C) 2026 Free Software Foundation, Inc.\nThis is free software; see the source for copying conditions.  There is NO\nwarranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\n",
+        "results": [
+          {
+            "source": "src/paint.cpp",
+            "args": [
+              "/usr/bin/g++",
+              "-std=c++20",
+              "-fsyntax-only",
+              "-Iinclude",
+              "-Isrc",
+              "-Ithird_party",
+              "-Ithird_party/openbrush",
+              "-Ithird_party/nlohmann",
+              "src/paint.cpp"
+            ],
+            "returncode": 1,
+            "seconds": 2.782014775031712
+          },
+          {
+            "source": "src/scene.cpp",
+            "args": [
+              "/usr/bin/g++",
+              "-std=c++20",
+              "-fsyntax-only",
+              "-Iinclude",
+              "-Isrc",
+              "-Ithird_party",
+              "-Ithird_party/openbrush",
+              "-Ithird_party/nlohmann",
+              "src/scene.cpp"
+            ],
+            "returncode": 0,
+            "seconds": 2.9490418230416253
+          }
+        ],
+        "drift": []
+      }
+    },
+    "fixed_core": {
+      "path": "artifacts/texture-set-syntax/core-fixed/status.json",
+      "sha256": "9cb39fdb34da7bde5059c2a1aafc0e7cf9a0a497531fa3ff858ffb6e6d9611fd",
+      "status": {
+        "scope": "Syntax only; no objects, link, build or execution evidence",
+        "compiler": "g++ (GCC) 16.2.1 20260819 (Red Hat 16.2.1-2)\nCopyright (C) 2026 Free Software Foundation, Inc.\nThis is free software; see the source for copying conditions.  There is NO\nwarranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\n",
+        "results": [
+          {
+            "source": "src/paint.cpp",
+            "args": [
+              "/usr/bin/g++",
+              "-std=c++20",
+              "-fsyntax-only",
+              "-Iinclude",
+              "-Isrc",
+              "-Ithird_party",
+              "-Ithird_party/openbrush",
+              "-Ithird_party/nlohmann",
+              "src/paint.cpp"
+            ],
+            "returncode": 0,
+            "seconds": 2.7932341169798747
+          },
+          {
+            "source": "src/scene.cpp",
+            "args": [
+              "/usr/bin/g++",
+              "-std=c++20",
+              "-fsyntax-only",
+              "-Iinclude",
+              "-Isrc",
+              "-Ithird_party",
+              "-Ithird_party/openbrush",
+              "-Ithird_party/nlohmann",
+              "src/scene.cpp"
+            ],
+            "returncode": 0,
+            "seconds": 3.0013607969740406
+          }
+        ],
+        "drift": []
+      }
+    },
+    "connected": {
+      "path": "artifacts/texture-set-syntax/connected/status.json",
+      "sha256": "3bb365090824bac596401ce8434cfa1dcc2fc2f81b003fff474891c8161f4d74",
+      "status": {
+        "scope": "Syntax only; no objects, link, build or execution evidence",
+        "compiler": "g++ (GCC) 16.2.1 20260819 (Red Hat 16.2.1-2)\nCopyright (C) 2026 Free Software Foundation, Inc.\nThis is free software; see the source for copying conditions.  There is NO\nwarranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\n",
+        "results": [
+          {
+            "source": "src/texture-sets.cpp",
+            "args": [
+              "/usr/bin/g++",
+              "-std=c++20",
+              "-fsyntax-only",
+              "-Iinclude",
+              "-Isrc",
+              "-Ithird_party",
+              "-Ithird_party/openbrush",
+              "-Ithird_party/nlohmann",
+              "src/texture-sets.cpp"
+            ],
+            "returncode": 0,
+            "seconds": 0.9108216059976257
+          },
+          {
+            "source": "src/texture-set-graph.cpp",
+            "args": [
+              "/usr/bin/g++",
+              "-std=c++20",
+              "-fsyntax-only",
+              "-Iinclude",
+              "-Isrc",
+              "-Ithird_party",
+              "-Ithird_party/openbrush",
+              "-Ithird_party/nlohmann",
+              "src/texture-set-graph.cpp"
+            ],
+            "returncode": 0,
+            "seconds": 1.1735068800044246
+          },
+          {
+            "source": "src/texture-set-archive.cpp",
+            "args": [
+              "/usr/bin/g++",
+              "-std=c++20",
+              "-fsyntax-only",
+              "-Iinclude",
+              "-Isrc",
+              "-Ithird_party",
+              "-Ithird_party/openbrush",
+              "-Ithird_party/nlohmann",
+              "src/texture-set-archive.cpp"
+            ],
+            "returncode": 0,
+            "seconds": 1.5952237410238013
+          },
+          {
+            "source": "src/paint.cpp",
+            "args": [
+              "/usr/bin/g++",
+              "-std=c++20",
+              "-fsyntax-only",
+              "-Iinclude",
+              "-Isrc",
+              "-Ithird_party",
+              "-Ithird_party/openbrush",
+              "-Ithird_party/nlohmann",
+              "src/paint.cpp"
+            ],
+            "returncode": 0,
+            "seconds": 2.8069782630191185
+          },
+          {
+            "source": "src/scene.cpp",
+            "args": [
+              "/usr/bin/g++",
+              "-std=c++20",
+              "-fsyntax-only",
+              "-Iinclude",
+              "-Isrc",
+              "-Ithird_party",
+              "-Ithird_party/openbrush",
+              "-Ithird_party/nlohmann",
+              "src/scene.cpp"
+            ],
+            "returncode": 0,
+            "seconds": 2.9566045830142684
+          },
+          {
+            "source": "tests/texture-sets.cpp",
+            "args": [
+              "/usr/bin/g++",
+              "-std=c++20",
+              "-fsyntax-only",
+              "-Iinclude",
+              "-Isrc",
+              "-Ithird_party",
+              "-Ithird_party/openbrush",
+              "-Ithird_party/nlohmann",
+              "tests/texture-sets.cpp"
+            ],
+            "returncode": 0,
+            "seconds": 1.1625186080345884
+          }
+        ],
+        "drift": []
+      }
+    },
+    "final": {
+      "path": "artifacts/texture-set-syntax/sealed/status.json",
+      "sha256": "dbb6a03e97b4dc2c4a1088b37cd4d525d5a5d4b37799e96f99b2dbce4510302a",
+      "status": {
+        "scope": "Syntax only; no objects, link, build or execution evidence",
+        "compiler": "g++ (GCC) 16.2.1 20260819 (Red Hat 16.2.1-2)\nCopyright (C) 2026 Free Software Foundation, Inc.\nThis is free software; see the source for copying conditions.  There is NO\nwarranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\n",
+        "results": [
+          {
+            "source": "src/texture-sets.cpp",
+            "args": [
+              "/usr/bin/g++",
+              "-std=c++20",
+              "-fsyntax-only",
+              "-Iinclude",
+              "-Isrc",
+              "-Ithird_party",
+              "-Ithird_party/openbrush",
+              "-Ithird_party/nlohmann",
+              "src/texture-sets.cpp"
+            ],
+            "returncode": 0,
+            "seconds": 0.8666028630104847
+          },
+          {
+            "source": "src/texture-set-graph.cpp",
+            "args": [
+              "/usr/bin/g++",
+              "-std=c++20",
+              "-fsyntax-only",
+              "-Iinclude",
+              "-Isrc",
+              "-Ithird_party",
+              "-Ithird_party/openbrush",
+              "-Ithird_party/nlohmann",
+              "src/texture-set-graph.cpp"
+            ],
+            "returncode": 0,
+            "seconds": 1.2380278499913402
+          },
+          {
+            "source": "src/texture-set-archive.cpp",
+            "args": [
+              "/usr/bin/g++",
+              "-std=c++20",
+              "-fsyntax-only",
+              "-Iinclude",
+              "-Isrc",
+              "-Ithird_party",
+              "-Ithird_party/openbrush",
+              "-Ithird_party/nlohmann",
+              "src/texture-set-archive.cpp"
+            ],
+            "returncode": 0,
+            "seconds": 1.6831737330066971
+          },
+          {
+            "source": "src/paint.cpp",
+            "args": [
+              "/usr/bin/g++",
+              "-std=c++20",
+              "-fsyntax-only",
+              "-Iinclude",
+              "-Isrc",
+              "-Ithird_party",
+              "-Ithird_party/openbrush",
+              "-Ithird_party/nlohmann",
+              "src/paint.cpp"
+            ],
+            "returncode": 0,
+            "seconds": 2.7541224400047213
+          },
+          {
+            "source": "src/scene.cpp",
+            "args": [
+              "/usr/bin/g++",
+              "-std=c++20",
+              "-fsyntax-only",
+              "-Iinclude",
+              "-Isrc",
+              "-Ithird_party",
+              "-Ithird_party/openbrush",
+              "-Ithird_party/nlohmann",
+              "src/scene.cpp"
+            ],
+            "returncode": 0,
+            "seconds": 2.9784445089753717
+          },
+          {
+            "source": "tests/texture-sets.cpp",
+            "args": [
+              "/usr/bin/g++",
+              "-std=c++20",
+              "-fsyntax-only",
+              "-Iinclude",
+              "-Isrc",
+              "-Ithird_party",
+              "-Ithird_party/openbrush",
+              "-Ithird_party/nlohmann",
+              "tests/texture-sets.cpp"
+            ],
+            "returncode": 0,
+            "seconds": 1.200934303982649
+          }
+        ],
+        "drift": []
+      }
+    }
+  },
+  "preserved_initial_diagnostic": "src/paint.cpp: In member function \u2018std::shared_ptr<dome::PaintedMesh> dome::PaintedMesh::reparameterize(dome::Mesh, const std::function<bool()>&) const\u2019:\nsrc/paint.cpp:2716:37: error: passing \u2018const dome::Mesh\u2019 as \u2018this\u2019 argument discards qualifiers [-fpermissive]\n 2716 |     surface->mesh = std::move(target);\n      |                                     ^\nIn file included from include/dome/rig.hpp:3,\n                 from include/dome/avatar.hpp:3,\n                 from include/dome/deformation.hpp:3,\n                 from include/dome/scene.hpp:4,\n                 from include/dome/texture-sets.hpp:3,\n                 from src/texture-set-paint-access.hpp:3,\n                 from src/paint.cpp:1:\ninclude/dome/mesh.hpp:7:8: note:   in call to \u2018constexpr dome::Mesh& dome::Mesh::operator=(dome::Mesh&&)\u2019\n    7 | struct Mesh {\n      |        ^~~~\n",
+  "correction": "Same-UV reparameterization now constructs a SurfaceMap with the replacement immutable geometry owner while retaining the proved raster. The const Mesh reference is never assigned.",
+  "unexecuted_test": "dome-sculpt-texture-sets",
+  "remaining": [
+    "subset rendering/query/visibility",
+    "actual native/FLTK/XR controls and transactions",
+    "multi-primitive skin/morph export/import",
+    "source/normal/recipe and retained polygon8 codec closure",
+    "all-channel resolution and UV/topology membership remaps",
+    "coherent full changed-layout product build, R/S, failure/cancel/history/Save/quality/resource qualification"
+  ],
+  "schema_reservations": {
+    "scene": 40,
+    "paint": 7,
+    "polygon_sources": 8,
+    "material22": "reserved only if needed; not used in initial slice"
+  },
+  "no_old_archive_reuse": true,
+  "no_device_job": true
+}

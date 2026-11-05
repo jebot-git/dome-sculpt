@@ -4,7 +4,7 @@
 #include <span>
 namespace dome {
 using TextureSetId = uint32_t;
-namespace detail { struct TextureSetAccess; struct TextureSetPaintAccess; }
+namespace detail { struct TextureSetAccess; struct TextureSetPaintAccess; class TextureSetArchive; }
 struct TextureSetLimits {
   size_t maximum_sets_per_object=64,maximum_sets_per_scene=256;
   size_t maximum_triangles=2'000'000,maximum_corners=6'000'000;
@@ -23,6 +23,7 @@ public:
   bool polygon_ids()const noexcept{return polygon_ids_;}
 private:
   friend struct detail::TextureSetAccess;
+  friend class detail::TextureSetArchive;
   TextureSetTopology()=default;
   TextureSetTopology(const TextureSetTopology&)=default;
   std::shared_ptr<const Mesh> geometry_;
@@ -41,6 +42,7 @@ public:
   bool matches(const std::shared_ptr<const Mesh>&)const noexcept;
 private:
   friend struct detail::TextureSetAccess;
+  friend class detail::TextureSetArchive;
   friend class TextureSetCollection;
   TextureSetFaceDomain()=default;
   TextureSetFaceDomain(const TextureSetFaceDomain&)=default;
@@ -75,9 +77,11 @@ public:
   void validate(const SculptObject&,bool deep=true,const TextureSetLimits & = {})const;
 private:
   friend struct detail::TextureSetAccess;
+  friend class detail::TextureSetArchive;
   friend TextureSetId create_texture_set(Scene&,uint64_t,std::span<const uint64_t>,std::string,uint32_t,const TextureSetLimits&);
   friend bool assign_texture_set_faces(Scene&,uint64_t,TextureSetId,std::span<const uint64_t>,const TextureSetLimits&);
   friend bool select_texture_set(Scene&,uint64_t,TextureSetId);
+  friend bool edit_texture_set(Scene&,uint64_t,TextureSetId,const std::function<bool(PaintedMesh&,Material&)> &,const TextureSetLimits&);
   TextureSetCollection()=default;
   TextureSetCollection(const TextureSetCollection&)=default;
   std::shared_ptr<const TextureSetTopology> topology_;
@@ -108,4 +112,10 @@ TextureSetId create_texture_set(Scene&,uint64_t object,std::span<const uint64_t>
 bool assign_texture_set_faces(Scene&,uint64_t object,TextureSetId,
                               std::span<const uint64_t> faces,const TextureSetLimits & = {});
 bool select_texture_set(Scene&,uint64_t object,TextureSetId);
+// Mutate a private COW draft, validate the actual full Scene/source context, and
+// seal a second snapshot before replacing a record. No mutable draft can be
+// retained through a const collection/history alias. Returning false discards
+// the draft; unfinished strokes, failures and cancellation never publish it.
+bool edit_texture_set(Scene&,uint64_t object,TextureSetId,
+    const std::function<bool(PaintedMesh&,Material&)> &,const TextureSetLimits & = {});
 } // namespace dome

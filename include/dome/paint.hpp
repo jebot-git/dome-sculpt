@@ -251,9 +251,17 @@ private:
   friend struct SourcePaintSamplingAccess;
   friend struct SourceKeyPaintAccess;
   void seal_paint_sampling_attachment();
+  // Only the owning Scene40 membership archive may omit the current geometry.
+  // Legacy/public paint entry points never supply this sealed domain.
+  nlohmann::json encode_impl(PaintImageArchive *,NormalSamplingArchive *,PaintSamplingArchive *,
+      const std::shared_ptr<const TextureSetFaceDomain> &) const;
+  static std::shared_ptr<PaintedMesh> decode_impl(const nlohmann::json &,const PaintImageArchive *,
+      bool,const NormalSamplingArchive *,const PaintSamplingArchive *,const SourcePaintDecodeContext &,
+      const std::shared_ptr<const TextureSetFaceDomain> &);
   PaintedMesh() = default;
   PaintedMesh(Mesh, uint32_t, const PaintSurfaceOptions &);
   PaintedMesh(Mesh, uint32_t, const PaintSurfaceOptions &,std::shared_ptr<const PaintSamplingDomain>);
+  PaintedMesh(std::shared_ptr<const Mesh>,uint32_t,const PaintSurfaceOptions &,std::shared_ptr<const PaintSamplingDomain>);
   struct PaintSample { PaintSettings settings; float opacity = 1; };
   using PaintSampler = std::function<std::optional<PaintSample>(Vec3,Vec3)>;
   void stamp_sampled(const Brush &, const PaintSettings &, const PaintSampler &, const std::function<bool()> &cancelled = {}, const Evaluation * = nullptr);

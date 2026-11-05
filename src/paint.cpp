@@ -286,6 +286,15 @@ struct PaintedMesh::SurfaceMap {
     if(!geometry)throw std::invalid_argument("Missing immutable paint geometry");
     return *geometry;
   }
+  // The existing same-UV triangle correspondence permits raster reuse while
+  // replacing the immutable vertex/index owner. A reference member must be
+  // bound to that new owner at construction, never assigned through const.
+  SurfaceMap(const SurfaceMap &before,std::shared_ptr<const Mesh> current)
+      :geometry(std::move(current)),mesh(checked_geometry(geometry)),
+       original_sampling(before.original_sampling),paint_domain(before.paint_domain),
+       sampling_raster_proven(before.sampling_raster_proven),source_capture_only(before.source_capture_only),
+       resolution(before.resolution),columns(before.columns),options(before.options),diagnostics(before.diagnostics),
+       linked(before.linked),extra(before.extra),texels(before.texels),tiles(before.tiles),padding(before.padding) {}
   SurfaceMap(Mesh input, uint32_t r, PaintSurfaceOptions opts = {},
              std::shared_ptr<const PaintSamplingDomain> domain = {},
              PaintSamplingLimits domain_limits = {})
@@ -459,6 +468,9 @@ PaintedMesh::PaintedMesh(Mesh mesh, uint32_t r):PaintedMesh(std::move(mesh),r,{}
 PaintedMesh::PaintedMesh(Mesh mesh,uint32_t r,const PaintSurfaceOptions &options)
     :PaintedMesh(std::move(mesh),r,options,{}){}
 PaintedMesh::PaintedMesh(Mesh mesh,uint32_t r,const PaintSurfaceOptions &options,
+    std::shared_ptr<const PaintSamplingDomain> sampling)
+    :PaintedMesh(std::make_shared<const Mesh>(std::move(mesh)),r,options,std::move(sampling)){}
+PaintedMesh::PaintedMesh(std::shared_ptr<const Mesh> mesh,uint32_t r,const PaintSurfaceOptions &options,
     std::shared_ptr<const PaintSamplingDomain> sampling) {
   if (r < 64 || r > 2048 || (r & (r - 1)))
     throw std::invalid_argument(
@@ -2709,8 +2721,7 @@ PaintedMesh::reparameterize(Mesh target,
   auto result = snapshot();
   if (same) {
     if(source_maps_&&source_maps_->uses_alternate_uv()&&(target.indices!=mesh().indices||target.positions.size()!=mesh().positions.size()))throw std::invalid_argument("Source UV1 vertex remapping requires explicit source-coordinate preparation");
-    auto surface = std::make_shared<SurfaceMap>(*surface_);
-    surface->mesh = std::move(target);
+    auto surface = std::make_shared<SurfaceMap>(*surface_,std::make_shared<const Mesh>(std::move(target)));
     result->surface_ = std::move(surface);
     ++result->revision_;
     return result;
@@ -2871,7 +2882,21 @@ nlohmann::json PaintedMesh::encode(PaintImageArchive *archive,NormalSamplingArch
   return encode(archive,domains,nullptr);
 }
 nlohmann::json PaintedMesh::encode(PaintImageArchive *archive,NormalSamplingArchive *domains,PaintSamplingArchive *paint_domains) const {
-  if(texture_set_domain_)throw std::invalid_argument("Texture-set paint requires its Scene40/Paint7 membership archive context");
+  return encode_impl(archive,domains,paint_domains,{});
+}
+nlohmann::json detail::TextureSetPaintAccess::encode(const PaintedMesh &paint,PaintImageArchive *images,
+    NormalSamplingArchive *normals,PaintSamplingArchive *sampling){
+  const auto &domain=paint.texture_set_domain_;
+  if(!domain||!domain->matches(paint.mesh_owner())||!images)
+    throw std::invalid_argument("Paint7 needs its exact owning membership and shared image archive");
+  auto payload=paint.encode_impl(images,normals,sampling,domain);
+  return {{"version",7},{"set",domain->set()},{"payload",std::move(payload)}};
+}
+nlohmann::json PaintedMesh::encode_impl(PaintImageArchive *archive,NormalSamplingArchive *domains,
+    PaintSamplingArchive *paint_domains,const std::shared_ptr<const TextureSetFaceDomain> &membership) const {
+  if(texture_set_domain_!=membership||(membership&&!membership->matches(mesh_owner())))
+    throw std::invalid_argument("Texture-set paint requires its Scene40/Paint7 membership archive context");
+  if(membership&&source_sampling_prepared())throw std::invalid_argument("Independent source Paint4 needs its geometry-deduplicated Paint7 adapter");
   if(!valid_source_sampling_attachment())throw std::invalid_argument("Independent source paint lost its own sampling attachment");
   const auto sampling=paint_sampling_domain();
   if(!valid_paint_sampling_attachment())throw std::logic_error("Paint sampling geometry attachment is invalid");
@@ -2892,6 +2917,7 @@ nlohmann::json PaintedMesh::encode(PaintImageArchive *archive,NormalSamplingArch
   if(color_projection_)j["color_projection"]=encode_color_projection(*color_projection_,archive?*archive:local);
   if(normal_projection_)j["normal_projection"]=encode_normal_projection(*normal_projection_,archive?*archive:local,domains);
   if(!archive && !source_sampling_prepared() && (source_maps_ || color_projection_ || normal_projection_))j["source_images"]=local.encode();
+  if(!membership){
   std::vector<uint8_t> positions, normals, uv, indices;
   for (auto p : mesh().positions)
     for (float f : {p.x, p.y, p.z})
@@ -2910,6 +2936,7 @@ nlohmann::json PaintedMesh::encode(PaintImageArchive *archive,NormalSamplingArch
                {"indices", nlohmann::json::binary(indices)}};
   j["mesh"]["uv_pins"] = nlohmann::json::binary(mesh().uv_pins);
   j["mesh"]["uv_seams"] = nlohmann::json::binary(mesh().uv_seams);
+  }
   for (auto &l : layers_) {
     nlohmann::json tiles = nlohmann::json::array();
     for (size_t i = 0; i < l.tiles.size(); ++i)
@@ -3023,6 +3050,25 @@ std::shared_ptr<PaintedMesh> PaintedMesh::decode(const nlohmann::json &input,con
 std::shared_ptr<PaintedMesh> PaintedMesh::decode(const nlohmann::json &input,const PaintImageArchive *archive,
     bool allow_polygon,const NormalSamplingArchive *domains,const PaintSamplingArchive *paint_domains,
     const SourcePaintDecodeContext &context) {
+  return decode_impl(input,archive,allow_polygon,domains,paint_domains,context,{});
+}
+std::shared_ptr<PaintedMesh> detail::TextureSetPaintAccess::decode(const nlohmann::json &input,
+    const PaintImageArchive *images,bool polygon,const NormalSamplingArchive *normals,
+    const PaintSamplingArchive *sampling,const SourcePaintDecodeContext &context,
+    const std::shared_ptr<const TextureSetFaceDomain> &membership){
+  if(!images||!membership||!membership->topology()||!membership->topology()->geometry()||
+     !input.is_object()||input.size()!=3||!input.at("version").is_number_integer()||input.at("version")!=7||
+     !input.at("set").is_number_integer()||input.at("set").get<int64_t>()<0||
+     input.at("set").get<uint64_t>()!=membership->set()||!input.at("payload").is_object())
+    throw std::invalid_argument("Paint7 requires its authenticated owning geometry and membership");
+  const auto &payload=input.at("payload");
+  if(payload.contains("version")&&payload.at("version")==4)
+    throw std::invalid_argument("Independent source Paint4 needs its geometry-deduplicated Paint7 adapter");
+  return PaintedMesh::decode_impl(payload,images,polygon,normals,sampling,context,membership);
+}
+std::shared_ptr<PaintedMesh> PaintedMesh::decode_impl(const nlohmann::json &input,const PaintImageArchive *archive,
+    bool allow_polygon,const NormalSamplingArchive *domains,const PaintSamplingArchive *paint_domains,
+    const SourcePaintDecodeContext &context,const std::shared_ptr<const TextureSetFaceDomain> &membership) {
   const bool independent=input.is_object()&&input.contains("version")&&input.at("version")==4;
   std::optional<PaintImageArchive> independent_images;
   std::shared_ptr<PaintedMesh> original;
@@ -3063,6 +3109,11 @@ std::shared_ptr<PaintedMesh> PaintedMesh::decode(const nlohmann::json &input,con
     j.at("baked").contains("normal_authority");
   if((retained_projection||retained_bake)&&(!domains||!archive))
     throw std::invalid_argument("Retained normal Paint requires paired image and sampling archive context");
+  std::shared_ptr<const Mesh> geometry;
+  if(membership){
+    if(j.contains("mesh"))throw std::invalid_argument("Paint7 current geometry must use its single owning topology record");
+    geometry=membership->topology()->geometry();
+  }else{
   auto &m = j.at("mesh");
   auto blob = [&](const char *name, size_t stride,
                   size_t limit) -> const std::vector<uint8_t> & {
@@ -3101,6 +3152,8 @@ std::shared_ptr<PaintedMesh> PaintedMesh::decode(const nlohmann::json &input,con
   };
   flags("uv_pins", mesh.positions.size(), mesh.uv_pins);
   flags("uv_seams", mesh.indices.size(), mesh.uv_seams);
+  geometry=std::make_shared<const Mesh>(std::move(mesh));
+  }
   auto &resolution = j.at("resolution");
   if ((!resolution.is_number_unsigned() &&
        (!resolution.is_number_integer() || resolution.get<int64_t>() < 64)) ||
@@ -3117,7 +3170,8 @@ std::shared_ptr<PaintedMesh> PaintedMesh::decode(const nlohmann::json &input,con
       surface_options.policy=PaintUvPolicy::SourceAuthored;
     }
   }
-  auto result=std::shared_ptr<PaintedMesh>(new PaintedMesh(std::move(mesh),uint32_t(resolution.get<uint64_t>()),surface_options,std::move(sampling)));
+  auto result=std::shared_ptr<PaintedMesh>(new PaintedMesh(std::move(geometry),uint32_t(resolution.get<uint64_t>()),surface_options,std::move(sampling)));
+  result->texture_set_domain_=membership;
   std::optional<PaintImageArchive> local_images;
   const PaintImageArchive *images=archive;
   if(j.contains("source_maps") || j.contains("color_projection") || j.contains("normal_projection")) {

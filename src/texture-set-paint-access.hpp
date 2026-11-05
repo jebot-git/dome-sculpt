@@ -4,6 +4,12 @@
 namespace dome::detail {
 struct TextureSetPaintAccess {
   static const std::shared_ptr<const TextureSetFaceDomain>& domain(const PaintedMesh&)noexcept;
+  // Membership-required Paint7 payload. The domain is minted only by the
+  // authenticated collection decoder; no standalone bool grants authority.
+  static nlohmann::json encode(const PaintedMesh &,PaintImageArchive *,NormalSamplingArchive *,PaintSamplingArchive *);
+  static std::shared_ptr<PaintedMesh> decode(const nlohmann::json &,const PaintImageArchive *,bool,
+      const NormalSamplingArchive *,const PaintSamplingArchive *,const SourcePaintDecodeContext &,
+      const std::shared_ptr<const TextureSetFaceDomain> &);
   static size_t working_bytes(const PaintedMesh&,uint32_t resolution);
   static std::shared_ptr<PaintedMesh> bind(const PaintedMesh&,
       std::shared_ptr<const TextureSetFaceDomain>,uint32_t resolution,

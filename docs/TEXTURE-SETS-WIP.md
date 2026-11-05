@@ -1,7 +1,8 @@
 # Native texture sets: source implementation in progress
 
 Pinned base: e79dbe9cbe3243b17b224843c247987b8f2595f8. No build or test claim. Qualified query corrections c3a1b19/5b02bfc are merged;
-all new texture-set code remains uncompiled.
+all new texture-set code remains unbuilt and unexecuted. Six changed/new TUs
+passed GCC16 C++20 syntax-only checks; this is not a coherent product build.
 Scene40, Paint7 and polygon_sources8 are reserved. Material22 is available only
 if a genuinely new connected material envelope is needed. Shared texture controls
 are reserved page31/count32; older private31/32 proposals are not current main.
@@ -32,6 +33,20 @@ The public/private sizes changed. Every actual product consumer requires a fresh
 coherent build. Old support overlays are not qualified by outer class size.
 The shared geometry owner now lives independently from raster caches. All affected
 sampling seals, cache lifetimes and owner guards require new runtime proof.
+
+The next source checkpoint adds the initial plain-mesh Scene40/Paint7 codec:
+current set payloads omit their mesh, one owning topology table supplies the
+shared geometry, standalone readers refuse Paint7, and Scene preflight includes
+all extra grids and membership data before SurfaceMap reconstruction. Genuine
+polygon IDs are replayed against the current triangulation. An immutable edit
+operation snapshots before mutation and seals a second COW snapshot before
+publication; failure, unfinished strokes and cancellation discard that draft.
+The source test is registered but has NOT been executed.
+
+This first connected codec explicitly refuses source/normal/recipe-backed sets
+and retained texture-set history. The reserved polygon_sources8 path is not yet
+implemented. These are missing adapters, not supported completion exceptions.
+Subset rendering is still guarded, so this is not a usable UI feature yet.
 
 Next implementation stages remain required:
 
