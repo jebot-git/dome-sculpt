@@ -40,8 +40,12 @@ are not Document Undo/Redo or actual worker publication tests.
 
 Original PolygonFace.material numbers remain original metadata. New membership
 is keyed by persistent face IDs and does not reinterpret those numbers. The
-polygon-ID replay path still needs the separately identified forged false-marker
-association repair and actual polygon controls; the plain gate does not qualify it.
+polygon-ID association gap is now independently reproduced against984 and fixed
+in769ce32: a forged raw marker can no longer bypass the genuine current polygon
+authority. The matched two-TU component passes six polygon controls plus the
+original32; its app/test link maps exclude both old archive members. This is
+component scope, not a second full build. See
+validation/TEXTURE-SETS-POLYGON-IDENTITY.json.
 
 The public/private layouts and mesh_owner ownership changed. No old project
 objects or archives are compatible by size. Every future layout addition needs
@@ -70,3 +74,10 @@ The following remain required:
 Ordinary native weight capture refuses unrepresented membership until its real
 multi-material retention and resource adapter exists. No main/default promotion
 or full texture-set completion is claimed.
+
+The initial fresh Release cohort and old marker counter are preserved unchanged.
+The later component rebuilt both complete changed production TUs and its whole
+model consumer, then linked the app and consumer before the immutable984 core.
+No public/private header changed, no archive was rewritten or copied, and all223
+original binary hashes remain exact. Current total phase178,298,880B is below
+the384MiB cap; the component/counter increment48,394,240B is below48MiB.
