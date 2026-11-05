@@ -1,3 +1,4 @@
+#include "polygon-surface-owner.hpp"
 #include "color-bound-memo.hpp"
 #include "native-paint-sampling.hpp"
 #include "native-paint-metadata.hpp"
@@ -186,6 +187,7 @@ void SourceMaterialBindings::validate(bool deep) const {
   if(sampling_reparameterized && !uv_origin)throw std::invalid_argument("Reparameterized sampling requires retained original provenance");
   if(color_preparation)color_preparation->validate(deep);
   if(canonical_paint_sampling)canonical_paint_sampling->validate_binding(*this,deep);
+  if(polygon_surface_transfer)polygon_surface_transfer->validate_binding(*this);
   if(canonical_uv){
     if(!canonical_uv->valid_owner(canonical_uv)||canonical_uv->origin()!=canonical_attributes)
       throw std::invalid_argument("Canonical UV correspondence lost its actual attribute origin");
@@ -279,6 +281,7 @@ void SourceMaterialBindings::validate(bool deep) const {
   validation.complete(deep);
 }
 uint32_t SourceMaterialArchive::add(std::shared_ptr<const SourceMaterialBindings> value,bool deep) {
+  if(value&&value->polygon_surface_transfer)throw std::invalid_argument("Polygon surface material requires its actual owning Scene39 archive adapter");
   if(!value) throw std::invalid_argument("Missing resolved material holder");
   auto found=std::find(bindings_.begin(),bindings_.end(),value);
   if(found!=bindings_.end())return uint32_t(found-bindings_.begin());

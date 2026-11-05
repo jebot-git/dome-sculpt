@@ -13,6 +13,7 @@ namespace dome::detail {
 // a current object or a neighboring Origin cannot authenticate that before-state.
 inline void source_paint_pairing(const PaintedMesh *paint,const SourceMaterialBindings *binding,
     const CreatorAppearance *appearance,bool deep){
+  if(binding&&binding->polygon_surface_transfer)throw std::invalid_argument("Polygon surface transfer requires its actual Scene39 publication/render/query adapter");
   const auto color=paint?paint->color_projection():nullptr;
   const auto normal=paint?paint->normal_projection():nullptr;
   const auto color_recipe=binding?binding->color_preparation:nullptr;

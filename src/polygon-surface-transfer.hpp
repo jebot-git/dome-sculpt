@@ -64,6 +64,12 @@ struct PolygonBeforeRole {
 // offsets and the before role's actual fragment/vertex normalization policy;
 // freezing an old object-space normal is not this operation. The normal sample
 // is the actual decoded/filtered role sample (including its declared scale).
+// A native N-only field has no normal-map T/W. Its supplied actual BEFORE
+// direction is transported by an explicit ordered geometric corner chart;
+// that chart is not a fabricated texture-coordinate or artist-tangent owner.
+Vec3 transport_polygon_direction(Vec3 before_direction,
+ const PolygonGeometryFrame &before,const PolygonGeometryFrame &current,
+ double minimum_relative_determinant=1e-6);
 Vec3 transport_polygon_normal(const PolygonBeforeRole &,Vec3 normal_sample,
  const PolygonGeometryFrame &before,const PolygonGeometryFrame &current,
  double minimum_relative_determinant=1e-6);

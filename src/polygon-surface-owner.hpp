@@ -7,6 +7,12 @@ namespace dome::detail {
 // not attach a Paint, change a material or grant Scene39 publication authority.
 // Original native/frame IDs remain original; the polygon derivative has its
 // own corner domain. The current binding is never an edge of this graph.
+class PolygonSurfaceOwner;
+struct PolygonSurfaceStage {
+ std::shared_ptr<const PolygonSurfaceOwner> owner;
+ std::shared_ptr<PaintedMesh> paint;
+ std::shared_ptr<const SourceMaterialBindings> binding;
+};
 class PolygonSurfaceOwner final {
 public:
  static std::shared_ptr<const PolygonSurfaceOwner> capture(
@@ -34,14 +40,27 @@ public:
  // Actual prepared CorePBR evaluation from the captured raw posed N/T and
  // filtered owning field. World/held-object transforms are evaluated now,
  // never baked into an anchor or substituted by a guessed similarity.
+ // Normal-map-free native meshes retain their actual evaluated/interpolated
+ // N field with a declared geometric corner chart; no role UV/T/W is minted.
+ Vec3 native_normal(size_t triangle,std::array<double,3>,const AffineTransform &,
+     const PolygonSurfaceTransferLimits & = {}) const;
  Vec3 pbr_normal(size_t triangle,std::array<double,3>,const AffineTransform &,
      const PolygonSurfaceTransferLimits & = {}) const;
  bool has_normal_field() const noexcept;
+ PolygonSurfaceStage stage_paint(const PolygonSurfaceTransferLimits & = {}) const;
+ bool matches_current(const PaintedMesh &) const noexcept;
+ void validate_binding(const SourceMaterialBindings &,const PolygonSurfaceTransferLimits & = {}) const;
+ void validate_current(const PaintedMesh &,const PolygonSurfaceTransferLimits & = {}) const;
+ // Structural stage only; current Paint/material publication additionally
+ // needs the genuine39 attachment and current normal-field binding adapter.
+ std::shared_ptr<const PaintSamplingDomain> paint_domain(
+     const PolygonSurfaceTransferLimits & = {}) const;
 private:
  PolygonSurfaceOwner()=default;
  PolygonSurfaceOwner(const PolygonSurfaceOwner&)=delete;
  std::weak_ptr<const PolygonSurfaceOwner> self_;
  std::shared_ptr<const PolygonOrigin> before_;
+ std::shared_ptr<const PaintSamplingAttachment> attachment_;
  PolygonSurfaceTrace trace_;
  // Original derivative corner -> original native corner, never raw vertex IDs.
  std::vector<uint32_t> native_corners_;

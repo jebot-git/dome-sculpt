@@ -6,6 +6,7 @@
 #include "normal-frame-runtime.hpp"
 #include "source-paint-pairing.hpp"
 #include "polygon-scene-archive.hpp"
+#include "paint-sampling-access.hpp"
 #include <limits>
 #include <nlohmann/json.hpp>
 namespace dome::detail {namespace {
@@ -46,6 +47,8 @@ SourceDomain source_domain(const PolygonOrigin&o,const PolygonSurfaceTransferLim
  source_paint_pairing(o.paint.get(),o.material_bindings.get(),o.appearance.get(),true);
  if(o.deformation)o.deformation->validate(o.paint->mesh());
  const auto &binding=o.material_bindings;const auto field=o.paint->baked()?o.paint->baked()->normal_field:nullptr;
+ if(!field&&o.paint->mesh().normals.size()!=o.paint->mesh().positions.size())throw std::invalid_argument("Polygon native N-only transfer requires its actual authored/evaluated normals");
+ if(!field&&o.paint->baked()&&(!o.paint->baked()->maps.normal.rgba.empty()||!o.paint->baked()->maps.mtoon_normal.rgba.empty()))throw std::invalid_argument("Polygon raw baked normal detail requires its actual native/converted normal adapter");
  if(binding&&(binding->has_mtoon||binding->native_paint_sampling||binding->native_paint_frames||binding->normal_preparation||binding->color_preparation))
   throw std::invalid_argument("Polygon typed/native/prepared field needs its separate actual role adapter");
  if(binding&&binding->normal_frames&&!field)throw std::invalid_argument("Polygon retained artist frame without active canonical detail needs its separate native frame adapter");
@@ -92,11 +95,20 @@ void PolygonSurfaceOwner::validate(const PolygonSurfaceTransferLimits&l)const{
  (void)trace_.triangle_permutation(l);stop(l);
 }
 std::shared_ptr<const PolygonSurfaceOwner> PolygonSurfaceOwner::advance(const PolygonSurfaceStep&step,const PolygonSurfaceTransferLimits&l)const{
- validate(l);auto next=trace_.advance(step,l);if(!next)return self_.lock();auto out=std::shared_ptr<PolygonSurfaceOwner>(new PolygonSurfaceOwner);out->before_=before_;out->trace_=std::move(*next);out->native_corners_=native_corners_;out->paint_corners_=paint_corners_;out->normal_corners_=normal_corners_;out->self_=out;out->validate(l);return out;
+ validate(l);if(attachment_)throw std::invalid_argument("Advancing connected polygon paint requires its actual current-value capture adapter");auto next=trace_.advance(step,l);if(!next)return self_.lock();auto out=std::shared_ptr<PolygonSurfaceOwner>(new PolygonSurfaceOwner);out->before_=before_;out->trace_=std::move(*next);out->native_corners_=native_corners_;out->paint_corners_=paint_corners_;out->normal_corners_=normal_corners_;out->self_=out;out->validate(l);return out;
 }
 std::array<double,3> PolygonSurfaceOwner::source_barycentrics(size_t t,std::array<double,3>b,const std::vector<PolygonSurfaceTriangle>&map)const{barycentric(b);std::array<double,3> q{};for(size_t c=0;c<3;++c)for(size_t k=0;k<3;++k)q[k]+=b[c]*map.at(t).source_barycentrics[c][k];barycentric(q);return q;}
 std::array<float,2> PolygonSurfaceOwner::paint_coordinates(size_t t,std::array<double,3>b,const PolygonSurfaceTransferLimits&l)const{validate(l);const auto map=trace_.triangle_permutation(l);return interpolate(paint_corners_,map.at(t).source_triangle,source_barycentrics(t,b,map));}
 std::array<float,2> PolygonSurfaceOwner::normal_coordinates(size_t t,std::array<double,3>b,const PolygonSurfaceTransferLimits&l)const{validate(l);if(!has_normal_field())throw std::invalid_argument("Normal-free polygon owner has no invented normal coordinates");const auto map=trace_.triangle_permutation(l);return interpolate(normal_corners_,map.at(t).source_triangle,source_barycentrics(t,b,map));}
+Vec3 PolygonSurfaceOwner::native_normal(size_t t,std::array<double,3>b,const AffineTransform&world,const PolygonSurfaceTransferLimits&l)const{
+ validate(l);if(has_normal_field())return pbr_normal(t,b,world,l);
+ const auto map=trace_.triangle_permutation(l);const auto source=map.at(t).source_triangle;const auto sb=source_barycentrics(t,b,map);const auto native=evaluated(*before_);Vec3 direction{};
+ for(size_t k=0;k<3;++k){const auto v=native.indices.at(native_corners_.at(source*3+k));const auto n=normal_bake_math::vec(world.normal(normal_bake_math::vec(native.normals.at(v))));direction+=normal_bake_math::unit(n)*float(sb[k]);}
+ const auto before_mesh=trace_.original()->triangulate(l.geometry).mesh,after_mesh=trace_.current()->triangulate(l.geometry).mesh;std::array<Vec3,3>p{},q{};
+ const std::array<std::array<float,2>,3>chart{{{0,0},{1,0},{0,1}}};std::array<std::array<float,2>,3>current_chart{};
+ for(size_t k=0;k<3;++k){p[k]=before_mesh.positions.at(before_mesh.indices.at(source*3+k));q[k]=after_mesh.positions.at(after_mesh.indices.at(t*3+k));for(size_t j=0;j<3;++j)for(size_t d=0;d<2;++d)current_chart[k][d]+=float(map[t].source_barycentrics[k][j]*chart[j][d]);}
+ return transport_polygon_direction(direction,polygon_geometry_frame(p,chart,world),polygon_geometry_frame(q,current_chart,world));
+}
 Vec3 PolygonSurfaceOwner::pbr_normal(size_t t,std::array<double,3>b,const AffineTransform&world,const PolygonSurfaceTransferLimits&l)const{
  validate(l);if(!has_normal_field())throw std::invalid_argument("Normal-free polygon owner has no prepared role to evaluate");
  const auto map=trace_.triangle_permutation(l);const auto st=map.at(t).source_triangle;const auto sb=source_barycentrics(t,b,map);
@@ -125,12 +137,12 @@ nlohmann::json PolygonSurfaceOwner::encode_recipe(const PolygonSurfaceTransferLi
  for(const auto&s:trace_.steps()){
   stop(l);const auto&e=s.edit;operations.push_back({{"operation",e.operation==PolygonOperation::Move?"move":"flip"},{"selection",{{"mode",int(e.selection.mode)},{"ids",e.selection.ids}}},{"delta",{e.delta.x,e.delta.y,e.delta.z}},{"amount",e.amount},{"cuts",e.cuts},{"first_id",e.first_id},{"world",s.world?nlohmann::json(s.world->matrix()):nlohmann::json(nullptr)}});
  }
- return {{"version",1},{"model","polygon-original-field-current-surface-v1"},{"normal_evaluation","core-pbr-unit-columns"},{"operations",std::move(operations)}};
+ return {{"version",1},{"model","polygon-original-field-current-surface-v1"},{"normal_evaluation",has_normal_field()?"core-pbr-unit-columns":"native-normal-only"},{"operations",std::move(operations)}};
 }
 std::shared_ptr<const PolygonSurfaceOwner> PolygonSurfaceOwner::replay(
  std::shared_ptr<const PolygonOrigin>before,const nlohmann::json&record,const PolygonSurfaceTransferLimits&l){
- stop(l);if(!before||!record.is_object()||record.size()!=4||record.at("version")!=1||record.at("model")!="polygon-original-field-current-surface-v1"||record.at("normal_evaluation")!="core-pbr-unit-columns"||!record.at("operations").is_array()||record.at("operations").size()>l.maximum_steps)throw std::invalid_argument("Unsupported owning polygon field recipe");
- forecast(*before,l);size_t entries=0,bytes=0;
+ stop(l);if(!before||!record.is_object()||record.size()!=4||record.at("version")!=1||record.at("model")!="polygon-original-field-current-surface-v1"||(record.at("normal_evaluation")!="core-pbr-unit-columns"&&record.at("normal_evaluation")!="native-normal-only")||!record.at("operations").is_array()||record.at("operations").size()>l.maximum_steps)throw std::invalid_argument("Unsupported owning polygon field recipe");
+ forecast(*before,l);if(record.at("normal_evaluation")!=(before->paint->baked()&&before->paint->baked()->normal_field?"core-pbr-unit-columns":"native-normal-only"))throw std::invalid_argument("Polygon field recipe claimed a different actual normal model");size_t entries=0,bytes=0;
  // Count the complete edit array before copying any selection or replaying a
  // mesh. The outer owner/archive must also charge its retained before DAG.
  for(const auto&item:record.at("operations")){
@@ -153,5 +165,58 @@ void PolygonSurfaceOwner::validate_current_geometry(const Mesh&mesh,const Polygo
  validate(l);mesh.validate();const auto target=trace_.current()->triangulate(l.geometry).mesh;
  const auto vectors=[](const std::vector<Vec3>&a,const std::vector<Vec3>&b){return a.size()==b.size()&&std::equal(a.begin(),a.end(),b.begin(),[](Vec3 x,Vec3 y){return x.x==y.x&&x.y==y.y&&x.z==y.z;});};
  if(!vectors(mesh.positions,target.positions)||!vectors(mesh.normals,target.normals)||mesh.indices!=target.indices||mesh.uv!=target.uv||mesh.uv_pins!=target.uv_pins||mesh.uv_seams!=target.uv_seams)throw std::invalid_argument("Polygon field current derivative differs from its exact replayed surface");stop(l);
+}
+
+std::shared_ptr<const PaintSamplingDomain> PolygonSurfaceOwner::paint_domain(const PolygonSurfaceTransferLimits&l)const{
+ validate(l);if(trace_.current()->encode()==trace_.original()->encode())throw std::invalid_argument("Unchanged polygon does not require a new paint-domain interpretation");
+ const auto previous=before_->paint->paint_sampling_domain();
+ if(previous&&previous->version()!=1)throw std::invalid_argument("Polygon paint source needs its actual prior transition composition adapter");
+ const auto basis=previous?previous->basis():before_->paint->mesh_owner();
+ size_t prospective=trace_.storage_bytes(),corners=0;for(const auto&face:trace_.current()->faces()){if(face.corners.size()>l.maximum_entries-corners)throw std::length_error("Polygon paint candidate exceeds its corner quota");corners+=face.corners.size();}
+ // Two current derivatives, map vectors and output snapshot/control blocks
+ // coexist here. Raster/grid construction has its own later aggregate stage.
+ charge(prospective,corners,2*(2*sizeof(Vec3)+sizeof(std::array<float,2>)+sizeof(uint32_t))+sizeof(PolygonSurfaceTriangle)+2*sizeof(uint32_t),l);
+ const auto mapping=trace_.triangle_permutation(l);auto derivative=trace_.current()->triangulate(l.geometry).mesh;std::vector<uint32_t> sources;sources.reserve(derivative.indices.size());
+ for(const auto&triangle:mapping)for(const auto&row:triangle.source_barycentrics){stop(l);size_t hit=3;for(size_t k=0;k<3;++k){if(row[k]==1&&hit==3)hit=k;else if(row[k]!=0)throw std::invalid_argument("Polygon paint common refinement requires its actual barycentric record");}if(hit==3)throw std::invalid_argument("Polygon paint corner lost its genuine original side");const auto native=native_corners_.at(triangle.source_triangle*3+hit);sources.push_back(previous?previous->source_corners()[native]:native);}
+ auto snapshot=std::make_shared<const Mesh>(std::move(derivative));auto domain=std::shared_ptr<const PaintSamplingDomain>(new PaintSamplingDomain(basis,std::move(sources),snapshot));
+ PaintSamplingLimits limits;limits.max_vertices=l.geometry.maximum_vertices;limits.max_triangles=l.geometry.maximum_faces;limits.max_work=l.geometry.maximum_work;limits.max_working_bytes=l.maximum_working_bytes;limits.max_basis_bytes=std::min(size_t(128*1024*1024),l.maximum_working_bytes);limits.cancelled=l.geometry.cancelled;
+ domain->validate_current(*snapshot,limits);stop(l);return domain;
+}
+
+bool PolygonSurfaceOwner::matches_current(const PaintedMesh&paint)const noexcept{
+ return attachment_&&own(attachment_,paint.paint_sampling_attachment())&&paint.valid_paint_sampling_attachment()&&paint.paint_sampling_domain()&&paint.paint_sampling_domain()->version()==3;
+}
+void PolygonSurfaceOwner::validate_current(const PaintedMesh&paint,const PolygonSurfaceTransferLimits&l)const{
+ validate(l);if(!matches_current(paint)||paint.source_maps()||paint.source_sampling_prepared()||paint.normal_projection()||paint.color_projection())throw std::invalid_argument("Polygon original-field/current-Paint attachment differs from its genuine owner");
+ validate_current_geometry(paint.mesh(),l);const auto domain=paint.paint_sampling_domain();const auto source=before_->paint->paint_sampling_domain();
+ if(!own(domain->basis(),source?source->basis():before_->paint->mesh_owner()))throw std::invalid_argument("Polygon current Paint borrowed a different original writable basis");
+ // Clear/rebake need the actual role write adapter. Neither clearing a field nor
+ // accepting a different field with equal pixels is a valid first transition.
+ const auto old_field=before_->paint->baked()?before_->paint->baked()->normal_field:nullptr,new_field=paint.baked()?paint.baked()->normal_field:nullptr;
+ if(!own(old_field,new_field))throw std::invalid_argument("Polygon changed normal detail requires its actual current-field write adapter");
+ const auto map=trace_.triangle_permutation(l);const auto actual=domain->source_corners();if(actual.size()!=map.size()*3)throw std::invalid_argument("Polygon current Paint lost its exact source corner stream");
+ for(size_t t=0;t<map.size();++t)for(size_t c=0;c<3;++c){stop(l);size_t k=0;while(k<3&&map[t].source_barycentrics[c][k]!=1)++k;if(k==3)throw std::invalid_argument("Polygon current Paint requires its barycentric refinement adapter");const auto native=native_corners_.at(map[t].source_triangle*3+k);if(actual[t*3+c]!=(source?source->source_corners()[native]:native))throw std::invalid_argument("Polygon current Paint correspondence differs from its authentic edit replay");}
+ stop(l);
+}
+void PolygonSurfaceOwner::validate_binding(const SourceMaterialBindings&b,const PolygonSurfaceTransferLimits&l)const{
+ if(!valid_owner(b.polygon_surface_transfer)||!attachment_||b.has_mtoon||b.normal_frames||b.canonical_attributes||b.canonical_uv||b.canonical_paint_sampling||b.native_paint_sampling||b.native_paint_frames||b.key_derivation||b.normal_preparation||b.color_preparation||b.normal_frame!=SourceMaterialNormalFrame::UvDerivative||b.sampling_reparameterized)throw std::invalid_argument("Polygon surface current binding lost its actual separate field/geometry owner");
+ const auto old=before_->material_bindings;SourceNativeMaterial reference;
+ if(old)reference=old->native_reference;else{reference.color=before_->material.color;reference.emission=before_->material.emissive;reference.alpha=int(before_->material.alpha);reference.alpha_cutoff=before_->material.alpha_cutoff;reference.double_sided=before_->material.double_sided;}
+ if((old?!own(old->uv_origin,b.uv_origin):bool(b.uv_origin))||b.native_reference.color!=reference.color||b.native_reference.emission!=reference.emission||b.native_reference.alpha!=reference.alpha||b.native_reference.alpha_cutoff!=reference.alpha_cutoff||b.native_reference.double_sided!=reference.double_sided)throw std::invalid_argument("Polygon surface binding changed its authentic original source/reference units");
+ for(const auto&role:b.roles)if(role.image)throw std::invalid_argument("Polygon surface typed image roles require their actual role adapter");
+ validate(l);
+}
+PolygonSurfaceStage PolygonSurfaceOwner::stage_paint(const PolygonSurfaceTransferLimits&l)const{
+ validate(l);if(attachment_)throw std::invalid_argument("Polygon current Paint stage is already connected; advance an actual edit before publishing again");
+ const auto domain=paint_domain(l);const auto &target=*domain->derived_geometry();size_t copied=trace_.storage_bytes();charge(copied,1,sizeof(PolygonSurfaceOwner)+sizeof(PaintedMesh)+256,l);
+ for(const auto&layer:before_->paint->layers()){charge(copied,1,sizeof(PaintLayer),l);charge(copied,layer.name.size()+1,1,l);charge(copied,layer.tiles.size()+layer.pbr_tiles.size()+layer.emission_tiles.size(),sizeof(std::shared_ptr<const PaintTile>),l);}
+ charge(copied,paint_corners_.size()+normal_corners_.size(),sizeof(std::array<float,2>),l);charge(copied,native_corners_.size(),sizeof(uint32_t),l);for(const auto&step:trace_.steps())charge(copied,step.edit.selection.ids.size(),sizeof(PolygonId),l);
+ if(copied>=l.maximum_working_bytes)throw std::length_error("Polygon Paint stage exhausted its prospective owner/snapshot quota");
+ PaintSamplingLimits limits;limits.max_working_bytes=l.maximum_working_bytes-copied;limits.max_basis_bytes=std::min(size_t(128*1024*1024),limits.max_working_bytes);limits.max_vertices=l.geometry.maximum_vertices;limits.max_triangles=l.geometry.maximum_faces;limits.max_work=l.geometry.maximum_work;limits.cancelled=l.geometry.cancelled;
+ auto paint=retain_paint_grid_borrowed(*before_->paint,target,domain,limits);auto owner=std::shared_ptr<PolygonSurfaceOwner>(new PolygonSurfaceOwner);owner->before_=before_;owner->trace_=trace_;owner->native_corners_=native_corners_;owner->paint_corners_=paint_corners_;owner->normal_corners_=normal_corners_;owner->attachment_=paint->paint_sampling_attachment();owner->self_=owner;owner->validate_current(*paint,l);
+ auto binding=std::make_shared<SourceMaterialBindings>();binding->has_mtoon=false;binding->polygon_surface_transfer=owner;
+ if(const auto old=before_->material_bindings){binding->uv_origin=old->uv_origin;binding->native_reference=old->native_reference;binding->physical_emission=old->physical_emission;}
+ else{binding->native_reference.color=before_->material.color;binding->native_reference.emission=before_->material.emissive;binding->native_reference.alpha=int(before_->material.alpha);binding->native_reference.alpha_cutoff=before_->material.alpha_cutoff;binding->native_reference.double_sided=before_->material.double_sided;}
+ binding->validate();stop(l);return {std::move(owner),std::move(paint),std::move(binding)};
 }
 } // namespace dome::detail

@@ -2882,3 +2882,13 @@ native/UI/persistence/render/export remain required; no public DTO/schema edits.
 Read KEY-MIRROR-PLANE.md and its receipt.
 
 Public-main-matched VRM1 preflight repair62ec13e: one Layer TU +two lasting controls in existing registered targets-faults, no layout/schema/shader/API change. Allfive strict fault/worker domains plus actualactiveRim fullcontrols R/S0 (268.013/1953.161s), final1857 defaulttarget checks R/S0, actualold-main app/inspector relink+normal22/compact22 perprofile0 (55.274/74.379s), canonicalSDKmaps exact. Distinct current37 ABI also qualifies; original late failures/prototype/wrapper statuses remain. See VRM1-EXPRESSION-PREFLIGHT.md/JSON. Parent review/main publication remains separate; full VRM goal continues.
+
+Private polygon source-owner continuation: math00c9b46 (corrected Release1097)
+and source-owner02c7cfd (Release107) are scoped detached proofs, not changed
+polygon admission. Source-only39 now appends a real current field owner and
+kind3 paint correspondence; legacy writers and Scene publication remain guarded.
+See POLYGON-SURFACE-TRANSFER39-PLAN.md. A fresh all-own Release12 gate is approved
+under320MiB phase/1152MiB cumulative and20GiB actual-free floor; no SAN/UI/GPU
+reserve. All earlier source/proof inputs stay immutable. Full codec/native,
+current paint capture, normal render/query, general topology and export remain
+required; no old public-size archives may be mixed with these headers.

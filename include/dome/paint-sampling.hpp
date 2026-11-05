@@ -7,6 +7,7 @@
 #include <span>
 #include <utility>
 namespace dome {
+namespace detail { class PolygonSurfaceOwner; }
 struct PaintSamplingLimits {
   size_t max_vertices=2'000'000,max_triangles=2'000'000;
   size_t max_basis_bytes=128*1024*1024,max_working_bytes=256*1024*1024;
@@ -20,7 +21,10 @@ struct PaintSamplingLimits {
 // rather than a current vertex, so welding never averages independent seams.
 class PaintSamplingDomain {
 public:
-  uint32_t version() const noexcept { return 1; }
+  uint32_t version() const noexcept { return version_; }
+  // Kind3 only: an independent geometry snapshot, never a SurfaceMap alias.
+  // This structural witness does not authenticate a material or Scene owner.
+  const std::shared_ptr<const Mesh> &derived_geometry() const noexcept { return derived_; }
   const std::shared_ptr<const Mesh> &basis() const noexcept { return basis_; }
   std::span<const uint32_t> source_corners() const noexcept { return source_corners_; }
   size_t storage_bytes(const PaintSamplingLimits & = {}) const;
@@ -32,10 +36,19 @@ public:
   // current triangle IDs; a SurfaceMap must continue storing the authored mesh.
   Mesh raster_mesh(const Mesh &,const PaintSamplingLimits & = {}) const;
 private:
+  friend class detail::PolygonSurfaceOwner;
+  PaintSamplingDomain(std::shared_ptr<const Mesh> basis,std::vector<uint32_t> corners,
+                      std::shared_ptr<const Mesh> derived)
+      : PaintSamplingDomain(std::move(basis),std::move(corners)) {
+    version_=3;derived_=std::move(derived);
+    retained_bytes_+=derived_->positions.size()*(2*sizeof(Vec3)+sizeof(std::array<float,2>))+derived_->indices.size()*sizeof(uint32_t)+derived_->uv_pins.size()+derived_->uv_seams.size();
+  }
   PaintSamplingDomain(std::shared_ptr<const Mesh> basis,std::vector<uint32_t> corners)
       :basis_(std::move(basis)),source_corners_(std::move(corners)),
        retained_bytes_(basis_->positions.size()*(2*sizeof(Vec3)+sizeof(std::array<float,2>))+basis_->indices.size()*sizeof(uint32_t)+basis_->uv_pins.size()+basis_->uv_seams.size()+source_corners_.size()*sizeof(uint32_t)){}
   std::shared_ptr<const Mesh> basis_;
+  uint32_t version_=1;
+  std::shared_ptr<const Mesh> derived_;
   std::vector<uint32_t> source_corners_;
   size_t retained_bytes_=0;
   friend class PaintSamplingArchive;

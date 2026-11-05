@@ -67,8 +67,11 @@ PolygonGeometryFrame polygon_geometry_frame(const std::array<Vec3,3> &p,const st
  const auto n=unit(world.normal(local_n)),raw_t=world.direction(local_t),raw_b=world.direction(local_b);const auto t=unit(subtract(raw_t,scale(n,dot(n,raw_t))));const auto cross_nt=unit(cross(n,t));const double sign=dot(cross_nt,raw_b);if(!std::isfinite(sign)||std::abs(sign)<=minimum*std::sqrt(dot(raw_b,raw_b)))throw std::invalid_argument("Polygon geometric tangent handedness is unrepresentable");
  const float w=sign<0?-1.f:1.f;PolygonGeometryFrame result{{vec(t),vec(scale(cross_nt,w)),vec(n)},w};frame(result,minimum);return result;
 }
+Vec3 transport_polygon_direction(Vec3 direction,const PolygonGeometryFrame&before,const PolygonGeometryFrame&current,double minimum){
+ using namespace normal_bake_math;frame(before,minimum);frame(current,minimum);const auto detail=inverse_apply(before.basis,unit(vec(direction)),minimum);return vec(unit(apply(current.basis,detail)));
+}
 Vec3 transport_polygon_normal(const PolygonBeforeRole &role,Vec3 sample,const PolygonGeometryFrame &before,const PolygonGeometryFrame &current,double minimum){
  using namespace normal_bake_math;handedness(role.tangent_handedness);if(role.basis_orientation!=1&&role.basis_orientation!=-1)throw std::invalid_argument("Missing actual before shader basis orientation");if(!finite(sample))throw std::invalid_argument("Nonfinite polygon normal sample");frame(before,minimum);frame(current,minimum);(void)inverse_apply(role.before_vs,{0,0,1},minimum);const auto determinant=dot(vec(role.before_vs.t),cross(vec(role.before_vs.b),vec(role.before_vs.n)));if((determinant<0?-1:1)!=role.basis_orientation*role.tangent_handedness)throw std::invalid_argument("Before shader basis differs from its actual tangent W/orientation policy");
- const auto desired_before=unit(apply(role.before_vs,vec(sample)));const auto detail=inverse_apply(before.basis,desired_before,minimum);return vec(unit(apply(current.basis,detail)));
+ const auto desired_before=unit(apply(role.before_vs,vec(sample)));return transport_polygon_direction(vec(desired_before),before,current,minimum);
 }
 } // namespace dome::detail
