@@ -1,0 +1,99 @@
+{
+  "source": "089ea32",
+  "scope": "Same frozen aggregate/receipt SHA/actual protected-input replay; no native operation rerun",
+  "cohorts": [
+    {
+      "profile": "release",
+      "operation": "Create",
+      "coverage": "artifacts/key-partitions/release-Create/run-823e5c2bfbc941f9baab98e87eec1d6d/coverage.json",
+      "coverage_sha256": "cd9624cb99096024f032ba59b883daccf2682089652ade6b6a26cd86e15c6815",
+      "plan_sha256": "28451f4f1cd97036416dc51e1fdcf90c20573691673e0385610cfc6d6efe1b6e",
+      "inputs_digest": "a1a75ae7735cf0acadf2398ab0ffb5b106ae17d4eb0bef2453e6e6edea36fad4",
+      "baseline_counts": [
+        44143,
+        44143,
+        44143
+      ],
+      "totals": {
+        "completed": 44144,
+        "denied": 44143,
+        "successful": 1,
+        "translated": 0
+      },
+      "maximum_part_seconds": 4.139335780986585,
+      "all_maps_verified": true,
+      "all_input_checks": true,
+      "parts": 128
+    },
+    {
+      "profile": "release",
+      "operation": "Replace",
+      "coverage": "artifacts/key-partitions/release-Replace/run-456c44e7447e43d598c6888e41b76bbd/coverage.json",
+      "coverage_sha256": "f8eb878e1a39155db527e98469090871ffd706f752619af5689b666534b5fb18",
+      "plan_sha256": "e9d92460b65cf1fb2744d12723339b0b0fa97bf9100712f7352c10d734ca27e1",
+      "inputs_digest": "a1a75ae7735cf0acadf2398ab0ffb5b106ae17d4eb0bef2453e6e6edea36fad4",
+      "baseline_counts": [
+        44993,
+        44993,
+        44993
+      ],
+      "totals": {
+        "completed": 44994,
+        "denied": 44993,
+        "successful": 1,
+        "translated": 0
+      },
+      "maximum_part_seconds": 6.582418135018088,
+      "all_maps_verified": true,
+      "all_input_checks": true,
+      "parts": 128
+    },
+    {
+      "profile": "sanitize",
+      "operation": "Create",
+      "coverage": "artifacts/key-partitions/sanitize-Create/run-0d189050bb534e658a00b558579c546b/coverage.json",
+      "coverage_sha256": "fc7f82849ed70b1a39ea7094f95e254ae56715a10ea1bdbf7bc07ef99a69a18d",
+      "plan_sha256": "df6a6964e8bf753f96166356d4e949ff2ea38087ceddf1b08eca89730cc80f4d",
+      "inputs_digest": "82e5cba1f74cece0bf6e0e8265f59a1fe6e0b5e0b27ed68e2b390203e13378ca",
+      "baseline_counts": [
+        44143,
+        44143,
+        44143
+      ],
+      "totals": {
+        "completed": 44144,
+        "denied": 44143,
+        "successful": 1,
+        "translated": 0
+      },
+      "maximum_part_seconds": 57.8600983590004,
+      "all_maps_verified": true,
+      "all_input_checks": true,
+      "parts": 128
+    },
+    {
+      "profile": "sanitize",
+      "operation": "Replace",
+      "coverage": "artifacts/key-partitions/sanitize-Replace/run-f7915ccafb2f4591b8b81242b2594cf4/coverage.json",
+      "coverage_sha256": "3354fed5447d72f2011748d51ccd1406583162a6ea94aef54c4489db2ca85fdd",
+      "plan_sha256": "36114fef5a7d6b7b4f97825c67003ae0624742b74c1a40d20ddecba3ba6491ae",
+      "inputs_digest": "82e5cba1f74cece0bf6e0e8265f59a1fe6e0b5e0b27ed68e2b390203e13378ca",
+      "baseline_counts": [
+        44993,
+        44993,
+        44993
+      ],
+      "totals": {
+        "completed": 44994,
+        "denied": 44993,
+        "successful": 1,
+        "translated": 0
+      },
+      "maximum_part_seconds": 120.47833845100831,
+      "all_maps_verified": true,
+      "all_input_checks": true,
+      "parts": 128
+    }
+  ],
+  "elapsed_timestamp": 1793888256.784608
+}

@@ -4244,6 +4244,9 @@ if(BUILD_TESTING)
   add_executable(dome-sculpt-canonical-paint-uv-kernel-test tests/canonical-paint-uv-kernel.cpp)
   target_include_directories(dome-sculpt-canonical-paint-uv-kernel-test PRIVATE src)
   target_link_libraries(dome-sculpt-canonical-paint-uv-kernel-test PRIVATE dome-sculpt-core)
+  add_executable(dome-sculpt-canonical-paint37-emission-mixed-test tests/canonical-paint37-emission-mixed.cpp)
+  target_include_directories(dome-sculpt-canonical-paint37-emission-mixed-test PRIVATE src third_party/cgltf)
+  target_link_libraries(dome-sculpt-canonical-paint37-emission-mixed-test PRIVATE dome-sculpt-render)
   add_executable(dome-sculpt-canonical-paint37-emission-render-test tests/canonical-paint37-emission-render.cpp)
   target_include_directories(dome-sculpt-canonical-paint37-emission-render-test PRIVATE src third_party/cgltf)
   target_link_libraries(dome-sculpt-canonical-paint37-emission-render-test PRIVATE dome-sculpt-render)
@@ -4462,9 +4465,10 @@ if(BUILD_TESTING AND TARGET dome-sculpt-render)
   set(_canonical37_hdr_input ${CMAKE_CURRENT_BINARY_DIR}/canonical-paint37-native-7-4/1.dsculpt)
   add_test(NAME canonical-paint37-emission-worker COMMAND dome-sculpt-canonical-paint37-emission-test ${_canonical37_hdr_input} ${CMAKE_CURRENT_BINARY_DIR}/canonical-paint37-emission-worker --positive)
   add_test(NAME canonical-paint37-emission-render COMMAND dome-sculpt-canonical-paint37-emission-render-test ${_canonical37_hdr_input} ${CMAKE_CURRENT_BINARY_DIR}/canonical-paint37-emission-render)
+  add_test(NAME canonical-paint37-emission-mixed COMMAND dome-sculpt-canonical-paint37-emission-mixed-test ${_canonical37_hdr_input} ${CMAKE_CURRENT_BINARY_DIR}/canonical-paint37-emission-mixed)
   add_test(NAME canonical-paint37-emission-contracts COMMAND dome-sculpt-canonical-paint37-emission-contracts-test ${_canonical37_hdr_input} ${CMAKE_CURRENT_BINARY_DIR}/canonical-paint37-emission-contracts)
   set(_canonical37_fault_env "LIBGL_ALWAYS_SOFTWARE=1;LP_NUM_THREADS=2;XR_RUNTIME_JSON=${CMAKE_CURRENT_BINARY_DIR}/canonical37-no-physical-runtime.json")
-  set_tests_properties(canonical-paint37-emission-worker canonical-paint37-emission-render canonical-paint37-emission-contracts PROPERTIES FIXTURES_REQUIRED canonical_paint37_native_key TIMEOUT 3600 ENVIRONMENT "${_canonical37_fault_env}")
+  set_tests_properties(canonical-paint37-emission-worker canonical-paint37-emission-render canonical-paint37-emission-mixed canonical-paint37-emission-contracts PROPERTIES FIXTURES_REQUIRED canonical_paint37_native_key TIMEOUT 3600 ENVIRONMENT "${_canonical37_fault_env}")
   # Every absolute persistent-denial prefix is retained. Independent partitions
   # avoid the old monolithic 3600-second timeout without increasing that limit.
   # The original --oom native CLI remains available for diagnostics.
@@ -4516,4 +4520,43 @@ if(BUILD_TESTING AND TARGET dome-sculpt-render)
   add_test(NAME canonical-paint37-post-key-uv COMMAND dome-sculpt-canonical-paint37-post-key-uv-test ${_canonical37_hdr_input} ${CMAKE_CURRENT_BINARY_DIR}/canonical-paint37-post-key-uv)
   set_tests_properties(canonical-paint37-key-quota canonical-paint37-key-quota-boundary canonical-paint37-post-key-uv PROPERTIES FIXTURES_REQUIRED canonical_paint37_native_key TIMEOUT 1200)
   set_tests_properties(canonical-paint37-native-7-0 canonical-paint37-key-author canonical-paint37-key-images canonical-paint37-key-controls canonical-paint37-key-quota canonical-paint37-key-quota-boundary canonical-paint37-post-key-uv PROPERTIES ENVIRONMENT "LIBGL_ALWAYS_SOFTWARE=1;LP_NUM_THREADS=2;XR_RUNTIME_JSON=${CMAKE_CURRENT_BINARY_DIR}/canonical37-no-physical-runtime.json")
+endif()
+
+# Native fresh-calling-thread key faults use the measured complete interval.
+# Each operation has an immutable plan and all of its explicit partitions.
+if(BUILD_TESTING AND TARGET dome-sculpt-render)
+  add_executable(dome-sculpt-canonical-paint37-key-allocation-test tests/canonical-paint37-key-allocation.cpp)
+  target_include_directories(dome-sculpt-canonical-paint37-key-allocation-test PRIVATE src)
+  target_link_libraries(dome-sculpt-canonical-paint37-key-allocation-test PRIVATE dome-sculpt-core)
+  find_package(Python3 REQUIRED COMPONENTS Interpreter)
+  set(DOME_KEY_OOM_PARTITIONS 128 CACHE STRING "Exhaustive fresh-caller key allocation partitions (2..512)")
+  if(NOT DOME_KEY_OOM_PARTITIONS MATCHES "^[0-9]+$" OR DOME_KEY_OOM_PARTITIONS LESS 2 OR DOME_KEY_OOM_PARTITIONS GREATER 512)
+    message(FATAL_ERROR "DOME_KEY_OOM_PARTITIONS must be an integer in [2,512]")
+  endif()
+  set(_key_fault_runner ${CMAKE_CURRENT_SOURCE_DIR}/tests/key-oom-partitions.py)
+  add_test(NAME canonical-paint37-key-fault-verifier COMMAND ${Python3_EXECUTABLE} ${_key_fault_runner} controls)
+  set_tests_properties(canonical-paint37-key-fault-verifier PROPERTIES TIMEOUT 30 FIXTURES_SETUP canonical37_key_fault_verifier)
+  math(EXPR _key_last_part "${DOME_KEY_OOM_PARTITIONS} - 1")
+  foreach(_operation IN ITEMS Create Replace)
+    string(TOLOWER "${_operation}" _operation_lower)
+    set(_key_root ${CMAKE_CURRENT_BINARY_DIR}/canonical-paint37-key-${_operation_lower}-faults)
+    set(_key_plan canonical37_key_${_operation_lower}_fault_plan)
+    set(_key_parts canonical37_key_${_operation_lower}_fault_parts)
+    add_test(NAME canonical-paint37-key-${_operation_lower}-fault-plan COMMAND ${Python3_EXECUTABLE} ${_key_fault_runner} prepare ${_key_root}
+      --binary $<TARGET_FILE:dome-sculpt-canonical-paint37-key-allocation-test>
+      --fixture ${_canonical37_hdr_input} --source ${CMAKE_CURRENT_SOURCE_DIR}
+      --operation ${_operation} --measure-baseline --partitions ${DOME_KEY_OOM_PARTITIONS})
+    set_tests_properties(canonical-paint37-key-${_operation_lower}-fault-plan PROPERTIES
+      FIXTURES_REQUIRED "canonical_paint37_native_key;canonical37_key_fault_verifier" FIXTURES_SETUP ${_key_plan}
+      TIMEOUT 3600 ENVIRONMENT "${_canonical37_fault_env}")
+    foreach(_part RANGE 0 ${_key_last_part})
+      add_test(NAME canonical-paint37-key-${_operation_lower}-fault-part-${_part}
+        COMMAND ${Python3_EXECUTABLE} ${_key_fault_runner} part ${_key_root} ${_part})
+      set_tests_properties(canonical-paint37-key-${_operation_lower}-fault-part-${_part} PROPERTIES
+        FIXTURES_REQUIRED ${_key_plan} FIXTURES_SETUP ${_key_parts} TIMEOUT 3600 ENVIRONMENT "${_canonical37_fault_env}")
+    endforeach()
+    add_test(NAME canonical-paint37-key-${_operation_lower}-faults COMMAND ${Python3_EXECUTABLE} ${_key_fault_runner} aggregate ${_key_root})
+    set_tests_properties(canonical-paint37-key-${_operation_lower}-faults PROPERTIES
+      FIXTURES_REQUIRED "${_key_plan};${_key_parts}" TIMEOUT 3600 ENVIRONMENT "${_canonical37_fault_env}")
+  endforeach()
 endif()

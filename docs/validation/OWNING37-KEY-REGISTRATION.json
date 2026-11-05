@@ -1,0 +1,38 @@
+{
+  "scope": "Source/test-framework integration only, NO native merged-product build/runtime qualification",
+  "parents": [
+    "472c74b15932b6216eb3ed4651dd83a7aaf2d66b",
+    "508338c4"
+  ],
+  "product_delta_from_472c74b": [],
+  "conflicts": {
+    "tests/canonical-paint37-key-controls.cpp": "Preserve exact current factory-mutable-array adversaries; older incoming decoded const-array mutation is not reinstated",
+    "tests/canonical-paint37-key-images.cpp": "Preserve exact self-contained registered canonical-paint37-native fixture paths"
+  },
+  "CMake": "Retain current foreach-defined key targets once; drop duplicate incoming definitions; register native fresh-key consumer, synthetic verifier, Create/Replace prepare+128partitions+aggregate and self-contained mixed emission",
+  "baseline_policy": "Explicit mutually-exclusive choice: existing --expect-baseline enforces exact pinned integer; new --measure-baseline requires three equal fresh-caller native measurements and pins every point0..N. No sampling, prefix pruning, interval/endpoint/fixture/input/environment/map/retry check removed.",
+  "endpoint_checks": "Additional uninjected checks outside fault count require real Create target cardinality/unique name/neutral REST and exact Replace identity/REST displacements; syntax checked only, runtime still pending",
+  "registration": {
+    "scope": "Configuration/registration and synthetic verifier only; no native merged product execution",
+    "registered_count": 1210,
+    "unique": true,
+    "Create_parts": 128,
+    "Replace_parts": 128,
+    "fresh_measurement_baseline": true,
+    "original_explicit_baseline_option_retained": true,
+    "synthetic_coverage_controls": 30,
+    "native_factory_rerun": false
+  },
+  "unchanged_current_adversary_sha256": {
+    "tests/canonical-paint37-key-controls.cpp": "8ffe78e7a9490d3202c07cdb8a22d666d22cb4997ac1a8dbcfb3e45fb18dec21",
+    "tests/canonical-paint37-key-images.cpp": "6673910ce2ff821066647ab26eef408b75dc244a4d8e6ed20bb5ee42eedeba68"
+  },
+  "new_framework_sha256": {
+    "CMakeLists.txt": "d1102f929cb2f5e9e9748fd475cf9130961c8436b3852d303331e5478bbffbd6",
+    "tests/canonical-paint37-key-allocation.cpp": "a0634ba19ef6ae991a88d72386c5152102a89c9b3b80da3c69d9b91788f11c10",
+    "tests/key-oom-partitions.py": "544ccd2e6e9ac6dd0bf33741d0a6963bc21ba54546abe643e22be449493f439c"
+  },
+  "native_key_source_syntax_exit": 0,
+  "source_freeze_required": "All tracked source/headers/scripts/assets and exact build/DSO inputs while a native plan is live",
+  "remaining": "Merge admitted polygon/weight/caller source; fresh coherent owning builds and actual native/GUI/device/interop qualification"
+}
