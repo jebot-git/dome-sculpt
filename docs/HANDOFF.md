@@ -1,3 +1,18 @@
+## Direct immutable geometry uploads admitted — 2026-11-06
+
+Main integrates qualified9f89fce on537c98b. The renderer uploads immutable arrays
+without full interleaved CPU geometry copies; plain GPU geometry stores24 rather
+than56 bytes per vertex. Fresh whole renderer/reference, XR and ordinary app
+consumers pass matched R/S73 direct controls, existing renderer suites and13442
+current input checks. Ordinary desktop/software-loader58 per profile pass;
+58 corresponding frame/native pairs are exact. Root independently verifies501
+unique files,98 headers and the current complete nine input/query providers.
+Read RENDER-DIRECT-UPLOAD-INTEGRATION.md and its receipt. This is component/app
+qualification, not fresh ALL, new hardware/HMD or a frame-time benchmark. Full
+geometry uploads/derived-coordinate work, bounded local extraction, polygon
+fields, texture sets, avatar/interoperability/accelerator and drawers remain
+required. No installation or session restart. Full goal active and incomplete.
+
 ## Caller and real XR input admission — 2026-11-06
 
 Main integrates qualified0cbc089 on5b02bfc: atomic caller/frame retopology

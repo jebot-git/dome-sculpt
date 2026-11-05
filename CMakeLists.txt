@@ -1599,6 +1599,14 @@ if(BUILD_TESTING)
 endif()
 
 if(BUILD_TESTING AND TARGET dome-sculpt-render)
+  add_executable(dome-sculpt-render-direct-upload-test tests/render-direct-upload.cpp)
+  target_link_libraries(dome-sculpt-render-direct-upload-test PRIVATE dome-sculpt-render)
+  target_link_options(dome-sculpt-render-direct-upload-test PRIVATE
+    -Wl,--wrap=glBufferData -Wl,--wrap=glBufferSubData)
+  add_test(NAME render-direct-upload COMMAND dome-sculpt-render-direct-upload-test
+    direct ${CMAKE_CURRENT_BINARY_DIR}/render-direct-upload)
+  set_tests_properties(render-direct-upload PROPERTIES
+    ENVIRONMENT "LIBGL_ALWAYS_SOFTWARE=1;LP_NUM_THREADS=2" TIMEOUT 120)
   add_executable(dome-sculpt-render-buffers-test tests/render-buffers.cpp)
   target_link_libraries(dome-sculpt-render-buffers-test PRIVATE dome-sculpt-render)
   target_link_options(dome-sculpt-render-buffers-test PRIVATE -Wl,--wrap=glBufferData)
