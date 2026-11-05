@@ -47,19 +47,33 @@ tests pass per profile on product-exact541 support, with no fixture guard lifted
 Currentf36570c also passes actual whole-app ordinary package4/Open/Save GUI12normal
 +12compact/profile and scoped Arc1506 with six software controls. The initial Arc
 manifest omits one native36 input; a separate protected same-binary115 follow-up
-closes that input scope. Remaining140 selected regressions are live, not passed.
-798registered is not a full runtime result;37 and physical4 remain outside main.
+closes that input scope. Release remaining140 closes134passed/6failed: five
+expression fault tests report late preflight refusal, and mixed native/normal
+authoring stops at its old33/34-only format assertion after the first two
+converted-source export orders pass. These failures remain recorded; the latter
+requires genuine owner/format consumer migration, not a version-only exemption.
+Together154/160 selected Release tests pass. The same owning sanitizer remainder
+is still running.798registered is not a full runtime result;37 and physical4
+remain outside main until the regressions and remaining admission controls close.
 
 Automatic weights remain experimental. Source-aware heat/role helpers now pass
 874 original+local avatar comparisons, but general closed-affine/edited domains
-and actual native publication/default integration remain open. Default weights
-are unchanged. Normal milestone6826452 is sealed separately with real worker,
+and actual native publication/default integration remain open. The fresh owning
+sanitizer four-consumer build completes; its actual runtime suite remains live.
+Default weights are unchanged. Normal milestone6826452 is sealed separately with real worker,
 Apply/history, factory, independent and hardware proof; it is not yet integrated
 with the current source/paint37 cohort. Full regression, remaining authoring/
 interoperability, physical devices and accelerator evidence remain required.
 Older full689 failures remain preserved; converter-consumer migration is in the
 separate37 candidate. Accepted XR selection remains; controller drawers follow
-the basic targets. The full objective remains active and incomplete.
+the basic targets. Separately, actual new-key editing after canonical paint passes
+19 native and26 owner/cancel checks per Release/sanitizer profile, actual FLTK
+34normal/36compact checks, and226 strict Arc checks across63 image cases with
+actual software/UHD refusals. That candidate and its remaining fault/command-path
+qualification are outside main. The original source-world sanitizer process now
+finishes successfully after43,388seconds, including66,187 persistent denial
+prefixes and908 cancellation points; its closure is preserved separately.
+The full objective remains active and incomplete.
 
 ## Qualified PBR renderer specialization — 2026-11-05
 
