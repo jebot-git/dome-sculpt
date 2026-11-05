@@ -17,15 +17,17 @@ remain. No product, header, class layout, schema, CMake or image bound changes.
 The complete changed consumer TU uses exact matching own headers and immutable
 support from each completed whole-own37 build. Release and owning sanitizer each
 pass229 controls/eight comparisons, maximum1 within the unchanged4. The sanitizer
-consumer uses the actual immutable Release-worker input files; the larger root
-sanitizer invocation has not yet produced its own fixtures. No sanitizer-producer
-workflow claim follows. All source/support/fixture manifests remain exact.
+consumer initially uses the actual immutable Release-worker input files. Once
+the original registered sanitizer Convert/UV/Clear/rebake and native32 producers
+finish, the same unchanged consumer also executes their actual sameprofile files:
+229 checks pass in6.829seconds. Both original scopes remain recorded; the larger
+root sanitizer remainder stays live. All source/support/fixture manifests are exact.
 
 The same Release binary passes229 on actual PCI03 Intel Arc A770, verified with
 render-node descriptors, sysfs identity and mapped driver hashes. Actual forced
-llvmpipe and actual UHD770 each refuse the strict hardware request. All24 emitted
-GLBs have zero Khronos errors,24 warnings and96 infos; all eight corresponding
-files are byte-identical across Release/sanitizer/Arc. Full messages are retained
+llvmpipe and actual UHD770 each refuse the strict hardware request. All32 emitted
+GLBs have zero Khronos errors,32 warnings and128 infos; all eight corresponding
+files are byte-identical across Release/sanitizer/Arc and the subsequent actual SAN producer files. Full messages are retained
 with maxIssues0 in the JSON receipt.
 
 This is a private consumer migration milestone, outside main. The root owning37

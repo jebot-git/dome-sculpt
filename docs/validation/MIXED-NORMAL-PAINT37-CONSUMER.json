@@ -8,8 +8,8 @@
   "unchanged_allowed_error": 4,
   "production_changed": false,
   "main_admitted": false,
-  "actual_sanitizer_fixture_producer": false,
-  "sanitizer_fixture_scope": "SAN whole consumer decodes actual immutable Release-worker inputs; original larger SAN10303 has not yet produced its own normal/native fixtures. This does not qualify that pending producer workflow.",
+  "actual_sanitizer_fixture_producer": true,
+  "sanitizer_fixture_scope": "Original root actual registered sameprofile layered-normal-native, layered-normal-uv-native and native-paint32-fixture have now finished; same unchanged whole SAN consumer executes those newly available files directly,229checks0/6.829sec. Initial immutable Release-fixture scope retained separately; root whole160 remainder stilllive, not passed.",
   "profiles": {
     "release": {
       "status": {
@@ -352,14 +352,35 @@
         "drift": []
       },
       "before_manifest_sha256": "9b8330677ae96643bc9e2c99d7d4fe4ad42daa92d8023a9e8b237f91d9a6d89e"
+    },
+    "sanitize-own-fixtures": {
+      "status": {
+        "state": "terminal",
+        "pid": 2902044,
+        "scope": "Same unchanged complete migrated sanitizer consumer and immutable wholly owning SAN support now executes actual sameprofile native Convert/UV/Clear/rebake+native32 producer files after their own original registered commands finish. Root160 remainder stilllive/frozen, not a green/full-suite claim. No compile or source change.",
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/union37-consumer-f365/artifacts/union37-proof/sanitize-release-fixtures/consumer",
+          "/home/blux/de-xr/dome-sculpt/artifacts/authoring37-rim-0ea/build-coherent37-sanitize/layered-normal-native",
+          "/home/blux/de-xr/dome-sculpt/artifacts/authoring37-rim-0ea/build-coherent37-sanitize/layered-normal-uv-native",
+          "/home/blux/de-xr/dome-sculpt/artifacts/authoring37-rim-0ea/build-coherent37-sanitize/native-paint32-fixture.dsculpt",
+          "/home/blux/de-xr/dome-sculpt/artifacts/union37-consumer-f365/artifacts/union37-proof/sanitize-own-fixtures/outputs"
+        ],
+        "binary_sha256": "2f0d329da38277603e4000d1e1045973c2f0917ebcd2ac8210fe7806c3298dae",
+        "child_pid": 2902316,
+        "exit_code": 0,
+        "seconds": 6.829103798023425,
+        "inputs": 2750,
+        "drift": []
+      },
+      "before_manifest_sha256": "6d429d651a9bcb5166c210c8a7890a45af5b814b944c1f99307c0e1a50ecea2d"
     }
   },
   "Khronos": {
-    "files": 24,
+    "files": 32,
     "totals": {
       "errors": 0,
-      "warnings": 24,
-      "infos": 96,
+      "warnings": 32,
+      "infos": 128,
       "hints": 0
     },
     "maxIssues": 0,
@@ -373,7 +394,7 @@
           "uri": "/home/blux/de-xr/dome-sculpt/artifacts/union37-consumer-f365/artifacts/union37-proof/release/outputs/0.glb",
           "mimeType": "model/gltf-binary",
           "validatorVersion": "2.0.0-dev.3.10",
-          "validatedAt": "2026-11-05T07:26:40.561Z",
+          "validatedAt": "2026-11-05T07:36:01.782Z",
           "issues": {
             "numErrors": 0,
             "numWarnings": 1,
@@ -548,7 +569,7 @@
           "uri": "/home/blux/de-xr/dome-sculpt/artifacts/union37-consumer-f365/artifacts/union37-proof/release/outputs/1.glb",
           "mimeType": "model/gltf-binary",
           "validatorVersion": "2.0.0-dev.3.10",
-          "validatedAt": "2026-11-05T07:26:40.569Z",
+          "validatedAt": "2026-11-05T07:36:01.793Z",
           "issues": {
             "numErrors": 0,
             "numWarnings": 1,
@@ -723,7 +744,7 @@
           "uri": "/home/blux/de-xr/dome-sculpt/artifacts/union37-consumer-f365/artifacts/union37-proof/release/outputs/2.glb",
           "mimeType": "model/gltf-binary",
           "validatorVersion": "2.0.0-dev.3.10",
-          "validatedAt": "2026-11-05T07:26:40.575Z",
+          "validatedAt": "2026-11-05T07:36:01.801Z",
           "issues": {
             "numErrors": 0,
             "numWarnings": 1,
@@ -904,7 +925,7 @@
           "uri": "/home/blux/de-xr/dome-sculpt/artifacts/union37-consumer-f365/artifacts/union37-proof/release/outputs/3.glb",
           "mimeType": "model/gltf-binary",
           "validatorVersion": "2.0.0-dev.3.10",
-          "validatedAt": "2026-11-05T07:26:40.582Z",
+          "validatedAt": "2026-11-05T07:36:01.807Z",
           "issues": {
             "numErrors": 0,
             "numWarnings": 1,
@@ -1085,7 +1106,7 @@
           "uri": "/home/blux/de-xr/dome-sculpt/artifacts/union37-consumer-f365/artifacts/union37-proof/release/outputs/4.glb",
           "mimeType": "model/gltf-binary",
           "validatorVersion": "2.0.0-dev.3.10",
-          "validatedAt": "2026-11-05T07:26:40.588Z",
+          "validatedAt": "2026-11-05T07:36:01.814Z",
           "issues": {
             "numErrors": 0,
             "numWarnings": 1,
@@ -1259,7 +1280,7 @@
           "uri": "/home/blux/de-xr/dome-sculpt/artifacts/union37-consumer-f365/artifacts/union37-proof/release/outputs/5.glb",
           "mimeType": "model/gltf-binary",
           "validatorVersion": "2.0.0-dev.3.10",
-          "validatedAt": "2026-11-05T07:26:40.593Z",
+          "validatedAt": "2026-11-05T07:36:01.821Z",
           "issues": {
             "numErrors": 0,
             "numWarnings": 1,
@@ -1433,7 +1454,7 @@
           "uri": "/home/blux/de-xr/dome-sculpt/artifacts/union37-consumer-f365/artifacts/union37-proof/release/outputs/6.glb",
           "mimeType": "model/gltf-binary",
           "validatorVersion": "2.0.0-dev.3.10",
-          "validatedAt": "2026-11-05T07:26:40.598Z",
+          "validatedAt": "2026-11-05T07:36:01.829Z",
           "issues": {
             "numErrors": 0,
             "numWarnings": 1,
@@ -1614,7 +1635,7 @@
           "uri": "/home/blux/de-xr/dome-sculpt/artifacts/union37-consumer-f365/artifacts/union37-proof/release/outputs/7.glb",
           "mimeType": "model/gltf-binary",
           "validatorVersion": "2.0.0-dev.3.10",
-          "validatedAt": "2026-11-05T07:26:40.603Z",
+          "validatedAt": "2026-11-05T07:36:01.835Z",
           "issues": {
             "numErrors": 0,
             "numWarnings": 1,
@@ -1795,7 +1816,7 @@
           "uri": "/home/blux/de-xr/dome-sculpt/artifacts/union37-consumer-f365/artifacts/union37-proof/arc/arc/0.glb",
           "mimeType": "model/gltf-binary",
           "validatorVersion": "2.0.0-dev.3.10",
-          "validatedAt": "2026-11-05T07:26:40.609Z",
+          "validatedAt": "2026-11-05T07:36:01.849Z",
           "issues": {
             "numErrors": 0,
             "numWarnings": 1,
@@ -1970,7 +1991,7 @@
           "uri": "/home/blux/de-xr/dome-sculpt/artifacts/union37-consumer-f365/artifacts/union37-proof/arc/arc/1.glb",
           "mimeType": "model/gltf-binary",
           "validatorVersion": "2.0.0-dev.3.10",
-          "validatedAt": "2026-11-05T07:26:40.614Z",
+          "validatedAt": "2026-11-05T07:36:01.858Z",
           "issues": {
             "numErrors": 0,
             "numWarnings": 1,
@@ -2145,7 +2166,7 @@
           "uri": "/home/blux/de-xr/dome-sculpt/artifacts/union37-consumer-f365/artifacts/union37-proof/arc/arc/2.glb",
           "mimeType": "model/gltf-binary",
           "validatorVersion": "2.0.0-dev.3.10",
-          "validatedAt": "2026-11-05T07:26:40.621Z",
+          "validatedAt": "2026-11-05T07:36:01.864Z",
           "issues": {
             "numErrors": 0,
             "numWarnings": 1,
@@ -2326,7 +2347,7 @@
           "uri": "/home/blux/de-xr/dome-sculpt/artifacts/union37-consumer-f365/artifacts/union37-proof/arc/arc/3.glb",
           "mimeType": "model/gltf-binary",
           "validatorVersion": "2.0.0-dev.3.10",
-          "validatedAt": "2026-11-05T07:26:40.625Z",
+          "validatedAt": "2026-11-05T07:36:01.870Z",
           "issues": {
             "numErrors": 0,
             "numWarnings": 1,
@@ -2507,7 +2528,7 @@
           "uri": "/home/blux/de-xr/dome-sculpt/artifacts/union37-consumer-f365/artifacts/union37-proof/arc/arc/4.glb",
           "mimeType": "model/gltf-binary",
           "validatorVersion": "2.0.0-dev.3.10",
-          "validatedAt": "2026-11-05T07:26:40.629Z",
+          "validatedAt": "2026-11-05T07:36:01.874Z",
           "issues": {
             "numErrors": 0,
             "numWarnings": 1,
@@ -2681,7 +2702,7 @@
           "uri": "/home/blux/de-xr/dome-sculpt/artifacts/union37-consumer-f365/artifacts/union37-proof/arc/arc/5.glb",
           "mimeType": "model/gltf-binary",
           "validatorVersion": "2.0.0-dev.3.10",
-          "validatedAt": "2026-11-05T07:26:40.634Z",
+          "validatedAt": "2026-11-05T07:36:01.881Z",
           "issues": {
             "numErrors": 0,
             "numWarnings": 1,
@@ -2855,7 +2876,7 @@
           "uri": "/home/blux/de-xr/dome-sculpt/artifacts/union37-consumer-f365/artifacts/union37-proof/arc/arc/6.glb",
           "mimeType": "model/gltf-binary",
           "validatorVersion": "2.0.0-dev.3.10",
-          "validatedAt": "2026-11-05T07:26:40.638Z",
+          "validatedAt": "2026-11-05T07:36:01.888Z",
           "issues": {
             "numErrors": 0,
             "numWarnings": 1,
@@ -3036,7 +3057,7 @@
           "uri": "/home/blux/de-xr/dome-sculpt/artifacts/union37-consumer-f365/artifacts/union37-proof/arc/arc/7.glb",
           "mimeType": "model/gltf-binary",
           "validatorVersion": "2.0.0-dev.3.10",
-          "validatedAt": "2026-11-05T07:26:40.642Z",
+          "validatedAt": "2026-11-05T07:36:01.896Z",
           "issues": {
             "numErrors": 0,
             "numWarnings": 1,
@@ -3217,7 +3238,7 @@
           "uri": "/home/blux/de-xr/dome-sculpt/artifacts/union37-consumer-f365/artifacts/union37-proof/sanitize-release-fixtures/outputs/0.glb",
           "mimeType": "model/gltf-binary",
           "validatorVersion": "2.0.0-dev.3.10",
-          "validatedAt": "2026-11-05T07:26:40.645Z",
+          "validatedAt": "2026-11-05T07:36:01.902Z",
           "issues": {
             "numErrors": 0,
             "numWarnings": 1,
@@ -3392,7 +3413,7 @@
           "uri": "/home/blux/de-xr/dome-sculpt/artifacts/union37-consumer-f365/artifacts/union37-proof/sanitize-release-fixtures/outputs/1.glb",
           "mimeType": "model/gltf-binary",
           "validatorVersion": "2.0.0-dev.3.10",
-          "validatedAt": "2026-11-05T07:26:40.648Z",
+          "validatedAt": "2026-11-05T07:36:01.906Z",
           "issues": {
             "numErrors": 0,
             "numWarnings": 1,
@@ -3567,7 +3588,7 @@
           "uri": "/home/blux/de-xr/dome-sculpt/artifacts/union37-consumer-f365/artifacts/union37-proof/sanitize-release-fixtures/outputs/2.glb",
           "mimeType": "model/gltf-binary",
           "validatorVersion": "2.0.0-dev.3.10",
-          "validatedAt": "2026-11-05T07:26:40.652Z",
+          "validatedAt": "2026-11-05T07:36:01.911Z",
           "issues": {
             "numErrors": 0,
             "numWarnings": 1,
@@ -3748,7 +3769,7 @@
           "uri": "/home/blux/de-xr/dome-sculpt/artifacts/union37-consumer-f365/artifacts/union37-proof/sanitize-release-fixtures/outputs/3.glb",
           "mimeType": "model/gltf-binary",
           "validatorVersion": "2.0.0-dev.3.10",
-          "validatedAt": "2026-11-05T07:26:40.654Z",
+          "validatedAt": "2026-11-05T07:36:01.915Z",
           "issues": {
             "numErrors": 0,
             "numWarnings": 1,
@@ -3929,7 +3950,7 @@
           "uri": "/home/blux/de-xr/dome-sculpt/artifacts/union37-consumer-f365/artifacts/union37-proof/sanitize-release-fixtures/outputs/4.glb",
           "mimeType": "model/gltf-binary",
           "validatorVersion": "2.0.0-dev.3.10",
-          "validatedAt": "2026-11-05T07:26:40.657Z",
+          "validatedAt": "2026-11-05T07:36:01.918Z",
           "issues": {
             "numErrors": 0,
             "numWarnings": 1,
@@ -4103,7 +4124,7 @@
           "uri": "/home/blux/de-xr/dome-sculpt/artifacts/union37-consumer-f365/artifacts/union37-proof/sanitize-release-fixtures/outputs/5.glb",
           "mimeType": "model/gltf-binary",
           "validatorVersion": "2.0.0-dev.3.10",
-          "validatedAt": "2026-11-05T07:26:40.659Z",
+          "validatedAt": "2026-11-05T07:36:01.923Z",
           "issues": {
             "numErrors": 0,
             "numWarnings": 1,
@@ -4277,7 +4298,7 @@
           "uri": "/home/blux/de-xr/dome-sculpt/artifacts/union37-consumer-f365/artifacts/union37-proof/sanitize-release-fixtures/outputs/6.glb",
           "mimeType": "model/gltf-binary",
           "validatorVersion": "2.0.0-dev.3.10",
-          "validatedAt": "2026-11-05T07:26:40.662Z",
+          "validatedAt": "2026-11-05T07:36:01.929Z",
           "issues": {
             "numErrors": 0,
             "numWarnings": 1,
@@ -4458,7 +4479,1429 @@
           "uri": "/home/blux/de-xr/dome-sculpt/artifacts/union37-consumer-f365/artifacts/union37-proof/sanitize-release-fixtures/outputs/7.glb",
           "mimeType": "model/gltf-binary",
           "validatorVersion": "2.0.0-dev.3.10",
-          "validatedAt": "2026-11-05T07:26:40.665Z",
+          "validatedAt": "2026-11-05T07:36:01.934Z",
+          "issues": {
+            "numErrors": 0,
+            "numWarnings": 1,
+            "numInfos": 4,
+            "numHints": 0,
+            "messages": [
+              {
+                "code": "UNUSED_OBJECT",
+                "message": "This object may be unused.",
+                "severity": 2,
+                "pointer": "/meshes/0/primitives/0/attributes/TEXCOORD_0"
+              },
+              {
+                "code": "UNUSED_OBJECT",
+                "message": "This object may be unused.",
+                "severity": 2,
+                "pointer": "/meshes/1/primitives/0/attributes/TEXCOORD_0"
+              },
+              {
+                "code": "NODE_SKINNED_MESH_NON_ROOT",
+                "message": "Node with a skinned mesh is not root. Parent transforms will not affect a skinned mesh.",
+                "severity": 1,
+                "pointer": "/nodes/2"
+              },
+              {
+                "code": "UNUSED_OBJECT",
+                "message": "This object may be unused.",
+                "severity": 2,
+                "pointer": "/bufferViews/26"
+              },
+              {
+                "code": "UNUSED_OBJECT",
+                "message": "This object may be unused.",
+                "severity": 2,
+                "pointer": "/textures/2"
+              }
+            ],
+            "truncated": false
+          },
+          "info": {
+            "version": "2.0",
+            "generator": "Dome Sculpt",
+            "extensionsUsed": [
+              "KHR_texture_transform",
+              "KHR_materials_emissive_strength"
+            ],
+            "resources": [
+              {
+                "pointer": "/buffers/0",
+                "mimeType": "application/gltf-buffer",
+                "storage": "glb",
+                "byteLength": 936280
+              },
+              {
+                "pointer": "/images/0",
+                "mimeType": "image/png",
+                "storage": "buffer-view",
+                "image": {
+                  "width": 64,
+                  "height": 64,
+                  "format": "rgba",
+                  "primaries": "srgb",
+                  "transfer": "srgb",
+                  "bits": 8
+                }
+              },
+              {
+                "pointer": "/images/1",
+                "mimeType": "image/png",
+                "storage": "buffer-view",
+                "image": {
+                  "width": 64,
+                  "height": 64,
+                  "format": "rgba",
+                  "primaries": "srgb",
+                  "transfer": "srgb",
+                  "bits": 8
+                }
+              },
+              {
+                "pointer": "/images/2",
+                "mimeType": "image/png",
+                "storage": "buffer-view",
+                "image": {
+                  "width": 64,
+                  "height": 64,
+                  "format": "rgba",
+                  "primaries": "srgb",
+                  "transfer": "srgb",
+                  "bits": 8
+                }
+              },
+              {
+                "pointer": "/images/3",
+                "mimeType": "image/png",
+                "storage": "buffer-view",
+                "image": {
+                  "width": 64,
+                  "height": 64,
+                  "format": "rgba",
+                  "primaries": "srgb",
+                  "transfer": "srgb",
+                  "bits": 8
+                }
+              },
+              {
+                "pointer": "/images/4",
+                "mimeType": "image/png",
+                "storage": "buffer-view",
+                "image": {
+                  "width": 64,
+                  "height": 64,
+                  "format": "rgba",
+                  "primaries": "srgb",
+                  "transfer": "srgb",
+                  "bits": 8
+                }
+              },
+              {
+                "pointer": "/images/5",
+                "mimeType": "image/png",
+                "storage": "buffer-view",
+                "image": {
+                  "width": 64,
+                  "height": 64,
+                  "format": "rgba",
+                  "primaries": "srgb",
+                  "transfer": "srgb",
+                  "bits": 8
+                }
+              },
+              {
+                "pointer": "/images/6",
+                "mimeType": "image/png",
+                "storage": "buffer-view",
+                "image": {
+                  "width": 64,
+                  "height": 64,
+                  "format": "rgba",
+                  "primaries": "srgb",
+                  "transfer": "srgb",
+                  "bits": 8
+                }
+              },
+              {
+                "pointer": "/images/7",
+                "mimeType": "image/png",
+                "storage": "buffer-view",
+                "image": {
+                  "width": 256,
+                  "height": 256,
+                  "format": "rgba",
+                  "primaries": "srgb",
+                  "transfer": "srgb",
+                  "bits": 8
+                }
+              }
+            ],
+            "animationCount": 0,
+            "materialCount": 2,
+            "hasMorphTargets": true,
+            "hasSkins": true,
+            "hasTextures": true,
+            "hasDefaultScene": true,
+            "drawCallCount": 2,
+            "totalVertexCount": 12,
+            "totalTriangleCount": 4,
+            "maxUVs": 3,
+            "maxInfluences": 4,
+            "maxAttributes": 8
+          }
+        }
+      },
+      {
+        "file": "/home/blux/de-xr/dome-sculpt/artifacts/union37-consumer-f365/artifacts/union37-proof/sanitize-own-fixtures/outputs/0.glb",
+        "sha256": "35d01b20505a5cac34686c414a5176b1bd20daf891a1b96a2c39ae140a2a386b",
+        "result": {
+          "uri": "/home/blux/de-xr/dome-sculpt/artifacts/union37-consumer-f365/artifacts/union37-proof/sanitize-own-fixtures/outputs/0.glb",
+          "mimeType": "model/gltf-binary",
+          "validatorVersion": "2.0.0-dev.3.10",
+          "validatedAt": "2026-11-05T07:36:01.939Z",
+          "issues": {
+            "numErrors": 0,
+            "numWarnings": 1,
+            "numInfos": 3,
+            "numHints": 0,
+            "messages": [
+              {
+                "code": "UNUSED_OBJECT",
+                "message": "This object may be unused.",
+                "severity": 2,
+                "pointer": "/meshes/1/primitives/0/attributes/TEXCOORD_0"
+              },
+              {
+                "code": "NODE_SKINNED_MESH_NON_ROOT",
+                "message": "Node with a skinned mesh is not root. Parent transforms will not affect a skinned mesh.",
+                "severity": 1,
+                "pointer": "/nodes/1"
+              },
+              {
+                "code": "UNUSED_OBJECT",
+                "message": "This object may be unused.",
+                "severity": 2,
+                "pointer": "/bufferViews/24"
+              },
+              {
+                "code": "UNUSED_OBJECT",
+                "message": "This object may be unused.",
+                "severity": 2,
+                "pointer": "/textures/6"
+              }
+            ],
+            "truncated": false
+          },
+          "info": {
+            "version": "2.0",
+            "generator": "Dome Sculpt",
+            "extensionsUsed": [
+              "KHR_texture_transform",
+              "KHR_materials_emissive_strength"
+            ],
+            "resources": [
+              {
+                "pointer": "/buffers/0",
+                "mimeType": "application/gltf-buffer",
+                "storage": "glb",
+                "byteLength": 765136
+              },
+              {
+                "pointer": "/images/0",
+                "mimeType": "image/png",
+                "storage": "buffer-view",
+                "image": {
+                  "width": 64,
+                  "height": 64,
+                  "format": "rgba",
+                  "primaries": "srgb",
+                  "transfer": "srgb",
+                  "bits": 8
+                }
+              },
+              {
+                "pointer": "/images/1",
+                "mimeType": "image/png",
+                "storage": "buffer-view",
+                "image": {
+                  "width": 64,
+                  "height": 64,
+                  "format": "rgba",
+                  "primaries": "srgb",
+                  "transfer": "srgb",
+                  "bits": 8
+                }
+              },
+              {
+                "pointer": "/images/2",
+                "mimeType": "image/png",
+                "storage": "buffer-view",
+                "image": {
+                  "width": 64,
+                  "height": 64,
+                  "format": "rgba",
+                  "primaries": "srgb",
+                  "transfer": "srgb",
+                  "bits": 8
+                }
+              },
+              {
+                "pointer": "/images/3",
+                "mimeType": "image/png",
+                "storage": "buffer-view",
+                "image": {
+                  "width": 64,
+                  "height": 64,
+                  "format": "rgba",
+                  "primaries": "srgb",
+                  "transfer": "srgb",
+                  "bits": 8
+                }
+              },
+              {
+                "pointer": "/images/4",
+                "mimeType": "image/png",
+                "storage": "buffer-view",
+                "image": {
+                  "width": 64,
+                  "height": 64,
+                  "format": "rgba",
+                  "primaries": "srgb",
+                  "transfer": "srgb",
+                  "bits": 8
+                }
+              },
+              {
+                "pointer": "/images/5",
+                "mimeType": "image/png",
+                "storage": "buffer-view",
+                "image": {
+                  "width": 64,
+                  "height": 64,
+                  "format": "rgba",
+                  "primaries": "srgb",
+                  "transfer": "srgb",
+                  "bits": 8
+                }
+              },
+              {
+                "pointer": "/images/6",
+                "mimeType": "image/png",
+                "storage": "buffer-view",
+                "image": {
+                  "width": 64,
+                  "height": 64,
+                  "format": "rgba",
+                  "primaries": "srgb",
+                  "transfer": "srgb",
+                  "bits": 8
+                }
+              },
+              {
+                "pointer": "/images/7",
+                "mimeType": "image/png",
+                "storage": "buffer-view",
+                "image": {
+                  "width": 256,
+                  "height": 256,
+                  "format": "rgba",
+                  "primaries": "srgb",
+                  "transfer": "srgb",
+                  "bits": 8
+                }
+              }
+            ],
+            "animationCount": 0,
+            "materialCount": 2,
+            "hasMorphTargets": true,
+            "hasSkins": true,
+            "hasTextures": true,
+            "hasDefaultScene": true,
+            "drawCallCount": 2,
+            "totalVertexCount": 12,
+            "totalTriangleCount": 4,
+            "maxUVs": 2,
+            "maxInfluences": 4,
+            "maxAttributes": 6
+          }
+        }
+      },
+      {
+        "file": "/home/blux/de-xr/dome-sculpt/artifacts/union37-consumer-f365/artifacts/union37-proof/sanitize-own-fixtures/outputs/1.glb",
+        "sha256": "de5a1d389c613cc2b8ec2260f7cd8e0da9668535798952e31411e709c3b8957a",
+        "result": {
+          "uri": "/home/blux/de-xr/dome-sculpt/artifacts/union37-consumer-f365/artifacts/union37-proof/sanitize-own-fixtures/outputs/1.glb",
+          "mimeType": "model/gltf-binary",
+          "validatorVersion": "2.0.0-dev.3.10",
+          "validatedAt": "2026-11-05T07:36:01.942Z",
+          "issues": {
+            "numErrors": 0,
+            "numWarnings": 1,
+            "numInfos": 3,
+            "numHints": 0,
+            "messages": [
+              {
+                "code": "UNUSED_OBJECT",
+                "message": "This object may be unused.",
+                "severity": 2,
+                "pointer": "/meshes/0/primitives/0/attributes/TEXCOORD_0"
+              },
+              {
+                "code": "NODE_SKINNED_MESH_NON_ROOT",
+                "message": "Node with a skinned mesh is not root. Parent transforms will not affect a skinned mesh.",
+                "severity": 1,
+                "pointer": "/nodes/2"
+              },
+              {
+                "code": "UNUSED_OBJECT",
+                "message": "This object may be unused.",
+                "severity": 2,
+                "pointer": "/bufferViews/24"
+              },
+              {
+                "code": "UNUSED_OBJECT",
+                "message": "This object may be unused.",
+                "severity": 2,
+                "pointer": "/textures/2"
+              }
+            ],
+            "truncated": false
+          },
+          "info": {
+            "version": "2.0",
+            "generator": "Dome Sculpt",
+            "extensionsUsed": [
+              "KHR_texture_transform",
+              "KHR_materials_emissive_strength"
+            ],
+            "resources": [
+              {
+                "pointer": "/buffers/0",
+                "mimeType": "application/gltf-buffer",
+                "storage": "glb",
+                "byteLength": 765136
+              },
+              {
+                "pointer": "/images/0",
+                "mimeType": "image/png",
+                "storage": "buffer-view",
+                "image": {
+                  "width": 64,
+                  "height": 64,
+                  "format": "rgba",
+                  "primaries": "srgb",
+                  "transfer": "srgb",
+                  "bits": 8
+                }
+              },
+              {
+                "pointer": "/images/1",
+                "mimeType": "image/png",
+                "storage": "buffer-view",
+                "image": {
+                  "width": 64,
+                  "height": 64,
+                  "format": "rgba",
+                  "primaries": "srgb",
+                  "transfer": "srgb",
+                  "bits": 8
+                }
+              },
+              {
+                "pointer": "/images/2",
+                "mimeType": "image/png",
+                "storage": "buffer-view",
+                "image": {
+                  "width": 64,
+                  "height": 64,
+                  "format": "rgba",
+                  "primaries": "srgb",
+                  "transfer": "srgb",
+                  "bits": 8
+                }
+              },
+              {
+                "pointer": "/images/3",
+                "mimeType": "image/png",
+                "storage": "buffer-view",
+                "image": {
+                  "width": 64,
+                  "height": 64,
+                  "format": "rgba",
+                  "primaries": "srgb",
+                  "transfer": "srgb",
+                  "bits": 8
+                }
+              },
+              {
+                "pointer": "/images/4",
+                "mimeType": "image/png",
+                "storage": "buffer-view",
+                "image": {
+                  "width": 64,
+                  "height": 64,
+                  "format": "rgba",
+                  "primaries": "srgb",
+                  "transfer": "srgb",
+                  "bits": 8
+                }
+              },
+              {
+                "pointer": "/images/5",
+                "mimeType": "image/png",
+                "storage": "buffer-view",
+                "image": {
+                  "width": 64,
+                  "height": 64,
+                  "format": "rgba",
+                  "primaries": "srgb",
+                  "transfer": "srgb",
+                  "bits": 8
+                }
+              },
+              {
+                "pointer": "/images/6",
+                "mimeType": "image/png",
+                "storage": "buffer-view",
+                "image": {
+                  "width": 64,
+                  "height": 64,
+                  "format": "rgba",
+                  "primaries": "srgb",
+                  "transfer": "srgb",
+                  "bits": 8
+                }
+              },
+              {
+                "pointer": "/images/7",
+                "mimeType": "image/png",
+                "storage": "buffer-view",
+                "image": {
+                  "width": 256,
+                  "height": 256,
+                  "format": "rgba",
+                  "primaries": "srgb",
+                  "transfer": "srgb",
+                  "bits": 8
+                }
+              }
+            ],
+            "animationCount": 0,
+            "materialCount": 2,
+            "hasMorphTargets": true,
+            "hasSkins": true,
+            "hasTextures": true,
+            "hasDefaultScene": true,
+            "drawCallCount": 2,
+            "totalVertexCount": 12,
+            "totalTriangleCount": 4,
+            "maxUVs": 2,
+            "maxInfluences": 4,
+            "maxAttributes": 6
+          }
+        }
+      },
+      {
+        "file": "/home/blux/de-xr/dome-sculpt/artifacts/union37-consumer-f365/artifacts/union37-proof/sanitize-own-fixtures/outputs/2.glb",
+        "sha256": "6a306e1c95f7aaca907a91f8f1d985e850f77b07ff1e9cd47525eaa9a1ffa438",
+        "result": {
+          "uri": "/home/blux/de-xr/dome-sculpt/artifacts/union37-consumer-f365/artifacts/union37-proof/sanitize-own-fixtures/outputs/2.glb",
+          "mimeType": "model/gltf-binary",
+          "validatorVersion": "2.0.0-dev.3.10",
+          "validatedAt": "2026-11-05T07:36:01.946Z",
+          "issues": {
+            "numErrors": 0,
+            "numWarnings": 1,
+            "numInfos": 4,
+            "numHints": 0,
+            "messages": [
+              {
+                "code": "UNUSED_OBJECT",
+                "message": "This object may be unused.",
+                "severity": 2,
+                "pointer": "/meshes/0/primitives/0/attributes/TEXCOORD_0"
+              },
+              {
+                "code": "UNUSED_OBJECT",
+                "message": "This object may be unused.",
+                "severity": 2,
+                "pointer": "/meshes/1/primitives/0/attributes/TEXCOORD_0"
+              },
+              {
+                "code": "NODE_SKINNED_MESH_NON_ROOT",
+                "message": "Node with a skinned mesh is not root. Parent transforms will not affect a skinned mesh.",
+                "severity": 1,
+                "pointer": "/nodes/1"
+              },
+              {
+                "code": "UNUSED_OBJECT",
+                "message": "This object may be unused.",
+                "severity": 2,
+                "pointer": "/bufferViews/26"
+              },
+              {
+                "code": "UNUSED_OBJECT",
+                "message": "This object may be unused.",
+                "severity": 2,
+                "pointer": "/textures/6"
+              }
+            ],
+            "truncated": false
+          },
+          "info": {
+            "version": "2.0",
+            "generator": "Dome Sculpt",
+            "extensionsUsed": [
+              "KHR_texture_transform",
+              "KHR_materials_emissive_strength"
+            ],
+            "resources": [
+              {
+                "pointer": "/buffers/0",
+                "mimeType": "application/gltf-buffer",
+                "storage": "glb",
+                "byteLength": 850824
+              },
+              {
+                "pointer": "/images/0",
+                "mimeType": "image/png",
+                "storage": "buffer-view",
+                "image": {
+                  "width": 64,
+                  "height": 64,
+                  "format": "rgba",
+                  "primaries": "srgb",
+                  "transfer": "srgb",
+                  "bits": 8
+                }
+              },
+              {
+                "pointer": "/images/1",
+                "mimeType": "image/png",
+                "storage": "buffer-view",
+                "image": {
+                  "width": 64,
+                  "height": 64,
+                  "format": "rgba",
+                  "primaries": "srgb",
+                  "transfer": "srgb",
+                  "bits": 8
+                }
+              },
+              {
+                "pointer": "/images/2",
+                "mimeType": "image/png",
+                "storage": "buffer-view",
+                "image": {
+                  "width": 64,
+                  "height": 64,
+                  "format": "rgba",
+                  "primaries": "srgb",
+                  "transfer": "srgb",
+                  "bits": 8
+                }
+              },
+              {
+                "pointer": "/images/3",
+                "mimeType": "image/png",
+                "storage": "buffer-view",
+                "image": {
+                  "width": 64,
+                  "height": 64,
+                  "format": "rgba",
+                  "primaries": "srgb",
+                  "transfer": "srgb",
+                  "bits": 8
+                }
+              },
+              {
+                "pointer": "/images/4",
+                "mimeType": "image/png",
+                "storage": "buffer-view",
+                "image": {
+                  "width": 64,
+                  "height": 64,
+                  "format": "rgba",
+                  "primaries": "srgb",
+                  "transfer": "srgb",
+                  "bits": 8
+                }
+              },
+              {
+                "pointer": "/images/5",
+                "mimeType": "image/png",
+                "storage": "buffer-view",
+                "image": {
+                  "width": 64,
+                  "height": 64,
+                  "format": "rgba",
+                  "primaries": "srgb",
+                  "transfer": "srgb",
+                  "bits": 8
+                }
+              },
+              {
+                "pointer": "/images/6",
+                "mimeType": "image/png",
+                "storage": "buffer-view",
+                "image": {
+                  "width": 64,
+                  "height": 64,
+                  "format": "rgba",
+                  "primaries": "srgb",
+                  "transfer": "srgb",
+                  "bits": 8
+                }
+              },
+              {
+                "pointer": "/images/7",
+                "mimeType": "image/png",
+                "storage": "buffer-view",
+                "image": {
+                  "width": 256,
+                  "height": 256,
+                  "format": "rgba",
+                  "primaries": "srgb",
+                  "transfer": "srgb",
+                  "bits": 8
+                }
+              }
+            ],
+            "animationCount": 0,
+            "materialCount": 2,
+            "hasMorphTargets": true,
+            "hasSkins": true,
+            "hasTextures": true,
+            "hasDefaultScene": true,
+            "drawCallCount": 2,
+            "totalVertexCount": 12,
+            "totalTriangleCount": 4,
+            "maxUVs": 3,
+            "maxInfluences": 4,
+            "maxAttributes": 8
+          }
+        }
+      },
+      {
+        "file": "/home/blux/de-xr/dome-sculpt/artifacts/union37-consumer-f365/artifacts/union37-proof/sanitize-own-fixtures/outputs/3.glb",
+        "sha256": "a554aac2444ca65ab609f5b743bdea961401862d1f78cedd6c25048cdb9367a9",
+        "result": {
+          "uri": "/home/blux/de-xr/dome-sculpt/artifacts/union37-consumer-f365/artifacts/union37-proof/sanitize-own-fixtures/outputs/3.glb",
+          "mimeType": "model/gltf-binary",
+          "validatorVersion": "2.0.0-dev.3.10",
+          "validatedAt": "2026-11-05T07:36:01.950Z",
+          "issues": {
+            "numErrors": 0,
+            "numWarnings": 1,
+            "numInfos": 4,
+            "numHints": 0,
+            "messages": [
+              {
+                "code": "UNUSED_OBJECT",
+                "message": "This object may be unused.",
+                "severity": 2,
+                "pointer": "/meshes/0/primitives/0/attributes/TEXCOORD_0"
+              },
+              {
+                "code": "UNUSED_OBJECT",
+                "message": "This object may be unused.",
+                "severity": 2,
+                "pointer": "/meshes/1/primitives/0/attributes/TEXCOORD_0"
+              },
+              {
+                "code": "NODE_SKINNED_MESH_NON_ROOT",
+                "message": "Node with a skinned mesh is not root. Parent transforms will not affect a skinned mesh.",
+                "severity": 1,
+                "pointer": "/nodes/2"
+              },
+              {
+                "code": "UNUSED_OBJECT",
+                "message": "This object may be unused.",
+                "severity": 2,
+                "pointer": "/bufferViews/26"
+              },
+              {
+                "code": "UNUSED_OBJECT",
+                "message": "This object may be unused.",
+                "severity": 2,
+                "pointer": "/textures/2"
+              }
+            ],
+            "truncated": false
+          },
+          "info": {
+            "version": "2.0",
+            "generator": "Dome Sculpt",
+            "extensionsUsed": [
+              "KHR_texture_transform",
+              "KHR_materials_emissive_strength"
+            ],
+            "resources": [
+              {
+                "pointer": "/buffers/0",
+                "mimeType": "application/gltf-buffer",
+                "storage": "glb",
+                "byteLength": 850824
+              },
+              {
+                "pointer": "/images/0",
+                "mimeType": "image/png",
+                "storage": "buffer-view",
+                "image": {
+                  "width": 64,
+                  "height": 64,
+                  "format": "rgba",
+                  "primaries": "srgb",
+                  "transfer": "srgb",
+                  "bits": 8
+                }
+              },
+              {
+                "pointer": "/images/1",
+                "mimeType": "image/png",
+                "storage": "buffer-view",
+                "image": {
+                  "width": 64,
+                  "height": 64,
+                  "format": "rgba",
+                  "primaries": "srgb",
+                  "transfer": "srgb",
+                  "bits": 8
+                }
+              },
+              {
+                "pointer": "/images/2",
+                "mimeType": "image/png",
+                "storage": "buffer-view",
+                "image": {
+                  "width": 64,
+                  "height": 64,
+                  "format": "rgba",
+                  "primaries": "srgb",
+                  "transfer": "srgb",
+                  "bits": 8
+                }
+              },
+              {
+                "pointer": "/images/3",
+                "mimeType": "image/png",
+                "storage": "buffer-view",
+                "image": {
+                  "width": 64,
+                  "height": 64,
+                  "format": "rgba",
+                  "primaries": "srgb",
+                  "transfer": "srgb",
+                  "bits": 8
+                }
+              },
+              {
+                "pointer": "/images/4",
+                "mimeType": "image/png",
+                "storage": "buffer-view",
+                "image": {
+                  "width": 64,
+                  "height": 64,
+                  "format": "rgba",
+                  "primaries": "srgb",
+                  "transfer": "srgb",
+                  "bits": 8
+                }
+              },
+              {
+                "pointer": "/images/5",
+                "mimeType": "image/png",
+                "storage": "buffer-view",
+                "image": {
+                  "width": 64,
+                  "height": 64,
+                  "format": "rgba",
+                  "primaries": "srgb",
+                  "transfer": "srgb",
+                  "bits": 8
+                }
+              },
+              {
+                "pointer": "/images/6",
+                "mimeType": "image/png",
+                "storage": "buffer-view",
+                "image": {
+                  "width": 64,
+                  "height": 64,
+                  "format": "rgba",
+                  "primaries": "srgb",
+                  "transfer": "srgb",
+                  "bits": 8
+                }
+              },
+              {
+                "pointer": "/images/7",
+                "mimeType": "image/png",
+                "storage": "buffer-view",
+                "image": {
+                  "width": 256,
+                  "height": 256,
+                  "format": "rgba",
+                  "primaries": "srgb",
+                  "transfer": "srgb",
+                  "bits": 8
+                }
+              }
+            ],
+            "animationCount": 0,
+            "materialCount": 2,
+            "hasMorphTargets": true,
+            "hasSkins": true,
+            "hasTextures": true,
+            "hasDefaultScene": true,
+            "drawCallCount": 2,
+            "totalVertexCount": 12,
+            "totalTriangleCount": 4,
+            "maxUVs": 3,
+            "maxInfluences": 4,
+            "maxAttributes": 8
+          }
+        }
+      },
+      {
+        "file": "/home/blux/de-xr/dome-sculpt/artifacts/union37-consumer-f365/artifacts/union37-proof/sanitize-own-fixtures/outputs/4.glb",
+        "sha256": "39b1896e76996109f1ba778b5883dc41a9199f7950330e04a9760f1b3e83b613",
+        "result": {
+          "uri": "/home/blux/de-xr/dome-sculpt/artifacts/union37-consumer-f365/artifacts/union37-proof/sanitize-own-fixtures/outputs/4.glb",
+          "mimeType": "model/gltf-binary",
+          "validatorVersion": "2.0.0-dev.3.10",
+          "validatedAt": "2026-11-05T07:36:01.954Z",
+          "issues": {
+            "numErrors": 0,
+            "numWarnings": 1,
+            "numInfos": 5,
+            "numHints": 0,
+            "messages": [
+              {
+                "code": "UNUSED_MESH_TANGENT",
+                "message": "Tangents are not used because the material has no normal texture.",
+                "severity": 2,
+                "pointer": "/meshes/0/primitives/0/attributes/TANGENT"
+              },
+              {
+                "code": "UNUSED_OBJECT",
+                "message": "This object may be unused.",
+                "severity": 2,
+                "pointer": "/meshes/0/primitives/0/attributes/TEXCOORD_0"
+              },
+              {
+                "code": "UNUSED_OBJECT",
+                "message": "This object may be unused.",
+                "severity": 2,
+                "pointer": "/meshes/1/primitives/0/attributes/TEXCOORD_0"
+              },
+              {
+                "code": "NODE_SKINNED_MESH_NON_ROOT",
+                "message": "Node with a skinned mesh is not root. Parent transforms will not affect a skinned mesh.",
+                "severity": 1,
+                "pointer": "/nodes/1"
+              },
+              {
+                "code": "UNUSED_OBJECT",
+                "message": "This object may be unused.",
+                "severity": 2,
+                "pointer": "/bufferViews/24"
+              },
+              {
+                "code": "UNUSED_OBJECT",
+                "message": "This object may be unused.",
+                "severity": 2,
+                "pointer": "/textures/5"
+              }
+            ],
+            "truncated": false
+          },
+          "info": {
+            "version": "2.0",
+            "generator": "Dome Sculpt",
+            "extensionsUsed": [
+              "KHR_texture_transform",
+              "KHR_materials_emissive_strength"
+            ],
+            "resources": [
+              {
+                "pointer": "/buffers/0",
+                "mimeType": "application/gltf-buffer",
+                "storage": "glb",
+                "byteLength": 795728
+              },
+              {
+                "pointer": "/images/0",
+                "mimeType": "image/png",
+                "storage": "buffer-view",
+                "image": {
+                  "width": 64,
+                  "height": 64,
+                  "format": "rgba",
+                  "primaries": "srgb",
+                  "transfer": "srgb",
+                  "bits": 8
+                }
+              },
+              {
+                "pointer": "/images/1",
+                "mimeType": "image/png",
+                "storage": "buffer-view",
+                "image": {
+                  "width": 64,
+                  "height": 64,
+                  "format": "rgba",
+                  "primaries": "srgb",
+                  "transfer": "srgb",
+                  "bits": 8
+                }
+              },
+              {
+                "pointer": "/images/2",
+                "mimeType": "image/png",
+                "storage": "buffer-view",
+                "image": {
+                  "width": 64,
+                  "height": 64,
+                  "format": "rgba",
+                  "primaries": "srgb",
+                  "transfer": "srgb",
+                  "bits": 8
+                }
+              },
+              {
+                "pointer": "/images/3",
+                "mimeType": "image/png",
+                "storage": "buffer-view",
+                "image": {
+                  "width": 64,
+                  "height": 64,
+                  "format": "rgba",
+                  "primaries": "srgb",
+                  "transfer": "srgb",
+                  "bits": 8
+                }
+              },
+              {
+                "pointer": "/images/4",
+                "mimeType": "image/png",
+                "storage": "buffer-view",
+                "image": {
+                  "width": 64,
+                  "height": 64,
+                  "format": "rgba",
+                  "primaries": "srgb",
+                  "transfer": "srgb",
+                  "bits": 8
+                }
+              },
+              {
+                "pointer": "/images/5",
+                "mimeType": "image/png",
+                "storage": "buffer-view",
+                "image": {
+                  "width": 64,
+                  "height": 64,
+                  "format": "rgba",
+                  "primaries": "srgb",
+                  "transfer": "srgb",
+                  "bits": 8
+                }
+              },
+              {
+                "pointer": "/images/6",
+                "mimeType": "image/png",
+                "storage": "buffer-view",
+                "image": {
+                  "width": 256,
+                  "height": 256,
+                  "format": "rgba",
+                  "primaries": "srgb",
+                  "transfer": "srgb",
+                  "bits": 8
+                }
+              }
+            ],
+            "animationCount": 0,
+            "materialCount": 2,
+            "hasMorphTargets": true,
+            "hasSkins": true,
+            "hasTextures": true,
+            "hasDefaultScene": true,
+            "drawCallCount": 2,
+            "totalVertexCount": 12,
+            "totalTriangleCount": 4,
+            "maxUVs": 2,
+            "maxInfluences": 4,
+            "maxAttributes": 7
+          }
+        }
+      },
+      {
+        "file": "/home/blux/de-xr/dome-sculpt/artifacts/union37-consumer-f365/artifacts/union37-proof/sanitize-own-fixtures/outputs/5.glb",
+        "sha256": "bab86f7c97cea81334fe2a03e685be1466b86682a4fe7f5e001977da46424ef6",
+        "result": {
+          "uri": "/home/blux/de-xr/dome-sculpt/artifacts/union37-consumer-f365/artifacts/union37-proof/sanitize-own-fixtures/outputs/5.glb",
+          "mimeType": "model/gltf-binary",
+          "validatorVersion": "2.0.0-dev.3.10",
+          "validatedAt": "2026-11-05T07:36:01.959Z",
+          "issues": {
+            "numErrors": 0,
+            "numWarnings": 1,
+            "numInfos": 5,
+            "numHints": 0,
+            "messages": [
+              {
+                "code": "UNUSED_OBJECT",
+                "message": "This object may be unused.",
+                "severity": 2,
+                "pointer": "/meshes/0/primitives/0/attributes/TEXCOORD_0"
+              },
+              {
+                "code": "UNUSED_MESH_TANGENT",
+                "message": "Tangents are not used because the material has no normal texture.",
+                "severity": 2,
+                "pointer": "/meshes/1/primitives/0/attributes/TANGENT"
+              },
+              {
+                "code": "UNUSED_OBJECT",
+                "message": "This object may be unused.",
+                "severity": 2,
+                "pointer": "/meshes/1/primitives/0/attributes/TEXCOORD_0"
+              },
+              {
+                "code": "NODE_SKINNED_MESH_NON_ROOT",
+                "message": "Node with a skinned mesh is not root. Parent transforms will not affect a skinned mesh.",
+                "severity": 1,
+                "pointer": "/nodes/2"
+              },
+              {
+                "code": "UNUSED_OBJECT",
+                "message": "This object may be unused.",
+                "severity": 2,
+                "pointer": "/bufferViews/24"
+              },
+              {
+                "code": "UNUSED_OBJECT",
+                "message": "This object may be unused.",
+                "severity": 2,
+                "pointer": "/textures/2"
+              }
+            ],
+            "truncated": false
+          },
+          "info": {
+            "version": "2.0",
+            "generator": "Dome Sculpt",
+            "extensionsUsed": [
+              "KHR_texture_transform",
+              "KHR_materials_emissive_strength"
+            ],
+            "resources": [
+              {
+                "pointer": "/buffers/0",
+                "mimeType": "application/gltf-buffer",
+                "storage": "glb",
+                "byteLength": 795728
+              },
+              {
+                "pointer": "/images/0",
+                "mimeType": "image/png",
+                "storage": "buffer-view",
+                "image": {
+                  "width": 64,
+                  "height": 64,
+                  "format": "rgba",
+                  "primaries": "srgb",
+                  "transfer": "srgb",
+                  "bits": 8
+                }
+              },
+              {
+                "pointer": "/images/1",
+                "mimeType": "image/png",
+                "storage": "buffer-view",
+                "image": {
+                  "width": 64,
+                  "height": 64,
+                  "format": "rgba",
+                  "primaries": "srgb",
+                  "transfer": "srgb",
+                  "bits": 8
+                }
+              },
+              {
+                "pointer": "/images/2",
+                "mimeType": "image/png",
+                "storage": "buffer-view",
+                "image": {
+                  "width": 64,
+                  "height": 64,
+                  "format": "rgba",
+                  "primaries": "srgb",
+                  "transfer": "srgb",
+                  "bits": 8
+                }
+              },
+              {
+                "pointer": "/images/3",
+                "mimeType": "image/png",
+                "storage": "buffer-view",
+                "image": {
+                  "width": 64,
+                  "height": 64,
+                  "format": "rgba",
+                  "primaries": "srgb",
+                  "transfer": "srgb",
+                  "bits": 8
+                }
+              },
+              {
+                "pointer": "/images/4",
+                "mimeType": "image/png",
+                "storage": "buffer-view",
+                "image": {
+                  "width": 64,
+                  "height": 64,
+                  "format": "rgba",
+                  "primaries": "srgb",
+                  "transfer": "srgb",
+                  "bits": 8
+                }
+              },
+              {
+                "pointer": "/images/5",
+                "mimeType": "image/png",
+                "storage": "buffer-view",
+                "image": {
+                  "width": 64,
+                  "height": 64,
+                  "format": "rgba",
+                  "primaries": "srgb",
+                  "transfer": "srgb",
+                  "bits": 8
+                }
+              },
+              {
+                "pointer": "/images/6",
+                "mimeType": "image/png",
+                "storage": "buffer-view",
+                "image": {
+                  "width": 256,
+                  "height": 256,
+                  "format": "rgba",
+                  "primaries": "srgb",
+                  "transfer": "srgb",
+                  "bits": 8
+                }
+              }
+            ],
+            "animationCount": 0,
+            "materialCount": 2,
+            "hasMorphTargets": true,
+            "hasSkins": true,
+            "hasTextures": true,
+            "hasDefaultScene": true,
+            "drawCallCount": 2,
+            "totalVertexCount": 12,
+            "totalTriangleCount": 4,
+            "maxUVs": 2,
+            "maxInfluences": 4,
+            "maxAttributes": 7
+          }
+        }
+      },
+      {
+        "file": "/home/blux/de-xr/dome-sculpt/artifacts/union37-consumer-f365/artifacts/union37-proof/sanitize-own-fixtures/outputs/6.glb",
+        "sha256": "283f3076946a2c33de6c6bc033c8f8580d33598fb75d1da8bd3cd9e0cf55a2f3",
+        "result": {
+          "uri": "/home/blux/de-xr/dome-sculpt/artifacts/union37-consumer-f365/artifacts/union37-proof/sanitize-own-fixtures/outputs/6.glb",
+          "mimeType": "model/gltf-binary",
+          "validatorVersion": "2.0.0-dev.3.10",
+          "validatedAt": "2026-11-05T07:36:01.965Z",
+          "issues": {
+            "numErrors": 0,
+            "numWarnings": 1,
+            "numInfos": 4,
+            "numHints": 0,
+            "messages": [
+              {
+                "code": "UNUSED_OBJECT",
+                "message": "This object may be unused.",
+                "severity": 2,
+                "pointer": "/meshes/0/primitives/0/attributes/TEXCOORD_0"
+              },
+              {
+                "code": "UNUSED_OBJECT",
+                "message": "This object may be unused.",
+                "severity": 2,
+                "pointer": "/meshes/1/primitives/0/attributes/TEXCOORD_0"
+              },
+              {
+                "code": "NODE_SKINNED_MESH_NON_ROOT",
+                "message": "Node with a skinned mesh is not root. Parent transforms will not affect a skinned mesh.",
+                "severity": 1,
+                "pointer": "/nodes/1"
+              },
+              {
+                "code": "UNUSED_OBJECT",
+                "message": "This object may be unused.",
+                "severity": 2,
+                "pointer": "/bufferViews/26"
+              },
+              {
+                "code": "UNUSED_OBJECT",
+                "message": "This object may be unused.",
+                "severity": 2,
+                "pointer": "/textures/6"
+              }
+            ],
+            "truncated": false
+          },
+          "info": {
+            "version": "2.0",
+            "generator": "Dome Sculpt",
+            "extensionsUsed": [
+              "KHR_texture_transform",
+              "KHR_materials_emissive_strength"
+            ],
+            "resources": [
+              {
+                "pointer": "/buffers/0",
+                "mimeType": "application/gltf-buffer",
+                "storage": "glb",
+                "byteLength": 936280
+              },
+              {
+                "pointer": "/images/0",
+                "mimeType": "image/png",
+                "storage": "buffer-view",
+                "image": {
+                  "width": 64,
+                  "height": 64,
+                  "format": "rgba",
+                  "primaries": "srgb",
+                  "transfer": "srgb",
+                  "bits": 8
+                }
+              },
+              {
+                "pointer": "/images/1",
+                "mimeType": "image/png",
+                "storage": "buffer-view",
+                "image": {
+                  "width": 64,
+                  "height": 64,
+                  "format": "rgba",
+                  "primaries": "srgb",
+                  "transfer": "srgb",
+                  "bits": 8
+                }
+              },
+              {
+                "pointer": "/images/2",
+                "mimeType": "image/png",
+                "storage": "buffer-view",
+                "image": {
+                  "width": 64,
+                  "height": 64,
+                  "format": "rgba",
+                  "primaries": "srgb",
+                  "transfer": "srgb",
+                  "bits": 8
+                }
+              },
+              {
+                "pointer": "/images/3",
+                "mimeType": "image/png",
+                "storage": "buffer-view",
+                "image": {
+                  "width": 64,
+                  "height": 64,
+                  "format": "rgba",
+                  "primaries": "srgb",
+                  "transfer": "srgb",
+                  "bits": 8
+                }
+              },
+              {
+                "pointer": "/images/4",
+                "mimeType": "image/png",
+                "storage": "buffer-view",
+                "image": {
+                  "width": 64,
+                  "height": 64,
+                  "format": "rgba",
+                  "primaries": "srgb",
+                  "transfer": "srgb",
+                  "bits": 8
+                }
+              },
+              {
+                "pointer": "/images/5",
+                "mimeType": "image/png",
+                "storage": "buffer-view",
+                "image": {
+                  "width": 64,
+                  "height": 64,
+                  "format": "rgba",
+                  "primaries": "srgb",
+                  "transfer": "srgb",
+                  "bits": 8
+                }
+              },
+              {
+                "pointer": "/images/6",
+                "mimeType": "image/png",
+                "storage": "buffer-view",
+                "image": {
+                  "width": 64,
+                  "height": 64,
+                  "format": "rgba",
+                  "primaries": "srgb",
+                  "transfer": "srgb",
+                  "bits": 8
+                }
+              },
+              {
+                "pointer": "/images/7",
+                "mimeType": "image/png",
+                "storage": "buffer-view",
+                "image": {
+                  "width": 256,
+                  "height": 256,
+                  "format": "rgba",
+                  "primaries": "srgb",
+                  "transfer": "srgb",
+                  "bits": 8
+                }
+              }
+            ],
+            "animationCount": 0,
+            "materialCount": 2,
+            "hasMorphTargets": true,
+            "hasSkins": true,
+            "hasTextures": true,
+            "hasDefaultScene": true,
+            "drawCallCount": 2,
+            "totalVertexCount": 12,
+            "totalTriangleCount": 4,
+            "maxUVs": 3,
+            "maxInfluences": 4,
+            "maxAttributes": 8
+          }
+        }
+      },
+      {
+        "file": "/home/blux/de-xr/dome-sculpt/artifacts/union37-consumer-f365/artifacts/union37-proof/sanitize-own-fixtures/outputs/7.glb",
+        "sha256": "b953a5323e043b614b00eca284ed28f6a18d42fab12dc55ce77fb4e7f0998ebc",
+        "result": {
+          "uri": "/home/blux/de-xr/dome-sculpt/artifacts/union37-consumer-f365/artifacts/union37-proof/sanitize-own-fixtures/outputs/7.glb",
+          "mimeType": "model/gltf-binary",
+          "validatorVersion": "2.0.0-dev.3.10",
+          "validatedAt": "2026-11-05T07:36:01.970Z",
           "issues": {
             "numErrors": 0,
             "numWarnings": 1,
@@ -4632,7 +6075,8 @@
           }
         }
       }
-    ]
+    ],
+    "exact_actual_SAN_fixtures": true
   },
   "support": "Both completed root owning37 profile builds; all source/public/private byte identity checked, all eleven archives and actual fixtures hashed; no parent mutation.",
   "limits": "Not full160/798, whole production goal, physical HMD, new compute, system install or root37 admission. Original rootSAN samehandle10303 remains live/frozen.",
@@ -4641,6 +6085,8 @@
     "artifacts/union37-proof/arc.py": "a430d02841dc6d479af395c2f19ad12dd392615b9fbb2ed31403c21ea33533d3",
     "artifacts/union37-proof/sanitize-shared-fixtures.py": "5968b554fa2e66e161aca7a7f07ddebec0aec67ec1a295c472383804cf110ed3",
     "artifacts/union37-proof/validate.cjs": "3c521ff19bb7d8cfa9b6588f3c0abd8dc4bfb8bcd80ba96dd95afee28596ba25",
-    "artifacts/union37-proof/validate-all.cjs": "dd2075993e0148f147ce15a27050e8719dce151ed8a353cdf64a40cc9cca84bf"
+    "artifacts/union37-proof/validate-all.cjs": "dd2075993e0148f147ce15a27050e8719dce151ed8a353cdf64a40cc9cca84bf",
+    "artifacts/union37-proof/sanitize-own-fixtures.py": "ebc3d166db692a7072bd0cef603def7896e1518e4ac64170171ed398a2fce7fb",
+    "artifacts/union37-proof/validate-final.cjs": "548193a13688aaca377dd0431e4dae19a39ad11ec284c1a27073e64871773f46"
   }
 }
