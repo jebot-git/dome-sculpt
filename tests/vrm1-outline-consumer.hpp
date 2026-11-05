@@ -8,7 +8,7 @@
 #include <map>
 struct V1OutlineLayerConsumer {
   using J=nlohmann::json;
-  bool wrong_outline_missing=false,wrong_outline_width=false,wrong_outline_color=false,wrong_outline_paint=false;
+  bool wrong_outline_missing=false,wrong_outline_width=false,wrong_outline_color=false;
   float expression=0;int pose=0,selected_node=-1;bool wrong_mask_cutoff=false,wrong_paint_uv=false,wrong_base_tint=false,wrong_shared_shade=false;
   bool wrong_binary_threshold=false,wrong_source_uv=false,wrong_matcap_view=false,wrong_matcap_uv_target=false,wrong_matcap_color=false,wrong_rim_color=false,wrong_rim_uv=false,wrong_rim_mix=false;
   bool wrong_normal_scale=false,wrong_normal_uv=false,wrong_normal_hand=false,wrong_normal_srgb=false;
@@ -22,7 +22,7 @@ struct V1OutlineLayerConsumer {
 layout(location=0)in vec3 p;layout(location=1)in vec3 N;
 layout(location=2)in vec2 UV;layout(location=3)in vec2 SU;layout(location=4)in vec2 EU;layout(location=5)in vec2 RU;layout(location=6)in vec2 NU;layout(location=7)in vec4 T;layout(location=8)in vec2 HU;
 uniform int outlinePass;uniform float outlineWidth;uniform mat4 camera;out vec3 n,world;out vec2 uv,shadeUV,emissionUV,rimUV,normalUV,shiftUV;out vec3 tangent;out float tangentHand;
-void main(){n=N;world=p;uv=UV;shadeUV=SU;emissionUV=EU;rimUV=RU;normalUV=NU;shiftUV=HU;tangent=normalize(T.xyz);tangentHand=T.w;gl_Position=camera*vec4(p+(outlinePass==1?normalize(N)*outlineWidth:vec3(0)),1);})GLSL";
+void main(){n=normalize(N);world=p;uv=UV;shadeUV=SU;emissionUV=EU;rimUV=RU;normalUV=NU;shiftUV=HU;tangent=normalize(T.xyz);tangentHand=T.w;gl_Position=camera*vec4(p+(outlinePass==1?normalize(N)*outlineWidth:vec3(0)),1);})GLSL";
     const char *fs = R"GLSL(#version 330 core
 uniform int outlinePass;uniform vec3 outlineColor;in vec3 n,world;in vec2 uv,shadeUV,emissionUV,rimUV,normalUV,shiftUV;in vec3 tangent;in float tangentHand;out vec4 result;
 uniform sampler2D baseMap,shadeMap,emissionMap,matcapMap,rimMap,normalMap,shiftMap;uniform int basePresent,shadePresent,emissionPresent,matcapPresent,rimPresent,normalPresent,shiftPresent,wrongMatcapView,wrongShiftChannel;uniform float normalScale,shiftTextureScale;
@@ -203,8 +203,11 @@ in vec2 uv;out vec4 result;uniform sampler2D scene;void main(){result=texture(sc
         if(!ext.contains("matcapFactor"))ext["matcapFactor"]=std::array<float,3>{1,1,1};
         if(!ext.contains("parametricRimColorFactor"))ext["parametricRimColorFactor"]=std::array<float,3>{0,0,0};
         const auto alpha=m.value("alphaMode",std::string("OPAQUE"));const bool blended=alpha=="BLEND",masked=alpha=="MASK";
-        if((!blended&&!masked&&alpha!="OPAQUE")||!m.value("doubleSided",false))throw std::runtime_error("Independent expression-layer oracle requires opaque/blend double-sided source");
-        if(blended){glEnable(GL_BLEND);glBlendEquationSeparate(GL_FUNC_ADD,GL_FUNC_ADD);glBlendFuncSeparate(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA,GL_ONE,GL_ONE_MINUS_SRC_ALPHA);glDepthMask(GL_FALSE);glDepthFunc(GL_LEQUAL);}else{glDisable(GL_BLEND);glDepthMask(GL_TRUE);glDepthFunc(GL_LESS);}glUniform1i(loc("blend"),blended?1:masked?2:0);scalar("alphaCutoff",wrong_mask_cutoff?.99f:m.value("alphaCutoff",.5f));
+        if(!blended&&!masked&&alpha!="OPAQUE")throw std::runtime_error("Independent expression-layer oracle requires standard alpha mode");
+        const bool double_sided=m.value("doubleSided",false);
+        if(double_sided)glDisable(GL_CULL_FACE);else{glEnable(GL_CULL_FACE);glCullFace(GL_BACK);}
+        if(ext.value("outlineWidthMode",std::string("none"))!="none"&&alpha!="OPAQUE")throw std::runtime_error("Independent source outline requires opaque membership");
+        if(blended){glEnable(GL_BLEND);glBlendEquationSeparate(GL_FUNC_ADD,GL_FUNC_ADD);glBlendFuncSeparate(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA,GL_ONE,GL_ONE_MINUS_SRC_ALPHA);glDepthMask(GL_FALSE);glDepthFunc(GL_LEQUAL);}else{glDisable(GL_BLEND);glDepthMask(GL_TRUE);glDepthFunc(GL_LEQUAL);}glUniform1i(loc("blend"),blended?1:masked?2:0);scalar("alphaCutoff",wrong_mask_cutoff?.99f:m.value("alphaCutoff",.5f));
         const size_t material=size_t(p.material-model.data->materials);
         if(weights.empty()){
          for(const auto &bind:expression_data.value("materialColorBinds",J::array()))if(bind.at("material").get<size_t>()==material){const std::string type=bind.at("type");J *field=type=="color"?&m["pbrMetallicRoughness"]["baseColorFactor"]:type=="shadeColor"?&m["extensions"]["VRMC_materials_mtoon"]["shadeColorFactor"]:type=="emissionColor"?&m["emissiveFactor"]:type=="rimColor"?&m["extensions"]["VRMC_materials_mtoon"]["parametricRimColorFactor"]:type=="matcapColor"?&m["extensions"]["VRMC_materials_mtoon"]["matcapFactor"]:type=="outlineColor"?&m["extensions"]["VRMC_materials_mtoon"]["outlineColorFactor"]:nullptr;if(!field)throw std::runtime_error("Independent layer colour type unsupported");for(size_t k=0;k<field->size();++k)(*field)[k]=field->at(k).get<double>()+(bind.at("targetValue").at(k).get<double>()-field->at(k).get<double>())*expression;}
@@ -310,18 +313,18 @@ in vec2 uv;out vec4 result;uniform sampler2D scene;void main(){result=texture(sc
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(uint32_t),
                      indices.data(), GL_STREAM_DRAW);
+        glUniform1i(loc("outlinePass"),0);glDepthFunc(GL_LEQUAL);
+        glDrawElements(GL_TRIANGLES,GLsizei(indices.size()),GL_UNSIGNED_INT,nullptr);
         const bool source_outline=ext.value("outlineWidthMode",std::string("none"))!="none";
-        if((source_outline||wrong_outline_paint)&&!wrong_outline_missing){
+        if(source_outline&&ext.value("outlineWidthFactor",0.f)>0&&!wrong_outline_missing){
           if(source_outline&&(ext.at("outlineWidthMode")!="worldCoordinates"||ext.value("outlineLightingMixFactor",1.f)!=0))throw std::runtime_error("Independent outline requires real unlit world-space metadata");
-          const auto color=wrong_outline_color?std::array<float,3>{0,0,0}:ext.value("outlineColorFactor",std::array<float,3>{.22f,.025f,.12f});
-          glUniform3fv(loc("outlineColor"),1,color.data());scalar("outlineWidth",(wrong_outline_width?1.8f:1.f)*(source_outline?ext.at("outlineWidthFactor").get<float>():.02f));glUniform1i(loc("outlinePass"),1);
-          glEnable(GL_CULL_FACE);glCullFace(GL_FRONT);glDisable(GL_BLEND);glDepthMask(GL_TRUE);glDepthFunc(GL_LESS);
+          const auto color=wrong_outline_color?std::array<float,3>{0,0,0}:ext.value("outlineColorFactor",std::array<float,3>{});
+          glUniform3fv(loc("outlineColor"),1,color.data());scalar("outlineWidth",(wrong_outline_width?1.8f:1.f)*ext.value("outlineWidthFactor",0.f));glUniform1i(loc("outlinePass"),1);
+          glEnable(GL_CULL_FACE);glCullFace(GL_FRONT);glDisable(GL_BLEND);glDepthMask(GL_TRUE);glDepthFunc(GL_LEQUAL);
           glDrawElements(GL_TRIANGLES,GLsizei(indices.size()),GL_UNSIGNED_INT,nullptr);
-          glDisable(GL_CULL_FACE);glUniform1i(loc("outlinePass"),0);
-          if(blended){glEnable(GL_BLEND);glDepthMask(GL_FALSE);glDepthFunc(GL_LEQUAL);}else{glDepthMask(GL_TRUE);glDepthFunc(GL_LESS);}
+          if(double_sided)glDisable(GL_CULL_FACE);else{glEnable(GL_CULL_FACE);glCullFace(GL_BACK);}glUniform1i(loc("outlinePass"),0);
+          if(blended){glEnable(GL_BLEND);glDepthMask(GL_FALSE);glDepthFunc(GL_LEQUAL);}else{glDepthMask(GL_TRUE);glDepthFunc(GL_LEQUAL);}
         }
-        glDrawElements(GL_TRIANGLES, GLsizei(indices.size()), GL_UNSIGNED_INT,
-                       nullptr);
         glDeleteTextures(1, &bt);
         glDeleteTextures(1, &st);
         glDeleteTextures(1, &et);

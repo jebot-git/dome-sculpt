@@ -30,7 +30,7 @@ for mesh in j['meshes']:
   primitive['indices']=append([(i*4+c,)for i in range(6)for c in(0,1,2,0,2,3)],'SCALAR',5125)
   for target in primitive.get('targets',[]):
    for name,index in list(target.items()):
-    a=j['accessors'][index];target[name]=append(values(index)*6,a['type'],a['componentType'])
+    a=j['accessors'][index];target[name]=append(values(index)*6,a['type'],a['componentType'],name=='POSITION')
 for material in j['materials']:
  material.pop('normalTexture',None);material.pop('emissiveTexture',None);material['alphaMode']='OPAQUE';toon=material['extensions']['VRMC_materials_mtoon'];toon.pop('shadeMultiplyTexture',None);material['pbrMetallicRoughness'].pop('baseColorTexture',None);toon.update(outlineWidthMode='screenCoordinates'if args.screen else'worldCoordinates',outlineWidthFactor=.02,outlineColorFactor=[.22,.025,.12],outlineLightingMixFactor=.5 if args.lit else 0)
 for expression in j['extensions']['VRMC_vrm']['expressions']['preset'].values():expression.setdefault('materialColorBinds',[]).append({'material':0,'type':'outlineColor','targetValue':[.02,.14,.24,19]})

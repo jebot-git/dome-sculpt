@@ -23,7 +23,10 @@ int main(int argc,char **argv)try{
   role_consumer::Model model(fixture/asset);consumer.selected_node=-1;
   for(const auto &entry:model.json.at("extras").at("domeSculptAuthoring").at("objects"))if(entry.at("object").get<std::string>()==std::to_string(id))consumer.selected_node=entry.at("node").get<int>();
   check(consumer.selected_node>=0,"Independent target consumer selects actual authenticated emitted object identity");
-  const Mat4 camera{5.27903413772583f,0,0,0,0,5.27903413772583f,0,0,0,0,5.27903413772583f,0,-2.639517307281494f,-.6387631297111511f,0,1};
+  // Actual orthographic view from +Z, consistent with viewOrigin(0,0,2).
+  // The old planar fixture's positive clip Z hid front-face paint on a cube
+  // behind its back face and made the inverted hull cover the whole body.
+  const Mat4 camera{5.27903413772583f,0,0,0,0,5.27903413772583f,0,0,0,0,-5.27903413772583f,0,-2.639517307281494f,-.6387631297111511f,0,1};
   auto image=[&](const std::string &name,const Pixels &pixels){const auto encoded=Image{96,96,pixels}.png();std::ofstream f(out/(std::string(asset)+"-"+name+".png"),std::ios::binary);f.write(reinterpret_cast<const char*>(encoded.data()),encoded.size());};
   for(int pose:{0,2}){
    auto posed=baseline.snapshot();

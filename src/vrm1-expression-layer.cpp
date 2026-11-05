@@ -13,6 +13,30 @@ namespace dome::detail {
 namespace {
 using J=nlohmann::json;
 using Pixel=std::array<double,4>;
+using ErrorPatch=std::array<Pixel,9>;
+// Exact de Casteljau restriction of a biquadratic error polynomial. Children
+// cover the complete parent rectangle; convex control hulls remain certificates,
+// unlike a denser set of sampled pixels. The fixed rounding margin below covers
+// the bounded double additions at all three permitted subdivision levels.
+std::array<ErrorPatch,4> split_error_patch(const ErrorPatch &patch){
+ std::array<ErrorPatch,2> halves{};std::array<ErrorPatch,4> children{};
+ for(size_t y=0;y<3;++y)for(size_t k=0;k<4;++k){
+  const double a=patch[y*3][k],b=patch[y*3+1][k],c=patch[y*3+2][k];
+  const double ab=(a+b)*.5,bc=(b+c)*.5,middle=(ab+bc)*.5;
+  halves[0][y*3][k]=a;halves[0][y*3+1][k]=ab;halves[0][y*3+2][k]=middle;
+  halves[1][y*3][k]=middle;halves[1][y*3+1][k]=bc;halves[1][y*3+2][k]=c;
+ }
+ for(size_t half=0;half<2;++half)for(size_t x=0;x<3;++x)for(size_t k=0;k<4;++k){
+  const double a=halves[half][x][k],b=halves[half][3+x][k],c=halves[half][6+x][k];
+  const double ab=(a+b)*.5,bc=(b+c)*.5,middle=(ab+bc)*.5;
+  children[half*2][x][k]=a;children[half*2][3+x][k]=ab;children[half*2][6+x][k]=middle;
+  children[half*2+1][x][k]=middle;children[half*2+1][3+x][k]=bc;children[half*2+1][6+x][k]=c;
+ }
+ return children;
+}
+double joint_error_hull(const ErrorPatch &patch){
+ double bound=0;for(const auto &p:patch)for(size_t k=0;k<3;++k)bound=std::max(bound,std::abs(p[k])+std::abs(p[3])+2e-12);return bound;
+}
 double linear(double v){return v<=.04045?v/12.92:std::pow((v+.055)/1.055,2.4);}
 double srgb(double v){return v<=.0031308?12.92*v:1.055*std::pow(v,1/2.4)-.055;}
 // MatCap is an additive view-normal term, independent of native colour paint.
@@ -87,7 +111,7 @@ Vrm1ExpressionLayer compile_vrm1_expression_layer(const J &original,const Sculpt
  const bool masked=material.parameters.alpha==MToonAlpha::Mask&&(object.material.alpha==Material::AlphaMode::Automatic||object.material.alpha==Material::AlphaMode::Mask||int(object.material.alpha)==binding.native_reference.alpha);
  if(material.version()!=MToonVersion::V1||(!opaque&&!masked)||
     material.parameters.scroll!=std::array<float,2>{}||material.parameters.rotation_speed!=0)
-  throw std::invalid_argument("VRM1 expression layer currently requires opaque outline-free nonanimated MToon1 source");
+  throw std::invalid_argument("VRM1 expression layer currently requires opaque or masked nonanimated MToon1 source");
  // An opaque unlit world-space outline is an independent original hull.
  // The existing writer disables outlines only on the derived paint primitive;
  // source outlineColor bindings remain on their actual lower material.
@@ -95,6 +119,7 @@ Vrm1ExpressionLayer compile_vrm1_expression_layer(const J &original,const Sculpt
     !(opaque&&material.parameters.outline==MToonOutline::World&&material.parameters.outline_mix==0&&
       !binding.roles[size_t(MToonSlot::Normal)].image&&!binding.roles[size_t(MToonSlot::OutlineWidth)].image))
   throw std::invalid_argument("VRM1 outlined paint needs its independent unlit world-space source proof");
+ const bool source_outline=material.parameters.outline!=MToonOutline::None;
  if(binding.canonical_attributes||binding.canonical_uv||binding.native_paint_sampling||binding.normal_preparation||binding.color_preparation||binding.key_derivation||binding.physical_emission)
   throw std::invalid_argument("VRM1 prepared/absolute expression layers need their owning adapter");
  if(binding.roles[size_t(MToonSlot::Normal)].image&&!opaque)throw std::invalid_argument("VRM1 masked normal expression layers need their independent membership adapter");
@@ -162,7 +187,8 @@ Vrm1ExpressionLayer compile_vrm1_expression_layer(const J &original,const Sculpt
   throw std::length_error("VRM1 expression-layer pixel limit exceeded");
  if(binding.roles[size_t(MToonSlot::Normal)].image)require_vrm1_authored_normal_frame(object,cancelled);
  const double additive_error=matcap_margin(expressions,object,result,limits,cancelled)+(rim_relevant?rim_margin(expressions,object,result,limits,cancelled):0);
- if(found&&(!same_target||result.scale[0]==0||result.scale[1]==0)){
+ const bool needs_invariant_upper=!same_target||result.scale[0]==0||result.scale[1]==0;
+ if(found&&(needs_invariant_upper||source_outline)){
   bool invariant=result.shade_alias||invariant_image(shade,active_components({material.parameters.shade_color.x,material.parameters.shade_color.y,material.parameters.shade_color.z},"shadeColor"));
   const auto &emission=material.parameters.emission;std::array<float,3> effective{vrm_native_factor(emission.x,binding.native_reference.emission[0],object.material.emissive[0]),vrm_native_factor(emission.y,binding.native_reference.emission[1],object.material.emissive[1]),vrm_native_factor(emission.z,binding.native_reference.emission[2],object.material.emissive[2])};
   invariant=invariant&&(material.parameters.emission_strength==0||invariant_image(binding.roles[size_t(MToonSlot::Emission)],active_components(effective,"emissionColor")));
@@ -171,21 +197,27 @@ Vrm1ExpressionLayer compile_vrm1_expression_layer(const J &original,const Sculpt
   auto rim_active=active_components({material.parameters.rim_color.x,material.parameters.rim_color.y,material.parameters.rim_color.z},"rimColor");
   if(binding.roles[size_t(MToonSlot::Matcap)].image){const auto matcap_active=active_components({material.parameters.matcap_color.x,material.parameters.matcap_color.y,material.parameters.matcap_color.z},"matcapColor");for(size_t k=0;k<3;++k)rim_active[k]=rim_active[k]||matcap_active[k];}
   invariant=invariant&&invariant_image(binding.roles[size_t(MToonSlot::Rim)],rim_active);
-  if(!invariant)throw std::invalid_argument(same_target?"VRM1 zero UV target couples moving upper roles to fixed paint":"VRM1 differing UV targets couple moving upper roles to fixed paint");
-  result.forward_uv=false;result.scale={1,1};result.offset={};
+  if(!invariant&&needs_invariant_upper)throw std::invalid_argument(same_target?"VRM1 zero UV target couples moving upper roles to fixed paint":"VRM1 differing UV targets couple moving upper roles to fixed paint");
+  // Newly supported source outlines need no inverse carrier when every actual
+  // upper role is invariant. Keep original UV bindings on the lower material;
+  // the independent paint coordinates then remain exact at their native scale.
+  if(invariant){result.forward_uv=false;result.scale={1,1};result.offset={};}
  }
  // Charge native premultiplied doubles, decoded output doubles, PNG source,
  // bounded encoder scratch, coordinate result and both merged knot vectors
  // before allocating any of them. Encoded output is bounded by writer too.
  auto charge=[&](size_t count,size_t width){if(result.working_bytes>limits.max_working_bytes||count>(limits.max_working_bytes-result.working_bytes)/width)throw std::length_error("VRM1 expression-layer prospective working limit exceeded");result.working_bytes+=count*width;};
  charge(native_pixels,sizeof(Pixel));charge(pixels,sizeof(Pixel)+10);charge(object.painted->mesh().positions.size(),sizeof(std::array<float,2>));charge(2*(n+size+2),sizeof(double));
+ if(source_outline)charge(1,16*1024); // Bounded recursive proof scratch, no heap.
  if(pixels>limits.max_output_bytes/6)throw std::length_error("VRM1 expression-layer prospective PNG limit exceeded");
  auto work=[&](size_t count){if(result.sample_operations>limits.max_sample_operations||count>limits.max_sample_operations-result.sample_operations)throw std::length_error("VRM1 expression-layer sampling work limit exceeded");result.sample_operations+=count;};
  const size_t divisor=std::gcd(n,size_t(size));
  const size_t shared_centres=(n/divisor)%2&&(size/divisor)%2?divisor:0;
  const size_t knot_count=n+size-shared_centres+2,cells=knot_count-1;
- bool compensate_tent=wide_shade&&size>n&&size%n==0&&(size/n)%2==0;
- size_t prefilter_work=wide_shade?(compensate_tent?13:9):0;
+ const size_t proof_work=source_outline?120:80;
+ constexpr size_t outline_refinement_limit=4096;
+ bool compensate_tent=(wide_shade||source_outline)&&size>n&&size%n==0&&(size/n)%2==0;
+ size_t prefilter_work=wide_shade||source_outline?(compensate_tent?13:9):0;
  // Forecast the full native sampling, optional prefilter and continuous proof
  // together, before dense allocations. The centre intersection count is exact:
  // n/g and size/g must both be odd to share the g rational centre knots.
@@ -194,7 +226,8 @@ Vrm1ExpressionLayer compile_vrm1_expression_layer(const J &original,const Sculpt
  size_t forecast=result.sample_operations;
  auto forecast_work=[&](size_t count,size_t width){if(forecast>limits.max_sample_operations||count>(limits.max_sample_operations-forecast)/width)throw std::length_error("VRM1 expression-layer prospective complete sampling work limit exceeded");forecast+=count*width;};
  if(masked){forecast_work(alpha_pixels,1);forecast_work(native_pixels,1+packet.layers().size());}
- forecast_work(native_pixels,1+packet.layers().size());forecast_work(pixels,1+prefilter_work);forecast_work(cells*cells,80);
+ forecast_work(native_pixels,1+packet.layers().size());forecast_work(pixels,1+prefilter_work);forecast_work(cells*cells,proof_work);
+ if(source_outline)forecast_work(outline_refinement_limit,1024);
  const uint32_t support_multiple=size>=n?uint32_t(size/n):0;
  const uint32_t support_logical=support_multiple?uint32_t(n)*(support_multiple%2?support_multiple:support_multiple-1):size;
  uint32_t logical_size=size,inset=0;double image_scale=1,image_offset=0;size_t support_remaining=0;
@@ -212,6 +245,12 @@ Vrm1ExpressionLayer compile_vrm1_expression_layer(const J &original,const Sculpt
   // never discard the native clamped alpha, including genuine authored zero.
   if(cutoff>0&&lower<cutoff+1e-5){support_remaining=forecast-result.sample_operations;require_vrm1_mask_paint_support(expressions,object,packet,support_logical,alpha_low,cutoff,result,limits,support_remaining,cancelled);support_reconstruction=true;}
  }
+ // A newly admitted invariant upper outline layer can retain the native
+ // centre knots exactly. An even upsample otherwise moves every knot and can
+ // smooth sharp genuine paint beyond the fixed error budget. Use the existing
+ // odd aligned interior and real affine carrier, without increasing PNG size.
+ const bool outline_alignment=source_outline&&!result.forward_uv&&size>n&&size%n==0&&(size/n)%2==0;
+ if(outline_alignment)support_reconstruction=true;
  if(support_reconstruction){
   // An odd multiple aligns every native texel centre with an output centre.
   // Keep the requested PNG dimensions; its padded interior carries the exact
@@ -221,7 +260,8 @@ Vrm1ExpressionLayer compile_vrm1_expression_layer(const J &original,const Sculpt
   // its dense scratch. Support scans have already consumed their own budget.
   size_t remaining=result.sample_operations;auto reserve=[&](size_t count,size_t width){if(remaining>limits.max_sample_operations||count>(limits.max_sample_operations-remaining)/width)throw std::length_error("VRM1 mask support reconstruction prospective work limit exceeded");remaining+=count*width;};
   const size_t g=std::gcd(n,size_t(logical_size)),shared=(n/g)%2&&(logical_size/g)%2?g:0,cells=n+logical_size-shared+1;
-  reserve(native_pixels,1+packet.layers().size());reserve(size_t(logical_size)*logical_size,1);reserve(pixels,prefilter_work+(logical_size!=size));reserve(cells*cells,80);
+  reserve(native_pixels,1+packet.layers().size());reserve(size_t(logical_size)*logical_size,1);reserve(pixels,prefilter_work+(logical_size!=size));reserve(cells*cells,proof_work);
+  if(source_outline)reserve(outline_refinement_limit,1024);
  }
  const size_t proof_divisor=std::gcd(n,size_t(logical_size)),proof_shared=(n/proof_divisor)%2&&(logical_size/proof_divisor)%2?proof_divisor:0,proof_knot_count=n+logical_size-proof_shared+2;
  if(prefilter_work)work(pixels*prefilter_work);
@@ -252,7 +292,7 @@ Vrm1ExpressionLayer compile_vrm1_expression_layer(const J &original,const Sculpt
  // straight colour there, without changing coverage or positive-coverage data.
  // All reads come from the immutable native field (never propagated padding).
  // The continuous proof below still decides admission; this is no error waiver.
- if(wide_shade||support_reconstruction)for(uint32_t y=0;y<logical_size;++y){stop();for(uint32_t x=0;x<logical_size;++x){
+ if(wide_shade||support_reconstruction||source_outline)for(uint32_t y=0;y<logical_size;++y){stop();for(uint32_t x=0;x<logical_size;++x){
   const double u=(x+.5)/logical_size,v=(y+.5)/logical_size;if(bilinear(native,uint32_t(n),u,v)[3]!=0)continue;
   Pixel sum{};for(int j=-1;j<=1;++j)for(int i=-1;i<=1;++i)if(i||j){const auto p=bilinear(native,uint32_t(n),(double(x)+i+.5)/logical_size,(double(y)+j+.5)/logical_size);for(size_t k=0;k<4;++k)sum[k]+=p[k];}
   if(sum[3]>0)for(size_t k=0;k<3;++k){const double value=std::clamp(sum[k]/sum[3]*result.paint_rgb_scale[k],0.,1.);const auto byte=uint8_t(std::clamp(std::lround(srgb(value)*255),0l,255l));const size_t at=size_t(y)*logical_size+x,image_at=(size_t(y+inset)*size+x+inset)*4;image->rgba[image_at+k]=byte;decoded[at][k]=linear(byte/255.)/result.paint_rgb_scale[k];}
@@ -263,22 +303,45 @@ Vrm1ExpressionLayer compile_vrm1_expression_layer(const J &original,const Sculpt
  // bilinear. Product(straight RGB,coverage) is biquadratic: its Bernstein
  // control hull bounds error against the degree-elevated native premult field
  // throughout the full footprint, not just at selected sample points.
- for(size_t y=1;y<knots.size();++y){stop();for(size_t x=1;x<knots.size();++x){work(80);Pixel a[2][2],b[2][2];for(int j=0;j<2;++j)for(int i=0;i<2;++i){a[j][i]=bilinear(native,uint32_t(n),knots[x-1+i],knots[y-1+j]);b[j][i]=bilinear(decoded,logical_size,knots[x-1+i],knots[y-1+j]);}
+ const double allowed_error=3./(255*lighting_bound)-additive_error/lighting_bound;
+ double outline_joint_error=0;size_t refinements=0;
+ auto certify_outline=[&](auto &&self,const ErrorPatch &patch,unsigned depth)->double{
+  const double bound=joint_error_hull(patch);if(bound<=allowed_error||depth==3)return bound;
+  if(refinements==outline_refinement_limit)throw std::length_error("VRM1 outline continuous proof refinement limit exceeded");
+  ++refinements;work(1024);stop();double tighter=0;
+  for(const auto &child:split_error_patch(patch))tighter=std::max(tighter,self(self,child,depth+1));
+  return tighter;
+ };
+ for(size_t y=1;y<knots.size();++y){stop();for(size_t x=1;x<knots.size();++x){work(proof_work);ErrorPatch errors;Pixel a[2][2],b[2][2];for(int j=0;j<2;++j)for(int i=0;i<2;++i){a[j][i]=bilinear(native,uint32_t(n),knots[x-1+i],knots[y-1+j]);b[j][i]=bilinear(decoded,logical_size,knots[x-1+i],knots[y-1+j]);}
   for(int j=0;j<3;++j)for(int i=0;i<3;++i)for(size_t k=0;k<4;++k){double product=0;
    if(k==3)product=std::lerp(std::lerp(b[0][0][3],b[0][1][3],i*.5),std::lerp(b[1][0][3],b[1][1][3],i*.5),j*.5);
    else for(int m=0;m<2;++m)for(int l=0;l<2;++l)if(i-l>=0&&i-l<2&&j-m>=0&&j-m<2)product+=b[m][l][k]*b[j-m][i-l][3]*(i==1?.5:1)*(j==1?.5:1);
    const double reference=std::lerp(std::lerp(a[0][0][k],a[0][1][k],i*.5),std::lerp(a[1][0][k],a[1][1][k],i*.5),j*.5),error=std::abs(product-reference)+1e-12;
+   if(source_outline)errors[size_t(j)*3+size_t(i)][k]=product-reference;
    auto &maximum=k==3?result.maximum_coverage_error:result.maximum_color_error;maximum=std::max(maximum,error);
   }
+  if(source_outline)outline_joint_error=std::max(outline_joint_error,certify_outline(certify_outline,errors,0));
  }}
- if(result.maximum_color_error+result.maximum_coverage_error>3./(255*lighting_bound)-additive_error/lighting_bound)throw std::invalid_argument("VRM1 straight-alpha PNG reconstruction exceeds fixed portable expression-layer error budget: RGB="+std::to_string(result.maximum_color_error)+" coverage="+std::to_string(result.maximum_coverage_error)+" light="+std::to_string(lighting_bound));
- result.paint_coordinates.reserve(object.painted->mesh().uv.size());for(auto uv:object.painted->mesh().uv){stop();for(size_t k=0;k<2;++k){uv[k]=((support_reconstruction?float(uv[k]*image_scale+image_offset):uv[k])-result.offset[k])/result.scale[k];if(!std::isfinite(uv[k]))throw std::invalid_argument("VRM1 expression-layer carrier coordinate is nonfinite");}result.paint_coordinates.push_back(uv);}
+ if((source_outline?outline_joint_error:result.maximum_color_error+result.maximum_coverage_error)>allowed_error)throw std::invalid_argument("VRM1 straight-alpha PNG reconstruction exceeds fixed portable expression-layer error budget: RGB="+std::to_string(result.maximum_color_error)+" coverage="+std::to_string(result.maximum_coverage_error)+" light="+std::to_string(lighting_bound)+(source_outline?" joint="+std::to_string(outline_joint_error):""));
+ std::array<double,2> carrier_encoding_error{};
+ result.paint_coordinates.reserve(object.painted->mesh().uv.size());for(auto uv:object.painted->mesh().uv){stop();for(size_t k=0;k<2;++k){
+  const double aligned=double(uv[k])*image_scale+image_offset;
+  uv[k]=((support_reconstruction?float(aligned):uv[k])-result.offset[k])/result.scale[k];
+  if(outline_alignment)carrier_encoding_error[k]=std::max(carrier_encoding_error[k],std::abs(double(uv[k])-aligned));
+  if(!std::isfinite(uv[k]))throw std::invalid_argument("VRM1 expression-layer carrier coordinate is nonfinite");}result.paint_coordinates.push_back(uv);}
  if(result.paint_coordinates.size()!=object.painted->mesh().positions.size())throw std::invalid_argument("VRM1 expression layer has no complete writable coordinate owner");
  // Bound ordinary F32 interpolation/scale/add cancellation relative to the
  // native field's one-texel Lipschitz scale. This rejects huge inverse carriers
  // even when double cancellation at the vertices would appear harmless.
  for(size_t k=0;k<2;++k){double maximum=0;for(auto uv:result.paint_coordinates)maximum=std::max(maximum,std::abs(double(uv[k])));
-  const double forward_error=16*std::numeric_limits<float>::epsilon()*(std::abs(double(result.scale[k]))*maximum+std::abs(double(result.offset[k]))+1+(support_reconstruction?image_scale+image_offset:0))/image_scale;
+  // Invariant aligned outlines encode the affine map directly into the actual
+  // vertex accessor. Identity scale/offset and no forwarded UV bindings execute
+  // no inverse/dynamic carrier arithmetic. Bound actual vertex rounding plus
+  // both interpolated varyings with the same conservative 16-epsilon envelope;
+  // do not charge nonexistent scale/add operations or relax the texel limit.
+  const double forward_error=outline_alignment?
+   (carrier_encoding_error[k]+16*std::numeric_limits<float>::epsilon()*maximum)/image_scale:
+   16*std::numeric_limits<float>::epsilon()*(std::abs(double(result.scale[k]))*maximum+std::abs(double(result.offset[k]))+1+(support_reconstruction?image_scale+image_offset:0))/image_scale;
   if(forward_error>1./(n*1024))throw std::invalid_argument("VRM1 expression carrier exceeds bounded native-field float precision");
  }
  for(size_t k=0;k<3;++k)result.shade_divisor[k]*=result.paint_rgb_scale[k];
