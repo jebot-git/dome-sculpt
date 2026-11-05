@@ -106,16 +106,17 @@ void edit_retopology_distance(Document &doc) {
   }
   if (accepted) doc.retopology_distance(float(std::pow(200., slider.value())));
 }
-void edit_voxel_remesh(Document &doc) {
-  doc.begin_voxel_remesh();
+static void edit_remesh(Document &doc,bool triangle) {
+  const auto parameter=triangle?VrParameter::TriangleEdge:VrParameter::VoxelSize;
+  if(triangle)doc.begin_triangle_remesh();else doc.begin_voxel_remesh();
   try {
     int row = std::max(32, dx::size + 14), width = std::max(560, dx::size * 34);
     int sx, sy, sw, sh;
     Fl::screen_work_area(sx, sy, sw, sh);
     width = std::min(width, sw - 40);
-    const char *description_text =
-        "Create a new sculpt from the displayed shape.\n"
-        "Source paint, rig and layers stay in a hidden object.";
+    const char *description_text = triangle?
+        "Create a new unpainted polygon surface.\nSource paint, rig and layers stay in a hidden object.":
+        "Create a new sculpt from the displayed shape.\nSource paint, rig and layers stay in a hidden object.";
     const char *hint_text = "Drag, wheel or arrow keys";
     fl_font(dx::font, dx::size);
     auto measured_height = [&](const char *text, int minimum) {
@@ -128,7 +129,7 @@ void edit_voxel_remesh(Document &doc) {
     int hint_height = measured_height(hint_text, row);
     int body_height = header + value_height + hint_height + row * 3;
     int height = std::min(body_height + row, sh - 40);
-    DomeDialog window(width, height, "Voxel remesh");
+    DomeDialog window(width,height,triangle?"Isotropic remesh":"Voxel remesh");
     Fl_Scroll scroll(0, 0, width, height - row);
     scroll.type(Fl_Scroll::VERTICAL);
     Fl_Group content(0, 0, width - 24, body_height);
@@ -147,14 +148,15 @@ void edit_voxel_remesh(Document &doc) {
     struct State {
       Document *doc;
       float minimum, maximum;
-    } state{&doc, controls.minimum, controls.maximum};
+      bool triangle;
+    } state{&doc,controls.minimum,controls.maximum,triangle};
     slider.callback([](Fl_Widget *widget, void *data) {
       auto &state = *static_cast<State *>(data);
       auto slider = static_cast<Fl_Slider *>(widget);
       try {
         float mm = std::exp(std::log(state.minimum) + slider->value() *
                              std::log(state.maximum / state.minimum));
-        state.doc->edit_voxel_size(std::clamp(mm, state.minimum, state.maximum));
+        if(state.triangle)state.doc->edit_triangle_edge(std::clamp(mm,state.minimum,state.maximum));else state.doc->edit_voxel_size(std::clamp(mm,state.minimum,state.maximum));
       } catch (const std::exception &e) {
         state.doc->report_error(e.what());
       }
@@ -167,12 +169,12 @@ void edit_voxel_remesh(Document &doc) {
     scroll.end();
     Fl_Button cancel(24, height - row + 4, width / 2 - 36, row - 8, "Cancel"),
         remesh(width / 2 + 12, height - row + 4, width / 2 - 36, row - 8, "Remesh");
-    struct Result { Document *doc; Fl_Window *window; } result{&doc, &window};
+    struct Result { Document *doc; Fl_Window *window; bool triangle; } result{&doc,&window,triangle};
     cancel.callback([](Fl_Widget *widget, void *) { widget->window()->hide(); });
     remesh.callback([](Fl_Widget *, void *data) {
       auto &result = *static_cast<Result *>(data);
       try {
-        result.doc->end_voxel_remesh(true);
+        if(result.triangle)result.doc->end_triangle_remesh(true);else result.doc->end_voxel_remesh(true);
         result.window->hide();
       } catch (const std::exception &e) {
         result.doc->report_error(e.what());
@@ -185,22 +187,26 @@ void edit_voxel_remesh(Document &doc) {
     cancel.take_focus();
     while (window.shown()) {
       auto frame = doc.frame().state;
-      if (frame->controls.parameter != VrParameter::VoxelSize) {
+      if (frame->controls.parameter != parameter) {
         window.hide();
         break;
       }
       char label[64];
-      snprintf(label, sizeof(label), "Voxel size: %.2f mm", double(frame->voxel_size_mm));
+      snprintf(label,sizeof(label),triangle?"Edge length: %.2f mm":"Voxel size: %.2f mm",double(frame->controls.value[0]));
       value.copy_label(label);
       status.copy_label(frame->error.c_str());
       Fl::wait(.05);
     }
-    if (doc.frame().state->controls.parameter == VrParameter::VoxelSize)
-      doc.end_voxel_remesh(false);
+    if (doc.frame().state->controls.parameter == parameter) {
+      if(triangle)doc.end_triangle_remesh(false);else doc.end_voxel_remesh(false);
+    }
   } catch (...) {
-    if (doc.frame().state->controls.parameter == VrParameter::VoxelSize)
-      doc.end_voxel_remesh(false);
+    if (doc.frame().state->controls.parameter == parameter) {
+      if(triangle)doc.end_triangle_remesh(false);else doc.end_voxel_remesh(false);
+    }
     throw;
   }
 }
+void edit_voxel_remesh(Document &doc){edit_remesh(doc,false);}
+void edit_triangle_remesh(Document &doc){edit_remesh(doc,true);}
 } // namespace dome

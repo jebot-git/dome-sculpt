@@ -1,0 +1,312 @@
+{
+  "recorded_utc": "2026-11-05T16:48:01.114581+00:00",
+  "base": "10944ab4ec69b5958ee09a546f55bdec3d7be2e3",
+  "admitted_main": false,
+  "state": "WIP; native source/worker/controller evidence, whole tests failed for affine polygon editing",
+  "runtime": "Full affine world-space isotropic kernel; inverse local editable PolygonAuthority; unpainted atlas and complete retained hidden original. Explicit native/FLTK/XR control routes. Scale-aware F32 area screen rejects unstable split/collapse/flip/relax candidates.",
+  "public_layouts": "No new data members, format or shader change. New member/free-function declarations and VrParameter TriangleEdge2049.",
+  "kernel_diagnostic": "Original tiny triangle raw normal 0,2.85218e-09,-1.90921e-08; source dot.0698498 fails unchanged>.1 eligibility. New operation screen keeps previous valid topology.",
+  "same_source_files": 2225,
+  "profiles": {
+    "release": {
+      "scope": "Complete native authoring/kernel/voxel consumer; actual process failed for affine polygon selection",
+      "wrapper": {
+        "state": "terminal",
+        "pid": 2125712,
+        "profile": "release",
+        "steps": [
+          {
+            "name": "compile-remesh.cpp",
+            "command": [
+              "/usr/bin/c++",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/triangle-remesh-10944/src",
+              "-DDOME_SCULPT_INSTALLED_ASSETS=\"/usr/local/share/dome-sculpt/assets/humanoid\"",
+              "-DDOME_SCULPT_SOURCE_ASSETS=\"/home/blux/de-xr/dome-sculpt/artifacts/triangle-remesh-10944/assets/humanoid\"",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/triangle-remesh-10944/third_party",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/triangle-remesh-10944/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/triangle-remesh-10944/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/triangle-remesh-10944/third_party/cgltf",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/triangle-remesh-10944/third_party/nlohmann",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/triangle-remesh-10944/third_party/xatlas",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/triangle-remesh-10944/third_party/mikktspace",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/triangle-remesh-10944/third_party/ufbx",
+              "-O3",
+              "-DNDEBUG",
+              "-std=gnu++20",
+              "-Wall",
+              "-Wextra",
+              "-Wpedantic",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/triangle-remesh-10944/artifacts/triangle-proof/release-v7/remesh.cpp.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/triangle-remesh-10944/src/remesh.cpp"
+            ],
+            "exit": 0,
+            "seconds": 2.302494300995022
+          },
+          {
+            "name": "compile-triangle-remesh-kernel.cpp",
+            "command": [
+              "/usr/bin/c++",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/triangle-remesh-10944/src",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/triangle-remesh-10944/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/triangle-remesh-10944/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/triangle-remesh-10944/third_party/nlohmann",
+              "-O3",
+              "-DNDEBUG",
+              "-std=gnu++20",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/triangle-remesh-10944/artifacts/triangle-proof/release-v7/triangle-remesh-kernel.cpp.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/triangle-remesh-10944/tests/triangle-remesh-kernel.cpp"
+            ],
+            "exit": 0,
+            "seconds": 1.4859552810085006
+          },
+          {
+            "name": "compile-triangle-remesh.cpp",
+            "command": [
+              "/usr/bin/c++",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/triangle-remesh-10944/src",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/triangle-remesh-10944/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/triangle-remesh-10944/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/triangle-remesh-10944/third_party/nlohmann",
+              "-O3",
+              "-DNDEBUG",
+              "-std=gnu++20",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/triangle-remesh-10944/artifacts/triangle-proof/release-v7/triangle-remesh.cpp.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/triangle-remesh-10944/tests/triangle-remesh.cpp"
+            ],
+            "exit": 0,
+            "seconds": 3.2201915309997275
+          },
+          {
+            "name": "link-native",
+            "command": [
+              "/usr/bin/c++",
+              "/home/blux/de-xr/dome-sculpt/artifacts/triangle-remesh-10944/artifacts/triangle-proof/release/mesh-authoring.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/triangle-remesh-10944/artifacts/triangle-proof/release/polygon-conversion.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/triangle-remesh-10944/artifacts/triangle-proof/release/document-assets.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/triangle-remesh-10944/artifacts/triangle-proof/release/document.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/triangle-remesh-10944/artifacts/triangle-proof/release/input.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/triangle-remesh-10944/artifacts/triangle-proof/release-v7/remesh.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/triangle-remesh-10944/artifacts/triangle-proof/release-v7/triangle-remesh-kernel.cpp.o",
+              "-Wl,-Map=/home/blux/de-xr/dome-sculpt/artifacts/triangle-remesh-10944/artifacts/triangle-proof/release-v7/native.map",
+              "-Wl,--wrap=_ZN4dome22create_triangle_remeshERNS_5SceneEfRKSt8functionIFbvEE",
+              "-O3",
+              "-DNDEBUG",
+              "/home/blux/de-xr/dome-sculpt/artifacts/triangle-remesh-10944/artifacts/triangle-proof/release-v7/triangle-remesh.cpp.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/triangle-remesh-10944/artifacts/triangle-proof/release-v7/native",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-preflight-qualified-0b6/artifacts/final-preflight/release/stage/libdome-sculpt-core.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-preflight-qualified-0b6/artifacts/final-preflight/release/stage/libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-preflight-qualified-0b6/artifacts/final-preflight/release/stage/libdome-sculpt-polygon.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-preflight-qualified-0b6/artifacts/final-preflight/release/stage/libxatlas.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-preflight-qualified-0b6/artifacts/final-preflight/release/stage/libmikktspace.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-preflight-qualified-0b6/artifacts/final-preflight/release/stage/libmikktspace-robust.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-preflight-qualified-0b6/artifacts/final-preflight/release/stage/libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-preflight-qualified-0b6/artifacts/final-preflight/release/stage/libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit": 0,
+            "seconds": 0.2623543560039252
+          },
+          {
+            "name": "actual-native",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/triangle-remesh-10944/artifacts/triangle-proof/release-v7/native",
+              "/home/blux/de-xr/dome-sculpt/artifacts/triangle-remesh-10944/artifacts/triangle-proof/release-v7/run"
+            ],
+            "exit": 1,
+            "seconds": 0.47286645299755037
+          }
+        ],
+        "scope": "Six complete changed core TUs before immutable matching CURRENT MAIN0 C179 support. Native triangle operation/worker/controller + unchanged complete voxel test; no app/UI/GL/fullbuild qualification.",
+        "allocated_bytes": 740950016,
+        "free_bytes": 25425399808,
+        "phase": "actual-native",
+        "child_pid": 2126673,
+        "old_changed_members_excluded": true,
+        "exit": 1,
+        "error": "RuntimeError('actual-native failed')",
+        "seconds": 7.945829194039106,
+        "inputs": 2243,
+        "drift": []
+      },
+      "log_sha256": "20bbaa9543f965ed1cb15866c76fe3e881041efa63746569b04784476a971bfa",
+      "printed_PASS_lines": 2155,
+      "failures": [
+        "FAIL affine polygon workflow: This object has exact affine placement; use world_matrix",
+        "FAIL All polygon integration workflows pass"
+      ],
+      "source_manifest_sha256": "cdaf0611aa7434be44202f3a44a731a2f7669dc51d4ce824b6764b060c8ddcf6",
+      "map_sha256": "d5ceea381fb1823931ef5b8899be7652961132a43b82634e49080481283189a8",
+      "binary_sha256": "1f1a1d20de842e79847259a84b73161bdb27c39331d463dc66b891183ae88216"
+    },
+    "sanitize": {
+      "scope": "Complete native authoring/kernel/voxel consumer; actual process failed for affine polygon selection",
+      "wrapper": {
+        "state": "terminal",
+        "pid": 2116712,
+        "profile": "sanitize",
+        "steps": [
+          {
+            "name": "link-native",
+            "command": [
+              "/usr/bin/c++",
+              "/home/blux/de-xr/dome-sculpt/artifacts/triangle-remesh-10944/artifacts/triangle-proof/sanitize-v5/mesh-authoring.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/triangle-remesh-10944/artifacts/triangle-proof/sanitize-v5/polygon-conversion.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/triangle-remesh-10944/artifacts/triangle-proof/sanitize-v5/document-assets.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/triangle-remesh-10944/artifacts/triangle-proof/sanitize-v5/document.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/triangle-remesh-10944/artifacts/triangle-proof/sanitize-v5/input.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/triangle-remesh-10944/artifacts/triangle-proof/sanitize-v5/remesh.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/triangle-remesh-10944/artifacts/triangle-proof/sanitize-v5/triangle-remesh-kernel.cpp.o",
+              "-Wl,-Map=/home/blux/de-xr/dome-sculpt/artifacts/triangle-remesh-10944/artifacts/triangle-proof/sanitize-v6/native.map",
+              "-Wl,--wrap=_ZN4dome22create_triangle_remeshERNS_5SceneEfRKSt8functionIFbvEE",
+              "-O1",
+              "-g1",
+              "-DNDEBUG",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "/home/blux/de-xr/dome-sculpt/artifacts/triangle-remesh-10944/artifacts/triangle-proof/sanitize-v5/triangle-remesh.cpp.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/triangle-remesh-10944/artifacts/triangle-proof/sanitize-v6/native",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-preflight-qualified-0b6/artifacts/final-preflight/sanitize/stage/libdome-sculpt-core.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-preflight-qualified-0b6/artifacts/final-preflight/sanitize/stage/libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-preflight-qualified-0b6/artifacts/final-preflight/sanitize/stage/libdome-sculpt-polygon.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-preflight-qualified-0b6/artifacts/final-preflight/sanitize/stage/libxatlas.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-preflight-qualified-0b6/artifacts/final-preflight/sanitize/stage/libmikktspace.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-preflight-qualified-0b6/artifacts/final-preflight/sanitize/stage/libmikktspace-robust.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-preflight-qualified-0b6/artifacts/final-preflight/sanitize/stage/libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-preflight-qualified-0b6/artifacts/final-preflight/sanitize/stage/libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit": 0,
+            "seconds": 1.8582950150012039
+          },
+          {
+            "name": "actual-native",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/triangle-remesh-10944/artifacts/triangle-proof/sanitize-v6/native",
+              "/home/blux/de-xr/dome-sculpt/artifacts/triangle-remesh-10944/artifacts/triangle-proof/sanitize-v6/run"
+            ],
+            "exit": 1,
+            "seconds": 3.634971109975595
+          }
+        ],
+        "scope": "Six complete changed core TUs before immutable matching CURRENT MAIN0 C179 support. Native triangle operation/worker/controller + unchanged complete voxel test; no app/UI/GL/fullbuild qualification.",
+        "allocated_bytes": 712863744,
+        "free_bytes": 25511919616,
+        "phase": "actual-native",
+        "child_pid": 2117291,
+        "old_changed_members_excluded": true,
+        "exit": 1,
+        "error": "RuntimeError('actual-native failed')",
+        "seconds": 6.93074715603143,
+        "inputs": 2245,
+        "drift": []
+      },
+      "log_sha256": "20bbaa9543f965ed1cb15866c76fe3e881041efa63746569b04784476a971bfa",
+      "printed_PASS_lines": 2155,
+      "failures": [
+        "FAIL affine polygon workflow: This object has exact affine placement; use world_matrix",
+        "FAIL All polygon integration workflows pass"
+      ],
+      "source_manifest_sha256": "164792f2441d1bcb41ac0ca87ca53d146cf3dc7318b01051d6367e9198bb712d",
+      "map_sha256": "c9cf4a76bc7a98c80aca730e3e7b8e208e714a0063d2ddb58908c6fde9c88f11",
+      "binary_sha256": "ea26ed39fe2475758b0eb43cb497adf010c5c34c716f6547d93324faac8e6fd4"
+    }
+  },
+  "exact_saved_pairs": [
+    {
+      "file": "immediate-save.dsculpt",
+      "sha256": "501dc11a5812f63956ce07a2ff4766cbc098f4dba806d913b2b88a2eb331f8ce"
+    },
+    {
+      "file": "roundtrip-0.dsculpt",
+      "sha256": "39b0a9937986da5734d8eddae23cb9c4403b6a42a2a53d3420dfbd27bc319555"
+    },
+    {
+      "file": "roundtrip-1.dsculpt",
+      "sha256": "501dc11a5812f63956ce07a2ff4766cbc098f4dba806d913b2b88a2eb331f8ce"
+    },
+    {
+      "file": "roundtrip-2.dsculpt",
+      "sha256": "1f93dbec96e07c7d27ce020de8d08c1cc419c2cb25a8de7a9ac8511be3ad0b5b"
+    }
+  ],
+  "original_failures": [
+    {
+      "directory": "artifacts/triangle-proof/release",
+      "exit": 1,
+      "error": "RuntimeError('actual-native failed')",
+      "status_sha256": "b5d31c3aaea3e70e7854349e728fac7a881a0ec643f39c35d096b58cf94c72f8"
+    },
+    {
+      "directory": "artifacts/triangle-proof/release-v2",
+      "exit": 1,
+      "error": "RuntimeError('actual-native failed')",
+      "status_sha256": "2d3119a1d555cf30b0f31c80e01075fdd7bf99154273f0ab9596a3cfbba79610"
+    },
+    {
+      "directory": "artifacts/triangle-proof/release-probe",
+      "exit": 1,
+      "error": "RuntimeError('actual-native failed')",
+      "status_sha256": "a737158e9240474b43b9d02957f0bd760fe7dc93158361a406ea8baafaea7945"
+    },
+    {
+      "directory": "artifacts/triangle-proof/release-v3",
+      "exit": 1,
+      "error": "RuntimeError('actual-native failed')",
+      "status_sha256": "84c95557226fbf3607c9e7ec248412f50af4fe54ef229b240fa17b5ed8e67a95"
+    },
+    {
+      "directory": "artifacts/triangle-proof/release-v4",
+      "exit": 1,
+      "error": "RuntimeError('actual-native failed')",
+      "status_sha256": "9de80bafd77b4c94abfc9d7b8c0f7c2d24d71a6e05eb8a74fd35411e9a1ee85e"
+    },
+    {
+      "directory": "artifacts/triangle-proof/sanitize-v5",
+      "exit": 1,
+      "error": "FileNotFoundError(2, 'No such file or directory')",
+      "status_sha256": "440f34bb5d0c97d6c757117be28343d5074491880116886eecd6672de31ac790"
+    }
+  ],
+  "remaining": [
+    "Full affine polygon workspace operations/picking/drag/adoption (actual SelectAll currently throws).",
+    "Authoring persistent allocation/factory/cancellation sweep.",
+    "Matching FLTK normal/compact/Wayland/synthetic-XR app qualification.",
+    "Broader sources, workload and physical-device/accelerator qualification."
+  ],
+  "no_claim": [
+    "No whole regression pass",
+    "No main integration",
+    "No GPU remeshing implementation or validation",
+    "No system installation or HMD launch"
+  ]
+}
