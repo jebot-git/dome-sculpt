@@ -4,8 +4,9 @@ Read [the current progress checkpoint](PRODUCTION-PROGRESS-2026-11-05.md) for
 the sealed private retopology, Automatic0/explicit5 weights, outline and remesh
 scopes and remaining gates. Main runtime remains native36/c179. Remesh source
 geometry/worker checks pass within full runs that still fail affine polygon
-editing; its complete allocation sweeps and matching retopology UI qualification
-are in progress. These updates preserve every unfinished requirement below.
+editing; its complete allocation sweeps are in progress. The private retopology
+client checkpoint a852855 closes its scoped FLTK/software-loader checks, while
+default-view marker feedback remains unresolved. These updates preserve every unfinished requirement below.
 
 ## Exhaustive private physical-package fault closure — 2026-11-05
 

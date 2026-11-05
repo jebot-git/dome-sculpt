@@ -7,12 +7,21 @@ full regression, interoperability, accelerator or physical-device completion.
 
 | Workstream | Verified checkpoint | Remaining integration |
 | --- | --- | --- |
-| Retopology | fd66d290: exact affine workspace placement and accepted-work/ordered-save handoff;1445 native checks per Release/sanitizer profile,26 corresponding native/sentinel files exact | Matching ordinary/compact FLTK and actual-loader XR qualification is in progress; default compact-view point markers can be subpixel and need a usability fix |
+| Retopology | fd66d290 native1445/profile; matching a852855 closes Release76/sanitizer59 FLTK/software-loader checks plus corrected cancellation-boundaries consumers; six UI/loader native file pairs exact | Default compact-view point markers can be subpixel and need a usability fix; broader coherent integration and physical-device qualification remain |
 | Automatic weights | 789a2dd: explicit SurfaceHeat5 on the current Automatic0 default;14 whole production TU compiles/two app links and selected native/controller regressions pass | Fresh current-runtime independent quality, factory/publication and explicit-choice GUI qualification; complex-source compatibility remains required |
 | Opaque unlit world outlines | 4ae4574: matching worker/render/factory, normal/compact FLTK, synthetic-XR, actual Arc and schema scopes pass | Main owning37 integration and remaining material/outline domains; no general Normal/Width-image/lit/screen/MASK/BLEND outline completion |
 | Physical-package fault coverage | 1f9fd48: all90262 points per profile close, including90261 persistent denials and one successful endpoint | The original whole-test sanitizer timeout remains failed; the integrated93c candidate has separate40-point smoke evidence, not a second exhaustive sweep |
 | Isotropic remeshing | b441ad3: native worker and shared desktop/XR controls; full-affine posed-source geometry, source retention, restoration, history and queued-save checks execute | Both full native runs remain failed because polygon selection requests a similarity transform for an affine object; full allocation sweeps are running, app/UI qualification remains pending |
 | Owning frame38 | 4ee2902 source/syntax checkpoint | Current binding, codec, native/render/export qualification and coherent integration remain open; no build reservation is granted |
+
+Retopology client scope includes normal/compact FLTK, actual-process close and
+fresh reopen, four software-loader app runs/profile and a separate Release
+EndGesture-gated immediate Save. The compact positive uses existing viewport
+zoom; it does not fix the initial subpixel marker. A prior sanitizer UI run
+loaded old `/opt` Cairo and leaked800bytes. Its failed invocation remains
+preserved; final unchanged app binaries map the canonical libraries and exit
+cleanly without suppressions. This is a component relink, not a fresh whole-app
+build, physical-headset test or main runtime admission.
 
 The remesh candidate fixes a reproduced kernel instability: edits could create
 float triangles too thin for a reliable normal, causing later source projection
@@ -37,6 +46,7 @@ physical controller/headset qualification remain part of the original objective.
 
 Checkpoint evidence:
 
+- [Matching retopology clients](https://github.com/jebot-git/dome-sculpt/blob/a852855088ddd10ad6c7479e8f1bdcb9efdc38e7/docs/RETOPO-AFFINE-UI.md).
 - [Retopology handoff](https://github.com/jebot-git/dome-sculpt/blob/fd66d2904375c781ef046b5aa1020243b96cfcec/docs/RETOPO-SAVE-HANDOFF.md).
 - [Automatic0/explicit5 integration](https://github.com/jebot-git/dome-sculpt/blob/789a2dd06c840011306310c0a50fa981d56e9953/docs/MODE5-OPTIN0-PHASE1.md).
 - [Scoped outline authoring](https://github.com/jebot-git/dome-sculpt/blob/4ae457455627c790881df51f879fea3e8cdedc89/docs/VRM1-OUTLINE-PAINT.md).
