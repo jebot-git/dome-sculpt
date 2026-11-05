@@ -1,0 +1,944 @@
+{
+  "status": "qualified private shader-only component, main admission separate",
+  "base": "a852855088ddd10ad6c7479e8f1bdcb9efdc38e7",
+  "product_delta": [
+    "src/render.cpp: CursorRenderer vertex shader minimum2physical-pixel projected marker radius and actual GL_VIEWPORT uniform; no CPUgeometry readback, header/layout/state/schema fields or archive rewrite"
+  ],
+  "formula": "For physical endpoint P and center C, compute projected offset from vp*worldOffset without subtracting near-equal endpoint NDCs. If nonzero projected marker radius is below2 pixels and center/end w are positive with center in depth clip range, replace endpoint XY using the normalized projected direction and2pixel radius. Physical endpoint z/w, depth bias and LEQUAL source occlusion are retained. Zero-marker edges, view-axiszero vectors, invalid/near/behind clip fallback and larger physical markers retain their original positions.",
+  "source_sha256": {
+    "src/render.cpp": "82874f8880983a44a65755077940ddcdb4d9c060a7fa67a9158057626f25edf8",
+    "tests/render.cpp": "92c1a519cdb18a77beff87af380533217b075fb51eaa9933d683c2ec47cb85e8",
+    "tests/menu.py": "56ff56a4f393526e64ca2586718976c147d00e374c73d84f95f79e292b81233e",
+    "tests/retopo-marker-dispatch.cpp": "c6bbda8022963ba2ec4e3faa667e389fb2c957a02f6f3509510c65a8ae550874"
+  },
+  "runtime_test_scope": "55new marker scenarios/profile:48 quarterpixel states across600x264/640x480/320x320,3near/far distances,1largerphysicalworldmarker,3eye/near/behind clipping states. Entire original tests/render.cpp assertions remain, includingstatic/stereo ownercache/revision/selection/transforms/GLstate/sourceocclusion/XRlinear/BDF/PBR/normal/occlusion controls.",
+  "profiles": {
+    "release": {
+      "status": {
+        "state": "terminal",
+        "pid": 4122973,
+        "scope": "One complete shader-only render TU; unchanged a852/fd66 five/core,26frontend/support. SAN single testdispatcher+actual app entry ELF, not ordinary product ELF. R ordinary app and whole renderer consumer. No header/layout/fullbuild/archive copy/GPU/HMD.",
+        "steps": [
+          {
+            "name": "compile-render",
+            "command": [
+              "/usr/bin/c++",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-marker-a852855/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-marker-a852855/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-marker-a852855/third_party/nlohmann",
+              "-isystem",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/harfbuzz",
+              "-isystem",
+              "/usr/include/glib-2.0",
+              "-isystem",
+              "/usr/lib64/glib-2.0/include",
+              "-isystem",
+              "/usr/include/sysprof-6",
+              "-isystem",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/freetype2",
+              "-isystem",
+              "/usr/include/libpng16",
+              "-isystem",
+              "/usr/include/libxml2",
+              "-O3",
+              "-DNDEBUG",
+              "-std=gnu++20",
+              "-pthread",
+              "-DWITH_GZFILEOP",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/retopo-marker-a852855/artifacts/marker-proof/release/render.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/retopo-marker-a852855/src/render.cpp"
+            ],
+            "cwd": "/home/blux/de-xr/dome-sculpt/artifacts/retopo-marker-a852855",
+            "exit": 0,
+            "seconds": 10.111294255009852
+          },
+          {
+            "name": "compile-renderer-tests",
+            "command": [
+              "/usr/bin/c++",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-marker-a852855/third_party/desktop",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-marker-a852855/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-marker-a852855/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-marker-a852855/third_party/nlohmann",
+              "-isystem",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/harfbuzz",
+              "-isystem",
+              "/usr/include/glib-2.0",
+              "-isystem",
+              "/usr/lib64/glib-2.0/include",
+              "-isystem",
+              "/usr/include/sysprof-6",
+              "-isystem",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/freetype2",
+              "-isystem",
+              "/usr/include/libpng16",
+              "-isystem",
+              "/usr/include/libxml2",
+              "-O3",
+              "-DNDEBUG",
+              "-std=gnu++20",
+              "-pthread",
+              "-DWITH_GZFILEOP",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/retopo-marker-a852855/artifacts/marker-proof/release/renderer-tests.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/retopo-marker-a852855/tests/render.cpp"
+            ],
+            "cwd": "/home/blux/de-xr/dome-sculpt/artifacts/retopo-marker-a852855",
+            "exit": 0,
+            "seconds": 5.5072282870532945
+          },
+          {
+            "name": "link-renderer-tests",
+            "command": [
+              "/usr/bin/c++",
+              "-Wl,-t,-t",
+              "/home/blux/de-xr/dome-sculpt/artifacts/retopo-marker-a852855/artifacts/marker-proof/release/render.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/handoff-proof/release/document.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/handoff-proof/release/document-retopo.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/handoff-proof/release/document-baking.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/affine-proof/release/retopo.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/affine-proof/release/retopo-authoring.cpp.o",
+              "-O3",
+              "-DNDEBUG",
+              "/home/blux/de-xr/dome-sculpt/artifacts/retopo-marker-a852855/artifacts/marker-proof/release/renderer-tests.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/retopo-marker-a852855/artifacts/marker-proof/release/renderer-tests",
+              "-Wl,-rpath,/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib",
+              "libdome-sculpt-render.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-preflight-qualified-0b6/artifacts/final-preflight/release/stage/libdome-sculpt-core.a",
+              "libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "libdome-sculpt-polygon.a",
+              "libxatlas.a",
+              "libmikktspace.a",
+              "libmikktspace-robust.a",
+              "libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libharfbuzz.so",
+              "/usr/lib64/libEGL.so",
+              "/usr/lib64/libGL.so",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libfreetype.so",
+              "/usr/lib64/libicui18n.so",
+              "/usr/lib64/libicuuc.so",
+              "/usr/lib64/libfontconfig.so",
+              "/usr/lib64/libz.so",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "cwd": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-next36-cutout-306/build-next36-release",
+            "exit": 0,
+            "seconds": 0.3030572969582863
+          },
+          {
+            "name": "link-ordinary-release-app",
+            "command": [
+              "/usr/bin/c++",
+              "/home/blux/de-xr/dome-sculpt/artifacts/retopo-marker-a852855/artifacts/marker-proof/release/render.o",
+              "-Wl,-t,-t",
+              "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/handoff-proof/release/document.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/handoff-proof/release/document-retopo.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/handoff-proof/release/document-baking.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/affine-proof/release/retopo.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/affine-proof/release/retopo-authoring.cpp.o",
+              "-O3",
+              "-DNDEBUG",
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-next36-cutout-306/build-next36-release/CMakeFiles/dome-sculpt.dir/src/native-display-runtime.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-next36-cutout-306/build-next36-release/CMakeFiles/dome-sculpt.dir/src/vrm-expression-editor.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-next36-cutout-306/build-next36-release/CMakeFiles/dome-sculpt.dir/src/rig-fit-editor.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-next36-cutout-306/build-next36-release/CMakeFiles/dome-sculpt.dir/src/projection-editor.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-next36-cutout-306/build-next36-release/CMakeFiles/dome-sculpt.dir/src/spacenav-options.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-next36-cutout-306/build-next36-release/CMakeFiles/dome-sculpt.dir/src/app.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-next36-cutout-306/build-next36-release/CMakeFiles/dome-sculpt.dir/src/polygon-editor.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-next36-cutout-306/build-next36-release/CMakeFiles/dome-sculpt.dir/src/import-editor.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-next36-cutout-306/build-next36-release/CMakeFiles/dome-sculpt.dir/src/procedural-editor.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-next36-cutout-306/build-next36-release/CMakeFiles/dome-sculpt.dir/src/resolution-editor.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-next36-cutout-306/build-next36-release/CMakeFiles/dome-sculpt.dir/src/sculpt-editor.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-next36-cutout-306/build-next36-release/CMakeFiles/dome-sculpt.dir/src/creator-editor.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-next36-cutout-306/build-next36-release/CMakeFiles/dome-sculpt.dir/src/rig-editor.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-next36-cutout-306/build-next36-release/CMakeFiles/dome-sculpt.dir/src/shapekey-editor.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-next36-cutout-306/build-next36-release/CMakeFiles/dome-sculpt.dir/src/weight-editor.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-next36-cutout-306/build-next36-release/CMakeFiles/dome-sculpt.dir/src/skin-editor.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-next36-cutout-306/build-next36-release/CMakeFiles/dome-sculpt.dir/src/mesh-editor.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-next36-cutout-306/build-next36-release/CMakeFiles/dome-sculpt.dir/src/bake-editor.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-next36-cutout-306/build-next36-release/CMakeFiles/dome-sculpt.dir/src/object-editor.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-next36-cutout-306/build-next36-release/CMakeFiles/dome-sculpt.dir/src/paint-editor.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-next36-cutout-306/build-next36-release/CMakeFiles/dome-sculpt.dir/src/uv-editor.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-next36-cutout-306/build-next36-release/CMakeFiles/dome-sculpt.dir/src/ui-conventions.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-next36-cutout-306/build-next36-release/CMakeFiles/dome-sculpt.dir/src/session-appearance.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-next36-cutout-306/build-next36-release/CMakeFiles/dome-sculpt.dir/src/export-editor.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-next36-cutout-306/build-next36-release/CMakeFiles/dome-sculpt.dir/third_party/desktop/desktop-menu.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-next36-cutout-306/build-next36-release/CMakeFiles/dome-sculpt.dir/appmenu-protocol.c.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/retopo-marker-a852855/artifacts/marker-proof/release/dome-sculpt",
+              "-L/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-release/lib",
+              "-L/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib",
+              "-Wl,-rpath,/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-release/lib:/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib:",
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-next36-cutout-306/build-next36-release/libdome-sculpt-spacenav.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-preflight-qualified-0b6/artifacts/final-preflight/release/stage/libdome-sculpt-core.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-next36-cutout-306/build-next36-release/libdome-sculpt-render.a",
+              "/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-release/lib/libfltk_images.so.1.4.5",
+              "/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-release/lib/libfltk_gl.so.1.4.5",
+              "/usr/lib64/libGLU.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-next36-cutout-306/build-next36-release/libdome-sculpt-xr.a",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libpng.so",
+              "/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-release/lib/libfltk.so.1.4.5",
+              "-lcairo",
+              "-L/usr/lib64",
+              "-lX11",
+              "-lGLU",
+              "-lGL",
+              "/usr/lib64/libdl.a",
+              "/usr/lib64/libSM.so",
+              "/usr/lib64/libICE.so",
+              "/usr/lib64/libXext.so",
+              "/usr/lib64/libXinerama.so",
+              "/usr/lib64/libXfixes.so",
+              "/usr/lib64/libXcursor.so",
+              "/usr/lib64/libXrender.so",
+              "/usr/lib64/libXft.so",
+              "/usr/lib64/libwayland-egl.so",
+              "/usr/lib64/libwayland-cursor.so",
+              "/usr/lib64/libxkbcommon.so",
+              "/usr/lib64/libGLX.so",
+              "/usr/lib64/libOpenGL.so",
+              "/usr/lib64/libz.so",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libcairo.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-next36-cutout-306/build-next36-release/libdome-sculpt-render.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-preflight-qualified-0b6/artifacts/final-preflight/release/stage/libdome-sculpt-core.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-next36-cutout-306/build-next36-release/libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-next36-cutout-306/build-next36-release/libdome-sculpt-polygon.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-next36-cutout-306/build-next36-release/libxatlas.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-next36-cutout-306/build-next36-release/libmikktspace.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-next36-cutout-306/build-next36-release/libmikktspace-robust.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-next36-cutout-306/build-next36-release/libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-next36-cutout-306/build-next36-release/libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "/usr/lib64/libEGL.so",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libharfbuzz.so",
+              "/usr/lib64/libGL.so",
+              "/usr/lib64/libfontconfig.so",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libfreetype.so",
+              "/usr/lib64/libicui18n.so",
+              "/usr/lib64/libicuuc.so",
+              "/usr/lib64/libopenxr_loader.so",
+              "/usr/lib64/libgio-2.0.so",
+              "/usr/lib64/libgobject-2.0.so",
+              "/usr/lib64/libglib-2.0.so",
+              "/usr/lib64/libX11.so",
+              "/usr/lib64/libwayland-client.so",
+              "-lm",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "cwd": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-next36-cutout-306/build-next36-release",
+            "exit": 0,
+            "seconds": 0.34898660401813686
+          },
+          {
+            "name": "actual-whole-renderer-tests",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/retopo-marker-a852855/artifacts/marker-proof/release/renderer-tests",
+              "/home/blux/de-xr/dome-sculpt/artifacts/retopo-marker-a852855/artifacts/marker-proof/release/renderer"
+            ],
+            "cwd": "/home/blux/de-xr/dome-sculpt/artifacts/retopo-marker-a852855",
+            "exit": 0,
+            "seconds": 11.97239799797535
+          },
+          {
+            "name": "actual-gui-normal",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/selection-gui-venv/bin/python",
+              "/home/blux/de-xr/dome-sculpt/artifacts/retopo-marker-a852855/tests/menu.py"
+            ],
+            "cwd": "/home/blux/de-xr/dome-sculpt/artifacts/retopo-marker-a852855",
+            "exit": 0,
+            "seconds": 22.91602648398839
+          },
+          {
+            "name": "actual-gui-compact-default",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/selection-gui-venv/bin/python",
+              "/home/blux/de-xr/dome-sculpt/artifacts/retopo-marker-a852855/tests/menu.py"
+            ],
+            "cwd": "/home/blux/de-xr/dome-sculpt/artifacts/retopo-marker-a852855",
+            "exit": 0,
+            "seconds": 23.801295384997502
+          }
+        ],
+        "new_phase_allocated_bytes": 165875712,
+        "actual_free_bytes": 23575404544,
+        "phase": "actual-gui-compact-default",
+        "child_pid": 4193886,
+        "exit": 0,
+        "seconds": 75.01890596101293,
+        "drift": []
+      },
+      "status_sha256": "cbc8b75224c275f9b6d9ec6a087aa6966de18fb97eb9b928a1c7222468446931",
+      "gui": {
+        "normal": {
+          "checks": 15,
+          "failed": 0,
+          "sha256": "34c885363952efa2a63ddb154e4ffd42bdd4eb1f6dbdb8e055278ba12cab3716"
+        },
+        "compact-default": {
+          "checks": 16,
+          "failed": 0,
+          "sha256": "e8b6790d9bd19aa683ebdb2e7275f52abcba80a979635f8b1411a5248e5e7fb3"
+        }
+      },
+      "binary": "/home/blux/de-xr/dome-sculpt/artifacts/retopo-marker-a852855/artifacts/marker-proof/release/dome-sculpt",
+      "binary_sha256": "38901f00993ace135db1178802cf7c485d2638b4c2e581fa04757aa7c353fea5",
+      "render_object_sha256": "40e71b895fc96bcf3172aa45963c5964d326be4ff4d3c2b7f08e783039a3fb6a",
+      "old_render_member_extracted": false
+    },
+    "sanitize": {
+      "status": {
+        "state": "terminal",
+        "pid": 66114,
+        "scope": "One complete shader-only render TU; unchanged a852/fd66 five/core,26frontend/support. SAN single testdispatcher+actual app entry ELF, not ordinary product ELF. R ordinary app and whole renderer consumer. No header/layout/fullbuild/archive copy/GPU/HMD.",
+        "steps": [
+          {
+            "name": "compile-render",
+            "command": [
+              "/usr/bin/c++",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-marker-a852855/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-marker-a852855/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-marker-a852855/third_party/nlohmann",
+              "-isystem",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/harfbuzz",
+              "-isystem",
+              "/usr/include/glib-2.0",
+              "-isystem",
+              "/usr/lib64/glib-2.0/include",
+              "-isystem",
+              "/usr/include/sysprof-6",
+              "-isystem",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/freetype2",
+              "-isystem",
+              "/usr/include/libpng16",
+              "-isystem",
+              "/usr/include/libxml2",
+              "-O1",
+              "-g1",
+              "-DNDEBUG",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "-std=gnu++20",
+              "-pthread",
+              "-DWITH_GZFILEOP",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/retopo-marker-a852855/artifacts/marker-proof/sanitize/render.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/retopo-marker-a852855/src/render.cpp"
+            ],
+            "cwd": "/home/blux/de-xr/dome-sculpt/artifacts/retopo-marker-a852855",
+            "exit": 0,
+            "seconds": 20.13162151101278
+          },
+          {
+            "name": "compile-renderer-tests",
+            "command": [
+              "/usr/bin/c++",
+              "-Dmain=retopo_render_tests_main",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-marker-a852855/third_party/desktop",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-marker-a852855/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-marker-a852855/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-marker-a852855/third_party/nlohmann",
+              "-isystem",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/harfbuzz",
+              "-isystem",
+              "/usr/include/glib-2.0",
+              "-isystem",
+              "/usr/lib64/glib-2.0/include",
+              "-isystem",
+              "/usr/include/sysprof-6",
+              "-isystem",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/freetype2",
+              "-isystem",
+              "/usr/include/libpng16",
+              "-isystem",
+              "/usr/include/libxml2",
+              "-O1",
+              "-g1",
+              "-DNDEBUG",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "-std=gnu++20",
+              "-pthread",
+              "-DWITH_GZFILEOP",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/retopo-marker-a852855/artifacts/marker-proof/sanitize/renderer-tests.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/retopo-marker-a852855/tests/render.cpp"
+            ],
+            "cwd": "/home/blux/de-xr/dome-sculpt/artifacts/retopo-marker-a852855",
+            "exit": 0,
+            "seconds": 9.180808065983001
+          },
+          {
+            "name": "compile-dispatcher",
+            "command": [
+              "/usr/bin/c++",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-marker-a852855/third_party/desktop",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-marker-a852855/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-marker-a852855/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-marker-a852855/third_party/nlohmann",
+              "-isystem",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/harfbuzz",
+              "-isystem",
+              "/usr/include/glib-2.0",
+              "-isystem",
+              "/usr/lib64/glib-2.0/include",
+              "-isystem",
+              "/usr/include/sysprof-6",
+              "-isystem",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/freetype2",
+              "-isystem",
+              "/usr/include/libpng16",
+              "-isystem",
+              "/usr/include/libxml2",
+              "-O1",
+              "-g1",
+              "-DNDEBUG",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "-std=gnu++20",
+              "-pthread",
+              "-DWITH_GZFILEOP",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/retopo-marker-a852855/artifacts/marker-proof/sanitize/dispatcher.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/retopo-marker-a852855/tests/retopo-marker-dispatch.cpp"
+            ],
+            "cwd": "/home/blux/de-xr/dome-sculpt/artifacts/retopo-marker-a852855",
+            "exit": 0,
+            "seconds": 0.02502176002599299
+          },
+          {
+            "name": "link-sanitizer-render-app-dispatch",
+            "command": [
+              "/usr/bin/c++",
+              "/home/blux/de-xr/dome-sculpt/artifacts/retopo-marker-a852855/artifacts/marker-proof/sanitize/renderer-tests.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/retopo-marker-a852855/artifacts/marker-proof/sanitize/dispatcher.o",
+              "-Wl,--wrap=main",
+              "/home/blux/de-xr/dome-sculpt/artifacts/retopo-marker-a852855/artifacts/marker-proof/sanitize/render.o",
+              "-Wl,-t,-t",
+              "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/handoff-proof/sanitize/document.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/handoff-proof/sanitize/document-retopo.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/handoff-proof/sanitize/document-baking.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/affine-proof/sanitize/retopo.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/affine-proof/sanitize/retopo-authoring.cpp.o",
+              "-O1",
+              "-g1",
+              "-DNDEBUG",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-next36-cutout-306/build-next36-sanitize/CMakeFiles/dome-sculpt.dir/src/native-display-runtime.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-next36-cutout-306/build-next36-sanitize/CMakeFiles/dome-sculpt.dir/src/vrm-expression-editor.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-next36-cutout-306/build-next36-sanitize/CMakeFiles/dome-sculpt.dir/src/rig-fit-editor.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-next36-cutout-306/build-next36-sanitize/CMakeFiles/dome-sculpt.dir/src/projection-editor.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-next36-cutout-306/build-next36-sanitize/CMakeFiles/dome-sculpt.dir/src/spacenav-options.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-next36-cutout-306/build-next36-sanitize/CMakeFiles/dome-sculpt.dir/src/app.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-next36-cutout-306/build-next36-sanitize/CMakeFiles/dome-sculpt.dir/src/polygon-editor.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-next36-cutout-306/build-next36-sanitize/CMakeFiles/dome-sculpt.dir/src/import-editor.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-next36-cutout-306/build-next36-sanitize/CMakeFiles/dome-sculpt.dir/src/procedural-editor.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-next36-cutout-306/build-next36-sanitize/CMakeFiles/dome-sculpt.dir/src/resolution-editor.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-next36-cutout-306/build-next36-sanitize/CMakeFiles/dome-sculpt.dir/src/sculpt-editor.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-next36-cutout-306/build-next36-sanitize/CMakeFiles/dome-sculpt.dir/src/creator-editor.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-next36-cutout-306/build-next36-sanitize/CMakeFiles/dome-sculpt.dir/src/rig-editor.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-next36-cutout-306/build-next36-sanitize/CMakeFiles/dome-sculpt.dir/src/shapekey-editor.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-next36-cutout-306/build-next36-sanitize/CMakeFiles/dome-sculpt.dir/src/weight-editor.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-next36-cutout-306/build-next36-sanitize/CMakeFiles/dome-sculpt.dir/src/skin-editor.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-next36-cutout-306/build-next36-sanitize/CMakeFiles/dome-sculpt.dir/src/mesh-editor.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-next36-cutout-306/build-next36-sanitize/CMakeFiles/dome-sculpt.dir/src/bake-editor.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-next36-cutout-306/build-next36-sanitize/CMakeFiles/dome-sculpt.dir/src/object-editor.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-next36-cutout-306/build-next36-sanitize/CMakeFiles/dome-sculpt.dir/src/paint-editor.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-next36-cutout-306/build-next36-sanitize/CMakeFiles/dome-sculpt.dir/src/uv-editor.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-next36-cutout-306/build-next36-sanitize/CMakeFiles/dome-sculpt.dir/src/ui-conventions.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-next36-cutout-306/build-next36-sanitize/CMakeFiles/dome-sculpt.dir/src/session-appearance.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-next36-cutout-306/build-next36-sanitize/CMakeFiles/dome-sculpt.dir/src/export-editor.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-next36-cutout-306/build-next36-sanitize/CMakeFiles/dome-sculpt.dir/third_party/desktop/desktop-menu.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-next36-cutout-306/build-next36-sanitize/CMakeFiles/dome-sculpt.dir/appmenu-protocol.c.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/retopo-marker-a852855/artifacts/marker-proof/sanitize/dome-sculpt-render-dispatch",
+              "-L/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-sanitize/lib",
+              "-L/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib",
+              "-Wl,-rpath,/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-sanitize/lib:/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib:",
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-next36-cutout-306/build-next36-sanitize/libdome-sculpt-spacenav.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-preflight-qualified-0b6/artifacts/final-preflight/sanitize/stage/libdome-sculpt-core.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-next36-cutout-306/build-next36-sanitize/libdome-sculpt-render.a",
+              "/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-sanitize/lib/libfltk_images.so.1.4.5",
+              "/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-sanitize/lib/libfltk_gl.so.1.4.5",
+              "/usr/lib64/libGLU.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-next36-cutout-306/build-next36-sanitize/libdome-sculpt-xr.a",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libpng.so",
+              "/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-sanitize/lib/libfltk.so.1.4.5",
+              "-lcairo",
+              "-L/usr/lib64",
+              "-lX11",
+              "-lGLU",
+              "-lGL",
+              "/usr/lib64/libdl.a",
+              "/usr/lib64/libSM.so",
+              "/usr/lib64/libICE.so",
+              "/usr/lib64/libXext.so",
+              "/usr/lib64/libXinerama.so",
+              "/usr/lib64/libXfixes.so",
+              "/usr/lib64/libXcursor.so",
+              "/usr/lib64/libXrender.so",
+              "/usr/lib64/libXft.so",
+              "/usr/lib64/libwayland-egl.so",
+              "/usr/lib64/libwayland-cursor.so",
+              "/usr/lib64/libxkbcommon.so",
+              "/usr/lib64/libGLX.so",
+              "/usr/lib64/libOpenGL.so",
+              "/usr/lib64/libz.so",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libcairo.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-next36-cutout-306/build-next36-sanitize/libdome-sculpt-render.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-preflight-qualified-0b6/artifacts/final-preflight/sanitize/stage/libdome-sculpt-core.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-next36-cutout-306/build-next36-sanitize/libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-next36-cutout-306/build-next36-sanitize/libdome-sculpt-polygon.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-next36-cutout-306/build-next36-sanitize/libxatlas.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-next36-cutout-306/build-next36-sanitize/libmikktspace.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-next36-cutout-306/build-next36-sanitize/libmikktspace-robust.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-next36-cutout-306/build-next36-sanitize/libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-next36-cutout-306/build-next36-sanitize/libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "/usr/lib64/libEGL.so",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libharfbuzz.so",
+              "/usr/lib64/libGL.so",
+              "/usr/lib64/libfontconfig.so",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libfreetype.so",
+              "/usr/lib64/libicui18n.so",
+              "/usr/lib64/libicuuc.so",
+              "/usr/lib64/libopenxr_loader.so",
+              "/usr/lib64/libgio-2.0.so",
+              "/usr/lib64/libgobject-2.0.so",
+              "/usr/lib64/libglib-2.0.so",
+              "/usr/lib64/libX11.so",
+              "/usr/lib64/libwayland-client.so",
+              "-lm",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "cwd": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-next36-cutout-306/build-next36-sanitize",
+            "exit": 0,
+            "seconds": 2.4067353429854847
+          },
+          {
+            "name": "actual-whole-renderer-tests",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/retopo-marker-a852855/artifacts/marker-proof/sanitize/dome-sculpt-render-dispatch",
+              "--retopo-render-tests",
+              "/home/blux/de-xr/dome-sculpt/artifacts/retopo-marker-a852855/artifacts/marker-proof/sanitize/renderer"
+            ],
+            "cwd": "/home/blux/de-xr/dome-sculpt/artifacts/retopo-marker-a852855",
+            "exit": 0,
+            "seconds": 50.937580431986134
+          },
+          {
+            "name": "actual-gui-normal",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/selection-gui-venv/bin/python",
+              "/home/blux/de-xr/dome-sculpt/artifacts/retopo-marker-a852855/tests/menu.py"
+            ],
+            "cwd": "/home/blux/de-xr/dome-sculpt/artifacts/retopo-marker-a852855",
+            "exit": 0,
+            "seconds": 36.875438301998656
+          },
+          {
+            "name": "actual-gui-compact-default",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/selection-gui-venv/bin/python",
+              "/home/blux/de-xr/dome-sculpt/artifacts/retopo-marker-a852855/tests/menu.py"
+            ],
+            "cwd": "/home/blux/de-xr/dome-sculpt/artifacts/retopo-marker-a852855",
+            "exit": 0,
+            "seconds": 39.8661226729746
+          }
+        ],
+        "new_phase_allocated_bytes": 632799232,
+        "actual_free_bytes": 24546586624,
+        "phase": "actual-gui-compact-default",
+        "child_pid": 230194,
+        "exit": 0,
+        "seconds": 159.46425256301882,
+        "drift": []
+      },
+      "status_sha256": "cbf5d9072c2ca35325d081a4a9386d8a9d16cf4a5186e77d19bf135062e70096",
+      "gui": {
+        "normal": {
+          "checks": 15,
+          "failed": 0,
+          "sha256": "34c885363952efa2a63ddb154e4ffd42bdd4eb1f6dbdb8e055278ba12cab3716"
+        },
+        "compact-default": {
+          "checks": 16,
+          "failed": 0,
+          "sha256": "e8b6790d9bd19aa683ebdb2e7275f52abcba80a979635f8b1411a5248e5e7fb3"
+        }
+      },
+      "binary": "/home/blux/de-xr/dome-sculpt/artifacts/retopo-marker-a852855/artifacts/marker-proof/sanitize/dome-sculpt-render-dispatch",
+      "binary_sha256": "28bace496c50c8eddf6aa3938664c18f3b45a7e4c1ad6c1e947ce062b18c6340",
+      "render_object_sha256": "973f5a3f1b4471503f86a1d8f28b1c2b034e14ebdf7b6de177df938766b066e9",
+      "old_render_member_extracted": false
+    }
+  },
+  "sanitizer_entry": {
+    "scope": "ONE explicitly test-composed SAN ELF: unchanged26frontend objects +exact qualifiedfd66five +whole newrender TU +whole renderer-test TU renamedentry +small GNU--wrap=main dispatcher. Real ordinary GUI argv are forwarded unchanged to actual appmain. This is NOT an ordinary product ELF or a fresh whole-app build.",
+    "audit": {
+      "wrapper_address": "0x4eb0a3",
+      "startup_matches_numeric_wrapper_address": true,
+      "wrapper_calls_real_main_and_actual_renderer_test": true,
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/retopo-marker-a852855/artifacts/marker-proof/sanitize/entry-audit.txt",
+      "sha256": "b4b7c3660c16e610e4e0150e986e3fd81ba34628dfe6ff9caa671cc46dab3d81"
+    },
+    "dispatcher_source_sha256": "c6bbda8022963ba2ec4e3faa667e389fb2c957a02f6f3509510c65a8ae550874",
+    "main_body": "Original immutable app.cpp.o; no weakstub or generated replacement. Both real appmain and renderer entry arestrongdefined. tests/render.cpp already has explicitreturn0."
+  },
+  "release_entry": "Ordinary unchanged appmain/frontend relink, no dispatcher; separate whole native renderer consumer.",
+  "header_closure": "Every include/ file byte-identical to a852 before eachprofile; fiveproduct and allcore/render/support archives matcha852 prequalificationdigests. New renderobject precedes immutable renderarchive; no oldrender.cpp member extracted. Frontend/core/read-only archives not copied or altered.",
+  "old_counter": {
+    "path": "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/affine-ui-proof/release-compact-actual-sample/status.json",
+    "status": 1,
+    "facts": "Actualrayhit/normal/pressure and realSample1vertex/1selected, but fixed.0025m marker vanished in unzoomedcompactGL_LINES. OriginalPNG/log/source andexit1preserved."
+  },
+  "gui": "15normal+16unzoomedcompact assertions/profile, exactheldpoint feedback/Escape rollback/Apply/UndoRedo/Save/newprocessreopen/cleanexit. No wheelzoom in compactregression. After heldcenterregression, quadcorners35px lie inside the actual preservedvisible source; former70px fell outsidecompactsource and was usedonlyzoomed. Native-source/pose/paint/morph/sculpt/affine retention unchanged.",
+  "native_pairs": [
+    {
+      "mode": "normal",
+      "release_sha256": "e435895ce3399ae919e998292881f1a22b1f0abf768238eace89261cd4ed0d0a",
+      "sanitize_sha256": "e435895ce3399ae919e998292881f1a22b1f0abf768238eace89261cd4ed0d0a",
+      "equal": true
+    },
+    {
+      "mode": "compact-default",
+      "release_sha256": "73bfe2314bdfe75d297e48ab59f137c66c9ec45e38524120cb4662097716ac89",
+      "sanitize_sha256": "73bfe2314bdfe75d297e48ab59f137c66c9ec45e38524120cb4662097716ac89",
+      "equal": true
+    }
+  ],
+  "render_image_pairs": [
+    {
+      "name": "renderer-bake-ao.ppm",
+      "release_sha256": "bd9962411b2d67bb33c5b007c25d70a298b43dfa236dc6569bad783a94a9f548",
+      "sanitize_sha256": "bd9962411b2d67bb33c5b007c25d70a298b43dfa236dc6569bad783a94a9f548",
+      "equal": true
+    },
+    {
+      "name": "renderer-bake-geometric.ppm",
+      "release_sha256": "7712baeeeafb9158abc40da1c560c7cfd6c4602f19230ce128aa7bf1c70713df",
+      "sanitize_sha256": "7712baeeeafb9158abc40da1c560c7cfd6c4602f19230ce128aa7bf1c70713df",
+      "equal": true
+    },
+    {
+      "name": "renderer-bake-normal.ppm",
+      "release_sha256": "8912f1593fc3da69f462ef00753475489b259d2fbd943fc27df3a40cf64b0d68",
+      "sanitize_sha256": "8912f1593fc3da69f462ef00753475489b259d2fbd943fc27df3a40cf64b0d68",
+      "equal": true
+    },
+    {
+      "name": "renderer-bake-reference.ppm",
+      "release_sha256": "aa7697009757e6e2219a630bf6d9cabc64d70749c2a7fd5fcf4b2d2ed0c52ae1",
+      "sanitize_sha256": "aa7697009757e6e2219a630bf6d9cabc64d70749c2a7fd5fcf4b2d2ed0c52ae1",
+      "equal": true
+    },
+    {
+      "name": "renderer-cut-gizmo.ppm",
+      "release_sha256": "ef92d537f18fa10979b3c0734ca9a5f142c24b2d682e348974549607d0148778",
+      "sanitize_sha256": "ef92d537f18fa10979b3c0734ca9a5f142c24b2d682e348974549607d0148778",
+      "equal": true
+    },
+    {
+      "name": "renderer-cut-menu.ppm",
+      "release_sha256": "4e6dcc3d242cfb6029d0c473ee3e19fe8c1a7fef80f3252a297cad3aeba50e74",
+      "sanitize_sha256": "4e6dcc3d242cfb6029d0c473ee3e19fe8c1a7fef80f3252a297cad3aeba50e74",
+      "equal": true
+    },
+    {
+      "name": "renderer-cut-surface.ppm",
+      "release_sha256": "696802542e6d6130a6cb47625eb7a428afe92ce1dedbd7db7f320bf2c641d389",
+      "sanitize_sha256": "696802542e6d6130a6cb47625eb7a428afe92ce1dedbd7db7f320bf2c641d389",
+      "equal": true
+    },
+    {
+      "name": "renderer-light.ppm",
+      "release_sha256": "8eda56a61cdd0d5622b37cdd862d3ed4781e7b697f686f0bd55ecbceffa9f36b",
+      "sanitize_sha256": "8eda56a61cdd0d5622b37cdd862d3ed4781e7b697f686f0bd55ecbceffa9f36b",
+      "equal": true
+    },
+    {
+      "name": "renderer-menu.ppm",
+      "release_sha256": "d243e60b91f17ccbb0e2d1c57e8e08bac01916394977d55b3c115cbf00dd2192",
+      "sanitize_sha256": "d243e60b91f17ccbb0e2d1c57e8e08bac01916394977d55b3c115cbf00dd2192",
+      "equal": true
+    },
+    {
+      "name": "renderer-objects.ppm",
+      "release_sha256": "7179518aea50c9ddf24c49507f9d949c3875d3ee036869d56a6ef9ab8c504bc5",
+      "sanitize_sha256": "7179518aea50c9ddf24c49507f9d949c3875d3ee036869d56a6ef9ab8c504bc5",
+      "equal": true
+    },
+    {
+      "name": "renderer-paint-before.ppm",
+      "release_sha256": "f306f89330c4642c9685fdfe9a1dffaf82d93672d246e5083afde9786fc05add",
+      "sanitize_sha256": "f306f89330c4642c9685fdfe9a1dffaf82d93672d246e5083afde9786fc05add",
+      "equal": true
+    },
+    {
+      "name": "renderer-paint-undo.ppm",
+      "release_sha256": "f306f89330c4642c9685fdfe9a1dffaf82d93672d246e5083afde9786fc05add",
+      "sanitize_sha256": "f306f89330c4642c9685fdfe9a1dffaf82d93672d246e5083afde9786fc05add",
+      "equal": true
+    },
+    {
+      "name": "renderer-painted.ppm",
+      "release_sha256": "28acbc526d8b76821902e7a212285a7c81177458a39f5576476a76c8531d9d95",
+      "sanitize_sha256": "28acbc526d8b76821902e7a212285a7c81177458a39f5576476a76c8531d9d95",
+      "equal": true
+    },
+    {
+      "name": "renderer-pbr.ppm",
+      "release_sha256": "f917cddf4ede4efc424414f8f39b753a01f8d199246a37c9de7f23b8b87cdab7",
+      "sanitize_sha256": "f917cddf4ede4efc424414f8f39b753a01f8d199246a37c9de7f23b8b87cdab7",
+      "equal": true
+    },
+    {
+      "name": "renderer-retopo-baseline.ppm",
+      "release_sha256": "f917cddf4ede4efc424414f8f39b753a01f8d199246a37c9de7f23b8b87cdab7",
+      "sanitize_sha256": "f917cddf4ede4efc424414f8f39b753a01f8d199246a37c9de7f23b8b87cdab7",
+      "equal": true
+    },
+    {
+      "name": "renderer-retopo-canvas-motion.ppm",
+      "release_sha256": "75ed906cb3b8e5c14ee33263d49095e746eb6deee70e592360dc3ecd1502cb6e",
+      "sanitize_sha256": "75ed906cb3b8e5c14ee33263d49095e746eb6deee70e592360dc3ecd1502cb6e",
+      "equal": true
+    },
+    {
+      "name": "renderer-retopo-front.ppm",
+      "release_sha256": "07bb43f9e5f3c8fbbd4ad5241144db153a9d70f415676a1acd8f632038fe04a3",
+      "sanitize_sha256": "07bb43f9e5f3c8fbbd4ad5241144db153a9d70f415676a1acd8f632038fe04a3",
+      "equal": true
+    },
+    {
+      "name": "renderer-retopo-linear.ppm",
+      "release_sha256": "07bb43f9e5f3c8fbbd4ad5241144db153a9d70f415676a1acd8f632038fe04a3",
+      "sanitize_sha256": "07bb43f9e5f3c8fbbd4ad5241144db153a9d70f415676a1acd8f632038fe04a3",
+      "equal": true
+    },
+    {
+      "name": "renderer-retopo-marker-scale.ppm",
+      "release_sha256": "fab7a8f8bb2787f19f94b43a4052aa04ca53401e304c61ad5a24ba107569f1b6",
+      "sanitize_sha256": "fab7a8f8bb2787f19f94b43a4052aa04ca53401e304c61ad5a24ba107569f1b6",
+      "equal": true
+    },
+    {
+      "name": "renderer-retopo-menu-move.ppm",
+      "release_sha256": "adac14008b3423bc3566c2e19fbc2925546176821c277214fe7f5d1e183bd15d",
+      "sanitize_sha256": "adac14008b3423bc3566c2e19fbc2925546176821c277214fe7f5d1e183bd15d",
+      "equal": true
+    },
+    {
+      "name": "renderer-retopo-menu-place.ppm",
+      "release_sha256": "8f487f15efe2f34d71e3131acc092ff2a72587196e93b1701da5943a5681d975",
+      "sanitize_sha256": "8f487f15efe2f34d71e3131acc092ff2a72587196e93b1701da5943a5681d975",
+      "equal": true
+    },
+    {
+      "name": "renderer-retopo-motion-base.ppm",
+      "release_sha256": "07bb43f9e5f3c8fbbd4ad5241144db153a9d70f415676a1acd8f632038fe04a3",
+      "sanitize_sha256": "07bb43f9e5f3c8fbbd4ad5241144db153a9d70f415676a1acd8f632038fe04a3",
+      "equal": true
+    },
+    {
+      "name": "renderer-retopo-object-motion.ppm",
+      "release_sha256": "0efbfdf58a75981a3b9ed02add9fbe97222e99d551b78cd9be2c4ae7e90a2395",
+      "sanitize_sha256": "0efbfdf58a75981a3b9ed02add9fbe97222e99d551b78cd9be2c4ae7e90a2395",
+      "equal": true
+    },
+    {
+      "name": "renderer-retopo-occluded.ppm",
+      "release_sha256": "f917cddf4ede4efc424414f8f39b753a01f8d199246a37c9de7f23b8b87cdab7",
+      "sanitize_sha256": "f917cddf4ede4efc424414f8f39b753a01f8d199246a37c9de7f23b8b87cdab7",
+      "equal": true
+    },
+    {
+      "name": "renderer-retopo-selection-cache.ppm",
+      "release_sha256": "48e04927ac7918cc8455a1e6e14be72994460ee8185e282b415f89e8747c4677",
+      "sanitize_sha256": "48e04927ac7918cc8455a1e6e14be72994460ee8185e282b415f89e8747c4677",
+      "equal": true
+    },
+    {
+      "name": "renderer-slider-high.ppm",
+      "release_sha256": "6dcaac8adfb4b5b3363798ac3e3ff9c4e7d134e09c87edda9a77d1b03a017465",
+      "sanitize_sha256": "6dcaac8adfb4b5b3363798ac3e3ff9c4e7d134e09c87edda9a77d1b03a017465",
+      "equal": true
+    },
+    {
+      "name": "renderer-slider-low.ppm",
+      "release_sha256": "8f6db9f9efb7d72239fc599d10f364e09d25af509594da08ed7279451663f00e",
+      "sanitize_sha256": "8f6db9f9efb7d72239fc599d10f364e09d25af509594da08ed7279451663f00e",
+      "equal": true
+    },
+    {
+      "name": "renderer-slider-pointer.ppm",
+      "release_sha256": "75b80d6e12f8e6211c26ce4192236a31b79b2c86139ddbb07d1c6f59dfd9119e",
+      "sanitize_sha256": "75b80d6e12f8e6211c26ce4192236a31b79b2c86139ddbb07d1c6f59dfd9119e",
+      "equal": true
+    },
+    {
+      "name": "renderer-toon.ppm",
+      "release_sha256": "857a453b79b8282c39d1d28d1830413a0535b839a9a4685b5251e1ebfbb37559",
+      "sanitize_sha256": "857a453b79b8282c39d1d28d1830413a0535b839a9a4685b5251e1ebfbb37559",
+      "equal": true
+    },
+    {
+      "name": "renderer-uv-editor.ppm",
+      "release_sha256": "d0d1243e2548765b6e31108fb7fdb6f6abd1cc2fccb18434aa5797d70886aedc",
+      "sanitize_sha256": "d0d1243e2548765b6e31108fb7fdb6f6abd1cc2fccb18434aa5797d70886aedc",
+      "equal": true
+    }
+  ],
+  "mapped_driver_observer": {
+    "state": "terminal",
+    "pid": 498970,
+    "steps": [
+      {
+        "profile": "release",
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/retopo-marker-a852855/artifacts/marker-proof/release/renderer-tests",
+          "/home/blux/de-xr/dome-sculpt/artifacts/retopo-marker-a852855/artifacts/marker-proof/observed/release/renderer"
+        ],
+        "exit": 0,
+        "actual_private_driver_maps": true,
+        "seconds": 12.69775979098631
+      },
+      {
+        "profile": "sanitize",
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/retopo-marker-a852855/artifacts/marker-proof/sanitize/dome-sculpt-render-dispatch",
+          "--retopo-render-tests",
+          "/home/blux/de-xr/dome-sculpt/artifacts/retopo-marker-a852855/artifacts/marker-proof/observed/sanitize/renderer"
+        ],
+        "exit": 0,
+        "actual_private_driver_maps": true,
+        "seconds": 51.361364932963625
+      }
+    ],
+    "phase": "sanitize",
+    "child_pid": 519379,
+    "exit": 0,
+    "seconds": 64.06875090202084,
+    "drift": [],
+    "allocated_blocks_bytes": 688865280,
+    "actual_free_bytes": 24285003776
+  },
+  "mapping_audit": {
+    "path": "/home/blux/de-xr/dome-sculpt/artifacts/retopo-marker-a852855/artifacts/marker-proof/final-audit.json",
+    "sha256": "73a6404a6213af3ed7b1d3aec474f6c3a527d138f5026364daead122c376f501",
+    "scope": "Actualrendererprocess privatepatchedEGL+gallium maps protected byobservedcohortbefore/after; actualGUIinstalledGLX lazy modules additionally compareexactly tosealeda852DSO BEFOREledger predatingmarkerbuild. No /opt bitmap runtime inactualmaps. Allimmutable mappedELFs match oneoftheseexplicit beforeledgers."
+  },
+  "inherited_driver_before_ledger": {
+    "path": "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/affine-ui-proof/final-audit.json",
+    "sha256": "0d2c7ba21d94429a25eb746b3e416eaba234879e3e1ce9140858bc0064aec6c0",
+    "scope": "a852 sealed map digests predate marker source/build; unchanged installed GLX modules are compared against this inherited BEFORE ledger and current AFTER maps. No retroactive before-hash invention."
+  },
+  "scripts": {
+    "run.py": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/retopo-marker-a852855/artifacts/marker-proof/run.py",
+      "sha256": "d9aacbc4aadc6e90d422cbf25ec802db37cc183b8a44247d1db5ce89f47d9d14"
+    },
+    "observe.py": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/retopo-marker-a852855/artifacts/marker-proof/observe.py",
+      "sha256": "12f07e4a73c4653113c1f7af7d598b306fe9c0ce575b0552fbd40b61dc4777e6"
+    },
+    "audit.py": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/retopo-marker-a852855/artifacts/marker-proof/audit.py",
+      "sha256": "4656a1b4ebe0b1f18bce86faf59481966db3051ec00695e54cd27fc7d44691d1"
+    }
+  },
+  "sanitizers": {
+    "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1",
+    "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=1",
+    "LSAN_OPTIONS_inherited": null,
+    "suppression_files_added": false
+  },
+  "resource_scope": {
+    "cap_allocated_bytes": 805306368,
+    "actual_allocated_bytes": 688885760,
+    "actual_free_bytes": 23888011264,
+    "hard_free_floor_bytes": 21474836480,
+    "no_support_archive_copies": true,
+    "no_newdeps_install_sessions_HMD_orGPU": true
+  },
+  "remaining": [
+    "Rootseparately identified held-gesture caller-allocation failure before acceptance transaction; the earlier63prefixes covercompleted drafts only. Thatrepair and semanticapp integration are REQUIRED beforemainretopo admission.",
+    "No hardware/physicalHMD or fullsuite claim; full authoring goal and other mesh/texture/rig/source requirements remain."
+  ],
+  "strict_hardware_followup": {
+    "status": "qualified Releaseonly strictPCI03 graphics; no runtime/source/quality-bound changes",
+    "head_runtime": "ed5b8d4787dbacb175844d07887a06116bf7adb7",
+    "device_gate_source": "tests/retopo-marker-device.cpp",
+    "source_sha256": "9736c98298adb754c6bb43eaf195083c9b95758f56b660777229eb9c55ca21ee",
+    "entry": "Exactsamequalified whole renderer-tests.o+render.o, only forwarding glGetString observer added. All55new+alloriginal assertions unchanged. Not GPUcompute/baking/physicalHMD or freshapp proof.",
+    "actual_vendor": "Intel",
+    "actual_renderer": "Mesa Intel(R) Arc(tm) A770 Graphics (DG2)",
+    "actual_gl_version": "4.6 (Core Profile) Mesa26.2.5",
+    "context_device": "eglGetCurrentDisplay\u2192EGLDeviceEXT\u2192DRMrendernode/dev/dri/renderD129",
+    "rdev": "226:129",
+    "sysfs": "0000:03:00.0/vendor8086/device56a0/i915",
+    "open_fds": [
+      3,
+      4,
+      5,
+      6
+    ],
+    "positive_exit": 0,
+    "positive_seconds": 10.6513291230076,
+    "same_binary_software_negative_exit": 1,
+    "software_negative_seconds": 6.829047784965951,
+    "actual_negative_renderer": "llvmpipe(LLVM22.1.8,256bits)",
+    "hardware_ppm_count": 30,
+    "driver_map_audit": "/home/blux/de-xr/dome-sculpt/artifacts/retopo-marker-a852855/artifacts/marker-proof/strict-device/final-audit.json",
+    "driver_map_audit_sha256": "aa6a916b35192f5885deaf434b45549351118659af8781cfba5ad4db6b880b2b",
+    "before_input_count": 2496,
+    "drift": [],
+    "no_mutable_cache_index_as_input": true,
+    "extra_allocated_bytes": 45850624,
+    "phase_allocated_bytes": 735006720,
+    "lease": "explicitlyreleased afterfinite7491closed0"
+  }
+}

@@ -392,7 +392,7 @@ async def main():
                 key("Shift_L",True);xtest.fake_input(d,X.ButtonPress,1);d.sync()
             def release():
                 xtest.fake_input(d,X.ButtonRelease,1);d.sync();key("Shift_L",False)
-            if retopo_compact:
+            if retopo_compact and os.environ.get("DOME_MENU_RETOPO_DEFAULT_VIEW")!="1":
                 before_zoom=pixels()
                 xtest.fake_input(d,X.MotionNotify,x=g.x+g.width//2,y=g.y+g.height//2);d.sync()
                 for _ in range(10):
@@ -413,7 +413,11 @@ async def main():
             key("Escape");release()
             await wait(lambda:pixels().tobytes()==before.tobytes())
             check(True,"Escape restores the exact native viewport before the held point")
-            for dx,dy in ((-70,70),(70,70),(70,-70),(-70,-70)):
+            # The preserved compact source screenshot spans y70..225. Keep
+            # all four real ray hits inside that visible source without zoom;
+            # the held center-point regression above is unchanged.
+            corner_span=35 if retopo_compact and os.environ.get("DOME_MENU_RETOPO_DEFAULT_VIEW")=="1" else 70
+            for dx,dy in ((-corner_span,corner_span),(corner_span,corner_span),(corner_span,-corner_span),(-corner_span,-corner_span)):
                 press(g.width*.5+dx,g.height*.5+dy);release();await asyncio.sleep(.25)
             await ready("Make face");pixels().save(out/"ordered-corners.png")
             if retopo_edges:
@@ -423,14 +427,14 @@ async def main():
             await click("Make face");await ready("Apply patch")
             check(info()["scene_hash"]==baseline["scene_hash"],"Ordered face remains an unconfirmed draft until Apply")
             if retopo_edges:
-                for dx in (-70,70):
-                    press(g.width*.5+dx,g.height*.5+70);release();await asyncio.sleep(.3)
+                for dx in (-corner_span,corner_span):
+                    press(g.width*.5+dx,g.height*.5+corner_span);release();await asyncio.sleep(.3)
                 await ready("Extrude edge");await click("Extrude edge")
                 nodes,_=await layout()
                 check(nodes["Extrude edge"][1].get("toggle-state")==1 and nodes["Move points"][1].get("toggle-state")==0 and nodes["Place points"][1].get("toggle-state")==0,
                       "Extrude is an exclusive native tool radio with selected edge endpoints")
-                press(g.width*.5,g.height*.5+70);await asyncio.sleep(.3)
-                xtest.fake_input(d,X.MotionNotify,x=g.x+int(g.width*.5),y=g.y+int(g.height*.5+100));d.sync();await asyncio.sleep(.5)
+                press(g.width*.5,g.height*.5+corner_span);await asyncio.sleep(.3)
+                xtest.fake_input(d,X.MotionNotify,x=g.x+int(g.width*.5),y=g.y+int(g.height*.5+corner_span+30));d.sync();await asyncio.sleep(.5)
                 pixels().save(out/"extruded-preview.png");release();await asyncio.sleep(.4)
                 check(info()["scene_hash"]==baseline["scene_hash"],"Actual native extrusion drag retains the committed source until Apply")
             await click("Move points")

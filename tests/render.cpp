@@ -196,9 +196,75 @@ int main(int argc, char **argv) try {
     renderer.draw(doc.frame().surface,model,vp,{},640,480);cursors.draw(overlay,vp);
     if(cursors.retopology_stats().uploads!=before_motion || capture("retopo-marker-scale")==object_motion)
       throw std::runtime_error("Retopology marker and object scaling must stay on GPU without geometry uploads");
+    {
+      // A single real retained vertex, no connecting edge that could hide a
+      // subpixel marker failure. The source remains independently depth-tested.
+      auto marker=std::make_shared<RetopoMesh>();
+      auto id=marker->add_vertex({{0,0,.8f}});
+      auto point_view=std::make_shared<RetopoView>();point_view->topology=marker;point_view->selected={id};
+      auto point_state=overlay;point_state.canvas=model;point_state.retopology=point_view;
+      auto marker_source_model=model;marker_source_model.position.z=-3;
+      auto pixels=[](int w,int h){std::vector<uint8_t> data(size_t(w)*h*3);glPixelStorei(GL_PACK_ALIGNMENT,1);glReadPixels(0,0,w,h,GL_RGB,GL_UNSIGNED_BYTE,data.data());return data;};
+      auto extent=[](const std::vector<uint8_t>&data,int w){
+        std::array<int,5> box{int(data.size()/3),int(data.size()/3),-1,-1,0};
+        for(size_t i=0;i<data.size();i+=3)if(data[i]>220&&data[i+1]>140&&data[i+2]<50){
+          const int x=int(i/3)%w,y=int(i/3)/w;box[0]=std::min(box[0],x);box[1]=std::min(box[1],y);box[2]=std::max(box[2],x);box[3]=std::max(box[3],y);++box[4];
+        }return box;
+      };
+      // Use the actual compact default distance, with subpixel phases in both
+      // axes. None of these states zooms or changes topology/selection owners.
+      auto compact_vp=projection(-.3926990817f,.3926990817f,-.3926990817f,.3926990817f);
+      point_state.canvas.position={0,0,-3}; // vertex .8 => actual distance2.2
+      renderer.draw(doc.frame().surface,marker_source_model,compact_vp,{},600,264);cursors.draw(point_state,compact_vp);
+      const auto uploads=cursors.retopology_stats().uploads;
+      for(auto dimensions:std::array<std::array<int,2>,3>{{{600,264},{640,480},{320,320}}})
+      for(int px=0;px<4;++px)for(int py=0;py<4;++py){
+        const int w=dimensions[0],h=dimensions[1];auto phased=compact_vp;
+        // Shifting clip XY by .25 pixel is genuine camera translation, not
+        // replacement geometry or pixel/normal data observed from the renderer.
+        phased[12]+=float(px)*.5f*2.2f/float(w);phased[13]+=float(py)*.5f*2.2f/float(h);
+        renderer.draw(doc.frame().surface,marker_source_model,phased,{},w,h);cursors.draw(point_state,phased);
+        const auto box=extent(pixels(w,h),w);
+        if(box[4]<5||box[2]-box[0]<2||box[3]-box[1]<2){
+          std::cerr<<"MARKER_PHASE "<<w<<' '<<h<<' '<<px<<' '<<py<<" box "<<box[0]<<' '<<box[1]<<' '<<box[2]<<' '<<box[3]<<" count "<<box[4]<<'\n';
+          throw std::runtime_error("Single default-view retopology marker disappears at a compact/stereo pixel phase");
+        }
+        if(cursors.retopology_stats().uploads!=uploads)
+          throw std::runtime_error("Viewport or subpixel stereo changes reupload unchanged marker geometry");
+      }
+      for(float distance:{.02f,.3f,10.f}){
+        point_state.canvas.position.z=-distance-.8f;marker_source_model.position.z=-distance-1;
+        renderer.draw(doc.frame().surface,marker_source_model,compact_vp,{},600,264);cursors.draw(point_state,compact_vp);
+        auto box=extent(pixels(600,264),600);
+        if(box[4]<5||box[2]-box[0]<2||box[3]-box[1]<2||cursors.retopology_stats().uploads!=uploads)
+          throw std::runtime_error("Near/far retopology marker loses its floor or immutable GPU geometry");
+      }
+      marker_source_model.position.z=-3;
+      // A larger physical world marker must keep growing rather than being
+      // replaced by a fixed-size screen glyph. Only the same draw uniforms vary.
+      point_state.canvas.scale=8;point_state.canvas.position={0,0,-8.6f};
+      renderer.draw(doc.frame().surface,marker_source_model,compact_vp,{},600,264);cursors.draw(point_state,compact_vp);
+      auto large=extent(pixels(600,264),600);
+      if(large[2]-large[0]<5||large[3]-large[1]<5||cursors.retopology_stats().uploads!=uploads)
+        throw std::runtime_error("Minimum marker size replaces the larger physical world marker or uploads geometry");
+      // A center behind the eye takes the original homogeneous clipping path.
+      point_state.canvas={};
+      for(float z:{1.f,-.8f,-.805f}){
+      point_state.canvas.position.z=z;
+      renderer.draw(doc.frame().surface,marker_source_model,compact_vp,{},600,264);const auto behind=pixels(600,264);
+      cursors.draw(point_state,compact_vp);
+      if(pixels(600,264)!=behind||glGetError()!=GL_NO_ERROR)
+        throw std::runtime_error("Near/behind-eye retopology marker does not preserve clip-w fallback");
+      }
+      std::cout<<"PASS Single retopology marker retains a GPU pixel floor across48 viewport/stereo phases, physical scale and clip-w fallback without uploads\n";
+      // Restore the original immutable overlay before its existing invalidation,
+      // source occlusion, GL-state and XR-linear composition controls below.
+      renderer.draw(doc.frame().surface,model,vp,{},640,480);cursors.draw(overlay,vp);
+    }
     ++r->revision;
+    const auto before_revision=cursors.retopology_stats().uploads;
     renderer.draw(doc.frame().surface,model,vp,{},640,480);cursors.draw(overlay,vp);
-    if(cursors.retopology_stats().uploads!=before_motion+1)throw std::runtime_error("Retopology revision does not invalidate cached geometry");
+    if(cursors.retopology_stats().uploads!=before_revision+1)throw std::runtime_error("Retopology revision does not invalidate cached geometry");
     overlay.canvas=base_canvas;r->transform={};
     renderer.draw(doc.frame().surface,model,vp,{},640,480);
     GLuint saved_vao=0,saved_buffer=0;glGenVertexArrays(1,&saved_vao);glGenBuffers(1,&saved_buffer);

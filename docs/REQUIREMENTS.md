@@ -1,3 +1,25 @@
+## Private marker device closure — 2026-11-05
+
+Exacted5renderer andwhole55scenario consumer nowpass observedPCI03ArcA770 with
+actualEGLdevice/renderD129/rdev226:129/sysfs8086:56a0/i915/openFDs andimmutableDSO
+maps; samebinaryforcedllvmpipe refuses1 afteractualrenderer observation. All30
+hardwarePPMs retained, no limits/source/tolerance changes. Finite7491closed0 and
+GPUlease explicitlyreleased; noSANhardwaredup/compute/HMD claim. See
+RETOPO-SCREEN-MARKERS.md/JSON. Rootheld-gesture repair/integration remainsrequired
+beforemainretopo admission; fullgoal staysactive.
+
+## Private default-view retopology marker repair — 2026-11-05
+
+Shader-only screen floor fixes the preserved unzoomed compact marker failure.
+Whole renderTU/consumer R/S pass55new scenarios plus every original cache/state/
+occlusion/linear/BDF/PBR assertion; actualnormal15+unzoomedcompact16 eachprofile
+pass cleanly,30renderer+2native pairs exact. Release isordinaryapp; SANexplicitly
+composes actualappmain andwhole renderer-test entry intooneELF undera mainwrapper,
+not anordinaryproductELF. No headers/layout/schema/archive change. Read
+RETOPO-SCREEN-MARKERS.md/receipt. Mainretopo stillrequiresroot's newlyidentified
+held-gesture admission/OOMrepair; earlier63prefixes covercompleted drafts only.
+No GPU/HMD/fullsuite/fullgoal claim.
+
 ## Private matching affine retopology clients — 2026-11-05
 
 The fd66 production bytes now pass actual matched FLTK normal/compact and
