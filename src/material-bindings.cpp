@@ -152,15 +152,15 @@ std::set<const PaintedMesh*> material_paint_owners(
   }
   return owners;
 }
+bool physical_material_state(const std::set<const PaintedMesh*> &paints,const std::vector<std::shared_ptr<const SourceMaterialBindings>> &bindings){
+  return std::any_of(paints.begin(),paints.end(),[](const auto *p){return p->has_physical_emission();})||std::any_of(bindings.begin(),bindings.end(),[](const auto &b){return detail::physical_emission(*b)||(b->native_paint_sampling&&detail::hdr_emission(b->native_paint_sampling->before_native_material().emissive));});
+}
 bool material_physical_graph(const std::vector<std::shared_ptr<const SourceMaterialBindings>> &bindings,
     const std::vector<std::shared_ptr<const SourceUvOrigin>> &origins){
  if(physical_material_state(material_paint_owners(bindings,origins,true),bindings))return true;
  detail::PolygonSceneArchive controls;for(const auto &b:bindings)if(b->canonical_paint_sampling)controls.add_origin(b->canonical_paint_sampling->before(),false);
  for(const auto &p:controls.origins())if(std::any_of(p->material.emissive.begin(),p->material.emissive.end(),[](float n){return n>1;}))return true;
  return false;
-}
-bool physical_material_state(const std::set<const PaintedMesh*> &paints,const std::vector<std::shared_ptr<const SourceMaterialBindings>> &bindings){
-  return std::any_of(paints.begin(),paints.end(),[](const auto *p){return p->has_physical_emission();})||std::any_of(bindings.begin(),bindings.end(),[](const auto &b){return detail::physical_emission(*b)||(b->native_paint_sampling&&detail::hdr_emission(b->native_paint_sampling->before_native_material().emissive));});
 }
 size_t index(const nlohmann::json &value,size_t size) {
   if((!value.is_number_unsigned() && (!value.is_number_integer() || value.get<int64_t>()<0)) ||

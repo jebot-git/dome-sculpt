@@ -75,7 +75,7 @@ size_t CanonicalPaintArchive::preflight(const nlohmann::json &j,const nlohmann::
  if(!j.is_object()||j.size()!=2||!j.at("version").is_number_integer()||j.at("version")!=1||
     !j.at("nodes").is_array()||j.at("nodes").empty()||j.at("nodes").size()>128||normals.at("version")!=2)
   throw std::invalid_argument("Scene37 requires actual bounded canonical paint and normal UV pools");
- size_t bytes=0;constexpr size_t limit=256*1024*1024;
+ size_t bytes=0,peak_scratch=0;constexpr size_t limit=256*1024*1024;
  for(const auto &p:j.at("nodes")){
   if(!p.is_object()||p.size()!=5||!p.at("version").is_number_integer()||p.at("version")!=1||!p.at("vertices").is_binary())
    throw std::invalid_argument("Invalid canonical paint owning correspondence record");
@@ -95,8 +95,13 @@ size_t CanonicalPaintArchive::preflight(const nlohmann::json &j,const nlohmann::
   const auto &positions=paint.at("mesh").at("positions");if(!positions.is_binary()||positions.get_binary().size()%12)throw std::invalid_argument("Canonical paint before geometry is unavailable");
   for(size_t at=0;at<map.size();at+=4)if(word(map,at)>=positions.get_binary().size()/12)throw std::invalid_argument("Canonical paint map exceeds its genuine before vertex domain");
   const auto surface=paint_sampling_surface_working_bytes(vertices,layout.at("indices").get_binary().size()/4,paint.at("resolution").get<uint32_t>());
-  if(surface>limit-bytes||map.size()>limit-bytes-surface)throw std::length_error("Canonical paint aggregate replay storage exceeds its owning limit before allocation");
-  bytes+=surface+map.size();
+  const auto retained=paint_sampling_surface_retained_bytes(vertices,layout.at("indices").get_binary().size()/4,paint.at("resolution").get<uint32_t>());
+  // Each node keeps one authenticated SurfaceMap. Raster and padding scratch
+  // are sequential per replay, not an extra persistent grid for every node.
+  peak_scratch=std::max(peak_scratch,surface-retained);
+  if(retained>limit-bytes||map.size()>limit-bytes-retained)throw std::length_error("Canonical paint retained replay storage exceeds its owning limit before allocation");
+  bytes+=retained+map.size();
+  if(peak_scratch>limit-bytes)throw std::length_error("Canonical paint retained owners plus peak replay scratch exceed their owning limit before allocation");
  }
  // Compute context-independent subtree heights and greatest material IDs.
  // A completed hit still pays the caller's depth/earlier-prefix requirement.

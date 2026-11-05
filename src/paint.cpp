@@ -1389,6 +1389,13 @@ std::shared_ptr<PaintedMesh> PaintedMesh::snapshot() const {
   return p;
 }
 struct SourcePaintSamplingAccess {
+  static size_t surface_retained_bytes(size_t vertices,size_t corners,uint32_t r){
+    (void)surface_working_bytes(vertices,corners,r);
+    return sizeof(PaintedMesh::SurfaceMap)+sizeof(PaintedMesh)+sizeof(PaintSamplingAttachment)+
+      vertices*(2*sizeof(Vec3)+sizeof(std::array<float,2>)+1)+corners*(sizeof(uint32_t)+1)+
+      size_t(r)*r*sizeof(PaintedMesh::SurfaceMap::Texel)+
+      size_t(r/32)*(r/32)*sizeof(PaintedMesh::SurfaceMap::Bounds);
+  }
   static size_t surface_working_bytes(size_t vertices,size_t corners,uint32_t r){
     if(!vertices||vertices>2'000'000||!corners||corners>6'000'000||corners%3||r<64||r>2048||(r&(r-1)))
       throw std::length_error("Retained strict surface dimensions exceed their bounded allocation policy");
@@ -1470,6 +1477,9 @@ struct SourcePaintSamplingAccess {
     ++result->revision_;stop();return result;
   }
 };
+size_t paint_sampling_surface_retained_bytes(size_t vertices,size_t corners,uint32_t resolution){
+  return SourcePaintSamplingAccess::surface_retained_bytes(vertices,corners,resolution);
+}
 size_t paint_sampling_surface_working_bytes(size_t vertices,size_t corners,uint32_t resolution){
   return SourcePaintSamplingAccess::surface_working_bytes(vertices,corners,resolution);
 }
