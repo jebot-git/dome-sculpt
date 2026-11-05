@@ -1,0 +1,709 @@
+{
+  "state": "qualified-private-component",
+  "source_merge": "bef587631b52e064a0c34714f613dd66938297ce",
+  "frozen_proof_checkpoint": "fbbd1b2986f1adf600b8921c63f6e22d65a20c19",
+  "main_parent": "c55dc2f708cdb6b267a40e6ac26f5757fcfae7d3",
+  "weights_parent": "1e6d76d6022409bbce7bee04dd37019c0c2a0223",
+  "policy": {
+    "default": "Automatic0 preserved. SurfaceHeat5 explicit opt-in; existing saved weights are unchanged absent a new request. Reserved2/3 and existing1/4 meanings unchanged.",
+    "admission": "Private integration candidate only; no main/default promotion, no fresh ALL claim. Complex37/38/prepared owners remain guarded; broader goal remains incomplete.",
+    "scope": "Fresh whole merged core5 and palette/editor; actual qualified whole poly6/retopo4/marker providers before immutable compatible C179 support. No archive extraction/rewrites/copies and no old default5 constructors. Fresh Release inspector shared by both Release and SAN app UI/loader checks; checker is not claimed SAN.",
+    "preservation": "Main polygon/worker/retopo/marker/avatar/validator changes retained by real merges. All quality/work/storage limits, normalization/pruning/locks/affine/IBM/source guards unchanged. No generic post-enqueue caller fix claimed."
+  },
+  "proofs": {
+    "artifacts/integration-poly/R-FROZEN.json": {
+      "sha256": "a0ad9180c5c389ce52b92168dea2ce279134a6a0fca378335afef89105fc2e71",
+      "bytes": 167406
+    },
+    "artifacts/integration-poly/R-status.json": {
+      "sha256": "f3c42617e023b488ed9a52c15228929a83632a219203105bf74d667b342baa8e",
+      "bytes": 37581
+    },
+    "artifacts/integration-sanitize/FROZEN.json": {
+      "sha256": "366727cb66dc7c646db4051ac497e016a03b20f8c6ca6166d0d0d440d2d4b5f0",
+      "bytes": 163515
+    },
+    "artifacts/integration-sanitize/status.json": {
+      "sha256": "292cc58e78aaab4270d8452a053963fb1c29b65fe4388a54a7b189282c348a65",
+      "bytes": 40487
+    },
+    "artifacts/integration-sanitize/run.py": {
+      "sha256": "d2968110a52ff7ce34e7d974834a1ba83ad17ec4ad3a69e080e2e40e10b8b0c7",
+      "bytes": 10039
+    },
+    "artifacts/integration-app/FROZEN.json": {
+      "sha256": "a0fb3f1d0dd201cdb02d8b3c601ce5dc7af04b7c11cb6502458a324f1645538d",
+      "bytes": 193765
+    },
+    "artifacts/integration-app/API-CLOSURE.json": {
+      "sha256": "a4313421fbf057de7039bba845e8de3e4b37d719a46030c4852f922b26d6aea2",
+      "bytes": 51054
+    },
+    "artifacts/integration-app/build-status.json": {
+      "sha256": "71bb8233c02f62bc5c5744e3a7dcdf7fa8af154bb8b11b6845c8f932cc194719",
+      "bytes": 33250
+    },
+    "artifacts/integration-app/run-build.py": {
+      "sha256": "cd6d8d4c8f7e7afc3317506ecf6d954b05836b287bc2e9a93cea9182370c4596",
+      "bytes": 7326
+    },
+    "artifacts/integration-worker/FROZEN.json": {
+      "sha256": "8e4f3993fbc6f6c55c78268077375d9035c2ee53ea184077338227092a8bf12a",
+      "bytes": 162226
+    },
+    "artifacts/integration-worker/status.json": {
+      "sha256": "881c71a70a659007b315c82ec47c9e1e44827c3155040d9032b6911e6e49c2f7",
+      "bytes": 16479
+    },
+    "artifacts/integration-worker/run.py": {
+      "sha256": "447a2bf01d1bfa5a3c3e091eb2dec9ab5ec9d0deada2a9555e4d15c23f955011",
+      "bytes": 3944
+    },
+    "artifacts/integration-app/ui-status.json": {
+      "sha256": "176a0fe7392e394e328218f6e22f0a1e858a08c8b3963288d3b47d82f20a65d5",
+      "bytes": 24334
+    },
+    "artifacts/integration-app/run-ui.py": {
+      "sha256": "7dfef77220d0db217e5b337e9aaff688358e6deb122c4dffd3f066d09f1cea61",
+      "bytes": 5000
+    },
+    "artifacts/integration-app/loader/status.json": {
+      "sha256": "c51b905ca8bec69556674a83bd8ccc1c90b63922f52e8222f787385bde9b33c5",
+      "bytes": 88816
+    },
+    "artifacts/integration-app/run-loader.py": {
+      "sha256": "cb3e35311c4af294580badb2f9d4496baaf8709364bca87681f030280a2e81fc",
+      "bytes": 8807
+    }
+  },
+  "new_current_results": {
+    "release_native": {
+      "surface": 25,
+      "legacy": 38,
+      "affine_polygon_retopo": 248,
+      "worker_checks": 4308,
+      "exit": 0,
+      "seconds": 101.718622238026,
+      "worker_one_shot_prefixes": 251,
+      "worker_fault_scope": "Default bare retopo-worker invocation only: persistent=false; allocator disables the injected fault after its selected hit, leaving reporting allocations available. All 251 measured one-shot boundaries and queued-next-event retention are included in 4,308 checks. Neither --persistent reporter recovery nor --acceptance was invoked; those separate scopes are not claimed."
+    },
+    "sanitize_native": {
+      "surface": 25,
+      "legacy": 38,
+      "affine_polygon_retopo": 248,
+      "worker_checks": 4308,
+      "exit": 0,
+      "seconds": 248.5825886959792,
+      "sanitizers": "ASan+UBSan+leak detection; no diagnostics",
+      "worker_one_shot_prefixes": 251,
+      "worker_fault_scope": "Default bare retopo-worker invocation only: persistent=false; allocator disables the injected fault after its selected hit, leaving reporting allocations available. All 251 measured one-shot boundaries and queued-next-event retention are included in 4,308 checks. Neither --persistent reporter recovery nor --acceptance was invoked; those separate scopes are not claimed."
+    },
+    "app_build": {
+      "exit": 0,
+      "seconds": 24.006771004002076,
+      "profiles": [
+        "optimized O3 Release",
+        "O1/g1 ASan+UBSan+leaks"
+      ],
+      "release_inspector": {
+        "binary": "/home/blux/de-xr/dome-sculpt/artifacts/mode5-main-9dd/artifacts/integration-app/release/surface-heat-ui",
+        "sha256": "9e49bcb5d6f4fbbae943abcdb9b8a58a5c17d6462c0f9e022b176944bd315b7a",
+        "profiles_used_for": [
+          "release-app",
+          "sanitize-app"
+        ],
+        "instrumented": false
+      }
+    },
+    "publication": {
+      "scope": "New current merged Document remeasurement; real preparation/real same-controller retry and native ordered Save every attempt. No replay. Original assertions unchanged.",
+      "cases": [
+        {
+          "label": "release-regular",
+          "exit": 0,
+          "seconds": 12.298314779007342,
+          "report": {
+            "actual_post_helper_publication_prefixes": 373,
+            "fault_scope": "Post real helper return through actual accepted endpoint done (success or failure), excluding following file encoding and error diagnostics after done",
+            "long_name_control": false,
+            "long_name_full": false,
+            "real_preparation_each_attempt": true,
+            "replayed_preparation": false,
+            "tested_prefix_start": 1
+          }
+        },
+        {
+          "label": "release-long-tail",
+          "exit": 0,
+          "seconds": 0.5111890790285543,
+          "report": {
+            "actual_post_helper_publication_prefixes": 377,
+            "fault_scope": "Post real helper return through actual accepted endpoint done (success or failure), excluding following file encoding and error diagnostics after done",
+            "long_name_control": true,
+            "long_name_full": false,
+            "real_preparation_each_attempt": true,
+            "replayed_preparation": false,
+            "tested_prefix_start": 373
+          }
+        },
+        {
+          "label": "sanitize-regular",
+          "exit": 0,
+          "seconds": 72.85501920897514,
+          "report": {
+            "actual_post_helper_publication_prefixes": 373,
+            "fault_scope": "Post real helper return through actual accepted endpoint done (success or failure), excluding following file encoding and error diagnostics after done",
+            "long_name_control": false,
+            "long_name_full": false,
+            "real_preparation_each_attempt": true,
+            "replayed_preparation": false,
+            "tested_prefix_start": 1
+          }
+        },
+        {
+          "label": "sanitize-long-tail",
+          "exit": 0,
+          "seconds": 2.0476073419558816,
+          "report": {
+            "actual_post_helper_publication_prefixes": 377,
+            "fault_scope": "Post real helper return through actual accepted endpoint done (success or failure), excluding following file encoding and error diagnostics after done",
+            "long_name_control": true,
+            "long_name_full": false,
+            "real_preparation_each_attempt": true,
+            "replayed_preparation": false,
+            "tested_prefix_start": 373
+          }
+        }
+      ],
+      "seconds": 117.94643667899072
+    },
+    "actual_fltk": {
+      "checks": 152,
+      "checks_per_profile": 76,
+      "cases": [
+        {
+          "profile": "release",
+          "case": "head",
+          "compact": false,
+          "checks": 18,
+          "exit": 0,
+          "seconds": 29.761311926005874,
+          "report": "artifacts/integration-app/release/ui-head-normal/report.json",
+          "report_sha256": "4c914ebf5a88c06d5888f7fc1342532132f26c680cd9a4eb47cdebcbbdc5a845",
+          "actual_app_maps": "artifacts/integration-app/release/ui-head-normal/app-maps.txt",
+          "actual_app_maps_sha256": "c9fc6e3280ec225640f7ad8de0f0f1d6263e557113ff019331aa79ffcbfe8459",
+          "inputs": {
+            "/home/blux/de-xr/dome-sculpt/artifacts/mode5-main-9dd/artifacts/integration-app/release/dome-sculpt": "1044a890b8f3227b50cd277a154d9961bc62df3bfdf31d62010814ca6b6062b6",
+            "/home/blux/de-xr/dome-sculpt/artifacts/mode5-main-9dd/artifacts/integration-app/release/surface-heat-ui": "9e49bcb5d6f4fbbae943abcdb9b8a58a5c17d6462c0f9e022b176944bd315b7a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/weights-mode5-native-humanoid-d3e174e/artifacts/weights-mode5/female/native-unskinned.dsculpt": "188c26252d4896ca0eb06154b0e06053dca5b7186b607f9e6b3453d3c5ee2bcc",
+            "/home/blux/de-xr/dome-sculpt/artifacts/mode5-optin0-next-789a2dd/artifacts/mode5-next/release/native-female/accepted.dsculpt": "071ad5eb3e8d8d9a0754ff8c4983c00741fadc6be3a177bc47c542a96000470f",
+            "/home/blux/de-xr/dome-sculpt/artifacts/mode5-main-9dd/tests/surface-heat-component-menu.py": "3da3abbf18a3f3665e5361404e98de1ff905372df104de79dc17a243d2e7d38b",
+            "/home/blux/de-xr/dome-sculpt/artifacts/mode5-main-9dd/tests/surface-heat-component-ui.cpp": "22bf64692fe97cce9a8c846c6af3749f14b842dc91de62b712b5cb65ac33a08e"
+          },
+          "input_drift": []
+        },
+        {
+          "profile": "release",
+          "case": "head",
+          "compact": true,
+          "checks": 19,
+          "exit": 0,
+          "seconds": 29.216945972002577,
+          "report": "artifacts/integration-app/release/ui-head-compact/report.json",
+          "report_sha256": "b00bfa23a0e24c235ff815196110f14de9c2c446b4c3664f229d25cfad010cc2",
+          "actual_app_maps": "artifacts/integration-app/release/ui-head-compact/app-maps.txt",
+          "actual_app_maps_sha256": "5cb86dae9f5f159ded8103726a1a0888ed04b713dfee02458815ced51a36064d",
+          "inputs": {
+            "/home/blux/de-xr/dome-sculpt/artifacts/mode5-main-9dd/artifacts/integration-app/release/dome-sculpt": "1044a890b8f3227b50cd277a154d9961bc62df3bfdf31d62010814ca6b6062b6",
+            "/home/blux/de-xr/dome-sculpt/artifacts/mode5-main-9dd/artifacts/integration-app/release/surface-heat-ui": "9e49bcb5d6f4fbbae943abcdb9b8a58a5c17d6462c0f9e022b176944bd315b7a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/weights-mode5-native-humanoid-d3e174e/artifacts/weights-mode5/female/native-unskinned.dsculpt": "188c26252d4896ca0eb06154b0e06053dca5b7186b607f9e6b3453d3c5ee2bcc",
+            "/home/blux/de-xr/dome-sculpt/artifacts/mode5-optin0-next-789a2dd/artifacts/mode5-next/release/native-female/accepted.dsculpt": "071ad5eb3e8d8d9a0754ff8c4983c00741fadc6be3a177bc47c542a96000470f",
+            "/home/blux/de-xr/dome-sculpt/artifacts/mode5-main-9dd/tests/surface-heat-component-menu.py": "3da3abbf18a3f3665e5361404e98de1ff905372df104de79dc17a243d2e7d38b",
+            "/home/blux/de-xr/dome-sculpt/artifacts/mode5-main-9dd/tests/surface-heat-component-ui.cpp": "22bf64692fe97cce9a8c846c6af3749f14b842dc91de62b712b5cb65ac33a08e"
+          },
+          "input_drift": []
+        },
+        {
+          "profile": "release",
+          "case": "mixed",
+          "compact": false,
+          "checks": 19,
+          "exit": 0,
+          "seconds": 16.965854262001812,
+          "report": "artifacts/integration-app/release/ui-mixed-normal/report.json",
+          "report_sha256": "7935fad8dfb27a0ac1e0a506aa73b1c9e82312b81a00e5cc8c468d086e7806be",
+          "actual_app_maps": "artifacts/integration-app/release/ui-mixed-normal/app-maps.txt",
+          "actual_app_maps_sha256": "e55bae660a0df3050f4946b180a0a248cdfb9f5fe6e5ca16347cf8d352d9c3b6",
+          "inputs": {
+            "/home/blux/de-xr/dome-sculpt/artifacts/mode5-main-9dd/artifacts/integration-app/release/dome-sculpt": "1044a890b8f3227b50cd277a154d9961bc62df3bfdf31d62010814ca6b6062b6",
+            "/home/blux/de-xr/dome-sculpt/artifacts/mode5-main-9dd/artifacts/integration-app/release/surface-heat-ui": "9e49bcb5d6f4fbbae943abcdb9b8a58a5c17d6462c0f9e022b176944bd315b7a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/mode5-optin0-71cf5b6/artifacts/mode5-phase1/release/mixed-output/restored.dsculpt": "e0c681a7523bc766c047381362bd843b0630343ae05424c272805eb2d6d9f2ff",
+            "/home/blux/de-xr/dome-sculpt/artifacts/mode5-optin0-71cf5b6/artifacts/mode5-phase1/release/mixed-output/0-0.dsculpt": "82032a9768888c10cd0bc33a934a7e7589c387baf8ae1a3b66c91394bb69cf37",
+            "/home/blux/de-xr/dome-sculpt/artifacts/mode5-main-9dd/tests/surface-heat-component-menu.py": "3da3abbf18a3f3665e5361404e98de1ff905372df104de79dc17a243d2e7d38b",
+            "/home/blux/de-xr/dome-sculpt/artifacts/mode5-main-9dd/tests/surface-heat-component-ui.cpp": "22bf64692fe97cce9a8c846c6af3749f14b842dc91de62b712b5cb65ac33a08e"
+          },
+          "input_drift": []
+        },
+        {
+          "profile": "release",
+          "case": "mixed",
+          "compact": true,
+          "checks": 20,
+          "exit": 0,
+          "seconds": 17.459057883999776,
+          "report": "artifacts/integration-app/release/ui-mixed-compact/report.json",
+          "report_sha256": "351b759e5ec57f713ad11b3f152b0410cd61cf14c0afe72a32e2e7215821c951",
+          "actual_app_maps": "artifacts/integration-app/release/ui-mixed-compact/app-maps.txt",
+          "actual_app_maps_sha256": "1008cfe566b7ccfb0503e104b3ea4d408b7ef2f005e81208abf15b5e7a150551",
+          "inputs": {
+            "/home/blux/de-xr/dome-sculpt/artifacts/mode5-main-9dd/artifacts/integration-app/release/dome-sculpt": "1044a890b8f3227b50cd277a154d9961bc62df3bfdf31d62010814ca6b6062b6",
+            "/home/blux/de-xr/dome-sculpt/artifacts/mode5-main-9dd/artifacts/integration-app/release/surface-heat-ui": "9e49bcb5d6f4fbbae943abcdb9b8a58a5c17d6462c0f9e022b176944bd315b7a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/mode5-optin0-71cf5b6/artifacts/mode5-phase1/release/mixed-output/restored.dsculpt": "e0c681a7523bc766c047381362bd843b0630343ae05424c272805eb2d6d9f2ff",
+            "/home/blux/de-xr/dome-sculpt/artifacts/mode5-optin0-71cf5b6/artifacts/mode5-phase1/release/mixed-output/0-0.dsculpt": "82032a9768888c10cd0bc33a934a7e7589c387baf8ae1a3b66c91394bb69cf37",
+            "/home/blux/de-xr/dome-sculpt/artifacts/mode5-main-9dd/tests/surface-heat-component-menu.py": "3da3abbf18a3f3665e5361404e98de1ff905372df104de79dc17a243d2e7d38b",
+            "/home/blux/de-xr/dome-sculpt/artifacts/mode5-main-9dd/tests/surface-heat-component-ui.cpp": "22bf64692fe97cce9a8c846c6af3749f14b842dc91de62b712b5cb65ac33a08e"
+          },
+          "input_drift": []
+        },
+        {
+          "profile": "sanitize",
+          "case": "head",
+          "compact": false,
+          "checks": 18,
+          "exit": 0,
+          "seconds": 46.56543670897372,
+          "report": "artifacts/integration-app/sanitize/ui-head-normal/report.json",
+          "report_sha256": "4c914ebf5a88c06d5888f7fc1342532132f26c680cd9a4eb47cdebcbbdc5a845",
+          "actual_app_maps": "artifacts/integration-app/sanitize/ui-head-normal/app-maps.txt",
+          "actual_app_maps_sha256": "e7dcfb162fcfce80bd37f503b4ebc2ffc4034b1f5716727eec6436e87aacceff",
+          "inputs": {
+            "/home/blux/de-xr/dome-sculpt/artifacts/mode5-main-9dd/artifacts/integration-app/sanitize/dome-sculpt": "4aab2ec3d147baf630ea2628469a6be89cc106a13ec2c4f5a0d6a1587029ec03",
+            "/home/blux/de-xr/dome-sculpt/artifacts/mode5-main-9dd/artifacts/integration-app/release/surface-heat-ui": "9e49bcb5d6f4fbbae943abcdb9b8a58a5c17d6462c0f9e022b176944bd315b7a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/weights-mode5-native-humanoid-d3e174e/artifacts/weights-mode5/female/native-unskinned.dsculpt": "188c26252d4896ca0eb06154b0e06053dca5b7186b607f9e6b3453d3c5ee2bcc",
+            "/home/blux/de-xr/dome-sculpt/artifacts/mode5-optin0-next-789a2dd/artifacts/mode5-next/sanitize/native-female/accepted.dsculpt": "071ad5eb3e8d8d9a0754ff8c4983c00741fadc6be3a177bc47c542a96000470f",
+            "/home/blux/de-xr/dome-sculpt/artifacts/mode5-main-9dd/tests/surface-heat-component-menu.py": "3da3abbf18a3f3665e5361404e98de1ff905372df104de79dc17a243d2e7d38b",
+            "/home/blux/de-xr/dome-sculpt/artifacts/mode5-main-9dd/tests/surface-heat-component-ui.cpp": "22bf64692fe97cce9a8c846c6af3749f14b842dc91de62b712b5cb65ac33a08e"
+          },
+          "input_drift": []
+        },
+        {
+          "profile": "sanitize",
+          "case": "head",
+          "compact": true,
+          "checks": 19,
+          "exit": 0,
+          "seconds": 48.04439083999023,
+          "report": "artifacts/integration-app/sanitize/ui-head-compact/report.json",
+          "report_sha256": "b00bfa23a0e24c235ff815196110f14de9c2c446b4c3664f229d25cfad010cc2",
+          "actual_app_maps": "artifacts/integration-app/sanitize/ui-head-compact/app-maps.txt",
+          "actual_app_maps_sha256": "8563d41c5896379ee526a46888cb6ff874e50cb100edbd7eb6ba45bb40261be8",
+          "inputs": {
+            "/home/blux/de-xr/dome-sculpt/artifacts/mode5-main-9dd/artifacts/integration-app/sanitize/dome-sculpt": "4aab2ec3d147baf630ea2628469a6be89cc106a13ec2c4f5a0d6a1587029ec03",
+            "/home/blux/de-xr/dome-sculpt/artifacts/mode5-main-9dd/artifacts/integration-app/release/surface-heat-ui": "9e49bcb5d6f4fbbae943abcdb9b8a58a5c17d6462c0f9e022b176944bd315b7a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/weights-mode5-native-humanoid-d3e174e/artifacts/weights-mode5/female/native-unskinned.dsculpt": "188c26252d4896ca0eb06154b0e06053dca5b7186b607f9e6b3453d3c5ee2bcc",
+            "/home/blux/de-xr/dome-sculpt/artifacts/mode5-optin0-next-789a2dd/artifacts/mode5-next/sanitize/native-female/accepted.dsculpt": "071ad5eb3e8d8d9a0754ff8c4983c00741fadc6be3a177bc47c542a96000470f",
+            "/home/blux/de-xr/dome-sculpt/artifacts/mode5-main-9dd/tests/surface-heat-component-menu.py": "3da3abbf18a3f3665e5361404e98de1ff905372df104de79dc17a243d2e7d38b",
+            "/home/blux/de-xr/dome-sculpt/artifacts/mode5-main-9dd/tests/surface-heat-component-ui.cpp": "22bf64692fe97cce9a8c846c6af3749f14b842dc91de62b712b5cb65ac33a08e"
+          },
+          "input_drift": []
+        },
+        {
+          "profile": "sanitize",
+          "case": "mixed",
+          "compact": false,
+          "checks": 19,
+          "exit": 0,
+          "seconds": 29.076752676977776,
+          "report": "artifacts/integration-app/sanitize/ui-mixed-normal/report.json",
+          "report_sha256": "7935fad8dfb27a0ac1e0a506aa73b1c9e82312b81a00e5cc8c468d086e7806be",
+          "actual_app_maps": "artifacts/integration-app/sanitize/ui-mixed-normal/app-maps.txt",
+          "actual_app_maps_sha256": "e578e2a7fb974b8de2b1b94e34b7b252291e0db91b446b9d94d3adb3e179ebd4",
+          "inputs": {
+            "/home/blux/de-xr/dome-sculpt/artifacts/mode5-main-9dd/artifacts/integration-app/sanitize/dome-sculpt": "4aab2ec3d147baf630ea2628469a6be89cc106a13ec2c4f5a0d6a1587029ec03",
+            "/home/blux/de-xr/dome-sculpt/artifacts/mode5-main-9dd/artifacts/integration-app/release/surface-heat-ui": "9e49bcb5d6f4fbbae943abcdb9b8a58a5c17d6462c0f9e022b176944bd315b7a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/mode5-optin0-71cf5b6/artifacts/mode5-phase1/sanitize/mixed-output/restored.dsculpt": "e0c681a7523bc766c047381362bd843b0630343ae05424c272805eb2d6d9f2ff",
+            "/home/blux/de-xr/dome-sculpt/artifacts/mode5-optin0-71cf5b6/artifacts/mode5-phase1/sanitize/mixed-output/0-0.dsculpt": "82032a9768888c10cd0bc33a934a7e7589c387baf8ae1a3b66c91394bb69cf37",
+            "/home/blux/de-xr/dome-sculpt/artifacts/mode5-main-9dd/tests/surface-heat-component-menu.py": "3da3abbf18a3f3665e5361404e98de1ff905372df104de79dc17a243d2e7d38b",
+            "/home/blux/de-xr/dome-sculpt/artifacts/mode5-main-9dd/tests/surface-heat-component-ui.cpp": "22bf64692fe97cce9a8c846c6af3749f14b842dc91de62b712b5cb65ac33a08e"
+          },
+          "input_drift": []
+        },
+        {
+          "profile": "sanitize",
+          "case": "mixed",
+          "compact": true,
+          "checks": 20,
+          "exit": 0,
+          "seconds": 30.60114679497201,
+          "report": "artifacts/integration-app/sanitize/ui-mixed-compact/report.json",
+          "report_sha256": "351b759e5ec57f713ad11b3f152b0410cd61cf14c0afe72a32e2e7215821c951",
+          "actual_app_maps": "artifacts/integration-app/sanitize/ui-mixed-compact/app-maps.txt",
+          "actual_app_maps_sha256": "8d5bd30fb5fd9a2af23475fecb5741e5684694e26f7f223f1bda21bd76cc8ab3",
+          "inputs": {
+            "/home/blux/de-xr/dome-sculpt/artifacts/mode5-main-9dd/artifacts/integration-app/sanitize/dome-sculpt": "4aab2ec3d147baf630ea2628469a6be89cc106a13ec2c4f5a0d6a1587029ec03",
+            "/home/blux/de-xr/dome-sculpt/artifacts/mode5-main-9dd/artifacts/integration-app/release/surface-heat-ui": "9e49bcb5d6f4fbbae943abcdb9b8a58a5c17d6462c0f9e022b176944bd315b7a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/mode5-optin0-71cf5b6/artifacts/mode5-phase1/sanitize/mixed-output/restored.dsculpt": "e0c681a7523bc766c047381362bd843b0630343ae05424c272805eb2d6d9f2ff",
+            "/home/blux/de-xr/dome-sculpt/artifacts/mode5-optin0-71cf5b6/artifacts/mode5-phase1/sanitize/mixed-output/0-0.dsculpt": "82032a9768888c10cd0bc33a934a7e7589c387baf8ae1a3b66c91394bb69cf37",
+            "/home/blux/de-xr/dome-sculpt/artifacts/mode5-main-9dd/tests/surface-heat-component-menu.py": "3da3abbf18a3f3665e5361404e98de1ff905372df104de79dc17a243d2e7d38b",
+            "/home/blux/de-xr/dome-sculpt/artifacts/mode5-main-9dd/tests/surface-heat-component-ui.cpp": "22bf64692fe97cce9a8c846c6af3749f14b842dc91de62b712b5cb65ac33a08e"
+          },
+          "input_drift": []
+        }
+      ],
+      "seconds": 249.1973539129831,
+      "scope": "Normal+compact active-morph/posed/painted authentic head and combined Head/Eye+generic; explicit Method5 popup from default0, one UndoRedo, EscapeCancel, Save/graceful close/reopen/CtrlW, complete source/field/paint preservation. Canonical actual app toolkit and stock GLX maps. Release inspector for both profiles."
+    },
+    "actual_synthetic_openxr": {
+      "checks": 56,
+      "exit": 0,
+      "seconds": 115.92491998098558,
+      "scope": "Real native OpenXR loader+production app using repository synthetic runtime, CPU software GL only; no HMD/session service/system action. Explicit5 head/mixed, implicit legacy0 fitted, and focus-cancel; fresh Release inspector for both app profiles. Private patched Mesa EGL+driver pinned only for SAN syntheticXR, exact live app maps required.",
+      "cases": [
+        {
+          "profile": "release",
+          "case": "head",
+          "exit": 0,
+          "seconds": 9.771019767969847,
+          "renderer": "llvmpipe (LLVM 22.1.8, 256 bits)",
+          "left_eye_nonblank": 38,
+          "right_eye_nonblank": 38,
+          "stereo_submissions": 38,
+          "independent_inspector": {
+            "active_morph": true,
+            "active_pose": true,
+            "authored_paint": true,
+            "blended_rows": 0,
+            "case": "head",
+            "field_matches": true,
+            "foreign_weight": 0.0,
+            "max_pose_m": 4.6684297101220214e-08,
+            "oracle_poses": 2,
+            "retained_exact": true,
+            "skinned": true
+          },
+          "actual_app_maps_sha256": "dfda7a395459b30c0bd231db005d190bbc9a00768cf2a8eccf2bf77aa73207c9"
+        },
+        {
+          "profile": "release",
+          "case": "mixed",
+          "exit": 0,
+          "seconds": 9.101942064007744,
+          "renderer": "llvmpipe (LLVM 22.1.8, 256 bits)",
+          "left_eye_nonblank": 37,
+          "right_eye_nonblank": 37,
+          "stereo_submissions": 38,
+          "independent_inspector": {
+            "active_morph": true,
+            "active_pose": true,
+            "authored_paint": true,
+            "blended_rows": 81,
+            "case": "mixed",
+            "field_matches": true,
+            "foreign_weight": 0.0,
+            "max_pose_m": 1.9504594620490323e-07,
+            "oracle_poses": 2,
+            "retained_exact": true,
+            "skinned": true
+          },
+          "actual_app_maps_sha256": "c5016bae6dc867c1e4a59f7e10b6eee11e4eaff57d4a20570fb6b69b3097a628"
+        },
+        {
+          "profile": "release",
+          "case": "fitted",
+          "exit": 0,
+          "seconds": 8.903654307010584,
+          "renderer": "llvmpipe (LLVM 22.1.8, 256 bits)",
+          "left_eye_nonblank": 37,
+          "right_eye_nonblank": 37,
+          "stereo_submissions": 38,
+          "independent_inspector": null,
+          "actual_app_maps_sha256": "1c1675ca80846b566a2177e8a996e8646da73209f8b0845e0b7b650665b1c5df"
+        },
+        {
+          "profile": "release",
+          "case": "focus",
+          "exit": 0,
+          "seconds": 8.864154131966643,
+          "renderer": "llvmpipe (LLVM 22.1.8, 256 bits)",
+          "left_eye_nonblank": 38,
+          "right_eye_nonblank": 38,
+          "stereo_submissions": 39,
+          "independent_inspector": null,
+          "actual_app_maps_sha256": "6293cce2f34f1ef2660008719394c3a16e33d3139df5d9a0cc6785e28fb8f125"
+        },
+        {
+          "profile": "sanitize",
+          "case": "head",
+          "exit": 0,
+          "seconds": 20.70859176898375,
+          "renderer": "llvmpipe (LLVM 19.1.7, 256 bits)",
+          "left_eye_nonblank": 38,
+          "right_eye_nonblank": 38,
+          "stereo_submissions": 38,
+          "independent_inspector": {
+            "active_morph": true,
+            "active_pose": true,
+            "authored_paint": true,
+            "blended_rows": 0,
+            "case": "head",
+            "field_matches": true,
+            "foreign_weight": 0.0,
+            "max_pose_m": 4.6684297101220214e-08,
+            "oracle_poses": 2,
+            "retained_exact": true,
+            "skinned": true
+          },
+          "actual_app_maps_sha256": "4f0d70a65fe74032e1711dfeedd04198be2f43cc264322c91f6b40248e52607a"
+        },
+        {
+          "profile": "sanitize",
+          "case": "mixed",
+          "exit": 0,
+          "seconds": 17.995016289001796,
+          "renderer": "llvmpipe (LLVM 19.1.7, 256 bits)",
+          "left_eye_nonblank": 37,
+          "right_eye_nonblank": 37,
+          "stereo_submissions": 38,
+          "independent_inspector": {
+            "active_morph": true,
+            "active_pose": true,
+            "authored_paint": true,
+            "blended_rows": 81,
+            "case": "mixed",
+            "field_matches": true,
+            "foreign_weight": 0.0,
+            "max_pose_m": 1.9504594620490323e-07,
+            "oracle_poses": 2,
+            "retained_exact": true,
+            "skinned": true
+          },
+          "actual_app_maps_sha256": "f73447d5c6042beb8b826f77ac4bac169aa90658189edd0d62ddd0a1f35c5393"
+        },
+        {
+          "profile": "sanitize",
+          "case": "fitted",
+          "exit": 0,
+          "seconds": 17.654204737977125,
+          "renderer": "llvmpipe (LLVM 19.1.7, 256 bits)",
+          "left_eye_nonblank": 37,
+          "right_eye_nonblank": 37,
+          "stereo_submissions": 38,
+          "independent_inspector": null,
+          "actual_app_maps_sha256": "c2748d8de4e801b42ec5f501b04608a7ba39e33cd67d908947baa631b14ac306"
+        },
+        {
+          "profile": "sanitize",
+          "case": "focus",
+          "exit": 0,
+          "seconds": 17.672120823001023,
+          "renderer": "llvmpipe (LLVM 19.1.7, 256 bits)",
+          "left_eye_nonblank": 38,
+          "right_eye_nonblank": 38,
+          "stereo_submissions": 39,
+          "independent_inspector": null,
+          "actual_app_maps_sha256": "1bb5543f847a71fd21ad7ebc53acb74fa8b1d953ec24c0d405e4bbf0d7df018d"
+        }
+      ],
+      "no_hardware_claim": true
+    }
+  },
+  "reused_evidence": {
+    "checkpoint": "1e6d76d",
+    "solver": "17 exact solver/API/authoring/private leaf bodies plus actual compiler dependency records in API-CLOSURE.json. Solver/rig/paint/Scene/export code unchanged except separately documented main Document/polygon/retopo/view delta. Current app independently compares complete new output fields with those sealed fields.",
+    "historical_only": "3496 original numeric comparisons, full1052 direct caller, full381 long path and7667 mixed factory prefixes per profile remain original1e6 component evidence. Not rerun/relabelled as exhaustive current merged Document. Current complete regular count373 and measured long377 tail373..377 are recorded independently. No malformed full-green union claim.",
+    "initial_release": "Old8f first R proof remains separate from merged-poly R2; its three approved closed0 ELFs are reversible archived with actual restore controls."
+  },
+  "storage": {
+    "cumulative_cap_allocated_blocks": 1342177280,
+    "hard_actual_free_floor": 21474836480,
+    "observed_peak_allocated_blocks": 1249034240,
+    "final_allocated_blocks": 1070022656,
+    "final_actual_free": 23230197760,
+    "accounting": "Per-file allocated blocks across own sparse worktree/artifacts plus2MiB Git metadata allowance, continuously checked; not inferred from concurrent global free gains. Prospective compile/link/maps/compression/restoration reserves enforced. Inputs/libs/objects/apps/failures untouched; only newly closed passed authorized standalone native ELFs archived.",
+    "closed_elf_restore_ledgers": [
+      {
+        "ledger": "artifacts/integration/surface-native-closed/RESTORE.json",
+        "sha256": "5188276c149c3b77b5ad775b4fe954d51e5c45d1386e6b8f2f3e0a4c9e5ede14",
+        "inventory": [
+          {
+            "path": "artifacts/integration/surface-native",
+            "member": "surface-native",
+            "sha256": "a97dad120d65137623a2bfcc83f0b2dfaec03615ba014946798486ac5acfcb23",
+            "bytes": 13093296,
+            "mode": 448,
+            "uid": 1000,
+            "gid": 1001,
+            "mtime_ns": 1793909696217258526
+          }
+        ],
+        "archive_sha256": "bc2b9277ab771496045bbe44fac8b9a2c72e850ffff997b2386d0c943d6ba6d9",
+        "original_path_restore_control": true
+      },
+      {
+        "ledger": "artifacts/integration/legacy-skin-closed/RESTORE.json",
+        "sha256": "a04b6d9da278c9dab3213cdfe43ee47e341094ca8d0eba29ad68bb4aeee66a6b",
+        "inventory": [
+          {
+            "path": "artifacts/integration/legacy-skin",
+            "member": "legacy-skin",
+            "sha256": "a7cde958e246e5cda094c2628dc9a7f3db3cdb41492b68790ca71f184e690710",
+            "bytes": 13095152,
+            "mode": 448,
+            "uid": 1000,
+            "gid": 1001,
+            "mtime_ns": 1793909703184480901
+          }
+        ],
+        "archive_sha256": "7ee9be98eaa17d92d8ae21629078f77d5f5a5b0d4c8515bbec8b4a69ea3af390",
+        "original_path_restore_control": true
+      },
+      {
+        "ledger": "artifacts/integration/retopo-worker-closed/RESTORE.json",
+        "sha256": "3239a8af191a29496b5796106440142bc18cddaf001abc782861904c4ba795e8",
+        "inventory": [
+          {
+            "path": "artifacts/integration/retopo-worker",
+            "member": "retopo-worker",
+            "sha256": "cd034c15c6b6810373de8c922b7a4519132e44ac9509878332c614736733fb6f",
+            "bytes": 13109224,
+            "mode": 448,
+            "uid": 1000,
+            "gid": 1001,
+            "mtime_ns": 1793909709752690540
+          }
+        ],
+        "archive_sha256": "0ee5133d4dcfeaa6c05d188351266e6333b6dcd3e72fa46ca6d6179b5e77a78a",
+        "original_path_restore_control": true
+      },
+      {
+        "ledger": "artifacts/integration-sanitize/surface-native-closed/RESTORE.json",
+        "sha256": "b8d0c23cc094475a13b0745da44c1144942489ff2877df330bd11055399e82dc",
+        "inventory": [
+          {
+            "path": "artifacts/integration-sanitize/surface-native",
+            "member": "surface-native",
+            "sha256": "751765a9ec25a6d1f3af1bc88a4a835d6e758571276eb9106c9f5c94ce831ac0",
+            "bytes": 331858112,
+            "mode": 448,
+            "uid": 1000,
+            "gid": 1001,
+            "mtime_ns": 1793912107374394523
+          }
+        ],
+        "archive_sha256": "c6910cd04aa1422502e6440142aa82ee5ce2916db2e419be703ee023cb2b1c0e",
+        "original_path_restore_control": true
+      },
+      {
+        "ledger": "artifacts/integration-sanitize/legacy-skin-closed/RESTORE.json",
+        "sha256": "6b155104168abfb4e0d758d1b2203c6ec2eae17ee20cae23fec44bdb9e23c18b",
+        "inventory": [
+          {
+            "path": "artifacts/integration-sanitize/legacy-skin",
+            "member": "legacy-skin",
+            "sha256": "8cd5c032f7aaa524f6a178eab7ce42520962cf7a3072a006c889b8e985bc2749",
+            "bytes": 331818416,
+            "mode": 448,
+            "uid": 1000,
+            "gid": 1001,
+            "mtime_ns": 1793912125232965844
+          }
+        ],
+        "archive_sha256": "485c764a8244a11ab0a1a40a59449c1e9369d43fe2c906bbf86428171cb7ae8d",
+        "original_path_restore_control": true
+      },
+      {
+        "ledger": "artifacts/integration-sanitize/poly-retopo-closed/RESTORE.json",
+        "sha256": "1dab439ad678784a39ccefaf44ff74817ed66a72e650b87f3767ec773bba0cfb",
+        "inventory": [
+          {
+            "path": "artifacts/integration-sanitize/poly-retopo",
+            "member": "poly-retopo",
+            "sha256": "e0deb7fc48734ceab622156f31878729ee2a7cd65241bbd37461ee379d0f1811",
+            "bytes": 331282280,
+            "mode": 448,
+            "uid": 1000,
+            "gid": 1001,
+            "mtime_ns": 1793912145252606300
+          }
+        ],
+        "archive_sha256": "785b35788cc7087b7a09455a861bebe86ce7462415a3d32fa8c31c8fcc4c0bb9",
+        "original_path_restore_control": true
+      },
+      {
+        "ledger": "artifacts/integration-sanitize/retopo-worker-closed/RESTORE.json",
+        "sha256": "3c0e25b413cef6327daba797e6592ab95d65f1f2f2faa631fb9a14fa3818302c",
+        "inventory": [
+          {
+            "path": "artifacts/integration-sanitize/retopo-worker",
+            "member": "retopo-worker",
+            "sha256": "0673f172ea54fc5824faf01773e0b3c54c3785da5e3a16b679e8a4a8bc49478b",
+            "bytes": 331367640,
+            "mode": 448,
+            "uid": 1000,
+            "gid": 1001,
+            "mtime_ns": 1793912168701356457
+          }
+        ],
+        "archive_sha256": "1a95d15dcfca29db94c6d2ea8a0defb100f28696cc1496206573e8a8a50523e8",
+        "original_path_restore_control": true
+      },
+      {
+        "ledger": "artifacts/integration-worker/sanitize/worker-closed/RESTORE.json",
+        "sha256": "ed6ff6e38f7a18271eb5d4ed3ce88cff3c204770d9b45047a036bef4ce5ebf11",
+        "inventory": [
+          {
+            "path": "artifacts/integration-worker/sanitize/worker",
+            "member": "worker",
+            "sha256": "9c8c4c2d9b33585384df529defe987eb75709a7725c6bf8f26a4344f06fde9f4",
+            "bytes": 331933040,
+            "mode": 448,
+            "uid": 1000,
+            "gid": 1001,
+            "mtime_ns": 1793912332671602092
+          }
+        ],
+        "archive_sha256": "dd41ccc2afdf4d452e56b9c89f38c920178f9825732022071e15542ced3391c2",
+        "original_path_restore_control": true
+      },
+      {
+        "ledger": "artifacts/integration-worker/release/worker-closed/RESTORE.json",
+        "sha256": "135ee0da19b232aadec92b363bffe53139b5695d916ad1f002262c9c9bad2aec",
+        "inventory": [
+          {
+            "path": "artifacts/integration-worker/release/worker",
+            "member": "worker",
+            "sha256": "d012d53f3bdea1f4e3de2cb1ff7e24137b62e892c8c02b75480df2dc2df8404b",
+            "bytes": 13119112,
+            "mode": 448,
+            "uid": 1000,
+            "gid": 1001,
+            "mtime_ns": 1793912304075687269
+          }
+        ],
+        "archive_sha256": "088ab0ae8e100910991a6b1f1e558bf8178cbbc81919420522dceb4b6a70c402",
+        "original_path_restore_control": true
+      }
+    ]
+  },
+  "immutability": {
+    "tracked_present_source_files": 1449,
+    "source_drift": [],
+    "readonly_support_drift": [],
+    "sparse_index": "Full index/tree retained; absent sparse assets/docs never staged as deletions, real repository assets read via exact qualified blob parity."
+  },
+  "remaining": {
+    "main": "Root review/current coherent admission required; default0 unchanged.",
+    "robust_domain": "Unsupported prepared/complex37/38 owners remain explicit guards and required future work. No universal automatic/volume-aware/default-complete claim.",
+    "faults": "New current worker regular/full373 +longtail5 qualified; old full1052/381/7667 retained as separate exact-leaf component scope. No claim current exhaustive caller/factory/helper or all C/C++ allocation families."
+  },
+  "main_exact_test_preservation": {
+    "tests/vrm-official-texture-schemas.py": "2ab41f118b013a4c5c9be997c02047e053a0319201462657bee48929604610a2",
+    "tests/avatar.cpp": "80514349cbdb84aa0bdc1500707875a68f8d61883f24a67cddc51ac46ee5cd20"
+  },
+  "metadata_correction": {
+    "supersedes_labels_in": "afd48988f38cdad4130b602397aaccbf19889a4b",
+    "change": "Rename only R/S retopology worker_permanent_prefixes to worker_one_shot_prefixes. Original logs/status/source/binaries and all numerical outcomes remain unchanged.",
+    "audit": "Actual R1/R2/S command arrays contain only the binary path, with no --persistent/--acceptance flags. Indexed MODE5 documents/receipts were audited; no other retopology permanent/persistent label was found.",
+    "separate_surface_heat_scope": "Current SurfaceHeat publication 373 complete regular prefixes plus five long-path tail controls per profile use persistent allocation denial and remain unchanged; they are not the retopology one-shot scope."
+  }
+}
