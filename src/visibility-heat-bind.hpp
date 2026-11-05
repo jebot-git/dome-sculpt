@@ -2,7 +2,9 @@
 #pragma once
 #include "visibility-geodesic-bind.hpp"
 #include "screened-continuation-solve.hpp"
+#include "closed-mesh-source-domain.hpp"
 namespace dome::detail {
+enum class HeatDomainPolicy { IntrinsicSurface, ClosedMaterial };
 namespace visibility_heat {
 // Same bounded IC-PCG linear solve as continuation, with no probability-range
 // requirement on a signed residual CORRECTION. Original fields are certified
@@ -90,6 +92,7 @@ void refined_solve(const System&s,std::span<const double>rhs,std::span<double>x,
 struct Prepared {
   weight_surface::System system;
   size_t visible=0,occluded=0;
+  size_t closed_components=0,interior_components=0,exterior_components=0,membership_rejected=0;
   std::vector<std::array<uint64_t,4>>component_sources;
 };
 // A distinct positive SURFACE screened energy, not a volumetric solve. The
@@ -97,9 +100,9 @@ struct Prepared {
 // are clipped per edge to obtain a genuine M-matrix; this deviation from raw
 // Blender FEM is reported, never a retry after an unsuccessful solve.
 inline Prepared prepare(const Mesh&m,const Skeleton&rig,BindOptions options,
-    weight_surface::Budget&work,visibility_geodesic::Bytes&bytes,std::span<const HeatSourceSegment>input_sources={}){
+    weight_surface::Budget&work,visibility_geodesic::Bytes&bytes,std::span<const HeatSourceSegment>input_sources={},HeatDomainPolicy policy=HeatDomainPolicy::IntrinsicSurface){
   const size_t n=m.positions.size(),corners=m.indices.size(),bones=rig.bones.size();
-  if(!n||n>2'000'000||!corners||corners>6'000'000||corners%3||!bones||bones>256||
+  if((policy!=HeatDomainPolicy::IntrinsicSurface&&policy!=HeatDomainPolicy::ClosedMaterial)||!n||n>2'000'000||!corners||corners>6'000'000||corners%3||!bones||bones>256||
      !options.maximum_work||options.maximum_work>500'000'000||
      !std::isfinite(options.maximum_seed_distance)||options.maximum_seed_distance<=0||options.maximum_seed_distance>10000||
      !options.limits.max_influences||options.limits.max_influences>32||!std::isfinite(options.limits.prune)||options.limits.prune<0||options.limits.prune>=1)
@@ -110,7 +113,9 @@ inline Prepared prepare(const Mesh&m,const Skeleton&rig,BindOptions options,
   work.step_items(n,4);work.step_items(corners,4*std::bit_width(corners+1)+4);work.step_items(bones,256);
   m.validate();rig.validate();
   std::vector<bone_shadow::Point>points;points.reserve(n);for(auto p:m.positions){work.step(3);if(std::max({std::abs(p.x),std::abs(p.y),std::abs(p.z)})>10000)throw std::invalid_argument("Heat metric exceeds bounded coordinates");points.push_back({p.x,p.y,p.z});}
-  visibility_geodesic::ClosestRayVisibility query(points,m.indices,bytes.maximum-bytes.used,work,true);bytes.add(query.planned_bytes);visibility_geodesic::ClosestRayVisibility::Scratch scratch(query);
+  auto query=std::make_shared<const visibility_geodesic::ClosestRayVisibility>(points,m.indices,bytes.maximum-bytes.used,work,true);bytes.add(query->planned_bytes);visibility_geodesic::ClosestRayVisibility::Scratch scratch(*query);
+  std::optional<visibility_geodesic::ClosedMeshSourceDomain>solid;
+  if(policy==HeatDomainPolicy::ClosedMaterial){solid.emplace(query,bytes.maximum-bytes.used,work);bytes.add(solid->planned_bytes);}
   auto segments=rig.segments();std::vector<HeatSourceSegment>sources;sources.reserve(bones);for(uint32_t b=0;b<bones;++b)if(rig.bones[b].deform){work.step(8);auto a=segments[b][0],z=segments[b][1];sources.push_back({{a.x,a.y,a.z},{z.x,z.y,z.z},b});}
   if(!input_sources.empty()){
     if(input_sources.size()!=sources.size())throw std::invalid_argument("Declared heat sources omit actual deform identities");
@@ -123,10 +128,21 @@ inline Prepared prepare(const Mesh&m,const Skeleton&rig,BindOptions options,
   NearestWeightSources nearest(sources,work);Prepared out;
   out.system=weight_surface::assemble(m,work,HeatOperator::PositiveGraph,{},HeatNormals::AreaWeighted,HeatMass::MixedVoronoi,HeatEdges::IncidentMean);auto&s=out.system;
   std::vector<uint8_t>supported(n);out.component_sources.resize(n);
-  for(uint32_t row=0;row<n;++row){work.stop();auto mask=nearest.nearest(points[row],work);double minimum=INFINITY;size_t ties=0;
+  using Mask=std::array<uint64_t,4>;std::vector<Mask>permitted;std::vector<uint8_t>classified,interior;
+  if(solid){bytes.add(n,sizeof(Mask)+2*sizeof(uint8_t));permitted.resize(n);classified.resize(n);interior.resize(n);out.closed_components=solid->closed_components;
+    for(uint32_t row=0;row<n;++row)if(solid->closed(row)){auto component=solid->component(row);if(classified[component])continue;classified[component]=1;
+      // Prospectively classify every finite source BEFORE nearest selection.
+      // Only all-source strict exterior proof admits an attachment domain.
+      // A possible crossing/contact never triggers an exterior solve retry.
+      for(const auto&source:sources){work.step(8);bone_shadow::Point a{float(source.head[0]),float(source.head[1]),float(source.head[2])},b{float(source.tail[0]),float(source.tail[1]),float(source.tail[2])};if(!solid->exterior(row,a,b,scratch,work))permitted[component][source.bone/64]|=uint64_t(1)<<(source.bone%64);}
+      interior[component]=permitted[component]!=Mask{};if(interior[component])++out.interior_components;else ++out.exterior_components;
+    }
+  }
+  for(uint32_t row=0;row<n;++row){work.stop();Mask allowed{UINT64_MAX,UINT64_MAX,UINT64_MAX,UINT64_MAX};if(solid&&solid->closed(row)&&interior[solid->component(row)])allowed=permitted[solid->component(row)];auto mask=nearest.nearest(points[row],allowed,work);double minimum=INFINITY;size_t ties=0;
     for(size_t k=0;k<4;++k){auto bits=mask[k];while(bits){work.step(8);auto b=uint32_t(k*64+std::countr_zero(bits));bits&=bits-1;auto a=segments.at(b)[0],z=segments.at(b)[1];auto p=points[row];
       const double d=visibility_geodesic::distance(p,{a.x,a.y,a.z},{z.x,z.y,z.z});if(d>options.maximum_seed_distance)continue;
-      if(!query.visible(row,{a.x,a.y,a.z},{z.x,z.y,z.z},scratch,work)){++out.occluded;continue;}
+      if(solid&&solid->closed(row)&&interior[solid->component(row)]&&!solid->nearest_material_closure(row,{a.x,a.y,a.z},{z.x,z.y,z.z},scratch,work)){++out.membership_rejected;continue;}
+      if(!query->visible(row,{a.x,a.y,a.z},{z.x,z.y,z.z},scratch,work)){++out.occluded;continue;}
       minimum=std::min(minimum,d);s.seeds[row][k]|=uint64_t(1)<<(b%64);++ties;++out.visible;
     }}
     if(ties){
@@ -143,10 +159,10 @@ inline Prepared prepare(const Mesh&m,const Skeleton&rig,BindOptions options,
 }
 }
 inline VisibilityGeodesicResult visibility_heat_bind(const Mesh&m,const Skeleton&rig,BindOptions options={},
-    const std::function<bool()>&cancelled={},size_t maximum_bytes=256u*1024u*1024u,std::span<const HeatSourceSegment>sources={}){
+    const std::function<bool()>&cancelled={},size_t maximum_bytes=256u*1024u*1024u,std::span<const HeatSourceSegment>sources={},HeatDomainPolicy policy=HeatDomainPolicy::IntrinsicSurface){
   if(maximum_bytes<65536||maximum_bytes>256u*1024u*1024u)throw std::invalid_argument("Heat workspace bound");
   weight_surface::Budget work{0,options.maximum_work,cancelled};work.stop();visibility_geodesic::Bytes bytes{0,maximum_bytes};
-  auto prepared=visibility_heat::prepare(m,rig,options,work,bytes,sources);auto&s=prepared.system;const size_t n=m.positions.size();
+  auto prepared=visibility_heat::prepare(m,rig,options,work,bytes,sources,policy);auto&s=prepared.system;const size_t n=m.positions.size();
   ContinuationIC ic(s,work);std::vector<double>rhs(n),field(n),sum(n);std::vector<VertexWeights>rows(n);for(auto&r:rows)r.reserve(options.limits.max_influences+1);
   ContinuationReport proof;
   std::vector<uint32_t>sole(n,UINT32_MAX);
@@ -164,11 +180,11 @@ inline VisibilityGeodesicResult visibility_heat_bind(const Mesh&m,const Skeleton
   VisibilityGeodesicResult result;result.negative_stiffness_edges=s.negative_edges;result.heat_iterations=proof.iterations;result.heat_residual=proof.residual;
   result.weights.vertices.reserve(n);for(size_t row=0;row<n;++row){work.step(64+rows[row].size()*8);result.partition_error=std::max(result.partition_error,std::abs(sum[row]-1));result.weights.vertices.push_back(normalize_weights(std::move(rows[row]),rig.bones.size(),{},options.limits));}
   if(result.partition_error>1e-7)throw std::runtime_error("Heat failed independently replayed pre-prune partition bound");
-  work.step_items(n,options.limits.max_influences+1);result.weights.validate(n,rig.bones.size());work.stop();result.visible_seeds=prepared.visible;result.occluded_candidates=prepared.occluded;result.work=work.used;result.workspace=bytes.used;return result;
+  work.step_items(n,options.limits.max_influences+1);result.weights.validate(n,rig.bones.size());work.stop();result.closed_components=prepared.closed_components;result.interior_components=prepared.interior_components;result.exterior_components=prepared.exterior_components;result.membership_rejected=prepared.membership_rejected;result.visible_seeds=prepared.visible;result.occluded_candidates=prepared.occluded;result.work=work.used;result.workspace=bytes.used;return result;
 }
 inline VisibilityGeodesicResult visibility_heat_bind_object(const SculptObject&object,const Skeleton&rig,
-    BindOptions options={},const std::function<bool()>&cancelled={},size_t maximum_bytes=256u*1024u*1024u,std::span<const HeatSourceSegment>sources={}){
+    BindOptions options={},const std::function<bool()>&cancelled={},size_t maximum_bytes=256u*1024u*1024u,std::span<const HeatSourceSegment>sources={},HeatDomainPolicy policy=HeatDomainPolicy::IntrinsicSurface){
   return bind_visibility_object(object,rig,options,cancelled,maximum_bytes,
-    [sources](const Mesh&m,const Skeleton&r,BindOptions o,const std::function<bool()>&c,size_t b){return visibility_heat_bind(m,r,o,c,b,sources);});
+    [sources,policy](const Mesh&m,const Skeleton&r,BindOptions o,const std::function<bool()>&c,size_t b){return visibility_heat_bind(m,r,o,c,b,sources,policy);});
 }
 }

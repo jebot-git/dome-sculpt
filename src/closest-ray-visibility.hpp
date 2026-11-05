@@ -6,10 +6,12 @@
 #include <span>
 #include <vector>
 namespace dome::detail::visibility_geodesic {
+class ClosedMeshSourceDomain;
 // A different query from the finite-source integral/entry-wall policy. This
 // class tests the genuine closest ray, two-sided, excluding only its exact
 // origin. It supplies no topology, source-bone or material authority.
 class ClosestRayVisibility {
+  friend class ClosedMeshSourceDomain;
   using I=volume_exact::Integer;
   using V=std::array<I,3>;
   using P=bone_shadow::Point;
