@@ -1,3 +1,18 @@
+## Affine polygon admission — 2026-11-05
+
+Main now also admits qualified polygon/retopology composition8750f20 (runtime0567)
+via37c46b9, with exact source/header/test/CMake parity. True-affine polygon tools,
+held placement, source restoration and reflection-correct normals coexist with
+the admitted transactional retopology worker. Native248/profile,16 exact file
+pairs, ordinary normal+compact GUI77each/profile and actual Arc stereo flows pass.
+Read POLYGON-AFFINE-ADMISSION.md and its receipt. This is component qualification,
+not a fresh full-project build, physical headset test or full-goal completion.
+
+The caller-admission repair and automatic weights are separate continuations and
+must merge this current source before their final qualification. Remesh remains
+private until its frozen sweep and coherent integration close. Older private
+entries below retain their historical scope; the full goal remains active.
+
 ## Current production admission — 2026-11-05
 
 Main integrates the qualified retopology worker publication repair from68daffe,
