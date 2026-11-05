@@ -1,7 +1,9 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-#define main old_key_allocation_suite
-#include "canonical-paint37-key-allocation.cpp"
-#undef main
+#include "dome/scene.hpp"
+#include "dome/material-bindings.hpp"
+#include "persistent-cpp-allocation.hpp"
+#include <iostream>
+using namespace dome;
 #include "refined-role-sampling.hpp"
 #include <cmath>
 namespace {
