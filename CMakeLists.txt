@@ -4296,3 +4296,8 @@ if(BUILD_TESTING)
     endforeach()
   endforeach()
 endif()
+
+if(BUILD_TESTING)
+  add_executable(dome-sculpt-surface-heat-head-ui-test tests/surface-heat-head-ui.cpp)
+  target_link_libraries(dome-sculpt-surface-heat-head-ui-test PRIVATE dome-sculpt-core)
+endif()

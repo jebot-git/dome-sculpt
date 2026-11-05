@@ -1,0 +1,802 @@
+{
+  "scope": "Same public9a ABI, fresh matching head inspector and whole native app relink of immutable9a complete frontend objects plus own a4 changed coreTU, actual native19 context with selected head/active facialmorph. SoftwareGLX/private display/bus, no fullALL/hardware/default claim.",
+  "build": {
+    "state": "terminal",
+    "scope": "Fresh helper and complete native app relink: immutable fully rebuilt9a frontend objects/current public headers, changed private-only complete own a4 coreTU; no new ABI or fullALL claim",
+    "sources": {
+      "tests/surface-heat-head-ui.cpp": "f5655dc02888024ca205509085c62bd1179923ff8b56be31144b7bb3fa933ce5",
+      "tests/surface-heat-head-menu.py": "c32ae53821f483499cd0390778eb765482656de78dd9ddb2b0818eef5ce4cc1e"
+    },
+    "profiles": {
+      "release": {
+        "helper_compile": [
+          "/usr/bin/c++",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/weights-mode5-head-ui-0a68a6e/include",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/weights-mode5-head-ui-0a68a6e/third_party/openbrush",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/weights-mode5-head-ui-0a68a6e/third_party/nlohmann",
+          "-O3",
+          "-DNDEBUG",
+          "-std=gnu++20",
+          "-o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-mode5-head-ui-0a68a6e/artifacts/weights-mode5/ui-release/helper.o",
+          "-c",
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-mode5-head-ui-0a68a6e/tests/surface-heat-head-ui.cpp"
+        ],
+        "core_sha256": "8612df5783442776364bfd6e32c28d8ec1c05ceb2e935ba2911fb78065cf88ec",
+        "parent_archives": {
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-surface-mode5-615bd42/artifacts/weights-mode5/release/stage/libdome-sculpt-affine.a": "9ef6fa577a30c7504e1ba79e064425a91bffd9b1bc1e90ea3813f2d5e66918a5",
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-surface-mode5-615bd42/artifacts/weights-mode5/release/stage/libdome-sculpt-core.a": "d77ad23d532fed902678f2060d585427363b468f0378d30bc263c32b56980556",
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-surface-mode5-615bd42/artifacts/weights-mode5/release/stage/libdome-sculpt-emission-codec.a": "782a74d571950ca5f39ad60484614d6013975e0529cf8a7d7f27deafa795addd",
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-surface-mode5-615bd42/artifacts/weights-mode5/release/stage/libdome-sculpt-polygon.a": "36757cc50ea27fc347e9decbe2ad7eb0f87723d40f7f2d7f433b4d72fff7ee9d",
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-surface-mode5-615bd42/artifacts/weights-mode5/release/stage/libdome-sculpt-render.a": "ece2f143fd212040165633a41be9451be23626c444ab930946485c34f72d29d8",
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-surface-mode5-615bd42/artifacts/weights-mode5/release/stage/libdome-sculpt-spacenav.a": "fef091fc48f780733689c2b2fb6a06c5736dbcff897659e166a4cad2d819d4ce",
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-surface-mode5-615bd42/artifacts/weights-mode5/release/stage/libdome-sculpt-xr.a": "718b315b56e5f16dfd219c595fd8125f3d3e52ffca6e51daa94a92b453df62c9",
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-surface-mode5-615bd42/artifacts/weights-mode5/release/stage/libmikktspace-robust.a": "627d6f0c527644de31bd1190d3f1921316af34275c750dd0945a2d6eda77816f",
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-surface-mode5-615bd42/artifacts/weights-mode5/release/stage/libmikktspace.a": "806583f7db2f05a24e2d375434c8d8c845ed06d26b3a1981b8022ab9cebbb4bf",
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-surface-mode5-615bd42/artifacts/weights-mode5/release/stage/libufbx.a": "935af8d78d957e340a65019a248197b4274a08272097cee3d1cbbb2a0098380d",
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-surface-mode5-615bd42/artifacts/weights-mode5/release/stage/libxatlas.a": "c42d5a60aee1112a4a4ed46b11c51cda184be715a72908e1d645b6c20874ed98"
+        },
+        "surface-heat-ui_link": [
+          "/usr/bin/c++",
+          "-O3",
+          "-DNDEBUG",
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-mode5-head-ui-0a68a6e/artifacts/weights-mode5/ui-release/helper.o",
+          "-o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-mode5-head-ui-0a68a6e/artifacts/weights-mode5/ui-release/surface-heat-ui",
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-mode5-closed-eye-99e4ae1/artifacts/weights-mode5/current-release/libdome-sculpt-core.a",
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-surface-mode5-615bd42/artifacts/weights-mode5/release/stage/libdome-sculpt-affine.a",
+          "/usr/lib64/liblapacke.so",
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-surface-mode5-615bd42/artifacts/weights-mode5/release/stage/libdome-sculpt-polygon.a",
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-surface-mode5-615bd42/artifacts/weights-mode5/release/stage/libxatlas.a",
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-surface-mode5-615bd42/artifacts/weights-mode5/release/stage/libmikktspace.a",
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-surface-mode5-615bd42/artifacts/weights-mode5/release/stage/libmikktspace-robust.a",
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-surface-mode5-615bd42/artifacts/weights-mode5/release/stage/libufbx.a",
+          "/usr/lib64/libpng.so",
+          "/usr/lib64/libjpeg.so",
+          "/usr/lib64/libz.so",
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-surface-mode5-615bd42/artifacts/weights-mode5/release/stage/libdome-sculpt-emission-codec.a",
+          "/usr/lib64/libOpenEXR-3_2.so",
+          "/usr/lib64/libOpenEXRUtil-3_2.so",
+          "/usr/lib64/libOpenEXRCore-3_2.so",
+          "/usr/lib64/libIex-3_2.so",
+          "/usr/lib64/libIlmThread-3_2.so",
+          "/usr/lib64/libImath-3_1.so",
+          "-lgcc_s_asneeded",
+          "-lgcc_s_asneeded"
+        ],
+        "dome-sculpt_link": [
+          "/usr/bin/c++",
+          "-O3",
+          "-DNDEBUG",
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-surface-mode5-615bd42/artifacts/weights-mode5/release/objects/dome-sculpt/native-display-runtime.cpp.o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-surface-mode5-615bd42/artifacts/weights-mode5/release/objects/dome-sculpt/vrm-expression-editor.cpp.o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-surface-mode5-615bd42/artifacts/weights-mode5/release/objects/dome-sculpt/rig-fit-editor.cpp.o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-surface-mode5-615bd42/artifacts/weights-mode5/release/objects/dome-sculpt/projection-editor.cpp.o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-surface-mode5-615bd42/artifacts/weights-mode5/release/objects/dome-sculpt/spacenav-options.cpp.o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-surface-mode5-615bd42/artifacts/weights-mode5/release/objects/dome-sculpt/app.cpp.o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-surface-mode5-615bd42/artifacts/weights-mode5/release/objects/dome-sculpt/polygon-editor.cpp.o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-surface-mode5-615bd42/artifacts/weights-mode5/release/objects/dome-sculpt/import-editor.cpp.o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-surface-mode5-615bd42/artifacts/weights-mode5/release/objects/dome-sculpt/procedural-editor.cpp.o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-surface-mode5-615bd42/artifacts/weights-mode5/release/objects/dome-sculpt/resolution-editor.cpp.o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-surface-mode5-615bd42/artifacts/weights-mode5/release/objects/dome-sculpt/sculpt-editor.cpp.o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-surface-mode5-615bd42/artifacts/weights-mode5/release/objects/dome-sculpt/creator-editor.cpp.o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-surface-mode5-615bd42/artifacts/weights-mode5/release/objects/dome-sculpt/rig-editor.cpp.o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-surface-mode5-615bd42/artifacts/weights-mode5/release/objects/dome-sculpt/shapekey-editor.cpp.o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-surface-mode5-615bd42/artifacts/weights-mode5/release/objects/dome-sculpt/weight-editor.cpp.o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-surface-mode5-615bd42/artifacts/weights-mode5/release/objects/dome-sculpt/skin-editor.cpp.o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-surface-mode5-615bd42/artifacts/weights-mode5/release/objects/dome-sculpt/mesh-editor.cpp.o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-surface-mode5-615bd42/artifacts/weights-mode5/release/objects/dome-sculpt/bake-editor.cpp.o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-surface-mode5-615bd42/artifacts/weights-mode5/release/objects/dome-sculpt/object-editor.cpp.o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-surface-mode5-615bd42/artifacts/weights-mode5/release/objects/dome-sculpt/paint-editor.cpp.o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-surface-mode5-615bd42/artifacts/weights-mode5/release/objects/dome-sculpt/uv-editor.cpp.o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-surface-mode5-615bd42/artifacts/weights-mode5/release/objects/dome-sculpt/ui-conventions.cpp.o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-surface-mode5-615bd42/artifacts/weights-mode5/release/objects/dome-sculpt/session-appearance.cpp.o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-surface-mode5-615bd42/artifacts/weights-mode5/release/objects/dome-sculpt/export-editor.cpp.o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-surface-mode5-615bd42/artifacts/weights-mode5/release/objects/dome-sculpt/desktop-menu.cpp.o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-surface-mode5-615bd42/artifacts/weights-mode5/release/objects/dome-sculpt/appmenu-protocol.c.o",
+          "-o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-mode5-head-ui-0a68a6e/artifacts/weights-mode5/ui-release/dome-sculpt",
+          "-L/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-release/lib",
+          "-L/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib",
+          "-Wl,-rpath,/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-release/lib:/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib:",
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-surface-mode5-615bd42/artifacts/weights-mode5/release/stage/libdome-sculpt-spacenav.a",
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-mode5-closed-eye-99e4ae1/artifacts/weights-mode5/current-release/libdome-sculpt-core.a",
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-surface-mode5-615bd42/artifacts/weights-mode5/release/stage/libdome-sculpt-render.a",
+          "/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-release/lib/libfltk_images.so.1.4.5",
+          "/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-release/lib/libfltk_gl.so.1.4.5",
+          "/usr/lib64/libGLU.so",
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-surface-mode5-615bd42/artifacts/weights-mode5/release/stage/libdome-sculpt-xr.a",
+          "/usr/lib64/libjpeg.so",
+          "/usr/lib64/libpng.so",
+          "/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-release/lib/libfltk.so.1.4.5",
+          "-lcairo",
+          "-L/usr/lib64",
+          "-lX11",
+          "-lGLU",
+          "-lGL",
+          "/usr/lib64/libdl.a",
+          "/usr/lib64/libSM.so",
+          "/usr/lib64/libICE.so",
+          "/usr/lib64/libXext.so",
+          "/usr/lib64/libXinerama.so",
+          "/usr/lib64/libXfixes.so",
+          "/usr/lib64/libXcursor.so",
+          "/usr/lib64/libXrender.so",
+          "/usr/lib64/libXft.so",
+          "/usr/lib64/libwayland-egl.so",
+          "/usr/lib64/libwayland-cursor.so",
+          "/usr/lib64/libxkbcommon.so",
+          "/usr/lib64/libGLX.so",
+          "/usr/lib64/libOpenGL.so",
+          "/usr/lib64/libz.so",
+          "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libcairo.so",
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-surface-mode5-615bd42/artifacts/weights-mode5/release/stage/libdome-sculpt-render.a",
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-mode5-closed-eye-99e4ae1/artifacts/weights-mode5/current-release/libdome-sculpt-core.a",
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-surface-mode5-615bd42/artifacts/weights-mode5/release/stage/libdome-sculpt-affine.a",
+          "/usr/lib64/liblapacke.so",
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-surface-mode5-615bd42/artifacts/weights-mode5/release/stage/libdome-sculpt-polygon.a",
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-surface-mode5-615bd42/artifacts/weights-mode5/release/stage/libxatlas.a",
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-surface-mode5-615bd42/artifacts/weights-mode5/release/stage/libmikktspace.a",
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-surface-mode5-615bd42/artifacts/weights-mode5/release/stage/libmikktspace-robust.a",
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-surface-mode5-615bd42/artifacts/weights-mode5/release/stage/libufbx.a",
+          "/usr/lib64/libpng.so",
+          "/usr/lib64/libjpeg.so",
+          "/usr/lib64/libz.so",
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-surface-mode5-615bd42/artifacts/weights-mode5/release/stage/libdome-sculpt-emission-codec.a",
+          "/usr/lib64/libOpenEXR-3_2.so",
+          "/usr/lib64/libOpenEXRUtil-3_2.so",
+          "/usr/lib64/libOpenEXRCore-3_2.so",
+          "/usr/lib64/libIex-3_2.so",
+          "/usr/lib64/libIlmThread-3_2.so",
+          "/usr/lib64/libImath-3_1.so",
+          "/usr/lib64/libEGL.so",
+          "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libharfbuzz.so",
+          "/usr/lib64/libGL.so",
+          "/usr/lib64/libfontconfig.so",
+          "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libfreetype.so",
+          "/usr/lib64/libicui18n.so",
+          "/usr/lib64/libicuuc.so",
+          "/usr/lib64/libopenxr_loader.so",
+          "/usr/lib64/libgio-2.0.so",
+          "/usr/lib64/libgobject-2.0.so",
+          "/usr/lib64/libglib-2.0.so",
+          "/usr/lib64/libX11.so",
+          "/usr/lib64/libwayland-client.so",
+          "-lm",
+          "-lgcc_s_asneeded",
+          "-lgcc_s_asneeded"
+        ],
+        "binaries": {
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-mode5-head-ui-0a68a6e/artifacts/weights-mode5/ui-release/surface-heat-ui": "6b543574f4d07560bde22841f4d5e980c0dc0f8ea865d40ae2b666e84266f669",
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-mode5-head-ui-0a68a6e/artifacts/weights-mode5/ui-release/dome-sculpt": "04c771f158862d137c24d14e0c0f48f373d2cbc218db253f4c8dbe612a2d7820"
+        },
+        "support_drift": [],
+        "core_after": "8612df5783442776364bfd6e32c28d8ec1c05ceb2e935ba2911fb78065cf88ec",
+        "exit": 0,
+        "seconds": 3.8937302519916557
+      },
+      "sanitize": {
+        "helper_compile": [
+          "/usr/bin/c++",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/weights-mode5-head-ui-0a68a6e/include",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/weights-mode5-head-ui-0a68a6e/third_party/openbrush",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/weights-mode5-head-ui-0a68a6e/third_party/nlohmann",
+          "-O1",
+          "-g",
+          "-UNDEBUG",
+          "-fsanitize=address,undefined",
+          "-fno-omit-frame-pointer",
+          "-std=gnu++20",
+          "-o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-mode5-head-ui-0a68a6e/artifacts/weights-mode5/ui-sanitize/helper.o",
+          "-c",
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-mode5-head-ui-0a68a6e/tests/surface-heat-head-ui.cpp"
+        ],
+        "core_sha256": "d2095ea775571e1716007d72e83d14461372ad58151119430b716d679f2ba9f3",
+        "parent_archives": {
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-surface-mode5-615bd42/artifacts/weights-mode5/sanitize/stage/libdome-sculpt-affine.a": "fcb648251b4bb8f5e968e9767be7d40f0db4d8880a4bd153575c07b25001d2ff",
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-surface-mode5-615bd42/artifacts/weights-mode5/sanitize/stage/libdome-sculpt-core.a": "bef6a45f9414a470f107c94356c94f6c8857a546a84e67670f8cc241a20f2239",
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-surface-mode5-615bd42/artifacts/weights-mode5/sanitize/stage/libdome-sculpt-emission-codec.a": "303bc415377b984732b8328b0909a5dbcf1fcdd6537a0aba499d3c611ec595b8",
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-surface-mode5-615bd42/artifacts/weights-mode5/sanitize/stage/libdome-sculpt-polygon.a": "0468d190b57b752b5435bd4c029dac922a0cec83e0e55073753b3e96502cad37",
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-surface-mode5-615bd42/artifacts/weights-mode5/sanitize/stage/libdome-sculpt-render.a": "23cd5ae5237b5d78c56db7ff800e5a017c035a73b1e73f582f75be560b6d95fa",
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-surface-mode5-615bd42/artifacts/weights-mode5/sanitize/stage/libdome-sculpt-spacenav.a": "ca3127b3477b0639917028756cd19b5b02824b8f60629b181923cf39fde4d9f1",
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-surface-mode5-615bd42/artifacts/weights-mode5/sanitize/stage/libdome-sculpt-xr.a": "6e87ef1a151be4e720c37db5b0661e9c61dd859000bbe2ece2beaa8d1c1ee0db",
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-surface-mode5-615bd42/artifacts/weights-mode5/sanitize/stage/libmikktspace-robust.a": "3216824c529e3a64ee65b789bf1b43a2999360fcadf6844d5b62b029c599a7c1",
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-surface-mode5-615bd42/artifacts/weights-mode5/sanitize/stage/libmikktspace.a": "ea61adef234d3c9d6a3ae9e72b863aca7db1fb71c54bcbd7ca1f38cd52600c55",
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-surface-mode5-615bd42/artifacts/weights-mode5/sanitize/stage/libufbx.a": "ba0ed9c7e59f8871e7397bee965227a4ce1449a1d147c3e2baa726423cc34dc7",
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-surface-mode5-615bd42/artifacts/weights-mode5/sanitize/stage/libxatlas.a": "264c5d9ee1e077df523c27da3f15743b81872cfdc700c4f29b5a9da0477f8856"
+        },
+        "surface-heat-ui_link": [
+          "/usr/bin/c++",
+          "-O1",
+          "-g",
+          "-UNDEBUG",
+          "-fsanitize=address,undefined",
+          "-fno-omit-frame-pointer",
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-mode5-head-ui-0a68a6e/artifacts/weights-mode5/ui-sanitize/helper.o",
+          "-o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-mode5-head-ui-0a68a6e/artifacts/weights-mode5/ui-sanitize/surface-heat-ui",
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-mode5-closed-eye-99e4ae1/artifacts/weights-mode5/current-sanitize/libdome-sculpt-core.a",
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-surface-mode5-615bd42/artifacts/weights-mode5/sanitize/stage/libdome-sculpt-affine.a",
+          "/usr/lib64/liblapacke.so",
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-surface-mode5-615bd42/artifacts/weights-mode5/sanitize/stage/libdome-sculpt-polygon.a",
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-surface-mode5-615bd42/artifacts/weights-mode5/sanitize/stage/libxatlas.a",
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-surface-mode5-615bd42/artifacts/weights-mode5/sanitize/stage/libmikktspace.a",
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-surface-mode5-615bd42/artifacts/weights-mode5/sanitize/stage/libmikktspace-robust.a",
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-surface-mode5-615bd42/artifacts/weights-mode5/sanitize/stage/libufbx.a",
+          "/usr/lib64/libpng.so",
+          "/usr/lib64/libjpeg.so",
+          "/usr/lib64/libz.so",
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-surface-mode5-615bd42/artifacts/weights-mode5/sanitize/stage/libdome-sculpt-emission-codec.a",
+          "/usr/lib64/libOpenEXR-3_2.so",
+          "/usr/lib64/libOpenEXRUtil-3_2.so",
+          "/usr/lib64/libOpenEXRCore-3_2.so",
+          "/usr/lib64/libIex-3_2.so",
+          "/usr/lib64/libIlmThread-3_2.so",
+          "/usr/lib64/libImath-3_1.so",
+          "-lgcc_s_asneeded",
+          "-lgcc_s_asneeded"
+        ],
+        "dome-sculpt_link": [
+          "/usr/bin/c++",
+          "-O1",
+          "-g",
+          "-UNDEBUG",
+          "-fsanitize=address,undefined",
+          "-fno-omit-frame-pointer",
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-surface-mode5-615bd42/artifacts/weights-mode5/sanitize/objects/dome-sculpt/native-display-runtime.cpp.o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-surface-mode5-615bd42/artifacts/weights-mode5/sanitize/objects/dome-sculpt/vrm-expression-editor.cpp.o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-surface-mode5-615bd42/artifacts/weights-mode5/sanitize/objects/dome-sculpt/rig-fit-editor.cpp.o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-surface-mode5-615bd42/artifacts/weights-mode5/sanitize/objects/dome-sculpt/projection-editor.cpp.o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-surface-mode5-615bd42/artifacts/weights-mode5/sanitize/objects/dome-sculpt/spacenav-options.cpp.o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-surface-mode5-615bd42/artifacts/weights-mode5/sanitize/objects/dome-sculpt/app.cpp.o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-surface-mode5-615bd42/artifacts/weights-mode5/sanitize/objects/dome-sculpt/polygon-editor.cpp.o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-surface-mode5-615bd42/artifacts/weights-mode5/sanitize/objects/dome-sculpt/import-editor.cpp.o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-surface-mode5-615bd42/artifacts/weights-mode5/sanitize/objects/dome-sculpt/procedural-editor.cpp.o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-surface-mode5-615bd42/artifacts/weights-mode5/sanitize/objects/dome-sculpt/resolution-editor.cpp.o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-surface-mode5-615bd42/artifacts/weights-mode5/sanitize/objects/dome-sculpt/sculpt-editor.cpp.o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-surface-mode5-615bd42/artifacts/weights-mode5/sanitize/objects/dome-sculpt/creator-editor.cpp.o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-surface-mode5-615bd42/artifacts/weights-mode5/sanitize/objects/dome-sculpt/rig-editor.cpp.o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-surface-mode5-615bd42/artifacts/weights-mode5/sanitize/objects/dome-sculpt/shapekey-editor.cpp.o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-surface-mode5-615bd42/artifacts/weights-mode5/sanitize/objects/dome-sculpt/weight-editor.cpp.o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-surface-mode5-615bd42/artifacts/weights-mode5/sanitize/objects/dome-sculpt/skin-editor.cpp.o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-surface-mode5-615bd42/artifacts/weights-mode5/sanitize/objects/dome-sculpt/mesh-editor.cpp.o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-surface-mode5-615bd42/artifacts/weights-mode5/sanitize/objects/dome-sculpt/bake-editor.cpp.o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-surface-mode5-615bd42/artifacts/weights-mode5/sanitize/objects/dome-sculpt/object-editor.cpp.o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-surface-mode5-615bd42/artifacts/weights-mode5/sanitize/objects/dome-sculpt/paint-editor.cpp.o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-surface-mode5-615bd42/artifacts/weights-mode5/sanitize/objects/dome-sculpt/uv-editor.cpp.o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-surface-mode5-615bd42/artifacts/weights-mode5/sanitize/objects/dome-sculpt/ui-conventions.cpp.o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-surface-mode5-615bd42/artifacts/weights-mode5/sanitize/objects/dome-sculpt/session-appearance.cpp.o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-surface-mode5-615bd42/artifacts/weights-mode5/sanitize/objects/dome-sculpt/export-editor.cpp.o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-surface-mode5-615bd42/artifacts/weights-mode5/sanitize/objects/dome-sculpt/desktop-menu.cpp.o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-surface-mode5-615bd42/artifacts/weights-mode5/sanitize/objects/dome-sculpt/appmenu-protocol.c.o",
+          "-o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-mode5-head-ui-0a68a6e/artifacts/weights-mode5/ui-sanitize/dome-sculpt",
+          "-L/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-sanitize/lib",
+          "-L/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib",
+          "-Wl,-rpath,/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-sanitize/lib:/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib:",
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-surface-mode5-615bd42/artifacts/weights-mode5/sanitize/stage/libdome-sculpt-spacenav.a",
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-mode5-closed-eye-99e4ae1/artifacts/weights-mode5/current-sanitize/libdome-sculpt-core.a",
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-surface-mode5-615bd42/artifacts/weights-mode5/sanitize/stage/libdome-sculpt-render.a",
+          "/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-sanitize/lib/libfltk_images.so.1.4.5",
+          "/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-sanitize/lib/libfltk_gl.so.1.4.5",
+          "/usr/lib64/libGLU.so",
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-surface-mode5-615bd42/artifacts/weights-mode5/sanitize/stage/libdome-sculpt-xr.a",
+          "/usr/lib64/libjpeg.so",
+          "/usr/lib64/libpng.so",
+          "/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-sanitize/lib/libfltk.so.1.4.5",
+          "-lcairo",
+          "-L/usr/lib64",
+          "-lX11",
+          "-lGLU",
+          "-lGL",
+          "/usr/lib64/libdl.a",
+          "/usr/lib64/libSM.so",
+          "/usr/lib64/libICE.so",
+          "/usr/lib64/libXext.so",
+          "/usr/lib64/libXinerama.so",
+          "/usr/lib64/libXfixes.so",
+          "/usr/lib64/libXcursor.so",
+          "/usr/lib64/libXrender.so",
+          "/usr/lib64/libXft.so",
+          "/usr/lib64/libwayland-egl.so",
+          "/usr/lib64/libwayland-cursor.so",
+          "/usr/lib64/libxkbcommon.so",
+          "/usr/lib64/libGLX.so",
+          "/usr/lib64/libOpenGL.so",
+          "/usr/lib64/libz.so",
+          "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libcairo.so",
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-surface-mode5-615bd42/artifacts/weights-mode5/sanitize/stage/libdome-sculpt-render.a",
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-mode5-closed-eye-99e4ae1/artifacts/weights-mode5/current-sanitize/libdome-sculpt-core.a",
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-surface-mode5-615bd42/artifacts/weights-mode5/sanitize/stage/libdome-sculpt-affine.a",
+          "/usr/lib64/liblapacke.so",
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-surface-mode5-615bd42/artifacts/weights-mode5/sanitize/stage/libdome-sculpt-polygon.a",
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-surface-mode5-615bd42/artifacts/weights-mode5/sanitize/stage/libxatlas.a",
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-surface-mode5-615bd42/artifacts/weights-mode5/sanitize/stage/libmikktspace.a",
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-surface-mode5-615bd42/artifacts/weights-mode5/sanitize/stage/libmikktspace-robust.a",
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-surface-mode5-615bd42/artifacts/weights-mode5/sanitize/stage/libufbx.a",
+          "/usr/lib64/libpng.so",
+          "/usr/lib64/libjpeg.so",
+          "/usr/lib64/libz.so",
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-surface-mode5-615bd42/artifacts/weights-mode5/sanitize/stage/libdome-sculpt-emission-codec.a",
+          "/usr/lib64/libOpenEXR-3_2.so",
+          "/usr/lib64/libOpenEXRUtil-3_2.so",
+          "/usr/lib64/libOpenEXRCore-3_2.so",
+          "/usr/lib64/libIex-3_2.so",
+          "/usr/lib64/libIlmThread-3_2.so",
+          "/usr/lib64/libImath-3_1.so",
+          "/usr/lib64/libEGL.so",
+          "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libharfbuzz.so",
+          "/usr/lib64/libGL.so",
+          "/usr/lib64/libfontconfig.so",
+          "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libfreetype.so",
+          "/usr/lib64/libicui18n.so",
+          "/usr/lib64/libicuuc.so",
+          "/usr/lib64/libopenxr_loader.so",
+          "/usr/lib64/libgio-2.0.so",
+          "/usr/lib64/libgobject-2.0.so",
+          "/usr/lib64/libglib-2.0.so",
+          "/usr/lib64/libX11.so",
+          "/usr/lib64/libwayland-client.so",
+          "-lm",
+          "-lgcc_s_asneeded",
+          "-lgcc_s_asneeded"
+        ],
+        "binaries": {
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-mode5-head-ui-0a68a6e/artifacts/weights-mode5/ui-sanitize/surface-heat-ui": "8ed5bcf7dc4920cf3f0b2a28d270bd724a8ba2e90e0af813c515e5d67e2194af",
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-mode5-head-ui-0a68a6e/artifacts/weights-mode5/ui-sanitize/dome-sculpt": "aa6574c3a07dcba350ad27d5eaa1df3f560041ddb9317e473c6cc7f850672526"
+        },
+        "support_drift": [],
+        "core_after": "d2095ea775571e1716007d72e83d14461372ad58151119430b716d679f2ba9f3",
+        "exit": 0,
+        "seconds": 13.696083942020778
+      }
+    },
+    "exit": 0,
+    "source_drift": []
+  },
+  "cohorts": [
+    {
+      "status": {
+        "state": "terminal",
+        "scope": "Actual matched a4 app/helper, native nineteen-part scene with selected unskinned head and active facial morph; private Xvfb/bus/stock softwareGLX, no HMD/session/GPU",
+        "sources": {
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-mode5-head-ui-0a68a6e/tests/surface-heat-head-ui.cpp": "f5655dc02888024ca205509085c62bd1179923ff8b56be31144b7bb3fa933ce5",
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-mode5-head-ui-0a68a6e/tests/surface-heat-head-menu.py": "c32ae53821f483499cd0390778eb765482656de78dd9ddb2b0818eef5ce4cc1e"
+        },
+        "binaries": {
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-mode5-head-ui-0a68a6e/artifacts/weights-mode5/ui-release/dome-sculpt": "04c771f158862d137c24d14e0c0f48f373d2cbc218db253f4c8dbe612a2d7820",
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-mode5-head-ui-0a68a6e/artifacts/weights-mode5/ui-release/surface-heat-ui": "6b543574f4d07560bde22841f4d5e980c0dc0f8ea865d40ae2b666e84266f669"
+        },
+        "inputs": {
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-mode5-native-humanoid-d3e174e/artifacts/weights-mode5/female/native-unskinned.dsculpt": "188c26252d4896ca0eb06154b0e06053dca5b7186b607f9e6b3453d3c5ee2bcc",
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-mode5-closed-eye-99e4ae1/artifacts/weights-mode5/release-native-female-public/accepted.dsculpt": "071ad5eb3e8d8d9a0754ff8c4983c00741fadc6be3a177bc47c542a96000470f"
+        },
+        "exit": 0,
+        "seconds": 23.206470617034938,
+        "source_drift": [],
+        "binary_drift": [],
+        "input_drift": []
+      },
+      "report": {
+        "checks": [
+          {
+            "passed": true,
+            "check": "Actual native application maps DOME_HEAT_EXPECT_DRIVER"
+          },
+          {
+            "passed": true,
+            "check": "Actual native application maps DOME_HEAT_EXPECT_TOOLKIT"
+          },
+          {
+            "passed": true,
+            "check": "Genuine native head target starts unskinned with active authored facial morph"
+          },
+          {
+            "passed": true,
+            "check": "Actual FLTK options retain parent identity and modal scene authority"
+          },
+          {
+            "passed": true,
+            "check": "Initial Return cancels default options with complete Scene retained"
+          },
+          {
+            "passed": true,
+            "check": "Actual default FLTK Apply executes surface heat with the independently qualified exact current head field"
+          },
+          {
+            "passed": true,
+            "check": "Actual saved default matches independent current joint-parent rigid translation and active-morph oracle"
+          },
+          {
+            "passed": true,
+            "check": "Actual bind preserves complete reference/paint/UV/morph/placement and adds only rig/skin/capsule"
+          },
+          {
+            "passed": true,
+            "check": "Exactly one universal Undo restores complete unskinned original"
+          },
+          {
+            "passed": true,
+            "check": "Bind contributes no extra hidden Undo operation"
+          },
+          {
+            "passed": true,
+            "check": "Universal Redo restores exact complete accepted field"
+          },
+          {
+            "passed": true,
+            "check": "Escape cancels real existing-skin options without changing rows or capsule"
+          },
+          {
+            "passed": true,
+            "check": "Ctrl+W closes only the modal bind options"
+          },
+          {
+            "passed": true,
+            "check": "Modal close retains accepted native source/history and file"
+          },
+          {
+            "passed": true,
+            "check": "Actual worker/application teardown closes gracefully"
+          },
+          {
+            "passed": true,
+            "check": "Actual application reopen and subsequent Save preserve the complete accepted skin/source field"
+          },
+          {
+            "passed": true,
+            "check": "Reopened native worker/application closes gracefully"
+          }
+        ],
+        "failed": 0
+      },
+      "artifacts": {
+        "artifacts/weights-mode5/release-normal-r1/status.json": "af78003b21b4e50e9000cdbf784520d0f9edb15154494387a1849e25cb8e8946",
+        "artifacts/weights-mode5/release-normal-r1/wrapper.log": "8e485cd5c8f21fdffdfc5258a8a141a57b4b51b2aa3417022a92e11ba4362437",
+        "artifacts/weights-mode5/release-normal-r1/xvfb.log": "cbdd290356a8c5d63f3531331b74b3f059312ba6bfed881de038e3303a9be429",
+        "artifacts/weights-mode5/release-normal-r1/original.json": "15d0556228b10cd5c9e5afc42510d9d55d740ebb06af71f3f57071c2b7622e26",
+        "artifacts/weights-mode5/release-normal-r1/app.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "artifacts/weights-mode5/release-normal-r1/app-maps.txt": "7c917eaba53045feafbddebcd8e979bb4724674910c9bf88399b717f4ccdf028",
+        "artifacts/weights-mode5/release-normal-r1/report.json": "3d2eed67093b86c4fa47a541664f0d23e8a1a061c1801bb83b1f9b1917323c49",
+        "artifacts/weights-mode5/release-normal-r1/default-options.png": "e2d2322138c5e1e6f87b8719f7965432dbf4c1f23889539b07b83adc55ce379d",
+        "artifacts/weights-mode5/release-normal-r1/bound.json": "e0a37844e08fad7a18ab78ec72743adea27a6f4b9cb067033600760f9332cf36",
+        "artifacts/weights-mode5/release-normal-r1/reopened-app.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "status": {
+        "state": "terminal",
+        "scope": "Actual matched a4 app/helper, native nineteen-part scene with selected unskinned head and active facial morph; private Xvfb/bus/stock softwareGLX, no HMD/session/GPU",
+        "sources": {
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-mode5-head-ui-0a68a6e/tests/surface-heat-head-ui.cpp": "f5655dc02888024ca205509085c62bd1179923ff8b56be31144b7bb3fa933ce5",
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-mode5-head-ui-0a68a6e/tests/surface-heat-head-menu.py": "c32ae53821f483499cd0390778eb765482656de78dd9ddb2b0818eef5ce4cc1e"
+        },
+        "binaries": {
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-mode5-head-ui-0a68a6e/artifacts/weights-mode5/ui-release/dome-sculpt": "04c771f158862d137c24d14e0c0f48f373d2cbc218db253f4c8dbe612a2d7820",
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-mode5-head-ui-0a68a6e/artifacts/weights-mode5/ui-release/surface-heat-ui": "6b543574f4d07560bde22841f4d5e980c0dc0f8ea865d40ae2b666e84266f669"
+        },
+        "inputs": {
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-mode5-native-humanoid-d3e174e/artifacts/weights-mode5/female/native-unskinned.dsculpt": "188c26252d4896ca0eb06154b0e06053dca5b7186b607f9e6b3453d3c5ee2bcc",
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-mode5-closed-eye-99e4ae1/artifacts/weights-mode5/release-native-female-public/accepted.dsculpt": "071ad5eb3e8d8d9a0754ff8c4983c00741fadc6be3a177bc47c542a96000470f"
+        },
+        "exit": 0,
+        "seconds": 23.256953901960514,
+        "source_drift": [],
+        "binary_drift": [],
+        "input_drift": []
+      },
+      "report": {
+        "checks": [
+          {
+            "passed": true,
+            "check": "Actual native application maps DOME_HEAT_EXPECT_DRIVER"
+          },
+          {
+            "passed": true,
+            "check": "Actual native application maps DOME_HEAT_EXPECT_TOOLKIT"
+          },
+          {
+            "passed": true,
+            "check": "Genuine native head target starts unskinned with active authored facial morph"
+          },
+          {
+            "passed": true,
+            "check": "Actual FLTK options retain parent identity and modal scene authority"
+          },
+          {
+            "passed": true,
+            "check": "Compact large-BDF bind controls fit actual640x360 work area"
+          },
+          {
+            "passed": true,
+            "check": "Initial Return cancels default options with complete Scene retained"
+          },
+          {
+            "passed": true,
+            "check": "Actual default FLTK Apply executes surface heat with the independently qualified exact current head field"
+          },
+          {
+            "passed": true,
+            "check": "Actual saved default matches independent current joint-parent rigid translation and active-morph oracle"
+          },
+          {
+            "passed": true,
+            "check": "Actual bind preserves complete reference/paint/UV/morph/placement and adds only rig/skin/capsule"
+          },
+          {
+            "passed": true,
+            "check": "Exactly one universal Undo restores complete unskinned original"
+          },
+          {
+            "passed": true,
+            "check": "Bind contributes no extra hidden Undo operation"
+          },
+          {
+            "passed": true,
+            "check": "Universal Redo restores exact complete accepted field"
+          },
+          {
+            "passed": true,
+            "check": "Escape cancels real existing-skin options without changing rows or capsule"
+          },
+          {
+            "passed": true,
+            "check": "Ctrl+W closes only the modal bind options"
+          },
+          {
+            "passed": true,
+            "check": "Modal close retains accepted native source/history and file"
+          },
+          {
+            "passed": true,
+            "check": "Actual worker/application teardown closes gracefully"
+          },
+          {
+            "passed": true,
+            "check": "Actual application reopen and subsequent Save preserve the complete accepted skin/source field"
+          },
+          {
+            "passed": true,
+            "check": "Reopened native worker/application closes gracefully"
+          }
+        ],
+        "failed": 0
+      },
+      "artifacts": {
+        "artifacts/weights-mode5/release-compact-r1/status.json": "354750abc2bf5765a70082a5cac58099db3ac29226f942dc31a31df2b0b88e99",
+        "artifacts/weights-mode5/release-compact-r1/wrapper.log": "e18acf945cbe5c86a153fd834e6d8667cd269c0fb16817bedaa35ad48eeef1d5",
+        "artifacts/weights-mode5/release-compact-r1/xvfb.log": "cbdd290356a8c5d63f3531331b74b3f059312ba6bfed881de038e3303a9be429",
+        "artifacts/weights-mode5/release-compact-r1/original.json": "15d0556228b10cd5c9e5afc42510d9d55d740ebb06af71f3f57071c2b7622e26",
+        "artifacts/weights-mode5/release-compact-r1/app.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "artifacts/weights-mode5/release-compact-r1/app-maps.txt": "70a8f8e28347b58c59a57dc6d95df2afd5e84f9cb31434312d1ab78f9b2c7947",
+        "artifacts/weights-mode5/release-compact-r1/report.json": "58fce068a9652ed8442d26ef054dcc9d48f53541f9810d63ed2ad1202b4dfe8d",
+        "artifacts/weights-mode5/release-compact-r1/default-options.png": "1e41358e50f9c5f96cb6b6d31563e3f6b75afd89196de00624c404ca8c99c4c6",
+        "artifacts/weights-mode5/release-compact-r1/scrolled-options.png": "f3652cf7a093a993338d6073e532707d16b093d4c53bbcba633b4f9c02300d31",
+        "artifacts/weights-mode5/release-compact-r1/bound.json": "e0a37844e08fad7a18ab78ec72743adea27a6f4b9cb067033600760f9332cf36",
+        "artifacts/weights-mode5/release-compact-r1/reopened-app.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "status": {
+        "state": "terminal",
+        "scope": "Actual matched a4 app/helper, native nineteen-part scene with selected unskinned head and active facial morph; private Xvfb/bus/stock softwareGLX, no HMD/session/GPU",
+        "sources": {
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-mode5-head-ui-0a68a6e/tests/surface-heat-head-ui.cpp": "f5655dc02888024ca205509085c62bd1179923ff8b56be31144b7bb3fa933ce5",
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-mode5-head-ui-0a68a6e/tests/surface-heat-head-menu.py": "c32ae53821f483499cd0390778eb765482656de78dd9ddb2b0818eef5ce4cc1e"
+        },
+        "binaries": {
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-mode5-head-ui-0a68a6e/artifacts/weights-mode5/ui-sanitize/dome-sculpt": "aa6574c3a07dcba350ad27d5eaa1df3f560041ddb9317e473c6cc7f850672526",
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-mode5-head-ui-0a68a6e/artifacts/weights-mode5/ui-sanitize/surface-heat-ui": "8ed5bcf7dc4920cf3f0b2a28d270bd724a8ba2e90e0af813c515e5d67e2194af"
+        },
+        "inputs": {
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-mode5-native-humanoid-d3e174e/artifacts/weights-mode5/female/native-unskinned.dsculpt": "188c26252d4896ca0eb06154b0e06053dca5b7186b607f9e6b3453d3c5ee2bcc",
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-mode5-closed-eye-99e4ae1/artifacts/weights-mode5/sanitize-native-female-public/accepted.dsculpt": "071ad5eb3e8d8d9a0754ff8c4983c00741fadc6be3a177bc47c542a96000470f"
+        },
+        "exit": 0,
+        "seconds": 87.42545021901606,
+        "source_drift": [],
+        "binary_drift": [],
+        "input_drift": []
+      },
+      "report": {
+        "checks": [
+          {
+            "passed": true,
+            "check": "Actual native application maps DOME_HEAT_EXPECT_DRIVER"
+          },
+          {
+            "passed": true,
+            "check": "Actual native application maps DOME_HEAT_EXPECT_TOOLKIT"
+          },
+          {
+            "passed": true,
+            "check": "Genuine native head target starts unskinned with active authored facial morph"
+          },
+          {
+            "passed": true,
+            "check": "Actual FLTK options retain parent identity and modal scene authority"
+          },
+          {
+            "passed": true,
+            "check": "Initial Return cancels default options with complete Scene retained"
+          },
+          {
+            "passed": true,
+            "check": "Actual default FLTK Apply executes surface heat with the independently qualified exact current head field"
+          },
+          {
+            "passed": true,
+            "check": "Actual saved default matches independent current joint-parent rigid translation and active-morph oracle"
+          },
+          {
+            "passed": true,
+            "check": "Actual bind preserves complete reference/paint/UV/morph/placement and adds only rig/skin/capsule"
+          },
+          {
+            "passed": true,
+            "check": "Exactly one universal Undo restores complete unskinned original"
+          },
+          {
+            "passed": true,
+            "check": "Bind contributes no extra hidden Undo operation"
+          },
+          {
+            "passed": true,
+            "check": "Universal Redo restores exact complete accepted field"
+          },
+          {
+            "passed": true,
+            "check": "Escape cancels real existing-skin options without changing rows or capsule"
+          },
+          {
+            "passed": true,
+            "check": "Ctrl+W closes only the modal bind options"
+          },
+          {
+            "passed": true,
+            "check": "Modal close retains accepted native source/history and file"
+          },
+          {
+            "passed": true,
+            "check": "Actual worker/application teardown closes gracefully"
+          },
+          {
+            "passed": true,
+            "check": "Actual application reopen and subsequent Save preserve the complete accepted skin/source field"
+          },
+          {
+            "passed": true,
+            "check": "Reopened native worker/application closes gracefully"
+          }
+        ],
+        "failed": 0
+      },
+      "artifacts": {
+        "artifacts/weights-mode5/sanitize-normal-r1/status.json": "4453b78ee7d0b80c42c570f321cdd70841289c0cc0b033d9d4c4fabcbb1c923e",
+        "artifacts/weights-mode5/sanitize-normal-r1/wrapper.log": "8e485cd5c8f21fdffdfc5258a8a141a57b4b51b2aa3417022a92e11ba4362437",
+        "artifacts/weights-mode5/sanitize-normal-r1/xvfb.log": "cbdd290356a8c5d63f3531331b74b3f059312ba6bfed881de038e3303a9be429",
+        "artifacts/weights-mode5/sanitize-normal-r1/original.json": "15d0556228b10cd5c9e5afc42510d9d55d740ebb06af71f3f57071c2b7622e26",
+        "artifacts/weights-mode5/sanitize-normal-r1/app.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "artifacts/weights-mode5/sanitize-normal-r1/app-maps.txt": "ac33e34fed750bca080bb1e208b03228b7d161ee3a9a2d25a8dfb6358b04616e",
+        "artifacts/weights-mode5/sanitize-normal-r1/report.json": "3d2eed67093b86c4fa47a541664f0d23e8a1a061c1801bb83b1f9b1917323c49",
+        "artifacts/weights-mode5/sanitize-normal-r1/default-options.png": "e2d2322138c5e1e6f87b8719f7965432dbf4c1f23889539b07b83adc55ce379d",
+        "artifacts/weights-mode5/sanitize-normal-r1/bound.json": "e0a37844e08fad7a18ab78ec72743adea27a6f4b9cb067033600760f9332cf36",
+        "artifacts/weights-mode5/sanitize-normal-r1/reopened-app.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "status": {
+        "state": "terminal",
+        "scope": "Actual matched a4 app/helper, native nineteen-part scene with selected unskinned head and active facial morph; private Xvfb/bus/stock softwareGLX, no HMD/session/GPU",
+        "sources": {
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-mode5-head-ui-0a68a6e/tests/surface-heat-head-ui.cpp": "f5655dc02888024ca205509085c62bd1179923ff8b56be31144b7bb3fa933ce5",
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-mode5-head-ui-0a68a6e/tests/surface-heat-head-menu.py": "c32ae53821f483499cd0390778eb765482656de78dd9ddb2b0818eef5ce4cc1e"
+        },
+        "binaries": {
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-mode5-head-ui-0a68a6e/artifacts/weights-mode5/ui-sanitize/dome-sculpt": "aa6574c3a07dcba350ad27d5eaa1df3f560041ddb9317e473c6cc7f850672526",
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-mode5-head-ui-0a68a6e/artifacts/weights-mode5/ui-sanitize/surface-heat-ui": "8ed5bcf7dc4920cf3f0b2a28d270bd724a8ba2e90e0af813c515e5d67e2194af"
+        },
+        "inputs": {
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-mode5-native-humanoid-d3e174e/artifacts/weights-mode5/female/native-unskinned.dsculpt": "188c26252d4896ca0eb06154b0e06053dca5b7186b607f9e6b3453d3c5ee2bcc",
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-mode5-closed-eye-99e4ae1/artifacts/weights-mode5/sanitize-native-female-public/accepted.dsculpt": "071ad5eb3e8d8d9a0754ff8c4983c00741fadc6be3a177bc47c542a96000470f"
+        },
+        "exit": 0,
+        "seconds": 89.67942005500663,
+        "source_drift": [],
+        "binary_drift": [],
+        "input_drift": []
+      },
+      "report": {
+        "checks": [
+          {
+            "passed": true,
+            "check": "Actual native application maps DOME_HEAT_EXPECT_DRIVER"
+          },
+          {
+            "passed": true,
+            "check": "Actual native application maps DOME_HEAT_EXPECT_TOOLKIT"
+          },
+          {
+            "passed": true,
+            "check": "Genuine native head target starts unskinned with active authored facial morph"
+          },
+          {
+            "passed": true,
+            "check": "Actual FLTK options retain parent identity and modal scene authority"
+          },
+          {
+            "passed": true,
+            "check": "Compact large-BDF bind controls fit actual640x360 work area"
+          },
+          {
+            "passed": true,
+            "check": "Initial Return cancels default options with complete Scene retained"
+          },
+          {
+            "passed": true,
+            "check": "Actual default FLTK Apply executes surface heat with the independently qualified exact current head field"
+          },
+          {
+            "passed": true,
+            "check": "Actual saved default matches independent current joint-parent rigid translation and active-morph oracle"
+          },
+          {
+            "passed": true,
+            "check": "Actual bind preserves complete reference/paint/UV/morph/placement and adds only rig/skin/capsule"
+          },
+          {
+            "passed": true,
+            "check": "Exactly one universal Undo restores complete unskinned original"
+          },
+          {
+            "passed": true,
+            "check": "Bind contributes no extra hidden Undo operation"
+          },
+          {
+            "passed": true,
+            "check": "Universal Redo restores exact complete accepted field"
+          },
+          {
+            "passed": true,
+            "check": "Escape cancels real existing-skin options without changing rows or capsule"
+          },
+          {
+            "passed": true,
+            "check": "Ctrl+W closes only the modal bind options"
+          },
+          {
+            "passed": true,
+            "check": "Modal close retains accepted native source/history and file"
+          },
+          {
+            "passed": true,
+            "check": "Actual worker/application teardown closes gracefully"
+          },
+          {
+            "passed": true,
+            "check": "Actual application reopen and subsequent Save preserve the complete accepted skin/source field"
+          },
+          {
+            "passed": true,
+            "check": "Reopened native worker/application closes gracefully"
+          }
+        ],
+        "failed": 0
+      },
+      "artifacts": {
+        "artifacts/weights-mode5/sanitize-compact-r1/status.json": "aa5f7394c5d3159bffec57f62c61e040ce172ef5053ceb25a0f60cff9be3ffbc",
+        "artifacts/weights-mode5/sanitize-compact-r1/wrapper.log": "e18acf945cbe5c86a153fd834e6d8667cd269c0fb16817bedaa35ad48eeef1d5",
+        "artifacts/weights-mode5/sanitize-compact-r1/xvfb.log": "e2a9cdea904f5b78cdec4d818de81709784ea2f07961a4cbb0c9b8fae1d95308",
+        "artifacts/weights-mode5/sanitize-compact-r1/original.json": "15d0556228b10cd5c9e5afc42510d9d55d740ebb06af71f3f57071c2b7622e26",
+        "artifacts/weights-mode5/sanitize-compact-r1/app.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "artifacts/weights-mode5/sanitize-compact-r1/app-maps.txt": "d6b23e16f2cb701695f378fbac3b4843858739238d5d9f7b83f73583a31ed59b",
+        "artifacts/weights-mode5/sanitize-compact-r1/report.json": "58fce068a9652ed8442d26ef054dcc9d48f53541f9810d63ed2ad1202b4dfe8d",
+        "artifacts/weights-mode5/sanitize-compact-r1/default-options.png": "1e41358e50f9c5f96cb6b6d31563e3f6b75afd89196de00624c404ca8c99c4c6",
+        "artifacts/weights-mode5/sanitize-compact-r1/scrolled-options.png": "f3652cf7a093a993338d6073e532707d16b093d4c53bbcba633b4f9c02300d31",
+        "artifacts/weights-mode5/sanitize-compact-r1/bound.json": "e0a37844e08fad7a18ab78ec72743adea27a6f4b9cb067033600760f9332cf36",
+        "artifacts/weights-mode5/sanitize-compact-r1/reopened-app.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    }
+  ]
+}
