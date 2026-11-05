@@ -1,0 +1,537 @@
+{
+  "base_main": "1a70f2afe46b37a30079bcf8667127154065fd5a",
+  "state": "native-qualified; ordinary-app validation pending",
+  "source_sha256": {
+    "src/document-retopo.cpp": "67cd2619411fb752228de2883e77288afcad22741d5e77d1dfd1e957789eada6",
+    "tests/retopo-worker-faults.cpp": "bddf18158aabbfc5b9972822f974321a517bdf01af0256518e5494828314e3ae",
+    "CMakeLists.txt": "a82e828d81af89ceb060c1d15b728c7de35019979c6c60e91dcda217c8f3d365"
+  },
+  "product_scope": "One complete DocumentRetopo TU; no header/layout/schema/default/renderer/guard change",
+  "worker_faults": {
+    "profiles": [
+      "Release",
+      "ASan/UBSan/leak"
+    ],
+    "stable_baseline_repeats": 3,
+    "allocations_per_profile": 251,
+    "one_shot_refused_per_profile": 251,
+    "optional_successes_per_profile": 0,
+    "checks_per_profile": 4308,
+    "persistent_reporter_checks_per_profile": 42,
+    "accepted_publication_checks_per_profile": 97,
+    "scope_limit": "Actual worker C++ new/new[]/aligned-new. Persistent reporter case denies first preparation plus reporter then releases; not exhaustive persistent worker failure, C allocator, other-thread or caller publication coverage."
+  },
+  "original_negative_controls": {
+    "release-original-v2": {
+      "state": "terminal",
+      "wrapper_exit": 0,
+      "seconds": 4.2683251990238205,
+      "drift": [],
+      "error": null,
+      "actual_steps": [
+        {
+          "name": "compile-test",
+          "exit": 0,
+          "expected_exit": 0,
+          "seconds": 3.7596877649775706
+        },
+        {
+          "name": "link",
+          "exit": 0,
+          "expected_exit": 0,
+          "seconds": 0.29614285501884297
+        },
+        {
+          "name": "actual-worker",
+          "exit": 1,
+          "expected_exit": 1,
+          "seconds": 0.021528324985411018
+        }
+      ]
+    },
+    "release-original-persistent-v4": {
+      "state": "terminal",
+      "wrapper_exit": 0,
+      "seconds": 4.297893890994601,
+      "drift": [],
+      "error": null,
+      "actual_steps": [
+        {
+          "name": "compile-test",
+          "exit": 0,
+          "expected_exit": 0,
+          "seconds": 3.8200771890114993
+        },
+        {
+          "name": "link",
+          "exit": 0,
+          "expected_exit": 0,
+          "seconds": 0.289854146016296
+        },
+        {
+          "name": "actual-worker",
+          "exit": 88,
+          "expected_exit": 88,
+          "seconds": 0.007194683013949543
+        }
+      ]
+    },
+    "release-acceptance-negative-v7": {
+      "state": "terminal",
+      "wrapper_exit": 0,
+      "seconds": 7.79683482600376,
+      "drift": [],
+      "error": null,
+      "actual_steps": [
+        {
+          "name": "compile-document-retopo",
+          "exit": 0,
+          "expected_exit": 0,
+          "seconds": 2.7879014880163595
+        },
+        {
+          "name": "compile-test",
+          "exit": 0,
+          "expected_exit": 0,
+          "seconds": 4.445502337999642
+        },
+        {
+          "name": "link",
+          "exit": 0,
+          "expected_exit": 0,
+          "seconds": 0.3201783350086771
+        },
+        {
+          "name": "actual-worker",
+          "exit": 1,
+          "expected_exit": 1,
+          "seconds": 0.03427921101683751
+        }
+      ]
+    },
+    "release-final-v8": {
+      "state": "terminal",
+      "wrapper_exit": 0,
+      "seconds": 7.938020220026374,
+      "drift": [],
+      "error": null,
+      "actual_steps": [
+        {
+          "name": "compile-document-retopo",
+          "exit": 0,
+          "expected_exit": 0,
+          "seconds": 2.8377647710149176
+        },
+        {
+          "name": "compile-test",
+          "exit": 0,
+          "expected_exit": 0,
+          "seconds": 4.167381565028336
+        },
+        {
+          "name": "link",
+          "exit": 0,
+          "expected_exit": 0,
+          "seconds": 0.33143053599633276
+        },
+        {
+          "name": "actual-worker",
+          "exit": 0,
+          "expected_exit": 0,
+          "seconds": 0.2254328760318458
+        },
+        {
+          "name": "persistent-recovery",
+          "exit": 0,
+          "expected_exit": 0,
+          "seconds": 0.009215771977324039
+        },
+        {
+          "name": "accepted-publication",
+          "exit": 0,
+          "expected_exit": 0,
+          "seconds": 0.13217778701800853
+        }
+      ]
+    },
+    "sanitize-final-v8": {
+      "state": "terminal",
+      "wrapper_exit": 1,
+      "seconds": 11.304737604979891,
+      "drift": [],
+      "error": "AssertionError('0.75GiB worker-transaction scope')",
+      "actual_steps": [
+        {
+          "name": "compile-document-retopo",
+          "exit": 0,
+          "expected_exit": 0,
+          "seconds": 3.602184353978373
+        },
+        {
+          "name": "compile-test",
+          "exit": 0,
+          "expected_exit": 0,
+          "seconds": 6.898377546982374
+        }
+      ]
+    },
+    "sanitize-final-v8-retry": {
+      "state": "terminal",
+      "wrapper_exit": 0,
+      "seconds": 7.61086959001841,
+      "drift": [],
+      "error": null,
+      "actual_steps": [
+        {
+          "name": "link",
+          "exit": 0,
+          "expected_exit": 0,
+          "seconds": 2.4419899089843966
+        },
+        {
+          "name": "actual-worker",
+          "exit": 0,
+          "expected_exit": 0,
+          "seconds": 2.3652140699559823
+        },
+        {
+          "name": "persistent-recovery",
+          "exit": 0,
+          "expected_exit": 0,
+          "seconds": 0.20276433101389557
+        },
+        {
+          "name": "accepted-publication",
+          "exit": 0,
+          "expected_exit": 0,
+          "seconds": 0.9005487789981999
+        }
+      ]
+    }
+  },
+  "CTest": {
+    "entries": [
+      {
+        "profile": "release",
+        "exit": 0,
+        "seconds": 0.42161007499089465,
+        "binary_sha256": "f1abef910a4bc3949acefd18e6fa997cf80cd6a296fdb447fd678c4d8f4b1cb6",
+        "command": [
+          "ctest",
+          "--test-dir",
+          "/home/blux/de-xr/dome-sculpt/artifacts/retopo-worker-1a70/artifacts/worker-proof/configure",
+          "-R",
+          "^retopology-worker-(faults|reporter-recovery|accepted-publication)$",
+          "--output-on-failure"
+        ],
+        "scope": "Fresh CMake registration with matching manual whole consumer symlink; not a fresh full core build"
+      },
+      {
+        "profile": "sanitize",
+        "exit": 0,
+        "seconds": 3.6427413880010135,
+        "binary_sha256": "c1a9d086d7feddef46c12abc558feef4a97a35214012a76bbfcd3b76ef2830b7",
+        "command": [
+          "ctest",
+          "--test-dir",
+          "/home/blux/de-xr/dome-sculpt/artifacts/retopo-worker-1a70/artifacts/worker-proof/configure",
+          "-R",
+          "^retopology-worker-(faults|reporter-recovery|accepted-publication)$",
+          "--output-on-failure"
+        ],
+        "scope": "Fresh CMake registration with matching manual whole consumer symlink; not a fresh full core build"
+      }
+    ],
+    "source_drift": [],
+    "state": "terminal",
+    "exit": 0
+  },
+  "legacy_regressions": {
+    "actual_native_exits_all": 0,
+    "held_checks_per_profile": 1267,
+    "composed_checks_per_profile": 1445,
+    "composed_counter_accounting": "1252 cumulative=858 handoff+394 affine, plus62 original authoring and131 edges",
+    "boundary_checks_per_profile": 26,
+    "original_wrapper_status": "artifacts/worker-proof/regressions/status.json",
+    "original_wrapper_exit": 1,
+    "original_wrapper_reason": "Prospective archive compression reserve exceeded1GiB after successful sanitize-composed native run; no native failure",
+    "remaining_wrapper_status": "artifacts/worker-proof/regressions/remaining-status.json",
+    "remaining_wrapper_exit": 0,
+    "source_input_drift": [],
+    "paired_native": [
+      {
+        "kind": "held",
+        "count": 1,
+        "sha256": {
+          "retry.dsculpt": "c65fc550df3f24bb9488da88b565b4c211fb87bdda24f415ad1b5a0ece010795"
+        }
+      },
+      {
+        "kind": "composed",
+        "count": 26,
+        "sha256": {
+          "immediate.dsculpt": "90c2bd9c766fbaabf5c96756d8dd422c02d569557c092aafc5210913659cf25c",
+          "noop.dsculpt": "90c2bd9c766fbaabf5c96756d8dd422c02d569557c092aafc5210913659cf25c",
+          "cancel.dsculpt": "56be03a0a42ca6b4008c851f440f7233588f458b2836c890cb9f01c9b5a4623b",
+          "invalid-face.dsculpt": "56be03a0a42ca6b4008c851f440f7233588f458b2836c890cb9f01c9b5a4623b",
+          "injected-error.dsculpt": "56be03a0a42ca6b4008c851f440f7233588f458b2836c890cb9f01c9b5a4623b",
+          "stale.dsculpt": "56be03a0a42ca6b4008c851f440f7233588f458b2836c890cb9f01c9b5a4623b",
+          "shutdown.dsculpt": "90c2bd9c766fbaabf5c96756d8dd422c02d569557c092aafc5210913659cf25c",
+          "overflow.dsculpt": "56be03a0a42ca6b4008c851f440f7233588f458b2836c890cb9f01c9b5a4623b",
+          "queued-0.dsculpt": "90c2bd9c766fbaabf5c96756d8dd422c02d569557c092aafc5210913659cf25c",
+          "queued-1.dsculpt": "90c2bd9c766fbaabf5c96756d8dd422c02d569557c092aafc5210913659cf25c",
+          "queued-2.dsculpt": "90c2bd9c766fbaabf5c96756d8dd422c02d569557c092aafc5210913659cf25c",
+          "queued-3.dsculpt": "90c2bd9c766fbaabf5c96756d8dd422c02d569557c092aafc5210913659cf25c",
+          "queued-4.dsculpt": "90c2bd9c766fbaabf5c96756d8dd422c02d569557c092aafc5210913659cf25c",
+          "queued-5.dsculpt": "90c2bd9c766fbaabf5c96756d8dd422c02d569557c092aafc5210913659cf25c",
+          "queued-6.dsculpt": "90c2bd9c766fbaabf5c96756d8dd422c02d569557c092aafc5210913659cf25c",
+          "queued-7.dsculpt": "90c2bd9c766fbaabf5c96756d8dd422c02d569557c092aafc5210913659cf25c",
+          "calibration.dsculpt": "90c2bd9c766fbaabf5c96756d8dd422c02d569557c092aafc5210913659cf25c",
+          "retry.dsculpt": "90c2bd9c766fbaabf5c96756d8dd422c02d569557c092aafc5210913659cf25c",
+          "0-rest.dsculpt": "eda1e176e4bf5fe5328b111bbd99a8ad16f4615f16bd60a73fe805c17d70982f",
+          "0-posed.dsculpt": "cd45ad1510223ff4c642adeb3b4b4b654b0486ad4923eda21e4591243c4c85d1",
+          "1-rest.dsculpt": "8fa1aa7badb4bed8c1262a4208c7e127f6132f3aff329e25c1b717ba6a399a3f",
+          "1-posed.dsculpt": "711f37d469444f78eb02c115a3b93c1281b7ff18a799657f137f4e01f07a7ef7",
+          "2-rest.dsculpt": "435f58c1cb2dbf2641971cd38101521195853ec09e6b22a1033f1b51a1c43345",
+          "2-posed.dsculpt": "c952538a3c172f5de1196d099f929c6f4e5f71770218301ab573bfb18c8cf17c",
+          "3-rest.dsculpt": "757cc0e0de166e28e1baa07cf4dd552b769a6d1a99d1d9e2233807f082111722",
+          "3-posed.dsculpt": "949b89ceac43aefc6a8f7c6132c4eebec7a50c0efca546456c65368c768b3ece"
+        }
+      }
+    ]
+  },
+  "storage": {
+    "initial_scope_bytes": 805306368,
+    "legacy_scope_prospective_bytes": 1073741824,
+    "free_floor_bytes": 21474836480,
+    "no_shared_source_objects_or_libraries_archived": true,
+    "archived_closed_artifacts": [
+      {
+        "ledger": "artifacts/worker-proof/regressions/release-boundaries.map-archive-ledger.json",
+        "ledger_sha256": "dd01a06a8ca6e6dbf81019f37e6d3924baf1038120b66835fab77c0d20137847",
+        "original_path": "/home/blux/de-xr/dome-sculpt/artifacts/retopo-worker-1a70/artifacts/worker-proof/regressions/release-boundaries.map",
+        "original_sha256": "a4b2b955dd0b28b43523fc1c43df056d7dd4dff00b8a62abb6970aedd510984c",
+        "archive_sha256": "4b4be2b788f275ebfafb3cba88688c63d3d87101d67c53f293ba6199cb522721",
+        "original_bytes": 9923798,
+        "archive_bytes": 395365,
+        "restore_control": "Full stream all-byte verification; actual original-path restoration with SHA/size/mode/UID/GID/nsmtime verified before removing the restored duplicate"
+      },
+      {
+        "ledger": "artifacts/worker-proof/regressions/release-composed.map-archive-ledger.json",
+        "ledger_sha256": "474c8e541de351f18b51d73dcb5e3aabe4efd98a10325329ee4c806aed0ad578",
+        "original_path": "/home/blux/de-xr/dome-sculpt/artifacts/retopo-worker-1a70/artifacts/worker-proof/regressions/release-composed.map",
+        "original_sha256": "22b977ccf69d8a2efe834892c843c7d7ac5376419300e17c36f7743c4430d18b",
+        "archive_sha256": "22e3dfda599667868de17d0af7ce7d5e0304ec9c4eda8b6fcbd7a9e74e9a017c",
+        "original_bytes": 10022837,
+        "archive_bytes": 398654,
+        "restore_control": "Full stream all-byte verification; actual original-path restoration with SHA/size/mode/UID/GID/nsmtime verified before removing the restored duplicate"
+      },
+      {
+        "ledger": "artifacts/worker-proof/regressions/release-held.map-archive-ledger.json",
+        "ledger_sha256": "8091bbf32387e76cfa45e608edd32e0a727aa6cefc4ae3faf00087c1211418dd",
+        "original_path": "/home/blux/de-xr/dome-sculpt/artifacts/retopo-worker-1a70/artifacts/worker-proof/regressions/release-held.map",
+        "original_sha256": "61fd5a118cc158a23bef2f3a88ab8e55d0ab7ffe3ef461d7aa4854ed9538b756",
+        "archive_sha256": "60c182194b434e4c7deb108785e9d7b837d6eeac993e3d6873b011f0a5c61d27",
+        "original_bytes": 9959081,
+        "archive_bytes": 396997,
+        "restore_control": "Full stream all-byte verification; actual original-path restoration with SHA/size/mode/UID/GID/nsmtime verified before removing the restored duplicate"
+      },
+      {
+        "ledger": "artifacts/worker-proof/regressions/sanitize-boundaries-archive-ledger.json",
+        "ledger_sha256": "4477f9e59ff681ddf3e9ac00e52bc8e8c087891b285b26bb00b7def7402845de",
+        "original_path": "/home/blux/de-xr/dome-sculpt/artifacts/retopo-worker-1a70/artifacts/worker-proof/regressions/sanitize-boundaries",
+        "original_sha256": "97489683a270a06721c0c4a4ea7245b87170743d71a95b5a6ea6bed968254b68",
+        "archive_sha256": "554ddd740184f9075da1f280400b91e1f00bcfbc06e3f58d08122b24affb8220",
+        "original_bytes": 319889680,
+        "archive_bytes": 57559672,
+        "restore_control": "Full stream all-byte verification; actual original-path restoration with SHA/size/mode/UID/GID/nsmtime verified before removing the restored duplicate"
+      },
+      {
+        "ledger": "artifacts/worker-proof/regressions/sanitize-boundaries.map-archive-ledger.json",
+        "ledger_sha256": "df29aff03a202492af173bb0a7debbf0d97e22b461e82dd21519afa133a92018",
+        "original_path": "/home/blux/de-xr/dome-sculpt/artifacts/retopo-worker-1a70/artifacts/worker-proof/regressions/sanitize-boundaries.map",
+        "original_sha256": "aa9c3a356ff414e661c317f3e69be23b2d0b0e3b0735c4dac002d6f5d849d633",
+        "archive_sha256": "7d19588607080d6948c3cb1480e490f10cbe9a70802359e5f4a40755eac98315",
+        "original_bytes": 26685075,
+        "archive_bytes": 1071111,
+        "restore_control": "Full stream all-byte verification; actual original-path restoration with SHA/size/mode/UID/GID/nsmtime verified before removing the restored duplicate"
+      },
+      {
+        "ledger": "artifacts/worker-proof/regressions/sanitize-composed-archive-ledger.json",
+        "ledger_sha256": "14d6cce2894fd2fe2d597495bc1670dc5d07d4d76d52196b168c1f4abb05f018",
+        "original_path": "/home/blux/de-xr/dome-sculpt/artifacts/retopo-worker-1a70/artifacts/worker-proof/regressions/sanitize-composed",
+        "original_sha256": "c397353fcf2a7566a85675a42b2aeedfc61389e079a656888863d29cf55e1e5c",
+        "archive_sha256": "10d31cf61200d9e6db92d3dbd35c855094589b1c21d8b77f61a1248679624eb0",
+        "original_bytes": 324104064,
+        "archive_bytes": 58258480,
+        "restore_control": "Full stream all-byte verification; actual original-path restoration with SHA/size/mode/UID/GID/nsmtime verified before removing the restored duplicate"
+      },
+      {
+        "ledger": "artifacts/worker-proof/regressions/sanitize-composed.map-archive-ledger.json",
+        "ledger_sha256": "e32e03a72011fca022bd81ff9eb9a3573ebf6376d4c5e780cc7ff6527127fe12",
+        "original_path": "/home/blux/de-xr/dome-sculpt/artifacts/retopo-worker-1a70/artifacts/worker-proof/regressions/sanitize-composed.map",
+        "original_sha256": "148773ff52f5b53145e1d1ed8a4b1f777582d202a7aa66d848ad480d11634c14",
+        "archive_sha256": "a6ed31dc3d93f38a3800de1022ccb99ab9595cf7bc7a0eb855a725967ecc39cb",
+        "original_bytes": 26980305,
+        "archive_bytes": 1084275,
+        "restore_control": "Full stream all-byte verification; actual original-path restoration with SHA/size/mode/UID/GID/nsmtime verified before removing the restored duplicate"
+      },
+      {
+        "ledger": "artifacts/worker-proof/regressions/sanitize-held-archive-ledger.json",
+        "ledger_sha256": "5ca5bb6a471289abbc39a314f0cb54b0eb56899126995723c6b47de9688a8693",
+        "original_path": "/home/blux/de-xr/dome-sculpt/artifacts/retopo-worker-1a70/artifacts/worker-proof/regressions/sanitize-held",
+        "original_sha256": "0dff13857722990a8222e4e0ee46a4f9978115e30f08e94ca3f48888a5a7362a",
+        "archive_sha256": "41acab70876f4c2e168e8ad86cda697cede12d5cce4fd75426c4884a27b1a9be",
+        "original_bytes": 321542528,
+        "archive_bytes": 57898874,
+        "restore_control": "Full stream all-byte verification; actual original-path restoration with SHA/size/mode/UID/GID/nsmtime verified before removing the restored duplicate"
+      },
+      {
+        "ledger": "artifacts/worker-proof/regressions/sanitize-held.map-archive-ledger.json",
+        "ledger_sha256": "f8f87b0506378c7fed1b35890afa201a67311a6e7620b37b163d70bae7636a38",
+        "original_path": "/home/blux/de-xr/dome-sculpt/artifacts/retopo-worker-1a70/artifacts/worker-proof/regressions/sanitize-held.map",
+        "original_sha256": "713699151f8e8bbb448630174d79b3600146d95ed292008d34598a6dfd40de4f",
+        "archive_sha256": "af4818041af9cfb51398efe1a8d78de87d2efe77e41f4e15e4e435955d1ae7aa",
+        "original_bytes": 26792364,
+        "archive_bytes": 1078261,
+        "restore_control": "Full stream all-byte verification; actual original-path restoration with SHA/size/mode/UID/GID/nsmtime verified before removing the restored duplicate"
+      },
+      {
+        "ledger": "artifacts/worker-proof/release-acceptance-negative-v7/native-archive-ledger.json",
+        "ledger_sha256": "b04241868835699e8c0c5d6fdb37eff575ce09bc1878999a65ea6fa7725912d9",
+        "original_path": "/home/blux/de-xr/dome-sculpt/artifacts/retopo-worker-1a70/artifacts/worker-proof/release-acceptance-negative-v7/native",
+        "original_sha256": "8a5094906c357f70ea099c2a1604ef81dd049dfb52ec9ef23c4730d51149805c",
+        "archive_sha256": "6060acc7494e78bad52c75c5537833139906daf7a8ba697221bd91b9eac80c95",
+        "original_bytes": 12841784,
+        "archive_bytes": 5499507,
+        "restore_control": "Full stream all-byte verification; actual original-path restoration with SHA/size/mode/UID/GID/nsmtime verified before removing the restored duplicate"
+      },
+      {
+        "ledger": "artifacts/worker-proof/release-corrected/archive-ledger.json",
+        "ledger_sha256": "58398fc140f33b1c96f693f4ca0b5dc3ee6da7062eabe903b724e92634f3adbc",
+        "original_path": "/home/blux/de-xr/dome-sculpt/artifacts/retopo-worker-1a70/artifacts/worker-proof/release-corrected/native",
+        "original_sha256": "8ea32fd530a1b496ae0b730a0afb6f77bc2e70f9b35bb739cf6883a96ab83bfb",
+        "archive_sha256": "aee0b1aaaba32c0bcc0d9a9b30f0525dad9debc66e1439788de7ff9b6d6bc8df",
+        "original_bytes": 12832816,
+        "archive_bytes": 4958335,
+        "restore_control": "Exact decompressed bytes/mode/UID/GID/nsmtime verified before unlink"
+      },
+      {
+        "ledger": "artifacts/worker-proof/release-corrected-v4/native-archive-ledger.json",
+        "ledger_sha256": "541121851984b593503219c1487e74aa9904427b58deab547ab3cba4de776e21",
+        "original_path": "/home/blux/de-xr/dome-sculpt/artifacts/retopo-worker-1a70/artifacts/worker-proof/release-corrected-v4/native",
+        "original_sha256": "ecdc60cb1fdc8280fd1a2b07c555095fa7df93f11c99f9f702c6cc29b3dadc4a",
+        "archive_sha256": "32f807d74d183a71427960461e25599468da4c231e86dd9704a6a7357dde578f",
+        "original_bytes": 12832920,
+        "archive_bytes": 5496822,
+        "restore_control": "Full stream all-byte verification; actual original-path restoration with SHA/size/mode/UID/GID/nsmtime verified before removing the restored duplicate"
+      },
+      {
+        "ledger": "artifacts/worker-proof/release-finalized-v7/native-archive-ledger.json",
+        "ledger_sha256": "664ee4d2a27723e7de4d8875cbd921bae99b9222f2fb6359cd275524eb30c2d3",
+        "original_path": "/home/blux/de-xr/dome-sculpt/artifacts/retopo-worker-1a70/artifacts/worker-proof/release-finalized-v7/native",
+        "original_sha256": "39d8c814c72e9da6cb01aedd25822a2d5fb4dfea22e4ab25f171e914f736e326",
+        "archive_sha256": "2a959fc5988bf0c1cdbc7a74c9ea18b12cdb652e8cce298f7a7b15553e58535d",
+        "original_bytes": 12841784,
+        "archive_bytes": 5499908,
+        "restore_control": "Full stream all-byte verification; actual original-path restoration with SHA/size/mode/UID/GID/nsmtime verified before removing the restored duplicate"
+      },
+      {
+        "ledger": "artifacts/worker-proof/release-original-persistent-v4/archive-ledger.json",
+        "ledger_sha256": "35644b6e5c44906de3b9bbdde6ae45229ff352efccb892b8e7fda74a84e8c057",
+        "original_path": "/home/blux/de-xr/dome-sculpt/artifacts/retopo-worker-1a70/artifacts/worker-proof/release-original-persistent-v4/native",
+        "original_sha256": "ff34d3f4630683e350cbd15afb9d991ebdb9457a17089593a4da7dc80bc65984",
+        "archive_sha256": "1d6f2beab2513caef6b5768f3b447cd6a30627c7220306dd629ee2a6ddfab711",
+        "original_bytes": 12828736,
+        "archive_bytes": 4957029,
+        "restore_control": "Exact decompressed bytes/mode/UID/GID/nsmtime verified before unlink"
+      },
+      {
+        "ledger": "artifacts/worker-proof/release-original-v2/archive-ledger.json",
+        "ledger_sha256": "310265623c6e8ff5b229140232459fc1b5504b007077b612f56200f7368ddd47",
+        "original_path": "/home/blux/de-xr/dome-sculpt/artifacts/retopo-worker-1a70/artifacts/worker-proof/release-original-v2/native",
+        "original_sha256": "e0b71976e0a730efccb9ae997b2890d2dc32489fb8b2855ba976b8bd3537f48a",
+        "archive_sha256": "a098480ab282a74eb111a9451b506b59d149dea6b9e2fadfa30c5e6c6e936d3b",
+        "original_bytes": 12828624,
+        "archive_bytes": 4956743,
+        "restore_control": "Exact decompressed bytes/mode/UID/GID/nsmtime verified before unlink"
+      },
+      {
+        "ledger": "artifacts/worker-proof/release-queued-v6/native-archive-ledger.json",
+        "ledger_sha256": "b4c5cb2d0967c44ac95a56f534cfd08a73f02081db6a6283227115bfe64030cf",
+        "original_path": "/home/blux/de-xr/dome-sculpt/artifacts/retopo-worker-1a70/artifacts/worker-proof/release-queued-v6/native",
+        "original_sha256": "15704da8c36b9fe8515a72eed0561b076f10c120dda9997a9669240b6d890049",
+        "archive_sha256": "d53c99d3d30b58837c9a8647330965e61f3ce4b23a2d607b59a9233686abcd38",
+        "original_bytes": 12833272,
+        "archive_bytes": 5496618,
+        "restore_control": "Full stream all-byte verification; actual original-path restoration with SHA/size/mode/UID/GID/nsmtime verified before removing the restored duplicate"
+      },
+      {
+        "ledger": "artifacts/worker-proof/sanitize-corrected-v5/archive-ledger.json",
+        "ledger_sha256": "0b1746707dec5816ae6fe9478d5f77b3e7886a4cca8701f11595f1dc5b018395",
+        "original_path": "/home/blux/de-xr/dome-sculpt/artifacts/retopo-worker-1a70/artifacts/worker-proof/sanitize-corrected-v5/native",
+        "original_sha256": "f21b3c0b0f7b30c915906b02e61981e005042b2750e9128c2b236c0afcd910ae",
+        "archive_sha256": "a11c266d3f764376ad30e473c2b956d66853d636a64badb88ecb6bc679d662e9",
+        "original_bytes": 320801696,
+        "archive_bytes": 54226019,
+        "restore_control": "Full stream byte verification before unlink; actualoriginal-path SHA+metadata restore before removing duplicate"
+      },
+      {
+        "ledger": "artifacts/worker-proof/sanitize-corrected-v5/native.map-archive-ledger.json",
+        "ledger_sha256": "1857187137a3063223f9f902561236be429ae79485fb38dcd5ccf18149d60962",
+        "original_path": "/home/blux/de-xr/dome-sculpt/artifacts/retopo-worker-1a70/artifacts/worker-proof/sanitize-corrected-v5/native.map",
+        "original_sha256": "4e2e9810b1a15e5396b1f3fae55665e23712731cfb49fb809ec75fb88f8b0cb8",
+        "archive_sha256": "ad958b273c426614bd4aa6d192163bef0d45f7462f2acd62bee2de4daa945ba5",
+        "original_bytes": 26742056,
+        "archive_bytes": 1075254,
+        "restore_control": "Full stream all-byte verification; actual original-path restoration with SHA/size/mode/UID/GID/nsmtime verified before removing the restored duplicate"
+      },
+      {
+        "ledger": "artifacts/worker-proof/sanitize-final-v8-retry/native-archive-ledger.json",
+        "ledger_sha256": "568737072640cb5ac6fb0d29958389db172fa133675a4d75a6f2460cb1bb6f5a",
+        "original_path": "/home/blux/de-xr/dome-sculpt/artifacts/retopo-worker-1a70/artifacts/worker-proof/sanitize-final-v8-retry/native",
+        "original_sha256": "c1a9d086d7feddef46c12abc558feef4a97a35214012a76bbfcd3b76ef2830b7",
+        "archive_sha256": "62439e57127f047583556c8c71d9480fea1ec9c5a3f7959f366c1149b8511f36",
+        "original_bytes": 320948872,
+        "archive_bytes": 57775197,
+        "restore_control": "Full stream all-byte verification; actual original-path restoration with SHA/size/mode/UID/GID/nsmtime verified before removing the restored duplicate"
+      },
+      {
+        "ledger": "artifacts/worker-proof/sanitize-final-v8-retry/native.map-archive-ledger.json",
+        "ledger_sha256": "b44c33b1f5879b6d93de5a96eefbcf85d392e3a04f424139cd39e6227907389c",
+        "original_path": "/home/blux/de-xr/dome-sculpt/artifacts/retopo-worker-1a70/artifacts/worker-proof/sanitize-final-v8-retry/native.map",
+        "original_sha256": "51489f6ea69ed4f343b940f3d34d62ff5fef3b6344a6e2069f5dfd7221aee723",
+        "archive_sha256": "422c499225c53cdef55dcc2f8d58890ea47ef8a98d71c17408538cd1090e2a64",
+        "original_bytes": 26750073,
+        "archive_bytes": 1076377,
+        "restore_control": "Full stream all-byte verification; actual original-path restoration with SHA/size/mode/UID/GID/nsmtime verified before removing the restored duplicate"
+      },
+      {
+        "ledger": "artifacts/worker-proof/sanitize-finalized-v7/native-archive-ledger.json",
+        "ledger_sha256": "d4c649f5f040f3c4506fb82b699413c7cddca59955df557cc13473c914b53433",
+        "original_path": "/home/blux/de-xr/dome-sculpt/artifacts/retopo-worker-1a70/artifacts/worker-proof/sanitize-finalized-v7/native",
+        "original_sha256": "96126e770727004697dfd0e46dadbce3bd358504401191da2f73b6eee6b6a2c8",
+        "archive_sha256": "2342e5c261e0bce401b1f19df49fa96518e5dad2a66ac57713c844558e87b9b2",
+        "original_bytes": 320891016,
+        "archive_bytes": 57748565,
+        "restore_control": "Full stream all-byte verification; actual original-path restoration with SHA/size/mode/UID/GID/nsmtime verified before removing the restored duplicate"
+      },
+      {
+        "ledger": "artifacts/worker-proof/sanitize-finalized-v7/native.map-archive-ledger.json",
+        "ledger_sha256": "ee02f2eeb0831c5eb8bff0cc9d7a690e770b85b9ef23da56ae5f06e8a64f7439",
+        "original_path": "/home/blux/de-xr/dome-sculpt/artifacts/retopo-worker-1a70/artifacts/worker-proof/sanitize-finalized-v7/native.map",
+        "original_sha256": "7fa4df7cd3c4be2ac10c7ba6cdbde5886d1b4d7df6d9b0f940fa2d540c2fffd9",
+        "archive_sha256": "abcd423d67e0d341134f106a96c25d20d010226778df3a7ea8c3a10d37cca76c",
+        "original_bytes": 26749096,
+        "archive_bytes": 1076598,
+        "restore_control": "Full stream all-byte verification; actual original-path restoration with SHA/size/mode/UID/GID/nsmtime verified before removing the restored duplicate"
+      }
+    ],
+    "restore_tool": "artifacts/worker-proof/archive-closed.py restore <individual-ledger.json>"
+  },
+  "known_limits": [
+    "Reporter exhaustion can retain old published busy status until subsequent healthy publication.",
+    "Caller-side edit_retopology post-enqueue publish failure is a separate unverified seam.",
+    "No fresh full-project build, full runtime suite, new GPU/accelerator, physical device, install or application qualification claim."
+  ]
+}
