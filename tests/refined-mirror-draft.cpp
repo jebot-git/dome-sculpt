@@ -3,6 +3,7 @@
 #include "dome/document.hpp"
 #include "dome/shapekey-authoring.hpp"
 #include <iostream>
+#include <nlohmann/json.hpp>
 using namespace dome;
 namespace {
 size_t checks=0;void check(bool value,const char*text){if(!value)throw std::runtime_error(text);++checks;std::cout<<"PASS "<<text<<std::endl;}

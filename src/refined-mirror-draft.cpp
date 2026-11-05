@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "refined-mirror-draft.hpp"
 #include <algorithm>
+#include "dome/material-bindings.hpp"
 #include <cmath>
 namespace dome::detail {
 namespace {
@@ -62,7 +63,7 @@ NormalFrameTarget relative_target(const FrameAttributeSampling &anchor,size_t ro
    if(!std::isfinite(det)||!std::isfinite(j)||!det||!j||!a||!d||(a>0)==(d>0)||j>=0||std::max(std::abs(b),std::abs(e))>1e-5*std::max(std::abs(a),std::abs(d)))throw std::invalid_argument("Refined Mirror needs genuine diagonal role-chart parity; cross-axis transport remains separate");
    sigma=(a>0)==(det>0)?1:-1;tau=(d>0)==(det>0)?1:-1;
   }
-  for(size_t k=0;k<3;++k){const auto at=c+k,s=map.opposite[at];const auto ns=vector(before.normals[s]),nt=vector(before.normals[at]),rn=reflect(ns);
+  for(size_t k=0;k<3;++k){const auto at=c+k;const size_t s=map.opposite[at];const auto ns=vector(before.normals[s]),nt=vector(before.normals[at]),rn=reflect(ns);
    if(before.tangents.empty()){if(!source.normals.empty())result.normals[at]=stored(normal_only(rn,nt,reflect(vector(source.normals[s]))));continue;}
    const auto ts=before.tangents[s],tt=before.tangents[at];if(ts[3]!=tt[3])throw std::invalid_argument("Refined Mirror cannot invent tangent handedness morphs");const D st{ts[0],ts[1],ts[2]},dt{tt[0],tt[1],tt[2]};const auto sb=cross(ns,st)*ts[3],db=cross(nt,dt)*tt[3];const auto input=basis(reflect(st)*sigma,reflect(sb)*tau,rn),output=basis(dt,db,nt);auto convert=[&](D delta){return output.compose(input.apply(delta));};
    if(!source.normals.empty())result.normals[at]=stored(convert(reflect(vector(source.normals[s]))));if(!source.tangents.empty())result.tangents[at]=stored(convert(reflect(vector(source.tangents[s]))*sigma));
