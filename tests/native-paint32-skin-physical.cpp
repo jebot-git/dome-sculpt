@@ -1,0 +1,33 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+#define main native32_skin_reference_main
+#include "native-paint32-skin-export.cpp"
+#undef main
+#include "dome/emission-native.hpp"
+#include "emission-export.hpp"
+#include "gltf-document.hpp"
+namespace {
+Scene physical_skin(bool posed,Material::AlphaMode alpha){
+ auto scene=skinned_native32(posed);auto &o=scene.active();o.material.alpha=alpha;o.material.emissive={2.4f,.015f,.8f};
+ Brush brush;brush.normal={0,0,1};brush.from=brush.to={.2f,-.12f,0};brush.radius=.3f;brush.strength=.8f;
+ PaintSettings ink;ink.front_only=false;ink.channel=PaintChannel::Emission;ink.emission_units=PaintEmissionUnits::Physical;ink.emission={8,.016f,.16f};
+ o.painted->add_layer("Genuine physical skin detail");o.painted->begin_stroke();o.painted->stamp(brush,ink);check(o.painted->end_stroke(),"Actual native32 physical skin fixture stamps nonconstant FLOAT paint");
+ o.painted->layer_properties("Genuine physical skin detail",true,.63f);ink.channel=PaintChannel::Mask;ink.mask=.35f;brush.radius=.12f;o.painted->begin_stroke();o.painted->stamp(brush,ink);check(o.painted->end_stroke(),"Actual physical skin fixture has independent partial common coverage");
+ check(o.painted->has_physical_emission()&&o.deformation&&o.deformation->skin&&o.material_bindings->native_paint_sampling&&!o.material_bindings->normal_frames,"Current grid, real skin and retained coordinates remain distinct genuine owners");scene.validate();return scene;
+}
+}
+int main(int argc,char **argv)try{
+ if(argc<2||argc>3)return 2;const bool negative=argc==3&&std::string_view(argv[2])=="--expect-refusal";const bool strict=argc==3&&std::string_view(argv[2])=="--hardware";if(argc==3&&!negative&&!strict)return 2;
+ const std::filesystem::path out=argv[1];std::filesystem::create_directories(out);NativeGraphics graphics;const std::string gpu=reinterpret_cast<const char*>(glGetString(GL_RENDERER));std::cout<<"GPU "<<gpu<<std::endl;check(!strict||(gpu.find("Intel")!=std::string::npos&&gpu.find("Arc")!=std::string::npos&&gpu.find("A770")!=std::string::npos&&gpu.find("llvmpipe")==std::string::npos),"Strict physical skin consumer requires actual Intel Arc A770");Fbo fbo;SurfaceRenderer renderer;prepared_normal_consumer::Renderer independent;unsigned number=0;
+ for(bool posed:{false,true})for(auto alpha:{Material::AlphaMode::Opaque,Material::AlphaMode::Mask,Material::AlphaMode::Blend}){
+  auto scene=physical_skin(posed,alpha);const auto before=scene.encode();Document doc;doc.replace(scene);auto dir=out/std::to_string(number++);std::filesystem::create_directories(dir);const auto file=dir/"physical.glb";
+  if(negative){const std::string prior="prior skinned HDR output";{std::ofstream f(file);f<<prior;}std::string reason;try{doc.export_asset(file,AssetExportFormat::Glb).get();}catch(const std::exception &e){reason=e.what();}std::cout<<"ORIGINAL_SKIN_HDR_NEGATIVE posed="<<posed<<" alpha="<<int(alpha)<<" reason="<<reason<<std::endl;check(reason.find("Native HDR field requires")!=std::string::npos,"Actual ordinary HDR worker refuses the genuine native32 skin field");auto sentinel=bytes(file);check(std::string(sentinel.begin(),sentinel.end())==prior&&doc.copy_scene().encode()==before,"Original native skin HDR refusal preserves exact old file and complete native source");auto save=dir/"following.dsculpt";doc.save_async(save).get();check(Scene::load(save).encode()==before,"Following Save succeeds after the actual native32 skin HDR refusal");continue;}
+  doc.shading(false);settled(doc);fbo.bind();const auto native=draw(renderer,doc.frame().surface);doc.export_asset(file,AssetExportFormat::Glb).get();auto recovered=extract_native_emission(bytes(file));check(recovered&&recovered->encode()==before&&doc.copy_scene().encode()==before,"Actual ordinary HDR worker/native recovery retains exact paint/skin/pose and source owners");prepared_normal_consumer::Model model(file);check(model.json.at("extras").at("domeSculptEmission").at("version")==3,"Actual skinned physical view retains genuine package3 paint-domain semantics");
+  size_t skins=0;for(size_t n=0;n<model.data->nodes_count;++n)if(model.data->nodes[n].mesh){check(model.data->nodes[n].skin&&model.data->nodes[n].skin->inverse_bind_matrices,"Physical view keeps actual skin and inverse-bind associations");++skins;}check(skins==1,"Exactly one real physical skinned subject is emitted");
+  fbo.bind();independent.render(model.data,nullptr);auto portable=read();auto error=delta(native,portable);std::cout<<"NATIVE32_SKIN_HDR posed="<<posed<<" alpha="<<int(alpha)<<" max="<<error<<std::endl;check(error<=2,"Independent skinned HDR paint/strength/coordinate consumer meets unchanged2 bound");joint::capture(dir/"native.png",native);joint::capture(dir/"portable.png",portable);
+  Document reopened;reopened.replace(*recovered);reopened.shading(false);settled(reopened);fbo.bind();check(draw(renderer,reopened.frame().surface)==native,"Reopened physical native skin project renders every original pixel exactly");
+  auto next=dir/"second.glb";reopened.export_asset(next,AssetExportFormat::Glb).get();check(bytes(next)==bytes(file),"Second ordinary skinned HDR cycle preserves exact output bytes and graph size");
+  auto owner=std::make_shared<NativeEmissionExport>();owner->scene=std::make_shared<const Scene>(scene.snapshot());owner->scope=NativeEmissionExport::Scope::WholeScene;owner->allow_measured_core_fallback=true;auto surfaces=emission_export_surfaces(*owner->scene);auto prepared=detail::prepare_emission_export(surfaces,*owner,{});
+  auto foreign=prepared;foreign.surfaces[0].deformation=std::make_shared<const DeformationState>(*foreign.surfaces[0].deformation);check(rejects([&]{detail::make_gltf_emission(foreign,false,{});}),"Equal-valued foreign deformation cannot borrow the normalized physical owner");foreign=prepared;auto raw=foreign.surfaces[0].deformation.get();foreign.surfaces[0].deformation=std::shared_ptr<const DeformationState>(raw,[](const DeformationState*){});check(rejects([&]{detail::make_gltf_emission(foreign,false,{});}),"Same-address foreign deformation control block cannot borrow physical authority");foreign=prepared;foreign.surfaces[0].deformation.reset();check(rejects([&]{detail::make_gltf_emission(foreign,false,{});}),"Missing current skin state cannot borrow an actual physical source");
+ }
+ std::cout<<"PASS "<<checks<<" actual native paint skin physical controls\n";return 0;
+}catch(const std::exception &e){std::cerr<<"FAIL "<<e.what()<<'\n';return 1;}

@@ -4011,3 +4011,11 @@ if(BUILD_TESTING)
   set_tests_properties(native-paint-rig-uv-worker PROPERTIES TIMEOUT 600
     ENVIRONMENT "LIBGL_ALWAYS_SOFTWARE=1;XR_RUNTIME_JSON=${CMAKE_CURRENT_BINARY_DIR}/native-paint-rig-no-physical-runtime.json")
 endif()
+
+if(BUILD_TESTING AND TARGET dome-sculpt-render)
+  add_executable(dome-sculpt-native-paint32-skin-physical-test tests/native-paint32-skin-physical.cpp)
+  target_include_directories(dome-sculpt-native-paint32-skin-physical-test PRIVATE src third_party/cgltf)
+  target_link_libraries(dome-sculpt-native-paint32-skin-physical-test PRIVATE dome-sculpt-render)
+  add_test(NAME native-paint32-skin-physical COMMAND dome-sculpt-native-paint32-skin-physical-test ${CMAKE_CURRENT_BINARY_DIR}/native-paint32-skin-physical)
+  set_tests_properties(native-paint32-skin-physical PROPERTIES TIMEOUT 300 ENVIRONMENT "LIBGL_ALWAYS_SOFTWARE=1;LP_NUM_THREADS=2;XR_RUNTIME_JSON=${CMAKE_CURRENT_BINARY_DIR}/no-physical-native-skin-hdr.json")
+endif()
