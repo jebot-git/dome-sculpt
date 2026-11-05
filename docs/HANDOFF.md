@@ -1,5 +1,29 @@
 # Dome Sculpt production handoff
 
+## Private painted MatCap expressions — 2026-11-05
+
+Runtime `d70e511` follows43e: genuine MatCap image/factor/color targets now stay
+independent through colour paint and editable Avatar worker. ONE complete Layer
+TU only, no native shader/helper/writer/paint/public/private layout/schema change.
+Old painted-role counter14 preserveda722; RAW/pristine independentR/S58/12pairs
+was authenticated BEFORE guard lift (reference998). Actual pinned UniVRM uses.5;
+explicit handedness/texture-row conversion matches native; no helperdefect claim.
+FullR103.457/S499.468s0/1905exact each: worker55, painted181/36pairs max1<=4,
+NEW1628factory (970persistent+648Cancel+10controls). Future nonnegative coefficient
+box+F32margin/64B/work proof retains all other role/owner guards, no budgetraise.
+Consumer-only omitted-factor null bug preserved2; local specifieddefault1 fixes
+it without changing source metadata. CurrentR62.750/S108.123s0/1917exact:181+58+14
+checks each,72paintedPNG identical to full phase and12defaultPNG exact oldbd3.
+All72PNG+11worker pairs R/S exact;49oldfiles/profile unchanged. ActualArc57728
+0/7.111s/1914exact:241/48pairs0 +2actualsoftware refusals1; lease released.
+42official/KHR0errors21warnings79infos12hints; configure677/5realfixtures only.
+No freshwholeapp/GUI/main/external execution claim. Normal/Rim/other guarded
+roles, owning canonical/native/prepared/physical domains, general MASK/BLEND and
+fullVRM remain required; SAME original64560 separately unfinished. Read
+VRM1-MATCAP-PAINTED-EXPRESSIONS.md/JSON; preserve root canonical/native guards at
+semantic union. A formerly MatCap-only legacy rejection needs a genuine positive
+workflow migration after qualified adapter integration, not weakened rollback.
+
 ## Private shade Apply with genuine later UV motion — 2026-11-05
 
 Test-only `d55158d` on sealedbd3: a real source custom expression Applies shade
