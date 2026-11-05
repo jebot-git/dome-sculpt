@@ -4463,7 +4463,7 @@ if(BUILD_TESTING AND TARGET dome-sculpt-render)
     ${CMAKE_CURRENT_BINARY_DIR}/vrm1-background-fixture/source.vrm ${CMAKE_CURRENT_BINARY_DIR}/vrm1-outline-source/source.vrm)
   set_tests_properties(vrm1-outline-source PROPERTIES FIXTURES_REQUIRED vrm1-background-model FIXTURES_SETUP vrm1-outline-source TIMEOUT 30)
   add_test(NAME vrm1-outline-authoring COMMAND dome-sculpt-vrm1-expression-layer-authoring-test
-    ${CMAKE_CURRENT_BINARY_DIR}/vrm1-outline-source/source.vrm ${CMAKE_CURRENT_BINARY_DIR}/vrm1-outline-authoring --positive)
+    ${CMAKE_CURRENT_BINARY_DIR}/vrm1-outline-source/source.vrm ${CMAKE_CURRENT_BINARY_DIR}/vrm1-outline-authoring --positive --outline)
   set_tests_properties(vrm1-outline-authoring PROPERTIES FIXTURES_REQUIRED vrm1-outline-source FIXTURES_SETUP vrm1-outline-model TIMEOUT 900 ENVIRONMENT "DOME_EXPRESSION_NATIVE_RESOLUTION=256")
   add_test(NAME vrm1-outline-render COMMAND dome-sculpt-vrm1-outline-render-test ${CMAKE_CURRENT_BINARY_DIR}/vrm1-outline-authoring ${CMAKE_CURRENT_BINARY_DIR}/vrm1-outline-images)
   set_tests_properties(vrm1-outline-render PROPERTIES FIXTURES_REQUIRED vrm1-outline-model TIMEOUT 900 ENVIRONMENT "LIBGL_ALWAYS_SOFTWARE=1;LP_NUM_THREADS=2")
