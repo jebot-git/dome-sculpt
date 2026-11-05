@@ -1,0 +1,24 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+#define DOME_CANONICAL_PAINT_RENDER_NO_MAIN
+#include "canonical-paint-key-uv-render.cpp"
+#undef DOME_CANONICAL_PAINT_RENDER_NO_MAIN
+#include "dome/shapekey-authoring.hpp"
+namespace {
+Scene authored37(const Scene&s,const std::filesystem::path&file){Document d;d.replace(s);settled(d);const size_t slot=s.active().deformation&&s.active().deformation->morphs?s.active().deformation->morphs->targets.size():0;ShapeKeyEdit c;c.name="Current37 order key";d.author_shape(c);settled(d);auto current=d.copy_scene();ShapeKeyEdit r;r.action=ShapeKeyAction::Replace;r.target=slot;r.positions=current.active().painted->mesh().positions;r.positions.at(0).z+=.007f;r.positions.at(3).z-=.006f;d.author_shape(r);d.save_async(file).get();settled(d);const auto next=d.copy_scene();check(Scene::load(file).encode()==next.encode(),"Actual nonzero order key saves/reopens with its own correct current authority");return next;}
+void appearance37(Scene&s,int pose,float weight,bool zero_new){auto &o=s.active();o.transform.scale=5;if(!o.deformation)return;auto d=*o.deformation;if(d.morphs){d.morph_weights.assign(d.morphs->targets.size(),weight);if(zero_new&&!d.morph_weights.empty())d.morph_weights.back()=0;}if(d.skeleton){d.pose.clear();for(const auto &b:d.skeleton->bones)d.pose.push_back(b.rest);if(pose){d.pose[0].scale=pose==1?Vec3{1.1f,.85f,.65f}:Vec3{.85f,1.05f,1.4f};if(d.pose.size()>1){const float a=pose==1?.2f:-.25f;d.pose[1].rotation={std::cos(a/2),0,std::sin(a/2),0};d.pose[1].scale=pose==1?Vec3{.9f,1.1f,1.4f}:Vec3{1.15f,.9f,.8f};}}}s.set_deformation(o.id,std::move(d));}
+Pixels image37(SurfaceRenderer&r,Fbo&f,const Scene&s){Document d;d.replace(s);d.shading(false);settled(d);f.bind();return draw(r,d.frame().surface);}
+}
+int main(int argc,char**argv)try{
+ if(argc!=4)return 2;NativeGraphics graphics;Fbo fbo;SurfaceRenderer renderer;renderer.set_frame_time(0);prepared_normal_consumer::Renderer independent;const std::filesystem::path before_dir=argv[1],retained_dir=argv[2],out=argv[3];std::filesystem::create_directories(out);size_t n=0;
+ for(const auto stem:{"0-0","7-0","7-4"}){
+  const auto before=Scene::load(before_dir/(std::string(stem)+".dsculpt"));const auto retained=Scene::load(retained_dir/(std::string("output-")+stem)/"1.dsculpt");const auto exact=retained.encode();auto current=authored37(retained,out/(std::string(stem)+"-current.dsculpt"));auto reference=keep(keep(authored37(before,out/(std::string(stem)+"-beforeUV.dsculpt"))));
+  check(reference.active().painted->mesh().uv==current.active().painted->mesh().uv&&reference.active().painted->mesh().indices==current.active().painted->mesh().indices,"Actual opposite key/UV orders preserve identical authored layout and logical triangles");
+  for(auto alpha:{Material::AlphaMode::Opaque,Material::AlphaMode::Mask,Material::AlphaMode::Blend})for(int pose=0;pose<3;++pose)for(float weight:{0.f,.35f,1.f}){
+   auto baseline=retained,zero=current,a=current,b=reference;for(auto *s:{&baseline,&zero,&a,&b}){s->active().material.alpha=alpha;s->active().material.color[3]=.85f;s->active().material.alpha_cutoff=.4f;}
+   appearance37(baseline,pose,weight,false);appearance37(zero,pose,weight,true);appearance37(a,pose,weight,false);appearance37(b,pose,weight,false);auto original=image37(renderer,fbo,baseline),unchanged=image37(renderer,fbo,zero),actual=image37(renderer,fbo,a),expected=image37(renderer,fbo,b);const auto prefix=out/std::to_string(n++);joint::capture(prefix.string()+"-before.png",original);joint::capture(prefix.string()+"-zero.png",unchanged);joint::capture(prefix.string()+"-current.png",actual);joint::capture(prefix.string()+"-reference.png",expected);std::cout<<"POST37_KEY stem="<<stem<<" alpha="<<int(alpha)<<" pose="<<pose<<" weight="<<weight<<" zero="<<delta(original,unchanged)<<" order="<<delta(actual,expected)<<std::endl;check(delta(original,unchanged)<=2,"Actual zero-weight post37 key preserves original material/normal-model image at unchanged2 bound");check(delta(actual,expected)<=2,"Actual independent key afterUV matches key-beforeUV role/geometry image at unchanged2 bound");
+   Document d;d.replace(a);d.shading(false);settled(d);const auto file=prefix.string()+".glb";d.export_asset(file,AssetExportFormat::Glb).get();settled(d);prepared_normal_consumer::Model parsed(file);fbo.bind();independent.render(parsed.data);auto portable=read();joint::capture(prefix.string()+"-portable.png",portable);std::cout<<"POST37_KEY_PARSED max="<<delta(actual,portable)<<std::endl;check(delta(actual,portable)<=2,"Actual post37 key+F32 public worker preserves independent standard GLB normal/UV/target/PNG interpretation at unchanged2");
+  }
+  check(retained.encode()==exact,"All actual order/pose/key/export work preserves complete original37 source");
+ }
+ std::cout<<"PASS "<<checks<<" current37 key image controls\n";return 0;
+}catch(const std::exception&e){std::cerr<<"FAIL "<<e.what()<<'\n';return 1;}
