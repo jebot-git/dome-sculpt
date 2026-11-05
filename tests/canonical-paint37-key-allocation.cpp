@@ -63,7 +63,7 @@ int partitioned_key(int argc,char**argv){
 #else
  report["profile"]="release";
 #endif
- if(!stable)throw std::runtime_error("Actual key allocation baseline differs across three same-input calls");
+ if(!stable){std::ofstream diagnostic(out/"unstable-calibration.json");diagnostic<<report.dump(2)<<'\n';std::cerr<<"KEY_UNSTABLE_COUNTS "<<nlohmann::json(counts)<<std::endl;throw std::runtime_error("Actual key allocation baseline differs across three same-input calls");}
  if(measure){report["terminal_exit"]=0;}else{
   const size_t begin=allocation_prefix(argv[4]),end=allocation_prefix(argv[5]);if(allocation_prefix(argv[6])!=baseline||begin>=end||end>baseline+1)throw std::invalid_argument("Key partition differs from measured absolute interval");size_t denied=0,successful=0;bool endpoint=false;std::vector<size_t> retries;
   for(size_t cut=begin;cut<end;++cut){auto candidate=source;bool failed=false;size_t calls=0;{allocation_probe::Guard guard(cut);try{author_shapekey(candidate,candidate.active().id,edit);}catch(const std::bad_alloc&){failed=true;}calls=allocation_probe::calls;}
