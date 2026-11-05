@@ -46,3 +46,14 @@ geometry. Existing closed-affine corner seed failure is still open; so are
 exterior attachment domains and broader stress, owning request/total budget,
 whole-owned SAN/fault/cancel, worker/history/orderedSave/Restore, native GUI/XR
 and independent exported poses. Full robust automatic weighting is incomplete.
+
+## Completed owning sanitizer component
+
+Sourcec912 now completes a fresh179-task owning C/C++O1/assertions-enabled
+ASan/UBSan core/support build and four fresh consuming test TUs. Actual female
+and male19-part preparations each pass, then independent95+342 oracles per
+avatar pass874/874. Role10 and current rig regressions pass; no ASan/UBSan/LSan
+diagnostic, tracked-source or compiled-support drift. The intrinsic-affine
+negative intentionally remains exit1, reported separately rather than as a
+green production test. No frontend/ALL, native admission/publication, persistent
+allocation sweep or default5 claim. New closed-material work is a separate child.
