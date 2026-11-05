@@ -6,14 +6,20 @@ the default. All legacy methods, resource/quality limits and unsupported complex
 37/38 owner guards remain intact. The second bounded Release component phase now passes surface25, legacy38,
 combined affine polygon/retopology248 and worker251-prefix/4,308 checks, with
 actual polygon payload/default parity. See [the R2 receipt](validation/MODE5-MAIN-POLY-INITIAL-R.json).
-This source is not yet a qualified merged application or main admission.
+The matched merged Release/SAN application phase now passes four native controls,
+152 actual normal/compact FLTK checks and 56 software synthetic-OpenXR loader
+checks. Fresh current worker publication remeasures 373 regular prefixes per
+profile and long-path 377 with the five tail controls 373..377, all passing
+real preparation/rollback/retry/ordered Save. The historical full-381 scope is
+separate. See [the application receipt](validation/MODE5-MAIN-APPLICATION-QUALIFICATION.json).
+This remains a private candidate; no main admission or default promotion.
 
 The initial merged Release proof on `8f43cae` covered the earlier `9dd63f9`
 retopology baseline only. Its 25 surface-heat checks, 38 legacy skin checks and
 251-prefix/4,308-check worker result stay separate; they do not qualify the new
-polygon job/world payload. Fresh whole merged Document and qualified complete
-polygon providers are required before the next bounded Release checks. No old
-provider is accepted merely because outer Document size happens to match.
+polygon job/world payload. The second Release and sanitizer cohorts freshly compiled the complete merged
+Document and used qualified complete polygon providers. No old provider is
+accepted merely because outer Document size happens to match.
 
 The weight component's complete caller 1,052 and long-basename publication 381
 prefixes passed in both profiles, with timing variance and previous sampled
