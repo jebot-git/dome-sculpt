@@ -8,7 +8,10 @@
 namespace dome::detail {
 // Private owning source-informed SURFACE heat route. No public method/default
 // redirection. Existing retention and lease primitives keep their exact meaning.
-using NativeSurfaceHeatOptions=NativeAnatomicalOptions;
+struct NativeSurfaceHeatOptions:NativeAnatomicalOptions {
+  WeightLimits limits{};
+  float seed_distance=.3f;
+};
 struct NativeSurfaceHeatReport {
   struct Part {uint64_t object=0;size_t work=0,workspace=0,closed=0,nonembedded=0;double residual=0,partition=0;};
   size_t work=0,workspace=0,retained_input=0,total_admission=0,changed=0;
@@ -19,6 +22,7 @@ class NativeSurfaceHeatRequest {
   Scene input_;
   std::vector<uint64_t>targets_,support_;
   uint64_t reference_=0;
+  bool source_head_=false;
   NativeSurfaceHeatOptions options_;
   NativeWeightRetention retained_;
   size_t capture_bytes_=0;
@@ -42,6 +46,7 @@ public:
 };
 inline NativeSurfaceHeatRequest capture_native_surface_heat(const Scene&source,
  std::span<const uint64_t>selected,uint64_t reference,const NativeSurfaceHeatOptions&options={}){
+  if(!std::isfinite(options.seed_distance)||options.seed_distance<=0||options.seed_distance>10000||!options.limits.max_influences||options.limits.max_influences>32||!std::isfinite(options.limits.prune)||options.limits.prune<0||options.limits.prune>=1)throw std::invalid_argument("Surface heat seed/influence/prune bounds");
   if(selected.empty()||selected.size()>64||source.objects().size()>128||source.groups().size()>128||!options.maximum_work||options.maximum_work>500'000'000||options.maximum_workspace<65536||options.maximum_workspace>256u*1024u*1024u||options.maximum_total<options.maximum_workspace||options.maximum_total>512u*1024u*1024u||options.locks.size()>256||std::any_of(options.locks.begin(),options.locks.end(),[](auto x){return x>1;}))throw std::invalid_argument("Native surface heat owning options/domain");
   // Pure bounded scan; no user callback and no Scene/JSON snapshot allocation
   // before the exact retained closure plus full working cap has been admitted.
@@ -62,12 +67,18 @@ inline NativeSurfaceHeatRequest capture_native_surface_heat(const Scene&source,
   std::set<uint64_t> unique;
   for(auto id:selected){const auto&o=source.object(id);if(!unique.insert(id).second||!o.visible||o.locked||!o.mesh_active||!o.painted||!o.volume||o.painted->in_stroke()||o.volume->in_stroke())throw std::invalid_argument("Choose explicit editable anatomical targets");request.targets_.push_back(id);}
   const auto&ref=source.object(reference);
-  if(!ref.deformation||!ref.deformation->skeleton||!ref.deformation->humanoid)throw std::invalid_argument("Choose the current native humanoid reference");
+  if(!ref.mesh_active||!ref.painted||!ref.deformation||!ref.deformation->skeleton)throw std::invalid_argument("Choose the current native humanoid reference");
   if(!options.locks.empty()&&options.locks.size()!=ref.deformation->skeleton->bones.size())throw std::invalid_argument("Native surface heat lock/joint identity");
   // Select the actual current source instance from explicit targets; foreign
   // instances/objects stay in the full lease and owning resource admission.
-  auto domain=native_anatomical_domain(source,selected,capture_work);
-  request.support_=std::move(domain.objects);
+  // Prospective input policy, never a retry after a failed domain or solve.
+  // A complete authenticated humanoid source uses its existing geometry-only
+  // head/ocular domain; ordinary native geometry uses each actual requested
+  // one-owner surface and the same exact visibility/screened energy.
+  request.source_head_=bool(ref.deformation->humanoid)&&source.object(selected.front()).appearance&&
+    ref.deformation->humanoid->joints.contains("head")&&ref.deformation->humanoid->joints.contains("leftEye")&&ref.deformation->humanoid->joints.contains("rightEye");
+  if(request.source_head_){auto domain=native_anatomical_domain(source,selected,capture_work);request.support_=std::move(domain.objects);}
+  else request.support_=request.targets_;
   request.retained_.work=capture_work.used;
   for(auto id:request.targets_)if(std::find(request.support_.begin(),request.support_.end(),id)==request.support_.end())throw std::invalid_argument("Native surface heat target lacks current source correspondence");
   if(!options.locks.empty())for(auto id:request.targets_){const auto&o=source.object(id);if(!o.deformation||!o.deformation->skin||!o.deformation->skeleton)throw std::invalid_argument("Native surface heat locks require actual current skin authority");}
@@ -103,7 +114,7 @@ inline NativeSurfaceHeatPrepared prepare_native_surface_heat(const NativeSurface
     if(o.deformation){geometry_weight_authoring::deformation_copy_bytes(*o.deformation,bytes,work);weight_surface::validate_rest_deformation(*o.deformation,o.painted->mesh(),work);}
     else bytes.add(sizeof(DeformationState));
     geometry_weight_authoring::deformation_copy_bytes(ref,bytes,work);
-    bytes.add(o.painted->mesh().positions.size(),sizeof(VertexWeights)+4*sizeof(Influence)+64);
+    bytes.add(o.painted->mesh().positions.size(),sizeof(VertexWeights)+options.limits.max_influences*sizeof(Influence)+64);
     if(!o.rig_source){bytes.add(sizeof(PolygonOrigin)+sizeof(PaintedMesh)+sizeof(Volume)+4096);bytes.add(o.painted->storage_bytes());}
   }
   const size_t fixed_bytes=bytes.used;
@@ -125,15 +136,19 @@ inline NativeSurfaceHeatPrepared prepare_native_surface_heat(const NativeSurface
       if(!d->humanoid)d->humanoid=ref.humanoid;
       if(!d->landmarks&&ref.landmarks){if(same)d->landmarks=ref.landmarks;else{SkinGeometryWork geometry(work.maximum-work.used,cancelled);auto before=geometry.remaining();d->landmarks=skin_reframe_landmarks(*ref.landmarks,target_world.inverse()*reference_world,geometry);work.step(before-geometry.remaining());}}
     }
-    if(!d->humanoid||d->humanoid->joints!=ref.humanoid->joints)throw std::invalid_argument("Surface heat current humanoid joint identities differ");
+    if(request.source_head_&&(!d->humanoid||d->humanoid->joints!=ref.humanoid->joints))throw std::invalid_argument("Surface heat current humanoid joint identities differ");
     support.object(id).deformation=std::move(d);
   }
-  auto anatomy=source_humanoid_heat_domains(support,request.support_,request.reference_,work,std::min(size_t(128u*1024u*1024u),options.maximum_workspace-fixed_bytes));
+  HumanoidHeatDomains anatomy;
+  if(request.source_head_)anatomy=source_humanoid_heat_domains(support,request.support_,request.reference_,work,std::min(size_t(128u*1024u*1024u),options.maximum_workspace-fixed_bytes));
+  else{for(auto id:request.support_){work.step(32);anatomy.parts.push_back({id,input.object(id).painted->mesh_owner(),{},false,false});}anatomy.forecast_bytes=65536+anatomy.parts.capacity()*sizeof(HumanoidHeatDomains::Part);}
   // Analysis temporary storage is released by its factory; retained per-row
   // boundary data stays charged alongside output and one active field.
   const size_t boundary_bytes=anatomy.forecast_bytes;
   bytes.add(boundary_bytes);
-  auto profile=humanoid_heat_sources(world_rig,*ref.humanoid,work);
+  std::vector<HeatSourceSegment>profile;
+  if(ref.humanoid)profile=humanoid_heat_sources(world_rig,*ref.humanoid,work);
+  else{const auto segments=world_rig.segments();profile.reserve(world_rig.bones.size());for(uint32_t j=0;j<world_rig.bones.size();++j)if(world_rig.bones[j].deform){work.step(8);const auto&a=segments[j][0],&b=segments[j][1];profile.push_back({{a.x,a.y,a.z},{b.x,b.y,b.z},j});}}
   bytes.add(profile.size(),sizeof(HeatSourceSegment)+64);
   NativeSurfaceHeatPrepared result;result.identity_=request.identity_;
   result.report_.retained_input=request.retained_.bytes;
@@ -145,14 +160,14 @@ inline NativeSurfaceHeatPrepared prepare_native_surface_heat(const NativeSurface
     // A completely locked current field is a true no-op; no source capsule or
     // optimizer invocation is manufactured. Partial locks retain exact values.
     if(!options.locks.empty()&&std::all_of(options.locks.begin(),options.locks.end(),[](auto x){return x!=0;})){
-      for(const auto&row:before.deformation->skin->vertices){work.step(64);if(row.size()>4)throw std::invalid_argument("Locked influences exceed the surface heat cap");}continue;
+      for(const auto&row:before.deformation->skin->vertices){work.step(64);if(row.size()>options.limits.max_influences)throw std::invalid_argument("Locked influences exceed the surface heat cap");}continue;
     }
     VisibilityGeodesicResult field;
     if(!found->fixed.empty()){
       if(found->fixed.size()!=mesh.positions.size())throw std::runtime_error("Surface heat fixed boundary dimensions");
       field.weights.vertices.reserve(found->fixed.size());for(auto joint:found->fixed){work.step(16);if(joint>=world_rig.bones.size()||!world_rig.bones[joint].deform)throw std::invalid_argument("Surface heat boundary references a nondeform joint");field.weights.vertices.push_back({{joint,1}});}
     }else{
-      BindOptions bind;bind.maximum_work=work.maximum-work.used;bind.limits={4,1e-5f};
+      BindOptions bind;bind.maximum_work=work.maximum-work.used;bind.limits=options.limits;bind.maximum_seed_distance=options.seed_distance;
       const auto metric=origin*input.world_matrix(id);
       // Sew only the genuine raw one-owner/all-morph geometry. Quantized world
       // coordinates must never invent an additional raw seam correspondence.
@@ -165,7 +180,7 @@ inline NativeSurfaceHeatPrepared prepare_native_surface_heat(const NativeSurface
        });work.step(field.work);
     }
     auto d=std::make_shared<DeformationState>(*current.deformation);
-    if(!options.locks.empty())for(size_t row=0;row<field.weights.vertices.size();++row){work.step(256);auto&next=field.weights.vertices[row];std::erase_if(next,[&](auto x){return options.locks.at(x.joint)!=0;});for(auto x:before.deformation->skin->vertices.at(row))if(options.locks.at(x.joint))next.push_back(x);next=normalize_weights(std::move(next),d->skeleton->bones.size(),options.locks,{4,1e-5f});}
+    if(!options.locks.empty())for(size_t row=0;row<field.weights.vertices.size();++row){work.step(256);auto&next=field.weights.vertices[row];std::erase_if(next,[&](auto x){return options.locks.at(x.joint)!=0;});for(auto x:before.deformation->skin->vertices.at(row))if(options.locks.at(x.joint))next.push_back(x);next=normalize_weights(std::move(next),d->skeleton->bones.size(),options.locks,options.limits);}
     bool changed=!before.deformation||!before.deformation->skin;
     if(!changed)for(size_t row=0;row<field.weights.vertices.size();++row){work.step(128);if(!geometry_weight_authoring::equal_row(field.weights.vertices[row],before.deformation->skin->vertices.at(row))){changed=true;break;}}
     result.report_.parts.push_back({id,field.work,field.workspace,field.closed_components,field.nonembedded_components,field.heat_residual,field.partition_error});

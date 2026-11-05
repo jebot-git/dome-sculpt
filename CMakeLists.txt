@@ -3891,7 +3891,7 @@ if(BUILD_TESTING)
   endif()
 endif()
 
-target_sources(dome-sculpt-core PRIVATE src/anatomical-authoring.cpp)
+target_sources(dome-sculpt-core PRIVATE src/anatomical-authoring.cpp src/surface-heat-authoring.cpp)
 
 if(BUILD_TESTING)
   add_executable(dome-sculpt-anatomical-authoring-worker-test tests/anatomical-authoring-worker.cpp)
