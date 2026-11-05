@@ -95,6 +95,7 @@ target_sources(dome-sculpt-core PRIVATE src/object-selection.cpp)
 target_sources(dome-sculpt-core PRIVATE src/source-sampling-transport.cpp)
 target_sources(dome-sculpt-core PRIVATE src/source-placement.cpp src/source-placement-archive.cpp)
 target_sources(dome-sculpt-core PRIVATE src/polygon-authoring.cpp src/polygon-source.cpp src/polygon-color-source.cpp src/polygon-color-archive.cpp src/polygon-scene.cpp src/polygon-conversion.cpp src/document-polygon.cpp)
+target_sources(dome-sculpt-core PRIVATE src/polygon-surface-transfer.cpp src/polygon-surface-owner.cpp)
 target_include_directories(dome-sculpt-core PRIVATE third_party/cgltf)
 target_compile_definitions(dome-sculpt-core PRIVATE
   DOME_SCULPT_SOURCE_ASSETS="${CMAKE_CURRENT_SOURCE_DIR}/assets/humanoid"
@@ -4716,4 +4717,12 @@ if(BUILD_TESTING)
   target_link_options(dome-sculpt-polygon-surface-transfer-test PRIVATE -Wl,--gc-sections)
   add_test(NAME polygon-surface-transfer COMMAND dome-sculpt-polygon-surface-transfer-test)
   set_tests_properties(polygon-surface-transfer PROPERTIES TIMEOUT 120)
+endif()
+
+if(BUILD_TESTING)
+  # Requires explicit authentic native fixture paths; no ignored artifact path
+  # is registered as a CTest fixture. The durable producer is follow-on work.
+  add_executable(dome-sculpt-polygon-surface-owner-test tests/polygon-surface-owner.cpp)
+  target_include_directories(dome-sculpt-polygon-surface-owner-test PRIVATE src)
+  target_link_libraries(dome-sculpt-polygon-surface-owner-test PRIVATE dome-sculpt-core)
 endif()
