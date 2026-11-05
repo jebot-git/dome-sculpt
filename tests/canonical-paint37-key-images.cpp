@@ -9,7 +9,7 @@ void appearance37(Scene&s,int pose,float weight,bool zero_new){auto &o=s.active(
 Pixels image37(SurfaceRenderer&r,Fbo&f,const Scene&s){Document d;d.replace(s);d.shading(false);settled(d);f.bind();return draw(r,d.frame().surface);}
 }
 int main(int argc,char**argv)try{
- if(argc!=4)return 2;NativeGraphics graphics;Fbo fbo;SurfaceRenderer renderer;renderer.set_frame_time(0);prepared_normal_consumer::Renderer independent;const std::filesystem::path before_dir=argv[1],retained_dir=argv[2],out=argv[3];std::filesystem::create_directories(out);size_t n=0;
+ if(argc!=4&&argc!=5)return 2;NativeGraphics graphics;device(argc==5&&std::string_view(argv[4])=="--hardware");Fbo fbo;SurfaceRenderer renderer;renderer.set_frame_time(0);prepared_normal_consumer::Renderer independent;const std::filesystem::path before_dir=argv[1],retained_dir=argv[2],out=argv[3];std::filesystem::create_directories(out);size_t n=0;
  for(const auto stem:{"0-0","7-0","7-4"}){
   const auto before=Scene::load(before_dir/(std::string(stem)+".dsculpt"));const auto retained=Scene::load(retained_dir/(std::string("output-")+stem)/"1.dsculpt");const auto exact=retained.encode();auto current=authored37(retained,out/(std::string(stem)+"-current.dsculpt"));auto reference=keep(keep(authored37(before,out/(std::string(stem)+"-beforeUV.dsculpt"))));
   check(reference.active().painted->mesh().uv==current.active().painted->mesh().uv&&reference.active().painted->mesh().indices==current.active().painted->mesh().indices,"Actual opposite key/UV orders preserve identical authored layout and logical triangles");
