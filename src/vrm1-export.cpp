@@ -558,7 +558,7 @@ static VrmExportReport export_vrm1_impl(const std::vector<ObjectSurface> &object
       const int uv_accessor=int(j["accessors"].size());j["accessors"].push_back({{"bufferView",uv_view},{"componentType",5126},{"count",frame.rest_vertices.size()},{"type","VEC2"}});
       PaintSourceTexture paint;paint.image=layer->image;paint.wrap_s=paint.wrap_t=33071;paint.min_filter=paint.mag_filter=9729;
       const int texture=role_texture(paint);
-      upper["pbrMetallicRoughness"]["baseColorFactor"]=std::array<float,4>{1,1,1,1};
+      upper["pbrMetallicRoughness"]["baseColorFactor"]=std::array<float,4>{1/layer->paint_rgb_scale[0],1/layer->paint_rgb_scale[1],1/layer->paint_rgb_scale[2],1};
       upper["pbrMetallicRoughness"]["baseColorTexture"]={{"index",texture},{"texCoord",channel},{"extensions",{{"KHR_texture_transform",{{"scale",layer->scale},{"offset",layer->offset}}}}}};
       if(layer->shade_alias){
         // The native shared image modifies the shade sample by P/nativeRGB.

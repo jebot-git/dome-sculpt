@@ -88,6 +88,35 @@ GLuint shader(GLenum kind, const char *text) {
   }
   return s;
 }
+GLuint surface_program(const std::string &vertex,const std::string &fragment) {
+  GLuint vs=0,fs=0,program=0;
+  try {
+    vs=shader(GL_VERTEX_SHADER,vertex.c_str());
+    fs=shader(GL_FRAGMENT_SHADER,fragment.c_str());
+    program=glCreateProgram();
+    glAttachShader(program,vs);glAttachShader(program,fs);glLinkProgram(program);
+    GLint good=0;glGetProgramiv(program,GL_LINK_STATUS,&good);
+    if(!good) {
+      char log[4096]{};glGetProgramInfoLog(program,sizeof(log),nullptr,log);
+      throw std::runtime_error(std::string("Sculpt shader linking failed: ")+log);
+    }
+    glDeleteShader(vs);glDeleteShader(fs);return program;
+  } catch(...) {
+    if(vs)glDeleteShader(vs);if(fs)glDeleteShader(fs);if(program)glDeleteProgram(program);
+    throw;
+  }
+}
+std::string pbr_surface_source(std::string source) {
+  // Keep the authored sampling and shading code identical. An actual PBR-only
+  // snapshot cannot enter the typed MToon branch; make that fact visible to the
+  // driver before it specializes every sampler/state combination.
+  constexpr std::string_view declaration="uniform int mt_mode,mt_outline,";
+  const auto offset=source.find(declaration);
+  if(offset==std::string::npos||source.find(declaration,offset+declaration.size())!=std::string::npos)
+    throw std::logic_error("Unexpected typed surface shader declaration");
+  source.replace(offset,declaration.size(),"const int mt_mode=0;\nuniform int mt_outline,");
+  return source;
+}
 } // namespace
 namespace {
 bool mtoon_shade_alias(const MToonMaterial&m){auto &a=m.textures[0],&b=m.textures[1];return a.index>=0&&a.index==b.index&&mtoon_coordinate(a)==mtoon_coordinate(b)&&(m.version()==MToonVersion::V0||(a.offset==b.offset&&a.scale==b.scale&&a.rotation==b.rotation));}
@@ -101,6 +130,16 @@ GLenum mtoon_blend(int value){constexpr GLenum factors[]={GL_ZERO,GL_ONE,GL_DST_
 }
 
 struct SurfaceRenderer::TextureState {
+  GLuint pbr_program=0,typed_program=0;
+  std::string typed_vertex,typed_fragment;
+  ~TextureState(){glDeleteProgram(pbr_program);glDeleteProgram(typed_program);}
+  GLuint program() {
+    // Mixed snapshots use the complete shader throughout the frame. Never
+    // infer this from an individual visible range or switch mid-frame.
+    if(toons.empty())return pbr_program;
+    if(!typed_program)typed_program=surface_program(typed_vertex,typed_fragment);
+    return typed_program;
+  }
   struct Key {const Image *image=nullptr;bool srgb=false;bool operator==(const Key&)const=default;};
   struct KeyHash {size_t operator()(const Key&k)const{return std::hash<const Image*>{}(k.image)^(size_t(k.srgb)<<1);}};
   using Sampler=std::array<int,4>;
@@ -560,7 +599,7 @@ void SurfaceRenderer::set_output_encoding(SurfaceOutputEncoding encoding){if(tex
 void SurfaceRenderer::set_deferred_resolve(bool value){if(textures_->target.pending())throw std::logic_error("Resolve current view before changing deferred output");textures_->deferred=value;}
 void SurfaceRenderer::resolve(){textures_->target.resolve(textures_->output);}
 void SurfaceRenderer::set_frame_time(double seconds){if(!std::isfinite(seconds)||seconds<0||seconds>std::numeric_limits<float>::max())throw std::invalid_argument("Invalid GPU animation frame time");textures_->frame_time=seconds;}
-void SurfaceRenderer::abandon(){program_=vao_=vertices_=indices_=weights_=masks_=0;buffers_.vertex_bytes=buffers_.index_bytes=buffers_.weight_bytes=buffers_.mask_bytes=0;cached_.reset();textures_->clear(false);textures_->target.clear(false);count_=0;}
+void SurfaceRenderer::abandon(){program_=vao_=vertices_=indices_=weights_=masks_=0;textures_->pbr_program=textures_->typed_program=0;buffers_.vertex_bytes=buffers_.index_bytes=buffers_.weight_bytes=buffers_.mask_bytes=0;cached_.reset();textures_->clear(false);textures_->target.clear(false);count_=0;}
 
 SurfaceRenderer::SurfaceRenderer(SurfaceTextureLimits limits):textures_(std::make_unique<TextureState>(limits)) {
   GLint attributes=0;glGetIntegerv(GL_MAX_VERTEX_ATTRIBS,&attributes);
@@ -629,18 +668,9 @@ vec3 N=shading_normal,V=normalize(camera-world),result;
 if(toon==1){float lit=dot(N,normalize(vec3(-.4,.8,.7)));float ramp=mix(.32*ao,1.0,smoothstep(-.05,.05,lit));float edge=smoothstep(.05,.18,max(dot(N,V),0.0));result=base.rgb*ramp*edge+vec3(.025);}
 else result=shade(N,V,normalize(vec3(-.4,.8,.7)),vec3(3.8),base.rgb,rough,metal)+shade(N,V,normalize(vec3(.7,.2,-.4)),vec3(.65,.8,1.0),base.rgb,rough,metal)+.045*base.rgb*ao;
 result+=glow;result=result/(result+vec3(1));color=ghost_color(vec4(sculpt_mask_color(result),base.a));})GLSL";
-  GLuint vs = shader(GL_VERTEX_SHADER, vertex.c_str()),
-         fs = shader(GL_FRAGMENT_SHADER, fragment.c_str());
-  program_ = glCreateProgram();
-  glAttachShader(program_, vs);
-  glAttachShader(program_, fs);
-  glLinkProgram(program_);
-  glDeleteShader(vs);
-  glDeleteShader(fs);
-  GLint good = 0;
-  glGetProgramiv(program_, GL_LINK_STATUS, &good);
-  if (!good)
-    throw std::runtime_error("Sculpt shader linking failed");
+  textures_->typed_vertex=std::move(vertex);textures_->typed_fragment=std::move(fragment);
+  textures_->pbr_program=surface_program(pbr_surface_source(textures_->typed_vertex),pbr_surface_source(textures_->typed_fragment));
+  program_=textures_->pbr_program;
   glGenVertexArrays(1, &vao_);
   glGenBuffers(1, &vertices_);
   glGenBuffers(1, &indices_);
@@ -655,7 +685,6 @@ SurfaceRenderer::~SurfaceRenderer() {
   glDeleteBuffers(1, &masks_);
   glDeleteBuffers(1, &vertices_);
   glDeleteVertexArrays(1, &vao_);
-  glDeleteProgram(program_);
 }
 void SurfaceRenderer::draw(std::shared_ptr<const MeshSnapshot> mesh,
                            CanvasTransform model, const Mat4 &vp,
@@ -796,6 +825,7 @@ void SurfaceRenderer::draw(std::shared_ptr<const MeshSnapshot> mesh,
   if(cached_->source_normals.empty() && cached_->canonical_normals.empty() && cached_->source_tangents.empty()) {
     glVertexAttrib3f(7,0,0,1);glVertexAttrib4f(8,1,0,0,1);glVertexAttrib3f(9,0,0,1);
   }
+  program_=textures_->program();
   glUseProgram(program_);
   glUniform1i(glGetUniformLocation(program_,"affine_motion"),0);
   glUniform1f(glGetUniformLocation(program_,"model_hand"),1);
