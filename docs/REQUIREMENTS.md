@@ -13,6 +13,14 @@ change only Layer. Read VRM1-EXPRESSION-PREFLIGHT.md for exact scope and retaine
 original failures. No Scene37/public canonical-owner append is admitted. FLTK
 remains the default with canonical DomeD bitmap/menu conventions.
 
+Official texture-schema validation now dispatches each pinned resource to its
+actual Draft4/2020 dialect. The old recipe demonstrably accepts missing-index
+and wrong-coordinate negatives. The same20 admitted Rim/cutout files pass168
+corrected instances;24 private Normal files pass186, with actual resolver negative
+controls and unchanged bytes. Read VRM-SCHEMA-DIALECT-AUDIT.md. This44-file scope
+does not retroactively qualify every historical official report or add runtime
+Python. Original Khronos and legacy-tool results remain preserved.
+
 The native36 ABI foundation completes Release ALL and owning sanitizer builds
 and125/125 selected tests per profile, including all four actual frame allocation/
 codec fault phases. Its actual native/Wayland/synthetic-XR workflows pass200UI

@@ -1,3 +1,15 @@
+## Corrected official-schema reference validation — 2026-11-05
+
+Main includes optional tests/vrm-official-texture-schemas.py with explicit pinned
+--spec and jsonschema4.26.0, declared Draft4/2020 resource dispatch and actual
+missing-index/wrong-coordinate negative controls. The old forced Draft4 recipe
+accepts those real MatCap negatives.44 unchanged files (20admittedRim/cutout,
+24privateNormal) now pass354 corrected extension instances, no schema/output
+rewrite. Read VRM-SCHEMA-DIALECT-AUDIT.md/receipt. This does not qualify unrelated
+historical reports or add a Python runtime. Runtime/header/C++tests/build/assets
+still match admitted preflightc179; only optional test tooling/docs are added.
+The original full objective remains active; newer private candidates stay separate.
+
 ## Admitted expression preflight repair — 2026-11-05
 
 Main now incorporates62ec13e/sealc17945d over qualified0b6. Only one complete
