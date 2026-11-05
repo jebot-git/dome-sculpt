@@ -4,10 +4,15 @@ The full Dome Sculpt objective remains active and incomplete. The accepted XR
 selection interface is preserved. Controller drawers remain required after the
 basic authoring targets. Animation and final scene rendering remain excluded.
 
-Main runtime is integrated at f9da354: qualified 1f authoring source, including
-genuine anatomical fixture endpoints and shared-shade VRM expressions. The tree
-was clean and the remote hash verified on 2026-11-05. The earlier ae075b1
-foundation and its four trailing-whitespace-only test fixes are preserved.
+Main now integrates runtimeab37175/seal79e288d, extending the earlier qualified
+1f/f9da354 foundation with complete skin/rig/UV/HDR ownership and wider expressions.
+The complete runtime/build/include/test/asset tree matches the qualified source
+at admission. Fresh owning337-task Release and sanitizer builds each pass92/92
+selected commands. Actual native/compact/Wayland/syntheticXR65 and posed physical-
+paint GUI80 pass each profile;8actualGUI GLBs have zero Khronos errors. Same own
+binaries pass632 actualArc checks plus three strict software refusals. See
+COHERENT-PHYSICAL-AUTHORING.md/receipt. This is not full739 runtime, native36/37 or
+MASK296 admission, physical headset/compute qualification or full goal completion.
 
 The qualified combined foundation is [4b37f11](https://github.com/jebot-git/dome-sculpt/tree/4b37f119f5c5274b118aa5a55ec8e5a689ef809f), with runtime source 1d573f2. Fresh optimized Release ALL completes 1,397
 build tasks; the separate owning sanitizer application/core/render/support and
@@ -89,7 +94,8 @@ passes the prior 109-check consumer. All 36 emitted GLBs have zero Khronos error
 with 36 warnings and 144 infos retained. Native recovery, actual pose/inverse
 binds and exact owner/control blocks are checked; cross-device pixels differ by
 at most one. Nine affected existing export consumers pass each profile. This is
-separately qualified component evidence, not current main or general morph export.
+component evidence, now included in the qualified main cohort; general morph
+export remains separate.
 The obsolete UV worker interception test is repaired at the actual paired model
 helper and passes 1,797 checks each profile without changing product cancellation
 or timeouts. Original b37 selected Release and sanitizer each finish83/84, both on the
@@ -117,12 +123,13 @@ including the complete application/core/render/support and whole consumers.
 739 tests are registered; 92 are selected for actual runtime validation,
 including positive physical skin export, the corrected worker hook, all five
 coefficient cases and legacy expression fault tests. Release closes337 owning build tasks and92/92 selected commands successfully.
-The owning sanitizer337-task build also finishes; its92 selected runtime commands
-remain live, with all tracked inputs and their script frozen. Actual new-owning
+The owning sanitizer337-task build and all92 selected runtime commands also
+finish with no input drift. Actual new-owning
 native/compact/Wayland/syntheticXR65 and physical-skin nativeGUI40normal+40compact
 pass each profile. All8 actual ordinary/editable GUI exports have0Khronos errors,
 8warnings and28infos retained; compact bitmap policy was visually inspected.
-These are scoped results, not a complete739 suite or main runtime admission. Static merge parity proves all seven expected
+This qualified source is now integrated on main. It remains a scoped result,
+not a complete739 suite or full production qualification. Static merge parity proves all seven expected
 unchanged files exact and the expression compiler equal to e84 plus existing
 canonical/UV/native owner guards. Public headers are unchanged.
 
@@ -162,7 +169,10 @@ owning-faults lacks the actual Scene33 archive context, and the dependent render
 is not run. The old consumer dereferences the removed normal-preparation path
 instead of current canonical attributes/baked fields. A separate test-only
 migration preserves all original variants, fault/Cancel/Save and render scopes.
-The newer current689 run is separate/live; its original source remains frozen.
+The newer current689 run is separate/live; its original source remains frozen. The strict
+migration also reaches a genuine missing canonical-key/UV path after the old
+consumer assumptions are repaired. Its new authenticated prototype and independent
+writable-paint transport remain separate; the original positive is preserved.
 
 The [legacy/portable deformation audit 9dabf78](https://github.com/jebot-git/dome-sculpt/tree/9dabf78887545aff7d9edadc5167c218735537d1) retains four curved-state differences above four, maximum nine. The predating
 conversion contract explicitly authors a portable normal/tangent model and

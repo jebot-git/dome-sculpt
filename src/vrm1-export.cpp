@@ -68,7 +68,7 @@ static VrmExportReport export_vrm1_impl(const std::vector<ObjectSurface> &object
       for (const auto &extension : node.at("extensions").items())
         require(extension.key() == "VRMC_node_constraint",
                 "node extension has no typed reference remapper");
-  struct ExpressionLayerIdentity {int source,lower,upper;bool shade_alias;std::array<float,3> shade_divisor;};
+  struct ExpressionLayerIdentity {int source,lower,upper;bool forward_uv,shade_alias;std::array<float,3> shade_divisor;};
   std::vector<ExpressionLayerIdentity> expression_layers;
   std::set<int> uv_expression_materials, color_expression_materials;
   const auto &vrm = original.at("extensions").at("VRMC_vrm");
@@ -574,7 +574,7 @@ static VrmExportReport export_vrm1_impl(const std::vector<ObjectSurface> &object
       // is a derived standard primitive, with no editor authority of its own.
       upper.erase("extras");(void)MToonMaterial::from_vrm1(upper,j["textures"].size());
       const int upper_material=int(j["materials"].size());j["materials"].push_back(std::move(upper));auto primitive=lower;primitive.erase("extras");primitive["material"]=upper_material;primitive["attributes"]["TEXCOORD_"+std::to_string(channel)]=uv_accessor;j["meshes"][emitted.mesh]["primitives"].push_back(std::move(primitive));
-      expression_layers.push_back({a.source_material,emitted.material,upper_material,layer->shade_alias,layer->shade_divisor});budget();
+      expression_layers.push_back({a.source_material,emitted.material,upper_material,layer->forward_uv,layer->shade_alias,layer->shade_divisor});budget();
     }
 
     ++report.meshes;
@@ -633,9 +633,10 @@ static VrmExportReport export_vrm1_impl(const std::vector<ObjectSurface> &object
       for(const char *kind:{"textureTransformBinds","materialColorBinds"})if(expression.contains(kind)){
         const auto original_binds=expression[kind];
         for(const auto &bind:original_binds)for(const auto &layer:expression_layers)if(bind.at("material").get<int>()==layer.lower){
+          if(std::string_view(kind)=="textureTransformBinds"&&!layer.forward_uv)continue;
           if(std::string_view(kind)=="materialColorBinds"&&(bind.at("type")=="color"||bind.at("type")=="outlineColor"))continue;
           auto forwarded=bind;forwarded["material"]=layer.upper;
-          if(layer.shade_alias&&std::string_view(kind)=="materialColorBinds"&&bind.at("type")=="shadeColor")for(size_t k=0;k<3;++k){const double value=bind.at("targetValue").at(k).get<double>()/layer.shade_divisor[k];require(std::isfinite(value)&&value>=0&&value<=1,"expression layer shade target exceeds unit representation");forwarded["targetValue"][k]=value;}
+          if(layer.shade_alias&&std::string_view(kind)=="materialColorBinds"&&bind.at("type")=="shadeColor")for(size_t k=0;k<3;++k){const double value=bind.at("targetValue").at(k).get<double>()/layer.shade_divisor[k];require(std::isfinite(value)&&value>=0&&value<=1e20,"expression layer shade target exceeds finite nonnegative source representation");forwarded["targetValue"][k]=value;}
           expression[kind].push_back(std::move(forwarded));
         }
       }

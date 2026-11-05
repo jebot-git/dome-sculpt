@@ -1,0 +1,1496 @@
+{
+  "counter": {
+    "state": "terminal",
+    "pid": 2907452,
+    "steps": [
+      {
+        "name": "compile",
+        "command": [
+          "/usr/bin/c++",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-uv-targets-ccc/src",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-uv-targets-ccc/third_party/cgltf",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-uv-targets-ccc/include",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-uv-targets-ccc/third_party/openbrush",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-uv-targets-ccc/third_party/nlohmann",
+          "-O3",
+          "-DNDEBUG",
+          "-std=gnu++20",
+          "-o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-uv-targets-ccc/artifacts/targets-proof/counter/worker.o",
+          "-c",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-uv-targets-ccc/tests/vrm1-expression-layer-authoring.cpp"
+        ],
+        "exit": 0,
+        "seconds": 11.292041144974064
+      },
+      {
+        "name": "link",
+        "command": [
+          "/usr/bin/c++",
+          "-O3",
+          "-DNDEBUG",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-uv-targets-ccc/artifacts/targets-proof/counter/worker.o",
+          "-o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-uv-targets-ccc/artifacts/targets-proof/counter/worker",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-alpha-5310/artifacts/shared-proof/current-release/stage/libdome-sculpt-core.a",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-alpha-5310/artifacts/shared-proof/current-release/stage/libdome-sculpt-affine.a",
+          "/usr/lib64/liblapacke.so",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-alpha-5310/artifacts/shared-proof/current-release/stage/libdome-sculpt-polygon.a",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-alpha-5310/artifacts/shared-proof/current-release/stage/libxatlas.a",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-alpha-5310/artifacts/shared-proof/current-release/stage/libmikktspace.a",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-alpha-5310/artifacts/shared-proof/current-release/stage/libmikktspace-robust.a",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-alpha-5310/artifacts/shared-proof/current-release/stage/libufbx.a",
+          "/usr/lib64/libpng.so",
+          "/usr/lib64/libjpeg.so",
+          "/usr/lib64/libz.so",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-alpha-5310/artifacts/shared-proof/current-release/stage/libdome-sculpt-emission-codec.a",
+          "/usr/lib64/libOpenEXR-3_2.so",
+          "/usr/lib64/libOpenEXRUtil-3_2.so",
+          "/usr/lib64/libOpenEXRCore-3_2.so",
+          "/usr/lib64/libIex-3_2.so",
+          "/usr/lib64/libIlmThread-3_2.so",
+          "/usr/lib64/libImath-3_1.so",
+          "-lgcc_s_asneeded",
+          "-lgcc_s_asneeded",
+          "-Wl,--wrap=fsync"
+        ],
+        "exit": 0,
+        "seconds": 0.45195071399211884
+      },
+      {
+        "name": "old-varying-uv",
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-uv-targets-ccc/artifacts/targets-proof/counter/worker",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-preview-1853cc3/build-preview-release/vrm1-background-fixture/source.vrm",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-uv-targets-ccc/artifacts/targets-proof/counter/varying-uv",
+          "--old-refusal",
+          "--varying-uv"
+        ],
+        "exit": 0,
+        "seconds": 0.13598518900107592
+      },
+      {
+        "name": "old-zero-uv",
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-uv-targets-ccc/artifacts/targets-proof/counter/worker",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-preview-1853cc3/build-preview-release/vrm1-background-fixture/source.vrm",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-uv-targets-ccc/artifacts/targets-proof/counter/zero-uv",
+          "--old-refusal",
+          "--zero-uv"
+        ],
+        "exit": 0,
+        "seconds": 0.14683645399054512
+      },
+      {
+        "name": "old-uniform-roles-uv",
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-uv-targets-ccc/artifacts/targets-proof/counter/worker",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-preview-1853cc3/build-preview-release/vrm1-background-fixture/source.vrm",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-uv-targets-ccc/artifacts/targets-proof/counter/uniform-roles-uv",
+          "--old-refusal",
+          "--uniform-roles-uv"
+        ],
+        "exit": 0,
+        "seconds": 0.15298176498617977
+      },
+      {
+        "name": "old-zero-roles-uv",
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-uv-targets-ccc/artifacts/targets-proof/counter/worker",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-preview-1853cc3/build-preview-release/vrm1-background-fixture/source.vrm",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-uv-targets-ccc/artifacts/targets-proof/counter/zero-roles-uv",
+          "--old-refusal",
+          "--zero-roles-uv"
+        ],
+        "exit": 0,
+        "seconds": 0.16217656404478475
+      }
+    ],
+    "scope": "Four genuine UV target authored INPUTs, actual oldccc worker refusals on copied matching current3TU support; no runtime/header/root35 changes.",
+    "child_pid": 2940316,
+    "exit": 0,
+    "seconds": 12.516977011982817,
+    "inputs": 1872,
+    "drift": []
+  },
+  "input_validation": {
+    "scope": "Four genuine new authored INPUTs before any runtime adapter change. No exported output rewritten.",
+    "steps": [
+      {
+        "name": "official",
+        "command": [
+          "/home/blux/.local/bin/uv",
+          "run",
+          "--offline",
+          "--with",
+          "jsonschema",
+          "python",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-uv-targets-ccc/artifacts/targets-proof/input-validation/official.py",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-uv-targets-ccc/artifacts/targets-proof/counter/varying-uv/source-varying-uv.vrm",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-uv-targets-ccc/artifacts/targets-proof/counter/zero-uv/source-zero-uv.vrm",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-uv-targets-ccc/artifacts/targets-proof/counter/uniform-roles-uv/source-uniform-roles-uv.vrm",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-uv-targets-ccc/artifacts/targets-proof/counter/zero-roles-uv/source-zero-roles-uv.vrm"
+        ],
+        "exit": 0,
+        "seconds": 0.5290800069924444
+      },
+      {
+        "name": "khronos",
+        "command": [
+          "node",
+          "-e",
+          "const fs=require('fs'),v=require('/home/blux/de-xr/dome-sculpt/artifacts/gltf-validator/node_modules/gltf-validator');(async()=>{let code=0;const all=[];for(const p of process.argv.slice(1)){const r=await v.validateBytes(new Uint8Array(fs.readFileSync(p)),{maxIssues:0,uri:p});all.push({path:p,result:r});if(r.issues.numErrors)code=1;}process.stdout.write(JSON.stringify(all,null,2));process.exitCode=code;})();",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-uv-targets-ccc/artifacts/targets-proof/counter/varying-uv/source-varying-uv.vrm",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-uv-targets-ccc/artifacts/targets-proof/counter/zero-uv/source-zero-uv.vrm",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-uv-targets-ccc/artifacts/targets-proof/counter/uniform-roles-uv/source-uniform-roles-uv.vrm",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-uv-targets-ccc/artifacts/targets-proof/counter/zero-roles-uv/source-zero-roles-uv.vrm"
+        ],
+        "exit": 0,
+        "seconds": 0.4745087129995227
+      }
+    ],
+    "inputs": {
+      "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-uv-targets-ccc/artifacts/targets-proof/counter/varying-uv/source-varying-uv.vrm": "cdb8c1913e56e1be9bac222c6cb1382241792da6b37594678ee6f8e59dcf930b",
+      "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-uv-targets-ccc/artifacts/targets-proof/counter/zero-uv/source-zero-uv.vrm": "35b4e52ce4b4079f884187238d93b0d30260019bace741a6c489671da1a62f91",
+      "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-uv-targets-ccc/artifacts/targets-proof/counter/uniform-roles-uv/source-uniform-roles-uv.vrm": "f0c7157cfaafcb2e641bd8211326c9878394c0ecbb38637a465e299657137466",
+      "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-uv-targets-ccc/artifacts/targets-proof/counter/zero-roles-uv/source-zero-roles-uv.vrm": "a839124f9e3348942df741f69bbd071231e3661edeefb70be6eb5a94187b4ee3"
+    }
+  },
+  "official": [
+    {
+      "file": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-uv-targets-ccc/artifacts/targets-proof/counter/varying-uv/source-varying-uv.vrm",
+      "checks": [
+        {
+          "kind": "VRMC_vrm-1.0",
+          "schema": "VRMC_vrm.schema.json",
+          "errors": []
+        },
+        {
+          "kind": "VRMC_springBone-1.0",
+          "schema": "VRMC_springBone.schema.json",
+          "errors": []
+        },
+        {
+          "kind": "VRMC_node_constraint-1.0",
+          "schema": "VRMC_node_constraint.schema.json",
+          "errors": []
+        },
+        {
+          "kind": "VRMC_node_constraint-1.0",
+          "schema": "VRMC_node_constraint.schema.json",
+          "errors": []
+        },
+        {
+          "kind": "VRMC_node_constraint-1.0",
+          "schema": "VRMC_node_constraint.schema.json",
+          "errors": []
+        },
+        {
+          "kind": "VRMC_materials_mtoon-1.0",
+          "schema": "VRMC_materials_mtoon.schema.json",
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-uv-targets-ccc/artifacts/targets-proof/counter/zero-uv/source-zero-uv.vrm",
+      "checks": [
+        {
+          "kind": "VRMC_vrm-1.0",
+          "schema": "VRMC_vrm.schema.json",
+          "errors": []
+        },
+        {
+          "kind": "VRMC_springBone-1.0",
+          "schema": "VRMC_springBone.schema.json",
+          "errors": []
+        },
+        {
+          "kind": "VRMC_node_constraint-1.0",
+          "schema": "VRMC_node_constraint.schema.json",
+          "errors": []
+        },
+        {
+          "kind": "VRMC_node_constraint-1.0",
+          "schema": "VRMC_node_constraint.schema.json",
+          "errors": []
+        },
+        {
+          "kind": "VRMC_node_constraint-1.0",
+          "schema": "VRMC_node_constraint.schema.json",
+          "errors": []
+        },
+        {
+          "kind": "VRMC_materials_mtoon-1.0",
+          "schema": "VRMC_materials_mtoon.schema.json",
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-uv-targets-ccc/artifacts/targets-proof/counter/uniform-roles-uv/source-uniform-roles-uv.vrm",
+      "checks": [
+        {
+          "kind": "VRMC_vrm-1.0",
+          "schema": "VRMC_vrm.schema.json",
+          "errors": []
+        },
+        {
+          "kind": "VRMC_springBone-1.0",
+          "schema": "VRMC_springBone.schema.json",
+          "errors": []
+        },
+        {
+          "kind": "VRMC_node_constraint-1.0",
+          "schema": "VRMC_node_constraint.schema.json",
+          "errors": []
+        },
+        {
+          "kind": "VRMC_node_constraint-1.0",
+          "schema": "VRMC_node_constraint.schema.json",
+          "errors": []
+        },
+        {
+          "kind": "VRMC_node_constraint-1.0",
+          "schema": "VRMC_node_constraint.schema.json",
+          "errors": []
+        },
+        {
+          "kind": "VRMC_materials_mtoon-1.0",
+          "schema": "VRMC_materials_mtoon.schema.json",
+          "errors": []
+        }
+      ]
+    },
+    {
+      "file": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-uv-targets-ccc/artifacts/targets-proof/counter/zero-roles-uv/source-zero-roles-uv.vrm",
+      "checks": [
+        {
+          "kind": "VRMC_vrm-1.0",
+          "schema": "VRMC_vrm.schema.json",
+          "errors": []
+        },
+        {
+          "kind": "VRMC_springBone-1.0",
+          "schema": "VRMC_springBone.schema.json",
+          "errors": []
+        },
+        {
+          "kind": "VRMC_node_constraint-1.0",
+          "schema": "VRMC_node_constraint.schema.json",
+          "errors": []
+        },
+        {
+          "kind": "VRMC_node_constraint-1.0",
+          "schema": "VRMC_node_constraint.schema.json",
+          "errors": []
+        },
+        {
+          "kind": "VRMC_node_constraint-1.0",
+          "schema": "VRMC_node_constraint.schema.json",
+          "errors": []
+        },
+        {
+          "kind": "VRMC_materials_mtoon-1.0",
+          "schema": "VRMC_materials_mtoon.schema.json",
+          "errors": []
+        }
+      ]
+    }
+  ],
+  "khronos": [
+    {
+      "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-uv-targets-ccc/artifacts/targets-proof/counter/varying-uv/source-varying-uv.vrm": {
+        "numErrors": 0,
+        "numWarnings": 6,
+        "numInfos": 15,
+        "numHints": 12,
+        "messages": [
+          {
+            "code": "UNSUPPORTED_EXTENSION",
+            "message": "Cannot validate an extension as it is not supported by the validator: 'VRMC_vrm'.",
+            "severity": 2,
+            "pointer": "/extensionsUsed/0"
+          },
+          {
+            "code": "UNSUPPORTED_EXTENSION",
+            "message": "Cannot validate an extension as it is not supported by the validator: 'VRMC_materials_mtoon'.",
+            "severity": 2,
+            "pointer": "/extensionsUsed/1"
+          },
+          {
+            "code": "UNSUPPORTED_EXTENSION",
+            "message": "Cannot validate an extension as it is not supported by the validator: 'VRMC_springBone'.",
+            "severity": 2,
+            "pointer": "/extensionsUsed/3"
+          },
+          {
+            "code": "UNSUPPORTED_EXTENSION",
+            "message": "Cannot validate an extension as it is not supported by the validator: 'VRMC_node_constraint'.",
+            "severity": 2,
+            "pointer": "/extensionsUsed/4"
+          },
+          {
+            "code": "KHR_MATERIALS_EMISSIVE_STRENGTH_ZERO_FACTOR",
+            "message": "Emissive strength has no effect when the emissive factor is zero or undefined.",
+            "severity": 1,
+            "pointer": "/materials/0/extensions/KHR_materials_emissive_strength"
+          },
+          {
+            "code": "BUFFER_VIEW_TARGET_MISSING",
+            "message": "bufferView.target should be set for vertex or index data.",
+            "severity": 3,
+            "pointer": "/meshes/0/primitives/0/attributes/COLOR_0"
+          },
+          {
+            "code": "BUFFER_VIEW_TARGET_MISSING",
+            "message": "bufferView.target should be set for vertex or index data.",
+            "severity": 3,
+            "pointer": "/meshes/0/primitives/0/attributes/JOINTS_0"
+          },
+          {
+            "code": "BUFFER_VIEW_TARGET_MISSING",
+            "message": "bufferView.target should be set for vertex or index data.",
+            "severity": 3,
+            "pointer": "/meshes/0/primitives/0/attributes/NORMAL"
+          },
+          {
+            "code": "BUFFER_VIEW_TARGET_MISSING",
+            "message": "bufferView.target should be set for vertex or index data.",
+            "severity": 3,
+            "pointer": "/meshes/0/primitives/0/attributes/POSITION"
+          },
+          {
+            "code": "BUFFER_VIEW_TARGET_MISSING",
+            "message": "bufferView.target should be set for vertex or index data.",
+            "severity": 3,
+            "pointer": "/meshes/0/primitives/0/attributes/TANGENT"
+          },
+          {
+            "code": "BUFFER_VIEW_TARGET_MISSING",
+            "message": "bufferView.target should be set for vertex or index data.",
+            "severity": 3,
+            "pointer": "/meshes/0/primitives/0/attributes/TEXCOORD_0"
+          },
+          {
+            "code": "BUFFER_VIEW_TARGET_MISSING",
+            "message": "bufferView.target should be set for vertex or index data.",
+            "severity": 3,
+            "pointer": "/meshes/0/primitives/0/attributes/TEXCOORD_1"
+          },
+          {
+            "code": "BUFFER_VIEW_TARGET_MISSING",
+            "message": "bufferView.target should be set for vertex or index data.",
+            "severity": 3,
+            "pointer": "/meshes/0/primitives/0/attributes/WEIGHTS_0"
+          },
+          {
+            "code": "BUFFER_VIEW_TARGET_MISSING",
+            "message": "bufferView.target should be set for vertex or index data.",
+            "severity": 3,
+            "pointer": "/meshes/0/primitives/0/indices"
+          },
+          {
+            "code": "UNUSED_MESH_TANGENT",
+            "message": "Tangents are not used because the material has no normal texture.",
+            "severity": 2,
+            "pointer": "/meshes/0/primitives/0/attributes/TANGENT"
+          },
+          {
+            "code": "BUFFER_VIEW_TARGET_MISSING",
+            "message": "bufferView.target should be set for vertex or index data.",
+            "severity": 3,
+            "pointer": "/meshes/0/primitives/0/targets/0/NORMAL"
+          },
+          {
+            "code": "BUFFER_VIEW_TARGET_MISSING",
+            "message": "bufferView.target should be set for vertex or index data.",
+            "severity": 3,
+            "pointer": "/meshes/0/primitives/0/targets/0/POSITION"
+          },
+          {
+            "code": "BUFFER_VIEW_TARGET_MISSING",
+            "message": "bufferView.target should be set for vertex or index data.",
+            "severity": 3,
+            "pointer": "/meshes/0/primitives/0/targets/0/TANGENT"
+          },
+          {
+            "code": "NODE_SKINNED_MESH_WITHOUT_SKIN",
+            "message": "Node uses skinned mesh, but has no skin defined.",
+            "severity": 1,
+            "pointer": "/nodes/23"
+          },
+          {
+            "code": "NODE_SKINNED_MESH_NON_ROOT",
+            "message": "Node with a skinned mesh is not root. Parent transforms will not affect a skinned mesh.",
+            "severity": 1,
+            "pointer": "/nodes/1"
+          },
+          {
+            "code": "NODE_SKINNED_MESH_LOCAL_TRANSFORMS",
+            "message": "Local transforms will not affect a skinned mesh.",
+            "severity": 1,
+            "pointer": "/nodes/1"
+          },
+          {
+            "code": "NODE_SKINNED_MESH_NON_ROOT",
+            "message": "Node with a skinned mesh is not root. Parent transforms will not affect a skinned mesh.",
+            "severity": 1,
+            "pointer": "/nodes/2"
+          },
+          {
+            "code": "NODE_SKINNED_MESH_LOCAL_TRANSFORMS",
+            "message": "Local transforms will not affect a skinned mesh.",
+            "severity": 1,
+            "pointer": "/nodes/2"
+          },
+          {
+            "code": "NODE_EMPTY",
+            "message": "Empty node encountered.",
+            "severity": 2,
+            "pointer": "/nodes/8"
+          },
+          {
+            "code": "NODE_EMPTY",
+            "message": "Empty node encountered.",
+            "severity": 2,
+            "pointer": "/nodes/11"
+          },
+          {
+            "code": "NODE_EMPTY",
+            "message": "Empty node encountered.",
+            "severity": 2,
+            "pointer": "/nodes/14"
+          },
+          {
+            "code": "NODE_EMPTY",
+            "message": "Empty node encountered.",
+            "severity": 2,
+            "pointer": "/nodes/17"
+          },
+          {
+            "code": "NODE_EMPTY",
+            "message": "Empty node encountered.",
+            "severity": 2,
+            "pointer": "/nodes/19"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/accessors/12"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/accessors/13"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/bufferViews/10"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/textures/1"
+          },
+          {
+            "code": "UNUSED_MESH_WEIGHTS",
+            "message": "The static morph target weights are always overridden.",
+            "severity": 2,
+            "pointer": "/meshes/0/weights"
+          }
+        ],
+        "truncated": false
+      }
+    },
+    {
+      "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-uv-targets-ccc/artifacts/targets-proof/counter/zero-uv/source-zero-uv.vrm": {
+        "numErrors": 0,
+        "numWarnings": 6,
+        "numInfos": 15,
+        "numHints": 12,
+        "messages": [
+          {
+            "code": "UNSUPPORTED_EXTENSION",
+            "message": "Cannot validate an extension as it is not supported by the validator: 'VRMC_vrm'.",
+            "severity": 2,
+            "pointer": "/extensionsUsed/0"
+          },
+          {
+            "code": "UNSUPPORTED_EXTENSION",
+            "message": "Cannot validate an extension as it is not supported by the validator: 'VRMC_materials_mtoon'.",
+            "severity": 2,
+            "pointer": "/extensionsUsed/1"
+          },
+          {
+            "code": "UNSUPPORTED_EXTENSION",
+            "message": "Cannot validate an extension as it is not supported by the validator: 'VRMC_springBone'.",
+            "severity": 2,
+            "pointer": "/extensionsUsed/3"
+          },
+          {
+            "code": "UNSUPPORTED_EXTENSION",
+            "message": "Cannot validate an extension as it is not supported by the validator: 'VRMC_node_constraint'.",
+            "severity": 2,
+            "pointer": "/extensionsUsed/4"
+          },
+          {
+            "code": "KHR_MATERIALS_EMISSIVE_STRENGTH_ZERO_FACTOR",
+            "message": "Emissive strength has no effect when the emissive factor is zero or undefined.",
+            "severity": 1,
+            "pointer": "/materials/0/extensions/KHR_materials_emissive_strength"
+          },
+          {
+            "code": "BUFFER_VIEW_TARGET_MISSING",
+            "message": "bufferView.target should be set for vertex or index data.",
+            "severity": 3,
+            "pointer": "/meshes/0/primitives/0/attributes/COLOR_0"
+          },
+          {
+            "code": "BUFFER_VIEW_TARGET_MISSING",
+            "message": "bufferView.target should be set for vertex or index data.",
+            "severity": 3,
+            "pointer": "/meshes/0/primitives/0/attributes/JOINTS_0"
+          },
+          {
+            "code": "BUFFER_VIEW_TARGET_MISSING",
+            "message": "bufferView.target should be set for vertex or index data.",
+            "severity": 3,
+            "pointer": "/meshes/0/primitives/0/attributes/NORMAL"
+          },
+          {
+            "code": "BUFFER_VIEW_TARGET_MISSING",
+            "message": "bufferView.target should be set for vertex or index data.",
+            "severity": 3,
+            "pointer": "/meshes/0/primitives/0/attributes/POSITION"
+          },
+          {
+            "code": "BUFFER_VIEW_TARGET_MISSING",
+            "message": "bufferView.target should be set for vertex or index data.",
+            "severity": 3,
+            "pointer": "/meshes/0/primitives/0/attributes/TANGENT"
+          },
+          {
+            "code": "BUFFER_VIEW_TARGET_MISSING",
+            "message": "bufferView.target should be set for vertex or index data.",
+            "severity": 3,
+            "pointer": "/meshes/0/primitives/0/attributes/TEXCOORD_0"
+          },
+          {
+            "code": "BUFFER_VIEW_TARGET_MISSING",
+            "message": "bufferView.target should be set for vertex or index data.",
+            "severity": 3,
+            "pointer": "/meshes/0/primitives/0/attributes/TEXCOORD_1"
+          },
+          {
+            "code": "BUFFER_VIEW_TARGET_MISSING",
+            "message": "bufferView.target should be set for vertex or index data.",
+            "severity": 3,
+            "pointer": "/meshes/0/primitives/0/attributes/WEIGHTS_0"
+          },
+          {
+            "code": "BUFFER_VIEW_TARGET_MISSING",
+            "message": "bufferView.target should be set for vertex or index data.",
+            "severity": 3,
+            "pointer": "/meshes/0/primitives/0/indices"
+          },
+          {
+            "code": "UNUSED_MESH_TANGENT",
+            "message": "Tangents are not used because the material has no normal texture.",
+            "severity": 2,
+            "pointer": "/meshes/0/primitives/0/attributes/TANGENT"
+          },
+          {
+            "code": "BUFFER_VIEW_TARGET_MISSING",
+            "message": "bufferView.target should be set for vertex or index data.",
+            "severity": 3,
+            "pointer": "/meshes/0/primitives/0/targets/0/NORMAL"
+          },
+          {
+            "code": "BUFFER_VIEW_TARGET_MISSING",
+            "message": "bufferView.target should be set for vertex or index data.",
+            "severity": 3,
+            "pointer": "/meshes/0/primitives/0/targets/0/POSITION"
+          },
+          {
+            "code": "BUFFER_VIEW_TARGET_MISSING",
+            "message": "bufferView.target should be set for vertex or index data.",
+            "severity": 3,
+            "pointer": "/meshes/0/primitives/0/targets/0/TANGENT"
+          },
+          {
+            "code": "NODE_SKINNED_MESH_WITHOUT_SKIN",
+            "message": "Node uses skinned mesh, but has no skin defined.",
+            "severity": 1,
+            "pointer": "/nodes/23"
+          },
+          {
+            "code": "NODE_SKINNED_MESH_NON_ROOT",
+            "message": "Node with a skinned mesh is not root. Parent transforms will not affect a skinned mesh.",
+            "severity": 1,
+            "pointer": "/nodes/1"
+          },
+          {
+            "code": "NODE_SKINNED_MESH_LOCAL_TRANSFORMS",
+            "message": "Local transforms will not affect a skinned mesh.",
+            "severity": 1,
+            "pointer": "/nodes/1"
+          },
+          {
+            "code": "NODE_SKINNED_MESH_NON_ROOT",
+            "message": "Node with a skinned mesh is not root. Parent transforms will not affect a skinned mesh.",
+            "severity": 1,
+            "pointer": "/nodes/2"
+          },
+          {
+            "code": "NODE_SKINNED_MESH_LOCAL_TRANSFORMS",
+            "message": "Local transforms will not affect a skinned mesh.",
+            "severity": 1,
+            "pointer": "/nodes/2"
+          },
+          {
+            "code": "NODE_EMPTY",
+            "message": "Empty node encountered.",
+            "severity": 2,
+            "pointer": "/nodes/8"
+          },
+          {
+            "code": "NODE_EMPTY",
+            "message": "Empty node encountered.",
+            "severity": 2,
+            "pointer": "/nodes/11"
+          },
+          {
+            "code": "NODE_EMPTY",
+            "message": "Empty node encountered.",
+            "severity": 2,
+            "pointer": "/nodes/14"
+          },
+          {
+            "code": "NODE_EMPTY",
+            "message": "Empty node encountered.",
+            "severity": 2,
+            "pointer": "/nodes/17"
+          },
+          {
+            "code": "NODE_EMPTY",
+            "message": "Empty node encountered.",
+            "severity": 2,
+            "pointer": "/nodes/19"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/accessors/12"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/accessors/13"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/bufferViews/10"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/textures/1"
+          },
+          {
+            "code": "UNUSED_MESH_WEIGHTS",
+            "message": "The static morph target weights are always overridden.",
+            "severity": 2,
+            "pointer": "/meshes/0/weights"
+          }
+        ],
+        "truncated": false
+      }
+    },
+    {
+      "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-uv-targets-ccc/artifacts/targets-proof/counter/uniform-roles-uv/source-uniform-roles-uv.vrm": {
+        "numErrors": 0,
+        "numWarnings": 5,
+        "numInfos": 17,
+        "numHints": 12,
+        "messages": [
+          {
+            "code": "UNSUPPORTED_EXTENSION",
+            "message": "Cannot validate an extension as it is not supported by the validator: 'VRMC_vrm'.",
+            "severity": 2,
+            "pointer": "/extensionsUsed/0"
+          },
+          {
+            "code": "UNSUPPORTED_EXTENSION",
+            "message": "Cannot validate an extension as it is not supported by the validator: 'VRMC_materials_mtoon'.",
+            "severity": 2,
+            "pointer": "/extensionsUsed/1"
+          },
+          {
+            "code": "UNSUPPORTED_EXTENSION",
+            "message": "Cannot validate an extension as it is not supported by the validator: 'VRMC_springBone'.",
+            "severity": 2,
+            "pointer": "/extensionsUsed/3"
+          },
+          {
+            "code": "UNSUPPORTED_EXTENSION",
+            "message": "Cannot validate an extension as it is not supported by the validator: 'VRMC_node_constraint'.",
+            "severity": 2,
+            "pointer": "/extensionsUsed/4"
+          },
+          {
+            "code": "BUFFER_VIEW_TARGET_MISSING",
+            "message": "bufferView.target should be set for vertex or index data.",
+            "severity": 3,
+            "pointer": "/meshes/0/primitives/0/attributes/COLOR_0"
+          },
+          {
+            "code": "BUFFER_VIEW_TARGET_MISSING",
+            "message": "bufferView.target should be set for vertex or index data.",
+            "severity": 3,
+            "pointer": "/meshes/0/primitives/0/attributes/JOINTS_0"
+          },
+          {
+            "code": "BUFFER_VIEW_TARGET_MISSING",
+            "message": "bufferView.target should be set for vertex or index data.",
+            "severity": 3,
+            "pointer": "/meshes/0/primitives/0/attributes/NORMAL"
+          },
+          {
+            "code": "BUFFER_VIEW_TARGET_MISSING",
+            "message": "bufferView.target should be set for vertex or index data.",
+            "severity": 3,
+            "pointer": "/meshes/0/primitives/0/attributes/POSITION"
+          },
+          {
+            "code": "BUFFER_VIEW_TARGET_MISSING",
+            "message": "bufferView.target should be set for vertex or index data.",
+            "severity": 3,
+            "pointer": "/meshes/0/primitives/0/attributes/TANGENT"
+          },
+          {
+            "code": "BUFFER_VIEW_TARGET_MISSING",
+            "message": "bufferView.target should be set for vertex or index data.",
+            "severity": 3,
+            "pointer": "/meshes/0/primitives/0/attributes/TEXCOORD_0"
+          },
+          {
+            "code": "BUFFER_VIEW_TARGET_MISSING",
+            "message": "bufferView.target should be set for vertex or index data.",
+            "severity": 3,
+            "pointer": "/meshes/0/primitives/0/attributes/TEXCOORD_1"
+          },
+          {
+            "code": "BUFFER_VIEW_TARGET_MISSING",
+            "message": "bufferView.target should be set for vertex or index data.",
+            "severity": 3,
+            "pointer": "/meshes/0/primitives/0/attributes/WEIGHTS_0"
+          },
+          {
+            "code": "BUFFER_VIEW_TARGET_MISSING",
+            "message": "bufferView.target should be set for vertex or index data.",
+            "severity": 3,
+            "pointer": "/meshes/0/primitives/0/indices"
+          },
+          {
+            "code": "UNUSED_MESH_TANGENT",
+            "message": "Tangents are not used because the material has no normal texture.",
+            "severity": 2,
+            "pointer": "/meshes/0/primitives/0/attributes/TANGENT"
+          },
+          {
+            "code": "BUFFER_VIEW_TARGET_MISSING",
+            "message": "bufferView.target should be set for vertex or index data.",
+            "severity": 3,
+            "pointer": "/meshes/0/primitives/0/targets/0/NORMAL"
+          },
+          {
+            "code": "BUFFER_VIEW_TARGET_MISSING",
+            "message": "bufferView.target should be set for vertex or index data.",
+            "severity": 3,
+            "pointer": "/meshes/0/primitives/0/targets/0/POSITION"
+          },
+          {
+            "code": "BUFFER_VIEW_TARGET_MISSING",
+            "message": "bufferView.target should be set for vertex or index data.",
+            "severity": 3,
+            "pointer": "/meshes/0/primitives/0/targets/0/TANGENT"
+          },
+          {
+            "code": "NODE_SKINNED_MESH_WITHOUT_SKIN",
+            "message": "Node uses skinned mesh, but has no skin defined.",
+            "severity": 1,
+            "pointer": "/nodes/23"
+          },
+          {
+            "code": "NODE_SKINNED_MESH_NON_ROOT",
+            "message": "Node with a skinned mesh is not root. Parent transforms will not affect a skinned mesh.",
+            "severity": 1,
+            "pointer": "/nodes/1"
+          },
+          {
+            "code": "NODE_SKINNED_MESH_LOCAL_TRANSFORMS",
+            "message": "Local transforms will not affect a skinned mesh.",
+            "severity": 1,
+            "pointer": "/nodes/1"
+          },
+          {
+            "code": "NODE_SKINNED_MESH_NON_ROOT",
+            "message": "Node with a skinned mesh is not root. Parent transforms will not affect a skinned mesh.",
+            "severity": 1,
+            "pointer": "/nodes/2"
+          },
+          {
+            "code": "NODE_SKINNED_MESH_LOCAL_TRANSFORMS",
+            "message": "Local transforms will not affect a skinned mesh.",
+            "severity": 1,
+            "pointer": "/nodes/2"
+          },
+          {
+            "code": "NODE_EMPTY",
+            "message": "Empty node encountered.",
+            "severity": 2,
+            "pointer": "/nodes/8"
+          },
+          {
+            "code": "NODE_EMPTY",
+            "message": "Empty node encountered.",
+            "severity": 2,
+            "pointer": "/nodes/11"
+          },
+          {
+            "code": "NODE_EMPTY",
+            "message": "Empty node encountered.",
+            "severity": 2,
+            "pointer": "/nodes/14"
+          },
+          {
+            "code": "NODE_EMPTY",
+            "message": "Empty node encountered.",
+            "severity": 2,
+            "pointer": "/nodes/17"
+          },
+          {
+            "code": "NODE_EMPTY",
+            "message": "Empty node encountered.",
+            "severity": 2,
+            "pointer": "/nodes/19"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/accessors/12"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/accessors/13"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/bufferViews/10"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/bufferViews/17"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/bufferViews/18"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/textures/1"
+          },
+          {
+            "code": "UNUSED_MESH_WEIGHTS",
+            "message": "The static morph target weights are always overridden.",
+            "severity": 2,
+            "pointer": "/meshes/0/weights"
+          }
+        ],
+        "truncated": false
+      }
+    },
+    {
+      "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-uv-targets-ccc/artifacts/targets-proof/counter/zero-roles-uv/source-zero-roles-uv.vrm": {
+        "numErrors": 0,
+        "numWarnings": 6,
+        "numInfos": 15,
+        "numHints": 12,
+        "messages": [
+          {
+            "code": "UNSUPPORTED_EXTENSION",
+            "message": "Cannot validate an extension as it is not supported by the validator: 'VRMC_vrm'.",
+            "severity": 2,
+            "pointer": "/extensionsUsed/0"
+          },
+          {
+            "code": "UNSUPPORTED_EXTENSION",
+            "message": "Cannot validate an extension as it is not supported by the validator: 'VRMC_materials_mtoon'.",
+            "severity": 2,
+            "pointer": "/extensionsUsed/1"
+          },
+          {
+            "code": "UNSUPPORTED_EXTENSION",
+            "message": "Cannot validate an extension as it is not supported by the validator: 'VRMC_springBone'.",
+            "severity": 2,
+            "pointer": "/extensionsUsed/3"
+          },
+          {
+            "code": "UNSUPPORTED_EXTENSION",
+            "message": "Cannot validate an extension as it is not supported by the validator: 'VRMC_node_constraint'.",
+            "severity": 2,
+            "pointer": "/extensionsUsed/4"
+          },
+          {
+            "code": "KHR_MATERIALS_EMISSIVE_STRENGTH_ZERO_FACTOR",
+            "message": "Emissive strength has no effect when the emissive factor is zero or undefined.",
+            "severity": 1,
+            "pointer": "/materials/0/extensions/KHR_materials_emissive_strength"
+          },
+          {
+            "code": "BUFFER_VIEW_TARGET_MISSING",
+            "message": "bufferView.target should be set for vertex or index data.",
+            "severity": 3,
+            "pointer": "/meshes/0/primitives/0/attributes/COLOR_0"
+          },
+          {
+            "code": "BUFFER_VIEW_TARGET_MISSING",
+            "message": "bufferView.target should be set for vertex or index data.",
+            "severity": 3,
+            "pointer": "/meshes/0/primitives/0/attributes/JOINTS_0"
+          },
+          {
+            "code": "BUFFER_VIEW_TARGET_MISSING",
+            "message": "bufferView.target should be set for vertex or index data.",
+            "severity": 3,
+            "pointer": "/meshes/0/primitives/0/attributes/NORMAL"
+          },
+          {
+            "code": "BUFFER_VIEW_TARGET_MISSING",
+            "message": "bufferView.target should be set for vertex or index data.",
+            "severity": 3,
+            "pointer": "/meshes/0/primitives/0/attributes/POSITION"
+          },
+          {
+            "code": "BUFFER_VIEW_TARGET_MISSING",
+            "message": "bufferView.target should be set for vertex or index data.",
+            "severity": 3,
+            "pointer": "/meshes/0/primitives/0/attributes/TANGENT"
+          },
+          {
+            "code": "BUFFER_VIEW_TARGET_MISSING",
+            "message": "bufferView.target should be set for vertex or index data.",
+            "severity": 3,
+            "pointer": "/meshes/0/primitives/0/attributes/TEXCOORD_0"
+          },
+          {
+            "code": "BUFFER_VIEW_TARGET_MISSING",
+            "message": "bufferView.target should be set for vertex or index data.",
+            "severity": 3,
+            "pointer": "/meshes/0/primitives/0/attributes/TEXCOORD_1"
+          },
+          {
+            "code": "BUFFER_VIEW_TARGET_MISSING",
+            "message": "bufferView.target should be set for vertex or index data.",
+            "severity": 3,
+            "pointer": "/meshes/0/primitives/0/attributes/WEIGHTS_0"
+          },
+          {
+            "code": "BUFFER_VIEW_TARGET_MISSING",
+            "message": "bufferView.target should be set for vertex or index data.",
+            "severity": 3,
+            "pointer": "/meshes/0/primitives/0/indices"
+          },
+          {
+            "code": "UNUSED_MESH_TANGENT",
+            "message": "Tangents are not used because the material has no normal texture.",
+            "severity": 2,
+            "pointer": "/meshes/0/primitives/0/attributes/TANGENT"
+          },
+          {
+            "code": "BUFFER_VIEW_TARGET_MISSING",
+            "message": "bufferView.target should be set for vertex or index data.",
+            "severity": 3,
+            "pointer": "/meshes/0/primitives/0/targets/0/NORMAL"
+          },
+          {
+            "code": "BUFFER_VIEW_TARGET_MISSING",
+            "message": "bufferView.target should be set for vertex or index data.",
+            "severity": 3,
+            "pointer": "/meshes/0/primitives/0/targets/0/POSITION"
+          },
+          {
+            "code": "BUFFER_VIEW_TARGET_MISSING",
+            "message": "bufferView.target should be set for vertex or index data.",
+            "severity": 3,
+            "pointer": "/meshes/0/primitives/0/targets/0/TANGENT"
+          },
+          {
+            "code": "NODE_SKINNED_MESH_WITHOUT_SKIN",
+            "message": "Node uses skinned mesh, but has no skin defined.",
+            "severity": 1,
+            "pointer": "/nodes/23"
+          },
+          {
+            "code": "NODE_SKINNED_MESH_NON_ROOT",
+            "message": "Node with a skinned mesh is not root. Parent transforms will not affect a skinned mesh.",
+            "severity": 1,
+            "pointer": "/nodes/1"
+          },
+          {
+            "code": "NODE_SKINNED_MESH_LOCAL_TRANSFORMS",
+            "message": "Local transforms will not affect a skinned mesh.",
+            "severity": 1,
+            "pointer": "/nodes/1"
+          },
+          {
+            "code": "NODE_SKINNED_MESH_NON_ROOT",
+            "message": "Node with a skinned mesh is not root. Parent transforms will not affect a skinned mesh.",
+            "severity": 1,
+            "pointer": "/nodes/2"
+          },
+          {
+            "code": "NODE_SKINNED_MESH_LOCAL_TRANSFORMS",
+            "message": "Local transforms will not affect a skinned mesh.",
+            "severity": 1,
+            "pointer": "/nodes/2"
+          },
+          {
+            "code": "NODE_EMPTY",
+            "message": "Empty node encountered.",
+            "severity": 2,
+            "pointer": "/nodes/8"
+          },
+          {
+            "code": "NODE_EMPTY",
+            "message": "Empty node encountered.",
+            "severity": 2,
+            "pointer": "/nodes/11"
+          },
+          {
+            "code": "NODE_EMPTY",
+            "message": "Empty node encountered.",
+            "severity": 2,
+            "pointer": "/nodes/14"
+          },
+          {
+            "code": "NODE_EMPTY",
+            "message": "Empty node encountered.",
+            "severity": 2,
+            "pointer": "/nodes/17"
+          },
+          {
+            "code": "NODE_EMPTY",
+            "message": "Empty node encountered.",
+            "severity": 2,
+            "pointer": "/nodes/19"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/accessors/12"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/accessors/13"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/bufferViews/10"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/textures/1"
+          },
+          {
+            "code": "UNUSED_MESH_WEIGHTS",
+            "message": "The static morph target weights are always overridden.",
+            "severity": 2,
+            "pointer": "/meshes/0/weights"
+          }
+        ],
+        "truncated": false
+      }
+    }
+  ],
+  "scope": "Actual56old-worker checks across differing/zero/shared-zero/unshared-uniform/unshared-zero contributions, unchanged original caller and previous files. Authored geometry/skin/morph BIN prefix retained; uniform-role INPUT intentionally adds genuine constant RGB images at original dimensions. No runtime support claim.",
+  "strengthened_uniform": {
+    "counter": {
+      "state": "terminal",
+      "pid": 2755879,
+      "steps": [
+        {
+          "name": "compile",
+          "command": [
+            "/usr/bin/c++",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-uv-targets-ccc/src",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-uv-targets-ccc/third_party/cgltf",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-uv-targets-ccc/include",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-uv-targets-ccc/third_party/openbrush",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-uv-targets-ccc/third_party/nlohmann",
+            "-O3",
+            "-DNDEBUG",
+            "-std=gnu++20",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-uv-targets-ccc/artifacts/targets-proof/counter-v2-uniform/worker.o",
+            "-c",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-uv-targets-ccc/tests/vrm1-expression-layer-authoring.cpp"
+          ],
+          "exit": 0,
+          "seconds": 12.072818299988285
+        },
+        {
+          "name": "link",
+          "command": [
+            "/usr/bin/c++",
+            "-O3",
+            "-DNDEBUG",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-uv-targets-ccc/artifacts/targets-proof/counter-v2-uniform/worker.o",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-uv-targets-ccc/artifacts/targets-proof/counter-v2-uniform/worker",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-alpha-5310/artifacts/shared-proof/current-release/stage/libdome-sculpt-core.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-alpha-5310/artifacts/shared-proof/current-release/stage/libdome-sculpt-affine.a",
+            "/usr/lib64/liblapacke.so",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-alpha-5310/artifacts/shared-proof/current-release/stage/libdome-sculpt-polygon.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-alpha-5310/artifacts/shared-proof/current-release/stage/libxatlas.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-alpha-5310/artifacts/shared-proof/current-release/stage/libmikktspace.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-alpha-5310/artifacts/shared-proof/current-release/stage/libmikktspace-robust.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-alpha-5310/artifacts/shared-proof/current-release/stage/libufbx.a",
+            "/usr/lib64/libpng.so",
+            "/usr/lib64/libjpeg.so",
+            "/usr/lib64/libz.so",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-alpha-5310/artifacts/shared-proof/current-release/stage/libdome-sculpt-emission-codec.a",
+            "/usr/lib64/libOpenEXR-3_2.so",
+            "/usr/lib64/libOpenEXRUtil-3_2.so",
+            "/usr/lib64/libOpenEXRCore-3_2.so",
+            "/usr/lib64/libIex-3_2.so",
+            "/usr/lib64/libIlmThread-3_2.so",
+            "/usr/lib64/libImath-3_1.so",
+            "-lgcc_s_asneeded",
+            "-lgcc_s_asneeded",
+            "-Wl,--wrap=fsync"
+          ],
+          "exit": 0,
+          "seconds": 0.4171647219918668
+        },
+        {
+          "name": "old-uniform-roles-uv",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-uv-targets-ccc/artifacts/targets-proof/counter-v2-uniform/worker",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-preview-1853cc3/build-preview-release/vrm1-background-fixture/source.vrm",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-uv-targets-ccc/artifacts/targets-proof/counter-v2-uniform/uniform-roles-uv",
+            "--old-refusal",
+            "--uniform-roles-uv"
+          ],
+          "exit": 0,
+          "seconds": 0.15112131502246484
+        }
+      ],
+      "scope": "Strengthened uniform-role INPUT preserves original varying base image0 and appends genuine separate constant shade/emission images. Current whole test TU calls only unchanged public API against oldccc matched support; no new private layer type consumed. Old firstcounter uniform all-role constant cohort retained separately.",
+      "child_pid": 2757224,
+      "exit": 0,
+      "seconds": 12.798845244047698,
+      "inputs": 1875,
+      "drift": []
+    },
+    "input_validation": {
+      "scope": "Strengthened genuine uniform shade/emission INPUT keeps original varying base image0, with new used role image descriptors rather than overwriting the shared source image. Original first weaker all-role-constant counter remains separate.",
+      "steps": [
+        {
+          "name": "official",
+          "command": [
+            "/home/blux/.local/bin/uv",
+            "run",
+            "--offline",
+            "--with",
+            "jsonschema",
+            "python",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-uv-targets-ccc/artifacts/targets-proof/input-validation-v2-uniform/official.py",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-uv-targets-ccc/artifacts/targets-proof/counter-v2-uniform/uniform-roles-uv/source-uniform-roles-uv.vrm"
+          ],
+          "exit": 0,
+          "seconds": 0.4677540740231052
+        },
+        {
+          "name": "khronos",
+          "command": [
+            "node",
+            "-e",
+            "const fs=require('fs'),v=require('/home/blux/de-xr/dome-sculpt/artifacts/gltf-validator/node_modules/gltf-validator');(async()=>{const r=await v.validateBytes(new Uint8Array(fs.readFileSync(process.argv[1])),{maxIssues:0,uri:process.argv[1]});process.stdout.write(JSON.stringify(r,null,2));process.exitCode=r.issues.numErrors?1:0;})();",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-uv-targets-ccc/artifacts/targets-proof/counter-v2-uniform/uniform-roles-uv/source-uniform-roles-uv.vrm"
+          ],
+          "exit": 0,
+          "seconds": 0.43498730298597366
+        }
+      ],
+      "input_sha256": "c231a3a464aafaee3754a7c6abdea7641fec6b80c4aaa7c72306e6ec3e8900c5"
+    },
+    "official": [
+      {
+        "file": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-uv-targets-ccc/artifacts/targets-proof/counter-v2-uniform/uniform-roles-uv/source-uniform-roles-uv.vrm",
+        "checks": [
+          {
+            "kind": "VRMC_vrm-1.0",
+            "schema": "VRMC_vrm.schema.json",
+            "errors": []
+          },
+          {
+            "kind": "VRMC_springBone-1.0",
+            "schema": "VRMC_springBone.schema.json",
+            "errors": []
+          },
+          {
+            "kind": "VRMC_node_constraint-1.0",
+            "schema": "VRMC_node_constraint.schema.json",
+            "errors": []
+          },
+          {
+            "kind": "VRMC_node_constraint-1.0",
+            "schema": "VRMC_node_constraint.schema.json",
+            "errors": []
+          },
+          {
+            "kind": "VRMC_node_constraint-1.0",
+            "schema": "VRMC_node_constraint.schema.json",
+            "errors": []
+          },
+          {
+            "kind": "VRMC_materials_mtoon-1.0",
+            "schema": "VRMC_materials_mtoon.schema.json",
+            "errors": []
+          }
+        ]
+      }
+    ],
+    "khronos": {
+      "numErrors": 0,
+      "numWarnings": 5,
+      "numInfos": 15,
+      "numHints": 12,
+      "messages": [
+        {
+          "code": "UNSUPPORTED_EXTENSION",
+          "message": "Cannot validate an extension as it is not supported by the validator: 'VRMC_vrm'.",
+          "severity": 2,
+          "pointer": "/extensionsUsed/0"
+        },
+        {
+          "code": "UNSUPPORTED_EXTENSION",
+          "message": "Cannot validate an extension as it is not supported by the validator: 'VRMC_materials_mtoon'.",
+          "severity": 2,
+          "pointer": "/extensionsUsed/1"
+        },
+        {
+          "code": "UNSUPPORTED_EXTENSION",
+          "message": "Cannot validate an extension as it is not supported by the validator: 'VRMC_springBone'.",
+          "severity": 2,
+          "pointer": "/extensionsUsed/3"
+        },
+        {
+          "code": "UNSUPPORTED_EXTENSION",
+          "message": "Cannot validate an extension as it is not supported by the validator: 'VRMC_node_constraint'.",
+          "severity": 2,
+          "pointer": "/extensionsUsed/4"
+        },
+        {
+          "code": "BUFFER_VIEW_TARGET_MISSING",
+          "message": "bufferView.target should be set for vertex or index data.",
+          "severity": 3,
+          "pointer": "/meshes/0/primitives/0/attributes/COLOR_0"
+        },
+        {
+          "code": "BUFFER_VIEW_TARGET_MISSING",
+          "message": "bufferView.target should be set for vertex or index data.",
+          "severity": 3,
+          "pointer": "/meshes/0/primitives/0/attributes/JOINTS_0"
+        },
+        {
+          "code": "BUFFER_VIEW_TARGET_MISSING",
+          "message": "bufferView.target should be set for vertex or index data.",
+          "severity": 3,
+          "pointer": "/meshes/0/primitives/0/attributes/NORMAL"
+        },
+        {
+          "code": "BUFFER_VIEW_TARGET_MISSING",
+          "message": "bufferView.target should be set for vertex or index data.",
+          "severity": 3,
+          "pointer": "/meshes/0/primitives/0/attributes/POSITION"
+        },
+        {
+          "code": "BUFFER_VIEW_TARGET_MISSING",
+          "message": "bufferView.target should be set for vertex or index data.",
+          "severity": 3,
+          "pointer": "/meshes/0/primitives/0/attributes/TANGENT"
+        },
+        {
+          "code": "BUFFER_VIEW_TARGET_MISSING",
+          "message": "bufferView.target should be set for vertex or index data.",
+          "severity": 3,
+          "pointer": "/meshes/0/primitives/0/attributes/TEXCOORD_0"
+        },
+        {
+          "code": "BUFFER_VIEW_TARGET_MISSING",
+          "message": "bufferView.target should be set for vertex or index data.",
+          "severity": 3,
+          "pointer": "/meshes/0/primitives/0/attributes/TEXCOORD_1"
+        },
+        {
+          "code": "BUFFER_VIEW_TARGET_MISSING",
+          "message": "bufferView.target should be set for vertex or index data.",
+          "severity": 3,
+          "pointer": "/meshes/0/primitives/0/attributes/WEIGHTS_0"
+        },
+        {
+          "code": "BUFFER_VIEW_TARGET_MISSING",
+          "message": "bufferView.target should be set for vertex or index data.",
+          "severity": 3,
+          "pointer": "/meshes/0/primitives/0/indices"
+        },
+        {
+          "code": "UNUSED_MESH_TANGENT",
+          "message": "Tangents are not used because the material has no normal texture.",
+          "severity": 2,
+          "pointer": "/meshes/0/primitives/0/attributes/TANGENT"
+        },
+        {
+          "code": "BUFFER_VIEW_TARGET_MISSING",
+          "message": "bufferView.target should be set for vertex or index data.",
+          "severity": 3,
+          "pointer": "/meshes/0/primitives/0/targets/0/NORMAL"
+        },
+        {
+          "code": "BUFFER_VIEW_TARGET_MISSING",
+          "message": "bufferView.target should be set for vertex or index data.",
+          "severity": 3,
+          "pointer": "/meshes/0/primitives/0/targets/0/POSITION"
+        },
+        {
+          "code": "BUFFER_VIEW_TARGET_MISSING",
+          "message": "bufferView.target should be set for vertex or index data.",
+          "severity": 3,
+          "pointer": "/meshes/0/primitives/0/targets/0/TANGENT"
+        },
+        {
+          "code": "NODE_SKINNED_MESH_WITHOUT_SKIN",
+          "message": "Node uses skinned mesh, but has no skin defined.",
+          "severity": 1,
+          "pointer": "/nodes/23"
+        },
+        {
+          "code": "NODE_SKINNED_MESH_NON_ROOT",
+          "message": "Node with a skinned mesh is not root. Parent transforms will not affect a skinned mesh.",
+          "severity": 1,
+          "pointer": "/nodes/1"
+        },
+        {
+          "code": "NODE_SKINNED_MESH_LOCAL_TRANSFORMS",
+          "message": "Local transforms will not affect a skinned mesh.",
+          "severity": 1,
+          "pointer": "/nodes/1"
+        },
+        {
+          "code": "NODE_SKINNED_MESH_NON_ROOT",
+          "message": "Node with a skinned mesh is not root. Parent transforms will not affect a skinned mesh.",
+          "severity": 1,
+          "pointer": "/nodes/2"
+        },
+        {
+          "code": "NODE_SKINNED_MESH_LOCAL_TRANSFORMS",
+          "message": "Local transforms will not affect a skinned mesh.",
+          "severity": 1,
+          "pointer": "/nodes/2"
+        },
+        {
+          "code": "NODE_EMPTY",
+          "message": "Empty node encountered.",
+          "severity": 2,
+          "pointer": "/nodes/8"
+        },
+        {
+          "code": "NODE_EMPTY",
+          "message": "Empty node encountered.",
+          "severity": 2,
+          "pointer": "/nodes/11"
+        },
+        {
+          "code": "NODE_EMPTY",
+          "message": "Empty node encountered.",
+          "severity": 2,
+          "pointer": "/nodes/14"
+        },
+        {
+          "code": "NODE_EMPTY",
+          "message": "Empty node encountered.",
+          "severity": 2,
+          "pointer": "/nodes/17"
+        },
+        {
+          "code": "NODE_EMPTY",
+          "message": "Empty node encountered.",
+          "severity": 2,
+          "pointer": "/nodes/19"
+        },
+        {
+          "code": "UNUSED_OBJECT",
+          "message": "This object may be unused.",
+          "severity": 2,
+          "pointer": "/accessors/12"
+        },
+        {
+          "code": "UNUSED_OBJECT",
+          "message": "This object may be unused.",
+          "severity": 2,
+          "pointer": "/accessors/13"
+        },
+        {
+          "code": "UNUSED_OBJECT",
+          "message": "This object may be unused.",
+          "severity": 2,
+          "pointer": "/bufferViews/10"
+        },
+        {
+          "code": "UNUSED_OBJECT",
+          "message": "This object may be unused.",
+          "severity": 2,
+          "pointer": "/textures/1"
+        },
+        {
+          "code": "UNUSED_MESH_WEIGHTS",
+          "message": "The static morph target weights are always overridden.",
+          "severity": 2,
+          "pointer": "/meshes/0/weights"
+        }
+      ],
+      "truncated": false
+    }
+  }
+}

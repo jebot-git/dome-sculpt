@@ -1,0 +1,93 @@
+{
+  "scope": "Valid authored input and actual existing196 public EditableAvatar256 worker refusal; no production change or wider-role admission.",
+  "base": "196ea9373dbb053c064a5c28783f1eb374a78987",
+  "status": {
+    "state": "terminal",
+    "pid": 3737873,
+    "steps": [
+      {
+        "name": "compile-vrm1-expression-layer-authoring",
+        "command": [
+          "/usr/bin/c++",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-coefficients-196/src",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-coefficients-196/third_party/cgltf",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-coefficients-196/include",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-coefficients-196/third_party/openbrush",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-coefficients-196/third_party/nlohmann",
+          "-O3",
+          "-DNDEBUG",
+          "-std=gnu++20",
+          "-o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-coefficients-196/artifacts/coefficient-proof/counter-release/stage/vrm1-expression-layer-authoring.cpp.o",
+          "-c",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-coefficients-196/tests/vrm1-expression-layer-authoring.cpp"
+        ],
+        "exit": 0,
+        "seconds": 8.29999804700492
+      },
+      {
+        "name": "link-worker",
+        "command": [
+          "/usr/bin/c++",
+          "-O3",
+          "-DNDEBUG",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-coefficients-196/artifacts/coefficient-proof/counter-release/stage/vrm1-expression-layer-authoring.cpp.o",
+          "-o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-coefficients-196/artifacts/coefficient-proof/counter-release/stage/worker",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-coefficients-196/artifacts/coefficient-proof/counter-release/stage/libdome-sculpt-core.a",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-coefficients-196/artifacts/coefficient-proof/counter-release/stage/libdome-sculpt-affine.a",
+          "/usr/lib64/liblapacke.so",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-coefficients-196/artifacts/coefficient-proof/counter-release/stage/libdome-sculpt-polygon.a",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-coefficients-196/artifacts/coefficient-proof/counter-release/stage/libxatlas.a",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-coefficients-196/artifacts/coefficient-proof/counter-release/stage/libmikktspace.a",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-coefficients-196/artifacts/coefficient-proof/counter-release/stage/libmikktspace-robust.a",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-coefficients-196/artifacts/coefficient-proof/counter-release/stage/libufbx.a",
+          "/usr/lib64/libpng.so",
+          "/usr/lib64/libjpeg.so",
+          "/usr/lib64/libz.so",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-coefficients-196/artifacts/coefficient-proof/counter-release/stage/libdome-sculpt-emission-codec.a",
+          "/usr/lib64/libOpenEXR-3_2.so",
+          "/usr/lib64/libOpenEXRUtil-3_2.so",
+          "/usr/lib64/libOpenEXRCore-3_2.so",
+          "/usr/lib64/libIex-3_2.so",
+          "/usr/lib64/libIlmThread-3_2.so",
+          "/usr/lib64/libImath-3_1.so",
+          "-lgcc_s_asneeded",
+          "-lgcc_s_asneeded",
+          "-Wl,--wrap=fsync"
+        ],
+        "exit": 0,
+        "seconds": 0.3111096950015053
+      },
+      {
+        "name": "wide-shade-refusal",
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-coefficients-196/artifacts/coefficient-proof/counter-release/stage/worker",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-preview-1853cc3/build-preview-release/vrm1-background-fixture/source.vrm",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-coefficients-196/artifacts/coefficient-proof/counter-release/wide-shade-run",
+          "--old-refusal",
+          "--wide-shade"
+        ],
+        "exit": 0,
+        "seconds": 0.10636587702902034
+      }
+    ],
+    "scope": "Test-only actual valid wider-shade worker against unchanged196 core. No producer change. Prior scope:Whole3directproductionTUs for new private invariant-role product on copied matchingccc owned support. Five actual worker/render domains, three actual public coupling refusals+Save/history, one new complex constant-role fullallocation/allCancel factory scope; no old broad sweep repetition, root35/freshapp/fullsuite claim.",
+    "child_pid": 3738753,
+    "exit": 0,
+    "seconds": 8.841951418027747,
+    "inputs": 1878,
+    "drift": []
+  },
+  "artifacts": {
+    "artifacts/coefficient-proof/counter-release/before.json": "523150e32669c1e16fe3668b31fd077b5819d477bff064b5c3ababc2d661be3d",
+    "artifacts/coefficient-proof/counter-release/after.json": "523150e32669c1e16fe3668b31fd077b5819d477bff064b5c3ababc2d661be3d",
+    "artifacts/coefficient-proof/counter-release/wide-shade-refusal.log": "6c899591afb170e51f9bc15b4685f5ebf7dfeb6805122b3625c0e3ed3ed19765",
+    "artifacts/coefficient-proof/counter-release/wide-shade-run/source-wide-shade.vrm": "8c276f0a56f3b8461005e47a7596e4cdc4f4ccf2c03ccc2ebeea4321aca61179",
+    "artifacts/coefficient-proof/counter-release/wide-shade-run/nonuniform-source.dsculpt": "087a2fdd1fecea7e432e884dc52af955202dc9d28ad98fcf72729e35dd1f748c",
+    "artifacts/coefficient-proof/spec/files.json": "ae5f958f346bd8ac2906955b8b482ca063be6056c0f55b62eabeddf1109b187b"
+  },
+  "specification": "94e82dd346fa6cf0337c4421728640e5252dd38e",
+  "consumer_audit": "efd20f62f1bf0ac3fcc34de1e497324c5197d146",
+  "remaining": "Actual target .99 divided by native .6 needs mapped1.65, permitted by generic VRM1 float4 schema. Producer and continuous error budget still refuse; no support claim."
+}

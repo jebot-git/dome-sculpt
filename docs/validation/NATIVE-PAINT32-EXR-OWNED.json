@@ -1,0 +1,667 @@
+{
+  "status": "qualified scoped owned EXR repair; private, not main admission or complete physical/normal-domain support",
+  "runtime": "da6a8e1556f07fa596cdbf88fd4debc107295aa3",
+  "parent": "66e2e5185759046578e730e843eb5227583ede48",
+  "implementation": {
+    "public_layout_or_schema_append": false,
+    "route": "Shared encode/decode/header API uses OpenEXR Core only; no production Imf high-level C++ reader/writer remains",
+    "ownership": "Per-call context allocator, aligned intrusive owning list, bounded provider allocation/free, scoped thread-local callback dispatch, RAII context/pipeline cleanup on every return/throw/cancel; no C++ exception crosses C callback",
+    "limits": "Original encoded/working/dimension/pixel caps unchanged. Actual raw/output capacities/context allocations including intrusive headers charged; no global failure disabling or suppression",
+    "guard": "Exact one-part increasing scanline ZIP, zero-origin matching windows, ten unique FLOAT planes, unit/version/coordinate attributes and premultiplied native values; actual metadata and field replay unchanged"
+  },
+  "original_negative": {
+    "status": "preserved failing sanitizer public export sweep",
+    "source": "2124ae4588c8cb515381a4aee520f5845edca131",
+    "exit": 1,
+    "leak_bytes": 5736,
+    "leak_allocations": 142,
+    "prefixes": 4038,
+    "observed": "System Imf Header/OutputFile partial construction under persistent C++new failure",
+    "status_artifact": "/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/artifacts/native32-package3-oom-sanitize/status.json",
+    "runtime_log": "/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/artifacts/native32-package3-oom-sanitize/runtime.log"
+  },
+  "fresh_coherent": {
+    "source": "da6a8e1556f07fa596cdbf88fd4debc107295aa3",
+    "scope": "fresh wholly owned core/render/support/application/inspector plus owned EXR and native32 package3 regressions; persistent public allocation sweep follows separately",
+    "results": [
+      {
+        "profile": "release",
+        "phase": "configure",
+        "command": [
+          "cmake",
+          "-S",
+          ".",
+          "-B",
+          "build-release",
+          "-G",
+          "Ninja",
+          "-DCMAKE_BUILD_TYPE=Release",
+          "-DBUILD_TESTING=ON",
+          "-DDOME_BUILD_UI=ON",
+          "-DDOME_BUILD_XR=ON",
+          "-DDOME_COMPUTE_BACKEND=CPU",
+          "-DCMAKE_EXPORT_COMPILE_COMMANDS=ON",
+          "-DFLTK_DIR=/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-release/share/fltk"
+        ],
+        "exit": 0,
+        "seconds": 8.677035208034795
+      },
+      {
+        "profile": "release",
+        "phase": "build",
+        "command": [
+          "nice",
+          "-n",
+          "15",
+          "cmake",
+          "--build",
+          "build-release",
+          "-j2",
+          "--target",
+          "dome-sculpt-emission-exr-test",
+          "dome-sculpt-emission-exr-owned-test",
+          "dome-sculpt",
+          "dome-sculpt-native-paint32-emission-test",
+          "dome-sculpt-native-paint32-emission-mixed-test",
+          "dome-sculpt-native-paint32-emission-contracts-test",
+          "dome-sculpt-native-paint32-export-test",
+          "dome-sculpt-xr-editable-export-test",
+          "dome-sculpt-native-physical-contracts-test",
+          "dome-sculpt-native-authoring-inspect",
+          "dome-sculpt-emission-export-test",
+          "dome-sculpt-emission-package-budget-test",
+          "dome-sculpt-source-paint-physical-authoring-test"
+        ],
+        "exit": 0,
+        "seconds": 718.9535894960281
+      },
+      {
+        "profile": "release",
+        "phase": "runtime",
+        "command": [
+          "ctest",
+          "--test-dir",
+          "build-release",
+          "-R",
+          "^(emission-exr|emission-exr-owned|native-paint32-emission|native-paint32-emission-mixed|native-paint32-emission-contracts|native-paint32-export|native-paint32-fixture|xr-native-paint32-export|xr-editable-export|emission-export|emission-package-budget|source-paint-physical-authoring)$",
+          "--output-on-failure"
+        ],
+        "exit": 0,
+        "seconds": 68.15079109999351
+      },
+      {
+        "profile": "sanitize",
+        "phase": "configure",
+        "command": [
+          "cmake",
+          "-S",
+          ".",
+          "-B",
+          "build-sanitize",
+          "-G",
+          "Ninja",
+          "-DCMAKE_BUILD_TYPE=Release",
+          "-DBUILD_TESTING=ON",
+          "-DDOME_BUILD_UI=ON",
+          "-DDOME_BUILD_XR=ON",
+          "-DDOME_COMPUTE_BACKEND=CPU",
+          "-DCMAKE_EXPORT_COMPILE_COMMANDS=ON",
+          "-DFLTK_DIR=/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-sanitize/share/fltk",
+          "-DCMAKE_C_FLAGS_RELEASE=-O1 -g1 -DNDEBUG -fsanitize=address,undefined -fno-omit-frame-pointer",
+          "-DCMAKE_CXX_FLAGS_RELEASE=-O1 -g1 -DNDEBUG -fsanitize=address,undefined -fno-omit-frame-pointer"
+        ],
+        "exit": 0,
+        "seconds": 8.044631803990342
+      },
+      {
+        "profile": "sanitize",
+        "phase": "build",
+        "command": [
+          "nice",
+          "-n",
+          "15",
+          "cmake",
+          "--build",
+          "build-sanitize",
+          "-j2",
+          "--target",
+          "dome-sculpt-emission-exr-test",
+          "dome-sculpt-emission-exr-owned-test",
+          "dome-sculpt",
+          "dome-sculpt-native-paint32-emission-test",
+          "dome-sculpt-native-paint32-emission-mixed-test",
+          "dome-sculpt-native-paint32-emission-contracts-test",
+          "dome-sculpt-native-paint32-export-test",
+          "dome-sculpt-xr-editable-export-test",
+          "dome-sculpt-native-physical-contracts-test",
+          "dome-sculpt-native-authoring-inspect",
+          "dome-sculpt-emission-export-test",
+          "dome-sculpt-emission-package-budget-test",
+          "dome-sculpt-source-paint-physical-authoring-test"
+        ],
+        "exit": 0,
+        "seconds": 1179.2185499210027
+      },
+      {
+        "profile": "sanitize",
+        "phase": "runtime",
+        "command": [
+          "ctest",
+          "--test-dir",
+          "build-sanitize",
+          "-R",
+          "^(emission-exr|emission-exr-owned|native-paint32-emission|native-paint32-emission-mixed|native-paint32-emission-contracts|native-paint32-export|native-paint32-fixture|xr-native-paint32-export|xr-editable-export|emission-export|emission-package-budget|source-paint-physical-authoring)$",
+          "--output-on-failure"
+        ],
+        "exit": 0,
+        "seconds": 151.8869200379704
+      }
+    ],
+    "exit": 0,
+    "inputs": 1879,
+    "unchanged": true
+  },
+  "kernel": {
+    "fresh_profile_checks_each": 553,
+    "malloc_null_prefixes_each": {
+      "encoder": 42,
+      "decoder": 40,
+      "header": 32
+    },
+    "cpp_allocation_prefixes_each": {
+      "encoder": 1,
+      "decoder": 1
+    },
+    "cancellation_points_each": {
+      "encoder": 125,
+      "decoder": 36
+    },
+    "legacy_byte_fingerprints": "Five exact pre-fix writer controls including tiny and partial/full multichunk extents",
+    "guards": "True encoded one-below/exact caps, aggregate working scratch, invalid/truncated metadata/layout, nested exception/retry, immutable source floats",
+    "development_negative": "/home/blux/de-xr/dome-sculpt/artifacts/native32-exr-owned-66e2e51/artifacts/exr-owned-kernel-r1/status.json",
+    "development_negative_reason": "Tiny-file Core pread callback must return available short read; corrected before production route",
+    "matched_R_S_development": {
+      "release": [
+        {
+          "phase": "build",
+          "command": [
+            "nice",
+            "-n",
+            "15",
+            "c++",
+            "-std=c++20",
+            "-O2",
+            "-g1",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-exr-owned-66e2e51/include",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-exr-owned-66e2e51/src",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native32-exr-owned-66e2e51/src/emission-exr-owned.cpp",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native32-exr-owned-66e2e51/tests/emission-exr-owned.cpp",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/build-release/libdome-sculpt-emission-codec.a",
+            "-I/usr/include/OpenEXR",
+            "-pthread",
+            "-I/usr/include/Imath",
+            "-lOpenEXR-3_2",
+            "-lOpenEXRUtil-3_2",
+            "-lOpenEXRCore-3_2",
+            "-lIex-3_2",
+            "-lIlmThread-3_2",
+            "-lImath-3_1",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native32-exr-owned-66e2e51/artifacts/exr-owned-kernel-r2/probe"
+          ],
+          "exit": 0,
+          "seconds": 2.7691271980293095
+        },
+        {
+          "phase": "runtime",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/native32-exr-owned-66e2e51/artifacts/exr-owned-kernel-r2/probe"
+          ],
+          "exit": 0,
+          "seconds": 0.04176142503274605
+        }
+      ],
+      "sanitize": [
+        {
+          "phase": "build",
+          "command": [
+            "nice",
+            "-n",
+            "15",
+            "c++",
+            "-std=c++20",
+            "-O1",
+            "-g1",
+            "-fsanitize=address,undefined",
+            "-fno-omit-frame-pointer",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-exr-owned-66e2e51/include",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-exr-owned-66e2e51/src",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native32-exr-owned-66e2e51/src/emission-exr-owned.cpp",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native32-exr-owned-66e2e51/tests/emission-exr-owned.cpp",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native32-package3-mixed-3ef4b7c/build-sanitize/libdome-sculpt-emission-codec.a",
+            "-I/usr/include/OpenEXR",
+            "-pthread",
+            "-I/usr/include/Imath",
+            "-lOpenEXR-3_2",
+            "-lOpenEXRUtil-3_2",
+            "-lOpenEXRCore-3_2",
+            "-lIex-3_2",
+            "-lIlmThread-3_2",
+            "-lImath-3_1",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native32-exr-owned-66e2e51/artifacts/exr-owned-kernel-s2/probe"
+          ],
+          "exit": 0,
+          "seconds": 3.94674062600825
+        },
+        {
+          "phase": "runtime",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/native32-exr-owned-66e2e51/artifacts/exr-owned-kernel-s2/probe"
+          ],
+          "exit": 0,
+          "seconds": 0.15462297503836453
+        }
+      ]
+    }
+  },
+  "public_export_oom_overlay": {
+    "result": {
+      "source": "da6a8e1556f07fa596cdbf88fd4debc107295aa3",
+      "scope": "new EXR codec archive, exact unchanged caller TU and all immutable parent coherent libraries; NOT fresh whole app proof",
+      "results": [
+        {
+          "profile": "release",
+          "phase": "compile-emission-exr",
+          "command": [
+            "nice",
+            "-n",
+            "15",
+            "c++",
+            "-std=c++20",
+            "-O3",
+            "-DNDEBUG",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-exr-owned-66e2e51/include",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-exr-owned-66e2e51/src",
+            "-I/usr/include/OpenEXR",
+            "-pthread",
+            "-I/usr/include/Imath",
+            "-lOpenEXR-3_2",
+            "-lOpenEXRUtil-3_2",
+            "-lOpenEXRCore-3_2",
+            "-lIex-3_2",
+            "-lIlmThread-3_2",
+            "-lImath-3_1",
+            "-c",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native32-exr-owned-66e2e51/src/emission-exr.cpp",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native32-exr-owned-66e2e51/artifacts/exr-owned-public-overlay/release/emission-exr.o"
+          ],
+          "exit": 0,
+          "seconds": 0.5951193880173378
+        },
+        {
+          "profile": "release",
+          "phase": "compile-emission-exr-owned",
+          "command": [
+            "nice",
+            "-n",
+            "15",
+            "c++",
+            "-std=c++20",
+            "-O3",
+            "-DNDEBUG",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-exr-owned-66e2e51/include",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-exr-owned-66e2e51/src",
+            "-I/usr/include/OpenEXR",
+            "-pthread",
+            "-I/usr/include/Imath",
+            "-lOpenEXR-3_2",
+            "-lOpenEXRUtil-3_2",
+            "-lOpenEXRCore-3_2",
+            "-lIex-3_2",
+            "-lIlmThread-3_2",
+            "-lImath-3_1",
+            "-c",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native32-exr-owned-66e2e51/src/emission-exr-owned.cpp",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native32-exr-owned-66e2e51/artifacts/exr-owned-public-overlay/release/emission-exr-owned.o"
+          ],
+          "exit": 0,
+          "seconds": 1.4898347560083494
+        },
+        {
+          "profile": "release",
+          "phase": "archive",
+          "command": [
+            "ar",
+            "rcs",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native32-exr-owned-66e2e51/artifacts/exr-owned-public-overlay/release/libdome-sculpt-emission-codec.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native32-exr-owned-66e2e51/artifacts/exr-owned-public-overlay/release/emission-exr.o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native32-exr-owned-66e2e51/artifacts/exr-owned-public-overlay/release/emission-exr-owned.o"
+          ],
+          "exit": 0,
+          "seconds": 0.018672290025278926
+        },
+        {
+          "profile": "release",
+          "phase": "link-contracts",
+          "command": [
+            "/usr/bin/c++",
+            "-O3",
+            "-DNDEBUG",
+            "-Wl,--wrap=fsync",
+            "-Wl,--dependency-file=CMakeFiles/dome-sculpt-native-paint32-emission-contracts-test.dir/link.d",
+            "CMakeFiles/dome-sculpt-native-paint32-emission-contracts-test.dir/tests/native-paint32-emission-contracts.cpp.o",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native32-exr-owned-66e2e51/artifacts/exr-owned-public-overlay/release/contracts",
+            "-Wl,-rpath,/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib",
+            "libdome-sculpt-render.a",
+            "libdome-sculpt-core.a",
+            "libdome-sculpt-affine.a",
+            "/usr/lib64/liblapacke.so",
+            "libdome-sculpt-polygon.a",
+            "libxatlas.a",
+            "libmikktspace.a",
+            "libmikktspace-robust.a",
+            "libufbx.a",
+            "/usr/lib64/libpng.so",
+            "/usr/lib64/libjpeg.so",
+            "/usr/lib64/libz.so",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native32-exr-owned-66e2e51/artifacts/exr-owned-public-overlay/release/libdome-sculpt-emission-codec.a",
+            "/usr/lib64/libOpenEXR-3_2.so",
+            "/usr/lib64/libOpenEXRUtil-3_2.so",
+            "/usr/lib64/libOpenEXRCore-3_2.so",
+            "/usr/lib64/libIex-3_2.so",
+            "/usr/lib64/libIlmThread-3_2.so",
+            "/usr/lib64/libImath-3_1.so",
+            "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libharfbuzz.so",
+            "/usr/lib64/libEGL.so",
+            "/usr/lib64/libGL.so",
+            "/usr/lib64/libfontconfig.so",
+            "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libfreetype.so",
+            "/usr/lib64/libicui18n.so",
+            "/usr/lib64/libicuuc.so",
+            "-lgcc_s_asneeded",
+            "-lgcc_s_asneeded"
+          ],
+          "exit": 0,
+          "seconds": 0.7959485489991494
+        },
+        {
+          "profile": "release",
+          "phase": "public-oom",
+          "command": [
+            "nice",
+            "-n",
+            "15",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native32-exr-owned-66e2e51/artifacts/exr-owned-public-overlay/release/contracts",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native32-exr-owned-66e2e51/artifacts/exr-owned-public-overlay/release/output",
+            "--oom"
+          ],
+          "exit": 0,
+          "seconds": 27.526549931964837
+        },
+        {
+          "profile": "sanitize",
+          "phase": "compile-emission-exr",
+          "command": [
+            "nice",
+            "-n",
+            "15",
+            "c++",
+            "-std=c++20",
+            "-O1",
+            "-g1",
+            "-DNDEBUG",
+            "-fsanitize=address,undefined",
+            "-fno-omit-frame-pointer",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-exr-owned-66e2e51/include",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-exr-owned-66e2e51/src",
+            "-I/usr/include/OpenEXR",
+            "-pthread",
+            "-I/usr/include/Imath",
+            "-lOpenEXR-3_2",
+            "-lOpenEXRUtil-3_2",
+            "-lOpenEXRCore-3_2",
+            "-lIex-3_2",
+            "-lIlmThread-3_2",
+            "-lImath-3_1",
+            "-c",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native32-exr-owned-66e2e51/src/emission-exr.cpp",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native32-exr-owned-66e2e51/artifacts/exr-owned-public-overlay/sanitize/emission-exr.o"
+          ],
+          "exit": 0,
+          "seconds": 0.730875807988923
+        },
+        {
+          "profile": "sanitize",
+          "phase": "compile-emission-exr-owned",
+          "command": [
+            "nice",
+            "-n",
+            "15",
+            "c++",
+            "-std=c++20",
+            "-O1",
+            "-g1",
+            "-DNDEBUG",
+            "-fsanitize=address,undefined",
+            "-fno-omit-frame-pointer",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-exr-owned-66e2e51/include",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-exr-owned-66e2e51/src",
+            "-I/usr/include/OpenEXR",
+            "-pthread",
+            "-I/usr/include/Imath",
+            "-lOpenEXR-3_2",
+            "-lOpenEXRUtil-3_2",
+            "-lOpenEXRCore-3_2",
+            "-lIex-3_2",
+            "-lIlmThread-3_2",
+            "-lImath-3_1",
+            "-c",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native32-exr-owned-66e2e51/src/emission-exr-owned.cpp",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native32-exr-owned-66e2e51/artifacts/exr-owned-public-overlay/sanitize/emission-exr-owned.o"
+          ],
+          "exit": 0,
+          "seconds": 1.7097568429890089
+        },
+        {
+          "profile": "sanitize",
+          "phase": "archive",
+          "command": [
+            "ar",
+            "rcs",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native32-exr-owned-66e2e51/artifacts/exr-owned-public-overlay/sanitize/libdome-sculpt-emission-codec.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native32-exr-owned-66e2e51/artifacts/exr-owned-public-overlay/sanitize/emission-exr.o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native32-exr-owned-66e2e51/artifacts/exr-owned-public-overlay/sanitize/emission-exr-owned.o"
+          ],
+          "exit": 0,
+          "seconds": 0.025623405002988875
+        },
+        {
+          "profile": "sanitize",
+          "phase": "link-contracts",
+          "command": [
+            "/usr/bin/c++",
+            "-O1",
+            "-g1",
+            "-DNDEBUG",
+            "-fsanitize=address,undefined",
+            "-fno-omit-frame-pointer",
+            "-Wl,--wrap=fsync",
+            "-Wl,--dependency-file=CMakeFiles/dome-sculpt-native-paint32-emission-contracts-test.dir/link.d",
+            "CMakeFiles/dome-sculpt-native-paint32-emission-contracts-test.dir/tests/native-paint32-emission-contracts.cpp.o",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native32-exr-owned-66e2e51/artifacts/exr-owned-public-overlay/sanitize/contracts",
+            "-Wl,-rpath,/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib",
+            "libdome-sculpt-render.a",
+            "libdome-sculpt-core.a",
+            "libdome-sculpt-affine.a",
+            "/usr/lib64/liblapacke.so",
+            "libdome-sculpt-polygon.a",
+            "libxatlas.a",
+            "libmikktspace.a",
+            "libmikktspace-robust.a",
+            "libufbx.a",
+            "/usr/lib64/libpng.so",
+            "/usr/lib64/libjpeg.so",
+            "/usr/lib64/libz.so",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native32-exr-owned-66e2e51/artifacts/exr-owned-public-overlay/sanitize/libdome-sculpt-emission-codec.a",
+            "/usr/lib64/libOpenEXR-3_2.so",
+            "/usr/lib64/libOpenEXRUtil-3_2.so",
+            "/usr/lib64/libOpenEXRCore-3_2.so",
+            "/usr/lib64/libIex-3_2.so",
+            "/usr/lib64/libIlmThread-3_2.so",
+            "/usr/lib64/libImath-3_1.so",
+            "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libharfbuzz.so",
+            "/usr/lib64/libEGL.so",
+            "/usr/lib64/libGL.so",
+            "/usr/lib64/libfontconfig.so",
+            "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libfreetype.so",
+            "/usr/lib64/libicui18n.so",
+            "/usr/lib64/libicuuc.so",
+            "-lgcc_s_asneeded",
+            "-lgcc_s_asneeded"
+          ],
+          "exit": 0,
+          "seconds": 3.9859741179971024
+        },
+        {
+          "profile": "sanitize",
+          "phase": "public-oom",
+          "command": [
+            "nice",
+            "-n",
+            "15",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native32-exr-owned-66e2e51/artifacts/exr-owned-public-overlay/sanitize/contracts",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native32-exr-owned-66e2e51/artifacts/exr-owned-public-overlay/sanitize/output",
+            "--oom"
+          ],
+          "exit": 0,
+          "seconds": 230.87293579999823
+        }
+      ],
+      "release_archives_unchanged": true,
+      "sanitize_archives_unchanged": true,
+      "exit": 0,
+      "inputs": 1879,
+      "unchanged": true
+    },
+    "counts_each": {
+      "baseline": 3868,
+      "denials": 3868,
+      "complete_success": 1,
+      "translated": 0
+    },
+    "coverage": "Every warmed calling-thread C++prefix0 through3868 inclusive; exact Scene/file preservation and early/middle/final retries. Complemented by separate context malloc-null sweeps, not claimed to inject every process malloc",
+    "scope": "Two rebuilt codec TUs + exact unchanged caller object and immutable matched coherent parent libraries; distinct from the later fresh whole-owned application proof",
+    "provenance_note": "Copied link commands rewrote ignored parent build link.d metadata only; source/object/archive/executable and captured input/library hashes unchanged. Future overlay links must relocate/remove dependency-file flag."
+  },
+  "bytes": {
+    "all_common_GLBS": 170,
+    "common_mismatches": 0,
+    "actual_previous_unfiltered_KHR_success_files": 92,
+    "validated_mismatches": 0,
+    "legacy_package1_2_controls": [
+      {
+        "profile": "release",
+        "file": "build-release/emission-export/physical.glb",
+        "historical_sha256": "85b4a26ce213ec550515686d5ac5b21295df9ef089758aabdae6a0c34b07b764",
+        "current_sha256": "85b4a26ce213ec550515686d5ac5b21295df9ef089758aabdae6a0c34b07b764",
+        "equal": true
+      },
+      {
+        "profile": "release",
+        "file": "build-release/emission-export/subset.glb",
+        "historical_sha256": "46ec96696461fe95b30ee5140e1c46ac3f0612a7451477d9f732690b7d315f63",
+        "current_sha256": "46ec96696461fe95b30ee5140e1c46ac3f0612a7451477d9f732690b7d315f63",
+        "equal": true
+      },
+      {
+        "profile": "release",
+        "file": "build-release/emission-export/second-cycle.glb",
+        "historical_sha256": "85b4a26ce213ec550515686d5ac5b21295df9ef089758aabdae6a0c34b07b764",
+        "current_sha256": "85b4a26ce213ec550515686d5ac5b21295df9ef089758aabdae6a0c34b07b764",
+        "equal": true
+      },
+      {
+        "profile": "sanitize",
+        "file": "build-sanitize/emission-export/physical.glb",
+        "historical_sha256": "85b4a26ce213ec550515686d5ac5b21295df9ef089758aabdae6a0c34b07b764",
+        "current_sha256": "85b4a26ce213ec550515686d5ac5b21295df9ef089758aabdae6a0c34b07b764",
+        "equal": true
+      },
+      {
+        "profile": "sanitize",
+        "file": "build-sanitize/emission-export/subset.glb",
+        "historical_sha256": "46ec96696461fe95b30ee5140e1c46ac3f0612a7451477d9f732690b7d315f63",
+        "current_sha256": "46ec96696461fe95b30ee5140e1c46ac3f0612a7451477d9f732690b7d315f63",
+        "equal": true
+      },
+      {
+        "profile": "sanitize",
+        "file": "build-sanitize/emission-export/second-cycle.glb",
+        "historical_sha256": "85b4a26ce213ec550515686d5ac5b21295df9ef089758aabdae6a0c34b07b764",
+        "current_sha256": "85b4a26ce213ec550515686d5ac5b21295df9ef089758aabdae6a0c34b07b764",
+        "equal": true
+      }
+    ],
+    "meaning": "Current R/S outputs are byte-identical to the prior actual unfiltered validator cohort; no redundant revalidation/hardware rerun claimed"
+  },
+  "dependency": {
+    "OpenEXR": "3.2.4",
+    "libdeflate": "1.26",
+    "observed_Core_symbols": [
+      "libdeflate_alloc_compressor_ex",
+      "libdeflate_alloc_decompressor_ex"
+    ],
+    "scope": "Installed actual ZIP implementation takes context-specific allocation callbacks, including compression/decompression state; no legacy global allocator path claimed"
+  },
+  "remaining": [
+    "Intentional fresh normal34/native32/Scene35 union and owning capability contexts; no numeric admission",
+    "Same-object physical export with canonical normal/UV/key/skin/deformation owners remains a required real adapter; current bare-native guard retained",
+    "Typed native MToon float/full retained-domain and general physical workflows remain required",
+    "No new-format hardware, full ALL/CTest, Wayland or fresh post-repair desktop GUI claim. Existing package3 GUI R/S15 positives are inherited with exact output/control provenance, not re-labelled as fresh codec GUI runs."
+  ],
+  "artifacts": [
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/native32-exr-owned-66e2e51/artifacts/exr-owned-seal/byte-audit.json",
+      "sha256": "46c3cf04ba673e4f42dea963e068bae3125d05bb3a147341f65c13f5a32d1aad"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/native32-exr-owned-66e2e51/artifacts/exr-owned-seal/legacy-package-bytes.json",
+      "sha256": "eb4684d7890a5f74ae5219fe78589b978c87c4751b0e4dee6ceb79dcae3a0c38"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/native32-exr-owned-66e2e51/artifacts/exr-owned-seal/artifacts.json",
+      "sha256": "7305de7ffec0d235db25fdc2530112d0525ab980bf15a4d5c482487d1c8f3bc4"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/native32-exr-owned-66e2e51/artifacts/exr-owned-coherent/before.json",
+      "sha256": "58c0db65f54ecdd6c00114c750376240daa4f3125735e5bb03fa50659598488e"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/native32-exr-owned-66e2e51/artifacts/exr-owned-public-overlay/before.json",
+      "sha256": "58c0db65f54ecdd6c00114c750376240daa4f3125735e5bb03fa50659598488e"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/native32-exr-owned-66e2e51/artifacts/exr-owned-coherent/release-runtime.log",
+      "sha256": "94ed9a27f23a030ed8d07d2bc74909edc70452db0add18ae83cbc06d23788807"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/native32-exr-owned-66e2e51/artifacts/exr-owned-coherent/sanitize-runtime.log",
+      "sha256": "5182c4cc52710e8de61a5bb3026dfe465e447979671271680a76222f4ad9fae8"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/native32-exr-owned-66e2e51/artifacts/exr-owned-public-overlay/release-public-oom.log",
+      "sha256": "ecf273998f6220f40664b46a1e231d4bf45916b34177bfd7f05248e958595e4c"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/native32-exr-owned-66e2e51/artifacts/exr-owned-public-overlay/sanitize-public-oom.log",
+      "sha256": "ecf273998f6220f40664b46a1e231d4bf45916b34177bfd7f05248e958595e4c"
+    }
+  ]
+}

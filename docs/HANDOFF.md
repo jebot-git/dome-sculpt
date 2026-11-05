@@ -1,5 +1,19 @@
 # Dome Sculpt production handoff
 
+## Main physical authoring milestone — 2026-11-05
+
+Main now integrates qualified runtimeab37175/seal79e288d. Its complete tracked
+runtime/build/test/asset tree matches that qualified source exactly. Fresh owning
+application/core/render/support/runtime337 tasks and92/92 selected commands pass
+each Release/sanitizer. Actual native/compact/Wayland/syntheticXR65 plus posed
+physical-paint nativeGUI80 pass each profile;8GUI GLBs0KHR errors. Same owning
+binaries pass632 actualArc checks and3strictsoftware refusals. Read
+COHERENT-PHYSICAL-AUTHORING.md and receipt. Registered739 is not full-suite runtime.
+Original failures stay recorded. Native36/keyUV/MASK296/newframe budgets and37
+remain in separately validated or building candidates. Canonical-keyUV and all
+remaining production/device/accelerator requirements and later drawers remain
+unfinished; no installation orphysicalHMD/session change is included.
+
 ## Native key export and current combined UI evidence — 2026-11-05
 
 Private key export7c9c476/runtime97f on genuine frame36 now passes151 each
@@ -28,6 +42,43 @@ Native key/UV owners, transparency/cutoff repairs and canonical paint-domain
 ownership are still active. Read PRIVATE-AUTHORING-PROGRESS.md for actual scopes.
 The complete production goal, physical devices, accelerators and later controller
 drawers remain unfinished. No installation or physical HMD/session action.
+## Qualified coherent physical authoring source — 2026-11-05
+
+Runtimeab37175 now completes fresh owning337 tasks and92/92 selected registered
+commands each Release/sanitizer. Actual native/compact/Wayland/syntheticXR65 and
+posed public-bound physical-paint nativeGUI80 pass each profile;8GUI GLBs0KHR.
+Same own binaries pass632 strictArc checks total and3forcedsoftware refusals,
+with actualPCI03 descriptors/maps and exactinputs. This is not full739 runtime,
+newnative36/37/MASK admission, compute orphysicalHMD. Read
+COHERENT-PHYSICAL-AUTHORING.md/receipt for scope and preserved original failures.
+Fullproduction/canonical-keyUV/newframe/domain/roles/device work and later
+controller drawers remain incomplete. Main integration is the next milestone.
+
+## Combined physical skin and wider expression candidate — 2026-11-05
+
+This isolated candidate merges qualified physical skin export c1354a6 and wider
+VRM1 shade expressions e84d919 into b37f360. Main remains f9da354. Fresh whole
+owning application/core/render/support and selected consumer builds are pending
+in both Release and sanitizer, including all direct private expression-header
+dependencies. The older b37 Release selected run closes 83/84 with an obsolete
+publication interception hook; its corrected real paired-helper probe separately
+passes 1,797 checks per profile. Its original sanitizer run remains frozen/live.
+No original failed result is relabeled. The physical skin positive consumer and
+five wider-coefficient tests enter this candidate's selected integration scope.
+Full regressions, complete authoring/device/accelerator requirements and later
+controller drawers remain required; no main admission or installation is claimed.
+
+## Current combined adapter qualification candidate — 2026-11-05
+
+This isolated candidate composes the qualified1f/aca/ccc authoring source,
+SKIN ee5, first-source Restore3ec, pure-skin UV d3, owned EXR e29/package3 and
+VRM invariant upper roles196, retaining current genuine canonical/native guards.
+Fresh whole-owned R/S application/core/render/support/consumer qualification is
+starting. The actual native32 skinned ordinary HDR refusal is captured explicitly
+before its adapter; no positive claim for that registered test or full734 suite.
+No new public layout/Scene version or main admission is included. Original full
+production, device/accelerator requirements and controller drawers remain open.
+
 
 ## Qualified combined authoring foundation — 2026-11-05
 
@@ -58,6 +109,34 @@ all unfinished requirements and deferred drawers remain.
 The dated private notes below retain historical observations and restrictions.
 The current qualification and main admission described above supersede their
 stale pending-build or private-only language; full production remains incomplete.
+
+## Private native writable-paint UV after skin binding — 2026-11-05
+
+A paired factory now transports actual REST-indexed pure skin/pose/IBM together
+with native32 writable paint and immutable first-source capsules. R/S72 new and
+legacy74 controls pass each; real worker332 each covers all157 SMALL helper C++
+allocation prefixes, Cancel/stale/dependent Save and exact retry/oneUndo. Exact
+local affine/space/rest/IBM and posed-corner POS/N preserved. Only two product TUs
+changed; new private header adds no existing record/public layout or schema/cap
+change. Read NATIVE-PAINT-RIG-UV.md and receipt for matching current44 component
+scope and preserved fixture-link/local-Undo negatives. No freshALL/UI/GPU/main
+claim. Genuine native32 key/frame composition and reverse-source row adapters,
+full current visual/export/UI and broader domains remain required; goal incomplete.
+
+
+## Private ordinary rig Restore after authoring — 2026-11-05
+
+Ordinary bind/rebind now stages its complete first source and verifies current
+normal/morph authority without changing paint/UV/frame owners. Self-contained
+R/S164 workflow +1424 actual worker checks pass each, including all203+261 SMALL
+helper allocation prefixes, actual Cancel/stale/accepted Save/Undo/Restore/reopen.
+Legacy ordinary skin/affine136/unskinned37 pass with contextual full-Scene oracles.
+No ABI/schema/cap/default change, freshALL or GUI/GPU/main admission claim. Read
+RIG-AFTER-AUTHORING.md and receipt for precise copied-current44 component scope,
+preserved counterexamples and setup negatives. Actual native32 post-bind UV/key
+adapters remain required; canonical-normal UV/key controls already succeed. Full
+goal, broader automatic-weight domains and later drawers remain incomplete.
+
 
 ## Current coherent authoring foundation — 2026-11-04
 
@@ -274,6 +353,37 @@ receipt for original failures, own fresh-parent/completed-TU build scope and fou
 retained Khronos tangent warnings. This is not fresh ALL/full612, main admission,
 physical headset, GPU baking or full production completion. Broader bake recipes,
 resource/consumer/device work and deferred drawers remain required.
+## Private wider VRM1 shade targets — 2026-11-05
+
+Runtime86ea09e follows196 with actual target>1 and simultaneous shade deltas,
+coefficient-aware continuous reconstruction, bounded compensation/padding and
+complete prospective work forecast. No public/schema/UI change; all3 directTUs
+and whole focused consumers rebuilt on matching196 support. R165.909s/S817.662s
+all0/1880exact: workers49+49, independent515/108pairs max1 at unchanged4, NEW
+full1874 (964persistent+903Cancel+7controls), legacy8/5/5 and coupled18. Strict
+PCI03 Arc517/108pairs0 plusactualsoftware1,9.351s/1894exact; lease released.
+90official instances0errors/KHR0errors47warnings173infos36hints;216PNG+20native/
+container/control R/S pairs exact;29oldwriter files/profile byte-identical.
+Configure656/5new is registration only. Initial-factor/MASK/BLEND/other owning
+roles/root composition/external/fullVRM remain open; SAME original64560 unfinished.
+Read VRM1-WIDE-SHADE-EXPRESSIONS.md/JSON; counterad0 and draft negatives retained.
+
+## Private invariant-role VRM1 UV targets — 2026-11-05
+
+Runtime7e5f869 supports differing/zero targets only when actual upper roles are
+proved invariant from shared paint shade, all future coefficients, absent
+images or complete active-RGB image scans. Original lower sampling/targets stay
+exact; genuinely coupled/hidden-future roles still refuse. R/S five realworker
+cases, three coupled18-check failures with exact Save/history,324 independent
+pairs each max1 at unchanged4,940persistent/907Cancel (1853) and oldshared smoke
+pass. StrictPCI03 Arc1531/324pairs +actualsoftware refusal closed; lease released.
+Twenty writers:180official instances/KHR0errors128warnings336infos.648PNG+65native/
+container/control pairs exact;29current old-domain files/profile byte-identical
+ccc. Three complete directTUs/private product on matchingccc support, public/
+layout/schema/UI/freshapp/main unchanged. Configure651/14new is registrationonly.
+Full MASK/BLEND/widercoefficients/remainingroles/derived/native/physical/external
+consumer/currentrootunion and fullgoal remain open. SAME longSAN64560 remains
+unfinished. Read VRM1-INVARIANT-UV-EXPRESSIONS.md/JSON.
 
 ## Private shared base/shade VRM1 expressions — 2026-11-04
 

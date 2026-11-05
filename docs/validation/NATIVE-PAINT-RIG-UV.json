@@ -1,0 +1,1261 @@
+{
+  "scope": "Matching current44 component after sealed3ec ordinary Restore; new paired native writable paint/pure-skin UV result, not freshALL/GUI/GPU",
+  "base": "3ecda6637175fb6d6c3a13a5e9ce8389edf8fb96",
+  "production_files": [
+    "src/native-paint-sampling.cpp",
+    "src/document-uv-solve.cpp",
+    "src/native-paint-model.hpp"
+  ],
+  "public_or_existing_private_layout_change": false,
+  "schema_default_cap_change": false,
+  "source": {
+    "src/native-paint-sampling.cpp": "c9260566e95fc4a355d2f4904c78b850545df76e8ae88582f613271c207be28b",
+    "src/document-uv-solve.cpp": "de757b919951a37ceee698f68f621ad370a46a93c32f5d869306c5db7ead988d",
+    "src/native-paint-model.hpp": "f06368a1d16152db275cc7d25a85f5edaea94e9486d2ab126a32c582edd330c8",
+    "tests/native-paint-rig-uv.cpp": "d2e1a7444ea0ee160f3bfde3bed71e0176ae47fcde6edf9d320c3d6739023689",
+    "tests/native-paint-rig-uv-worker.cpp": "5a8cb0d368e1a181d50053930e08100eb60dfd82a5b20347e8c39bac501b392d",
+    "CMakeLists.txt": "170eeddcfa132133ce07aab699ae35790c950f9cf142ecc0cc5c61b4b450a416"
+  },
+  "profiles": {
+    "release": {
+      "initial_full_profile_status": {
+        "state": "terminal",
+        "pid": 3681877,
+        "profile": "release",
+        "steps": [
+          {
+            "name": "compile-native-paint-sampling.cpp",
+            "exit": 0,
+            "seconds": 5.626115305989515,
+            "command": [
+              "/usr/bin/c++",
+              "-DDOME_SCULPT_INSTALLED_ASSETS=\"/usr/local/share/dome-sculpt/assets/humanoid\"",
+              "-DDOME_SCULPT_SOURCE_ASSETS=\"/home/blux/de-xr/dome-sculpt/artifacts/native32-bound-uv-key-3ecda66/assets/humanoid\"",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-bound-uv-key-3ecda66/third_party",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-bound-uv-key-3ecda66/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-bound-uv-key-3ecda66/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-bound-uv-key-3ecda66/third_party/cgltf",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-bound-uv-key-3ecda66/third_party/nlohmann",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-bound-uv-key-3ecda66/third_party/xatlas",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-bound-uv-key-3ecda66/third_party/mikktspace",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-bound-uv-key-3ecda66/third_party/ufbx",
+              "-O3",
+              "-DNDEBUG",
+              "-std=gnu++20",
+              "-Wall",
+              "-Wextra",
+              "-Wpedantic",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-bound-uv-key-3ecda66/artifacts/native32-rig-uv/release/native-paint-sampling.cpp.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-bound-uv-key-3ecda66/src/native-paint-sampling.cpp",
+              "-MMD",
+              "-MF",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-bound-uv-key-3ecda66/artifacts/native32-rig-uv/release/native-paint-sampling.cpp.o.d"
+            ]
+          },
+          {
+            "name": "replace-native-paint-sampling.cpp",
+            "exit": 0,
+            "seconds": 0.16472906997660175,
+            "command": [
+              "ar",
+              "r",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-bound-uv-key-3ecda66/artifacts/native32-rig-uv/release/libdome-sculpt-core.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-bound-uv-key-3ecda66/artifacts/native32-rig-uv/release/native-paint-sampling.cpp.o"
+            ]
+          },
+          {
+            "name": "compile-document-uv-solve.cpp",
+            "exit": 0,
+            "seconds": 6.878404275979847,
+            "command": [
+              "/usr/bin/c++",
+              "-DDOME_SCULPT_INSTALLED_ASSETS=\"/usr/local/share/dome-sculpt/assets/humanoid\"",
+              "-DDOME_SCULPT_SOURCE_ASSETS=\"/home/blux/de-xr/dome-sculpt/artifacts/native32-bound-uv-key-3ecda66/assets/humanoid\"",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-bound-uv-key-3ecda66/third_party",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-bound-uv-key-3ecda66/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-bound-uv-key-3ecda66/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-bound-uv-key-3ecda66/third_party/cgltf",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-bound-uv-key-3ecda66/third_party/nlohmann",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-bound-uv-key-3ecda66/third_party/xatlas",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-bound-uv-key-3ecda66/third_party/mikktspace",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-bound-uv-key-3ecda66/third_party/ufbx",
+              "-O3",
+              "-DNDEBUG",
+              "-std=gnu++20",
+              "-Wall",
+              "-Wextra",
+              "-Wpedantic",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-bound-uv-key-3ecda66/artifacts/native32-rig-uv/release/document-uv-solve.cpp.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-bound-uv-key-3ecda66/src/document-uv-solve.cpp",
+              "-MMD",
+              "-MF",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-bound-uv-key-3ecda66/artifacts/native32-rig-uv/release/document-uv-solve.cpp.o.d"
+            ]
+          },
+          {
+            "name": "replace-document-uv-solve.cpp",
+            "exit": 0,
+            "seconds": 0.16482614999404177,
+            "command": [
+              "ar",
+              "r",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-bound-uv-key-3ecda66/artifacts/native32-rig-uv/release/libdome-sculpt-core.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-bound-uv-key-3ecda66/artifacts/native32-rig-uv/release/document-uv-solve.cpp.o"
+            ]
+          },
+          {
+            "name": "compile-model",
+            "exit": 0,
+            "seconds": 4.87430453998968,
+            "command": [
+              "/usr/bin/c++",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-bound-uv-key-3ecda66/src",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-bound-uv-key-3ecda66/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-bound-uv-key-3ecda66/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-bound-uv-key-3ecda66/third_party/nlohmann",
+              "-O3",
+              "-DNDEBUG",
+              "-std=gnu++20",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-bound-uv-key-3ecda66/artifacts/native32-rig-uv/release/model.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-bound-uv-key-3ecda66/tests/native-paint-rig-uv.cpp",
+              "-MMD",
+              "-MF",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-bound-uv-key-3ecda66/artifacts/native32-rig-uv/release/model.o.d"
+            ]
+          },
+          {
+            "name": "link-model",
+            "exit": 0,
+            "seconds": 0.3655816029640846,
+            "command": [
+              "/usr/bin/c++",
+              "-O3",
+              "-DNDEBUG",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-bound-uv-key-3ecda66/artifacts/native32-rig-uv/release/model.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-bound-uv-key-3ecda66/artifacts/native32-rig-uv/release/model",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-bound-uv-key-3ecda66/artifacts/native32-rig-uv/release/libdome-sculpt-core.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/release/libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/release/libdome-sculpt-polygon.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/release/libxatlas.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/release/libmikktspace.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/release/libmikktspace-robust.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/release/libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/release/libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ]
+          },
+          {
+            "name": "run-model",
+            "exit": 0,
+            "seconds": 0.03277254098793492,
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-bound-uv-key-3ecda66/artifacts/native32-rig-uv/release/model",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-bound-uv-key-3ecda66/artifacts/native32-rig-uv/release/model-data"
+            ]
+          },
+          {
+            "name": "compile-legacy",
+            "exit": 0,
+            "seconds": 4.223669668019284,
+            "command": [
+              "/usr/bin/c++",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-bound-uv-key-3ecda66/src",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-bound-uv-key-3ecda66/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-bound-uv-key-3ecda66/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-bound-uv-key-3ecda66/third_party/nlohmann",
+              "-isystem",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/harfbuzz",
+              "-isystem",
+              "/usr/include/glib-2.0",
+              "-isystem",
+              "/usr/lib64/glib-2.0/include",
+              "-isystem",
+              "/usr/include/sysprof-6",
+              "-isystem",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/freetype2",
+              "-isystem",
+              "/usr/include/libpng16",
+              "-isystem",
+              "/usr/include/libxml2",
+              "-O3",
+              "-DNDEBUG",
+              "-std=gnu++20",
+              "-pthread",
+              "-DWITH_GZFILEOP",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-bound-uv-key-3ecda66/artifacts/native32-rig-uv/release/legacy.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-bound-uv-key-3ecda66/tests/native-paint-sampling.cpp",
+              "-MMD",
+              "-MF",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-bound-uv-key-3ecda66/artifacts/native32-rig-uv/release/legacy.o.d"
+            ]
+          },
+          {
+            "name": "link-legacy",
+            "exit": 0,
+            "seconds": 0.36563703702995554,
+            "command": [
+              "/usr/bin/c++",
+              "-O3",
+              "-DNDEBUG",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-bound-uv-key-3ecda66/artifacts/native32-rig-uv/release/legacy.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-bound-uv-key-3ecda66/artifacts/native32-rig-uv/release/legacy",
+              "-Wl,-rpath,/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/release/libdome-sculpt-render.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-bound-uv-key-3ecda66/artifacts/native32-rig-uv/release/libdome-sculpt-core.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/release/libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/release/libdome-sculpt-polygon.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/release/libxatlas.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/release/libmikktspace.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/release/libmikktspace-robust.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/release/libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/release/libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libharfbuzz.so",
+              "/usr/lib64/libEGL.so",
+              "/usr/lib64/libGL.so",
+              "/usr/lib64/libfontconfig.so",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libfreetype.so",
+              "/usr/lib64/libicui18n.so",
+              "/usr/lib64/libicuuc.so",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ]
+          },
+          {
+            "name": "run-legacy",
+            "exit": 0,
+            "seconds": 0.11563835298875347,
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-bound-uv-key-3ecda66/artifacts/native32-rig-uv/release/legacy",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-bound-uv-key-3ecda66/artifacts/native32-rig-uv/release/legacy-data"
+            ]
+          },
+          {
+            "name": "compile-worker",
+            "exit": 0,
+            "seconds": 4.774478817998897,
+            "command": [
+              "/usr/bin/c++",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-bound-uv-key-3ecda66/src",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-bound-uv-key-3ecda66/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-bound-uv-key-3ecda66/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-bound-uv-key-3ecda66/third_party/nlohmann",
+              "-O3",
+              "-DNDEBUG",
+              "-std=gnu++20",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-bound-uv-key-3ecda66/artifacts/native32-rig-uv/release/worker.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-bound-uv-key-3ecda66/tests/native-paint-rig-uv-worker.cpp",
+              "-MMD",
+              "-MF",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-bound-uv-key-3ecda66/artifacts/native32-rig-uv/release/worker.o.d"
+            ]
+          },
+          {
+            "name": "link-worker",
+            "exit": 1,
+            "seconds": 0.315670685027726,
+            "command": [
+              "/usr/bin/c++",
+              "-Wl,--wrap=_ZN4dome6detail25retain_native_paint_modelERKNS_12SculptObjectERKNS_4MeshESt4spanIKjLm18446744073709551615EERKNS_19PaintSamplingLimitsE",
+              "-O3",
+              "-DNDEBUG",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-bound-uv-key-3ecda66/artifacts/native32-rig-uv/release/worker.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-bound-uv-key-3ecda66/artifacts/native32-rig-uv/release/worker",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-bound-uv-key-3ecda66/artifacts/native32-rig-uv/release/libdome-sculpt-core.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/release/libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/release/libdome-sculpt-polygon.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/release/libxatlas.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/release/libmikktspace.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/release/libmikktspace-robust.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/release/libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/release/libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ]
+          }
+        ],
+        "phase": "link-worker",
+        "child": 3684457,
+        "error": "RuntimeError('link-worker failed')",
+        "exit": 1,
+        "seconds": 28.227501404995564,
+        "inputs": 2103,
+        "drift": [],
+        "outputs": {
+          "/home/blux/de-xr/dome-sculpt/artifacts/native32-bound-uv-key-3ecda66/artifacts/native32-rig-uv/release/libdome-sculpt-core.a": "c89507571543f3557353522bc06e7b8ab25a7982f64535475627a3b6078f1e39",
+          "/home/blux/de-xr/dome-sculpt/artifacts/native32-bound-uv-key-3ecda66/artifacts/native32-rig-uv/release/native-paint-sampling.cpp.o.d": "2bcbb3d7676d4c56db04e30f64d1046f0d452537b670dd8dbeb44c5e7ea69457",
+          "/home/blux/de-xr/dome-sculpt/artifacts/native32-bound-uv-key-3ecda66/artifacts/native32-rig-uv/release/native-paint-sampling.cpp.o": "c8eb1ee652f8891596f17b196f1ed653eb8dcebafa070eb01827410f4c981ff8",
+          "/home/blux/de-xr/dome-sculpt/artifacts/native32-bound-uv-key-3ecda66/artifacts/native32-rig-uv/release/document-uv-solve.cpp.o.d": "3b7b8348a93eb9a2b0f3fa7479c910fe71a7813ec6bfb57eafc571882b25683a",
+          "/home/blux/de-xr/dome-sculpt/artifacts/native32-bound-uv-key-3ecda66/artifacts/native32-rig-uv/release/document-uv-solve.cpp.o": "0344da3482a6f02f263c200c1072d6d2bdb0ee5b2dc1765d9a882e8c21f832b9",
+          "/home/blux/de-xr/dome-sculpt/artifacts/native32-bound-uv-key-3ecda66/artifacts/native32-rig-uv/release/model.o.d": "e23c3121038011b9af5aee6d5762aabf5f5df054ebbf0356a7af47779aed445a",
+          "/home/blux/de-xr/dome-sculpt/artifacts/native32-bound-uv-key-3ecda66/artifacts/native32-rig-uv/release/model.o": "3348b96e38ee3f769ba40960d44031ac74d9313c9e38a26331127f0c2a523d01",
+          "/home/blux/de-xr/dome-sculpt/artifacts/native32-bound-uv-key-3ecda66/artifacts/native32-rig-uv/release/model": "799afb24a723d2244bfb0531e4947f033c610ec34405ef0cc6e84f60b3d8876b",
+          "/home/blux/de-xr/dome-sculpt/artifacts/native32-bound-uv-key-3ecda66/artifacts/native32-rig-uv/release/legacy.o.d": "d2f47c2585daf533c3dfe9da12d9b1d8ffd2d585d5dc84e5fea1ae6840842b73",
+          "/home/blux/de-xr/dome-sculpt/artifacts/native32-bound-uv-key-3ecda66/artifacts/native32-rig-uv/release/legacy.o": "e1a1cbeb98193ac953b50f3581d6e91a3d7c1a934227c95cb924305dca535ef2",
+          "/home/blux/de-xr/dome-sculpt/artifacts/native32-bound-uv-key-3ecda66/artifacts/native32-rig-uv/release/legacy": "58a1d880c9c72a0379c0bdc4da9f6aef8d389ea1a4de4af3b9c5da3d9e627629",
+          "/home/blux/de-xr/dome-sculpt/artifacts/native32-bound-uv-key-3ecda66/artifacts/native32-rig-uv/release/worker.o.d": "9c8009712dbd3b59b8418d1f41ec2428d0e89b7d4ebcf23ce349957d36a78e71",
+          "/home/blux/de-xr/dome-sculpt/artifacts/native32-bound-uv-key-3ecda66/artifacts/native32-rig-uv/release/worker.o": "ca22b3ef4408fabf1ac8011fe724bc310a95dfbc1a698c1131f4355a65262216"
+        }
+      },
+      "worker_final": {
+        "state": "terminal",
+        "pid": 3702816,
+        "steps": [
+          {
+            "name": "compile-worker",
+            "command": [
+              "/usr/bin/c++",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-bound-uv-key-3ecda66/src",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-bound-uv-key-3ecda66/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-bound-uv-key-3ecda66/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-bound-uv-key-3ecda66/third_party/nlohmann",
+              "-O3",
+              "-DNDEBUG",
+              "-std=gnu++20",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-bound-uv-key-3ecda66/artifacts/native32-rig-uv/worker-release/worker.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-bound-uv-key-3ecda66/tests/native-paint-rig-uv-worker.cpp",
+              "-MMD",
+              "-MF",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-bound-uv-key-3ecda66/artifacts/native32-rig-uv/worker-release/worker.o.d"
+            ],
+            "exit": 0,
+            "seconds": 4.974547563993838
+          },
+          {
+            "name": "link-worker",
+            "command": [
+              "/usr/bin/c++",
+              "-Wl,--wrap=_ZN4dome6detail25retain_native_paint_modelERKNS_12SculptObjectERKNS_4MeshESt4spanIKjLm18446744073709551615EERKNS_19PaintSamplingLimitsE",
+              "-O3",
+              "-DNDEBUG",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-bound-uv-key-3ecda66/artifacts/native32-rig-uv/worker-release/worker.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-bound-uv-key-3ecda66/artifacts/native32-rig-uv/worker-release/worker",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-bound-uv-key-3ecda66/artifacts/native32-rig-uv/release/libdome-sculpt-core.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/release/libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/release/libdome-sculpt-polygon.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/release/libxatlas.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/release/libmikktspace.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/release/libmikktspace-robust.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/release/libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/release/libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit": 0,
+            "seconds": 0.31493100099032745
+          },
+          {
+            "name": "run-worker",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-bound-uv-key-3ecda66/artifacts/native32-rig-uv/worker-release/worker",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-bound-uv-key-3ecda66/artifacts/native32-rig-uv/worker-release/data"
+            ],
+            "exit": 0,
+            "seconds": 0.11420449800789356
+          }
+        ],
+        "exit": 0,
+        "seconds": 5.405421694973484,
+        "drift": [],
+        "outputs": {
+          "/home/blux/de-xr/dome-sculpt/artifacts/native32-bound-uv-key-3ecda66/artifacts/native32-rig-uv/worker-release/before.json": "922fdf1ca9b6957a9c1bddcc6624f38ab3eba2ccc2dc06d2da8771c0243c6eda",
+          "/home/blux/de-xr/dome-sculpt/artifacts/native32-bound-uv-key-3ecda66/artifacts/native32-rig-uv/worker-release/status.json": "31678a13e3840d0fa792c4cbad513abfcae1e2ab05d4fdc190bd8b0a22b5babc",
+          "/home/blux/de-xr/dome-sculpt/artifacts/native32-bound-uv-key-3ecda66/artifacts/native32-rig-uv/worker-release/compile-worker.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "/home/blux/de-xr/dome-sculpt/artifacts/native32-bound-uv-key-3ecda66/artifacts/native32-rig-uv/worker-release/worker.o.d": "f48352878989d9dd60c581bd13e43532ed821369d295593c1889785e8e80d620",
+          "/home/blux/de-xr/dome-sculpt/artifacts/native32-bound-uv-key-3ecda66/artifacts/native32-rig-uv/worker-release/worker.o": "99c558c21c18139d44fbd450c9e3f6b3d56e34bd0b498774d8a6215fe726dcc9",
+          "/home/blux/de-xr/dome-sculpt/artifacts/native32-bound-uv-key-3ecda66/artifacts/native32-rig-uv/worker-release/link-worker.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "/home/blux/de-xr/dome-sculpt/artifacts/native32-bound-uv-key-3ecda66/artifacts/native32-rig-uv/worker-release/worker": "91cc0da291db2fb796be47387ab9a2e4523c0ebba255fbef665eae5562f128ae",
+          "/home/blux/de-xr/dome-sculpt/artifacts/native32-bound-uv-key-3ecda66/artifacts/native32-rig-uv/worker-release/run-worker.log": "4019517a5a6367a92376774114532e987b2fdf9562514d90ac3083f68047f574"
+        }
+      },
+      "workflow_checks": 72,
+      "legacy_controls": 74,
+      "worker_checks": 332,
+      "all_small_preparation_prefixes": 157,
+      "original_core_sha256": "c4b04530b0350857d3e81773b9c3711db4cb4edea3e99d4e5acf2125605e38e6",
+      "fixed_core_sha256": "c89507571543f3557353522bc06e7b8ab25a7982f64535475627a3b6078f1e39",
+      "archive_member_count": 157,
+      "changed_members": [
+        "document-uv-solve.cpp.o",
+        "native-paint-sampling.cpp.o"
+      ]
+    },
+    "sanitize": {
+      "initial_full_profile_status": {
+        "state": "terminal",
+        "pid": 3689756,
+        "profile": "sanitize",
+        "steps": [
+          {
+            "name": "compile-native-paint-sampling.cpp",
+            "exit": 0,
+            "seconds": 12.440717849007342,
+            "command": [
+              "/usr/bin/c++",
+              "-DDOME_SCULPT_INSTALLED_ASSETS=\"/usr/local/share/dome-sculpt/assets/humanoid\"",
+              "-DDOME_SCULPT_SOURCE_ASSETS=\"/home/blux/de-xr/dome-sculpt/artifacts/native32-bound-uv-key-3ecda66/assets/humanoid\"",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-bound-uv-key-3ecda66/third_party",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-bound-uv-key-3ecda66/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-bound-uv-key-3ecda66/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-bound-uv-key-3ecda66/third_party/cgltf",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-bound-uv-key-3ecda66/third_party/nlohmann",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-bound-uv-key-3ecda66/third_party/xatlas",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-bound-uv-key-3ecda66/third_party/mikktspace",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-bound-uv-key-3ecda66/third_party/ufbx",
+              "-O1",
+              "-g1",
+              "-DNDEBUG",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "-std=gnu++20",
+              "-Wall",
+              "-Wextra",
+              "-Wpedantic",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-bound-uv-key-3ecda66/artifacts/native32-rig-uv/sanitize/native-paint-sampling.cpp.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-bound-uv-key-3ecda66/src/native-paint-sampling.cpp",
+              "-MMD",
+              "-MF",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-bound-uv-key-3ecda66/artifacts/native32-rig-uv/sanitize/native-paint-sampling.cpp.o.d"
+            ]
+          },
+          {
+            "name": "replace-native-paint-sampling.cpp",
+            "exit": 0,
+            "seconds": 2.1193351590191014,
+            "command": [
+              "ar",
+              "r",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-bound-uv-key-3ecda66/artifacts/native32-rig-uv/sanitize/libdome-sculpt-core.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-bound-uv-key-3ecda66/artifacts/native32-rig-uv/sanitize/native-paint-sampling.cpp.o"
+            ]
+          },
+          {
+            "name": "compile-document-uv-solve.cpp",
+            "exit": 0,
+            "seconds": 12.540538804023527,
+            "command": [
+              "/usr/bin/c++",
+              "-DDOME_SCULPT_INSTALLED_ASSETS=\"/usr/local/share/dome-sculpt/assets/humanoid\"",
+              "-DDOME_SCULPT_SOURCE_ASSETS=\"/home/blux/de-xr/dome-sculpt/artifacts/native32-bound-uv-key-3ecda66/assets/humanoid\"",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-bound-uv-key-3ecda66/third_party",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-bound-uv-key-3ecda66/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-bound-uv-key-3ecda66/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-bound-uv-key-3ecda66/third_party/cgltf",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-bound-uv-key-3ecda66/third_party/nlohmann",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-bound-uv-key-3ecda66/third_party/xatlas",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-bound-uv-key-3ecda66/third_party/mikktspace",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-bound-uv-key-3ecda66/third_party/ufbx",
+              "-O1",
+              "-g1",
+              "-DNDEBUG",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "-std=gnu++20",
+              "-Wall",
+              "-Wextra",
+              "-Wpedantic",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-bound-uv-key-3ecda66/artifacts/native32-rig-uv/sanitize/document-uv-solve.cpp.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-bound-uv-key-3ecda66/src/document-uv-solve.cpp",
+              "-MMD",
+              "-MF",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-bound-uv-key-3ecda66/artifacts/native32-rig-uv/sanitize/document-uv-solve.cpp.o.d"
+            ]
+          },
+          {
+            "name": "replace-document-uv-solve.cpp",
+            "exit": 0,
+            "seconds": 1.6194075599778444,
+            "command": [
+              "ar",
+              "r",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-bound-uv-key-3ecda66/artifacts/native32-rig-uv/sanitize/libdome-sculpt-core.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-bound-uv-key-3ecda66/artifacts/native32-rig-uv/sanitize/document-uv-solve.cpp.o"
+            ]
+          },
+          {
+            "name": "compile-model",
+            "exit": 0,
+            "seconds": 8.583317057986278,
+            "command": [
+              "/usr/bin/c++",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-bound-uv-key-3ecda66/src",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-bound-uv-key-3ecda66/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-bound-uv-key-3ecda66/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-bound-uv-key-3ecda66/third_party/nlohmann",
+              "-O1",
+              "-g1",
+              "-DNDEBUG",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "-std=gnu++20",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-bound-uv-key-3ecda66/artifacts/native32-rig-uv/sanitize/model.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-bound-uv-key-3ecda66/tests/native-paint-rig-uv.cpp",
+              "-MMD",
+              "-MF",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-bound-uv-key-3ecda66/artifacts/native32-rig-uv/sanitize/model.o.d"
+            ]
+          },
+          {
+            "name": "link-model",
+            "exit": 0,
+            "seconds": 2.3702748190262355,
+            "command": [
+              "/usr/bin/c++",
+              "-O1",
+              "-g1",
+              "-DNDEBUG",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-bound-uv-key-3ecda66/artifacts/native32-rig-uv/sanitize/model.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-bound-uv-key-3ecda66/artifacts/native32-rig-uv/sanitize/model",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-bound-uv-key-3ecda66/artifacts/native32-rig-uv/sanitize/libdome-sculpt-core.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/sanitize/libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/sanitize/libdome-sculpt-polygon.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/sanitize/libxatlas.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/sanitize/libmikktspace.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/sanitize/libmikktspace-robust.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/sanitize/libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/sanitize/libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ]
+          },
+          {
+            "name": "run-model",
+            "exit": 0,
+            "seconds": 0.3160320050083101,
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-bound-uv-key-3ecda66/artifacts/native32-rig-uv/sanitize/model",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-bound-uv-key-3ecda66/artifacts/native32-rig-uv/sanitize/model-data"
+            ]
+          },
+          {
+            "name": "compile-legacy",
+            "exit": 0,
+            "seconds": 6.77848942799028,
+            "command": [
+              "/usr/bin/c++",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-bound-uv-key-3ecda66/src",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-bound-uv-key-3ecda66/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-bound-uv-key-3ecda66/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-bound-uv-key-3ecda66/third_party/nlohmann",
+              "-isystem",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/harfbuzz",
+              "-isystem",
+              "/usr/include/glib-2.0",
+              "-isystem",
+              "/usr/lib64/glib-2.0/include",
+              "-isystem",
+              "/usr/include/sysprof-6",
+              "-isystem",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/freetype2",
+              "-isystem",
+              "/usr/include/libpng16",
+              "-isystem",
+              "/usr/include/libxml2",
+              "-O1",
+              "-g1",
+              "-DNDEBUG",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "-std=gnu++20",
+              "-pthread",
+              "-DWITH_GZFILEOP",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-bound-uv-key-3ecda66/artifacts/native32-rig-uv/sanitize/legacy.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-bound-uv-key-3ecda66/tests/native-paint-sampling.cpp",
+              "-MMD",
+              "-MF",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-bound-uv-key-3ecda66/artifacts/native32-rig-uv/sanitize/legacy.o.d"
+            ]
+          },
+          {
+            "name": "link-legacy",
+            "exit": 0,
+            "seconds": 2.6204688609577715,
+            "command": [
+              "/usr/bin/c++",
+              "-O1",
+              "-g1",
+              "-DNDEBUG",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-bound-uv-key-3ecda66/artifacts/native32-rig-uv/sanitize/legacy.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-bound-uv-key-3ecda66/artifacts/native32-rig-uv/sanitize/legacy",
+              "-Wl,-rpath,/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/sanitize/libdome-sculpt-render.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-bound-uv-key-3ecda66/artifacts/native32-rig-uv/sanitize/libdome-sculpt-core.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/sanitize/libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/sanitize/libdome-sculpt-polygon.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/sanitize/libxatlas.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/sanitize/libmikktspace.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/sanitize/libmikktspace-robust.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/sanitize/libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/sanitize/libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libharfbuzz.so",
+              "/usr/lib64/libEGL.so",
+              "/usr/lib64/libGL.so",
+              "/usr/lib64/libfontconfig.so",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libfreetype.so",
+              "/usr/lib64/libicui18n.so",
+              "/usr/lib64/libicuuc.so",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ]
+          },
+          {
+            "name": "run-legacy",
+            "exit": 0,
+            "seconds": 0.7667095130309463,
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-bound-uv-key-3ecda66/artifacts/native32-rig-uv/sanitize/legacy",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-bound-uv-key-3ecda66/artifacts/native32-rig-uv/sanitize/legacy-data"
+            ]
+          },
+          {
+            "name": "compile-worker",
+            "exit": 0,
+            "seconds": 8.632063643017318,
+            "command": [
+              "/usr/bin/c++",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-bound-uv-key-3ecda66/src",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-bound-uv-key-3ecda66/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-bound-uv-key-3ecda66/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-bound-uv-key-3ecda66/third_party/nlohmann",
+              "-O1",
+              "-g1",
+              "-DNDEBUG",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "-std=gnu++20",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-bound-uv-key-3ecda66/artifacts/native32-rig-uv/sanitize/worker.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-bound-uv-key-3ecda66/tests/native-paint-rig-uv-worker.cpp",
+              "-MMD",
+              "-MF",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-bound-uv-key-3ecda66/artifacts/native32-rig-uv/sanitize/worker.o.d"
+            ]
+          },
+          {
+            "name": "link-worker",
+            "exit": 0,
+            "seconds": 2.4702558440039866,
+            "command": [
+              "/usr/bin/c++",
+              "-Wl,--wrap=_ZN4dome6detail25retain_native_paint_modelERKNS_12SculptObjectERKNS_4MeshESt4spanIKjLm18446744073709551615EERKNS_19PaintSamplingLimitsE",
+              "-O1",
+              "-g1",
+              "-DNDEBUG",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-bound-uv-key-3ecda66/artifacts/native32-rig-uv/sanitize/worker.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-bound-uv-key-3ecda66/artifacts/native32-rig-uv/sanitize/worker",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-bound-uv-key-3ecda66/artifacts/native32-rig-uv/sanitize/libdome-sculpt-core.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/sanitize/libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/sanitize/libdome-sculpt-polygon.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/sanitize/libxatlas.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/sanitize/libmikktspace.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/sanitize/libmikktspace-robust.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/sanitize/libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/sanitize/libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ]
+          },
+          {
+            "name": "run-worker",
+            "exit": 1,
+            "seconds": 1.7195622880244628,
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-bound-uv-key-3ecda66/artifacts/native32-rig-uv/sanitize/worker",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-bound-uv-key-3ecda66/artifacts/native32-rig-uv/sanitize/worker-data"
+            ]
+          }
+        ],
+        "phase": "run-worker",
+        "child": 3696131,
+        "error": "RuntimeError('run-worker failed')",
+        "exit": 1,
+        "seconds": 64.84313924203161,
+        "inputs": 2103,
+        "drift": [],
+        "outputs": {
+          "/home/blux/de-xr/dome-sculpt/artifacts/native32-bound-uv-key-3ecda66/artifacts/native32-rig-uv/sanitize/libdome-sculpt-core.a": "fcf26f8f018afb898ea29623419ab94ba62f8dfc484de342bfc4e5193b3888ea",
+          "/home/blux/de-xr/dome-sculpt/artifacts/native32-bound-uv-key-3ecda66/artifacts/native32-rig-uv/sanitize/native-paint-sampling.cpp.o.d": "e3860469b3936b021399ffe3f9faefa04ae7b901f49319ca17f1c50112692be5",
+          "/home/blux/de-xr/dome-sculpt/artifacts/native32-bound-uv-key-3ecda66/artifacts/native32-rig-uv/sanitize/native-paint-sampling.cpp.o": "b14db548bbd10e740e3104ef5d0f8c4c16c89e30d4b60792cdf134936238ca1d",
+          "/home/blux/de-xr/dome-sculpt/artifacts/native32-bound-uv-key-3ecda66/artifacts/native32-rig-uv/sanitize/document-uv-solve.cpp.o.d": "81aa740328de7ea81ccdf77ea99b1cc5e1da313edcad03f5a77e14dafc86c3f6",
+          "/home/blux/de-xr/dome-sculpt/artifacts/native32-bound-uv-key-3ecda66/artifacts/native32-rig-uv/sanitize/document-uv-solve.cpp.o": "f35681200574851eaab85d87be3a0eb864cd37d6a5ddd3ed5cd303105096b9c6",
+          "/home/blux/de-xr/dome-sculpt/artifacts/native32-bound-uv-key-3ecda66/artifacts/native32-rig-uv/sanitize/model.o.d": "b9b55f3669b2fa70dd29cadbc35c0cd97e4625cfb5d111ed009918b2315d0cca",
+          "/home/blux/de-xr/dome-sculpt/artifacts/native32-bound-uv-key-3ecda66/artifacts/native32-rig-uv/sanitize/model.o": "13458917455441a3dbfce17a059351a15f96d0e5f5d93b6054fb27c2a1ffb7c5",
+          "/home/blux/de-xr/dome-sculpt/artifacts/native32-bound-uv-key-3ecda66/artifacts/native32-rig-uv/sanitize/model": "3d0003e03ec71f46033c536dad9023d1fc859c8bd817c7f1c60e3d1e57b97a89",
+          "/home/blux/de-xr/dome-sculpt/artifacts/native32-bound-uv-key-3ecda66/artifacts/native32-rig-uv/sanitize/legacy.o.d": "4d160562b6d9d53286293cd900dda5d00b6086964b78c92ee1ba67202c5604dc",
+          "/home/blux/de-xr/dome-sculpt/artifacts/native32-bound-uv-key-3ecda66/artifacts/native32-rig-uv/sanitize/legacy.o": "a89ae3b86a5b2d4af999a016fb20a7ca2face7fad22fe23c68141b4ccb15fefb",
+          "/home/blux/de-xr/dome-sculpt/artifacts/native32-bound-uv-key-3ecda66/artifacts/native32-rig-uv/sanitize/legacy": "62284fc533cdb2e5efb3691f9d1e427b6c52b70c95f0140d2febf7cced7084f2",
+          "/home/blux/de-xr/dome-sculpt/artifacts/native32-bound-uv-key-3ecda66/artifacts/native32-rig-uv/sanitize/worker.o.d": "040685a621ca9c0ca42db789de94d4799b927c08eac2c231c52a99d4792087bc",
+          "/home/blux/de-xr/dome-sculpt/artifacts/native32-bound-uv-key-3ecda66/artifacts/native32-rig-uv/sanitize/worker.o": "20c98f9cff6bb484e0f558ff32c6b9316fc4e1deaaeff9952c5a355d6522a2eb",
+          "/home/blux/de-xr/dome-sculpt/artifacts/native32-bound-uv-key-3ecda66/artifacts/native32-rig-uv/sanitize/worker": "1aacd1cfbd86f6942cd04d71ba0186fc2fb0c7b1456a6b511a46d42fe6488961"
+        }
+      },
+      "worker_final": {
+        "state": "terminal",
+        "pid": 3704612,
+        "steps": [
+          {
+            "name": "compile-worker",
+            "command": [
+              "/usr/bin/c++",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-bound-uv-key-3ecda66/src",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-bound-uv-key-3ecda66/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-bound-uv-key-3ecda66/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/native32-bound-uv-key-3ecda66/third_party/nlohmann",
+              "-O1",
+              "-g1",
+              "-DNDEBUG",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "-std=gnu++20",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-bound-uv-key-3ecda66/artifacts/native32-rig-uv/worker-sanitize/worker.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-bound-uv-key-3ecda66/tests/native-paint-rig-uv-worker.cpp",
+              "-MMD",
+              "-MF",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-bound-uv-key-3ecda66/artifacts/native32-rig-uv/worker-sanitize/worker.o.d"
+            ],
+            "exit": 0,
+            "seconds": 8.532691732048988
+          },
+          {
+            "name": "link-worker",
+            "command": [
+              "/usr/bin/c++",
+              "-Wl,--wrap=_ZN4dome6detail25retain_native_paint_modelERKNS_12SculptObjectERKNS_4MeshESt4spanIKjLm18446744073709551615EERKNS_19PaintSamplingLimitsE",
+              "-O1",
+              "-g1",
+              "-DNDEBUG",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-bound-uv-key-3ecda66/artifacts/native32-rig-uv/worker-sanitize/worker.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-bound-uv-key-3ecda66/artifacts/native32-rig-uv/worker-sanitize/worker",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-bound-uv-key-3ecda66/artifacts/native32-rig-uv/sanitize/libdome-sculpt-core.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/sanitize/libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/sanitize/libdome-sculpt-polygon.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/sanitize/libxatlas.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/sanitize/libmikktspace.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/sanitize/libmikktspace-robust.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/sanitize/libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/anatomical-current44-f7f1e13/artifacts/current44/sanitize/libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit": 0,
+            "seconds": 2.419699349964503
+          },
+          {
+            "name": "run-worker",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-bound-uv-key-3ecda66/artifacts/native32-rig-uv/worker-sanitize/worker",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native32-bound-uv-key-3ecda66/artifacts/native32-rig-uv/worker-sanitize/data"
+            ],
+            "exit": 0,
+            "seconds": 1.8178809069795534
+          }
+        ],
+        "exit": 0,
+        "seconds": 12.772340926050674,
+        "drift": [],
+        "outputs": {
+          "/home/blux/de-xr/dome-sculpt/artifacts/native32-bound-uv-key-3ecda66/artifacts/native32-rig-uv/worker-sanitize/before.json": "3b36aedff1923d1fba0f11f9c691fdc107730dc8a96972ba7e4e661ff9933446",
+          "/home/blux/de-xr/dome-sculpt/artifacts/native32-bound-uv-key-3ecda66/artifacts/native32-rig-uv/worker-sanitize/status.json": "70080652a1c19cc3de6ff5a7e70ebab844b8493e3fe5d2806e4e9fa05891c1db",
+          "/home/blux/de-xr/dome-sculpt/artifacts/native32-bound-uv-key-3ecda66/artifacts/native32-rig-uv/worker-sanitize/compile-worker.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "/home/blux/de-xr/dome-sculpt/artifacts/native32-bound-uv-key-3ecda66/artifacts/native32-rig-uv/worker-sanitize/worker.o.d": "16a63603146fa512a3f49b09577c5deb5f2903fe8e51f292ef1e0a150c09496c",
+          "/home/blux/de-xr/dome-sculpt/artifacts/native32-bound-uv-key-3ecda66/artifacts/native32-rig-uv/worker-sanitize/worker.o": "67b5448ff2d9bf33d77f1dded1f4c8ad8065a3348d8ce5b174846b3cf99c5b92",
+          "/home/blux/de-xr/dome-sculpt/artifacts/native32-bound-uv-key-3ecda66/artifacts/native32-rig-uv/worker-sanitize/link-worker.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "/home/blux/de-xr/dome-sculpt/artifacts/native32-bound-uv-key-3ecda66/artifacts/native32-rig-uv/worker-sanitize/worker": "c21542cb697503e05edba553ddb07a57c8f00577fa25b55a285576560e48987f",
+          "/home/blux/de-xr/dome-sculpt/artifacts/native32-bound-uv-key-3ecda66/artifacts/native32-rig-uv/worker-sanitize/run-worker.log": "4019517a5a6367a92376774114532e987b2fdf9562514d90ac3083f68047f574"
+        }
+      },
+      "workflow_checks": 72,
+      "legacy_controls": 74,
+      "worker_checks": 332,
+      "all_small_preparation_prefixes": 157,
+      "original_core_sha256": "64e6820153a57252ad0239eade6bfd1d1a9649c2ac69dc43594577f969b2dc49",
+      "fixed_core_sha256": "fcf26f8f018afb898ea29623419ab94ba62f8dfc484de342bfc4e5193b3888ea",
+      "archive_member_count": 157,
+      "changed_members": [
+        "document-uv-solve.cpp.o",
+        "native-paint-sampling.cpp.o"
+      ]
+    }
+  },
+  "native_pairs": [
+    {
+      "release": "artifacts/native32-rig-uv/release/model-data/bound-uv.dsculpt",
+      "sanitize": "artifacts/native32-rig-uv/sanitize/model-data/bound-uv.dsculpt",
+      "sha256": "07ce0c7f6b2886462e4def8f5b62751361ed35a263f82d31a2965e90dc7071de"
+    },
+    {
+      "release": "artifacts/native32-rig-uv/release/model-data/twice.dsculpt",
+      "sanitize": "artifacts/native32-rig-uv/sanitize/model-data/twice.dsculpt",
+      "sha256": "ee6e98ef8f5010e46fb51431725efc0ae7cef20a5ca720a3aea05fcca55c65c7"
+    },
+    {
+      "release": "artifacts/native32-rig-uv/release/model-data/restored.dsculpt",
+      "sanitize": "artifacts/native32-rig-uv/sanitize/model-data/restored.dsculpt",
+      "sha256": "1f2e7dfe9b0e436c835165c310885466953459d2dfc2be5ec27605f64ea1f439"
+    },
+    {
+      "release": "artifacts/native32-rig-uv/worker-release/data/prior.dsculpt",
+      "sanitize": "artifacts/native32-rig-uv/worker-sanitize/data/prior.dsculpt",
+      "sha256": "6e4f3562e9a9e04ddee95ed18b54fcdf97e72640d28852e9a690e52a571ebe87"
+    },
+    {
+      "release": "artifacts/native32-rig-uv/worker-release/data/result.dsculpt",
+      "sanitize": "artifacts/native32-rig-uv/worker-sanitize/data/result.dsculpt",
+      "sha256": "83a00fc69dd13d6ec658ee89fb742cae02eccb2becc126e608822c47e5c0e591"
+    }
+  ],
+  "evidence": {
+    "artifacts/native32-rig-uv/closure.json": {
+      "sha256": "35a8dc1f94f99d6cb5b48fdf258f678bff7643506fa01f3ecf2fe3199a210d65",
+      "bytes": 3966
+    },
+    "artifacts/native32-rig-uv/qualify.py": {
+      "sha256": "f3f70f264a25e672fb17937dbcd9bbac5aa96d141ae0e5dc953db047a2e9b0af",
+      "bytes": 4091
+    },
+    "artifacts/native32-rig-uv/worker-v1-double-symbol-underscore.cpp": {
+      "sha256": "9befa530abbc3d38d73b6423a6e1d2b8851b0b48faeed029299dbaf3fad3b482",
+      "bytes": 7556
+    },
+    "artifacts/native32-rig-uv/worker-release.py": {
+      "sha256": "ccf12bfbef1c37432c12a7053c5a0acde875abc1ddd034af6e6ea69fbf2b670d",
+      "bytes": 1970
+    },
+    "artifacts/native32-rig-uv/worker-v2-cancel-negative.cpp": {
+      "sha256": "e5b88fcae067456bcf664299ddd0371307c7b0de5bd08e2f7f111eff9963d326",
+      "bytes": 7554
+    },
+    "artifacts/native32-rig-uv/worker-v3-history-diagnostic.cpp": {
+      "sha256": "c0e0e86c80f086a25ca5798c880e9175d410508358d2e4da2e75f2a3498ef3c1",
+      "bytes": 7846
+    },
+    "artifacts/native32-rig-uv/worker-sanitize.py": {
+      "sha256": "d543f3ea37307c163be0cb37a00c35cf1cad9a6f79b8a3d290e747197c1a4f82",
+      "bytes": 2267
+    },
+    "artifacts/native32-rig-uv/release-v1-basic-pose/status.json": {
+      "sha256": "0e58f6a5e85abae004746508954d1d2b322dfe3e7147ac99faaa80786d226fd5",
+      "bytes": 14488
+    },
+    "artifacts/native32-rig-uv/release-v1-basic-pose/before.json": {
+      "sha256": "9824ec2962febbc45793456e2040d28f962ecc592266965cad1f12b966ea7925",
+      "bytes": 364959
+    },
+    "artifacts/native32-rig-uv/release-v1-basic-pose/compile-native-paint-sampling.cpp.log": {
+      "sha256": "a77f5d482a5bd8f6ce0ce71e7fbc48fb9a36fee3a3804a106ce6c29752639006",
+      "bytes": 2629
+    },
+    "artifacts/native32-rig-uv/release-v1-basic-pose/replace-native-paint-sampling.cpp.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/native32-rig-uv/release-v1-basic-pose/compile-document-uv-solve.cpp.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/native32-rig-uv/release-v1-basic-pose/replace-document-uv-solve.cpp.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/native32-rig-uv/release-v1-basic-pose/compile-model.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/native32-rig-uv/release-v1-basic-pose/link-model.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/native32-rig-uv/release-v1-basic-pose/run-model.log": {
+      "sha256": "5f43695720eebf67f7ec2c17d1fe66a6673d61b1c619633f2e3b5550af37eec6",
+      "bytes": 4604
+    },
+    "artifacts/native32-rig-uv/release-v1-basic-pose/compile-legacy.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/native32-rig-uv/release-v1-basic-pose/link-legacy.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/native32-rig-uv/release-v1-basic-pose/run-legacy.log": {
+      "sha256": "17c387baf3be7c2d672419f0cd308628322419e6c4de7c08bbb1210b9b93dae1",
+      "bytes": 626
+    },
+    "artifacts/native32-rig-uv/release-v2-exact-pose/status.json": {
+      "sha256": "71a12f1558bc8760d4f036d567a5935965d290a4c92d797872b3425b8893ff1b",
+      "bytes": 14487
+    },
+    "artifacts/native32-rig-uv/release-v2-exact-pose/before.json": {
+      "sha256": "59c8c41bdccead6eebbb09fa59822b1991f30961ba2de59fa5daeb2cb8d5f8ec",
+      "bytes": 364959
+    },
+    "artifacts/native32-rig-uv/release-v2-exact-pose/compile-native-paint-sampling.cpp.log": {
+      "sha256": "a77f5d482a5bd8f6ce0ce71e7fbc48fb9a36fee3a3804a106ce6c29752639006",
+      "bytes": 2629
+    },
+    "artifacts/native32-rig-uv/release-v2-exact-pose/replace-native-paint-sampling.cpp.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/native32-rig-uv/release-v2-exact-pose/compile-document-uv-solve.cpp.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/native32-rig-uv/release-v2-exact-pose/replace-document-uv-solve.cpp.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/native32-rig-uv/release-v2-exact-pose/compile-model.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/native32-rig-uv/release-v2-exact-pose/link-model.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/native32-rig-uv/release-v2-exact-pose/run-model.log": {
+      "sha256": "91893190d2c024ae1d62d3fbe2f108ebac04f86886ddf5a00770b1856832d9a5",
+      "bytes": 4767
+    },
+    "artifacts/native32-rig-uv/release-v2-exact-pose/compile-legacy.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/native32-rig-uv/release-v2-exact-pose/link-legacy.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/native32-rig-uv/release-v2-exact-pose/run-legacy.log": {
+      "sha256": "17c387baf3be7c2d672419f0cd308628322419e6c4de7c08bbb1210b9b93dae1",
+      "bytes": 626
+    },
+    "artifacts/native32-rig-uv/release/status.json": {
+      "sha256": "aafbb4098a027eb83c7c395c0ac31ab73c29041b94445f1b6f774cbf83113dc9",
+      "bytes": 17983
+    },
+    "artifacts/native32-rig-uv/release/before.json": {
+      "sha256": "bb28a5af4e037e6ba1b6db9b2bd510c98b3aa2872965c1d38e2f19342b558f6e",
+      "bytes": 365138
+    },
+    "artifacts/native32-rig-uv/release/compile-native-paint-sampling.cpp.log": {
+      "sha256": "a77f5d482a5bd8f6ce0ce71e7fbc48fb9a36fee3a3804a106ce6c29752639006",
+      "bytes": 2629
+    },
+    "artifacts/native32-rig-uv/release/replace-native-paint-sampling.cpp.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/native32-rig-uv/release/compile-document-uv-solve.cpp.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/native32-rig-uv/release/replace-document-uv-solve.cpp.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/native32-rig-uv/release/compile-model.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/native32-rig-uv/release/link-model.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/native32-rig-uv/release/run-model.log": {
+      "sha256": "91893190d2c024ae1d62d3fbe2f108ebac04f86886ddf5a00770b1856832d9a5",
+      "bytes": 4767
+    },
+    "artifacts/native32-rig-uv/release/compile-legacy.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/native32-rig-uv/release/link-legacy.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/native32-rig-uv/release/run-legacy.log": {
+      "sha256": "17c387baf3be7c2d672419f0cd308628322419e6c4de7c08bbb1210b9b93dae1",
+      "bytes": 626
+    },
+    "artifacts/native32-rig-uv/release/compile-worker.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/native32-rig-uv/release/link-worker.log": {
+      "sha256": "356af8d45b33e5d6511cf55a2548c69450bd7c1314630e1aa9e3aa1ae1951871",
+      "bytes": 2096
+    },
+    "artifacts/native32-rig-uv/sanitize/status.json": {
+      "sha256": "f7a14b7900c0064699d2214bd7b0bc002de279afb2ec876e7c2caf972fd1afd9",
+      "bytes": 19317
+    },
+    "artifacts/native32-rig-uv/sanitize/before.json": {
+      "sha256": "2a8ec00cadde5c791aa97e8cb6b357a7962b13dd4b854f6cd768e3555e86d6e3",
+      "bytes": 365150
+    },
+    "artifacts/native32-rig-uv/sanitize/compile-native-paint-sampling.cpp.log": {
+      "sha256": "a77f5d482a5bd8f6ce0ce71e7fbc48fb9a36fee3a3804a106ce6c29752639006",
+      "bytes": 2629
+    },
+    "artifacts/native32-rig-uv/sanitize/replace-native-paint-sampling.cpp.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/native32-rig-uv/sanitize/compile-document-uv-solve.cpp.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/native32-rig-uv/sanitize/replace-document-uv-solve.cpp.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/native32-rig-uv/sanitize/compile-model.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/native32-rig-uv/sanitize/link-model.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/native32-rig-uv/sanitize/run-model.log": {
+      "sha256": "91893190d2c024ae1d62d3fbe2f108ebac04f86886ddf5a00770b1856832d9a5",
+      "bytes": 4767
+    },
+    "artifacts/native32-rig-uv/sanitize/compile-legacy.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/native32-rig-uv/sanitize/link-legacy.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/native32-rig-uv/sanitize/run-legacy.log": {
+      "sha256": "17c387baf3be7c2d672419f0cd308628322419e6c4de7c08bbb1210b9b93dae1",
+      "bytes": 626
+    },
+    "artifacts/native32-rig-uv/sanitize/compile-worker.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/native32-rig-uv/sanitize/link-worker.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/native32-rig-uv/sanitize/run-worker.log": {
+      "sha256": "cd4bb531a2c160aad321b0565d225e2e5f70f6881b0f0ca248445acf3fbc56b2",
+      "bytes": 26896
+    },
+    "artifacts/native32-rig-uv/worker-release-v2-cancel-negative/before.json": {
+      "sha256": "b7f1b0a4b98ea7ba5f0252d875239c49fa9e25cc73822a003bf37550c4e1c403",
+      "bytes": 362869
+    },
+    "artifacts/native32-rig-uv/worker-release-v2-cancel-negative/status.json": {
+      "sha256": "692db624937c62674e7f80ad5749be6b51b61e0b6c32ae5d29d1e47139938b6a",
+      "bytes": 5233
+    },
+    "artifacts/native32-rig-uv/worker-release-v2-cancel-negative/compile-worker.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/native32-rig-uv/worker-release-v2-cancel-negative/link-worker.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/native32-rig-uv/worker-release-v2-cancel-negative/run-worker.log": {
+      "sha256": "cd4bb531a2c160aad321b0565d225e2e5f70f6881b0f0ca248445acf3fbc56b2",
+      "bytes": 26896
+    },
+    "artifacts/native32-rig-uv/worker-release-v3-history-diagnostic/before.json": {
+      "sha256": "0488e13636dd535a3b9732ca78999b3ff3d8552b4cf3ccbc445e4be5a062a86a",
+      "bytes": 362869
+    },
+    "artifacts/native32-rig-uv/worker-release-v3-history-diagnostic/status.json": {
+      "sha256": "bf722328cd20404939ed1419e316209517dea476b97bc7d976c9f6985fb79e1c",
+      "bytes": 5236
+    },
+    "artifacts/native32-rig-uv/worker-release-v3-history-diagnostic/compile-worker.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/native32-rig-uv/worker-release-v3-history-diagnostic/link-worker.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/native32-rig-uv/worker-release-v3-history-diagnostic/run-worker.log": {
+      "sha256": "7664ea059e9dd3553285338b59888400e66b3eca939fd203e221f7b4281a8269",
+      "bytes": 26962
+    },
+    "artifacts/native32-rig-uv/worker-release/before.json": {
+      "sha256": "922fdf1ca9b6957a9c1bddcc6624f38ab3eba2ccc2dc06d2da8771c0243c6eda",
+      "bytes": 362869
+    },
+    "artifacts/native32-rig-uv/worker-release/status.json": {
+      "sha256": "020ffd5b4fe0331dba0d92b53a77ffd39b324c4348f8c86a33a7ec4d89ccdaaa",
+      "bytes": 5195
+    },
+    "artifacts/native32-rig-uv/worker-release/compile-worker.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/native32-rig-uv/worker-release/link-worker.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/native32-rig-uv/worker-release/run-worker.log": {
+      "sha256": "4019517a5a6367a92376774114532e987b2fdf9562514d90ac3083f68047f574",
+      "bytes": 27595
+    },
+    "artifacts/native32-rig-uv/worker-sanitize/before.json": {
+      "sha256": "3b36aedff1923d1fba0f11f9c691fdc107730dc8a96972ba7e4e661ff9933446",
+      "bytes": 362870
+    },
+    "artifacts/native32-rig-uv/worker-sanitize/status.json": {
+      "sha256": "18f7b721dd75a551e115a42a77207b984f3d0706920be9d09b742a7b23e91240",
+      "bytes": 5395
+    },
+    "artifacts/native32-rig-uv/worker-sanitize/compile-worker.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/native32-rig-uv/worker-sanitize/link-worker.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/native32-rig-uv/worker-sanitize/run-worker.log": {
+      "sha256": "4019517a5a6367a92376774114532e987b2fdf9562514d90ac3083f68047f574",
+      "bytes": 27595
+    }
+  },
+  "preserved_failures": [
+    "initial wrapper __real/__wrap underscore link typo (no test ran)",
+    "initial R/S local UV can_undo incorrectly treated as global history; wholeScene/file exact and Save failed; diagnostic preserved",
+    "native32 key creation still refuses; native morph/frame UV remains explicit unsupported until genuine Scene36 pairing"
+  ],
+  "remaining": [
+    "Scene36/material18 real nativePaint+key/frame composition",
+    "UV Restore of skin-bearing domain beyond complete rig Restore",
+    "desktop/controller/independent graphical and emitted-current export quality",
+    "source canonical/physical-normal composition with Palette",
+    "fresh coherent complete current native qualification before main admission"
+  ],
+  "unchanged_existing_private_header_sha256": "4a2de5b05332e903f92390f1616db5000080c31eb05e776d3665f8c6e4538dba"
+}
