@@ -1,5 +1,19 @@
 # Current production progress — 2026-11-05
 
+## Qualified PBR renderer specialization — 2026-11-05
+
+Runtime79abe8e keeps authored sampling/math unchanged while specializing actual
+PBR-only frames; mixed/typed frames retain the complete MToon shader. Unchanged
+full72 sampler cases pass cold16.61s Release/21.96s sanitizer,289checks/max0,
+original bound2/180s. Six graphics consumers pass456checks per profile and actual
+PCI03Arc, plus6samebinarysoftware refusals. Newly relinked matching-owning main
+applications pass native/compact/Wayland/syntheticXR65 each; no public/schema/ABI
+change or physicalHMD/compute/full740 claim. Read PBR-SURFACE-SPECIALIZATION.md
+and receipt. Original full689timeout and failed fixture/orchestration invocations
+remain recorded. Native36 candidate105/107 has a separately qualified test-only
+MatCap diagnostic correction3065889 (762authoring+22render eachR/S); originalSAN
+continues. Full goal and later drawers remain unfinished.
+
 The full Dome Sculpt objective remains active and incomplete. The accepted XR
 selection interface is preserved. Controller drawers remain required after the
 basic authoring targets. Animation and final scene rendering remain excluded.
