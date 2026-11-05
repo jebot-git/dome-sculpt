@@ -12,7 +12,10 @@ Scene physical_skin(bool posed,Material::AlphaMode alpha){
  PaintSettings ink;ink.front_only=false;ink.channel=PaintChannel::Emission;ink.emission_units=PaintEmissionUnits::Physical;ink.emission={8,.016f,.16f};
  o.painted->add_layer("Genuine physical skin detail");o.painted->begin_stroke();o.painted->stamp(brush,ink);check(o.painted->end_stroke(),"Actual native32 physical skin fixture stamps nonconstant FLOAT paint");
  o.painted->layer_properties("Genuine physical skin detail",true,.63f);ink.channel=PaintChannel::Mask;ink.mask=.35f;brush.radius=.12f;o.painted->begin_stroke();o.painted->stamp(brush,ink);check(o.painted->end_stroke(),"Actual physical skin fixture has independent partial common coverage");
- check(o.painted->has_physical_emission()&&o.deformation&&o.deformation->skin&&o.material_bindings->native_paint_sampling&&!o.material_bindings->normal_frames,"Current grid, real skin and retained coordinates remain distinct genuine owners");scene.validate();return scene;
+ check(o.painted->has_physical_emission()&&o.deformation&&o.deformation->skin&&o.material_bindings->native_paint_sampling&&!o.material_bindings->normal_frames,"Current grid, real skin and retained coordinates remain distinct genuine owners");
+ // Exercise the actual public binding factory and its complete first source,
+ // rather than qualify export solely with a manually assigned skin fixture.
+ const auto reference=o.id;const auto target=scene.add("Physical skinned authoring target",Volume{});auto &subject=scene.object(target);const auto &original=scene.object(reference);subject.mesh_active=true;subject.painted=original.painted->snapshot();subject.material=original.material;subject.material_bindings=original.material_bindings;scene.object(reference).visible=false;scene.select(target);SkinAuthoringOptions options;options.reference=reference;options.mode=SkinAuthoringMode::Transfer;options.transfer_distance=.001f;check(author_skin(scene,target,options),"Actual public transfer binds the physical native paint recipient");check(bool(scene.active().rig_source),"Public bound physical paint recipient retains a genuine first-rig source capsule");scene.validate();return scene;
 }
 }
 int main(int argc,char **argv)try{
