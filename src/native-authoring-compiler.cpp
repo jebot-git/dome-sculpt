@@ -10,6 +10,7 @@
 #include "paint-overlay-sample.hpp"
 #include "native-paint-sampling.hpp"
 #include "native-paint-export-policy.hpp"
+#include "native-paint-frame-export-policy.hpp"
 #include <cstring>
 #include <tuple>
 #include "dome/color-paint-sampling.hpp"
@@ -48,7 +49,12 @@ NativeExtractionCost native_extraction_cost(const Scene &scene,const SourceUvBak
       throw std::invalid_argument("Native physical finite resolution must be a power of two in64..2048");
     auto bytes=[&](size_t n,size_t unit){charge(cost.bytes,n,unit,policy.max_working_bytes,"Native physical extraction exceeds working budget before allocation");};
     bytes(1,sizeof(PaintedMesh)+sizeof(TextureMaps)+sizeof(SourceMaterialBindings)+4096);
-    if(o.material_bindings&&o.material_bindings->native_paint_sampling)bytes(native_paint_export_working_bytes(p.mesh(),o.deformation.get()),1);
+    if(o.material_bindings&&o.material_bindings->native_paint_sampling){
+      const auto working=o.material_bindings->native_paint_frames
+        ?native_paint_frame_export_working_bytes(o,policy.max_working_bytes-cost.bytes,cancelled)
+        :native_paint_export_working_bytes(p.mesh(),o.deformation.get());
+      bytes(working,1);
+    }
     const auto maps=p.source_maps();
     auto pixels=[&](std::initializer_list<const PaintSourceTexture*> roles){uint32_t w=r,h=r;
       for(auto role:roles)if(role&&role->image){w=std::max(w,role->image->width);h=std::max(h,role->image->height);}
