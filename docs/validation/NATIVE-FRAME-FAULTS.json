@@ -1,0 +1,830 @@
+{
+  "schema": 1,
+  "state": "qualified private test-only component; original sanitizer aggregate and per-mode timeouts preserved",
+  "base": "e77ba52b63dc2786bfe4f370b6f5f203036c589e",
+  "production": {
+    "runtime": "1c5e446c48435c52af7eebf938f716f68ca901d6",
+    "support_checkpoint": "1ae1b64e27440e4d5cf3a94bdfec8c172baff6aa",
+    "new_runtime_or_public_layout": false,
+    "source_inputs_from_original_frozen_manifest": 2112,
+    "source_drift_excluding_intended_test_and_CMake": [],
+    "support_artifacts": {
+      "release": {
+        "/home/blux/de-xr/dome-sculpt/artifacts/native36-key-uv-af8def6/build-keyuv36-release/libdome-sculpt-affine.a": "95d3728807e5e733ff17ec3302b9e48c7017a1a3cf98cf5c700929fa2cd3cc40",
+        "/home/blux/de-xr/dome-sculpt/artifacts/native36-key-uv-af8def6/build-keyuv36-release/libxatlas.a": "a4533055dbd2a7b320226657c4f16324df230b0f96a6e7476c1316465bb9773b",
+        "/home/blux/de-xr/dome-sculpt/artifacts/native36-key-uv-af8def6/build-keyuv36-release/libufbx.a": "0f3d95c0c56410ac280d187269964b4bae2053840d92c0c7e52029cdd583dbf6",
+        "/home/blux/de-xr/dome-sculpt/artifacts/native36-key-uv-af8def6/build-keyuv36-release/libmikktspace.a": "0805aae7cbee26efea1e406bf30a8c88da88da151aaa8b9792f5cb47c6aa7452",
+        "/home/blux/de-xr/dome-sculpt/artifacts/native36-key-uv-af8def6/build-keyuv36-release/libdome-sculpt-polygon.a": "257f0fad4860ee4e77a4a601fdfae84d461010b4e76172ad16bd37ba1ed38f1b",
+        "/home/blux/de-xr/dome-sculpt/artifacts/native36-key-uv-af8def6/build-keyuv36-release/libmikktspace-robust.a": "99558caa1249b7b1545ff8a3017f0688500573390c038fb058faaa9f4468ad22",
+        "/home/blux/de-xr/dome-sculpt/artifacts/native36-key-uv-af8def6/build-keyuv36-release/libdome-sculpt-emission-codec.a": "612eaf574fda3136637ae6db7c66d918605574aed0e521725bfeab0c395c1105",
+        "/home/blux/de-xr/dome-sculpt/artifacts/native36-key-uv-af8def6/build-keyuv36-release/libdome-sculpt-core.a": "a0cc85fb26a650cc19707c0920ca720352a9c3dd30839f0fa553c02a2ff83b95",
+        "/home/blux/de-xr/dome-sculpt/artifacts/native36-key-uv-af8def6/build-keyuv36-release/libdome-sculpt-render.a": "db5473abf1d9fb060c28ebed356a7c3079240a57dff34efa11f27cbb1234d99c",
+        "/home/blux/de-xr/dome-sculpt/artifacts/native36-key-uv-af8def6/build-keyuv36-release/libdome-sculpt-spacenav.a": "066899844e7fc239252acff0d2f8147ff94bacc0a6fcc7833b4ed07e28e10b90",
+        "/home/blux/de-xr/dome-sculpt/artifacts/native36-key-uv-af8def6/build-keyuv36-release/libdome-sculpt-xr.a": "cb29c27b29f77ba1ecb3337c59c9ec80deb225e85678d34b56b670416130d864",
+        "/home/blux/de-xr/dome-sculpt/artifacts/native36-key-uv-af8def6/build-keyuv36-release/dome-sculpt": "6c36ed4fb9ee1ad495d72c75c0c29870ba6fdf27c892bc358e407ce6d9d692b8",
+        "/home/blux/de-xr/dome-sculpt/artifacts/native36-key-uv-af8def6/build-keyuv36-release/dome-sculpt-native-paint-sampling-test": "e27c07122a90bdbfe42ad9b34744cec9a9b267565ce3c4448efd4d01b43b8b5c",
+        "/home/blux/de-xr/dome-sculpt/artifacts/native36-key-uv-af8def6/build-keyuv36-release/dome-sculpt-native-paint-sampling-faults-test": "5b97cdb3e4c9b923c4a4238ab51073032281f42096de498284a036c50942aac6",
+        "/home/blux/de-xr/dome-sculpt/artifacts/native36-key-uv-af8def6/build-keyuv36-release/dome-sculpt-rig-after-authoring-test": "aa26ff7ba977f1113de27f25bc8c561c943bc68dc94beee9fdf3062f318084ea",
+        "/home/blux/de-xr/dome-sculpt/artifacts/native36-key-uv-af8def6/build-keyuv36-release/dome-sculpt-rig-after-authoring-worker-test": "c7a7cc99ccdcf669d395d70a15d7aa0ecace05628a18bc0f13109596ed83c51c",
+        "/home/blux/de-xr/dome-sculpt/artifacts/native36-key-uv-af8def6/build-keyuv36-release/dome-sculpt-native-paint-rig-uv-test": "d85907f21101ef1c86cbb80fd699f2c61d6683ccc3056a0e475107eb67744d52",
+        "/home/blux/de-xr/dome-sculpt/artifacts/native36-key-uv-af8def6/build-keyuv36-release/dome-sculpt-native-paint-rig-uv-worker-test": "0e8ae33e51df45b5470488f4d83977c72d9cfbaa4a57e6c2a705964ae982fd28",
+        "/home/blux/de-xr/dome-sculpt/artifacts/native36-key-uv-af8def6/build-keyuv36-release/dome-sculpt-native-paint-key-frames-test": "66834182bf72510e71534f73b7be98dde8b0d98e3e2a3ba2f5f53ee783ea4e2f",
+        "/home/blux/de-xr/dome-sculpt/artifacts/native36-key-uv-af8def6/build-keyuv36-release/dome-sculpt-native-key-uv-test": "06a25fa17bdc57eb4fbefc25dbe86e80f536b8ee72f91bab20bd70448b43bfed",
+        "/home/blux/de-xr/dome-sculpt/artifacts/native36-key-uv-af8def6/build-keyuv36-release/dome-sculpt-native-key-uv-metadata-test": "1238a4d4ff07c27c40b38b2775013a03f80e7213ac66e5d29a0a0831887ff9e9",
+        "/home/blux/de-xr/dome-sculpt/artifacts/native36-key-uv-af8def6/build-keyuv36-release/dome-sculpt-native-key-uv-worker-test": "d5819225c539bfdd8234d5127ef65652740050d09ba1b4fc62647a58daa4b0fd",
+        "/home/blux/de-xr/dome-sculpt/artifacts/native36-key-uv-af8def6/build-keyuv36-release/dome-sculpt-native-key-uv-render-test": "d04d88adfcdd9c18af85ab153b0e2772f407f5868a8be28cfcd9b84bd77ee33a",
+        "/home/blux/de-xr/dome-sculpt/artifacts/native36-key-uv-af8def6/build-keyuv36-release/CMakeCache.txt": "dc8899e9cb4a9e61db93f17d34fe562b748701d50f709b035ac484e7fabb02df",
+        "/home/blux/de-xr/dome-sculpt/artifacts/native36-key-uv-af8def6/build-keyuv36-release/compile_commands.json": "a5d5e30cd984a8a293b00e2a5a4fda766b658cf79a5ea8aca1e684f476272c14",
+        "/home/blux/de-xr/dome-sculpt/artifacts/native36-key-uv-af8def6/build-keyuv36-release/build.ninja": "5e67f358522ff3a398cdaff8a5b3ff19aac3cfc1ab2ad9f3bf74c51415770863"
+      },
+      "sanitize": {
+        "/home/blux/de-xr/dome-sculpt/artifacts/native36-key-uv-af8def6/build-keyuv36-sanitize/libdome-sculpt-affine.a": "2cf92f070915ebb92bf5be357ad17dd02282900a2f80c3f27a0d3ba6ea8f41a6",
+        "/home/blux/de-xr/dome-sculpt/artifacts/native36-key-uv-af8def6/build-keyuv36-sanitize/libxatlas.a": "4e6c9d3da6913d12d339d3585d96ba50bd187e95852e9b2a229b2330f8c7fadc",
+        "/home/blux/de-xr/dome-sculpt/artifacts/native36-key-uv-af8def6/build-keyuv36-sanitize/libufbx.a": "3764e2f2347ba7fde7c65fd8a6cb535deadac55126be283409c5ae4e2a6f54de",
+        "/home/blux/de-xr/dome-sculpt/artifacts/native36-key-uv-af8def6/build-keyuv36-sanitize/libmikktspace.a": "8ba94945cc70de2ba186d594da84268ba3b6e9729321d224d07c4eb3d0cbc5b4",
+        "/home/blux/de-xr/dome-sculpt/artifacts/native36-key-uv-af8def6/build-keyuv36-sanitize/libmikktspace-robust.a": "aca467f5578aabfaca59cfecdf251a77f7aeeba9eed86d63949bf48e769d8d0c",
+        "/home/blux/de-xr/dome-sculpt/artifacts/native36-key-uv-af8def6/build-keyuv36-sanitize/libdome-sculpt-polygon.a": "567e1af7dc4068986a80f7159a3f6b514c3feff4f6dffb8770293f7ec570e941",
+        "/home/blux/de-xr/dome-sculpt/artifacts/native36-key-uv-af8def6/build-keyuv36-sanitize/libdome-sculpt-emission-codec.a": "d74a3d4c3488fecf738a5bd2087a0cbc77a38e2875077d8cb02f8a4ee19021a5",
+        "/home/blux/de-xr/dome-sculpt/artifacts/native36-key-uv-af8def6/build-keyuv36-sanitize/libdome-sculpt-spacenav.a": "abf8b3700491273dbba3b291ac31425807762fd1e65a9fe23dfc35a3fd18a2af",
+        "/home/blux/de-xr/dome-sculpt/artifacts/native36-key-uv-af8def6/build-keyuv36-sanitize/libdome-sculpt-core.a": "15593298821a6ecff25c3dd2e2a2e9462278f041c9c462940d689732a192ed63",
+        "/home/blux/de-xr/dome-sculpt/artifacts/native36-key-uv-af8def6/build-keyuv36-sanitize/libdome-sculpt-render.a": "69cabf8ef919469ff45f68489bd2ed9b52a53d7b6c12b6995ed0f50e19397fef",
+        "/home/blux/de-xr/dome-sculpt/artifacts/native36-key-uv-af8def6/build-keyuv36-sanitize/libdome-sculpt-xr.a": "e9404c109963c7cb27b314928177bf0e73cd3378ead5f8dea8301ee94523a8eb",
+        "/home/blux/de-xr/dome-sculpt/artifacts/native36-key-uv-af8def6/build-keyuv36-sanitize/dome-sculpt": "917eadf4499562b1b2c1775868fdc4b20d09a7aa0b477bb02e1ac7864f66a401",
+        "/home/blux/de-xr/dome-sculpt/artifacts/native36-key-uv-af8def6/build-keyuv36-sanitize/dome-sculpt-native-paint-sampling-test": "72e0567cf12ce4a48d27f79d671ee0b735dd19f653980c9a280225ff74c42d3e",
+        "/home/blux/de-xr/dome-sculpt/artifacts/native36-key-uv-af8def6/build-keyuv36-sanitize/dome-sculpt-native-paint-sampling-faults-test": "7ebac2fc129955c5b88cd4e580697760fd6d541303738d09390ce05373597804",
+        "/home/blux/de-xr/dome-sculpt/artifacts/native36-key-uv-af8def6/build-keyuv36-sanitize/dome-sculpt-rig-after-authoring-test": "0b6e858b04b34c982539136dcf88c47a68db243a81471ea1dbfe145d346538b4",
+        "/home/blux/de-xr/dome-sculpt/artifacts/native36-key-uv-af8def6/build-keyuv36-sanitize/dome-sculpt-rig-after-authoring-worker-test": "b27b5137a29b6bc97d2597ba95e617b318ce383cecf834be4163b520fb0242cb",
+        "/home/blux/de-xr/dome-sculpt/artifacts/native36-key-uv-af8def6/build-keyuv36-sanitize/dome-sculpt-native-paint-rig-uv-test": "7b40cbe0bbae4edd0fcc8353a84c466b89cca35297539cfc92b6290d889821f2",
+        "/home/blux/de-xr/dome-sculpt/artifacts/native36-key-uv-af8def6/build-keyuv36-sanitize/dome-sculpt-native-paint-rig-uv-worker-test": "09aee031252792d7523ac0f678bc648410a2cfe19d9d4c662b8d33676ccaf2f7",
+        "/home/blux/de-xr/dome-sculpt/artifacts/native36-key-uv-af8def6/build-keyuv36-sanitize/dome-sculpt-native-paint-key-frames-test": "1bfc20a9262b778d203ef1d65a677b8b89436585c6ee6473bd939a3531c457a9",
+        "/home/blux/de-xr/dome-sculpt/artifacts/native36-key-uv-af8def6/build-keyuv36-sanitize/dome-sculpt-native-key-uv-test": "7ec52a412450d2d90b9e1a733f6f86eeced0037cdbfd051b367b20a0c924c71d",
+        "/home/blux/de-xr/dome-sculpt/artifacts/native36-key-uv-af8def6/build-keyuv36-sanitize/dome-sculpt-native-key-uv-metadata-test": "e5be475dfbd018b156298aa3aa7b6ae20c5b00f0107db5ddf8108d9c327c385d",
+        "/home/blux/de-xr/dome-sculpt/artifacts/native36-key-uv-af8def6/build-keyuv36-sanitize/dome-sculpt-native-key-uv-worker-test": "35756ea430df89760998769a58f3ab1ecdc93ec2d359a7e9c60f9820869dafc8",
+        "/home/blux/de-xr/dome-sculpt/artifacts/native36-key-uv-af8def6/build-keyuv36-sanitize/dome-sculpt-native-key-uv-render-test": "f12782c3f7f33a197796606ab4c5f1f2053a97e3d3392205417881b4a4dc2af3",
+        "/home/blux/de-xr/dome-sculpt/artifacts/native36-key-uv-af8def6/build-keyuv36-sanitize/CMakeCache.txt": "bf30e2ca08472c0548136a6c37a81e8305604fe3779a225a227a368c7d2bce8d",
+        "/home/blux/de-xr/dome-sculpt/artifacts/native36-key-uv-af8def6/build-keyuv36-sanitize/compile_commands.json": "ee69b725eedc54feaf5ba6a16be21d4e82b2de7f45dc8de97fbfc0025333bbfa",
+        "/home/blux/de-xr/dome-sculpt/artifacts/native36-key-uv-af8def6/build-keyuv36-sanitize/build.ninja": "d58155efcb513b2bef81c75c57887607754fbabe27ca59d17774387c48788bab"
+      }
+    },
+    "support_drift": {
+      "release": [],
+      "sanitize": []
+    },
+    "measurement_boundary": "Frozen proof terminal audit precedes final documentation and CMake sanitizer wall-budget edit; product CPP/headers/assets remain unchanged. Final source hashes identify final CMake and byte-identical selector test."
+  },
+  "scope": {
+    "fixture": "One genuine native32 painted RGBA/PBR object with ordinary public skin then public Create/Replace supplying real current native36 frame/key and complete source graph",
+    "operations": [
+      "author_shapekey Create",
+      "author_shapekey Replace",
+      "Scene.encode",
+      "Scene.decode"
+    ],
+    "boundaries": "Real operation only; preparation and caller Scene copy outside denial. Persistent C++ operator new denial is disjoint from native static malloc wrapping through __real_malloc. C allocations not universally covered: calloc/realloc and dynamic library allocators are not claimed.",
+    "oracles": [
+      "Every actual measured denied prefix reached",
+      "Exact entire caller Scene after refusal",
+      "Exact immutable seed and encoded input after every prefix",
+      "Exact real retry after every prefix",
+      "Persisted Create/Replace endpoints reopen exactly"
+    ],
+    "build": "New test TUs compiled with exact own headers over immutable completed whole-owned native36 core/support. O3 Release and O1 ASan/UBSan/leaks. No fresh ALL claim or ABI archive substitution."
+  },
+  "completed": {
+    "release_original": {
+      "tool_handle": 1371,
+      "exit": 0,
+      "source": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/native-frame-faults-e77ba52/tests/native-frame-faults.cpp",
+        "sha256": "65fb144c2ed3508d5a1799f376908ad9e5ae793d7b461334ef6d757925f3880f"
+      },
+      "binary": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/native-frame-faults-e77ba52/artifacts/native-frame-faults/release/faults",
+        "sha256": "bb6b13853d74e35f5c5565c58a25852b94b20490a1cca2de6fe735732d52a779"
+      },
+      "log": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/native-frame-faults-e77ba52/artifacts/native-frame-faults/release/run.log",
+        "sha256": "0734c8098df017de08d956bde760a60e8cf0536c707cd2aba468e8eec5e90a56"
+      },
+      "counts": [
+        {
+          "mode": "Create",
+          "Cplusplus": 3458,
+          "native_malloc": 437
+        },
+        {
+          "mode": "Replace",
+          "Cplusplus": 2687,
+          "native_malloc": 608
+        },
+        {
+          "mode": "encode",
+          "Cplusplus": 7544,
+          "native_malloc": 608
+        },
+        {
+          "mode": "decode",
+          "Cplusplus": 4555,
+          "native_malloc": 646
+        }
+      ]
+    },
+    "sanitize_original_completed_phases": {
+      "tool_handle": 22015,
+      "whole_exit": 124,
+      "counts": [
+        {
+          "mode": "Create",
+          "Cplusplus": 3458,
+          "native_malloc": 460
+        },
+        {
+          "mode": "Replace",
+          "Cplusplus": 2687,
+          "native_malloc": 640
+        }
+      ],
+      "log": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/native-frame-faults-e77ba52/artifacts/native-frame-faults/sanitize/run.log",
+        "sha256": "afadb3a7df5cd4bfeef2fbdf4375883ca03cfceb3152cd87174a452d0c718242"
+      }
+    },
+    "sanitize_same_frozen_selector_repairs": {
+      "state": "terminal",
+      "pid": 1449566,
+      "parallel_workers": 4,
+      "binary": "b33acf078e1e380346fef7c9b2f98df3533f77200da5796521241fc41b274e22",
+      "source": {
+        "tests/native-frame-faults.cpp": "38802806b54da46a7922a2a27c2f4a803c8e459d877f5900676576ce42505cf5",
+        "CMakeLists.txt": "6ffe4be019f4439363fbe2b158649dc36178820b16d1537055562f2a993f5869"
+      },
+      "plan": [
+        [
+          2,
+          "cpp",
+          1,
+          2048
+        ],
+        [
+          2,
+          "cpp",
+          2049,
+          4096
+        ],
+        [
+          2,
+          "cpp",
+          4097,
+          6144
+        ],
+        [
+          2,
+          "cpp",
+          6145,
+          7544
+        ],
+        [
+          2,
+          "c",
+          null,
+          null
+        ],
+        [
+          3,
+          "cpp",
+          1,
+          2048
+        ],
+        [
+          3,
+          "cpp",
+          2049,
+          4096
+        ],
+        [
+          3,
+          "cpp",
+          4097,
+          4555
+        ],
+        [
+          3,
+          "c",
+          null,
+          null
+        ]
+      ],
+      "results": [
+        {
+          "state": "terminal",
+          "pid": 1449566,
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/native-frame-fault-ranges-e77/artifacts/native-frame-faults/sanitize/faults",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native-frame-fault-ranges-e77/artifacts/native-frame-faults/sanitize/mode2-cpp-6145-7544/data",
+            "2",
+            "cpp",
+            "6145",
+            "7544"
+          ],
+          "source": {
+            "tests/native-frame-faults.cpp": "38802806b54da46a7922a2a27c2f4a803c8e459d877f5900676576ce42505cf5",
+            "CMakeLists.txt": "6ffe4be019f4439363fbe2b158649dc36178820b16d1537055562f2a993f5869"
+          },
+          "binary": "b33acf078e1e380346fef7c9b2f98df3533f77200da5796521241fc41b274e22",
+          "spec": [
+            2,
+            "cpp",
+            6145,
+            7544
+          ],
+          "exit": 0,
+          "reason": "exit",
+          "seconds": 177.05045274901204,
+          "source_drift": [],
+          "binary_drift": false,
+          "log_sha256": "6fe2a7b52f84e94fc235e23b9bbcb99f93fe14bb27c839ca290e8532f291b3f6"
+        },
+        {
+          "state": "terminal",
+          "pid": 1449566,
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/native-frame-fault-ranges-e77/artifacts/native-frame-faults/sanitize/faults",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native-frame-fault-ranges-e77/artifacts/native-frame-faults/sanitize/mode2-cpp-1-2048/data",
+            "2",
+            "cpp",
+            "1",
+            "2048"
+          ],
+          "source": {
+            "tests/native-frame-faults.cpp": "38802806b54da46a7922a2a27c2f4a803c8e459d877f5900676576ce42505cf5",
+            "CMakeLists.txt": "6ffe4be019f4439363fbe2b158649dc36178820b16d1537055562f2a993f5869"
+          },
+          "binary": "b33acf078e1e380346fef7c9b2f98df3533f77200da5796521241fc41b274e22",
+          "spec": [
+            2,
+            "cpp",
+            1,
+            2048
+          ],
+          "exit": 0,
+          "reason": "exit",
+          "seconds": 224.86390555195976,
+          "source_drift": [],
+          "binary_drift": false,
+          "log_sha256": "c9e726156c291c8d34db616638094dfb6afb784e6bda2cbad705c3e7c06ba0f4"
+        },
+        {
+          "state": "terminal",
+          "pid": 1449566,
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/native-frame-fault-ranges-e77/artifacts/native-frame-faults/sanitize/faults",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native-frame-fault-ranges-e77/artifacts/native-frame-faults/sanitize/mode2-cpp-2049-4096/data",
+            "2",
+            "cpp",
+            "2049",
+            "4096"
+          ],
+          "source": {
+            "tests/native-frame-faults.cpp": "38802806b54da46a7922a2a27c2f4a803c8e459d877f5900676576ce42505cf5",
+            "CMakeLists.txt": "6ffe4be019f4439363fbe2b158649dc36178820b16d1537055562f2a993f5869"
+          },
+          "binary": "b33acf078e1e380346fef7c9b2f98df3533f77200da5796521241fc41b274e22",
+          "spec": [
+            2,
+            "cpp",
+            2049,
+            4096
+          ],
+          "exit": 0,
+          "reason": "exit",
+          "seconds": 239.88970610901015,
+          "source_drift": [],
+          "binary_drift": false,
+          "log_sha256": "3a5b50bb703b2ac3256e96c584a563fdc08f8c7feff24f682433938589de9376"
+        },
+        {
+          "state": "terminal",
+          "pid": 1449566,
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/native-frame-fault-ranges-e77/artifacts/native-frame-faults/sanitize/faults",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native-frame-fault-ranges-e77/artifacts/native-frame-faults/sanitize/mode2-c/data",
+            "2",
+            "c"
+          ],
+          "source": {
+            "tests/native-frame-faults.cpp": "38802806b54da46a7922a2a27c2f4a803c8e459d877f5900676576ce42505cf5",
+            "CMakeLists.txt": "6ffe4be019f4439363fbe2b158649dc36178820b16d1537055562f2a993f5869"
+          },
+          "binary": "b33acf078e1e380346fef7c9b2f98df3533f77200da5796521241fc41b274e22",
+          "spec": [
+            2,
+            "c",
+            null,
+            null
+          ],
+          "exit": 0,
+          "reason": "exit",
+          "seconds": 68.93984989495948,
+          "source_drift": [],
+          "binary_drift": false,
+          "log_sha256": "575ae30fdd43ea12fd5950a7ad0758cbf7bc58fb9c6e9a18c18e0c631bc18115"
+        },
+        {
+          "state": "terminal",
+          "pid": 1449566,
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/native-frame-fault-ranges-e77/artifacts/native-frame-faults/sanitize/faults",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native-frame-fault-ranges-e77/artifacts/native-frame-faults/sanitize/mode2-cpp-4097-6144/data",
+            "2",
+            "cpp",
+            "4097",
+            "6144"
+          ],
+          "source": {
+            "tests/native-frame-faults.cpp": "38802806b54da46a7922a2a27c2f4a803c8e459d877f5900676576ce42505cf5",
+            "CMakeLists.txt": "6ffe4be019f4439363fbe2b158649dc36178820b16d1537055562f2a993f5869"
+          },
+          "binary": "b33acf078e1e380346fef7c9b2f98df3533f77200da5796521241fc41b274e22",
+          "spec": [
+            2,
+            "cpp",
+            4097,
+            6144
+          ],
+          "exit": 0,
+          "reason": "exit",
+          "seconds": 253.43097621499328,
+          "source_drift": [],
+          "binary_drift": false,
+          "log_sha256": "eb2c7219ae6159f62087d423caefeee7a52434a5402b3225849466fb89e60fd0"
+        },
+        {
+          "state": "terminal",
+          "pid": 1449566,
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/native-frame-fault-ranges-e77/artifacts/native-frame-faults/sanitize/faults",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native-frame-fault-ranges-e77/artifacts/native-frame-faults/sanitize/mode3-cpp-4097-4555/data",
+            "3",
+            "cpp",
+            "4097",
+            "4555"
+          ],
+          "source": {
+            "tests/native-frame-faults.cpp": "38802806b54da46a7922a2a27c2f4a803c8e459d877f5900676576ce42505cf5",
+            "CMakeLists.txt": "6ffe4be019f4439363fbe2b158649dc36178820b16d1537055562f2a993f5869"
+          },
+          "binary": "b33acf078e1e380346fef7c9b2f98df3533f77200da5796521241fc41b274e22",
+          "spec": [
+            3,
+            "cpp",
+            4097,
+            4555
+          ],
+          "exit": 0,
+          "reason": "exit",
+          "seconds": 73.78864058904583,
+          "source_drift": [],
+          "binary_drift": false,
+          "log_sha256": "f28f953fdba5743d9c72fb254b54f4f877b2a920893b0ff3dd3b94d2f290c276"
+        },
+        {
+          "state": "terminal",
+          "pid": 1449566,
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/native-frame-fault-ranges-e77/artifacts/native-frame-faults/sanitize/faults",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native-frame-fault-ranges-e77/artifacts/native-frame-faults/sanitize/mode3-c/data",
+            "3",
+            "c"
+          ],
+          "source": {
+            "tests/native-frame-faults.cpp": "38802806b54da46a7922a2a27c2f4a803c8e459d877f5900676576ce42505cf5",
+            "CMakeLists.txt": "6ffe4be019f4439363fbe2b158649dc36178820b16d1537055562f2a993f5869"
+          },
+          "binary": "b33acf078e1e380346fef7c9b2f98df3533f77200da5796521241fc41b274e22",
+          "spec": [
+            3,
+            "c",
+            null,
+            null
+          ],
+          "exit": 0,
+          "reason": "exit",
+          "seconds": 103.02006492199143,
+          "source_drift": [],
+          "binary_drift": false,
+          "log_sha256": "1ee6c561b2c03a01e0b2f7614b952f021a93ed2cc55f0e6b6cd2540c840dfd8d"
+        },
+        {
+          "state": "terminal",
+          "pid": 1449566,
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/native-frame-fault-ranges-e77/artifacts/native-frame-faults/sanitize/faults",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native-frame-fault-ranges-e77/artifacts/native-frame-faults/sanitize/mode3-cpp-1-2048/data",
+            "3",
+            "cpp",
+            "1",
+            "2048"
+          ],
+          "source": {
+            "tests/native-frame-faults.cpp": "38802806b54da46a7922a2a27c2f4a803c8e459d877f5900676576ce42505cf5",
+            "CMakeLists.txt": "6ffe4be019f4439363fbe2b158649dc36178820b16d1537055562f2a993f5869"
+          },
+          "binary": "b33acf078e1e380346fef7c9b2f98df3533f77200da5796521241fc41b274e22",
+          "spec": [
+            3,
+            "cpp",
+            1,
+            2048
+          ],
+          "exit": 0,
+          "reason": "exit",
+          "seconds": 297.633677565027,
+          "source_drift": [],
+          "binary_drift": false,
+          "log_sha256": "d203a71cd0d78d844e88b000f17437144b390f7a73814bc2f345db81e9b5899e"
+        },
+        {
+          "state": "terminal",
+          "pid": 1449566,
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/native-frame-fault-ranges-e77/artifacts/native-frame-faults/sanitize/faults",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native-frame-fault-ranges-e77/artifacts/native-frame-faults/sanitize/mode3-cpp-2049-4096/data",
+            "3",
+            "cpp",
+            "2049",
+            "4096"
+          ],
+          "source": {
+            "tests/native-frame-faults.cpp": "38802806b54da46a7922a2a27c2f4a803c8e459d877f5900676576ce42505cf5",
+            "CMakeLists.txt": "6ffe4be019f4439363fbe2b158649dc36178820b16d1537055562f2a993f5869"
+          },
+          "binary": "b33acf078e1e380346fef7c9b2f98df3533f77200da5796521241fc41b274e22",
+          "spec": [
+            3,
+            "cpp",
+            2049,
+            4096
+          ],
+          "exit": 0,
+          "reason": "exit",
+          "seconds": 288.7600854479824,
+          "source_drift": [],
+          "binary_drift": false,
+          "log_sha256": "77999faf2a7b091ff85a798af4f6e92126a324979c5d31048532ed4a3b405f0e"
+        }
+      ],
+      "exit": 0
+    },
+    "totals": {
+      "Release": {
+        "Cplusplus": 18244,
+        "native_malloc": 2299
+      },
+      "composed_SAN": {
+        "Cplusplus": 18244,
+        "native_malloc": 2420
+      },
+      "all_refused": true,
+      "optional_successes": 0,
+      "sanitizer_diagnostics": false
+    },
+    "optimized_selector_smokes": {
+      "binary": "2570023085cc607a70087e4b8dc8195a1001150a73c4162f1693344dce67f425",
+      "scope": "Fresh optimized selector TU plus immutable completed native36 owning core/support; two endpoint selector smoke prefixes, not a repeated full original sweep",
+      "runs": [
+        {
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/native-frame-fault-ranges-e77/artifacts/native-frame-faults/release/faults",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native-frame-fault-ranges-e77/artifacts/native-frame-faults/release/smoke-2-1/data",
+            "2",
+            "cpp",
+            "1",
+            "1"
+          ],
+          "exit": 0,
+          "seconds": 0.03241542202886194,
+          "log_sha256": "8a83f12992a8028e151e64e2c8e0fef002fee1e290963221db4fd8ed86b90523"
+        },
+        {
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/native-frame-fault-ranges-e77/artifacts/native-frame-faults/release/faults",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native-frame-fault-ranges-e77/artifacts/native-frame-faults/release/smoke-3-4555/data",
+            "3",
+            "cpp",
+            "4555",
+            "4555"
+          ],
+          "exit": 0,
+          "seconds": 0.06453926401445642,
+          "log_sha256": "16f3bf19c54881187afd76fb48945011197231fc20c14a3b0df17628e6dc91b7"
+        }
+      ],
+      "binary_drift": false
+    }
+  },
+  "preserved_timeouts": [
+    {
+      "state": "terminal",
+      "tool_handle": 22015,
+      "exit": 124,
+      "budget_seconds": 900,
+      "completed": [
+        {
+          "mode": "Create",
+          "Cpp": 3458,
+          "C_malloc": 460
+        },
+        {
+          "mode": "Replace",
+          "Cpp": 2687,
+          "C_malloc": 640
+        }
+      ],
+      "unfinished": [
+        "encode C++ (no completed-prefix range claimed)",
+        "encode C",
+        "decode C++",
+        "decode C"
+      ],
+      "source_drift": [],
+      "support_drift": [],
+      "log_sha256": "afadb3a7df5cd4bfeef2fbdf4375883ca03cfceb3152cd87174a452d0c718242"
+    },
+    {
+      "state": "terminal",
+      "pid": 1344526,
+      "command": [
+        "/home/blux/de-xr/dome-sculpt/artifacts/native-frame-fault-ranges-e77/artifacts/native-frame-faults/sanitize/faults",
+        "/home/blux/de-xr/dome-sculpt/artifacts/native-frame-fault-ranges-e77/artifacts/native-frame-faults/sanitize/mode2-all/data",
+        "2",
+        "all"
+      ],
+      "source": {
+        "tests/native-frame-faults.cpp": "38802806b54da46a7922a2a27c2f4a803c8e459d877f5900676576ce42505cf5",
+        "CMakeLists.txt": "6ffe4be019f4439363fbe2b158649dc36178820b16d1537055562f2a993f5869"
+      },
+      "binary": "b33acf078e1e380346fef7c9b2f98df3533f77200da5796521241fc41b274e22",
+      "tool_handle": 83196,
+      "wrapper_exit": 1,
+      "reason": "subprocess.TimeoutExpired",
+      "budget_seconds": 900,
+      "completed_prefix_ranges": [],
+      "source_drift": [],
+      "binary_drift": false,
+      "log_sha256": "82f28fbd1341061e960f3f9544f1bc94b47a8fa3710c633b2c9d735d18f968f1",
+      "wrapper_log_sha256": "f8eda8461868ada58625a1dbc2f6f9773573cb0a03983be5575e1f9a49d9d862"
+    },
+    {
+      "state": "terminal",
+      "pid": 1344643,
+      "command": [
+        "/home/blux/de-xr/dome-sculpt/artifacts/native-frame-fault-ranges-e77/artifacts/native-frame-faults/sanitize/faults",
+        "/home/blux/de-xr/dome-sculpt/artifacts/native-frame-fault-ranges-e77/artifacts/native-frame-faults/sanitize/mode3-all/data",
+        "3",
+        "all"
+      ],
+      "source": {
+        "tests/native-frame-faults.cpp": "38802806b54da46a7922a2a27c2f4a803c8e459d877f5900676576ce42505cf5",
+        "CMakeLists.txt": "6ffe4be019f4439363fbe2b158649dc36178820b16d1537055562f2a993f5869"
+      },
+      "binary": "b33acf078e1e380346fef7c9b2f98df3533f77200da5796521241fc41b274e22",
+      "tool_handle": 64924,
+      "wrapper_exit": 1,
+      "reason": "subprocess.TimeoutExpired",
+      "budget_seconds": 900,
+      "completed_prefix_ranges": [],
+      "source_drift": [],
+      "binary_drift": false,
+      "log_sha256": "82f28fbd1341061e960f3f9544f1bc94b47a8fa3710c633b2c9d735d18f968f1",
+      "wrapper_log_sha256": "cf8ab0e9102ecad28664d659b559d228dd604dc76e2720f66503ecfa1fd8873a"
+    }
+  ],
+  "native_files": {
+    "created.dsculpt": [
+      [
+        "/home/blux/de-xr/dome-sculpt/artifacts/native-frame-fault-ranges-e77/artifacts/native-frame-faults/sanitize/mode2-cpp-6145-7544/data/created.dsculpt",
+        "464bb566e5c0fa01928f2c333974cc9d092eaad3748a8311d531c9055554b710"
+      ],
+      [
+        "/home/blux/de-xr/dome-sculpt/artifacts/native-frame-fault-ranges-e77/artifacts/native-frame-faults/sanitize/mode2-cpp-1-2048/data/created.dsculpt",
+        "464bb566e5c0fa01928f2c333974cc9d092eaad3748a8311d531c9055554b710"
+      ],
+      [
+        "/home/blux/de-xr/dome-sculpt/artifacts/native-frame-fault-ranges-e77/artifacts/native-frame-faults/sanitize/mode2-cpp-2049-4096/data/created.dsculpt",
+        "464bb566e5c0fa01928f2c333974cc9d092eaad3748a8311d531c9055554b710"
+      ],
+      [
+        "/home/blux/de-xr/dome-sculpt/artifacts/native-frame-fault-ranges-e77/artifacts/native-frame-faults/sanitize/mode2-c/data/created.dsculpt",
+        "464bb566e5c0fa01928f2c333974cc9d092eaad3748a8311d531c9055554b710"
+      ],
+      [
+        "/home/blux/de-xr/dome-sculpt/artifacts/native-frame-fault-ranges-e77/artifacts/native-frame-faults/sanitize/mode2-cpp-4097-6144/data/created.dsculpt",
+        "464bb566e5c0fa01928f2c333974cc9d092eaad3748a8311d531c9055554b710"
+      ],
+      [
+        "/home/blux/de-xr/dome-sculpt/artifacts/native-frame-fault-ranges-e77/artifacts/native-frame-faults/sanitize/mode3-cpp-4097-4555/data/created.dsculpt",
+        "464bb566e5c0fa01928f2c333974cc9d092eaad3748a8311d531c9055554b710"
+      ],
+      [
+        "/home/blux/de-xr/dome-sculpt/artifacts/native-frame-fault-ranges-e77/artifacts/native-frame-faults/sanitize/mode3-c/data/created.dsculpt",
+        "464bb566e5c0fa01928f2c333974cc9d092eaad3748a8311d531c9055554b710"
+      ],
+      [
+        "/home/blux/de-xr/dome-sculpt/artifacts/native-frame-fault-ranges-e77/artifacts/native-frame-faults/sanitize/mode3-cpp-1-2048/data/created.dsculpt",
+        "464bb566e5c0fa01928f2c333974cc9d092eaad3748a8311d531c9055554b710"
+      ],
+      [
+        "/home/blux/de-xr/dome-sculpt/artifacts/native-frame-fault-ranges-e77/artifacts/native-frame-faults/sanitize/mode3-cpp-2049-4096/data/created.dsculpt",
+        "464bb566e5c0fa01928f2c333974cc9d092eaad3748a8311d531c9055554b710"
+      ],
+      [
+        "/home/blux/de-xr/dome-sculpt/artifacts/native-frame-faults-e77ba52/artifacts/native-frame-faults/release/data/created.dsculpt",
+        "464bb566e5c0fa01928f2c333974cc9d092eaad3748a8311d531c9055554b710"
+      ],
+      [
+        "/home/blux/de-xr/dome-sculpt/artifacts/native-frame-faults-e77ba52/artifacts/native-frame-faults/sanitize/data/created.dsculpt",
+        "464bb566e5c0fa01928f2c333974cc9d092eaad3748a8311d531c9055554b710"
+      ],
+      [
+        "/home/blux/de-xr/dome-sculpt/artifacts/native-frame-fault-ranges-e77/artifacts/native-frame-faults/sanitize/mode2-all/data/created.dsculpt",
+        "464bb566e5c0fa01928f2c333974cc9d092eaad3748a8311d531c9055554b710"
+      ],
+      [
+        "/home/blux/de-xr/dome-sculpt/artifacts/native-frame-fault-ranges-e77/artifacts/native-frame-faults/sanitize/mode3-all/data/created.dsculpt",
+        "464bb566e5c0fa01928f2c333974cc9d092eaad3748a8311d531c9055554b710"
+      ]
+    ],
+    "replaced.dsculpt": [
+      [
+        "/home/blux/de-xr/dome-sculpt/artifacts/native-frame-fault-ranges-e77/artifacts/native-frame-faults/sanitize/mode2-cpp-6145-7544/data/replaced.dsculpt",
+        "47ff824ba960ff88cfe8b5100b736c92cdbd75578ab5c5ee0feb06182eb1cbb2"
+      ],
+      [
+        "/home/blux/de-xr/dome-sculpt/artifacts/native-frame-fault-ranges-e77/artifacts/native-frame-faults/sanitize/mode2-cpp-1-2048/data/replaced.dsculpt",
+        "47ff824ba960ff88cfe8b5100b736c92cdbd75578ab5c5ee0feb06182eb1cbb2"
+      ],
+      [
+        "/home/blux/de-xr/dome-sculpt/artifacts/native-frame-fault-ranges-e77/artifacts/native-frame-faults/sanitize/mode2-cpp-2049-4096/data/replaced.dsculpt",
+        "47ff824ba960ff88cfe8b5100b736c92cdbd75578ab5c5ee0feb06182eb1cbb2"
+      ],
+      [
+        "/home/blux/de-xr/dome-sculpt/artifacts/native-frame-fault-ranges-e77/artifacts/native-frame-faults/sanitize/mode2-c/data/replaced.dsculpt",
+        "47ff824ba960ff88cfe8b5100b736c92cdbd75578ab5c5ee0feb06182eb1cbb2"
+      ],
+      [
+        "/home/blux/de-xr/dome-sculpt/artifacts/native-frame-fault-ranges-e77/artifacts/native-frame-faults/sanitize/mode2-cpp-4097-6144/data/replaced.dsculpt",
+        "47ff824ba960ff88cfe8b5100b736c92cdbd75578ab5c5ee0feb06182eb1cbb2"
+      ],
+      [
+        "/home/blux/de-xr/dome-sculpt/artifacts/native-frame-fault-ranges-e77/artifacts/native-frame-faults/sanitize/mode3-cpp-4097-4555/data/replaced.dsculpt",
+        "47ff824ba960ff88cfe8b5100b736c92cdbd75578ab5c5ee0feb06182eb1cbb2"
+      ],
+      [
+        "/home/blux/de-xr/dome-sculpt/artifacts/native-frame-fault-ranges-e77/artifacts/native-frame-faults/sanitize/mode3-c/data/replaced.dsculpt",
+        "47ff824ba960ff88cfe8b5100b736c92cdbd75578ab5c5ee0feb06182eb1cbb2"
+      ],
+      [
+        "/home/blux/de-xr/dome-sculpt/artifacts/native-frame-fault-ranges-e77/artifacts/native-frame-faults/sanitize/mode3-cpp-1-2048/data/replaced.dsculpt",
+        "47ff824ba960ff88cfe8b5100b736c92cdbd75578ab5c5ee0feb06182eb1cbb2"
+      ],
+      [
+        "/home/blux/de-xr/dome-sculpt/artifacts/native-frame-fault-ranges-e77/artifacts/native-frame-faults/sanitize/mode3-cpp-2049-4096/data/replaced.dsculpt",
+        "47ff824ba960ff88cfe8b5100b736c92cdbd75578ab5c5ee0feb06182eb1cbb2"
+      ],
+      [
+        "/home/blux/de-xr/dome-sculpt/artifacts/native-frame-faults-e77ba52/artifacts/native-frame-faults/release/data/replaced.dsculpt",
+        "47ff824ba960ff88cfe8b5100b736c92cdbd75578ab5c5ee0feb06182eb1cbb2"
+      ],
+      [
+        "/home/blux/de-xr/dome-sculpt/artifacts/native-frame-faults-e77ba52/artifacts/native-frame-faults/sanitize/data/replaced.dsculpt",
+        "47ff824ba960ff88cfe8b5100b736c92cdbd75578ab5c5ee0feb06182eb1cbb2"
+      ],
+      [
+        "/home/blux/de-xr/dome-sculpt/artifacts/native-frame-fault-ranges-e77/artifacts/native-frame-faults/sanitize/mode2-all/data/replaced.dsculpt",
+        "47ff824ba960ff88cfe8b5100b736c92cdbd75578ab5c5ee0feb06182eb1cbb2"
+      ],
+      [
+        "/home/blux/de-xr/dome-sculpt/artifacts/native-frame-fault-ranges-e77/artifacts/native-frame-faults/sanitize/mode3-all/data/replaced.dsculpt",
+        "47ff824ba960ff88cfe8b5100b736c92cdbd75578ab5c5ee0feb06182eb1cbb2"
+      ]
+    ]
+  },
+  "final_sources": {
+    "tests/native-frame-faults.cpp": "38802806b54da46a7922a2a27c2f4a803c8e459d877f5900676576ce42505cf5",
+    "CMakeLists.txt": "e431cc1e9946b58a2b9ee99caf991d7cd3bc6fce75f89afcfdfcfae8178a7012"
+  },
+  "registration": {
+    "release": {
+      "configure_exit": 0,
+      "scope": "Configuration/listing only; no libraries or targets built in this registration directory",
+      "tests": [
+        {
+          "name": "native-frame-create-faults",
+          "registration": "add_test([=[native-frame-create-faults]=] \"/home/blux/de-xr/dome-sculpt/artifacts/native-frame-fault-ranges-e77/build-register-release/dome-sculpt-native-frame-faults-test\" \"/home/blux/de-xr/dome-sculpt/artifacts/native-frame-fault-ranges-e77/build-register-release/native-frame-create-faults\" \"0\" \"all\")",
+          "timeout": 900.0
+        },
+        {
+          "name": "native-frame-replace-faults",
+          "registration": "add_test([=[native-frame-replace-faults]=] \"/home/blux/de-xr/dome-sculpt/artifacts/native-frame-fault-ranges-e77/build-register-release/dome-sculpt-native-frame-faults-test\" \"/home/blux/de-xr/dome-sculpt/artifacts/native-frame-fault-ranges-e77/build-register-release/native-frame-replace-faults\" \"1\" \"all\")",
+          "timeout": 900.0
+        },
+        {
+          "name": "native-frame-encode-faults",
+          "registration": "add_test([=[native-frame-encode-faults]=] \"/home/blux/de-xr/dome-sculpt/artifacts/native-frame-fault-ranges-e77/build-register-release/dome-sculpt-native-frame-faults-test\" \"/home/blux/de-xr/dome-sculpt/artifacts/native-frame-fault-ranges-e77/build-register-release/native-frame-encode-faults\" \"2\" \"all\")",
+          "timeout": 900.0
+        },
+        {
+          "name": "native-frame-decode-faults",
+          "registration": "add_test([=[native-frame-decode-faults]=] \"/home/blux/de-xr/dome-sculpt/artifacts/native-frame-fault-ranges-e77/build-register-release/dome-sculpt-native-frame-faults-test\" \"/home/blux/de-xr/dome-sculpt/artifacts/native-frame-fault-ranges-e77/build-register-release/native-frame-decode-faults\" \"3\" \"all\")",
+          "timeout": 900.0
+        }
+      ]
+    },
+    "sanitize": {
+      "configure_exit": 0,
+      "scope": "Configuration/listing only; no libraries or targets built in this registration directory",
+      "tests": [
+        {
+          "name": "native-frame-create-faults",
+          "registration": "add_test([=[native-frame-create-faults]=] \"/home/blux/de-xr/dome-sculpt/artifacts/native-frame-fault-ranges-e77/build-register-sanitize/dome-sculpt-native-frame-faults-test\" \"/home/blux/de-xr/dome-sculpt/artifacts/native-frame-fault-ranges-e77/build-register-sanitize/native-frame-create-faults\" \"0\" \"all\")",
+          "timeout": 2400.0
+        },
+        {
+          "name": "native-frame-replace-faults",
+          "registration": "add_test([=[native-frame-replace-faults]=] \"/home/blux/de-xr/dome-sculpt/artifacts/native-frame-fault-ranges-e77/build-register-sanitize/dome-sculpt-native-frame-faults-test\" \"/home/blux/de-xr/dome-sculpt/artifacts/native-frame-fault-ranges-e77/build-register-sanitize/native-frame-replace-faults\" \"1\" \"all\")",
+          "timeout": 2400.0
+        },
+        {
+          "name": "native-frame-encode-faults",
+          "registration": "add_test([=[native-frame-encode-faults]=] \"/home/blux/de-xr/dome-sculpt/artifacts/native-frame-fault-ranges-e77/build-register-sanitize/dome-sculpt-native-frame-faults-test\" \"/home/blux/de-xr/dome-sculpt/artifacts/native-frame-fault-ranges-e77/build-register-sanitize/native-frame-encode-faults\" \"2\" \"all\")",
+          "timeout": 2400.0
+        },
+        {
+          "name": "native-frame-decode-faults",
+          "registration": "add_test([=[native-frame-decode-faults]=] \"/home/blux/de-xr/dome-sculpt/artifacts/native-frame-fault-ranges-e77/build-register-sanitize/dome-sculpt-native-frame-faults-test\" \"/home/blux/de-xr/dome-sculpt/artifacts/native-frame-fault-ranges-e77/build-register-sanitize/native-frame-decode-faults\" \"3\" \"all\")",
+          "timeout": 2400.0
+        }
+      ]
+    }
+  },
+  "budget": "Only after frozen proof jobs terminated: CMake now registers four natural modes, each900s optimized or2400s with address/undefined sanitizer flags. Inner assertions,32768 measured-prefix bound and production caps unchanged. Existing900s failures remain failures; longer whole-mode rerun not manufactured.",
+  "preserved_setup_negative": {
+    "release": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/native-frame-fault-ranges-e77/artifacts/native-frame-faults/register-headless-release-negative.log",
+      "sha256": "0f6db5fab17ec48e71a4326ad691b7cf484d4ea93b42e553039d15e84904da52"
+    },
+    "sanitize": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/native-frame-fault-ranges-e77/artifacts/native-frame-faults/register-headless-sanitize-negative.log",
+      "sha256": "ffc9d1e65c150aa854b5a22662ec1a242f5edf1a3d23a670a8c210898a53ca74"
+    },
+    "cause": "Inherited e77 VRM1 expression palette target links missing PkgConfig::RENDERFONTS with UI/XR off; no headless fix claimed. Canonical UI/XR registration/configure succeeds separately."
+  },
+  "evidence": {
+    "final-frozen-proof.json": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/native-frame-fault-ranges-e77/artifacts/native-frame-faults/final-frozen-proof.json",
+      "sha256": "55ae45c7d0a9fad70d148745b5e4905211fd4c8c5d1f4c808096f76f2b54f94d"
+    },
+    "live-audit.json": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/native-frame-fault-ranges-e77/artifacts/native-frame-faults/live-audit.json",
+      "sha256": "059b552a813ae033afee3ff4a1a16704ee7c6d19c4f4ee42130b82b09676e894"
+    },
+    "selector.diff": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/native-frame-fault-ranges-e77/artifacts/native-frame-faults/selector.diff",
+      "sha256": "1901a84a01d1ed4c8f882e086909f9ceabbd21c4e2a7093c8277d4020310403f"
+    },
+    "registration.json": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/native-frame-fault-ranges-e77/artifacts/native-frame-faults/registration.json",
+      "sha256": "73d6942320eacd083bf7513ae183fade800998d6ffbe145c42cfe774db43052f"
+    },
+    "build.py": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/native-frame-fault-ranges-e77/artifacts/native-frame-faults/build.py",
+      "sha256": "5af7a751741398e1a7183d125c3fafe45cd317f95cde374275c356e08a646772"
+    },
+    "run-mode.py": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/native-frame-fault-ranges-e77/artifacts/native-frame-faults/run-mode.py",
+      "sha256": "b7591f0d22ef7a88c8a9850e7b9803f60d64e3f7d66569335c96bf4f569dee24"
+    },
+    "run-ranges.py": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/native-frame-fault-ranges-e77/artifacts/native-frame-faults/run-ranges.py",
+      "sha256": "cebbcf2c1ed3fc7feb275160070777522e045ea6dd30657a312b0a364453e9fa"
+    },
+    "register-release.log": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/native-frame-fault-ranges-e77/artifacts/native-frame-faults/register-release.log",
+      "sha256": "888a64eb0db49a6d52bd3cf68b84e01ace10632bb9c90a8fd9ad6fd1910f1334"
+    },
+    "register-sanitize.log": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/native-frame-fault-ranges-e77/artifacts/native-frame-faults/register-sanitize.log",
+      "sha256": "22b9858db17597c5834ab6a271e9649ba7c2fed63accf1a71e480361014e22af"
+    }
+  },
+  "not_claimed": [
+    "A green original aggregate SAN invocation or the two exhausted900s per-mode wrappers",
+    "Exhaustive arbitrary input, caller admission, publication, C allocator family or cache-state faults",
+    "Fresh whole project rebuild, device/render/export/UI evidence from this allocation-only test",
+    "Main/Scene37 admission or full authoring goal completion"
+  ],
+  "final_documentation": [
+    "docs/NATIVE-FRAME-FAULTS.md",
+    "docs/HANDOFF.md"
+  ]
+}

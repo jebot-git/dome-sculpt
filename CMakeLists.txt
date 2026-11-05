@@ -4152,3 +4152,30 @@ if(BUILD_TESTING AND TARGET dome-sculpt AND TARGET dome-sculpt-test-runtime AND 
   set_tests_properties(native-key-uv-openxr PROPERTIES FIXTURES_REQUIRED native_key_uv TIMEOUT 300
     ENVIRONMENT "LIBGL_ALWAYS_SOFTWARE=1;LP_NUM_THREADS=2")
 endif()
+if(BUILD_TESTING)
+  add_executable(dome-sculpt-native-frame-faults-test tests/native-frame-faults.cpp)
+  target_include_directories(dome-sculpt-native-frame-faults-test PRIVATE src)
+  target_link_libraries(dome-sculpt-native-frame-faults-test PRIVATE dome-sculpt-core)
+  target_link_options(dome-sculpt-native-frame-faults-test PRIVATE "-Wl,--wrap=malloc")
+  # Preserve the original 900s optimized budget. Full owned O1 ASan/UBSan
+  # encoding exceeded that wall limit; completed disjoint ranges retain every
+  # allocation prefix and assertion. This changes only the whole-test budget.
+  set(_native_frame_fault_timeout 900)
+  string(TOUPPER "${CMAKE_BUILD_TYPE}" _native_frame_fault_config)
+  set(_native_frame_fault_flags "${CMAKE_CXX_FLAGS} ${CMAKE_CXX_FLAGS_${_native_frame_fault_config}}")
+  if(_native_frame_fault_flags MATCHES "-fsanitize=[^ ]*(address|undefined)")
+    set(_native_frame_fault_timeout 2400)
+  endif()
+  set(frame_fault_mode 0)
+  foreach(phase IN ITEMS create replace encode decode)
+    add_test(NAME native-frame-${phase}-faults COMMAND dome-sculpt-native-frame-faults-test
+      ${CMAKE_CURRENT_BINARY_DIR}/native-frame-${phase}-faults ${frame_fault_mode} all)
+    set_tests_properties(native-frame-${phase}-faults PROPERTIES TIMEOUT ${_native_frame_fault_timeout}
+      ENVIRONMENT "LIBGL_ALWAYS_SOFTWARE=1;XR_RUNTIME_JSON=${CMAKE_CURRENT_BINARY_DIR}/native-frame-no-physical-runtime.json")
+    math(EXPR frame_fault_mode "${frame_fault_mode}+1")
+  endforeach()
+  unset(frame_fault_mode)
+  unset(_native_frame_fault_timeout)
+  unset(_native_frame_fault_config)
+  unset(_native_frame_fault_flags)
+endif()

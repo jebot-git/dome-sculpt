@@ -39,3 +39,13 @@ directories and retains every successfully compiled matching object, then
 completes Release ALL/selected sanitizer and the120 runtime commands. This is
 an explicit incremental continuation after an evidenced build-system failure,
 not a restart caused by observation timeout or a green original invocation.
+
+At this finite boundary, test-only milestones55b1c89 andf3716c2 are also included:
+the current controller report/actual numeric receipt and all four genuine native
+frame Create/Replace/encoder/decoder fault modes. Production C++ and headers
+still matchc31 exactly. Existing nine controller checks and complete measured
+fault prefixes have separate matching-support evidence; current combined tests
+must run again. Four new registrations give766 commands; the focused cohort
+selects125, including the controller and four fault phases. Sanitizer fault wall
+budgets are2400 per phase; optimized900 and every inner allocation assertion/cap
+are preserved. Original timeout/failure results remain in their receipts.
