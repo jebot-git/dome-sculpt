@@ -386,6 +386,9 @@ def aggregate(args):
         calibration_file = run / "case-9999" / "measurement.json"
         require(digest(calibration_file) == calibration["native_report_sha256"]
                 and read(calibration_file) == calibration["native"], "Calibration report changed")
+        expected = {f"part-{p['id']:04d}.json" for p in plan["parts"]}
+        require({p.name for p in run.glob("part-*.json")} == expected,
+                "Missing or stray partition receipts")
         receipts = [verify_stored(run, plan, part) for part in plan["parts"]]
         totals = validate_coverage(plan, receipts)
         check_inputs(plan)
