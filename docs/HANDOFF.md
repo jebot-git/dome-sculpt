@@ -2157,3 +2157,5 @@ common-refinement are separate approved record4 kinds within owning29/material12
 conditional Paint5/domain2/frame-position3/normal6 only apply when used. Full
 native/UI/persistence/render/export remain required; no public DTO/schema edits.
 Read KEY-MIRROR-PLANE.md and its receipt.
+
+Private authored-Normal VRM1 expression milestone: see docs/VRM1-NORMAL-PAINTED-EXPRESSIONS.md and its machine receipt. Five complete production TUs on matching4ab support; R/S2659 factory boundaries, worker67, Apply/history38, independent199 painted+64 raw checks/48 pairs each, max1<=4; strict Arc265/48pairs plus2software refusals,75official instances/10files0errors. No renderer/layout/schema/UI change, old generic transformed-normal API refusal preserved; semantic current-ABI union, generated/prepared/native/physical/MASK coupling remain required. Original64560 full66187-prefix sanitizer remains independent/live, never replaced. Camera audit retains native camera-up, pinned reference world-up and explicit no-roll scope.

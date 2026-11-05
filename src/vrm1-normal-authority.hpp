@@ -10,6 +10,7 @@ inline void require_vrm1_authored_normal_frame(const SculptObject &object,
  auto fail=[](const char *reason){throw std::invalid_argument(std::string("VRM1 normal-texture authored frame: ")+reason);};
  if(!object.painted||!object.appearance||!object.material_bindings)fail("owning source is absent");
  const auto &binding=*object.material_bindings;
+ if(!binding.has_mtoon||binding.material.version()!=MToonVersion::V1)fail("actual typed MToon1 owner is required");
  if(!object.painted->source_sampling_prepared()||!object.painted->valid_source_sampling_attachment()||
     binding.normal_frame!=SourceMaterialNormalFrame::OriginalAttributes||!binding.normal_frames||
     !binding.uv_origin||!binding.uv_origin->appearance||!binding.uv_origin->paint||
@@ -35,4 +36,21 @@ inline void require_vrm1_authored_normal_frame(const SculptObject &object,
  if(!maps||!role.image||role.image!=maps->normal.image||role.wrap_s!=maps->normal.wrap_s||role.wrap_t!=maps->normal.wrap_t||role.min_filter!=maps->normal.min_filter||role.mag_filter!=maps->normal.mag_filter||binding.material.parameters.normal_scale!=maps->normal_scale)
   fail("typed and original core normal sampler/image authority differs");
 }
+struct NormalFrameExport;
+class Vrm1AuthoringCompilation;
+NormalFrameExport normal_frame_export_vrm1(const Vrm1AuthoringCompilation &,
+ const ObjectSurface &,const std::function<bool()> &);
+// A caller cannot construct this from arbitrary changed geometry or a bool.
+// Its only friend authenticates the exact sealed compiler surface and captured
+// Source4 owner, and consumes the token synchronously without exposing it.
+class Vrm1NormalFrameExportProof final {
+ const ObjectSurface *surface_;
+ std::shared_ptr<const SourceMaterialBindings> binding_;
+ std::shared_ptr<const TextureMaps> textures_;
+ Vrm1NormalFrameExportProof(const ObjectSurface &surface):surface_(&surface),binding_(surface.material_bindings),textures_(surface.textures){}
+ friend NormalFrameExport normal_frame_export_vrm1(const Vrm1AuthoringCompilation &,const ObjectSurface &,const std::function<bool()> &);
+public:
+ Vrm1NormalFrameExportProof(const Vrm1NormalFrameExportProof&)=delete;
+ bool matches(const ObjectSurface &surface)const{return &surface==surface_&&surface.material_bindings==binding_&&surface.textures==textures_;}
+};
 } // namespace dome::detail

@@ -983,3 +983,5 @@ VRM1-COHERENT-INTEGRATION.md. Root vendor all-target builds now pass on a
 frozen copy (build-only; see validation/VRM1-VENDOR-BUILDS.json). Full V1/physics/
 HDR/painting and broader workflow requirements stay
 open. This is not an all535-test or full-goal completion claim.
+
+Qualified private authored-Normal VRM1 expression increment is recorded in VRM1-NORMAL-PAINTED-EXPRESSIONS.md/JSON: genuine imported authored tangent frame and original sampler/UV1/KHR through native Apply/history/Save plus dynamic independent painted export. Ordinary APIs keep their prior guard, foreign sealed-surface ownership refuses; generated/coupled/prepared/canonical/native/physical domains and full coherent app/external consumer admission remain open. Component and original full-prefix sanitizer scopes are distinct; full objective remains active.

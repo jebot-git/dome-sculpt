@@ -13,6 +13,7 @@
 #include "io.hpp"
 #include "gltf-document.hpp"
 #include "normal-frame-export.hpp"
+#include "vrm1-normal-export.hpp"
 #include "prepared-color-state.hpp"
 #include "current-colors.hpp"
 #include "bone-metadata.hpp"
@@ -58,8 +59,10 @@ GltfExportReport export_glb(const std::vector<ObjectSurface> &objects,
     "Source NORMAL deltas recomputed from edited geometry; original authoring data remains unchanged");
   stop();detail::write_glb(std::move(document),path,options.cancelled,options.before_commit);return report;
 }
-detail::GltfDocument detail::make_gltf(const std::vector<ObjectSurface> &input_objects,
-    SourceMorphSpace source_space,bool recompute_changed_normals,std::function<bool()> cancelled) {
+namespace detail {
+namespace {
+GltfDocument make_gltf_impl(const std::vector<ObjectSurface> &input_objects,
+    SourceMorphSpace source_space,bool recompute_changed_normals,std::function<bool()> cancelled,const Vrm1AuthoringCompilation *normal_owner) {
   auto stop=[&]{if(cancelled && cancelled())throw std::runtime_error("glTF export cancelled");};
   size_t work=0;auto checkpoint=[&]{if((++work&1023)==0)stop();};
   stop();
@@ -181,7 +184,7 @@ detail::GltfDocument detail::make_gltf(const std::vector<ObjectSurface> &input_o
     if(input.material_bindings&&input.material_bindings->color_preparation)
       input.material_bindings->color_preparation->validate_current(input.mesh,input.appearance.get(),cancelled);
     std::optional<NormalFrameExport> prepared;
-    if(input.material_bindings && input.material_bindings->normal_frames)prepared=normal_frame_export(input,source_space,cancelled,source_space==SourceMorphSpace::Native);
+    if(input.material_bindings && input.material_bindings->normal_frames)prepared=normal_owner?normal_frame_export_vrm1(*normal_owner,input,cancelled):normal_frame_export(input,source_space,cancelled,source_space==SourceMorphSpace::Native);
     const auto &o=prepared?prepared->surface:input;auto *frame=prepared?&*prepared:nullptr;
     GltfObjectIdentity emission;
     if(frame){emission.canonical_normal=frame->canonical_normal;emission.prepared_normal=frame->prepared_normal;}
@@ -755,6 +758,12 @@ detail::GltfDocument detail::make_gltf(const std::vector<ObjectSurface> &input_o
   }
   return result;
 }
+} // namespace
+GltfDocument make_gltf(const std::vector<ObjectSurface> &objects,SourceMorphSpace space,
+ bool recompute,std::function<bool()> cancelled){return make_gltf_impl(objects,space,recompute,std::move(cancelled),nullptr);}
+GltfDocument make_vrm1_authoring_gltf(const Vrm1AuthoringCompilation &owner,
+ const std::function<bool()> &cancelled){return make_gltf_impl(owner.surfaces(),SourceMorphSpace::Native,true,cancelled,&owner);}
+} // namespace detail
 void detail::write_glb(GltfDocument document,const std::filesystem::path &path) {
   write_glb(std::move(document),path,{},{});
 }

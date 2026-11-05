@@ -896,5 +896,25 @@
     "artifacts/normal-proof/native-v1-sanitize/images/source-normal.vrm-p2-h1.000000-c0.000000-e0-parsed.png": "69a0e0088fefec31cc855c88f01516e9bff24a0fbef93cd7850162f2b157259c",
     "artifacts/normal-proof/native-v1-sanitize/images/source-normal.vrm-p2-h1.000000-c0.000000-e1-native.png": "016a42da5632f9d41ebdc28b3c31c647a12f788f75609f40069a1628ceee6bf6",
     "artifacts/normal-proof/native-v1-sanitize/images/source-normal.vrm-p2-h1.000000-c0.000000-e1-parsed.png": "11d08f2de98b2f95b8f7f3134001590562357290f36948d96006c365c3a50808"
+  },
+  "matcap_camera_convention": {
+    "audit": "Read-only. No renderer change. Current independent pairs have no camera roll; future rolled-view comparison must declare its reference convention.",
+    "primary": {
+      "project": "UniVRM",
+      "commit": "efd20f62f1bf0ac3fcc34de1e497324c5197d146",
+      "file": "Packages/VRM10/MToon10/Shaders/vrmc_materials_mtoon_lighting_mtoon.hlsl",
+      "local_copy": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-role-audit-43e/artifacts/role-audit/spec/vrmc_materials_mtoon_lighting_mtoon.hlsl",
+      "sha256": "9450a91f375b30fde1e0a7e85d133fefb3eca5e80c72bfe9f4bb2370bfd45ba9",
+      "lines": "113-117",
+      "semantics": "Pinned reference constructs right/up from viewDirWS and fixed worldUpWS=(0,1,0)."
+    },
+    "native": {
+      "render_cpp_lines": "754-759",
+      "render_cpp_sha256": "189779fcdabda18eda4f522de6c15cceaca9568f30821795876564d88aa37504",
+      "shader_lines": "136-140",
+      "shader_sha256": "0b0367d3b78a33312c6f8b92aebdb29d67383cbcdd435a3289202eb2a594e47d",
+      "semantics": "Renderer derives forward/up from the supplied view-projection matrix, removes forward from up, and passes camera-up to the shader. The shader builds the MatCap axes with that up; ordinary perspective/asymmetric XR retains camera roll."
+    },
+    "separate_observation": "Root measured cross-device Rim87/pristine113 rare pixel deltas while each device native-vs-independent remained <=1. This audit does not attribute them to roll or classify them as export failures. No CPU-to-Arc bit identity claim."
   }
 }

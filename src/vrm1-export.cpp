@@ -7,6 +7,7 @@
 #include "vrm-source-graph.hpp"
 #include "vrm1-metadata.hpp"
 #include "vrm1-authoring.hpp"
+#include "vrm1-normal-export.hpp"
 #include "native-authoring-attach.hpp"
 #include <set>
 #include <bit>
@@ -187,7 +188,7 @@ static VrmExportReport export_vrm1_impl(const std::vector<ObjectSurface> &object
   // VRM1 uses native glTF axes. Original is the older VRM0 basis conversion,
   // not a version-neutral switch for all VRM formats.
   auto document =
-      make_gltf(objects, SourceMorphSpace::Native, true, options.cancelled);
+      authoring?make_vrm1_authoring_gltf(*authoring,options.cancelled):make_gltf(objects, SourceMorphSpace::Native, true, options.cancelled);
   auto &j = document.json;
   auto &binary = document.binary;
   Vrm1IdentityMap identities;
@@ -526,7 +527,7 @@ static VrmExportReport export_vrm1_impl(const std::vector<ObjectSurface> &object
     if(const auto *layer=authoring?authoring->expression_layer(object):nullptr){
       // Replay the same owning frame expansion as make_gltf, then authenticate
       // the actual emitted index bytes. Never infer correspondence by position.
-      auto frame=normal_frame_export(object,SourceMorphSpace::Native,options.cancelled,true);
+      auto frame=normal_frame_export_vrm1(*authoring,object,options.cancelled);
       const auto lower=j["meshes"][emitted.mesh]["primitives"][0];
       const auto &position=j["accessors"][lower.at("attributes").at("POSITION").get<size_t>()];
       require(position.at("count").get<size_t>()==frame.rest_vertices.size(),"expression layer frame expansion count differs");
