@@ -5,6 +5,9 @@
 #include <iostream>
 #include <cstdlib>
 #include <new>
+#include <charconv>
+#include <fstream>
+#include "humanoid-sha256.hpp"
 namespace allocation_probe {
 thread_local bool active=false;thread_local size_t calls=0,limit=SIZE_MAX;
 void hit(){if(active&&calls++>=limit)throw std::bad_alloc();}
@@ -47,6 +50,35 @@ void sweep(const Scene &source,const ShapeKeyEdit &edit,const char *label,bool m
  if(!denied||!success)throw std::runtime_error("Persistent factory allocation cohort lacks denial or success endpoint");std::cout<<"PASS KEY_CPP_PREFIXES "<<label<<" denied="<<denied<<" successful="<<success<<" baseline="<<baseline<<std::endl;
 }
 }
+namespace {
+size_t allocation_prefix(std::string_view value){size_t n=0;const auto [end,error]=std::from_chars(value.data(),value.data()+value.size(),n);if(value.empty()||error!=std::errc{}||end!=value.data()+value.size())throw std::invalid_argument("Invalid absolute key allocation prefix");return n;}
+int partitioned_key(int argc,char**argv){
+ const bool measure=std::string_view(argv[3])=="--oom-measure";if((measure&&argc!=5)||(!measure&&argc!=8))return 2;const std::string operation=argv[measure?4:7];if(operation!="Create"&&operation!="Replace")throw std::invalid_argument("Unknown actual key operation");const std::filesystem::path out=argv[2];if(std::filesystem::exists(out))throw std::invalid_argument("Key partition output exists; preserve original evidence");std::filesystem::create_directories(out);
+ auto source=Scene::load(argv[1]);ShapeKeyEdit edit;edit.name="Persistent current37 new key";if(operation=="Replace"){author_shapekey(source,source.active().id,edit);edit.action=ShapeKeyAction::Replace;edit.target=source.active().deformation->morphs->targets.size()-1;edit.positions=source.active().painted->mesh().positions;edit.positions.at(0).z+=.007f;edit.positions.at(3).z-=.006f;}
+ const auto exact=source.encode();nlohmann::json positive;std::vector<size_t> counts;for(size_t pass=0;pass<3;++pass){auto candidate=source;size_t count=0;{allocation_probe::Guard guard(SIZE_MAX);author_shapekey(candidate,candidate.active().id,edit);count=allocation_probe::calls;}counts.push_back(count);if(!pass)positive=candidate.encode();else if(candidate.encode()!=positive)throw std::runtime_error("Repeated actual key result differs");if(source.encode()!=exact)throw std::runtime_error("Actual key measurement changed complete source");}
+ const size_t baseline=counts.front();const bool stable=std::all_of(counts.begin(),counts.end(),[&](auto n){return n==baseline;});std::ifstream fixture_file(argv[1],std::ios::binary);const std::vector<uint8_t> fixture{std::istreambuf_iterator<char>(fixture_file),{}};if(!fixture_file.eof()&&fixture_file.fail())throw std::runtime_error("Cannot hash input fixture");
+ nlohmann::json report{{"format",1},{"mode",measure?"measure":"range"},{"operation",operation},{"baseline",baseline},{"baseline_counts",counts},{"stable_baseline",stable},{"fixture_sha256",creator_detail::sha256(fixture)},{"scene_sha256",creator_detail::sha256(nlohmann::json::to_cbor(exact))},{"baseline_result_sha256",creator_detail::sha256(nlohmann::json::to_cbor(positive))},{"cache_budget",paint_composite_cache_stats().limit_bytes}};
+#ifdef __SANITIZE_ADDRESS__
+ report["profile"]="asan-ubsan";
+#else
+ report["profile"]="release";
+#endif
+ if(!stable)throw std::runtime_error("Actual key allocation baseline differs across three same-input calls");
+ if(measure){report["terminal_exit"]=0;}else{
+  const size_t begin=allocation_prefix(argv[4]),end=allocation_prefix(argv[5]);if(allocation_prefix(argv[6])!=baseline||begin>=end||end>baseline+1)throw std::invalid_argument("Key partition differs from measured absolute interval");size_t denied=0,successful=0;bool endpoint=false;std::vector<size_t> retries;
+  for(size_t cut=begin;cut<end;++cut){auto candidate=source;bool failed=false;size_t calls=0;{allocation_probe::Guard guard(cut);try{author_shapekey(candidate,candidate.active().id,edit);}catch(const std::bad_alloc&){failed=true;}calls=allocation_probe::calls;}
+   if(failed){if(calls<=cut||candidate.encode()!=exact||source.encode()!=exact)throw std::runtime_error("Actual key persistent denial changed complete caller: "+operation+" prefix "+std::to_string(cut));++denied;}
+   else{if(candidate.encode()!=positive||source.encode()!=exact)throw std::runtime_error("Actual key allocation success differs from exact complete reference: "+operation+" prefix "+std::to_string(cut));++successful;if(cut==baseline)endpoint=true;}
+   if(cut==0||cut==baseline/2||cut==baseline){auto retry=source;author_shapekey(retry,retry.active().id,edit);if(retry.encode()!=positive)throw std::runtime_error("Persistent allocation context retry differs");retries.push_back(cut);}
+   if(cut%250==0)std::cout<<"KEY_CPP_PREFIX "<<operation<<" "<<cut<<std::endl;
+  }
+  if(denied+successful!=end-begin||source.encode()!=exact)throw std::runtime_error("Key partition is incomplete or changed source");report.update({{"begin",begin},{"end",end},{"completed",denied+successful},{"denied",denied},{"successful",successful},{"translated",0},{"endpoint_successful",endpoint},{"retried_prefixes",retries},{"first_completed",begin},{"last_completed",end-1},{"terminal_exit",0}});
+ }
+ std::ofstream output(out/(measure?"measurement.json":"range.json"));output.exceptions(std::ios::badbit|std::ios::failbit);output<<report.dump(2)<<'\n';std::cout<<"KEY_PARTITION "<<operation<<" baseline="<<baseline<<" mode="<<(measure?"measure":"range")<<" terminal0\n";return 0;
+}
+}
+
 int main(int argc,char **argv)try{
+ if(argc>=4&&(std::string_view(argv[3])=="--oom-measure"||std::string_view(argv[3])=="--oom-range"))return partitioned_key(argc,argv);
  if(argc<2||argc>3)return 2;const bool measure=argc==3&&std::string_view(argv[2])=="--measure";auto source=Scene::load(argv[1]);const auto exact=source.encode();ShapeKeyEdit create;create.name="Persistent current37 new key";sweep(source,create,"Create",measure);author_shapekey(source,source.active().id,create);ShapeKeyEdit replace;replace.action=ShapeKeyAction::Replace;replace.target=source.active().deformation->morphs->targets.size()-1;replace.positions=source.active().painted->mesh().positions;replace.positions.at(0).z+=.007f;replace.positions.at(3).z-=.006f;sweep(source,replace,"Replace",measure);std::cout<<"PASS actual post37 persistent key factory controls\n";return 0;
 }catch(const std::exception &e){allocation_probe::active=false;std::cerr<<"FAIL "<<e.what()<<'\n';return 1;}
