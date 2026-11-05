@@ -49,14 +49,14 @@ int main(int argc,char **argv)try{
    begin=prefix_number(argv[4]);end=prefix_number(argv[5]);
    if(begin>=end||end>baseline+1)throw std::invalid_argument("Allocation partition is outside the complete absolute prefix interval");
   }
-  size_t denied=0,successful=0,translated=0;std::set<std::string> messages;const auto started=std::chrono::steady_clock::now();
+  size_t denied=0,successful=0,translated=0;bool endpoint_successful=false;std::vector<size_t> retried_prefixes;std::set<std::string> messages;const auto started=std::chrono::steady_clock::now();
   for(size_t prefix=begin;prefix<end;++prefix){seed(file);const auto prior=bytes(file);bool failed=false,other=false;std::exception_ptr error;size_t calls=0;
    {allocation_probe::Guard guard(prefix);try{emit(file,options);}catch(const std::bad_alloc&){failed=true;}catch(const std::exception&e){failed=other=true;error=std::current_exception();}calls=allocation_probe::calls;}
    std::string message;if(error)try{std::rethrow_exception(error);}catch(const std::exception&e){message=e.what();}
    if(other&&calls<=prefix)throw std::runtime_error(std::string("Unrelated export error in allocation sweep: ")+message);
    if(failed){if(bytes(file)!=prior||scene.encode()!=exact)throw std::runtime_error("Canonical37 physical allocation denial changed prior output or complete source");++denied;if(other){++translated;if(messages.insert(message).second)std::cout<<"CANONICAL37_TRANSLATED_DENIAL "<<message<<std::endl;}}
-   else {auto restored=extract_native_emission(bytes(file));if(!restored||restored->encode()!=exact)throw std::runtime_error("Successful allocation prefix failed exact canonical37 recovery");++successful;}
-   if(prefix==0||prefix==baseline/2||prefix==baseline){emit(out/"retry.glb",options);auto retry=extract_native_emission(bytes(out/"retry.glb"));check(retry&&retry->encode()==exact,"Early/middle/final persistent denial contexts retry exact complete project");}
+   else {auto restored=extract_native_emission(bytes(file));if(!restored||restored->encode()!=exact)throw std::runtime_error("Successful allocation prefix failed exact canonical37 recovery");++successful;if(prefix==baseline)endpoint_successful=true;}
+   if(prefix==0||prefix==baseline/2||prefix==baseline){emit(out/"retry.glb",options);auto retry=extract_native_emission(bytes(out/"retry.glb"));check(retry&&retry->encode()==exact,"Early/middle/final persistent denial contexts retry exact complete project");retried_prefixes.push_back(prefix);}
    if(prefix%250==0)std::cout<<"CANONICAL37_PHYSICAL_PREFIX "<<prefix<<std::endl;
   }
   check((full?(denied&&successful):(denied+successful==end-begin))&&scene.encode()==exact,
@@ -64,6 +64,7 @@ int main(int argc,char **argv)try{
   if(!full){
    if(captured->scene->encode()!=exact||creator_detail::sha256(bytes(argv[1]))!=evidence.at("fixture_sha256").get_ref<const std::string&>())throw std::runtime_error("Allocation partition changed captured owner or input fixture");
    evidence.update({{"begin",begin},{"end",end},{"completed",denied+successful},{"denied",denied},{"successful",successful},{"translated",translated},
+    {"endpoint_successful",endpoint_successful},{"retried_prefixes",retried_prefixes},{"first_completed",begin},{"last_completed",end-1},
     {"seconds",std::chrono::duration<double>(std::chrono::steady_clock::now()-started).count()},{"terminal_exit",0}});prefix_report(report_file,evidence);
   }
 std::cout<<"CANONICAL37_PHYSICAL_PREFIXES denied="<<denied<<" successful="<<successful<<" baseline="<<baseline<<" translated="<<translated<<std::endl;return 0;
