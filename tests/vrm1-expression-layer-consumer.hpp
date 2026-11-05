@@ -182,6 +182,7 @@ in vec2 uv;out vec4 result;uniform sampler2D scene;void main(){result=texture(sc
         auto m = model.json.at("materials")
                       .at(size_t(p.material - model.data->materials));
         auto &ext = m.at("extensions").at("VRMC_materials_mtoon");
+        if(!ext.contains("matcapFactor"))ext["matcapFactor"]=std::array<float,3>{1,1,1};
         const auto alpha=m.value("alphaMode",std::string("OPAQUE"));const bool blended=alpha=="BLEND",masked=alpha=="MASK";
         if((!blended&&!masked&&alpha!="OPAQUE")||!m.value("doubleSided",false))throw std::runtime_error("Independent expression-layer oracle requires opaque/blend double-sided source");
         if(blended){glEnable(GL_BLEND);glBlendEquationSeparate(GL_FUNC_ADD,GL_FUNC_ADD);glBlendFuncSeparate(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA,GL_ONE,GL_ONE_MINUS_SRC_ALPHA);glDepthMask(GL_FALSE);glDepthFunc(GL_LEQUAL);}else{glDisable(GL_BLEND);glDepthMask(GL_TRUE);glDepthFunc(GL_LESS);}glUniform1i(loc("blend"),blended?1:masked?2:0);scalar("alphaCutoff",wrong_mask_cutoff?.99f:m.value("alphaCutoff",.5f));
