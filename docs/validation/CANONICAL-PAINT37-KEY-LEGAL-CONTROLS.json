@@ -1,0 +1,247 @@
+{
+  "source": "a1c2025",
+  "runtime": "4df8d14",
+  "scope": "TEST ONLY replacement of three owner adversaries; whole29-check consumer against complete immutable fresh39 support plus corrected cdbd packageTU and three4df runtimeTUs, all product/transitive headers byteequal. No new whole-source/current-root build.",
+  "checks_per_profile": 29,
+  "cohorts": {
+    "release": {
+      "status": {
+        "scope": "One whole mixed consumer against complete immutable fresh owning39+corrected cdbd one-TU support; all transitive headers and product source equal cdbd; not a new all-source rebuild",
+        "source": "a1c2025e832ac1bf34613e9a03af1d93c27e5788",
+        "profile": "release",
+        "results": [
+          {
+            "phase": "compile",
+            "command": [
+              "/usr/bin/c++",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-key-controls-legal-0d66/src",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-key-controls-legal-0d66/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-key-controls-legal-0d66/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-key-controls-legal-0d66/third_party/nlohmann",
+              "-isystem",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/harfbuzz",
+              "-isystem",
+              "/usr/include/glib-2.0",
+              "-isystem",
+              "/usr/lib64/glib-2.0/include",
+              "-isystem",
+              "/usr/include/sysprof-6",
+              "-isystem",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/freetype2",
+              "-isystem",
+              "/usr/include/libpng16",
+              "-isystem",
+              "/usr/include/libxml2",
+              "-O3",
+              "-DNDEBUG",
+              "-std=gnu++20",
+              "-pthread",
+              "-DWITH_GZFILEOP",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-key-controls-legal-0d66/third_party/cgltf",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-key-controls-legal-0d66/tests/canonical-paint37-key-controls.cpp",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-key-controls-legal-0d66/artifacts/key-controls/release/consumer.o"
+            ],
+            "exit": 0,
+            "seconds": 3.025991298025474
+          },
+          {
+            "phase": "link",
+            "command": [
+              "/usr/bin/c++",
+              "-O3",
+              "-DNDEBUG",
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-key-controls-legal-0d66/artifacts/key-controls/release/consumer.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-key-controls-legal-0d66/artifacts/key-controls/release/consumer",
+              "-Wl,-rpath,/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib",
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-key-controls-legal-0d66/artifacts/key-controls/release/support/libdome-sculpt-render.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-key-controls-legal-0d66/artifacts/key-controls/release/support/libdome-sculpt-core.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-key-controls-legal-0d66/artifacts/key-controls/release/support/libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-key-controls-legal-0d66/artifacts/key-controls/release/support/libdome-sculpt-polygon.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-key-controls-legal-0d66/artifacts/key-controls/release/support/libxatlas.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-key-controls-legal-0d66/artifacts/key-controls/release/support/libmikktspace.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-key-controls-legal-0d66/artifacts/key-controls/release/support/libmikktspace-robust.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-key-controls-legal-0d66/artifacts/key-controls/release/support/libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-key-controls-legal-0d66/artifacts/key-controls/release/support/libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libharfbuzz.so",
+              "/usr/lib64/libEGL.so",
+              "/usr/lib64/libGL.so",
+              "/usr/lib64/libfontconfig.so",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libfreetype.so",
+              "/usr/lib64/libicui18n.so",
+              "/usr/lib64/libicuuc.so",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded",
+              "-Wl,--wrap=_ZN4dome15author_shapekeyERNS_5SceneEmRKNS_12ShapeKeyEditERKSt8functionIFbvEE"
+            ],
+            "exit": 0,
+            "seconds": 0.29219648195430636
+          },
+          {
+            "phase": "runtime",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-key-controls-legal-0d66/artifacts/key-controls/release/consumer",
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-key-replay-9b/artifacts/key-adapter/release/output/replaced.dsculpt",
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-key-controls-legal-0d66/artifacts/key-controls/release/output"
+            ],
+            "exit": 0,
+            "seconds": 0.3298693419783376
+          }
+        ],
+        "exit": 0,
+        "inputs": 2185,
+        "unchanged": true,
+        "consumer_sha256": "bfa58ce1acc203822e3bd0c856317c7c90d3fbaa49234730a581ef8d95ad80e3"
+      },
+      "runtime_sha256": "5b21edac2d2abb0915455a54959db25a39f8c0ee74747848caf41fd9e160e20e"
+    },
+    "sanitize": {
+      "status": {
+        "scope": "One whole mixed consumer against complete immutable fresh owning39+corrected cdbd one-TU support; all transitive headers and product source equal cdbd; not a new all-source rebuild",
+        "source": "a1c2025e832ac1bf34613e9a03af1d93c27e5788",
+        "profile": "sanitize",
+        "results": [
+          {
+            "phase": "compile",
+            "command": [
+              "/usr/bin/c++",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-key-controls-legal-0d66/src",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-key-controls-legal-0d66/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-key-controls-legal-0d66/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-key-controls-legal-0d66/third_party/nlohmann",
+              "-isystem",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/harfbuzz",
+              "-isystem",
+              "/usr/include/glib-2.0",
+              "-isystem",
+              "/usr/lib64/glib-2.0/include",
+              "-isystem",
+              "/usr/include/sysprof-6",
+              "-isystem",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/freetype2",
+              "-isystem",
+              "/usr/include/libpng16",
+              "-isystem",
+              "/usr/include/libxml2",
+              "-O1",
+              "-g1",
+              "-DNDEBUG",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "-std=gnu++20",
+              "-pthread",
+              "-DWITH_GZFILEOP",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-key-controls-legal-0d66/third_party/cgltf",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-key-controls-legal-0d66/tests/canonical-paint37-key-controls.cpp",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-key-controls-legal-0d66/artifacts/key-controls/sanitize/consumer.o"
+            ],
+            "exit": 0,
+            "seconds": 4.425112637982238
+          },
+          {
+            "phase": "link",
+            "command": [
+              "/usr/bin/c++",
+              "-O1",
+              "-g1",
+              "-DNDEBUG",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-key-controls-legal-0d66/artifacts/key-controls/sanitize/consumer.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-key-controls-legal-0d66/artifacts/key-controls/sanitize/consumer",
+              "-Wl,-rpath,/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib",
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-key-controls-legal-0d66/artifacts/key-controls/sanitize/support/libdome-sculpt-render.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-key-controls-legal-0d66/artifacts/key-controls/sanitize/support/libdome-sculpt-core.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-key-controls-legal-0d66/artifacts/key-controls/sanitize/support/libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-key-controls-legal-0d66/artifacts/key-controls/sanitize/support/libdome-sculpt-polygon.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-key-controls-legal-0d66/artifacts/key-controls/sanitize/support/libxatlas.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-key-controls-legal-0d66/artifacts/key-controls/sanitize/support/libmikktspace.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-key-controls-legal-0d66/artifacts/key-controls/sanitize/support/libmikktspace-robust.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-key-controls-legal-0d66/artifacts/key-controls/sanitize/support/libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-key-controls-legal-0d66/artifacts/key-controls/sanitize/support/libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libharfbuzz.so",
+              "/usr/lib64/libEGL.so",
+              "/usr/lib64/libGL.so",
+              "/usr/lib64/libfontconfig.so",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libfreetype.so",
+              "/usr/lib64/libicui18n.so",
+              "/usr/lib64/libicuuc.so",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded",
+              "-Wl,--wrap=_ZN4dome15author_shapekeyERNS_5SceneEmRKNS_12ShapeKeyEditERKSt8functionIFbvEE"
+            ],
+            "exit": 0,
+            "seconds": 2.0842596879811026
+          },
+          {
+            "phase": "runtime",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-key-controls-legal-0d66/artifacts/key-controls/sanitize/consumer",
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-key-replay-9b/artifacts/key-adapter/release/output/replaced.dsculpt",
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-key-controls-legal-0d66/artifacts/key-controls/sanitize/output"
+            ],
+            "exit": 0,
+            "seconds": 6.30439398199087
+          }
+        ],
+        "exit": 0,
+        "inputs": 2185,
+        "unchanged": true,
+        "consumer_sha256": "f952d1afb29ab602ff08de21687f4f8a8619b5e5f2593102d44ee58cdad80fb8"
+      },
+      "runtime_sha256": "ba47df67d464a9d4dbeb986e9bb9d6d5dd289f49d630f38dff8c2329ca422988"
+    }
+  },
+  "genuine_nonconst_paths": [
+    "author_derived_normal_shapekey replay allocates NormalFrames with make_shared<NormalFrames> at normal-key-derivation.cpp162.",
+    "Factory published SourceMaterialBindings is make_shared<SourceMaterialBindings>.",
+    "Named Duplicate captures explicitly constructed shared_ptr<SourceMaterialBindings> as before material; exact pointer asserted."
+  ],
+  "adversaries": [
+    "Unit-preserving base N change is intrinsically shape/finite valid but full owning replay rejects; exact retry.",
+    "Finite target N change in actual nonconst factory array rejects full replay; exact retry.",
+    "Foreign same-address key controlblock refuses.",
+    "Separately decoded equal-value CPS owner cannot replace actual explicitly mutable before binding.",
+    "Original internal Create/Replace callbacks and computed-publication/queuedSave/Cancel/complete rollback checks retained."
+  ],
+  "audit_history": [
+    "Initial audit incorrectly concluded make_shared<const NormalFrames> alone proved prior vector-element mutation UB and retracted that one attribution.",
+    "Correction: const outer/vector storage does not itself make separately allocated Vec3 elements const; old element-only mutation is not proven UB from that fact alone. No scalar/vector-control mutation was claimed. Sources C++ draft dcl.type.cv, vector.overview, vector.data.",
+    "This new consumer avoids ambiguity entirely using actual nonconst factory role/binding objects. Old test/evidence retained; no functional/product/GUI/pixel/quota/OOM retraction."
+  ],
+  "primary_language_sources": [
+    "https://eel.is/c++draft/dcl.type.cv",
+    "https://eel.is/c++draft/vector.overview",
+    "https://eel.is/c++draft/vector.data"
+  ],
+  "remaining": [
+    "Full persistent key-SAN24732 and package4-SAN67604 remain separate/live.",
+    "Fresh current-root all-layout integration and new common-refinement owning/native/export work remain."
+  ],
+  "main_admission": false
+}
