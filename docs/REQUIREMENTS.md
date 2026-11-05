@@ -1,3 +1,15 @@
+## Private retopology caller/input qualification — 2026-11-05
+
+A matched current-main5b02 candidate repairs queued edits surviving caller
+publication refusal and retired-workspace view revival. R/S13442 native checks,
+710 caller denial boundaries, separately measured worker251/4308+42+97,
+held73/1419, composed1541, actual raw-Boolean XR317 and ordinary desktop/loader58
+per profile pass with exact source/history/Save controls. See
+RETOPO-CALLER-ADMISSION.md. This is private qualified integration, not main
+admission or completion of broader retopology/remeshing, authoring, interoperability,
+GPU/performance and physical-workflow requirements. Existing limits and default
+policies are unchanged.
+
 ## Explicit surface-heat binding admission — 2026-11-05
 
 Main admits exact6bcc91b/runtimebef5876 through9c72cc2: explicit SurfaceHeat5,

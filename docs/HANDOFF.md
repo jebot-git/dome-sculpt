@@ -1,3 +1,18 @@
+## Private qualified retopology caller/input repair — 2026-11-05
+
+This private descendant of main5b02 repairs the real post-enqueue caller refusal,
+whole-frame batch publication and retired-view resurrection, and supplies actual
+XR history levels with focus/rebase latches. R/S native13442/710 persistent,
+worker4308/251+42+97, held1419/73, composed1541/71 and26 boundaries pass.
+Real-loader observer161+156 per profile and ordinary app15normal+16unzoomedcompact+
+27loader per profile pass;44 R/S native/sentinel pairs are exact. Read
+[RETOPO-CALLER-ADMISSION.md](RETOPO-CALLER-ADMISSION.md) and its precise receipt.
+Matching whole-TU components and ordinary app relinks are qualified, not a fresh
+ALL build. The failed standalone Fontconfig leak/ELF and all old counterexamples
+remain preserved; fixed fixture uses the ordinary app's existing process owner.
+Main review/publication is separate; full sculpt/paint/retopo/rig/avatar/GPU and
+physical production requirements remain active. No new schema/outer layout.
+
 ## Explicit surface-heat binding admitted — 2026-11-05
 
 Main admits corrected seal6bcc91b/runtimebef5876 via9c72cc2, with exact product,

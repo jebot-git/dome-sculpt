@@ -989,6 +989,7 @@ if(DOME_BUILD_UI OR DOME_BUILD_XR OR BUILD_TESTING)
       target_link_libraries(dome-sculpt-test-runtime PRIVATE dome-sculpt-json PkgConfig::NATIVEGL)
       add_executable(dome-sculpt-retopo-history-openxr-test tests/retopo-history-openxr.cpp)
       target_link_libraries(dome-sculpt-retopo-history-openxr-test PRIVATE dome-sculpt-xr PkgConfig::RENDERFONTS)
+      add_dependencies(dome-sculpt-retopo-history-openxr-test dome-sculpt-test-runtime)
       target_link_options(dome-sculpt-retopo-history-openxr-test PRIVATE
         -Wl,--wrap=_ZN4dome6unwrapERNS_4MeshEjjRKSt8functionIFbvEE
         -Wl,--wrap=_ZN4dome8Document6submitENS_12SpatialFrameE)
