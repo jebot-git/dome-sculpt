@@ -7,8 +7,8 @@ A=runpy.run_path(str(ROOT/'tests/polygon-affine-proof.py'))
 OUT=ROOT/'artifacts/followup-proof';OUT.mkdir(exist_ok=True)
 def sha(p):return A['sha'](p)
 def save(p,d):p.write_text(json.dumps(d,indent=2)+'\n')
-def profile(which):
- directory=OUT/which;directory.mkdir(exist_ok=False)
+def profile(which,tag=""):
+ directory=OUT/(which+tag);directory.mkdir(exist_ok=False)
  state=dict(state='running',profile=which,directory=str(directory),steps=[],pid=os.getpid(),scope='Test-only standalone renderer; Release-only Scene producer/observer; production remains263c753')
  before=A['sources']();save(directory/'source-before.json',before)
  old=A['OLD'];oldbuild=old/f'build-next36-{which}'
@@ -32,7 +32,7 @@ def profile(which):
    p=Path(a);a=str(p if p.is_absolute() else oldbuild/p)
   if a in front:continue
   link.append(a)
- overridden=[ROOT/f'artifacts/affine-proof/{which}-capability/{s}.o' for s in ('polygon-authoring.cpp','polygon-render.cpp')]
+ overridden=[ROOT/f'artifacts/affine-proof/{which}-capability/{s}.o' for s in ('polygon-authoring.cpp','polygon-conversion.cpp','polygon-render.cpp')]
  exe=directory/'polygon-affine-render'
  link=link[:1]+[str(obj),*[str(p) for p in overridden]]+link[1:]+['-Wl,--compress-debug-sections=zstd','-Wl,-t,-t',*[f'-Wl,--wrap={n}' for n in ('glBufferData','glBufferSubData','glGetBufferSubData','glMapBuffer','glMapBufferRange','glReadPixels')],'-o',str(exe)]
  protected={a:sha(a) for a in link if a.endswith(('.o','.a')) and a!=str(obj) and not a.startswith('-')}
@@ -71,5 +71,7 @@ def profile(which):
   state['space']=A['guard']();state['state']='terminal';state['artifacts']={str(p.relative_to(directory)):sha(p) for p in directory.rglob('*') if p.is_file() and p.name!='status.json'};save(directory/'status.json',state)
  return state['exit']
 if __name__=='__main__':
- if len(sys.argv)!=2 or sys.argv[1] not in ('release','sanitize'):raise SystemExit('Use release, then sanitize')
- raise SystemExit(profile(sys.argv[1]))
+ if len(sys.argv) not in (2,3) or sys.argv[1] not in ('release','sanitize'):raise SystemExit('Use release, then sanitize; optional unique -tag')
+ tag=sys.argv[2] if len(sys.argv)==3 else ''
+ if tag and (not tag.startswith('-') or '/' in tag or '..' in tag):raise SystemExit('Invalid unique tag')
+ raise SystemExit(profile(sys.argv[1],tag))
