@@ -1,8 +1,9 @@
 # Native texture sets: source implementation in progress
 
 Pinned base: e79dbe9cbe3243b17b224843c247987b8f2595f8. No build or test claim. Qualified query corrections c3a1b19/5b02bfc are merged;
-all new texture-set code remains unbuilt and unexecuted. Six changed/new TUs
-passed GCC16 C++20 syntax-only checks; this is not a coherent product build.
+The first plain model/codec slice now has a fresh optimized Release app/core/
+support/render/XR build (225 steps) and 32 executed native model controls.
+No app UI, renderer, sanitizer or device execution is claimed.
 Scene40, Paint7 and polygon_sources8 are reserved. Material22 is available only
 if a genuinely new connected material envelope is needed. Shared texture controls
 are reserved page31/count32; older private31/32 proposals are not current main.
@@ -80,3 +81,14 @@ records can refer to one genuine shared mesh owner without duplicating its
 vertices, normals, UVs or edit flags. The unexecuted fixture now includes a
 second independently editable instance with the same geometry owner. Six-TU
 syntax checks still pass; actual Release execution is the next finite gate.
+
+The first actual Release gate is closed0 on source984de42: configure5.089s,
+fresh own build439.549s, one CTest passed (32 controls, test0.01s). Every
+project object/archive was freshly compiled in this cohort:210 objects,11
+archives, app and model-test ELF.1476 source,483 canonical SDK and223 owned
+binary hashes had no drift. The model checks COW history snapshots, independent
+F32/layer/material fields, duplicate instances sharing geometry, actual native
+file Save/reopen, membership/context/foreign-ID/orphan refusals and cancellation.
+This is not Document Undo/Redo or a usable texture-set UI yet. The original
+polygon-flag association gap is separately recorded for the next source repair.
+See validation/TEXTURE-SETS-INITIAL-RELEASE.json for exact evidence and scope.

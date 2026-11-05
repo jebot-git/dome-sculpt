@@ -1,0 +1,219 @@
+{
+  "source": "984de42f765babb45efcea4128db8c851b7d01a5",
+  "scope": "Fresh optimized CPU all-reachable own app/core/support/render/XR plus native texture-set model/codec test. No old own objects or archives; no SAN/UI/device execution.",
+  "status": {
+    "state": "terminal",
+    "pid": 2637871,
+    "source": "984de42f765babb45efcea4128db8c851b7d01a5",
+    "scope": "Fresh optimized CPU all-reachable own app/core/support/render/XR plus native texture-set model/codec test. No old own objects or archives; no SAN/UI/device execution.",
+    "steps": [
+      {
+        "name": "configure",
+        "command": [
+          "cmake",
+          "-S",
+          "/home/blux/de-xr/dome-sculpt/artifacts/native-texture-sets-e79dbe9",
+          "-B",
+          "/home/blux/de-xr/dome-sculpt/artifacts/native-texture-sets-e79dbe9/artifacts/texture-set-initial-release/build",
+          "-G",
+          "Ninja",
+          "-DCMAKE_BUILD_TYPE=Release",
+          "-DCMAKE_EXPORT_COMPILE_COMMANDS=ON",
+          "-DDOME_COMPUTE_BACKEND=CPU",
+          "-DDOME_BUILD_UI=ON",
+          "-DDOME_BUILD_XR=ON",
+          "-DBUILD_TESTING=ON",
+          "-DCMAKE_CXX_COMPILER=/usr/bin/c++",
+          "-DCMAKE_C_COMPILER=/usr/bin/cc",
+          "-DFLTK_DIR=/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-release/share/fltk",
+          "-DCMAKE_PROJECT_INCLUDE=/home/blux/de-xr/dome-sculpt/artifacts/native-texture-sets-e79dbe9/artifacts/texture-set-initial-release/guard.cmake"
+        ],
+        "before": {
+          "phase": 462848,
+          "source": 56778752,
+          "free": 23509110784,
+          "prospective": 0
+        },
+        "state": "terminal",
+        "pid": 2637948,
+        "exit": 0,
+        "seconds": 5.088974158046767,
+        "after": {
+          "phase": 7573504,
+          "source": 56778752,
+          "free": 23509110784,
+          "prospective": 0
+        }
+      },
+      {
+        "name": "build",
+        "command": [
+          "nice",
+          "-n",
+          "15",
+          "cmake",
+          "--build",
+          "/home/blux/de-xr/dome-sculpt/artifacts/native-texture-sets-e79dbe9/artifacts/texture-set-initial-release/build",
+          "--parallel",
+          "2",
+          "--target",
+          "dome-sculpt",
+          "dome-sculpt-texture-sets-test"
+        ],
+        "before": {
+          "phase": 7573504,
+          "source": 56778752,
+          "free": 23509110784,
+          "prospective": 0
+        },
+        "state": "terminal",
+        "pid": 2639591,
+        "exit": 0,
+        "seconds": 439.5489178709686,
+        "after": {
+          "phase": 125493248,
+          "source": 56778752,
+          "free": 23449575424,
+          "prospective": 0
+        }
+      },
+      {
+        "name": "model-codec",
+        "command": [
+          "ctest",
+          "--test-dir",
+          "/home/blux/de-xr/dome-sculpt/artifacts/native-texture-sets-e79dbe9/artifacts/texture-set-initial-release/build",
+          "-R",
+          "^dome-sculpt-texture-sets$",
+          "--output-on-failure",
+          "--timeout",
+          "180"
+        ],
+        "before": {
+          "phase": 129519616,
+          "source": 56778752,
+          "free": 23449575424,
+          "prospective": 0
+        },
+        "state": "terminal",
+        "pid": 2733051,
+        "exit": 0,
+        "seconds": 1.0480810650042258,
+        "after": {
+          "phase": 129622016,
+          "source": 56778752,
+          "free": 23449575424,
+          "prospective": 0
+        }
+      }
+    ],
+    "targets": [
+      "dome-sculpt",
+      "dome-sculpt-texture-sets-test"
+    ],
+    "binary_drift": [],
+    "exit": 0,
+    "source_drift": [],
+    "sdk_drift": [],
+    "space": {
+      "phase": 129904640,
+      "source": 56778752,
+      "free": 23449575424,
+      "prospective": 0
+    }
+  },
+  "native_controls": 32,
+  "ctest": "1/1 passed; actual test elapsed0.01s, outer poll wrapper1.048s",
+  "own_objects": 210,
+  "own_archives": 11,
+  "owned_binary_hashes": 223,
+  "source_files_hashed": 1476,
+  "sdk_files_hashed": 483,
+  "model_file": "artifacts/texture-set-initial-release/build/texture-set-model-output/sets.dsculpt",
+  "evidence": {
+    "status.json": {
+      "path": "artifacts/texture-set-initial-release/status.json",
+      "sha256": "f397b0202e08d1331ba337b48667e1ae512e9b7b733d77fc9168cb484bcc1fb2"
+    },
+    "source-before.json": {
+      "path": "artifacts/texture-set-initial-release/source-before.json",
+      "sha256": "39f68049d914060fd6336a2e0fea1316f9356808e3b2b0a0a32aff87fd39cdbf"
+    },
+    "source-after.json": {
+      "path": "artifacts/texture-set-initial-release/source-after.json",
+      "sha256": "39f68049d914060fd6336a2e0fea1316f9356808e3b2b0a0a32aff87fd39cdbf"
+    },
+    "sdk-before.json": {
+      "path": "artifacts/texture-set-initial-release/sdk-before.json",
+      "sha256": "390bf0387f24ffb706b75d940f48aadd9ec3d984d2b1b6a32266f79a47ddf906"
+    },
+    "sdk-after.json": {
+      "path": "artifacts/texture-set-initial-release/sdk-after.json",
+      "sha256": "390bf0387f24ffb706b75d940f48aadd9ec3d984d2b1b6a32266f79a47ddf906"
+    },
+    "index-before.txt": {
+      "path": "artifacts/texture-set-initial-release/index-before.txt",
+      "sha256": "c169f42e7effd2df3b9025ad7bfac15cb304e655d978287aab7d2049d6c4db66"
+    },
+    "binaries-before-test.json": {
+      "path": "artifacts/texture-set-initial-release/binaries-before-test.json",
+      "sha256": "0c81e33b215b55c5c042e3fa791a5b189a3be88ed64ee8382e3c32b855cd7312"
+    },
+    "binaries-after-test.json": {
+      "path": "artifacts/texture-set-initial-release/binaries-after-test.json",
+      "sha256": "0c81e33b215b55c5c042e3fa791a5b189a3be88ed64ee8382e3c32b855cd7312"
+    },
+    "actual-dependencies.txt": {
+      "path": "artifacts/texture-set-initial-release/actual-dependencies.txt",
+      "sha256": "2b87ff198c8d4cff108edb46606831632e81f66786ac09de5400deee707bd731"
+    },
+    "actual-dependency-hashes.json": {
+      "path": "artifacts/texture-set-initial-release/actual-dependency-hashes.json",
+      "sha256": "94cf43fd5d7c809cf80b50ed3ecc4303412d04904c504f36567c19304019da57"
+    },
+    "link-events.jsonl": {
+      "path": "artifacts/texture-set-initial-release/link-events.jsonl",
+      "sha256": "4f45d875eebe961e09109035d1ab95edc4f983ece829d818d3512784f3622514"
+    },
+    "configure.log": {
+      "path": "artifacts/texture-set-initial-release/configure.log",
+      "sha256": "71b21f79cf180ef790ea799aab2dddbdfecb58971104d1ba7fe3d3e78dacc796"
+    },
+    "build.log": {
+      "path": "artifacts/texture-set-initial-release/build.log",
+      "sha256": "cc13407a6e21fda41f979dbad9ffc5ba5b7a384b9db6a0880ca31eb6b777ac32"
+    },
+    "model-codec.log": {
+      "path": "artifacts/texture-set-initial-release/model-codec.log",
+      "sha256": "37a071744fd39a532107788f8e378cab57ac0842fc04beb058e1a51927ee8cdf"
+    },
+    "run.py": {
+      "path": "artifacts/texture-set-initial-release/run.py",
+      "sha256": "023fe7d757c905e8c853ac57a3da53a45f4975988234c63a17ce87d5d51b87d2"
+    },
+    "guard.py": {
+      "path": "artifacts/texture-set-initial-release/guard.py",
+      "sha256": "bb629637a8bf5c82a031697dbb477f62aa26576bdd339f19656a3a1f132c6470"
+    },
+    "guard.cmake": {
+      "path": "artifacts/texture-set-initial-release/guard.cmake",
+      "sha256": "9e3a27a84cf13c9461c3cb1f7f0a590be57d3a517d482f8bb1ee049ec7dfab5a"
+    },
+    "build/Testing/Temporary/LastTest.log": {
+      "path": "artifacts/texture-set-initial-release/build/Testing/Temporary/LastTest.log",
+      "sha256": "3ca6d1125f887115c32e0e787a529a665b076c984a9b023301c2d75b8170ab0b"
+    }
+  },
+  "app_built_not_executed": true,
+  "no_old_own_object_or_archive": true,
+  "no_sanitizer_ui_or_gpu_claim": true,
+  "remaining": [
+    "Authentic polygon-vs-triangle marker association counter/fix",
+    "Source/normal/recipe-backed set and retained polygon8 archive adapters",
+    "Resource/work/cancel/fault admission and exact codec old-reader negatives",
+    "Subset material-aware render/query/stencil and active-only native edits",
+    "Document worker Undo/Redo/Cancel/queuedSave; real FLTK/XR set controls",
+    "Set-specific resolution/Bake/Clear and exact UV/topology transfers",
+    "Single-node multi-primitive glTF/VRM skin/morph import/export"
+  ]
+}
