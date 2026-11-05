@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "refined-mirror-draft.hpp"
 #include "dome/document.hpp"
+#include "dome/material-bindings.hpp"
 #include "dome/shapekey-authoring.hpp"
 #include <iostream>
 #include <nlohmann/json.hpp>
