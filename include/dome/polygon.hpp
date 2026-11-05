@@ -100,6 +100,7 @@ private:
   friend struct PolygonSourceAccess;
   friend struct PolygonCutAccess;
   friend struct PolygonConversionAccess;
+  friend struct PolygonAffineAccess;
   friend PolygonEditResult
   edit_polygon(const PolygonMesh &, const PolygonEdit &, const PolygonLimits &);
 };

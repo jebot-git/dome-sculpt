@@ -6,6 +6,7 @@ struct PolygonPreview {
  std::shared_ptr<const PolygonView> view;
  uint64_t object=0;
  CanvasTransform world{};
+ std::optional<AffineTransform> affine_world;
 };
 inline PolygonPreview polygon_preview(const EditorSnapshot &frame) {
  auto &state=*frame.state;PolygonPreview preview;
@@ -16,7 +17,10 @@ inline PolygonPreview polygon_preview(const EditorSnapshot &frame) {
  }
  if(!preview.view)return {};
  auto object=std::find_if(state.objects.begin(),state.objects.end(),[&](const auto &o){return o.id==preview.object;});
- if(object==state.objects.end()||!object->visible||!object->editable||!object->world_transform_valid)return {};
- preview.world=object->world_transform;return preview;
+ if(object==state.objects.end()||!object->visible||!object->editable)return {};
+ if(object->affine_world)preview.affine_world=object->affine_world;
+ else if(object->world_transform_valid)preview.world=object->world_transform;
+ else return {};
+ return preview;
 }
 }

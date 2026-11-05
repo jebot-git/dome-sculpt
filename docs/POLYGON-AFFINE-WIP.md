@@ -1,0 +1,82 @@
+# Affine polygon workspace draft
+
+This isolated child of main10944ab is a source prototype, not a runtime-qualified
+milestone. Twelve own-header syntax checks pass (including all seven affected
+product TUs, new consumer and older polygon/render/framing consumers). No native
+runtime, GUI, pixels or hardware result is claimed by that syntax evidence.
+
+The local polygon authority and its immutable history remain local. Real affine
+placement is used independently for world-metre operations and pointer metrics:
+
+- Extrude/Inset run on a detached linear-world geometry, with reflection winding
+  corrected in both directions. Results map through the actual inverse. Untouched
+  existing vertex positions remain bit exact; stable vertex/corner/edge IDs, UVs,
+  hard flags and original corner-color provenance are retained. No atlas or paint
+  resampling, similarity fit, nearest projection or identity placement is used.
+- Affine picks use watertight double local ray expressions and actual world-space
+  vertex/edge distances. They do not inherit the old float ray's local distance
+  ceiling or rebuild a transformed BVH on each sample. Work/cancellation limits
+  still apply. Drag planes are local covectors (A-transpose of the world plane
+  normal); total pointer displacement maps through the real inverse. XR adds the
+  actual canvas frame and held-object edits use the current full affine matrix.
+- Apply captures the current held NativeAffineEdit in the accepted token. It
+  publishes that placement and topology together, retaining one Undo. Origin
+  capture uses the complete initial Scene's placement capsule; current placement
+  is independent of original mesh/paint/material/deformation identity checks.
+- The private preview and camera-framing path use ObjectInfo.affine_world when
+  present instead of hiding the workspace. The polygon shader uses inverse-
+  transpose normals and correct reflected front-face convention, restoring
+  caller GL state. Geometry upload/immutable motion semantics remain unchanged.
+
+The combined new consumer has basic native, controller and kernel-fault modes.
+It contains independent physical Extrude/Inset endpoint/radius checks, corner
+color owner controls, actual native selection/drag/Cancel/Apply/queuedSave/
+restart/Undo/Redo/Restore and held-affine publication. The fault mode measures
+all C++ allocation prefixes and callback cancellation sites of the new detached
+world-metric kernel. It does not claim all Document/file/worker OOM paths.
+Graphical fidelity, actual FLTK normal/compact UI and application synthetic-XR
+remain required after the initial bounded cohort. Existing parent remesh R/S
+SelectAll failures remain preserved in the separate root tree.
+
+## Exact affected object closure
+
+No public data member, Scene codec or persistent record changes. PolygonMesh
+adds only a friend; PolygonWorkspace adds methods; private preview fields change.
+Document's actual fields remain unchanged. Own-header constant-assembly probes
+show Document6968/align8, EditorState1896 and Scene72 unchanged; private PolygonJob
+changes96->232 and PolygonAccept344->360. Size equality is not the sole proof.
+
+Source search plus definitions AND undefined symbols in complete immutable R/S
+C179 core/render/XR/polygon archives and all26 frontend objects/profile find
+nested job/token symbols only in document.cpp.o and document-polygon.cpp.o.
+Transaction/authority helpers use shared pointers/views, not changed nested
+object offsets. Actual changed private include consumers add the other five TUs:
+
+1. document.cpp (constructor/destructor/deque elements and local End/Undo jobs)
+2. document-polygon.cpp (jobs, accepted token, worker and geometry publication)
+3. polygon-authoring.cpp
+4. polygon-conversion.cpp
+5. polygon-render.cpp
+6. app.cpp (preview/framing private inline helpers)
+7. xr.cpp (preview private inline helper)
+
+All seven must be compiled whole. Both new app/consumer include current own
+headers. Unchanged objects are reused only with exact source/body/header layout,
+symbol and link-trace proof; no changed old archive member may be selected.
+Main10944 and C179 have byte-identical src/include content before this patch.
+No static archive is copied/repacked or modified.
+
+## Authorized first cohort only
+
+Root approved cumulative1.25GiB allocated bytes for sequential Release then owned
+O1 ASan/UBSan app plus one combined consumer, with at least20GiB actual free and
+prospective output checks before every compiler/linker. No further target is
+approved until actual growth/outcome review. Existing matched member payloads
+are2.67MB Release and72.02MB sanitizer for these seven TUs; matched existing app
+is14.1MB/410.4MB. This replaces the rejected broad5GiB proposal.
+
+The runner is tests/polygon-affine-proof.py. It overrides whole objects before
+immutable currentmain10944/C179 support, pins archive/frontend/runtime inputs,
+captures dependencies/link traces and actual ELF maps, and refuses old member
+selection or drift. No archive copies, full build, GPU work, installation,
+headset/session action or new Scene38 reserve is authorized by this cohort.
