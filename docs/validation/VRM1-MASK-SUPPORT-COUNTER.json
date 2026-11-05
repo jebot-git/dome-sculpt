@@ -1,0 +1,89 @@
+{
+  "base": "296f192cf8f11fdb74249ae8929435c6e849572c",
+  "scope": "Actual real cutout INPUT with paint confined to one face. Unchanged sealed296 worker rejects global alpha minimum0;10native/source/file checks, no producer change. Real source sampling is authored LINEAR/no-mip and preserved as input intent, not an exporter workaround.",
+  "status": {
+    "state": "terminal",
+    "pid": 104832,
+    "steps": [
+      {
+        "name": "compile-vrm1-expression-layer-authoring",
+        "command": [
+          "/usr/bin/c++",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-mask-paint-support-296/src",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-mask-paint-support-296/third_party/cgltf",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-mask-paint-support-296/include",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-mask-paint-support-296/third_party/openbrush",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-mask-paint-support-296/third_party/nlohmann",
+          "-O3",
+          "-DNDEBUG",
+          "-std=gnu++20",
+          "-o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-mask-paint-support-296/artifacts/support-proof/counter-release/stage/vrm1-expression-layer-authoring.cpp.o",
+          "-c",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-mask-paint-support-296/tests/vrm1-expression-layer-authoring.cpp"
+        ],
+        "exit": 0,
+        "seconds": 9.946178635000251
+      },
+      {
+        "name": "link-worker",
+        "command": [
+          "/usr/bin/c++",
+          "-O3",
+          "-DNDEBUG",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-mask-paint-support-296/artifacts/support-proof/counter-release/stage/vrm1-expression-layer-authoring.cpp.o",
+          "-o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-mask-paint-support-296/artifacts/support-proof/counter-release/stage/worker",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-mask-paint-support-296/artifacts/support-proof/counter-release/stage/libdome-sculpt-core.a",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-mask-paint-support-296/artifacts/support-proof/counter-release/stage/libdome-sculpt-affine.a",
+          "/usr/lib64/liblapacke.so",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-mask-paint-support-296/artifacts/support-proof/counter-release/stage/libdome-sculpt-polygon.a",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-mask-paint-support-296/artifacts/support-proof/counter-release/stage/libxatlas.a",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-mask-paint-support-296/artifacts/support-proof/counter-release/stage/libmikktspace.a",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-mask-paint-support-296/artifacts/support-proof/counter-release/stage/libmikktspace-robust.a",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-mask-paint-support-296/artifacts/support-proof/counter-release/stage/libufbx.a",
+          "/usr/lib64/libpng.so",
+          "/usr/lib64/libjpeg.so",
+          "/usr/lib64/libz.so",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-mask-paint-support-296/artifacts/support-proof/counter-release/stage/libdome-sculpt-emission-codec.a",
+          "/usr/lib64/libOpenEXR-3_2.so",
+          "/usr/lib64/libOpenEXRUtil-3_2.so",
+          "/usr/lib64/libOpenEXRCore-3_2.so",
+          "/usr/lib64/libIex-3_2.so",
+          "/usr/lib64/libIlmThread-3_2.so",
+          "/usr/lib64/libImath-3_1.so",
+          "-lgcc_s_asneeded",
+          "-lgcc_s_asneeded",
+          "-Wl,--wrap=fsync"
+        ],
+        "exit": 0,
+        "seconds": 0.32572725298814476
+      },
+      {
+        "name": "mask-local-cutouts-refusal",
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-mask-paint-support-296/artifacts/support-proof/counter-release/stage/worker",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-preview-1853cc3/build-preview-release/vrm1-background-fixture/source.vrm",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-mask-paint-support-296/artifacts/support-proof/counter-release/mask-local-cutouts-run",
+          "--old-refusal",
+          "--mask-local-cutouts"
+        ],
+        "exit": 0,
+        "seconds": 0.10264814301626757
+      }
+    ],
+    "scope": "Test-only actual MASK authored inputs against unchanged e84 worker/core. No producer change or alpha admission. Prior scope:Whole3directproductionTUs for new private invariant-role product on copied matchingccc owned support. Five actual worker/render domains, three actual public coupling refusals+Save/history, one new complex constant-role fullallocation/allCancel factory scope; no old broad sweep repetition, root35/freshapp/fullsuite claim.",
+    "child_pid": 105887,
+    "exit": 0,
+    "seconds": 10.502076480013784,
+    "inputs": 1888,
+    "drift": []
+  },
+  "artifacts": {
+    "artifacts/support-proof/counter-release/before.json": "56a249e482c7e27959e1f7f2a334fefcd2413a223341ff7995e435898b396cee",
+    "artifacts/support-proof/counter-release/after.json": "56a249e482c7e27959e1f7f2a334fefcd2413a223341ff7995e435898b396cee",
+    "artifacts/support-proof/counter-release/mask-local-cutouts-refusal.log": "4d304f61dadce1435d7c6de8cab6420b792157ecf401d583486a2abd5762c161",
+    "artifacts/support-proof/counter-release/mask-local-cutouts-run/source-mask-local-cutouts.vrm": "647fd732b14784f250d5704080d4db58fc771b74870b90cf5dc6f4425bcd4fb6",
+    "artifacts/support-proof/counter-release/mask-local-cutouts-run/nonuniform-source.dsculpt": "19be9ef1cd6febabfd80e517c68d67f17ac5eb0db4c44bf92a0a27271c4b28c2"
+  }
+}
