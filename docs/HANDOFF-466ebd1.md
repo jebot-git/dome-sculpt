@@ -1,11 +1,11 @@
-> Current continuation, 2026-11-05: the complete original goal remains active.
-> REQUIREMENTS.md and PRIVATE-AUTHORING-PROGRESS.md contain current evidence.
-> Keyed HDR/MatCap integration c494d39 is sealed/pushed privately, with native
-> FLTK export/recovery and Release/sanitizer/Arc proof. Parent a0 Release125
-> passes; its same sanitizer process has completed121 and is running four fault
-> phases. Native37/package4, robust weights, remaining authoring/device work and
-> controller drawers remain incomplete. The historical checkpoint below is
-> preserved and does not describe current main or imply full completion.
+> Current continuation, 2026-11-05: native36 a0b8a37/seal881021c is admitted to
+> main with matching runtime/test/build bytes, Release and sanitizer125/125,
+> actual native/Wayland/synthetic-XR200 UI checks per profile and scoped Arc proof.
+> See REQUIREMENTS.md and COHERENT-NATIVE36-AUTHORING.md. HDR/MatCap/Rim and
+> owning37/physical4 integration remain separately qualified/building. Local
+> automatic-weight quality, Normal roles, remaining authoring/device/accelerator
+> work and later controller drawers remain incomplete; the full goal is active.
+> This historical handoff is preserved and is not a full-production claim.
 
 # Agent handoff — editable UV and universal-menu checkpoint
 

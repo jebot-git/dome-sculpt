@@ -2,51 +2,46 @@
 
 ## Current production state — 2026-11-05
 
-Main retains the qualified physical-authoring foundation, PBR renderer79,
-controller55 and headlessc28 checks. FLTK remains the default, using the latest
-canonical DomeD SDK; the remote DomeD head341152b and preserved local a5c444c
-were reverified. Native36/37 production admission and the full goal remain open.
+Main now admits the qualified native36 runtimea0b8a37/seal881021c. Its production,
+public/private headers, CMake, tests and assets match that qualified cohort.
+Original fresh-started builds retain their actual include failure/known-error
+interruption; the same owning objects complete Release ALL and owning sanitizer
+builds after build/test-only corrections. **125/125 selected tests pass per
+profile**, including all four actual frame allocation/codec fault phases.
+All source/SDK manifests remain exact and no reused production object changed.
+Native/compact/Wayland/synthetic-XR65, physical-paint GUI80 and keyed-UV55 pass
+per profile (200 UI checks each); eight GUI GLBs have zero Khronos errors.
+Actual Arc passes1129 component +19 application synthetic-XR checks, with six
+software refusal controls. Read COHERENT-NATIVE36-AUTHORING.md and its receipt.
+The766-command graph is not a complete runtime result. No physical HMD, compute,
+installation or session restart is included. Canonical DomeD FLTK stays default.
 
-The private [keyed HDR/MatCap milestone c494d39](https://github.com/jebot-git/dome-sculpt/tree/c494d39f4c9f0e6746ac3b4c1110d78e57b289f1)
-(runtime640f05c) integrates three complete production TUs on matching own a0
-application/core/render/support. Public/private headers and persistence versions
-are unchanged. Release and sanitizer pass 1,147 worker controls, 445 independent
-binary-expression checks over72 image pairs, and115 genuine keyed FLOAT-paint
-HDR checks. Actual Arc passes561 checks plus two software refusal controls.
-Whole matching native application/inspector relinks pass actual keyed HDR ordinary
-and editable512 export, chooser cancellation, package Open and native Save:
-22normal+22compact checks per profile. All110 emitted files have zero Khronos
-errors; warnings/infos and six inherited malformed raw inputs remain recorded.
-Read that branch's NATIVE-KEY-MATCAP-INTEGRATION.md/receipt. This is a private
-integration qualification, not a fresh ALL build or main admission.
+The private keyed HDR/MatCap milestone c494d39 and current Rim/cutout integration
+remain separate until admission. They retain exact ownership/worker/UI/device
+proof and original failed observers; no full-material or cross-device pixel-
+equivalence claim follows. Current Rim source/independent pixels match within1
+per device at fixed4, while rare CPU-versus-Arc deltas also occur in pristine
+source lookup and remain recorded. The current shader already retains XR camera
+up/head roll; reference-view conventions still need deliberate rolled-view proof.
 
-Combined parent a0b8a37 preserves production/header bytes from c31. After the
-recorded missing-cgltf test include failure and explicit Release interruption,
-the same owning build directories continue with build/test-only corrections.
-Release ALL and125/125 selected tests pass. The owning sanitizer build passes;
-its original same125 process has passed121 tests and is running the four native
-frame fault phases. Native/compact/Wayland/synthetic-XR65, physical-paint GUI80
-and keyed-UV GUI/XR55 pass per profile. Actual Arc components pass1129 plus19
-application synthetic-XR checks. Eight actual GUI GLBs have zero Khronos errors.
-These are scoped checks; the766-command graph is not a complete runtime result.
-Do not edit the frozen a0 source/scripts or restart that live sanitizer handle.
+A new isolated owning37/physical4/Rim candidate5414621 composes sealedbf174c3 and
+correctedcdbd7ea with current native36/HDR/Rim. It appends the genuine public
+canonical owner and private physical-image owner, so all users rebuild together.
+The initial owning sanitizer build stops on a missing private cgltf test include;
+Release ALL is explicitly interrupted for the same confirmed error. After that
+boundary four target includes and a separately qualified visible-chooser test
+observer are corrected; the same owning directories continue asf95c87d, with
+production/header/C++ test bytes unchanged. Self-contained native gesture/Save/
+UV fixtures and actual package4 worker/render/Cancel/cap/fault pipelines must
+pass; no new37/main or complete798 runtime result is claimed yet.
 
-Native37 paint preservation is sealed/pushed as bf174c3, with whole owning R/S
-builds, actual native/compact UI, independent R/S/Arc370 checks and exact retained
-paint across the original UV counterexample. Genuine physical package4 export
-is now being implemented in an isolated descendant; it is not yet qualified.
-MatCap-cutout9a1c6a2 and opaque Rim4ab1bc6 are separately sealed/pushed, with
-independent rendering and Arc proof; normal-map support is the next material
-adapter. Automatic-weight work repairs a thin-limb counterexample privately,
-but real avatar connectivity/occlusion and end-user integration remain open.
-
-The original older full689 regression closed with the preserved sampler timeout,
-stale controller assertion, two canonical failures and dependent not-run. The
-first two have separately qualified fixes on main; the complete old run is not
-relabeled green. Full regression/integration, remaining authoring features,
-physical devices and accelerator evidence remain required. The accepted XR
-selection interface is preserved; controller drawers remain queued after basic
-authoring. No installation, headset launch or active-session restart.
+Automatic-weight work has experimental global avatar positives but still fails
+stronger local head/toe and affine seed controls; it is not the new default.
+A source-owned Normal adapter is also independently qualifying. Full regression,
+remaining authoring/interoperability, physical devices and accelerator evidence
+remain required. The older full689 failures are preserved; newer converter test
+migration is in the separate37 candidate. Accepted XR selection remains; controller
+drawers are queued after the basic authoring targets. Full goal remains active.
 
 ## Qualified PBR renderer specialization — 2026-11-05
 

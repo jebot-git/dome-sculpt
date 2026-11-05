@@ -68,6 +68,7 @@ std::shared_ptr<const Vrm1AuthoringCompilation> compile_vrm1_authoring(
    const size_t targets=object.deformation&&object.deformation->morphs?object.deformation->morphs->targets.size():0;
    reserve(object.painted->mesh().indices.size(),2*(sizeof(Vec3)*(3+3*targets)+sizeof(uint32_t)+sizeof(std::array<float,2>)*arrays+sizeof(std::array<float,4>)));
 
+   reserve(1,sizeof(std::pair<const uint64_t,Vrm1ExpressionLayer>)+4*sizeof(void*));
    auto bounded=policy;bounded.max_working_bytes=policy.max_working_bytes-working;bounded.max_output_bytes=image_limit-images;bounded.max_sample_operations=policy.max_sample_operations-samples;
    auto layer=compile_vrm1_expression_layer(result->original_,object,*packet,resolution,bounded,stop);
    reserve(layer.working_bytes,1);images+=layer.image->rgba.size();samples+=layer.sample_operations;

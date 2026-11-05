@@ -53,7 +53,8 @@ int main(int argc,char **argv)try{
      std::cout<<"UV_TARGET_IMAGE "<<asset<<" "<<name<<" max="<<maximum<<" coverage="<<coverage<<std::endl;
      check(coverage>300&&maximum<=4,"Actual painted native source matches independent varying/zero/mixed target semantics at unchanged4");
      if(!pose&&!eye&&((w[0]==1&&w[1]==0)||(w[0]==0&&w[1]==1))){
-      std::vector<std::pair<bool*,const char*>> controls{{&consumer.wrong_paint_uv,"moving-paint"},{&consumer.wrong_source_uv,"frozen-source"}};if(w[0]==1)controls.push_back({&consumer.wrong_base_tint,"tinted-paint"});if(shared)controls.push_back({&consumer.wrong_shared_shade,"missing-shade-paint"});
+      bool layered=false;for(const auto &mesh:model.json.at("meshes"))layered|=mesh.at("primitives").size()>1;
+      std::vector<std::pair<bool*,const char*>> controls{{&consumer.wrong_source_uv,"frozen-source"}};if(layered)controls.push_back({&consumer.wrong_paint_uv,"moving-paint"});if(layered&&w[0]==1)controls.push_back({&consumer.wrong_base_tint,"tinted-paint"});if(binding.material.parameters.alpha==MToonAlpha::Mask)controls.push_back({&consumer.wrong_mask_cutoff,"wrong-mask-cutoff"});if(shared&&layered)controls.push_back({&consumer.wrong_shared_shade,"missing-shade-paint"});
       for(const auto &[flag,label]:controls){*flag=true;fbo.bind();const auto wrong=consumer.render(model,0,view);*flag=false;const auto effect=delta(independent,wrong);std::cout<<"UV_TARGET_SENSITIVITY "<<label<<" "<<effect<<std::endl;check(effect>2,"Independent target consumer detects the genuine source/paint counterfactual");}
      }
      if(eye){fbo.bind();renderer.draw(frame.surface,{},view,{0,0,2},96,96,true);check(read()==native&&stable(first_buffer,renderer.buffer_stats(),first_texture,renderer.texture_stats()),"Actual no-op view preserves every native pixel and performs no geometry or image reupload");}

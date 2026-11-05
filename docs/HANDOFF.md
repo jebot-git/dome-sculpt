@@ -1,3 +1,14 @@
+## Admitted native36 milestone — 2026-11-05
+
+Main now carries qualifieda0b8a37/seal881021c with matching source/build/tests:
+ReleaseALL+125/125 and owningSAN+125/125, actualUI200/profile, Arc1129+19 with
+six software controls and8GUI GLBs0KHRerrors. Original failed/cancelled builds
+remain recorded; no full766/runtime or fullproduction/device/compute claim.
+Read COHERENT-NATIVE36-AUTHORING.md and latest REQUIREMENTS.md. Larger37/physical4
+candidatef95c87d is a separate same-owning-object continuation after a test-target
+include error; preserve its live sources/scripts until authoritative terminal.
+The full objective and later controller drawers remain required.
+
 # Dome Sculpt production handoff
 
 ## Current production state — 2026-11-05

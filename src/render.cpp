@@ -1,4 +1,5 @@
 #include "native-paint-sampling.hpp"
+#include "native-paint-metadata.hpp"
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Matrix helpers adapted from OpenBrush Native (Apache-2.0).
 #include "dome/render.hpp"
@@ -367,9 +368,10 @@ struct SurfaceRenderer::TextureState {
         wanted_samplers.insert(sample);plan[index]={key,sample,view.uv_transform,true,view.texcoord};
       };
       if(range.normal_preview_proof&&!range.normal_preview_proof->matches(range.material_bindings,maps))throw std::invalid_argument("Normal GPU preview lost its exact independently authenticated owners");
-      const bool sealed=range.paint_sampling_attachment&&range.normal_preview_proof&&range.normal_preview_proof->matches(range.material_bindings,maps)&&
+      const bool sealed24=range.paint_sampling_attachment&&range.normal_preview_proof&&range.normal_preview_proof->matches(range.material_bindings,maps)&&
         range.normal_preview_proof->metadata_domain()==range.paint_sampling_attachment->domain()&&!range.normal_preview_proof->metadata_domain().owner_before(range.paint_sampling_attachment->domain())&&!range.paint_sampling_attachment->domain().owner_before(range.normal_preview_proof->metadata_domain());
-      if(range.normal_preview_proof&&range.paint_sampling_attachment&&!sealed)throw std::invalid_argument("Normal and paint preview metadata use different owning coordinate domains");
+      if(range.normal_preview_proof&&range.paint_sampling_attachment&&!sealed24)throw std::invalid_argument("Normal and paint preview metadata use different owning coordinate domains");
+      const bool sealed=sealed24||detail::native_frame_preview_metadata(range.material_bindings,range.paint_sampling_attachment);
       const bool deep_material=geometry_changed&&!sealed;
       const bool prepared_color=detail::prepared_color_state(range.material_bindings.get(),maps.get(),deep_material);
       const bool prepared_normal=detail::prepared_normal_state(range.material_bindings.get(),maps.get(),deep_material);

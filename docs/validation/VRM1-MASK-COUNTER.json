@@ -1,0 +1,162 @@
+{
+  "base": "e84d919848499a0fce7bda1c84101ae49565d582",
+  "scope": "Test-only actual original native EditableAvatar256 worker refuses both genuine MASK inputs.14checks each; no producer change/admission.",
+  "counter": {
+    "state": "terminal",
+    "pid": 3944106,
+    "steps": [
+      {
+        "name": "compile-vrm1-expression-layer-authoring",
+        "command": [
+          "/usr/bin/c++",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-mask-e84/src",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-mask-e84/third_party/cgltf",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-mask-e84/include",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-mask-e84/third_party/openbrush",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-mask-e84/third_party/nlohmann",
+          "-O3",
+          "-DNDEBUG",
+          "-std=gnu++20",
+          "-o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-mask-e84/artifacts/mask-proof/counter-release/stage/vrm1-expression-layer-authoring.cpp.o",
+          "-c",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-mask-e84/tests/vrm1-expression-layer-authoring.cpp"
+        ],
+        "exit": 0,
+        "seconds": 10.418602125020698
+      },
+      {
+        "name": "link-worker",
+        "command": [
+          "/usr/bin/c++",
+          "-O3",
+          "-DNDEBUG",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-mask-e84/artifacts/mask-proof/counter-release/stage/vrm1-expression-layer-authoring.cpp.o",
+          "-o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-mask-e84/artifacts/mask-proof/counter-release/stage/worker",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-mask-e84/artifacts/mask-proof/counter-release/stage/libdome-sculpt-core.a",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-mask-e84/artifacts/mask-proof/counter-release/stage/libdome-sculpt-affine.a",
+          "/usr/lib64/liblapacke.so",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-mask-e84/artifacts/mask-proof/counter-release/stage/libdome-sculpt-polygon.a",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-mask-e84/artifacts/mask-proof/counter-release/stage/libxatlas.a",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-mask-e84/artifacts/mask-proof/counter-release/stage/libmikktspace.a",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-mask-e84/artifacts/mask-proof/counter-release/stage/libmikktspace-robust.a",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-mask-e84/artifacts/mask-proof/counter-release/stage/libufbx.a",
+          "/usr/lib64/libpng.so",
+          "/usr/lib64/libjpeg.so",
+          "/usr/lib64/libz.so",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-mask-e84/artifacts/mask-proof/counter-release/stage/libdome-sculpt-emission-codec.a",
+          "/usr/lib64/libOpenEXR-3_2.so",
+          "/usr/lib64/libOpenEXRUtil-3_2.so",
+          "/usr/lib64/libOpenEXRCore-3_2.so",
+          "/usr/lib64/libIex-3_2.so",
+          "/usr/lib64/libIlmThread-3_2.so",
+          "/usr/lib64/libImath-3_1.so",
+          "-lgcc_s_asneeded",
+          "-lgcc_s_asneeded",
+          "-Wl,--wrap=fsync"
+        ],
+        "exit": 0,
+        "seconds": 0.613244777021464
+      },
+      {
+        "name": "mask-invariant-refusal",
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-mask-e84/artifacts/mask-proof/counter-release/stage/worker",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-preview-1853cc3/build-preview-release/vrm1-background-fixture/source.vrm",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-mask-e84/artifacts/mask-proof/counter-release/mask-invariant-run",
+          "--old-refusal",
+          "--mask-invariant"
+        ],
+        "exit": 0,
+        "seconds": 0.1324347319896333
+      },
+      {
+        "name": "mask-crossing-refusal",
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-mask-e84/artifacts/mask-proof/counter-release/stage/worker",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-preview-1853cc3/build-preview-release/vrm1-background-fixture/source.vrm",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-mask-e84/artifacts/mask-proof/counter-release/mask-crossing-run",
+          "--old-refusal",
+          "--mask-crossing"
+        ],
+        "exit": 0,
+        "seconds": 0.1357701070373878
+      }
+    ],
+    "scope": "Test-only actual MASK authored inputs against unchanged e84 worker/core. No producer change or alpha admission. Prior scope:Whole3directproductionTUs for new private invariant-role product on copied matchingccc owned support. Five actual worker/render domains, three actual public coupling refusals+Save/history, one new complex constant-role fullallocation/allCancel factory scope; no old broad sweep repetition, root35/freshapp/fullsuite claim.",
+    "child_pid": 3945420,
+    "exit": 0,
+    "seconds": 11.447984228958376,
+    "inputs": 1882,
+    "drift": []
+  },
+  "input_validation": {
+    "scope": "Both real MASK authored INPUTs used by unchanged e84 native worker counter; outputs are not rewritten. Pinned official and maxIssues0 unfiltered Khronos.",
+    "files": {
+      "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-mask-e84/artifacts/mask-proof/counter-release/mask-invariant-run/source-mask-invariant.vrm": "319f0aa7a485a8ba8fd64a06e2f5cf69f5aceba493ded691e69d6f58db14e57f",
+      "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-mask-e84/artifacts/mask-proof/counter-release/mask-crossing-run/source-mask-crossing.vrm": "78a49af95e1e7a080b0669558df5a7a24e3aabdc5d3c0934365dc21c57fb1e8d"
+    },
+    "steps": [
+      {
+        "name": "official",
+        "command": [
+          "/home/blux/.local/bin/uv",
+          "run",
+          "--offline",
+          "--with",
+          "jsonschema",
+          "python",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-mask-e84/artifacts/mask-proof/input-validation/official.py",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-mask-e84/artifacts/mask-proof/counter-release/mask-invariant-run/source-mask-invariant.vrm",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-mask-e84/artifacts/mask-proof/counter-release/mask-crossing-run/source-mask-crossing.vrm"
+        ],
+        "exit": 0,
+        "seconds": 0.3328842769842595
+      },
+      {
+        "name": "khronos",
+        "command": [
+          "node",
+          "-e",
+          "const fs=require('fs'),v=require('/home/blux/de-xr/dome-sculpt/artifacts/gltf-validator/node_modules/gltf-validator');(async()=>{let code=0;const all=[];for(const p of process.argv.slice(1)){const r=await v.validateBytes(new Uint8Array(fs.readFileSync(p)),{maxIssues:0,uri:p});all.push({path:p,result:r});if(r.issues.numErrors)code=1;}process.stdout.write(JSON.stringify(all,null,2));process.exitCode=code;})();",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-mask-e84/artifacts/mask-proof/counter-release/mask-invariant-run/source-mask-invariant.vrm",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-mask-e84/artifacts/mask-proof/counter-release/mask-crossing-run/source-mask-crossing.vrm"
+        ],
+        "exit": 0,
+        "seconds": 0.2841440559714101
+      }
+    ],
+    "exit": 0,
+    "seconds": 0.6174093229928985,
+    "drift": []
+  },
+  "pinned_gltf": {
+    "url": "https://raw.githubusercontent.com/KhronosGroup/glTF/3cd6f59b277ed7f6540dbabdacc7841a5fdc0ded/specification/2.0/Specification.adoc",
+    "pin": "3cd6f59b277ed7f6540dbabdacc7841a5fdc0ded",
+    "sha256": "b4c436a38c3ec374c47b8522b7c9e14c68890454a5bfe7d2b84642760e5d079b",
+    "scope": "Existing pinned normative alpha coverage reference; no new version or source adoption."
+  },
+  "artifacts": {
+    "artifacts/mask-proof/counter-release/after.json": "c5c7da4a41565dadd9dd17b0ebe6738c34631ae1da743012cc1c3ef564bb4d76",
+    "artifacts/mask-proof/counter-release/before.json": "c5c7da4a41565dadd9dd17b0ebe6738c34631ae1da743012cc1c3ef564bb4d76",
+    "artifacts/mask-proof/counter-release/compile-vrm1-expression-layer-authoring.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "artifacts/mask-proof/counter-release/link-worker.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "artifacts/mask-proof/counter-release/mask-crossing-refusal.log": "ec9457c489dfab37900e2ca4eabdbe40399525a520aaa3e5fc2a607583888872",
+    "artifacts/mask-proof/counter-release/mask-crossing-run/dynamic.vrm": "db36251b3c135816ae9671421f0013791db8790de3cf74d2982da66e5293ed60",
+    "artifacts/mask-proof/counter-release/mask-crossing-run/nonuniform-source.dsculpt": "5adc453ee9ee16bae4e64db414c0663d186086bc453f840fff10d2874040cfed",
+    "artifacts/mask-proof/counter-release/mask-crossing-run/source-mask-crossing.vrm": "78a49af95e1e7a080b0669558df5a7a24e3aabdc5d3c0934365dc21c57fb1e8d",
+    "artifacts/mask-proof/counter-release/mask-invariant-refusal.log": "ec9457c489dfab37900e2ca4eabdbe40399525a520aaa3e5fc2a607583888872",
+    "artifacts/mask-proof/counter-release/mask-invariant-run/dynamic.vrm": "db36251b3c135816ae9671421f0013791db8790de3cf74d2982da66e5293ed60",
+    "artifacts/mask-proof/counter-release/mask-invariant-run/nonuniform-source.dsculpt": "e584c7f815a5316654abd19852a0d0adbef518cafc514b0548b4340d5069c2ca",
+    "artifacts/mask-proof/counter-release/mask-invariant-run/source-mask-invariant.vrm": "319f0aa7a485a8ba8fd64a06e2f5cf69f5aceba493ded691e69d6f58db14e57f",
+    "artifacts/mask-proof/counter-release/status.json": "32eb7d3b7f1e65c30bd5a0f1a0b0b847ff3e35b949228ed3ac77cd51dd2c7bd9",
+    "artifacts/mask-proof/input-validation/after.json": "5fb4a15840949eb990ac5038deb778ab50cf6899e34664fd45b0d4f1ff5704de",
+    "artifacts/mask-proof/input-validation/before.json": "5fb4a15840949eb990ac5038deb778ab50cf6899e34664fd45b0d4f1ff5704de",
+    "artifacts/mask-proof/input-validation/khronos.log": "0b1085736e9e677d18e0fb320eca41f862ec5b057e1d1708cd6c4b85ce17d79e",
+    "artifacts/mask-proof/input-validation/official.json": "fd61582549971ac4182549e2cb3b52e67897c36767b50763bf8a75706367884b",
+    "artifacts/mask-proof/input-validation/official.log": "33fbec115ee0126e398c066e898f090f25cd494411dcb42c2cc5c724a8cfd1e8",
+    "artifacts/mask-proof/input-validation/status.json": "9c5795db7dd63c40a3e06244086895728576add087b3a48f63aab8a4072bebf3",
+    "artifacts/mask-proof/spec/provenance.json": "f6b1ef1aa7450f9b20649b410fc471656b479af99c93238684702c6fba8f8bee"
+  }
+}
