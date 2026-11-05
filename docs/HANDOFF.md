@@ -1,5 +1,15 @@
 # Dome Sculpt production handoff
 
+## Private current surface-heat export — 2026-11-05
+
+Actual female worker/male owning results now pass independent emittedGLB
+228part-pose comparisons each Release/sanitizer (456total), max4.30e-7m against
+unchanged3e-5m; missingIBM sensitivity1.45/1.61m. All24emitted files have0KHR
+errors/456unfiltered nonroot-skin warnings, independently checked world transport.
+No production/default/layout/UI/GPU change; current615 port, fault coverage and
+general-native automatic admission remain. Read SURFACE-HEAT-CURRENT-EXPORT-WIP
+and receipt for actual matched55 scope and exact inputs.
+
 ## Private owning new-bind surface heat — 2026-11-05
 
 Actual genuinely unskinned female/male19 owning binds now equal the qualified
