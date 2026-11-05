@@ -54,3 +54,16 @@ original build or a new clean invocation. The known nativeHDR GUI observer fix
 uses only visible chooser windows and verifies no default output; originalSAN
 CtrlW observer timeout remains recorded, precise cause unproven. Prior HDR pair
 count metadata is corrected from18 PNG images to12 independent comparisons.
+
+The corrected same-owning Release ALL and sanitizer build continuations now
+complete. The first20 runtime gate runs11 tests successfully in each profile,
+including migrated owning conversion/render, genuine current-key physical HDR,
+Rim/cutout and binary MatCap. Its new fixture then correctly refuses a stroke on
+the original intentionally hidden active layer; eight dependent tests do not run.
+Original exit8 results/manifests remain. Test-only14c3ae5 uses the same public
+Paint/Add layer command as the application before the real native FLOAT gesture.
+A separate complete consumer on the same newly owned sanitizer core successfully
+creates all4 real source/key/physical fixtures with no source drift. No product,
+header, schema or hidden-layer protection changes. The corrected fixture and
+previously dependent actual package4 pipelines remain to qualify in the owning
+cohort; old successful tests need not be repeated for this setup-only repair.
