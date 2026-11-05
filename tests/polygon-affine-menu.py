@@ -39,7 +39,8 @@ async def main():
   if compact:
    path=Path(home,'config/dome/appearance.json');path.parent.mkdir(parents=True,exist_ok=True);path.write_text(json.dumps({'font':'Unifont / Sans-Serif','font_size':16,'font_scale':2}))
   fixture=out/'working.dsculpt';shutil.copy2(input_fixture,fixture)
-  def inspect():return json.loads(subprocess.check_output([str(helper),'--inspect',str(fixture)]))
+  observer_env={**os.environ,'LD_LIBRARY_PATH':'/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-release/lib:/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib'}
+  def inspect():return json.loads(subprocess.check_output([str(helper),'--inspect',str(fixture)],env=observer_env))
   original=inspect();app=subprocess.Popen([str(app_binary),str(fixture)],env=env,cwd=home,stdout=(out/'app.log').open('w'),stderr=subprocess.STDOUT);processes.append(app);d=display.Display(screen)
   def named(title):
    for w in d.screen().root.query_tree().children:
