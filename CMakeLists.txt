@@ -4327,3 +4327,29 @@ if(BUILD_TESTING)
   add_test(NAME surface-heat-current-head-stress COMMAND dome-sculpt-surface-heat-head-stress-test ${CMAKE_CURRENT_BINARY_DIR}/surface-heat/current-head-stress)
   set_tests_properties(surface-heat-current-head-stress PROPERTIES TIMEOUT 300)
 endif()
+
+# Actual SurfaceHeat5 allocation controls, independent of the implicit method.
+if(BUILD_TESTING)
+  foreach(kind IN ITEMS factory caller worker)
+    add_executable(dome-sculpt-surface-heat-${kind}-faults-test tests/surface-heat-${kind}-faults.cpp)
+    target_include_directories(dome-sculpt-surface-heat-${kind}-faults-test PRIVATE src)
+    target_link_libraries(dome-sculpt-surface-heat-${kind}-faults-test PRIVATE dome-sculpt-core)
+  endforeach()
+  foreach(kind IN ITEMS caller worker)
+    target_link_options(dome-sculpt-surface-heat-${kind}-faults-test PRIVATE
+      -Wl,--wrap=_ZN4dome24author_surface_heat_skinERNS_5SceneESt4spanIKmLm18446744073709551615EERKNS_20SkinAuthoringOptionsERKSt8functionIFbvEE)
+  endforeach()
+  add_test(NAME surface-heat-real-factory-faults COMMAND dome-sculpt-surface-heat-factory-faults-test
+    ${CMAKE_CURRENT_BINARY_DIR}/surface-heat/real-factory-faults all)
+  set_tests_properties(surface-heat-real-factory-faults PROPERTIES TIMEOUT 600)
+  add_test(NAME surface-heat-real-caller-faults COMMAND dome-sculpt-surface-heat-caller-faults-test
+    ${CMAKE_CURRENT_BINARY_DIR}/anatomical-native/female/fitted-unskinned.dsculpt
+    ${CMAKE_CURRENT_BINARY_DIR}/surface-heat/real-caller-faults)
+  set_tests_properties(surface-heat-real-caller-faults PROPERTIES FIXTURES_REQUIRED anatomical_female_input TIMEOUT 900)
+  add_test(NAME surface-heat-real-publication-faults COMMAND dome-sculpt-surface-heat-worker-faults-test
+    ${CMAKE_CURRENT_BINARY_DIR}/surface-heat/real-publication-faults)
+  set_tests_properties(surface-heat-real-publication-faults PROPERTIES TIMEOUT 600)
+  add_test(NAME surface-heat-real-publication-long-name COMMAND dome-sculpt-surface-heat-worker-faults-test
+    ${CMAKE_CURRENT_BINARY_DIR}/surface-heat/real-publication-long-name long-name-control)
+  set_tests_properties(surface-heat-real-publication-long-name PROPERTIES TIMEOUT 300)
+endif()
