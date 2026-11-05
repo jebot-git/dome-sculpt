@@ -19,12 +19,16 @@ RefinedRoleField sample_refined_role_field(const KeyMirrorRefinement &r,
     throw std::length_error("Refined role working budget exceeded before allocation");bytes+=amount*unit;};
   auto operations=[&](size_t amount){if(amount>limits.max_work-work)
     throw std::length_error("Refined role work budget exceeded before allocation");work+=amount;};
-  charge(1,sizeof(RefinedRoleField));charge(1,role->storage_bytes());
-  const auto &mesh=*r.source;
-  charge(mesh.positions.size()+mesh.normals.size(),sizeof(Vec3));
-  charge(mesh.uv.size(),sizeof(std::array<float,2>));charge(mesh.indices.size(),sizeof(uint32_t));
-  charge(mesh.uv_pins.size()+mesh.uv_seams.size(),1);
-  charge(n,sizeof(MirrorRefinementCorner)+sizeof(uint32_t));
+  charge(1,sizeof(RefinedRoleField));charge(1,sizeof(NormalFrames));
+  charge(role->origin_vertices.capacity()+role->source_vertices.capacity()+role->source_corners.capacity(),sizeof(uint32_t));
+  charge(role->normals.capacity(),sizeof(Vec3));charge(role->tangents.capacity(),sizeof(std::array<float,4>));
+  charge(role->targets.capacity(),sizeof(NormalFrameTarget));
+  for(const auto &t:role->targets){stop();charge(t.normals.capacity()+t.tangents.capacity(),sizeof(Vec3));}
+  const auto &mesh=*r.source;charge(1,sizeof(Mesh));
+  charge(mesh.positions.capacity()+mesh.normals.capacity(),sizeof(Vec3));
+  charge(mesh.uv.capacity(),sizeof(std::array<float,2>));charge(mesh.indices.capacity(),sizeof(uint32_t));
+  charge(mesh.uv_pins.capacity()+mesh.uv_seams.capacity(),1);
+  charge(1,sizeof(KeyMirrorRefinement));charge(r.corners.capacity(),sizeof(MirrorRefinementCorner));charge(r.opposite.capacity(),sizeof(uint32_t));
   charge(n,sizeof(Vec3));operations(n*6); // three barycentric/source-normal reads each
   if(!role->tangents.empty()){charge(n,sizeof(std::array<float,4>));operations(n*6);}
   charge(role->targets.size(),sizeof(NormalFrameTarget));
@@ -36,6 +40,7 @@ RefinedRoleField sample_refined_role_field(const KeyMirrorRefinement &r,
   // reserved before the first output vector. This helper borrows all inputs.
   RefinedRoleField out;out.before=std::move(role);out.working_bytes=bytes;out.work_units=work;
   out.normals.resize(n);if(!out.before->tangents.empty())out.tangents.resize(n);
+  out.targets.reserve(out.before->targets.size());
   for(const auto &t:out.before->targets){NormalFrameTarget sampled;sampled.id=t.id;
     if(!t.normals.empty())sampled.normals.resize(n);
     if(!t.tangents.empty())sampled.tangents.resize(n);out.targets.push_back(std::move(sampled));}
