@@ -2,6 +2,7 @@
 #pragma once
 #include "humanoid-heat-domains.hpp"
 #include "weight-boundary-sewing.hpp"
+#include "closed-mesh-source-domain.hpp"
 namespace dome::detail {
 // Current geometry/semantic-role boundary construction. No raw asset, material
 // names, artist influences, cross-owner sewing, or posed coordinates are inputs.
@@ -19,12 +20,12 @@ inline HumanoidHeatDomains current_humanoid_heat_domains(const Scene&scene,
  // Retained fixed data and the largest simultaneously live analysis workspace
  // are admitted before copying meshes, morph rows, tree keys or boundary data.
  visibility_geodesic::Bytes retained{65536,maximum_bytes};retained.add(selected.size(),sizeof(HumanoidHeatDomains::Part)+128);
- size_t peak=0;for(auto id:selected){const auto&o=scene.object(id);if(!o.mesh_active||!o.painted||o.appearance||!o.deformation||!o.deformation->skeleton||!o.deformation->humanoid||o.deformation->humanoid->joints!=roles)throw std::invalid_argument("Current humanoid boundary requires captured native mesh/role correspondence");const auto&m=o.painted->mesh();const size_t n=m.positions.size(),c=m.indices.size(),targets=o.deformation->morphs?o.deformation->morphs->targets.size():0;if(!n||n>2'000'000||c>6'000'000||targets>128)throw std::length_error("Current humanoid boundary geometry cap");retained.add(n,sizeof(uint32_t));visibility_geodesic::Bytes transient{65536,maximum_bytes};transient.add(n,240+24*targets);transient.add(c,320+48*targets);transient.add(rig.bones.size(),4096);peak=std::max(peak,transient.used);}
+ size_t peak=0;for(auto id:selected){const auto&o=scene.object(id);if(!o.mesh_active||!o.painted||o.appearance||!o.deformation||!o.deformation->skeleton||!o.deformation->humanoid||o.deformation->humanoid->joints!=roles)throw std::invalid_argument("Current humanoid boundary requires captured native mesh/role correspondence");const auto&m=o.painted->mesh();const size_t n=m.positions.size(),c=m.indices.size(),targets=o.deformation->morphs?o.deformation->morphs->targets.size():0;if(!n||n>2'000'000||c>6'000'000||targets>128)throw std::length_error("Current humanoid boundary geometry cap");retained.add(n,sizeof(uint32_t));visibility_geodesic::Bytes transient{65536,maximum_bytes};transient.add(n,768+24*targets);transient.add(c,640+48*targets);transient.add(rig.bones.size(),4096);peak=std::max(peak,transient.used);}
  if(peak>maximum_bytes-retained.used)throw std::length_error("Current humanoid boundary analysis workspace before staging");
  const size_t initial_work=work.used;HumanoidHeatDomains result;result.forecast_bytes=retained.used;result.analysis_bytes=retained.used+peak;result.parts.reserve(selected.size());
  const auto ref_world=scene.world_matrix(reference);auto shift=AffineTransform{}.matrix();for(size_t k=0;k<3;++k)shift[12+k]=-ref_world.matrix()[12+k];const AffineTransform origin(shift);
  auto profile=declared_weight_profile(rig,work,DeclaredRigGeometry::NativeBoneAxes);for(auto&s:profile.segments){auto f=[&](std::array<double,3>a){work.step(64);auto p=skin_affine_point(origin*ref_world,{float(a[0]),float(a[1]),float(a[2])});return std::array<double,3>{p.x,p.y,p.z};};s.head=f(s.head);s.tail=f(s.tail);}
- std::vector<HeatSourceSegment>eye_points;const auto segments=rig.segments();for(auto role:{"leftEye","rightEye"}){auto j=roles.at(role);if(!rig.bones[j].deform)continue;const auto p=segments[j][0];work.step(64);auto q=(origin*ref_world).point({p.x,p.y,p.z});std::array<double,3>a{float(q[0]),float(q[1]),float(q[2])};eye_points.push_back({a,a,j});}if(eye_points.empty())throw std::invalid_argument("Current ocular boundary has no deform eye control");NearestWeightSources nearest_eye(eye_points,work);
+ std::vector<HeatSourceSegment>eye_points;const auto segments=rig.segments();for(auto role:{"leftEye","rightEye"}){auto j=roles.at(role);const auto p=segments[j][0];work.step(64);auto q=(origin*ref_world).point({p.x,p.y,p.z});std::array<double,3>a{float(q[0]),float(q[1]),float(q[2])};eye_points.push_back({a,a,j});}if(eye_points.empty())throw std::invalid_argument("Current ocular boundary has no deform eye control");NearestWeightSources nearest_eye(eye_points,work);
  for(auto id:selected){work.stop();const auto&o=scene.object(id);const auto&m=o.painted->mesh();
   std::vector<std::vector<Vec3>>deltas;if(o.deformation->morphs){deltas.reserve(o.deformation->morphs->targets.size());for(const auto&t:o.deformation->morphs->targets){work.step_items(t.delta.size(),4);deltas.push_back(t.delta);}}
   // Sew only this exact raw owner and all authored morph rows before metric
@@ -45,8 +46,24 @@ inline HumanoidHeatDomains current_humanoid_heat_domains(const Scene&scene,
     Mesh subset;std::vector<uint32_t>map(intrinsic.positions.size(),UINT32_MAX);subset.positions.reserve(rows.size());subset.indices.reserve(intrinsic.indices.size());for(auto i:rows){work.step(8);map[i]=uint32_t(subset.positions.size());subset.positions.push_back(intrinsic.positions[i]);}for(size_t c=0;c<intrinsic.indices.size();c+=3){work.step(8);if(components[intrinsic.indices[c]]!=root)continue;for(size_t k=0;k<3;++k)subset.indices.push_back(map[intrinsic.indices[c+k]]);}
     // Large/non-disk regions are not silently reinterpreted as eye caps.
     if(subset.positions.size()>4096||subset.indices.size()/3>16384)throw std::length_error("Current ocular patch exceeds certified geometric descriptor");
-    const auto patch=analyze_projected_ocular_patch(subset,maximum_bytes-retained.used,work);uint32_t joint=head;
-    if(patch.disk&&patch.convex_boundary){uint32_t selected_eye=UINT32_MAX;for(auto p:subset.positions){const auto mask=nearest_eye.nearest({p.x,p.y,p.z},work);uint32_t selected_joint=UINT32_MAX;size_t count=0;for(size_t k=0;k<4;++k){work.step();const auto bits=mask[k];count+=std::popcount(bits);if(bits)selected_joint=uint32_t(k*64+std::countr_zero(bits));}if(count!=1||(selected_eye!=UINT32_MAX&&selected_eye!=selected_joint))throw std::runtime_error("Current convex ocular patch lacks a unique actual eye control");selected_eye=selected_joint;}joint=selected_eye;}
+    // Closed eye shells need a different witness from open convex disks.
+    // The owning exact BVH and embedded-manifold check are local to THIS
+    // current intrinsic component; no neighboring actor or skin data enters.
+    std::vector<bone_shadow::Point>points;points.reserve(subset.positions.size());for(auto p:subset.positions){work.step(4);points.push_back({p.x,p.y,p.z});}
+    auto query=std::make_shared<const visibility_geodesic::ClosestRayVisibility>(points,subset.indices,maximum_bytes-retained.used,work,true);
+    visibility_geodesic::ClosestRayVisibility::Scratch scratch(*query);
+    if(query->planned_bytes>maximum_bytes-retained.used)throw std::length_error("Current ocular owning BVH workspace");
+    visibility_geodesic::ClosedMeshSourceDomain closed(query,maximum_bytes-retained.used-query->planned_bytes,work);
+    uint32_t joint=head;
+    if(closed.closed(0)){
+      size_t inside=0;for(const auto&eye:eye_points){work.step(8);const auto p=eye.head;const bone_shadow::Point pivot{float(p[0]),float(p[1]),float(p[2])};const auto location=closed.closest(0,pivot,pivot,scratch,work);if(location==visibility_geodesic::ClosedMeshSourceDomain::Location::Boundary)throw std::invalid_argument("Current ocular pivot lies on the closed boundary");if(location==visibility_geodesic::ClosedMeshSourceDomain::Location::Inside){joint=eye.bone;++inside;}}
+      if(inside>1)throw std::invalid_argument("Current closed ocular component contains multiple eye pivots");if(inside==1&&!rig.bones.at(joint).deform)joint=head;
+      // No contained pivot grants no Eye authority. This is a prospective
+      // geometric classification, never recovery from a failed solve/query.
+    }else{
+    const auto patch=analyze_projected_ocular_patch(subset,maximum_bytes-retained.used,work);
+    if(patch.disk&&patch.convex_boundary){uint32_t selected_eye=UINT32_MAX;for(auto p:subset.positions){const auto mask=nearest_eye.nearest({p.x,p.y,p.z},work);uint32_t selected_joint=UINT32_MAX;size_t count=0;for(size_t k=0;k<4;++k){work.step();const auto bits=mask[k];count+=std::popcount(bits);if(bits)selected_joint=uint32_t(k*64+std::countr_zero(bits));}if(count!=1||(selected_eye!=UINT32_MAX&&selected_eye!=selected_joint))throw std::runtime_error("Current convex ocular patch lacks a unique actual eye control");selected_eye=selected_joint;}joint=rig.bones.at(selected_eye).deform?selected_eye:head;}
+    }
     for(auto i:rows){work.step();fixed[i]=joint;}
    }
    for(size_t i=0;i<m.positions.size();++i){work.step();part.fixed[i]=fixed.at(to_intrinsic[i]);}
