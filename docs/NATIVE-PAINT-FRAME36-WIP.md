@@ -31,8 +31,20 @@ preserved), then both worker commands pass twice on the same directories/binarie
 Production cancellation logic and assertions were not weakened. All phases stay
 separate; no synthetic green original6 claim.
 
-This is NOT a sanitizer, GL/export/UI or main-admission checkpoint. Fresh whole own
-SAN, factory/codec/resource/fault/cancel and direct cheap-path counters remain.
+The final own Release registrations pass7/7 (1.41s). Fresh whole-owned sanitizer
+app/core/render/support and all seven consumers compile in231 tasks; selected
+SAN passes7/7 (25.94s), with no ASan/UBSan/LSan diagnostics. All2096 measured
+source inputs remain exact;38 native output pairs are byte-identical across R/S.
+Actual counts per profile are29 new36 key,164 ordinary authoring,1424 ordinary
+worker,72 pure-skin UV,332 pure-skin UV worker,74 old sampling and1797 actual
+paired-publication/fault checks. The migrated publication hook is root
+c43d1db+b30a959, carried as0734059+af8def6. Those inherited measured sweeps do not
+constitute exhaustive coverage of the new36 factory/codec.
+
+This is a private source/interface/codec component checkpoint, not GL/export/UI
+or main admission. Broader new36 factory/codec/resource/fault/cancel checks and
+actual native/controller consumers remain. Direct no-replay publication counters
+are being implemented in a separate post-key UV child, not claimed for this tree.
 Native32 post-key UV and reverse source-row restore still require actual adapters;
 no guards are lifted for those cases. Root owns the separate skin coordinate-export
 adapter; morph shading export remains explicit. Palette's canonical/F32 paint UV
