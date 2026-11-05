@@ -6,6 +6,9 @@
 #include "dome/polygon-scene.hpp"
 #include "dome/polygon-source.hpp"
 #include "polygon-conversion.hpp"
+#include "polygon-affine.hpp"
+#include "affine-interaction.hpp"
+#include "document-held-affine.hpp"
 #include <pthread.h>
 namespace dome {
 namespace {
@@ -35,6 +38,29 @@ std::optional<Vec3> intersect(Vec3 origin, Vec3 direction, Vec3 point,
   if (!std::isfinite(distance) || distance < 0 || distance > maximum)
     return {};
   return origin + direction * distance;
+}
+std::optional<AffineVector> intersect_affine(const detail::AffineLocalRay &ray,
+    AffineVector point,AffineVector normal) {
+  double denominator=0,numerator=0;
+  for(size_t i=0;i<3;++i){denominator+=ray.direction[i]*normal[i];numerator+=(point[i]-ray.origin[i])*normal[i];}
+  if(denominator==0)return {};
+  const auto distance=numerator/denominator;
+  if(!std::isfinite(distance)||distance<0||distance>ray.maximum_distance)return {};
+  auto hit=ray.origin;for(size_t i=0;i<3;++i)hit[i]+=ray.direction[i]*distance;
+  return hit;
+}
+detail::AffineLocalRay local_ray(const AffineTransform &world,Vec3 origin,Vec3 direction,float maximum) {
+  return detail::affine_local_ray(detail::AffineInteractionFrame(world),
+    {origin.x,origin.y,origin.z},{direction.x,direction.y,direction.z},maximum);
+}
+AffineVector local_plane_normal(const AffineTransform &world,Vec3 world_normal) {
+  // Plane covectors use A^T, not inverse(A) or a fitted orientation.
+  const auto &m=world.matrix();AffineVector out{};
+  for(size_t c=0;c<3;++c)out[c]=m[c*4]*world_normal.x+m[c*4+1]*world_normal.y+m[c*4+2]*world_normal.z;
+  const auto length=std::hypot(out[0],out[1],out[2]);
+  if(!std::isfinite(length)||length==0)throw std::invalid_argument("Affine polygon drag plane is undefined");
+  for(auto &v:out)v/=length;
+  return out;
 }
 } // namespace
 bool Document::polygon_source_matches_locked() const {
@@ -328,8 +354,9 @@ void Document::edit_polygon(PolygonAction action) {
         "Finish the polygon move before changing its topology");
   PolygonJob job;
   job.action = action;
-  auto world = object_world_transform_locked(scene_.active().id);
-  job.amount = state_.polygon_controls.distance_mm * .001f / world.scale;
+  job.amount=state_.polygon_controls.distance_mm*.001f;
+  if(scene_.has_affine_placement(scene_.active().id))job.world=object_world_matrix_locked(scene_.active().id);
+  else job.amount/=object_world_transform_locked(scene_.active().id).scale;
   job.cuts = state_.polygon_controls.cuts;
   queue_polygon_locked(std::move(job));
 }
@@ -348,15 +375,18 @@ void Document::polygon_pointer_locked(Vec3 origin, Vec3 direction,
       (!polygon_stroking_ || polygon_owner_ != owner))
     return;
   const auto object = scene_.active().id;
-  auto world = object_world_transform_locked(object);
-  if (xr)
-    world = ob::compose(state_.canvas, world);
-  PolygonJob job;
-  job.action = action;
-  job.origin = local_point(world, origin);
-  job.direction = local_direction(world, direction);
-  job.radius = .015f / world.scale;
-  job.maximum = 100 / world.scale;
+  PolygonJob job;job.action=action;
+  if(scene_.has_affine_placement(object)){
+    auto world=object_world_matrix_locked(object);
+    if(xr)world=affine_similarity(state_.canvas)*world;
+    job.world=world;job.origin=origin;job.direction=direction;
+    job.radius=.015f;job.maximum=100;
+  }else{
+    auto world=object_world_transform_locked(object);
+    if(xr)world=ob::compose(state_.canvas,world);
+    job.origin=local_point(world,origin);job.direction=local_direction(world,direction);
+    job.radius=.015f/world.scale;job.maximum=100/world.scale;
+  }
   job.additive = additive || state_.polygon_controls.additive;
   const auto old_stroking = polygon_stroking_;
   const auto old_owner = polygon_owner_;
@@ -419,6 +449,7 @@ void Document::end_polygon_locked(bool accept) {
   token->held_pose =
       state_.object_grabbing && state_.held_object == polygon_source_.object;
   token->pose = held_preview_transform_;
+  token->affine_pose = token->held_pose && held_affine_ ? held_affine_->preview_edit : scene_.active().affine_edit;
   for (size_t i = 0; i < 2; ++i)
     token->grips[i] =
         state_.hands[i].tracked.valid && state_.hands[i].tracked.squeeze > .55f;
@@ -516,7 +547,9 @@ void Document::polygon_command_locked(SpatialCommand command) {
   case SpatialCommand::PolygonFlip:job.action=PolygonAction::FlipFaces;break;
   default:return;
   }
-  job.amount=state_.polygon_controls.distance_mm*.001f/object_world_transform_locked(scene_.active().id).scale;
+  job.amount=state_.polygon_controls.distance_mm*.001f;
+  if(scene_.has_affine_placement(scene_.active().id))job.world=object_world_matrix_locked(scene_.active().id);
+  else job.amount/=object_world_transform_locked(scene_.active().id).scale;
   job.cuts=state_.polygon_controls.cuts;
   queue_polygon_locked(std::move(job));
   if(command==SpatialCommand::Undo)polygon_stroking_=false;
@@ -542,6 +575,8 @@ void Document::polygon_loop() {
   uint64_t session = 0;
   std::optional<Vec3> anchor;
   Vec3 plane{}, normal{};
+  std::optional<AffineVector> affine_anchor;
+  AffineVector affine_plane{},affine_normal{};
   bool convert = false;
   for (;;) {
     PolygonJob job;
@@ -556,7 +591,7 @@ void Document::polygon_loop() {
       if (workspace && session != polygon_session_.load()) {
         lock.unlock();
         workspace.reset();
-        anchor.reset();
+        anchor.reset();affine_anchor.reset();
         session = 0;
         continue;
       }
@@ -589,6 +624,7 @@ void Document::polygon_loop() {
       checkpoint();
       auto next_anchor = anchor;
       auto next_plane = plane, next_normal = normal;
+      auto next_affine_anchor=affine_anchor;auto next_affine_plane=affine_plane,next_affine_normal=affine_normal;
       std::unique_ptr<PolygonWorkspace> candidate;
       PolygonLimits limits;
       limits.cancelled = cancelled;
@@ -597,7 +633,7 @@ void Document::polygon_loop() {
             job.initial->active(), job.convert_source, cancelled);
         candidate = std::make_unique<PolygonWorkspace>(std::move(source.topology),
             std::move(source.colors), limits);
-        next_anchor.reset();
+        next_anchor.reset();next_affine_anchor.reset();
       } else {
         if (!workspace || session != job.session)
           throw std::logic_error("Polygon workspace is unavailable");
@@ -630,11 +666,12 @@ void Document::polygon_loop() {
           candidate->redo();
           break;
         case PolygonAction::Extrude:
-          candidate->apply(PolygonOperation::Extrude, {}, job.amount, 1,
-                           limits);
+          if(job.world)candidate->apply_affine(*job.world,PolygonOperation::Extrude,job.amount,1,limits);
+          else candidate->apply(PolygonOperation::Extrude,{},job.amount,1,limits);
           break;
         case PolygonAction::Inset:
-          candidate->apply(PolygonOperation::Inset, {}, job.amount, 1, limits);
+          if(job.world)candidate->apply_affine(*job.world,PolygonOperation::Inset,job.amount,1,limits);
+          else candidate->apply(PolygonOperation::Inset,{},job.amount,1,limits);
           break;
         case PolygonAction::Bridge:
           candidate->apply(PolygonOperation::Bridge, {}, 0, 1, limits);
@@ -659,35 +696,43 @@ void Document::polygon_loop() {
           break;
         case PolygonAction::Pick:
         case PolygonAction::BeginDrag:
-          if (candidate->select_ray(job.origin, job.direction, job.maximum,
-                                    job.radius, job.additive, job.additive,
-                                    limits,
-                                    *job.action == PolygonAction::BeginDrag) &&
+          if ((job.world ? candidate->select_ray_affine(*job.world,job.origin,job.direction,job.maximum,
+                    job.radius,job.additive,job.additive,limits,*job.action==PolygonAction::BeginDrag)
+                  : candidate->select_ray(job.origin,job.direction,job.maximum,
+                    job.radius,job.additive,job.additive,limits,*job.action==PolygonAction::BeginDrag)) &&
               *job.action == PolygonAction::BeginDrag &&
               candidate->view().display->has_selection) {
-            next_plane = candidate->view().display->selection_center;
-            next_normal = job.direction;
-            next_anchor = intersect(job.origin, job.direction, next_plane,
-                                    next_normal, job.maximum);
-            if (next_anchor)
-              candidate->begin_move();
+            next_plane=candidate->view().display->selection_center;
+            if(job.world){
+              next_affine_plane={next_plane.x,next_plane.y,next_plane.z};
+              next_affine_normal=local_plane_normal(*job.world,job.direction);
+              next_affine_anchor=intersect_affine(local_ray(*job.world,job.origin,job.direction,job.maximum),next_affine_plane,next_affine_normal);
+              next_anchor.reset();if(next_affine_anchor)candidate->begin_move();
+            }else{
+              next_normal=job.direction;
+              next_anchor=intersect(job.origin,job.direction,next_plane,next_normal,job.maximum);
+              next_affine_anchor.reset();if(next_anchor)candidate->begin_move();
+            }
           }
           break;
         case PolygonAction::Drag:
-          if (next_anchor && candidate->view().moving)
-            if (auto point = intersect(job.origin, job.direction, next_plane,
-                                       next_normal, job.maximum))
-              candidate->move_to(*point - *next_anchor, limits);
+          if(job.world&&next_affine_anchor&&candidate->view().moving){
+            if(auto point=intersect_affine(local_ray(*job.world,job.origin,job.direction,job.maximum),next_affine_plane,next_affine_normal)){
+              for(size_t i=0;i<3;++i)(*point)[i]-=(*next_affine_anchor)[i];
+              candidate->move_to(PolygonAffineAccess::point(*point),limits);
+            }
+          }else if(next_anchor&&candidate->view().moving)
+            if(auto point=intersect(job.origin,job.direction,next_plane,next_normal,job.maximum))candidate->move_to(*point-*next_anchor,limits);
           break;
         case PolygonAction::EndDrag:
           if (candidate->view().moving)
             candidate->end_move(true, limits);
-          next_anchor.reset();
+          next_anchor.reset();next_affine_anchor.reset();
           break;
         case PolygonAction::CancelDrag:
           if (candidate->view().moving)
             candidate->end_move(false, limits);
-          next_anchor.reset();
+          next_anchor.reset();next_affine_anchor.reset();
           break;
         }
       }
@@ -701,20 +746,21 @@ void Document::polygon_loop() {
         auto token = job.acceptance;
         token->work->progress.store(.1f);
         prepared = token->before->snapshot();
-        if (token->held_pose)
-          prepared->object(token->source.object).transform = token->pose;
+        if(token->held_pose){
+          prepared->object(token->source.object).transform=token->pose;
+          prepared->object(token->source.object).affine_edit=token->affine_pose;
+        }
         global_change =
             view->changed ||
             (token->held_pose &&
              !detail::same_transform(
                  token->before->object(token->source.object).transform,
-                 token->pose));
+                 token->pose)) ||
+            (token->held_pose&&token->before->object(token->source.object).affine_edit!=token->affine_pose);
         if (view->changed) {
           auto initial = token->original;
           adopt_polygon_edit(*prepared, token->source.object, *view->topology,
-                             view->colors, initial->object(token->source.object),
-                             initial->world_transform(token->source.object),
-                             convert, cancelled);
+                             view->colors,*initial,convert,cancelled);
         }
         token->work->progress.store(.9f);
         if(token->isolation_target)detail::require_isolated_scene(*token->before,*prepared,token->isolation_target);
@@ -767,7 +813,7 @@ void Document::polygon_loop() {
                               state_.held_object == token->source.object;
         if (end_held) {
           state_.object_grabbing = false;
-          desktop_ = false;
+          held_affine_.reset();desktop_ = false;
           object_navigation_.reset();
         }
         transaction.finish_polygon(global_change && view->changed);
@@ -807,6 +853,7 @@ void Document::polygon_loop() {
         anchor = next_anchor;
         plane = next_plane;
         normal = next_normal;
+        affine_anchor=next_affine_anchor;affine_plane=next_affine_plane;affine_normal=next_affine_normal;
         if (job.initial)
           convert = job.convert_source;
       }
@@ -833,7 +880,7 @@ void Document::polygon_loop() {
             state_.held_object == job.acceptance->source.object;
         if (reset_pose) {
           state_.object_grabbing = false;
-          desktop_ = false;
+          held_affine_.reset();desktop_ = false;
           object_navigation_.reset();
           held_preview_transform_ = held_start_transform_ =
               scene_.object(state_.held_object).transform;

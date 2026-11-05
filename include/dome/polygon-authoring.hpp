@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #pragma once
+#include "affine.hpp"
 #include "mesh-processing.hpp"
 #include "polygon-color.hpp"
 #include "polygon.hpp"
@@ -45,6 +46,16 @@ public:
                   bool preserve_selected_group = false);
   void apply(PolygonOperation, Vec3 delta = {}, float amount = 0,
              unsigned cuts = 1, const PolygonLimits & = {});
+  // Exact world metric; topology, stable IDs, UV/color provenance and history
+  // remain local. These do not fit a similarity transform to an affine frame.
+  bool select_ray_affine(const AffineTransform &, Vec3 world_origin,
+                         Vec3 world_direction, float maximum_world_distance,
+                         float world_component_radius, bool additive = false,
+                         bool toggle = false, const PolygonLimits & = {},
+                         bool preserve_selected_group = false);
+  void apply_affine(const AffineTransform &, PolygonOperation,
+                    float world_amount, unsigned cuts = 1,
+                    const PolygonLimits & = {});
   void begin_move();
   // Total displacement from Begin, not a sum of lossy floating-point deltas.
   void move_to(Vec3 total_delta, const PolygonLimits & = {});

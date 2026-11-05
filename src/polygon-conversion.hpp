@@ -23,6 +23,13 @@ void adopt_polygon_edit(Scene &, uint64_t, const PolygonMesh &,
                         CanvasTransform original_world, bool convert_source,
                         const std::function<bool()> & = {});
 
+// Captures the real initial placement capsule, including affine/group owners.
+// Current placement may legitimately advance during a held-object edit.
+void adopt_polygon_edit(Scene &,uint64_t,const PolygonMesh &,
+                        std::shared_ptr<const PolygonColorField>,
+                        const Scene &original_scene,bool convert_source,
+                        const std::function<bool()> & = {});
+
 PolygonMesh
 prepare_polygon_workspace_topology(const SculptObject &, bool convert_source,
                                    const std::function<bool()> & = {});
