@@ -2,10 +2,16 @@
 
 ## Current production state — 2026-11-05
 
-Main now combines qualified native36 cohort881021c/a0b8a37 with current keyed-HDR,
-MatCap and Rim/cutout integration0b6b59f. Runtime, headers, tests, CMake and assets
-match0b6b59f exactly at admission. No Scene37/public canonical-owner append is
-included. FLTK remains the default with canonical DomeD bitmap/menu conventions.
+Main combines qualified native36 cohort881021c/a0b8a37 and current keyed-HDR,
+MatCap/Rim0b6b59f with strict preflight repair62ec13e/sealc17945d. Compared with
+0b6, only one complete Layer TU and two regression cases in the existing registered
+target consumer change. All headers, layouts, formats, shaders and original
+bounds remain unchanged. All six actual fault/worker domains pass per Release/
+sanitizer profile, plus1857 final registered controls and actual relinked native
+22normal+22compact menu/export/Open/Save checks/profile. Core159-member audits
+change only Layer. Read VRM1-EXPRESSION-PREFLIGHT.md for exact scope and retained
+original failures. No Scene37/public canonical-owner append is admitted. FLTK
+remains the default with canonical DomeD bitmap/menu conventions.
 
 The native36 ABI foundation completes Release ALL and owning sanitizer builds
 and125/125 selected tests per profile, including all four actual frame allocation/
@@ -63,11 +69,15 @@ and append order. It passes229 controls/eight comparisons each Release, actual
 same-profile sanitizer worker inputs and strict Arc, maximum1 within unchanged4;
 32 validated GLBs have zero errors and corresponding bytes are exact. Read
 MIXED-NORMAL-PAINT37-CONSUMER.md. Original failed tests remain recorded. A separate
-normal-expression compositiond6d40ca retains the current native/HDR/paint export
-paths and sealed typed normal proof; its fresh owning app/core/render/support/XR
-and110 explicit targets are building in Release/sanitizer. That source still
-needs the stricter inactive-Rim preflight correction and runtime qualification;
-neither candidate is admitted to main and807registered is not a runtime result.
+normal-expression compositiond6d40ca/seal4c9f321 retains the current native/HDR/
+paint export paths and sealed typed normal proof. Fresh owning442-task app/core/
+render/support/XR/inspector and110 explicit targets complete per profile. Its
+10 normal commands,104 actual FLTK/synthetic-XR checks per profile and271 strict
+Arc checks pass, with two software/two UHD refusals.24VRMs have zero Khronos errors
+and186 pinned official-schema instances pass;12 corresponding files are exact
+between profiles. Read COHERENT-NORMAL-AUTHORING-WIP.md in that private branch.
+That source still needs the separately qualified preflight repair and broader
+integration; neither larger candidate is admitted and807registration is not runtime.
 
 Automatic weights remain experimental. Source-aware heat/role helpers now pass
 874 original+local avatar comparisons, but general closed-affine/edited domains
@@ -1298,3 +1308,5 @@ VRM1-COHERENT-INTEGRATION.md. Root vendor all-target builds now pass on a
 frozen copy (build-only; see validation/VRM1-VENDOR-BUILDS.json). Full V1/physics/
 HDR/painting and broader workflow requirements stay
 open. This is not an all535-test or full-goal completion claim.
+
+VRM1 expression preflight repair is independently qualified on public0b6 matching support: source-material Rim relevance is collected during existing scan, no-relevant rejection precedes role work, exact old poll/image/work bounds unchanged. Registered unused-material/foreign-Rim controls and complete affected fault/Cancel/native worker suites R/S pass, plus matching actual normal/compact FLTK smoke. One product TU, no new layout/schema/domain admission; current37/Normal and remaining full-VRM requirements stay separate. Evidence: VRM1-EXPRESSION-PREFLIGHT.md/JSON.

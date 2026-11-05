@@ -1,6 +1,28 @@
-## Current continuation — 2026-11-05
+## Admitted expression preflight repair — 2026-11-05
 
-Main runtime remains qualified0b6b59f (native36/current HDR/MatCap/Rim);
+Main now incorporates62ec13e/sealc17945d over qualified0b6. Only one complete
+Layer TU and two cases in the existing registered target-fault consumer change;
+headers/layouts/formats/shaders and fixedpoll/work/image bounds stay exact. Six
+full fault/worker domains pass each Release/sanitizer, final registered1857 each,
+and actual matching-main app/inspector relinks pass22normal+22compact menu,
+HDR/editable512/Open/Save checks/profile.159-member audits change only Layer.
+Read VRM1-EXPRESSION-PREFLIGHT.md/receipt; originals are retained. This is a matching
+component/app qualification, not a new whole regression or37/Normal admission.
+
+Private Normal source d6d40ca/seal4c9f321 has now completed fresh442-task owning
+builds and10 normal commands/profile,104 native/synthetic-XR checks/profile,
+strictArc271 with2software/2UHD refusals and24VRMs0KHRerrors/186official instances0.
+All12 corresponding R/S files are byte-identical. The separate source still needs
+preflight/key composition at its closed boundary and larger admission controls;
+807registered is not a full runtime result. Root originalf365/S10303 remains live
+on its own frozen source at the final package allocation sweep (all earlier
+commands terminal, original six failures retained). Do not mutate/restart it.
+The full original goal, remaining role/weight/Mirror/device/accelerator work and
+later controller drawers stay active. No installation or headset launch.
+
+## Earlier continuation — 2026-11-05
+
+At this earlier checkpoint, main runtime was0b6b59f (native36/current HDR/MatCap/Rim);
 status documentation is9940068. The full REQUIREMENTS/HANDOFF-466ebd1 production
 goal stays active and incomplete. Older entries below are historical checkpoints,
 not current process state.
@@ -2548,3 +2570,5 @@ common-refinement are separate approved record4 kinds within owning29/material12
 conditional Paint5/domain2/frame-position3/normal6 only apply when used. Full
 native/UI/persistence/render/export remain required; no public DTO/schema edits.
 Read KEY-MIRROR-PLANE.md and its receipt.
+
+Public-main-matched VRM1 preflight repair62ec13e: one Layer TU +two lasting controls in existing registered targets-faults, no layout/schema/shader/API change. Allfive strict fault/worker domains plus actualactiveRim fullcontrols R/S0 (268.013/1953.161s), final1857 defaulttarget checks R/S0, actualold-main app/inspector relink+normal22/compact22 perprofile0 (55.274/74.379s), canonicalSDKmaps exact. Distinct current37 ABI also qualifies; original late failures/prototype/wrapper statuses remain. See VRM1-EXPRESSION-PREFLIGHT.md/JSON. Parent review/main publication remains separate; full VRM goal continues.
