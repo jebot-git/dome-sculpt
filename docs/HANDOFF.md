@@ -1,5 +1,18 @@
 # Dome Sculpt production handoff
 
+## Current-main frontend-off qualification — 2026-11-05
+
+Runtime a08c9d9 is already an ancestor of public55b1c89; no duplicate CMake patch
+is required. Fresh optimized current-main headless core/render/support and seven
+real consumers build198 tasks and pass7/7 commands, including native bitmap
+fonts/Unicode, actual llvmpipe images and real VRM producer/palette. All2142source,
+20compiled/config and48bitmap names stay exact. Default740 registration/property
+parity is exact with defaultFLTK/XR unchanged; frontend-off retains714 real tests,
+core-only0 without render/fonts, no Qt. Read CURRENT-HEADLESS-QUALIFICATION.md and
+receipt for exact scope and preserved older e77/observer negatives. Metadata only,
+no current full714/default740/SAN/frontend/hardware claim. Private36/37 integration
+and the complete original goal remain unfinished.
+
 ## Controller report regression — 2026-11-05
 
 The stale bake-normal-controller status assertion from the older full689 run is

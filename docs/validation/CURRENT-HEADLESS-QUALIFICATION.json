@@ -1,0 +1,358 @@
+{
+  "schema": 1,
+  "state": "qualified current public main frontend-off optimized component; no runtime patch needed",
+  "source": {
+    "base": "55b1c89717177f3ce1cc01a6f330399345d29b9d",
+    "fix_already_public": "a08c9d94ee33d97e6f87de79fe97ac0e502c717b",
+    "history_and_graph": {
+      "base": "55b1c89717177f3ce1cc01a6f330399345d29b9d",
+      "fix": "a08c9d94ee33d97e6f87de79fe97ac0e502c717b",
+      "runtime_fix_already_ancestor": true,
+      "historical_seal_ancestor": false,
+      "blame": "a08c9d9 (jebot-git 2026-11-05 00:08:52 +0100 727) # Image/palette regression tests use the windowless renderer even when neither\na08c9d9 (jebot-git 2026-11-05 00:08:52 +0100 728) # frontend is requested. Keep their real rendering/font dependencies available;\na08c9d9 (jebot-git 2026-11-05 00:08:52 +0100 729) # UI/XR executables and FLTK discovery remain controlled by their own options.\na08c9d9 (jebot-git 2026-11-05 00:08:52 +0100 730) if(DOME_BUILD_UI OR DOME_BUILD_XR OR BUILD_TESTING)\n3cdf697 (jebot-git 2026-10-29 12:12:21 +0100 731)   find_package(PkgConfig REQUIRED)\n296f86d (jebot-git 2026-10-30 17:56:30 +0100 732)   # FindPkgConfig searches accumulated -L directories in order. Resolve the\n",
+      "graphs": {
+        "build-default": {
+          "cache_sha256": "6719de02d52cb5a41d42e9bc9881a9ce9e63ca54f03ac72d6d4c3348bf06b558",
+          "tests": 740,
+          "normalized_registration_sha256": "41fee583f64256f85971176e3ce4886dd27a0caef1d23835577daa1aa864f83f",
+          "Qt6_cache_present": false
+        },
+        "build-default-old-guard": {
+          "cache_sha256": "bf975b71bbb4bf2b2fc1eca29158953322e84a75910f88765bae1ec2161d9835",
+          "tests": 740,
+          "normalized_registration_sha256": "41fee583f64256f85971176e3ce4886dd27a0caef1d23835577daa1aa864f83f",
+          "Qt6_cache_present": false
+        },
+        "build-headless": {
+          "cache_sha256": "b2c68e27b226d205710caa5096ecef51cb5b4d4aba8d184b5fbea07275ad74cf",
+          "tests": 714,
+          "normalized_registration_sha256": "cc4032f819701e6a00fc2e8f4cac1d4f34e26d2b58ed1c6ffc116fed2b4e90c0",
+          "Qt6_cache_present": false
+        },
+        "build-core-only": {
+          "cache_sha256": "5d1834a446e71652ca121e4123457da00f443a602fb8a5f28907a9998ccbfbbd",
+          "tests": 0,
+          "normalized_registration_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "Qt6_cache_present": false
+        }
+      }
+    },
+    "tracked_inputs": 2142,
+    "source_drift_before_final_documentation": [],
+    "public_or_private_header_CPP_CMake_delta": false,
+    "full_proof_status_sha256": "f7438d7468adedb845cc1074f1383aaa667ea15ef1374946412ba24a4445428e"
+  },
+  "scope": "Fresh current-main O3 CPU frontend-off core/render/support and seven complete native consumers;198 tasks. No old libraries, overlay objects, new frontend, Qt fallback or installation. No full ALL/full714, sanitizer, hardware or physical/OpenXR application claim.",
+  "environment": {
+    "PKG_CONFIG_PATH": "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/pkgconfig",
+    "LD_LIBRARY_PATH": "/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-release/lib:/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib",
+    "LIBGL_ALWAYS_SOFTWARE": "1",
+    "LP_NUM_THREADS": "2",
+    "XR_RUNTIME_JSON": "/nonexistent/no-physical-runtime.json"
+  },
+  "steps": [
+    {
+      "name": "build-default-old-guard",
+      "command": [
+        "cmake",
+        "-S",
+        "/home/blux/de-xr/dome-sculpt/artifacts/headless-current-55b1c89",
+        "-B",
+        "/home/blux/de-xr/dome-sculpt/artifacts/headless-current-55b1c89/build-default-old-guard",
+        "-G",
+        "Ninja",
+        "-DCMAKE_BUILD_TYPE=Release",
+        "-DDOME_COMPUTE_BACKEND=CPU",
+        "-DCMAKE_EXPORT_COMPILE_COMMANDS=ON",
+        "-DFLTK_DIR=/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-release/share/fltk"
+      ],
+      "exit": 0,
+      "seconds": 5.535476280027069,
+      "log_sha256": "c579f3cff08fd60e8f90525c285c3e6096f46898a265bf19e5f4ce90ba291767"
+    },
+    {
+      "name": "build-default",
+      "command": [
+        "cmake",
+        "-S",
+        "/home/blux/de-xr/dome-sculpt/artifacts/headless-current-55b1c89",
+        "-B",
+        "/home/blux/de-xr/dome-sculpt/artifacts/headless-current-55b1c89/build-default",
+        "-G",
+        "Ninja",
+        "-DCMAKE_BUILD_TYPE=Release",
+        "-DDOME_COMPUTE_BACKEND=CPU",
+        "-DCMAKE_EXPORT_COMPILE_COMMANDS=ON",
+        "-DFLTK_DIR=/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-release/share/fltk"
+      ],
+      "exit": 0,
+      "seconds": 5.570915457967203,
+      "log_sha256": "ff21d48d73e7ca3eb0dfe4090f9e88d0b6aaedcb7458455effa9696a7d85ed3a"
+    },
+    {
+      "name": "build-headless",
+      "command": [
+        "cmake",
+        "-S",
+        "/home/blux/de-xr/dome-sculpt/artifacts/headless-current-55b1c89",
+        "-B",
+        "/home/blux/de-xr/dome-sculpt/artifacts/headless-current-55b1c89/build-headless",
+        "-G",
+        "Ninja",
+        "-DCMAKE_BUILD_TYPE=Release",
+        "-DDOME_COMPUTE_BACKEND=CPU",
+        "-DCMAKE_EXPORT_COMPILE_COMMANDS=ON",
+        "-DDOME_BUILD_UI=OFF",
+        "-DDOME_BUILD_XR=OFF"
+      ],
+      "exit": 0,
+      "seconds": 3.559902603039518,
+      "log_sha256": "85f198fa3b7d198c809da43b84742ed234cec1e51b4a09e81985ce2f4cb2672d"
+    },
+    {
+      "name": "build-core-only",
+      "command": [
+        "cmake",
+        "-S",
+        "/home/blux/de-xr/dome-sculpt/artifacts/headless-current-55b1c89",
+        "-B",
+        "/home/blux/de-xr/dome-sculpt/artifacts/headless-current-55b1c89/build-core-only",
+        "-G",
+        "Ninja",
+        "-DCMAKE_BUILD_TYPE=Release",
+        "-DDOME_COMPUTE_BACKEND=CPU",
+        "-DCMAKE_EXPORT_COMPILE_COMMANDS=ON",
+        "-DDOME_BUILD_UI=OFF",
+        "-DDOME_BUILD_XR=OFF",
+        "-DBUILD_TESTING=OFF"
+      ],
+      "exit": 0,
+      "seconds": 1.2196404940332286,
+      "log_sha256": "b7c5e49bc1dc8530de2ea565e710805dd36079e74f0662da2792f50ef7052072"
+    },
+    {
+      "name": "build-headless-selected",
+      "command": [
+        "cmake",
+        "--build",
+        "/home/blux/de-xr/dome-sculpt/artifacts/headless-current-55b1c89/build-headless",
+        "--parallel",
+        "2",
+        "--target",
+        "dome-sculpt-compute-backend-test",
+        "dome-sculpt-appearance-test",
+        "dome-sculpt-palette-text-test",
+        "dome-sculpt-render-test",
+        "dome-sculpt-vrm1-background-fixture-test",
+        "dome-sculpt-vrm1-expression-palette-test",
+        "dome-sculpt-source-uv1-render-test"
+      ],
+      "exit": 0,
+      "seconds": 461.89572180400137,
+      "log_sha256": "bdfae2d5965780c69d9b93c3577c4654151fe06b950ecba6cf700a7c6f70e0a1"
+    },
+    {
+      "name": "test-headless-selected",
+      "command": [
+        "ctest",
+        "--test-dir",
+        "/home/blux/de-xr/dome-sculpt/artifacts/headless-current-55b1c89/build-headless",
+        "-R",
+        "^(compute-backend|session-appearance|palette-unicode|spatial-gpu-render|vrm1-background-fixture|vrm1-expression-palette|source-uv1-render)$",
+        "--output-on-failure",
+        "--parallel",
+        "2"
+      ],
+      "exit": 0,
+      "seconds": 23.93240676802816,
+      "log_sha256": "af06b9576d84e9d8e144ee1486538ecb62ef254825b2feac25518890cff3d0c0"
+    }
+  ],
+  "configuration": {
+    "default_frontends": {
+      "test_registration_text_exact_after_paths": true,
+      "registered": 740,
+      "default_UI_ON": true,
+      "default_XR_ON": true
+    },
+    "frontend_off_registered": 714,
+    "frontend_off_targets": {
+      "application_absent": true,
+      "xr_library_absent": true,
+      "real_renderer_present": true,
+      "native_XR_control_unit_tests_retained": true
+    },
+    "core_only": {
+      "renderer_absent": true,
+      "fonts_absent": true
+    },
+    "core_only_registered": 0,
+    "default_old_guard_counterfactual": "Only isolated CMake gate temporarily removed OR BUILD_TESTING for configuration with default UI/XR ON, then restored byte-exact before compiling. All740 default registration commands/properties exact after source/build path normalization. No product compiler read temporary guard.",
+    "all_configs_no_Qt6_cache": true
+  },
+  "test_result": {
+    "commands_passed": 7,
+    "commands_failed": 0,
+    "ctest_seconds": 23.86,
+    "scope": [
+      "compute-backend",
+      "session-appearance",
+      "palette-unicode",
+      "spatial-gpu-render",
+      "source-uv1-render",
+      "vrm1-background-fixture",
+      "vrm1-expression-palette"
+    ],
+    "source_uv1": {
+      "checks": 13,
+      "roles": 5,
+      "independent_full_image_errors": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    "expression_palette_actual_checks": 83,
+    "renderer": "Mesa llvmpipe (LLVM22.1.8,256bits), actual GL_RENDERER in retained log; no --hardware option passed",
+    "font_evidence": "Native BDF session appearance and actual primary/fallback Unicode/grapheme/bidi/clipping/cache/GL palette tests. No outline fallback or toolkit switch."
+  },
+  "compiled_and_config_before_tests": {
+    "/home/blux/de-xr/dome-sculpt/artifacts/headless-current-55b1c89/build-headless/CMakeCache.txt": "b2c68e27b226d205710caa5096ecef51cb5b4d4aba8d184b5fbea07275ad74cf",
+    "/home/blux/de-xr/dome-sculpt/artifacts/headless-current-55b1c89/build-headless/CTestTestfile.cmake": "b077e2fe05a486ecd5f0eac0c4b95df1c76c13960dadf2aa2c080952817103a9",
+    "/home/blux/de-xr/dome-sculpt/artifacts/headless-current-55b1c89/build-headless/compile_commands.json": "9ec9005814b45aa6e38ad33d98f2e0dec6a2297adc468950650fa23137fd81f9",
+    "/home/blux/de-xr/dome-sculpt/artifacts/headless-current-55b1c89/build-headless/build.ninja": "2e80c16ec92d08b43f897d44fa50dd0d709af6fc9f1c6e0d6d3338c4455e0463",
+    "/home/blux/de-xr/dome-sculpt/artifacts/headless-current-55b1c89/build-headless/libdome-sculpt-affine.a": "34a553f7fe2ec87c639862a382ee57cb851987fb4f7744092e9cf85ec808f786",
+    "/home/blux/de-xr/dome-sculpt/artifacts/headless-current-55b1c89/build-headless/libxatlas.a": "b731c15b2d11b8ea2dd6e24acf4e401368ac0dda1260333ebf00b15dde7dae44",
+    "/home/blux/de-xr/dome-sculpt/artifacts/headless-current-55b1c89/build-headless/libufbx.a": "f9655d05c13af0842866d2de9a6fb643681ffedc9c1a8c7a67410c1b39bb19dd",
+    "/home/blux/de-xr/dome-sculpt/artifacts/headless-current-55b1c89/build-headless/libmikktspace.a": "139cba5adb8bcd0d178c41cc114b164a80b68246b6bbd63975c7cb38b5770c0e",
+    "/home/blux/de-xr/dome-sculpt/artifacts/headless-current-55b1c89/build-headless/libdome-sculpt-polygon.a": "f5b01ebad30776a6e77a421138f5cc01da69ca5e214099820d72484bc236d42b",
+    "/home/blux/de-xr/dome-sculpt/artifacts/headless-current-55b1c89/build-headless/libmikktspace-robust.a": "07fdd14e0f2c4bb458952470a56df07534bb92b50b04768836edad22361758a0",
+    "/home/blux/de-xr/dome-sculpt/artifacts/headless-current-55b1c89/build-headless/libdome-sculpt-emission-codec.a": "742192ff3d4284a3e16461182147e9e674e02796a9decddcfa0b838a84a1a47d",
+    "/home/blux/de-xr/dome-sculpt/artifacts/headless-current-55b1c89/build-headless/libdome-sculpt-core.a": "5af0719b296baa3b270889bd991a8e1681c7da702a99802ebf0c3ab07f3ca993",
+    "/home/blux/de-xr/dome-sculpt/artifacts/headless-current-55b1c89/build-headless/libdome-sculpt-render.a": "571af99a7fef83d4174122315ae031af5098ab258a22e9145da80e33a05bbd1f",
+    "/home/blux/de-xr/dome-sculpt/artifacts/headless-current-55b1c89/build-headless/dome-sculpt-source-uv1-render-test": "b5bb62e825f2d925d3bfbaf1c26cfb92e4cabeda88bc5f3fb2fd92e9cf924b70",
+    "/home/blux/de-xr/dome-sculpt/artifacts/headless-current-55b1c89/build-headless/dome-sculpt-appearance-test": "b76755123970d52356e0fe9b23ca91e061bb348e8819736220b204427f85a255",
+    "/home/blux/de-xr/dome-sculpt/artifacts/headless-current-55b1c89/build-headless/dome-sculpt-render-test": "898a506cad271a1f1813ebd6d1b1759a3734e13f8c159fa15d7b1003d94cff8c",
+    "/home/blux/de-xr/dome-sculpt/artifacts/headless-current-55b1c89/build-headless/dome-sculpt-palette-text-test": "bde20219b2588f03bd217955d59ee8da56d9f2c10e6e51cdc705ea36ef7e8a02",
+    "/home/blux/de-xr/dome-sculpt/artifacts/headless-current-55b1c89/build-headless/dome-sculpt-compute-backend-test": "3fa61ca6e509cb39f137481c99c008522c88b55179eb10d2e729a10919431a2a",
+    "/home/blux/de-xr/dome-sculpt/artifacts/headless-current-55b1c89/build-headless/dome-sculpt-vrm1-expression-palette-test": "a1c5d34da75a7e65c49f87fdbb471a7708a811c4a3742d8cc7b04652ddb262a0",
+    "/home/blux/de-xr/dome-sculpt/artifacts/headless-current-55b1c89/build-headless/dome-sculpt-vrm1-background-fixture-test": "f806dff2ab3db33d552d2ec57ba711556d1d097c2273ef8c2a6bbd23491bcf07"
+  },
+  "compiled_and_config_after_test_drift": [],
+  "bitmap_before_tests": {
+    "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libfreetype.so.6.20.6": "826c2bf3007f04253719b5492314fb0521e5f6c4a55b9d18e48995b7d1f95c97",
+    "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libfreetype.so.6": "826c2bf3007f04253719b5492314fb0521e5f6c4a55b9d18e48995b7d1f95c97",
+    "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libfreetype.so": "826c2bf3007f04253719b5492314fb0521e5f6c4a55b9d18e48995b7d1f95c97",
+    "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libharfbuzz.so.0.61410.0": "5248da4d5c68f252551e39a8c929ce120eec9ffa0120d4ac7be39615dbc8e33a",
+    "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libharfbuzz-subset.so.0.61410.0": "5f162adcfd55f98713ff53cc24b11265b67513ec9783287c9f848f4d00861302",
+    "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libharfbuzz-raster.so.0.61410.0": "b47e00f8a0f081767d948312052cfbff25bc7125b86a73b7999daede4896d16a",
+    "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libharfbuzz-vector.so.0.61410.0": "e9d9fd24bd083720bac19bdf21caa88cc77084d1109b87200f8a159a33acc64e",
+    "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libharfbuzz-gpu.so.0.61410.0": "63918adf3c44d60f0e94ea60525c12e7750f867e28df473233e0bf389e2f4024",
+    "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libharfbuzz-cairo.so.0.61410.0": "41dd1ead20cbc6ad8f01a70a1dbdbf493abf5d6b74e094791d1e290d6e113549",
+    "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libharfbuzz-icu.so.0.61410.0": "e456685b6550493bc0a388ff0c33a63a3eef8f6461d4083647ae74b0cdfdf92e",
+    "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libharfbuzz-gobject.so.0.61410.0": "615cba523f6980ecf14a65d79a30403237407bc5773fe9be45970f6228d90de9",
+    "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libharfbuzz.so.0": "5248da4d5c68f252551e39a8c929ce120eec9ffa0120d4ac7be39615dbc8e33a",
+    "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libharfbuzz.so": "5248da4d5c68f252551e39a8c929ce120eec9ffa0120d4ac7be39615dbc8e33a",
+    "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libharfbuzz-subset.so.0": "5f162adcfd55f98713ff53cc24b11265b67513ec9783287c9f848f4d00861302",
+    "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libharfbuzz-subset.so": "5f162adcfd55f98713ff53cc24b11265b67513ec9783287c9f848f4d00861302",
+    "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libharfbuzz-raster.so.0": "b47e00f8a0f081767d948312052cfbff25bc7125b86a73b7999daede4896d16a",
+    "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libharfbuzz-raster.so": "b47e00f8a0f081767d948312052cfbff25bc7125b86a73b7999daede4896d16a",
+    "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libharfbuzz-vector.so.0": "e9d9fd24bd083720bac19bdf21caa88cc77084d1109b87200f8a159a33acc64e",
+    "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libharfbuzz-vector.so": "e9d9fd24bd083720bac19bdf21caa88cc77084d1109b87200f8a159a33acc64e",
+    "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libharfbuzz-gpu.so.0": "63918adf3c44d60f0e94ea60525c12e7750f867e28df473233e0bf389e2f4024",
+    "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libharfbuzz-gpu.so": "63918adf3c44d60f0e94ea60525c12e7750f867e28df473233e0bf389e2f4024",
+    "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libharfbuzz-cairo.so.0": "41dd1ead20cbc6ad8f01a70a1dbdbf493abf5d6b74e094791d1e290d6e113549",
+    "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libharfbuzz-cairo.so": "41dd1ead20cbc6ad8f01a70a1dbdbf493abf5d6b74e094791d1e290d6e113549",
+    "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libharfbuzz-icu.so.0": "e456685b6550493bc0a388ff0c33a63a3eef8f6461d4083647ae74b0cdfdf92e",
+    "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libharfbuzz-icu.so": "e456685b6550493bc0a388ff0c33a63a3eef8f6461d4083647ae74b0cdfdf92e",
+    "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libharfbuzz-gobject.so.0": "615cba523f6980ecf14a65d79a30403237407bc5773fe9be45970f6228d90de9",
+    "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libharfbuzz-gobject.so": "615cba523f6980ecf14a65d79a30403237407bc5773fe9be45970f6228d90de9",
+    "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libcairo.so.2.11804.4": "fe12b9ab782c68ba4d28fd8cd9c168cb808da20745a818fe101e1966fc67737c",
+    "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libcairo-gobject.so.2.11804.4": "fdbc59ea23924c704d3283a1741b93def3e2dc2f8b2bb64fc56c920cfa09bf4f",
+    "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libcairo-script-interpreter.so.2.11804.4": "372a5ef5107bd15f30cd9f269b81b8687694cc4209a27230804cf3f7d5f138b4",
+    "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libcairo.so.2": "fe12b9ab782c68ba4d28fd8cd9c168cb808da20745a818fe101e1966fc67737c",
+    "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libcairo.so": "fe12b9ab782c68ba4d28fd8cd9c168cb808da20745a818fe101e1966fc67737c",
+    "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libcairo-gobject.so.2": "fdbc59ea23924c704d3283a1741b93def3e2dc2f8b2bb64fc56c920cfa09bf4f",
+    "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libcairo-gobject.so": "fdbc59ea23924c704d3283a1741b93def3e2dc2f8b2bb64fc56c920cfa09bf4f",
+    "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libcairo-script-interpreter.so.2": "372a5ef5107bd15f30cd9f269b81b8687694cc4209a27230804cf3f7d5f138b4",
+    "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libcairo-script-interpreter.so": "372a5ef5107bd15f30cd9f269b81b8687694cc4209a27230804cf3f7d5f138b4",
+    "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libpango-1.0.so.0.5701.0": "5e2010bb3c84690a521c395bb182851f8147532cb98229473e65dcf76104f99a",
+    "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libpangoft2-1.0.so.0.5701.0": "1c803218943ca29c49f1c70a5d1015065a0248a7b24176e90d075b2cb5182f4a",
+    "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libpangoxft-1.0.so.0.5701.0": "00267648bb7c92a716b292d6afb32d47533b71b94b92a275154438f11ffdb3f4",
+    "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libpangocairo-1.0.so.0.5701.0": "482b621e56d8290f0392b1098b87de0aa3fc68ea5250b83b418c4bd85e1de485",
+    "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libpango-1.0.so.0": "5e2010bb3c84690a521c395bb182851f8147532cb98229473e65dcf76104f99a",
+    "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libpango-1.0.so": "5e2010bb3c84690a521c395bb182851f8147532cb98229473e65dcf76104f99a",
+    "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libpangoft2-1.0.so.0": "1c803218943ca29c49f1c70a5d1015065a0248a7b24176e90d075b2cb5182f4a",
+    "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libpangoft2-1.0.so": "1c803218943ca29c49f1c70a5d1015065a0248a7b24176e90d075b2cb5182f4a",
+    "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libpangoxft-1.0.so.0": "00267648bb7c92a716b292d6afb32d47533b71b94b92a275154438f11ffdb3f4",
+    "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libpangoxft-1.0.so": "00267648bb7c92a716b292d6afb32d47533b71b94b92a275154438f11ffdb3f4",
+    "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libpangocairo-1.0.so.0": "482b621e56d8290f0392b1098b87de0aa3fc68ea5250b83b418c4bd85e1de485",
+    "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libpangocairo-1.0.so": "482b621e56d8290f0392b1098b87de0aa3fc68ea5250b83b418c4bd85e1de485"
+  },
+  "bitmap_after_test_drift": [],
+  "preserved_negatives": {
+    "older_e77": "The genuine UI/XR-off font target configure failure belongs to the older e77/native36 component, retained in f3716c2 NATIVE-FRAME-FAULTS receipt. It is not a current55b failure.",
+    "current_orchestration": "Initial configuration observer overmatched native XR control unit-test names as a frontend. All four configurations had already succeeded; no product compiler/test ran. Corrected exact app/library target check preserves those unit tests.",
+    "observer_status": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/headless-current-55b1c89/artifacts/headless-current/configuration-observer-negative.json",
+      "sha256": "12419e3769fa66b9222a7ee217d5e5a1c192a468b5bc8a0a2da140e1f825ea2e"
+    },
+    "observer_log": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/headless-current-55b1c89/artifacts/headless-current/configuration-observer-negative.log",
+      "sha256": "78e283aaaaeaa1dfe7e4c7c9abf24f8af3faee83134b0f74db71c91721026683"
+    }
+  },
+  "evidence": {
+    "status.json": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/headless-current-55b1c89/artifacts/headless-current/status.json",
+      "sha256": "f7438d7468adedb845cc1074f1383aaa667ea15ef1374946412ba24a4445428e"
+    },
+    "qualify.py": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/headless-current-55b1c89/artifacts/headless-current/qualify.py",
+      "sha256": "b8273f218e908c394e380967993044f8443aa7de7082192f6feedcb6c4eb8054"
+    },
+    "continue.py": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/headless-current-55b1c89/artifacts/headless-current/continue.py",
+      "sha256": "8e553b148e0f8693104aaa768fc34cc9d88ec7370af111bec6e052433dce891a"
+    },
+    "ancestry-graph.json": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/headless-current-55b1c89/artifacts/headless-current/ancestry-graph.json",
+      "sha256": "89bb14760920352d9c0443d6ba0595ceb1bdd9045fe8ed5987f8edf498b10c59"
+    },
+    "build-default-old-guard.log": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/headless-current-55b1c89/artifacts/headless-current/build-default-old-guard.log",
+      "sha256": "c579f3cff08fd60e8f90525c285c3e6096f46898a265bf19e5f4ce90ba291767"
+    },
+    "build-default.log": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/headless-current-55b1c89/artifacts/headless-current/build-default.log",
+      "sha256": "ff21d48d73e7ca3eb0dfe4090f9e88d0b6aaedcb7458455effa9696a7d85ed3a"
+    },
+    "build-headless.log": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/headless-current-55b1c89/artifacts/headless-current/build-headless.log",
+      "sha256": "85f198fa3b7d198c809da43b84742ed234cec1e51b4a09e81985ce2f4cb2672d"
+    },
+    "build-core-only.log": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/headless-current-55b1c89/artifacts/headless-current/build-core-only.log",
+      "sha256": "b7c5e49bc1dc8530de2ea565e710805dd36079e74f0662da2792f50ef7052072"
+    },
+    "build-headless-selected.log": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/headless-current-55b1c89/artifacts/headless-current/build-headless-selected.log",
+      "sha256": "bdfae2d5965780c69d9b93c3577c4654151fe06b950ecba6cf700a7c6f70e0a1"
+    },
+    "test-headless-selected.log": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/headless-current-55b1c89/artifacts/headless-current/test-headless-selected.log",
+      "sha256": "af06b9576d84e9d8e144ee1486538ecb62ef254825b2feac25518890cff3d0c0"
+    },
+    "LastTest.log": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/headless-current-55b1c89/artifacts/headless-current/LastTest.log",
+      "sha256": "29afd0a6c2e6019ad801fb440d19d3f07717c7ebc78359c6e890e7d0d6d00c61"
+    },
+    "palette-loader-resolution.log": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/headless-current-55b1c89/artifacts/headless-current/palette-loader-resolution.log",
+      "sha256": "d08b7c025cca95124d4cf2524bda5f4a723f853a992749a32a17ba764c4d33f1"
+    }
+  },
+  "remaining": "No further CMake correction required for current55b; qualification/documentation only for next integration boundary. Private native36/canonical37 and every remaining original authoring requirement remain separate."
+}
