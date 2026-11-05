@@ -1,94 +1,72 @@
-# Native texture sets: source implementation in progress
+# Native texture sets: partial implementation
 
-Pinned base: e79dbe9cbe3243b17b224843c247987b8f2595f8. No build or test claim. Qualified query corrections c3a1b19/5b02bfc are merged;
-The first plain model/codec slice now has a fresh optimized Release app/core/
-support/render/XR build (225 steps) and 32 executed native model controls.
-No app UI, renderer, sanitizer or device execution is claimed.
-Scene40, Paint7 and polygon_sources8 are reserved. Material22 is available only
-if a genuinely new connected material envelope is needed. Shared texture controls
-are reserved page31/count32; older private31/32 proposals are not current main.
+Pinned original base: e79dbe9cbe3243b17b224843c247987b8f2595f8. Qualified query
+corrections c3a1b19/5b02bfc are merged. Scene40, Paint7 and polygon_sources8 are
+reserved; Material22 is available only if a new connected envelope is needed.
+Shared controls are reserved page31/count32. The feature is private and incomplete.
 
-A set is a persistent material slot on one native mesh instance. Set0 retains the
-existing object geometry/paint/material/source fields. Extra sets have independent
-layer/channel/F32 state, resolution, material/source context and bake recipe.
-There is no global name-based sharing between objects, and no implicit UDIM
-requirement. The active set is persistent; switching it must not replace the
-object's authoritative geometry or hide the other sets.
+The first actual gate passed on source984de42: a fresh optimized Release app,
+core, support, render and XR build (225 steps,439.549s), followed by32 native
+model/codec controls (one CTest,0.01s). All210 project objects and11 archives
+were freshly compiled.1476 source,483 canonical SDK and223 owned binary hashes
+had no drift. The app was built, not launched. No sanitizer, UI, renderer or
+hardware execution is claimed. Exact evidence is in
+validation/TEXTURE-SETS-INITIAL-RELEASE.json. Earlier syntax diagnostics and
+source-only checkpoints remain in validation/TEXTURE-SETS-SOURCE-WIP.json.
 
-Current source foundation has immutable shared topology/face membership,
-object-local IDs, original Polygon face/corner IDs, detached COW fork/assignment,
-constant-time candidate membership, shared geometry across resolution rasters,
-paint snapshot/swap retention, and complete first-origin capture/Restore fields.
-Additional painters are sealed `shared_ptr<const PaintedMesh>` values: immutable
-collection/history snapshots retain them, and edits create detached paint and
-collection replacements. A per-call ledger now bounds live slots separately from
-unique retained domains and charges shared geometry/assignment/ID owners once,
-including polygon/shape/rig origins and actual material before-state edges.
-Pixel/source/raster accounting still needs its connected Scene integration and
-new runtime/fault proof; this source ledger is not a qualification claim.
-Original `PolygonFace.material` values remain original topology metadata; the new
-slot table is keyed by actual persistent face IDs and never reinterprets those
-old numbers as a new source/material authority.
+A set is a persistent material slot on one native mesh instance. Set0 retains
+the existing object's geometry/paint/material/source fields. Extra records own
+independent writable layers,14 channels/F32, material/source context and bake
+recipe. Selecting a set never swaps it into the object's primary paint field.
+There is no global name-based sharing or implicit UDIM requirement.
 
-The public/private sizes changed. Every actual product consumer requires a fresh
-coherent build. Old support overlays are not qualified by outer class size.
-The shared geometry owner now lives independently from raster caches. All affected
-sampling seals, cache lifetimes and owner guards require new runtime proof.
+The current model uses immutable shared topology and exact face membership.
+Additional painters are shared_ptr<const PaintedMesh>; edits create a detached
+COW draft and seal another snapshot before replacing the collection. History
+snapshots and duplicated instances cannot acquire a mutable extra-paint alias.
+The per-call graph ledger counts live slots separately from unique retained
+domains, and charges shared geometry/assignment/ID owners once through actual
+material and polygon/shape/rig before-state edges. Complete source/raster/cache
+working-budget and failure qualification remains required.
 
-The next source checkpoint adds the initial plain-mesh Scene40/Paint7 codec:
-current set payloads omit their mesh, one owning topology table supplies the
-shared geometry, standalone readers refuse Paint7, and Scene preflight includes
-all extra grids and membership data before SurfaceMap reconstruction. Genuine
-polygon IDs are replayed against the current triangulation. An immutable edit
-operation snapshots before mutation and seals a second COW snapshot before
-publication; failure, unfinished strokes and cancellation discard that draft.
-The source test is registered but has NOT been executed.
+The initial connected codec supports plain current meshes, including legacy
+and F32 paint. Per-set Paint7 payloads contain no mesh; one shared mesh table
+is referenced by distinct face/corner identity records. Standalone paint decode
+refuses Paint7. Aggregate Scene preflight charges the grids and shared geometry
+before SurfaceMap construction. Executed controls cover independent fields,
+shared geometry, duplicate-instance isolation, native file Save/reopen, COW
+history snapshots, context/foreign-ID/orphan refusals and cancellation. These
+are not Document Undo/Redo or actual worker publication tests.
 
-This first connected codec explicitly refuses source/normal/recipe-backed sets
-and retained texture-set history. The reserved polygon_sources8 path is not yet
-implemented. These are missing adapters, not supported completion exceptions.
-Subset rendering is still guarded, so this is not a usable UI feature yet.
+Original PolygonFace.material numbers remain original metadata. New membership
+is keyed by persistent face IDs and does not reinterpret those numbers. The
+polygon-ID replay path still needs the separately identified forged false-marker
+association repair and actual polygon controls; the plain gate does not qualify it.
 
-Next implementation stages remain required:
+The public/private layouts and mesh_owner ownership changed. No old project
+objects or archives are compatible by size. Every future layout addition needs
+a fresh matching consumer closure. Normal/color/source authority remains
+independent; membership cannot authorize a normal frame or receipt.
 
-1. Scene40/Paint7 geometry-deduplicated membership codec, strict old/context-free
-   refusal, polygon8 before-state retention, complete source/material/image
-   closure, quotas, min-version and native append/recipe remapping.
-2. Subset render/query proof with explicit logical corner/winding mapping. All
-   sets stay visible and occlude stencil/projector rays; only the selected set
-   receives edits. Extra-grid raster work and shared geometry/tiles/cache leases
-   need truthful aggregate accounting before allocation.
-3. Independent active-set Bake/Clear and all-channel measured resolution change;
-   existing painted-resolution transfer currently refuses instead of discarding
-   layers, physical values, masks, baked fields or normal ownership.
-4. Multi-primitive glTF/VRM compilation under the original single object/node,
-   with exact skin/IBM/morph and source identity; no duplicate-object workaround.
-5. Shared native Document/desktop/XR selection/assignment/layer/bake controls,
-   immutable set/paint/geometry leases, one Undo, real Cancel/stale/ordered Save,
-   actual loader/UI/export and allocation/resource proof.
-6. Exact producer remaps for UV and topology edits, including mixed-set face
-   creation and material-boundary operations. No nearest-position matching,
-   averaging, raw material-index guessing or silent unsupported-owner fallback.
+The following remain required:
 
-All old field/source guards and normal/color receipt independence remain. A set
-membership seal does not grant any new normal or source-color authority. The
-current ordinary native weight capture explicitly refuses unrepresented set
-membership until its actual multi-material resource/retention adapter exists.
+1. Genuine source/normal/recipe-backed sets and retained polygon_sources8 codec,
+   source/material/image closure, feature recursion, quotas, append and recipe
+   remapping. Current complex and retained-history codec paths explicitly refuse.
+2. Subset render/query/stencil proof with explicit logical corners and winding.
+   All sets remain visible/occluding while only the selected set receives edits.
+   Conflicting frame/paint/source attributes require complete corner signatures
+   and necessary boundary splits; EBO ranges alone are insufficient. Rendering
+   currently refuses texture sets until the actual adapter exists.
+3. Independent active-set Bake/Clear and measured all-channel/F32 resolution
+   transfer. Painted resolution changes currently refuse rather than discard data.
+4. Multi-primitive glTF/VRM compilation under the original single mesh/node with
+   exact skin/IBM/morph/source identity, plus corresponding genuine import.
+5. Native Document, FLTK and XR selection/assignment/layer/bake controls, immutable
+   leases, one Undo, Cancel/stale/ordered Save, fault/resource and quality proof.
+6. Exact UV/topology producer remaps, including material-boundary face creation.
+   No nearest-position matching, averaging or silent unsupported-owner fallback.
 
-A subsequent source refinement splits immutable mesh arrays from face/corner
-identity records in the owning geometry table. Distinct topology/instance
-records can refer to one genuine shared mesh owner without duplicating its
-vertices, normals, UVs or edit flags. The unexecuted fixture now includes a
-second independently editable instance with the same geometry owner. Six-TU
-syntax checks still pass; actual Release execution is the next finite gate.
-
-The first actual Release gate is closed0 on source984de42: configure5.089s,
-fresh own build439.549s, one CTest passed (32 controls, test0.01s). Every
-project object/archive was freshly compiled in this cohort:210 objects,11
-archives, app and model-test ELF.1476 source,483 canonical SDK and223 owned
-binary hashes had no drift. The model checks COW history snapshots, independent
-F32/layer/material fields, duplicate instances sharing geometry, actual native
-file Save/reopen, membership/context/foreign-ID/orphan refusals and cancellation.
-This is not Document Undo/Redo or a usable texture-set UI yet. The original
-polygon-flag association gap is separately recorded for the next source repair.
-See validation/TEXTURE-SETS-INITIAL-RELEASE.json for exact evidence and scope.
+Ordinary native weight capture refuses unrepresented membership until its real
+multi-material retention and resource adapter exists. No main/default promotion
+or full texture-set completion is claimed.
