@@ -33,3 +33,15 @@ Undo/Redo, and an actual retopology→polygon edit→source-Restore roundtrip. R
 is a separate real history operation; it never erases the conversion entry.
 Later GUI/device qualification must retain both viewport paths and current
 retopology marker semantics. No remesh source or protected root sweep is changed.
+
+Scoped runtime closure is now recorded in `validation/POLYGON-RETOPO-AFFINE.json`:
+R/S248 native assertions each,16 byte-identical native pairs, and77 real ordinary
+application checks in each normal/compact/profile case. Both mode orders and
+retopology→polygon/source-Restore run within each actual desktop process.
+The unchanged ordinary Release app also completes genuine affine posed/painted
+real-loader retopology and polygon/Restore workflows on observed PCI03 A770;
+software/UHD qualification controls refuse the hardware claim while the ordinary
+application retains its correct software support. Actual source/binary/ELF maps
+remain unchanged, and the lease is released. Original observer/setup failures
+remain explicit. This is not main admission: published9dd worker composition and
+its current-body closure are the next required stage.
