@@ -81,20 +81,22 @@
       "surface": 25,
       "legacy": 38,
       "affine_polygon_retopo": 248,
-      "worker_permanent_prefixes": 251,
       "worker_checks": 4308,
       "exit": 0,
-      "seconds": 101.718622238026
+      "seconds": 101.718622238026,
+      "worker_one_shot_prefixes": 251,
+      "worker_fault_scope": "Default bare retopo-worker invocation only: persistent=false; allocator disables the injected fault after its selected hit, leaving reporting allocations available. All 251 measured one-shot boundaries and queued-next-event retention are included in 4,308 checks. Neither --persistent reporter recovery nor --acceptance was invoked; those separate scopes are not claimed."
     },
     "sanitize_native": {
       "surface": 25,
       "legacy": 38,
       "affine_polygon_retopo": 248,
-      "worker_permanent_prefixes": 251,
       "worker_checks": 4308,
       "exit": 0,
       "seconds": 248.5825886959792,
-      "sanitizers": "ASan+UBSan+leak detection; no diagnostics"
+      "sanitizers": "ASan+UBSan+leak detection; no diagnostics",
+      "worker_one_shot_prefixes": 251,
+      "worker_fault_scope": "Default bare retopo-worker invocation only: persistent=false; allocator disables the injected fault after its selected hit, leaving reporting allocations available. All 251 measured one-shot boundaries and queued-next-event retention are included in 4,308 checks. Neither --persistent reporter recovery nor --acceptance was invoked; those separate scopes are not claimed."
     },
     "app_build": {
       "exit": 0,
@@ -697,5 +699,11 @@
   "main_exact_test_preservation": {
     "tests/vrm-official-texture-schemas.py": "2ab41f118b013a4c5c9be997c02047e053a0319201462657bee48929604610a2",
     "tests/avatar.cpp": "80514349cbdb84aa0bdc1500707875a68f8d61883f24a67cddc51ac46ee5cd20"
+  },
+  "metadata_correction": {
+    "supersedes_labels_in": "afd48988f38cdad4130b602397aaccbf19889a4b",
+    "change": "Rename only R/S retopology worker_permanent_prefixes to worker_one_shot_prefixes. Original logs/status/source/binaries and all numerical outcomes remain unchanged.",
+    "audit": "Actual R1/R2/S command arrays contain only the binary path, with no --persistent/--acceptance flags. Indexed MODE5 documents/receipts were audited; no other retopology permanent/persistent label was found.",
+    "separate_surface_heat_scope": "Current SurfaceHeat publication 373 complete regular prefixes plus five long-path tail controls per profile use persistent allocation denial and remain unchanged; they are not the retopology one-shot scope."
   }
 }

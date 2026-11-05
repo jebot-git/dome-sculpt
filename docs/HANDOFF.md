@@ -4,7 +4,7 @@ This private candidate combines main `c55dc2f` (polygon + transactional
 retopology worker) with qualified opt-in weights `1e6d76d`. Automatic0 remains
 the default. All legacy methods, resource/quality limits and unsupported complex
 37/38 owner guards remain intact. The second bounded Release component phase now passes surface25, legacy38,
-combined affine polygon/retopology248 and worker251-prefix/4,308 checks, with
+combined affine polygon/retopology248 and worker251 one-shot-prefix/4,308 checks, with
 actual polygon payload/default parity. See [the R2 receipt](validation/MODE5-MAIN-POLY-INITIAL-R.json).
 The matched merged Release/SAN application phase now passes four native controls,
 152 actual normal/compact FLTK checks and 56 software synthetic-OpenXR loader
@@ -16,7 +16,7 @@ This remains a private candidate; no main admission or default promotion.
 
 The initial merged Release proof on `8f43cae` covered the earlier `9dd63f9`
 retopology baseline only. Its 25 surface-heat checks, 38 legacy skin checks and
-251-prefix/4,308-check worker result stay separate; they do not qualify the new
+251-one-shot-prefix/4,308-check worker result stay separate; they do not qualify the new
 polygon job/world payload. The second Release and sanitizer cohorts freshly compiled the complete merged
 Document and used qualified complete polygon providers. No old provider is
 accepted merely because outer Document size happens to match.
