@@ -9,7 +9,7 @@
 struct V1ExpressionLayerConsumer {
   using J=nlohmann::json;
   float expression=0;int pose=0,selected_node=-1;bool wrong_mask_cutoff=false,wrong_paint_uv=false,wrong_base_tint=false,wrong_shared_shade=false;
-  bool wrong_source_uv=false,wrong_matcap_view=false,wrong_matcap_uv_target=false,wrong_matcap_color=false,wrong_rim_color=false,wrong_rim_uv=false;
+  bool wrong_source_uv=false,wrong_matcap_view=false,wrong_matcap_uv_target=false,wrong_matcap_color=false,wrong_rim_color=false,wrong_rim_uv=false,wrong_rim_mix=false;
   bool wrong_normal_scale=false,wrong_normal_uv=false,wrong_normal_hand=false,wrong_normal_srgb=false;
   bool wrong_shift_scale=false,wrong_shift_uv=false,wrong_shift_srgb=false,wrong_shift_channel=false;
   std::map<std::string,float> weights;
@@ -220,7 +220,7 @@ in vec2 uv;out vec4 result;uniform sampler2D scene;void main(){result=texture(sc
         if(wrong_shared_shade&&pi>0)shadeColor={0,0,0};
         glUniform4fv(loc("baseFactor"), 1, baseColor.data());
         glUniform3fv(loc("shadeFactor"), 1, shadeColor.data());
-        auto mf=ext.value("matcapFactor",std::array<float,3>{1,1,1});if(wrong_matcap_color)mf={0,0,0};glUniform3fv(loc("matcapFactor"),1,mf.data());glUniform3f(loc("viewOrigin"),0,0,2);scalar("rimLightingMix",ext.value("rimLightingMixFactor",1.f));auto rf=ext.value("parametricRimColorFactor",std::array<float,3>{});if(wrong_rim_color)rf={0,0,0};glUniform3fv(loc("rimFactor"),1,rf.data());scalar("rimPower",ext.value("parametricRimFresnelPowerFactor",5.f));scalar("rimLift",ext.value("parametricRimLiftFactor",0.f));glUniform1i(loc("wrongMatcapView"),wrong_matcap_view);
+        auto mf=ext.value("matcapFactor",std::array<float,3>{1,1,1});if(wrong_matcap_color)mf={0,0,0};glUniform3fv(loc("matcapFactor"),1,mf.data());glUniform3f(loc("viewOrigin"),0,0,2);scalar("rimLightingMix",wrong_rim_mix?0.f:ext.value("rimLightingMixFactor",1.f));auto rf=ext.value("parametricRimColorFactor",std::array<float,3>{});if(wrong_rim_color)rf={0,0,0};glUniform3fv(loc("rimFactor"),1,rf.data());scalar("rimPower",ext.value("parametricRimFresnelPowerFactor",5.f));scalar("rimLift",ext.value("parametricRimLiftFactor",0.f));glUniform1i(loc("wrongMatcapView"),wrong_matcap_view);
         scalar("seconds", float(seconds));
         scalar("speed", ext.value("uvAnimationRotationSpeedFactor", 0.f));
         glUniform2f(loc("scroll"),
