@@ -106,6 +106,27 @@ finishes successfully after43,388seconds, including66,187 persistent denial
 prefixes and908 cancellation points; its closure is preserved separately.
 The full objective remains active and incomplete.
 
+## Exhaustive allocation coverage in progress — 2026-11-05
+
+Private test-only branch1f9fd48 adds deterministic partitions for the actual
+physical-package denial loop, not sampled allocation points. Both consumers
+compile and measure successfully;28 synthetic verifier controls reject incomplete
+or mixed evidence. The configured graph is944 entries, not a full runtime pass.
+Both final32 pilots pass, including complete package recovery at the endpoint.
+The longer output path measures90,261 allocations stably in both profiles, versus
+90,257 with the same binary in the earlier path; path-dependent counts are now
+explicit. Each partition recalibrates three times and asserts its frozen plan.
+All90,262 points, exact source/prior-file/success recovery and the early/mid/final
+retry checks remain required. Actual exhaustive batches are running, one worker
+per profile; no full-coverage/admission claim yet. Originalf365 timeout evidence
+remains separate. Read the newest HANDOFF entry before changing live inputs.
+
+The optional historical VRM schema tool now handles pinned VRM0 as well as VRM1.
+240 actual unchanged files pass957 declared-dialect instances and real negative
+controls, independently repeated by root with308 exact protected hashes. Read
+VRM-HISTORICAL-DIALECT-AUDIT.md. Missing/unhashed historical paths remain outside
+that evidence. Production runtime/layout/schema/asset bytes are unchanged.
+
 ## Current combined candidate closure — 2026-11-05
 
 Private5df649d now passes33/33 selected commands per Release/sanitizer, actual

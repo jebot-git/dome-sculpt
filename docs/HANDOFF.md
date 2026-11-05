@@ -1,3 +1,44 @@
+## Exhaustive allocation partitions and historical schema audit — 2026-11-05
+
+The full goal remains active and incomplete. Main's production code still matches
+qualified c179/615; the new historical schema utility/audit is test-only. Root
+independently repeated the declared-dialect validation on 240 unchanged files:
+957 extension instances and three negative controls pass, all 308 protected
+inputs exact. Read VRM-HISTORICAL-DIALECT-AUDIT.md. Missing/unhashed historical
+outputs remain explicitly unqualified.
+
+The test-only partition branch work/physical-oom-shards-5df is pushed at
+1f9fd48501aeba4db77eabb0e86679efad7923bf, based on private combined candidate
+5df649d. Both complete changed test consumers compile/link/measure successfully;
+28 synthetic coverage-verifier controls pass. The configured CTest graph has
+944 entries, including 128 actual partitions plus plan, verifier and aggregate;
+this is registration, not full runtime evidence. The original --oom CLI remains.
+
+Same frozen binaries measure 90,257 allocations in the initial measurement path,
+and 90,261 in the new longer partition path, three stable repeats each profile.
+This demonstrates path-sensitive allocation counts. Every partition repeats the
+full calibration and must agree with its own plan, fixture/scene/package hashes,
+profile, binary/source/dependency hashes, actual mapped ELF files and environment.
+Same-length case directories keep each plan coherent. Both final 32-point pilots
+pass (31 denials, one successful endpoint), in 0.697s Release and 7.520s sanitizer.
+128 partitions cover every absolute point in [0,90262); the tail pilot is a real
+covered partition. Native per-prefix exact rollback/recovery and the original
+early/middle/final retries remain. No timeout increase or prefix sampling.
+
+Actual Release and sanitizer exhaustive batches are now running with one native
+worker each (tool handles 70713 and 43091). Inspect their real process/handle and
+artifacts/physical-oom-shards-5df/artifacts/partition-native before changing the
+frozen tracked inputs; an observation timeout is not a terminal result. The
+aggregator must reject incomplete, overlapping, mixed-input, failed, timed-out or
+stray receipts. These ongoing runs are not yet full coverage or larger37 admission.
+The original f365 3600.04s timeout/90,259 baseline/11,750 completion marker and
+Palette's separate original long sweeps stay preserved, without success relabel.
+
+Shift c9ae484, Rim-MASK 5a6fa08, source-aware weight mode5 and mirrored before-VS
+work remain separate agent candidates. Full requirement coverage, physical-device
+and accelerator evidence and later controller drawers remain unfinished. No
+system installation, headset launch or session restart in this checkpoint.
+
 ## Latest finite-job closure — 2026-11-05
 
 Main runtime remains admittedc179/615bd42; current637 adds corrected optional

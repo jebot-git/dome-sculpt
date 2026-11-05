@@ -24,3 +24,8 @@ qualified. The first collector stopped on a list-shaped report before
 validation; only its layout handling was corrected. No export data was repaired.
 These results update standards evidence; they add no new rendering, export,
 application, device or full-goal admission claim.
+
+Root independently repeated the exact offline command before admission: all 240
+files and 957 instances pass, with the same three negative controls. All 308
+protected file/schema/tool hashes remain exact. This adds standards evidence
+only; no runtime source or application build changes.

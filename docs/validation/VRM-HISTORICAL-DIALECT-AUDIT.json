@@ -10402,5 +10402,33 @@
     }
   },
   "preserved_setup_negative": "Initial manifest collector assumed a dict; one official report is a list. It stopped before validation; corrected only layout handling. First137/153 audit and final240/957 both terminal0, inputs unchanged.",
-  "outstanding": "Original-path unavailable/unhashed records are not retroactively certified. No positive schema instance or source/output was rewritten."
+  "outstanding": "Original-path unavailable/unhashed records are not retroactively certified. No positive schema instance or source/output was rewritten.",
+  "root_independent_replay": {
+    "exit_code": 0,
+    "seconds": 5.219090201950166,
+    "files": 240,
+    "instances": 957,
+    "controls": [
+      {
+        "source_file": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-source-eec7753/build-release/vrm1-source-export/current.vrm",
+        "role": "matcapTexture",
+        "control": "Actual missing texture index rejects through pinned core2020 textureInfo siblings"
+      },
+      {
+        "source_file": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-source-eec7753/build-release/vrm1-source-export/current.vrm",
+        "role": "matcapTexture",
+        "control": "Actual texture coordinate wrong type rejects through pinned core2020 schema"
+      },
+      {
+        "source_file": "/home/blux/de-xr/dome-sculpt/artifacts/publish-final/build/artifacts/vrm-export-female/avatar.vrm",
+        "control": "Actual VRM0 nested human-bone node rejects a string through pinned Draft4 sibling reference"
+      }
+    ],
+    "protected_inputs": 308,
+    "drift": [],
+    "tool_sha256": "2ab41f118b013a4c5c9be997c02047e053a0319201462657bee48929604610a2",
+    "scope": "Root repeats exact historical offline schema command with unchanged current files, pinned schema and original per-file hashes; no runtime/ABI/device or unavailable historical data claim",
+    "validation_sha256": "7a3470c6ef7e2d1d079122413859157e98cdbb1bf9d6bed2174ba8eba1cd0acd",
+    "log": "artifacts/historical-root-review-9f/validation.log"
+  }
 }
