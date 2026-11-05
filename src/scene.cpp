@@ -731,8 +731,9 @@ Scene Scene::decode(const nlohmann::json &j) {
     if(version==40&&!o.at("texture_sets").is_null()&&(!o.at("painted").is_null()||o.at("mesh_active")!=true))throw std::invalid_argument("Texture-set geometry cannot have a second mutable primary owner");
   }
   if(version==40)for(const auto&o:objects){
-    size_t count=1;
+    size_t count=o.at("mesh_active")==true&&!o.at("painted").is_null()?1:0;
     if(!o.at("texture_sets").is_null()){
+      count=1;
       const auto &extra=o.at("texture_sets").at("additional");
       if(!extra.is_array()||extra.empty()||extra.size()>63)throw std::invalid_argument("Incomplete texture-set collection");
       count+=extra.size();
@@ -802,10 +803,12 @@ Scene Scene::decode(const nlohmann::json &j) {
     if(layered_context)for(const auto &c:j.at("baked_normal_fields").at("origins"))budget.deformation(c.at("deformation"),unsigned(version));
     budget.independent_source_paint=source_paint_context.independent_source;budget.owning_physical_emission=version>=27;
     if(version==40){
-      const auto &geometries=j.at("texture_set_geometry").at("topologies");
-      if(!geometries.is_array()||geometries.empty()||geometries.size()>256)throw std::length_error("Invalid texture-set geometry table count");
-      for(const auto &geometry:geometries)for(const auto &field:geometry.items())if(field.value().is_binary())
-        detail::PolygonSceneBudget::add(budget.paint_bytes,field.value().get_binary().size(),256*1024*1024,"Shared texture-set geometry/identity exceeds whole Scene paint storage budget");
+      for(const auto *name:{"meshes","topologies"}){
+        const auto &geometries=j.at("texture_set_geometry").at(name);
+        if(!geometries.is_array()||geometries.empty()||geometries.size()>256)throw std::length_error("Invalid texture-set geometry table count");
+        for(const auto &geometry:geometries)for(const auto &field:geometry.items())if(field.value().is_binary())
+          detail::PolygonSceneBudget::add(budget.paint_bytes,field.value().get_binary().size(),256*1024*1024,"Shared texture-set geometry/identity exceeds whole Scene paint storage budget");
+      }
       for(const auto &object:objects)if(!object.at("texture_sets").is_null()){
         const auto &slots=object.at("texture_sets").at("slots");
         if(!slots.is_binary()||slots.get_binary().size()%4||slots.get_binary().size()>8'000'000)throw std::invalid_argument("Invalid texture-set assignment storage");

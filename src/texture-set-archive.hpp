@@ -20,7 +20,9 @@ public:
 private:
   TextureSetLimits limits_;
   size_t bytes_=0,work_=0,sets_=0;
+  std::vector<std::shared_ptr<const Mesh>> geometry_;
   std::vector<std::shared_ptr<const TextureSetTopology>> topology_;
+  std::vector<uint32_t> topology_geometry_;
   mutable std::set<uint32_t> reached_;
   void charge(size_t,size_t);
   void step(size_t=1);

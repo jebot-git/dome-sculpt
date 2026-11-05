@@ -394,5 +394,114 @@
     "material22": "reserved only if needed; not used in initial slice"
   },
   "no_old_archive_reuse": true,
-  "no_device_job": true
+  "no_device_job": true,
+  "next_source_refinement": {
+    "scope": "Unbuilt mesh/topology pool split plus duplicate-instance/COW controls",
+    "syntax_path": "artifacts/texture-set-syntax/pool-split/status.json",
+    "syntax_sha256": "b8d75b1eb7c71a73065b9a22ad020d59c3667c00c3e913d1ff9ae199932fefd6",
+    "syntax": {
+      "scope": "Syntax only; no objects, link, build or execution evidence",
+      "compiler": "g++ (GCC) 16.2.1 20260819 (Red Hat 16.2.1-2)\nCopyright (C) 2026 Free Software Foundation, Inc.\nThis is free software; see the source for copying conditions.  There is NO\nwarranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\n",
+      "results": [
+        {
+          "source": "src/texture-sets.cpp",
+          "args": [
+            "/usr/bin/g++",
+            "-std=c++20",
+            "-fsyntax-only",
+            "-Iinclude",
+            "-Isrc",
+            "-Ithird_party",
+            "-Ithird_party/openbrush",
+            "-Ithird_party/nlohmann",
+            "src/texture-sets.cpp"
+          ],
+          "returncode": 0,
+          "seconds": 0.8671919460175559
+        },
+        {
+          "source": "src/texture-set-graph.cpp",
+          "args": [
+            "/usr/bin/g++",
+            "-std=c++20",
+            "-fsyntax-only",
+            "-Iinclude",
+            "-Isrc",
+            "-Ithird_party",
+            "-Ithird_party/openbrush",
+            "-Ithird_party/nlohmann",
+            "src/texture-set-graph.cpp"
+          ],
+          "returncode": 0,
+          "seconds": 1.1544776819646358
+        },
+        {
+          "source": "src/texture-set-archive.cpp",
+          "args": [
+            "/usr/bin/g++",
+            "-std=c++20",
+            "-fsyntax-only",
+            "-Iinclude",
+            "-Isrc",
+            "-Ithird_party",
+            "-Ithird_party/openbrush",
+            "-Ithird_party/nlohmann",
+            "src/texture-set-archive.cpp"
+          ],
+          "returncode": 0,
+          "seconds": 1.6068115269881673
+        },
+        {
+          "source": "src/paint.cpp",
+          "args": [
+            "/usr/bin/g++",
+            "-std=c++20",
+            "-fsyntax-only",
+            "-Iinclude",
+            "-Isrc",
+            "-Ithird_party",
+            "-Ithird_party/openbrush",
+            "-Ithird_party/nlohmann",
+            "src/paint.cpp"
+          ],
+          "returncode": 0,
+          "seconds": 2.7164853569702245
+        },
+        {
+          "source": "src/scene.cpp",
+          "args": [
+            "/usr/bin/g++",
+            "-std=c++20",
+            "-fsyntax-only",
+            "-Iinclude",
+            "-Isrc",
+            "-Ithird_party",
+            "-Ithird_party/openbrush",
+            "-Ithird_party/nlohmann",
+            "src/scene.cpp"
+          ],
+          "returncode": 0,
+          "seconds": 3.025064764020499
+        },
+        {
+          "source": "tests/texture-sets.cpp",
+          "args": [
+            "/usr/bin/g++",
+            "-std=c++20",
+            "-fsyntax-only",
+            "-Iinclude",
+            "-Isrc",
+            "-Ithird_party",
+            "-Ithird_party/openbrush",
+            "-Ithird_party/nlohmann",
+            "tests/texture-sets.cpp"
+          ],
+          "returncode": 0,
+          "seconds": 1.1560671650222503
+        }
+      ],
+      "drift": []
+    },
+    "runtime_test": "Not run; separate fresh optimized own cohort approved as next gate"
+  }
 }

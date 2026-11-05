@@ -73,3 +73,10 @@ All old field/source guards and normal/color receipt independence remain. A set
 membership seal does not grant any new normal or source-color authority. The
 current ordinary native weight capture explicitly refuses unrepresented set
 membership until its actual multi-material resource/retention adapter exists.
+
+A subsequent source refinement splits immutable mesh arrays from face/corner
+identity records in the owning geometry table. Distinct topology/instance
+records can refer to one genuine shared mesh owner without duplicating its
+vertices, normals, UVs or edit flags. The unexecuted fixture now includes a
+second independently editable instance with the same geometry owner. Six-TU
+syntax checks still pass; actual Release execution is the next finite gate.

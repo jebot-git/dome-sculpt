@@ -21,7 +21,12 @@ int main(int argc,char**argv)try{
  check(s.active().painted->mesh_owner()==original_mesh&&s.active().texture_sets->at(id).painted->mesh_owner()==original_mesh,"Set fork shares one immutable actual authoring mesh owner");
  check(s.active().texture_sets->triangle_sets()[0]==0&&s.active().texture_sets->triangle_sets()[2]==id,"Actual face IDs assign distinct material slots");
  const auto first=s.encode();check(first.at("version")==40&&first.at("objects")[0].at("painted").is_null(),"Conditional Scene40 has no duplicate primary geometry payload");
- check(first.at("texture_set_geometry").at("topologies").size()==1,"All sets share one geometry archive record");
+ check(first.at("texture_set_geometry").at("meshes").size()==1&&first.at("texture_set_geometry").at("topologies").size()==1,"All sets share one geometry archive record");
+ auto duplicate=s.snapshot();const auto copy=duplicate.duplicate(object);const auto two=duplicate.encode();
+ check(two.at("texture_set_geometry").at("meshes").size()==1,"Distinct mesh instances with the same immutable geometry owner do not duplicate vertex arrays");
+ check(Scene::decode(two).encode()==two,"Independent object-local set IDs survive shared-geometry roundtrip");
+ check(edit_texture_set(duplicate,copy,id,[](PaintedMesh&p,Material&){p.add_layer("Other instance only");return true;}),"Duplicated instance edits detach its immutable set collection");
+ check(duplicate.object(object).texture_sets->at(id).painted->layers().size()==1&&duplicate.object(copy).texture_sets->at(id).painted->layers().size()==2,"Shared geometry never implies shared mutable set layers");
  const auto&sets=first.at("objects")[0].at("texture_sets");check(sets.at("primary").at("version")==7&&sets.at("additional")[0].at("painted").at("version")==7,"Every set requires its own Paint7 membership context");
  check(!sets.at("primary").at("payload").contains("mesh")&&!sets.at("additional")[0].at("painted").at("payload").contains("mesh"),"Set paint payloads never copy the full current geometry");
  refuses([&]{PaintedMesh::decode(sets.at("primary"));},"Standalone Paint reader cannot invent set membership");

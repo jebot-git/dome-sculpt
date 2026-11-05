@@ -45,8 +45,12 @@ uint32_t TextureSetArchive::add(const std::shared_ptr<const TextureSetTopology>&
  if(!t||!t->geometry())throw std::invalid_argument("Texture-set archive lost its geometry owner");
  for(size_t i=0;i<topology_.size();++i){step();if(topology_[i]==t)return uint32_t(i);}
  if(topology_.size()>=limits_.maximum_sets_per_scene)throw std::length_error("Too many retained texture-set topologies");
- const auto&m=*t->geometry();step(m.positions.size()+m.indices.size());charge(m.positions.size()+m.normals.size(),sizeof(Vec3));charge(m.uv.size(),sizeof(std::array<float,2>));charge(m.indices.size(),sizeof(uint32_t));charge(m.uv_pins.size()+m.uv_seams.size(),1);charge(t->faces_.size()+t->corners_.size(),sizeof(uint64_t));
- topology_.push_back(t);return uint32_t(topology_.size()-1);
+ uint32_t geometry=0;for(;geometry<geometry_.size();++geometry){step();if(same(geometry_[geometry],t->geometry()))break;}
+ if(geometry==geometry_.size()){
+  const auto&m=*t->geometry();step(m.positions.size()+m.indices.size());charge(m.positions.size()+m.normals.size(),sizeof(Vec3));charge(m.uv.size(),sizeof(std::array<float,2>));charge(m.indices.size(),sizeof(uint32_t));charge(m.uv_pins.size()+m.uv_seams.size(),1);geometry_.push_back(t->geometry());
+ }
+ charge(t->faces_.size()+t->corners_.size(),sizeof(uint64_t));
+ topology_.push_back(t);topology_geometry_.push_back(geometry);return uint32_t(topology_.size()-1);
 }
 Json TextureSetArchive::encode(const SculptObject&o,PaintImageArchive&images,NormalSamplingArchive*normals,PaintSamplingArchive*sampling){
  if(!o.texture_sets)throw std::invalid_argument("Texture-set archive requires actual collection membership");
@@ -61,45 +65,60 @@ Json TextureSetArchive::encode(const SculptObject&o,PaintImageArchive&images,Nor
  return j;
 }
 Json TextureSetArchive::geometry_records()const{
- Json out={{"version",1},{"topologies",Json::array()}};
- for(const auto&t:topology_){
-  const auto&m=*t->geometry();std::vector<uint8_t>p,n,uv,indices,faces,corners;
-  p.reserve(m.positions.size()*12);n.reserve(m.normals.size()*12);uv.reserve(m.uv.size()*8);indices.reserve(m.indices.size()*4);faces.reserve(t->faces_.size()*8);corners.reserve(t->corners_.size()*8);
+ Json out={{"version",1},{"meshes",Json::array()},{"topologies",Json::array()}};
+ for(const auto&owner:geometry_){
+  const auto&m=*owner;std::vector<uint8_t>p,n,uv,indices;
+  p.reserve(m.positions.size()*12);n.reserve(m.normals.size()*12);uv.reserve(m.uv.size()*8);indices.reserve(m.indices.size()*4);
   for(auto v:m.positions)for(float x:{v.x,v.y,v.z})word(p,std::bit_cast<uint32_t>(x),4);
   for(auto v:m.normals)for(float x:{v.x,v.y,v.z})word(n,std::bit_cast<uint32_t>(x),4);
-  for(auto v:m.uv)for(float x:v)word(uv,std::bit_cast<uint32_t>(x),4);
-  for(auto x:m.indices)word(indices,x,4);for(auto x:t->faces_)word(faces,x,8);for(auto x:t->corners_)word(corners,x,8);
-  out["topologies"].push_back({{"positions",Json::binary(std::move(p))},{"normals",Json::binary(std::move(n))},{"uv",Json::binary(std::move(uv))},
-   {"indices",Json::binary(std::move(indices))},{"uv_pins",Json::binary(m.uv_pins)},{"uv_seams",Json::binary(m.uv_seams)},
-   {"faces",Json::binary(std::move(faces))},{"corners",Json::binary(std::move(corners))},{"polygon_ids",t->polygon_ids_}});
+  for(auto v:m.uv)for(float x:v)word(uv,std::bit_cast<uint32_t>(x),4);for(auto x:m.indices)word(indices,x,4);
+  out["meshes"].push_back({{"positions",Json::binary(std::move(p))},{"normals",Json::binary(std::move(n))},{"uv",Json::binary(std::move(uv))},
+   {"indices",Json::binary(std::move(indices))},{"uv_pins",Json::binary(m.uv_pins)},{"uv_seams",Json::binary(m.uv_seams)}});
+ }
+ for(size_t at=0;at<topology_.size();++at){const auto&t=topology_[at];std::vector<uint8_t>faces,corners;faces.reserve(t->faces_.size()*8);corners.reserve(t->corners_.size()*8);
+  for(auto x:t->faces_)word(faces,x,8);for(auto x:t->corners_)word(corners,x,8);
+  out["topologies"].push_back({{"mesh",topology_geometry_.at(at)},{"faces",Json::binary(std::move(faces))},
+   {"corners",Json::binary(std::move(corners))},{"polygon_ids",t->polygon_ids_}});
  }
  return out;
 }
 TextureSetArchive TextureSetArchive::decode_geometry(const Json&j,TextureSetLimits limits){
  TextureSetArchive out(std::move(limits));
- if(!j.is_object()||j.size()!=2||integer(j.at("version"),1)!=1||!j.at("topologies").is_array()||j.at("topologies").empty()||j.at("topologies").size()>out.limits_.maximum_sets_per_scene)
+ if(!j.is_object()||j.size()!=3||integer(j.at("version"),1)!=1||!j.at("meshes").is_array()||j.at("meshes").empty()||j.at("meshes").size()>out.limits_.maximum_sets_per_scene||
+    !j.at("topologies").is_array()||j.at("topologies").empty()||j.at("topologies").size()>out.limits_.maximum_sets_per_scene)
   throw std::invalid_argument("Scene40 needs its actual bounded texture-set geometry table");
  // First measure every encoded buffer before any Mesh/vector reconstruction.
- for(const auto&v:j.at("topologies")){
-  if(!v.is_object()||v.size()!=9)throw std::invalid_argument("Invalid texture-set topology record");
+ for(const auto&v:j.at("meshes")){
+  if(!v.is_object()||v.size()!=6)throw std::invalid_argument("Invalid texture-set mesh record");
   const auto&p=blob(v.at("positions"),12,2'000'000),&n=blob(v.at("normals"),12,2'000'000),&uv=blob(v.at("uv"),8,2'000'000),&i=blob(v.at("indices"),12,out.limits_.maximum_triangles);
   if(p.size()!=n.size()||p.size()/12!=uv.size()/8)throw std::invalid_argument("Texture-set vertex arrays disagree");
-  const auto&f=blob(v.at("faces"),8,out.limits_.maximum_triangles),&c=blob(v.at("corners"),8,out.limits_.maximum_corners);
-  if(f.size()/8!=i.size()/12||c.size()/8!=i.size()/4)throw std::invalid_argument("Texture-set topology identities differ from actual corners");
   const auto&pins=blob(v.at("uv_pins"),1,p.size()/12,true),&seams=blob(v.at("uv_seams"),1,i.size()/4,true);
   if((!pins.empty()&&pins.size()!=p.size()/12)||(!seams.empty()&&seams.size()!=i.size()/4))throw std::invalid_argument("Invalid texture-set UV edit flags");
-  out.charge(p.size()+n.size()+uv.size()+i.size()+f.size()+c.size()+pins.size()+seams.size(),1);out.step(p.size()/12+i.size()/4);
+  out.charge(p.size()+n.size()+uv.size()+i.size()+pins.size()+seams.size(),1);out.step(p.size()/12+i.size()/4);
  }
+ std::set<uint32_t>used_meshes;
  for(const auto&v:j.at("topologies")){
-  auto t=std::shared_ptr<TextureSetTopology>(new TextureSetTopology);auto m=std::make_shared<Mesh>();
+  if(!v.is_object()||v.size()!=4||!v.at("polygon_ids").is_boolean())throw std::invalid_argument("Invalid texture-set topology record");
+  const auto geometry=uint32_t(integer(v.at("mesh"),j.at("meshes").size()-1));used_meshes.insert(geometry);
+  const auto&i=j.at("meshes")[geometry].at("indices").get_binary();
+  const auto&f=blob(v.at("faces"),8,out.limits_.maximum_triangles),&c=blob(v.at("corners"),8,out.limits_.maximum_corners);
+  if(f.size()/8!=i.size()/12||c.size()/8!=i.size()/4)throw std::invalid_argument("Texture-set topology identities differ from actual corners");
+  out.charge(f.size()+c.size(),1);out.step(f.size()/8+c.size()/8);
+ }
+ if(used_meshes.size()!=j.at("meshes").size())throw std::invalid_argument("Unreachable texture-set mesh records");
+ for(const auto&v:j.at("meshes")){
+  auto m=std::make_shared<Mesh>();
   auto vectors=[&](const char*key,std::vector<Vec3>&target){const auto&b=v.at(key).get_binary();target.reserve(b.size()/12);for(size_t at=0;at<b.size();at+=12)target.push_back({std::bit_cast<float>(uint32_t(word(b,at,4))),std::bit_cast<float>(uint32_t(word(b,at+4,4))),std::bit_cast<float>(uint32_t(word(b,at+8,4)))});};
   vectors("positions",m->positions);vectors("normals",m->normals);
   const auto&uv=v.at("uv").get_binary();m->uv.reserve(uv.size()/8);for(size_t at=0;at<uv.size();at+=8)m->uv.push_back({std::bit_cast<float>(uint32_t(word(uv,at,4))),std::bit_cast<float>(uint32_t(word(uv,at+4,4)))});
   const auto&i=v.at("indices").get_binary();m->indices.reserve(i.size()/4);for(size_t at=0;at<i.size();at+=4)m->indices.push_back(uint32_t(word(i,at,4)));
-  m->uv_pins=v.at("uv_pins").get_binary();m->uv_seams=v.at("uv_seams").get_binary();m->validate();t->geometry_=std::move(m);
+  m->uv_pins=v.at("uv_pins").get_binary();m->uv_seams=v.at("uv_seams").get_binary();m->validate();out.geometry_.push_back(std::move(m));
+ }
+ for(const auto&v:j.at("topologies")){
+  auto t=std::shared_ptr<TextureSetTopology>(new TextureSetTopology);const auto geometry=uint32_t(integer(v.at("mesh"),out.geometry_.size()-1));t->geometry_=out.geometry_[geometry];
   const auto&f=v.at("faces").get_binary(),&c=v.at("corners").get_binary();t->faces_.reserve(f.size()/8);t->corners_.reserve(c.size()/8);
   for(size_t at=0;at<f.size();at+=8)t->faces_.push_back(word(f,at,8));for(size_t at=0;at<c.size();at+=8)t->corners_.push_back(word(c,at,8));
-  t->polygon_ids_=v.at("polygon_ids").get<bool>();out.topology_.push_back(std::move(t));
+  t->polygon_ids_=v.at("polygon_ids").get<bool>();out.topology_.push_back(std::move(t));out.topology_geometry_.push_back(geometry);
  }
  return out;
 }
