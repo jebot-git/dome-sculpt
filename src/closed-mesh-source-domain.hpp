@@ -4,6 +4,7 @@
 #include "weight-surface-system.hpp"
 #include "volume-topology.hpp"
 #include <map>
+#include <optional>
 namespace dome::detail::visibility_geodesic {
 // Owning closed-material classifier paired with ONE immutable exact BVH.
 // Closed indexed manifold components use unsigned solid parity. Open or
@@ -18,6 +19,14 @@ class ClosedMeshSourceDomain {
   using Q=ClosestRayVisibility;using I=Q::I;using V=Q::V;using P=Q::P;
   std::shared_ptr<const Q>geometry_;
   std::vector<uint8_t>closed_;
+  std::optional<ClosedEmbeddingFailure>first_nonembedded_;
+  void embedding_failure(const ClosedEmbeddingFailure&e,bool intrinsic){
+    if(!intrinsic)throw e;
+    if(closed_.at(e.component)){
+      if(!first_nonembedded_)first_nonembedded_=e;
+      closed_[e.component]=0;--closed_components;++nonembedded_components;
+    }
+  }
   using Work=weight_surface::Budget;
   template<class E>static I edge_side(const V&a,const V&b,const V&q,const I&den,size_t drop,E&x){const size_t u=(drop+1)%3,v=(drop+2)%3;auto dx=x.subtract(b[u],a[u]),dy=x.subtract(b[v],a[v]);return x.subtract(x.multiply(dx,x.subtract(q[v],x.multiply(a[v],den))),x.multiply(dy,x.subtract(q[u],x.multiply(a[u],den))));}
   template<class E>static I plane_side(const std::array<V,3>&f,const V&q,const I&den,E&x){V u,v,r,zero{};for(size_t k=0;k<3;++k){u[k]=x.subtract(f[1][k],f[0][k]);v[k]=x.subtract(f[2][k],f[0][k]);r[k]=x.subtract(q[k],x.multiply(f[0][k],den));}return Q::orient3(zero,u,v,r,x);}
@@ -32,8 +41,8 @@ class ClosedMeshSourceDomain {
   template<class E>bool ray_box(const Q::Box&box,const V&q,const I&den,size_t axis,uint32_t delta,E&x,const V*direction=nullptr)const{const auto&g=*geometry_;auto sign=[&](I value,size_t k){return value.sign?value.sign:direction?(*direction)[k].sign:0;};for(size_t k=0;k<3;++k){auto hi=x.multiply(g.coordinate(box.high[k],k,delta),den);if(sign(x.subtract(q[k],hi),k)>0)return false;if(k!=axis){auto lo=x.multiply(g.coordinate(box.low[k],k,delta),den);if(sign(x.subtract(q[k],lo),k)<0)return false;}}return true;}
 public:
   enum class Location{Outside,Inside,Boundary};
-  size_t planned_bytes=0,closed_components=0;
-  ClosedMeshSourceDomain(std::shared_ptr<const Q>geometry,size_t maximum_bytes,Work&w):geometry_(std::move(geometry)){
+  size_t planned_bytes=0,closed_components=0,nonembedded_components=0;
+  ClosedMeshSourceDomain(std::shared_ptr<const Q>geometry,size_t maximum_bytes,Work&w,bool intrinsic_nonembedded=false):geometry_(std::move(geometry)){
     if(!geometry_||geometry_->components_.size()!=geometry_->points_.size())throw std::invalid_argument("Closed source domain requires an owning intrinsic-component BVH");const auto&q=*geometry_;const size_t n=q.points_.size(),faces=q.faces_.size(),corners=faces*3;
     planned_bytes=65536+n*(sizeof(uint8_t)+4*sizeof(uint32_t))+corners*(192+sizeof(uint32_t))+faces*3*sizeof(uint32_t)+q.nodes_.size()*16;
     if(planned_bytes>maximum_bytes)throw std::length_error("Closed topology/embedding before allocation");
@@ -50,8 +59,9 @@ public:
     // Equal coordinates with distinct indices never invent shared incidence.
     std::vector<std::array<uint32_t,2>>stack;stack.reserve(q.nodes_.size()*2);stack.push_back({0,0});
     auto overlap=[&](const Q::Box&a,const Q::Box&b){for(size_t k=0;k<3;++k){w.step();if(a.hi[k]<b.lo[k]||b.hi[k]<a.lo[k])return false;}return true;};
-    while(!stack.empty()){w.stop();auto pair=stack.back();stack.pop_back();const auto&a=q.nodes_[pair[0]],&b=q.nodes_[pair[1]];if(!overlap(a.box,b.box))continue;if(a.count&&b.count){for(uint32_t i=a.first;i<a.first+a.count;++i)for(uint32_t j=b.first;j<b.first+b.count;++j){w.step();auto first=q.order_[i],second=q.order_[j];if(first>=second&&pair[0]==pair[1])continue;const auto&x=q.faces_[first],&y=q.faces_[second];if(q.components_[x[0]]!=q.components_[y[0]]||!closed_[q.components_[x[0]]])continue;bool bounds=true;for(size_t k=0;k<3;++k){w.step();float xl=INFINITY,xh=-INFINITY,yl=INFINITY,yh=-INFINITY;for(auto v:x){xl=std::min(xl,q.points_[v][k]);xh=std::max(xh,q.points_[v][k]);}for(auto v:y){yl=std::min(yl,q.points_[v][k]);yh=std::max(yh,q.points_[v][k]);}bounds&=xh>=yl&&yh>=xl;}if(!bounds)continue;volume_topology::Triangle tx,ty;for(size_t k=0;k<3;++k){tx[k]=q.points_[x[k]];ty[k]=q.points_[y[k]];}for(auto u:x)for(auto v:y){w.step();if(u!=v&&q.points_[u]==q.points_[v])throw ClosedEmbeddingFailure(q.components_[x[0]],first,second,tx,ty,true);}if(volume_topology::unexpected_contact(tx,ty,w))throw ClosedEmbeddingFailure(q.components_[x[0]],first,second,tx,ty,false);}}else if(pair[0]==pair[1]){stack.push_back({a.left,a.left});stack.push_back({a.right,a.right});stack.push_back({a.left,a.right});}else if(!a.count){stack.push_back({a.left,pair[1]});stack.push_back({a.right,pair[1]});}else{stack.push_back({pair[0],b.left});stack.push_back({pair[0],b.right});}}
+    while(!stack.empty()){w.stop();auto pair=stack.back();stack.pop_back();const auto&a=q.nodes_[pair[0]],&b=q.nodes_[pair[1]];if(!overlap(a.box,b.box))continue;if(a.count&&b.count){for(uint32_t i=a.first;i<a.first+a.count;++i)for(uint32_t j=b.first;j<b.first+b.count;++j){w.step();auto first=q.order_[i],second=q.order_[j];if(first>=second&&pair[0]==pair[1])continue;const auto&x=q.faces_[first],&y=q.faces_[second];if(q.components_[x[0]]!=q.components_[y[0]]||!closed_[q.components_[x[0]]])continue;bool bounds=true;for(size_t k=0;k<3;++k){w.step();float xl=INFINITY,xh=-INFINITY,yl=INFINITY,yh=-INFINITY;for(auto v:x){xl=std::min(xl,q.points_[v][k]);xh=std::max(xh,q.points_[v][k]);}for(auto v:y){yl=std::min(yl,q.points_[v][k]);yh=std::max(yh,q.points_[v][k]);}bounds&=xh>=yl&&yh>=xl;}if(!bounds)continue;volume_topology::Triangle tx,ty;for(size_t k=0;k<3;++k){tx[k]=q.points_[x[k]];ty[k]=q.points_[y[k]];}bool unowned=false;for(auto u:x)for(auto v:y){w.step();unowned|=u!=v&&q.points_[u]==q.points_[v];}if(unowned)embedding_failure(ClosedEmbeddingFailure(q.components_[x[0]],first,second,tx,ty,true),intrinsic_nonembedded);if(!closed_[q.components_[x[0]]])continue;if(volume_topology::unexpected_contact(tx,ty,w))embedding_failure(ClosedEmbeddingFailure(q.components_[x[0]],first,second,tx,ty,false),intrinsic_nonembedded);}}else if(pair[0]==pair[1]){stack.push_back({a.left,a.left});stack.push_back({a.right,a.right});stack.push_back({a.left,a.right});}else if(!a.count){stack.push_back({a.left,pair[1]});stack.push_back({a.right,pair[1]});}else{stack.push_back({pair[0],b.left});stack.push_back({pair[0],b.right});}}
   }
+  const std::optional<ClosedEmbeddingFailure>&nonembedded_witness()const noexcept{return first_nonembedded_;}
   uint32_t component(uint32_t row)const{if(row>=geometry_->components_.size())throw std::invalid_argument("Closed source row outside owner");return geometry_->components_[row];}
   bool closed(uint32_t row)const{if(row>=geometry_->components_.size())throw std::invalid_argument("Closed source row outside owner");return closed_[geometry_->components_[row]]!=0;}
 private:
@@ -73,6 +83,24 @@ public:
     // cannot borrow this one-dimensional interior-continuation certificate.
     if(t.numerator.sign){V direction;for(size_t k=0;k<3;++k)direction[k]=x.subtract(head[k],tail[k]);if(locate(component,point,t.denominator,delta,s,x,w,&direction)==Location::Inside)return true;}
     if(x.compare(t,x.one())<0){V direction;for(size_t k=0;k<3;++k)direction[k]=x.subtract(tail[k],head[k]);if(locate(component,point,t.denominator,delta,s,x,w,&direction)==Location::Inside)return true;}
+    return false;
+  }
+  // Component support is a property of the WHOLE genuine finite handle,
+  // not containment of each projected query point. A supported bone may
+  // legitimately extend out of a shoe/glove. Isolated boundary contact and
+  // coplanar/tangent segments cannot establish that interior support.
+  bool has_interior_support(uint32_t row,P a,P b,Q::Scratch&s,Work&w)const{
+    scratch(s);if(!closed(row))throw std::invalid_argument("Interior support requires certified closed component");const auto&q=*geometry_;volume_exact::Arithmetic x(w);V head,tail;auto delta=source_coordinates(a,b,head,tail,x);const auto one=x.integer(1);const auto component=q.components_[row];
+    auto enters=[&](const V&point,const I&den,const volume_exact::Fraction&t){auto location=locate(component,point,den,delta,s,x,w);if(location==Location::Inside)return true;if(location==Location::Outside)return false;if(t.numerator.sign){V direction;for(size_t k=0;k<3;++k)direction[k]=x.subtract(head[k],tail[k]);if(locate(component,point,den,delta,s,x,w,&direction)==Location::Inside)return true;}if(x.compare(t,x.one())<0){V direction;for(size_t k=0;k<3;++k)direction[k]=x.subtract(tail[k],head[k]);if(locate(component,point,den,delta,s,x,w,&direction)==Location::Inside)return true;}return false;};
+    if(enters(head,one,x.zero())||enters(tail,one,x.one()))return true;
+    // Every entry into a closed embedded region crosses a source/face-plane
+    // root (including vertex events). Visit the exact finite roots; an
+    // infinitesimal side is certified by the same affine-predicate ledger.
+    std::vector<uint32_t>pending;pending.reserve(q.nodes_.size());pending.push_back(0);
+    while(!pending.empty()){w.stop();auto id=pending.back();pending.pop_back();const auto&node=q.nodes_[id];bool overlap=true;for(size_t k=0;k<3;++k){w.step();if(std::max(a[k],b[k])<node.box.lo[k]||std::min(a[k],b[k])>node.box.hi[k])overlap=false;}if(!overlap)continue;if(!node.count){pending.push_back(node.left);pending.push_back(node.right);continue;}
+      for(uint32_t at=node.first;at<node.first+node.count;++at){w.step();const auto&ids=q.faces_[q.order_[at]];if(q.components_[ids[0]]!=component)continue;std::array<V,3>f{q.coordinate(ids[0],delta),q.coordinate(ids[1],delta),q.coordinate(ids[2],delta)};auto first=Q::orient3(f[0],f[1],f[2],head,x),last=Q::orient3(f[0],f[1],f[2],tail,x);auto difference=x.subtract(first,last);if(!difference.sign)continue;auto t=bone_shadow::ratio(first,difference,x);if(x.compare(t,x.zero())<0||x.compare(t,x.one())>0)continue;V point;for(size_t k=0;k<3;++k)point[k]=Q::blend(head[k],tail[k],t,x);if(!on_face(f,point,t.denominator,x))continue;if(enters(point,t.denominator,t))return true;
+      }
+    }
     return false;
   }
   // True means the entire finite source is proved strictly exterior. Any

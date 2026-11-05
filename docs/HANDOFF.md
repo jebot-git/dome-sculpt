@@ -1,5 +1,17 @@
 # Dome Sculpt production handoff
 
+## Private component-supported surface heat — 2026-11-05
+
+Distinct private policy now passes874/874 actual female/male global/local pose
+comparisons each optimized/sanitizer, unchanged limits and500M work. Current
+R29+10+7/S29+10+7 native controls pass; no sanitizer diagnostics. Exact whole
+finite control support corrects shoe truncation; male genuine self-contact is
+prospectively intrinsic, never repaired or given solid authority. Original
+strict-policy negatives remain. Read COMPONENT-HANDLE-HEAT-WIP.md/receipt for
+matched-source support scope. Public modes/default are unchanged; owning
+Document/new-bind/affine/locks/history/Save/UI/export and broader robustness
+remain required. No main admission, GPU or physical-device claim.
+
 ## Controller report regression — 2026-11-05
 
 The stale bake-normal-controller status assertion from the older full689 run is

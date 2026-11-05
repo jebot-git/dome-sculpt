@@ -12,7 +12,7 @@ struct VisibilityGeodesicResult {
   SkinWeights weights;
   size_t work=0, workspace=0, visible_seeds=0, occluded_candidates=0;
   size_t heat_iterations=0, negative_stiffness_edges=0;
-  size_t closed_components=0,interior_components=0,exterior_components=0,membership_rejected=0;
+  size_t closed_components=0,interior_components=0,exterior_components=0,membership_rejected=0,nonembedded_components=0;
   double heat_residual=0, partition_error=0;
 };
 namespace visibility_geodesic {
