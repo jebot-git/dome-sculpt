@@ -1,5 +1,27 @@
 # Dome Sculpt production handoff
 
+## Private native shade Apply factorization — 2026-11-05
+
+Runtime `a78fc02` follows1231. Actual native paint→expression Apply preserves
+inspectorR=.6 and authors shadeR=.99: old upper coefficient1.65 refused. Real
+paint R×2 with upper baseR×.5 and matching shade divisor now preserves source/
+independent paint. Entire actual scaled paint must stay unit; a real red.8
+stroke refuses precisely. No clamp/flatten/dummy resources or public/schema/UI
+change. PRIVATE Layer product append requires all3 complete production TUs and
+direct consumers rebuilt (done); actual map node is forecast before staging.
+Final R109.425s/S671.337s both0/1897exact: native47, independent169/36pairs max1
+at unchanged4, real over-range18, NEW full1823 (912persistent+903Cancel+8controls).
+All72PNG+15worker/control files exact R/S;49old files/profile byte-identical.
+ActualArc83073 terminal0/4.035s/1904exact:170checks/36pairs0 plusactualsoftware1,
+lease released.42official instances/KHR0errors21warnings79infos12hints. Configure
+670/4new only. Three changed core members proved, no freshapp/rootABI/mainclaim.
+This full Apply consumed the only happy UV target, so frozen-source UV is an
+identity for this input; actual future movingUV+newinitialfactor remains extra
+scope. General MASK/BLEND/remaining owners/roles/external/fullVRM requirements
+stay open, SAME original64560 separately unfinished. Read
+VRM1-INITIAL-SHADE-FACTORIZATION.md/JSON and actual counterc7f9b8a; preserve root
+canonical/native owner guards and private-header dependency closure at union.
+
 ## Private real cutouts outside painted support — 2026-11-05
 
 Runtime a4ad6ce extends qualified296 with an owning, per-triangle MASK paint
