@@ -1,0 +1,322 @@
+{
+  "runtime": "804ec971bdbc137da3aa39b5566039328e0da263",
+  "parents": [
+    "360f575cb3a7d1477164ec68b719df145a36a793",
+    "f2a382c"
+  ],
+  "scope": "Fresh matching Scene36 appended-ABI application/core/render/support/XR with private canonical paint owner and lazy origin-reader foundation. No Scene37 public field or writer/reader/native action.",
+  "profiles": {
+    "release": {
+      "status": "artifacts/origin-reader-owned/release/status.json",
+      "status_sha256": "a1c51d74fce7df8a7a4ac01340c2ace6ce7b4bdb87322464cacba55111528208",
+      "inputs": 2396,
+      "unchanged": true,
+      "exit": 0,
+      "results": [
+        {
+          "phase": "configure",
+          "command": [
+            "cmake",
+            "-S",
+            "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-owner-360f575",
+            "-B",
+            "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-owner-360f575/build-release",
+            "-G",
+            "Ninja",
+            "-DCMAKE_BUILD_TYPE=Release",
+            "-DBUILD_TESTING=ON",
+            "-DDOME_BUILD_UI=ON",
+            "-DDOME_BUILD_XR=ON",
+            "-DDOME_COMPUTE_BACKEND=CPU",
+            "-DFLTK_DIR=/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-release/share/fltk"
+          ],
+          "exit": 0,
+          "seconds": 7.409790797973983
+        },
+        {
+          "phase": "build",
+          "command": [
+            "nice",
+            "-n",
+            "15",
+            "cmake",
+            "--build",
+            "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-owner-360f575/build-release",
+            "-j2",
+            "--target",
+            "dome-sculpt",
+            "dome-sculpt-canonical-paint-owner-test",
+            "dome-sculpt-canonical-paint-owner-cap-test",
+            "dome-sculpt-canonical-paint-origin-reader-test",
+            "dome-sculpt-canonical-paint-uv-kernel-test",
+            "dome-sculpt-scene-test",
+            "dome-sculpt-scene-file-test",
+            "dome-sculpt-polygon-scene-test",
+            "dome-sculpt-native-paint-key-frames-test",
+            "dome-sculpt-native-paint-rig-uv-test",
+            "dome-sculpt-rig-after-authoring-test",
+            "dome-sculpt-native-paint32-emission-test",
+            "dome-sculpt-native-paint32-emission-mixed-test"
+          ],
+          "exit": 0,
+          "seconds": 679.1155925599742
+        },
+        {
+          "phase": "app-version",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-owner-360f575/build-release/dome-sculpt",
+            "--version"
+          ],
+          "exit": 0,
+          "seconds": 0.027225936006288975
+        },
+        {
+          "phase": "owner-0-0",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-owner-360f575/build-release/dome-sculpt-canonical-paint-owner-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native35-physical-1f4f55c/artifacts/canonical-physical-controls/output/0-0.dsculpt",
+            "--oom"
+          ],
+          "exit": 0,
+          "seconds": 0.11887706397101283
+        },
+        {
+          "phase": "owner-7-0",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-owner-360f575/build-release/dome-sculpt-canonical-paint-owner-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native35-physical-1f4f55c/artifacts/canonical-physical-controls/output/7-0.dsculpt"
+          ],
+          "exit": 0,
+          "seconds": 0.027973604970611632
+        },
+        {
+          "phase": "owner-0-1",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-owner-360f575/build-release/dome-sculpt-canonical-paint-owner-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native35-physical-1f4f55c/artifacts/canonical-physical-controls/output/0-1.dsculpt"
+          ],
+          "exit": 0,
+          "seconds": 0.014028871955815703
+        },
+        {
+          "phase": "owner-7-1",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-owner-360f575/build-release/dome-sculpt-canonical-paint-owner-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native35-physical-1f4f55c/artifacts/canonical-physical-controls/output/7-1.dsculpt"
+          ],
+          "exit": 0,
+          "seconds": 0.019878624007105827
+        },
+        {
+          "phase": "actual-cap",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-owner-360f575/build-release/dome-sculpt-canonical-paint-owner-cap-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-owner-360f575/tests/fixtures/layered-normal/original-0.dsculpt"
+          ],
+          "exit": 0,
+          "seconds": 0.7933983819675632
+        },
+        {
+          "phase": "reader-0-3",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-owner-360f575/build-release/dome-sculpt-canonical-paint-origin-reader-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native35-physical-1f4f55c/artifacts/canonical-physical-controls/output/0-3.dsculpt"
+          ],
+          "exit": 0,
+          "seconds": 0.03130026097642258
+        },
+        {
+          "phase": "reader-7-4",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-owner-360f575/build-release/dome-sculpt-canonical-paint-origin-reader-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native35-physical-1f4f55c/artifacts/canonical-physical-controls/output/7-4.dsculpt"
+          ],
+          "exit": 0,
+          "seconds": 0.033679935964755714
+        },
+        {
+          "phase": "regressions",
+          "command": [
+            "ctest",
+            "--test-dir",
+            "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-owner-360f575/build-release",
+            "--output-on-failure",
+            "-R",
+            "^(scene-authoring|scene-file|polygon-scene-archive|native-paint-key-frames|native-paint-rig-uv|rig-after-authoring|native-paint32-emission|native-paint32-emission-mixed)$"
+          ],
+          "exit": 0,
+          "seconds": 15.574646027002018
+        }
+      ],
+      "reader_logs": {
+        "reader-0-3": "PASS 105 lazy before-origin checks; origins=1 cancellations=3 allocation_prefixes=86\n",
+        "reader-7-4": "PASS 152 lazy before-origin checks; origins=1 cancellations=3 allocation_prefixes=133\n"
+      }
+    },
+    "sanitize": {
+      "status": "artifacts/origin-reader-owned/sanitize/status.json",
+      "status_sha256": "2eb2709747728eb062a757c635be7e6cb411cb8052a38a5b0154530f558b7664",
+      "inputs": 2396,
+      "unchanged": true,
+      "exit": 0,
+      "results": [
+        {
+          "phase": "configure",
+          "command": [
+            "cmake",
+            "-S",
+            "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-owner-360f575",
+            "-B",
+            "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-owner-360f575/build-sanitize",
+            "-G",
+            "Ninja",
+            "-DCMAKE_BUILD_TYPE=Release",
+            "-DBUILD_TESTING=ON",
+            "-DDOME_BUILD_UI=ON",
+            "-DDOME_BUILD_XR=ON",
+            "-DDOME_COMPUTE_BACKEND=CPU",
+            "-DFLTK_DIR=/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-sanitize/share/fltk",
+            "-DCMAKE_C_FLAGS_RELEASE=-O1 -g1 -DNDEBUG -fsanitize=address,undefined -fno-omit-frame-pointer",
+            "-DCMAKE_CXX_FLAGS_RELEASE=-O1 -g1 -DNDEBUG -fsanitize=address,undefined -fno-omit-frame-pointer"
+          ],
+          "exit": 0,
+          "seconds": 7.439018638979178
+        },
+        {
+          "phase": "build",
+          "command": [
+            "nice",
+            "-n",
+            "15",
+            "cmake",
+            "--build",
+            "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-owner-360f575/build-sanitize",
+            "-j2",
+            "--target",
+            "dome-sculpt",
+            "dome-sculpt-canonical-paint-owner-test",
+            "dome-sculpt-canonical-paint-owner-cap-test",
+            "dome-sculpt-canonical-paint-origin-reader-test",
+            "dome-sculpt-canonical-paint-uv-kernel-test",
+            "dome-sculpt-scene-test",
+            "dome-sculpt-scene-file-test",
+            "dome-sculpt-polygon-scene-test",
+            "dome-sculpt-native-paint-key-frames-test",
+            "dome-sculpt-native-paint-rig-uv-test",
+            "dome-sculpt-rig-after-authoring-test",
+            "dome-sculpt-native-paint32-emission-test",
+            "dome-sculpt-native-paint32-emission-mixed-test"
+          ],
+          "exit": 0,
+          "seconds": 1046.2823066840065
+        },
+        {
+          "phase": "app-version",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-owner-360f575/build-sanitize/dome-sculpt",
+            "--version"
+          ],
+          "exit": 0,
+          "seconds": 0.1802284630248323
+        },
+        {
+          "phase": "owner-0-0",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-owner-360f575/build-sanitize/dome-sculpt-canonical-paint-owner-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native35-physical-1f4f55c/artifacts/canonical-physical-controls/output/0-0.dsculpt",
+            "--oom"
+          ],
+          "exit": 0,
+          "seconds": 1.5898963440558873
+        },
+        {
+          "phase": "owner-7-0",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-owner-360f575/build-sanitize/dome-sculpt-canonical-paint-owner-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native35-physical-1f4f55c/artifacts/canonical-physical-controls/output/7-0.dsculpt"
+          ],
+          "exit": 0,
+          "seconds": 0.19365715997992083
+        },
+        {
+          "phase": "owner-0-1",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-owner-360f575/build-sanitize/dome-sculpt-canonical-paint-owner-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native35-physical-1f4f55c/artifacts/canonical-physical-controls/output/0-1.dsculpt"
+          ],
+          "exit": 0,
+          "seconds": 0.17609939200337976
+        },
+        {
+          "phase": "owner-7-1",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-owner-360f575/build-sanitize/dome-sculpt-canonical-paint-owner-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native35-physical-1f4f55c/artifacts/canonical-physical-controls/output/7-1.dsculpt"
+          ],
+          "exit": 0,
+          "seconds": 0.2023556599742733
+        },
+        {
+          "phase": "actual-cap",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-owner-360f575/build-sanitize/dome-sculpt-canonical-paint-owner-cap-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-owner-360f575/tests/fixtures/layered-normal/original-0.dsculpt"
+          ],
+          "exit": 0,
+          "seconds": 6.287836942996364
+        },
+        {
+          "phase": "reader-0-3",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-owner-360f575/build-sanitize/dome-sculpt-canonical-paint-origin-reader-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native35-physical-1f4f55c/artifacts/canonical-physical-controls/output/0-3.dsculpt"
+          ],
+          "exit": 0,
+          "seconds": 0.2787251289701089
+        },
+        {
+          "phase": "reader-7-4",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-owner-360f575/build-sanitize/dome-sculpt-canonical-paint-origin-reader-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/native35-physical-1f4f55c/artifacts/canonical-physical-controls/output/7-4.dsculpt"
+          ],
+          "exit": 0,
+          "seconds": 0.38010901800589636
+        },
+        {
+          "phase": "regressions",
+          "command": [
+            "ctest",
+            "--test-dir",
+            "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-owner-360f575/build-sanitize",
+            "--output-on-failure",
+            "-R",
+            "^(scene-authoring|scene-file|polygon-scene-archive|native-paint-key-frames|native-paint-rig-uv|rig-after-authoring|native-paint32-emission|native-paint32-emission-mixed)$"
+          ],
+          "exit": 0,
+          "seconds": 29.527867782046087
+        }
+      ],
+      "reader_logs": {
+        "reader-0-3": "PASS 105 lazy before-origin checks; origins=1 cancellations=3 allocation_prefixes=86\n",
+        "reader-7-4": "PASS 152 lazy before-origin checks; origins=1 cancellations=3 allocation_prefixes=133\n"
+      }
+    }
+  },
+  "negative": "artifacts/origin-reader-syntax/compile.log preserves missing test-only source-paint.hpp include; production TUs parsed, fixture corrected804 then exact syntax0.",
+  "invariants": [
+    "Old eager polygon decode remains unchanged and is the only old-format production path.",
+    "New reader resolves requested origins against real material prefix, preserves source IDs/typed pool identities and exact Paint/volume/model values.",
+    "Every cached origin hit checks exact material control block again; cycle and complete subtree height checks precede completed hits.",
+    "Reader retry, same-address foreign binding, cycle and shared-node depth controls pass. Measured persistent ordinary-new failures86+133 and callback cancellations3+3 per profile pass.",
+    "Four detached owner fixtures1259 checks/profile,267 persistent ordinary-new failures and588 callback cancellations remain green on fresh libraries.",
+    "Actual canonical native Convert/physical brush boundary accepts8M/four model slots; real ordered seam predicts8000128 and refuses before output-model copies.",
+    "All8 selected regressions pass/profile: scene-authoring,scene-file,polygon-scene-archive,native-paint-key-frames,native-paint-rig-uv,rig-after-authoring,native-paint32-emission,native-paint32-emission-mixed."
+  ],
+  "remaining": [
+    "Connected37 material19 owner/pool/context/writer/reader, total prospective resource closure and mixed36 roots",
+    "Actual native key-to-UV authority plus retained colour/float composition; raster colour3px strict2 negative remains outside this foundation",
+    "RepeatedUV/paint/Restore/nativeUI/projected/current-pose/cancel/queuedSave/hardware/currentGLB/VRM/package4",
+    "No main promotion/full regression or actual37 graphical admission"
+  ]
+}
