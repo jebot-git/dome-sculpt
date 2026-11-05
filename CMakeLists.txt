@@ -3904,3 +3904,11 @@ if(BUILD_TESTING)
   set_tests_properties(${anatomical_registered} PROPERTIES
     ENVIRONMENT "LIBGL_ALWAYS_SOFTWARE=1;LP_NUM_THREADS=2;XR_RUNTIME_JSON=${CMAKE_CURRENT_BINARY_DIR}/anatomical-no-physical-runtime.json")
 endif()
+
+if(BUILD_TESTING)
+  add_executable(dome-sculpt-canonical-key-uv-authority-test tests/canonical-key-uv-authority.cpp)
+  target_include_directories(dome-sculpt-canonical-key-uv-authority-test PRIVATE src)
+  target_link_libraries(dome-sculpt-canonical-key-uv-authority-test PRIVATE dome-sculpt-core)
+  add_test(NAME canonical-key-uv-authority COMMAND dome-sculpt-canonical-key-uv-authority-test ${CMAKE_CURRENT_BINARY_DIR}/canonical-key-uv-authority)
+  set_tests_properties(canonical-key-uv-authority PROPERTIES TIMEOUT 600 ENVIRONMENT "LIBGL_ALWAYS_SOFTWARE=1;XR_RUNTIME_JSON=${CMAKE_CURRENT_BINARY_DIR}/canonical-key-uv-no-physical-runtime.json")
+endif()
