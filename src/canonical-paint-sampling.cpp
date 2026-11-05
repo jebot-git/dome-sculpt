@@ -5,6 +5,7 @@
 #include "normal-frame-runtime.hpp"
 #include "source-paint-pairing.hpp"
 #include "canonical-key-uv.hpp"
+#include "normal-key-derivation.hpp"
 #include "paint-sampling-access.hpp"
 #include <cstring>
 namespace dome::detail {
@@ -52,11 +53,31 @@ void CanonicalPaintSampling::validate(const PaintSamplingLimits &limits,bool dee
 }
 void CanonicalPaintSampling::validate_binding(const SourceMaterialBindings &binding,bool deep) const{
  auto own=[](const auto &a,const auto &b){return a==b&&!a.owner_before(b)&&!b.owner_before(a);};
- if(!valid_owner(binding.canonical_paint_sampling)||binding.has_mtoon||binding.native_paint_sampling||binding.native_paint_frames||
-    binding.color_preparation||binding.normal_preparation||!own(binding.key_derivation,before_->material_bindings->key_derivation)||!binding.sampling_reparameterized||
-    !own(binding.canonical_uv,normal_uv_)||!own(binding.canonical_attributes,normal_uv_->origin())||
-    !own(binding.normal_frames,before_->material_bindings->normal_frames)||!own(binding.uv_origin,before_->material_bindings->uv_origin))
+ if(!before_||!before_->material_bindings||!attachment_||!valid_owner(binding.canonical_paint_sampling)||
+    binding.has_mtoon||binding.native_paint_sampling||binding.native_paint_frames||binding.color_preparation||binding.normal_preparation||
+    !binding.sampling_reparameterized||!own(binding.canonical_uv,normal_uv_)||!own(binding.canonical_attributes,normal_uv_->origin())||
+    !own(binding.uv_origin,before_->material_bindings->uv_origin)||binding.normal_frame!=before_->material_bindings->normal_frame)
   throw std::invalid_argument("Canonical writable paint binding lost its actual independent normal/paint source owners");
+ const auto &before=*before_->material_bindings;
+ const bool original=own(binding.key_derivation,before.key_derivation)&&own(binding.normal_frames,before.normal_frames);
+ if(!original){
+  // A later key owns CURRENT attribute authoring. It does not replace this
+  // immutable writable-UV transition or inherit its earlier normal frames.
+  const auto &key=binding.key_derivation;
+  if(!key||!key->valid_owner(key)||!key->before_material()||!key->before_paint()||!key->position_domain()||
+     !own(binding.normal_frames,key->frames())||!valid_owner(key->before_material()->canonical_paint_sampling)||
+     !own(key->before_material()->canonical_uv,normal_uv_)||!own(key->before_material()->canonical_attributes,normal_uv_->origin())||
+     !own(key->before_material()->uv_origin,binding.uv_origin)||!matches_current(*key->before_paint())||
+     !own(key->before_paint()->mesh_owner(),attachment_->authored_geometry())||
+     !own(key->position_domain()->current_geometry(),attachment_->authored_geometry()))
+   throw std::invalid_argument("Canonical current key lacks its exact captured writable and normal source context");
+  // Contextual proof is always real replay, including during a shallow caller
+  // validation. An equal address/FrameSet or a prior successful call is not a
+  // certificate for legally mutable target arrays or another owner context.
+  key->validate(true);
+  validate_current(*key->before_paint(),{},true);
+  normal_frame_current_authority(*key->before_material(),key->before_paint()->mesh(),key->before_deformation().get());
+ }
  validate({},deep);
 }
 void CanonicalPaintSampling::validate_current(const PaintedMesh &paint,const PaintSamplingLimits &limits,bool deep) const{
