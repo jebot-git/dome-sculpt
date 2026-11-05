@@ -1,3 +1,28 @@
+## Caller and real XR input admission — 2026-11-06
+
+Main integrates qualified0cbc089 on5b02bfc: atomic caller/frame retopology
+admission, no retired-workspace revival, actual XR button levels and history
+consumption across focus/reference changes. Each R/S profile passes native13442
+with710 persistent boundaries, distinct current worker/held/composed/authority
+controls, actual-loader161Apply+156Cancel and ordinary app58.44 native/sentinel
+pairs are exact. Root source parity and receipt/archive/file rehash review pass.
+Read RETOPO-CALLER-INTEGRATION.md and the original admission receipt for scope.
+This is a matched component/application qualification, not fresh ALL or physical
+headset/accelerator completion. Full goal, polygon fields, texture sets, remaining
+geometry/rig/avatar/interoperability and controller drawers remain required.
+
+## Private retopology caller/input qualification — 2026-11-05
+
+A matched current-main5b02 candidate repairs queued edits surviving caller
+publication refusal and retired-workspace view revival. R/S13442 native checks,
+710 caller denial boundaries, separately measured worker251/4308+42+97,
+held73/1419, composed1541, actual raw-Boolean XR317 and ordinary desktop/loader58
+per profile pass with exact source/history/Save controls. See
+RETOPO-CALLER-ADMISSION.md. This is private qualified integration, not main
+admission or completion of broader retopology/remeshing, authoring, interoperability,
+GPU/performance and physical-workflow requirements. Existing limits and default
+policies are unchanged.
+
 ## Explicit surface-heat binding admission — 2026-11-05
 
 Main admits exact6bcc91b/runtimebef5876 through9c72cc2: explicit SurfaceHeat5,

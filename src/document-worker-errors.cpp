@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/document.hpp"
+#include "document-retopo-input.hpp"
 #include "text-utf8.hpp"
 namespace dome {
 namespace {
@@ -101,6 +102,7 @@ void Document::retry_worker_notices_locked(bool input,bool native) noexcept {
     auto &notice=*pending;
     bool handled=false;
     try {
+      RetopoInputScope admission(*this,notice.input && bool(state_.retopology));
       const bool same_generation=notice.generation==state_.generation;
       const bool same_publication=notice.publication==published_.load();
       const bool same_actor=same_generation&&state_.object_grabbing&&
@@ -141,7 +143,7 @@ void Document::retry_worker_notices_locked(bool input,bool native) noexcept {
         if(notice.cancelled&&state_.message=="Cancelling background work...")state_.message="Export cancelled";
         publish_locked(false,false);
       }
-      handled=true;
+      admission.commit();handled=true;
     }catch(...){/* memory pressure: original record and worker remain live */}
     // Preserve the normal ready-future/native-status ordering. Under memory
     // pressure a failed publication must not strand the original exception.
