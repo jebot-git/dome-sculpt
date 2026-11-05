@@ -14,6 +14,13 @@ meanings and reject unsupported capabilities explicitly.
 | 39: polygon surface transfer | Reserved for the current normal/paint polygon conversion implementation in `work/owning37-main-9dd` | Material21, Paint6/domain3 if the actual representation needs them; finalize the typed definitions before enabling a codec. |
 | 40: same-mesh texture sets | Reserved for the texture-set implementation; not an object-picker alias | Paint7 for an actual membership envelope; Material22 if a new material envelope is needed. Existing nested records keep their own meanings. |
 
+PolygonSources8 is reserved for retaining actual texture sets in source origins;
+the version7 bake-recipe meaning stays intact. Polygon surface transfer may use
+PolygonSources9 if its trace/normal payload requires another capability. Its
+eventual composition must retain the explicit version8 set semantics. The shared
+texture-set controller panel uses page31/count32; older private references to
+pages31/32 are not current-main allocations.
+
 The existing FrameSet3 prototype only authorizes its stated baseline-expansion
 semantics. It does not by itself authenticate changed polygon topology, pose,
 normal fields, or writable-paint correspondence. New consumers may reuse a
