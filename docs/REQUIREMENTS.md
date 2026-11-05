@@ -1,3 +1,12 @@
+## Private affine retopology component — 2026-11-05
+
+Exact main10944 child now qualifies full-affine manual retopo geometry/native
+controls:587Release/587ownedSAN, eight native pairs byte-identical, no layout/
+format or archive change. Read RETOPO-AFFINE.md/receipt for scope and preserved
+failed originals. Immediate accepted-input-to-Save still has a genuine gap;
+the positive gated Save covers only later accepted AssetWork. No app/frontend/
+main admission or full-goal claim; other production rows remain required.
+
 ## Exhaustive private physical-package fault closure — 2026-11-05
 
 Private frozen1f9fd48/owning5df now closes all128 partitions/profile:90,261

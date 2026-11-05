@@ -4,6 +4,7 @@
 // Relax blend informed by VCGLib smooth.h, VertexCoordLaplacianBlend:
 // Copyright(C) 2004-2016 Visual Computing Lab, ISTI-CNR, GPL-2.0-or-later.
 #include "dome/retopo.hpp"
+#include "dome/affine.hpp"
 #include <bit>
 #include <limits>
 #include <nlohmann/json.hpp>
@@ -265,6 +266,34 @@ void RetopoMesh::move_vertex(TopologyID id, Vec3 p) {
   draft.vertices_.at(id).position = p;
   draft.validate();
   preserve_orientation(faces_, vertices_, draft.vertices_);
+  *this = std::move(draft);
+}
+void RetopoMesh::transform(const AffineTransform &matrix,
+                           const std::function<bool()> &cancelled) {
+  stop(cancelled);
+  validate(cancelled);
+  const auto orientation = matrix.orientation();
+  if (orientation == AffineOrientation::Singular)
+    throw std::invalid_argument("Retopology coordinate frame is singular");
+  RetopoMesh draft = *this;
+  for (auto &[id, vertex] : draft.vertices_) {
+    (void)id; stop(cancelled);
+    const auto p = vertex.position;
+    const auto q = matrix.point({p.x, p.y, p.z});
+    Vec3 next{float(q[0]), float(q[1]), float(q[2])};
+    if ((q[0] != 0 && next.x == 0) || (q[1] != 0 && next.y == 0) ||
+        (q[2] != 0 && next.z == 0))
+      throw std::invalid_argument("Retopology coordinate frame underflows float geometry");
+    position(next);
+    vertex.position = next;
+  }
+  if (orientation == AffineOrientation::Reversing)
+    for (auto &[id, face] : draft.faces_) {
+      (void)id; stop(cancelled);
+      std::reverse(face.vertices.begin() + 1, face.vertices.end());
+    }
+  draft.validate(cancelled);
+  stop(cancelled);
   *this = std::move(draft);
 }
 void RetopoMesh::set_pinned(TopologyID id, bool value) {
