@@ -1,6 +1,7 @@
 ## Unqualified owning37 source composition — 2026-11-05
 
-This private continuation merges current main9dd63f9 with admission candidate93c1fad
+This private continuation now also merges admitted affine polygon mainc55dc2f
+on top of main9dd63f9, admission candidate93c1fad and historical key seal508338c4
 by real history. It retains the current affine retopology, ordered Save, held-input
 admission repair, visible markers, worker publication repair and active avatar
 assertions, plus the canonical-paint/material/physical-package component sources.
@@ -12,11 +13,26 @@ older support archives cannot qualify its public layout. Existing component
 results below remain scoped to their original source and binaries. Full goal
 active; no new main admission, installation, headset or session restart follows.
 
-The current polygon, automatic-weight and caller-input repairs are separate
-continuations. Merge their admitted current-main results before freezing the new
-owning build. Physical-package exhaustive parent results and all four fresh-caller key
+The admitted polygon source is now included. Automatic-weight and caller-input
+repairs remain separate continuations; merge their admitted current-main results
+before freezing the new owning build. Physical-package exhaustive parent results and all four fresh-caller key
 Create/Replace coverage aggregates have closed. Their actual receipts have been
 rehashed; original product scopes remain distinct from this unqualified tree.
+
+## Affine polygon admission — 2026-11-05
+
+Main now also admits qualified polygon/retopology composition8750f20 (runtime0567)
+via37c46b9, with exact source/header/test/CMake parity. True-affine polygon tools,
+held placement, source restoration and reflection-correct normals coexist with
+the admitted transactional retopology worker. Native248/profile,16 exact file
+pairs, ordinary normal+compact GUI77each/profile and actual Arc stereo flows pass.
+Read POLYGON-AFFINE-ADMISSION.md and its receipt. This is component qualification,
+not a fresh full-project build, physical headset test or full-goal completion.
+
+The caller-admission repair and automatic weights are separate continuations and
+must merge this current source before their final qualification. Remesh remains
+private until its frozen sweep and coherent integration close. Older private
+entries below retain their historical scope; the full goal remains active.
 
 ## Current production admission — 2026-11-05
 

@@ -40,3 +40,14 @@ interoperability, device and accelerator obligations remain. No installation,
 headset launch or session restart is performed.
 
 See [the composition receipt](validation/OWNING37-CURRENT-MAIN-COMPOSITION.json).
+
+## Admitted polygon source included
+
+This continuation now merges mainc55dc2f after the key framework integration.
+Admitted polygon provider bodies and the Document header remain exact main;
+Document.cpp combines those gates with owning37 guards. The real material owner
+append remains1704bytes, while Document6968, EditorState1896 and Scene72 stay
+unchanged. Updated headless configuration has1214 unique registrations. No merged
+product is compiled or executed; current weighting and caller-input admissions
+still precede the fresh owning build. Read
+[the source composition receipt](validation/OWNING37-POLYGON-SOURCE-COMPOSITION.json).

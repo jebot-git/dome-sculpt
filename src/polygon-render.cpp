@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/polygon-render.hpp"
+#include "dome/affine.hpp"
 #include <limits>
 namespace dome {
 namespace {
@@ -21,7 +22,7 @@ float linear(float x) {
   return x <= .04045f ? x / 12.92f : std::pow((x + .055f) / 1.055f, 2.4f);
 }
 struct GLState {
-  GLint program = 0, vao = 0, array = 0, depth_function = 0;
+  GLint program = 0, vao = 0, array = 0, depth_function = 0,front_face=GL_CCW;
   GLboolean depth_mask;
   bool depth, blend, cull, offset, points, srgb;
   GLfloat factor, units, point_size, line_width;
@@ -30,6 +31,7 @@ struct GLState {
     glGetIntegerv(GL_VERTEX_ARRAY_BINDING, &vao);
     glGetIntegerv(GL_ARRAY_BUFFER_BINDING, &array);
     glGetIntegerv(GL_DEPTH_FUNC, &depth_function);
+    glGetIntegerv(GL_FRONT_FACE,&front_face);
     glGetBooleanv(GL_DEPTH_WRITEMASK, &depth_mask);
     depth = glIsEnabled(GL_DEPTH_TEST);
     blend = glIsEnabled(GL_BLEND);
@@ -59,6 +61,7 @@ struct GLState {
     restore(GL_PROGRAM_POINT_SIZE, points);
     restore(GL_FRAMEBUFFER_SRGB, srgb);
     glDepthFunc(depth_function);
+    glFrontFace(GLenum(front_face));
     glDepthMask(depth_mask);
     glPolygonOffset(factor, units);
     glPointSize(point_size);
@@ -121,10 +124,11 @@ PolygonRenderer::PolygonRenderer() {
  layout(location=2) in float selected;
  layout(location=3) in vec3 normal_coefficient;
  uniform mat4 object_to_clip,object_to_world;
+ uniform mat3 object_to_normal;
  uniform vec3 delta;
  uniform float point_size;
  out vec3 world_normal,world_position;
- void main(){vec3 p=position+delta*selected;gl_Position=object_to_clip*vec4(p,1);world_position=(object_to_world*vec4(p,1)).xyz;vec3 n=normal+cross(delta,normal_coefficient);world_normal=mat3(object_to_world)*(dot(n,n)>0?n:normal);gl_PointSize=point_size;}
+ void main(){vec3 p=position+delta*selected;gl_Position=object_to_clip*vec4(p,1);world_position=(object_to_world*vec4(p,1)).xyz;vec3 n=normal+cross(delta,normal_coefficient);world_normal=object_to_normal*(dot(n,n)>0?n:normal);gl_PointSize=point_size;}
  )GLSL";
   static const char *fragment = R"GLSL(#version 330 core
  in vec3 world_normal,world_position;
@@ -217,6 +221,13 @@ void PolygonRenderer::draw(const PolygonView &view,
                        view.move_delta.z != 0))
     throw std::invalid_argument(
         "Polygon displacement requires an active move preview");
+  const AffineTransform placement(world);
+  const auto reflected=placement.orientation()==AffineOrientation::Reversing;
+  std::array<float,9> normals{};
+  for(size_t c=0;c<3;++c){AffineVector basis{};basis[c]=1;auto column=placement.normal(basis);
+    for(size_t r=0;r<3;++r){normals[c*3+r]=float(column[r]);
+      if(!std::isfinite(normals[c*3+r])||(column[r]!=0&&normals[c*3+r]==0))
+        throw std::overflow_error("Polygon normal placement exceeds shader precision");}}
   static_assert(sizeof(Vec3) == 3 * sizeof(float));
   GLState restore;
   const auto &mesh = view.surface->mesh;
@@ -316,6 +327,8 @@ void PolygonRenderer::draw(const PolygonView &view,
                      GL_FALSE, clip.data());
   glUniformMatrix4fv(glGetUniformLocation(program_, "object_to_world"), 1,
                      GL_FALSE, world.data());
+  glUniformMatrix3fv(glGetUniformLocation(program_,"object_to_normal"),1,GL_FALSE,normals.data());
+  glFrontFace(reflected?GL_CW:GL_CCW);
   glUniform3f(glGetUniformLocation(program_, "delta"), view.move_delta.x,
               view.move_delta.y, view.move_delta.z);
   glUniform1f(glGetUniformLocation(program_, "point_size"), point_size);

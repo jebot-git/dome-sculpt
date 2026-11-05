@@ -1,0 +1,240 @@
+{
+  "status": "source composition and own-header layout only; runtime unqualified until authorized firstRelease cohort",
+  "main": "1a70f2afe46b37a30079bcf8667127154065fd5a",
+  "qualified_polygon": "1e8c84dd48a9e4bdf01b923d3dc2a58e71c57f6b",
+  "actual_layout": {
+    "scope": "Own-header constantassembly only; no executable, archive, object or mixed-header run",
+    "rows": [
+      {
+        "label": "main1a70-v2",
+        "command": [
+          "c++",
+          "-std=c++20",
+          "-O3",
+          "-S",
+          "-I/home/blux/de-xr/dome-sculpt/include",
+          "-I/home/blux/de-xr/dome-sculpt/third_party/openbrush",
+          "-I/home/blux/de-xr/dome-sculpt/third_party/nlohmann",
+          "/home/blux/de-xr/dome-sculpt/artifacts/polygon-affine-main-1a70/artifacts/integration-plan/layout.cpp",
+          "-o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/polygon-affine-main-1a70/artifacts/integration-plan/main1a70-v2.s"
+        ],
+        "exit": 0,
+        "header_sha256": "3b65f782b9c1072b326eda0304167ae5c4f373a2f3106a69a6f355b340f6a7e6",
+        "values": {
+          "Document_size": 6968,
+          "Document_align": 8,
+          "EditorState_size": 1896,
+          "EditorState_align": 8,
+          "Scene_size": 72,
+          "Scene_align": 8,
+          "PolygonJob_size": 96,
+          "PolygonJob_align": 8,
+          "PolygonAccept_size": 344,
+          "PolygonAccept_align": 8,
+          "RetopoJob_size": 72,
+          "RetopoJob_align": 8,
+          "RetopoAcceptance_size": 112,
+          "RetopoAcceptance_align": 8,
+          "Polygon_jobs_offset": 4536,
+          "Retopo_jobs_offset": 4768,
+          "Polygon_accept_offset": 4424,
+          "Retopo_pending_offset": 4672
+        }
+      },
+      {
+        "label": "combined-v2",
+        "command": [
+          "c++",
+          "-std=c++20",
+          "-O3",
+          "-S",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/polygon-affine-main-1a70/include",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/polygon-affine-main-1a70/third_party/openbrush",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/polygon-affine-main-1a70/third_party/nlohmann",
+          "/home/blux/de-xr/dome-sculpt/artifacts/polygon-affine-main-1a70/artifacts/integration-plan/layout.cpp",
+          "-o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/polygon-affine-main-1a70/artifacts/integration-plan/combined-v2.s"
+        ],
+        "exit": 0,
+        "header_sha256": "c53b6facf138d28f12fb7d7e3ac18213ebb671b8f038f0483fbee84e426e778a",
+        "values": {
+          "Document_size": 6968,
+          "Document_align": 8,
+          "EditorState_size": 1896,
+          "EditorState_align": 8,
+          "Scene_size": 72,
+          "Scene_align": 8,
+          "PolygonJob_size": 232,
+          "PolygonJob_align": 8,
+          "PolygonAccept_size": 360,
+          "PolygonAccept_align": 8,
+          "RetopoJob_size": 72,
+          "RetopoJob_align": 8,
+          "RetopoAcceptance_size": 112,
+          "RetopoAcceptance_align": 8,
+          "Polygon_jobs_offset": 4536,
+          "Retopo_jobs_offset": 4768,
+          "Polygon_accept_offset": 4424,
+          "Retopo_pending_offset": 4672
+        }
+      }
+    ],
+    "equal_public_and_outer_offsets": true,
+    "combined_polygon_payload_expected": true,
+    "exit": 0
+  },
+  "source_body_closure": {
+    "RetopoJob_equal_main": true,
+    "RetopoAcceptance_equal_main": true,
+    "PolygonJob_equal_qualified_polygon": true,
+    "PolygonAccept_equal_qualified_polygon": true,
+    "header_equals_main_after_removing_only_two_polygon_payload_additions": true,
+    "unchanged_main_bodies": {
+      "src/document-retopo.cpp": true,
+      "src/document-baking.cpp": true,
+      "src/render.cpp": true,
+      "src/retopo.cpp": true,
+      "src/retopo-authoring.cpp": true,
+      "include/dome/retopo.hpp": true,
+      "tests/avatar.cpp": true
+    },
+    "unchanged_qualified_polygon_bodies": {
+      "src/document-polygon.cpp": true,
+      "src/polygon-authoring.cpp": true,
+      "src/polygon-conversion.cpp": true,
+      "src/polygon-render.cpp": true,
+      "src/desktop-framing.hpp": true,
+      "src/polygon-view-state.hpp": true,
+      "src/polygon-view-render.hpp": true,
+      "src/polygon-affine.hpp": true,
+      "src/polygon-conversion.hpp": true,
+      "src/app.cpp": true,
+      "src/xr.cpp": true
+    },
+    "merged_document_cpp_equals_main_plus_only_can_polygon_adapter": true
+  },
+  "actual_nm_input_count": 99,
+  "actual_nm_payload_units": {
+    "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/handoff-proof/release/document.cpp.o": [
+      "document.cpp.o"
+    ],
+    "/home/blux/de-xr/dome-sculpt/artifacts/retopo-input-a852/artifacts/held-proof/release-sample-v2/document-retopo.cpp.o": [
+      "document-retopo.cpp.o"
+    ],
+    "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-preflight-qualified-0b6/artifacts/final-preflight/release/stage/libdome-sculpt-core.a": [
+      "document-polygon.cpp.o",
+      "document-retopo.cpp.o",
+      "document.cpp.o"
+    ],
+    "/home/blux/de-xr/dome-sculpt/artifacts/polygon-affine-10944/artifacts/affine-proof/release-capability/document-polygon.cpp.o": [
+      "document-polygon.cpp.o"
+    ],
+    "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/handoff-proof/sanitize/document.cpp.o": [
+      "document.cpp.o"
+    ],
+    "/home/blux/de-xr/dome-sculpt/artifacts/retopo-input-a852/artifacts/held-proof/sanitize-sample-v2/document-retopo.cpp.o": [
+      "document-retopo.cpp.o"
+    ],
+    "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-preflight-qualified-0b6/artifacts/final-preflight/sanitize/stage/libdome-sculpt-core.a": [
+      "document-polygon.cpp.o",
+      "document-retopo.cpp.o",
+      "document.cpp.o"
+    ],
+    "/home/blux/de-xr/dome-sculpt/artifacts/polygon-affine-10944/artifacts/affine-proof/sanitize-capability/document-polygon.cpp.o": [
+      "document-polygon.cpp.o"
+    ]
+  },
+  "full_nm_SHA_audit": "/home/blux/de-xr/dome-sculpt/artifacts/polygon-affine-main-1a70/artifacts/integration-plan/source-object-audit.json",
+  "full_nm_SHA_audit_sha256": "84ae6e97c1474a629c1da40b0c079a52ae69573198818b0795bcc8c925a7b774",
+  "retained_whole_main_TUs": [
+    "document-retopo.cpp",
+    "document-baking.cpp",
+    "retopo.cpp",
+    "retopo-authoring.cpp",
+    "render.cpp marker implementation"
+  ],
+  "retained_whole_polygon_TUs": [
+    "document-polygon.cpp",
+    "polygon-authoring.cpp",
+    "polygon-conversion.cpp",
+    "polygon-render.cpp",
+    "app.cpp with exact qualified preview/framing inline headers",
+    "xr.cpp with exact qualified affine preview inline header"
+  ],
+  "fresh_whole_product_TUs": [
+    "document.cpp (merged wholebody, both private payload constructors/destructors)"
+  ],
+  "fresh_consumer": "tests/polygon-retopo-affine.cpp",
+  "reuse_rules": [
+    "All reused complete object/archive SHA pinned; no archive copies or partial production functions.",
+    "No old Document.cpp weak constructor/destructor or replaced archive member may be extracted.",
+    "RetopoJob andAcceptance definitions identical currentmain; PolygonJob andAccept definitions identical qualifiedpolygon. Header changes do not alter any outer Document field declaration.",
+    "DocPolygon instantiates only exact qualifiedPolygon payload; DocRetopo instantiates only exact mainRetopo payload. App/XR/marker/frontend objects reference neither nested payload; outofline ctor/dtor resolves fresh whole Document.cpp.",
+    "EditorState/Scene layouts unchanged; actual public sizes and representative outer offsets equal in samecompiler own-header assembly."
+  ],
+  "first_Release_authorization": {
+    "cumulative_cap_bytes": 214748364,
+    "minimum_actual_free_bytes": 21474836480,
+    "fresh_doc_compile_prospective_bytes": 8388608,
+    "fresh_test_compile_prospective_bytes": 8388608,
+    "each_link_hardlimit_bytes": 25165824,
+    "expected_additional_allocated_bytes": 46137344,
+    "archive_copy_bytes": 0,
+    "GPU": false,
+    "full_build": false
+  },
+  "sanitizer_proposal_HELD": {
+    "fresh_doc_actual_prior_bytes": 34722952,
+    "fresh_consumer_estimate_bytes": 12582912,
+    "compressed_app_hardlimit_proposal_bytes": 402653184,
+    "compressed_consumer_hardlimit_proposal_bytes": 369098752,
+    "expected_additional_actual_bytes": 754974720,
+    "conservative_additional_bytes": 859832320,
+    "cumulative_cap_proposal_bytes": 1073741824,
+    "authorization": "NOT granted; stop afterRactualgrowth/outcome and reconcile shared free-space floor with coordinator"
+  },
+  "semantic_matrix": [
+    {
+      "gate": "fresh native firstRelease",
+      "checks": [
+        "bothoperationorders; shear/reflection +realnativepose/skin/morph andsparsepaint",
+        "entry/edit/pointer/heldCancel; modeexclusivity andexactunchangedauthority",
+        "actualApply/immediateSave/reopen/globalUndoRedo",
+        "retopo\u2192polygon conversion/edit\u2192sourceRestore withseparate trueRestore andconversion history",
+        "bothprivatequeue/constructor/destructor paths inoneprocess"
+      ]
+    },
+    {
+      "gate": "held sanitized counterpart afterreview",
+      "checks": [
+        "same nativebody andexactR/Snativefilepairs",
+        "matched noleak/UBsan suppression",
+        "retopo pendingApply andqueuedCancel/Save independent-input gate, full existing persistent heldprefix controls inone matchingconsumer where feasible"
+      ]
+    },
+    {
+      "gate": "actual ordinary apps afterreview",
+      "checks": [
+        "normal and640x360bitmap32 dialogs; bothworkspace orders inoneapplication",
+        "real mouse/joystick andno carried gesture; heldsource Cancel/Apply",
+        "retopo marker visibility+polygon inverse-transpose/reflection preview coexistence",
+        "Save/reopen/sourceRestore andexactcurrentpaint/pose/origin data"
+      ]
+    },
+    {
+      "gate": "strict Arc aftersoftwareandrootlease",
+      "checks": [
+        "actualPCI03/renderD129/rdev/sysfs/openFD/ELFmaps",
+        "both realpreview paths/GLstate andsamebinarysoftware/UHD refusals; unchangedqualitylimits",
+        "synthetic runtimeonly, nophysicalHMD/computeclaim"
+      ]
+    }
+  ],
+  "original_failures": {
+    "layout_parser": "compiler0, observer first matched initfunction suffix; exact originalassembly/log preserved; v2 exactdata-label probe closes0",
+    "component_negatives": "all previous source/scoped failures preserved in original1e8c84d receipts; no relabelling"
+  },
+  "remesh_boundary": "Roottriangle-remesh-10944/b441 protectedfrozen source/support/sweeps untouched. Later plannedsemanticunion must preserve worldsolve\u2192exactinverse\u2192trueplacement/origin andwinding+seam0/2 correspondence. No remesh/sourcebody consumed now.",
+  "main_admission": false
+}

@@ -582,7 +582,7 @@ void Document::publish_locked(bool force,bool checkpoint) {
   if(state_.polygon_handoff&&(state_.polygon_handoff_generation!=state_.generation||state_.polygon_handoff_revision!=state_.revision||state_.polygon_handoff_object!=active.id||!object_editable_locked(active.id))) {
     state_.polygon_handoff.reset();state_.polygon_handoff_object=0;
   }
-  state_.can_polygon=!scene_.has_affine_placement(active.id)&&!state_.asset_busy&&!state_.recovery_busy&&!uv_&&!state_.retopology&&!state_.cut&&!import_view_&&object_editable_locked(active.id);
+  state_.can_polygon=!state_.asset_busy&&!state_.recovery_busy&&!uv_&&!state_.retopology&&!state_.cut&&!import_view_&&object_editable_locked(active.id);
   state_.polygon_requires_conversion=polygon_conversion_required(active);
   state_.polygon_has_source=active.polygon&&bool(active.polygon->origin);
   state_.project_path = path_;

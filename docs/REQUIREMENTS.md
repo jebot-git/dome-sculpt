@@ -7,6 +7,17 @@ fresh owning consumers. Keep older component proofs scoped to their original
 bytes. Current polygon/weights/caller repairs and every unfinished requirement
 remain required before production admission. Read HANDOFF.md.
 
+## Affine polygon and retopology admission — 2026-11-05
+
+Main admits exact qualified8750f20/runtime0567 via37c46b9: true-affine polygon
+editing and source restoration with the current transactional retopology worker.
+Native248/profile,16 byte-identical native pairs, ordinary FLTK77normal+77compact
+per profile and actual Arc stereo workflows pass. Private polygon payload sizes
+are handled by their complete matched providers; outer public sizes and scene
+format remain unchanged. Read POLYGON-AFFINE-ADMISSION.md and its receipt for the
+component scope. Full-project, caller/weights/remesh integration, physical-device,
+interoperability and accelerator requirements remain open; full goal active.
+
 ## Worker publication admission — 2026-11-05
 
 Main admits the exact68daffe worker product body: detached retopology geometry
