@@ -13,7 +13,7 @@ struct AnatomicalSkinOptions {
 };
 struct SkinAuthoringOptions {
   uint64_t reference = 0;
-  SkinAuthoringMode mode = SkinAuthoringMode::SurfaceHeat;
+  SkinAuthoringMode mode = SkinAuthoringMode::Automatic;
   WeightLimits limits{};
   // Distances are world metres, independent of object/group scale.
   float seed_distance = .3f, seed_margin = .01f, falloff = 2;

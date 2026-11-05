@@ -1,3 +1,29 @@
+## Private explicit5/default0 phase1 closed — 2026-11-05
+
+Automatic0 remains the public/newDocument default. Current source compiles seven
+full TUs/profile and relinks matching whole apps before immutable main0 supports;
+no old5 objects or archive copies. Legacy38/136/85, native25, head18 and actual
+component/mixed worker controls pass each R/S. OriginalR/S controller fixture
+endpoint mismatch is retained; after original jobs close, corrected test selects
+actual Transfer index1 and verifies default0/range with all history checks. This
+is a composed scoped closure, not an initial all-green/fullALL result. No source/
+archive/input drift or sanitizer diagnostics. Actual descendant GUI, broader5
+quality/factory and complex37/38 support remain. Read MODE5-OPTIN0-PHASE1.md/receipt.
+All phase1 jobs closed; no main/default promotion, GPU/HMD/session/install.
+
+## Active explicit-opt-in0 integration WIP — 2026-11-05
+
+This descendant of unpublished exact5 merge71cf preserves main Automatic0 and
+makes method5 explicit in its own fixtures/GUI. Algorithm sources remaine06;
+the public header extension adds enum5/API with identical existing fields and
+initializer0. Old default5 object/GUI evidence is not current qualification.
+Before compilation, audit actual main0 header/dependency semantics and reuse only
+immutable matching main0 support/frontend objects; replace all7 changed complete
+product TUs/profile. Plan/space guard is artifacts/mode5-integration/
+OPTIN0-BUILD-PROPOSAL.json. Actual current qualification is pending; no main push,
+default promotion, archive copies or product build has started. All original
+negative/unsupported complex37/38 scopes and the full objective remain.
+
 ## Unpublished exact mode5 integration option — 2026-11-05
 
 This private merge combines public10944ab with qualified d464/516/e06 and keeps

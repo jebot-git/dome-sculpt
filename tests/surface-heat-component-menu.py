@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Actual FLTK default heat binding on private Xvfb/bus; no physical XR."""
+"""Actual FLTK explicit surface heat binding on private Xvfb/bus; no physical XR."""
 import asyncio,json,os,signal,subprocess,sys,tempfile,time,shutil,hashlib
 from pathlib import Path
 from dbus_next import Variant
@@ -62,6 +62,28 @@ async def main():
    g=w.get_geometry();xtest.fake_input(d,X.MotionNotify,x=g.x+int(x),y=g.y+int(y));xtest.fake_input(d,X.ButtonPress,1);xtest.fake_input(d,X.ButtonRelease,1);d.sync()
   def picture(w,name):
    g=w.get_geometry();raw=w.get_image(0,0,g.width,g.height,X.ZPixmap,0xffffffff);Image.frombytes('RGB',(g.width,g.height),raw.data,'raw','BGRX').save(OUT/name)
+  async def select_surface_heat(editor):
+   # Canonical normal and explicit16px*2 BDF test profiles match the actual
+   # skin-editor row geometry. Choose the visible native menu, not a hook.
+   row=46 if COMPACT else 32
+   old=set()
+   for child in d.screen().root.query_tree().children:
+    try:
+     if child.get_attributes().map_state==X.IsViewable:old.add(child.id)
+    except error.BadWindow:pass
+   g=editor.get_geometry();tap(editor,g.width*.72,row*3+(row-4)/2)
+   def popup():
+    for child in d.screen().root.query_tree().children:
+     try:
+      a=child.get_attributes();box=child.get_geometry()
+      if child.id not in old and a.map_state==X.IsViewable and a.override_redirect and box.width>100 and box.height>=64:return child
+     except error.BadWindow:pass
+   menu_window=await wait(popup);picture(menu_window,'explicit-method-menu.png');box=menu_window.get_geometry();tap(menu_window,box.width/2,box.height-8)
+   def closed():
+    try:return menu_window.get_attributes().map_state!=X.IsViewable
+    except error.BadWindow:return True
+   await wait(closed);picture(editor,'explicit-surface-heat.png')
+   check(True,'Actual native Method menu explicitly selects additive SurfaceHeat5; main default0 is retained')
   async def ready():
    for _ in range(1500):
     nodes=await layout()
@@ -76,9 +98,9 @@ async def main():
    for _ in range(22):xtest.fake_input(d,X.MotionNotify,x=g.x+g.width-10,y=g.y+80);xtest.fake_input(d,X.ButtonPress,5);xtest.fake_input(d,X.ButtonRelease,5)
    d.sync();await asyncio.sleep(.2);picture(editor,'scrolled-options.png')
   key('Return');await wait(lambda:named('Bind or transfer skin') is None);await command('Save');check(inspect()['scene']==original,'Initial Return cancels default options with complete Scene retained')
-  await command('Bind or transfer skin...');editor=await wait(lambda:named('Bind or transfer skin'));editor.set_input_focus(X.RevertToParent,X.CurrentTime);d.sync();g=editor.get_geometry();tap(editor,g.width*.7,g.height-40);await wait(lambda:named('Bind or transfer skin') is None);await command('Save');await ready();bound=inspect();(OUT/'bound-witness.json').write_text(json.dumps({**{k:v for k,v in bound.items() if k!='scene'},'scene_sha256':hashlib.sha256(json.dumps(bound['scene'],sort_keys=True,separators=(',',':')).encode()).hexdigest()},indent=2));shutil.copyfile(project,OUT/'bound.dsculpt')
-  check(bound['skinned'] and bound['foreign_weight']==0 and bound['field_matches'],'Actual default FLTK Apply executes surface heat with the independently qualified exact current component field')
-  check(bound['max_pose_m']<3e-5,'Actual saved default matches independent LBS/IBM/current-pose and new-pose active-morph oracle')
+  await command('Bind or transfer skin...');editor=await wait(lambda:named('Bind or transfer skin'));editor.set_input_focus(X.RevertToParent,X.CurrentTime);d.sync();await select_surface_heat(editor);g=editor.get_geometry();tap(editor,g.width*.7,g.height-40);await wait(lambda:named('Bind or transfer skin') is None);await command('Save');await ready();bound=inspect();(OUT/'bound-witness.json').write_text(json.dumps({**{k:v for k,v in bound.items() if k!='scene'},'scene_sha256':hashlib.sha256(json.dumps(bound['scene'],sort_keys=True,separators=(',',':')).encode()).hexdigest()},indent=2));shutil.copyfile(project,OUT/'bound.dsculpt')
+  check(bound['skinned'] and bound['foreign_weight']==0 and bound['field_matches'],'Actual explicit FLTK Apply executes surface heat with the independently qualified exact current component field')
+  check(bound['max_pose_m']<3e-5,'Actual saved opt-in field matches independent LBS/IBM/current-pose and new-pose active-morph oracle')
   if initial['case']=='mixed':check(bound['blended_rows']==81,'Actual combined Head/Eye plus generic actor retains all81 genuinely blended heat rows')
   check(bound['retained_exact'],'Actual bind preserves complete reference/paint/UV/morph/placement and adds only rig/skin/capsule')
   await command('Undo');await command('Save');check(inspect()['scene']==original,'Exactly one universal Undo restores complete unskinned original')

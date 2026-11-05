@@ -41,7 +41,7 @@ int main(int argc,char**argv)try{
  for(auto&o:input.objects())if(o.deformation&&o.deformation->skeleton)reference=o.id;
  for(auto&o:input.objects())if(o.mesh_active&&o.painted&&o.appearance)ids.push_back(o.id);
  check(reference&&ids.size()==19,"Actual unskinned current reference and explicit full nineteen-target request");
- Document doc;doc.replace(input);doc.select_objects(ids);check(doc.wait_mesh(std::chrono::seconds(120)),"Actual viewed native source mesh fence ready");
+ Document doc;doc.replace(input);check(doc.frame().state->skin_options.mode==SkinAuthoringMode::Automatic,"Actual new Document preserves the existing Automatic0 default");doc.select_objects(ids);check(doc.wait_mesh(std::chrono::seconds(120)),"Actual viewed native source mesh fence ready");
  auto live=doc.frame().surface;check(live&&!live->ranges.empty(),"Real native frame owns source markers before capture");
  const auto before=doc.copy_scene();
  auto expected=before;
