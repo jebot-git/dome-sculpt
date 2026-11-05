@@ -37,6 +37,38 @@ double matcap_margin(const J &expressions,const SculptObject &object,
  if(error>=3./255)throw std::invalid_argument("VRM1 MatCap float composition exceeds fixed portable budget");
  return error;
 }
+// Parametric Rim and MatCap share the real rim-multiply role. Their additive
+// terms remain independent from paint RGB. Bound the complete expression weight
+// box before allocating image scratch; the source coefficients are not clamped.
+double rim_margin(const J &expressions,const SculptObject &object,
+ Vrm1ExpressionLayer &stats,const SourceUvBakeOptions &limits,
+ const std::function<bool()> &cancelled){
+ const auto &binding=*object.material_bindings;const auto &factor=binding.material.parameters.rim_color;
+ const std::array<double,3> initial{factor.x,factor.y,factor.z};
+ bool relevant=initial!=std::array<double,3>{};
+ for(const char *table:{"preset","custom"})if(expressions.contains(table))for(const auto &expression:expressions.at(table)){
+  if(cancelled&&cancelled())throw std::runtime_error("VRM1 Rim parameter compilation cancelled");
+  if(expression.contains("materialColorBinds"))for(const auto &bind:expression.at("materialColorBinds"))if(bind.at("material").get<int>()==object.appearance->source_material&&bind.at("type")=="rimColor")relevant=true;
+ }
+ if(!relevant)return 0;
+ if(binding.material.parameters.alpha!=MToonAlpha::Opaque)throw std::invalid_argument("VRM1 masked Rim layers need their independent membership adapter");
+ if(stats.working_bytes>limits.max_working_bytes||64>limits.max_working_bytes-stats.working_bytes)throw std::length_error("VRM1 Rim prospective working limit exceeded");
+ stats.working_bytes+=64;auto low=initial,high=initial;
+ auto work=[&]{if(stats.sample_operations>limits.max_sample_operations||4>limits.max_sample_operations-stats.sample_operations)throw std::length_error("VRM1 Rim prospective parameter work limit exceeded");stats.sample_operations+=4;};
+ for(const char *table:{"preset","custom"})if(expressions.contains(table))for(const auto &expression:expressions.at(table)){
+  if(cancelled&&cancelled())throw std::runtime_error("VRM1 Rim parameter compilation cancelled");
+  work();std::array<double,3> delta{};
+  if(expression.contains("materialColorBinds"))for(const auto &bind:expression.at("materialColorBinds")){work();if(bind.at("material").get<int>()!=object.appearance->source_material||bind.at("type")!="rimColor")continue;for(size_t k=0;k<3;++k){const double target=bind.at("targetValue").at(k).get<double>();if(!std::isfinite(target)||std::abs(target)>1e20)throw std::invalid_argument("VRM1 Rim target exceeds finite source metadata bounds");delta[k]+=target-initial[k];}}
+  for(size_t k=0;k<3;++k){low[k]+=std::min(0.,delta[k]);high[k]+=std::max(0.,delta[k]);}
+ }
+ double maximum=0;for(size_t k=0;k<3;++k){if(!std::isfinite(low[k])||!std::isfinite(high[k])||low[k]<0||high[k]>1e20)throw std::invalid_argument("VRM1 Rim future coefficients need a nonnegative finite adapter");maximum=std::max(maximum,high[k]);}
+ // Tiny exponents use implementation-specific safety epsilons. Preserve the
+ // source and refuse that still unqualified model instead of changing its power.
+ if(maximum&&binding.material.parameters.rim_power<.0009765625f)throw std::invalid_argument("VRM1 Rim tiny exponent needs its independent model adapter");
+ const double error=32*std::numeric_limits<float>::epsilon()*1.25*maximum;
+ if(error>=3./255)throw std::invalid_argument("VRM1 Rim float composition exceeds fixed portable budget");
+ return error;
+}
 Pixel bilinear(const std::vector<Pixel> &values,uint32_t n,double u,double v){
  const double x=std::clamp(u,0.,1.)*n-.5,y=std::clamp(v,0.,1.)*n-.5;
  const int ix=int(std::floor(x)),iy=int(std::floor(y));const double a=x-ix,b=y-iy;
@@ -56,12 +88,11 @@ Vrm1ExpressionLayer compile_vrm1_expression_layer(const J &original,const Sculpt
  if(material.version()!=MToonVersion::V1||(!opaque&&!masked)||
     material.parameters.outline!=MToonOutline::None||material.parameters.scroll!=std::array<float,2>{}||material.parameters.rotation_speed!=0)
   throw std::invalid_argument("VRM1 expression layer currently requires opaque outline-free nonanimated MToon1 source");
- if(material.parameters.rim_color.x!=0||material.parameters.rim_color.y!=0||material.parameters.rim_color.z!=0)
-  throw std::invalid_argument("VRM1 rim expression layers need their independent lighting adapter");
  if(binding.normal_preparation||binding.color_preparation||binding.key_derivation||binding.physical_emission)
   throw std::invalid_argument("VRM1 prepared/absolute expression layers need their owning adapter");
- for(auto role:{MToonSlot::Normal,MToonSlot::Rim,MToonSlot::OutlineWidth,MToonSlot::Shift,MToonSlot::UvMask})
+ for(auto role:{MToonSlot::Normal,MToonSlot::OutlineWidth,MToonSlot::Shift,MToonSlot::UvMask})
   if(binding.roles[size_t(role)].image)throw std::invalid_argument("VRM1 expression layer role needs its independent consumer adapter");
+ if(masked&&binding.roles[size_t(MToonSlot::Rim)].image)throw std::invalid_argument("VRM1 masked Rim texture needs its independent membership adapter");
  const auto &base=binding.roles[0],&shade=binding.roles[1];const auto &bt=material.textures[0],&st=material.textures[1];
  Vrm1ExpressionLayer result;bool found=false,colour=false,same_target=true;
  result.shade_alias=base.image&&base.image==shade.image&&base.wrap_s==shade.wrap_s&&base.wrap_t==shade.wrap_t&&base.min_filter==shade.min_filter&&base.mag_filter==shade.mag_filter&&mtoon_coordinate(bt)==mtoon_coordinate(st)&&bt.offset==st.offset&&bt.scale==st.scale&&bt.rotation==st.rotation;
@@ -74,11 +105,10 @@ Vrm1ExpressionLayer compile_vrm1_expression_layer(const J &original,const Sculpt
  double alpha_low=initial_alpha,alpha_high=initial_alpha;
  const double cutoff=object.material.alpha_cutoff!=binding.native_reference.alpha_cutoff?object.material.alpha_cutoff:material.parameters.alpha_cutoff;
  const auto expressions=original.at("extensions").at("VRMC_vrm").value("expressions",J::object());
- const double matcap_error=matcap_margin(expressions,object,result,limits,cancelled);
+ const double additive_error=matcap_margin(expressions,object,result,limits,cancelled)+rim_margin(expressions,object,result,limits,cancelled);
  for(const auto *table:{"preset","custom"})if(expressions.contains(table))for(const auto &expression:expressions.at(table)){
   std::array<double,3> shade_delta{};double alpha_delta=0;
   for(const auto &bind:expression.value("materialColorBinds",J::array()))if(bind.at("material").get<int>()==object.appearance->source_material){
-   if(bind.at("type")=="rimColor")throw std::invalid_argument("VRM1 rim colour expression needs its layered lighting adapter");
    colour|=bind.at("type")=="color";
    if(masked&&bind.at("type")=="color"){const double alpha=bind.at("targetValue").at(3).get<double>();if(!std::isfinite(alpha)||std::abs(alpha)>1e20)throw std::invalid_argument("VRM1 mask colour target is outside finite source metadata bounds");alpha_delta+=alpha-initial_alpha;}
    if(bind.at("type")=="shadeColor"){const auto target=bind.at("targetValue").get<std::array<float,4>>();shade_factor({target[0],target[1],target[2]},false);if(result.shade_alias)for(size_t k=0;k<3;++k)shade_delta[k]+=(double(target[k])-initial_shade[k])/result.shade_divisor[k];}
@@ -119,6 +149,9 @@ Vrm1ExpressionLayer compile_vrm1_expression_layer(const J &original,const Sculpt
   bool invariant=result.shade_alias||invariant_image(shade,active_components({material.parameters.shade_color.x,material.parameters.shade_color.y,material.parameters.shade_color.z},"shadeColor"));
   const auto &emission=material.parameters.emission;std::array<float,3> effective{vrm_native_factor(emission.x,binding.native_reference.emission[0],object.material.emissive[0]),vrm_native_factor(emission.y,binding.native_reference.emission[1],object.material.emissive[1]),vrm_native_factor(emission.z,binding.native_reference.emission[2],object.material.emissive[2])};
   invariant=invariant&&(material.parameters.emission_strength==0||invariant_image(binding.roles[size_t(MToonSlot::Emission)],active_components(effective,"emissionColor")));
+  auto rim_active=active_components({material.parameters.rim_color.x,material.parameters.rim_color.y,material.parameters.rim_color.z},"rimColor");
+  if(binding.roles[size_t(MToonSlot::Matcap)].image){const auto matcap_active=active_components({material.parameters.matcap_color.x,material.parameters.matcap_color.y,material.parameters.matcap_color.z},"matcapColor");for(size_t k=0;k<3;++k)rim_active[k]=rim_active[k]||matcap_active[k];}
+  invariant=invariant&&invariant_image(binding.roles[size_t(MToonSlot::Rim)],rim_active);
   if(!invariant)throw std::invalid_argument(same_target?"VRM1 zero UV target couples moving upper roles to fixed paint":"VRM1 differing UV targets couple moving upper roles to fixed paint");
   result.forward_uv=false;result.scale={1,1};result.offset={};
  }
@@ -222,7 +255,7 @@ Vrm1ExpressionLayer compile_vrm1_expression_layer(const J &original,const Sculpt
    auto &maximum=k==3?result.maximum_coverage_error:result.maximum_color_error;maximum=std::max(maximum,error);
   }
  }}
- if(result.maximum_color_error+result.maximum_coverage_error>3./(255*lighting_bound)-matcap_error/lighting_bound)throw std::invalid_argument("VRM1 straight-alpha PNG reconstruction exceeds fixed portable expression-layer error budget: RGB="+std::to_string(result.maximum_color_error)+" coverage="+std::to_string(result.maximum_coverage_error)+" light="+std::to_string(lighting_bound));
+ if(result.maximum_color_error+result.maximum_coverage_error>3./(255*lighting_bound)-additive_error/lighting_bound)throw std::invalid_argument("VRM1 straight-alpha PNG reconstruction exceeds fixed portable expression-layer error budget: RGB="+std::to_string(result.maximum_color_error)+" coverage="+std::to_string(result.maximum_coverage_error)+" light="+std::to_string(lighting_bound));
  result.paint_coordinates.reserve(object.painted->mesh().uv.size());for(auto uv:object.painted->mesh().uv){stop();for(size_t k=0;k<2;++k){uv[k]=((support_reconstruction?float(uv[k]*image_scale+image_offset):uv[k])-result.offset[k])/result.scale[k];if(!std::isfinite(uv[k]))throw std::invalid_argument("VRM1 expression-layer carrier coordinate is nonfinite");}result.paint_coordinates.push_back(uv);}
  if(result.paint_coordinates.size()!=object.painted->mesh().positions.size())throw std::invalid_argument("VRM1 expression layer has no complete writable coordinate owner");
  // Bound ordinary F32 interpolation/scale/add cancellation relative to the
