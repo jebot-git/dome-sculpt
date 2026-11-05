@@ -1,5 +1,17 @@
 # Dome Sculpt production handoff
 
+## Current combined adapter qualification candidate — 2026-11-05
+
+This isolated candidate composes the qualified1f/aca/ccc authoring source,
+SKIN ee5, first-source Restore3ec, pure-skin UV d3, owned EXR e29/package3 and
+VRM invariant upper roles196, retaining current genuine canonical/native guards.
+Fresh whole-owned R/S application/core/render/support/consumer qualification is
+starting. The actual native32 skinned ordinary HDR refusal is captured explicitly
+before its adapter; no positive claim for that registered test or full734 suite.
+No new public layout/Scene version or main admission is included. Original full
+production, device/accelerator requirements and controller drawers remain open.
+
+
 ## Qualified combined authoring foundation — 2026-11-05
 
 Foundation4b37f11 completes fresh Release ALL1397 and owning SAN276 builds;
