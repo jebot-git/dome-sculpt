@@ -62,7 +62,7 @@ int main(int argc,char **argv)try{
   check((full?(denied&&successful):(denied+successful==end-begin))&&scene.encode()==exact,
    "All assigned calling-thread C++ prefixes retain exact file/source or complete successful package");
   if(!full){
-   if(captured->scene->encode()!=exact||creator_detail::sha256(bytes(argv[1]))!=evidence.at("fixture_sha256"))throw std::runtime_error("Allocation partition changed captured owner or input fixture");
+   if(captured->scene->encode()!=exact||creator_detail::sha256(bytes(argv[1]))!=evidence.at("fixture_sha256").get_ref<const std::string&>())throw std::runtime_error("Allocation partition changed captured owner or input fixture");
    evidence.update({{"begin",begin},{"end",end},{"completed",denied+successful},{"denied",denied},{"successful",successful},{"translated",translated},
     {"seconds",std::chrono::duration<double>(std::chrono::steady_clock::now()-started).count()},{"terminal_exit",0}});prefix_report(report_file,evidence);
   }
