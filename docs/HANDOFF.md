@@ -1,3 +1,24 @@
+## Private explicit SurfaceHeat5 integration candidate — 2026-11-05
+
+This private source merge combines qualified main `9dd63f9` with opt-in weights
+checkpoint `1e6d76d`. It preserves Automatic0 as the default and keeps method5
+explicit. Reserved2/3, existing methods, all resource/quality limits and complex
+prepared37/38 refusal guards remain unchanged. This candidate is not yet a
+qualified coherent application or main admission.
+
+The weight component passed current opt-in public/controller and independent
+pose checks, actual normal/compact FLTK, and complete real caller1052 and
+long-basename publication381 faults in Release and sanitizer profiles. See
+[complete admission evidence](MODE5-COMPLETE-ADMISSION.md) and its preceding
+phaseA/B/C receipts for exact scopes, original negatives and cost uncertainty.
+Those are component proofs, not fresh merged-ABI results.
+
+Main's affine retopology, visible markers, active avatar assertions and
+transactional worker remain intact below. The separately observed generic
+post-enqueue caller publication gap is not claimed fixed by direct skin caller
+coverage. Fresh merged Document/closure checks and coordinated coherent
+application qualification remain required. No default promotion is authorized.
+
 ## Current production admission — 2026-11-05
 
 Main integrates the qualified retopology worker publication repair from68daffe,

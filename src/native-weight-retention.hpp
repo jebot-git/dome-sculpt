@@ -95,6 +95,7 @@ struct Counter {
     else if(j.is_binary())add(j.get_binary().capacity()+64);
   }
   void material(const std::shared_ptr<const SourceMaterialBindings>&p){if(enter(p)){
+    unsupported(p->native_paint_frames,"Native surface weights require the retained native paint/frame closure adapter");
     unsupported(p->canonical_attributes,"Native anatomical budget requires its retained canonical attribute closure adapter");
     unsupported(p->canonical_uv,"Native anatomical budget requires its retained canonical UV closure adapter");
     unsupported(p->native_paint_sampling,"Native anatomical budget requires its retained native paint closure adapter");
