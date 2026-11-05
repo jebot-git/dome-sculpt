@@ -1,0 +1,169 @@
+{
+  "scope": "Same frozena4 product/current9a support, all550 actual closed-pivot factory allocation prefixesR/S; real solve every attempt+same-recipient retry. No whole19 allocation/main/default claim.",
+  "runtime": {
+    "state": "terminal",
+    "scope": "Every measured actual new closed-ocular factory allocation prefix, genuine preparation and same-recipient retry; no replay/whole19 helper claim",
+    "source_before": "24c871bba39a77581eb47b75962b8eb839f366e00f9c8281133fe80b7bbd4043",
+    "input": "/home/blux/de-xr/dome-sculpt/artifacts/weights-mode5-native-tests-9a08f5c/build-registration/anatomical-native/female/fitted-unskinned.dsculpt",
+    "input_before": "22e2b3dcd13e2646017a827abad0e79e720c6cbe9b2ebcba1185762b08e152e8",
+    "steps": [
+      {
+        "profile": "release",
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-mode5-closed-faults-a4a734d/artifacts/weights-mode5/release-closed-faults",
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-mode5-closed-faults-a4a734d/artifacts/weights-mode5/release-closed-faults-output"
+        ],
+        "exit": 0,
+        "seconds": 0.665963311039377,
+        "binary_before": "5cf308da7eb156fce8b0a1551e204e3c2426580f19d8278c679d21b083098f00",
+        "binary_after": "5cf308da7eb156fce8b0a1551e204e3c2426580f19d8278c679d21b083098f00"
+      },
+      {
+        "profile": "sanitize",
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-mode5-closed-faults-a4a734d/artifacts/weights-mode5/sanitize-closed-faults",
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-mode5-closed-faults-a4a734d/artifacts/weights-mode5/sanitize-closed-faults-output"
+        ],
+        "exit": 0,
+        "seconds": 5.876008613035083,
+        "binary_before": "a5cd9dd021a7fc21eb22ab9b4977ba532265b443bf4d92f1751b0ea5925ffef3",
+        "binary_after": "a5cd9dd021a7fc21eb22ab9b4977ba532265b443bf4d92f1751b0ea5925ffef3"
+      }
+    ],
+    "seconds": 6.454216163023375,
+    "exit": 0,
+    "source_drift": false,
+    "input_drift": false
+  },
+  "reports": {
+    "release": {
+      "all_actual_factory_prefixes": 550,
+      "preparation_replayed": false,
+      "same_recipient_real_retry": true,
+      "scene_atomic": true
+    },
+    "sanitize": {
+      "all_actual_factory_prefixes": 550,
+      "preparation_replayed": false,
+      "same_recipient_real_retry": true,
+      "scene_atomic": true
+    }
+  },
+  "build": {
+    "scope": "Fresh testTUs on exact matching9a/current615 fullchanged product closure+entire actual native app. No55objects/default admission.",
+    "source": "24c871bba39a77581eb47b75962b8eb839f366e00f9c8281133fe80b7bbd4043",
+    "steps": [
+      {
+        "profile": "release",
+        "compile": [
+          "/usr/bin/c++",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/weights-mode5-closed-faults-a4a734d/third_party/cgltf",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/weights-mode5-closed-faults-a4a734d/src",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/weights-mode5-closed-faults-a4a734d/include",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/weights-mode5-closed-faults-a4a734d/third_party/openbrush",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/weights-mode5-closed-faults-a4a734d/third_party/nlohmann",
+          "-O3",
+          "-DNDEBUG",
+          "-std=gnu++20",
+          "-o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-mode5-closed-faults-a4a734d/artifacts/weights-mode5/release-closed-faults.o",
+          "-c",
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-mode5-closed-faults-a4a734d/tests/surface-heat-closed-factory-faults.cpp"
+        ],
+        "link": [
+          "/usr/bin/c++",
+          "-O3",
+          "-DNDEBUG",
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-mode5-closed-faults-a4a734d/artifacts/weights-mode5/release-closed-faults.o",
+          "-o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-mode5-closed-faults-a4a734d/artifacts/weights-mode5/release-closed-faults",
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-mode5-closed-eye-99e4ae1/artifacts/weights-mode5/current-release/libdome-sculpt-core.a",
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-surface-mode5-615bd42/artifacts/weights-mode5/release/stage/libdome-sculpt-affine.a",
+          "/usr/lib64/liblapacke.so",
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-surface-mode5-615bd42/artifacts/weights-mode5/release/stage/libdome-sculpt-polygon.a",
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-surface-mode5-615bd42/artifacts/weights-mode5/release/stage/libxatlas.a",
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-surface-mode5-615bd42/artifacts/weights-mode5/release/stage/libmikktspace.a",
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-surface-mode5-615bd42/artifacts/weights-mode5/release/stage/libmikktspace-robust.a",
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-surface-mode5-615bd42/artifacts/weights-mode5/release/stage/libufbx.a",
+          "/usr/lib64/libpng.so",
+          "/usr/lib64/libjpeg.so",
+          "/usr/lib64/libz.so",
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-surface-mode5-615bd42/artifacts/weights-mode5/release/stage/libdome-sculpt-emission-codec.a",
+          "/usr/lib64/libOpenEXR-3_2.so",
+          "/usr/lib64/libOpenEXRUtil-3_2.so",
+          "/usr/lib64/libOpenEXRCore-3_2.so",
+          "/usr/lib64/libIex-3_2.so",
+          "/usr/lib64/libIlmThread-3_2.so",
+          "/usr/lib64/libImath-3_1.so",
+          "-lgcc_s_asneeded",
+          "-lgcc_s_asneeded"
+        ],
+        "exit": 0,
+        "phase": "link",
+        "seconds": 8.188752268033568,
+        "binary": "5cf308da7eb156fce8b0a1551e204e3c2426580f19d8278c679d21b083098f00"
+      },
+      {
+        "profile": "sanitize",
+        "compile": [
+          "/usr/bin/c++",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/weights-mode5-closed-faults-a4a734d/third_party/cgltf",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/weights-mode5-closed-faults-a4a734d/src",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/weights-mode5-closed-faults-a4a734d/include",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/weights-mode5-closed-faults-a4a734d/third_party/openbrush",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/weights-mode5-closed-faults-a4a734d/third_party/nlohmann",
+          "-O1",
+          "-g",
+          "-UNDEBUG",
+          "-fsanitize=address,undefined",
+          "-fno-omit-frame-pointer",
+          "-std=gnu++20",
+          "-o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-mode5-closed-faults-a4a734d/artifacts/weights-mode5/sanitize-closed-faults.o",
+          "-c",
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-mode5-closed-faults-a4a734d/tests/surface-heat-closed-factory-faults.cpp"
+        ],
+        "link": [
+          "/usr/bin/c++",
+          "-O1",
+          "-g",
+          "-UNDEBUG",
+          "-fsanitize=address,undefined",
+          "-fno-omit-frame-pointer",
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-mode5-closed-faults-a4a734d/artifacts/weights-mode5/sanitize-closed-faults.o",
+          "-o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-mode5-closed-faults-a4a734d/artifacts/weights-mode5/sanitize-closed-faults",
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-mode5-closed-eye-99e4ae1/artifacts/weights-mode5/current-sanitize/libdome-sculpt-core.a",
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-surface-mode5-615bd42/artifacts/weights-mode5/sanitize/stage/libdome-sculpt-affine.a",
+          "/usr/lib64/liblapacke.so",
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-surface-mode5-615bd42/artifacts/weights-mode5/sanitize/stage/libdome-sculpt-polygon.a",
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-surface-mode5-615bd42/artifacts/weights-mode5/sanitize/stage/libxatlas.a",
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-surface-mode5-615bd42/artifacts/weights-mode5/sanitize/stage/libmikktspace.a",
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-surface-mode5-615bd42/artifacts/weights-mode5/sanitize/stage/libmikktspace-robust.a",
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-surface-mode5-615bd42/artifacts/weights-mode5/sanitize/stage/libufbx.a",
+          "/usr/lib64/libpng.so",
+          "/usr/lib64/libjpeg.so",
+          "/usr/lib64/libz.so",
+          "/home/blux/de-xr/dome-sculpt/artifacts/weights-surface-mode5-615bd42/artifacts/weights-mode5/sanitize/stage/libdome-sculpt-emission-codec.a",
+          "/usr/lib64/libOpenEXR-3_2.so",
+          "/usr/lib64/libOpenEXRUtil-3_2.so",
+          "/usr/lib64/libOpenEXRCore-3_2.so",
+          "/usr/lib64/libIex-3_2.so",
+          "/usr/lib64/libIlmThread-3_2.so",
+          "/usr/lib64/libImath-3_1.so",
+          "-lgcc_s_asneeded",
+          "-lgcc_s_asneeded"
+        ],
+        "exit": 0,
+        "phase": "link",
+        "seconds": 20.196465989982244,
+        "binary": "a5cd9dd021a7fc21eb22ab9b4977ba532265b443bf4d92f1751b0ea5925ffef3"
+      }
+    ],
+    "exit": 0
+  },
+  "source": {
+    "tests/surface-heat-closed-factory-faults.cpp": "24c871bba39a77581eb47b75962b8eb839f366e00f9c8281133fe80b7bbd4043",
+    "tests/surface-heat-head-stress.cpp": "25aa1258402cdb0c0573a0aeea163edfb22d727ffb9a4fa91611051e24fb9cbc"
+  }
+}
