@@ -1,5 +1,37 @@
 # Full objective and completion evidence
 
+## Current production state — 2026-11-05
+
+Main includes qualified renderer79/controller55 and current headlessc28 evidence:
+headless198 optimized tasks and7/7 tests pass; FLTK remains default. The actual
+runtime font-discovery correctiona08 is already present. Main is not native36/37
+production admission or full-goal completion.
+
+Private HDR/key milestone d10855a (runtime68a11b0) now passes381 each Release,
+sanitizer andactualArc (115new+151key+115skin);72newGLBs have0KHRerrors, with all
+warnings/infos retained.30native/container triples are exact andR/S PNGs exact,
+Arcmax1. It extends genuine native36 frame/FLOAT paint and exact package3 target
+carrier verification; canonical/CPS/prepared/typed guards and package4 separation
+remain. See the private branch NATIVE-KEY-PHYSICAL-EXPORT.md/receipt.
+
+Combined sourcea0b8a37 keeps production/header bytes equalc31. OriginalSAN stops
+on a missingcgltf test include; originalRALL is deliberately interrupted130 for
+that evidenced build error, originals retained. After the include/test-only fixes,
+the same own build directories continue ReleaseALL and owningSAN/125 selected
+commands (766registered). NewSAN build andnative/compact/Wayland/syntheticXR65
+plusphysicalpaintGUI80 pass; selected125 andReleaseALL are still running. This
+is an explicit incremental continuation, not a green original invocation.
+
+Original olderfull689 now closes8: sampler209timeout (qualified renderer fix on
+main), controller439 stale report (qualified test fix onmain), canonical651
+segfault/652faults and656dependent-not-run. Private genuine37 codec cf4 passes
+260controls+8regressions eachR/S; exact retained-grid native/GLB prototypes repair
+the former3px paint loss to0 across9 poses, but current native/copy/fault/export
+admission remains work. MatCap expression work is independently qualifying;
+robust Automatic weights still have measured thin/disconnected/avatar quality
+gaps. Remaining authoring, device/accelerator requirements and later controller
+drawers remain required. No complete-suite or full-production claim follows.
+
 ## Qualified PBR renderer specialization — 2026-11-05
 
 Runtime79abe8e keeps authored sampling/math unchanged while specializing actual
