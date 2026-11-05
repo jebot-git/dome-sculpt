@@ -1,3 +1,19 @@
+## Current production admission — 2026-11-05
+
+Main integrates the qualified retopology worker publication repair from68daffe,
+on the admitted1a70 affine/ordered-Save/visible-marker foundation. Whole native
+Release/sanitizer fault, history and acceptance regressions plus58 matched
+ordinary Release application checks pass. Read
+[RETOPO-WORKER-PUBLICATION.md](RETOPO-WORKER-PUBLICATION.md) and
+[PRODUCTION-PROGRESS-2026-11-05.md](PRODUCTION-PROGRESS-2026-11-05.md).
+
+A separately reproduced caller-side post-enqueue publication failure remains
+open: caller refusal can leave an accepted Face command. Full production,
+interoperability, physical-device/accelerator and later controller-drawer targets
+remain required. Older private status entries below are historical evidence;
+this admission supersedes their retopology admission blockers only. No install,
+headset launch or session restart is part of this checkpoint.
+
 ## Private marker device closure — 2026-11-05
 
 Exacted5renderer andwhole55scenario consumer nowpass observedPCI03ArcA770 with

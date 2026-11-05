@@ -197,22 +197,19 @@ void Document::retopo_loop() {
         if (job.acceptance) throw std::runtime_error("Retopology acceptance cancelled");
         continue;
       }
-      if (job.initial) { workspace = std::make_unique<RetopoWorkspace>(*job.initial, cancelled); session = job.session; }
-      if (!workspace || session != job.session) throw std::logic_error("Retopology workspace is unavailable");
-      if (job.action) workspace->edit(*job.action, job.point, job.snap_mm, cancelled);
+      // Draft geometry and local history cannot advance before the immutable
+      // model publication succeeds, including failures after a real edit.
+      std::unique_ptr<RetopoWorkspace> candidate;
+      if (job.initial) candidate = std::make_unique<RetopoWorkspace>(*job.initial, cancelled);
+      else {
+        if (!workspace || session != job.session) throw std::logic_error("Retopology workspace is unavailable");
+        candidate = std::make_unique<RetopoWorkspace>(*workspace);
+      }
+      if (job.action) candidate->edit(*job.action, job.point, job.snap_mm, cancelled);
       if (job.accept) {
         if (!job.acceptance) throw std::logic_error("Retopology acceptance lost its ordered asset owner");
-        workspace->edit(RetopoAction::EndGesture, {}, job.snap_mm, cancelled);
-        if (workspace->view().topology->faces().empty()) throw std::logic_error("Make at least one face before applying the patch");
-        {
-          std::lock_guard lock(retopo_mutex_);
-          job.acceptance->topology = workspace->view().topology;
-          job.acceptance->source = workspace->source_object();
-          job.acceptance->transform = workspace->view().transform;
-          *job.acceptance->changed = workspace->view().changed;
-          job.acceptance->ready = true;
-        }
-        retopo_changed_.notify_all();
+        candidate->edit(RetopoAction::EndGesture, {}, job.snap_mm, cancelled);
+        if (candidate->view().topology->faces().empty()) throw std::logic_error("Make at least one face before applying the patch");
       }
       if (!job.acceptance && cancelled()) continue;
       std::lock_guard lock(model_mutex_);
@@ -224,11 +221,33 @@ void Document::retopo_loop() {
       --retopo_pending_;
       retired = true;
       if (cancelled()) continue;
-      auto view = std::make_shared<RetopoView>(workspace->view());
+      auto view = std::make_shared<RetopoView>(candidate->view());
       view->busy = retopo_pending_ != 0; view->committing = retopo_accepting_; view->snap_mm = retopo_snap_mm_;
-      state_.retopology = view;
-      state_.error.clear(); state_.message.clear();
-      publish_locked();
+      const auto previous = state_.retopology;
+      auto previous_error = state_.error, previous_message = state_.message;
+      try {
+        state_.retopology = std::move(view);
+        state_.error.clear(); state_.message.clear();
+        publish_locked();
+      } catch (...) {
+        state_.retopology = previous;
+        state_.error = std::move(previous_error); state_.message = std::move(previous_message);
+        throw;
+      }
+      // Swap without destroying the old BVH/history under the model lock.
+      // candidate is destroyed after this lock guard leaves scope.
+      workspace.swap(candidate); session = job.session;
+      if (job.acceptance) {
+        // Only hand the file owner a draft whose immutable view succeeded.
+        // A failed preview must fail the dependent Save, retaining the exact
+        // pre-Apply workspace (including any unfinished held gesture).
+        std::lock_guard input_lock(retopo_mutex_);
+        job.acceptance->topology = workspace->view().topology;
+        job.acceptance->source = workspace->source_object();
+        job.acceptance->transform = workspace->view().transform;
+        *job.acceptance->changed = workspace->view().changed;
+        job.acceptance->ready = true;
+      }
     } catch (const std::exception &e) {
       if (job.acceptance) {
         {
@@ -247,12 +266,18 @@ void Document::retopo_loop() {
       }
       std::lock_guard lock(model_mutex_);
       if (cancelled() || !state_.retopology) continue;
-      if (retopo_pending_) --retopo_pending_;
+      if (!retired && retopo_pending_) --retopo_pending_;
       if (job.accept) retopo_accepting_ = false;
-      auto view = workspace && session == job.session ? std::make_shared<RetopoView>(workspace->view())
-                                                     : std::make_shared<RetopoView>(*state_.retopology);
-      view->error = e.what(); view->busy = retopo_pending_ != 0; view->committing = retopo_accepting_;
-      state_.retopology = view; state_.error = e.what(); publish_locked();
+      try {
+        auto view = workspace && session == job.session ? std::make_shared<RetopoView>(workspace->view())
+                                                       : std::make_shared<RetopoView>(*state_.retopology);
+        view->error = e.what(); view->busy = retopo_pending_ != 0; view->committing = retopo_accepting_;
+        state_.retopology = std::move(view); state_.error = e.what(); publish_locked();
+      } catch (...) {
+        // Exhausting the error reporter must not terminate the worker. Keep
+        // the immutable draft; a healthy subsequent input can publish again.
+        try { state_.error = "Out of memory"; } catch (...) {}
+      }
     }
     retopo_changed_.notify_all();
   }

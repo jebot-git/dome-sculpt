@@ -1,0 +1,129 @@
+{
+  "status": "Source-only qualifiedworker9dd composition, runtime followup pending",
+  "main": "9dd63f90f6062b366276b4ce8192a46892de9e81",
+  "prior_qualified": "4d1eede1ea58c0c29832ef03c85beeb3fad6d06f",
+  "product_delta": [
+    "src/document-retopo.cpp exactqualifiedmain9dd"
+  ],
+  "all_headers_and_other_bodies_unchanged": true,
+  "qualified_provider_audit": {
+    "status": "Source-only9dd composition; no new links yet",
+    "main": "9dd63f90f6062b366276b4ce8192a46892de9e81",
+    "qualified_prior": "4d1eede1ea58c0c29832ef03c85beeb3fad6d06f",
+    "src_cpp_equals_main": true,
+    "headers_equal_prior": true,
+    "all_other_product_bodies_equal_prior": [],
+    "profiles": {
+      "release": {
+        "object": "/home/blux/de-xr/dome-sculpt/artifacts/retopo-worker-1a70/artifacts/worker-proof/release-final-v8/document-retopo.cpp.o",
+        "sha256": "aa707e49025c824e2d3b83dc8bc9cf78aacfe7dc5922fc4f908e864492739722",
+        "bytes": 124640,
+        "allocated": 126976,
+        "nested_symbols": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/retopo-worker-1a70/artifacts/worker-proof/release-final-v8/document-retopo.cpp.o:0000000000000000 W dome::Document::RetopoJob::~RetopoJob()",
+          "/home/blux/de-xr/dome-sculpt/artifacts/retopo-worker-1a70/artifacts/worker-proof/release-final-v8/document-retopo.cpp.o:0000000000000000 W dome::Document::RetopoJob::~RetopoJob()",
+          "/home/blux/de-xr/dome-sculpt/artifacts/retopo-worker-1a70/artifacts/worker-proof/release-final-v8/document-retopo.cpp.o:0000000000000000 n dome::Document::RetopoJob::~RetopoJob()",
+          "/home/blux/de-xr/dome-sculpt/artifacts/retopo-worker-1a70/artifacts/worker-proof/release-final-v8/document-retopo.cpp.o:0000000000000028 t std::_Deque_iterator<dome::Document::RetopoJob, dome::Document::RetopoJob&, dome::Document::RetopoJob*>::operator+=(long) [clone .isra.0]",
+          "/home/blux/de-xr/dome-sculpt/artifacts/retopo-worker-1a70/artifacts/worker-proof/release-final-v8/document-retopo.cpp.o:0000000000000000 W std::_Sp_counted_ptr_inplace<dome::Document::RetopoAcceptance, std::allocator<void>, (__gnu_cxx::_Lock_policy)2>::_M_destroy()",
+          "/home/blux/de-xr/dome-sculpt/artifacts/retopo-worker-1a70/artifacts/worker-proof/release-final-v8/document-retopo.cpp.o:0000000000000000 W std::_Sp_counted_ptr_inplace<dome::Document::RetopoAcceptance, std::allocator<void>, (__gnu_cxx::_Lock_policy)2>::_M_dispose()",
+          "/home/blux/de-xr/dome-sculpt/artifacts/retopo-worker-1a70/artifacts/worker-proof/release-final-v8/document-retopo.cpp.o:0000000000000000 W std::_Sp_counted_ptr_inplace<dome::Document::RetopoAcceptance, std::allocator<void>, (__gnu_cxx::_Lock_policy)2>::_M_get_deleter(std::type_info const&)",
+          "/home/blux/de-xr/dome-sculpt/artifacts/retopo-worker-1a70/artifacts/worker-proof/release-final-v8/document-retopo.cpp.o:0000000000000000 W std::_Sp_counted_ptr_inplace<dome::Document::RetopoAcceptance, std::allocator<void>, (__gnu_cxx::_Lock_policy)2>::~_Sp_counted_ptr_inplace()",
+          "/home/blux/de-xr/dome-sculpt/artifacts/retopo-worker-1a70/artifacts/worker-proof/release-final-v8/document-retopo.cpp.o:0000000000000000 W std::_Sp_counted_ptr_inplace<dome::Document::RetopoAcceptance, std::allocator<void>, (__gnu_cxx::_Lock_policy)2>::~_Sp_counted_ptr_inplace()",
+          "/home/blux/de-xr/dome-sculpt/artifacts/retopo-worker-1a70/artifacts/worker-proof/release-final-v8/document-retopo.cpp.o:0000000000000000 W std::_Sp_counted_ptr_inplace<dome::Document::RetopoAcceptance, std::allocator<void>, (__gnu_cxx::_Lock_policy)2>::~_Sp_counted_ptr_inplace()",
+          "/home/blux/de-xr/dome-sculpt/artifacts/retopo-worker-1a70/artifacts/worker-proof/release-final-v8/document-retopo.cpp.o:0000000000000000 n std::_Sp_counted_ptr_inplace<dome::Document::RetopoAcceptance, std::allocator<void>, (__gnu_cxx::_Lock_policy)2>::~_Sp_counted_ptr_inplace()",
+          "/home/blux/de-xr/dome-sculpt/artifacts/retopo-worker-1a70/artifacts/worker-proof/release-final-v8/document-retopo.cpp.o:0000000000003ca0 t dome::Document::RetopoJob& std::deque<dome::Document::RetopoJob, std::allocator<dome::Document::RetopoJob> >::emplace_back<dome::Document::RetopoJob>(dome::Document::RetopoJob&&) [clone .isra.0]",
+          "/home/blux/de-xr/dome-sculpt/artifacts/retopo-worker-1a70/artifacts/worker-proof/release-final-v8/document-retopo.cpp.o:0000000000000e5c t dome::Document::RetopoJob& std::deque<dome::Document::RetopoJob, std::allocator<dome::Document::RetopoJob> >::emplace_back<dome::Document::RetopoJob>(dome::Document::RetopoJob&&) [clone .isra.0] [clone .cold]",
+          "/home/blux/de-xr/dome-sculpt/artifacts/retopo-worker-1a70/artifacts/worker-proof/release-final-v8/document-retopo.cpp.o:0000000000000000 W std::deque<dome::Document::RetopoJob, std::allocator<dome::Document::RetopoJob> >::_M_erase_at_end(std::_Deque_iterator<dome::Document::RetopoJob, dome::Document::RetopoJob&, dome::Document::RetopoJob*>)",
+          "/home/blux/de-xr/dome-sculpt/artifacts/retopo-worker-1a70/artifacts/worker-proof/release-final-v8/document-retopo.cpp.o:0000000000000000 W std::deque<dome::Document::RetopoJob, std::allocator<dome::Document::RetopoJob> >::_M_reallocate_map(unsigned long, bool)",
+          "/home/blux/de-xr/dome-sculpt/artifacts/retopo-worker-1a70/artifacts/worker-proof/release-final-v8/document-retopo.cpp.o:0000000000000000 W __gnu_cxx::__enable_if<std::__is_any_random_access_iter<dome::Document::RetopoJob*, decltype ((__iter_concept_or_category<dome::Document::RetopoJob*>)())>::__value, std::_Deque_iterator<dome::Document::RetopoJob, dome::Document::RetopoJob&, dome::Document::RetopoJob*> >::__type std::__copy_move_a1<true, dome::Document::RetopoJob*, dome::Document::RetopoJob>(dome::Document::RetopoJob*, dome::Document::RetopoJob*, std::_Deque_iterator<dome::Document::RetopoJob, dome::Document::RetopoJob&, dome::Document::RetopoJob*>)",
+          "/home/blux/de-xr/dome-sculpt/artifacts/retopo-worker-1a70/artifacts/worker-proof/release-final-v8/document-retopo.cpp.o:0000000000000000 W __gnu_cxx::__enable_if<std::__is_any_random_access_iter<dome::Document::RetopoJob*, decltype ((__iter_concept_or_category<dome::Document::RetopoJob*>)())>::__value, std::_Deque_iterator<dome::Document::RetopoJob, dome::Document::RetopoJob&, dome::Document::RetopoJob*> >::__type std::__copy_move_backward_a1<true, dome::Document::RetopoJob*, dome::Document::RetopoJob>(dome::Document::RetopoJob*, dome::Document::RetopoJob*, std::_Deque_iterator<dome::Document::RetopoJob, dome::Document::RetopoJob&, dome::Document::RetopoJob*>)",
+          "/home/blux/de-xr/dome-sculpt/artifacts/retopo-worker-1a70/artifacts/worker-proof/release-final-v8/document-retopo.cpp.o:0000000000000000 V typeinfo for std::_Sp_counted_ptr_inplace<dome::Document::RetopoAcceptance, std::allocator<void>, (__gnu_cxx::_Lock_policy)2>",
+          "/home/blux/de-xr/dome-sculpt/artifacts/retopo-worker-1a70/artifacts/worker-proof/release-final-v8/document-retopo.cpp.o:0000000000000000 V typeinfo name for std::_Sp_counted_ptr_inplace<dome::Document::RetopoAcceptance, std::allocator<void>, (__gnu_cxx::_Lock_policy)2>",
+          "/home/blux/de-xr/dome-sculpt/artifacts/retopo-worker-1a70/artifacts/worker-proof/release-final-v8/document-retopo.cpp.o:0000000000000000 V vtable for std::_Sp_counted_ptr_inplace<dome::Document::RetopoAcceptance, std::allocator<void>, (__gnu_cxx::_Lock_policy)2>"
+        ],
+        "polygon_payload_refs": []
+      },
+      "sanitize": {
+        "object": "/home/blux/de-xr/dome-sculpt/artifacts/retopo-worker-1a70/artifacts/worker-proof/sanitize-final-v8/document-retopo.cpp.o",
+        "sha256": "6f3b73dccb54bddb673661e8e23959422d0c786690ccab491f42357b93b75365",
+        "bytes": 2214384,
+        "allocated": 2215936,
+        "nested_symbols": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/retopo-worker-1a70/artifacts/worker-proof/sanitize-final-v8/document-retopo.cpp.o:0000000000000000 W dome::Document::RetopoAcceptance::RetopoAcceptance()",
+          "/home/blux/de-xr/dome-sculpt/artifacts/retopo-worker-1a70/artifacts/worker-proof/sanitize-final-v8/document-retopo.cpp.o:0000000000000000 W dome::Document::RetopoAcceptance::RetopoAcceptance()",
+          "/home/blux/de-xr/dome-sculpt/artifacts/retopo-worker-1a70/artifacts/worker-proof/sanitize-final-v8/document-retopo.cpp.o:0000000000000000 n dome::Document::RetopoAcceptance::RetopoAcceptance()",
+          "/home/blux/de-xr/dome-sculpt/artifacts/retopo-worker-1a70/artifacts/worker-proof/sanitize-final-v8/document-retopo.cpp.o:0000000000000000 W dome::Document::RetopoJob::RetopoJob(dome::Document::RetopoJob&&)",
+          "/home/blux/de-xr/dome-sculpt/artifacts/retopo-worker-1a70/artifacts/worker-proof/sanitize-final-v8/document-retopo.cpp.o:0000000000000000 W dome::Document::RetopoJob::RetopoJob(dome::Document::RetopoJob&&)",
+          "/home/blux/de-xr/dome-sculpt/artifacts/retopo-worker-1a70/artifacts/worker-proof/sanitize-final-v8/document-retopo.cpp.o:0000000000000000 n dome::Document::RetopoJob::RetopoJob(dome::Document::RetopoJob&&)",
+          "/home/blux/de-xr/dome-sculpt/artifacts/retopo-worker-1a70/artifacts/worker-proof/sanitize-final-v8/document-retopo.cpp.o:0000000000000000 W dome::Document::RetopoJob::operator=(dome::Document::RetopoJob&&)",
+          "/home/blux/de-xr/dome-sculpt/artifacts/retopo-worker-1a70/artifacts/worker-proof/sanitize-final-v8/document-retopo.cpp.o:0000000000000000 W std::_Deque_iterator<dome::Document::RetopoJob, dome::Document::RetopoJob&, dome::Document::RetopoJob*>::operator*() const",
+          "/home/blux/de-xr/dome-sculpt/artifacts/retopo-worker-1a70/artifacts/worker-proof/sanitize-final-v8/document-retopo.cpp.o:0000000000000000 W std::deque<dome::Document::RetopoJob, std::allocator<dome::Document::RetopoJob> >::size() const",
+          "/home/blux/de-xr/dome-sculpt/artifacts/retopo-worker-1a70/artifacts/worker-proof/sanitize-final-v8/document-retopo.cpp.o:0000000000000000 W std::_Deque_base<dome::Document::RetopoJob, std::allocator<dome::Document::RetopoJob> >::_M_destroy_nodes(dome::Document::RetopoJob**, dome::Document::RetopoJob**)",
+          "/home/blux/de-xr/dome-sculpt/artifacts/retopo-worker-1a70/artifacts/worker-proof/sanitize-final-v8/document-retopo.cpp.o:0000000000000000 W std::_Deque_iterator<dome::Document::RetopoJob, dome::Document::RetopoJob const&, dome::Document::RetopoJob const*>::_Deque_iterator<std::_Deque_iterator<dome::Document::RetopoJob, dome::Document::RetopoJob&, dome::Document::RetopoJob*>, void>(std::_Deque_iterator<dome::Document::RetopoJob, dome::Document::RetopoJob&, dome::Document::RetopoJob*> const&)",
+          "/home/blux/de-xr/dome-sculpt/artifacts/retopo-worker-1a70/artifacts/worker-proof/sanitize-final-v8/document-retopo.cpp.o:0000000000000000 W std::_Deque_iterator<dome::Document::RetopoJob, dome::Document::RetopoJob const&, dome::Document::RetopoJob const*>::_Deque_iterator<std::_Deque_iterator<dome::Document::RetopoJob, dome::Document::RetopoJob&, dome::Document::RetopoJob*>, void>(std::_Deque_iterator<dome::Document::RetopoJob, dome::Document::RetopoJob&, dome::Document::RetopoJob*> const&)",
+          "/home/blux/de-xr/dome-sculpt/artifacts/retopo-worker-1a70/artifacts/worker-proof/sanitize-final-v8/document-retopo.cpp.o:0000000000000000 n std::_Deque_iterator<dome::Document::RetopoJob, dome::Document::RetopoJob const&, dome::Document::RetopoJob const*>::_Deque_iterator<std::_Deque_iterator<dome::Document::RetopoJob, dome::Document::RetopoJob&, dome::Document::RetopoJob*>, void>(std::_Deque_iterator<dome::Document::RetopoJob, dome::Document::RetopoJob&, dome::Document::RetopoJob*> const&)",
+          "/home/blux/de-xr/dome-sculpt/artifacts/retopo-worker-1a70/artifacts/worker-proof/sanitize-final-v8/document-retopo.cpp.o:0000000000000000 W std::_Deque_iterator<dome::Document::RetopoJob, dome::Document::RetopoJob&, dome::Document::RetopoJob*>::_M_set_node(dome::Document::RetopoJob**)",
+          "/home/blux/de-xr/dome-sculpt/artifacts/retopo-worker-1a70/artifacts/worker-proof/sanitize-final-v8/document-retopo.cpp.o:0000000000000000 W std::_Deque_iterator<dome::Document::RetopoJob, dome::Document::RetopoJob&, dome::Document::RetopoJob*>::_Deque_iterator(std::_Deque_iterator<dome::Document::RetopoJob, dome::Document::RetopoJob&, dome::Document::RetopoJob*> const&)",
+          "/home/blux/de-xr/dome-sculpt/artifacts/retopo-worker-1a70/artifacts/worker-proof/sanitize-final-v8/document-retopo.cpp.o:0000000000000000 W std::_Deque_iterator<dome::Document::RetopoJob, dome::Document::RetopoJob&, dome::Document::RetopoJob*>::_Deque_iterator(std::_Deque_iterator<dome::Document::RetopoJob, dome::Document::RetopoJob&, dome::Document::RetopoJob*> const&)",
+          "/home/blux/de-xr/dome-sculpt/artifacts/retopo-worker-1a70/artifacts/worker-proof/sanitize-final-v8/document-retopo.cpp.o:0000000000000000 n std::_Deque_iterator<dome::Document::RetopoJob, dome::Document::RetopoJob&, dome::Document::RetopoJob*>::_Deque_iterator(std::_Deque_iterator<dome::Document::RetopoJob, dome::Document::RetopoJob&, dome::Document::RetopoJob*> const&)",
+          "/home/blux/de-xr/dome-sculpt/artifacts/retopo-worker-1a70/artifacts/worker-proof/sanitize-final-v8/document-retopo.cpp.o:0000000000000000 W std::_Deque_iterator<dome::Document::RetopoJob, dome::Document::RetopoJob&, dome::Document::RetopoJob*>::operator+=(long)",
+          "/home/blux/de-xr/dome-sculpt/artifacts/retopo-worker-1a70/artifacts/worker-proof/sanitize-final-v8/document-retopo.cpp.o:0000000000000000 W std::_Deque_iterator<dome::Document::RetopoJob, dome::Document::RetopoJob&, dome::Document::RetopoJob*>::operator++()",
+          "/home/blux/de-xr/dome-sculpt/artifacts/retopo-worker-1a70/artifacts/worker-proof/sanitize-final-v8/document-retopo.cpp.o:0000000000000000 W std::_Sp_counted_ptr_inplace<dome::Document::RetopoAcceptance, std::allocator<void>, (__gnu_cxx::_Lock_policy)2>::_M_destroy()",
+          "/home/blux/de-xr/dome-sculpt/artifacts/retopo-worker-1a70/artifacts/worker-proof/sanitize-final-v8/document-retopo.cpp.o:0000000000000000 W std::_Sp_counted_ptr_inplace<dome::Document::RetopoAcceptance, std::allocator<void>, (__gnu_cxx::_Lock_policy)2>::_M_dispose()",
+          "/home/blux/de-xr/dome-sculpt/artifacts/retopo-worker-1a70/artifacts/worker-proof/sanitize-final-v8/document-retopo.cpp.o:0000000000000000 W std::_Sp_counted_ptr_inplace<dome::Document::RetopoAcceptance, std::allocator<void>, (__gnu_cxx::_Lock_policy)2>::_M_get_deleter(std::type_info const&)",
+          "/home/blux/de-xr/dome-sculpt/artifacts/retopo-worker-1a70/artifacts/worker-proof/sanitize-final-v8/document-retopo.cpp.o:0000000000000000 W std::_Sp_counted_ptr_inplace<dome::Document::RetopoAcceptance, std::allocator<void>, (__gnu_cxx::_Lock_policy)2>::~_Sp_counted_ptr_inplace()",
+          "/home/blux/de-xr/dome-sculpt/artifacts/retopo-worker-1a70/artifacts/worker-proof/sanitize-final-v8/document-retopo.cpp.o:0000000000000000 W std::_Sp_counted_ptr_inplace<dome::Document::RetopoAcceptance, std::allocator<void>, (__gnu_cxx::_Lock_policy)2>::~_Sp_counted_ptr_inplace()",
+          "/home/blux/de-xr/dome-sculpt/artifacts/retopo-worker-1a70/artifacts/worker-proof/sanitize-final-v8/document-retopo.cpp.o:0000000000000000 W std::_Sp_counted_ptr_inplace<dome::Document::RetopoAcceptance, std::allocator<void>, (__gnu_cxx::_Lock_policy)2>::~_Sp_counted_ptr_inplace()",
+          "/home/blux/de-xr/dome-sculpt/artifacts/retopo-worker-1a70/artifacts/worker-proof/sanitize-final-v8/document-retopo.cpp.o:0000000000000000 n std::_Sp_counted_ptr_inplace<dome::Document::RetopoAcceptance, std::allocator<void>, (__gnu_cxx::_Lock_policy)2>::~_Sp_counted_ptr_inplace()",
+          "/home/blux/de-xr/dome-sculpt/artifacts/retopo-worker-1a70/artifacts/worker-proof/sanitize-final-v8/document-retopo.cpp.o:0000000000000000 W dome::Document::RetopoJob& std::deque<dome::Document::RetopoJob, std::allocator<dome::Document::RetopoJob> >::emplace_back<dome::Document::RetopoJob>(dome::Document::RetopoJob&&)",
+          "/home/blux/de-xr/dome-sculpt/artifacts/retopo-worker-1a70/artifacts/worker-proof/sanitize-final-v8/document-retopo.cpp.o:0000000000000000 W std::deque<dome::Document::RetopoJob, std::allocator<dome::Document::RetopoJob> >::_M_pop_front_aux()",
+          "/home/blux/de-xr/dome-sculpt/artifacts/retopo-worker-1a70/artifacts/worker-proof/sanitize-final-v8/document-retopo.cpp.o:0000000000000000 W void std::deque<dome::Document::RetopoJob, std::allocator<dome::Document::RetopoJob> >::_M_push_back_aux<dome::Document::RetopoJob>(dome::Document::RetopoJob&&)",
+          "/home/blux/de-xr/dome-sculpt/artifacts/retopo-worker-1a70/artifacts/worker-proof/sanitize-final-v8/document-retopo.cpp.o:0000000000000000 W std::deque<dome::Document::RetopoJob, std::allocator<dome::Document::RetopoJob> >::_M_reallocate_map(unsigned long, bool)",
+          "/home/blux/de-xr/dome-sculpt/artifacts/retopo-worker-1a70/artifacts/worker-proof/sanitize-final-v8/document-retopo.cpp.o:0000000000000000 W std::deque<dome::Document::RetopoJob, std::allocator<dome::Document::RetopoJob> >::_M_destroy_data_aux(std::_Deque_iterator<dome::Document::RetopoJob, dome::Document::RetopoJob&, dome::Document::RetopoJob*>, std::_Deque_iterator<dome::Document::RetopoJob, dome::Document::RetopoJob&, dome::Document::RetopoJob*>)",
+          "/home/blux/de-xr/dome-sculpt/artifacts/retopo-worker-1a70/artifacts/worker-proof/sanitize-final-v8/document-retopo.cpp.o:0000000000000000 W std::deque<dome::Document::RetopoJob, std::allocator<dome::Document::RetopoJob> >::_M_erase(std::_Deque_iterator<dome::Document::RetopoJob, dome::Document::RetopoJob&, dome::Document::RetopoJob*>, std::_Deque_iterator<dome::Document::RetopoJob, dome::Document::RetopoJob&, dome::Document::RetopoJob*>)",
+          "/home/blux/de-xr/dome-sculpt/artifacts/retopo-worker-1a70/artifacts/worker-proof/sanitize-final-v8/document-retopo.cpp.o:0000000000000000 W std::_Deque_iterator<dome::Document::RetopoJob, dome::Document::RetopoJob&, dome::Document::RetopoJob*> std::__copy_move_a1<true, dome::Document::RetopoJob, dome::Document::RetopoJob&, dome::Document::RetopoJob*, dome::Document::RetopoJob>(std::_Deque_iterator<dome::Document::RetopoJob, dome::Document::RetopoJob&, dome::Document::RetopoJob*>, std::_Deque_iterator<dome::Document::RetopoJob, dome::Document::RetopoJob&, dome::Document::RetopoJob*>, std::_Deque_iterator<dome::Document::RetopoJob, dome::Document::RetopoJob&, dome::Document::RetopoJob*>)",
+          "/home/blux/de-xr/dome-sculpt/artifacts/retopo-worker-1a70/artifacts/worker-proof/sanitize-final-v8/document-retopo.cpp.o:0000000000000000 W __gnu_cxx::__enable_if<std::__is_any_random_access_iter<dome::Document::RetopoJob*, decltype ((__iter_concept_or_category<dome::Document::RetopoJob*>)())>::__value, std::_Deque_iterator<dome::Document::RetopoJob, dome::Document::RetopoJob&, dome::Document::RetopoJob*> >::__type std::__copy_move_a1<true, dome::Document::RetopoJob*, dome::Document::RetopoJob>(dome::Document::RetopoJob*, dome::Document::RetopoJob*, std::_Deque_iterator<dome::Document::RetopoJob, dome::Document::RetopoJob&, dome::Document::RetopoJob*>)",
+          "/home/blux/de-xr/dome-sculpt/artifacts/retopo-worker-1a70/artifacts/worker-proof/sanitize-final-v8/document-retopo.cpp.o:0000000000000000 W std::_Deque_iterator<dome::Document::RetopoJob, dome::Document::RetopoJob&, dome::Document::RetopoJob*> std::__copy_move_dit<true, dome::Document::RetopoJob, dome::Document::RetopoJob&, dome::Document::RetopoJob*, std::_Deque_iterator<dome::Document::RetopoJob, dome::Document::RetopoJob&, dome::Document::RetopoJob*> >(std::_Deque_iterator<dome::Document::RetopoJob, dome::Document::RetopoJob&, dome::Document::RetopoJob*>, std::_Deque_iterator<dome::Document::RetopoJob, dome::Document::RetopoJob&, dome::Document::RetopoJob*>, std::_Deque_iterator<dome::Document::RetopoJob, dome::Document::RetopoJob&, dome::Document::RetopoJob*>)",
+          "/home/blux/de-xr/dome-sculpt/artifacts/retopo-worker-1a70/artifacts/worker-proof/sanitize-final-v8/document-retopo.cpp.o:0000000000000000 W std::_Deque_iterator<dome::Document::RetopoJob, dome::Document::RetopoJob&, dome::Document::RetopoJob*> std::__copy_move_backward_a1<true, dome::Document::RetopoJob, dome::Document::RetopoJob&, dome::Document::RetopoJob*, dome::Document::RetopoJob>(std::_Deque_iterator<dome::Document::RetopoJob, dome::Document::RetopoJob&, dome::Document::RetopoJob*>, std::_Deque_iterator<dome::Document::RetopoJob, dome::Document::RetopoJob&, dome::Document::RetopoJob*>, std::_Deque_iterator<dome::Document::RetopoJob, dome::Document::RetopoJob&, dome::Document::RetopoJob*>)",
+          "/home/blux/de-xr/dome-sculpt/artifacts/retopo-worker-1a70/artifacts/worker-proof/sanitize-final-v8/document-retopo.cpp.o:0000000000000000 W __gnu_cxx::__enable_if<std::__is_any_random_access_iter<dome::Document::RetopoJob*, decltype ((__iter_concept_or_category<dome::Document::RetopoJob*>)())>::__value, std::_Deque_iterator<dome::Document::RetopoJob, dome::Document::RetopoJob&, dome::Document::RetopoJob*> >::__type std::__copy_move_backward_a1<true, dome::Document::RetopoJob*, dome::Document::RetopoJob>(dome::Document::RetopoJob*, dome::Document::RetopoJob*, std::_Deque_iterator<dome::Document::RetopoJob, dome::Document::RetopoJob&, dome::Document::RetopoJob*>)",
+          "/home/blux/de-xr/dome-sculpt/artifacts/retopo-worker-1a70/artifacts/worker-proof/sanitize-final-v8/document-retopo.cpp.o:0000000000000000 W std::_Deque_iterator<dome::Document::RetopoJob, dome::Document::RetopoJob&, dome::Document::RetopoJob*> std::__copy_move_backward_dit<true, dome::Document::RetopoJob, dome::Document::RetopoJob&, dome::Document::RetopoJob*, std::_Deque_iterator<dome::Document::RetopoJob, dome::Document::RetopoJob&, dome::Document::RetopoJob*> >(std::_Deque_iterator<dome::Document::RetopoJob, dome::Document::RetopoJob&, dome::Document::RetopoJob*>, std::_Deque_iterator<dome::Document::RetopoJob, dome::Document::RetopoJob&, dome::Document::RetopoJob*>, std::_Deque_iterator<dome::Document::RetopoJob, dome::Document::RetopoJob&, dome::Document::RetopoJob*>)",
+          "/home/blux/de-xr/dome-sculpt/artifacts/retopo-worker-1a70/artifacts/worker-proof/sanitize-final-v8/document-retopo.cpp.o:0000000000000000 W std::operator==(std::_Deque_iterator<dome::Document::RetopoJob, dome::Document::RetopoJob&, dome::Document::RetopoJob*> const&, std::_Deque_iterator<dome::Document::RetopoJob, dome::Document::RetopoJob&, dome::Document::RetopoJob*> const&)",
+          "/home/blux/de-xr/dome-sculpt/artifacts/retopo-worker-1a70/artifacts/worker-proof/sanitize-final-v8/document-retopo.cpp.o:0000000000000000 V typeinfo for std::_Sp_counted_ptr_inplace<dome::Document::RetopoAcceptance, std::allocator<void>, (__gnu_cxx::_Lock_policy)2>",
+          "/home/blux/de-xr/dome-sculpt/artifacts/retopo-worker-1a70/artifacts/worker-proof/sanitize-final-v8/document-retopo.cpp.o:0000000000000000 V typeinfo name for std::_Sp_counted_ptr_inplace<dome::Document::RetopoAcceptance, std::allocator<void>, (__gnu_cxx::_Lock_policy)2>",
+          "/home/blux/de-xr/dome-sculpt/artifacts/retopo-worker-1a70/artifacts/worker-proof/sanitize-final-v8/document-retopo.cpp.o:0000000000000000 V vtable for std::_Sp_counted_ptr_inplace<dome::Document::RetopoAcceptance, std::allocator<void>, (__gnu_cxx::_Lock_policy)2>",
+          "/home/blux/de-xr/dome-sculpt/artifacts/retopo-worker-1a70/artifacts/worker-proof/sanitize-final-v8/document-retopo.cpp.o:0000000000000494 t auto dome::Document::end_retopology_locked(bool)::{lambda(auto:1 const&)#1}::operator()<dome::Document::RetopoJob>(dome::Document::RetopoJob const&) const"
+        ],
+        "polygon_payload_refs": []
+      }
+    }
+  },
+  "compile_plan": "No compilation: one complete qualifiedworker object replacement perprofile, noPolygonpayloadrefs; reuse exact fcDoc ctor/dtor+test andotherwholeproviders. Parentexplicitlyaccepted this audit.",
+  "links": {
+    "release_each_bound": 25165824,
+    "sanitize_consumer_bound": 369098752,
+    "sanitize_app_bound": 377487360,
+    "rules": "SequentialSlinks only; beforeSapp accountactualconsumer+maps/logs+newGUI/HWreserve. Ifneeded losslesslyarchive onlyNEWclosedpassedconsumer afternative248/RSpairs/maps beforeapp."
+  },
+  "storage": {
+    "cumulative_cap": 1073741824,
+    "actual_free_floor": 21474836480,
+    "usage_after_own_closed_san_archival": 310616064,
+    "actual_free": 22853214208,
+    "archived": [
+      "artifacts/new-san-archive/consumer.json",
+      "artifacts/new-san-archive/app.json"
+    ],
+    "archive_ledger_SHA": {
+      "consumer.json": "52c4e826089f0c65a4c8432d332f14c2b00d404c2683502a5ff4c93bed4dc7f9",
+      "app.json": "bbdbf608a4d2e908290d66f6897087a29e152e688d1cad7313cd4ddbe02a8d59"
+    },
+    "verification": "Allbytes +mode/UID/GID/nsmtime andactualoriginalpathrestore verified. Existing4nonDumpable desktopservicemaps unreadable explicitlyrecorded; accessiblemaps/FDrefsnone, allownforegroundjobsclosed. Oldcomponentsharedobjects/archivesuntouched."
+  },
+  "semantic_gates": {
+    "native": "same248/profile andall16nativefileRSpairs exact",
+    "GUI": "same77eachR/Snormal+compact, bothmodes/bothorders/retopo\u2192polygonRestore/actualordinaryapp+maps",
+    "hardware": "ScopedexistingRapp/genuinefixtures real-loader flows afterrootlease; no newbinary/devicepermissionflag"
+  },
+  "full_build": false,
+  "main_admission": false
+}

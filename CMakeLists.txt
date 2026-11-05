@@ -585,6 +585,19 @@ if(BUILD_TESTING)
     -Wl,--wrap=_ZN4dome6unwrapERNS_4MeshEjjRKSt8functionIFbvEE
     -Wl,--wrap=_ZN4dome15RetopoWorkspace4editENS_12RetopoActionENS_4Vec3EfRKSt8functionIFbvEE)
   add_test(NAME retopology-held-admission COMMAND dome-sculpt-retopo-held-admission-test ${CMAKE_CURRENT_BINARY_DIR}/retopology-held-admission)
+  add_executable(dome-sculpt-retopo-worker-faults-test tests/retopo-worker-faults.cpp)
+  target_link_libraries(dome-sculpt-retopo-worker-faults-test PRIVATE dome-sculpt-core)
+  target_link_options(dome-sculpt-retopo-worker-faults-test PRIVATE
+    -Wl,--wrap=_ZN4dome6unwrapERNS_4MeshEjjRKSt8functionIFbvEE
+    -Wl,--wrap=_ZN4dome8Document11retopo_loopEv
+    -Wl,--wrap=_ZN4dome15RetopoWorkspace4editENS_12RetopoActionENS_4Vec3EfRKSt8functionIFbvEE
+    -Wl,--wrap=_ZN4dome8Document14publish_lockedEbb)
+  add_test(NAME retopology-worker-faults COMMAND dome-sculpt-retopo-worker-faults-test)
+  add_test(NAME retopology-worker-reporter-recovery COMMAND dome-sculpt-retopo-worker-faults-test --persistent)
+  add_test(NAME retopology-worker-accepted-publication COMMAND dome-sculpt-retopo-worker-faults-test
+    --acceptance ${CMAKE_CURRENT_BINARY_DIR}/retopology-worker-accepted-publication)
+  set_tests_properties(retopology-worker-faults retopology-worker-reporter-recovery
+    retopology-worker-accepted-publication PROPERTIES TIMEOUT 120)
   add_executable(dome-sculpt-retopo-affine-ui-fixture tests/retopo-affine-ui-fixture.cpp)
   target_link_libraries(dome-sculpt-retopo-affine-ui-fixture PRIVATE dome-sculpt-core)
   add_test(NAME retopology-affine-ui-fixture COMMAND dome-sculpt-retopo-affine-ui-fixture ${CMAKE_CURRENT_BINARY_DIR}/retopology-affine-ui.dsculpt)
