@@ -1,5 +1,5 @@
 {
-  "milestone": "Retopology caller/input batch admission: final Release checkpoint; SAN, legacy and app pending",
+  "milestone": "Retopology caller/input batch admission: Release + native sanitizer checkpoint; final legacy/app/XR pending",
   "original_base": "9dd63f90f6062b366276b4ce8192a46892de9e81",
   "current_runtime_parent": "37c46b9e1bed1cc06e61ec04667ea0761b7540e9",
   "current_metadata_parent": "c55dc2f708cdb6b267a40e6ac26f5757fcfae7d3",
@@ -366,6 +366,45 @@
       "seconds": 10.510123398969881,
       "drift": [],
       "steps": []
+    },
+    "sanitize-v1": {
+      "classification": "First fresh four-TU native sanitizer positive; no app or actual XR adapter claim",
+      "status": "/home/blux/de-xr/dome-sculpt/artifacts/retopo-caller-9dd/artifacts/caller-proof/sanitize-v1/status.json",
+      "sha256": "cfd9a046aa858276d9b312c248e0dd264d2dfaa20b9e457e6745cf9585eacc0a",
+      "state": "terminal",
+      "exit": 0,
+      "seconds": 136.19638278201455,
+      "drift": [],
+      "steps": [
+        {
+          "name": "compile-document.cpp",
+          "exit": 0
+        },
+        {
+          "name": "compile-document-retopo.cpp",
+          "exit": 0
+        },
+        {
+          "name": "compile-document-worker-errors.cpp",
+          "exit": 0
+        },
+        {
+          "name": "compile-document-interaction.cpp",
+          "exit": 0
+        },
+        {
+          "name": "compile-retopo-input-admission.cpp",
+          "exit": 0
+        },
+        {
+          "name": "link",
+          "exit": 0
+        },
+        {
+          "name": "native",
+          "exit": 0
+        }
+      ]
     }
   },
   "final_release_counts": {
@@ -428,12 +467,43 @@
     "last_new_growth_bytes": 179171328,
     "release_growth_limit_bytes": 184549376,
     "total_task_limit_bytes": 805306368,
-    "actual_free_floor_bytes": 21474836480
+    "actual_free_floor_bytes": 21474836480,
+    "last_total_task_allocated_bytes": 391467008
   },
   "remaining": [
-    "First finite own sanitizer4TU+whole input consumer not yet run.",
-    "Existing251/42/97 worker and1267/1445/26 legacy controls must be qualified against final four-TU source, not inferred from earlier public-only checkpoint.",
+    "Existing251/42/97 worker and1267/1445/26 legacy controls must be qualified against final source; historical public-only results are not reused as final proof.",
     "Actual ordinary app normal/compact/shared-loader gate and generated CTest execution remain pending.",
+    "Current production XR supplies press pulses; before app/main admission adapt to explicit SpatialHand undo/redo LEVEL semantics, preserve Doc latches across rebase/focus and qualify actual stateSync path.",
+    "Compose subsequently admitted mode5 parent with exact qualified providers before final app/current-main proof.",
     "No main admission or complete full-goal claim."
-  ]
+  ],
+  "qualified_native_source_head": "9316b9a149b75f3a070c719628e59d3d8670f7c7",
+  "sanitizer": {
+    "flags": "O1/g1, address+undefined, leak detection/halt on error, no suppression",
+    "total_checks": 13380,
+    "persistent_total": 710,
+    "mapped_inputs": 77,
+    "map_snapshots": 4,
+    "native_R_S_pairs_exact": 4,
+    "outputs_after": "/home/blux/de-xr/dome-sculpt/artifacts/retopo-caller-9dd/artifacts/caller-proof/sanitize-v1/outputs-after.json",
+    "outputs_after_sha256": "76a4c0bcb14c1b4a89e5c8f814c969daa5530bbc8b27517126a9357a596fabdb",
+    "not_a_fresh_whole_app_core_build": true
+  },
+  "archival": {
+    "classification": "ONLY closed passing firstSAN test ELF, restore required before replay",
+    "ledger": "/home/blux/de-xr/dome-sculpt/artifacts/retopo-caller-9dd/artifacts/caller-proof/sanitize-v1/archive/ledger.json",
+    "ledger_sha256": "e8151991107da59c4d21d7dec69eee94b96a6383524e841a2ac2f03742d98ed2",
+    "raw_sha256": "b3c6580af0a912b8c19e3033919818d07318216822f175f333bba1264bdddbec",
+    "raw_size": 329584824,
+    "archive_sha256": "e1ab1300c9917d7bf241c9360296e8608fce0ae2eda121f8e5a3790fb6aecf0c",
+    "archive_size": 56321781,
+    "restore_command": [
+      "python3",
+      "/home/blux/de-xr/dome-sculpt/artifacts/retopo-caller-9dd/artifacts/caller-proof/sanitize-v1/archive/restore.py",
+      "/home/blux/de-xr/dome-sculpt/artifacts/retopo-caller-9dd/artifacts/caller-proof/sanitize-v1/archive/ledger.json"
+    ],
+    "stream_verified_before_unlink": true,
+    "actual_original_path_restore_control": true,
+    "reclaimed_allocated_bytes": 273264640
+  }
 }
