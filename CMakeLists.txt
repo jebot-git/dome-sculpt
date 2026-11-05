@@ -4701,3 +4701,19 @@ if(BUILD_TESTING)
     ${CMAKE_CURRENT_BINARY_DIR}/surface-heat/real-publication-long-name-all long-name-all)
   set_tests_properties(surface-heat-real-publication-long-name-all PROPERTIES TIMEOUT 600)
 endif()
+
+# Private polygon field-transfer foundation. Complete mathematical TUs only;
+# no material/Scene capability or runtime geometry guard is enabled by this test.
+if(BUILD_TESTING)
+  add_executable(dome-sculpt-polygon-surface-transfer-test
+    tests/polygon-surface-transfer.cpp src/polygon-surface-transfer.cpp
+    src/polygon.cpp src/mesh.cpp src/affine.cpp src/sculpt-storage.cpp)
+  target_include_directories(dome-sculpt-polygon-surface-transfer-test PRIVATE
+    include src third_party/openbrush)
+  target_link_libraries(dome-sculpt-polygon-surface-transfer-test PRIVATE dome-sculpt-json)
+  target_compile_options(dome-sculpt-polygon-surface-transfer-test PRIVATE
+    -ffunction-sections -fdata-sections)
+  target_link_options(dome-sculpt-polygon-surface-transfer-test PRIVATE -Wl,--gc-sections)
+  add_test(NAME polygon-surface-transfer COMMAND dome-sculpt-polygon-surface-transfer-test)
+  set_tests_properties(polygon-surface-transfer PROPERTIES TIMEOUT 120)
+endif()

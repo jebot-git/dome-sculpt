@@ -1,0 +1,38 @@
+{
+  "scope": "Private Move/Flip polygon surface correspondence and role-normal mathematical primitive only",
+  "source_base": "bf9e6f30cf7c24862e79acbe2770ee7010f0a597",
+  "terminal_handle": "97292",
+  "runtime_checks": 1097,
+  "persistent_cpp_denials": 789,
+  "successful_endpoint": 1,
+  "cancellation_polls": 175,
+  "source_drift": [],
+  "provider_drift": [],
+  "binary_sha256": "829f700f4eab06ab9be7fb21aef97cc33e62e7fba03dacc1291e7cd28b3d2b28",
+  "artifacts": "artifacts/polygon-surface-transfer-math-v4/status.json",
+  "earlier_failures": [
+    {
+      "handle": "63426",
+      "cause": "Missing complete JSON header; compile failure, no runtime claim"
+    },
+    {
+      "handle": "72593",
+      "cause": "Missing genuine sculpt-storage TU; link failure, no runtime claim"
+    }
+  ],
+  "scope_correction": "65905 pure math passed using arbitrary supplied BEFORE VS bases. Its synthetic pose simulator used the wrong tangent transform and omitted model handedness; corrected whole test TU uses actual linear CPU/VS tangent and model hand. Earlier source and results remain preserved; no claim of native or Scene replay from either primitive.",
+  "not_qualified": [
+    "Scene39 or material21 codec",
+    "native owning source/current field authentication",
+    "actual app/shader/pixels",
+    "F32 paint transfer",
+    "general topology/refinement",
+    "portable GLB/VRM adapter",
+    "sanitizer profile"
+  ],
+  "inputs": {
+    "src/polygon-surface-transfer.cpp": "51076f02d4221e171ea6cc1080e1e08940e6cd0b54e3676b6f03b96cea1db0ad",
+    "src/polygon-surface-transfer.hpp": "0d74da32d9c24ebc923f7421c0ee2b72efa926e3a120377971d03389ee215435",
+    "tests/polygon-surface-transfer.cpp": "172ac1578e94ef05f55855c1fafda7bc6722408e5b17436cb7cb524053a449bc"
+  }
+}
