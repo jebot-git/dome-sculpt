@@ -3,11 +3,13 @@
 #include "retopo-affine.cpp"
 #undef main
 #include "dome/xr.hpp"
+#include "../third_party/desktop/bdf_font.hpp"
 #include <fstream>
 #include <cstdlib>
 namespace {
 Document *observed=nullptr;
-std::string mode,original;
+std::string mode;
+nlohmann::json original;
 nlohmann::json samples=nlohmann::json::array();
 bool undo_level(unsigned n){return(n>=4&&n<=16)||(n>=20&&n<=23)||(n>=48&&n<=54);}
 bool redo_level(unsigned n){return(n>=26&&n<=29)||(n>=33&&n<=36)||(n>=48&&n<=54);}
@@ -42,7 +44,9 @@ int main(int argc,char**argv)try{
   setenv("XR_RUNTIME_JSON",manifest.c_str(),1);setenv("DOME_XR_FIXTURE_RETOPO",mode.c_str(),1);
   const auto report=out/"runtime-report.json";setenv("DOME_XR_FIXTURE_REPORT",report.c_str(),1);
   constexpr Matrix m{-1.3,.1,0,0,.35,.8,.05,0,.1,.15,1.2,0,.15,-.1,.2,1};const auto s=source(m,true);original=s.encode();
-  Document d;d.replace(s.snapshot());check(d.wait_mesh(),"Genuine affine skinned/morphed/painted source is current");d.begin_retopology();ready(d);
+  const auto fontconfig=bdf_fonts::export_config();setenv("FONTCONFIG_FILE",fontconfig.c_str(),1);
+  const auto face=bdf_fonts::resolve("Unifont","Sans-Serif",16);
+  Document d;d.appearance(face.file,face.pixels,false,0xff3399ff,255);d.replace(s.snapshot());check(d.wait_mesh(),"Genuine affine skinned/morphed/painted source is current");d.begin_retopology();ready(d);
   for(auto p:std::array<Vec3,3>{{{-.2f,-.15f,-.055f},{.2f,-.15f,.025f},{0,.15f,.015f}}})place(d,point(m,evaluated(p,true)));
   const auto epoch=d.frame().state->input_epoch;observed=&d;
   {XrSculpt xr(d);xr.run(65);}observed=nullptr;
