@@ -1,4 +1,5 @@
 #include "native-paint-sampling.hpp"
+#include "native-paint-metadata.hpp"
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/material-visibility.hpp"
 #include "dome/document.hpp"
@@ -111,9 +112,10 @@ struct Visibility {
       for(const auto &[set,values]:owned_extra_uv){if(r.first_vertex>mesh.positions.size()||values->size()>mesh.positions.size()-r.first_vertex)throw std::invalid_argument("Visibility additional UV domain exceeds packed geometry");for(size_t c=r.first;c<r.first+r.count;++c){auto vertex=mesh.indices.at(c);if(vertex<r.first_vertex||vertex-r.first_vertex>=values->size())throw std::invalid_argument("Visibility additional UV packed index is invalid");}}
     }
     if(r.normal_preview_proof&&!r.normal_preview_proof->matches(r.material_bindings,maps))throw std::invalid_argument("Visibility normal preview lost its own immutable owners");
-    const bool sealed=r.paint_sampling_attachment&&r.normal_preview_proof&&r.normal_preview_proof->matches(r.material_bindings,maps)&&r.normal_preview_proof->metadata_domain()==r.paint_sampling_attachment->domain()&&
+    const bool sealed24=r.paint_sampling_attachment&&r.normal_preview_proof&&r.normal_preview_proof->matches(r.material_bindings,maps)&&r.normal_preview_proof->metadata_domain()==r.paint_sampling_attachment->domain()&&
       !r.normal_preview_proof->metadata_domain().owner_before(r.paint_sampling_attachment->domain())&&!r.paint_sampling_attachment->domain().owner_before(r.normal_preview_proof->metadata_domain());
-    if(r.normal_preview_proof&&r.paint_sampling_attachment&&!sealed)throw std::invalid_argument("Visibility normal and paint metadata have different owning coordinate domains");
+    if(r.normal_preview_proof&&r.paint_sampling_attachment&&!sealed24)throw std::invalid_argument("Visibility normal and paint metadata have different owning coordinate domains");
+    const bool sealed=sealed24||detail::native_frame_preview_metadata(r.material_bindings,r.paint_sampling_attachment);
     const bool prepared=detail::prepared_color_state(r.material_bindings.get(),maps.get(),!sealed);
     if (maps) {
       if (maps->source_only) {

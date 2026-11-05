@@ -1,5 +1,6 @@
 #include "color-bound-memo.hpp"
 #include "native-paint-sampling.hpp"
+#include "native-paint-metadata.hpp"
 #include "native-paint-frame-source.hpp"
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/material-bindings.hpp"
@@ -204,7 +205,7 @@ void SourceMaterialBindings::validate(bool deep) const {
   if(native_paint_frames&&!native_paint_sampling)throw std::invalid_argument("Native frame source requires its own writable paint owner");
   if(native_paint_sampling){
     if(!native_paint_sampling->valid_owner(native_paint_sampling))throw std::invalid_argument("Native paint material has no genuine owning lease");
-    native_paint_sampling->validate();
+    if(deep)native_paint_sampling->validate();else detail::native_paint_metadata(native_paint_sampling);
     if(native_paint_frames){
       if(canonical_attributes||canonical_uv||has_mtoon||color_preparation||normal_preparation||!sampling_reparameterized)throw std::invalid_argument("Native frame capture needs its independent supported paint interpretation");
       native_paint_frames->validate_binding(*this,deep);
