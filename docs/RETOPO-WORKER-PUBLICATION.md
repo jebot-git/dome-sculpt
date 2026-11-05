@@ -1,8 +1,8 @@
 # Retopology worker publication transactions
 
 The candidate extends main `1a70f2a` with one complete DocumentRetopo translation
-unit. Native qualification is complete; ordinary-application validation and main
-admission are pending. The full production objective remains active.
+unit. Native and matching ordinary Release application qualification are complete.
+Main admits the exact product body from private checkpoint `68daffe`. The full production objective remains active.
 
 A real worker allocation failure after Face editing could report failure while
 leaving the face committed. The original measured245 allocations; its preserved
@@ -46,9 +46,24 @@ source inputs or unrelated data are removed.
 
 Continuous allocation exhaustion can retain an old published busy view until a
 healthy publication; recovery is tested, universal progress under exhaustion is
-not claimed. Calling-thread publication after queue admission remains a separate
-unverified seam. C allocator/other-thread failure injection, fresh whole-project
-regression, current application/device/accelerator qualification remain outside
-this native checkpoint.
+not claimed. A separate real calling-thread publication probe now confirms that a refused
+command can leave a queued Face edit. This pre-existing caller-admission bug
+remains open; the worker repair does not claim to fix it. C allocator/other-thread failure injection, fresh whole-project
+regression, broader device/accelerator qualification remain outside
+this checkpoint.
 
 The detailed receipt is [RETOPO-WORKER-PUBLICATION.json](validation/RETOPO-WORKER-PUBLICATION.json).
+
+
+## Matching ordinary application
+
+The same six-product/26-frontend admitted application cohort is relinked with
+only the qualified whole DocumentRetopo object replaced. Its ordinary product
+main passes15 normal and16 unzoomed compact FLTK checks plus27 actual-loader
+software OpenXR checks. All58 pass, six native outputs match the admitted main
+outputs byte for byte, and source/generated-input drift is empty. Seven actual
+process maps contain no unprotected immutable ELF and use the canonical SDK;
+the short committed-prefix loader case has no captured map and is not counted
+as a mapped process. No test dispatcher, fresh full build, sanitizer application,
+new hardware or headset claim is made. Read
+[the application receipt](validation/RETOPO-WORKER-APP.json).

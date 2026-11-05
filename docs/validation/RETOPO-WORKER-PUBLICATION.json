@@ -1,6 +1,6 @@
 {
   "base_main": "1a70f2afe46b37a30079bcf8667127154065fd5a",
-  "state": "native-qualified; ordinary-app validation pending",
+  "state": "Native and matched ordinary Release application qualified; admitted with exact product body68daffe",
   "source_sha256": {
     "src/document-retopo.cpp": "67cd2619411fb752228de2883e77288afcad22741d5e77d1dfd1e957789eada6",
     "tests/retopo-worker-faults.cpp": "bddf18158aabbfc5b9972822f974321a517bdf01af0256518e5494828314e3ae",
@@ -531,7 +531,31 @@
   },
   "known_limits": [
     "Reporter exhaustion can retain old published busy status until subsequent healthy publication.",
-    "Caller-side edit_retopology post-enqueue publish failure is a separate unverified seam.",
+    "Proven preexisting calling-thread post-enqueue publication failure: actual worker Face appears despite caller refusal; next repair.",
     "No fresh full-project build, full runtime suite, new GPU/accelerator, physical device, install or application qualification claim."
-  ]
+  ],
+  "ordinary_application": {
+    "receipt": "RETOPO-WORKER-APP.json",
+    "receipt_sha256": "33fa3b066033b6bdfa88ce21ba68aca0e77cdb1a99637840c446d599d61d1cc4",
+    "Release_checks": 58,
+    "normal": 15,
+    "compact_unzoomed": 16,
+    "real_loader_software_XR": 27,
+    "native_pairs_against_admitted_main": 6,
+    "actual_maps": 7,
+    "unprotected_immutable_ELFs": 0,
+    "source_generated_drift": [],
+    "scope": "One changed whole DocumentRetopo on admitted app cohort; ordinary product main, no dispatcher, no fresh full build/SAN app/GPU/HMD claim"
+  },
+  "calling_thread_counterexample": {
+    "source_base": "68daffefa427efb04604fc46e043617e173aa7c8",
+    "wrapper_exit": 0,
+    "actual_native_exit": 1,
+    "observer": "Actual worker Face observed after calling-thread publication throws; exact topology rollback invariant fails",
+    "source_sha256": "7270ef05a1780a4dfaaef39116c3d5b35d5975366626d10d3cc56d5ae92c3713",
+    "log_sha256": "c6377de8362679557011ee231f8152ad845c163814f911249feef7aeb86fa7a3",
+    "status_sha256": "7de19c59fddece934c2f931cef7d368b5fce5ad68f56aa54ebf4cc364a3bf58b",
+    "drift": [],
+    "initial_probe": "Initial local caller-seam probe returned0 before worker completion; wrapper expectednegative therefore1. Its result is preserved and is not evidence of rollback."
+  }
 }

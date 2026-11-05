@@ -1,3 +1,15 @@
+## Worker publication admission — 2026-11-05
+
+Main admits the exact68daffe worker product body: detached retopology geometry
+and history, rollback on view publication failure, file handoff only after
+successful publication, exact event retirement and reporter-exhaustion recovery.
+Release/sanitizer native fault and legacy consumers plus58 matched ordinary
+Release FLTK/software OpenXR checks pass. Read RETOPO-WORKER-PUBLICATION.md and
+its receipts. A separate pre-existing caller post-enqueue publication failure is
+now reproduced and remains open. This is scoped admission; all unfinished
+production, interoperability, physical-device, accelerator and drawer rows remain
+required. No new installation/headset/session restart is claimed.
+
 ## Production integration update — 2026-11-05
 
 Main now adds the qualified affine retopology/ordered-save/held-admission and
