@@ -1,5 +1,21 @@
 # Dome Sculpt production handoff
 
+## Private shade Apply with genuine later UV motion — 2026-11-05
+
+Test-only `d55158d` on sealedbd3: a real source custom expression Applies shade
+alone, leaving original happy colour/UV/morph motion nontrivial. R60.476/S128.707s
+both0/1899exact:47 actualworker +UNCHANGED generic independent172/36pairs each,
+allmax1<=4/coverage>300; frozen-sourceUV132, movingpaint46–48, tint23, shade12.
+Old1231 counter18/18.681s is genuine. Current runtime/src/include are byte-exact
+bd3, all copied archives/hash paired; no repeated fullfactory/newproduction or
+freshapp claim.72PNG+11worker files R/S exact;42official/KHR0errors21warnings/
+79infos12hints. Arc40349 terminal0/5.195s/1906exact:173/36pairs0 +actualsoftware1;
+PCI03fd/sysfs/maps observed, lease released. Configure672/two genuine fixture
+registrations only. This closes the preceding receipt's specifically missing
+movingUV+initialfactor input; remaining general MASK/BLEND/owners/roles/fullVRM
+and SAME original64560 stay required. Read VRM1-SHADE-MOVING-UV.md/JSON. No root
+frozen source/build changed; merge test-only follow-up after finite boundary.
+
 ## Private native shade Apply factorization — 2026-11-05
 
 Runtime `a78fc02` follows1231. Actual native paint→expression Apply preserves

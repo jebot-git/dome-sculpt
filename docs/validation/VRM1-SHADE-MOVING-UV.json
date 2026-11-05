@@ -1,0 +1,2663 @@
+{
+  "format": 1,
+  "test_commit": "d55158dfcf8a2036f376ef83e88551d62289c14f",
+  "runtime": "a78fc022a0a4137873655de7118656a30f260f5f",
+  "qualified_runtime_seal": "bd3c7dc779e8d62f840bcbebf0714efcbe001a5e",
+  "scope": "TEST-ONLY actual native custom shade-only Apply leaves genuine original happy color/UV/morph motion; exact sealedbd3 runtime/private/public headers and copied support, whole changed public worker and unchanged generic independent renderer. No fresh app/GUI/root ABI or repeated factory-sweep claim.",
+  "production_and_public_diff": "empty src/include vsbd3",
+  "stages": {
+    "counter-release": {
+      "status": {
+        "state": "terminal",
+        "pid": 1324531,
+        "steps": [
+          {
+            "name": "compile-vrm1-initial-shade-authoring",
+            "command": [
+              "/usr/bin/c++",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/src",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/third_party/cgltf",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/third_party/nlohmann",
+              "-O3",
+              "-DNDEBUG",
+              "-std=gnu++20",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/counter-release/stage/vrm1-initial-shade-authoring.cpp.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/tests/vrm1-initial-shade-authoring.cpp"
+            ],
+            "exit": 0,
+            "seconds": 17.37243769696215
+          },
+          {
+            "name": "link-worker",
+            "command": [
+              "/usr/bin/c++",
+              "-O3",
+              "-DNDEBUG",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/counter-release/stage/vrm1-initial-shade-authoring.cpp.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/counter-release/stage/worker",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/counter-release/stage/libdome-sculpt-core.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/counter-release/stage/libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/counter-release/stage/libdome-sculpt-polygon.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/counter-release/stage/libxatlas.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/counter-release/stage/libmikktspace.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/counter-release/stage/libmikktspace-robust.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/counter-release/stage/libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/counter-release/stage/libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded",
+              "-Wl,--wrap=fsync"
+            ],
+            "exit": 0,
+            "seconds": 0.6179338750080206
+          },
+          {
+            "name": "initial-factor-refusal",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/counter-release/stage/worker",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-preview-1853cc3/build-preview-release/vrm1-background-fixture/source.vrm",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/counter-release/run",
+              "--old-refusal",
+              "--shade-only"
+            ],
+            "exit": 0,
+            "seconds": 0.24885489797452465
+          }
+        ],
+        "scope": "Untouched sealed1231 runtime on copied immutable own matching support, whole NEW counter consumer only. Genuine native paint then Preview Apply, UndoRedo/Save and actual editable Avatar worker refusal, no product changes or full newbuild claim.",
+        "child_pid": 1326763,
+        "exit": 0,
+        "seconds": 18.68102107499726,
+        "inputs": 1899,
+        "drift": []
+      },
+      "status_sha256": "922c6b801ffca2984041331afa3f43b24dfe52dd0d3f791115b6a0816ba58ab0",
+      "log_digests": {
+        "compile-vrm1-initial-shade-authoring.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "initial-factor-refusal.log": "caa83c8b3ca85c9fa9404148beda7ebc67147fb7aa0f0243012c830478ea2607",
+        "link-worker.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "manifest_digests": {
+        "before.json": "bee745500e412b474e719cb96875e303b8f06871f2bda3e86e0d2c5d814448a4",
+        "after.json": "bee745500e412b474e719cb96875e303b8f06871f2bda3e86e0d2c5d814448a4"
+      }
+    },
+    "final-release": {
+      "status": {
+        "state": "terminal",
+        "pid": 1324710,
+        "steps": [
+          {
+            "name": "compile-vrm1-initial-shade-authoring",
+            "command": [
+              "/usr/bin/c++",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/src",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/third_party/cgltf",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/third_party/nlohmann",
+              "-O3",
+              "-DNDEBUG",
+              "-std=gnu++20",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-release/stage/vrm1-initial-shade-authoring.cpp.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/tests/vrm1-initial-shade-authoring.cpp"
+            ],
+            "exit": 0,
+            "seconds": 20.185989465971943
+          },
+          {
+            "name": "link-worker",
+            "command": [
+              "/usr/bin/c++",
+              "-O3",
+              "-DNDEBUG",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-release/stage/vrm1-initial-shade-authoring.cpp.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-release/stage/worker",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-release/stage/libdome-sculpt-core.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-release/stage/libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-release/stage/libdome-sculpt-polygon.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-release/stage/libxatlas.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-release/stage/libmikktspace.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-release/stage/libmikktspace-robust.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-release/stage/libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-release/stage/libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded",
+              "-Wl,--wrap=fsync"
+            ],
+            "exit": 0,
+            "seconds": 0.6290737409726717
+          },
+          {
+            "name": "compile-vrm1-expression-targets-render",
+            "command": [
+              "/usr/bin/c++",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/src",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/third_party/cgltf",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/third_party/nlohmann",
+              "-isystem",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/harfbuzz",
+              "-isystem",
+              "/usr/include/glib-2.0",
+              "-isystem",
+              "/usr/lib64/glib-2.0/include",
+              "-isystem",
+              "/usr/include/sysprof-6",
+              "-isystem",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/freetype2",
+              "-isystem",
+              "/usr/include/libpng16",
+              "-isystem",
+              "/usr/include/libxml2",
+              "-O3",
+              "-DNDEBUG",
+              "-std=gnu++20",
+              "-pthread",
+              "-DWITH_GZFILEOP",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-release/stage/vrm1-expression-targets-render.cpp.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/tests/vrm1-expression-targets-render.cpp"
+            ],
+            "exit": 0,
+            "seconds": 33.21111552999355
+          },
+          {
+            "name": "link-render",
+            "command": [
+              "/usr/bin/c++",
+              "-O3",
+              "-DNDEBUG",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-release/stage/vrm1-expression-targets-render.cpp.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-release/stage/render",
+              "-Wl,-rpath,/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-release/stage/libdome-sculpt-render.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-release/stage/libdome-sculpt-core.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-release/stage/libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-release/stage/libdome-sculpt-polygon.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-release/stage/libxatlas.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-release/stage/libmikktspace.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-release/stage/libmikktspace-robust.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-release/stage/libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-release/stage/libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libharfbuzz.so",
+              "/usr/lib64/libEGL.so",
+              "/usr/lib64/libGL.so",
+              "/usr/lib64/libfontconfig.so",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libfreetype.so",
+              "/usr/lib64/libicui18n.so",
+              "/usr/lib64/libicuuc.so",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit": 0,
+            "seconds": 0.6739230079692788
+          },
+          {
+            "name": "initial-shade-worker",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-release/stage/worker",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-preview-1853cc3/build-preview-release/vrm1-background-fixture/source.vrm",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-release/initial-shade-run",
+              "--positive",
+              "--shade-only"
+            ],
+            "exit": 0,
+            "seconds": 3.1111166889895685
+          },
+          {
+            "name": "initial-shade-render",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-release/stage/render",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-release/initial-shade-run",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-release/initial-shade-images"
+            ],
+            "exit": 0,
+            "seconds": 2.347607464995235
+          }
+        ],
+        "scope": "TEST-ONLY descendant; exact sealedbd3 runtime/private/public headers. Whole changed public worker +unchanged generic independent renderer on copied bd3 three-TU-qualified support. Actual shade-only native Apply leaves nontrivial happy color/UV/morph motion. No production mutation, freshapp or repeated factory sweep.",
+        "child_pid": 1330736,
+        "exit": 0,
+        "seconds": 60.4764064589981,
+        "inputs": 1899,
+        "drift": []
+      },
+      "status_sha256": "cd90241cb742c72ff9562afd228846527394a5db6985f3cc41727cc931612838",
+      "log_digests": {
+        "compile-vrm1-expression-targets-render.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "compile-vrm1-initial-shade-authoring.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "initial-shade-render.log": "cc40bed96f0c2d13db212ca690a8c85eeedd23db2bbf3af643925f0115465a48",
+        "initial-shade-worker.log": "ff07f8a822020fe18ed4d20ddb612436c70a26a093eab7be66156035849cb2b6",
+        "link-render.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "link-worker.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "manifest_digests": {
+        "before.json": "1f2c193640706a2b91cbe4e3d1d25fd51c5dad5bac0f169b96242381068e909e",
+        "after.json": "1f2c193640706a2b91cbe4e3d1d25fd51c5dad5bac0f169b96242381068e909e"
+      }
+    },
+    "final-sanitize": {
+      "status": {
+        "state": "terminal",
+        "pid": 1324875,
+        "steps": [
+          {
+            "name": "compile-vrm1-initial-shade-authoring",
+            "command": [
+              "/usr/bin/c++",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/src",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/third_party/cgltf",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/third_party/nlohmann",
+              "-O1",
+              "-g1",
+              "-UNDEBUG",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "-std=gnu++20",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-sanitize/stage/vrm1-initial-shade-authoring.cpp.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/tests/vrm1-initial-shade-authoring.cpp"
+            ],
+            "exit": 0,
+            "seconds": 27.100392760999966
+          },
+          {
+            "name": "link-worker",
+            "command": [
+              "/usr/bin/c++",
+              "-O1",
+              "-g1",
+              "-UNDEBUG",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "-fsanitize=address,undefined",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-sanitize/stage/vrm1-initial-shade-authoring.cpp.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-sanitize/stage/worker",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-sanitize/stage/libdome-sculpt-core.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-sanitize/stage/libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-sanitize/stage/libdome-sculpt-polygon.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-sanitize/stage/libxatlas.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-sanitize/stage/libmikktspace.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-sanitize/stage/libmikktspace-robust.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-sanitize/stage/libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-sanitize/stage/libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded",
+              "-Wl,--wrap=fsync"
+            ],
+            "exit": 0,
+            "seconds": 4.588399175030645
+          },
+          {
+            "name": "compile-vrm1-expression-targets-render",
+            "command": [
+              "/usr/bin/c++",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/src",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/third_party/cgltf",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/third_party/nlohmann",
+              "-isystem",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/harfbuzz",
+              "-isystem",
+              "/usr/include/glib-2.0",
+              "-isystem",
+              "/usr/lib64/glib-2.0/include",
+              "-isystem",
+              "/usr/include/sysprof-6",
+              "-isystem",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/freetype2",
+              "-isystem",
+              "/usr/include/libpng16",
+              "-isystem",
+              "/usr/include/libxml2",
+              "-O1",
+              "-g1",
+              "-UNDEBUG",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "-std=gnu++20",
+              "-pthread",
+              "-DWITH_GZFILEOP",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-sanitize/stage/vrm1-expression-targets-render.cpp.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/tests/vrm1-expression-targets-render.cpp"
+            ],
+            "exit": 0,
+            "seconds": 43.55367561301682
+          },
+          {
+            "name": "link-render",
+            "command": [
+              "/usr/bin/c++",
+              "-O1",
+              "-g1",
+              "-UNDEBUG",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "-fsanitize=address,undefined",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-sanitize/stage/vrm1-expression-targets-render.cpp.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-sanitize/stage/render",
+              "-Wl,-rpath,/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-sanitize/stage/libdome-sculpt-render.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-sanitize/stage/libdome-sculpt-core.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-sanitize/stage/libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-sanitize/stage/libdome-sculpt-polygon.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-sanitize/stage/libxatlas.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-sanitize/stage/libmikktspace.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-sanitize/stage/libmikktspace-robust.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-sanitize/stage/libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-sanitize/stage/libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libharfbuzz.so",
+              "/usr/lib64/libEGL.so",
+              "/usr/lib64/libGL.so",
+              "/usr/lib64/libfontconfig.so",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libfreetype.so",
+              "/usr/lib64/libicui18n.so",
+              "/usr/lib64/libicuuc.so",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit": 0,
+            "seconds": 4.83321989903925
+          },
+          {
+            "name": "initial-shade-worker",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-sanitize/stage/worker",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-preview-1853cc3/build-preview-release/vrm1-background-fixture/source.vrm",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-sanitize/initial-shade-run",
+              "--positive",
+              "--shade-only"
+            ],
+            "exit": 0,
+            "seconds": 38.96712596795987
+          },
+          {
+            "name": "initial-shade-render",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-sanitize/stage/render",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-sanitize/initial-shade-run",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-sanitize/initial-shade-images"
+            ],
+            "exit": 0,
+            "seconds": 8.407822198991198
+          }
+        ],
+        "scope": "TEST-ONLY descendant; exact sealedbd3 runtime/private/public headers. Whole changed public worker +unchanged generic independent renderer on copied bd3 three-TU-qualified support. Actual shade-only native Apply leaves nontrivial happy color/UV/morph motion. No production mutation, freshapp or repeated factory sweep.",
+        "child_pid": 1336675,
+        "exit": 0,
+        "seconds": 128.70702590199653,
+        "inputs": 1899,
+        "drift": []
+      },
+      "status_sha256": "48e25a085d40485269b07936297db3396c38116e625097a3a263e815da5a8175",
+      "log_digests": {
+        "compile-vrm1-expression-targets-render.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "compile-vrm1-initial-shade-authoring.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "initial-shade-render.log": "cc40bed96f0c2d13db212ca690a8c85eeedd23db2bbf3af643925f0115465a48",
+        "initial-shade-worker.log": "ff07f8a822020fe18ed4d20ddb612436c70a26a093eab7be66156035849cb2b6",
+        "link-render.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "link-worker.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "manifest_digests": {
+        "before.json": "7a6f02db671f910552b582354626621a68d07ad8224deb7495308c616cd80825",
+        "after.json": "7a6f02db671f910552b582354626621a68d07ad8224deb7495308c616cd80825"
+      }
+    },
+    "hardware": {
+      "status": {
+        "state": "terminal",
+        "pid": 1345500,
+        "steps": [
+          {
+            "name": "initial-shade",
+            "pid": 1345631,
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-release/stage/render",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-release/initial-shade-run",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/hardware/initial-shade",
+              "--hardware"
+            ],
+            "exit": 0,
+            "expected_exit": 0,
+            "seconds": 3.4278624859871343,
+            "actual_drm_fds": {
+              "/dev/dri/renderD129": {
+                "sysfs_device": "/sys/devices/pci0000:00/0000:00:01.0/0000:01:00.0/0000:02:01.0/0000:03:00.0",
+                "vendor": "0x8086",
+                "device": "0x56a0"
+              }
+            }
+          },
+          {
+            "name": "software-refusal",
+            "pid": 1345990,
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-release/stage/render",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-release/initial-shade-run",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/hardware/software-refusal",
+              "--hardware"
+            ],
+            "exit": 1,
+            "expected_exit": 1,
+            "seconds": 1.6381374369957484,
+            "actual_drm_fds": {
+              "/dev/dri/card1": {
+                "sysfs_device": "/sys/devices/pci0000:00/0000:00:02.0",
+                "vendor": "0x8086",
+                "device": "0x4680"
+              }
+            }
+          }
+        ],
+        "scope": "Actual GL independent metadata/skin/morph rendering and immutable-view upload checks; no compute, app/UI or headset claim.",
+        "child_pid": 1345990,
+        "exit": 0,
+        "seconds": 5.1950195679673925,
+        "inputs": 1906,
+        "drift": []
+      },
+      "status_sha256": "6b06a72f1df756c0a9758ead9b1aa6be1a58a9f7e0602f6b528a0a3280f1f3a9",
+      "log_digests": {
+        "initial-shade.log": "b1af6916251a3cb5a701db1509d86910c5dcba0ee096ea8cfc03efe006ee3f8b",
+        "software-refusal.log": "7597d623ae75626f86a15570b53eca8cad19dcc08808a1b4ed68e76ed435be40"
+      },
+      "manifest_digests": {
+        "before.json": "eed9b4c07589ab7dcbbd852cf9fa124d2b5af5f0ec6a052cc440a962c679df07",
+        "after.json": "eed9b4c07589ab7dcbbd852cf9fa124d2b5af5f0ec6a052cc440a962c679df07"
+      }
+    },
+    "configuration": {
+      "status": {
+        "exit": 0,
+        "seconds": 8.892663914011791,
+        "command": [
+          "cmake",
+          "-S",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3",
+          "-B",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/configuration/build",
+          "-G",
+          "Ninja",
+          "-DCMAKE_BUILD_TYPE=Release",
+          "-DCMAKE_EXPORT_COMPILE_COMMANDS=ON",
+          "-DBUILD_TESTING=ON",
+          "-DDOME_COMPUTE_BACKEND=CPU",
+          "-DFLTK_DIR=/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-release/share/fltk"
+        ],
+        "scope": "Test-only fixture registration/configuration, not a fresh production build/CTest execution.",
+        "registered": 672,
+        "new_graph": [
+          {
+            "backtrace": 1235,
+            "name": "vrm1-initial-shade-moving-uv-authoring",
+            "properties": [
+              {
+                "name": "DEPENDS",
+                "value": [
+                  "vrm1-background-fixture"
+                ]
+              },
+              {
+                "name": "FIXTURES_REQUIRED",
+                "value": [
+                  "vrm1-background-model"
+                ]
+              },
+              {
+                "name": "FIXTURES_SETUP",
+                "value": [
+                  "vrm1-initial-shade-moving-uv-model"
+                ]
+              },
+              {
+                "name": "TIMEOUT",
+                "value": 900.0
+              },
+              {
+                "name": "WORKING_DIRECTORY",
+                "value": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/configuration/build"
+              }
+            ]
+          },
+          {
+            "backtrace": 1237,
+            "name": "vrm1-initial-shade-moving-uv-render",
+            "properties": [
+              {
+                "name": "DEPENDS",
+                "value": [
+                  "vrm1-initial-shade-moving-uv-authoring"
+                ]
+              },
+              {
+                "name": "ENVIRONMENT",
+                "value": [
+                  "LIBGL_ALWAYS_SOFTWARE=1",
+                  "LP_NUM_THREADS=2"
+                ]
+              },
+              {
+                "name": "FIXTURES_REQUIRED",
+                "value": [
+                  "vrm1-initial-shade-moving-uv-model"
+                ]
+              },
+              {
+                "name": "TIMEOUT",
+                "value": 900.0
+              },
+              {
+                "name": "WORKING_DIRECTORY",
+                "value": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/configuration/build"
+              }
+            ]
+          }
+        ],
+        "drift": []
+      },
+      "status_sha256": "87ed413006a28318ae37bcf27203d1c43f49b9d07d33f50d33258eaf53495377",
+      "log_digests": {
+        "configure.log": "05c29b4b0737c717413b1dd8d5f9a8d9bf5281e70cbebc3d5c9383e50e4399e9"
+      },
+      "manifest_digests": {
+        "before.json": "a478b167dd9fabebc8d70de3198eecf6ade4132cd7a10c4915c4d6e6644bf0fc"
+      }
+    },
+    "validation": {
+      "status": {
+        "scope": "Actual4 current positive worker outputs plus genuine raw local-cutout source input. No output rewrite. No prior-file sentinels or rewritten output. Pinned official and maxIssues0 unfiltered Khronos.",
+        "files": {
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-release/initial-shade-run/dynamic.vrm": "e47ad3df7e3a2d76cc4d796a5f875330fe345a7c278271e6f4ece2935ec3467c",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-release/initial-shade-run/dynamic-512.vrm": "d60db3aac9d0358da9b0ed102c4ab590b5529d55ff5bb06f5abc9fd71c4de312",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-release/initial-shade-run/dynamic-1024.vrm": "69c1625bc279c3b5955764ff76c48eaead0aee77feaea22b4fa7f412da7f7997",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-release/initial-shade-run/dynamic-second.vrm": "e47ad3df7e3a2d76cc4d796a5f875330fe345a7c278271e6f4ece2935ec3467c",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-release/initial-shade-run/source-initial-shade.vrm": "e1a509534389ae9b89467d47cecaec1737a05fdc52b25b917a211a120c3c7603"
+        },
+        "steps": [
+          {
+            "name": "official",
+            "command": [
+              "/home/blux/.local/bin/uv",
+              "run",
+              "--offline",
+              "--with",
+              "jsonschema",
+              "python",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/validation/official.py",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-release/initial-shade-run/dynamic.vrm",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-release/initial-shade-run/dynamic-512.vrm",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-release/initial-shade-run/dynamic-1024.vrm",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-release/initial-shade-run/dynamic-second.vrm",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-release/initial-shade-run/source-initial-shade.vrm"
+            ],
+            "exit": 0,
+            "seconds": 0.5128537789569236
+          },
+          {
+            "name": "khronos",
+            "command": [
+              "node",
+              "-e",
+              "const fs=require('fs'),v=require('/home/blux/de-xr/dome-sculpt/artifacts/gltf-validator/node_modules/gltf-validator');(async()=>{let code=0;const all=[];for(const p of process.argv.slice(1)){const r=await v.validateBytes(new Uint8Array(fs.readFileSync(p)),{maxIssues:0,uri:p});all.push({path:p,result:r});if(r.issues.numErrors)code=1;}process.stdout.write(JSON.stringify(all,null,2));process.exitCode=code;})();",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-release/initial-shade-run/dynamic.vrm",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-release/initial-shade-run/dynamic-512.vrm",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-release/initial-shade-run/dynamic-1024.vrm",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-release/initial-shade-run/dynamic-second.vrm",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-release/initial-shade-run/source-initial-shade.vrm"
+            ],
+            "exit": 0,
+            "seconds": 0.5988908790168352
+          }
+        ],
+        "exit": 0,
+        "seconds": 1.1139792639878578,
+        "drift": []
+      },
+      "status_sha256": "c3225bb707b465c2b4430ddbdef6113213e3fc8cf0c1731becfa735b840809c4",
+      "log_digests": {
+        "khronos.log": "9dd7cd02ce12d151ffaaf7b705999747fb5fa5551936cab6dc7f98aa9477cba5",
+        "official.log": "bb37849a787b41be93b008510673862cae76e62afd0624598487695ed4b9cdcd"
+      },
+      "manifest_digests": {
+        "before.json": "d78efff41005d4c156bb2f561064b203ff6975f68d581aedc362a1f664694b6c",
+        "after.json": "d78efff41005d4c156bb2f561064b203ff6975f68d581aedc362a1f664694b6c"
+      }
+    }
+  },
+  "profile_pairs": {
+    "pairs": [
+      {
+        "release": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-release/initial-shade-run/after-cancel.dsculpt",
+        "sanitize": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-sanitize/initial-shade-run/after-cancel.dsculpt",
+        "sha256": "d99b270d9eee8724c0d075f642ba98869c6b4709b5d08e0e38360ebc30343692"
+      },
+      {
+        "release": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-release/initial-shade-run/applied-source.dsculpt",
+        "sanitize": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-sanitize/initial-shade-run/applied-source.dsculpt",
+        "sha256": "d99b270d9eee8724c0d075f642ba98869c6b4709b5d08e0e38360ebc30343692"
+      },
+      {
+        "release": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-release/initial-shade-run/dynamic-1024.vrm",
+        "sanitize": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-sanitize/initial-shade-run/dynamic-1024.vrm",
+        "sha256": "69c1625bc279c3b5955764ff76c48eaead0aee77feaea22b4fa7f412da7f7997"
+      },
+      {
+        "release": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-release/initial-shade-run/dynamic-512.vrm",
+        "sanitize": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-sanitize/initial-shade-run/dynamic-512.vrm",
+        "sha256": "d60db3aac9d0358da9b0ed102c4ab590b5529d55ff5bb06f5abc9fd71c4de312"
+      },
+      {
+        "release": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-release/initial-shade-run/dynamic-second.vrm",
+        "sanitize": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-sanitize/initial-shade-run/dynamic-second.vrm",
+        "sha256": "e47ad3df7e3a2d76cc4d796a5f875330fe345a7c278271e6f4ece2935ec3467c"
+      },
+      {
+        "release": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-release/initial-shade-run/dynamic.vrm",
+        "sanitize": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-sanitize/initial-shade-run/dynamic.vrm",
+        "sha256": "e47ad3df7e3a2d76cc4d796a5f875330fe345a7c278271e6f4ece2935ec3467c"
+      },
+      {
+        "release": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-release/initial-shade-run/nonuniform-source.dsculpt",
+        "sanitize": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-sanitize/initial-shade-run/nonuniform-source.dsculpt",
+        "sha256": "d99b270d9eee8724c0d075f642ba98869c6b4709b5d08e0e38360ebc30343692"
+      },
+      {
+        "release": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-release/initial-shade-run/ordered.dsculpt",
+        "sanitize": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-sanitize/initial-shade-run/ordered.dsculpt",
+        "sha256": "d99b270d9eee8724c0d075f642ba98869c6b4709b5d08e0e38360ebc30343692"
+      },
+      {
+        "release": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-release/initial-shade-run/reopened.dsculpt",
+        "sanitize": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-sanitize/initial-shade-run/reopened.dsculpt",
+        "sha256": "c78ead9d30bf8c830a35a292e859b8e4653d432b29539cce2252692efd1bbd35"
+      },
+      {
+        "release": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-release/initial-shade-run/source-initial-shade.vrm",
+        "sanitize": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-sanitize/initial-shade-run/source-initial-shade.vrm",
+        "sha256": "e1a509534389ae9b89467d47cecaec1737a05fdc52b25b917a211a120c3c7603"
+      },
+      {
+        "release": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-release/initial-shade-run/waiting.vrm",
+        "sanitize": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-sanitize/initial-shade-run/waiting.vrm",
+        "sha256": "9f1862847a0f31aa299a328e280ba7d592a923fc2567ff92ae1bc212a2b0dce5"
+      },
+      {
+        "release": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-release/initial-shade-images/dynamic-1024.vrm-p0-h0.000000-c0.000000-e0-native.png",
+        "sanitize": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-sanitize/initial-shade-images/dynamic-1024.vrm-p0-h0.000000-c0.000000-e0-native.png",
+        "sha256": "46ad1e7fb51ad8dffdd0ebf3bbd83eaa05b9ffc386538fb2b2b789397607893b"
+      },
+      {
+        "release": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-release/initial-shade-images/dynamic-1024.vrm-p0-h0.000000-c0.000000-e0-parsed.png",
+        "sanitize": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-sanitize/initial-shade-images/dynamic-1024.vrm-p0-h0.000000-c0.000000-e0-parsed.png",
+        "sha256": "fd1f0198eb0395d682fc9e4fa3548646ea1714b934fe5800f344c911fc6b4172"
+      },
+      {
+        "release": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-release/initial-shade-images/dynamic-1024.vrm-p0-h0.000000-c0.000000-e1-native.png",
+        "sanitize": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-sanitize/initial-shade-images/dynamic-1024.vrm-p0-h0.000000-c0.000000-e1-native.png",
+        "sha256": "042004e159f6679cba9b89705f385a9694fe30437d8815b6eefb8a7151094ab7"
+      },
+      {
+        "release": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-release/initial-shade-images/dynamic-1024.vrm-p0-h0.000000-c0.000000-e1-parsed.png",
+        "sanitize": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-sanitize/initial-shade-images/dynamic-1024.vrm-p0-h0.000000-c0.000000-e1-parsed.png",
+        "sha256": "ff99584a59d4c66a96141893762d083ff129df11248b6e4953d722862debf570"
+      },
+      {
+        "release": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-release/initial-shade-images/dynamic-1024.vrm-p0-h0.350000-c0.000000-e0-native.png",
+        "sanitize": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-sanitize/initial-shade-images/dynamic-1024.vrm-p0-h0.350000-c0.000000-e0-native.png",
+        "sha256": "a9cb0147ac693ab830cf6eb848ddf71008f40882192d13e62e716df87d621008"
+      },
+      {
+        "release": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-release/initial-shade-images/dynamic-1024.vrm-p0-h0.350000-c0.000000-e0-parsed.png",
+        "sanitize": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-sanitize/initial-shade-images/dynamic-1024.vrm-p0-h0.350000-c0.000000-e0-parsed.png",
+        "sha256": "0d0096146f1e80414fd41b248a1750c1435129d0acd240286f22a8d402ec6eae"
+      },
+      {
+        "release": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-release/initial-shade-images/dynamic-1024.vrm-p0-h0.350000-c0.000000-e1-native.png",
+        "sanitize": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-sanitize/initial-shade-images/dynamic-1024.vrm-p0-h0.350000-c0.000000-e1-native.png",
+        "sha256": "3aa3979dc5cb9f5fc9ff2d448779f76595a596b11b044f061f6839485cb0086c"
+      },
+      {
+        "release": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-release/initial-shade-images/dynamic-1024.vrm-p0-h0.350000-c0.000000-e1-parsed.png",
+        "sanitize": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-sanitize/initial-shade-images/dynamic-1024.vrm-p0-h0.350000-c0.000000-e1-parsed.png",
+        "sha256": "3cce68e316ff86f2c29b1993d750d37f5c572a7956f50e35171f5cb696fcdaeb"
+      },
+      {
+        "release": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-release/initial-shade-images/dynamic-1024.vrm-p0-h1.000000-c0.000000-e0-native.png",
+        "sanitize": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-sanitize/initial-shade-images/dynamic-1024.vrm-p0-h1.000000-c0.000000-e0-native.png",
+        "sha256": "108898242b88c47387982738d3a06bbd5bf1c2623a7c6230da3f3f2b37db6754"
+      },
+      {
+        "release": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-release/initial-shade-images/dynamic-1024.vrm-p0-h1.000000-c0.000000-e0-parsed.png",
+        "sanitize": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-sanitize/initial-shade-images/dynamic-1024.vrm-p0-h1.000000-c0.000000-e0-parsed.png",
+        "sha256": "9db9f36025b3181e7411d65a44326b84641918cbbb291c7b102b3258e8364bea"
+      },
+      {
+        "release": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-release/initial-shade-images/dynamic-1024.vrm-p0-h1.000000-c0.000000-e1-native.png",
+        "sanitize": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-sanitize/initial-shade-images/dynamic-1024.vrm-p0-h1.000000-c0.000000-e1-native.png",
+        "sha256": "3690c8cdb295e680986c1cd822ec92191c94a0354f05babaa5e6b93cdd205de6"
+      },
+      {
+        "release": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-release/initial-shade-images/dynamic-1024.vrm-p0-h1.000000-c0.000000-e1-parsed.png",
+        "sanitize": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-sanitize/initial-shade-images/dynamic-1024.vrm-p0-h1.000000-c0.000000-e1-parsed.png",
+        "sha256": "713b0e69a91190f2008e4b9ba7cc132ad5284bcacb462ec543e2e5df45015f80"
+      },
+      {
+        "release": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-release/initial-shade-images/dynamic-1024.vrm-p2-h0.000000-c0.000000-e0-native.png",
+        "sanitize": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-sanitize/initial-shade-images/dynamic-1024.vrm-p2-h0.000000-c0.000000-e0-native.png",
+        "sha256": "d0b58f15ebbd023e7a3262fd7eea574355219dcad965e5efac239369b0bf34c5"
+      },
+      {
+        "release": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-release/initial-shade-images/dynamic-1024.vrm-p2-h0.000000-c0.000000-e0-parsed.png",
+        "sanitize": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-sanitize/initial-shade-images/dynamic-1024.vrm-p2-h0.000000-c0.000000-e0-parsed.png",
+        "sha256": "a6600c529c447a6e83711c73a2b266863b618e4772955e0d316a34633502758c"
+      },
+      {
+        "release": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-release/initial-shade-images/dynamic-1024.vrm-p2-h0.000000-c0.000000-e1-native.png",
+        "sanitize": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-sanitize/initial-shade-images/dynamic-1024.vrm-p2-h0.000000-c0.000000-e1-native.png",
+        "sha256": "26e90d5fbfcf3100f33b924eb7ba8c8f0b3a345fb666b9ca511e7c250ef13091"
+      },
+      {
+        "release": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-release/initial-shade-images/dynamic-1024.vrm-p2-h0.000000-c0.000000-e1-parsed.png",
+        "sanitize": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-sanitize/initial-shade-images/dynamic-1024.vrm-p2-h0.000000-c0.000000-e1-parsed.png",
+        "sha256": "8f9883b1c9c9edf1070d9f42b374e1e7907bc91aa3115e490ff0f618147a69d1"
+      },
+      {
+        "release": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-release/initial-shade-images/dynamic-1024.vrm-p2-h0.350000-c0.000000-e0-native.png",
+        "sanitize": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-sanitize/initial-shade-images/dynamic-1024.vrm-p2-h0.350000-c0.000000-e0-native.png",
+        "sha256": "f5814a069975ca6973aad7b116e7bddf26f6817237005ab381637beed7cd2960"
+      },
+      {
+        "release": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-release/initial-shade-images/dynamic-1024.vrm-p2-h0.350000-c0.000000-e0-parsed.png",
+        "sanitize": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-sanitize/initial-shade-images/dynamic-1024.vrm-p2-h0.350000-c0.000000-e0-parsed.png",
+        "sha256": "5b613171a5a5cd23b4b84faef445fb18a63f60dfdef19c128602013fcd963889"
+      },
+      {
+        "release": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-release/initial-shade-images/dynamic-1024.vrm-p2-h0.350000-c0.000000-e1-native.png",
+        "sanitize": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-sanitize/initial-shade-images/dynamic-1024.vrm-p2-h0.350000-c0.000000-e1-native.png",
+        "sha256": "490a3ee751d9be5f5204bb97aebf03f058b2facdd1ffa45e6da8a1b44c1acad7"
+      },
+      {
+        "release": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-release/initial-shade-images/dynamic-1024.vrm-p2-h0.350000-c0.000000-e1-parsed.png",
+        "sanitize": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-sanitize/initial-shade-images/dynamic-1024.vrm-p2-h0.350000-c0.000000-e1-parsed.png",
+        "sha256": "87617da2e81d08aed9dfa2b46415f71e0de224173e96cb24bad38d2bd94ae618"
+      },
+      {
+        "release": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-release/initial-shade-images/dynamic-1024.vrm-p2-h1.000000-c0.000000-e0-native.png",
+        "sanitize": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-sanitize/initial-shade-images/dynamic-1024.vrm-p2-h1.000000-c0.000000-e0-native.png",
+        "sha256": "2e1a1746334dff7c0d30474382f5e4ca221ed2bfdc998b3672aed32dee9517dc"
+      },
+      {
+        "release": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-release/initial-shade-images/dynamic-1024.vrm-p2-h1.000000-c0.000000-e0-parsed.png",
+        "sanitize": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-sanitize/initial-shade-images/dynamic-1024.vrm-p2-h1.000000-c0.000000-e0-parsed.png",
+        "sha256": "b5a142dd807d3734802c710d14f08f762e62a169605e46fda45541c80d7139dd"
+      },
+      {
+        "release": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-release/initial-shade-images/dynamic-1024.vrm-p2-h1.000000-c0.000000-e1-native.png",
+        "sanitize": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-sanitize/initial-shade-images/dynamic-1024.vrm-p2-h1.000000-c0.000000-e1-native.png",
+        "sha256": "d016f715c505d5a1861c61b4a463a4e4d9617b0fb3b61cf48d145977cabd7941"
+      },
+      {
+        "release": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-release/initial-shade-images/dynamic-1024.vrm-p2-h1.000000-c0.000000-e1-parsed.png",
+        "sanitize": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-sanitize/initial-shade-images/dynamic-1024.vrm-p2-h1.000000-c0.000000-e1-parsed.png",
+        "sha256": "b7f9a45ae9d61b9f06b992f534ec147a443805420777a1160e965195fa2a095d"
+      },
+      {
+        "release": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-release/initial-shade-images/dynamic-512.vrm-p0-h0.000000-c0.000000-e0-native.png",
+        "sanitize": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-sanitize/initial-shade-images/dynamic-512.vrm-p0-h0.000000-c0.000000-e0-native.png",
+        "sha256": "46ad1e7fb51ad8dffdd0ebf3bbd83eaa05b9ffc386538fb2b2b789397607893b"
+      },
+      {
+        "release": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-release/initial-shade-images/dynamic-512.vrm-p0-h0.000000-c0.000000-e0-parsed.png",
+        "sanitize": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-sanitize/initial-shade-images/dynamic-512.vrm-p0-h0.000000-c0.000000-e0-parsed.png",
+        "sha256": "9ff2efc940f8bf5b2f8c14cf06be77db951c42d64709c811162d15970ce32b29"
+      },
+      {
+        "release": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-release/initial-shade-images/dynamic-512.vrm-p0-h0.000000-c0.000000-e1-native.png",
+        "sanitize": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-sanitize/initial-shade-images/dynamic-512.vrm-p0-h0.000000-c0.000000-e1-native.png",
+        "sha256": "042004e159f6679cba9b89705f385a9694fe30437d8815b6eefb8a7151094ab7"
+      },
+      {
+        "release": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-release/initial-shade-images/dynamic-512.vrm-p0-h0.000000-c0.000000-e1-parsed.png",
+        "sanitize": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-sanitize/initial-shade-images/dynamic-512.vrm-p0-h0.000000-c0.000000-e1-parsed.png",
+        "sha256": "b8f97e3fa95dba1d5d427ab1134694c9708adc965f465fe23c9a027bc6ca920b"
+      },
+      {
+        "release": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-release/initial-shade-images/dynamic-512.vrm-p0-h0.350000-c0.000000-e0-native.png",
+        "sanitize": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-sanitize/initial-shade-images/dynamic-512.vrm-p0-h0.350000-c0.000000-e0-native.png",
+        "sha256": "a9cb0147ac693ab830cf6eb848ddf71008f40882192d13e62e716df87d621008"
+      },
+      {
+        "release": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-release/initial-shade-images/dynamic-512.vrm-p0-h0.350000-c0.000000-e0-parsed.png",
+        "sanitize": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-sanitize/initial-shade-images/dynamic-512.vrm-p0-h0.350000-c0.000000-e0-parsed.png",
+        "sha256": "89966e6ec37b0149cbaf8350a9b282cdd8284af41500e56e87a9a6e6e8e15caa"
+      },
+      {
+        "release": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-release/initial-shade-images/dynamic-512.vrm-p0-h0.350000-c0.000000-e1-native.png",
+        "sanitize": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-sanitize/initial-shade-images/dynamic-512.vrm-p0-h0.350000-c0.000000-e1-native.png",
+        "sha256": "3aa3979dc5cb9f5fc9ff2d448779f76595a596b11b044f061f6839485cb0086c"
+      },
+      {
+        "release": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-release/initial-shade-images/dynamic-512.vrm-p0-h0.350000-c0.000000-e1-parsed.png",
+        "sanitize": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-sanitize/initial-shade-images/dynamic-512.vrm-p0-h0.350000-c0.000000-e1-parsed.png",
+        "sha256": "e43da3a37d1643899f2b3466427dab31292adbe8483bf219a86fad438d714591"
+      },
+      {
+        "release": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-release/initial-shade-images/dynamic-512.vrm-p0-h1.000000-c0.000000-e0-native.png",
+        "sanitize": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-sanitize/initial-shade-images/dynamic-512.vrm-p0-h1.000000-c0.000000-e0-native.png",
+        "sha256": "108898242b88c47387982738d3a06bbd5bf1c2623a7c6230da3f3f2b37db6754"
+      },
+      {
+        "release": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-release/initial-shade-images/dynamic-512.vrm-p0-h1.000000-c0.000000-e0-parsed.png",
+        "sanitize": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-sanitize/initial-shade-images/dynamic-512.vrm-p0-h1.000000-c0.000000-e0-parsed.png",
+        "sha256": "9c25e5a335f4fe32e973493145b9ee1690b875b5be0410f970f1be08bcfb89b0"
+      },
+      {
+        "release": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-release/initial-shade-images/dynamic-512.vrm-p0-h1.000000-c0.000000-e1-native.png",
+        "sanitize": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-sanitize/initial-shade-images/dynamic-512.vrm-p0-h1.000000-c0.000000-e1-native.png",
+        "sha256": "3690c8cdb295e680986c1cd822ec92191c94a0354f05babaa5e6b93cdd205de6"
+      },
+      {
+        "release": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-release/initial-shade-images/dynamic-512.vrm-p0-h1.000000-c0.000000-e1-parsed.png",
+        "sanitize": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-sanitize/initial-shade-images/dynamic-512.vrm-p0-h1.000000-c0.000000-e1-parsed.png",
+        "sha256": "7d533bc4b24bb74501ba99499c9af50d5e2ea1e5e75efa2a7bd95eeecfa566fb"
+      },
+      {
+        "release": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-release/initial-shade-images/dynamic-512.vrm-p2-h0.000000-c0.000000-e0-native.png",
+        "sanitize": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-sanitize/initial-shade-images/dynamic-512.vrm-p2-h0.000000-c0.000000-e0-native.png",
+        "sha256": "d0b58f15ebbd023e7a3262fd7eea574355219dcad965e5efac239369b0bf34c5"
+      },
+      {
+        "release": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-release/initial-shade-images/dynamic-512.vrm-p2-h0.000000-c0.000000-e0-parsed.png",
+        "sanitize": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-sanitize/initial-shade-images/dynamic-512.vrm-p2-h0.000000-c0.000000-e0-parsed.png",
+        "sha256": "18fb87dddb66845eec80d9966cf8e41635e649f892f48e03a342efe9c7eb7df3"
+      },
+      {
+        "release": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-release/initial-shade-images/dynamic-512.vrm-p2-h0.000000-c0.000000-e1-native.png",
+        "sanitize": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-sanitize/initial-shade-images/dynamic-512.vrm-p2-h0.000000-c0.000000-e1-native.png",
+        "sha256": "26e90d5fbfcf3100f33b924eb7ba8c8f0b3a345fb666b9ca511e7c250ef13091"
+      },
+      {
+        "release": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-release/initial-shade-images/dynamic-512.vrm-p2-h0.000000-c0.000000-e1-parsed.png",
+        "sanitize": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-sanitize/initial-shade-images/dynamic-512.vrm-p2-h0.000000-c0.000000-e1-parsed.png",
+        "sha256": "8ee6e8beda1074f5dbb9855a9d5b03491da856074540e45289281dc2cad8fcf3"
+      },
+      {
+        "release": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-release/initial-shade-images/dynamic-512.vrm-p2-h0.350000-c0.000000-e0-native.png",
+        "sanitize": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-sanitize/initial-shade-images/dynamic-512.vrm-p2-h0.350000-c0.000000-e0-native.png",
+        "sha256": "f5814a069975ca6973aad7b116e7bddf26f6817237005ab381637beed7cd2960"
+      },
+      {
+        "release": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-release/initial-shade-images/dynamic-512.vrm-p2-h0.350000-c0.000000-e0-parsed.png",
+        "sanitize": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-sanitize/initial-shade-images/dynamic-512.vrm-p2-h0.350000-c0.000000-e0-parsed.png",
+        "sha256": "0c93155fac837c1c9cac09d8e3c0fa5fabf34c4c150d3ac5d77632c68b528db1"
+      },
+      {
+        "release": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-release/initial-shade-images/dynamic-512.vrm-p2-h0.350000-c0.000000-e1-native.png",
+        "sanitize": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-sanitize/initial-shade-images/dynamic-512.vrm-p2-h0.350000-c0.000000-e1-native.png",
+        "sha256": "490a3ee751d9be5f5204bb97aebf03f058b2facdd1ffa45e6da8a1b44c1acad7"
+      },
+      {
+        "release": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-release/initial-shade-images/dynamic-512.vrm-p2-h0.350000-c0.000000-e1-parsed.png",
+        "sanitize": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-sanitize/initial-shade-images/dynamic-512.vrm-p2-h0.350000-c0.000000-e1-parsed.png",
+        "sha256": "f06b487ca17062dfce9bd84cc47da5e96b55b3eeac6aee47ec60161be35278db"
+      },
+      {
+        "release": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-release/initial-shade-images/dynamic-512.vrm-p2-h1.000000-c0.000000-e0-native.png",
+        "sanitize": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-sanitize/initial-shade-images/dynamic-512.vrm-p2-h1.000000-c0.000000-e0-native.png",
+        "sha256": "2e1a1746334dff7c0d30474382f5e4ca221ed2bfdc998b3672aed32dee9517dc"
+      },
+      {
+        "release": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-release/initial-shade-images/dynamic-512.vrm-p2-h1.000000-c0.000000-e0-parsed.png",
+        "sanitize": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-sanitize/initial-shade-images/dynamic-512.vrm-p2-h1.000000-c0.000000-e0-parsed.png",
+        "sha256": "e39caed5b65f9e713df93ae9366d57119797c24ae214a061c0a81c4372922fbb"
+      },
+      {
+        "release": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-release/initial-shade-images/dynamic-512.vrm-p2-h1.000000-c0.000000-e1-native.png",
+        "sanitize": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-sanitize/initial-shade-images/dynamic-512.vrm-p2-h1.000000-c0.000000-e1-native.png",
+        "sha256": "d016f715c505d5a1861c61b4a463a4e4d9617b0fb3b61cf48d145977cabd7941"
+      },
+      {
+        "release": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-release/initial-shade-images/dynamic-512.vrm-p2-h1.000000-c0.000000-e1-parsed.png",
+        "sanitize": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-sanitize/initial-shade-images/dynamic-512.vrm-p2-h1.000000-c0.000000-e1-parsed.png",
+        "sha256": "2795310c3e2e2bce1d9c101710a85c51a0a47338bdbc55832cf8e9bf5e31c743"
+      },
+      {
+        "release": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-release/initial-shade-images/dynamic.vrm-p0-h0.000000-c0.000000-e0-native.png",
+        "sanitize": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-sanitize/initial-shade-images/dynamic.vrm-p0-h0.000000-c0.000000-e0-native.png",
+        "sha256": "46ad1e7fb51ad8dffdd0ebf3bbd83eaa05b9ffc386538fb2b2b789397607893b"
+      },
+      {
+        "release": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-release/initial-shade-images/dynamic.vrm-p0-h0.000000-c0.000000-e0-parsed.png",
+        "sanitize": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-sanitize/initial-shade-images/dynamic.vrm-p0-h0.000000-c0.000000-e0-parsed.png",
+        "sha256": "f4d09c427c105eea021b228cf9aa79b85c2761ed32d9ec204f2bf633f72bbf36"
+      },
+      {
+        "release": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-release/initial-shade-images/dynamic.vrm-p0-h0.000000-c0.000000-e1-native.png",
+        "sanitize": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-sanitize/initial-shade-images/dynamic.vrm-p0-h0.000000-c0.000000-e1-native.png",
+        "sha256": "042004e159f6679cba9b89705f385a9694fe30437d8815b6eefb8a7151094ab7"
+      },
+      {
+        "release": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-release/initial-shade-images/dynamic.vrm-p0-h0.000000-c0.000000-e1-parsed.png",
+        "sanitize": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-sanitize/initial-shade-images/dynamic.vrm-p0-h0.000000-c0.000000-e1-parsed.png",
+        "sha256": "b7a48b5d883b7cc7d37df72b89cfba33981dc560ddc38cede88f8b51414e079f"
+      },
+      {
+        "release": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-release/initial-shade-images/dynamic.vrm-p0-h0.350000-c0.000000-e0-native.png",
+        "sanitize": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-sanitize/initial-shade-images/dynamic.vrm-p0-h0.350000-c0.000000-e0-native.png",
+        "sha256": "a9cb0147ac693ab830cf6eb848ddf71008f40882192d13e62e716df87d621008"
+      },
+      {
+        "release": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-release/initial-shade-images/dynamic.vrm-p0-h0.350000-c0.000000-e0-parsed.png",
+        "sanitize": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-sanitize/initial-shade-images/dynamic.vrm-p0-h0.350000-c0.000000-e0-parsed.png",
+        "sha256": "b6e8221de574118f065c9a2ec03b29eb9c6652b3e14f121613f6acaddddde68b"
+      },
+      {
+        "release": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-release/initial-shade-images/dynamic.vrm-p0-h0.350000-c0.000000-e1-native.png",
+        "sanitize": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-sanitize/initial-shade-images/dynamic.vrm-p0-h0.350000-c0.000000-e1-native.png",
+        "sha256": "3aa3979dc5cb9f5fc9ff2d448779f76595a596b11b044f061f6839485cb0086c"
+      },
+      {
+        "release": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-release/initial-shade-images/dynamic.vrm-p0-h0.350000-c0.000000-e1-parsed.png",
+        "sanitize": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-sanitize/initial-shade-images/dynamic.vrm-p0-h0.350000-c0.000000-e1-parsed.png",
+        "sha256": "bf6a951d12012fd821df1050686fe8e2ae7d9d1d1e2d62c679cfc61adab65408"
+      },
+      {
+        "release": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-release/initial-shade-images/dynamic.vrm-p0-h1.000000-c0.000000-e0-native.png",
+        "sanitize": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-sanitize/initial-shade-images/dynamic.vrm-p0-h1.000000-c0.000000-e0-native.png",
+        "sha256": "108898242b88c47387982738d3a06bbd5bf1c2623a7c6230da3f3f2b37db6754"
+      },
+      {
+        "release": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-release/initial-shade-images/dynamic.vrm-p0-h1.000000-c0.000000-e0-parsed.png",
+        "sanitize": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-sanitize/initial-shade-images/dynamic.vrm-p0-h1.000000-c0.000000-e0-parsed.png",
+        "sha256": "3380a547b7ea8f5a765dbccaf788e989bbd04ef398258f33cbd3ba413f10a475"
+      },
+      {
+        "release": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-release/initial-shade-images/dynamic.vrm-p0-h1.000000-c0.000000-e1-native.png",
+        "sanitize": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-sanitize/initial-shade-images/dynamic.vrm-p0-h1.000000-c0.000000-e1-native.png",
+        "sha256": "3690c8cdb295e680986c1cd822ec92191c94a0354f05babaa5e6b93cdd205de6"
+      },
+      {
+        "release": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-release/initial-shade-images/dynamic.vrm-p0-h1.000000-c0.000000-e1-parsed.png",
+        "sanitize": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-sanitize/initial-shade-images/dynamic.vrm-p0-h1.000000-c0.000000-e1-parsed.png",
+        "sha256": "f76496f53fd2341613f7e1eecaee2ef08421027fe2572698de42165143f714db"
+      },
+      {
+        "release": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-release/initial-shade-images/dynamic.vrm-p2-h0.000000-c0.000000-e0-native.png",
+        "sanitize": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-sanitize/initial-shade-images/dynamic.vrm-p2-h0.000000-c0.000000-e0-native.png",
+        "sha256": "d0b58f15ebbd023e7a3262fd7eea574355219dcad965e5efac239369b0bf34c5"
+      },
+      {
+        "release": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-release/initial-shade-images/dynamic.vrm-p2-h0.000000-c0.000000-e0-parsed.png",
+        "sanitize": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-sanitize/initial-shade-images/dynamic.vrm-p2-h0.000000-c0.000000-e0-parsed.png",
+        "sha256": "441614e8e946d4b756128a2614404ac9005a5da235fcfdb940b9ae5190e18702"
+      },
+      {
+        "release": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-release/initial-shade-images/dynamic.vrm-p2-h0.000000-c0.000000-e1-native.png",
+        "sanitize": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-sanitize/initial-shade-images/dynamic.vrm-p2-h0.000000-c0.000000-e1-native.png",
+        "sha256": "26e90d5fbfcf3100f33b924eb7ba8c8f0b3a345fb666b9ca511e7c250ef13091"
+      },
+      {
+        "release": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-release/initial-shade-images/dynamic.vrm-p2-h0.000000-c0.000000-e1-parsed.png",
+        "sanitize": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-sanitize/initial-shade-images/dynamic.vrm-p2-h0.000000-c0.000000-e1-parsed.png",
+        "sha256": "70f9a105895f9eaef425df446764e77ea64ce22af964fd8bbbbcfd709e853869"
+      },
+      {
+        "release": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-release/initial-shade-images/dynamic.vrm-p2-h0.350000-c0.000000-e0-native.png",
+        "sanitize": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-sanitize/initial-shade-images/dynamic.vrm-p2-h0.350000-c0.000000-e0-native.png",
+        "sha256": "f5814a069975ca6973aad7b116e7bddf26f6817237005ab381637beed7cd2960"
+      },
+      {
+        "release": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-release/initial-shade-images/dynamic.vrm-p2-h0.350000-c0.000000-e0-parsed.png",
+        "sanitize": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-sanitize/initial-shade-images/dynamic.vrm-p2-h0.350000-c0.000000-e0-parsed.png",
+        "sha256": "27ceba7d6f4b12871a6d0bdf02ea73ea0f2fd4a7f4423955bccf828c1303b477"
+      },
+      {
+        "release": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-release/initial-shade-images/dynamic.vrm-p2-h0.350000-c0.000000-e1-native.png",
+        "sanitize": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-sanitize/initial-shade-images/dynamic.vrm-p2-h0.350000-c0.000000-e1-native.png",
+        "sha256": "490a3ee751d9be5f5204bb97aebf03f058b2facdd1ffa45e6da8a1b44c1acad7"
+      },
+      {
+        "release": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-release/initial-shade-images/dynamic.vrm-p2-h0.350000-c0.000000-e1-parsed.png",
+        "sanitize": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-sanitize/initial-shade-images/dynamic.vrm-p2-h0.350000-c0.000000-e1-parsed.png",
+        "sha256": "f65013e45b24972bc4e44ef768be508b8e62c67f95aa2995385c52d85ef37f8c"
+      },
+      {
+        "release": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-release/initial-shade-images/dynamic.vrm-p2-h1.000000-c0.000000-e0-native.png",
+        "sanitize": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-sanitize/initial-shade-images/dynamic.vrm-p2-h1.000000-c0.000000-e0-native.png",
+        "sha256": "2e1a1746334dff7c0d30474382f5e4ca221ed2bfdc998b3672aed32dee9517dc"
+      },
+      {
+        "release": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-release/initial-shade-images/dynamic.vrm-p2-h1.000000-c0.000000-e0-parsed.png",
+        "sanitize": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-sanitize/initial-shade-images/dynamic.vrm-p2-h1.000000-c0.000000-e0-parsed.png",
+        "sha256": "0a7a43a8810cdaf45b48b228addccc073606beee2a4251394288f007917760d4"
+      },
+      {
+        "release": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-release/initial-shade-images/dynamic.vrm-p2-h1.000000-c0.000000-e1-native.png",
+        "sanitize": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-sanitize/initial-shade-images/dynamic.vrm-p2-h1.000000-c0.000000-e1-native.png",
+        "sha256": "d016f715c505d5a1861c61b4a463a4e4d9617b0fb3b61cf48d145977cabd7941"
+      },
+      {
+        "release": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-release/initial-shade-images/dynamic.vrm-p2-h1.000000-c0.000000-e1-parsed.png",
+        "sanitize": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-sanitize/initial-shade-images/dynamic.vrm-p2-h1.000000-c0.000000-e1-parsed.png",
+        "sha256": "13ec63cfd9067bb366bafd53c3ce06c307f572406528a474144d19ccf0e40365"
+      }
+    ],
+    "count": 83,
+    "pngs": 72
+  },
+  "validators": {
+    "official": [
+      {
+        "file": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-release/initial-shade-run/dynamic.vrm",
+        "checks": [
+          {
+            "kind": "VRMC_vrm-1.0",
+            "schema": "VRMC_vrm.schema.json",
+            "errors": []
+          },
+          {
+            "kind": "VRMC_springBone-1.0",
+            "schema": "VRMC_springBone.schema.json",
+            "errors": []
+          },
+          {
+            "kind": "VRMC_node_constraint-1.0",
+            "schema": "VRMC_node_constraint.schema.json",
+            "errors": []
+          },
+          {
+            "kind": "VRMC_node_constraint-1.0",
+            "schema": "VRMC_node_constraint.schema.json",
+            "errors": []
+          },
+          {
+            "kind": "VRMC_node_constraint-1.0",
+            "schema": "VRMC_node_constraint.schema.json",
+            "errors": []
+          },
+          {
+            "kind": "VRMC_materials_mtoon-1.0",
+            "schema": "VRMC_materials_mtoon.schema.json",
+            "errors": []
+          },
+          {
+            "kind": "VRMC_materials_mtoon-1.0",
+            "schema": "VRMC_materials_mtoon.schema.json",
+            "errors": []
+          },
+          {
+            "kind": "VRMC_materials_mtoon-1.0",
+            "schema": "VRMC_materials_mtoon.schema.json",
+            "errors": []
+          },
+          {
+            "kind": "VRMC_materials_mtoon-1.0",
+            "schema": "VRMC_materials_mtoon.schema.json",
+            "errors": []
+          }
+        ]
+      },
+      {
+        "file": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-release/initial-shade-run/dynamic-512.vrm",
+        "checks": [
+          {
+            "kind": "VRMC_vrm-1.0",
+            "schema": "VRMC_vrm.schema.json",
+            "errors": []
+          },
+          {
+            "kind": "VRMC_springBone-1.0",
+            "schema": "VRMC_springBone.schema.json",
+            "errors": []
+          },
+          {
+            "kind": "VRMC_node_constraint-1.0",
+            "schema": "VRMC_node_constraint.schema.json",
+            "errors": []
+          },
+          {
+            "kind": "VRMC_node_constraint-1.0",
+            "schema": "VRMC_node_constraint.schema.json",
+            "errors": []
+          },
+          {
+            "kind": "VRMC_node_constraint-1.0",
+            "schema": "VRMC_node_constraint.schema.json",
+            "errors": []
+          },
+          {
+            "kind": "VRMC_materials_mtoon-1.0",
+            "schema": "VRMC_materials_mtoon.schema.json",
+            "errors": []
+          },
+          {
+            "kind": "VRMC_materials_mtoon-1.0",
+            "schema": "VRMC_materials_mtoon.schema.json",
+            "errors": []
+          },
+          {
+            "kind": "VRMC_materials_mtoon-1.0",
+            "schema": "VRMC_materials_mtoon.schema.json",
+            "errors": []
+          },
+          {
+            "kind": "VRMC_materials_mtoon-1.0",
+            "schema": "VRMC_materials_mtoon.schema.json",
+            "errors": []
+          }
+        ]
+      },
+      {
+        "file": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-release/initial-shade-run/dynamic-1024.vrm",
+        "checks": [
+          {
+            "kind": "VRMC_vrm-1.0",
+            "schema": "VRMC_vrm.schema.json",
+            "errors": []
+          },
+          {
+            "kind": "VRMC_springBone-1.0",
+            "schema": "VRMC_springBone.schema.json",
+            "errors": []
+          },
+          {
+            "kind": "VRMC_node_constraint-1.0",
+            "schema": "VRMC_node_constraint.schema.json",
+            "errors": []
+          },
+          {
+            "kind": "VRMC_node_constraint-1.0",
+            "schema": "VRMC_node_constraint.schema.json",
+            "errors": []
+          },
+          {
+            "kind": "VRMC_node_constraint-1.0",
+            "schema": "VRMC_node_constraint.schema.json",
+            "errors": []
+          },
+          {
+            "kind": "VRMC_materials_mtoon-1.0",
+            "schema": "VRMC_materials_mtoon.schema.json",
+            "errors": []
+          },
+          {
+            "kind": "VRMC_materials_mtoon-1.0",
+            "schema": "VRMC_materials_mtoon.schema.json",
+            "errors": []
+          },
+          {
+            "kind": "VRMC_materials_mtoon-1.0",
+            "schema": "VRMC_materials_mtoon.schema.json",
+            "errors": []
+          },
+          {
+            "kind": "VRMC_materials_mtoon-1.0",
+            "schema": "VRMC_materials_mtoon.schema.json",
+            "errors": []
+          }
+        ]
+      },
+      {
+        "file": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-release/initial-shade-run/dynamic-second.vrm",
+        "checks": [
+          {
+            "kind": "VRMC_vrm-1.0",
+            "schema": "VRMC_vrm.schema.json",
+            "errors": []
+          },
+          {
+            "kind": "VRMC_springBone-1.0",
+            "schema": "VRMC_springBone.schema.json",
+            "errors": []
+          },
+          {
+            "kind": "VRMC_node_constraint-1.0",
+            "schema": "VRMC_node_constraint.schema.json",
+            "errors": []
+          },
+          {
+            "kind": "VRMC_node_constraint-1.0",
+            "schema": "VRMC_node_constraint.schema.json",
+            "errors": []
+          },
+          {
+            "kind": "VRMC_node_constraint-1.0",
+            "schema": "VRMC_node_constraint.schema.json",
+            "errors": []
+          },
+          {
+            "kind": "VRMC_materials_mtoon-1.0",
+            "schema": "VRMC_materials_mtoon.schema.json",
+            "errors": []
+          },
+          {
+            "kind": "VRMC_materials_mtoon-1.0",
+            "schema": "VRMC_materials_mtoon.schema.json",
+            "errors": []
+          },
+          {
+            "kind": "VRMC_materials_mtoon-1.0",
+            "schema": "VRMC_materials_mtoon.schema.json",
+            "errors": []
+          },
+          {
+            "kind": "VRMC_materials_mtoon-1.0",
+            "schema": "VRMC_materials_mtoon.schema.json",
+            "errors": []
+          }
+        ]
+      },
+      {
+        "file": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-release/initial-shade-run/source-initial-shade.vrm",
+        "checks": [
+          {
+            "kind": "VRMC_vrm-1.0",
+            "schema": "VRMC_vrm.schema.json",
+            "errors": []
+          },
+          {
+            "kind": "VRMC_springBone-1.0",
+            "schema": "VRMC_springBone.schema.json",
+            "errors": []
+          },
+          {
+            "kind": "VRMC_node_constraint-1.0",
+            "schema": "VRMC_node_constraint.schema.json",
+            "errors": []
+          },
+          {
+            "kind": "VRMC_node_constraint-1.0",
+            "schema": "VRMC_node_constraint.schema.json",
+            "errors": []
+          },
+          {
+            "kind": "VRMC_node_constraint-1.0",
+            "schema": "VRMC_node_constraint.schema.json",
+            "errors": []
+          },
+          {
+            "kind": "VRMC_materials_mtoon-1.0",
+            "schema": "VRMC_materials_mtoon.schema.json",
+            "errors": []
+          }
+        ]
+      }
+    ],
+    "khronos": [
+      {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-release/initial-shade-run/dynamic.vrm",
+        "result": {
+          "uri": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-release/initial-shade-run/dynamic.vrm",
+          "mimeType": "model/gltf-binary",
+          "validatorVersion": "2.0.0-dev.3.10",
+          "validatedAt": "2026-11-05T03:21:59.394Z",
+          "issues": {
+            "numErrors": 0,
+            "numWarnings": 4,
+            "numInfos": 16,
+            "numHints": 0,
+            "messages": [
+              {
+                "code": "UNSUPPORTED_EXTENSION",
+                "message": "Cannot validate an extension as it is not supported by the validator: 'VRMC_vrm'.",
+                "severity": 2,
+                "pointer": "/extensionsUsed/1"
+              },
+              {
+                "code": "UNSUPPORTED_EXTENSION",
+                "message": "Cannot validate an extension as it is not supported by the validator: 'VRMC_materials_mtoon'.",
+                "severity": 2,
+                "pointer": "/extensionsUsed/2"
+              },
+              {
+                "code": "UNSUPPORTED_EXTENSION",
+                "message": "Cannot validate an extension as it is not supported by the validator: 'VRMC_springBone'.",
+                "severity": 2,
+                "pointer": "/extensionsUsed/3"
+              },
+              {
+                "code": "UNSUPPORTED_EXTENSION",
+                "message": "Cannot validate an extension as it is not supported by the validator: 'VRMC_node_constraint'.",
+                "severity": 2,
+                "pointer": "/extensionsUsed/4"
+              },
+              {
+                "code": "NODE_MATRIX_DEFAULT",
+                "message": "Do not specify default transform matrix.",
+                "severity": 2,
+                "pointer": "/nodes/0/matrix"
+              },
+              {
+                "code": "UNUSED_MESH_TANGENT",
+                "message": "Tangents are not used because the material has no normal texture.",
+                "severity": 2,
+                "pointer": "/meshes/0/primitives/0/attributes/TANGENT"
+              },
+              {
+                "code": "UNUSED_MESH_TANGENT",
+                "message": "Tangents are not used because the material has no normal texture.",
+                "severity": 2,
+                "pointer": "/meshes/0/primitives/1/attributes/TANGENT"
+              },
+              {
+                "code": "UNUSED_MESH_TANGENT",
+                "message": "Tangents are not used because the material has no normal texture.",
+                "severity": 2,
+                "pointer": "/meshes/1/primitives/0/attributes/TANGENT"
+              },
+              {
+                "code": "UNUSED_MESH_TANGENT",
+                "message": "Tangents are not used because the material has no normal texture.",
+                "severity": 2,
+                "pointer": "/meshes/2/primitives/0/attributes/TANGENT"
+              },
+              {
+                "code": "NODE_SKINNED_MESH_NON_ROOT",
+                "message": "Node with a skinned mesh is not root. Parent transforms will not affect a skinned mesh.",
+                "severity": 1,
+                "pointer": "/nodes/3"
+              },
+              {
+                "code": "NODE_SKINNED_MESH_LOCAL_TRANSFORMS",
+                "message": "Local transforms will not affect a skinned mesh.",
+                "severity": 1,
+                "pointer": "/nodes/3"
+              },
+              {
+                "code": "NODE_SKINNED_MESH_NON_ROOT",
+                "message": "Node with a skinned mesh is not root. Parent transforms will not affect a skinned mesh.",
+                "severity": 1,
+                "pointer": "/nodes/4"
+              },
+              {
+                "code": "NODE_SKINNED_MESH_LOCAL_TRANSFORMS",
+                "message": "Local transforms will not affect a skinned mesh.",
+                "severity": 1,
+                "pointer": "/nodes/4"
+              },
+              {
+                "code": "NODE_EMPTY",
+                "message": "Empty node encountered.",
+                "severity": 2,
+                "pointer": "/nodes/21"
+              },
+              {
+                "code": "UNUSED_OBJECT",
+                "message": "This object may be unused.",
+                "severity": 2,
+                "pointer": "/bufferViews/40"
+              },
+              {
+                "code": "UNUSED_OBJECT",
+                "message": "This object may be unused.",
+                "severity": 2,
+                "pointer": "/textures/0"
+              },
+              {
+                "code": "UNUSED_OBJECT",
+                "message": "This object may be unused.",
+                "severity": 2,
+                "pointer": "/textures/1"
+              },
+              {
+                "code": "UNUSED_OBJECT",
+                "message": "This object may be unused.",
+                "severity": 2,
+                "pointer": "/textures/2"
+              },
+              {
+                "code": "UNUSED_OBJECT",
+                "message": "This object may be unused.",
+                "severity": 2,
+                "pointer": "/textures/3"
+              },
+              {
+                "code": "UNUSED_OBJECT",
+                "message": "This object may be unused.",
+                "severity": 2,
+                "pointer": "/textures/4"
+              }
+            ],
+            "truncated": false
+          },
+          "info": {
+            "version": "2.0",
+            "generator": "Dome Sculpt",
+            "extensionsUsed": [
+              "KHR_texture_transform",
+              "VRMC_vrm",
+              "VRMC_materials_mtoon",
+              "VRMC_springBone",
+              "VRMC_node_constraint",
+              "KHR_materials_emissive_strength"
+            ],
+            "extensionsRequired": [
+              "VRMC_vrm",
+              "VRMC_materials_mtoon"
+            ],
+            "resources": [
+              {
+                "pointer": "/buffers/0",
+                "mimeType": "application/gltf-buffer",
+                "storage": "glb",
+                "byteLength": 404828
+              },
+              {
+                "pointer": "/images/0",
+                "mimeType": "image/png",
+                "storage": "buffer-view",
+                "image": {
+                  "width": 128,
+                  "height": 128,
+                  "format": "rgba",
+                  "primaries": "srgb",
+                  "transfer": "srgb",
+                  "bits": 8
+                }
+              },
+              {
+                "pointer": "/images/1",
+                "mimeType": "image/png",
+                "storage": "buffer-view",
+                "image": {
+                  "width": 128,
+                  "height": 128,
+                  "format": "rgba",
+                  "primaries": "srgb",
+                  "transfer": "srgb",
+                  "bits": 8
+                }
+              },
+              {
+                "pointer": "/images/2",
+                "mimeType": "image/png",
+                "storage": "buffer-view",
+                "image": {
+                  "width": 256,
+                  "height": 256,
+                  "format": "rgba",
+                  "primaries": "srgb",
+                  "transfer": "srgb",
+                  "bits": 8
+                }
+              }
+            ],
+            "animationCount": 0,
+            "materialCount": 4,
+            "hasMorphTargets": true,
+            "hasSkins": true,
+            "hasTextures": true,
+            "hasDefaultScene": true,
+            "drawCallCount": 4,
+            "totalVertexCount": 16,
+            "totalTriangleCount": 8,
+            "maxUVs": 2,
+            "maxInfluences": 4,
+            "maxAttributes": 8
+          }
+        }
+      },
+      {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-release/initial-shade-run/dynamic-512.vrm",
+        "result": {
+          "uri": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-release/initial-shade-run/dynamic-512.vrm",
+          "mimeType": "model/gltf-binary",
+          "validatorVersion": "2.0.0-dev.3.10",
+          "validatedAt": "2026-11-05T03:21:59.429Z",
+          "issues": {
+            "numErrors": 0,
+            "numWarnings": 4,
+            "numInfos": 16,
+            "numHints": 0,
+            "messages": [
+              {
+                "code": "UNSUPPORTED_EXTENSION",
+                "message": "Cannot validate an extension as it is not supported by the validator: 'VRMC_vrm'.",
+                "severity": 2,
+                "pointer": "/extensionsUsed/1"
+              },
+              {
+                "code": "UNSUPPORTED_EXTENSION",
+                "message": "Cannot validate an extension as it is not supported by the validator: 'VRMC_materials_mtoon'.",
+                "severity": 2,
+                "pointer": "/extensionsUsed/2"
+              },
+              {
+                "code": "UNSUPPORTED_EXTENSION",
+                "message": "Cannot validate an extension as it is not supported by the validator: 'VRMC_springBone'.",
+                "severity": 2,
+                "pointer": "/extensionsUsed/3"
+              },
+              {
+                "code": "UNSUPPORTED_EXTENSION",
+                "message": "Cannot validate an extension as it is not supported by the validator: 'VRMC_node_constraint'.",
+                "severity": 2,
+                "pointer": "/extensionsUsed/4"
+              },
+              {
+                "code": "NODE_MATRIX_DEFAULT",
+                "message": "Do not specify default transform matrix.",
+                "severity": 2,
+                "pointer": "/nodes/0/matrix"
+              },
+              {
+                "code": "UNUSED_MESH_TANGENT",
+                "message": "Tangents are not used because the material has no normal texture.",
+                "severity": 2,
+                "pointer": "/meshes/0/primitives/0/attributes/TANGENT"
+              },
+              {
+                "code": "UNUSED_MESH_TANGENT",
+                "message": "Tangents are not used because the material has no normal texture.",
+                "severity": 2,
+                "pointer": "/meshes/0/primitives/1/attributes/TANGENT"
+              },
+              {
+                "code": "UNUSED_MESH_TANGENT",
+                "message": "Tangents are not used because the material has no normal texture.",
+                "severity": 2,
+                "pointer": "/meshes/1/primitives/0/attributes/TANGENT"
+              },
+              {
+                "code": "UNUSED_MESH_TANGENT",
+                "message": "Tangents are not used because the material has no normal texture.",
+                "severity": 2,
+                "pointer": "/meshes/2/primitives/0/attributes/TANGENT"
+              },
+              {
+                "code": "NODE_SKINNED_MESH_NON_ROOT",
+                "message": "Node with a skinned mesh is not root. Parent transforms will not affect a skinned mesh.",
+                "severity": 1,
+                "pointer": "/nodes/3"
+              },
+              {
+                "code": "NODE_SKINNED_MESH_LOCAL_TRANSFORMS",
+                "message": "Local transforms will not affect a skinned mesh.",
+                "severity": 1,
+                "pointer": "/nodes/3"
+              },
+              {
+                "code": "NODE_SKINNED_MESH_NON_ROOT",
+                "message": "Node with a skinned mesh is not root. Parent transforms will not affect a skinned mesh.",
+                "severity": 1,
+                "pointer": "/nodes/4"
+              },
+              {
+                "code": "NODE_SKINNED_MESH_LOCAL_TRANSFORMS",
+                "message": "Local transforms will not affect a skinned mesh.",
+                "severity": 1,
+                "pointer": "/nodes/4"
+              },
+              {
+                "code": "NODE_EMPTY",
+                "message": "Empty node encountered.",
+                "severity": 2,
+                "pointer": "/nodes/21"
+              },
+              {
+                "code": "UNUSED_OBJECT",
+                "message": "This object may be unused.",
+                "severity": 2,
+                "pointer": "/bufferViews/40"
+              },
+              {
+                "code": "UNUSED_OBJECT",
+                "message": "This object may be unused.",
+                "severity": 2,
+                "pointer": "/textures/0"
+              },
+              {
+                "code": "UNUSED_OBJECT",
+                "message": "This object may be unused.",
+                "severity": 2,
+                "pointer": "/textures/1"
+              },
+              {
+                "code": "UNUSED_OBJECT",
+                "message": "This object may be unused.",
+                "severity": 2,
+                "pointer": "/textures/2"
+              },
+              {
+                "code": "UNUSED_OBJECT",
+                "message": "This object may be unused.",
+                "severity": 2,
+                "pointer": "/textures/3"
+              },
+              {
+                "code": "UNUSED_OBJECT",
+                "message": "This object may be unused.",
+                "severity": 2,
+                "pointer": "/textures/4"
+              }
+            ],
+            "truncated": false
+          },
+          "info": {
+            "version": "2.0",
+            "generator": "Dome Sculpt",
+            "extensionsUsed": [
+              "KHR_texture_transform",
+              "VRMC_vrm",
+              "VRMC_materials_mtoon",
+              "VRMC_springBone",
+              "VRMC_node_constraint",
+              "KHR_materials_emissive_strength"
+            ],
+            "extensionsRequired": [
+              "VRMC_vrm",
+              "VRMC_materials_mtoon"
+            ],
+            "resources": [
+              {
+                "pointer": "/buffers/0",
+                "mimeType": "application/gltf-buffer",
+                "storage": "glb",
+                "byteLength": 413308
+              },
+              {
+                "pointer": "/images/0",
+                "mimeType": "image/png",
+                "storage": "buffer-view",
+                "image": {
+                  "width": 128,
+                  "height": 128,
+                  "format": "rgba",
+                  "primaries": "srgb",
+                  "transfer": "srgb",
+                  "bits": 8
+                }
+              },
+              {
+                "pointer": "/images/1",
+                "mimeType": "image/png",
+                "storage": "buffer-view",
+                "image": {
+                  "width": 128,
+                  "height": 128,
+                  "format": "rgba",
+                  "primaries": "srgb",
+                  "transfer": "srgb",
+                  "bits": 8
+                }
+              },
+              {
+                "pointer": "/images/2",
+                "mimeType": "image/png",
+                "storage": "buffer-view",
+                "image": {
+                  "width": 512,
+                  "height": 512,
+                  "format": "rgba",
+                  "primaries": "srgb",
+                  "transfer": "srgb",
+                  "bits": 8
+                }
+              }
+            ],
+            "animationCount": 0,
+            "materialCount": 4,
+            "hasMorphTargets": true,
+            "hasSkins": true,
+            "hasTextures": true,
+            "hasDefaultScene": true,
+            "drawCallCount": 4,
+            "totalVertexCount": 16,
+            "totalTriangleCount": 8,
+            "maxUVs": 2,
+            "maxInfluences": 4,
+            "maxAttributes": 8
+          }
+        }
+      },
+      {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-release/initial-shade-run/dynamic-1024.vrm",
+        "result": {
+          "uri": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-release/initial-shade-run/dynamic-1024.vrm",
+          "mimeType": "model/gltf-binary",
+          "validatorVersion": "2.0.0-dev.3.10",
+          "validatedAt": "2026-11-05T03:21:59.471Z",
+          "issues": {
+            "numErrors": 0,
+            "numWarnings": 4,
+            "numInfos": 16,
+            "numHints": 0,
+            "messages": [
+              {
+                "code": "UNSUPPORTED_EXTENSION",
+                "message": "Cannot validate an extension as it is not supported by the validator: 'VRMC_vrm'.",
+                "severity": 2,
+                "pointer": "/extensionsUsed/1"
+              },
+              {
+                "code": "UNSUPPORTED_EXTENSION",
+                "message": "Cannot validate an extension as it is not supported by the validator: 'VRMC_materials_mtoon'.",
+                "severity": 2,
+                "pointer": "/extensionsUsed/2"
+              },
+              {
+                "code": "UNSUPPORTED_EXTENSION",
+                "message": "Cannot validate an extension as it is not supported by the validator: 'VRMC_springBone'.",
+                "severity": 2,
+                "pointer": "/extensionsUsed/3"
+              },
+              {
+                "code": "UNSUPPORTED_EXTENSION",
+                "message": "Cannot validate an extension as it is not supported by the validator: 'VRMC_node_constraint'.",
+                "severity": 2,
+                "pointer": "/extensionsUsed/4"
+              },
+              {
+                "code": "NODE_MATRIX_DEFAULT",
+                "message": "Do not specify default transform matrix.",
+                "severity": 2,
+                "pointer": "/nodes/0/matrix"
+              },
+              {
+                "code": "UNUSED_MESH_TANGENT",
+                "message": "Tangents are not used because the material has no normal texture.",
+                "severity": 2,
+                "pointer": "/meshes/0/primitives/0/attributes/TANGENT"
+              },
+              {
+                "code": "UNUSED_MESH_TANGENT",
+                "message": "Tangents are not used because the material has no normal texture.",
+                "severity": 2,
+                "pointer": "/meshes/0/primitives/1/attributes/TANGENT"
+              },
+              {
+                "code": "UNUSED_MESH_TANGENT",
+                "message": "Tangents are not used because the material has no normal texture.",
+                "severity": 2,
+                "pointer": "/meshes/1/primitives/0/attributes/TANGENT"
+              },
+              {
+                "code": "UNUSED_MESH_TANGENT",
+                "message": "Tangents are not used because the material has no normal texture.",
+                "severity": 2,
+                "pointer": "/meshes/2/primitives/0/attributes/TANGENT"
+              },
+              {
+                "code": "NODE_SKINNED_MESH_NON_ROOT",
+                "message": "Node with a skinned mesh is not root. Parent transforms will not affect a skinned mesh.",
+                "severity": 1,
+                "pointer": "/nodes/3"
+              },
+              {
+                "code": "NODE_SKINNED_MESH_LOCAL_TRANSFORMS",
+                "message": "Local transforms will not affect a skinned mesh.",
+                "severity": 1,
+                "pointer": "/nodes/3"
+              },
+              {
+                "code": "NODE_SKINNED_MESH_NON_ROOT",
+                "message": "Node with a skinned mesh is not root. Parent transforms will not affect a skinned mesh.",
+                "severity": 1,
+                "pointer": "/nodes/4"
+              },
+              {
+                "code": "NODE_SKINNED_MESH_LOCAL_TRANSFORMS",
+                "message": "Local transforms will not affect a skinned mesh.",
+                "severity": 1,
+                "pointer": "/nodes/4"
+              },
+              {
+                "code": "NODE_EMPTY",
+                "message": "Empty node encountered.",
+                "severity": 2,
+                "pointer": "/nodes/21"
+              },
+              {
+                "code": "UNUSED_OBJECT",
+                "message": "This object may be unused.",
+                "severity": 2,
+                "pointer": "/bufferViews/40"
+              },
+              {
+                "code": "UNUSED_OBJECT",
+                "message": "This object may be unused.",
+                "severity": 2,
+                "pointer": "/textures/0"
+              },
+              {
+                "code": "UNUSED_OBJECT",
+                "message": "This object may be unused.",
+                "severity": 2,
+                "pointer": "/textures/1"
+              },
+              {
+                "code": "UNUSED_OBJECT",
+                "message": "This object may be unused.",
+                "severity": 2,
+                "pointer": "/textures/2"
+              },
+              {
+                "code": "UNUSED_OBJECT",
+                "message": "This object may be unused.",
+                "severity": 2,
+                "pointer": "/textures/3"
+              },
+              {
+                "code": "UNUSED_OBJECT",
+                "message": "This object may be unused.",
+                "severity": 2,
+                "pointer": "/textures/4"
+              }
+            ],
+            "truncated": false
+          },
+          "info": {
+            "version": "2.0",
+            "generator": "Dome Sculpt",
+            "extensionsUsed": [
+              "KHR_texture_transform",
+              "VRMC_vrm",
+              "VRMC_materials_mtoon",
+              "VRMC_springBone",
+              "VRMC_node_constraint",
+              "KHR_materials_emissive_strength"
+            ],
+            "extensionsRequired": [
+              "VRMC_vrm",
+              "VRMC_materials_mtoon"
+            ],
+            "resources": [
+              {
+                "pointer": "/buffers/0",
+                "mimeType": "application/gltf-buffer",
+                "storage": "glb",
+                "byteLength": 434400
+              },
+              {
+                "pointer": "/images/0",
+                "mimeType": "image/png",
+                "storage": "buffer-view",
+                "image": {
+                  "width": 128,
+                  "height": 128,
+                  "format": "rgba",
+                  "primaries": "srgb",
+                  "transfer": "srgb",
+                  "bits": 8
+                }
+              },
+              {
+                "pointer": "/images/1",
+                "mimeType": "image/png",
+                "storage": "buffer-view",
+                "image": {
+                  "width": 128,
+                  "height": 128,
+                  "format": "rgba",
+                  "primaries": "srgb",
+                  "transfer": "srgb",
+                  "bits": 8
+                }
+              },
+              {
+                "pointer": "/images/2",
+                "mimeType": "image/png",
+                "storage": "buffer-view",
+                "image": {
+                  "width": 1024,
+                  "height": 1024,
+                  "format": "rgba",
+                  "primaries": "srgb",
+                  "transfer": "srgb",
+                  "bits": 8
+                }
+              }
+            ],
+            "animationCount": 0,
+            "materialCount": 4,
+            "hasMorphTargets": true,
+            "hasSkins": true,
+            "hasTextures": true,
+            "hasDefaultScene": true,
+            "drawCallCount": 4,
+            "totalVertexCount": 16,
+            "totalTriangleCount": 8,
+            "maxUVs": 2,
+            "maxInfluences": 4,
+            "maxAttributes": 8
+          }
+        }
+      },
+      {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-release/initial-shade-run/dynamic-second.vrm",
+        "result": {
+          "uri": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-release/initial-shade-run/dynamic-second.vrm",
+          "mimeType": "model/gltf-binary",
+          "validatorVersion": "2.0.0-dev.3.10",
+          "validatedAt": "2026-11-05T03:21:59.497Z",
+          "issues": {
+            "numErrors": 0,
+            "numWarnings": 4,
+            "numInfos": 16,
+            "numHints": 0,
+            "messages": [
+              {
+                "code": "UNSUPPORTED_EXTENSION",
+                "message": "Cannot validate an extension as it is not supported by the validator: 'VRMC_vrm'.",
+                "severity": 2,
+                "pointer": "/extensionsUsed/1"
+              },
+              {
+                "code": "UNSUPPORTED_EXTENSION",
+                "message": "Cannot validate an extension as it is not supported by the validator: 'VRMC_materials_mtoon'.",
+                "severity": 2,
+                "pointer": "/extensionsUsed/2"
+              },
+              {
+                "code": "UNSUPPORTED_EXTENSION",
+                "message": "Cannot validate an extension as it is not supported by the validator: 'VRMC_springBone'.",
+                "severity": 2,
+                "pointer": "/extensionsUsed/3"
+              },
+              {
+                "code": "UNSUPPORTED_EXTENSION",
+                "message": "Cannot validate an extension as it is not supported by the validator: 'VRMC_node_constraint'.",
+                "severity": 2,
+                "pointer": "/extensionsUsed/4"
+              },
+              {
+                "code": "NODE_MATRIX_DEFAULT",
+                "message": "Do not specify default transform matrix.",
+                "severity": 2,
+                "pointer": "/nodes/0/matrix"
+              },
+              {
+                "code": "UNUSED_MESH_TANGENT",
+                "message": "Tangents are not used because the material has no normal texture.",
+                "severity": 2,
+                "pointer": "/meshes/0/primitives/0/attributes/TANGENT"
+              },
+              {
+                "code": "UNUSED_MESH_TANGENT",
+                "message": "Tangents are not used because the material has no normal texture.",
+                "severity": 2,
+                "pointer": "/meshes/0/primitives/1/attributes/TANGENT"
+              },
+              {
+                "code": "UNUSED_MESH_TANGENT",
+                "message": "Tangents are not used because the material has no normal texture.",
+                "severity": 2,
+                "pointer": "/meshes/1/primitives/0/attributes/TANGENT"
+              },
+              {
+                "code": "UNUSED_MESH_TANGENT",
+                "message": "Tangents are not used because the material has no normal texture.",
+                "severity": 2,
+                "pointer": "/meshes/2/primitives/0/attributes/TANGENT"
+              },
+              {
+                "code": "NODE_SKINNED_MESH_NON_ROOT",
+                "message": "Node with a skinned mesh is not root. Parent transforms will not affect a skinned mesh.",
+                "severity": 1,
+                "pointer": "/nodes/3"
+              },
+              {
+                "code": "NODE_SKINNED_MESH_LOCAL_TRANSFORMS",
+                "message": "Local transforms will not affect a skinned mesh.",
+                "severity": 1,
+                "pointer": "/nodes/3"
+              },
+              {
+                "code": "NODE_SKINNED_MESH_NON_ROOT",
+                "message": "Node with a skinned mesh is not root. Parent transforms will not affect a skinned mesh.",
+                "severity": 1,
+                "pointer": "/nodes/4"
+              },
+              {
+                "code": "NODE_SKINNED_MESH_LOCAL_TRANSFORMS",
+                "message": "Local transforms will not affect a skinned mesh.",
+                "severity": 1,
+                "pointer": "/nodes/4"
+              },
+              {
+                "code": "NODE_EMPTY",
+                "message": "Empty node encountered.",
+                "severity": 2,
+                "pointer": "/nodes/21"
+              },
+              {
+                "code": "UNUSED_OBJECT",
+                "message": "This object may be unused.",
+                "severity": 2,
+                "pointer": "/bufferViews/40"
+              },
+              {
+                "code": "UNUSED_OBJECT",
+                "message": "This object may be unused.",
+                "severity": 2,
+                "pointer": "/textures/0"
+              },
+              {
+                "code": "UNUSED_OBJECT",
+                "message": "This object may be unused.",
+                "severity": 2,
+                "pointer": "/textures/1"
+              },
+              {
+                "code": "UNUSED_OBJECT",
+                "message": "This object may be unused.",
+                "severity": 2,
+                "pointer": "/textures/2"
+              },
+              {
+                "code": "UNUSED_OBJECT",
+                "message": "This object may be unused.",
+                "severity": 2,
+                "pointer": "/textures/3"
+              },
+              {
+                "code": "UNUSED_OBJECT",
+                "message": "This object may be unused.",
+                "severity": 2,
+                "pointer": "/textures/4"
+              }
+            ],
+            "truncated": false
+          },
+          "info": {
+            "version": "2.0",
+            "generator": "Dome Sculpt",
+            "extensionsUsed": [
+              "KHR_texture_transform",
+              "VRMC_vrm",
+              "VRMC_materials_mtoon",
+              "VRMC_springBone",
+              "VRMC_node_constraint",
+              "KHR_materials_emissive_strength"
+            ],
+            "extensionsRequired": [
+              "VRMC_vrm",
+              "VRMC_materials_mtoon"
+            ],
+            "resources": [
+              {
+                "pointer": "/buffers/0",
+                "mimeType": "application/gltf-buffer",
+                "storage": "glb",
+                "byteLength": 404828
+              },
+              {
+                "pointer": "/images/0",
+                "mimeType": "image/png",
+                "storage": "buffer-view",
+                "image": {
+                  "width": 128,
+                  "height": 128,
+                  "format": "rgba",
+                  "primaries": "srgb",
+                  "transfer": "srgb",
+                  "bits": 8
+                }
+              },
+              {
+                "pointer": "/images/1",
+                "mimeType": "image/png",
+                "storage": "buffer-view",
+                "image": {
+                  "width": 128,
+                  "height": 128,
+                  "format": "rgba",
+                  "primaries": "srgb",
+                  "transfer": "srgb",
+                  "bits": 8
+                }
+              },
+              {
+                "pointer": "/images/2",
+                "mimeType": "image/png",
+                "storage": "buffer-view",
+                "image": {
+                  "width": 256,
+                  "height": 256,
+                  "format": "rgba",
+                  "primaries": "srgb",
+                  "transfer": "srgb",
+                  "bits": 8
+                }
+              }
+            ],
+            "animationCount": 0,
+            "materialCount": 4,
+            "hasMorphTargets": true,
+            "hasSkins": true,
+            "hasTextures": true,
+            "hasDefaultScene": true,
+            "drawCallCount": 4,
+            "totalVertexCount": 16,
+            "totalTriangleCount": 8,
+            "maxUVs": 2,
+            "maxInfluences": 4,
+            "maxAttributes": 8
+          }
+        }
+      },
+      {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-release/initial-shade-run/source-initial-shade.vrm",
+        "result": {
+          "uri": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-release/initial-shade-run/source-initial-shade.vrm",
+          "mimeType": "model/gltf-binary",
+          "validatorVersion": "2.0.0-dev.3.10",
+          "validatedAt": "2026-11-05T03:21:59.522Z",
+          "issues": {
+            "numErrors": 0,
+            "numWarnings": 5,
+            "numInfos": 15,
+            "numHints": 12,
+            "messages": [
+              {
+                "code": "UNSUPPORTED_EXTENSION",
+                "message": "Cannot validate an extension as it is not supported by the validator: 'VRMC_vrm'.",
+                "severity": 2,
+                "pointer": "/extensionsUsed/0"
+              },
+              {
+                "code": "UNSUPPORTED_EXTENSION",
+                "message": "Cannot validate an extension as it is not supported by the validator: 'VRMC_materials_mtoon'.",
+                "severity": 2,
+                "pointer": "/extensionsUsed/1"
+              },
+              {
+                "code": "UNSUPPORTED_EXTENSION",
+                "message": "Cannot validate an extension as it is not supported by the validator: 'VRMC_springBone'.",
+                "severity": 2,
+                "pointer": "/extensionsUsed/3"
+              },
+              {
+                "code": "UNSUPPORTED_EXTENSION",
+                "message": "Cannot validate an extension as it is not supported by the validator: 'VRMC_node_constraint'.",
+                "severity": 2,
+                "pointer": "/extensionsUsed/4"
+              },
+              {
+                "code": "BUFFER_VIEW_TARGET_MISSING",
+                "message": "bufferView.target should be set for vertex or index data.",
+                "severity": 3,
+                "pointer": "/meshes/0/primitives/0/attributes/COLOR_0"
+              },
+              {
+                "code": "BUFFER_VIEW_TARGET_MISSING",
+                "message": "bufferView.target should be set for vertex or index data.",
+                "severity": 3,
+                "pointer": "/meshes/0/primitives/0/attributes/JOINTS_0"
+              },
+              {
+                "code": "BUFFER_VIEW_TARGET_MISSING",
+                "message": "bufferView.target should be set for vertex or index data.",
+                "severity": 3,
+                "pointer": "/meshes/0/primitives/0/attributes/NORMAL"
+              },
+              {
+                "code": "BUFFER_VIEW_TARGET_MISSING",
+                "message": "bufferView.target should be set for vertex or index data.",
+                "severity": 3,
+                "pointer": "/meshes/0/primitives/0/attributes/POSITION"
+              },
+              {
+                "code": "BUFFER_VIEW_TARGET_MISSING",
+                "message": "bufferView.target should be set for vertex or index data.",
+                "severity": 3,
+                "pointer": "/meshes/0/primitives/0/attributes/TANGENT"
+              },
+              {
+                "code": "BUFFER_VIEW_TARGET_MISSING",
+                "message": "bufferView.target should be set for vertex or index data.",
+                "severity": 3,
+                "pointer": "/meshes/0/primitives/0/attributes/TEXCOORD_0"
+              },
+              {
+                "code": "BUFFER_VIEW_TARGET_MISSING",
+                "message": "bufferView.target should be set for vertex or index data.",
+                "severity": 3,
+                "pointer": "/meshes/0/primitives/0/attributes/TEXCOORD_1"
+              },
+              {
+                "code": "BUFFER_VIEW_TARGET_MISSING",
+                "message": "bufferView.target should be set for vertex or index data.",
+                "severity": 3,
+                "pointer": "/meshes/0/primitives/0/attributes/WEIGHTS_0"
+              },
+              {
+                "code": "BUFFER_VIEW_TARGET_MISSING",
+                "message": "bufferView.target should be set for vertex or index data.",
+                "severity": 3,
+                "pointer": "/meshes/0/primitives/0/indices"
+              },
+              {
+                "code": "UNUSED_MESH_TANGENT",
+                "message": "Tangents are not used because the material has no normal texture.",
+                "severity": 2,
+                "pointer": "/meshes/0/primitives/0/attributes/TANGENT"
+              },
+              {
+                "code": "BUFFER_VIEW_TARGET_MISSING",
+                "message": "bufferView.target should be set for vertex or index data.",
+                "severity": 3,
+                "pointer": "/meshes/0/primitives/0/targets/0/NORMAL"
+              },
+              {
+                "code": "BUFFER_VIEW_TARGET_MISSING",
+                "message": "bufferView.target should be set for vertex or index data.",
+                "severity": 3,
+                "pointer": "/meshes/0/primitives/0/targets/0/POSITION"
+              },
+              {
+                "code": "BUFFER_VIEW_TARGET_MISSING",
+                "message": "bufferView.target should be set for vertex or index data.",
+                "severity": 3,
+                "pointer": "/meshes/0/primitives/0/targets/0/TANGENT"
+              },
+              {
+                "code": "NODE_SKINNED_MESH_WITHOUT_SKIN",
+                "message": "Node uses skinned mesh, but has no skin defined.",
+                "severity": 1,
+                "pointer": "/nodes/23"
+              },
+              {
+                "code": "NODE_SKINNED_MESH_NON_ROOT",
+                "message": "Node with a skinned mesh is not root. Parent transforms will not affect a skinned mesh.",
+                "severity": 1,
+                "pointer": "/nodes/1"
+              },
+              {
+                "code": "NODE_SKINNED_MESH_LOCAL_TRANSFORMS",
+                "message": "Local transforms will not affect a skinned mesh.",
+                "severity": 1,
+                "pointer": "/nodes/1"
+              },
+              {
+                "code": "NODE_SKINNED_MESH_NON_ROOT",
+                "message": "Node with a skinned mesh is not root. Parent transforms will not affect a skinned mesh.",
+                "severity": 1,
+                "pointer": "/nodes/2"
+              },
+              {
+                "code": "NODE_SKINNED_MESH_LOCAL_TRANSFORMS",
+                "message": "Local transforms will not affect a skinned mesh.",
+                "severity": 1,
+                "pointer": "/nodes/2"
+              },
+              {
+                "code": "NODE_EMPTY",
+                "message": "Empty node encountered.",
+                "severity": 2,
+                "pointer": "/nodes/8"
+              },
+              {
+                "code": "NODE_EMPTY",
+                "message": "Empty node encountered.",
+                "severity": 2,
+                "pointer": "/nodes/11"
+              },
+              {
+                "code": "NODE_EMPTY",
+                "message": "Empty node encountered.",
+                "severity": 2,
+                "pointer": "/nodes/14"
+              },
+              {
+                "code": "NODE_EMPTY",
+                "message": "Empty node encountered.",
+                "severity": 2,
+                "pointer": "/nodes/17"
+              },
+              {
+                "code": "NODE_EMPTY",
+                "message": "Empty node encountered.",
+                "severity": 2,
+                "pointer": "/nodes/19"
+              },
+              {
+                "code": "UNUSED_OBJECT",
+                "message": "This object may be unused.",
+                "severity": 2,
+                "pointer": "/accessors/12"
+              },
+              {
+                "code": "UNUSED_OBJECT",
+                "message": "This object may be unused.",
+                "severity": 2,
+                "pointer": "/accessors/13"
+              },
+              {
+                "code": "UNUSED_OBJECT",
+                "message": "This object may be unused.",
+                "severity": 2,
+                "pointer": "/bufferViews/10"
+              },
+              {
+                "code": "UNUSED_OBJECT",
+                "message": "This object may be unused.",
+                "severity": 2,
+                "pointer": "/textures/1"
+              },
+              {
+                "code": "UNUSED_MESH_WEIGHTS",
+                "message": "The static morph target weights are always overridden.",
+                "severity": 2,
+                "pointer": "/meshes/0/weights"
+              }
+            ],
+            "truncated": false
+          },
+          "info": {
+            "version": "2.0",
+            "extensionsUsed": [
+              "VRMC_vrm",
+              "VRMC_materials_mtoon",
+              "KHR_texture_transform",
+              "VRMC_springBone",
+              "VRMC_node_constraint",
+              "KHR_materials_emissive_strength"
+            ],
+            "extensionsRequired": [
+              "VRMC_vrm",
+              "VRMC_materials_mtoon"
+            ],
+            "resources": [
+              {
+                "pointer": "/buffers/0",
+                "mimeType": "application/gltf-buffer",
+                "storage": "glb",
+                "byteLength": 18032
+              },
+              {
+                "pointer": "/images/0",
+                "mimeType": "image/png",
+                "storage": "buffer-view",
+                "image": {
+                  "width": 128,
+                  "height": 128,
+                  "format": "rgba",
+                  "primaries": "srgb",
+                  "transfer": "srgb",
+                  "bits": 8
+                }
+              }
+            ],
+            "animationCount": 0,
+            "materialCount": 1,
+            "hasMorphTargets": true,
+            "hasSkins": true,
+            "hasTextures": true,
+            "hasDefaultScene": true,
+            "drawCallCount": 1,
+            "totalVertexCount": 4,
+            "totalTriangleCount": 2,
+            "maxUVs": 2,
+            "maxInfluences": 4,
+            "maxAttributes": 8
+          }
+        }
+      }
+    ]
+  },
+  "source_hashes": {
+    "CMakeLists.txt": "35bd35d3fea959a5a5fcdc1677b7b6243ab2326078a2e98ff320996652d3a970",
+    "tests/vrm1-initial-shade-authoring.cpp": "11cec10a43ee827e0ac3e9929379adc9f43c52badaa868c9de23cc600861a5f7",
+    "tests/vrm1-expression-targets-render.cpp": "aa6c4bc01c05f599cddd9597eb96c87c74715ce68433bd95c01f67bdf02a99cc",
+    "tests/vrm1-expression-layer-consumer.hpp": "0e1b85bc8d655d4406d7d279cdcf957e82c3dece0e745c46e36abe3a7cc31e56"
+  },
+  "counts": {
+    "worker_each": 47,
+    "independent_each": 172,
+    "pairs_each": 36,
+    "strict_arc_checks": 173,
+    "old_counter": 18,
+    "png_pairs_exact": 72,
+    "worker_control_pairs_exact": 11
+  },
+  "bounds": {
+    "unchanged_image_bound": 4,
+    "actual_maximum": 1,
+    "minimum_coverage": 300,
+    "source_uv_sensitivity": 132,
+    "moving_paint_sensitivity": [
+      46,
+      47,
+      48
+    ],
+    "tint_sensitivity": 23,
+    "shade_sensitivity": 12
+  },
+  "scope_limits": [
+    "Graphics focuses one part; native package preserves all three source parts/dependencies",
+    "Raw INPUT JSON adds genuine custom expression; original BIN bytes and other metadata retained, no output rewrite",
+    "No new runtime; sealedbd3 full1823 factory proof remains separate, not repeated or relabeled for this new input",
+    "General MASK/BLEND and remaining owning/role/full VRM interoperability requirements stay open",
+    "Same original64560 source-world full66187-prefix sanitizer remains separate/live"
+  ],
+  "gpu": "40349 terminal0/released; no GPU process remains",
+  "runtime_archive_pairs": {
+    "release": [
+      {
+        "current": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-release/stage/libdome-sculpt-affine.a",
+        "qualified_parent": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-initial-shade-1231/artifacts/initial-proof/final-release/stage/libdome-sculpt-affine.a",
+        "sha256": "fb35d39425c5b622f72c0254fa77db43cea6230f7887922a428a1e6948cd5875"
+      },
+      {
+        "current": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-release/stage/libdome-sculpt-core.a",
+        "qualified_parent": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-initial-shade-1231/artifacts/initial-proof/final-release/stage/libdome-sculpt-core.a",
+        "sha256": "80d3891f01cd226961d4bca4de6832d42aaaeb34687ffbf485a517d119bca23d"
+      },
+      {
+        "current": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-release/stage/libdome-sculpt-emission-codec.a",
+        "qualified_parent": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-initial-shade-1231/artifacts/initial-proof/final-release/stage/libdome-sculpt-emission-codec.a",
+        "sha256": "a8529b093ef10dc194fcf4a108af93d0eded35a4dd694a947c32e0a478caade8"
+      },
+      {
+        "current": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-release/stage/libdome-sculpt-polygon.a",
+        "qualified_parent": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-initial-shade-1231/artifacts/initial-proof/final-release/stage/libdome-sculpt-polygon.a",
+        "sha256": "8307004ff812bf333c332616d8fbe9f558b4f02cbede81319eda7e623841e20f"
+      },
+      {
+        "current": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-release/stage/libdome-sculpt-render.a",
+        "qualified_parent": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-initial-shade-1231/artifacts/initial-proof/final-release/stage/libdome-sculpt-render.a",
+        "sha256": "63f69169c6de1a3c35a790f2c7fa040ebfcbc42bfef7e486ff2135b2e0f36dcd"
+      },
+      {
+        "current": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-release/stage/libdome-sculpt-spacenav.a",
+        "qualified_parent": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-initial-shade-1231/artifacts/initial-proof/final-release/stage/libdome-sculpt-spacenav.a",
+        "sha256": "39ec5fe4de9b478b6e7bb22789ddc23ca23c918b15d21e4a9a2c4d23fa3e2d17"
+      },
+      {
+        "current": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-release/stage/libdome-sculpt-xr.a",
+        "qualified_parent": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-initial-shade-1231/artifacts/initial-proof/final-release/stage/libdome-sculpt-xr.a",
+        "sha256": "b27ecc8f71de03428019fa1fc6c23aefa8fc2bec01cb2717278024cc4759eec8"
+      },
+      {
+        "current": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-release/stage/libmikktspace-robust.a",
+        "qualified_parent": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-initial-shade-1231/artifacts/initial-proof/final-release/stage/libmikktspace-robust.a",
+        "sha256": "025322a12f603b1b284cff08e9630b1da346c4c821a860deaf260a9a56081a67"
+      },
+      {
+        "current": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-release/stage/libmikktspace.a",
+        "qualified_parent": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-initial-shade-1231/artifacts/initial-proof/final-release/stage/libmikktspace.a",
+        "sha256": "4047428382c619e928aae1fd29a2d4d7e00c70905a929d7ea648295ff7d54fee"
+      },
+      {
+        "current": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-release/stage/libufbx.a",
+        "qualified_parent": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-initial-shade-1231/artifacts/initial-proof/final-release/stage/libufbx.a",
+        "sha256": "62c101b55ed714d0798f1bb007aad6d7098796d6b6cc89c3e2400a88c71cf548"
+      },
+      {
+        "current": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-release/stage/libxatlas.a",
+        "qualified_parent": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-initial-shade-1231/artifacts/initial-proof/final-release/stage/libxatlas.a",
+        "sha256": "de14e7b31474ffa0c34df68497f4a886402ccfef759670578ebc995d9d413172"
+      }
+    ],
+    "sanitize": [
+      {
+        "current": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-sanitize/stage/libdome-sculpt-affine.a",
+        "qualified_parent": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-initial-shade-1231/artifacts/initial-proof/final-sanitize/stage/libdome-sculpt-affine.a",
+        "sha256": "306c34ec32845a430d55e84ed3d007fce4c96b13431108598803ffb47fdd7d44"
+      },
+      {
+        "current": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-sanitize/stage/libdome-sculpt-core.a",
+        "qualified_parent": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-initial-shade-1231/artifacts/initial-proof/final-sanitize/stage/libdome-sculpt-core.a",
+        "sha256": "04eb77bae398972054625d4499fda8a7d2b1a080f146b921d916b31c2fa903de"
+      },
+      {
+        "current": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-sanitize/stage/libdome-sculpt-emission-codec.a",
+        "qualified_parent": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-initial-shade-1231/artifacts/initial-proof/final-sanitize/stage/libdome-sculpt-emission-codec.a",
+        "sha256": "469828a2d39f6d3ceacc931471fce260b65f6cd585507668d8e67c92b11860ea"
+      },
+      {
+        "current": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-sanitize/stage/libdome-sculpt-polygon.a",
+        "qualified_parent": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-initial-shade-1231/artifacts/initial-proof/final-sanitize/stage/libdome-sculpt-polygon.a",
+        "sha256": "40765e48c23fb04f310c7cf16127748a590775ed5055edd91d95af3e9bb6e597"
+      },
+      {
+        "current": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-sanitize/stage/libdome-sculpt-render.a",
+        "qualified_parent": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-initial-shade-1231/artifacts/initial-proof/final-sanitize/stage/libdome-sculpt-render.a",
+        "sha256": "a5aae11d5187edaf3f05bebfe14a2eacb9ae89200237c86d727e6c78ec0819a7"
+      },
+      {
+        "current": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-sanitize/stage/libdome-sculpt-spacenav.a",
+        "qualified_parent": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-initial-shade-1231/artifacts/initial-proof/final-sanitize/stage/libdome-sculpt-spacenav.a",
+        "sha256": "2576c5a8249e2a0c3aff0f02cb533e61e77fcbd2b805a5cb9f3807b0ae143fce"
+      },
+      {
+        "current": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-sanitize/stage/libdome-sculpt-xr.a",
+        "qualified_parent": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-initial-shade-1231/artifacts/initial-proof/final-sanitize/stage/libdome-sculpt-xr.a",
+        "sha256": "cd0baa28e4e27c172195772f980c565ec9e61a000e2b99a7abc9bef046d550a3"
+      },
+      {
+        "current": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-sanitize/stage/libmikktspace-robust.a",
+        "qualified_parent": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-initial-shade-1231/artifacts/initial-proof/final-sanitize/stage/libmikktspace-robust.a",
+        "sha256": "8aa49e8fc9e789a95875ba3da205cb920ef6d3820ab641e8f8d9927268c06123"
+      },
+      {
+        "current": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-sanitize/stage/libmikktspace.a",
+        "qualified_parent": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-initial-shade-1231/artifacts/initial-proof/final-sanitize/stage/libmikktspace.a",
+        "sha256": "97e7023a21a2cc30ea0c17e0e07c1e954c988f47d868791a8bbca019f96bc412"
+      },
+      {
+        "current": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-sanitize/stage/libufbx.a",
+        "qualified_parent": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-initial-shade-1231/artifacts/initial-proof/final-sanitize/stage/libufbx.a",
+        "sha256": "99f39129fb6b376601ad72af4878302012331de03e2415b172c2d1b0052826a5"
+      },
+      {
+        "current": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-sanitize/stage/libxatlas.a",
+        "qualified_parent": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-initial-shade-1231/artifacts/initial-proof/final-sanitize/stage/libxatlas.a",
+        "sha256": "e8e3ec8a35633ab0abd7dee080072a413f5f96654a5ba98798ddf365be8fbfcc"
+      }
+    ]
+  },
+  "current_consumer_artifacts": {
+    "release": {
+      "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-release/stage/libdome-sculpt-affine.a": "fb35d39425c5b622f72c0254fa77db43cea6230f7887922a428a1e6948cd5875",
+      "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-release/stage/libdome-sculpt-core.a": "80d3891f01cd226961d4bca4de6832d42aaaeb34687ffbf485a517d119bca23d",
+      "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-release/stage/libdome-sculpt-emission-codec.a": "a8529b093ef10dc194fcf4a108af93d0eded35a4dd694a947c32e0a478caade8",
+      "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-release/stage/libdome-sculpt-polygon.a": "8307004ff812bf333c332616d8fbe9f558b4f02cbede81319eda7e623841e20f",
+      "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-release/stage/libdome-sculpt-render.a": "63f69169c6de1a3c35a790f2c7fa040ebfcbc42bfef7e486ff2135b2e0f36dcd",
+      "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-release/stage/libdome-sculpt-spacenav.a": "39ec5fe4de9b478b6e7bb22789ddc23ca23c918b15d21e4a9a2c4d23fa3e2d17",
+      "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-release/stage/libdome-sculpt-xr.a": "b27ecc8f71de03428019fa1fc6c23aefa8fc2bec01cb2717278024cc4759eec8",
+      "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-release/stage/libmikktspace-robust.a": "025322a12f603b1b284cff08e9630b1da346c4c821a860deaf260a9a56081a67",
+      "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-release/stage/libmikktspace.a": "4047428382c619e928aae1fd29a2d4d7e00c70905a929d7ea648295ff7d54fee",
+      "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-release/stage/libufbx.a": "62c101b55ed714d0798f1bb007aad6d7098796d6b6cc89c3e2400a88c71cf548",
+      "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-release/stage/libxatlas.a": "de14e7b31474ffa0c34df68497f4a886402ccfef759670578ebc995d9d413172",
+      "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-release/stage/render": "ca6260b72d80e31157fbe28917dc89a484a29d23794afc88cf4b1b921b5a38a7",
+      "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-release/stage/vrm1-expression-targets-render.cpp.o": "7d00d993556ed000230a99025b6785c37ba6f68434749f348827bfb235b09b64",
+      "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-release/stage/vrm1-initial-shade-authoring.cpp.o": "096f91e1721cd4b368e588a22e734980ecfe3e17f124177d8454ada69f9c0edf",
+      "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-release/stage/worker": "250e24a6ce565efd238858e6baa5b772a7dc304c9ff3b5da6948f5f361caf003"
+    },
+    "sanitize": {
+      "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-sanitize/stage/libdome-sculpt-affine.a": "306c34ec32845a430d55e84ed3d007fce4c96b13431108598803ffb47fdd7d44",
+      "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-sanitize/stage/libdome-sculpt-core.a": "04eb77bae398972054625d4499fda8a7d2b1a080f146b921d916b31c2fa903de",
+      "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-sanitize/stage/libdome-sculpt-emission-codec.a": "469828a2d39f6d3ceacc931471fce260b65f6cd585507668d8e67c92b11860ea",
+      "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-sanitize/stage/libdome-sculpt-polygon.a": "40765e48c23fb04f310c7cf16127748a590775ed5055edd91d95af3e9bb6e597",
+      "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-sanitize/stage/libdome-sculpt-render.a": "a5aae11d5187edaf3f05bebfe14a2eacb9ae89200237c86d727e6c78ec0819a7",
+      "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-sanitize/stage/libdome-sculpt-spacenav.a": "2576c5a8249e2a0c3aff0f02cb533e61e77fcbd2b805a5cb9f3807b0ae143fce",
+      "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-sanitize/stage/libdome-sculpt-xr.a": "cd0baa28e4e27c172195772f980c565ec9e61a000e2b99a7abc9bef046d550a3",
+      "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-sanitize/stage/libmikktspace-robust.a": "8aa49e8fc9e789a95875ba3da205cb920ef6d3820ab641e8f8d9927268c06123",
+      "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-sanitize/stage/libmikktspace.a": "97e7023a21a2cc30ea0c17e0e07c1e954c988f47d868791a8bbca019f96bc412",
+      "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-sanitize/stage/libufbx.a": "99f39129fb6b376601ad72af4878302012331de03e2415b172c2d1b0052826a5",
+      "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-sanitize/stage/libxatlas.a": "e8e3ec8a35633ab0abd7dee080072a413f5f96654a5ba98798ddf365be8fbfcc",
+      "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-sanitize/stage/render": "570f1affd26c8598b7f0d522ad6ceefe1d2a8823f62a58994377255c10559310",
+      "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-sanitize/stage/vrm1-expression-targets-render.cpp.o": "40fdfef24e4267223fde4725683288434dfee8beb9280449df325483824e18f2",
+      "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-sanitize/stage/vrm1-initial-shade-authoring.cpp.o": "7c6eb8c25f1e90bdee20bb6fb0144ae11c9c706e1836ab1f16c5cbdc16ab699e",
+      "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-shade-uv-bd3/artifacts/shade-uv-proof/final-sanitize/stage/worker": "8bc1e895b27a28de4b01859a629dcb466061b7393fa35e940767e4edfccb2447"
+    }
+  },
+  "original_long_san": {
+    "handle": 64560,
+    "pid": 1141482,
+    "completed_snapshot": 62980,
+    "required": 66187,
+    "status": "Same original live, no restart/extension/sampling/replacement or completion claim"
+  }
+}
