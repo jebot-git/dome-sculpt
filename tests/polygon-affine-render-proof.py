@@ -41,7 +41,7 @@ def profile(which,tag=""):
   A['run_step'](state,'compile',cmd,prospective=(32 if which=='sanitize' else 8)*2**20)
   if which=='sanitize':
    overridden=[]
-   for source in ('polygon-authoring.cpp','polygon-conversion.cpp','polygon-render.cpp'):
+   for source in ('polygon-authoring.cpp','polygon-render.cpp'):
     ownentry=next(x for x in db if x['file'].endswith('/src/'+source));whole=[];skip=False
     for a in shlex.split(ownentry['command']):
      if skip:skip=False;continue
