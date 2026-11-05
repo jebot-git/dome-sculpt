@@ -94,6 +94,7 @@ NormalFrames NormalFrames::decode(const nlohmann::json &j) {
   f.validate();return f;
 }
 void NormalFrameSet::validate(bool deep) const {
+  if(attribute_sampling)throw std::invalid_argument("Refined attribute owner requires its actual owning FrameSet3 replay");
   if(skin_policy!=NormalFrameSkinPolicy::WeightedJointInverseTranspose)throw std::invalid_argument("Unknown native normal frame skin policy");
   if(canonical_evaluation!=NativeCanonicalNormalEvaluation::RawInterpolatedVertexTbn)throw std::invalid_argument("Unknown native canonical normal evaluation");
   if(!pbr && !mtoon && !canonical)throw std::invalid_argument("Empty native normal frame set");
@@ -106,6 +107,7 @@ void NormalFrameSet::validate(bool deep) const {
   storage_bytes();
 }
 size_t NormalFrameSet::storage_bytes() const {
+  if(attribute_sampling)throw std::invalid_argument("Refined attribute storage requires its actual owning FrameSet3 context");
   size_t bytes=0;if(position_domain)checked_add(bytes,position_domain->storage_bytes());std::set<const NormalFrames*> seen;for(const auto &f:{pbr,mtoon,canonical})if(f && seen.insert(f.get()).second)checked_add(bytes,f->storage_bytes());
   for(const auto &t:targets)checked_add(bytes,t.positions.size()*sizeof(Vec3));
   return bytes;

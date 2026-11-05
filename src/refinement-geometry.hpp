@@ -15,10 +15,15 @@ public:
  const auto &mesh() const noexcept{return mesh_;}
  float tolerance() const noexcept{return tolerance_;}
  size_t working_bytes() const noexcept{return working_bytes_;}
+ bool matches_source(const std::shared_ptr<const Mesh> &) const noexcept;
+ size_t retained_bytes() const;
  void validate(const PaintSamplingLimits & = {}) const;
 private:
  RefinementGeometry()=default;
+ RefinementGeometry(const RefinementGeometry&)=delete;
+ RefinementGeometry&operator=(const RefinementGeometry&)=delete;
  std::weak_ptr<const RefinementGeometry> self_;
+ std::weak_ptr<const Mesh> source_owner_;
  KeyMirrorRefinement refinement_;
  std::shared_ptr<const Mesh> mesh_;
  float tolerance_=0;

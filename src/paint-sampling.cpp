@@ -1,17 +1,40 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/paint-sampling.hpp"
+#include "refinement-geometry.hpp"
+#include <cstring>
 #include <algorithm>
 #include <cmath>
 #include <limits>
 #include <stdexcept>
-namespace dome {namespace {
+namespace dome {namespace detail {
+class WeightedPaintDomain final {
+public:
+ std::shared_ptr<const PaintSamplingDomain> previous;
+ std::shared_ptr<const RefinementGeometry> geometry;
+ std::vector<PaintSamplingPoint> points;
+};
+} namespace {
+struct WeightedWorkState {uint64_t limit=0,used=0;size_t depth=0;};
+thread_local WeightedWorkState weighted_work;
+struct WeightedScope {
+ explicit WeightedScope(const PaintSamplingLimits&l){if(!weighted_work.depth){weighted_work.limit=l.max_work;weighted_work.used=0;}++weighted_work.depth;}
+ ~WeightedScope(){if(!--weighted_work.depth)weighted_work={};}
+};
+struct WeightedPath {
+ static thread_local std::array<const PaintSamplingDomain*,32> nodes;
+ static thread_local size_t depth;
+ explicit WeightedPath(const PaintSamplingDomain*p){if(depth>=nodes.size()||std::find(nodes.begin(),nodes.begin()+depth,p)!=nodes.begin()+depth)throw std::length_error("Weighted paint domain exceeds bounded acyclic history");nodes[depth++]=p;}
+ ~WeightedPath(){nodes[--depth]=nullptr;}
+};
+thread_local std::array<const PaintSamplingDomain*,32> WeightedPath::nodes{};
+thread_local size_t WeightedPath::depth=0;
 struct Budget {
  const PaintSamplingLimits &limits;uint64_t used=0;
  explicit Budget(const PaintSamplingLimits &l):limits(l){
   if(!l.max_vertices||l.max_vertices>2'000'000||!l.max_triangles||l.max_triangles>2'000'000||!l.max_basis_bytes||l.max_basis_bytes>128*1024*1024||!l.max_working_bytes||l.max_working_bytes>512*1024*1024||!l.max_work||l.max_work>256'000'000)throw std::invalid_argument("Invalid writable paint-domain resource limits");stop();
  }
  void stop(){if(limits.cancelled&&limits.cancelled())throw std::runtime_error("Writable paint-domain operation cancelled");}
- void work(uint64_t n=1){if(n>limits.max_work-used)throw std::length_error("Writable paint-domain work budget exceeded");used+=n;if((used&1023)==0)stop();}
+ void work(uint64_t n=1){if(weighted_work.depth){if(n>weighted_work.limit-weighted_work.used)throw std::length_error("Weighted paint aggregate work budget exceeded");weighted_work.used+=n;}if(n>limits.max_work-used)throw std::length_error("Writable paint-domain work budget exceeded");used+=n;if((used&1023)==0)stop();}
  void bytes(size_t total)const{if(total>limits.max_working_bytes)throw std::length_error("Writable paint-domain working bytes exceeded");}
 };
 bool same(Vec3 a,Vec3 b){return a.x==b.x&&a.y==b.y&&a.z==b.z;}
@@ -47,13 +70,25 @@ size_t validate(const PaintSamplingDomain &domain,const Mesh &current,Budget &bu
  correspondence(*domain.basis(),current,domain.source_corners(),budget,owned+bytes);return owned;
 }
 }
-size_t PaintSamplingDomain::storage_bytes(const PaintSamplingLimits &limits)const{Budget b(limits);return own_bytes(*this,b);}
-void PaintSamplingDomain::validate_current(const Mesh &current,const PaintSamplingLimits &limits)const{Budget b(limits);validate(*this,current,b);}
+uint32_t PaintSamplingDomain::version()const noexcept{return weighted_?2:1;}
+std::span<const PaintSamplingPoint> PaintSamplingDomain::weighted_corners()const noexcept{return weighted_?std::span<const PaintSamplingPoint>(weighted_->points):std::span<const PaintSamplingPoint>{};}
+const std::shared_ptr<const detail::RefinementGeometry>&PaintSamplingDomain::refined_geometry()const noexcept{static const std::shared_ptr<const detail::RefinementGeometry> empty;return weighted_?weighted_->geometry:empty;}
+const std::shared_ptr<const PaintSamplingDomain>&PaintSamplingDomain::previous_domain()const noexcept{static const std::shared_ptr<const PaintSamplingDomain> empty;return weighted_?weighted_->previous:empty;}
+size_t PaintSamplingDomain::storage_bytes(const PaintSamplingLimits &limits)const{Budget b(limits);if(weighted_){WeightedScope scope(limits);WeightedPath path(this);if(!basis_||!weighted_->geometry||!weighted_->geometry->valid_owner(weighted_->geometry))throw std::invalid_argument("Weighted paint lost genuine geometry");size_t bytes=sizeof(PaintSamplingDomain)+sizeof(detail::WeightedPaintDomain);auto add=[&](size_t n){if(n>limits.max_basis_bytes-bytes)throw std::length_error("Weighted paint retained basis exceeds byte limit");bytes+=n;};if(bytes>limits.max_basis_bytes)throw std::length_error("Weighted paint retained basis exceeds byte limit");add(weighted_->geometry->retained_bytes());if(weighted_->previous)add(weighted_->previous->storage_bytes(limits));else mesh_bytes(*basis_,b,true);if(weighted_->points.capacity()>limits.max_basis_bytes/sizeof(PaintSamplingPoint))throw std::length_error("Weighted paint retained corner count exceeds byte limit");add(weighted_->points.capacity()*sizeof(PaintSamplingPoint));b.bytes(bytes);return bytes;}return own_bytes(*this,b);}
+void PaintSamplingDomain::validate_current(const Mesh &current,const PaintSamplingLimits &limits)const{
+ Budget b(limits);if(!weighted_){validate(*this,current,b);return;}
+ WeightedScope scope(limits);const auto owned=storage_bytes(limits);const auto &g=weighted_->geometry;const auto before_work=weighted_work.limit-weighted_work.used;b.work(g->refinement().work_units+g->refinement().corners.size()*8);auto geometry_limits=limits;geometry_limits.max_work=before_work;g->validate(geometry_limits);const auto &expected=*g->mesh();mesh_bytes(current,b,false);auto same=[](const auto&a,const auto&v){return a.size()==v.size()&&(a.empty()||!std::memcmp(a.data(),v.data(),a.size()*sizeof(a[0])));};
+ if(!same(current.positions,expected.positions)||!same(current.normals,expected.normals)||current.uv!=expected.uv||current.indices!=expected.indices||current.uv_pins!=expected.uv_pins||current.uv_seams!=expected.uv_seams||weighted_->points.size()!=current.indices.size()||!source_corners_.empty())throw std::invalid_argument("Weighted paint current REST/corner geometry differs from actual refinement");
+ auto replay=retain_refined_paint_sampling(weighted_->previous,g,limits);if(replay->basis()!=basis_||replay->basis().owner_before(basis_)||basis_.owner_before(replay->basis())||replay->weighted_corners().size()!=weighted_->points.size())throw std::invalid_argument("Weighted paint basis association differs from actual before grid");
+ for(size_t c=0;c<weighted_->points.size();++c){b.work();const auto&a=weighted_->points[c],&v=replay->weighted_corners()[c];if(a.source_corners!=v.source_corners||a.weights!=v.weights)throw std::invalid_argument("Weighted paint stencil differs from actual before grid replay");}b.bytes(owned+g->working_bytes());b.stop();
+}
 std::vector<std::array<float,2>> PaintSamplingDomain::corner_coordinates(const Mesh &current,const PaintSamplingLimits &limits)const{
+ if(weighted_){WeightedScope scope(limits);validate_current(current,limits);Budget b(limits);const auto owned=storage_bytes(limits);b.bytes(owned+weighted_->points.size()*sizeof(std::array<float,2>));std::vector<std::array<float,2>> out;out.reserve(weighted_->points.size());for(const auto&p:weighted_->points){b.work();std::array<double,2> uv{};for(size_t k=0;k<3;++k)for(size_t d=0;d<2;++d)uv[d]+=basis_->uv.at(basis_->indices.at(p.source_corners[k]))[d]*p.weights[k];out.push_back({float(uv[0]),float(uv[1])});}b.stop();return out;}
  Budget b(limits);const auto owned=validate(*this,current,b);b.bytes(owned+source_corners().size()*sizeof(std::array<float,2>));std::vector<std::array<float,2>> result;result.reserve(source_corners().size());
  for(auto corner:source_corners()){b.work();result.push_back(basis()->uv[basis()->indices[corner]]);}b.stop();return result;
 }
 Mesh PaintSamplingDomain::raster_mesh(const Mesh &current,const PaintSamplingLimits &limits)const{
+ if(weighted_){WeightedScope scope(limits);auto uv=corner_coordinates(current,limits);Budget b(limits);const auto owned=storage_bytes(limits);b.bytes(owned+uv.capacity()*sizeof(std::array<float,2>)+current.indices.size()*(2*sizeof(Vec3)+sizeof(std::array<float,2>)+sizeof(uint32_t)));Mesh out;out.positions.reserve(uv.size());out.normals.reserve(uv.size());out.uv=std::move(uv);out.indices.reserve(out.uv.size());for(auto v:current.indices){b.work();out.positions.push_back(current.positions[v]);out.normals.push_back(current.normals[v]);out.indices.push_back(uint32_t(out.indices.size()));}b.stop();return out;}
  Budget b(limits);const auto owned=validate(*this,current,b);const size_t count=source_corners().size();b.bytes(owned+count*(2*sizeof(Vec3)+sizeof(std::array<float,2>)+sizeof(uint32_t)));
  Mesh raster;raster.positions.reserve(count);raster.normals.reserve(count);raster.uv.reserve(count);raster.indices.reserve(count);
  for(size_t c=0;c<count;++c){b.work();const auto vertex=current.indices[c];raster.positions.push_back(current.positions[vertex]);raster.normals.push_back(current.normals[vertex]);raster.uv.push_back(basis()->uv[basis()->indices[source_corners()[c]]]);raster.indices.push_back(uint32_t(c));}b.stop();return raster;
@@ -71,5 +106,17 @@ std::shared_ptr<const PaintSamplingDomain> retain_paint_sampling(const Mesh &bef
  for(auto corner:corners){b.work();mapping.push_back(previous?previous->source_corners()[corner]:corner);}
  auto result=std::shared_ptr<const PaintSamplingDomain>(new const PaintSamplingDomain(std::move(basis),std::move(mapping)));
  validate(*result,current,b);b.stop();return result;
+}
+std::shared_ptr<const PaintSamplingDomain> retain_refined_paint_sampling(std::shared_ptr<const PaintSamplingDomain> previous,std::shared_ptr<const detail::RefinementGeometry> geometry,const PaintSamplingLimits&limits){
+ WeightedScope scope(limits);Budget b(limits);if(!geometry||!geometry->valid_owner(geometry))throw std::invalid_argument("Weighted paint requires genuine owning refinement geometry");std::array<const PaintSamplingDomain*,31> ancestors{};size_t depth=0;for(auto p=previous;p&&p->version()==2;p=p->previous_domain()){if(std::find(ancestors.begin(),ancestors.begin()+depth,p.get())!=ancestors.begin()+depth)throw std::length_error("Weighted paint requires acyclic before history");if(depth>=ancestors.size())throw std::length_error("Weighted paint history exceeds its bounded depth before allocation");ancestors[depth++]=p.get();}const auto before_work=weighted_work.limit-weighted_work.used;b.work(geometry->refinement().work_units+geometry->refinement().corners.size()*8);auto geometry_limits=limits;geometry_limits.max_work=before_work;geometry->validate(geometry_limits);if(previous)previous->validate_current(*geometry->source(),limits);else mesh_bytes(*geometry->source(),b,true);
+ const auto n=geometry->refinement().corners.size();const auto previous_bytes=previous?previous->storage_bytes(limits):mesh_bytes(*geometry->source(),b,true);b.bytes(previous_bytes+geometry->working_bytes()+n*sizeof(PaintSamplingPoint));
+ const auto retained=sizeof(PaintSamplingDomain)+sizeof(detail::WeightedPaintDomain)+geometry->retained_bytes()+(previous?previous_bytes:0)+n*sizeof(PaintSamplingPoint);if(retained>limits.max_basis_bytes)throw std::length_error("Weighted paint complete retained basis exceeds byte limit before allocation");
+ auto data=std::make_shared<detail::WeightedPaintDomain>();data->geometry=std::move(geometry);data->previous=std::move(previous);data->points.reserve(n);const auto &r=data->geometry->refinement();
+ auto basis=data->previous?data->previous->basis():r.source;
+ for(const auto &c:r.corners){b.work();PaintSamplingPoint point;bool set=false;for(size_t k=0;k<3;++k){const size_t old=size_t(c.current.triangle)*3+k;PaintSamplingPoint before;
+   if(data->previous&&data->previous->version()==2)before=data->previous->weighted_corners()[old];else{const auto raw=data->previous?data->previous->source_corners()[old]:uint32_t(old);before.source_corners={raw/3*3,raw/3*3+1,raw/3*3+2};before.weights[raw%3]=1;}
+   const uint32_t face=before.source_corners[0]/3;if(!set){point.source_corners={face*3,face*3+1,face*3+2};set=true;}for(size_t v=0;v<3;++v){if(before.source_corners[v]/3!=point.source_corners[0]/3)throw std::invalid_argument("Weighted paint triangle crosses distinct genuine source-grid faces");point.weights[before.source_corners[v]%3]+=before.weights[v]*c.current.barycentric[k];}
+  }double sum=0;for(double w:point.weights){if(!std::isfinite(w)||w< -1e-12||w>1+1e-12)throw std::invalid_argument("Weighted paint stencil is not a genuine source point");sum+=w;}if(std::abs(sum-1)>1e-12)throw std::invalid_argument("Weighted paint stencil lost affine sum");data->points.push_back(point);}
+ auto result=std::shared_ptr<const PaintSamplingDomain>(new const PaintSamplingDomain(std::move(basis),std::move(data),retained));result->storage_bytes(limits);b.stop();return result;
 }
 } // namespace dome

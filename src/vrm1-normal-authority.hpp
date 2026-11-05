@@ -10,6 +10,7 @@ inline void require_vrm1_authored_normal_frame(const SculptObject &object,
  auto fail=[](const char *reason){throw std::invalid_argument(std::string("VRM1 normal-texture authored frame: ")+reason);};
  if(!object.painted||!object.appearance||!object.material_bindings)fail("owning source is absent");
  const auto &binding=*object.material_bindings;
+ if(binding.normal_frames&&binding.normal_frames->attribute_sampling)fail("refined attribute sampling requires an independent typed normal adapter");
  if(!binding.has_mtoon||binding.material.version()!=MToonVersion::V1)fail("actual typed MToon1 owner is required");
  if(!object.painted->source_sampling_prepared()||!object.painted->valid_source_sampling_attachment()||
     binding.normal_frame!=SourceMaterialNormalFrame::OriginalAttributes||!binding.normal_frames||

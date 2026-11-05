@@ -77,6 +77,7 @@ PaintSamplingArchive::PaintSamplingArchive(PaintSamplingArchiveLimits l):limits_
 }
 uint32_t PaintSamplingArchive::add(std::shared_ptr<const PaintSamplingDomain> d) {
   stop(limits_);if(!d)throw std::invalid_argument("Missing paint sampling domain");
+  if(d->version()!=1)throw std::invalid_argument("Weighted paint requires the genuine owning refinement pool context");
   for(size_t i=0;i<domains_.size();++i)if(domains_[i]==d)return uint32_t(i);
   if(domains_.size()>=limits_.max_domains)throw std::length_error("Paint sampling domain count exceeded");
   auto count=d->storage_bytes(limits_.geometry);validate_corners(*d,limits_);

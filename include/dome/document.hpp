@@ -29,6 +29,7 @@
 #include <span>
 #include <thread>
 namespace dome {
+namespace detail {class AttributePreviewPacket;}
 class MaterialSurfaceQuery;
 struct SpatialHand {
   TrackedHand tracked;
@@ -194,6 +195,7 @@ struct SurfaceRange {
   bool paint_winding_reversed=false; // Actual packed index flip, not cull mode.
   std::shared_ptr<const NormalPreviewProof> normal_preview_proof{};
   bool pbr_view = false;
+  std::shared_ptr<const detail::AttributePreviewPacket> attribute_preview;
 };
 struct SculptMeshingStats {
   size_t objects_reused=0,local_updates=0,full_rebuilds=0,history_fallbacks=0,capacity_fallbacks=0;

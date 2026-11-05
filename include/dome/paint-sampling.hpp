@@ -7,6 +7,8 @@
 #include <span>
 #include <utility>
 namespace dome {
+namespace detail {class RefinementGeometry;class WeightedPaintDomain;}
+struct PaintSamplingPoint {std::array<uint32_t,3> source_corners{};std::array<double,3> weights{};};
 struct PaintSamplingLimits {
   size_t max_vertices=2'000'000,max_triangles=2'000'000;
   size_t max_basis_bytes=128*1024*1024,max_working_bytes=256*1024*1024;
@@ -20,7 +22,10 @@ struct PaintSamplingLimits {
 // rather than a current vertex, so welding never averages independent seams.
 class PaintSamplingDomain {
 public:
-  uint32_t version() const noexcept { return 1; }
+  uint32_t version() const noexcept;
+  std::span<const PaintSamplingPoint> weighted_corners() const noexcept;
+  const std::shared_ptr<const detail::RefinementGeometry> &refined_geometry() const noexcept;
+  const std::shared_ptr<const PaintSamplingDomain> &previous_domain() const noexcept;
   const std::shared_ptr<const Mesh> &basis() const noexcept { return basis_; }
   std::span<const uint32_t> source_corners() const noexcept { return source_corners_; }
   size_t storage_bytes(const PaintSamplingLimits & = {}) const;
@@ -35,9 +40,14 @@ private:
   PaintSamplingDomain(std::shared_ptr<const Mesh> basis,std::vector<uint32_t> corners)
       :basis_(std::move(basis)),source_corners_(std::move(corners)),
        retained_bytes_(basis_->positions.size()*(2*sizeof(Vec3)+sizeof(std::array<float,2>))+basis_->indices.size()*sizeof(uint32_t)+basis_->uv_pins.size()+basis_->uv_seams.size()+source_corners_.size()*sizeof(uint32_t)){}
+  PaintSamplingDomain(std::shared_ptr<const Mesh> basis,std::shared_ptr<const detail::WeightedPaintDomain> weighted,size_t retained)
+      :basis_(std::move(basis)),retained_bytes_(retained),weighted_(std::move(weighted)){}
   std::shared_ptr<const Mesh> basis_;
   std::vector<uint32_t> source_corners_;
   size_t retained_bytes_=0;
+  std::shared_ptr<const detail::WeightedPaintDomain> weighted_;
+  friend std::shared_ptr<const PaintSamplingDomain> retain_refined_paint_sampling(
+      std::shared_ptr<const PaintSamplingDomain>,std::shared_ptr<const detail::RefinementGeometry>,const PaintSamplingLimits &);
   friend class PaintSamplingArchive;
   friend std::shared_ptr<const PaintSamplingDomain> retain_paint_sampling(
       const Mesh &,std::shared_ptr<const PaintSamplingDomain>,const Mesh &,
@@ -97,5 +107,10 @@ private:
 std::shared_ptr<const PaintSamplingDomain> retain_paint_sampling(
     const Mesh &before,std::shared_ptr<const PaintSamplingDomain> previous,
     const Mesh &current,std::span<const uint32_t> before_corners,
+    const PaintSamplingLimits & = {});
+// Pure geometry only; the owning paint/material/frame transition must replay
+// independently before publication. Interior points never become raw IDs.
+std::shared_ptr<const PaintSamplingDomain> retain_refined_paint_sampling(
+    std::shared_ptr<const PaintSamplingDomain>,std::shared_ptr<const detail::RefinementGeometry>,
     const PaintSamplingLimits & = {});
 } // namespace dome
