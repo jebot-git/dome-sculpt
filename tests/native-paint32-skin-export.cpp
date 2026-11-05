@@ -28,6 +28,7 @@ Scene skinned_native32(bool posed) {
 Vec3 parsed_point(const float *m,Vec3 p){return {m[0]*p.x+m[4]*p.y+m[8]*p.z+m[12],m[1]*p.x+m[5]*p.y+m[9]*p.z+m[13],m[2]*p.x+m[6]*p.y+m[10]*p.z+m[14]};}
 std::vector<uint8_t> bytes(const std::filesystem::path &p){std::ifstream f(p,std::ios::binary);return {std::istreambuf_iterator<char>(f),{}};}
 }
+#ifndef DOME_NATIVE32_SKIN_EXPORT_NO_MAIN
 int main(int argc,char **argv)try{
  if(argc<2||argc>3)return 2;const std::filesystem::path out=argv[1];std::filesystem::create_directories(out);
  if(argc==3&&std::string_view(argv[2])!="--expect-refusal"&&std::string_view(argv[2])!="--hardware")return 2;
@@ -64,3 +65,5 @@ int main(int argc,char **argv)try{
  if(!negative){auto scene=skinned_native32(false);auto state=*scene.active().deformation;const auto &mesh=scene.active().painted->mesh();state.morphs=MorphSet(mesh);auto positions=mesh.positions;positions[0].z+=.1f;state.morphs->set_target(mesh,"Actual curved key",positions);state.morph_weights={.35f};scene.set_deformation(scene.active().id,std::move(state));const auto before=scene.encode();Document d;d.replace(scene);auto dir=out/"refusal";std::filesystem::create_directories(dir);auto file=dir/"morph.glb";{std::ofstream f(file);f<<"prior output";}std::string reason;try{d.export_asset(file).get();}catch(const std::exception &e){reason=e.what();}check(reason.find("complete shading adapter")!=std::string::npos,"Actual curved native paint morph retains its genuine unadapted shading refusal");const auto sentinel=bytes(file);check(std::string(sentinel.begin(),sentinel.end())=="prior output"&&d.copy_scene().encode()==before,"Morph refusal preserves exact prior output and complete skin/morph/paint graph");auto save=dir/"following.dsculpt";d.save_async(save).get();check(Scene::load(save).encode()==before,"Following native Save succeeds and retains all unsupported-but-editable morph data");}
  std::cout<<"PASS "<<checks<<" native paint skin export checks\n";return 0;
 }catch(const std::exception &e){std::cerr<<"FAIL "<<e.what()<<'\n';return 1;}
+
+#endif

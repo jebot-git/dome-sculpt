@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-#define main native32_skin_reference_main
+#define DOME_NATIVE32_SKIN_EXPORT_NO_MAIN
 #include "native-paint32-skin-export.cpp"
-#undef main
+#undef DOME_NATIVE32_SKIN_EXPORT_NO_MAIN
 #include "dome/emission-native.hpp"
 #include "emission-export.hpp"
 #include "gltf-document.hpp"
