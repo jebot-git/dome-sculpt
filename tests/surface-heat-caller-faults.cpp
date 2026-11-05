@@ -11,6 +11,7 @@
 #include <new>
 #include <set>
 #include <thread>
+#include <string_view>
 #include <nlohmann/json.hpp>
 using namespace dome;
 namespace {
@@ -28,14 +29,14 @@ extern "C" bool real_heat(Scene&,std::span<const uint64_t>,const SkinAuthoringOp
 extern "C" bool wrap_heat(Scene&,std::span<const uint64_t>,const SkinAuthoringOptions&,const Cancel&) asm("__wrap__ZN4dome24author_surface_heat_skinERNS_5SceneESt4spanIKmLm18446744073709551615EERKNS_20SkinAuthoringOptionsERKSt8functionIFbvEE");
 extern "C" bool wrap_heat(Scene&s,std::span<const uint64_t>ids,const SkinAuthoringOptions&o,const Cancel&cancel){auto g=gate.load();if(g){g->entered=true;while(!g->release&&!(cancel&&cancel()))std::this_thread::sleep_for(std::chrono::milliseconds(1));}return real_heat(s,ids,o,cancel);}
 int main(int argc,char**argv)try{
- if(argc!=3)throw std::invalid_argument("Authentic unskinned complete source, output directory");const std::filesystem::path out=argv[2];std::filesystem::create_directories(out);setenv("XDG_STATE_HOME",(out/"state").c_str(),1);setenv("XDG_CONFIG_HOME",(out/"config").c_str(),1);
+ if(argc!=3&&argc!=4)throw std::invalid_argument("Authentic unskinned complete source, output directory, optional all");const bool all=argc==4&&std::string_view(argv[3])=="all";if(argc==4&&!all)throw std::invalid_argument("Unknown caller allocation coverage mode");const std::filesystem::path out=argv[2];std::filesystem::create_directories(out);setenv("XDG_STATE_HOME",(out/"state").c_str(),1);setenv("XDG_CONFIG_HOME",(out/"config").c_str(),1);
  auto source=Scene::load(argv[1]);uint64_t reference=0;std::vector<uint64_t>ids;for(auto&o:source.objects()){if(o.deformation&&o.deformation->skeleton)reference=o.id;if(o.mesh_active&&o.painted&&o.appearance)ids.push_back(o.id);}check(reference&&ids.size()==19,"Authentic full nineteen-output intent required");
  SkinAuthoringOptions options;options.mode=SkinAuthoringMode::SurfaceHeat;options.reference=reference;options.limits={1,.9f};options.locks.assign(source.object(reference).deformation->skeleton->bones.size(),1);
  auto setup=[&](Document&d){d.replace(source);d.select_objects(ids);check(d.wait_mesh(std::chrono::seconds(120)),"Initial immutable source mesh fence required");};
  auto cancel_save=[&](Document&d,const std::shared_ptr<Gate>&g,const nlohmann::json&before,const std::filesystem::path&file){entered(g);auto f=d.save_async(file);d.cancel_background_work();g->release=true;bool refused=false;try{f.get();}catch(const std::exception&){refused=true;}check(refused&&d.wait_asset(std::chrono::seconds(60))&&d.copy_scene().encode()==before&&!d.frame().state->asset_busy&&!d.frame().state->can_save_after_asset&&!d.frame().state->can_undo,"Real accepted Cancel must fail dependent Save and preserve exact Scene/history");check(!std::filesystem::exists(file),"Cancelled accepted Save must not fabricate a file");};
  size_t total=0;
  {Document d;setup(d);auto before=d.copy_scene().encode();auto g=std::make_shared<Gate>();gate=g;Drain drain{d,g};calls=0;tracked=true;d.bind_skin_selected(options,{},ids);tracked=false;total=calls;check(total>16,"Actual allocating direct caller baseline required");auto state=d.frame().state;check(state->asset_busy&&state->skin_options.mode==SkinAuthoringMode::SurfaceHeat&&state->skin_options.limits.max_influences==1&&state->skin_options.limits.prune==.9f&&state->skin_use_locks&&state->weights.locks==options.locks&&state->skin_options.locks.empty(),"Actual typed configuration/locks must publish with accepted work");cancel_save(d,g,before,out/"baseline-cancelled.dsculpt");}
- std::set<size_t>prefixes;for(size_t n=1;n<=total;n*=2)prefixes.insert(n);for(size_t n=0;n<16;++n)prefixes.insert(total-n);
+ std::set<size_t>prefixes;for(size_t n=1;n<=total;n*=2)prefixes.insert(n);for(size_t n=0;n<16;++n)prefixes.insert(total-n);if(all)for(size_t n=1;n<=total;++n)prefixes.insert(n);
  size_t passed=0;
  for(auto prefix:prefixes){Document d;setup(d);auto before=d.copy_scene();const auto value=before.encode();const auto state=d.frame().state;auto g=std::make_shared<Gate>();gate=g;Drain drain{d,g};bool refused=false;calls=0;fail_at=prefix;tracked=true;
   try{d.bind_skin_selected(options,{},ids);}catch(const std::bad_alloc&){refused=true;}catch(...){tracked=false;throw;}tracked=false;fail_at=0;
@@ -45,5 +46,5 @@ int main(int argc,char**argv)try{
   // Cancel/accepted Save. It does not stand in for a completed solver run.
   d.bind_skin_selected(options,{},ids);cancel_save(d,g,value,out/("retry-cancelled-"+std::to_string(prefix)+".dsculpt"));++passed;std::cout<<"PASS actual direct caller permanent prefix="<<prefix<<" reached="<<calls<<std::endl;
  }
- std::cout<<"PASS sampled actual direct caller prefixes="<<passed<<" measured="<<total<<"; powers-of-two+last16, exact snapshot/owners/controls/queue/history; same-controller retry+Cancel+accepted Save; not exhaustive helper/publication"<<std::endl;return 0;
+ std::ofstream(out/"report.json")<<nlohmann::json{{"all_measured_caller_prefixes",all},{"actual_caller_allocations",total},{"tested_prefixes",prefixes},{"passed",passed},{"real_retry_helper_entry_cancel_dependent_save",true},{"helper_preparation_faults_covered",false}}.dump(2);std::cout<<"PASS "<<(all?"complete":"sampled")<<" actual direct caller prefixes="<<passed<<" measured="<<total<<"; "<<(all?"all measured prefixes":"powers-of-two+last16")<<", exact snapshot/owners/controls/queue/history; same-controller retry+Cancel+accepted Save; not exhaustive helper/publication"<<std::endl;return 0;
 }catch(const std::exception&e){tracked=false;std::cerr<<"FAIL "<<e.what()<<std::endl;return 1;}

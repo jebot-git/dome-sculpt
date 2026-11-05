@@ -4353,3 +4353,14 @@ if(BUILD_TESTING)
     ${CMAKE_CURRENT_BINARY_DIR}/surface-heat/real-publication-long-name long-name-control)
   set_tests_properties(surface-heat-real-publication-long-name PROPERTIES TIMEOUT 300)
 endif()
+
+# Complete caller and long-basename paths preserve the sampled controls above.
+if(BUILD_TESTING)
+  add_test(NAME surface-heat-real-caller-all-faults COMMAND dome-sculpt-surface-heat-caller-faults-test
+    ${CMAKE_CURRENT_BINARY_DIR}/anatomical-native/female/fitted-unskinned.dsculpt
+    ${CMAKE_CURRENT_BINARY_DIR}/surface-heat/real-caller-all-faults all)
+  set_tests_properties(surface-heat-real-caller-all-faults PROPERTIES FIXTURES_REQUIRED anatomical_female_input TIMEOUT 3600)
+  add_test(NAME surface-heat-real-publication-long-name-all COMMAND dome-sculpt-surface-heat-worker-faults-test
+    ${CMAKE_CURRENT_BINARY_DIR}/surface-heat/real-publication-long-name-all long-name-all)
+  set_tests_properties(surface-heat-real-publication-long-name-all PROPERTIES TIMEOUT 600)
+endif()
