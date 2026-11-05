@@ -25,6 +25,11 @@ int main()try{
         SurfaceQueryOptions options;options.closest_maximum=s*.17f;
         check(!q.nearest(turn({s*.75f+d,s*.75f-d,h*.25f}),options));
         options.closest_maximum=s*.18f;check(q.nearest(turn({s*.75f+d,s*.75f-d,h*.25f}),options).has_value());
+        m.normals.assign(3,{});SurfaceQuery geometric(m);
+        const auto expected_normal=turn(normalized(Vec3{1,-1,0}))*(flipped?-1.f:1.f)*(mirrored?-1.f:1.f);
+        check(length(geometric.closest(turn({s*.75f+d,s*.75f-d,h*.25f})).normal-expected_normal)<1e-6f);
+        const auto ray=geometric.raycast(turn({s*.75f+d,s*.75f-d,h*.25f}),turn({-1,1,0}),d*2);
+        check(ray&&length(ray->normal-expected_normal)<1e-6f);
         ++count;
       }
   std::cout<<"PASS "<<count<<" oblique scale/aspect/axis/reflection/winding families\n";return 0;

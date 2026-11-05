@@ -40,3 +40,22 @@ whole provider objects and consumer executables. See
 The full production goal remains active. This repair does not close the separate
 polygon paint/normal transport, controller transaction, texture-set or broader
 authoring/device requirements.
+
+## Geometric-normal fallback follow-up
+
+The same valid-face policy now applies when vertex normals are absent or cancel
+at a hit. The previous fallback computed a float cross product and passed it to
+a normalizer with a fixed small-vector threshold. A valid tiny face therefore
+returned the normalizer's arbitrary up vector, rather than its geometric normal.
+An actual c3-provider counter reproduces both zero and cancelling input normals
+in Release and sanitizer. The fallback now normalizes the geometric cross product
+in double precision before converting to a unit float vector. Ordinary authored
+normal interpolation and input validation remain unchanged.
+
+New Release/sanitizer whole-provider and complete native consumers pass, including
+nearest and ray normal checks across the 54 axis and 108 oblique families above,
+winding/reflection, and both real counterexamples. This follow-up runs the actual
+permanent oblique consumer directly; it does not claim another registered CTest
+or GUI/device run. The initial oversized-normal fixture was correctly rejected
+by the existing input guard and is retained as a fixture failure, not a product
+negative. See [the follow-up receipt](validation/SURFACE-NORMAL-PRECISION.json).
