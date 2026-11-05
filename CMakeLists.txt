@@ -4421,8 +4421,34 @@ if(BUILD_TESTING AND TARGET dome-sculpt-render)
   add_test(NAME canonical-paint37-emission-worker COMMAND dome-sculpt-canonical-paint37-emission-test ${_canonical37_hdr_input} ${CMAKE_CURRENT_BINARY_DIR}/canonical-paint37-emission-worker --positive)
   add_test(NAME canonical-paint37-emission-render COMMAND dome-sculpt-canonical-paint37-emission-render-test ${_canonical37_hdr_input} ${CMAKE_CURRENT_BINARY_DIR}/canonical-paint37-emission-render)
   add_test(NAME canonical-paint37-emission-contracts COMMAND dome-sculpt-canonical-paint37-emission-contracts-test ${_canonical37_hdr_input} ${CMAKE_CURRENT_BINARY_DIR}/canonical-paint37-emission-contracts)
-  add_test(NAME canonical-paint37-emission-faults COMMAND dome-sculpt-canonical-paint37-emission-contracts-test ${_canonical37_hdr_input} ${CMAKE_CURRENT_BINARY_DIR}/canonical-paint37-emission-faults --oom)
-  set_tests_properties(canonical-paint37-emission-worker canonical-paint37-emission-render canonical-paint37-emission-contracts canonical-paint37-emission-faults PROPERTIES FIXTURES_REQUIRED canonical_paint37_native_key TIMEOUT 3600 ENVIRONMENT "LIBGL_ALWAYS_SOFTWARE=1;LP_NUM_THREADS=2;XR_RUNTIME_JSON=${CMAKE_CURRENT_BINARY_DIR}/canonical37-no-physical-runtime.json")
+  set(_canonical37_fault_env "LIBGL_ALWAYS_SOFTWARE=1;LP_NUM_THREADS=2;XR_RUNTIME_JSON=${CMAKE_CURRENT_BINARY_DIR}/canonical37-no-physical-runtime.json")
+  set_tests_properties(canonical-paint37-emission-worker canonical-paint37-emission-render canonical-paint37-emission-contracts PROPERTIES FIXTURES_REQUIRED canonical_paint37_native_key TIMEOUT 3600 ENVIRONMENT "${_canonical37_fault_env}")
+  # Every absolute persistent-denial prefix is retained. Independent partitions
+  # avoid the old monolithic 3600-second timeout without increasing that limit.
+  # The original --oom native CLI remains available for diagnostics.
+  find_package(Python3 REQUIRED COMPONENTS Interpreter)
+  set(DOME_PHYSICAL_OOM_PARTITIONS 128 CACHE STRING "Exhaustive physical export allocation partitions (2..512)")
+  if(NOT DOME_PHYSICAL_OOM_PARTITIONS MATCHES "^[0-9]+$" OR DOME_PHYSICAL_OOM_PARTITIONS LESS 2 OR DOME_PHYSICAL_OOM_PARTITIONS GREATER 512)
+    message(FATAL_ERROR "DOME_PHYSICAL_OOM_PARTITIONS must be an integer in [2,512]")
+  endif()
+  set(_canonical37_fault_runner ${CMAKE_CURRENT_SOURCE_DIR}/tests/physical-oom-partitions.py)
+  set(_canonical37_fault_root ${CMAKE_CURRENT_BINARY_DIR}/canonical-paint37-emission-faults)
+  add_test(NAME canonical-paint37-emission-fault-verifier COMMAND ${Python3_EXECUTABLE} ${_canonical37_fault_runner} controls)
+  set_tests_properties(canonical-paint37-emission-fault-verifier PROPERTIES TIMEOUT 30 FIXTURES_SETUP canonical37_fault_verifier)
+  add_test(NAME canonical-paint37-emission-fault-plan COMMAND ${Python3_EXECUTABLE} ${_canonical37_fault_runner} prepare ${_canonical37_fault_root}
+    --binary $<TARGET_FILE:dome-sculpt-canonical-paint37-emission-contracts-test> --fixture ${_canonical37_hdr_input}
+    --partitions ${DOME_PHYSICAL_OOM_PARTITIONS})
+  set_tests_properties(canonical-paint37-emission-fault-plan PROPERTIES FIXTURES_REQUIRED "canonical_paint37_native_key;canonical37_fault_verifier"
+    FIXTURES_SETUP canonical37_fault_plan TIMEOUT 3600 ENVIRONMENT "${_canonical37_fault_env}")
+  math(EXPR _canonical37_last_part "${DOME_PHYSICAL_OOM_PARTITIONS} - 1")
+  foreach(_part RANGE 0 ${_canonical37_last_part})
+    add_test(NAME canonical-paint37-emission-fault-part-${_part} COMMAND ${Python3_EXECUTABLE} ${_canonical37_fault_runner} part ${_canonical37_fault_root} ${_part})
+    set_tests_properties(canonical-paint37-emission-fault-part-${_part} PROPERTIES FIXTURES_REQUIRED canonical37_fault_plan
+      FIXTURES_SETUP canonical37_fault_parts TIMEOUT 3600 ENVIRONMENT "${_canonical37_fault_env}")
+  endforeach()
+  add_test(NAME canonical-paint37-emission-faults COMMAND ${Python3_EXECUTABLE} ${_canonical37_fault_runner} aggregate ${_canonical37_fault_root})
+  set_tests_properties(canonical-paint37-emission-faults PROPERTIES FIXTURES_REQUIRED "canonical37_fault_plan;canonical37_fault_parts"
+    TIMEOUT 3600 ENVIRONMENT "${_canonical37_fault_env}")
 endif()
 
 # Current keys compose genuine writable37 history. These consumers use actual
