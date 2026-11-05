@@ -82,7 +82,9 @@ void Document::cancel_retopology_locked() {
 void Document::end_retopology(bool accept) {
   std::lock_guard lock(model_mutex_);
   end_retopology_locked(accept);
-  publish_locked();
+  // Successful acceptance already published its ordered asset owner. Do not
+  // introduce another throwing allocation after that transaction commits.
+  if (!accept) publish_locked();
 }
 void Document::end_retopology_locked(bool accept) {
   if (!state_.retopology) return;
@@ -99,13 +101,54 @@ void Document::end_retopology_locked(bool accept) {
   }
   if (!state_.retopology->source) throw std::logic_error("Wait for the source surface");
   if (retopo_stroking_) { end_action_locked(); desktop_ = false; input_.cancel(); }
-  std::lock_guard lock(retopo_mutex_);
-  if (retopo_jobs_.size() >= 256) throw std::length_error("Retopology input queue is full");
-  retopo_jobs_.push_back({retopo_session_.load(), {}, {}, {}, retopo_snap_mm_, true});
-  ++retopo_pending_; retopo_accepting_ = true;
+  auto acceptance = std::make_shared<RetopoAcceptance>();
+  acceptance->work = std::make_shared<AssetWork>();
+  acceptance->changed = std::make_shared<bool>(true);
   auto view = std::make_shared<RetopoView>(*state_.retopology);
-  view->busy = view->committing = true; state_.retopology = std::move(view);
-  retopo_changed_.notify_one();
+  view->busy = view->committing = true;
+  const auto session = retopo_session_.load();
+  RetopoJob job{session, {}, {}, {}, retopo_snap_mm_, true};
+  job.acceptance = acceptance;
+  {
+    std::lock_guard lock(retopo_mutex_);
+    if (retopo_jobs_.size() >= 256) throw std::length_error("Retopology input queue is full");
+    retopo_jobs_.push_back(std::move(job));
+  }
+  const auto previous = state_.retopology;
+  const auto pending = retopo_pending_;
+  ++retopo_pending_; retopo_accepting_ = true;
+  state_.retopology = std::move(view);
+  try {
+    queue_scene_operation_locked("Apply retopology", [this, acceptance](Scene &scene, const auto &cancelled) {
+      std::unique_lock lock(retopo_mutex_);
+      retopo_changed_.wait(lock, [&] { return acceptance->ready || cancelled(); });
+      if (cancelled()) throw std::runtime_error("Retopology acceptance cancelled");
+      if (acceptance->error) std::rethrow_exception(acceptance->error);
+      if (!*acceptance->changed) return;
+      auto topology = acceptance->topology;
+      const auto source = acceptance->source;
+      const auto transform = acceptance->transform;
+      if (!topology) throw std::logic_error("Accepted retopology has no finalized topology");
+      lock.unlock();
+      publish_retopology(scene, *topology, source, transform, cancelled);
+    }, retopo_source_, {}, acceptance->work, acceptance->changed, {}, session);
+  } catch (...) {
+    {
+      std::lock_guard lock(retopo_mutex_);
+      acceptance->admission = RetopoAcceptance::Admission::Rejected;
+      std::erase_if(retopo_jobs_, [&](const auto &queued) { return queued.acceptance == acceptance; });
+    }
+    retopo_pending_ = pending;retopo_accepting_ = false;
+    state_.retopology = previous;
+    retopo_changed_.notify_all();
+    throw;
+  }
+  {
+    std::lock_guard lock(retopo_mutex_);
+    acceptance->admission = RetopoAcceptance::Admission::Accepted;
+  }
+  // Both the input queue and accepted-result waiter use this condition.
+  retopo_changed_.notify_all();
 }
 bool Document::wait_retopology(std::chrono::milliseconds timeout) const {
   std::unique_lock lock(retopo_mutex_);
@@ -131,37 +174,69 @@ void Document::retopo_loop() {
       }
       job = std::move(retopo_jobs_.front()); retopo_jobs_.pop_front();
     }
-    auto cancelled = [&] { return stopping_.load() || job.session != retopo_session_.load(); };
+    const auto obsolete = [&] { return stopping_.load() || job.session != retopo_session_.load(); };
+    auto cancelled = [&] { return obsolete() || (job.acceptance && job.acceptance->work->cancelled.load()); };
+    bool retired = false;
     try {
-      if (cancelled()) continue;
+      if (job.acceptance) {
+        std::unique_lock lock(retopo_mutex_);
+        retopo_changed_.wait(lock, [&] {
+          return job.acceptance->admission != RetopoAcceptance::Admission::Pending || obsolete();
+        });
+        if (job.acceptance->admission != RetopoAcceptance::Admission::Accepted) continue;
+      }
+      if (cancelled()) {
+        if (job.acceptance) throw std::runtime_error("Retopology acceptance cancelled");
+        continue;
+      }
       if (job.initial) { workspace = std::make_unique<RetopoWorkspace>(*job.initial, cancelled); session = job.session; }
       if (!workspace || session != job.session) throw std::logic_error("Retopology workspace is unavailable");
       if (job.action) workspace->edit(*job.action, job.point, job.snap_mm, cancelled);
       if (job.accept) {
+        if (!job.acceptance) throw std::logic_error("Retopology acceptance lost its ordered asset owner");
         workspace->edit(RetopoAction::EndGesture, {}, job.snap_mm, cancelled);
         if (workspace->view().topology->faces().empty()) throw std::logic_error("Make at least one face before applying the patch");
+        {
+          std::lock_guard lock(retopo_mutex_);
+          job.acceptance->topology = workspace->view().topology;
+          job.acceptance->source = workspace->source_object();
+          job.acceptance->transform = workspace->view().transform;
+          *job.acceptance->changed = workspace->view().changed;
+          job.acceptance->ready = true;
+        }
+        retopo_changed_.notify_all();
       }
-      if (cancelled()) continue;
+      if (!job.acceptance && cancelled()) continue;
       std::lock_guard lock(model_mutex_);
-      if (cancelled() || !state_.retopology) continue;
+      if (obsolete() || !state_.retopology) continue;
       if (retopo_source_.generation != state_.generation || retopo_source_.revision != state_.revision ||
           retopo_source_.object != scene_.active().id) {
         cancel_retopology_locked(); state_.error = "Retopology source changed; reopen the workspace"; publish_locked(true); continue;
       }
       --retopo_pending_;
+      retired = true;
+      if (cancelled()) continue;
       auto view = std::make_shared<RetopoView>(workspace->view());
       view->busy = retopo_pending_ != 0; view->committing = retopo_accepting_; view->snap_mm = retopo_snap_mm_;
       state_.retopology = view;
       state_.error.clear(); state_.message.clear();
-      if (job.accept) {
-        if (!view->changed) { cancel_retopology_locked(); publish_locked(true); continue; }
-        auto topology = view->topology; auto source = workspace->source_object(); auto transform = view->transform;
-        queue_scene_operation_locked("Apply retopology", [topology, source, transform](Scene &scene, const auto &cancel) {
-          publish_retopology(scene, *topology, source, transform, cancel);
-        }, retopo_source_, {}, {}, {}, {}, job.session);
-      }
       publish_locked();
     } catch (const std::exception &e) {
+      if (job.acceptance) {
+        {
+          std::lock_guard lock(retopo_mutex_);
+          if (!job.acceptance->ready) {
+            job.acceptance->error = std::current_exception();
+            job.acceptance->ready = true;
+          }
+        }
+        retopo_changed_.notify_all();
+        std::lock_guard lock(model_mutex_);
+        if (!obsolete() && state_.retopology && !retired && retopo_pending_) --retopo_pending_;
+        // The already-ordered file owner publishes failure and retires dependent
+        // Saves. Do not race it with a second independently allocated error view.
+        continue;
+      }
       std::lock_guard lock(model_mutex_);
       if (cancelled() || !state_.retopology) continue;
       if (retopo_pending_) --retopo_pending_;

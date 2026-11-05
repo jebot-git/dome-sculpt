@@ -1,0 +1,796 @@
+{
+  "scope": "Private early-retopology-to-AssetWork handoff component; no application/frontend/fullbuild/GPU or main admission claim. No Scene/EditorState/Document layout fields or serialized feature change.",
+  "base": "f5fdd3692dd34ea9bb1c114841c9abafdaf4f33b",
+  "source_sha256": {
+    "include/dome/document.hpp": "3b65f782b9c1072b326eda0304167ae5c4f373a2f3106a69a6f355b340f6a7e6",
+    "src/document-retopo.cpp": "b6a5e15acc979dd2c676b51a7ba6520022ecf4d6c20b8d563cf720cd2169ddaf",
+    "src/document-baking.cpp": "8522960263401f889cd32a96feffcf6cd6e1b71f45dde4610b4978355214c899",
+    "src/document.cpp": "db15a9ad05270b5665eca8d7740fea247dd951aa81eb4b2c3a6fbab24a9730ee",
+    "tests/retopo-save-handoff.cpp": "22c523a21b8daa486f70a03c6f5e23f0d3fa2952df6569f93ab13032b029c2b3",
+    "tests/retopo-affine.cpp": "ce52bd1fc794222aeff59fab50ddf8939227ac6c0a9624b98b61a51c356ba8ed",
+    "tests/retopo-authoring.cpp": "324ca754e20514dcd9f17b5c88117fb9bf94832ceff83bef887d66a28c039fe9",
+    "CMakeLists.txt": "e255d823a3dcd04ddd7ba447f420bfe442a7f4fe69e79ff58912fdcd29636f4b"
+  },
+  "production_delta": [
+    "include/dome/document.hpp: private shared RetopoAcceptance nested type and deque-element pointer only",
+    "src/document-retopo.cpp: synchronous accepted file-queue admission, Pending/Accepted/Rejected independent-input handoff, no timers/sleeps, exception and no-op handling",
+    "src/document-baking.cpp: cancellation condition-variable handshake"
+  ],
+  "rebuild_closure": [
+    "Whole document-retopo.cpp is every direct RetopoJob/deque accessor",
+    "Whole document.cpp rebuilds actual Document constructor/destructor/deque instantiations despite unchanged body",
+    "Whole document-baking.cpp contains cancellation notifier",
+    "Exact full retopo.cpp/retopo-authoring.cpp objects from f5f reused; their source/header closure unchanged",
+    "Whole immediate-handoff/affine combined test TU and both legacy authoring/edge TUs plus small driver"
+  ],
+  "runs": {
+    "release": {
+      "state": "terminal",
+      "pid": 1610779,
+      "steps": [
+        {
+          "name": "compile-document.cpp",
+          "args": [
+            "/usr/bin/c++",
+            "-DDOME_SCULPT_INSTALLED_ASSETS=\"/usr/local/share/dome-sculpt/assets/humanoid\"",
+            "-DDOME_SCULPT_SOURCE_ASSETS=\"/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/assets/humanoid\"",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/third_party",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/include",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/third_party/openbrush",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/third_party/cgltf",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/third_party/nlohmann",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/third_party/xatlas",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/third_party/mikktspace",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/third_party/ufbx",
+            "-O3",
+            "-DNDEBUG",
+            "-std=gnu++20",
+            "-Wall",
+            "-Wextra",
+            "-Wpedantic",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/handoff-proof/release/document.cpp.o",
+            "-c",
+            "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/src/document.cpp"
+          ],
+          "exit": 0,
+          "seconds": 17.99518991797231
+        },
+        {
+          "name": "compile-document-retopo.cpp",
+          "args": [
+            "/usr/bin/c++",
+            "-DDOME_SCULPT_INSTALLED_ASSETS=\"/usr/local/share/dome-sculpt/assets/humanoid\"",
+            "-DDOME_SCULPT_SOURCE_ASSETS=\"/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/assets/humanoid\"",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/third_party",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/include",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/third_party/openbrush",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/third_party/cgltf",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/third_party/nlohmann",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/third_party/xatlas",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/third_party/mikktspace",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/third_party/ufbx",
+            "-O3",
+            "-DNDEBUG",
+            "-std=gnu++20",
+            "-Wall",
+            "-Wextra",
+            "-Wpedantic",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/handoff-proof/release/document-retopo.cpp.o",
+            "-c",
+            "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/src/document-retopo.cpp"
+          ],
+          "exit": 0,
+          "seconds": 2.3392980780336075
+        },
+        {
+          "name": "compile-document-baking.cpp",
+          "args": [
+            "/usr/bin/c++",
+            "-DDOME_SCULPT_INSTALLED_ASSETS=\"/usr/local/share/dome-sculpt/assets/humanoid\"",
+            "-DDOME_SCULPT_SOURCE_ASSETS=\"/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/assets/humanoid\"",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/third_party",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/include",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/third_party/openbrush",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/third_party/cgltf",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/third_party/nlohmann",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/third_party/xatlas",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/third_party/mikktspace",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/third_party/ufbx",
+            "-O3",
+            "-DNDEBUG",
+            "-std=gnu++20",
+            "-Wall",
+            "-Wextra",
+            "-Wpedantic",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/handoff-proof/release/document-baking.cpp.o",
+            "-c",
+            "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/src/document-baking.cpp"
+          ],
+          "exit": 0,
+          "seconds": 2.7649006369756535
+        },
+        {
+          "name": "compile-retopo-save-handoff",
+          "args": [
+            "/usr/bin/c++",
+            "-DDOME_RETOPO_HANDOFF_EMBEDDED",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/include",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/third_party/openbrush",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/third_party/nlohmann",
+            "-O3",
+            "-DNDEBUG",
+            "-std=gnu++20",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/handoff-proof/release/retopo-save-handoff.o",
+            "-c",
+            "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/tests/retopo-save-handoff.cpp"
+          ],
+          "exit": 0,
+          "seconds": 4.292761490039993
+        },
+        {
+          "name": "compile-retopo-authoring",
+          "args": [
+            "/usr/bin/c++",
+            "-Dmain=legacy_authoring_main",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/include",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/third_party/openbrush",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/third_party/nlohmann",
+            "-O3",
+            "-DNDEBUG",
+            "-std=gnu++20",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/handoff-proof/release/retopo-authoring.o",
+            "-c",
+            "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/tests/retopo-authoring.cpp"
+          ],
+          "exit": 0,
+          "seconds": 3.9293154790066183
+        },
+        {
+          "name": "compile-retopo-edges",
+          "args": [
+            "/usr/bin/c++",
+            "-Dmain=legacy_edges_main",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/include",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/third_party/openbrush",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/third_party/nlohmann",
+            "-O3",
+            "-DNDEBUG",
+            "-std=gnu++20",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/handoff-proof/release/retopo-edges.o",
+            "-c",
+            "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/tests/retopo-edges.cpp"
+          ],
+          "exit": 0,
+          "seconds": 3.4785994850099087
+        },
+        {
+          "name": "compile-driver",
+          "args": [
+            "/usr/bin/c++",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/include",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/third_party/openbrush",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/third_party/nlohmann",
+            "-O3",
+            "-DNDEBUG",
+            "-std=gnu++20",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/handoff-proof/release/driver.o",
+            "-c",
+            "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/handoff-proof/driver.cpp"
+          ],
+          "exit": 0,
+          "seconds": 0.19256649300223216
+        },
+        {
+          "name": "link-composed",
+          "args": [
+            "/usr/bin/c++",
+            "-Wl,-t,-t",
+            "-Wl,--wrap=_ZN4dome6unwrapERNS_4MeshEjjRKSt8functionIFbvEE",
+            "-Wl,--wrap=_ZN4dome15RetopoWorkspace4editENS_12RetopoActionENS_4Vec3EfRKSt8functionIFbvEE",
+            "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/handoff-proof/release/document.cpp.o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/handoff-proof/release/document-retopo.cpp.o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/handoff-proof/release/document-baking.cpp.o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/affine-proof/release/retopo.cpp.o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/affine-proof/release/retopo-authoring.cpp.o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/handoff-proof/release/retopo-save-handoff.o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/handoff-proof/release/retopo-authoring.o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/handoff-proof/release/retopo-edges.o",
+            "-O3",
+            "-DNDEBUG",
+            "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/handoff-proof/release/driver.o",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/handoff-proof/release/retopo-handoff-composed",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-preflight-qualified-0b6/artifacts/final-preflight/release/stage/libdome-sculpt-core.a",
+            "libdome-sculpt-affine.a",
+            "/usr/lib64/liblapacke.so",
+            "libdome-sculpt-polygon.a",
+            "libxatlas.a",
+            "libmikktspace.a",
+            "libmikktspace-robust.a",
+            "libufbx.a",
+            "/usr/lib64/libpng.so",
+            "/usr/lib64/libjpeg.so",
+            "/usr/lib64/libz.so",
+            "libdome-sculpt-emission-codec.a",
+            "/usr/lib64/libOpenEXR-3_2.so",
+            "/usr/lib64/libOpenEXRUtil-3_2.so",
+            "/usr/lib64/libOpenEXRCore-3_2.so",
+            "/usr/lib64/libIex-3_2.so",
+            "/usr/lib64/libIlmThread-3_2.so",
+            "/usr/lib64/libImath-3_1.so",
+            "-lgcc_s_asneeded",
+            "-lgcc_s_asneeded"
+          ],
+          "exit": 0,
+          "seconds": 0.29040803300449625
+        },
+        {
+          "name": "actual-immediate-and-native-composed",
+          "args": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/handoff-proof/release/retopo-handoff-composed",
+            "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/handoff-proof/release/run"
+          ],
+          "exit": 0,
+          "seconds": 2.5675623490242288
+        }
+      ],
+      "scope": "New immediate-retopo handoff. Whole Document constructor/destructor/deque, document-retopo and cancelnotifyBaking TUs rebuilt. Reuse exactly qualified full2topology objects. Whole new immediate/oldaffine plus twolegacy native test TUs composed into one ELF under1.5GiB. Immutable mainc179 core/support, no archive rewrite/app/fullbuild/GPU.",
+      "maximum_task_bytes": 1610612736,
+      "tree_st_blocks_bytes": 793260032,
+      "free_bytes": 25445150720,
+      "phase": "actual-immediate-and-native-composed",
+      "child_pid": 1614690,
+      "exit": 0,
+      "seconds": 37.919151868030895,
+      "drift": [],
+      "old_override_archive_members_extracted": []
+    },
+    "sanitize": {
+      "state": "terminal",
+      "pid": 1618606,
+      "steps": [
+        {
+          "name": "compile-document.cpp",
+          "args": [
+            "/usr/bin/c++",
+            "-DDOME_SCULPT_INSTALLED_ASSETS=\"/usr/local/share/dome-sculpt/assets/humanoid\"",
+            "-DDOME_SCULPT_SOURCE_ASSETS=\"/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/assets/humanoid\"",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/third_party",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/include",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/third_party/openbrush",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/third_party/cgltf",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/third_party/nlohmann",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/third_party/xatlas",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/third_party/mikktspace",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/third_party/ufbx",
+            "-O1",
+            "-g1",
+            "-DNDEBUG",
+            "-fsanitize=address,undefined",
+            "-fno-omit-frame-pointer",
+            "-std=gnu++20",
+            "-Wall",
+            "-Wextra",
+            "-Wpedantic",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/handoff-proof/sanitize/document.cpp.o",
+            "-c",
+            "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/src/document.cpp"
+          ],
+          "exit": 0,
+          "seconds": 37.545791054028086
+        },
+        {
+          "name": "compile-document-retopo.cpp",
+          "args": [
+            "/usr/bin/c++",
+            "-DDOME_SCULPT_INSTALLED_ASSETS=\"/usr/local/share/dome-sculpt/assets/humanoid\"",
+            "-DDOME_SCULPT_SOURCE_ASSETS=\"/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/assets/humanoid\"",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/third_party",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/include",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/third_party/openbrush",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/third_party/cgltf",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/third_party/nlohmann",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/third_party/xatlas",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/third_party/mikktspace",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/third_party/ufbx",
+            "-O1",
+            "-g1",
+            "-DNDEBUG",
+            "-fsanitize=address,undefined",
+            "-fno-omit-frame-pointer",
+            "-std=gnu++20",
+            "-Wall",
+            "-Wextra",
+            "-Wpedantic",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/handoff-proof/sanitize/document-retopo.cpp.o",
+            "-c",
+            "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/src/document-retopo.cpp"
+          ],
+          "exit": 0,
+          "seconds": 3.4317950890399516
+        },
+        {
+          "name": "compile-document-baking.cpp",
+          "args": [
+            "/usr/bin/c++",
+            "-DDOME_SCULPT_INSTALLED_ASSETS=\"/usr/local/share/dome-sculpt/assets/humanoid\"",
+            "-DDOME_SCULPT_SOURCE_ASSETS=\"/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/assets/humanoid\"",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/third_party",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/include",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/third_party/openbrush",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/third_party/cgltf",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/third_party/nlohmann",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/third_party/xatlas",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/third_party/mikktspace",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/third_party/ufbx",
+            "-O1",
+            "-g1",
+            "-DNDEBUG",
+            "-fsanitize=address,undefined",
+            "-fno-omit-frame-pointer",
+            "-std=gnu++20",
+            "-Wall",
+            "-Wextra",
+            "-Wpedantic",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/handoff-proof/sanitize/document-baking.cpp.o",
+            "-c",
+            "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/src/document-baking.cpp"
+          ],
+          "exit": 0,
+          "seconds": 3.84946531499736
+        },
+        {
+          "name": "compile-retopo-save-handoff",
+          "args": [
+            "/usr/bin/c++",
+            "-DDOME_RETOPO_HANDOFF_EMBEDDED",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/include",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/third_party/openbrush",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/third_party/nlohmann",
+            "-O1",
+            "-g1",
+            "-DNDEBUG",
+            "-fsanitize=address,undefined",
+            "-fno-omit-frame-pointer",
+            "-std=gnu++20",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/handoff-proof/sanitize/retopo-save-handoff.o",
+            "-c",
+            "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/tests/retopo-save-handoff.cpp"
+          ],
+          "exit": 0,
+          "seconds": 7.428383616963401
+        },
+        {
+          "name": "compile-retopo-authoring",
+          "args": [
+            "/usr/bin/c++",
+            "-Dmain=legacy_authoring_main",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/include",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/third_party/openbrush",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/third_party/nlohmann",
+            "-O1",
+            "-g1",
+            "-DNDEBUG",
+            "-fsanitize=address,undefined",
+            "-fno-omit-frame-pointer",
+            "-std=gnu++20",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/handoff-proof/sanitize/retopo-authoring.o",
+            "-c",
+            "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/tests/retopo-authoring.cpp"
+          ],
+          "exit": 0,
+          "seconds": 6.845251184946392
+        },
+        {
+          "name": "compile-retopo-edges",
+          "args": [
+            "/usr/bin/c++",
+            "-Dmain=legacy_edges_main",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/include",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/third_party/openbrush",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/third_party/nlohmann",
+            "-O1",
+            "-g1",
+            "-DNDEBUG",
+            "-fsanitize=address,undefined",
+            "-fno-omit-frame-pointer",
+            "-std=gnu++20",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/handoff-proof/sanitize/retopo-edges.o",
+            "-c",
+            "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/tests/retopo-edges.cpp"
+          ],
+          "exit": 0,
+          "seconds": 4.591115268995054
+        },
+        {
+          "name": "compile-driver",
+          "args": [
+            "/usr/bin/c++",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/include",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/third_party/openbrush",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/third_party/nlohmann",
+            "-O1",
+            "-g1",
+            "-DNDEBUG",
+            "-fsanitize=address,undefined",
+            "-fno-omit-frame-pointer",
+            "-std=gnu++20",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/handoff-proof/sanitize/driver.o",
+            "-c",
+            "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/handoff-proof/driver.cpp"
+          ],
+          "exit": 0,
+          "seconds": 0.21816166798816994
+        },
+        {
+          "name": "link-composed",
+          "args": [
+            "/usr/bin/c++",
+            "-Wl,-t,-t",
+            "-Wl,--wrap=_ZN4dome6unwrapERNS_4MeshEjjRKSt8functionIFbvEE",
+            "-Wl,--wrap=_ZN4dome15RetopoWorkspace4editENS_12RetopoActionENS_4Vec3EfRKSt8functionIFbvEE",
+            "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/handoff-proof/sanitize/document.cpp.o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/handoff-proof/sanitize/document-retopo.cpp.o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/handoff-proof/sanitize/document-baking.cpp.o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/affine-proof/sanitize/retopo.cpp.o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/affine-proof/sanitize/retopo-authoring.cpp.o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/handoff-proof/sanitize/retopo-save-handoff.o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/handoff-proof/sanitize/retopo-authoring.o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/handoff-proof/sanitize/retopo-edges.o",
+            "-O1",
+            "-g1",
+            "-DNDEBUG",
+            "-fsanitize=address,undefined",
+            "-fno-omit-frame-pointer",
+            "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/handoff-proof/sanitize/driver.o",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/handoff-proof/sanitize/retopo-handoff-composed",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-preflight-qualified-0b6/artifacts/final-preflight/sanitize/stage/libdome-sculpt-core.a",
+            "libdome-sculpt-affine.a",
+            "/usr/lib64/liblapacke.so",
+            "libdome-sculpt-polygon.a",
+            "libxatlas.a",
+            "libmikktspace.a",
+            "libmikktspace-robust.a",
+            "libufbx.a",
+            "/usr/lib64/libpng.so",
+            "/usr/lib64/libjpeg.so",
+            "/usr/lib64/libz.so",
+            "libdome-sculpt-emission-codec.a",
+            "/usr/lib64/libOpenEXR-3_2.so",
+            "/usr/lib64/libOpenEXRUtil-3_2.so",
+            "/usr/lib64/libOpenEXRCore-3_2.so",
+            "/usr/lib64/libIex-3_2.so",
+            "/usr/lib64/libIlmThread-3_2.so",
+            "/usr/lib64/libImath-3_1.so",
+            "-lgcc_s_asneeded",
+            "-lgcc_s_asneeded"
+          ],
+          "exit": 0,
+          "seconds": 2.164958707988262
+        },
+        {
+          "name": "actual-immediate-and-native-composed",
+          "args": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/handoff-proof/sanitize/retopo-handoff-composed",
+            "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/handoff-proof/sanitize/run"
+          ],
+          "exit": 0,
+          "seconds": 16.482774935953785
+        }
+      ],
+      "scope": "New immediate-retopo handoff. Whole Document constructor/destructor/deque, document-retopo and cancelnotifyBaking TUs rebuilt. Reuse exactly qualified full2topology objects. Whole new immediate/oldaffine plus twolegacy native test TUs composed into one ELF under1.5GiB. Immutable mainc179 core/support, no archive rewrite/app/fullbuild/GPU.",
+      "maximum_task_bytes": 1610612736,
+      "tree_st_blocks_bytes": 1232941056,
+      "free_bytes": 25302773760,
+      "phase": "actual-immediate-and-native-composed",
+      "child_pid": 1626329,
+      "exit": 0,
+      "seconds": 82.62781529902713,
+      "drift": [],
+      "old_override_archive_members_extracted": []
+    }
+  },
+  "counts_each_profile": {
+    "new_handoff_controls": 858,
+    "persistent_denials_included_in_new_controls": 63,
+    "additional_affine_controls": 394,
+    "legacy_authoring_controls": 62,
+    "legacy_bridge_extrusion_controls": 131,
+    "total": 1445
+  },
+  "raw_counter_note": "Shared source fixture counter prints1252 at end of affine phase:858 preceding new controls+394 affine. It is not1252 additional affine checks.",
+  "layout_probe": {
+    "rows": [
+      {
+        "name": "main10944",
+        "header_sha256": "348b168d02e8b9ab7f192bb7d309211f76515b585c6eb0ec51fb6a113e76d792",
+        "command": [
+          "/usr/bin/c++",
+          "-O3",
+          "-DNDEBUG",
+          "-std=gnu++20",
+          "-I/home/blux/de-xr/dome-sculpt/include",
+          "-I/home/blux/de-xr/dome-sculpt/third_party/nlohmann",
+          "-I/home/blux/de-xr/dome-sculpt/third_party/openbrush",
+          "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/handoff-proof/layout.cpp",
+          "-o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/handoff-proof/layout-final-main10944"
+        ],
+        "output": "Document 6968 8\nEditorState 1896 8\nScene 72 8\nRetopoView 144 8\nRetopoWorkspace 392 8\n",
+        "binary_sha256": "43a912419b8aa1187496b42724610a987a286a0e2f344c7b4e48207020e13cd8"
+      },
+      {
+        "name": "current-handoff",
+        "header_sha256": "3b65f782b9c1072b326eda0304167ae5c4f373a2f3106a69a6f355b340f6a7e6",
+        "command": [
+          "/usr/bin/c++",
+          "-O3",
+          "-DNDEBUG",
+          "-std=gnu++20",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/include",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/third_party/nlohmann",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/third_party/openbrush",
+          "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/handoff-proof/layout.cpp",
+          "-o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/retopo-affine-10944ab/artifacts/handoff-proof/layout-final-current-handoff"
+        ],
+        "output": "Document 6968 8\nEditorState 1896 8\nScene 72 8\nRetopoView 144 8\nRetopoWorkspace 392 8\n",
+        "binary_sha256": "43a912419b8aa1187496b42724610a987a286a0e2f344c7b4e48207020e13cd8"
+      }
+    ],
+    "equal": true,
+    "scope": "Same compiler/flags actual sizeof+alignof of allfive public object types. Document field list unchanged; only nested deque element shape appends private shared handoff."
+  },
+  "native_pairs": [
+    {
+      "name": "0-posed.dsculpt",
+      "bytes": 60489,
+      "sentinel": false,
+      "same": true,
+      "R_sha256": "cd45ad1510223ff4c642adeb3b4b4b654b0486ad4923eda21e4591243c4c85d1",
+      "S_sha256": "cd45ad1510223ff4c642adeb3b4b4b654b0486ad4923eda21e4591243c4c85d1"
+    },
+    {
+      "name": "0-rest.dsculpt",
+      "bytes": 60398,
+      "sentinel": false,
+      "same": true,
+      "R_sha256": "eda1e176e4bf5fe5328b111bbd99a8ad16f4615f16bd60a73fe805c17d70982f",
+      "S_sha256": "eda1e176e4bf5fe5328b111bbd99a8ad16f4615f16bd60a73fe805c17d70982f"
+    },
+    {
+      "name": "1-posed.dsculpt",
+      "bytes": 60504,
+      "sentinel": false,
+      "same": true,
+      "R_sha256": "711f37d469444f78eb02c115a3b93c1281b7ff18a799657f137f4e01f07a7ef7",
+      "S_sha256": "711f37d469444f78eb02c115a3b93c1281b7ff18a799657f137f4e01f07a7ef7"
+    },
+    {
+      "name": "1-rest.dsculpt",
+      "bytes": 60420,
+      "sentinel": false,
+      "same": true,
+      "R_sha256": "8fa1aa7badb4bed8c1262a4208c7e127f6132f3aff329e25c1b717ba6a399a3f",
+      "S_sha256": "8fa1aa7badb4bed8c1262a4208c7e127f6132f3aff329e25c1b717ba6a399a3f"
+    },
+    {
+      "name": "2-posed.dsculpt",
+      "bytes": 60523,
+      "sentinel": false,
+      "same": true,
+      "R_sha256": "c952538a3c172f5de1196d099f929c6f4e5f71770218301ab573bfb18c8cf17c",
+      "S_sha256": "c952538a3c172f5de1196d099f929c6f4e5f71770218301ab573bfb18c8cf17c"
+    },
+    {
+      "name": "2-rest.dsculpt",
+      "bytes": 60442,
+      "sentinel": false,
+      "same": true,
+      "R_sha256": "435f58c1cb2dbf2641971cd38101521195853ec09e6b22a1033f1b51a1c43345",
+      "S_sha256": "435f58c1cb2dbf2641971cd38101521195853ec09e6b22a1033f1b51a1c43345"
+    },
+    {
+      "name": "3-posed.dsculpt",
+      "bytes": 60524,
+      "sentinel": false,
+      "same": true,
+      "R_sha256": "949b89ceac43aefc6a8f7c6132c4eebec7a50c0efca546456c65368c768b3ece",
+      "S_sha256": "949b89ceac43aefc6a8f7c6132c4eebec7a50c0efca546456c65368c768b3ece"
+    },
+    {
+      "name": "3-rest.dsculpt",
+      "bytes": 60444,
+      "sentinel": false,
+      "same": true,
+      "R_sha256": "757cc0e0de166e28e1baa07cf4dd552b769a6d1a99d1d9e2233807f082111722",
+      "S_sha256": "757cc0e0de166e28e1baa07cf4dd552b769a6d1a99d1d9e2233807f082111722"
+    },
+    {
+      "name": "calibration.dsculpt",
+      "bytes": 60381,
+      "sentinel": false,
+      "same": true,
+      "R_sha256": "90c2bd9c766fbaabf5c96756d8dd422c02d569557c092aafc5210913659cf25c",
+      "S_sha256": "90c2bd9c766fbaabf5c96756d8dd422c02d569557c092aafc5210913659cf25c"
+    },
+    {
+      "name": "cancel.dsculpt",
+      "bytes": 26,
+      "sentinel": true,
+      "same": true,
+      "R_sha256": "56be03a0a42ca6b4008c851f440f7233588f458b2836c890cb9f01c9b5a4623b",
+      "S_sha256": "56be03a0a42ca6b4008c851f440f7233588f458b2836c890cb9f01c9b5a4623b"
+    },
+    {
+      "name": "immediate.dsculpt",
+      "bytes": 60381,
+      "sentinel": false,
+      "same": true,
+      "R_sha256": "90c2bd9c766fbaabf5c96756d8dd422c02d569557c092aafc5210913659cf25c",
+      "S_sha256": "90c2bd9c766fbaabf5c96756d8dd422c02d569557c092aafc5210913659cf25c"
+    },
+    {
+      "name": "injected-error.dsculpt",
+      "bytes": 26,
+      "sentinel": true,
+      "same": true,
+      "R_sha256": "56be03a0a42ca6b4008c851f440f7233588f458b2836c890cb9f01c9b5a4623b",
+      "S_sha256": "56be03a0a42ca6b4008c851f440f7233588f458b2836c890cb9f01c9b5a4623b"
+    },
+    {
+      "name": "invalid-face.dsculpt",
+      "bytes": 26,
+      "sentinel": true,
+      "same": true,
+      "R_sha256": "56be03a0a42ca6b4008c851f440f7233588f458b2836c890cb9f01c9b5a4623b",
+      "S_sha256": "56be03a0a42ca6b4008c851f440f7233588f458b2836c890cb9f01c9b5a4623b"
+    },
+    {
+      "name": "noop.dsculpt",
+      "bytes": 60381,
+      "sentinel": false,
+      "same": true,
+      "R_sha256": "90c2bd9c766fbaabf5c96756d8dd422c02d569557c092aafc5210913659cf25c",
+      "S_sha256": "90c2bd9c766fbaabf5c96756d8dd422c02d569557c092aafc5210913659cf25c"
+    },
+    {
+      "name": "overflow.dsculpt",
+      "bytes": 26,
+      "sentinel": true,
+      "same": true,
+      "R_sha256": "56be03a0a42ca6b4008c851f440f7233588f458b2836c890cb9f01c9b5a4623b",
+      "S_sha256": "56be03a0a42ca6b4008c851f440f7233588f458b2836c890cb9f01c9b5a4623b"
+    },
+    {
+      "name": "queued-0.dsculpt",
+      "bytes": 60381,
+      "sentinel": false,
+      "same": true,
+      "R_sha256": "90c2bd9c766fbaabf5c96756d8dd422c02d569557c092aafc5210913659cf25c",
+      "S_sha256": "90c2bd9c766fbaabf5c96756d8dd422c02d569557c092aafc5210913659cf25c"
+    },
+    {
+      "name": "queued-1.dsculpt",
+      "bytes": 60381,
+      "sentinel": false,
+      "same": true,
+      "R_sha256": "90c2bd9c766fbaabf5c96756d8dd422c02d569557c092aafc5210913659cf25c",
+      "S_sha256": "90c2bd9c766fbaabf5c96756d8dd422c02d569557c092aafc5210913659cf25c"
+    },
+    {
+      "name": "queued-2.dsculpt",
+      "bytes": 60381,
+      "sentinel": false,
+      "same": true,
+      "R_sha256": "90c2bd9c766fbaabf5c96756d8dd422c02d569557c092aafc5210913659cf25c",
+      "S_sha256": "90c2bd9c766fbaabf5c96756d8dd422c02d569557c092aafc5210913659cf25c"
+    },
+    {
+      "name": "queued-3.dsculpt",
+      "bytes": 60381,
+      "sentinel": false,
+      "same": true,
+      "R_sha256": "90c2bd9c766fbaabf5c96756d8dd422c02d569557c092aafc5210913659cf25c",
+      "S_sha256": "90c2bd9c766fbaabf5c96756d8dd422c02d569557c092aafc5210913659cf25c"
+    },
+    {
+      "name": "queued-4.dsculpt",
+      "bytes": 60381,
+      "sentinel": false,
+      "same": true,
+      "R_sha256": "90c2bd9c766fbaabf5c96756d8dd422c02d569557c092aafc5210913659cf25c",
+      "S_sha256": "90c2bd9c766fbaabf5c96756d8dd422c02d569557c092aafc5210913659cf25c"
+    },
+    {
+      "name": "queued-5.dsculpt",
+      "bytes": 60381,
+      "sentinel": false,
+      "same": true,
+      "R_sha256": "90c2bd9c766fbaabf5c96756d8dd422c02d569557c092aafc5210913659cf25c",
+      "S_sha256": "90c2bd9c766fbaabf5c96756d8dd422c02d569557c092aafc5210913659cf25c"
+    },
+    {
+      "name": "queued-6.dsculpt",
+      "bytes": 60381,
+      "sentinel": false,
+      "same": true,
+      "R_sha256": "90c2bd9c766fbaabf5c96756d8dd422c02d569557c092aafc5210913659cf25c",
+      "S_sha256": "90c2bd9c766fbaabf5c96756d8dd422c02d569557c092aafc5210913659cf25c"
+    },
+    {
+      "name": "queued-7.dsculpt",
+      "bytes": 60381,
+      "sentinel": false,
+      "same": true,
+      "R_sha256": "90c2bd9c766fbaabf5c96756d8dd422c02d569557c092aafc5210913659cf25c",
+      "S_sha256": "90c2bd9c766fbaabf5c96756d8dd422c02d569557c092aafc5210913659cf25c"
+    },
+    {
+      "name": "retry.dsculpt",
+      "bytes": 60381,
+      "sentinel": false,
+      "same": true,
+      "R_sha256": "90c2bd9c766fbaabf5c96756d8dd422c02d569557c092aafc5210913659cf25c",
+      "S_sha256": "90c2bd9c766fbaabf5c96756d8dd422c02d569557c092aafc5210913659cf25c"
+    },
+    {
+      "name": "shutdown.dsculpt",
+      "bytes": 60381,
+      "sentinel": false,
+      "same": true,
+      "R_sha256": "90c2bd9c766fbaabf5c96756d8dd422c02d569557c092aafc5210913659cf25c",
+      "S_sha256": "90c2bd9c766fbaabf5c96756d8dd422c02d569557c092aafc5210913659cf25c"
+    },
+    {
+      "name": "stale.dsculpt",
+      "bytes": 26,
+      "sentinel": true,
+      "same": true,
+      "R_sha256": "56be03a0a42ca6b4008c851f440f7233588f458b2836c890cb9f01c9b5a4623b",
+      "S_sha256": "56be03a0a42ca6b4008c851f440f7233588f458b2836c890cb9f01c9b5a4623b"
+    }
+  ],
+  "counters_preserved": [
+    "Original main/f5f exact-affine entry refusal exit1",
+    "Original zero-paint fixture exit1 and explicit real normal correction",
+    "Original immediate retopo Save refusal exit1 at artifacts/affine-proof/release-v2; not relabelled",
+    "Original renamed-main sanitizer UB exit1, complete exact archived ELF/source provenance and explicit return0 correction; old bridge cases notrun"
+  ],
+  "ownership_cases": [
+    "Caller immediate Save issued with no input/atlas wait; actual independent EndGesture held BEFORE real finalization and unwrap",
+    "File worker CV waiting does not own model lock: actual simultaneous copy_scene succeeds",
+    "Actual cancellation wakes dependent Save while input remains held; prior file/source exact",
+    "Real empty-face finalization error and labelled test-injected after-real-input exception preserve original failure in dependent Save",
+    "Document replacement wakes stale operation without publishing into newer generation",
+    "Shutdown drains accepted Save; no-op reopened Apply adds no object/history entry",
+    "Real8-entry Save queue overflow preserves prior file and all8admitted exact endpoints",
+    "Every63 measured persistent calling-thread allocation denial leaves source/draft/authority/input-file admission exact and retries successfully"
+  ],
+  "limits": {
+    "cumulative_task_cap_bytes": 1610612736,
+    "free_floor_bytes": 21474836480,
+    "final_st_blocks_bytes": 1232986112
+  },
+  "remaining": [
+    "Native FLTK/XR client relinks and actual GUI/controller admission pending; no app expansion authorized in this cohort",
+    "No general downstream file-worker/atlas malloc-null/fault sweep claimed by63 calling-thread admission prefixes",
+    "Real external avatar source metadata/production-diverse fixtures remain beyond these genuine native painted/skinned/morphed affine tests",
+    "Triangle-remesh/CATS/texture sets and complete original objective remain required; other private38/material/normal branches not consumed"
+  ]
+}

@@ -1,3 +1,12 @@
+## Private immediate retopology Save repair — 2026-11-05
+
+The real affine-checkpoint Apply-to-Save gap now has an explicit independent-
+queue handoff:1445Release/1445ownedSAN including63persistent admission denials
+each,21native+5sentinel pairs exact and actual public layout equality. Read
+RETOPO-SAVE-HANDOFF.md/receipt. Original failures remain; no app/UI/main/fullgoal
+admission follows. Downstream fault/device/production and remesh/CATS/texture-set
+requirements remain open.
+
 ## Private affine retopology component — 2026-11-05
 
 Exact main10944 child now qualifies full-affine manual retopo geometry/native

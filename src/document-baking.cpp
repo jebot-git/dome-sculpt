@@ -18,6 +18,9 @@ void Document::cancel_asset_work_locked(){
   }
   if(auto work=asset_work_.load();work && state_.asset_busy){
     work->cancelled.store(true);state_.message="Cancelling background work...";
+    // Accepted retopology may await its independent input-worker result.
+    // Handshake with its predicate mutex instead of introducing timed polling.
+    {std::lock_guard lock(retopo_mutex_);retopo_changed_.notify_all();}
   }
 }
 void Document::cancel_background_work_locked(){

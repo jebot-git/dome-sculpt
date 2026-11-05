@@ -561,6 +561,12 @@ if(BUILD_TESTING)
   target_link_libraries(dome-sculpt-retopo-affine-test PRIVATE dome-sculpt-core)
   target_link_options(dome-sculpt-retopo-affine-test PRIVATE -Wl,--wrap=_ZN4dome6unwrapERNS_4MeshEjjRKSt8functionIFbvEE)
   add_test(NAME retopology-affine COMMAND dome-sculpt-retopo-affine-test ${CMAKE_CURRENT_BINARY_DIR}/retopology-affine)
+  add_executable(dome-sculpt-retopo-save-handoff-test tests/retopo-save-handoff.cpp)
+  target_link_libraries(dome-sculpt-retopo-save-handoff-test PRIVATE dome-sculpt-core)
+  target_link_options(dome-sculpt-retopo-save-handoff-test PRIVATE
+    -Wl,--wrap=_ZN4dome6unwrapERNS_4MeshEjjRKSt8functionIFbvEE
+    -Wl,--wrap=_ZN4dome15RetopoWorkspace4editENS_12RetopoActionENS_4Vec3EfRKSt8functionIFbvEE)
+  add_test(NAME retopology-save-handoff COMMAND dome-sculpt-retopo-save-handoff-test ${CMAKE_CURRENT_BINARY_DIR}/retopology-save-handoff)
   add_executable(dome-sculpt-cut-color-publication-test tests/cut-color-publication.cpp)
   target_include_directories(dome-sculpt-cut-color-publication-test PRIVATE src)
   target_link_libraries(dome-sculpt-cut-color-publication-test PRIVATE dome-sculpt-core)

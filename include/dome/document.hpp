@@ -577,6 +577,19 @@ private:
   std::atomic<uint64_t> retopo_session_{0};
   bool retopo_stroking_ = false, retopo_sampled_ = false, retopo_accepting_ = false;
   size_t retopo_pending_ = 0;
+  // Shared independent-input/file-queue handoff, protected by retopo_mutex_.
+  // This is a deque element payload, not a new Document/EditorState field.
+  struct RetopoAcceptance {
+    enum class Admission { Pending, Accepted, Rejected };
+    Admission admission = Admission::Pending;
+    std::shared_ptr<AssetWork> work;
+    std::shared_ptr<bool> changed;
+    std::shared_ptr<const RetopoMesh> topology;
+    uint64_t source = 0;
+    CanvasTransform transform{};
+    std::exception_ptr error;
+    bool ready = false;
+  };
   struct RetopoJob {
     uint64_t session = 0;
     std::shared_ptr<const Scene> initial;
@@ -584,6 +597,7 @@ private:
     Vec3 point{};
     float snap_mm = 50;
     bool accept = false, coalescible = false;
+    std::shared_ptr<RetopoAcceptance> acceptance{};
   };
   mutable std::mutex retopo_mutex_;
   mutable std::condition_variable retopo_changed_;
