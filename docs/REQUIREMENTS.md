@@ -1,3 +1,12 @@
+## Private owning37 source continuation — 2026-11-05
+
+Current main9dd63f9 and private admission candidate93c1fad are composed by real
+merge history in this branch. This is source integration only: no new build or
+runtime/GUI/device qualification. A changed SourceMaterialBindings owner requires
+fresh owning consumers. Keep older component proofs scoped to their original
+bytes. Current polygon/weights/caller repairs and every unfinished requirement
+remain required before production admission. Read HANDOFF.md.
+
 ## Worker publication admission — 2026-11-05
 
 Main admits the exact68daffe worker product body: detached retopology geometry

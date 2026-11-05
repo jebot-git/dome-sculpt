@@ -10,6 +10,7 @@
 #include "normal-frame-runtime.hpp"
 #include "paint-sampling-access.hpp"
 #include "native-paint-model.hpp"
+#include "canonical-paint-native.hpp"
 #include <new>
 #include "document-transaction.hpp"
 namespace dome {
@@ -28,12 +29,13 @@ bool Document::uv_retention_requested_locked() const {
   return state_.controls.parameter==VrParameter::UvEdit&&state_.controls.value[3]>.5f;
 }
 bool Document::uv_paint_retention_requested_locked() const {
+  if(control_before_&&control_object_&&detail::canonical_paint_retention_supported(scene_.object(control_object_)))return true;
   return state_.controls.parameter==VrParameter::UvEdit&&state_.controls.value[3]>1.5f;
 }
 bool Document::uv_paint_retention_available_locked() const {
   if(!control_before_||!control_object_)return false;
   const auto &o=scene_.object(control_object_);const auto b=o.material_bindings;
-  return detail::native_paint_retention_supported(o)||(o.mesh_active&&o.painted&&!o.appearance&&b&&!b->has_mtoon&&b->normal_preparation&&b->color_preparation&&
+  return detail::canonical_paint_retention_supported(o)||detail::native_paint_retention_supported(o)||(o.mesh_active&&o.painted&&!o.appearance&&b&&!b->has_mtoon&&b->normal_preparation&&b->color_preparation&&
     o.painted->normal_projection()&&o.painted->color_projection()&&o.polygon&&o.polygon->active&&o.polygon->colors&&
     b->color_preparation->receipt.source_field==SourceColorField::PolygonCorners&&
     b->color_preparation->current_descriptor()&&b->color_preparation->current_descriptor()->field==o.polygon->colors&&
@@ -42,6 +44,7 @@ bool Document::uv_paint_retention_available_locked() const {
 bool Document::uv_retention_changes_locked() const {
   if(!uv_retention_requested_locked()||!control_before_)return false;
   const auto &o=scene_.object(control_object_);
+  if(detail::canonical_paint_retention_supported(o))return false; // required policy is not an untouched edit
   return o.painted&&(((uv_paint_retention_requested_locked()||uv_paint_retention_available_locked())&&!o.painted->paint_sampling_domain())||(o.painted->normal_projection()&&o.painted->normal_projection()->version==1));
 }
 void Document::edit_uv(UvAction action, float x, float y) {
@@ -56,9 +59,9 @@ void Document::edit_uv(UvAction action, float x, float y) {
 }
 void Document::restore_uv_source_locked(){
     if(!uv_||uv_accept_pending_||uv_solving_||!uv_->view().topology||uv_->view().validating)throw std::logic_error("Wait for UV processing before restoring its source");
-    const auto object=control_object_;if(!detail::native_paint_source_restorable(scene_.object(object)))throw std::logic_error("This UV source cannot yet be restored without changing other authored data");
+    const auto object=control_object_;if(!detail::native_paint_source_restorable(scene_.object(object))&&!detail::canonical_paint_source_restorable(scene_.object(object)))throw std::logic_error("This UV source cannot yet be restored without changing other authored data");
     const AssetSource expected{state_.generation,state_.revision,object,state_.edit_authority};
-    queue_scene_operation_locked("Restore UV and paint source",[object](Scene &scene,const auto &cancelled){detail::restore_native_paint(scene,object,cancelled);},expected,{},{},{},{},0,0,{},{},uv_session_);
+    queue_scene_operation_locked("Restore UV and paint source",[object](Scene &scene,const auto &cancelled){if(detail::canonical_paint_source_restorable(scene.object(object)))detail::restore_canonical_paint(scene,object,cancelled);else detail::restore_native_paint(scene,object,cancelled);},expected,{},{},{},{},0,0,{},{},uv_session_);
 }
 void Document::apply_uv_action_locked(UvAction action, float x, float y) {
   if (!uv_) throw std::logic_error("Open the UV editor first");
@@ -69,6 +72,7 @@ void Document::apply_uv_action_locked(UvAction action, float x, float y) {
     if(action==UvAction::RetainPaint) {
       const auto &o=scene_.object(control_object_);
       if(!uv_paint_retention_available_locked())throw std::logic_error("This mesh cannot yet keep paint detail with its current geometry and materials");
+      if(detail::canonical_paint_retention_supported(o))throw std::logic_error("Converted normal authoring keeps both paint and normal coordinates; restore its source to change representation");
       if(o.painted->paint_sampling_domain())throw std::logic_error("This project uses retained paint coordinates; restore its source before choosing a different transfer");
       if(!uv_->view().topology||uv_->view().validating)throw std::logic_error("Wait for UV validation before changing paint detail");
       state_.controls.value[3]=uv_paint_retention_requested_locked()?(o.painted->normal_projection()&&o.painted->normal_projection()->version==2?1.f:0.f):2.f;
@@ -317,15 +321,20 @@ void Document::process_uv_transfer(FileJob &job) {
       updated->source_vertices.push_back(source.appearance->source_vertices.at(original));
     appearance = std::move(updated);
   }
+  const bool canonical_paint=detail::canonical_paint_retention_supported(source);
   bool changed = uv_changed(target, old) || morph_topology_id(target) != morph_topology_id(old) ||
     (job.uv_keep_normals&&source.painted->normal_projection()&&source.painted->normal_projection()->version==1)||
-    (job.uv_keep_paint&&!source.painted->paint_sampling_domain());
+    (job.uv_keep_paint&&!source.painted->paint_sampling_domain()&&!canonical_paint);
   std::shared_ptr<PaintedMesh> painted;
   auto binding=source.material_bindings;
   if(!changed&&binding&&binding->canonical_attributes){
     // Finishing an untouched workspace is a genuine no-op. It must not enter
     // an atlas transfer that lacks this separate normal-role interpretation.
     painted=source.painted;deformation=source.deformation;appearance=source.appearance;
+  }else if(canonical_paint){
+    PaintSamplingLimits limits;limits.cancelled=cancelled;
+    auto retained=detail::CanonicalPaintSampling::create(job.scene,job.object,target,*map,limits);
+    painted=std::move(retained.paint);binding=std::move(retained.binding);deformation=std::move(retained.deformation);appearance=source.appearance;
   }else if(job.uv_keep_paint&&detail::native_paint_retention_supported(source)){
     PaintSamplingLimits limits;limits.cancelled=cancelled;auto retained=detail::retain_native_paint_model(source,target,*map,limits);
     painted=std::move(retained.sampling.paint);binding=detail::bind_native_paint(retained.sampling.owner,source.material_bindings);
@@ -403,7 +412,7 @@ void Document::process_uv_transfer(FileJob &job) {
     transaction.finish_uv();
     if(job.uv_desktop)desktop_=false;
     if(changed){scene_=std::move(prepared);record_locked({{},transaction.before(),scene_});bind_locked();}
-    state_.asset_busy=false;if(asset_work_.load()==job.work)asset_work_.store({});state_.message=scene_.active().material_bindings&&scene_.active().material_bindings->canonical_attributes?"UV layout updated; original normal detail retained. Native and glTF export supported.":retained_paint?"UV layout updated. Paint and normal detail retained; save the native project to keep editable sources.":job.uv_keep_normals?"UVs updated; original normal detail kept. Save the native project; glTF/VRM export still needs a sampling conversion.":"UVs, paint and deformation identities updated";state_.error.clear();
+    state_.asset_busy=false;if(asset_work_.load()==job.work)asset_work_.store({});state_.message=scene_.active().material_bindings&&scene_.active().material_bindings->canonical_paint_sampling?"UV layout updated; paint and normal detail retained.":scene_.active().material_bindings&&scene_.active().material_bindings->canonical_attributes?"UV layout updated; original normal detail retained. Native and glTF export supported.":retained_paint?"UV layout updated. Paint and normal detail retained; save the native project to keep editable sources.":job.uv_keep_normals?"UVs updated; original normal detail kept. Save the native project; glTF/VRM export still needs a sampling conversion.":"UVs, paint and deformation identities updated";state_.error.clear();
     publish_locked(changed,false);transaction.commit();
     if(accepted){
       accepted->revision=state_.revision;accepted->content=content_;

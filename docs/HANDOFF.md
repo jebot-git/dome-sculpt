@@ -1,3 +1,23 @@
+## Unqualified owning37 source composition — 2026-11-05
+
+This private continuation merges current main9dd63f9 with admission candidate93c1fad
+by real history. It retains the current affine retopology, ordered Save, held-input
+admission repair, visible markers, worker publication repair and active avatar
+assertions, plus the canonical-paint/material/physical-package component sources.
+Only CMake and this handoff required textual resolution; source merged normally.
+
+This merged tree has NOT been built or executed. SourceMaterialBindings adds a
+real canonical-paint owner, so a fresh coherent build of all consumers is required;
+older support archives cannot qualify its public layout. Existing component
+results below remain scoped to their original source and binaries. Full goal
+active; no new main admission, installation, headset or session restart follows.
+
+The current polygon, automatic-weight and caller-input repairs are separate
+continuations. Merge their admitted current-main results before freezing the new
+owning build. Physical-package exhaustive parent results and all four fresh-caller key
+Create/Replace coverage aggregates have closed. Their actual receipts have been
+rehashed; original product scopes remain distinct from this unqualified tree.
+
 ## Current production admission — 2026-11-05
 
 Main integrates the qualified retopology worker publication repair from68daffe,
@@ -77,6 +97,18 @@ has separate40-point smoke evidence only. Main runtime remainsc179/615/native36;
 37, physical4, broader integration, weights/Mirror/material/device/accelerator
 requirements and later controller drawers remain open. Full goal active;
 no installation or headset launch.
+
+## Integrated admission candidate — 2026-11-05
+
+This branch integrates227c11c material qualification,1f9fd48 package partitions
+andmainb3b4d00 standards/handoff by real merges. Production/header/assets remain
+exact eacfba7; whole new package consumers R/S contracts and40explicit smoke
+points/profile pass with exact hashes.28verifiercontrols pass;967registered is
+not fullruntime. Read ADMISSION-CANDIDATE-37.md/receipt. Parent5df packageSAN43091
+andfresh-key sanitizer partitions remainlive andoutside this smoke scope.
+No main37/public38/default-weight/fullgoal claim. Preserve frozen original job
+inputs and inspect actualhandles before restart. Controllerdrawers remain after
+basic targets; allfullmatrix/device/accelerator work stays required.
 
 ## Matching material clients and exhaustive factories closed — 2026-11-05
 

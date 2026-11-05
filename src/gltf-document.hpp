@@ -26,6 +26,11 @@ GltfDocument make_gltf_authoring(const NativeAuthoringCapture &,
     const std::vector<ObjectSurface> &, bool recompute_changed_normals,
     std::function<bool()> cancelled = {});
 GltfDocument make_gltf_emission(const EmissionExportPrepared &, bool recompute_changed_normals, std::function<bool()> cancelled);
+class Vrm1AuthoringCompilation;
+// Authenticated typed Scene compilation only. The ordinary exporter retains
+// all prior transformed-normal guards and never receives this authority.
+GltfDocument make_vrm1_authoring_gltf(const Vrm1AuthoringCompilation &,
+ const std::function<bool()> &);
 void write_glb(GltfDocument, const std::filesystem::path &);
 void write_glb(GltfDocument, const std::filesystem::path &,
                const std::function<bool()> &cancelled,

@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "vrm1-expression-layer.hpp"
 #include "vrm1-mask-support.hpp"
+#include "vrm1-normal-authority.hpp"
 #include "paint-overlay-sample.hpp"
 #include "source-paint-pairing.hpp"
 #include "source-extra-uv-authority.hpp"
@@ -51,7 +52,6 @@ double rim_margin(const J &expressions,const SculptObject &object,
   if(expression.contains("materialColorBinds"))for(const auto &bind:expression.at("materialColorBinds"))if(bind.at("material").get<int>()==object.appearance->source_material&&bind.at("type")=="rimColor")relevant=true;
  }
  if(!relevant)return 0;
- if(binding.material.parameters.alpha!=MToonAlpha::Opaque)throw std::invalid_argument("VRM1 masked Rim layers need their independent membership adapter");
  if(stats.working_bytes>limits.max_working_bytes||64>limits.max_working_bytes-stats.working_bytes)throw std::length_error("VRM1 Rim prospective working limit exceeded");
  stats.working_bytes+=64;auto low=initial,high=initial;
  auto work=[&]{if(stats.sample_operations>limits.max_sample_operations||4>limits.max_sample_operations-stats.sample_operations)throw std::length_error("VRM1 Rim prospective parameter work limit exceeded");stats.sample_operations+=4;};
@@ -90,9 +90,12 @@ Vrm1ExpressionLayer compile_vrm1_expression_layer(const J &original,const Sculpt
   throw std::invalid_argument("VRM1 expression layer currently requires opaque outline-free nonanimated MToon1 source");
  if(binding.canonical_attributes||binding.canonical_uv||binding.native_paint_sampling||binding.normal_preparation||binding.color_preparation||binding.key_derivation||binding.physical_emission)
   throw std::invalid_argument("VRM1 prepared/absolute expression layers need their owning adapter");
- for(auto role:{MToonSlot::Normal,MToonSlot::OutlineWidth,MToonSlot::Shift,MToonSlot::UvMask})
+ if(binding.roles[size_t(MToonSlot::Normal)].image&&!opaque)throw std::invalid_argument("VRM1 masked normal expression layers need their independent membership adapter");
+ for(auto role:{MToonSlot::OutlineWidth,MToonSlot::UvMask})
   if(binding.roles[size_t(role)].image)throw std::invalid_argument("VRM1 expression layer role needs its independent consumer adapter");
- if(masked&&binding.roles[size_t(MToonSlot::Rim)].image)throw std::invalid_argument("VRM1 masked Rim texture needs its independent membership adapter");
+ // Rim affects RGB only. MASK admission below independently proves the real
+ // source/native fragment membership over every reached paint footprint and
+ // expression weight; both admitted fragments carry the same additive Rim.
  const auto &base=binding.roles[0],&shade=binding.roles[1];const auto &bt=material.textures[0],&st=material.textures[1];
  Vrm1ExpressionLayer result;bool found=false,colour=false,same_target=true;
  result.shade_alias=base.image&&base.image==shade.image&&base.wrap_s==shade.wrap_s&&base.wrap_t==shade.wrap_t&&base.min_filter==shade.min_filter&&base.mag_filter==shade.mag_filter&&mtoon_coordinate(bt)==mtoon_coordinate(st)&&bt.offset==st.offset&&bt.scale==st.scale&&bt.rotation==st.rotation;
@@ -146,20 +149,24 @@ Vrm1ExpressionLayer compile_vrm1_expression_layer(const J &original,const Sculpt
   return true;
  };
  if(!found&&!colour)throw std::invalid_argument("VRM1 expression layer has no relevant original binding");
+ // Reject pure size limits before callback-bearing normal/additive scans.
+ const size_t n=packet.resolution(),pixels=size_t(size)*size,native_pixels=n*n;
+ if(size<64||size>4096||pixels>limits.max_image_pixels||native_pixels>limits.max_image_pixels)
+  throw std::length_error("VRM1 expression-layer pixel limit exceeded");
+ if(binding.roles[size_t(MToonSlot::Normal)].image)require_vrm1_authored_normal_frame(object,cancelled);
  const double additive_error=matcap_margin(expressions,object,result,limits,cancelled)+(rim_relevant?rim_margin(expressions,object,result,limits,cancelled):0);
  if(found&&(!same_target||result.scale[0]==0||result.scale[1]==0)){
   bool invariant=result.shade_alias||invariant_image(shade,active_components({material.parameters.shade_color.x,material.parameters.shade_color.y,material.parameters.shade_color.z},"shadeColor"));
   const auto &emission=material.parameters.emission;std::array<float,3> effective{vrm_native_factor(emission.x,binding.native_reference.emission[0],object.material.emissive[0]),vrm_native_factor(emission.y,binding.native_reference.emission[1],object.material.emissive[1]),vrm_native_factor(emission.z,binding.native_reference.emission[2],object.material.emissive[2])};
   invariant=invariant&&(material.parameters.emission_strength==0||invariant_image(binding.roles[size_t(MToonSlot::Emission)],active_components(effective,"emissionColor")));
+  if(binding.roles[size_t(MToonSlot::Normal)].image)invariant=invariant&&invariant_image(binding.roles[size_t(MToonSlot::Normal)],{true,true,true});
+  if(material.textures[size_t(MToonSlot::Shift)].strength!=0)invariant=invariant&&invariant_image(binding.roles[size_t(MToonSlot::Shift)],{true,false,false});
   auto rim_active=active_components({material.parameters.rim_color.x,material.parameters.rim_color.y,material.parameters.rim_color.z},"rimColor");
   if(binding.roles[size_t(MToonSlot::Matcap)].image){const auto matcap_active=active_components({material.parameters.matcap_color.x,material.parameters.matcap_color.y,material.parameters.matcap_color.z},"matcapColor");for(size_t k=0;k<3;++k)rim_active[k]=rim_active[k]||matcap_active[k];}
   invariant=invariant&&invariant_image(binding.roles[size_t(MToonSlot::Rim)],rim_active);
   if(!invariant)throw std::invalid_argument(same_target?"VRM1 zero UV target couples moving upper roles to fixed paint":"VRM1 differing UV targets couple moving upper roles to fixed paint");
   result.forward_uv=false;result.scale={1,1};result.offset={};
  }
- const size_t n=packet.resolution(),pixels=size_t(size)*size,native_pixels=n*n;
- if(size<64||size>4096||pixels>limits.max_image_pixels||native_pixels>limits.max_image_pixels)
-  throw std::length_error("VRM1 expression-layer pixel limit exceeded");
  // Charge native premultiplied doubles, decoded output doubles, PNG source,
  // bounded encoder scratch, coordinate result and both merged knot vectors
  // before allocating any of them. Encoded output is bounded by writer too.

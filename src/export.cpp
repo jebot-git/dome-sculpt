@@ -15,6 +15,7 @@
 #include "raw-source-emission.hpp"
 #include "native-authoring-compiler.hpp"
 #include "normal-frame-export.hpp"
+#include "vrm1-normal-export.hpp"
 #include "prepared-color-state.hpp"
 #include "current-colors.hpp"
 #include "bone-metadata.hpp"
@@ -62,7 +63,8 @@ GltfExportReport export_glb(const std::vector<ObjectSurface> &objects,
 namespace detail {
 static GltfDocument make_gltf_impl(const std::vector<ObjectSurface> &input_objects,
     SourceMorphSpace source_space,bool recompute_changed_normals,std::function<bool()> cancelled,
-    const NativeAuthoringCapture *raw_authority,const EmissionExportPrepared *physical) {
+    const NativeAuthoringCapture *raw_authority,const EmissionExportPrepared *physical,
+    const Vrm1AuthoringCompilation *normal_owner) {
   auto stop=[&]{if(cancelled && cancelled())throw std::runtime_error("glTF export cancelled");};
   size_t work=0;auto checkpoint=[&]{if((++work&1023)==0)stop();};
   stop();
@@ -187,7 +189,7 @@ static GltfDocument make_gltf_impl(const std::vector<ObjectSurface> &input_objec
     if(input.material_bindings&&input.material_bindings->color_preparation)
       input.material_bindings->color_preparation->validate_current(input.mesh,input.appearance.get(),cancelled);
     std::optional<NormalFrameExport> prepared;
-    if(input.material_bindings && input.material_bindings->normal_frames)prepared=normal_frame_export(input,source_space,cancelled,source_space==SourceMorphSpace::Native);
+    if(input.material_bindings && input.material_bindings->normal_frames)prepared=normal_owner?normal_frame_export_vrm1(*normal_owner,input,cancelled):normal_frame_export(input,source_space,cancelled,source_space==SourceMorphSpace::Native);
     else if(input.material_bindings&&input.material_bindings->native_paint_sampling)prepared=native_paint_export(input,source_space,cancelled);
     const auto &o=prepared?prepared->surface:input;auto *frame=prepared?&*prepared:nullptr;
     GltfObjectIdentity emission;
@@ -766,16 +768,16 @@ static GltfDocument make_gltf_impl(const std::vector<ObjectSurface> &input_objec
 }
 GltfDocument make_gltf(const std::vector<ObjectSurface> &objects,SourceMorphSpace space,
     bool recompute_changed_normals,std::function<bool()> cancelled) {
-  return make_gltf_impl(objects,space,recompute_changed_normals,std::move(cancelled),nullptr,nullptr);
+  return make_gltf_impl(objects,space,recompute_changed_normals,std::move(cancelled),nullptr,nullptr,nullptr);
 }
 GltfDocument make_gltf_emission(const EmissionExportPrepared &prepared,bool recompute_changed_normals,std::function<bool()> cancelled){
  validate_native_emission_surfaces(prepared,cancelled);
- return make_gltf_impl(prepared.surfaces,SourceMorphSpace::Native,recompute_changed_normals,std::move(cancelled),nullptr,&prepared);
+ return make_gltf_impl(prepared.surfaces,SourceMorphSpace::Native,recompute_changed_normals,std::move(cancelled),nullptr,&prepared,nullptr);
 }
 GltfDocument make_gltf_authoring(const NativeAuthoringCapture &capture,
     const std::vector<ObjectSurface> &objects,bool recompute_changed_normals,
     std::function<bool()> cancelled) {
-  auto document=make_gltf_impl(objects,SourceMorphSpace::Native,recompute_changed_normals,cancelled,&capture,nullptr);
+  auto document=make_gltf_impl(objects,SourceMorphSpace::Native,recompute_changed_normals,cancelled,&capture,nullptr,nullptr);
   auto &j=document.json;
   for(size_t i=0;i<objects.size();++i) {
     if(cancelled&&cancelled())throw std::runtime_error("Raw source emission finish cancelled");
@@ -814,6 +816,11 @@ GltfDocument make_gltf_authoring(const NativeAuthoringCapture &capture,
   }
   return document;
 }
+GltfDocument make_vrm1_authoring_gltf(const Vrm1AuthoringCompilation &owner,
+ const std::function<bool()> &cancelled){
+ return make_gltf_impl(owner.surfaces(),SourceMorphSpace::Native,true,cancelled,nullptr,nullptr,&owner);
+}
+
 } // namespace detail
 void detail::write_glb(GltfDocument document,const std::filesystem::path &path) {
   write_glb(std::move(document),path,{},{});

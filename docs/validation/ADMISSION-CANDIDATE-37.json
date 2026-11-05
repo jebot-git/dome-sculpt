@@ -1,0 +1,577 @@
+{
+  "recorded_utc": "2026-11-05T12:23:29.602538+00:00",
+  "source_before_metadata": "87f3e3dc9fcb929f10dfbe6f3530ab2415e1edf2",
+  "runtime_exact": "eacfba7a26b06550d5d6da89987dd2929065e227",
+  "material_seal": "227c11c",
+  "test_framework": "1f9fd48501aeba4db77eabb0e86679efad7923bf",
+  "main_metadata": "b3b4d00",
+  "scope": "Isolated integrated admission candidate. Production/header/asset bytes equal qualifiedeacf/227; only test CLI/partition registration plusmainstandards/docs composed. No public38/weightdefault/mainruntime admission.",
+  "profiles": {
+    "release": {
+      "status": {
+        "state": "terminal",
+        "pid": 451557,
+        "source": "87f3e3dc9fcb929f10dfbe6f3530ab2415e1edf2",
+        "profile": "release",
+        "steps": [
+          {
+            "name": "compile",
+            "command": [
+              "/usr/bin/c++",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/authoring37-admission-227/src",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/authoring37-admission-227/third_party/cgltf",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/authoring37-admission-227/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/authoring37-admission-227/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/authoring37-admission-227/third_party/nlohmann",
+              "-isystem",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/harfbuzz",
+              "-isystem",
+              "/usr/include/glib-2.0",
+              "-isystem",
+              "/usr/lib64/glib-2.0/include",
+              "-isystem",
+              "/usr/include/sysprof-6",
+              "-isystem",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/freetype2",
+              "-isystem",
+              "/usr/include/libpng16",
+              "-isystem",
+              "/usr/include/libxml2",
+              "-O3",
+              "-DNDEBUG",
+              "-std=gnu++20",
+              "-pthread",
+              "-DWITH_GZFILEOP",
+              "-MD",
+              "-MT",
+              "CMakeFiles/dome-sculpt-canonical-paint37-emission-contracts-test.dir/tests/canonical-paint37-emission-contracts.cpp.o",
+              "-MF",
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring37-admission-227/artifacts/admission-smoke/release/consumer.d",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring37-admission-227/artifacts/admission-smoke/release/consumer.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring37-admission-227/tests/canonical-paint37-emission-contracts.cpp"
+            ],
+            "exit_code": 0,
+            "seconds": 14.60684260801645
+          },
+          {
+            "name": "link",
+            "command": [
+              "/usr/bin/c++",
+              "-O3",
+              "-DNDEBUG",
+              "-Wl,--wrap=fsync",
+              "-Wl,--dependency-file=/home/blux/de-xr/dome-sculpt/artifacts/authoring37-admission-227/artifacts/admission-smoke/release/link.d",
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring37-admission-227/artifacts/admission-smoke/release/consumer.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring37-admission-227/artifacts/admission-smoke/release/consumer",
+              "-Wl,-rpath,/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/stage/libdome-sculpt-render.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/stage/libdome-sculpt-core.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/stage/libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/stage/libdome-sculpt-polygon.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/stage/libxatlas.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/stage/libmikktspace.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/stage/libmikktspace-robust.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/stage/libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/stage/libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libharfbuzz.so",
+              "/usr/lib64/libEGL.so",
+              "/usr/lib64/libGL.so",
+              "/usr/lib64/libfontconfig.so",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libfreetype.so",
+              "/usr/lib64/libicui18n.so",
+              "/usr/lib64/libicuuc.so",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit_code": 0,
+            "seconds": 0.3403915800154209
+          },
+          {
+            "name": "real-physical-package-contracts",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring37-admission-227/artifacts/admission-smoke/release/consumer",
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring37-normal-f365/build-normal37-release/canonical-paint37-native-7-4/1.dsculpt",
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring37-admission-227/artifacts/admission-smoke/release/contracts"
+            ],
+            "exit_code": 0,
+            "seconds": 0.3665991419693455
+          },
+          {
+            "name": "stable-baseline",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring37-admission-227/artifacts/admission-smoke/release/consumer",
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring37-normal-f365/build-normal37-release/canonical-paint37-native-7-4/1.dsculpt",
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring37-admission-227/artifacts/admission-smoke/release/case-9999",
+              "--oom-measure"
+            ],
+            "exit_code": 0,
+            "seconds": 0.11200137698324397
+          },
+          {
+            "name": "smoke-0",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring37-admission-227/artifacts/admission-smoke/release/consumer",
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring37-normal-f365/build-normal37-release/canonical-paint37-native-7-4/1.dsculpt",
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring37-admission-227/artifacts/admission-smoke/release/case-0000",
+              "--oom-range",
+              "0",
+              "4",
+              "90255"
+            ],
+            "exit_code": 0,
+            "seconds": 0.17120673699537292
+          },
+          {
+            "name": "smoke-1",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring37-admission-227/artifacts/admission-smoke/release/consumer",
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring37-normal-f365/build-normal37-release/canonical-paint37-native-7-4/1.dsculpt",
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring37-admission-227/artifacts/admission-smoke/release/case-0001",
+              "--oom-range",
+              "45127",
+              "45131",
+              "90255"
+            ],
+            "exit_code": 0,
+            "seconds": 0.19992497703060508
+          },
+          {
+            "name": "smoke-2",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring37-admission-227/artifacts/admission-smoke/release/consumer",
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring37-normal-f365/build-normal37-release/canonical-paint37-native-7-4/1.dsculpt",
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring37-admission-227/artifacts/admission-smoke/release/case-0002",
+              "--oom-range",
+              "90224",
+              "90256",
+              "90255"
+            ],
+            "exit_code": 0,
+            "seconds": 0.7971862539998256
+          }
+        ],
+        "scope": "Merged metadata/test registration candidate, production exacteacf. Whole updated1f9testTU +matching11combinedarchives; real contracts plus40prefix smoke only, NOT new exhaustive proof. Original5dfcurrentfullSAN43091 remainsindependent/frozen. PhysicalGLB route prepare_emission_export->make_gltf_emission uses nullVRM1 compilation; Layer changedTU belongs separate VRM1 exporter.",
+        "phase": "smoke-2",
+        "child_pid": 453738,
+        "measurement": {
+          "baseline": 90255,
+          "baseline_counts": [
+            90255,
+            90255,
+            90255
+          ],
+          "baseline_package_sha256": "bbda94a4db56ace79ee83622bc8af54fab39cb5cccf6c66078916197eafc4a1b",
+          "cache_budget": 0,
+          "fixture_sha256": "c88483b9a417561a97be80f7cbe471fe4a1aea83bbcb7813713b1530d0d0095a",
+          "format": 1,
+          "mode": "measure",
+          "profile": "release",
+          "scene_sha256": "c88483b9a417561a97be80f7cbe471fe4a1aea83bbcb7813713b1530d0d0095a",
+          "stable_baseline": true,
+          "terminal_exit": 0
+        },
+        "smoke_ranges": [
+          {
+            "baseline": 90255,
+            "baseline_counts": [
+              90255,
+              90255,
+              90255
+            ],
+            "baseline_package_sha256": "bbda94a4db56ace79ee83622bc8af54fab39cb5cccf6c66078916197eafc4a1b",
+            "begin": 0,
+            "cache_budget": 0,
+            "completed": 4,
+            "denied": 4,
+            "end": 4,
+            "endpoint_successful": false,
+            "first_completed": 0,
+            "fixture_sha256": "c88483b9a417561a97be80f7cbe471fe4a1aea83bbcb7813713b1530d0d0095a",
+            "format": 1,
+            "last_completed": 3,
+            "mode": "range",
+            "profile": "release",
+            "retried_prefixes": [
+              0
+            ],
+            "scene_sha256": "c88483b9a417561a97be80f7cbe471fe4a1aea83bbcb7813713b1530d0d0095a",
+            "seconds": 0.057243229,
+            "stable_baseline": true,
+            "successful": 0,
+            "terminal_exit": 0,
+            "translated": 0
+          },
+          {
+            "baseline": 90255,
+            "baseline_counts": [
+              90255,
+              90255,
+              90255
+            ],
+            "baseline_package_sha256": "bbda94a4db56ace79ee83622bc8af54fab39cb5cccf6c66078916197eafc4a1b",
+            "begin": 45127,
+            "cache_budget": 0,
+            "completed": 4,
+            "denied": 4,
+            "end": 45131,
+            "endpoint_successful": false,
+            "first_completed": 45127,
+            "fixture_sha256": "c88483b9a417561a97be80f7cbe471fe4a1aea83bbcb7813713b1530d0d0095a",
+            "format": 1,
+            "last_completed": 45130,
+            "mode": "range",
+            "profile": "release",
+            "retried_prefixes": [
+              45127
+            ],
+            "scene_sha256": "c88483b9a417561a97be80f7cbe471fe4a1aea83bbcb7813713b1530d0d0095a",
+            "seconds": 0.079485,
+            "stable_baseline": true,
+            "successful": 0,
+            "terminal_exit": 0,
+            "translated": 0
+          },
+          {
+            "baseline": 90255,
+            "baseline_counts": [
+              90255,
+              90255,
+              90255
+            ],
+            "baseline_package_sha256": "bbda94a4db56ace79ee83622bc8af54fab39cb5cccf6c66078916197eafc4a1b",
+            "begin": 90224,
+            "cache_budget": 0,
+            "completed": 32,
+            "denied": 31,
+            "end": 90256,
+            "endpoint_successful": true,
+            "first_completed": 90224,
+            "fixture_sha256": "c88483b9a417561a97be80f7cbe471fe4a1aea83bbcb7813713b1530d0d0095a",
+            "format": 1,
+            "last_completed": 90255,
+            "mode": "range",
+            "profile": "release",
+            "retried_prefixes": [
+              90255
+            ],
+            "scene_sha256": "c88483b9a417561a97be80f7cbe471fe4a1aea83bbcb7813713b1530d0d0095a",
+            "seconds": 0.68544644,
+            "stable_baseline": true,
+            "successful": 1,
+            "terminal_exit": 0,
+            "translated": 0
+          }
+        ],
+        "smoke_prefixes": 40,
+        "exit_code": 0,
+        "seconds": 16.60201904096175,
+        "inputs": 2752,
+        "drift": []
+      },
+      "status_sha256": "19b24095b3e8323d2640597b42810374d52e37f45cf00e8fc13b5bffe45b2737",
+      "before_manifest_sha256": "22643283c03faed064ac802f2e34f6932fcef17741fc7cd5a26941aaab3cc6a4"
+    },
+    "sanitize": {
+      "status": {
+        "state": "terminal",
+        "pid": 451556,
+        "source": "87f3e3dc9fcb929f10dfbe6f3530ab2415e1edf2",
+        "profile": "sanitize",
+        "steps": [
+          {
+            "name": "compile",
+            "command": [
+              "/usr/bin/c++",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/authoring37-admission-227/src",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/authoring37-admission-227/third_party/cgltf",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/authoring37-admission-227/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/authoring37-admission-227/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/authoring37-admission-227/third_party/nlohmann",
+              "-isystem",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/harfbuzz",
+              "-isystem",
+              "/usr/include/glib-2.0",
+              "-isystem",
+              "/usr/lib64/glib-2.0/include",
+              "-isystem",
+              "/usr/include/sysprof-6",
+              "-isystem",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/freetype2",
+              "-isystem",
+              "/usr/include/libpng16",
+              "-isystem",
+              "/usr/include/libxml2",
+              "-O1",
+              "-g1",
+              "-DNDEBUG",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "-std=gnu++20",
+              "-pthread",
+              "-DWITH_GZFILEOP",
+              "-MD",
+              "-MT",
+              "CMakeFiles/dome-sculpt-canonical-paint37-emission-contracts-test.dir/tests/canonical-paint37-emission-contracts.cpp.o",
+              "-MF",
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring37-admission-227/artifacts/admission-smoke/sanitize/consumer.d",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring37-admission-227/artifacts/admission-smoke/sanitize/consumer.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring37-admission-227/tests/canonical-paint37-emission-contracts.cpp"
+            ],
+            "exit_code": 0,
+            "seconds": 23.786991274973843
+          },
+          {
+            "name": "link",
+            "command": [
+              "/usr/bin/c++",
+              "-O1",
+              "-g1",
+              "-DNDEBUG",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "-Wl,--wrap=fsync",
+              "-Wl,--dependency-file=/home/blux/de-xr/dome-sculpt/artifacts/authoring37-admission-227/artifacts/admission-smoke/sanitize/link.d",
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring37-admission-227/artifacts/admission-smoke/sanitize/consumer.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring37-admission-227/artifacts/admission-smoke/sanitize/consumer",
+              "-Wl,-rpath,/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/stage/libdome-sculpt-render.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/stage/libdome-sculpt-core.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/stage/libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/stage/libdome-sculpt-polygon.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/stage/libxatlas.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/stage/libmikktspace.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/stage/libmikktspace-robust.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/stage/libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/stage/libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libharfbuzz.so",
+              "/usr/lib64/libEGL.so",
+              "/usr/lib64/libGL.so",
+              "/usr/lib64/libfontconfig.so",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libfreetype.so",
+              "/usr/lib64/libicui18n.so",
+              "/usr/lib64/libicuuc.so",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit_code": 0,
+            "seconds": 2.2568329729838297
+          },
+          {
+            "name": "real-physical-package-contracts",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring37-admission-227/artifacts/admission-smoke/sanitize/consumer",
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring37-normal-f365/build-normal37-sanitize/canonical-paint37-native-7-4/1.dsculpt",
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring37-admission-227/artifacts/admission-smoke/sanitize/contracts"
+            ],
+            "exit_code": 0,
+            "seconds": 4.716136097966228
+          },
+          {
+            "name": "stable-baseline",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring37-admission-227/artifacts/admission-smoke/sanitize/consumer",
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring37-normal-f365/build-normal37-sanitize/canonical-paint37-native-7-4/1.dsculpt",
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring37-admission-227/artifacts/admission-smoke/sanitize/case-9999",
+              "--oom-measure"
+            ],
+            "exit_code": 0,
+            "seconds": 1.3559273380087689
+          },
+          {
+            "name": "smoke-0",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring37-admission-227/artifacts/admission-smoke/sanitize/consumer",
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring37-normal-f365/build-normal37-sanitize/canonical-paint37-native-7-4/1.dsculpt",
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring37-admission-227/artifacts/admission-smoke/sanitize/case-0000",
+              "--oom-range",
+              "0",
+              "4",
+              "90255"
+            ],
+            "exit_code": 0,
+            "seconds": 2.1201176069444045
+          },
+          {
+            "name": "smoke-1",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring37-admission-227/artifacts/admission-smoke/sanitize/consumer",
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring37-normal-f365/build-normal37-sanitize/canonical-paint37-native-7-4/1.dsculpt",
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring37-admission-227/artifacts/admission-smoke/sanitize/case-0001",
+              "--oom-range",
+              "45127",
+              "45131",
+              "90255"
+            ],
+            "exit_code": 0,
+            "seconds": 2.4359909190097824
+          },
+          {
+            "name": "smoke-2",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring37-admission-227/artifacts/admission-smoke/sanitize/consumer",
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring37-normal-f365/build-normal37-sanitize/canonical-paint37-native-7-4/1.dsculpt",
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring37-admission-227/artifacts/admission-smoke/sanitize/case-0002",
+              "--oom-range",
+              "90224",
+              "90256",
+              "90255"
+            ],
+            "exit_code": 0,
+            "seconds": 8.691862715990283
+          }
+        ],
+        "scope": "Merged metadata/test registration candidate, production exacteacf. Whole updated1f9testTU +matching11combinedarchives; real contracts plus40prefix smoke only, NOT new exhaustive proof. Original5dfcurrentfullSAN43091 remainsindependent/frozen. PhysicalGLB route prepare_emission_export->make_gltf_emission uses nullVRM1 compilation; Layer changedTU belongs separate VRM1 exporter.",
+        "phase": "smoke-2",
+        "child_pid": 455952,
+        "measurement": {
+          "baseline": 90255,
+          "baseline_counts": [
+            90255,
+            90255,
+            90255
+          ],
+          "baseline_package_sha256": "bbda94a4db56ace79ee83622bc8af54fab39cb5cccf6c66078916197eafc4a1b",
+          "cache_budget": 0,
+          "fixture_sha256": "c88483b9a417561a97be80f7cbe471fe4a1aea83bbcb7813713b1530d0d0095a",
+          "format": 1,
+          "mode": "measure",
+          "profile": "asan-ubsan",
+          "scene_sha256": "c88483b9a417561a97be80f7cbe471fe4a1aea83bbcb7813713b1530d0d0095a",
+          "stable_baseline": true,
+          "terminal_exit": 0
+        },
+        "smoke_ranges": [
+          {
+            "baseline": 90255,
+            "baseline_counts": [
+              90255,
+              90255,
+              90255
+            ],
+            "baseline_package_sha256": "bbda94a4db56ace79ee83622bc8af54fab39cb5cccf6c66078916197eafc4a1b",
+            "begin": 0,
+            "cache_budget": 0,
+            "completed": 4,
+            "denied": 4,
+            "end": 4,
+            "endpoint_successful": false,
+            "first_completed": 0,
+            "fixture_sha256": "c88483b9a417561a97be80f7cbe471fe4a1aea83bbcb7813713b1530d0d0095a",
+            "format": 1,
+            "last_completed": 3,
+            "mode": "range",
+            "profile": "asan-ubsan",
+            "retried_prefixes": [
+              0
+            ],
+            "scene_sha256": "c88483b9a417561a97be80f7cbe471fe4a1aea83bbcb7813713b1530d0d0095a",
+            "seconds": 0.740517234,
+            "stable_baseline": true,
+            "successful": 0,
+            "terminal_exit": 0,
+            "translated": 0
+          },
+          {
+            "baseline": 90255,
+            "baseline_counts": [
+              90255,
+              90255,
+              90255
+            ],
+            "baseline_package_sha256": "bbda94a4db56ace79ee83622bc8af54fab39cb5cccf6c66078916197eafc4a1b",
+            "begin": 45127,
+            "cache_budget": 0,
+            "completed": 4,
+            "denied": 4,
+            "end": 45131,
+            "endpoint_successful": false,
+            "first_completed": 45127,
+            "fixture_sha256": "c88483b9a417561a97be80f7cbe471fe4a1aea83bbcb7813713b1530d0d0095a",
+            "format": 1,
+            "last_completed": 45130,
+            "mode": "range",
+            "profile": "asan-ubsan",
+            "retried_prefixes": [
+              45127
+            ],
+            "scene_sha256": "c88483b9a417561a97be80f7cbe471fe4a1aea83bbcb7813713b1530d0d0095a",
+            "seconds": 1.064361237,
+            "stable_baseline": true,
+            "successful": 0,
+            "terminal_exit": 0,
+            "translated": 0
+          },
+          {
+            "baseline": 90255,
+            "baseline_counts": [
+              90255,
+              90255,
+              90255
+            ],
+            "baseline_package_sha256": "bbda94a4db56ace79ee83622bc8af54fab39cb5cccf6c66078916197eafc4a1b",
+            "begin": 90224,
+            "cache_budget": 0,
+            "completed": 32,
+            "denied": 31,
+            "end": 90256,
+            "endpoint_successful": true,
+            "first_completed": 90224,
+            "fixture_sha256": "c88483b9a417561a97be80f7cbe471fe4a1aea83bbcb7813713b1530d0d0095a",
+            "format": 1,
+            "last_completed": 90255,
+            "mode": "range",
+            "profile": "asan-ubsan",
+            "retried_prefixes": [
+              90255
+            ],
+            "scene_sha256": "c88483b9a417561a97be80f7cbe471fe4a1aea83bbcb7813713b1530d0d0095a",
+            "seconds": 7.305764544,
+            "stable_baseline": true,
+            "successful": 1,
+            "terminal_exit": 0,
+            "translated": 0
+          }
+        ],
+        "smoke_prefixes": 40,
+        "exit_code": 0,
+        "seconds": 45.37132000800921,
+        "inputs": 2752,
+        "drift": []
+      },
+      "status_sha256": "cc7b1605f3c6dd27a26eb88a02019808fa338db4f550c01aaf74f40746687257",
+      "before_manifest_sha256": "bed77e7ade3e006c280dae3cd93dc32887bc14ce0dde8912f37909cdfb9ac6d7"
+    }
+  },
+  "controls": "PASS 28 synthetic coverage-verifier controls (not native allocation coverage)",
+  "configured_tests": 967,
+  "configured_fault_partitions": 128,
+  "limits": "Fixed3600CTest/3500child. Each actual native range repeats3fullmeasurements andchecks exactfile/source/package/retry. Hereonly40smokepoints/profile; no fullcoverage or oldtimeout relabel.",
+  "package_route_audit": "export_glb inexport.cpp prepares physical anddispatches make_gltf_emission; make_gltf_impl calledwithnullVRM1compilation. ChangedLayer belongsseparatecompile_vrm1_authoring path. Both actual publicpackagecontractcommands pass againstcurrentcombinedcore; allotherproductionmembers identical. Parent5df90,262fullRproof remainsdistinct; SAN43091live.",
+  "remaining": "Fullpackage/keySANaggregates andremaininglargercohort admission controls; fullproduction matrix (weightsnativehead/eye,strongMirror38,UVanimation/outline/BLEND,devices/accelerators) remainsunfinished."
+}

@@ -1,3 +1,4 @@
+#include "canonical-paint-native.hpp"
 #include "dome/bake-distance.hpp"
 #include "dome/bake-recipe.hpp"
 #include "paint-overlay-packet.hpp"
@@ -617,9 +618,9 @@ void Document::publish_locked(bool force,bool checkpoint) {
     view->normal_sampling_required=view->normal_sampling_available&&(source.material_bindings->canonical_attributes||(source.painted->normal_projection()&&source.painted->normal_projection()->version==2));
     view->retain_normal_sampling=uv_retention_requested_locked();
     view->paint_sampling_available=uv_paint_retention_available_locked();
-    view->paint_sampling_required=bool(source.painted&&source.painted->paint_sampling_domain());
+    view->paint_sampling_required=detail::canonical_paint_retention_supported(source)||bool(source.painted&&source.painted->paint_sampling_domain());
     view->retain_paint_sampling=uv_paint_retention_requested_locked();
-    view->can_restore_paint_source=detail::native_paint_source_restorable(source);
+    view->can_restore_paint_source=detail::canonical_paint_source_restorable(source)||detail::native_paint_source_restorable(source);
     view->committing = uv_accept_pending_;
     view->solving = uv_solving_;
     if (view->solving) { view->can_undo = view->can_redo = false; view->valid = false; }
@@ -2452,7 +2453,7 @@ void Document::control_event_locked(VrControlEvent event) {
         ++uv_session_;
         uv_.emplace(std::shared_ptr<const Mesh>(o.painted, &o.painted->mesh()),
                     o.painted->resolution());
-        c.value[3]=o.painted->paint_sampling_domain()?2.f:(o.material_bindings&&o.material_bindings->canonical_attributes)||(o.painted->normal_projection()&&o.painted->normal_projection()->version==2)?1.f:0.f;
+        c.value[3]=(detail::canonical_paint_retention_supported(o)||o.painted->paint_sampling_domain())?2.f:(o.material_bindings&&o.material_bindings->canonical_attributes)||(o.painted->normal_projection()&&o.painted->normal_projection()->version==2)?1.f:0.f;
         c.title = "UV editor";
       } catch (...) {
         control_before_.reset();

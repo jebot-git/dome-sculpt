@@ -1,0 +1,268 @@
+{
+  "scope": "Unqualified source composition and CMake/layout metadata; NO owning product build/runtime test",
+  "parents": [
+    "9dd63f90f6062b366276b4ce8192a46892de9e81",
+    "93c1fad8192c1c487ed28d4e5f9ba65e665074e9"
+  ],
+  "parity": {
+    "parents": [
+      "9dd63f90f6062b366276b4ce8192a46892de9e81",
+      "93c1fad8192c1c487ed28d4e5f9ba65e665074e9"
+    ],
+    "merge_base": "b3b4d0067632a30121ddbcf468b719bcac7038ce",
+    "source_conflict_files": [],
+    "text_conflicts_resolved": [
+      "CMakeLists.txt",
+      "docs/HANDOFF.md"
+    ],
+    "main_only_product_files": [
+      "include/dome/document.hpp",
+      "include/dome/retopo.hpp",
+      "src/document-baking.cpp",
+      "src/document-retopo.cpp",
+      "src/document.cpp",
+      "src/render.cpp",
+      "src/retopo-authoring.cpp",
+      "src/retopo.cpp"
+    ],
+    "owning37_product_files": [
+      "include/dome/material-bindings.hpp",
+      "include/dome/mtoon.hpp",
+      "src/canonical-key-uv.hpp",
+      "src/canonical-paint-archive.cpp",
+      "src/canonical-paint-archive.hpp",
+      "src/canonical-paint-export-policy.hpp",
+      "src/canonical-paint-history.hpp",
+      "src/canonical-paint-native.cpp",
+      "src/canonical-paint-native.hpp",
+      "src/canonical-paint-prospect.cpp",
+      "src/canonical-paint-prospect.hpp",
+      "src/canonical-paint-sampling.cpp",
+      "src/canonical-paint-sampling.hpp",
+      "src/canonical-paint-uv.cpp",
+      "src/canonical-paint-uv.hpp",
+      "src/document-assets.cpp",
+      "src/document-uv-solve.cpp",
+      "src/document.cpp",
+      "src/emission-export.cpp",
+      "src/emission-export.hpp",
+      "src/emission-package.cpp",
+      "src/emission-package.hpp",
+      "src/export.cpp",
+      "src/gltf-document.hpp",
+      "src/key-archive-preflight.cpp",
+      "src/material-archive-version.hpp",
+      "src/material-bindings.cpp",
+      "src/mtoon.cpp",
+      "src/native-paint-sampling.cpp",
+      "src/normal-frame-export.hpp",
+      "src/paint-sampling-access.hpp",
+      "src/paint.cpp",
+      "src/polygon-scene-archive.hpp",
+      "src/polygon-scene.cpp",
+      "src/scene-feature-version.hpp",
+      "src/scene.cpp",
+      "src/source-paint-pairing.hpp",
+      "src/vrm-expression-scene.cpp",
+      "src/vrm1-export.cpp",
+      "src/vrm1-expression-layer.cpp",
+      "src/vrm1-normal-authority.hpp",
+      "src/vrm1-normal-export.hpp"
+    ],
+    "shared_product_auto_merge": [
+      "src/document.cpp"
+    ],
+    "all_other_provider_bodies_byte_exact": true,
+    "main_Document_Retopo_headers_and_avatar_worker_tests_exact": true,
+    "public_material_header_exact93": true,
+    "coherent_build": "required; NOT RUN",
+    "status": "source composition only"
+  },
+  "public_layout": {
+    "scope": "Compiler public-layout probe only; no product/ABI compatibility runtime qualification",
+    "entries": {
+      "main9dd": {
+        "command": [
+          "/usr/bin/c++",
+          "-O2",
+          "-DNDEBUG",
+          "-std=c++20",
+          "-I/home/blux/de-xr/dome-sculpt/include",
+          "-I/home/blux/de-xr/dome-sculpt/third_party/openbrush",
+          "/home/blux/de-xr/dome-sculpt/artifacts/owning37-main-9dd/artifacts/layout/probe.cpp",
+          "-o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/owning37-main-9dd/artifacts/layout/main9dd"
+        ],
+        "layout": "Document 6968 8\nEditorState 1896 8\nScene 72 8\nSourceMaterialBindings 1688 8\n"
+      },
+      "candidate": {
+        "command": [
+          "/usr/bin/c++",
+          "-O2",
+          "-DNDEBUG",
+          "-std=c++20",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/owning37-main-9dd/include",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/owning37-main-9dd/third_party/openbrush",
+          "/home/blux/de-xr/dome-sculpt/artifacts/owning37-main-9dd/artifacts/layout/probe.cpp",
+          "-o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/owning37-main-9dd/artifacts/layout/candidate"
+        ],
+        "layout": "Document 6968 8\nEditorState 1896 8\nScene 72 8\nSourceMaterialBindings 1704 8\n"
+      }
+    },
+    "material_owner_append_bytes": 16,
+    "requires_full_owning_rebuild": true
+  },
+  "registration": {
+    "state": "terminal",
+    "exit": 0,
+    "scope": "Registration-only verification of SAME successfully configured mergedsource; no product build/test execution",
+    "original_status": "/home/blux/de-xr/dome-sculpt/artifacts/owning37-main-9dd/artifacts/configure-only/status.json",
+    "original_failure": "Observer expected nonexistent testname ending -verify; actual registered aggregate is -faults and control is -verifier; original wrapper remainsfailed",
+    "registered_count": 948,
+    "required_present": [
+      "retopology-worker-faults",
+      "retopology-worker-reporter-recovery",
+      "retopology-worker-accepted-publication",
+      "retopology-held-admission",
+      "canonical-paint37-owner",
+      "canonical-paint37-emission-fault-plan",
+      "canonical-paint37-emission-fault-verifier",
+      "canonical-paint37-emission-faults",
+      "canonical-key-uv-authority"
+    ],
+    "physical_partitions": 128,
+    "source_input_drift": [],
+    "command": [
+      "ctest",
+      "--test-dir",
+      "/home/blux/de-xr/dome-sculpt/artifacts/owning37-main-9dd/artifacts/configure-only/release",
+      "--show-only=json-v1"
+    ],
+    "configuration": "Release; CPU; UI OFF; XR OFF; BUILD_TESTING ON"
+  },
+  "merged_changed_source_sha256": {
+    "CMakeLists.txt": "c3a15e9aca47d4a6385deda41b7a0e8f64312625f75906e66639b01d52c0a8fa",
+    "include/dome/material-bindings.hpp": "98f201ce9ed694ddcc9f9bcbeae0c337a2ae4ad868e7e14019b710e38d190c17",
+    "include/dome/mtoon.hpp": "b74495741db99eec54c3459128aacc5a7e9df7bf2e39c0fa155cca335b750122",
+    "src/canonical-key-uv.hpp": "84fc16535908cde79c85ae769e61ac148033c369c85d08ee4e5175911e4a3c34",
+    "src/canonical-paint-archive.cpp": "d2175bf14c1a224f7673388c801b98d2b31bedfbaf38aa60f325a3ef07ff8503",
+    "src/canonical-paint-archive.hpp": "9a85e9201a6f07b8ee0ff5e4e1f4c7024a8ab5af9c4003260a74ee3fab6f0f63",
+    "src/canonical-paint-export-policy.hpp": "62c70aee98b7e7a7e5c8c8ba513dedac0a548b783a83e99bc37c6207b3a6b92d",
+    "src/canonical-paint-history.hpp": "10f0714a9cb06c8eca545d6243e57d7ca7863cb41de9e482dcc639aa6c21ad93",
+    "src/canonical-paint-native.cpp": "35492f0fb48abaf48cb8b88285c73f368dd1a211ce114e023cce20fbdc0b8258",
+    "src/canonical-paint-native.hpp": "f1b6d040ffbeeba5b302f23dad94c60f3348e4871a866ba3cb9f336e3ed9c668",
+    "src/canonical-paint-prospect.cpp": "f9e625f77c03dec325a952b49f5a50fcbdd096d42df15b25e46f1620ac50ef2b",
+    "src/canonical-paint-prospect.hpp": "46a9f839b5611c9a57b59e2e01943a186652b564b2fda28007a4a8d7b25eecd1",
+    "src/canonical-paint-sampling.cpp": "4feeb4772ee9495db54abf3ccf32cc08e5efe50644f7f610949b2d8439aa949c",
+    "src/canonical-paint-sampling.hpp": "8296db12d5735bcb77beb65acf967e879299653866f1939a50ac8fd6e0b135a8",
+    "src/canonical-paint-uv.cpp": "e9f23430c6104098d2e25c41ed369fa64f44158960b265819650fb10a756a302",
+    "src/canonical-paint-uv.hpp": "0fa405444028dd1df2eb8fd7d0db854c717f8e53d99c69f6ee114286b57aede1",
+    "src/document-assets.cpp": "92e286af6fad4a1a0662c268c8dea480611e80186488bc3f6fc2f3084ed9f480",
+    "src/document-uv-solve.cpp": "f103784a7b084b2956815dbf9597424ec19da1152a33db93575fbca5eefcc16e",
+    "src/document.cpp": "fb40a2e24fa77c7347409bfabef41cd9f57fa1472e4a72f5088c8a44c27795a7",
+    "src/emission-export.cpp": "3c8630fbc88f039495c9bf1ecbc7202628f50c2ee129028f1fa9350e8f7b1690",
+    "src/emission-export.hpp": "224642750028ec1a824a7ff83a8d0fbdc72efb7a9e208cee1fb3dc8f4260d8c1",
+    "src/emission-package.cpp": "6f1daa6622f0ad7137dc040a89c8413d4f4e848bfb24e3340499103d3aafee08",
+    "src/emission-package.hpp": "9fbf5ad9f4d2cbebcc99fdb6157305c777158a7840598c08040f5567eb248034",
+    "src/export.cpp": "6760a3d80eb9e8d70a4d8b27bfaa4d669ebadf19f38aaaeec4bf96bc7e4007cc",
+    "src/gltf-document.hpp": "395029469fd2cfa0ef358e0b768f98d148625e905c290c41c7551af67bc5d6a2",
+    "src/key-archive-preflight.cpp": "1018514ef2bd489bd0afef3dd1c61bc140e372f482778cd30e576a873f8aadaf",
+    "src/material-archive-version.hpp": "aadf65beda518b2ee6e867b15e56110f2e340592b216047ab93ae7641dfce8ac",
+    "src/material-bindings.cpp": "d3fd8949be05825549bb51c09d7b3238083ed96d3c4a0338407aa0f05b5082a8",
+    "src/mtoon.cpp": "ad07e2b23899c27fc109370803c55bb83dfb6a15afe4a771bf5b16c7187184b9",
+    "src/native-paint-sampling.cpp": "90b1de2ead5982c8fb5ad596584bcdf205fac2c7a9c028df0b662fb11ccf0d2c",
+    "src/normal-frame-export.hpp": "b1c5a4215b81f63266e22042d801df6f8c57e2cf069a21cf838767c71c170b6d",
+    "src/paint-sampling-access.hpp": "89c5d3c0be13318993364a18311186caeecbb1f685c269c5a8ad3a47530037bd",
+    "src/paint.cpp": "a09bba6e8cda98405b583fec85c56c493bbfc3a2f3a0e0c4003117b480de0318",
+    "src/polygon-scene-archive.hpp": "0e8c760868b7ed6bea5d48037bef17eaa3d11b07b0399cb1b5b68520a89e0291",
+    "src/polygon-scene.cpp": "96f39838b4e4b684cf72e12b6fa355c16a875a6fb6d9ef33af2fa567614e08a3",
+    "src/scene-feature-version.hpp": "f32c5643b29a32522e3e96bb2d654d3c5e0abb48ccbc43077ec06e07c00d691f",
+    "src/scene.cpp": "9280177da9de20199f0945794941b37dc2bd53f423ac448a855dddc078aae907",
+    "src/source-paint-pairing.hpp": "886f5519a947cfc26b9e6d1509354f0c1dc39dacfda1c37aafb76aa2b32b7a64",
+    "src/vrm-expression-scene.cpp": "a936fcce4d33d039e2f7bacf53df0d5ba76b0053c71bbc5b442c242f9c7c1ee7",
+    "src/vrm1-export.cpp": "1581ec9bd5016507be4f37ed6b7cbd571bc1b8c36276e987e6d4396543fa168e",
+    "src/vrm1-expression-layer.cpp": "cabb1a3c99627e8e8b50dfedb76764a844d200d3aa2727f1c240cd11f3e62d3a",
+    "src/vrm1-normal-authority.hpp": "f8e8f6cd1bda3990ea756b856ad0aed9afa30e8bb3cf67e3a37a8fd9e9dd1cb9",
+    "src/vrm1-normal-export.hpp": "0d872a85c64fe45a5818167c0452ae49f567d8e97e1b1f6ceb9df0eaa67dd96a"
+  },
+  "historical_key_factory_closure": {
+    "original_source": "089ea32",
+    "seal_path": "/home/blux/de-xr/dome-sculpt/artifacts/canonical-key-oom-partitions-8b/artifacts/key-oom/seal-aggregate-audit.json",
+    "seal_sha256": "253b168c626c35d33051831aea6be234523a49854ecee73c5bd426667cea6cc6",
+    "four_coverage_documents_rehashed_exact_now": true,
+    "cohorts": [
+      {
+        "profile": "release",
+        "operation": "Create",
+        "coverage_path": "/home/blux/de-xr/dome-sculpt/artifacts/canonical-key-oom-partitions-8b/artifacts/key-partitions/release-Create/run-823e5c2bfbc941f9baab98e87eec1d6d/coverage.json",
+        "coverage_sha256": "cd9624cb99096024f032ba59b883daccf2682089652ade6b6a26cd86e15c6815",
+        "totals": {
+          "completed": 44144,
+          "denied": 44143,
+          "successful": 1,
+          "translated": 0
+        },
+        "baseline_counts": [
+          44143,
+          44143,
+          44143
+        ]
+      },
+      {
+        "profile": "release",
+        "operation": "Replace",
+        "coverage_path": "/home/blux/de-xr/dome-sculpt/artifacts/canonical-key-oom-partitions-8b/artifacts/key-partitions/release-Replace/run-456c44e7447e43d598c6888e41b76bbd/coverage.json",
+        "coverage_sha256": "f8eb878e1a39155db527e98469090871ffd706f752619af5689b666534b5fb18",
+        "totals": {
+          "completed": 44994,
+          "denied": 44993,
+          "successful": 1,
+          "translated": 0
+        },
+        "baseline_counts": [
+          44993,
+          44993,
+          44993
+        ]
+      },
+      {
+        "profile": "sanitize",
+        "operation": "Create",
+        "coverage_path": "/home/blux/de-xr/dome-sculpt/artifacts/canonical-key-oom-partitions-8b/artifacts/key-partitions/sanitize-Create/run-0d189050bb534e658a00b558579c546b/coverage.json",
+        "coverage_sha256": "fc7f82849ed70b1a39ea7094f95e254ae56715a10ea1bdbf7bc07ef99a69a18d",
+        "totals": {
+          "completed": 44144,
+          "denied": 44143,
+          "successful": 1,
+          "translated": 0
+        },
+        "baseline_counts": [
+          44143,
+          44143,
+          44143
+        ]
+      },
+      {
+        "profile": "sanitize",
+        "operation": "Replace",
+        "coverage_path": "/home/blux/de-xr/dome-sculpt/artifacts/canonical-key-oom-partitions-8b/artifacts/key-partitions/sanitize-Replace/run-f7915ccafb2f4591b8b81242b2594cf4/coverage.json",
+        "coverage_sha256": "3354fed5447d72f2011748d51ccd1406583162a6ea94aef54c4489db2ca85fdd",
+        "totals": {
+          "completed": 44994,
+          "denied": 44993,
+          "successful": 1,
+          "translated": 0
+        },
+        "baseline_counts": [
+          44993,
+          44993,
+          44993
+        ]
+      }
+    ],
+    "scope_limit": "Historical full fresh-calling-thread Create/Replace proof only; not a rerun on this merged tree. Old warm/terminated143 invocations remain separate."
+  },
+  "build_policy": "Fresh all-owning consumers/core/render/app/XR/support needed; no old C179 public binding ABI reuse",
+  "next": "Merge current polygon/weight/caller main admissions before freeze/build; preserve all original component scopes"
+}
