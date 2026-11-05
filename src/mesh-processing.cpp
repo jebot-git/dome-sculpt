@@ -408,9 +408,16 @@ struct SurfaceQuery::Impl {
          c = mesh.indices[triangle * 3 + 2];
     auto n = mesh.normals[a] * bary[0] + mesh.normals[b] * bary[1] +
              mesh.normals[c] * bary[2];
-    if (length(n) < 1e-12f)
-      n = cross(mesh.positions[b] - mesh.positions[a],
-                mesh.positions[c] - mesh.positions[a]);
+    if (length(n) < 1e-12f) {
+      // The triangle was validated in double precision. Its geometric normal
+      // can be much smaller than normalized(Vec3)'s fallback threshold (or
+      // underflow when squared in float), without being degenerate.
+      const auto geometric=precise_cross(difference(mesh.positions[b],mesh.positions[a]),
+                                        difference(mesh.positions[c],mesh.positions[a]));
+      const double magnitude=std::sqrt(precise_dot(geometric,geometric));
+      n={float(geometric[0]/magnitude),float(geometric[1]/magnitude),
+         float(geometric[2]/magnitude)};
+    }
     return {triangle, position, normalized(n), bary, distance};
   }
 };
