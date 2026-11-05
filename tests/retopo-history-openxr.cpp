@@ -3,6 +3,7 @@
 #include "retopo-affine.cpp"
 #undef main
 #include "dome/xr.hpp"
+#include "../src/native-fontconfig.hpp"
 #include "../third_party/desktop/bdf_font.hpp"
 #include <fstream>
 #include <cstdlib>
@@ -44,6 +45,7 @@ int main(int argc,char**argv)try{
   setenv("XR_RUNTIME_JSON",manifest.c_str(),1);setenv("DOME_XR_FIXTURE_RETOPO",mode.c_str(),1);
   const auto report=out/"runtime-report.json";setenv("DOME_XR_FIXTURE_REPORT",report.c_str(),1);
   constexpr Matrix m{-1.3,.1,0,0,.35,.8,.05,0,.1,.15,1.2,0,.15,-.1,.2,1};const auto s=source(m,true);original=s.encode();
+  desktop::NativeFontconfigRuntime fontconfig_owner;
   const auto fontconfig=bdf_fonts::export_config();setenv("FONTCONFIG_FILE",fontconfig.c_str(),1);
   const auto face=bdf_fonts::resolve("Unifont","Sans-Serif",16);
   Document d;d.appearance(face.file,face.pixels,false,0xff3399ff,255);d.replace(s.snapshot());check(d.wait_mesh(),"Genuine affine skinned/morphed/painted source is current");d.begin_retopology();ready(d);
