@@ -9,7 +9,7 @@
 #include "normal-sampling-access.hpp"
 #include "normal-frame-runtime.hpp"
 #include "paint-sampling-access.hpp"
-#include "native-paint-sampling.hpp"
+#include "native-paint-model.hpp"
 #include <new>
 #include "document-transaction.hpp"
 namespace dome {
@@ -327,8 +327,9 @@ void Document::process_uv_transfer(FileJob &job) {
     // an atlas transfer that lacks this separate normal-role interpretation.
     painted=source.painted;deformation=source.deformation;appearance=source.appearance;
   }else if(job.uv_keep_paint&&detail::native_paint_retention_supported(source)){
-    PaintSamplingLimits limits;limits.cancelled=cancelled;auto retained=detail::retain_native_paint(source,target,*map,limits);
-    painted=std::move(retained.paint);binding=detail::bind_native_paint(retained.owner,source.material_bindings);
+    PaintSamplingLimits limits;limits.cancelled=cancelled;auto retained=detail::retain_native_paint_model(source,target,*map,limits);
+    painted=std::move(retained.sampling.paint);binding=detail::bind_native_paint(retained.sampling.owner,source.material_bindings);
+    deformation=std::move(retained.deformation);appearance=source.appearance;
   }else if(job.uv_keep_paint) {
     if(!job.uv_keep_normals)throw std::invalid_argument("Retained paint lost its independent normal sampling choice");
     if(!own_corners||!polygon||!source.material_bindings||!source.material_bindings->normal_preparation||
