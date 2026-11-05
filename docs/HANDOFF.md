@@ -1,3 +1,18 @@
+## Explicit surface-heat binding admitted — 2026-11-05
+
+Main admits corrected seal6bcc91b/runtimebef5876 via9c72cc2, with exact product,
+header, test and CMake parity. Surface heat is an explicit skin-binding choice;
+Automatic0 remains the default and existing saved weights stay unchanged until
+a new request. Native R/S controls,152 ordinary FLTK checks,56 software OpenXR
+checks and current publication fault controls pass. Read SURFACE-HEAT-ADMISSION.md.
+
+The historical3496 numeric/1052 caller/381 full-long/7667 mixed proofs retain
+their original component scope. The current long measurement is377 with tail
+373..377; no new complete-long sweep is claimed. Retopology251 cases are one-shot,
+not persistent; reporter/acceptance modes are not inferred. Complex37/38/prepared
+owners, broader weights, caller-input repair, full regression/interoperability,
+physical-device and accelerator work remain required. Full goal active.
+
 ## Private opt-in mode 5 + current polygon/retopology integration — 2026-11-05
 
 This private candidate combines main `c55dc2f` (polygon + transactional

@@ -1,3 +1,14 @@
+## Explicit surface-heat binding admission — 2026-11-05
+
+Main admits exact6bcc91b/runtimebef5876 through9c72cc2: explicit SurfaceHeat5,
+Automatic0 default preserved, reference/selection controls and source/paint/morph/
+pose-preserving worker publication. Fresh current R/S native,152 ordinary FLTK,
+56 actual software OpenXR and regular373+longtail5 worker cases pass. Historical
+full solver/caller/long/mixed evidence remains separately scoped. Retopology251
+cases are one-shot; no unexecuted reporter/acceptance modes are claimed. Read
+SURFACE-HEAT-ADMISSION.md and its receipt. Complex/prepared37/38, remaining weights,
+interoperability/device/accelerator and full-goal requirements remain incomplete.
+
 ## Affine polygon and retopology admission — 2026-11-05
 
 Main admits exact qualified8750f20/runtime0567 via37c46b9: true-affine polygon
