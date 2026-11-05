@@ -6,8 +6,13 @@ This new isolated candidate composes ab37175 with qualified frame36/f2a and
 key-export7c9 (runtime97f), plus MASK/source-cutoff296 (runtime9ef). Its public
 layout includes the real native frame owner; it requires fresh whole owning
 Release and sanitizer application/core/render/support and complete consumers.
-No previously sized35 archive can qualify this source. Source37/public paint
-owner work, unsealed post-key UV/new-key and canonical-key/UV adapters are absent.
+No previously sized35 archive can qualify this source. Qualified post-key UV/new-key source1ae1b64 is now included. Source37/public
+paint owner and unsealed canonical-key/UV adapters remain absent. The bare morph
+policy refusal was measured on a genuine36 frame; the new authenticated frame
+budget route has60 policy-only Release/sanitizer checks over exact prior frame
+API support. After the new metadata/UV merge, fresh complete owning builds and
+the default whole capture/compiler tests are required; prior-sized archives do
+not qualify this combined source. Native UI continuation remains separate.
 Original ab37175 SAN92 and currentfull689 stay untouched and frozen; separate
 oldf2 continuation failures remain preserved. All original production/device/
 accelerator requirements and later controller drawers remain unfinished.
