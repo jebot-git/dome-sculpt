@@ -120,3 +120,15 @@ normal/compact and actual app-loader workflows, affine posed/colored/imported
 combinations and full native worker/queuedCancel OOM remain required. Existing
 app binaries can support a later bounded GUI cohort; further consumer links
 require root review. POLYGON-AFFINE-PHASE1.json contains exact per-profile receipts.
+
+The software followup at `docs/validation/POLYGON-AFFINE-FOLLOWUP.json` closes
+231 independent preview checks per profile (36 image pairs, max0 with unchanged
+limit1), and78 real FLTK workflow checks per profile across ordinary and compact
+native/sheared and posed corner-color/reflected projects. Apply/immediate Save,
+local and global Undo/Redo, Cancel and complete Restore are checked by real file
+worker output. The actual sanitizer application exits cleanly with leak checking.
+The standalone sanitizer consumer compiles complete production workspace/render
+TUs with function/data sections and linker GC; it does not substitute Release
+workspace output or extract production functions. Old link-cap, observer and SDK
+selection failures remain recorded. This is scoped matched incremental software
+qualification; strict hardware and root semantic integration are separate gates.
