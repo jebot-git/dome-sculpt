@@ -11,6 +11,8 @@ enum class VisibilitySeedPolicy { ComponentBand, ExactNearestRows, ExactNearestS
 struct VisibilityGeodesicResult {
   SkinWeights weights;
   size_t work=0, workspace=0, visible_seeds=0, occluded_candidates=0;
+  size_t heat_iterations=0, negative_stiffness_edges=0;
+  double heat_residual=0, partition_error=0;
 };
 namespace visibility_geodesic {
 using Budget=weight_surface::Budget;
@@ -168,11 +170,10 @@ namespace dome::detail {
 // primitive pairs only unique opposite boundary edges co-moving through every
 // current morph. It does not establish original topology/skin authority and
 // never edits raw topology, UVs, normals, paint, frame owners or source IDs.
-inline VisibilityGeodesicResult visibility_geodesic_bind_object(
+template<class Solve> inline VisibilityGeodesicResult bind_visibility_object(
     const SculptObject&object,const Skeleton&target_local_rig,
-    BindOptions options={},const std::function<bool()>&cancelled={},
-    size_t maximum_bytes=256u*1024u*1024u,
-    VisibilitySeedPolicy policy=VisibilitySeedPolicy::ComponentBand) {
+    BindOptions options,const std::function<bool()>&cancelled,
+    size_t maximum_bytes,Solve&&solve) {
   if(!object.id||!object.painted||maximum_bytes<65536||maximum_bytes>256u*1024u*1024u||
      !options.maximum_work||options.maximum_work>500'000'000||
      !options.limits.max_influences||options.limits.max_influences>32)
@@ -214,11 +215,18 @@ inline VisibilityGeodesicResult visibility_geodesic_bind_object(
   if(work.used>=options.maximum_work||expansion>options.maximum_work-work.used)
     throw std::length_error("Sewn visibility field work forecast exceeded");
   auto field_options=options;field_options.maximum_work-=work.used+expansion;
-  auto result=visibility_geodesic_bind(domain,target_local_rig,field_options,cancelled,maximum_bytes-retained.used,policy);
+  auto result=solve(domain,target_local_rig,field_options,cancelled,maximum_bytes-retained.used);
   SkinWeights raw;raw.vertices.reserve(n);
   for(auto v:raw_to_domain){work.step(options.limits.max_influences+2);raw.vertices.push_back(result.weights.vertices.at(v));}
   result.weights=std::move(raw);result.work+=work.used;
   result.workspace=std::max(preparation.used,result.workspace+retained.used);
   work.stop();return result;
+}
+inline VisibilityGeodesicResult visibility_geodesic_bind_object(
+    const SculptObject&object,const Skeleton&rig,BindOptions options={},
+    const std::function<bool()>&cancelled={},size_t maximum_bytes=256u*1024u*1024u,
+    VisibilitySeedPolicy policy=VisibilitySeedPolicy::ComponentBand) {
+  return bind_visibility_object(object,rig,options,cancelled,maximum_bytes,
+    [policy](const Mesh&m,const Skeleton&r,BindOptions o,const std::function<bool()>&c,size_t b){return visibility_geodesic_bind(m,r,o,c,b,policy);});
 }
 } // namespace dome::detail
