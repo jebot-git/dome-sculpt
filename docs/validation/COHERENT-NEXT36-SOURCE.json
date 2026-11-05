@@ -1,0 +1,74 @@
+{
+  "state": "static-source-parity-only",
+  "checks": {
+    "tests/surface-program-switch.cpp": {
+      "source": "79abe8e",
+      "sha256": "ad748c4fc4dfb7d3cbad6240d2311d30e5b0d99bfb32e56cea00638a37ba00a0",
+      "exact": true
+    },
+    "src/vrm1-expression-layer.hpp": {
+      "source": "a78fc022",
+      "sha256": "d3282fa75dcc542ce344b300a5a12b60ec7625be260ff1fe115de8247d2fe324",
+      "exact": true
+    },
+    "src/vrm1-mask-support.hpp": {
+      "source": "1231f21",
+      "sha256": "26ee86d4793bfc49aadd1fc40bdac5a009234c51898f8761626bc22254fc9195",
+      "exact": true
+    },
+    "tests/vrm1-initial-shade-authoring.cpp": {
+      "source": "a78fc022",
+      "sha256": "e80be6f951409c17a7644b06e14ef872e9f5b2bbb0b635dfccad05c17a27a890",
+      "exact": true
+    },
+    "tests/vrm1-initial-shade-faults.cpp": {
+      "source": "a78fc022",
+      "sha256": "830d0922a1483b91b95ec43cccc2d4343801e4fc6e98edaadad16f74cecbd8d1",
+      "exact": true
+    },
+    "tests/vrm1-initial-shade-render.cpp": {
+      "source": "a78fc022",
+      "sha256": "8b1ffac8d52151b5a94f61623ef8fa1affd959c5309190a2f3646f6f1a108bf6",
+      "exact": true
+    },
+    "tests/native-key-uv-menu.py": {
+      "source": "e77ba52",
+      "sha256": "803edf5f44f314f85bc5abf53ba40735e3e0e99691cfde310cb9bdcd64262e38",
+      "exact": true
+    },
+    "tests/native-key-uv-xr.py": {
+      "source": "e77ba52",
+      "sha256": "58bb394c721e40e1b91b9acce29a40b16f313833cc1b296bcc5e5294eaea44c2",
+      "exact": true
+    },
+    "tests/vrm1-painted-authoring.cpp": {
+      "source": "3065889",
+      "sha256": "7c3b5895739198e635755bda4fc7b34ce397afab5a182769ca7b6eb7efd3fed0",
+      "exact": true
+    },
+    "tests/native-paint-key-export-budget.cpp": {
+      "source": "3065889",
+      "sha256": "de1449d7b42a676cdc3887a134d5a2b2f27fb51fc2f5b394d849df4529e5c547",
+      "exact": true
+    },
+    "src/render.cpp": {
+      "source": "79abe8e plus unchanged qualified306/1ae frame metadata owner route",
+      "sha256": "8191ed37efe9959428090cc6f332055d25642998c999d337a98af94bb002dcff",
+      "scope": "New full owning36 compilation required; not byteexact to main renderer."
+    },
+    "src/vrm1-authoring.cpp": {
+      "source": "a78fc022 plus existing canonical/native owner guards",
+      "sha256": "1b74817f3681ec1e8f15cab1632bfc34d044bedbdd14d880e7a11078cc768e43"
+    },
+    "src/vrm1-export.cpp": {
+      "source": "a78fc022 plus existing canonical/native owner guards",
+      "sha256": "2a073e83e56c056086a4ea94e7624dfa62e44d1a3821b14ed54e8061565930fd"
+    },
+    "src/vrm1-expression-layer.cpp": {
+      "source": "a78fc022 plus existing canonical/native owner guards",
+      "sha256": "a3e69556e3cfbb08a1737aed8b327b1c918ebf6190de9e3c072e601a302022ff"
+    }
+  },
+  "scope": "Not runtime/ABI/whole candidate qualification. Fresh own Release ALL and own selected sanitizer follow. Actualnative36+privateLayer changes require new matching whole support; no prior-layout archives.",
+  "original_preflight_failure": "Direct renderer79 byte comparison correctly fails on existing qualified frame36 metadata include and owning proof route. Original source not changed/restarted. Corrected explicit composition proves both shader delta and original metadata route."
+}
