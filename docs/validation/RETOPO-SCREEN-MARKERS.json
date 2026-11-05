@@ -907,5 +907,38 @@
   "remaining": [
     "Rootseparately identified held-gesture caller-allocation failure before acceptance transaction; the earlier63prefixes covercompleted drafts only. Thatrepair and semanticapp integration are REQUIRED beforemainretopo admission.",
     "No hardware/physicalHMD or fullsuite claim; full authoring goal and other mesh/texture/rig/source requirements remain."
-  ]
+  ],
+  "strict_hardware_followup": {
+    "status": "qualified Releaseonly strictPCI03 graphics; no runtime/source/quality-bound changes",
+    "head_runtime": "ed5b8d4787dbacb175844d07887a06116bf7adb7",
+    "device_gate_source": "tests/retopo-marker-device.cpp",
+    "source_sha256": "9736c98298adb754c6bb43eaf195083c9b95758f56b660777229eb9c55ca21ee",
+    "entry": "Exactsamequalified whole renderer-tests.o+render.o, only forwarding glGetString observer added. All55new+alloriginal assertions unchanged. Not GPUcompute/baking/physicalHMD or freshapp proof.",
+    "actual_vendor": "Intel",
+    "actual_renderer": "Mesa Intel(R) Arc(tm) A770 Graphics (DG2)",
+    "actual_gl_version": "4.6 (Core Profile) Mesa26.2.5",
+    "context_device": "eglGetCurrentDisplay\u2192EGLDeviceEXT\u2192DRMrendernode/dev/dri/renderD129",
+    "rdev": "226:129",
+    "sysfs": "0000:03:00.0/vendor8086/device56a0/i915",
+    "open_fds": [
+      3,
+      4,
+      5,
+      6
+    ],
+    "positive_exit": 0,
+    "positive_seconds": 10.6513291230076,
+    "same_binary_software_negative_exit": 1,
+    "software_negative_seconds": 6.829047784965951,
+    "actual_negative_renderer": "llvmpipe(LLVM22.1.8,256bits)",
+    "hardware_ppm_count": 30,
+    "driver_map_audit": "/home/blux/de-xr/dome-sculpt/artifacts/retopo-marker-a852855/artifacts/marker-proof/strict-device/final-audit.json",
+    "driver_map_audit_sha256": "aa6a916b35192f5885deaf434b45549351118659af8781cfba5ad4db6b880b2b",
+    "before_input_count": 2496,
+    "drift": [],
+    "no_mutable_cache_index_as_input": true,
+    "extra_allocated_bytes": 45850624,
+    "phase_allocated_bytes": 735006720,
+    "lease": "explicitlyreleased afterfinite7491closed0"
+  }
 }

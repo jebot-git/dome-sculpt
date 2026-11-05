@@ -48,3 +48,16 @@ found an additional held-gesture caller-allocation ordering gap before accepted
 retopo handoff. The earlier 63 allocation prefixes cover completed drafts. That
 repair and its semantic application integration remain required before publishing
 retopology to main. The full authoring objective remains active.
+
+The exact Release renderer/test objects subsequently pass all unchanged marker
+and legacy assertions on observed Intel Arc A770, PCI 0000:03:00.0. The separate
+`tests/retopo-marker-device.cpp` observer forwards glGetString unchanged and
+requires the actual current EGL display's device/render node, char-device rdev,
+sysfs vendor8086/device56a0, and open FDs on renderD129. Four actual FDs, installed
+Mesa/i915 and immutable mapped-driver digests are recorded. All 30 hardware PPMs
+remain available. The **same binary** with forced llvmpipe reaches its actual
+renderer query and refuses with exit1; this is an identity negative, not an
+argument or setup failure. No pixel or source bound changes. The finite cohort
+closes0/drift[] and explicitly releases its GPU lease. No sanitizer hardware
+duplicate, compute/baking or physical-headset claim is added. The portable helper
+is a manual hardware-link seam, not a default software CTest requirement.
