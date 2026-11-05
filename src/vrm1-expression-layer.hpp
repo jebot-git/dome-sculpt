@@ -12,7 +12,7 @@ struct Vrm1ExpressionLayer {
  std::array<float,2> scale{1,1},offset{};
  // Exact native shared-role rule: zero native factors use the native fallback.
  bool forward_uv=true,shade_alias=false;std::array<float,3> shade_divisor{1,1,1};
- double maximum_color_error=0,maximum_coverage_error=0;
+ double maximum_color_error=0,maximum_coverage_error=0,maximum_shade_coefficient=1;
  size_t working_bytes=0,sample_operations=0;
 };
 Vrm1ExpressionLayer compile_vrm1_expression_layer(const nlohmann::json &original,
