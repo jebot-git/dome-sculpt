@@ -1,3 +1,22 @@
+## Release exhaustive coverage and combined material component — 2026-11-05
+
+Fullgoal active/incomplete. Release partition70713 is now CLOSED0:128partitions,
+all90,262absolute points (90,261denials+one successful endpoint), exact aggregate.
+Sanitizer43091 is still running on frozen1f9fd48; do not mutate/restart it.
+Read PHYSICAL-ALLOCATION-PARTITIONS.md/receipt. Originalf365 actual timeout stays
+separate. Palette's old key24732 is now terminal143 with unchanged2186protected
+hashes and incomplete Replace coverage, cause unestablished; its fresh-caller
+partition work is separate. Original package4 handle67604 remains live.
+
+Private Shift/Rim compositioneacfba7 passes27actualcommands/profile,1765strictArc
+checks+3software/1UHD refusal controls,737R/S exact data/PNG pairs and84containers
+0KHRerrors/684officialinstances. Only oneLayerTU, no publiclayout/shader change.
+Four full Release factory domains pass; full sanitizer60702 is live. Read
+MATERIAL-SHIFT-RIM-COMPOSITION.md/receipt; no larger/main admission yet. GPUfree.
+Mode5 actualnative136controls plusR25/S25 pass separately, currentapp/remaining
+faultstress still open. UVanimation/Mirror/newweight andfullremaining matrix,
+physicaldevices/accelerators andlater controllerdrawers remain unfinished.
+
 ## Exhaustive allocation partitions and historical schema audit — 2026-11-05
 
 The full goal remains active and incomplete. Main's production code still matches

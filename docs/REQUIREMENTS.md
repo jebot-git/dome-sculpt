@@ -106,6 +106,17 @@ finishes successfully after43,388seconds, including66,187 persistent denial
 prefixes and908 cancellation points; its closure is preserved separately.
 The full objective remains active and incomplete.
 
+## Latest qualification boundary — 2026-11-05
+
+The private physical-package Release sweep now closes all90,262points and its
+128-part aggregate0; full sanitizer43091 remains live. Originalf365 timeout is
+not relabeled. Read PHYSICAL-ALLOCATION-PARTITIONS.md. Separately, private
+Shift/Rim-MASK union eacfba7 passes27actual commands each profile,1765strictArc
+checks with actual software/UHD negatives,737byteexact R/S data/PNG pairs,
+84containers0KHRerrors and684declared official instances. Full Release factories
+pass; full sanitizer60702 remains live. Read MATERIAL-SHIFT-RIM-COMPOSITION.md.
+These do not admit the larger37 cohort to main or finish the production matrix.
+
 ## Exhaustive allocation coverage in progress — 2026-11-05
 
 Private test-only branch1f9fd48 adds deterministic partitions for the actual

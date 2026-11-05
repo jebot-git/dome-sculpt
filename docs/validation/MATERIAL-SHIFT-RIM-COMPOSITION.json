@@ -1,0 +1,2619 @@
+{
+  "recorded_utc": "2026-11-05T11:07:27.579873+00:00",
+  "source": "eacfba7a26b06550d5d6da89987dd2929065e227",
+  "base": "5a6fa080593fe0309b9caa926e86834df85720ff",
+  "scope": "Private component only, not main runtime/full application/full regression/physicaldevice/compute admission. One Layer member of164 on exact5df supports. No header/layout/schema/shader change. Full sanitizer factories are still running.",
+  "profiles": {
+    "release": {
+      "status": {
+        "state": "terminal",
+        "pid": 4016095,
+        "source": "eacfba7a26b06550d5d6da89987dd2929065e227",
+        "steps": [
+          {
+            "name": "compile-vrm1-expression-layer.cpp",
+            "command": [
+              "/usr/bin/c++",
+              "-DDOME_SCULPT_INSTALLED_ASSETS=\"/usr/local/share/dome-sculpt/assets/humanoid\"",
+              "-DDOME_SCULPT_SOURCE_ASSETS=\"/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/assets/humanoid\"",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/third_party",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/third_party/cgltf",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/third_party/nlohmann",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/third_party/xatlas",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/third_party/mikktspace",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/third_party/ufbx",
+              "-O3",
+              "-DNDEBUG",
+              "-std=gnu++20",
+              "-Wall",
+              "-Wextra",
+              "-Wpedantic",
+              "-MD",
+              "-MT",
+              "CMakeFiles/dome-sculpt-core.dir/src/vrm1-expression-layer.cpp.o",
+              "-MF",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/stage/vrm1-expression-layer.cpp.d",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/stage/vrm1-expression-layer.cpp.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/src/vrm1-expression-layer.cpp"
+            ],
+            "exit_code": 0,
+            "seconds": 6.528243473032489
+          },
+          {
+            "name": "replace-layer-member",
+            "command": [
+              "ar",
+              "r",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/stage/libdome-sculpt-core.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/stage/vrm1-expression-layer.cpp.o"
+            ],
+            "exit_code": 0,
+            "seconds": 0.11474484205245972
+          },
+          {
+            "name": "compile-vrm1-expression-layer-authoring",
+            "command": [
+              "/usr/bin/c++",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/src",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/third_party/nlohmann",
+              "-O3",
+              "-DNDEBUG",
+              "-std=gnu++20",
+              "-MD",
+              "-MT",
+              "CMakeFiles/dome-sculpt-vrm1-expression-layer-authoring-test.dir/tests/vrm1-expression-layer-authoring.cpp.o",
+              "-MF",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/stage/vrm1-expression-layer-authoring.d",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/stage/vrm1-expression-layer-authoring.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/tests/vrm1-expression-layer-authoring.cpp"
+            ],
+            "exit_code": 0,
+            "seconds": 9.382612808025442
+          },
+          {
+            "name": "link-vrm1-expression-layer-authoring",
+            "command": [
+              "/usr/bin/c++",
+              "-O3",
+              "-DNDEBUG",
+              "-Wl,--wrap=fsync",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/stage/vrm1-expression-layer-authoring.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/stage/vrm1-expression-layer-authoring",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/stage/libdome-sculpt-core.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/stage/libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/stage/libdome-sculpt-polygon.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/stage/libxatlas.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/stage/libmikktspace.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/stage/libmikktspace-robust.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/stage/libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/stage/libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit_code": 0,
+            "seconds": 0.31538200000068173
+          },
+          {
+            "name": "compile-vrm1-expression-targets-render",
+            "command": [
+              "/usr/bin/c++",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/src",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/third_party/cgltf",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/third_party/nlohmann",
+              "-isystem",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/harfbuzz",
+              "-isystem",
+              "/usr/include/glib-2.0",
+              "-isystem",
+              "/usr/lib64/glib-2.0/include",
+              "-isystem",
+              "/usr/include/sysprof-6",
+              "-isystem",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/freetype2",
+              "-isystem",
+              "/usr/include/libpng16",
+              "-isystem",
+              "/usr/include/libxml2",
+              "-O3",
+              "-DNDEBUG",
+              "-std=gnu++20",
+              "-pthread",
+              "-DWITH_GZFILEOP",
+              "-MD",
+              "-MT",
+              "CMakeFiles/dome-sculpt-vrm1-expression-targets-render-test.dir/tests/vrm1-expression-targets-render.cpp.o",
+              "-MF",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/stage/vrm1-expression-targets-render.d",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/stage/vrm1-expression-targets-render.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/tests/vrm1-expression-targets-render.cpp"
+            ],
+            "exit_code": 0,
+            "seconds": 14.893399783002678
+          },
+          {
+            "name": "link-vrm1-expression-targets-render",
+            "command": [
+              "/usr/bin/c++",
+              "-O3",
+              "-DNDEBUG",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/stage/vrm1-expression-targets-render.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/stage/vrm1-expression-targets-render",
+              "-Wl,-rpath,/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/stage/libdome-sculpt-render.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/stage/libdome-sculpt-core.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/stage/libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/stage/libdome-sculpt-polygon.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/stage/libxatlas.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/stage/libmikktspace.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/stage/libmikktspace-robust.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/stage/libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/stage/libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libharfbuzz.so",
+              "/usr/lib64/libEGL.so",
+              "/usr/lib64/libGL.so",
+              "/usr/lib64/libfontconfig.so",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libfreetype.so",
+              "/usr/lib64/libicui18n.so",
+              "/usr/lib64/libicuuc.so",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit_code": 0,
+            "seconds": 0.365527727000881
+          },
+          {
+            "name": "compile-vrm1-shift-pristine-render",
+            "command": [
+              "/usr/bin/c++",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/src",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/third_party/cgltf",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/third_party/desktop",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/third_party/nlohmann",
+              "-isystem",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/harfbuzz",
+              "-isystem",
+              "/usr/include/glib-2.0",
+              "-isystem",
+              "/usr/lib64/glib-2.0/include",
+              "-isystem",
+              "/usr/include/sysprof-6",
+              "-isystem",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/freetype2",
+              "-isystem",
+              "/usr/include/libpng16",
+              "-isystem",
+              "/usr/include/libxml2",
+              "-O3",
+              "-DNDEBUG",
+              "-std=gnu++20",
+              "-pthread",
+              "-DWITH_GZFILEOP",
+              "-MD",
+              "-MT",
+              "CMakeFiles/dome-sculpt-vrm1-normal-pristine-render-test.dir/tests/vrm1-normal-pristine-render.cpp.o",
+              "-MF",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/stage/vrm1-shift-pristine-render.d",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/stage/vrm1-shift-pristine-render.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/tests/vrm1-shift-pristine-render.cpp"
+            ],
+            "exit_code": 0,
+            "seconds": 15.093907788977958
+          },
+          {
+            "name": "link-vrm1-shift-pristine-render",
+            "command": [
+              "/usr/bin/c++",
+              "-O3",
+              "-DNDEBUG",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/stage/vrm1-shift-pristine-render.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/stage/vrm1-shift-pristine-render",
+              "-Wl,-rpath,/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/stage/libdome-sculpt-render.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/stage/libdome-sculpt-core.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/stage/libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/stage/libdome-sculpt-polygon.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/stage/libxatlas.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/stage/libmikktspace.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/stage/libmikktspace-robust.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/stage/libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/stage/libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libharfbuzz.so",
+              "/usr/lib64/libEGL.so",
+              "/usr/lib64/libGL.so",
+              "/usr/lib64/libfontconfig.so",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libfreetype.so",
+              "/usr/lib64/libicui18n.so",
+              "/usr/lib64/libicuuc.so",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit_code": 0,
+            "seconds": 0.3656496779876761
+          },
+          {
+            "name": "compile-vrm1-shift-default-pristine-render",
+            "command": [
+              "/usr/bin/c++",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/src",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/third_party/cgltf",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/third_party/desktop",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/third_party/nlohmann",
+              "-isystem",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/harfbuzz",
+              "-isystem",
+              "/usr/include/glib-2.0",
+              "-isystem",
+              "/usr/lib64/glib-2.0/include",
+              "-isystem",
+              "/usr/include/sysprof-6",
+              "-isystem",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/freetype2",
+              "-isystem",
+              "/usr/include/libpng16",
+              "-isystem",
+              "/usr/include/libxml2",
+              "-O3",
+              "-DNDEBUG",
+              "-std=gnu++20",
+              "-pthread",
+              "-DWITH_GZFILEOP",
+              "-MD",
+              "-MT",
+              "CMakeFiles/dome-sculpt-vrm1-normal-pristine-render-test.dir/tests/vrm1-normal-pristine-render.cpp.o",
+              "-MF",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/stage/vrm1-shift-default-pristine-render.d",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/stage/vrm1-shift-default-pristine-render.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/tests/vrm1-shift-default-pristine-render.cpp"
+            ],
+            "exit_code": 0,
+            "seconds": 15.495710511982907
+          },
+          {
+            "name": "link-vrm1-shift-default-pristine-render",
+            "command": [
+              "/usr/bin/c++",
+              "-O3",
+              "-DNDEBUG",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/stage/vrm1-shift-default-pristine-render.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/stage/vrm1-shift-default-pristine-render",
+              "-Wl,-rpath,/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/stage/libdome-sculpt-render.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/stage/libdome-sculpt-core.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/stage/libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/stage/libdome-sculpt-polygon.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/stage/libxatlas.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/stage/libmikktspace.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/stage/libmikktspace-robust.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/stage/libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/stage/libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libharfbuzz.so",
+              "/usr/lib64/libEGL.so",
+              "/usr/lib64/libGL.so",
+              "/usr/lib64/libfontconfig.so",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libfreetype.so",
+              "/usr/lib64/libicui18n.so",
+              "/usr/lib64/libicuuc.so",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit_code": 0,
+            "seconds": 0.3658933490514755
+          },
+          {
+            "name": "compile-vrm1-shift-faults",
+            "command": [
+              "/usr/bin/c++",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/src",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/third_party/nlohmann",
+              "-O3",
+              "-DNDEBUG",
+              "-std=gnu++20",
+              "-MD",
+              "-MT",
+              "CMakeFiles/dome-sculpt-vrm1-normal-faults-test.dir/tests/vrm1-normal-faults.cpp.o",
+              "-MF",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/stage/vrm1-shift-faults.d",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/stage/vrm1-shift-faults.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/tests/vrm1-shift-faults.cpp"
+            ],
+            "exit_code": 0,
+            "seconds": 4.874760624021292
+          },
+          {
+            "name": "link-vrm1-shift-faults",
+            "command": [
+              "/usr/bin/c++",
+              "-O3",
+              "-DNDEBUG",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/stage/vrm1-shift-faults.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/stage/vrm1-shift-faults",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/stage/libdome-sculpt-core.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/stage/libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/stage/libdome-sculpt-polygon.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/stage/libxatlas.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/stage/libmikktspace.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/stage/libmikktspace-robust.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/stage/libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/stage/libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit_code": 0,
+            "seconds": 0.21567525394493714
+          },
+          {
+            "name": "compile-vrm1-normal-authoring-workflow",
+            "command": [
+              "/usr/bin/c++",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/src",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/third_party/nlohmann",
+              "-O3",
+              "-DNDEBUG",
+              "-std=gnu++20",
+              "-MD",
+              "-MT",
+              "CMakeFiles/dome-sculpt-vrm1-normal-authoring-workflow-test.dir/tests/vrm1-normal-authoring-workflow.cpp.o",
+              "-MF",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/stage/vrm1-normal-authoring-workflow.d",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/stage/vrm1-normal-authoring-workflow.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/tests/vrm1-normal-authoring-workflow.cpp"
+            ],
+            "exit_code": 0,
+            "seconds": 7.328896750987042
+          },
+          {
+            "name": "link-vrm1-normal-authoring-workflow",
+            "command": [
+              "/usr/bin/c++",
+              "-O3",
+              "-DNDEBUG",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/stage/vrm1-normal-authoring-workflow.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/stage/vrm1-normal-authoring-workflow",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/stage/libdome-sculpt-core.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/stage/libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/stage/libdome-sculpt-polygon.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/stage/libxatlas.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/stage/libmikktspace.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/stage/libmikktspace-robust.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/stage/libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/stage/libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit_code": 0,
+            "seconds": 0.26533014402957633
+          },
+          {
+            "name": "compile-vrm1-rim-mask-authoring-workflow",
+            "command": [
+              "/usr/bin/c++",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/src",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/third_party/nlohmann",
+              "-O3",
+              "-DNDEBUG",
+              "-std=gnu++20",
+              "-MD",
+              "-MT",
+              "CMakeFiles/dome-sculpt-vrm1-normal-authoring-workflow-test.dir/tests/vrm1-normal-authoring-workflow.cpp.o",
+              "-MF",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/stage/vrm1-rim-mask-authoring-workflow.d",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/stage/vrm1-rim-mask-authoring-workflow.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/tests/vrm1-rim-mask-authoring-workflow.cpp"
+            ],
+            "exit_code": 0,
+            "seconds": 4.92542158003198
+          },
+          {
+            "name": "link-vrm1-rim-mask-authoring-workflow",
+            "command": [
+              "/usr/bin/c++",
+              "-O3",
+              "-DNDEBUG",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/stage/vrm1-rim-mask-authoring-workflow.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/stage/vrm1-rim-mask-authoring-workflow",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/stage/libdome-sculpt-core.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/stage/libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/stage/libdome-sculpt-polygon.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/stage/libxatlas.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/stage/libmikktspace.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/stage/libmikktspace-robust.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/stage/libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/stage/libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit_code": 0,
+            "seconds": 0.26568185503128916
+          },
+          {
+            "name": "compile-vrm1-mask-support-faults",
+            "command": [
+              "/usr/bin/c++",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/src",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/third_party/nlohmann",
+              "-O3",
+              "-DNDEBUG",
+              "-std=gnu++20",
+              "-MD",
+              "-MT",
+              "CMakeFiles/dome-sculpt-vrm1-mask-support-faults-test.dir/tests/vrm1-mask-support-faults.cpp.o",
+              "-MF",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/stage/vrm1-mask-support-faults.d",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/stage/vrm1-mask-support-faults.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/tests/vrm1-mask-support-faults.cpp"
+            ],
+            "exit_code": 0,
+            "seconds": 3.7723699689959176
+          },
+          {
+            "name": "link-vrm1-mask-support-faults",
+            "command": [
+              "/usr/bin/c++",
+              "-O3",
+              "-DNDEBUG",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/stage/vrm1-mask-support-faults.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/stage/vrm1-mask-support-faults",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/stage/libdome-sculpt-core.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/stage/libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/stage/libdome-sculpt-polygon.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/stage/libxatlas.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/stage/libmikktspace.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/stage/libmikktspace-robust.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/stage/libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/stage/libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit_code": 0,
+            "seconds": 0.2152757320436649
+          },
+          {
+            "name": "compile-vrm1-rim-faults",
+            "command": [
+              "/usr/bin/c++",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/src",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/third_party/nlohmann",
+              "-O3",
+              "-DNDEBUG",
+              "-std=gnu++20",
+              "-MD",
+              "-MT",
+              "CMakeFiles/dome-sculpt-vrm1-rim-faults-test.dir/tests/vrm1-rim-faults.cpp.o",
+              "-MF",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/stage/vrm1-rim-faults.d",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/stage/vrm1-rim-faults.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/tests/vrm1-rim-faults.cpp"
+            ],
+            "exit_code": 0,
+            "seconds": 3.2716680699959397
+          },
+          {
+            "name": "link-vrm1-rim-faults",
+            "command": [
+              "/usr/bin/c++",
+              "-O3",
+              "-DNDEBUG",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/stage/vrm1-rim-faults.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/stage/vrm1-rim-faults",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/stage/libdome-sculpt-core.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/stage/libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/stage/libdome-sculpt-polygon.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/stage/libxatlas.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/stage/libmikktspace.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/stage/libmikktspace-robust.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/stage/libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/stage/libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit_code": 0,
+            "seconds": 0.21575141698122025
+          },
+          {
+            "name": "compile-vrm1-normal-faults",
+            "command": [
+              "/usr/bin/c++",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/src",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/third_party/nlohmann",
+              "-O3",
+              "-DNDEBUG",
+              "-std=gnu++20",
+              "-MD",
+              "-MT",
+              "CMakeFiles/dome-sculpt-vrm1-normal-faults-test.dir/tests/vrm1-normal-faults.cpp.o",
+              "-MF",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/stage/vrm1-normal-faults.d",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/stage/vrm1-normal-faults.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/tests/vrm1-normal-faults.cpp"
+            ],
+            "exit_code": 0,
+            "seconds": 4.824468582984991
+          },
+          {
+            "name": "link-vrm1-normal-faults",
+            "command": [
+              "/usr/bin/c++",
+              "-O3",
+              "-DNDEBUG",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/stage/vrm1-normal-faults.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/stage/vrm1-normal-faults",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/stage/libdome-sculpt-core.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/stage/libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/stage/libdome-sculpt-polygon.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/stage/libxatlas.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/stage/libmikktspace.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/stage/libmikktspace-robust.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/stage/libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/stage/libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit_code": 0,
+            "seconds": 0.21659922203980386
+          },
+          {
+            "name": "worker-shift",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/stage/vrm1-expression-layer-authoring",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-preview-1853cc3/build-preview-release/vrm1-background-fixture/source.vrm",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/shift",
+              "--positive",
+              "--shift"
+            ],
+            "exit_code": 0,
+            "seconds": 1.8701171219581738
+          },
+          {
+            "name": "render-shift",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/stage/vrm1-expression-targets-render",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/shift",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/shift-images"
+            ],
+            "exit_code": 0,
+            "seconds": 4.874134864949156
+          },
+          {
+            "name": "pristine-shift",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/stage/vrm1-shift-pristine-render",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/shift",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/pristine-shift-images"
+            ],
+            "exit_code": 0,
+            "seconds": 3.5718582050176337
+          },
+          {
+            "name": "controls-shift",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/stage/vrm1-shift-faults",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/shift/nonuniform-source.dsculpt",
+              "--controls-only"
+            ],
+            "exit_code": 0,
+            "seconds": 0.31611281202640384
+          },
+          {
+            "name": "native-shift",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/stage/vrm1-normal-authoring-workflow",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/shift/nonuniform-source.dsculpt",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/native-shift"
+            ],
+            "exit_code": 0,
+            "seconds": 0.4178785560070537
+          },
+          {
+            "name": "worker-shift-invariant-uv",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/stage/vrm1-expression-layer-authoring",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-preview-1853cc3/build-preview-release/vrm1-background-fixture/source.vrm",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/shift-invariant-uv",
+              "--positive",
+              "--shift-invariant-uv"
+            ],
+            "exit_code": 0,
+            "seconds": 1.8180316009675153
+          },
+          {
+            "name": "render-shift-invariant-uv",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/stage/vrm1-expression-targets-render",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/shift-invariant-uv",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/shift-invariant-uv-images"
+            ],
+            "exit_code": 0,
+            "seconds": 5.876837338029873
+          },
+          {
+            "name": "worker-shift-mask",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/stage/vrm1-expression-layer-authoring",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-preview-1853cc3/build-preview-release/vrm1-background-fixture/source.vrm",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/shift-mask",
+              "--positive",
+              "--shift-mask"
+            ],
+            "exit_code": 0,
+            "seconds": 1.5682640500017442
+          },
+          {
+            "name": "render-shift-mask",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/stage/vrm1-expression-targets-render",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/shift-mask",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/shift-mask-images"
+            ],
+            "exit_code": 0,
+            "seconds": 4.625598511018325
+          },
+          {
+            "name": "worker-shift-mask-no-rim",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/stage/vrm1-expression-layer-authoring",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-preview-1853cc3/build-preview-release/vrm1-background-fixture/source.vrm",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/shift-mask-no-rim",
+              "--positive",
+              "--shift-mask-no-rim"
+            ],
+            "exit_code": 0,
+            "seconds": 1.618407504982315
+          },
+          {
+            "name": "render-shift-mask-no-rim",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/stage/vrm1-expression-targets-render",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/shift-mask-no-rim",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/shift-mask-no-rim-images"
+            ],
+            "exit_code": 0,
+            "seconds": 1.618920796958264
+          },
+          {
+            "name": "worker-shift-default-rim",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/stage/vrm1-expression-layer-authoring",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-preview-1853cc3/build-preview-release/vrm1-background-fixture/source.vrm",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/shift-default-rim",
+              "--positive",
+              "--shift-default-rim"
+            ],
+            "exit_code": 0,
+            "seconds": 1.8688231380074285
+          },
+          {
+            "name": "render-shift-default-rim",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/stage/vrm1-expression-targets-render",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/shift-default-rim",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/shift-default-rim-images"
+            ],
+            "exit_code": 0,
+            "seconds": 5.325996718020178
+          },
+          {
+            "name": "pristine-defaults",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/stage/vrm1-shift-default-pristine-render",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/shift-default-rim",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/pristine-default-images"
+            ],
+            "exit_code": 0,
+            "seconds": 4.025046678958461
+          },
+          {
+            "name": "worker-rim-mask",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/stage/vrm1-expression-layer-authoring",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-preview-1853cc3/build-preview-release/vrm1-background-fixture/source.vrm",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/rim-mask",
+              "--positive",
+              "--rim-mask"
+            ],
+            "exit_code": 0,
+            "seconds": 1.617940602998715
+          },
+          {
+            "name": "render-rim-mask",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/stage/vrm1-expression-targets-render",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/rim-mask",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/rim-mask-images"
+            ],
+            "exit_code": 0,
+            "seconds": 1.6176814640057273
+          },
+          {
+            "name": "controls-mask",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/stage/vrm1-mask-support-faults",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/rim-mask/nonuniform-source.dsculpt",
+              "--controls-only"
+            ],
+            "exit_code": 0,
+            "seconds": 0.3160346259828657
+          },
+          {
+            "name": "controls-rim",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/stage/vrm1-rim-faults",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/rim-mask/nonuniform-source.dsculpt",
+              "--controls-only"
+            ],
+            "exit_code": 0,
+            "seconds": 0.2171991239883937
+          },
+          {
+            "name": "native-rim-mask",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/stage/vrm1-rim-mask-authoring-workflow",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/rim-mask/nonuniform-source.dsculpt",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/native-rim-mask"
+            ],
+            "exit_code": 0,
+            "seconds": 0.3686828489881009
+          },
+          {
+            "name": "worker-normal",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/stage/vrm1-expression-layer-authoring",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-preview-1853cc3/build-preview-release/vrm1-background-fixture/source.vrm",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/normal",
+              "--positive",
+              "--normal"
+            ],
+            "exit_code": 0,
+            "seconds": 1.9694359380519018
+          },
+          {
+            "name": "render-normal",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/stage/vrm1-expression-targets-render",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/normal",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/normal-images"
+            ],
+            "exit_code": 0,
+            "seconds": 2.7212141980417073
+          },
+          {
+            "name": "controls-normal",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/stage/vrm1-normal-faults",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/normal/nonuniform-source.dsculpt",
+              "--controls-only"
+            ],
+            "exit_code": 0,
+            "seconds": 0.31772302300669253
+          },
+          {
+            "name": "guard-shift-varying-uv",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/stage/vrm1-expression-layer-authoring",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-preview-1853cc3/build-preview-release/vrm1-background-fixture/source.vrm",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/shift-varying-uv",
+              "--coupling-refusal",
+              "--shift-varying-uv"
+            ],
+            "exit_code": 0,
+            "seconds": 0.21740092698018998
+          },
+          {
+            "name": "guard-shift-zero-uv",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/stage/vrm1-expression-layer-authoring",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-preview-1853cc3/build-preview-release/vrm1-background-fixture/source.vrm",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/shift-zero-uv",
+              "--coupling-refusal",
+              "--shift-zero-uv"
+            ],
+            "exit_code": 0,
+            "seconds": 0.21612848696531728
+          },
+          {
+            "name": "guard-rim-mask-crossing",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/stage/vrm1-expression-layer-authoring",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-preview-1853cc3/build-preview-release/vrm1-background-fixture/source.vrm",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/rim-mask-crossing",
+              "--coupling-refusal",
+              "--rim-mask-crossing"
+            ],
+            "exit_code": 0,
+            "seconds": 0.36663763399701566
+          },
+          {
+            "name": "guard-normal-varying-uv",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/stage/vrm1-expression-layer-authoring",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-preview-1853cc3/build-preview-release/vrm1-background-fixture/source.vrm",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/normal-varying-uv",
+              "--coupling-refusal",
+              "--normal-varying-uv"
+            ],
+            "exit_code": 0,
+            "seconds": 0.2161125160055235
+          },
+          {
+            "name": "guard-normal-zero-uv",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/stage/vrm1-expression-layer-authoring",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-preview-1853cc3/build-preview-release/vrm1-background-fixture/source.vrm",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/normal-zero-uv",
+              "--coupling-refusal",
+              "--normal-zero-uv"
+            ],
+            "exit_code": 0,
+            "seconds": 0.2162700550397858
+          }
+        ],
+        "scope": "Combined Shift and Rim MASK one complete Layer TU over immutable matching5df11archives, complete changed consumers. No public/header/schema/shader/fullbuild or physicaldevice claim. Factory controls-only calls do not claim exhaustive prefixes.",
+        "phase": "guard-normal-zero-uv",
+        "child_pid": 4032630,
+        "changed_core_members": [
+          "vrm1-expression-layer.cpp.o"
+        ],
+        "exit_code": 0,
+        "seconds": 144.99749380600406,
+        "inputs": 2741,
+        "drift": []
+      },
+      "status_sha256": "f5be138ca600d514ca613f4684f2293cdf7991bd0ebff80a89832c7a6a0414d0",
+      "before_manifest_sha256": "fd6aa167bd4a5c9c5f828184a05ddd7a609ff698ef5e4454893b3962ac08235b",
+      "runtime_commands": 27
+    },
+    "sanitize": {
+      "status": {
+        "state": "terminal",
+        "pid": 4016094,
+        "source": "eacfba7a26b06550d5d6da89987dd2929065e227",
+        "steps": [
+          {
+            "name": "compile-vrm1-expression-layer.cpp",
+            "command": [
+              "/usr/bin/c++",
+              "-DDOME_SCULPT_INSTALLED_ASSETS=\"/usr/local/share/dome-sculpt/assets/humanoid\"",
+              "-DDOME_SCULPT_SOURCE_ASSETS=\"/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/assets/humanoid\"",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/third_party",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/third_party/cgltf",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/third_party/nlohmann",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/third_party/xatlas",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/third_party/mikktspace",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/third_party/ufbx",
+              "-O1",
+              "-g1",
+              "-DNDEBUG",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "-std=gnu++20",
+              "-Wall",
+              "-Wextra",
+              "-Wpedantic",
+              "-MD",
+              "-MT",
+              "CMakeFiles/dome-sculpt-core.dir/src/vrm1-expression-layer.cpp.o",
+              "-MF",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/stage/vrm1-expression-layer.cpp.d",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/stage/vrm1-expression-layer.cpp.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/src/vrm1-expression-layer.cpp"
+            ],
+            "exit_code": 0,
+            "seconds": 9.983214915031567
+          },
+          {
+            "name": "replace-layer-member",
+            "command": [
+              "ar",
+              "r",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/stage/libdome-sculpt-core.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/stage/vrm1-expression-layer.cpp.o"
+            ],
+            "exit_code": 0,
+            "seconds": 1.1165721470024437
+          },
+          {
+            "name": "compile-vrm1-expression-layer-authoring",
+            "command": [
+              "/usr/bin/c++",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/src",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/third_party/nlohmann",
+              "-O1",
+              "-g1",
+              "-DNDEBUG",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "-std=gnu++20",
+              "-MD",
+              "-MT",
+              "CMakeFiles/dome-sculpt-vrm1-expression-layer-authoring-test.dir/tests/vrm1-expression-layer-authoring.cpp.o",
+              "-MF",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/stage/vrm1-expression-layer-authoring.d",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/stage/vrm1-expression-layer-authoring.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/tests/vrm1-expression-layer-authoring.cpp"
+            ],
+            "exit_code": 0,
+            "seconds": 13.891065998002887
+          },
+          {
+            "name": "link-vrm1-expression-layer-authoring",
+            "command": [
+              "/usr/bin/c++",
+              "-O1",
+              "-g1",
+              "-DNDEBUG",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "-Wl,--wrap=fsync",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/stage/vrm1-expression-layer-authoring.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/stage/vrm1-expression-layer-authoring",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/stage/libdome-sculpt-core.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/stage/libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/stage/libdome-sculpt-polygon.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/stage/libxatlas.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/stage/libmikktspace.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/stage/libmikktspace-robust.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/stage/libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/stage/libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit_code": 0,
+            "seconds": 2.369208214979153
+          },
+          {
+            "name": "compile-vrm1-expression-targets-render",
+            "command": [
+              "/usr/bin/c++",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/src",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/third_party/cgltf",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/third_party/nlohmann",
+              "-isystem",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/harfbuzz",
+              "-isystem",
+              "/usr/include/glib-2.0",
+              "-isystem",
+              "/usr/lib64/glib-2.0/include",
+              "-isystem",
+              "/usr/include/sysprof-6",
+              "-isystem",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/freetype2",
+              "-isystem",
+              "/usr/include/libpng16",
+              "-isystem",
+              "/usr/include/libxml2",
+              "-O1",
+              "-g1",
+              "-DNDEBUG",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "-std=gnu++20",
+              "-pthread",
+              "-DWITH_GZFILEOP",
+              "-MD",
+              "-MT",
+              "CMakeFiles/dome-sculpt-vrm1-expression-targets-render-test.dir/tests/vrm1-expression-targets-render.cpp.o",
+              "-MF",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/stage/vrm1-expression-targets-render.d",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/stage/vrm1-expression-targets-render.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/tests/vrm1-expression-targets-render.cpp"
+            ],
+            "exit_code": 0,
+            "seconds": 25.515864721965045
+          },
+          {
+            "name": "link-vrm1-expression-targets-render",
+            "command": [
+              "/usr/bin/c++",
+              "-O1",
+              "-g1",
+              "-DNDEBUG",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/stage/vrm1-expression-targets-render.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/stage/vrm1-expression-targets-render",
+              "-Wl,-rpath,/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/stage/libdome-sculpt-render.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/stage/libdome-sculpt-core.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/stage/libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/stage/libdome-sculpt-polygon.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/stage/libxatlas.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/stage/libmikktspace.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/stage/libmikktspace-robust.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/stage/libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/stage/libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libharfbuzz.so",
+              "/usr/lib64/libEGL.so",
+              "/usr/lib64/libGL.so",
+              "/usr/lib64/libfontconfig.so",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libfreetype.so",
+              "/usr/lib64/libicui18n.so",
+              "/usr/lib64/libicuuc.so",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit_code": 0,
+            "seconds": 2.570114146976266
+          },
+          {
+            "name": "compile-vrm1-shift-pristine-render",
+            "command": [
+              "/usr/bin/c++",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/src",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/third_party/cgltf",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/third_party/desktop",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/third_party/nlohmann",
+              "-isystem",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/harfbuzz",
+              "-isystem",
+              "/usr/include/glib-2.0",
+              "-isystem",
+              "/usr/lib64/glib-2.0/include",
+              "-isystem",
+              "/usr/include/sysprof-6",
+              "-isystem",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/freetype2",
+              "-isystem",
+              "/usr/include/libpng16",
+              "-isystem",
+              "/usr/include/libxml2",
+              "-O1",
+              "-g1",
+              "-DNDEBUG",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "-std=gnu++20",
+              "-pthread",
+              "-DWITH_GZFILEOP",
+              "-MD",
+              "-MT",
+              "CMakeFiles/dome-sculpt-vrm1-normal-pristine-render-test.dir/tests/vrm1-normal-pristine-render.cpp.o",
+              "-MF",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/stage/vrm1-shift-pristine-render.d",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/stage/vrm1-shift-pristine-render.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/tests/vrm1-shift-pristine-render.cpp"
+            ],
+            "exit_code": 0,
+            "seconds": 24.112360974017065
+          },
+          {
+            "name": "link-vrm1-shift-pristine-render",
+            "command": [
+              "/usr/bin/c++",
+              "-O1",
+              "-g1",
+              "-DNDEBUG",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/stage/vrm1-shift-pristine-render.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/stage/vrm1-shift-pristine-render",
+              "-Wl,-rpath,/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/stage/libdome-sculpt-render.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/stage/libdome-sculpt-core.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/stage/libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/stage/libdome-sculpt-polygon.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/stage/libxatlas.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/stage/libmikktspace.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/stage/libmikktspace-robust.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/stage/libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/stage/libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libharfbuzz.so",
+              "/usr/lib64/libEGL.so",
+              "/usr/lib64/libGL.so",
+              "/usr/lib64/libfontconfig.so",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libfreetype.so",
+              "/usr/lib64/libicui18n.so",
+              "/usr/lib64/libicuuc.so",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit_code": 0,
+            "seconds": 2.2190314960316755
+          },
+          {
+            "name": "compile-vrm1-shift-default-pristine-render",
+            "command": [
+              "/usr/bin/c++",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/src",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/third_party/cgltf",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/third_party/desktop",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/third_party/nlohmann",
+              "-isystem",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/harfbuzz",
+              "-isystem",
+              "/usr/include/glib-2.0",
+              "-isystem",
+              "/usr/lib64/glib-2.0/include",
+              "-isystem",
+              "/usr/include/sysprof-6",
+              "-isystem",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/freetype2",
+              "-isystem",
+              "/usr/include/libpng16",
+              "-isystem",
+              "/usr/include/libxml2",
+              "-O1",
+              "-g1",
+              "-DNDEBUG",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "-std=gnu++20",
+              "-pthread",
+              "-DWITH_GZFILEOP",
+              "-MD",
+              "-MT",
+              "CMakeFiles/dome-sculpt-vrm1-normal-pristine-render-test.dir/tests/vrm1-normal-pristine-render.cpp.o",
+              "-MF",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/stage/vrm1-shift-default-pristine-render.d",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/stage/vrm1-shift-default-pristine-render.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/tests/vrm1-shift-default-pristine-render.cpp"
+            ],
+            "exit_code": 0,
+            "seconds": 24.211491043039132
+          },
+          {
+            "name": "link-vrm1-shift-default-pristine-render",
+            "command": [
+              "/usr/bin/c++",
+              "-O1",
+              "-g1",
+              "-DNDEBUG",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/stage/vrm1-shift-default-pristine-render.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/stage/vrm1-shift-default-pristine-render",
+              "-Wl,-rpath,/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/stage/libdome-sculpt-render.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/stage/libdome-sculpt-core.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/stage/libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/stage/libdome-sculpt-polygon.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/stage/libxatlas.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/stage/libmikktspace.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/stage/libmikktspace-robust.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/stage/libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/stage/libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libharfbuzz.so",
+              "/usr/lib64/libEGL.so",
+              "/usr/lib64/libGL.so",
+              "/usr/lib64/libfontconfig.so",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libfreetype.so",
+              "/usr/lib64/libicui18n.so",
+              "/usr/lib64/libicuuc.so",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit_code": 0,
+            "seconds": 2.419924216985237
+          },
+          {
+            "name": "compile-vrm1-shift-faults",
+            "command": [
+              "/usr/bin/c++",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/src",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/third_party/nlohmann",
+              "-O1",
+              "-g1",
+              "-DNDEBUG",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "-std=gnu++20",
+              "-MD",
+              "-MT",
+              "CMakeFiles/dome-sculpt-vrm1-normal-faults-test.dir/tests/vrm1-normal-faults.cpp.o",
+              "-MF",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/stage/vrm1-shift-faults.d",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/stage/vrm1-shift-faults.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/tests/vrm1-shift-faults.cpp"
+            ],
+            "exit_code": 0,
+            "seconds": 9.534353756986093
+          },
+          {
+            "name": "link-vrm1-shift-faults",
+            "command": [
+              "/usr/bin/c++",
+              "-O1",
+              "-g1",
+              "-DNDEBUG",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/stage/vrm1-shift-faults.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/stage/vrm1-shift-faults",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/stage/libdome-sculpt-core.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/stage/libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/stage/libdome-sculpt-polygon.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/stage/libxatlas.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/stage/libmikktspace.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/stage/libmikktspace-robust.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/stage/libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/stage/libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit_code": 0,
+            "seconds": 1.4177184339496307
+          },
+          {
+            "name": "compile-vrm1-normal-authoring-workflow",
+            "command": [
+              "/usr/bin/c++",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/src",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/third_party/nlohmann",
+              "-O1",
+              "-g1",
+              "-DNDEBUG",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "-std=gnu++20",
+              "-MD",
+              "-MT",
+              "CMakeFiles/dome-sculpt-vrm1-normal-authoring-workflow-test.dir/tests/vrm1-normal-authoring-workflow.cpp.o",
+              "-MF",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/stage/vrm1-normal-authoring-workflow.d",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/stage/vrm1-normal-authoring-workflow.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/tests/vrm1-normal-authoring-workflow.cpp"
+            ],
+            "exit_code": 0,
+            "seconds": 15.145689567027148
+          },
+          {
+            "name": "link-vrm1-normal-authoring-workflow",
+            "command": [
+              "/usr/bin/c++",
+              "-O1",
+              "-g1",
+              "-DNDEBUG",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/stage/vrm1-normal-authoring-workflow.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/stage/vrm1-normal-authoring-workflow",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/stage/libdome-sculpt-core.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/stage/libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/stage/libdome-sculpt-polygon.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/stage/libxatlas.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/stage/libmikktspace.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/stage/libmikktspace-robust.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/stage/libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/stage/libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit_code": 0,
+            "seconds": 2.3701897599967197
+          },
+          {
+            "name": "compile-vrm1-rim-mask-authoring-workflow",
+            "command": [
+              "/usr/bin/c++",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/src",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/third_party/nlohmann",
+              "-O1",
+              "-g1",
+              "-DNDEBUG",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "-std=gnu++20",
+              "-MD",
+              "-MT",
+              "CMakeFiles/dome-sculpt-vrm1-normal-authoring-workflow-test.dir/tests/vrm1-normal-authoring-workflow.cpp.o",
+              "-MF",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/stage/vrm1-rim-mask-authoring-workflow.d",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/stage/vrm1-rim-mask-authoring-workflow.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/tests/vrm1-rim-mask-authoring-workflow.cpp"
+            ],
+            "exit_code": 0,
+            "seconds": 7.179515536990948
+          },
+          {
+            "name": "link-vrm1-rim-mask-authoring-workflow",
+            "command": [
+              "/usr/bin/c++",
+              "-O1",
+              "-g1",
+              "-DNDEBUG",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/stage/vrm1-rim-mask-authoring-workflow.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/stage/vrm1-rim-mask-authoring-workflow",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/stage/libdome-sculpt-core.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/stage/libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/stage/libdome-sculpt-polygon.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/stage/libxatlas.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/stage/libmikktspace.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/stage/libmikktspace-robust.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/stage/libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/stage/libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit_code": 0,
+            "seconds": 5.24015241098823
+          },
+          {
+            "name": "compile-vrm1-mask-support-faults",
+            "command": [
+              "/usr/bin/c++",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/src",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/third_party/nlohmann",
+              "-O1",
+              "-g1",
+              "-DNDEBUG",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "-std=gnu++20",
+              "-MD",
+              "-MT",
+              "CMakeFiles/dome-sculpt-vrm1-mask-support-faults-test.dir/tests/vrm1-mask-support-faults.cpp.o",
+              "-MF",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/stage/vrm1-mask-support-faults.d",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/stage/vrm1-mask-support-faults.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/tests/vrm1-mask-support-faults.cpp"
+            ],
+            "exit_code": 0,
+            "seconds": 12.331862271996215
+          },
+          {
+            "name": "link-vrm1-mask-support-faults",
+            "command": [
+              "/usr/bin/c++",
+              "-O1",
+              "-g1",
+              "-DNDEBUG",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/stage/vrm1-mask-support-faults.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/stage/vrm1-mask-support-faults",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/stage/libdome-sculpt-core.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/stage/libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/stage/libdome-sculpt-polygon.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/stage/libxatlas.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/stage/libmikktspace.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/stage/libmikktspace-robust.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/stage/libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/stage/libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit_code": 0,
+            "seconds": 1.3676076109986752
+          },
+          {
+            "name": "compile-vrm1-rim-faults",
+            "command": [
+              "/usr/bin/c++",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/src",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/third_party/nlohmann",
+              "-O1",
+              "-g1",
+              "-DNDEBUG",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "-std=gnu++20",
+              "-MD",
+              "-MT",
+              "CMakeFiles/dome-sculpt-vrm1-rim-faults-test.dir/tests/vrm1-rim-faults.cpp.o",
+              "-MF",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/stage/vrm1-rim-faults.d",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/stage/vrm1-rim-faults.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/tests/vrm1-rim-faults.cpp"
+            ],
+            "exit_code": 0,
+            "seconds": 5.374650839017704
+          },
+          {
+            "name": "link-vrm1-rim-faults",
+            "command": [
+              "/usr/bin/c++",
+              "-O1",
+              "-g1",
+              "-DNDEBUG",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/stage/vrm1-rim-faults.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/stage/vrm1-rim-faults",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/stage/libdome-sculpt-core.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/stage/libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/stage/libdome-sculpt-polygon.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/stage/libxatlas.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/stage/libmikktspace.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/stage/libmikktspace-robust.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/stage/libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/stage/libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit_code": 0,
+            "seconds": 1.3675867620040663
+          },
+          {
+            "name": "compile-vrm1-normal-faults",
+            "command": [
+              "/usr/bin/c++",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/src",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/third_party/nlohmann",
+              "-O1",
+              "-g1",
+              "-DNDEBUG",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "-std=gnu++20",
+              "-MD",
+              "-MT",
+              "CMakeFiles/dome-sculpt-vrm1-normal-faults-test.dir/tests/vrm1-normal-faults.cpp.o",
+              "-MF",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/stage/vrm1-normal-faults.d",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/stage/vrm1-normal-faults.o",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/tests/vrm1-normal-faults.cpp"
+            ],
+            "exit_code": 0,
+            "seconds": 7.979910461988766
+          },
+          {
+            "name": "link-vrm1-normal-faults",
+            "command": [
+              "/usr/bin/c++",
+              "-O1",
+              "-g1",
+              "-DNDEBUG",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/stage/vrm1-normal-faults.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/stage/vrm1-normal-faults",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/stage/libdome-sculpt-core.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/stage/libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/stage/libdome-sculpt-polygon.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/stage/libxatlas.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/stage/libmikktspace.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/stage/libmikktspace-robust.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/stage/libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/stage/libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit_code": 0,
+            "seconds": 1.26720669696806
+          },
+          {
+            "name": "worker-shift",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/stage/vrm1-expression-layer-authoring",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-preview-1853cc3/build-preview-release/vrm1-background-fixture/source.vrm",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/shift",
+              "--positive",
+              "--shift"
+            ],
+            "exit_code": 0,
+            "seconds": 13.99020268197637
+          },
+          {
+            "name": "render-shift",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/stage/vrm1-expression-targets-render",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/shift",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/shift-images"
+            ],
+            "exit_code": 0,
+            "seconds": 5.425061733985785
+          },
+          {
+            "name": "pristine-shift",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/stage/vrm1-shift-pristine-render",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/shift",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/pristine-shift-images"
+            ],
+            "exit_code": 0,
+            "seconds": 1.768043610965833
+          },
+          {
+            "name": "controls-shift",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/stage/vrm1-shift-faults",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/shift/nonuniform-source.dsculpt",
+              "--controls-only"
+            ],
+            "exit_code": 0,
+            "seconds": 2.519467757025268
+          },
+          {
+            "name": "native-shift",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/stage/vrm1-normal-authoring-workflow",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/shift/nonuniform-source.dsculpt",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/native-shift"
+            ],
+            "exit_code": 0,
+            "seconds": 3.37388991197804
+          },
+          {
+            "name": "worker-shift-invariant-uv",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/stage/vrm1-expression-layer-authoring",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-preview-1853cc3/build-preview-release/vrm1-background-fixture/source.vrm",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/shift-invariant-uv",
+              "--positive",
+              "--shift-invariant-uv"
+            ],
+            "exit_code": 0,
+            "seconds": 15.244195603008848
+          },
+          {
+            "name": "render-shift-invariant-uv",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/stage/vrm1-expression-targets-render",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/shift-invariant-uv",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/shift-invariant-uv-images"
+            ],
+            "exit_code": 0,
+            "seconds": 9.29232053796295
+          },
+          {
+            "name": "worker-shift-mask",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/stage/vrm1-expression-layer-authoring",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-preview-1853cc3/build-preview-release/vrm1-background-fixture/source.vrm",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/shift-mask",
+              "--positive",
+              "--shift-mask"
+            ],
+            "exit_code": 0,
+            "seconds": 16.196047640987672
+          },
+          {
+            "name": "render-shift-mask",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/stage/vrm1-expression-targets-render",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/shift-mask",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/shift-mask-images"
+            ],
+            "exit_code": 0,
+            "seconds": 5.024101849994622
+          },
+          {
+            "name": "worker-shift-mask-no-rim",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/stage/vrm1-expression-layer-authoring",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-preview-1853cc3/build-preview-release/vrm1-background-fixture/source.vrm",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/shift-mask-no-rim",
+              "--positive",
+              "--shift-mask-no-rim"
+            ],
+            "exit_code": 0,
+            "seconds": 16.545107393001672
+          },
+          {
+            "name": "render-shift-mask-no-rim",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/stage/vrm1-expression-targets-render",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/shift-mask-no-rim",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/shift-mask-no-rim-images"
+            ],
+            "exit_code": 0,
+            "seconds": 4.925961239961907
+          },
+          {
+            "name": "worker-shift-default-rim",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/stage/vrm1-expression-layer-authoring",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-preview-1853cc3/build-preview-release/vrm1-background-fixture/source.vrm",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/shift-default-rim",
+              "--positive",
+              "--shift-default-rim"
+            ],
+            "exit_code": 0,
+            "seconds": 15.143259321979713
+          },
+          {
+            "name": "render-shift-default-rim",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/stage/vrm1-expression-targets-render",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/shift-default-rim",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/shift-default-rim-images"
+            ],
+            "exit_code": 0,
+            "seconds": 5.677613133972045
+          },
+          {
+            "name": "pristine-defaults",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/stage/vrm1-shift-default-pristine-render",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/shift-default-rim",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/pristine-default-images"
+            ],
+            "exit_code": 0,
+            "seconds": 1.9685466040391475
+          },
+          {
+            "name": "worker-rim-mask",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/stage/vrm1-expression-layer-authoring",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-preview-1853cc3/build-preview-release/vrm1-background-fixture/source.vrm",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/rim-mask",
+              "--positive",
+              "--rim-mask"
+            ],
+            "exit_code": 0,
+            "seconds": 16.1949326969916
+          },
+          {
+            "name": "render-rim-mask",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/stage/vrm1-expression-targets-render",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/rim-mask",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/rim-mask-images"
+            ],
+            "exit_code": 0,
+            "seconds": 5.026182375964709
+          },
+          {
+            "name": "controls-mask",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/stage/vrm1-mask-support-faults",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/rim-mask/nonuniform-source.dsculpt",
+              "--controls-only"
+            ],
+            "exit_code": 0,
+            "seconds": 3.8234838700154796
+          },
+          {
+            "name": "controls-rim",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/stage/vrm1-rim-faults",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/rim-mask/nonuniform-source.dsculpt",
+              "--controls-only"
+            ],
+            "exit_code": 0,
+            "seconds": 2.3193783089518547
+          },
+          {
+            "name": "native-rim-mask",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/stage/vrm1-rim-mask-authoring-workflow",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/rim-mask/nonuniform-source.dsculpt",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/native-rim-mask"
+            ],
+            "exit_code": 0,
+            "seconds": 3.220917937986087
+          },
+          {
+            "name": "worker-normal",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/stage/vrm1-expression-layer-authoring",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-preview-1853cc3/build-preview-release/vrm1-background-fixture/source.vrm",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/normal",
+              "--positive",
+              "--normal"
+            ],
+            "exit_code": 0,
+            "seconds": 15.042532591032796
+          },
+          {
+            "name": "render-normal",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/stage/vrm1-expression-targets-render",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/normal",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/normal-images"
+            ],
+            "exit_code": 0,
+            "seconds": 5.477117242000531
+          },
+          {
+            "name": "controls-normal",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/stage/vrm1-normal-faults",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/normal/nonuniform-source.dsculpt",
+              "--controls-only"
+            ],
+            "exit_code": 0,
+            "seconds": 2.620396469021216
+          },
+          {
+            "name": "guard-shift-varying-uv",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/stage/vrm1-expression-layer-authoring",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-preview-1853cc3/build-preview-release/vrm1-background-fixture/source.vrm",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/shift-varying-uv",
+              "--coupling-refusal",
+              "--shift-varying-uv"
+            ],
+            "exit_code": 0,
+            "seconds": 1.667786936974153
+          },
+          {
+            "name": "guard-shift-zero-uv",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/stage/vrm1-expression-layer-authoring",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-preview-1853cc3/build-preview-release/vrm1-background-fixture/source.vrm",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/shift-zero-uv",
+              "--coupling-refusal",
+              "--shift-zero-uv"
+            ],
+            "exit_code": 0,
+            "seconds": 1.568189392972272
+          },
+          {
+            "name": "guard-rim-mask-crossing",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/stage/vrm1-expression-layer-authoring",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-preview-1853cc3/build-preview-release/vrm1-background-fixture/source.vrm",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/rim-mask-crossing",
+              "--coupling-refusal",
+              "--rim-mask-crossing"
+            ],
+            "exit_code": 0,
+            "seconds": 1.617810086987447
+          },
+          {
+            "name": "guard-normal-varying-uv",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/stage/vrm1-expression-layer-authoring",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-preview-1853cc3/build-preview-release/vrm1-background-fixture/source.vrm",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/normal-varying-uv",
+              "--coupling-refusal",
+              "--normal-varying-uv"
+            ],
+            "exit_code": 0,
+            "seconds": 1.6178156030364335
+          },
+          {
+            "name": "guard-normal-zero-uv",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/stage/vrm1-expression-layer-authoring",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-preview-1853cc3/build-preview-release/vrm1-background-fixture/source.vrm",
+              "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/normal-zero-uv",
+              "--coupling-refusal",
+              "--normal-zero-uv"
+            ],
+            "exit_code": 0,
+            "seconds": 1.6674231920042075
+          }
+        ],
+        "scope": "Combined Shift and Rim MASK one complete Layer TU over immutable matching5df11archives, complete changed consumers. No public/header/schema/shader/fullbuild or physicaldevice claim. Factory controls-only calls do not claim exhaustive prefixes.",
+        "phase": "guard-normal-zero-uv",
+        "child_pid": 4061938,
+        "changed_core_members": [
+          "vrm1-expression-layer.cpp.o"
+        ],
+        "exit_code": 0,
+        "seconds": 363.67041492200224,
+        "inputs": 2741,
+        "drift": []
+      },
+      "status_sha256": "5f4d2adce7ca05f9fc0d3b9d1b52036c179fa7669d5d1fe32bf15d7361dfc47e",
+      "before_manifest_sha256": "0e203cf31737bfee3c7d05bf771c88e07519fce1c115f40f248aba902c258545",
+      "runtime_commands": 27
+    }
+  },
+  "hardware": {
+    "state": "terminal",
+    "pid": 4095548,
+    "steps": [
+      {
+        "name": "shift",
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/stage/vrm1-expression-targets-render",
+          "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/shift",
+          "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/hardware/shift",
+          "--hardware"
+        ],
+        "exit": 0,
+        "expected_exit": 0,
+        "seconds": 2.347786015016027,
+        "actual_drm_fds": {
+          "/dev/dri/renderD129": {
+            "sysfs_device": "/sys/devices/pci0000:00/0000:00:01.0/0000:01:00.0/0000:02:01.0/0000:03:00.0",
+            "vendor": "0x8086",
+            "device": "0x56a0"
+          }
+        }
+      },
+      {
+        "name": "shift-invariant-uv",
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/stage/vrm1-expression-targets-render",
+          "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/shift-invariant-uv",
+          "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/hardware/shift-invariant-uv",
+          "--hardware"
+        ],
+        "exit": 0,
+        "expected_exit": 0,
+        "seconds": 3.0071299219853245,
+        "actual_drm_fds": {
+          "/dev/dri/renderD129": {
+            "sysfs_device": "/sys/devices/pci0000:00/0000:00:01.0/0000:01:00.0/0000:02:01.0/0000:03:00.0",
+            "vendor": "0x8086",
+            "device": "0x56a0"
+          }
+        }
+      },
+      {
+        "name": "shift-mask",
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/stage/vrm1-expression-targets-render",
+          "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/shift-mask",
+          "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/hardware/shift-mask",
+          "--hardware"
+        ],
+        "exit": 0,
+        "expected_exit": 0,
+        "seconds": 1.9827517439844087,
+        "actual_drm_fds": {
+          "/dev/dri/renderD129": {
+            "sysfs_device": "/sys/devices/pci0000:00/0000:00:01.0/0000:01:00.0/0000:02:01.0/0000:03:00.0",
+            "vendor": "0x8086",
+            "device": "0x56a0"
+          }
+        }
+      },
+      {
+        "name": "shift-mask-no-rim",
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/stage/vrm1-expression-targets-render",
+          "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/shift-mask-no-rim",
+          "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/hardware/shift-mask-no-rim",
+          "--hardware"
+        ],
+        "exit": 0,
+        "expected_exit": 0,
+        "seconds": 2.025898341962602,
+        "actual_drm_fds": {
+          "/dev/dri/renderD129": {
+            "sysfs_device": "/sys/devices/pci0000:00/0000:00:01.0/0000:01:00.0/0000:02:01.0/0000:03:00.0",
+            "vendor": "0x8086",
+            "device": "0x56a0"
+          }
+        }
+      },
+      {
+        "name": "shift-default-rim",
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/stage/vrm1-expression-targets-render",
+          "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/shift-default-rim",
+          "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/hardware/shift-default-rim",
+          "--hardware"
+        ],
+        "exit": 0,
+        "expected_exit": 0,
+        "seconds": 2.3192948740324937,
+        "actual_drm_fds": {
+          "/dev/dri/renderD129": {
+            "sysfs_device": "/sys/devices/pci0000:00/0000:00:01.0/0000:01:00.0/0000:02:01.0/0000:03:00.0",
+            "vendor": "0x8086",
+            "device": "0x56a0"
+          }
+        }
+      },
+      {
+        "name": "rim-mask",
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/stage/vrm1-expression-targets-render",
+          "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/rim-mask",
+          "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/hardware/rim-mask",
+          "--hardware"
+        ],
+        "exit": 0,
+        "expected_exit": 0,
+        "seconds": 1.9488443289883435,
+        "actual_drm_fds": {
+          "/dev/dri/renderD129": {
+            "sysfs_device": "/sys/devices/pci0000:00/0000:00:01.0/0000:01:00.0/0000:02:01.0/0000:03:00.0",
+            "vendor": "0x8086",
+            "device": "0x56a0"
+          }
+        }
+      },
+      {
+        "name": "normal",
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/stage/vrm1-expression-targets-render",
+          "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/normal",
+          "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/hardware/normal",
+          "--hardware"
+        ],
+        "exit": 0,
+        "expected_exit": 0,
+        "seconds": 2.2641942389891483,
+        "actual_drm_fds": {
+          "/dev/dri/renderD129": {
+            "sysfs_device": "/sys/devices/pci0000:00/0000:00:01.0/0000:01:00.0/0000:02:01.0/0000:03:00.0",
+            "vendor": "0x8086",
+            "device": "0x56a0"
+          }
+        }
+      },
+      {
+        "name": "raw-shift",
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/stage/vrm1-shift-pristine-render",
+          "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/shift",
+          "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/hardware/raw-shift",
+          "--hardware"
+        ],
+        "exit": 0,
+        "expected_exit": 0,
+        "seconds": 1.4452616869821213,
+        "actual_drm_fds": {
+          "/dev/dri/renderD129": {
+            "sysfs_device": "/sys/devices/pci0000:00/0000:00:01.0/0000:01:00.0/0000:02:01.0/0000:03:00.0",
+            "vendor": "0x8086",
+            "device": "0x56a0"
+          }
+        }
+      },
+      {
+        "name": "raw-defaults",
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/stage/vrm1-shift-default-pristine-render",
+          "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/shift-default-rim",
+          "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/hardware/raw-defaults",
+          "--hardware"
+        ],
+        "exit": 0,
+        "expected_exit": 0,
+        "seconds": 1.4470892429817468,
+        "actual_drm_fds": {
+          "/dev/dri/renderD129": {
+            "sysfs_device": "/sys/devices/pci0000:00/0000:00:01.0/0000:01:00.0/0000:02:01.0/0000:03:00.0",
+            "vendor": "0x8086",
+            "device": "0x56a0"
+          }
+        }
+      },
+      {
+        "name": "shift-software-refusal",
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/stage/vrm1-expression-targets-render",
+          "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/shift",
+          "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/hardware/shift-software-refusal",
+          "--hardware"
+        ],
+        "exit": 1,
+        "expected_exit": 1,
+        "seconds": 1.1540274429717101,
+        "actual_drm_fds": {}
+      },
+      {
+        "name": "raw-shift-software-refusal",
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/stage/vrm1-shift-pristine-render",
+          "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/shift",
+          "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/hardware/raw-shift-software-refusal",
+          "--hardware"
+        ],
+        "exit": 1,
+        "expected_exit": 1,
+        "seconds": 1.2192892539897002,
+        "actual_drm_fds": {}
+      },
+      {
+        "name": "raw-defaults-software-refusal",
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/stage/vrm1-shift-default-pristine-render",
+          "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/shift-default-rim",
+          "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/hardware/raw-defaults-software-refusal",
+          "--hardware"
+        ],
+        "exit": 1,
+        "expected_exit": 1,
+        "seconds": 1.1970706909778528,
+        "actual_drm_fds": {}
+      },
+      {
+        "name": "actual-uhd-refusal",
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/stage/vrm1-expression-targets-render",
+          "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/shift",
+          "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/hardware/actual-uhd-refusal",
+          "--hardware"
+        ],
+        "exit": 1,
+        "expected_exit": 1,
+        "seconds": 1.1933425969909877,
+        "actual_drm_fds": {
+          "/dev/dri/renderD129": {
+            "sysfs_device": "/sys/devices/pci0000:00/0000:00:01.0/0000:01:00.0/0000:02:01.0/0000:03:00.0",
+            "vendor": "0x8086",
+            "device": "0x56a0"
+          },
+          "/dev/dri/renderD128": {
+            "sysfs_device": "/sys/devices/pci0000:00/0000:00:02.0",
+            "vendor": "0x8086",
+            "device": "0x4680"
+          }
+        }
+      }
+    ],
+    "scope": "Combined Shift/RimMASK/Normal same final Release GL/skin/morph/source/paint image proof only. Strict actually observed PCI03/IntelArcA770, three unique-binary software refusals and one actualUHD refusal. No compute/HMD/app/UI/newbuild claim.",
+    "child_pid": 4098066,
+    "exit": 0,
+    "seconds": 24.07103658997221,
+    "inputs": 2918,
+    "drift": []
+  },
+  "hardware_status_sha256": "60daeb7fa5ffeb88d75c5bda0d6bb24a16b3685a2d656d126895c84edfb5efe6",
+  "hardware_checks": 1765,
+  "cross_profile_data_png_pairs": 737,
+  "cross_profile_receipt_sha256": "eaf0169e341f5c6b385cf1184c47c56b1d1bd5928b8a77182948fd18464e71f9",
+  "standards": {
+    "status": {
+      "state": "terminal",
+      "pid": 4107983,
+      "steps": [
+        {
+          "name": "khronos",
+          "command": [
+            "node",
+            "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/standards/validate.cjs",
+            "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/standards/selection.json"
+          ],
+          "exit_code": 0,
+          "seconds": 1.0025721130077727
+        },
+        {
+          "name": "official",
+          "command": [
+            "/home/blux/.local/bin/uv",
+            "run",
+            "--offline",
+            "--with",
+            "jsonschema==4.26.0",
+            "python",
+            "/home/blux/de-xr/dome-sculpt/tests/vrm-official-texture-schemas.py",
+            "--spec",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-integration-69ca191/artifacts/spec/specification",
+            "--vrm0-spec",
+            "/home/blux/de-xr/dome-sculpt/artifacts/prepared-shapes-vrm-schema",
+            "--output",
+            "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/standards/official.json",
+            "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/native-rim-mask/applied.vrm",
+            "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/native-shift/applied.vrm",
+            "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/normal/dynamic-1024.vrm",
+            "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/normal/dynamic-512.vrm",
+            "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/normal/dynamic-second.vrm",
+            "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/normal/dynamic.vrm",
+            "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/normal/source-normal.vrm",
+            "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/normal-varying-uv/source-normal-varying-uv.vrm",
+            "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/normal-zero-uv/source-normal-zero-uv.vrm",
+            "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/rim-mask/dynamic-1024.vrm",
+            "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/rim-mask/dynamic-512.vrm",
+            "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/rim-mask/dynamic-second.vrm",
+            "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/rim-mask/dynamic.vrm",
+            "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/rim-mask/source-rim-mask.vrm",
+            "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/rim-mask-crossing/source-rim-mask-crossing.vrm",
+            "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/shift/dynamic-1024.vrm",
+            "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/shift/dynamic-512.vrm",
+            "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/shift/dynamic-second.vrm",
+            "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/shift/dynamic.vrm",
+            "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/shift/source-shift.vrm",
+            "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/shift-default-rim/dynamic-1024.vrm",
+            "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/shift-default-rim/dynamic-512.vrm",
+            "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/shift-default-rim/dynamic-second.vrm",
+            "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/shift-default-rim/dynamic.vrm",
+            "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/shift-default-rim/source-shift-default-rim.vrm",
+            "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/shift-invariant-uv/dynamic-1024.vrm",
+            "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/shift-invariant-uv/dynamic-512.vrm",
+            "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/shift-invariant-uv/dynamic-second.vrm",
+            "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/shift-invariant-uv/dynamic.vrm",
+            "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/shift-invariant-uv/source-shift-invariant-uv.vrm",
+            "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/shift-mask/dynamic-1024.vrm",
+            "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/shift-mask/dynamic-512.vrm",
+            "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/shift-mask/dynamic-second.vrm",
+            "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/shift-mask/dynamic.vrm",
+            "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/shift-mask/source-shift-mask.vrm",
+            "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/shift-mask-no-rim/dynamic-1024.vrm",
+            "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/shift-mask-no-rim/dynamic-512.vrm",
+            "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/shift-mask-no-rim/dynamic-second.vrm",
+            "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/shift-mask-no-rim/dynamic.vrm",
+            "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/shift-mask-no-rim/source-shift-mask-no-rim.vrm",
+            "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/shift-varying-uv/source-shift-varying-uv.vrm",
+            "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/shift-zero-uv/source-shift-zero-uv.vrm",
+            "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/native-rim-mask/applied.vrm",
+            "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/native-shift/applied.vrm",
+            "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/normal/dynamic-1024.vrm",
+            "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/normal/dynamic-512.vrm",
+            "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/normal/dynamic-second.vrm",
+            "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/normal/dynamic.vrm",
+            "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/normal/source-normal.vrm",
+            "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/normal-varying-uv/source-normal-varying-uv.vrm",
+            "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/normal-zero-uv/source-normal-zero-uv.vrm",
+            "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/rim-mask/dynamic-1024.vrm",
+            "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/rim-mask/dynamic-512.vrm",
+            "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/rim-mask/dynamic-second.vrm",
+            "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/rim-mask/dynamic.vrm",
+            "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/rim-mask/source-rim-mask.vrm",
+            "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/rim-mask-crossing/source-rim-mask-crossing.vrm",
+            "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/shift/dynamic-1024.vrm",
+            "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/shift/dynamic-512.vrm",
+            "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/shift/dynamic-second.vrm",
+            "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/shift/dynamic.vrm",
+            "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/shift/source-shift.vrm",
+            "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/shift-default-rim/dynamic-1024.vrm",
+            "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/shift-default-rim/dynamic-512.vrm",
+            "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/shift-default-rim/dynamic-second.vrm",
+            "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/shift-default-rim/dynamic.vrm",
+            "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/shift-default-rim/source-shift-default-rim.vrm",
+            "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/shift-invariant-uv/dynamic-1024.vrm",
+            "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/shift-invariant-uv/dynamic-512.vrm",
+            "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/shift-invariant-uv/dynamic-second.vrm",
+            "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/shift-invariant-uv/dynamic.vrm",
+            "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/shift-invariant-uv/source-shift-invariant-uv.vrm",
+            "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/shift-mask/dynamic-1024.vrm",
+            "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/shift-mask/dynamic-512.vrm",
+            "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/shift-mask/dynamic-second.vrm",
+            "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/shift-mask/dynamic.vrm",
+            "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/shift-mask/source-shift-mask.vrm",
+            "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/shift-mask-no-rim/dynamic-1024.vrm",
+            "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/shift-mask-no-rim/dynamic-512.vrm",
+            "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/shift-mask-no-rim/dynamic-second.vrm",
+            "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/shift-mask-no-rim/dynamic.vrm",
+            "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/shift-mask-no-rim/source-shift-mask-no-rim.vrm",
+            "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/shift-varying-uv/source-shift-varying-uv.vrm",
+            "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/shift-zero-uv/source-shift-zero-uv.vrm"
+          ],
+          "exit_code": 0,
+          "seconds": 1.2506275000050664
+        }
+      ],
+      "files": 84,
+      "excluded": [
+        {
+          "file": "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/normal/dynamic-waiting.vrm",
+          "sha256": "a2cf683f0f0428b7255d230ceb890fdee9edcee61a0f1ece103a132f00c4e0f0",
+          "reason": "Actual prior-output sentinel from deliberate guarded worker, not an emitted glTF container"
+        },
+        {
+          "file": "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/normal-varying-uv/dynamic.vrm",
+          "sha256": "db36251b3c135816ae9671421f0013791db8790de3cf74d2982da66e5293ed60",
+          "reason": "Actual prior-output sentinel from deliberate guarded worker, not an emitted glTF container"
+        },
+        {
+          "file": "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/normal-zero-uv/dynamic.vrm",
+          "sha256": "db36251b3c135816ae9671421f0013791db8790de3cf74d2982da66e5293ed60",
+          "reason": "Actual prior-output sentinel from deliberate guarded worker, not an emitted glTF container"
+        },
+        {
+          "file": "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/rim-mask/dynamic-waiting.vrm",
+          "sha256": "a2cf683f0f0428b7255d230ceb890fdee9edcee61a0f1ece103a132f00c4e0f0",
+          "reason": "Actual prior-output sentinel from deliberate guarded worker, not an emitted glTF container"
+        },
+        {
+          "file": "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/rim-mask-crossing/dynamic.vrm",
+          "sha256": "db36251b3c135816ae9671421f0013791db8790de3cf74d2982da66e5293ed60",
+          "reason": "Actual prior-output sentinel from deliberate guarded worker, not an emitted glTF container"
+        },
+        {
+          "file": "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/shift/dynamic-waiting.vrm",
+          "sha256": "a2cf683f0f0428b7255d230ceb890fdee9edcee61a0f1ece103a132f00c4e0f0",
+          "reason": "Actual prior-output sentinel from deliberate guarded worker, not an emitted glTF container"
+        },
+        {
+          "file": "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/shift-default-rim/dynamic-waiting.vrm",
+          "sha256": "a2cf683f0f0428b7255d230ceb890fdee9edcee61a0f1ece103a132f00c4e0f0",
+          "reason": "Actual prior-output sentinel from deliberate guarded worker, not an emitted glTF container"
+        },
+        {
+          "file": "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/shift-invariant-uv/dynamic-waiting.vrm",
+          "sha256": "a2cf683f0f0428b7255d230ceb890fdee9edcee61a0f1ece103a132f00c4e0f0",
+          "reason": "Actual prior-output sentinel from deliberate guarded worker, not an emitted glTF container"
+        },
+        {
+          "file": "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/shift-mask/dynamic-waiting.vrm",
+          "sha256": "a2cf683f0f0428b7255d230ceb890fdee9edcee61a0f1ece103a132f00c4e0f0",
+          "reason": "Actual prior-output sentinel from deliberate guarded worker, not an emitted glTF container"
+        },
+        {
+          "file": "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/shift-mask-no-rim/dynamic-waiting.vrm",
+          "sha256": "a2cf683f0f0428b7255d230ceb890fdee9edcee61a0f1ece103a132f00c4e0f0",
+          "reason": "Actual prior-output sentinel from deliberate guarded worker, not an emitted glTF container"
+        },
+        {
+          "file": "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/shift-varying-uv/dynamic.vrm",
+          "sha256": "db36251b3c135816ae9671421f0013791db8790de3cf74d2982da66e5293ed60",
+          "reason": "Actual prior-output sentinel from deliberate guarded worker, not an emitted glTF container"
+        },
+        {
+          "file": "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/shift-zero-uv/dynamic.vrm",
+          "sha256": "db36251b3c135816ae9671421f0013791db8790de3cf74d2982da66e5293ed60",
+          "reason": "Actual prior-output sentinel from deliberate guarded worker, not an emitted glTF container"
+        },
+        {
+          "file": "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/normal/dynamic-waiting.vrm",
+          "sha256": "a2cf683f0f0428b7255d230ceb890fdee9edcee61a0f1ece103a132f00c4e0f0",
+          "reason": "Actual prior-output sentinel from deliberate guarded worker, not an emitted glTF container"
+        },
+        {
+          "file": "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/normal-varying-uv/dynamic.vrm",
+          "sha256": "db36251b3c135816ae9671421f0013791db8790de3cf74d2982da66e5293ed60",
+          "reason": "Actual prior-output sentinel from deliberate guarded worker, not an emitted glTF container"
+        },
+        {
+          "file": "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/normal-zero-uv/dynamic.vrm",
+          "sha256": "db36251b3c135816ae9671421f0013791db8790de3cf74d2982da66e5293ed60",
+          "reason": "Actual prior-output sentinel from deliberate guarded worker, not an emitted glTF container"
+        },
+        {
+          "file": "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/rim-mask/dynamic-waiting.vrm",
+          "sha256": "a2cf683f0f0428b7255d230ceb890fdee9edcee61a0f1ece103a132f00c4e0f0",
+          "reason": "Actual prior-output sentinel from deliberate guarded worker, not an emitted glTF container"
+        },
+        {
+          "file": "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/rim-mask-crossing/dynamic.vrm",
+          "sha256": "db36251b3c135816ae9671421f0013791db8790de3cf74d2982da66e5293ed60",
+          "reason": "Actual prior-output sentinel from deliberate guarded worker, not an emitted glTF container"
+        },
+        {
+          "file": "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/shift/dynamic-waiting.vrm",
+          "sha256": "a2cf683f0f0428b7255d230ceb890fdee9edcee61a0f1ece103a132f00c4e0f0",
+          "reason": "Actual prior-output sentinel from deliberate guarded worker, not an emitted glTF container"
+        },
+        {
+          "file": "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/shift-default-rim/dynamic-waiting.vrm",
+          "sha256": "a2cf683f0f0428b7255d230ceb890fdee9edcee61a0f1ece103a132f00c4e0f0",
+          "reason": "Actual prior-output sentinel from deliberate guarded worker, not an emitted glTF container"
+        },
+        {
+          "file": "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/shift-invariant-uv/dynamic-waiting.vrm",
+          "sha256": "a2cf683f0f0428b7255d230ceb890fdee9edcee61a0f1ece103a132f00c4e0f0",
+          "reason": "Actual prior-output sentinel from deliberate guarded worker, not an emitted glTF container"
+        },
+        {
+          "file": "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/shift-mask/dynamic-waiting.vrm",
+          "sha256": "a2cf683f0f0428b7255d230ceb890fdee9edcee61a0f1ece103a132f00c4e0f0",
+          "reason": "Actual prior-output sentinel from deliberate guarded worker, not an emitted glTF container"
+        },
+        {
+          "file": "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/shift-mask-no-rim/dynamic-waiting.vrm",
+          "sha256": "a2cf683f0f0428b7255d230ceb890fdee9edcee61a0f1ece103a132f00c4e0f0",
+          "reason": "Actual prior-output sentinel from deliberate guarded worker, not an emitted glTF container"
+        },
+        {
+          "file": "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/shift-varying-uv/dynamic.vrm",
+          "sha256": "db36251b3c135816ae9671421f0013791db8790de3cf74d2982da66e5293ed60",
+          "reason": "Actual prior-output sentinel from deliberate guarded worker, not an emitted glTF container"
+        },
+        {
+          "file": "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/sanitize/shift-zero-uv/dynamic.vrm",
+          "sha256": "db36251b3c135816ae9671421f0013791db8790de3cf74d2982da66e5293ed60",
+          "reason": "Actual prior-output sentinel from deliberate guarded worker, not an emitted glTF container"
+        }
+      ],
+      "child_pid": 4108098,
+      "exit_code": 0,
+      "seconds": 2.2544946509879082,
+      "inputs": 174,
+      "drift": []
+    },
+    "khronos": {
+      "numErrors": 0,
+      "numWarnings": 466,
+      "numInfos": 1424,
+      "numHints": 288
+    },
+    "files": 84,
+    "official_instances": 684,
+    "resolver_controls": [
+      {
+        "source_file": "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/native-rim-mask/applied.vrm",
+        "role": "matcapTexture",
+        "control": "Actual missing texture index rejects through pinned core2020 textureInfo siblings"
+      },
+      {
+        "source_file": "/home/blux/de-xr/dome-sculpt/artifacts/material-shift-rim-5a6/artifacts/combined-proof/release/native-rim-mask/applied.vrm",
+        "role": "matcapTexture",
+        "control": "Actual texture coordinate wrong type rejects through pinned core2020 schema"
+      }
+    ],
+    "khronos_report_sha256": "9dfce6327b1044ad3e269aaca8bdce274eb6c540bd28fd50d1500c941f51bb73",
+    "official_report_sha256": "b24bee5a65caacf5494cafd988d0b8d972a1ed0d5ba85bb705b78e05735e6d28"
+  },
+  "configured_tests": 837,
+  "full_factories": "Handle60702 live, Release4domains0; sanitizer still running; no completed full sanitizer claim",
+  "preserved_originals": "Original c9 zeroRim MASK guard remains separate; genuine case29 now positive with independent source/native/export images under combined membership proof. No old negative relabel.",
+  "remaining": "Full SANfactory closure, eventual wider owning37 admission/currentapp validation, UVanimation/generalBLEND/outline/remainingMirror/weight/production requirements."
+}
