@@ -13,10 +13,9 @@ void ready(Document &d){if(!d.wait_asset()||!d.wait_mesh()||!d.frame().state->er
 int main(int argc,char **argv)try{
  if(argc!=2)return 2;auto raw=Scene::load(argv[1]);auto &source=raw.active();
  const auto old=source.painted;require(old&&old->baked()&&!old->has_physical_emission()&&!source.material_bindings,"Quota source is actual native baked canonical data");
- for(const auto &l:old->layers())require(l.tiles.empty()&&l.pbr_tiles.empty()&&l.emission_tiles.empty(),"No existing editable data may be discarded when adding unused native vertices");
  auto mesh=old->mesh();const auto p=mesh.positions.front(),n=mesh.normals.front();const auto uv=mesh.uv.front();
  mesh.positions.resize(15625,p);mesh.normals.resize(15625,n);mesh.uv.resize(15625,uv);
- source.painted=std::make_shared<PaintedMesh>(mesh,old->resolution());source.painted->install_bake(*old->baked());
+ source.painted=old->reparameterize(mesh);require(source.painted->baked()==old->baked()&&source.painted->layers().size()==old->layers().size(),"Actual identity-UV transfer preserves original baked and editable data");for(size_t i=0;i<old->layers().size();++i){const auto &a=old->layers()[i],&b=source.painted->layers()[i];require(a.tiles==b.tiles&&a.pbr_tiles==b.pbr_tiles&&a.emission_tiles==b.emission_tiles&&a.opacity==b.opacity&&a.visible==b.visible,"Every actual legacy channel and layer metadata survives unused-vertex extension exactly");}
  auto model=DeformationState(mesh);model.morphs=MorphSet(mesh);
  for(size_t slot=0;slot<128;++slot){MorphTarget t;t.name="actual-zero-"+std::to_string(slot);t.delta.resize(mesh.positions.size());model.morphs->targets.push_back(std::move(t));}
  model.validate(mesh);raw.set_deformation(source.id,std::move(model));raw.validate();
