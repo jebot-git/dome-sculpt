@@ -6,11 +6,12 @@
 #include <map>
 #include <memory>
 namespace dome {
-namespace detail {class PaintOverlayPacket;struct PaintOverlayFactory;struct EmissionExportAccess;class BakedNormalField;struct NativeWeightPaintAccess;}
+namespace detail {class PaintOverlayPacket;struct PaintOverlayFactory;struct EmissionExportAccess;class BakedNormalField;struct NativeWeightPaintAccess;struct TextureSetPaintAccess;}
 struct Material;
 class PaintProjection;
 class PaintSamplingDomain;
 class PaintSamplingAttachment;
+class TextureSetFaceDomain;
 class PaintSamplingArchive;
 struct SourcePaintDecodeContext;
 struct PaintSourceMaps;
@@ -244,6 +245,7 @@ private:
   friend struct detail::PaintOverlayFactory;
   friend struct detail::EmissionExportAccess;
   friend struct detail::NativeWeightPaintAccess;
+  friend struct detail::TextureSetPaintAccess;
   friend struct PolygonPaintAccess;
   friend struct SourceNormalPreparationAccess;
   friend struct SourcePaintSamplingAccess;
@@ -264,6 +266,8 @@ private:
   std::shared_ptr<CompositeCache> composite_cache_;
   uint64_t composite_token_ = 0, before_composite_token_ = 0;
   std::shared_ptr<const SurfaceMap> surface_;
+  // Independent writable membership; geometry/raster can be shared by sets.
+  std::shared_ptr<const TextureSetFaceDomain> texture_set_domain_;
   std::shared_ptr<const PaintSamplingAttachment> sampling_attachment_;
   std::shared_ptr<const PaintSourceMaps> source_maps_;
   std::shared_ptr<const PaintColorProjection> color_projection_;

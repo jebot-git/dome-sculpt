@@ -1,3 +1,4 @@
+#include "dome/texture-sets.hpp"
 #include "color-bound-memo.hpp"
 #include "emission-paint-access.hpp"
 // SPDX-License-Identifier: GPL-3.0-or-later
@@ -135,6 +136,7 @@ uint64_t Scene::duplicate(uint64_t id) {
   source.name=text::utf8_prefix(source.name,240)+" copy";
   source.volume=std::make_shared<Volume>(source.volume->geometry_snapshot());
   if(source.painted)source.painted=source.painted->snapshot();
+  if(source.texture_sets)source.texture_sets=source.texture_sets->snapshot();
   source.id=next_;
   objects_.push_back(std::move(source));
   active_=next_++;return active_;
@@ -174,6 +176,7 @@ Scene Scene::snapshot() const {
     o.volume = std::make_shared<Volume>(o.volume->geometry_snapshot());
     if (o.painted)
       o.painted = o.painted->snapshot();
+    if(o.texture_sets)o.texture_sets=o.texture_sets->snapshot();
   }
   return result;
 }
@@ -295,6 +298,7 @@ void Scene::validate(bool deep_sources) const {
       throw std::invalid_argument(
           "Invalid scene object identity or unfinished stroke");
     name_valid(o.name);
+    if(o.texture_sets)o.texture_sets->validate(o,deep_sources);
     detail::require_polygon_paint_owner(o.painted.get(),o.polygon.get(),o.mesh_active);
     if(o.shape_source)polygons.add_origin(o.shape_source,deep_sources);
     if(o.rig_source)polygons.add_rig_origin(o.rig_source,deep_sources);
@@ -1213,6 +1217,7 @@ std::vector<ObjectSurface> Scene::preview_surfaces(const std::function<bool()> &
   return surfaces_impl(false, true, cancelled, mesher);
 }
 std::vector<ObjectSurface> Scene::surfaces_impl(bool atlas, bool preview, const std::function<bool()> &cancelled, const SculptMesher &mesher) const {
+  for(const auto &o:objects_)if(o.texture_sets)throw std::logic_error("Texture-set surfaces require their owning subset render/export adapter");
   std::vector<ObjectSurface> result;
   for (auto &o : objects_)
     if (o.visible) {

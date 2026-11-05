@@ -89,7 +89,7 @@ add_library(dome-sculpt-core src/source-rest-graph.cpp src/source-rest-plan.cpp 
   src/key-mirror-relative.cpp ${compute_source})
 target_include_directories(dome-sculpt-core PRIVATE third_party)
 target_include_directories(dome-sculpt-core PUBLIC include third_party/openbrush)
-target_sources(dome-sculpt-core PRIVATE src/retopo-authoring.cpp src/document-retopo.cpp src/document-sculpt.cpp src/document-native.cpp src/document-contact.cpp src/document-transaction.cpp)
+target_sources(dome-sculpt-core PRIVATE src/retopo-authoring.cpp src/document-retopo.cpp src/document-sculpt.cpp src/document-native.cpp src/document-contact.cpp src/document-transaction.cpp src/texture-sets.cpp)
 target_sources(dome-sculpt-core PRIVATE src/cut-authoring.cpp src/cut-color.cpp src/document-cut.cpp src/document-worker-errors.cpp)
 target_sources(dome-sculpt-core PRIVATE src/object-selection.cpp)
 target_sources(dome-sculpt-core PRIVATE src/source-sampling-transport.cpp)

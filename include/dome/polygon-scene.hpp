@@ -39,6 +39,8 @@ struct PolygonOrigin {
   std::shared_ptr<const PolygonOrigin> shape_source{};
   std::shared_ptr<const PolygonOrigin> rig_source{};
   std::shared_ptr<const ObjectBakeRecipe> bake_recipe{};
+  // Scene40/polygon_sources8 complete original material-slot state.
+  std::shared_ptr<const TextureSetCollection> texture_sets{};
 };
 // Compare the active painted REST derivative only. Posed preview positions and
 // unrelated source attributes must not replace the editable topology authority.

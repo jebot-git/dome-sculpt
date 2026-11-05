@@ -15,6 +15,7 @@ struct RetopoPatch;
 struct PolygonAuthority;
 struct PolygonOrigin;
 struct ObjectBakeRecipe;
+class TextureSetCollection;
 struct Material {
   std::string name = "Clay";
   std::array<float, 4> color{.58f, .30f, .15f, 1};
@@ -48,6 +49,8 @@ struct SculptObject {
   // Scene25 complete first source before rig/rest authoring.
   std::shared_ptr<const PolygonOrigin> rig_source{};
   std::shared_ptr<const ObjectBakeRecipe> bake_recipe{};
+  // Scene40: persistent material-slot paint resources on this one mesh.
+  std::shared_ptr<const TextureSetCollection> texture_sets{};
 };
 bool source_is_dormant(const SculptObject &);
 class PaintSamplingAttachment;
