@@ -27,6 +27,34 @@ optimized ALL and selected owning SAN qualification must use this actual combine
 source. A component pass does not qualify the whole candidate or complete the
 original/additional goal. Controller drawers remain required after basic targets.
 
+## Private native writable-paint UV after skin binding — 2026-11-05
+
+A paired factory now transports actual REST-indexed pure skin/pose/IBM together
+with native32 writable paint and immutable first-source capsules. R/S72 new and
+legacy74 controls pass each; real worker332 each covers all157 SMALL helper C++
+allocation prefixes, Cancel/stale/dependent Save and exact retry/oneUndo. Exact
+local affine/space/rest/IBM and posed-corner POS/N preserved. Only two product TUs
+changed; new private header adds no existing record/public layout or schema/cap
+change. Read NATIVE-PAINT-RIG-UV.md and receipt for matching current44 component
+scope and preserved fixture-link/local-Undo negatives. No freshALL/UI/GPU/main
+claim. Genuine native32 key/frame composition and reverse-source row adapters,
+full current visual/export/UI and broader domains remain required; goal incomplete.
+
+
+## Private ordinary rig Restore after authoring — 2026-11-05
+
+Ordinary bind/rebind now stages its complete first source and verifies current
+normal/morph authority without changing paint/UV/frame owners. Self-contained
+R/S164 workflow +1424 actual worker checks pass each, including all203+261 SMALL
+helper allocation prefixes, actual Cancel/stale/accepted Save/Undo/Restore/reopen.
+Legacy ordinary skin/affine136/unskinned37 pass with contextual full-Scene oracles.
+No ABI/schema/cap/default change, freshALL or GUI/GPU/main admission claim. Read
+RIG-AFTER-AUTHORING.md and receipt for precise copied-current44 component scope,
+preserved counterexamples and setup negatives. Actual native32 post-bind UV/key
+adapters remain required; canonical-normal UV/key controls already succeed. Full
+goal, broader automatic-weight domains and later drawers remain incomplete.
+
+
 ## Private current44 anatomical port — 2026-11-04
 
 The qualified319 packing/reference runtime is composed with the current44 ABI and

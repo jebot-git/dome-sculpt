@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-#include "native-paint-sampling.hpp"
+#include "native-paint-model.hpp"
 #include "paint-sampling-access.hpp"
+#include "normal-frame-runtime.hpp"
 #include "dome/color-paint-sampling.hpp"
 #include <nlohmann/json.hpp>
 #include <numeric>
@@ -69,7 +70,8 @@ void NativePaintSampling::validate_current(const PaintedMesh &paint,const PaintS
   validate(limits);if(!native_grid_state(paint))throw std::invalid_argument("Native retained paint needs an explicit baked/projection/source transition");if(!matches_current(paint))throw std::invalid_argument("Native retained paint borrowed another current attachment or grid");
 }
 bool native_paint_retention_supported(const SculptObject &source) noexcept {
-  if(!source.mesh_active||!source.painted||source.painted->in_stroke()||source.appearance||source.deformation||source.shape_source||source.rig_source||source.polygon||
+  if(!source.mesh_active||!source.painted||source.painted->in_stroke()||source.appearance||source.shape_source||source.polygon||
+     (source.deformation&&source.deformation->morphs&&!source.deformation->morphs->targets.empty())||
      source.painted->source_maps()||source.painted->color_projection()||source.painted->normal_projection()||source.painted->baked()||source.painted->source_sampling_prepared()||source.painted->surface_diagnostics().policy!=PaintUvPolicy::Strict)return false;
   const auto &b=source.material_bindings;
   return !b?!source.painted->paint_sampling_domain():!b->has_mtoon&&b->normal_frame==SourceMaterialNormalFrame::UvDerivative&&!b->normal_frames&&!b->key_derivation&&!b->normal_preparation&&!b->color_preparation&&b->native_paint_sampling&&b->native_paint_sampling->valid_owner(b->native_paint_sampling)&&b->native_paint_sampling->history_depth()<32&&b->native_paint_sampling->matches_current(*source.painted);
@@ -153,6 +155,34 @@ struct NativePaintSamplingAccess {
 };
 RetainedNativePaint retain_native_paint(const SculptObject &source,const Mesh &target,std::span<const uint32_t> vertices,const PaintSamplingLimits &limits){
   return NativePaintSamplingAccess::build(source,target,vertices,limits,{},[](const auto &paint){return std::make_shared<const PaintedMesh>(*paint->snapshot());},[](const auto &binding){return binding?std::make_shared<const SourceMaterialBindings>(*binding):nullptr;});
+}
+RetainedNativePaintModel retain_native_paint_model(const SculptObject &source,const Mesh &target,
+    std::span<const uint32_t> vertices,const PaintSamplingLimits &limits){
+  stop(limits);
+  if(!native_paint_retention_supported(source))throw std::invalid_argument("Native UV model requires its complete supported current paint and deformation");
+  replay_budget(*source.painted,target,limits);
+  if(!limits.max_basis_bytes||limits.max_basis_bytes>128*1024*1024)throw std::invalid_argument("Invalid native UV model basis budget");
+  auto budget=limits;
+  // Charge all newly owned model arrays and metadata before their copies. The
+  // retained input and first-source capsule are immutable shared owners. Paint
+  // construction receives only the remaining common scratch allowance.
+  size_t bytes=sizeof(DeformationState),work=0;
+  auto charge=[&](size_t n,size_t stride){if(!stride||bytes>budget.max_working_bytes||n>(budget.max_working_bytes-bytes)/stride)throw std::length_error("Native UV model exceeds combined paint/deformation scratch budget");bytes+=n*stride;};
+  auto visit=[&](size_t n){if(work>budget.max_work||n>budget.max_work-work)throw std::length_error("Native UV model exceeds combined remap work budget");work+=n;stop(limits);};
+  if(const auto &d=source.deformation){
+    d->resource_entries();visit(source.painted->mesh().positions.size()+vertices.size());
+    charge(d->pose.size(),sizeof(JointTransform));charge(d->morph_weights.size(),sizeof(float));
+    if(d->skeleton){charge(d->skeleton->bones.size(),sizeof(Bone));for(const auto &b:d->skeleton->bones)charge(b.name.size()+1,1);if(d->skeleton->inverse_bind_override)charge(d->skeleton->inverse_bind_override->size(),sizeof(RigMatrix));}
+    if(d->humanoid)for(const auto &[name,joint]:d->humanoid->joints)charge(1,sizeof(std::pair<const std::string,uint32_t>)+64+name.size()+1);
+    if(d->landmarks)for(const auto &[name,value]:d->landmarks->points)charge(1,sizeof(std::pair<const std::string,Vec3>)+64+name.size()+1);
+    if(d->expressions)for(const auto &[name,values]:d->expressions->visemes){charge(1,sizeof(std::pair<const std::string,std::vector<VisemeBinding>>)+64+name.size()+1);charge(values.size(),sizeof(VisemeBinding));for(const auto &value:values)charge(value.shape.size()+1,1);}
+    if(d->skin){charge(vertices.size(),sizeof(std::vector<Influence>));for(size_t v=0;v<vertices.size();++v){if((v&1023)==0)stop(limits);const auto old=vertices[v];if(old>=d->skin->vertices.size())throw std::invalid_argument("Native UV model source vertex is outside its actual skin domain");const auto n=d->skin->vertices[old].size();charge(n,sizeof(Influence));visit(n);}}
+  }
+  if(bytes>=budget.max_working_bytes||work>=budget.max_work)throw std::length_error("Native UV model exhausts common authoring budget");
+  budget.max_working_bytes-=bytes;budget.max_basis_bytes=std::min(budget.max_basis_bytes,budget.max_working_bytes);budget.max_work-=work;
+  auto deformation=normal_frame_remap_deformation(source.deformation,source.painted->mesh(),target,vertices,limits.cancelled);
+  auto sampling=retain_native_paint(source,target,vertices,budget);
+  stop(limits);return {std::move(sampling),std::move(deformation)};
 }
 RetainedNativePaint NativePaintSamplingCodec::replay(std::shared_ptr<const PaintedMesh> before,Material native,
     std::shared_ptr<const SourceMaterialBindings> binding,std::shared_ptr<const SourceNormalUvLayout> layout,

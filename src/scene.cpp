@@ -6,6 +6,7 @@
 #include "deformation-json.hpp"
 #include "polygon-paint-authority.hpp"
 #include "scene-feature-version.hpp"
+#include "native-paint-frame-source.hpp"
 #include "baked-normal-field.hpp"
 #include "baked-normal-archive.hpp"
 #include "canonical-normal-uv.hpp"
@@ -406,6 +407,14 @@ void Scene::validate(bool deep_sources) const {
   for (const auto &binding : source_materials.bindings())
     if (binding->normal_frames)
       normal_frames.add(binding->normal_frames, deep_sources);
+  std::set<const detail::NativePaintFrameSource*> native_frame_sources;size_t native_frame_metadata=0;
+  for(const auto &binding:source_materials.bindings())if(const auto &f=binding->native_paint_frames;f&&native_frame_sources.insert(f.get()).second){
+    if(native_frame_sources.size()>128)throw std::length_error("Native frame source count exceeds Scene budget");
+    if(f->metadata_bytes()>16*1024*1024-native_frame_metadata)throw std::length_error("Native frame source certificates exceed Scene metadata budget");native_frame_metadata+=f->metadata_bytes();
+    f->validate_binding(*binding,deep_sources);normal_frames.add(f->base_frames(),deep_sources);normal_frames.add(f->frames(),deep_sources);
+    const bool fresh=!retained_paint.contains(f->before_paint().get());retain_paint(f->before_paint(),true);pair_domain(f->before_paint(),f->before_material(),nullptr);
+    if(fresh){const auto n=f->before_paint()->mesh().positions.size();if(n>8'000'000-origin_vertices)throw std::length_error("Native frame capture geometry exceeds aggregate Scene budget");origin_vertices+=n;}
+  }
   normal_frames.storage_bytes();
   for(const auto &binding:source_materials.bindings())
     for(const auto &view:binding->roles)if(view.image)source_images.add(view.image);
@@ -602,7 +611,7 @@ nlohmann::json Scene::encode() const {
   }
   if(polygon_fields)j["polygon_sources"]=polygons.encode(source_images,source_models,source_materials,&placements,corner_prepared?&color_archive:nullptr,feature_version>=21?&normal_domains:nullptr,feature_version>=24?&writable_domains:nullptr);
   if(extended)j["source_materials"]=source_materials.encode(source_images,source_models,corner_prepared?&color_archive:nullptr,feature_version>=21?&normal_domains:nullptr,feature_version>=24?&writable_domains:nullptr);
-  if(detail::composed_material_scene_version(source_materials))j["version"]=35;
+  if(const auto composed=detail::composed_material_scene_version(source_materials))j["version"]=composed;
   if(corner_prepared){auto records=color_archive.encode();j["polygon_sources"]["color_bases"]=std::move(records["color_bases"]);j["polygon_sources"]["color_fields"]=std::move(records["color_fields"]);}
   if(!placements.empty())j["affine_state"]=placements.encode(source_images,source_models);
   if(normal_domains.size())j["normal_sampling"]=normal_domains.encode(source_images);
@@ -618,9 +627,10 @@ Scene Scene::decode(const nlohmann::json &j) {
     throw std::runtime_error("Unsupported scene format or version type");
   const auto version=j.at("version").get<int64_t>();
   const bool normal_context=j.contains("normal_sampling"),paint_context=j.contains("paint_sampling");
-  const bool native_paint_context=(version==32||version==35)&&paint_context&&j.contains("source_materials")&&detail::native_paint_material_archive(j.at("source_materials"));
-  if((version==32||version==35)&&!native_paint_context)throw std::invalid_argument("Scene32 requires its actual native paint owning capability");
+  const bool native_paint_context=(version==32||version==35||version==36)&&paint_context&&j.contains("source_materials")&&detail::native_paint_material_archive(j.at("source_materials"));
+  if((version==32||version==35||version==36)&&!native_paint_context)throw std::invalid_argument("Scene32 requires its actual native paint owning capability");
   if(version!=32&&j.contains("source_materials")&&j.at("source_materials").at("version")==14)throw std::invalid_argument("Native paint material14 requires Scene32");
+  if((version==36)!=(j.contains("source_materials")&&j.at("source_materials").at("version")==18))throw std::invalid_argument("Scene36 requires exactly material18 native frame ownership");
   if((version==35)!=(j.contains("source_materials")&&j.at("source_materials").at("version")==17))
     throw std::invalid_argument("Scene35 requires exactly the composed material17 owning context");
   const bool explicit_mirror_context=version>=29&&j.contains("source_materials")&&detail::explicit_mirror_material_archive(j.at("source_materials"))&&detail::encoded_key_context(j.at("source_materials"));
@@ -634,14 +644,14 @@ Scene Scene::decode(const nlohmann::json &j) {
     if(j.contains("objects"))throw std::runtime_error("Mixed flat Volume and Scene fields");
     result.active().volume=std::make_shared<Volume>(Volume::decode(j));return result;
   }
-  if(version<2 || (version>21&&version!=22&&version!=23&&version!=24&&version!=25&&version!=26&&version!=27&&version!=28&&version!=29&&version!=30&&version!=31&&version!=32&&version!=33&&version!=34&&version!=35))throw std::runtime_error("Unsupported scene version");
+  if(version<2 || (version>21&&version!=22&&version!=23&&version!=24&&version!=25&&version!=26&&version!=27&&version!=28&&version!=29&&version!=30&&version!=31&&version!=32&&version!=33&&version!=34&&version!=35&&version!=36))throw std::runtime_error("Unsupported scene version");
   size_t layered_normal_bytes=0;
   const bool layered_context=version==33||version==34||
-    (version==35&&detail::layered_material_archive(j.at("source_materials")));
+    ((version==35||version==36)&&detail::layered_material_archive(j.at("source_materials")));
   if(layered_context){
     if(!j.contains("baked_normal_fields")||!j.contains("source_materials")||!detail::layered_material_archive(j.at("source_materials")))
       throw std::invalid_argument("Scene33 requires its complete material15/normal-field ownership graph");
-    if(version!=35&&(version==34)!=detail::canonical_uv_material_archive(j.at("source_materials")))throw std::invalid_argument("Scene34 requires actual material16 UV capability");
+    if(version!=35&&version!=36&&(version==34)!=detail::canonical_uv_material_archive(j.at("source_materials")))throw std::invalid_argument("Scene34 requires actual material16 UV capability");
     layered_normal_bytes=detail::BakedNormalArchive::preflight(j.at("baked_normal_fields"),j.at("source_materials"));
   }else if(j.contains("baked_normal_fields")||(j.contains("source_materials")&&detail::layered_material_archive(j.at("source_materials"))))
     throw std::invalid_argument("Independent baked normal ownership requires actual Scene33");
@@ -1148,6 +1158,7 @@ Scene Scene::decode(const nlohmann::json &j) {
   unsigned actual_feature=0;
   for(const auto &o:result.objects_)actual_feature=std::max({actual_feature,o.bake_recipe?30u:0u,detail::hdr_emission(o.material.emissive)?27u:0u,detail::minimum_scene_version(o.painted.get()),detail::minimum_scene_version(o.appearance.get()),detail::minimum_scene_version(o.deformation.get()),detail::minimum_scene_version(o.material_bindings.get()),detail::minimum_scene_version(o.polygon.get()),detail::minimum_scene_version(o.shape_source.get()),o.rig_source?25u:0u,detail::minimum_scene_version(o.rig_source.get())});
   actual_feature=std::max(actual_feature,detail::composed_material_scene_version(source_materials));
+  if(version==36&&actual_feature!=36)throw std::invalid_argument("Scene36 lacks genuine current native paint/frame source");
   if(version==35&&actual_feature!=35)throw std::invalid_argument("Scene35 lacks genuine decoded native/canonical composition");
   if(actual_feature>unsigned(version))throw std::invalid_argument("Retained data requires its actual Scene feature version");
   if(version==29&&actual_feature!=29)throw std::invalid_argument("Scene29 requires genuine decoded explicit Mirror authority");
