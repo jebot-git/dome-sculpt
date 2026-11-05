@@ -1,3 +1,15 @@
+## Private default-view retopology marker repair — 2026-11-05
+
+Shader-only screen floor fixes the preserved unzoomed compact marker failure.
+Whole renderTU/consumer R/S pass55new scenarios plus every original cache/state/
+occlusion/linear/BDF/PBR assertion; actualnormal15+unzoomedcompact16 eachprofile
+pass cleanly,30renderer+2native pairs exact. Release isordinaryapp; SANexplicitly
+composes actualappmain andwhole renderer-test entry intooneELF undera mainwrapper,
+not anordinaryproductELF. No headers/layout/schema/archive change. Read
+RETOPO-SCREEN-MARKERS.md/receipt. Mainretopo stillrequiresroot's newlyidentified
+held-gesture admission/OOMrepair; earlier63prefixes covercompleted drafts only.
+No GPU/HMD/fullsuite/fullgoal claim.
+
 ## Private matching affine retopology clients — 2026-11-05
 
 The fd66 production bytes now pass actual matched FLTK normal/compact and

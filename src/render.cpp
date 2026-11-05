@@ -1182,8 +1182,27 @@ void CursorRenderer::abandon(){program_=vao_=buffer_=0;overlay_->projection.clea
 CursorRenderer::CursorRenderer():overlay_(std::make_unique<OverlayCache>()) {
   const char *v = R"(#version 330 core
 layout(location=0)in vec3 position;layout(location=1)in vec3 color;layout(location=2)in vec3 marker;
-uniform mat4 vp,overlay_model;uniform float depth_bias,marker_radius;uniform int local_overlay;out vec3 tint;
-void main(){tint=color;vec4 p=local_overlay==1?overlay_model*vec4(position,1)+vec4(marker*marker_radius,0):vec4(position,1);gl_Position=vp*p;gl_Position.z-=depth_bias*gl_Position.w;})";
+uniform mat4 vp,overlay_model;uniform float depth_bias,marker_radius;uniform vec2 viewport_pixels;uniform int local_overlay;out vec3 tint;
+void main(){
+ tint=color;
+ vec4 center=local_overlay==1?overlay_model*vec4(position,1):vec4(position,1);
+ vec4 offset=local_overlay==1?vec4(marker*marker_radius,0):vec4(0);
+ gl_Position=vp*(center+offset);
+ if(local_overlay==1&&any(notEqual(marker,vec3(0)))&&all(greaterThan(viewport_pixels,vec2(0)))){
+   vec4 c=vp*center,d=vp*offset;
+   // Keep the physical marker above the screen floor. Below it only XY grows;
+   // physical endpoint depth/w and source occlusion remain unchanged. The
+   // algebraic projected delta avoids subtracting almost equal NDC positions.
+   if(c.w>0&&gl_Position.w>0&&c.z>=-c.w&&c.z<=c.w){
+     vec2 delta=(d.xy-(c.xy/c.w)*d.w)/gl_Position.w;
+     vec2 pixels=delta*viewport_pixels*.5;
+     float extent=length(pixels);
+     if(extent>0&&extent<2&&!isnan(extent)&&!isinf(extent))
+       gl_Position.xy=(c.xy/c.w+(pixels/extent)*(4.0/viewport_pixels))*gl_Position.w;
+   }
+ }
+ gl_Position.z-=depth_bias*gl_Position.w;
+})";
   const char *f = R"(#version 330 core
 in vec3 tint;out vec4 color;uniform int linear_output;vec3 decode(vec3 c){return mix(c/12.92,pow((c+.055)/1.055,vec3(2.4)),greaterThan(c,vec3(.04045)));}void main(){color=vec4(linear_output==1?decode(tint):tint,1);})";
   auto vs = shader(GL_VERTEX_SHADER, v), fs = shader(GL_FRAGMENT_SHADER, f);
@@ -1345,6 +1364,8 @@ void CursorRenderer::draw(const EditorState &state, const Mat4 &vp) {
     for(float v:overlay_model)if(!std::isfinite(v))throw std::invalid_argument("Retopology overlay transform is nonfinite");
     if(!std::isfinite(radius))throw std::invalid_argument("Retopology marker scale is nonfinite");
     glUniformMatrix4fv(glGetUniformLocation(program_,"overlay_model"),1,GL_FALSE,overlay_model.data());
+    GLint viewport[4]{};glGetIntegerv(GL_VIEWPORT,viewport);
+    glUniform2f(glGetUniformLocation(program_,"viewport_pixels"),float(viewport[2]),float(viewport[3]));
     glUniform1f(glGetUniformLocation(program_,"marker_radius"),radius);glUniform1i(glGetUniformLocation(program_,"local_overlay"),1);
     glUniform1f(glGetUniformLocation(program_,"depth_bias"),.0001f);
     glBindVertexArray(overlay_->vao);glDrawArrays(GL_LINES,0,GLsizei(overlay_->count));
