@@ -1,5 +1,19 @@
 # Dome Sculpt production handoff
 
+## Native key export and current combined UI evidence — 2026-11-05
+
+Private key export7c9c476/runtime97f on genuine frame36 now passes151 each
+Release/sanitizer/strictArc,36KHR0errors and exact native/container triples;
+actual complete-stream omission was reproduced and fixed. This is matched
+three-TU/whole-consumer evidence, not new owning36/main admission. Combinedab37175
+passes fresh Release337 +92/92; ownSAN337 finishes and92runtime remains live.
+Actual own normal/compact/Wayland/syntheticXR65 and physical-skin nativeGUI80 pass
+each profile,8actualGUI GLBs0KHRerrors. Originalb37 remains83/84 each on old probe.
+Olderf2 continuation closes with two stale canonical consumers and one dependent
+not run; originals retained, strict test migration underway. Read the current
+PRIVATE-AUTHORING-PROGRESS.md for limits and new agent seals. Full production,
+coherent36/37 integration, device/accelerator work and later drawers remain open.
+
 ## Current physical-skin and expression integration work — 2026-11-05
 
 Main runtime f9da354 includes the qualified 1f foundation (52 selected tests

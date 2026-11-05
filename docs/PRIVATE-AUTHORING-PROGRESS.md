@@ -92,8 +92,8 @@ at most one. Nine affected existing export consumers pass each profile. This is
 separately qualified component evidence, not current main or general morph export.
 The obsolete UV worker interception test is repaired at the actual paired model
 helper and passes 1,797 checks each profile without changing product cancellation
-or timeouts. Original b37 selected Release remains 83/84; its sanitizer run is
-still active and frozen. That original failure is not relabeled green.
+or timeouts. Original b37 selected Release and sanitizer each finish83/84, both on the
+obsolete publication hook, with no input drift. Neither failure is relabeled green.
 
 [Wider VRM1 shade expressions e84d919](https://github.com/jebot-git/dome-sculpt/tree/e84d919848499a0fce7bda1c84101ae49565d582)
 are sealed/pushed: actual Release/sanitizer factories, cancellation, independent
@@ -116,25 +116,53 @@ c1354a6 and e84d919. New own Release and sanitizer builds each target 337 tasks,
 including the complete application/core/render/support and whole consumers.
 739 tests are registered; 92 are selected for actual runtime validation,
 including positive physical skin export, the corrected worker hook, all five
-coefficient cases and legacy expression fault tests. Both jobs are live and all
-tracked inputs plus their orchestration script are frozen. No pass, full-suite
-or main admission claim follows. Static merge parity proves all seven expected
+coefficient cases and legacy expression fault tests. Release closes337 owning build tasks and92/92 selected commands successfully.
+The owning sanitizer337-task build also finishes; its92 selected runtime commands
+remain live, with all tracked inputs and their script frozen. Actual new-owning
+native/compact/Wayland/syntheticXR65 and physical-skin nativeGUI40normal+40compact
+pass each profile. All8 actual ordinary/editable GUI exports have0Khronos errors,
+8warnings and28infos retained; compact bitmap policy was visually inspected.
+These are scoped results, not a complete739 suite or main runtime admission. Static merge parity proves all seven expected
 unchanged files exact and the expression compiler equal to e84 plus existing
 canonical/UV/native owner guards. Public headers are unchanged.
 
-Native paint with current key frames and subsequent UV editing is active in the
-contracts lane. Its appended-layout candidate passes seven selected Release
-commands, but whole-owning sanitizer validation and independent exports remain
-unfinished. Its format reservation and the canonical paint-domain reservation
+The [native frame36 seal f2a382c](https://github.com/jebot-git/dome-sculpt/tree/f2a382ca2f7b3516074d8f3109ddbcd5672f09fe) now has fresh owning Release and sanitizer support and seven selected commands
+passing in each, with38 saved native pairs exact. Its codec/factory/caller/fault
+and full production admission remain unfinished. Post-key UV/new-key composition
+continues in a separate source with fresh owning builds running. Its format reservation and the canonical paint-domain reservation
 remain separate until their genuine owners and codecs are proven. No source
 from either in-progress append is included in ab37175.
+
+The [native key export seal 7c9c476](https://github.com/jebot-git/dome-sculpt/tree/7c9c476) now passes151 checks each Release/sanitizer/strictArc using the actual frame36
+owner and independent paint domain. Three complete production TUs and whole
+consumers use exact owning36 support; no new public layout/schema. Ordinary and
+editable GLB,6pose/weight states, exact recovery/Save and genuine ownership
+negatives pass. An actual additional complete-stream-absence negative exposed a
+prototype gap after preliminary150 positives; the final early guard repairs it.
+All36GLBs have0KHR errors/36warnings/108infos,18container/native triples are exact,
+19R/S PNG pairs are exact andArcmax1. Two existing whole normal/morph consumers
+pass each profile. The new CTest fixture pair is configured, not a new whole-app
+or complete registered-suite run. Physical/key and broader alpha/multiple-key,
+role/postUV/device work and coherent owning36 integration remain required.
+
+The [MASK/cutoff seal296f192](https://github.com/jebot-git/dome-sculpt/tree/296f192cf8f11fdb74249ae8929435c6e849572c) is also ready for the next coherent boundary. Actual Release/sanitizer and
+strictArc workers, independent72-pair images and new failure/cancellation
+coverage pass. The real source-only cutoff .3/.5 export mismatch is repaired;
+original255-pixel-error counter remains. Full general MASK/BLEND and remaining
+material/source adapters remain unfinished. The canonical paint owner foundation
+360f575 is separately qualified, while genuine37 codec/publication is still being
+implemented with truthful retained origin/material dependencies.
 
 The original frozen f2 full630 invocation ended 143 after 131 passing tests and
 no final summary. Its original partial log and stale running-status file are
 preserved. A separately named exact-source continuation runs remaining tests
-132–630 after verifying source/SDK/application/archive hashes. Neither the
-partial run nor that continuation is called a complete original invocation.
-The newer current 689-test run is separate.
+132–630 after verifying source/SDK/application/archive hashes. Neither the partial run nor that continuation is a complete original green
+invocation. Its final521–630 batch now closes8: canonical-normal-owning segfaults,
+owning-faults lacks the actual Scene33 archive context, and the dependent render
+is not run. The old consumer dereferences the removed normal-preparation path
+instead of current canonical attributes/baked fields. A separate test-only
+migration preserves all original variants, fault/Cancel/Save and render scopes.
+The newer current689 run is separate/live; its original source remains frozen.
 
 The [legacy/portable deformation audit 9dabf78](https://github.com/jebot-git/dome-sculpt/tree/9dabf78887545aff7d9edadc5167c218735537d1) retains four curved-state differences above four, maximum nine. The predating
 conversion contract explicitly authors a portable normal/tangent model and
