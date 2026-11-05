@@ -1,0 +1,91 @@
+{
+  "format": 1,
+  "scope": "Actual native stroke then source Preview Apply, UndoRedo/Save and editable Avatar export counter on untouched sealed1231 runtime. Whole new consumer only, immutable matching1231 support.",
+  "source_parent": "1231f2127a995548205d26d2dd0078c00173e09b",
+  "status": {
+    "state": "terminal",
+    "pid": 1143010,
+    "steps": [
+      {
+        "name": "compile-vrm1-initial-shade-authoring",
+        "command": [
+          "/usr/bin/c++",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-initial-shade-1231/src",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-initial-shade-1231/third_party/cgltf",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-initial-shade-1231/include",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-initial-shade-1231/third_party/openbrush",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-initial-shade-1231/third_party/nlohmann",
+          "-O3",
+          "-DNDEBUG",
+          "-std=gnu++20",
+          "-o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-initial-shade-1231/artifacts/initial-proof/counter-release/stage/vrm1-initial-shade-authoring.cpp.o",
+          "-c",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-initial-shade-1231/tests/vrm1-initial-shade-authoring.cpp"
+        ],
+        "exit": 0,
+        "seconds": 10.898788259015419
+      },
+      {
+        "name": "link-worker",
+        "command": [
+          "/usr/bin/c++",
+          "-O3",
+          "-DNDEBUG",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-initial-shade-1231/artifacts/initial-proof/counter-release/stage/vrm1-initial-shade-authoring.cpp.o",
+          "-o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-initial-shade-1231/artifacts/initial-proof/counter-release/stage/worker",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-initial-shade-1231/artifacts/initial-proof/counter-release/stage/libdome-sculpt-core.a",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-initial-shade-1231/artifacts/initial-proof/counter-release/stage/libdome-sculpt-affine.a",
+          "/usr/lib64/liblapacke.so",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-initial-shade-1231/artifacts/initial-proof/counter-release/stage/libdome-sculpt-polygon.a",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-initial-shade-1231/artifacts/initial-proof/counter-release/stage/libxatlas.a",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-initial-shade-1231/artifacts/initial-proof/counter-release/stage/libmikktspace.a",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-initial-shade-1231/artifacts/initial-proof/counter-release/stage/libmikktspace-robust.a",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-initial-shade-1231/artifacts/initial-proof/counter-release/stage/libufbx.a",
+          "/usr/lib64/libpng.so",
+          "/usr/lib64/libjpeg.so",
+          "/usr/lib64/libz.so",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-initial-shade-1231/artifacts/initial-proof/counter-release/stage/libdome-sculpt-emission-codec.a",
+          "/usr/lib64/libOpenEXR-3_2.so",
+          "/usr/lib64/libOpenEXRUtil-3_2.so",
+          "/usr/lib64/libOpenEXRCore-3_2.so",
+          "/usr/lib64/libIex-3_2.so",
+          "/usr/lib64/libIlmThread-3_2.so",
+          "/usr/lib64/libImath-3_1.so",
+          "-lgcc_s_asneeded",
+          "-lgcc_s_asneeded",
+          "-Wl,--wrap=fsync"
+        ],
+        "exit": 0,
+        "seconds": 0.3978954459889792
+      },
+      {
+        "name": "initial-factor-refusal",
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-initial-shade-1231/artifacts/initial-proof/counter-release/stage/worker",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-preview-1853cc3/build-preview-release/vrm1-background-fixture/source.vrm",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-initial-shade-1231/artifacts/initial-proof/counter-release/run",
+          "--old-refusal"
+        ],
+        "exit": 0,
+        "seconds": 0.18183075997512788
+      }
+    ],
+    "scope": "Untouched sealed1231 runtime on copied immutable own matching support, whole NEW counter consumer only. Genuine native paint then Preview Apply, UndoRedo/Save and actual editable Avatar worker refusal, no product changes or full newbuild claim.",
+    "child_pid": 1144268,
+    "exit": 0,
+    "seconds": 11.618429132038727,
+    "inputs": 1894,
+    "drift": []
+  },
+  "log": "PASS Actual initial-factor source retains both skins and rigid part\nPASS Actual source mesh: \nPASS Actual active source part supplies genuine paint geometry\nPASS Actual low-colour native stroke enters worker without source mutation\nPASS Actual independent paint completes\nPASS Actual source mesh: \nPASS Actual source expression session is ready\nPASS Actual happy preset identity exists\nPASS Actual full weight previews source and independent paint\nPASS Actual explicit Apply worker reaches publication\nPASS Actual source mesh: \nACTUAL_INITIAL_SHADE nativeR=0.6 authoredShadeR=0.99 upperCoefficient=1.65\nPASS Actual accepted native Apply yields a valid authored factor with wider independent-paint coefficient\nPASS Actual Apply retains exact original source-byte owner\nPASS Actual expression Apply is exactly one Undo/Redo transaction\nPASS Actual source mesh: \nPASS Actual Save/restart preserves applied source and independent paint authority\nINITIAL_FACTOR_OLD_REFUSAL VRM1 shared painted initial shade factor exceeds standard unit representation\nPASS Actual old editable Avatar worker refuses the unrepresented initial coefficient\nPASS Actual export refusal preserves prior file, caller and following ordered Save\nPASS 18 actual applied initial-factor counter checks\n",
+  "source_sha256": "38f91896e5e8574d447cb496d5fe324f4ddf838358d93ad9594700fcd58af809",
+  "outputs": {
+    "artifacts/initial-proof/counter-release/run/source-initial-shade.vrm": "8c276f0a56f3b8461005e47a7596e4cdc4f4ccf2c03ccc2ebeea4321aca61179",
+    "artifacts/initial-proof/counter-release/run/applied-source.dsculpt": "a58395930ce904c951853aec1626acab2a681f2b4f2356cfae60b8d3c001bec8",
+    "artifacts/initial-proof/counter-release/run/dynamic.vrm": "5eb441eb1e815e7bbcbf10d0a06dfed3db11c0e5686f7885ab59aa33974263fd",
+    "artifacts/initial-proof/counter-release/run/following.dsculpt": "a58395930ce904c951853aec1626acab2a681f2b4f2356cfae60b8d3c001bec8"
+  },
+  "limitation": "Current valid authored shade factor can divide by actual native base factor to a value above1; no runtime fix or positive export claim yet. Prior dynamic.vrm is a 3-byte sentinel."
+}
