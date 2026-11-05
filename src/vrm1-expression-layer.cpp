@@ -27,8 +27,9 @@ Vrm1ExpressionLayer compile_vrm1_expression_layer(const J &original,const Sculpt
  if(!object.painted||!object.appearance||!object.material_bindings||!object.material_bindings->has_mtoon)
   throw std::invalid_argument("VRM1 expression layer requires its actual paint and typed source owners");
  const auto &binding=*object.material_bindings;binding.validate();const auto &material=binding.material;
- if(material.version()!=MToonVersion::V1||material.parameters.alpha!=MToonAlpha::Opaque||
-    (object.material.alpha!=Material::AlphaMode::Automatic&&object.material.alpha!=Material::AlphaMode::Opaque)||
+ const bool opaque=material.parameters.alpha==MToonAlpha::Opaque&&(object.material.alpha==Material::AlphaMode::Automatic||object.material.alpha==Material::AlphaMode::Opaque);
+ const bool masked=material.parameters.alpha==MToonAlpha::Mask&&(object.material.alpha==Material::AlphaMode::Automatic||object.material.alpha==Material::AlphaMode::Mask||int(object.material.alpha)==binding.native_reference.alpha);
+ if(material.version()!=MToonVersion::V1||(!opaque&&!masked)||
     material.parameters.outline!=MToonOutline::None||material.parameters.scroll!=std::array<float,2>{}||material.parameters.rotation_speed!=0)
   throw std::invalid_argument("VRM1 expression layer currently requires opaque outline-free nonanimated MToon1 source");
  if(material.parameters.rim_color.x!=0||material.parameters.rim_color.y!=0||material.parameters.rim_color.z!=0)
@@ -45,14 +46,19 @@ Vrm1ExpressionLayer compile_vrm1_expression_layer(const J &original,const Sculpt
  auto shade_factor=[&](const std::array<float,3> &factor,bool initial){if(result.shade_alias)for(size_t k=0;k<3;++k){const double value=double(factor[k])/result.shade_divisor[k];if(!std::isfinite(value)||value<0||value>(initial?1.:1e20))throw std::invalid_argument(initial?"VRM1 shared painted initial shade factor exceeds standard unit representation":"VRM1 shared painted shade target exceeds finite nonnegative source representation");}};
  shade_factor(initial_shade,true);
  std::array<double,3> shade_low{},shade_high{};if(result.shade_alias)for(size_t k=0;k<3;++k)shade_low[k]=shade_high[k]=double(initial_shade[k])/result.shade_divisor[k];
+ const double initial_alpha=masked?vrm_native_factor(material.parameters.base_color[3],binding.native_reference.color[3],object.material.color[3]):1;
+ double alpha_low=initial_alpha,alpha_high=initial_alpha;
+ const double cutoff=object.material.alpha_cutoff!=binding.native_reference.alpha_cutoff?object.material.alpha_cutoff:material.parameters.alpha_cutoff;
  const auto expressions=original.at("extensions").at("VRMC_vrm").value("expressions",J::object());
  for(const auto *table:{"preset","custom"})if(expressions.contains(table))for(const auto &expression:expressions.at(table)){
-  std::array<double,3> shade_delta{};
+  std::array<double,3> shade_delta{};double alpha_delta=0;
   for(const auto &bind:expression.value("materialColorBinds",J::array()))if(bind.at("material").get<int>()==object.appearance->source_material){
    if(bind.at("type")=="rimColor")throw std::invalid_argument("VRM1 rim colour expression needs its layered lighting adapter");
    colour|=bind.at("type")=="color";
+   if(masked&&bind.at("type")=="color"){const double alpha=bind.at("targetValue").at(3).get<double>();if(!std::isfinite(alpha)||std::abs(alpha)>1e20)throw std::invalid_argument("VRM1 mask colour target is outside finite source metadata bounds");alpha_delta+=alpha-initial_alpha;}
    if(bind.at("type")=="shadeColor"){const auto target=bind.at("targetValue").get<std::array<float,4>>();shade_factor({target[0],target[1],target[2]},false);if(result.shade_alias)for(size_t k=0;k<3;++k)shade_delta[k]+=(double(target[k])-initial_shade[k])/result.shade_divisor[k];}
   }
+  if(masked){alpha_low+=std::min(0.,alpha_delta);alpha_high+=std::max(0.,alpha_delta);}
   if(result.shade_alias)for(size_t k=0;k<3;++k){shade_low[k]+=std::min(0.,shade_delta[k]);shade_high[k]+=std::max(0.,shade_delta[k]);}
   for(const auto &bind:expression.value("textureTransformBinds",J::array()))if(bind.at("material").get<int>()==object.appearance->source_material){
   const auto raw_scale=bind.value("scale",std::array<double,2>{1,1}),raw_offset=bind.value("offset",std::array<double,2>{});
@@ -65,6 +71,7 @@ Vrm1ExpressionLayer compile_vrm1_expression_layer(const J &original,const Sculpt
  // Bound the entire [0,1] weight box, including simultaneous custom/presets,
  // rather than assuming one active expression or clamping their true targets.
  if(result.shade_alias)for(size_t k=0;k<3;++k){const double bound=std::max(std::abs(shade_low[k]),std::abs(shade_high[k]));if(!std::isfinite(bound)||bound>1e20)throw std::invalid_argument("VRM1 accumulated shade coefficients exceed finite source bounds");result.maximum_shade_coefficient=std::max(result.maximum_shade_coefficient,bound);}
+ if(masked&&(!std::isfinite(alpha_low)||!std::isfinite(alpha_high)||alpha_low<0||alpha_high>1||!std::isfinite(cutoff)||cutoff<0||cutoff>1))throw std::invalid_argument("VRM1 masked alpha expressions need their native unit-alpha adapter");
  const bool wide_shade=result.maximum_shade_coefficient>1;
  const double lighting_bound=std::max(1.,result.maximum_shade_coefficient)+.25;
  // Source per-material bindings need not be copied onto an upper role
@@ -108,9 +115,25 @@ Vrm1ExpressionLayer compile_vrm1_expression_layer(const J &original,const Sculpt
  // Forecast the full native sampling, optional prefilter and continuous proof
  // together, before dense allocations. The centre intersection count is exact:
  // n/g and size/g must both be odd to share the g rational centre knots.
+ const auto &alpha_image=base.image;const size_t alpha_pixels=masked&&alpha_image?size_t(alpha_image->width)*alpha_image->height:0;
+ if(alpha_pixels>limits.max_image_pixels)throw std::length_error("VRM1 masked source-alpha prospective pixel limit exceeded");
  size_t forecast=result.sample_operations;
  auto forecast_work=[&](size_t count,size_t width){if(forecast>limits.max_sample_operations||count>(limits.max_sample_operations-forecast)/width)throw std::length_error("VRM1 expression-layer prospective complete sampling work limit exceeded");forecast+=count*width;};
+ if(masked){forecast_work(alpha_pixels,1);forecast_work(native_pixels,1+packet.layers().size());}
  forecast_work(native_pixels,1+packet.layers().size());forecast_work(pixels,1+prefilter_work);forecast_work(cells*cells,80);
+ if(masked){
+  // All source samplers/mips use convex alpha reconstruction. Scan the REAL
+  // immutable role image, then combine that bound with the native independent
+  // paint's premultiplied alpha and coverage at every native knot. Their
+  // bilinear difference has no lower interior extremum. No role is flattened.
+  unsigned minimum=255;work(alpha_pixels);
+  if(alpha_image)for(size_t y=0;y<alpha_image->height;++y){stop();for(size_t x=0;x<alpha_image->width;++x)minimum=std::min(minimum,unsigned(alpha_image->rgba[(y*alpha_image->width+x)*4+3]));}
+  const double original_alpha=alpha_low*(minimum/255.);double lower=1;
+  for(size_t y=0;y<n;++y){stop();for(size_t x=0;x<n;++x){work(1+packet.layers().size());const auto v=sample_overlay_texel_values(packet,int(x),int(y),false);lower=std::min(lower,original_alpha*(1-double(v[3][0]))+double(v[0][3]));}}
+  // Keep a conservative F32 filtering/composition margin. Cutoff zero can
+  // never discard the native clamped alpha, including genuine authored zero.
+  if(cutoff>0&&lower<cutoff+1e-5)throw std::invalid_argument("VRM1 masked source can change fragment membership under paint: minimum="+std::to_string(lower)+" cutoff="+std::to_string(cutoff));
+ }
  if(prefilter_work)work(pixels*prefilter_work);
  std::vector<Pixel> native(native_pixels),decoded(pixels);auto image=std::make_shared<Image>(Image{size,size,std::vector<uint8_t>(pixels*4)});
  for(size_t y=0;y<n;++y){stop();for(size_t x=0;x<n;++x){work(1+packet.layers().size());const auto v=sample_overlay_texel_values(packet,int(x),int(y),false);
