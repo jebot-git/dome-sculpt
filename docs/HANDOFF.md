@@ -1,3 +1,50 @@
+## Current continuation — 2026-11-05
+
+Main runtime remains qualified0b6b59f (native36/current HDR/MatCap/Rim);
+status documentation is9940068. The full REQUIREMENTS/HANDOFF-466ebd1 production
+goal stays active and incomplete. Older entries below are historical checkpoints,
+not current process state.
+
+Separate owning37/physical4 sourcef36570c completes its fresh ReleaseALL and
+owning sanitizer builds. Its corrected actual AddLayer pipeline passes20 selected
+commands/profile; Release remainder closes134/140, giving154/160. Five expression
+fault tests exceed strict preflight polling bounds, and the old mixed normal
+consumer rejects actual new37 ownership at its33/34-only assertion. Original
+failures remain. SAN remainder handle10303 is still live on that exact frozen
+source; do not edit its tracked files/scripts or restart on an observation timeout.
+807/798 registrations are not complete runtime results.
+
+The mixed-consumer migrationaeaf4b2/seal81c2e30 is pushed separately at
+work/union37-consumer-f365. It verifies real conversion/UV/writable owners and
+additional missing/downgraded/foreign-owner counterfactuals. Release, owningSAN
+with its actual sameprofile worker files, and strict PCI03Arc each pass229;
+eight independent image comparisons/profile stay within unchanged4 (maximum1).
+All32GLBs validate without errors and corresponding files are byte-identical.
+Read MIXED-NORMAL-PAINT37-CONSUMER.md in that branch. This does not turn the old
+root invocation green or admit37 to main.
+
+Normal-expression compositiond6d40ca is pushed at work/authoring37-normal-f365.
+It overlays only eight qualified normal product files on current37/HDR/native
+export paths, preserves raw/physical/ordinary strict guards and typed owner proof,
+and includes the migrated mixed consumer. Fresh whole-owning app/core/render/
+support/OpenXR/inspector and110 explicit targets are running: Release24810,
+SAN79991,442 build tasks/profile. Preserve both frozen source/scripts until their
+actual terminal results. Original Release wrapper selection error happened before
+building and is retained; the explicitly corrected Release wrapper uses target
+names from the sanitizer plan with its own Release configuration/artifacts.
+The known inactive-Rim preflight scan still requires the separately qualifyingv2
+repair after this boundary; no runtime/admission claim follows from compilation.
+
+Agentmerge_docs qualifies the strict preflight repair on37 and independently on
+exact0b6 main support, plus remaining normal/Shift material cases. Agentmerge_palette
+has sealed functional new-key worke924 and actual8M-boundary controls0d66;
+full key-factory and original package4 sanitizer allocation sweeps remain live,
+and repeated-UV/Restore/named-command controls continue. Agentmerge_contracts keeps
+qualified874 avatar controls separate from new closed-domain witnesses/failures;
+there is no new automatic-weight default admission. Full remaining authoring,
+interoperability, production/device/accelerator requirements and later controller
+drawers remain required. No headset launch, installation or session restart.
+
 ## Admitted keyed HDR and Rim milestone — 2026-11-05
 
 Main's runtime/header/test/build/asset bytes match0b6b59f: qualified native36
