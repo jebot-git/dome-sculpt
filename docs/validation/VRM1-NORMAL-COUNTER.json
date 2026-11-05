@@ -1,0 +1,94 @@
+{
+  "scope": "Actual first normalTexture worker refusal on exact sealed4ab runtime/matching copied support; whole new test input only. Genuine authored varying linear32x32 normal image, existing original TANGENT/NORMAL morph/skin and actual UV1/KHR descriptor, native paint/source Save and previous output exact. No support claim or production change. Runner inherited initial-factor step/scope prose is not the authoritative classification.",
+  "status": {
+    "state": "terminal",
+    "pid": 2223585,
+    "steps": [
+      {
+        "name": "compile-vrm1-expression-layer-authoring",
+        "command": [
+          "/usr/bin/c++",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-normal-4ab/src",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-normal-4ab/third_party/cgltf",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-normal-4ab/include",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-normal-4ab/third_party/openbrush",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-normal-4ab/third_party/nlohmann",
+          "-O3",
+          "-DNDEBUG",
+          "-std=gnu++20",
+          "-o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-normal-4ab/artifacts/normal-proof/counter-release/stage/vrm1-expression-layer-authoring.cpp.o",
+          "-c",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-normal-4ab/tests/vrm1-expression-layer-authoring.cpp"
+        ],
+        "exit": 0,
+        "seconds": 10.422597084019799
+      },
+      {
+        "name": "link-worker",
+        "command": [
+          "/usr/bin/c++",
+          "-O3",
+          "-DNDEBUG",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-normal-4ab/artifacts/normal-proof/counter-release/stage/vrm1-expression-layer-authoring.cpp.o",
+          "-o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-normal-4ab/artifacts/normal-proof/counter-release/stage/worker",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-normal-4ab/artifacts/normal-proof/counter-release/stage/libdome-sculpt-core.a",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-normal-4ab/artifacts/normal-proof/counter-release/stage/libdome-sculpt-affine.a",
+          "/usr/lib64/liblapacke.so",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-normal-4ab/artifacts/normal-proof/counter-release/stage/libdome-sculpt-polygon.a",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-normal-4ab/artifacts/normal-proof/counter-release/stage/libxatlas.a",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-normal-4ab/artifacts/normal-proof/counter-release/stage/libmikktspace.a",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-normal-4ab/artifacts/normal-proof/counter-release/stage/libmikktspace-robust.a",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-normal-4ab/artifacts/normal-proof/counter-release/stage/libufbx.a",
+          "/usr/lib64/libpng.so",
+          "/usr/lib64/libjpeg.so",
+          "/usr/lib64/libz.so",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-normal-4ab/artifacts/normal-proof/counter-release/stage/libdome-sculpt-emission-codec.a",
+          "/usr/lib64/libOpenEXR-3_2.so",
+          "/usr/lib64/libOpenEXRUtil-3_2.so",
+          "/usr/lib64/libOpenEXRCore-3_2.so",
+          "/usr/lib64/libIex-3_2.so",
+          "/usr/lib64/libIlmThread-3_2.so",
+          "/usr/lib64/libImath-3_1.so",
+          "-lgcc_s_asneeded",
+          "-lgcc_s_asneeded",
+          "-Wl,--wrap=fsync"
+        ],
+        "exit": 0,
+        "seconds": 0.3441802610177547
+      },
+      {
+        "name": "initial-factor-refusal",
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-normal-4ab/artifacts/normal-proof/counter-release/stage/worker",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-preview-1853cc3/build-preview-release/vrm1-background-fixture/source.vrm",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-normal-4ab/artifacts/normal-proof/counter-release/run",
+          "--old-refusal",
+          "--normal"
+        ],
+        "exit": 0,
+        "seconds": 0.14202479302184656
+      }
+    ],
+    "scope": "Untouched sealedbd3 runtime on copied immutable own matching support, whole NEW counter consumer only. Genuine two-stroke native paint plus actual source MatCap image and color target; Save and actual editable Avatar worker refusal, no product changes or full newbuild claim.",
+    "child_pid": 2224938,
+    "exit": 0,
+    "seconds": 11.045311417023186,
+    "inputs": 1914,
+    "drift": []
+  },
+  "files": {
+    "artifacts/normal-proof/counter-release/before.json": "143ba6049cf21d609893f5079b9311d54f216273ec1e54cc28c0476c41f4d15d",
+    "artifacts/normal-proof/counter-release/status.json": "5a49342c06b7881e5ced22a21d104917f983a7439e302b370796e4c1649d14c9",
+    "artifacts/normal-proof/counter-release/compile-vrm1-expression-layer-authoring.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "artifacts/normal-proof/counter-release/link-worker.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "artifacts/normal-proof/counter-release/initial-factor-refusal.log": "4fe2a0554c7141ce7d7432cde1458ae15d20a38c89781e68619ad8789487cb38",
+    "artifacts/normal-proof/counter-release/after.json": "143ba6049cf21d609893f5079b9311d54f216273ec1e54cc28c0476c41f4d15d",
+    "artifacts/normal-proof/counter-release/run/source-normal.vrm": "727e8d1313221c518372b48ae9f82237932c08b5ba670f1d679fd06c3ae54fe4",
+    "artifacts/normal-proof/counter-release/run/pristine-source.dsculpt": "9228d54158270c9907392ad03ed6f2addfde27db61d797cfe4fe233b66af386f",
+    "artifacts/normal-proof/counter-release/run/nonuniform-source.dsculpt": "ef0a83baae140eb653282e29fe579a2cdbac3b8a24a7cce46bd205caf9ec2331",
+    "artifacts/normal-proof/counter-release/run/dynamic.vrm": "db36251b3c135816ae9671421f0013791db8790de3cf74d2982da66e5293ed60"
+  },
+  "source_sha256": "439bd2ddfe055acadbb072dbfbabba452ea4ff3460bfdb4d4cb3b1139fb047ad"
+}
