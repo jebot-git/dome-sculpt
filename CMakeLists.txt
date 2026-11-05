@@ -4104,6 +4104,14 @@ if(BUILD_TESTING)
     add_executable(dome-sculpt-native-paint-key-export-render-test tests/native-paint-key-export-render.cpp)
     target_include_directories(dome-sculpt-native-paint-key-export-render-test PRIVATE src third_party/cgltf third_party/desktop)
     target_link_libraries(dome-sculpt-native-paint-key-export-render-test PRIVATE dome-sculpt-render)
+    add_executable(dome-sculpt-native-paint-key-physical-test tests/native-paint-key-physical.cpp)
+    target_include_directories(dome-sculpt-native-paint-key-physical-test PRIVATE src third_party/cgltf third_party/desktop)
+    target_link_libraries(dome-sculpt-native-paint-key-physical-test PRIVATE dome-sculpt-render)
+    add_test(NAME native-paint-key-physical COMMAND dome-sculpt-native-paint-key-physical-test
+      ${CMAKE_CURRENT_BINARY_DIR}/native-paint-key-frames/replaced.dsculpt
+      ${CMAKE_CURRENT_BINARY_DIR}/native-paint-key-physical)
+    set_tests_properties(native-paint-key-physical PROPERTIES FIXTURES_REQUIRED native-paint-key-frames-model TIMEOUT 600
+      ENVIRONMENT "LIBGL_ALWAYS_SOFTWARE=1;LP_NUM_THREADS=2;XR_RUNTIME_JSON=${CMAKE_CURRENT_BINARY_DIR}/native-paint-key-no-physical-runtime.json")
     add_test(NAME native-paint-key-export-render COMMAND dome-sculpt-native-paint-key-export-render-test
       ${CMAKE_CURRENT_BINARY_DIR}/native-paint-key-frames/replaced.dsculpt
       ${CMAKE_CURRENT_BINARY_DIR}/native-paint-key-export-render)
