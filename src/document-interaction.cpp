@@ -35,9 +35,13 @@ void Document::require_authority_locked(AssetSource source) const {
 bool Document::invalidate_object_authority_locked() {
   if(state_.edit_authority==UINT64_MAX)throw std::overflow_error("Object editing authority exhausted");
   if(native_stroke_)cancel_native_locked();
+  // Permission transitions retire the entire unaccepted workspace/session.
+  // Do that before generic gesture cancellation: enqueueing a CancelGesture
+  // into a workspace that is being destroyed is both redundant and outside
+  // the input caller's publication transaction.
+  if(state_.retopology)cancel_retopology_locked();
   if(action_active_locked())cancel_action_locked();
   desktop_=false;input_.cancel();finish_control_locked(false);
-  if(state_.retopology)cancel_retopology_locked();
   if(state_.cut)cancel_cut_locked();
   invalidate_uv_locked();
   // Accepted polygon cancellation follows successful permission publication.
@@ -129,6 +133,10 @@ void Document::update_object_grab_locked(const SpatialFrame &frame){
       for(const auto&r:snapshot->ranges)if(corner>=r.first&&corner-r.first<r.count){target=r.object;break;}
       if(!target)return;
     }
+    // Edge detection above used the previous hands. The accepted authority
+    // publication must carry this frame's current levels/pose, including modal
+    // history consumption if the retopology namespace is retired.
+    state_.hands=frame.hands;
     if(!begin_object_grab_locked(target))return;
   }
   const auto navigation=object_navigation_;

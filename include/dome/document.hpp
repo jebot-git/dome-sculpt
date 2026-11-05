@@ -32,7 +32,10 @@ namespace dome {
 class MaterialSurfaceQuery;
 struct SpatialHand {
   TrackedHand tracked;
-  bool joystick = false, undo = false, redo = false;
+  bool joystick = false;
+  // Current button levels. Document owns press edges and modal consumption;
+  // providers must not pre-filter these with changedSinceLastSync.
+  bool undo = false, redo = false;
   float x = 0, y = 0;
   DeviceKind kind = DeviceKind::Controller;
 };
@@ -581,6 +584,14 @@ private:
   size_t retopo_pending_ = 0;
   // Shared independent-input/file-queue handoff, protected by retopo_mutex_.
   // This is a deque element payload, not a new Document/EditorState field.
+  class RetopoInputScope;
+  void rebase_space_locked(std::optional<CanvasTransform>, RetopoInputScope &);
+  struct RetopoStep {
+    RetopoAction action;
+    Vec3 point{};
+    float snap_mm = 50;
+    bool coalescible = false;
+  };
   struct RetopoAcceptance {
     enum class Admission { Pending, Accepted, Rejected };
     Admission admission = Admission::Pending;
@@ -591,6 +602,12 @@ private:
     CanvasTransform transform{};
     std::exception_ptr error;
     bool ready = false;
+    // A pending batch stays in the deque until its caller publishes. No
+    // accepted payload is coalesced or otherwise modified by a later caller.
+    bool input_batch = false, counted = false, cancel_workspace = false, opening = false;
+    std::optional<uint64_t> next_session;
+    std::vector<RetopoStep> steps;
+    std::shared_ptr<AssetWork> cancel_work;
   };
   struct RetopoJob {
     uint64_t session = 0;

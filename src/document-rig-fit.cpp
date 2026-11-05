@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/document.hpp"
+#include "spatial-history-levels.hpp"
 #include "dome/rig-fit.hpp"
 #include "rig-fit-metric.hpp"
 #include "document-transaction.hpp"
@@ -109,6 +110,6 @@ bool Document::process_rig_fit_spatial_locked(const SpatialFrame &f){
  const auto name=rig_fit_selection_label(*next);
  if(valid&&!cancel){if(h.tracked.trigger<=.02f){if(next->pressed)finish=true;else next->armed=true;}else if(next->armed){next->pressed=true;auto p=ob::transform(ob::inverse(state_.canvas),h.tracked.grip.position);rig_fit_selection_point(*next,local_point(next->world,{p.x,p.y,p.z}));}}
  if(cancel||finish){if(cancel){rig_fit_selection_point(*next,next->before_placement);}next->placing=false;next->before_placement.reset();contact_rearmed_={};state_.selection_release={true,true};if(valid){input_.retain_page(rig_fit_page,uint32_t(hand+1),2);state_.panel={h.tracked.grip.position,f.head.orientation,1};state_.panel.position=state_.panel.position+ob::rotate(f.head.orientation,{0,.08f,-.18f});}else input_.cancel();}
- Transaction transaction(*this);state_.rig_fit=std::move(next);state_.hands=valid?f.hands:std::array<SpatialHand,2>{};publish_locked(false,false);transaction.commit(false);return true;
+ Transaction transaction(*this);state_.rig_fit=std::move(next);state_.hands=valid?f.hands:detail::history_only_hands(state_.hands);publish_locked(false,false);transaction.commit(false);return true;
 }
 } // namespace dome
