@@ -16,6 +16,7 @@ completion.
 | --- | --- | --- |
 | Retopology | Admitted71270a9: affine workspace/ordered Save/held-admission rollback and GPU marker floor; native1267+1445+26/profile, matched final Release75/sanitizer58 clients, actual Arc marker proof | Fresh full-project/accelerator regression, broader geometry/input/worker stress and physical-device qualification remain |
 | Affine polygon editing | Admitted8750f20/runtime0567 with current worker: native248/profile,16 file pairs, ordinaryGUI77 normal+77compact/profile, actual Arc stereo Apply/Restore; complete private-payload/provider closure | Fresh full-project/device qualification and remesh/weights/caller composition remain required |
+| Nearest-surface precision | Whole provider and complete mesh-processing/remesh/rig/bake consumers pass Release/sanitizer; valid thin-face interiors, winding-independent edge selection, exact source barycentrics and range bounds; independent oblique108/profile and registered CTest1/1/profile | Component evidence only; matched application/device and broader production qualification remain required; see SURFACE-QUERY-PRECISION.md |
 | Retopology worker | Detached geometry/history, atomic view/workspace/file handoff, one-time retirement and reporter recovery;251 one-shot denials,4308+42+97 new checks,1267+1445+26 legacy checks/profile and58 ordinary Release app checks | Separate caller-side post-enqueue refusal bug reproduced; complete caller/input stress and whole-project qualification remain open |
 | Retopology caller/input candidate | Private candidate passes 13,380 native checks in each Release/sanitizer profile, including 710 injected points and same-frame history/worker publication controls | Current XR button levels, focus/rebase history latches and controller-grab authority transitions need matched application qualification; not admitted to main |
 | Owning37 paint/material integration | Exact c6e6cd5 fresh optimized Release application and selected native/codec/key/package controls pass; all 244 own binary inputs are preserved before later source changes | New bf9e6f3 source merge includes current SurfaceHeat main, but is not rebuilt; changed polygon normal/paint transport, sanitizer and broad production qualification remain open |
@@ -74,6 +75,10 @@ the baseline. Controller-mounted tool/function/selection drawers remain a
 required later phase after the basic targets. Texture-set workflows, remaining
 avatar/VRM authoring, production geometry and rig quality, broader GPU work and
 physical controller/headset qualification remain part of the original objective.
+
+Parallel polygon-field and texture-set implementations coordinate their new
+capabilities in [FORMAT-RESERVATIONS.md](FORMAT-RESERVATIONS.md). These are source
+reservations, not newly accepted file formats or completed workflows.
 
 Checkpoint evidence:
 
