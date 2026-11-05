@@ -1,3 +1,24 @@
+## Owning37 continuation with current main — 2026-11-05
+
+This private tree now combines owning37 candidate c6e6cd5 with admitted main
+c53e0b6 (explicit SurfaceHeat5, Automatic0 default unchanged). This merge has
+not yet been compiled or qualified. The earlier c6 cohort has a fresh optimized
+Release application and selected native/key/codec/package checks, not full-suite
+or sanitizer qualification. All 244 actual own objects, archives and executables
+are preserved in verified separate-inode copy-on-write snapshots before this
+source merge. Existing component results retain their exact original scope.
+
+A genuine manifold affine/reflected source now proves retained-domain polygon
+refusal, Save/history/cancellation/retry and before-only37 persistence/Restore.
+The required changed-polygon positive after canonical-paint Restore still fails:
+"Baked normal field lost its actual separate attribute origin". The conversion
+keeps the baked field but drops its material origin; new geometry also needs
+real current normal/paint correspondence. This is an unimplemented adapter,
+not a reason to discard fields, counterfeit owners or bypass validation.
+All production, caller-input, remesh, interoperability, accelerator, device and
+controller-drawer requirements remain active. Entries below retain checkpoint
+history; this source merge is not main admission or a completed release.
+
 ## Unqualified owning37 source composition — 2026-11-05
 
 This private continuation now also merges admitted affine polygon mainc55dc2f
@@ -18,6 +39,51 @@ repairs remain separate continuations; merge their admitted current-main results
 before freezing the new owning build. Physical-package exhaustive parent results and all four fresh-caller key
 Create/Replace coverage aggregates have closed. Their actual receipts have been
 rehashed; original product scopes remain distinct from this unqualified tree.
+
+## Explicit surface-heat binding admitted — 2026-11-05
+
+Main admits corrected seal6bcc91b/runtimebef5876 via9c72cc2, with exact product,
+header, test and CMake parity. Surface heat is an explicit skin-binding choice;
+Automatic0 remains the default and existing saved weights stay unchanged until
+a new request. Native R/S controls,152 ordinary FLTK checks,56 software OpenXR
+checks and current publication fault controls pass. Read SURFACE-HEAT-ADMISSION.md.
+
+The historical3496 numeric/1052 caller/381 full-long/7667 mixed proofs retain
+their original component scope. The current long measurement is377 with tail
+373..377; no new complete-long sweep is claimed. Retopology251 cases are one-shot,
+not persistent; reporter/acceptance modes are not inferred. Complex37/38/prepared
+owners, broader weights, caller-input repair, full regression/interoperability,
+physical-device and accelerator work remain required. Full goal active.
+
+## Private opt-in mode 5 + current polygon/retopology integration — 2026-11-05
+
+This private candidate combines main `c55dc2f` (polygon + transactional
+retopology worker) with qualified opt-in weights `1e6d76d`. Automatic0 remains
+the default. All legacy methods, resource/quality limits and unsupported complex
+37/38 owner guards remain intact. The second bounded Release component phase now passes surface25, legacy38,
+combined affine polygon/retopology248 and worker251 one-shot-prefix/4,308 checks, with
+actual polygon payload/default parity. See [the R2 receipt](validation/MODE5-MAIN-POLY-INITIAL-R.json).
+The matched merged Release/SAN application phase now passes four native controls,
+152 actual normal/compact FLTK checks and 56 software synthetic-OpenXR loader
+checks. Fresh current worker publication remeasures 373 regular prefixes per
+profile and long-path 377 with the five tail controls 373..377, all passing
+real preparation/rollback/retry/ordered Save. The historical full-381 scope is
+separate. See [the application receipt](validation/MODE5-MAIN-APPLICATION-QUALIFICATION.json).
+This remains a private candidate; no main admission or default promotion.
+
+The initial merged Release proof on `8f43cae` covered the earlier `9dd63f9`
+retopology baseline only. Its 25 surface-heat checks, 38 legacy skin checks and
+251-one-shot-prefix/4,308-check worker result stay separate; they do not qualify the new
+polygon job/world payload. The second Release and sanitizer cohorts freshly compiled the complete merged
+Document and used qualified complete polygon providers. No old provider is
+accepted merely because outer Document size happens to match.
+
+The weight component's complete caller 1,052 and long-basename publication 381
+prefixes passed in both profiles, with timing variance and previous sampled
+scopes retained in [the component receipt](MODE5-COMPLETE-ADMISSION.md).
+Main's polygon/retopology changes and all current documentation remain below.
+No generic post-enqueue caller fix, default promotion or full-goal completion
+is implied by those component proofs.
 
 ## Affine polygon admission — 2026-11-05
 

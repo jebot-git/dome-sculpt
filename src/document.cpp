@@ -7,6 +7,7 @@
 #include "emission-control-scale.hpp"
 #include "emission-source-info.hpp"
 #include "dome/document.hpp"
+#include "skin-methods.hpp"
 #include "native-paint-sampling.hpp"
 #include "dome/scene-file.hpp"
 #include "dome/native-authoring.hpp"
@@ -658,7 +659,8 @@ void Document::publish_locked(bool force,bool checkpoint) {
       state_.skin_sources.empty()?0:state_.skin_sources.front();
   }
   state_.can_configure_skin=skin_target_ready_locked() && !skin_sources_locked(SkinAuthoringMode::Automatic).empty();
-  state_.can_bind_skin=skin_target_ready_locked() && !state_.skin_sources.empty();
+  state_.can_bind_skin=skin_target_ready_locked() && !state_.skin_sources.empty() &&
+    !(state_.skin_options.mode==SkinAuthoringMode::SurfaceHeat&&state_.selected_objects.size()>1&&!selected_skin_ready_locked(SkinAuthoringMode::SurfaceHeat));
   state_.can_retopologize = !state_.polygon && !state_.cut && !state_.retopology && !uv_ && !state_.asset_busy && !state_.recovery_busy &&
       !control_before_ && !action_active_locked() && object_editable_locked(active.id) &&
       scene_.objects().size() < 256 && (active.mesh_active || !active.volume->voxels().empty());
@@ -2158,7 +2160,7 @@ bool Document::parameter_enabled_locked(VrParameter parameter) const {
   if (parameter == VrParameter::RetopoDistance)
     return state_.retopology && state_.retopology->source && !retopo_accepting_ && !state_.asset_busy;
   if (state_.retopology) return false;
-  if(skin_parameter(parameter)) return (state_.skin_options.mode!=SkinAuthoringMode::Anatomical || parameter==VrParameter::SkinSource || parameter==VrParameter::SkinMode) && skin_target_ready_locked() &&
+  if(skin_parameter(parameter)) return !(state_.skin_options.mode==SkinAuthoringMode::SurfaceHeat&&parameter==VrParameter::SkinFalloff) && (state_.skin_options.mode!=SkinAuthoringMode::Anatomical || parameter==VrParameter::SkinSource || parameter==VrParameter::SkinMode) && skin_target_ready_locked() &&
     (parameter==VrParameter::SkinSource ? !skin_sources_locked(state_.skin_options.mode).empty()
       : !skin_sources_locked(SkinAuthoringMode::Automatic).empty());
   if(parameter==VrParameter::BakeSource&&canonical_conversion_ready_locked())return true;
@@ -2317,7 +2319,7 @@ void Document::finish_control_locked(bool accept) {
       auto &options=state_.skin_options;
       if(c.parameter==VrParameter::SkinSource) {
         auto ids=skin_sources_locked(options.mode); options.reference=ids.at(size_t(std::lround(c.value[0])));
-      } else if(c.parameter==VrParameter::SkinMode) options.mode=int(std::lround(c.value[0]))==2?SkinAuthoringMode::Anatomical:SkinAuthoringMode(int(std::lround(c.value[0])));
+      } else if(c.parameter==VrParameter::SkinMode) options.mode=detail::skin_method_mode(int(std::lround(c.value[0])));
       else if(c.parameter==VrParameter::SkinDistances) {
         options.seed_distance=skin_distance_metres(c.value[0]);
         options.seed_margin=skin_distance_metres(c.value[1]);
@@ -2522,13 +2524,12 @@ void Document::control_event_locked(VrControlEvent event) {
       c.value[0]=found==ids.end()?0:float(found-ids.begin());break;
     }
     case VrParameter::SkinMode: {
-      const bool anatomical=!skin_sources_locked(SkinAuthoringMode::Anatomical).empty();
-      c.title=anatomical?"Method: Automatic / transfer / anatomical":"Automatic bind / weight transfer";
-      c.maximum=anatomical?2:1;
-      c.value[0]=state_.skin_options.mode==SkinAuthoringMode::Anatomical?(anatomical?2:0):int(state_.skin_options.mode);break;
+      c.title="Method: Legacy / transfer / source / Automatic";
+      c.maximum=3;
+      c.value[0]=float(detail::skin_method_choice(state_.skin_options.mode));break;
     }
     case VrParameter::SkinDistances:
-      c.title="Seed / margin / transfer (world mm)";c.components=3;
+      c.title=state_.skin_options.mode==SkinAuthoringMode::SurfaceHeat?"Seed radius (world mm)":"Seed / margin / transfer (world mm)";c.components=state_.skin_options.mode==SkinAuthoringMode::SurfaceHeat?1:3;
       c.value={skin_distance_slider(state_.skin_options.seed_distance),skin_distance_slider(state_.skin_options.seed_margin),skin_distance_slider(state_.skin_options.transfer_distance),0};break;
     case VrParameter::SkinFalloff:
       c.title="Automatic bind distance falloff";c.minimum=1;c.maximum=8;c.value[0]=state_.skin_options.falloff;break;
@@ -3006,7 +3007,8 @@ bool Document::command_enabled_locked(SpatialCommand command) const {
   if(command==SpatialCommand::BakeSurface)return !control_before_ && bake_source_eligible_locked(state_.bake_source) && state_.bake_settings.cage_object!=unavailable_bake_object && bake_target_ready_locked();
   if(command==SpatialCommand::ClearBake)return !control_before_ && bake_target_ready_locked() && bool(scene_.active().painted->baked());
   if(command==SpatialCommand::BindSkin) return !control_before_ && skin_target_ready_locked() &&
-    !skin_sources_locked(state_.skin_options.mode).empty();
+    !skin_sources_locked(state_.skin_options.mode).empty() &&
+    !(state_.skin_options.mode==SkinAuthoringMode::SurfaceHeat&&state_.selected_objects.size()>1&&!selected_skin_ready_locked(SkinAuthoringMode::SurfaceHeat));
   if(command==SpatialCommand::SkinUseLocks) return !control_before_ && skin_target_ready_locked() && state_.can_paint_weights;
   if (uv_solving_ && (command == SpatialCommand::Undo || command == SpatialCommand::Redo)) return false;
   if (command >= SpatialCommand::WeightToggle && command <= SpatialCommand::WeightLinked)
@@ -3252,7 +3254,8 @@ void Document::command_locked(SpatialCommand command) {
       auto options=state_.skin_options;
       if(state_.skin_use_locks && state_.can_paint_weights) options.locks=state_.weights.locks;
       else options.locks.clear();
-      queue_bind_skin_locked(std::move(options));
+      const bool selected=options.mode==SkinAuthoringMode::SurfaceHeat&&state_.selected_objects.size()>1;
+      queue_bind_skin_locked(std::move(options),{},selected,selected?state_.selected_objects:std::vector<uint64_t>{});
     }
     return;
   }

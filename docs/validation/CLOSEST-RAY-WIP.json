@@ -1,0 +1,3118 @@
+{
+  "state": "private WIP; actual both19 fields but fixed quality bounds fail; no native/API/main admission",
+  "base": "f641b8ff8bb8f5f42ca342b25558e0bd29e560c2",
+  "native_checks": 84,
+  "native": {
+    "max_pose_error_m": 0.0,
+    "maximum_foreign_weight": 0.0,
+    "mean_pose_error_m": 0.0,
+    "occluded_candidates": 32,
+    "visible_seeds": 16,
+    "weights": {
+      "version": 1,
+      "vertices": [
+        [
+          [
+            0,
+            1.0
+          ]
+        ],
+        [
+          [
+            0,
+            1.0
+          ]
+        ],
+        [
+          [
+            0,
+            1.0
+          ]
+        ],
+        [
+          [
+            0,
+            1.0
+          ]
+        ],
+        [
+          [
+            0,
+            1.0
+          ]
+        ],
+        [
+          [
+            0,
+            1.0
+          ]
+        ],
+        [
+          [
+            0,
+            1.0
+          ]
+        ],
+        [
+          [
+            0,
+            1.0
+          ]
+        ],
+        [
+          [
+            0,
+            1.0
+          ]
+        ],
+        [
+          [
+            0,
+            1.0
+          ]
+        ],
+        [
+          [
+            0,
+            1.0
+          ]
+        ],
+        [
+          [
+            0,
+            1.0
+          ]
+        ],
+        [
+          [
+            0,
+            1.0
+          ]
+        ],
+        [
+          [
+            0,
+            1.0
+          ]
+        ],
+        [
+          [
+            0,
+            1.0
+          ]
+        ],
+        [
+          [
+            0,
+            1.0
+          ]
+        ],
+        [
+          [
+            1,
+            1.0
+          ]
+        ],
+        [
+          [
+            1,
+            1.0
+          ]
+        ],
+        [
+          [
+            1,
+            1.0
+          ]
+        ],
+        [
+          [
+            1,
+            1.0
+          ]
+        ],
+        [
+          [
+            1,
+            1.0
+          ]
+        ],
+        [
+          [
+            1,
+            1.0
+          ]
+        ],
+        [
+          [
+            1,
+            1.0
+          ]
+        ],
+        [
+          [
+            1,
+            1.0
+          ]
+        ],
+        [
+          [
+            1,
+            1.0
+          ]
+        ],
+        [
+          [
+            1,
+            1.0
+          ]
+        ],
+        [
+          [
+            1,
+            1.0
+          ]
+        ],
+        [
+          [
+            1,
+            1.0
+          ]
+        ],
+        [
+          [
+            1,
+            1.0
+          ]
+        ],
+        [
+          [
+            1,
+            1.0
+          ]
+        ],
+        [
+          [
+            1,
+            1.0
+          ]
+        ],
+        [
+          [
+            1,
+            1.0
+          ]
+        ]
+      ]
+    },
+    "work": 171023,
+    "workspace": 164016
+  },
+  "same_owner_component_diagnostic": {
+    "bones": [
+      {
+        "candidates": 0,
+        "closest_m": 0.7451403141021729,
+        "joint": 0,
+        "label_diagnostic_only": "hips",
+        "same_component_visible": 0,
+        "whole_mesh_visible": 0
+      },
+      {
+        "candidates": 0,
+        "closest_m": 0.7061966061592102,
+        "joint": 1,
+        "label_diagnostic_only": "spine",
+        "same_component_visible": 0,
+        "whole_mesh_visible": 0
+      },
+      {
+        "candidates": 0,
+        "closest_m": 0.6830205917358398,
+        "joint": 2,
+        "label_diagnostic_only": "chest",
+        "same_component_visible": 0,
+        "whole_mesh_visible": 0
+      },
+      {
+        "candidates": 0,
+        "closest_m": 0.6800651550292969,
+        "joint": 3,
+        "label_diagnostic_only": "upperChest",
+        "same_component_visible": 0,
+        "whole_mesh_visible": 0
+      },
+      {
+        "candidates": 0,
+        "closest_m": 0.6823595762252808,
+        "joint": 4,
+        "label_diagnostic_only": "neck",
+        "same_component_visible": 0,
+        "whole_mesh_visible": 0
+      },
+      {
+        "candidates": 0,
+        "closest_m": 0.6906246542930603,
+        "joint": 5,
+        "label_diagnostic_only": "head",
+        "same_component_visible": 0,
+        "whole_mesh_visible": 0
+      },
+      {
+        "candidates": 0,
+        "closest_m": 0.6832740902900696,
+        "joint": 6,
+        "label_diagnostic_only": "leftEye",
+        "same_component_visible": 0,
+        "whole_mesh_visible": 0
+      },
+      {
+        "candidates": 0,
+        "closest_m": 0.7235405445098877,
+        "joint": 7,
+        "label_diagnostic_only": "rightEye",
+        "same_component_visible": 0,
+        "whole_mesh_visible": 0
+      },
+      {
+        "candidates": 0,
+        "closest_m": 0.7224625945091248,
+        "joint": 8,
+        "label_diagnostic_only": "leftUpperLeg",
+        "same_component_visible": 0,
+        "whole_mesh_visible": 0
+      },
+      {
+        "candidates": 0,
+        "closest_m": 0.9754598140716553,
+        "joint": 9,
+        "label_diagnostic_only": "leftLowerLeg",
+        "same_component_visible": 0,
+        "whole_mesh_visible": 0
+      },
+      {
+        "candidates": 0,
+        "closest_m": 1.2568591833114624,
+        "joint": 10,
+        "label_diagnostic_only": "leftFoot",
+        "same_component_visible": 0,
+        "whole_mesh_visible": 0
+      },
+      {
+        "candidates": 0,
+        "closest_m": 1.3121684789657593,
+        "joint": 11,
+        "label_diagnostic_only": "leftToes",
+        "same_component_visible": 0,
+        "whole_mesh_visible": 0
+      },
+      {
+        "candidates": 0,
+        "closest_m": 0.5716385841369629,
+        "joint": 12,
+        "label_diagnostic_only": "leftShoulder",
+        "same_component_visible": 0,
+        "whole_mesh_visible": 0
+      },
+      {
+        "candidates": 0,
+        "closest_m": 0.3528958261013031,
+        "joint": 13,
+        "label_diagnostic_only": "leftUpperArm",
+        "same_component_visible": 0,
+        "whole_mesh_visible": 0
+      },
+      {
+        "candidates": 16,
+        "closest_m": 0.1387220323085785,
+        "joint": 14,
+        "label_diagnostic_only": "leftLowerArm",
+        "same_component_visible": 16,
+        "whole_mesh_visible": 0
+      },
+      {
+        "candidates": 16,
+        "closest_m": 0.1386110484600067,
+        "joint": 15,
+        "label_diagnostic_only": "leftHand",
+        "same_component_visible": 16,
+        "whole_mesh_visible": 0
+      },
+      {
+        "candidates": 16,
+        "closest_m": 0.11307064443826675,
+        "joint": 16,
+        "label_diagnostic_only": "leftThumbMetacarpal",
+        "same_component_visible": 16,
+        "whole_mesh_visible": 0
+      },
+      {
+        "candidates": 16,
+        "closest_m": 0.10357265919446945,
+        "joint": 17,
+        "label_diagnostic_only": "leftThumbProximal",
+        "same_component_visible": 16,
+        "whole_mesh_visible": 0
+      },
+      {
+        "candidates": 16,
+        "closest_m": 0.10219993442296982,
+        "joint": 18,
+        "label_diagnostic_only": "leftThumbDistal",
+        "same_component_visible": 16,
+        "whole_mesh_visible": 0
+      },
+      {
+        "candidates": 16,
+        "closest_m": 0.044930603355169296,
+        "joint": 19,
+        "label_diagnostic_only": "leftIndexProximal",
+        "same_component_visible": 16,
+        "whole_mesh_visible": 0
+      },
+      {
+        "candidates": 16,
+        "closest_m": 0.028293807059526443,
+        "joint": 20,
+        "label_diagnostic_only": "leftIndexIntermediate",
+        "same_component_visible": 16,
+        "whole_mesh_visible": 0
+      },
+      {
+        "candidates": 16,
+        "closest_m": 0.028278589248657227,
+        "joint": 21,
+        "label_diagnostic_only": "leftIndexDistal",
+        "same_component_visible": 16,
+        "whole_mesh_visible": 0
+      },
+      {
+        "candidates": 16,
+        "closest_m": 0.03538601100444794,
+        "joint": 22,
+        "label_diagnostic_only": "leftMiddleProximal",
+        "same_component_visible": 16,
+        "whole_mesh_visible": 0
+      },
+      {
+        "candidates": 16,
+        "closest_m": 0.012749997898936272,
+        "joint": 23,
+        "label_diagnostic_only": "leftMiddleIntermediate",
+        "same_component_visible": 16,
+        "whole_mesh_visible": 0
+      },
+      {
+        "candidates": 16,
+        "closest_m": 0.012675642967224121,
+        "joint": 24,
+        "label_diagnostic_only": "leftMiddleDistal",
+        "same_component_visible": 16,
+        "whole_mesh_visible": 0
+      },
+      {
+        "candidates": 16,
+        "closest_m": 0.041284408420324326,
+        "joint": 25,
+        "label_diagnostic_only": "leftRingProximal",
+        "same_component_visible": 15,
+        "whole_mesh_visible": 0
+      },
+      {
+        "candidates": 16,
+        "closest_m": 0.024575432762503624,
+        "joint": 26,
+        "label_diagnostic_only": "leftRingIntermediate",
+        "same_component_visible": 13,
+        "whole_mesh_visible": 0
+      },
+      {
+        "candidates": 16,
+        "closest_m": 0.024575432762503624,
+        "joint": 27,
+        "label_diagnostic_only": "leftRingDistal",
+        "same_component_visible": 13,
+        "whole_mesh_visible": 0
+      },
+      {
+        "candidates": 16,
+        "closest_m": 0.05495216324925423,
+        "joint": 28,
+        "label_diagnostic_only": "leftLittleProximal",
+        "same_component_visible": 16,
+        "whole_mesh_visible": 0
+      },
+      {
+        "candidates": 16,
+        "closest_m": 0.04232053831219673,
+        "joint": 29,
+        "label_diagnostic_only": "leftLittleIntermediate",
+        "same_component_visible": 15,
+        "whole_mesh_visible": 0
+      },
+      {
+        "candidates": 16,
+        "closest_m": 0.042302437126636505,
+        "joint": 30,
+        "label_diagnostic_only": "leftLittleDistal",
+        "same_component_visible": 15,
+        "whole_mesh_visible": 0
+      },
+      {
+        "candidates": 0,
+        "closest_m": 0.8553603887557983,
+        "joint": 31,
+        "label_diagnostic_only": "rightUpperLeg",
+        "same_component_visible": 0,
+        "whole_mesh_visible": 0
+      },
+      {
+        "candidates": 0,
+        "closest_m": 1.0517184734344482,
+        "joint": 32,
+        "label_diagnostic_only": "rightLowerLeg",
+        "same_component_visible": 0,
+        "whole_mesh_visible": 0
+      },
+      {
+        "candidates": 0,
+        "closest_m": 1.3062548637390137,
+        "joint": 33,
+        "label_diagnostic_only": "rightFoot",
+        "same_component_visible": 0,
+        "whole_mesh_visible": 0
+      },
+      {
+        "candidates": 0,
+        "closest_m": 1.361023187637329,
+        "joint": 34,
+        "label_diagnostic_only": "rightToes",
+        "same_component_visible": 0,
+        "whole_mesh_visible": 0
+      },
+      {
+        "candidates": 0,
+        "closest_m": 0.7030637860298157,
+        "joint": 35,
+        "label_diagnostic_only": "rightShoulder",
+        "same_component_visible": 0,
+        "whole_mesh_visible": 0
+      },
+      {
+        "candidates": 0,
+        "closest_m": 0.7888099551200867,
+        "joint": 36,
+        "label_diagnostic_only": "rightUpperArm",
+        "same_component_visible": 0,
+        "whole_mesh_visible": 0
+      },
+      {
+        "candidates": 0,
+        "closest_m": 1.0076640844345093,
+        "joint": 37,
+        "label_diagnostic_only": "rightLowerArm",
+        "same_component_visible": 0,
+        "whole_mesh_visible": 0
+      },
+      {
+        "candidates": 0,
+        "closest_m": 1.220920205116272,
+        "joint": 38,
+        "label_diagnostic_only": "rightHand",
+        "same_component_visible": 0,
+        "whole_mesh_visible": 0
+      },
+      {
+        "candidates": 0,
+        "closest_m": 1.2230305671691895,
+        "joint": 39,
+        "label_diagnostic_only": "rightThumbMetacarpal",
+        "same_component_visible": 0,
+        "whole_mesh_visible": 0
+      },
+      {
+        "candidates": 0,
+        "closest_m": 1.2560348510742188,
+        "joint": 40,
+        "label_diagnostic_only": "rightThumbProximal",
+        "same_component_visible": 0,
+        "whole_mesh_visible": 0
+      },
+      {
+        "candidates": 0,
+        "closest_m": 1.278027892112732,
+        "joint": 41,
+        "label_diagnostic_only": "rightThumbDistal",
+        "same_component_visible": 0,
+        "whole_mesh_visible": 0
+      },
+      {
+        "candidates": 0,
+        "closest_m": 1.284867525100708,
+        "joint": 42,
+        "label_diagnostic_only": "rightIndexProximal",
+        "same_component_visible": 0,
+        "whole_mesh_visible": 0
+      },
+      {
+        "candidates": 0,
+        "closest_m": 1.3177485466003418,
+        "joint": 43,
+        "label_diagnostic_only": "rightIndexIntermediate",
+        "same_component_visible": 0,
+        "whole_mesh_visible": 0
+      },
+      {
+        "candidates": 0,
+        "closest_m": 1.3380937576293945,
+        "joint": 44,
+        "label_diagnostic_only": "rightIndexDistal",
+        "same_component_visible": 0,
+        "whole_mesh_visible": 0
+      },
+      {
+        "candidates": 0,
+        "closest_m": 1.2870113849639893,
+        "joint": 45,
+        "label_diagnostic_only": "rightMiddleProximal",
+        "same_component_visible": 0,
+        "whole_mesh_visible": 0
+      },
+      {
+        "candidates": 0,
+        "closest_m": 1.3239061832427979,
+        "joint": 46,
+        "label_diagnostic_only": "rightMiddleIntermediate",
+        "same_component_visible": 0,
+        "whole_mesh_visible": 0
+      },
+      {
+        "candidates": 0,
+        "closest_m": 1.3465886116027832,
+        "joint": 47,
+        "label_diagnostic_only": "rightMiddleDistal",
+        "same_component_visible": 0,
+        "whole_mesh_visible": 0
+      },
+      {
+        "candidates": 0,
+        "closest_m": 1.2877178192138672,
+        "joint": 48,
+        "label_diagnostic_only": "rightRingProximal",
+        "same_component_visible": 0,
+        "whole_mesh_visible": 0
+      },
+      {
+        "candidates": 0,
+        "closest_m": 1.3220337629318237,
+        "joint": 49,
+        "label_diagnostic_only": "rightRingIntermediate",
+        "same_component_visible": 0,
+        "whole_mesh_visible": 0
+      },
+      {
+        "candidates": 0,
+        "closest_m": 1.3418258428573608,
+        "joint": 50,
+        "label_diagnostic_only": "rightRingDistal",
+        "same_component_visible": 0,
+        "whole_mesh_visible": 0
+      },
+      {
+        "candidates": 0,
+        "closest_m": 1.284632921218872,
+        "joint": 51,
+        "label_diagnostic_only": "rightLittleProximal",
+        "same_component_visible": 0,
+        "whole_mesh_visible": 0
+      },
+      {
+        "candidates": 0,
+        "closest_m": 1.316019892692566,
+        "joint": 52,
+        "label_diagnostic_only": "rightLittleIntermediate",
+        "same_component_visible": 0,
+        "whole_mesh_visible": 0
+      },
+      {
+        "candidates": 0,
+        "closest_m": 1.3340940475463867,
+        "joint": 53,
+        "label_diagnostic_only": "rightLittleDistal",
+        "same_component_visible": 0,
+        "whole_mesh_visible": 0
+      }
+    ],
+    "boundary_edges": 14,
+    "component": 1452,
+    "duplicate_positions_in_other_components": 14,
+    "inconsistent_edges": 0,
+    "name": "Body.baked / 2",
+    "nonmanifold_edges": 0,
+    "object": 14,
+    "policy": "read-only prospective wall-domain control, not a failed-field retry or production bypass",
+    "same_component_visible": 263,
+    "triangles": 16,
+    "vertices": [
+      1452,
+      1453,
+      1454,
+      1455,
+      1456,
+      1457,
+      1458,
+      1459,
+      1460,
+      1461,
+      1462,
+      1463,
+      1464,
+      1465,
+      1466,
+      1467
+    ],
+    "whole_mesh_visible": 0,
+    "work": 8580621
+  },
+  "fields": {
+    "female": {
+      "no_artist_weight_values_input": true,
+      "parts": 19,
+      "per_target_work_limit": 500000000,
+      "records": [
+        {
+          "object": 2,
+          "occluded_candidates": 453,
+          "visible_seeds": 644,
+          "work": 26913407,
+          "workspace": 4720800
+        },
+        {
+          "object": 3,
+          "occluded_candidates": 32,
+          "visible_seeds": 224,
+          "work": 2020970,
+          "workspace": 973344
+        },
+        {
+          "object": 4,
+          "occluded_candidates": 70,
+          "visible_seeds": 1242,
+          "work": 13216760,
+          "workspace": 3644928
+        },
+        {
+          "object": 5,
+          "occluded_candidates": 0,
+          "visible_seeds": 456,
+          "work": 4142269,
+          "workspace": 2156128
+        },
+        {
+          "object": 6,
+          "occluded_candidates": 0,
+          "visible_seeds": 444,
+          "work": 2200044,
+          "workspace": 1563360
+        },
+        {
+          "object": 7,
+          "occluded_candidates": 0,
+          "visible_seeds": 604,
+          "work": 4097793,
+          "workspace": 1854240
+        },
+        {
+          "object": 8,
+          "occluded_candidates": 0,
+          "visible_seeds": 594,
+          "work": 3688360,
+          "workspace": 1854240
+        },
+        {
+          "object": 9,
+          "occluded_candidates": 0,
+          "visible_seeds": 419,
+          "work": 7317525,
+          "workspace": 9876352
+        },
+        {
+          "object": 10,
+          "occluded_candidates": 0,
+          "visible_seeds": 230,
+          "work": 2661637,
+          "workspace": 2732608
+        },
+        {
+          "object": 11,
+          "occluded_candidates": 0,
+          "visible_seeds": 256,
+          "work": 1620789,
+          "workspace": 674208
+        },
+        {
+          "object": 12,
+          "occluded_candidates": 0,
+          "visible_seeds": 965,
+          "work": 26779071,
+          "workspace": 3456800
+        },
+        {
+          "object": 13,
+          "occluded_candidates": 520,
+          "visible_seeds": 152,
+          "work": 21542150,
+          "workspace": 773492
+        },
+        {
+          "object": 14,
+          "occluded_candidates": 2816,
+          "visible_seeds": 1318,
+          "work": 89439212,
+          "workspace": 1862848
+        },
+        {
+          "object": 15,
+          "occluded_candidates": 0,
+          "visible_seeds": 58,
+          "work": 794586,
+          "workspace": 392600
+        },
+        {
+          "object": 16,
+          "occluded_candidates": 63,
+          "visible_seeds": 264,
+          "work": 10010267,
+          "workspace": 1679120
+        },
+        {
+          "object": 17,
+          "occluded_candidates": 182,
+          "visible_seeds": 294,
+          "work": 7071635,
+          "workspace": 398924
+        },
+        {
+          "object": 18,
+          "occluded_candidates": 0,
+          "visible_seeds": 83,
+          "work": 2889059,
+          "workspace": 743558
+        },
+        {
+          "object": 19,
+          "occluded_candidates": 44,
+          "visible_seeds": 84,
+          "work": 3331918,
+          "workspace": 611028
+        },
+        {
+          "object": 20,
+          "occluded_candidates": 0,
+          "visible_seeds": 141,
+          "work": 1737648,
+          "workspace": 499754
+        }
+      ],
+      "sum_work": 231475100,
+      "transport_prerequisite": "actual original ordinary bind target-local rig/pose/IBM and retained capsules; not a new public worker mode"
+    },
+    "male": {
+      "no_artist_weight_values_input": true,
+      "parts": 19,
+      "per_target_work_limit": 500000000,
+      "records": [
+        {
+          "object": 2,
+          "occluded_candidates": 0,
+          "visible_seeds": 410,
+          "work": 2159627,
+          "workspace": 1514464
+        },
+        {
+          "object": 3,
+          "occluded_candidates": 520,
+          "visible_seeds": 593,
+          "work": 28041004,
+          "workspace": 4567184
+        },
+        {
+          "object": 4,
+          "occluded_candidates": 0,
+          "visible_seeds": 578,
+          "work": 4546950,
+          "workspace": 1795840
+        },
+        {
+          "object": 5,
+          "occluded_candidates": 0,
+          "visible_seeds": 558,
+          "work": 3555450,
+          "workspace": 1795840
+        },
+        {
+          "object": 6,
+          "occluded_candidates": 58,
+          "visible_seeds": 216,
+          "work": 2415432,
+          "workspace": 943744
+        },
+        {
+          "object": 7,
+          "occluded_candidates": 0,
+          "visible_seeds": 370,
+          "work": 6575546,
+          "workspace": 9629296
+        },
+        {
+          "object": 8,
+          "occluded_candidates": 0,
+          "visible_seeds": 404,
+          "work": 4275543,
+          "workspace": 2087840
+        },
+        {
+          "object": 9,
+          "occluded_candidates": 62,
+          "visible_seeds": 1126,
+          "work": 13135006,
+          "workspace": 3527920
+        },
+        {
+          "object": 10,
+          "occluded_candidates": 0,
+          "visible_seeds": 208,
+          "work": 2456482,
+          "workspace": 2659888
+        },
+        {
+          "object": 11,
+          "occluded_candidates": 0,
+          "visible_seeds": 248,
+          "work": 1547893,
+          "workspace": 654400
+        },
+        {
+          "object": 12,
+          "occluded_candidates": 2,
+          "visible_seeds": 892,
+          "work": 25660473,
+          "workspace": 3151248
+        },
+        {
+          "object": 13,
+          "occluded_candidates": 516,
+          "visible_seeds": 110,
+          "work": 21803954,
+          "workspace": 773492
+        },
+        {
+          "object": 14,
+          "occluded_candidates": 2728,
+          "visible_seeds": 1208,
+          "work": 83337546,
+          "workspace": 1862848
+        },
+        {
+          "object": 15,
+          "occluded_candidates": 0,
+          "visible_seeds": 66,
+          "work": 871048,
+          "workspace": 394752
+        },
+        {
+          "object": 16,
+          "occluded_candidates": 58,
+          "visible_seeds": 124,
+          "work": 8526487,
+          "workspace": 1631088
+        },
+        {
+          "object": 17,
+          "occluded_candidates": 0,
+          "visible_seeds": 84,
+          "work": 454834,
+          "workspace": 311212
+        },
+        {
+          "object": 18,
+          "occluded_candidates": 30,
+          "visible_seeds": 137,
+          "work": 7062006,
+          "workspace": 1334384
+        },
+        {
+          "object": 19,
+          "occluded_candidates": 40,
+          "visible_seeds": 76,
+          "work": 3149851,
+          "workspace": 610092
+        },
+        {
+          "object": 20,
+          "occluded_candidates": 0,
+          "visible_seeds": 122,
+          "work": 1700292,
+          "workspace": 510876
+        }
+      ],
+      "sum_work": 221275424,
+      "transport_prerequisite": "actual original ordinary bind target-local rig/pose/IBM and retained capsules; not a new public worker mode"
+    }
+  },
+  "quality": {
+    "female": {
+      "cohorts": 95,
+      "failures": 4,
+      "max_fraction_bound": 0.03,
+      "mean_fraction_bound": 0.01,
+      "records": [
+        {
+          "max_fraction": 3.888238689675056e-08,
+          "maximum_m": 6.212694906396437e-08,
+          "mean_fraction": 1.1310794438447056e-08,
+          "mean_m": 1.8072582627613775e-08,
+          "name": "Face.baked / 0",
+          "object": 2,
+          "pass": true,
+          "pose": 0,
+          "vertices": 386
+        },
+        {
+          "max_fraction": 2.025886288239271e-08,
+          "maximum_m": 3.2369960870211764e-08,
+          "mean_fraction": 8.387874521562876e-09,
+          "mean_m": 1.340229072201355e-08,
+          "name": "Face.baked / 1",
+          "object": 3,
+          "pass": true,
+          "pose": 0,
+          "vertices": 74
+        },
+        {
+          "max_fraction": 2.7171694750908103e-08,
+          "maximum_m": 4.341540297548789e-08,
+          "mean_fraction": 8.458689734869976e-09,
+          "mean_m": 1.3515440492416447e-08,
+          "name": "Face.baked / 2",
+          "object": 4,
+          "pass": true,
+          "pose": 0,
+          "vertices": 260
+        },
+        {
+          "max_fraction": 2.7323167370640163e-08,
+          "maximum_m": 4.365742854237677e-08,
+          "mean_fraction": 8.011155202073101e-09,
+          "mean_m": 1.2800362089506976e-08,
+          "name": "Face.baked / 3",
+          "object": 5,
+          "pass": true,
+          "pose": 0,
+          "vertices": 150
+        },
+        {
+          "max_fraction": 4.2074420437419836e-08,
+          "maximum_m": 6.722723536372851e-08,
+          "mean_fraction": 9.139727961914302e-09,
+          "mean_m": 1.4603615129291206e-08,
+          "name": "Face.baked / 4",
+          "object": 6,
+          "pass": true,
+          "pose": 0,
+          "vertices": 110
+        },
+        {
+          "max_fraction": 2.7203701463895928e-08,
+          "maximum_m": 4.346654385407592e-08,
+          "mean_fraction": 7.147139808485991e-09,
+          "mean_m": 1.1419823376942664e-08,
+          "name": "Face.baked / 5",
+          "object": 7,
+          "pass": true,
+          "pose": 0,
+          "vertices": 122
+        },
+        {
+          "max_fraction": 2.7202522054353686e-08,
+          "maximum_m": 4.3464659373147547e-08,
+          "mean_fraction": 8.862472413338233e-09,
+          "mean_m": 1.4160611427130977e-08,
+          "name": "Face.baked / 6",
+          "object": 8,
+          "pass": true,
+          "pose": 0,
+          "vertices": 122
+        },
+        {
+          "max_fraction": 4.1719119490645164e-08,
+          "maximum_m": 6.665952937692107e-08,
+          "mean_fraction": 1.153240030304539e-08,
+          "mean_m": 1.8426668303957042e-08,
+          "name": "Face.baked / 7",
+          "object": 9,
+          "pass": true,
+          "pose": 0,
+          "vertices": 588
+        },
+        {
+          "max_fraction": 2.740654113871518e-08,
+          "maximum_m": 4.379064458840352e-08,
+          "mean_fraction": 7.82435832145082e-09,
+          "mean_m": 1.2501894808716204e-08,
+          "name": "Face.baked / 8",
+          "object": 10,
+          "pass": true,
+          "pose": 0,
+          "vertices": 192
+        },
+        {
+          "max_fraction": 4.0180292961791115e-08,
+          "maximum_m": 6.42007657822308e-08,
+          "mean_fraction": 1.2417559434969728e-08,
+          "mean_m": 1.9840990846670128e-08,
+          "name": "Face.baked / 9",
+          "object": 11,
+          "pass": true,
+          "pose": 0,
+          "vertices": 50
+        },
+        {
+          "max_fraction": 0.019324857211087957,
+          "maximum_m": 0.030877590483571388,
+          "mean_fraction": 0.0007668711798479563,
+          "mean_m": 0.0012253200107171878,
+          "name": "Body.baked / 0",
+          "object": 12,
+          "pass": true,
+          "pose": 0,
+          "vertices": 2418
+        },
+        {
+          "max_fraction": 0.04220339638769625,
+          "maximum_m": 0.06743331536377009,
+          "mean_fraction": 0.019521742116291266,
+          "mean_m": 0.031192176584201228,
+          "name": "Body.baked / 1",
+          "object": 13,
+          "pass": false,
+          "pose": 0,
+          "vertices": 508
+        },
+        {
+          "max_fraction": 7.191516048777916e-08,
+          "maximum_m": 1.1490728499809416e-07,
+          "mean_fraction": 1.677470986868989e-08,
+          "mean_m": 2.680292103317277e-08,
+          "name": "Body.baked / 2",
+          "object": 14,
+          "pass": true,
+          "pose": 0,
+          "vertices": 1580
+        },
+        {
+          "max_fraction": 2.9691173238314543e-08,
+          "maximum_m": 4.7441069199902085e-08,
+          "mean_fraction": 1.0386781115984395e-08,
+          "mean_m": 1.6596178188465012e-08,
+          "name": "Body.baked / 3",
+          "object": 15,
+          "pass": true,
+          "pose": 0,
+          "vertices": 142
+        },
+        {
+          "max_fraction": 0.012278874152777576,
+          "maximum_m": 0.019619397108467974,
+          "mean_fraction": 0.0019208348628363835,
+          "mean_m": 0.003069143105864624,
+          "name": "Body.baked / 4",
+          "object": 16,
+          "pass": true,
+          "pose": 0,
+          "vertices": 1425
+        },
+        {
+          "max_fraction": 2.4506344524609202e-08,
+          "maximum_m": 3.915666036828606e-08,
+          "mean_fraction": 7.746913590243073e-09,
+          "mean_m": 1.237815228015713e-08,
+          "name": "Body.baked / 5",
+          "object": 17,
+          "pass": true,
+          "pose": 0,
+          "vertices": 215
+        },
+        {
+          "max_fraction": 0.016094483497870387,
+          "maximum_m": 0.025716043594190236,
+          "mean_fraction": 0.002329570841869625,
+          "mean_m": 0.0037222285097375522,
+          "name": "Body.baked / 6",
+          "object": 18,
+          "pass": true,
+          "pose": 0,
+          "vertices": 742
+        },
+        {
+          "max_fraction": 0.07970977057558357,
+          "maximum_m": 0.12736164756550528,
+          "mean_fraction": 0.034181607185744506,
+          "mean_m": 0.0546159620856676,
+          "name": "Body.baked / 7",
+          "object": 19,
+          "pass": false,
+          "pose": 0,
+          "vertices": 542
+        },
+        {
+          "max_fraction": 4.463919756061963e-08,
+          "maximum_m": 7.132528053046622e-08,
+          "mean_fraction": 1.161471725342767e-08,
+          "mean_m": 1.855819574842903e-08,
+          "name": "Body.baked / 8",
+          "object": 20,
+          "pass": true,
+          "pose": 0,
+          "vertices": 225
+        },
+        {
+          "max_fraction": 0.003329736323991676,
+          "maximum_m": 0.005320310184309977,
+          "mean_fraction": 0.0009067634476623189,
+          "mean_m": 0.001448842291384368,
+          "name": "Face.baked / 0",
+          "object": 2,
+          "pass": true,
+          "pose": 1,
+          "vertices": 386
+        },
+        {
+          "max_fraction": 0.004527232446072192,
+          "maximum_m": 0.007233690162199361,
+          "mean_fraction": 0.0033855703478397076,
+          "mean_m": 0.005409522751554215,
+          "name": "Face.baked / 1",
+          "object": 3,
+          "pass": true,
+          "pose": 1,
+          "vertices": 74
+        },
+        {
+          "max_fraction": 0.006672877478276666,
+          "maximum_m": 0.010662038837888707,
+          "mean_fraction": 0.0038174488146442394,
+          "mean_m": 0.006099585621928833,
+          "name": "Face.baked / 2",
+          "object": 4,
+          "pass": true,
+          "pose": 1,
+          "vertices": 260
+        },
+        {
+          "max_fraction": 0.006067172482231339,
+          "maximum_m": 0.00969423293808574,
+          "mean_fraction": 0.004102154763609662,
+          "mean_m": 0.006554493702457723,
+          "name": "Face.baked / 3",
+          "object": 5,
+          "pass": true,
+          "pose": 1,
+          "vertices": 150
+        },
+        {
+          "max_fraction": 0.0053386594431399734,
+          "maximum_m": 0.008530202226898983,
+          "mean_fraction": 0.004144478430917385,
+          "mean_m": 0.006622119188773916,
+          "name": "Face.baked / 4",
+          "object": 6,
+          "pass": true,
+          "pose": 1,
+          "vertices": 110
+        },
+        {
+          "max_fraction": 0.003920748556055172,
+          "maximum_m": 0.006264639732161301,
+          "mean_fraction": 0.003221835560669739,
+          "mean_m": 0.005147904481834312,
+          "name": "Face.baked / 5",
+          "object": 7,
+          "pass": true,
+          "pose": 1,
+          "vertices": 122
+        },
+        {
+          "max_fraction": 0.003971006930667794,
+          "maximum_m": 0.006344943430797069,
+          "mean_fraction": 0.003240054972332643,
+          "mean_m": 0.005177015772336162,
+          "name": "Face.baked / 6",
+          "object": 8,
+          "pass": true,
+          "pose": 1,
+          "vertices": 122
+        },
+        {
+          "max_fraction": 0.013513914959596012,
+          "maximum_m": 0.021592766631817344,
+          "mean_fraction": 0.004320643881990151,
+          "mean_m": 0.006903599387885422,
+          "name": "Face.baked / 7",
+          "object": 9,
+          "pass": true,
+          "pose": 1,
+          "vertices": 588
+        },
+        {
+          "max_fraction": 0.009120218819464912,
+          "maximum_m": 0.014572443084672307,
+          "mean_fraction": 0.007420488254001208,
+          "mean_m": 0.011856584242378551,
+          "name": "Face.baked / 8",
+          "object": 10,
+          "pass": true,
+          "pose": 1,
+          "vertices": 192
+        },
+        {
+          "max_fraction": 0.0029305399879068195,
+          "maximum_m": 0.004682467386636007,
+          "mean_fraction": 0.002230905817216452,
+          "mean_m": 0.0035645798299561494,
+          "name": "Face.baked / 9",
+          "object": 11,
+          "pass": true,
+          "pose": 1,
+          "vertices": 50
+        },
+        {
+          "max_fraction": 0.008619104397077115,
+          "maximum_m": 0.013771753809150838,
+          "mean_fraction": 0.0010872967715572703,
+          "mean_m": 0.0017373015530997838,
+          "name": "Body.baked / 0",
+          "object": 12,
+          "pass": true,
+          "pose": 1,
+          "vertices": 2418
+        },
+        {
+          "max_fraction": 4.077093261009371e-09,
+          "maximum_m": 6.514450000931653e-09,
+          "mean_fraction": 1.154571820238089e-09,
+          "mean_m": 1.844794787344059e-09,
+          "name": "Body.baked / 1",
+          "object": 13,
+          "pass": true,
+          "pose": 1,
+          "vertices": 508
+        },
+        {
+          "max_fraction": 7.191516048777916e-08,
+          "maximum_m": 1.1490728499809416e-07,
+          "mean_fraction": 1.413585346039127e-08,
+          "mean_m": 2.258651070577116e-08,
+          "name": "Body.baked / 2",
+          "object": 14,
+          "pass": true,
+          "pose": 1,
+          "vertices": 1580
+        },
+        {
+          "max_fraction": 0.02527741832178543,
+          "maximum_m": 0.04038869539352595,
+          "mean_fraction": 0.012536745212141535,
+          "mean_m": 0.020031427939103893,
+          "name": "Body.baked / 3",
+          "object": 15,
+          "pass": false,
+          "pose": 1,
+          "vertices": 142
+        },
+        {
+          "max_fraction": 0.01516634640834288,
+          "maximum_m": 0.024233050128830973,
+          "mean_fraction": 0.001818598393953075,
+          "mean_m": 0.0029057879108335366,
+          "name": "Body.baked / 4",
+          "object": 16,
+          "pass": true,
+          "pose": 1,
+          "vertices": 1425
+        },
+        {
+          "max_fraction": 0.00402583884712091,
+          "maximum_m": 0.006432554813544948,
+          "mean_fraction": 0.0025304972097088124,
+          "mean_m": 0.0040432721291403465,
+          "name": "Body.baked / 5",
+          "object": 17,
+          "pass": true,
+          "pose": 1,
+          "vertices": 215
+        },
+        {
+          "max_fraction": 5.646120338409416e-08,
+          "maximum_m": 9.021468553482495e-08,
+          "mean_fraction": 1.2859771033402684e-08,
+          "mean_m": 2.0547564173155762e-08,
+          "name": "Body.baked / 6",
+          "object": 18,
+          "pass": true,
+          "pose": 1,
+          "vertices": 742
+        },
+        {
+          "max_fraction": 4.693223639884147e-09,
+          "maximum_m": 7.498913757407293e-09,
+          "mean_fraction": 1.0780037469084236e-09,
+          "mean_m": 1.7224529978775394e-09,
+          "name": "Body.baked / 7",
+          "object": 19,
+          "pass": true,
+          "pose": 1,
+          "vertices": 542
+        },
+        {
+          "max_fraction": 0.030883576595352003,
+          "maximum_m": 0.04934631186988224,
+          "mean_fraction": 0.008998662971141352,
+          "mean_m": 0.014378219051634462,
+          "name": "Body.baked / 8",
+          "object": 20,
+          "pass": false,
+          "pose": 1,
+          "vertices": 225
+        },
+        {
+          "max_fraction": 3.888238689675056e-08,
+          "maximum_m": 6.212694906396437e-08,
+          "mean_fraction": 1.1310794438447056e-08,
+          "mean_m": 1.8072582627613775e-08,
+          "name": "Face.baked / 0",
+          "object": 2,
+          "pass": true,
+          "pose": 2,
+          "vertices": 386
+        },
+        {
+          "max_fraction": 2.025886288239271e-08,
+          "maximum_m": 3.2369960870211764e-08,
+          "mean_fraction": 8.387874521562876e-09,
+          "mean_m": 1.340229072201355e-08,
+          "name": "Face.baked / 1",
+          "object": 3,
+          "pass": true,
+          "pose": 2,
+          "vertices": 74
+        },
+        {
+          "max_fraction": 2.7171694750908103e-08,
+          "maximum_m": 4.341540297548789e-08,
+          "mean_fraction": 8.458689734869976e-09,
+          "mean_m": 1.3515440492416447e-08,
+          "name": "Face.baked / 2",
+          "object": 4,
+          "pass": true,
+          "pose": 2,
+          "vertices": 260
+        },
+        {
+          "max_fraction": 2.7323167370640163e-08,
+          "maximum_m": 4.365742854237677e-08,
+          "mean_fraction": 8.011155202073101e-09,
+          "mean_m": 1.2800362089506976e-08,
+          "name": "Face.baked / 3",
+          "object": 5,
+          "pass": true,
+          "pose": 2,
+          "vertices": 150
+        },
+        {
+          "max_fraction": 4.2074420437419836e-08,
+          "maximum_m": 6.722723536372851e-08,
+          "mean_fraction": 9.139727961914302e-09,
+          "mean_m": 1.4603615129291206e-08,
+          "name": "Face.baked / 4",
+          "object": 6,
+          "pass": true,
+          "pose": 2,
+          "vertices": 110
+        },
+        {
+          "max_fraction": 2.7203701463895928e-08,
+          "maximum_m": 4.346654385407592e-08,
+          "mean_fraction": 7.147139808485991e-09,
+          "mean_m": 1.1419823376942664e-08,
+          "name": "Face.baked / 5",
+          "object": 7,
+          "pass": true,
+          "pose": 2,
+          "vertices": 122
+        },
+        {
+          "max_fraction": 2.7202522054353686e-08,
+          "maximum_m": 4.3464659373147547e-08,
+          "mean_fraction": 8.862472413338233e-09,
+          "mean_m": 1.4160611427130977e-08,
+          "name": "Face.baked / 6",
+          "object": 8,
+          "pass": true,
+          "pose": 2,
+          "vertices": 122
+        },
+        {
+          "max_fraction": 4.1719119490645164e-08,
+          "maximum_m": 6.665952937692107e-08,
+          "mean_fraction": 1.153240030304539e-08,
+          "mean_m": 1.8426668303957042e-08,
+          "name": "Face.baked / 7",
+          "object": 9,
+          "pass": true,
+          "pose": 2,
+          "vertices": 588
+        },
+        {
+          "max_fraction": 2.740654113871518e-08,
+          "maximum_m": 4.379064458840352e-08,
+          "mean_fraction": 7.82435832145082e-09,
+          "mean_m": 1.2501894808716204e-08,
+          "name": "Face.baked / 8",
+          "object": 10,
+          "pass": true,
+          "pose": 2,
+          "vertices": 192
+        },
+        {
+          "max_fraction": 4.0180292961791115e-08,
+          "maximum_m": 6.42007657822308e-08,
+          "mean_fraction": 1.2417559434969728e-08,
+          "mean_m": 1.9840990846670128e-08,
+          "name": "Face.baked / 9",
+          "object": 11,
+          "pass": true,
+          "pose": 2,
+          "vertices": 50
+        },
+        {
+          "max_fraction": 0.015340548287268385,
+          "maximum_m": 0.024511392898465732,
+          "mean_fraction": 0.000640611328885743,
+          "mean_m": 0.0010235798410516083,
+          "name": "Body.baked / 0",
+          "object": 12,
+          "pass": true,
+          "pose": 2,
+          "vertices": 2418
+        },
+        {
+          "max_fraction": 0.010184297807398409,
+          "maximum_m": 0.016272646862257364,
+          "mean_fraction": 0.003645466179524329,
+          "mean_m": 0.005824788798360526,
+          "name": "Body.baked / 1",
+          "object": 13,
+          "pass": true,
+          "pose": 2,
+          "vertices": 508
+        },
+        {
+          "max_fraction": 0.0027999533347866533,
+          "maximum_m": 0.00447381377778289,
+          "mean_fraction": 0.00014762557385704792,
+          "mean_m": 0.00023587869057292363,
+          "name": "Body.baked / 2",
+          "object": 14,
+          "pass": true,
+          "pose": 2,
+          "vertices": 1580
+        },
+        {
+          "max_fraction": 2.9691173238314543e-08,
+          "maximum_m": 4.7441069199902085e-08,
+          "mean_fraction": 1.0386781115984395e-08,
+          "mean_m": 1.6596178188465012e-08,
+          "name": "Body.baked / 3",
+          "object": 15,
+          "pass": true,
+          "pose": 2,
+          "vertices": 142
+        },
+        {
+          "max_fraction": 0.006018295191966904,
+          "maximum_m": 0.00961613595986507,
+          "mean_fraction": 0.0002146343603284672,
+          "mean_m": 0.0003429464864621683,
+          "name": "Body.baked / 4",
+          "object": 16,
+          "pass": true,
+          "pose": 2,
+          "vertices": 1425
+        },
+        {
+          "max_fraction": 2.4506344524609202e-08,
+          "maximum_m": 3.915666036828606e-08,
+          "mean_fraction": 7.746913590243073e-09,
+          "mean_m": 1.237815228015713e-08,
+          "name": "Body.baked / 5",
+          "object": 17,
+          "pass": true,
+          "pose": 2,
+          "vertices": 215
+        },
+        {
+          "max_fraction": 5.646120338409416e-08,
+          "maximum_m": 9.021468553482495e-08,
+          "mean_fraction": 1.2859771033402684e-08,
+          "mean_m": 2.0547564173155762e-08,
+          "name": "Body.baked / 6",
+          "object": 18,
+          "pass": true,
+          "pose": 2,
+          "vertices": 742
+        },
+        {
+          "max_fraction": 0.015572554768061348,
+          "maximum_m": 0.024882096858924976,
+          "mean_fraction": 0.004702266872586658,
+          "mean_m": 0.007513363190745179,
+          "name": "Body.baked / 7",
+          "object": 19,
+          "pass": true,
+          "pose": 2,
+          "vertices": 542
+        },
+        {
+          "max_fraction": 4.463919756061963e-08,
+          "maximum_m": 7.132528053046622e-08,
+          "mean_fraction": 1.161471725342767e-08,
+          "mean_m": 1.855819574842903e-08,
+          "name": "Body.baked / 8",
+          "object": 20,
+          "pass": true,
+          "pose": 2,
+          "vertices": 225
+        },
+        {
+          "max_fraction": 4.2265195801898705e-08,
+          "maximum_m": 6.75320595347114e-08,
+          "mean_fraction": 1.3175247160360332e-08,
+          "mean_m": 2.1051637375308704e-08,
+          "name": "Face.baked / 0",
+          "object": 2,
+          "pass": true,
+          "pose": 3,
+          "vertices": 386
+        },
+        {
+          "max_fraction": 2.3667101019962673e-08,
+          "maximum_m": 3.781570260754233e-08,
+          "mean_fraction": 9.82678046199131e-09,
+          "mean_m": 1.5701399475450285e-08,
+          "name": "Face.baked / 1",
+          "object": 3,
+          "pass": true,
+          "pose": 3,
+          "vertices": 74
+        },
+        {
+          "max_fraction": 3.2301703574148e-08,
+          "maximum_m": 5.161221963968675e-08,
+          "mean_fraction": 1.0679636661967576e-08,
+          "mean_m": 1.706410783580662e-08,
+          "name": "Face.baked / 2",
+          "object": 4,
+          "pass": true,
+          "pose": 3,
+          "vertices": 260
+        },
+        {
+          "max_fraction": 3.299748307388733e-08,
+          "maximum_m": 5.272394813657255e-08,
+          "mean_fraction": 1.0541760256761526e-08,
+          "mean_m": 1.6843806535217626e-08,
+          "name": "Face.baked / 3",
+          "object": 5,
+          "pass": true,
+          "pose": 3,
+          "vertices": 150
+        },
+        {
+          "max_fraction": 3.585736395274879e-08,
+          "maximum_m": 5.72935151788901e-08,
+          "mean_fraction": 1.1423060276217719e-08,
+          "mean_m": 1.825196292140392e-08,
+          "name": "Face.baked / 4",
+          "object": 6,
+          "pass": true,
+          "pose": 3,
+          "vertices": 110
+        },
+        {
+          "max_fraction": 3.3131504968197704e-08,
+          "maximum_m": 5.2938090633106686e-08,
+          "mean_fraction": 8.524016913965927e-09,
+          "mean_m": 1.3619821387009257e-08,
+          "name": "Face.baked / 5",
+          "object": 7,
+          "pass": true,
+          "pose": 3,
+          "vertices": 122
+        },
+        {
+          "max_fraction": 3.292447427612493e-08,
+          "maximum_m": 5.260729341905609e-08,
+          "mean_fraction": 1.0231537317244567e-08,
+          "mean_m": 1.6348126966650446e-08,
+          "name": "Face.baked / 6",
+          "object": 8,
+          "pass": true,
+          "pose": 3,
+          "vertices": 122
+        },
+        {
+          "max_fraction": 0.0032869003223380796,
+          "maximum_m": 0.005251866081330813,
+          "mean_fraction": 8.932993716616647e-05,
+          "mean_m": 0.00014273291583015866,
+          "name": "Face.baked / 7",
+          "object": 9,
+          "pass": true,
+          "pose": 3,
+          "vertices": 588
+        },
+        {
+          "max_fraction": 3.2747073173496484e-08,
+          "maximum_m": 5.232383887455615e-08,
+          "mean_fraction": 1.0333379327616147e-08,
+          "mean_m": 1.6510851889061412e-08,
+          "name": "Face.baked / 8",
+          "object": 10,
+          "pass": true,
+          "pose": 3,
+          "vertices": 192
+        },
+        {
+          "max_fraction": 4.0977020665102324e-08,
+          "maximum_m": 6.547379106159197e-08,
+          "mean_fraction": 1.4680708032212146e-08,
+          "mean_m": 2.34570887472034e-08,
+          "name": "Face.baked / 9",
+          "object": 11,
+          "pass": true,
+          "pose": 3,
+          "vertices": 50
+        },
+        {
+          "max_fraction": 0.018844090369212523,
+          "maximum_m": 0.030109412923480953,
+          "mean_fraction": 0.0026603505466824117,
+          "mean_m": 0.004250754032794229,
+          "name": "Body.baked / 0",
+          "object": 12,
+          "pass": true,
+          "pose": 3,
+          "vertices": 2418
+        },
+        {
+          "max_fraction": 7.249273549010298e-09,
+          "maximum_m": 1.1583014430828197e-08,
+          "mean_fraction": 1.9424949336144135e-09,
+          "mean_m": 3.1037519409014715e-09,
+          "name": "Body.baked / 1",
+          "object": 13,
+          "pass": true,
+          "pose": 3,
+          "vertices": 508
+        },
+        {
+          "max_fraction": 8.001078025274892e-08,
+          "maximum_m": 1.278426060244258e-07,
+          "mean_fraction": 2.129980637197344e-08,
+          "mean_m": 3.4033198349108713e-08,
+          "name": "Body.baked / 2",
+          "object": 14,
+          "pass": true,
+          "pose": 3,
+          "vertices": 1580
+        },
+        {
+          "max_fraction": 0.006238157007822714,
+          "maximum_m": 0.00996743496501761,
+          "mean_fraction": 0.0007839150991796743,
+          "mean_m": 0.0012525530792781214,
+          "name": "Body.baked / 3",
+          "object": 15,
+          "pass": true,
+          "pose": 3,
+          "vertices": 142
+        },
+        {
+          "max_fraction": 0.026825523563098072,
+          "maximum_m": 0.04286228467517379,
+          "mean_fraction": 0.0027797182954714425,
+          "mean_m": 0.00444148188261962,
+          "name": "Body.baked / 4",
+          "object": 16,
+          "pass": true,
+          "pose": 3,
+          "vertices": 1425
+        },
+        {
+          "max_fraction": 0.006733971237728558,
+          "maximum_m": 0.010759655501486871,
+          "mean_fraction": 0.001630212522226993,
+          "mean_m": 0.0026047817126241637,
+          "name": "Body.baked / 5",
+          "object": 17,
+          "pass": true,
+          "pose": 3,
+          "vertices": 215
+        },
+        {
+          "max_fraction": 0.013550195162395157,
+          "maximum_m": 0.02165073576620506,
+          "mean_fraction": 0.0052664950414385665,
+          "mean_m": 0.00841489669998676,
+          "name": "Body.baked / 6",
+          "object": 18,
+          "pass": true,
+          "pose": 3,
+          "vertices": 742
+        },
+        {
+          "max_fraction": 7.6116159478897e-09,
+          "maximum_m": 1.2161971371374883e-08,
+          "mean_fraction": 2.306480487822475e-09,
+          "mean_m": 3.68533434340035e-09,
+          "name": "Body.baked / 7",
+          "object": 19,
+          "pass": true,
+          "pose": 3,
+          "vertices": 542
+        },
+        {
+          "max_fraction": 0.008004006547497196,
+          "maximum_m": 0.0127889398458085,
+          "mean_fraction": 0.00037504511021064466,
+          "mean_m": 0.0005992535520161922,
+          "name": "Body.baked / 8",
+          "object": 20,
+          "pass": true,
+          "pose": 3,
+          "vertices": 225
+        },
+        {
+          "max_fraction": 3.889255028774369e-08,
+          "maximum_m": 6.214318830555784e-08,
+          "mean_fraction": 1.1310875035463959e-08,
+          "mean_m": 1.807271140691884e-08,
+          "name": "Face.baked / 0",
+          "object": 2,
+          "pass": true,
+          "pose": 4,
+          "vertices": 386
+        },
+        {
+          "max_fraction": 2.025886288239271e-08,
+          "maximum_m": 3.2369960870211764e-08,
+          "mean_fraction": 8.387876053915984e-09,
+          "mean_m": 1.3402293170433801e-08,
+          "name": "Face.baked / 1",
+          "object": 3,
+          "pass": true,
+          "pose": 4,
+          "vertices": 74
+        },
+        {
+          "max_fraction": 2.7171694750908103e-08,
+          "maximum_m": 4.341540297548789e-08,
+          "mean_fraction": 8.458689734869976e-09,
+          "mean_m": 1.3515440492416447e-08,
+          "name": "Face.baked / 2",
+          "object": 4,
+          "pass": true,
+          "pose": 4,
+          "vertices": 260
+        },
+        {
+          "max_fraction": 2.7323167370640163e-08,
+          "maximum_m": 4.365742854237677e-08,
+          "mean_fraction": 8.011155202073101e-09,
+          "mean_m": 1.2800362089506976e-08,
+          "name": "Face.baked / 3",
+          "object": 5,
+          "pass": true,
+          "pose": 4,
+          "vertices": 150
+        },
+        {
+          "max_fraction": 4.2074420437419836e-08,
+          "maximum_m": 6.722723536372851e-08,
+          "mean_fraction": 9.139727961914302e-09,
+          "mean_m": 1.4603615129291206e-08,
+          "name": "Face.baked / 4",
+          "object": 6,
+          "pass": true,
+          "pose": 4,
+          "vertices": 110
+        },
+        {
+          "max_fraction": 2.7203701463895928e-08,
+          "maximum_m": 4.346654385407592e-08,
+          "mean_fraction": 7.147139808485991e-09,
+          "mean_m": 1.1419823376942664e-08,
+          "name": "Face.baked / 5",
+          "object": 7,
+          "pass": true,
+          "pose": 4,
+          "vertices": 122
+        },
+        {
+          "max_fraction": 2.7202522054353686e-08,
+          "maximum_m": 4.3464659373147547e-08,
+          "mean_fraction": 8.862472413338233e-09,
+          "mean_m": 1.4160611427130977e-08,
+          "name": "Face.baked / 6",
+          "object": 8,
+          "pass": true,
+          "pose": 4,
+          "vertices": 122
+        },
+        {
+          "max_fraction": 4.1719119490645164e-08,
+          "maximum_m": 6.665952937692107e-08,
+          "mean_fraction": 1.1532432389802206e-08,
+          "mean_m": 1.8426719572731038e-08,
+          "name": "Face.baked / 7",
+          "object": 9,
+          "pass": true,
+          "pose": 4,
+          "vertices": 588
+        },
+        {
+          "max_fraction": 2.740654113871518e-08,
+          "maximum_m": 4.379064458840352e-08,
+          "mean_fraction": 7.82435832145082e-09,
+          "mean_m": 1.2501894808716204e-08,
+          "name": "Face.baked / 8",
+          "object": 10,
+          "pass": true,
+          "pose": 4,
+          "vertices": 192
+        },
+        {
+          "max_fraction": 4.0180292961791115e-08,
+          "maximum_m": 6.42007657822308e-08,
+          "mean_fraction": 1.2417559434969728e-08,
+          "mean_m": 1.9840990846670128e-08,
+          "name": "Face.baked / 9",
+          "object": 11,
+          "pass": true,
+          "pose": 4,
+          "vertices": 50
+        },
+        {
+          "max_fraction": 0.015340548287268385,
+          "maximum_m": 0.024511392898465732,
+          "mean_fraction": 0.000640611328885743,
+          "mean_m": 0.0010235798410516083,
+          "name": "Body.baked / 0",
+          "object": 12,
+          "pass": true,
+          "pose": 4,
+          "vertices": 2418
+        },
+        {
+          "max_fraction": 0.010184297807398409,
+          "maximum_m": 0.016272646862257364,
+          "mean_fraction": 0.003645466179524329,
+          "mean_m": 0.005824788798360526,
+          "name": "Body.baked / 1",
+          "object": 13,
+          "pass": true,
+          "pose": 4,
+          "vertices": 508
+        },
+        {
+          "max_fraction": 0.0027999533347866533,
+          "maximum_m": 0.00447381377778289,
+          "mean_fraction": 0.00014762557385704792,
+          "mean_m": 0.00023587869057292363,
+          "name": "Body.baked / 2",
+          "object": 14,
+          "pass": true,
+          "pose": 4,
+          "vertices": 1580
+        },
+        {
+          "max_fraction": 2.9691173238314543e-08,
+          "maximum_m": 4.7441069199902085e-08,
+          "mean_fraction": 1.0386781115984395e-08,
+          "mean_m": 1.6596178188465012e-08,
+          "name": "Body.baked / 3",
+          "object": 15,
+          "pass": true,
+          "pose": 4,
+          "vertices": 142
+        },
+        {
+          "max_fraction": 0.006018295191966904,
+          "maximum_m": 0.00961613595986507,
+          "mean_fraction": 0.0002146343603284672,
+          "mean_m": 0.0003429464864621683,
+          "name": "Body.baked / 4",
+          "object": 16,
+          "pass": true,
+          "pose": 4,
+          "vertices": 1425
+        },
+        {
+          "max_fraction": 2.4506344524609202e-08,
+          "maximum_m": 3.915666036828606e-08,
+          "mean_fraction": 7.746913590243073e-09,
+          "mean_m": 1.237815228015713e-08,
+          "name": "Body.baked / 5",
+          "object": 17,
+          "pass": true,
+          "pose": 4,
+          "vertices": 215
+        },
+        {
+          "max_fraction": 5.646120338409416e-08,
+          "maximum_m": 9.021468553482495e-08,
+          "mean_fraction": 1.2859771033402684e-08,
+          "mean_m": 2.0547564173155762e-08,
+          "name": "Body.baked / 6",
+          "object": 18,
+          "pass": true,
+          "pose": 4,
+          "vertices": 742
+        },
+        {
+          "max_fraction": 0.015572554768061348,
+          "maximum_m": 0.024882096858924976,
+          "mean_fraction": 0.004702266872586658,
+          "mean_m": 0.007513363190745179,
+          "name": "Body.baked / 7",
+          "object": 19,
+          "pass": true,
+          "pose": 4,
+          "vertices": 542
+        },
+        {
+          "max_fraction": 4.463919756061963e-08,
+          "maximum_m": 7.132528053046622e-08,
+          "mean_fraction": 1.161471725342767e-08,
+          "mean_m": 1.855819574842903e-08,
+          "name": "Body.baked / 8",
+          "object": 20,
+          "pass": true,
+          "pose": 4,
+          "vertices": 225
+        }
+      ],
+      "saved_field": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/weights-nearest-ray-f641b8f/artifacts/weights-audit/female-sewn/bound.dsculpt",
+        "sha256": "ae410f543997b4f22e1c13634ddd350815d5ed7fb8b4154d3072066fd5cbef81"
+      }
+    },
+    "male": {
+      "cohorts": 95,
+      "failures": 4,
+      "max_fraction_bound": 0.03,
+      "mean_fraction_bound": 0.01,
+      "records": [
+        {
+          "max_fraction": 2.8113208318574142e-08,
+          "maximum_m": 4.938515343810306e-08,
+          "mean_fraction": 9.207689503169363e-09,
+          "mean_m": 1.6174715947450168e-08,
+          "name": "Face.baked / 0",
+          "object": 2,
+          "pass": true,
+          "pose": 0,
+          "vertices": 110
+        },
+        {
+          "max_fraction": 3.926575170316241e-08,
+          "maximum_m": 6.89763029089055e-08,
+          "mean_fraction": 1.1308073869173685e-08,
+          "mean_m": 1.9864362572577055e-08,
+          "name": "Face.baked / 1",
+          "object": 3,
+          "pass": true,
+          "pose": 0,
+          "vertices": 384
+        },
+        {
+          "max_fraction": 2.7327977078087657e-08,
+          "maximum_m": 4.800577457616803e-08,
+          "mean_fraction": 8.439110499890145e-09,
+          "mean_m": 1.4824589288972306e-08,
+          "name": "Face.baked / 2",
+          "object": 4,
+          "pass": true,
+          "pose": 0,
+          "vertices": 122
+        },
+        {
+          "max_fraction": 2.7343252699018115e-08,
+          "maximum_m": 4.803260854242917e-08,
+          "mean_fraction": 7.099577336161588e-09,
+          "mean_m": 1.2471494257038307e-08,
+          "name": "Face.baked / 3",
+          "object": 5,
+          "pass": true,
+          "pose": 0,
+          "vertices": 122
+        },
+        {
+          "max_fraction": 2.73516275724279e-08,
+          "maximum_m": 4.8047320289437196e-08,
+          "mean_fraction": 8.636885141680979e-09,
+          "mean_m": 1.5172010718797276e-08,
+          "name": "Face.baked / 4",
+          "object": 6,
+          "pass": true,
+          "pose": 0,
+          "vertices": 74
+        },
+        {
+          "max_fraction": 4.0571495637666164e-08,
+          "maximum_m": 7.127004198790405e-08,
+          "mean_fraction": 1.0470075410475584e-08,
+          "mean_m": 1.8392290015267504e-08,
+          "name": "Face.baked / 5",
+          "object": 7,
+          "pass": true,
+          "pose": 0,
+          "vertices": 596
+        },
+        {
+          "max_fraction": 2.74072719364749e-08,
+          "maximum_m": 4.8145068131849453e-08,
+          "mean_fraction": 8.646110505203264e-09,
+          "mean_m": 1.51882164818645e-08,
+          "name": "Face.baked / 6",
+          "object": 8,
+          "pass": true,
+          "pose": 0,
+          "vertices": 150
+        },
+        {
+          "max_fraction": 2.7544114689978227e-08,
+          "maximum_m": 4.838545337362171e-08,
+          "mean_fraction": 7.322629845875212e-09,
+          "mean_m": 1.286332013091708e-08,
+          "name": "Face.baked / 7",
+          "object": 9,
+          "pass": true,
+          "pose": 0,
+          "vertices": 260
+        },
+        {
+          "max_fraction": 2.7556719654271455e-08,
+          "maximum_m": 4.840759592272706e-08,
+          "mean_fraction": 8.286513725768908e-09,
+          "mean_m": 1.4556529698663724e-08,
+          "name": "Face.baked / 8",
+          "object": 10,
+          "pass": true,
+          "pose": 0,
+          "vertices": 188
+        },
+        {
+          "max_fraction": 3.41668193417277e-08,
+          "maximum_m": 6.001924777003711e-08,
+          "mean_fraction": 1.3971834745838839e-08,
+          "mean_m": 2.454366626946641e-08,
+          "name": "Face.baked / 9",
+          "object": 11,
+          "pass": true,
+          "pose": 0,
+          "vertices": 50
+        },
+        {
+          "max_fraction": 0.010842962800029395,
+          "maximum_m": 0.019047323789412804,
+          "mean_fraction": 0.0006604857522114054,
+          "mean_m": 0.0011602443181517148,
+          "name": "Body.baked / 0",
+          "object": 12,
+          "pass": true,
+          "pose": 0,
+          "vertices": 2233
+        },
+        {
+          "max_fraction": 0.049489867135742355,
+          "maximum_m": 0.08693652657620007,
+          "mean_fraction": 0.02287963981236339,
+          "mean_m": 0.040191589303436887,
+          "name": "Body.baked / 1",
+          "object": 13,
+          "pass": false,
+          "pose": 0,
+          "vertices": 508
+        },
+        {
+          "max_fraction": 8.249300883930803e-08,
+          "maximum_m": 1.4491159646152553e-07,
+          "mean_fraction": 1.863318560881357e-08,
+          "mean_m": 3.273204252977211e-08,
+          "name": "Body.baked / 2",
+          "object": 14,
+          "pass": true,
+          "pose": 0,
+          "vertices": 1580
+        },
+        {
+          "max_fraction": 2.9345228034107554e-08,
+          "maximum_m": 5.154938464220177e-08,
+          "mean_fraction": 9.987458706321917e-09,
+          "mean_m": 1.7544499904785045e-08,
+          "name": "Body.baked / 3",
+          "object": 15,
+          "pass": true,
+          "pose": 0,
+          "vertices": 145
+        },
+        {
+          "max_fraction": 0.01338266142676213,
+          "maximum_m": 0.02350869315524465,
+          "mean_fraction": 0.003070335576531865,
+          "mean_m": 0.005393514387801583,
+          "name": "Body.baked / 4",
+          "object": 16,
+          "pass": true,
+          "pose": 0,
+          "vertices": 1399
+        },
+        {
+          "max_fraction": 4.87782860300574e-08,
+          "maximum_m": 8.568652544898298e-08,
+          "mean_fraction": 1.2237004361167322e-08,
+          "mean_m": 2.149617116448824e-08,
+          "name": "Body.baked / 5",
+          "object": 17,
+          "pass": true,
+          "pose": 0,
+          "vertices": 77
+        },
+        {
+          "max_fraction": 0.013970339103962523,
+          "maximum_m": 0.02454103894558671,
+          "mean_fraction": 0.0013144785298821108,
+          "mean_m": 0.0023090827327036504,
+          "name": "Body.baked / 6",
+          "object": 18,
+          "pass": true,
+          "pose": 0,
+          "vertices": 1095
+        },
+        {
+          "max_fraction": 0.11323823593417548,
+          "maximum_m": 0.19892029373874762,
+          "mean_fraction": 0.04620530231080457,
+          "mean_m": 0.08116668572350101,
+          "name": "Body.baked / 7",
+          "object": 19,
+          "pass": false,
+          "pose": 0,
+          "vertices": 536
+        },
+        {
+          "max_fraction": 3.3245714039556214e-08,
+          "maximum_m": 5.840118532177733e-08,
+          "mean_fraction": 9.613855500495735e-09,
+          "mean_m": 1.6888208689794005e-08,
+          "name": "Body.baked / 8",
+          "object": 20,
+          "pass": true,
+          "pose": 0,
+          "vertices": 249
+        },
+        {
+          "max_fraction": 0.0045019655961726635,
+          "maximum_m": 0.007908391643551992,
+          "mean_fraction": 0.0035129081082471993,
+          "mean_m": 0.006170960780208212,
+          "name": "Face.baked / 0",
+          "object": 2,
+          "pass": true,
+          "pose": 1,
+          "vertices": 110
+        },
+        {
+          "max_fraction": 0.004849749830654706,
+          "maximum_m": 0.008519327883507972,
+          "mean_fraction": 0.0013855781619616498,
+          "mean_m": 0.0024339801190087504,
+          "name": "Face.baked / 1",
+          "object": 3,
+          "pass": true,
+          "pose": 1,
+          "vertices": 384
+        },
+        {
+          "max_fraction": 0.003478795177440835,
+          "maximum_m": 0.006111036195898756,
+          "mean_fraction": 0.0028982513352209666,
+          "mean_m": 0.005091222078609556,
+          "name": "Face.baked / 2",
+          "object": 4,
+          "pass": true,
+          "pose": 1,
+          "vertices": 122
+        },
+        {
+          "max_fraction": 0.0035186712317478073,
+          "maximum_m": 0.006181084588744579,
+          "mean_fraction": 0.0029030328047952875,
+          "mean_m": 0.005099621461771791,
+          "name": "Face.baked / 3",
+          "object": 5,
+          "pass": true,
+          "pose": 1,
+          "vertices": 122
+        },
+        {
+          "max_fraction": 0.003970133762424618,
+          "maximum_m": 0.006974147625036248,
+          "mean_fraction": 0.0030160291764226447,
+          "mean_m": 0.005298116883835699,
+          "name": "Face.baked / 4",
+          "object": 6,
+          "pass": true,
+          "pose": 1,
+          "vertices": 74
+        },
+        {
+          "max_fraction": 0.016433514663287928,
+          "maximum_m": 0.028867983830845545,
+          "mean_fraction": 0.004880966037169081,
+          "mean_m": 0.008574163928223985,
+          "name": "Face.baked / 5",
+          "object": 7,
+          "pass": true,
+          "pose": 1,
+          "vertices": 596
+        },
+        {
+          "max_fraction": 0.005744039964681089,
+          "maximum_m": 0.010090285384573244,
+          "mean_fraction": 0.0037537912103386387,
+          "mean_m": 0.00659410881876105,
+          "name": "Face.baked / 6",
+          "object": 8,
+          "pass": true,
+          "pose": 1,
+          "vertices": 150
+        },
+        {
+          "max_fraction": 0.006100588695375766,
+          "maximum_m": 0.010716617803626389,
+          "mean_fraction": 0.0034724757752014374,
+          "mean_m": 0.006099935198613307,
+          "name": "Face.baked / 7",
+          "object": 9,
+          "pass": true,
+          "pose": 1,
+          "vertices": 260
+        },
+        {
+          "max_fraction": 0.00855597003330429,
+          "maximum_m": 0.015029870946012842,
+          "mean_fraction": 0.006880899989292246,
+          "mean_m": 0.012087354026360877,
+          "name": "Face.baked / 8",
+          "object": 10,
+          "pass": true,
+          "pose": 1,
+          "vertices": 188
+        },
+        {
+          "max_fraction": 0.0031382178812013285,
+          "maximum_m": 0.0055127600460645925,
+          "mean_fraction": 0.0021382205343364823,
+          "mean_m": 0.003756111646031639,
+          "name": "Face.baked / 9",
+          "object": 11,
+          "pass": true,
+          "pose": 1,
+          "vertices": 50
+        },
+        {
+          "max_fraction": 0.00950651689174808,
+          "maximum_m": 0.016699651994209273,
+          "mean_fraction": 0.000826712615160418,
+          "mean_m": 0.001452247245716827,
+          "name": "Body.baked / 0",
+          "object": 12,
+          "pass": true,
+          "pose": 1,
+          "vertices": 2233
+        },
+        {
+          "max_fraction": 5.230439333025519e-09,
+          "maximum_m": 9.188067263012959e-09,
+          "mean_fraction": 1.3936443079952932e-09,
+          "mean_m": 2.448149539126569e-09,
+          "name": "Body.baked / 1",
+          "object": 13,
+          "pass": true,
+          "pose": 1,
+          "vertices": 508
+        },
+        {
+          "max_fraction": 8.039279659747733e-08,
+          "maximum_m": 1.4122225219885505e-07,
+          "mean_fraction": 1.4147471153087299e-08,
+          "mean_m": 2.4852198501824666e-08,
+          "name": "Body.baked / 2",
+          "object": 14,
+          "pass": true,
+          "pose": 1,
+          "vertices": 1580
+        },
+        {
+          "max_fraction": 0.021846286635534326,
+          "maximum_m": 0.03837634628260607,
+          "mean_fraction": 0.010623236748968996,
+          "mean_m": 0.018661341349308413,
+          "name": "Body.baked / 3",
+          "object": 15,
+          "pass": false,
+          "pose": 1,
+          "vertices": 145
+        },
+        {
+          "max_fraction": 0.022312956334065468,
+          "maximum_m": 0.03919612303685319,
+          "mean_fraction": 0.0039610549450528765,
+          "mean_m": 0.006958199292712906,
+          "name": "Body.baked / 4",
+          "object": 16,
+          "pass": true,
+          "pose": 1,
+          "vertices": 1399
+        },
+        {
+          "max_fraction": 0.006352517227989127,
+          "maximum_m": 0.011159168831511988,
+          "mean_fraction": 0.0030999915704411464,
+          "mean_m": 0.00544560968026956,
+          "name": "Body.baked / 5",
+          "object": 17,
+          "pass": true,
+          "pose": 1,
+          "vertices": 77
+        },
+        {
+          "max_fraction": 4.369405946770665e-08,
+          "maximum_m": 7.675530329708504e-08,
+          "mean_fraction": 7.693963657953019e-09,
+          "mean_m": 1.3515624808434168e-08,
+          "name": "Body.baked / 6",
+          "object": 18,
+          "pass": true,
+          "pose": 1,
+          "vertices": 1095
+        },
+        {
+          "max_fraction": 5.044328856981466e-09,
+          "maximum_m": 8.861135725647247e-09,
+          "mean_fraction": 1.1316074509939394e-09,
+          "mean_m": 1.9878416922665468e-09,
+          "name": "Body.baked / 7",
+          "object": 19,
+          "pass": true,
+          "pose": 1,
+          "vertices": 536
+        },
+        {
+          "max_fraction": 0.021312615777457036,
+          "maximum_m": 0.03743887173637371,
+          "mean_fraction": 0.00770613178531727,
+          "mean_m": 0.013536999986611214,
+          "name": "Body.baked / 8",
+          "object": 20,
+          "pass": true,
+          "pose": 1,
+          "vertices": 249
+        },
+        {
+          "max_fraction": 2.8113208318574142e-08,
+          "maximum_m": 4.938515343810306e-08,
+          "mean_fraction": 9.207689503169363e-09,
+          "mean_m": 1.6174715947450168e-08,
+          "name": "Face.baked / 0",
+          "object": 2,
+          "pass": true,
+          "pose": 2,
+          "vertices": 110
+        },
+        {
+          "max_fraction": 3.926575170316241e-08,
+          "maximum_m": 6.89763029089055e-08,
+          "mean_fraction": 1.1308073869173685e-08,
+          "mean_m": 1.9864362572577055e-08,
+          "name": "Face.baked / 1",
+          "object": 3,
+          "pass": true,
+          "pose": 2,
+          "vertices": 384
+        },
+        {
+          "max_fraction": 2.7327977078087657e-08,
+          "maximum_m": 4.800577457616803e-08,
+          "mean_fraction": 8.439110499890145e-09,
+          "mean_m": 1.4824589288972306e-08,
+          "name": "Face.baked / 2",
+          "object": 4,
+          "pass": true,
+          "pose": 2,
+          "vertices": 122
+        },
+        {
+          "max_fraction": 2.7343252699018115e-08,
+          "maximum_m": 4.803260854242917e-08,
+          "mean_fraction": 7.099577336161588e-09,
+          "mean_m": 1.2471494257038307e-08,
+          "name": "Face.baked / 3",
+          "object": 5,
+          "pass": true,
+          "pose": 2,
+          "vertices": 122
+        },
+        {
+          "max_fraction": 2.73516275724279e-08,
+          "maximum_m": 4.8047320289437196e-08,
+          "mean_fraction": 8.636885141680979e-09,
+          "mean_m": 1.5172010718797276e-08,
+          "name": "Face.baked / 4",
+          "object": 6,
+          "pass": true,
+          "pose": 2,
+          "vertices": 74
+        },
+        {
+          "max_fraction": 4.0571495637666164e-08,
+          "maximum_m": 7.127004198790405e-08,
+          "mean_fraction": 1.0470075410475584e-08,
+          "mean_m": 1.8392290015267504e-08,
+          "name": "Face.baked / 5",
+          "object": 7,
+          "pass": true,
+          "pose": 2,
+          "vertices": 596
+        },
+        {
+          "max_fraction": 2.74072719364749e-08,
+          "maximum_m": 4.8145068131849453e-08,
+          "mean_fraction": 8.646110505203264e-09,
+          "mean_m": 1.51882164818645e-08,
+          "name": "Face.baked / 6",
+          "object": 8,
+          "pass": true,
+          "pose": 2,
+          "vertices": 150
+        },
+        {
+          "max_fraction": 2.7544114689978227e-08,
+          "maximum_m": 4.838545337362171e-08,
+          "mean_fraction": 7.322629845875212e-09,
+          "mean_m": 1.286332013091708e-08,
+          "name": "Face.baked / 7",
+          "object": 9,
+          "pass": true,
+          "pose": 2,
+          "vertices": 260
+        },
+        {
+          "max_fraction": 2.7556719654271455e-08,
+          "maximum_m": 4.840759592272706e-08,
+          "mean_fraction": 8.286513725768908e-09,
+          "mean_m": 1.4556529698663724e-08,
+          "name": "Face.baked / 8",
+          "object": 10,
+          "pass": true,
+          "pose": 2,
+          "vertices": 188
+        },
+        {
+          "max_fraction": 3.41668193417277e-08,
+          "maximum_m": 6.001924777003711e-08,
+          "mean_fraction": 1.3971834745838839e-08,
+          "mean_m": 2.454366626946641e-08,
+          "name": "Face.baked / 9",
+          "object": 11,
+          "pass": true,
+          "pose": 2,
+          "vertices": 50
+        },
+        {
+          "max_fraction": 0.0174324880475103,
+          "maximum_m": 0.030622833483768586,
+          "mean_fraction": 0.000934601399000543,
+          "mean_m": 0.0016417704080616481,
+          "name": "Body.baked / 0",
+          "object": 12,
+          "pass": true,
+          "pose": 2,
+          "vertices": 2233
+        },
+        {
+          "max_fraction": 0.011774554326918233,
+          "maximum_m": 0.0206838068964172,
+          "mean_fraction": 0.004348705572803059,
+          "mean_m": 0.007639166954421276,
+          "name": "Body.baked / 1",
+          "object": 13,
+          "pass": true,
+          "pose": 2,
+          "vertices": 508
+        },
+        {
+          "max_fraction": 0.0029858714267257417,
+          "maximum_m": 0.005245140180527687,
+          "mean_fraction": 0.00014774052966308262,
+          "mean_m": 0.00025952885361780017,
+          "name": "Body.baked / 2",
+          "object": 14,
+          "pass": true,
+          "pose": 2,
+          "vertices": 1580
+        },
+        {
+          "max_fraction": 2.9345228034107554e-08,
+          "maximum_m": 5.154938464220177e-08,
+          "mean_fraction": 9.987458706321917e-09,
+          "mean_m": 1.7544499904785045e-08,
+          "name": "Body.baked / 3",
+          "object": 15,
+          "pass": true,
+          "pose": 2,
+          "vertices": 145
+        },
+        {
+          "max_fraction": 8.446325002385246e-08,
+          "maximum_m": 1.4837262666861546e-07,
+          "mean_fraction": 1.728702474286006e-08,
+          "mean_m": 3.036730492443943e-08,
+          "name": "Body.baked / 4",
+          "object": 16,
+          "pass": true,
+          "pose": 2,
+          "vertices": 1399
+        },
+        {
+          "max_fraction": 4.87782860300574e-08,
+          "maximum_m": 8.568652544898298e-08,
+          "mean_fraction": 1.2237004361167322e-08,
+          "mean_m": 2.149617116448824e-08,
+          "name": "Body.baked / 5",
+          "object": 17,
+          "pass": true,
+          "pose": 2,
+          "vertices": 77
+        },
+        {
+          "max_fraction": 0.01684883454738079,
+          "maximum_m": 0.029597556776394772,
+          "mean_fraction": 0.0014948334883139798,
+          "mean_m": 0.0026259038224401734,
+          "name": "Body.baked / 6",
+          "object": 18,
+          "pass": true,
+          "pose": 2,
+          "vertices": 1095
+        },
+        {
+          "max_fraction": 0.019222193431278393,
+          "maximum_m": 0.03376672492386407,
+          "mean_fraction": 0.006168464544870616,
+          "mean_m": 0.010835852122387158,
+          "name": "Body.baked / 7",
+          "object": 19,
+          "pass": true,
+          "pose": 2,
+          "vertices": 536
+        },
+        {
+          "max_fraction": 3.3245714039556214e-08,
+          "maximum_m": 5.840118532177733e-08,
+          "mean_fraction": 9.613855500495735e-09,
+          "mean_m": 1.6888208689794005e-08,
+          "name": "Body.baked / 8",
+          "object": 20,
+          "pass": true,
+          "pose": 2,
+          "vertices": 249
+        },
+        {
+          "max_fraction": 6.52274765971925e-08,
+          "maximum_m": 1.1458204640430045e-07,
+          "mean_fraction": 3.272084318073424e-08,
+          "mean_m": 5.747916932117072e-08,
+          "name": "Face.baked / 0",
+          "object": 2,
+          "pass": true,
+          "pose": 3,
+          "vertices": 110
+        },
+        {
+          "max_fraction": 6.386196869678615e-08,
+          "maximum_m": 1.1218332277168128e-07,
+          "mean_fraction": 2.6425304035294593e-08,
+          "mean_m": 4.642009121276044e-08,
+          "name": "Face.baked / 1",
+          "object": 3,
+          "pass": true,
+          "pose": 3,
+          "vertices": 384
+        },
+        {
+          "max_fraction": 5.042251862129326e-08,
+          "maximum_m": 8.857487166283238e-08,
+          "mean_fraction": 1.6537305184369995e-08,
+          "mean_m": 2.9050307767372987e-08,
+          "name": "Face.baked / 2",
+          "object": 4,
+          "pass": true,
+          "pose": 3,
+          "vertices": 122
+        },
+        {
+          "max_fraction": 4.355532716462478e-08,
+          "maximum_m": 7.651159877226235e-08,
+          "mean_fraction": 1.61194044284066e-08,
+          "mean_m": 2.831620112535319e-08,
+          "name": "Face.baked / 3",
+          "object": 5,
+          "pass": true,
+          "pose": 3,
+          "vertices": 122
+        },
+        {
+          "max_fraction": 5.123746332027697e-08,
+          "maximum_m": 9.000644676257967e-08,
+          "mean_fraction": 2.906823033126073e-08,
+          "mean_m": 5.1062795779697073e-08,
+          "name": "Face.baked / 4",
+          "object": 6,
+          "pass": true,
+          "pose": 3,
+          "vertices": 74
+        },
+        {
+          "max_fraction": 0.0037000029377764624,
+          "maximum_m": 0.0064996214851365,
+          "mean_fraction": 0.0002060587994260694,
+          "mean_m": 0.0003619738206899846,
+          "name": "Face.baked / 5",
+          "object": 7,
+          "pass": true,
+          "pose": 3,
+          "vertices": 596
+        },
+        {
+          "max_fraction": 6.22267625310299e-08,
+          "maximum_m": 1.0931083285577757e-07,
+          "mean_fraction": 3.066570883804674e-08,
+          "mean_m": 5.3869011287998764e-08,
+          "name": "Face.baked / 6",
+          "object": 8,
+          "pass": true,
+          "pose": 3,
+          "vertices": 150
+        },
+        {
+          "max_fraction": 6.275826588866829e-08,
+          "maximum_m": 1.1024449985572994e-07,
+          "mean_fraction": 3.1855312961227894e-08,
+          "mean_m": 5.595873301197171e-08,
+          "name": "Face.baked / 7",
+          "object": 9,
+          "pass": true,
+          "pose": 3,
+          "vertices": 260
+        },
+        {
+          "max_fraction": 5.955421996138362e-08,
+          "maximum_m": 1.0461610277103505e-07,
+          "mean_fraction": 2.9740288744660214e-08,
+          "mean_m": 5.224336924854493e-08,
+          "name": "Face.baked / 8",
+          "object": 10,
+          "pass": true,
+          "pose": 3,
+          "vertices": 188
+        },
+        {
+          "max_fraction": 7.50335267258713e-08,
+          "maximum_m": 1.3180787437593676e-07,
+          "mean_fraction": 3.5232575373637015e-08,
+          "mean_m": 6.189141136541912e-08,
+          "name": "Face.baked / 9",
+          "object": 11,
+          "pass": true,
+          "pose": 3,
+          "vertices": 50
+        },
+        {
+          "max_fraction": 0.030246655615607472,
+          "maximum_m": 0.0531328801622168,
+          "mean_fraction": 0.0037255282907347935,
+          "mean_m": 0.006544460674535458,
+          "name": "Body.baked / 0",
+          "object": 12,
+          "pass": false,
+          "pose": 3,
+          "vertices": 2233
+        },
+        {
+          "max_fraction": 5.2459656850565e-09,
+          "maximum_m": 9.215341676829237e-09,
+          "mean_fraction": 1.6984564803958423e-09,
+          "mean_m": 2.9835987747037522e-09,
+          "name": "Body.baked / 1",
+          "object": 13,
+          "pass": true,
+          "pose": 3,
+          "vertices": 508
+        },
+        {
+          "max_fraction": 7.483803045042972e-08,
+          "maximum_m": 1.3146445524533253e-07,
+          "mean_fraction": 2.057474970139345e-08,
+          "mean_m": 3.6142697035491356e-08,
+          "name": "Body.baked / 2",
+          "object": 14,
+          "pass": true,
+          "pose": 3,
+          "vertices": 1580
+        },
+        {
+          "max_fraction": 0.005796466977189306,
+          "maximum_m": 0.010182381456557638,
+          "mean_fraction": 0.0006344546979190995,
+          "mean_m": 0.001114516786956644,
+          "name": "Body.baked / 3",
+          "object": 15,
+          "pass": true,
+          "pose": 3,
+          "vertices": 145
+        },
+        {
+          "max_fraction": 0.014867477639354457,
+          "maximum_m": 0.0261170000996288,
+          "mean_fraction": 0.003234367587744614,
+          "mean_m": 0.0056816617223464675,
+          "name": "Body.baked / 4",
+          "object": 16,
+          "pass": true,
+          "pose": 3,
+          "vertices": 1399
+        },
+        {
+          "max_fraction": 0.0029243375172436884,
+          "maximum_m": 0.005137046450100989,
+          "mean_fraction": 0.0013665201661776064,
+          "mean_m": 0.0024005018323844567,
+          "name": "Body.baked / 5",
+          "object": 17,
+          "pass": true,
+          "pose": 3,
+          "vertices": 77
+        },
+        {
+          "max_fraction": 0.024471027909046317,
+          "maximum_m": 0.042987106074190255,
+          "mean_fraction": 0.004829246740499133,
+          "mean_m": 0.008483311067432973,
+          "name": "Body.baked / 6",
+          "object": 18,
+          "pass": true,
+          "pose": 3,
+          "vertices": 1095
+        },
+        {
+          "max_fraction": 5.098277652244451e-09,
+          "maximum_m": 8.955905041965479e-09,
+          "mean_fraction": 1.776050930917198e-09,
+          "mean_m": 3.1199053037031718e-09,
+          "name": "Body.baked / 7",
+          "object": 19,
+          "pass": true,
+          "pose": 3,
+          "vertices": 536
+        },
+        {
+          "max_fraction": 0.0060810507795169885,
+          "maximum_m": 0.010682296463933936,
+          "mean_fraction": 0.00026090812495049794,
+          "mean_m": 0.0004583250562482088,
+          "name": "Body.baked / 8",
+          "object": 20,
+          "pass": true,
+          "pose": 3,
+          "vertices": 249
+        },
+        {
+          "max_fraction": 2.8113208318574142e-08,
+          "maximum_m": 4.938515343810306e-08,
+          "mean_fraction": 9.207689503169363e-09,
+          "mean_m": 1.6174715947450168e-08,
+          "name": "Face.baked / 0",
+          "object": 2,
+          "pass": true,
+          "pose": 4,
+          "vertices": 110
+        },
+        {
+          "max_fraction": 3.927228706066461e-08,
+          "maximum_m": 6.898778326466433e-08,
+          "mean_fraction": 1.1308651440992851e-08,
+          "mean_m": 1.986537716588095e-08,
+          "name": "Face.baked / 1",
+          "object": 3,
+          "pass": true,
+          "pose": 4,
+          "vertices": 384
+        },
+        {
+          "max_fraction": 2.7327977078087657e-08,
+          "maximum_m": 4.800577457616803e-08,
+          "mean_fraction": 8.439110499890145e-09,
+          "mean_m": 1.4824589288972306e-08,
+          "name": "Face.baked / 2",
+          "object": 4,
+          "pass": true,
+          "pose": 4,
+          "vertices": 122
+        },
+        {
+          "max_fraction": 2.7343252699018115e-08,
+          "maximum_m": 4.803260854242917e-08,
+          "mean_fraction": 7.099577336161588e-09,
+          "mean_m": 1.2471494257038307e-08,
+          "name": "Face.baked / 3",
+          "object": 5,
+          "pass": true,
+          "pose": 4,
+          "vertices": 122
+        },
+        {
+          "max_fraction": 2.73516275724279e-08,
+          "maximum_m": 4.8047320289437196e-08,
+          "mean_fraction": 8.636885141680979e-09,
+          "mean_m": 1.5172010718797276e-08,
+          "name": "Face.baked / 4",
+          "object": 6,
+          "pass": true,
+          "pose": 4,
+          "vertices": 74
+        },
+        {
+          "max_fraction": 4.0571495637666164e-08,
+          "maximum_m": 7.127004198790405e-08,
+          "mean_fraction": 1.0470800574393275e-08,
+          "mean_m": 1.8393563876683004e-08,
+          "name": "Face.baked / 5",
+          "object": 7,
+          "pass": true,
+          "pose": 4,
+          "vertices": 596
+        },
+        {
+          "max_fraction": 2.74072719364749e-08,
+          "maximum_m": 4.8145068131849453e-08,
+          "mean_fraction": 8.646110505203264e-09,
+          "mean_m": 1.51882164818645e-08,
+          "name": "Face.baked / 6",
+          "object": 8,
+          "pass": true,
+          "pose": 4,
+          "vertices": 150
+        },
+        {
+          "max_fraction": 2.7544114689978227e-08,
+          "maximum_m": 4.838545337362171e-08,
+          "mean_fraction": 7.322629845875212e-09,
+          "mean_m": 1.286332013091708e-08,
+          "name": "Face.baked / 7",
+          "object": 9,
+          "pass": true,
+          "pose": 4,
+          "vertices": 260
+        },
+        {
+          "max_fraction": 2.7556719654271455e-08,
+          "maximum_m": 4.840759592272706e-08,
+          "mean_fraction": 8.286513725768908e-09,
+          "mean_m": 1.4556529698663724e-08,
+          "name": "Face.baked / 8",
+          "object": 10,
+          "pass": true,
+          "pose": 4,
+          "vertices": 188
+        },
+        {
+          "max_fraction": 3.41668193417277e-08,
+          "maximum_m": 6.001924777003711e-08,
+          "mean_fraction": 1.3971834745838839e-08,
+          "mean_m": 2.454366626946641e-08,
+          "name": "Face.baked / 9",
+          "object": 11,
+          "pass": true,
+          "pose": 4,
+          "vertices": 50
+        },
+        {
+          "max_fraction": 0.0174324880475103,
+          "maximum_m": 0.030622833483768586,
+          "mean_fraction": 0.000934601399000543,
+          "mean_m": 0.0016417704080616481,
+          "name": "Body.baked / 0",
+          "object": 12,
+          "pass": true,
+          "pose": 4,
+          "vertices": 2233
+        },
+        {
+          "max_fraction": 0.011774554326918233,
+          "maximum_m": 0.0206838068964172,
+          "mean_fraction": 0.004348705572803059,
+          "mean_m": 0.007639166954421276,
+          "name": "Body.baked / 1",
+          "object": 13,
+          "pass": true,
+          "pose": 4,
+          "vertices": 508
+        },
+        {
+          "max_fraction": 0.0029858714267257417,
+          "maximum_m": 0.005245140180527687,
+          "mean_fraction": 0.00014774052966308262,
+          "mean_m": 0.00025952885361780017,
+          "name": "Body.baked / 2",
+          "object": 14,
+          "pass": true,
+          "pose": 4,
+          "vertices": 1580
+        },
+        {
+          "max_fraction": 2.9345228034107554e-08,
+          "maximum_m": 5.154938464220177e-08,
+          "mean_fraction": 9.987458706321917e-09,
+          "mean_m": 1.7544499904785045e-08,
+          "name": "Body.baked / 3",
+          "object": 15,
+          "pass": true,
+          "pose": 4,
+          "vertices": 145
+        },
+        {
+          "max_fraction": 8.446325002385246e-08,
+          "maximum_m": 1.4837262666861546e-07,
+          "mean_fraction": 1.728702474286006e-08,
+          "mean_m": 3.036730492443943e-08,
+          "name": "Body.baked / 4",
+          "object": 16,
+          "pass": true,
+          "pose": 4,
+          "vertices": 1399
+        },
+        {
+          "max_fraction": 4.87782860300574e-08,
+          "maximum_m": 8.568652544898298e-08,
+          "mean_fraction": 1.2237004361167322e-08,
+          "mean_m": 2.149617116448824e-08,
+          "name": "Body.baked / 5",
+          "object": 17,
+          "pass": true,
+          "pose": 4,
+          "vertices": 77
+        },
+        {
+          "max_fraction": 0.01684883454738079,
+          "maximum_m": 0.029597556776394772,
+          "mean_fraction": 0.0014948334883139798,
+          "mean_m": 0.0026259038224401734,
+          "name": "Body.baked / 6",
+          "object": 18,
+          "pass": true,
+          "pose": 4,
+          "vertices": 1095
+        },
+        {
+          "max_fraction": 0.019222193431278393,
+          "maximum_m": 0.03376672492386407,
+          "mean_fraction": 0.006168464544870616,
+          "mean_m": 0.010835852122387158,
+          "name": "Body.baked / 7",
+          "object": 19,
+          "pass": true,
+          "pose": 4,
+          "vertices": 536
+        },
+        {
+          "max_fraction": 3.3245714039556214e-08,
+          "maximum_m": 5.840118532177733e-08,
+          "mean_fraction": 9.613855500495735e-09,
+          "mean_m": 1.6888208689794005e-08,
+          "name": "Body.baked / 8",
+          "object": 20,
+          "pass": true,
+          "pose": 4,
+          "vertices": 249
+        }
+      ],
+      "saved_field": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/weights-nearest-ray-f641b8f/artifacts/weights-audit/male-sewn/bound.dsculpt",
+        "sha256": "ba70727fa82324869c0b0d27bf379d1095738a4e5dda94d79fc24d2516b62b9b"
+      }
+    }
+  },
+  "sources": {
+    "src/closest-ray-visibility.hpp": "3177994f37ab0d0998528567c72d3f3c7295fb83868eda0ffbc50a84a99c59e9",
+    "src/visibility-geodesic-bind.hpp": "163a73532308776ad0e57b0f105580672149346e140ba8cf726782855512a3ff",
+    "tests/visibility-geodesic.cpp": "86a6864efc1de1b09c3a98f653b6156a335be53865628a4c5fbd01eabc03359c",
+    "tests/visibility-geodesic-avatar.cpp": "2c9d0b8b4a25ee91299715394ad7d0e48ca548e69b4ec27183eadfc531e89651",
+    "tests/visibility-component-audit.cpp": "2ffd74f41f93b154fb4a7c109475e0c9197169e9963f246354252bc71fcd0f46"
+  },
+  "evidence": {
+    "closest-native.log": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/weights-nearest-ray-f641b8f/artifacts/weights-audit/closest-native.log",
+      "sha256": "ec7663a19d9e0f9caa592792b22e5a7003b679966a20bff0c5aab3546230d402"
+    },
+    "female-component1452.log": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/weights-nearest-ray-f641b8f/artifacts/weights-audit/female-component1452.log",
+      "sha256": "86074bbf91f9c6b97e05da7eaf472b6c730c099a9c5ef6386c9ce3ea4bdf3fb4"
+    },
+    "female-sewn/status.json": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/weights-nearest-ray-f641b8f/artifacts/weights-audit/female-sewn/status.json",
+      "sha256": "5cb1427188fe5b0caf2b53d03f418c0ebad4cab879681efd698ce04a67d0f70c"
+    },
+    "male-sewn/status.json": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/weights-nearest-ray-f641b8f/artifacts/weights-audit/male-sewn/status.json",
+      "sha256": "cea654e326106f6e63b91eb1e87aaa574741f97f5c82789c1062cee8af4b38c9"
+    },
+    "female-quality/status.json": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/weights-nearest-ray-f641b8f/artifacts/weights-audit/female-quality/status.json",
+      "sha256": "c8c8d88e8d94d2091fb9da3a53654f84d37004cd75ed710674871f608b3dcbbc"
+    },
+    "male-sewn-quality/status.json": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/weights-nearest-ray-f641b8f/artifacts/weights-audit/male-sewn-quality/status.json",
+      "sha256": "a4722fcc630156be8115d7f2661408e147b9763ed0fd044a6f6fe28fe13788a2"
+    }
+  },
+  "remaining": [
+    "Fixed global/local deformation quality and continuity",
+    "Native/interface selection and exact frame/IBM transport",
+    "Owning total/work/memory admission and failure/cancel",
+    "Owned SAN and native history/Save/UI/export"
+  ]
+}

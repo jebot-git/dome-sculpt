@@ -1,3 +1,24 @@
+## Owning37 continuation with current main — 2026-11-05
+
+This private tree now combines owning37 candidate c6e6cd5 with admitted main
+c53e0b6 (explicit SurfaceHeat5, Automatic0 default unchanged). This merge has
+not yet been compiled or qualified. The earlier c6 cohort has a fresh optimized
+Release application and selected native/key/codec/package checks, not full-suite
+or sanitizer qualification. All 244 actual own objects, archives and executables
+are preserved in verified separate-inode copy-on-write snapshots before this
+source merge. Existing component results retain their exact original scope.
+
+A genuine manifold affine/reflected source now proves retained-domain polygon
+refusal, Save/history/cancellation/retry and before-only37 persistence/Restore.
+The required changed-polygon positive after canonical-paint Restore still fails:
+"Baked normal field lost its actual separate attribute origin". The conversion
+keeps the baked field but drops its material origin; new geometry also needs
+real current normal/paint correspondence. This is an unimplemented adapter,
+not a reason to discard fields, counterfeit owners or bypass validation.
+All production, caller-input, remesh, interoperability, accelerator, device and
+controller-drawer requirements remain active. Entries below retain checkpoint
+history; this source merge is not main admission or a completed release.
+
 ## Private owning37 source continuation — 2026-11-05
 
 Current main9dd63f9 and private admission candidate93c1fad are composed by real
@@ -6,6 +27,17 @@ runtime/GUI/device qualification. A changed SourceMaterialBindings owner require
 fresh owning consumers. Keep older component proofs scoped to their original
 bytes. Current polygon/weights/caller repairs and every unfinished requirement
 remain required before production admission. Read HANDOFF.md.
+
+## Explicit surface-heat binding admission — 2026-11-05
+
+Main admits exact6bcc91b/runtimebef5876 through9c72cc2: explicit SurfaceHeat5,
+Automatic0 default preserved, reference/selection controls and source/paint/morph/
+pose-preserving worker publication. Fresh current R/S native,152 ordinary FLTK,
+56 actual software OpenXR and regular373+longtail5 worker cases pass. Historical
+full solver/caller/long/mixed evidence remains separately scoped. Retopology251
+cases are one-shot; no unexecuted reporter/acceptance modes are claimed. Read
+SURFACE-HEAT-ADMISSION.md and its receipt. Complex/prepared37/38, remaining weights,
+interoperability/device/accelerator and full-goal requirements remain incomplete.
 
 ## Affine polygon and retopology admission — 2026-11-05
 

@@ -1,0 +1,11 @@
+# Explicit surface heat source-avatar qualification, phase B
+
+The current Automatic0 candidate passed fresh Release and whole-owned sanitizer component tests: 140 actual source-avatar public worker/controller controls and 1,748 independent original-avatar global/local pose comparisons. Each of 92 full posed Scenes also passed an exact native encode/decode round trip. Together with [phase A](MODE5-OPTIN0-PHASE-A.md), current optin0 evidence totals 280 public controls, 3,496 independent pose comparisons and 152 actual normal/compact FLTK checks. SurfaceHeat5 is explicitly selected; the default remains Automatic0.
+
+Both complete source test translation units were freshly compiled against the exact current headers; entry-only renaming and a small dispatcher share the linked support code. All seven changed production TUs/profile and immutable C179 main0 supports remain byte-exact to the preceding qualified cohort. This is a matched-source component scope, not a fresh whole-project build.
+
+No numeric check or limit changed. The test-only quality change strengthens every pose with an actual native codec round trip. An explicit first/last diagnostic policy may omit intermediate write-only disk dumps, while retaining every failing pose, all per-row metrics, raw-original cgltf parsing and manual LBS/IBM/transport checks. The standalone default still writes all dumps.
+
+Only newly generated closed passing Save-output groups and eligible first/last pose diagnostics were losslessly archived after their original consumers returned. Accepted fields, raw inputs and failures stay intact. Every member and its metadata were verified and every group has an actual original-path restoration control. Restore any archived dependency with its ledger before freezing a future consumer.
+
+The [full receipt](validation/MODE5-OPTIN0-PHASE-B.json) preserves commands, compiler/link maps, input/source/object/output hashes, every quality record, setup-only wrapper failure and archival ledgers. The original 300MiB B storage forecast was low; the correction is explicit, and later fault links remain held for budget reconciliation. Original historical/default-compatibility failures are not relabeled. Current real fault sweeps, registration and main review remain outstanding; complex prepared37/38 owners remain guarded.
