@@ -1,6 +1,7 @@
 # Native texture sets: source implementation in progress
 
-Pinned base: e79dbe9cbe3243b17b224843c247987b8f2595f8. No build or test claim.
+Pinned base: e79dbe9cbe3243b17b224843c247987b8f2595f8. No build or test claim. Qualified query corrections c3a1b19/5b02bfc are merged;
+all new texture-set code remains uncompiled.
 Scene40, Paint7 and polygon_sources8 are reserved. Material22 is available only
 if a genuinely new connected material envelope is needed. Shared texture controls
 are reserved page31/count32; older private31/32 proposals are not current main.
@@ -16,6 +17,13 @@ Current source foundation has immutable shared topology/face membership,
 object-local IDs, original Polygon face/corner IDs, detached COW fork/assignment,
 constant-time candidate membership, shared geometry across resolution rasters,
 paint snapshot/swap retention, and complete first-origin capture/Restore fields.
+Additional painters are sealed `shared_ptr<const PaintedMesh>` values: immutable
+collection/history snapshots retain them, and edits create detached paint and
+collection replacements. A per-call ledger now bounds live slots separately from
+unique retained domains and charges shared geometry/assignment/ID owners once,
+including polygon/shape/rig origins and actual material before-state edges.
+Pixel/source/raster accounting still needs its connected Scene integration and
+new runtime/fault proof; this source ledger is not a qualification claim.
 Original `PolygonFace.material` values remain original topology metadata; the new
 slot table is keyed by actual persistent face IDs and never reinterprets those
 old numbers as a new source/material authority.
