@@ -44,6 +44,7 @@
 #include "dome/local-surface.hpp"
 #include "geometry-identity.hpp"
 #include "document-transaction.hpp"
+#include "document-retopo-input.hpp"
 #include <unistd.h>
 #include <utility>
 #include <numeric>
@@ -886,16 +887,18 @@ bool Document::begin_desktop() {
     return false;
   if (state_.retopology && (!state_.retopology->source || retopo_accepting_)) return false;
   if(!state_.weights.enabled && !state_.retopology && reject_texture_paint_locked())return false;
+  RetopoInputScope admission(*this,bool(state_.retopology));
   input_.cancel();
   begin_action_locked();
   desktop_ = true;
-  publish_locked();
+  publish_locked();admission.commit();
   return true;
 }
 void Document::stamp_desktop(Brush b) {
   std::lock_guard lock(model_mutex_);
   if (!desktop_)
     throw std::logic_error("Desktop does not own the active stroke");
+  RetopoInputScope admission(*this,bool(state_.retopology));
   auto t = state_.retopology ? state_.retopology->transform
                             : object_world_transform_locked(scene_.active().id);
   b.from = world_to_model(t, b.from);
@@ -905,11 +908,12 @@ void Document::stamp_desktop(Brush b) {
   auto n = ob::rotate(ob::conjugate(t.orientation), obv(b.normal));
   b.normal = vec(n);
   stamp_action_locked(b);
-  publish_locked();
+  publish_locked();admission.commit();
 }
 void Document::end_desktop() {
   std::lock_guard lock(model_mutex_);
   if(native_stroke_){end_native_locked(true);publish_locked();return;}
+  RetopoInputScope admission(*this,bool(state_.retopology));
   if (desktop_) {
     if (end_action_locked())
       record_stroke_locked();
@@ -917,16 +921,19 @@ void Document::end_desktop() {
     input_.cancel();
     publish_locked();
   }
+  admission.commit();
 }
 void Document::cancel_desktop() {
   std::lock_guard lock(model_mutex_);
   if(native_stroke_){cancel_native_locked();publish_locked();return;}
+  RetopoInputScope admission(*this,bool(state_.retopology));
   if (desktop_) {
     cancel_action_locked();
     desktop_ = false;
     input_.cancel();
     publish_locked();
   }
+  admission.commit();
 }
 std::optional<Vec3> Document::raycast(Vec3 p, Vec3 d) const {
   return raycast(p, d, render_frame_time());
@@ -1021,10 +1028,11 @@ bool Document::undo() {
   if(state_.cut){bool available=!cut_undo_.empty()||bool(control_before_);cut_history_locked(false);publish_locked();return available;}
   if (state_.retopology) {
     if (retopo_accepting_ || !state_.retopology->source) return false;
+    RetopoInputScope admission(*this,true);
     bool available = state_.retopology->can_undo || retopo_stroking_;
     if (retopo_stroking_) { cancel_action_locked(); desktop_ = false; input_.cancel(); }
     else queue_retopology_locked(RetopoAction::Undo);
-    publish_locked(); return available;
+    publish_locked();admission.commit();return available;
   }
   if (uv_accept_pending_ || uv_solving_)
     return false;
@@ -1049,8 +1057,9 @@ bool Document::redo() {
   if(state_.cut){bool available=!cut_redo_.empty()&&!control_before_;cut_history_locked(true);publish_locked();return available;}
   if (state_.retopology) {
     if (retopo_accepting_ || retopo_stroking_ || !state_.retopology->source) return false;
+    RetopoInputScope admission(*this,true);
     bool available = state_.retopology->can_redo;
-    queue_retopology_locked(RetopoAction::Redo); publish_locked(); return available;
+    queue_retopology_locked(RetopoAction::Redo);publish_locked();admission.commit();return available;
   }
   if (weight_stroking_) return false;
   if (uv_accept_pending_ || uv_solving_)
@@ -1321,6 +1330,7 @@ void Document::begin_spatial() {
 }
 void Document::rebase_space(std::optional<CanvasTransform> old_from_new) {
   std::lock_guard lock(model_mutex_);
+  RetopoInputScope admission(*this,bool(state_.retopology)||input_.menu_page()==16);
   if (!desktop_) {
     if(state_.expressions)end_expression_preview_locked(false);
     bool accepted_uv = uv_accept_pending_;
@@ -1331,12 +1341,11 @@ void Document::rebase_space(std::optional<CanvasTransform> old_from_new) {
   navigation_.reset();object_navigation_.reset();
   state_.hands = {};
   ++state_.input_epoch;
-  {
+  if(admission.active())admission.retire_inputs();
+  else {
     std::lock_guard queue_lock(input_mutex_);
-    inputs_.clear();
-    reset_input_ = false;
+    inputs_.clear();reset_input_ = false;input_changed_.notify_all();
   }
-  input_changed_.notify_all();
   if (old_from_new && ob::finite(*old_from_new)) {
     auto inverse = ob::inverse(*old_from_new);
     state_.canvas = ob::compose(inverse, state_.canvas);
@@ -1344,7 +1353,7 @@ void Document::rebase_space(std::optional<CanvasTransform> old_from_new) {
     state_.hierarchy_panel=ob::compose(inverse,state_.hierarchy_panel);
   } else {anchored_ = false;state_.hierarchy_anchored=false;}
   state_.selection_pressed={true,true};state_.selection_release={true,true};state_.selection_hover={};
-  publish_locked();
+  publish_locked();admission.commit();
 }
 void Document::finish_spatial() {
   {
@@ -1356,6 +1365,7 @@ void Document::finish_spatial() {
   if (!wait_input())
     throw std::runtime_error("Spatial edit worker did not finish");
   std::lock_guard lock(model_mutex_);
+  RetopoInputScope admission(*this,bool(state_.retopology)||input_.menu_page()==16);
   if (!desktop_) {
     if(state_.expressions)end_expression_preview_locked(false);
     bool accepted_uv = uv_accept_pending_;
@@ -1366,18 +1376,23 @@ void Document::finish_spatial() {
     navigation_.reset();
     publish_locked();
   }
+  admission.commit();
 }
 void Document::process_locked(const SpatialFrame &incoming) {
   SpatialFrame f=incoming;
+  // History is a press event. In particular a terminal modal command consumes
+  // simultaneous buttons; holding one cannot undo a different namespace on
+  // the following frame. The existing published hands provide the latches.
+  const bool undo_requested=(f.hands[0].undo&&!state_.hands[0].undo)||(f.hands[1].undo&&!state_.hands[1].undo);
+  const bool redo_requested=(f.hands[0].redo&&!state_.hands[0].redo)||(f.hands[1].redo&&!state_.hands[1].redo);
   for(size_t i=0;i<2;++i)if(state_.selection_release[i]){
     if(f.hands[i].tracked.trigger<=.02f)state_.selection_release[i]=false;
     else f.hands[i].tracked.trigger=0;
   }
-  if(process_rig_fit_spatial_locked(f))return;
-  if(process_projection_spatial_locked(f))return;
+  if(process_rig_fit_spatial_locked(f)){return;}
+  if(process_projection_spatial_locked(f)){return;}
   if(native_stroke_&&native_stroke_->spatial_owner){if(native_stroke_->space==NativeStrokeSpace::Ray)process_shape_spatial_locked(f);else process_affine_paint_spatial_locked(f);return;}
-  if (desktop_)
-    return;
+  if (desktop_){return;}
   if (!f.focused || !f.head_valid || !ob::finite(f.head) ||
       !std::isfinite(f.time) || f.time < 0) {
     if(held_polygon_pending_locked()){
@@ -1427,7 +1442,7 @@ void Document::process_locked(const SpatialFrame &incoming) {
       return;
     }
   }
-  if(!state_.selection_mode&&process_affine_paint_spatial_locked(f))return;
+  if(!state_.selection_mode&&process_affine_paint_spatial_locked(f)){return;}
   const bool affine_target=scene_.has_affine_placement(scene_.active().id);
   auto object_canvas = state_.retopology
       ? ob::compose(state_.canvas, state_.retopology->transform)
@@ -1516,11 +1531,17 @@ void Document::process_locked(const SpatialFrame &incoming) {
         input_.menu_page()!=30 && input_.menu_page()!=24 && input_.menu_page()!=18 && input_.menu_page()!=20 && input_.menu_page()!=19 && input_.menu_page()!=22 && !state_.polygon) finish_locked();
     auto command_publication=published_.load();
     command_locked(*c);
-    import_published=(import_command(*c)||projection_command(*c)||rig_fit_command(*c)||expression_command(*c))&&published_.load()!=command_publication;
+    import_published=(import_command(*c)||projection_command(*c)||rig_fit_command(*c)||expression_command(*c)||
+                      *c==SpatialCommand::RetopoBegin||*c==SpatialCommand::RetopoApply||*c==SpatialCommand::RetopoCancel)&&
+                     published_.load()!=command_publication;
     if((command_page==30)||(command_page==20)||(command_page==24&&*c!=SpatialCommand::ShapeSculpt)){input_.retain_page(command_page,command_owner,command_sector);publish_locked(false,false);}
+    // Opening/Apply/Cancel already published this frame's actual hands and
+    // immutable owner. Do not reinterpret simultaneous history against the
+    // newly opened/closed namespace or add a fallible second publication.
+    if(import_published&&(*c==SpatialCommand::RetopoBegin||*c==SpatialCommand::RetopoApply||*c==SpatialCommand::RetopoCancel))return;
   }
 
-  if (f.hands[0].undo || f.hands[1].undo) {
+  if (undo_requested) {
     if(state_.polygon){polygon_command_locked(SpatialCommand::Undo);
     } else if(state_.cut){cut_history_locked(false);
     } else if (state_.retopology) {
@@ -1537,7 +1558,7 @@ void Document::process_locked(const SpatialFrame &incoming) {
       undo_locked(false);
     }
   }
-  if (f.hands[0].redo || f.hands[1].redo) {
+  if (redo_requested) {
     if(state_.polygon){polygon_command_locked(SpatialCommand::Redo);
     } else if(state_.cut){cut_history_locked(true);
     } else if (state_.retopology) {
@@ -1554,15 +1575,17 @@ void Document::process_locked(const SpatialFrame &incoming) {
   // Detached import/image admission already published the current hands/menu. A second
   // fallible publication must not report failure after accepting its file job.
   // Independent history buttons in this same frame still need normal handling.
-  if(!import_published || f.hands[0].undo || f.hands[1].undo || f.hands[0].redo || f.hands[1].redo)
+  if(!import_published || undo_requested || redo_requested)
     publish_locked();
+
 }
 void Document::cancel_spatial_menu() {
   std::lock_guard lock(model_mutex_);
+  RetopoInputScope admission(*this,bool(state_.retopology)||input_.menu_page()==16);
   finish_control_locked(false);
   if (!desktop_)
     input_.cancel();
-  publish_locked();
+  publish_locked();admission.commit();
 }
 void Document::input_loop() {
   while (!stopping_) {
@@ -1587,11 +1610,14 @@ void Document::input_loop() {
     {
       std::lock_guard lock(model_mutex_);
       try {
+        RetopoInputScope admission(*this,generation==state_.input_epoch &&
+                                        (bool(state_.retopology)||input_.menu_page()==16));
         if (generation == state_.input_epoch) {
           // Resume only after this worker has cancelled/reported its failed
           // control. Recovery is independent of long file/authoring jobs.
           if(!worker_notices_[0]){if(reset&&!desktop_)input_.cancel();process_locked(f);}
         }
+        admission.commit();
       } catch (...) {
         input_worker_error_locked(std::current_exception());
       }
