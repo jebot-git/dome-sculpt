@@ -10,6 +10,9 @@ namespace dome::detail {
 struct KeyMirrorLimits {
   size_t max_bytes=128*1024*1024,max_work=64*1024*1024;
   std::function<bool()> cancelled;
+  // Owning refinement factories reserve later endpoint buffers while the
+  // geometric kernel still builds its map; old callers retain zero cost.
+  size_t reserved_output_corner_bytes=0;
 };
 // Explicit object-local X plane; direction vectors never receive its offset.
 struct KeyMirrorPlane { double offset=0; };

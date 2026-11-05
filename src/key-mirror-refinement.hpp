@@ -22,7 +22,7 @@ struct KeyMirrorRefinement {
   std::vector<uint32_t> opposite;
   double plane_offset = 0;
   double maximum_rest_error = 0;
-  size_t work_units = 0;
+  size_t work_units = 0,working_bytes=0,reserved_output_bytes=0;
 };
 KeyMirrorRefinement refine_reflected_key(std::shared_ptr<const Mesh>, KeyMirrorPlane,
                                          float tolerance, const KeyMirrorLimits & = {});

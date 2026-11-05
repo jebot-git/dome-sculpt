@@ -85,7 +85,7 @@ bool overlaps(Bounds a, Bounds b, double t) {
 }
 struct Budget {
   const KeyMirrorLimits &limits;
-  size_t work = 0, bytes = 0;
+  size_t work = 0, bytes = 0,peak=0;
   void poll(size_t n = 1) {
     if (n > limits.max_work - work)
       throw std::length_error("Mirror refinement exceeds bounded work");
@@ -96,7 +96,7 @@ struct Budget {
   void charge(size_t n) {
     if (n > limits.max_bytes - bytes)
       throw std::length_error("Mirror refinement exceeds prospective scratch/output quota");
-    bytes += n;
+    bytes += n;peak=std::max(peak,bytes);
   }
   template <class T> void grow(std::vector<T> &v, size_t needed) {
     if (needed <= v.capacity())
@@ -106,6 +106,7 @@ struct Budget {
       throw std::length_error("Mirror refinement allocation overflow");
     if (capacity * sizeof(T) > limits.max_bytes - bytes)
       throw std::length_error("Mirror refinement reallocation exceeds prospective peak quota");
+    peak=std::max(peak,bytes+capacity*sizeof(T));
     charge((capacity - v.capacity()) * sizeof(T));
     v.reserve(capacity);
   }
@@ -171,7 +172,7 @@ KeyMirrorRefinement refine_reflected_key(std::shared_ptr<const Mesh> source, Key
     throw std::invalid_argument("Invalid explicit Mirror plane");
   if (!source || !std::isfinite(tolerance) || tolerance <= 0 || tolerance > 1 ||
       !limits.max_bytes || limits.max_bytes > 256 * 1024 * 1024 || !limits.max_work ||
-      limits.max_work > 256 * 1024 * 1024)
+      limits.max_work > 256 * 1024 * 1024||limits.reserved_output_corner_bytes>limits.max_bytes/3)
     throw std::invalid_argument("Invalid mirror refinement source or resource policy");
   Budget budget{limits};
   budget.poll();
@@ -233,6 +234,7 @@ KeyMirrorRefinement refine_reflected_key(std::shared_ptr<const Mesh> source, Key
                   const MirrorRefinementCorner &c) {
     if (out.corners.size() > 2'000'000 - 3)
       throw std::length_error("Mirror refinement output exceeds current vertex quota");
+    budget.charge(3*limits.reserved_output_corner_bytes);
     budget.grow(out.corners, out.corners.size() + 3);
     budget.grow(out.opposite, out.opposite.size() + 3);
     const auto base = uint32_t(out.corners.size());
@@ -416,7 +418,7 @@ KeyMirrorRefinement refine_reflected_key(std::shared_ptr<const Mesh> source, Key
         !same_weights(a.reflected.barycentric, b.current.barycentric))
       throw std::invalid_argument("Mirror refinement opposite provenance was fabricated");
   }
-  out.work_units = budget.work;
+  out.work_units = budget.work;out.working_bytes=budget.peak;out.reserved_output_bytes=out.corners.size()*limits.reserved_output_corner_bytes;
   return out;
 }
 } // namespace dome::detail
