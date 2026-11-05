@@ -1170,6 +1170,8 @@ if(BUILD_TESTING)
   add_executable(dome-sculpt-avatar-test tests/avatar.cpp)
   target_link_libraries(dome-sculpt-avatar-test PRIVATE dome-sculpt-core)
   add_test(NAME humanoid-authoring COMMAND dome-sculpt-avatar-test)
+  add_test(NAME humanoid-authoring-rejection COMMAND dome-sculpt-avatar-test --verify-failure)
+  set_tests_properties(humanoid-authoring-rejection PROPERTIES WILL_FAIL TRUE)
 endif()
 
 install(DIRECTORY assets/humanoid DESTINATION ${CMAKE_INSTALL_DATADIR}/dome-sculpt/assets)

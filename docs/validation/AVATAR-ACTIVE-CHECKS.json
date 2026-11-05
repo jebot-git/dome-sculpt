@@ -1,0 +1,406 @@
+{
+  "recorded_utc": "2026-11-05T17:21:23.338202+00:00",
+  "base": "c7b814defbbc711c79fcf89fbe5090889680caec",
+  "scope": "tests/avatar.cpp +one CTest rejection registration only; production sources, headers, flags, archives unchanged",
+  "defect": "Both existing R/S whole test compile commands include -DNDEBUG, so old assert predicates and negative-case result assertions are omitted.",
+  "fix": "Explicit require with source_location diagnostics/count, all original predicates/thresholds unchanged. Intentional --verify-failure mode plus CTest WILL_FAIL control.",
+  "profiles": {
+    "release": {
+      "positive_checks": 92,
+      "wrong_role_count_exit": 1,
+      "registered_rejection_exit": 1
+    },
+    "sanitize": {
+      "positive_checks": 92,
+      "wrong_role_count_exit": 1,
+      "registered_rejection_exit": 1,
+      "sanitizer_diagnostics": []
+    }
+  },
+  "old_false_assert_control_exit": 0,
+  "proof_wrapper": {
+    "state": "terminal",
+    "pid": 3640780,
+    "steps": [
+      {
+        "name": "legacy-negative-compile",
+        "command": [
+          "/usr/bin/c++",
+          "-O3",
+          "-DNDEBUG",
+          "/home/blux/de-xr/dome-sculpt/artifacts/assertions-c7b814d/artifacts/avatar-proof/run-v2/legacy-assert.cpp",
+          "-o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/assertions-c7b814d/artifacts/avatar-proof/run-v2/legacy-negative"
+        ],
+        "exit": 0,
+        "expected_exit": 0,
+        "seconds": 0.26016345497919247
+      },
+      {
+        "name": "legacy-negative-exec",
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/assertions-c7b814d/artifacts/avatar-proof/run-v2/legacy-negative"
+        ],
+        "exit": 0,
+        "expected_exit": 0,
+        "seconds": 0.008149104018229991
+      },
+      {
+        "name": "release-positive-compile",
+        "command": [
+          "/usr/bin/c++",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/assertions-c7b814d/include",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/assertions-c7b814d/third_party/openbrush",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/assertions-c7b814d/third_party/nlohmann",
+          "-O3",
+          "-DNDEBUG",
+          "-std=gnu++20",
+          "-o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/assertions-c7b814d/artifacts/avatar-proof/run-v2/release-positive.o",
+          "-c",
+          "/home/blux/de-xr/dome-sculpt/artifacts/assertions-c7b814d/tests/avatar.cpp"
+        ],
+        "exit": 0,
+        "expected_exit": 0,
+        "seconds": 6.738718550011981
+      },
+      {
+        "name": "release-positive-link",
+        "command": [
+          "/usr/bin/c++",
+          "-Wl,-Map=/home/blux/de-xr/dome-sculpt/artifacts/assertions-c7b814d/artifacts/avatar-proof/run-v2/release-positive.map",
+          "-O3",
+          "-DNDEBUG",
+          "/home/blux/de-xr/dome-sculpt/artifacts/assertions-c7b814d/artifacts/avatar-proof/run-v2/release-positive.o",
+          "-o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/assertions-c7b814d/artifacts/avatar-proof/run-v2/release-positive",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-preflight-qualified-0b6/artifacts/final-preflight/release/stage/libdome-sculpt-core.a",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-preflight-qualified-0b6/artifacts/final-preflight/release/stage/libdome-sculpt-affine.a",
+          "/usr/lib64/liblapacke.so",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-preflight-qualified-0b6/artifacts/final-preflight/release/stage/libdome-sculpt-polygon.a",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-preflight-qualified-0b6/artifacts/final-preflight/release/stage/libxatlas.a",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-preflight-qualified-0b6/artifacts/final-preflight/release/stage/libmikktspace.a",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-preflight-qualified-0b6/artifacts/final-preflight/release/stage/libmikktspace-robust.a",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-preflight-qualified-0b6/artifacts/final-preflight/release/stage/libufbx.a",
+          "/usr/lib64/libpng.so",
+          "/usr/lib64/libjpeg.so",
+          "/usr/lib64/libz.so",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-preflight-qualified-0b6/artifacts/final-preflight/release/stage/libdome-sculpt-emission-codec.a",
+          "/usr/lib64/libOpenEXR-3_2.so",
+          "/usr/lib64/libOpenEXRUtil-3_2.so",
+          "/usr/lib64/libOpenEXRCore-3_2.so",
+          "/usr/lib64/libIex-3_2.so",
+          "/usr/lib64/libIlmThread-3_2.so",
+          "/usr/lib64/libImath-3_1.so",
+          "-lgcc_s_asneeded",
+          "-lgcc_s_asneeded"
+        ],
+        "exit": 0,
+        "expected_exit": 0,
+        "seconds": 0.19441286899382249
+      },
+      {
+        "name": "release-positive-exec",
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/assertions-c7b814d/artifacts/avatar-proof/run-v2/release-positive"
+        ],
+        "exit": 0,
+        "expected_exit": 0,
+        "seconds": 0.007624966965522617
+      },
+      {
+        "name": "release-positive-registered-rejection",
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/assertions-c7b814d/artifacts/avatar-proof/run-v2/release-positive",
+          "--verify-failure"
+        ],
+        "exit": 1,
+        "expected_exit": 1,
+        "seconds": 0.005447003000881523
+      },
+      {
+        "name": "release-negative-compile",
+        "command": [
+          "/usr/bin/c++",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/assertions-c7b814d/include",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/assertions-c7b814d/third_party/openbrush",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/assertions-c7b814d/third_party/nlohmann",
+          "-O3",
+          "-DNDEBUG",
+          "-std=gnu++20",
+          "-o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/assertions-c7b814d/artifacts/avatar-proof/run-v2/release-negative.o",
+          "-c",
+          "/home/blux/de-xr/dome-sculpt/artifacts/assertions-c7b814d/artifacts/avatar-proof/run-v2/avatar-negative.cpp"
+        ],
+        "exit": 0,
+        "expected_exit": 0,
+        "seconds": 5.730822981975507
+      },
+      {
+        "name": "release-negative-link",
+        "command": [
+          "/usr/bin/c++",
+          "-Wl,-Map=/home/blux/de-xr/dome-sculpt/artifacts/assertions-c7b814d/artifacts/avatar-proof/run-v2/release-negative.map",
+          "-O3",
+          "-DNDEBUG",
+          "/home/blux/de-xr/dome-sculpt/artifacts/assertions-c7b814d/artifacts/avatar-proof/run-v2/release-negative.o",
+          "-o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/assertions-c7b814d/artifacts/avatar-proof/run-v2/release-negative",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-preflight-qualified-0b6/artifacts/final-preflight/release/stage/libdome-sculpt-core.a",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-preflight-qualified-0b6/artifacts/final-preflight/release/stage/libdome-sculpt-affine.a",
+          "/usr/lib64/liblapacke.so",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-preflight-qualified-0b6/artifacts/final-preflight/release/stage/libdome-sculpt-polygon.a",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-preflight-qualified-0b6/artifacts/final-preflight/release/stage/libxatlas.a",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-preflight-qualified-0b6/artifacts/final-preflight/release/stage/libmikktspace.a",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-preflight-qualified-0b6/artifacts/final-preflight/release/stage/libmikktspace-robust.a",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-preflight-qualified-0b6/artifacts/final-preflight/release/stage/libufbx.a",
+          "/usr/lib64/libpng.so",
+          "/usr/lib64/libjpeg.so",
+          "/usr/lib64/libz.so",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-preflight-qualified-0b6/artifacts/final-preflight/release/stage/libdome-sculpt-emission-codec.a",
+          "/usr/lib64/libOpenEXR-3_2.so",
+          "/usr/lib64/libOpenEXRUtil-3_2.so",
+          "/usr/lib64/libOpenEXRCore-3_2.so",
+          "/usr/lib64/libIex-3_2.so",
+          "/usr/lib64/libIlmThread-3_2.so",
+          "/usr/lib64/libImath-3_1.so",
+          "-lgcc_s_asneeded",
+          "-lgcc_s_asneeded"
+        ],
+        "exit": 0,
+        "expected_exit": 0,
+        "seconds": 0.1471798680140637
+      },
+      {
+        "name": "release-negative-exec",
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/assertions-c7b814d/artifacts/avatar-proof/run-v2/release-negative"
+        ],
+        "exit": 1,
+        "expected_exit": 1,
+        "seconds": 0.0042482869466766715
+      },
+      {
+        "name": "sanitize-positive-compile",
+        "command": [
+          "/usr/bin/c++",
+          "-gz=zstd",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/assertions-c7b814d/include",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/assertions-c7b814d/third_party/openbrush",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/assertions-c7b814d/third_party/nlohmann",
+          "-O1",
+          "-g1",
+          "-DNDEBUG",
+          "-fsanitize=address,undefined",
+          "-fno-omit-frame-pointer",
+          "-std=gnu++20",
+          "-o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/assertions-c7b814d/artifacts/avatar-proof/run-v2/sanitize-positive.o",
+          "-c",
+          "/home/blux/de-xr/dome-sculpt/artifacts/assertions-c7b814d/tests/avatar.cpp"
+        ],
+        "exit": 0,
+        "expected_exit": 0,
+        "seconds": 5.993771018984262
+      },
+      {
+        "name": "sanitize-positive-link",
+        "command": [
+          "/usr/bin/c++",
+          "-Wl,--compress-debug-sections=zstd",
+          "-Wl,-Map=/home/blux/de-xr/dome-sculpt/artifacts/assertions-c7b814d/artifacts/avatar-proof/run-v2/sanitize-positive.map",
+          "-O1",
+          "-g1",
+          "-DNDEBUG",
+          "-fsanitize=address,undefined",
+          "-fno-omit-frame-pointer",
+          "/home/blux/de-xr/dome-sculpt/artifacts/assertions-c7b814d/artifacts/avatar-proof/run-v2/sanitize-positive.o",
+          "-o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/assertions-c7b814d/artifacts/avatar-proof/run-v2/sanitize-positive",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-preflight-qualified-0b6/artifacts/final-preflight/sanitize/stage/libdome-sculpt-core.a",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-preflight-qualified-0b6/artifacts/final-preflight/sanitize/stage/libdome-sculpt-affine.a",
+          "/usr/lib64/liblapacke.so",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-preflight-qualified-0b6/artifacts/final-preflight/sanitize/stage/libdome-sculpt-polygon.a",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-preflight-qualified-0b6/artifacts/final-preflight/sanitize/stage/libxatlas.a",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-preflight-qualified-0b6/artifacts/final-preflight/sanitize/stage/libmikktspace.a",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-preflight-qualified-0b6/artifacts/final-preflight/sanitize/stage/libmikktspace-robust.a",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-preflight-qualified-0b6/artifacts/final-preflight/sanitize/stage/libufbx.a",
+          "/usr/lib64/libpng.so",
+          "/usr/lib64/libjpeg.so",
+          "/usr/lib64/libz.so",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-preflight-qualified-0b6/artifacts/final-preflight/sanitize/stage/libdome-sculpt-emission-codec.a",
+          "/usr/lib64/libOpenEXR-3_2.so",
+          "/usr/lib64/libOpenEXRUtil-3_2.so",
+          "/usr/lib64/libOpenEXRCore-3_2.so",
+          "/usr/lib64/libIex-3_2.so",
+          "/usr/lib64/libIlmThread-3_2.so",
+          "/usr/lib64/libImath-3_1.so",
+          "-lgcc_s_asneeded",
+          "-lgcc_s_asneeded"
+        ],
+        "exit": 0,
+        "expected_exit": 0,
+        "seconds": 0.3277314529987052
+      },
+      {
+        "name": "sanitize-positive-exec",
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/assertions-c7b814d/artifacts/avatar-proof/run-v2/sanitize-positive"
+        ],
+        "exit": 0,
+        "expected_exit": 0,
+        "seconds": 0.030351135006640106
+      },
+      {
+        "name": "sanitize-positive-registered-rejection",
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/assertions-c7b814d/artifacts/avatar-proof/run-v2/sanitize-positive",
+          "--verify-failure"
+        ],
+        "exit": 1,
+        "expected_exit": 1,
+        "seconds": 0.021809441968798637
+      },
+      {
+        "name": "sanitize-negative-compile",
+        "command": [
+          "/usr/bin/c++",
+          "-gz=zstd",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/assertions-c7b814d/include",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/assertions-c7b814d/third_party/openbrush",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/assertions-c7b814d/third_party/nlohmann",
+          "-O1",
+          "-g1",
+          "-DNDEBUG",
+          "-fsanitize=address,undefined",
+          "-fno-omit-frame-pointer",
+          "-std=gnu++20",
+          "-o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/assertions-c7b814d/artifacts/avatar-proof/run-v2/sanitize-negative.o",
+          "-c",
+          "/home/blux/de-xr/dome-sculpt/artifacts/assertions-c7b814d/artifacts/avatar-proof/run-v2/avatar-negative.cpp"
+        ],
+        "exit": 0,
+        "expected_exit": 0,
+        "seconds": 5.956844393978827
+      },
+      {
+        "name": "sanitize-negative-link",
+        "command": [
+          "/usr/bin/c++",
+          "-Wl,--compress-debug-sections=zstd",
+          "-Wl,-Map=/home/blux/de-xr/dome-sculpt/artifacts/assertions-c7b814d/artifacts/avatar-proof/run-v2/sanitize-negative.map",
+          "-O1",
+          "-g1",
+          "-DNDEBUG",
+          "-fsanitize=address,undefined",
+          "-fno-omit-frame-pointer",
+          "/home/blux/de-xr/dome-sculpt/artifacts/assertions-c7b814d/artifacts/avatar-proof/run-v2/sanitize-negative.o",
+          "-o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/assertions-c7b814d/artifacts/avatar-proof/run-v2/sanitize-negative",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-preflight-qualified-0b6/artifacts/final-preflight/sanitize/stage/libdome-sculpt-core.a",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-preflight-qualified-0b6/artifacts/final-preflight/sanitize/stage/libdome-sculpt-affine.a",
+          "/usr/lib64/liblapacke.so",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-preflight-qualified-0b6/artifacts/final-preflight/sanitize/stage/libdome-sculpt-polygon.a",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-preflight-qualified-0b6/artifacts/final-preflight/sanitize/stage/libxatlas.a",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-preflight-qualified-0b6/artifacts/final-preflight/sanitize/stage/libmikktspace.a",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-preflight-qualified-0b6/artifacts/final-preflight/sanitize/stage/libmikktspace-robust.a",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-preflight-qualified-0b6/artifacts/final-preflight/sanitize/stage/libufbx.a",
+          "/usr/lib64/libpng.so",
+          "/usr/lib64/libjpeg.so",
+          "/usr/lib64/libz.so",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-preflight-qualified-0b6/artifacts/final-preflight/sanitize/stage/libdome-sculpt-emission-codec.a",
+          "/usr/lib64/libOpenEXR-3_2.so",
+          "/usr/lib64/libOpenEXRUtil-3_2.so",
+          "/usr/lib64/libOpenEXRCore-3_2.so",
+          "/usr/lib64/libIex-3_2.so",
+          "/usr/lib64/libIlmThread-3_2.so",
+          "/usr/lib64/libImath-3_1.so",
+          "-lgcc_s_asneeded",
+          "-lgcc_s_asneeded"
+        ],
+        "exit": 0,
+        "expected_exit": 0,
+        "seconds": 0.2999991180258803
+      },
+      {
+        "name": "sanitize-negative-exec",
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/assertions-c7b814d/artifacts/avatar-proof/run-v2/sanitize-negative"
+        ],
+        "exit": 1,
+        "expected_exit": 1,
+        "seconds": 0.021394280018284917
+      }
+    ],
+    "allocated_bytes": 208486400,
+    "actual_free_bytes": 24707276800,
+    "phase": "sanitize-negative-exec",
+    "child_pid": 3668471,
+    "exit": 0,
+    "seconds": 27.101757337048184,
+    "drift": []
+  },
+  "ctest": [
+    {
+      "profile": "release",
+      "exit": 0,
+      "binary": "/home/blux/de-xr/dome-sculpt/artifacts/assertions-c7b814d/artifacts/avatar-proof/run-v2/release-positive",
+      "binary_sha256": "34d48db6dfae5087397c938ff8a03e14d395ac6e267de197a6cfbf61b236454f",
+      "log": "/home/blux/de-xr/dome-sculpt/artifacts/assertions-c7b814d/artifacts/avatar-proof/ctest-release.log",
+      "scope": "Fresh CMake registration; matching manually compiled test consumer symlink, not a fresh core build"
+    },
+    {
+      "profile": "sanitize",
+      "exit": 0,
+      "binary": "/home/blux/de-xr/dome-sculpt/artifacts/assertions-c7b814d/artifacts/avatar-proof/run-v2/sanitize-positive",
+      "binary_sha256": "f2fe9bac13cc9e9bd410ffdee206b617666696a132216d0efa6c95508ba636fb",
+      "log": "/home/blux/de-xr/dome-sculpt/artifacts/assertions-c7b814d/artifacts/avatar-proof/ctest-sanitize.log",
+      "scope": "Fresh CMake registration; matching manually compiled test consumer symlink, not a fresh core build"
+    }
+  ],
+  "inputs": {
+    "before_manifest_sha256": "2e2e29650e4b20e09291d46cd32dbb8d8c51cc9352c91327cff3983c3312fca6",
+    "after_manifest_sha256": "2e2e29650e4b20e09291d46cd32dbb8d8c51cc9352c91327cff3983c3312fca6",
+    "test_sha256": "80514349cbdb84aa0bdc1500707875a68f8d61883f24a67cddc51ac46ee5cd20",
+    "cmake_sha256": "15c15295447828f91c6d545ca2ed940cdd46591e64441e0d8625224568faa860",
+    "script_sha256": "18440211f123ecdf4bd9982b93807031b4e65bc2c0e7a4b218f31de21c5c5bd2"
+  },
+  "artifacts": {
+    "legacy-negative-compile.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "legacy-negative": "aa53efbfd5b2fa19a0c71635cd2c580e30b9b707dbd1aa0f304342a95f83fb33",
+    "legacy-negative-exec.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "avatar-negative.cpp": "720a4924a20630682221d8685f5fadf7e82dac2db8c07188d075aaa2578c8397",
+    "release-positive-compile.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "release-positive-link.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "release-positive.map": "d26e859ef34b4391039ec5deef93e3aeeb3f09b7c5493b7b3525ca1a2fc225b2",
+    "release-positive": "34d48db6dfae5087397c938ff8a03e14d395ac6e267de197a6cfbf61b236454f",
+    "release-positive-exec.log": "2a33f9bccceb56c1d0fd9a229566fd2f4d7732c5199e038e48b83d460018cfc8",
+    "release-positive-registered-rejection.log": "bbb8f870c3aa4d78e2645e44f67fcf1226e29afe880bfc4111b84b9cac42ca73",
+    "release-negative-compile.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "release-negative-link.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "release-negative.map": "883865c09775b80669776806b2db587dee93a11c77a80b1e639f5d410eb2dcf1",
+    "release-negative": "0246a437e91145e233229885f0eed2904310e796dbe044d2f68c5c8b666b016b",
+    "release-negative-exec.log": "70a3b09cb770f789190706d6e617eaed3fab9dbff4257a449945e9080f2535b8",
+    "sanitize-positive-compile.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "sanitize-positive-link.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "sanitize-positive.map": "2d934c9caa7717ad00842063fe1424eacc26724d1937946c3064e973625f2fa9",
+    "sanitize-positive": "f2fe9bac13cc9e9bd410ffdee206b617666696a132216d0efa6c95508ba636fb",
+    "sanitize-positive-exec.log": "2a33f9bccceb56c1d0fd9a229566fd2f4d7732c5199e038e48b83d460018cfc8",
+    "sanitize-positive-registered-rejection.log": "bbb8f870c3aa4d78e2645e44f67fcf1226e29afe880bfc4111b84b9cac42ca73",
+    "sanitize-negative-compile.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "sanitize-negative-link.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "sanitize-negative.map": "529ba710edfc054012c45ef599b551a83a0632a15a450bdfe227adf080ab1274",
+    "sanitize-negative": "98ac57205aa1011d0ebfff4621b3af2a338f8b606e26fd2e6bebef99190f50ac",
+    "sanitize-negative-exec.log": "70a3b09cb770f789190706d6e617eaed3fab9dbff4257a449945e9080f2535b8"
+  },
+  "limitations": [
+    "Fresh whole test consumer with immutable matching current-main support; not fresh whole-core build.",
+    "CMake registration configured with explicit UI/XR off for this kernel test only; application defaults unchanged.",
+    "CTest target symlink points to exact manually compiled consumer; not a CMake rebuild claim.",
+    "Historical green avatar invocations are not retroactively qualified.",
+    "No avatar UI, VRM authoring, hardware, installation or full-goal completion claim."
+  ],
+  "disk_scope_bytes": 268435456
+}
