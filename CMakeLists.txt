@@ -4270,3 +4270,10 @@ if(BUILD_TESTING)
     set_tests_properties(surface-heat-${base}-articulation PROPERTIES FIXTURES_REQUIRED surface_heat_${base}_public TIMEOUT 600)
   endforeach()
 endif()
+
+# Matched native-app UI inspector; Python drives only a private test display.
+if(BUILD_TESTING)
+  add_executable(dome-sculpt-surface-heat-ui-test tests/surface-heat-ui.cpp)
+  target_include_directories(dome-sculpt-surface-heat-ui-test PRIVATE src)
+  target_link_libraries(dome-sculpt-surface-heat-ui-test PRIVATE dome-sculpt-core)
+endif()

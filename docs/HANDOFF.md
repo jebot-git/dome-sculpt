@@ -1,3 +1,7 @@
+## Private actual surface-heat FLTK proof
+
+Same9a/current615 app+fresh inspector pass normal17+compact18 checks per Release/owningSAN, including actual application reopen, complete native affine/IBM/morph/source retention, oneUndo/Redo and modal cancellation. Read SURFACE-HEAT-NATIVE-UI.md/receipt. No main/default admission; allocation and broader edited-domain/owner adapters remain open. Both setup negatives preserved.
+
 ## Admitted expression preflight repair — 2026-11-05
 
 Main now incorporates62ec13e/sealc17945d over qualified0b6. Only one complete
