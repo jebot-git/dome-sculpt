@@ -52,7 +52,7 @@ private:
 struct TextureSetRecord {
   TextureSetId id=0;
   std::string name;
-  std::shared_ptr<PaintedMesh> painted;
+  std::shared_ptr<const PaintedMesh> painted;
   Material material;
   std::shared_ptr<const CreatorAppearance> appearance;
   std::shared_ptr<const SourceMaterialBindings> material_bindings;
@@ -72,7 +72,6 @@ public:
   std::span<const TextureSetId> triangle_sets()const noexcept{return slots_?std::span<const TextureSetId>(*slots_):std::span<const TextureSetId>{};}
   const std::vector<TextureSetRecord>& additional()const noexcept{return additional_;}
   const TextureSetRecord& at(TextureSetId)const;
-  std::shared_ptr<const TextureSetCollection> snapshot()const;
   void validate(const SculptObject&,bool deep=true,const TextureSetLimits & = {})const;
 private:
   friend struct detail::TextureSetAccess;

@@ -2,6 +2,7 @@
 #include "dome/texture-sets.hpp"
 #include "dome/polygon-scene.hpp"
 #include "texture-set-paint-access.hpp"
+#include "texture-set-graph.hpp"
 #include <algorithm>
 #include <limits>
 #include <map>
@@ -20,10 +21,6 @@ bool TextureSetFaceDomain::contains(uint32_t triangle)const noexcept{return assi
 bool TextureSetFaceDomain::matches(const std::shared_ptr<const Mesh>&mesh)const noexcept{return topology_&&same_owner(topology_->geometry(),mesh);}
 const TextureSetRecord&TextureSetCollection::at(TextureSetId id)const{
  auto i=std::find_if(additional_.begin(),additional_.end(),[&](const auto&s){return s.id==id;});if(i==additional_.end())throw std::out_of_range("Unknown additional texture set");return *i;
-}
-std::shared_ptr<const TextureSetCollection>TextureSetCollection::snapshot()const{
- auto out=std::shared_ptr<TextureSetCollection>(new TextureSetCollection(*this));
- for(auto&s:out->additional_)s.painted=s.painted->snapshot();return out;
 }
 TextureSetView texture_set_view(const SculptObject&o,TextureSetId id){
  if(!o.mesh_active||!o.painted)throw std::logic_error("Texture sets require an active painting mesh");
@@ -82,13 +79,13 @@ TextureSetId create_texture_set(Scene&scene,uint64_t object,std::span<const uint
  auto paint=detail::TextureSetPaintAccess::bind(*source.painted,domain,resolution,l);
  TextureSetRecord record{id,std::move(name),std::move(paint),source.material,source.appearance,source.material_bindings,source.bake_recipe,{}};
  c->additional_.push_back(std::move(record));auto slots=std::make_shared<std::vector<TextureSetId>>(*c->slots_);for(auto f:chosen)(*slots)[f]=id;c->slots_=std::move(slots);c->active_=id;
- detail::TextureSetAccess::bind(o,*c,l);o.texture_sets=c;c->validate(o,true,l);stop(l);scene=std::move(next);return id;
+ detail::TextureSetAccess::bind(o,*c,l);o.texture_sets=c;c->validate(o,true,l);detail::validate_texture_set_graph(next,l);stop(l);scene=std::move(next);return id;
 }
 bool assign_texture_set_faces(Scene&scene,uint64_t object,TextureSetId set,std::span<const uint64_t>faces,const TextureSetLimits&l){
  auto next=scene;auto&o=next.object(object);auto c=detail::TextureSetAccess::begin(o,l);if(set)(void)c->at(set);
  auto chosen=detail::TextureSetAccess::selected(*c,faces,l);bool changed=false;for(auto f:chosen)changed|=(*c->slots_)[f]!=set;if(!changed)return false;
  auto slots=std::make_shared<std::vector<TextureSetId>>(*c->slots_);for(auto f:chosen)(*slots)[f]=set;c->slots_=std::move(slots);
- detail::TextureSetAccess::bind(o,*c,l);o.texture_sets=c;c->validate(o,true,l);stop(l);scene=std::move(next);return true;
+ detail::TextureSetAccess::bind(o,*c,l);o.texture_sets=c;c->validate(o,true,l);detail::validate_texture_set_graph(next,l);stop(l);scene=std::move(next);return true;
 }
 bool select_texture_set(Scene&scene,uint64_t object,TextureSetId set){
  auto&o=scene.object(object);if(!o.texture_sets){if(!set)return false;throw std::out_of_range("This mesh has only its original texture set");}

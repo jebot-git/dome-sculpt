@@ -1,4 +1,5 @@
 #include "dome/texture-sets.hpp"
+#include "texture-set-graph.hpp"
 #include "color-bound-memo.hpp"
 #include "emission-paint-access.hpp"
 // SPDX-License-Identifier: GPL-3.0-or-later
@@ -136,7 +137,6 @@ uint64_t Scene::duplicate(uint64_t id) {
   source.name=text::utf8_prefix(source.name,240)+" copy";
   source.volume=std::make_shared<Volume>(source.volume->geometry_snapshot());
   if(source.painted)source.painted=source.painted->snapshot();
-  if(source.texture_sets)source.texture_sets=source.texture_sets->snapshot();
   source.id=next_;
   objects_.push_back(std::move(source));
   active_=next_++;return active_;
@@ -176,11 +176,11 @@ Scene Scene::snapshot() const {
     o.volume = std::make_shared<Volume>(o.volume->geometry_snapshot());
     if (o.painted)
       o.painted = o.painted->snapshot();
-    if(o.texture_sets)o.texture_sets=o.texture_sets->snapshot();
   }
   return result;
 }
 void Scene::validate(bool deep_sources) const {
+  detail::validate_texture_set_graph(*this);
   detail::ColorBoundScope color_bound_scope;
   if (objects_.empty() || objects_.size() > 256)
     throw std::length_error("Invalid scene object count");
