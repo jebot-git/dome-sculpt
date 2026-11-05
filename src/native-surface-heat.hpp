@@ -4,6 +4,7 @@
 #include "visibility-heat-bind.hpp"
 #include "humanoid-heat-sources.hpp"
 #include "humanoid-heat-domains.hpp"
+#include "current-humanoid-heat-domains.hpp"
 #include "normal-frame-runtime.hpp"
 namespace dome::detail {
 // Private owning source-informed SURFACE heat route. No public method/default
@@ -143,6 +144,7 @@ inline NativeSurfaceHeatPrepared prepare_native_surface_heat(const NativeSurface
   }
   HumanoidHeatDomains anatomy;
   if(request.source_head_)anatomy=source_humanoid_heat_domains(support,request.support_,request.reference_,work,std::min(size_t(128u*1024u*1024u),options.maximum_workspace-fixed_bytes));
+  else if(ref.humanoid&&ref.humanoid->joints.contains("head")&&ref.humanoid->joints.contains("leftEye")&&ref.humanoid->joints.contains("rightEye"))anatomy=current_humanoid_heat_domains(support,request.support_,request.reference_,work,std::min(size_t(128u*1024u*1024u),options.maximum_workspace-fixed_bytes));
   else{for(auto id:request.support_){work.step(32);anatomy.parts.push_back({id,input.object(id).painted->mesh_owner(),{},false,false});}anatomy.forecast_bytes=65536+anatomy.parts.capacity()*sizeof(HumanoidHeatDomains::Part);}
   // Analysis temporary storage is released by its factory; retained per-row
   // boundary data stays charged alongside output and one active field.
