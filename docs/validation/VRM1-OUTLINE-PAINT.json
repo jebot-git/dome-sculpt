@@ -1,0 +1,1560 @@
+{
+  "date": "2026-11-05",
+  "runtime_commit": "fc7e270d3c4ebd486caf9918d825ae1ebd78409a",
+  "base_component": "227c11cb699a58c4575b00c99f4e37505dedc319",
+  "scope": "Qualified private opaque unlit world-space source-outline paint component only. One whole Layer production TU; no public layout/header/schema/writer/shader/asset changes. Not main37 admission, all843 regression, all MToon outline modes, physicalHMD or compute qualification.",
+  "production_files": {
+    "src/vrm1-expression-layer.cpp": "ec2be729cc772bb0592dbae3c4b864e2d1f7b787aafe0cb79f9e8d8b0d052845"
+  },
+  "profiles": {
+    "release": {
+      "native_status": {
+        "state": "terminal",
+        "pid": 1195564,
+        "steps": [
+          {
+            "name": "actual-outline-worker",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-outline-eacf/artifacts/outline-proof/release-v10/vrm1-expression-layer-authoring",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-outline-eacf/artifacts/outline-proof/source-v11.vrm",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-outline-eacf/artifacts/outline-proof/release-v11/run",
+              "--positive",
+              "--outline"
+            ],
+            "exit": 0,
+            "seconds": 1.4148415090166964,
+            "actual_elf_count": 22
+          },
+          {
+            "name": "actual-outline-render",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-outline-eacf/artifacts/outline-proof/release-v10/vrm1-expression-targets-render",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-outline-eacf/artifacts/outline-proof/release-v11/run",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-outline-eacf/artifacts/outline-proof/release-v11/images"
+            ],
+            "exit": 0,
+            "seconds": 1.6389829829568043,
+            "actual_elf_count": 69
+          },
+          {
+            "name": "actual-outline-full-factory",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-outline-eacf/artifacts/outline-proof/release-v10/vrm1-mask-support-faults",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-outline-eacf/artifacts/outline-proof/release-v11/run/nonuniform-source.dsculpt"
+            ],
+            "exit": 0,
+            "seconds": 19.026358582021203,
+            "actual_elf_count": 22
+          }
+        ],
+        "scope": "New fully bounded source fixture only: missing morph POSITION min/max fixed in generator, unchanged full C++ source/product/headers/compiler objects/binaries from passing V10. No new build/link. Real child ELF maps pre-pinned and verified; original V10 schema failure retained.",
+        "prior": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-outline-eacf/artifacts/outline-proof/release-v10",
+        "generator_only_changed": [
+          "tests/vrm1-outline-source.py"
+        ],
+        "binary_sha256": {
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-outline-eacf/artifacts/outline-proof/release-v10/vrm1-expression-layer-authoring": "1b553c7556962bec8139b2889c07f1c7698d84391a0282643c920ccfe6237a80",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-outline-eacf/artifacts/outline-proof/release-v10/vrm1-expression-targets-render": "505260d8402718abc216079f2f95b6fe276385dc2c3a98ac0dabccc3328cbdfd",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-outline-eacf/artifacts/outline-proof/release-v10/vrm1-mask-support-faults": "5066c8451686ae784417b770223b79fc4edbacbf5f74de8fdd2d8e809d79a8db"
+        },
+        "child_pid": 1196035,
+        "exit": 0,
+        "seconds": 22.42908269504551,
+        "inputs": 2791,
+        "drift": []
+      },
+      "native_status_sha256": "3da69da2fbea0a08d5422fedc363b43cab961a0d5df03f8e64f38eb14443d551",
+      "compile_link_status_sha256": "8f7f3559a3d4bb063dd36dba39e4b90da52c9485c47d6189ecf3783a622122c5",
+      "old_complete_layer_excluded_maps": [
+        {
+          "file": "artifacts/outline-proof/release-v10/vrm1-expression-layer-authoring.map",
+          "sha256": "a35652cb1d3cf3109c83fb989dba80d78092b77bf8d5952da3129a7d511597eb",
+          "original_layer_member_extracted": false
+        },
+        {
+          "file": "artifacts/outline-proof/release-v10/vrm1-expression-targets-render.map",
+          "sha256": "8f18de5f7dd0d946daf34f0d95dfd072f6d8a604db7d917bd85e7165801f9a42",
+          "original_layer_member_extracted": false
+        },
+        {
+          "file": "artifacts/outline-proof/release-v10/vrm1-mask-support-faults.map",
+          "sha256": "3b911f8dbad12982610bd2705f9aa092a33828a60474eff86e53102bf74ab1d1",
+          "original_layer_member_extracted": false
+        },
+        {
+          "file": "artifacts/outline-proof/ui-release-v11/stage/dome-sculpt.map",
+          "sha256": "67235157404687e065630db1d6afe6f55d67d7d62132475b348b027cdab22b11",
+          "original_layer_member_extracted": false
+        },
+        {
+          "file": "artifacts/outline-proof/ui-release-v11/stage/dome-sculpt-native-authoring-inspect.map",
+          "sha256": "c4a278ceb860d0f95712118a59549c0dbbc60cc9af7cd4fcca4d284a7f54a43b",
+          "original_layer_member_extracted": false
+        },
+        {
+          "file": "artifacts/outline-proof/ui-release-v11/stage/dome-sculpt-vrm1-expression-preview-test.map",
+          "sha256": "a3b5d1a51ecccccdf5034bdfeb23f40460378b6691f4f487795da7b7f4017463",
+          "original_layer_member_extracted": false
+        }
+      ],
+      "worker_checks": 54,
+      "independent_checks": 181,
+      "image_pairs": 36,
+      "maximum_image_error": 1,
+      "factory_checks": 1922,
+      "allocation_denials": 860,
+      "cancel_points": 1054,
+      "native_ui_status": {
+        "state": "terminal",
+        "pid": 1255875,
+        "profile": "release",
+        "steps": [
+          {
+            "name": "relink-dome-sculpt",
+            "command": [
+              "/usr/bin/c++",
+              "-O3",
+              "-DNDEBUG",
+              "-Wl,--dependency-file=/home/blux/de-xr/dome-sculpt/artifacts/vrm1-outline-eacf/artifacts/outline-proof/ui-release-v11/stage/dome-sculpt.link.d",
+              "CMakeFiles/dome-sculpt.dir/src/native-display-runtime.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/vrm-expression-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/rig-fit-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/projection-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/spacenav-options.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/app.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/polygon-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/import-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/procedural-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/resolution-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/sculpt-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/creator-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/rig-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/shapekey-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/weight-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/skin-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/mesh-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/bake-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/object-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/paint-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/uv-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/ui-conventions.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/session-appearance.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/export-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/third_party/desktop/desktop-menu.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/appmenu-protocol.c.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-outline-eacf/artifacts/outline-proof/release-v10/layer.o",
+              "-Wl,-Map=/home/blux/de-xr/dome-sculpt/artifacts/vrm1-outline-eacf/artifacts/outline-proof/ui-release-v11/stage/dome-sculpt.map",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-outline-eacf/artifacts/outline-proof/ui-release-v11/stage/dome-sculpt",
+              "-L/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-release/lib",
+              "-L/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib",
+              "-Wl,-rpath,/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-release/lib:/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib:",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-outline-eacf/artifacts/outline-proof/release-v3/stage/libdome-sculpt-spacenav.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-outline-eacf/artifacts/outline-proof/release-v3/stage/libdome-sculpt-core.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-outline-eacf/artifacts/outline-proof/release-v3/stage/libdome-sculpt-render.a",
+              "/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-release/lib/libfltk_images.so.1.4.5",
+              "/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-release/lib/libfltk_gl.so.1.4.5",
+              "/usr/lib64/libGLU.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-outline-eacf/artifacts/outline-proof/release-v3/stage/libdome-sculpt-xr.a",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libpng.so",
+              "/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-release/lib/libfltk.so.1.4.5",
+              "-lcairo",
+              "-L/usr/lib64",
+              "-lX11",
+              "-lGLU",
+              "-lGL",
+              "/usr/lib64/libdl.a",
+              "/usr/lib64/libSM.so",
+              "/usr/lib64/libICE.so",
+              "/usr/lib64/libXext.so",
+              "/usr/lib64/libXinerama.so",
+              "/usr/lib64/libXfixes.so",
+              "/usr/lib64/libXcursor.so",
+              "/usr/lib64/libXrender.so",
+              "/usr/lib64/libXft.so",
+              "/usr/lib64/libwayland-egl.so",
+              "/usr/lib64/libwayland-cursor.so",
+              "/usr/lib64/libxkbcommon.so",
+              "/usr/lib64/libGLX.so",
+              "/usr/lib64/libOpenGL.so",
+              "/usr/lib64/libz.so",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libcairo.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-outline-eacf/artifacts/outline-proof/release-v3/stage/libdome-sculpt-render.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-outline-eacf/artifacts/outline-proof/release-v3/stage/libdome-sculpt-core.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-outline-eacf/artifacts/outline-proof/release-v3/stage/libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-outline-eacf/artifacts/outline-proof/release-v3/stage/libdome-sculpt-polygon.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-outline-eacf/artifacts/outline-proof/release-v3/stage/libxatlas.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-outline-eacf/artifacts/outline-proof/release-v3/stage/libmikktspace.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-outline-eacf/artifacts/outline-proof/release-v3/stage/libmikktspace-robust.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-outline-eacf/artifacts/outline-proof/release-v3/stage/libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-outline-eacf/artifacts/outline-proof/release-v3/stage/libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "/usr/lib64/libEGL.so",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libharfbuzz.so",
+              "/usr/lib64/libGL.so",
+              "/usr/lib64/libfontconfig.so",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libfreetype.so",
+              "/usr/lib64/libicui18n.so",
+              "/usr/lib64/libicuuc.so",
+              "/usr/lib64/libopenxr_loader.so",
+              "/usr/lib64/libgio-2.0.so",
+              "/usr/lib64/libgobject-2.0.so",
+              "/usr/lib64/libglib-2.0.so",
+              "/usr/lib64/libX11.so",
+              "/usr/lib64/libwayland-client.so",
+              "-lm",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit_code": 0,
+            "seconds": 0.40157235303195193
+          },
+          {
+            "name": "relink-dome-sculpt-native-authoring-inspect",
+            "command": [
+              "/usr/bin/c++",
+              "-O3",
+              "-DNDEBUG",
+              "-Wl,--dependency-file=/home/blux/de-xr/dome-sculpt/artifacts/vrm1-outline-eacf/artifacts/outline-proof/ui-release-v11/stage/dome-sculpt-native-authoring-inspect.link.d",
+              "CMakeFiles/dome-sculpt-native-authoring-inspect.dir/tests/native-authoring-inspect.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-outline-eacf/artifacts/outline-proof/release-v10/layer.o",
+              "-Wl,-Map=/home/blux/de-xr/dome-sculpt/artifacts/vrm1-outline-eacf/artifacts/outline-proof/ui-release-v11/stage/dome-sculpt-native-authoring-inspect.map",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-outline-eacf/artifacts/outline-proof/ui-release-v11/stage/dome-sculpt-native-authoring-inspect",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-outline-eacf/artifacts/outline-proof/release-v3/stage/libdome-sculpt-core.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-outline-eacf/artifacts/outline-proof/release-v3/stage/libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-outline-eacf/artifacts/outline-proof/release-v3/stage/libdome-sculpt-polygon.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-outline-eacf/artifacts/outline-proof/release-v3/stage/libxatlas.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-outline-eacf/artifacts/outline-proof/release-v3/stage/libmikktspace.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-outline-eacf/artifacts/outline-proof/release-v3/stage/libmikktspace-robust.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-outline-eacf/artifacts/outline-proof/release-v3/stage/libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-outline-eacf/artifacts/outline-proof/release-v3/stage/libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit_code": 0,
+            "seconds": 0.20135605602990836
+          },
+          {
+            "name": "relink-dome-sculpt-vrm1-expression-preview-test",
+            "command": [
+              "/usr/bin/c++",
+              "-O3",
+              "-DNDEBUG",
+              "-Wl,--wrap=_ZN4dome25bake_vrm1_expression_poseERKNS_5SceneEmRKNS_21Vrm1ExpressionWeightsERKSt8functionIFbvEE",
+              "-Wl,--dependency-file=/home/blux/de-xr/dome-sculpt/artifacts/vrm1-outline-eacf/artifacts/outline-proof/ui-release-v11/stage/dome-sculpt-vrm1-expression-preview-test.link.d",
+              "CMakeFiles/dome-sculpt-vrm1-expression-preview-test.dir/tests/vrm1-expression-preview.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-outline-eacf/artifacts/outline-proof/release-v10/layer.o",
+              "-Wl,-Map=/home/blux/de-xr/dome-sculpt/artifacts/vrm1-outline-eacf/artifacts/outline-proof/ui-release-v11/stage/dome-sculpt-vrm1-expression-preview-test.map",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-outline-eacf/artifacts/outline-proof/ui-release-v11/stage/dome-sculpt-vrm1-expression-preview-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-outline-eacf/artifacts/outline-proof/release-v3/stage/libdome-sculpt-core.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-outline-eacf/artifacts/outline-proof/release-v3/stage/libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-outline-eacf/artifacts/outline-proof/release-v3/stage/libdome-sculpt-polygon.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-outline-eacf/artifacts/outline-proof/release-v3/stage/libxatlas.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-outline-eacf/artifacts/outline-proof/release-v3/stage/libmikktspace.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-outline-eacf/artifacts/outline-proof/release-v3/stage/libmikktspace-robust.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-outline-eacf/artifacts/outline-proof/release-v3/stage/libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-outline-eacf/artifacts/outline-proof/release-v3/stage/libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit_code": 0,
+            "seconds": 0.3016182670253329
+          },
+          {
+            "name": "expected",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-outline-eacf/artifacts/outline-proof/ui-release-v11/stage/dome-sculpt-vrm1-expression-preview-test",
+              "--expected",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-outline-eacf/artifacts/outline-proof/release-v11/run/nonuniform-source.dsculpt",
+              ".35",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-outline-eacf/artifacts/outline-proof/ui-release-v11/expected.dsculpt"
+            ],
+            "exit_code": 0,
+            "seconds": 0.10098987602395937
+          },
+          {
+            "name": "menu-outline-normal",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/selection-gui-venv/bin/python",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-outline-eacf/tests/vrm1-expression-menu.py"
+            ],
+            "exit_code": 0,
+            "seconds": 25.489165506034624,
+            "actual_app_elf_files": 98
+          },
+          {
+            "name": "menu-outline-compact",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/selection-gui-venv/bin/python",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-outline-eacf/tests/vrm1-expression-menu.py"
+            ],
+            "exit_code": 0,
+            "seconds": 24.99599585699616,
+            "actual_app_elf_files": 98
+          },
+          {
+            "name": "xr-outline",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/selection-gui-venv/bin/python",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-outline-eacf/tests/vrm1-expression-xr.py",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-outline-eacf/artifacts/outline-proof/ui-release-v11/stage/dome-sculpt",
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring37-normal-f365/build-normal37-release/libdome-sculpt-test-runtime.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-outline-eacf/artifacts/outline-proof/ui-release-v11/stage/dome-sculpt-vrm1-expression-preview-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-outline-eacf/artifacts/outline-proof/ui-release-v11/stage/dome-sculpt-native-authoring-inspect",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-outline-eacf/artifacts/outline-proof/release-v11/run/nonuniform-source.dsculpt",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-outline-eacf/artifacts/outline-proof/ui-release-v11/outline-xr"
+            ],
+            "exit_code": 0,
+            "seconds": 43.50319026102079,
+            "actual_app_elf_files": 97
+          }
+        ],
+        "scope": "Actual matching FLTK app26unchanged5df TUs +whole inspector/preview helper relinks, complete new Layer override object BEFORE immutable11support archives; maps exclude old Layer member. Normal/compact native universal-menu workflow and actual-loader syntheticXR on genuine valid outlined fixture. PrivateMesaSAN onlyXR, explicit X11 private test backend; no physicalHMD/compute/fullregression.",
+        "phase": "xr-outline",
+        "child_pid": 1261116,
+        "artifact_drift": [],
+        "exit_code": 0,
+        "seconds": 98.95184347097529,
+        "inputs": 2833,
+        "drift": []
+      },
+      "native_ui_status_sha256": "6566f74cb08e003ac28eb50ce5994062ab4ea33f15db250a0dea35fdaa6ad02e",
+      "ui_checks": {
+        "outline-normal": 22,
+        "outline-compact": 22,
+        "outline-xr": 22
+      },
+      "legacy_worker_status_sha256": "7d893564ad10caa7a64ee441b53fd02fb9e29798dc1bdade83d8640d177a99f8",
+      "legacy_worker_cases": [
+        {
+          "mode": "shift",
+          "exit": 0,
+          "exact_files": 11
+        },
+        {
+          "mode": "shift-invariant-uv",
+          "exit": 0,
+          "exact_files": 11
+        },
+        {
+          "mode": "shift-mask",
+          "exit": 0,
+          "exact_files": 11
+        },
+        {
+          "mode": "shift-mask-no-rim",
+          "exit": 0,
+          "exact_files": 11
+        },
+        {
+          "mode": "shift-default-rim",
+          "exit": 0,
+          "exact_files": 11
+        },
+        {
+          "mode": "rim-mask",
+          "exit": 0,
+          "exact_files": 11
+        },
+        {
+          "mode": "normal",
+          "exit": 0,
+          "exact_files": 11
+        }
+      ],
+      "standards": {
+        "containers": 5,
+        "sentinels_excluded": 1,
+        "khronos_errors": 0,
+        "khronos_warnings": 21,
+        "khronos_infos": 115,
+        "khronos_hints": 12,
+        "official_container_instances": 42,
+        "official_control_instances": 6,
+        "resolver_negative_controls": 2,
+        "status_sha256": "0a7438974a77d473f71f4e7a904a9f0ec5b060a5a5e515e3c5e62b5632ee89cd",
+        "before_manifest_sha256": "7655f3d79165320a300c9ac236c042e38e365689b2a06e96754c56826eed979e",
+        "after_manifest_sha256": "7655f3d79165320a300c9ac236c042e38e365689b2a06e96754c56826eed979e"
+      }
+    },
+    "sanitize": {
+      "native_status": {
+        "state": "terminal",
+        "pid": 1198296,
+        "steps": [
+          {
+            "name": "actual-outline-worker",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-outline-eacf/artifacts/outline-proof/sanitize-v10/vrm1-expression-layer-authoring",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-outline-eacf/artifacts/outline-proof/source-v11.vrm",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-outline-eacf/artifacts/outline-proof/sanitize-v11/run",
+              "--positive",
+              "--outline"
+            ],
+            "exit": 0,
+            "seconds": 14.109566947969142,
+            "actual_elf_count": 24
+          },
+          {
+            "name": "actual-outline-render",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-outline-eacf/artifacts/outline-proof/sanitize-v10/vrm1-expression-targets-render",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-outline-eacf/artifacts/outline-proof/sanitize-v11/run",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-outline-eacf/artifacts/outline-proof/sanitize-v11/images"
+            ],
+            "exit": 0,
+            "seconds": 5.49169300700305,
+            "actual_elf_count": 71
+          },
+          {
+            "name": "actual-outline-full-factory",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-outline-eacf/artifacts/outline-proof/sanitize-v10/vrm1-mask-support-faults",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-outline-eacf/artifacts/outline-proof/sanitize-v11/run/nonuniform-source.dsculpt"
+            ],
+            "exit": 0,
+            "seconds": 250.77308866102248,
+            "actual_elf_count": 24
+          }
+        ],
+        "scope": "New fully bounded source fixture only: missing morph POSITION min/max fixed in generator, unchanged full C++ source/product/headers/compiler objects/binaries from passing V10. No new build/link. Real child ELF maps pre-pinned and verified; original V10 schema failure retained.",
+        "prior": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-outline-eacf/artifacts/outline-proof/sanitize-v10",
+        "generator_only_changed": [
+          "tests/vrm1-outline-source.py"
+        ],
+        "binary_sha256": {
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-outline-eacf/artifacts/outline-proof/sanitize-v10/vrm1-expression-layer-authoring": "aa8fefd2d6d4ad6ae1715f4119ef6cf7ea0ed98ff2806575d3c99ec1df5bb715",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-outline-eacf/artifacts/outline-proof/sanitize-v10/vrm1-expression-targets-render": "fe3c6b819d350ed032466b27d744d592ecb0d28babd533ab2e64c124043868e2",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-outline-eacf/artifacts/outline-proof/sanitize-v10/vrm1-mask-support-faults": "a3b8d22470ae8bd499615b20addb6922c52caf237f011b01ccc52354d0f7823c"
+        },
+        "child_pid": 1200404,
+        "exit": 0,
+        "seconds": 271.9927507599932,
+        "inputs": 2793,
+        "drift": []
+      },
+      "native_status_sha256": "be3df870b026f039b544ec4c270d69ed752db1b622e8fed658d23b11e65c6711",
+      "compile_link_status_sha256": "fc526675f992a6b79ea31b33b7ee442091c1519bdbdfe19d11a3cdf2db500243",
+      "old_complete_layer_excluded_maps": [
+        {
+          "file": "artifacts/outline-proof/sanitize-v10/vrm1-expression-layer-authoring.map",
+          "sha256": "24019ca4d46c20a316f51ac39a91fe404f8b8cab6a6ec05608bd3babcbe4930e",
+          "original_layer_member_extracted": false
+        },
+        {
+          "file": "artifacts/outline-proof/sanitize-v10/vrm1-expression-targets-render.map",
+          "sha256": "5e0f6f23510a87d55331055eaa6411af0e7b3854604519fa683209b368217dfa",
+          "original_layer_member_extracted": false
+        },
+        {
+          "file": "artifacts/outline-proof/sanitize-v10/vrm1-mask-support-faults.map",
+          "sha256": "306ccb07db9c7adaa7b630bd70b7cc44a3b5977c7d7c55e0564e744381bc32cd",
+          "original_layer_member_extracted": false
+        },
+        {
+          "file": "artifacts/outline-proof/ui-sanitize-v11/stage/dome-sculpt.map",
+          "sha256": "70c614d9cb8667cfa376b604a01b7921ed2bcb0eefee978b47a5680b6f27c350",
+          "original_layer_member_extracted": false
+        },
+        {
+          "file": "artifacts/outline-proof/ui-sanitize-v11/stage/dome-sculpt-native-authoring-inspect.map",
+          "sha256": "673afea8bef162dfdd87496b41d184178148703c46f9db5de4dd34d3e225956a",
+          "original_layer_member_extracted": false
+        },
+        {
+          "file": "artifacts/outline-proof/ui-sanitize-v11/stage/dome-sculpt-vrm1-expression-preview-test.map",
+          "sha256": "a140c79f3c977d9f60be0296c5c28636f0eba4265d07d915a4e758d5e4e97554",
+          "original_layer_member_extracted": false
+        }
+      ],
+      "worker_checks": 54,
+      "independent_checks": 181,
+      "image_pairs": 36,
+      "maximum_image_error": 1,
+      "factory_checks": 1922,
+      "allocation_denials": 860,
+      "cancel_points": 1054,
+      "native_ui_status": {
+        "state": "terminal",
+        "pid": 1255876,
+        "profile": "sanitize",
+        "steps": [
+          {
+            "name": "relink-dome-sculpt",
+            "command": [
+              "/usr/bin/c++",
+              "-O1",
+              "-g1",
+              "-DNDEBUG",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "-Wl,--dependency-file=/home/blux/de-xr/dome-sculpt/artifacts/vrm1-outline-eacf/artifacts/outline-proof/ui-sanitize-v11/stage/dome-sculpt.link.d",
+              "CMakeFiles/dome-sculpt.dir/src/native-display-runtime.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/vrm-expression-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/rig-fit-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/projection-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/spacenav-options.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/app.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/polygon-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/import-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/procedural-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/resolution-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/sculpt-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/creator-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/rig-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/shapekey-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/weight-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/skin-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/mesh-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/bake-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/object-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/paint-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/uv-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/ui-conventions.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/session-appearance.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/src/export-editor.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/third_party/desktop/desktop-menu.cpp.o",
+              "CMakeFiles/dome-sculpt.dir/appmenu-protocol.c.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-outline-eacf/artifacts/outline-proof/sanitize-v10/layer.o",
+              "-Wl,-Map=/home/blux/de-xr/dome-sculpt/artifacts/vrm1-outline-eacf/artifacts/outline-proof/ui-sanitize-v11/stage/dome-sculpt.map",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-outline-eacf/artifacts/outline-proof/ui-sanitize-v11/stage/dome-sculpt",
+              "-L/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-sanitize/lib",
+              "-L/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib",
+              "-Wl,-rpath,/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-sanitize/lib:/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib:",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-outline-eacf/artifacts/outline-proof/sanitize-v3/stage/libdome-sculpt-spacenav.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-outline-eacf/artifacts/outline-proof/sanitize-v3/stage/libdome-sculpt-core.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-outline-eacf/artifacts/outline-proof/sanitize-v3/stage/libdome-sculpt-render.a",
+              "/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-sanitize/lib/libfltk_images.so.1.4.5",
+              "/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-sanitize/lib/libfltk_gl.so.1.4.5",
+              "/usr/lib64/libGLU.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-outline-eacf/artifacts/outline-proof/sanitize-v3/stage/libdome-sculpt-xr.a",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libpng.so",
+              "/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-sanitize/lib/libfltk.so.1.4.5",
+              "-lcairo",
+              "-L/usr/lib64",
+              "-lX11",
+              "-lGLU",
+              "-lGL",
+              "/usr/lib64/libdl.a",
+              "/usr/lib64/libSM.so",
+              "/usr/lib64/libICE.so",
+              "/usr/lib64/libXext.so",
+              "/usr/lib64/libXinerama.so",
+              "/usr/lib64/libXfixes.so",
+              "/usr/lib64/libXcursor.so",
+              "/usr/lib64/libXrender.so",
+              "/usr/lib64/libXft.so",
+              "/usr/lib64/libwayland-egl.so",
+              "/usr/lib64/libwayland-cursor.so",
+              "/usr/lib64/libxkbcommon.so",
+              "/usr/lib64/libGLX.so",
+              "/usr/lib64/libOpenGL.so",
+              "/usr/lib64/libz.so",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libcairo.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-outline-eacf/artifacts/outline-proof/sanitize-v3/stage/libdome-sculpt-render.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-outline-eacf/artifacts/outline-proof/sanitize-v3/stage/libdome-sculpt-core.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-outline-eacf/artifacts/outline-proof/sanitize-v3/stage/libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-outline-eacf/artifacts/outline-proof/sanitize-v3/stage/libdome-sculpt-polygon.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-outline-eacf/artifacts/outline-proof/sanitize-v3/stage/libxatlas.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-outline-eacf/artifacts/outline-proof/sanitize-v3/stage/libmikktspace.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-outline-eacf/artifacts/outline-proof/sanitize-v3/stage/libmikktspace-robust.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-outline-eacf/artifacts/outline-proof/sanitize-v3/stage/libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-outline-eacf/artifacts/outline-proof/sanitize-v3/stage/libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "/usr/lib64/libEGL.so",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libharfbuzz.so",
+              "/usr/lib64/libGL.so",
+              "/usr/lib64/libfontconfig.so",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libfreetype.so",
+              "/usr/lib64/libicui18n.so",
+              "/usr/lib64/libicuuc.so",
+              "/usr/lib64/libopenxr_loader.so",
+              "/usr/lib64/libgio-2.0.so",
+              "/usr/lib64/libgobject-2.0.so",
+              "/usr/lib64/libglib-2.0.so",
+              "/usr/lib64/libX11.so",
+              "/usr/lib64/libwayland-client.so",
+              "-lm",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit_code": 0,
+            "seconds": 2.206890631990973
+          },
+          {
+            "name": "relink-dome-sculpt-native-authoring-inspect",
+            "command": [
+              "/usr/bin/c++",
+              "-O1",
+              "-g1",
+              "-DNDEBUG",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "-Wl,--dependency-file=/home/blux/de-xr/dome-sculpt/artifacts/vrm1-outline-eacf/artifacts/outline-proof/ui-sanitize-v11/stage/dome-sculpt-native-authoring-inspect.link.d",
+              "CMakeFiles/dome-sculpt-native-authoring-inspect.dir/tests/native-authoring-inspect.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-outline-eacf/artifacts/outline-proof/sanitize-v10/layer.o",
+              "-Wl,-Map=/home/blux/de-xr/dome-sculpt/artifacts/vrm1-outline-eacf/artifacts/outline-proof/ui-sanitize-v11/stage/dome-sculpt-native-authoring-inspect.map",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-outline-eacf/artifacts/outline-proof/ui-sanitize-v11/stage/dome-sculpt-native-authoring-inspect",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-outline-eacf/artifacts/outline-proof/sanitize-v3/stage/libdome-sculpt-core.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-outline-eacf/artifacts/outline-proof/sanitize-v3/stage/libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-outline-eacf/artifacts/outline-proof/sanitize-v3/stage/libdome-sculpt-polygon.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-outline-eacf/artifacts/outline-proof/sanitize-v3/stage/libxatlas.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-outline-eacf/artifacts/outline-proof/sanitize-v3/stage/libmikktspace.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-outline-eacf/artifacts/outline-proof/sanitize-v3/stage/libmikktspace-robust.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-outline-eacf/artifacts/outline-proof/sanitize-v3/stage/libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-outline-eacf/artifacts/outline-proof/sanitize-v3/stage/libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit_code": 0,
+            "seconds": 1.2040023260051385
+          },
+          {
+            "name": "relink-dome-sculpt-vrm1-expression-preview-test",
+            "command": [
+              "/usr/bin/c++",
+              "-O1",
+              "-g1",
+              "-DNDEBUG",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "-Wl,--wrap=_ZN4dome25bake_vrm1_expression_poseERKNS_5SceneEmRKNS_21Vrm1ExpressionWeightsERKSt8functionIFbvEE",
+              "-Wl,--dependency-file=/home/blux/de-xr/dome-sculpt/artifacts/vrm1-outline-eacf/artifacts/outline-proof/ui-sanitize-v11/stage/dome-sculpt-vrm1-expression-preview-test.link.d",
+              "CMakeFiles/dome-sculpt-vrm1-expression-preview-test.dir/tests/vrm1-expression-preview.cpp.o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-outline-eacf/artifacts/outline-proof/sanitize-v10/layer.o",
+              "-Wl,-Map=/home/blux/de-xr/dome-sculpt/artifacts/vrm1-outline-eacf/artifacts/outline-proof/ui-sanitize-v11/stage/dome-sculpt-vrm1-expression-preview-test.map",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-outline-eacf/artifacts/outline-proof/ui-sanitize-v11/stage/dome-sculpt-vrm1-expression-preview-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-outline-eacf/artifacts/outline-proof/sanitize-v3/stage/libdome-sculpt-core.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-outline-eacf/artifacts/outline-proof/sanitize-v3/stage/libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-outline-eacf/artifacts/outline-proof/sanitize-v3/stage/libdome-sculpt-polygon.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-outline-eacf/artifacts/outline-proof/sanitize-v3/stage/libxatlas.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-outline-eacf/artifacts/outline-proof/sanitize-v3/stage/libmikktspace.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-outline-eacf/artifacts/outline-proof/sanitize-v3/stage/libmikktspace-robust.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-outline-eacf/artifacts/outline-proof/sanitize-v3/stage/libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-outline-eacf/artifacts/outline-proof/sanitize-v3/stage/libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit_code": 0,
+            "seconds": 1.907481889007613
+          },
+          {
+            "name": "expected",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-outline-eacf/artifacts/outline-proof/ui-sanitize-v11/stage/dome-sculpt-vrm1-expression-preview-test",
+              "--expected",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-outline-eacf/artifacts/outline-proof/sanitize-v11/run/nonuniform-source.dsculpt",
+              ".35",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-outline-eacf/artifacts/outline-proof/ui-sanitize-v11/expected.dsculpt"
+            ],
+            "exit_code": 0,
+            "seconds": 0.40299168101046234
+          },
+          {
+            "name": "menu-outline-normal",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/selection-gui-venv/bin/python",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-outline-eacf/tests/vrm1-expression-menu.py"
+            ],
+            "exit_code": 0,
+            "seconds": 34.40537102497183,
+            "actual_app_elf_files": 100
+          },
+          {
+            "name": "menu-outline-compact",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/selection-gui-venv/bin/python",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-outline-eacf/tests/vrm1-expression-menu.py"
+            ],
+            "exit_code": 0,
+            "seconds": 36.13266513502458,
+            "actual_app_elf_files": 100
+          },
+          {
+            "name": "xr-outline",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/selection-gui-venv/bin/python",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-outline-eacf/tests/vrm1-expression-xr.py",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-outline-eacf/artifacts/outline-proof/ui-sanitize-v11/stage/dome-sculpt",
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring37-normal-f365/build-normal37-sanitize/libdome-sculpt-test-runtime.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-outline-eacf/artifacts/outline-proof/ui-sanitize-v11/stage/dome-sculpt-vrm1-expression-preview-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-outline-eacf/artifacts/outline-proof/ui-sanitize-v11/stage/dome-sculpt-native-authoring-inspect",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-outline-eacf/artifacts/outline-proof/sanitize-v11/run/nonuniform-source.dsculpt",
+              "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-outline-eacf/artifacts/outline-proof/ui-sanitize-v11/outline-xr"
+            ],
+            "exit_code": 0,
+            "seconds": 65.4303769459948,
+            "actual_app_elf_files": 86
+          }
+        ],
+        "scope": "Actual matching FLTK app26unchanged5df TUs +whole inspector/preview helper relinks, complete new Layer override object BEFORE immutable11support archives; maps exclude old Layer member. Normal/compact native universal-menu workflow and actual-loader syntheticXR on genuine valid outlined fixture. PrivateMesaSAN onlyXR, explicit X11 private test backend; no physicalHMD/compute/fullregression.",
+        "phase": "xr-outline",
+        "child_pid": 1263755,
+        "artifact_drift": [],
+        "exit_code": 0,
+        "seconds": 149.97581847099354,
+        "inputs": 2836,
+        "drift": []
+      },
+      "native_ui_status_sha256": "676cece5842b9db0d7b25b32ed457563b657a8dce2fe7d4757a179b439bcb0de",
+      "ui_checks": {
+        "outline-normal": 22,
+        "outline-compact": 22,
+        "outline-xr": 22
+      },
+      "legacy_worker_status_sha256": "09c8119de18a9b2c08746f128b968a4891088582725ec39b5be2a6425998c2b6",
+      "legacy_worker_cases": [
+        {
+          "mode": "shift",
+          "exit": 0,
+          "exact_files": 11
+        },
+        {
+          "mode": "shift-invariant-uv",
+          "exit": 0,
+          "exact_files": 11
+        },
+        {
+          "mode": "shift-mask",
+          "exit": 0,
+          "exact_files": 11
+        },
+        {
+          "mode": "shift-mask-no-rim",
+          "exit": 0,
+          "exact_files": 11
+        },
+        {
+          "mode": "shift-default-rim",
+          "exit": 0,
+          "exact_files": 11
+        },
+        {
+          "mode": "rim-mask",
+          "exit": 0,
+          "exact_files": 11
+        },
+        {
+          "mode": "normal",
+          "exit": 0,
+          "exact_files": 11
+        }
+      ],
+      "standards": {
+        "containers": 5,
+        "sentinels_excluded": 1,
+        "khronos_errors": 0,
+        "khronos_warnings": 21,
+        "khronos_infos": 115,
+        "khronos_hints": 12,
+        "official_container_instances": 42,
+        "official_control_instances": 6,
+        "resolver_negative_controls": 2,
+        "status_sha256": "e3590d9c2c3bcb97be54af3df3f53cae0389ba300077443eb4e37c23f59abff4",
+        "before_manifest_sha256": "997edf9f9035965fd0bb45b4f31b87bec525752e8055d4bb011b239fe22c82b6",
+        "after_manifest_sha256": "997edf9f9035965fd0bb45b4f31b87bec525752e8055d4bb011b239fe22c82b6"
+      }
+    }
+  },
+  "preserved_failures": [
+    {
+      "file": "artifacts/outline-proof/release/status.json",
+      "sha256": "e962456fb7c04cba0a41431f69bd487f17efd624ddf094b376c8e9de97694171",
+      "exit": 1,
+      "error": "RuntimeError('actual-outline-worker failed 1')",
+      "scope": "Earlier closed prototype; never relabeled"
+    },
+    {
+      "file": "artifacts/outline-proof/release-v2/status.json",
+      "sha256": "f66a021bbbecd78c3cf8b782601389f0e01bd536d2c2073d1a6189c09d332018",
+      "exit": 1,
+      "error": "RuntimeError('actual-outline-worker failed 1')",
+      "scope": "Earlier closed prototype; never relabeled"
+    },
+    {
+      "file": "artifacts/outline-proof/release-v3/status.json",
+      "sha256": "c9480ae8735d2f3c61e037a31ea10b0c17bad8481b9b291a0d27939bcc5dcdda",
+      "exit": 1,
+      "error": "RuntimeError('actual-outline-worker failed 1')",
+      "scope": "Earlier closed prototype; never relabeled"
+    },
+    {
+      "file": "artifacts/outline-proof/release-v4/status.json",
+      "sha256": "b460f1c716974820354e9256ab9392c4229a5f04fcffdf34ca68245270852e39",
+      "exit": 1,
+      "error": "RuntimeError('actual-outline-worker failed 1')",
+      "scope": "Earlier closed prototype; never relabeled"
+    },
+    {
+      "file": "artifacts/outline-proof/release-v5/status.json",
+      "sha256": "3e886c9cba48efbcdd831f28a0ec778c1ee63645896ecdf8ef3f43ad3f667437",
+      "exit": 1,
+      "error": "RuntimeError('actual-outline-worker failed 1')",
+      "scope": "Earlier closed prototype; never relabeled"
+    },
+    {
+      "file": "artifacts/outline-proof/release-v6/status.json",
+      "sha256": "0fdd8553080da6641d4808df128144734c4264e5609c63ce1ee329b9ff50854e",
+      "exit": 1,
+      "error": "RuntimeError('actual-outline-worker failed 1')",
+      "scope": "Earlier closed prototype; never relabeled"
+    },
+    {
+      "file": "artifacts/outline-proof/release-v7/status.json",
+      "sha256": "dc298a0dde729fb5f381825b166f00f55ab039bc293b93732fd48026a571de20",
+      "exit": 1,
+      "error": "RuntimeError('actual-outline-worker failed 1')",
+      "scope": "Earlier closed prototype; never relabeled"
+    },
+    {
+      "file": "artifacts/outline-proof/release-v8/status.json",
+      "sha256": "4e95320f561b1ea22c620d6d60c21e311b15b8d42ee6e6e84cd0e180f3cc5404",
+      "exit": 1,
+      "error": "RuntimeError('actual-outline-worker failed 1')",
+      "scope": "Earlier closed prototype; never relabeled"
+    },
+    {
+      "file": "artifacts/outline-proof/release-v9/status.json",
+      "sha256": "64a737058346eea8f81ed501937920bd5a11c157b0b38e953bde0556ee8498af",
+      "exit": 1,
+      "error": "RuntimeError('actual-outline-render failed 1')",
+      "scope": "Earlier closed prototype; never relabeled"
+    },
+    {
+      "file": "artifacts/outline-proof/sanitize/status.json",
+      "sha256": "ab681924c5fa0e42eeb8e415ad37457a54db1a185517db46fee3d93deec0ea98",
+      "exit": 1,
+      "error": "RuntimeError('actual-outline-worker failed 1')",
+      "scope": "Earlier closed prototype; never relabeled"
+    },
+    {
+      "file": "artifacts/outline-proof/sanitize-v2/status.json",
+      "sha256": "4b5248f0a8a7c19fc39326b4b114eab4f8d89e5dc47b878a55ccc27954c3e1ea",
+      "exit": 1,
+      "error": "RuntimeError('actual-outline-worker failed 1')",
+      "scope": "Earlier closed prototype; never relabeled"
+    },
+    {
+      "file": "artifacts/outline-proof/sanitize-v3/status.json",
+      "sha256": "844bfa6432a48b90f33784d68ddf2812367faeaa38af1561b31900c65226498d",
+      "exit": 1,
+      "error": "RuntimeError('actual-outline-worker failed 1')",
+      "scope": "Earlier closed prototype; never relabeled"
+    }
+  ],
+  "precision_scope": "PNG biquadratic/deCasteljau certificate covers complete filtered footprint at unchanged3/255 linear bound. Aligned carrier uses exact accessor-rounding bound plus existing assumed16epsilon F32 interpolation screening; device qualification is actual software/Arc here, not an API-wide universal interpolation proof. Diagnostic RGB/coverage maxima are unrefined and their sum is not the tighter accepted joint certificate.",
+  "hardware": {
+    "status": {
+      "state": "terminal",
+      "pid": 1253005,
+      "steps": [
+        {
+          "name": "opaque-world-outline",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-outline-eacf/artifacts/outline-proof/release-v10/vrm1-expression-targets-render",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-outline-eacf/artifacts/outline-proof/release-v11/run",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-outline-eacf/artifacts/outline-proof/hardware-v12/opaque-world-outline",
+            "--hardware"
+          ],
+          "exit": 0,
+          "expected_exit": 0,
+          "seconds": 5.390679431962781,
+          "actual_drm_fds": {
+            "/dev/dri/renderD129": {
+              "sysfs_device": "/sys/devices/pci0000:00/0000:00:01.0/0000:01:00.0/0000:02:01.0/0000:03:00.0",
+              "vendor": "0x8086",
+              "device": "0x56a0"
+            }
+          }
+        },
+        {
+          "name": "opaque-world-outline-software-refusal",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-outline-eacf/artifacts/outline-proof/release-v10/vrm1-expression-targets-render",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-outline-eacf/artifacts/outline-proof/release-v11/run",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-outline-eacf/artifacts/outline-proof/hardware-v12/opaque-world-outline-software-refusal",
+            "--hardware"
+          ],
+          "exit": 1,
+          "expected_exit": 1,
+          "seconds": 0.9718282380490564,
+          "actual_drm_fds": {}
+        },
+        {
+          "name": "actual-uhd-refusal",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-outline-eacf/artifacts/outline-proof/release-v10/vrm1-expression-targets-render",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-outline-eacf/artifacts/outline-proof/release-v11/run",
+            "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-outline-eacf/artifacts/outline-proof/hardware-v12/actual-uhd-refusal",
+            "--hardware"
+          ],
+          "exit": 1,
+          "expected_exit": 1,
+          "seconds": 0.944042488001287,
+          "actual_drm_fds": {
+            "/dev/dri/renderD129": {
+              "sysfs_device": "/sys/devices/pci0000:00/0000:00:01.0/0000:01:00.0/0000:02:01.0/0000:03:00.0",
+              "vendor": "0x8086",
+              "device": "0x56a0"
+            },
+            "/dev/dri/renderD128": {
+              "sysfs_device": "/sys/devices/pci0000:00/0000:00:02.0",
+              "vendor": "0x8086",
+              "device": "0x4680"
+            }
+          }
+        }
+      ],
+      "scope": "Opaque independent source world outline: actual one binary,36painted stereo/pose/resolution image pairs plus structural and wrong-hull/color/paint controls. Strict actual PCI03/IntelArcA770; same-binary software and actualUHD refusals. No compute/HMD/app/UI/newbuild/generaloutline claim.",
+      "child_pid": 1253677,
+      "exit": 0,
+      "seconds": 7.681168041017372,
+      "inputs": 2855,
+      "drift": []
+    },
+    "status_sha256": "ff4d17bd641bc7bfa64c1d148ccb9ecc21b986b2840f91dd1735d7416b7bc461",
+    "observer_fix": "Previousv11 included mutable non-ELF Mesa cache index; retainexit1. V12 pre-pins/verifies actual mapped ELF only plus fixed source/fixture/SDK inputs, uses isolated output cache.",
+    "original_failed_status_sha256": "1744c800cd228a3eb535d8af8294b03cb8e8a33945e002b4d486aff71156889f"
+  },
+  "corresponding_profiles": {
+    "files": [
+      {
+        "name": "run/source-outline.vrm",
+        "release_sha256": "b5d24c1cf7e2b8fc987d723fd9fe176a6c8c546d649bb07438ac8c6d0efdbfe9",
+        "sanitize_sha256": "b5d24c1cf7e2b8fc987d723fd9fe176a6c8c546d649bb07438ac8c6d0efdbfe9",
+        "byte_identical": true
+      },
+      {
+        "name": "run/pristine-source.dsculpt",
+        "release_sha256": "d5e106f5a06a0579b612bdd3ee79a3ffceb8dfffc97742cd2587212c557e1bf8",
+        "sanitize_sha256": "d5e106f5a06a0579b612bdd3ee79a3ffceb8dfffc97742cd2587212c557e1bf8",
+        "byte_identical": true
+      },
+      {
+        "name": "run/nonuniform-source.dsculpt",
+        "release_sha256": "8faf09ef088412f40a8ffa39361db7761521be6f9518295e583a1de9d127e7c9",
+        "sanitize_sha256": "8faf09ef088412f40a8ffa39361db7761521be6f9518295e583a1de9d127e7c9",
+        "byte_identical": true
+      },
+      {
+        "name": "run/dynamic-512.vrm",
+        "release_sha256": "bb56113bcacb61aa12ec277a97ba781ea6c029ef08aab99583ba0a48ae360339",
+        "sanitize_sha256": "bb56113bcacb61aa12ec277a97ba781ea6c029ef08aab99583ba0a48ae360339",
+        "byte_identical": true
+      },
+      {
+        "name": "run/dynamic-1024.vrm",
+        "release_sha256": "05b61af91cb7b567c0e9d44f8e37c10c2e27d1756d969345ab7e0a24abbf7cd2",
+        "sanitize_sha256": "05b61af91cb7b567c0e9d44f8e37c10c2e27d1756d969345ab7e0a24abbf7cd2",
+        "byte_identical": true
+      },
+      {
+        "name": "run/dynamic-ordered.dsculpt",
+        "release_sha256": "8faf09ef088412f40a8ffa39361db7761521be6f9518295e583a1de9d127e7c9",
+        "sanitize_sha256": "8faf09ef088412f40a8ffa39361db7761521be6f9518295e583a1de9d127e7c9",
+        "byte_identical": true
+      },
+      {
+        "name": "run/dynamic-second.vrm",
+        "release_sha256": "a1e53712e0b04057d902aa6b050ec591ea9815834c131a1700856de2d79ebb5c",
+        "sanitize_sha256": "a1e53712e0b04057d902aa6b050ec591ea9815834c131a1700856de2d79ebb5c",
+        "byte_identical": true
+      },
+      {
+        "name": "run/reopened.dsculpt",
+        "release_sha256": "060cb1d1bf3b5a06b33963e98c208b0cc1ba7eba9cfbaa6be380120cf8a46004",
+        "sanitize_sha256": "060cb1d1bf3b5a06b33963e98c208b0cc1ba7eba9cfbaa6be380120cf8a46004",
+        "byte_identical": true
+      },
+      {
+        "name": "run/dynamic-waiting.vrm",
+        "release_sha256": "a2cf683f0f0428b7255d230ceb890fdee9edcee61a0f1ece103a132f00c4e0f0",
+        "sanitize_sha256": "a2cf683f0f0428b7255d230ceb890fdee9edcee61a0f1ece103a132f00c4e0f0",
+        "byte_identical": true
+      },
+      {
+        "name": "run/after-cancel.dsculpt",
+        "release_sha256": "8faf09ef088412f40a8ffa39361db7761521be6f9518295e583a1de9d127e7c9",
+        "sanitize_sha256": "8faf09ef088412f40a8ffa39361db7761521be6f9518295e583a1de9d127e7c9",
+        "byte_identical": true
+      },
+      {
+        "name": "run/dynamic.vrm",
+        "release_sha256": "a1e53712e0b04057d902aa6b050ec591ea9815834c131a1700856de2d79ebb5c",
+        "sanitize_sha256": "a1e53712e0b04057d902aa6b050ec591ea9815834c131a1700856de2d79ebb5c",
+        "byte_identical": true
+      },
+      {
+        "name": "images/dynamic.vrm-p0-h0.000000-i0-c0.000000-e0-native.png",
+        "release_sha256": "79cf1beec44d0cd33cce5193d1a738d1ee2ecd28d3901c7a039e18a77280f3a0",
+        "sanitize_sha256": "79cf1beec44d0cd33cce5193d1a738d1ee2ecd28d3901c7a039e18a77280f3a0",
+        "byte_identical": true
+      },
+      {
+        "name": "images/dynamic.vrm-p0-h0.000000-i0-c0.000000-e0-parsed.png",
+        "release_sha256": "e4bbdecb4fd5a386474903d99a9c011528d30cc50a6cf71d96e6ac595c4dd074",
+        "sanitize_sha256": "e4bbdecb4fd5a386474903d99a9c011528d30cc50a6cf71d96e6ac595c4dd074",
+        "byte_identical": true
+      },
+      {
+        "name": "images/dynamic.vrm-p0-h0.000000-i0-c0.000000-e1-native.png",
+        "release_sha256": "7de12d85ca0ea8e98a591d5a8448168c4977d1382fa399cbf7e8ade01fcd221b",
+        "sanitize_sha256": "7de12d85ca0ea8e98a591d5a8448168c4977d1382fa399cbf7e8ade01fcd221b",
+        "byte_identical": true
+      },
+      {
+        "name": "images/dynamic.vrm-p0-h0.000000-i0-c0.000000-e1-parsed.png",
+        "release_sha256": "19a27cab33ca1cabf78d5761467160ea43a148d94bb062cdbf8a7d64fd09dec4",
+        "sanitize_sha256": "19a27cab33ca1cabf78d5761467160ea43a148d94bb062cdbf8a7d64fd09dec4",
+        "byte_identical": true
+      },
+      {
+        "name": "images/dynamic.vrm-p0-h0.350000-i1-c0.000000-e0-native.png",
+        "release_sha256": "deed3c58736d71b03318ffa5a6ee98d22408599bcc3fb994e6f49fc4d3fc8b10",
+        "sanitize_sha256": "deed3c58736d71b03318ffa5a6ee98d22408599bcc3fb994e6f49fc4d3fc8b10",
+        "byte_identical": true
+      },
+      {
+        "name": "images/dynamic.vrm-p0-h0.350000-i1-c0.000000-e0-parsed.png",
+        "release_sha256": "0facb0f1e0fb43d4042a9bb995548bbd0028f3f9e100a858b1978b50190568c2",
+        "sanitize_sha256": "0facb0f1e0fb43d4042a9bb995548bbd0028f3f9e100a858b1978b50190568c2",
+        "byte_identical": true
+      },
+      {
+        "name": "images/dynamic.vrm-p0-h0.350000-i1-c0.000000-e1-native.png",
+        "release_sha256": "cdf8d5ba9bc6bdedd3ba64b27800338cf1c24ef07eee0e13a0fe0945e0989c17",
+        "sanitize_sha256": "cdf8d5ba9bc6bdedd3ba64b27800338cf1c24ef07eee0e13a0fe0945e0989c17",
+        "byte_identical": true
+      },
+      {
+        "name": "images/dynamic.vrm-p0-h0.350000-i1-c0.000000-e1-parsed.png",
+        "release_sha256": "7b106782b67b0f9b3ffe7befca2d017c444601d1715ffb5a1d449e5263a59700",
+        "sanitize_sha256": "7b106782b67b0f9b3ffe7befca2d017c444601d1715ffb5a1d449e5263a59700",
+        "byte_identical": true
+      },
+      {
+        "name": "images/dynamic.vrm-p0-h1.000000-i2-c0.000000-e0-native.png",
+        "release_sha256": "c8a77fd39ab3400f7b4e399120e9509ff32699c0c848b763c098e48adc718ebf",
+        "sanitize_sha256": "c8a77fd39ab3400f7b4e399120e9509ff32699c0c848b763c098e48adc718ebf",
+        "byte_identical": true
+      },
+      {
+        "name": "images/dynamic.vrm-p0-h1.000000-i2-c0.000000-e0-parsed.png",
+        "release_sha256": "452a4823ecc81ea75caf7e21da3c125802891515f8eb9bd2fea81c1df562ac2c",
+        "sanitize_sha256": "452a4823ecc81ea75caf7e21da3c125802891515f8eb9bd2fea81c1df562ac2c",
+        "byte_identical": true
+      },
+      {
+        "name": "images/dynamic.vrm-p0-h1.000000-i2-c0.000000-e1-native.png",
+        "release_sha256": "9c33d58d23b5736eb41c290c0148816c50dc9aaed184fd0ffc424c3888fb7d27",
+        "sanitize_sha256": "9c33d58d23b5736eb41c290c0148816c50dc9aaed184fd0ffc424c3888fb7d27",
+        "byte_identical": true
+      },
+      {
+        "name": "images/dynamic.vrm-p0-h1.000000-i2-c0.000000-e1-parsed.png",
+        "release_sha256": "53d0bbdea1047be5ea67741b73b7e75f24db9c5000a3f30099a6cd27062b76bf",
+        "sanitize_sha256": "53d0bbdea1047be5ea67741b73b7e75f24db9c5000a3f30099a6cd27062b76bf",
+        "byte_identical": true
+      },
+      {
+        "name": "images/dynamic.vrm-p2-h0.000000-i0-c0.000000-e0-native.png",
+        "release_sha256": "108b1023d8079d6ade754e22d17caeab8927aac2470b8fd620b9e095ce4dd1b5",
+        "sanitize_sha256": "108b1023d8079d6ade754e22d17caeab8927aac2470b8fd620b9e095ce4dd1b5",
+        "byte_identical": true
+      },
+      {
+        "name": "images/dynamic.vrm-p2-h0.000000-i0-c0.000000-e0-parsed.png",
+        "release_sha256": "87a21391b615db8369e793974383f5d3231f81157d1f8a93c3718e49eeab56ad",
+        "sanitize_sha256": "87a21391b615db8369e793974383f5d3231f81157d1f8a93c3718e49eeab56ad",
+        "byte_identical": true
+      },
+      {
+        "name": "images/dynamic.vrm-p2-h0.000000-i0-c0.000000-e1-native.png",
+        "release_sha256": "dd7e0aebcc4433aa0370a5ecf7ce9f7dd553f38d0746fa8775770b8d4c790a70",
+        "sanitize_sha256": "dd7e0aebcc4433aa0370a5ecf7ce9f7dd553f38d0746fa8775770b8d4c790a70",
+        "byte_identical": true
+      },
+      {
+        "name": "images/dynamic.vrm-p2-h0.000000-i0-c0.000000-e1-parsed.png",
+        "release_sha256": "deb7791e196afc72a482e8192438cb9e0891c5041fa3b0b2e88476d25cb2b1f7",
+        "sanitize_sha256": "deb7791e196afc72a482e8192438cb9e0891c5041fa3b0b2e88476d25cb2b1f7",
+        "byte_identical": true
+      },
+      {
+        "name": "images/dynamic.vrm-p2-h0.350000-i1-c0.000000-e0-native.png",
+        "release_sha256": "a29971594d09f798acb2878311dcd2aac0f4ad9943e8b61296bd493e34874afb",
+        "sanitize_sha256": "a29971594d09f798acb2878311dcd2aac0f4ad9943e8b61296bd493e34874afb",
+        "byte_identical": true
+      },
+      {
+        "name": "images/dynamic.vrm-p2-h0.350000-i1-c0.000000-e0-parsed.png",
+        "release_sha256": "6bc5a773a461b2f22d8f041fd6a2bfcb971f6bbaf0a0e5989252f0b5645fc3d9",
+        "sanitize_sha256": "6bc5a773a461b2f22d8f041fd6a2bfcb971f6bbaf0a0e5989252f0b5645fc3d9",
+        "byte_identical": true
+      },
+      {
+        "name": "images/dynamic.vrm-p2-h0.350000-i1-c0.000000-e1-native.png",
+        "release_sha256": "c64c4278c2fddf621c6d785d1384c02b3d841080e7db9d3e8112621d5290b977",
+        "sanitize_sha256": "c64c4278c2fddf621c6d785d1384c02b3d841080e7db9d3e8112621d5290b977",
+        "byte_identical": true
+      },
+      {
+        "name": "images/dynamic.vrm-p2-h0.350000-i1-c0.000000-e1-parsed.png",
+        "release_sha256": "044286860254f4de8acfa587cfb67c883129d380619d8101d54f0e8abecc88cf",
+        "sanitize_sha256": "044286860254f4de8acfa587cfb67c883129d380619d8101d54f0e8abecc88cf",
+        "byte_identical": true
+      },
+      {
+        "name": "images/dynamic.vrm-p2-h1.000000-i2-c0.000000-e0-native.png",
+        "release_sha256": "f0d9a36eb88bf114cd72b67695d66e2458ad9a2f361c6b8f3fe152f92388ccc0",
+        "sanitize_sha256": "f0d9a36eb88bf114cd72b67695d66e2458ad9a2f361c6b8f3fe152f92388ccc0",
+        "byte_identical": true
+      },
+      {
+        "name": "images/dynamic.vrm-p2-h1.000000-i2-c0.000000-e0-parsed.png",
+        "release_sha256": "a3b5a1d0a71cad35e386592ad006c10e50347f1b304d9826453fbad967a7fdc5",
+        "sanitize_sha256": "a3b5a1d0a71cad35e386592ad006c10e50347f1b304d9826453fbad967a7fdc5",
+        "byte_identical": true
+      },
+      {
+        "name": "images/dynamic.vrm-p2-h1.000000-i2-c0.000000-e1-native.png",
+        "release_sha256": "31be10aee301b846562afcf3534b4c36ec9ff612f2f1d3da299fa32859d1a4e4",
+        "sanitize_sha256": "31be10aee301b846562afcf3534b4c36ec9ff612f2f1d3da299fa32859d1a4e4",
+        "byte_identical": true
+      },
+      {
+        "name": "images/dynamic.vrm-p2-h1.000000-i2-c0.000000-e1-parsed.png",
+        "release_sha256": "24c5e2c6e697fbf6e63c175404f475af37a49afb0dc499562286d5bd60a6aacc",
+        "sanitize_sha256": "24c5e2c6e697fbf6e63c175404f475af37a49afb0dc499562286d5bd60a6aacc",
+        "byte_identical": true
+      },
+      {
+        "name": "images/dynamic-512.vrm-p0-h0.000000-i0-c0.000000-e0-native.png",
+        "release_sha256": "79cf1beec44d0cd33cce5193d1a738d1ee2ecd28d3901c7a039e18a77280f3a0",
+        "sanitize_sha256": "79cf1beec44d0cd33cce5193d1a738d1ee2ecd28d3901c7a039e18a77280f3a0",
+        "byte_identical": true
+      },
+      {
+        "name": "images/dynamic-512.vrm-p0-h0.000000-i0-c0.000000-e0-parsed.png",
+        "release_sha256": "e4bbdecb4fd5a386474903d99a9c011528d30cc50a6cf71d96e6ac595c4dd074",
+        "sanitize_sha256": "e4bbdecb4fd5a386474903d99a9c011528d30cc50a6cf71d96e6ac595c4dd074",
+        "byte_identical": true
+      },
+      {
+        "name": "images/dynamic-512.vrm-p0-h0.000000-i0-c0.000000-e1-native.png",
+        "release_sha256": "7de12d85ca0ea8e98a591d5a8448168c4977d1382fa399cbf7e8ade01fcd221b",
+        "sanitize_sha256": "7de12d85ca0ea8e98a591d5a8448168c4977d1382fa399cbf7e8ade01fcd221b",
+        "byte_identical": true
+      },
+      {
+        "name": "images/dynamic-512.vrm-p0-h0.000000-i0-c0.000000-e1-parsed.png",
+        "release_sha256": "19a27cab33ca1cabf78d5761467160ea43a148d94bb062cdbf8a7d64fd09dec4",
+        "sanitize_sha256": "19a27cab33ca1cabf78d5761467160ea43a148d94bb062cdbf8a7d64fd09dec4",
+        "byte_identical": true
+      },
+      {
+        "name": "images/dynamic-512.vrm-p0-h0.350000-i1-c0.000000-e0-native.png",
+        "release_sha256": "deed3c58736d71b03318ffa5a6ee98d22408599bcc3fb994e6f49fc4d3fc8b10",
+        "sanitize_sha256": "deed3c58736d71b03318ffa5a6ee98d22408599bcc3fb994e6f49fc4d3fc8b10",
+        "byte_identical": true
+      },
+      {
+        "name": "images/dynamic-512.vrm-p0-h0.350000-i1-c0.000000-e0-parsed.png",
+        "release_sha256": "0facb0f1e0fb43d4042a9bb995548bbd0028f3f9e100a858b1978b50190568c2",
+        "sanitize_sha256": "0facb0f1e0fb43d4042a9bb995548bbd0028f3f9e100a858b1978b50190568c2",
+        "byte_identical": true
+      },
+      {
+        "name": "images/dynamic-512.vrm-p0-h0.350000-i1-c0.000000-e1-native.png",
+        "release_sha256": "cdf8d5ba9bc6bdedd3ba64b27800338cf1c24ef07eee0e13a0fe0945e0989c17",
+        "sanitize_sha256": "cdf8d5ba9bc6bdedd3ba64b27800338cf1c24ef07eee0e13a0fe0945e0989c17",
+        "byte_identical": true
+      },
+      {
+        "name": "images/dynamic-512.vrm-p0-h0.350000-i1-c0.000000-e1-parsed.png",
+        "release_sha256": "7b106782b67b0f9b3ffe7befca2d017c444601d1715ffb5a1d449e5263a59700",
+        "sanitize_sha256": "7b106782b67b0f9b3ffe7befca2d017c444601d1715ffb5a1d449e5263a59700",
+        "byte_identical": true
+      },
+      {
+        "name": "images/dynamic-512.vrm-p0-h1.000000-i2-c0.000000-e0-native.png",
+        "release_sha256": "c8a77fd39ab3400f7b4e399120e9509ff32699c0c848b763c098e48adc718ebf",
+        "sanitize_sha256": "c8a77fd39ab3400f7b4e399120e9509ff32699c0c848b763c098e48adc718ebf",
+        "byte_identical": true
+      },
+      {
+        "name": "images/dynamic-512.vrm-p0-h1.000000-i2-c0.000000-e0-parsed.png",
+        "release_sha256": "452a4823ecc81ea75caf7e21da3c125802891515f8eb9bd2fea81c1df562ac2c",
+        "sanitize_sha256": "452a4823ecc81ea75caf7e21da3c125802891515f8eb9bd2fea81c1df562ac2c",
+        "byte_identical": true
+      },
+      {
+        "name": "images/dynamic-512.vrm-p0-h1.000000-i2-c0.000000-e1-native.png",
+        "release_sha256": "9c33d58d23b5736eb41c290c0148816c50dc9aaed184fd0ffc424c3888fb7d27",
+        "sanitize_sha256": "9c33d58d23b5736eb41c290c0148816c50dc9aaed184fd0ffc424c3888fb7d27",
+        "byte_identical": true
+      },
+      {
+        "name": "images/dynamic-512.vrm-p0-h1.000000-i2-c0.000000-e1-parsed.png",
+        "release_sha256": "53d0bbdea1047be5ea67741b73b7e75f24db9c5000a3f30099a6cd27062b76bf",
+        "sanitize_sha256": "53d0bbdea1047be5ea67741b73b7e75f24db9c5000a3f30099a6cd27062b76bf",
+        "byte_identical": true
+      },
+      {
+        "name": "images/dynamic-512.vrm-p2-h0.000000-i0-c0.000000-e0-native.png",
+        "release_sha256": "108b1023d8079d6ade754e22d17caeab8927aac2470b8fd620b9e095ce4dd1b5",
+        "sanitize_sha256": "108b1023d8079d6ade754e22d17caeab8927aac2470b8fd620b9e095ce4dd1b5",
+        "byte_identical": true
+      },
+      {
+        "name": "images/dynamic-512.vrm-p2-h0.000000-i0-c0.000000-e0-parsed.png",
+        "release_sha256": "87a21391b615db8369e793974383f5d3231f81157d1f8a93c3718e49eeab56ad",
+        "sanitize_sha256": "87a21391b615db8369e793974383f5d3231f81157d1f8a93c3718e49eeab56ad",
+        "byte_identical": true
+      },
+      {
+        "name": "images/dynamic-512.vrm-p2-h0.000000-i0-c0.000000-e1-native.png",
+        "release_sha256": "dd7e0aebcc4433aa0370a5ecf7ce9f7dd553f38d0746fa8775770b8d4c790a70",
+        "sanitize_sha256": "dd7e0aebcc4433aa0370a5ecf7ce9f7dd553f38d0746fa8775770b8d4c790a70",
+        "byte_identical": true
+      },
+      {
+        "name": "images/dynamic-512.vrm-p2-h0.000000-i0-c0.000000-e1-parsed.png",
+        "release_sha256": "deb7791e196afc72a482e8192438cb9e0891c5041fa3b0b2e88476d25cb2b1f7",
+        "sanitize_sha256": "deb7791e196afc72a482e8192438cb9e0891c5041fa3b0b2e88476d25cb2b1f7",
+        "byte_identical": true
+      },
+      {
+        "name": "images/dynamic-512.vrm-p2-h0.350000-i1-c0.000000-e0-native.png",
+        "release_sha256": "a29971594d09f798acb2878311dcd2aac0f4ad9943e8b61296bd493e34874afb",
+        "sanitize_sha256": "a29971594d09f798acb2878311dcd2aac0f4ad9943e8b61296bd493e34874afb",
+        "byte_identical": true
+      },
+      {
+        "name": "images/dynamic-512.vrm-p2-h0.350000-i1-c0.000000-e0-parsed.png",
+        "release_sha256": "6bc5a773a461b2f22d8f041fd6a2bfcb971f6bbaf0a0e5989252f0b5645fc3d9",
+        "sanitize_sha256": "6bc5a773a461b2f22d8f041fd6a2bfcb971f6bbaf0a0e5989252f0b5645fc3d9",
+        "byte_identical": true
+      },
+      {
+        "name": "images/dynamic-512.vrm-p2-h0.350000-i1-c0.000000-e1-native.png",
+        "release_sha256": "c64c4278c2fddf621c6d785d1384c02b3d841080e7db9d3e8112621d5290b977",
+        "sanitize_sha256": "c64c4278c2fddf621c6d785d1384c02b3d841080e7db9d3e8112621d5290b977",
+        "byte_identical": true
+      },
+      {
+        "name": "images/dynamic-512.vrm-p2-h0.350000-i1-c0.000000-e1-parsed.png",
+        "release_sha256": "044286860254f4de8acfa587cfb67c883129d380619d8101d54f0e8abecc88cf",
+        "sanitize_sha256": "044286860254f4de8acfa587cfb67c883129d380619d8101d54f0e8abecc88cf",
+        "byte_identical": true
+      },
+      {
+        "name": "images/dynamic-512.vrm-p2-h1.000000-i2-c0.000000-e0-native.png",
+        "release_sha256": "f0d9a36eb88bf114cd72b67695d66e2458ad9a2f361c6b8f3fe152f92388ccc0",
+        "sanitize_sha256": "f0d9a36eb88bf114cd72b67695d66e2458ad9a2f361c6b8f3fe152f92388ccc0",
+        "byte_identical": true
+      },
+      {
+        "name": "images/dynamic-512.vrm-p2-h1.000000-i2-c0.000000-e0-parsed.png",
+        "release_sha256": "a3b5a1d0a71cad35e386592ad006c10e50347f1b304d9826453fbad967a7fdc5",
+        "sanitize_sha256": "a3b5a1d0a71cad35e386592ad006c10e50347f1b304d9826453fbad967a7fdc5",
+        "byte_identical": true
+      },
+      {
+        "name": "images/dynamic-512.vrm-p2-h1.000000-i2-c0.000000-e1-native.png",
+        "release_sha256": "31be10aee301b846562afcf3534b4c36ec9ff612f2f1d3da299fa32859d1a4e4",
+        "sanitize_sha256": "31be10aee301b846562afcf3534b4c36ec9ff612f2f1d3da299fa32859d1a4e4",
+        "byte_identical": true
+      },
+      {
+        "name": "images/dynamic-512.vrm-p2-h1.000000-i2-c0.000000-e1-parsed.png",
+        "release_sha256": "24c5e2c6e697fbf6e63c175404f475af37a49afb0dc499562286d5bd60a6aacc",
+        "sanitize_sha256": "24c5e2c6e697fbf6e63c175404f475af37a49afb0dc499562286d5bd60a6aacc",
+        "byte_identical": true
+      },
+      {
+        "name": "images/dynamic-1024.vrm-p0-h0.000000-i0-c0.000000-e0-native.png",
+        "release_sha256": "79cf1beec44d0cd33cce5193d1a738d1ee2ecd28d3901c7a039e18a77280f3a0",
+        "sanitize_sha256": "79cf1beec44d0cd33cce5193d1a738d1ee2ecd28d3901c7a039e18a77280f3a0",
+        "byte_identical": true
+      },
+      {
+        "name": "images/dynamic-1024.vrm-p0-h0.000000-i0-c0.000000-e0-parsed.png",
+        "release_sha256": "1d1dfe0ff3fb0cbc320fb73aead37cb072129dc76345e7b3c80842be78e4c537",
+        "sanitize_sha256": "1d1dfe0ff3fb0cbc320fb73aead37cb072129dc76345e7b3c80842be78e4c537",
+        "byte_identical": true
+      },
+      {
+        "name": "images/dynamic-1024.vrm-p0-h0.000000-i0-c0.000000-e1-native.png",
+        "release_sha256": "7de12d85ca0ea8e98a591d5a8448168c4977d1382fa399cbf7e8ade01fcd221b",
+        "sanitize_sha256": "7de12d85ca0ea8e98a591d5a8448168c4977d1382fa399cbf7e8ade01fcd221b",
+        "byte_identical": true
+      },
+      {
+        "name": "images/dynamic-1024.vrm-p0-h0.000000-i0-c0.000000-e1-parsed.png",
+        "release_sha256": "b5f0a010624ab0e8f0b64a028ec6239fb8951047a19a29e1a707283dc5505deb",
+        "sanitize_sha256": "b5f0a010624ab0e8f0b64a028ec6239fb8951047a19a29e1a707283dc5505deb",
+        "byte_identical": true
+      },
+      {
+        "name": "images/dynamic-1024.vrm-p0-h0.350000-i1-c0.000000-e0-native.png",
+        "release_sha256": "deed3c58736d71b03318ffa5a6ee98d22408599bcc3fb994e6f49fc4d3fc8b10",
+        "sanitize_sha256": "deed3c58736d71b03318ffa5a6ee98d22408599bcc3fb994e6f49fc4d3fc8b10",
+        "byte_identical": true
+      },
+      {
+        "name": "images/dynamic-1024.vrm-p0-h0.350000-i1-c0.000000-e0-parsed.png",
+        "release_sha256": "7b17d0af1b76cb7b12859886552d3560db5c3779ef0dfd67d1afeb1d0b1c9585",
+        "sanitize_sha256": "7b17d0af1b76cb7b12859886552d3560db5c3779ef0dfd67d1afeb1d0b1c9585",
+        "byte_identical": true
+      },
+      {
+        "name": "images/dynamic-1024.vrm-p0-h0.350000-i1-c0.000000-e1-native.png",
+        "release_sha256": "cdf8d5ba9bc6bdedd3ba64b27800338cf1c24ef07eee0e13a0fe0945e0989c17",
+        "sanitize_sha256": "cdf8d5ba9bc6bdedd3ba64b27800338cf1c24ef07eee0e13a0fe0945e0989c17",
+        "byte_identical": true
+      },
+      {
+        "name": "images/dynamic-1024.vrm-p0-h0.350000-i1-c0.000000-e1-parsed.png",
+        "release_sha256": "a7fd2c8cc2921579605be26de7b31b05445e58a279d51fff9622d7b2602ad9fc",
+        "sanitize_sha256": "a7fd2c8cc2921579605be26de7b31b05445e58a279d51fff9622d7b2602ad9fc",
+        "byte_identical": true
+      },
+      {
+        "name": "images/dynamic-1024.vrm-p0-h1.000000-i2-c0.000000-e0-native.png",
+        "release_sha256": "c8a77fd39ab3400f7b4e399120e9509ff32699c0c848b763c098e48adc718ebf",
+        "sanitize_sha256": "c8a77fd39ab3400f7b4e399120e9509ff32699c0c848b763c098e48adc718ebf",
+        "byte_identical": true
+      },
+      {
+        "name": "images/dynamic-1024.vrm-p0-h1.000000-i2-c0.000000-e0-parsed.png",
+        "release_sha256": "22f797a256ab53f7a0fec5f5cddc4cc2618e697217800d4eae78b3bb4411e0d9",
+        "sanitize_sha256": "22f797a256ab53f7a0fec5f5cddc4cc2618e697217800d4eae78b3bb4411e0d9",
+        "byte_identical": true
+      },
+      {
+        "name": "images/dynamic-1024.vrm-p0-h1.000000-i2-c0.000000-e1-native.png",
+        "release_sha256": "9c33d58d23b5736eb41c290c0148816c50dc9aaed184fd0ffc424c3888fb7d27",
+        "sanitize_sha256": "9c33d58d23b5736eb41c290c0148816c50dc9aaed184fd0ffc424c3888fb7d27",
+        "byte_identical": true
+      },
+      {
+        "name": "images/dynamic-1024.vrm-p0-h1.000000-i2-c0.000000-e1-parsed.png",
+        "release_sha256": "eb2d4c322533fa5f66c8f5ddf2a68aff43e51dd9bcb5f05e193a33ef128a7a1f",
+        "sanitize_sha256": "eb2d4c322533fa5f66c8f5ddf2a68aff43e51dd9bcb5f05e193a33ef128a7a1f",
+        "byte_identical": true
+      },
+      {
+        "name": "images/dynamic-1024.vrm-p2-h0.000000-i0-c0.000000-e0-native.png",
+        "release_sha256": "108b1023d8079d6ade754e22d17caeab8927aac2470b8fd620b9e095ce4dd1b5",
+        "sanitize_sha256": "108b1023d8079d6ade754e22d17caeab8927aac2470b8fd620b9e095ce4dd1b5",
+        "byte_identical": true
+      },
+      {
+        "name": "images/dynamic-1024.vrm-p2-h0.000000-i0-c0.000000-e0-parsed.png",
+        "release_sha256": "f5eefde326c71f98f402938db01538318c1c13641cfb6aa5e92d2c95df1fffaf",
+        "sanitize_sha256": "f5eefde326c71f98f402938db01538318c1c13641cfb6aa5e92d2c95df1fffaf",
+        "byte_identical": true
+      },
+      {
+        "name": "images/dynamic-1024.vrm-p2-h0.000000-i0-c0.000000-e1-native.png",
+        "release_sha256": "dd7e0aebcc4433aa0370a5ecf7ce9f7dd553f38d0746fa8775770b8d4c790a70",
+        "sanitize_sha256": "dd7e0aebcc4433aa0370a5ecf7ce9f7dd553f38d0746fa8775770b8d4c790a70",
+        "byte_identical": true
+      },
+      {
+        "name": "images/dynamic-1024.vrm-p2-h0.000000-i0-c0.000000-e1-parsed.png",
+        "release_sha256": "f8a084d55ad0658f94b8617a2fd0da51f8176ced597de36639d248c0562fd9e8",
+        "sanitize_sha256": "f8a084d55ad0658f94b8617a2fd0da51f8176ced597de36639d248c0562fd9e8",
+        "byte_identical": true
+      },
+      {
+        "name": "images/dynamic-1024.vrm-p2-h0.350000-i1-c0.000000-e0-native.png",
+        "release_sha256": "a29971594d09f798acb2878311dcd2aac0f4ad9943e8b61296bd493e34874afb",
+        "sanitize_sha256": "a29971594d09f798acb2878311dcd2aac0f4ad9943e8b61296bd493e34874afb",
+        "byte_identical": true
+      },
+      {
+        "name": "images/dynamic-1024.vrm-p2-h0.350000-i1-c0.000000-e0-parsed.png",
+        "release_sha256": "289e9e53aa1122d44080433ce598e0e9fa8a0b6f91cc3103c211f9165587ffa3",
+        "sanitize_sha256": "289e9e53aa1122d44080433ce598e0e9fa8a0b6f91cc3103c211f9165587ffa3",
+        "byte_identical": true
+      },
+      {
+        "name": "images/dynamic-1024.vrm-p2-h0.350000-i1-c0.000000-e1-native.png",
+        "release_sha256": "c64c4278c2fddf621c6d785d1384c02b3d841080e7db9d3e8112621d5290b977",
+        "sanitize_sha256": "c64c4278c2fddf621c6d785d1384c02b3d841080e7db9d3e8112621d5290b977",
+        "byte_identical": true
+      },
+      {
+        "name": "images/dynamic-1024.vrm-p2-h0.350000-i1-c0.000000-e1-parsed.png",
+        "release_sha256": "431f9caf57c902bab7690aa9165b0a0322a0615106e3f5521a43efb6ebd5c64c",
+        "sanitize_sha256": "431f9caf57c902bab7690aa9165b0a0322a0615106e3f5521a43efb6ebd5c64c",
+        "byte_identical": true
+      },
+      {
+        "name": "images/dynamic-1024.vrm-p2-h1.000000-i2-c0.000000-e0-native.png",
+        "release_sha256": "f0d9a36eb88bf114cd72b67695d66e2458ad9a2f361c6b8f3fe152f92388ccc0",
+        "sanitize_sha256": "f0d9a36eb88bf114cd72b67695d66e2458ad9a2f361c6b8f3fe152f92388ccc0",
+        "byte_identical": true
+      },
+      {
+        "name": "images/dynamic-1024.vrm-p2-h1.000000-i2-c0.000000-e0-parsed.png",
+        "release_sha256": "80f707029a2cffa0cc1e979f611a366a04ec9e2b73294f1b24da895efe61f655",
+        "sanitize_sha256": "80f707029a2cffa0cc1e979f611a366a04ec9e2b73294f1b24da895efe61f655",
+        "byte_identical": true
+      },
+      {
+        "name": "images/dynamic-1024.vrm-p2-h1.000000-i2-c0.000000-e1-native.png",
+        "release_sha256": "31be10aee301b846562afcf3534b4c36ec9ff612f2f1d3da299fa32859d1a4e4",
+        "sanitize_sha256": "31be10aee301b846562afcf3534b4c36ec9ff612f2f1d3da299fa32859d1a4e4",
+        "byte_identical": true
+      },
+      {
+        "name": "images/dynamic-1024.vrm-p2-h1.000000-i2-c0.000000-e1-parsed.png",
+        "release_sha256": "c0b08e1593b5966a3b2483f17881eb03addf6629019de83650690d495eafbe0b",
+        "sanitize_sha256": "c0b08e1593b5966a3b2483f17881eb03addf6629019de83650690d495eafbe0b",
+        "byte_identical": true
+      },
+      {
+        "name": "ui/expected.dsculpt",
+        "release_sha256": "93cc6b7bf71483cfadaaa1c8c32312fcfb41472fa3f93a6fb5afcec95612a1ab",
+        "sanitize_sha256": "93cc6b7bf71483cfadaaa1c8c32312fcfb41472fa3f93a6fb5afcec95612a1ab",
+        "byte_identical": true
+      },
+      {
+        "name": "ui/outline-xr/accept.dsculpt",
+        "release_sha256": "e470b99bbab2e85270daf29c63bc7ade241a8210368615c613c1674b3632aa45",
+        "sanitize_sha256": "e470b99bbab2e85270daf29c63bc7ade241a8210368615c613c1674b3632aa45",
+        "byte_identical": true
+      },
+      {
+        "name": "ui/outline-xr/cancel.dsculpt",
+        "release_sha256": "8faf09ef088412f40a8ffa39361db7761521be6f9518295e583a1de9d127e7c9",
+        "sanitize_sha256": "8faf09ef088412f40a8ffa39361db7761521be6f9518295e583a1de9d127e7c9",
+        "byte_identical": true
+      },
+      {
+        "name": "ui/outline-xr/focus.dsculpt",
+        "release_sha256": "8faf09ef088412f40a8ffa39361db7761521be6f9518295e583a1de9d127e7c9",
+        "sanitize_sha256": "8faf09ef088412f40a8ffa39361db7761521be6f9518295e583a1de9d127e7c9",
+        "byte_identical": true
+      }
+    ],
+    "pairs": 87,
+    "exact_pairs": 87
+  },
+  "configured_only": {
+    "registrations": 843,
+    "new_outline_tests": [
+      "vrm1-outline-source",
+      "vrm1-outline-authoring",
+      "vrm1-outline-render",
+      "vrm1-outline-faults"
+    ],
+    "all_registered_runtime": false
+  },
+  "preserved_standards_failure": {
+    "file": "artifacts/outline-proof/standards-v10/summary.json",
+    "sha256": "631147629cc54e0a55d8fa809d406e50d7ecc7d8ec1fd394510da1a66f99cba0",
+    "authored_source_errors": 1,
+    "reason": "Original generated morph POSITION lacked required min/max; generator fixed beforeV11, no exported output repair."
+  },
+  "canonical_DomeD": {
+    "remote_head_reverified": "341152b2429d28e70834917bc65c371b044481e8",
+    "SDK": "poll-final Release/SAN +cairo-shm-drain-f797 bitmap runtime, all inputs exact",
+    "local_commits_preserved": true,
+    "session_restart": false
+  },
+  "preserved_other_observations": [
+    {
+      "file": "artifacts/outline-proof/hardware-v12-preparation-failure.json",
+      "sha256": "4868065caac831c2ab73031753516947865f5ed7c8f119d2d95e248fe07f202d"
+    },
+    {
+      "file": "artifacts/outline-proof/legacy-release-v11/preparation-failure.json",
+      "sha256": "272a2e928ecdd0d38e5c75bb151c7751d0ed8abe95d57b3eb905e7e0969900f1"
+    },
+    {
+      "file": "artifacts/outline-proof/legacy-sanitize-v11/preparation-failure.json",
+      "sha256": "272a2e928ecdd0d38e5c75bb151c7751d0ed8abe95d57b3eb905e7e0969900f1"
+    },
+    {
+      "file": "artifacts/outline-proof/release-v4/native64.log",
+      "sha256": "5ff9ed937b3f193e96eb0d83cca817b08bdf5da8fe8946e0449860edde05445d"
+    },
+    {
+      "file": "artifacts/outline-proof/release-v4/native128.log",
+      "sha256": "02f66eb55daef629671e8aba484529f7afed8c2d0962362a664440b849b468cc"
+    },
+    {
+      "file": "artifacts/outline-proof/diagnostic-v2/status.json",
+      "sha256": "994abcaec7c80ae4c07faea56cf2b090cfc009062cf293a3163549081ce6c027"
+    }
+  ]
+}

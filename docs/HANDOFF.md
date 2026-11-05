@@ -1,3 +1,20 @@
+## Private opaque world-outline paint checkpoint — 2026-11-05
+
+Runtimefc7e270 extends the existing native exporter on227c/5df support. One Layer
+production TU changes; no header/layout/writer/shader/schema/asset change. R/S
+worker54, independent181/36pairs(max1), factory1922(860denials+1054Cancel), actual
+FLTK44+syntheticXR22 each pass. Strict actualArc same-domain max1 +software/UHD
+refusals pass; mapped/input hashes exact. Five genuine containers/profile0KHR
+errors/42official instances;87R/S pairs and77legacy goldens/profile exact.
+Fresh843registrations is configure-only. Original prototype, source-schema and
+observer failures remain. Read VRM1-OUTLINE-PAINT.md/receipt for restrictions and
+F32-model caveat. This private owning37 component is not main admission or full
+production completion. Main10944 runtime remainsnative36/c179; full objective,
+remaining authoring/Mirror/weights/interoperability/device/accelerator work and
+later controller drawers stay active. No HMD/install/session restart.
+Older live-process statements below are historical; current root finite outline
+jobs are all closed. Separate original package4SAN67604 remains untouched/live.
+
 ## Admitted expression preflight repair — 2026-11-05
 
 Main now incorporates62ec13e/sealc17945d over qualified0b6. Only one complete
