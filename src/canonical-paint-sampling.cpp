@@ -16,10 +16,9 @@ bool CanonicalPaintSampling::matches_current(const PaintedMesh &paint) const noe
    !paint.paint_sampling_attachment().owner_before(attachment_)&&
    !attachment_.owner_before(paint.paint_sampling_attachment())&&paint.valid_paint_sampling_attachment();
 }
-void CanonicalPaintSampling::validate_current(const PaintedMesh &paint,const PaintSamplingLimits &limits) const{
+void CanonicalPaintSampling::validate(const PaintSamplingLimits &limits,bool deep) const{
  stop(limits);if(!valid_owner(self_.lock())||!before_||!before_->paint||!before_->material_bindings||
-  !normal_uv_||!normal_uv_->valid_owner(normal_uv_)||!attachment_||!matches_current(paint)||
-  paint.source_maps()||paint.source_sampling_prepared()||paint.color_projection()||paint.normal_projection())
+  !normal_uv_||!normal_uv_->valid_owner(normal_uv_)||!attachment_||!attachment_->authored_geometry()||!attachment_->domain())
   throw std::invalid_argument("Canonical paint sampling lost its own exact before/current owners");
  const auto &b=*before_->material_bindings;
  if(normal_uv_->origin()!=b.canonical_attributes||b.normal_frames!=b.canonical_attributes->frames())
@@ -27,15 +26,38 @@ void CanonicalPaintSampling::validate_current(const PaintedMesh &paint,const Pai
  // A geometry seal does not certify the caller's legally mutable material DTO.
  // Revalidate that actual before holder on each call, including its complete
  // before-binding graph; no pointer/scalar validity survives this invocation.
- b.validate();
- source_paint_pairing(before_->paint.get(),before_->material_bindings.get(),before_->appearance.get(),true);
- normal_uv_->validate_current(paint.mesh(),limits.cancelled);
- if(current_sources_.size()!=paint.mesh().positions.size())throw std::invalid_argument("Canonical paint source dimensions differ");
- const auto &old=before_->paint->mesh(),&current=paint.mesh();
+ b.validate(deep);
+ if(b.canonical_paint_sampling){
+  // The holder validation above already descended through this exact older
+  // owner. Pair the immutable before Paint without recursively validating that
+  // same chain a second time at every UV step.
+  if(!b.canonical_paint_sampling->matches_current(*before_->paint)||before_->paint->source_maps()||
+     before_->paint->source_sampling_prepared()||before_->paint->normal_projection()||before_->paint->color_projection())
+   throw std::invalid_argument("Canonical paint before-state lost its exact older sampling attachment");
+  if(before_->paint->baked()&&before_->paint->baked()->normal_field&&before_->paint->baked()->normal_field->origin()!=b.canonical_attributes)
+   throw std::invalid_argument("Canonical paint before-state borrowed another independent normal field");
+ }else source_paint_pairing(before_->paint.get(),before_->material_bindings.get(),before_->appearance.get(),deep);
+ const auto &current=*attachment_->authored_geometry();normal_uv_->validate_current(current,limits.cancelled);
+ if(current_sources_.size()!=current.positions.size())throw std::invalid_argument("Canonical paint source dimensions differ");
+ const auto &old=before_->paint->mesh();
  if(old.indices.size()!=current.indices.size())throw std::invalid_argument("Canonical paint triangle identity differs");
  for(size_t c=0;c<current.indices.size();++c){if((c&1023)==0)stop(limits);
   if(current_sources_.at(current.indices[c])!=old.indices[c])throw std::invalid_argument("Canonical paint ordered source corners differ");}
  attachment_->domain()->validate_current(current,limits);
+ stop(limits);
+}
+void CanonicalPaintSampling::validate_binding(const SourceMaterialBindings &binding,bool deep) const{
+ if(!valid_owner(binding.canonical_paint_sampling)||binding.has_mtoon||binding.native_paint_sampling||binding.native_paint_frames||
+    binding.color_preparation||binding.normal_preparation||binding.key_derivation||!binding.sampling_reparameterized||
+    binding.canonical_uv!=normal_uv_||binding.canonical_attributes!=normal_uv_->origin()||
+    binding.normal_frames!=before_->material_bindings->normal_frames||binding.uv_origin!=before_->material_bindings->uv_origin)
+  throw std::invalid_argument("Canonical writable paint binding lost its actual independent normal/paint source owners");
+ validate({},deep);
+}
+void CanonicalPaintSampling::validate_current(const PaintedMesh &paint,const PaintSamplingLimits &limits,bool deep) const{
+ validate(limits,deep);
+ if(!matches_current(paint)||paint.source_maps()||paint.source_sampling_prepared()||paint.color_projection()||paint.normal_projection())
+  throw std::invalid_argument("Canonical paint sampling lost its exact current geometry attachment");
  if(paint.baked()&&paint.baked()->normal_field&&paint.baked()->normal_field->origin()!=normal_uv_->origin())
   throw std::invalid_argument("Canonical paint borrowed another baked normal field origin");
  stop(limits);
@@ -74,6 +96,9 @@ CanonicalPaintTransition CanonicalPaintSampling::create(const Scene &scene,uint6
  owner->attachment_=geometry.paint->paint_sampling_attachment();
  owner->current_sources_=std::move(geometry.current_sources);owner->self_=owner;
  owner->validate_current(*geometry.paint,limits);stop(limits);
- return {std::move(owner),std::move(geometry.paint),std::move(model)};
+ auto binding=std::make_shared<SourceMaterialBindings>(*source.material_bindings);
+ binding->canonical_uv=owner->normal_uv_;binding->canonical_paint_sampling=owner;binding->sampling_reparameterized=true;
+ binding->validate();source_paint_pairing(geometry.paint.get(),binding.get(),nullptr,true);stop(limits);
+ return {std::move(owner),std::move(geometry.paint),std::move(model),std::move(binding)};
 }
 }

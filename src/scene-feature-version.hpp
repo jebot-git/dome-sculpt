@@ -13,6 +13,7 @@
 #include "emission-authority.hpp"
 #include "native-paint-sampling.hpp"
 #include "native-paint-frame-source.hpp"
+#include "canonical-paint-sampling.hpp"
 #include <set>
 #include <nlohmann/json.hpp>
 namespace dome { struct PolygonAuthority; }
@@ -53,6 +54,9 @@ inline unsigned minimum_scene_version(const PaintedMesh *paint){return paint&&pa
 inline unsigned minimum_scene_version(const SourceMaterialBindings *binding) {
   if (!binding)
     return 0;
+  // This newest feature is selected only by a real owning node. Its complete
+  // before graph is validated/collected separately, including before-only roots.
+  if(binding->canonical_paint_sampling)return 37;
   unsigned result=binding->uv_origin
              ? std::max({minimum_scene_version(binding->uv_origin->paint.get()),minimum_scene_version(binding->uv_origin->deformation.get()),minimum_scene_version(binding->uv_origin->appearance.get())})
              : 0u;

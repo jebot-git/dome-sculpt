@@ -21,6 +21,8 @@
 #include "canonical-normal-owner.hpp"
 #include "baked-normal-archive.hpp"
 #include "canonical-normal-uv.hpp"
+#include "canonical-paint-sampling.hpp"
+#include "polygon-scene-archive.hpp"
 #include "dome/normal-sampling.hpp"
 #include "dome/creator-archive.hpp"
 #include "dome/paint.hpp"
@@ -139,6 +141,7 @@ std::set<const PaintedMesh*> material_paint_owners(
   auto add=[&](const auto &p){if(p)owners.insert(p.get());};
   for(const auto &o:origins)add(o->paint);
   for(const auto &b:bindings){
+    if(b->canonical_paint_sampling)add(b->canonical_paint_sampling->before()->paint);
     if(b->canonical_attributes)add(b->canonical_attributes->before_paint());
     if(b->native_paint_frames)add(b->native_paint_frames->before_paint());
     if(b->key_derivation)add(b->key_derivation->before_paint());
@@ -173,6 +176,7 @@ void SourceMaterialBindings::validate(bool deep) const {
     throw std::invalid_argument("Invalid derived material frame or animation provenance");
   if(sampling_reparameterized && !uv_origin)throw std::invalid_argument("Reparameterized sampling requires retained original provenance");
   if(color_preparation)color_preparation->validate(deep);
+  if(canonical_paint_sampling)canonical_paint_sampling->validate_binding(*this,deep);
   if(canonical_uv){
     if(!canonical_uv->valid_owner(canonical_uv)||canonical_uv->origin()!=canonical_attributes)
       throw std::invalid_argument("Canonical UV correspondence lost its actual attribute origin");
@@ -271,6 +275,10 @@ uint32_t SourceMaterialArchive::add(std::shared_ptr<const SourceMaterialBindings
   if(found!=bindings_.end())return uint32_t(found-bindings_.begin());
   if(bindings_.size()>=256)throw std::length_error("Resolved material archive count exceeds budget");
   value->validate(deep);
+  if(value->canonical_paint_sampling){
+    detail::PolygonSceneArchive controls;controls.add_origin(value->canonical_paint_sampling->before(),deep);
+    for(const auto &origin:controls.origins())if(origin->material_bindings)add(origin->material_bindings,deep);
+  }
   if(value->canonical_attributes&&value->canonical_attributes->before_material())add(value->canonical_attributes->before_material(),deep);
   if(value->color_preparation && value->color_preparation->original_material)
     add(value->color_preparation->original_material,deep);
@@ -311,6 +319,8 @@ nlohmann::json SourceMaterialArchive::encode(PaintImageArchive &images,CreatorAs
 }
 nlohmann::json SourceMaterialArchive::encode(PaintImageArchive &images,CreatorAssetArchive &models,
     detail::PolygonColorArchive *colors,NormalSamplingArchive *domains,PaintSamplingArchive *paint_domains) const {
+  if(std::any_of(bindings_.begin(),bindings_.end(),[](const auto &b){return bool(b->canonical_paint_sampling);}))
+    throw std::invalid_argument("Canonical paint persistence requires its actual owning Scene37 writer");
   const bool native_frames=std::any_of(bindings_.begin(),bindings_.end(),[](const auto &b){return bool(b->native_paint_frames);});
   const bool keyed=std::any_of(bindings_.begin(),bindings_.end(),[](const auto&b){return bool(b->key_derivation);});
   const bool canonical_uv=std::any_of(bindings_.begin(),bindings_.end(),[](const auto &b){return bool(b->canonical_uv);});

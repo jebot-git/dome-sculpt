@@ -10,6 +10,7 @@
 #include "baked-normal-field.hpp"
 #include "baked-normal-archive.hpp"
 #include "canonical-normal-uv.hpp"
+#include "canonical-paint-history.hpp"
 #include "bake-recipe-remap.hpp"
 #include "source-extra-uv-authority.hpp"
 #include "creator-source-uv-archive.hpp"
@@ -358,6 +359,9 @@ void Scene::validate(bool deep_sources) const {
     if (count > 4'000'000)
       throw std::length_error("Scene sample limit exceeded");
   }
+  const bool canonical_controls=std::any_of(source_materials.bindings().begin(),source_materials.bindings().end(),[](const auto &b){return bool(b->canonical_paint_sampling);})||
+    std::any_of(polygons.origins().begin(),polygons.origins().end(),[](const auto &o){return detail::minimum_scene_version(o->material_bindings.get())==37;});
+  if(canonical_controls)detail::collect_canonical_paint_controls(source_materials,polygons,deep_sources);
   for (const auto &v : polygons.volumes()) {
     const auto mask_samples=v->mask_values().size();
     const size_t n = std::max(v->voxels().size(), v->stored_samples()-mask_samples)+mask_samples;

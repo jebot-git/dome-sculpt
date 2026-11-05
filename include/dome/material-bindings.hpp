@@ -5,7 +5,7 @@
 #include "normal-frames.hpp"
 #include <optional>
 namespace dome {
-namespace detail { class PolygonColorArchive; class SourceKeyDerivation; class CanonicalNormalConversion; class CanonicalNormalUv; class NativePaintSampling; class NativePaintFrameSource; }
+namespace detail { class PolygonColorArchive; class SourceKeyDerivation; class CanonicalNormalConversion; class CanonicalNormalUv; class NativePaintSampling; class NativePaintFrameSource; class CanonicalPaintSampling; }
 class PaintedMesh;
 class CreatorAssetArchive;
 class NormalSamplingArchive;
@@ -68,6 +68,8 @@ struct SourceMaterialBindings {
   std::shared_ptr<const detail::NativePaintSampling> native_paint_sampling;
   // Scene36: independent current normal capture, separate from writable UV history.
   std::shared_ptr<const detail::NativePaintFrameSource> native_paint_frames;
+  // Scene37: writable paint correspondence with independent canonical normals.
+  std::shared_ptr<const detail::CanonicalPaintSampling> canonical_paint_sampling;
   void validate(bool deep=true) const;
 };
 using SourceUvMaterialBindings = SourceMaterialBindings;

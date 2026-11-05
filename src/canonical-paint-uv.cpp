@@ -14,7 +14,7 @@ CanonicalPaintUvGeometry stage_canonical_paint_uv(const SculptObject &source,con
  if(!source.mesh_active||!paint_source||paint_source->in_stroke()||!origin||!origin->valid_owner(origin)||
     binding->has_mtoon||binding->normal_preparation||binding->color_preparation||binding->native_paint_sampling||
     binding->key_derivation||binding->normal_frames!=origin->frames()||source.appearance||source.polygon||
-    paint_source->source_maps()||paint_source->source_sampling_prepared()||paint_source->normal_projection()||paint_source->color_projection())
+    paint_source->surface_diagnostics().policy!=PaintUvPolicy::Strict||paint_source->source_maps()||paint_source->source_sampling_prepared()||paint_source->normal_projection()||paint_source->color_projection())
   throw std::invalid_argument("Canonical writable UV stage needs its genuine supported current normal/grid owners");
  const auto &live=*paint_source;const auto &mesh=live.mesh();
  if(vertices.size()!=target.positions.size()||target.positions.size()>limits.max_vertices||target.indices.size()/3>limits.max_triangles||target.indices.size()!=mesh.indices.size()||target.indices.size()%3)

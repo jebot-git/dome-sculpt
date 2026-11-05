@@ -3,6 +3,9 @@
 #include "dome/paint.hpp"
 #include "dome/paint-sampling.hpp"
 namespace dome {
+// Exact private strict-raster/geometry forecast, including constructor scratch.
+// This does not authenticate any material, Paint, or sampling-domain owner.
+size_t paint_sampling_surface_working_bytes(size_t vertices,size_t corners,uint32_t resolution);
 // Detached geometry/grid stage only. The owning colour/material/normal recipe
 // must be admitted atomically before Scene24 can expose this editable result.
 std::shared_ptr<PaintedMesh> retain_paint_grid(const PaintedMesh &,Mesh,

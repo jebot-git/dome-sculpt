@@ -7,6 +7,7 @@
 #include "canonical-normal-owner.hpp"
 #include "polygon-scene-archive.hpp"
 #include "dome/bake-recipe.hpp"
+#include "canonical-paint-history.hpp"
 #include <set>
 namespace dome::detail {
 CanonicalPaintArchiveUsage preflight_canonical_paint_models(const Scene &scene,uint64_t selected,
@@ -29,7 +30,8 @@ CanonicalPaintArchiveUsage preflight_canonical_paint_models(const Scene &scene,u
  // Recipes own bounded settings/ID references only. Their before-models are
  // held by the genuine source/rig/polygon origins, collected exactly once by
  // the polygon pool. Do not invent another model slot for a recipe reference.
- for(const auto &p:origins.origins()){stop();deform(p->deformation);if(p->material_bindings)materials.add(p->material_bindings,false);if(p->bake_recipe)p->bake_recipe->validate();}
+ collect_canonical_paint_controls(materials,origins,false,cancelled);
+ for(const auto &p:origins.origins()){stop();deform(p->deformation);if(p->bake_recipe)p->bake_recipe->validate();}
  for(const auto &p:materials.origins()){stop();deform(p->deformation);}
  std::set<const SourceColorPreparation*> colors;std::set<const SourceNormalPreparation*> normals;
  std::set<const SourceKeyDerivation*> keys;
