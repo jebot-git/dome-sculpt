@@ -1,0 +1,327 @@
+{
+  "scope": "Matched seven-whole-TU incremental currentmain10944/C179 app and actual native/controller/kernel consumer; not full rebuild/all regression/GUI/graphics admission",
+  "base": "10944ab4ec69b5958ee09a546f55bdec3d7be2e3",
+  "runtime_source": "263c753",
+  "product_source": [
+    "src/document.cpp",
+    "src/document-polygon.cpp",
+    "src/polygon-authoring.cpp",
+    "src/polygon-conversion.cpp",
+    "src/polygon-render.cpp",
+    "src/app.cpp (private header closure)",
+    "src/xr.cpp (private header closure)"
+  ],
+  "new_public_data_members": false,
+  "new_schema": false,
+  "no_archive_copies": true,
+  "old_replaced_archive_members_selected": false,
+  "layout": {
+    "scope": "Own-header constant assembly only; no object/archive/executable or mixed-header run",
+    "rows": [
+      {
+        "label": "main10944",
+        "command": [
+          "c++",
+          "-std=c++20",
+          "-O3",
+          "-S",
+          "-x",
+          "c++",
+          "-o",
+          "-",
+          "-I/home/blux/de-xr/dome-sculpt/include",
+          "-I/home/blux/de-xr/dome-sculpt/third_party/openbrush",
+          "-I/home/blux/de-xr/dome-sculpt/third_party/nlohmann",
+          "-"
+        ],
+        "values": [
+          6968,
+          8,
+          1896,
+          72,
+          96,
+          344
+        ],
+        "fields": [
+          "Document_size",
+          "Document_align",
+          "EditorState_size",
+          "Scene_size",
+          "PolygonJob_size",
+          "PolygonAccept_size"
+        ]
+      },
+      {
+        "label": "polygon-affine",
+        "command": [
+          "c++",
+          "-std=c++20",
+          "-O3",
+          "-S",
+          "-x",
+          "c++",
+          "-o",
+          "-",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/polygon-affine-10944/include",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/polygon-affine-10944/third_party/openbrush",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/polygon-affine-10944/third_party/nlohmann",
+          "-"
+        ],
+        "values": [
+          6968,
+          8,
+          1896,
+          72,
+          232,
+          360
+        ],
+        "fields": [
+          "Document_size",
+          "Document_align",
+          "EditorState_size",
+          "Scene_size",
+          "PolygonJob_size",
+          "PolygonAccept_size"
+        ]
+      }
+    ]
+  },
+  "syntax12": {
+    "path": "/home/blux/de-xr/dome-sculpt/artifacts/polygon-affine-10944/artifacts/source-audit/syntax-v2/status.json",
+    "exit": 0,
+    "drift": []
+  },
+  "nested_symbol_audit": {
+    "path": "/home/blux/de-xr/dome-sculpt/artifacts/polygon-affine-10944/artifacts/source-audit/nested-symbols.json",
+    "sha256": "3d4ea15fe5ded39c00ec419f41f91dfd4a00c5bcfe8192211db0a47e558fa8bc",
+    "actual_changed_nested_type_users": [
+      "document.cpp.o",
+      "document-polygon.cpp.o"
+    ],
+    "frontend_objects_per_profile": 26
+  },
+  "profiles": {
+    "release": {
+      "status": "/home/blux/de-xr/dome-sculpt/artifacts/polygon-affine-10944/artifacts/affine-proof/release-capability/status.json",
+      "sha256": "1e8286bd150d06bb585dcf175e054e63b984713b4dc683987fe5355d03fe238a",
+      "steps": [
+        {
+          "name": "compile-document.cpp",
+          "exit": 0,
+          "seconds": 18.628664255142212
+        },
+        {
+          "name": "compile-document-polygon.cpp",
+          "exit": 0,
+          "seconds": 3.7664637565612793
+        },
+        {
+          "name": "compile-polygon-authoring.cpp",
+          "exit": 0,
+          "seconds": 2.9281113147735596
+        },
+        {
+          "name": "compile-polygon-conversion.cpp",
+          "exit": 0,
+          "seconds": 3.704602003097534
+        },
+        {
+          "name": "compile-polygon-render.cpp",
+          "exit": 0,
+          "seconds": 0.9999923706054688
+        },
+        {
+          "name": "compile-app.cpp",
+          "exit": 0,
+          "seconds": 11.396321296691895
+        },
+        {
+          "name": "compile-xr.cpp",
+          "exit": 0,
+          "seconds": 3.0787353515625
+        },
+        {
+          "name": "compile-polygon-affine.cpp",
+          "exit": 0,
+          "seconds": 4.63247013092041
+        },
+        {
+          "name": "link-app",
+          "exit": 0,
+          "seconds": 0.39432430267333984
+        },
+        {
+          "name": "link-consumer",
+          "exit": 0,
+          "seconds": 0.3335573673248291
+        },
+        {
+          "name": "app-version",
+          "exit": 0,
+          "seconds": 0.02317047119140625
+        },
+        {
+          "name": "basic",
+          "exit": 0,
+          "seconds": 0.11533546447753906
+        },
+        {
+          "name": "controller",
+          "exit": 0,
+          "seconds": 0.1223907470703125
+        },
+        {
+          "name": "faults",
+          "exit": 0,
+          "seconds": 1.192039966583252
+        }
+      ],
+      "input_count": 111,
+      "source_count": 1375,
+      "source_drift": [],
+      "input_drift": [],
+      "runtime_map_drift": [],
+      "space": {
+        "allocated": 170967040,
+        "free": 24715780096,
+        "prospective": 0
+      },
+      "basic_assertions": 160,
+      "controller_assertions": 32,
+      "kernel_fault_assertions": 9265,
+      "kernel_all_cpp_prefixes": 3283,
+      "kernel_all_cancel_sites": 2699
+    },
+    "sanitize": {
+      "status": "/home/blux/de-xr/dome-sculpt/artifacts/polygon-affine-10944/artifacts/affine-proof/sanitize-capability/status.json",
+      "sha256": "5822222ac99ade65de50d20a3d46cff8996e9f3a6541c65a2faead7b0fac807b",
+      "steps": [
+        {
+          "name": "compile-document.cpp",
+          "exit": 0,
+          "seconds": 40.30327773094177
+        },
+        {
+          "name": "compile-document-polygon.cpp",
+          "exit": 0,
+          "seconds": 6.451571464538574
+        },
+        {
+          "name": "compile-polygon-authoring.cpp",
+          "exit": 0,
+          "seconds": 5.98511815071106
+        },
+        {
+          "name": "compile-polygon-conversion.cpp",
+          "exit": 0,
+          "seconds": 7.46853232383728
+        },
+        {
+          "name": "compile-polygon-render.cpp",
+          "exit": 0,
+          "seconds": 1.363105297088623
+        },
+        {
+          "name": "compile-app.cpp",
+          "exit": 0,
+          "seconds": 22.559794902801514
+        },
+        {
+          "name": "compile-xr.cpp",
+          "exit": 0,
+          "seconds": 4.653382301330566
+        },
+        {
+          "name": "compile-polygon-affine.cpp",
+          "exit": 0,
+          "seconds": 8.599301099777222
+        },
+        {
+          "name": "link-app",
+          "exit": 0,
+          "seconds": 2.4944658279418945
+        },
+        {
+          "name": "link-consumer",
+          "exit": 0,
+          "seconds": 2.2716147899627686
+        },
+        {
+          "name": "app-version",
+          "exit": 0,
+          "seconds": 0.3614687919616699
+        },
+        {
+          "name": "basic",
+          "exit": 0,
+          "seconds": 0.943199872970581
+        },
+        {
+          "name": "controller",
+          "exit": 0,
+          "seconds": 0.49552321434020996
+        },
+        {
+          "name": "faults",
+          "exit": 0,
+          "seconds": 19.670001745224
+        }
+      ],
+      "input_count": 113,
+      "source_count": 1375,
+      "source_drift": [],
+      "input_drift": [],
+      "runtime_map_drift": [],
+      "space": {
+        "allocated": 1044185088,
+        "free": 24458571776,
+        "prospective": 0
+      },
+      "basic_assertions": 160,
+      "controller_assertions": 32,
+      "kernel_fault_assertions": 9265,
+      "kernel_all_cpp_prefixes": 3283,
+      "kernel_all_cancel_sites": 2699
+    }
+  },
+  "native_R_S_exact_files": {
+    "sheared.dsculpt": {
+      "paths": [
+        "/home/blux/de-xr/dome-sculpt/artifacts/polygon-affine-10944/artifacts/affine-proof/release-capability/native-output/sheared.dsculpt",
+        "/home/blux/de-xr/dome-sculpt/artifacts/polygon-affine-10944/artifacts/affine-proof/sanitize-capability/native-output/sheared.dsculpt"
+      ],
+      "sha256": "1856a5de59c292a6eefc3da6cee97ede96d071460d05b6d3b40d30146453f304",
+      "bytes": 53117
+    },
+    "reflected.dsculpt": {
+      "paths": [
+        "/home/blux/de-xr/dome-sculpt/artifacts/polygon-affine-10944/artifacts/affine-proof/release-capability/native-output/reflected.dsculpt",
+        "/home/blux/de-xr/dome-sculpt/artifacts/polygon-affine-10944/artifacts/affine-proof/sanitize-capability/native-output/reflected.dsculpt"
+      ],
+      "sha256": "475293527a76073eb0ed397edfe664b9c43afbccb451a275ea9d31176ee9c9ce",
+      "bytes": 53117
+    }
+  },
+  "preserved_negative": {
+    "source": "7849cb5",
+    "handle": 82003,
+    "status": "/home/blux/de-xr/dome-sculpt/artifacts/polygon-affine-10944/artifacts/affine-proof/release/status.json",
+    "sha256": "4adc78a65341b9eecef4802862657c351a997ab36befae1a4403661543e73669",
+    "exit": 1,
+    "actual_failure": "XR capability omitted actual supported affine workspace because can_polygon blanket-excluded all affine actors",
+    "basic160_passed": true,
+    "faults_not_started": true,
+    "not_relabelled": true
+  },
+  "cap_bytes": 1342177280,
+  "allocated_bytes": 1044189184,
+  "actual_free_bytes": 24035074048,
+  "remaining": [
+    "Independent affine preview pixels and real FLTK normal/compact operation workflow",
+    "Real application synthetic-XR/loader path and hardware identity cohort only after coordination",
+    "Affine posed/imported/current-corner-colour workflow combinations beyond current native unposed polygon fixture",
+    "Full Document/accepted-worker/queuedCancel persistent OOM scope (current exhaustive new sweep is detached kernel only)",
+    "Old Doc/render/framing regression targets held pending growth review",
+    "No main integration yet; source-only Scene38 prototype remains separate/disabled"
+  ]
+}

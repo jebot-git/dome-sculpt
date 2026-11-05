@@ -345,12 +345,20 @@ void adopt_polygon_edit(Scene &scene, uint64_t id, const PolygonMesh &input,
   adopt_polygon_edit(scene, id, input, {}, original, original_world, convert,
                      cancelled);
 }
-void adopt_polygon_edit(Scene &scene, uint64_t id, const PolygonMesh &input,
+static void adopt_polygon_edit_impl(Scene &scene,uint64_t id,const PolygonMesh &input,
                         std::shared_ptr<const PolygonColorField> colors,
-                        const SculptObject &original,
-                        CanvasTransform original_world, bool convert,
+                        const SculptObject &original,CanvasTransform original_world,
+                        const Scene *original_scene,bool convert,
                         const std::function<bool()> &cancelled) {
   check(cancelled);
+  if(original_scene){
+    // The complete captured Scene owns original affine/group provenance. A
+    // current native placement edit is independent of the exact mesh/paint/
+    // material/deformation checks below, as it already is for held TRS edits.
+    original_scene->validate();
+    if(original_scene->object(id).group!=scene.object(id).group)
+      throw std::invalid_argument("Polygon adoption changed its original group authority");
+  }
   const auto &current = scene.object(id);
   if (current.id != original.id ||
       current.volume->geometry_owner() != original.volume->geometry_owner() ||
@@ -360,7 +368,7 @@ void adopt_polygon_edit(Scene &scene, uint64_t id, const PolygonMesh &input,
       current.appearance != original.appearance ||
       current.material_bindings != original.material_bindings ||
       current.polygon != original.polygon ||
-      current.affine_edit != original.affine_edit ||
+      (!original_scene&&current.affine_edit!=original.affine_edit) ||
       bool(current.painted) != bool(original.painted) ||
       (current.painted &&
        (current.painted->mesh_owner() != original.painted->mesh_owner() ||
@@ -404,8 +412,8 @@ void adopt_polygon_edit(Scene &scene, uint64_t id, const PolygonMesh &input,
   authority->origin = original.polygon && original.polygon->active &&
                               !conversion && original.polygon->origin
                           ? original.polygon->origin
-                          : capture_origin(original, original_world,
-                                           capture_source_placement(scene, id));
+                          : original_scene ? capture_polygon_origin(*original_scene,id)
+                          : capture_origin(original,original_world,capture_source_placement(scene,id));
   auto result = scene;
   auto &target = result.object(id);
   if (!input.faces().empty()) {
@@ -445,6 +453,19 @@ void adopt_polygon_edit(Scene &scene, uint64_t id, const PolygonMesh &input,
   check(cancelled);
   scene = std::move(result);
 }
+void adopt_polygon_edit(Scene &scene,uint64_t id,const PolygonMesh &input,
+                        std::shared_ptr<const PolygonColorField> colors,
+                        const SculptObject &original,CanvasTransform world,bool convert,
+                        const std::function<bool()> &cancelled) {
+  adopt_polygon_edit_impl(scene,id,input,std::move(colors),original,world,nullptr,convert,cancelled);
+}
+void adopt_polygon_edit(Scene &scene,uint64_t id,const PolygonMesh &input,
+                        std::shared_ptr<const PolygonColorField> colors,
+                        const Scene &original,bool convert,
+                        const std::function<bool()> &cancelled) {
+  adopt_polygon_edit_impl(scene,id,input,std::move(colors),original.object(id),{},&original,convert,cancelled);
+}
+
 PolygonUvDerivative
 prepare_polygon_uv_derivative(const SculptObject &source, const Mesh &target,
                               std::span<const uint32_t> mapping,

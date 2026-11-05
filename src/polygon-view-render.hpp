@@ -6,7 +6,7 @@
 namespace dome::detail {
 inline void draw_polygon_preview(PolygonRenderer &renderer,const PolygonPreview &preview,CanvasTransform canvas,const Mat4 &vp,uint32_t accent) {
  if(!preview.view)return;
- auto world=model_matrix(ob::compose(canvas,preview.world));
+ auto world=preview.affine_world?multiply(model_matrix(canvas),preview.affine_world->float_matrix()):model_matrix(ob::compose(canvas,preview.world));
  renderer.draw(*preview.view,multiply(vp,world),world,accent,true);
 }
 }
