@@ -17,7 +17,7 @@ also check the actual declared Draft4 scale constraint. No Python runtime is add
 All24 unchanged Normal source/worker/GUI files from d6d40ca/seal4c9f321 pass all186
 extension-schema instances using the corrected dispatcher. Both actual MatCap
 negative controls now reject. Input COW copies match every original file SHA.
-No malformed positive output was found or repaired. Original Khronos0errors and
+No malformed positive output was found or repaired. The same20 admitted-main Rim/cutout source/output files are also rechecked against their original closed-manifest hashes: all168 extension-schema instances pass with the same real negative controls. Together44 unchanged files/354 instances are covered. Other historical official reports are not retroactively qualified by this audit. Original Khronos0errors and
 all110 warnings/344 infos/112 hints remain separate unchanged evidence.
 
 The first wrapper failed before copying or validating because a fresh worktree

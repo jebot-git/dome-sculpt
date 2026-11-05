@@ -1307,5 +1307,1128 @@
     "artifacts/schema-audit/legacy-controls.py": "a96a32e09b921cfc228947d1108bfba3630e012586b2011d25b5322556ddfa6d",
     "artifacts/schema-audit/legacy-controls.json": "049b5fd0245b93eae333f7617a0b82a713c5fd7166babf09eaf4841773803514"
   },
-  "scope": "Same24/186 nowactualdeclaredDraft4/2020 dispatch withnegativecontrols. No newmain37/Normal/full807/device/compute or goalcompletion claim."
+  "scope": "Same24/186 nowactualdeclaredDraft4/2020 dispatch withnegativecontrols. No newmain37/Normal/full807/device/compute or goalcompletion claim.",
+  "main_Rim_cutout": {
+    "scope": "Same20actual VRM source/output files from admitted0b6Rim/cutout; allSHAsmatchoriginalclosedvalidationmanifest. Main615preflight preservespositivepayloadbytes, no source/instance/schema rewrite.",
+    "files": [
+      {
+        "original": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-rim-c494/artifacts/rim-current/release/rim/dynamic.vrm",
+        "copy": "/home/blux/de-xr/dome-sculpt/artifacts/normal-schema-audit-4c9/artifacts/schema-audit/inputs/main-rim/0-dynamic.vrm",
+        "sha256": "c1978b1db399807c6554204f9b48cf7dc9896304b25c0c490b97e29f98806c6c"
+      },
+      {
+        "original": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-rim-c494/artifacts/rim-current/release/rim/dynamic-512.vrm",
+        "copy": "/home/blux/de-xr/dome-sculpt/artifacts/normal-schema-audit-4c9/artifacts/schema-audit/inputs/main-rim/1-dynamic-512.vrm",
+        "sha256": "88fec380a4f56a6ab76ad073af069618eea43ebbb8c9e6426f5e2597ab1af99b"
+      },
+      {
+        "original": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-rim-c494/artifacts/rim-current/release/rim/dynamic-1024.vrm",
+        "copy": "/home/blux/de-xr/dome-sculpt/artifacts/normal-schema-audit-4c9/artifacts/schema-audit/inputs/main-rim/2-dynamic-1024.vrm",
+        "sha256": "5a51723cc5d2a49fbac9e89882c5a169c0e524087d2d58cfad41f5e37464a15a"
+      },
+      {
+        "original": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-rim-c494/artifacts/rim-current/release/rim/dynamic-second.vrm",
+        "copy": "/home/blux/de-xr/dome-sculpt/artifacts/normal-schema-audit-4c9/artifacts/schema-audit/inputs/main-rim/3-dynamic-second.vrm",
+        "sha256": "c1978b1db399807c6554204f9b48cf7dc9896304b25c0c490b97e29f98806c6c"
+      },
+      {
+        "original": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-rim-c494/artifacts/rim-current/release/rim/source-rim.vrm",
+        "copy": "/home/blux/de-xr/dome-sculpt/artifacts/normal-schema-audit-4c9/artifacts/schema-audit/inputs/main-rim/4-source-rim.vrm",
+        "sha256": "f91137fa0860ea11ff367e5fe160c15d43dbc6ecd7f951defc608fffb78c385b"
+      },
+      {
+        "original": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-rim-c494/artifacts/rim-current/release/cutout/dynamic.vrm",
+        "copy": "/home/blux/de-xr/dome-sculpt/artifacts/normal-schema-audit-4c9/artifacts/schema-audit/inputs/main-rim/5-dynamic.vrm",
+        "sha256": "b6231fea7d66960f4d2b39dc0adbf84a9f7e99d24dc48b3e22de3b1193df3a56"
+      },
+      {
+        "original": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-rim-c494/artifacts/rim-current/release/cutout/dynamic-512.vrm",
+        "copy": "/home/blux/de-xr/dome-sculpt/artifacts/normal-schema-audit-4c9/artifacts/schema-audit/inputs/main-rim/6-dynamic-512.vrm",
+        "sha256": "090140025c8ce592a3eb426d5788d6f2445a25c78173418394c8effca6cf0a55"
+      },
+      {
+        "original": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-rim-c494/artifacts/rim-current/release/cutout/dynamic-1024.vrm",
+        "copy": "/home/blux/de-xr/dome-sculpt/artifacts/normal-schema-audit-4c9/artifacts/schema-audit/inputs/main-rim/7-dynamic-1024.vrm",
+        "sha256": "89789ca3dbe78051239c2c4d28a1b8fd6c3a2d44802a24c19d430995e07ac79b"
+      },
+      {
+        "original": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-rim-c494/artifacts/rim-current/release/cutout/dynamic-second.vrm",
+        "copy": "/home/blux/de-xr/dome-sculpt/artifacts/normal-schema-audit-4c9/artifacts/schema-audit/inputs/main-rim/8-dynamic-second.vrm",
+        "sha256": "b6231fea7d66960f4d2b39dc0adbf84a9f7e99d24dc48b3e22de3b1193df3a56"
+      },
+      {
+        "original": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-rim-c494/artifacts/rim-current/release/cutout/source-mask-matcap.vrm",
+        "copy": "/home/blux/de-xr/dome-sculpt/artifacts/normal-schema-audit-4c9/artifacts/schema-audit/inputs/main-rim/9-source-mask-matcap.vrm",
+        "sha256": "04c28569fc2de00d085e1d2b4f0a8a58791f2d9992d4dd2945ef86e464b29644"
+      },
+      {
+        "original": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-rim-c494/artifacts/rim-current/sanitize/rim/dynamic.vrm",
+        "copy": "/home/blux/de-xr/dome-sculpt/artifacts/normal-schema-audit-4c9/artifacts/schema-audit/inputs/main-rim/10-dynamic.vrm",
+        "sha256": "c1978b1db399807c6554204f9b48cf7dc9896304b25c0c490b97e29f98806c6c"
+      },
+      {
+        "original": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-rim-c494/artifacts/rim-current/sanitize/rim/dynamic-512.vrm",
+        "copy": "/home/blux/de-xr/dome-sculpt/artifacts/normal-schema-audit-4c9/artifacts/schema-audit/inputs/main-rim/11-dynamic-512.vrm",
+        "sha256": "88fec380a4f56a6ab76ad073af069618eea43ebbb8c9e6426f5e2597ab1af99b"
+      },
+      {
+        "original": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-rim-c494/artifacts/rim-current/sanitize/rim/dynamic-1024.vrm",
+        "copy": "/home/blux/de-xr/dome-sculpt/artifacts/normal-schema-audit-4c9/artifacts/schema-audit/inputs/main-rim/12-dynamic-1024.vrm",
+        "sha256": "5a51723cc5d2a49fbac9e89882c5a169c0e524087d2d58cfad41f5e37464a15a"
+      },
+      {
+        "original": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-rim-c494/artifacts/rim-current/sanitize/rim/dynamic-second.vrm",
+        "copy": "/home/blux/de-xr/dome-sculpt/artifacts/normal-schema-audit-4c9/artifacts/schema-audit/inputs/main-rim/13-dynamic-second.vrm",
+        "sha256": "c1978b1db399807c6554204f9b48cf7dc9896304b25c0c490b97e29f98806c6c"
+      },
+      {
+        "original": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-rim-c494/artifacts/rim-current/sanitize/rim/source-rim.vrm",
+        "copy": "/home/blux/de-xr/dome-sculpt/artifacts/normal-schema-audit-4c9/artifacts/schema-audit/inputs/main-rim/14-source-rim.vrm",
+        "sha256": "f91137fa0860ea11ff367e5fe160c15d43dbc6ecd7f951defc608fffb78c385b"
+      },
+      {
+        "original": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-rim-c494/artifacts/rim-current/sanitize/cutout/dynamic.vrm",
+        "copy": "/home/blux/de-xr/dome-sculpt/artifacts/normal-schema-audit-4c9/artifacts/schema-audit/inputs/main-rim/15-dynamic.vrm",
+        "sha256": "b6231fea7d66960f4d2b39dc0adbf84a9f7e99d24dc48b3e22de3b1193df3a56"
+      },
+      {
+        "original": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-rim-c494/artifacts/rim-current/sanitize/cutout/dynamic-512.vrm",
+        "copy": "/home/blux/de-xr/dome-sculpt/artifacts/normal-schema-audit-4c9/artifacts/schema-audit/inputs/main-rim/16-dynamic-512.vrm",
+        "sha256": "090140025c8ce592a3eb426d5788d6f2445a25c78173418394c8effca6cf0a55"
+      },
+      {
+        "original": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-rim-c494/artifacts/rim-current/sanitize/cutout/dynamic-1024.vrm",
+        "copy": "/home/blux/de-xr/dome-sculpt/artifacts/normal-schema-audit-4c9/artifacts/schema-audit/inputs/main-rim/17-dynamic-1024.vrm",
+        "sha256": "89789ca3dbe78051239c2c4d28a1b8fd6c3a2d44802a24c19d430995e07ac79b"
+      },
+      {
+        "original": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-rim-c494/artifacts/rim-current/sanitize/cutout/dynamic-second.vrm",
+        "copy": "/home/blux/de-xr/dome-sculpt/artifacts/normal-schema-audit-4c9/artifacts/schema-audit/inputs/main-rim/18-dynamic-second.vrm",
+        "sha256": "b6231fea7d66960f4d2b39dc0adbf84a9f7e99d24dc48b3e22de3b1193df3a56"
+      },
+      {
+        "original": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-rim-c494/artifacts/rim-current/sanitize/cutout/source-mask-matcap.vrm",
+        "copy": "/home/blux/de-xr/dome-sculpt/artifacts/normal-schema-audit-4c9/artifacts/schema-audit/inputs/main-rim/19-source-mask-matcap.vrm",
+        "sha256": "04c28569fc2de00d085e1d2b4f0a8a58791f2d9992d4dd2945ef86e464b29644"
+      }
+    ],
+    "result": {
+      "files": [
+        {
+          "file": "artifacts/schema-audit/inputs/main-rim/0-dynamic.vrm",
+          "checks": [
+            {
+              "kind": "VRMC_vrm-1.0",
+              "schema": "VRMC_vrm.schema.json",
+              "errors": []
+            },
+            {
+              "kind": "VRMC_springBone-1.0",
+              "schema": "VRMC_springBone.schema.json",
+              "errors": []
+            },
+            {
+              "kind": "VRMC_node_constraint-1.0",
+              "schema": "VRMC_node_constraint.schema.json",
+              "errors": []
+            },
+            {
+              "kind": "VRMC_node_constraint-1.0",
+              "schema": "VRMC_node_constraint.schema.json",
+              "errors": []
+            },
+            {
+              "kind": "VRMC_node_constraint-1.0",
+              "schema": "VRMC_node_constraint.schema.json",
+              "errors": []
+            },
+            {
+              "kind": "VRMC_materials_mtoon-1.0",
+              "schema": "VRMC_materials_mtoon.schema.json",
+              "errors": []
+            },
+            {
+              "kind": "VRMC_materials_mtoon-1.0",
+              "schema": "VRMC_materials_mtoon.schema.json",
+              "errors": []
+            },
+            {
+              "kind": "VRMC_materials_mtoon-1.0",
+              "schema": "VRMC_materials_mtoon.schema.json",
+              "errors": []
+            },
+            {
+              "kind": "VRMC_materials_mtoon-1.0",
+              "schema": "VRMC_materials_mtoon.schema.json",
+              "errors": []
+            }
+          ]
+        },
+        {
+          "file": "artifacts/schema-audit/inputs/main-rim/1-dynamic-512.vrm",
+          "checks": [
+            {
+              "kind": "VRMC_vrm-1.0",
+              "schema": "VRMC_vrm.schema.json",
+              "errors": []
+            },
+            {
+              "kind": "VRMC_springBone-1.0",
+              "schema": "VRMC_springBone.schema.json",
+              "errors": []
+            },
+            {
+              "kind": "VRMC_node_constraint-1.0",
+              "schema": "VRMC_node_constraint.schema.json",
+              "errors": []
+            },
+            {
+              "kind": "VRMC_node_constraint-1.0",
+              "schema": "VRMC_node_constraint.schema.json",
+              "errors": []
+            },
+            {
+              "kind": "VRMC_node_constraint-1.0",
+              "schema": "VRMC_node_constraint.schema.json",
+              "errors": []
+            },
+            {
+              "kind": "VRMC_materials_mtoon-1.0",
+              "schema": "VRMC_materials_mtoon.schema.json",
+              "errors": []
+            },
+            {
+              "kind": "VRMC_materials_mtoon-1.0",
+              "schema": "VRMC_materials_mtoon.schema.json",
+              "errors": []
+            },
+            {
+              "kind": "VRMC_materials_mtoon-1.0",
+              "schema": "VRMC_materials_mtoon.schema.json",
+              "errors": []
+            },
+            {
+              "kind": "VRMC_materials_mtoon-1.0",
+              "schema": "VRMC_materials_mtoon.schema.json",
+              "errors": []
+            }
+          ]
+        },
+        {
+          "file": "artifacts/schema-audit/inputs/main-rim/10-dynamic.vrm",
+          "checks": [
+            {
+              "kind": "VRMC_vrm-1.0",
+              "schema": "VRMC_vrm.schema.json",
+              "errors": []
+            },
+            {
+              "kind": "VRMC_springBone-1.0",
+              "schema": "VRMC_springBone.schema.json",
+              "errors": []
+            },
+            {
+              "kind": "VRMC_node_constraint-1.0",
+              "schema": "VRMC_node_constraint.schema.json",
+              "errors": []
+            },
+            {
+              "kind": "VRMC_node_constraint-1.0",
+              "schema": "VRMC_node_constraint.schema.json",
+              "errors": []
+            },
+            {
+              "kind": "VRMC_node_constraint-1.0",
+              "schema": "VRMC_node_constraint.schema.json",
+              "errors": []
+            },
+            {
+              "kind": "VRMC_materials_mtoon-1.0",
+              "schema": "VRMC_materials_mtoon.schema.json",
+              "errors": []
+            },
+            {
+              "kind": "VRMC_materials_mtoon-1.0",
+              "schema": "VRMC_materials_mtoon.schema.json",
+              "errors": []
+            },
+            {
+              "kind": "VRMC_materials_mtoon-1.0",
+              "schema": "VRMC_materials_mtoon.schema.json",
+              "errors": []
+            },
+            {
+              "kind": "VRMC_materials_mtoon-1.0",
+              "schema": "VRMC_materials_mtoon.schema.json",
+              "errors": []
+            }
+          ]
+        },
+        {
+          "file": "artifacts/schema-audit/inputs/main-rim/11-dynamic-512.vrm",
+          "checks": [
+            {
+              "kind": "VRMC_vrm-1.0",
+              "schema": "VRMC_vrm.schema.json",
+              "errors": []
+            },
+            {
+              "kind": "VRMC_springBone-1.0",
+              "schema": "VRMC_springBone.schema.json",
+              "errors": []
+            },
+            {
+              "kind": "VRMC_node_constraint-1.0",
+              "schema": "VRMC_node_constraint.schema.json",
+              "errors": []
+            },
+            {
+              "kind": "VRMC_node_constraint-1.0",
+              "schema": "VRMC_node_constraint.schema.json",
+              "errors": []
+            },
+            {
+              "kind": "VRMC_node_constraint-1.0",
+              "schema": "VRMC_node_constraint.schema.json",
+              "errors": []
+            },
+            {
+              "kind": "VRMC_materials_mtoon-1.0",
+              "schema": "VRMC_materials_mtoon.schema.json",
+              "errors": []
+            },
+            {
+              "kind": "VRMC_materials_mtoon-1.0",
+              "schema": "VRMC_materials_mtoon.schema.json",
+              "errors": []
+            },
+            {
+              "kind": "VRMC_materials_mtoon-1.0",
+              "schema": "VRMC_materials_mtoon.schema.json",
+              "errors": []
+            },
+            {
+              "kind": "VRMC_materials_mtoon-1.0",
+              "schema": "VRMC_materials_mtoon.schema.json",
+              "errors": []
+            }
+          ]
+        },
+        {
+          "file": "artifacts/schema-audit/inputs/main-rim/12-dynamic-1024.vrm",
+          "checks": [
+            {
+              "kind": "VRMC_vrm-1.0",
+              "schema": "VRMC_vrm.schema.json",
+              "errors": []
+            },
+            {
+              "kind": "VRMC_springBone-1.0",
+              "schema": "VRMC_springBone.schema.json",
+              "errors": []
+            },
+            {
+              "kind": "VRMC_node_constraint-1.0",
+              "schema": "VRMC_node_constraint.schema.json",
+              "errors": []
+            },
+            {
+              "kind": "VRMC_node_constraint-1.0",
+              "schema": "VRMC_node_constraint.schema.json",
+              "errors": []
+            },
+            {
+              "kind": "VRMC_node_constraint-1.0",
+              "schema": "VRMC_node_constraint.schema.json",
+              "errors": []
+            },
+            {
+              "kind": "VRMC_materials_mtoon-1.0",
+              "schema": "VRMC_materials_mtoon.schema.json",
+              "errors": []
+            },
+            {
+              "kind": "VRMC_materials_mtoon-1.0",
+              "schema": "VRMC_materials_mtoon.schema.json",
+              "errors": []
+            },
+            {
+              "kind": "VRMC_materials_mtoon-1.0",
+              "schema": "VRMC_materials_mtoon.schema.json",
+              "errors": []
+            },
+            {
+              "kind": "VRMC_materials_mtoon-1.0",
+              "schema": "VRMC_materials_mtoon.schema.json",
+              "errors": []
+            }
+          ]
+        },
+        {
+          "file": "artifacts/schema-audit/inputs/main-rim/13-dynamic-second.vrm",
+          "checks": [
+            {
+              "kind": "VRMC_vrm-1.0",
+              "schema": "VRMC_vrm.schema.json",
+              "errors": []
+            },
+            {
+              "kind": "VRMC_springBone-1.0",
+              "schema": "VRMC_springBone.schema.json",
+              "errors": []
+            },
+            {
+              "kind": "VRMC_node_constraint-1.0",
+              "schema": "VRMC_node_constraint.schema.json",
+              "errors": []
+            },
+            {
+              "kind": "VRMC_node_constraint-1.0",
+              "schema": "VRMC_node_constraint.schema.json",
+              "errors": []
+            },
+            {
+              "kind": "VRMC_node_constraint-1.0",
+              "schema": "VRMC_node_constraint.schema.json",
+              "errors": []
+            },
+            {
+              "kind": "VRMC_materials_mtoon-1.0",
+              "schema": "VRMC_materials_mtoon.schema.json",
+              "errors": []
+            },
+            {
+              "kind": "VRMC_materials_mtoon-1.0",
+              "schema": "VRMC_materials_mtoon.schema.json",
+              "errors": []
+            },
+            {
+              "kind": "VRMC_materials_mtoon-1.0",
+              "schema": "VRMC_materials_mtoon.schema.json",
+              "errors": []
+            },
+            {
+              "kind": "VRMC_materials_mtoon-1.0",
+              "schema": "VRMC_materials_mtoon.schema.json",
+              "errors": []
+            }
+          ]
+        },
+        {
+          "file": "artifacts/schema-audit/inputs/main-rim/14-source-rim.vrm",
+          "checks": [
+            {
+              "kind": "VRMC_vrm-1.0",
+              "schema": "VRMC_vrm.schema.json",
+              "errors": []
+            },
+            {
+              "kind": "VRMC_springBone-1.0",
+              "schema": "VRMC_springBone.schema.json",
+              "errors": []
+            },
+            {
+              "kind": "VRMC_node_constraint-1.0",
+              "schema": "VRMC_node_constraint.schema.json",
+              "errors": []
+            },
+            {
+              "kind": "VRMC_node_constraint-1.0",
+              "schema": "VRMC_node_constraint.schema.json",
+              "errors": []
+            },
+            {
+              "kind": "VRMC_node_constraint-1.0",
+              "schema": "VRMC_node_constraint.schema.json",
+              "errors": []
+            },
+            {
+              "kind": "VRMC_materials_mtoon-1.0",
+              "schema": "VRMC_materials_mtoon.schema.json",
+              "errors": []
+            }
+          ]
+        },
+        {
+          "file": "artifacts/schema-audit/inputs/main-rim/15-dynamic.vrm",
+          "checks": [
+            {
+              "kind": "VRMC_vrm-1.0",
+              "schema": "VRMC_vrm.schema.json",
+              "errors": []
+            },
+            {
+              "kind": "VRMC_springBone-1.0",
+              "schema": "VRMC_springBone.schema.json",
+              "errors": []
+            },
+            {
+              "kind": "VRMC_node_constraint-1.0",
+              "schema": "VRMC_node_constraint.schema.json",
+              "errors": []
+            },
+            {
+              "kind": "VRMC_node_constraint-1.0",
+              "schema": "VRMC_node_constraint.schema.json",
+              "errors": []
+            },
+            {
+              "kind": "VRMC_node_constraint-1.0",
+              "schema": "VRMC_node_constraint.schema.json",
+              "errors": []
+            },
+            {
+              "kind": "VRMC_materials_mtoon-1.0",
+              "schema": "VRMC_materials_mtoon.schema.json",
+              "errors": []
+            },
+            {
+              "kind": "VRMC_materials_mtoon-1.0",
+              "schema": "VRMC_materials_mtoon.schema.json",
+              "errors": []
+            },
+            {
+              "kind": "VRMC_materials_mtoon-1.0",
+              "schema": "VRMC_materials_mtoon.schema.json",
+              "errors": []
+            },
+            {
+              "kind": "VRMC_materials_mtoon-1.0",
+              "schema": "VRMC_materials_mtoon.schema.json",
+              "errors": []
+            }
+          ]
+        },
+        {
+          "file": "artifacts/schema-audit/inputs/main-rim/16-dynamic-512.vrm",
+          "checks": [
+            {
+              "kind": "VRMC_vrm-1.0",
+              "schema": "VRMC_vrm.schema.json",
+              "errors": []
+            },
+            {
+              "kind": "VRMC_springBone-1.0",
+              "schema": "VRMC_springBone.schema.json",
+              "errors": []
+            },
+            {
+              "kind": "VRMC_node_constraint-1.0",
+              "schema": "VRMC_node_constraint.schema.json",
+              "errors": []
+            },
+            {
+              "kind": "VRMC_node_constraint-1.0",
+              "schema": "VRMC_node_constraint.schema.json",
+              "errors": []
+            },
+            {
+              "kind": "VRMC_node_constraint-1.0",
+              "schema": "VRMC_node_constraint.schema.json",
+              "errors": []
+            },
+            {
+              "kind": "VRMC_materials_mtoon-1.0",
+              "schema": "VRMC_materials_mtoon.schema.json",
+              "errors": []
+            },
+            {
+              "kind": "VRMC_materials_mtoon-1.0",
+              "schema": "VRMC_materials_mtoon.schema.json",
+              "errors": []
+            },
+            {
+              "kind": "VRMC_materials_mtoon-1.0",
+              "schema": "VRMC_materials_mtoon.schema.json",
+              "errors": []
+            },
+            {
+              "kind": "VRMC_materials_mtoon-1.0",
+              "schema": "VRMC_materials_mtoon.schema.json",
+              "errors": []
+            }
+          ]
+        },
+        {
+          "file": "artifacts/schema-audit/inputs/main-rim/17-dynamic-1024.vrm",
+          "checks": [
+            {
+              "kind": "VRMC_vrm-1.0",
+              "schema": "VRMC_vrm.schema.json",
+              "errors": []
+            },
+            {
+              "kind": "VRMC_springBone-1.0",
+              "schema": "VRMC_springBone.schema.json",
+              "errors": []
+            },
+            {
+              "kind": "VRMC_node_constraint-1.0",
+              "schema": "VRMC_node_constraint.schema.json",
+              "errors": []
+            },
+            {
+              "kind": "VRMC_node_constraint-1.0",
+              "schema": "VRMC_node_constraint.schema.json",
+              "errors": []
+            },
+            {
+              "kind": "VRMC_node_constraint-1.0",
+              "schema": "VRMC_node_constraint.schema.json",
+              "errors": []
+            },
+            {
+              "kind": "VRMC_materials_mtoon-1.0",
+              "schema": "VRMC_materials_mtoon.schema.json",
+              "errors": []
+            },
+            {
+              "kind": "VRMC_materials_mtoon-1.0",
+              "schema": "VRMC_materials_mtoon.schema.json",
+              "errors": []
+            },
+            {
+              "kind": "VRMC_materials_mtoon-1.0",
+              "schema": "VRMC_materials_mtoon.schema.json",
+              "errors": []
+            },
+            {
+              "kind": "VRMC_materials_mtoon-1.0",
+              "schema": "VRMC_materials_mtoon.schema.json",
+              "errors": []
+            }
+          ]
+        },
+        {
+          "file": "artifacts/schema-audit/inputs/main-rim/18-dynamic-second.vrm",
+          "checks": [
+            {
+              "kind": "VRMC_vrm-1.0",
+              "schema": "VRMC_vrm.schema.json",
+              "errors": []
+            },
+            {
+              "kind": "VRMC_springBone-1.0",
+              "schema": "VRMC_springBone.schema.json",
+              "errors": []
+            },
+            {
+              "kind": "VRMC_node_constraint-1.0",
+              "schema": "VRMC_node_constraint.schema.json",
+              "errors": []
+            },
+            {
+              "kind": "VRMC_node_constraint-1.0",
+              "schema": "VRMC_node_constraint.schema.json",
+              "errors": []
+            },
+            {
+              "kind": "VRMC_node_constraint-1.0",
+              "schema": "VRMC_node_constraint.schema.json",
+              "errors": []
+            },
+            {
+              "kind": "VRMC_materials_mtoon-1.0",
+              "schema": "VRMC_materials_mtoon.schema.json",
+              "errors": []
+            },
+            {
+              "kind": "VRMC_materials_mtoon-1.0",
+              "schema": "VRMC_materials_mtoon.schema.json",
+              "errors": []
+            },
+            {
+              "kind": "VRMC_materials_mtoon-1.0",
+              "schema": "VRMC_materials_mtoon.schema.json",
+              "errors": []
+            },
+            {
+              "kind": "VRMC_materials_mtoon-1.0",
+              "schema": "VRMC_materials_mtoon.schema.json",
+              "errors": []
+            }
+          ]
+        },
+        {
+          "file": "artifacts/schema-audit/inputs/main-rim/19-source-mask-matcap.vrm",
+          "checks": [
+            {
+              "kind": "VRMC_vrm-1.0",
+              "schema": "VRMC_vrm.schema.json",
+              "errors": []
+            },
+            {
+              "kind": "VRMC_springBone-1.0",
+              "schema": "VRMC_springBone.schema.json",
+              "errors": []
+            },
+            {
+              "kind": "VRMC_node_constraint-1.0",
+              "schema": "VRMC_node_constraint.schema.json",
+              "errors": []
+            },
+            {
+              "kind": "VRMC_node_constraint-1.0",
+              "schema": "VRMC_node_constraint.schema.json",
+              "errors": []
+            },
+            {
+              "kind": "VRMC_node_constraint-1.0",
+              "schema": "VRMC_node_constraint.schema.json",
+              "errors": []
+            },
+            {
+              "kind": "VRMC_materials_mtoon-1.0",
+              "schema": "VRMC_materials_mtoon.schema.json",
+              "errors": []
+            }
+          ]
+        },
+        {
+          "file": "artifacts/schema-audit/inputs/main-rim/2-dynamic-1024.vrm",
+          "checks": [
+            {
+              "kind": "VRMC_vrm-1.0",
+              "schema": "VRMC_vrm.schema.json",
+              "errors": []
+            },
+            {
+              "kind": "VRMC_springBone-1.0",
+              "schema": "VRMC_springBone.schema.json",
+              "errors": []
+            },
+            {
+              "kind": "VRMC_node_constraint-1.0",
+              "schema": "VRMC_node_constraint.schema.json",
+              "errors": []
+            },
+            {
+              "kind": "VRMC_node_constraint-1.0",
+              "schema": "VRMC_node_constraint.schema.json",
+              "errors": []
+            },
+            {
+              "kind": "VRMC_node_constraint-1.0",
+              "schema": "VRMC_node_constraint.schema.json",
+              "errors": []
+            },
+            {
+              "kind": "VRMC_materials_mtoon-1.0",
+              "schema": "VRMC_materials_mtoon.schema.json",
+              "errors": []
+            },
+            {
+              "kind": "VRMC_materials_mtoon-1.0",
+              "schema": "VRMC_materials_mtoon.schema.json",
+              "errors": []
+            },
+            {
+              "kind": "VRMC_materials_mtoon-1.0",
+              "schema": "VRMC_materials_mtoon.schema.json",
+              "errors": []
+            },
+            {
+              "kind": "VRMC_materials_mtoon-1.0",
+              "schema": "VRMC_materials_mtoon.schema.json",
+              "errors": []
+            }
+          ]
+        },
+        {
+          "file": "artifacts/schema-audit/inputs/main-rim/3-dynamic-second.vrm",
+          "checks": [
+            {
+              "kind": "VRMC_vrm-1.0",
+              "schema": "VRMC_vrm.schema.json",
+              "errors": []
+            },
+            {
+              "kind": "VRMC_springBone-1.0",
+              "schema": "VRMC_springBone.schema.json",
+              "errors": []
+            },
+            {
+              "kind": "VRMC_node_constraint-1.0",
+              "schema": "VRMC_node_constraint.schema.json",
+              "errors": []
+            },
+            {
+              "kind": "VRMC_node_constraint-1.0",
+              "schema": "VRMC_node_constraint.schema.json",
+              "errors": []
+            },
+            {
+              "kind": "VRMC_node_constraint-1.0",
+              "schema": "VRMC_node_constraint.schema.json",
+              "errors": []
+            },
+            {
+              "kind": "VRMC_materials_mtoon-1.0",
+              "schema": "VRMC_materials_mtoon.schema.json",
+              "errors": []
+            },
+            {
+              "kind": "VRMC_materials_mtoon-1.0",
+              "schema": "VRMC_materials_mtoon.schema.json",
+              "errors": []
+            },
+            {
+              "kind": "VRMC_materials_mtoon-1.0",
+              "schema": "VRMC_materials_mtoon.schema.json",
+              "errors": []
+            },
+            {
+              "kind": "VRMC_materials_mtoon-1.0",
+              "schema": "VRMC_materials_mtoon.schema.json",
+              "errors": []
+            }
+          ]
+        },
+        {
+          "file": "artifacts/schema-audit/inputs/main-rim/4-source-rim.vrm",
+          "checks": [
+            {
+              "kind": "VRMC_vrm-1.0",
+              "schema": "VRMC_vrm.schema.json",
+              "errors": []
+            },
+            {
+              "kind": "VRMC_springBone-1.0",
+              "schema": "VRMC_springBone.schema.json",
+              "errors": []
+            },
+            {
+              "kind": "VRMC_node_constraint-1.0",
+              "schema": "VRMC_node_constraint.schema.json",
+              "errors": []
+            },
+            {
+              "kind": "VRMC_node_constraint-1.0",
+              "schema": "VRMC_node_constraint.schema.json",
+              "errors": []
+            },
+            {
+              "kind": "VRMC_node_constraint-1.0",
+              "schema": "VRMC_node_constraint.schema.json",
+              "errors": []
+            },
+            {
+              "kind": "VRMC_materials_mtoon-1.0",
+              "schema": "VRMC_materials_mtoon.schema.json",
+              "errors": []
+            }
+          ]
+        },
+        {
+          "file": "artifacts/schema-audit/inputs/main-rim/5-dynamic.vrm",
+          "checks": [
+            {
+              "kind": "VRMC_vrm-1.0",
+              "schema": "VRMC_vrm.schema.json",
+              "errors": []
+            },
+            {
+              "kind": "VRMC_springBone-1.0",
+              "schema": "VRMC_springBone.schema.json",
+              "errors": []
+            },
+            {
+              "kind": "VRMC_node_constraint-1.0",
+              "schema": "VRMC_node_constraint.schema.json",
+              "errors": []
+            },
+            {
+              "kind": "VRMC_node_constraint-1.0",
+              "schema": "VRMC_node_constraint.schema.json",
+              "errors": []
+            },
+            {
+              "kind": "VRMC_node_constraint-1.0",
+              "schema": "VRMC_node_constraint.schema.json",
+              "errors": []
+            },
+            {
+              "kind": "VRMC_materials_mtoon-1.0",
+              "schema": "VRMC_materials_mtoon.schema.json",
+              "errors": []
+            },
+            {
+              "kind": "VRMC_materials_mtoon-1.0",
+              "schema": "VRMC_materials_mtoon.schema.json",
+              "errors": []
+            },
+            {
+              "kind": "VRMC_materials_mtoon-1.0",
+              "schema": "VRMC_materials_mtoon.schema.json",
+              "errors": []
+            },
+            {
+              "kind": "VRMC_materials_mtoon-1.0",
+              "schema": "VRMC_materials_mtoon.schema.json",
+              "errors": []
+            }
+          ]
+        },
+        {
+          "file": "artifacts/schema-audit/inputs/main-rim/6-dynamic-512.vrm",
+          "checks": [
+            {
+              "kind": "VRMC_vrm-1.0",
+              "schema": "VRMC_vrm.schema.json",
+              "errors": []
+            },
+            {
+              "kind": "VRMC_springBone-1.0",
+              "schema": "VRMC_springBone.schema.json",
+              "errors": []
+            },
+            {
+              "kind": "VRMC_node_constraint-1.0",
+              "schema": "VRMC_node_constraint.schema.json",
+              "errors": []
+            },
+            {
+              "kind": "VRMC_node_constraint-1.0",
+              "schema": "VRMC_node_constraint.schema.json",
+              "errors": []
+            },
+            {
+              "kind": "VRMC_node_constraint-1.0",
+              "schema": "VRMC_node_constraint.schema.json",
+              "errors": []
+            },
+            {
+              "kind": "VRMC_materials_mtoon-1.0",
+              "schema": "VRMC_materials_mtoon.schema.json",
+              "errors": []
+            },
+            {
+              "kind": "VRMC_materials_mtoon-1.0",
+              "schema": "VRMC_materials_mtoon.schema.json",
+              "errors": []
+            },
+            {
+              "kind": "VRMC_materials_mtoon-1.0",
+              "schema": "VRMC_materials_mtoon.schema.json",
+              "errors": []
+            },
+            {
+              "kind": "VRMC_materials_mtoon-1.0",
+              "schema": "VRMC_materials_mtoon.schema.json",
+              "errors": []
+            }
+          ]
+        },
+        {
+          "file": "artifacts/schema-audit/inputs/main-rim/7-dynamic-1024.vrm",
+          "checks": [
+            {
+              "kind": "VRMC_vrm-1.0",
+              "schema": "VRMC_vrm.schema.json",
+              "errors": []
+            },
+            {
+              "kind": "VRMC_springBone-1.0",
+              "schema": "VRMC_springBone.schema.json",
+              "errors": []
+            },
+            {
+              "kind": "VRMC_node_constraint-1.0",
+              "schema": "VRMC_node_constraint.schema.json",
+              "errors": []
+            },
+            {
+              "kind": "VRMC_node_constraint-1.0",
+              "schema": "VRMC_node_constraint.schema.json",
+              "errors": []
+            },
+            {
+              "kind": "VRMC_node_constraint-1.0",
+              "schema": "VRMC_node_constraint.schema.json",
+              "errors": []
+            },
+            {
+              "kind": "VRMC_materials_mtoon-1.0",
+              "schema": "VRMC_materials_mtoon.schema.json",
+              "errors": []
+            },
+            {
+              "kind": "VRMC_materials_mtoon-1.0",
+              "schema": "VRMC_materials_mtoon.schema.json",
+              "errors": []
+            },
+            {
+              "kind": "VRMC_materials_mtoon-1.0",
+              "schema": "VRMC_materials_mtoon.schema.json",
+              "errors": []
+            },
+            {
+              "kind": "VRMC_materials_mtoon-1.0",
+              "schema": "VRMC_materials_mtoon.schema.json",
+              "errors": []
+            }
+          ]
+        },
+        {
+          "file": "artifacts/schema-audit/inputs/main-rim/8-dynamic-second.vrm",
+          "checks": [
+            {
+              "kind": "VRMC_vrm-1.0",
+              "schema": "VRMC_vrm.schema.json",
+              "errors": []
+            },
+            {
+              "kind": "VRMC_springBone-1.0",
+              "schema": "VRMC_springBone.schema.json",
+              "errors": []
+            },
+            {
+              "kind": "VRMC_node_constraint-1.0",
+              "schema": "VRMC_node_constraint.schema.json",
+              "errors": []
+            },
+            {
+              "kind": "VRMC_node_constraint-1.0",
+              "schema": "VRMC_node_constraint.schema.json",
+              "errors": []
+            },
+            {
+              "kind": "VRMC_node_constraint-1.0",
+              "schema": "VRMC_node_constraint.schema.json",
+              "errors": []
+            },
+            {
+              "kind": "VRMC_materials_mtoon-1.0",
+              "schema": "VRMC_materials_mtoon.schema.json",
+              "errors": []
+            },
+            {
+              "kind": "VRMC_materials_mtoon-1.0",
+              "schema": "VRMC_materials_mtoon.schema.json",
+              "errors": []
+            },
+            {
+              "kind": "VRMC_materials_mtoon-1.0",
+              "schema": "VRMC_materials_mtoon.schema.json",
+              "errors": []
+            },
+            {
+              "kind": "VRMC_materials_mtoon-1.0",
+              "schema": "VRMC_materials_mtoon.schema.json",
+              "errors": []
+            }
+          ]
+        },
+        {
+          "file": "artifacts/schema-audit/inputs/main-rim/9-source-mask-matcap.vrm",
+          "checks": [
+            {
+              "kind": "VRMC_vrm-1.0",
+              "schema": "VRMC_vrm.schema.json",
+              "errors": []
+            },
+            {
+              "kind": "VRMC_springBone-1.0",
+              "schema": "VRMC_springBone.schema.json",
+              "errors": []
+            },
+            {
+              "kind": "VRMC_node_constraint-1.0",
+              "schema": "VRMC_node_constraint.schema.json",
+              "errors": []
+            },
+            {
+              "kind": "VRMC_node_constraint-1.0",
+              "schema": "VRMC_node_constraint.schema.json",
+              "errors": []
+            },
+            {
+              "kind": "VRMC_node_constraint-1.0",
+              "schema": "VRMC_node_constraint.schema.json",
+              "errors": []
+            },
+            {
+              "kind": "VRMC_materials_mtoon-1.0",
+              "schema": "VRMC_materials_mtoon.schema.json",
+              "errors": []
+            }
+          ]
+        }
+      ],
+      "resolver_controls": [
+        {
+          "source_file": "artifacts/schema-audit/inputs/main-rim/0-dynamic.vrm",
+          "role": "matcapTexture",
+          "control": "Actual missing texture index rejects through pinned core2020 textureInfo siblings"
+        },
+        {
+          "source_file": "artifacts/schema-audit/inputs/main-rim/0-dynamic.vrm",
+          "role": "matcapTexture",
+          "control": "Actual texture coordinate wrong type rejects through pinned core2020 schema"
+        }
+      ],
+      "schema_bytes_rewritten": false,
+      "network_references_allowed": false,
+      "mixed_dialect_dispatch": "Declared Draft4 or2020 perresource; unspecifiedVRM defaultsDraft4",
+      "jsonschema_version": "4.26.0",
+      "consumed_schema_sha256": {
+        "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-integration-69ca191/artifacts/spec/specification/VRMC_vrm-1.0/schema/VRMC_vrm.expressions.expression.materialColorBind.schema.json": "3106d724bf5f680f40e76a4386a7d19d91069edaf942b7a50075e62b92658950",
+        "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-integration-69ca191/artifacts/spec/specification/VRMC_vrm-1.0/schema/VRMC_vrm.expressions.expression.morphTargetBind.schema.json": "32e94d057ee4a590426e92597ba9b0b7ebd527d3be924e5ffbe722d7a6eec4ba",
+        "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-integration-69ca191/artifacts/spec/specification/VRMC_vrm-1.0/schema/VRMC_vrm.expressions.expression.schema.json": "35671fab00107e0cd95bf7a2675fae4a44aeb5058ea9be3fd88464fb9311beeb",
+        "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-integration-69ca191/artifacts/spec/specification/VRMC_vrm-1.0/schema/VRMC_vrm.expressions.expression.textureTransformBind.schema.json": "692155ed69e8c8ebb6da57d380a11847260064e64dd3ec4bbe57767b42aaef53",
+        "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-integration-69ca191/artifacts/spec/specification/VRMC_vrm-1.0/schema/VRMC_vrm.expressions.schema.json": "1aafa72830f3ac7cbbb26ca21f9f0e0da2025db453e2df223dbb2750cc848748",
+        "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-integration-69ca191/artifacts/spec/specification/VRMC_vrm-1.0/schema/VRMC_vrm.firstPerson.meshAnnotation.schema.json": "833b4f9309c59925ee46fba4fc2106a37eee31b0ddee8df2de78045a6273cf00",
+        "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-integration-69ca191/artifacts/spec/specification/VRMC_vrm-1.0/schema/VRMC_vrm.firstPerson.schema.json": "95c524ae48ac6d9163fd1dc7fee6dba1730e86f17f2c370c9239c1486b74c81d",
+        "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-integration-69ca191/artifacts/spec/specification/VRMC_vrm-1.0/schema/VRMC_vrm.humanoid.humanBones.humanBone.schema.json": "1d9c3ffe288e49d38e17048756c35af19b5cb4d3f9b9a9096c91ed51248e6e7a",
+        "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-integration-69ca191/artifacts/spec/specification/VRMC_vrm-1.0/schema/VRMC_vrm.humanoid.humanBones.schema.json": "eb74f10a7bcae4a4fb44073ffc99b64cadb4c41c000ff137fac651106163f033",
+        "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-integration-69ca191/artifacts/spec/specification/VRMC_vrm-1.0/schema/VRMC_vrm.humanoid.schema.json": "40f033c9f47d04aae8fa9d5d2ffae6dd5fa2f1592c6885a526a5b4232992f4a0",
+        "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-integration-69ca191/artifacts/spec/specification/VRMC_vrm-1.0/schema/VRMC_vrm.lookAt.rangeMap.schema.json": "ca423bbb60628a55cd08438201e2dff9f5d0f0fcf939fc69e5e9ebac508fae46",
+        "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-integration-69ca191/artifacts/spec/specification/VRMC_vrm-1.0/schema/VRMC_vrm.lookAt.schema.json": "a2c5e057f5294e8cae61b51a95a049db46415c818b516f8e2bada98bd5e32c78",
+        "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-integration-69ca191/artifacts/spec/specification/VRMC_vrm-1.0/schema/VRMC_vrm.meta.schema.json": "8d1d11ce15deedf91da1c5179febf4cc59168a02701e631538962d61f0e146f2",
+        "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-integration-69ca191/artifacts/spec/specification/VRMC_vrm-1.0/schema/VRMC_vrm.schema.json": "b852c4ecaf66cc2ba8af00659d1c408f5b1ae06174ba766319ef7e4d8db2f5e0",
+        "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-integration-69ca191/artifacts/spec/specification/VRMC_vrm-1.0/schema/textureInfo.schema.json": "d112fbf4c366bee9309dfb476f73cbf057a199425baf7cdcb66e2382b2346431",
+        "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-integration-69ca191/artifacts/spec/specification/VRMC_vrm-1.0/schema/glTFid.schema.json": "83037eabbf44c5e07e28f3b8d3822c9c8359b9cd80710a32ddd482a7c4a6ede4",
+        "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-integration-69ca191/artifacts/spec/specification/VRMC_vrm-1.0/schema/glTFProperty.schema.json": "fe4a6164cdd8be0fd40324f1391a381564b93a82ba8730182cf3e7195a06ebfb",
+        "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-integration-69ca191/artifacts/spec/specification/VRMC_vrm-1.0/schema/extras.schema.json": "97a8d6a5780c7c5d135933009261333c10bb7bfee0545c4e4b326d2d5c2d9fe5",
+        "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-integration-69ca191/artifacts/spec/specification/VRMC_vrm-1.0/schema/extensions.schema.json": "57c27d85fe1a7e4e13cc750ff1e35313cd5da83cc676d1526d626096e3b61d53",
+        "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-integration-69ca191/artifacts/spec/specification/VRMC_vrm-1.0/schema/glTFChildOfRootProperty.schema.json": "80952f5b6d0c2da226a2d009f67364f87a913b92adcf37be8e17445d40b4dfcd",
+        "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-integration-69ca191/artifacts/spec/specification/VRMC_springBone-1.0/schema/VRMC_springBone.collider.schema.json": "d323adbea9133c20ad554514a75d1c48ddac33f8866745332cd3dfc1921d08c2",
+        "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-integration-69ca191/artifacts/spec/specification/VRMC_springBone-1.0/schema/VRMC_springBone.colliderGroup.schema.json": "73c6a51ceb4f21493cc6f7bdb62a08874bfee4d969c88301e0c8d87d680b22bc",
+        "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-integration-69ca191/artifacts/spec/specification/VRMC_springBone-1.0/schema/VRMC_springBone.joint.schema.json": "886dba93de146dd529c7e0fa8e0e8b585e5160d5455764f4bdfbcdf800a8d8d6",
+        "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-integration-69ca191/artifacts/spec/specification/VRMC_springBone-1.0/schema/VRMC_springBone.schema.json": "084ec425e4e69da15dbc2127726c70d9a26291cfaabaeddd8f5a173f23dbeb02",
+        "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-integration-69ca191/artifacts/spec/specification/VRMC_springBone-1.0/schema/VRMC_springBone.shape.schema.json": "448c92d1961a314a4c9b48e194b145cb2a8cbb2c59d021ec02a0da84dd3929ee",
+        "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-integration-69ca191/artifacts/spec/specification/VRMC_springBone-1.0/schema/VRMC_springBone.spring.schema.json": "3a4a7a1311f7653c1955c478de3fcca4ae44efafa6ee3688208dcd345584647e",
+        "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-integration-69ca191/artifacts/spec/specification/VRMC_springBone-1.0/schema/textureInfo.schema.json": "d112fbf4c366bee9309dfb476f73cbf057a199425baf7cdcb66e2382b2346431",
+        "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-integration-69ca191/artifacts/spec/specification/VRMC_springBone-1.0/schema/glTFid.schema.json": "83037eabbf44c5e07e28f3b8d3822c9c8359b9cd80710a32ddd482a7c4a6ede4",
+        "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-integration-69ca191/artifacts/spec/specification/VRMC_springBone-1.0/schema/glTFProperty.schema.json": "fe4a6164cdd8be0fd40324f1391a381564b93a82ba8730182cf3e7195a06ebfb",
+        "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-integration-69ca191/artifacts/spec/specification/VRMC_springBone-1.0/schema/extras.schema.json": "97a8d6a5780c7c5d135933009261333c10bb7bfee0545c4e4b326d2d5c2d9fe5",
+        "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-integration-69ca191/artifacts/spec/specification/VRMC_springBone-1.0/schema/extensions.schema.json": "57c27d85fe1a7e4e13cc750ff1e35313cd5da83cc676d1526d626096e3b61d53",
+        "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-integration-69ca191/artifacts/spec/specification/VRMC_springBone-1.0/schema/glTFChildOfRootProperty.schema.json": "80952f5b6d0c2da226a2d009f67364f87a913b92adcf37be8e17445d40b4dfcd",
+        "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-integration-69ca191/artifacts/spec/specification/VRMC_node_constraint-1.0/schema/VRMC_node_constraint.aimConstraint.schema.json": "84f64fc5d303bfc4539ec12cdfde2421e21ede58f51d8b6858a51e49f4cdf940",
+        "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-integration-69ca191/artifacts/spec/specification/VRMC_node_constraint-1.0/schema/VRMC_node_constraint.constraint.schema.json": "fbc6d976e94791e9132b23854fe2a96a8fbf3f4f771485fa4a705c139f92e928",
+        "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-integration-69ca191/artifacts/spec/specification/VRMC_node_constraint-1.0/schema/VRMC_node_constraint.rollConstraint.schema.json": "c7f24b5139a14bd079f2e35ea65eb9fc7b31b17627ebc5c247363af8dee03a1b",
+        "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-integration-69ca191/artifacts/spec/specification/VRMC_node_constraint-1.0/schema/VRMC_node_constraint.rotationConstraint.schema.json": "896d5dee6caec10d532ca0397883502416f2f3a25ed30c3dad53acc9b61e5d4f",
+        "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-integration-69ca191/artifacts/spec/specification/VRMC_node_constraint-1.0/schema/VRMC_node_constraint.schema.json": "1864d42685b7d06cc333ca1ba16e1a2edcd2ad620501a1cf15f988200304208a",
+        "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-integration-69ca191/artifacts/spec/specification/VRMC_node_constraint-1.0/schema/textureInfo.schema.json": "d112fbf4c366bee9309dfb476f73cbf057a199425baf7cdcb66e2382b2346431",
+        "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-integration-69ca191/artifacts/spec/specification/VRMC_node_constraint-1.0/schema/glTFid.schema.json": "83037eabbf44c5e07e28f3b8d3822c9c8359b9cd80710a32ddd482a7c4a6ede4",
+        "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-integration-69ca191/artifacts/spec/specification/VRMC_node_constraint-1.0/schema/glTFProperty.schema.json": "fe4a6164cdd8be0fd40324f1391a381564b93a82ba8730182cf3e7195a06ebfb",
+        "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-integration-69ca191/artifacts/spec/specification/VRMC_node_constraint-1.0/schema/extras.schema.json": "97a8d6a5780c7c5d135933009261333c10bb7bfee0545c4e4b326d2d5c2d9fe5",
+        "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-integration-69ca191/artifacts/spec/specification/VRMC_node_constraint-1.0/schema/extensions.schema.json": "57c27d85fe1a7e4e13cc750ff1e35313cd5da83cc676d1526d626096e3b61d53",
+        "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-integration-69ca191/artifacts/spec/specification/VRMC_node_constraint-1.0/schema/glTFChildOfRootProperty.schema.json": "80952f5b6d0c2da226a2d009f67364f87a913b92adcf37be8e17445d40b4dfcd",
+        "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-integration-69ca191/artifacts/spec/specification/VRMC_materials_mtoon-1.0/schema/VRMC_materials_mtoon.schema.json": "39e69f102c7ae3bdaa35ff8f2bcbc022a5a4c052fe97009198566105c667e941",
+        "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-integration-69ca191/artifacts/spec/specification/VRMC_materials_mtoon-1.0/schema/mtoon.shadingShiftTexture.schema.json": "248280f5bbb0d0677125237d6837d8157f88632a3a3c1aef1f7ee923e23c152c",
+        "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-integration-69ca191/artifacts/spec/specification/VRMC_materials_mtoon-1.0/schema/textureInfo.schema.json": "d112fbf4c366bee9309dfb476f73cbf057a199425baf7cdcb66e2382b2346431",
+        "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-integration-69ca191/artifacts/spec/specification/VRMC_materials_mtoon-1.0/schema/glTFid.schema.json": "83037eabbf44c5e07e28f3b8d3822c9c8359b9cd80710a32ddd482a7c4a6ede4",
+        "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-integration-69ca191/artifacts/spec/specification/VRMC_materials_mtoon-1.0/schema/glTFProperty.schema.json": "fe4a6164cdd8be0fd40324f1391a381564b93a82ba8730182cf3e7195a06ebfb",
+        "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-integration-69ca191/artifacts/spec/specification/VRMC_materials_mtoon-1.0/schema/extras.schema.json": "97a8d6a5780c7c5d135933009261333c10bb7bfee0545c4e4b326d2d5c2d9fe5",
+        "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-integration-69ca191/artifacts/spec/specification/VRMC_materials_mtoon-1.0/schema/extensions.schema.json": "57c27d85fe1a7e4e13cc750ff1e35313cd5da83cc676d1526d626096e3b61d53",
+        "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-integration-69ca191/artifacts/spec/specification/VRMC_materials_mtoon-1.0/schema/glTFChildOfRootProperty.schema.json": "80952f5b6d0c2da226a2d009f67364f87a913b92adcf37be8e17445d40b4dfcd"
+      },
+      "schema_drift": []
+    },
+    "instances": 168,
+    "errors": 0
+  },
+  "all_reaudited_files": 44,
+  "all_reaudited_instances": 354
 }
