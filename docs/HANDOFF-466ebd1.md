@@ -1,11 +1,10 @@
-> Current continuation, 2026-11-05: native36 a0b8a37/seal881021c is admitted to
-> main with matching runtime/test/build bytes, Release and sanitizer125/125,
-> actual native/Wayland/synthetic-XR200 UI checks per profile and scoped Arc proof.
-> See REQUIREMENTS.md and COHERENT-NATIVE36-AUTHORING.md. HDR/MatCap/Rim and
-> owning37/physical4 integration remain separately qualified/building. Local
-> automatic-weight quality, Normal roles, remaining authoring/device/accelerator
-> work and later controller drawers remain incomplete; the full goal is active.
-> This historical handoff is preserved and is not a full-production claim.
+> Current continuation, 2026-11-05: main admits native36 a0b8a37/881021c plus
+> currentHDR/MatCap/Rim0b6b59f with exact runtime/header/test/build parity and
+> scoped whole-owning, targeted sanitizer, native FLTK and actualArc proof.
+> Read REQUIREMENTS.md, COHERENT-NATIVE36-AUTHORING.md and
+> CURRENT-RIM-INTEGRATION.md.37/physical4 builds, robustweights/Normal roles,
+> remaining authoring/device/accelerator work and later controller drawers remain
+> incomplete. Fullgoal active; this historical handoff is preserved below.
 
 # Agent handoff — editable UV and universal-menu checkpoint
 

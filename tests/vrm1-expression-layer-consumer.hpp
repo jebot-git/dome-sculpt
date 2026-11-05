@@ -8,7 +8,7 @@
 struct V1ExpressionLayerConsumer {
   using J=nlohmann::json;
   float expression=0;int pose=0,selected_node=-1;bool wrong_mask_cutoff=false,wrong_paint_uv=false,wrong_base_tint=false,wrong_shared_shade=false;
-  bool wrong_source_uv=false;
+  bool wrong_binary_threshold=false,wrong_source_uv=false,wrong_matcap_view=false,wrong_matcap_uv_target=false,wrong_matcap_color=false,wrong_rim_color=false,wrong_rim_uv=false;
   std::map<std::string,float> weights;
   struct WeightedExpression {const J *value;float weight;};
   std::vector<WeightedExpression> active;
@@ -16,28 +16,41 @@ struct V1ExpressionLayerConsumer {
   V1ExpressionLayerConsumer() {
     const char *vs = R"GLSL(#version 330 core
 layout(location=0)in vec3 p;layout(location=1)in vec3 N;
-layout(location=2)in vec2 UV;layout(location=3)in vec2 SU;layout(location=4)in vec2 EU;
-uniform mat4 camera;out vec3 n;out vec2 uv,shadeUV,emissionUV;
-void main(){n=N;uv=UV;shadeUV=SU;emissionUV=EU;gl_Position=camera*vec4(p,1);})GLSL";
+layout(location=2)in vec2 UV;layout(location=3)in vec2 SU;layout(location=4)in vec2 EU;layout(location=5)in vec2 RU;
+uniform mat4 camera;out vec3 n,world;out vec2 uv,shadeUV,emissionUV,rimUV;
+void main(){n=N;world=p;uv=UV;shadeUV=SU;emissionUV=EU;rimUV=RU;gl_Position=camera*vec4(p,1);})GLSL";
     const char *fs = R"GLSL(#version 330 core
-in vec3 n;in vec2 uv,shadeUV,emissionUV;out vec4 result;
-uniform sampler2D baseMap,shadeMap,emissionMap;uniform int basePresent,shadePresent,emissionPresent;
+in vec3 n,world;in vec2 uv,shadeUV,emissionUV,rimUV;out vec4 result;
+uniform sampler2D baseMap,shadeMap,emissionMap,matcapMap,rimMap;uniform int basePresent,shadePresent,emissionPresent,matcapPresent,rimPresent,wrongMatcapView;
+uniform vec3 matcapFactor,rimFactor,viewOrigin;uniform float rimLightingMix,rimPower,rimLift;
 uniform vec3 emissionFactor;uniform float emissionStrength;
 uniform int blend;uniform float alphaCutoff;uniform vec4 baseFactor;uniform vec3 shadeFactor;
 uniform vec2 scroll;uniform float speed,seconds,shift,toony,equalization;
-uniform vec3 baseX,baseY,shadeX,shadeY,emissionX,emissionY;
+uniform vec3 baseX,baseY,shadeX,shadeY,emissionX,emissionY,matcapX,matcapY,rimX,rimY;
 vec2 animated(vec2 u){float a=speed*seconds;vec2 q=u-.5;
 return vec2(cos(a)*q.x+sin(a)*q.y,-sin(a)*q.x+cos(a)*q.y)+.5+scroll*seconds;}
 vec2 mapped(vec2 u,vec3 X,vec3 Y){vec2 q=animated(u)*X.xy;float c=cos(X.z),s=sin(X.z);return mat2(c,s,-s,c)*q+Y.xy;}
+// Independent pinned UniVRM view-normal lookup, in its left-handed frame.
+// Reflect X for glTF -> Unity, then flip texture V back to glTF's top row.
+// This expresses coordinate conversion, not a call to the native UV helper.
+vec2 viewLookup(vec3 N,vec3 V){vec3 L=vec3(-N.x,N.y,N.z),W=vec3(-V.x,V.y,V.z);
+vec3 X=normalize(cross(W,vec3(0,1,0))),Y=normalize(cross(X,W));
+vec2 q=.5+.5*vec2(dot(X,L),dot(Y,L));return vec2(q.x,1-q.y);}
 void main(){vec3 N=normalize(n);if(!gl_FrontFacing)N=-N;
 vec4 lit=(basePresent==1?texture(baseMap,mapped(uv,baseX,baseY)):vec4(1))*baseFactor;
-if(blend==2&&lit.a<alphaCutoff)discard;
 vec3 shade=(shadePresent==1?texture(shadeMap,mapped(shadeUV,shadeX,shadeY)).rgb:vec3(1))*shadeFactor;
 float width=1-toony,x=dot(N,normalize(vec3(-.4,.8,.7)))+shift;
 float ratio=width<=.0000001?step(0,x):clamp((x+width)/(2*width),0,1);
-float gi=mix(mix(.1,.25,.5+.5*N.y),.175,equalization);
+float rawGi=mix(.1,.25,.5+.5*N.y),gi=mix(rawGi,.175,equalization);
 vec3 emission=(emissionPresent==1?texture(emissionMap,mapped(emissionUV,emissionX,emissionY)).rgb:vec3(1))*emissionFactor*emissionStrength;
-result=vec4(mix(shade,lit.rgb,ratio)+gi*lit.rgb+emission,blend==1?lit.a:1);})GLSL";
+vec3 V=normalize(viewOrigin-world);vec2 M=wrongMatcapView==1?uv:viewLookup(N,V);
+vec3 matcap=matcapPresent==1?texture(matcapMap,mapped(M,matcapX,matcapY)).rgb*matcapFactor:vec3(0);
+vec3 rim=rimFactor*pow(clamp(1-dot(N,V)+rimLift,0.,1.),max(rimPower,.00001));
+matcap=(matcap+rim)*(rimPresent==1?texture(rimMap,mapped(rimUV,rimX,rimY)).rgb:vec3(1))*mix(1.,1.+rawGi,rimLightingMix);
+// Evaluate all implicitly filtered role textures before divergent discard.
+// A removed quad lane cannot define the mip derivatives of later samples.
+if(blend==2&&lit.a<alphaCutoff)discard;
+result=vec4(mix(shade,lit.rgb,ratio)+gi*lit.rgb+emission+matcap,blend==1?lit.a:1);})GLSL";
     auto v = role_consumer::shader(GL_VERTEX_SHADER, vs);
     auto f = role_consumer::shader(GL_FRAGMENT_SHADER, fs);
     program = glCreateProgram();
@@ -86,7 +99,7 @@ in vec2 uv;out vec4 result;uniform sampler2D scene;void main(){result=texture(sc
   }
   GLuint texture(cgltf_data *data, const J &info, unsigned unit,
                  const char *uniform) {
-    const char *presence=unit==0?"basePresent":unit==1?"shadePresent":"emissionPresent";
+    const char *presence=unit==0?"basePresent":unit==1?"shadePresent":unit==2?"emissionPresent":unit==3?"matcapPresent":"rimPresent";
     glUniform1i(loc(presence),!info.is_null());glUniform1i(loc(uniform),unit);
     if(info.is_null()){glActiveTexture(GL_TEXTURE0+unit);glBindSampler(unit,0);glBindTexture(GL_TEXTURE_2D,0);return 0;}
     int index = info.at("index").get<int>();
@@ -115,7 +128,7 @@ in vec2 uv;out vec4 result;uniform sampler2D scene;void main(){result=texture(sc
     glUniform1i(loc(uniform), unit);
     return id;
   }
-  void transform(const J &info, const char *x, const char *y,const J &expression_data,size_t material,bool paint_layer=false) {
+  void transform(const J &info, const char *x, const char *y,const J &expression_data,size_t material,bool paint_layer=false,bool screen_mapped=false) {
     J t = J::object();
     if (info.contains("extensions") &&
         info.at("extensions").contains("KHR_texture_transform"))
@@ -124,10 +137,11 @@ in vec2 uv;out vec4 result;uniform sampler2D scene;void main(){result=texture(sc
          scale = t.value("scale", std::array<float, 2>{1, 1});
     double a = t.value("rotation", 0.0);
     const auto initial_scale=scale,initial_offset=offset;
-    if(weights.empty()){
+    if(!screen_mapped){if(weights.empty()){
       for(const auto &bind:expression_data.value("textureTransformBinds",J::array()))if(bind.at("material").get<size_t>()==material)for(size_t k=0;k<2;++k){scale[k]+=float((double(bind.value("scale",std::array<float,2>{1,1})[k])-initial_scale[k])*expression);offset[k]+=float((double(bind.value("offset",std::array<float,2>{})[k])-initial_offset[k])*expression);}
     }else{double total=0;std::array<double,2> scales{},offsets{};for(const auto &e:active)for(const auto &bind:e.value->value("textureTransformBinds",J::array()))if(bind.at("material").get<size_t>()==material){total+=e.weight;const auto target_scale=bind.value("scale",std::array<float,2>{1,1}),target_offset=bind.value("offset",std::array<float,2>{});for(size_t k=0;k<2;++k){scales[k]+=double(target_scale[k])*e.weight;offsets[k]+=double(target_offset[k])*e.weight;}}for(size_t k=0;k<2;++k){scale[k]=float(initial_scale[k]*(1-total)+scales[k]);offset[k]=float(initial_offset[k]*(1-total)+offsets[k]);}}
-    if(wrong_source_uv&&!paint_layer){scale=initial_scale;offset=initial_offset;}
+    }
+    if(wrong_source_uv&&!paint_layer&&!screen_mapped){scale=initial_scale;offset=initial_offset;}
     if(wrong_paint_uv&&std::string_view(x)=="baseX"&&paint_layer){scale=initial_scale;offset=initial_offset;offset[0]+=expression*.2f;offset[1]-=expression*.1f;}
     glUniform3f(loc(x),scale[0],scale[1],float(a));glUniform3f(loc(y),offset[0],offset[1],0);
   }
@@ -135,7 +149,10 @@ in vec2 uv;out vec4 result;uniform sampler2D scene;void main(){result=texture(sc
                 role_consumer::Matrix prefix) {
     GLint destination=0;glGetIntegerv(GL_DRAW_FRAMEBUFFER_BINDING,&destination);glBindFramebuffer(GL_FRAMEBUFFER,framebuffer);
     const auto &expression_data=model.json.at("extensions").at("VRMC_vrm").at("expressions").at("preset").at("happy");
-    active.clear();size_t selected=0;if(!weights.empty()){const auto &definitions=model.json.at("extensions").at("VRMC_vrm").at("expressions");for(const char *table:{"preset","custom"})if(definitions.contains(table))for(const auto &entry:definitions.at(table).items()){const auto key=std::string(table)+"/"+entry.key();if(const auto at=weights.find(key);at!=weights.end()){if(!std::isfinite(at->second)||at->second<0||at->second>1||entry.value().value("isBinary",false))throw std::runtime_error("Independent target oracle requires finite nonbinary requested weights");if(std::string_view(table)=="preset"&&entry.key()!="happy")throw std::runtime_error("Independent target oracle does not simulate procedural expression groups");active.push_back({&entry.value(),at->second});++selected;}}if(selected!=weights.size())throw std::runtime_error("Independent target oracle requested an absent source expression");}
+    active.clear();size_t selected=0;if(!weights.empty()){const auto &definitions=model.json.at("extensions").at("VRMC_vrm").at("expressions");for(const char *table:{"preset","custom"})if(definitions.contains(table))for(const auto &entry:definitions.at(table).items()){const auto key=std::string(table)+"/"+entry.key();if(const auto at=weights.find(key);at!=weights.end()){if(!std::isfinite(at->second)||at->second<0||at->second>1)throw std::runtime_error("Independent target oracle requires finite requested weights in [0,1]");if(std::string_view(table)=="preset"&&entry.key()!="happy")throw std::runtime_error("Independent target oracle does not simulate procedural expression groups");// VRMC_vrm-1.0 expressions.md: isBinary is on strictly above 0.5.
+        // Independent of production expression evaluation, including its boundary.
+        const float weight=entry.value().value("isBinary",false)?float(wrong_binary_threshold?at->second>=.5f:at->second>.5f):at->second;
+        active.push_back({&entry.value(),weight});++selected;}}if(selected!=weights.size())throw std::runtime_error("Independent target oracle requested an absent source expression");}
     std::vector<std::vector<cgltf_float>> node_weights(model.data->nodes_count);
     struct WeightRestore {cgltf_data *data;std::vector<std::pair<cgltf_float*,cgltf_size>> pointers;~WeightRestore(){for(size_t i=0;i<pointers.size();++i){data->nodes[i].weights=pointers[i].first;data->nodes[i].weights_count=pointers[i].second;}}} restore{model.data,{}};for(size_t i=0;i<model.data->nodes_count;++i)restore.pointers.push_back({model.data->nodes[i].weights,model.data->nodes[i].weights_count});
     for(size_t ni=0;ni<model.data->nodes_count;++ni){auto &node=model.data->nodes[ni];if(!node.mesh)continue;const auto &json=model.json.at("nodes").at(ni);const size_t count=node.mesh->primitives[0].targets_count;auto &values=node_weights[ni];values.assign(count,0);const auto defaults=json.value("weights",model.json.at("meshes").at(size_t(node.mesh-model.data->meshes)).value("weights",J::array()));for(size_t t=0;t<count&&t<defaults.size();++t)values[t]=defaults.at(t).get<float>();node.weights=values.data();node.weights_count=count;}
@@ -171,13 +188,20 @@ in vec2 uv;out vec4 result;uniform sampler2D scene;void main(){result=texture(sc
         auto m = model.json.at("materials")
                       .at(size_t(p.material - model.data->materials));
         auto &ext = m.at("extensions").at("VRMC_materials_mtoon");
+        // Material-colour bindings start from specification defaults when a
+        // source omits an optional factor; operator[] must not create null.
+        if(!m["pbrMetallicRoughness"].contains("baseColorFactor"))m["pbrMetallicRoughness"]["baseColorFactor"]=std::array<float,4>{1,1,1,1};
+        if(!m.contains("emissiveFactor"))m["emissiveFactor"]=std::array<float,3>{0,0,0};
+        if(!ext.contains("shadeColorFactor"))ext["shadeColorFactor"]=std::array<float,3>{1,1,1};
+        if(!ext.contains("matcapFactor"))ext["matcapFactor"]=std::array<float,3>{1,1,1};
+        if(!ext.contains("parametricRimColorFactor"))ext["parametricRimColorFactor"]=std::array<float,3>{0,0,0};
         const auto alpha=m.value("alphaMode",std::string("OPAQUE"));const bool blended=alpha=="BLEND",masked=alpha=="MASK";
         if((!blended&&!masked&&alpha!="OPAQUE")||!m.value("doubleSided",false))throw std::runtime_error("Independent expression-layer oracle requires opaque/blend double-sided source");
         if(blended){glEnable(GL_BLEND);glBlendEquationSeparate(GL_FUNC_ADD,GL_FUNC_ADD);glBlendFuncSeparate(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA,GL_ONE,GL_ONE_MINUS_SRC_ALPHA);glDepthMask(GL_FALSE);glDepthFunc(GL_LEQUAL);}else{glDisable(GL_BLEND);glDepthMask(GL_TRUE);glDepthFunc(GL_LESS);}glUniform1i(loc("blend"),blended?1:masked?2:0);scalar("alphaCutoff",wrong_mask_cutoff?.99f:m.value("alphaCutoff",.5f));
         const size_t material=size_t(p.material-model.data->materials);
         if(weights.empty()){
-         for(const auto &bind:expression_data.value("materialColorBinds",J::array()))if(bind.at("material").get<size_t>()==material){const std::string type=bind.at("type");J *field=type=="color"?&m["pbrMetallicRoughness"]["baseColorFactor"]:type=="shadeColor"?&m["extensions"]["VRMC_materials_mtoon"]["shadeColorFactor"]:type=="emissionColor"?&m["emissiveFactor"]:nullptr;if(!field)throw std::runtime_error("Independent layer colour type unsupported");for(size_t k=0;k<field->size();++k)(*field)[k]=field->at(k).get<double>()+(bind.at("targetValue").at(k).get<double>()-field->at(k).get<double>())*expression;}
-        }else{for(const char *type:{"color","shadeColor","emissionColor"}){J &field=std::string_view(type)=="color"?m["pbrMetallicRoughness"]["baseColorFactor"]:std::string_view(type)=="shadeColor"?m["extensions"]["VRMC_materials_mtoon"]["shadeColorFactor"]:m["emissiveFactor"];const auto initial=field;for(size_t k=0;k<field.size();++k){double value=initial.at(k).get<double>();for(const auto &e:active)for(const auto &bind:e.value->value("materialColorBinds",J::array()))if(bind.at("material").get<size_t>()==material&&bind.at("type")==type)value+=(bind.at("targetValue").at(k).get<double>()-initial.at(k).get<double>())*e.weight;field[k]=float(value);}}}
+         for(const auto &bind:expression_data.value("materialColorBinds",J::array()))if(bind.at("material").get<size_t>()==material){const std::string type=bind.at("type");J *field=type=="color"?&m["pbrMetallicRoughness"]["baseColorFactor"]:type=="shadeColor"?&m["extensions"]["VRMC_materials_mtoon"]["shadeColorFactor"]:type=="emissionColor"?&m["emissiveFactor"]:type=="rimColor"?&m["extensions"]["VRMC_materials_mtoon"]["parametricRimColorFactor"]:type=="matcapColor"?&m["extensions"]["VRMC_materials_mtoon"]["matcapFactor"]:nullptr;if(!field)throw std::runtime_error("Independent layer colour type unsupported");for(size_t k=0;k<field->size();++k)(*field)[k]=field->at(k).get<double>()+(bind.at("targetValue").at(k).get<double>()-field->at(k).get<double>())*expression;}
+        }else{for(const char *type:{"color","shadeColor","emissionColor","matcapColor","rimColor"}){J &field=std::string_view(type)=="color"?m["pbrMetallicRoughness"]["baseColorFactor"]:std::string_view(type)=="shadeColor"?m["extensions"]["VRMC_materials_mtoon"]["shadeColorFactor"]:std::string_view(type)=="emissionColor"?m["emissiveFactor"]:std::string_view(type)=="matcapColor"?m["extensions"]["VRMC_materials_mtoon"]["matcapFactor"]:m["extensions"]["VRMC_materials_mtoon"]["parametricRimColorFactor"];const auto initial=field;for(size_t k=0;k<field.size();++k){double value=initial.at(k).get<double>();for(const auto &e:active)for(const auto &bind:e.value->value("materialColorBinds",J::array()))if(bind.at("material").get<size_t>()==material&&bind.at("type")==type)value+=(bind.at("targetValue").at(k).get<double>()-initial.at(k).get<double>())*e.weight;field[k]=float(value);}}}
         if(wrong_base_tint&&pi>0){const auto &bind=expression_data.at("materialColorBinds").at(0);for(size_t k=0;k<3;++k)m["pbrMetallicRoughness"]["baseColorFactor"][k]=1+(bind.at("targetValue").at(k).get<double>()-1)*expression;}
         // Core occlusion/MR fields are PBR fallbacks, not MToon1 roles.
         for (const char *role :
@@ -185,15 +209,14 @@ in vec2 uv;out vec4 result;uniform sampler2D scene;void main(){result=texture(sc
           if (m.contains(role))
             throw std::runtime_error("Unexpected independent V1 role");
         for (const char *role :
-             {"matcapTexture", "rimMultiplyTexture",
-              "outlineWidthMultiplyTexture", "shadingShiftTexture",
+             {"outlineWidthMultiplyTexture", "shadingShiftTexture",
               "uvAnimationMaskTexture"})
           if (ext.contains(role))
             throw std::runtime_error("Unexpected independent V1 MToon role");
         auto &base = m.at("pbrMetallicRoughness");
         const auto bi = base.value("baseColorTexture",J());
         const auto si = ext.value("shadeMultiplyTexture",J());
-        const auto ei=m.value("emissiveTexture",J());
+        const auto ei=m.value("emissiveTexture",J()),mi=ext.value("matcapTexture",J()),ri=ext.value("rimMultiplyTexture",J());
         const auto ef=m.value("emissiveFactor",std::array<float,3>{});
         glUniform3fv(loc("emissionFactor"),1,ef.data());
         float strength=1;if(m.contains("extensions")&&m.at("extensions").contains("KHR_materials_emissive_strength"))strength=m.at("extensions").at("KHR_materials_emissive_strength").value("emissiveStrength",1.f);
@@ -205,6 +228,7 @@ in vec2 uv;out vec4 result;uniform sampler2D scene;void main(){result=texture(sc
         if(wrong_shared_shade&&pi>0)shadeColor={0,0,0};
         glUniform4fv(loc("baseFactor"), 1, baseColor.data());
         glUniform3fv(loc("shadeFactor"), 1, shadeColor.data());
+        auto mf=ext.value("matcapFactor",std::array<float,3>{1,1,1});if(wrong_matcap_color)mf={0,0,0};glUniform3fv(loc("matcapFactor"),1,mf.data());glUniform3f(loc("viewOrigin"),0,0,2);scalar("rimLightingMix",ext.value("rimLightingMixFactor",1.f));auto rf=ext.value("parametricRimColorFactor",std::array<float,3>{});if(wrong_rim_color)rf={0,0,0};glUniform3fv(loc("rimFactor"),1,rf.data());scalar("rimPower",ext.value("parametricRimFresnelPowerFactor",5.f));scalar("rimLift",ext.value("parametricRimLiftFactor",0.f));glUniform1i(loc("wrongMatcapView"),wrong_matcap_view);
         scalar("seconds", float(seconds));
         scalar("speed", ext.value("uvAnimationRotationSpeedFactor", 0.f));
         glUniform2f(loc("scroll"),
@@ -216,9 +240,12 @@ in vec2 uv;out vec4 result;uniform sampler2D scene;void main(){result=texture(sc
         transform(bi, "baseX", "baseY",expression_data,material,pi>0);
         transform(si, "shadeX", "shadeY",expression_data,material);
         transform(ei, "emissionX", "emissionY",expression_data,material);
+        transform(mi,"matcapX","matcapY",expression_data,material,false,!wrong_matcap_uv_target);
+        transform(ri,"rimX","rimY",expression_data,material);if(wrong_rim_uv)glUniform3f(loc("rimY"),.7f,.8f,0);
         auto bt = texture(model.data, bi, 0, "baseMap"),
              st = texture(model.data, si, 1, "shadeMap"),
-             et = texture(model.data, ei, 2, "emissionMap");
+             et = texture(model.data, ei, 2, "emissionMap"),
+             mt = texture(model.data,mi,3,"matcapMap"),rt=texture(model.data,ri,4,"rimMap");
         auto P = role_consumer::attr(p.attributes, p.attributes_count,
                                      cgltf_attribute_type_position);
         auto N = role_consumer::attr(p.attributes, p.attributes_count,
@@ -227,7 +254,7 @@ in vec2 uv;out vec4 result;uniform sampler2D scene;void main(){result=texture(sc
           throw std::runtime_error("V1 authored geometry missing");
         struct Vertex {
           Vec3 p, n;
-          std::array<float, 2> uv, shade, emission;
+          std::array<float, 2> uv, shade, emission, rim;
         };
         std::vector<Vertex> vertices;
         std::vector<role_consumer::Matrix> skin;
@@ -249,7 +276,7 @@ in vec2 uv;out vec4 result;uniform sampler2D scene;void main(){result=texture(sc
             float j[4],w[4];if(!ws||!cgltf_accessor_read_float(js,v,j,4)||!cgltf_accessor_read_float(ws,v,w,4))throw std::runtime_error("Independent V1 skin accessor missing");
             for(size_t k=0;k<4;++k)if(w[k]){wp+=role_consumer::point(skin.at(size_t(j[k])),position)*w[k];wn+=role_consumer::direction(skin_normal.at(size_t(j[k])),normal)*w[k];}
           }position=wp;normal=wn;}else{position=role_consumer::point(W,position);normal=role_consumer::direction(NW,normal);}
-          vertices.push_back({position,normal,coordinates(p,bi,v),coordinates(p,si,v),coordinates(p,ei,v)});
+          vertices.push_back({position,normal,coordinates(p,bi,v),coordinates(p,si,v),coordinates(p,ei,v),coordinates(p,ri,v)});
         }
         std::vector<uint32_t> indices;
         for (size_t c = 0; c < (p.indices ? p.indices->count : P->count); ++c)
@@ -259,14 +286,15 @@ in vec2 uv;out vec4 result;uniform sampler2D scene;void main(){result=texture(sc
         glBindBuffer(GL_ARRAY_BUFFER, vbo);
         glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex),
                      vertices.data(), GL_STREAM_DRAW);
-        for (GLuint a = 0; a < 5; ++a) {
+        for (GLuint a = 0; a < 6; ++a) {
           glVertexAttribPointer(
               a, a < 2 ? 3 : 2, GL_FLOAT, GL_FALSE, sizeof(Vertex),
               reinterpret_cast<void *>(a == 0   ? offsetof(Vertex, p)
                                        : a == 1 ? offsetof(Vertex, n)
                                        : a == 2 ? offsetof(Vertex, uv)
                                        : a == 3 ? offsetof(Vertex, shade)
-                                                : offsetof(Vertex, emission)));
+                                       : a == 4 ? offsetof(Vertex, emission)
+                                                : offsetof(Vertex, rim)));
           glEnableVertexAttribArray(a);
         }
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
@@ -277,6 +305,7 @@ in vec2 uv;out vec4 result;uniform sampler2D scene;void main(){result=texture(sc
         glDeleteTextures(1, &bt);
         glDeleteTextures(1, &st);
         glDeleteTextures(1, &et);
+        glDeleteTextures(1,&mt);glDeleteTextures(1,&rt);
       }
     }
     glBindFramebuffer(GL_FRAMEBUFFER,GLuint(destination));glViewport(0,0,96,96);glDisable(GL_DEPTH_TEST);glDepthMask(GL_TRUE);glDisable(GL_BLEND);glUseProgram(resolve);glUniform1i(glGetUniformLocation(resolve,"scene"),0);glActiveTexture(GL_TEXTURE0);glBindTexture(GL_TEXTURE_2D,color);glBindSampler(0,0);glBindVertexArray(vao);glDrawArrays(GL_TRIANGLES,0,3);

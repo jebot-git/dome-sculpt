@@ -1,3 +1,13 @@
+## Admitted keyed HDR and Rim milestone — 2026-11-05
+
+Main's runtime/header/test/build/asset bytes match0b6b59f: qualified native36
+owning125/125 per profile plus currentHDR/MatCap/Rim targeted2326, current native
+HDRGUI44/profile and actualArc1067. Read CURRENT-RIM-INTEGRATION.md and latest
+REQUIREMENTS.md for scope and preserved negative/crossdevice observations. No
+37/physical4/full782 runtime/device/compute/production-complete claim. Separate
+f95c87d owning37 continuation is live and frozen; do not restart on observation
+timeout or change its sources/scripts. Fullgoal andlater drawers remain required.
+
 ## Admitted native36 milestone — 2026-11-05
 
 Main now carries qualifieda0b8a37/seal881021c with matching source/build/tests:

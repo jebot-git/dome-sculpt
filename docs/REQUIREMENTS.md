@@ -2,46 +2,53 @@
 
 ## Current production state — 2026-11-05
 
-Main now admits the qualified native36 runtimea0b8a37/seal881021c. Its production,
-public/private headers, CMake, tests and assets match that qualified cohort.
-Original fresh-started builds retain their actual include failure/known-error
-interruption; the same owning objects complete Release ALL and owning sanitizer
-builds after build/test-only corrections. **125/125 selected tests pass per
-profile**, including all four actual frame allocation/codec fault phases.
-All source/SDK manifests remain exact and no reused production object changed.
-Native/compact/Wayland/synthetic-XR65, physical-paint GUI80 and keyed-UV55 pass
-per profile (200 UI checks each); eight GUI GLBs have zero Khronos errors.
-Actual Arc passes1129 component +19 application synthetic-XR checks, with six
-software refusal controls. Read COHERENT-NATIVE36-AUTHORING.md and its receipt.
-The766-command graph is not a complete runtime result. No physical HMD, compute,
-installation or session restart is included. Canonical DomeD FLTK stays default.
+Main now combines qualified native36 cohort881021c/a0b8a37 with current keyed-HDR,
+MatCap and Rim/cutout integration0b6b59f. Runtime, headers, tests, CMake and assets
+match0b6b59f exactly at admission. No Scene37/public canonical-owner append is
+included. FLTK remains the default with canonical DomeD bitmap/menu conventions.
 
-The private keyed HDR/MatCap milestone c494d39 and current Rim/cutout integration
-remain separate until admission. They retain exact ownership/worker/UI/device
-proof and original failed observers; no full-material or cross-device pixel-
-equivalence claim follows. Current Rim source/independent pixels match within1
-per device at fixed4, while rare CPU-versus-Arc deltas also occur in pristine
-source lookup and remain recorded. The current shader already retains XR camera
-up/head roll; reference-view conventions still need deliberate rolled-view proof.
+The native36 ABI foundation completes Release ALL and owning sanitizer builds
+and125/125 selected tests per profile, including all four actual frame allocation/
+codec fault phases. Its actual native/Wayland/synthetic-XR workflows pass200UI
+checks per profile; eight GUI GLBs have zero Khronos errors. Same-own Arc passes
+1129 component+19 application synthetic-XR checks plus six software refusals.
+Original failed/cancelled invocations and explicit same-object continuation remain
+recorded. Read COHERENT-NATIVE36-AUTHORING.md;766registered is not allruntime.
 
-A new isolated owning37/physical4/Rim candidate5414621 composes sealedbf174c3 and
-correctedcdbd7ea with current native36/HDR/Rim. It appends the genuine public
-canonical owner and private physical-image owner, so all users rebuild together.
-The initial owning sanitizer build stops on a missing private cgltf test include;
-Release ALL is explicitly interrupted for the same confirmed error. After that
-boundary four target includes and a separately qualified visible-chooser test
-observer are corrected; the same owning directories continue asf95c87d, with
-production/header/C++ test bytes unchanged. Self-contained native gesture/Save/
-UV fixtures and actual package4 worker/render/Cancel/cap/fault pipelines must
-pass; no new37/main or complete798 runtime result is claimed yet.
+Three complete product TUs extend that matching own cohort without header/layout
+or schema changes: genuine current-key FLOAT HDR package3, painted MatCap and
+Rim expressions. Targeted current-core Release/sanitizer2326 controls pass;
+actual Arc1067 and six software refusals pass. Same-own current application/
+inspector relinks pass22normal+22compact actual HDR/editable512/Open/Save checks
+per profile. All28 new-role source/output/GUI files have zero Khronos errors;
+20VRM source/output files pass official schemas. Read CURRENT-RIM-INTEGRATION.md
+and NATIVE-KEY-MATCAP-INTEGRATION.md for source/byte/owner/Cancel/budget proof.
+The original sanitizer chooser observer timeout is retained; the corrected
+observer checks visible modal closure, no default output and exact native data.
+Rare CPU-versus-Arc colour deltas also occur in pristine Rim lookup; eachdevice
+native/independent maximum1 stays within fixed4. Exact cross-device pixel
+equivalence and the old timeout's precise cause are not claimed. Four pristine
+CMake targets now declare their required private includes. No current782 whole
+runtime, physical HMD, new compute, installation or session-restart claim follows.
 
-Automatic-weight work has experimental global avatar positives but still fails
-stronger local head/toe and affine seed controls; it is not the new default.
-A source-owned Normal adapter is also independently qualifying. Full regression,
-remaining authoring/interoperability, physical devices and accelerator evidence
-remain required. The older full689 failures are preserved; newer converter test
-migration is in the separate37 candidate. Accepted XR selection remains; controller
-drawers are queued after the basic authoring targets. Full goal remains active.
+An isolated owning37/physical4/Rim candidate5414621 composes sealedbf174c3 and
+correctedcdbd7ea with the current native/HDR/Rim lineage. It appends the genuine
+public canonical owner and private physical-image owner, so all users rebuild
+together. InitialSAN stops on a private cgltf test include; ReleaseALL is then
+explicitly interrupted for that confirmed error. After that boundary, corrected
+includes and visible-chooser observer continue the same owning objects asf95c87d;
+production/header/C++ test bytes stay exact541. The actual native FLOAT fixture
+target compiles in both profiles. Remaining builds, self-contained UV/Save/
+package4 and complete160 selected gates are live, not passed.798registered is
+not a full runtime result;37 and physical4 remain outside main.
+
+Automatic weights remain experimental: stronger local head/toe and affine seed
+controls still fail, so no new automatic default is admitted. A source-owned
+Normal adapter is independently qualifying. Full regression, remaining authoring/
+interoperability, physical devices and accelerator evidence remain required.
+Older full689 failures remain preserved; converter-consumer migration is in the
+separate37 candidate. Accepted XR selection remains; controller drawers follow
+the basic targets. The full objective remains active and incomplete.
 
 ## Qualified PBR renderer specialization — 2026-11-05
 
