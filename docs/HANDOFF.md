@@ -3,8 +3,10 @@
 This private source merge combines qualified main `9dd63f9` with opt-in weights
 checkpoint `1e6d76d`. It preserves Automatic0 as the default and keeps method5
 explicit. Reserved2/3, existing methods, all resource/quality limits and complex
-prepared37/38 refusal guards remain unchanged. This candidate is not yet a
-qualified coherent application or main admission.
+prepared37/38 refusal guards remain unchanged. Initial merged Release component checks now pass: native surface25, legacy
+skin38 and retopology-worker251 prefixes/4,308 checks. Main and merged type/default
+probes match. This is not yet a qualified coherent application or main admission.
+See [initial merged R receipt](validation/MODE5-MAIN-INITIAL-R.json).
 
 The weight component passed current opt-in public/controller and independent
 pose checks, actual normal/compact FLTK, and complete real caller1052 and
