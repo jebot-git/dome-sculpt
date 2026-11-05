@@ -43,8 +43,16 @@ int main(int argc,char**argv)try{
  // The initial complete-output forecast must leave capacity for the actual
  // local support scan too. A budget one unit above that original forecast
  // reaches and refuses in the support scan, before dense PNG allocation.
- const size_t n=packet->resolution(),size=256,g=std::gcd(n,size),shared=(n/g)%2&&(size/g)%2?g:0,cells=n+size-shared+1,alpha_pixels=size_t(image.width)*image.height;
- bounded=limits;bounded.max_sample_operations=alpha_pixels+2*n*n*(1+packet->layers().size())+size*size+cells*cells*80+1;rejects(original,bounded,SIZE_MAX,"mask support prospective work");
+ // Find the actual complete-output forecast boundary through the public
+ // bounded compiler. Additive typed roles have real parameter work, so a
+ // hand-coded no-role formula cannot determine that boundary for this input.
+ size_t low=0,high=limits.max_sample_operations;
+ while(low<high){const auto middle=low+(high-low)/2;auto probe=limits;probe.max_sample_operations=middle;bool before_support=false;
+  try{(void)detail::compile_vrm1_expression_layer(original,object,*packet,256,probe,{});}catch(const std::length_error &e){const std::string_view reason=e.what();before_support=reason.find("prospective complete sampling")!=std::string_view::npos||reason.find("prospective parameter work")!=std::string_view::npos;}
+  if(before_support)low=middle+1;else high=middle;
+ }
+ bounded=limits;bounded.max_sample_operations=low;rejects(original,bounded,SIZE_MAX,"mask support prospective work");
+
  // Independent elementary geometry expectations cover face boundaries and
  // degenerate source-coordinate hulls, rather than mirroring the SAT code.
  using P=detail::mask_support::Point;const std::array<P,3> triangle{P{0,0},P{1,0},P{1,1}};
