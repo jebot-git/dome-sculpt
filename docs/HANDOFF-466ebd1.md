@@ -1,3 +1,12 @@
+> Current continuation, 2026-11-05: the complete original goal remains active.
+> REQUIREMENTS.md and PRIVATE-AUTHORING-PROGRESS.md contain current evidence.
+> Keyed HDR/MatCap integration c494d39 is sealed/pushed privately, with native
+> FLTK export/recovery and Release/sanitizer/Arc proof. Parent a0 Release125
+> passes; its same sanitizer process has completed121 and is running four fault
+> phases. Native37/package4, robust weights, remaining authoring/device work and
+> controller drawers remain incomplete. The historical checkpoint below is
+> preserved and does not describe current main or imply full completion.
+
 # Agent handoff — editable UV and universal-menu checkpoint
 
 The user requested committing/pushing the current stage and preparing a handoff;
