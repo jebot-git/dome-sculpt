@@ -23,6 +23,9 @@ class ClosestRayVisibility {
   std::vector<std::array<uint32_t,3>>faces_;
   std::vector<uint32_t>order_;
   std::vector<Node>nodes_;
+  // Optional explicit intrinsic-sheet wall domain. Never merges vertices or
+  // changes geometry: disconnected indexed surfaces are independent domains.
+  std::vector<uint32_t>components_;
   uint32_t unit_=0;
   std::shared_ptr<const uint8_t>identity_;
   template<class E>static I reduced(float value,uint32_t unit,E&exact){auto x=exact.scalar(value);if(x.sign){if(x.shift<unit)throw std::logic_error("Exact ray dyadic unit changed");x.shift-=unit;}return x;}
@@ -71,20 +74,27 @@ public:
   };
   ClosestRayVisibility(const ClosestRayVisibility&)=delete;
   ClosestRayVisibility&operator=(const ClosestRayVisibility&)=delete;
-  template<class W>ClosestRayVisibility(std::span<const P>points,std::span<const uint32_t>indices,size_t maximum_bytes,W&w){
+  template<class W>ClosestRayVisibility(std::span<const P>points,std::span<const uint32_t>indices,size_t maximum_bytes,W&w,bool component_self_occlusion=false){
     w.stop();size_t triangles=indices.size()/3;if(points.empty()||points.size()>2'000'000||!triangles||triangles>2'000'000||indices.size()%3)throw std::invalid_argument("Invalid closest-ray owning geometry");size_t depth=std::bit_width(triangles);
     planned_bytes=65536+points.size()*(sizeof(P)+sizeof(V))+triangles*(sizeof(std::array<uint32_t,3>)+sizeof(uint32_t)+2*sizeof(Node)+2*sizeof(uint32_t));construction_forecast=points.size()*16+triangles*(64+32*depth*depth);
+    if(component_self_occlusion){planned_bytes+=points.size()*2*sizeof(uint32_t);construction_forecast+=points.size()*4+indices.size()*(16+8*std::bit_width(points.size()));}
     if(planned_bytes>maximum_bytes||construction_forecast>w.maximum-w.used)throw std::length_error("Closest-ray owning construction exceeds bound before copies");
     volume_exact::Arithmetic exact(w);unit_=UINT32_MAX;
     for(auto p:points)for(float value:p){auto n=exact.scalar(value);if(n.sign)unit_=std::min(unit_,n.shift);}if(unit_==UINT32_MAX)unit_=0;
     points_.assign(points.begin(),points.end());coordinates_.reserve(points.size());for(auto p:points_){w.step(3);V v;for(size_t k=0;k<3;++k)v[k]=reduced(p[k],unit_,exact);coordinates_.push_back(v);}
-    faces_.reserve(triangles);for(size_t at=0;at<indices.size();at+=3){w.step(3);std::array<uint32_t,3>f{indices[at],indices[at+1],indices[at+2]};for(auto i:f)if(i>=points_.size())throw std::invalid_argument("Closest-ray corner outside owning geometry");faces_.push_back(f);}order_.resize(triangles);std::iota(order_.begin(),order_.end(),0);nodes_.reserve(triangles*2);build(0,uint32_t(triangles),w);identity_=std::make_shared<const uint8_t>(0);
+    faces_.reserve(triangles);for(size_t at=0;at<indices.size();at+=3){w.step(3);std::array<uint32_t,3>f{indices[at],indices[at+1],indices[at+2]};for(auto i:f)if(i>=points_.size())throw std::invalid_argument("Closest-ray corner outside owning geometry");faces_.push_back(f);}if(component_self_occlusion){
+      components_.resize(points.size());std::iota(components_.begin(),components_.end(),0);std::vector<uint32_t>sizes(points.size(),1);
+      auto root=[&](uint32_t a){while(components_[a]!=a){w.step(3);components_[a]=components_[components_[a]];a=components_[a];}return a;};
+      for(const auto&f:faces_)for(size_t k=0;k<3;++k){w.step(4);auto a=root(f[k]),b=root(f[(k+1)%3]);if(a!=b){if(sizes[a]<sizes[b])std::swap(a,b);components_[b]=a;sizes[a]+=sizes[b];}}
+      for(uint32_t v=0;v<components_.size();++v){w.step();components_[v]=root(v);}
+    }
+    order_.resize(triangles);std::iota(order_.begin(),order_.end(),0);nodes_.reserve(triangles*2);build(0,uint32_t(triangles),w);identity_=std::make_shared<const uint8_t>(0);
   }
   template<class W>bool visible(uint32_t row,P head,P tail,Scratch&scratch,W&w)const{
     w.stop();if(row>=points_.size()||scratch.geometry.get()!=identity_.get()||scratch.geometry.owner_before(identity_)||identity_.owner_before(scratch.geometry)||scratch.stack.capacity()<nodes_.size())throw std::invalid_argument("Closest-ray scratch/row owner differs");
     volume_exact::Arithmetic exact(w);uint32_t unit=unit_;for(auto p:{head,tail})for(float value:p){auto n=exact.scalar(value);if(n.sign)unit=std::min(unit,n.shift);}const uint32_t delta=unit_-unit;V p=coordinate(row,delta),a,b;for(size_t k=0;k<3;++k){a[k]=reduced(head[k],unit,exact);b[k]=reduced(tail[k],unit,exact);}auto parameter=closest(p,a,b,exact);V qnum;for(size_t k=0;k<3;++k)qnum[k]=blend(a[k],b[k],parameter,exact);bool same=true;for(size_t k=0;k<3;++k)same&=!exact.subtract(qnum[k],exact.multiply(p[k],parameter.denominator)).sign;if(same)return true;
     auto overlaps=[&](const Box&box){for(size_t k=0;k<3;++k){w.step(2);const float current=points_[row][k];if(current<box.lo[k]){if(std::max(head[k],tail[k])<box.lo[k])return false;auto bound=exact.multiply(coordinate(box.low[k],k,delta),parameter.denominator);if(exact.subtract(qnum[k],bound).sign<0)return false;}if(current>box.hi[k]){if(std::min(head[k],tail[k])>box.hi[k])return false;auto bound=exact.multiply(coordinate(box.high[k],k,delta),parameter.denominator);if(exact.subtract(qnum[k],bound).sign>0)return false;}}return true;};
-    scratch.stack.clear();scratch.stack.push_back(0);while(!scratch.stack.empty()){w.stop();auto id=scratch.stack.back();scratch.stack.pop_back();const auto&node=nodes_[id];if(!overlaps(node.box))continue;if(!node.count){scratch.stack.push_back(node.right);scratch.stack.push_back(node.left);continue;}for(uint32_t i=node.first;i<node.first+node.count;++i){w.step(4);const auto&face=faces_[order_[i]];if(std::find(face.begin(),face.end(),row)!=face.end())continue;std::array<V,3>f{coordinate(face[0],delta),coordinate(face[1],delta),coordinate(face[2],delta)};if(triangle_hit(p,a,b,qnum,parameter,f,exact))return false;}}return true;
+    scratch.stack.clear();scratch.stack.push_back(0);while(!scratch.stack.empty()){w.stop();auto id=scratch.stack.back();scratch.stack.pop_back();const auto&node=nodes_[id];if(!overlaps(node.box))continue;if(!node.count){scratch.stack.push_back(node.right);scratch.stack.push_back(node.left);continue;}for(uint32_t i=node.first;i<node.first+node.count;++i){w.step(4);const auto&face=faces_[order_[i]];if(!components_.empty()&&components_[row]!=components_[face[0]])continue;if(std::find(face.begin(),face.end(),row)!=face.end())continue;std::array<V,3>f{coordinate(face[0],delta),coordinate(face[1],delta),coordinate(face[2],delta)};if(triangle_hit(p,a,b,qnum,parameter,f,exact))return false;}}return true;
   }
 };
 } // namespace dome::detail::visibility_geodesic

@@ -3,9 +3,11 @@
 #include "bone-shadow-query.hpp"
 #include "closest-ray-visibility.hpp"
 #include "weight-surface-system.hpp"
+#include "weight-nearest-support.hpp"
 #include "dome/rig.hpp"
 #include <numeric>
 namespace dome::detail {
+enum class VisibilitySeedPolicy { ComponentBand, ExactNearestRows, ExactNearestSurfaceRows };
 struct VisibilityGeodesicResult {
   SkinWeights weights;
   size_t work=0, workspace=0, visible_seeds=0, occluded_candidates=0;
@@ -76,14 +78,15 @@ inline bool closest_visible(const ClosestRayVisibility&q,uint32_t row,
 // remains a separate prerequisite; no coordinate-only topology weld is made.
 inline VisibilityGeodesicResult visibility_geodesic_bind(
     const Mesh&m,const Skeleton&rig,BindOptions options={},
-    const std::function<bool()>&cancelled={},size_t maximum_bytes=256u*1024u*1024u) {
+    const std::function<bool()>&cancelled={},size_t maximum_bytes=256u*1024u*1024u,
+    VisibilitySeedPolicy policy=VisibilitySeedPolicy::ComponentBand) {
   using namespace visibility_geodesic;
   const size_t n=m.positions.size(),corners=m.indices.size(),bones=rig.bones.size();
-  if(!n||n>2'000'000||!corners||corners>6'000'000||corners%3||!bones||bones>256||
+  if((policy!=VisibilitySeedPolicy::ComponentBand&&policy!=VisibilitySeedPolicy::ExactNearestRows&&policy!=VisibilitySeedPolicy::ExactNearestSurfaceRows)||!n||n>2'000'000||!corners||corners>6'000'000||corners%3||!bones||bones>256||
      !options.maximum_work||options.maximum_work>500'000'000||maximum_bytes<65536||
      maximum_bytes>256u*1024u*1024u||!std::isfinite(options.maximum_seed_distance)||
      options.maximum_seed_distance<=0||options.maximum_seed_distance>10000||
-     !std::isfinite(options.seed_margin)||options.seed_margin<0||options.seed_margin>options.maximum_seed_distance||
+     !std::isfinite(options.seed_margin)||options.seed_margin<0||(policy==VisibilitySeedPolicy::ComponentBand&&options.seed_margin>options.maximum_seed_distance)||
      !std::isfinite(options.falloff)||options.falloff<1||options.falloff>8||
      !options.limits.max_influences||options.limits.max_influences>32||
      !std::isfinite(options.limits.prune)||options.limits.prune<0||options.limits.prune>=1)
@@ -99,7 +102,7 @@ inline VisibilityGeodesicResult visibility_geodesic_bind(
   bytes.add(bones,2*sizeof(Point)+4*sizeof(RigMatrix)+512);
   std::vector<Point>points;points.reserve(n);
   for(auto p:m.positions){work.step(3);if(std::max({std::abs(p.x),std::abs(p.y),std::abs(p.z)})>10000)throw std::invalid_argument("Visibility mesh exceeds metric workspace");points.push_back({p.x,p.y,p.z});}
-  ClosestRayVisibility query(points,m.indices,maximum_bytes-bytes.used,work);
+  ClosestRayVisibility query(points,m.indices,maximum_bytes-bytes.used,work,policy==VisibilitySeedPolicy::ExactNearestSurfaceRows);
   bytes.add(query.planned_bytes);ClosestRayVisibility::Scratch scratch(query);
   std::vector<size_t>starts(n+1),cursor(n);
   std::vector<uint32_t>parent(n);std::iota(parent.begin(),parent.end(),0);
@@ -117,17 +120,31 @@ inline VisibilityGeodesicResult visibility_geodesic_bind(
   }
   auto segments=rig.segments();float scale=1e-5f;
   for(size_t b=0;b<bones;++b){work.step();if(rig.bones[b].deform)scale=std::max(scale,length(segments[b][1]-segments[b][0])*.02f);}
+  std::vector<std::array<uint64_t,4>>nearest;
+  std::array<uint32_t,256>source_rows{};
+  if(policy!=VisibilitySeedPolicy::ComponentBand){
+    // Selection is prospective and visibility-independent. An occluded
+    // closest source never causes a retry with a farther control.
+    bytes.add(n,sizeof(std::array<uint64_t,4>));
+    bytes.add(bones,sizeof(HeatSourceSegment)+64);
+    std::vector<HeatSourceSegment>sources;sources.reserve(bones);
+    for(uint32_t b=0;b<bones;++b)if(rig.bones[b].deform){work.step(8);const auto&a=segments[b][0],&z=segments[b][1];sources.push_back({{a.x,a.y,a.z},{z.x,z.y,z.z},b});}
+    NearestWeightSources select(sources,work);nearest.reserve(n);
+    for(auto p:points){work.step(4);auto mask=select.nearest(p,work);nearest.push_back(mask);for(size_t k=0;k<4;++k){auto bits=mask[k];while(bits){work.step(2);auto joint=uint32_t(k*64+std::countr_zero(bits));if(joint>=bones)throw std::logic_error("Nearest source row joint changed");++source_rows[joint];bits&=bits-1;}}}
+  }
   std::vector<VertexWeights>candidate(n);for(auto&row:candidate)row.reserve(options.limits.max_influences);
   std::vector<float>direct(n),dist(n),best(n);
   std::vector<uint32_t>order(n);std::vector<uint8_t>finalized(n),seeded(n);
   Heap heap(n,dist,work);VisibilityGeodesicResult result;
-  for(uint32_t bone=0;bone<bones;++bone)if(rig.bones[bone].deform){
+  for(uint32_t bone=0;bone<bones;++bone)if(rig.bones[bone].deform&&(policy==VisibilitySeedPolicy::ComponentBand||source_rows[bone])){
     Point a{segments[bone][0].x,segments[bone][0].y,segments[bone][0].z},b{segments[bone][1].x,segments[bone][1].y,segments[bone][1].z};
     std::fill(best.begin(),best.end(),INFINITY);std::fill(dist.begin(),dist.end(),INFINITY);std::fill(finalized.begin(),finalized.end(),0);heap.reset();
-    for(uint32_t v=0;v<n;++v){work.step(32);direct[v]=distance(points[v],a,b);order[v]=v;}
-    std::sort(order.begin(),order.end(),[&](auto x,auto y){work.step();return direct[x]<direct[y]||(direct[x]==direct[y]&&x<y);});
-    for(auto v:order){work.step();if(direct[v]>options.maximum_seed_distance)break;auto component=parent[v];
-      if(direct[v]>best[component]+options.seed_margin)continue;
+    for(uint32_t v=0;v<n;++v){work.step();order[v]=v;if(policy==VisibilitySeedPolicy::ComponentBand||(nearest[v][bone/64]&(uint64_t(1)<<(bone%64)))){work.step(32);direct[v]=distance(points[v],a,b);}}
+    if(policy==VisibilitySeedPolicy::ComponentBand)
+      std::sort(order.begin(),order.end(),[&](auto x,auto y){work.step();return direct[x]<direct[y]||(direct[x]==direct[y]&&x<y);});
+    for(auto v:order){work.step();if(policy!=VisibilitySeedPolicy::ComponentBand&&!(nearest[v][bone/64]&(uint64_t(1)<<(bone%64))))continue;
+      if(direct[v]>options.maximum_seed_distance){if(policy==VisibilitySeedPolicy::ComponentBand)break;continue;}auto component=parent[v];
+      if(policy==VisibilitySeedPolicy::ComponentBand&&direct[v]>best[component]+options.seed_margin)continue;
       if(!closest_visible(query,v,a,b,scratch,work)){++result.occluded_candidates;continue;}
       best[component]=std::min(best[component],direct[v]);seeded[component]=1;dist[v]=direct[v];heap.decrease(v);++result.visible_seeds;
     }
@@ -154,7 +171,8 @@ namespace dome::detail {
 inline VisibilityGeodesicResult visibility_geodesic_bind_object(
     const SculptObject&object,const Skeleton&target_local_rig,
     BindOptions options={},const std::function<bool()>&cancelled={},
-    size_t maximum_bytes=256u*1024u*1024u) {
+    size_t maximum_bytes=256u*1024u*1024u,
+    VisibilitySeedPolicy policy=VisibilitySeedPolicy::ComponentBand) {
   if(!object.id||!object.painted||maximum_bytes<65536||maximum_bytes>256u*1024u*1024u||
      !options.maximum_work||options.maximum_work>500'000'000||
      !options.limits.max_influences||options.limits.max_influences>32)
@@ -196,7 +214,7 @@ inline VisibilityGeodesicResult visibility_geodesic_bind_object(
   if(work.used>=options.maximum_work||expansion>options.maximum_work-work.used)
     throw std::length_error("Sewn visibility field work forecast exceeded");
   auto field_options=options;field_options.maximum_work-=work.used+expansion;
-  auto result=visibility_geodesic_bind(domain,target_local_rig,field_options,cancelled,maximum_bytes-retained.used);
+  auto result=visibility_geodesic_bind(domain,target_local_rig,field_options,cancelled,maximum_bytes-retained.used,policy);
   SkinWeights raw;raw.vertices.reserve(n);
   for(auto v:raw_to_domain){work.step(options.limits.max_influences+2);raw.vertices.push_back(result.weights.vertices.at(v));}
   result.weights=std::move(raw);result.work+=work.used;
