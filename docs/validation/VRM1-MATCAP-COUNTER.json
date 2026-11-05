@@ -1,0 +1,133 @@
+{
+  "format": 1,
+  "scope": "Actual authored MatCap image and matcapColor target on genuine painted V1 source, prior sealedbd3 producer; complete whole public worker consumer only. Native paint/Save/source owner preserved, no runtime mutation.",
+  "base": "43e02c0b27352375fd695383b802f9fc6289618f",
+  "status": {
+    "state": "terminal",
+    "pid": 1488564,
+    "steps": [
+      {
+        "name": "compile-vrm1-expression-layer-authoring",
+        "command": [
+          "/usr/bin/c++",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-role-audit-43e/src",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-role-audit-43e/third_party/cgltf",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-role-audit-43e/include",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-role-audit-43e/third_party/openbrush",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/vrm1-role-audit-43e/third_party/nlohmann",
+          "-O3",
+          "-DNDEBUG",
+          "-std=gnu++20",
+          "-o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-role-audit-43e/artifacts/role-audit/counter-release/stage/vrm1-expression-layer-authoring.cpp.o",
+          "-c",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-role-audit-43e/tests/vrm1-expression-layer-authoring.cpp"
+        ],
+        "exit": 0,
+        "seconds": 14.723029646032955
+      },
+      {
+        "name": "link-worker",
+        "command": [
+          "/usr/bin/c++",
+          "-O3",
+          "-DNDEBUG",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-role-audit-43e/artifacts/role-audit/counter-release/stage/vrm1-expression-layer-authoring.cpp.o",
+          "-o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-role-audit-43e/artifacts/role-audit/counter-release/stage/worker",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-role-audit-43e/artifacts/role-audit/counter-release/stage/libdome-sculpt-core.a",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-role-audit-43e/artifacts/role-audit/counter-release/stage/libdome-sculpt-affine.a",
+          "/usr/lib64/liblapacke.so",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-role-audit-43e/artifacts/role-audit/counter-release/stage/libdome-sculpt-polygon.a",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-role-audit-43e/artifacts/role-audit/counter-release/stage/libxatlas.a",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-role-audit-43e/artifacts/role-audit/counter-release/stage/libmikktspace.a",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-role-audit-43e/artifacts/role-audit/counter-release/stage/libmikktspace-robust.a",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-role-audit-43e/artifacts/role-audit/counter-release/stage/libufbx.a",
+          "/usr/lib64/libpng.so",
+          "/usr/lib64/libjpeg.so",
+          "/usr/lib64/libz.so",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-role-audit-43e/artifacts/role-audit/counter-release/stage/libdome-sculpt-emission-codec.a",
+          "/usr/lib64/libOpenEXR-3_2.so",
+          "/usr/lib64/libOpenEXRUtil-3_2.so",
+          "/usr/lib64/libOpenEXRCore-3_2.so",
+          "/usr/lib64/libIex-3_2.so",
+          "/usr/lib64/libIlmThread-3_2.so",
+          "/usr/lib64/libImath-3_1.so",
+          "-lgcc_s_asneeded",
+          "-lgcc_s_asneeded",
+          "-Wl,--wrap=fsync"
+        ],
+        "exit": 0,
+        "seconds": 0.608351620961912
+      },
+      {
+        "name": "initial-factor-refusal",
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-role-audit-43e/artifacts/role-audit/counter-release/stage/worker",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-expression-preview-1853cc3/build-preview-release/vrm1-background-fixture/source.vrm",
+          "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-role-audit-43e/artifacts/role-audit/counter-release/run",
+          "--old-refusal",
+          "--matcap"
+        ],
+        "exit": 0,
+        "seconds": 0.150425762985833
+      }
+    ],
+    "scope": "Untouched sealedbd3 runtime on copied immutable own matching support, whole NEW counter consumer only. Genuine two-stroke native paint plus actual source MatCap image and color target; Save and actual editable Avatar worker refusal, no product changes or full newbuild claim.",
+    "child_pid": 1490804,
+    "exit": 0,
+    "seconds": 15.648269457975402,
+    "inputs": 1901,
+    "drift": []
+  },
+  "actual_log": "PASS Actual original source retains both skins and rigid part\nPASS Actual source mesh: \nPASS Actual visible active source part supplies the native paint ray\nPASS Genuine independent colour/coverage stroke enters actual native worker\nPASS Genuine nonuniform paint worker retires\nPASS Actual source mesh: \nPASS Actual visible active source part supplies the native paint ray\nPASS Genuine independent colour/coverage stroke enters actual native worker\nPASS Genuine nonuniform paint worker retires\nPASS Actual source mesh: \nPASS Real source/paint owner persists before export counterfactual\nPASS Actual EditableAvatar file worker reaches its failure endpoint\nOLD_DYNAMIC_EXPRESSION_REFUSAL VRM1 expression layer role needs its independent consumer adapter\nPASS Actual painted worker refuses unresolved source/paint expression coupling\nPASS Genuine refusal preserves prior output and complete original source/paint Scene\nPASS 14 actual old dynamic counterfactual checks\n",
+  "note": "Runner inherited step/log name initial-factor-refusal; actual arguments --matcap and actual failure are MatCap role adapter, not initial shade factor.",
+  "source_sha256": "5245efc3079e596260e8cfb1fd400dce3333167342e7af1c04e8d849db8b7a3e",
+  "output_digests": {
+    "artifacts/role-audit/counter-release/run/source-matcap.vrm": "0c017b9d4ea81ce59a207c4adfaad1638c51af82164d438f0cc23ad7ce2df0e7",
+    "artifacts/role-audit/counter-release/run/nonuniform-source.dsculpt": "4373738f8d3e2649a96704d7ff121af19d3cd1304d00051454646080e147556e",
+    "artifacts/role-audit/counter-release/run/dynamic.vrm": "db36251b3c135816ae9671421f0013791db8790de3cf74d2982da66e5293ed60"
+  },
+  "primary_source_audit": {
+    "commit": "efd20f62f1bf0ac3fcc34de1e497324c5197d146",
+    "source_audit_only_not_copied_into_runtime": true,
+    "files": [
+      {
+        "url": "https://raw.githubusercontent.com/vrm-c/UniVRM/efd20f62f1bf0ac3fcc34de1e497324c5197d146/Packages/VRM10/MToon10/Shaders/vrmc_materials_mtoon_lighting_mtoon.hlsl",
+        "sha256": "9450a91f375b30fde1e0a7e85d133fefb3eca5e80c72bfe9f4bb2370bfd45ba9",
+        "bytes": 7485
+      },
+      {
+        "url": "https://raw.githubusercontent.com/vrm-c/UniVRM/efd20f62f1bf0ac3fcc34de1e497324c5197d146/Packages/VRM10/MToon10/Shaders/vrmc_materials_mtoon_geometry_uv.hlsl",
+        "sha256": "4f9d3d49569c59003ca103492dc5258675f37b94ce8d547a1c20578e29838a9c",
+        "bytes": 1202
+      },
+      {
+        "url": "https://raw.githubusercontent.com/vrm-c/UniVRM/efd20f62f1bf0ac3fcc34de1e497324c5197d146/Packages/VRM10/MToon10/Shaders/vrmc_materials_mtoon_input.hlsl",
+        "sha256": "aa27df0349179ed4bf553242bb47df015fd329234d0297be5786e2c6d6547aad",
+        "bytes": 1265
+      },
+      {
+        "url": "https://raw.githubusercontent.com/vrm-c/UniVRM/efd20f62f1bf0ac3fcc34de1e497324c5197d146/Packages/UniGLTF/Runtime/UniGLTF/IO/Axes.cs",
+        "sha256": "d88a312fa944054938e0fd9c290836643c0ea7fb133cdc3a8a9e771bfbadfd04",
+        "bytes": 1676
+      },
+      {
+        "url": "https://raw.githubusercontent.com/vrm-c/UniVRM/efd20f62f1bf0ac3fcc34de1e497324c5197d146/Packages/UniGLTF/Runtime/UniGLTF/IO/MaterialIO/TextureTransform.cs",
+        "sha256": "65d828bba93a79b5c8dca91ca045b4bda20f8292e58ff3b92d56fb5f5841817e",
+        "bytes": 641
+      },
+      {
+        "url": "https://raw.githubusercontent.com/vrm-c/UniVRM/efd20f62f1bf0ac3fcc34de1e497324c5197d146/Packages/VRM10/Runtime/IO/Vrm10ImportData.cs",
+        "sha256": "b4a25898e3851bdf0a64d078bf737fb96547e373f77e66c07c96920a9e3c99df",
+        "bytes": 18934
+      },
+      {
+        "url": "https://raw.githubusercontent.com/vrm-c/UniVRM/efd20f62f1bf0ac3fcc34de1e497324c5197d146/Packages/VRM10/vrmlib/Runtime/Coordinates.cs",
+        "sha256": "0d4c745a149c53b23bb525e40d5dd72b7de7c361a5fe2bd6fd80453097fa403a",
+        "bytes": 1229
+      }
+    ]
+  },
+  "open_question": "README illustrative .495 vs actual pinned UniVRM .5 is not itself a native defect. Coordinate/view/row conversion must be authenticated before selecting independent MatCap reference. No native/shared shader/helper edits or role-guard lift yet."
+}
