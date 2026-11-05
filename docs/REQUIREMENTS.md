@@ -106,6 +106,19 @@ finishes successfully after43,388seconds, including66,187 persistent denial
 prefixes and908 cancellation points; its closure is preserved separately.
 The full objective remains active and incomplete.
 
+## Current combined candidate closure — 2026-11-05
+
+Private5df649d now passes33/33 selected commands per Release/sanitizer, actual
+key UI70/profile andstrictArc226/63views with actualsoftware/UHD refusals. Source,
+SDK and unchangedproduction objects remain exact; core164members changeonly4
+expected TUs. Publicheaders/layouts are unchanged from the owningd6cohort. This
+is not814runtime ormainadmission. Originalf365SAN has nowclosed153/160 after
+9302.676s: its sixoriginalfailures plus the actualpackage4 allocation test's
+3600.04s timeout (baseline90259, lastcompletedprefix11750). Fullcoverage remains
+open. Deterministic exhaustive partitions with coverage aggregation must retain
+every prefix/exactsource/priorfile/recovery check; no sample or blindtimeoutraise
+counts as closing it. Original failed logs andseparateliveagent sweeps remain.
+
 ## Qualified PBR renderer specialization — 2026-11-05
 
 Runtime79abe8e keeps authored sampling/math unchanged while specializing actual

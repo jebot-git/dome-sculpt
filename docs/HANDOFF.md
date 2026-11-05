@@ -1,3 +1,25 @@
+## Latest finite-job closure — 2026-11-05
+
+Main runtime remains admittedc179/615bd42; current637 adds corrected optional
+schema tooling/docs only. Private current5df649d has now passed all33 selected
+registered tests in both profiles (11real key/history/quota/repeatedUV plus22
+normal/six strictpreflight commands), actualkey GUI34normal+36compact/profile,
+and strictArc226/63views with software/UHD refusals.164-member audits change
+exactly4 expected TUs; all unchanged production objects/input hashes stay exact.
+Its source is pushed on work/authoring37-normal-f365, outside main.
+
+Original f365 sanitizer handle10303 is now AUTHORITATIVELY CLOSED8 after9302.676s,
+not live. It finishes153/160selected: original six failures plus the final package4
+allocation sweep's actual CTest3600.04s timeout. That genuine fixture measures90259
+C++ allocations and prints completion through11750 before timeout. No drift,
+no success relabel, no restart-on-observation-timeout. Complete prefix coverage
+remains required before larger37 admission. Next work must preserve that failure
+and all per-prefix source/file/recovery checks, using deterministic exhaustive
+partitions and coverage aggregation or a demonstrated performance repair rather
+than sampled prefixes or a blind time-limit increase. Palette's two original
+long sanitizer sweeps are separate and must not be disturbed. All root jobs from
+this checkpoint are closed; verify new agent state independently.
+
 ## Corrected official-schema reference validation — 2026-11-05
 
 Main includes optional tests/vrm-official-texture-schemas.py with explicit pinned
