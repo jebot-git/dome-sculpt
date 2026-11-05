@@ -1188,3 +1188,5 @@ VRM1-COHERENT-INTEGRATION.md. Root vendor all-target builds now pass on a
 frozen copy (build-only; see validation/VRM1-VENDOR-BUILDS.json). Full V1/physics/
 HDR/painting and broader workflow requirements stay
 open. This is not an all535-test or full-goal completion claim.
+
+VRM1 expression preflight repair is independently qualified on public0b6 matching support: source-material Rim relevance is collected during existing scan, no-relevant rejection precedes role work, exact old poll/image/work bounds unchanged. Registered unused-material/foreign-Rim controls and complete affected fault/Cancel/native worker suites R/S pass, plus matching actual normal/compact FLTK smoke. One product TU, no new layout/schema/domain admission; current37/Normal and remaining full-VRM requirements stay separate. Evidence: VRM1-EXPRESSION-PREFLIGHT.md/JSON.

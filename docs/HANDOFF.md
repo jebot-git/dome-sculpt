@@ -2403,3 +2403,5 @@ common-refinement are separate approved record4 kinds within owning29/material12
 conditional Paint5/domain2/frame-position3/normal6 only apply when used. Full
 native/UI/persistence/render/export remain required; no public DTO/schema edits.
 Read KEY-MIRROR-PLANE.md and its receipt.
+
+Public-main-matched VRM1 preflight repair62ec13e: one Layer TU +two lasting controls in existing registered targets-faults, no layout/schema/shader/API change. Allfive strict fault/worker domains plus actualactiveRim fullcontrols R/S0 (268.013/1953.161s), final1857 defaulttarget checks R/S0, actualold-main app/inspector relink+normal22/compact22 perprofile0 (55.274/74.379s), canonicalSDKmaps exact. Distinct current37 ABI also qualifies; original late failures/prototype/wrapper statuses remain. See VRM1-EXPRESSION-PREFLIGHT.md/JSON. Parent review/main publication remains separate; full VRM goal continues.
