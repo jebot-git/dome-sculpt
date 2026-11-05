@@ -109,6 +109,7 @@ inline NativeSurfaceHeatPrepared prepare_native_surface_heat(const NativeSurface
   bytes.add(input.objects().size(),sizeof(SculptObject)+512);bytes.add(input.groups().size(),sizeof(SceneGroup)+512);
   bytes.add(request.targets_.size(),sizeof(NativeSurfaceHeatReport::Part)+256);
   const auto&reference=input.object(request.reference_);const auto&ref=*reference.deformation;
+  weight_surface::validate_rest_deformation(ref,reference.painted->mesh(),work);
   // Plan all staged current rig/morph/output storage before any copies. No
   // solved skin values from the reference are consulted by field construction.
   for(auto id:request.support_){const auto&o=input.object(id);work.step(256);
