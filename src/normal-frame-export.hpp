@@ -3,6 +3,7 @@
 #include "normal-frame-runtime.hpp"
 #include "export-corner-coordinates.hpp"
 #include "native-paint-sampling.hpp"
+#include "canonical-paint-sampling.hpp"
 #include "native-paint-export-policy.hpp"
 #include "dome/color-paint-sampling.hpp"
 #include "source-morph.hpp"
@@ -168,11 +169,18 @@ inline NormalFrameExport normal_frame_export(const ObjectSurface &input,SourceMo
   auto layout=normal_frame_layout(input.mesh,set,cancelled);NormalFrameExport out;
   if(input.paint_sampling_attachment||!input.paint_corner_coordinates.empty()) {
     const auto node=binding.color_preparation?binding.color_preparation->paint_sampling:nullptr;
-    const auto expected=node?node->geometry_attachment():nullptr;
-    if(legacy||binding.has_mtoon||!retained||!expected||expected!=input.paint_sampling_attachment||
+    const auto canonical=binding.canonical_paint_sampling;
+    const auto expected=node?node->geometry_attachment():canonical?canonical->attachment():nullptr;
+    if(legacy||binding.has_mtoon||(!canonical&&!retained)||!expected||expected!=input.paint_sampling_attachment||
         expected.owner_before(input.paint_sampling_attachment)||input.paint_sampling_attachment.owner_before(expected))
       throw std::invalid_argument("Paint sampling export requires its own supported native colour/normal attachment");
-    node->validate_current(input.mesh,cancelled);
+    if(canonical){
+      // The normal frame/current key proof above is independent of writable
+      // paint. Authenticate this actual material owner and exact current UV
+      // geometry before using its ordered paint-corner stream.
+      canonical->validate_binding(binding,true);
+      canonical->normal_uv()->validate_current(input.mesh,cancelled);
+    }else node->validate_current(input.mesh,cancelled);
     PaintSamplingLimits limits;limits.cancelled=cancelled;
     auto corners=expected->domain()->corner_coordinates(input.mesh,limits);
     if(corners!=input.paint_corner_coordinates)throw std::invalid_argument("Paint export corner stream differs from its own REST/domain proof");
