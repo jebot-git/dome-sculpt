@@ -8,8 +8,18 @@
 #include <map>
 struct V1ExpressionLayerConsumer {
   using J=nlohmann::json;
+  using WideMatrix=std::array<double,16>;
+  static WideMatrix wide(const role_consumer::Matrix &m){WideMatrix out{};std::copy(m.begin(),m.end(),out.begin());return out;}
+  static WideMatrix product(const WideMatrix &a,const WideMatrix &b){WideMatrix out{};for(size_t column=0;column<4;++column)for(size_t row=0;row<4;++row)for(size_t k=0;k<4;++k)out[column*4+row]+=a[k*4+row]*b[column*4+k];return out;}
+  static WideMatrix world_matrix(const cgltf_node &node){
+    std::vector<const cgltf_node*> path;for(auto n=&node;n;n=n->parent){if(path.size()==256||std::find(path.begin(),path.end(),n)!=path.end())throw std::runtime_error("Independent source node ancestry is cyclic or excessive");path.push_back(n);}
+    WideMatrix out{};out[0]=out[5]=out[10]=out[15]=1;
+    for(auto at=path.rbegin();at!=path.rend();++at){role_consumer::Matrix local{};cgltf_node_transform_local(*at,local.data());out=product(out,wide(local));}return out;
+  }
+  static std::array<double,3> point(const WideMatrix &m,Vec3 p){return {m[0]*p.x+m[4]*p.y+m[8]*p.z+m[12],m[1]*p.x+m[5]*p.y+m[9]*p.z+m[13],m[2]*p.x+m[6]*p.y+m[10]*p.z+m[14]};}
   float expression=0;int pose=0,selected_node=-1;bool wrong_mask_cutoff=false,wrong_paint_uv=false,wrong_base_tint=false,wrong_shared_shade=false;
-  bool wrong_binary_threshold=false,wrong_source_uv=false,wrong_matcap_view=false,wrong_matcap_uv_target=false,wrong_matcap_color=false,wrong_rim_color=false,wrong_rim_uv=false,wrong_rim_mix=false;
+  bool coverage_only=false,wrong_upper_filter=false,drawing_upper=false;
+  bool wrong_float_transform=false,wrong_float_world=false,wrong_matcap_animation=false,wrong_binary_threshold=false,wrong_source_uv=false,wrong_matcap_view=false,wrong_matcap_uv_target=false,wrong_matcap_color=false,wrong_rim_color=false,wrong_rim_uv=false,wrong_rim_mix=false;
   bool wrong_normal_scale=false,wrong_normal_uv=false,wrong_normal_hand=false,wrong_normal_srgb=false;
   bool wrong_shift_scale=false,wrong_shift_uv=false,wrong_shift_srgb=false,wrong_shift_channel=false;
   std::map<std::string,float> weights;
@@ -24,15 +34,21 @@ uniform mat4 camera;out vec3 n,world;out vec2 uv,shadeUV,emissionUV,rimUV,normal
 void main(){n=N;world=p;uv=UV;shadeUV=SU;emissionUV=EU;rimUV=RU;normalUV=NU;shiftUV=HU;tangent=normalize(T.xyz);tangentHand=T.w;gl_Position=camera*vec4(p,1);})GLSL";
     const char *fs = R"GLSL(#version 330 core
 in vec3 n,world;in vec2 uv,shadeUV,emissionUV,rimUV,normalUV,shiftUV;in vec3 tangent;in float tangentHand;out vec4 result;
-uniform sampler2D baseMap,shadeMap,emissionMap,matcapMap,rimMap,normalMap,shiftMap;uniform int basePresent,shadePresent,emissionPresent,matcapPresent,rimPresent,normalPresent,shiftPresent,wrongMatcapView,wrongShiftChannel;uniform float normalScale,shiftTextureScale;
+uniform sampler2D baseMap,shadeMap,emissionMap,matcapMap,rimMap,normalMap,shiftMap;uniform int basePresent,shadePresent,emissionPresent,matcapPresent,rimPresent,normalPresent,shiftPresent,wrongMatcapView,wrongShiftChannel,wrongMatcapAnimation;uniform float normalScale,shiftTextureScale;
 uniform vec3 matcapFactor,rimFactor,viewOrigin;uniform float rimLightingMix,rimPower,rimLift;
 uniform vec3 emissionFactor;uniform float emissionStrength;
 uniform int blend;uniform float alphaCutoff;uniform vec4 baseFactor;uniform vec3 shadeFactor;
+uniform int onlyCoverage;
+uniform int wrongFloatTransform;
 uniform vec2 scroll;uniform float speed,seconds,shift,toony,equalization;
 uniform vec3 baseX,baseY,shadeX,shadeY,emissionX,emissionY,matcapX,matcapY,rimX,rimY,normalX,normalY,shiftX,shiftY;
 vec2 animated(vec2 u){float a=speed*seconds;vec2 q=u-.5;
 return vec2(cos(a)*q.x+sin(a)*q.y,-sin(a)*q.x+cos(a)*q.y)+.5+scroll*seconds;}
-vec2 mapped(vec2 u,vec3 X,vec3 Y){vec2 q=animated(u)*X.xy;float c=cos(X.z),s=sin(X.z);return mat2(c,s,-s,c)*q+Y.xy;}
+// Independent expansion of the KHR scale -> rotation -> offset matrix.
+// Keep the actual float stages explicit: a contracted matrix intrinsic can
+// land on the other side of a genuine nearest-texel discontinuity.
+vec2 mappedStatic(vec2 u,vec3 X,vec3 Y){vec2 q=u*X.xy;float c=cos(X.z),s=sin(X.z);if(wrongFloatTransform==1)return mat2(c,s,-s,c)*q+Y.xy;return vec2(c*q.x-s*q.y,s*q.x+c*q.y)+Y.xy;}
+vec2 mapped(vec2 u,vec3 X,vec3 Y){return mappedStatic(animated(u),X,Y);}
 // Independent pinned UniVRM view-normal lookup, in its left-handed frame.
 // Reflect X for glTF -> Unity, then flip texture V back to glTF's top row.
 // This expresses coordinate conversion, not a call to the native UV helper.
@@ -42,14 +58,16 @@ vec2 q=.5+.5*vec2(dot(X,L),dot(Y,L));return vec2(q.x,1-q.y);}
 void main(){vec3 N=normalize(n);if(!gl_FrontFacing)N=-N;
 if(normalPresent==1){vec3 q=texture(normalMap,mapped(normalUV,normalX,normalY)).rgb*2-1;q.xy*=normalScale;vec3 T=normalize(tangent),B=normalize(cross(N,T))*tangentHand;N=normalize(T*q.x+B*q.y+N*q.z);}
 vec4 lit=(basePresent==1?texture(baseMap,mapped(uv,baseX,baseY)):vec4(1))*baseFactor;
+// Preserve original lower depth/occlusion while observing only upper alpha.
+if(onlyCoverage==1){result=vec4(0,0,0,blend==1?lit.a:0.0);return;}
 vec3 shade=(shadePresent==1?texture(shadeMap,mapped(shadeUV,shadeX,shadeY)).rgb:vec3(1))*shadeFactor;
 vec4 shiftTexel=shiftPresent==1?texture(shiftMap,mapped(shiftUV,shiftX,shiftY)):vec4(0);
 float width=1-toony,x=dot(N,normalize(vec3(-.4,.8,.7)))+shift+(wrongShiftChannel==1?shiftTexel.g:shiftTexel.r)*shiftTextureScale;
-float ratio=width<=.0000001?step(0,x):clamp((x+width)/(2*width),0,1);
+float ratio=width<=.0000001?step(0.0,x):clamp((x+width)/(2*width),0.0,1.0);
 float rawGi=mix(.1,.25,.5+.5*N.y),gi=mix(rawGi,.175,equalization);
 vec3 emission=(emissionPresent==1?texture(emissionMap,mapped(emissionUV,emissionX,emissionY)).rgb:vec3(1))*emissionFactor*emissionStrength;
 vec3 V=normalize(viewOrigin-world);vec2 M=wrongMatcapView==1?uv:viewLookup(N,V);
-vec3 matcap=matcapPresent==1?texture(matcapMap,mapped(M,matcapX,matcapY)).rgb*matcapFactor:vec3(0);
+vec3 matcap=matcapPresent==1?texture(matcapMap,wrongMatcapAnimation==1?mapped(M,matcapX,matcapY):mappedStatic(M,matcapX,matcapY)).rgb*matcapFactor:vec3(0);
 vec3 rim=rimFactor*pow(clamp(1-dot(N,V)+rimLift,0.,1.),max(rimPower,.00001));
 matcap=(matcap+rim)*(rimPresent==1?texture(rimMap,mapped(rimUV,rimX,rimY)).rgb:vec3(1))*mix(1.,1.+rawGi,rimLightingMix);
 // Evaluate all implicitly filtered role textures before divergent discard.
@@ -130,6 +148,7 @@ in vec2 uv;out vec4 result;uniform sampler2D scene;void main(){result=texture(sc
                     t.sampler && t.sampler->mag_filter ? t.sampler->mag_filter
                                                        : GL_LINEAR);
     glGenerateMipmap(GL_TEXTURE_2D);
+    if(wrong_upper_filter&&drawing_upper&&std::string_view(uniform)=="baseMap"){glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_NEAREST);glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_NEAREST);}
     glUniform1i(loc(uniform), unit);
     return id;
   }
@@ -185,9 +204,10 @@ in vec2 uv;out vec4 result;uniform sampler2D scene;void main(){result=texture(sc
       role_consumer::Matrix W{};
       cgltf_node_transform_world(&node, W.data());
 
-      auto NW = role_consumer::normal_matrix(W);
+      auto NW = role_consumer::normal_matrix(W);const auto precise_world=world_matrix(node);
       for (size_t pi = 0; pi < node.mesh->primitives_count; ++pi) {
         auto &p = node.mesh->primitives[pi];
+        drawing_upper=pi>0;glUniform1i(loc("onlyCoverage"),coverage_only);
         if (!p.material)
           throw std::runtime_error("V1 oracle requires authored material");
         auto m = model.json.at("materials")
@@ -228,7 +248,8 @@ in vec2 uv;out vec4 result;uniform sampler2D scene;void main(){result=texture(sc
         if(wrong_shared_shade&&pi>0)shadeColor={0,0,0};
         glUniform4fv(loc("baseFactor"), 1, baseColor.data());
         glUniform3fv(loc("shadeFactor"), 1, shadeColor.data());
-        auto mf=ext.value("matcapFactor",std::array<float,3>{1,1,1});if(wrong_matcap_color)mf={0,0,0};glUniform3fv(loc("matcapFactor"),1,mf.data());glUniform3f(loc("viewOrigin"),0,0,2);scalar("rimLightingMix",wrong_rim_mix?0.f:ext.value("rimLightingMixFactor",1.f));auto rf=ext.value("parametricRimColorFactor",std::array<float,3>{});if(wrong_rim_color)rf={0,0,0};glUniform3fv(loc("rimFactor"),1,rf.data());scalar("rimPower",ext.value("parametricRimFresnelPowerFactor",5.f));scalar("rimLift",ext.value("parametricRimLiftFactor",0.f));glUniform1i(loc("wrongMatcapView"),wrong_matcap_view);
+        auto mf=ext.value("matcapFactor",std::array<float,3>{1,1,1});if(wrong_matcap_color)mf={0,0,0};glUniform3fv(loc("matcapFactor"),1,mf.data());glUniform3f(loc("viewOrigin"),0,0,2);scalar("rimLightingMix",wrong_rim_mix?0.f:ext.value("rimLightingMixFactor",1.f));auto rf=ext.value("parametricRimColorFactor",std::array<float,3>{});if(wrong_rim_color)rf={0,0,0};glUniform3fv(loc("rimFactor"),1,rf.data());scalar("rimPower",ext.value("parametricRimFresnelPowerFactor",5.f));scalar("rimLift",ext.value("parametricRimLiftFactor",0.f));glUniform1i(loc("wrongMatcapView"),wrong_matcap_view);glUniform1i(loc("wrongMatcapAnimation"),wrong_matcap_animation);
+        glUniform1i(loc("wrongFloatTransform"),wrong_float_transform);
         scalar("seconds", float(seconds));
         scalar("speed", ext.value("uvAnimationRotationSpeedFactor", 0.f));
         glUniform2f(loc("scroll"),
@@ -259,12 +280,12 @@ in vec2 uv;out vec4 result;uniform sampler2D scene;void main(){result=texture(sc
           std::array<float, 2> uv, shade, emission, rim, normal_uv, shift_uv;std::array<float,4> tangent;
         };
         std::vector<Vertex> vertices;
-        std::vector<role_consumer::Matrix> skin;
+        std::vector<role_consumer::Matrix> skin;std::vector<WideMatrix> precise_skin;
         std::vector<role_consumer::NormalMatrix> skin_normal;
         if(node.skin)for(size_t joint=0;joint<node.skin->joints_count;++joint){
           role_consumer::Matrix w{},ibm{};cgltf_node_transform_world(node.skin->joints[joint],w.data());
           if(!node.skin->inverse_bind_matrices||!cgltf_accessor_read_float(node.skin->inverse_bind_matrices,joint,ibm.data(),16))throw std::runtime_error("Independent V1 IBM missing");
-          auto matrix=role_consumer::multiply(w,ibm);skin.push_back(matrix);skin_normal.push_back(role_consumer::normal_matrix(matrix));
+          auto matrix=role_consumer::multiply(w,ibm);skin.push_back(matrix);precise_skin.push_back(product(world_matrix(*node.skin->joints[joint]),wide(ibm)));skin_normal.push_back(role_consumer::normal_matrix(matrix));
         }
         for (size_t v = 0; v < P->count; ++v){
           auto position=role_consumer::vec(P,v),normal=role_consumer::vec(N,v);float tv[4]{1,0,0,1};
@@ -276,11 +297,11 @@ in vec2 uv;out vec4 result;uniform sampler2D scene;void main(){result=texture(sc
             if(auto a=role_consumer::attr(p.targets[target].attributes,p.targets[target].attributes_count,cgltf_attribute_type_normal))normal+=role_consumer::vec(a,v)*weight;
             if(auto a=role_consumer::attr(p.targets[target].attributes,p.targets[target].attributes_count,cgltf_attribute_type_tangent))tangent+=role_consumer::vec(a,v)*weight;
           }
-          if(node.skin){Vec3 wp{},wn{},wt{};role_consumer::Matrix blended{};for(int set=0;;++set){
+          if(node.skin){Vec3 wp{},wn{},wt{};std::array<double,3> precise_position{};role_consumer::Matrix blended{};for(int set=0;;++set){
             auto js=role_consumer::attr(p.attributes,p.attributes_count,cgltf_attribute_type_joints,set),ws=role_consumer::attr(p.attributes,p.attributes_count,cgltf_attribute_type_weights,set);if(!js)break;
             float j[4],w[4];if(!ws||!cgltf_accessor_read_float(js,v,j,4)||!cgltf_accessor_read_float(ws,v,w,4))throw std::runtime_error("Independent V1 skin accessor missing");
-            for(size_t k=0;k<4;++k)if(w[k]){wp+=role_consumer::point(skin.at(size_t(j[k])),position)*w[k];wn+=role_consumer::direction(skin_normal.at(size_t(j[k])),normal)*w[k];wt+=role_consumer::direction(skin.at(size_t(j[k])),tangent)*w[k];for(size_t c=0;c<16;++c)blended[c]+=skin.at(size_t(j[k]))[c]*w[k];}
-          }position=wp;normal=wn;tangent=wt;hand=consumer_frame::handedness(blended);}else{tangent=role_consumer::direction(W,tangent);position=role_consumer::point(W,position);normal=role_consumer::direction(NW,normal);}
+            for(size_t k=0;k<4;++k)if(w[k]){const auto sample=point(precise_skin.at(size_t(j[k])),position);for(size_t axis=0;axis<3;++axis)precise_position[axis]+=sample[axis]*w[k];wp+=role_consumer::point(skin.at(size_t(j[k])),position)*w[k];wn+=role_consumer::direction(skin_normal.at(size_t(j[k])),normal)*w[k];wt+=role_consumer::direction(skin.at(size_t(j[k])),tangent)*w[k];for(size_t c=0;c<16;++c)blended[c]+=skin.at(size_t(j[k]))[c]*w[k];}
+          }position=wrong_float_world?wp:Vec3{float(precise_position[0]),float(precise_position[1]),float(precise_position[2])};normal=wn;tangent=wt;hand=consumer_frame::handedness(blended);}else{tangent=role_consumer::direction(W,tangent);const auto precise_position=point(precise_world,position);position=wrong_float_world?role_consumer::point(W,position):Vec3{float(precise_position[0]),float(precise_position[1]),float(precise_position[2])};normal=role_consumer::direction(NW,normal);}
           if(!ni.is_null())normal=normalized(normal);vertices.push_back({position,normal,coordinates(p,bi,v),coordinates(p,si,v),coordinates(p,ei,v),coordinates(p,ri,v),coordinates(p,ni,v),coordinates(p,hi,v),{tangent.x,tangent.y,tangent.z,tv[3]*hand*(wrong_normal_hand?-1.f:1.f)}});
         }
         std::vector<uint32_t> indices;

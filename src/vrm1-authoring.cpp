@@ -57,7 +57,10 @@ std::shared_ptr<const Vrm1AuthoringCompilation> compile_vrm1_authoring(
    for(const auto &bind:expression.value("textureTransformBinds",J::array()))dynamic_uv|=bind.at("material").get<int>()==surface.appearance->source_material;
    for(const auto &bind:expression.value("materialColorBinds",J::array()))dynamic_colour|=bind.at("material").get<int>()==surface.appearance->source_material&&bind.at("type")=="color";
   }
-  if(dynamic_uv||dynamic_colour){
+  const auto &typed=*object.material_bindings;
+  const bool animated_source=typed.has_mtoon&&typed.material.version()==MToonVersion::V1&&
+      (typed.material.parameters.scroll!=std::array<float,2>{}||typed.material.parameters.rotation_speed!=0);
+  if(dynamic_uv||dynamic_colour||animated_source){
    const auto before=object.painted->source_sampling_original();
    if(!before)throw std::invalid_argument("VRM1 dynamic paint has no original source owner");
    const auto maps=before->source_maps();const size_t arrays=1+(maps?bool(maps->uv1)+maps->extra_uv_sets.size():0);

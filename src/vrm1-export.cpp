@@ -570,6 +570,11 @@ static VrmExportReport export_vrm1_impl(const std::vector<ObjectSurface> &object
         for(size_t k=0;k<3;++k){const double value=double(factor[k])/layer->shade_divisor[k];require(std::isfinite(value)&&value>=0&&value<=1,"expression layer shade factor exceeds unit representation");factor[k]=float(value);}
         toon["shadeColorFactor"]=factor;
       }
+      if(layer->static_paint_animation){
+        // Only the sealed invariant-upper proof permits this change. The
+        // genuine source lower keeps every authored perpetual-motion value.
+        toon["uvAnimationScrollXSpeedFactor"]=0;toon["uvAnimationScrollYSpeedFactor"]=0;toon["uvAnimationRotationSpeedFactor"]=0;
+      }
       upper["alphaMode"]="BLEND";upper.erase("alphaCutoff");toon["transparentWithZWrite"]=false;toon["renderQueueOffsetNumber"]=0;toon["outlineWidthMode"]="none";toon["outlineWidthFactor"]=0;
       upper["name"]=object.name+" independent paint contribution";
       // Source material extras stay on the original lower material. The upper

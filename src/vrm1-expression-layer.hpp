@@ -11,7 +11,7 @@ struct Vrm1ExpressionLayer {
  std::vector<std::array<float,2>> paint_coordinates;
  std::array<float,2> scale{1,1},offset{};
  // Exact native shared-role rule: zero native factors use the native fallback.
- bool forward_uv=true,shade_alias=false;std::array<float,3> shade_divisor{1,1,1};
+ bool forward_uv=true,shade_alias=false,static_paint_animation=false;std::array<float,3> shade_divisor{1,1,1};
  double maximum_color_error=0,maximum_coverage_error=0,maximum_shade_coefficient=1;
  size_t working_bytes=0,sample_operations=0;
  // Actual paint image channels are scaled by these exact powers of two.

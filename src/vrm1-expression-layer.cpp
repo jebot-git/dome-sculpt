@@ -83,11 +83,12 @@ Vrm1ExpressionLayer compile_vrm1_expression_layer(const J &original,const Sculpt
  if(!object.painted||!object.appearance||!object.material_bindings||!object.material_bindings->has_mtoon)
   throw std::invalid_argument("VRM1 expression layer requires its actual paint and typed source owners");
  const auto &binding=*object.material_bindings;binding.validate();const auto &material=binding.material;
+ const bool animated=material.parameters.scroll!=std::array<float,2>{}||material.parameters.rotation_speed!=0;
  const bool opaque=material.parameters.alpha==MToonAlpha::Opaque&&(object.material.alpha==Material::AlphaMode::Automatic||object.material.alpha==Material::AlphaMode::Opaque);
  const bool masked=material.parameters.alpha==MToonAlpha::Mask&&(object.material.alpha==Material::AlphaMode::Automatic||object.material.alpha==Material::AlphaMode::Mask||int(object.material.alpha)==binding.native_reference.alpha);
  if(material.version()!=MToonVersion::V1||(!opaque&&!masked)||
-    material.parameters.outline!=MToonOutline::None||material.parameters.scroll!=std::array<float,2>{}||material.parameters.rotation_speed!=0)
-  throw std::invalid_argument("VRM1 expression layer currently requires opaque outline-free nonanimated MToon1 source");
+    material.parameters.outline!=MToonOutline::None)
+  throw std::invalid_argument("VRM1 expression layer currently requires opaque outline-free nonanimated MToon1 source or an independently proved animation/MASK adapter");
  if(binding.canonical_attributes||binding.canonical_uv||binding.native_paint_sampling||binding.normal_preparation||binding.color_preparation||binding.key_derivation||binding.physical_emission)
   throw std::invalid_argument("VRM1 prepared/absolute expression layers need their owning adapter");
  if(binding.roles[size_t(MToonSlot::Normal)].image&&!opaque)throw std::invalid_argument("VRM1 masked normal expression layers need their independent membership adapter");
@@ -136,8 +137,9 @@ Vrm1ExpressionLayer compile_vrm1_expression_layer(const J &original,const Sculpt
  // Source per-material bindings need not be copied onto an upper role
  // whose actual contribution is UV-invariant. Shared shade is the new paint
  // image itself; other shade/emission roles require immutable data proof.
+ auto animation_parameter_work=[&]{if(!animated)return;if(result.sample_operations>limits.max_sample_operations||4>limits.max_sample_operations-result.sample_operations)throw std::length_error("VRM1 UV animation prospective parameter work limit exceeded");result.sample_operations+=4;};
  auto active_components=[&](std::array<float,3> initial,std::string_view type){std::array<bool,3> active{};for(size_t k=0;k<3;++k){if(!std::isfinite(initial[k]))throw std::invalid_argument("VRM1 upper role has nonfinite native coefficients");active[k]=initial[k]!=0;}
-  size_t visits=0;for(const auto *table:{"preset","custom"})if(expressions.contains(table))for(const auto &expression:expressions.at(table)){stop();if(expression.contains("materialColorBinds"))for(const auto &bind:expression.at("materialColorBinds")){if((++visits&255)==0)stop();if(bind.at("material").get<int>()==object.appearance->source_material&&bind.at("type").get_ref<const std::string&>()==type)for(size_t k=0;k<3;++k){const double target=bind.at("targetValue").at(k).get<double>();if(!std::isfinite(target)||std::abs(target)>1e20)throw std::invalid_argument("VRM1 colour target is outside finite source metadata bounds");active[k]=active[k]||target!=0;}}}
+  size_t visits=0;for(const auto *table:{"preset","custom"})if(expressions.contains(table))for(const auto &expression:expressions.at(table)){animation_parameter_work();stop();if(expression.contains("materialColorBinds"))for(const auto &bind:expression.at("materialColorBinds")){animation_parameter_work();if((++visits&255)==0)stop();if(bind.at("material").get<int>()==object.appearance->source_material&&bind.at("type").get_ref<const std::string&>()==type)for(size_t k=0;k<3;++k){const double target=bind.at("targetValue").at(k).get<double>();if(!std::isfinite(target)||std::abs(target)>1e20)throw std::invalid_argument("VRM1 colour target is outside finite source metadata bounds");active[k]=active[k]||target!=0;}}}
   return active;
  };
  auto invariant_image=[&](const PaintSourceTexture &role,std::array<bool,3> active){
@@ -148,14 +150,18 @@ Vrm1ExpressionLayer compile_vrm1_expression_layer(const J &original,const Sculpt
   for(size_t y=0;y<image.height;++y){stop();for(size_t x=0;x<image.width;++x)for(size_t k=0;k<3;++k)if(active[k]&&image.rgba[(y*image.width+x)*4+k]!=image.rgba[k])return false;}
   return true;
  };
- if(!found&&!colour)throw std::invalid_argument("VRM1 expression layer has no relevant original binding");
+ if(!found&&!colour&&!animated)throw std::invalid_argument("VRM1 expression layer has no relevant original binding");
  // Reject pure size limits before callback-bearing normal/additive scans.
  const size_t n=packet.resolution(),pixels=size_t(size)*size,native_pixels=n*n;
  if(size<64||size>4096||pixels>limits.max_image_pixels||native_pixels>limits.max_image_pixels)
   throw std::length_error("VRM1 expression-layer pixel limit exceeded");
  if(binding.roles[size_t(MToonSlot::Normal)].image)require_vrm1_authored_normal_frame(object,cancelled);
  const double additive_error=matcap_margin(expressions,object,result,limits,cancelled)+(rim_relevant?rim_margin(expressions,object,result,limits,cancelled):0);
- if(found&&(!same_target||result.scale[0]==0||result.scale[1]==0)){
+ // UV animation moves original source sampling, never the independently
+ // owned writable paint grid. Its other upper roles must be invariant before
+ // the writer may disable animation on that derived material alone. MatCap
+ // uses view normals and is not animated by the pinned specification.
+ auto upper_invariant=[&]{
   bool invariant=result.shade_alias||invariant_image(shade,active_components({material.parameters.shade_color.x,material.parameters.shade_color.y,material.parameters.shade_color.z},"shadeColor"));
   const auto &emission=material.parameters.emission;std::array<float,3> effective{vrm_native_factor(emission.x,binding.native_reference.emission[0],object.material.emissive[0]),vrm_native_factor(emission.y,binding.native_reference.emission[1],object.material.emissive[1]),vrm_native_factor(emission.z,binding.native_reference.emission[2],object.material.emissive[2])};
   invariant=invariant&&(material.parameters.emission_strength==0||invariant_image(binding.roles[size_t(MToonSlot::Emission)],active_components(effective,"emissionColor")));
@@ -163,9 +169,22 @@ Vrm1ExpressionLayer compile_vrm1_expression_layer(const J &original,const Sculpt
   auto rim_active=active_components({material.parameters.rim_color.x,material.parameters.rim_color.y,material.parameters.rim_color.z},"rimColor");
   if(binding.roles[size_t(MToonSlot::Matcap)].image){const auto matcap_active=active_components({material.parameters.matcap_color.x,material.parameters.matcap_color.y,material.parameters.matcap_color.z},"matcapColor");for(size_t k=0;k<3;++k)rim_active[k]=rim_active[k]||matcap_active[k];}
   invariant=invariant&&invariant_image(binding.roles[size_t(MToonSlot::Rim)],rim_active);
-  if(!invariant)throw std::invalid_argument(same_target?"VRM1 zero UV target couples moving upper roles to fixed paint":"VRM1 differing UV targets couple moving upper roles to fixed paint");
+  if(material.textures[size_t(MToonSlot::Shift)].strength!=0)
+   invariant=invariant&&invariant_image(binding.roles[size_t(MToonSlot::Shift)],{true,false,false});
+  return invariant;
+ };
+ std::optional<bool> invariant;
+ auto invariant_once=[&]{if(!invariant)invariant=upper_invariant();return *invariant;};
+ if(animated){
+  if(!opaque)throw std::invalid_argument("VRM1 animated MASK needs its independent all-time membership adapter");
+  if(!invariant_once())throw std::invalid_argument("VRM1 UV animation couples moving upper roles to fixed paint");
+  result.static_paint_animation=true;
+ }
+ if(found&&(!same_target||result.scale[0]==0||result.scale[1]==0)){
+  if(!invariant_once())throw std::invalid_argument(same_target?"VRM1 zero UV target couples moving upper roles to fixed paint":"VRM1 differing UV targets couple moving upper roles to fixed paint");
   result.forward_uv=false;result.scale={1,1};result.offset={};
  }
+
  // Charge native premultiplied doubles, decoded output doubles, PNG source,
  // bounded encoder scratch, coordinate result and both merged knot vectors
  // before allocating any of them. Encoded output is bounded by writer too.
