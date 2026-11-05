@@ -97,7 +97,7 @@ struct Prepared {
 // are clipped per edge to obtain a genuine M-matrix; this deviation from raw
 // Blender FEM is reported, never a retry after an unsuccessful solve.
 inline Prepared prepare(const Mesh&m,const Skeleton&rig,BindOptions options,
-    weight_surface::Budget&work,visibility_geodesic::Bytes&bytes){
+    weight_surface::Budget&work,visibility_geodesic::Bytes&bytes,std::span<const HeatSourceSegment>input_sources={}){
   const size_t n=m.positions.size(),corners=m.indices.size(),bones=rig.bones.size();
   if(!n||n>2'000'000||!corners||corners>6'000'000||corners%3||!bones||bones>256||
      !options.maximum_work||options.maximum_work>500'000'000||
@@ -112,6 +112,14 @@ inline Prepared prepare(const Mesh&m,const Skeleton&rig,BindOptions options,
   std::vector<bone_shadow::Point>points;points.reserve(n);for(auto p:m.positions){work.step(3);if(std::max({std::abs(p.x),std::abs(p.y),std::abs(p.z)})>10000)throw std::invalid_argument("Heat metric exceeds bounded coordinates");points.push_back({p.x,p.y,p.z});}
   visibility_geodesic::ClosestRayVisibility query(points,m.indices,bytes.maximum-bytes.used,work,true);bytes.add(query.planned_bytes);visibility_geodesic::ClosestRayVisibility::Scratch scratch(query);
   auto segments=rig.segments();std::vector<HeatSourceSegment>sources;sources.reserve(bones);for(uint32_t b=0;b<bones;++b)if(rig.bones[b].deform){work.step(8);auto a=segments[b][0],z=segments[b][1];sources.push_back({{a.x,a.y,a.z},{z.x,z.y,z.z},b});}
+  if(!input_sources.empty()){
+    if(input_sources.size()!=sources.size())throw std::invalid_argument("Declared heat sources omit actual deform identities");
+    std::array<bool,256>seen{};sources.clear();
+    for(const auto&source:input_sources){work.step(32);if(source.bone>=bones||!rig.bones[source.bone].deform||seen[source.bone])throw std::invalid_argument("Declared heat source identity repeated/nondeform");seen[source.bone]=true;
+      for(size_t k=0;k<3;++k){const float a=float(source.head[k]),z=float(source.tail[k]);if(!std::isfinite(a)||!std::isfinite(z)||double(a)!=source.head[k]||double(z)!=source.tail[k]||std::max(std::abs(a),std::abs(z))>10000)throw std::invalid_argument("Declared heat source requires bounded captured binary32 geometry");}
+      segments[source.bone][0]={float(source.head[0]),float(source.head[1]),float(source.head[2])};segments[source.bone][1]={float(source.tail[0]),float(source.tail[1]),float(source.tail[2])};sources.push_back(source);
+    }
+  }
   NearestWeightSources nearest(sources,work);Prepared out;
   out.system=weight_surface::assemble(m,work,HeatOperator::PositiveGraph,{},HeatNormals::AreaWeighted,HeatMass::MixedVoronoi,HeatEdges::IncidentMean);auto&s=out.system;
   std::vector<uint8_t>supported(n);out.component_sources.resize(n);
@@ -135,10 +143,10 @@ inline Prepared prepare(const Mesh&m,const Skeleton&rig,BindOptions options,
 }
 }
 inline VisibilityGeodesicResult visibility_heat_bind(const Mesh&m,const Skeleton&rig,BindOptions options={},
-    const std::function<bool()>&cancelled={},size_t maximum_bytes=256u*1024u*1024u){
+    const std::function<bool()>&cancelled={},size_t maximum_bytes=256u*1024u*1024u,std::span<const HeatSourceSegment>sources={}){
   if(maximum_bytes<65536||maximum_bytes>256u*1024u*1024u)throw std::invalid_argument("Heat workspace bound");
   weight_surface::Budget work{0,options.maximum_work,cancelled};work.stop();visibility_geodesic::Bytes bytes{0,maximum_bytes};
-  auto prepared=visibility_heat::prepare(m,rig,options,work,bytes);auto&s=prepared.system;const size_t n=m.positions.size();
+  auto prepared=visibility_heat::prepare(m,rig,options,work,bytes,sources);auto&s=prepared.system;const size_t n=m.positions.size();
   ContinuationIC ic(s,work);std::vector<double>rhs(n),field(n),sum(n);std::vector<VertexWeights>rows(n);for(auto&r:rows)r.reserve(options.limits.max_influences+1);
   ContinuationReport proof;
   std::vector<uint32_t>sole(n,UINT32_MAX);
@@ -159,8 +167,8 @@ inline VisibilityGeodesicResult visibility_heat_bind(const Mesh&m,const Skeleton
   work.step_items(n,options.limits.max_influences+1);result.weights.validate(n,rig.bones.size());work.stop();result.visible_seeds=prepared.visible;result.occluded_candidates=prepared.occluded;result.work=work.used;result.workspace=bytes.used;return result;
 }
 inline VisibilityGeodesicResult visibility_heat_bind_object(const SculptObject&object,const Skeleton&rig,
-    BindOptions options={},const std::function<bool()>&cancelled={},size_t maximum_bytes=256u*1024u*1024u){
+    BindOptions options={},const std::function<bool()>&cancelled={},size_t maximum_bytes=256u*1024u*1024u,std::span<const HeatSourceSegment>sources={}){
   return bind_visibility_object(object,rig,options,cancelled,maximum_bytes,
-    [](const Mesh&m,const Skeleton&r,BindOptions o,const std::function<bool()>&c,size_t b){return visibility_heat_bind(m,r,o,c,b);});
+    [sources](const Mesh&m,const Skeleton&r,BindOptions o,const std::function<bool()>&c,size_t b){return visibility_heat_bind(m,r,o,c,b,sources);});
 }
 }
