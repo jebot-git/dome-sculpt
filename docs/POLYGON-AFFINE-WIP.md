@@ -132,3 +132,12 @@ TUs with function/data sections and linker GC; it does not substitute Release
 workspace output or extract production functions. Old link-cap, observer and SDK
 selection failures remain recorded. This is scoped matched incremental software
 qualification; strict hardware and root semantic integration are separate gates.
+
+The strict hardware continuation is sealed in
+`docs/validation/POLYGON-AFFINE-HARDWARE.json`: actual PCI03 A770/EGL renderD129
+and open-FD/sysfs proof,236 checks/36 image pairs with max0<=1, and intended
+same-binary software/UHD identity refusals. Source, executable, mapped ELF and
+SDK/driver hashes are unchanged. The lease is released. The first hardware
+observer's omitted five device checks remains an explicit failed observer case.
+This completes the authorized bounded polygon-affine cohort; coherent integration
+with current retopology/remesh and broader regression remains separate.

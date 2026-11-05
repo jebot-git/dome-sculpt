@@ -63,7 +63,7 @@ def profile(which,tag=""):
   for name in ('document.cpp.o','document-polygon.cpp.o','polygon-authoring.cpp.o','polygon-render.cpp.o','polygon-conversion.cpp.o','render.cpp.o','xr.cpp.o'):
    if any((')'+name) in line or '.a('+name+')' in line for line in trace.splitlines()):bad.append(name)
   assert not bad,('Unexpected changed/heavy old member selected',bad)
-  env=dict(os.environ,LIBGL_ALWAYS_SOFTWARE='1',LP_NUM_THREADS='2',EGL_PLATFORM='surfaceless',ASAN_OPTIONS='detect_leaks=1:halt_on_error=1',UBSAN_OPTIONS='halt_on_error=1')
+  env=dict(os.environ,LIBGL_ALWAYS_SOFTWARE='1',LP_NUM_THREADS='2',EGL_PLATFORM='surfaceless',MESA_SHADER_CACHE_DISABLE='1',ASAN_OPTIONS='detect_leaks=1:halt_on_error=1',UBSAN_OPTIONS='halt_on_error=1')
   toolkit='/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-'+which
   bitmap='/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime'
   env['LD_LIBRARY_PATH']=toolkit+'/lib:'+bitmap+'/lib';private=directory/'private';private.mkdir()

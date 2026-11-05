@@ -466,8 +466,9 @@
   "allocation_cap_bytes": 1342177280,
   "minimum_actual_free_bytes": 21474836480,
   "remaining": [
-    "Strict Arc renderer and actual software/UHD identity controls pending root grant.",
     "Coherent semantic main/triangle-remesh/retopo integration remains root-owned; this private branch is not main.",
     "Full Document acceptance allocation sweep/fresh full application build/Wayland/new loader not claimed by this scoped cohort."
-  ]
+  ],
+  "hardware_continuation": "POLYGON-AFFINE-HARDWARE.json",
+  "runner_note": "Tracked render proof now explicitly disables writable Mesa cache, matching the successful same-binary S and strict hardware runtime controls; original cache-index observer failure retained."
 }
