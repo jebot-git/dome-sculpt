@@ -25,6 +25,17 @@ int main(int argc,char**argv)try{
  bounded=limits;bounded.max_image_pixels=1;rejects(original,bounded,1+definitions,"invariant-role prospective");
  auto changed=original;changed["extensions"]["VRMC_vrm"]["expressions"]["custom"]["cross"]["textureTransformBinds"][0]["scale"][0]=1e21;rejects(changed,limits,1,"source metadata bounds");
  changed=original;for(const char *table:{"preset","custom"})if(changed["extensions"]["VRMC_vrm"]["expressions"].contains(table))for(auto &entry:changed["extensions"]["VRMC_vrm"]["expressions"][table]){entry.erase("materialColorBinds");entry.erase("textureTransformBinds");}rejects(changed,limits,1,"no relevant original binding");
+ // A genuine unused material declaration is valid metadata; its Rim bind
+ // must not activate work or confer authority on the current material. This
+ // is a private metadata-selector control, never an import/publication seal.
+ const auto &rim=object.material_bindings->material.parameters.rim_color;
+ if(object.material_bindings->roles[size_t(MToonSlot::Rim)].image||rim.x!=0||rim.y!=0||rim.z!=0)throw std::runtime_error("Inactive-Rim relevance fixture unexpectedly has an active Rim owner");
+ auto unrelated=original;const auto unrelated_material=unrelated.at("materials").size();auto declaration=unrelated.at("materials").at(object.appearance->source_material);declaration["name"]="Actual unused material for relevance counter";unrelated["materials"].push_back(std::move(declaration));
+ auto &first_expression=unrelated["extensions"]["VRMC_vrm"]["expressions"]["preset"].begin().value();first_expression["materialColorBinds"].push_back({{"material",unrelated_material},{"type","rimColor"},{"targetValue",std::array<float,4>{.2f,.3f,.4f,17}}});
+ size_t unrelated_polls=0;const auto foreign=detail::compile_vrm1_expression_layer(unrelated,object,*packet,256,limits,[&]{++unrelated_polls;return false;});
+ if(unrelated_polls!=polls||foreign.image->rgba!=expected.image->rgba||foreign.paint_coordinates!=expected.paint_coordinates||foreign.forward_uv!=expected.forward_uv||foreign.scale!=expected.scale||foreign.offset!=expected.offset||foreign.sample_operations!=expected.sample_operations||foreign.working_bytes!=expected.working_bytes||scene.encode()!=exact)throw std::runtime_error("Unrelated material Rim metadata activated current work or changed actual source/paint result");++passed;
+ for(const char *table:{"preset","custom"})if(unrelated["extensions"]["VRMC_vrm"]["expressions"].contains(table))for(auto &entry:unrelated["extensions"]["VRMC_vrm"]["expressions"][table])for(const char *kind:{"materialColorBinds","textureTransformBinds"})if(entry.contains(kind)){auto retained=nlohmann::json::array();for(const auto &bind:entry[kind])if(bind.at("material").get<int>()!=object.appearance->source_material)retained.push_back(bind);entry[kind]=std::move(retained);}
+ rejects(unrelated,limits,1,"no relevant original binding");
  auto retry=detail::compile_vrm1_expression_layer(original,object,*packet,256,limits,{});if(retry.image->rgba!=expected.image->rgba||retry.paint_coordinates!=expected.paint_coordinates||retry.forward_uv!=expected.forward_uv||retry.shade_alias!=expected.shade_alias||retry.shade_divisor!=expected.shade_divisor||scene.encode()!=exact)throw std::runtime_error("Expression-layer retry after actual denials changed output or authority");
  std::cout<<"PASS "<<passed+1<<" actual invariant-role allocation/cancel/target/retry checks\n";return 0;
 }catch(const std::exception&e){injecting=false;std::cerr<<"FAIL "<<e.what()<<std::endl;return 1;}

@@ -28706,6 +28706,6 @@
   "receipt_count_correction": {
     "physical_HDR_independent_comparisons": 12,
     "HDR_PNG_images": 18,
-    "reason": "Six poses/weights times ordinary+editable is12 independent comparisons. The former18 count was the saved PNG images; checks115 and all results/artifacts unchanged."
+    "reason": "Six pose/morph states times ordinary+editable is12 independent comparisons. Former18 meant savedPNGfiles;115checks andallactualresults unchanged."
   }
 }

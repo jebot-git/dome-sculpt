@@ -107,10 +107,12 @@ Vrm1ExpressionLayer compile_vrm1_expression_layer(const J &original,const Sculpt
  double alpha_low=initial_alpha,alpha_high=initial_alpha;
  const double cutoff=object.material.alpha_cutoff!=binding.native_reference.alpha_cutoff?object.material.alpha_cutoff:material.parameters.alpha_cutoff;
  const auto expressions=original.at("extensions").at("VRMC_vrm").value("expressions",J::object());
+ bool rim_relevant=bool(binding.roles[size_t(MToonSlot::Rim)].image)||material.parameters.rim_color.x!=0||material.parameters.rim_color.y!=0||material.parameters.rim_color.z!=0;
  for(const auto *table:{"preset","custom"})if(expressions.contains(table))for(const auto &expression:expressions.at(table)){
   std::array<double,3> shade_delta{};double alpha_delta=0;
   for(const auto &bind:expression.value("materialColorBinds",J::array()))if(bind.at("material").get<int>()==object.appearance->source_material){
    colour|=bind.at("type")=="color";
+   rim_relevant|=bind.at("type")=="rimColor";
    if(masked&&bind.at("type")=="color"){const double alpha=bind.at("targetValue").at(3).get<double>();if(!std::isfinite(alpha)||std::abs(alpha)>1e20)throw std::invalid_argument("VRM1 mask colour target is outside finite source metadata bounds");alpha_delta+=alpha-initial_alpha;}
    if(bind.at("type")=="shadeColor"){const auto target=bind.at("targetValue").get<std::array<float,4>>();shade_factor({target[0],target[1],target[2]},false);if(result.shade_alias)for(size_t k=0;k<3;++k)shade_delta[k]+=(double(target[k])-initial_shade[k])/result.shade_divisor[k];}
   }
@@ -147,7 +149,7 @@ Vrm1ExpressionLayer compile_vrm1_expression_layer(const J &original,const Sculpt
  };
  if(!found&&!colour)throw std::invalid_argument("VRM1 expression layer has no relevant original binding");
  if(binding.roles[size_t(MToonSlot::Normal)].image)require_vrm1_authored_normal_frame(object,cancelled);
- const double additive_error=matcap_margin(expressions,object,result,limits,cancelled)+rim_margin(expressions,object,result,limits,cancelled);
+ const double additive_error=matcap_margin(expressions,object,result,limits,cancelled)+(rim_relevant?rim_margin(expressions,object,result,limits,cancelled):0);
  if(found&&(!same_target||result.scale[0]==0||result.scale[1]==0)){
   bool invariant=result.shade_alias||invariant_image(shade,active_components({material.parameters.shade_color.x,material.parameters.shade_color.y,material.parameters.shade_color.z},"shadeColor"));
   const auto &emission=material.parameters.emission;std::array<float,3> effective{vrm_native_factor(emission.x,binding.native_reference.emission[0],object.material.emissive[0]),vrm_native_factor(emission.y,binding.native_reference.emission[1],object.material.emissive[1]),vrm_native_factor(emission.z,binding.native_reference.emission[2],object.material.emissive[2])};

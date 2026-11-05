@@ -1,21 +1,170 @@
 # Full objective and completion evidence
 
-## Combined native36 and MASK/cutoff qualification candidate — 2026-11-05
+## Current production state — 2026-11-05
 
-This new isolated candidate composes ab37175 with qualified frame36/f2a and
-key-export7c9 (runtime97f), plus MASK/source-cutoff296 (runtime9ef). Its public
-layout includes the real native frame owner; it requires fresh whole owning
-Release and sanitizer application/core/render/support and complete consumers.
-No previously sized35 archive can qualify this source. Qualified post-key UV/new-key source1ae1b64 is now included. Source37/public
-paint owner and unsealed canonical-key/UV adapters remain absent. The bare morph
-policy refusal was measured on a genuine36 frame; the new authenticated frame
-budget route has60 policy-only Release/sanitizer checks over exact prior frame
-API support. After the new metadata/UV merge, fresh complete owning builds and
-the default whole capture/compiler tests are required; prior-sized archives do
-not qualify this combined source. Native UI continuation remains separate.
-Original ab37175 SAN92 and currentfull689 stay untouched and frozen; separate
-oldf2 continuation failures remain preserved. All original production/device/
-accelerator requirements and later controller drawers remain unfinished.
+Main combines qualified native36 cohort881021c/a0b8a37 and current keyed-HDR,
+MatCap/Rim0b6b59f with strict preflight repair62ec13e/sealc17945d. Compared with
+0b6, only one complete Layer TU and two regression cases in the existing registered
+target consumer change. All headers, layouts, formats, shaders and original
+bounds remain unchanged. All six actual fault/worker domains pass per Release/
+sanitizer profile, plus1857 final registered controls and actual relinked native
+22normal+22compact menu/export/Open/Save checks/profile. Core159-member audits
+change only Layer. Read VRM1-EXPRESSION-PREFLIGHT.md for exact scope and retained
+original failures. No Scene37/public canonical-owner append is admitted. FLTK
+remains the default with canonical DomeD bitmap/menu conventions.
+
+The native36 ABI foundation completes Release ALL and owning sanitizer builds
+and125/125 selected tests per profile, including all four actual frame allocation/
+codec fault phases. Its actual native/Wayland/synthetic-XR workflows pass200UI
+checks per profile; eight GUI GLBs have zero Khronos errors. Same-own Arc passes
+1129 component+19 application synthetic-XR checks plus six software refusals.
+Original failed/cancelled invocations and explicit same-object continuation remain
+recorded. Read COHERENT-NATIVE36-AUTHORING.md;766registered is not allruntime.
+
+Three complete product TUs extend that matching own cohort without header/layout
+or schema changes: genuine current-key FLOAT HDR package3, painted MatCap and
+Rim expressions. Targeted current-core Release/sanitizer2326 controls pass;
+actual Arc1067 and six software refusals pass. Same-own current application/
+inspector relinks pass22normal+22compact actual HDR/editable512/Open/Save checks
+per profile. All28 new-role source/output/GUI files have zero Khronos errors;
+20VRM source/output files pass official schemas. Read CURRENT-RIM-INTEGRATION.md
+and NATIVE-KEY-MATCAP-INTEGRATION.md for source/byte/owner/Cancel/budget proof.
+The original sanitizer chooser observer timeout is retained; the corrected
+observer checks visible modal closure, no default output and exact native data.
+Rare CPU-versus-Arc colour deltas also occur in pristine Rim lookup; eachdevice
+native/independent maximum1 stays within fixed4. Exact cross-device pixel
+equivalence and the old timeout's precise cause are not claimed. Four pristine
+CMake targets now declare their required private includes. No current782 whole
+runtime, physical HMD, new compute, installation or session-restart claim follows.
+
+An isolated owning37/physical4/Rim candidate5414621 composes sealedbf174c3 and
+correctedcdbd7ea with the current native/HDR/Rim lineage. It appends the genuine
+public canonical owner and private physical-image owner, so all users rebuild
+together. InitialSAN stops on a private cgltf test include; ReleaseALL is then
+explicitly interrupted for that confirmed error. After that boundary, corrected
+includes and visible-chooser observer continue the same owning objects asf95c87d;
+production/header/C++ test bytes stay exact541. Whole Release ALL and owning
+sanitizer builds now complete. Their first20 gate passes11, then correctly
+refuses a hidden-active-layer stroke in the new fixture; eight dependents do not
+run. The original exit8 results remain. Test-only14c3 uses real Paint/Add layer
+before its native FLOAT gesture; that complete producer and all nine previously
+dependent pipeline tests now pass per profile. Together20 actual first-stage
+tests pass per profile on product-exact541 support, with no fixture guard lifted.
+Currentf36570c also passes actual whole-app ordinary package4/Open/Save GUI12normal
++12compact/profile and scoped Arc1506 with six software controls. The initial Arc
+manifest omits one native36 input; a separate protected same-binary115 follow-up
+closes that input scope. Release remaining140 closes134passed/6failed: five
+expression fault tests report late preflight refusal, and mixed native/normal
+authoring stops at its old33/34-only format assertion after the first two
+converted-source export orders pass. These failures remain recorded; the latter
+requires genuine owner/format consumer migration, not a version-only exemption.
+Together154/160 selected Release tests pass. The same owning sanitizer remainder
+is still running.798registered is not a full runtime result;37 and physical4
+remain outside main until the regressions and remaining admission controls close.
+
+Private test-only mixed-consumer migration81c2e30 now checks genuine conversion,
+normal-UV and writable-paint owners, derives the format from those owners, and
+rejects five additional missing/downgraded/foreign-owner cases per retained state
+and append order. It passes229 controls/eight comparisons each Release, actual
+same-profile sanitizer worker inputs and strict Arc, maximum1 within unchanged4;
+32 validated GLBs have zero errors and corresponding bytes are exact. Read
+MIXED-NORMAL-PAINT37-CONSUMER.md. Original failed tests remain recorded. A separate
+normal-expression compositiond6d40ca/seal4c9f321 retains the current native/HDR/
+paint export paths and sealed typed normal proof. Fresh owning442-task app/core/
+render/support/XR/inspector and110 explicit targets complete per profile. Its
+10 normal commands,104 actual FLTK/synthetic-XR checks per profile and271 strict
+Arc checks pass, with two software/two UHD refusals.24VRMs have zero Khronos errors
+and186 pinned official-schema instances pass;12 corresponding files are exact
+between profiles. Read COHERENT-NORMAL-AUTHORING-WIP.md in that private branch.
+That source still needs the separately qualified preflight repair and broader
+integration; neither larger candidate is admitted and807registration is not runtime.
+
+Automatic weights remain experimental. Source-aware heat/role helpers now pass
+874 original+local avatar comparisons, but general closed-affine/edited domains
+and actual native publication/default integration remain open. The fresh owning
+sanitizer four-consumer build completes; its actual runtime suite remains live.
+Default weights are unchanged. Normal milestone6826452 is sealed separately with real worker,
+Apply/history, factory, independent and hardware proof; it is not yet integrated
+with the current source/paint37 cohort. Full regression, remaining authoring/
+interoperability, physical devices and accelerator evidence remain required.
+Older full689 failures remain preserved; converter-consumer migration is in the
+separate37 candidate. Accepted XR selection remains; controller drawers follow
+the basic targets. Separately, actual new-key editing after canonical paint passes
+19 native and26 owner/cancel checks per Release/sanitizer profile, actual FLTK
+34normal/36compact checks, and226 strict Arc checks across63 image cases with
+actual software/UHD refusals. That candidate and its remaining fault/command-path
+qualification are outside main. The original source-world sanitizer process now
+finishes successfully after43,388seconds, including66,187 persistent denial
+prefixes and908 cancellation points; its closure is preserved separately.
+The full objective remains active and incomplete.
+
+## Qualified PBR renderer specialization — 2026-11-05
+
+Runtime79abe8e keeps authored sampling/math unchanged while specializing actual
+PBR-only frames; mixed/typed frames retain the complete MToon shader. Unchanged
+full72 sampler cases pass cold16.61s Release/21.96s sanitizer,289checks/max0,
+original bound2/180s. Six graphics consumers pass456checks per profile and actual
+PCI03Arc, plus6samebinarysoftware refusals. Newly relinked matching-owning main
+applications pass native/compact/Wayland/syntheticXR65 each; no public/schema/ABI
+change or physicalHMD/compute/full740 claim. Read PBR-SURFACE-SPECIALIZATION.md
+and receipt. Original full689timeout and failed fixture/orchestration invocations
+remain recorded. Native36 candidate105/107 has a separately qualified test-only
+MatCap diagnostic correction3065889 (762authoring+22render eachR/S); originalSAN
+continues. Full goal and later drawers remain unfinished.
+
+## Main physical authoring milestone — 2026-11-05
+
+Main now integrates qualified runtimeab37175/seal79e288d. Its complete tracked
+runtime/build/test/asset tree matches that qualified source exactly. Fresh owning
+application/core/render/support/runtime337 tasks and92/92 selected commands pass
+each Release/sanitizer. Actual native/compact/Wayland/syntheticXR65 plus posed
+physical-paint nativeGUI80 pass each profile;8GUI GLBs0KHR errors. Same owning
+binaries pass632 actualArc checks and3strictsoftware refusals. Read
+COHERENT-PHYSICAL-AUTHORING.md and receipt. Registered739 is not full-suite runtime.
+Original failures stay recorded. Native36/keyUV/MASK296/newframe budgets and37
+remain in separately validated or building candidates. Canonical-keyUV and all
+remaining production/device/accelerator requirements and later drawers remain
+unfinished; no installation orphysicalHMD/session change is included.
+
+## Native key export and current combined UI evidence — 2026-11-05
+
+Private key export7c9c476/runtime97f on genuine frame36 now passes151 each
+Release/sanitizer/strictArc,36KHR0errors and exact native/container triples;
+actual complete-stream omission was reproduced and fixed. This is matched
+three-TU/whole-consumer evidence, not new owning36/main admission. Combinedab37175
+passes fresh Release337 +92/92; ownSAN337 finishes and92runtime remains live.
+Actual own normal/compact/Wayland/syntheticXR65 and physical-skin nativeGUI80 pass
+each profile,8actualGUI GLBs0KHRerrors. Originalb37 remains83/84 each on old probe.
+Olderf2 continuation closes with two stale canonical consumers and one dependent
+not run; originals retained, strict test migration underway. Read the current
+PRIVATE-AUTHORING-PROGRESS.md for limits and new agent seals. Full production,
+coherent36/37 integration, device/accelerator work and later drawers remain open.
+
+## Current physical-skin and expression integration work — 2026-11-05
+
+Main runtime f9da354 includes the qualified 1f foundation (52 selected tests
+per Release/sanitizer profile). Physical skin export c1354a6, wider shade
+expressions e84d919 and canonical paint/UV foundation d9163a8 are separately
+sealed/pushed with scoped evidence. New isolated ab37175 composes the first two
+with the full b37 adapter source; fresh own 337-task application/core/render/
+support/consumer builds and 92 selected commands per profile are running.
+Registered739 is not a full runtime result. Original b37 Release83/84 and frozen
+SAN84 remain separate; corrected paired-helper interception passes1797/profile.
+Native key/UV owners, transparency/cutoff repairs and canonical paint-domain
+ownership are still active. Read PRIVATE-AUTHORING-PROGRESS.md for actual scopes.
+The complete production goal, physical devices, accelerators and later controller
+drawers remain unfinished. No installation or physical HMD/session action.
+## Qualified coherent physical authoring source — 2026-11-05
+
+Runtimeab37175 now completes fresh owning337 tasks and92/92 selected registered
+commands each Release/sanitizer. Actual native/compact/Wayland/syntheticXR65 and
+posed public-bound physical-paint nativeGUI80 pass each profile;8GUI GLBs0KHR.
+Same own binaries pass632 strictArc checks total and3forcedsoftware refusals,
+with actualPCI03 descriptors/maps and exactinputs. This is not full739 runtime,
+newnative36/37/MASK admission, compute orphysicalHMD. Read
+COHERENT-PHYSICAL-AUTHORING.md/receipt for scope and preserved original failures.
+Fullproduction/canonical-keyUV/newframe/domain/roles/device work and later
+controller drawers remain incomplete. Main integration is the next milestone.
 
 ## Combined physical skin and wider expression candidate — 2026-11-05
 
@@ -47,8 +196,8 @@ production, device/accelerator requirements and controller drawers remain open.
 
 Foundation4b37f11 completes fresh Release ALL1397 and owning SAN276 builds;
 selected32 and actual native/compact/Wayland/syntheticXR65 pass each profile.
-Current full689 regression remains running. Next1f completes owning Release294
-and52/52 including real repository anatomical17; SAN remains live. Skin export
+Current full689 regression remains running. Current1f completes fresh owning294
+builds and52/52 tests each Release/SAN, including real repository anatomical17. Skin export
 117R/S/Arc, first-rig Restore3ec and owned EXR e29 are separately qualified and
 queued for combined integration. Read PRIVATE-AUTHORING-PROGRESS.md for exact
 scopes, retained failures, ongoing VRM/HDR/rig adapters and original f2 continuation.
@@ -99,18 +248,6 @@ fixture integration and broader authoring/interop/device work remain. Next fresh
 optimized ALL and selected owning SAN qualification must use this actual combined
 source. A component pass does not qualify the whole candidate or complete the
 original/additional goal. Controller drawers remain required after basic targets.
-## Private current native key export adapter — 2026-11-05
-
-Runtime97f4f2c on genuine frame36/af8 now passes151 each Release/sanitizer/strict
-Arc for independent current-frame/writable-paint export,6pose/weight states,
-ordinary/editable GLB and exact recovery/Save. Complete3 changed-header TUs and
-whole consumers use matching own36 support. Actual prior missing-stream negative
-is repaired without changing valid writer bytes.36KHR0errors/36warnings/108infos,
-18container/native triples exact,19R/S PNG exact andArcmax1;2legacy consumers pass
-each profile. New fixture-dependent CTest is configured, not a fresh owning app
-or complete registered-suite result. Read NATIVE-PAINT-KEY-EXPORT.md and receipt.
-Full36 composition/fault/device/typed/postUV/physical-key work and the original
-production requirements/controller drawers remain incomplete; no main admission.
 
 ## Explicit portable normal model controls — 2026-11-04
 
@@ -287,23 +424,6 @@ receipt for original failures, own fresh-parent/completed-TU build scope and fou
 retained Khronos tangent warnings. This is not fresh ALL/full612, main admission,
 physical headset, GPU baking or full production completion. Broader bake recipes,
 resource/consumer/device work and deferred drawers remain required.
-## Private proven MASK and current cutoff — 2026-11-05
-
-Runtime9ef186b follows e84: owned MASK alpha proof across declared future weights,
-real source alpha/native paint fields, no public/private header/layout/schema/UI
-change. Source-only writer now preserves typed cutoff .3 when original/unchanged
-inspector is .5; old sealed producer really emits .5 and fails independent255>4.
-R142.960s/S597.353s all0/1886exact: painted49, typed-source23, independent175+166
-checks/72pairs max1 at unchanged4; NEW1762 full916persistent/839Cancel+7controls.
-Changing-membership worker18 refuses exactly; actual native11 proves filled261
-vs same-geometry3777, Save guard/Cancel/Save exact. StrictArc355/72pairs plus2
-actualsoftware refusals,10.733s/1901exact, lease released.148PNG+22data/control
-pairs exact;29ordinary old files/profile byte-identical;22files166official/KHR
-0errors95warnings334infos84hints. Configure663/7new registration only. Matched2TUs
-on immutablee84 support, no freshwholeapp/main/fullVRM claim. General MASK/BLEND,
-other owners/roles/currentroot/external remain required; SAME64560 still live.
-Read VRM1-MASK-EXPRESSIONS.md/JSON; source877counter and two observer negatives kept.
-
 ## Private wider VRM1 shade targets — 2026-11-05
 
 Runtime86ea09e follows196 with actual target>1 and simultaneous shade deltas,
@@ -1188,3 +1308,5 @@ VRM1-COHERENT-INTEGRATION.md. Root vendor all-target builds now pass on a
 frozen copy (build-only; see validation/VRM1-VENDOR-BUILDS.json). Full V1/physics/
 HDR/painting and broader workflow requirements stay
 open. This is not an all535-test or full-goal completion claim.
+
+VRM1 expression preflight repair is independently qualified on public0b6 matching support: source-material Rim relevance is collected during existing scan, no-relevant rejection precedes role work, exact old poll/image/work bounds unchanged. Registered unused-material/foreign-Rim controls and complete affected fault/Cancel/native worker suites R/S pass, plus matching actual normal/compact FLTK smoke. One product TU, no new layout/schema/domain admission; current37/Normal and remaining full-VRM requirements stay separate. Evidence: VRM1-EXPRESSION-PREFLIGHT.md/JSON.
