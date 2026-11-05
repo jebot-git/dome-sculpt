@@ -20,6 +20,9 @@ int main(int argc,char **argv)try{
    ShapeKeyEdit key;key.action=ShapeKeyAction::Create;key.name="Canonical fixture current key";document.author_shape(key);settled(document);
    key.action=ShapeKeyAction::Replace;key.target=document.frame().state->morph_target;key.positions=document.copy_scene().active().painted->mesh().positions;key.positions.at(0).z+=.01f;document.author_shape(key);settled(document);
   }
+  const auto old_layers=document.copy_scene().active().painted->layers().size();
+  document.paint_command(SpatialCommand::AddLayer);settled(document);
+  require(document.frame().state->layer_visible&&document.copy_scene().active().painted->layers().size()==old_layers+1,"Actual Paint/Add layer creates a visible native stroke layer without exposing protected hidden layers");
   document.edit_scene("Fixture physical material",[](Scene &current,const std::function<bool()> &cancelled){if(cancelled&&cancelled())throw std::runtime_error("Fixture cancelled");current.active().material.emissive={8,.016f,.16f};});settled(document);
   const auto surface=document.frame().surface;require(surface&&!surface->ranges.empty(),"Actual converted fixture publishes a visible native stroke target");const auto &range=surface->ranges.front();const auto a=surface->mesh.positions.at(surface->mesh.indices.at(range.first)),b=surface->mesh.positions.at(surface->mesh.indices.at(range.first+1)),c=surface->mesh.positions.at(surface->mesh.indices.at(range.first+2));
   const auto point=a*.3f+b*.3f+c*.4f,normal=normalized(cross(b-a,c-a));PaintSettings ink;ink.front_only=false;ink.channel=PaintChannel::Emission;ink.emission_units=PaintEmissionUnits::Physical;ink.emission={12,.002f,3};document.paint_settings(ink);
