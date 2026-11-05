@@ -4,6 +4,7 @@
 #include "dome/affine.hpp"
 namespace dome::detail {
 enum class VertexBitangentPolicy { RawCross, UnitCross };
+enum class VertexColumnPath { Source, Canonical };
 struct VertexStageMatrices {
  std::array<float,16> model{};
  std::array<float,9> normal{};
@@ -22,5 +23,5 @@ struct PulledBackVertexStage {
 };
 PulledBackVertexStage pullback_vertex_stage(const KeyMirrorRefinement &,
  BeforeVertexColumns,const VertexStageMatrices &,VertexBitangentPolicy,
- const KeyMirrorLimits & = {});
+ const KeyMirrorLimits & = {},VertexColumnPath = VertexColumnPath::Source);
 }
