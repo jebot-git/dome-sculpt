@@ -1,5 +1,15 @@
 # Dome Sculpt production handoff
 
+## Private owning new-bind surface heat — 2026-11-05
+
+Actual genuinely unskinned female/male19 owning binds now equal the qualified
+563 fields byte-for-byte in Release/sanitizer. Work331M/310M and total admission
+490.7/495.2MB stay within original500M/512MiB; actual all19 Document worker24
+checks/profile pass Cancel/stale/orderedSave/oneUndo/locks/fullRestore. No
+sanitizer diagnostics or input drift. Read NATIVE-SURFACE-HEAT-WIP.md/receipt
+for matched-source component scope. New public/default/controller/UI/general
+native admission, export/fault/full-affine robustness remain required.
+
 ## Private component-supported surface heat — 2026-11-05
 
 Distinct private policy now passes874/874 actual female/male global/local pose
