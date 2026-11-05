@@ -1,3 +1,16 @@
+## Private current component weights app workflow — 2026-11-05
+
+Frozen516/e06 intrinsic-component weighting now has a matched whole-app native
+FLTK qualification:144 checks across actual Head/Eye/generic and existing head,
+normal/compact and R/S. Active keys/current poses/real colour+roughness paint,
+exact fields, independent LBS/IBM, oneUndoRedo/Save/reopen and modal cancellation
+pass; all sources/inputs/binaries remain exact. Whole26-object app closure is
+matched with the new complete production TU before immutable owning support;
+old archive member excluded, no archive rewrite/ABI mix or freshALL claim.
+Read NATIVE-INTRINSIC-HEAT-UI.md/receipt. No main/default promotion or new complex
+owner admission; full automatic-weight/project goals and37/38 integration stay
+open. No GPU/HMD/session/install; all finite jobs closed.
+
 ## Private current SurfaceHeat5 qualification — 2026-11-05
 
 Current615-compatible runtime9a now rebuilds all55actual affected product TUs
