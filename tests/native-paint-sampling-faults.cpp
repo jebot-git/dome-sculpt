@@ -2,6 +2,7 @@
 #define main native_paint_functional_reference
 #include "native-paint-sampling.cpp"
 #undef main
+#include "native-paint-model.hpp"
 #include <cstdlib>
 #include <new>
 #include <mutex>
@@ -32,6 +33,10 @@ struct Release{~Release(){release();}};
 }
 extern "C" detail::RetainedNativePaint __real__ZN4dome6detail19retain_native_paintERKNS_12SculptObjectERKNS_4MeshESt4spanIKjLm18446744073709551615EERKNS_19PaintSamplingLimitsE(const SculptObject &,const Mesh &,std::span<const uint32_t>,const PaintSamplingLimits &);
 extern "C" detail::RetainedNativePaint __wrap__ZN4dome6detail19retain_native_paintERKNS_12SculptObjectERKNS_4MeshESt4spanIKjLm18446744073709551615EERKNS_19PaintSamplingLimitsE(const SculptObject &s,const Mesh &m,std::span<const uint32_t> v,const PaintSamplingLimits &l){auto result=__real__ZN4dome6detail19retain_native_paintERKNS_12SculptObjectERKNS_4MeshESt4spanIKjLm18446744073709551615EERKNS_19PaintSamplingLimitsE(s,m,v,l);std::unique_lock lock(publication_gate::mutex);if(publication_gate::armed){publication_gate::entered=true;publication_gate::cv.notify_all();publication_gate::cv.wait(lock,[]{return publication_gate::released;});}return result;}
+// The native UV worker now publishes the paired paint/current-model result.
+// Gate the actual complete helper, preserving the direct older factory probes.
+extern "C" detail::RetainedNativePaintModel __real__ZN4dome6detail25retain_native_paint_modelERKNS_12SculptObjectERKNS_4MeshESt4spanIKjLm18446744073709551615EERKNS_19PaintSamplingLimitsE(const SculptObject &,const Mesh &,std::span<const uint32_t>,const PaintSamplingLimits &);
+extern "C" detail::RetainedNativePaintModel __wrap__ZN4dome6detail25retain_native_paint_modelERKNS_12SculptObjectERKNS_4MeshESt4spanIKjLm18446744073709551615EERKNS_19PaintSamplingLimitsE(const SculptObject &s,const Mesh &m,std::span<const uint32_t> v,const PaintSamplingLimits &l){auto result=__real__ZN4dome6detail25retain_native_paint_modelERKNS_12SculptObjectERKNS_4MeshESt4spanIKjLm18446744073709551615EERKNS_19PaintSamplingLimitsE(s,m,v,l);std::unique_lock lock(publication_gate::mutex);if(publication_gate::armed){publication_gate::entered=true;publication_gate::cv.notify_all();publication_gate::cv.wait(lock,[]{return publication_gate::released;});}return result;}
 extern "C" void __real__ZN4dome6detail20restore_native_paintERNS_5SceneEmRKSt8functionIFbvEE(Scene &,uint64_t,const std::function<bool()> &);
 extern "C" void __wrap__ZN4dome6detail20restore_native_paintERNS_5SceneEmRKSt8functionIFbvEE(Scene &s,uint64_t object,const std::function<bool()> &cancelled){__real__ZN4dome6detail20restore_native_paintERNS_5SceneEmRKSt8functionIFbvEE(s,object,cancelled);std::unique_lock lock(publication_gate::mutex);if(publication_gate::armed){publication_gate::entered=true;publication_gate::cv.notify_all();publication_gate::cv.wait(lock,[]{return publication_gate::released;});}}
 namespace {
