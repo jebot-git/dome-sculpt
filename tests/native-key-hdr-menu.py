@@ -46,7 +46,7 @@ async def main():
         def named(title):
             for child in d.screen().root.query_tree().children:
                 try:
-                    if title in str(child.get_wm_name() or ''):return child
+                    if title in str(child.get_wm_name() or '') and child.get_attributes().map_state==X.IsViewable:return child
                 except error.BadWindow:pass
         window=await wait(lambda:named('Dome Sculpt'));window.set_input_focus(X.RevertToParent,X.CurrentTime);d.sync()
         def prop(name):
@@ -177,7 +177,13 @@ async def main():
         check('original.dsculpt' in str(window.get_wm_name()) and '*' not in str(window.get_wm_name()),'Actual current-key HDR native Open preserves saved document identity')
         (out/'input-native.dsculpt').write_bytes(original)
         await command('Export glTF (.glb)...');cancel=await wait(lambda:named('Export glTF scene'));cancel.set_input_focus(X.RevertToParent,X.CurrentTime);d.sync();key('Control_L',True);key('w');key('Control_L',False);await wait(lambda:named('Export glTF scene') is None)
-        check(project.read_bytes()==original,'Canonical Ctrl+W cancels actual ordinary HDR chooser with exact native source')
+        retained=[]
+        for child in d.screen().root.query_tree().children:
+            try:
+                if 'Export glTF scene' in str(child.get_wm_name() or ''):retained.append({'id':child.id,'mapped':child.get_attributes().map_state,'title':str(child.get_wm_name())})
+            except error.BadWindow:pass
+        (out/'cancel-window-lifetime.json').write_text(json.dumps({'remaining_titled_windows':retained},indent=2)+'\n')
+        check(project.read_bytes()==original and not list(Path(home).glob('*.glb')),'Canonical Ctrl+W hides the actual ordinary HDR chooser without accepting a default path or changing native source')
         ordinary=Path(home)/'ordinary.glb'
         await command('Export glTF (.glb)...');chooser=await wait(lambda:named('Export glTF scene'))
         check(chooser.get_wm_transient_for().id==window.id,'Ordinary skinned HDR export uses the real owned native FLTK chooser')
