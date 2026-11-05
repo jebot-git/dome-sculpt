@@ -46,7 +46,7 @@ async def main():
         def named(title):
             for child in d.screen().root.query_tree().children:
                 try:
-                    if title in str(child.get_wm_name() or ''):return child
+                    if title in str(child.get_wm_name() or '') and child.get_attributes().map_state==X.IsViewable:return child
                 except error.BadWindow:pass
         window=await wait(lambda:named('Dome Sculpt'));window.set_input_focus(X.RevertToParent,X.CurrentTime);d.sync()
         def prop(name):
