@@ -2,6 +2,7 @@
 #include "dome/scene.hpp"
 #include "dome/shapekey-authoring.hpp"
 #include "key-archive-preflight.hpp"
+#include "polygon-conversion.hpp"
 #include "normal-key-derivation.hpp"
 #include "canonical-paint-history.hpp"
 #include "canonical-normal-owner.hpp"
