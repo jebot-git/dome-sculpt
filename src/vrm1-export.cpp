@@ -636,7 +636,7 @@ static VrmExportReport export_vrm1_impl(const std::vector<ObjectSurface> &object
           if(std::string_view(kind)=="textureTransformBinds"&&!layer.forward_uv)continue;
           if(std::string_view(kind)=="materialColorBinds"&&(bind.at("type")=="color"||bind.at("type")=="outlineColor"))continue;
           auto forwarded=bind;forwarded["material"]=layer.upper;
-          if(layer.shade_alias&&std::string_view(kind)=="materialColorBinds"&&bind.at("type")=="shadeColor")for(size_t k=0;k<3;++k){const double value=bind.at("targetValue").at(k).get<double>()/layer.shade_divisor[k];require(std::isfinite(value)&&value>=0&&value<=1,"expression layer shade target exceeds unit representation");forwarded["targetValue"][k]=value;}
+          if(layer.shade_alias&&std::string_view(kind)=="materialColorBinds"&&bind.at("type")=="shadeColor")for(size_t k=0;k<3;++k){const double value=bind.at("targetValue").at(k).get<double>()/layer.shade_divisor[k];require(std::isfinite(value)&&value>=0&&value<=1e20,"expression layer shade target exceeds finite nonnegative source representation");forwarded["targetValue"][k]=value;}
           expression[kind].push_back(std::move(forwarded));
         }
       }

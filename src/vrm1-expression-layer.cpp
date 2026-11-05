@@ -6,6 +6,7 @@
 #include "vrm-painted.hpp"
 #include <cmath>
 #include <limits>
+#include <numeric>
 namespace dome::detail {
 namespace {
 using J=nlohmann::json;
@@ -40,21 +41,32 @@ Vrm1ExpressionLayer compile_vrm1_expression_layer(const J &original,const Sculpt
  Vrm1ExpressionLayer result;bool found=false,colour=false,same_target=true;
  result.shade_alias=base.image&&base.image==shade.image&&base.wrap_s==shade.wrap_s&&base.wrap_t==shade.wrap_t&&base.min_filter==shade.min_filter&&base.mag_filter==shade.mag_filter&&mtoon_coordinate(bt)==mtoon_coordinate(st)&&bt.offset==st.offset&&bt.scale==st.scale&&bt.rotation==st.rotation;
  if(result.shade_alias)for(size_t k=0;k<3;++k)result.shade_divisor[k]=object.material.color[k]!=0?object.material.color[k]:1;
- auto shade_factor=[&](const std::array<float,3> &factor){if(result.shade_alias)for(size_t k=0;k<3;++k){const double value=double(factor[k])/result.shade_divisor[k];if(!std::isfinite(value)||value<0||value>1)throw std::invalid_argument("VRM1 shared painted shade factor exceeds standard unit representation");}};
- shade_factor({material.parameters.shade_color.x,material.parameters.shade_color.y,material.parameters.shade_color.z});
+ const std::array<float,3> initial_shade{material.parameters.shade_color.x,material.parameters.shade_color.y,material.parameters.shade_color.z};
+ auto shade_factor=[&](const std::array<float,3> &factor,bool initial){if(result.shade_alias)for(size_t k=0;k<3;++k){const double value=double(factor[k])/result.shade_divisor[k];if(!std::isfinite(value)||value<0||value>(initial?1.:1e20))throw std::invalid_argument(initial?"VRM1 shared painted initial shade factor exceeds standard unit representation":"VRM1 shared painted shade target exceeds finite nonnegative source representation");}};
+ shade_factor(initial_shade,true);
+ std::array<double,3> shade_low{},shade_high{};if(result.shade_alias)for(size_t k=0;k<3;++k)shade_low[k]=shade_high[k]=double(initial_shade[k])/result.shade_divisor[k];
  const auto expressions=original.at("extensions").at("VRMC_vrm").value("expressions",J::object());
  for(const auto *table:{"preset","custom"})if(expressions.contains(table))for(const auto &expression:expressions.at(table)){
+  std::array<double,3> shade_delta{};
   for(const auto &bind:expression.value("materialColorBinds",J::array()))if(bind.at("material").get<int>()==object.appearance->source_material){
    if(bind.at("type")=="rimColor")throw std::invalid_argument("VRM1 rim colour expression needs its layered lighting adapter");
    colour|=bind.at("type")=="color";
-   if(bind.at("type")=="shadeColor"){const auto target=bind.at("targetValue").get<std::array<float,4>>();shade_factor({target[0],target[1],target[2]});}
+   if(bind.at("type")=="shadeColor"){const auto target=bind.at("targetValue").get<std::array<float,4>>();shade_factor({target[0],target[1],target[2]},false);if(result.shade_alias)for(size_t k=0;k<3;++k)shade_delta[k]+=(double(target[k])-initial_shade[k])/result.shade_divisor[k];}
   }
+  if(result.shade_alias)for(size_t k=0;k<3;++k){shade_low[k]+=std::min(0.,shade_delta[k]);shade_high[k]+=std::max(0.,shade_delta[k]);}
   for(const auto &bind:expression.value("textureTransformBinds",J::array()))if(bind.at("material").get<int>()==object.appearance->source_material){
   const auto raw_scale=bind.value("scale",std::array<double,2>{1,1}),raw_offset=bind.value("offset",std::array<double,2>{});
   std::array<float,2> scale{},offset{};for(size_t k=0;k<2;++k){if(!std::isfinite(raw_scale[k])||!std::isfinite(raw_offset[k])||std::abs(raw_scale[k])>1e20||std::abs(raw_offset[k])>1e20)throw std::invalid_argument("VRM1 texture target is outside finite source metadata bounds");scale[k]=float(raw_scale[k]);offset[k]=float(raw_offset[k]);}
   if(found&&(result.scale!=scale||result.offset!=offset))same_target=false;
   if(!found){result.scale=scale;result.offset=offset;}found=true;
  }}
+ // VRM1 targetValue is an unrestricted float4. The serialized initial MToon
+ // shade factor remains unit, while every expression may accumulate deltas.
+ // Bound the entire [0,1] weight box, including simultaneous custom/presets,
+ // rather than assuming one active expression or clamping their true targets.
+ if(result.shade_alias)for(size_t k=0;k<3;++k){const double bound=std::max(std::abs(shade_low[k]),std::abs(shade_high[k]));if(!std::isfinite(bound)||bound>1e20)throw std::invalid_argument("VRM1 accumulated shade coefficients exceed finite source bounds");result.maximum_shade_coefficient=std::max(result.maximum_shade_coefficient,bound);}
+ const bool wide_shade=result.maximum_shade_coefficient>1;
+ const double lighting_bound=std::max(1.,result.maximum_shade_coefficient)+.25;
  // Source per-material bindings need not be copied onto an upper role
  // whose actual contribution is UV-invariant. Shared shade is the new paint
  // image itself; other shade/emission roles require immutable data proof.
@@ -88,21 +100,51 @@ Vrm1ExpressionLayer compile_vrm1_expression_layer(const J &original,const Sculpt
  charge(native_pixels,sizeof(Pixel));charge(pixels,sizeof(Pixel)+10);charge(object.painted->mesh().positions.size(),sizeof(std::array<float,2>));charge(2*(n+size+2),sizeof(double));
  if(pixels>limits.max_output_bytes/6)throw std::length_error("VRM1 expression-layer prospective PNG limit exceeded");
  auto work=[&](size_t count){if(result.sample_operations>limits.max_sample_operations||count>limits.max_sample_operations-result.sample_operations)throw std::length_error("VRM1 expression-layer sampling work limit exceeded");result.sample_operations+=count;};
- const size_t maximum_knots=n+size+2;
- if(maximum_knots>std::numeric_limits<size_t>::max()/maximum_knots||maximum_knots*maximum_knots>limits.max_sample_operations/80)
-  throw std::length_error("VRM1 expression-layer prospective continuous proof work limit exceeded");
+ const size_t divisor=std::gcd(n,size_t(size));
+ const size_t shared_centres=(n/divisor)%2&&(size/divisor)%2?divisor:0;
+ const size_t knot_count=n+size-shared_centres+2,cells=knot_count-1;
+ const bool compensate_tent=wide_shade&&size>n&&size%n==0&&(size/n)%2==0;
+ const size_t prefilter_work=wide_shade?(compensate_tent?13:9):0;
+ // Forecast the full native sampling, optional prefilter and continuous proof
+ // together, before dense allocations. The centre intersection count is exact:
+ // n/g and size/g must both be odd to share the g rational centre knots.
+ size_t forecast=result.sample_operations;
+ auto forecast_work=[&](size_t count,size_t width){if(forecast>limits.max_sample_operations||count>(limits.max_sample_operations-forecast)/width)throw std::length_error("VRM1 expression-layer prospective complete sampling work limit exceeded");forecast+=count*width;};
+ forecast_work(native_pixels,1+packet.layers().size());forecast_work(pixels,1+prefilter_work);forecast_work(cells*cells,80);
+ if(prefilter_work)work(pixels*prefilter_work);
  std::vector<Pixel> native(native_pixels),decoded(pixels);auto image=std::make_shared<Image>(Image{size,size,std::vector<uint8_t>(pixels*4)});
  for(size_t y=0;y<n;++y){stop();for(size_t x=0;x<n;++x){work(1+packet.layers().size());const auto v=sample_overlay_texel_values(packet,int(x),int(y),false);
   if(v[3][1]!=0||v[3][2]!=0||v[3][3]!=0||v[4]!=std::array<float,4>{})throw std::invalid_argument("VRM1 expression layers currently transport colour paint only");
   auto &p=native[y*n+x];for(size_t k=0;k<3;++k)p[k]=v[0][k];p[3]=v[3][0];
  }}
- for(uint32_t y=0;y<size;++y){stop();for(uint32_t x=0;x<size;++x){work(1);const auto p=bilinear(native,uint32_t(n),(x+.5)/size,(y+.5)/size);auto &q=decoded[size_t(y)*size+x];const size_t at=(size_t(y)*size+x)*4;
+ for(uint32_t y=0;y<size;++y){stop();for(uint32_t x=0;x<size;++x){work(1);auto p=bilinear(native,uint32_t(n),(x+.5)/size,(y+.5)/size);
+  if(compensate_tent){
+   // An even integer upsample misaligns native/output texel-centre knots.
+   // A linear texture adds a second tent reconstruction to the native field.
+   // A bounded local prefilter compensates its knot smoothing. Its values are
+   // still genuine premultiplied colour/coverage, and the unchanged continuous
+   // proof below measures the resulting texture against the ORIGINAL field.
+   Pixel adjacent{};for(auto d:{std::array<int,2>{-1,0},{1,0},{0,-1},{0,1}}){const auto a=bilinear(native,uint32_t(n),(double(x)+d[0]+.5)/size,(double(y)+d[1]+.5)/size);for(size_t k=0;k<4;++k)adjacent[k]+=a[k];}
+   for(size_t k=0;k<4;++k)p[k]+=.25*(4*p[k]-adjacent[k]);
+   p[3]=std::clamp(p[3],0.,1.);for(size_t k=0;k<3;++k)p[k]=std::clamp(p[k],0.,p[3]);
+  }
+  auto &q=decoded[size_t(y)*size+x];const size_t at=(size_t(y)*size+x)*4;
   for(size_t k=0;k<4;++k){const double value=k==3?p[3]:p[3]>0?p[k]/p[3]:0;
    if(!std::isfinite(value)||value<0||value>1+1e-6)throw std::invalid_argument("VRM1 expression layer exceeds standard unit texture representation");
    const auto byte=uint8_t(std::clamp(std::lround((k==3?std::clamp(value,0.,1.):srgb(std::clamp(value,0.,1.)))*255),0l,255l));image->rgba[at+k]=byte;q[k]=k==3?byte/255.:linear(byte/255.);
   }
  }}
- std::vector<double> knots{0,1};knots.reserve(n+size+2);for(auto count:{n,size_t(size)})for(size_t i=0;i<count;++i)knots.push_back((i+.5)/count);std::sort(knots.begin(),knots.end());knots.erase(std::unique(knots.begin(),knots.end()),knots.end());
+ // RGB at genuinely zero native coverage has no pointwise contribution.
+ // Its filtered value does matter at the boundary. Extend genuine neighbouring
+ // straight colour there, without changing coverage or positive-coverage data.
+ // All reads come from the immutable native field (never propagated padding).
+ // The continuous proof below still decides admission; this is no error waiver.
+ if(wide_shade)for(uint32_t y=0;y<size;++y){stop();for(uint32_t x=0;x<size;++x){
+  const double u=(x+.5)/size,v=(y+.5)/size;if(bilinear(native,uint32_t(n),u,v)[3]!=0)continue;
+  Pixel sum{};for(int j=-1;j<=1;++j)for(int i=-1;i<=1;++i)if(i||j){const auto p=bilinear(native,uint32_t(n),(double(x)+i+.5)/size,(double(y)+j+.5)/size);for(size_t k=0;k<4;++k)sum[k]+=p[k];}
+  if(sum[3]>0)for(size_t k=0;k<3;++k){const double value=std::clamp(sum[k]/sum[3],0.,1.);const auto byte=uint8_t(std::clamp(std::lround(srgb(value)*255),0l,255l));const size_t at=size_t(y)*size+x;image->rgba[at*4+k]=byte;decoded[at][k]=linear(byte/255.);}
+ }}
+ std::vector<double> knots{0,1};knots.reserve(n+size+2);for(auto count:{n,size_t(size)})for(size_t i=0;i<count;++i)knots.push_back((i+.5)/count);std::sort(knots.begin(),knots.end());knots.erase(std::unique(knots.begin(),knots.end()),knots.end());if(knots.size()!=knot_count)throw std::logic_error("VRM1 expression-layer exact centre-knot forecast differs");
  // On every merged texel-centre rectangle both reconstructed fields are
  // bilinear. Product(straight RGB,coverage) is biquadratic: its Bernstein
  // control hull bounds error against the degree-elevated native premult field
@@ -115,7 +157,7 @@ Vrm1ExpressionLayer compile_vrm1_expression_layer(const J &original,const Sculpt
    auto &maximum=k==3?result.maximum_coverage_error:result.maximum_color_error;maximum=std::max(maximum,error);
   }
  }}
- if(result.maximum_color_error+result.maximum_coverage_error>3./(255*1.25))throw std::invalid_argument("VRM1 straight-alpha PNG reconstruction exceeds fixed portable expression-layer error budget");
+ if(result.maximum_color_error+result.maximum_coverage_error>3./(255*lighting_bound))throw std::invalid_argument("VRM1 straight-alpha PNG reconstruction exceeds fixed portable expression-layer error budget: RGB="+std::to_string(result.maximum_color_error)+" coverage="+std::to_string(result.maximum_coverage_error)+" light="+std::to_string(lighting_bound));
  result.paint_coordinates.reserve(object.painted->mesh().uv.size());for(auto uv:object.painted->mesh().uv){stop();for(size_t k=0;k<2;++k){uv[k]=(uv[k]-result.offset[k])/result.scale[k];if(!std::isfinite(uv[k]))throw std::invalid_argument("VRM1 expression-layer carrier coordinate is nonfinite");}result.paint_coordinates.push_back(uv);}
  if(result.paint_coordinates.size()!=object.painted->mesh().positions.size())throw std::invalid_argument("VRM1 expression layer has no complete writable coordinate owner");
  // Bound ordinary F32 interpolation/scale/add cancellation relative to the

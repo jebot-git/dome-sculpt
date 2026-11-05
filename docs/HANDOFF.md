@@ -1,5 +1,19 @@
 # Dome Sculpt production handoff
 
+## Combined physical skin and wider expression candidate — 2026-11-05
+
+This isolated candidate merges qualified physical skin export c1354a6 and wider
+VRM1 shade expressions e84d919 into b37f360. Main remains f9da354. Fresh whole
+owning application/core/render/support and selected consumer builds are pending
+in both Release and sanitizer, including all direct private expression-header
+dependencies. The older b37 Release selected run closes 83/84 with an obsolete
+publication interception hook; its corrected real paired-helper probe separately
+passes 1,797 checks per profile. Its original sanitizer run remains frozen/live.
+No original failed result is relabeled. The physical skin positive consumer and
+five wider-coefficient tests enter this candidate's selected integration scope.
+Full regressions, complete authoring/device/accelerator requirements and later
+controller drawers remain required; no main admission or installation is claimed.
+
 ## Current combined adapter qualification candidate — 2026-11-05
 
 This isolated candidate composes the qualified1f/aca/ccc authoring source,
@@ -285,6 +299,20 @@ receipt for original failures, own fresh-parent/completed-TU build scope and fou
 retained Khronos tangent warnings. This is not fresh ALL/full612, main admission,
 physical headset, GPU baking or full production completion. Broader bake recipes,
 resource/consumer/device work and deferred drawers remain required.
+## Private wider VRM1 shade targets — 2026-11-05
+
+Runtime86ea09e follows196 with actual target>1 and simultaneous shade deltas,
+coefficient-aware continuous reconstruction, bounded compensation/padding and
+complete prospective work forecast. No public/schema/UI change; all3 directTUs
+and whole focused consumers rebuilt on matching196 support. R165.909s/S817.662s
+all0/1880exact: workers49+49, independent515/108pairs max1 at unchanged4, NEW
+full1874 (964persistent+903Cancel+7controls), legacy8/5/5 and coupled18. Strict
+PCI03 Arc517/108pairs0 plusactualsoftware1,9.351s/1894exact; lease released.
+90official instances0errors/KHR0errors47warnings173infos36hints;216PNG+20native/
+container/control R/S pairs exact;29oldwriter files/profile byte-identical.
+Configure656/5new is registration only. Initial-factor/MASK/BLEND/other owning
+roles/root composition/external/fullVRM remain open; SAME original64560 unfinished.
+Read VRM1-WIDE-SHADE-EXPRESSIONS.md/JSON; counterad0 and draft negatives retained.
 
 ## Private invariant-role VRM1 UV targets — 2026-11-05
 
