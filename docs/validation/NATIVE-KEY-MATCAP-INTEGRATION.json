@@ -27410,7 +27410,7 @@
     "binary_MatCap_consumer": 445,
     "binary_pairs": 72,
     "physical_key_HDR": 115,
-    "physical_HDR_pairs": 18,
+    "physical_HDR_pairs": 12,
     "native_GUI": 44
   },
   "hardware": {
@@ -28702,5 +28702,10 @@
     "geometry": "No authored geometry/camera/pose/texture resolution/error-bound change in existing sources. New MatCap input separately declared. No exported output rewriting.",
     "UI_source": "tests/native-key-hdr-menu.py byte-exact executed artifact consumer",
     "scope": "No source runtime drift; no global guard lift, schema change, installed session or silent accelerator fallback."
+  },
+  "receipt_count_correction": {
+    "physical_HDR_independent_comparisons": 12,
+    "HDR_PNG_images": 18,
+    "reason": "Six pose/morph states times ordinary+editable is12 independent comparisons. Former18 meant savedPNGfiles;115checks andallactualresults unchanged."
   }
 }

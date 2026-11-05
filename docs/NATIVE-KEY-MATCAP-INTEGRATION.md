@@ -29,7 +29,7 @@ source/paint coordinates, tint, shared shade and MatCap mappings are detected.
 
 - Release and matching owning ASan/UBSan/leak consumers: 1,147 worker/geometry/
   package/history/quota controls, 445 independent binary-expression checks over
-  72 image pairs, and 115 actual physical-key HDR controls over 18 image pairs.
+  72 image pairs, and 115 actual physical-key HDR controls over 12 independent image comparisons (18 PNG images).
 - Actual Arc A770 PCI03: 446 binary-expression and 115 HDR checks; two same-binary
   forced-software hardware requests refuse. Device descriptors, sysfs and mapped
   driver hashes are recorded. This is graphics evidence, not compute or HMD proof.
