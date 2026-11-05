@@ -42,3 +42,15 @@ independent views, foreign/missing-domain negatives, exact caps, allocation swee
 and fsync-gated running/queued Cancel consume that authenticated current data.
 The original39f omission counterexample remains preserved by its agent; the new
 reader must reject a rehashed legacy1 package omitting the actual37 witness.
+
+Initial fresh sanitizer build stops at263/436 at a missing private cgltf include
+on the new mask/MatCap pristine test. Release ALL is explicitly interrupted130
+for this same confirmed target-definition error, before reaching it. Original
+statuses/logs/manifests remain terminal1/130 with no source drift. Four pristine/
+default consumers now declare src/cgltf/desktop private includes. No production,
+public/private header, C++ test or persistence source changes. A separately named
+continuation reuses only the same owning prebuilt objects; it is not a green
+original build or a new clean invocation. The known nativeHDR GUI observer fix
+uses only visible chooser windows and verifies no default output; originalSAN
+CtrlW observer timeout remains recorded, precise cause unproven. Prior HDR pair
+count metadata is corrected from18 PNG images to12 independent comparisons.
