@@ -1,5 +1,18 @@
 # Dome Sculpt production handoff
 
+## Private native36 factory and codec allocation proof — 2026-11-05
+
+Real Create/Replace/Scene encode/decode complete all18,244 measured C++ prefixes
+plus2,299 Release/2,420 composed ownedSAN native malloc prefixes on the actual
+small native paint/skin/key graph. Every refusal preserves caller/source/wire
+and exact retry;13 copies of each persisted endpoint are byte-identical and
+52 compiled support/config artifacts stay exact. Original aggregate and two
+whole-mode SAN900s timeouts remain failures; disjoint same-binary ranges close
+coverage without assertion changes. Test/CMake/docs only, no runtime/layout or
+production-cap change. Read NATIVE-FRAME-FAULTS.md and its receipt for matched
+native36 support, finite conditional SAN wall budget, preserved headless setup
+failure and non-claims. No freshALL/whole-green-SAN/main/full-goal claim.
+
 ## Private native writable-paint UV after skin binding — 2026-11-05
 
 A paired factory now transports actual REST-indexed pure skin/pose/IBM together
