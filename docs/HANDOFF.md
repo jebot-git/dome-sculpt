@@ -1,3 +1,15 @@
+## Exhaustive private physical-package fault closure — 2026-11-05
+
+Private frozen1f9fd48/owning5df now closes all128 partitions/profile:90,261
+persistent allocation denials plus1successful endpoint each Release/SAN, exact
+rollback/recovery and mapped/input hashes. Independent aggregate replays pass0;
+originalf365 whole-test SAN timeout3600.04 remains failed. Read
+PHYSICAL-PACKAGE-FAULT-CLOSURE.md and its receipt. The integrated93c candidate
+has separate40-point smoke evidence only. Main runtime remainsc179/615/native36;
+37, physical4, broader integration, weights/Mirror/material/device/accelerator
+requirements and later controller drawers remain open. Full goal active;
+no installation or headset launch.
+
 ## Matching material clients and exhaustive factories closed — 2026-11-05
 
 Private component seal227c11c (runtimecodeeacfba7) now closes the same fullfactory
