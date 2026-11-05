@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/document.hpp"
+#include "spatial-history-levels.hpp"
 #include "document-held-affine.hpp"
 namespace dome {
 bool Document::process_affine_paint_spatial_locked(const SpatialFrame &f){
@@ -22,7 +23,7 @@ bool Document::process_affine_paint_spatial_locked(const SpatialFrame &f){
   if(sample_native_locked(s))session.contact_previous=s.brush.to;
  };
  if(active){
-  auto session=native_stroke_;const size_t i=session->spatial_owner-1;const auto &h=f.hands[i];state_.hands=valid?f.hands:std::array<SpatialHand,2>{};
+  auto session=native_stroke_;const size_t i=session->spatial_owner-1;const auto &h=f.hands[i];state_.hands=valid?f.hands:detail::history_only_hands(state_.hands);
   if(!valid||!h.tracked.valid||!ob::finite(h.tracked.grip)||!std::isfinite(h.tracked.trigger)){
    session->menu_after=false;contact_rearmed_={};if(!session->accepted.load()){cancel_native_locked();if(state_.object_grabbing)finish_object_grab_locked(false,true);}publish_locked(false,false);return true;
   }
