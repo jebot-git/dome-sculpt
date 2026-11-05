@@ -1,0 +1,30 @@
+{
+  "main_merge": "37c46b9e1bed1cc06e61ec04667ea0761b7540e9",
+  "qualified_seal": "8750f20135772cc32f4943f937a55cf6ef93be70",
+  "runtime_source": "0567c46f5068a1d20e3f35fe49f04ac2cd19710d",
+  "product_header_CMake_test_parity_exact": true,
+  "qualification_receipt": "POLYGON-RETOPO-WORKER9DD.json",
+  "receipt_sha256": "d5d924797ac44750a55b0b0fae60af1362bbf5cbe5fe4bda8aae2c03a9494bde",
+  "scope": "Scoped component admission; fresh matched mergedDocument constructor/destructor and whole polygon providers, qualified one-whole retopology worker replacement; no fresh full-project build claim",
+  "native_checks_per_profile": 248,
+  "native_file_pairs": 16,
+  "GUI": {
+    "ordinary_Release_normal": 77,
+    "ordinary_Release_compact": 77,
+    "ordinary_SAN_normal": 77,
+    "ordinary_SAN_compact": 77
+  },
+  "hardware": "Same ordinary Release app on actualPCI03ArcA770/renderD129; stereo retopo+polygon Apply/Restore, immutable source/inputs/maps; SW/UHD fail hardware observer, ordinaryapp allows software",
+  "public_Document_EditorState_Scene_sizes_unchanged": true,
+  "private_Polygon_payloads_changed": "Only complete compatible providers used, oldmembers excluded; source field/size/offset/nm audit in sealed receipt",
+  "schema_change": false,
+  "old_failure_records_preserved": true,
+  "remaining": [
+    "Caller input publication repair and coherent weights integration",
+    "Remesh candidate composition and remaining allocation sweep",
+    "Broader whole-project/runtime/device/interoperability/accelerator and full goal"
+  ],
+  "installation": false,
+  "physical_HMD": false,
+  "session_restart": false
+}
