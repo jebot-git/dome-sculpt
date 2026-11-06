@@ -16,9 +16,9 @@ class PolygonSurfaceGpu {
   Chunk(Chunk&&o)noexcept:buffer(std::exchange(o.buffer,0)),texture(std::exchange(o.texture,0)),first(o.first),count(o.count){}
   ~Chunk(){if(texture)glDeleteTextures(1,&texture);if(buffer)glDeleteBuffers(1,&buffer);}
  };
- struct Entry {std::shared_ptr<const PolygonSurfaceOwner>owner;AffineTransform world;std::vector<Chunk>chunks;size_t bytes=0;};
+ struct Entry {std::shared_ptr<const PolygonSurfaceOwner>owner;std::shared_ptr<const TextureSetFaceDomain>domain;AffineTransform world;std::vector<Chunk>chunks;size_t bytes=0;};
  std::vector<Entry>entries_;
- static bool same(const Entry&e,const PolygonSurfacePreview&p,const AffineTransform&w){const auto&o=p.field_owner();return e.owner==o&&!e.owner.owner_before(o)&&!o.owner_before(e.owner)&&e.world.matrix()==w.matrix();}
+ static bool same(const Entry&e,const PolygonSurfacePreview&p,const AffineTransform&w,const std::shared_ptr<const TextureSetFaceDomain>&domain){const auto&o=p.field_owner();return e.domain==domain&&!e.domain.owner_before(domain)&&!domain.owner_before(e.domain)&&e.owner==o&&!e.owner.owner_before(o)&&!o.owner_before(e.owner)&&e.world.matrix()==w.matrix();}
  struct Bind {
   GLint active=0,texture=0,buffer=0;
   Bind(){glGetIntegerv(GL_ACTIVE_TEXTURE,&active);glActiveTexture(GL_TEXTURE14);glGetIntegerv(GL_TEXTURE_BINDING_BUFFER,&texture);glGetIntegerv(GL_TEXTURE_BUFFER_BINDING,&buffer);}
@@ -29,28 +29,33 @@ public:
  size_t images()const{size_t n=0;for(const auto&e:entries_)n+=e.chunks.size();return n;}
  void clear(bool release){if(!release)for(auto&e:entries_)for(auto&c:e.chunks)c.texture=c.buffer=0;entries_.clear();}
  void prepare(const MeshSnapshot&snapshot,size_t other_bytes,size_t other_images,const SurfaceTextureLimits&limits){
-  struct Wanted {std::shared_ptr<const PolygonSurfacePreview>packet;AffineTransform world;};std::vector<Wanted>wanted;
+  struct Wanted {std::shared_ptr<const PolygonSurfacePreview>packet;AffineTransform world;std::shared_ptr<const TextureSetFaceDomain>domain;};std::vector<Wanted>wanted;
   if(std::none_of(snapshot.ranges.begin(),snapshot.ranges.end(),[](const auto&r){return r.textures&&bool(r.textures->polygon_surface);})){clear(true);return;}
   GLint texels=0;glGetIntegerv(GL_MAX_TEXTURE_BUFFER_SIZE,&texels);if(texels<4)throw std::runtime_error("Polygon primitive frames require an actual texture-buffer capacity");const size_t chunk_triangles=size_t(texels)/4;
   size_t all_bytes=0,all_images=0;
   for(const auto&r:snapshot.ranges)if(r.textures&&r.textures->polygon_surface){
-   const auto&p=r.textures->polygon_surface;const auto world=polygon_range_world(r);
-   if(std::any_of(wanted.begin(),wanted.end(),[&](const auto&w){return w.packet->field_owner()==p->field_owner()&&!w.packet->field_owner().owner_before(p->field_owner())&&!p->field_owner().owner_before(w.packet->field_owner())&&w.world.matrix()==world.matrix();}))continue;
+   const auto&p=r.textures->polygon_surface;const auto world=polygon_range_world(r);const auto domain=r.texture_set_proof?r.texture_set_proof->field().domain:nullptr;
+   if(r.texture_set_proof)r.texture_set_proof->authenticate(r);if(domain)domain->authenticate_owner(domain);
+   if(std::any_of(wanted.begin(),wanted.end(),[&](const auto&w){return w.domain==domain&&!w.domain.owner_before(domain)&&!domain.owner_before(w.domain)&&w.packet->field_owner()==p->field_owner()&&!w.packet->field_owner().owner_before(p->field_owner())&&!p->field_owner().owner_before(w.packet->field_owner())&&w.world.matrix()==world.matrix();}))continue;
    if(wanted.size()>=256)throw std::length_error("Polygon primitive frame owner count exceeds its renderer bound");
-   const size_t triangles=p->geometric_frames().size(),bytes=triangles*64,images=(triangles+chunk_triangles-1)/chunk_triangles;
+   const size_t triangles=domain?domain->triangles().size():p->geometric_frames().size(),bytes=triangles*64,images=(triangles+chunk_triangles-1)/chunk_triangles;
    if(all_bytes>limits.max_bytes||other_bytes>limits.max_bytes-all_bytes||bytes>limits.max_bytes-all_bytes-other_bytes||all_images>limits.max_images||other_images>limits.max_images-all_images||images>limits.max_images-all_images-other_images)throw std::length_error("Polygon primitive frames exceed aggregate image/buffer quota before upload");
-   all_bytes+=bytes;all_images+=images;wanted.push_back({p,world});
+   all_bytes+=bytes;all_images+=images;wanted.push_back({p,world,domain});
   }
-  std::erase_if(entries_,[&](const Entry&e){return !std::any_of(wanted.begin(),wanted.end(),[&](const auto&w){return same(e,*w.packet,w.world);});});
+  std::erase_if(entries_,[&](const Entry&e){return !std::any_of(wanted.begin(),wanted.end(),[&](const auto&w){return same(e,*w.packet,w.world,w.domain);});});
   Bind restore;
-  for(const auto&w:wanted){if(std::any_of(entries_.begin(),entries_.end(),[&](const Entry&e){return same(e,*w.packet,w.world);}))continue;
-   const auto frames=w.packet->placed_frames(w.world);Entry entry;entry.owner=w.packet->field_owner();entry.world=w.world;entry.bytes=frames.size()*64;
+  for(const auto&w:wanted){if(std::any_of(entries_.begin(),entries_.end(),[&](const Entry&e){return same(e,*w.packet,w.world,w.domain);}))continue;
+   // Reserve the full placement scratch plus the retained subset before allocation.
+   const size_t full=w.packet->geometric_frames().size();if(full>limits.max_bytes/64||all_bytes>limits.max_bytes-full*64||other_bytes>limits.max_bytes-full*64-all_bytes)throw std::length_error("Polygon set frame placement scratch exceeds aggregate quota");
+   auto frames=w.packet->placed_frames(w.world);
+   if(w.domain){std::vector<std::array<std::array<float,4>,4>>subset;subset.reserve(w.domain->triangles().size());for(auto triangle:w.domain->triangles())subset.push_back(frames.at(triangle));frames=std::move(subset);}
+   Entry entry;entry.owner=w.packet->field_owner();entry.domain=w.domain;entry.world=w.world;entry.bytes=frames.size()*64;
    for(size_t first=0;first<frames.size();first+=chunk_triangles){Chunk c;c.first=first;c.count=std::min(chunk_triangles,frames.size()-first);glGenBuffers(1,&c.buffer);glGenTextures(1,&c.texture);if(!c.buffer||!c.texture)throw std::runtime_error("Polygon primitive frame allocation failed");glBindBuffer(GL_TEXTURE_BUFFER,c.buffer);glBufferData(GL_TEXTURE_BUFFER,GLsizeiptr(c.count*64),frames.data()+first,GL_STATIC_DRAW);glBindTexture(GL_TEXTURE_BUFFER,c.texture);glTexBuffer(GL_TEXTURE_BUFFER,GL_RGBA32F,c.buffer);if(glGetError()!=GL_NO_ERROR)throw std::runtime_error("Polygon primitive frame upload failed");entry.chunks.push_back(std::move(c));}
    entries_.push_back(std::move(entry));
   }
  }
- template<class Draw>void draw(const PolygonSurfacePreview&p,const AffineTransform&world,size_t first,size_t count,Draw&&draw){
-  auto found=std::find_if(entries_.begin(),entries_.end(),[&](const Entry&e){return same(e,p,world);});if(found==entries_.end()||count!=p.geometric_frames().size()*3)throw std::invalid_argument("Polygon draw has no matching immutable primitive-frame upload");
+ template<class Draw>void draw(const PolygonSurfacePreview&p,const AffineTransform&world,size_t first,size_t count,const std::shared_ptr<const TextureSetFaceDomain>&domain,Draw&&draw){
+  auto found=std::find_if(entries_.begin(),entries_.end(),[&](const Entry&e){return same(e,p,world,domain);});if(found==entries_.end()||count!=(domain?domain->triangles().size():p.geometric_frames().size())*3)throw std::invalid_argument("Polygon draw has no matching immutable primitive-frame upload");
   Bind restore;for(const auto&chunk:found->chunks){glBindTexture(GL_TEXTURE_BUFFER,chunk.texture);draw(first+chunk.first*3,chunk.count*3);}
  }
 };

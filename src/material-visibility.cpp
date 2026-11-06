@@ -94,12 +94,11 @@ struct Visibility {
       if(!expected||expected!=r.paint_sampling_attachment||expected.owner_before(r.paint_sampling_attachment)||r.paint_sampling_attachment.owner_before(expected))
         throw std::invalid_argument("Visibility paint range differs from its own immutable material attachment");
       const auto &domain=*r.paint_sampling_attachment->domain();
-      if(domain.source_corners().size()!=r.count||coordinates.empty())
+      if((r.texture_set_proof?r.count!=r.texture_set_proof->draw().count:domain.source_corners().size()!=r.count)||coordinates.empty())
         throw std::invalid_argument("Visibility paint corner coordinates are incomplete");
       paint_corners.reserve(r.count);
       for(size_t c=0;c<r.count;++c) {
-        auto logical=c;
-        if(r.paint_winding_reversed&&c%3)logical=c/3*3+3-c%3;
+        const auto logical=detail::surface_logical_corner(r,c);
         auto source=domain.source_corners()[logical];
         auto expected=domain.basis()->uv.at(domain.basis()->indices.at(source));
         auto actual=coordinates[per_vertex?mesh.indices.at(r.first+c):r.first+c];
