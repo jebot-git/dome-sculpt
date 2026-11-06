@@ -5,8 +5,12 @@
 namespace dome::detail {
 // Typed private envelope seam. An actual replayed node grants only its exact
 // current geometry/grid correspondence, never another field or arbitrary Paint.
-// Ordinary public Paint readers/writers keep refusing Paint6/domain3.
+// Public Paint6 calls require the actual synchronous Scene39 owning scope;
+// standalone readers/writers keep refusing domain3.
 struct PolygonSurfacePaintCodec {
+ static std::shared_ptr<const TextureMaps> preview(const PaintedMesh &,
+     const std::shared_ptr<const SourceMaterialBindings> &,const Material &,
+     const std::function<bool()> &cancelled={});
  static nlohmann::json encode(const PaintedMesh &,
      const std::shared_ptr<const SourceMaterialBindings> &,PolygonSurfaceNodeWriter &,
      PaintImageArchive &,NormalSamplingArchive * = nullptr,

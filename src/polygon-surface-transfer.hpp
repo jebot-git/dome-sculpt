@@ -2,6 +2,7 @@
 #pragma once
 #include "dome/affine.hpp"
 #include "dome/polygon.hpp"
+#include "dome/polygon-authoring.hpp"
 #include "normal-bake-encoding.hpp"
 namespace dome::detail {
 // Private mathematical/correspondence foundation. These values do not mint a
@@ -11,10 +12,7 @@ struct PolygonSurfaceTransferLimits {
  size_t maximum_working_bytes=256*1024*1024;
  PolygonLimits geometry;
 };
-struct PolygonSurfaceStep {
- PolygonEdit edit;
- std::optional<AffineTransform> world;
-};
+using PolygonSurfaceStep=PolygonReplayStep;
 struct PolygonSurfaceTriangle {
  uint32_t source_triangle=0;
  std::array<std::array<double,3>,3> source_barycentrics{};

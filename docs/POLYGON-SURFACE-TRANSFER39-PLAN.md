@@ -158,3 +158,60 @@ and rendered recovery need the actual enclosing normal/image/material codec.
 Generic preview/composite and ordinary public domain3 writing now refuse early
 until a genuine current-field adapter is connected; this is a temporary missing
 path, not completion. All Scene39 publication and material21 writer guards stay.
+
+
+The next initial producer checkpoint is source-connected and **unexecuted**.
+It adds `TextureMaps::polygon_surface` and persistent geometry-operation metadata
+on `PolygonView`; it does not append SurfaceRange or MeshSnapshot fields. All
+allocating/accessing app, core, support, renderer, XR and inspector consumers
+must be rebuilt together before any runtime. The earlier 252 providers are
+immutable controls, not compatible link inputs for these new layouts.
+
+The actual native Accept path now replays the complete bounded Move/Flip
+program against its captured source topology, stages genuine current Paint and
+binds a new active PolygonAuthority to that same owner's complete before root.
+Unchanged Accept remains a no-op; incomplete programs and other topology
+operations refuse. Actual pre-edit pose/morph/skin geometry is captured while
+full REST/deformation, first-source and placement history remain in the origin.
+Both live actors and retained before-only origins must match the current
+polygon, paint attachment and owner, rather than authenticating only a material
+pointer. Current normal writes/Clear/rebake and repeated connected edits still
+require real transition adapters.
+
+Scene39/material21/Paint6 now have explicit scoped writers/readers. Actual
+field nodes supply source-root and original-grid witnesses. Reader preflight
+checks the full node pool, retained origin/authority graph, earlier material
+prefixes, recursive depth and source/raster/JSON/deformation allocation bounds
+before replay. Full pose matrices charge 16 entries each. Material21 carries
+actual historical base1..10 plus explicit existing physical/canonical/native/
+key/CPS capabilities; no high-number fallback grants those authorities. Old
+Paint/material envelopes retain their old branches. Standalone Paint6 lacks a
+Scene39 source resolver and refuses. Bare attribute-Paint6 history remains
+unsupported: it must use a material-bearing owning source root, not an inferred
+or equal-valued material association.
+
+A typed current-field packet retains separate original paint coordinates,
+normal coordinates, actual before raw N/T/W and current geometric frame rows.
+Native N-only has neither invented artist T/W nor normal UV. The native mesh
+worker packs actual ordered current corners and full world placement. Material
+queries authenticate those streams and retain geometric normals for picking;
+CPU detail evaluation requires no GPU readback. The renderer uses a separate
+lazy polygon shader and immutable RGBA32F per-primitive frame buffers on the
+existing samplerBuffer unit14, with no new vertex attributes. Mixed old ranges
+keep their actual source/normal paths and aggregate image/buffer bounds. These
+sources still need independent GL shader, full affine/held/pose/morph, pixel,
+conditioning and two-eye reuse proof; syntax does not qualify those properties.
+
+A new self-contained native test constructs a real quad Bake/Convert/FLOAT
+stroke, current key and required37 UV retention, then uses actual polygon
+Move/Flip, queued Save, restart, Undo/Redo and source Restore. It also covers
+native N-only, affine/reflected contexts, before-only ownership, false flags,
+foreign source references and cyclic material prefixes. Syntax passes only;
+no assertions in this new workflow have executed. The old nonmanifold and
+Restore-to-polygon failures remain preserved.
+
+Standard GLB/VRM and physical package output remain guarded pending measured
+portable/domain adapters. Source-aware/typed MToon, material-set subranges,
+new post-Apply keys/rig/UV, repeated edits and general topology/refinement remain
+full-goal work. No current-format, sanitizer, UI, GPU, performance or main
+admission follows from this source checkpoint.

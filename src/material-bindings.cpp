@@ -1,3 +1,4 @@
+#include "polygon-surface-archive.hpp"
 #include "polygon-surface-owner.hpp"
 #include "color-bound-memo.hpp"
 #include "native-paint-sampling.hpp"
@@ -144,7 +145,7 @@ std::set<const PaintedMesh*> material_paint_owners(
   auto add=[&](const auto &p){if(p)owners.insert(p.get());};
   for(const auto &o:origins)add(o->paint);
   for(const auto &b:bindings){
-    if(controls&&b->canonical_paint_sampling){detail::PolygonSceneArchive roots;roots.add_origin(b->canonical_paint_sampling->before(),false);for(const auto &p:roots.origins())add(p->paint);}
+    if(controls&&(b->canonical_paint_sampling||b->polygon_surface_transfer)){detail::PolygonSceneArchive roots;roots.add_origin(b->polygon_surface_transfer?b->polygon_surface_transfer->before():b->canonical_paint_sampling->before(),false);for(const auto &p:roots.origins())add(p->paint);}
     if(b->canonical_attributes)add(b->canonical_attributes->before_paint());
     if(b->native_paint_frames)add(b->native_paint_frames->before_paint());
     if(b->key_derivation)add(b->key_derivation->before_paint());
@@ -160,7 +161,7 @@ bool physical_material_state(const std::set<const PaintedMesh*> &paints,const st
 bool material_physical_graph(const std::vector<std::shared_ptr<const SourceMaterialBindings>> &bindings,
     const std::vector<std::shared_ptr<const SourceUvOrigin>> &origins){
  if(physical_material_state(material_paint_owners(bindings,origins,true),bindings))return true;
- detail::PolygonSceneArchive controls;for(const auto &b:bindings)if(b->canonical_paint_sampling)controls.add_origin(b->canonical_paint_sampling->before(),false);
+ detail::PolygonSceneArchive controls;for(const auto &b:bindings)if(b->canonical_paint_sampling||b->polygon_surface_transfer)controls.add_origin(b->polygon_surface_transfer?b->polygon_surface_transfer->before():b->canonical_paint_sampling->before(),false);
  for(const auto &p:controls.origins())if(std::any_of(p->material.emissive.begin(),p->material.emissive.end(),[](float n){return n>1;}))return true;
  return false;
 }
@@ -281,12 +282,12 @@ void SourceMaterialBindings::validate(bool deep) const {
   validation.complete(deep);
 }
 uint32_t SourceMaterialArchive::add(std::shared_ptr<const SourceMaterialBindings> value,bool deep) {
-  if(value&&value->polygon_surface_transfer)throw std::invalid_argument("Polygon surface material requires its actual owning Scene39 archive adapter");
   if(!value) throw std::invalid_argument("Missing resolved material holder");
   auto found=std::find(bindings_.begin(),bindings_.end(),value);
   if(found!=bindings_.end())return uint32_t(found-bindings_.begin());
   if(bindings_.size()>=256)throw std::length_error("Resolved material archive count exceeds budget");
   value->validate(deep);
+  if(value->polygon_surface_transfer){detail::PolygonSceneArchive controls;controls.add_origin(value->polygon_surface_transfer->before(),deep);for(const auto&origin:controls.origins())if(origin->material_bindings)add(origin->material_bindings,deep);}
   if(value->canonical_paint_sampling){
     detail::PolygonSceneArchive controls;controls.add_origin(value->canonical_paint_sampling->before(),deep);
     for(const auto &origin:controls.origins())if(origin->material_bindings)add(origin->material_bindings,deep);
@@ -331,6 +332,7 @@ nlohmann::json SourceMaterialArchive::encode(PaintImageArchive &images,CreatorAs
 }
 nlohmann::json SourceMaterialArchive::encode(PaintImageArchive &images,CreatorAssetArchive &models,
     detail::PolygonColorArchive *colors,NormalSamplingArchive *domains,PaintSamplingArchive *paint_domains) const {
+  const bool polygon_surface=std::any_of(bindings_.begin(),bindings_.end(),[](const auto&b){return bool(b->polygon_surface_transfer);});
   const bool canonical_paint=std::any_of(bindings_.begin(),bindings_.end(),[](const auto &b){return bool(b->canonical_paint_sampling);});
   if(canonical_paint)(void)detail::CanonicalPaintArchive::writer();
   const bool native_frames=std::any_of(bindings_.begin(),bindings_.end(),[](const auto &b){return bool(b->native_paint_frames);});
@@ -352,6 +354,7 @@ nlohmann::json SourceMaterialArchive::encode(PaintImageArchive &images,CreatorAs
   nlohmann::json output={{"version",material_shape_version(bindings_,origins_)},{"paints",nlohmann::json::array()},{"origins",nlohmann::json::array()},{"bindings",nlohmann::json::array()}};
   std::vector<std::shared_ptr<const PaintedMesh>> paints;
   auto paint_id=[&](const std::shared_ptr<const PaintedMesh> &paint){
+    if(paint->paint_sampling_domain()&&paint->paint_sampling_domain()->version()==3)throw std::invalid_argument("Polygon current Paint6 requires its material-bearing source root, not a bare attribute Paint archive");
     auto found=std::find(paints.begin(),paints.end(),paint);
     if(found!=paints.end())return size_t(found-paints.begin());
     if(paints.size()>=256)throw std::length_error("Retained paint archive count exceeds budget");
@@ -513,6 +516,7 @@ nlohmann::json SourceMaterialArchive::encode(PaintImageArchive &images,CreatorAs
       nlohmann::json(detail::BakedNormalArchive::writer().add_origin(binding->canonical_attributes)):nlohmann::json(nullptr);
     if(native_frames){const auto found=std::find(native_frame_sources.begin(),native_frame_sources.end(),binding->native_paint_frames);output["bindings"].back()["native_paint_frames"]=binding->native_paint_frames?nlohmann::json(size_t(found-native_frame_sources.begin())):nlohmann::json(nullptr);}
     if(canonical_paint)output["bindings"].back()["canonical_paint_sampling"]=binding->canonical_paint_sampling?nlohmann::json(detail::CanonicalPaintArchive::writer().add(binding->canonical_paint_sampling)):nlohmann::json(nullptr);
+    if(polygon_surface)output["bindings"].back()["polygon_surface_transfer"]=binding->polygon_surface_transfer?nlohmann::json(detail::PolygonSurfaceArchive::writer().add(binding)):nlohmann::json(nullptr);
     if(native_paint){const auto found=std::find(native_paints.begin(),native_paints.end(),binding->native_paint_sampling);
       output["bindings"].back()["native_paint_sampling"]=binding->native_paint_sampling?nlohmann::json(size_t(found-native_paints.begin())):nlohmann::json(nullptr);}
 
@@ -558,6 +562,7 @@ nlohmann::json SourceMaterialArchive::encode(PaintImageArchive &images,CreatorAs
     output["layered_normals"]=layered;output["retained_canonical_uv"]=canonical_uv;
     output["native_paint_frames"]=native_frames;output["canonical_paint_sampling"]=true;
   }
+  if(polygon_surface){const auto base=output.contains("base_version")?output.at("base_version"):output.at("version");output["base_version"]=base;output["version"]=21;output["physical_emission"]=physical;output["explicit_mirror"]=explicit_mirror;output["canonical_normals"]=!canonical_conversions.empty();output["native_paint_sampling"]=native_paint;output["layered_normals"]=layered;output["retained_canonical_uv"]=canonical_uv;output["native_paint_frames"]=native_frames;output["canonical_paint_sampling"]=canonical_paint;output["polygon_surface_transfer"]=true;}
   return output;
 }
 size_t SourceMaterialArchive::deformation_entries(const nlohmann::json &input) {
@@ -640,6 +645,8 @@ SourceMaterialArchive SourceMaterialArchive::decode(const nlohmann::json &input,
 }
 SourceMaterialArchive SourceMaterialArchive::decode(const nlohmann::json &input,const PaintImageArchive &images,
     const CreatorAssetArchive &models,const detail::PolygonColorArchive *colors,const NormalSamplingArchive *domains,const PaintSamplingArchive *paint_domains,const SourcePaintDecodeContext &supplied) {
+  const bool polygon_surface=detail::polygon_surface_material_archive(input);
+  if(polygon_surface)(void)detail::PolygonSurfaceArchive::reader();else for(const auto&b:input.at("bindings"))if(b.contains("polygon_surface_transfer"))throw std::invalid_argument("Polygon surface reference requires actual material21/Scene39");
   const bool physical=detail::physical_material_archive(input);
   const bool layered=detail::layered_material_archive(input);
   const bool canonical_uv=detail::canonical_uv_material_archive(input);
@@ -783,10 +790,11 @@ SourceMaterialArchive SourceMaterialArchive::decode(const nlohmann::json &input,
   for(const auto &record:input.at("paints"))preflight_paint(record);
   SourceMaterialArchive output;
   struct ResolverRestore {
-    detail::CanonicalPaintArchive *archive=nullptr;
-    detail::PolygonSceneReader::MaterialResolver previous;
-    ~ResolverRestore(){if(archive)archive->restore_material_resolver(std::move(previous));}
+    detail::CanonicalPaintArchive *archive=nullptr;detail::PolygonSurfaceArchive*surface=nullptr;
+    detail::PolygonSceneReader::MaterialResolver previous,surface_previous;
+    ~ResolverRestore(){if(archive)archive->restore_material_resolver(std::move(previous));if(surface)surface->restore_material_resolver(std::move(surface_previous));}
   } resolver_restore;
+  if(polygon_surface){auto&archive=detail::PolygonSurfaceArchive::reader();resolver_restore.surface_previous=archive.material_resolver([&output](uint32_t id){return output.at(id);});resolver_restore.surface=&archive;}
   if(canonical_paint){
     auto &archive=detail::CanonicalPaintArchive::reader();
     auto previous=archive.material_resolver([&output](uint32_t id){return output.at(id);});
@@ -801,6 +809,7 @@ SourceMaterialArchive SourceMaterialArchive::decode(const nlohmann::json &input,
     decoding_paint[id]=1;paints[id]=PaintedMesh::decode(input.at("paints")[id],&images,false,domains,paint_domains,context);if(native_paint)paints[id]=std::make_shared<const PaintedMesh>(*paints[id]);decoding_paint[id]=0;return paints[id];
   };
   if(layered)detail::BakedNormalArchive::reader().paint_resolver(decode_paint);
+  if(polygon_surface)for(const auto&p:input.at("paints"))if(p.is_object()&&p.contains("version")&&p.at("version")==6)throw std::invalid_argument("Polygon current Paint6 requires its material-bearing source root, not a bare attribute Paint archive");
   for(size_t i=0;i<paints.size();++i)decode_paint(uint32_t(i));
   std::vector<std::shared_ptr<const PaintSamplingAttachment>> bound_paints(paints.size());
   auto bind_paint=[&](size_t id,const std::shared_ptr<const SourceMaterialBindings> &before){
@@ -1021,6 +1030,7 @@ SourceMaterialArchive SourceMaterialArchive::decode(const nlohmann::json &input,
     if(canonical_paint&&!value.at("canonical_paint_sampling").is_null()){
       binding->canonical_paint_sampling=detail::CanonicalPaintArchive::reader().at(uint32_t(index(value.at("canonical_paint_sampling"),detail::CanonicalPaintArchive::reader().size())));
     }
+    if(polygon_surface&&!value.at("polygon_surface_transfer").is_null())binding->polygon_surface_transfer=detail::PolygonSurfaceArchive::reader().at(uint32_t(index(value.at("polygon_surface_transfer"),detail::PolygonSurfaceArchive::reader().size())));
     binding->validate();if(native_paint)output.bindings_.push_back(std::make_shared<const SourceMaterialBindings>(*binding));else output.bindings_.push_back(std::move(binding));
   }
   if(detail::material_archive_base_version(input)==9&&!std::any_of(preparations.begin(),preparations.end(),[](const auto &p){return p&&p->paint_sampling;}))throw std::invalid_argument("Material9 requires actual retained current-colour paint authority");
@@ -1033,8 +1043,9 @@ SourceMaterialArchive SourceMaterialArchive::decode(const nlohmann::json &input,
   if(native_paint&&std::any_of(native_paints.begin(),native_paints.end(),[](const auto &p){return !p;}))
     throw std::invalid_argument("Unreferenced native paint owner");
   if(canonical_paint)detail::CanonicalPaintArchive::reader().require_complete();
+  if(polygon_surface)detail::PolygonSurfaceArchive::reader().require_complete();
   if(std::any_of(canonical_conversions.begin(),canonical_conversions.end(),[](const auto &p){return !p;}))throw std::invalid_argument("Unreferenced canonical conversion lease");
-  if(physical||detail::explicit_mirror_material_archive(input)||detail::canonical_material_archive(input)||layered||native_paint){
+  if(physical||detail::explicit_mirror_material_archive(input)||detail::canonical_material_archive(input)||layered||native_paint||polygon_surface){
     if(native_paint&&input.at("explicit_mirror").get<bool>()!=std::any_of(output.bindings_.begin(),output.bindings_.end(),[](const auto &b){return b->key_derivation&&b->key_derivation->uses_explicit_mirror();}))throw std::invalid_argument("Native paint explicit-Mirror capability differs from actual graph");
     SourceMaterialArchive reachable;
     for(const auto &binding:output.bindings_)reachable.add(binding,false);

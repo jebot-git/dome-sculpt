@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #pragma once
 #include "canonical-paint-sampling.hpp"
+#include "polygon-surface-owner.hpp"
 #include "polygon-scene-archive.hpp"
 namespace dome::detail {
 // Close the real material/origin DAG before counting or encoding either pool.
@@ -14,6 +15,7 @@ inline void collect_canonical_paint_controls(SourceMaterialArchive &materials,
   while(material<materials.bindings().size()){
    stop();const auto binding=materials.bindings()[material++];
    if(binding->canonical_paint_sampling)origins.add_origin(binding->canonical_paint_sampling->before(),deep);
+   if(binding->polygon_surface_transfer)origins.add_origin(binding->polygon_surface_transfer->before(),deep);
   }
   while(origin<origins.origins().size()){
    stop();const auto before=origins.origins()[origin++];if(before->material_bindings)materials.add(before->material_bindings,deep);

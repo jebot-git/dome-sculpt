@@ -32,6 +32,7 @@ public:
   static void preflight(const nlohmann::json &, const nlohmann::json &objects);
   static void preflight(const nlohmann::json &, const nlohmann::json &objects,const nlohmann::json *materials);
   static void preflight(const nlohmann::json &,const nlohmann::json &objects,const nlohmann::json *materials,const nlohmann::json *canonical_paint);
+  static void preflight(const nlohmann::json &,const nlohmann::json &objects,const nlohmann::json *materials,const nlohmann::json *canonical_paint,const nlohmann::json *polygon_surfaces);
   static PolygonSceneArchive decode(const nlohmann::json &,
                                     const PaintImageArchive &,
                                     const CreatorAssetArchive &,

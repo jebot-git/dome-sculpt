@@ -6,6 +6,14 @@
 #include "polygon.hpp"
 #include <deque>
 namespace dome {
+// Geometry operation data, not a material/paint authority. Persistent immutable
+// nodes retain exact local gesture deltas and world-metric operation witnesses.
+struct PolygonReplayStep {PolygonEdit edit;std::optional<AffineTransform> world;};
+struct PolygonReplayNode {
+ PolygonReplayStep step;
+ std::shared_ptr<const PolygonReplayNode> previous;
+ size_t depth=0,entries=0;
+};
 struct PolygonDrawData {
   std::vector<float> move_weights;
   // For each packed corner, N(delta) = N(0) + cross(delta, coefficient).
@@ -26,6 +34,8 @@ struct PolygonView {
   bool changed = false, can_undo = false, can_redo = false;
   bool moving = false, busy = false, committing = false;
   std::string error;
+  std::shared_ptr<const PolygonReplayNode> replay;
+  bool replay_complete=true;
 };
 // Worker-owned component workspace. All snapshots own immutable geometry and
 // selection; frontends never build triangulations/BVHs or mutate this object.

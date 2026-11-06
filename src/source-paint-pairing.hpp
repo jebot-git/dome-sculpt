@@ -8,12 +8,18 @@
 #include "color-bound-memo.hpp"
 #include "native-paint-sampling.hpp"
 #include "canonical-paint-sampling.hpp"
+#include "polygon-surface-owner.hpp"
 namespace dome::detail {
 // Call after holder validation. A retained paint needs its OWN interpretation;
 // a current object or a neighboring Origin cannot authenticate that before-state.
 inline void source_paint_pairing(const PaintedMesh *paint,const SourceMaterialBindings *binding,
     const CreatorAppearance *appearance,bool deep){
-  if(binding&&binding->polygon_surface_transfer)throw std::invalid_argument("Polygon surface transfer requires its actual Scene39 publication/render/query adapter");
+  if(binding&&binding->polygon_surface_transfer){
+    if(!paint||appearance)throw std::invalid_argument("Polygon surface paint lost its actual native current domain");
+    binding->polygon_surface_transfer->validate_binding(*binding);
+    binding->polygon_surface_transfer->validate_current(*paint);
+    return; // This owning model retains its separate original normal field.
+  }
   const auto color=paint?paint->color_projection():nullptr;
   const auto normal=paint?paint->normal_projection():nullptr;
   const auto color_recipe=binding?binding->color_preparation:nullptr;

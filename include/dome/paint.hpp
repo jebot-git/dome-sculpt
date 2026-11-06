@@ -6,7 +6,7 @@
 #include <map>
 #include <memory>
 namespace dome {
-namespace detail {class PaintOverlayPacket;struct PaintOverlayFactory;struct EmissionExportAccess;class BakedNormalField;struct NativeWeightPaintAccess;class PolygonSurfaceOwner;struct PolygonSurfaceStage;struct PolygonSurfacePaintCodec;}
+namespace detail {class PaintOverlayPacket;struct PaintOverlayFactory;struct EmissionExportAccess;class BakedNormalField;struct NativeWeightPaintAccess;class PolygonSurfaceOwner;class PolygonSurfacePreview;struct PolygonSurfaceStage;struct PolygonSurfacePaintCodec;}
 struct Material;
 class PaintProjection;
 class PaintSamplingDomain;
@@ -69,6 +69,9 @@ struct TextureMaps {
   std::shared_ptr<const PaintNormalProjection> normal_projection;
   // Transient sparse GPU contribution input; never a serialized image authority.
   std::shared_ptr<const detail::PaintOverlayPacket> overlay;
+  // Scene39 current surface field. Independent from colour/F32 grid sampling;
+  // a generic baked-normal/source-frame interpretation cannot replace it.
+  std::shared_ptr<const detail::PolygonSurfacePreview> polygon_surface;
 };
 enum class BakedColorInterpretation { VertexComponent, ResolvedPbr };
 enum class BakedNormalInterpretation { CanonicalMikk, PreparedAttributes };

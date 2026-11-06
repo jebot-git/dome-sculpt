@@ -14,6 +14,8 @@ struct PolygonWorkspaceSource {
   PolygonMesh topology;
   std::shared_ptr<const PolygonColorField> colors;
 };
+PolygonMesh evaluate_polygon_source_topology(const PolygonAuthority &,const Mesh &rest,
+    const Mesh &posed,const PolygonLimits & = {});
 PolygonWorkspaceSource
 prepare_polygon_workspace_source(const SculptObject &, bool convert_source,
                                  const std::function<bool()> & = {});

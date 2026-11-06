@@ -1,3 +1,4 @@
+#include "polygon-surface-paint.hpp"
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/document.hpp"
 #include "dome/paint-sampling.hpp"
@@ -186,16 +187,17 @@ void Document::native_loop(){
         } else geometry=shape?std::make_shared<const Mesh>(shape->preview()):o.deformation?std::make_shared<const Mesh>(o.deformation->preview(o.painted->mesh())):std::shared_ptr<const Mesh>(o.painted,&o.painted->mesh());
         if(cancelled())throw std::runtime_error("Desktop stroke cancelled");
         if(!shape&&(o.deformation||session->affine_world))evaluation=o.painted->evaluate(geometry,cancelled);
-        query_range.emplace(SurfaceRange{o.id,0,geometry->indices.size(),o.material,o.painted->preview(o.material,cancelled),o.appearance,0,o.material_bindings});
+        query_range.emplace(SurfaceRange{o.id,0,geometry->indices.size(),o.material,o.material_bindings&&o.material_bindings->polygon_surface_transfer?detail::PolygonSurfacePaintCodec::preview(*o.painted,o.material_bindings,o.material,cancelled):o.painted->preview(o.material,cancelled),o.appearance,0,o.material_bindings});
         auto &range=*query_range;
         range.reflected=reflected;
+        if(session->affine_world)range.affine_world=*session->affine_world;
         // This query keeps logical REST triangle order. place_mesh transforms
         // positions/normals without reindexing; only the packed render worker
         // reverses corners for reflected placement.
         range.paint_winding_reversed=false;
         if(o.painted->paint_sampling_domain()) {
           range.paint_sampling_attachment=o.painted->paint_sampling_attachment();
-          range.normal_preview_proof=prepare_normal_preview(*o.painted,o.material_bindings,o.material,cancelled);
+          if(!o.material_bindings||!o.material_bindings->polygon_surface_transfer)range.normal_preview_proof=prepare_normal_preview(*o.painted,o.material_bindings,o.material,cancelled);
           PaintSamplingLimits limits;limits.cancelled=cancelled;
           query_paint=o.painted->paint_sampling_domain()->corner_coordinates(o.painted->mesh(),limits);
         }

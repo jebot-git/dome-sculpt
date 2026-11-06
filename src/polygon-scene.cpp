@@ -207,6 +207,7 @@ void PolygonSceneArchive::collect(std::shared_ptr<const PolygonAuthority> root,
           else validate_transform(o->world_transform);
           insert(volumes_, o->volume);
           require_polygon_paint_owner(o->paint.get(),o->polygon.get(),o->mesh_active);
+          validate_polygon_surface_model(o->mesh_active,o->paint.get(),o->polygon.get(),o->material_bindings.get(),o->deformation.get(),o->appearance.get());
           if (o->paint) {
             if (o->paint->in_stroke())
               throw std::invalid_argument(
@@ -378,6 +379,9 @@ void PolygonSceneArchive::preflight(const nlohmann::json &j,const nlohmann::json
   preflight(j,objects,materials,nullptr);
 }
 void PolygonSceneArchive::preflight(const nlohmann::json &j,const nlohmann::json &objects,const nlohmann::json *materials,const nlohmann::json *canonical_paint) {
+  preflight(j,objects,materials,canonical_paint,nullptr);
+}
+void PolygonSceneArchive::preflight(const nlohmann::json &j,const nlohmann::json &objects,const nlohmann::json *materials,const nlohmann::json *canonical_paint,const nlohmann::json*polygon_surfaces) {
   if (!j.is_object() || !j.at("version").is_number_integer() ||
       (j.at("version") != 1 && j.at("version") != 2 && j.at("version") != 3 && j.at("version") != 4 && j.at("version") != 5 && j.at("version") != 6 && j.at("version") != 7))
     throw std::invalid_argument("Unsupported polygon source archive");
@@ -548,6 +552,10 @@ void PolygonSceneArchive::preflight(const nlohmann::json &j,const nlohmann::json
       const auto &node=canonical_paint->at("nodes").at(polygon_archive_index(binding.at("canonical_paint_sampling"),canonical_paint->at("nodes").size()));
       origin(polygon_archive_index(node.at("before_origin"),oo.size()),1);
     }
+  }
+  if(polygon_surfaces){
+    if(!materials||!polygon_surface_material_archive(*materials))throw std::invalid_argument("Polygon field roots require actual material21");
+    for(const auto&node:polygon_surfaces->at("nodes"))origin(polygon_archive_index(node.at("before_origin"),oo.size()),1);
   }
   auto all = [](const auto &v) {
     return std::all_of(v.begin(), v.end(), [](auto n) { return n != 0; });

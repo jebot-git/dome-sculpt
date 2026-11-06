@@ -3,6 +3,16 @@
 #include "polygon-surface-transfer.hpp"
 #include "dome/polygon-scene.hpp"
 namespace dome::detail {
+// True authoring source classification. It does not admit unsupported roles;
+// the actual factory still authenticates all geometry/field/paint owners.
+bool polygon_surface_transfer_required(const SculptObject &);
+bool adopt_polygon_surface_edit(Scene &,uint64_t,const PolygonView &,const Scene &,
+    const PolygonSurfaceTransferLimits & = {});
+// Live actors and retained PolygonOrigins obey the same current-model rule.
+// A before-only material reference cannot hide a mismatched polygon/source.
+void validate_polygon_surface_model(bool mesh_active,const PaintedMesh *,
+    const PolygonAuthority *,const SourceMaterialBindings *,
+    const DeformationState *,const CreatorAppearance *);
 // Detached owning source for the first Move/Flip transfer boundary. It does
 // not attach a Paint, change a material or grant Scene39 publication authority.
 // Original native/frame IDs remain original; the polygon derivative has its

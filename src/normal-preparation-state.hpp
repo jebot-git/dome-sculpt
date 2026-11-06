@@ -5,6 +5,7 @@
 #include "normal-sampling-access.hpp"
 #include "baked-normal-field.hpp"
 #include "canonical-normal-uv.hpp"
+#include "polygon-surface-preview.hpp"
 namespace dome::detail {
 struct NormalCoordinateView {
   const std::vector<std::array<float,2>> &coordinates,&mtoon_coordinates;
@@ -26,6 +27,12 @@ inline std::optional<NormalCoordinateView> retained_normal_coordinates(
   return {};
 }
 inline bool prepared_normal_state(const SourceMaterialBindings *binding,const TextureMaps *maps,bool deep=false){
+  if(binding&&binding->polygon_surface_transfer){
+    if(!maps||!maps->polygon_surface||!maps->polygon_surface->matches_binding(*binding))throw std::invalid_argument("Polygon normal preview lost its actual current field owner");
+    maps->polygon_surface->validate_maps(*maps);if(deep)binding->validate();
+    return maps->polygon_surface->model()==PolygonSurfaceNormalModel::PreparedCorePbr;
+  }
+  if(maps&&maps->polygon_surface)throw std::invalid_argument("Polygon normal preview cannot borrow a legacy material");
   if(maps&&maps->baked_base&&maps->baked_base->normal_field){
     const auto &field=maps->baked_base->normal_field;field->validate();
     if(!binding||!binding->canonical_attributes||binding->canonical_attributes!=field->origin()||
