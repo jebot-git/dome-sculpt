@@ -186,3 +186,27 @@ archive reuse is permitted. Complex per-set source/normal/recipe/retained-histor
 adapters, all-channel resolution/UV remap, independent real bake targets and
 shared-node multi-primitive glTF/VRM import/export remain required. This source
 checkpoint and earlier scoped plain Release controls do not complete texture sets.
+
+
+## Fresh native selected-field Release qualification — 2026-11-06
+
+Frozen cdfadd18 now passes a fresh236-step optimized CPU Release cohort, with
+all234 own object/archive/app/test binary inputs built from this layout. The
+ordinary application version command exits0; five native CTests pass: model32,
+polygon6, partition24, raster/worker/query72 and selected-field native45. The
+last mode executes genuine face picking and typed material/layer workers,
+source/pose/collection leases, preview ownership, Cancel/retry, multi-sample
+painting, one Undo/Redo and ordered native Save/reopen. Source, canonical SDK and
+owned binary hashes are unchanged. Exact evidence is in
+validation/TEXTURE-SETS-NATIVE-RELEASE.json.
+
+All three configure-only sparse setup failures are retained. Full tests/tools
+were materialized before the successful frozen build; product bytes did not
+change. Cumulative fresh phase151,797,760B includes those failures, below the
+additional256MiB cap including64MiB prospective serial-link reserve.
+
+This qualifies the named CPU native workflows and application build, not an
+actual FLTK window or GL/OpenXR/HMD/device interaction, sanitizer or full-suite
+production test. Root remesh44fe is merged separately in the export child, which
+requires a new owning cohort. Complex owners, full per-set baking/resampling,
+import/export, production fixtures and main integration remain required.

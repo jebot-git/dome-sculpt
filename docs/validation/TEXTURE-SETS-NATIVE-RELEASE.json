@@ -1,0 +1,109 @@
+{
+  "status": "PASS: private native selected-field optimized CPU Release component/application-build gate; no main admission",
+  "source": "cdfadd18b7728dd8899be8c8dd19ea51c168db40",
+  "seconds": 589.2398739090422,
+  "whole_fresh_build_steps": 236,
+  "own_binary_inputs": 234,
+  "own_types": {
+    ".a": 11,
+    "ELF": 4,
+    ".o": 219
+  },
+  "executed": {
+    "app_version": 0,
+    "ctests_passed": 5,
+    "model": 32,
+    "polygon": 6,
+    "partition": 24,
+    "surface_worker_query": 72,
+    "native_selected_field": 45
+  },
+  "source_drift": [],
+  "sdk_drift": [],
+  "binary_drift": [],
+  "evidence": {
+    "source-before.json": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/texture-set-native-72238fc/artifacts/native-release-v4/source-before.json",
+      "sha256": "de18cf3b0e32b25e78153d0395098fc070d5b6a6917b2d61dfdbf3f18fd66b97"
+    },
+    "source-after.json": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/texture-set-native-72238fc/artifacts/native-release-v4/source-after.json",
+      "sha256": "de18cf3b0e32b25e78153d0395098fc070d5b6a6917b2d61dfdbf3f18fd66b97"
+    },
+    "sdk-before.json": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/texture-set-native-72238fc/artifacts/native-release-v4/sdk-before.json",
+      "sha256": "390bf0387f24ffb706b75d940f48aadd9ec3d984d2b1b6a32266f79a47ddf906"
+    },
+    "sdk-after.json": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/texture-set-native-72238fc/artifacts/native-release-v4/sdk-after.json",
+      "sha256": "390bf0387f24ffb706b75d940f48aadd9ec3d984d2b1b6a32266f79a47ddf906"
+    },
+    "binaries-before-test.json": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/texture-set-native-72238fc/artifacts/native-release-v4/binaries-before-test.json",
+      "sha256": "b810f02bf9998786f454fab0e9df158edfd2e4e58c80e4f8e932da7acca1b91f"
+    },
+    "binaries-after-test.json": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/texture-set-native-72238fc/artifacts/native-release-v4/binaries-after-test.json",
+      "sha256": "b810f02bf9998786f454fab0e9df158edfd2e4e58c80e4f8e932da7acca1b91f"
+    },
+    "actual-dependency-hashes.json": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/texture-set-native-72238fc/artifacts/native-release-v4/actual-dependency-hashes.json",
+      "sha256": "80a4768706d064a5fc32bbad75d1d3b96b347c895a800caa849a2f5c34b48d15"
+    },
+    "all-link-compile-commands.txt": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/texture-set-native-72238fc/artifacts/native-release-v4/all-link-compile-commands.txt",
+      "sha256": "eb22c7ba1979026f315031402435ca2193d34b99acdc17e07867b5bb792561f9"
+    },
+    "link-events.jsonl": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/texture-set-native-72238fc/artifacts/native-release-v4/link-events.jsonl",
+      "sha256": "353db321f6ffb9a23aa227d41b873d41579c43603f6a4594df86550c6b864fd1"
+    },
+    "harness-before.json": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/texture-set-native-72238fc/artifacts/native-release-v4/harness-before.json",
+      "sha256": "8b181d4911bd84c686288cc826b1afacbf17664b629399e1512630d84170324f"
+    },
+    "status.json": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/texture-set-native-72238fc/artifacts/native-release-v4/status.json",
+      "sha256": "e198f62de111ad7696da68c4b9dbd4acc198fbd57ae7abfd9ecd7004446e647b"
+    },
+    "model-codec-native.log": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/texture-set-native-72238fc/artifacts/native-release-v4/model-codec-native.log",
+      "sha256": "d52949cd0974b0569738bcf818a56d4631795bf065444738629c987f468c1432"
+    },
+    "build/Testing/Temporary/LastTest.log": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/texture-set-native-72238fc/artifacts/native-release-v4/build/Testing/Temporary/LastTest.log",
+      "sha256": "c2ec9a706fe4670bf223626c197617972dc01efa7b533bab61f9d630cb70f95e"
+    }
+  },
+  "resources": {
+    "allocated": 151797760,
+    "free": 22213718016,
+    "cap": 268435456,
+    "prospective": 67108864,
+    "root_reserved": 201326592,
+    "floor": 21474836480
+  },
+  "preserved_configure_only_failures": [
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/texture-set-native-72238fc/artifacts/native-release/status.json",
+      "sha256": "c6db2cddd1315ac7a6b10c75fd7bc3bbaf9af7fa8d2c7f0f164a0a52103538d3",
+      "reason": "Sparse source setup incomplete, no compile/link/runtime began"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/texture-set-native-72238fc/artifacts/native-release-v2/status.json",
+      "sha256": "cc90ae43fe6f0f9d22935c03eb43e0bb9c4277ceb7b259bdf51975dcab181fe4",
+      "reason": "Sparse source setup incomplete, no compile/link/runtime began"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/texture-set-native-72238fc/artifacts/native-release-v3/status.json",
+      "sha256": "4c1817f4b3141c19c15cc209c173279b443ce1d80a6c751d99ddfd23388d75a3",
+      "reason": "Sparse source setup incomplete, no compile/link/runtime began"
+    }
+  ],
+  "scope_limits": [
+    "Sourcecdf predates root remesh44fe; export child separately merged44fe and needs fresh full owning cohort",
+    "No actual FLTK window/UI interaction, GL render/pixels, OpenXR runtime/HMD or device execution",
+    "No sanitizer scope",
+    "Complex per-set source/normal/recipe/history, independent Bake/Clear/all-channel resampling and true import/export remain open"
+  ]
+}
