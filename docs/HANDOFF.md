@@ -1,3 +1,15 @@
+## Private cold sculpt workspace source checkpoint — 2026-11-06
+
+After actual P1 refusal4b150185, isolated43cd3c9e replaces cold repeated AVL edits
+with bottom-up sorted construction and scopes proven temporary arrays/maps/tile
+workspace. Returned geometry/tile payload and old owners stay charged; numerical
+limits unchanged. Kernel and two whole native consumers pass warning-free syntax
+only; no runtime or production-size success yet. Existing public/index layouts
+and persistent bodies remain exact. Read SCULPT-COLD-WORKSPACE-SOURCE.md and its
+receipt. New current complete-owned candidate should rebuild all3 index-provider
+TUs and run native/oracle/appearance/history before exact P1 retry. Full goal
+active/incomplete; no install or headset launch.
+
 ## Current combined sustained-consumer smoke — 2026-11-06
 
 A fresh whole optimized test consumer on exact frozen d1f40159 headers and current

@@ -1,0 +1,41 @@
+{
+  "product_source": "43cd3c9e93dede8c10f7023b53b0138c033caa8a",
+  "base_failure": "4b150185",
+  "scope": "Source/syntax only, no .o/link/native/GL/production runtime",
+  "whole_kernel_final_syntax": {
+    "exit": 0,
+    "seconds": 1.1450713369995356,
+    "warnings_bytes": 0
+  },
+  "unchanged_whole_native_consumer_syntax": [
+    {
+      "source": "tests/sculpt-chunk-workspace.cpp",
+      "exit": 0,
+      "seconds": 0.8660962919821031
+    },
+    {
+      "source": "tests/sculpt-surface-chunks.cpp",
+      "exit": 0,
+      "seconds": 0.9667058850172907
+    }
+  ],
+  "source_drift": [],
+  "public_chunk_header_byte_exact_current_d1": true,
+  "existing_index_fields_and_method_bodies_byte_exact_current_d1": true,
+  "new_index_method_only": "strict sorted balanced construction; no node/member layout changes",
+  "limits_unchanged": {
+    "working_bytes": 1073741824,
+    "retained_bytes": 536870912
+  },
+  "source": {
+    "src/sculpt-surface-chunks.cpp": "bf2720ed9d18a607301f67bb4c2e15b9478bed199255fb69cbeb5e0ff9f11446",
+    "src/sculpt-chunk-index.hpp": "808e7ed8f80c39bacd26b2c0d4c770ff520e5b9f989dea3070f5276f05d8a334",
+    "src/sculpt-surface-chunks.hpp": "870b9234a2454adbefa440e1bb46b73cec5a72d3cad4486113ae7235f0d6800d",
+    "tests/sculpt-chunk-workspace.cpp": "d2bcfc49c4b22a47c4162885a34e79aa133695d662260b0791ab93d1356c1101",
+    "tests/sculpt-surface-chunks.cpp": "e8d3de52dcc1a9629847a2f24ae129da73a0729fac976525a191982183560799"
+  },
+  "final_receipt_sha256": "95d9632a5307eb3978dd8f3cf2ef10165a84f4beea741ea954a32df496d67eee",
+  "preserved_initial_syntax_failure": "artifacts/source-workspace-v1",
+  "preserved_pre_map_scope_source": "artifacts/source-workspace-v2/input",
+  "remaining": "All native runtime/peak controls, actual current complete-provider/frame/query/history composition and exact failed P1 retry remain unexecuted. No fallback/speed/GPU claim."
+}
