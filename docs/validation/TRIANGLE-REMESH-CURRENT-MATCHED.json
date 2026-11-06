@@ -1,0 +1,494 @@
+{
+  "status": "Qualified current isotropic-remesh implementation integrated from c618c828; full production objective remains incomplete",
+  "source": "c618c8285ba5bd03c609a4efd284c5cbaaa3c59c",
+  "main_parent": "f9073165040eb3140bf312710fd4b961af43bed5",
+  "release": {
+    "build": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/triangle-remesh-f907/artifacts/current-release/status.json",
+      "sha256": "a2abb8331ee05cc01f99fdb98a54b1027543896907d4683bb970baf3305a8a47"
+    },
+    "runtime": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/triangle-remesh-f907/artifacts/current-release/runtime-status.json",
+      "sha256": "cd63b2688b60d0824bbc18f454ec1384efedba477d9031611876bfd1f93529d8"
+    },
+    "own_inputs": 233
+  },
+  "sanitize": {
+    "qualification": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/triangle-remesh-f907/artifacts/current-sanitize/thin4-status.json",
+      "sha256": "f813d92b829d5ead3a5d329ad3834bbeb4583c8e0f337634cb6b4c6b279d2e1b"
+    },
+    "native_remesh_actual_pass_in_preserved_attempt3": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/triangle-remesh-f907/artifacts/current-sanitize/thin3-status.json",
+      "sha256": "c8185c5af4816faa752b9b2d6de4d120763774cca11d411922faf236d7851de6"
+    },
+    "unserialized_own_inputs": 228,
+    "serialized_standalones": 5,
+    "total_own_inputs": 233,
+    "compiler_commands_exact_first_attempt": true,
+    "flags": "O1/g1 ASan+UBSan/frame pointers; canonical owned SAN SDK; no suppressions",
+    "archives": [
+      {
+        "ledger": "/home/blux/de-xr/dome-sculpt/artifacts/triangle-remesh-f907/artifacts/current-sanitize/archives/dome-sculpt-triangle-remesh-test/ledger.json",
+        "ledger_sha256": "f7aed5c5857192a9208a59e28d113b1c8c828867bf64fb7d584fa7c9046b5c66",
+        "archive_sha256": "8ca7ce189be8c627f83f4014b5c201caa1651034abdaafbc9c0c17a9716fd19e",
+        "actual_original_path_restore": true
+      },
+      {
+        "ledger": "/home/blux/de-xr/dome-sculpt/artifacts/triangle-remesh-f907/artifacts/current-sanitize/archives/dome-sculpt-polygon-retopo-affine-test/ledger.json",
+        "ledger_sha256": "caa9679c92cb97845371dd16041c37fbfb1c978271b74c4fccb771cfae3faab3",
+        "archive_sha256": "11adbfbda2b4836c77fa7869efc1437712ae2d116aba16d901e9e69a4ffb3839",
+        "actual_original_path_restore": true
+      },
+      {
+        "ledger": "/home/blux/de-xr/dome-sculpt/artifacts/triangle-remesh-f907/artifacts/current-sanitize/archives/dome-sculpt-surface-query-oblique-test/ledger.json",
+        "ledger_sha256": "a4b5991eeefd44affe4f1b4fee1a9f47008462a56acfe6ef6095f5473f6bd6e2",
+        "archive_sha256": "7a7f7568429189f68f7f918b4e40d9d49a8d904d8f9ed5dfd4a7afd93962e84e",
+        "actual_original_path_restore": true
+      },
+      {
+        "ledger": "/home/blux/de-xr/dome-sculpt/artifacts/triangle-remesh-f907/artifacts/current-sanitize/archives/dome-sculpt-retopo-input-admission-test/ledger.json",
+        "ledger_sha256": "30a191f67b42ff48b6548a7acd8c369deb6b0219820f34ec4e5ea0838271688b",
+        "archive_sha256": "1724e9d7eb87061b56409aa45cc9a0876a0b0a78526fae64f38a02e2cf6e0400",
+        "actual_original_path_restore": true
+      },
+      {
+        "ledger": "/home/blux/de-xr/dome-sculpt/artifacts/triangle-remesh-f907/artifacts/current-sanitize/archives/dome-sculpt-render-direct-upload-test/ledger.json",
+        "ledger_sha256": "9603c5cd044ed90871ae920e67206bc427570c167a64e54c1e5d837fe4f771d8",
+        "archive_sha256": "f6d29f2829b3e09a6d6dc5af981f0c0847930e012f983183047cdde7d8a453c3",
+        "actual_original_path_restore": true
+      }
+    ]
+  },
+  "counts_per_profile": {
+    "full_native_remesh_PASS_lines": 2166,
+    "affine_polygon_retopology": 248,
+    "query_scale_aspect_axis_reflection_winding_families": 108,
+    "current_input_checks": 13442,
+    "direct_upload_checks": 73,
+    "persistent_fault_prefix": 32,
+    "persistent_fault_tail": 32,
+    "fault_endpoint": 1,
+    "desktop_normal": 20,
+    "desktop_compact": 22
+  },
+  "ordinary_UI": [
+    {
+      "status": "/home/blux/de-xr/dome-sculpt/artifacts/triangle-ui-c618/release-shear-normal-qualified/status.json",
+      "sha256": "4b37c58993566dcbe9bca9d576be53972bdf9dc2f36119ccde40fe59e4e71ca8",
+      "checks": 20
+    },
+    {
+      "status": "/home/blux/de-xr/dome-sculpt/artifacts/triangle-ui-c618/sanitize-shear-normal-qualified/status.json",
+      "sha256": "6409f12cc1a9625905eabd38d609adc3e7b70137a2e64b6975ad19c9d56fc0e6",
+      "checks": 20
+    },
+    {
+      "status": "/home/blux/de-xr/dome-sculpt/artifacts/triangle-ui-c618/release-reflect-compact-qualified/status.json",
+      "sha256": "85ab1803a8d51c82c08cf4c14890e3800beec0733f7e3d0d9e7af01f4d87f65b",
+      "checks": 22
+    },
+    {
+      "status": "/home/blux/de-xr/dome-sculpt/artifacts/triangle-ui-c618/sanitize-reflect-compact-qualified/status.json",
+      "sha256": "6833615b10d6aa60dd6253f1f0c1410a79e3d7847a68c2b6f03d0411da6e7550",
+      "checks": 22
+    }
+  ],
+  "R_S_byte_exact_pairs": 43,
+  "pairs": [
+    {
+      "release": "/home/blux/de-xr/dome-sculpt/artifacts/triangle-remesh-f907/artifacts/current-release/native-remesh/immediate-save.dsculpt",
+      "sanitize": "/home/blux/de-xr/dome-sculpt/artifacts/triangle-remesh-f907/artifacts/current-sanitize/native-remesh/immediate-save.dsculpt",
+      "sha256": "1a087c8957652b8dd950b8d026b2fb1210e82ed6f8cd3bf2dc872431edb578fa"
+    },
+    {
+      "release": "/home/blux/de-xr/dome-sculpt/artifacts/triangle-remesh-f907/artifacts/current-release/native-remesh/roundtrip-0.dsculpt",
+      "sanitize": "/home/blux/de-xr/dome-sculpt/artifacts/triangle-remesh-f907/artifacts/current-sanitize/native-remesh/roundtrip-0.dsculpt",
+      "sha256": "2b76fdcb49cf19a0d478d1cec1ff88439c2d40353d440c21ee422e914d199ee3"
+    },
+    {
+      "release": "/home/blux/de-xr/dome-sculpt/artifacts/triangle-remesh-f907/artifacts/current-release/native-remesh/roundtrip-1.dsculpt",
+      "sanitize": "/home/blux/de-xr/dome-sculpt/artifacts/triangle-remesh-f907/artifacts/current-sanitize/native-remesh/roundtrip-1.dsculpt",
+      "sha256": "1a087c8957652b8dd950b8d026b2fb1210e82ed6f8cd3bf2dc872431edb578fa"
+    },
+    {
+      "release": "/home/blux/de-xr/dome-sculpt/artifacts/triangle-remesh-f907/artifacts/current-release/native-remesh/roundtrip-2.dsculpt",
+      "sanitize": "/home/blux/de-xr/dome-sculpt/artifacts/triangle-remesh-f907/artifacts/current-sanitize/native-remesh/roundtrip-2.dsculpt",
+      "sha256": "8567c0fe52f53e9afd9177f7bc7a687e341d0cc6d7f8fe5589bc0fd25eb92e79"
+    },
+    {
+      "release": "/home/blux/de-xr/dome-sculpt/artifacts/triangle-remesh-f907/artifacts/current-release/native-affine/reflected-polygon-first/polygon.dsculpt",
+      "sanitize": "/home/blux/de-xr/dome-sculpt/artifacts/triangle-remesh-f907/artifacts/current-sanitize/native-affine/reflected-polygon-first/polygon.dsculpt",
+      "sha256": "629a41cf6f9e977cb169ba123213c3562336051d132b7b7f446ba2b381eee3dc"
+    },
+    {
+      "release": "/home/blux/de-xr/dome-sculpt/artifacts/triangle-remesh-f907/artifacts/current-release/native-affine/reflected-polygon-first/restored.dsculpt",
+      "sanitize": "/home/blux/de-xr/dome-sculpt/artifacts/triangle-remesh-f907/artifacts/current-sanitize/native-affine/reflected-polygon-first/restored.dsculpt",
+      "sha256": "f1ec008f0da4cb7ba94d2b3aae58f586d51cd3824f9166241550a62e463a7538"
+    },
+    {
+      "release": "/home/blux/de-xr/dome-sculpt/artifacts/triangle-remesh-f907/artifacts/current-release/native-affine/reflected-polygon-first/retopo.dsculpt",
+      "sanitize": "/home/blux/de-xr/dome-sculpt/artifacts/triangle-remesh-f907/artifacts/current-sanitize/native-affine/reflected-polygon-first/retopo.dsculpt",
+      "sha256": "0b64c8f7b10af7c743eb1fd5e8e47613d88d238b2290e46c087022ab048f657a"
+    },
+    {
+      "release": "/home/blux/de-xr/dome-sculpt/artifacts/triangle-remesh-f907/artifacts/current-release/native-affine/reflected-polygon-first/retopo.dsculpt-polygon.dsculpt",
+      "sanitize": "/home/blux/de-xr/dome-sculpt/artifacts/triangle-remesh-f907/artifacts/current-sanitize/native-affine/reflected-polygon-first/retopo.dsculpt-polygon.dsculpt",
+      "sha256": "ea117e33c3620f382f4fecbce47b194277532f6b250d5906b54451b90f5df589"
+    },
+    {
+      "release": "/home/blux/de-xr/dome-sculpt/artifacts/triangle-remesh-f907/artifacts/current-release/native-affine/reflected-retopo-first/polygon.dsculpt",
+      "sanitize": "/home/blux/de-xr/dome-sculpt/artifacts/triangle-remesh-f907/artifacts/current-sanitize/native-affine/reflected-retopo-first/polygon.dsculpt",
+      "sha256": "629a41cf6f9e977cb169ba123213c3562336051d132b7b7f446ba2b381eee3dc"
+    },
+    {
+      "release": "/home/blux/de-xr/dome-sculpt/artifacts/triangle-remesh-f907/artifacts/current-release/native-affine/reflected-retopo-first/restored.dsculpt",
+      "sanitize": "/home/blux/de-xr/dome-sculpt/artifacts/triangle-remesh-f907/artifacts/current-sanitize/native-affine/reflected-retopo-first/restored.dsculpt",
+      "sha256": "f1ec008f0da4cb7ba94d2b3aae58f586d51cd3824f9166241550a62e463a7538"
+    },
+    {
+      "release": "/home/blux/de-xr/dome-sculpt/artifacts/triangle-remesh-f907/artifacts/current-release/native-affine/reflected-retopo-first/retopo.dsculpt",
+      "sanitize": "/home/blux/de-xr/dome-sculpt/artifacts/triangle-remesh-f907/artifacts/current-sanitize/native-affine/reflected-retopo-first/retopo.dsculpt",
+      "sha256": "0b64c8f7b10af7c743eb1fd5e8e47613d88d238b2290e46c087022ab048f657a"
+    },
+    {
+      "release": "/home/blux/de-xr/dome-sculpt/artifacts/triangle-remesh-f907/artifacts/current-release/native-affine/reflected-retopo-first/retopo.dsculpt-polygon.dsculpt",
+      "sanitize": "/home/blux/de-xr/dome-sculpt/artifacts/triangle-remesh-f907/artifacts/current-sanitize/native-affine/reflected-retopo-first/retopo.dsculpt-polygon.dsculpt",
+      "sha256": "ea117e33c3620f382f4fecbce47b194277532f6b250d5906b54451b90f5df589"
+    },
+    {
+      "release": "/home/blux/de-xr/dome-sculpt/artifacts/triangle-remesh-f907/artifacts/current-release/native-affine/sheared-polygon-first/polygon.dsculpt",
+      "sanitize": "/home/blux/de-xr/dome-sculpt/artifacts/triangle-remesh-f907/artifacts/current-sanitize/native-affine/sheared-polygon-first/polygon.dsculpt",
+      "sha256": "b091189a83f67402ce892ca89f2e1b31c55c2c91a4e2e1cc2819d2ff4d02ed77"
+    },
+    {
+      "release": "/home/blux/de-xr/dome-sculpt/artifacts/triangle-remesh-f907/artifacts/current-release/native-affine/sheared-polygon-first/restored.dsculpt",
+      "sanitize": "/home/blux/de-xr/dome-sculpt/artifacts/triangle-remesh-f907/artifacts/current-sanitize/native-affine/sheared-polygon-first/restored.dsculpt",
+      "sha256": "920477d3b6ffe42868f936d782a4e641e4976f3c2c25bf925f1894f52ae47f05"
+    },
+    {
+      "release": "/home/blux/de-xr/dome-sculpt/artifacts/triangle-remesh-f907/artifacts/current-release/native-affine/sheared-polygon-first/retopo.dsculpt",
+      "sanitize": "/home/blux/de-xr/dome-sculpt/artifacts/triangle-remesh-f907/artifacts/current-sanitize/native-affine/sheared-polygon-first/retopo.dsculpt",
+      "sha256": "fa488d989567b121fb6f346a86b92e02d8a63e76d5d8f797681bdb7a91a8493a"
+    },
+    {
+      "release": "/home/blux/de-xr/dome-sculpt/artifacts/triangle-remesh-f907/artifacts/current-release/native-affine/sheared-polygon-first/retopo.dsculpt-polygon.dsculpt",
+      "sanitize": "/home/blux/de-xr/dome-sculpt/artifacts/triangle-remesh-f907/artifacts/current-sanitize/native-affine/sheared-polygon-first/retopo.dsculpt-polygon.dsculpt",
+      "sha256": "6e11d74b108a6fc5a9e9a3f647365c255152c6958e8c83082bd6b6f56ace72a1"
+    },
+    {
+      "release": "/home/blux/de-xr/dome-sculpt/artifacts/triangle-remesh-f907/artifacts/current-release/native-affine/sheared-retopo-first/polygon.dsculpt",
+      "sanitize": "/home/blux/de-xr/dome-sculpt/artifacts/triangle-remesh-f907/artifacts/current-sanitize/native-affine/sheared-retopo-first/polygon.dsculpt",
+      "sha256": "b091189a83f67402ce892ca89f2e1b31c55c2c91a4e2e1cc2819d2ff4d02ed77"
+    },
+    {
+      "release": "/home/blux/de-xr/dome-sculpt/artifacts/triangle-remesh-f907/artifacts/current-release/native-affine/sheared-retopo-first/restored.dsculpt",
+      "sanitize": "/home/blux/de-xr/dome-sculpt/artifacts/triangle-remesh-f907/artifacts/current-sanitize/native-affine/sheared-retopo-first/restored.dsculpt",
+      "sha256": "920477d3b6ffe42868f936d782a4e641e4976f3c2c25bf925f1894f52ae47f05"
+    },
+    {
+      "release": "/home/blux/de-xr/dome-sculpt/artifacts/triangle-remesh-f907/artifacts/current-release/native-affine/sheared-retopo-first/retopo.dsculpt",
+      "sanitize": "/home/blux/de-xr/dome-sculpt/artifacts/triangle-remesh-f907/artifacts/current-sanitize/native-affine/sheared-retopo-first/retopo.dsculpt",
+      "sha256": "fa488d989567b121fb6f346a86b92e02d8a63e76d5d8f797681bdb7a91a8493a"
+    },
+    {
+      "release": "/home/blux/de-xr/dome-sculpt/artifacts/triangle-remesh-f907/artifacts/current-release/native-affine/sheared-retopo-first/retopo.dsculpt-polygon.dsculpt",
+      "sanitize": "/home/blux/de-xr/dome-sculpt/artifacts/triangle-remesh-f907/artifacts/current-sanitize/native-affine/sheared-retopo-first/retopo.dsculpt-polygon.dsculpt",
+      "sha256": "6e11d74b108a6fc5a9e9a3f647365c255152c6958e8c83082bd6b6f56ace72a1"
+    },
+    {
+      "release": "/home/blux/de-xr/dome-sculpt/artifacts/triangle-remesh-f907/artifacts/current-release/native-input/controller-apply.dsculpt",
+      "sanitize": "/home/blux/de-xr/dome-sculpt/artifacts/triangle-remesh-f907/artifacts/current-sanitize/native-input/controller-apply.dsculpt",
+      "sha256": "1862e38c05eba6598584593b09a45285827b2a9be6f0c6f082ca50687b06b53e"
+    },
+    {
+      "release": "/home/blux/de-xr/dome-sculpt/artifacts/triangle-remesh-f907/artifacts/current-release/native-input/frame-retry.dsculpt",
+      "sanitize": "/home/blux/de-xr/dome-sculpt/artifacts/triangle-remesh-f907/artifacts/current-sanitize/native-input/frame-retry.dsculpt",
+      "sha256": "1862e38c05eba6598584593b09a45285827b2a9be6f0c6f082ca50687b06b53e"
+    },
+    {
+      "release": "/home/blux/de-xr/dome-sculpt/artifacts/triangle-remesh-f907/artifacts/current-release/native-input/retry.dsculpt",
+      "sanitize": "/home/blux/de-xr/dome-sculpt/artifacts/triangle-remesh-f907/artifacts/current-sanitize/native-input/retry.dsculpt",
+      "sha256": "1862e38c05eba6598584593b09a45285827b2a9be6f0c6f082ca50687b06b53e"
+    },
+    {
+      "release": "/home/blux/de-xr/dome-sculpt/artifacts/triangle-remesh-f907/artifacts/current-release/native-input/worker-retry.dsculpt",
+      "sanitize": "/home/blux/de-xr/dome-sculpt/artifacts/triangle-remesh-f907/artifacts/current-sanitize/native-input/worker-retry.dsculpt",
+      "sha256": "1862e38c05eba6598584593b09a45285827b2a9be6f0c6f082ca50687b06b53e"
+    },
+    {
+      "release": "/home/blux/de-xr/dome-sculpt/artifacts/triangle-remesh-f907/artifacts/current-release/direct-images/constants.rgba",
+      "sanitize": "/home/blux/de-xr/dome-sculpt/artifacts/triangle-remesh-f907/artifacts/current-sanitize/direct-images/constants.rgba",
+      "sha256": "5e0bdf0e3047d97d156e44ab964b78ae63af1c36a84e83d248f4a1910720086b"
+    },
+    {
+      "release": "/home/blux/de-xr/dome-sculpt/artifacts/triangle-remesh-f907/artifacts/current-release/direct-images/frames.rgba",
+      "sanitize": "/home/blux/de-xr/dome-sculpt/artifacts/triangle-remesh-f907/artifacts/current-sanitize/direct-images/frames.rgba",
+      "sha256": "5e0bdf0e3047d97d156e44ab964b78ae63af1c36a84e83d248f4a1910720086b"
+    },
+    {
+      "release": "/home/blux/de-xr/dome-sculpt/artifacts/triangle-remesh-f907/artifacts/current-release/direct-images/mask.rgba",
+      "sanitize": "/home/blux/de-xr/dome-sculpt/artifacts/triangle-remesh-f907/artifacts/current-sanitize/direct-images/mask.rgba",
+      "sha256": "830bfb3bb7f07cd4536a5b1103815687c142042146d2435403ab605799dbcf43"
+    },
+    {
+      "release": "/home/blux/de-xr/dome-sculpt/artifacts/triangle-remesh-f907/artifacts/current-release/direct-images/partial.rgba",
+      "sanitize": "/home/blux/de-xr/dome-sculpt/artifacts/triangle-remesh-f907/artifacts/current-sanitize/direct-images/partial.rgba",
+      "sha256": "5e0bdf0e3047d97d156e44ab964b78ae63af1c36a84e83d248f4a1910720086b"
+    },
+    {
+      "release": "/home/blux/de-xr/dome-sculpt/artifacts/triangle-remesh-f907/artifacts/current-release/direct-images/plain.rgba",
+      "sanitize": "/home/blux/de-xr/dome-sculpt/artifacts/triangle-remesh-f907/artifacts/current-sanitize/direct-images/plain.rgba",
+      "sha256": "5e0bdf0e3047d97d156e44ab964b78ae63af1c36a84e83d248f4a1910720086b"
+    },
+    {
+      "release": "/home/blux/de-xr/dome-sculpt/artifacts/triangle-remesh-f907/artifacts/current-release/direct-images/recovered-0.rgba",
+      "sanitize": "/home/blux/de-xr/dome-sculpt/artifacts/triangle-remesh-f907/artifacts/current-sanitize/direct-images/recovered-0.rgba",
+      "sha256": "5e0bdf0e3047d97d156e44ab964b78ae63af1c36a84e83d248f4a1910720086b"
+    },
+    {
+      "release": "/home/blux/de-xr/dome-sculpt/artifacts/triangle-remesh-f907/artifacts/current-release/direct-images/recovered-1.rgba",
+      "sanitize": "/home/blux/de-xr/dome-sculpt/artifacts/triangle-remesh-f907/artifacts/current-sanitize/direct-images/recovered-1.rgba",
+      "sha256": "5e0bdf0e3047d97d156e44ab964b78ae63af1c36a84e83d248f4a1910720086b"
+    },
+    {
+      "release": "/home/blux/de-xr/dome-sculpt/artifacts/triangle-remesh-f907/artifacts/current-release/direct-images/recovered-2.rgba",
+      "sanitize": "/home/blux/de-xr/dome-sculpt/artifacts/triangle-remesh-f907/artifacts/current-sanitize/direct-images/recovered-2.rgba",
+      "sha256": "5e0bdf0e3047d97d156e44ab964b78ae63af1c36a84e83d248f4a1910720086b"
+    },
+    {
+      "release": "/home/blux/de-xr/dome-sculpt/artifacts/triangle-remesh-f907/artifacts/current-release/direct-images/recovered-3.rgba",
+      "sanitize": "/home/blux/de-xr/dome-sculpt/artifacts/triangle-remesh-f907/artifacts/current-sanitize/direct-images/recovered-3.rgba",
+      "sha256": "5e0bdf0e3047d97d156e44ab964b78ae63af1c36a84e83d248f4a1910720086b"
+    },
+    {
+      "release": "/home/blux/de-xr/dome-sculpt/artifacts/triangle-remesh-f907/artifacts/current-release/direct-images/recovered-4.rgba",
+      "sanitize": "/home/blux/de-xr/dome-sculpt/artifacts/triangle-remesh-f907/artifacts/current-sanitize/direct-images/recovered-4.rgba",
+      "sha256": "5e0bdf0e3047d97d156e44ab964b78ae63af1c36a84e83d248f4a1910720086b"
+    },
+    {
+      "release": "/home/blux/de-xr/dome-sculpt/artifacts/triangle-remesh-f907/artifacts/current-release/direct-images/recovered-5.rgba",
+      "sanitize": "/home/blux/de-xr/dome-sculpt/artifacts/triangle-remesh-f907/artifacts/current-sanitize/direct-images/recovered-5.rgba",
+      "sha256": "5e0bdf0e3047d97d156e44ab964b78ae63af1c36a84e83d248f4a1910720086b"
+    },
+    {
+      "release": "/home/blux/de-xr/dome-sculpt/artifacts/triangle-remesh-f907/artifacts/current-release/direct-images/stereo.rgba",
+      "sanitize": "/home/blux/de-xr/dome-sculpt/artifacts/triangle-remesh-f907/artifacts/current-sanitize/direct-images/stereo.rgba",
+      "sha256": "5e0bdf0e3047d97d156e44ab964b78ae63af1c36a84e83d248f4a1910720086b"
+    },
+    {
+      "release": "/home/blux/de-xr/dome-sculpt/artifacts/triangle-ui-c618/release-shear-normal-qualified/accepted.dsculpt",
+      "sanitize": "/home/blux/de-xr/dome-sculpt/artifacts/triangle-ui-c618/sanitize-shear-normal-qualified/accepted.dsculpt",
+      "sha256": "138ced7c9def2dc61997cfa06f92bdbdf9b0e7191c41608d188ee81d7a024c0b"
+    },
+    {
+      "release": "/home/blux/de-xr/dome-sculpt/artifacts/triangle-ui-c618/release-reflect-compact-qualified/accepted.dsculpt",
+      "sanitize": "/home/blux/de-xr/dome-sculpt/artifacts/triangle-ui-c618/sanitize-reflect-compact-qualified/accepted.dsculpt",
+      "sha256": "7c67e9bfe1fb01f48d9cb53a4ba118ddba208e424086ce79e776c9d6a5512945"
+    },
+    {
+      "release": "/home/blux/de-xr/dome-sculpt/artifacts/triangle-xr-c618/release-accept-1-v2/output.dsculpt",
+      "sanitize": "/home/blux/de-xr/dome-sculpt/artifacts/triangle-xr-c618/sanitize-accept-1-v2/output.dsculpt",
+      "sha256": "94d4bd9903a8be43fd506188299013afdfcea70a3f949fc7486ba2282c4da9b4"
+    },
+    {
+      "release": "/home/blux/de-xr/dome-sculpt/artifacts/triangle-xr-c618/release-cancel-2-v2/output.dsculpt",
+      "sanitize": "/home/blux/de-xr/dome-sculpt/artifacts/triangle-xr-c618/sanitize-cancel-2-v2/output.dsculpt",
+      "sha256": "bc264d1e07c6de11da8df5307892131d3a6ec3d1281d3741850105c56d5a246a"
+    },
+    {
+      "release": "/home/blux/de-xr/dome-sculpt/artifacts/triangle-xr-c618/release-focus-2-v2/output.dsculpt",
+      "sanitize": "/home/blux/de-xr/dome-sculpt/artifacts/triangle-xr-c618/sanitize-focus-2-v2/output.dsculpt",
+      "sha256": "bc264d1e07c6de11da8df5307892131d3a6ec3d1281d3741850105c56d5a246a"
+    },
+    {
+      "release": "/home/blux/de-xr/dome-sculpt/artifacts/triangle-xr-c618/release-reference-1-v2/output.dsculpt",
+      "sanitize": "/home/blux/de-xr/dome-sculpt/artifacts/triangle-xr-c618/sanitize-reference-1-v2/output.dsculpt",
+      "sha256": "30813a8fff60706b7c748a00e89b8ee82a77d20985417a29c8383b752a8f5e94"
+    },
+    {
+      "release": "/home/blux/de-xr/dome-sculpt/artifacts/triangle-xr-c618/release-undo-1-v2/output.dsculpt",
+      "sanitize": "/home/blux/de-xr/dome-sculpt/artifacts/triangle-xr-c618/sanitize-undo-1-v2/output.dsculpt",
+      "sha256": "30813a8fff60706b7c748a00e89b8ee82a77d20985417a29c8383b752a8f5e94"
+    }
+  ],
+  "current_complete_release_faults": {
+    "path": "/home/blux/de-xr/dome-sculpt/artifacts/triangle-remesh-f907/artifacts/current-faults/release/status.json",
+    "sha256": "0319de3e788ee1449621f4e098089f58c3e03a85ea799392f7bbaa54d9984dda",
+    "partitions": 128,
+    "persistent_denials": 116337,
+    "successful_endpoints": 1,
+    "seconds": 3537.5040021429886
+  },
+  "current_complete_sanitize_faults": {
+    "state": "Incomplete; resumed verified completed receipts after missing coordinator",
+    "old_status": "/home/blux/de-xr/dome-sculpt/artifacts/triangle-remesh-f907/artifacts/current-faults/sanitize/status.json",
+    "completed_receipts_reused": 24,
+    "old_24_25_logs_not_used_as_exit_receipts": true,
+    "resume_status": "/home/blux/de-xr/dome-sculpt/artifacts/triangle-remesh-f907/artifacts/current-faults/sanitize-resume1/status.json",
+    "resume_script": "/home/blux/de-xr/dome-sculpt/artifacts/triangle-remesh-f907/artifacts/current-faults/sanitize-resume1.py",
+    "resume_script_sha256": "43d07a17251c3d1038188eb03d7f63a532b051200907f5e0abf9e3f781673032"
+  },
+  "preserved_failures": {
+    "first_SAN_resource_stop": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/triangle-remesh-f907/artifacts/current-sanitize/RESOURCE-PREFLIGHT-STOP.json",
+      "sha256": "b89db519bd9a5caba1b0698c59fb471d5f2b66626a6dcc7102ea5b96678d9dfe"
+    },
+    "first_partial_outputs_COW144": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/triangle-remesh-f907/artifacts/sanitize-first-attempt-outputs/ledger.json",
+      "sha256": "dca4676bec8a2911293fd649ef5ee9b3632f7e7b73ad11b139d69c2d86bedc08"
+    },
+    "second_resource_final_guard": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/triangle-remesh-f907/artifacts/current-sanitize/THIN-ATTEMPT2-TERMINAL.json",
+      "sha256": "5f7bfe1927d2239dc8b88409728296de84114c099732b9139111f097a4658e5d"
+    },
+    "third_archive_parent_setup": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/triangle-remesh-f907/artifacts/current-sanitize/thin3-status.json",
+      "sha256": "c8185c5af4816faa752b9b2d6de4d120763774cca11d411922faf236d7851de6"
+    },
+    "UI_observer_correction": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/triangle-ui-c618/OBSERVER-CORRECTION.json",
+      "sha256": "aac383f750e5cd9b481cf30630f05616276ad75d892cbe74cc30577009c47549"
+    }
+  },
+  "scope_limits": "Matched complete reachable native app build plus selected native/FLTK/OpenXR/render component validation. Exhaustive current sanitizer faults still incomplete. No fresh ALL, complete interoperability, physical headset, system installation or full production completion.",
+  "software_XR": {
+    "matrix": "/home/blux/de-xr/dome-sculpt/artifacts/triangle-xr-c618/matrix-v2-compact.json",
+    "sha256": "37a6e7bbb6a1f9e346889879480c3d278b3790837daea5bd756a93eec7175dc7",
+    "cases_per_profile": 5,
+    "checks_per_profile": 103,
+    "routes": [
+      "accept",
+      "cancel",
+      "focus",
+      "reference",
+      "undo"
+    ],
+    "slider_input_mm": 140,
+    "readable_visual_confirmation": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/triangle-xr-c618/release-accept-1-v2-hires/runtime-report.json.triangle-17.png",
+      "sha256": "53831ec5f31ba65fea043aab288c3f33c782a7312104e4b737e4f933c3557d10",
+      "observed": "Isotropic remesh edge (mm),140.00mm, source retained and hidden, Cancel and Remesh controls"
+    },
+    "actual_loader_maps": [
+      {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/triangle-xr-c618/release-accept-1-v2/app-maps.txt",
+        "sha256": "b6b15872a21dfaac2ba3eec86c8ce21151293c5ebaaecd5290aa833911f68a37"
+      },
+      {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/triangle-xr-c618/release-cancel-2-v2/app-maps.txt",
+        "sha256": "a2df4e613c946e5ed96f8a6f073da1b0d16bf7f0dfb954dd8c259c466fb3738c"
+      },
+      {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/triangle-xr-c618/release-focus-2-v2/app-maps.txt",
+        "sha256": "86e980435d62d6ba1726e6ed74b85363669dc53e5564182bf3ea5115c1c5bad4"
+      },
+      {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/triangle-xr-c618/release-reference-1-v2/app-maps.txt",
+        "sha256": "6738404ee78c712e3c1b812dd191dcc085f499ff54913fcb7bf2f7c02eb12ace"
+      },
+      {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/triangle-xr-c618/release-undo-1-v2/app-maps.txt",
+        "sha256": "52d8648d8ad8f065ceaf176ab5836b5e8c01240c7ad538d438f91663e248ae7a"
+      },
+      {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/triangle-xr-c618/sanitize-accept-1-v2/app-maps.txt",
+        "sha256": "4dd92a6cb422c9b52605fffe871ea4f99f32e1db7037f7c4c8ad98e05e404ca6"
+      },
+      {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/triangle-xr-c618/sanitize-cancel-2-v2/app-maps.txt",
+        "sha256": "ed103df8897f0842aae1b814bf52a1679a22a688970e62c03559c80c7fb01d65"
+      },
+      {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/triangle-xr-c618/sanitize-focus-2-v2/app-maps.txt",
+        "sha256": "c3ada3e47f7afb77e40da54fede8a87b7ce2ea636c8d48e29b7ddca9332fff8d"
+      },
+      {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/triangle-xr-c618/sanitize-reference-1-v2/app-maps.txt",
+        "sha256": "26fdb528d7c476c5d189a7bcae1ae25678f66565bb236a9b73d25a31ed33f137"
+      },
+      {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/triangle-xr-c618/sanitize-undo-1-v2/app-maps.txt",
+        "sha256": "d96874cadaa205ec652a9732fca428807939cb4d79bab3d667e5501b4e111a55"
+      }
+    ]
+  },
+  "actual_Arc": {
+    "status": "/home/blux/de-xr/dome-sculpt/artifacts/triangle-arc-c618/release-accept-1-v2/status.json",
+    "sha256": "1a83952f82b4eee953e1f39f00b010efd234a79bc72ce995319f992646ebe09d",
+    "checks": 24,
+    "witness": "/home/blux/de-xr/dome-sculpt/artifacts/triangle-arc-c618/release-accept-1-v2/device/device.txt",
+    "witness_sha256": "263bf74fabdab2191523e95d249385e17ed264aea37f8d6168bb195da85e0324",
+    "context_maps": "/home/blux/de-xr/dome-sculpt/artifacts/triangle-arc-c618/release-accept-1-v2/device/context-maps.txt",
+    "context_maps_sha256": "71ecc0370698beb794303d9f7ca19aa89d9127dfdb8ceb9a43a2e92dea0fbe91",
+    "ordinary_native_app_unchanged": true,
+    "saved_scene_exact_software": true,
+    "scope": "Real GL rendering on PCI03 Intel Arc A770; controller poses are synthetic. No new compute acceleration or physical HMD claim."
+  },
+  "root_review": {
+    "own_inputs_rehashed": 461,
+    "serialized_standalones": 5,
+    "prior_restore_controls_retained": true,
+    "product_files_exact_c618": {
+      "CMakeLists.txt": "ed40e9f7045a35b7d7410c449bf4507d6ea1f02b43467c3e750c296776a74772",
+      "include/dome/document.hpp": "c6331cc001fb1bef3283560e2ebcee354989ea5d755c681384e648e4b52bedc3",
+      "include/dome/mesh-authoring.hpp": "d1e56b65741cc36708cd7d84a3befa207227d7c90e7cfab05090fffcb506c806",
+      "include/dome/vr-controls.hpp": "6700ff5199507ce9ee428f600140842ad6754eee25098d5032810a5c8a2cfee6",
+      "src/app.cpp": "307eb6bf0bdb500431ac700d931d0ee7259b18b773066ba4e110a3f4fba47ab6",
+      "src/document-assets.cpp": "892054536b167ab51784405e0883e5dc9c37d9784f47df0fccd0117071fb1183",
+      "src/document.cpp": "0cb824889200854063b703fd2ca4246ce3a72cfe036eb889f9e215a1e0b7de99",
+      "src/input.cpp": "533aecae6d4f25160c11b2231fa9266c030a709bf4701cd5854a7a126fd0efba",
+      "src/mesh-authoring.cpp": "4ae42d33b1a17d87016bcd5605863b302932d9ebf3093429c92e4634224985fd",
+      "src/mesh-editor.cpp": "568214f94bfc8fdadbef48cde61a5a5dd2f01d51adae21c0227fc7bf340a2fd2",
+      "src/mesh-editor.hpp": "4bec6f5f238950c6cf44ba82dc61d2188a99694d32313b4c1b4a6bf8a7c7ea9d",
+      "src/palette.cpp": "a79d4f201f3ee5c898972c90ad351a39d1fba1626fc6aa6ce3b8378a90a51a22",
+      "src/polygon-conversion.cpp": "ec84037e426c421320b9dca68222c8051079d02cf9c58f266c022f9390d90121",
+      "src/polygon-conversion.hpp": "b3db461cebdff70147ce23e429cf2931e7b9fced7ad8008737d64d593e1da581",
+      "src/remesh.cpp": "dfbacf92fb3e22e26f0519b1d15c6290d5c3cfa5f45dcdc11f1012b904c458ce",
+      "tests/triangle-remesh-faults.cpp": "c00111e99ea43d7926b29519f0f66ba231679df601aae0a2d7970919ed6271b5",
+      "tests/triangle-remesh-kernel.cpp": "d7f06ba0d8c792e760809f8b83b0beb1f224c55204d8c63fce0f9558d20f2026",
+      "tests/triangle-remesh.cpp": "c3b30eabdbfefa4cedfbf2cdf482a3f348b3ceb2040d4bf2109e835cf0450175"
+    },
+    "XR_input_hashes": {
+      "/home/blux/de-xr/dome-sculpt/artifacts/triangle-xr-c618/run-v2-compact-json.py": "ae5330ba3cf88bd5116fad679dfd392c6edd6ba7345ae1428cee50be22fb2446",
+      "/home/blux/de-xr/dome-sculpt/artifacts/triangle-xr-c618/runtime-v2.cpp": "8329ba99301a2208b8446c0e3f2ea8453f16c37fafda3fd2bee7a302e5cd7ff1",
+      "/home/blux/de-xr/dome-sculpt/artifacts/triangle-xr-c618/runtime-v2-release.so": "fbfb4e376ffba50a9fad0eb9652c5841f539260407cbdb8a7a4f7a2df7974865",
+      "/home/blux/de-xr/dome-sculpt/artifacts/triangle-xr-c618/fixtures/1.dsculpt": "30813a8fff60706b7c748a00e89b8ee82a77d20985417a29c8383b752a8f5e94",
+      "/home/blux/de-xr/dome-sculpt/artifacts/triangle-remesh-f907/artifacts/current-release/build/dome-sculpt": "4589db233e212d0490a4d3ef39aeabda5f442f8b477be8279cbb8d0fa9a61ecf",
+      "/home/blux/de-xr/dome-sculpt/artifacts/triangle-remesh-f907/artifacts/current-release/build/dome-sculpt-native-authoring-inspect": "01526846f14e04aed75532e9480cab3d8d32e77adae3f06b257eedd2c33a0a3a",
+      "/home/blux/de-xr/dome-sculpt/artifacts/mesa-xr-leak-26.2.5/build-patched-v2/src/gallium/targets/dri/libgallium-26.2.5.so": "d8cf7ee81cf354f7595d5b98c5d2e45d5d52cf06e88fb6a82edf08bd203fd132",
+      "/home/blux/de-xr/dome-sculpt/artifacts/mesa-xr-leak-26.2.5/build-patched-v2/src/egl/libEGL_mesa.so.0.0.0": "1a6aedf2eb11801863d1d24fdb8880a16a5ced8feb437d54916dec1b57e4a75e",
+      "/home/blux/de-xr/dome-sculpt/artifacts/triangle-xr-c618/release-accept-1-v2/runtime.json": "8df46bf5161dba8b2e47536a53e56f6bf99ca9a730cb55dc302878cccb69ca7d",
+      "/home/blux/de-xr/dome-sculpt/artifacts/triangle-xr-c618/release-accept-1-v2/egl.json": "0a6007d23e96d185858f5eb913732bd06c77c97003976266be4fc50bd8fcd1d2",
+      "/home/blux/de-xr/dome-sculpt/artifacts/triangle-xr-c618/fixtures/2.dsculpt": "bc264d1e07c6de11da8df5307892131d3a6ec3d1281d3741850105c56d5a246a",
+      "/home/blux/de-xr/dome-sculpt/artifacts/triangle-xr-c618/release-cancel-2-v2/runtime.json": "8df46bf5161dba8b2e47536a53e56f6bf99ca9a730cb55dc302878cccb69ca7d",
+      "/home/blux/de-xr/dome-sculpt/artifacts/triangle-xr-c618/release-cancel-2-v2/egl.json": "0a6007d23e96d185858f5eb913732bd06c77c97003976266be4fc50bd8fcd1d2",
+      "/home/blux/de-xr/dome-sculpt/artifacts/triangle-xr-c618/release-focus-2-v2/runtime.json": "8df46bf5161dba8b2e47536a53e56f6bf99ca9a730cb55dc302878cccb69ca7d",
+      "/home/blux/de-xr/dome-sculpt/artifacts/triangle-xr-c618/release-focus-2-v2/egl.json": "0a6007d23e96d185858f5eb913732bd06c77c97003976266be4fc50bd8fcd1d2",
+      "/home/blux/de-xr/dome-sculpt/artifacts/triangle-xr-c618/release-reference-1-v2/runtime.json": "8df46bf5161dba8b2e47536a53e56f6bf99ca9a730cb55dc302878cccb69ca7d",
+      "/home/blux/de-xr/dome-sculpt/artifacts/triangle-xr-c618/release-reference-1-v2/egl.json": "0a6007d23e96d185858f5eb913732bd06c77c97003976266be4fc50bd8fcd1d2",
+      "/home/blux/de-xr/dome-sculpt/artifacts/triangle-xr-c618/release-undo-1-v2/runtime.json": "8df46bf5161dba8b2e47536a53e56f6bf99ca9a730cb55dc302878cccb69ca7d",
+      "/home/blux/de-xr/dome-sculpt/artifacts/triangle-xr-c618/release-undo-1-v2/egl.json": "0a6007d23e96d185858f5eb913732bd06c77c97003976266be4fc50bd8fcd1d2",
+      "/home/blux/de-xr/dome-sculpt/artifacts/triangle-xr-c618/runtime-v2-sanitize.so": "60ab9dc8471927b5932508e0be2701cfde9bb74b2a17de3931ef52c408f46b0f",
+      "/home/blux/de-xr/dome-sculpt/artifacts/triangle-remesh-f907/artifacts/current-sanitize/build/dome-sculpt": "2d8c2b5ea053e5a06b8df56922e98389b70e51ea8ebc1224c88a3ca9d8df9e29",
+      "/home/blux/de-xr/dome-sculpt/artifacts/triangle-xr-c618/sanitize-accept-1-v2/runtime.json": "cc386fb4864713ed87482a7a019b1509931c5ba703c8281288977b59e19fb49a",
+      "/home/blux/de-xr/dome-sculpt/artifacts/triangle-xr-c618/sanitize-accept-1-v2/egl.json": "0a6007d23e96d185858f5eb913732bd06c77c97003976266be4fc50bd8fcd1d2",
+      "/home/blux/de-xr/dome-sculpt/artifacts/triangle-xr-c618/sanitize-cancel-2-v2/runtime.json": "cc386fb4864713ed87482a7a019b1509931c5ba703c8281288977b59e19fb49a",
+      "/home/blux/de-xr/dome-sculpt/artifacts/triangle-xr-c618/sanitize-cancel-2-v2/egl.json": "0a6007d23e96d185858f5eb913732bd06c77c97003976266be4fc50bd8fcd1d2",
+      "/home/blux/de-xr/dome-sculpt/artifacts/triangle-xr-c618/sanitize-focus-2-v2/runtime.json": "cc386fb4864713ed87482a7a019b1509931c5ba703c8281288977b59e19fb49a",
+      "/home/blux/de-xr/dome-sculpt/artifacts/triangle-xr-c618/sanitize-focus-2-v2/egl.json": "0a6007d23e96d185858f5eb913732bd06c77c97003976266be4fc50bd8fcd1d2",
+      "/home/blux/de-xr/dome-sculpt/artifacts/triangle-xr-c618/sanitize-reference-1-v2/runtime.json": "cc386fb4864713ed87482a7a019b1509931c5ba703c8281288977b59e19fb49a",
+      "/home/blux/de-xr/dome-sculpt/artifacts/triangle-xr-c618/sanitize-reference-1-v2/egl.json": "0a6007d23e96d185858f5eb913732bd06c77c97003976266be4fc50bd8fcd1d2",
+      "/home/blux/de-xr/dome-sculpt/artifacts/triangle-xr-c618/sanitize-undo-1-v2/runtime.json": "cc386fb4864713ed87482a7a019b1509931c5ba703c8281288977b59e19fb49a",
+      "/home/blux/de-xr/dome-sculpt/artifacts/triangle-xr-c618/sanitize-undo-1-v2/egl.json": "0a6007d23e96d185858f5eb913732bd06c77c97003976266be4fc50bd8fcd1d2",
+      "/home/blux/de-xr/dome-sculpt/artifacts/triangle-arc-c618/run-arc.py": "d6a287cf1533ffb0a0c57a22309020e088ac19e72d5b263b051459ddb0991f1c",
+      "/home/blux/de-xr/dome-sculpt/artifacts/triangle-arc-c618/device-auth.cpp": "9748e2f597ba436146d4d93d407b8de8953829aebcd2525785905462ddd8a53e",
+      "/home/blux/de-xr/dome-sculpt/artifacts/triangle-arc-c618/runtime-v2.cpp": "4edcf3b684dae0db1a92d44398ecc139369d86e821340c05a72bcfbb112273fc",
+      "/home/blux/de-xr/dome-sculpt/artifacts/triangle-arc-c618/runtime-v2-release.so": "ead209572967616b69d22e80d23e869d6b23ce8183807f6d99e5f26dd75f0db7",
+      "/usr/lib64/dri/libdril_dri.so": "15b07285a0c6ab92d7b7738181a2f66493bf8e394718e08e9e226eb050c3dee7",
+      "/usr/lib64/libEGL_mesa.so.0.0.0": "c786fa61da74b62ae0b8ab9fdb9bc020be92c02896d37220c58724107195002c",
+      "/home/blux/de-xr/dome-sculpt/artifacts/triangle-arc-c618/release-accept-1-v2/runtime.json": "90fb4b523a00d026fda261163cd54bf2e63476f57047503954c710fae4640547",
+      "/home/blux/de-xr/dome-sculpt/artifacts/triangle-arc-c618/release-accept-1-v2/egl.json": "8e7e7164be2abfc5e987d03c4e1a2de60acf0b0266f2ee1a7777f2292f702aeb"
+    }
+  }
+}

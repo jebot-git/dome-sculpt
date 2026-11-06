@@ -37,7 +37,8 @@ enum class VrParameter {
   SculptMaskMode, SculptMaskStrength, SculptPlanes, SculptResolution,
   ProceduralPattern, ProceduralFace, ProceduralGrid, ProceduralCoverage, ProceduralDepth, ProceduralSeed, BakeProjection, ImportUnitScale, BakeColors, PolygonDistance, PolygonCuts, PolygonConversion, ShapeRestore,
   InkEmissionUnits, MaterialEmission, EmissionSource,
-  ShapeMirror=2048 // Explicit additive ID; existing control identifiers remain stable.
+  ShapeMirror=2048, // Explicit additive IDs; existing identifiers stay stable.
+  TriangleEdge=2049
 };
 inline bool procedural_parameter(VrParameter p) {
   return p>=VrParameter::ProceduralPattern && p<=VrParameter::ProceduralSeed;

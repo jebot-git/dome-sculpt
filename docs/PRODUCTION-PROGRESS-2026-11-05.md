@@ -1,5 +1,16 @@
 # Production integration progress — 2026-11-05
 
+Current update — 2026-11-06: isotropic remeshing from c618c828 is now integrated
+with matched complete reachable Release/SAN native app providers, desktop42 and
+actual-loader syntheticXR103 checks/profile,43 exact pairs and authenticated
+Arc GL24. Current Release116337 denials+endpoint closes. Current SAN exhaustive
+sweep is incomplete and resumed from24 verified receipts after its coordinator
+exited; the old running status is preserved. Read TRIANGLE-REMESH-INTEGRATION.md.
+Private paint-field authoring now passes292 native workflow controls plus its
+five codec/paint/affine/key/package consumers; actual app/render qualification
+continues. Texture-set native integration and local chunk publication remain
+separate branches. These are integration milestones; the full goal is incomplete.
+
 The full REQUIREMENTS/HANDOFF objective remains active and incomplete. Main now integrates the retopology composition71270a9 on its qualified
 native36/c179 foundation, plus the qualified worker publication repair68daffe;
 and affine polygon composition8750f20 via37c46b9. Read
@@ -25,7 +36,7 @@ completion.
 | Automatic weights | Admitted6bcc91b/bef5876: explicit SurfaceHeat5, default0; fresh R/S native25+38+248+4308, FLTK152, softwareXR56, current worker regular373+longtail5/profile; historical solver scope retained separately | Prepared/complex37/38 domains, broader production deformation/quality, complete current caller/factory and physical/accelerator qualification remain required |
 | Opaque unlit world outlines | 4ae4574: matching worker/render/factory, normal/compact FLTK, synthetic-XR, actual Arc and schema scopes pass | Main owning37 integration and remaining material/outline domains; no general Normal/Width-image/lit/screen/MASK/BLEND outline completion |
 | Physical-package fault coverage | 1f9fd48: all90262 points per profile close, including90261 persistent denials and one successful endpoint | The original whole-test sanitizer timeout remains failed; the integrated93c candidate has separate40-point smoke evidence, not a second exhaustive sweep |
-| Isotropic remeshing | Original kernela7ec25b closes116325 persistent denials+endpoint per R/S,128 partitions/profile. Fresh currentc618 Release235-step/233-own-input cohort now passes full remesh authoring including old affine gate,248 polygon/retopo,13442 input,108 query and73 upload controls | Current allocation map116337 differs; full current Release sweep and fresh whole-owned sanitizer build are live. Current SAN/application/device and broader qualification remain required; private, not main admission |
+| Isotropic remeshing | Integrated c618c828: matched full reachable R/S providers, native2166/248/query108/input13442/upload73, desktop42 and softwareXR103/profile,43 exact pairs, actual ArcGL24; full current Release116337 denials+endpoint | Current exhaustive SAN resumed/incomplete; broader quality, ALL and physical headset qualification remain |
 | Owning frame38 | 4ee2902 source/syntax checkpoint | Current binding, codec, native/render/export qualification and coherent integration remain open; no build reservation is granted |
 
 Retopology client scope includes normal/compact FLTK, actual-process close and
@@ -38,7 +49,7 @@ preserved; final unchanged app binaries map the canonical libraries and exit
 cleanly without suppressions. This is a component relink, not a fresh whole-app
 build, physical-headset test or full-runtime regression.
 
-The remesh candidate fixes a reproduced kernel instability: edits could create
+The original historical remesh candidate fixes a reproduced kernel instability: edits could create
 float triangles too thin for a reliable normal, causing later source projection
 to find no eligible triangle. A scale-aware candidate screen retains the valid
 topology instead. Both Release and sanitizer consumers print2155 passing lines

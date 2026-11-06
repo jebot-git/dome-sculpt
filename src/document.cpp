@@ -816,6 +816,7 @@ void Document::finish_locked() {
                         state_.controls.parameter != VrParameter::ImportUnitScale &&
                         state_.controls.parameter != VrParameter::SculptResolution &&
                         state_.controls.parameter != VrParameter::VoxelSize &&
+                        state_.controls.parameter != VrParameter::TriangleEdge &&
                         state_.controls.parameter != VrParameter::RigRotation &&
                         state_.controls.parameter != VrParameter::MorphWeight &&
                         state_.controls.parameter != VrParameter::BakeSource &&
@@ -1224,6 +1225,26 @@ void Document::end_voxel_remesh(bool accept) {
   finish_control_locked(accept);
   desktop_ = false;
   publish_locked();
+}
+void Document::begin_triangle_remesh() {
+  std::lock_guard lock(model_mutex_);finish_locked();
+  control_event_locked({VrControlEventType::Begin,VrParameter::TriangleEdge});
+  desktop_=true;state_.error.clear();publish_locked();
+}
+void Document::edit_triangle_edge(float mm) {
+  std::lock_guard lock(model_mutex_);
+  if(!control_before_||state_.controls.parameter!=VrParameter::TriangleEdge)
+    throw std::logic_error("Open the isotropic remesh controls first");
+  auto &c=state_.controls;
+  if(!std::isfinite(mm)||mm<c.minimum||mm>c.maximum)
+    throw std::invalid_argument("Edge length is outside the supported range");
+  c.value[0]=mm;state_.error.clear();publish_locked();
+}
+void Document::end_triangle_remesh(bool accept) {
+  std::lock_guard lock(model_mutex_);
+  if(control_before_&&state_.controls.parameter!=VrParameter::TriangleEdge)
+    throw std::logic_error("Another control owns the document");
+  finish_control_locked(accept);desktop_=false;publish_locked();
 }
 void Document::end_uv(bool accept) {
   std::lock_guard lock(model_mutex_);
@@ -2214,6 +2235,11 @@ bool Document::parameter_enabled_locked(VrParameter parameter) const {
         ? d.skeleton && d.skin && !d.skeleton->bones.empty()
         : d.morphs && !d.morphs->targets.empty();
   }
+  if (parameter == VrParameter::TriangleEdge) {
+    const auto &o=scene_.active();
+    return !state_.asset_busy&&!state_.recovery_busy&&o.visible&&!o.locked&&
+      scene_.objects().size()<256&&(o.mesh_active?bool(o.painted):!o.volume->voxels().empty());
+  }
   if (parameter == VrParameter::VoxelSize) {
     const auto &o = scene_.active();
     return !scene_.has_affine_placement(o.id) && !state_.asset_busy && !state_.recovery_busy && o.visible && !o.locked &&
@@ -2409,6 +2435,14 @@ void Document::finish_control_locked(bool accept) {
     control_changed_ = false;
     state_.controls = {};
     return;
+  }
+  if (state_.controls.parameter == VrParameter::TriangleEdge) {
+    if(accept){
+      auto before=std::move(control_before_);control_before_.reset();
+      try{queue_triangle_remesh_locked(state_.controls.value[0],control_source_);}
+      catch(...){control_before_=std::move(before);throw;}
+    }else control_before_.reset();
+    control_changed_=false;state_.controls={};return;
   }
   if (state_.controls.parameter == VrParameter::VoxelSize) {
     if (accept) {
@@ -2617,6 +2651,9 @@ void Document::control_event_locked(VrControlEvent event) {
       c.minimum = -1; c.maximum = 1;
       c.value[0] = o.deformation->morph_weights.empty() ? 0 : o.deformation->morph_weights.at(control_rig_index_);
       break;
+    case VrParameter::TriangleEdge:
+      c.title="Isotropic remesh edge (mm)";c.minimum=.01f;c.maximum=1000;
+      c.logarithmic=true;c.value[0]=50;break;
     case VrParameter::VoxelSize:
       control_voxel_mm_ = state_.voxel_size_mm;
       c.title = "Voxel remesh size (mm)";
@@ -2854,6 +2891,8 @@ void Document::control_event_locked(VrControlEvent event) {
   case VrParameter::MorphWeight:
     control_changed_ = c.value[0] != (before.deformation->morph_weights.empty() ? 0 : before.deformation->morph_weights.at(control_rig_index_));
     break;
+  case VrParameter::TriangleEdge:
+    break; // Staged configuration; only explicit Confirm queues the worker.
   case VrParameter::VoxelSize:
     state_.voxel_size_mm = value;
     break;

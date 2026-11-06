@@ -338,6 +338,7 @@ public:
   void open_import_browser(std::filesystem::path = {});
   void import_action(SpatialCommand);
   void remesh_to_sculpt(float world_voxel_mm, AssetSource expected = {});
+  void remesh_to_triangles(float world_edge_mm, AssetSource expected = {});
   void bake_from_object(uint64_t source, ObjectBakeSettings = {}, AssetSource expected = {});
   void clear_bake(AssetSource expected = {});
   void convert_baked_normals(AssetSource expected = {});
@@ -348,6 +349,9 @@ public:
   void begin_voxel_remesh();
   void edit_voxel_size(float world_voxel_mm);
   void end_voxel_remesh(bool accept);
+  void begin_triangle_remesh();
+  void edit_triangle_edge(float world_edge_mm);
+  void end_triangle_remesh(bool accept);
   bool wait_asset(
       std::chrono::milliseconds timeout = std::chrono::seconds(60)) const;
   void begin_uv();
@@ -931,5 +935,6 @@ private:
   void queue_bind_skin_locked(SkinAuthoringOptions, AssetSource = {},
                               bool selected=false,std::vector<uint64_t> expected_selection={});
   void queue_voxel_sculpt_locked(float, AssetSource);
+  void queue_triangle_remesh_locked(float, AssetSource);
 };
 } // namespace dome
