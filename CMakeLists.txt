@@ -4888,3 +4888,10 @@ if(BUILD_TESTING AND TARGET dome-sculpt-render)
   target_link_options(dome-sculpt-sculpt-chunk-render-test PRIVATE -Wl,--wrap=glBufferData)
   add_test(NAME sculpt-chunk-render COMMAND dome-sculpt-sculpt-chunk-render-test ${CMAKE_CURRENT_BINARY_DIR}/sculpt-chunk-render)
 endif()
+
+# Manual owning-workspace regression; production reference is an explicit argv.
+if(BUILD_TESTING)
+  add_executable(dome-sculpt-sculpt-chunk-workspace-test EXCLUDE_FROM_ALL tests/sculpt-chunk-workspace.cpp)
+  target_include_directories(dome-sculpt-sculpt-chunk-workspace-test PRIVATE src)
+  target_link_libraries(dome-sculpt-sculpt-chunk-workspace-test PRIVATE dome-sculpt-core)
+endif()
