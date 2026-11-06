@@ -1,3 +1,15 @@
+## Current combined sustained-consumer smoke — 2026-11-06
+
+A fresh whole optimized test consumer on exact frozen d1f40159 headers and current
+all-owned Release libraries passes corrected small smoke.477 actual dependencies,
+9archives/203members and196 actual trace objects are authenticated; all282 current
+outputs/source/SDK/runtime maps stay exact. Actual100704 triangles is not a
+production-size timing result. Native strokes/masks, independent whole geometry/
+scalar/full-affine query/3mode frames, movement reuse and exact history/stale
+controls pass. See SCULPT-SUSTAINED-CURRENT-SMOKE.md and receipt. P1 inventory is
+only proposed in SCULPT-CURRENT-INVENTORY-PLAN.md; no inventory/production/Arc run
+occurred. Full goal remains active/incomplete; no install or headset launch.
+
 ## Coherent FLTK qualification and resolution plan — 2026-11-06
 
 Actual whole-ownedee557 Release passes19 polygon and51 texture-manager GUI
