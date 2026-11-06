@@ -4921,6 +4921,8 @@ include(tests/texture-set-resolution-workflows.cmake)
 include(tests/sculpt-sustained.cmake)
 include(tests/texture-set-source-render.cmake)
 
+include(tests/sculpt-placed-workspace.cmake)
+
 # Manual owning-workspace regression; production reference is an explicit argv.
 if(BUILD_TESTING)
   add_executable(dome-sculpt-sculpt-chunk-workspace-test EXCLUDE_FROM_ALL tests/sculpt-chunk-workspace.cpp)

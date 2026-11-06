@@ -61,7 +61,11 @@ SculptPlacedChunk::Ptr SculptPlacedChunk::capture(const SculptSceneChunks::Ptr &
   if(source->bytes>limits.retained_bytes||own>limits.retained_bytes-source->bytes||query_bytes>limits.retained_bytes-source->bytes-own)
     throw std::length_error("Placed sculpt chunk retained byte limit exceeded");
   const auto retained=source->bytes+own+query_bytes;
-  const auto previous=before?before->bytes_:0;
+  // Both immutable wrappers stay live. Their actual source and query control
+  // blocks may be shared; equal values or a different COW root grant no credit.
+  size_t previous=before?before->bytes_:0;
+  if(same_source)previous-=source->bytes;
+  if(reuse_query)previous-=query_bytes;
   if(retained>limits.working_bytes||previous>limits.working_bytes-retained)
     throw std::length_error("Placed sculpt chunk working byte limit exceeded");
   auto out=std::shared_ptr<SculptPlacedChunk>(new SculptPlacedChunk);
@@ -84,7 +88,8 @@ SculptPlacedChunk::Ptr SculptPlacedChunk::capture(const SculptSceneChunks::Ptr &
   const auto &box=out->bounds_;
   if(require_query&&std::max({std::abs(box.minimum.x),std::abs(box.minimum.y),std::abs(box.minimum.z),std::abs(box.maximum.x),std::abs(box.maximum.y),std::abs(box.maximum.z)})>100)
     for(size_t v=0;v<source->mesh.positions.size();++v){
-      if((v&255)==0)stop(cancel);const auto p=view->placed_position(source->mesh.positions[v]);
+      if((v&255)==0)stop(cancel);
+      const auto p=view->placed_position(source->mesh.positions[v]);
       if(std::max({std::abs(p.x),std::abs(p.y),std::abs(p.z)})>100)throw std::runtime_error("Mesh outside 100m authoring workspace");
     }
   if(reuse_query)out->query_=before->query_;

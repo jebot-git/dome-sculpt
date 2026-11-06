@@ -23,7 +23,11 @@ public:
   const AffineInteractionFrame &placement_frame() const {return *affine_;}
   const Tangent &tangent() const {return tangent_;}
   bool reflected() const {return reflected_;}
+  // Reachable footprint includes the actual source owner. A directory which
+  // already reserves that source uses only this wrapper/query allocation.
   size_t retained_bytes() const {return bytes_;}
+  size_t placement_bytes() const {return bytes_-source_->bytes;}
+  size_t query_bytes() const {return placement_bytes()-sizeof(SculptPlacedChunk)-128;}
   bool placement_matches(const SculptObjectChunks &) const;
 private:
   SculptPlacedChunk()=default;
