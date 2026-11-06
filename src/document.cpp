@@ -1897,7 +1897,9 @@ void Document::mesh_loop() {
           snapshot->mesh.uv.push_back(o.mesh.uv.empty() ? std::array<float,2>{0,0} : o.mesh.uv.at(vertex));
           auto direction = vec(ob::rotate(world.orientation, obv({tangent[0],tangent[1],tangent[2]})));
           snapshot->tangents.push_back(frame?detail::placed_tangent(*frame,tangent):Tangent{direction.x,direction.y,direction.z,tangent[3]});
-          if(retained || !snapshot->source_normals.empty()) {
+          // A first polygon-field object has no earlier mesh to seed these arrays.
+          // Publish its actual before attributes even while the packed prefix is empty.
+          if(polygon_field || retained || !snapshot->source_normals.empty()) {
             auto source=o.mesh.normals.at(vertex),canonical_normal=source;
             std::array<float,4> source_tangent{1,0,0,1};
             if(polygon_field){source=polygon_field->normals().at(frame_vertex);if(!polygon_field->tangents().empty())source_tangent=polygon_field->tangents().at(frame_vertex);}
