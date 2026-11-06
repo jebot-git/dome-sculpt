@@ -36,7 +36,9 @@ void stamp(PaintedMesh &p, PaintSettings settings, float strength = 1) {
   Brush b;
   b.from = b.to = {0, 0, .5f};
   b.normal = {0, 0, 1};
-  b.radius = 10000;
+  // Use the actual native brush bound; radius5 covers this full two-unit quad
+  // while retaining genuine radial coverage instead of an invalid flat stamp.
+  b.radius = 5;
   b.strength = strength;
   p.begin_stroke();
   p.stamp(b, settings);
@@ -205,6 +207,70 @@ void oracle(const PaintedMesh &old, const PaintedMesh &now,
           "Asymmetric actual authoring distinguishes footprint integration, "
           "linear-light filtering and nearest-neighbor copying");
 }
+// Independent long-double composition from actual raw layers. This does not
+// call the production overlay evaluator, preview or quality implementation.
+void emission_oracle(const PaintedMesh &before, const PaintedMesh &after,
+                     const Material &material,
+                     const TextureSetResolutionReport &report) {
+  const auto at = [&](const PaintedMesh &paint, int x, int y) {
+    const auto n = int(paint.resolution());
+    x = std::clamp(x, 0, n - 1);
+    y = std::clamp(y, 0, n - 1);
+    std::array<long double, 4> result{};
+    for (size_t k = 0; k < 3; ++k)
+      result[k] = material.emissive[k];
+    for (const auto &layer : paint.layers()) {
+      if (!layer.visible || layer.opacity == 0)
+        continue;
+      const auto common = paint.pixel(layer.id, x, y);
+      const auto value = paint.emission_pixel(layer.id, x, y);
+      const long double coverage = value.coverage *
+          static_cast<long double>(common.data[13]) / 255 * layer.opacity;
+      for (size_t k = 0; k < 3; ++k)
+        result[k] = result[k] * (1 - coverage) +
+            (static_cast<long double>(value.legacy[k]) + value.physical[k]) * coverage;
+      result[3] = result[3] * (1 - coverage) + coverage;
+    }
+    return result;
+  };
+  long double peak = 1;
+  const auto n = before.resolution();
+  for (uint32_t y = 0; y < n; ++y)
+    for (uint32_t x = 0; x < n; ++x) {
+      const auto value = at(before, x, y);
+      for (size_t k = 0; k < 3; ++k)
+        peak = std::max(peak, value[k]);
+    }
+  std::array<long double, 4> maximum{};
+  for (uint32_t y = 0; y < n; ++y)
+    for (uint32_t x = 0; x < n; ++x) {
+      const long double u = (static_cast<long double>(x) + .5L) * after.resolution() / n - .5L,
+                        v = (static_cast<long double>(y) + .5L) * after.resolution() / n - .5L;
+      const int bx = int(floorl(u)), by = int(floorl(v));
+      std::array<long double, 4> reconstructed{};
+      for (int corner = 0; corner < 4; ++corner) {
+        const auto value = at(after, bx + (corner & 1), by + ((corner >> 1) & 1));
+        const long double weight = ((corner & 1) ? u - bx : 1 - (u - bx)) *
+            ((corner & 2) ? v - by : 1 - (v - by));
+        for (size_t k = 0; k < 4; ++k)
+          reconstructed[k] += weight * value[k];
+      }
+      const auto actual = at(before, x, y);
+      for (size_t k = 0; k < 4; ++k)
+        maximum[k] = std::max(maximum[k], fabsl(actual[k] - reconstructed[k]) /
+                                                    (k < 3 ? peak : 1));
+    }
+  for (size_t k = 0; k < 4; ++k)
+    check(fabsl(report.material_error[8 + k] - maximum[k]) < 2e-6L,
+          "Independent visible layer/mask/FLOAT radiance integral matches actual material quality");
+  check(maximum[0] > 0 && maximum[0] < .30L &&
+            fabsl(report.material_error[13] - maximum[3]) < 2e-6L,
+        "Actual nonzero physical reconstruction error and independent FLOAT coverage are measured");
+  std::cout << "ORACLE linear_emission peak=" << double(peak)
+            << " relative_rgb=" << double(maximum[0]) << ',' << double(maximum[1])
+            << ',' << double(maximum[2]) << " float_coverage=" << double(maximum[3])
+            << '\n';
+}
 void numeric() {
   auto scene = fixture();
   const auto original = scene.snapshot();
@@ -242,6 +308,21 @@ void numeric() {
         "Sub-UNORM8 FLOAT coverage and native high radiance remain authored "
         "after resize");
   oracle(*before.painted, *field.painted);
+  emission_oracle(*before.painted, *field.painted, before.material, report);
+  auto luminous = fixture();
+  edit_texture_set(luminous, luminous.active().id, 1,
+                   [](PaintedMesh &, Material &material) {
+    material.emissive = {500, .125f, 3};
+    return true;
+  });
+  const auto luminous_before = texture_set_view(luminous.active(), 1);
+  const auto luminous_report = resample_texture_set(
+      luminous, luminous.active().id, 1, options);
+  check(luminous_report.changed,
+        "Actual mixed FLOAT/legacy paint resizes over an authored HDR background");
+  emission_oracle(*luminous_before.painted,
+                 *texture_set_view(luminous.active(), 1).painted,
+                 luminous_before.material, luminous_report);
   auto asymmetric = fixture();
   edit_texture_set(asymmetric, asymmetric.active().id, 1,
                    [](PaintedMesh &p, Material &) {
@@ -378,11 +459,36 @@ void numeric() {
   // planes. This checks the kernel only; its authenticated prepared-grid
   // transition deliberately remains refused by the actual scene/public resize
   // operation.
+  auto pbr_scene = fixture();
+  TextureSetResolutionOptions pbr_grid;
+  pbr_grid.resolution = 128;
+  check(resample_texture_set(pbr_scene, pbr_scene.active().id, 0, pbr_grid).changed,
+        "Independent PBR control receives a real128 native primary grid");
+  edit_texture_set(pbr_scene, pbr_scene.active().id, 0,
+                   [](PaintedMesh &paint, Material &) {
+    PaintSettings ink;
+    ink.color = {.4f, .7f, .2f, .8f};
+    stamp(paint, ink, .7f);
+    ink.channel = PaintChannel::Metallic;
+    ink.metallic = .31f;
+    stamp(paint, ink, .6f);
+    ink.channel = PaintChannel::Roughness;
+    ink.roughness = .67f;
+    stamp(paint, ink, .8f);
+    ink.channel = PaintChannel::Emission;
+    ink.emission = {.15f, .4f, .09f};
+    stamp(paint, ink, .4f);
+    ink.channel = PaintChannel::Mask;
+    ink.mask = .42f;
+    stamp(paint, ink);
+    return true;
+  });
+  const auto pbr_before = texture_set_view(pbr_scene.active(), 0);
   std::vector<std::array<float, 4>> colors(
-      before.painted->mesh().positions.size(), {.4f, .7f, .2f, .8f});
+      pbr_before.painted->mesh().positions.size(), {.4f, .7f, .2f, .8f});
   ColorPreparationOptions color_options;
   auto prepared = SourceColorPreparationAccess::prepare(
-      *before.painted, colors, before.material, color_options);
+      *pbr_before.painted, colors, pbr_before.material, color_options);
   check(prepared.paint->color_projection() &&
             !prepared.paint->layers()[0].pbr_tiles.empty(),
         "Actual preparation authors independent PBR color planes");
@@ -397,6 +503,44 @@ void numeric() {
                         [](const auto &p) { return bool(p); }),
         "Measured kernel carries genuine independent PBR planes without "
         "flattening");
+  size_t distinct_pbr = 0;
+  for (size_t li = 0; li < prepared.paint->layers().size(); ++li) {
+    const auto &input = prepared.paint->layers()[li];
+    const auto &output = layers[li];
+    for (uint32_t y : {0u, 9u, 31u, 63u})
+      for (uint32_t x : {0u, 13u, 42u, 63u}) {
+        const auto target_tile = size_t(y / 32) * 2 + x / 32;
+        const auto target_pixel = size_t(y % 32) * 32 + x % 32;
+        check(bool(output.pbr_tiles.at(target_tile)),
+              "Actual independent PBR target tile exists at each analytic sample");
+        const auto &actual = output.pbr_tiles[target_tile]->pixels[target_pixel];
+        for (size_t k = 0; k < 4; ++k) {
+          long double integral = 0, coverage = 0;
+          for (uint32_t dy = 0; dy < 2; ++dy)
+            for (uint32_t dx = 0; dx < 2; ++dx) {
+              const auto sx = x * 2 + dx, sy = y * 2 + dy;
+              const auto tile = size_t(sy / 32) * 4 + sx / 32;
+              const auto pixel = size_t(sy % 32) * 32 + sx % 32;
+              check(bool(input.tiles.at(tile)) && bool(input.pbr_tiles.at(tile)),
+                    "Independent PBR oracle reads actual authored source planes");
+              const auto &common = input.tiles[tile]->pixels[pixel];
+              const auto &value = input.pbr_tiles[tile]->pixels[pixel];
+              distinct_pbr += value[k] != common.data[k];
+              coverage += common.data[9];
+              integral += (k < 3 ? decode(value[k]) :
+                           static_cast<long double>(value[k]) / 255) * common.data[9];
+            }
+          check(coverage > 0,
+                "Independent PBR area control has actual authored color coverage");
+          const auto expected = k < 3 ? encode(integral / coverage) :
+              int(llroundl(integral / coverage * 255));
+          check(std::abs(int(actual[k]) - expected) <= 1,
+                "Independent linear-light PBR RGBA area integral matches kernel output");
+        }
+      }
+  }
+  check(distinct_pbr > 0,
+        "Actual prepared PBR planes differ from common color at analytic samples");
   refuses(
       [&] {
         detail::TextureSetPaintAccess::resample_plain(*prepared.paint, raw, {},
@@ -550,6 +694,6 @@ int main(int argc, char **argv) try {
   std::cout << "PASS " << checks << " measured texture resolution checks\n";
   return 0;
 } catch (const std::exception &e) {
-  std::cerr << "FAIL " << e.what() << '\n';
+  std::cerr << "FAIL after " << checks << " checks: " << e.what() << '\n';
   return 1;
 }
