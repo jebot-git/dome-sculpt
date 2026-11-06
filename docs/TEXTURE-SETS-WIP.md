@@ -166,3 +166,23 @@ validation/TEXTURE-SETS-INITIAL-OWNER-RELEASE.json. This is scoped CPU component
 evidence; the app was not relaunched with11cf and no SAN/UI/GL/device proof is
 claimed. Active-set workflow and all complex/native/import/export rows remain
 required in the separate continuation.
+
+
+## Native selected-field source continuation — 2026-11-06
+
+Source7ae8bd4 carries the qualified initial membership producer by real merge
+and adds owning selected-field native painting, typed accepted worker controls,
+material-visible logical face picking, shared page31, and ordinary FLTK controls.
+A strong immutable recipient lease protects actual target/collection/source/pose
+and group/volume authority; accepted drafts replace only the requested field.
+Scalar material/layer values are staged until Apply, keeping raster work off UI
+publication. The new actual Document/Cancel/Undo/Save fixture is registered but
+has **not executed**. Sixteen whole own-source/frontend/fixture TUs passed syntax
+checking, with final label-only frontend checks; no object/link/app/runtime proof
+is claimed for this appended layout. See TEXTURE-SETS-NATIVE-SOURCE.json.
+
+Fresh complete owning Release gate is proposed separately; no old-layout project
+archive reuse is permitted. Complex per-set source/normal/recipe/retained-history
+adapters, all-channel resolution/UV remap, independent real bake targets and
+shared-node multi-primitive glTF/VRM import/export remain required. This source
+checkpoint and earlier scoped plain Release controls do not complete texture sets.

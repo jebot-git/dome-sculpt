@@ -1,0 +1,59 @@
+{
+  "status": "PRIVATE SOURCE MILESTONE ONLY \u2014 not runtime-qualified, not main admission",
+  "production_source": "7ae8bd4677a78a6dc4c6ac71ba279866e88b4d7f",
+  "base": "72238fcf4e83001bb3d0df659ba5069e1279035e",
+  "qualified_initial_owner_seal": "f000e62c911b0c60fe786b0a430aeedbb14c783e",
+  "real_merge": "5e09ce5",
+  "syntax_cohorts": [
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/texture-set-native-72238fc/artifacts/native-syntax/selected-controls/status.json",
+      "sha256": "9fbcf7114117cee12f74c41bcd126df03341cd9d3e6d3f25e5b21269c8a0371f",
+      "bytes": 572
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/texture-set-native-72238fc/artifacts/native-syntax/selected-controls-fixed/status.json",
+      "sha256": "f5617d852672a2fe4dc2755debc8de9849bd5a4e5ff82b54f352c351ab06e5aa",
+      "bytes": 4748
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/texture-set-native-72238fc/artifacts/native-syntax/native-ui/status.json",
+      "sha256": "ab7d1eaf553d76c7ac6d9099a0f1094b9e7644a5fb24882af13309753344faeb",
+      "bytes": 24443
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/texture-set-native-72238fc/artifacts/native-syntax/native-ui-final/status.json",
+      "sha256": "0c8de0099b4a733620cd2c549d8e409b41c49093f4aa920a85ad3c59940278b0",
+      "bytes": 24456
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/texture-set-native-72238fc/artifacts/native-syntax/native-labels/status.json",
+      "sha256": "b68a2e3f8006944cf10be0e6dd36b7aeeaba54565a0a3685f3f650479895cc94",
+      "bytes": 3632
+    }
+  ],
+  "last_exact_syntax": "16 full own-tree product/frontend/fixture TUs terminal0; then only two display-name lines changed and both complete frontend TUs pass again. No source drift within any run; 2,158,592B cumulative syntax artifacts. Earlier declaration failure retained.",
+  "implemented": [
+    "Immutable selected-field recipient lease authenticates complete current target fields, primary COW values, collection/source/frame/pose/group/volume owners and exact metadata before queue/publication; no Scene.encode on UI",
+    "Native worker owns independent paint draft, material-aware visibility, current logical triangle/barycentric Evaluation; preview/adoption replace selected field without overwriting sibling recipients",
+    "Typed common accepted worker actions create/assign/select/rename/edit a stable material slot and its independent layer controls; actual expected authority captured and checked before and after finishing earlier gestures",
+    "Material/layer scalar sliders stage values; Apply uses worker, Cancel leaves Scene unchanged; no raster replay per UI slider/second eye",
+    "Actual desktop and XR source handlers route selected-field paint, visible face picking, stable logical face IDs and shared page31/count32 commands",
+    "Ordinary FLTK manager/menu/view picking plus new native regression fixture and registration"
+  ],
+  "layout_boundary": "New EditorState/Document private NativeStroke/FileJob and input page/enum consumers require a fresh coherent complete own product closure. No old722/984/769 support has executed these sources.",
+  "limitations": [
+    "SAN",
+    "FLTK window launch or UI interaction",
+    "GL pixel/render or device proof",
+    "HMD/OpenXR session",
+    "complex per-set source/normal/recipe/history adapters",
+    "post-edit UV or all-channel resampling",
+    "actual bake target compiler",
+    "multi-primitive glTF/VRM import/export"
+  ],
+  "future_gate_plan": {
+    "path": "/home/blux/de-xr/dome-sculpt/artifacts/texture-set-native-72238fc/artifacts/native-release-plan/proposal.json",
+    "sha256": "469e532954b046ce13d24aac695c35482a3ef9daa74d3b1768a43743cc55f099",
+    "bytes": 2827
+  }
+}
