@@ -1,3 +1,18 @@
+## Private current remesh Release composition — 2026-11-06
+
+Privatec618c82 combines isotropic remeshing with current mainf907. Its fresh235-step
+optimized Release build owns233 project objects/archives/ELFs and all reachable
+app/core/render/XR providers. Full remesh authoring now passes the original affine
+gate;248 polygon/retopo,13442 input,108 query families and73 direct-upload controls
+pass. Its measured allocation map is116337;32 prefix+32 tail denials and endpoint
+pass. Fresh whole-owned sanitizer and a new complete current Release sweep remain
+live. See validation/TRIANGLE-REMESH-CURRENT-RELEASE.json. Separately, original
+kernela7ec25b closes116325 persistent denials+endpoint in both profiles, all128
+partitions/profile and2288 protected inputs unchanged. That historical proof does
+not qualify the changed current map or relabel original native failures. Remesh
+is still private; full production, interoperability, acceleration and drawers
+remain required. No installation/headset/session restart; full goal active.
+
 ## Direct immutable geometry uploads admitted — 2026-11-06
 
 Main integrates qualified9f89fce on537c98b. The renderer uploads immutable arrays

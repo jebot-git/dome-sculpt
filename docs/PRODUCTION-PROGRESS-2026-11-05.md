@@ -25,7 +25,7 @@ completion.
 | Automatic weights | Admitted6bcc91b/bef5876: explicit SurfaceHeat5, default0; fresh R/S native25+38+248+4308, FLTK152, softwareXR56, current worker regular373+longtail5/profile; historical solver scope retained separately | Prepared/complex37/38 domains, broader production deformation/quality, complete current caller/factory and physical/accelerator qualification remain required |
 | Opaque unlit world outlines | 4ae4574: matching worker/render/factory, normal/compact FLTK, synthetic-XR, actual Arc and schema scopes pass | Main owning37 integration and remaining material/outline domains; no general Normal/Width-image/lit/screen/MASK/BLEND outline completion |
 | Physical-package fault coverage | 1f9fd48: all90262 points per profile close, including90261 persistent denials and one successful endpoint | The original whole-test sanitizer timeout remains failed; the integrated93c candidate has separate40-point smoke evidence, not a second exhaustive sweep |
-| Isotropic remeshing | b441ad3: native worker and shared desktop/XR controls; full-affine posed-source geometry, source retention, restoration, history and queued-save checks execute | Both original native runs retain the affine polygon failure. Admitted polygon repair passes combined248 native/profile and77 normal+77compact ordinary GUI/profile; coherent remesh composition/app and remaining full sanitizer sweep stay pending |
+| Isotropic remeshing | Original kernela7ec25b closes116325 persistent denials+endpoint per R/S,128 partitions/profile. Fresh currentc618 Release235-step/233-own-input cohort now passes full remesh authoring including old affine gate,248 polygon/retopo,13442 input,108 query and73 upload controls | Current allocation map116337 differs; full current Release sweep and fresh whole-owned sanitizer build are live. Current SAN/application/device and broader qualification remain required; private, not main admission |
 | Owning frame38 | 4ee2902 source/syntax checkpoint | Current binding, codec, native/render/export qualification and coherent integration remain open; no build reservation is granted |
 
 Retopology client scope includes normal/compact FLTK, actual-process close and
@@ -47,12 +47,15 @@ are exact, and no sanitizer diagnostic is emitted. The complete unchanged kernel
 and voxel-authoring suites finish successfully inside those consumers. This is
 scoped positive evidence within failed full runs, not a green authoring release.
 
-The new remesh fault test measures116325 calling-thread C++ allocations stably
-three times per profile. Both final32-denial/one-success pilots pass exact
-rollback and real retry. All 128 Release partitions have closed successfully;
-the sanitizer sweep remains live, with 123 of 128 partitions passing at this
-checkpoint. It must close before claiming complete paired coverage. C allocator and other-thread
-allocation injection are outside this test's scope.
+The original remesh fault test measures116325 calling-thread C++ allocations
+stably three times per profile. The complete paired job98490 now closes0 after
+26286.69 seconds: all128 partitions per profile pass, with116325 persistent
+denials and one successful endpoint, exact rollback and real retry. Root verifies
+all256 logs/receipts and2288 input hashes. C allocator and other-thread allocation
+injection remain outside scope. The new currentc618 allocation map116337 requires
+its own proof; a separate full Release sweep is live, alongside the fresh owned
+sanitizer build. Read [the original kernel closure](https://github.com/jebot-git/dome-sculpt/blob/a7ec25b/docs/TRIANGLE-REMESH-FAULT-CLOSURE.md)
+and [the current Release receipt](validation/TRIANGLE-REMESH-CURRENT-RELEASE.json).
 
 The later private polygon transport checkpoint does not relabel the two original
 owning37 positives below. It builds a genuine before/current correspondence and
