@@ -1,3 +1,4 @@
+#include "polygon-surface-range.hpp"
 #include "native-paint-sampling.hpp"
 #include "native-paint-metadata.hpp"
 #include "texture-set-range.hpp"
@@ -55,7 +56,8 @@ struct Visibility {
   std::vector<std::array<float,4>> vertex_colors;
   std::vector<std::array<float,2>> paint_corners;
   explicit Visibility(const SurfaceRange &r, const Mesh &mesh,
-                      std::span<const std::array<float,4>> packed_colors, bool explicit_colors, std::span<const std::array<float,2>> coordinates, bool per_vertex) : range(r) {
+                      std::span<const std::array<float,4>> packed_colors, bool explicit_colors, std::span<const std::array<float,2>> coordinates, bool per_vertex,const std::function<bool()>&cancelled) : range(r) {
+    detail::validate_polygon_range(mesh,r,coordinates,per_vertex,{},{},{},false,cancelled);
     if(r.texture_set_proof){r.texture_set_proof->authenticate_stream(mesh,r);r.texture_set_proof->authenticate_tint(mesh,r,packed_colors);}
     else if(r.texture_set)throw std::invalid_argument("Visibility texture set lacks its actual field/range proof");
     cull = r.material.double_sided ? MToonCull::Off : MToonCull::Back;
@@ -300,7 +302,7 @@ struct MaterialSurfaceQuery::Impl {
       if (range.first != end || range.count % 3 || range.count > mesh.indices.size() - end)
         throw std::invalid_argument("Visibility requires contiguous triangle-aligned surface ranges");
       end += range.count;
-      surfaces.emplace_back(range, mesh,colors,explicit_colors,paint,per_vertex);
+      surfaces.emplace_back(range, mesh,colors,explicit_colors,paint,per_vertex,cancelled);
     }
     if (end != mesh.indices.size()) throw std::invalid_argument("Visibility surface ranges are incomplete");
   }

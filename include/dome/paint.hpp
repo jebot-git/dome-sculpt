@@ -6,7 +6,7 @@
 #include <map>
 #include <memory>
 namespace dome {
-namespace detail {class PaintOverlayPacket;struct PaintOverlayFactory;struct EmissionExportAccess;class BakedNormalField;struct NativeWeightPaintAccess;struct TextureSetPaintAccess;}
+namespace detail {class PaintOverlayPacket;struct PaintOverlayFactory;struct EmissionExportAccess;class BakedNormalField;struct NativeWeightPaintAccess;struct TextureSetPaintAccess;class PolygonSurfaceOwner;class PolygonSurfacePreview;struct PolygonSurfaceStage;struct PolygonSurfacePaintCodec;}
 struct Material;
 class PaintProjection;
 class PaintSamplingDomain;
@@ -70,6 +70,9 @@ struct TextureMaps {
   std::shared_ptr<const PaintNormalProjection> normal_projection;
   // Transient sparse GPU contribution input; never a serialized image authority.
   std::shared_ptr<const detail::PaintOverlayPacket> overlay;
+  // Scene39 current surface field. Independent from colour/F32 grid sampling;
+  // a generic baked-normal/source-frame interpretation cannot replace it.
+  std::shared_ptr<const detail::PolygonSurfacePreview> polygon_surface;
 };
 enum class BakedColorInterpretation { VertexComponent, ResolvedPbr };
 enum class BakedNormalInterpretation { CanonicalMikk, PreparedAttributes };
@@ -250,14 +253,20 @@ private:
   friend struct SourceNormalPreparationAccess;
   friend struct SourcePaintSamplingAccess;
   friend struct SourceKeyPaintAccess;
+  friend struct detail::PolygonSurfacePaintCodec;
+  nlohmann::json encode_native_payload(PaintImageArchive *,NormalSamplingArchive *,PaintSamplingArchive *,
+      const detail::PolygonSurfaceOwner *) const;
+  static std::shared_ptr<PaintedMesh> decode_native_payload(const nlohmann::json &,const PaintImageArchive *,
+      bool,const NormalSamplingArchive *,const PaintSamplingArchive *,const SourcePaintDecodeContext &,
+      const detail::PolygonSurfaceStage *);
   void seal_paint_sampling_attachment();
   // Only the owning Scene40 membership archive may omit the current geometry.
   // Legacy/public paint entry points never supply this sealed domain.
   nlohmann::json encode_impl(PaintImageArchive *,NormalSamplingArchive *,PaintSamplingArchive *,
-      const std::shared_ptr<const TextureSetFaceDomain> &) const;
+      const std::shared_ptr<const TextureSetFaceDomain> &,const detail::PolygonSurfaceOwner * = nullptr) const;
   static std::shared_ptr<PaintedMesh> decode_impl(const nlohmann::json &,const PaintImageArchive *,
       bool,const NormalSamplingArchive *,const PaintSamplingArchive *,const SourcePaintDecodeContext &,
-      const std::shared_ptr<const TextureSetFaceDomain> &);
+      const std::shared_ptr<const TextureSetFaceDomain> &,const detail::PolygonSurfaceStage * = nullptr);
   PaintedMesh() = default;
   PaintedMesh(Mesh, uint32_t, const PaintSurfaceOptions &);
   PaintedMesh(Mesh, uint32_t, const PaintSurfaceOptions &,std::shared_ptr<const PaintSamplingDomain>);

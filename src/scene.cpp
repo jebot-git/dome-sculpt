@@ -2,6 +2,9 @@
 #include "dome/texture-sets.hpp"
 #include "texture-set-graph.hpp"
 #include "texture-set-archive.hpp"
+#include "polygon-surface-archive.hpp"
+#include "polygon-surface-paint.hpp"
+#include "polygon-surface-preview.hpp"
 #include "color-bound-memo.hpp"
 #include "emission-paint-access.hpp"
 // SPDX-License-Identifier: GPL-3.0-or-later
@@ -14,6 +17,8 @@
 #include "baked-normal-field.hpp"
 #include "baked-normal-archive.hpp"
 #include "canonical-normal-uv.hpp"
+#include "canonical-paint-history.hpp"
+#include "canonical-paint-archive.hpp"
 #include "bake-recipe-remap.hpp"
 #include "source-extra-uv-authority.hpp"
 #include "creator-source-uv-archive.hpp"
@@ -219,6 +224,7 @@ void Scene::validate(bool deep_sources) const {
     if(paint_domains.size()>128)throw std::length_error("Scene writable paint-domain count exceeded");
     auto bytes=domain->source_corners().size()*sizeof(uint32_t);
     if(paint_bases.insert(domain->basis().get()).second)bytes=domain->retained_bytes();
+    else if(const auto&geometry=domain->derived_geometry())bytes+=geometry->positions.size()*(2*sizeof(Vec3)+sizeof(std::array<float,2>))+geometry->indices.size()*sizeof(uint32_t)+geometry->uv_pins.size()+geometry->uv_seams.size();
     if(bytes>128*1024*1024-paint_domain_bytes)throw std::length_error("Scene retained writable paint basis exceeds aggregate bytes");paint_domain_bytes+=bytes;
     if(deep_sources)domain->storage_bytes();
   };
@@ -333,6 +339,8 @@ void Scene::validate(bool deep_sources) const {
           "Invalid scene object identity or unfinished stroke");
     name_valid(o.name);
     if(o.texture_sets)o.texture_sets->validate(o,deep_sources);
+    detail::validate_polygon_surface_model(o.mesh_active,o.painted.get(),o.polygon.get(),o.material_bindings.get(),o.deformation.get(),o.appearance.get());
+
     detail::require_polygon_paint_owner(o.painted.get(),o.polygon.get(),o.mesh_active);
     if(o.shape_source)polygons.add_origin(o.shape_source,deep_sources);
     if(o.rig_source)polygons.add_rig_origin(o.rig_source,deep_sources);
@@ -377,6 +385,9 @@ void Scene::validate(bool deep_sources) const {
     if (count > 4'000'000)
       throw std::length_error("Scene sample limit exceeded");
   }
+  const bool canonical_controls=std::any_of(source_materials.bindings().begin(),source_materials.bindings().end(),[](const auto &b){return bool(b->canonical_paint_sampling)||bool(b->polygon_surface_transfer);})||
+    std::any_of(polygons.origins().begin(),polygons.origins().end(),[](const auto &o){return detail::minimum_scene_version(o->material_bindings.get())==37||detail::minimum_scene_version(o->material_bindings.get())==39;});
+  if(canonical_controls)detail::collect_canonical_paint_controls(source_materials,polygons,deep_sources);
   for (const auto &v : polygons.volumes()) {
     const auto mask_samples=v->mask_values().size();
     const size_t n = std::max(v->voxels().size(), v->stored_samples()-mask_samples)+mask_samples;
@@ -565,6 +576,20 @@ nlohmann::json Scene::encode() const {
   NormalSamplingArchive normal_domains;PaintSamplingArchive writable_domains;
   detail::SourcePlacementArchive placements;
   for(const auto &o:objects_){if(o.polygon)polygons.add(o.polygon,false);if(o.shape_source)polygons.add_origin(o.shape_source,false);if(o.rig_source)polygons.add_rig_origin(o.rig_source,false);}
+  std::unique_ptr<detail::CanonicalPaintArchive> canonical_paints;
+  std::unique_ptr<detail::PolygonSurfaceArchive> polygon_surfaces;
+  // Scene40 composes its genuine set archive with independently owned fields.
+  // The outer version does not manufacture a polygon/canonical capability.
+  if(feature_version==37||feature_version==39||feature_version==40){
+    for(const auto&o:objects_)if(o.material_bindings)source_materials.add(o.material_bindings);
+    detail::collect_canonical_paint_controls(source_materials,polygons,true);
+    const bool needs_polygon=std::any_of(source_materials.bindings().begin(),source_materials.bindings().end(),[](const auto&b){return bool(b->polygon_surface_transfer);});
+    if(needs_polygon){polygon_surfaces=std::make_unique<detail::PolygonSurfaceArchive>(polygons);for(const auto&b:source_materials.bindings())if(b->polygon_surface_transfer)polygon_surfaces->add(b);}
+    if(feature_version==39&&(!polygon_surfaces||!polygon_surfaces->size()))throw std::invalid_argument("Scene39 writer lacks actual current field ownership");
+    const bool needs_canonical=std::any_of(source_materials.bindings().begin(),source_materials.bindings().end(),[](const auto&b){return bool(b->canonical_paint_sampling);});
+    if(needs_canonical){canonical_paints=std::make_unique<detail::CanonicalPaintArchive>(polygons,layered_normals,writable_domains);for(const auto&b:source_materials.bindings())if(b->canonical_paint_sampling)canonical_paints->add(b->canonical_paint_sampling);}
+    if(feature_version==37&&!canonical_paints)throw std::invalid_argument("Scene37 writer lacks actual canonical paint ownership");
+  }
   // Keep old UV-only Scene26 records free of fabricated rig-history fields.
   // Scene25 retains its original nullable layout; real nested history owns pool6.
   const bool rig_fields=feature_version==25 ||
@@ -645,6 +670,8 @@ nlohmann::json Scene::encode() const {
     if(geometry.at("topologies").empty())throw std::invalid_argument("Retained texture-set history needs its polygon8 owning archive adapter");
     j["texture_set_geometry"]=std::move(geometry);
   }
+  if(canonical_paints)j["canonical_paint"]=canonical_paints->encode();
+  if(polygon_surfaces)j["polygon_surfaces"]=polygon_surfaces->encode();
   if(corner_prepared){auto records=color_archive.encode();j["polygon_sources"]["color_bases"]=std::move(records["color_bases"]);j["polygon_sources"]["color_fields"]=std::move(records["color_fields"]);}
   if(!placements.empty())j["affine_state"]=placements.encode(source_images,source_models);
   if(normal_domains.size())j["normal_sampling"]=normal_domains.encode(source_images);
@@ -660,7 +687,17 @@ Scene Scene::decode(const nlohmann::json &j) {
     throw std::runtime_error("Unsupported scene format or version type");
   const auto version=j.at("version").get<int64_t>();
   const bool normal_context=j.contains("normal_sampling"),paint_context=j.contains("paint_sampling");
-  const bool native_paint_context=(version==32||version==35||version==36||version==40)&&paint_context&&j.contains("source_materials")&&detail::native_paint_material_archive(j.at("source_materials"));
+  const bool polygon_materials=j.contains("source_materials")&&detail::polygon_surface_material_archive(j.at("source_materials"));
+  const bool polygon_surface_context=(version==39||version==40)&&polygon_materials&&j.contains("polygon_surfaces");
+  if((version==39||polygon_materials||j.contains("polygon_surfaces"))&&!polygon_surface_context)
+    throw std::invalid_argument("Polygon field scene requires genuine material21/current field ownership");
+  std::unique_ptr<detail::PolygonSurfacePreflight> polygon_preflight;
+  if(polygon_surface_context)polygon_preflight=std::make_unique<detail::PolygonSurfacePreflight>(j);
+  const bool canonical_materials=j.contains("source_materials")&&detail::canonical_paint_material_archive(j.at("source_materials"));
+  const bool canonical_paint_context=(version==37||version==40||polygon_surface_context)&&paint_context&&j.contains("canonical_paint")&&canonical_materials;
+  if((version==37||canonical_materials||j.contains("canonical_paint"))&&!canonical_paint_context)
+    throw std::invalid_argument("Canonical paint scene requires genuine paint ownership and its complete pools");
+  const bool native_paint_context=(version==32||version==35||version==36||version==37||version==40||polygon_surface_context)&&paint_context&&j.contains("source_materials")&&detail::native_paint_material_archive(j.at("source_materials"));
   if((version==32||version==35||version==36)&&!native_paint_context)throw std::invalid_argument("Scene32 requires its actual native paint owning capability");
   if(version!=32&&version!=40&&j.contains("source_materials")&&j.at("source_materials").at("version")==14)throw std::invalid_argument("Native paint material14 requires Scene32");
   if(version!=40&&(version==36)!=(j.contains("source_materials")&&j.at("source_materials").at("version")==18))throw std::invalid_argument("Scene36 requires exactly material18 native frame ownership");
@@ -677,15 +714,16 @@ Scene Scene::decode(const nlohmann::json &j) {
     if(j.contains("objects"))throw std::runtime_error("Mixed flat Volume and Scene fields");
     result.active().volume=std::make_shared<Volume>(Volume::decode(j));return result;
   }
-  if(version<2 || (version>21&&version!=22&&version!=23&&version!=24&&version!=25&&version!=26&&version!=27&&version!=28&&version!=29&&version!=30&&version!=31&&version!=32&&version!=33&&version!=34&&version!=35&&version!=36&&version!=40))throw std::runtime_error("Unsupported scene version");
+  if(version<2 || (version>21&&version!=22&&version!=23&&version!=24&&version!=25&&version!=26&&version!=27&&version!=28&&version!=29&&version!=30&&version!=31&&version!=32&&version!=33&&version!=34&&version!=35&&version!=36&&version!=37&&version!=39&&version!=40))throw std::runtime_error("Unsupported scene version");
   size_t layered_normal_bytes=0;
   const bool layered_context=version==33||version==34||
-    ((version==35||version==36||version==40)&&detail::layered_material_archive(j.at("source_materials")));
+    ((version==35||version==36||version==37||version==40||polygon_surface_context)&&detail::layered_material_archive(j.at("source_materials")));
   if(layered_context){
     if(!j.contains("baked_normal_fields")||!j.contains("source_materials")||!detail::layered_material_archive(j.at("source_materials")))
       throw std::invalid_argument("Scene33 requires its complete material15/normal-field ownership graph");
-    if(version!=35&&version!=36&&version!=40&&(version==34)!=detail::canonical_uv_material_archive(j.at("source_materials")))throw std::invalid_argument("Scene34 requires actual material16 UV capability");
+    if(version!=35&&version!=36&&version!=37&&version!=40&&!polygon_surface_context&&(version==34)!=detail::canonical_uv_material_archive(j.at("source_materials")))throw std::invalid_argument("Scene34 requires actual material16 UV capability");
     layered_normal_bytes=detail::BakedNormalArchive::preflight(j.at("baked_normal_fields"),j.at("source_materials"));
+    if(canonical_paint_context)detail::CanonicalPaintArchive::preflight(j.at("canonical_paint"),j.at("polygon_sources"),j.at("baked_normal_fields"),j.at("paint_sampling"),j.at("source_materials"),source_paint_context);
   }else if(j.contains("baked_normal_fields")||(j.contains("source_materials")&&detail::layered_material_archive(j.at("source_materials"))))
     throw std::invalid_argument("Independent baked normal ownership requires actual Scene33");
   if(j.contains("source_materials")&&detail::canonical_material_archive(j.at("source_materials"))&&version<31)
@@ -789,7 +827,7 @@ Scene Scene::decode(const nlohmann::json &j) {
     if(version<13 && j.at("polygon_sources").at("version")!=1)throw std::invalid_argument("Exact polygon placement requires Scene13");
     if(version<14 && j.at("polygon_sources").at("version")==3)
       throw std::invalid_argument("Current polygon corner colors require Scene14");
-    detail::PolygonSceneArchive::preflight(j.at("polygon_sources"), objects,shared_corner_context?&j.at("source_materials"):nullptr);
+    detail::PolygonSceneArchive::preflight(j.at("polygon_sources"),objects,(shared_corner_context||canonical_paint_context||polygon_surface_context)?&j.at("source_materials"):nullptr,canonical_paint_context?&j.at("canonical_paint"):nullptr,polygon_surface_context?&j.at("polygon_surfaces"):nullptr);
     const auto &material_records=j.at("source_materials").at("bindings");
     const auto &model_records=j.at("source_models");
     if(!material_records.is_array() || material_records.size()>256 || !model_records.is_array() || model_records.size()>16)
@@ -1100,11 +1138,20 @@ Scene Scene::decode(const nlohmann::json &j) {
   if(normal_context)normal_domains=NormalSamplingArchive::decode(j.at("normal_sampling"),source_images);
   PaintSamplingArchive writable_domains;if(paint_context)writable_domains=PaintSamplingArchive::decode(j.at("paint_sampling"));
   SourceMaterialArchive source_materials;
-  if(material_fields)source_materials=SourceMaterialArchive::decode(j.at("source_materials"),source_images,source_models,shared_corner_context?&color_archive:nullptr,normal_context?&normal_domains:nullptr,paint_context?&writable_domains:nullptr,source_paint_context);
+  if(material_fields&&!canonical_paint_context&&!polygon_surface_context)source_materials=SourceMaterialArchive::decode(j.at("source_materials"),source_images,source_models,shared_corner_context?&color_archive:nullptr,normal_context?&normal_domains:nullptr,paint_context?&writable_domains:nullptr,source_paint_context);
   detail::SourcePlacementArchive placements;
   if(j.contains("affine_state"))placements=detail::SourcePlacementArchive::decode(j.at("affine_state"),source_models);
   detail::PolygonSceneArchive polygons;
-  if(polygon_fields)polygons=detail::PolygonSceneArchive::decode(j.at("polygon_sources"),source_images,source_models,source_materials,&placements,shared_corner_context?&color_archive:nullptr,normal_context?&normal_domains:nullptr,paint_context?&writable_domains:nullptr,source_paint_context);
+  std::unique_ptr<detail::PolygonSceneReader> polygon_reader;
+  std::unique_ptr<detail::PolygonSurfaceArchive> polygon_surfaces;
+  std::unique_ptr<detail::CanonicalPaintArchive> canonical_paints;
+  if(canonical_paint_context||polygon_surface_context){
+    polygon_reader=std::make_unique<detail::PolygonSceneReader>(j.at("polygon_sources"),source_images,source_models,[&source_materials](uint32_t id){return source_materials.at(id);},&placements,shared_corner_context?&color_archive:nullptr,normal_context?&normal_domains:nullptr,&writable_domains,source_paint_context);
+    if(polygon_surface_context)polygon_surfaces=std::make_unique<detail::PolygonSurfaceArchive>(j.at("polygon_surfaces"),*polygon_reader,j.at("polygon_sources").at("origins").size());
+    if(canonical_paint_context)canonical_paints=std::make_unique<detail::CanonicalPaintArchive>(j.at("canonical_paint"),*polygon_reader,layered_normals,writable_domains);
+    source_materials=SourceMaterialArchive::decode(j.at("source_materials"),source_images,source_models,shared_corner_context?&color_archive:nullptr,normal_context?&normal_domains:nullptr,&writable_domains,source_paint_context);
+    polygons=polygon_reader->finish();
+  }else if(polygon_fields)polygons=detail::PolygonSceneArchive::decode(j.at("polygon_sources"),source_images,source_models,source_materials,&placements,shared_corner_context?&color_archive:nullptr,normal_context?&normal_domains:nullptr,paint_context?&writable_domains:nullptr,source_paint_context);
   size_t remap_vertices = 0;
   result.active_ = id(j.at("active"));
   result.next_ = id(j.at("next_id"));
@@ -1254,11 +1301,14 @@ Scene Scene::decode(const nlohmann::json &j) {
   if(normal_context)normal_domains.require_reachable();if(paint_context)writable_domains.require_reachable();
   layered_normals.require_reachable();
   if(texture_archive)texture_archive->require_reachable();
+  if(canonical_paints)canonical_paints->require_complete();
   unsigned actual_feature=0;
   for(const auto &o:result.objects_)actual_feature=std::max({actual_feature,o.bake_recipe?30u:0u,detail::hdr_emission(o.material.emissive)?27u:0u,detail::minimum_scene_version(o.painted.get()),detail::minimum_scene_version(o.appearance.get()),detail::minimum_scene_version(o.deformation.get()),detail::minimum_scene_version(o.material_bindings.get()),detail::minimum_scene_version(o.polygon.get()),detail::minimum_scene_version(o.shape_source.get()),o.rig_source?25u:0u,detail::minimum_scene_version(o.rig_source.get())});
   if(std::any_of(result.objects_.begin(),result.objects_.end(),[](const auto&o){return bool(o.texture_sets);}))actual_feature=std::max(actual_feature,40u);
   if(version==40&&actual_feature!=40)throw std::invalid_argument("Scene40 lacks actual decoded texture-set membership");
   actual_feature=std::max(actual_feature,detail::composed_material_scene_version(source_materials));
+  if(version==39&&actual_feature!=39)throw std::invalid_argument("Scene39 lacks genuine decoded current polygon field ownership");
+  if(version==37&&actual_feature!=37)throw std::invalid_argument("Scene37 lacks genuine decoded canonical paint ownership");
   if(version==36&&actual_feature!=36)throw std::invalid_argument("Scene36 lacks genuine current native paint/frame source");
   if(version==35&&actual_feature!=35)throw std::invalid_argument("Scene35 lacks genuine decoded native/canonical composition");
   if(actual_feature>unsigned(version))throw std::invalid_argument("Retained data requires its actual Scene feature version");
@@ -1270,7 +1320,7 @@ Scene Scene::decode(const nlohmann::json &j) {
   if(version==33&&actual_feature!=33)throw std::invalid_argument("Scene33 requires an actual separate canonical attribute origin");
   if(version==28&&actual_feature!=28)throw std::invalid_argument("Scene28 requires actual independent source paint ownership");
   if(version==27&&actual_feature<27)throw std::invalid_argument("Scene27 requires genuine physical emission state");
-  if(material_fields&&(detail::physical_material_archive(j.at("source_materials"))||detail::explicit_mirror_material_archive(j.at("source_materials"))||detail::canonical_material_archive(j.at("source_materials"))||native_paint_context||detail::layered_material_archive(j.at("source_materials")))){
+  if(material_fields&&(polygon_surface_context||detail::physical_material_archive(j.at("source_materials"))||detail::explicit_mirror_material_archive(j.at("source_materials"))||detail::canonical_material_archive(j.at("source_materials"))||native_paint_context||detail::layered_material_archive(j.at("source_materials")))){
     SourceMaterialArchive reachable;
     for(const auto &o:result.objects_)if(o.material_bindings)reachable.add(o.material_bindings,false);
     for(const auto &o:polygons.origins())if(o->material_bindings)reachable.add(o->material_bindings,false);
@@ -1346,9 +1396,11 @@ std::vector<ObjectSurface> Scene::surfaces_impl(bool atlas, bool preview, const 
         continue;
       if (atlas && !o.mesh_active)
         unwrap(mesh, 1024, 4, cancelled);
+      const bool polygon_field=o.mesh_active&&o.material_bindings&&bool(o.material_bindings->polygon_surface_transfer);
+      if(polygon_field&&!preview)throw std::invalid_argument("Polygon surface standard export requires its actual portable field compiler");
       result.push_back(
           {o.id, o.name, o.transform, o.material, std::move(mesh),
-           o.mesh_active ? ((preview||o.painted->source_sampling_prepared()) ? (detail::EmissionExportAccess::requires_preview(*o.painted,o.material,o.material_bindings.get()) ? detail::EmissionExportAccess::preview(*o.painted,o.material,cancelled) : o.painted->preview(o.material,cancelled)) : o.painted->composite(o.material,cancelled)) : nullptr,
+           o.mesh_active ? (polygon_field ? detail::PolygonSurfacePaintCodec::preview(*o.painted,o.material_bindings,o.material,cancelled) : (preview||o.painted->source_sampling_prepared()) ? (detail::EmissionExportAccess::requires_preview(*o.painted,o.material,o.material_bindings.get()) ? detail::EmissionExportAccess::preview(*o.painted,o.material,cancelled) : o.painted->preview(o.material,cancelled)) : o.painted->composite(o.material,cancelled)) : nullptr,
            o.mesh_active ? o.deformation : nullptr, group_path(o.group),
            o.mesh_active ? o.appearance : nullptr,
            o.mesh_active ? o.material_bindings : nullptr,
@@ -1359,7 +1411,7 @@ std::vector<ObjectSurface> Scene::surfaces_impl(bool atlas, bool preview, const 
         detail::source_paint_export(*o.painted,result.back(),cancelled);
       if(o.mesh_active&&o.painted->paint_sampling_domain()){
         result.back().paint_sampling_attachment=o.painted->paint_sampling_attachment();
-        result.back().normal_preview_proof=prepare_normal_preview(*o.painted,o.material_bindings,o.material,cancelled);
+        if(!polygon_field)result.back().normal_preview_proof=prepare_normal_preview(*o.painted,o.material_bindings,o.material,cancelled);
         const auto domain=o.painted->paint_sampling_domain();const auto &basis=*domain->basis();
         auto &uv=result.back().paint_corner_coordinates;uv.reserve(domain->source_corners().size());size_t c=0;
         // The factory seal already proves this exact REST mesh. Read the private

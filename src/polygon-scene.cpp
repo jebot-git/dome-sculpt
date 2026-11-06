@@ -207,6 +207,7 @@ void PolygonSceneArchive::collect(std::shared_ptr<const PolygonAuthority> root,
           else validate_transform(o->world_transform);
           insert(volumes_, o->volume);
           require_polygon_paint_owner(o->paint.get(),o->polygon.get(),o->mesh_active);
+          validate_polygon_surface_model(o->mesh_active,o->paint.get(),o->polygon.get(),o->material_bindings.get(),o->deformation.get(),o->appearance.get());
           if (o->paint) {
             if (o->paint->in_stroke())
               throw std::invalid_argument(
@@ -375,6 +376,12 @@ void PolygonSceneArchive::preflight(const nlohmann::json &j,
   preflight(j,objects,nullptr);
 }
 void PolygonSceneArchive::preflight(const nlohmann::json &j,const nlohmann::json &objects,const nlohmann::json *materials) {
+  preflight(j,objects,materials,nullptr);
+}
+void PolygonSceneArchive::preflight(const nlohmann::json &j,const nlohmann::json &objects,const nlohmann::json *materials,const nlohmann::json *canonical_paint) {
+  preflight(j,objects,materials,canonical_paint,nullptr);
+}
+void PolygonSceneArchive::preflight(const nlohmann::json &j,const nlohmann::json &objects,const nlohmann::json *materials,const nlohmann::json *canonical_paint,const nlohmann::json*polygon_surfaces) {
   if (!j.is_object() || !j.at("version").is_number_integer() ||
       (j.at("version") != 1 && j.at("version") != 2 && j.at("version") != 3 && j.at("version") != 4 && j.at("version") != 5 && j.at("version") != 6 && j.at("version") != 7))
     throw std::invalid_argument("Unsupported polygon source archive");
@@ -539,6 +546,17 @@ void PolygonSceneArchive::preflight(const nlohmann::json &j,const nlohmann::json
       origin(polygon_archive_index(o.at("rig_source"),oo.size()),1);
     }
   }
+  if(canonical_paint){
+    if(!materials||!canonical_paint_material_archive(*materials))throw std::invalid_argument("Canonical before-origin roots need their actual owning material19");
+    for(const auto &binding:materials->at("bindings"))if(!binding.at("canonical_paint_sampling").is_null()){
+      const auto &node=canonical_paint->at("nodes").at(polygon_archive_index(binding.at("canonical_paint_sampling"),canonical_paint->at("nodes").size()));
+      origin(polygon_archive_index(node.at("before_origin"),oo.size()),1);
+    }
+  }
+  if(polygon_surfaces){
+    if(!materials||!polygon_surface_material_archive(*materials))throw std::invalid_argument("Polygon field roots require actual material21");
+    for(const auto&node:polygon_surfaces->at("nodes"))origin(polygon_archive_index(node.at("before_origin"),oo.size()),1);
+  }
   auto all = [](const auto &v) {
     return std::all_of(v.begin(), v.end(), [](auto n) { return n != 0; });
   };
@@ -644,6 +662,146 @@ PolygonSceneArchive PolygonSceneArchive::decode(const nlohmann::json &j,const Pa
       authorities[i]->origin = out.origins_[polygon_archive_index(
           j.at("authorities")[i].at("origin"), out.origins_.size())];
   return out;
+}
+// The existing eager decoder above is retained for every old Scene format.
+// This context is used only by an owning caller that already preflighted the
+// complete graph. It retains actual pool identities through interleaved reads.
+struct PolygonSceneReader::Impl {
+  const nlohmann::json &input;
+  const PaintImageArchive &images;
+  const CreatorAssetArchive &models;
+  MaterialResolver material;
+  const SourcePlacementArchive *placements;
+  const NormalSamplingArchive *normals;
+  const PaintSamplingArchive *domains;
+  SourcePaintDecodeContext context;
+  std::function<bool()> cancelled;
+  PolygonSceneArchive out;
+  std::vector<uint8_t> origin_state,authority_state;
+  std::vector<size_t> origin_height,authority_height;
+  std::vector<std::shared_ptr<const PaintSamplingAttachment>> bound_paints;
+  bool colored=false,finished=false;
+  Impl(const nlohmann::json &j,const PaintImageArchive &i,const CreatorAssetArchive &m,
+      MaterialResolver resolver,const SourcePlacementArchive *p,const PolygonColorArchive *colors,
+      const NormalSamplingArchive *n,const PaintSamplingArchive *d,const SourcePaintDecodeContext &c,
+      std::function<bool()> stop):input(j),images(i),models(m),material(std::move(resolver)),
+      placements(p),normals(n),domains(d),context(c),cancelled(std::move(stop)) {
+    poll();if(!material)throw std::invalid_argument("Polygon reader needs its owning material resolver");
+    for(const char *name:{"authorities","origins","paints","volumes"})
+      if(!j.at(name).is_array()||j.at(name).size()>512)throw std::length_error("Lazy polygon table exceeds its preflight count");
+    out.direct_origins_=j.at("version")>=4;out.direct_rig_origins_=j.at("version")>=6;
+    if((j.at("version")==5||(j.at("version")>=6&&j.at("shared_colors").get<bool>()))&&!colors)
+      throw std::invalid_argument("Shared current corner archive requires its actual owning color pool");
+    colored=j.at("version")==3||j.contains("color_fields");
+    if(colors)out.colors_=*colors;
+    else if(colored)out.colors_=PolygonColorArchive::decode(j.at("color_bases"),j.at("color_fields"));
+    out.origins_.resize(j.at("origins").size());origin_state.resize(out.origins_.size());origin_height.resize(out.origins_.size());
+    out.authorities_.resize(j.at("authorities").size());authority_state.resize(out.authorities_.size());authority_height.resize(out.authorities_.size());
+    out.paints_.resize(j.at("paints").size());bound_paints.resize(out.paints_.size());
+    out.volumes_.resize(j.at("volumes").size());
+  }
+  void poll()const {if(cancelled&&cancelled())throw std::runtime_error("Polygon owning read cancelled");}
+  void open()const{poll();if(finished)throw std::logic_error("Polygon owning reader already finished");}
+  struct Pending {
+    uint8_t &state;bool complete=false;
+    explicit Pending(uint8_t &s):state(s){if(s==1)throw std::invalid_argument("Polygon owning read contains a cycle");s=1;}
+    ~Pending(){state=complete?2:0;}
+  };
+  const std::shared_ptr<const PolygonAuthority> &authority(uint32_t id,size_t depth){
+    open();if(id>=out.authorities_.size()||depth>32)throw std::length_error("Polygon owning authority path exceeds its bound");
+    if(authority_state[id]==1)throw std::invalid_argument("Polygon owning authority cycle");
+    if(authority_state[id]==2){if(authority_height[id]>33-depth)throw std::length_error("Polygon owning authority height exceeds its path bound");return out.authorities_[id];}
+    Pending pending(authority_state[id]);const auto &j=input.at("authorities")[id];
+    auto value=std::make_shared<PolygonAuthority>();value->topology=PolygonMesh::decode(j.at("topology"));
+    value->active=j.at("active").get<bool>();
+    if(colored&&!j.at("colors").is_null())value->colors=out.colors_.at(polygon_archive_index(j.at("colors"),out.colors_.fields().size()));
+    size_t height=1;
+    if(!j.at("origin").is_null()){const auto source=polygon_archive_index(j.at("origin"),out.origins_.size());value->origin=origin(source,depth);height=origin_height[source];}
+    authority_height[id]=height;
+    out.authorities_[id]=std::move(value);pending.complete=true;return out.authorities_[id];
+  }
+  const std::shared_ptr<const PolygonOrigin> &origin(uint32_t id,size_t depth){
+    open();if(id>=out.origins_.size()||depth>32)throw std::length_error("Polygon owning origin path exceeds its bound");
+    // Path/depth checks precede completed hits. No foreign caller material
+    // context is used to certify a node; the record's actual material ID is
+    // resolved and held strongly the first time it is constructed.
+    if(origin_state[id]==1)throw std::invalid_argument("Polygon owning origin cycle");
+    const auto &j=input.at("origins")[id];std::shared_ptr<const SourceMaterialBindings> binding;
+    if(!j.at("material_bindings").is_null()){
+      const auto index=unsigned_id(j.at("material_bindings"));if(index>UINT32_MAX)throw std::invalid_argument("Polygon material reference exceeds its bounded identity");
+      binding=material(uint32_t(index));if(!binding)throw std::invalid_argument("Polygon before material is not complete");
+    }
+    if(origin_state[id]==2){if(origin_height[id]>33-depth)throw std::length_error("Polygon owning origin height exceeds its path bound");const auto &old=out.origins_[id]->material_bindings;
+      if(old!=binding||old.owner_before(binding)||binding.owner_before(old))throw std::invalid_argument("Polygon origin material context changed its exact owning binding");
+      return out.origins_[id];}
+    Pending pending(origin_state[id]);auto value=std::make_shared<PolygonOrigin>();value->material_bindings=std::move(binding);
+    const auto volume_id=polygon_archive_index(j.at("volume"),out.volumes_.size());
+    if(!out.volumes_[volume_id])out.volumes_[volume_id]=std::make_shared<const Volume>(Volume::decode(input.at("volumes")[volume_id]));
+    value->volume=out.volumes_[volume_id];
+    if(!j.at("painted").is_null()){
+      const auto paint_id=polygon_archive_index(j.at("painted"),out.paints_.size());
+      if(!out.paints_[paint_id])out.paints_[paint_id]=PaintedMesh::decode(input.at("paints")[paint_id],&images,true,normals,domains,context);
+      value->paint=out.paints_[paint_id];
+    }
+    value->material=detail::material(j.at("material"));value->mesh_active=j.at("mesh_active").get<bool>();
+    value->name=j.at("name").get<std::string>();value->source_object=unsigned_id(j.at("source_object"));
+    if(input.at("version")==7&&!j.at("bake_recipe").is_null())value->bake_recipe=ObjectBakeRecipe::decode(j.at("bake_recipe"));
+    if(j.contains("placement")){
+      if(!placements)throw std::invalid_argument("Polygon source placement archive is missing");
+      value->placement=placements->capsule(uint32_t(unsigned_id(j.at("placement"))));
+    }else{
+      const auto p=j.at("translation").get<std::array<float,3>>();const auto q=j.at("rotation").get<std::array<float,4>>();
+      value->world_transform={{p[0],p[1],p[2]},{q[0],q[1],q[2],q[3]},j.at("scale").get<float>()};validate_transform(value->world_transform);
+    }
+    if(!j.at("deformation").is_null()){
+      if(!value->paint)throw std::invalid_argument("Polygon deformation has no actual paint geometry");
+      value->deformation=std::make_shared<const DeformationState>(DeformationState::decode(j.at("deformation"),value->paint->mesh()));
+    }
+    if(!j.at("appearance").is_null())value->appearance=decode_creator_appearance(j.at("appearance"),models);
+    if(value->paint&&value->paint->paint_sampling_domain()){
+      const auto attachment=material_paint_attachment(value->material_bindings.get());
+      if(!attachment)throw std::invalid_argument("Retained polygon paint lacks its own sampling material");
+      const auto paint_id=polygon_archive_index(j.at("painted"),out.paints_.size());
+      if(bound_paints[paint_id]&&bound_paints[paint_id]!=attachment)throw std::invalid_argument("One polygon paint record cannot acquire conflicting immutable material owners");
+      if(!bound_paints[paint_id]){out.paints_[paint_id]=rebind_paint_sampling_geometry(*value->paint,attachment);bound_paints[paint_id]=attachment;}
+      value->paint=out.paints_[paint_id];
+    }
+    if(value->paint&&value->material_bindings&&value->material_bindings->key_derivation)
+      value->paint=adopt_key_paint_geometry(*value->paint,*value->material_bindings,value->appearance.get(),value->deformation.get());
+    if(!j.at("retopology").is_null()){
+      const auto &record=j.at("retopology");value->retopology=std::make_shared<const RetopoPatch>(RetopoPatch{unsigned_id(record.at("source")),RetopoMesh::decode(record.at("topology").get_ref<const std::string&>())});
+    }
+    size_t height=1;
+    if(!j.at("polygon").is_null()){const auto next=polygon_archive_index(j.at("polygon"),out.authorities_.size());value->polygon=authority(next,depth+1);height=std::max(height,1+authority_height[next]);}
+    for(auto entry:{std::pair{"shape_source",&value->shape_source},std::pair{"rig_source",&value->rig_source}})
+      if(j.contains(entry.first)&&!j.at(entry.first).is_null()){const auto next=polygon_archive_index(j.at(entry.first),out.origins_.size());*entry.second=origin(next,depth+1);height=std::max(height,1+origin_height[next]);}
+    origin_height[id]=height;
+    out.origins_[id]=std::move(value);pending.complete=true;return out.origins_[id];
+  }
+};
+PolygonSceneReader::PolygonSceneReader(const nlohmann::json &j,const PaintImageArchive &i,
+    const CreatorAssetArchive &m,MaterialResolver resolver,const SourcePlacementArchive *p,
+    const PolygonColorArchive *colors,const NormalSamplingArchive *normals,const PaintSamplingArchive *domains,
+    const SourcePaintDecodeContext &context,std::function<bool()> cancelled)
+    :impl_(std::make_unique<Impl>(j,i,m,std::move(resolver),p,colors,normals,domains,context,std::move(cancelled))){}
+PolygonSceneReader::~PolygonSceneReader()=default;
+const std::shared_ptr<const PolygonOrigin> &PolygonSceneReader::origin_at(uint32_t id){return impl_->origin(id,1);}
+const std::shared_ptr<const PolygonAuthority> &PolygonSceneReader::authority_at(uint32_t id){return impl_->authority(id,1);}
+PolygonSceneReader::MaterialResolver PolygonSceneReader::material_resolver(MaterialResolver next){
+  impl_->open();if(!next)throw std::invalid_argument("Polygon owning reader needs a complete material context");
+  auto previous=std::move(impl_->material);impl_->material=std::move(next);return previous;
+}
+void PolygonSceneReader::restore_material_resolver(MaterialResolver previous) noexcept{
+  impl_->material=std::move(previous);
+}
+PolygonSceneArchive PolygonSceneReader::finish(){
+  impl_->open();for(size_t id=0;id<impl_->out.origins_.size();++id)impl_->origin(uint32_t(id),1);
+  for(size_t id=0;id<impl_->out.authorities_.size();++id)impl_->authority(uint32_t(id),1);
+  // The complete Scene preflight owns reachability, including all declared
+  // paints/volumes. Require their actual uses rather than allocate spare data.
+  for(const auto &p:impl_->out.paints_)if(!p)throw std::invalid_argument("Unreachable lazy polygon paint record");
+  for(const auto &v:impl_->out.volumes_)if(!v)throw std::invalid_argument("Unreachable lazy polygon volume record");
+  impl_->finished=true;return std::move(impl_->out);
 }
 } // namespace detail
 } // namespace dome

@@ -3,6 +3,7 @@
 #include "normal-key-derivation.hpp"
 #include "frame-position-domain.hpp"
 #include "native-paint-frame-source.hpp"
+#include "canonical-paint-sampling.hpp"
 #include "dome/color-paint-sampling.hpp"
 #include "dome/polygon-scene.hpp"
 #include <set>
@@ -30,6 +31,7 @@ class Prospect {
   std::set<const SourceUvOrigin*> uv_origins_;
   std::set<std::pair<const NativePaintFrameSource*,bool>> native_frames_;
   std::set<const SourceKeyDerivation*> keys_,key_path_;
+  std::set<const CanonicalNormalConversion*> canonical_,canonical_path_;
   std::set<const PolygonOrigin*> origins_,origin_path_;
   std::set<const PolygonAuthority*> authorities_,authority_path_;
   void stop()const{if(cancelled_&&cancelled_())throw std::runtime_error("Prospective key archive cancelled");}
@@ -73,6 +75,14 @@ class Prospect {
     // context has the same immutable value. Frame data is genuinely pooled.
     deform(p->before_deformation());frame(p->frames());material(p->before_material());
   }
+  void canonical(const std::shared_ptr<const CanonicalNormalConversion>&p){
+    stop();if(!p)return;if(canonical_path_.contains(p.get()))throw std::length_error("Prospective canonical key source history contains a cycle");if(canonical_.contains(p.get()))return;
+    if(canonical_.size()>=256)throw std::length_error("Prospective canonical key source registry exceeds native quota");
+    canonical_.insert(p.get());canonical_path_.insert(p.get());struct Pop{std::set<const CanonicalNormalConversion*>&s;const CanonicalNormalConversion*p;~Pop(){s.erase(p);}}pop{canonical_path_,p.get()};
+    // The layered-normal origin table owns this real inline model slot.
+    // It is distinct from a legacy preparation/UV/key model, even on aliases.
+    deform(p->before_deformation());frame(p->frames());material(p->before_material());
+  }
   size_t history_height(const std::shared_ptr<const PolygonAuthority>&p){
     stop();if(!p)return 0;const HistoryKey id{p.get(),true};
     if(history_path_.contains(id))throw std::length_error("Prospective polygon history contains a cycle");
@@ -95,6 +105,8 @@ class Prospect {
     if(p.normal_preparation){const auto &n=*p.normal_preparation;take(n.original_material);if(n.uv_reprojection)take(n.uv_reprojection->before_material);if(n.sampling_domain){take(n.sampling_domain->before_material);take(n.sampling_domain->sampling_material);}}
     if(p.native_paint_sampling)take(p.native_paint_sampling->before_material());
     if(p.native_paint_frames)take(p.native_paint_frames->before_material());
+    if(p.canonical_attributes)take(p.canonical_attributes->before_material());
+    if(p.canonical_paint_sampling&&p.canonical_paint_sampling->before())take(p.canonical_paint_sampling->before()->material_bindings);
     if(future)take(plan_.reused_anchor?plan_.reused_anchor->before_material():current_.material_bindings,1);else if(p.key_derivation)take(p.key_derivation->before_material(),1);
     return h;
   }
@@ -110,6 +122,8 @@ public:
     // hits, so this bounded per-call visitation never certifies a cycle.
     materials_.insert(id);uv(p->uv_origin);color(p->color_preparation);normal(p->normal_preparation,future);
     if(p->native_paint_sampling)material(p->native_paint_sampling->before_material());
+    canonical(p->canonical_attributes);
+    if(p->canonical_paint_sampling)origin(p->canonical_paint_sampling->before());
     if(const auto &capture=p->native_paint_frames;capture){
       if(native_frames_.insert({capture.get(),future}).second){if(native_frames_.size()>128)throw std::length_error("Prospective native normal captures exceed owning source count before allocation");frame_bytes(future?65536:capture->metadata_bytes());}
       frame(capture->base_frames());material(capture->before_material());

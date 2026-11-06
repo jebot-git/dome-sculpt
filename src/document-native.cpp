@@ -1,3 +1,4 @@
+#include "polygon-surface-paint.hpp"
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/document.hpp"
 #include "dome/paint-sampling.hpp"
@@ -199,16 +200,17 @@ void Document::native_loop(){
           auto layout=detail::prepare_texture_set_packed(bundle.texture_set_surface,limits);MeshSnapshot query_snapshot;detail::TextureSetWorkerView view;view.pbr=session->pbr_view;detail::append_texture_set_surface(query_snapshot,bundle,layout,view,limits);
           query=std::make_unique<MaterialSurfaceQuery>(query_snapshot.mesh,query_snapshot.ranges,cancelled,query_snapshot.source_colors,PaintVertexCoordinates{query_snapshot.paint_coordinates});
         }else{
-        query_range.emplace(SurfaceRange{o.id,0,geometry->indices.size(),o.material,o.painted->preview(o.material,cancelled),o.appearance,0,o.material_bindings});
+        query_range.emplace(SurfaceRange{o.id,0,geometry->indices.size(),o.material,o.material_bindings&&o.material_bindings->polygon_surface_transfer?detail::PolygonSurfacePaintCodec::preview(*o.painted,o.material_bindings,o.material,cancelled):o.painted->preview(o.material,cancelled),o.appearance,0,o.material_bindings});
         auto &range=*query_range;
         range.reflected=reflected;
+        if(session->affine_world)range.affine_world=*session->affine_world;
         // This query keeps logical REST triangle order. place_mesh transforms
         // positions/normals without reindexing; only the packed render worker
         // reverses corners for reflected placement.
         range.paint_winding_reversed=false;
         if(o.painted->paint_sampling_domain()) {
           range.paint_sampling_attachment=o.painted->paint_sampling_attachment();
-          range.normal_preview_proof=prepare_normal_preview(*o.painted,o.material_bindings,o.material,cancelled);
+          if(!o.material_bindings||!o.material_bindings->polygon_surface_transfer)range.normal_preview_proof=prepare_normal_preview(*o.painted,o.material_bindings,o.material,cancelled);
           PaintSamplingLimits limits;limits.cancelled=cancelled;
           query_paint=o.painted->paint_sampling_domain()->corner_coordinates(o.painted->mesh(),limits);
         }

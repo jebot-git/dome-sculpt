@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "document-authority-transition.hpp"
+#include "polygon-surface-owner.hpp"
 #include "document-authority.hpp"
 #include "document-transaction.hpp"
 #include "dome/document.hpp"
@@ -629,10 +630,15 @@ void Document::polygon_loop() {
       PolygonLimits limits;
       limits.cancelled = cancelled;
       if (job.initial) {
-        auto source = prepare_polygon_workspace_source(
-            job.initial->active(), job.convert_source, cancelled);
-        candidate = std::make_unique<PolygonWorkspace>(std::move(source.topology),
-            std::move(source.colors), limits);
+        if(detail::polygon_surface_transfer_required(job.initial->active())){
+          if(polygon_conversion_required(job.initial->active())&&!job.convert_source)throw std::invalid_argument("Polygon field conversion requires explicit retained-source consent");
+          detail::PolygonSurfaceTransferLimits field_limits;field_limits.geometry.cancelled=cancelled;
+          auto field=detail::PolygonSurfaceOwner::capture(*job.initial,job.initial->active().id,field_limits);
+          candidate=std::make_unique<PolygonWorkspace>(*field->trace().original(),limits);
+        }else{
+          auto source=prepare_polygon_workspace_source(job.initial->active(),job.convert_source,cancelled);
+          candidate=std::make_unique<PolygonWorkspace>(std::move(source.topology),std::move(source.colors),limits);
+        }
         next_anchor.reset();next_affine_anchor.reset();
       } else {
         if (!workspace || session != job.session)
@@ -759,7 +765,10 @@ void Document::polygon_loop() {
             (token->held_pose&&token->before->object(token->source.object).affine_edit!=token->affine_pose);
         if (view->changed) {
           auto initial = token->original;
-          adopt_polygon_edit(*prepared, token->source.object, *view->topology,
+          if(detail::polygon_surface_transfer_required(initial->object(token->source.object))){
+            detail::PolygonSurfaceTransferLimits field_limits;field_limits.geometry.cancelled=cancelled;
+            if(!detail::adopt_polygon_surface_edit(*prepared,token->source.object,*view,*initial,field_limits))global_change=token->held_pose&&(!detail::same_transform(token->before->object(token->source.object).transform,token->pose)||token->before->object(token->source.object).affine_edit!=token->affine_pose);
+          }else adopt_polygon_edit(*prepared, token->source.object, *view->topology,
                              view->colors,*initial,convert,cancelled);
         }
         token->work->progress.store(.9f);

@@ -1,0 +1,1788 @@
+{
+  "runtime": "cdbd7ea",
+  "functional_seal": "f803dea612d879a5ae99278dd10de15692ad940d",
+  "test_source_mixed": "ec224d3",
+  "test_source_gui": "519d005",
+  "status": "private supplemental mixed/ordinary-HDR desktop proof; no new runtime/public headers/schema",
+  "mixed": {
+    "release": {
+      "scope": "One whole mixed consumer against complete immutable fresh owning39+corrected cdbd one-TU support; all transitive headers and product source equal cdbd; not a new all-source rebuild",
+      "source": "ec224d3fe0d83cfd3fcceef130333d30687ff822",
+      "profile": "release",
+      "results": [
+        {
+          "phase": "compile",
+          "command": [
+            "/usr/bin/c++",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-package4-mixed-cdbd/src",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-package4-mixed-cdbd/include",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-package4-mixed-cdbd/third_party/openbrush",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-package4-mixed-cdbd/third_party/nlohmann",
+            "-isystem",
+            "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/harfbuzz",
+            "-isystem",
+            "/usr/include/glib-2.0",
+            "-isystem",
+            "/usr/lib64/glib-2.0/include",
+            "-isystem",
+            "/usr/include/sysprof-6",
+            "-isystem",
+            "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/freetype2",
+            "-isystem",
+            "/usr/include/libpng16",
+            "-isystem",
+            "/usr/include/libxml2",
+            "-O3",
+            "-DNDEBUG",
+            "-std=gnu++20",
+            "-pthread",
+            "-DWITH_GZFILEOP",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-package4-mixed-cdbd/third_party/cgltf",
+            "-c",
+            "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-package4-mixed-cdbd/tests/canonical-paint37-emission-mixed.cpp",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-package4-mixed-cdbd/artifacts/package4-mixed/release/consumer.o"
+          ],
+          "exit": 0,
+          "seconds": 23.813844087999314
+        },
+        {
+          "phase": "link",
+          "command": [
+            "/usr/bin/c++",
+            "-O3",
+            "-DNDEBUG",
+            "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-package4-mixed-cdbd/artifacts/package4-mixed/release/consumer.o",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-package4-mixed-cdbd/artifacts/package4-mixed/release/consumer",
+            "-Wl,-rpath,/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib",
+            "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-package4-mixed-cdbd/artifacts/package4-mixed/release/support/libdome-sculpt-render.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-package4-mixed-cdbd/artifacts/package4-mixed/release/support/libdome-sculpt-core.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-package4-mixed-cdbd/artifacts/package4-mixed/release/support/libdome-sculpt-affine.a",
+            "/usr/lib64/liblapacke.so",
+            "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-package4-mixed-cdbd/artifacts/package4-mixed/release/support/libdome-sculpt-polygon.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-package4-mixed-cdbd/artifacts/package4-mixed/release/support/libxatlas.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-package4-mixed-cdbd/artifacts/package4-mixed/release/support/libmikktspace.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-package4-mixed-cdbd/artifacts/package4-mixed/release/support/libmikktspace-robust.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-package4-mixed-cdbd/artifacts/package4-mixed/release/support/libufbx.a",
+            "/usr/lib64/libpng.so",
+            "/usr/lib64/libjpeg.so",
+            "/usr/lib64/libz.so",
+            "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-package4-mixed-cdbd/artifacts/package4-mixed/release/support/libdome-sculpt-emission-codec.a",
+            "/usr/lib64/libOpenEXR-3_2.so",
+            "/usr/lib64/libOpenEXRUtil-3_2.so",
+            "/usr/lib64/libOpenEXRCore-3_2.so",
+            "/usr/lib64/libIex-3_2.so",
+            "/usr/lib64/libIlmThread-3_2.so",
+            "/usr/lib64/libImath-3_1.so",
+            "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libharfbuzz.so",
+            "/usr/lib64/libEGL.so",
+            "/usr/lib64/libGL.so",
+            "/usr/lib64/libfontconfig.so",
+            "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libfreetype.so",
+            "/usr/lib64/libicui18n.so",
+            "/usr/lib64/libicuuc.so",
+            "-lgcc_s_asneeded",
+            "-lgcc_s_asneeded"
+          ],
+          "exit": 0,
+          "seconds": 0.49294693901902065
+        },
+        {
+          "phase": "runtime",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-package4-mixed-cdbd/artifacts/package4-mixed/release/consumer",
+            "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-fixture-ac0/artifacts/legal-native/release/output-7-4/1.dsculpt",
+            "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-package4-mixed-cdbd/artifacts/package4-mixed/release/output"
+          ],
+          "exit": 0,
+          "seconds": 18.501814431976527
+        }
+      ],
+      "exit": 0,
+      "inputs": 2170,
+      "unchanged": true,
+      "consumer_sha256": "4fafd45661d0fe679b7f84a6256277515e782c376672ef1596fd14d03b76bb83"
+    },
+    "sanitize": {
+      "scope": "One whole mixed consumer against complete immutable fresh owning39+corrected cdbd one-TU support; all transitive headers and product source equal cdbd; not a new all-source rebuild",
+      "source": "ec224d3fe0d83cfd3fcceef130333d30687ff822",
+      "profile": "sanitize",
+      "results": [
+        {
+          "phase": "compile",
+          "command": [
+            "/usr/bin/c++",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-package4-mixed-cdbd/src",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-package4-mixed-cdbd/include",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-package4-mixed-cdbd/third_party/openbrush",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-package4-mixed-cdbd/third_party/nlohmann",
+            "-isystem",
+            "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/harfbuzz",
+            "-isystem",
+            "/usr/include/glib-2.0",
+            "-isystem",
+            "/usr/lib64/glib-2.0/include",
+            "-isystem",
+            "/usr/include/sysprof-6",
+            "-isystem",
+            "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/freetype2",
+            "-isystem",
+            "/usr/include/libpng16",
+            "-isystem",
+            "/usr/include/libxml2",
+            "-O1",
+            "-g1",
+            "-DNDEBUG",
+            "-fsanitize=address,undefined",
+            "-fno-omit-frame-pointer",
+            "-std=gnu++20",
+            "-pthread",
+            "-DWITH_GZFILEOP",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-package4-mixed-cdbd/third_party/cgltf",
+            "-c",
+            "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-package4-mixed-cdbd/tests/canonical-paint37-emission-mixed.cpp",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-package4-mixed-cdbd/artifacts/package4-mixed/sanitize/consumer.o"
+          ],
+          "exit": 0,
+          "seconds": 37.1317205009982
+        },
+        {
+          "phase": "link",
+          "command": [
+            "/usr/bin/c++",
+            "-O1",
+            "-g1",
+            "-DNDEBUG",
+            "-fsanitize=address,undefined",
+            "-fno-omit-frame-pointer",
+            "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-package4-mixed-cdbd/artifacts/package4-mixed/sanitize/consumer.o",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-package4-mixed-cdbd/artifacts/package4-mixed/sanitize/consumer",
+            "-Wl,-rpath,/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib",
+            "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-package4-mixed-cdbd/artifacts/package4-mixed/sanitize/support/libdome-sculpt-render.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-package4-mixed-cdbd/artifacts/package4-mixed/sanitize/support/libdome-sculpt-core.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-package4-mixed-cdbd/artifacts/package4-mixed/sanitize/support/libdome-sculpt-affine.a",
+            "/usr/lib64/liblapacke.so",
+            "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-package4-mixed-cdbd/artifacts/package4-mixed/sanitize/support/libdome-sculpt-polygon.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-package4-mixed-cdbd/artifacts/package4-mixed/sanitize/support/libxatlas.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-package4-mixed-cdbd/artifacts/package4-mixed/sanitize/support/libmikktspace.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-package4-mixed-cdbd/artifacts/package4-mixed/sanitize/support/libmikktspace-robust.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-package4-mixed-cdbd/artifacts/package4-mixed/sanitize/support/libufbx.a",
+            "/usr/lib64/libpng.so",
+            "/usr/lib64/libjpeg.so",
+            "/usr/lib64/libz.so",
+            "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-package4-mixed-cdbd/artifacts/package4-mixed/sanitize/support/libdome-sculpt-emission-codec.a",
+            "/usr/lib64/libOpenEXR-3_2.so",
+            "/usr/lib64/libOpenEXRUtil-3_2.so",
+            "/usr/lib64/libOpenEXRCore-3_2.so",
+            "/usr/lib64/libIex-3_2.so",
+            "/usr/lib64/libIlmThread-3_2.so",
+            "/usr/lib64/libImath-3_1.so",
+            "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libharfbuzz.so",
+            "/usr/lib64/libEGL.so",
+            "/usr/lib64/libGL.so",
+            "/usr/lib64/libfontconfig.so",
+            "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libfreetype.so",
+            "/usr/lib64/libicui18n.so",
+            "/usr/lib64/libicuuc.so",
+            "-lgcc_s_asneeded",
+            "-lgcc_s_asneeded"
+          ],
+          "exit": 0,
+          "seconds": 2.920524081971962
+        },
+        {
+          "phase": "runtime",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-package4-mixed-cdbd/artifacts/package4-mixed/sanitize/consumer",
+            "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-fixture-ac0/artifacts/legal-native/release/output-7-4/1.dsculpt",
+            "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-package4-mixed-cdbd/artifacts/package4-mixed/sanitize/output"
+          ],
+          "exit": 0,
+          "seconds": 27.219193115015514
+        }
+      ],
+      "exit": 0,
+      "inputs": 2170,
+      "unchanged": true,
+      "consumer_sha256": "c36bc276b89b68b0811e3eabe85e523c7f4dbace0057c05cf1a1cac2a8aab101"
+    }
+  },
+  "gui": {
+    "release": {
+      "source": "519d0055dced703306b23734eceabd67d24a8028",
+      "profile": "release",
+      "scope": "Actual corrected cdbd full app relink +new whole matching inspector with complete own39/corrected support; private Xvfb/dbus/software native chooser; no user session/HMD or fresh all-source compile",
+      "results": [
+        {
+          "phase": "inspect-compile",
+          "command": [
+            "/usr/bin/c++",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-package4-mixed-cdbd/src",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-package4-mixed-cdbd/include",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-package4-mixed-cdbd/third_party/openbrush",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-package4-mixed-cdbd/third_party/nlohmann",
+            "-isystem",
+            "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/harfbuzz",
+            "-isystem",
+            "/usr/include/glib-2.0",
+            "-isystem",
+            "/usr/lib64/glib-2.0/include",
+            "-isystem",
+            "/usr/include/sysprof-6",
+            "-isystem",
+            "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/freetype2",
+            "-isystem",
+            "/usr/include/libpng16",
+            "-isystem",
+            "/usr/include/libxml2",
+            "-O3",
+            "-DNDEBUG",
+            "-std=gnu++20",
+            "-pthread",
+            "-DWITH_GZFILEOP",
+            "-c",
+            "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-package4-mixed-cdbd/tests/native-authoring-inspect.cpp",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-package4-mixed-cdbd/artifacts/package4-gui/release/stage/inspect.o"
+          ],
+          "exit": 0,
+          "seconds": 3.5477431320468895
+        },
+        {
+          "phase": "inspect-link",
+          "command": [
+            "/usr/bin/c++",
+            "-O3",
+            "-DNDEBUG",
+            "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-package4-mixed-cdbd/artifacts/package4-gui/release/stage/inspect.o",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-package4-mixed-cdbd/artifacts/package4-gui/release/stage/dome-sculpt-native-authoring-inspect",
+            "-Wl,-rpath,/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib",
+            "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-package4-mixed-cdbd/artifacts/package4-mixed/release/support/libdome-sculpt-render.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-package4-mixed-cdbd/artifacts/package4-mixed/release/support/libdome-sculpt-core.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-package4-mixed-cdbd/artifacts/package4-mixed/release/support/libdome-sculpt-affine.a",
+            "/usr/lib64/liblapacke.so",
+            "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-package4-mixed-cdbd/artifacts/package4-mixed/release/support/libdome-sculpt-polygon.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-package4-mixed-cdbd/artifacts/package4-mixed/release/support/libxatlas.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-package4-mixed-cdbd/artifacts/package4-mixed/release/support/libmikktspace.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-package4-mixed-cdbd/artifacts/package4-mixed/release/support/libmikktspace-robust.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-package4-mixed-cdbd/artifacts/package4-mixed/release/support/libufbx.a",
+            "/usr/lib64/libpng.so",
+            "/usr/lib64/libjpeg.so",
+            "/usr/lib64/libz.so",
+            "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-package4-mixed-cdbd/artifacts/package4-mixed/release/support/libdome-sculpt-emission-codec.a",
+            "/usr/lib64/libOpenEXR-3_2.so",
+            "/usr/lib64/libOpenEXRUtil-3_2.so",
+            "/usr/lib64/libOpenEXRCore-3_2.so",
+            "/usr/lib64/libIex-3_2.so",
+            "/usr/lib64/libIlmThread-3_2.so",
+            "/usr/lib64/libImath-3_1.so",
+            "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libharfbuzz.so",
+            "/usr/lib64/libEGL.so",
+            "/usr/lib64/libGL.so",
+            "/usr/lib64/libfontconfig.so",
+            "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libfreetype.so",
+            "/usr/lib64/libicui18n.so",
+            "/usr/lib64/libicuuc.so",
+            "-lgcc_s_asneeded",
+            "-lgcc_s_asneeded"
+          ],
+          "exit": 0,
+          "seconds": 0.5235107960179448
+        },
+        {
+          "phase": "gui",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/selection-gui-venv/bin/python",
+            "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-package4-mixed-cdbd/tests/canonical-paint37-emission-menu.py"
+          ],
+          "exit": 0,
+          "seconds": 26.970061735017225
+        }
+      ],
+      "exit": 0,
+      "inputs": 2428,
+      "unchanged": true,
+      "inspector_sha256": "0c3b2fce237cea9a6ebe227a915d3dc5b051fbddfbd1da6e8e833b46cb4a972a"
+    },
+    "sanitize": {
+      "source": "519d0055dced703306b23734eceabd67d24a8028",
+      "profile": "sanitize",
+      "scope": "Actual corrected cdbd full app relink +new whole matching inspector with complete own39/corrected support; private Xvfb/dbus/software native chooser; no user session/HMD or fresh all-source compile",
+      "results": [
+        {
+          "phase": "inspect-compile",
+          "command": [
+            "/usr/bin/c++",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-package4-mixed-cdbd/src",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-package4-mixed-cdbd/include",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-package4-mixed-cdbd/third_party/openbrush",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-package4-mixed-cdbd/third_party/nlohmann",
+            "-isystem",
+            "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/harfbuzz",
+            "-isystem",
+            "/usr/include/glib-2.0",
+            "-isystem",
+            "/usr/lib64/glib-2.0/include",
+            "-isystem",
+            "/usr/include/sysprof-6",
+            "-isystem",
+            "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/freetype2",
+            "-isystem",
+            "/usr/include/libpng16",
+            "-isystem",
+            "/usr/include/libxml2",
+            "-O1",
+            "-g1",
+            "-DNDEBUG",
+            "-fsanitize=address,undefined",
+            "-fno-omit-frame-pointer",
+            "-std=gnu++20",
+            "-pthread",
+            "-DWITH_GZFILEOP",
+            "-c",
+            "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-package4-mixed-cdbd/tests/native-authoring-inspect.cpp",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-package4-mixed-cdbd/artifacts/package4-gui/sanitize/stage/inspect.o"
+          ],
+          "exit": 0,
+          "seconds": 4.985769168008119
+        },
+        {
+          "phase": "inspect-link",
+          "command": [
+            "/usr/bin/c++",
+            "-O1",
+            "-g1",
+            "-DNDEBUG",
+            "-fsanitize=address,undefined",
+            "-fno-omit-frame-pointer",
+            "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-package4-mixed-cdbd/artifacts/package4-gui/sanitize/stage/inspect.o",
+            "-o",
+            "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-package4-mixed-cdbd/artifacts/package4-gui/sanitize/stage/dome-sculpt-native-authoring-inspect",
+            "-Wl,-rpath,/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib",
+            "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-package4-mixed-cdbd/artifacts/package4-mixed/sanitize/support/libdome-sculpt-render.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-package4-mixed-cdbd/artifacts/package4-mixed/sanitize/support/libdome-sculpt-core.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-package4-mixed-cdbd/artifacts/package4-mixed/sanitize/support/libdome-sculpt-affine.a",
+            "/usr/lib64/liblapacke.so",
+            "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-package4-mixed-cdbd/artifacts/package4-mixed/sanitize/support/libdome-sculpt-polygon.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-package4-mixed-cdbd/artifacts/package4-mixed/sanitize/support/libxatlas.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-package4-mixed-cdbd/artifacts/package4-mixed/sanitize/support/libmikktspace.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-package4-mixed-cdbd/artifacts/package4-mixed/sanitize/support/libmikktspace-robust.a",
+            "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-package4-mixed-cdbd/artifacts/package4-mixed/sanitize/support/libufbx.a",
+            "/usr/lib64/libpng.so",
+            "/usr/lib64/libjpeg.so",
+            "/usr/lib64/libz.so",
+            "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-package4-mixed-cdbd/artifacts/package4-mixed/sanitize/support/libdome-sculpt-emission-codec.a",
+            "/usr/lib64/libOpenEXR-3_2.so",
+            "/usr/lib64/libOpenEXRUtil-3_2.so",
+            "/usr/lib64/libOpenEXRCore-3_2.so",
+            "/usr/lib64/libIex-3_2.so",
+            "/usr/lib64/libIlmThread-3_2.so",
+            "/usr/lib64/libImath-3_1.so",
+            "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libharfbuzz.so",
+            "/usr/lib64/libEGL.so",
+            "/usr/lib64/libGL.so",
+            "/usr/lib64/libfontconfig.so",
+            "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libfreetype.so",
+            "/usr/lib64/libicui18n.so",
+            "/usr/lib64/libicuuc.so",
+            "-lgcc_s_asneeded",
+            "-lgcc_s_asneeded"
+          ],
+          "exit": 0,
+          "seconds": 1.8382957670255564
+        },
+        {
+          "phase": "gui",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/selection-gui-venv/bin/python",
+            "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-package4-mixed-cdbd/tests/canonical-paint37-emission-menu.py"
+          ],
+          "exit": 0,
+          "seconds": 44.23781576397596
+        }
+      ],
+      "exit": 0,
+      "inputs": 2428,
+      "unchanged": true,
+      "inspector_sha256": "d4d6f741d1007d34d9b22bc804f4030d052cb67e65e0630c78013601b731ba5e"
+    }
+  },
+  "results": {
+    "mixed_checks_each": 33,
+    "mixed_pixel_maximum": 1,
+    "unchanged_bound": 2,
+    "gui_checks_each": 12,
+    "gui_modes": [
+      "Release normal",
+      "whole-owned O1 ASan/UBSan/leaks640x360/font32"
+    ],
+    "mixed_domains": [
+      "genuine native32 Create+Replace/current frame36 +native_frame_sources",
+      "independent canonical37 writable/normal/key/F32",
+      "legacy implicitUV0",
+      "nonemitting actors"
+    ],
+    "source_integrity": "2170 mixed and2428 GUI immutable inputs exact each profile",
+    "native": "actual mixed ordinary FileJob/Save/reopen/second bytes; actual desktop filename app-client clipboard ACK/ordinary export/Open exact native/Save/exit",
+    "qualification": "same complete owning39 support +actual one-TU cdbd correction, all product sources/headers exact; not a new all-source build"
+  },
+  "khronos": {
+    "version": "2.0.0-dev.3.10",
+    "maxIssues": 0,
+    "issueFilters": [],
+    "files": [
+      {
+        "file": "artifacts/package4-supplement-validation/positive/release-gui.glb",
+        "sha256": "5720fa084e71773647c53ba5f1ff718cb9f33bc0529ebee463463f05b20091eb",
+        "numErrors": 0,
+        "numWarnings": 1,
+        "numInfos": 4,
+        "numHints": 0,
+        "messages": [
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/meshes/0/primitives/0/attributes/TEXCOORD_0"
+          },
+          {
+            "code": "NODE_SKINNED_MESH_NON_ROOT",
+            "message": "Node with a skinned mesh is not root. Parent transforms will not affect a skinned mesh.",
+            "severity": 1,
+            "pointer": "/nodes/1"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/bufferViews/21"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/bufferViews/22"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/textures/3"
+          }
+        ],
+        "truncated": false
+      },
+      {
+        "file": "artifacts/package4-supplement-validation/positive/release-mixed-second.glb",
+        "sha256": "ec9a8ea3d5a58822197a0f7bb2e0430c305c08af0aba229dd123eb39b59b6049",
+        "numErrors": 0,
+        "numWarnings": 1,
+        "numInfos": 16,
+        "numHints": 0,
+        "messages": [
+          {
+            "code": "UNUSED_MESH_TANGENT",
+            "message": "Tangents are not used because the material has no normal texture.",
+            "severity": 2,
+            "pointer": "/meshes/0/primitives/0/attributes/TANGENT"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/meshes/0/primitives/0/attributes/TEXCOORD_0"
+          },
+          {
+            "code": "UNUSED_MESH_TANGENT",
+            "message": "Tangents are not used because the material has no normal texture.",
+            "severity": 2,
+            "pointer": "/meshes/1/primitives/0/attributes/TANGENT"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/meshes/1/primitives/0/attributes/TEXCOORD_0"
+          },
+          {
+            "code": "UNUSED_MESH_TANGENT",
+            "message": "Tangents are not used because the material has no normal texture.",
+            "severity": 2,
+            "pointer": "/meshes/2/primitives/0/attributes/TANGENT"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/meshes/2/primitives/0/attributes/TEXCOORD_0"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/meshes/5/primitives/0/attributes/TEXCOORD_0"
+          },
+          {
+            "code": "NODE_SKINNED_MESH_NON_ROOT",
+            "message": "Node with a skinned mesh is not root. Parent transforms will not affect a skinned mesh.",
+            "severity": 1,
+            "pointer": "/nodes/6"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/bufferViews/74"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/bufferViews/75"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/bufferViews/76"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/bufferViews/77"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/bufferViews/78"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/textures/2"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/textures/8"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/textures/11"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/textures/18"
+          }
+        ],
+        "truncated": false
+      },
+      {
+        "file": "artifacts/package4-supplement-validation/positive/release-mixed-shared.glb",
+        "sha256": "dbad825696c355c21c67698c3fb49d9b82e4c723c467b85d33553da6f0fda725",
+        "numErrors": 0,
+        "numWarnings": 1,
+        "numInfos": 41,
+        "numHints": 0,
+        "messages": [
+          {
+            "code": "UNUSED_MESH_TANGENT",
+            "message": "Tangents are not used because the material has no normal texture.",
+            "severity": 2,
+            "pointer": "/meshes/0/primitives/0/attributes/TANGENT"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/meshes/0/primitives/0/attributes/TEXCOORD_0"
+          },
+          {
+            "code": "UNUSED_MESH_TANGENT",
+            "message": "Tangents are not used because the material has no normal texture.",
+            "severity": 2,
+            "pointer": "/meshes/1/primitives/0/attributes/TANGENT"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/meshes/1/primitives/0/attributes/TEXCOORD_0"
+          },
+          {
+            "code": "UNUSED_MESH_TANGENT",
+            "message": "Tangents are not used because the material has no normal texture.",
+            "severity": 2,
+            "pointer": "/meshes/2/primitives/0/attributes/TANGENT"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/meshes/2/primitives/0/attributes/TEXCOORD_0"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/meshes/5/primitives/0/attributes/TEXCOORD_0"
+          },
+          {
+            "code": "NODE_SKINNED_MESH_NON_ROOT",
+            "message": "Node with a skinned mesh is not root. Parent transforms will not affect a skinned mesh.",
+            "severity": 1,
+            "pointer": "/nodes/6"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/bufferViews/74"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/bufferViews/75"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/bufferViews/76"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/bufferViews/77"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/bufferViews/78"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/images/3"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/images/4"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/images/5"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/images/6"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/images/7"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/images/8"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/images/9"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/images/10"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/images/11"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/images/12"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/images/13"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/images/14"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/images/18"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/materials/1"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/materials/2"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/materials/4"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/textures/3"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/textures/4"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/textures/5"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/textures/6"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/textures/7"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/textures/8"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/textures/9"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/textures/10"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/textures/11"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/textures/12"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/textures/13"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/textures/14"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/textures/18"
+          }
+        ],
+        "truncated": false
+      },
+      {
+        "file": "artifacts/package4-supplement-validation/positive/release-mixed-worker.glb",
+        "sha256": "ec9a8ea3d5a58822197a0f7bb2e0430c305c08af0aba229dd123eb39b59b6049",
+        "numErrors": 0,
+        "numWarnings": 1,
+        "numInfos": 16,
+        "numHints": 0,
+        "messages": [
+          {
+            "code": "UNUSED_MESH_TANGENT",
+            "message": "Tangents are not used because the material has no normal texture.",
+            "severity": 2,
+            "pointer": "/meshes/0/primitives/0/attributes/TANGENT"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/meshes/0/primitives/0/attributes/TEXCOORD_0"
+          },
+          {
+            "code": "UNUSED_MESH_TANGENT",
+            "message": "Tangents are not used because the material has no normal texture.",
+            "severity": 2,
+            "pointer": "/meshes/1/primitives/0/attributes/TANGENT"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/meshes/1/primitives/0/attributes/TEXCOORD_0"
+          },
+          {
+            "code": "UNUSED_MESH_TANGENT",
+            "message": "Tangents are not used because the material has no normal texture.",
+            "severity": 2,
+            "pointer": "/meshes/2/primitives/0/attributes/TANGENT"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/meshes/2/primitives/0/attributes/TEXCOORD_0"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/meshes/5/primitives/0/attributes/TEXCOORD_0"
+          },
+          {
+            "code": "NODE_SKINNED_MESH_NON_ROOT",
+            "message": "Node with a skinned mesh is not root. Parent transforms will not affect a skinned mesh.",
+            "severity": 1,
+            "pointer": "/nodes/6"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/bufferViews/74"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/bufferViews/75"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/bufferViews/76"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/bufferViews/77"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/bufferViews/78"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/textures/2"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/textures/8"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/textures/11"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/textures/18"
+          }
+        ],
+        "truncated": false
+      },
+      {
+        "file": "artifacts/package4-supplement-validation/positive/release-mixed.glb",
+        "sha256": "ec9a8ea3d5a58822197a0f7bb2e0430c305c08af0aba229dd123eb39b59b6049",
+        "numErrors": 0,
+        "numWarnings": 1,
+        "numInfos": 16,
+        "numHints": 0,
+        "messages": [
+          {
+            "code": "UNUSED_MESH_TANGENT",
+            "message": "Tangents are not used because the material has no normal texture.",
+            "severity": 2,
+            "pointer": "/meshes/0/primitives/0/attributes/TANGENT"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/meshes/0/primitives/0/attributes/TEXCOORD_0"
+          },
+          {
+            "code": "UNUSED_MESH_TANGENT",
+            "message": "Tangents are not used because the material has no normal texture.",
+            "severity": 2,
+            "pointer": "/meshes/1/primitives/0/attributes/TANGENT"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/meshes/1/primitives/0/attributes/TEXCOORD_0"
+          },
+          {
+            "code": "UNUSED_MESH_TANGENT",
+            "message": "Tangents are not used because the material has no normal texture.",
+            "severity": 2,
+            "pointer": "/meshes/2/primitives/0/attributes/TANGENT"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/meshes/2/primitives/0/attributes/TEXCOORD_0"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/meshes/5/primitives/0/attributes/TEXCOORD_0"
+          },
+          {
+            "code": "NODE_SKINNED_MESH_NON_ROOT",
+            "message": "Node with a skinned mesh is not root. Parent transforms will not affect a skinned mesh.",
+            "severity": 1,
+            "pointer": "/nodes/6"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/bufferViews/74"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/bufferViews/75"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/bufferViews/76"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/bufferViews/77"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/bufferViews/78"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/textures/2"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/textures/8"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/textures/11"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/textures/18"
+          }
+        ],
+        "truncated": false
+      },
+      {
+        "file": "artifacts/package4-supplement-validation/positive/sanitize-gui.glb",
+        "sha256": "5720fa084e71773647c53ba5f1ff718cb9f33bc0529ebee463463f05b20091eb",
+        "numErrors": 0,
+        "numWarnings": 1,
+        "numInfos": 4,
+        "numHints": 0,
+        "messages": [
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/meshes/0/primitives/0/attributes/TEXCOORD_0"
+          },
+          {
+            "code": "NODE_SKINNED_MESH_NON_ROOT",
+            "message": "Node with a skinned mesh is not root. Parent transforms will not affect a skinned mesh.",
+            "severity": 1,
+            "pointer": "/nodes/1"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/bufferViews/21"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/bufferViews/22"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/textures/3"
+          }
+        ],
+        "truncated": false
+      },
+      {
+        "file": "artifacts/package4-supplement-validation/positive/sanitize-mixed-second.glb",
+        "sha256": "ec9a8ea3d5a58822197a0f7bb2e0430c305c08af0aba229dd123eb39b59b6049",
+        "numErrors": 0,
+        "numWarnings": 1,
+        "numInfos": 16,
+        "numHints": 0,
+        "messages": [
+          {
+            "code": "UNUSED_MESH_TANGENT",
+            "message": "Tangents are not used because the material has no normal texture.",
+            "severity": 2,
+            "pointer": "/meshes/0/primitives/0/attributes/TANGENT"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/meshes/0/primitives/0/attributes/TEXCOORD_0"
+          },
+          {
+            "code": "UNUSED_MESH_TANGENT",
+            "message": "Tangents are not used because the material has no normal texture.",
+            "severity": 2,
+            "pointer": "/meshes/1/primitives/0/attributes/TANGENT"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/meshes/1/primitives/0/attributes/TEXCOORD_0"
+          },
+          {
+            "code": "UNUSED_MESH_TANGENT",
+            "message": "Tangents are not used because the material has no normal texture.",
+            "severity": 2,
+            "pointer": "/meshes/2/primitives/0/attributes/TANGENT"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/meshes/2/primitives/0/attributes/TEXCOORD_0"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/meshes/5/primitives/0/attributes/TEXCOORD_0"
+          },
+          {
+            "code": "NODE_SKINNED_MESH_NON_ROOT",
+            "message": "Node with a skinned mesh is not root. Parent transforms will not affect a skinned mesh.",
+            "severity": 1,
+            "pointer": "/nodes/6"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/bufferViews/74"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/bufferViews/75"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/bufferViews/76"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/bufferViews/77"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/bufferViews/78"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/textures/2"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/textures/8"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/textures/11"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/textures/18"
+          }
+        ],
+        "truncated": false
+      },
+      {
+        "file": "artifacts/package4-supplement-validation/positive/sanitize-mixed-shared.glb",
+        "sha256": "dbad825696c355c21c67698c3fb49d9b82e4c723c467b85d33553da6f0fda725",
+        "numErrors": 0,
+        "numWarnings": 1,
+        "numInfos": 41,
+        "numHints": 0,
+        "messages": [
+          {
+            "code": "UNUSED_MESH_TANGENT",
+            "message": "Tangents are not used because the material has no normal texture.",
+            "severity": 2,
+            "pointer": "/meshes/0/primitives/0/attributes/TANGENT"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/meshes/0/primitives/0/attributes/TEXCOORD_0"
+          },
+          {
+            "code": "UNUSED_MESH_TANGENT",
+            "message": "Tangents are not used because the material has no normal texture.",
+            "severity": 2,
+            "pointer": "/meshes/1/primitives/0/attributes/TANGENT"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/meshes/1/primitives/0/attributes/TEXCOORD_0"
+          },
+          {
+            "code": "UNUSED_MESH_TANGENT",
+            "message": "Tangents are not used because the material has no normal texture.",
+            "severity": 2,
+            "pointer": "/meshes/2/primitives/0/attributes/TANGENT"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/meshes/2/primitives/0/attributes/TEXCOORD_0"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/meshes/5/primitives/0/attributes/TEXCOORD_0"
+          },
+          {
+            "code": "NODE_SKINNED_MESH_NON_ROOT",
+            "message": "Node with a skinned mesh is not root. Parent transforms will not affect a skinned mesh.",
+            "severity": 1,
+            "pointer": "/nodes/6"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/bufferViews/74"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/bufferViews/75"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/bufferViews/76"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/bufferViews/77"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/bufferViews/78"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/images/3"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/images/4"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/images/5"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/images/6"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/images/7"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/images/8"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/images/9"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/images/10"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/images/11"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/images/12"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/images/13"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/images/14"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/images/18"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/materials/1"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/materials/2"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/materials/4"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/textures/3"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/textures/4"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/textures/5"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/textures/6"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/textures/7"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/textures/8"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/textures/9"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/textures/10"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/textures/11"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/textures/12"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/textures/13"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/textures/14"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/textures/18"
+          }
+        ],
+        "truncated": false
+      },
+      {
+        "file": "artifacts/package4-supplement-validation/positive/sanitize-mixed-worker.glb",
+        "sha256": "ec9a8ea3d5a58822197a0f7bb2e0430c305c08af0aba229dd123eb39b59b6049",
+        "numErrors": 0,
+        "numWarnings": 1,
+        "numInfos": 16,
+        "numHints": 0,
+        "messages": [
+          {
+            "code": "UNUSED_MESH_TANGENT",
+            "message": "Tangents are not used because the material has no normal texture.",
+            "severity": 2,
+            "pointer": "/meshes/0/primitives/0/attributes/TANGENT"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/meshes/0/primitives/0/attributes/TEXCOORD_0"
+          },
+          {
+            "code": "UNUSED_MESH_TANGENT",
+            "message": "Tangents are not used because the material has no normal texture.",
+            "severity": 2,
+            "pointer": "/meshes/1/primitives/0/attributes/TANGENT"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/meshes/1/primitives/0/attributes/TEXCOORD_0"
+          },
+          {
+            "code": "UNUSED_MESH_TANGENT",
+            "message": "Tangents are not used because the material has no normal texture.",
+            "severity": 2,
+            "pointer": "/meshes/2/primitives/0/attributes/TANGENT"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/meshes/2/primitives/0/attributes/TEXCOORD_0"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/meshes/5/primitives/0/attributes/TEXCOORD_0"
+          },
+          {
+            "code": "NODE_SKINNED_MESH_NON_ROOT",
+            "message": "Node with a skinned mesh is not root. Parent transforms will not affect a skinned mesh.",
+            "severity": 1,
+            "pointer": "/nodes/6"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/bufferViews/74"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/bufferViews/75"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/bufferViews/76"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/bufferViews/77"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/bufferViews/78"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/textures/2"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/textures/8"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/textures/11"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/textures/18"
+          }
+        ],
+        "truncated": false
+      },
+      {
+        "file": "artifacts/package4-supplement-validation/positive/sanitize-mixed.glb",
+        "sha256": "ec9a8ea3d5a58822197a0f7bb2e0430c305c08af0aba229dd123eb39b59b6049",
+        "numErrors": 0,
+        "numWarnings": 1,
+        "numInfos": 16,
+        "numHints": 0,
+        "messages": [
+          {
+            "code": "UNUSED_MESH_TANGENT",
+            "message": "Tangents are not used because the material has no normal texture.",
+            "severity": 2,
+            "pointer": "/meshes/0/primitives/0/attributes/TANGENT"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/meshes/0/primitives/0/attributes/TEXCOORD_0"
+          },
+          {
+            "code": "UNUSED_MESH_TANGENT",
+            "message": "Tangents are not used because the material has no normal texture.",
+            "severity": 2,
+            "pointer": "/meshes/1/primitives/0/attributes/TANGENT"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/meshes/1/primitives/0/attributes/TEXCOORD_0"
+          },
+          {
+            "code": "UNUSED_MESH_TANGENT",
+            "message": "Tangents are not used because the material has no normal texture.",
+            "severity": 2,
+            "pointer": "/meshes/2/primitives/0/attributes/TANGENT"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/meshes/2/primitives/0/attributes/TEXCOORD_0"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/meshes/5/primitives/0/attributes/TEXCOORD_0"
+          },
+          {
+            "code": "NODE_SKINNED_MESH_NON_ROOT",
+            "message": "Node with a skinned mesh is not root. Parent transforms will not affect a skinned mesh.",
+            "severity": 1,
+            "pointer": "/nodes/6"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/bufferViews/74"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/bufferViews/75"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/bufferViews/76"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/bufferViews/77"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/bufferViews/78"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/textures/2"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/textures/8"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/textures/11"
+          },
+          {
+            "code": "UNUSED_OBJECT",
+            "message": "This object may be unused.",
+            "severity": 2,
+            "pointer": "/textures/18"
+          }
+        ],
+        "truncated": false
+      }
+    ],
+    "errors": 0,
+    "warnings": 10
+  },
+  "positive_files": [
+    {
+      "profile": "release",
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-package4-mixed-cdbd/artifacts/package4-mixed/release/output/mixed.glb",
+      "sha256": "ec9a8ea3d5a58822197a0f7bb2e0430c305c08af0aba229dd123eb39b59b6049"
+    },
+    {
+      "profile": "release",
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-package4-mixed-cdbd/artifacts/package4-mixed/release/output/mixed-shared.glb",
+      "sha256": "dbad825696c355c21c67698c3fb49d9b82e4c723c467b85d33553da6f0fda725"
+    },
+    {
+      "profile": "release",
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-package4-mixed-cdbd/artifacts/package4-mixed/release/output/mixed-worker.glb",
+      "sha256": "ec9a8ea3d5a58822197a0f7bb2e0430c305c08af0aba229dd123eb39b59b6049"
+    },
+    {
+      "profile": "release",
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-package4-mixed-cdbd/artifacts/package4-mixed/release/output/mixed-second.glb",
+      "sha256": "ec9a8ea3d5a58822197a0f7bb2e0430c305c08af0aba229dd123eb39b59b6049"
+    },
+    {
+      "profile": "release",
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-package4-mixed-cdbd/artifacts/package4-gui/release/output/physical37.glb",
+      "sha256": "5720fa084e71773647c53ba5f1ff718cb9f33bc0529ebee463463f05b20091eb"
+    },
+    {
+      "profile": "sanitize",
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-package4-mixed-cdbd/artifacts/package4-mixed/sanitize/output/mixed.glb",
+      "sha256": "ec9a8ea3d5a58822197a0f7bb2e0430c305c08af0aba229dd123eb39b59b6049"
+    },
+    {
+      "profile": "sanitize",
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-package4-mixed-cdbd/artifacts/package4-mixed/sanitize/output/mixed-shared.glb",
+      "sha256": "dbad825696c355c21c67698c3fb49d9b82e4c723c467b85d33553da6f0fda725"
+    },
+    {
+      "profile": "sanitize",
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-package4-mixed-cdbd/artifacts/package4-mixed/sanitize/output/mixed-worker.glb",
+      "sha256": "ec9a8ea3d5a58822197a0f7bb2e0430c305c08af0aba229dd123eb39b59b6049"
+    },
+    {
+      "profile": "sanitize",
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-package4-mixed-cdbd/artifacts/package4-mixed/sanitize/output/mixed-second.glb",
+      "sha256": "ec9a8ea3d5a58822197a0f7bb2e0430c305c08af0aba229dd123eb39b59b6049"
+    },
+    {
+      "profile": "sanitize",
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-package4-mixed-cdbd/artifacts/package4-gui/sanitize/output/physical37.glb",
+      "sha256": "5720fa084e71773647c53ba5f1ff718cb9f33bc0529ebee463463f05b20091eb"
+    }
+  ],
+  "remaining": [
+    "unrestricted whole-owned SAN calling-thread export allocation sweep is live67604 on frozenf803; no completed claim",
+    "new37 reader-specific allocation denial/remaining recursive model and working budget controls",
+    "post37 Create/Replace/freehand authoring adapter is independently under development, original public refusal6 remains",
+    "controller package4 export-specific proof and generic EditableGlb policy compilation of retained canonical scenes remain distinct",
+    "currentroot541 fresh coherent all-layout/full regression admission is independent and live; no main promotion"
+  ]
+}

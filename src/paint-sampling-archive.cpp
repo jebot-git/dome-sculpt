@@ -77,6 +77,7 @@ PaintSamplingArchive::PaintSamplingArchive(PaintSamplingArchiveLimits l):limits_
 }
 uint32_t PaintSamplingArchive::add(std::shared_ptr<const PaintSamplingDomain> d) {
   stop(limits_);if(!d)throw std::invalid_argument("Missing paint sampling domain");
+  if(d->version()!=1)throw std::invalid_argument("Polygon paint domain3 requires its actual owning Scene39 archive adapter");
   for(size_t i=0;i<domains_.size();++i)if(domains_[i]==d)return uint32_t(i);
   if(domains_.size()>=limits_.max_domains)throw std::length_error("Paint sampling domain count exceeded");
   auto count=d->storage_bytes(limits_.geometry);validate_corners(*d,limits_);
@@ -99,7 +100,7 @@ void PaintSamplingArchive::require_reachable() const {
 nlohmann::json PaintSamplingArchive::encode() const {
   nlohmann::json out={{"version",1},{"bases",nlohmann::json::array()},{"domains",nlohmann::json::array()}};
   std::vector<std::shared_ptr<const Mesh>> bases;
-  for(const auto &d:domains_){stop(limits_);d->storage_bytes(limits_.geometry);validate_corners(*d,limits_);
+  for(const auto &d:domains_){stop(limits_);if(d->version()!=1)throw std::invalid_argument("Polygon paint domain3 cannot be encoded as a legacy domain1");d->storage_bytes(limits_.geometry);validate_corners(*d,limits_);
     auto found=std::find(bases.begin(),bases.end(),d->basis());size_t id=size_t(found-bases.begin());
     if(found==bases.end()){const auto &m=*d->basis();bases.push_back(d->basis());
       auto vectors=[&](const auto &v){return words(v.size()*3,[&](size_t i){auto p=v[i/3];return std::bit_cast<uint32_t>(i%3==0?p.x:i%3==1?p.y:p.z);},limits_);};

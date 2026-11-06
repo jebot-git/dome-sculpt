@@ -2,6 +2,7 @@
 #pragma once
 #include <nlohmann/json.hpp>
 #include "dome/source-paint.hpp"
+#include "polygon-surface-context.hpp"
 namespace dome::detail {
 // Independently authored logical UV1 has no image-role/carrier number. Its
 // source-domain count is preflighted before any surface/coordinate allocation.
@@ -26,6 +27,7 @@ inline const nlohmann::json &paint_archive_payload(const nlohmann::json &input,b
     return input;
   }
   if(!input.at("version").is_number_integer())throw std::invalid_argument("Invalid paint envelope version");
+  if(input.at("version")==6)return polygon_surface_payload_shape(input);
   const bool physical=input.at("version")==3;
   if(physical&&!physical_emission)throw std::invalid_argument("Physical emission Paint3 requires Scene27 capability");
   if((!physical&&(!owning_domain||input.at("version")!=2))||input.size()!=3||
@@ -55,6 +57,7 @@ inline const nlohmann::json &paint_archive_payload(const nlohmann::json &input,b
   return paint_archive_payload(input.at("payload"),false);
 }
 inline bool physical_paint_authority(const nlohmann::json &input,const SourcePaintDecodeContext &context) {
+  if(input.is_object()&&input.contains("version")&&input.at("version")==6)return polygon_surface_physical_payload(input);
   return context.physical_emission&&input.is_object()&&input.contains("version")&&
     (input.at("version")==3||(context.independent_source&&input.at("version")==4));
 }

@@ -1,6 +1,9 @@
+#include "polygon-surface-owner.hpp"
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "native-paint-model.hpp"
 #include "native-paint-frame-source.hpp"
+#include "canonical-paint-sampling.hpp"
+
 #include "paint-sampling-access.hpp"
 #include "normal-frame-runtime.hpp"
 #include "dome/color-paint-sampling.hpp"
@@ -99,7 +102,9 @@ std::shared_ptr<const SourceMaterialBindings> bind_native_paint(const std::share
 }
 std::shared_ptr<const PaintSamplingAttachment> material_paint_attachment(const SourceMaterialBindings *b){
   if(!b)return {};const auto color=b->color_preparation?b->color_preparation->paint_sampling:nullptr;
-  if(color&&b->native_paint_sampling)throw std::invalid_argument("One paint grid cannot borrow two distinct material owners");
+  if(size_t(bool(color))+size_t(bool(b->native_paint_sampling))+size_t(bool(b->canonical_paint_sampling))+size_t(bool(b->polygon_surface_transfer))>1)throw std::invalid_argument("One paint grid cannot borrow two distinct material owners");
+  if(b->polygon_surface_transfer)return b->polygon_surface_transfer->current_attachment();
+  if(b->canonical_paint_sampling)return b->canonical_paint_sampling->attachment();
   return b->native_paint_sampling?b->native_paint_sampling->attachment():color?color->geometry_attachment():nullptr;
 }
 struct NativePaintSamplingAccess {

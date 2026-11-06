@@ -1,0 +1,13 @@
+# Canonical paint37 physical export, package4
+
+Private functional milestone on cdbd7ea. Ordinary Document GLB export now carries the genuine retained writable domain alongside the independently owned canonical normal/key domain. It does not reinterpret native32 or borrow normal coordinates as paint authority. Package4 owns the exact native Scene and FLOAT32 emission coefficients; the standard PNG/factor/strength view remains explicitly finite.
+
+The writer authenticates the immutable Scene, current Paint, strong owner/control blocks and ordered paint corners. The reader replays that Scene and independently checks emitted paint UVs, normal UVs, resolved normal PNG/sampler, POSITION/N/T and current target arrays. Rehashing a legacy marker cannot omit an actual canonical37 image owner. Existing formats1/2/3 retain their interpretations and no-CPS writer branches.
+
+Fresh complete owning39 builds passed in optimized Release and whole-owned O1 ASan/UBSan/leaks. The subsequent correction changes only emission-package.cpp, with every public/private header and all other product source byte-identical. That TU was compiled into copied complete own support, then the full app and whole consumers relinked; this is a matched single-TU correction scope, not a second all-source build.
+
+Each corrected profile passed public worker7, graphical229 across27 alpha/pose/morph views (max1 at unchanged2), and resource/callback/durable-commit Cancel/history28. All2194 immutable paths remained exact; the separately hashed derived core archive is an intentional output. Running and queued export cancellation preserves prior files and the following native Save, Undo/Redo and retry. Exact native recovery and second worker export bytes pass. Strict actual PCI03 A770229 passed, with real llvmpipe and UHD770 refusing the requested identity. All28 positive GLBs are byte-identical across Release/SAN/Arc;84 unfiltered Khronos validations report0errors/84warnings. Twenty-four legacy package3 files remain byte-identical to sealed ac0 outputs.
+
+The original public refusal and genuine old39 legacy-omission reader counterexample remain preserved. Actual same-file mixed actors, complete new export/reader allocation-failure coverage, package4 GUI/controller qualification and current-root all-layout integration remain open. Native37 UV/Restore GUI proof belongs to bf174c3 and is not relabelled as HDR export GUI. No main admission, general post37 key authoring, typed-avatar admission or full codec OOM claim follows from this milestone.
+
+See [the complete scoped receipt](validation/CANONICAL-PAINT37-EMISSION4.json).

@@ -1,3 +1,5 @@
+#include "polygon-surface-preview.hpp"
+#include "canonical-paint-native.hpp"
 #include "dome/bake-distance.hpp"
 #include "dome/bake-recipe.hpp"
 #include "paint-overlay-packet.hpp"
@@ -626,9 +628,9 @@ void Document::publish_locked(bool force,bool checkpoint) {
     view->normal_sampling_required=view->normal_sampling_available&&(source.material_bindings->canonical_attributes||(source.painted->normal_projection()&&source.painted->normal_projection()->version==2));
     view->retain_normal_sampling=uv_retention_requested_locked();
     view->paint_sampling_available=uv_paint_retention_available_locked();
-    view->paint_sampling_required=bool(source.painted&&source.painted->paint_sampling_domain());
+    view->paint_sampling_required=detail::canonical_paint_retention_supported(source)||bool(source.painted&&source.painted->paint_sampling_domain());
     view->retain_paint_sampling=uv_paint_retention_requested_locked();
-    view->can_restore_paint_source=detail::native_paint_source_restorable(source);
+    view->can_restore_paint_source=detail::canonical_paint_source_restorable(source)||detail::native_paint_source_restorable(source);
     view->committing = uv_accept_pending_;
     view->solving = uv_solving_;
     if (view->solving) { view->can_undo = view->can_redo = false; view->valid = false; }
@@ -1846,6 +1848,8 @@ void Document::mesh_loop() {
         }
         auto colors=detail::current_vertex_colors(o,cancelled);
         const auto paint_attachment=o.paint_sampling_attachment;
+        const auto polygon_field=o.textures?o.textures->polygon_surface:nullptr;
+        if(polygon_field){polygon_field->validate_maps(*o.textures);if(!polygon_field->matches(o.material_bindings,paint_attachment))throw std::invalid_argument("Polygon worker field lost its current paint/material attachment");polygon_field->validate_world(o.world_matrix(),1e-6,cancelled);}
         if(paint_attachment&&snapshot->paint_coordinates.empty())snapshot->paint_coordinates=snapshot->mesh.uv;
         std::shared_ptr<const std::vector<std::array<float,2>>> paint_coordinates;
         const auto normal_domain=detail::retained_normal_coordinates(o.material_bindings.get(),o.textures.get());
@@ -1860,7 +1864,7 @@ void Document::mesh_loop() {
         }
         if(!colors.empty() && snapshot->source_colors.empty())snapshot->source_colors.assign(snapshot->mesh.positions.size(),{1,1,1,1});
         auto retained=o.material_bindings?o.material_bindings->normal_frames:nullptr;
-        const bool canonical=o.textures && !o.textures->normal_projection && !o.textures->normal.rgba.empty();
+        const bool canonical=!polygon_field && o.textures && !o.textures->normal_projection && !o.textures->normal.rgba.empty();
         // Existing bakes without captured canonical authority use the historical
         // posed-mesh Mikk basis. Do not invent a persisted/rest export basis.
         const bool dynamic_canonical=retained && canonical && !retained->canonical;
@@ -1871,7 +1875,7 @@ void Document::mesh_loop() {
           detail::normal_frame_current_authority(*o.material_bindings,o.mesh,o.deformation.get(),cancelled);
           if(!(source_role?retained->mtoon:retained->pbr))throw std::invalid_argument("Selected material has no retained source normal frame");
         }
-        if(retained||paint_attachment) {
+        if(!polygon_field&&(retained||paint_attachment)) {
           frame_objects.insert(o.id);auto mesh_owner=job->scene.object(o.id).painted->mesh_owner();
           auto old=frame_layouts.find(o.id);
           if(old!=frame_layouts.end() && old->second.mesh.lock()==mesh_owner && old->second.frames.lock()==retained && old->second.paint.lock()==paint_attachment && old->second.dynamic_canonical==dynamic_canonical) {
@@ -1909,6 +1913,12 @@ void Document::mesh_loop() {
             frame_layouts.emplace(o.id,FrameLayoutCache{mesh_owner,retained,paint_attachment,paint_coordinates,retained_layout,bytes,dynamic_canonical});frame_layout_bytes+=bytes;++frame_layout_builds;
           }
         }
+        if(polygon_field){
+          auto layout=std::make_shared<detail::NormalFrameLayout>();layout->vertices=o.mesh.indices;layout->corners.resize(o.mesh.indices.size());std::iota(layout->corners.begin(),layout->corners.end(),0u);layout->indices=layout->corners;retained_layout=std::move(layout);
+          paint_coordinates=std::make_shared<const std::vector<std::array<float,2>>>(polygon_field->paint_coordinates());
+          if(snapshot->source_normals.empty()){snapshot->source_normals=snapshot->mesh.normals;snapshot->canonical_normals=snapshot->mesh.normals;snapshot->source_tangents.assign(snapshot->mesh.positions.size(),{1,0,0,1});}
+          if(polygon_field->model()==detail::PolygonSurfaceNormalModel::PreparedCorePbr&&snapshot->normal_coordinates.empty()){for(auto uv:snapshot->mesh.uv)snapshot->normal_coordinates.push_back({uv[0],uv[1],uv[0],uv[1]});}
+        }
         if(retained) {
           retained_pose=detail::normal_frame_preview(*retained,*retained_layout,o.deformation.get(),cancelled,(1u<<source_role)|(canonical?4u:0u));
           if(snapshot->source_normals.empty()) {
@@ -1927,7 +1937,7 @@ void Document::mesh_loop() {
           }
         }
         if (cancelled()) throw std::runtime_error("Stale surface preview");
-        const bool affine=bool(o.affine_edit)||std::any_of(o.groups.begin(),o.groups.end(),[](const auto &g){return g.source_placement||g.affine_edit;});
+        const bool affine=bool(polygon_field)||bool(o.affine_edit)||std::any_of(o.groups.begin(),o.groups.end(),[](const auto &g){return g.source_placement||g.affine_edit;});
         const auto frame=affine?std::optional<detail::AffineInteractionFrame>(detail::placement_frame(o)):std::nullopt;
         const bool reflected=frame&&frame->orientation()==AffineOrientation::Reversing;
         auto world = affine?CanvasTransform{}:o.world_transform();
@@ -1955,8 +1965,8 @@ void Document::mesh_loop() {
           if(paint_attachment||!snapshot->paint_coordinates.empty())snapshot->paint_coordinates.push_back(paint_attachment?paint_coordinates->at(frame_vertex):o.mesh.uv.empty()?std::array<float,2>{}:o.mesh.uv.at(vertex));
           if(packed_uv1)packed_uv1->push_back(o.textures->source_maps->uv1->at(vertex));
           for(auto &[set,values]:packed_extra_uv)values->push_back(o.textures->source_maps->extra_uv_sets.at(set)->at(vertex));
-          if(normal_domain||!snapshot->normal_coordinates.empty()){
-            const auto uv=normal_domain?normal_domain->coordinates.at(vertex):o.mesh.uv.empty()?std::array<float,2>{}:o.mesh.uv.at(vertex);
+          if(normal_domain||polygon_field&&polygon_field->model()==detail::PolygonSurfaceNormalModel::PreparedCorePbr||!snapshot->normal_coordinates.empty()){
+            const auto uv=polygon_field&&polygon_field->model()==detail::PolygonSurfaceNormalModel::PreparedCorePbr?polygon_field->normal_coordinates().at(frame_vertex):normal_domain?normal_domain->coordinates.at(vertex):o.mesh.uv.empty()?std::array<float,2>{}:o.mesh.uv.at(vertex);
             const auto toon=normal_domain&&!normal_domain->mtoon_coordinates.empty()?normal_domain->mtoon_coordinates.at(vertex):uv;
             snapshot->normal_coordinates.push_back({uv[0],uv[1],toon[0],toon[1]});
           }
@@ -1966,9 +1976,12 @@ void Document::mesh_loop() {
           snapshot->mesh.uv.push_back(o.mesh.uv.empty() ? std::array<float,2>{0,0} : o.mesh.uv.at(vertex));
           auto direction = vec(ob::rotate(world.orientation, obv({tangent[0],tangent[1],tangent[2]})));
           snapshot->tangents.push_back(frame?detail::placed_tangent(*frame,tangent):Tangent{direction.x,direction.y,direction.z,tangent[3]});
-          if(retained || !snapshot->source_normals.empty()) {
+          // A first polygon-field object has no earlier mesh to seed these arrays.
+          // Publish its actual before attributes even while the packed prefix is empty.
+          if(polygon_field || retained || !snapshot->source_normals.empty()) {
             auto source=o.mesh.normals.at(vertex),canonical_normal=source;
             std::array<float,4> source_tangent{1,0,0,1};
+            if(polygon_field){source=polygon_field->normals().at(frame_vertex);if(!polygon_field->tangents().empty())source_tangent=polygon_field->tangents().at(frame_vertex);}
             if(retained) {
               source=retained_pose->normals[source_role].at(frame_vertex);
               if(!retained_pose->normals[2].empty())canonical_normal=retained_pose->normals[2].at(frame_vertex);
@@ -2033,6 +2046,7 @@ void Document::mesh_loop() {
         if(o.normal_preview_proof&&o.normal_preview_proof->matches(o.material_bindings,snapshot->ranges.back().textures))snapshot->ranges.back().normal_preview_proof=o.normal_preview_proof;
         snapshot->ranges.back().paint_winding_reversed=reflected;
         snapshot->ranges.back().pbr_view=job->pbr_view;
+        if(polygon_field){snapshot->ranges.back().source_frame=true;snapshot->ranges.back().canonical_frame=false;snapshot->ranges.back().source_normal_only=polygon_field->model()==detail::PolygonSurfaceNormalModel::NativeNOnly;}
         if(frame)snapshot->ranges.back().affine_world=frame->world();
       }
       for(auto it=frame_layouts.begin();it!=frame_layouts.end();)if(!frame_objects.contains(it->first) || it->second.mesh.expired() || (it->second.frames.expired()&&it->second.paint.expired())){frame_layout_bytes-=it->second.bytes;it=frame_layouts.erase(it);}else ++it;
@@ -2593,7 +2607,7 @@ void Document::control_event_locked(VrControlEvent event) {
         ++uv_session_;
         uv_.emplace(std::shared_ptr<const Mesh>(o.painted, &o.painted->mesh()),
                     o.painted->resolution());
-        c.value[3]=o.painted->paint_sampling_domain()?2.f:(o.material_bindings&&o.material_bindings->canonical_attributes)||(o.painted->normal_projection()&&o.painted->normal_projection()->version==2)?1.f:0.f;
+        c.value[3]=(detail::canonical_paint_retention_supported(o)||o.painted->paint_sampling_domain())?2.f:(o.material_bindings&&o.material_bindings->canonical_attributes)||(o.painted->normal_projection()&&o.painted->normal_projection()->version==2)?1.f:0.f;
         c.title = "UV editor";
       } catch (...) {
         control_before_.reset();

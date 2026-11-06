@@ -273,6 +273,9 @@ PolygonMesh prepare_unpainted_polygon_atlas(const PolygonMesh &source,
   PolygonLimits limits;limits.cancelled=cancelled;
   return PolygonConversionAccess::atlas(source,resolution,limits);
 }
+PolygonMesh evaluate_polygon_source_topology(const PolygonAuthority&authority,const Mesh&rest,const Mesh&posed,const PolygonLimits&limits){
+ return PolygonConversionAccess::evaluated(authority.topology,rest,posed,limits);
+}
 bool polygon_conversion_required(const SculptObject &object) {
   const bool current_polygon = object.polygon && object.polygon->active;
   if (current_polygon && !object.deformation && !object.appearance &&

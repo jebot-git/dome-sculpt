@@ -1,3 +1,4 @@
+#include "canonical-paint-native.hpp"
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/document.hpp"
 #include "dome/import.hpp"
@@ -40,7 +41,7 @@ void Document::queue_scene_operation_locked(std::string label, SceneOperation op
   const bool restore_uv=uv_restore_session&&uv_restore_session==uv_session_&&uv_&&control_before_&&
       !uv_accept_pending_&&!uv_solving_&&uv_->view().topology&&!uv_->view().validating&&
       state_.controls.parameter==VrParameter::UvEdit&&control_object_==scene_.active().id&&
-      detail::native_paint_source_restorable(scene_.active());
+      (detail::native_paint_source_restorable(scene_.active())||detail::canonical_paint_source_restorable(scene_.active()));
   if(uv_restore_session&&!restore_uv)throw std::logic_error("The source Restore lost its exact ready UV workspace");
   if (state_.asset_busy || state_.recovery_busy || (control_before_&&!restore_uv) || action_active_locked())
     throw std::logic_error("Finish the current action before starting asset work");

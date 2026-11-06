@@ -6,6 +6,13 @@
 #include <set>
 namespace dome {
 namespace {
+void record_replay(PolygonView&next,const PolygonView&before,const PolygonEdit&edit,std::optional<AffineTransform>world={}){
+ const size_t depth=before.replay?before.replay->depth:0,entries=before.replay?before.replay->entries:0;
+ // Plain geometry editing remains usable beyond this transfer-program bound;
+ // an owning field adapter must explicitly refuse an incomplete witness.
+ if(!before.replay_complete||depth>=128||entries>8'000'000||edit.selection.ids.size()>8'000'000-entries){next.replay.reset();next.replay_complete=false;return;}
+ auto node=std::make_shared<PolygonReplayNode>();node->depth=depth+1;node->entries=entries+edit.selection.ids.size();node->step={edit,std::move(world)};node->previous=before.replay;next.replay=std::move(node);next.replay_complete=true;
+}
 void stop(const PolygonLimits &limits) {
   if (limits.cancelled && limits.cancelled())
     throw std::runtime_error("Polygon workspace cancelled");
@@ -499,6 +506,7 @@ void PolygonWorkspace::apply(PolygonOperation operation, Vec3 delta,
     return;
   auto next = prepare(std::move(*result.replacement), *current_.view->selection,
                       limits, std::move(colors));
+  auto recorded=std::make_shared<PolygonView>(*next.view);record_replay(*recorded,*current_.view,edit);next.view=std::move(recorded);
   commit(std::move(next), current_);
 }
 void PolygonWorkspace::apply_affine(const AffineTransform &world,
@@ -523,6 +531,7 @@ void PolygonWorkspace::apply_affine(const AffineTransform &world,
   if(!result.replacement)return;
   auto local=PolygonAffineAccess::returned(std::move(*result.replacement),source,placed,frame,limits);
   auto next=prepare(std::move(local),*current_.view->selection,limits,std::move(colors));
+  auto recorded=std::make_shared<PolygonView>(*next.view);record_replay(*recorded,*current_.view,edit,world);next.view=std::move(recorded);
   commit(std::move(next),current_);
 }
 void PolygonWorkspace::begin_move() {
@@ -572,6 +581,7 @@ void PolygonWorkspace::end_move(bool accept, const PolygonLimits &limits) {
     if (result.replacement) {
       auto next = prepare(std::move(*result.replacement),
                           *before.view->selection, limits, std::move(colors));
+      auto recorded=std::make_shared<PolygonView>(*next.view);record_replay(*recorded,*before.view,edit);next.view=std::move(recorded);
       commit(std::move(next), before);
       gesture_.reset();
       return;

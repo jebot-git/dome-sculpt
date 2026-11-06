@@ -1,0 +1,73 @@
+{
+  "scope": "Unexecuted private owning-node and preview-data source checkpoint; syntax only, no Scene39/material21/Paint6 publication, runtime/render/query/export/SAN/UI/GPU admission",
+  "command_prefix": [
+    "/usr/bin/c++",
+    "-DDOME_SCULPT_INSTALLED_ASSETS=\"/usr/local/share/dome-sculpt/assets/humanoid\"",
+    "-DDOME_SCULPT_SOURCE_ASSETS=\"/home/blux/de-xr/dome-sculpt/artifacts/owning37-main-9dd/assets/humanoid\"",
+    "-I/home/blux/de-xr/dome-sculpt/artifacts/owning37-main-9dd/third_party",
+    "-I/home/blux/de-xr/dome-sculpt/artifacts/owning37-main-9dd/include",
+    "-I/home/blux/de-xr/dome-sculpt/artifacts/owning37-main-9dd/third_party/openbrush",
+    "-I/home/blux/de-xr/dome-sculpt/artifacts/owning37-main-9dd/third_party/cgltf",
+    "-I/home/blux/de-xr/dome-sculpt/artifacts/owning37-main-9dd/third_party/nlohmann",
+    "-I/home/blux/de-xr/dome-sculpt/artifacts/owning37-main-9dd/third_party/xatlas",
+    "-I/home/blux/de-xr/dome-sculpt/artifacts/owning37-main-9dd/third_party/mikktspace",
+    "-I/home/blux/de-xr/dome-sculpt/artifacts/owning37-main-9dd/third_party/ufbx",
+    "-O3",
+    "-DNDEBUG",
+    "-std=gnu++20",
+    "-Wall",
+    "-Wextra",
+    "-Wpedantic",
+    "-I/home/blux/de-xr/dome-sculpt/artifacts/owning37-main-9dd/src",
+    "-fsyntax-only"
+  ],
+  "results": [
+    {
+      "file": "src/polygon-surface-owner.cpp",
+      "sha256": "fc9d48790ddf3e6e9f4dfc7fb10ecb3cad75ef2ede742ab7b990c0b1bad88865",
+      "exit": 0,
+      "stderr": "In file included from /home/blux/de-xr/dome-sculpt/artifacts/owning37-main-9dd/src/source-paint-pairing.hpp:8,\n                 from /home/blux/de-xr/dome-sculpt/artifacts/owning37-main-9dd/src/polygon-surface-owner.cpp:7:\n/home/blux/de-xr/dome-sculpt/artifacts/owning37-main-9dd/src/color-bound-memo.hpp: In destructor \u2018dome::detail::ColorBoundScope::~ColorBoundScope()\u2019:\n/home/blux/de-xr/dome-sculpt/artifacts/owning37-main-9dd/src/color-bound-memo.hpp:78:5: warning: this \u2018for\u2019 clause does not guard... [-Wmisleading-indentation]\n   78 |     for(size_t n=0;n<c.count;++n)c.entries[n]={};c.count=0;\n      |     ^~~\n/home/blux/de-xr/dome-sculpt/artifacts/owning37-main-9dd/src/color-bound-memo.hpp:78:50: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the \u2018for\u2019\n   78 |     for(size_t n=0;n<c.count;++n)c.entries[n]={};c.count=0;\n      |                                                  ^\n/home/blux/de-xr/dome-sculpt/artifacts/owning37-main-9dd/src/color-bound-memo.hpp:79:5: warning: this \u2018for\u2019 clause does not guard... [-Wmisleading-indentation]\n   79 |     for(size_t n=0;n<c.paint_count;++n)c.paints[n]={};c.paint_count=0;\n      |     ^~~\n/home/blux/de-xr/dome-sculpt/artifacts/owning37-main-9dd/src/color-bound-memo.hpp:79:55: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the \u2018for\u2019\n   79 |     for(size_t n=0;n<c.paint_count;++n)c.paints[n]={};c.paint_count=0;\n      |                                                       ^\n/home/blux/de-xr/dome-sculpt/artifacts/owning37-main-9dd/src/color-bound-memo.hpp: In destructor \u2018dome::detail::ColorBoundPaintScope::~ColorBoundPaintScope()\u2019:\n/home/blux/de-xr/dome-sculpt/artifacts/owning37-main-9dd/src/color-bound-memo.hpp:95:5: warning: this \u2018if\u2019 clause does not guard... [-Wmisleading-indentation]\n   95 |     if(index_==SIZE_MAX)return;auto &c=color_bound_context();\n      |     ^~\n/home/blux/de-xr/dome-sculpt/artifacts/owning37-main-9dd/src/color-bound-memo.hpp:95:32: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the \u2018if\u2019\n   95 |     if(index_==SIZE_MAX)return;auto &c=color_bound_context();\n      |                                ^~~~\n/home/blux/de-xr/dome-sculpt/artifacts/owning37-main-9dd/src/polygon-surface-owner.cpp: In function \u2018uint64_t dome::detail::{anonymous}::number(const nlohmann::json_abi_v3_12_0::json&, uint64_t)\u2019:\n/home/blux/de-xr/dome-sculpt/artifacts/owning37-main-9dd/src/polygon-surface-owner.cpp:133:2: warning: this \u2018if\u2019 clause does not guard... [-Wmisleading-indentation]\n  133 |  if((!j.is_number_unsigned()&&(!j.is_number_integer()||j.get<int64_t>()<0))||j.get<uint64_t>()>limit)throw std::invalid_argument(\"Polygon field recipe integer is outside its exact range\");return j.get<uint64_t>();\n      |  ^~\n/home/blux/de-xr/dome-sculpt/artifacts/owning37-main-9dd/src/polygon-surface-owner.cpp:133:189: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the \u2018if\u2019\n  133 |  if((!j.is_number_unsigned()&&(!j.is_number_integer()||j.get<int64_t>()<0))||j.get<uint64_t>()>limit)throw std::invalid_argument(\"Polygon field recipe integer is outside its exact range\");return j.get<uint64_t>();\n      |                                                                                                                                                                                             ^~~~~~\n/home/blux/de-xr/dome-sculpt/artifacts/owning37-main-9dd/src/polygon-surface-owner.cpp: In member function \u2018void dome::detail::PolygonSurfaceOwner::validate_current_geometry(const dome::Mesh&, const dome::detail::PolygonSurfaceTransferLimits&) const\u2019:\n/home/blux/de-xr/dome-sculpt/artifacts/owning37-main-9dd/src/polygon-surface-owner.cpp:173:2: warning: this \u2018if\u2019 clause does not guard... [-Wmisleading-indentation]\n  173 |  if(!vectors(mesh.positions,target.positions)||!vectors(mesh.normals,target.normals)||mesh.indices!=target.indices||mesh.uv!=target.uv||mesh.uv_pins!=target.uv_pins||mesh.uv_seams!=target.uv_seams)throw std::invalid_argument(\"Polygon field current derivative differs from its exact replayed surface\");stop(l);\n      |  ^~\n/home/blux/de-xr/dome-sculpt/artifacts/owning37-main-9dd/src/polygon-surface-owner.cpp:173:302: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the \u2018if\u2019\n  173 |  if(!vectors(mesh.positions,target.positions)||!vectors(mesh.normals,target.normals)||mesh.indices!=target.indices||mesh.uv!=target.uv||mesh.uv_pins!=target.uv_pins||mesh.uv_seams!=target.uv_seams)throw std::invalid_argument(\"Polygon field current derivative differs from its exact replayed surface\");stop(l);\n      |                                                                                                                                                                                                                                                                                                              ^~~~\n"
+    },
+    {
+      "file": "src/polygon-surface-codec.cpp",
+      "sha256": "2104912dbdd61b9ef2e717988ac39ffaffda76a9b1763bb2149f47e5fb5b2ae1",
+      "exit": 0,
+      "stderr": ""
+    },
+    {
+      "file": "src/polygon-surface-preview.cpp",
+      "sha256": "474fa97a8a731f1445cc5d056e9262101ac33c2e53b3208de3be7aaaf16ddf1f",
+      "exit": 0,
+      "stderr": ""
+    },
+    {
+      "file": "tests/polygon-surface-preview.cpp",
+      "sha256": "4761187abe153a44a63fd9102cb25b478fbd8f56e854f517ac5c7099b6d9459e",
+      "exit": 0,
+      "stderr": ""
+    },
+    {
+      "file": "tests/polygon-surface-codec.cpp",
+      "sha256": "bebe6b2ad6d3e7292f7802982db18843ca930a27e4b57b0b7f4a16a5c21e0a7c",
+      "exit": 0,
+      "stderr": ""
+    }
+  ],
+  "base": "a5a8fd12faaed2d60ffd7699d44455b12b010e36",
+  "qualified_release": "8f1892b9add90576d170e2ce75befd06585b9836",
+  "qualified_inputs_unchanged": 252,
+  "guards_preserved": [
+    "SourceMaterialArchive polygon_surface_transfer refusal",
+    "source_paint_pairing current Scene39 adapter refusal",
+    "PaintSamplingArchive domain3 encode refusal",
+    "ordinary exports remain unsupported"
+  ],
+  "required_next": [
+    "actual Scene39/material21/Paint6 and origin-prefix/resource closure",
+    "current renderer/query full before vertex outputs and world/held transforms",
+    "post-paint edits/repeated current-value capture",
+    "native history/Apply/Cancel/Undo/Save/Restore",
+    "general topology/refinement",
+    "measured standard GLB/VRM export"
+  ]
+}

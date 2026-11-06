@@ -1,0 +1,502 @@
+{
+  "runtime": "81d65cd1dacf291a339aa6f9f7c497c79b673cff",
+  "branch": "work/canonical-paint-owner-6e",
+  "base": "d9163a87aeee9c650dd7d16979e58bca5e4a0fc8",
+  "scope": "Private detached immutable canonical paint correspondence factory and prospective decoded-model planner. No public layout/schema admission or document publication.",
+  "implemented": [
+    "Complete PolygonOrigin before control capture with own Paint metadata snapshot and retained immutable normal/model/history/placement roots",
+    "Genuine current retained writable attachment plus independently authenticated CanonicalNormalUv",
+    "Exact current skin/morph vertex-map remap; no normal/image rerasterization",
+    "Eight-million prospective inline model-slot accounting including pose16, shared polygon roots, per-table canonical origins, and replacement of current model slot",
+    "Fresh before-material validation: real same-address scalar tamper refused"
+  ],
+  "qualification": {
+    "release": {
+      "checks": 1259,
+      "persistent_ordinary_new_prefixes": 267,
+      "measured_cancellations": 588,
+      "actual_cap_entries": 8000000,
+      "actual_seam_refusal_entries": 8000128
+    },
+    "sanitize": {
+      "checks": 1259,
+      "persistent_ordinary_new_prefixes": 267,
+      "measured_cancellations": 588,
+      "actual_cap_entries": 8000000,
+      "actual_seam_refusal_entries": 8000128
+    }
+  },
+  "artifact_cohorts": {
+    "owner-first-proof": {
+      "status": "artifacts/owner-first-proof/status.json",
+      "status_sha256": "5ab706f8d31587fbb40ed03ac204c41bec3b7b433a1258a23ab1f85f94c744e3",
+      "exit": 0,
+      "unchanged": true,
+      "inputs": 2137,
+      "results": [
+        {
+          "profile": "release",
+          "phase": "compile-src/canonical-paint-prospect.cpp",
+          "exit": 0,
+          "seconds": 4.411721643991768
+        },
+        {
+          "profile": "release",
+          "phase": "compile-src/canonical-paint-sampling.cpp",
+          "exit": 0,
+          "seconds": 6.0609886510064825
+        },
+        {
+          "profile": "release",
+          "phase": "compile-tests/canonical-paint-owner.cpp",
+          "exit": 0,
+          "seconds": 6.23845900100423
+        },
+        {
+          "profile": "release",
+          "phase": "link",
+          "exit": 0,
+          "seconds": 0.3488522389670834
+        },
+        {
+          "profile": "release",
+          "phase": "runtime-0-0",
+          "exit": 0,
+          "seconds": 0.16975858301157132
+        },
+        {
+          "profile": "release",
+          "phase": "runtime-7-0",
+          "exit": 0,
+          "seconds": 0.025044196052476764
+        },
+        {
+          "profile": "release",
+          "phase": "runtime-0-1",
+          "exit": 0,
+          "seconds": 0.0272809179732576
+        },
+        {
+          "profile": "release",
+          "phase": "runtime-7-1",
+          "exit": 0,
+          "seconds": 0.022735756007023156
+        },
+        {
+          "profile": "sanitize",
+          "phase": "compile-src/canonical-paint-prospect.cpp",
+          "exit": 0,
+          "seconds": 4.309719819983002
+        },
+        {
+          "profile": "sanitize",
+          "phase": "compile-src/canonical-paint-sampling.cpp",
+          "exit": 0,
+          "seconds": 8.761748596036341
+        },
+        {
+          "profile": "sanitize",
+          "phase": "compile-tests/canonical-paint-owner.cpp",
+          "exit": 0,
+          "seconds": 12.19125473301392
+        },
+        {
+          "profile": "sanitize",
+          "phase": "link",
+          "exit": 0,
+          "seconds": 2.1227068249718286
+        },
+        {
+          "profile": "sanitize",
+          "phase": "runtime-0-0",
+          "exit": 0,
+          "seconds": 2.4536107670282945
+        },
+        {
+          "profile": "sanitize",
+          "phase": "runtime-7-0",
+          "exit": 0,
+          "seconds": 0.3426096919574775
+        },
+        {
+          "profile": "sanitize",
+          "phase": "runtime-0-1",
+          "exit": 0,
+          "seconds": 0.29290948499692604
+        },
+        {
+          "profile": "sanitize",
+          "phase": "runtime-7-1",
+          "exit": 0,
+          "seconds": 0.3431636079913005
+        }
+      ]
+    },
+    "owner-cap-proof": {
+      "status": "artifacts/owner-cap-proof/status.json",
+      "status_sha256": "47f0c37a081017272cd5f7de5916103416226fafad6dc6d34169e0cfb9bd4a0c",
+      "exit": 1,
+      "unchanged": true,
+      "inputs": 2142,
+      "results": [
+        {
+          "profile": "release",
+          "phase": "compile-canonical-paint-owner",
+          "exit": 0,
+          "seconds": 5.448466720001306
+        },
+        {
+          "profile": "release",
+          "phase": "link-canonical-paint-owner",
+          "exit": 0,
+          "seconds": 0.3217009640065953
+        },
+        {
+          "profile": "release",
+          "phase": "runtime-canonical-paint-owner",
+          "exit": 0,
+          "seconds": 0.15386199299246073
+        },
+        {
+          "profile": "release",
+          "phase": "compile-canonical-paint-owner-cap",
+          "exit": 0,
+          "seconds": 4.7418128330027685
+        },
+        {
+          "profile": "release",
+          "phase": "link-canonical-paint-owner-cap",
+          "exit": 0,
+          "seconds": 0.4146173109766096
+        },
+        {
+          "profile": "release",
+          "phase": "runtime-canonical-paint-owner-cap",
+          "exit": 1,
+          "seconds": 0.008433015027549118
+        }
+      ]
+    },
+    "owner-cap-proof-r2": {
+      "status": "artifacts/owner-cap-proof-r2/status.json",
+      "status_sha256": "8299bee621598e1dafb61c4c6a2f06061cfc02467a1aa6bb53ea64016c7fb4b0",
+      "exit": 1,
+      "unchanged": true,
+      "inputs": 2142,
+      "results": [
+        {
+          "profile": "release",
+          "phase": "compile-canonical-paint-owner-cap",
+          "exit": 0,
+          "seconds": 4.372363817004953
+        },
+        {
+          "profile": "release",
+          "phase": "link-canonical-paint-owner-cap",
+          "exit": 0,
+          "seconds": 0.39750674896640703
+        },
+        {
+          "profile": "release",
+          "phase": "runtime-canonical-paint-owner-cap",
+          "exit": 1,
+          "seconds": 0.008522588002961129
+        }
+      ]
+    },
+    "owner-cap-proof-r3": {
+      "status": "artifacts/owner-cap-proof-r3/status.json",
+      "status_sha256": "d24249af68014834fd7bc03b967fbaa1f224ee5298c6e3a7ad380b002fd9ce74",
+      "exit": 1,
+      "unchanged": true,
+      "inputs": 2142,
+      "results": [
+        {
+          "profile": "release",
+          "phase": "compile-canonical-paint-owner-cap",
+          "exit": 0,
+          "seconds": 4.4149987190030515
+        },
+        {
+          "profile": "release",
+          "phase": "link-canonical-paint-owner-cap",
+          "exit": 0,
+          "seconds": 0.42814306600484997
+        },
+        {
+          "profile": "release",
+          "phase": "runtime-canonical-paint-owner-cap",
+          "exit": 1,
+          "seconds": 0.8349686999572441
+        }
+      ]
+    },
+    "owner-cap-proof-r4": {
+      "status": "artifacts/owner-cap-proof-r4/status.json",
+      "status_sha256": "8f667d55aec260f51b00cc9bd28f94a816bafd1030b380e9985202b01516045f",
+      "exit": 0,
+      "unchanged": true,
+      "inputs": 2142,
+      "results": [
+        {
+          "profile": "release",
+          "phase": "compile-canonical-paint-owner-cap",
+          "exit": 0,
+          "seconds": 4.7514344149967656
+        },
+        {
+          "profile": "release",
+          "phase": "link-canonical-paint-owner-cap",
+          "exit": 0,
+          "seconds": 0.4261519690044224
+        },
+        {
+          "profile": "release",
+          "phase": "runtime-canonical-paint-owner-cap",
+          "exit": 0,
+          "seconds": 1.0781799859832972
+        },
+        {
+          "profile": "sanitize",
+          "phase": "compile-canonical-paint-owner-cap",
+          "exit": 0,
+          "seconds": 7.027131870971061
+        },
+        {
+          "profile": "sanitize",
+          "phase": "link-canonical-paint-owner-cap",
+          "exit": 0,
+          "seconds": 3.5314916759962216
+        },
+        {
+          "profile": "sanitize",
+          "phase": "runtime-canonical-paint-owner-cap",
+          "exit": 0,
+          "seconds": 7.761174906976521
+        }
+      ]
+    },
+    "owner-final-proof": {
+      "status": "artifacts/owner-final-proof/status.json",
+      "status_sha256": "c3363a24579d5e639b548aa6dd4448f5e7322bb226ead575149ad646731ea703",
+      "exit": 0,
+      "unchanged": true,
+      "inputs": 2142,
+      "results": [
+        {
+          "profile": "release",
+          "phase": "compile-canonical-paint-owner",
+          "exit": 0,
+          "seconds": 5.9679998139617965
+        },
+        {
+          "profile": "release",
+          "phase": "link-counterfactual",
+          "exit": 0,
+          "seconds": 0.33659297798294574
+        },
+        {
+          "profile": "release",
+          "phase": "old-owner-counterfactual",
+          "exit": 1,
+          "seconds": 0.0216442629462108
+        },
+        {
+          "profile": "release",
+          "phase": "compile-canonical-paint-sampling",
+          "exit": 0,
+          "seconds": 5.895142264023889
+        },
+        {
+          "profile": "release",
+          "phase": "link-current",
+          "exit": 0,
+          "seconds": 0.2808905660058372
+        },
+        {
+          "profile": "release",
+          "phase": "runtime-0-0",
+          "exit": 0,
+          "seconds": 0.14075026498176157
+        },
+        {
+          "profile": "release",
+          "phase": "runtime-7-0",
+          "exit": 0,
+          "seconds": 0.019376331008970737
+        },
+        {
+          "profile": "release",
+          "phase": "runtime-0-1",
+          "exit": 0,
+          "seconds": 0.01958624296821654
+        },
+        {
+          "profile": "release",
+          "phase": "runtime-7-1",
+          "exit": 0,
+          "seconds": 0.021002063993364573
+        },
+        {
+          "profile": "release",
+          "phase": "compile-canonical-paint-owner-cap",
+          "exit": 0,
+          "seconds": 4.521132057998329
+        },
+        {
+          "profile": "release",
+          "phase": "link-cap",
+          "exit": 0,
+          "seconds": 0.5303868949995376
+        },
+        {
+          "profile": "release",
+          "phase": "actual-cap",
+          "exit": 0,
+          "seconds": 1.1558031130116433
+        },
+        {
+          "profile": "sanitize",
+          "phase": "compile-canonical-paint-owner",
+          "exit": 0,
+          "seconds": 10.78520894102985
+        },
+        {
+          "profile": "sanitize",
+          "phase": "link-counterfactual",
+          "exit": 0,
+          "seconds": 2.0266428999602795
+        },
+        {
+          "profile": "sanitize",
+          "phase": "old-owner-counterfactual",
+          "exit": 1,
+          "seconds": 0.18251375097315758
+        },
+        {
+          "profile": "sanitize",
+          "phase": "compile-canonical-paint-sampling",
+          "exit": 0,
+          "seconds": 7.477264460991137
+        },
+        {
+          "profile": "sanitize",
+          "phase": "link-current",
+          "exit": 0,
+          "seconds": 1.8539753910154104
+        },
+        {
+          "profile": "sanitize",
+          "phase": "runtime-0-0",
+          "exit": 0,
+          "seconds": 2.845602359971963
+        },
+        {
+          "profile": "sanitize",
+          "phase": "runtime-7-0",
+          "exit": 0,
+          "seconds": 0.2835838319733739
+        },
+        {
+          "profile": "sanitize",
+          "phase": "runtime-0-1",
+          "exit": 0,
+          "seconds": 0.24531675595790148
+        },
+        {
+          "profile": "sanitize",
+          "phase": "runtime-7-1",
+          "exit": 0,
+          "seconds": 0.3377919319900684
+        },
+        {
+          "profile": "sanitize",
+          "phase": "compile-canonical-paint-owner-cap",
+          "exit": 0,
+          "seconds": 8.023997176031116
+        },
+        {
+          "profile": "sanitize",
+          "phase": "link-cap",
+          "exit": 0,
+          "seconds": 3.4371190200326964
+        },
+        {
+          "profile": "sanitize",
+          "phase": "actual-cap",
+          "exit": 0,
+          "seconds": 7.472569374018349
+        }
+      ]
+    },
+    "owner-cap-counterfactual": {
+      "status": "artifacts/owner-cap-counterfactual/status.json",
+      "status_sha256": "b99de4521eb6acc986768e9a410195d48c9da898ff87d4aa4969d80bd024e275",
+      "exit": 0,
+      "unchanged": true,
+      "inputs": 2141,
+      "results": [
+        {
+          "profile": "release",
+          "phase": "compile",
+          "exit": 0,
+          "seconds": 4.944738472986501
+        },
+        {
+          "profile": "release",
+          "phase": "link",
+          "exit": 0,
+          "seconds": 0.5720494529814459
+        },
+        {
+          "profile": "release",
+          "phase": "runtime",
+          "exit": 1,
+          "seconds": 1.1993778939940967
+        },
+        {
+          "profile": "sanitize",
+          "phase": "compile",
+          "exit": 0,
+          "seconds": 7.573543388047256
+        },
+        {
+          "profile": "sanitize",
+          "phase": "link",
+          "exit": 0,
+          "seconds": 2.9902526110527106
+        },
+        {
+          "profile": "sanitize",
+          "phase": "runtime",
+          "exit": 1,
+          "seconds": 7.733210392005276
+        }
+      ]
+    }
+  },
+  "proof_contract": [
+    "Three new or changed complete TUs and complete fixture TUs use immutable matching d916 own optimized/SAN core/support libraries. Existing public headers/layouts and archive bodies are unchanged. No new whole-app/full-suite/SAN-core build claim.",
+    "Final49761 closed0 for both profiles;2142 source/object/library inputs exact. Old3315 owner TU with current test rejects at intended scalar-mutation assertion in both profiles.",
+    "Actual native canonical producer keeps all existing legacy channels/metadata through identity UV transfer, adds128 real native targets and15625 vertices, uses real Document Convert and physical stroke. Identity layout plus actual new before slot equals8000000; one ordered seam duplicate predicts8000128 and refuses.",
+    "Test-only omission of exactly prospective-call line produces intended cap assertion failure with actual same native producer in both profiles;2141 fingerprints exact.",
+    "Final ordinary-new persistent sweep covers all267 measured prefixes on real flat owner cases; all588 measured callback cancellation points across four real flat/curved/current-UV-before-F32 fixtures. This is not a process malloc sweep.",
+    "All SAN runtime cohorts have leak detection enabled and no sanitizer reports; expected functional counterfactual assertion exits remain failures."
+  ],
+  "preserved_failures": {
+    "owner-cap-proof": "Initial fixture attempted a blank Paint rebuild; explicit assertion rejected existing editable data.",
+    "owner-cap-proof-r2": "Existing per-vertex pin array dimensions were not extended with actual unused vertices.",
+    "owner-cap-proof-r3": "Raw fixture active layer was hidden; actual physical stroke correctly refused.",
+    "old-owner-counterfactual": "Prior owner omitted complete fresh material validation and accepted actual incompatible same-address DTO scalar edit.",
+    "owner-cap-counterfactual": "Omitting prospective model planner mints an over-cap detached transition; real assertion fails."
+  },
+  "not_admitted": [
+    "No material19/Scene37 field, writer/reader, native publication or Restore action",
+    "No repeated37 UV, key/seam/Mirror/rig/Clear/rebake integration",
+    "No total paint/domain/frame/volume aggregate prospective resource closure; current planner specifically covers inline deformation entries",
+    "No same-object MToon, Source4, artist/prepared color or key-derived canonical transition",
+    "No package4 physical export, actual37 render/query/UI/history/GLB/VRM/pixel hardware proof",
+    "No mixed36 owner union and no main integration"
+  ],
+  "next": "Bounded lazy PolygonScene/material before-origin resolution, genuine conditional37 material19 owning codec and exact recursive closure. Public pointer order native_paint_frames then canonical_paint_sampling in final36/37 composition."
+}

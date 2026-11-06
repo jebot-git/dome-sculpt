@@ -4,9 +4,12 @@
 #include "dome/material-bindings.hpp"
 #include "dome/polygon-scene.hpp"
 #include "polygon-color-archive.hpp"
+#include <functional>
+#include <memory>
 #include <set>
 namespace dome::detail {
 class SourcePlacementArchive;
+class PolygonSceneReader;
 // Bounded immutable graph archive. Source IDs are data, never object lookups.
 class PolygonSceneArchive {
 public:
@@ -28,6 +31,8 @@ public:
   nlohmann::json encode(PaintImageArchive &,CreatorAssetArchive &,SourceMaterialArchive &,SourcePlacementArchive *,PolygonColorArchive *,NormalSamplingArchive *,PaintSamplingArchive *) const;
   static void preflight(const nlohmann::json &, const nlohmann::json &objects);
   static void preflight(const nlohmann::json &, const nlohmann::json &objects,const nlohmann::json *materials);
+  static void preflight(const nlohmann::json &,const nlohmann::json &objects,const nlohmann::json *materials,const nlohmann::json *canonical_paint);
+  static void preflight(const nlohmann::json &,const nlohmann::json &objects,const nlohmann::json *materials,const nlohmann::json *canonical_paint,const nlohmann::json *polygon_surfaces);
   static PolygonSceneArchive decode(const nlohmann::json &,
                                     const PaintImageArchive &,
                                     const CreatorAssetArchive &,
@@ -44,6 +49,7 @@ public:
   static PolygonSceneArchive decode(const nlohmann::json &,const PaintImageArchive &,const CreatorAssetArchive &,const SourceMaterialArchive &,const SourcePlacementArchive *,const PolygonColorArchive *,const NormalSamplingArchive *,const PaintSamplingArchive *,bool physical_emission);
 
 private:
+  friend class PolygonSceneReader;
   size_t entries_ = 0;
   PolygonColorArchive colors_;
   std::set<const PolygonAuthority *> deeply_validated_;
@@ -55,6 +61,29 @@ private:
   std::vector<std::shared_ptr<const PolygonOrigin>> origins_;
   std::vector<std::shared_ptr<const Volume>> volumes_;
   std::vector<std::shared_ptr<const PaintedMesh>> paints_;
+};
+// Scene37 can own a material -> before-origin -> earlier-material DAG. Resolve
+// only the origins requested while a material prefix is complete, then finish
+// the actual Scene roots. The enclosing Scene preflight still charges every
+// record before this reader allocates any payload; this is not a validity cache.
+class PolygonSceneReader {
+public:
+  using MaterialResolver=std::function<std::shared_ptr<const SourceMaterialBindings>(uint32_t)>;
+  PolygonSceneReader(const nlohmann::json &,const PaintImageArchive &,
+      const CreatorAssetArchive &,MaterialResolver,const SourcePlacementArchive *,
+      const PolygonColorArchive *,const NormalSamplingArchive *,const PaintSamplingArchive *,
+      const SourcePaintDecodeContext &,std::function<bool()> cancelled={});
+  ~PolygonSceneReader();
+  PolygonSceneReader(const PolygonSceneReader&)=delete;
+  PolygonSceneReader &operator=(const PolygonSceneReader&)=delete;
+  const std::shared_ptr<const PolygonOrigin> &origin_at(uint32_t);
+  const std::shared_ptr<const PolygonAuthority> &authority_at(uint32_t);
+  MaterialResolver material_resolver(MaterialResolver);
+  void restore_material_resolver(MaterialResolver) noexcept;
+  PolygonSceneArchive finish();
+private:
+  struct Impl;
+  std::unique_ptr<Impl> impl_;
 };
 uint32_t polygon_archive_index(const nlohmann::json &, size_t count);
 } // namespace dome::detail
