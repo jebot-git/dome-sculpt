@@ -4,6 +4,7 @@
 namespace dome::detail {
 class PolygonSurfaceOwner;
 class PolygonSurfacePreview;
+class TextureSetFieldCodec;
 struct TextureSetFieldSample {
   uint32_t triangle=0;
   uint64_t face=0;
@@ -29,6 +30,7 @@ public:
       std::shared_ptr<const TextureSetFaceDomain>,const TextureSetLimits & = {})const;
   const TextureSetView&field()const noexcept{return field_;}
   const std::shared_ptr<const PaintedMesh>&original_paint()const noexcept{return original_;}
+  bool owns_read_paint(const PaintedMesh&)const noexcept;
   const std::shared_ptr<const PolygonSurfaceOwner>&polygon_owner()const noexcept{return polygon_;}
   const std::shared_ptr<const PolygonSurfacePreview>&source_preview()const noexcept{return preview_;}
   // The private source view uses the original proved raster/attachment and
@@ -41,9 +43,10 @@ public:
       const TextureSetLimits & = {})const;
 private:
   friend struct TextureSetAccess;
+  friend class TextureSetFieldCodec;
   static std::shared_ptr<const TextureSetFieldSource> capture_prepared(
       const TextureSetView &,std::shared_ptr<const TextureSetFaceDomain>,
-      std::shared_ptr<const PolygonSurfacePreview>,const TextureSetLimits &);
+      std::shared_ptr<const PolygonSurfacePreview>,const TextureSetLimits &,const PaintedMesh*raster_template=nullptr);
   void validate_member(const TextureSetView &,const TextureSetLimits &)const;
   TextureSetFieldSource()=default;
   TextureSetFieldSource(TextureSetFieldSource&&)=default;

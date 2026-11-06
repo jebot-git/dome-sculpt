@@ -2,6 +2,7 @@
 #pragma once
 #include "dome/texture-sets.hpp"
 namespace dome::detail {
+struct PolygonSurfaceStage;
 struct TextureSetPaintAccess {
   static const std::shared_ptr<const TextureSetFaceDomain>& domain(const PaintedMesh&)noexcept;
   static std::shared_ptr<const void> raster_owner(const PaintedMesh&)noexcept;
@@ -26,6 +27,17 @@ struct TextureSetPaintAccess {
   static std::shared_ptr<const PaintedMesh> field_source_view(const PaintedMesh &member,
       const PaintedMesh &original,const std::shared_ptr<const TextureSetFaceDomain>&,
       const TextureSetLimits&);
+  static std::shared_ptr<PaintedMesh> bind_raster(const PaintedMesh&,
+      std::shared_ptr<const TextureSetFaceDomain>,const PaintedMesh&,
+      const TextureSetLimits&);
+  static nlohmann::json encode_source_grid(const PaintedMesh&,
+      const std::shared_ptr<const TextureSetFieldSource>&,PaintImageArchive*,
+      NormalSamplingArchive*,PaintSamplingArchive*);
+  static std::shared_ptr<PaintedMesh> decode_source_grid(const nlohmann::json&,
+      const PaintImageArchive*,bool,const NormalSamplingArchive*,const PaintSamplingArchive*,
+      const SourcePaintDecodeContext&,const PolygonSurfaceStage&,const PaintedMesh&,
+      const std::shared_ptr<const TextureSetFaceDomain>& = {},
+      const std::shared_ptr<const TextureSetFieldSource>& = {});
   static std::shared_ptr<PaintedMesh> bind(const PaintedMesh&,
       std::shared_ptr<const TextureSetFaceDomain>,uint32_t resolution,
       const TextureSetLimits&);

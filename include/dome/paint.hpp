@@ -6,7 +6,7 @@
 #include <map>
 #include <memory>
 namespace dome {
-namespace detail {class PaintOverlayPacket;struct PaintOverlayFactory;struct EmissionExportAccess;class BakedNormalField;struct NativeWeightPaintAccess;struct TextureSetPaintAccess;class PolygonSurfaceOwner;class PolygonSurfacePreview;struct PolygonSurfaceStage;struct PolygonSurfacePaintCodec;}
+namespace detail {class PaintOverlayPacket;struct PaintOverlayFactory;struct EmissionExportAccess;class BakedNormalField;struct NativeWeightPaintAccess;struct TextureSetPaintAccess;class TextureSetFieldSource;class PolygonSurfaceOwner;class PolygonSurfacePreview;struct PolygonSurfaceStage;struct PolygonSurfacePaintCodec;}
 struct Material;
 class PaintProjection;
 class PaintSamplingDomain;
@@ -263,11 +263,12 @@ private:
   // Only the owning Scene40 membership archive may omit the current geometry.
   // Legacy/public paint entry points never supply this sealed domain.
   nlohmann::json encode_impl(PaintImageArchive *,NormalSamplingArchive *,PaintSamplingArchive *,
-      const std::shared_ptr<const TextureSetFaceDomain> &,const detail::PolygonSurfaceOwner * = nullptr) const;
+      const std::shared_ptr<const TextureSetFaceDomain> &,const detail::PolygonSurfaceOwner * = nullptr,
+      const detail::TextureSetFieldSource*source_field=nullptr) const;
   static std::shared_ptr<PaintedMesh> decode_impl(const nlohmann::json &,const PaintImageArchive *,
       bool,const NormalSamplingArchive *,const PaintSamplingArchive *,const SourcePaintDecodeContext &,
       const std::shared_ptr<const TextureSetFaceDomain> &,const detail::PolygonSurfaceStage * = nullptr,
-      const PaintedMesh*shared_raster=nullptr);
+      const PaintedMesh*shared_raster=nullptr,const detail::TextureSetFieldSource*source_field=nullptr);
   PaintedMesh() = default;
   PaintedMesh(Mesh, uint32_t, const PaintSurfaceOptions &);
   PaintedMesh(Mesh, uint32_t, const PaintSurfaceOptions &,std::shared_ptr<const PaintSamplingDomain>);

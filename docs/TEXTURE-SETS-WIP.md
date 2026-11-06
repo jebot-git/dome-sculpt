@@ -284,3 +284,16 @@ syntax; no new native execution or application qualification is claimed. Record,
 View and collection layouts changed. Read
 validation/TEXTURE-SETS-FIELD-RECORD-SOURCE.json. Paint7/PolygonSources8 wire and
 actual source-backed GPU/query/native/export adapters remain guarded work.
+
+The source-backed Paint7 codec now owns a bounded explicit field_sources table.
+Each retained seed names its actual geometry, polygon node and material binding,
+original raw grid and recipe. Current member grids reference that seed without
+duplicating geometry or source history. Decode requires the real node replay,
+strong geometry/material owners and enclosing FLOAT context; current values are
+read on the seed raster while editable members retain their subset raster.
+Prototype sharing keeps actual SurfaceMap identity across COW paints. This codec
+is not yet registered in the shared/history archive or root Scene composition.
+Four whole TUs pass syntax only; the first nonexistent counter-name failure and
+its log remain preserved. Decode now also creates a fresh composite cache when
+replacing prototype layers. Read validation/TEXTURE-SETS-FIELD-CODEC-SOURCE.json.
+GPU/range/query/native/export and PolygonSources8 integration remain required.
