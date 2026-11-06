@@ -10,6 +10,7 @@ struct TextureSetPaintAccess {
   static std::shared_ptr<PaintedMesh> decode(const nlohmann::json &,const PaintImageArchive *,bool,
       const NormalSamplingArchive *,const PaintSamplingArchive *,const SourcePaintDecodeContext &,
       const std::shared_ptr<const TextureSetFaceDomain> &);
+  static bool valid_raster(const PaintedMesh&)noexcept;
   static size_t working_bytes(const PaintedMesh&,uint32_t resolution);
   static std::shared_ptr<PaintedMesh> bind(const PaintedMesh&,
       std::shared_ptr<const TextureSetFaceDomain>,uint32_t resolution,

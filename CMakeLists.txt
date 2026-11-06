@@ -90,7 +90,7 @@ add_library(dome-sculpt-core src/source-rest-graph.cpp src/source-rest-plan.cpp 
 target_include_directories(dome-sculpt-core PRIVATE third_party)
 target_include_directories(dome-sculpt-core PUBLIC include third_party/openbrush)
 target_sources(dome-sculpt-core PRIVATE src/retopo-authoring.cpp src/document-retopo.cpp src/document-sculpt.cpp src/document-native.cpp src/document-contact.cpp src/document-transaction.cpp src/texture-sets.cpp src/texture-set-graph.cpp
-  src/texture-set-archive.cpp src/texture-set-surface.cpp src/texture-set-range.cpp)
+  src/texture-set-archive.cpp src/texture-set-surface.cpp src/texture-set-range.cpp src/texture-set-packed.cpp src/texture-set-worker.cpp)
 target_sources(dome-sculpt-core PRIVATE src/cut-authoring.cpp src/cut-color.cpp src/document-cut.cpp src/document-worker-errors.cpp)
 target_sources(dome-sculpt-core PRIVATE src/object-selection.cpp)
 target_sources(dome-sculpt-core PRIVATE src/source-sampling-transport.cpp)
@@ -4483,4 +4483,12 @@ if(BUILD_TESTING)
   add_test(NAME dome-sculpt-texture-sets-plan
     COMMAND dome-sculpt-texture-sets-test ${CMAKE_CURRENT_BINARY_DIR}/texture-set-plan-output --plan)
   set_tests_properties(dome-sculpt-texture-sets dome-sculpt-texture-sets-polygon dome-sculpt-texture-sets-plan PROPERTIES TIMEOUT 180)
+endif()
+
+if(BUILD_TESTING)
+  add_executable(dome-sculpt-texture-set-surfaces-test tests/texture-set-surfaces.cpp)
+  target_include_directories(dome-sculpt-texture-set-surfaces-test PRIVATE src)
+  target_link_libraries(dome-sculpt-texture-set-surfaces-test PRIVATE dome-sculpt-core)
+  add_test(NAME dome-sculpt-texture-set-surfaces COMMAND dome-sculpt-texture-set-surfaces-test)
+  set_tests_properties(dome-sculpt-texture-set-surfaces PROPERTIES TIMEOUT 180)
 endif()

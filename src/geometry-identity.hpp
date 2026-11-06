@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #pragma once
 #include "dome/scene.hpp"
+#include "dome/texture-sets.hpp"
 #include <bit>
 namespace dome::geometry_detail {
 // Exact dependency identity, never a fingerprint of packed mesh contents. All
@@ -23,6 +24,8 @@ struct Dependency {
   std::optional<AffineTransform> affine_world;
   bool canonical = false;
   uint8_t frame_role = 0;
+  std::shared_ptr<const TextureSetFaceDomain> texture_membership;
+  std::vector<std::pair<uint32_t,bool>> texture_frames;
 };
 template <class T>
 bool same_owner(const std::shared_ptr<const T> &a,
@@ -58,6 +61,7 @@ struct Identity {
           !same_owner(a.appearance, b.appearance) ||
           !same_owner(a.material_bindings, b.material_bindings) || !same_owner(a.frame_positions,b.frame_positions) ||
           !same_owner(a.polygon, b.polygon) ||
+          !same_owner(a.texture_membership,b.texture_membership) || a.texture_frames!=b.texture_frames ||
           a.canonical != b.canonical || a.frame_role != b.frame_role || !same(a.world, b.world) ||
           bool(a.affine_world)!=bool(b.affine_world) || (a.affine_world && a.affine_world->matrix()!=b.affine_world->matrix()))
         return false;

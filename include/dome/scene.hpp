@@ -16,6 +16,7 @@ struct PolygonAuthority;
 struct PolygonOrigin;
 struct ObjectBakeRecipe;
 class TextureSetCollection;
+namespace detail {class TextureSetSurfacePlan;}
 struct Material {
   std::string name = "Clay";
   std::array<float, 4> color{.58f, .30f, .15f, 1};
@@ -81,6 +82,9 @@ struct ObjectSurface {
   // Exact logical REST TRIANGLE CORNERS, never an ambiguous vertex stream.
   std::vector<std::array<float,2>> paint_corner_coordinates;
   std::shared_ptr<const NormalPreviewProof> normal_preview_proof{};
+  // Worker-only multi-material bundle; mesh stays empty to avoid a second
+  // full authoring geometry copy. Legacy single-material consumers refuse it.
+  std::shared_ptr<const detail::TextureSetSurfacePlan> texture_set_surface{};
 };
 // Scene copies retain object volumes for command history. Use snapshot() for
 // detached immutable geometry on meshing and file workers.
@@ -129,13 +133,14 @@ public:
   // and source ownership still come from this Scene snapshot.
   using SculptMesher = std::function<Mesh(uint64_t, const Volume &)>;
   std::vector<ObjectSurface> preview_surfaces(const std::function<bool()> &, const SculptMesher &) const;
+  std::vector<ObjectSurface> preview_surface_bundles(const std::function<bool()> &, const SculptMesher & = {}) const;
 
 private:
   // Detached native append reserves nonlive provenance IDs without inventing
   // geometry or bypassing the live object/group quotas. No layout change.
   friend NativeSceneAppend append_native_scene(const Scene &,const Scene &,
                                                 const std::function<bool()> &);
-  std::vector<ObjectSurface> surfaces_impl(bool, bool, const std::function<bool()> &, const SculptMesher & = {}) const;
+  std::vector<ObjectSurface> surfaces_impl(bool, bool, const std::function<bool()> &, const SculptMesher & = {}, bool texture_bundles = false) const;
   std::vector<SculptObject> objects_;
   uint64_t active_ = 1, next_ = 2;
   std::vector<SceneGroup> groups_;

@@ -261,7 +261,7 @@ private:
   PaintedMesh() = default;
   PaintedMesh(Mesh, uint32_t, const PaintSurfaceOptions &);
   PaintedMesh(Mesh, uint32_t, const PaintSurfaceOptions &,std::shared_ptr<const PaintSamplingDomain>);
-  PaintedMesh(std::shared_ptr<const Mesh>,uint32_t,const PaintSurfaceOptions &,std::shared_ptr<const PaintSamplingDomain>);
+  PaintedMesh(std::shared_ptr<const Mesh>,uint32_t,const PaintSurfaceOptions &,std::shared_ptr<const PaintSamplingDomain>,std::shared_ptr<const TextureSetFaceDomain> = {});
   struct PaintSample { PaintSettings settings; float opacity = 1; };
   using PaintSampler = std::function<std::optional<PaintSample>(Vec3,Vec3)>;
   void stamp_sampled(const Brush &, const PaintSettings &, const PaintSampler &, const std::function<bool()> &cancelled = {}, const Evaluation * = nullptr);

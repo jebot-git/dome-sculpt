@@ -32,7 +32,7 @@ struct Ledger {
   auto&t=d->topology();if(!t||t->triangle_faces().size()>limits.maximum_triangles||t->triangle_corners().size()>limits.maximum_corners)throw std::invalid_argument("Texture-set domain omitted or exceeded its owning topology");
   if(topologies.insert(t.get()).second){++stats.topologies;charge(stats.membership_bytes,1,sizeof(TextureSetTopology));charge(stats.membership_bytes,t->triangle_faces().size()+t->triangle_corners().size(),sizeof(uint64_t));auto&m=t->geometry();if(!m)throw std::invalid_argument("Texture-set topology omitted its owning geometry");if(geometry.insert(m.get()).second){charge(stats.geometry_bytes,1,sizeof(Mesh));charge(stats.geometry_bytes,m->positions.capacity()+m->normals.capacity(),sizeof(Vec3));charge(stats.geometry_bytes,m->uv.capacity(),sizeof(std::array<float,2>));charge(stats.geometry_bytes,m->indices.capacity(),sizeof(uint32_t));charge(stats.geometry_bytes,m->uv_pins.capacity()+m->uv_seams.capacity(),1);}}
  }
- void paint(const std::shared_ptr<const PaintedMesh>&p,size_t depth){node(1,p.get(),depth,[&]{auto&d=TextureSetPaintAccess::domain(*p);if(d&&!d->matches(p->mesh_owner()))throw std::invalid_argument("Retained set paint lost its own immutable mesh owner");domain(d);if(d)paint_domains.insert(d.get());paint(p->source_sampling_original(),depth+1);});}
+ void paint(const std::shared_ptr<const PaintedMesh>&p,size_t depth){node(1,p.get(),depth,[&]{if(!TextureSetPaintAccess::valid_raster(*p))throw std::invalid_argument("Retained set paint lost its actual raster membership");auto&d=TextureSetPaintAccess::domain(*p);if(d&&!d->matches(p->mesh_owner()))throw std::invalid_argument("Retained set paint lost its own immutable mesh owner");domain(d);if(d)paint_domains.insert(d.get());paint(p->source_sampling_original(),depth+1);});}
  void conversion(const std::shared_ptr<const CanonicalNormalConversion>&p,size_t depth){if(p){paint(p->before_paint(),depth+1);material(p->before_material(),depth+1);}}
  void key(const std::shared_ptr<const SourceKeyDerivation>&p,size_t depth){if(p){paint(p->before_paint(),depth+1);material(p->before_material(),depth+1);}}
  void uv_origin(const std::shared_ptr<const SourceUvOrigin>&p,size_t depth){if(p)paint(p->paint,depth+1);}
@@ -54,7 +54,10 @@ struct Ledger {
  void polygon(const std::shared_ptr<const PolygonAuthority>&p,size_t depth){node(5,p.get(),depth,[&]{origin(p->origin,depth+1);});}
  void object(const SculptObject&o){
   if(o.painted&&TextureSetPaintAccess::domain(*o.painted)&&(!o.texture_sets||TextureSetPaintAccess::domain(*o.painted)!=o.texture_sets->primary_domain()))throw std::invalid_argument("Current set-bound paint requires its own complete collection");
-  if(o.mesh_active&&o.painted){const auto count=o.texture_sets?o.texture_sets->additional().size()+1:1;if(count>limits.maximum_sets_per_scene-stats.live_sets)throw std::length_error("Live texture sets exceed the Scene bound");stats.live_sets+=count;}
+  // Every live object has its implicit material slot, including generated
+  // volume surfaces. Additional writable sets cannot evade the scene total.
+  const auto count=o.texture_sets?o.texture_sets->additional().size()+1:1;
+  if(count>limits.maximum_sets_per_scene-stats.live_sets)throw std::length_error("Live material/texture slots exceed the Scene bound");stats.live_sets+=count;
   collection(o.texture_sets,1);paint(o.painted,1);material(o.material_bindings,1);polygon(o.polygon,1);origin(o.shape_source,1);origin(o.rig_source,1);
  }
 };

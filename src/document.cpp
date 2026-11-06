@@ -44,6 +44,7 @@
 #include "sculpt-ui-values.hpp"
 #include "dome/local-surface.hpp"
 #include "geometry-identity.hpp"
+#include "texture-set-worker.hpp"
 #include "document-transaction.hpp"
 #include "document-retopo-input.hpp"
 #include "spatial-history-levels.hpp"
@@ -1660,8 +1661,18 @@ void Document::mesh_loop() {
     bool dynamic_canonical=false;
   };
   std::unordered_map<uint64_t,FrameLayoutCache> frame_layouts;
+  std::unordered_map<uint64_t,std::shared_ptr<const detail::TextureSetPackedGeometry>> texture_layouts;
+  size_t texture_layout_bytes=0;
   size_t frame_layout_bytes=0;uint64_t frame_layout_builds=0;
   constexpr size_t frame_layout_limit=128*1024*1024;
+  auto reserve_layout=[&](size_t bytes){
+    if(bytes>frame_layout_limit)throw std::length_error("Immutable surface layout exceeds the shared cache budget");
+    while(frame_layouts.size()+texture_layouts.size()>=256||frame_layout_bytes+texture_layout_bytes>frame_layout_limit-bytes){
+      if(!frame_layouts.empty()){auto old=frame_layouts.begin();frame_layout_bytes-=old->second.bytes;frame_layouts.erase(old);}
+      else if(!texture_layouts.empty()){auto old=texture_layouts.begin();texture_layout_bytes-=old->second->owned_bytes();texture_layouts.erase(old);}
+      else break;
+    }
+  };
   std::shared_ptr<const geometry_detail::Identity> geometry_identity;
   while (!stopping_) {
     std::optional<MeshJob> job;
@@ -1708,7 +1719,7 @@ void Document::mesh_loop() {
       });
       SculptMeshingStats meshing;
       auto worker_start=std::chrono::steady_clock::now();
-      auto objects=job->scene.preview_surfaces(cancelled,[&](uint64_t id,const Volume &source) {
+      auto objects=job->scene.preview_surface_bundles(cancelled,[&](uint64_t id,const Volume &source) {
         auto &cache=sculpt_cache[id];
         auto start=std::chrono::steady_clock::now();
         LocalSurfaceUpdateReport report;
@@ -1748,6 +1759,10 @@ void Document::mesh_loop() {
         }
         auto surface=std::find_if(objects.begin(),objects.end(),[&](const auto &s){return s.id==o.id;});
         dep.canonical=surface!=objects.end()&&surface->textures&&!surface->textures->normal.rgba.empty();
+        if(surface!=objects.end()&&surface->texture_set_surface){
+          const auto&plan=*surface->texture_set_surface;dep.texture_membership=plan.collection()->primary_domain();
+          for(const auto&field:plan.fields())dep.texture_frames.push_back({field.id,field.painted->baked()&&!field.painted->baked()->maps.normal.rgba.empty()});
+        }
         dependencies->objects.push_back(std::move(dep));
       }
       std::shared_ptr<const geometry_detail::Identity> identity=geometry_identity&&geometry_identity->matches(*dependencies)?geometry_identity:std::move(dependencies);
@@ -1763,8 +1778,25 @@ void Document::mesh_loop() {
       snapshot->native_gesture=job->native_gesture;snapshot->native_samples=job->native_samples;
       auto weighted = job->weight_view ? weight_objects(job->scene, job->scene.active().id, job->linked_weights)
                                       : std::vector<uint64_t>{};
-      std::unordered_set<uint64_t> frame_objects;
+      std::unordered_set<uint64_t> frame_objects,texture_objects;
       for (auto &o : objects) {
+        if(o.texture_set_surface){
+          texture_objects.insert(o.id);TextureSetLimits limits;limits.cancelled=cancelled;
+          auto cached=texture_layouts.find(o.id);std::shared_ptr<const detail::TextureSetPackedGeometry>layout;
+          if(cached!=texture_layouts.end()&&cached->second->matches_plan(*o.texture_set_surface))layout=cached->second;
+          else{
+            layout=detail::prepare_texture_set_packed(o.texture_set_surface,limits);const auto bytes=layout->owned_bytes();
+            if(bytes>frame_layout_limit)throw std::length_error("Texture-set geometry exceeds the immutable layout cache bound");
+            if(cached!=texture_layouts.end()){texture_layout_bytes-=cached->second->owned_bytes();texture_layouts.erase(cached);}
+            reserve_layout(bytes);
+            texture_layouts.emplace(o.id,layout);texture_layout_bytes+=bytes;++frame_layout_builds;
+          }
+          detail::TextureSetWorkerView view;view.pbr=job->pbr_view;view.weights=job->weight_view;view.masks=job->sculpt_mask_view;
+          view.selected=std::find(weighted.begin(),weighted.end(),o.id)!=weighted.end();view.joint=job->weight_joint;
+          view.weight_values=proposed?proposed->object(o.id).deformation:o.deformation;
+          if(view.masks&&o.id==job->scene.active().id)view.mask=[&](uint32_t v){return job->scene.object(o.id).volume->mask_sample(layout->posed()->positions.at(v));};
+          detail::append_texture_set_surface(*snapshot,o,layout,view,limits);continue;
+        }
         auto colors=detail::current_vertex_colors(o,cancelled);
         const auto paint_attachment=o.paint_sampling_attachment;
         if(paint_attachment&&snapshot->paint_coordinates.empty())snapshot->paint_coordinates=snapshot->mesh.uv;
@@ -1826,7 +1858,7 @@ void Document::mesh_loop() {
             size_t bytes=(retained_layout->vertices.size()+retained_layout->corners.size()+retained_layout->indices.size())*sizeof(uint32_t)+(paint_coordinates?paint_coordinates->size()*sizeof(std::array<float,2>):0);
             if(bytes>frame_layout_limit)throw std::length_error("Immutable surface layout exceeds cache budget");
             if(old!=frame_layouts.end()){frame_layout_bytes-=old->second.bytes;frame_layouts.erase(old);}
-            while(!frame_layouts.empty() && (frame_layouts.size()>=256 || bytes>frame_layout_limit-frame_layout_bytes)){auto expired=frame_layouts.begin();frame_layout_bytes-=expired->second.bytes;frame_layouts.erase(expired);}
+            reserve_layout(bytes);
             frame_layouts.emplace(o.id,FrameLayoutCache{mesh_owner,retained,paint_attachment,paint_coordinates,retained_layout,bytes,dynamic_canonical});frame_layout_bytes+=bytes;++frame_layout_builds;
           }
         }
@@ -1957,9 +1989,10 @@ void Document::mesh_loop() {
         if(frame)snapshot->ranges.back().affine_world=frame->world();
       }
       for(auto it=frame_layouts.begin();it!=frame_layouts.end();)if(!frame_objects.contains(it->first) || it->second.mesh.expired() || (it->second.frames.expired()&&it->second.paint.expired())){frame_layout_bytes-=it->second.bytes;it=frame_layouts.erase(it);}else ++it;
+      for(auto it=texture_layouts.begin();it!=texture_layouts.end();)if(!texture_objects.contains(it->first)){texture_layout_bytes-=it->second->owned_bytes();it=texture_layouts.erase(it);}else ++it;
       snapshot->normal_frame_layout_builds=frame_layout_builds;
       const bool has_polygon_colors=std::any_of(objects.begin(),objects.end(),[](const ObjectSurface &o){return bool(o.polygon_colors);});
-      if ((has_polygon_colors || !snapshot->paint_coordinates.empty() || job->weight_view || std::any_of(snapshot->ranges.begin(),snapshot->ranges.end(),[](const auto&r){return bool(r.affine_world);}) || ((published_.load()->object_grab_mode&&!published_.load()->object_grabbing)||published_.load()->selection_mode)) && !snapshot->mesh.indices.empty())
+      if ((!texture_objects.empty() || has_polygon_colors || !snapshot->paint_coordinates.empty() || job->weight_view || std::any_of(snapshot->ranges.begin(),snapshot->ranges.end(),[](const auto&r){return bool(r.affine_world);}) || ((published_.load()->object_grab_mode&&!published_.load()->object_grabbing)||published_.load()->selection_mode)) && !snapshot->mesh.indices.empty())
         snapshot->picking = std::make_shared<MaterialSurfaceQuery>(snapshot->mesh, snapshot->ranges, cancelled,snapshot->source_colors,PaintVertexCoordinates{snapshot->paint_coordinates});
       snapshot->sculpt_meshing.worker_ms=std::chrono::duration<double,std::milli>(std::chrono::steady_clock::now()-worker_start).count();
       if(expression_result){

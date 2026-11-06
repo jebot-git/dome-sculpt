@@ -19,7 +19,8 @@ bool bits(Vec3 a,Vec3 b){return bits(a.x,b.x)&&bits(a.y,b.y)&&bits(a.z,b.z);}
 }
 std::shared_ptr<const TextureSetSurfacePlan> prepare_texture_set_surface(const SculptObject&o,const TextureSetLimits&limits){
  limits.validate();stop(limits);
- if(!o.mesh_active||!o.painted||!o.texture_sets||o.painted->in_stroke())throw std::invalid_argument("Texture-set surface needs its actual finished current collection");
+ if(!o.id||!o.mesh_active||!o.painted||!o.texture_sets||o.painted->in_stroke())throw std::invalid_argument("Texture-set surface needs its actual finished current collection");
+ if(o.polygon&&o.polygon->colors)throw std::invalid_argument("Texture-set corner colours need their complete source/corner surface adapter");
  const auto&m=o.painted->mesh();const auto corners=m.indices.size(),faces=corners/3;
  if(corners>limits.maximum_corners||faces>limits.maximum_triangles)throw std::length_error("Texture-set surface geometry exceeds its declared bounds");
  plain(*o.painted,o.appearance.get(),o.material_bindings.get(),o.bake_recipe.get());
@@ -50,7 +51,7 @@ std::shared_ptr<const TextureSetSurfacePlan> prepare_texture_set_surface(const S
  // the packet. The fields below retain COW pixels rather than cloning them.
  o.texture_sets->validate(o,true,limits);
  auto plan=std::shared_ptr<TextureSetSurfacePlan>(new TextureSetSurfacePlan);
- plan->object_=o.id;plan->geometry_=o.painted->mesh_owner();plan->deformation_=o.deformation;plan->collection_=o.texture_sets;
+ plan->object_=o.id;plan->preparation_work_=forecast;plan->preparation_bytes_=bytes;plan->geometry_=o.painted->mesh_owner();plan->deformation_=o.deformation;plan->collection_=o.texture_sets;
  plan->fields_.reserve(o.texture_sets->additional().size()+1);plan->draws_.reserve(o.texture_sets->additional().size()+1);
  plan->indices_.reserve(corners);plan->corners_.reserve(corners);
  auto append=[&](TextureSetId id){

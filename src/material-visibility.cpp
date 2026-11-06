@@ -56,7 +56,7 @@ struct Visibility {
   std::vector<std::array<float,2>> paint_corners;
   explicit Visibility(const SurfaceRange &r, const Mesh &mesh,
                       std::span<const std::array<float,4>> packed_colors, bool explicit_colors, std::span<const std::array<float,2>> coordinates, bool per_vertex) : range(r) {
-    if(r.texture_set_proof)r.texture_set_proof->authenticate(r);
+    if(r.texture_set_proof){r.texture_set_proof->authenticate_stream(mesh,r);r.texture_set_proof->authenticate_tint(mesh,r,packed_colors);}
     else if(r.texture_set)throw std::invalid_argument("Visibility texture set lacks its actual field/range proof");
     cull = r.material.double_sided ? MToonCull::Off : MToonCull::Back;
     alpha = r.material.alpha; cutoff = r.material.alpha_cutoff; factor = r.material.color[3];
@@ -140,7 +140,7 @@ struct Visibility {
       color.validate(maps&&maps->source_maps?maps->source_maps->coordinate_count():owned_uv1?2:1);
       if(prepared){color=derived_view(maps,maps->pbr_color);color.wrap_s=color.wrap_t=33071;color.min_filter=color.mag_filter=9729;}
       if(explicit_colors) {
-        if(!packed_colors.empty()) {
+        if(!packed_colors.empty()&&!r.texture_set_proof) {
           size_t end=r.first_vertex;
           for(size_t c=r.first;c<r.first+r.count;++c){auto v=mesh.indices.at(c);if(v<r.first_vertex)throw std::invalid_argument("Packed visibility color offset is outside its range");end=std::max(end,size_t(v)+1);}
           if(end>packed_colors.size())throw std::invalid_argument("Packed visibility color range is incomplete");

@@ -13,6 +13,8 @@ struct TextureSetDraw {
 class TextureSetSurfacePlan {
 public:
   uint64_t object()const noexcept{return object_;}
+  size_t preparation_work()const noexcept{return preparation_work_;}
+  size_t preparation_bytes()const noexcept{return preparation_bytes_;}
   void authenticate_owner(const std::shared_ptr<const TextureSetSurfacePlan>&)const;
   const std::shared_ptr<const Mesh>&geometry()const noexcept{return geometry_;}
   const std::shared_ptr<const DeformationState>&deformation()const noexcept{return deformation_;}
@@ -30,6 +32,7 @@ private:
   TextureSetSurfacePlan(const TextureSetSurfacePlan&)=delete;
   TextureSetSurfacePlan(TextureSetSurfacePlan&&)=default;
   uint64_t object_=0;
+  size_t preparation_work_=0,preparation_bytes_=0;
   mutable std::weak_ptr<const TextureSetSurfacePlan>self_;
   std::shared_ptr<const Mesh>geometry_;
   std::shared_ptr<const DeformationState>deformation_;

@@ -1,5 +1,6 @@
 #include "native-paint-sampling.hpp"
 #include "native-paint-metadata.hpp"
+#include "texture-set-range.hpp"
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Matrix helpers adapted from OpenBrush Native (Apache-2.0).
 #include "dome/render.hpp"
@@ -168,17 +169,26 @@ struct SurfaceRenderer::TextureState {
   static bool native_float(const SurfaceRange &range) noexcept {
     return native_float(range.material,range.textures.get(),range.material_bindings.get());
   }
+  using MaterialKey=SurfaceMaterialIdentity;
+  struct MaterialHash {
+    size_t operator()(const MaterialKey&key)const noexcept{
+      const auto h=std::hash<uint64_t>{}(key.object);
+      return h^(std::hash<uint32_t>{}(key.texture_set)+size_t(0x9e3779b9)+(h<<6)+(h>>2));
+    }
+  };
+  template<class T>using MaterialMap=std::unordered_map<MaterialKey,T,MaterialHash>;
+  static MaterialKey material_key(const SurfaceRange&r)noexcept{return {r.object,r.texture_set};}
   GLint vertex_attributes=0;
-  std::unordered_map<uint64_t,Toon> toons;
+  MaterialMap<Toon> toons;
   MToonSourcePacks packed_sources;
   detail::PaintOverlayCompiler paint_overlays;
-  std::unordered_map<uint64_t,std::array<float,3>> physical_backgrounds;
+  MaterialMap<std::array<float,3>> physical_backgrounds;
   std::vector<std::array<float,2>> uv1;
   std::vector<std::array<float,2>> original_uv0,paint_coordinates;
   std::array<std::vector<std::array<float,4>>,3> extra_uv;
-  std::unordered_map<uint64_t,std::shared_ptr<const PaintSourceMaps>> source_maps;
+  MaterialMap<std::shared_ptr<const PaintSourceMaps>> source_maps;
   std::unordered_set<uint64_t> weighted;
-  std::unordered_set<uint64_t> vertex_alpha;
+  std::unordered_set<MaterialKey,MaterialHash> vertex_alpha;
   std::optional<double> frame_time;
   std::chrono::steady_clock::time_point started=std::chrono::steady_clock::now();
   SurfaceTextureLimits limits;
@@ -188,7 +198,7 @@ struct SurfaceRenderer::TextureState {
   uint64_t uploads=0;
   std::unordered_map<Key,ImageResource,KeyHash> images;
   std::unordered_map<Sampler,GLuint,SamplerHash> samplers;
-  std::unordered_map<uint64_t,Binding> bindings;
+  MaterialMap<Binding> bindings;
   explicit TextureState(SurfaceTextureLimits l):limits(l){
     if(!l.max_bytes||l.max_bytes>2ull*1024*1024*1024||!l.max_images||l.max_images>2048||!l.max_samplers||l.max_samplers>256)
       throw std::invalid_argument("Invalid GPU source texture resource bounds");
@@ -213,15 +223,17 @@ struct SurfaceRenderer::TextureState {
     if(geometry_changed) {
       for(auto color:mesh.source_colors)for(float c:color)if(!std::isfinite(c) || c<0 || c>1)throw std::invalid_argument("Source vertex colors must be finite linear RGBA");
       vertex_alpha.clear();
-      if(mesh.ranges.empty() && std::any_of(mesh.source_colors.begin(),mesh.source_colors.end(),[](const auto &c){return c[3]<1;}))vertex_alpha.insert(0);
+      if(mesh.ranges.empty() && std::any_of(mesh.source_colors.begin(),mesh.source_colors.end(),[](const auto &c){return c[3]<1;}))vertex_alpha.insert({0,0});
       if(!mesh.source_colors.empty())for(const auto &r:mesh.ranges) {
         if(r.first>mesh.mesh.indices.size() || r.count>mesh.mesh.indices.size()-r.first)throw std::invalid_argument("Source vertex-alpha range is invalid");
-        for(size_t c=r.first;c<r.first+r.count;++c)if(mesh.source_colors.at(mesh.mesh.indices[c])[3]<1){vertex_alpha.insert(r.object);break;}
+        for(size_t c=r.first;c<r.first+r.count;++c)if(mesh.source_colors.at(mesh.mesh.indices[c])[3]<1){vertex_alpha.insert(material_key(r));break;}
       }
     }
     if(!mesh.source_tangents.empty() && mesh.source_tangents.size()!=count)throw std::invalid_argument("Retained tangent frame size differs from geometry");
     if(geometry_changed)for(auto t:mesh.source_tangents){float n=length(Vec3{t[0],t[1],t[2]});if(!finite(Vec3{t[0],t[1],t[2]})||!std::isfinite(n)||n<1e-8f||(t[3]!=-1&&t[3]!=1))throw std::invalid_argument("Retained tangent frame is invalid");}
     for(const auto &range:mesh.ranges) {
+      if(range.texture_set_proof){range.texture_set_proof->authenticate(range);if(geometry_changed){range.texture_set_proof->authenticate_stream(mesh.mesh,range);range.texture_set_proof->authenticate_tint(mesh.mesh,range,mesh.source_colors);}}
+      else if(range.texture_set)throw std::invalid_argument("GPU texture set lacks its actual owning range proof");
       if(range.material_bindings&&range.material_bindings->physical_emission&&
          (range.textures&&!range.textures->source_only&&(!range.textures->overlay||!range.textures->overlay->native_geometry())))
         throw std::invalid_argument("Derived absolute emission requires its physical overlay adapter");
@@ -247,28 +259,29 @@ struct SurfaceRenderer::TextureState {
     struct PlanSlot {Key key;Sampler sampler;std::array<float,6>uv;bool present=false;int coordinate=0;};
     std::unordered_map<Key,Desired,KeyHash> wanted;
     std::unordered_set<Sampler,SamplerHash> wanted_samplers;
-    std::unordered_map<uint64_t,std::array<PlanSlot,16>> planned;
-    std::unordered_map<uint64_t,Toon> next_toons;std::vector<std::array<float,2>> next_uv1;
+    MaterialMap<std::array<PlanSlot,16>> planned;
+    MaterialMap<Toon> next_toons;std::vector<std::array<float,2>> next_uv1;
     std::vector<std::array<float,2>> next_original_uv0,next_paint_coordinates;
     std::array<std::vector<std::array<float,4>>,3> next_extra_uv;
-    std::unordered_map<uint64_t,std::shared_ptr<const PaintSourceMaps>> next_source_maps;
-    std::unordered_map<uint64_t,std::array<float,3>> next_physical_backgrounds;
+    MaterialMap<std::shared_ptr<const PaintSourceMaps>> next_source_maps;
+    MaterialMap<std::array<float,3>> next_physical_backgrounds;
     std::vector<detail::PaintOverlayCompiler::Input> overlay_inputs;
     for(auto &range:mesh.ranges){
-      auto maps=range.textures;auto &plan=planned[range.object];
+      auto maps=range.textures;auto &plan=planned[material_key(range)];
       if(range.material_bindings&&range.material_bindings->physical_emission)
-        next_physical_backgrounds.emplace(range.object,*range.material_bindings->physical_emission);
+        next_physical_backgrounds.emplace(material_key(range),*range.material_bindings->physical_emission);
       if(maps&&maps->overlay&&maps->overlay->native_geometry()){
         const auto &packet=*maps->overlay;const auto &owner=packet.source_maps();
         if(maps->source_only||owner!=maps->source_maps||owner.owner_before(maps->source_maps)||maps->source_maps.owner_before(owner)||
            packet.native_domain()!=(range.paint_sampling_attachment?range.paint_sampling_attachment->domain():nullptr))
           throw std::invalid_argument("Native emission packet lost its actual independent paint owners");
         const auto &basis=*packet.native_geometry();
-        if(basis.indices.size()!=range.count)throw std::invalid_argument("Native emission packet corner layout differs from the displayed geometry");
+        if(range.texture_set_proof){const auto&expected=range.texture_set_proof->plan()->geometry();if(packet.native_geometry()!=expected||packet.native_geometry().owner_before(expected)||expected.owner_before(packet.native_geometry()))throw std::invalid_argument("Texture-set emission borrowed a foreign geometry owner");}
+        else if(basis.indices.size()!=range.count)throw std::invalid_argument("Native emission packet corner layout differs from the displayed geometry");
         if(range.paint_sampling_attachment&&!range.paint_sampling_attachment->matches(packet.native_geometry(),packet.native_domain()))
           throw std::invalid_argument("Native emission packet borrowed another current geometry attachment");
         if(geometry_changed)for(size_t c=0;c<range.count;++c){
-          const auto logical=range.paint_winding_reversed&&c%3?c+(c%3==1?1:-1):c;
+          const auto logical=range.texture_set_proof?size_t(range.texture_set_proof->logical_corner(c,range.paint_winding_reversed)):range.paint_winding_reversed&&c%3?c+(c%3==1?1:-1):c;
           const auto expected=packet.native_domain()?packet.native_domain()->basis()->uv.at(packet.native_domain()->basis()->indices.at(packet.native_domain()->source_corners()[logical])):basis.uv.at(basis.indices.at(logical));
           const auto vertex=mesh.mesh.indices.at(range.first+c);
           const auto actual=mesh.paint_coordinates.empty()?mesh.mesh.uv.at(vertex):mesh.paint_coordinates.at(vertex);
@@ -296,12 +309,12 @@ struct SurfaceRenderer::TextureState {
         }
       }
       if(maps&&maps->source_maps){
-        const auto &owner=maps->source_maps;auto before=source_maps.find(range.object);
+        const auto &owner=maps->source_maps;auto before=source_maps.find(material_key(range));
         if(geometry_changed||before==source_maps.end()||before->second!=owner)owner->validate();
         // The trusted geometry token owns the REST coordinate dependencies.
         // Worker-expanded arrays may have fresh allocation owners while their
         // authenticated REST inputs and packed layout remain unchanged.
-        next_source_maps.emplace(range.object,owner);
+        next_source_maps.emplace(material_key(range),owner);
         if(geometry_changed)for(const auto &[set,values]:owner->extra_uv_sets){
           if(range.first_vertex>count||values->size()>count-range.first_vertex)throw std::invalid_argument("Extra source UV domain exceeds packed geometry");
           for(size_t c=range.first;c<range.first+range.count;++c)if(mesh.mesh.indices.at(c)<range.first_vertex||mesh.mesh.indices.at(c)-range.first_vertex>=values->size())throw std::invalid_argument("Extra source UV index is outside its packed owner");
@@ -379,7 +392,7 @@ struct SurfaceRenderer::TextureState {
       if(range.material_bindings) {
         range.material_bindings->validate(deep_material);
         if(range.material_bindings->has_mtoon&&!range.pbr_view)typed=range.material_bindings->material;
-      } else if(auto previous=toons.find(range.object);!range.pbr_view&&previous!=toons.end() &&
+      } else if(auto previous=toons.find(material_key(range));!range.pbr_view&&previous!=toons.end() &&
                 previous->second.appearance==range.appearance && !previous->second.source)typed=previous->second.material;
       else if(!range.pbr_view)typed=retained_mtoon(range.appearance.get());
       if(range.source_normal_only && ((typed && typed->parameters.normal_enabled && typed->parameters.normal_scale!=0 && typed->textures[size_t(MToonSlot::Normal)].index>=0) ||
@@ -471,7 +484,7 @@ struct SurfaceRenderer::TextureState {
           if(range.first>mesh.mesh.indices.size()||range.count>mesh.mesh.indices.size()-range.first)throw std::runtime_error("MToon packed index range is invalid");
           for(size_t n=range.first;n<range.first+range.count;++n)if(mesh.mesh.indices[n]<range.first_vertex||mesh.mesh.indices[n]>=range.first_vertex+appearance.source_vertices.size())throw std::runtime_error("MToon packed source vertex interval is invalid");
         }
-        next_toons.emplace(range.object,std::move(toon));continue;
+        next_toons.emplace(material_key(range),std::move(toon));continue;
       }
       if(!maps)continue;
       if(maps->source_only){
@@ -588,7 +601,7 @@ struct SurfaceRenderer::TextureState {
       source_packs.push_back(toon.packed_inputs);
     }
     packed_sources.prepare(source_packs,bytes+overlay_bytes,wanted.size()+overlay_images,limits);
-    std::unordered_map<uint64_t,Binding> ready;
+    MaterialMap<Binding> ready;
     for(auto &[object,plan]:planned){auto &binding=ready[object];for(int n=0;n<16;++n)if(plan[n].present)binding[n]={images.at(plan[n].key).id,samplers.at(plan[n].sampler),plan[n].uv,plan[n].coordinate};}
     bindings=std::move(ready);toons=std::move(next_toons);physical_backgrounds=std::move(next_physical_backgrounds);if(geometry_changed){uv1=std::move(next_uv1);extra_uv=std::move(next_extra_uv);original_uv0=std::move(next_original_uv0);paint_coordinates=next_paint_coordinates.empty()?mesh.paint_coordinates:std::move(next_paint_coordinates);}source_maps=std::move(next_source_maps);weighted=std::move(next_weighted);
   }
@@ -851,14 +864,15 @@ void SurfaceRenderer::draw(std::shared_ptr<const MeshSnapshot> mesh,
   glUniform1f(glGetUniformLocation(program_,"mt_aspect"),float(width)/height);
   auto seconds=textures_->frame_time.value_or(std::chrono::duration<double>(std::chrono::steady_clock::now()-textures_->started).count());glUniform1f(glGetUniformLocation(program_,"mt_time"),float(seconds));
   glBindVertexArray(vao_);
-  auto blended = [&](const Material &m, const TextureMaps *maps,uint64_t id,std::optional<float> alpha={}) {
+  auto blended = [&](const Material &m, const TextureMaps *maps,TextureState::MaterialKey key,std::optional<float> alpha={}) {
     if (m.alpha == Material::AlphaMode::Blend) return true;
     if (m.alpha != Material::AlphaMode::Automatic) return false;
-    return alpha.value_or(m.color[3]) < 1 || (maps && (maps->color_projection?maps->pbr_transparent:maps->transparent)) || textures_->vertex_alpha.contains(id);
+    return alpha.value_or(m.color[3]) < 1 || (maps && (maps->color_projection?maps->pbr_transparent:maps->transparent)) || textures_->vertex_alpha.contains(key);
   };
   bool ghost_pass=false;
   auto draw_range = [&](const Material &original, size_t first, size_t count,
-                        uint64_t id, const TextureMaps *maps,bool use_source=false,bool use_canonical=false,bool force_pbr=false,bool paint_domain=false,bool normal_domain=false,const SourceMaterialBindings *binding=nullptr,const detail::Vrm1SourceBackground *background=nullptr) {
+                        uint64_t id, const TextureMaps *maps,bool use_source=false,bool use_canonical=false,bool force_pbr=false,bool paint_domain=false,bool normal_domain=false,const SourceMaterialBindings *binding=nullptr,const detail::Vrm1SourceBackground *background=nullptr,uint32_t texture_set=0) {
+    const TextureState::MaterialKey key{id,texture_set};
     const bool native_float=TextureState::native_float(original,maps,binding);
     Material material = original;if(background){material.color=background->color;material.emissive=background->emission;}
     glUniform1f(glGetUniformLocation(program_,"relative_emission_strength"),background?background->relative_emission_strength:1);
@@ -878,7 +892,7 @@ void SurfaceRenderer::draw(std::shared_ptr<const MeshSnapshot> mesh,
     }
     std::array<GLint,5> present{},coordinates{};std::array<float,15> ux{},uy{};
     for(int n=0;n<5;++n){
-      TextureState::Slot slot;if(maps)slot=textures_->bindings.at(id)[n];
+      TextureState::Slot slot;if(maps)slot=textures_->bindings.at(key)[n];
       glActiveTexture(GL_TEXTURE0+n);glBindTexture(GL_TEXTURE_2D,slot.image);glBindSampler(n,slot.sampler);present[n]=slot.image!=0;coordinates[n]=slot.coordinate;
       ux[n*3]=slot.uv[0];ux[n*3+1]=slot.uv[1];ux[n*3+2]=slot.uv[4];uy[n*3]=slot.uv[2];uy[n*3+1]=slot.uv[3];uy[n*3+2]=slot.uv[5];
     }
@@ -888,7 +902,7 @@ void SurfaceRenderer::draw(std::shared_ptr<const MeshSnapshot> mesh,
     const bool source_bake=use_source && use_canonical && maps && maps->baked_base && !maps->baked_normal.rgba.empty();
     glUniform1i(glGetUniformLocation(program_,"source_baked_frame"),source_bake);
     glUniform1i(glGetUniformLocation(program_,"original_normal_present"),0);
-    if(source_bake){const auto &binding=textures_->bindings.at(id);
+    if(source_bake){const auto &binding=textures_->bindings.at(key);
       for(int n:{5,6}){glActiveTexture(GL_TEXTURE0+n);glBindTexture(GL_TEXTURE_2D,binding[n].image);glBindSampler(n,binding[n].sampler);}
       const auto &view=binding[5];glUniform1i(glGetUniformLocation(program_,"original_normal_coordinate"),view.coordinate);glUniform1i(glGetUniformLocation(program_,"original_normal_present"),view.image!=0);
       glUniform3f(glGetUniformLocation(program_,"original_normal_x"),view.uv[0],view.uv[1],view.uv[4]);glUniform3f(glGetUniformLocation(program_,"original_normal_y"),view.uv[2],view.uv[3],view.uv[5]);}
@@ -908,7 +922,7 @@ void SurfaceRenderer::draw(std::shared_ptr<const MeshSnapshot> mesh,
     glUniform1f(glGetUniformLocation(program_, "alpha_cutoff"), material.alpha_cutoff);
     glUniform4fv(glGetUniformLocation(program_, "base_color"), 1,
                  material.color.data());
-    const auto physical=textures_->physical_backgrounds.find(id);
+    const auto physical=textures_->physical_backgrounds.find(key);
     glUniform3fv(glGetUniformLocation(program_, "emission"),1,
       physical==textures_->physical_backgrounds.end()?material.emissive.data():physical->second.data());
     glUniform1f(glGetUniformLocation(program_, "metallic"), material.metallic);
@@ -920,7 +934,7 @@ void SurfaceRenderer::draw(std::shared_ptr<const MeshSnapshot> mesh,
       glEnable(GL_CULL_FACE);
       glCullFace(GL_BACK);
     }
-    if (blended(material, maps,id)) {
+    if (blended(material,maps,key)) {
       glEnable(GL_BLEND);
       glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE,
                           GL_ONE_MINUS_SRC_ALPHA);
@@ -952,14 +966,14 @@ void SurfaceRenderer::draw(std::shared_ptr<const MeshSnapshot> mesh,
     }
     u[0]=effective;
     if(t.derived){u[0]={1,1,1,1};u[2][0]=u[2][1]=u[2][2]=emission_strength;}
-    const auto background=textures_->physical_backgrounds.find(r.object);
+    const auto background=textures_->physical_backgrounds.find(TextureState::material_key(r));
     if(t.overlay)u[0]={1,1,1,1};
     if(t.overlay||t.native_emission||background!=textures_->physical_backgrounds.end())u[2][0]=u[2][1]=u[2][2]=1;
     auto original=Material::AlphaMode(source.alpha);
     if(r.material.alpha!=Material::AlphaMode::Automatic&&r.material.alpha!=original)u[8][1]=r.material.alpha==Material::AlphaMode::Opaque?0:r.material.alpha==Material::AlphaMode::Mask?1:2;
     if(r.material.alpha_cutoff!=source.alpha_cutoff)u[6][3]=r.material.alpha_cutoff;
     std::array<GLint,16> present{},coordinates{},derived{},channels{};std::array<float,32> offsets{},scales{};std::array<float,16> rotations{};std::array<float,6> pbrx{},pbry{};
-    auto &binding=textures_->bindings.at(r.object);
+    auto &binding=textures_->bindings.at(TextureState::material_key(r));
     for(int n=0;n<16;++n){auto &slot=binding[n];glActiveTexture(GL_TEXTURE0+n);
       if(n==14){glBindTexture(GL_TEXTURE_BUFFER,(t.derived||t.overlay)?textures_->packed_sources.at(t.packed_inputs).texture:0);glBindSampler(n,0);}
       else {glBindTexture(GL_TEXTURE_2D,slot.image);glBindSampler(n,slot.sampler);}
@@ -1012,7 +1026,7 @@ void SurfaceRenderer::draw(std::shared_ptr<const MeshSnapshot> mesh,
   else {
     std::vector<const SurfaceRange*> ordered;for(auto &r:cached_->ranges)ordered.push_back(&r);
     auto is_ghost=[&](uint64_t id){auto i=std::find_if(display.begin(),display.end(),[&](const auto &o){return o.id==id;});return i!=display.end() && i->ghost;};
-    auto queue=[&](const SurfaceRange&r){if(is_ghost(r.object))return 3500;auto toon=textures_->toons.find(r.object);if(toon!=textures_->toons.end())return toon_state(r,toon->second,false).queue;const auto background=detail::vrm1_source_background(r.material,r.material_bindings.get(),r.appearance.get(),r.textures.get(),r.pbr_view);return blended(r.material,r.textures.get(),r.object,background?std::optional<float>(background->color[3]):std::nullopt)?3000:r.material.alpha==Material::AlphaMode::Mask?2450:2000;};
+    auto queue=[&](const SurfaceRange&r){if(is_ghost(r.object))return 3500;auto toon=textures_->toons.find(TextureState::material_key(r));if(toon!=textures_->toons.end())return toon_state(r,toon->second,false).queue;const auto background=detail::vrm1_source_background(r.material,r.material_bindings.get(),r.appearance.get(),r.textures.get(),r.pbr_view);return blended(r.material,r.textures.get(),TextureState::material_key(r),background?std::optional<float>(background->color[3]):std::nullopt)?3000:r.material.alpha==Material::AlphaMode::Mask?2450:2000;};
     std::stable_sort(ordered.begin(),ordered.end(),[&](auto a,auto b){return queue(*a)<queue(*b);});
     for(auto r:ordered){
       if(replaced_object&&r->object==replaced_object)continue;
@@ -1048,8 +1062,8 @@ void SurfaceRenderer::draw(std::shared_ptr<const MeshSnapshot> mesh,
       glUniform1i(glGetUniformLocation(program_,"clip_enabled"),cached_->clipped_object&&r->object==cached_->clipped_object);
       bool weighted=!ghost_pass && textures_->weighted.contains(r->object);
       glUniform1i(glGetUniformLocation(program_,"weight_pass"),weighted);
-      auto typed=textures_->toons.find(r->object);
-      if(typed==textures_->toons.end()){const auto background=detail::vrm1_source_background(r->material,r->material_bindings.get(),r->appearance.get(),r->textures.get(),r->pbr_view);draw_range(r->material,r->first,r->count,r->object,r->textures.get(),r->source_frame,r->canonical_frame,r->pbr_view,bool(r->paint_sampling_attachment),bool(detail::retained_normal_coordinates(r->material_bindings.get(),r->textures.get())),r->material_bindings.get(),background?&*background:nullptr);}
+      auto typed=textures_->toons.find(TextureState::material_key(*r));
+      if(typed==textures_->toons.end()){const auto background=detail::vrm1_source_background(r->material,r->material_bindings.get(),r->appearance.get(),r->textures.get(),r->pbr_view);draw_range(r->material,r->first,r->count,r->object,r->textures.get(),r->source_frame,r->canonical_frame,r->pbr_view,bool(r->paint_sampling_attachment),bool(detail::retained_normal_coordinates(r->material_bindings.get(),r->textures.get())),r->material_bindings.get(),background?&*background:nullptr,r->texture_set);}
       else{
         draw_toon(*r,typed->second,false);
         if(!ghost_pass&&!weighted&&typed->second.material.parameters.outline!=MToonOutline::None&&typed->second.material.parameters.outline_width>0)

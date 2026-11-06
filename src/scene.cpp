@@ -1,3 +1,4 @@
+#include "texture-set-surface.hpp"
 #include "dome/texture-sets.hpp"
 #include "texture-set-graph.hpp"
 #include "texture-set-archive.hpp"
@@ -143,6 +144,7 @@ uint64_t Scene::duplicate(uint64_t id) {
   active_=next_++;return active_;
 }
 Mesh ObjectSurface::preview_mesh() const {
+  if(texture_set_surface)throw std::logic_error("A texture-set bundle needs its complete per-material geometry consumer");
   return deformation ? deformation->preview(mesh) : mesh;
 }
 void Scene::set_deformation(uint64_t id, DeformationState state) {
@@ -731,7 +733,7 @@ Scene Scene::decode(const nlohmann::json &j) {
     if(version==40&&!o.at("texture_sets").is_null()&&(!o.at("painted").is_null()||o.at("mesh_active")!=true))throw std::invalid_argument("Texture-set geometry cannot have a second mutable primary owner");
   }
   if(version==40)for(const auto&o:objects){
-    size_t count=o.at("mesh_active")==true&&!o.at("painted").is_null()?1:0;
+    size_t count=1; // The implicit material slot also belongs to a volume object.
     if(!o.at("texture_sets").is_null()){
       count=1;
       const auto &extra=o.at("texture_sets").at("additional");
@@ -1311,11 +1313,25 @@ std::vector<ObjectSurface> Scene::export_surfaces(const std::function<bool()> &c
 std::vector<ObjectSurface> Scene::preview_surfaces(const std::function<bool()> &cancelled, const SculptMesher &mesher) const {
   return surfaces_impl(false, true, cancelled, mesher);
 }
-std::vector<ObjectSurface> Scene::surfaces_impl(bool atlas, bool preview, const std::function<bool()> &cancelled, const SculptMesher &mesher) const {
-  for(const auto &o:objects_)if(o.texture_sets)throw std::logic_error("Texture-set surfaces require their owning subset render/export adapter");
+std::vector<ObjectSurface> Scene::preview_surface_bundles(const std::function<bool()> &cancelled,const SculptMesher &mesher)const {
+  return surfaces_impl(false,true,cancelled,mesher,true);
+}
+std::vector<ObjectSurface> Scene::surfaces_impl(bool atlas, bool preview, const std::function<bool()> &cancelled, const SculptMesher &mesher,bool texture_bundles) const {
+  bool has_sets=false;for(const auto &o:objects_)if(o.texture_sets){has_sets=true;if(!texture_bundles)throw std::logic_error("Texture-set surfaces require their owning subset render/export adapter");}
+  if(has_sets)detail::validate_texture_set_graph(*this);
   std::vector<ObjectSurface> result;
   for (auto &o : objects_)
     if (o.visible) {
+      if(o.texture_sets){
+        if(!preview||atlas)throw std::logic_error("Texture-set bundles cannot substitute the multi-primitive export compiler");
+        TextureSetLimits limits;limits.cancelled=cancelled;
+        auto plan=detail::prepare_texture_set_surface(o,limits);
+        if(plan->indices().empty())continue;
+        ObjectSurface surface;surface.id=o.id;surface.name=o.name;surface.transform=o.transform;
+        surface.material=o.material;surface.deformation=o.deformation;surface.groups=group_path(o.group);
+        surface.affine_edit=o.affine_edit;surface.rig_source=o.rig_source;surface.texture_set_surface=std::move(plan);
+        result.push_back(std::move(surface));continue;
+      }
       if(o.mesh_active&&o.painted&&o.painted->paint_sampling_domain()){
         if(atlas)throw std::invalid_argument("Retained writable paint needs its explicit compact/current-layout compilation adapter");
         if(!o.painted->valid_paint_sampling_attachment())throw std::invalid_argument("Retained paint lost its exact REST geometry attachment");
