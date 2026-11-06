@@ -45,3 +45,11 @@ Only afterP1's actual outcome, separately propose/admit P4 (`--objects 4 --voxel
 independent declared cases, not automatic lower-density fallback. Any subsequent
 production software or Arc timing run requires its own bounded plan and go.
 The coordinated hardware lock remains `/tmp/dome-sculpt-arc-device.lock`.
+
+P1 executed exactly as approved and closed1 after3.91s. Actual current Document
+refused cold publication with `Sculpt chunk working byte limit exceeded`; no
+production snapshot or triangle count was accepted. Observed treeRSS295702528B
+stayed below3GiB. All282 providers/source/SDK/ELF/runtime bytes remain exact. No
+fallback, quota change, P4/P16, sustained or Arc run occurred. Preserve this
+consumer/failed input/output; the real meshing/envelope limitation is next work
+in a new isolated current child. See validation/SCULPT-P1-INVENTORY-REFUSAL.json.
