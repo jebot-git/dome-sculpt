@@ -19,7 +19,7 @@ void float_stroke(Document&d){
  expect(d.begin_native_stroke()&&d.sample_native_stroke(sample),"Actual native gesture hits the genuine current writable grid");d.end_native_stroke();expect(d.wait_native_stroke(std::chrono::seconds(120)),"Native physical gesture finishes");settled(d);expect(d.copy_scene().active().painted->has_physical_emission(),"Real FLOAT emission metadata is present");
 }
 Scene source(bool canonical,bool reflected){
- Scene s;if(canonical)s=mirror_conversion_model();else{auto m=mirrored_fan();m.indices={0,1,2,0,2,3};m.positions.resize(4);m.normals.resize(4);m.uv.resize(4);m.uv_pins.resize(4);s.active().mesh_active=true;s.active().painted=std::make_shared<PaintedMesh>(m,64);}
+ Scene s;if(canonical)s=mirror_conversion_model();else{auto m=mirrored_fan();m.indices={0,1,2,0,2,3};m.positions.resize(4);m.normals.resize(4);m.uv.resize(4);m.uv[3]={.1f,.5f};m.uv_pins.resize(4);s.active().mesh_active=true;s.active().painted=std::make_shared<PaintedMesh>(m,64);}
  auto a=AffineTransform{}.matrix();a[0]=reflected?-1.2:1.2;a[1]=.1;a[4]=.3;a[5]=.8;a[9]=.15;a[10]=1.1;a[12]=.02;a[14]=.1;s.active().affine_edit=std::make_shared<const NativeAffineEdit>(AffineTransform(a));s.validate();return s;
 }
 void drag(Document&d,bool cancel){
