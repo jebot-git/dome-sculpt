@@ -20,7 +20,7 @@ void float_stroke(Document&d){
 }
 Scene source(bool canonical,bool reflected){
  Scene s;if(canonical)s=mirror_conversion_model();else{auto m=mirrored_fan();m.indices={0,1,2,0,2,3};m.positions.resize(4);m.normals.resize(4);m.uv.resize(4);m.uv[3]={.1f,.5f};m.uv_pins.resize(4);s.active().mesh_active=true;s.active().painted=std::make_shared<PaintedMesh>(m,64);}
- auto a=AffineTransform{}.matrix();a[0]=reflected?-1.2:1.2;a[1]=.1;a[4]=.3;a[5]=.8;a[9]=.15;a[10]=1.1;a[12]=.02;a[14]=.1;s.active().affine_edit=std::make_shared<const NativeAffineEdit>(AffineTransform(a));s.validate();return s;
+ auto a=AffineTransform{}.matrix();a[0]=reflected?-1.2:1.2;a[1]=.1;a[4]=.3;a[5]=.8;a[9]=.15;a[10]=1.1;a[12]=.02;a[14]=.1;if(!canonical)s.active().affine_edit=std::make_shared<const NativeAffineEdit>(AffineTransform(a));s.validate();return s;
 }
 void drag(Document&d,bool cancel){
  const auto scene=d.copy_scene();const auto topo=d.frame().state->polygon->topology;const auto mesh=topo->triangulate().mesh;const auto c=mesh.indices.front();const auto p=world_point(scene,mesh.positions[c]*.3f+mesh.positions[mesh.indices[1]]*.3f+mesh.positions[mesh.indices[2]]*.4f);const auto matrix=scene.world_matrix(scene.active().id);auto v=matrix.normal({mesh.normals[c].x,mesh.normals[c].y,mesh.normals[c].z});Vec3 n=normalized(Vec3{float(v[0]),float(v[1]),float(v[2])});
@@ -40,7 +40,7 @@ void before_only(const Scene&current){
 }
 void run(bool canonical,bool reflected,bool flip,const std::filesystem::path&out){
  Document d;d.replace(source(canonical,reflected));d.shading(false);settled(d);
- if(canonical){d.convert_baked_normals();settled(d);d.edit_scene("Actual current morph evaluation",[](Scene&s,const auto&){auto df=std::make_shared<DeformationState>(*s.active().deformation);df->morph_weights.assign(df->morphs->targets.size(),.35f);s.active().deformation=df;});settled(d);}
+ if(canonical){d.convert_baked_normals();settled(d);d.edit_scene("Actual post-conversion affine placement and morph evaluation",[reflected](Scene&s,const auto&){auto a=AffineTransform{}.matrix();a[0]=reflected?-1.2:1.2;a[1]=.1;a[4]=.3;a[5]=.8;a[9]=.15;a[10]=1.1;a[12]=.02;a[14]=.1;s.active().affine_edit=std::make_shared<const NativeAffineEdit>(AffineTransform(a));auto df=std::make_shared<DeformationState>(*s.active().deformation);df->morph_weights.assign(df->morphs->targets.size(),.35f);s.active().deformation=df;});settled(d);}
  float_stroke(d);
  if(canonical){ShapeKeyEdit key;key.action=ShapeKeyAction::Create;key.name="Before field polygon key";d.author_shape(key);settled(d);key.action=ShapeKeyAction::Replace;key.target=d.frame().state->morph_target;key.positions=d.copy_scene().active().painted->mesh().positions;key.positions[1].z+=.003f;d.author_shape(key);settled(d);d.begin_uv();expect(d.wait_uv(),"Actual canonical UV workspace prepares");d.edit_uv(UvAction::Scale,.8f);expect(d.wait_uv(),"Actual required canonical paint/normal retention scales");d.end_uv(true);settled(d);expect(bool(d.copy_scene().active().material_bindings->canonical_paint_sampling),"Real before graph contains owning37, current key and FLOAT paint");}
  const auto before=d.copy_scene().encode();const auto rev=d.frame().state->revision;
