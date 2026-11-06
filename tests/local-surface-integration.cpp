@@ -2,6 +2,7 @@
 #include "brush_kernel.hpp"
 #include "dome/document.hpp"
 #include "dome/local-surface.hpp"
+#include "sculpt-placed-chunks.hpp"
 #include <atomic>
 #include <bit>
 #include <cstdlib>
@@ -12,7 +13,8 @@ namespace {
 thread_local int64_t fail_allocation = -1, fail_after_backend = -1;
 thread_local bool arm_backend = false, count_allocations = false;
 thread_local size_t allocations = 0;
-std::atomic_bool fail_materialization{false};
+std::atomic_bool fail_capture{false};
+std::atomic_size_t injected_capture_failures{0};
 void reset_allocations() {
   fail_allocation = -1;
   fail_after_backend = -1;
@@ -55,22 +57,23 @@ std::string_view instrumented_backend() {
   return "CPU (shared kernel; allocation instrumentation)";
 }
 } // namespace dome
-extern "C" dome::Mesh real_materialize(
-    const dome::LocalSurfaceCache *,
-    dome::LocalSurfaceCache::Cancel) asm("__real__"
-                                         "ZNK4dome17LocalSurfaceCache11material"
-                                         "izeESt8functionIFbvEE");
-extern "C" dome::Mesh wrapped_materialize(
-    const dome::LocalSurfaceCache *,
-    dome::LocalSurfaceCache::Cancel) asm("__wrap__"
-                                         "ZNK4dome17LocalSurfaceCache11material"
-                                         "izeESt8functionIFbvEE");
-extern "C" dome::Mesh
-wrapped_materialize(const dome::LocalSurfaceCache *cache,
-                    dome::LocalSurfaceCache::Cancel cancel) {
-  auto result = real_materialize(cache, std::move(cancel));
-  if (fail_materialization.exchange(false))
-    throw std::bad_alloc();
+// The real worker now captures immutable chunk/scalar/query owners. Inject at
+// that actual factory return boundary, after genuine preparation and before
+// publication. The legacy materializer remains separately tested below.
+extern "C" dome::detail::SculptScenePreview real_capture(
+    const dome::Scene &,dome::detail::SculptSceneChunkContext,
+    const dome::detail::SculptSceneChunks::Ptr &,dome::detail::SculptSceneChunkLimits,
+    dome::LocalSurfaceCache::Cancel) asm("__real__ZN4dome6detail17SculptSceneChunks7captureERKNS_5SceneENS0_23SculptSceneChunkContextERKSt10shared_ptrIKS1_ENS0_22SculptSceneChunkLimitsESt8functionIFbvEE");
+extern "C" dome::detail::SculptScenePreview wrapped_capture(
+    const dome::Scene &,dome::detail::SculptSceneChunkContext,
+    const dome::detail::SculptSceneChunks::Ptr &,dome::detail::SculptSceneChunkLimits,
+    dome::LocalSurfaceCache::Cancel) asm("__wrap__ZN4dome6detail17SculptSceneChunks7captureERKNS_5SceneENS0_23SculptSceneChunkContextERKSt10shared_ptrIKS1_ENS0_22SculptSceneChunkLimitsESt8functionIFbvEE");
+extern "C" dome::detail::SculptScenePreview wrapped_capture(
+    const dome::Scene &scene,dome::detail::SculptSceneChunkContext context,
+    const dome::detail::SculptSceneChunks::Ptr &before,dome::detail::SculptSceneChunkLimits limits,
+    dome::LocalSurfaceCache::Cancel cancel) {
+  auto result=real_capture(scene,context,before,limits,std::move(cancel));
+  if(fail_capture.exchange(false)){++injected_capture_failures;throw std::bad_alloc();}
   return result;
 }
 using namespace dome;
@@ -150,6 +153,38 @@ Mesh whole_scene(const Scene &scene) {
       result.indices.push_back(offset + i);
   }
   return result;
+}
+bool same_preview(const MeshSnapshot &snapshot,const Scene &scene,const Mesh *reference=nullptr) {
+  const Mesh expected=reference?Mesh{}:whole_scene(scene);
+  const auto &oracle=reference?*reference:expected;
+  size_t cursor=0;
+  auto corner=[&](Vec3 position,Vec3 normal){
+    if(cursor>=oracle.indices.size())throw std::runtime_error("Actual preview has extra ordered corners");
+    const auto vertex=oracle.indices[cursor++];
+    if(!same(position,oracle.positions.at(vertex))||!same(normal,oracle.normals.at(vertex)))
+      throw std::runtime_error("Actual typed preview differs from independent whole-scene corner/normal bits");
+  };
+  std::vector<uint64_t> order;
+  for(const auto &object:scene.objects())order.push_back(object.id);
+  if(snapshot.sculpt_chunks&&snapshot.sculpt_chunks->object_order()!=order)return false;
+  for(const auto &object:scene.objects()) {
+    if(!object.visible)continue;
+    const auto *chunk=snapshot.sculpt_chunks?snapshot.sculpt_chunks->find(object.id):nullptr;
+    if(chunk) {
+      if(std::any_of(snapshot.ranges.begin(),snapshot.ranges.end(),[&](const auto &r){return r.object==object.id;}))return false;
+      chunk->geometry->for_each_run([&](const dome::detail::SculptSurfaceRun &run){
+        const auto placed=chunk->placed->find(run.chunk);const auto &mesh=*placed->geometry_owner();
+        for(size_t c=run.first;c<run.first+run.count;++c){const auto vertex=mesh.indices.at(c);corner(chunk->placed_position(mesh.positions.at(vertex)),chunk->placed_normal(mesh.normals.at(vertex)));}
+      });
+    }else for(const auto &range:snapshot.ranges)if(range.object==object.id)
+      for(size_t c=range.first;c<range.first+range.count;++c){const auto vertex=snapshot.mesh.indices.at(c);corner(snapshot.mesh.positions.at(vertex),snapshot.mesh.normals.at(vertex));}
+  }
+  return cursor==oracle.indices.size();
+}
+const dome::detail::SculptObjectChunks &chunk_object(const MeshSnapshot &snapshot,uint64_t id) {
+  const auto *object=snapshot.sculpt_chunks?snapshot.sculpt_chunks->find(id):nullptr;
+  if(!object)throw std::runtime_error("A genuine visible generated object has no immutable chunk owner");
+  return *object;
 }
 void ready(Document &d) {
   if (!d.wait_mesh(std::chrono::seconds(30)))
@@ -258,7 +293,7 @@ int main(int argc, char **argv) try {
       Mesh oracle;
       auto scene = d.copy_scene();
       reference += timed([&] { oracle = whole_scene(scene); });
-      if (!same(oracle, f.surface->mesh))
+      if (!same_preview(*f.surface,scene,&oracle))
         throw std::runtime_error(
             "End-to-end benchmark differs from whole-scene oracle");
     }
@@ -570,8 +605,11 @@ int main(int argc, char **argv) try {
     auto held = d.frame().surface;
     check(bool(held->geometry_identity),
           "Product mesh publishes a strong opaque geometry identity");
+    check(held->sculpt_chunks&&held->sculpt_chunks->objects().size()==2&&
+              held->mesh.indices.empty()&&held->ranges.empty(),
+          "Actual generated objects occupy typed chunk owners without a hidden flat packed copy");
     check(held->sculpt_meshing.full_rebuilds == 2 &&
-              same(held->mesh, whole_scene(d.copy_scene())),
+              same_preview(*held,d.copy_scene()),
           "Actual Document worker initially builds both grouped source objects "
           "exactly");
     for (int i = 0; i < 12; ++i) {
@@ -584,30 +622,40 @@ int main(int argc, char **argv) try {
     auto frame = d.frame();
     check(frame.surface->sculpt_meshing.local_updates == 1 &&
               frame.surface->sculpt_meshing.objects_reused == 1 &&
-              frame.surface->sculpt_meshing.samples_scanned == 0 &&
-              same(frame.surface->mesh, whole_scene(d.copy_scene())),
+              chunk_object(*frame.surface,first).geometry->report().kind==dome::detail::SculptChunkReport::Kind::Local &&
+              !chunk_object(*frame.surface,first).geometry->report().extraction_directory_copy &&
+              chunk_object(*frame.surface,other).geometry==chunk_object(*held,other).geometry &&
+              chunk_object(*frame.surface,other).placed==chunk_object(*held,other).placed &&
+              same_preview(*frame.surface,d.copy_scene()),
           "Real asynchronous worker coalesces long strokes while retaining "
           "another grouped object's tiles");
-    check(frame.surface->geometry_identity != held->geometry_identity,
-          "Actual geometry edits invalidate the upload identity");
-    check(held->mesh.indices.size() != 0 &&
+    check(chunk_object(*frame.surface,first).geometry!=chunk_object(*held,first).geometry &&
+              chunk_object(*frame.surface,first).placed!=chunk_object(*held,first).placed &&
+              frame.surface->geometry_identity==held->geometry_identity,
+          "Real generated geometry changes its own upload owners without invalidating an unchanged separate packed identity");
+    check(chunk_object(*held,first).geometry->report().indices!=0 &&
               held->sculpt_meshing.full_rebuilds == 2,
           "Previously acquired immutable Document snapshot remains unchanged");
     check(d.undo(), "Document undo available");
     ready(d);
-    check(same(d.frame().surface->mesh, whole_scene(d.copy_scene())),
+    check(same_preview(*d.frame().surface,d.copy_scene()),
           "Document history undo preserves whole-scene oracle equivalence");
     check(d.redo(), "Document redo available");
     ready(d);
-    check(same(d.frame().surface->mesh, whole_scene(d.copy_scene())),
+    check(same_preview(*d.frame().surface,d.copy_scene()),
           "Document history redo preserves whole-scene oracle equivalence");
-    auto geometry_token = d.frame().surface->geometry_identity;
+    const auto geometric=d.frame().surface;
+    auto geometry_token=geometric->geometry_identity;
+    const auto geometry_owner=chunk_object(*geometric,first).geometry;
+    const auto placed_owner=chunk_object(*geometric,first).placed;
     auto settings = d.frame().state->sculpt_settings;
     settings.mask_edit = true;
     d.sculpt_settings(settings);
     ready(d);
-    check(d.frame().surface->geometry_identity == geometry_token,
-          "Mask-control publications retain exact static geometry identity");
+    check(d.frame().surface->geometry_identity==geometry_token &&
+              chunk_object(*d.frame().surface,first).geometry==geometry_owner &&
+              chunk_object(*d.frame().surface,first).placed==placed_owner,
+          "Mask-control publications retain exact packed and generated geometry/placed identities");
     auto stats = d.frame().surface->sculpt_meshing;
     check(stats.objects_reused == 2 && stats.rebuilt_tiles == 0 &&
               stats.materialize_ms == 0,
@@ -617,33 +665,38 @@ int main(int argc, char **argv) try {
     ready(d);
     stats = d.frame().surface->sculpt_meshing;
     check(stats.objects_reused == 2 && stats.rebuilt_tiles == 0 &&
-              same(d.frame().surface->mesh, whole_scene(d.copy_scene())),
+              same_preview(*d.frame().surface,d.copy_scene()),
           "Actual mask stroke changes overlay while preserving cached grouped "
           "geometry");
-    check(d.frame().surface->geometry_identity == geometry_token,
-          "Mask painting preserves static geometry identity while scalar "
-          "overlay changes");
+    check(d.frame().surface->geometry_identity==geometry_token &&
+              chunk_object(*d.frame().surface,first).geometry==geometry_owner &&
+              chunk_object(*d.frame().surface,first).placed==placed_owner &&
+              chunk_object(*d.frame().surface,first).masks!=chunk_object(*geometric,first).masks,
+          "Real mask painting changes scalar owners while preserving exact packed and generated geometry/BVH identities");
     auto object = d.copy_scene().active();
     auto material = object.material;
     material.color = {.1f, .6f, .2f, 1};
     d.object_properties(object.id, object.name, object.visible, object.locked,
                         object.transform, material);
     ready(d);
-    check(d.frame().surface->geometry_identity == geometry_token,
-          "Material-factor-only publication reuses geometry identity");
+    check(d.frame().surface->geometry_identity==geometry_token &&
+              chunk_object(*d.frame().surface,first).geometry==geometry_owner &&
+              chunk_object(*d.frame().surface,first).placed==placed_owner,
+          "Material-factor-only publication reuses packed and generated geometry/BVH identities");
     auto moved = object.transform;
     moved.position.x += .01f;
     d.object_properties(object.id, object.name, object.visible, object.locked,
                         moved, material);
     ready(d);
-    check(d.frame().surface->geometry_identity != geometry_token &&
-              same(d.frame().surface->mesh, whole_scene(d.copy_scene())),
-          "World/group transform dependencies invalidate static geometry "
-          "identity");
+    check(d.frame().surface->geometry_identity==geometry_token &&
+              chunk_object(*d.frame().surface,first).geometry==geometry_owner &&
+              chunk_object(*d.frame().surface,first).placed!=placed_owner &&
+              same_preview(*d.frame().surface,d.copy_scene()),
+          "Real authored world/group movement replaces placed owners but retains local geometry and unchanged packed identity");
     d.replace(sphere());
     ready(d);
     check(d.frame().surface->sculpt_meshing.full_rebuilds == 1 &&
-              same(d.frame().surface->mesh, whole_scene(d.copy_scene())),
+              same_preview(*d.frame().surface,d.copy_scene()),
           "Generation replacement cannot reuse old-object cache ancestry");
   }
   {
@@ -699,20 +752,22 @@ int main(int argc, char **argv) try {
     d.replace(sphere());
     ready(d);
     auto held = d.frame().surface;
-    fail_materialization = true;
+    const auto failures_before=injected_capture_failures.load();
+    fail_capture=true;
     doc_stroke(d, brush({.32f, .03f, .01f}));
     auto deadline = std::chrono::steady_clock::now() + std::chrono::seconds(10);
     while (d.frame().state->error.empty() &&
            std::chrono::steady_clock::now() < deadline)
       std::this_thread::sleep_for(std::chrono::milliseconds(1));
-    check(!d.frame().state->error.empty() && d.frame().surface == held,
+    check(!d.frame().state->error.empty() && d.frame().surface==held &&
+              injected_capture_failures.load()==failures_before+1,
           "Actual worker allocation failure retains prior immutable geometry "
           "and upload identity");
     d.report_error({});
     doc_stroke(d, brush({.32f, -.03f, .02f}, Tool::Clay));
     ready(d);
     check(d.frame().surface->sculpt_meshing.local_updates == 1 &&
-              same(d.frame().surface->mesh, whole_scene(d.copy_scene())),
+              same_preview(*d.frame().surface,d.copy_scene()),
           "Mesh worker recovers after failed publication using authenticated "
           "skipped-event ancestry");
   }

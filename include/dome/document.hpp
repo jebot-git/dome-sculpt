@@ -30,6 +30,7 @@
 #include <span>
 #include <thread>
 namespace dome {
+namespace detail {class SculptSceneChunks;}
 class MaterialSurfaceQuery;
 namespace detail {class TextureSetRangeProof;class TextureSetStrokeLease;}
 struct SpatialHand {
@@ -245,6 +246,11 @@ struct MeshSnapshot {
   std::vector<std::array<float,2>> paint_coordinates; // Explicit packed vertices.
   bool pbr_view = false;
   uint64_t view_epoch = 0;
+  // Genuine separate Volume preview geometry. Flat mesh/ranges keep their
+  // existing meaning; no empty fake ranges or opaque-owner casts authorize
+  // chunks. This appended snapshot field requires a coherent producer and
+  // consumer rebuild, including frontend, renderer, query and Cut helpers.
+  std::shared_ptr<const detail::SculptSceneChunks> sculpt_chunks{};
 };
 struct AssetSource {
   uint64_t generation = 0, revision = 0, object = 0, edit_authority = 0;

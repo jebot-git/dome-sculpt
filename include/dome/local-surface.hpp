@@ -5,6 +5,7 @@
 #include <memory>
 #include <span>
 namespace dome {
+namespace detail { class SculptSurfaceChunks; }
 // Inclusive lattice SAMPLE bounds, before the mesher's support halo. Producers
 // must include every changed value (including erased values), not just
 // negatives.
@@ -89,7 +90,12 @@ public:
   static Int3 tile_coordinate(Int3 cell);
 
 private:
+  friend class detail::SculptSurfaceChunks;
   LocalSurfaceCache() = default;
+  // Explicit legacy operation adapter for genuine private packet owners. A
+  // complete ordered map is assembled only at Cut/export/repair boundaries.
+  // Never used by the incremental preview update itself.
+  static Mesh materialize_packets(Owner,Tiles,LocalSurfaceLimits,Cancel);
   Ptr update_regions(const Volume &, std::span<const SurfaceSampleRegion>,
                      Cancel) const;
   Owner source_;

@@ -271,9 +271,9 @@ void Document::native_loop(){
               if(hit&&hit->distance+target_epsilon<ray.distance)return {};
               if(scene_query){
                 const auto world=point(world_from_reference,p);const auto scene_ray=world_projector->camera_ray(world);
-                auto occluder=scene_query->raycast_excluding(scene_ray.origin,scene_ray.direction,
+                auto occluder=scene_query->raycast_excluding_target(scene_ray.origin,scene_ray.direction,
                     scene_ray.distance+settings.image.visibility_epsilon,sample->material_time,session->projection_excluded);
-                if(occluder&&occluder->distance+settings.image.visibility_epsilon<scene_ray.distance)return {};
+                if(occluder&&occluder->surface.distance+settings.image.visibility_epsilon<scene_ray.distance)return {};
               }
             }
             return PaintedMesh::PaintSample{projected->settings,projected->opacity};

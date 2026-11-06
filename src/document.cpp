@@ -50,6 +50,7 @@
 #include "texture-set-stroke.hpp"
 #include "texture-set-controls.hpp"
 #include "texture-set-surface.hpp"
+#include "sculpt-scene-chunks.hpp"
 #include "document-transaction.hpp"
 #include "document-retopo-input.hpp"
 #include "spatial-history-levels.hpp"
@@ -968,8 +969,8 @@ std::optional<Vec3> Document::raycast(Vec3 p, Vec3 d, double material_time) cons
   if(!state_.retopology && scene_.has_affine_placement(scene_.active().id)) {
     auto snapshot=mesh_.load();
     if(!object_editable_locked(scene_.active().id)||snapshot->generation!=state_.generation||snapshot->revision!=state_.revision||!snapshot->picking)return {};
-    auto hit=snapshot->picking->raycast(p,d,10,material_time,scene_.active().id);
-    return hit?std::optional<Vec3>(hit->position):std::nullopt;
+    auto hit=snapshot->picking->raycast_target(p,d,10,material_time,scene_.active().id);
+    return hit?std::optional<Vec3>(hit->surface.position):std::nullopt;
   }
   if (state_.weights.enabled) {
     auto mesh = mesh_.load();
@@ -978,11 +979,14 @@ std::optional<Vec3> Document::raycast(Vec3 p, Vec3 d, double material_time) cons
     auto delta=held?ob::compose(object_world_transform_locked(state_.held_object),ob::inverse(scene_.world_transform(state_.held_object))):CanvasTransform{};
     auto origin=held?world_to_model(delta,p):p;
     auto direction=held?vec(ob::rotate(ob::conjugate(delta.orientation),obv(d))):d;
-    auto hit = mesh->picking->raycast(origin, direction, held?20/delta.scale:20, material_time,(held||state_.isolate_held)?state_.held_object:0);
+    auto hit = mesh->picking->raycast_target(origin, direction, held?20/delta.scale:20, material_time,(held||state_.isolate_held)?state_.held_object:0);
     if (!hit) return {};
-    if(held)hit->position=vec(ob::transform(delta,obv(hit->position)));
-    auto vertex = mesh->mesh.indices.at(size_t(hit->triangle) * 3);
-    return mesh->selected_weights.at(vertex) >= 0 ? std::optional<Vec3>(hit->position) : std::nullopt;
+    // A separate ordinary Volume is an unselected occluder. It has no packed
+    // weight vertex and cannot be mapped into a different object's namespace.
+    if(!hit->packed())return {};
+    if(held)hit->surface.position=vec(ob::transform(delta,obv(hit->surface.position)));
+    auto vertex = mesh->mesh.indices.at(size_t(hit->surface.triangle) * 3);
+    return mesh->selected_weights.at(vertex) >= 0 ? std::optional<Vec3>(hit->surface.position) : std::nullopt;
   }
   const auto &active=scene_.active();
   if(!state_.retopology && active.mesh_active && active.polygon && active.polygon->active && active.polygon->colors) {
@@ -992,9 +996,9 @@ std::optional<Vec3> Document::raycast(Vec3 p, Vec3 d, double material_time) cons
     auto delta=held?ob::compose(object_world_transform_locked(active.id),ob::inverse(scene_.world_transform(active.id))):CanvasTransform{};
     auto origin=held?world_to_model(delta,p):p;
     auto direction=held?vec(ob::rotate(ob::conjugate(delta.orientation),obv(d))):d;
-    auto hit=mesh->picking->raycast(origin,direction,held?20/delta.scale:20,material_time,active.id);
+    auto hit=mesh->picking->raycast_target(origin,direction,held?20/delta.scale:20,material_time,active.id);
     if(!hit)return {};
-    return held?std::optional<Vec3>(vec(ob::transform(delta,obv(hit->position)))):std::optional<Vec3>(hit->position);
+    return held?std::optional<Vec3>(vec(ob::transform(delta,obv(hit->surface.position)))):std::optional<Vec3>(hit->surface.position);
   }
   auto t = state_.retopology ? state_.retopology->transform
                             : object_world_transform_locked(scene_.active().id);
@@ -1030,12 +1034,12 @@ Vec3 Document::gradient(Vec3 p) const {
     auto snapshot=mesh_.load();
     if(snapshot->generation!=state_.generation||snapshot->revision!=state_.revision||!snapshot->picking)
       throw std::logic_error("Wait for the current affine surface before querying its normal");
-    return snapshot->picking->closest(p,scene_.active().id).normal;
+    return snapshot->picking->closest_target(p,scene_.active().id).surface.normal;
   }
   if (state_.weights.enabled) {
     auto mesh = mesh_.load();
     if (mesh->generation == state_.generation && mesh->revision == state_.revision && mesh->picking)
-      return mesh->picking->closest(p).normal;
+      return mesh->picking->closest_target(p).surface.normal;
   }
   auto t = object_world_transform_locked(scene_.active().id);
   return vec(
@@ -1694,12 +1698,7 @@ void Document::input_loop() {
   }
 }
 void Document::mesh_loop() {
-  struct CachedSculpt {
-    LocalSurfaceCache::Ptr tiles;
-    Mesh mesh;
-  };
-  std::unordered_map<uint64_t, CachedSculpt> sculpt_cache;
-  uint64_t cache_generation = 0;
+  detail::SculptSceneChunks::Ptr sculpt_cache;
   struct FrameLayoutCache {
     std::weak_ptr<const Mesh> mesh;
     std::weak_ptr<const NormalFrameSet> frames;
@@ -1758,44 +1757,33 @@ void Document::mesh_loop() {
         paint_scene_weights(*proposed, job->scene.active().id, job->weight_samples,
                             job->weight_settings, cancelled);
       }
-      // Keep the gesture's posed geometry fixed. Preview only the candidate
-      // influences, so every capsule addresses the same displayed surface.
-      if (cache_generation != job->generation) { sculpt_cache.clear(); cache_generation = job->generation; }
-      std::erase_if(sculpt_cache, [&](const auto &entry) {
-        return std::none_of(job->scene.objects().begin(), job->scene.objects().end(), [&](const auto &o) {
-          return o.id == entry.first && o.visible && !o.mesh_active;
-        });
-      });
+      // All geometry/scalar/query preparation stays on this worker. Candidate
+      // owners remain detached until the exact generation/revision/view fences
+      // accept the completed immutable snapshot below.
+      const auto policy=published_.load();
+      const bool wants_query=job->weight_view||policy->selection_mode||policy->object_grab_mode||
+        std::any_of(job->scene.objects().begin(),job->scene.objects().end(),[](const auto &o){return o.visible&&(o.mesh_active||(o.polygon&&o.polygon->active));})||
+        std::any_of(job->scene.objects().begin(),job->scene.objects().end(),[&](const auto &o){return o.visible&&job->scene.has_affine_placement(o.id);});
       SculptMeshingStats meshing;
       auto worker_start=std::chrono::steady_clock::now();
-      auto objects=job->scene.preview_surface_bundles(cancelled,[&](uint64_t id,const Volume &source) {
-        auto &cache=sculpt_cache[id];
-        auto start=std::chrono::steady_clock::now();
-        LocalSurfaceUpdateReport report;
-        auto candidate=cache.tiles?cache.tiles->update(source,cancelled,&report):LocalSurfaceCache::build(source,{},cancelled);
-        meshing.extraction_ms+=std::chrono::duration<double,std::milli>(std::chrono::steady_clock::now()-start).count();
-        if(candidate==cache.tiles) {
-          ++meshing.objects_reused;meshing.reused_tiles+=candidate->tiles().size();
-        } else {
-          if(report.kind==LocalSurfaceUpdateReport::Kind::Local)++meshing.local_updates;
-          else {++meshing.full_rebuilds;if(cache.tiles)++meshing.history_fallbacks;}
-          if(report.capacity_fallback)++meshing.capacity_fallbacks;
-          meshing.rebuilt_tiles+=candidate->stats().tiles_built;
-          meshing.reused_tiles+=candidate->stats().tiles_reused;
-          meshing.samples_scanned+=candidate->stats().samples_scanned;
-          meshing.cells_evaluated+=candidate->stats().cells_evaluated;
-          start=std::chrono::steady_clock::now();
-          auto mesh=candidate->materialize(cancelled);
-          meshing.materialize_ms+=std::chrono::duration<double,std::milli>(std::chrono::steady_clock::now()-start).count();
-          if(cancelled())throw std::runtime_error("Stale local surface preview");
-          cache={std::move(candidate),std::move(mesh)};
+      auto sculpt_preview=detail::SculptSceneChunks::capture(job->scene,
+          {job->generation,job->revision,job->view_epoch,job->sculpt_mask_view,wants_query},
+          sculpt_cache,{},cancelled);
+      auto objects=std::move(sculpt_preview.legacy);
+      for(const auto &object:sculpt_preview.chunks->objects()) {
+        const auto *previous=sculpt_cache?sculpt_cache->find(object.object):nullptr;
+        const auto &report=object.geometry->report();
+        if(previous&&previous->geometry==object.geometry)++meshing.objects_reused;
+        else {
+          if(report.kind==detail::SculptChunkReport::Kind::Local)++meshing.local_updates;
+          else {++meshing.full_rebuilds;if(previous)++meshing.history_fallbacks;}
+          meshing.rebuilt_tiles+=report.extracted_tiles;
         }
-        return cache.mesh;
-      });
+      }
       auto dependencies=std::make_shared<geometry_detail::Identity>();
       dependencies->generation=job->generation;
       dependencies->objects.reserve(job->scene.objects().size());
-      for(const auto &o:job->scene.objects())if(o.visible) {
+      for(const auto &o:job->scene.objects())if(o.visible&&!sculpt_preview.chunks->captures(o.id)) {
         geometry_detail::Dependency dep;dep.object=o.id;
         if(job->scene.has_affine_placement(o.id))dep.affine_world=job->scene.world_matrix(o.id);
         else dep.world=job->scene.world_transform(o.id);
@@ -1817,6 +1805,7 @@ void Document::mesh_loop() {
       std::shared_ptr<const geometry_detail::Identity> identity=geometry_identity&&geometry_identity->matches(*dependencies)?geometry_identity:std::move(dependencies);
       auto snapshot = std::make_shared<MeshSnapshot>();
       snapshot->geometry_identity=identity;
+      snapshot->sculpt_chunks=sculpt_preview.chunks;
       snapshot->sculpt_meshing=meshing;
       snapshot->revision = job->revision;
       snapshot->generation = job->generation;
@@ -2053,19 +2042,24 @@ void Document::mesh_loop() {
       for(auto it=texture_layouts.begin();it!=texture_layouts.end();)if(!texture_objects.contains(it->first)){texture_layout_bytes-=it->second->owned_bytes();it=texture_layouts.erase(it);}else ++it;
       snapshot->normal_frame_layout_builds=frame_layout_builds;
       const bool has_polygon_colors=std::any_of(objects.begin(),objects.end(),[](const ObjectSurface &o){return bool(o.polygon_colors);});
-      if ((!texture_objects.empty() || has_polygon_colors || !snapshot->paint_coordinates.empty() || job->weight_view || std::any_of(snapshot->ranges.begin(),snapshot->ranges.end(),[](const auto&r){return bool(r.affine_world);}) || ((published_.load()->object_grab_mode&&!published_.load()->object_grabbing)||published_.load()->selection_mode)) && !snapshot->mesh.indices.empty())
-        snapshot->picking = std::make_shared<MaterialSurfaceQuery>(snapshot->mesh, snapshot->ranges, cancelled,snapshot->source_colors,PaintVertexCoordinates{snapshot->paint_coordinates});
+      if (!texture_objects.empty()||has_polygon_colors||!snapshot->paint_coordinates.empty()||wants_query) {
+        // The actual typed owner retains separate packed and chunk triangle
+        // spaces, with one total query budget. No whole sculpt flatten occurs.
+        if(!snapshot->mesh.indices.empty()||!snapshot->sculpt_chunks->objects().empty())
+          snapshot->picking=std::make_shared<MaterialSurfaceQuery>(snapshot->mesh,snapshot->ranges,cancelled,
+              snapshot->source_colors,PaintVertexCoordinates{snapshot->paint_coordinates},snapshot->sculpt_chunks);
+      }
       snapshot->sculpt_meshing.worker_ms=std::chrono::duration<double,std::milli>(std::chrono::steady_clock::now()-worker_start).count();
       if(expression_result){
         std::lock_guard model_lock(model_mutex_);
         if(cancelled()||!state_.expressions||state_.expressions->request!=job->expressions->request)continue;
         expression_result->selected=state_.expressions->selected;
         Transaction transaction(*this);state_.expressions=std::move(expression_result);state_.message="Expression preview only; Apply static pose or Cancel";publish_locked(false,false);
-        {std::lock_guard mesh_lock(mesh_mutex_);geometry_identity=std::move(identity);mesh_.store(std::move(snapshot));}
+        {std::lock_guard mesh_lock(mesh_mutex_);geometry_identity=std::move(identity);sculpt_cache=snapshot->sculpt_chunks;mesh_.store(std::move(snapshot));}
         transaction.commit(false);
       }else{
         std::lock_guard lock(mesh_mutex_);
-        if(!cancelled()){geometry_identity=std::move(identity);mesh_.store(std::move(snapshot));}
+        if(!cancelled()){geometry_identity=std::move(identity);sculpt_cache=snapshot->sculpt_chunks;mesh_.store(std::move(snapshot));}
       }
     } catch (const std::exception &e) {
       if (!cancelled()) {

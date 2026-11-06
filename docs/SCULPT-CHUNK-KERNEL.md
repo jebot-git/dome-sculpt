@@ -1,0 +1,57 @@
+# Immutable sculpt chunk kernel — private native checkpoint
+
+This checkpoint qualifies the CPU geometry kernel only. One optimized native consumer passes 22 checks using complete new `sculpt-surface-chunks.cpp`, `local-surface.cpp` and test translation units. It does not qualify Scene capture, the new snapshot layout, a worker, application, sanitizer, GPU upload, frame rate or a complete bounded sculpt pipeline.
+
+The kernel captures actual immutable Volume sample owners. Local extraction shares the existing tile/tetrahedron/gradient implementation through a private seam and updates a persistent tile directory. Persistent edge, exact-position and chunk directories resolve the original first-cell/first-request representative, including its exact float normal. Position aliases are resolved through the complete actual position class rather than an assumed spatial halo. Only affected dependency-closure chunks are assembled; bit-identical chunks retain their exact owners. A weak actual base authorizes a candidate change list; a foreign base requires complete-manifest reconciliation.
+
+The native consumer compares against the separate whole `surface_mesh` implementation: exact compact indices, ordered position/normal corner bits, two closed connected components and opposite shared halfedges. A real local edit preserves unchanged packet owners and the retained previous result. Two exact-zero configurations preserve whole-mesher output and closed orientation. A deliberately wrong reference normal is rejected. Equal-valued foreign base ownership, immediate cancellation and an early work-budget refusal are rejected with the previous owner still usable. These are not allocation-prefix, full cancellation-sweep or worker-history results. The explicit exact collinear-repair fallback exists, but this run does not separately certify entering that branch or complete incremental global repair.
+
+Only eight old core archive members were actually extracted: backend_cpu, mesh, ray-index, sculpt-mask, sculpt-storage, volume-geometry, volume-raycast and volume. Their complete source bodies are unchanged between the archive's 0b6 baseline and f907. No old LocalSurface, Document, Scene or MeshSnapshot-owning member/header was consumed. The archive and each new whole object were hashed; provider hashes were checked before link, and all captured source/object/archive bytes remained exact. The minimal ELF links libc/libstdc++/libm/libgcc/zlib; the receipt records `ldd`, not sampled live mappings. Existing render/native/app proof artifacts were never changed or copied.
+
+The sparse child also contains deliberately unqualified source scaffolding: a private common-policy Scene capture, separate immutable mask sampler, exact placement helpers and selected-object cancellable world flatten. `MeshSnapshot::sculpt_chunks` is a real appended C++ snapshot field. Five source units and the Document/private-owner header pair pass syntax-only checks. The worker/render/query/framing/Cut routes do not yet use the field. No older Document or application archive is valid under these headers; complete matching producers/readers must rebuild before runtime admission. Polygon39 and Texture40 remain separate, unconsumed layouts and owner domains.
+
+Remaining production work includes live worker publication and geometry/scalar cache separation, chunk GPU resources and exact ordered transparent/ghost draws, object/chunk-aware query identity, tight framing and cancellable selected Cut adapters, persistent fault/cancel/history/Save/native-app proofs and meaningful CPU/GPU work measurements. Per-tile winding approximation, hidden whole-mesh flatten on every stroke, or a GPU-statistics-only change cannot close the objective. Global repair/component orientation and actual 39/40/paint/normal/source adapters remain required beyond the initial ordinary Volume route.
+
+Exact evidence: `docs/validation/SCULPT-CHUNK-KERNEL-R.json`. Ignored raw artifacts remain at `artifacts/native-kernel-release-v1`; the kernel execution takes 0.127 seconds after whole optimized compilation. All phase guards retained the 20 GiB actual-free floor plus the coordinator's 192 MiB reserve, the 20 MiB finite output limit and the cumulative 1.5 GiB allocation cap.
+
+## Worker, query and GPU source continuation
+
+The later runtime child connects generated chunks to the real Document worker
+and SurfaceRenderer. Detached caches publish only with the accepted snapshot
+under actual generation/revision/view fences. Painted/source surfaces keep their
+packed representation; Volume objects retain typed chunk geometry without fake
+packed ranges. Protection scalars have independent persistent mask owners.
+
+Typed material queries combine actual world chunk BVHs and packed geometry
+under one total 65,536-triangle and 262,144-bounds work envelope, retaining real
+object/source-chunk identity and reflection corner mapping. GL caches key both
+object and immutable placed Mesh owner, upload positions/normals directly, stage
+new scalar buffers before replacing accepted owners, prune unused packets, clear
+on failed draws, and support context abandonment. The cap is 512 MiB/65,536
+packets. Held/canvas motion stays in uniforms. Draws retain original Scene order
+within material queues and global cell/triangle order, including opaque ties,
+Blend and ghosts; only adjacent contiguous same-owner ranges can merge.
+
+Seven whole source/renderer/test units pass syntax checks. The genuine native
+fixture remains unexecuted. It covers an independent whole-mesher corner/order
+oracle, typed hits, masks, shear/reflection and actual Document Cancel, Apply,
+Save, Undo and Redo. No application, GL, performance or sanitizer qualification
+is claimed. Fresh complete own providers on latest main are required.
+
+GPU manifest reconciliation still scans whole chunk-directory metadata per new
+accepted snapshot. Changed mask owners resample all current object packets. The
+exact-repair fallback retains its real materializer. These costs remain open;
+Polygon39/Texture40 fields, broader production, runtime/device and sustained
+performance requirements remain open. The earlier22 kernel checks keep their
+original isolated scope.
+
+Receipt: `docs/validation/SCULPT-CHUNK-PIPELINE-SOURCE.json`.
+
+The latest source composition merges main44fe3742 remeshing and adds binary64
+query-result metrics without changing existing SurfaceHit/Options/class layouts.
+Nine complete source/test units pass syntax only. Additional unexecuted actual
+GL controls compare whole-reference framebuffer bytes for ordinary material,
+ghost/order, scalar-owner, staged GL failure/retry and pruning cases. The fresh
+all-own optimized runtime proposal is approved under a 200 MiB phase cap that
+includes a 64 MiB prospective reserve. No executable result is implied by that
+approval; the raw plan and final syntax records remain separate.

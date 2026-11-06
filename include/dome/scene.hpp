@@ -8,6 +8,7 @@
 #include "paint.hpp"
 #include <memory>
 namespace dome {
+namespace detail {struct SculptScenePreviewAccess;}
 struct PolygonColorSurface;
 struct CreatorAppearance;
 struct SourceMaterialBindings;
@@ -136,11 +137,13 @@ public:
   std::vector<ObjectSurface> preview_surface_bundles(const std::function<bool()> &, const SculptMesher & = {}) const;
 
 private:
+  friend struct detail::SculptScenePreviewAccess;
   // Detached native append reserves nonlive provenance IDs without inventing
   // geometry or bypassing the live object/group quotas. No layout change.
   friend NativeSceneAppend append_native_scene(const Scene &,const Scene &,
                                                 const std::function<bool()> &);
-  std::vector<ObjectSurface> surfaces_impl(bool, bool, const std::function<bool()> &, const SculptMesher & = {}, bool texture_bundles = false) const;
+  std::vector<ObjectSurface> surfaces_impl(bool, bool, const std::function<bool()> &, const SculptMesher & = {},
+      bool texture_bundles = false, const std::function<bool(const SculptObject &)> * = nullptr) const;
   std::vector<SculptObject> objects_;
   uint64_t active_ = 1, next_ = 2;
   std::vector<SceneGroup> groups_;

@@ -1367,7 +1367,8 @@ std::vector<ObjectSurface> Scene::preview_surfaces(const std::function<bool()> &
 std::vector<ObjectSurface> Scene::preview_surface_bundles(const std::function<bool()> &cancelled,const SculptMesher &mesher)const {
   return surfaces_impl(false,true,cancelled,mesher,true);
 }
-std::vector<ObjectSurface> Scene::surfaces_impl(bool atlas, bool preview, const std::function<bool()> &cancelled, const SculptMesher &mesher,bool texture_bundles) const {
+std::vector<ObjectSurface> Scene::surfaces_impl(bool atlas, bool preview, const std::function<bool()> &cancelled, const SculptMesher &mesher,bool texture_bundles,
+    const std::function<bool(const SculptObject &)> *capture_sculpt) const {
   bool has_sets=false;for(const auto &o:objects_)if(o.texture_sets){has_sets=true;if(!texture_bundles)throw std::logic_error("Texture-set surfaces require their owning subset render/export adapter");}
   if(has_sets)detail::validate_texture_set_graph(*this);
   std::vector<ObjectSurface> result;
@@ -1390,6 +1391,7 @@ std::vector<ObjectSurface> Scene::surfaces_impl(bool atlas, bool preview, const 
         o.material_bindings->validate(false);detail::source_paint_pairing(o.painted.get(),o.material_bindings.get(),o.appearance.get(),false);
       }
       if(o.polygon && o.polygon->active && o.polygon->topology.faces().empty())continue;
+      if(!o.mesh_active&&capture_sculpt&&(*capture_sculpt)(o))continue;
       auto mesh = o.mesh_active ? o.painted->mesh()
                                 : mesher ? mesher(o.id, *o.volume) : surface_mesh(*o.volume, cancelled);
       if (mesh.indices.empty())

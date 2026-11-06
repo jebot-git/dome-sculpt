@@ -4,6 +4,8 @@
 #include "dome/polygon-source.hpp"
 #include "dome/texture-sets.hpp"
 #include "polygon-conversion.hpp"
+#include "sculpt-scene-chunks.hpp"
+#include <algorithm>
 #include "polygon-surface-owner.hpp"
 #include "polygon-surface-preview.hpp"
 #include <nlohmann/json.hpp>
@@ -26,6 +28,36 @@ uint64_t add_sets(Scene&s){
  Mesh m;m.positions={{-.5f,-.5f,0},{.5f,-.5f,0},{0,.5f,0},{-.5f,-.5f,.5f},{.5f,-.5f,.5f},{0,.5f,.5f}};m.normals.assign(6,{0,0,1});m.uv={{{.1f,.1f}},{{.9f,.1f}},{{.5f,.9f}},{{.1f,.1f}},{{.9f,.1f}},{{.5f,.9f}}};m.indices={0,1,2,3,4,5};
  std::array<TextureSetInitialField,2>fields;fields[0].resolution=64;fields[1].resolution=128;for(auto&f:fields)f.material.double_sided=true;fields[0].material.name="Actual back slot";fields[1].material.name="Actual front slot";
  initialize_texture_sets(s,id,m,fields,std::array<TextureSetId,2>{0,1});select_texture_set(s,id,1);return id;
+}
+void mixed_material_exclusions(Scene scene,uint64_t sets){
+ Volume::Voxels samples;
+ for(int x=-8;x<=8;++x)for(int y=-8;y<=8;++y)for(int z=-8;z<=8;++z){
+  const Vec3 p{float(x)+.17f,float(y)-.31f,float(z)+.23f};
+  samples.emplace(Int3{x,y,z},std::clamp(length(p)-4.35f,-4.f,4.f)*.04f);
+ }
+ auto volume=Volume::from_samples(.04f,std::move(samples));
+ const auto sculpt=scene.add("Actual generated foreground occluder",volume);
+ scene.object(sculpt).transform.position={2,0,1.5f};scene.object(sculpt).material.double_sided=true;
+ Document mixed;mixed.replace(scene);ready(mixed);const auto frame=mixed.frame();
+ check(frame.surface->sculpt_chunks&&frame.surface->sculpt_chunks->find(sculpt)&&frame.surface->picking&&frame.surface->ranges.size()==3,
+   "Actual three-feature worker retains local sculpt chunks beside field39 and both40 packed ranges");
+ const auto&query=*frame.surface->picking;
+ const auto identity=[&](const MaterialSurfaceHit&h){return h.chunk?SurfaceMaterialIdentity{h.object,0}:query.material_identity(h.surface.triangle);};
+ const auto ray=[&](std::span<const SurfaceMaterialIdentity>excluded){return query.raycast_excluding_materials_target({2,0,3},{0,0,-1},4,0,excluded);};
+ auto hit=ray({});check(hit&&hit->chunk&&identity(*hit)==SurfaceMaterialIdentity{sculpt,0},"Typed material query sees the real nearest generated occluder");
+ const std::array<SurfaceMaterialIdentity,1>foreign_set{{{sculpt,1}}};hit=ray(foreign_set);
+ check(hit&&hit->chunk&&identity(*hit)==SurfaceMaterialIdentity{sculpt,0},"Excluding another material identity does not exclude a whole sculpt object");
+ const std::array<SurfaceMaterialIdentity,1>without_sculpt{{{sculpt,0}}};hit=ray(without_sculpt);
+ check(hit&&!hit->chunk&&identity(*hit)==SurfaceMaterialIdentity{sets,1},"Excluding actual sculpt material reveals the unchanged front texture set");
+ const std::array<SurfaceMaterialIdentity,2>without_front{{{sculpt,0},{sets,1}}};hit=ray(without_front);
+ check(hit&&!hit->chunk&&identity(*hit)==SurfaceMaterialIdentity{sets,0},"Per-material exclusion retains another material on the same packed object");
+ const std::array<SurfaceMaterialIdentity,3>without_all{{{sculpt,0},{sets,1},{sets,0}}};check(!ray(without_all),"Actual mixed material exclusion exhausts only the specified ray candidates");
+ refuses([&]{query.raycast_excluding_materials({2,0,3},{0,0,-1},4,0,without_sculpt);},"Untyped legacy hit cannot silently enter the mixed chunk triangle namespace");
+ Scene only;only.active().volume=std::make_shared<Volume>(volume);only.active().material.double_sided=true;Document chunk_only;chunk_only.replace(only);chunk_only.configure_selection(true);ready(chunk_only);
+ const auto local=chunk_only.frame().surface;check(local->mesh.indices.empty()&&local->picking&&local->sculpt_chunks,"A chunk-only scene has no fabricated packed BVH");
+ auto closest=local->picking->raycast_excluding_materials_target({0,0,2},{0,0,-1},4,0,{});
+ check(closest&&closest->chunk&&closest->object==only.active().id,"Chunk-only typed material query retains its real object and strong owner");
+ const std::array<SurfaceMaterialIdentity,1>without_only{{{only.active().id,0}}};check(!local->picking->raycast_excluding_materials_target({0,0,2},{0,0,-1},4,0,without_only),"Chunk-only exclusion never dereferences an absent packed query");
 }
 void owners(const Scene&s,uint64_t field,uint64_t sets){
  const auto&o=s.object(field);check(bool(o.material_bindings),"Mixed actor retains its actual material-binding owner");const auto&owner=o.material_bindings->polygon_surface_transfer;check(owner&&owner->matches_current(*o.painted)&&o.polygon->origin==owner->before(),"Mixed Scene40 retains the real39 current Paint, material field and exact before-root alias");
@@ -59,6 +91,7 @@ void mixed(){
  auto before_only=scene.snapshot();auto authority=std::make_shared<PolygonAuthority>();authority->origin=capture_polygon_origin(scene,field_id);auto&shell=before_only.object(field_id);shell.mesh_active=false;shell.painted.reset();shell.material_bindings.reset();shell.deformation.reset();shell.appearance.reset();shell.retopology.reset();shell.shape_source.reset();shell.rig_source.reset();shell.bake_recipe.reset();shell.polygon=authority;
  const auto retained=before_only.encode();check(retained.at("version")==40&&retained.contains("polygon_surfaces")&&Scene::decode(retained).encode()==retained,"Before-only39 source nodes remain genuine and reachable beside an actual40 actor");
  live.restore_polygon_source();ready(live);auto expected=original.snapshot();check(add_sets(expected)==set_id,"Expected Restore retains the same actual sibling object identity");expected.select(field_id);check(live.copy_scene().encode()==expected.encode(),"Restarted actual source Restore recovers full before39 data without changing sibling40 fields");check(live.undo()&&live.copy_scene().encode()==wire&&live.redo()&&live.copy_scene().encode()==expected.encode(),"Mixed actual Restore has exact global Undo/Redo across both features");
+ mixed_material_exclusions(scene,set_id);
  check(scene.encode()==wire,"All mixed decode/negative/native/Restore controls retain the independent source Scene");
 }
 }

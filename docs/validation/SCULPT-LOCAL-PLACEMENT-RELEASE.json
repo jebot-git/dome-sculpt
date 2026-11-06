@@ -1,0 +1,196 @@
+{
+  "state": "Private Release coordinate representation fix qualified on original grouped source; not main/source39/40/SAN/fullALL/physical/performance completion",
+  "product_source": "4d54c660e4d6b2a3e274b39b75d76d8ab572aa0d",
+  "qualified_parent": "25dd9bc60e6e796491b2ea330550704769bcca48",
+  "real_counterexample": {
+    "mesh": "Original CPU sphere0.04voxel/0.36radius,4336vertices/8668triangles",
+    "original_group": "1.25scale, (.12,-.04,.03)translation;secondlocalX1 producesworldX1.37",
+    "local": "Original unchanged whole mesh and strict Mesh::validate pass",
+    "world_first": "Original first grouped placement passes",
+    "world_second": "Original second grouped absolute-world-float staging fails Degenerate mesh triangle",
+    "full_old_native": "72 original component/allocation/history controls pass before first Document grouped preview fails",
+    "no_guard_or_fixture_weakening": true
+  },
+  "fix": [
+    "Alias actual original validated local chunk Mesh for GPU/BVH; no absolute-world-float Mesh copy",
+    "Author/current-held/canvas placement uses GPU uniforms, full inverse-transpose normal matrix, handedness and transported clip halfspace",
+    "World nearest computes binary64 transformed edge differences and full affine metric with outward-rounded conservative AABB bounds, not Euclidean nearest after shear",
+    "World ray uses inverse double ray and world parameter; normals interpolate per-vertex inverse-transpose-normalized values; original local corner namespace retained under reflection",
+    "Local geometry/BVH owners reused through authored placement; strict actual-vertex query workspace and existing Mesh/source validation remain"
+  ],
+  "compatible_layouts": "Existing header bodies/data members/inline code byte-identical after removing only new affine include/nonvirtual overloads and private frame getter; no existing class/snapshot/options/hit layout change",
+  "whole_rebuilt_products": [
+    "mesh-processing",
+    "sculpt-placed-chunk",
+    "sculpt-placed-chunks",
+    "sculpt-scene-chunks",
+    "material-visibility",
+    "document",
+    "document-cut",
+    "render"
+  ],
+  "whole_rebuilt_consumers": [
+    "app including desktop framing",
+    "original authenticated local integration native",
+    "sculpt chunk native",
+    "real EGL chunk render"
+  ],
+  "old_affected_archive_members_excluded": true,
+  "protected_prior_outputs": 237,
+  "prior_project_outputs": 233,
+  "prior_compiler_probe_ELFs": 4,
+  "new_whole_objects_and_ELFs": {
+    "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-integration-contract-25dd/artifacts/local-placement-release/dome-sculpt": "c8f2c79dbdff2075df4c8b5564ff8deed13c430c3098e2351b347404b6537661",
+    "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-integration-contract-25dd/artifacts/local-placement-release/dome-sculpt-local-surface-integration-test": "0667200d0afb74861042821668423e26d71fda9f85c541632ce377658e40dc7c",
+    "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-integration-contract-25dd/artifacts/local-placement-release/dome-sculpt-sculpt-chunk-pipeline-test": "d3eaf283335af54b8fba9a0f75616f7792a128df19ac29ce08c5877ecdcde7e5",
+    "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-integration-contract-25dd/artifacts/local-placement-release/dome-sculpt-sculpt-chunk-render-test": "0e8b97a88595be1765f80e57b8a456115f674d99c1e57b1391f98f3c2c07bd2a",
+    "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-integration-contract-25dd/artifacts/local-placement-release/objects/mesh.o": "2498027cd0b6e6b4f3d3d60fe9b9b6923eb66b635a6825fd6228c87b047ac69a",
+    "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-integration-contract-25dd/artifacts/local-placement-release/objects/placed.o": "e052972f76f07f6385481d048e3bc18bf954b54dce53bd512452d55173dcac7e",
+    "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-integration-contract-25dd/artifacts/local-placement-release/objects/directory.o": "e6ce6536947a50a480fede7b357a108e2a3c97f2a7a38abe013f8e8928aadaac",
+    "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-integration-contract-25dd/artifacts/local-placement-release/objects/capture.o": "0f0d64f53ac1e13c1a0edf0b46bb63dfcea66389827f752a3e668a893e9910f7",
+    "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-integration-contract-25dd/artifacts/local-placement-release/objects/material.o": "d629349b55c8bd26e13db26bdec006d8fc2acc08815aeea30b7fca3efe321abb",
+    "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-integration-contract-25dd/artifacts/local-placement-release/objects/document.o": "92be54fe762aef1b22416ec47cd6cbe29b559f95195b93bb2008cf2751fd98a1",
+    "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-integration-contract-25dd/artifacts/local-placement-release/objects/cut.o": "95836e63c9771063f00fdae53803def21c76996ec24d8d8460caf089ec1ace9d",
+    "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-integration-contract-25dd/artifacts/local-placement-release/objects/render.o": "6ffe85ad77874cf49168a7b21479421fe07648af19d615cb70b86c8846cad22b",
+    "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-integration-contract-25dd/artifacts/local-placement-release/objects/app.o": "4d93f7826306ca61925eb55f4e8d7ecee6c2fa7f4219335e633ed365cbff3fae",
+    "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-integration-contract-25dd/artifacts/local-placement-release/objects/legacy-native.o": "5562b3eaf7e28be4715e96f9efcb99af598ecb64cc6eae54e71ae871db135cbb",
+    "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-integration-contract-25dd/artifacts/local-placement-release/objects/pipeline-native.o": "57a1fdd99a0f820abdb4cf7216f9ab7d811aabd00b2fc2acc9eac9fc25e692d3",
+    "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-integration-contract-25dd/artifacts/local-placement-release/objects/GL.o": "9315c34e09274777da5e309f5a94995e0f3b407c8d4379f75d6dac2fc3de9997"
+  },
+  "actual_checks": {
+    "original_authenticated_local_integration": 95,
+    "actual_factory_failure_hook_witness_and_recovery": true,
+    "pipeline_native": 43,
+    "software_EGL": 72,
+    "public_oblique_query_scale_aspect_axis_reflection_winding_families": 108,
+    "corrected_app_version": 0,
+    "ordinary_corrected_app_smoke": {
+      "exit": 0,
+      "dimensions": [
+        1100,
+        744
+      ],
+      "clay_pixels": 74853,
+      "ELF": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-integration-contract-25dd/artifacts/local-placement-release/dome-sculpt",
+      "sha256": "c8f2c79dbdff2075df4c8b5564ff8deed13c430c3098e2351b347404b6537661",
+      "capture": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-integration-contract-25dd/artifacts/local-placement-app/viewport.png",
+      "sha256_capture": "a617fa88a5c3ba00b399118c8057bf5df64dc16fad42eb3d735acac6abc79515",
+      "lossless_conversion": true,
+      "pixels_equal_prior_visually_inspected": true
+    }
+  },
+  "byte_exact_RGBA_pairs": [
+    {
+      "reference": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-integration-contract-25dd/artifacts/local-placement-release/GL/case-0-reference.rgba",
+      "current": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-integration-contract-25dd/artifacts/local-placement-release/GL/case-0-chunk.rgba",
+      "sha256": "67bbaa966bcd263aa4f7d2ea6d6d145a9cc6fd7a6b6430c1eaac398fc73e1c30",
+      "bytes": 36864
+    },
+    {
+      "reference": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-integration-contract-25dd/artifacts/local-placement-release/GL/case-1-reference.rgba",
+      "current": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-integration-contract-25dd/artifacts/local-placement-release/GL/case-1-chunk.rgba",
+      "sha256": "6b67bb6f79b9ef4ef8b879e64b7c14c177f3db411557bd89b482e422f04b2b29",
+      "bytes": 36864
+    },
+    {
+      "reference": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-integration-contract-25dd/artifacts/local-placement-release/GL/case-2-reference.rgba",
+      "current": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-integration-contract-25dd/artifacts/local-placement-release/GL/case-2-chunk.rgba",
+      "sha256": "43dde08353bf84139fa3ef1f039054c574acb212dec944a4ba8d90e5deb70868",
+      "bytes": 36864
+    },
+    {
+      "reference": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-integration-contract-25dd/artifacts/local-placement-release/GL/case-3-reference.rgba",
+      "current": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-integration-contract-25dd/artifacts/local-placement-release/GL/case-3-chunk.rgba",
+      "sha256": "f131dbe6298652ea5d4ec78ee03664049e3d03f9ee6abb26b0ec921f4464e487",
+      "bytes": 36864
+    },
+    {
+      "reference": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-integration-contract-25dd/artifacts/local-placement-release/GL/case-4-reference.rgba",
+      "current": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-integration-contract-25dd/artifacts/local-placement-release/GL/case-4-chunk.rgba",
+      "sha256": "e49ea0f15ecb70a2dc2936b09bd4c28edcf46696d13d007c2c026de607bef858",
+      "bytes": 36864
+    },
+    {
+      "reference": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-integration-contract-25dd/artifacts/local-placement-release/GL/case-5-reference.rgba",
+      "current": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-integration-contract-25dd/artifacts/local-placement-release/GL/case-5-chunk.rgba",
+      "sha256": "13beb691cf6ed0a6694ab701ca3d23a00586128c39f5ae92f7cc8db4027a4146",
+      "bytes": 36864
+    },
+    {
+      "reference": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-integration-contract-25dd/artifacts/local-placement-release/GL/grouped-reference.rgba",
+      "current": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-integration-contract-25dd/artifacts/local-placement-release/GL/grouped-local.rgba",
+      "sha256": "3e35cabba1cd068d5b27658d6563b6856d9e73fac348a46d4754b881a3cdfe01",
+      "bytes": 36864
+    }
+  ],
+  "runtime_map_stages": [
+    "legacy-native",
+    "pipeline-native",
+    "GL"
+  ],
+  "ordinary_app_mapped_ELFs": 98,
+  "all_input_and_mapped_ELF_drift": [],
+  "receipts": {
+    "contract-native-release/status.json": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-integration-contract-25dd/artifacts/contract-native-release/status.json",
+      "sha256": "f35e89cd0c6ae0e9ec48e077d399fe54202d0d4fa1d6ea5bb8865f1171dd87fc"
+    },
+    "contract-native-release-v2/status.json": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-integration-contract-25dd/artifacts/contract-native-release-v2/status.json",
+      "sha256": "251fc5266f43f09fa40d1339acf1b6b03659eb8655e5d2fcd00225d61a439632"
+    },
+    "grouped-sphere-repro/status-v2.json": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-integration-contract-25dd/artifacts/grouped-sphere-repro/status-v2.json",
+      "sha256": "850cf02e4cd625032c7d136fa8f6926d81af2bb297c92413d9d183a67a1ba2fa"
+    },
+    "grouped-sphere-repro/status-v3.json": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-integration-contract-25dd/artifacts/grouped-sphere-repro/status-v3.json",
+      "sha256": "159e9749c5346795bd674bf2931f249c62983d4fbd9104337d1acead39e5eade"
+    },
+    "local-placement-syntax-v2/status.json": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-integration-contract-25dd/artifacts/local-placement-syntax-v2/status.json",
+      "sha256": "467461a5620c013ee9c1d4ec3aef7f6acc5bbbce6bf2710eb927dd6994506062"
+    },
+    "local-placement-release/status.json": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-integration-contract-25dd/artifacts/local-placement-release/status.json",
+      "sha256": "3923cb3237ef1ee2b04f7cc8236b1b3249aa346d1f707e1f8cdc04a46c1a0a6e"
+    },
+    "local-placement-app/status.json": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-integration-contract-25dd/artifacts/local-placement-app/status.json",
+      "sha256": "fdc9865d81e06b27c5ee60d8e257421657a95749b046c1b28c6c3d45cc3267d6"
+    },
+    "local-placement-query/status.json": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-integration-contract-25dd/artifacts/local-placement-query/status.json",
+      "sha256": "c43e76e377c2fe64beabc6a08037d1e07b951a77cede050fb384e8b3d9a05068"
+    }
+  },
+  "resources": {
+    "local_placement_app_and_build": {
+      "actual_free_bytes": 21811036160,
+      "cumulative_allocated_bytes": 54124544,
+      "prospective_bytes": 67108864,
+      "cap_bytes": 134217728
+    },
+    "additional_current_legacy_query_gate": {
+      "actual_free_bytes": 21765955584,
+      "phase_allocated_bytes": 54087680
+    },
+    "hard_actual_free_floor": 21474836480,
+    "root_reserve": 201326592,
+    "own_prospective": 67108864,
+    "local_phase_cap": 134217728
+  },
+  "preserved_failures": [
+    "Original wrapper asm-decoration compile0/link1, no native execution; corrected only decoration",
+    "Complete original native fixture/producers retained after72controls and genuine grouped-world-float product failure",
+    "Minimal local and first-world positives, unchanged second-world collapse counterexample retained",
+    "Prior25dd sparse configuration/observer/invalid32paint fixture failures retain original scope"
+  ],
+  "remaining": [
+    "Current39/40 composition and full fresh combined application qualification",
+    "SAN/allocation-prefix/cancellation/physical hardware and broader full-project workflows",
+    "Sustained production-scale CPU/ArcGPU/frame-work measurement plan is unexecuted; zero-transfer counters alone are not speed evidence",
+    "GPU metadata reconciliation and mask-owner changes still have whole-directory/whole-object costs",
+    "Selected Cut/export and authenticated exact legacy-repair world materialization are separate existing boundaries requiring further coordinate-domain audit"
+  ]
+}

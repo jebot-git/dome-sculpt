@@ -3,14 +3,18 @@
 #include "dome/document.hpp"
 #include "dome/source-placement.hpp"
 #include "polygon-view-state.hpp"
+#include "sculpt-scene-chunks.hpp"
 #include <limits>
 namespace dome::detail {
 struct DesktopFraming { Vec3 pivot,pan;float distance; };
-inline bool desktop_range_eligible(const EditorState &state,const SurfaceRange &range,bool selected){
-  auto object=std::find_if(state.objects.begin(),state.objects.end(),[&](const auto&o){return o.id==range.object;});
+inline bool desktop_object_eligible(const EditorState &state,uint64_t id,bool selected){
+  auto object=std::find_if(state.objects.begin(),state.objects.end(),[&](const auto&o){return o.id==id;});
   if(object!=state.objects.end()&&!object->visible)return false;
-  return !selected||(state.selected_objects.empty()?range.object==state.active_object:
-      std::find(state.selected_objects.begin(),state.selected_objects.end(),range.object)!=state.selected_objects.end());
+  return !selected||(state.selected_objects.empty()?id==state.active_object:
+      std::find(state.selected_objects.begin(),state.selected_objects.end(),id)!=state.selected_objects.end());
+}
+inline bool desktop_range_eligible(const EditorState &state,const SurfaceRange &range,bool selected){
+  return desktop_object_eligible(state,range.object,selected);
 }
 inline bool desktop_frameable(const EditorSnapshot &frame,bool selected){
   if(!frame.surface||!frame.state||frame.surface->generation!=frame.state->generation)return false;
@@ -19,7 +23,11 @@ inline bool desktop_frameable(const EditorSnapshot &frame,bool selected){
       desktop_range_eligible(*frame.state,SurfaceRange{preview.object,0,1,{}},selected))return true;
   if(frame.state->retopology&&frame.state->retopology->topology&&!frame.state->retopology->topology->vertices().empty()&&
       desktop_range_eligible(*frame.state,SurfaceRange{frame.state->active_object,0,1,{}},selected))return true;
-  return std::any_of(frame.surface->ranges.begin(),frame.surface->ranges.end(),[&](const auto&r){return r.object!=preview.object&&r.count&&desktop_range_eligible(*frame.state,r,selected);});
+  if(std::any_of(frame.surface->ranges.begin(),frame.surface->ranges.end(),[&](const auto&r){return r.object!=preview.object&&r.count&&desktop_range_eligible(*frame.state,r,selected);}))return true;
+  if(frame.surface->sculpt_chunks)
+    for(const auto &object:frame.surface->sculpt_chunks->objects())
+      if(object.object!=preview.object&&object.geometry->report().indices&&desktop_object_eligible(*frame.state,object.object,selected))return true;
+  return false;
 }
 // Read the same immutable packed geometry and live placement deltas as the
 // renderer. This never extracts geometry, copies a Scene, or reads GPU buffers.
@@ -52,6 +60,24 @@ inline std::optional<DesktopFraming> desktop_framing(const EditorSnapshot &frame
       if(delta){auto q=delta->point({p.x,p.y,p.z});p={float(q[0]),float(q[1]),float(q[2])};}
       add(p);
     }
+  }
+  if(frame.surface->sculpt_chunks)for(const auto &source:frame.surface->sculpt_chunks->objects()) {
+    if(source.object==preview.object||!desktop_object_eligible(state,source.object,selected))continue;
+    const auto object=std::find_if(state.objects.begin(),state.objects.end(),[&](const auto &o){return o.id==source.object;});
+    std::optional<AffineTransform> delta;
+    if(object!=state.objects.end()&&object->affine_world&&source.affine&&
+        object->affine_world->matrix()!=source.affine->world().matrix())
+      delta=(*object->affine_world)*source.affine->world().inverse();
+    else if(object!=state.objects.end()&&object->world_transform_valid&&!source.affine)
+      delta=affine_similarity(ob::compose(object->world_transform,ob::inverse(source.world)));
+    source.geometry->for_each_ordered_triangle([&](const auto &,size_t,const auto &points,const auto &){
+      for(size_t c=0;c<3;++c) {
+        const auto corner=source.reflected()&&c?3-c:c;
+        auto p=source.placed_position(points[corner]);
+        if(delta){const auto q=delta->point({p.x,p.y,p.z});p={float(q[0]),float(q[1]),float(q[2])};}
+        add(p);
+      }
+    });
   }
   if(preview.view&&preview.view->display&&desktop_range_eligible(state,SurfaceRange{preview.object,0,1,{}},selected)){
     const auto &view=*preview.view;const auto &surface=view.surface->mesh;
