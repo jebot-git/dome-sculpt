@@ -27,7 +27,8 @@ public:
   void authenticate_rest(const Mesh&,const std::shared_ptr<const DeformationState>&,
                          const TextureSetLimits & = {})const;
 private:
-  friend std::shared_ptr<const TextureSetSurfacePlan> prepare_texture_set_surface(const SculptObject&,const TextureSetLimits&);
+  friend bool texture_set_plain_fields(const SculptObject&)noexcept;
+std::shared_ptr<const TextureSetSurfacePlan> prepare_texture_set_surface(const SculptObject&,const TextureSetLimits&);
   TextureSetSurfacePlan()=default;
   TextureSetSurfacePlan(const TextureSetSurfacePlan&)=delete;
   TextureSetSurfacePlan(TextureSetSurfacePlan&&)=default;

@@ -1424,6 +1424,24 @@ const std::shared_ptr<const TextureSetFaceDomain>&detail::TextureSetPaintAccess:
 bool detail::TextureSetPaintAccess::valid_raster(const PaintedMesh&paint)noexcept{
  return paint.surface_&&paint.surface_->set_domain==paint.texture_set_domain_&&(!paint.texture_set_domain_||paint.texture_set_domain_->matches(paint.mesh_owner()));
 }
+size_t detail::TextureSetPaintAccess::snapshot_bytes(const PaintedMesh&paint){
+ size_t bytes=sizeof(PaintedMesh)+sizeof(PaintedMesh::CompositeCache);
+ auto add=[&](size_t n,size_t unit){if(unit&&n>(SIZE_MAX-bytes)/unit)throw std::length_error("Texture-set snapshot metadata overflow");bytes+=n*unit;};
+ for(const auto&layer:paint.layers_){add(1,sizeof(PaintLayer));add(layer.name.size()+1,1);add(layer.tiles.size()+layer.pbr_tiles.size()+layer.emission_tiles.size(),sizeof(std::shared_ptr<const PaintTile>));}return bytes;
+}
+bool detail::TextureSetPaintAccess::same_current(const PaintedMesh&a,const PaintedMesh&b)noexcept{
+ // Identity/value association only; no normal/source interpretation is granted.
+ return NativeWeightPaintAccess::same_current(a,b);
+}
+bool detail::TextureSetPaintAccess::stroke_structure(const PaintedMesh&a,const PaintedMesh&b)noexcept{
+ using namespace native_weight_state;
+ if(a.editing_||!valid_raster(a)||!valid_raster(b)||!owner(a.surface_,b.surface_)||!owner(a.texture_set_domain_,b.texture_set_domain_)||!owner(a.sampling_attachment_,b.sampling_attachment_)||!owner(a.source_maps_,b.source_maps_)||!owner(a.color_projection_,b.color_projection_)||!owner(a.normal_projection_,b.normal_projection_)||!owner(a.baked_,b.baked_)||a.active_!=b.active_||a.next_!=b.next_||a.layers_.size()!=b.layers_.size())return false;
+ for(size_t i=0;i<a.layers_.size();++i){const auto&x=a.layers_[i];const auto&y=b.layers_[i];if(x.id!=y.id||x.name!=y.name||x.visible!=y.visible||!scalar(x.opacity,y.opacity))return false;}return true;
+}
+void detail::TextureSetPaintAccess::swap_stroke(PaintedMesh&target,PaintedMesh&sealed){
+ if(sealed.in_stroke()||!stroke_structure(target,sealed))throw std::invalid_argument("Texture-set stroke adoption lost its immutable structure");
+ target.swap_state(sealed);
+}
 size_t detail::TextureSetPaintAccess::working_bytes(const PaintedMesh&paint,uint32_t r){
   if(r<64||r>2048||(r&(r-1)))throw std::invalid_argument("Invalid texture-set resolution");
   size_t bytes=sizeof(PaintedMesh)+sizeof(PaintedMesh::CompositeCache);

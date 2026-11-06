@@ -10,6 +10,10 @@ struct TextureSetPaintAccess {
   static std::shared_ptr<PaintedMesh> decode(const nlohmann::json &,const PaintImageArchive *,bool,
       const NormalSamplingArchive *,const PaintSamplingArchive *,const SourcePaintDecodeContext &,
       const std::shared_ptr<const TextureSetFaceDomain> &);
+  static size_t snapshot_bytes(const PaintedMesh&);
+  static bool same_current(const PaintedMesh&,const PaintedMesh&)noexcept;
+  static bool stroke_structure(const PaintedMesh&,const PaintedMesh&)noexcept;
+  static void swap_stroke(PaintedMesh&,PaintedMesh&);
   static bool valid_raster(const PaintedMesh&)noexcept;
   static size_t working_bytes(const PaintedMesh&,uint32_t resolution);
   static std::shared_ptr<PaintedMesh> bind(const PaintedMesh&,

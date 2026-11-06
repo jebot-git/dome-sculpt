@@ -6,6 +6,7 @@
 #include "document-transaction.hpp"
 #include "native-paint-sampling.hpp"
 #include "text-utf8.hpp"
+#include "texture-set-stroke.hpp"
 namespace dome {
 SceneDraft Document::draft_scene() const {
   std::lock_guard lock(model_mutex_);
@@ -23,7 +24,7 @@ void Document::queue_scene_operation(std::string label, SceneOperation operation
 }
 void Document::queue_scene_operation_locked(std::string label, SceneOperation operation,
                                       AssetSource expected, std::shared_ptr<std::string> report, std::shared_ptr<AssetWork> work, std::shared_ptr<bool> changed,
-                                      std::shared_ptr<const MeshSnapshot> rollback_preview, uint64_t retopo_session, uint64_t cut_session, std::shared_ptr<CutHandoff> cut_handoff, std::optional<BakeAdmission> bake_admission, uint64_t uv_restore_session, std::optional<SkinAdmission> skin_admission) {
+                                      std::shared_ptr<const MeshSnapshot> rollback_preview, uint64_t retopo_session, uint64_t cut_session, std::shared_ptr<CutHandoff> cut_handoff, std::optional<BakeAdmission> bake_admission, uint64_t uv_restore_session, std::optional<SkinAdmission> skin_admission, std::shared_ptr<const detail::TextureSetStrokeLease> texture_set_source) {
   require_authority_locked(expected);
   if(state_.expressions)throw std::logic_error("Apply or cancel expression preview before starting authoring work");
   if(state_.object_grabbing && !(work&&work->held_weight))throw std::logic_error("Release object motion before starting asset work");
@@ -51,7 +52,9 @@ void Document::queue_scene_operation_locked(std::string label, SceneOperation op
   if(cut_handoff && (!cut_session || state_.cut!=cut_handoff->draft || !cut_handoff->accepting ||
       cut_handoff->accepting->session!=cut_session || !cut_handoff->accepting->committing))
     throw std::logic_error("Cut Apply admission lost its exact ready draft");
+  if(texture_set_source){texture_set_source->authenticate_owner(texture_set_source);texture_set_source->authenticate_scene(scene_);}
   FileJob job{scene_.snapshot(), {}, state_.revision, state_.generation, content_, false};
+  job.texture_set_source=std::move(texture_set_source);
   job.object = scene_.active().id;job.edit_authority=state_.edit_authority;job.isolation_target=state_.isolate_held?state_.held_object:0;
   job.scene_operation = std::move(operation);
   job.operation_label = std::move(label);

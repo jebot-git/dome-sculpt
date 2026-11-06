@@ -12,6 +12,8 @@
 #include "dome/shapekey-sculpt.hpp"
 #include "shapekey-preview.hpp"
 #include "current-colors.hpp"
+#include "texture-set-stroke.hpp"
+#include "texture-set-worker.hpp"
 #include <pthread.h>
 namespace dome {
 namespace {
@@ -58,14 +60,15 @@ bool Document::begin_native_locked(uint32_t spatial_owner,NativeStrokeSpace spac
   if(!native_source_scene_||preview->generation!=state_.generation||preview->revision!=state_.revision||preview->pbr_view!=state_.pbr_view||preview->view_epoch!=state_.view_epoch){state_.message="Wait for the current surface before painting";publish_locked();return false;}
   const bool projected=o.mesh_active&&!state_.shape_sculpt&&state_.projection&&state_.projection->settings.enabled&&state_.projection->image;
   if(projected&&(!o.mesh_active||state_.shape_sculpt||state_.projection->placing))return false;
-  auto session=std::make_shared<NativeStroke>();session->epoch=++native_epoch_;
+  auto field_lease=o.texture_sets?detail::capture_texture_set_stroke(scene_,o.id):nullptr;
+  auto session=std::make_shared<NativeStroke>();session->texture_set=std::move(field_lease);session->epoch=++native_epoch_;
   if(projected){
     session->projection=state_.projection;
     session->projection_excluded.push_back(o.id);
     for(const auto &other:state_.objects)if(!other.visible||other.ghost)
       session->projection_excluded.push_back(other.id);
   }
-  session->source={state_.generation,state_.revision,o.id,state_.edit_authority};if(projected||scene_.has_affine_placement(o.id)||space==NativeStrokeSpace::EvaluatedWorldBrush)session->affine_world=scene_.world_matrix(o.id);else session->transform=scene_.world_transform(o.id);session->deformation=o.deformation;
+  session->source={state_.generation,state_.revision,o.id,state_.edit_authority};if(projected||o.texture_sets||scene_.has_affine_placement(o.id)||space==NativeStrokeSpace::EvaluatedWorldBrush)session->affine_world=scene_.world_matrix(o.id);else session->transform=scene_.world_transform(o.id);session->deformation=o.deformation;
   session->initial=native_source_scene_;session->original_preview=preview;session->paint=state_.paint;session->spatial_owner=spatial_owner;session->space=space;session->menu_page=space==NativeStrokeSpace::Ray?24:3;
   if(projected)session->menu_page=25;
   session->pbr_view=state_.pbr_view;
@@ -73,6 +76,7 @@ bool Document::begin_native_locked(uint32_t spatial_owner,NativeStrokeSpace spac
   if(state_.object_grabbing&&space==NativeStrokeSpace::EvaluatedWorldBrush)session->held_basis=held_affine_;
   if(state_.shape_sculpt&&space!=NativeStrokeSpace::Ray)return false;
   if(space==NativeStrokeSpace::EvaluatedWorldBrush&&!o.mesh_active)return false;
+  if(state_.shape_sculpt&&o.texture_sets)throw std::logic_error("Texture-set shape editing requires its complete field/frame remap");
   if(state_.shape_sculpt){if(!o.deformation||!o.deformation->morphs||state_.morph_target>=o.deformation->morphs->targets.size()||state_.object_grabbing)return false;session->shape_target=state_.morph_target;}
   std::lock_guard queue(native_mutex_);
   if(native_jobs_.size()>=8){state_.error="Desktop gesture queue is full; retry after pending cancellation finishes";publish_locked();return false;}
@@ -161,6 +165,10 @@ void Document::native_loop(){
     try{
       if(cancelled())throw std::runtime_error("Desktop stroke cancelled");
       Scene working=session->initial->snapshot();working.select(session->source.object);auto &o=working.active();
+      if(session->texture_set){session->texture_set->authenticate_owner(session->texture_set);session->texture_set->authenticate_scene(working);}
+      // The selected mutable draft is deliberately outside every published const
+      // collection. Only sealed COW snapshots of this field are ever adopted.
+      auto paint_target=session->texture_set?session->texture_set->paint()->snapshot():o.painted;
       size_t budget=4'000'000;if(!session->shape_target)for(const auto &other:working.objects())if(other.id!=o.id){auto used=std::max(other.volume->stored_samples(),other.volume->voxels().size());if(used>budget)throw std::length_error("Scene sculpt storage budget exceeded");budget-=used;}
       std::unique_ptr<MaterialSurfaceQuery> query;
       std::optional<SurfaceRange> query_range;
@@ -185,7 +193,12 @@ void Document::native_loop(){
           reflected=frame.orientation()==AffineOrientation::Reversing;geometry=std::move(placed);
         } else geometry=shape?std::make_shared<const Mesh>(shape->preview()):o.deformation?std::make_shared<const Mesh>(o.deformation->preview(o.painted->mesh())):std::shared_ptr<const Mesh>(o.painted,&o.painted->mesh());
         if(cancelled())throw std::runtime_error("Desktop stroke cancelled");
-        if(!shape&&(o.deformation||session->affine_world))evaluation=o.painted->evaluate(geometry,cancelled);
+        if(!shape&&(o.deformation||session->affine_world))evaluation=paint_target->evaluate(geometry,cancelled);
+        if(session->texture_set){
+          TextureSetLimits limits;limits.cancelled=cancelled;ObjectSurface bundle;bundle.id=o.id;bundle.name=o.name;bundle.transform=o.transform;bundle.material=o.material;bundle.deformation=o.deformation;bundle.groups=working.group_path(o.group);bundle.affine_edit=o.affine_edit;bundle.rig_source=o.rig_source;bundle.texture_set_surface=detail::prepare_texture_set_surface(o,limits);
+          auto layout=detail::prepare_texture_set_packed(bundle.texture_set_surface,limits);MeshSnapshot query_snapshot;detail::TextureSetWorkerView view;view.pbr=session->pbr_view;detail::append_texture_set_surface(query_snapshot,bundle,layout,view,limits);
+          query=std::make_unique<MaterialSurfaceQuery>(query_snapshot.mesh,query_snapshot.ranges,cancelled,query_snapshot.source_colors,PaintVertexCoordinates{query_snapshot.paint_coordinates});
+        }else{
         query_range.emplace(SurfaceRange{o.id,0,geometry->indices.size(),o.material,o.painted->preview(o.material,cancelled),o.appearance,0,o.material_bindings});
         auto &range=*query_range;
         range.reflected=reflected;
@@ -208,7 +221,9 @@ void Document::native_loop(){
         query_colors=detail::current_vertex_colors(o.painted->mesh(),
             current_colors.field?&current_colors:nullptr,o.appearance.get(),
             o.material_bindings.get(),range.textures.get(),cancelled);
-        query=std::make_unique<MaterialSurfaceQuery>(*geometry,std::span<const SurfaceRange>(&range,1),cancelled,query_colors,PaintCornerCoordinates{query_paint});if(!shape)o.painted->begin_stroke();
+        query=std::make_unique<MaterialSurfaceQuery>(*geometry,std::span<const SurfaceRange>(&range,1),cancelled,query_colors,PaintCornerCoordinates{query_paint});
+        }
+        if(!shape)paint_target->begin_stroke();
       }else o.volume->begin_stroke();
       std::shared_ptr<const MaterialSurfaceQuery> scene_query;
       std::optional<PaintProjection> world_projector;
@@ -233,8 +248,8 @@ void Document::native_loop(){
         if(!sample){if(accept)break;continue;}
         auto paint=[&](const Brush &brush){
           if(!world_projector){
-            if(evaluation)o.painted->stamp_evaluated(brush,session->paint,*evaluation,cancelled);
-            else o.painted->stamp(brush,session->paint,cancelled);
+            if(evaluation)paint_target->stamp_evaluated(brush,session->paint,*evaluation,cancelled);
+            else paint_target->stamp(brush,session->paint,cancelled);
             return;
           }
           auto camera=session->projection->settings.camera;
@@ -243,7 +258,7 @@ void Document::native_loop(){
           const auto &settings=session->projection->settings;
           const float target_epsilon=settings.image.visibility_epsilon/world_from_reference.scale;
           uint64_t samples=0;
-          o.painted->stamp_sampled(brush,session->paint,[&](Vec3 p,Vec3 n)->std::optional<PaintedMesh::PaintSample>{
+          paint_target->stamp_sampled(brush,session->paint,[&](Vec3 p,Vec3 n)->std::optional<PaintedMesh::PaintSample>{
             if(++samples>projector.max_samples_per_stamp())throw std::length_error("Projection stamp sample budget exceeded");
             auto projected=projector.sample(p,n,session->paint);if(!projected)return {};
             if(settings.image.visibility){
@@ -268,7 +283,7 @@ void Document::native_loop(){
         }else {
         auto origin=session->affine_world?sample->origin:local(session->transform,sample->origin);auto direction=session->affine_world?sample->direction:rotate(ob::conjugate(session->transform.orientation),sample->direction);
         std::optional<Vec3> hit;Vec3 normal;
-        if(query){auto picked=query->raycast(origin,direction,session->affine_world?10:10/session->transform.scale,sample->material_time);if(picked){hit=picked->position;normal=picked->normal;}}
+        if(query){auto picked=query->raycast(origin,direction,session->affine_world?10:10/session->transform.scale,sample->material_time);if(picked&&(!session->texture_set||query->material_identity(picked->triangle)==SurfaceMaterialIdentity{o.id,session->texture_set->set()})){hit=picked->position;normal=picked->normal;}}
         else {hit=o.volume->raycast(origin,direction,10/session->transform.scale,cancelled);if(hit)normal=o.volume->gradient(*hit);}
         if(hit){auto brush=sample->brush;brush.from=previous.value_or(*hit);brush.to=*hit;brush.normal=normal;if(!session->affine_world){brush.radius/=session->transform.scale;brush.blend/=session->transform.scale;}
           if(shape){auto world=sample->brush;world.from=session->affine_world?previous.value_or(*hit):point(session->transform,previous.value_or(*hit));world.to=session->affine_world?*hit:point(session->transform,*hit);world.normal=session->affine_world?normal:rotate(session->transform.orientation,normal);shape->stamp(world,cancelled);}
@@ -280,6 +295,7 @@ void Document::native_loop(){
         auto now=std::chrono::steady_clock::now();
         if(now-shown>=std::chrono::milliseconds(30)){
           auto preview=working.snapshot();
+          if(session->texture_set){TextureSetLimits limits;limits.cancelled=cancelled;detail::adopt_texture_set_stroke(preview,session->texture_set,*paint_target,limits);}
           if(shape){ShapeKeyEdit edit;edit.action=ShapeKeyAction::Replace;edit.target=*session->shape_target;edit.positions.assign(shape->positions().begin(),shape->positions().end());author_shapekey(preview,o.id,edit,cancelled);detail::shape_sculpt_preview(preview,o.id,*session->shape_target);
             auto geometry=shape->preview();auto frame=detail::placement_frame(working,o.id);if(session->affine_world){detail::place_mesh(geometry,frame,cancelled);if(auto positions=source_world_positions(working,o,shape.get(),cancelled))geometry.positions=std::move(*positions);}
             // Only evaluated geometry changes during this gesture. Preserve
@@ -290,6 +306,7 @@ void Document::native_loop(){
           }
           std::lock_guard lock(model_mutex_);
           if(native_stroke_!=session||session->source.generation!=state_.generation||session->source.revision!=state_.revision||scene_.active().id!=session->source.object||scene_.active().deformation!=session->deformation||!same_placement(scene_,session->source.object,session->transform,session->affine_world))throw std::runtime_error("Desktop source or pose changed");
+          if(session->texture_set)session->texture_set->authenticate_scene(scene_);
           state_.native_samples=processed;publish_locked();
           {std::lock_guard mesh(mesh_mutex_);pending_mesh_.emplace(MeshJob{state_.revision,state_.generation,std::move(preview),false,true,0,0,{}, {}});pending_mesh_->sculpt_mask_view=state_.sculpt_mask_visible;pending_mesh_->native_gesture=session->epoch;pending_mesh_->native_samples=processed;pending_mesh_->pbr_view=session->pbr_view;pending_mesh_->view_epoch=session->view_epoch;}
           mesh_changed_.notify_all();shown=now;
@@ -298,13 +315,15 @@ void Document::native_loop(){
       if(cancelled())throw std::runtime_error("Desktop stroke cancelled");
       bool changed;
       if(shape){ShapeKeyEdit edit;edit.action=ShapeKeyAction::Replace;edit.target=*session->shape_target;edit.positions.assign(shape->positions().begin(),shape->positions().end());changed=author_shapekey(working,o.id,edit,cancelled).changed;}
-      else changed=o.mesh_active?o.painted->end_stroke():o.volume->end_stroke();
+      else changed=o.mesh_active?paint_target->end_stroke():o.volume->end_stroke();
+      if(changed&&session->texture_set){TextureSetLimits limits;limits.cancelled=cancelled;detail::adopt_texture_set_stroke(working,session->texture_set,*paint_target,limits);}
       std::deque<History> previous_redo;
       {std::lock_guard lock(model_mutex_);
         if(cancelled()||native_stroke_!=session||session->source.generation!=state_.generation||session->source.revision!=state_.revision||scene_.active().id!=session->source.object||scene_.active().deformation!=session->deformation||!same_placement(scene_,session->source.object,session->transform,session->affine_world))throw std::runtime_error("Desktop source or pose changed");
+        if(session->texture_set)session->texture_set->authenticate_scene(scene_);
         const bool release_held=session->release_held.load();
         if(release_held){
-          if(!state_.object_grabbing||state_.held_object!=o.id||!held_affine_||!session->held_basis||held_affine_->base_edit!=session->held_basis->base_edit)throw std::runtime_error("Held contact source placement changed");
+          if(!state_.object_grabbing||state_.held_object!=session->source.object||!held_affine_||!session->held_basis||held_affine_->base_edit!=session->held_basis->base_edit)throw std::runtime_error("Held contact source placement changed");
           if(state_.edit_authority==UINT64_MAX)throw std::overflow_error("Object editing authority exhausted");
           working.active().transform=held_preview_transform_;working.active().affine_edit=held_affine_->preview_edit;
           changed=changed||working.active().affine_edit!=scene_.active().affine_edit;

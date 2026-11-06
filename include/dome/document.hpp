@@ -18,6 +18,7 @@
 #include "polygon-controls.hpp"
 #include "cut-authoring.hpp"
 #include "native-stroke.hpp"
+#include "texture-sets.hpp"
 #include "projection-tool.hpp"
 #include "shapekey-authoring.hpp"
 #include <atomic>
@@ -30,7 +31,7 @@
 #include <thread>
 namespace dome {
 class MaterialSurfaceQuery;
-namespace detail {class TextureSetRangeProof;}
+namespace detail {class TextureSetRangeProof;class TextureSetStrokeLease;}
 struct SpatialHand {
   TrackedHand tracked;
   bool joystick = false;
@@ -81,6 +82,7 @@ struct AssetWork {
   std::atomic_bool done{false};
 };
 struct AssetStatus { bool cancellable=false, cancelling=false; float progress=0; };
+struct TextureSetInfo {uint32_t id=0;std::string name;uint32_t resolution=0;size_t triangles=0;};
 struct EditorState {
   uint64_t revision = 1, generation = 1, input_epoch = 1;
   bool dirty = false, stroking = false, menu = false;
@@ -181,6 +183,10 @@ struct EditorState {
   uint64_t view_epoch = 1;
   std::shared_ptr<const RigFitView> rig_fit;
   std::shared_ptr<const VrmExpressionView> expressions;
+  uint32_t active_texture_set=0;
+  std::vector<TextureSetInfo> texture_sets;
+  Material texture_material;
+  bool can_edit_texture_sets=false;
 };
 struct SurfaceRange {
   uint64_t object;
@@ -296,6 +302,7 @@ public:
   std::optional<uint64_t> pick_object(Vec3,Vec3,double material_time=0) const;
   void replace(Volume, bool clean = true);
   void seed();
+  void edit_texture_set(TextureSetEdit,AssetSource expected = {});
   bool begin_native_stroke();
   void configure_shape_sculpt(bool enabled);
   void select_shape_target(uint32_t target, AssetSource expected = {});
@@ -687,6 +694,7 @@ private:
     std::optional<AffineTransform> affine_world;
     std::shared_ptr<const DeformationState> deformation;
     std::shared_ptr<const Scene> initial;
+    std::shared_ptr<const detail::TextureSetStrokeLease> texture_set;
     std::shared_ptr<const MeshSnapshot> original_preview;
     std::optional<size_t> shape_target;
     uint32_t spatial_owner=0;
@@ -824,6 +832,7 @@ private:
     bool uv_keep_normals=false;
     bool uv_keep_paint=false;
     std::shared_ptr<ProjectionLoad> projection_load;
+    std::shared_ptr<const detail::TextureSetStrokeLease> texture_set_source;
   };
   // One running job plus the bounded eight-entry ordered file queue.
   // Protected by model_mutex_; explicit Cancel owns the phase transition.
@@ -903,7 +912,8 @@ private:
                                     std::shared_ptr<std::string>, std::shared_ptr<AssetWork> = {}, std::shared_ptr<bool> = {},
                                     std::shared_ptr<const MeshSnapshot> = {}, uint64_t retopo_session = 0,
                                     uint64_t cut_session = 0, std::shared_ptr<CutHandoff> = {},
-                                    std::optional<BakeAdmission> = {}, uint64_t uv_restore_session = 0, std::optional<SkinAdmission> = {});
+                                    std::optional<BakeAdmission> = {}, uint64_t uv_restore_session = 0, std::optional<SkinAdmission> = {},
+                                    std::shared_ptr<const detail::TextureSetStrokeLease> texture_set_source = {});
   std::vector<uint64_t> bake_sources_locked() const;
   bool bake_source_eligible_locked(uint64_t) const;
   std::vector<uint64_t> bake_cages_locked() const;

@@ -108,6 +108,15 @@ bool select_texture_set(Scene&scene,uint64_t object,TextureSetId set){
  if(set)(void)o.texture_sets->at(set);if(o.texture_sets->active()==set)return false;
  auto c=std::shared_ptr<TextureSetCollection>(new TextureSetCollection(*o.texture_sets));c->active_=set;o.texture_sets=std::move(c);return true;
 }
+bool rename_texture_set(Scene&scene,uint64_t object,TextureSetId id,std::string name,const TextureSetLimits&limits){
+ name_valid(name);limits.validate();stop(limits);const auto&before=scene.object(object);
+ if(!before.texture_sets||!before.visible||before.locked||!before.mesh_active||!before.painted||before.painted->in_stroke())throw std::invalid_argument("Texture-set names need an actual editable member");
+ before.texture_sets->validate(before,false,limits);detail::validate_texture_set_graph(scene,limits);
+ const auto field=texture_set_view(before,id);if(field.name==name)return false;
+ auto next=scene;auto&o=next.object(object);auto c=std::shared_ptr<TextureSetCollection>(new TextureSetCollection(*before.texture_sets));
+ if(!id)o.material.name=std::move(name);else{auto it=std::find_if(c->additional_.begin(),c->additional_.end(),[&](const auto&r){return r.id==id;});it->name=std::move(name);}o.texture_sets=std::move(c);
+ next.validate(false);stop(limits);scene=std::move(next);return true;
+}
 bool edit_texture_set(Scene&scene,uint64_t object,TextureSetId id,
     const std::function<bool(PaintedMesh&,Material&)>&edit,const TextureSetLimits&limits){
  limits.validate();stop(limits);if(!edit)throw std::invalid_argument("Missing texture-set edit operation");

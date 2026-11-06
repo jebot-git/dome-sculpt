@@ -17,6 +17,11 @@ void plain(const PaintedMesh&p,const CreatorAppearance*appearance,const SourceMa
 bool bits(float a,float b){return std::bit_cast<uint32_t>(a)==std::bit_cast<uint32_t>(b);}
 bool bits(Vec3 a,Vec3 b){return bits(a.x,b.x)&&bits(a.y,b.y)&&bits(a.z,b.z);}
 }
+bool texture_set_plain_fields(const SculptObject&o)noexcept{
+ auto field=[](const PaintedMesh*p,const CreatorAppearance*a,const SourceMaterialBindings*b,const ObjectBakeRecipe*r){return p&&!a&&!b&&!r&&!p->source_maps()&&!p->color_projection()&&!p->normal_projection()&&!p->paint_sampling_domain()&&!p->source_sampling_prepared()&&(!p->baked()||(!p->baked()->normal_field&&!p->baked()->normal_authority));};
+ if(!o.mesh_active||!field(o.painted.get(),o.appearance.get(),o.material_bindings.get(),o.bake_recipe.get())||(o.polygon&&o.polygon->colors))return false;
+ if(o.texture_sets)for(const auto&s:o.texture_sets->additional())if(!field(s.painted.get(),s.appearance.get(),s.material_bindings.get(),s.bake_recipe.get()))return false;return true;
+}
 std::shared_ptr<const TextureSetSurfacePlan> prepare_texture_set_surface(const SculptObject&o,const TextureSetLimits&limits){
  limits.validate();stop(limits);
  if(!o.id||!o.mesh_active||!o.painted||!o.texture_sets||o.painted->in_stroke())throw std::invalid_argument("Texture-set surface needs its actual finished current collection");

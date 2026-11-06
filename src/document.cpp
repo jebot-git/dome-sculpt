@@ -45,6 +45,8 @@
 #include "dome/local-surface.hpp"
 #include "geometry-identity.hpp"
 #include "texture-set-worker.hpp"
+#include "texture-set-stroke.hpp"
+#include "texture-set-surface.hpp"
 #include "document-transaction.hpp"
 #include "document-retopo-input.hpp"
 #include "spatial-history-levels.hpp"
@@ -216,12 +218,13 @@ bool Document::pending_locked() const {
 bool Document::reject_texture_paint_locked() {
   const auto &o=scene_.active();
   if(!o.mesh_active || !o.painted)return false;
-  const bool raw_physical=o.painted->surface_diagnostics().policy==PaintUvPolicy::SourceAuthored &&
-      !o.painted->source_sampling_prepared() &&
-      (detail::hdr_emission(o.material.emissive)||o.painted->has_physical_emission()||
-       (o.material_bindings&&detail::physical_emission(*o.material_bindings))||
+  const auto field=active_texture_set(o);const auto&paint=*field.painted;
+  const bool raw_physical=paint.surface_diagnostics().policy==PaintUvPolicy::SourceAuthored &&
+      !paint.source_sampling_prepared() &&
+      (detail::hdr_emission(field.material.emissive)||paint.has_physical_emission()||
+       (field.material_bindings&&detail::physical_emission(*field.material_bindings))||
        (state_.paint.channel==PaintChannel::Emission&&state_.paint.emission_units==PaintEmissionUnits::Physical));
-  if(!raw_physical&&!detail::paint_requires_editable_atlas(*o.painted))return false;
+  if(!raw_physical&&!detail::paint_requires_editable_atlas(paint))return false;
   Transaction transaction(*this);
   state_.message=detail::editable_texture_atlas_notice;
   state_.error.clear();publish_locked(false,false);transaction.commit(false);
@@ -252,6 +255,7 @@ void Document::begin_action_locked() {
     weight_joint_ = uint32_t(state_.rig_joint);
     return;
   }
+  if(scene_.active().texture_sets)throw std::logic_error("Texture-set painting requires its owning native field transaction");
   if(reject_texture_paint_locked())throw std::logic_error(detail::editable_texture_atlas_notice);
   if (scene_.active().mesh_active)
     scene_.active().painted->begin_stroke();
@@ -713,11 +717,19 @@ void Document::publish_locked(bool force,bool checkpoint) {
       state_.sculpt_layer_opacity = l.opacity;
     }
   }
-  state_.active_layer = active.mesh_active ? active.painted->active_layer() : 0;
+  const auto selected_field=active.mesh_active?std::optional<TextureSetView>(active_texture_set(active)):std::nullopt;
+  state_.texture_sets.clear();state_.active_texture_set=active.texture_sets?active.texture_sets->active():0;
+  state_.texture_material=selected_field?selected_field->material:active.material;
+  state_.can_edit_texture_sets=selected_field&&detail::texture_set_plain_fields(active)&&object_editable_locked(active.id)&&!state_.asset_busy&&!state_.recovery_busy&&!native_stroke_&&!control_before_&&!state_.polygon&&!state_.retopology&&!state_.cut&&!uv_;
+  if(selected_field){
+    const auto primary=texture_set_view(active,0);state_.texture_sets.push_back({0,primary.name,primary.painted->resolution(),primary.domain?primary.domain->triangles().size():primary.painted->mesh().indices.size()/3});
+    if(active.texture_sets)for(const auto&s:active.texture_sets->additional())state_.texture_sets.push_back({s.id,s.name,s.painted->resolution(),s.domain->triangles().size()});
+  }
+  state_.active_layer = selected_field ? selected_field->painted->active_layer() : 0;
   state_.paint_layers.clear();
   state_.layer_visible = false;
-  if (active.mesh_active)
-    for (auto &l : active.painted->layers()) {
+  if (selected_field)
+    for (auto &l : selected_field->painted->layers()) {
       state_.paint_layers.push_back(l.name);
       if (l.id == state_.active_layer)
         state_.layer_visible = l.visible;
@@ -884,6 +896,7 @@ void Document::seed() {
 bool Document::begin_desktop() {
   std::lock_guard lock(model_mutex_);
   if(state_.cut)return false;
+  if(scene_.active().texture_sets&&!state_.weights.enabled&&!state_.retopology)return begin_native_locked(0,NativeStrokeSpace::EvaluatedWorldBrush);
   if (control_before_ || uv_ || state_.asset_busy || action_active_locked() ||
       input_.menu_open() || !scene_.active().visible ||
       !object_editable_locked(scene_.active().id) ||
@@ -902,6 +915,7 @@ void Document::stamp_desktop(Brush b) {
   std::lock_guard lock(model_mutex_);
   if (!desktop_)
     throw std::logic_error("Desktop does not own the active stroke");
+  if(native_stroke_&&native_stroke_->texture_set){NativeStrokeSample sample;sample.space=NativeStrokeSpace::EvaluatedWorldBrush;sample.brush=b;if(!sample_native_locked(std::move(sample)))throw std::logic_error("The selected field no longer accepts desktop samples");return;}
   RetopoInputScope admission(*this,bool(state_.retopology));
   auto t = state_.retopology ? state_.retopology->transform
                             : object_world_transform_locked(scene_.active().id);
@@ -1292,6 +1306,7 @@ void Document::prepare_locked(uint32_t resolution) {
   if (state_.asset_busy)
     throw std::logic_error("A painting mesh is already being prepared");
   auto &o = scene_.active();
+  if(o.texture_sets)throw std::logic_error("Texture-set geometry replacement needs its owning membership/field remap");
   if(o.polygon&&o.polygon->active)throw std::logic_error("Use the polygon or UV editor for this native polygon mesh; restore its source before rebuilding sculpt geometry");
   if (o.painted && o.painted->has_paint_data())
     throw std::logic_error("The existing mesh has paint data; use the UV editor or transfer paint before rebuilding its geometry");
@@ -1469,6 +1484,7 @@ void Document::process_locked(const SpatialFrame &incoming) {
   if(state_.shape_sculpt||state_.selection_mode||state_.rig_fit)input_.edit_allowed=false;
   if (state_.retopology) input_.edit_allowed = bool(state_.retopology->source) && !retopo_accepting_ && !state_.asset_busy;
   if(state_.cut)input_.edit_allowed=false;
+  if(scene_.active().texture_sets&&!state_.weights.enabled)input_.edit_allowed=false;
   input_.painting = scene_.active().mesh_active&&!state_.shape_sculpt;
   input_.retopology = bool(state_.retopology);
   input_.cutting = bool(state_.cut);
@@ -3159,9 +3175,9 @@ bool Document::command_enabled_locked(SpatialCommand command) const {
   case SpatialCommand::Duplicate:
     return scene_.objects().size() < 256;
   case SpatialCommand::MakeMesh:
-    return o.visible && !o.locked && !o.deformation;
+    return !o.texture_sets&&o.visible && !o.locked && !o.deformation;
   case SpatialCommand::EditSource:
-    return o.visible && !o.locked && (o.mesh_active || volume().sculpt_settings().mask_edit);
+    return !o.texture_sets&&o.visible && !o.locked && (o.mesh_active || volume().sculpt_settings().mask_edit);
   case SpatialCommand::PaintColor:
   case SpatialCommand::PaintMetal:
   case SpatialCommand::PaintRough:
@@ -3169,10 +3185,10 @@ bool Document::command_enabled_locked(SpatialCommand command) const {
   case SpatialCommand::PaintMask:
     return o.visible && !o.locked;
   case SpatialCommand::AddLayer:
-    return o.mesh_active && o.painted && o.painted->layers().size() < 16;
+    return o.mesh_active && o.painted && active_texture_set(o).painted->layers().size() < 16;
   case SpatialCommand::DeleteLayer:
   case SpatialCommand::NextLayer:
-    return o.mesh_active && o.painted && o.painted->layers().size() > 1;
+    return o.mesh_active && o.painted && active_texture_set(o).painted->layers().size() > 1;
   case SpatialCommand::LayerVisible:
   case SpatialCommand::LayerOpacity:
     return o.mesh_active && bool(o.painted);
@@ -3513,6 +3529,18 @@ void Document::command_locked(SpatialCommand command) {
     auto &o = scene_.active();
     if (!o.painted || !o.mesh_active)
       throw std::logic_error("Prepare or select a painting mesh first");
+    if(o.texture_sets){
+      Scene next=scene_;const auto set=o.texture_sets->active();
+      dome::edit_texture_set(next,o.id,set,[&](PaintedMesh&p,Material&){
+        const auto&layers=p.layers();const auto at=std::find_if(layers.begin(),layers.end(),[&](const auto&l){return l.id==p.active_layer();});
+        if(command==SpatialCommand::NextLayer)p.select_layer(layers[(size_t(at-layers.begin())+1)%layers.size()].id);
+        else if(command==SpatialCommand::AddLayer)p.add_layer("Paint "+std::to_string(layers.size()+1));
+        else if(command==SpatialCommand::DeleteLayer)p.delete_layer();
+        else p.layer_properties(at->name,command==SpatialCommand::LayerVisible?!at->visible:at->visible,command==SpatialCommand::LayerOpacity?(at->opacity>.26f?at->opacity-.25f:1.f):at->opacity);
+        return true;
+      });
+      Scene before=std::move(scene_);scene_=std::move(next);scene_changed_locked(std::move(before));return;
+    }
     if (command == SpatialCommand::NextLayer) {
       auto &layers = o.painted->layers();
       auto i = std::find_if(layers.begin(), layers.end(), [&](auto &l) {
@@ -3742,6 +3770,7 @@ void Document::file_loop() {
           return stopping_.load() || (job->work && job->work->cancelled.load()) || state->generation != job->generation ||
                  state->revision != job->revision || state->active_object != job->object || state->edit_authority!=job->edit_authority;
         };
+        if(job->texture_set_source){job->texture_set_source->authenticate_owner(job->texture_set_source);job->texture_set_source->authenticate_scene(job->scene);}
         job->scene_operation(job->scene, cancelled);
         if (cancelled()) throw std::runtime_error("Scene changed during " + job->operation_label);
         if(job->cut_handoff){
@@ -3766,6 +3795,7 @@ void Document::file_loop() {
           if (job->content != content_ || job->revision != state_.revision ||
               job->object != scene_.active().id || state_.edit_authority!=job->edit_authority || action_active_locked() || control_before_)
             throw std::runtime_error("Scene changed during " + job->operation_label);
+          if(job->texture_set_source)job->texture_set_source->authenticate_scene(scene_);
           if(accepted_result)accepted_result->recovery=recovery_source_;
           Transaction transaction(*this);
           state_.asset_busy=false;
