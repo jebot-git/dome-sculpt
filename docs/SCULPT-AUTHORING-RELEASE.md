@@ -31,8 +31,11 @@ two informational issues across the five actual current GLB exports. Issues are
 unfiltered. The `NODE_SKINNED_MESH_NON_ROOT` warnings remain relevant to broader
 independent transform/deformation qualification.
 
-A fresh matching ASan/UBSan build is running; no sanitizer pass is claimed by
-this milestone. Current combined OpenXR/compositor/physical workflows, sustained
+A matching ASan/UBSan follow-up now passes the selected native, graphics, FLTK
+and synthetic-controller workflows; read
+[SCULPT-AUTHORING-MATCHED.md](SCULPT-AUTHORING-MATCHED.md) for its precise scope
+and the separate inherited VRM1 regression still required before main admission.
+Current combined material-specific OpenXR/compositor/physical workflows, sustained
 production-size performance and the remaining requirements still need evidence.
 The newer sourceful texture-set persistence and all-channel resolution changes
 remain separate agent branches awaiting runtime qualification. Controller

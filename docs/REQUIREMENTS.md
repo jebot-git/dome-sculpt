@@ -1,3 +1,16 @@
+## Private matched sculpt/material evidence — 2026-11-06
+
+Private `d1f40159` has matching Release/SAN qualification for 15 selected native
+suites, 733 software graphics, 70 ordinary FLTK and 103 actual-loader synthetic
+OpenXR checks per profile, with 564 current binary inputs unchanged. Read
+[SCULPT-AUTHORING-MATCHED.md](SCULPT-AUTHORING-MATCHED.md) for exact comparisons,
+preserved original failures and limits. Current independently inherited VRM1
+normal/Shift/masked-Rim routes still require union regression before main product
+admission. Production P1 sculpt inventory fails the working-byte guard before
+accepted publication; a genuine bounded construction repair is in progress.
+New sourceful texture/resolution branches, broader production, interoperability,
+backend/device and controller-drawer requirements remain required. Full goal active.
+
 ## Private combined sculpt/material Release evidence — 2026-11-06
 
 Private `d1f40159` now has fresh reachable Release application/core/render/XR

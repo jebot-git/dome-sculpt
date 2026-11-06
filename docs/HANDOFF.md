@@ -1,3 +1,25 @@
+## Private matched sculpt/material qualification — 2026-11-06
+
+Current `d1f40159` now passes matched Release/SAN: 15 selected native suites,
+733 software GL, 70 normal FLTK and 103 actual-loader/synthetic-controller XR
+checks per profile. All 564 current project outputs rehash unchanged. There are
+84 exact native/graphics/XR pairs and two exact GUI native endpoints; four GUI
+viewport/dialog images match, with two whole PNG differences confined to Saved
+path text. The sanitizer final-link disk-reserve failure and its unchanged-input
+continuation are preserved. Read
+[SCULPT-AUTHORING-MATCHED.md](SCULPT-AUTHORING-MATCHED.md) and its receipt.
+
+Main product admission waits for current regression of independently inherited
+VRM1 normal/Shift/masked-Rim behavior. Historical source parity does not replace
+current union tests. Actual production P1 sculpt inventory is not admitted: cold
+publication exceeds the working-byte guard. The local-meshing agent is repairing
+initial index construction and scratch lifetimes without increasing the guard.
+Sourceful texture/history/export and resolution/UI-test branches remain separate.
+Older77e237objects are losslessly archived with original-path restore controls;
+restore before using its thin indexes. Current raw builds/verified full Release
+backup are RAM-backed and need durable restaging before cleanup. Full goal active;
+no installation or new physical-headset acceptance.
+
 ## Private combined sculpt/material Release checkpoint — 2026-11-06
 
 Private `d1f40159` combines local sculpt chunks, owning polygon fields and plain

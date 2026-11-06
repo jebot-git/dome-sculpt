@@ -1,0 +1,107 @@
+{
+  "status": "Private matched current sculpt/polygon/plain-texture component/application qualification; full objective incomplete",
+  "product_source": "d1f4015995c48ee582b9478d99cb521a1101571b",
+  "branch": "work/sculpt-authoring-77e",
+  "receipts": {
+    "Release": {
+      "path": "artifacts/sculpt-authoring-77e/artifacts/current-release-tmp-v2/status.json",
+      "sha256": "41481a7a512b170842a24720aed9edbfb30aff75c590c38e9be8a40f1aa48f31"
+    },
+    "SAN": {
+      "path": "artifacts/sculpt-authoring-77e/artifacts/current-sanitize-tmp-v2/status.json",
+      "sha256": "b2b1667eb35973c04f78761ad9f1303780c80563d83f73a29703b58ee1ad8da0"
+    },
+    "ReleaseGL": {
+      "path": "artifacts/sculpt-authoring-77e/artifacts/current-graphics/status.json",
+      "sha256": "609f19e72c2ad1af869d75da386048d84836dbff248b95522cf59e9ccba28029"
+    },
+    "SANGL": {
+      "path": "artifacts/sculpt-authoring-77e/artifacts/current-sanitize-graphics/raw/status.json",
+      "sha256": "624c977d16f6111c7001e16fbe4ec2327e5ba54895c027d4c34b3d5e33ad63a1"
+    },
+    "ReleasePolygonGUI": {
+      "path": "artifacts/sculpt-authoring-77e/artifacts/current-gui/polygon-normal/status.json",
+      "sha256": "234e7af14c9c1503c35efcd330a0fd680d84ea02e98eb7e606c3ab3126eda816"
+    },
+    "ReleaseTextureGUI": {
+      "path": "artifacts/sculpt-authoring-77e/artifacts/current-gui/texture-normal/status.json",
+      "sha256": "f308be189a2f802c463f3fe11ec8c56e9811224b6c478384154a126b32410a74"
+    },
+    "SANPolygonGUI": {
+      "path": "artifacts/sculpt-authoring-77e/artifacts/current-gui-sanitize/polygon-normal/status.json",
+      "sha256": "c9d55c6db21dd10f791ee1a839925cd6a35c608d250d4e2de1049c31fe194833"
+    },
+    "SANTextureGUI": {
+      "path": "artifacts/sculpt-authoring-77e/artifacts/current-gui-sanitize/texture-normal/status.json",
+      "sha256": "e3e7c78ae4c82c963ac93d27e1b19462c4ac6af8456e28075023fb1dcb1bd1a7"
+    },
+    "ReleaseXR": {
+      "path": "artifacts/sculpt-authoring-77e/artifacts/current-xr/status.json",
+      "sha256": "4f122db7fd671259a9a878510cfa530fe5a2a8b408990862240d9c0e45b83cc3"
+    },
+    "SANXR": {
+      "path": "artifacts/sculpt-authoring-77e/artifacts/current-xr-sanitize/status.json",
+      "sha256": "0a5689fdf87cf108ffb788e00d354fb2b0c97c7340859821e12799d58c5e7829"
+    },
+    "Arc": {
+      "path": "artifacts/sculpt-authoring-77e/artifacts/current-arc/status.json",
+      "sha256": "93dad7cff2b9689afabfa4a471dc523bdd1bf97e2dd66c10de11ad24f392f1fb"
+    },
+    "Khronos": {
+      "path": "artifacts/sculpt-authoring-77e/artifacts/current-gltf-validation/status.json",
+      "sha256": "f21254bd8af621fa557860135ded3efdbd82b6f0522ed845b824a8131781f0c9"
+    },
+    "pairs-native-and-GL": {
+      "path": "artifacts/sculpt-authoring-77e/artifacts/current-pairs/native-and-GL.json",
+      "sha256": "d5d1ce2dee68989556133b77efd421e6a2427bca267d6483716213dbb04c75d4"
+    },
+    "pairs-XR": {
+      "path": "artifacts/sculpt-authoring-77e/artifacts/current-pairs/XR.json",
+      "sha256": "851c2f94a4a0f521b9277098f4863011932bcddb9e2f382a399a9905c87e82b6"
+    },
+    "pairs-GUI": {
+      "path": "artifacts/sculpt-authoring-77e/artifacts/current-pairs/GUI.json",
+      "sha256": "e38bc9fa6c515522a7aadd95c27ca024a27bb6c0eb3fa4283f3f87335eaff7fa"
+    },
+    "pairs-GUI-viewport": {
+      "path": "artifacts/sculpt-authoring-77e/artifacts/current-pairs/GUI-viewport.json",
+      "sha256": "12ba3d3a38b67aefc3f04d411066f1b98a2415e98a1273546b144a639894a8dd"
+    }
+  },
+  "providers": {
+    "per_profile": 282,
+    "total_rehashed_unique": 564,
+    "objects_per_profile": 252,
+    "thin_archives_per_profile": 11,
+    "executables_per_profile": 19,
+    "Release_flags": "O3/NDEBUG/function+data sections/gc",
+    "SAN_flags": "O1/g1/NDEBUG ASan+UBSan/framepointers/sections/gc, leak/UB stop; no suppressions",
+    "current_canonical_SDK": "DomeD fltk-poll-final Release/SAN plus canonical bitmap runtime",
+    "all_current_project_bytes_rehashed_unchanged": true
+  },
+  "per_profile": {
+    "selected_native_suites": 15,
+    "software_GL_controls": 733,
+    "actual_normal_FLTK_checks": 70,
+    "actual_loader_synthetic_controller_XR_checks": 103
+  },
+  "hardware": "Release-only unchanged consumers733 on authenticated Arc A770; actual UHD refused. No new compute/physical claim.",
+  "pairs": {
+    "native_and_GL_exact": 64,
+    "XR_exact": 20,
+    "GUI_native_endpoints_exact": 2,
+    "GUI_whole_images_exact": 2,
+    "GUI_whole_image_differences": 2,
+    "GUI_viewport_and_dialog_images_exact": 4,
+    "difference_explanation": "Only Saved path text differs in actual28pixel status bar. Original whole PNG differences retained; no pixel tolerance changes."
+  },
+  "Khronos": "Five exports zero errors/five warnings/two infos, unfiltered. SAN exports byte-identical; original report applies to same bytes.",
+  "retained_failures": {
+    "Release": "Initial01a packed-only picking regression fixed by whole d1 material-query TU; original failed outputs preserved.",
+    "SAN": "Initial final-link guard stops at277/284 after all252objects and11archives compiled. Unchanged-input continuation finishes9missingELFs; all273prior inputs/source/SDK unchanged.",
+    "storage": "Older77e237objects archived losslessly with original-path metadata/xattr restoration controls; indexes/ELFs/sources retained. Current full Release archive verified1189files, root duplicate withdrawn to maintain SAN diskreserve; verified archive/raw outputs remainRAM-backed. See current-preservation-v5/workspace-copy-withdrawal.json and closed-authoring-77e-20261106."
+  },
+  "main_admission": "Held for current regression of inherited independent VRM1 normal/Shift/masked-Rim changes; historical source-byte parity and component receipts do not qualify this current union. Current15native/polygonGL controls do not cover those routes.",
+  "production_inventory": "NOT admitted: actual cold P1 voxel.0125 fails Sculpt chunk working byte limit exceeded before accepted snapshot. Efficient initial sorted AVL construction and lifetime-proven tile scratch are being implemented on separate branch without raising guards.",
+  "remaining": "New sourceful texture-set/history/export/resolution branches need fresh composition/runtime; production sustained use, broader authoring/avatar/interoperability/backend/device and controller drawers remain required. No goal completion, installation or physical headset test."
+}
