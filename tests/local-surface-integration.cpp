@@ -174,7 +174,7 @@ bool same_preview(const MeshSnapshot &snapshot,const Scene &scene,const Mesh *re
       if(std::any_of(snapshot.ranges.begin(),snapshot.ranges.end(),[&](const auto &r){return r.object==object.id;}))return false;
       chunk->geometry->for_each_run([&](const dome::detail::SculptSurfaceRun &run){
         const auto placed=chunk->placed->find(run.chunk);const auto &mesh=*placed->geometry_owner();
-        for(size_t c=run.first;c<run.first+run.count;++c){const auto vertex=mesh.indices.at(c);corner(mesh.positions.at(vertex),mesh.normals.at(vertex));}
+        for(size_t c=run.first;c<run.first+run.count;++c){const auto vertex=mesh.indices.at(c);corner(chunk->placed_position(mesh.positions.at(vertex)),chunk->placed_normal(mesh.normals.at(vertex)));}
       });
     }else for(const auto &range:snapshot.ranges)if(range.object==object.id)
       for(size_t c=range.first;c<range.first+range.count;++c){const auto vertex=snapshot.mesh.indices.at(c);corner(snapshot.mesh.positions.at(vertex),snapshot.mesh.normals.at(vertex));}

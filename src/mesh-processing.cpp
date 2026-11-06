@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/mesh-processing.hpp"
+#include "affine-query-metric.hpp"
 #include <bit>
 #include <limits>
 #include <map>
@@ -531,6 +532,61 @@ std::optional<SurfaceQueryResult> SurfaceQuery::raycast_result(Vec3 origin, Vec3
   if (triangle == UINT32_MAX)
     return {};
   return SurfaceQueryResult{impl_->hit(triangle,origin+direction*float(best),bary,float(best)),best*best};
+}
+std::optional<SurfaceQueryResult> SurfaceQuery::nearest_result(Vec3 point,const AffineTransform &world,
+    const SurfaceQueryOptions &options) const {
+  cancel(options.cancelled);
+  if(!impl_||!finite(point)||std::max({std::abs(point.x),std::abs(point.y),std::abs(point.z)})>1000||
+     !options.max_triangle_tests||options.max_triangle_tests>2'000'000||std::isnan(options.closest_maximum)||options.closest_maximum<=0)
+    throw std::invalid_argument("Invalid affine closest-surface query");
+  const auto inverse=world.inverse();const auto local=inverse.point(detail::query_point(point));
+  double best=std::nextafter(double(options.closest_maximum)*options.closest_maximum,INFINITY);uint32_t triangle=UINT32_MAX;
+  std::array<float,3> bary{};Vec3 position;size_t visited=0;
+  auto distance=[&](const Bvh::Node &node){return detail::metric_bounds_distance(node.box.lo,node.box.hi,local,world);};
+  const auto walk=[&](auto &self,int index)->void {
+    cancel(options.cancelled);const auto &node=impl_->tree.nodes[index];if(distance(node)>best)return;
+    if(node.left>=0){auto a=node.left,b=node.right;if(distance(impl_->tree.nodes[a])>distance(impl_->tree.nodes[b]))std::swap(a,b);self(self,a);self(self,b);return;}
+    for(size_t i=node.start;i<node.start+node.count;++i){
+      if(++visited>options.max_triangle_tests)throw std::length_error("Affine closest triangle work budget exceeded");
+      const auto t=impl_->tree.order[i];if(options.triangle_filter&&!options.triangle_filter(t))continue;
+      const auto a=detail::query_point(impl_->tree.point(t,0)),b=detail::query_point(impl_->tree.point(t,1)),c=detail::query_point(impl_->tree.point(t,2));
+      const auto ap=world.direction(detail::query_sub(local,a)),ab=world.direction(detail::query_sub(b,a)),ac=world.direction(detail::query_sub(c,a));
+      const auto hit=detail::metric_closest(ap,ab,ac);
+      if(hit.distance2<best||(hit.distance2==best&&t<triangle)){
+        if(options.closest_filter&&!options.closest_filter(t,hit.bary))continue;
+        best=hit.distance2;triangle=t;bary=hit.bary;
+        position={float(double(point.x)-ap[0]+hit.relative[0]),float(double(point.y)-ap[1]+hit.relative[1]),float(double(point.z)-ap[2]+hit.relative[2])};
+      }
+    }
+  };
+  walk(walk,0);if(triangle==UINT32_MAX)return {};cancel(options.cancelled);
+  return SurfaceQueryResult{SurfaceHit{triangle,position,detail::metric_normal(impl_->mesh,triangle,bary,inverse),bary,float(std::sqrt(best))},best};
+}
+std::optional<SurfaceQueryResult> SurfaceQuery::raycast_result(Vec3 origin,Vec3 direction,float maximum,
+    const AffineTransform &world,const SurfaceQueryOptions &options) const {
+  cancel(options.cancelled);
+  if(!impl_||!finite(origin)||!finite(direction)||!std::isfinite(length(direction))||length(direction)<1e-12f||
+     std::max({std::abs(origin.x),std::abs(origin.y),std::abs(origin.z)})>1000||!std::isfinite(maximum)||maximum<0||maximum>1000||!options.max_triangle_tests)
+    throw std::invalid_argument("Invalid affine surface ray");
+  const auto inverse=world.inverse();auto d=detail::query_point(direction);const auto magnitude=std::hypot(d[0],d[1],d[2]);for(double &v:d)v/=magnitude;
+  const detail::MetricRay ray(inverse.point(detail::query_point(origin)),inverse.direction(d));
+  double best=maximum;uint32_t triangle=UINT32_MAX;std::array<float,3>bary{};size_t visited=0;
+  const auto walk=[&](auto &self,int index)->void {
+    cancel(options.cancelled);const auto &node=impl_->tree.nodes[index];if(!ray.box(node.box.lo,node.box.hi,best))return;
+    if(node.left>=0){self(self,node.left);self(self,node.right);return;}
+    for(size_t i=node.start;i<node.start+node.count;++i){
+      if(++visited>options.max_triangle_tests)throw std::length_error("Affine ray triangle work budget exceeded");
+      const auto t=impl_->tree.order[i];if(options.triangle_filter&&!options.triangle_filter(t))continue;
+      double distance;std::array<float,3>coordinates{};
+      if(!ray.hit(impl_->tree.point(t,0),impl_->tree.point(t,1),impl_->tree.point(t,2),best,distance,coordinates))continue;
+      if(distance==best&&triangle!=UINT32_MAX&&t>triangle)continue;
+      if(options.ray_filter&&!options.ray_filter(t,coordinates))continue;
+      best=distance;triangle=t;bary=coordinates;
+    }
+  };
+  walk(walk,0);if(triangle==UINT32_MAX)return {};cancel(options.cancelled);
+  Vec3 position{float(double(origin.x)+d[0]*best),float(double(origin.y)+d[1]*best),float(double(origin.z)+d[2]*best)};
+  return SurfaceQueryResult{SurfaceHit{triangle,position,detail::metric_normal(impl_->mesh,triangle,bary,inverse),bary,float(best)},best*best};
 }
 TopologyReport inspect_mesh(const Mesh &m,
                             const std::function<bool()> &cancelled) {

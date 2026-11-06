@@ -414,16 +414,18 @@ std::optional<MaterialSurfaceHit> MaterialSurfaceQuery::Impl::target(Vec3 point,
       SurfaceQueryOptions options;options.max_triangle_tests=65536;
       options.closest_maximum=upper_limit();
       options.triangle_filter=count;
+      const auto &frame=chunk->placement_frame();
+      const auto local_direction=frame.inverse().direction({direction.x,direction.y,direction.z});
       if(ray&&!material.double_sided)options.ray_filter=[&](uint32_t t,const std::array<float,3>&){
         const auto &m=*chunk->geometry_owner();const auto c=size_t(t)*3;
         const auto a=m.positions[m.indices[c]],b=m.positions[m.indices[c+1]],v=m.positions[m.indices[c+2]];
         const double ux=double(b.x)-a.x,uy=double(b.y)-a.y,uz=double(b.z)-a.z;
         const double vx=double(v.x)-a.x,vy=double(v.y)-a.y,vz=double(v.z)-a.z;
-        return (uy*vz-uz*vy)*direction.x+(uz*vx-ux*vz)*direction.y+(ux*vy-uy*vx)*direction.z<0;
+        return (uy*vz-uz*vy)*local_direction[0]+(uz*vx-ux*vz)*local_direction[1]+(ux*vy-uy*vx)*local_direction[2]<0;
       };
       const auto limit=upper_limit();
-      auto hit=ray?chunk->query()->raycast_result(point,direction,limit,options):chunk->query()->nearest_result(point,options);
-      if(hit){if(chunk->reflected())std::swap(hit->surface.barycentric[1],hit->surface.barycentric[2]);accept({hit->surface,object.object,chunk->source()},hit->squared_distance);}
+      auto hit=ray?chunk->query()->raycast_result(point,direction,limit,frame.world(),options):chunk->query()->nearest_result(point,frame.world(),options);
+      if(hit)accept({hit->surface,object.object,chunk->source()},hit->squared_distance);
     });
   }
   return best;

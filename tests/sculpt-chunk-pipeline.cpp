@@ -62,8 +62,9 @@ void corners_equal(const Scene &scene,const SculptScenePreview &preview){
     object.geometry->for_each_run([&](const SculptSurfaceRun &run){
       const auto placed=object.placed->find(run.chunk);const auto &mesh=*placed->geometry_owner();
       for(size_t c=run.first;c<run.first+run.count;++c){
-        const auto v=mesh.indices.at(c),w=expected->mesh.indices.at(at++);
-        if(!bits(mesh.positions.at(v),expected->mesh.positions.at(w))||!bits(mesh.normals.at(v),expected->mesh.normals.at(w)))throw std::runtime_error("Original-order independent world corner/normal mismatch");
+        const auto corner=object.reflected()&&c%3?c/3*3+3-c%3:c;
+        const auto v=mesh.indices.at(corner),w=expected->mesh.indices.at(at++);
+        if(!bits(object.placed_position(mesh.positions.at(v)),expected->mesh.positions.at(w))||!bits(object.placed_normal(mesh.normals.at(v)),expected->mesh.normals.at(w)))throw std::runtime_error("Original-order independent world corner/normal mismatch");
       }
     });
     pipeline_check(at==range->first+range->count,"Original Scene/cell/triangle draw runs preserve every whole-reference corner and normal bit");
@@ -88,8 +89,8 @@ int main(int argc,char **argv)try{
   size_t probes=0;
   one->placed->for_each([&](const auto &packet){
     const auto &mesh=*packet->geometry_owner();if(probes>=12)return;
-    const auto a=mesh.indices[0],b=mesh.indices[1],c=mesh.indices[2];const auto center=(mesh.positions[a]+mesh.positions[b]+mesh.positions[c])/3.f;
-    const auto n=normalized(mesh.normals[a]+mesh.normals[b]+mesh.normals[c]);const auto p=center+n*.03f;
+    const auto a=mesh.indices[0],b=mesh.indices[1],c=mesh.indices[2];const auto &object=*one;const auto center=(object.placed_position(mesh.positions[a])+object.placed_position(mesh.positions[b])+object.placed_position(mesh.positions[c]))/3.f;
+    const auto n=normalized(object.placed_normal(mesh.normals[a])+object.placed_normal(mesh.normals[b])+object.placed_normal(mesh.normals[c]));const auto p=center+n*.03f;
     const auto hit=actual.raycast_target(p,n*-1,.08f,0,1),expected=oracle.raycast_target(p,n*-1,.08f,0,1);
     if(!hit||!expected||hit->packed()||hit->object!=1||!one->geometry->owns(hit->chunk)||length(hit->surface.position-expected->surface.position)>2e-5f||std::abs(hit->surface.distance-expected->surface.distance)>2e-5f)throw std::runtime_error("Actual typed chunk ray differs from independent packed reference");
     ++probes;
@@ -116,8 +117,8 @@ int main(int argc,char **argv)try{
     size_t affine_probes=0;
     affine.chunks->find(1)->placed->for_each([&](const auto &packet){
       if(affine_probes>=8)return;const auto &mesh=*packet->geometry_owner();
-      const auto a=mesh.indices[0],b=mesh.indices[1],c=mesh.indices[2];const auto center=(mesh.positions[a]+mesh.positions[b]+mesh.positions[c])/3.f;
-      const auto n=normalized(mesh.normals[a]+mesh.normals[b]+mesh.normals[c]),p=center+n*.03f;
+      const auto a=mesh.indices[0],b=mesh.indices[1],c=mesh.indices[2];const auto &object=*affine.chunks->find(1);const auto center=(object.placed_position(mesh.positions[a])+object.placed_position(mesh.positions[b])+object.placed_position(mesh.positions[c]))/3.f;
+      const auto n=normalized(object.placed_normal(mesh.normals[a])+object.placed_normal(mesh.normals[b])+object.placed_normal(mesh.normals[c])),p=center+n*.03f;
       const auto actual=query.raycast_target(p,n*-1,.08f,0,1),expected=independent.raycast_target(p,n*-1,.08f,0,1);
       if(!actual||!expected||actual->object!=1||actual->packed()||length(actual->surface.position-expected->surface.position)>3e-5f||std::abs(actual->surface.distance-expected->surface.distance)>3e-5f||length(actual->surface.normal-expected->surface.normal)>3e-4f)
         throw std::runtime_error("Affine mixed ray metric/normal differs from independently packed world geometry");

@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #pragma once
 #include "mesh.hpp"
+#include "affine.hpp"
 #include <memory>
 #include <limits>
 #include <stdexcept>
@@ -80,6 +81,10 @@ public:
   std::optional<SurfaceHit> nearest(Vec3, const SurfaceQueryOptions &) const;
   std::optional<SurfaceQueryResult> nearest_result(Vec3,const SurfaceQueryOptions &) const;
   std::optional<SurfaceQueryResult> raycast_result(Vec3,Vec3,float,const SurfaceQueryOptions &) const;
+  // Immutable local geometry with an exact authored placement. World distances
+  // and normals retain full affine meaning without float world-Mesh staging.
+  std::optional<SurfaceQueryResult> nearest_result(Vec3,const AffineTransform &,const SurfaceQueryOptions &) const;
+  std::optional<SurfaceQueryResult> raycast_result(Vec3,Vec3,float,const AffineTransform &,const SurfaceQueryOptions &) const;
   std::optional<SurfaceHit> raycast(Vec3 origin, Vec3 direction,
                                     float maximum = 100) const;
   std::optional<SurfaceHit> raycast(Vec3 origin, Vec3 direction, float maximum,

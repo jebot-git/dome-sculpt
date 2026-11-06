@@ -31,11 +31,10 @@ bool SculptPlacedChunk::matches(const SculptObjectChunks &object,const SculptSur
   return placement_matches(object);
 }
 bool SculptPlacedChunk::placement_matches(const SculptObjectChunks &object) const {
-  if(bool(affine_)!=bool(object.affine))return false;
-  if(!affine_)return same(world_,object.world);
-  return matrix_same(affine_->world().matrix(),object.affine->world().matrix())&&
-      matrix_same(affine_->inverse().matrix(),object.affine->inverse().matrix())&&
-      affine_->orientation()==object.affine->orientation();
+  if(!affine_)return false;
+  if(object.affine)return matrix_same(affine_->world().matrix(),object.affine->world().matrix())&&
+      matrix_same(affine_->inverse().matrix(),object.affine->inverse().matrix())&&affine_->orientation()==object.affine->orientation();
+  return same(world_,object.world)&&matrix_same(affine_->world().matrix(),affine_similarity(object.world).matrix());
 }
 SculptPlacedChunk::Ptr SculptPlacedChunk::capture(const SculptSceneChunks::Ptr &scene,uint64_t object,
     const SculptSurfaceChunks::Chunk &source,const Ptr &before,bool require_query,
@@ -51,63 +50,45 @@ SculptPlacedChunk::Ptr SculptPlacedChunk::capture(const SculptSceneChunks::Ptr &
       throw std::length_error("Retained placed chunk exceeds requested limits");
     return before;
   }
+  // Keep the original valid local float representation. Absolute world float
+  // placement can collapse distinct vertices even under a simple translation.
+  // GPU placement and binary64 affine query metrics consume the real frame.
+  const bool same_source=before&&before->source_==source&&!before->source_.owner_before(source)&&!source.owner_before(before->source_);
+  if(!same_source)source->mesh.validate();
+  const bool reuse_query=require_query&&same_source&&before->query_;
   const auto query_bytes=require_query?SurfaceQuery::immutable_working_bytes(source->mesh):0;
   const auto own=sizeof(SculptPlacedChunk)+128;
-  size_t retained=source->bytes;
-  auto retain=[&](size_t n,size_t width=1){
-    if(retained>limits.retained_bytes||n>(limits.retained_bytes-retained)/width)
-      throw std::length_error("Placed sculpt chunk retained byte limit exceeded");
-    retained+=n*width;
-  };
-  retain(own);
-  if(reuse)retain(mesh_bytes(*before->geometry_));
-  else {
-    retain(sizeof(Mesh)+128);retain(source->mesh.positions.size(),2*sizeof(Vec3));
-    retain(source->mesh.indices.size(),sizeof(uint32_t));
-  }
-  retain(query_bytes);
-  size_t working=0;
-  auto charge=[&](size_t n,size_t width=1){
-    if(working>limits.working_bytes||n>(limits.working_bytes-working)/width)
-      throw std::length_error("Placed sculpt chunk working byte limit exceeded");
-    working+=n*width;
-  };
-  charge(source->bytes);if(before)charge(before->bytes_);
-  charge(sizeof(SculptPlacedChunk)+128);
-  charge(query_bytes);
-  std::shared_ptr<const Mesh> geometry;
-  SculptChunkBounds bounds;
-  if(reuse) {geometry=before->geometry_;bounds=before->bounds_;}
-  else {
-    charge(sizeof(Mesh)+128);
-    charge(source->mesh.positions.size(),2*sizeof(Vec3));charge(source->mesh.indices.size(),sizeof(uint32_t));
-    Mesh mesh;mesh.positions.reserve(source->mesh.positions.size());mesh.normals.reserve(source->mesh.normals.size());
-    mesh.indices=source->mesh.indices;
-    for(size_t v=0;v<source->mesh.positions.size();++v) {
-      if((v&255)==0)stop(cancel);
-      const auto p=view->placed_position(source->mesh.positions[v]);
-      mesh.positions.push_back(p);mesh.normals.push_back(view->placed_normal(source->mesh.normals.at(v)));bounds.include(p);
-    }
-    if(view->reflected())for(size_t c=0;c<mesh.indices.size();c+=3) {
-      if((c&255)==0)stop(cancel);std::swap(mesh.indices[c+1],mesh.indices[c+2]);
-    }
-    mesh.validate();geometry=std::make_shared<const Mesh>(std::move(mesh));
-  }
-  // Capacity is deterministic for the qualified standard library, but still
-  // verify the owned result rather than treating requested capacity as proof.
-  const auto actual_mesh=mesh_bytes(*geometry);
-  const auto expected_mesh=reuse?mesh_bytes(*before->geometry_):
-      sizeof(Mesh)+128+source->mesh.positions.size()*2*sizeof(Vec3)+source->mesh.indices.size()*sizeof(uint32_t);
-  if(actual_mesh>expected_mesh)throw std::length_error("Placed mesh capacity exceeded its prospective envelope");
+  if(source->bytes>limits.retained_bytes||own>limits.retained_bytes-source->bytes||query_bytes>limits.retained_bytes-source->bytes-own)
+    throw std::length_error("Placed sculpt chunk retained byte limit exceeded");
+  const auto retained=source->bytes+own+query_bytes;
+  const auto previous=before?before->bytes_:0;
+  if(retained>limits.working_bytes||previous>limits.working_bytes-retained)
+    throw std::length_error("Placed sculpt chunk working byte limit exceeded");
   auto out=std::shared_ptr<SculptPlacedChunk>(new SculptPlacedChunk);
-  out->source_=source;out->geometry_=std::move(geometry);out->bounds_=bounds;
-  out->world_=view->world;out->affine_=view->affine;out->reflected_=view->reflected();out->bytes_=retained;
-  if(out->affine_)out->tangent_=placed_tangent(*out->affine_,{1,0,0,1});
-  else {
-    const auto t=ob::rotate(out->world_.orientation,{1,0,0});out->tangent_={t.x,t.y,t.z,1};
+  out->source_=source;out->geometry_=same_source?before->geometry_:std::shared_ptr<const Mesh>(source,&source->mesh);
+  out->world_=view->world;out->affine_=view->affine?view->affine:std::optional<AffineInteractionFrame>(AffineInteractionFrame(affine_similarity(view->world)));
+  out->reflected_=view->reflected();out->bytes_=retained;
+  // A transformed local box is conservative for every actual source vertex.
+  // Outward float neighbours retain coverage of double authored placement.
+  for(size_t corner=0;corner<8;++corner){
+    stop(cancel);const auto &box=source->bounds;
+    const Vec3 local{corner&1?box.maximum.x:box.minimum.x,corner&2?box.maximum.y:box.minimum.y,corner&4?box.maximum.z:box.minimum.z};
+    const auto p=out->affine_->world().point({local.x,local.y,local.z});
+    const Vec3 lower{std::nextafter(float(p[0]),-INFINITY),std::nextafter(float(p[1]),-INFINITY),std::nextafter(float(p[2]),-INFINITY)};
+    const Vec3 upper{std::nextafter(float(p[0]),INFINITY),std::nextafter(float(p[1]),INFINITY),std::nextafter(float(p[2]),INFINITY)};
+    if(!finite(lower)||!finite(upper))throw std::overflow_error("Placed bounds exceed finite GPU coordinates");
+    out->bounds_.include(lower);out->bounds_.include(upper);
   }
-  if(require_query)out->query_=std::shared_ptr<const SurfaceQuery>(new SurfaceQuery(
-      SurfaceQuery::ImmutableGeometry{},out->geometry_,cancel));
+  // Preserve the existing query workspace guard on actual vertices. A loose
+  // transformed box corner is not permission to reject a valid rotated shape.
+  const auto &box=out->bounds_;
+  if(require_query&&std::max({std::abs(box.minimum.x),std::abs(box.minimum.y),std::abs(box.minimum.z),std::abs(box.maximum.x),std::abs(box.maximum.y),std::abs(box.maximum.z)})>100)
+    for(size_t v=0;v<source->mesh.positions.size();++v){
+      if((v&255)==0)stop(cancel);const auto p=view->placed_position(source->mesh.positions[v]);
+      if(std::max({std::abs(p.x),std::abs(p.y),std::abs(p.z)})>100)throw std::runtime_error("Mesh outside 100m authoring workspace");
+    }
+  if(reuse_query)out->query_=before->query_;
+  else if(require_query)out->query_=std::shared_ptr<const SurfaceQuery>(new SurfaceQuery(SurfaceQuery::ImmutableGeometry{},out->geometry_,cancel));
   stop(cancel);return out;
 }
 } // namespace dome::detail

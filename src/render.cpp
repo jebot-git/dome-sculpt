@@ -683,7 +683,7 @@ struct SurfaceRenderer::ChunkState {
       throw std::logic_error("Sculpt GPU packet lost its actual immutable geometry owner");
     glBindVertexArray(i->second.vao);
     glVertexAttrib2f(2,0,0);glVertexAttrib2f(3,0,0);glVertexAttrib1f(4,-1);
-    const auto &t=chunk->tangent();glVertexAttrib4f(5,t[0],t[1],t[2],t[3]);
+    glVertexAttrib4f(5,1,0,0,1);
     if(i->second.mask){glBindBuffer(GL_ARRAY_BUFFER,i->second.scalar);glVertexAttribPointer(6,1,GL_FLOAT,GL_FALSE,sizeof(float),nullptr);glEnableVertexAttribArray(6);}
     else {glDisableVertexAttribArray(6);glVertexAttrib1f(6,-1);}
     glVertexAttrib3f(7,0,0,1);glVertexAttrib4f(8,1,0,0,1);glVertexAttrib3f(9,0,0,1);
@@ -1117,17 +1117,37 @@ void SurfaceRenderer::draw(std::shared_ptr<const MeshSnapshot> mesh,
     draw_range(Material{},0,count_,0,nullptr,false,false,cached_->pbr_view);
   }else {
     auto is_ghost=[&](uint64_t id){auto i=std::find_if(display.begin(),display.end(),[&](const auto &o){return o.id==id;});return i!=display.end()&&i->ghost;};
-    auto begin_object=[&](uint64_t id,bool world_valid,CanvasTransform world,const std::optional<AffineTransform> &affine){
+    auto begin_object=[&](uint64_t id,bool world_valid,CanvasTransform world,const std::optional<AffineTransform> &affine,bool local_geometry=false){
 
       if(replaced_object&&id==replaced_object)return false;
-      auto object_model=model;
       auto current=std::find_if(display.begin(),display.end(),[&](const auto &o){return o.id==id;});
       if(current!=display.end()&&!current->visible)return false;
+      Mat4 local_model;bool reversing=false;
+      if(local_geometry) {
+        auto authored=affine?*affine:affine_similarity(world);
+        if(current!=display.end()) {
+          if(current->affine_world)authored=*current->affine_world;
+          else if(current->world_transform_valid)authored=affine_similarity(current->world_transform);
+        }
+        const auto full=affine_similarity(model)*authored;local_model=full.float_matrix();const auto inverse=full.inverse().matrix();
+        std::array<float,9> normal{};
+        for(size_t c=0;c<3;++c)for(size_t row=0;row<3;++row){normal[c*3+row]=float(inverse[row*4+c]);if(!std::isfinite(normal[c*3+row]))throw std::overflow_error("Affine local normal matrix exceeds GPU range");}
+        glUniformMatrix3fv(glGetUniformLocation(program_,"normal_model"),1,GL_FALSE,normal.data());
+        glUniform1i(glGetUniformLocation(program_,"affine_motion"),1);reversing=authored.orientation()==AffineOrientation::Reversing;
+        // cut_position is now the real local vertex. Transport the same exact
+        // authored world halfspace once; canvas/held motion never bakes Meshes.
+        const auto &matrix=authored.matrix();const auto &plane=cached_->clip_plane;
+        const double n[3]={plane.normal.x,plane.normal.y,plane.normal.z};double local[3]{};
+        for(size_t col=0;col<3;++col)for(size_t row=0;row<3;++row)local[col]+=matrix[col*4+row]*n[row];
+        const double offset=plane.offset-n[0]*matrix[12]-n[1]*matrix[13]-n[2]*matrix[14];
+        glUniform4f(glGetUniformLocation(program_,"clip_plane"),float(local[0]),float(local[1]),float(local[2]),float(offset));
+      }else {
+      auto object_model=model;
       if(current!=display.end() && current->world_transform_valid && world_valid)
         object_model=ob::compose(model,ob::compose(current->world_transform,ob::inverse(world)));
-      auto local_model=model_matrix(object_model);
+      local_model=model_matrix(object_model);
       const bool affine_preview=current!=display.end()&&current->affine_world&&affine&&current->affine_world->matrix()!=affine->matrix();
-      bool reversing=false;
+
       if(affine_preview) {
         auto delta=(*current->affine_world)*affine->inverse();
         auto full=affine_similarity(model)*delta;
@@ -1140,6 +1160,10 @@ void SurfaceRenderer::draw(std::shared_ptr<const MeshSnapshot> mesh,
       glUniform1i(glGetUniformLocation(program_,"affine_motion"),affine_preview);
       glUniform1f(glGetUniformLocation(program_,"model_hand"),reversing?-1.f:1.f);
       glFrontFace(reversing?GL_CW:GL_CCW);
+
+        glUniform4f(glGetUniformLocation(program_,"clip_plane"),plane.normal.x,plane.normal.y,plane.normal.z,plane.offset);
+      }
+      glUniform1f(glGetUniformLocation(program_,"model_hand"),reversing?-1.f:1.f);glFrontFace(reversing?GL_CW:GL_CCW);
       const auto local_mvp=multiply(vp,local_model);
       glUniformMatrix4fv(glGetUniformLocation(program_,"model"),1,GL_FALSE,local_model.data());
       glUniformMatrix4fv(glGetUniformLocation(program_,"mvp"),1,GL_FALSE,local_mvp.data());
@@ -1179,7 +1203,7 @@ void SurfaceRenderer::draw(std::shared_ptr<const MeshSnapshot> mesh,
       if(item.chunk) {
         const auto &object=*item.chunk;
         const auto affine=object.affine?std::optional<AffineTransform>(object.affine->world()):std::nullopt;
-        if(!begin_object(object.object,!object.affine,object.world,affine))continue;
+        if(!begin_object(object.object,!object.affine,object.world,affine,true))continue;
         glUniform1i(glGetUniformLocation(program_,"weight_pass"),0);
         // Always retain original cell/triangle order, including opaque ties.
         // Chunk-major sorting would change Blend/ghost and GL_LESS results.

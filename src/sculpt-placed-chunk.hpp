@@ -20,6 +20,7 @@ public:
   const std::shared_ptr<const Mesh> &geometry_owner() const {return geometry_;}
   const std::shared_ptr<const SurfaceQuery> &query() const {return query_;}
   const SculptChunkBounds &bounds() const {return bounds_;}
+  const AffineInteractionFrame &placement_frame() const {return *affine_;}
   const Tangent &tangent() const {return tangent_;}
   bool reflected() const {return reflected_;}
   size_t retained_bytes() const {return bytes_;}

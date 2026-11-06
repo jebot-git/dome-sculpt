@@ -55,6 +55,35 @@ int main(int argc,char **argv)try{
     check(render(actual,chunked,{},canvas)==render(expected,flat,{},canvas)&&actual.buffer_stats().geometry_uploads==transfers.geometry_uploads,"Canvas motion stays in uniforms with reference-equivalent pixels and no geometry upload");
     display[0].visible=false;check(render(actual,chunked,display)==render(expected,flat,display),"Live visibility excludes the same whole object in mixed and independent reference views");
   }
+  {
+    // The unchanged original grouped-sphere regression: a valid local sphere
+    // becomes degenerate if absolute world float positions are materialized.
+    Volume sphere(.04f);stamp(sphere,{},.36f);Scene grouped;grouped.active().volume=std::make_shared<Volume>(sphere);
+    CanvasTransform group_pose;group_pose.position={.12f,-.04f,.03f};group_pose.scale=1.25f;
+    const auto group=grouped.add_group("Original grouped regression",group_pose);grouped.active().group=group;
+    CanvasTransform other;other.position={1,0,0};const auto second=grouped.add("Original second sphere",sphere,other);grouped.object(second).group=group;
+    grouped.object(1).material=white();grouped.object(second).material=white();grouped.object(second).material.color={.1f,.7f,.2f,1};grouped.select(1);
+    check(rejects([&]{reference(grouped)->mesh.validate();}),"Original grouped authored placement reproduces the absolute-world-float collapse without changing its source or guard");
+    // Independent whole meshes captured at the origin, then moved through the
+    // existing renderer's actual live ObjectInfo placement contract. No invalid
+    // world Mesh is used as an oracle for the coordinate representation fix.
+    auto origin=grouped.snapshot();for(const auto &object:grouped.objects()){origin.object(object.id).group=0;origin.object(object.id).transform={};}
+    auto whole=reference(origin);for(auto &range:whole->ranges){range.object_world={};range.world_frame_valid=true;}
+    std::vector<ObjectInfo> display;
+    for(const auto &object:grouped.objects()){ObjectInfo item{};item.id=object.id;item.visible=true;item.world_transform=grouped.world_transform(object.id);item.world_transform_valid=true;display.push_back(item);}
+    auto chunked=mixed(grouped);Mat4 view=identity;view[0]=.5f;view[12]=-.3f;
+    auto draw_group=[&](SurfaceRenderer &r,const std::shared_ptr<MeshSnapshot> &s){r.draw(s,{},view,{0,0,2},Fbo::size,Fbo::size,true,false,false,display);return read();};
+    const auto wanted=draw_group(expected,whole),actual_pixels=draw_group(actual,chunked);
+    check(actual_pixels==wanted,"Original grouped valid local meshes render exactly like independently whole-meshed objects with actual GPU placements");
+    check(std::any_of(actual_pixels.begin(),actual_pixels.end(),[](uint8_t v){return v!=0;}),"Original translated second grouped object no longer prevents a real rendered frame");
+    pixel_file(output/"grouped-reference.rgba",wanted);pixel_file(output/"grouped-local.rgba",actual_pixels);
+    const auto uploads=actual.buffer_stats().geometry_uploads;
+    grouped.object(second).transform.position.x+=.03f;display[1].world_transform=grouped.world_transform(second);
+    auto moved=mixed(grouped,chunked->sculpt_chunks,false,chunked->geometry_identity);
+    check(moved->sculpt_chunks->find(second)->geometry==chunked->sculpt_chunks->find(second)->geometry,
+          "Authored motion retains genuine local geometry ownership");
+    check(draw_group(actual,moved)==draw_group(expected,whole)&&actual.buffer_stats().geometry_uploads==uploads,"Authored grouped motion stays in GPU placement with exact whole-reference pixels and no geometry upload");
+  }
   auto scene=fixture();scene.object(3).volume=std::make_shared<Volume>(scene.object(1).volume->geometry_snapshot());scene.object(3).transform=scene.object(1).transform;
   scene.object(1).material=white();scene.object(3).material=white();scene.object(3).material.color={.1f,.8f,.2f,1};scene.object(3).volume->fill_mask(.85f);
   auto before=mixed(scene,{},true);const auto baseline=render(actual,before);check(baseline==render(expected,reference(scene,true)),"Original mixed scalar picture equals independently sampled whole-scene mask reference");const auto stats=actual.buffer_stats();
