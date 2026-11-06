@@ -3,8 +3,10 @@
 #include "texture-set-surface.hpp"
 #include "dome/tangents.hpp"
 namespace dome::detail {
-// Geometry-only packed layout: it never retains Paint, TextureMaps or the full
-// collection. Range proofs retain the separate current material/field plan.
+class PolygonSurfacePreview;
+// Immutable attribute layout retains actual source role packets when needed,
+// independently of current Paint pixels/maps or the complete collection.
+// Range proofs retain the separate current material/field plan.
 class TextureSetPackedGeometry {
 public:
   void authenticate_owner(const std::shared_ptr<const TextureSetPackedGeometry>&)const;
@@ -17,6 +19,11 @@ public:
   std::span<const uint32_t>indices()const noexcept{return indices_;}
   std::span<const uint32_t>logical_corners()const noexcept{return corners_;}
   std::span<const Tangent>tangents()const noexcept{return tangents_;}
+  bool has_source()const noexcept{return !source_previews_.empty();}
+  std::span<const Vec3>source_normals()const noexcept{return source_normals_;}
+  std::span<const Tangent>source_tangents()const noexcept{return source_tangents_;}
+  std::span<const std::array<float,2>>paint_coordinates()const noexcept{return paint_;}
+  std::span<const std::array<float,2>>normal_coordinates()const noexcept{return normal_;}
   bool canonical(size_t field)const{return canonical_.at(field);}
 private:
   friend std::shared_ptr<const TextureSetPackedGeometry> prepare_texture_set_packed(
@@ -32,7 +39,10 @@ private:
   std::vector<TextureSetDraw>draws_;
   std::vector<uint8_t>canonical_;
   std::vector<uint32_t>vertices_,indices_,corners_;
-  std::vector<Tangent>tangents_;
+  std::vector<Tangent>tangents_,source_tangents_;
+  std::vector<Vec3>source_normals_;
+  std::vector<std::array<float,2>>paint_,normal_;
+  std::vector<std::shared_ptr<const PolygonSurfacePreview>>source_previews_;
 };
 std::shared_ptr<const TextureSetPackedGeometry> prepare_texture_set_packed(
     const std::shared_ptr<const TextureSetSurfacePlan>&,const TextureSetLimits & = {});

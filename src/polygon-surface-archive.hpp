@@ -20,13 +20,15 @@ private:
 class PolygonSurfaceArchive final {
 public:
  explicit PolygonSurfaceArchive(PolygonSceneArchive&);
- PolygonSurfaceArchive(const nlohmann::json&,PolygonSceneReader&,size_t origin_count);
+ PolygonSurfaceArchive(const nlohmann::json&,PolygonSceneReader&,size_t origin_count,
+     PolygonSurfaceGeometryReader = {});
  ~PolygonSurfaceArchive();
  PolygonSurfaceArchive(const PolygonSurfaceArchive&)=delete;
  static PolygonSurfaceArchive&writer();
  static PolygonSurfaceArchive&reader();
  uint32_t add(const std::shared_ptr<const SourceMaterialBindings>&);
  std::shared_ptr<const PolygonSurfaceOwner>at(uint32_t);
+ const PolygonSurfaceStage&stage_at(uint32_t);
  nlohmann::json encode();
  nlohmann::json encode_paint(const PaintedMesh&,PaintImageArchive&,NormalSamplingArchive*);
  std::shared_ptr<PaintedMesh>decode_paint(const nlohmann::json&,const PaintImageArchive&,const NormalSamplingArchive*);

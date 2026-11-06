@@ -84,8 +84,8 @@ nlohmann::json PolygonSurfaceNodeWriter::encode(const PolygonSurfaceOriginWriter
  stop(limits_);return output;
 }
 PolygonSurfaceNodeReader::PolygonSurfaceNodeReader(const nlohmann::json&input,size_t origins,
- PolygonSurfaceOriginReader origin,const PolygonSurfaceTransferLimits&l)
- :input_(input),origin_count_(origins),origin_(std::move(origin)),limits_(l){
+ PolygonSurfaceOriginReader origin,const PolygonSurfaceTransferLimits&l,PolygonSurfaceGeometryReader geometry)
+ :input_(input),origin_count_(origins),origin_(std::move(origin)),geometry_(std::move(geometry)),limits_(l){
  preflight_pool(input_,origin_count_,limits_);if(!origin_)throw std::invalid_argument("Polygon surface pool has no actual origin resolver");
  const auto count=input_.at("nodes").size();const size_t per_node=sizeof(std::optional<PolygonSurfaceStage>)+sizeof(uint8_t);
  if(count>limits_.maximum_working_bytes/per_node)throw std::length_error("Polygon surface pool index exceeds prospective working quota");
@@ -99,8 +99,9 @@ const PolygonSurfaceStage&PolygonSurfaceNodeReader::at(uint32_t id){
  busy_[id]=1;struct Reset{uint8_t&value;~Reset(){value=0;}}reset{busy_[id]};
  const auto&node=input_.at("nodes")[id];auto before=origin_(uint32_t(integer(node.at("before_origin"),origin_count_-1)));
  if(!before||!tag(node.at("basis"),relation(*before)))throw std::invalid_argument("Polygon surface pool basis differs from its actual source ownership");
+ const auto geometry=geometry_?geometry_(id):std::shared_ptr<const Mesh>{};
  if(stages_[id]){
-  auto&stage=*stages_[id];if(!same_owner(stage.owner->before(),before)||stage.owner->encode_recipe(limits_)!=node.at("recipe"))throw std::invalid_argument("Polygon surface completed node changed its exact owning context");
+  auto&stage=*stages_[id];if(geometry&&!same_owner(geometry,stage.paint->mesh_owner()))throw std::invalid_argument("Polygon surface shared geometry changed its actual owning context");if(!same_owner(stage.owner->before(),before)||stage.owner->encode_recipe(limits_)!=node.at("recipe"))throw std::invalid_argument("Polygon surface completed node changed its exact owning context");
   stage.owner->validate_binding(*stage.binding,limits_);stage.owner->validate_current(*stage.paint,limits_);stop(limits_);return stage;
  }
  const auto bytes=replay_reservation(node,*before,limits_);
@@ -108,7 +109,7 @@ const PolygonSurfaceStage&PolygonSurfaceNodeReader::at(uint32_t id){
  // Charge before allocating the next source/mesh/grid. Failure does not commit
  // either the slot or its reservation, so an exact retry can succeed.
  auto remaining=limits_;remaining.maximum_working_bytes-=reserved_;
- auto owner=PolygonSurfaceOwner::replay(before,node.at("recipe"),remaining);auto stage=owner->stage_paint(remaining);stage.owner->validate_current(*stage.paint,remaining);stop(limits_);
+ auto owner=PolygonSurfaceOwner::replay(before,node.at("recipe"),remaining);auto stage=owner->stage_paint(geometry,remaining);stage.owner->validate_current(*stage.paint,remaining);stop(limits_);
  stages_[id]=std::move(stage);reserved_+=bytes;return *stages_[id];
 }
 void PolygonSurfaceNodeReader::require_complete(){

@@ -12,6 +12,11 @@ size_t paint_sampling_surface_working_bytes(size_t vertices,size_t corners,uint3
 std::shared_ptr<PaintedMesh> retain_paint_grid(const PaintedMesh &,Mesh,
     std::shared_ptr<const PaintSamplingDomain>,const PaintSamplingLimits & = {});
 // Borrowed target is copied only after the complete grid budget preflight.
+// A replayed source may supply its already authenticated immutable geometry.
+// The same full domain/grid proof runs; no extra Mesh copy is created.
+std::shared_ptr<PaintedMesh> retain_paint_grid_shared(const PaintedMesh &,
+    std::shared_ptr<const Mesh>,std::shared_ptr<const PaintSamplingDomain>,
+    const PaintSamplingLimits & = {});
 std::shared_ptr<PaintedMesh> retain_paint_grid_borrowed(const PaintedMesh &,const Mesh &,
     std::shared_ptr<const PaintSamplingDomain>,const PaintSamplingLimits & = {});
 struct SourceNormalSampling;

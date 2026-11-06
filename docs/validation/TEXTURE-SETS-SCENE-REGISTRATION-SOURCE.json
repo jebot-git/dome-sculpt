@@ -1,0 +1,23 @@
+{
+  "status": "Implemented source-backed Scene40/history8 writer and reader registration; syntax only, root composition/runtime pending",
+  "syntax": {
+    "path": "/home/blux/de-xr/dome-sculpt/artifacts/texture-set-fields-e412/artifacts/scene-field-registration-seal/status.json",
+    "sha256": "ac01af9f4584b92275450efc58e2876201496acd4ed33533fbaff784d87b043d",
+    "whole_TUs": 6,
+    "exit": 0,
+    "drift": []
+  },
+  "registered_tests": [
+    "dome-sculpt-texture-set-field-source",
+    "dome-sculpt-texture-set-history"
+  ],
+  "compatibility": "Ordinary current-only plain40 V1 retained; true shared history/source fields use geometry2 and actual required source pools",
+  "new_callback": "FieldDecoder appends actual bool allow_polygon, passed from the real holder context; never inferred from persisted topology IDs",
+  "remaining": [
+    "fresh all-own full object/link/runtime/native/GL/UI/SAN/XR qualification",
+    "sourceful frontend admission",
+    "sourceful standard export with before-normal/role-coordinate compiler",
+    "posed retained fields and multimaterial-before polygon edit kernel",
+    "source-grid resolution transitions and owning normal-detail edit adapters"
+  ]
+}

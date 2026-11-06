@@ -10,13 +10,18 @@ namespace dome::detail {
 struct PolygonSurfacePaintCodec {
  static std::shared_ptr<const TextureMaps> preview(const PaintedMesh &,
      const std::shared_ptr<const SourceMaterialBindings> &,const Material &,
-     const std::function<bool()> &cancelled={});
+     const std::function<bool()> &cancelled={},
+     std::shared_ptr<const PolygonSurfacePreview> cached={});
  static nlohmann::json encode(const PaintedMesh &,
      const std::shared_ptr<const SourceMaterialBindings> &,PolygonSurfaceNodeWriter &,
      PaintImageArchive &,NormalSamplingArchive * = nullptr,
      const PolygonSurfaceTransferLimits & = {});
  static std::shared_ptr<PaintedMesh> decode(const nlohmann::json &,PolygonSurfaceNodeReader &,
      const PaintImageArchive &,const NormalSamplingArchive * = nullptr,
+     const PolygonSurfaceTransferLimits & = {});
+ // Borrowed raw grid inspection. shared_geometry forbids an inline Mesh and
+ // grants no decode/material/domain permission by itself.
+ static size_t preflight_grid(const nlohmann::json &,bool physical,bool shared_geometry,
      const PolygonSurfaceTransferLimits & = {});
  // Shape/metadata/binary scan only. Does not resolve a node or mint ownership.
  static size_t preflight(const nlohmann::json &,size_t node_count,

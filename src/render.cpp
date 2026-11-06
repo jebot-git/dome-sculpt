@@ -338,10 +338,10 @@ struct SurfaceRenderer::TextureState {
         if(!expected||expected!=range.paint_sampling_attachment||expected.owner_before(range.paint_sampling_attachment)||range.paint_sampling_attachment.owner_before(expected))
           throw std::invalid_argument("Paint GPU range differs from its own immutable material attachment");
         const auto &domain=*range.paint_sampling_attachment->domain();
-        if(mesh.paint_coordinates.size()!=count||range.count!=domain.source_corners().size())
+        if(mesh.paint_coordinates.size()!=count||(range.texture_set_proof?range.count!=range.texture_set_proof->draw().count:range.count!=domain.source_corners().size()))
           throw std::invalid_argument("Paint sampling GPU stream/range dimensions differ");
         if(geometry_changed)for(size_t c=0;c<range.count;++c) {
-          const auto logical=range.paint_winding_reversed&&c%3?c+(c%3==1?1:-1):c;
+          const auto logical=detail::surface_logical_corner(range,c);
           const auto source=domain.source_corners()[logical];
           if(mesh.paint_coordinates.at(mesh.mesh.indices.at(range.first+c))!=domain.basis()->uv.at(domain.basis()->indices.at(source)))
             throw std::invalid_argument("Paint GPU stream lost exact ordered corner correspondence");
@@ -1066,7 +1066,7 @@ void SurfaceRenderer::draw(std::shared_ptr<const MeshSnapshot> mesh,
     if(ghost_pass){glEnable(GL_BLEND);glBlendFuncSeparate(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA,GL_ONE,GL_ONE_MINUS_SRC_ALPHA);glDepthMask(GL_FALSE);glDisable(GL_SAMPLE_ALPHA_TO_COVERAGE);}
     if(polygon){
       const auto range=std::find_if(cached_->ranges.begin(),cached_->ranges.end(),[&](const auto&r){return r.object==id&&r.texture_set==texture_set&&r.first==first&&r.count==count;});if(range==cached_->ranges.end())throw std::invalid_argument("Polygon draw lost its actual current range");
-      textures_->polygon_frames.draw(*polygon,detail::polygon_range_world(*range),first,count,[&](size_t offset,size_t n){glDrawElements(GL_TRIANGLES,GLsizei(n),GL_UNSIGNED_INT,reinterpret_cast<void*>(offset*sizeof(uint32_t)));});
+      textures_->polygon_frames.draw(*polygon,detail::polygon_range_world(*range),first,count,range->texture_set_proof?range->texture_set_proof->field().domain:nullptr,[&](size_t offset,size_t n){glDrawElements(GL_TRIANGLES,GLsizei(n),GL_UNSIGNED_INT,reinterpret_cast<void*>(offset*sizeof(uint32_t)));});
     }else glDrawElements(GL_TRIANGLES, GLsizei(count), GL_UNSIGNED_INT,
                    reinterpret_cast<void *>(first * sizeof(uint32_t)));
   };

@@ -237,3 +237,129 @@ new object/link/app/consumer/SAN/UI/device completion is claimed. Read
 validation/TEXTURE-SETS-MULTIPRIMITIVE-SOURCE.json. VRM semantic metadata,
 original source/HDR material compilation, multi-primitive import, deformed normal
 quality and all earlier production/workflow rows remain required.
+
+
+## Detached retained material-field source preparation — 2026-11-06
+
+The separate e412 child now prepares real39 source fields without publishing an
+unfinished Scene40 interpretation. A sealed field source retains the genuine
+original Paint/material/before-normal/recipe owners and an independently minted
+actual logical face/corner membership. Every member retains the same Mesh owner.
+The editable Paint uses its real subset raster. A private COW read view carries
+current member values through the original proved39 raster/attachment, so it
+passes the existing39 owner and packet factory without impersonating that owner
+with the new membership attachment. Real before attributes are prepared once
+and shared by the fields; paint/normal coordinates remain independent.
+
+The source fixture uses a genuine native FLOAT-painted source and accepted Flip,
+then actual two-field preparation, COW editing, original39 preview production,
+logical face/corner/barycentric identities and reflected/sheared normal checks.
+It includes foreign control-block/domain/material, cancellation and prospective
+resource counters. **It has not executed.** Eight whole production/fixture TUs
+pass syntax with source hashes unchanged. No object/link/runtime/UI/GL/XR/SAN or
+device result is claimed. Read validation/TEXTURE-SETS-FIELD-SOURCE.json.
+
+A discovered same-address membership-owner gap is closed by a weak self-owner
+in TextureSetFaceDomain, initialized by both native and archive factories and
+checked by collection/raster/source/graph consumers. This changes its layout; a
+fresh whole owning cohort is mandatory. Old qualified binaries stay immutable.
+The source ledger now follows real polygon_surface_transfer before roots.
+
+The private preparation is not persistent same-object39+40 support. Collection
+field descriptors, nonduplicating source-backed Paint7 envelopes, PolygonSources8
+source/history transport, actual packed source/normal corner streams and GPU
+ranges/query/export/native-publication adapters remain unfinished. Existing
+Scene/codec/render/query/export guards remain intact. Current deformed inputs,
+multiple-material before models and unsupported original/prepared roles retain
+explicit diagnostics. No Scene41 or version-only permission is introduced.
+
+The next source boundary adds persistent primary/additional field descriptors
+and immutable current-readable COW refresh on accepted edits/repartition. Scene
+pairing consumes that proved read while editable Paint keeps the subset raster.
+The graph ledger counts original field and shared raw before-input owners.
+Source node staging now accepts an explicit replay-validated shared geometry
+owner and retains that owner through the real sampling-domain/raster factory,
+avoiding a second copy of its own immutable derivative. Ten whole TUs pass
+syntax; no new native execution or application qualification is claimed. Record,
+View and collection layouts changed. Read
+validation/TEXTURE-SETS-FIELD-RECORD-SOURCE.json. Paint7/PolygonSources8 wire and
+actual source-backed GPU/query/native/export adapters remain guarded work.
+
+The source-backed Paint7 codec now owns a bounded explicit field_sources table.
+Each retained seed names its actual geometry, polygon node and material binding,
+original raw grid and recipe. Current member grids reference that seed without
+duplicating geometry or source history. Decode requires the real node replay,
+strong geometry/material owners and enclosing FLOAT context; current values are
+read on the seed raster while editable members retain their subset raster.
+Prototype sharing keeps actual SurfaceMap identity across COW paints. This codec
+is not yet registered in the shared/history archive or root Scene composition.
+Four whole TUs pass syntax only; the first nonexistent counter-name failure and
+its log remain preserved. Decode now also creates a fresh composite cache when
+replacing prototype layers. Read validation/TEXTURE-SETS-FIELD-CODEC-SOURCE.json.
+GPU/range/query/native/export and PolygonSources8 integration remain required.
+
+Retained source fields now have a separate actual corner-layout producer. Its
+complete signature includes current vertex/canonical tangent, before raw N/T/W,
+original paint coordinates and independent normal-role coordinates. Genuine
+source packets remain shared independently from current pixels. Workers publish
+all required streams even when this is the first object, and source ranges
+retain their real binding/attachment and subset membership. CPU visibility and
+GPU validation resolve each subset corner through its actual logical identity.
+Primitive-frame GPU uploads use the actual membership triangle order and retain
+that domain control block in their cache; no readback is introduced.
+
+The real collection fixture now creates two fields from an accepted native39
+Flip, builds the actual worker packet and MaterialSurfaceQuery, and includes
+independent coordinate/control-block corruptions. It is **unexecuted**. Nine
+whole TUs pass syntax with unchanged source hashes. This is no object/link,
+runtime/native/GL/UI/SAN/XR/device qualification. Sourceful frontend eligibility
+remains disabled pending the complete shared/history Scene codec and fresh
+qualification. Source-backed export explicitly refuses pending its genuine
+before-normal and independent paint/role coordinate compiler; generic plain
+export cannot silently consume these new source plans. Posed source fields,
+multimaterial-before polygon operations and source grid resizing stay guarded.
+Read validation/TEXTURE-SETS-RETAINED-STREAM-SOURCE.json.
+
+The field child now merges the separate actual shared-owner history8 archive
+and its enclosing polygon-policy fix. Genuine source Paint7 preflight inspects
+the retained seed, material21 binding and actual node pair, strict borrowed raw
+original/current grids and the real geometry2 domain/raster references. The39
+before-root material-prefix DFS descends source fields in retained collections;
+old cycle/depth/future-prefix/node quotas remain. An immediate polygon-node
+before model with multiple materials is still refused pending its genuine
+per-field polygon operation kernel. Geometry2 is not a numerical permission.
+
+PolygonSceneReader now offers material_at through its actual installed prefix
+resolver. Field callbacks must use this while material decoding replays retained
+roots; the not-yet-assigned outer material archive is not a valid substitute.
+The actual accepted39→two-field fixture now requires a full Scene40/geometry2
+roundtrip and rejects foreign nodes, inline fake geometry, unknown seed fields
+and false FLOAT interpretations. These assertions await common Scene callback
+registration by the integration owner and have **not executed**. Seven whole
+production/fixture TUs pass syntax with unchanged source hashes. Sparse-checkout
+setup/missing-file attempts and their logs remain preserved. Read
+validation/TEXTURE-SETS-SOURCE-HISTORY-PREFLIGHT.json. No fresh native/GL/UI/XR/SAN
+qualification or complete sourceful export/frontend admission is claimed.
+
+Actual isolated Scene registration is now implemented. Sourceful current fields
+or genuine retained collections enable shared records before holder emission;
+ordinary current-only plain40 continues to write its original V1 byte shape.
+The writer closes actual current/retained material roots and installs the real
+seed encoder before Sources8 output. Reader geometry2 is created after aggregate
+preflight, then field callbacks and node→actual shared geometry are installed
+before material-prefix replay. Field decoding uses PolygonSceneReader.material_at
+and receives the actual enclosing polygon capability, not a topology boolean.
+Primary binding/recipe context is staged before decoding and remains the actual
+returned source owner afterward; generic legacy rebind paths do not replace
+member attachments. All shared paints/seeds/assignments are counted from actual
+tables once, including FLOAT source grids; original source Paints are retained
+and paired in the live ledger. Reachability/completion includes all field roots.
+
+Both real field-source roundtrip/corruption and shared-history/V1/owner-alias
+fixtures are registered as CTests. Six whole production/fixture TUs pass syntax
+with source drift[]. They still have **no fresh owning object/link/runtime proof**.
+The root integration tree stays unchanged/frozen. Complete sourceful standard
+export, posed source fields, multi-material-before polygon operations, genuine
+source-grid resizing and sourceful frontend admission remain guarded. Source
+normal-detail editing also retains its existing owning-field restrictions. Read
+validation/TEXTURE-SETS-SCENE-REGISTRATION-SOURCE.json.

@@ -4,7 +4,9 @@
 #include <span>
 namespace dome {
 using TextureSetId = uint32_t;
-namespace detail { struct TextureSetAccess; struct TextureSetPaintAccess; class TextureSetArchive; }
+struct PolygonOrigin;
+struct TextureSetView;
+namespace detail { class TextureSetFieldSource; struct TextureSetAccess; struct TextureSetPaintAccess; class TextureSetArchive; }
 struct TextureSetInitialField {Material material;uint32_t resolution=512;};
 struct TextureSetLimits {
   size_t maximum_sets_per_object=64,maximum_sets_per_scene=256;
@@ -41,12 +43,14 @@ public:
   std::span<const uint32_t> triangles()const noexcept{return triangles_;}
   bool contains(uint32_t triangle)const noexcept;
   bool matches(const std::shared_ptr<const Mesh>&)const noexcept;
+  void authenticate_owner(const std::shared_ptr<const TextureSetFaceDomain>&)const;
 private:
   friend struct detail::TextureSetAccess;
   friend class detail::TextureSetArchive;
   friend class TextureSetCollection;
   TextureSetFaceDomain()=default;
   TextureSetFaceDomain(const TextureSetFaceDomain&)=default;
+  mutable std::weak_ptr<const TextureSetFaceDomain>self_;
   std::shared_ptr<const TextureSetTopology> topology_;
   std::shared_ptr<const std::vector<TextureSetId>> assignments_;
   std::vector<uint32_t> triangles_;
@@ -61,6 +65,7 @@ struct TextureSetRecord {
   std::shared_ptr<const SourceMaterialBindings> material_bindings;
   std::shared_ptr<const ObjectBakeRecipe> bake_recipe;
   std::shared_ptr<const TextureSetFaceDomain> domain;
+  std::shared_ptr<const detail::TextureSetFieldSource> source;
 };
 // Set0 uses the existing SculptObject paint/material/source fields. Additional
 // records never replace that geometry authority when the active set changes.
@@ -72,10 +77,12 @@ public:
   uint64_t next_id()const noexcept{return next_;}
   const std::shared_ptr<const TextureSetTopology>& topology()const noexcept{return topology_;}
   const std::shared_ptr<const TextureSetFaceDomain>& primary_domain()const noexcept{return primary_;}
+  const std::shared_ptr<const detail::TextureSetFieldSource>& primary_source()const noexcept{return primary_source_;}
   std::span<const TextureSetId> triangle_sets()const noexcept{return slots_?std::span<const TextureSetId>(*slots_):std::span<const TextureSetId>{};}
   const std::vector<TextureSetRecord>& additional()const noexcept{return additional_;}
   const TextureSetRecord& at(TextureSetId)const;
   void validate(const SculptObject&,bool deep=true,const TextureSetLimits & = {})const;
+  void validate(const PolygonOrigin&,bool deep=true,const TextureSetLimits & = {})const;
 private:
   friend struct detail::TextureSetAccess;
   friend class detail::TextureSetArchive;
@@ -85,10 +92,13 @@ private:
   friend bool select_texture_set(Scene&,uint64_t,TextureSetId);
   friend bool rename_texture_set(Scene&,uint64_t,TextureSetId,std::string,const TextureSetLimits&);
   friend bool edit_texture_set(Scene&,uint64_t,TextureSetId,const std::function<bool(PaintedMesh&,Material&)> &,const TextureSetLimits&);
+  void validate_owner(const TextureSetView&,bool,const std::shared_ptr<const PolygonAuthority>&,
+      bool,const TextureSetLimits&)const;
   TextureSetCollection()=default;
   TextureSetCollection(const TextureSetCollection&)=default;
   std::shared_ptr<const TextureSetTopology> topology_;
   std::shared_ptr<const TextureSetFaceDomain> primary_;
+  std::shared_ptr<const detail::TextureSetFieldSource> primary_source_;
   std::shared_ptr<const std::vector<TextureSetId>> slots_;
   std::vector<TextureSetRecord> additional_;
   TextureSetId active_=0;
@@ -103,8 +113,9 @@ struct TextureSetView {
   std::shared_ptr<const SourceMaterialBindings> material_bindings;
   std::shared_ptr<const ObjectBakeRecipe> bake_recipe;
   std::shared_ptr<const TextureSetFaceDomain> domain;
+  std::shared_ptr<const detail::TextureSetFieldSource> source;
 };
-enum class TextureSetAction { Create, AssignFaces, Select, Rename, Material, LayerOpacity, LayerOrder, AddLayer, DeleteLayer, NextLayer, ToggleLayer };
+enum class TextureSetAction { Create, AssignFaces, Select, Rename, Material, LayerOpacity, LayerOrder, AddLayer, DeleteLayer, NextLayer, ToggleLayer, Resolution };
 // Native/desktop/XR requests operate on persistent logical face IDs and one
 // explicit material slot of the active mesh, never an object/group alias.
 struct TextureSetEdit {

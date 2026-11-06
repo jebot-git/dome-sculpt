@@ -1,0 +1,16 @@
+{
+  "status": "Source-only actual retained seed/current-member Paint7 codec; archive registration and runtime pending",
+  "syntax": {
+    "path": "/home/blux/de-xr/dome-sculpt/artifacts/texture-set-fields-e412/artifacts/source-codec-syntax-v2/status.json",
+    "sha256": "418b9b4c6e2ae643be49a72b359969402bf52d5b37be1f51219832d7af4137d7",
+    "whole_TUs": 4,
+    "exit": 0,
+    "drift": []
+  },
+  "preserved_failure": "artifacts/source-codec-syntax/paint.log: nonexistent counter name; corrected, no original receipt overwritten",
+  "not_claimed": [
+    "object/link/runtime/GL/native/UI/SAN/XR/device proof",
+    "complete PolygonSources8 or Scene registration",
+    "sourceful range/query/export adapter"
+  ]
+}

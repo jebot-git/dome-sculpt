@@ -1,5 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "texture-set-packed.hpp"
+#include "texture-set-field-source.hpp"
+#include "polygon-surface-preview.hpp"
 #include <bit>
 #include <map>
 namespace dome::detail {
@@ -12,7 +14,44 @@ template<class T>bool owner(const std::shared_ptr<const T>&a,const std::shared_p
 std::shared_ptr<const TextureSetPackedGeometry> prepare_texture_set_packed(
     const std::shared_ptr<const TextureSetSurfacePlan>&plan,const TextureSetLimits&limits){
  limits.validate();stop(limits);if(!plan)throw std::invalid_argument("Texture-set layout needs its genuine current field plan");plan->authenticate_owner(plan);
- const auto&rest=*plan->geometry();const auto count=plan->indices().size();size_t normal_corners=0;
+ const auto&rest=*plan->geometry();const auto count=plan->indices().size();
+ const bool source=std::any_of(plan->fields().begin(),plan->fields().end(),[](const auto&f){return bool(f.source);});
+ if(source){
+  if(plan->deformation())throw std::invalid_argument("Retained set attributes require their actual posed source adapter");
+  size_t work=plan->preparation_work(),bytes=2*sizeof(TextureSetPackedGeometry)+128;
+  charge(work,count,2*std::bit_width(count)+96,limits.maximum_work);
+  charge(bytes,count,3*sizeof(uint32_t)+2*sizeof(Tangent)+sizeof(Vec3)+2*sizeof(std::array<float,2>)+128+10*sizeof(void*),limits.maximum_bytes);
+  charge(bytes,rest.indices.size(),sizeof(Tangent),limits.maximum_bytes);
+  charge(bytes,plan->fields().size(),sizeof(TextureSetDraw)+sizeof(uint8_t)+sizeof(std::shared_ptr<const PolygonSurfacePreview>),limits.maximum_bytes);
+  auto layout=std::shared_ptr<TextureSetPackedGeometry>(new TextureSetPackedGeometry);
+  layout->bytes_=bytes;layout->work_=work;layout->object_=plan->object();layout->rest_=plan->geometry();layout->posed_=layout->rest_;layout->membership_=plan->collection()->primary_domain();
+  layout->draws_.assign(plan->draws().begin(),plan->draws().end());layout->corners_.assign(plan->logical_corners().begin(),plan->logical_corners().end());
+  bool canonical=false;for(const auto&field:plan->fields())canonical|=!field.source&&field_canonical(field);
+  const auto frames=canonical?tangent_corners(rest,limits.cancelled):std::vector<Tangent>{};
+  using Signature=std::array<uint32_t,16>;std::map<Signature,uint32_t>split;
+  for(size_t f=0;f<plan->fields().size();++f){
+   const auto&field=plan->fields()[f];const auto preview=field.source?field.source->source_preview():nullptr;
+   if(field.source){field.source->authenticate_owner(field.source);field.source->validate_field(field,limits);if(!preview)throw std::invalid_argument("Source layout lacks its actual raw before-attribute packet");}
+   layout->source_previews_.push_back(preview);layout->canonical_.push_back(!preview&&field_canonical(field));
+   const auto&draw=plan->draws()[f];
+   for(size_t c=0;c<draw.count;++c){
+    if((c&1023)==0)stop(limits);const auto logical=plan->logical_corners()[draw.first+c];const auto vertex=rest.indices.at(logical);
+    const Tangent tangent=layout->canonical_.back()?frames.at(logical):Tangent{1,0,0,1};
+    const Vec3 n=preview?preview->normals().at(logical):rest.normals.at(vertex);
+    const Tangent t=preview&&!preview->tangents().empty()?preview->tangents().at(logical):Tangent{1,0,0,1};
+    const auto paint=preview?preview->paint_coordinates().at(logical):rest.uv.at(vertex);
+    const auto role=preview&&!preview->normal_coordinates().empty()?preview->normal_coordinates().at(logical):rest.uv.at(vertex);
+    Signature key{};key[0]=vertex;size_t k=1;for(float v:tangent)key[k++]=std::bit_cast<uint32_t>(v);for(float v:{n.x,n.y,n.z})key[k++]=std::bit_cast<uint32_t>(v);for(float v:t)key[k++]=std::bit_cast<uint32_t>(v);for(float v:paint)key[k++]=std::bit_cast<uint32_t>(v);for(float v:role)key[k++]=std::bit_cast<uint32_t>(v);
+    auto found=split.find(key);uint32_t index;
+    if(found!=split.end())index=found->second;
+    else{index=uint32_t(layout->vertices_.size());split.emplace(key,index);layout->vertices_.push_back(vertex);layout->tangents_.push_back(tangent);layout->source_normals_.push_back(n);layout->source_tangents_.push_back(t);layout->paint_.push_back(paint);layout->normal_.push_back(role);}
+    layout->indices_.push_back(index);
+   }
+  }
+  if(layout->indices_.size()!=count||layout->vertices_.size()>count)throw std::invalid_argument("Retained set layout lost its actual logical corners");
+  stop(limits);std::shared_ptr<const TextureSetPackedGeometry>sealed(new const TextureSetPackedGeometry(std::move(*layout)));sealed->self_=sealed;return sealed;
+ }
+ size_t normal_corners=0;
  for(size_t f=0;f<plan->fields().size();++f)if(field_canonical(plan->fields()[f]))normal_corners+=plan->draws()[f].count;
  size_t work=plan->preparation_work();charge(work,count,8,limits.maximum_work);charge(work,rest.positions.size(),8,limits.maximum_work);
  charge(work,normal_corners,2*std::bit_width(normal_corners)+24,limits.maximum_work);
@@ -60,9 +99,12 @@ void TextureSetPackedGeometry::authenticate_owner(const std::shared_ptr<const Te
  const auto expected=self_.lock();if(!expected||!owner(expected,value))throw std::invalid_argument("Texture-set packed layout borrowed another control block");
 }
 bool TextureSetPackedGeometry::matches_plan(const TextureSetSurfacePlan&plan)const{
+ const bool source=std::any_of(plan.fields().begin(),plan.fields().end(),[](const auto&f){return bool(f.source);});
+ if(source!=has_source()||(source&&source_previews_.size()!=plan.fields().size()))return false;
+ if(source)for(size_t f=0;f<plan.fields().size();++f)if(!owner(source_previews_[f],plan.fields()[f].source?plan.fields()[f].source->source_preview():std::shared_ptr<const PolygonSurfacePreview>{}))return false;
  if(object_!=plan.object()||!owner(rest_,plan.geometry())||!owner(deformation_,plan.deformation())||!owner(membership_,plan.collection()->primary_domain())||draws_.size()!=plan.draws().size()||canonical_.size()!=plan.fields().size())
   return false;
- for(size_t f=0;f<draws_.size();++f)if(draws_[f].set!=plan.draws()[f].set||draws_[f].first!=plan.draws()[f].first||draws_[f].count!=plan.draws()[f].count||bool(canonical_[f])!=field_canonical(plan.fields()[f]))return false;
+ for(size_t f=0;f<draws_.size();++f)if(draws_[f].set!=plan.draws()[f].set||draws_[f].first!=plan.draws()[f].first||draws_[f].count!=plan.draws()[f].count||bool(canonical_[f])!=(!plan.fields()[f].source&&field_canonical(plan.fields()[f])))return false;
  return true;
 }
 void TextureSetPackedGeometry::authenticate_plan(const TextureSetSurfacePlan&plan)const{

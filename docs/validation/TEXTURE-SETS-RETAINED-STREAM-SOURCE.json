@@ -1,0 +1,16 @@
+{
+  "status": "Source-only retained attributes/GPU subset/range/query/native worker adapters; execution pending",
+  "syntax": {
+    "path": "/home/blux/de-xr/dome-sculpt/artifacts/texture-set-fields-e412/artifacts/retained-stream-seal/status.json",
+    "sha256": "20b23efafdb04235ed4adbeece9a6f5e02be93113011fef367c7296cf32f8508",
+    "whole_TUs": 9,
+    "exit": 0,
+    "drift": []
+  },
+  "test": "tests/texture-set-field-source.cpp registered but unexecuted",
+  "not_claimed": [
+    "complete source Scene archive registration or sourceful frontend admission",
+    "sourceful export, posed retained fields, source grid resizing",
+    "objects/links/runtime/native/GL/UI/SAN/XR/device qualification"
+  ]
+}

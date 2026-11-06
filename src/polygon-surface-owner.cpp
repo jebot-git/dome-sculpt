@@ -193,6 +193,9 @@ void PolygonSurfaceOwner::validate_current_geometry(const Mesh&mesh,const Polygo
 }
 
 std::shared_ptr<const PaintSamplingDomain> PolygonSurfaceOwner::paint_domain(const PolygonSurfaceTransferLimits&l)const{
+ return paint_domain({},l);
+}
+std::shared_ptr<const PaintSamplingDomain> PolygonSurfaceOwner::paint_domain(std::shared_ptr<const Mesh>geometry,const PolygonSurfaceTransferLimits&l)const{
  validate(l);if(trace_.current()->encode()==trace_.original()->encode())throw std::invalid_argument("Unchanged polygon does not require a new paint-domain interpretation");
  const auto previous=before_->paint->paint_sampling_domain();
  if(previous&&previous->version()!=1)throw std::invalid_argument("Polygon paint source needs its actual prior transition composition adapter");
@@ -201,9 +204,9 @@ std::shared_ptr<const PaintSamplingDomain> PolygonSurfaceOwner::paint_domain(con
  // Two current derivatives, map vectors and output snapshot/control blocks
  // coexist here. Raster/grid construction has its own later aggregate stage.
  charge(prospective,corners,2*(2*sizeof(Vec3)+sizeof(std::array<float,2>)+sizeof(uint32_t))+sizeof(PolygonSurfaceTriangle)+2*sizeof(uint32_t),l);
- const auto mapping=trace_.triangle_permutation(l);auto derivative=trace_.current()->triangulate(l.geometry).mesh;std::vector<uint32_t> sources;sources.reserve(derivative.indices.size());
+ const auto mapping=trace_.triangle_permutation(l);Mesh derivative;if(geometry)validate_current_geometry(*geometry,l);else derivative=trace_.current()->triangulate(l.geometry).mesh;std::vector<uint32_t> sources;sources.reserve(geometry?geometry->indices.size():derivative.indices.size());
  for(const auto&triangle:mapping)for(const auto&row:triangle.source_barycentrics){stop(l);size_t hit=3;for(size_t k=0;k<3;++k){if(row[k]==1&&hit==3)hit=k;else if(row[k]!=0)throw std::invalid_argument("Polygon paint common refinement requires its actual barycentric record");}if(hit==3)throw std::invalid_argument("Polygon paint corner lost its genuine original side");const auto native=native_corners_.at(triangle.source_triangle*3+hit);sources.push_back(previous?previous->source_corners()[native]:native);}
- auto snapshot=std::make_shared<const Mesh>(std::move(derivative));auto domain=std::shared_ptr<const PaintSamplingDomain>(new PaintSamplingDomain(basis,std::move(sources),snapshot));
+ auto snapshot=geometry?std::move(geometry):std::make_shared<const Mesh>(std::move(derivative));auto domain=std::shared_ptr<const PaintSamplingDomain>(new PaintSamplingDomain(basis,std::move(sources),snapshot));
  PaintSamplingLimits limits;limits.max_vertices=l.geometry.maximum_vertices;limits.max_triangles=l.geometry.maximum_faces;limits.max_work=l.geometry.maximum_work;limits.max_working_bytes=l.maximum_working_bytes;limits.max_basis_bytes=std::min(size_t(128*1024*1024),l.maximum_working_bytes);limits.cancelled=l.geometry.cancelled;
  domain->validate_current(*snapshot,limits);stop(l);return domain;
 }
@@ -233,13 +236,16 @@ void PolygonSurfaceOwner::validate_binding(const SourceMaterialBindings&b,const 
  validate(l);
 }
 PolygonSurfaceStage PolygonSurfaceOwner::stage_paint(const PolygonSurfaceTransferLimits&l)const{
+ return stage_paint({},l);
+}
+PolygonSurfaceStage PolygonSurfaceOwner::stage_paint(std::shared_ptr<const Mesh>geometry,const PolygonSurfaceTransferLimits&l)const{
  validate(l);if(attachment_)throw std::invalid_argument("Polygon current Paint stage is already connected; advance an actual edit before publishing again");
- const auto domain=paint_domain(l);const auto &target=*domain->derived_geometry();size_t copied=trace_.storage_bytes();charge(copied,1,sizeof(PolygonSurfaceOwner)+sizeof(PaintedMesh)+256,l);
+ const auto domain=paint_domain(std::move(geometry),l);size_t copied=trace_.storage_bytes();charge(copied,1,sizeof(PolygonSurfaceOwner)+sizeof(PaintedMesh)+256,l);
  for(const auto&layer:before_->paint->layers()){charge(copied,1,sizeof(PaintLayer),l);charge(copied,layer.name.size()+1,1,l);charge(copied,layer.tiles.size()+layer.pbr_tiles.size()+layer.emission_tiles.size(),sizeof(std::shared_ptr<const PaintTile>),l);}
  charge(copied,paint_corners_.size()+normal_corners_.size(),sizeof(std::array<float,2>),l);charge(copied,native_corners_.size(),sizeof(uint32_t),l);for(const auto&step:trace_.steps())charge(copied,step.edit.selection.ids.size(),sizeof(PolygonId),l);
  if(copied>=l.maximum_working_bytes)throw std::length_error("Polygon Paint stage exhausted its prospective owner/snapshot quota");
  PaintSamplingLimits limits;limits.max_working_bytes=l.maximum_working_bytes-copied;limits.max_basis_bytes=std::min(size_t(128*1024*1024),limits.max_working_bytes);limits.max_vertices=l.geometry.maximum_vertices;limits.max_triangles=l.geometry.maximum_faces;limits.max_work=l.geometry.maximum_work;limits.cancelled=l.geometry.cancelled;
- auto paint=retain_paint_grid_borrowed(*before_->paint,target,domain,limits);auto owner=std::shared_ptr<PolygonSurfaceOwner>(new PolygonSurfaceOwner);owner->before_=before_;owner->trace_=trace_;owner->native_corners_=native_corners_;owner->paint_corners_=paint_corners_;owner->normal_corners_=normal_corners_;owner->attachment_=paint->paint_sampling_attachment();owner->self_=owner;owner->validate_current(*paint,l);
+ auto paint=retain_paint_grid_shared(*before_->paint,domain->derived_geometry(),domain,limits);auto owner=std::shared_ptr<PolygonSurfaceOwner>(new PolygonSurfaceOwner);owner->before_=before_;owner->trace_=trace_;owner->native_corners_=native_corners_;owner->paint_corners_=paint_corners_;owner->normal_corners_=normal_corners_;owner->attachment_=paint->paint_sampling_attachment();owner->self_=owner;owner->validate_current(*paint,l);
  auto binding=std::make_shared<SourceMaterialBindings>();binding->has_mtoon=false;binding->polygon_surface_transfer=owner;
  if(const auto old=before_->material_bindings){binding->uv_origin=old->uv_origin;binding->native_reference=old->native_reference;binding->physical_emission=old->physical_emission;}
  else{binding->native_reference.color=before_->material.color;binding->native_reference.emission=before_->material.emissive;binding->native_reference.alpha=int(before_->material.alpha);binding->native_reference.alpha_cutoff=before_->material.alpha_cutoff;binding->native_reference.double_sided=before_->material.double_sided;}

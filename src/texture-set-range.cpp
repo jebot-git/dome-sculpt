@@ -1,6 +1,9 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "texture-set-range.hpp"
 #include "emission-paint-access.hpp"
+#include "texture-set-field-source.hpp"
+#include "polygon-surface-paint.hpp"
+#include "polygon-surface-preview.hpp"
 #include "dome/document.hpp"
 #include "paint-overlay-packet.hpp"
 #include <bit>
@@ -25,14 +28,18 @@ std::shared_ptr<const TextureSetRangeProof> prepare_texture_set_range(
  const auto&view=plan->fields()[field];
  if(first>std::numeric_limits<size_t>::max()-plan->draws()[field].first||vertex>UINT32_MAX||layout->vertices().size()>uint64_t(UINT32_MAX)+1-vertex)throw std::length_error("Texture-set packed location exceeds native index bounds");
  auto result=std::shared_ptr<TextureSetRangeProof>(new TextureSetRangeProof);result->plan_=std::move(plan);result->field_=field;result->layout_=std::move(layout);result->first_=first+result->draw().first;result->vertex_=vertex;
- result->maps_=EmissionExportAccess::requires_preview(*view.painted,view.material,view.material_bindings.get())?
-   EmissionExportAccess::preview(*view.painted,view.material,cancelled):view.painted->preview(view.material,cancelled);
- if(!result->maps_||result->maps_->source_only||result->maps_->source_maps||result->maps_->normal_projection||result->maps_->color_projection)
-  throw std::invalid_argument("Texture-set complex field cannot borrow the plain range proof");
- if((!result->maps_->normal.rgba.empty())!=result->layout_->canonical(field))throw std::invalid_argument("Texture-set canonical tangent layout differs from its actual field");
+ if(view.source){
+  const auto read=view.source->read_view(view);result->maps_=PolygonSurfacePaintCodec::preview(*read,view.material_bindings,view.material,cancelled,view.source->source_preview());
+  if(!result->maps_||!result->maps_->polygon_surface||!result->maps_->polygon_surface->matches(view.material_bindings,read->paint_sampling_attachment())||result->layout_->canonical(field))throw std::invalid_argument("Retained texture-set range lost its actual source/current field packet");
+ }else{
+  result->maps_=EmissionExportAccess::requires_preview(*view.painted,view.material,view.material_bindings.get())?
+    EmissionExportAccess::preview(*view.painted,view.material,cancelled):view.painted->preview(view.material,cancelled);
+  if(!result->maps_||result->maps_->source_only||result->maps_->source_maps||result->maps_->normal_projection||result->maps_->color_projection||result->maps_->polygon_surface)throw std::invalid_argument("Texture-set complex field cannot borrow the plain range proof");
+  if((!result->maps_->normal.rgba.empty())!=result->layout_->canonical(field))throw std::invalid_argument("Texture-set canonical tangent layout differs from its actual field");
+ }
  if(const auto&packet=result->maps_->overlay){
   const auto&mesh=packet->native_geometry();
-  if(!mesh||mesh!=result->plan_->geometry()||mesh.owner_before(result->plan_->geometry())||result->plan_->geometry().owner_before(mesh)||packet->native_domain())
+  if(!mesh||mesh!=result->plan_->geometry()||mesh.owner_before(result->plan_->geometry())||result->plan_->geometry().owner_before(mesh)||(view.source?packet->native_domain()!=view.source->read_view(view)->paint_sampling_domain():bool(packet->native_domain())))
    throw std::invalid_argument("Texture-set emission packet lost its independent actual geometry owner");
  }
  if(cancelled&&cancelled())throw std::runtime_error("Texture-set field preparation cancelled");
@@ -48,8 +55,13 @@ void TextureSetRangeProof::authenticate(const SurfaceRange&r)const{
  if(!self||r.texture_set_proof!=self||r.texture_set_proof.owner_before(self)||self.owner_before(r.texture_set_proof))throw std::invalid_argument("Texture-set range borrowed a foreign proof control block");
  plan_->authenticate_owner(plan_);layout_->authenticate_owner(layout_);layout_->authenticate_plan(*plan_);
  if(r.first!=first_||r.first_vertex!=vertex_||r.object!=plan_->object()||r.texture_set!=field().id||r.count!=draw().count||!material(r.material,field().material)||r.textures!=maps_||r.textures.owner_before(maps_)||maps_.owner_before(r.textures)||
-    r.appearance||r.material_bindings||r.paint_sampling_attachment||r.normal_preview_proof||r.source_frame||r.canonical_frame||r.source_normal_only)
+    r.appearance||r.normal_preview_proof||r.canonical_frame)
   throw std::invalid_argument("Texture-set range lost its own material, field, domain or role authority");
+ if(field().source){
+  field().source->authenticate_owner(field().source);field().source->validate_field(field(),{},false);
+  const auto&packet=maps_->polygon_surface;const auto&binding=field().material_bindings;
+  if(!packet||r.material_bindings!=binding||r.material_bindings.owner_before(binding)||binding.owner_before(r.material_bindings)||!packet->matches(binding,r.paint_sampling_attachment)||!r.source_frame||r.source_normal_only!=(packet->model()==PolygonSurfaceNormalModel::NativeNOnly))throw std::invalid_argument("Retained texture-set range changed its actual source/before-role owners");
+ }else if(r.material_bindings||r.paint_sampling_attachment||r.source_frame||r.source_normal_only)throw std::invalid_argument("Plain texture-set range fabricated source roles");
 }
 void TextureSetRangeProof::authenticate_tint(const Mesh&mesh,const SurfaceRange&r,std::span<const std::array<float,4>>colors)const{
  authenticate(r);if(colors.empty())return;

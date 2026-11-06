@@ -26,6 +26,7 @@ size_t texture_set_export_working_bound(const ObjectSurface&input,const TextureS
  for(size_t f=0;f<plan->fields().size();++f){
   stop(limits);const auto&field=plan->fields()[f];const auto&draw=plan->draws()[f];
   if(!draw.count)continue;
+  if(field.source)throw std::invalid_argument("Retained texture-set export needs its actual per-field before-normal and independent paint/role-coordinate compiler");
   if(hdr_emission(field.material.emissive)||field.painted->has_physical_emission())throw std::invalid_argument("Texture-set HDR emission needs its per-material precision-qualified export compiler");
   const bool canonical=field.painted->baked()&&!field.painted->baked()->maps.normal.rgba.empty();(void)canonical;
   const auto r=field.painted->resolution();charge(bytes,size_t(r)*r,64,limits.maximum_bytes);

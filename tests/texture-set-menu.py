@@ -1,6 +1,10 @@
 #!/usr/bin/env python3
-"""Actual FLTK material texture-set manager workflow on a private X11 display."""
-import asyncio,hashlib,json,os,signal,subprocess,sys,time
+"""Actual FLTK manager51 plus painted-field resize workflows; native file inspection only.
+Run against a fresh coherent app/inspector and the actual fixture producer manifest.
+DOME_FIELD_MENU_ROW defaults36 (canonical current bitmap metrics); use the measured
+row when qualifying another toolkit/font profile, including compact windows.
+"""
+import asyncio,hashlib,json,os,signal,subprocess,sys,time,struct,math
 from pathlib import Path
 from dbus_next.aio import MessageBus
 from dbus_next import Variant
@@ -12,10 +16,12 @@ if os.environ.get('DOME_FIELD_MENU_BUS')!='1':
  os.execvpe('dbus-run-session',['dbus-run-session','--',sys.executable,*sys.argv],{**os.environ,'DOME_FIELD_MENU_BUS':'1'})
 root=Path(__file__).resolve().parents[1]
 build=Path(os.environ['DOME_FIELD_MENU_BUILD']).resolve();inspector=Path(os.environ['DOME_FIELD_MENU_INSPECTOR']).resolve();fixture=Path(os.environ['DOME_FIELD_MENU_FIXTURE']).resolve();out=Path(os.environ['DOME_FIELD_MENU_OUT']).resolve();out.mkdir(parents=True,exist_ok=True)
-processes=[];checks=[];app=None
+manifest_path=Path(os.environ["DOME_FIELD_RESOLUTION_MANIFEST"]).resolve();manifest=json.loads(manifest_path.read_text());fixtures={k:(manifest_path.parent/v).resolve() for k,v in manifest["files"].items()}
+processes=[];checks=[];app=None;legacy_count=0
 sha=lambda p:hashlib.sha256(Path(p).read_bytes()).hexdigest()
+pins={str(p):sha(p) for p in [build/'dome-sculpt',inspector,fixture,manifest_path,Path(__file__).resolve(),*fixtures.values()]}
 def report(complete=False,problem=None):
- (out/'report.json').write_text(json.dumps({'complete':complete,'error':problem,'checks':checks,'count':len(checks),'inputs':{str(p):sha(p) for p in [build/'dome-sculpt',inspector,fixture]},'scope':'Actual FLTK texture-set manager, active field controls and pointer painting on private X11; no resolution resize control or physical headset claim'},indent=2)+'\n')
+ (out/'report.json').write_text(json.dumps({'complete':complete,'error':problem,'checks':checks,'count':len(checks),'inputs':pins,'drift':[p for p,v in pins.items() if sha(p)!=v],'legacy_manager_checks':legacy_count,'scope':'Actual FLTK manager51 plus independent active-field resizing, modal/focus/Cancel/UndoRedo/orderedSave/freshreopen; no product observer or physical headset claim'},indent=2)+'\n')
 def check(value,label):
  checks.append({'passed':bool(value),'label':label});report();print(('PASS ' if value else 'FAIL ')+label,flush=True);assert value,label
 async def wait(fn,seconds=50):
@@ -27,11 +33,11 @@ async def wait(fn,seconds=50):
   await asyncio.sleep(.05)
  raise TimeoutError('Actual FLTK workflow did not reach its expected state')
 async def main():
- global app
+ global app,legacy_count
  bus=await MessageBus().connect();await bus.request_name('com.canonical.AppMenu.Registrar')
- home=out/'home';home.mkdir();rd,wr=os.pipe();xlog=(out/'xvfb.log').open('w');xvfb=subprocess.Popen(['Xvfb','-displayfd',str(wr),'-screen','0','1100x800x24','-nolisten','tcp'],pass_fds=(wr,),stdout=xlog,stderr=xlog);processes.append(xvfb);os.close(wr)
+ home=out/'home';home.mkdir();rd,wr=os.pipe();xlog=(out/'xvfb.log').open('w');xvfb=subprocess.Popen(['Xvfb','-displayfd',str(wr),'-screen','0',os.environ.get('DOME_FIELD_MENU_SCREEN','1100x800x24'),'-nolisten','tcp'],pass_fds=(wr,),stdout=xlog,stderr=xlog);processes.append(xvfb);os.close(wr)
  with os.fdopen(rd) as p:screen=':'+p.readline().strip()
- env={**os.environ,'HOME':str(home),'DISPLAY':screen,'XDG_CURRENT_DESKTOP':'Dome','FLTK_BACKEND':'x11','LIBGL_ALWAYS_SOFTWARE':'1','LP_NUM_THREADS':'2','XMODIFIERS':'@im=none'}
+ env={**os.environ,'HOME':str(home),'DISPLAY':screen,'XDG_CURRENT_DESKTOP':'Dome','FLTK_BACKEND':'x11','LIBGL_ALWAYS_SOFTWARE':'1','LP_NUM_THREADS':'2','XMODIFIERS':'@im=none','MESA_SHADER_CACHE_DISABLE':'true'}
  for name in ['WAYLAND_DISPLAY','WAYLAND_SOCKET','__EGL_VENDOR_LIBRARY_FILENAMES','LIBGL_DRIVERS_PATH','MESA_LOADER_DRIVER_OVERRIDE']:env.pop(name,None)
  for name,suffix in [('XDG_STATE_HOME','state'),('XDG_CONFIG_HOME','config'),('XDG_CACHE_HOME','cache'),('XDG_DATA_HOME','data'),('XDG_RUNTIME_DIR','runtime')]:env[name]=str(home/suffix);Path(env[name]).mkdir(mode=0o700)
  project=home/'actual.dsculpt';project.write_bytes(fixture.read_bytes());d=display.Display(screen)
@@ -70,8 +76,8 @@ async def main():
    with (out/'commands.jsonl').open('a') as f:f.write(json.dumps({'label':label,'time':time.monotonic()})+'\n')
    await menu.call_event(nodes[label][0],'clicked',Variant('i',0),0);await asyncio.sleep(pause)
   (out/('runtime-maps-'+str(number)+'.txt')).write_text(Path('/proc/'+str(app.pid)+'/maps').read_text());return w,layout,command
- async def save(command):
-  stamp=project.stat().st_mtime_ns;await command('Save');await wait(lambda:project.stat().st_mtime_ns!=stamp);return inspect()
+ async def save(command,immediate=False):
+  stamp=project.stat().st_mtime_ns;await command('Save',pause=0 if immediate else .15);await wait(lambda:project.stat().st_mtime_ns!=stamp);return inspect()
  async def begin(w,command,cancel=False):
   await command('Start polygon editing');await asyncio.sleep(.3);dialog=named('Convert to editable polygons')
   if dialog:
@@ -86,7 +92,10 @@ async def main():
  def collection(scene):return actor(scene)['texture_sets']
  def extra(scene):return collection(scene)['additional'][0]
  def primary(scene):return collection(scene)['primary']
- def payload(p):return p['payload']
+ def payload(p):
+  p=p['payload']
+  while 'resolution' not in p:p=p['payload']
+  return p
  def only_extra(before,after):
   expected=json.loads(json.dumps(before));collection(expected)['additional'][0]=json.loads(json.dumps(extra(after)));return expected==after
  def text(value):
@@ -94,15 +103,16 @@ async def main():
   for c in value:key('space' if c==' ' else 'period' if c=='.' else c)
  combo_state={}
  async def manager(command):
-  await command('Texture sets...');dialog=await wait(lambda:named('Material texture sets'));dialog.set_input_focus(X.RevertToParent,X.CurrentTime);d.sync();g=dialog.get_geometry();row=g.height/19
+  await command('Texture sets...');dialog=await wait(lambda:named('Material texture sets'));dialog.set_input_focus(X.RevertToParent,X.CurrentTime);d.sync();g=dialog.get_geometry();row=int(os.environ.get('DOME_FIELD_MENU_ROW','36'));assert 28<=row<=96;assert g.height<=row*20+2
   check(dialog.get_wm_transient_for().id==w.id,'Texture manager is an actual document-owned FLTK modal')
-  combo_state[(dialog.id,1)]=collection(inspect())['active'];combo_state[(dialog.id,2)]=0
+  current=inspect();combo_state[(dialog.id,1)]=collection(current)['active'];combo_state[(dialog.id,2)]=0;active=primary(current) if collection(current)['active']==0 else next(v['painted'] for v in collection(current)['additional'] if v['id']==collection(current)['active']);combo_state[(dialog.id,3)]=int(math.log2(payload(active)['resolution']))-6
   return dialog,row
  async def choice(dialog,row,index,value):
   g=dialog.get_geometry();old=combo_state[(dialog.id,index)];mouse(dialog,g.width*.7,row*(index+.4),True);mouse(dialog,g.width*.7,row*(index+.4),False);await asyncio.sleep(.08)
   for _ in range(abs(value-old)):key('Down' if value>old else 'Up')
   key('Return');await asyncio.sleep(.08);combo_state[(dialog.id,index)]=value
  async def entry(dialog,row,index,value):
+  index+=1 if index>=4 else 0 # Real new resolution row precedes old name/material fields.
   g=dialog.get_geometry();xtest.fake_input(d,X.MotionNotify,x=g.x+int(g.width*2/5)+16,y=g.y+int(row*(index+.4)));xtest.fake_input(d,X.ButtonPress,1);xtest.fake_input(d,X.ButtonRelease,1);d.sync();text(value);key('Tab');await asyncio.sleep(.06)
  async def finish(dialog,row,accept=True,shortcut=None):
   if shortcut:
@@ -145,6 +155,64 @@ async def main():
  check(payload(primary(back_layer))['resolution']==64 and payload(extra(back_layer)['painted'])['resolution']==128,'Both independent64/128 resolutions survive manager, material, layer and pointer workflows')
  final=await select_set(command,1);check(payload(primary(final))['resolution']==64 and payload(extra(final)['painted'])['resolution']==128,'Final active128 selection preserves primary64 resolution and source pixels');await command('Close Window');await asyncio.sleep(.2);check(app.wait(timeout=15)==0,'Actual texture-authoring application closes cleanly after Save');app=None
  w,layout,command=await launch(1);check(await save(command)==final,'Fresh ordinary application reopens the exact independent fields/materials/layers/resolutions');dialog,row=await manager(command);await finish(dialog,row,shortcut='Ctrl+W');check(await save(command)==final,'Reopened manager cancellation preserves complete editable set state');await command('Close Window');await asyncio.sleep(.2);check(app.wait(timeout=15)==0,'Fresh texture-authoring application closes cleanly');app=None
+ legacy_count=len(checks);check(legacy_count==51,'All51 previous real manager assertions remain present and passing before added resize cases')
+ def decoded_blob(value):
+  if isinstance(value,dict) and 'bytes' in value:return bytes(value['bytes'])
+  if isinstance(value,list):return bytes(value)
+  raise AssertionError('Native inspector lost the actual binary plane representation')
+ def field(scene,set_id):return primary(scene) if set_id==0 else next(v['painted'] for v in collection(scene)['additional'] if v['id']==set_id)
+ def authored(scene,set_id):
+  grid=payload(field(scene,set_id));components=[False]*14;masked=False;hidden=False;physical=False;legacy=False;tiny=False;physical_max=0
+  for layer in grid['layers']:
+   tiles=layer['tiles'];hidden|=bool(tiles) and (not layer['visible'] or layer['opacity']==0)
+   for tile in tiles:
+    data=decoded_blob(tile['data']);assert len(data)==32*32*14
+    for at in range(0,len(data),14):
+     for c in range(14):components[c]|=data[at+c]!=0
+     masked|=data[at+13]!=255
+   for tile in layer.get('physical_emission_tiles',[]):
+    data=decoded_blob(tile['data']);assert len(data)==32*32*28
+    for values in struct.iter_unpack('<7f',data):
+     assert all(math.isfinite(v) for v in values) and 0<=values[6]<=1 and all(0<=v<=10000 for v in values[3:6])
+     physical|=max(values[3:6])>0;legacy|=max(values[:3])>0;tiny|=0<values[6]<1/255;physical_max=max(physical_max,*values[3:6])
+  return {'all14':all(components),'masked':masked,'hidden':hidden,'physical':physical,'legacy':legacy,'tiny':tiny,'physical_max':physical_max,'layers':len(grid['layers']),'resolution':grid['resolution']}
+ async def load_fixture(key,number):
+  global app
+  if app is not None:
+   await command('Close Window');check(app.wait(timeout=15)==0,'Independent resize case closes its prior real app cleanly');app=None
+  project.write_bytes(fixtures[key].read_bytes());return await launch(number)
+ async def resize(command,target,accept=True,shortcut=None,lose_focus=False):
+  dialog,row=await manager(command);await choice(dialog,row,2,5);await choice(dialog,row,3,int(math.log2(target))-6)
+  if lose_focus:
+   dummy=d.screen().root.create_window(4,4,100,50,0,d.screen().root_depth,X.InputOutput,X.CopyFromParent);dummy.set_wm_name('External focus control');dummy.map();dummy.set_input_focus(X.RevertToParent,X.CurrentTime);d.sync();await asyncio.sleep(.2);dialog.set_input_focus(X.RevertToParent,X.CurrentTime);dummy.destroy();d.sync()
+  await finish(dialog,row,accept=accept,shortcut=shortcut)
+ w,layout,command=await load_fixture('rich-extra128',2);rich=inspect();before=authored(rich,1);check(before['all14'] and before['masked'] and before['hidden'] and before['physical'] and before['legacy'] and before['tiny'] and before['physical_max']>9000,'Rich real native input contains all14 channels, independent mask, hidden data and mixed/tiny FLOAT radiance')
+ await resize(command,64,shortcut='Escape');check(await save(command)==rich,'Escape cancels a staged actual painted-field resize exactly')
+ await resize(command,64,accept=False,lose_focus=True);check(await save(command)==rich,'Actual FLTK focus loss cannot implicitly resize; explicit Cancel retains every original plane')
+ await resize(command,128);check(await save(command,True)==rich,'Same-size real manager Apply is an exact native no-op')
+ await resize(command,64);small=await save(command,True);expected=json.loads(subprocess.check_output([str(inspector),str(fixtures['extra64'])],env=env));check(small==expected and only_extra(rich,small),'Actual manager Apply plus immediately ordered Save reaches the exact measured extra64 endpoint and untouched primary')
+ after=authored(small,1);check(all(after[k] for k in ['all14','masked','hidden','physical','legacy','tiny']) and after['physical_max']>9000 and after['layers']==before['layers'],'Saved resize retains all independent authored planes, units, masks and hidden layers')
+ check(small['texture_set_geometry']==rich['texture_set_geometry'] and collection(small)['slots']==collection(rich)['slots'],'Resize preserves complete native shared geometry and logical face membership')
+ await history(command,rich,small,'Manager painted resolution resize');picture('resized-extra64')
+ await command('Close Window');check(app.wait(timeout=15)==0,'Resized real FLTK app drains and closes normally');app=None
+ w,layout,command=await launch(3);check(await save(command)==small,'A genuinely fresh app reopens the exact resized editable FLOAT/mask/layer state')
+ w,layout,command=await load_fixture('rich-primary64',4);primary_before=inspect();await resize(command,128);primary_after=await save(command,True);expected=json.loads(subprocess.check_output([str(inspector),str(fixtures['primary128'])],env=env));check(primary_after==expected and extra(primary_after)==extra(primary_before),'Actual primary64-to128 resize keeps the complete extra128 field byte-exact')
+ p=authored(primary_after,0);check(p['all14'] and p['masked'] and p['hidden'] and p['physical'] and p['legacy'],'Primary field magnification retains its own full authoring planes');await history(command,primary_before,primary_after,'Primary field magnification')
+ w,layout,command=await load_fixture('quality-source',5);quality_before=inspect();await command('Frame all');baseline_status=picture('quality-before');await resize(command,64);await asyncio.sleep(.3)
+ # Wait for the real worker's menus to re-enable. Error evidence is the actual
+ # changed rendered status plus exact saved data and absent Undo; no fake observer.
+ for _ in range(1600):
+  nodes=await layout()
+  if nodes.get('Texture sets...',(0,{}))[1].get('enabled',False):break
+  await asyncio.sleep(.05)
+ else:raise TimeoutError('Quality refusal worker did not terminate')
+ await asyncio.sleep(.2);quality_status=picture('quality-refusal');g=w.get_geometry();box=(0,max(0,g.height-40),g.width,g.height)
+ check(baseline_status.crop(box).tobytes()!=quality_status.crop(box).tobytes(),'Real failed resize displays a changed native error/status line before Save clears it')
+ nodes=await layout();check(not nodes.get('Undo',(0,{}))[1].get('enabled',True),'Refused real resize creates no accepted global Undo record')
+ check(manifest['quality']['measured_maximum']>.30 or manifest['quality']['measured_rms']>.08,'Independent native control measured reconstruction beyond the actual default policy')
+ check(await save(command)==quality_before,'Real Apply of measured quality-refusal input preserves every original field and source byte')
+ await command('Close Window');check(app.wait(timeout=15)==0,'Quality-refusal app closes cleanly after exact native Save');app=None
+ check(not [p for p,v in pins.items() if sha(p)!=v],'All actual application, inspector, native fixtures and script inputs remain unchanged')
  report(True);d.close();bus.disconnect()
 try:asyncio.run(main())
 except BaseException as e:report(problem=repr(e));raise
