@@ -30,6 +30,7 @@
 #include <thread>
 namespace dome {
 class MaterialSurfaceQuery;
+namespace detail {class TextureSetRangeProof;}
 struct SpatialHand {
   TrackedHand tracked;
   bool joystick = false;
@@ -197,6 +198,8 @@ struct SurfaceRange {
   bool paint_winding_reversed=false; // Actual packed index flip, not cull mode.
   std::shared_ptr<const NormalPreviewProof> normal_preview_proof{};
   bool pbr_view = false;
+  uint32_t texture_set=0; // Object-local persistent material slot, not a raw material table index.
+  std::shared_ptr<const detail::TextureSetRangeProof> texture_set_proof;
 };
 struct SculptMeshingStats {
   size_t objects_reused=0,local_updates=0,full_rebuilds=0,history_fallbacks=0,capacity_fallbacks=0;

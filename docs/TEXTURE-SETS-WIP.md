@@ -93,3 +93,12 @@ now isolated at bind; same-frame/no-op image/cache evidence is still required.
 The three-TU syntax-only result is in validation/TEXTURE-SETS-PARTITION-SOURCE.json.
 The plan is not yet attached to drawing/query/native controls; full complex
 attribute ownership and all previously listed workflow adapters remain required.
+
+The next source boundary appends SurfaceRange.texture_set and its private range
+proof pointer, and adds material-query object+set identity, logical-triangle
+lookup and per-material exclusion. Old whole-object exclusion remains separate.
+Private plans/range proofs are truly const factory nodes with exact control-block,
+object/set/material/maps checks. This is not yet a complete packed-stream proof: the
+actual layout/producer must bind and authenticate the EBO, logical-corner and
+necessary attribute-split maps before surfaces can be enabled. Four syntax-only
+TUs passed; no new execution or old-layout archive reuse is claimed.

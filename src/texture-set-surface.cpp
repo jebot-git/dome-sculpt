@@ -36,7 +36,7 @@ std::shared_ptr<const TextureSetSurfacePlan> prepare_texture_set_surface(const S
  bounded_product(forecast,faces,4*std::bit_width(faces)+16,limits);
  bounded_product(forecast,corners,2*std::bit_width(corners)+8,limits);
  bounded_product(forecast,m.positions.size(),8,limits);work(forecast,corners,limits);
- size_t bytes=sizeof(TextureSetSurfacePlan);charge(bytes,corners,2*sizeof(uint32_t),limits);
+ size_t bytes=2*sizeof(TextureSetSurfacePlan)+128;charge(bytes,corners,2*sizeof(uint32_t),limits);
  charge(bytes,o.texture_sets->additional().size()+1,sizeof(TextureSetView)+sizeof(TextureSetDraw),limits);
  charge(bytes,o.texture_sets->additional().size()+1,514,limits); // Two bounded names per captured field.
  charge(bytes,1,TextureSetPaintAccess::working_bytes(*o.painted,o.painted->resolution()),limits);
@@ -50,7 +50,7 @@ std::shared_ptr<const TextureSetSurfacePlan> prepare_texture_set_surface(const S
  // the packet. The fields below retain COW pixels rather than cloning them.
  o.texture_sets->validate(o,true,limits);
  auto plan=std::shared_ptr<TextureSetSurfacePlan>(new TextureSetSurfacePlan);
- plan->geometry_=o.painted->mesh_owner();plan->deformation_=o.deformation;plan->collection_=o.texture_sets;
+ plan->object_=o.id;plan->geometry_=o.painted->mesh_owner();plan->deformation_=o.deformation;plan->collection_=o.texture_sets;
  plan->fields_.reserve(o.texture_sets->additional().size()+1);plan->draws_.reserve(o.texture_sets->additional().size()+1);
  plan->indices_.reserve(corners);plan->corners_.reserve(corners);
  auto append=[&](TextureSetId id){
@@ -66,7 +66,13 @@ std::shared_ptr<const TextureSetSurfacePlan> prepare_texture_set_surface(const S
  };
  append(0);for(const auto&field:o.texture_sets->additional())append(field.id);
  if(plan->indices_.size()!=corners)throw std::invalid_argument("Texture-set surface omitted actual current triangles");
- stop(limits);return plan;
+ stop(limits);
+ std::shared_ptr<const TextureSetSurfacePlan>sealed(new const TextureSetSurfacePlan(std::move(*plan)));
+ sealed->self_=sealed;return sealed;
+}
+void TextureSetSurfacePlan::authenticate_owner(const std::shared_ptr<const TextureSetSurfacePlan>&owner)const{
+ const auto expected=self_.lock();
+ if(!expected||owner!=expected||owner.owner_before(expected)||expected.owner_before(owner))throw std::invalid_argument("Texture-set surface plan borrowed a foreign owner control block");
 }
 void TextureSetSurfacePlan::authenticate_rest(const Mesh&mesh,
     const std::shared_ptr<const DeformationState>&deformation,const TextureSetLimits&limits)const{

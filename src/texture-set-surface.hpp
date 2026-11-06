@@ -12,6 +12,8 @@ struct TextureSetDraw {
 // those owners until the complete per-corner attribute adapter is implemented.
 class TextureSetSurfacePlan {
 public:
+  uint64_t object()const noexcept{return object_;}
+  void authenticate_owner(const std::shared_ptr<const TextureSetSurfacePlan>&)const;
   const std::shared_ptr<const Mesh>&geometry()const noexcept{return geometry_;}
   const std::shared_ptr<const DeformationState>&deformation()const noexcept{return deformation_;}
   const std::shared_ptr<const TextureSetCollection>&collection()const noexcept{return collection_;}
@@ -26,6 +28,9 @@ private:
   friend std::shared_ptr<const TextureSetSurfacePlan> prepare_texture_set_surface(const SculptObject&,const TextureSetLimits&);
   TextureSetSurfacePlan()=default;
   TextureSetSurfacePlan(const TextureSetSurfacePlan&)=delete;
+  TextureSetSurfacePlan(TextureSetSurfacePlan&&)=default;
+  uint64_t object_=0;
+  mutable std::weak_ptr<const TextureSetSurfacePlan>self_;
   std::shared_ptr<const Mesh>geometry_;
   std::shared_ptr<const DeformationState>deformation_;
   std::shared_ptr<const TextureSetCollection>collection_;
