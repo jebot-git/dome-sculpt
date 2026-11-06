@@ -46,3 +46,12 @@ performance requirements remain open. The earlier22 kernel checks keep their
 original isolated scope.
 
 Receipt: `docs/validation/SCULPT-CHUNK-PIPELINE-SOURCE.json`.
+
+The latest source composition merges main44fe3742 remeshing and adds binary64
+query-result metrics without changing existing SurfaceHit/Options/class layouts.
+Nine complete source/test units pass syntax only. Additional unexecuted actual
+GL controls compare whole-reference framebuffer bytes for ordinary material,
+ghost/order, scalar-owner, staged GL failure/retry and pruning cases. The fresh
+all-own optimized runtime proposal is approved under a 200 MiB phase cap that
+includes a 64 MiB prospective reserve. No executable result is implied by that
+approval; the raw plan and final syntax records remain separate.

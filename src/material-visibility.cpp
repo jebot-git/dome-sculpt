@@ -371,20 +371,21 @@ std::optional<MaterialSurfaceHit> MaterialSurfaceQuery::Impl::target(Vec3 point,
   size_t triangle_tests=0,metadata_tests=0;
   auto allowed=[&](uint64_t object){return (!only||only==object)&&std::find(excluded.begin(),excluded.end(),object)==excluded.end();};
   auto count=[&](uint32_t){if(++triangle_tests>65536)throw std::length_error("Mixed scene triangle work budget exceeded");return true;};
-  std::optional<MaterialSurfaceHit> best;
+  std::optional<MaterialSurfaceHit> best;double best_distance2=INFINITY;
+  auto upper_limit=[&]{return best?std::min(maximum,std::nextafter(float(std::sqrt(best_distance2)),INFINITY)):maximum;};
   auto rank=[&](uint64_t object){
     if(chunks){auto i=std::find(chunks->object_order().begin(),chunks->object_order().end(),object);return size_t(i-chunks->object_order().begin());}
     auto i=std::find_if(surfaces.begin(),surfaces.end(),[&](const auto &s){return s.range.object==object;});return size_t(i-surfaces.begin());
   };
-  auto accept=[&](MaterialSurfaceHit hit){
+  auto accept=[&](MaterialSurfaceHit hit,double distance2){
     bool earlier=false;
-    if(best&&hit.surface.distance==best->surface.distance) {
+    if(best&&distance2==best_distance2) {
       if(hit.object!=best->object)earlier=rank(hit.object)<rank(best->object);
       else if(hit.chunk&&best->chunk)
         earlier=hit.chunk->triangles.at(hit.surface.triangle)<best->chunk->triangles.at(best->surface.triangle);
       else if(!hit.chunk&&!best->chunk)earlier=hit.surface.triangle<best->surface.triangle;
     }
-    if(!best||hit.surface.distance<best->surface.distance||earlier)best=std::move(hit);
+    if(!best||distance2<best_distance2||earlier){best=std::move(hit);best_distance2=distance2;}
   };
   if(query) {
     SurfaceQueryOptions options;options.max_triangle_tests=65536;options.closest_maximum=maximum;
@@ -397,8 +398,8 @@ std::optional<MaterialSurfaceHit> MaterialSurfaceQuery::Impl::target(Vec3 point,
       return c<found->range.first+found->range.count&&found->visible(query->mesh(),t,bary,direction,seconds,ray);
     };
     options.ray_filter=visible;options.closest_filter=visible;
-    auto hit=ray?query->raycast(point,direction,maximum,options):query->nearest(point,options);
-    if(hit)accept({*hit,object_for(hit->triangle),{}});
+    auto hit=ray?query->raycast_result(point,direction,maximum,options):query->nearest_result(point,options);
+    if(hit)accept({hit->surface,object_for(hit->surface.triangle),{}},hit->squared_distance);
   }
   if(chunks)for(const auto &object:chunks->objects()) {
     if(!allowed(object.object))continue;
@@ -407,11 +408,11 @@ std::optional<MaterialSurfaceHit> MaterialSurfaceQuery::Impl::target(Vec3 point,
        (material.alpha==Material::AlphaMode::Mask?material.color[3]<material.alpha_cutoff:material.color[3]<=0))continue;
     object.placed->visit_bounds([&](const auto &bounds){
       if(++metadata_tests>262144)throw std::length_error("Mixed scene bounds work budget exceeded");
-      const auto limit=best?best->surface.distance:maximum;
-      return ray?bounds_ray(bounds,point,direction,limit):bounds_distance(bounds,point)<=std::nextafter(double(limit)*limit,INFINITY);
+      const auto limit=upper_limit();
+      return ray?bounds_ray(bounds,point,direction,limit):bounds_distance(bounds,point)<=std::nextafter(best?best_distance2:double(maximum)*maximum,INFINITY);
     },[&](const detail::SculptPlacedChunk::Ptr &chunk){
       SurfaceQueryOptions options;options.max_triangle_tests=65536;
-      options.closest_maximum=best?std::nextafter(best->surface.distance,INFINITY):maximum;
+      options.closest_maximum=upper_limit();
       options.triangle_filter=count;
       if(ray&&!material.double_sided)options.ray_filter=[&](uint32_t t,const std::array<float,3>&){
         const auto &m=*chunk->geometry_owner();const auto c=size_t(t)*3;
@@ -420,9 +421,9 @@ std::optional<MaterialSurfaceHit> MaterialSurfaceQuery::Impl::target(Vec3 point,
         const double vx=double(v.x)-a.x,vy=double(v.y)-a.y,vz=double(v.z)-a.z;
         return (uy*vz-uz*vy)*direction.x+(uz*vx-ux*vz)*direction.y+(ux*vy-uy*vx)*direction.z<0;
       };
-      const auto limit=best?best->surface.distance:maximum;
-      auto hit=ray?chunk->query()->raycast(point,direction,limit,options):chunk->query()->nearest(point,options);
-      if(hit){if(chunk->reflected())std::swap(hit->barycentric[1],hit->barycentric[2]);accept({*hit,object.object,chunk->source()});}
+      const auto limit=upper_limit();
+      auto hit=ray?chunk->query()->raycast_result(point,direction,limit,options):chunk->query()->nearest_result(point,options);
+      if(hit){if(chunk->reflected())std::swap(hit->surface.barycentric[1],hit->surface.barycentric[2]);accept({hit->surface,object.object,chunk->source()},hit->squared_distance);}
     });
   }
   return best;

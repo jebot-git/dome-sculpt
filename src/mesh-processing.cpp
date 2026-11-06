@@ -482,6 +482,9 @@ SurfaceHit SurfaceQuery::closest(Vec3 p,
   return *result;
 }
 std::optional<SurfaceHit> SurfaceQuery::nearest(Vec3 p,const SurfaceQueryOptions &options) const {
+  const auto result=nearest_result(p,options);return result?std::optional<SurfaceHit>(result->surface):std::nullopt;
+}
+std::optional<SurfaceQueryResult> SurfaceQuery::nearest_result(Vec3 p,const SurfaceQueryOptions &options) const {
   cancel(options.cancelled);
   if (!options.max_triangle_tests || options.max_triangle_tests > 2'000'000)
     throw std::invalid_argument("Invalid closest surface query budget");
@@ -499,13 +502,16 @@ std::optional<SurfaceHit> SurfaceQuery::nearest(Vec3 p,const SurfaceQueryOptions
   if (triangle == UINT32_MAX)
     return {};
   cancel(options.cancelled);
-  return impl_->hit(triangle, position, bary, float(std::sqrt(d2)));
+  return SurfaceQueryResult{impl_->hit(triangle,position,bary,float(std::sqrt(d2))),d2};
 }
 std::optional<SurfaceHit> SurfaceQuery::raycast(Vec3 origin, Vec3 direction,
                                                 float maximum) const {
   return raycast(origin, direction, maximum, {});
 }
-std::optional<SurfaceHit> SurfaceQuery::raycast(Vec3 origin, Vec3 direction,
+std::optional<SurfaceHit> SurfaceQuery::raycast(Vec3 origin,Vec3 direction,float maximum,const SurfaceQueryOptions &options) const {
+  const auto result=raycast_result(origin,direction,maximum,options);return result?std::optional<SurfaceHit>(result->surface):std::nullopt;
+}
+std::optional<SurfaceQueryResult> SurfaceQuery::raycast_result(Vec3 origin, Vec3 direction,
                                                 float maximum, const SurfaceQueryOptions &options) const {
   cancel(options.cancelled);
   if (!options.max_triangle_tests) throw std::invalid_argument("Empty surface ray budget");
@@ -524,8 +530,7 @@ std::optional<SurfaceHit> SurfaceQuery::raycast(Vec3 origin, Vec3 direction,
   impl_->tree.ray_hit(origin, direction, SurfaceRay(origin,direction), 0, best, triangle, bary, options, visited);
   if (triangle == UINT32_MAX)
     return {};
-  return impl_->hit(triangle, origin + direction * float(best), bary,
-                    float(best));
+  return SurfaceQueryResult{impl_->hit(triangle,origin+direction*float(best),bary,float(best)),best*best};
 }
 TopologyReport inspect_mesh(const Mesh &m,
                             const std::function<bool()> &cancelled) {
