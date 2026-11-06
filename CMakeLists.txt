@@ -1604,7 +1604,7 @@ if(BUILD_TESTING)
   add_executable(dome-sculpt-local-surface-integration-test tests/local-surface-integration.cpp)
   target_include_directories(dome-sculpt-local-surface-integration-test PRIVATE src)
   target_link_libraries(dome-sculpt-local-surface-integration-test PRIVATE dome-sculpt-core)
-  target_link_options(dome-sculpt-local-surface-integration-test PRIVATE -Wl,--wrap=_ZNK4dome17LocalSurfaceCache11materializeESt8functionIFbvEE)
+  target_link_options(dome-sculpt-local-surface-integration-test PRIVATE -Wl,--wrap=_ZN4dome6detail17SculptSceneChunks7captureERKNS_5SceneENS0_23SculptSceneChunkContextERKSt10shared_ptrIKS1_ENS0_22SculptSceneChunkLimitsESt8functionIFbvEE)
   # Instrument the two original brush entry points through linker wrapping.
   # Other compute operations may now pull the actual backend archive member.
   target_link_options(dome-sculpt-local-surface-integration-test PRIVATE
