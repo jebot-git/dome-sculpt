@@ -104,7 +104,7 @@ struct TextureSetView {
   std::shared_ptr<const ObjectBakeRecipe> bake_recipe;
   std::shared_ptr<const TextureSetFaceDomain> domain;
 };
-enum class TextureSetAction { Create, AssignFaces, Select, Rename, Material };
+enum class TextureSetAction { Create, AssignFaces, Select, Rename, Material, LayerOpacity, LayerOrder, AddLayer, DeleteLayer, NextLayer, ToggleLayer };
 // Native/desktop/XR requests operate on persistent logical face IDs and one
 // explicit material slot of the active mesh, never an object/group alias.
 struct TextureSetEdit {
@@ -114,6 +114,8 @@ struct TextureSetEdit {
   std::string name;
   uint32_t resolution=0;
   dome::Material material;
+  uint64_t layer=0;
+  float value=0;
 };
 TextureSetView texture_set_view(const SculptObject&,TextureSetId);
 TextureSetView active_texture_set(const SculptObject&);
@@ -137,6 +139,5 @@ bool select_texture_set(Scene&,uint64_t object,TextureSetId);
 // the draft; unfinished strokes, failures and cancellation never publish it.
 bool edit_texture_set(Scene&,uint64_t object,TextureSetId,
     const std::function<bool(PaintedMesh&,Material&)> &,const TextureSetLimits & = {});
+bool rename_texture_set(Scene&,uint64_t,TextureSetId,std::string,const TextureSetLimits & = {});
 } // namespace dome
-
-namespace dome { bool rename_texture_set(Scene&,uint64_t,TextureSetId,std::string,const TextureSetLimits & = {}); }

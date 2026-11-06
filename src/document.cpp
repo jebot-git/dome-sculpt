@@ -46,6 +46,7 @@
 #include "geometry-identity.hpp"
 #include "texture-set-worker.hpp"
 #include "texture-set-stroke.hpp"
+#include "texture-set-controls.hpp"
 #include "texture-set-surface.hpp"
 #include "document-transaction.hpp"
 #include "document-retopo-input.hpp"
@@ -718,9 +719,10 @@ void Document::publish_locked(bool force,bool checkpoint) {
     }
   }
   const auto selected_field=active.mesh_active?std::optional<TextureSetView>(active_texture_set(active)):std::nullopt;
+  if(texture_face_object_!=active.id||!active.mesh_active||!active.painted||texture_face_geometry_!=active.painted->mesh_owner()){state_.texture_faces.clear();state_.texture_face_select=false;texture_face_geometry_.reset();texture_face_object_=0;}
   state_.texture_sets.clear();state_.active_texture_set=active.texture_sets?active.texture_sets->active():0;
   state_.texture_material=selected_field?selected_field->material:active.material;
-  state_.can_edit_texture_sets=selected_field&&detail::texture_set_plain_fields(active)&&object_editable_locked(active.id)&&!state_.asset_busy&&!state_.recovery_busy&&!native_stroke_&&!control_before_&&!state_.polygon&&!state_.retopology&&!state_.cut&&!uv_;
+  state_.can_edit_texture_sets=selected_field&&(!active.polygon||active.texture_sets)&&detail::texture_set_plain_fields(active)&&object_editable_locked(active.id)&&!state_.asset_busy&&!state_.recovery_busy&&!native_stroke_&&!control_before_&&!state_.polygon&&!state_.retopology&&!state_.cut&&!uv_;
   if(selected_field){
     const auto primary=texture_set_view(active,0);state_.texture_sets.push_back({0,primary.name,primary.painted->resolution(),primary.domain?primary.domain->triangles().size():primary.painted->mesh().indices.size()/3});
     if(active.texture_sets)for(const auto&s:active.texture_sets->additional())state_.texture_sets.push_back({s.id,s.name,s.painted->resolution(),s.domain->triangles().size()});
@@ -1441,7 +1443,15 @@ void Document::process_locked(const SpatialFrame &incoming) {
     state_.canvas.orientation = {};
     anchored_ = true;
   }
-  if(process_object_selection_locked(f)){
+  if(state_.texture_face_select&&!input_.menu_open()&&!control_before_&&!state_.asset_busy){
+    for(size_t i=0;i<2;++i){const auto&h=f.hands[i];const bool pressed=h.tracked.valid&&std::isfinite(h.tracked.trigger)&&h.tracked.trigger>.02f;
+      if(pressed&&!texture_face_pressed_[i]&&!h.joystick){const auto aim=h.tracked.aimValid?h.tracked.aim:h.tracked.grip;if(ob::finite(aim)){
+        const auto local=ob::inverse(state_.canvas);const auto p=ob::transform(local,aim.position);const auto d=ob::rotate(ob::conjugate(state_.canvas.orientation),ob::rotate(aim.orientation,{0,0,-1}));
+        texture_face_pointer_locked({p.x,p.y,p.z},{d.x,d.y,d.z},true,f.time);}}
+      texture_face_pressed_[i]=pressed;
+    }
+  }
+  if(!state_.texture_face_select&&process_object_selection_locked(f)){
     // The hierarchy owns trigger events, but the shared menu still receives
     // neutral releases so a thumbstick/menu button can reopen it immediately.
     for(size_t i=0;i<2;++i){SpatialSample release;release.id=i+1;release.sequence=f.sequence;release.time=f.time;release.focused=f.focused;release.tracked=f.hands[i].tracked.valid;input_.update(release);}
@@ -1471,7 +1481,7 @@ void Document::process_locked(const SpatialFrame &incoming) {
       return;
     }
   }
-  if(!state_.selection_mode&&process_affine_paint_spatial_locked(f)){return;}
+  if(!state_.texture_face_select&&!state_.selection_mode&&process_affine_paint_spatial_locked(f)){return;}
   const bool affine_target=scene_.has_affine_placement(scene_.active().id);
   auto object_canvas = state_.retopology
       ? ob::compose(state_.canvas, state_.retopology->transform)
@@ -1481,7 +1491,7 @@ void Document::process_locked(const SpatialFrame &incoming) {
       !affine_target && (!scene_.active().mesh_active||!scene_.active().deformation||state_.weights.enabled) && !state_.asset_busy && object_editable_locked(scene_.active().id) &&
       (scene_.active().mesh_active || volume().editable_layer() || volume().sculpt_settings().mask_edit) &&
       (!state_.weights.enabled || (mesh_.load()->generation == state_.generation && mesh_.load()->revision == state_.revision));
-  if(state_.shape_sculpt||state_.selection_mode||state_.rig_fit)input_.edit_allowed=false;
+  if(state_.texture_face_select||state_.shape_sculpt||state_.selection_mode||state_.rig_fit)input_.edit_allowed=false;
   if (state_.retopology) input_.edit_allowed = bool(state_.retopology->source) && !retopo_accepting_ && !state_.asset_busy;
   if(state_.cut)input_.edit_allowed=false;
   if(scene_.active().texture_sets&&!state_.weights.enabled)input_.edit_allowed=false;
@@ -1519,7 +1529,7 @@ void Document::process_locked(const SpatialFrame &incoming) {
     const bool owned_control=control_before_&&!state_.asset_busy&&!uv_accept_pending_&&
       control_object_==scene_.active().id&&control_source_.generation==state_.generation&&
       control_source_.edit_authority==state_.edit_authority&&input_.owns_control(state_.controls.parameter);
-    if(state_.selection_mode&&!owned_control)s.pressure=0;
+    if((state_.texture_face_select||state_.selection_mode)&&!owned_control)s.pressure=0;
     s.trigger = s.pressure > .02f;
     s.joystick_press = h.joystick;
     s.stick_x = h.x;
@@ -1558,13 +1568,13 @@ void Document::process_locked(const SpatialFrame &incoming) {
     // live page so toggles and Fill can be followed by Resume without losing it.
     if (!state_.retopology && !state_.cut && !sculpt_mask_command(*c) && !import_command(*c) && !projection_command(*c) && !preview_command(*c) && !rig_fit_command(*c) && !expression_command(*c) &&
         !(input_.menu_page()==15 && *c==SpatialCommand::CancelWork) &&
-        input_.menu_page()!=30 && input_.menu_page()!=24 && input_.menu_page()!=18 && input_.menu_page()!=20 && input_.menu_page()!=19 && input_.menu_page()!=22 && !state_.polygon) finish_locked();
+        input_.menu_page()!=31 && input_.menu_page()!=30 && input_.menu_page()!=24 && input_.menu_page()!=18 && input_.menu_page()!=20 && input_.menu_page()!=19 && input_.menu_page()!=22 && !state_.polygon) finish_locked();
     auto command_publication=published_.load();
     command_locked(*c);
     import_published=(import_command(*c)||projection_command(*c)||rig_fit_command(*c)||expression_command(*c)||
                       *c==SpatialCommand::RetopoBegin||*c==SpatialCommand::RetopoApply||*c==SpatialCommand::RetopoCancel)&&
                      published_.load()!=command_publication;
-    if((command_page==30)||(command_page==20)||(command_page==24&&*c!=SpatialCommand::ShapeSculpt)){input_.retain_page(command_page,command_owner,command_sector);publish_locked(false,false);}
+    if((command_page==31&&*c!=SpatialCommand::TexturePickFaces)||(command_page==30)||(command_page==20)||(command_page==24&&*c!=SpatialCommand::ShapeSculpt)){input_.retain_page(command_page,command_owner,command_sector);publish_locked(false,false);}
     // Opening/Apply/Cancel already published this frame's actual hands and
     // immutable owner. Do not reinterpret simultaneous history against the
     // newly opened/closed namespace or add a fallible second publication.
@@ -2280,16 +2290,24 @@ bool Document::parameter_enabled_locked(VrParameter parameter) const {
   if (state_.asset_busy || parameter == VrParameter::None)
     return false;
   auto &o = scene_.active();
+  if(o.texture_sets&&detail::texture_set_control(parameter))return object_editable_locked(o.id)&&detail::texture_set_plain_fields(o)&&!action_active_locked()&&!state_.recovery_busy;
   if (parameter == VrParameter::LayerOpacity ||
       parameter == VrParameter::LayerOrder)
     return o.mesh_active && o.painted &&
            (parameter != VrParameter::LayerOrder ||
-            o.painted->layers().size() > 1);
+            active_texture_set(o).painted->layers().size() > 1);
   return true;
 }
 void Document::finish_control_locked(bool accept) {
   if (!control_before_)
     return;
+  if(control_before_->object(control_object_).texture_sets&&detail::texture_set_control(state_.controls.parameter)){
+    auto controls=std::move(state_.controls);const auto source=control_source_;
+    auto before=std::move(control_before_);control_before_.reset();state_.controls={};const bool changed=control_changed_;control_changed_=false;
+    try{if(accept&&changed){auto edit=detail::texture_set_control_request(before->object(control_object_),controls);queue_texture_set_locked(std::move(edit),source);}}
+    catch(...){control_before_=std::move(before);state_.controls=std::move(controls);control_changed_=changed;input_.resume_control(state_.controls.parameter);throw;}
+    return;
+  }
   if(state_.controls.parameter==VrParameter::BakeSource){
     static_assert(std::is_nothrow_move_constructible_v<VrControlState> && std::is_nothrow_move_assignable_v<VrControlState>);
     auto controls=std::move(state_.controls);
@@ -2688,20 +2706,20 @@ void Document::control_event_locked(VrControlEvent event) {
       break;
     case VrParameter::Metallic:
       c.title = "Material metalness";
-      c.value[0] = o.material.metallic;
+      c.value[0] = o.texture_sets?active_texture_set(o).material.metallic:o.material.metallic;
       break;
     case VrParameter::Roughness:
       c.title = "Material roughness";
-      c.value[0] = o.material.roughness;
+      c.value[0] = o.texture_sets?active_texture_set(o).material.roughness:o.material.roughness;
       break;
     case VrParameter::Opacity:
       c.title = "Material opacity";
-      c.value[0] = o.material.color[3];
+      c.value[0] = o.texture_sets?active_texture_set(o).material.color[3]:o.material.color[3];
       break;
     case VrParameter::BaseColor:
       c.title = "Material color";
       c.components = 4;
-      c.value = o.material.color;
+      c.value = o.texture_sets?active_texture_set(o).material.color:o.material.color;
       break;
     case VrParameter::InkColor:
       c.title = "Brush color";
@@ -2716,8 +2734,10 @@ void Document::control_event_locked(VrControlEvent event) {
     case VrParameter::InkEmissionUnits:
       c.title="Brush units / relative normalizes";c.value[0]=state_.paint.emission_units==PaintEmissionUnits::Physical?1:0;break;
     case VrParameter::MaterialEmission: {
-      c.title=o.material.unlit?"Unlit material ignores emission":o.material_bindings&&o.material_bindings->physical_emission?"Absolute background radiance":"Material emission / linear radiance";
-      c.components=3;c.maximum=maximum_native_emission;const auto &value=o.material_bindings&&o.material_bindings->physical_emission?*o.material_bindings->physical_emission:o.material.emissive;
+      const auto material=o.texture_sets?active_texture_set(o).material:o.material;
+      const auto binding=o.texture_sets?active_texture_set(o).material_bindings:o.material_bindings;
+      c.title=material.unlit?"Unlit material ignores emission":binding&&binding->physical_emission?"Absolute background radiance":"Material emission / linear radiance";
+      c.components=3;c.maximum=maximum_native_emission;const auto &value=binding&&binding->physical_emission?*binding->physical_emission:material.emissive;
       for(size_t k=0;k<3;++k)c.value[k]=value[k];break;
     }
     case VrParameter::InkEmission:
@@ -2747,9 +2767,9 @@ void Document::control_event_locked(VrControlEvent event) {
     }
     case VrParameter::LayerOpacity:
     case VrParameter::LayerOrder: {
-      auto &layers = o.painted->layers();
+      const auto field=active_texture_set(o);const auto &layers = field.painted->layers();
       auto it = std::find_if(layers.begin(), layers.end(), [&](auto &l) {
-        return l.id == o.painted->active_layer();
+        return l.id == field.painted->active_layer();
       });
       c.title = event.parameter == VrParameter::LayerOpacity ? "Layer opacity"
                                                              : "Layer order";
@@ -2758,13 +2778,13 @@ void Document::control_event_locked(VrControlEvent event) {
                        : float(it - layers.begin());
       if (event.parameter == VrParameter::LayerOrder)
         c.maximum = float(layers.size() - 1);
-      o.painted = o.painted->snapshot();
+      if(!o.texture_sets)o.painted = o.painted->snapshot();
       break;
     }
     default:
       break;
     }
-    state_.message.clear();
+    state_.message=o.texture_sets&&detail::texture_set_control(event.parameter)?"Texture-set changes are staged until Apply":std::string{};
     return;
   }
   if (!control_before_ || event.parameter != state_.controls.parameter)
@@ -2847,6 +2867,14 @@ void Document::control_event_locked(VrControlEvent event) {
   c.value[event.component] = value;
   auto &o = scene_.object(control_object_);
   auto &before = control_before_->object(control_object_);
+  if(o.texture_sets&&detail::texture_set_control(c.parameter)){
+    const auto original=active_texture_set(before);auto request=detail::texture_set_control_request(before,c);
+    if(request.action==TextureSetAction::Material)control_changed_=!detail::same_texture_material(request.material,original.material);
+    else{const auto&layers=original.painted->layers();const auto at=std::find_if(layers.begin(),layers.end(),[&](const auto&l){return l.id==request.layer;});
+      if(at==layers.end())throw std::logic_error("Texture-set controls lost their selected layer");
+      control_changed_=request.action==TextureSetAction::LayerOpacity?request.value!=at->opacity:int(std::lround(request.value))!=int(at-layers.begin());}
+    publish_locked(false,false);return;
+  }
   bool scene_changed = false;
   switch (c.parameter) {
   case VrParameter::CutOffset:
@@ -3012,6 +3040,7 @@ void Document::control_event_locked(VrControlEvent event) {
 }
 
 bool Document::command_enabled_locked(SpatialCommand command) const {
+  if(texture_set_command(command))return texture_set_command_enabled_locked(command);
   if(expression_command(command))return expression_command_enabled_locked(command);
   if(state_.expressions&&!preview_command(command)&&command!=SpatialCommand::CancelWork&&command!=SpatialCommand::Center)return false;
   if(editable_avatar_export_command(command))return
@@ -3226,6 +3255,7 @@ void Document::sculpt_command(SpatialCommand command) {
   if(published_.load()==publication)publish_locked();
 }
 void Document::command_locked(SpatialCommand command) {
+  if(texture_set_command(command)){texture_set_command_locked(command);return;}
   if(expression_command(command)){expression_command_locked(command);return;}
   if(state_.expressions&&command==SpatialCommand::CancelWork){end_expression_preview_locked(false);return;}
   if(state_.expressions&&!preview_command(command)&&command!=SpatialCommand::Center)return;
@@ -3530,16 +3560,13 @@ void Document::command_locked(SpatialCommand command) {
     if (!o.painted || !o.mesh_active)
       throw std::logic_error("Prepare or select a painting mesh first");
     if(o.texture_sets){
-      Scene next=scene_;const auto set=o.texture_sets->active();
-      dome::edit_texture_set(next,o.id,set,[&](PaintedMesh&p,Material&){
-        const auto&layers=p.layers();const auto at=std::find_if(layers.begin(),layers.end(),[&](const auto&l){return l.id==p.active_layer();});
-        if(command==SpatialCommand::NextLayer)p.select_layer(layers[(size_t(at-layers.begin())+1)%layers.size()].id);
-        else if(command==SpatialCommand::AddLayer)p.add_layer("Paint "+std::to_string(layers.size()+1));
-        else if(command==SpatialCommand::DeleteLayer)p.delete_layer();
-        else p.layer_properties(at->name,command==SpatialCommand::LayerVisible?!at->visible:at->visible,command==SpatialCommand::LayerOpacity?(at->opacity>.26f?at->opacity-.25f:1.f):at->opacity);
-        return true;
-      });
-      Scene before=std::move(scene_);scene_=std::move(next);scene_changed_locked(std::move(before));return;
+      const auto field=active_texture_set(o);TextureSetEdit edit;edit.set=field.id;edit.layer=field.painted->active_layer();
+      if(command==SpatialCommand::AddLayer)edit.action=TextureSetAction::AddLayer;
+      else if(command==SpatialCommand::DeleteLayer)edit.action=TextureSetAction::DeleteLayer;
+      else if(command==SpatialCommand::NextLayer)edit.action=TextureSetAction::NextLayer;
+      else if(command==SpatialCommand::LayerVisible)edit.action=TextureSetAction::ToggleLayer;
+      else{edit.action=TextureSetAction::LayerOpacity;const auto&layers=field.painted->layers();const auto at=std::find_if(layers.begin(),layers.end(),[&](const auto&l){return l.id==edit.layer;});if(at==layers.end())throw std::logic_error("Texture-set layer is unavailable");edit.value=at->opacity>.26f?at->opacity-.25f:1.f;}
+      queue_texture_set_locked(std::move(edit));return;
     }
     if (command == SpatialCommand::NextLayer) {
       auto &layers = o.painted->layers();
@@ -3594,6 +3621,17 @@ void Document::command_locked(SpatialCommand command) {
     return;
   default:
     break;
+  }
+  if(scene_.active().texture_sets&&((command>=SpatialCommand::Warm&&command<=SpatialCommand::Opacity))){
+    TextureSetEdit edit;edit.action=TextureSetAction::Material;const auto field=active_texture_set(scene_.active());edit.set=field.id;edit.material=field.material;auto&m=edit.material;
+    switch(command){
+    case SpatialCommand::Warm:m.color={.58f,.30f,.15f,1};break;case SpatialCommand::Blue:m.color={.04f,.12f,.8f,1};break;
+    case SpatialCommand::White:m.color={.8f,.8f,.8f,1};break;case SpatialCommand::Dark:m.color={.04f,.04f,.04f,1};break;
+    case SpatialCommand::MetalUp:m.metallic=std::min(1.f,m.metallic+.1f);break;case SpatialCommand::MetalDown:m.metallic=std::max(0.f,m.metallic-.1f);break;
+    case SpatialCommand::RoughUp:m.roughness=std::min(1.f,m.roughness+.1f);break;case SpatialCommand::RoughDown:m.roughness=std::max(0.f,m.roughness-.1f);break;
+    case SpatialCommand::Toon:m.toon=true;break;case SpatialCommand::Pbr:m.toon=false;break;case SpatialCommand::Opacity:m.color[3]=m.color[3]>.26f?m.color[3]-.25f:1.f;break;
+    default:throw std::logic_error("Unknown material command");}
+    queue_texture_set_locked(std::move(edit));return;
   }
   Scene before = scene_;
   auto &o = scene_.active();

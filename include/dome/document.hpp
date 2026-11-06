@@ -186,7 +186,8 @@ struct EditorState {
   uint32_t active_texture_set=0;
   std::vector<TextureSetInfo> texture_sets;
   Material texture_material;
-  bool can_edit_texture_sets=false;
+  bool can_edit_texture_sets=false,texture_face_select=false;
+  std::vector<uint64_t> texture_faces;
 };
 struct SurfaceRange {
   uint64_t object;
@@ -303,6 +304,8 @@ public:
   void replace(Volume, bool clean = true);
   void seed();
   void edit_texture_set(TextureSetEdit,AssetSource expected = {});
+  void texture_set_action(SpatialCommand);
+  bool texture_face_pointer(Vec3 origin,Vec3 direction,bool additive=false,double material_time=0);
   bool begin_native_stroke();
   void configure_shape_sculpt(bool enabled);
   void select_shape_target(uint32_t target, AssetSource expected = {});
@@ -908,6 +911,13 @@ private:
     std::vector<uint8_t> locks;
     bool use_locks=false;
   };
+  void queue_texture_set_locked(TextureSetEdit,AssetSource = {});
+  bool texture_face_pointer_locked(Vec3,Vec3,bool,double);
+  void texture_set_command_locked(SpatialCommand);
+  bool texture_set_command_enabled_locked(SpatialCommand)const;
+  std::shared_ptr<const Mesh> texture_face_geometry_;
+  uint64_t texture_face_object_=0;
+  std::array<bool,2> texture_face_pressed_{true,true};
   void queue_scene_operation_locked(std::string, SceneOperation, AssetSource,
                                     std::shared_ptr<std::string>, std::shared_ptr<AssetWork> = {}, std::shared_ptr<bool> = {},
                                     std::shared_ptr<const MeshSnapshot> = {}, uint64_t retopo_session = 0,
