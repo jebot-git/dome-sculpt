@@ -6,7 +6,7 @@
 #include <map>
 #include <memory>
 namespace dome {
-namespace detail {class PaintOverlayPacket;struct PaintOverlayFactory;struct EmissionExportAccess;class BakedNormalField;struct NativeWeightPaintAccess;}
+namespace detail {class PaintOverlayPacket;struct PaintOverlayFactory;struct EmissionExportAccess;class BakedNormalField;struct NativeWeightPaintAccess;class PolygonSurfaceOwner;struct PolygonSurfaceStage;struct PolygonSurfacePaintCodec;}
 struct Material;
 class PaintProjection;
 class PaintSamplingDomain;
@@ -248,6 +248,12 @@ private:
   friend struct SourceNormalPreparationAccess;
   friend struct SourcePaintSamplingAccess;
   friend struct SourceKeyPaintAccess;
+  friend struct detail::PolygonSurfacePaintCodec;
+  nlohmann::json encode_native_payload(PaintImageArchive *,NormalSamplingArchive *,PaintSamplingArchive *,
+      const detail::PolygonSurfaceOwner *) const;
+  static std::shared_ptr<PaintedMesh> decode_native_payload(const nlohmann::json &,const PaintImageArchive *,
+      bool,const NormalSamplingArchive *,const PaintSamplingArchive *,const SourcePaintDecodeContext &,
+      const detail::PolygonSurfaceStage *);
   void seal_paint_sampling_attachment();
   PaintedMesh() = default;
   PaintedMesh(Mesh, uint32_t, const PaintSurfaceOptions &);

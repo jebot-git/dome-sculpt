@@ -24,6 +24,7 @@ public:
  uint32_t add(std::shared_ptr<const PolygonSurfaceOwner>);
  nlohmann::json encode(const PolygonSurfaceOriginWriter &) const;
  size_t size()const noexcept{return owners_.size();}
+ size_t reserved_working_bytes()const noexcept{return reserved_;}
 private:
  PolygonSurfaceTransferLimits limits_;
  size_t reserved_=0,entries_=0;

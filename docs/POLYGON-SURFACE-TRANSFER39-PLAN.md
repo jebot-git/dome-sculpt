@@ -127,3 +127,34 @@ future coordinated cohort, not new qualification. Runtime/publication and old
 writer guards remain unchanged. Repeated post-paint edits, full owning Scene39
 codec, current renderer/query, general topology, portable output, and native
 Apply/Cancel/Undo/Save/Restore still require their actual adapters and tests.
+
+
+The following unexecuted Paint6 source seam uses the sealed typed node writer/
+reader rather than adding a public decode permission. It carries `node`, actual
+`physical_paint` and the current plain payload. Actual current Paint and material
+must match the node before encoding. Decoding checks exact current POSITION/N/
+UV/index/flag replay and original grid resolution, then borrows the real replayed
+SurfaceMap and attachment before parsing current layer values. It constructs no
+second UV raster. Real float-plane presence must equal the encoded flag; layer
+identity/metadata, all legacy bytes, physical values and common coverage/masks
+are current payload data, not a reset to the captured before state. Actual old
+normal-field pool identity must still match the immutable node before root.
+
+Encoded node/string/container/binary dimensions and a conservative three-copy
+current payload estimate are scanned before new payload copies. Node replay peak
+reservations are counted alongside them. This is not the complete outer graph/
+image budget: Scene39 must still perform all retained-root/dependency prefix and
+aggregate preallocation before enabling any writer or publication. The new
+private reader/writer routes share the existing complete Paint member bodies;
+legacy public entrypoints pass no typed node and retain old envelope paths.
+Their old bytes still require actual runtime comparison after the held build
+boundary. No new Paint data field or object-size append is introduced here.
+
+A self-contained proposed native-N-only FLOAT counter covers real paint before
+and after Move, current layer/mask edits, exact every-pixel floats/legacy bytes,
+second-cycle encoding, wrong geometry/resolution/physical flags, tiny budget and
+old reader rejection. It is syntax-only, unexecuted. Full canonical field alias
+and rendered recovery need the actual enclosing normal/image/material codec.
+Generic preview/composite and ordinary public domain3 writing now refuse early
+until a genuine current-field adapter is connected; this is a temporary missing
+path, not completion. All Scene39 publication and material21 writer guards stay.

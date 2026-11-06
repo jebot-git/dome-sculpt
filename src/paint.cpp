@@ -19,6 +19,7 @@
 #include "paint-sampling-access.hpp"
 #include "dome/normal-preparation.hpp"
 #include "polygon-paint.hpp"
+#include "polygon-surface-paint.hpp"
 #include "paint-composite-backend.hpp"
 #include "dome/source-maps.hpp"
 #include "dome/normal-sampling.hpp"
@@ -2177,6 +2178,7 @@ std::shared_ptr<PaintedMesh> PaintedMesh::from_maps(Mesh mesh,
 std::shared_ptr<const TextureMaps> PaintedMesh::preview(const Material &material) const {return preview(material,{});}
 std::shared_ptr<const TextureMaps> PaintedMesh::preview(const Material &material,const std::function<bool()> &cancelled) const {
   paint_compute::checkpoint(cancelled);material.validate();
+  if(surface_->paint_domain&&surface_->paint_domain->version()==3)throw std::invalid_argument("Polygon surface preview/export requires its actual current field adapter");
   if(detail::EmissionExportAccess::requires_preview(*this,material,nullptr))
     return detail::EmissionExportAccess::preview(*this,material,cancelled);
   if(baked_&&baked_->normal_authority&&(!normal_projection_||normal_projection_->version!=2))
@@ -2377,6 +2379,7 @@ PaintedMesh::composite(const Material &material) const {return composite(materia
 std::shared_ptr<const TextureMaps>
 PaintedMesh::composite(const Material &material,const std::function<bool()> &cancelled) const {
   paint_compute::checkpoint(cancelled);material.validate();
+  if(surface_->paint_domain&&surface_->paint_domain->version()==3)throw std::invalid_argument("Polygon surface preview/export requires its actual current field adapter");
   if(surface_->source_capture_only) {
     if(!source_maps_||baked_||color_projection_||normal_projection_||
        std::any_of(layers_.begin(),layers_.end(),[](const auto &layer){return tile_count(layer)||color_tile_count(layer);}))
@@ -2850,10 +2853,15 @@ nlohmann::json PaintedMesh::encode(PaintImageArchive *archive,NormalSamplingArch
   return encode(archive,domains,nullptr);
 }
 nlohmann::json PaintedMesh::encode(PaintImageArchive *archive,NormalSamplingArchive *domains,PaintSamplingArchive *paint_domains) const {
+  return encode_native_payload(archive,domains,paint_domains,nullptr);
+}
+nlohmann::json PaintedMesh::encode_native_payload(PaintImageArchive *archive,NormalSamplingArchive *domains,PaintSamplingArchive *paint_domains,const detail::PolygonSurfaceOwner *polygon) const {
+  if(polygon){if(!archive)throw std::invalid_argument("Polygon Paint6 requires its actual owning image archive");polygon->validate_current(*this);}
   if(!valid_source_sampling_attachment())throw std::invalid_argument("Independent source paint lost its own sampling attachment");
   const auto sampling=paint_sampling_domain();
   if(!valid_paint_sampling_attachment())throw std::logic_error("Paint sampling geometry attachment is invalid");
-  if(sampling&&(!paint_domains||!archive))throw std::logic_error("Retained writable paint requires its complete paired Scene24 archive context");
+  if(sampling&&sampling->version()==3&&!polygon)throw std::invalid_argument("Polygon Paint6 requires its actual owning node codec");
+  if(sampling&&!polygon&&(!paint_domains||!archive))throw std::logic_error("Retained writable paint requires its complete paired Scene24 archive context");
   if((!domains||!archive)&&((baked_&&baked_->normal_authority)||
      (normal_projection_&&normal_projection_->version==2)))
     throw std::invalid_argument("Retained normal bake requires an owning sampling archive context");
@@ -2976,6 +2984,7 @@ nlohmann::json PaintedMesh::encode(PaintImageArchive *archive,NormalSamplingArch
     if(!archive)envelope["source_images"]=local.encode();
     return envelope;
   }
+  if(polygon)return j; // Only the typed private Paint6 writer can call this branch.
   if(has_physical_emission())return {{"version",3},{"payload",std::move(j)},{"domain",sampling?nlohmann::json(paint_domains->add(sampling)):nlohmann::json(nullptr)}};
   if(sampling)return {{"version",2},{"payload",std::move(j)},{"domain",paint_domains->add(sampling)}};
   return j;
@@ -3001,6 +3010,11 @@ std::shared_ptr<PaintedMesh> PaintedMesh::decode(const nlohmann::json &input,con
 std::shared_ptr<PaintedMesh> PaintedMesh::decode(const nlohmann::json &input,const PaintImageArchive *archive,
     bool allow_polygon,const NormalSamplingArchive *domains,const PaintSamplingArchive *paint_domains,
     const SourcePaintDecodeContext &context) {
+  return decode_native_payload(input,archive,allow_polygon,domains,paint_domains,context,nullptr);
+}
+std::shared_ptr<PaintedMesh> PaintedMesh::decode_native_payload(const nlohmann::json &input,const PaintImageArchive *archive,
+    bool allow_polygon,const NormalSamplingArchive *domains,const PaintSamplingArchive *paint_domains,
+    const SourcePaintDecodeContext &context,const detail::PolygonSurfaceStage *polygon) {
   const bool independent=input.is_object()&&input.contains("version")&&input.at("version")==4;
   std::optional<PaintImageArchive> independent_images;
   std::shared_ptr<PaintedMesh> original;
@@ -3030,7 +3044,7 @@ std::shared_ptr<PaintedMesh> PaintedMesh::decode(const nlohmann::json &input,con
   }
   const auto &record=independent?input.at("payload"):input;
   std::shared_ptr<const PaintSamplingDomain> sampling;
-  const bool physical=record.is_object()&&record.contains("version")&&record.at("version")==3;
+  const bool physical=(record.is_object()&&record.contains("version")&&record.at("version")==3)||(polygon&&context.physical_emission);
   const auto &j=detail::paint_archive_payload(record,archive&&paint_domains,context.physical_emission);
   if(record.contains("version")&&!record.at("domain").is_null())
     sampling=paint_domains->at(record.at("domain").get<uint32_t>());
@@ -3095,7 +3109,17 @@ std::shared_ptr<PaintedMesh> PaintedMesh::decode(const nlohmann::json &input,con
       surface_options.policy=PaintUvPolicy::SourceAuthored;
     }
   }
-  auto result=std::shared_ptr<PaintedMesh>(new PaintedMesh(std::move(mesh),uint32_t(resolution.get<uint64_t>()),surface_options,std::move(sampling)));
+  std::shared_ptr<PaintedMesh>result;
+  if(polygon){
+    if(!archive||!polygon->owner||!polygon->paint||independent||sampling||surface_options.policy!=PaintUvPolicy::Strict||j.contains("source_maps")||j.contains("normal_projection")||j.contains("color_projection")||j.contains("source_images"))throw std::invalid_argument("Polygon Paint6 payload contradicts its actual independent field/grid model");
+    polygon->owner->validate_current(*polygon->paint);polygon->owner->validate_current_geometry(mesh);
+    if(resolution.get<uint64_t>()!=polygon->paint->resolution())throw std::invalid_argument("Polygon Paint6 changed its actual source grid resolution");
+    // The node factory has already replayed and sealed this exact map. Parse
+    // current layer values onto it; never build a second guessed UV raster.
+    result=std::shared_ptr<PaintedMesh>(new PaintedMesh);
+    result->surface_=polygon->paint->surface_;result->sampling_attachment_=polygon->paint->sampling_attachment_;
+    result->composite_cache_=std::make_shared<CompositeCache>();result->composite_token_=next_composite_token();
+  }else result=std::shared_ptr<PaintedMesh>(new PaintedMesh(std::move(mesh),uint32_t(resolution.get<uint64_t>()),surface_options,std::move(sampling)));
   std::optional<PaintImageArchive> local_images;
   const PaintImageArchive *images=archive;
   if(j.contains("source_maps") || j.contains("color_projection") || j.contains("normal_projection")) {
@@ -3292,6 +3316,7 @@ std::shared_ptr<PaintedMesh> PaintedMesh::decode(const nlohmann::json &input,con
     SourcePaintAccess::bind(*result,std::move(original),original_vertices,resource_limits,std::move(authored_uv1));
     if(result->storage_bytes()>128*1024*1024)throw std::length_error("Independent source paint exceeds total retained storage budget");
   }
+  if(polygon)polygon->owner->validate_current(*result);
   return result;
 }
 void PaintedMesh::swap_state(PaintedMesh &other) noexcept {
