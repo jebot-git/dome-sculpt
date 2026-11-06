@@ -90,7 +90,7 @@ add_library(dome-sculpt-core src/source-rest-graph.cpp src/source-rest-plan.cpp 
 target_include_directories(dome-sculpt-core PRIVATE third_party)
 target_include_directories(dome-sculpt-core PUBLIC include third_party/openbrush)
 target_sources(dome-sculpt-core PRIVATE src/retopo-authoring.cpp src/document-retopo.cpp src/document-sculpt.cpp src/document-native.cpp src/document-contact.cpp src/document-transaction.cpp src/texture-sets.cpp src/texture-set-graph.cpp
-  src/texture-set-archive.cpp src/texture-set-surface.cpp src/texture-set-range.cpp src/texture-set-packed.cpp src/texture-set-worker.cpp src/texture-set-stroke.cpp src/document-texture-sets.cpp src/texture-set-export.cpp src/texture-set-field-source.cpp src/texture-set-field-codec.cpp)
+  src/texture-set-archive.cpp src/texture-set-surface.cpp src/texture-set-range.cpp src/texture-set-packed.cpp src/texture-set-resample.cpp src/texture-set-worker.cpp src/texture-set-stroke.cpp src/document-texture-sets.cpp src/texture-set-export.cpp src/texture-set-field-source.cpp src/texture-set-field-codec.cpp)
 target_sources(dome-sculpt-core PRIVATE src/cut-authoring.cpp src/cut-color.cpp src/document-cut.cpp src/document-worker-errors.cpp)
 target_sources(dome-sculpt-core PRIVATE src/object-selection.cpp)
 target_sources(dome-sculpt-core PRIVATE src/source-sampling-transport.cpp)

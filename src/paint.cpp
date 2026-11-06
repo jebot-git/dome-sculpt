@@ -1,5 +1,6 @@
 #include "texture-set-field-source.hpp"
 #include "texture-set-paint-access.hpp"
+#include "texture-set-resample.hpp"
 #include "source-paint-parameters.hpp"
 #include "paint-overlay-packet.hpp"
 #include "emission-paint-access.hpp"
@@ -1560,6 +1561,52 @@ std::shared_ptr<PaintedMesh>detail::TextureSetPaintAccess::bind(const PaintedMes
   }
   result->texture_set_domain_=std::move(domain);result->seal_paint_sampling_attachment();
   if(limits.cancelled&&limits.cancelled())throw std::runtime_error("Texture-set paint binding cancelled");return result;
+}
+std::shared_ptr<PaintedMesh> detail::TextureSetPaintAccess::resample_plain(const PaintedMesh&before,
+    const TextureSetResolutionOptions&options,const TextureSetLimits&limits,TextureSetResolutionReport&report){
+ options.validate();limits.validate();const auto domain=before.texture_set_domain_;
+ if(domain)domain->authenticate_owner(domain);
+ if(!domain||!valid_raster(before)||before.in_stroke()||!domain->matches(before.mesh_owner())||
+    before.paint_sampling_domain()||before.source_maps_||before.source_sampling_prepared()||
+    before.sampling_attachment_||before.color_projection_||before.normal_projection_||before.baked_||
+    before.surface_->original_sampling||before.surface_->source_capture_only)
+  throw std::invalid_argument("Resampling requires actual plain member geometry/grid owners");
+ if(options.resolution==before.resolution())return before.snapshot();
+ if(before.revision_==UINT64_MAX)throw std::overflow_error("Texture-set paint revision exhausted");
+ // Bound actual authored candidates before allocating layer output or raster.
+ // Mesh/domain still keep the original logical triangle sequence.
+ size_t candidate_bytes=0;
+ if(before.surface_->options.policy!=PaintUvPolicy::Strict){
+  if(before.surface_->options.policy!=PaintUvPolicy::PolygonAuthored||!domain->topology()->polygon_ids())
+   throw std::invalid_argument("Source-authored grid resizing needs its actual source transition");
+  size_t samples=0;const auto r=options.resolution;const auto&mesh=before.mesh();
+  for(auto triangle:domain->triangles()){
+   if(limits.cancelled&&limits.cancelled())throw std::runtime_error("Texture-set candidate forecast cancelled");
+   const auto a=mesh.uv.at(mesh.indices.at(size_t(triangle)*3)),b=mesh.uv.at(mesh.indices.at(size_t(triangle)*3+1)),c=mesh.uv.at(mesh.indices.at(size_t(triangle)*3+2));
+   const int x0=std::max(0,int(std::floor(std::min({a[0],b[0],c[0]})*r))),x1=std::min(int(r)-1,int(std::ceil(std::max({a[0],b[0],c[0]})*r)));
+   const int y0=std::max(0,int(std::floor(std::min({a[1],b[1],c[1]})*r))),y1=std::min(int(r)-1,int(std::ceil(std::max({a[1],b[1],c[1]})*r)));
+   const size_t n=size_t(std::max(0,x1-x0+1))*std::max(0,y1-y0+1);
+   if(n>limits.maximum_work-samples)throw std::length_error("Texture-set candidate samples exceed their prospective work bound");samples+=n;
+  }
+  const size_t candidates=domain->triangles().size()<2?0:std::min(samples,before.surface_->options.max_additional_candidates);
+  constexpr size_t stride=2*sizeof(PaintedMesh::SurfaceMap::Extra)+8*sizeof(void*)+sizeof(PaintedMesh::SurfaceMap::Head)+sizeof(uint32_t);
+  if(candidates>limits.maximum_bytes/stride)throw std::length_error("Texture-set candidate storage exceeds its prospective byte bound");candidate_bytes=candidates*stride;
+ }
+ auto filter_limits=limits;if(candidate_bytes>=filter_limits.maximum_bytes)throw std::length_error("Texture-set candidates exhaust its peak budget");filter_limits.maximum_bytes-=candidate_bytes;
+ auto layers=detail::resample_texture_set_layers(before,options,filter_limits,report);report.peak_bytes+=candidate_bytes;
+ auto raster_options=before.surface_->options;raster_options.cancelled=limits.cancelled;
+ raster_options.max_raster_samples=std::min(raster_options.max_raster_samples,limits.maximum_work-report.work);
+ raster_options.max_candidate_checks=std::min(raster_options.max_candidate_checks,limits.maximum_work-report.work);
+ PaintSamplingLimits sampling_limits;sampling_limits.cancelled=limits.cancelled;
+ auto surface=std::make_shared<PaintedMesh::SurfaceMap>(before.surface_->geometry,options.resolution,std::move(raster_options),nullptr,sampling_limits,domain);
+ const auto raster_work=surface->diagnostics.raster_samples+surface->diagnostics.candidate_checks;
+ if(raster_work>limits.maximum_work-report.work)throw std::length_error("Texture-set resolution raster exceeds complete work budget");report.work+=raster_work;
+ auto result=before.snapshot();result->surface_=std::move(surface);result->layers_=std::move(layers);
+ result->allocated_tiles_=result->allocated_color_tiles_=0;
+ for(const auto&l:result->layers_){result->allocated_tiles_+=tile_count(l);result->allocated_color_tiles_+=color_tile_count(l);}
+ result->composite_cache_=std::make_shared<PaintedMesh::CompositeCache>();result->composite_token_=next_composite_token();++result->revision_;
+ if(result->storage_bytes()>128*1024*1024)throw std::length_error("Resampled field exceeds the native per-field storage bound");
+ if(limits.cancelled&&limits.cancelled())throw std::runtime_error("Texture-set resolution cancelled");return result;
 }
 struct SourcePaintSamplingAccess {
   static size_t surface_retained_bytes(size_t vertices,size_t corners,uint32_t r){

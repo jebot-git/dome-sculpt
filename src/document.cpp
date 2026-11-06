@@ -834,6 +834,7 @@ void Document::finish_locked() {
                         state_.controls.parameter != VrParameter::SculptResolution &&
                         state_.controls.parameter != VrParameter::VoxelSize &&
                         state_.controls.parameter != VrParameter::TriangleEdge &&
+                        state_.controls.parameter != VrParameter::TextureResolution &&
                         state_.controls.parameter != VrParameter::RigRotation &&
                         state_.controls.parameter != VrParameter::MorphWeight &&
                         state_.controls.parameter != VrParameter::BakeSource &&
@@ -2330,6 +2331,7 @@ bool Document::parameter_enabled_locked(VrParameter parameter) const {
   if (state_.asset_busy || parameter == VrParameter::None)
     return false;
   auto &o = scene_.active();
+  if(parameter==VrParameter::TextureResolution&&!o.texture_sets)return false;
   if(o.texture_sets&&detail::texture_set_control(parameter))return object_editable_locked(o.id)&&detail::texture_set_plain_fields(o)&&!action_active_locked()&&!state_.recovery_busy;
   if (parameter == VrParameter::LayerOpacity ||
       parameter == VrParameter::LayerOrder)
@@ -2706,6 +2708,9 @@ void Document::control_event_locked(VrControlEvent event) {
       c.value={state_.bake_settings.front_mm,state_.bake_settings.back_mm,state_.bake_settings.ao_distance_mm,0};
       for(int k=0;k<3;++k)c.value[k]=std::clamp(c.value[k],c.minimum,c.maximum);
       break;
+    case VrParameter::TextureResolution:
+      if(!o.texture_sets)throw std::logic_error("Choose an actual texture field before resizing");
+      c.title="Selected material paint resolution";c.minimum=0;c.maximum=5;c.value[0]=float(std::countr_zero(active_texture_set(o).painted->resolution())-6);break;
     case VrParameter::BakeColors:
       c.title="Color / normal preparation and maximum errors";c.components=4;
       c.value={state_.bake_settings.prepare_colors?1.f:0.f,state_.bake_settings.color_error,state_.bake_settings.prepare_normals?1.f:0.f,state_.bake_settings.normal_error*4};break;
@@ -2920,7 +2925,8 @@ void Document::control_event_locked(VrControlEvent event) {
   auto &before = control_before_->object(control_object_);
   if(o.texture_sets&&detail::texture_set_control(c.parameter)){
     const auto original=active_texture_set(before);auto request=detail::texture_set_control_request(before,c);
-    if(request.action==TextureSetAction::Material)control_changed_=!detail::same_texture_material(request.material,original.material);
+    if(request.action==TextureSetAction::Resolution)control_changed_=request.resolution!=original.painted->resolution();
+    else if(request.action==TextureSetAction::Material)control_changed_=!detail::same_texture_material(request.material,original.material);
     else{const auto&layers=original.painted->layers();const auto at=std::find_if(layers.begin(),layers.end(),[&](const auto&l){return l.id==request.layer;});
       if(at==layers.end())throw std::logic_error("Texture-set controls lost their selected layer");
       control_changed_=request.action==TextureSetAction::LayerOpacity?request.value!=at->opacity:int(std::lround(request.value))!=int(at-layers.begin());}

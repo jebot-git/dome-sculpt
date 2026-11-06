@@ -5,7 +5,7 @@ namespace dome {
 const std::array<const char *, 12> &spatial_labels(int page) {
   static const std::array<const char*,12> emission={"Brush RGB","Brush units","Material radiance","Source factors","Relative / normalize","Physical brush","Brush black","Paint emission","Back","Undo","Redo","Close"};
   if(page==30)return emission;
-  static const std::array<const char*,12> sets={"Previous set","Next set","Pick faces","Clear faces","New from faces","Assign to set","Layer opacity","Material color","Back","Undo","Redo","Save"};
+  static const std::array<const char*,12> sets={"Previous set","Next set","Pick faces","Clear faces","New from faces","Assign to set","Resolution","Material color","Back","Undo","Redo","Save"};
   if(page==31)return sets;
   static const std::array<const char *,12> exporting={"Strict glTF","Editable 256","Editable 512","Editable 1024","Avatar VRM","Native Save","V1 edit256","Cancel work","Back","Close","V1 edit512","V1 edit1024"};
   if(page==28)return exporting;
@@ -90,7 +90,7 @@ const std::array<const char *, 12> &spatial_labels(int page) {
                      : root;
 }
 std::optional<VrParameter> spatial_parameter(int page, int sector) {
-  if(page==31){if(sector==6)return VrParameter::LayerOpacity;if(sector==7)return VrParameter::BaseColor;return {};}
+  if(page==31){if(sector==6)return VrParameter::TextureResolution;if(sector==7)return VrParameter::BaseColor;return {};}
   if(page==24&&sector==3)return VrParameter::ShapeMirror;
   if(page==30){if(sector==0)return VrParameter::InkEmission;if(sector==1)return VrParameter::InkEmissionUnits;if(sector==2)return VrParameter::MaterialEmission;if(sector==3)return VrParameter::EmissionSource;return {};}
   if(page==24&&sector==4)return VrParameter::MorphWeight;

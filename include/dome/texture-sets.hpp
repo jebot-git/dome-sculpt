@@ -115,7 +115,7 @@ struct TextureSetView {
   std::shared_ptr<const TextureSetFaceDomain> domain;
   std::shared_ptr<const detail::TextureSetFieldSource> source;
 };
-enum class TextureSetAction { Create, AssignFaces, Select, Rename, Material, LayerOpacity, LayerOrder, AddLayer, DeleteLayer, NextLayer, ToggleLayer };
+enum class TextureSetAction { Create, AssignFaces, Select, Rename, Material, LayerOpacity, LayerOrder, AddLayer, DeleteLayer, NextLayer, ToggleLayer, Resolution };
 // Native/desktop/XR requests operate on persistent logical face IDs and one
 // explicit material slot of the active mesh, never an object/group alias.
 struct TextureSetEdit {

@@ -1,9 +1,11 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #pragma once
 #include "dome/texture-sets.hpp"
+namespace dome {struct TextureSetResolutionOptions;struct TextureSetResolutionReport;}
 namespace dome::detail {
 struct PolygonSurfaceStage;
 struct TextureSetPaintAccess {
+  static std::shared_ptr<PaintedMesh> resample_plain(const PaintedMesh&,const TextureSetResolutionOptions&,const TextureSetLimits&,TextureSetResolutionReport&);
   static const std::shared_ptr<const TextureSetFaceDomain>& domain(const PaintedMesh&)noexcept;
   static std::shared_ptr<const void> raster_owner(const PaintedMesh&)noexcept;
   // Membership-required Paint7 payload. The domain is minted only by the
