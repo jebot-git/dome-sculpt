@@ -4,8 +4,9 @@ Unexecuted. Small logic seal3fb8fd19 qualifies100704 triangles only. No producti
 or hardware process starts before coordinator go. Freeze a fresh child of the
 coordinator's completed39/40/chunk composition and add the whole current benchmark
 consumer there. Keep29ca and all original failed/successful sources/binaries exact.
-Source-only additions below need their own whole consumer compile/smoke before
-inventory; the current executable does not yet implement these extra options.
+Source255654a7 now implements the additions below and passes private-header
+syntax only. Its new CLI/runtime still needs a whole current consumer compile/
+smoke before inventory; the sealed29ca executable keeps its original options.
 
 ## Admission and exact configuration
 
@@ -116,7 +117,8 @@ from actual admitted workload progress, never from upload counters.
 
 ## Arc execution after software closes
 
-Request an exclusive Arc device lease from the coordinator. Use exactly the same
+Request the coordinated Arc device lease from the coordinator through
+`/tmp/dome-sculpt-arc-device.lock`. Use exactly the same
 source/compiler/SDK/input, counts, viewport, limits, correctness checkpoints and
 natural/instrumented separation; replace only `--device arc` and output path.
 Actual brush compute remains CPU. Arc OpenGL acceleration does not qualify OneAPI

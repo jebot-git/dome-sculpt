@@ -1,0 +1,21 @@
+{
+  "product_source": "255654a7c2b45ef8b81525af9946473052e90a78",
+  "parent": "0517883414a10209289cd68c92eee5a801880983",
+  "scope": "source-only whole benchmark consumer syntax against own8a05-derived public headers; no object/link/runtime/current-combined qualification",
+  "exit": 0,
+  "seconds": 4.589509583020117,
+  "warning_log_bytes": 0,
+  "syntax_log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "source_and_header_count": 108,
+  "source_drift": [],
+  "workspace_free_before": 21745672192,
+  "workspace_free_after": 21745672192,
+  "allocated_source_tree_bytes": 1318912,
+  "syntax_receipt_sha256": "c90ed52ccbfa541ffa1f1bd8bf90f40b3a36b3c81480673a0a2eeaa6c26e6d7e",
+  "syntax_receipt": "artifacts/source-inventory-v2/receipt.json",
+  "prior_warning_source_and_log_preserved": "artifacts/source-inventory-v1",
+  "no_new_objects_or_runtime": true,
+  "no_current_d1_provider_changes": true,
+  "gpu_lease": "/tmp/dome-sculpt-arc-device.lock (not acquired)",
+  "remaining": "Whole consumer current-header/provider compilation, CLI/smoke/device negative controls, actual >=250k oracle inventory and separately approved sustained software/Arc measurements remain unexecuted."
+}

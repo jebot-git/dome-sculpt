@@ -1,3 +1,14 @@
+## Private sustained inventory/device source checkpoint — 2026-11-06
+
+New255654a7 adds explicit inventory/density/count/device arguments, strict actual
+Arc GL/EGL/openFD/sysfs witnesses, accepted-publication versus draw timings,
+per-sample raw NDJSON and async timer reset/disjoint/coverage guards. Whole
+consumer syntax is warning-free against this private child only; no object/link/
+EGL/current-d1/inventory/production/Arc run occurred. Passing small3fb8fd19 logic
+seal remains immutable. Read SCULPT-SUSTAINED-INVENTORY-SOURCE.md and its receipt.
+Actual >=250k candidate admission and all sustained device measurements remain
+open; full goal remains active/incomplete. No install or headset launch occurred.
+
 ## Private sustained sculpt workload logic checkpoint — 2026-11-06
 
 The real Document/renderer manual benchmark now passes a small optimized software
