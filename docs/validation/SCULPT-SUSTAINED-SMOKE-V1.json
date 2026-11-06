@@ -1,0 +1,43 @@
+{
+  "source": "1872dd59b54475faa61132f93bea9ef5fe4ec6a6",
+  "scope": "One whole new Release consumer, all exact-compatible8a05 affected providers before immutable233+4 base; small smoke logic only, no production/Arc timing claim",
+  "state": "terminal",
+  "exit": 1,
+  "failure": "RuntimeError(('smoke', -6))",
+  "steps": [
+    {
+      "name": "compile",
+      "exit": 0,
+      "seconds": 9.432887125993147,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "link",
+      "exit": 0,
+      "seconds": 0.704133075021673,
+      "sha256": "74770c1750b6af0a919040def7969543247a1ce52c3c24849bd797e961c0e236"
+    },
+    {
+      "name": "smoke",
+      "exit": -6,
+      "seconds": 0.6297061410150491,
+      "sha256": "2dd1fe2b3cae4978399e57fd8b099d55c3afc920452590712ad443d5ae455c05"
+    }
+  ],
+  "old_affected_members_excluded": true,
+  "drift": [],
+  "runtime_post_drift": [],
+  "outputs": {
+    "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-sustained-8a05/artifacts/sustained-smoke-v1/sustained.o": "45a59020c6db11e63f12c20d6db662a0356dc35a99a0b42008860f983d507dbb",
+    "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-sustained-8a05/artifacts/sustained-smoke-v1/dome-sculpt-sculpt-sustained": "379301eab27775d62b07a00e1a8b62f3e404de4590da30d39eef062e7d5145f5"
+  },
+  "space_final": {
+    "actual_free_bytes": 21768052736,
+    "phase_allocated_bytes": 13975552,
+    "cap_bytes": 100663296,
+    "prospective_bytes": 67108864
+  },
+  "artifact_status_sha256": "c413fef1040f1df7c6a3a201fc7c3a72aac8c23e313a4da3899948a9ed6d41c8",
+  "evidence": "artifacts/sustained-smoke-v1/status.json",
+  "conclusion": "Compile/link only; startup smoke aborted with LLVM allocation failure before any workload result. Allocation instrumentation passes small C++ alignment directly to POSIX and needs normalization. No production, Arc, or performance claim."
+}

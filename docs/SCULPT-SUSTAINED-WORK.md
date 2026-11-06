@@ -54,3 +54,11 @@ Production runs need a new explicit output/RSS/time envelope after the admitted
 sizes and smoke logic are known. Strict Arc runs additionally need an exclusive
 device lease, actual GL/EGL render-node FD and sysfs8086:56a0/PCI03/i915 receipts;
 environment selection alone is insufficient.
+
+The first bounded1872 source gate compiles and links, excludes all8 old affected
+archive members and preserves protected providers. Software EGL startup aborts
+with LLVM allocation failure before a workload result. The instrumentation
+passed small alignments directly to POSIX, which rejects1/2/4; an independent
+tiny probe confirms normalization to pointer alignment succeeds. The failed
+source/ELF remain immutable; correction is in a fresh child. See
+validation/SCULPT-SUSTAINED-SMOKE-V1.json. This is compile/link evidence only.
