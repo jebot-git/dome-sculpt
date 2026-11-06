@@ -45,7 +45,7 @@ void operator delete(void *p)noexcept{std::free(p);}
 void operator delete[](void *p)noexcept{std::free(p);}
 void operator delete(void *p,size_t)noexcept{std::free(p);}
 void operator delete[](void *p,size_t)noexcept{std::free(p);}
-void *operator new(size_t n,std::align_val_t a){void *p=nullptr;if(posix_memalign(&p,size_t(a),n?n:1))throw std::bad_alloc();sustained::allocation(n);return p;}
+void *operator new(size_t n,std::align_val_t a){void *p=nullptr;const auto alignment=std::max(size_t(a),alignof(void*));if(posix_memalign(&p,alignment,n?n:1))throw std::bad_alloc();sustained::allocation(n);return p;}
 void *operator new[](size_t n,std::align_val_t a){return ::operator new(n,a);}
 void operator delete(void *p,std::align_val_t)noexcept{std::free(p);}
 void operator delete[](void *p,std::align_val_t)noexcept{std::free(p);}
