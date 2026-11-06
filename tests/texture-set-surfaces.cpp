@@ -8,9 +8,12 @@
 #include <iostream>
 #include <chrono>
 #include <bit>
+#include <algorithm>
 using namespace dome;
 namespace {
 size_t checks=0;
+bool bits(float a,float b){return std::bit_cast<uint32_t>(a)==std::bit_cast<uint32_t>(b);}
+bool vectors(const std::vector<Vec3>&a,const std::vector<Vec3>&b){return std::equal(a.begin(),a.end(),b.begin(),b.end(),[](Vec3 x,Vec3 y){return bits(x.x,y.x)&&bits(x.y,y.y)&&bits(x.z,y.z);});}
 void check(bool value,const char*message){if(!value)throw std::runtime_error(message);++checks;}
 template<class F>void refuses(F&&f,const char*message){bool caught=false;try{f();}catch(const std::exception&e){caught=true;std::cout<<"EXPECTED "<<e.what()<<'\n';}check(caught,message);}
 Mesh triangles(bool coincident){
@@ -18,11 +21,26 @@ Mesh triangles(bool coincident){
  m.normals.assign(6,{0,0,1});m.uv={{{.1f,.1f}},{{.9f,.1f}},{{.5f,.9f}},{{.1f,.1f}},{{.9f,.1f}},{{.5f,.9f}}};m.indices={0,1,2,3,4,5};return m;
 }
 Scene overlap(bool coincident){
- Scene s;s.active().mesh_active=true;PaintSurfaceOptions options;options.policy=PaintUvPolicy::SourceAuthored;
- s.active().painted=PaintedMesh::from_mesh(triangles(coincident),64,options);s.active().material.double_sided=true;
- create_texture_set(s,s.active().id,std::array<uint64_t,1>{2},"Independent overlaid UVs");return s;
+ Scene s;std::array<TextureSetInitialField,2>fields;for(auto&f:fields){f.resolution=64;f.material.double_sided=true;}fields[0].material.name="Back material";fields[1].material.name="Front material";
+ const auto mesh=triangles(coincident);initialize_texture_sets(s,s.active().id,mesh,fields,std::array<TextureSetId,2>{0,1});select_texture_set(s,s.active().id,1);
+ check(s.active().painted->surface_diagnostics().policy==PaintUvPolicy::Strict&&s.active().texture_sets->at(1).painted->surface_diagnostics().policy==PaintUvPolicy::Strict,"Actual initial material membership precedes both strict rasters without an original-source policy flag");
+ check(vectors(s.active().painted->mesh().positions,mesh.positions)&&vectors(s.active().painted->mesh().normals,mesh.normals)&&s.active().painted->mesh().uv==mesh.uv&&s.active().painted->mesh().indices==mesh.indices,"Genuine producer preserves all original coincident/depth/UV/normal/index data without repair or relabeling");
+ return s;
 }
 bool ink(PaintedMesh&p,std::array<float,4>color){PaintSettings settings;settings.front_only=false;settings.color=color;Brush b;b.from=b.to={0,0,0};b.normal={0,0,1};b.radius=2;b.strength=1;p.begin_stroke();p.stamp(b,settings);return p.end_stroke();}
+void initial_controls(){
+ PaintSurfaceOptions source;source.policy=PaintUvPolicy::SourceAuthored;refuses([&]{PaintedMesh::from_mesh(triangles(true),64,source);},"Bare SourceAuthored flag still cannot invent an original source authority");
+ Scene scene;const auto before=scene.encode();const auto object=scene.active().id;auto mesh=triangles(false);std::array<TextureSetInitialField,2>fields;for(auto&f:fields)f.resolution=64;
+ const std::array<TextureSetId,2>slots{0,1};TextureSetLimits low;low.maximum_work=1;
+ refuses([&]{initialize_texture_sets(scene,object,mesh,fields,slots,low);},"Initial membership/raster work forecast refuses before staging");check(scene.encode()==before,"Initial work refusal preserves the complete previous Scene");
+ low=TextureSetLimits{};low.maximum_bytes=1;refuses([&]{initialize_texture_sets(scene,object,mesh,fields,slots,low);},"Initial owning geometry/raster byte forecast refuses before copying");check(scene.encode()==before,"Initial byte refusal preserves the complete previous Scene");
+ low=TextureSetLimits{};low.cancelled=[] {return true;};refuses([&]{initialize_texture_sets(scene,object,mesh,fields,slots,low);},"Initial factory cancellation cannot publish a partial material actor");check(scene.encode()==before,"Initial cancel preserves native values and IDs");
+ refuses([&]{initialize_texture_sets(scene,object,mesh,fields,std::array<TextureSetId,2>{0,2});},"An undeclared initial material cannot own a logical face");check(scene.encode()==before,"Invalid membership cannot replace the old actor");
+ initialize_texture_sets(scene,object,mesh,fields,slots);const auto complete=scene.encode();const auto x=scene.active().painted->mesh().positions[0].x;mesh.positions[0].x+=1;
+ check(scene.active().painted->mesh().positions[0].x==x,"Owning factory detaches its single immutable geometry from the caller's mutable vector");
+ refuses([&]{initialize_texture_sets(scene,object,triangles(false),fields,slots);},"Initialization cannot discard an existing authored material/paint/source actor");check(scene.encode()==complete,"Existing actor rejection retains all material resources exactly");
+ std::cout<<"INITIAL_CURRENT_GEOMETRY "<<complete.at("texture_set_geometry").dump()<<'\n';
+}
 void raster(){
  auto s=overlap(true);const auto geometry=s.active().painted->mesh_owner();const auto exact=s.encode();auto history=s.snapshot();
  check(s.active().painted->surface_diagnostics().covered_texels>100&&s.active().texture_sets->at(1).painted->surface_diagnostics().covered_texels>100,"Each coincident logical face has its own actual covered raster");
@@ -63,7 +81,8 @@ void query(){
  auto foreign=overlap(false);auto plan=detail::prepare_texture_set_surface(foreign.active());refuses([&]{layout->authenticate_plan(*plan);},"Numerically equal foreign geometry/membership owners cannot reuse the packed layout");
  const auto old_collection=s.active().texture_sets;edit_texture_set(s,s.active().id,1,[](PaintedMesh&p,Material&m){m.roughness=.25f;p.add_layer("Independent metadata");return true;});
  plan=detail::prepare_texture_set_surface(s.active());check(old_collection!=s.active().texture_sets&&layout->matches_plan(*plan),"A genuine paint/material edit changes its field owner without rebuilding the unchanged geometry-only layout");
- assign_texture_set_faces(s,s.active().id,1,std::array<uint64_t,1>{1});plan=detail::prepare_texture_set_surface(s.active());check(!layout->matches_plan(*plan),"Changing actual material membership invalidates the packed EBO dependency");
+ const auto before_invalid_merge=s.encode();const auto merge_collection=s.active().texture_sets;const auto merge_primary=s.active().painted;const auto merge_extra=s.active().texture_sets->at(1).painted;refuses([&]{assign_texture_set_faces(s,s.active().id,1,std::array<uint64_t,1>{1});},"Two depth-separated faces with identical UVs cannot silently become independently writable in one Strict material grid");check(s.encode()==before_invalid_merge,"Ambiguous same-grid reassignment preserves every set, image, source and ID exactly");check(s.active().texture_sets==merge_collection&&s.active().painted==merge_primary&&s.active().texture_sets->at(1).painted==merge_extra,"Strict reassignment refusal preserves the actual collection and both field owners");
+ create_texture_set(s,s.active().id,std::array<uint64_t,1>{1},"Genuine changed face membership");plan=detail::prepare_texture_set_surface(s.active());check(!layout->matches_plan(*plan),"Changing actual material membership invalidates the packed EBO dependency");
  check(exact!=s.encode(),"The COW/cache controls used actual state-changing edits");
 }
 Image image(uint8_t r,uint8_t g,uint8_t b){Image out{64,64,std::vector<uint8_t>(64*64*4)};for(size_t p=0;p<out.rgba.size();p+=4){out.rgba[p]=r;out.rgba[p+1]=g;out.rgba[p+2]=b;out.rgba[p+3]=255;}return out;}
@@ -83,6 +102,13 @@ void native(){
  check(f.state->error.empty()&&f.surface->ranges.size()==2&&f.surface->picking,"Actual immutable native endpoint contains both genuine ranges and material-aware picking");
  check(f.surface->ranges[0].object==f.surface->ranges[1].object&&f.surface->ranges[0].texture_set!=f.surface->ranges[1].texture_set,"Actual producer keeps one native object and distinct persistent material slots");
  check(doc.copy_scene().encode()==original,"Worker surface preparation cannot mutate native paint, memberships, history or source state");
+ auto distinct=overlap(false);Document denied;denied.replace(distinct);check(denied.wait_mesh(std::chrono::seconds(30)),"Distinct-depth actual native endpoint is ready before the rejected assignment");
+ const auto before=denied.copy_scene();const auto values=before.encode();const auto owner=before.active().texture_sets;const auto history=denied.frame().state->can_undo;
+ denied.edit_scene("Reject ambiguous same-grid material assignment",[object=distinct.active().id](Scene&scene,const auto&cancelled){TextureSetLimits limits;limits.cancelled=cancelled;assign_texture_set_faces(scene,object,1,std::array<uint64_t,1>{1},limits);});
+ check(denied.wait_asset(std::chrono::seconds(30)),"Actual rejected material worker terminates without publishing a partial endpoint");
+ const auto refused=denied.copy_scene();check(refused.encode()==values&&refused.active().texture_sets==owner&&refused.active().painted->mesh_owner()==before.active().painted->mesh_owner(),"Actual native worker refusal preserves full Scene and genuine geometry/collection owners");
+ check(denied.frame().state->can_undo==history&&denied.frame().state->error.find("Overlapping UV islands")!=std::string::npos,"Actual native refusal retains its strict cause and adds no history entry");
+ denied.save("strict-reassignment-preserved.dsculpt");check(Scene::load("strict-reassignment-preserved.dsculpt").encode()==values,"Subsequent real native Save/reopen retains the exact pre-refusal material fields");
 }
 }
-int main()try{raster();query();boundary();native();std::cout<<"PASS "<<checks<<" texture-set raster/worker/query controls\n";return 0;}catch(const std::exception&e){std::cerr<<"FAIL "<<e.what()<<'\n';return 1;}
+int main()try{initial_controls();raster();query();boundary();native();std::cout<<"PASS "<<checks<<" texture-set raster/worker/query controls\n";return 0;}catch(const std::exception&e){std::cerr<<"FAIL "<<e.what()<<'\n';return 1;}

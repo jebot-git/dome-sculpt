@@ -6,6 +6,7 @@
 #include "text-utf8.hpp"
 #include <algorithm>
 #include <limits>
+#include <cmath>
 #include <map>
 #include <set>
 namespace dome {
@@ -55,6 +56,12 @@ void TextureSetCollection::validate(const SculptObject&o,bool deep,const Texture
 }
 namespace detail {
 struct TextureSetAccess {
+ static std::shared_ptr<TextureSetCollection>initial(const Mesh&mesh,std::span<const TextureSetId>assignments){
+  auto t=std::shared_ptr<TextureSetTopology>(new TextureSetTopology);t->geometry_=std::make_shared<const Mesh>(mesh);
+  t->faces_.reserve(assignments.size());t->corners_.reserve(mesh.indices.size());
+  for(size_t f=0;f<assignments.size();++f){t->faces_.push_back(f+1);for(size_t k=0;k<3;++k)t->corners_.push_back(f*3+k+1);}
+  auto c=std::shared_ptr<TextureSetCollection>(new TextureSetCollection);c->topology_=std::move(t);c->slots_=std::make_shared<const std::vector<TextureSetId>>(assignments.begin(),assignments.end());return c;
+ }
  static std::shared_ptr<TextureSetCollection>begin(const SculptObject&o,const TextureSetLimits&l){
   l.validate();stop(l);if(!o.visible||o.locked||!o.mesh_active||!o.painted||o.painted->in_stroke())throw std::logic_error("Texture sets require a finished editable painting mesh");
   if(o.texture_sets){o.texture_sets->validate(o,true,l);return std::shared_ptr<TextureSetCollection>(new TextureSetCollection(*o.texture_sets));}
@@ -84,6 +91,37 @@ struct TextureSetAccess {
  }
 };
 } // namespace detail
+void initialize_texture_sets(Scene&scene,uint64_t object,const Mesh&mesh,
+    std::span<const TextureSetInitialField>fields,std::span<const TextureSetId>assignments,const TextureSetLimits&limits){
+ limits.validate();stop(limits);const auto&old=scene.object(object);const auto graph=detail::validate_texture_set_graph(scene,limits);
+ if(!old.visible||old.locked||old.mesh_active||old.painted||!old.volume||old.volume->in_stroke()||!old.volume->voxels().empty()||old.volume->stored_samples()||old.texture_sets||old.deformation||old.appearance||old.material_bindings||old.retopology||old.polygon||old.shape_source||old.rig_source||old.bake_recipe)
+  throw std::invalid_argument("Initial material membership requires a genuinely new empty mesh actor");
+ if(fields.size()<2||fields.size()>limits.maximum_sets_per_object||fields.size()-1>limits.maximum_sets_per_scene-graph.live_sets||fields.size()>limits.maximum_sets_per_scene-graph.retained_domains)
+  throw std::length_error("Initial texture-set slots exceed their complete Scene bound");
+ if(mesh.indices.size()%3||mesh.indices.size()/3>limits.maximum_triangles||mesh.indices.size()>limits.maximum_corners||assignments.size()!=mesh.indices.size()/3||mesh.uv.size()!=mesh.positions.size())throw std::invalid_argument("Initial texture sets need complete current geometry/UV/triangle membership");
+ size_t bytes=sizeof(TextureSetTopology)+sizeof(TextureSetCollection)+sizeof(Mesh)+256,work=0,pixels=0;
+ auto work_items=[&](size_t n,size_t unit){if(work>limits.maximum_work||(unit&&n>(limits.maximum_work-work)/unit))throw std::length_error("Initial texture-set geometry/raster work exceeds bounds");work+=n*unit;};
+ charge(bytes,mesh.positions.size()+mesh.normals.size(),sizeof(Vec3),limits);charge(bytes,mesh.uv.size(),sizeof(std::array<float,2>),limits);charge(bytes,mesh.indices.size(),sizeof(uint32_t),limits);charge(bytes,mesh.uv_pins.size()+mesh.uv_seams.size(),1,limits);
+ charge(bytes,assignments.size(),sizeof(uint64_t)+3*sizeof(uint32_t),limits);charge(bytes,mesh.indices.size(),sizeof(uint64_t),limits);
+ charge(bytes,fields.size(),sizeof(TextureSetFaceDomain)+sizeof(TextureSetRecord)+128,limits);
+ charge(bytes,scene.objects().size(),sizeof(SculptObject)+514,limits);charge(bytes,scene.groups().size(),sizeof(SceneGroup)+257,limits);
+ work_items(mesh.positions.size()+mesh.normals.size()+mesh.uv.size(),4*(fields.size()+1));work_items(mesh.indices.size(),4*(fields.size()+1));
+ for(const auto&field:fields){field.material.validate();name_valid(field.material.name);charge(bytes,field.material.name.size()*2+2,1,limits);charge(bytes,1,detail::TextureSetPaintAccess::initial_raster_bytes(field.resolution),limits);const size_t count=size_t(field.resolution)*field.resolution;if(count>16*1024*1024-pixels)throw std::length_error("Initial texture-set grids exceed the aggregate Scene paint bound");pixels+=count;work_items(count,20);}
+ mesh.validate();for(auto uv:mesh.uv)if(uv[0]<0||uv[0]>1||uv[1]<0||uv[1]>1)throw std::invalid_argument("Initial plain material slots require their actual unit paint coordinates");
+ for(size_t face=0;face<assignments.size();++face){
+  if((face&1023)==0)stop(limits);const auto set=assignments[face];if(set>=fields.size())throw std::invalid_argument("Initial face assignment refers to a foreign material slot");const auto r=fields[set].resolution;
+  const auto a=mesh.uv[mesh.indices[face*3]],b=mesh.uv[mesh.indices[face*3+1]],c=mesh.uv[mesh.indices[face*3+2]];
+  const int x0=std::max(0,int(std::floor(std::min({a[0],b[0],c[0]})*r))),x1=std::min(int(r)-1,int(std::ceil(std::max({a[0],b[0],c[0]})*r)));
+  const int y0=std::max(0,int(std::floor(std::min({a[1],b[1],c[1]})*r))),y1=std::min(int(r)-1,int(std::ceil(std::max({a[1],b[1],c[1]})*r)));
+  work_items(size_t(std::max(0,x1-x0+1))*std::max(0,y1-y0+1),1);
+ }
+ // Every forecast/shape/slot check precedes the sole detached geometry copy.
+ auto collection=detail::TextureSetAccess::initial(mesh,assignments);collection->next_=fields.size();collection->primary_=detail::TextureSetAccess::domain(collection->topology_,0,collection->slots_);collection->additional_.reserve(fields.size()-1);
+ auto primary=detail::TextureSetPaintAccess::empty(collection->primary_,fields[0].resolution,limits);
+ for(size_t k=1;k<fields.size();++k){stop(limits);auto domain=detail::TextureSetAccess::domain(collection->topology_,TextureSetId(k),collection->slots_);auto paint=detail::TextureSetPaintAccess::empty(domain,fields[k].resolution,limits);collection->additional_.push_back({TextureSetId(k),fields[k].material.name,std::move(paint),fields[k].material,{},{},{},std::move(domain)});}
+ auto next=scene;auto&target=next.object(object);target.mesh_active=true;target.painted=std::move(primary);target.material=fields[0].material;target.texture_sets=std::move(collection);
+ target.texture_sets->validate(target,true,limits);next.validate();detail::validate_texture_set_graph(next,limits);stop(limits);scene=std::move(next);
+}
 TextureSetId create_texture_set(Scene&scene,uint64_t object,std::span<const uint64_t>faces,std::string name,uint32_t resolution,const TextureSetLimits&l){
  name_valid(name);l.validate();const auto graph=detail::validate_texture_set_graph(scene,l);if(graph.live_sets>=l.maximum_sets_per_scene)throw std::length_error("New texture set exceeds the whole Scene material-slot bound");stop(l);auto next=scene;auto&o=next.object(object);auto c=detail::TextureSetAccess::begin(o,l);
  if(c->additional_.size()+1>=l.maximum_sets_per_object||c->next_>UINT32_MAX)throw std::length_error("Texture-set identity/count budget exceeded");

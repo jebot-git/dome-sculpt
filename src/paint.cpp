@@ -1442,6 +1442,20 @@ void detail::TextureSetPaintAccess::swap_stroke(PaintedMesh&target,PaintedMesh&s
  if(sealed.in_stroke()||!stroke_structure(target,sealed))throw std::invalid_argument("Texture-set stroke adoption lost its immutable structure");
  target.swap_state(sealed);
 }
+size_t detail::TextureSetPaintAccess::initial_raster_bytes(uint32_t r){
+ if(r<64||r>2048||(r&(r-1)))throw std::invalid_argument("Invalid initial texture-set resolution");
+ return sizeof(PaintedMesh)+sizeof(PaintedMesh::CompositeCache)+sizeof(PaintedMesh::SurfaceMap)+sizeof(PaintLayer)+256+
+   size_t(r)*r*(sizeof(PaintedMesh::SurfaceMap::Texel)+2*sizeof(int32_t))+size_t(r/32)*(r/32)*(sizeof(PaintedMesh::SurfaceMap::Bounds)+sizeof(std::shared_ptr<const PaintTile>));
+}
+std::shared_ptr<PaintedMesh> detail::TextureSetPaintAccess::empty(std::shared_ptr<const TextureSetFaceDomain>domain,uint32_t r,const TextureSetLimits&limits){
+ limits.validate();if(limits.cancelled&&limits.cancelled())throw std::runtime_error("Initial texture-set raster cancelled");
+ if(!domain||!domain->topology()||!domain->topology()->geometry()||!domain->matches(domain->topology()->geometry()))throw std::invalid_argument("Initial paint raster needs its actual owning membership");
+ if(initial_raster_bytes(r)>limits.maximum_bytes)throw std::length_error("Initial paint raster exceeds its prospective bytes");
+ PaintSurfaceOptions options;options.policy=PaintUvPolicy::Strict;options.cancelled=limits.cancelled;
+ options.max_raster_samples=std::min(options.max_raster_samples,limits.maximum_work);options.max_candidate_checks=std::min(options.max_candidate_checks,limits.maximum_work);
+ auto geometry=domain->topology()->geometry();
+ return std::shared_ptr<PaintedMesh>(new PaintedMesh(std::move(geometry),r,options,{},std::move(domain)));
+}
 size_t detail::TextureSetPaintAccess::working_bytes(const PaintedMesh&paint,uint32_t r){
   if(r<64||r>2048||(r&(r-1)))throw std::invalid_argument("Invalid texture-set resolution");
   size_t bytes=sizeof(PaintedMesh)+sizeof(PaintedMesh::CompositeCache);

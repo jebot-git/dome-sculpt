@@ -5,6 +5,7 @@
 namespace dome {
 using TextureSetId = uint32_t;
 namespace detail { struct TextureSetAccess; struct TextureSetPaintAccess; class TextureSetArchive; }
+struct TextureSetInitialField {Material material;uint32_t resolution=512;};
 struct TextureSetLimits {
   size_t maximum_sets_per_object=64,maximum_sets_per_scene=256;
   size_t maximum_triangles=2'000'000,maximum_corners=6'000'000;
@@ -78,6 +79,7 @@ public:
 private:
   friend struct detail::TextureSetAccess;
   friend class detail::TextureSetArchive;
+  friend void initialize_texture_sets(Scene&,uint64_t,const Mesh&,std::span<const TextureSetInitialField>,std::span<const TextureSetId>,const TextureSetLimits&);
   friend TextureSetId create_texture_set(Scene&,uint64_t,std::span<const uint64_t>,std::string,uint32_t,const TextureSetLimits&);
   friend bool assign_texture_set_faces(Scene&,uint64_t,TextureSetId,std::span<const uint64_t>,const TextureSetLimits&);
   friend bool select_texture_set(Scene&,uint64_t,TextureSetId);
@@ -118,6 +120,11 @@ TextureSetView active_texture_set(const SculptObject&);
 // Detached operations: every allocation, membership/owner check and raster
 // construction precedes replacing the caller Scene. A failed/cancelled call
 // leaves all objects, geometry, layers, high-water IDs and sources untouched.
+// Creates genuine plain current geometry on a new empty actor. Membership is
+// minted before any paint raster, so separate material slots may share UV0
+// without claiming original-source authority or duplicating the mesh.
+void initialize_texture_sets(Scene&,uint64_t,const Mesh&,
+    std::span<const TextureSetInitialField>,std::span<const TextureSetId>,const TextureSetLimits & = {});
 TextureSetId create_texture_set(Scene&,uint64_t object,std::span<const uint64_t> faces,
                                std::string name,uint32_t resolution=0,
                                const TextureSetLimits & = {});
