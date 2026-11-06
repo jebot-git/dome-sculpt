@@ -4,6 +4,8 @@
 #include <span>
 namespace dome {
 using TextureSetId = uint32_t;
+struct PolygonOrigin;
+struct TextureSetView;
 namespace detail { class TextureSetFieldSource; struct TextureSetAccess; struct TextureSetPaintAccess; class TextureSetArchive; }
 struct TextureSetInitialField {Material material;uint32_t resolution=512;};
 struct TextureSetLimits {
@@ -80,6 +82,7 @@ public:
   const std::vector<TextureSetRecord>& additional()const noexcept{return additional_;}
   const TextureSetRecord& at(TextureSetId)const;
   void validate(const SculptObject&,bool deep=true,const TextureSetLimits & = {})const;
+  void validate(const PolygonOrigin&,bool deep=true,const TextureSetLimits & = {})const;
 private:
   friend struct detail::TextureSetAccess;
   friend class detail::TextureSetArchive;
@@ -89,6 +92,8 @@ private:
   friend bool select_texture_set(Scene&,uint64_t,TextureSetId);
   friend bool rename_texture_set(Scene&,uint64_t,TextureSetId,std::string,const TextureSetLimits&);
   friend bool edit_texture_set(Scene&,uint64_t,TextureSetId,const std::function<bool(PaintedMesh&,Material&)> &,const TextureSetLimits&);
+  void validate_owner(const TextureSetView&,bool,const std::shared_ptr<const PolygonAuthority>&,
+      bool,const TextureSetLimits&)const;
   TextureSetCollection()=default;
   TextureSetCollection(const TextureSetCollection&)=default;
   std::shared_ptr<const TextureSetTopology> topology_;

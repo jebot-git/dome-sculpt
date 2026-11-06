@@ -36,22 +36,28 @@ void TextureSetFaceDomain::authenticate_owner(const std::shared_ptr<const Textur
 }
 TextureSetView active_texture_set(const SculptObject&o){return texture_set_view(o,o.texture_sets?o.texture_sets->active():0);}
 void TextureSetCollection::validate(const SculptObject&o,bool deep,const TextureSetLimits&l)const{
- l.validate();if(primary_)primary_->authenticate_owner(primary_);for(const auto&s:additional_)if(s.domain)s.domain->authenticate_owner(s.domain);if(!o.mesh_active||!o.painted||!detail::TextureSetPaintAccess::valid_raster(*o.painted)||!topology_||!same_owner(topology_->geometry(),o.painted->mesh_owner())||!primary_||primary_->set()!=0||primary_->topology()!=topology_||primary_->assignments_!=slots_||detail::TextureSetPaintAccess::domain(*o.painted)!=primary_||additional_.empty()||additional_.size()+1>l.maximum_sets_per_object||!next_||next_>uint64_t(UINT32_MAX)+1||!slots_||slots_->size()!=o.painted->mesh().indices.size()/3||topology_->triangle_faces().size()!=slots_->size()||topology_->triangle_corners().size()!=slots_->size()*3)throw std::invalid_argument("Texture-set collection lost its actual mesh/material membership");
+ validate_owner({0,o.material.name,o.painted,o.material,o.appearance,o.material_bindings,o.bake_recipe,primary_,primary_source_},o.mesh_active,o.polygon,deep,l);
+}
+void TextureSetCollection::validate(const PolygonOrigin&o,bool deep,const TextureSetLimits&l)const{
+ validate_owner({0,o.material.name,o.paint,o.material,o.appearance,o.material_bindings,o.bake_recipe,primary_,primary_source_},o.mesh_active,o.polygon,deep,l);
+}
+void TextureSetCollection::validate_owner(const TextureSetView&primary,bool active,const std::shared_ptr<const PolygonAuthority>&polygon,bool deep,const TextureSetLimits&l)const{
+ l.validate();if(primary_)primary_->authenticate_owner(primary_);for(const auto&s:additional_)if(s.domain)s.domain->authenticate_owner(s.domain);if(!active||!primary.painted||!detail::TextureSetPaintAccess::valid_raster(*primary.painted)||!topology_||!same_owner(topology_->geometry(),primary.painted->mesh_owner())||!primary_||primary_->set()!=0||primary_->topology()!=topology_||primary_->assignments_!=slots_||detail::TextureSetPaintAccess::domain(*primary.painted)!=primary_||additional_.empty()||additional_.size()+1>l.maximum_sets_per_object||!next_||next_>uint64_t(UINT32_MAX)+1||!slots_||slots_->size()!=primary.painted->mesh().indices.size()/3||topology_->triangle_faces().size()!=slots_->size()||topology_->triangle_corners().size()!=slots_->size()*3)throw std::invalid_argument("Texture-set collection lost its actual mesh/material membership");
  if(slots_->size()>l.maximum_triangles||topology_->triangle_corners().size()>l.maximum_corners||slots_->size()>l.maximum_work)throw std::length_error("Texture-set collection exceeds its declared geometry/work bounds");
- std::set<TextureSetId>ids{0};bool active=active_==0;uint64_t texels=uint64_t(o.painted->resolution())*o.painted->resolution();
- for(const auto&s:additional_){if(!s.id||s.id>=next_||!ids.insert(s.id).second||!s.painted||!detail::TextureSetPaintAccess::valid_raster(*s.painted)||s.painted->in_stroke()||!same_owner(s.painted->mesh_owner(),topology_->geometry())||!s.domain||s.domain->set()!=s.id||s.domain->topology()!=topology_||s.domain->assignments_!=slots_||detail::TextureSetPaintAccess::domain(*s.painted)!=s.domain)throw std::invalid_argument("Texture-set paint/material belongs to another face or geometry owner");name_valid(s.name);s.material.validate();texels+=uint64_t(s.painted->resolution())*s.painted->resolution();active|=active_==s.id;}
+ std::set<TextureSetId>ids{0};bool selected=active_==0;uint64_t texels=uint64_t(primary.painted->resolution())*primary.painted->resolution();
+ for(const auto&s:additional_){if(!s.id||s.id>=next_||!ids.insert(s.id).second||!s.painted||!detail::TextureSetPaintAccess::valid_raster(*s.painted)||s.painted->in_stroke()||!same_owner(s.painted->mesh_owner(),topology_->geometry())||!s.domain||s.domain->set()!=s.id||s.domain->topology()!=topology_||s.domain->assignments_!=slots_||detail::TextureSetPaintAccess::domain(*s.painted)!=s.domain)throw std::invalid_argument("Texture-set paint/material belongs to another face or geometry owner");name_valid(s.name);s.material.validate();texels+=uint64_t(s.painted->resolution())*s.painted->resolution();selected|=active_==s.id;}
  const auto validate_source=[&](const TextureSetView&v){
   if(v.source){v.source->authenticate_owner(v.source);v.source->validate_field(v,l,deep);}
   else if(v.material_bindings&&v.material_bindings->polygon_surface_transfer)throw std::invalid_argument("A source-backed set requires its actual retained field descriptor");
  };
- validate_source({0,o.material.name,o.painted,o.material,o.appearance,o.material_bindings,o.bake_recipe,primary_,primary_source_});for(const auto&f:additional_)validate_source({f.id,f.name,f.painted,f.material,f.appearance,f.material_bindings,f.bake_recipe,f.domain,f.source});
- if(!active||texels>16*1024*1024)throw std::length_error("Texture-set active ID or aggregate paint-map budget is invalid");
- if(topology_->polygon_ids()!=bool(o.polygon&&o.polygon->active))throw std::invalid_argument("Texture-set identity kind differs from its actual current polygon authority");
+ validate_source(primary);for(const auto&f:additional_)validate_source({f.id,f.name,f.painted,f.material,f.appearance,f.material_bindings,f.bake_recipe,f.domain,f.source});
+ if(!selected||texels>16*1024*1024)throw std::length_error("Texture-set active ID or aggregate paint-map budget is invalid");
+ if(topology_->polygon_ids()!=bool(polygon&&polygon->active))throw std::invalid_argument("Texture-set identity kind differs from its actual current polygon authority");
  if(!deep)return;
  stop(l);topology_->geometry()->validate();
  if(topology_->polygon_ids()){
-  if(!o.polygon||!o.polygon->active)throw std::invalid_argument("Texture-set polygon IDs require their actual current authority");
-  validate_polygon_derivative(*o.polygon,o.painted.get(),true);const auto derivative=o.polygon->topology.triangulate();
+  if(!polygon||!polygon->active)throw std::invalid_argument("Texture-set polygon IDs require their actual current authority");
+  validate_polygon_derivative(*polygon,primary.painted.get(),true);const auto derivative=polygon->topology.triangulate();
   if(!std::equal(derivative.triangle_faces.begin(),derivative.triangle_faces.end(),topology_->triangle_faces().begin(),topology_->triangle_faces().end())||derivative.mesh.indices.size()!=topology_->triangle_corners().size())throw std::invalid_argument("Texture-set polygon face correspondence differs from its current authority");
   for(size_t c=0;c<derivative.mesh.indices.size();++c){if((c&1023)==0)stop(l);if(derivative.corners.at(derivative.mesh.indices[c])!=topology_->triangle_corners()[c])throw std::invalid_argument("Texture-set polygon corner correspondence differs from its actual derivative");}
  }else{
