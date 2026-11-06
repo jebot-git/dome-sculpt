@@ -4492,3 +4492,22 @@ if(BUILD_TESTING AND TARGET dome-sculpt-render)
   target_link_options(dome-sculpt-sculpt-chunk-render-test PRIVATE -Wl,--wrap=glBufferData)
   add_test(NAME sculpt-chunk-render COMMAND dome-sculpt-sculpt-chunk-render-test ${CMAKE_CURRENT_BINARY_DIR}/sculpt-chunk-render)
 endif()
+
+# Explicit manual gate: this workload is deliberately excluded from ALL/CTest.
+# Running a reduced --smoke case never qualifies the production measurement.
+if(BUILD_TESTING AND TARGET dome-sculpt-render AND DOME_COMPUTE_BACKEND STREQUAL "CPU")
+  add_executable(dome-sculpt-sculpt-sustained EXCLUDE_FROM_ALL tests/sculpt-sustained.cpp)
+  target_include_directories(dome-sculpt-sculpt-sustained PRIVATE src)
+  target_link_libraries(dome-sculpt-sculpt-sustained PRIVATE dome-sculpt-render)
+  foreach(sustained_symbol IN ITEMS
+      glBufferData glBufferSubData
+      _ZN4dome6detail17SculptSceneChunks7captureERKNS_5SceneENS0_23SculptSceneChunkContextERKSt10shared_ptrIKS1_ENS0_22SculptSceneChunkLimitsESt8functionIFbvEE
+      _ZN4dome6detail19SculptSurfaceChunks5buildERKNS_6VolumeENS0_17SculptChunkLimitsESt8functionIFbvEE
+      _ZNK4dome6detail19SculptSurfaceChunks6updateERKNS_6VolumeENS0_17SculptChunkLimitsESt8functionIFbvEE
+      _ZN4dome6detail18SculptPlacedChunks7captureERKSt10shared_ptrIKNS0_17SculptSceneChunksEEmRKS2_IKS1_EbNS0_24SculptPlacedChunksLimitsESt8functionIFbvEE
+      _ZN4dome6detail16SculptChunkMasks7captureESt10shared_ptrIKNS0_19SculptSurfaceChunksEES2_IKNS0_18SculptMaskSnapshotEERKS2_IKS1_EmmSt8functionIFbvEE
+      _ZNK4dome12SurfaceQuery14nearest_resultENS_4Vec3ERKNS_15AffineTransformERKNS_19SurfaceQueryOptionsE
+      _ZNK4dome12SurfaceQuery14raycast_resultENS_4Vec3ES1_fRKNS_15AffineTransformERKNS_19SurfaceQueryOptionsE)
+    target_link_options(dome-sculpt-sculpt-sustained PRIVATE "-Wl,--wrap=${sustained_symbol}")
+  endforeach()
+endif()
