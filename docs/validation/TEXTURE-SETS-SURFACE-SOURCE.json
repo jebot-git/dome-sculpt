@@ -1,0 +1,355 @@
+{
+  "status": "PRIVATE SOURCE-ONLY WIP; no current execution/admission",
+  "source_commit": "cf5c672c9b3c6174ee00d0c22f05d5c64776878d",
+  "parent": "2b36634f2d95873b370bff3ccad4e7c542ce3d64",
+  "main_merged": "f9073165040eb3140bf312710fd4b961af43bed5",
+  "changes": {
+    "CMakeLists.txt": "6a51a3b3c06154431fb2b9f73484c5eff3d1af109adb98b7856e900453c72dc0",
+    "include/dome/paint.hpp": "dc4f20939a45137e443dd2181513e20a836e91b384bd341c97182b9d5fe9f1fb",
+    "include/dome/scene.hpp": "f44c35576aea8e1e78d63645ef8155c28d7f0557cf9c91fbaced89db33a40e33",
+    "src/document.cpp": "13a85ae4ac9d047fa796231292e6788250d28c769b0bd022d42ac8936b3ecac4",
+    "src/geometry-identity.hpp": "382be0d2cf41acd8a08dc7c92ba47dd3dd71be9006da912b90484c4719174536",
+    "src/material-visibility.cpp": "77dde558e6c769de71331b8c35185387f84871c2ec009adf3c1d87267357438a",
+    "src/paint.cpp": "a2a8ed20e3936e9348f5d06ce4bdb8f622a8b51bfc0ef5050909426f48362d17",
+    "src/render.cpp": "e9fd3e42e3c45618082f6da491478f6c1ddccead62ea58cf92e8e39e8946aa4d",
+    "src/scene.cpp": "16dc1ae417e64339e793e121232f5eeaca79fe91a02add94ef432ad2511c6d8d",
+    "src/texture-set-graph.cpp": "393c85d8f16b788c0e1fe9040590877a0f609c2730621da75b77835c2a8c8d4d",
+    "src/texture-set-packed.cpp": "680c701b3a8f752bceb8e720449015879bdb2472a58b66faa8ad03688f296de6",
+    "src/texture-set-packed.hpp": "15261f6a284fe37d8e87711fc8afbce7e4da8005cf86e523ca144124c2883270",
+    "src/texture-set-paint-access.hpp": "5acbbced562d1b43ebfb3937c2159fdf56ab2c2a924e54674c22820500970d44",
+    "src/texture-set-range.cpp": "8876a8ac2a43abb77f9c29ed70b311e7d7da5ec60a4f088ecd859f37a4395545",
+    "src/texture-set-range.hpp": "f6f265295fb04a0a0d170193e950f52d4b989191b596a74e57be3df2b5c1de8e",
+    "src/texture-set-surface.cpp": "62c7ef4c3941172305f047570e1761ba0930d25209ea8cae14072710fcd985b1",
+    "src/texture-set-surface.hpp": "1712f98b8c1e7b7e0bb10accb029527d5db5e8551458ab4daced4be20635a5dd",
+    "src/texture-set-worker.cpp": "46a0c6cd7eb81a99631573eafacf27f403b8337a05a20251f3ff3737a335603d",
+    "src/texture-set-worker.hpp": "2594ed07073161dc42ae99db3a59b4c8f7c82774c37073fc4302641e74c9327b",
+    "src/texture-sets.cpp": "4a83016eca9d5ea32757d9506d4647a62b941bb3bf7686b7386676446759ed1b",
+    "tests/texture-set-surfaces.cpp": "76c10355e6dcdf8ea85b8392f241c6fcefc4cec63fd3d1748c8a86953ab9efcc"
+  },
+  "syntax": {
+    "handle": 99891,
+    "exit": 0,
+    "whole_translation_units": 14,
+    "seconds": 25.82589446095517,
+    "results": [
+      {
+        "source": "src/paint.cpp",
+        "args": [
+          "/usr/bin/g++",
+          "-std=c++20",
+          "-fsyntax-only",
+          "-Iinclude",
+          "-Isrc",
+          "-Ithird_party",
+          "-Ithird_party/openbrush",
+          "-Ithird_party/nlohmann",
+          "src/paint.cpp"
+        ],
+        "returncode": 0,
+        "seconds": 2.8379025099566206
+      },
+      {
+        "source": "src/texture-sets.cpp",
+        "args": [
+          "/usr/bin/g++",
+          "-std=c++20",
+          "-fsyntax-only",
+          "-Iinclude",
+          "-Isrc",
+          "-Ithird_party",
+          "-Ithird_party/openbrush",
+          "-Ithird_party/nlohmann",
+          "src/texture-sets.cpp"
+        ],
+        "returncode": 0,
+        "seconds": 0.8304241150035523
+      },
+      {
+        "source": "src/texture-set-graph.cpp",
+        "args": [
+          "/usr/bin/g++",
+          "-std=c++20",
+          "-fsyntax-only",
+          "-Iinclude",
+          "-Isrc",
+          "-Ithird_party",
+          "-Ithird_party/openbrush",
+          "-Ithird_party/nlohmann",
+          "src/texture-set-graph.cpp"
+        ],
+        "returncode": 0,
+        "seconds": 1.1906265150173567
+      },
+      {
+        "source": "src/texture-set-archive.cpp",
+        "args": [
+          "/usr/bin/g++",
+          "-std=c++20",
+          "-fsyntax-only",
+          "-Iinclude",
+          "-Isrc",
+          "-Ithird_party",
+          "-Ithird_party/openbrush",
+          "-Ithird_party/nlohmann",
+          "src/texture-set-archive.cpp"
+        ],
+        "returncode": 0,
+        "seconds": 1.643106049974449
+      },
+      {
+        "source": "src/texture-set-surface.cpp",
+        "args": [
+          "/usr/bin/g++",
+          "-std=c++20",
+          "-fsyntax-only",
+          "-Iinclude",
+          "-Isrc",
+          "-Ithird_party",
+          "-Ithird_party/openbrush",
+          "-Ithird_party/nlohmann",
+          "src/texture-set-surface.cpp"
+        ],
+        "returncode": 0,
+        "seconds": 0.7580122060026042
+      },
+      {
+        "source": "src/texture-set-packed.cpp",
+        "args": [
+          "/usr/bin/g++",
+          "-std=c++20",
+          "-fsyntax-only",
+          "-Iinclude",
+          "-Isrc",
+          "-Ithird_party",
+          "-Ithird_party/openbrush",
+          "-Ithird_party/nlohmann",
+          "src/texture-set-packed.cpp"
+        ],
+        "returncode": 0,
+        "seconds": 0.8443603279883973
+      },
+      {
+        "source": "src/texture-set-range.cpp",
+        "args": [
+          "/usr/bin/g++",
+          "-std=c++20",
+          "-fsyntax-only",
+          "-Iinclude",
+          "-Isrc",
+          "-Ithird_party",
+          "-Ithird_party/openbrush",
+          "-Ithird_party/nlohmann",
+          "src/texture-set-range.cpp"
+        ],
+        "returncode": 0,
+        "seconds": 1.4022233040304855
+      },
+      {
+        "source": "src/texture-set-worker.cpp",
+        "args": [
+          "/usr/bin/g++",
+          "-std=c++20",
+          "-fsyntax-only",
+          "-Iinclude",
+          "-Isrc",
+          "-Ithird_party",
+          "-Ithird_party/openbrush",
+          "-Ithird_party/nlohmann",
+          "src/texture-set-worker.cpp"
+        ],
+        "returncode": 0,
+        "seconds": 1.601757193042431
+      },
+      {
+        "source": "src/scene.cpp",
+        "args": [
+          "/usr/bin/g++",
+          "-std=c++20",
+          "-fsyntax-only",
+          "-Iinclude",
+          "-Isrc",
+          "-Ithird_party",
+          "-Ithird_party/openbrush",
+          "-Ithird_party/nlohmann",
+          "src/scene.cpp"
+        ],
+        "returncode": 0,
+        "seconds": 3.037750318995677
+      },
+      {
+        "source": "src/document.cpp",
+        "args": [
+          "/usr/bin/g++",
+          "-std=c++20",
+          "-fsyntax-only",
+          "-Iinclude",
+          "-Isrc",
+          "-Ithird_party",
+          "-Ithird_party/openbrush",
+          "-Ithird_party/nlohmann",
+          "src/document.cpp"
+        ],
+        "returncode": 0,
+        "seconds": 3.882362595992163
+      },
+      {
+        "source": "src/material-visibility.cpp",
+        "args": [
+          "/usr/bin/g++",
+          "-std=c++20",
+          "-fsyntax-only",
+          "-Iinclude",
+          "-Isrc",
+          "-Ithird_party",
+          "-Ithird_party/openbrush",
+          "-Ithird_party/nlohmann",
+          "src/material-visibility.cpp"
+        ],
+        "returncode": 0,
+        "seconds": 1.962721667950973
+      },
+      {
+        "source": "src/render.cpp",
+        "args": [
+          "/usr/bin/c++",
+          "-fsyntax-only",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/native-texture-sets-e79dbe9/include",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/native-texture-sets-e79dbe9/third_party/openbrush",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/native-texture-sets-e79dbe9/third_party/nlohmann",
+          "-isystem",
+          "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/harfbuzz",
+          "-isystem",
+          "/usr/include/glib-2.0",
+          "-isystem",
+          "/usr/lib64/glib-2.0/include",
+          "-isystem",
+          "/usr/include/sysprof-6",
+          "-isystem",
+          "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/freetype2",
+          "-isystem",
+          "/usr/include/libpng16",
+          "-isystem",
+          "/usr/include/libxml2",
+          "-O3",
+          "-DNDEBUG",
+          "-std=gnu++20",
+          "-pthread",
+          "-DWITH_GZFILEOP",
+          "/home/blux/de-xr/dome-sculpt/artifacts/native-texture-sets-e79dbe9/src/render.cpp"
+        ],
+        "returncode": 0,
+        "seconds": 2.601876678992994
+      },
+      {
+        "source": "tests/texture-sets.cpp",
+        "args": [
+          "/usr/bin/g++",
+          "-std=c++20",
+          "-fsyntax-only",
+          "-Iinclude",
+          "-Isrc",
+          "-Ithird_party",
+          "-Ithird_party/openbrush",
+          "-Ithird_party/nlohmann",
+          "tests/texture-sets.cpp"
+        ],
+        "returncode": 0,
+        "seconds": 1.3014696530299261
+      },
+      {
+        "source": "tests/texture-set-surfaces.cpp",
+        "args": [
+          "/usr/bin/g++",
+          "-std=c++20",
+          "-fsyntax-only",
+          "-Iinclude",
+          "-Isrc",
+          "-Ithird_party",
+          "-Ithird_party/openbrush",
+          "-Ithird_party/nlohmann",
+          "tests/texture-set-surfaces.cpp"
+        ],
+        "returncode": 0,
+        "seconds": 1.9313013249775395
+      }
+    ],
+    "owned_input_count": 1469,
+    "source_drift": [],
+    "files": [
+      {
+        "path": "artifacts/texture-set-syntax/surface-source-sealed/status.json",
+        "sha256": "49e1dc2a55ece67b3000bc52883d579aabdd79781a32be2baecfcc1998ac55da",
+        "bytes": 6196
+      },
+      {
+        "path": "artifacts/texture-set-syntax/surface-source-sealed/before.json",
+        "sha256": "c7d92cf50fde9222fae86a1f44bdfdd3afa2d2390f3d1ccb6e5e74e0b5a3d3bb",
+        "bytes": 150849
+      },
+      {
+        "path": "artifacts/texture-set-syntax/surface-source-sealed/after.json",
+        "sha256": "c7d92cf50fde9222fae86a1f44bdfdd3afa2d2390f3d1ccb6e5e74e0b5a3d3bb",
+        "bytes": 150849
+      },
+      {
+        "path": "artifacts/texture-set-syntax/surface-source-sealed/source-at-first-check.tar.gz",
+        "sha256": "c97368cd3ab2901b10b4b7644be5700fabf1565d1970f92a8f98bf57da501447",
+        "bytes": 219096
+      }
+    ]
+  },
+  "preserved_diagnostic": {
+    "handle": 58388,
+    "kind": "test syntax only",
+    "exit": 1,
+    "reason": "New fixture omitted source-placement.hpp required for complete NativeAffineEdit; no product failure or execution claim",
+    "status": {
+      "path": "artifacts/texture-set-syntax/surface-fixture/status.json",
+      "sha256": "3a2c52c140fe3f13654e90c634e9b2cdbd25b2ab1fd126df84d93f66329b3387",
+      "bytes": 494
+    },
+    "fixed_4TU_syntax_handle": 97748,
+    "fixed_exit": 0
+  },
+  "implemented_source": [
+    "Worker-specific Scene preview bundles carry one genuine geometry/deformation plan with no extra ObjectSurface Mesh copy; legacy single-material surface/export methods remain guarded.",
+    "Geometry-only packed layout/cache owns immutable mesh/deformation/membership and necessary tangent boundary splits, never paint/collection/maps; field range proofs separately own object+set/material/maps and exact EBO/logical-corner/UV/winding correspondence.",
+    "Document source path emits every nonempty set range, keeps optional packed streams, and material-aware picking; geometry cache identity excludes paint collection and image values.",
+    "Renderer caches use full object+set identity; plain proofs validate membership and actual map/material owners plus identity tint, retaining direct immutable uploads.",
+    "Independent SurfaceMap raster/padding per actual membership preserves original logical face/bary IDs and one shared immutable mesh; empty members are valid, COW authored grids are retained, decoder reconstructs actual membership before raster creation.",
+    "Global admission counts every current implicit material slot including generated volume objects, rejects an additional set before Scene staging, and retains per-call unique retained-domain accounting."
+  ],
+  "prepared_but_not_run": [
+    "Coincident same-position/same-UV face field painting and no mutation leakage, full owning native encode/decode and subsequent writable reopened set.",
+    "Worker packing, same-object unselected material occlusion, separate whole-object exclusion, control-block/field/material/UV/EBO/tint negatives, geometry-only cache reuse/invalidation.",
+    "Necessary welded tangent boundary splits and actual reflected material-aware picking.",
+    "Actual Document worker publishes two distinct material ranges under one object, retains Scene state, and builds material-aware picking."
+  ],
+  "abi_scope": {
+    "new_public_boundary": "ObjectSurface.texture_set_surface appended; earlier source-only SurfaceRange texture_set/texture_set_proof appends remain. Private Paint constructor and SurfaceMap representation changed.",
+    "old_cohorts": "984/769 fresh app/support and historical32+6 execution are immutable past evidence only. No old project object/archive is an input to future changed-layout execution.",
+    "fresh_required": "Fresh reachable own app/core/support/render/XR and all selected consumers, then separate whole-owned SAN and real GUI/device gates."
+  },
+  "open_requirements": [
+    "No current source execution, renderer pixel, GUI, SAN or device qualification.",
+    "Active-set native mutation/controller/FLTK/page31 and shared XR controls, exact field leases, Undo/Cancel/stale/ordered Save remain unfinished; existing generic paint/layer commands are not yet an active-set workflow.",
+    "Complex source/normal/canonical/retained sampling/corner-colour owner adapters remain guarded; genuine per-range conflicting attribute coordinates remain required.",
+    "Full retained polygon_sources8/history/recipe/image/source closure, resource replay/fault/total process measurements, native append and remapping remain required.",
+    "Per-set Bake/Clear and measured all-channel/F32 resolution transfer, exact topology/UV remaps, actual multi-primitive glTF/VRM export and import retaining one mesh/node/rig identity remain unfinished."
+  ],
+  "reservation": {
+    "Scene": 40,
+    "Paint": 7,
+    "polygon_sources": 8,
+    "Material": 22,
+    "page": 31,
+    "page_count": 32
+  },
+  "claims_excluded": [
+    "No main/default promotion",
+    "No complete texture-set feature claim",
+    "No N mesh-per-set workaround",
+    "No runtime/compiler success inferred from syntax",
+    "No old cohort or failure relabeling"
+  ]
+}

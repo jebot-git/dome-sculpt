@@ -102,3 +102,42 @@ object/set/material/maps checks. This is not yet a complete packed-stream proof:
 actual layout/producer must bind and authenticate the EBO, logical-corner and
 necessary attribute-split maps before surfaces can be enabled. Four syntax-only
 TUs passed; no new execution or old-layout archive reuse is claimed.
+
+Source-only worker continuation cf5c672 now incorporates mainf907's direct
+immutable upload path. A worker-specific Scene bundle holds one genuine
+geometry/deformation owner, membership partition and logical corners; it leaves
+the legacy ObjectSurface Mesh empty instead of copying it per set. Document
+source now emits every nonempty set range and material-aware picking. Private
+geometry-only layouts/cache keys exclude paint/maps/collection values. Necessary
+welded tangent conflicts split only their actual vertices. Range proofs bind
+object+set, actual field/material/map owners, EBO/corner/UV correspondence and
+explicit reflected winding; renderer material caches use full object+set keys.
+Legacy single-material/export surfaces still refuse this unfinished feature.
+
+The source audit also found that filtering stroke candidates on a shared full
+raster was insufficient for coincident faces with identical UVs. Each set now
+builds its own membership-filtered raster over the same immutable mesh, keeping
+original logical triangle/barycentric IDs and retaining authored COW grids.
+Paint7 reconstruction installs actual membership before building its raster.
+Empty material slots remain valid. Global admission counts every implicit live
+material slot, including volume objects, before staging another set. Raster,
+geometry/output/query and per-field preview forecasts are bounded; measured full
+request/process/fault qualification remains required.
+
+The final14-TU syntax pass is terminal0 with no input drift. The new registered
+surface fixture covers coincident-field isolation, codec/writable reopen, real
+worker packets, same-object material occlusion versus whole-object exclusion,
+owner/stream negatives, tangent boundary splits and reflected picking. It has
+not been executed. A new fixture's missing complete-type include produced a
+preserved syntax failure before correction. These source checks do not extend
+the executed984/769 scope. No current linked/runtime/UI/SAN/device claim is made.
+See validation/TEXTURE-SETS-SURFACE-SOURCE.json and the unlaunched bounded plan in
+validation/TEXTURE-SETS-NEXT-RELEASE-PLAN.json.
+
+Active-set native edits, shared FLTK/XR/page31 controls and transactional
+Undo/Cancel/ordered Save are still unfinished. Current generic paint/layer
+commands are not an active-set workflow. Source/normal/canonical/retained-domain
+and corner-colour adapters, retained polygon_sources8/history/recipe closure,
+independent Bake/Clear/resolution transfer and true multi-primitive import/export
+remain required. A fresh matching whole reachable cohort is mandatory after the
+ObjectSurface/private-raster boundary; original project archives are not reused.
