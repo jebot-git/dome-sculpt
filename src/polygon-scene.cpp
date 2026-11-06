@@ -703,7 +703,7 @@ void PolygonSceneArchive::preflight(const nlohmann::json &j,
                                       "must be acyclic and ordered");
         before(ref, prior);
       };
-      if (materials->at("version") == 14 &&
+      if (native_paint_material_archive(*materials) &&
           !binding.at("native_paint_sampling").is_null()) {
         const auto &n = materials->at("native_paints")
                             .at(polygon_archive_index(

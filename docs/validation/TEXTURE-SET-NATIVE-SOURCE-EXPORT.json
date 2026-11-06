@@ -1,0 +1,197 @@
+{
+  "state": "SOURCE/SYNTAX ONLY; requested pause before new compile/link/runtime",
+  "base": "498fee621e6dd71491a4b3fd0b18ddd53b0902dd",
+  "current_headers": "8cad0929f985ae0b02f806c4d9afe9dfd09e2eef",
+  "files": {
+    "src/polygon-surface-owner.cpp": "be05b61a5aa9b73a88ad2a45b22fb138e9fc3721f28068319d966c51970a37bd",
+    "src/polygon-scene.cpp": "68e2dcc707b77df3deb41f2f39626ae192d2e00ac5267fbe3458184a5473ce21",
+    "tests/texture-set-source-export.cpp": "da5c390dee25027d185708155548f924c142c92ae8415bad33ced159baeaef8c"
+  },
+  "syntax": {
+    "path": "/home/blux/de-xr/dome-sculpt/artifacts/texture-source-export-native-498/artifacts/native-export-syntax-v2/status.json",
+    "sha256": "d6d5d6793a69aea186d00647961e1212a2a6791b9f3ac695910abcfde374896c",
+    "receipt": {
+      "state": "terminal",
+      "source_base": "498fee621e6dd71491a4b3fd0b18ddd53b0902dd",
+      "headers_base": "498fee621e6dd71491a4b3fd0b18ddd53b0902dd",
+      "results": [
+        {
+          "file": "src/polygon-surface-owner.cpp",
+          "args": [
+            "/usr/bin/c++",
+            "-DDOME_SCULPT_INSTALLED_ASSETS=\"/usr/local/share/dome-sculpt/assets/humanoid\"",
+            "-DDOME_SCULPT_SOURCE_ASSETS=\"/home/blux/de-xr/dome-sculpt/artifacts/sculpt-authoring-5301/assets/humanoid\"",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/sculpt-authoring-5301/third_party",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/sculpt-authoring-5301/include",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/sculpt-authoring-5301/third_party/openbrush",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/sculpt-authoring-5301/third_party/cgltf",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/sculpt-authoring-5301/third_party/nlohmann",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/sculpt-authoring-5301/third_party/xatlas",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/sculpt-authoring-5301/third_party/mikktspace",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/sculpt-authoring-5301/third_party/ufbx",
+            "-O3",
+            "-DNDEBUG",
+            "-ffunction-sections",
+            "-fdata-sections",
+            "-std=gnu++20",
+            "-Wall",
+            "-Wextra",
+            "-Wpedantic",
+            "-fsyntax-only",
+            "/home/blux/de-xr/dome-sculpt/artifacts/texture-source-export-native-498/src/polygon-surface-owner.cpp"
+          ],
+          "exit": 0,
+          "log_sha256": "7507eb35316db2aaba30f0d58b2ee88e0ce2dfef90d8e2ea1c498ccb77282cb8"
+        },
+        {
+          "file": "src/polygon-scene.cpp",
+          "args": [
+            "/usr/bin/c++",
+            "-DDOME_SCULPT_INSTALLED_ASSETS=\"/usr/local/share/dome-sculpt/assets/humanoid\"",
+            "-DDOME_SCULPT_SOURCE_ASSETS=\"/home/blux/de-xr/dome-sculpt/artifacts/sculpt-authoring-5301/assets/humanoid\"",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/sculpt-authoring-5301/third_party",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/sculpt-authoring-5301/include",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/sculpt-authoring-5301/third_party/openbrush",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/sculpt-authoring-5301/third_party/cgltf",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/sculpt-authoring-5301/third_party/nlohmann",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/sculpt-authoring-5301/third_party/xatlas",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/sculpt-authoring-5301/third_party/mikktspace",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/sculpt-authoring-5301/third_party/ufbx",
+            "-O3",
+            "-DNDEBUG",
+            "-ffunction-sections",
+            "-fdata-sections",
+            "-std=gnu++20",
+            "-Wall",
+            "-Wextra",
+            "-Wpedantic",
+            "-fsyntax-only",
+            "/home/blux/de-xr/dome-sculpt/artifacts/texture-source-export-native-498/src/polygon-scene.cpp"
+          ],
+          "exit": 0,
+          "log_sha256": "aeae906168bc14f4ed413c1fa13340e117ea03c0eb465c43112d29ffdc797399"
+        },
+        {
+          "file": "tests/texture-set-source-export.cpp",
+          "args": [
+            "/usr/bin/c++",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/sculpt-authoring-5301/src",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/sculpt-authoring-5301/third_party/cgltf",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/sculpt-authoring-5301/include",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/sculpt-authoring-5301/third_party/openbrush",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/sculpt-authoring-5301/third_party/nlohmann",
+            "-O3",
+            "-DNDEBUG",
+            "-ffunction-sections",
+            "-fdata-sections",
+            "-std=gnu++20",
+            "-fsyntax-only",
+            "/home/blux/de-xr/dome-sculpt/artifacts/texture-source-export-native-498/tests/texture-set-source-export.cpp"
+          ],
+          "exit": 0,
+          "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      ],
+      "protected_inputs": 699,
+      "drift": [],
+      "exit": 0,
+      "scope": "Source/syntax only; genuine native UV/Move/Flip field admission and portable/history fixture remain runtime-unexecuted"
+    }
+  },
+  "initial_failure": {
+    "path": "/home/blux/de-xr/dome-sculpt/artifacts/texture-source-export-native-498/artifacts/native-export-syntax/status.json",
+    "sha256": "c21d46ae65491cad243421e0675e4655b61d56704f84d1a4dd3a0c7851e6ca63",
+    "receipt": {
+      "state": "terminal",
+      "source_base": "498fee621e6dd71491a4b3fd0b18ddd53b0902dd",
+      "headers_base": "498fee621e6dd71491a4b3fd0b18ddd53b0902dd",
+      "results": [
+        {
+          "file": "src/polygon-surface-owner.cpp",
+          "args": [
+            "/usr/bin/c++",
+            "-DDOME_SCULPT_INSTALLED_ASSETS=\"/usr/local/share/dome-sculpt/assets/humanoid\"",
+            "-DDOME_SCULPT_SOURCE_ASSETS=\"/home/blux/de-xr/dome-sculpt/artifacts/sculpt-authoring-5301/assets/humanoid\"",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/sculpt-authoring-5301/third_party",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/sculpt-authoring-5301/include",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/sculpt-authoring-5301/third_party/openbrush",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/sculpt-authoring-5301/third_party/cgltf",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/sculpt-authoring-5301/third_party/nlohmann",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/sculpt-authoring-5301/third_party/xatlas",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/sculpt-authoring-5301/third_party/mikktspace",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/sculpt-authoring-5301/third_party/ufbx",
+            "-O3",
+            "-DNDEBUG",
+            "-ffunction-sections",
+            "-fdata-sections",
+            "-std=gnu++20",
+            "-Wall",
+            "-Wextra",
+            "-Wpedantic",
+            "-fsyntax-only",
+            "/home/blux/de-xr/dome-sculpt/artifacts/texture-source-export-native-498/src/polygon-surface-owner.cpp"
+          ],
+          "exit": 1,
+          "log_sha256": "cf57ae4a6aad4ed6d0c04793dbb76b98ce99b6ea6c30de27b725953855d601bd"
+        },
+        {
+          "file": "tests/texture-set-source-export.cpp",
+          "args": [
+            "/usr/bin/c++",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/sculpt-authoring-5301/src",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/sculpt-authoring-5301/third_party/cgltf",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/sculpt-authoring-5301/include",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/sculpt-authoring-5301/third_party/openbrush",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/sculpt-authoring-5301/third_party/nlohmann",
+            "-O3",
+            "-DNDEBUG",
+            "-ffunction-sections",
+            "-fdata-sections",
+            "-std=gnu++20",
+            "-fsyntax-only",
+            "/home/blux/de-xr/dome-sculpt/artifacts/texture-source-export-native-498/tests/texture-set-source-export.cpp"
+          ],
+          "exit": 0,
+          "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      ],
+      "protected_inputs": 401,
+      "drift": [],
+      "exit": 1,
+      "scope": "Source/syntax only; source owner admission and actual worker/portable fixture runtime remain unexecuted"
+    }
+  },
+  "preserved_current_failure": {
+    "log": "/tmp/dome-sculpt-498fee62-release-v2-logs/native.log",
+    "log_sha256": "80bdba18475ee067ef8b8c8a668c488b9871fa1de6873adaf97b714b837a62c1",
+    "original_elf": "/tmp/dome-sculpt-57e42265-release/dome-sculpt-texture-set-source-export-test",
+    "original_elf_sha256": "d1971ae7965ec6dfab5e71bf59233749ad0fccd52a91069e860b7225c3e2dac2",
+    "root_provider_receipt": "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-authoring-5301/artifacts/next-release-v2/status.json",
+    "root_provider_receipt_sha256": "828455ce19ddabe0c57b76aab50116d476c602361d4e7bf9236ecfaa6fdeec39",
+    "reported_native_pass": 20,
+    "reported_native_total": 22,
+    "failed_control": "Actual accepted native edit owns its original field"
+  },
+  "runtime": {
+    "new_compile": false,
+    "new_link": false,
+    "new_test_execution": false,
+    "all_added_positive_negative_codec_history_export_assertions": "UNEXECUTED",
+    "open": [
+      "genuine worker/Move/Flip acceptance and owning source roundtrip",
+      "all ownership/version/frame/quota/cancel controls",
+      "material partition +portable glTF accessor/image/normal oracle",
+      "native Undo/Redo and restarted Restore",
+      "new whole-provider composition",
+      "sanitizer",
+      "hardware"
+    ]
+  },
+  "resources": {
+    "source_syntax_cap_bytes": 4194304,
+    "workspace_free_floor_bytes": 21692940288,
+    "new_heavy_jobs": 0,
+    "live_handles": []
+  },
+  "scope": "Normal-free authentic native sampling adapter and Material21 native before-history traversal; all other typed/frame/current-owner guards preserved; empty ordinary native route unchanged"
+}
