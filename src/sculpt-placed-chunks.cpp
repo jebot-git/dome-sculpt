@@ -3,20 +3,26 @@
 #include "sculpt-chunk-index.hpp"
 namespace dome::detail {
 namespace {
+template<class T> bool same_owner(const std::shared_ptr<const T> &a,const std::shared_ptr<const T> &b){
+  return a.get()==b.get()&&!a.owner_before(b)&&!b.owner_before(a);
+}
 struct Traits {
   static SculptChunkBounds bounds(const SculptPlacedChunk::Ptr &p){return p->bounds();}
-  static size_t bytes(const SculptPlacedChunk::Ptr &p){return p->retained_bytes();}
+  static size_t bytes(const SculptPlacedChunk::Ptr &p){return p->placement_bytes();}
 };
 using Index=PersistentSculptIndex<Int3,SculptPlacedChunk::Ptr,Traits>;
 struct Work {
   const SculptPlacedChunksLimits &limits;
   LocalSurfaceCache::Cancel cancel;
   size_t bytes=0,steps=0;
+  const char *phase="initial owner reservations";
   void stop() const {if(cancel&&cancel())throw std::runtime_error("Placed sculpt directory cancelled");}
   void tick(){if(steps>=limits.metadata_steps)throw std::length_error("Placed sculpt directory metadata work limit exceeded");++steps;if((steps&63)==0)stop();}
   void charge(size_t n,size_t width=1){
     if(bytes>limits.working_bytes||n>(limits.working_bytes-bytes)/width)
-      throw std::length_error("Placed sculpt directory working byte limit exceeded");
+      throw std::length_error(std::string("Placed sculpt directory working byte limit exceeded during ")+phase+
+          " (live="+std::to_string(bytes)+", request="+std::to_string(n)+"x"+std::to_string(width)+
+          ", limit="+std::to_string(limits.working_bytes)+")");
     bytes+=n*width;
   }
 };
@@ -32,6 +38,9 @@ struct SculptPlacedChunks::State {
 SculptPlacedChunks::SculptPlacedChunks(std::shared_ptr<const State> s):state_(std::move(s)){}
 const SculptSurfaceChunks::Ptr &SculptPlacedChunks::geometry() const {return state_->geometry;}
 const SculptPlacedChunksReport &SculptPlacedChunks::report() const {return state_->report;}
+size_t SculptPlacedChunks::placement_bytes() const {
+  return state_->report.retained_bytes-state_->geometry->report().retained_bytes;
+}
 const SculptChunkBounds &SculptPlacedChunks::bounds() const {
   static const SculptChunkBounds empty;
   return state_->chunks.root?state_->chunks.root->bounds:empty;
@@ -60,11 +69,16 @@ SculptPlacedChunks::Ptr SculptPlacedChunks::capture(const SculptSceneChunks::Ptr
     return before;
   }
   if(before)work.charge(before->report().retained_bytes);
-  work.charge(view->geometry->report().retained_bytes);work.charge(sizeof(State)+sizeof(SculptPlacedChunks)+256);
+  // The prior report owns its geometry. Deduplicate only this exact owner;
+  // different persistent roots may share nodes but stay fully reserved here.
+  if(!before||!same_owner(before->state_->geometry,view->geometry))
+    work.charge(view->geometry->report().retained_bytes);
+  work.charge(sizeof(State)+sizeof(SculptPlacedChunks)+256);
   auto out=std::make_shared<State>();out->geometry=view->geometry;out->object=object;
   out->generation=scene->context().generation;out->queries=queries;out->limits=limits;
   // Enabling picking needs a one-time acceleration pass even if geometry is
   // unchanged. A zero geometry delta cannot manufacture complete BVHs.
+  work.phase="directory path construction";
   const bool attempt_delta=context&&placement&&(!queries||before->state_->queries);
   if(attempt_delta)out->chunks=before->state_->chunks;
   bool delta=false;
@@ -85,22 +99,38 @@ SculptPlacedChunks::Ptr SculptPlacedChunks::capture(const SculptSceneChunks::Ptr
     const auto current=retained();
     if(current>limits.retained_bytes||sizeof(Index::Node)+128>limits.retained_bytes-current)
       throw std::length_error("Placed directory retained byte limit exceeded");
+    SculptPlacedChunk::Ptr previous;
+    if(context)if(const auto found=before->state_->chunks.find(source->coordinate))previous=*found;
     auto chunk_limits=limits.chunk;
-    chunk_limits.retained_bytes=std::min(chunk_limits.retained_bytes,limits.retained_bytes-current-sizeof(Index::Node)-128);
+    // current already includes this source via the authenticated geometry
+    // directory. The nested standalone factory still checks its total source
+    // footprint; reserve only other directory-owned bytes outside that scope.
+    if(source->bytes>current)throw std::logic_error("Placed source reservation exceeds its actual geometry owner");
+    const auto retained_other=current-source->bytes;
+    chunk_limits.retained_bytes=std::min(chunk_limits.retained_bytes,
+        limits.retained_bytes-retained_other-sizeof(Index::Node)-128);
     const size_t node_copies=3*(size_t(Index::h(out->chunks.root))+1);
     if(node_copies>(limits.working_bytes-work.bytes)/(sizeof(Index::Node)+128))
       throw std::length_error("Placed directory insertion envelope exceeds working budget");
     const size_t index_work=node_copies*(sizeof(Index::Node)+128);
-    chunk_limits.working_bytes=std::min(chunk_limits.working_bytes,limits.working_bytes-work.bytes-index_work);
+    size_t shared=source->bytes;
+    if(previous){
+      shared=sculpt_index_sum(shared,previous->retained_bytes());
+      if(same_owner(previous->source(),source))shared-=source->bytes;
+    }
+    if(shared>work.bytes)throw std::logic_error("Placed nested scope lacks its actual outer owner reservation");
+    chunk_limits.working_bytes=std::min(chunk_limits.working_bytes,
+        limits.working_bytes-(work.bytes-shared)-index_work);
     if(!chunk_limits.working_bytes||!chunk_limits.retained_bytes)
       throw std::length_error("No placed chunk capacity remains in the directory budget");
-    SculptPlacedChunk::Ptr previous;
-    if(context)if(const auto found=before->state_->chunks.find(source->coordinate))previous=*found;
-    // The per-chunk operation includes any live previous owner. Its bounded
-    // complete envelope must fit before the new geometry/BVH factory starts.
     const auto placed=SculptPlacedChunk::capture(scene,object,source,previous,queries,chunk_limits,cancel);
     if(placed==previous)++out->report.reused;else ++out->report.built;
-    work.charge(placed->retained_bytes());
+    // Previous wrappers were reserved before traversal. An unchanged wrapper
+    // needs no allocation; a new wrapper may retain the exact previous BVH.
+    size_t added=placed==previous?0:placed->placement_bytes();
+    if(placed!=previous&&previous&&placed->query()&&same_owner(placed->query(),previous->query()))
+      added-=placed->query_bytes();
+    work.charge(added);
     out->chunks.put(source->coordinate,placed,work);
     if(retained()>limits.retained_bytes)throw std::length_error("Placed directory retained byte limit exceeded");
   };
@@ -121,7 +151,8 @@ void SculptPlacedChunks::visit_bounds(const std::function<bool(const SculptChunk
     LocalSurfaceCache::Cancel cancel) const {
   Work work{state_->limits,std::move(cancel)};work.stop();
   const auto visit=[&](auto &self,const Index::Ptr &node)->void {
-    if(!node)return;work.tick();if(!keep(node->bounds))return;
+    if(!node)return;
+    work.tick();if(!keep(node->bounds))return;
     self(self,node->left);if(keep(node->value->bounds()))fn(node->value);self(self,node->right);
   };
   visit(visit,state_->chunks.root);work.stop();

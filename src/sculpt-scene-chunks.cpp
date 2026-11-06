@@ -106,15 +106,21 @@ SculptScenePreview SculptSceneChunks::capture_geometry(const Scene &scene,Sculpt
     if(o.mesh_active||(o.polygon&&o.polygon->active))return false;
     o.material.validate();
     const auto remaining=limits.retained_bytes-out->bytes_;
-    if(prior>limits.working_bytes-out->bytes_)throw std::length_error("Sculpt scene working limit exceeded");
-    auto object_limits=limits.geometry;
-    object_limits.retained_bytes=std::min(object_limits.retained_bytes,remaining);
-    if(group_scratch>limits.working_bytes-out->bytes_-prior)throw std::length_error("Sculpt group working limit exceeded");
-    object_limits.working_bytes=std::min(object_limits.working_bytes,limits.working_bytes-out->bytes_-prior-group_scratch);
-    object_limits.extraction.bytes=std::min(object_limits.extraction.bytes,object_limits.retained_bytes);
     SculptSurfaceChunks::Ptr old;
     if(before&&before->context_.generation==context.generation)
       for(const auto &entry:before->caches_)if(entry.object==o.id){old=entry.geometry;break;}
+    // The nested producer reserves its genuine previous owner. Keep all other
+    // previous Scene allocations outside that scope, without reserving this
+    // same immutable directory twice. Different COW roots receive no credit.
+    const size_t old_geometry=old?old->report().retained_bytes:0;
+    if(old_geometry>prior)throw std::logic_error("Previous sculpt geometry exceeds its actual Scene reservation");
+    const auto prior_other=prior-old_geometry;
+    if(prior_other>limits.working_bytes-out->bytes_)throw std::length_error("Sculpt scene working limit exceeded");
+    auto object_limits=limits.geometry;
+    object_limits.retained_bytes=std::min(object_limits.retained_bytes,remaining);
+    if(group_scratch>limits.working_bytes-out->bytes_-prior_other)throw std::length_error("Sculpt group working limit exceeded");
+    object_limits.working_bytes=std::min(object_limits.working_bytes,limits.working_bytes-out->bytes_-prior_other-group_scratch);
+    object_limits.extraction.bytes=std::min(object_limits.extraction.bytes,object_limits.retained_bytes);
     auto geometry=old?old->update(*o.volume,object_limits,cancel):SculptSurfaceChunks::build(*o.volume,object_limits,cancel);
     // A reused owner's original limits never override this caller's reduced
     // aggregate cap. Its complete immutable footprint must still fit.
@@ -180,22 +186,39 @@ SculptScenePreview SculptSceneChunks::capture(const Scene &scene,SculptSceneChun
     stop(cancel);
     if(retained>limits.retained_bytes||retained>limits.working_bytes-prior-clone)
       throw std::length_error("Sculpt placed view remaining budget exceeded");
-    SculptPlacedChunksLimits own;
-    own.retained_bytes=std::min(own.retained_bytes,limits.retained_bytes-retained);
-    own.working_bytes=std::min(own.working_bytes,limits.working_bytes-retained-prior-clone);
-    if(!own.retained_bytes||!own.working_bytes)throw std::length_error("No sculpt placed capacity remains");
     const auto *previous=before?before->find(object.object):nullptr;
-    auto result=SculptPlacedChunks::capture(geometry,object.object,previous?previous->placed:nullptr,
-                                           context.queries,own,cancel);
-    if(result->report().retained_bytes>limits.retained_bytes-retained)
-      throw std::length_error("Sculpt placed result exceeded its prospective envelope");
-    retained+=result->report().retained_bytes;placed.push_back(std::move(result));
+    const auto previous_placed=previous?previous->placed:SculptPlacedChunks::Ptr{};
+    const size_t current_geometry=object.geometry->report().retained_bytes;
+    const size_t previous_scope=previous_placed?previous_placed->report().retained_bytes:0;
+    if(current_geometry>retained||previous_scope>prior)
+      throw std::logic_error("Placed scope lacks its actual Scene owner reservation");
+    // Full standalone placed guards include their current geometry and prior
+    // directory. The Scene holds those exact scopes already: its remaining
+    // budget excludes only allocations outside this nested factory.
+    const auto retained_other=retained-current_geometry;
+    const auto prior_other=prior-previous_scope;
+    if(retained_other>limits.retained_bytes||retained_other>limits.working_bytes||
+        prior_other>limits.working_bytes-retained_other||clone>limits.working_bytes-retained_other-prior_other)
+      throw std::length_error("Sculpt placed external owner envelope exceeded");
+    SculptPlacedChunksLimits own;
+    own.retained_bytes=std::min(own.retained_bytes,limits.retained_bytes-retained_other);
+    own.working_bytes=std::min(own.working_bytes,limits.working_bytes-retained_other-prior_other-clone);
+    if(!own.retained_bytes||!own.working_bytes)throw std::length_error("No sculpt placed capacity remains");
+    auto result=SculptPlacedChunks::capture(geometry,object.object,previous_placed,context.queries,own,cancel);
+    if(result->geometry()!=object.geometry||result->placement_bytes()>limits.retained_bytes-retained)
+      throw std::length_error("Sculpt placed result exceeded its actual prospective envelope");
+    // Geometry is already present exactly once in retained. The added layer
+    // owns only placed wrappers/BVHs/index nodes, not a second copied Mesh.
+    retained+=result->placement_bytes();placed.push_back(std::move(result));
     SculptChunkMasks::Ptr scalar;
     if(object.mask) {
-      if(retained>=limits.retained_bytes||retained>=limits.working_bytes-prior-clone)
+      const auto previous_masks=previous?previous->masks:SculptChunkMasks::Ptr{};
+      const size_t old_scalar=previous_masks?previous_masks->retained_bytes():0;
+      if(old_scalar>prior)throw std::logic_error("Previous scalar scope exceeds its actual Scene reservation");
+      if(retained>=limits.retained_bytes||retained>=limits.working_bytes-(prior-old_scalar)-clone)
         throw std::length_error("No sculpt scalar capacity remains");
-      scalar=SculptChunkMasks::capture(object.geometry,object.mask,previous?previous->masks:nullptr,
-          limits.retained_bytes-retained,limits.working_bytes-prior-clone-retained,cancel);
+      scalar=SculptChunkMasks::capture(object.geometry,object.mask,previous_masks,
+          limits.retained_bytes-retained,limits.working_bytes-(prior-old_scalar)-clone-retained,cancel);
       if(scalar->retained_bytes()>limits.retained_bytes-retained)throw std::length_error("Sculpt scalar result exceeds aggregate budget");
       retained+=scalar->retained_bytes();
     }
@@ -218,7 +241,8 @@ Mesh SculptSceneChunks::materialize(uint64_t object,LocalSurfaceCache::Cancel ca
     mesh.normals[v]=view->placed_normal(mesh.normals[v]);
   }
   if(view->reflected())for(size_t c=0;c<mesh.indices.size();c+=3) {
-    if((c&255)==0)stop(cancel);std::swap(mesh.indices[c+1],mesh.indices[c+2]);
+    if((c&255)==0)stop(cancel);
+    std::swap(mesh.indices[c+1],mesh.indices[c+2]);
   }
   stop(cancel);return mesh;
 }

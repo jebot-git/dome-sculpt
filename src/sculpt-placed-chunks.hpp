@@ -21,6 +21,9 @@ public:
       LocalSurfaceCache::Cancel={});
   const SculptSurfaceChunks::Ptr &geometry() const;
   const SculptPlacedChunksReport &report() const;
+  // Allocation owned by this placement layer, excluding the genuine geometry
+  // owner reported separately by geometry(). Standalone limits remain total.
+  size_t placement_bytes() const;
   const SculptChunkBounds &bounds() const;
   bool has_queries() const;
   SculptPlacedChunk::Ptr find(const SculptSurfaceChunks::Chunk &) const;
