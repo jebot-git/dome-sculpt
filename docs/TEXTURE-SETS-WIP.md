@@ -141,3 +141,28 @@ and corner-colour adapters, retained polygon_sources8/history/recipe closure,
 independent Bake/Clear/resolution transfer and true multi-primitive import/export
 remain required. A fresh matching whole reachable cohort is mandatory after the
 ObjectSurface/private-raster boundary; original project archives are not reused.
+
+
+The first frozen722 fresh optimized CPU gate compiled all231 reachable steps,
+including app/core/support/render/XR and both consumers. It passed model32,
+polygon6 and partition24; the new surface fixture correctly refused its bare
+SourceAuthored constructor before creating any set. The exact original failure
+remains retained. The additive11cf producer now creates genuine initial material
+membership on a new empty actor before constructing independent Strict rasters
+over one detached Mesh. It keeps all original UV/depth/normal/index data and
+never supplies a source-authority flag. Existing layouts and inline ownership
+remain unchanged. A matched two-whole-TU component plus whole consumers excludes
+both old core members; it retained a later Strict same-grid overlap refusal.
+
+Finaldbc907 fixture-only follow-up passes all four direct modes: model32,
+polygon6, partition24 and surface72. The same-grid merge remains an exact
+model/native owner/history rollback negative, with actual subsequent Save/reopen.
+A valid new-set reassignment preserves the same input data while testing cache
+invalidation. Coincident independent-field painting, owning codec/writable
+reopen, material occlusion, owner/stream negatives, tangent boundary splitting,
+reflected picking and the actual Document surface worker pass. All protected
+source/SDK/old/new binary comparisons have no drift. See
+validation/TEXTURE-SETS-INITIAL-OWNER-RELEASE.json. This is scoped CPU component
+evidence; the app was not relaunched with11cf and no SAN/UI/GL/device proof is
+claimed. Active-set workflow and all complex/native/import/export rows remain
+required in the separate continuation.
