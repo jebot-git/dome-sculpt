@@ -83,6 +83,14 @@ public:
                                const std::array<Vec3, 3> &,
                                const std::array<Vec3, 3> &)> &,
       Cancel = {}) const;
+  // Explicit whole-object operation traversal, with original global triangle
+  // order and no materialized Mesh copy. Framing/Cut/transparent draw adapters
+  // must not replace this order with tile order at shared/depth boundaries.
+  void for_each_ordered_triangle(
+      const std::function<void(const Chunk &,size_t,
+                               const std::array<Vec3,3> &,
+                               const std::array<Vec3,3> &)> &,
+      Cancel = {}) const;
   // Explicit O(surface) operation boundary for Cut/export/legacy consumers.
   // Exact repair delegates to the existing authenticated cache materializer.
   // Ordinary chunk flatten preserves its global first-use vertex ordering.

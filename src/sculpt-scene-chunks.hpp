@@ -55,6 +55,9 @@ public:
   const SculptSceneChunkContext &context() const {return context_;}
   size_t retained_bytes() const {return bytes_;}
   const SculptObjectChunks *find(uint64_t) const;
+  // Includes a genuinely captured empty Volume. Such an owner has no draw
+  // item but must not perturb the separate legacy packed-geometry identity.
+  bool captures(uint64_t) const;
   // Selected-object Cut/export boundary. Retains original local indices until
   // the existing exact world placement/reflection policy is applied once.
   Mesh materialize(uint64_t,LocalSurfaceCache::Cancel={}) const;

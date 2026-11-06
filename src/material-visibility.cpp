@@ -284,6 +284,15 @@ struct Visibility {
 struct MaterialSurfaceQuery::Impl {
   SurfaceQuery query;
   std::vector<Visibility> surfaces;
+  uint64_t object_for(uint32_t triangle) const {
+    const size_t corner=size_t(triangle)*3;
+    auto found=std::upper_bound(surfaces.begin(),surfaces.end(),corner,
+        [](size_t value,const Visibility &surface){return value<surface.range.first;});
+    if(found==surfaces.begin())throw std::logic_error("Material hit has no actual owning range");
+    --found;
+    if(corner>=found->range.first+found->range.count)throw std::logic_error("Material hit is outside its actual owning range");
+    return found->range.object;
+  }
   Impl(const Mesh &mesh, std::span<const SurfaceRange> ranges, const std::function<bool()> &cancelled,
        std::span<const std::array<float,4>> colors,bool explicit_colors, std::span<const std::array<float,2>> paint={},bool per_vertex=false)
       : query(mesh, cancelled) {
@@ -315,6 +324,21 @@ MaterialSurfaceQuery::MaterialSurfaceQuery(const Mesh &mesh,std::span<const Surf
  const std::function<bool()> &cancelled,std::span<const std::array<float,4>> colors,PaintVertexCoordinates paint)
     :impl_(std::make_unique<Impl>(mesh,ranges,cancelled,colors,true,paint.values,true)){}
 MaterialSurfaceQuery::~MaterialSurfaceQuery() = default;
+MaterialSurfaceHit MaterialSurfaceQuery::closest_target(Vec3 p,uint64_t object) const {
+  auto hit=object?closest(p,object):closest(p);return {hit,impl_->object_for(hit.triangle),{}};
+}
+std::optional<MaterialSurfaceHit> MaterialSurfaceQuery::nearby_target(Vec3 p,float maximum,double seconds) const {
+  auto hit=nearby(p,maximum,seconds);if(!hit)return {};
+  return MaterialSurfaceHit{*hit,impl_->object_for(hit->triangle),{}};
+}
+std::optional<MaterialSurfaceHit> MaterialSurfaceQuery::raycast_target(Vec3 p,Vec3 d,float maximum,double seconds,uint64_t object) const {
+  auto hit=raycast(p,d,maximum,seconds,object);if(!hit)return {};
+  return MaterialSurfaceHit{*hit,impl_->object_for(hit->triangle),{}};
+}
+std::optional<MaterialSurfaceHit> MaterialSurfaceQuery::raycast_excluding_target(Vec3 p,Vec3 d,float maximum,double seconds,std::span<const uint64_t> excluded) const {
+  auto hit=raycast_excluding(p,d,maximum,seconds,excluded);if(!hit)return {};
+  return MaterialSurfaceHit{*hit,impl_->object_for(hit->triangle),{}};
+}
 SurfaceHit MaterialSurfaceQuery::closest(Vec3 point) const { return impl_->query.closest(point); }
 std::optional<SurfaceHit> MaterialSurfaceQuery::nearby(Vec3 point,float maximum,double seconds) const {
   if(!std::isfinite(maximum)||maximum<=0||!std::isfinite(seconds))throw std::invalid_argument("Invalid direct selection query");

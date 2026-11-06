@@ -5,6 +5,7 @@
 #include <optional>
 #include <span>
 namespace dome {
+namespace detail {struct SculptSurfaceChunk;}
 struct CreatorAppearance;
 struct SurfaceRange;
 struct SourceNativeMaterial;
@@ -15,6 +16,15 @@ SourceNativeMaterial native_source(const CreatorAppearance &);
 float mtoon_factor(float typed, float original, float current);
 struct PaintCornerCoordinates { std::span<const std::array<float,2>> values; };
 struct PaintVertexCoordinates { std::span<const std::array<float,2>> values; };
+// Distinguishes an actual packed triangle from a chunk-local triangle. A
+// caller selecting an object must use object, never manufacture a global
+// packed offset for a separate immutable geometry owner.
+struct MaterialSurfaceHit {
+  SurfaceHit surface;
+  uint64_t object=0;
+  std::shared_ptr<const detail::SculptSurfaceChunk> chunk;
+  bool packed() const {return !chunk;}
+};
 class MaterialSurfaceQuery {
   struct Impl;
   std::unique_ptr<Impl> impl_;
@@ -44,5 +54,11 @@ public:
   // Excluded objects are a captured visibility/edit policy, never an alpha override.
   std::optional<SurfaceHit> raycast_excluding(Vec3 origin, Vec3 direction, float maximum,
                                     double seconds, std::span<const uint64_t> excluded) const;
+  MaterialSurfaceHit closest_target(Vec3,uint64_t only_object=0) const;
+  std::optional<MaterialSurfaceHit> nearby_target(Vec3,float maximum,double seconds=0) const;
+  std::optional<MaterialSurfaceHit> raycast_target(Vec3,Vec3,float maximum=100,
+                                                double seconds=0,uint64_t only_object=0) const;
+  std::optional<MaterialSurfaceHit> raycast_excluding_target(Vec3,Vec3,float maximum,
+                                                double seconds,std::span<const uint64_t>) const;
 };
 } // namespace dome

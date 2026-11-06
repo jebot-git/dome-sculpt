@@ -56,6 +56,11 @@ const SculptObjectChunks *SculptSceneChunks::find(uint64_t object) const {
   auto i=std::find_if(objects_.begin(),objects_.end(),[&](const auto &o){return o.object==object;});
   return i==objects_.end()?nullptr:&*i;
 }
+bool SculptSceneChunks::captures(uint64_t object) const {
+  for(const auto &cache:caches_)if(cache.object==object)
+    return cache.geometry->representation()==SculptSurfaceChunks::Representation::Chunks;
+  return false;
+}
 SculptScenePreview SculptSceneChunks::capture(const Scene &scene,SculptSceneChunkContext context,
     const Ptr &before,SculptSceneChunkLimits limits,LocalSurfaceCache::Cancel cancel) {
   stop(cancel);

@@ -948,8 +948,8 @@ std::optional<Vec3> Document::raycast(Vec3 p, Vec3 d, double material_time) cons
   if(!state_.retopology && scene_.has_affine_placement(scene_.active().id)) {
     auto snapshot=mesh_.load();
     if(!object_editable_locked(scene_.active().id)||snapshot->generation!=state_.generation||snapshot->revision!=state_.revision||!snapshot->picking)return {};
-    auto hit=snapshot->picking->raycast(p,d,10,material_time,scene_.active().id);
-    return hit?std::optional<Vec3>(hit->position):std::nullopt;
+    auto hit=snapshot->picking->raycast_target(p,d,10,material_time,scene_.active().id);
+    return hit?std::optional<Vec3>(hit->surface.position):std::nullopt;
   }
   if (state_.weights.enabled) {
     auto mesh = mesh_.load();
@@ -958,11 +958,14 @@ std::optional<Vec3> Document::raycast(Vec3 p, Vec3 d, double material_time) cons
     auto delta=held?ob::compose(object_world_transform_locked(state_.held_object),ob::inverse(scene_.world_transform(state_.held_object))):CanvasTransform{};
     auto origin=held?world_to_model(delta,p):p;
     auto direction=held?vec(ob::rotate(ob::conjugate(delta.orientation),obv(d))):d;
-    auto hit = mesh->picking->raycast(origin, direction, held?20/delta.scale:20, material_time,(held||state_.isolate_held)?state_.held_object:0);
+    auto hit = mesh->picking->raycast_target(origin, direction, held?20/delta.scale:20, material_time,(held||state_.isolate_held)?state_.held_object:0);
     if (!hit) return {};
-    if(held)hit->position=vec(ob::transform(delta,obv(hit->position)));
-    auto vertex = mesh->mesh.indices.at(size_t(hit->triangle) * 3);
-    return mesh->selected_weights.at(vertex) >= 0 ? std::optional<Vec3>(hit->position) : std::nullopt;
+    // A separate ordinary Volume is an unselected occluder. It has no packed
+    // weight vertex and cannot be mapped into a different object's namespace.
+    if(!hit->packed())return {};
+    if(held)hit->surface.position=vec(ob::transform(delta,obv(hit->surface.position)));
+    auto vertex = mesh->mesh.indices.at(size_t(hit->surface.triangle) * 3);
+    return mesh->selected_weights.at(vertex) >= 0 ? std::optional<Vec3>(hit->surface.position) : std::nullopt;
   }
   const auto &active=scene_.active();
   if(!state_.retopology && active.mesh_active && active.polygon && active.polygon->active && active.polygon->colors) {
@@ -972,9 +975,9 @@ std::optional<Vec3> Document::raycast(Vec3 p, Vec3 d, double material_time) cons
     auto delta=held?ob::compose(object_world_transform_locked(active.id),ob::inverse(scene_.world_transform(active.id))):CanvasTransform{};
     auto origin=held?world_to_model(delta,p):p;
     auto direction=held?vec(ob::rotate(ob::conjugate(delta.orientation),obv(d))):d;
-    auto hit=mesh->picking->raycast(origin,direction,held?20/delta.scale:20,material_time,active.id);
+    auto hit=mesh->picking->raycast_target(origin,direction,held?20/delta.scale:20,material_time,active.id);
     if(!hit)return {};
-    return held?std::optional<Vec3>(vec(ob::transform(delta,obv(hit->position)))):std::optional<Vec3>(hit->position);
+    return held?std::optional<Vec3>(vec(ob::transform(delta,obv(hit->surface.position)))):std::optional<Vec3>(hit->surface.position);
   }
   auto t = state_.retopology ? state_.retopology->transform
                             : object_world_transform_locked(scene_.active().id);
@@ -1010,12 +1013,12 @@ Vec3 Document::gradient(Vec3 p) const {
     auto snapshot=mesh_.load();
     if(snapshot->generation!=state_.generation||snapshot->revision!=state_.revision||!snapshot->picking)
       throw std::logic_error("Wait for the current affine surface before querying its normal");
-    return snapshot->picking->closest(p,scene_.active().id).normal;
+    return snapshot->picking->closest_target(p,scene_.active().id).surface.normal;
   }
   if (state_.weights.enabled) {
     auto mesh = mesh_.load();
     if (mesh->generation == state_.generation && mesh->revision == state_.revision && mesh->picking)
-      return mesh->picking->closest(p).normal;
+      return mesh->picking->closest_target(p).surface.normal;
   }
   auto t = object_world_transform_locked(scene_.active().id);
   return vec(

@@ -3,6 +3,7 @@
 #include "dome/polygon-scene.hpp"
 #include "cut-color.hpp"
 #include "document-authority.hpp"
+#include "sculpt-scene-chunks.hpp"
 namespace dome {
 namespace {
 bool same(const CutSettings &a,const CutSettings &b){
@@ -14,6 +15,32 @@ bool same(const CutSettings &a,const CutSettings &b){
          a.cap_material.alpha_cutoff==b.cap_material.alpha_cutoff&&a.cap_material.unlit==b.cap_material.unlit;
 }
 std::shared_ptr<const BakeSource> source_mesh(const MeshSnapshot &base,uint64_t object,const std::function<bool()> &cancelled){
+  if(base.sculpt_chunks)if(const auto *view=base.sculpt_chunks->find(object)) {
+    const auto count=view->geometry->report().indices;
+    if(!count)throw std::logic_error("The cut source has no displayed surface");
+    if(count>2'000'000)throw std::length_error("The cut source range exceeds its bounded surface");
+    auto source=std::make_shared<BakeSource>();source->materials[0].material=view->material;
+    auto &mesh=source->mesh;
+    mesh.positions.reserve(count);mesh.normals.reserve(count);mesh.uv.reserve(count);mesh.indices.reserve(count);
+    if(!base.source_colors.empty())source->colors.reserve(count);
+    // Expand the actual selected owner directly into the same world-space
+    // triangle soup as the old packed adapter. No whole-scene flatten and no
+    // intermediate full selected Mesh are needed by a Cut worker.
+    view->geometry->for_each_ordered_triangle([&](const auto &,size_t,const auto &points,const auto &normals){
+      if(cancelled&&cancelled())throw std::runtime_error("Plane cutting cancelled");
+      for(size_t c=0;c<3;++c) {
+        const auto corner=view->reflected()&&c?3-c:c;
+        mesh.indices.push_back(uint32_t(mesh.positions.size()));
+        mesh.positions.push_back(view->placed_position(points[corner]));
+        mesh.normals.push_back(view->placed_normal(normals[corner]));mesh.uv.push_back({0,0});
+        // Match the existing packed stream's identity padding when another
+        // object actually owns artist colours; this grants no colour domain
+        // to the generated Volume surface.
+        if(!base.source_colors.empty())source->colors.push_back({1,1,1,1});
+      }
+    },cancelled);
+    mesh.validate();return source;
+  }
   auto range=std::find_if(base.ranges.begin(),base.ranges.end(),[&](auto &r){return r.object==object;});
   if(range==base.ranges.end()||!range->count)throw std::logic_error("The cut source has no displayed surface");
   if(range->first>base.mesh.indices.size()||range->count>base.mesh.indices.size()-range->first||range->count>2'000'000)

@@ -599,6 +599,29 @@ void SculptSurfaceChunks::for_each_triangle(
     }
   },cancel);w.stop();
 }
+void SculptSurfaceChunks::for_each_ordered_triangle(
+    const std::function<void(const Chunk &,size_t,const std::array<Vec3,3> &,const std::array<Vec3,3> &)> &fn,
+    Cancel cancel) const {
+  if(representation()!=Representation::Chunks)throw std::logic_error("Exact repair requires legacy surface traversal");
+  Work w{state_->limits,std::move(cancel)};w.stop();w.charge(state_->report.retained_bytes);
+  struct Cursor {Chunk chunk;size_t triangle;};
+  auto later=[](const Cursor &a,const Cursor &b){return a.chunk->triangles[a.triangle]>b.chunk->triangles[b.triangle];};
+  w.charge(Chunks::n(state_->chunks.root),sizeof(Cursor));
+  std::vector<Cursor> storage;storage.reserve(Chunks::n(state_->chunks.root));
+  std::priority_queue<Cursor,std::vector<Cursor>,decltype(later)> queue(later,std::move(storage));
+  state_->chunks.visit([&](const Int3 &,const Chunk &c){queue.push({c,0});},w);
+  while(!queue.empty()) {
+    w.tick();auto cursor=queue.top();queue.pop();
+    std::array<Vec3,3> points,normals;
+    for(size_t k=0;k<3;++k) {
+      const auto vertex=cursor.chunk->mesh.indices.at(3*cursor.triangle+k);
+      points[k]=cursor.chunk->mesh.positions.at(vertex);normals[k]=cursor.chunk->mesh.normals.at(vertex);
+    }
+    fn(cursor.chunk,cursor.triangle,points,normals);
+    if(++cursor.triangle<cursor.chunk->triangles.size())queue.push(std::move(cursor));
+  }
+  w.stop();
+}
 Mesh SculptSurfaceChunks::materialize(Cancel cancel) const {
   return materialize(state_->limits.working_bytes,std::move(cancel));
 }

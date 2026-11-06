@@ -201,16 +201,15 @@ bool Document::process_object_selection_locked(const SpatialFrame &f){
     auto snapshot=mesh_.load();
     if(!snapshot->picking||snapshot->generation!=state_.generation||snapshot->revision!=state_.revision)continue;
     const auto origin=world_to_model(state_.canvas,{h.tracked.grip.position.x,h.tracked.grip.position.y,h.tracked.grip.position.z});
-    auto hit=snapshot->picking->nearby(origin,.04f/state_.canvas.scale,f.time);
+    auto hit=snapshot->picking->nearby_target(origin,.04f/state_.canvas.scale,f.time);
     if(!hit&&h.tracked.aimValid){
       const auto &aim=h.tracked.aim;auto from=world_to_model(state_.canvas,{aim.position.x,aim.position.y,aim.position.z});
       auto d=ob::rotate(ob::conjugate(state_.canvas.orientation),ob::rotate(aim.orientation,{0,0,-1}));
-      hit=snapshot->picking->raycast(from,{d.x,d.y,d.z},5/state_.canvas.scale,f.time);
+      hit=snapshot->picking->raycast_target(from,{d.x,d.y,d.z},5/state_.canvas.scale,f.time);
     }
     if(hit){
-      const size_t corner=size_t(hit->triangle)*3;
-      for(const auto &range:snapshot->ranges)if(corner>=range.first&&corner-range.first<range.count){state_.selection_hover[i]=range.object;break;}
-      state_.selection_hit[i]=hit->position;
+      state_.selection_hover[i]=hit->object;
+      state_.selection_hit[i]=hit->surface.position;
     }
     if(pressed&&selection_ready_locked()){
       if(auto id=state_.selection_hover[i])select_objects_locked(std::span<const uint64_t>(&id,1),additive?ObjectSelection::Toggle:ObjectSelection::Replace);
