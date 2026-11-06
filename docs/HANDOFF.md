@@ -1,4 +1,22 @@
 
+## Remaining five owning39 native consumers closed — 2026-11-06
+
+All five originally planned downstream consumers now pass on the same actual
+fresh e754 ABI cohort with the complete0ae Archive override: node codec56,
+current Paint6 byte/FLOAT16408, combined affine polygon/retopology248, canonical37
+key controls29 and emission package4 contracts28. Each fixture TU is compiled
+whole at O3/NDEBUG; every link explicitly excludes the old Archive member. All241
+prior binary inputs, tracked sources and observed ELF maps remain unchanged.
+The292-control native authoring closure remains separately pinned. Read
+validation/POLYGON-SURFACE-OWNING39-NATIVE.json for both scopes.
+
+Root approved a304MiB phase cap with the complete64MiB serial-link prospective
+reserve, unchanged1536MiB cumulative bound and20GiB+192MiB global free floor.
+Actual phase207228928 and cumulative1275940864 bytes stay inside those limits.
+No extra archival was needed. Actual renderer/shader, SAN, FLTK/OpenXR, device,
+repeated edits, broader topology/source and portable export remain required.
+
+
 ## Initial owning polygon-field native workflow qualified — 2026-11-06
 
 Source643dec72 now passes292 actual native controls across eight N-only/canonical,

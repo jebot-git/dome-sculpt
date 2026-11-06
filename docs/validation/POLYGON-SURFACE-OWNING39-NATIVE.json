@@ -68,11 +68,36 @@
     "sha256": "dabac159d344ef714d729783ca74ee206e748972bede7bfad17e18083369b711"
   },
   "remaining": [
-    "five original codec/paint/legacy consumers not yet built/executed against current fresh cohort",
     "shader sampler reuse and actual GL frames/mixed materials",
     "SAN/desktop/OpenXR/device qualification",
     "repeated edits and broad topology/source-aware domains",
     "portable GLB/VRM field adapters"
   ],
-  "limits": "CPU native component/application-provider evidence only; no current renderer execution, no hardware/headset claim; earlier failed invocations remain failed and preserved"
+  "limits": "CPU native component/application-provider evidence only; no current renderer execution, no hardware/headset claim; earlier failed invocations remain failed and preserved",
+  "downstream_consumers": {
+    "status": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/owning37-main-9dd/artifacts/polygon-transfer39-owning-release/remaining-five-v6/status.json",
+      "sha256": "29bf6d977e19597af254b63331445600a9165386fcb647f8639b93f9b808bd2f"
+    },
+    "plan": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/owning37-main-9dd/artifacts/polygon-transfer39-owning-release/remaining-five-v6/plan.json",
+      "sha256": "578a185f83cee7d28387f6d0f1ceeb8e6cb347baed9322afa3439cb7131b0ed3"
+    },
+    "counts": {
+      "node_codec": 56,
+      "current_paint_legacy_bytes_and_FLOAT": 16408,
+      "combined_affine_polygon_retopology": 248,
+      "canonical37_key_controls": 29,
+      "canonical37_emission_contracts": 28
+    },
+    "five_complete_fixture_TUs": true,
+    "same_whole_Archive_override": true,
+    "old_archive_member_excluded_for_every_link": true,
+    "prior_inputs_unchanged": 241,
+    "source_and_actual_ELF_maps_unchanged": true,
+    "phase_bytes": 207228928,
+    "cumulative_bytes": 1275940864,
+    "phase_cap_approved": 318767104,
+    "serial_link_prospective": 67108864
+  }
 }
