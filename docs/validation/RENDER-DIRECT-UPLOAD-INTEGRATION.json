@@ -1,0 +1,54 @@
+{
+  "qualified_candidate": "9f89fce729772d914fa83406d582d7ec8c5a19fa",
+  "main_parent": "537c98b20f4bec57e89366e3772761855a48c3a5",
+  "original_current_receipt_sha256": "5c954e88a4e8c48a875c6c165f0638fd0adcd076afdde57eab1cd70e3b838629",
+  "source_parity_paths": [
+    "CMakeLists.txt",
+    "src/render.cpp",
+    "tests/render-direct-upload.cpp"
+  ],
+  "source_hashes": {
+    "CMakeLists.txt": "a07415350fe69970e10e3fc6c55d41c871062597b7219e350583d0f37215f0be",
+    "src/render.cpp": "87ee8e34971c2fb498c99d7799391db81a8d32aa833850a6f20c8690f1cdd6fe",
+    "tests/render-direct-upload.cpp": "ad17e682fac61d03eebd7171e7520eacad45dcbe65f960e9c404b0aed425bac6"
+  },
+  "root_verified": {
+    "headers": 98,
+    "source_receipt_pins": 6,
+    "complete_admitted_input_query_sources": 9,
+    "produced_provider_test_objects": 20,
+    "executed_test_logs": 14,
+    "byte_exact_R_S_frames_native_pairs": 58,
+    "process_mapping_records": 14,
+    "archive_restore_ledgers_archives_tools": 8,
+    "unique_rehashed_files": 501
+  },
+  "qualification": {
+    "direct_upload": 73,
+    "buffers": 24,
+    "materials": 81,
+    "normal_frames": 47,
+    "ghosts": 36,
+    "full_render": "All unchanged predicates passed; exact full log and30 frames recorded",
+    "current_native_input": 13442,
+    "ordinary_app": {
+      "normal": 15,
+      "unzoomed_compact": 16,
+      "software_loader": 27,
+      "total": 58
+    }
+  },
+  "scope": "Fresh whole renderer/reference, direct production app.cpp/XR consumers and selected whole tests on exact admitted9 input/query +mode5/poly/other frontend/SDK supports. Transparent matching component/ordinary app relink; no fresh whole core/ALL or new GPU/HMD claim.",
+  "CMake_registration": {
+    "name": "render-direct-upload",
+    "mode": "direct",
+    "matching_R_S_consumer_executed": true,
+    "fresh_CMake_configuration_exit": 0,
+    "CTest_runner_or_ALL_claim": false
+  },
+  "review_correction": "Initial root file enumerator expected a directory named images and counted28; actual test writes30 images-*.ppm beside it. Corrected enumeration rehashes all58. No product or test bytes changed.",
+  "new_hardware_claim": false,
+  "installation": false,
+  "full_goal": "active and incomplete",
+  "source_parity_drift": []
+}

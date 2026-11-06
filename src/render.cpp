@@ -728,69 +728,65 @@ void SurfaceRenderer::draw(std::shared_ptr<const MeshSnapshot> mesh,
     try{textures_->prepare(*mesh,!reuse);}catch(...){textures_->clear(true);cached_.reset();count_=0;throw;}
     glBindVertexArray(vao_);
     if(!reuse) {
-      struct Vertex {
-        Vec3 p,n;
-        std::array<float,2> uv,uv1;
-        std::array<float,4> tangent;
+      struct Stream {
+        GLuint attribute;
+        GLint components;
+        GLsizei stride;
+        size_t offset,bytes;
+        const void *data;
+        bool enabled;
       };
-      struct FrameVertex {Vec3 source_n,canonical_n;std::array<float,4> source_t;};
-      const bool has_frames=!mesh->source_normals.empty() || !mesh->canonical_normals.empty() || !mesh->source_tangents.empty();
-      const size_t vertex_bytes=render_detail::buffer_bytes(count,sizeof(Vertex));
-      const size_t frame_bytes=has_frames?render_detail::buffer_bytes(count,sizeof(FrameVertex)):0;
-      const size_t color_bytes=render_detail::buffer_bytes(mesh->source_colors.size(),sizeof(std::array<float,4>));
-      const size_t color_offset=render_detail::buffer_sum(vertex_bytes,frame_bytes);
-      const size_t normal_offset=render_detail::buffer_sum(color_offset,color_bytes);
-      if(!mesh->normal_coordinates.empty()&&mesh->normal_coordinates.size()!=count)throw std::invalid_argument("Retained normal coordinate vertex count differs");
-      const size_t normal_bytes=render_detail::buffer_bytes(mesh->normal_coordinates.size(),sizeof(std::array<float,4>));
-      const size_t paint_offset=render_detail::buffer_sum(normal_offset,normal_bytes);
-      const size_t paint_bytes=render_detail::buffer_bytes(textures_->paint_coordinates.size(),sizeof(std::array<float,2>));
-      std::array<size_t,3> extra_offsets{},extra_bytes{};
-      size_t geometry_bytes=render_detail::buffer_sum(paint_offset,paint_bytes);
-      for(size_t block=0;block<3;++block){const auto &values=textures_->extra_uv[block];if(!values.empty()&&values.size()!=count)throw std::invalid_argument("Extra source UV packed count differs");extra_offsets[block]=geometry_bytes;extra_bytes[block]=render_detail::buffer_bytes(values.size(),sizeof(std::array<float,4>));geometry_bytes=render_detail::buffer_sum(geometry_bytes,extra_bytes[block]);}
+      std::array<Stream,14> streams{};
+      size_t stream_count=0,geometry_bytes=0;
+      auto add=[&](GLuint attribute,GLint components,const auto &values) {
+        if(stream_count==streams.size())throw std::length_error("Too many surface attribute streams");
+        if(!values.empty()&&values.size()!=count)
+          throw std::invalid_argument("Surface attribute stream differs from vertex count");
+        const size_t offset=geometry_bytes;
+        const size_t bytes=render_detail::buffer_bytes(values.size(),sizeof(values[0]));
+        geometry_bytes=render_detail::buffer_sum(geometry_bytes,bytes);
+        streams[stream_count++]={attribute,components,GLsizei(sizeof(values[0])),offset,bytes,values.data(),!values.empty()};
+        return offset;
+      };
+      auto alias=[&](GLuint attribute,GLint components,size_t offset) {
+        if(stream_count==streams.size())throw std::length_error("Too many surface attribute streams");
+        streams[stream_count++]={attribute,components,GLsizei(sizeof(Vec3)),offset,0,nullptr,count!=0};
+      };
+      add(0,3,mesh->mesh.positions);
+      const auto normal_offset=add(1,3,mesh->mesh.normals);
+      add(2,2,textures_->original_uv0.empty()?mesh->mesh.uv:textures_->original_uv0);
+      add(3,2,textures_->uv1);
+      add(5,4,mesh->tangents);
+      const bool has_frames=!mesh->source_normals.empty()||!mesh->canonical_normals.empty()||!mesh->source_tangents.empty();
+      if(has_frames&&mesh->source_normals.empty())alias(7,3,normal_offset);
+      else add(7,3,mesh->source_normals);
+      add(8,4,mesh->source_tangents);
+      if(has_frames&&mesh->canonical_normals.empty())alias(9,3,normal_offset);
+      else add(9,3,mesh->canonical_normals);
+      add(10,4,mesh->source_colors);
+      add(11,4,mesh->normal_coordinates);
+      add(12,2,textures_->paint_coordinates);
+      for(size_t block=0;block<3;++block)add(GLuint(13+block),4,textures_->extra_uv[block]);
       const size_t index_bytes=render_detail::buffer_bytes(mesh->mesh.indices.size(),sizeof(uint32_t));
-      std::vector<Vertex> vertices;
-      vertices.reserve(count);
-      for(size_t i=0;i<count;++i)
-        vertices.push_back({mesh->mesh.positions[i],mesh->mesh.normals[i],
-          textures_->original_uv0.empty()?(mesh->mesh.uv.empty()?std::array<float,2>{}:mesh->mesh.uv[i]):textures_->original_uv0[i],
-          textures_->uv1.empty()?std::array<float,2>{}:textures_->uv1[i],
-          mesh->tangents.empty()?std::array<float,4>{1,0,0,1}:mesh->tangents[i]});
+      // Upload the immutable source arrays directly. No mesh-sized interleaved
+      // Vertex/FrameVertex copies or repeated default attribute arrays exist.
       glBindBuffer(GL_ARRAY_BUFFER,vertices_);
-      if(has_frames || color_bytes || normal_bytes || paint_bytes || std::any_of(extra_bytes.begin(),extra_bytes.end(),[](auto n){return n!=0;})) {
-        // Optional direction block shares the static geometry lifetime without
-        // increasing ordinary sculpt vertices or concatenating host buffers.
-        std::vector<FrameVertex> frames;if(has_frames)frames.reserve(count);
-        if(has_frames)for(size_t i=0;i<count;++i)frames.push_back({
-          mesh->source_normals.empty()?mesh->mesh.normals[i]:mesh->source_normals[i],
-          mesh->canonical_normals.empty()?mesh->mesh.normals[i]:mesh->canonical_normals[i],
-          mesh->source_tangents.empty()?std::array<float,4>{1,0,0,1}:mesh->source_tangents[i]});
-        glBufferData(GL_ARRAY_BUFFER,GLsizeiptr(geometry_bytes),nullptr,GL_STATIC_DRAW);
-        check_surface_buffer("Surface geometry buffer allocation failed");
-        if(vertex_bytes)glBufferSubData(GL_ARRAY_BUFFER,0,GLsizeiptr(vertex_bytes),vertices.data());
-        if(frame_bytes)glBufferSubData(GL_ARRAY_BUFFER,GLintptr(vertex_bytes),GLsizeiptr(frame_bytes),frames.data());
-        if(color_bytes)glBufferSubData(GL_ARRAY_BUFFER,GLintptr(color_offset),GLsizeiptr(color_bytes),mesh->source_colors.data());
-        if(normal_bytes)glBufferSubData(GL_ARRAY_BUFFER,GLintptr(normal_offset),GLsizeiptr(normal_bytes),mesh->normal_coordinates.data());
-        for(size_t block=0;block<3;++block)if(extra_bytes[block])glBufferSubData(GL_ARRAY_BUFFER,GLintptr(extra_offsets[block]),GLsizeiptr(extra_bytes[block]),textures_->extra_uv[block].data());
-        if(paint_bytes)glBufferSubData(GL_ARRAY_BUFFER,GLintptr(paint_offset),GLsizeiptr(paint_bytes),textures_->paint_coordinates.data());
-      } else glBufferData(GL_ARRAY_BUFFER,GLsizeiptr(vertex_bytes),vertices.data(),GL_STATIC_DRAW);
+      glBufferData(GL_ARRAY_BUFFER,GLsizeiptr(geometry_bytes),nullptr,GL_STATIC_DRAW);
+      check_surface_buffer("Surface geometry buffer allocation failed");
+      const auto active_streams=std::span(streams).first(stream_count);
+      for(const auto &stream:active_streams)if(stream.bytes)
+        glBufferSubData(GL_ARRAY_BUFFER,GLintptr(stream.offset),GLsizeiptr(stream.bytes),stream.data);
+      for(const auto &stream:active_streams) {
+        if(stream.attribute>=GLuint(textures_->vertex_attributes)) {
+          if(stream.enabled)throw std::runtime_error("Surface attribute exceeds the actual vertex attribute limit");
+          continue;
+        }
+        if(stream.enabled) {
+          glVertexAttribPointer(stream.attribute,stream.components,GL_FLOAT,GL_FALSE,stream.stride,reinterpret_cast<void*>(stream.offset));
+          glEnableVertexAttribArray(stream.attribute);
+        }else glDisableVertexAttribArray(stream.attribute);
+      }
       check_surface_buffer("Surface vertex buffer upload failed");
-      glVertexAttribPointer(0,3,GL_FLOAT,GL_FALSE,sizeof(Vertex),nullptr);glEnableVertexAttribArray(0);
-      glVertexAttribPointer(1,3,GL_FLOAT,GL_FALSE,sizeof(Vertex),reinterpret_cast<void*>(offsetof(Vertex,n)));glEnableVertexAttribArray(1);
-      glVertexAttribPointer(2,2,GL_FLOAT,GL_FALSE,sizeof(Vertex),reinterpret_cast<void*>(offsetof(Vertex,uv)));glEnableVertexAttribArray(2);
-      glVertexAttribPointer(3,2,GL_FLOAT,GL_FALSE,sizeof(Vertex),reinterpret_cast<void*>(offsetof(Vertex,uv1)));glEnableVertexAttribArray(3);
-      glVertexAttribPointer(5,4,GL_FLOAT,GL_FALSE,sizeof(Vertex),reinterpret_cast<void*>(offsetof(Vertex,tangent)));glEnableVertexAttribArray(5);
-      if(has_frames) {
-        glVertexAttribPointer(7,3,GL_FLOAT,GL_FALSE,sizeof(FrameVertex),reinterpret_cast<void*>(vertex_bytes+offsetof(FrameVertex,source_n)));glEnableVertexAttribArray(7);
-        glVertexAttribPointer(8,4,GL_FLOAT,GL_FALSE,sizeof(FrameVertex),reinterpret_cast<void*>(vertex_bytes+offsetof(FrameVertex,source_t)));glEnableVertexAttribArray(8);
-        glVertexAttribPointer(9,3,GL_FLOAT,GL_FALSE,sizeof(FrameVertex),reinterpret_cast<void*>(vertex_bytes+offsetof(FrameVertex,canonical_n)));glEnableVertexAttribArray(9);
-      } else for(GLuint attribute:{7,8,9})glDisableVertexAttribArray(attribute);
-      if(color_bytes){glVertexAttribPointer(10,4,GL_FLOAT,GL_FALSE,sizeof(std::array<float,4>),reinterpret_cast<void*>(color_offset));glEnableVertexAttribArray(10);}
-      else glDisableVertexAttribArray(10);
-      if(normal_bytes){glVertexAttribPointer(11,4,GL_FLOAT,GL_FALSE,sizeof(std::array<float,4>),reinterpret_cast<void*>(normal_offset));glEnableVertexAttribArray(11);}
-      else glDisableVertexAttribArray(11);
-      for(size_t block=0;block<3;++block){if(extra_bytes[block]){glVertexAttribPointer(GLuint(13+block),4,GL_FLOAT,GL_FALSE,sizeof(std::array<float,4>),reinterpret_cast<void*>(extra_offsets[block]));glEnableVertexAttribArray(GLuint(13+block));}else glDisableVertexAttribArray(GLuint(13+block));}
-      if(paint_bytes){glVertexAttribPointer(12,2,GL_FLOAT,GL_FALSE,sizeof(std::array<float,2>),reinterpret_cast<void*>(paint_offset));glEnableVertexAttribArray(12);}
-      else if(textures_->vertex_attributes>=13)glDisableVertexAttribArray(12);
       glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,indices_);
       glBufferData(GL_ELEMENT_ARRAY_BUFFER,GLsizeiptr(index_bytes),mesh->mesh.indices.data(),GL_STATIC_DRAW);
       check_surface_buffer("Surface index buffer upload failed");
@@ -820,6 +816,10 @@ void SurfaceRenderer::draw(std::shared_ptr<const MeshSnapshot> mesh,
   // them for every draw, including stereo reuse and interleaved renderers.
   if(cached_->selected_weights.empty())glVertexAttrib1f(4,-1);
   if(cached_->sculpt_masks.empty())glVertexAttrib1f(6,-1);
+  if(textures_->original_uv0.empty()&&cached_->mesh.uv.empty())glVertexAttrib2f(2,0,0);
+  if(textures_->uv1.empty())glVertexAttrib2f(3,0,0);
+  if(cached_->tangents.empty())glVertexAttrib4f(5,1,0,0,1);
+  if(cached_->source_tangents.empty())glVertexAttrib4f(8,1,0,0,1);
   if(cached_->source_colors.empty())glVertexAttrib4f(10,1,1,1,1);
   if(cached_->normal_coordinates.empty())glVertexAttrib4f(11,0,0,0,0);
   if(cached_->source_normals.empty() && cached_->canonical_normals.empty() && cached_->source_tangents.empty()) {
