@@ -3,6 +3,7 @@
 #include "dome/material-visibility.hpp"
 #include "dome/polygon-source.hpp"
 #include "dome/texture-sets.hpp"
+#include "polygon-conversion.hpp"
 #include "polygon-surface-owner.hpp"
 #include "polygon-surface-preview.hpp"
 #include <nlohmann/json.hpp>
