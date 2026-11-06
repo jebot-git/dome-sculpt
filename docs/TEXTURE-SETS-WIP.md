@@ -237,3 +237,38 @@ new object/link/app/consumer/SAN/UI/device completion is claimed. Read
 validation/TEXTURE-SETS-MULTIPRIMITIVE-SOURCE.json. VRM semantic metadata,
 original source/HDR material compilation, multi-primitive import, deformed normal
 quality and all earlier production/workflow rows remain required.
+
+
+## Detached retained material-field source preparation — 2026-11-06
+
+The separate e412 child now prepares real39 source fields without publishing an
+unfinished Scene40 interpretation. A sealed field source retains the genuine
+original Paint/material/before-normal/recipe owners and an independently minted
+actual logical face/corner membership. Every member retains the same Mesh owner.
+The editable Paint uses its real subset raster. A private COW read view carries
+current member values through the original proved39 raster/attachment, so it
+passes the existing39 owner and packet factory without impersonating that owner
+with the new membership attachment. Real before attributes are prepared once
+and shared by the fields; paint/normal coordinates remain independent.
+
+The source fixture uses a genuine native FLOAT-painted source and accepted Flip,
+then actual two-field preparation, COW editing, original39 preview production,
+logical face/corner/barycentric identities and reflected/sheared normal checks.
+It includes foreign control-block/domain/material, cancellation and prospective
+resource counters. **It has not executed.** Eight whole production/fixture TUs
+pass syntax with source hashes unchanged. No object/link/runtime/UI/GL/XR/SAN or
+device result is claimed. Read validation/TEXTURE-SETS-FIELD-SOURCE.json.
+
+A discovered same-address membership-owner gap is closed by a weak self-owner
+in TextureSetFaceDomain, initialized by both native and archive factories and
+checked by collection/raster/source/graph consumers. This changes its layout; a
+fresh whole owning cohort is mandatory. Old qualified binaries stay immutable.
+The source ledger now follows real polygon_surface_transfer before roots.
+
+The private preparation is not persistent same-object39+40 support. Collection
+field descriptors, nonduplicating source-backed Paint7 envelopes, PolygonSources8
+source/history transport, actual packed source/normal corner streams and GPU
+ranges/query/export/native-publication adapters remain unfinished. Existing
+Scene/codec/render/query/export guards remain intact. Current deformed inputs,
+multiple-material before models and unsupported original/prepared roles retain
+explicit diagnostics. No Scene41 or version-only permission is introduced.

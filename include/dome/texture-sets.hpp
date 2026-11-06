@@ -41,12 +41,14 @@ public:
   std::span<const uint32_t> triangles()const noexcept{return triangles_;}
   bool contains(uint32_t triangle)const noexcept;
   bool matches(const std::shared_ptr<const Mesh>&)const noexcept;
+  void authenticate_owner(const std::shared_ptr<const TextureSetFaceDomain>&)const;
 private:
   friend struct detail::TextureSetAccess;
   friend class detail::TextureSetArchive;
   friend class TextureSetCollection;
   TextureSetFaceDomain()=default;
   TextureSetFaceDomain(const TextureSetFaceDomain&)=default;
+  mutable std::weak_ptr<const TextureSetFaceDomain>self_;
   std::shared_ptr<const TextureSetTopology> topology_;
   std::shared_ptr<const std::vector<TextureSetId>> assignments_;
   std::vector<uint32_t> triangles_;

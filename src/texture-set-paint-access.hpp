@@ -18,6 +18,11 @@ struct TextureSetPaintAccess {
   static size_t initial_raster_bytes(uint32_t);
   static std::shared_ptr<PaintedMesh> empty(std::shared_ptr<const TextureSetFaceDomain>,uint32_t,const TextureSetLimits&);
   static size_t working_bytes(const PaintedMesh&,uint32_t resolution);
+  // Source-backed read view only: actual subset membership and original
+  // raster/attachment are independently authenticated, never inferred by UV.
+  static std::shared_ptr<const PaintedMesh> field_source_view(const PaintedMesh &member,
+      const PaintedMesh &original,const std::shared_ptr<const TextureSetFaceDomain>&,
+      const TextureSetLimits&);
   static std::shared_ptr<PaintedMesh> bind(const PaintedMesh&,
       std::shared_ptr<const TextureSetFaceDomain>,uint32_t resolution,
       const TextureSetLimits&);

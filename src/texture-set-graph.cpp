@@ -1,3 +1,4 @@
+#include "polygon-surface-owner.hpp"
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "texture-set-graph.hpp"
 #include "texture-set-paint-access.hpp"
@@ -27,6 +28,7 @@ struct Ledger {
  }
  void charge(size_t&counter,size_t n,size_t unit){if(unit&&n>(limits.maximum_bytes-counter)/unit)throw std::length_error("Texture-set retained owner bytes exceed bounds");counter+=n*unit;}
  void domain(const std::shared_ptr<const TextureSetFaceDomain>&d){
+  if(d)d->authenticate_owner(d);
   if(!d||!domains.insert(d.get()).second)return;if(++stats.retained_domains>limits.maximum_sets_per_scene)throw std::length_error("Retained texture-set count exceeds the Scene bound");
   charge(stats.membership_bytes,1,sizeof(TextureSetFaceDomain));charge(stats.membership_bytes,d->triangles().size(),sizeof(uint32_t));
   auto&t=d->topology();if(!t||t->triangle_faces().size()>limits.maximum_triangles||t->triangle_corners().size()>limits.maximum_corners)throw std::invalid_argument("Texture-set domain omitted or exceeded its owning topology");
@@ -37,6 +39,7 @@ struct Ledger {
  void key(const std::shared_ptr<const SourceKeyDerivation>&p,size_t depth){if(p){paint(p->before_paint(),depth+1);material(p->before_material(),depth+1);}}
  void uv_origin(const std::shared_ptr<const SourceUvOrigin>&p,size_t depth){if(p)paint(p->paint,depth+1);}
  void material(const std::shared_ptr<const SourceMaterialBindings>&p,size_t depth){node(2,p.get(),depth,[&]{
+  if(p->polygon_surface_transfer)origin(p->polygon_surface_transfer->before(),depth+1);
   uv_origin(p->uv_origin,depth+1);key(p->key_derivation,depth+1);conversion(p->canonical_attributes,depth+1);if(p->canonical_uv)conversion(p->canonical_uv->origin(),depth+1);
   if(p->native_paint_sampling){paint(p->native_paint_sampling->before_paint(),depth+1);material(p->native_paint_sampling->before_material(),depth+1);}
   if(p->native_paint_frames){paint(p->native_paint_frames->before_paint(),depth+1);material(p->native_paint_frames->before_material(),depth+1);uv_origin(p->native_paint_frames->origin(),depth+1);key(p->native_paint_frames->keys(),depth+1);}

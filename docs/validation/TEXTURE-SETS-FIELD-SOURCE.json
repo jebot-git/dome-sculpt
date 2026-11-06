@@ -1,0 +1,49 @@
+{
+  "status": "Source-only actual detached retained material-field preparation; not Scene40 same-object admission",
+  "parent": "e4129237",
+  "source_files": {
+    "CMakeLists.txt": "93c739e4bf49a68c6719e48a765db66546a24c40ab01486e93045202773b115b",
+    "include/dome/texture-sets.hpp": "445fe7a2d8f00233174ef67b1abdd30fdd0f44a223182e6e3af662f1cf3bb29b",
+    "src/paint.cpp": "c7c42341983d1ecfc1fa46fe8c2de1b64bcbbd96d43b601f10317e4d23382433",
+    "src/texture-set-archive.cpp": "fcaeffbe26e91932684accba5b52b9f817e084eb88ae0e456a8af0ada70fa040",
+    "src/texture-set-field-source.cpp": "d12dda68883e12cb7a36dc19c9d4b672b2399bc1e40478cf468a05d170d0b1b1",
+    "src/texture-set-field-source.hpp": "fcf4553ba891ca0616d5b076d5e94527dd3aa868209283e29485e1e2fad79a6c",
+    "src/texture-set-graph.cpp": "12f0504e31eee8e3efc0444ef5661b195cc83241f02571b4a2ebbb9543799a95",
+    "src/texture-set-paint-access.hpp": "ecd44a56abf2ca37ad10dee29f3c842e16b612e63f2e5943ee74cc3bee8a1c98",
+    "src/texture-sets.cpp": "e96e9e4b47eb7eb04d4363af28c351258370fde6506705c49ec48cff66a3b8b2",
+    "tests/texture-set-field-source.cpp": "2407aa9875f05e6ca52bb8112d6fb7b939f2bca8f92a1a1389d1c9a7796a43cd"
+  },
+  "syntax": {
+    "path": "/home/blux/de-xr/dome-sculpt/artifacts/texture-set-fields-e412/artifacts/field-syntax-sealed/status.json",
+    "sha256": "bec0d96570cd73bf211df4fdf49a4c782bf0eb5df63a9d98b72ac9be00abbb2e",
+    "whole_translation_units": 8,
+    "exit": 0,
+    "source_drift": []
+  },
+  "resource": {
+    "source_cap": 134217728,
+    "syntax_cap": 8388608,
+    "source_allocated": 11448320,
+    "syntax_allocated": 561152
+  },
+  "real_source_changes": [
+    "Private immutable field source captures genuine39 original Paint/material/before normal/recipe owners and actual member domain",
+    "Real subset raster remains editable; a separately authenticated COW read view retains original39 raster/attachment and current member values",
+    "Source inputs/cache are prepared once and shared across fields; logical face/corners/barycentrics and independent paint/normal coordinates are checked",
+    "Membership weak-self control blocks reject forged same-address domains; all domain constructors/decoders and existing collection/graph validators participate",
+    "Texture-set source graph now traverses actual polygon_surface_transfer before roots",
+    "Existing original39 preview producer consumes the authenticated source view; no public frontend/format guard is removed"
+  ],
+  "layout_change": "TextureSetFaceDomain appends weak self-owner; every allocating/destroying/accessing provider and consumer needs a fresh matching whole-owning cohort. Earlier binaries are retained and not reused.",
+  "unexecuted": [
+    "dome-sculpt-texture-set-field-source-test: actual native F32/Flip to two independent field sources, COW edit, source packet, exact geometry/normal/barycentric/foreign-owner/cancel/quota controls",
+    "Object/link/native-runtime/GUI/GL/XR/SAN/device qualification"
+  ],
+  "remaining": [
+    "Attach actual field-source descriptors to persistent collections and Scene/source validation",
+    "Nonduplicating per-field source/normal Paint7 codec and actual PolygonSources8 retained collection/history graph",
+    "Real per-field packed corner attributes, GPU ranges and material-aware queries",
+    "Actual typed native/publication leases/history/Save/workflow for source-backed sets",
+    "Per-field role/bake/resolution/UV/export/VRM/source graph adapters; current deformed and multi-material before roots remain guarded"
+  ]
+}
