@@ -10,12 +10,17 @@
 namespace dome::detail {
 class SourcePlacementArchive;
 class PolygonSceneReader;
+class TextureSetArchive;
 // Bounded immutable graph archive. Source IDs are data, never object lookups.
 class PolygonSceneArchive {
 public:
   uint32_t add(std::shared_ptr<const PolygonAuthority>, bool deep = true);
   uint32_t add_origin(std::shared_ptr<const PolygonOrigin>, bool deep = true);
-  uint32_t add_rig_origin(std::shared_ptr<const PolygonOrigin> origin,bool deep=true){direct_rig_origins_=true;return add_origin(std::move(origin),deep);}
+  uint32_t add_rig_origin(std::shared_ptr<const PolygonOrigin> origin,
+                          bool deep = true) {
+    direct_rig_origins_ = true;
+    return add_origin(std::move(origin), deep);
+  }
   const std::shared_ptr<const PolygonAuthority> &at(uint32_t) const;
   const auto &authorities() const { return authorities_; }
   const auto &origins() const { return origins_; }
@@ -24,29 +29,74 @@ public:
   size_t component_entries() const { return entries_; }
   const PolygonColorArchive &color_archive() const { return colors_; }
   nlohmann::json encode(PaintImageArchive &, CreatorAssetArchive &,
-                        SourceMaterialArchive &, SourcePlacementArchive * = nullptr) const;
+                        SourceMaterialArchive &,
+                        SourcePlacementArchive * = nullptr) const;
   nlohmann::json encode(PaintImageArchive &, CreatorAssetArchive &,
-                        SourceMaterialArchive &, SourcePlacementArchive *,PolygonColorArchive *) const;
-  nlohmann::json encode(PaintImageArchive &, CreatorAssetArchive &, SourceMaterialArchive &, SourcePlacementArchive *, PolygonColorArchive *, NormalSamplingArchive *) const;
-  nlohmann::json encode(PaintImageArchive &,CreatorAssetArchive &,SourceMaterialArchive &,SourcePlacementArchive *,PolygonColorArchive *,NormalSamplingArchive *,PaintSamplingArchive *) const;
+                        SourceMaterialArchive &, SourcePlacementArchive *,
+                        PolygonColorArchive *) const;
+  nlohmann::json encode(PaintImageArchive &, CreatorAssetArchive &,
+                        SourceMaterialArchive &, SourcePlacementArchive *,
+                        PolygonColorArchive *, NormalSamplingArchive *) const;
+  nlohmann::json encode(PaintImageArchive &, CreatorAssetArchive &,
+                        SourceMaterialArchive &, SourcePlacementArchive *,
+                        PolygonColorArchive *, NormalSamplingArchive *,
+                        PaintSamplingArchive *) const;
+  nlohmann::json encode(PaintImageArchive &, CreatorAssetArchive &,
+                        SourceMaterialArchive &, SourcePlacementArchive *,
+                        PolygonColorArchive *, NormalSamplingArchive *,
+                        PaintSamplingArchive *, TextureSetArchive *) const;
   static void preflight(const nlohmann::json &, const nlohmann::json &objects);
-  static void preflight(const nlohmann::json &, const nlohmann::json &objects,const nlohmann::json *materials);
-  static void preflight(const nlohmann::json &,const nlohmann::json &objects,const nlohmann::json *materials,const nlohmann::json *canonical_paint);
-  static void preflight(const nlohmann::json &,const nlohmann::json &objects,const nlohmann::json *materials,const nlohmann::json *canonical_paint,const nlohmann::json *polygon_surfaces);
+  static void preflight(const nlohmann::json &, const nlohmann::json &objects,
+                        const nlohmann::json *materials);
+  static void preflight(const nlohmann::json &, const nlohmann::json &objects,
+                        const nlohmann::json *materials,
+                        const nlohmann::json *canonical_paint);
+  static void preflight(const nlohmann::json &, const nlohmann::json &objects,
+                        const nlohmann::json *materials,
+                        const nlohmann::json *canonical_paint,
+                        const nlohmann::json *polygon_surfaces);
+  static void preflight(const nlohmann::json &, const nlohmann::json &,
+                        const nlohmann::json *, const nlohmann::json *,
+                        const nlohmann::json *,
+                        const nlohmann::json *texture_geometry);
   static PolygonSceneArchive decode(const nlohmann::json &,
                                     const PaintImageArchive &,
                                     const CreatorAssetArchive &,
                                     const SourceMaterialArchive &,
                                     const SourcePlacementArchive * = nullptr);
-  static PolygonSceneArchive decode(const nlohmann::json &,
-                                    const PaintImageArchive &,
-                                    const CreatorAssetArchive &,
-                                    const SourceMaterialArchive &,
-                                    const SourcePlacementArchive *,const PolygonColorArchive *);
-  static PolygonSceneArchive decode(const nlohmann::json &, const PaintImageArchive &, const CreatorAssetArchive &, const SourceMaterialArchive &, const SourcePlacementArchive *, const PolygonColorArchive *, const NormalSamplingArchive *);
-  static PolygonSceneArchive decode(const nlohmann::json &,const PaintImageArchive &,const CreatorAssetArchive &,const SourceMaterialArchive &,const SourcePlacementArchive *,const PolygonColorArchive *,const NormalSamplingArchive *,const PaintSamplingArchive *);
-  static PolygonSceneArchive decode(const nlohmann::json &,const PaintImageArchive &,const CreatorAssetArchive &,const SourceMaterialArchive &,const SourcePlacementArchive *,const PolygonColorArchive *,const NormalSamplingArchive *,const PaintSamplingArchive *,const SourcePaintDecodeContext &);
-  static PolygonSceneArchive decode(const nlohmann::json &,const PaintImageArchive &,const CreatorAssetArchive &,const SourceMaterialArchive &,const SourcePlacementArchive *,const PolygonColorArchive *,const NormalSamplingArchive *,const PaintSamplingArchive *,bool physical_emission);
+  static PolygonSceneArchive
+  decode(const nlohmann::json &, const PaintImageArchive &,
+         const CreatorAssetArchive &, const SourceMaterialArchive &,
+         const SourcePlacementArchive *, const PolygonColorArchive *);
+  static PolygonSceneArchive
+  decode(const nlohmann::json &, const PaintImageArchive &,
+         const CreatorAssetArchive &, const SourceMaterialArchive &,
+         const SourcePlacementArchive *, const PolygonColorArchive *,
+         const NormalSamplingArchive *);
+  static PolygonSceneArchive
+  decode(const nlohmann::json &, const PaintImageArchive &,
+         const CreatorAssetArchive &, const SourceMaterialArchive &,
+         const SourcePlacementArchive *, const PolygonColorArchive *,
+         const NormalSamplingArchive *, const PaintSamplingArchive *);
+  static PolygonSceneArchive
+  decode(const nlohmann::json &, const PaintImageArchive &,
+         const CreatorAssetArchive &, const SourceMaterialArchive &,
+         const SourcePlacementArchive *, const PolygonColorArchive *,
+         const NormalSamplingArchive *, const PaintSamplingArchive *,
+         const SourcePaintDecodeContext &);
+  static PolygonSceneArchive
+  decode(const nlohmann::json &, const PaintImageArchive &,
+         const CreatorAssetArchive &, const SourceMaterialArchive &,
+         const SourcePlacementArchive *, const PolygonColorArchive *,
+         const NormalSamplingArchive *, const PaintSamplingArchive *,
+         bool physical_emission);
+
+  static PolygonSceneArchive
+  decode(const nlohmann::json &, const PaintImageArchive &,
+         const CreatorAssetArchive &, const SourceMaterialArchive &,
+         const SourcePlacementArchive *, const PolygonColorArchive *,
+         const NormalSamplingArchive *, const PaintSamplingArchive *,
+         const SourcePaintDecodeContext &, TextureSetArchive *);
 
 private:
   friend class PolygonSceneReader;
@@ -54,7 +104,7 @@ private:
   PolygonColorArchive colors_;
   std::set<const PolygonAuthority *> deeply_validated_;
   std::set<const PolygonOrigin *> deeply_validated_origins_;
-  bool direct_origins_ = false,direct_rig_origins_=false;
+  bool direct_origins_ = false, direct_rig_origins_ = false;
   void collect(std::shared_ptr<const PolygonAuthority>,
                std::shared_ptr<const PolygonOrigin>, bool deep);
   std::vector<std::shared_ptr<const PolygonAuthority>> authorities_;
@@ -65,22 +115,29 @@ private:
 // Scene37 can own a material -> before-origin -> earlier-material DAG. Resolve
 // only the origins requested while a material prefix is complete, then finish
 // the actual Scene roots. The enclosing Scene preflight still charges every
-// record before this reader allocates any payload; this is not a validity cache.
+// record before this reader allocates any payload; this is not a validity
+// cache.
 class PolygonSceneReader {
 public:
-  using MaterialResolver=std::function<std::shared_ptr<const SourceMaterialBindings>(uint32_t)>;
-  PolygonSceneReader(const nlohmann::json &,const PaintImageArchive &,
-      const CreatorAssetArchive &,MaterialResolver,const SourcePlacementArchive *,
-      const PolygonColorArchive *,const NormalSamplingArchive *,const PaintSamplingArchive *,
-      const SourcePaintDecodeContext &,std::function<bool()> cancelled={});
+  using MaterialResolver =
+      std::function<std::shared_ptr<const SourceMaterialBindings>(uint32_t)>;
+  PolygonSceneReader(const nlohmann::json &, const PaintImageArchive &,
+                     const CreatorAssetArchive &, MaterialResolver,
+                     const SourcePlacementArchive *,
+                     const PolygonColorArchive *, const NormalSamplingArchive *,
+                     const PaintSamplingArchive *,
+                     const SourcePaintDecodeContext &,
+                     std::function<bool()> cancelled = {},
+                     TextureSetArchive *texture_sets = nullptr);
   ~PolygonSceneReader();
-  PolygonSceneReader(const PolygonSceneReader&)=delete;
-  PolygonSceneReader &operator=(const PolygonSceneReader&)=delete;
+  PolygonSceneReader(const PolygonSceneReader &) = delete;
+  PolygonSceneReader &operator=(const PolygonSceneReader &) = delete;
   const std::shared_ptr<const PolygonOrigin> &origin_at(uint32_t);
   const std::shared_ptr<const PolygonAuthority> &authority_at(uint32_t);
   MaterialResolver material_resolver(MaterialResolver);
   void restore_material_resolver(MaterialResolver) noexcept;
   PolygonSceneArchive finish();
+
 private:
   struct Impl;
   std::unique_ptr<Impl> impl_;
