@@ -6,6 +6,7 @@
 #include "paint-sampling-access.hpp"
 #include "deformation-json.hpp"
 #include <nlohmann/json.hpp>
+#include <algorithm>
 namespace dome::detail {
 thread_local const PolygonSurfacePreflight*PolygonSurfacePreflight::current_=nullptr;
 thread_local PolygonSurfaceArchive*PolygonSurfaceArchive::current_=nullptr;
@@ -23,6 +24,57 @@ size_t deformation_copy_bytes(const nlohmann::json&d){
  if(!d.at("morphs").is_null()){const auto&targets=d.at("morphs").at("targets");if(!targets.is_array()||targets.size()>128)throw std::length_error("Scene39 before morph target count exceeds its bound");for(const auto&t:targets){if(!t.at("delta").is_array()||!t.at("name").is_string())throw std::invalid_argument("Invalid Scene39 before morph payload");add(t.at("delta").size());const auto n=t.at("name").get_ref<const std::string&>().size();if(n>16*1024*1024-names)throw std::length_error("Scene39 before name metadata exceeds its bound");names+=n;}}
  if(!d.at("skeleton").is_null()){const auto&joints=d.at("skeleton").at("bones");if(!joints.is_array()||joints.size()>256)throw std::length_error("Scene39 before skeleton dimensions exceed their bound");bones=joints.size();for(const auto&bone:joints){if(!bone.at("name").is_string())throw std::invalid_argument("Invalid Scene39 before bone name");const auto n=bone.at("name").get_ref<const std::string&>().size();if(n>16*1024*1024-names)throw std::length_error("Scene39 before name metadata exceeds its bound");names+=n;}}
  return entries*sizeof(Vec3)+d.at("pose").size()*sizeof(JointTransform)+vertices*sizeof(VertexWeights)+bones*(sizeof(Bone)+sizeof(RigMatrix)*3+64)+names;
+}
+// Scene40 may carry an independent genuine39 actor. Establish the owning40
+// archive structurally before allowing that outer context; a larger version
+// alone never grants a polygon field or geometry/membership authority.
+void texture_set_context(const nlohmann::json&scene){
+ if(!scene.at("objects").is_array()||scene.at("objects").empty()||scene.at("objects").size()>256)throw std::invalid_argument("Mixed Scene40 object table exceeds its bounded domain");
+ const auto&table=scene.at("texture_set_geometry");
+ if(!table.is_object()||table.size()!=3||!table.at("version").is_number_integer()||table.at("version")!=1||!table.at("meshes").is_array()||table.at("meshes").empty()||table.at("meshes").size()>256||!table.at("topologies").is_array()||table.at("topologies").empty()||table.at("topologies").size()>256)throw std::invalid_argument("Mixed Scene40 needs its actual bounded texture-set geometry archive");
+ const auto&meshes=table.at("meshes"),&topologies=table.at("topologies");
+ size_t bytes=0,work=0,sets=0;std::array<uint8_t,256>used_mesh{},used_topology{};
+ const auto charge=[&](size_t n){if(n>256*1024*1024-bytes)throw std::length_error("Mixed Scene40 texture-set encoded geometry exceeds its quota");bytes+=n;};
+ const auto step=[&](size_t n){if(n>64'000'000-work)throw std::length_error("Mixed Scene40 texture-set preflight exceeds its work quota");work+=n;};
+ const auto blob=[&](const nlohmann::json&v,size_t stride,size_t maximum,bool empty=false)->const auto&{
+  if(!v.is_binary()||(!empty&&v.get_binary().empty())||v.get_binary().size()%stride||v.get_binary().size()/stride>maximum)throw std::invalid_argument("Mixed Scene40 texture-set geometry/identity buffer is invalid");charge(v.get_binary().size());return v.get_binary();
+ };
+ const auto word=[](const auto&v,size_t at,size_t count){uint64_t n=0;for(size_t k=0;k<count;++k)n|=uint64_t(v.at(at+k))<<(8*k);return n;};
+ for(const auto&m:meshes){
+  if(!m.is_object()||m.size()!=6)throw std::invalid_argument("Mixed Scene40 texture-set mesh record is incomplete");
+  const auto&p=blob(m.at("positions"),12,2'000'000),&n=blob(m.at("normals"),12,2'000'000),&uv=blob(m.at("uv"),8,2'000'000),&indices=blob(m.at("indices"),12,2'000'000);const size_t vertices=p.size()/12;
+  if(n.size()!=p.size()||uv.size()/8!=vertices)throw std::invalid_argument("Mixed Scene40 texture-set vertex arrays differ");
+  const auto&pins=blob(m.at("uv_pins"),1,vertices,true),&seams=blob(m.at("uv_seams"),1,indices.size()/4,true);
+  if((!pins.empty()&&pins.size()!=vertices)||(!seams.empty()&&seams.size()!=indices.size()/4))throw std::invalid_argument("Mixed Scene40 texture-set UV flags differ");
+  step(indices.size()/4);for(size_t i=0;i<indices.size();i+=4)if(word(indices,i,4)>=vertices)throw std::invalid_argument("Mixed Scene40 texture-set index lies outside its actual geometry");
+ }
+ for(const auto&t:topologies){
+  if(!t.is_object()||t.size()!=4||!t.at("polygon_ids").is_boolean())throw std::invalid_argument("Mixed Scene40 texture-set topology record is incomplete");
+  const auto mesh=ref(t.at("mesh"),meshes.size());used_mesh[mesh]=1;const size_t corners=meshes[mesh].at("indices").get_binary().size()/4;
+  const auto&faces=blob(t.at("faces"),8,2'000'000),&ids=blob(t.at("corners"),8,6'000'000);
+  if(faces.size()/8!=corners/3||ids.size()/8!=corners)throw std::invalid_argument("Mixed Scene40 texture-set topology IDs differ from actual triangles");
+  step(faces.size()/8+ids.size()/8);for(size_t i=0;i<faces.size();i+=8)if(!word(faces,i,8))throw std::invalid_argument("Mixed Scene40 material face identity is absent");for(size_t i=0;i<ids.size();i+=8)if(!word(ids,i,8))throw std::invalid_argument("Mixed Scene40 material corner identity is absent");
+ }
+ for(const auto&o:scene.at("objects")){
+  if(!o.contains("texture_sets"))throw std::invalid_argument("Mixed Scene40 omits actual per-object texture-set membership");
+  const auto&c=o.at("texture_sets");if(c.is_null())continue;
+  if(!c.is_object()||c.size()!=7||!c.at("version").is_number_integer()||c.at("version")!=1||!c.at("additional").is_array()||c.at("additional").empty()||c.at("additional").size()>63||!o.at("painted").is_null()||o.at("mesh_active")!=true)throw std::invalid_argument("Mixed Scene40 needs its actual owning material collection");
+  if(c.at("additional").size()+1>256-sets)throw std::length_error("Mixed Scene40 aggregate material slots exceed quota");sets+=c.at("additional").size()+1;
+  const auto topology=ref(c.at("topology"),topologies.size());used_topology[topology]=1;const auto&slots=blob(c.at("slots"),4,2'000'000);
+  if(slots.size()/4!=topologies[topology].at("faces").get_binary().size()/8)throw std::invalid_argument("Mixed Scene40 membership omits genuine logical faces");
+  std::array<uint64_t,64>ids{};size_t count=1;
+  const auto integer=[](const nlohmann::json&v,uint64_t maximum){if((!v.is_number_unsigned()&&(!v.is_number_integer()||v.get<int64_t>()<0))||v.get<uint64_t>()>maximum)throw std::invalid_argument("Mixed Scene40 material-slot identity is invalid");return v.get<uint64_t>();};
+  const auto next=integer(c.at("next_id"),uint64_t(UINT32_MAX)+1);if(!next)throw std::invalid_argument("Mixed Scene40 material high-water identity is absent");
+  const auto field=[&](const nlohmann::json&paint,uint64_t id){if(!paint.is_object()||paint.size()!=3||!paint.at("version").is_number_integer()||paint.at("version")!=7||integer(paint.at("set"),UINT32_MAX)!=id||!paint.at("payload").is_object())throw std::invalid_argument("Mixed Scene40 field lacks its genuine Paint7 membership envelope");};
+  field(c.at("primary"),0);
+  for(const auto&f:c.at("additional")){if(!f.is_object()||f.size()!=4||!f.at("name").is_string()||f.at("name").get_ref<const std::string&>().empty()||f.at("name").get_ref<const std::string&>().size()>256||!f.at("material").is_object())throw std::invalid_argument("Mixed Scene40 member field is incomplete");const auto id=integer(f.at("id"),UINT32_MAX);if(!id||id>=next)throw std::invalid_argument("Mixed Scene40 material identity is outside its actual high-water mark");ids[count++]=id;field(f.at("painted"),id);}
+  std::sort(ids.begin(),ids.begin()+count);if(std::adjacent_find(ids.begin(),ids.begin()+count)!=ids.begin()+count)throw std::invalid_argument("Mixed Scene40 material identities repeat");
+  if(!std::binary_search(ids.begin(),ids.begin()+count,integer(c.at("active"),UINT32_MAX)))throw std::invalid_argument("Mixed Scene40 active set has no actual material owner");
+  step(slots.size()/4*7);for(size_t i=0;i<slots.size();i+=4)if(!std::binary_search(ids.begin(),ids.begin()+count,word(slots,i,4)))throw std::invalid_argument("Mixed Scene40 logical face names a foreign material set");
+ }
+ if(!sets)throw std::invalid_argument("Mixed outer Scene40 has no genuine material collection");
+ for(size_t i=0;i<meshes.size();++i)if(!used_mesh[i])throw std::invalid_argument("Mixed Scene40 has an unreachable geometry record");
+ for(size_t i=0;i<topologies.size();++i)if(!used_topology[i])throw std::invalid_argument("Mixed Scene40 has an unreachable topology record");
 }
 void graph_preflight(const nlohmann::json&scene){
  if(!scene.at("objects").is_array()||scene.at("objects").empty()||scene.at("objects").size()>256)throw std::invalid_argument("Scene39 object table exceeds its bounded domain");
@@ -50,12 +102,25 @@ void graph_preflight(const nlohmann::json&scene){
  for(size_t id=0;id<bindings.size();++id){const auto&b=bindings[id];if(!b.contains("polygon_surface_transfer"))throw std::invalid_argument("Material21 lacks actual per-binding polygon field references");if(b.at("polygon_surface_transfer").is_null())continue;const auto node=ref(b.at("polygon_surface_transfer"),nodes.size());used[node]=1;const auto reach=visit(visit,false,ref(nodes[node].at("before_origin"),origins.size()),1);if(reach.has&&reach.material>=id)throw std::invalid_argument("Scene39 field before-root requires an incomplete/future material prefix");}
  for(size_t id=0;id<nodes.size();++id)if(!used[id])throw std::invalid_argument("Scene39 contains an unreferenced polygon field node");
  const auto paired=[&](const nlohmann::json&paint,const nlohmann::json&binding){if(!paint.is_object()||!paint.contains("version")||paint.at("version")!=6)return;if(binding.is_null()||bindings.at(ref(binding,bindings.size())).at("polygon_surface_transfer").is_null()||paint.at("node")!=bindings.at(ref(binding,bindings.size())).at("polygon_surface_transfer"))throw std::invalid_argument("Scene39 Paint6 and its actual material node differ");PolygonSurfacePaintCodec::preflight(paint,nodes.size());};
- for(const auto&o:scene.at("objects"))if(!o.at("painted").is_null())paired(o.at("painted"),o.at("material_bindings"));
- for(const auto&o:origins)if(!o.at("painted").is_null())paired(polygons.at("paints").at(ref(o.at("painted"),polygons.at("paints").size())),o.at("material_bindings"));
+ const auto nested=[&](const nlohmann::json&o){
+  if(!o.contains("texture_sets")||o.at("texture_sets").is_null())return;
+  const auto&collection=o.at("texture_sets");
+  const auto field=[&](const nlohmann::json&paint,const nlohmann::json&binding){
+   paired(paint,binding);
+   if(paint.is_object()&&paint.contains("version")&&paint.at("version")==7&&paint.contains("payload"))paired(paint.at("payload"),binding);
+   if(!binding.is_null()||(paint.is_object()&&paint.contains("version")&&paint.at("version")==6)||(paint.is_object()&&paint.contains("payload")&&paint.at("payload").is_object()&&paint.at("payload").contains("version")&&paint.at("payload").at("version")==6))throw std::invalid_argument("Nested polygon field Paint6 needs its actual texture-set field/source adapter");
+  };
+  field(collection.at("primary"),o.at("material_bindings"));
+  for(const auto&f:collection.at("additional"))field(f.at("painted"),f.contains("material_bindings")?f.at("material_bindings"):nlohmann::json(nullptr));
+ };
+ for(const auto&o:scene.at("objects")){if(!o.at("painted").is_null())paired(o.at("painted"),o.at("material_bindings"));nested(o);}
+ for(const auto&o:origins){if(!o.at("painted").is_null())paired(polygons.at("paints").at(ref(o.at("painted"),polygons.at("paints").size())),o.at("material_bindings"));nested(o);}
 }
 }
 PolygonSurfacePreflight::PolygonSurfacePreflight(const nlohmann::json&scene):previous_(current_),scene_(scene){
- if(!scene.is_object()||scene.at("version")!=39||!scene.contains("polygon_surfaces")||!scene.contains("source_materials")||!polygon_surface_material_archive(scene.at("source_materials")))throw std::invalid_argument("Polygon Paint6 requires genuine Scene39/material21 ownership");
+ if(!scene.is_object()||(!scene.at("version").is_number_integer())||(scene.at("version")!=39&&scene.at("version")!=40)||!scene.contains("polygon_surfaces")||!scene.contains("source_materials")||!polygon_surface_material_archive(scene.at("source_materials")))throw std::invalid_argument("Polygon Paint6 requires genuine Scene39/material21 ownership or its owning Scene40 composition");
+ if(scene.at("version")==40){if(!scene.contains("texture_set_geometry"))throw std::invalid_argument("Mixed Scene40 polygon fields require the actual texture-set archive");texture_set_context(scene);}
+ else{if(scene.contains("texture_set_geometry"))throw std::invalid_argument("Scene39 cannot conceal an owning Scene40 texture-set archive");for(const auto&o:scene.at("objects"))if(o.contains("texture_sets")&&!o.at("texture_sets").is_null())throw std::invalid_argument("Scene39 cannot borrow current texture-set membership");}
  current_=this;try{graph_preflight(scene);}catch(...){current_=previous_;throw;}
 }
 PolygonSurfacePreflight::~PolygonSurfacePreflight(){current_=previous_;}

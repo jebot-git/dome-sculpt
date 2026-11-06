@@ -397,6 +397,28 @@ void PolygonSceneArchive::preflight(const nlohmann::json &j,const nlohmann::json
     if (!j.at(key).is_array() || j.at(key).size() > maximum_nodes)
       throw std::length_error("Polygon snapshot count exceeded");
   const auto &aa = j.at("authorities"), &oo = j.at("origins");
+  // Archive1..7 retain complete ordinary polygon source roots. Current40
+  // collections on independent actors add no hidden source/material edges.
+  // Refuse unrepresented per-set or retained histories rather than omitting
+  // them from the exact reachability/acyclic/material-prefix walk below.
+  const auto texture_fields=[&](const nlohmann::json&object,bool retained){
+    if(!object.contains("texture_sets")||object.at("texture_sets").is_null())return;
+    if(retained)throw std::invalid_argument("Retained texture-set history requires its actual polygon8 owning archive adapter");
+    if(!object.at("material_bindings").is_null())throw std::invalid_argument("A polygon source material cannot grant authority to an unrepresented texture-set field");
+    const auto&sets=object.at("texture_sets");
+    if(!sets.is_object()||!sets.contains("primary")||!sets.contains("additional")||!sets.at("additional").is_array()||sets.at("additional").size()>63)throw std::invalid_argument("Invalid nested texture-set field table in polygon source preflight");
+    const auto field=[&](const nlohmann::json&paint){
+      if(paint.is_object()&&paint.contains("version")&&paint.at("version")==6)throw std::invalid_argument("Texture-set polygon Paint6 requires its actual field/source adapter");
+      if(paint.is_object()&&paint.contains("payload")&&paint.at("payload").is_object()&&paint.at("payload").contains("version")&&(paint.at("payload").at("version")==4||paint.at("payload").at("version")==6))throw std::invalid_argument("Nested source/Paint6 payload cannot borrow plain Paint7 field authority");
+    };
+    field(sets.at("primary"));
+    for(const auto&set:sets.at("additional")){
+      for(const char*source:{"material_bindings","appearance","bake_recipe","shape_source","rig_source","polygon"})if(set.contains(source)&&!set.at(source).is_null())throw std::invalid_argument("Texture-set source/material/recipe edges require their actual owning field adapter");
+      field(set.at("painted"));
+    }
+  };
+  for(const auto&object:objects)texture_fields(object,false);
+  for(const auto&origin:oo)texture_fields(origin,true);
   size_t entries = 0;
   std::vector<uint8_t> used_colors;
   if (colored) {
