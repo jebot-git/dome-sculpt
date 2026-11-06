@@ -16,6 +16,7 @@
 #include "source-placement-archive.hpp"
 #include "text-utf8.hpp"
 #include "texture-set-archive.hpp"
+#include "texture-set-source-preflight.hpp"
 #include <map>
 #include <nlohmann/json.hpp>
 #include <set>
@@ -571,7 +572,11 @@ void PolygonSceneArchive::preflight(const nlohmann::json &j,
       return;
     const auto &sets = object.at("texture_sets");
     const auto field = [&](const nlohmann::json &paint) {
-      if (!paint.is_object() || paint.contains("field_source") ||
+      if(paint.is_object()&&paint.contains("field_source")){
+        if(!texture_geometry||!materials||!polygon_surfaces)throw std::invalid_argument("Source Paint7 requires its actual enclosing material/node/geometry preflight");
+        (void)texture_source_seed(paint,*texture_geometry,*materials,*polygon_surfaces);return;
+      }
+      if (!paint.is_object() ||
           (paint.contains("version") && paint.at("version") == 6))
         throw std::invalid_argument("Texture-set source fields require their "
                                     "actual owning graph adapter");
@@ -587,15 +592,18 @@ void PolygonSceneArchive::preflight(const nlohmann::json &j,
       if (!texture_geometry || (retained && !membership))
         throw std::invalid_argument(
             "Shared retained collection requires actual archive8");
-      if (!object.at("material_bindings").is_null() ||
-          !object.at("appearance").is_null() ||
-          (object.contains("bake_recipe") &&
-           !object.at("bake_recipe").is_null()))
-        throw std::invalid_argument("Plain membership history cannot borrow "
-                                    "source/material/recipe authority");
-      for (const auto *paint :
-           TextureSetArchive::referenced_paints(sets, *texture_geometry))
+      const auto paints=TextureSetArchive::referenced_paints(sets,*texture_geometry);
+      bool first=true;
+      for(const auto*paint:paints){
         field(*paint);
+        if(first){
+          const auto*seed=paint->contains("field_source")?texture_source_seed(*paint,*texture_geometry,*materials,*polygon_surfaces):nullptr;
+          if(!object.at("appearance").is_null()||(seed?object.at("material_bindings")!=seed->at("binding"):!object.at("material_bindings").is_null()))throw std::invalid_argument("Shared primary source/material owner is unrepresented or foreign");
+          const auto&recipe=object.contains("bake_recipe")?object.at("bake_recipe"):nlohmann::json(nullptr);
+          if(seed?recipe!=seed->at("bake_recipe"):!recipe.is_null())throw std::invalid_argument("Shared primary recipe differs from its explicitly referenced source seed");
+          first=false;
+        }
+      }
       if (retained) {
         retained_membership = true;
         if (!object.at("painted").is_null() || object.at("mesh_active") != true)
@@ -1482,6 +1490,9 @@ PolygonSceneReader::origin_at(uint32_t id) {
 const std::shared_ptr<const PolygonAuthority> &
 PolygonSceneReader::authority_at(uint32_t id) {
   return impl_->authority(id, 1);
+}
+std::shared_ptr<const SourceMaterialBindings>PolygonSceneReader::material_at(uint32_t id)const{
+ impl_->poll();if(!impl_->material)throw std::invalid_argument("Polygon field lacks its actual current material-prefix resolver");return impl_->material(id);
 }
 PolygonSceneReader::MaterialResolver
 PolygonSceneReader::material_resolver(MaterialResolver next) {
