@@ -94,6 +94,9 @@ bool ink() { return getenv("DOME_XR_FIXTURE_STYLUS") != nullptr; }
 std::string bake_mode(){auto mode=getenv("DOME_XR_FIXTURE_BAKE");return mode?mode:"";}
 std::string skin_mode(){auto mode=getenv("DOME_XR_FIXTURE_SKIN");return mode?mode:"";}
 std::string retopo_mode(){auto mode=getenv("DOME_XR_FIXTURE_RETOPO");return mode?mode:"";}
+bool retopo_history(){return retopo_mode().starts_with("history-");}
+bool history_undo(unsigned n){return (n>=4&&n<=16)||(n>=20&&n<=23)||(n>=48&&n<=54);}
+bool history_redo(unsigned n){return (n>=26&&n<=29)||(n>=33&&n<=36)||(n>=48&&n<=54);}
 std::string cut_mode(){auto mode=getenv("DOME_XR_FIXTURE_CUT");return mode?mode:"";}
 unsigned cut_step=0;
 bool cut_held(){return getenv("DOME_XR_FIXTURE_CUT_HELD")!=nullptr;}
@@ -647,7 +650,7 @@ FN(PollEvent, XrInstance, XrEventDataBuffer *out) {
   }
   auto retopo = retopo_mode();
   unsigned focus_frame = !polygon_mode().empty()?polygon_stage():!cut_mode().empty()?cut_step:!mask_mode().empty() ? mask_step : retopo.empty() ? frame : retopo_step;
-  unsigned focus_at = !cut_mode().empty()?90:!mask_mode().empty() ? (mask_mode()=="focus"?40:90) : retopo.empty() ? 30 : retopo == "focus" ? 40 : 90;
+  unsigned focus_at = retopo_history()?7:!cut_mode().empty()?90:!mask_mode().empty() ? (mask_mode()=="focus"?40:90) : retopo.empty() ? 30 : retopo == "focus" ? 40 : 90;
   if(!bake_policy_mode().empty())focus_at=bake_policy_mode()=="focus"?(bake_projection_mode()?28:20):90;
   if(!procedural_mode().empty())focus_at=procedural_mode()=="focus"?20:90;
   if(!polygon_mode().empty())focus_at=polygon_mode()=="focus"?30:90;
@@ -681,6 +684,12 @@ FN(PollEvent, XrInstance, XrEventDataBuffer *out) {
     e->state = XR_SESSION_STATE_FOCUSED;
     count("focus_regains");
     return XR_SUCCESS;
+  }
+  if(retopo_history()&&frame>=12&&!reference_event){
+    reference_event=true;auto e=reinterpret_cast<XrEventDataReferenceSpaceChangePending*>(out);
+    e->type=XR_TYPE_EVENT_DATA_REFERENCE_SPACE_CHANGE_PENDING;e->session=reinterpret_cast<XrSession>(&session_tag);
+    e->referenceSpaceType=XR_REFERENCE_SPACE_TYPE_STAGE;e->changeTime=1000000000+(physical_frame+1)*18000000;
+    e->poseValid=XR_TRUE;e->poseInPreviousSpace={{0,0,0,1},{0,0,0}};count("reference_changes");return XR_SUCCESS;
   }
   if (editable_avatar_mode().empty() && (cage_mode().empty()&&(mirror_mode().empty()&&expression_mode().empty())&&import_atlas_mode().empty()&&projection_mode().empty()&&rig_fit_mode().empty()) && !pbr_preview_fixture() && !selection_fixture() && (polygon_mode().empty()&&corner_uv_mode().empty()) && bake_policy_mode().empty() && procedural_mode().empty() && resolution_mode().empty() && retopo.empty() && mask_mode().empty() && cut_mode().empty() && frame >= 35 && !reference_event) {
     reference_event = true;
@@ -726,8 +735,8 @@ FN(WaitFrame, XrSession, const XrFrameWaitInfo *, XrFrameState *p) {
     }
   }
   if (auto mode=retopo_mode(); !mode.empty()) {
-    bool waiting = (retopo_step == 27 && !retopo_source_ready) ||
-                   (mode!="unconfirmed" && retopo_step == 60 && !retopo_apply_ready);
+    bool waiting = !retopo_history()&&((retopo_step == 27 && !retopo_source_ready) ||
+                   (mode!="unconfirmed" && retopo_step == 60 && !retopo_apply_ready));
     if (!waiting) ++retopo_step;
     report["retopo_script_step"] = retopo_step;
   }
@@ -820,6 +829,18 @@ FN(GetActionStateBoolean, XrSession, const XrActionStateGetInfo *p,
   auto a = reinterpret_cast<Action *>(p->action);
   bool button = right(p->subactionPath) && a->name == "recenter";
   out->isActive = XR_TRUE;
+  if(retopo_history()){
+    const bool hand=right(p->subactionPath);bool current=false,previous=false;
+    if(hand&&a->name=="undo"){current=history_undo(frame);previous=frame&&history_undo(frame-1);count("history_undo_queries");}
+    if(hand&&a->name=="redo"){current=history_redo(frame);previous=frame&&history_redo(frame-1);count("history_redo_queries");}
+    if(button){current=frame==42||frame==44||frame==48;previous=frame==43||frame==45||frame==49;}
+    out->currentState=current;out->changedSinceLastSync=current!=previous;
+    if(hand&&(a->name=="undo"||a->name=="redo")){
+      report["history_levels"].push_back({{"frame",frame},{"action",a->name},{"current",current},{"changed",current!=previous}});
+      if(current&&!out->changedSinceLastSync)count("history_held_queries");
+    }
+    return XR_SUCCESS;
+  }
   if(!expression_mode().empty()){out->currentState=button&&expression_click();out->changedSinceLastSync=button;return XR_SUCCESS;}
   if(auto mode=editable_avatar_mode();!mode.empty()){
     out->currentState=button&&(mode=="recover"?(frame==8||frame==10):(frame==8||frame==10||frame==14||frame==18||frame==20||(mode=="cancel"&&(frame==22||frame==24||frame==28))));
@@ -918,6 +939,7 @@ FN(GetActionStateFloat, XrSession, const XrActionStateGetInfo *p,
                 (a->name == "tip_force" && ink());
   out->isActive = active;
   out->currentState = 0;
+  if(retopo_history())return XR_SUCCESS;
   if(!expression_mode().empty())return XR_SUCCESS;
   if(!editable_avatar_mode().empty())return XR_SUCCESS;
   if(!corner_uv_mode().empty()){if(corner_uv_mode()=="cancel"&&right(p->subactionPath)&&a->name=="paint_pressure"&&frame==28)out->currentState=.9f;return XR_SUCCESS;}
@@ -990,6 +1012,14 @@ FN(GetActionStateVector2f, XrSession, const XrActionStateGetInfo *p,
    XrActionStateVector2f *out) {
   auto a = reinterpret_cast<Action *>(p->action);
   out->isActive = XR_TRUE;
+  if(retopo_history()){
+    out->currentState={0,0};
+    if(right(p->subactionPath)&&a->name=="right_stick"){
+      int sector=(frame==43||frame==44)?2:(frame==47||frame==48)?(retopo_mode()=="history-cancel"?11:10):-1;
+      if(sector>=0){const float angle=sector*6.283185307f/12;out->currentState={std::cos(angle),std::sin(angle)};}
+    }
+    return XR_SUCCESS;
+  }
   if(!canonical_conversion_mode().empty()){int sector=canonical_conversion_sector();float angle=sector*3.14159265358979323846f/6;out->currentState=right(p->subactionPath)&&a->name=="right_stick"&&sector>=0?XrVector2f{std::cos(angle),std::sin(angle)}:XrVector2f{0,0};return XR_SUCCESS;}
   if(!expression_mode().empty()){int sector=expression_sector();float angle=sector*3.14159265358979323846f/6;out->currentState=right(p->subactionPath)&&a->name=="right_stick"&&sector>=0?XrVector2f{std::cos(angle),std::sin(angle)}:XrVector2f{0,0};return XR_SUCCESS;}
   if(!cage_mode().empty()){int sector=cage_sector();float angle=sector*3.14159265358979323846f/6;out->currentState=right(p->subactionPath)&&a->name=="right_stick"&&sector>=0?XrVector2f{std::cos(angle),std::sin(angle)}:XrVector2f{0,0};return XR_SUCCESS;}

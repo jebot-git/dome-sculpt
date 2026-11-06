@@ -6,6 +6,7 @@
 #include "emission-control-scale.hpp"
 #include "emission-source-info.hpp"
 #include "dome/document.hpp"
+#include "skin-methods.hpp"
 #include "native-paint-sampling.hpp"
 #include "dome/scene-file.hpp"
 #include "dome/native-authoring.hpp"
@@ -44,6 +45,8 @@
 #include "dome/local-surface.hpp"
 #include "geometry-identity.hpp"
 #include "document-transaction.hpp"
+#include "document-retopo-input.hpp"
+#include "spatial-history-levels.hpp"
 #include <unistd.h>
 #include <utility>
 #include <numeric>
@@ -581,7 +584,7 @@ void Document::publish_locked(bool force,bool checkpoint) {
   if(state_.polygon_handoff&&(state_.polygon_handoff_generation!=state_.generation||state_.polygon_handoff_revision!=state_.revision||state_.polygon_handoff_object!=active.id||!object_editable_locked(active.id))) {
     state_.polygon_handoff.reset();state_.polygon_handoff_object=0;
   }
-  state_.can_polygon=!scene_.has_affine_placement(active.id)&&!state_.asset_busy&&!state_.recovery_busy&&!uv_&&!state_.retopology&&!state_.cut&&!import_view_&&object_editable_locked(active.id);
+  state_.can_polygon=!state_.asset_busy&&!state_.recovery_busy&&!uv_&&!state_.retopology&&!state_.cut&&!import_view_&&object_editable_locked(active.id);
   state_.polygon_requires_conversion=polygon_conversion_required(active);
   state_.polygon_has_source=active.polygon&&bool(active.polygon->origin);
   state_.project_path = path_;
@@ -657,7 +660,8 @@ void Document::publish_locked(bool force,bool checkpoint) {
       state_.skin_sources.empty()?0:state_.skin_sources.front();
   }
   state_.can_configure_skin=skin_target_ready_locked() && !skin_sources_locked(SkinAuthoringMode::Automatic).empty();
-  state_.can_bind_skin=skin_target_ready_locked() && !state_.skin_sources.empty();
+  state_.can_bind_skin=skin_target_ready_locked() && !state_.skin_sources.empty() &&
+    !(state_.skin_options.mode==SkinAuthoringMode::SurfaceHeat&&state_.selected_objects.size()>1&&!selected_skin_ready_locked(SkinAuthoringMode::SurfaceHeat));
   state_.can_retopologize = !state_.polygon && !state_.cut && !state_.retopology && !uv_ && !state_.asset_busy && !state_.recovery_busy &&
       !control_before_ && !action_active_locked() && object_editable_locked(active.id) &&
       scene_.objects().size() < 256 && (active.mesh_active || !active.volume->voxels().empty());
@@ -887,17 +891,20 @@ bool Document::begin_desktop() {
     return false;
   if (state_.retopology && (!state_.retopology->source || retopo_accepting_)) return false;
   if(!state_.weights.enabled && !state_.retopology && reject_texture_paint_locked())return false;
+  RetopoInputScope admission(*this,bool(state_.retopology));
   input_.cancel();
   begin_action_locked();
   desktop_ = true;
-  publish_locked();
+  publish_locked();admission.commit();
   return true;
 }
 void Document::stamp_desktop(Brush b) {
   std::lock_guard lock(model_mutex_);
   if (!desktop_)
     throw std::logic_error("Desktop does not own the active stroke");
-  auto t = object_world_transform_locked(scene_.active().id);
+  RetopoInputScope admission(*this,bool(state_.retopology));
+  auto t = state_.retopology ? state_.retopology->transform
+                            : object_world_transform_locked(scene_.active().id);
   b.from = world_to_model(t, b.from);
   b.to = world_to_model(t, b.to);
   b.radius /= t.scale;
@@ -905,11 +912,12 @@ void Document::stamp_desktop(Brush b) {
   auto n = ob::rotate(ob::conjugate(t.orientation), obv(b.normal));
   b.normal = vec(n);
   stamp_action_locked(b);
-  publish_locked();
+  publish_locked();admission.commit();
 }
 void Document::end_desktop() {
   std::lock_guard lock(model_mutex_);
   if(native_stroke_){end_native_locked(true);publish_locked();return;}
+  RetopoInputScope admission(*this,bool(state_.retopology));
   if (desktop_) {
     if (end_action_locked())
       record_stroke_locked();
@@ -917,16 +925,19 @@ void Document::end_desktop() {
     input_.cancel();
     publish_locked();
   }
+  admission.commit();
 }
 void Document::cancel_desktop() {
   std::lock_guard lock(model_mutex_);
   if(native_stroke_){cancel_native_locked();publish_locked();return;}
+  RetopoInputScope admission(*this,bool(state_.retopology));
   if (desktop_) {
     cancel_action_locked();
     desktop_ = false;
     input_.cancel();
     publish_locked();
   }
+  admission.commit();
 }
 std::optional<Vec3> Document::raycast(Vec3 p, Vec3 d) const {
   return raycast(p, d, render_frame_time());
@@ -935,7 +946,7 @@ std::optional<Vec3> Document::raycast(Vec3 p, Vec3 d, double material_time) cons
   if (!std::isfinite(material_time)) throw std::invalid_argument("Invalid material pick time");
   std::lock_guard lock(model_mutex_);
   if(scene_.active().polygon&&scene_.active().polygon->active&&!scene_.active().mesh_active)return {};
-  if(scene_.has_affine_placement(scene_.active().id)) {
+  if(!state_.retopology && scene_.has_affine_placement(scene_.active().id)) {
     auto snapshot=mesh_.load();
     if(!object_editable_locked(scene_.active().id)||snapshot->generation!=state_.generation||snapshot->revision!=state_.revision||!snapshot->picking)return {};
     auto hit=snapshot->picking->raycast(p,d,10,material_time,scene_.active().id);
@@ -966,7 +977,8 @@ std::optional<Vec3> Document::raycast(Vec3 p, Vec3 d, double material_time) cons
     if(!hit)return {};
     return held?std::optional<Vec3>(vec(ob::transform(delta,obv(hit->position)))):std::optional<Vec3>(hit->position);
   }
-  auto t = object_world_transform_locked(scene_.active().id);
+  auto t = state_.retopology ? state_.retopology->transform
+                            : object_world_transform_locked(scene_.active().id);
   if (state_.retopology) {
     if (!state_.retopology->source || retopo_accepting_) return {};
     auto direction = vec(ob::rotate(ob::conjugate(t.orientation), obv(d)));
@@ -987,6 +999,14 @@ std::optional<Vec3> Document::raycast(Vec3 p, Vec3 d, double material_time) cons
 }
 Vec3 Document::gradient(Vec3 p) const {
   std::lock_guard lock(model_mutex_);
+  if (state_.retopology) {
+    if (!state_.retopology->source || retopo_accepting_)
+      throw std::logic_error("Wait for the retopology source before querying its normal");
+    const auto &t = state_.retopology->transform;
+    SurfaceQueryOptions options; options.max_triangle_tests = 65'536;
+    const auto hit = state_.retopology->source->closest(world_to_model(t, p), options);
+    return vec(ob::rotate(t.orientation, obv(hit.normal)));
+  }
   if(scene_.has_affine_placement(scene_.active().id)) {
     auto snapshot=mesh_.load();
     if(snapshot->generation!=state_.generation||snapshot->revision!=state_.revision||!snapshot->picking)
@@ -1012,10 +1032,11 @@ bool Document::undo() {
   if(state_.cut){bool available=!cut_undo_.empty()||bool(control_before_);cut_history_locked(false);publish_locked();return available;}
   if (state_.retopology) {
     if (retopo_accepting_ || !state_.retopology->source) return false;
+    RetopoInputScope admission(*this,true);
     bool available = state_.retopology->can_undo || retopo_stroking_;
     if (retopo_stroking_) { cancel_action_locked(); desktop_ = false; input_.cancel(); }
     else queue_retopology_locked(RetopoAction::Undo);
-    publish_locked(); return available;
+    publish_locked();admission.commit();return available;
   }
   if (uv_accept_pending_ || uv_solving_)
     return false;
@@ -1040,8 +1061,9 @@ bool Document::redo() {
   if(state_.cut){bool available=!cut_redo_.empty()&&!control_before_;cut_history_locked(true);publish_locked();return available;}
   if (state_.retopology) {
     if (retopo_accepting_ || retopo_stroking_ || !state_.retopology->source) return false;
+    RetopoInputScope admission(*this,true);
     bool available = state_.retopology->can_redo;
-    queue_retopology_locked(RetopoAction::Redo); publish_locked(); return available;
+    queue_retopology_locked(RetopoAction::Redo);publish_locked();admission.commit();return available;
   }
   if (weight_stroking_) return false;
   if (uv_accept_pending_ || uv_solving_)
@@ -1323,15 +1345,20 @@ void Document::prepare_locked(uint32_t resolution) {
 
 }
 void Document::begin_spatial() {
-  rebase_space({});
-  {
-    std::lock_guard lock(input_mutex_);
-    spatial_accepting_ = true;
-  }
-  report_error({});
+  std::lock_guard lock(model_mutex_);
+  RetopoInputScope admission(*this,bool(state_.retopology)||(input_.menu_open()&&input_.menu_page()==16));
+  rebase_space_locked({},admission);
+  state_.error.clear();publish_locked();admission.commit();
+  // There is no fallible second publication after accepting the rebase or
+  // exposing its producer. A refusal leaves the producer's old policy intact.
+  {std::lock_guard input_lock(input_mutex_);spatial_accepting_ = true;}
 }
 void Document::rebase_space(std::optional<CanvasTransform> old_from_new) {
   std::lock_guard lock(model_mutex_);
+  RetopoInputScope admission(*this,bool(state_.retopology)||(input_.menu_open()&&input_.menu_page()==16));
+  rebase_space_locked(old_from_new,admission);publish_locked();admission.commit();
+}
+void Document::rebase_space_locked(std::optional<CanvasTransform> old_from_new,RetopoInputScope &admission) {
   if (!desktop_) {
     if(state_.expressions)end_expression_preview_locked(false);
     bool accepted_uv = uv_accept_pending_;
@@ -1340,14 +1367,13 @@ void Document::rebase_space(std::optional<CanvasTransform> old_from_new) {
     if (accepted_uv) input_.take_controls();
   }
   navigation_.reset();object_navigation_.reset();
-  state_.hands = {};
+  state_.hands = detail::history_only_hands(state_.hands);
   ++state_.input_epoch;
-  {
+  if(admission.active())admission.retire_inputs();
+  else {
     std::lock_guard queue_lock(input_mutex_);
-    inputs_.clear();
-    reset_input_ = false;
+    inputs_.clear();reset_input_ = false;input_changed_.notify_all();
   }
-  input_changed_.notify_all();
   if (old_from_new && ob::finite(*old_from_new)) {
     auto inverse = ob::inverse(*old_from_new);
     state_.canvas = ob::compose(inverse, state_.canvas);
@@ -1355,7 +1381,6 @@ void Document::rebase_space(std::optional<CanvasTransform> old_from_new) {
     state_.hierarchy_panel=ob::compose(inverse,state_.hierarchy_panel);
   } else {anchored_ = false;state_.hierarchy_anchored=false;}
   state_.selection_pressed={true,true};state_.selection_release={true,true};state_.selection_hover={};
-  publish_locked();
 }
 void Document::finish_spatial() {
   {
@@ -1367,6 +1392,7 @@ void Document::finish_spatial() {
   if (!wait_input())
     throw std::runtime_error("Spatial edit worker did not finish");
   std::lock_guard lock(model_mutex_);
+  RetopoInputScope admission(*this,bool(state_.retopology)||(input_.menu_open()&&input_.menu_page()==16));
   if (!desktop_) {
     if(state_.expressions)end_expression_preview_locked(false);
     bool accepted_uv = uv_accept_pending_;
@@ -1377,25 +1403,30 @@ void Document::finish_spatial() {
     navigation_.reset();
     publish_locked();
   }
+  admission.commit();
 }
 void Document::process_locked(const SpatialFrame &incoming) {
   SpatialFrame f=incoming;
+  // History is a press event. In particular a terminal modal command consumes
+  // simultaneous buttons; holding one cannot undo a different namespace on
+  // the following frame. The existing published hands provide the latches.
+  const bool undo_requested=(f.hands[0].undo&&!state_.hands[0].undo)||(f.hands[1].undo&&!state_.hands[1].undo);
+  const bool redo_requested=(f.hands[0].redo&&!state_.hands[0].redo)||(f.hands[1].redo&&!state_.hands[1].redo);
   for(size_t i=0;i<2;++i)if(state_.selection_release[i]){
     if(f.hands[i].tracked.trigger<=.02f)state_.selection_release[i]=false;
     else f.hands[i].tracked.trigger=0;
   }
-  if(process_rig_fit_spatial_locked(f))return;
-  if(process_projection_spatial_locked(f))return;
+  if(process_rig_fit_spatial_locked(f)){return;}
+  if(process_projection_spatial_locked(f)){return;}
   if(native_stroke_&&native_stroke_->spatial_owner){if(native_stroke_->space==NativeStrokeSpace::Ray)process_shape_spatial_locked(f);else process_affine_paint_spatial_locked(f);return;}
-  if (desktop_)
-    return;
+  if (desktop_){return;}
   if (!f.focused || !f.head_valid || !ob::finite(f.head) ||
       !std::isfinite(f.time) || f.time < 0) {
     if(held_polygon_pending_locked()){
-      input_.cancel();object_navigation_.reset();navigation_.reset();state_.hands={};publish_locked(false,false);return;
+      input_.cancel();object_navigation_.reset();navigation_.reset();state_.hands=detail::history_only_hands(state_.hands);publish_locked(false,false);return;
     }
     if(state_.object_grabbing&&held_weight_pending_locked()){
-      input_.cancel();held_preview_transform_=held_start_transform_;object_navigation_.reset();navigation_.reset();state_.hands={};publish_locked(false,false);return;
+      input_.cancel();held_preview_transform_=held_start_transform_;object_navigation_.reset();navigation_.reset();state_.hands=detail::history_only_hands(state_.hands);publish_locked(false,false);return;
     }
     if(state_.expressions)end_expression_preview_locked(false);
     bool accepted_uv = uv_accept_pending_;
@@ -1404,7 +1435,7 @@ void Document::process_locked(const SpatialFrame &incoming) {
     if (accepted_uv) input_.take_controls();
     if(state_.held_object||state_.object_grabbing){invalidate_object_authority_locked();state_.held_object=0;}
     navigation_.reset();
-    state_.hands = {};state_.selection_hover={};state_.hierarchy_hover={-1,-1};
+    state_.hands = detail::history_only_hands(state_.hands);state_.selection_hover={};state_.hierarchy_hover={-1,-1};
     state_.selection_pressed={true,true};state_.selection_release={true,true};
     publish_locked();
     return;
@@ -1422,7 +1453,14 @@ void Document::process_locked(const SpatialFrame &incoming) {
     state_.hands=f.hands;publish_locked(false,false);return;
   }
   std::array<TrackedHand, 2> hands{f.hands[0].tracked, f.hands[1].tracked};
-  if(!state_.selection_mode&&state_.object_grab_mode && !input_.menu_open())update_object_grab_locked(f);
+  if(!state_.selection_mode&&state_.object_grab_mode && !input_.menu_open()) {
+    const auto session=retopo_session_.load();
+    update_object_grab_locked(f);
+    // A real authority publication already consumed this frame and retired
+    // its old tool. Do not add a second fallible publication or reinterpret
+    // the same physical event in the new namespace.
+    if(retopo_session_.load()!=session)return;
+  }
   if (!state_.selection_mode && !state_.object_grab_mode && !input_.menu_open()) {
     if (auto transform = navigation_.update(hands, state_.canvas)) {
       if (action_active_locked())
@@ -1438,9 +1476,11 @@ void Document::process_locked(const SpatialFrame &incoming) {
       return;
     }
   }
-  if(!state_.selection_mode&&process_affine_paint_spatial_locked(f))return;
+  if(!state_.selection_mode&&process_affine_paint_spatial_locked(f)){return;}
   const bool affine_target=scene_.has_affine_placement(scene_.active().id);
-  auto object_canvas = affine_target?state_.canvas:ob::compose(state_.canvas, object_world_transform_locked(scene_.active().id));
+  auto object_canvas = state_.retopology
+      ? ob::compose(state_.canvas, state_.retopology->transform)
+      : affine_target ? state_.canvas : ob::compose(state_.canvas, object_world_transform_locked(scene_.active().id));
   input_.radius = state_.radius / object_canvas.scale;
   input_.edit_allowed =
       !affine_target && (!scene_.active().mesh_active||!scene_.active().deformation||state_.weights.enabled) && !state_.asset_busy && object_editable_locked(scene_.active().id) &&
@@ -1525,11 +1565,17 @@ void Document::process_locked(const SpatialFrame &incoming) {
         input_.menu_page()!=30 && input_.menu_page()!=24 && input_.menu_page()!=18 && input_.menu_page()!=20 && input_.menu_page()!=19 && input_.menu_page()!=22 && !state_.polygon) finish_locked();
     auto command_publication=published_.load();
     command_locked(*c);
-    import_published=(import_command(*c)||projection_command(*c)||rig_fit_command(*c)||expression_command(*c))&&published_.load()!=command_publication;
+    import_published=(import_command(*c)||projection_command(*c)||rig_fit_command(*c)||expression_command(*c)||
+                      *c==SpatialCommand::RetopoBegin||*c==SpatialCommand::RetopoApply||*c==SpatialCommand::RetopoCancel)&&
+                     published_.load()!=command_publication;
     if((command_page==30)||(command_page==20)||(command_page==24&&*c!=SpatialCommand::ShapeSculpt)){input_.retain_page(command_page,command_owner,command_sector);publish_locked(false,false);}
+    // Opening/Apply/Cancel already published this frame's actual hands and
+    // immutable owner. Do not reinterpret simultaneous history against the
+    // newly opened/closed namespace or add a fallible second publication.
+    if(import_published&&(*c==SpatialCommand::RetopoBegin||*c==SpatialCommand::RetopoApply||*c==SpatialCommand::RetopoCancel))return;
   }
 
-  if (f.hands[0].undo || f.hands[1].undo) {
+  if (undo_requested) {
     if(state_.polygon){polygon_command_locked(SpatialCommand::Undo);
     } else if(state_.cut){cut_history_locked(false);
     } else if (state_.retopology) {
@@ -1546,7 +1592,7 @@ void Document::process_locked(const SpatialFrame &incoming) {
       undo_locked(false);
     }
   }
-  if (f.hands[0].redo || f.hands[1].redo) {
+  if (redo_requested) {
     if(state_.polygon){polygon_command_locked(SpatialCommand::Redo);
     } else if(state_.cut){cut_history_locked(true);
     } else if (state_.retopology) {
@@ -1563,15 +1609,17 @@ void Document::process_locked(const SpatialFrame &incoming) {
   // Detached import/image admission already published the current hands/menu. A second
   // fallible publication must not report failure after accepting its file job.
   // Independent history buttons in this same frame still need normal handling.
-  if(!import_published || f.hands[0].undo || f.hands[1].undo || f.hands[0].redo || f.hands[1].redo)
+  if(!import_published || undo_requested || redo_requested)
     publish_locked();
+
 }
 void Document::cancel_spatial_menu() {
   std::lock_guard lock(model_mutex_);
+  RetopoInputScope admission(*this,bool(state_.retopology)||(input_.menu_open()&&input_.menu_page()==16));
   finish_control_locked(false);
   if (!desktop_)
     input_.cancel();
-  publish_locked();
+  publish_locked();admission.commit();
 }
 void Document::input_loop() {
   while (!stopping_) {
@@ -1596,11 +1644,15 @@ void Document::input_loop() {
     {
       std::lock_guard lock(model_mutex_);
       try {
+        RetopoInputScope admission(*this,generation==state_.input_epoch &&
+                                        (bool(state_.retopology)||(input_.menu_open()&&input_.menu_page()==16)));
+        if(!state_.retopology)admission.opening_only();
         if (generation == state_.input_epoch) {
           // Resume only after this worker has cancelled/reported its failed
           // control. Recovery is independent of long file/authoring jobs.
           if(!worker_notices_[0]){if(reset&&!desktop_)input_.cancel();process_locked(f);}
         }
+        admission.commit();
       } catch (...) {
         input_worker_error_locked(std::current_exception());
       }
@@ -2166,7 +2218,7 @@ bool Document::parameter_enabled_locked(VrParameter parameter) const {
   if (parameter == VrParameter::RetopoDistance)
     return state_.retopology && state_.retopology->source && !retopo_accepting_ && !state_.asset_busy;
   if (state_.retopology) return false;
-  if(skin_parameter(parameter)) return (state_.skin_options.mode!=SkinAuthoringMode::Anatomical || parameter==VrParameter::SkinSource || parameter==VrParameter::SkinMode) && skin_target_ready_locked() &&
+  if(skin_parameter(parameter)) return !(state_.skin_options.mode==SkinAuthoringMode::SurfaceHeat&&parameter==VrParameter::SkinFalloff) && (state_.skin_options.mode!=SkinAuthoringMode::Anatomical || parameter==VrParameter::SkinSource || parameter==VrParameter::SkinMode) && skin_target_ready_locked() &&
     (parameter==VrParameter::SkinSource ? !skin_sources_locked(state_.skin_options.mode).empty()
       : !skin_sources_locked(SkinAuthoringMode::Automatic).empty());
   if(parameter==VrParameter::BakeSource&&canonical_conversion_ready_locked())return true;
@@ -2330,7 +2382,7 @@ void Document::finish_control_locked(bool accept) {
       auto &options=state_.skin_options;
       if(c.parameter==VrParameter::SkinSource) {
         auto ids=skin_sources_locked(options.mode); options.reference=ids.at(size_t(std::lround(c.value[0])));
-      } else if(c.parameter==VrParameter::SkinMode) options.mode=int(std::lround(c.value[0]))==2?SkinAuthoringMode::Anatomical:SkinAuthoringMode(int(std::lround(c.value[0])));
+      } else if(c.parameter==VrParameter::SkinMode) options.mode=detail::skin_method_mode(int(std::lround(c.value[0])));
       else if(c.parameter==VrParameter::SkinDistances) {
         options.seed_distance=skin_distance_metres(c.value[0]);
         options.seed_margin=skin_distance_metres(c.value[1]);
@@ -2543,13 +2595,12 @@ void Document::control_event_locked(VrControlEvent event) {
       c.value[0]=found==ids.end()?0:float(found-ids.begin());break;
     }
     case VrParameter::SkinMode: {
-      const bool anatomical=!skin_sources_locked(SkinAuthoringMode::Anatomical).empty();
-      c.title=anatomical?"Method: Automatic / transfer / anatomical":"Automatic bind / weight transfer";
-      c.maximum=anatomical?2:1;
-      c.value[0]=state_.skin_options.mode==SkinAuthoringMode::Anatomical?(anatomical?2:0):int(state_.skin_options.mode);break;
+      c.title="Method: Legacy / transfer / source / Automatic";
+      c.maximum=3;
+      c.value[0]=float(detail::skin_method_choice(state_.skin_options.mode));break;
     }
     case VrParameter::SkinDistances:
-      c.title="Seed / margin / transfer (world mm)";c.components=3;
+      c.title=state_.skin_options.mode==SkinAuthoringMode::SurfaceHeat?"Seed radius (world mm)":"Seed / margin / transfer (world mm)";c.components=state_.skin_options.mode==SkinAuthoringMode::SurfaceHeat?1:3;
       c.value={skin_distance_slider(state_.skin_options.seed_distance),skin_distance_slider(state_.skin_options.seed_margin),skin_distance_slider(state_.skin_options.transfer_distance),0};break;
     case VrParameter::SkinFalloff:
       c.title="Automatic bind distance falloff";c.minimum=1;c.maximum=8;c.value[0]=state_.skin_options.falloff;break;
@@ -3032,7 +3083,8 @@ bool Document::command_enabled_locked(SpatialCommand command) const {
   if(command==SpatialCommand::BakeSurface)return !control_before_ && bake_source_eligible_locked(state_.bake_source) && state_.bake_settings.cage_object!=unavailable_bake_object && bake_target_ready_locked();
   if(command==SpatialCommand::ClearBake)return !control_before_ && bake_target_ready_locked() && bool(scene_.active().painted->baked());
   if(command==SpatialCommand::BindSkin) return !control_before_ && skin_target_ready_locked() &&
-    !skin_sources_locked(state_.skin_options.mode).empty();
+    !skin_sources_locked(state_.skin_options.mode).empty() &&
+    !(state_.skin_options.mode==SkinAuthoringMode::SurfaceHeat&&state_.selected_objects.size()>1&&!selected_skin_ready_locked(SkinAuthoringMode::SurfaceHeat));
   if(command==SpatialCommand::SkinUseLocks) return !control_before_ && skin_target_ready_locked() && state_.can_paint_weights;
   if (uv_solving_ && (command == SpatialCommand::Undo || command == SpatialCommand::Redo)) return false;
   if (command >= SpatialCommand::WeightToggle && command <= SpatialCommand::WeightLinked)
@@ -3278,7 +3330,8 @@ void Document::command_locked(SpatialCommand command) {
       auto options=state_.skin_options;
       if(state_.skin_use_locks && state_.can_paint_weights) options.locks=state_.weights.locks;
       else options.locks.clear();
-      queue_bind_skin_locked(std::move(options));
+      const bool selected=options.mode==SkinAuthoringMode::SurfaceHeat&&state_.selected_objects.size()>1;
+      queue_bind_skin_locked(std::move(options),{},selected,selected?state_.selected_objects:std::vector<uint64_t>{});
     }
     return;
   }

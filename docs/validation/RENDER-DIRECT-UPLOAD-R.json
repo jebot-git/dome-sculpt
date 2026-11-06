@@ -1,0 +1,96 @@
+{
+  "status": "Qualified private Release component only, not main admission",
+  "base": "5b02bfc44f9ba6f5b0fb33b225ca46c1db986f68",
+  "product_delta": [
+    "src/render.cpp only; fixed-size descriptor table and direct structure-of-arrays VBO upload, source-frame aliases and per-draw defaults; no public layout/schema change"
+  ],
+  "source_sha256": {
+    "src/render.cpp": "87ee8e34971c2fb498c99d7799391db81a8d32aa833850a6f20c8690f1cdd6fe",
+    "tests/render-direct-upload.cpp": "0d083cc2e77374187971f8df941609882f6f27cd744068e308d96b8aa36d484e",
+    "CMakeLists.txt": "5dbb903dd524a23873854a930daa7793c5961a4e81207c1c1ffa709e62671cad"
+  },
+  "baseline": {
+    "status": "artifacts/staging-proof/baseline/status.json",
+    "sha256": "8b1cec46242d33419301be03c9661a454b2038ae2058314c816ad2a55044583d",
+    "unchanged_renderer_source": "artifacts/staging-proof/baseline/render-source.cpp",
+    "actual_reference_exit": 0,
+    "actual_direct_contract_negative": 1
+  },
+  "qualified_R": {
+    "direct_status": "artifacts/staging-proof/direct-r-v1/status.json",
+    "direct_status_sha256": "137b83fb13420f262ae845f1f2b1670e7f8021b67d9b8fa58dfeb8e86044b18a",
+    "actual_direct_checks": 37,
+    "exact_framebuffer_pairs": 6,
+    "regression_status": "artifacts/staging-proof/regress-r-v1/status.json",
+    "regression_status_sha256": "ce3dbe52f166529e26995760f7fbc5e74e0d76f8979ba2c5b59469391ad263e6",
+    "regression_scopes": {
+      "render-buffers": {
+        "PASS_lines": 24,
+        "last_line": "GPU buffer reuse complete: 24 checks"
+      },
+      "mtoon-render": {
+        "PASS_lines": 81,
+        "last_line": "Production MToon/linear target tests complete: 81 checks"
+      },
+      "normal-frame-render": {
+        "PASS_lines": 47,
+        "last_line": "Original frame renderer checks 47"
+      },
+      "object-isolation-render": {
+        "PASS_lines": 36,
+        "last_line": "Ghost GPU checks 36"
+      },
+      "render": {
+        "PASS_lines": 6,
+        "last_line": "PASS Native PBR and toon GPU previews, grey appearance backgrounds, transparent XR overlay, BDF spatial menu and visible joystick selection"
+      }
+    },
+    "old_render_archive_member_extracted": false
+  },
+  "device": {
+    "GPU": "Actual Intel Arc A770 PCI0000:03:00.0/renderD129/8086:56a0/i915, actual current EGL device and open FDs",
+    "observer": "Unmodified tests/retopo-marker-device.cpp link seam forwards actual glGetString",
+    "mapped_DSO_audit": "artifacts/staging-proof/R-mapped-DSO-audit.json",
+    "mapped_DSO_audit_sha256": "3312a61b40d56915ad6b00d51a3ae4164dbcbb1c0be3d1dcca5ef305b8d580d4",
+    "observer_negatives": [
+      {
+        "name": "software",
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/bounded-render-5b02/artifacts/staging-proof/direct-r-v1/native",
+          "direct",
+          "/home/blux/de-xr/dome-sculpt/artifacts/bounded-render-5b02/artifacts/staging-proof/direct-r-v1/software-images"
+        ],
+        "exit": 1,
+        "actual_renderer_lines": [
+          "GPU STRICT_MARKER_ACTUAL vendor=Mesa renderer=llvmpipe (LLVM 22.1.8, 256 bits) version=4.6 (Core Profile) Mesa 26.2.5"
+        ]
+      },
+      {
+        "name": "uhd",
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/bounded-render-5b02/artifacts/staging-proof/direct-r-v1/native",
+          "direct",
+          "/home/blux/de-xr/dome-sculpt/artifacts/bounded-render-5b02/artifacts/staging-proof/direct-r-v1/uhd-images"
+        ],
+        "exit": 1,
+        "actual_renderer_lines": [
+          "GPU STRICT_MARKER_ACTUAL vendor=Intel renderer=Mesa Intel(R) UHD Graphics 770 (ADL-S GT1) version=4.6 (Core Profile) Mesa 26.2.5"
+        ]
+      }
+    ],
+    "observer_policy": "Strict hardware witness refuses software and UHD; product renderer still permits supported software/other devices"
+  },
+  "representation": {
+    "plain_vertices": 19200,
+    "plain_current_static_bytes_per_vertex": 24,
+    "old_interleaved_struct_bytes_per_vertex": 56,
+    "metric_note": "New24 verified from actual buffer_stats; old56 is the original C++ packed layout, not a timing benchmark",
+    "packing_staging": "Fixed14 descriptors, no mesh-sized Vertex/FrameVertex temporary; required derived-coordinate preparation and full geometry uploads remain separate"
+  },
+  "remaining": [
+    "Fresh current-main/caller matching composition, sanitizer and ordinary app qualification",
+    "Actual registered CTest execution; CMake registration added only",
+    "Broader material/owner/paint/device/production requirements and full goal"
+  ],
+  "installation": false
+}

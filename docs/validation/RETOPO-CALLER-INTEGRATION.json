@@ -1,0 +1,201 @@
+{
+  "qualified_candidate": "0cbc08900a1790089e084a8b5c1247d4d5f6851b",
+  "main_parent": "5b02bfc44f9ba6f5b0fb33b225ca46c1db986f68",
+  "source_parity_paths": [
+    "CMakeLists.txt",
+    "include/dome/document.hpp",
+    "src/document-contact.cpp",
+    "src/document-interaction.cpp",
+    "src/document-projection.cpp",
+    "src/document-retopo-input.hpp",
+    "src/document-retopo.cpp",
+    "src/document-rig-fit.cpp",
+    "src/document-shapes.cpp",
+    "src/document-worker-errors.cpp",
+    "src/document.cpp",
+    "src/spatial-history-levels.hpp",
+    "src/xr.cpp",
+    "tests/retopo-authority-admission.cpp",
+    "tests/retopo-caller-admission.cpp",
+    "tests/retopo-history-openxr.cpp",
+    "tests/retopo-input-admission.cpp",
+    "tests/xr_runtime.cpp"
+  ],
+  "source_parity_drift": [],
+  "original_admission_receipt_sha256": "c2e1e7966eb88ceede57f02601f109852c02683e8e4cc5e6dbe3137642f3e7a7",
+  "root_verified": {
+    "final_proof_receipts": 9,
+    "archive_restore_ledgers_and_archives": 7,
+    "ordinary_application_file_pairs": 6,
+    "source_hashes": 18
+  },
+  "test_scope": {
+    "native_per_profile": {
+      "input_checks": 13442,
+      "persistent_caller_boundaries": 710,
+      "worker_one_shot_points": 251,
+      "worker_checks": 4308,
+      "persistent_reporter_checks": 42,
+      "accepted_publication_file_cancel_checks": 97,
+      "held_admission_prefixes": 73,
+      "held_checks": 1419,
+      "immediate_handoff_prefixes": 71,
+      "composed_handoff_checks": 954,
+      "additional_affine_checks": 394,
+      "composed_cumulative_after_affine": 1348,
+      "authoring_checks": 62,
+      "bridge_checks": 131,
+      "composed_total_checks": 1541,
+      "boundaries": 26,
+      "authority_grab_checks": 31,
+      "authority_focus_checks": 55
+    },
+    "actual_new_loader_per_profile": {
+      "apply": 161,
+      "cancel": 156,
+      "raw_boolean_levels": true,
+      "real_xrSyncActions_and_xrGetActionStateBoolean": true,
+      "focus_loss_regain": true,
+      "reference_space_change_while_held": true,
+      "terminal_simultaneous_history": true,
+      "second_real_press": true
+    },
+    "ordinary_app_per_profile": {
+      "normal": 15,
+      "unzoomed_compact": 16,
+      "affine_loader": 27,
+      "total": 58
+    },
+    "registered_CMake_tests": [
+      "retopology-caller-admission",
+      "retopology-input-admission",
+      "retopology-authority-grab",
+      "retopology-authority-focus",
+      "retopology-history-openxr-apply",
+      "retopology-history-openxr-cancel"
+    ],
+    "runtime_build_dependency": true,
+    "configuration_only_CTest_runner_not_claimed": true
+  },
+  "byte_pairs": {
+    "native": [
+      {
+        "scope": "input",
+        "count": 4,
+        "sha256": {
+          "controller-apply.dsculpt": "1862e38c05eba6598584593b09a45285827b2a9be6f0c6f082ca50687b06b53e",
+          "frame-retry.dsculpt": "1862e38c05eba6598584593b09a45285827b2a9be6f0c6f082ca50687b06b53e",
+          "retry.dsculpt": "1862e38c05eba6598584593b09a45285827b2a9be6f0c6f082ca50687b06b53e",
+          "worker-retry.dsculpt": "1862e38c05eba6598584593b09a45285827b2a9be6f0c6f082ca50687b06b53e"
+        }
+      },
+      {
+        "scope": "worker",
+        "count": 3,
+        "sha256": {
+          "local-undo.dsculpt": "1862e38c05eba6598584593b09a45285827b2a9be6f0c6f082ca50687b06b53e",
+          "next-gesture.dsculpt": "a7cc3cb536974e8ab11caefb53d5655bd3629a53e80070501b6bf0d9cce22d74",
+          "file-cancel-retry.dsculpt": "a7cc3cb536974e8ab11caefb53d5655bd3629a53e80070501b6bf0d9cce22d74"
+        }
+      },
+      {
+        "scope": "held",
+        "count": 1,
+        "sha256": {
+          "retry.dsculpt": "a7cc3cb536974e8ab11caefb53d5655bd3629a53e80070501b6bf0d9cce22d74"
+        }
+      },
+      {
+        "scope": "composed",
+        "count": 26,
+        "sha256": {
+          "immediate.dsculpt": "1862e38c05eba6598584593b09a45285827b2a9be6f0c6f082ca50687b06b53e",
+          "noop.dsculpt": "1862e38c05eba6598584593b09a45285827b2a9be6f0c6f082ca50687b06b53e",
+          "cancel.dsculpt": "56be03a0a42ca6b4008c851f440f7233588f458b2836c890cb9f01c9b5a4623b",
+          "invalid-face.dsculpt": "56be03a0a42ca6b4008c851f440f7233588f458b2836c890cb9f01c9b5a4623b",
+          "injected-error.dsculpt": "56be03a0a42ca6b4008c851f440f7233588f458b2836c890cb9f01c9b5a4623b",
+          "stale.dsculpt": "56be03a0a42ca6b4008c851f440f7233588f458b2836c890cb9f01c9b5a4623b",
+          "shutdown.dsculpt": "1862e38c05eba6598584593b09a45285827b2a9be6f0c6f082ca50687b06b53e",
+          "overflow.dsculpt": "56be03a0a42ca6b4008c851f440f7233588f458b2836c890cb9f01c9b5a4623b",
+          "queued-0.dsculpt": "1862e38c05eba6598584593b09a45285827b2a9be6f0c6f082ca50687b06b53e",
+          "queued-1.dsculpt": "1862e38c05eba6598584593b09a45285827b2a9be6f0c6f082ca50687b06b53e",
+          "queued-2.dsculpt": "1862e38c05eba6598584593b09a45285827b2a9be6f0c6f082ca50687b06b53e",
+          "queued-3.dsculpt": "1862e38c05eba6598584593b09a45285827b2a9be6f0c6f082ca50687b06b53e",
+          "queued-4.dsculpt": "1862e38c05eba6598584593b09a45285827b2a9be6f0c6f082ca50687b06b53e",
+          "queued-5.dsculpt": "1862e38c05eba6598584593b09a45285827b2a9be6f0c6f082ca50687b06b53e",
+          "queued-6.dsculpt": "1862e38c05eba6598584593b09a45285827b2a9be6f0c6f082ca50687b06b53e",
+          "queued-7.dsculpt": "1862e38c05eba6598584593b09a45285827b2a9be6f0c6f082ca50687b06b53e",
+          "calibration.dsculpt": "1862e38c05eba6598584593b09a45285827b2a9be6f0c6f082ca50687b06b53e",
+          "retry.dsculpt": "1862e38c05eba6598584593b09a45285827b2a9be6f0c6f082ca50687b06b53e",
+          "0-rest.dsculpt": "7f593a07b349a5292929247c18106ea31b28938df5f8a2cdf89190f1855205d8",
+          "0-posed.dsculpt": "e2b7c7d100733fffc72c2cd8c2f08b9197353859c0414b75ceb4981f09b61a35",
+          "1-rest.dsculpt": "30f06fc3d16348d4a4c160c9a6dce6d21cd1ee71395f86d2b46ab8794cfc7292",
+          "1-posed.dsculpt": "d2fa86378548811e3c4b0f41ae1fd56aa797ec0c00e270c3af6fe2c4481c01f6",
+          "2-rest.dsculpt": "48cb653e541a28e21dbcff46c89faed4c9a43b9afe6c94e50c2504cc2a88c92e",
+          "2-posed.dsculpt": "c73d1068c3a8da8b5cd4418b02793534a55f0245d4153bb9118ee77d0b3b0918",
+          "3-rest.dsculpt": "be98656e204d67ee2afa65b9dbcc751be41fad0ae0d18c1f9b926d4fd7973066",
+          "3-posed.dsculpt": "8698c5be253c3ffa36986f0070fc481b24ae65cbfe752e5254fc76f8f439a919"
+        }
+      },
+      {
+        "scope": "authority-grab",
+        "count": 1,
+        "sha256": "1862e38c05eba6598584593b09a45285827b2a9be6f0c6f082ca50687b06b53e"
+      },
+      {
+        "scope": "authority-focus",
+        "count": 1,
+        "sha256": "1862e38c05eba6598584593b09a45285827b2a9be6f0c6f082ca50687b06b53e"
+      },
+      {
+        "scope": "history-apply",
+        "count": 1,
+        "sha256": "1862e38c05eba6598584593b09a45285827b2a9be6f0c6f082ca50687b06b53e"
+      },
+      {
+        "scope": "history-cancel",
+        "count": 1,
+        "sha256": "a14076b41fb67d17e8c5043146a4d1037cd5c448c0895a23972446f130cdf6f5"
+      }
+    ],
+    "ordinary_apps": [
+      {
+        "release": "/home/blux/de-xr/dome-sculpt/artifacts/retopo-caller-9dd/artifacts/caller-proof/final-app/release/gui-normal/accepted.dsculpt",
+        "sanitize": "/home/blux/de-xr/dome-sculpt/artifacts/retopo-caller-9dd/artifacts/caller-proof/final-app/sanitize/gui-normal/accepted.dsculpt",
+        "sha256": "57f6886aee93ce1f0745a0cdbc712e3cf71053f40b06d5755f2ce8159c3c4d99"
+      },
+      {
+        "release": "/home/blux/de-xr/dome-sculpt/artifacts/retopo-caller-9dd/artifacts/caller-proof/final-app/release/gui-compact-default/accepted.dsculpt",
+        "sanitize": "/home/blux/de-xr/dome-sculpt/artifacts/retopo-caller-9dd/artifacts/caller-proof/final-app/sanitize/gui-compact-default/accepted.dsculpt",
+        "sha256": "4346e5cb12beac0a03efe88ad125fc3f664780b8e46d0e3862936e6390f50e1d"
+      },
+      {
+        "release": "/home/blux/de-xr/dome-sculpt/artifacts/retopo-caller-9dd/artifacts/caller-proof/final-app/release/xr/committed.dsculpt",
+        "sanitize": "/home/blux/de-xr/dome-sculpt/artifacts/retopo-caller-9dd/artifacts/caller-proof/final-app/sanitize/xr/committed.dsculpt",
+        "sha256": "c13bec551cd935e947bc82cb54eb8ce9100da02d2df14c0a36f82c4c5b0053d8"
+      },
+      {
+        "release": "/home/blux/de-xr/dome-sculpt/artifacts/retopo-caller-9dd/artifacts/caller-proof/final-app/release/xr/accept.dsculpt",
+        "sanitize": "/home/blux/de-xr/dome-sculpt/artifacts/retopo-caller-9dd/artifacts/caller-proof/final-app/sanitize/xr/accept.dsculpt",
+        "sha256": "a8b0878f48f279d9768600f3385e74822f62c8cc276e5a007d5d6dddca8ef4a7"
+      },
+      {
+        "release": "/home/blux/de-xr/dome-sculpt/artifacts/retopo-caller-9dd/artifacts/caller-proof/final-app/release/xr/focus.dsculpt",
+        "sanitize": "/home/blux/de-xr/dome-sculpt/artifacts/retopo-caller-9dd/artifacts/caller-proof/final-app/sanitize/xr/focus.dsculpt",
+        "sha256": "a8b0878f48f279d9768600f3385e74822f62c8cc276e5a007d5d6dddca8ef4a7"
+      },
+      {
+        "release": "/home/blux/de-xr/dome-sculpt/artifacts/retopo-caller-9dd/artifacts/caller-proof/final-app/release/xr/unconfirmed.dsculpt",
+        "sanitize": "/home/blux/de-xr/dome-sculpt/artifacts/retopo-caller-9dd/artifacts/caller-proof/final-app/sanitize/xr/unconfirmed.dsculpt",
+        "sha256": "c13bec551cd935e947bc82cb54eb8ce9100da02d2df14c0a36f82c4c5b0053d8"
+      }
+    ],
+    "total": 44
+  },
+  "dependency_boundary": "Private Acceptance112\u2192168 only allocated/accessed in whole DocRetopo. Private Scope16; whole Doc/worker-errors/interaction rebuilt. All four history-helper consumer TUs rebuilt. No Transaction extent, Document/EditorState/Scene fields, RetopoJob extent or Scene schema changes. Current mode5/poly payload providers retained; no C179 old PolygonJob providers.",
+  "goal_status": "active and incomplete",
+  "limitations": [
+    "Matched component rebuild/ordinary app relink, not fresh whole-project build",
+    "No new hardware/HMD/accelerator or installation result"
+  ]
+}

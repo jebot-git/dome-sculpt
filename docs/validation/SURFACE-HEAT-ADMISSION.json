@@ -1,0 +1,42 @@
+{
+  "main_merge": "9c72cc232c583ae9dc26090a9c3e2aeecb1d289d",
+  "qualified_seal": "6bcc91b0f5979563cdfa0d4662b95ad34fda9d3b",
+  "runtime_source": "bef587631b52e064a0c34714f613dd66938297ce",
+  "product_header_tests_CMake_byte_exact": true,
+  "qualification_receipt": "MODE5-MAIN-APPLICATION-QUALIFICATION.json",
+  "qualification_receipt_sha256": "49dc1c584633582fb49abf583a59a141bbae9539f6274c2c95616bfbb971c52f",
+  "behavior": "Explicit SurfaceHeat5 skin binding with existing Automatic0 default preserved; no serialized weight changes without a request",
+  "current_native_each": {
+    "surface": 25,
+    "legacy": 38,
+    "polygon_retopology": 248,
+    "retopo_worker_one_shot_failures": 251,
+    "retopo_worker_checks": 4308
+  },
+  "current_surface_heat_worker_each": {
+    "regular_persistent_prefixes": 373,
+    "actual_long_measurement": 377,
+    "long_tail_tested": [
+      373,
+      377
+    ],
+    "all_regular_and_tail_endpoints_exit": 0
+  },
+  "actual_Fltk_checks": 152,
+  "actual_software_OpenXR_checks": 56,
+  "checker": "Fresh Release inspector explicitly checks both Release and fully instrumented sanitizer app outputs; no sanitizer-checker claim",
+  "exact_leaf_historical_only": "Original3496 numeric comparisons,1052 direct caller,381 full long-path and7667 mixed prefixes/profile remain their separate1e6 source scope",
+  "closure": "Whole fresh merged core5 and palette/editor; complete qualified current polygon/retopo/render/app/XR providers and immutable ABI-compatible support; no partial functions or old-sized class facade",
+  "remaining": [
+    "Broader prepared/complex37/38 source domains and production deformation quality",
+    "Current full caller/factory coverage beyond the stated native/publication scopes",
+    "Whole-project/interoperability/physical device/accelerator requirements"
+  ],
+  "default_changed": false,
+  "fresh_all_build": false,
+  "physical_HMD": false,
+  "new_compute_or_hardware_claim": false,
+  "installation": false,
+  "session_restart": false,
+  "full_goal_complete": false
+}

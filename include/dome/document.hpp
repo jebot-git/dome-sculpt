@@ -32,7 +32,10 @@ namespace dome {
 class MaterialSurfaceQuery;
 struct SpatialHand {
   TrackedHand tracked;
-  bool joystick = false, undo = false, redo = false;
+  bool joystick = false;
+  // Current button levels. Document owns press edges and modal consumption;
+  // providers must not pre-filter these with changedSinceLastSync.
+  bool undo = false, redo = false;
   float x = 0, y = 0;
   DeviceKind kind = DeviceKind::Controller;
 };
@@ -541,6 +544,7 @@ private:
     uint64_t content = 0, revision = 0, isolation_target = 0;
     RecoverySource recovery_source;
     CanvasTransform pose{};
+    std::shared_ptr<const NativeAffineEdit> affine_pose;
     std::array<bool,2> grips{};
     std::exception_ptr error;
   };
@@ -553,6 +557,7 @@ private:
     std::shared_ptr<PolygonAccept> acceptance;
     std::optional<PolygonAction> action;
     Vec3 origin{}, direction{};
+    std::optional<AffineTransform> world; // True metric/pointer frame, including held/XR placement.
     float radius = .015f, amount = .01f, maximum = 100;
     unsigned cuts = 1;
     bool accept = false, convert_source = false, additive = false;
@@ -581,6 +586,33 @@ private:
   std::atomic<uint64_t> retopo_session_{0};
   bool retopo_stroking_ = false, retopo_sampled_ = false, retopo_accepting_ = false;
   size_t retopo_pending_ = 0;
+  // Shared independent-input/file-queue handoff, protected by retopo_mutex_.
+  // This is a deque element payload, not a new Document/EditorState field.
+  class RetopoInputScope;
+  void rebase_space_locked(std::optional<CanvasTransform>, RetopoInputScope &);
+  struct RetopoStep {
+    RetopoAction action;
+    Vec3 point{};
+    float snap_mm = 50;
+    bool coalescible = false;
+  };
+  struct RetopoAcceptance {
+    enum class Admission { Pending, Accepted, Rejected };
+    Admission admission = Admission::Pending;
+    std::shared_ptr<AssetWork> work;
+    std::shared_ptr<bool> changed;
+    std::shared_ptr<const RetopoMesh> topology;
+    uint64_t source = 0;
+    CanvasTransform transform{};
+    std::exception_ptr error;
+    bool ready = false;
+    // A pending batch stays in the deque until its caller publishes. No
+    // accepted payload is coalesced or otherwise modified by a later caller.
+    bool input_batch = false, counted = false, cancel_workspace = false, opening = false;
+    std::optional<uint64_t> next_session;
+    std::vector<RetopoStep> steps;
+    std::shared_ptr<AssetWork> cancel_work;
+  };
   struct RetopoJob {
     uint64_t session = 0;
     std::shared_ptr<const Scene> initial;
@@ -588,6 +620,7 @@ private:
     Vec3 point{};
     float snap_mm = 50;
     bool accept = false, coalescible = false;
+    std::shared_ptr<RetopoAcceptance> acceptance{};
   };
   mutable std::mutex retopo_mutex_;
   mutable std::condition_variable retopo_changed_;

@@ -97,6 +97,54 @@ int main() try {
           std::abs(closest.barycentric[0] + closest.barycentric[1] +
                    closest.barycentric[2] - 1) < 1e-6f,
       "Reusable BVH closest queries expose triangle identity and barycentrics");
+  bool thin_interior=true,thin_edges=true,thin_filters=true,thin_ranges=true,thin_normals=true;
+  for(float scale:{std::ldexp(1.f,-20),1.f,32.f})
+    for(float ratio:{std::ldexp(1.f,-10),std::ldexp(1.f,-30),std::ldexp(1.f,-60)})
+      for(int axis=0;axis<3;++axis)for(bool flipped:{false,true}) {
+        auto rotate=[axis](Vec3 p) {return axis==0?p:axis==1?Vec3{p.z,p.x,p.y}:Vec3{p.y,p.z,p.x};};
+        const float h=scale*ratio,d=scale*.125f;
+        Mesh thin;thin.positions={rotate({0,0,0}),rotate({scale,0,0}),rotate({scale,h,0})};
+        thin.normals.assign(3,rotate({0,0,1}));thin.indices=flipped?std::vector<uint32_t>{0,2,1}:std::vector<uint32_t>{0,1,2};
+        SurfaceQuery surface(thin);
+        const auto interior=surface.closest(rotate({scale*.75f,h*.25f,d}));
+        const std::array<float,3> expected=flipped?std::array<float,3>{.25f,.25f,.5f}:std::array<float,3>{.25f,.5f,.25f};
+        const auto point=rotate({scale*.75f,h*.25f,0});
+        thin_interior &= interior.barycentric==expected&&interior.position.x==point.x&&interior.position.y==point.y&&interior.position.z==point.z&&interior.distance==d;
+        const auto edge=surface.closest(rotate({scale*.5f,-h,d}));
+        const std::array<float,3> edge_bary=flipped?std::array<float,3>{.5f,0,.5f}:std::array<float,3>{.5f,.5f,0};
+        const auto vertex=surface.closest(rotate({-scale*.5f,-h,d}));
+        thin_edges &= edge.barycentric==edge_bary&&vertex.barycentric==std::array<float,3>{1,0,0};
+        bool observed=false;SurfaceQueryOptions options;
+        options.closest_filter=[&](uint32_t t,const auto &bary){observed=true;return t==0&&bary==expected;};
+        thin_filters &= surface.nearest(rotate({scale*.75f,h*.25f,d}),options).has_value()&&observed;
+        options.closest_filter={};options.closest_maximum=d;
+        thin_ranges &= surface.nearest(rotate({scale*.75f,h*.25f,d}),options).has_value();
+        options.closest_maximum=d*.5f;
+        thin_ranges &= !surface.nearest(rotate({scale*.75f,h*.25f,d}),options);
+        const auto expected_normal=rotate({0,0,flipped?-1.f:1.f});
+        for(bool cancelling:{false,true}) {
+          auto fallback=thin;
+          fallback.normals=cancelling?std::vector<Vec3>{rotate({1,0,0}),rotate({-1,0,0}),rotate({1,0,0})}:std::vector<Vec3>(3);
+          SurfaceQuery geometric(fallback);
+          const auto nearest=geometric.closest(rotate({scale*.75f,h*.25f,d}));
+          const auto ray=geometric.raycast(rotate({scale*.75f,h*.25f,d}),rotate({0,0,-1}),d*2);
+          thin_normals &= finite(nearest.normal)&&length(nearest.normal-expected_normal)<1e-6f;
+          thin_normals &= ray&&finite(ray->normal)&&length(ray->normal-expected_normal)<1e-6f;
+        }
+      }
+  require(thin_interior,"Thin valid triangles preserve interior barycentrics across scales, axes and winding");
+  require(thin_edges,"Thin triangle exterior queries retain the correct edge and vertex regions");
+  require(thin_filters,"Closest filters receive actual thin-triangle barycentrics without rounded-point reconstruction");
+  require(thin_ranges,"Thin triangle nearest queries obey exact inclusive physical distance bounds");
+  require(thin_normals,"Missing or cancelling normals use scale-independent geometric winding for nearest and ray hits");
+  Mesh tiny_range;tiny_range.positions={{0,0,0},{1,0,0},{0,1,0}};
+  tiny_range.normals.assign(3,{0,0,1});tiny_range.indices={0,1,2};
+  SurfaceQuery tiny_surface(tiny_range);SurfaceQueryOptions tiny_options;
+  const float tiny_distance=std::ldexp(1.f,-80);tiny_options.closest_maximum=tiny_distance;
+  auto tiny_hit=tiny_surface.nearest({.25f,.25f,tiny_distance},tiny_options);
+  require(tiny_hit&&tiny_hit->distance==tiny_distance,"Nearest radius squares retain sub-float-range physical distances");
+  tiny_options.closest_maximum=tiny_distance*.5f;
+  require(!tiny_surface.nearest({.25f,.25f,tiny_distance},tiny_options),"Sub-float-range radius cannot admit a more distant surface");
   auto filtered = query.closest(
       {0, 0, .4f},
       {.triangle_filter = [](uint32_t t) { return t < 2; }, .cancelled = {}});

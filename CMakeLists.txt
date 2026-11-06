@@ -439,6 +439,18 @@ if(BUILD_TESTING)
   add_executable(dome-sculpt-polygon-source-test tests/polygon-source.cpp)
   target_link_libraries(dome-sculpt-polygon-source-test PRIVATE dome-sculpt-core)
   add_test(NAME polygon-source COMMAND dome-sculpt-polygon-source-test)
+  add_executable(dome-sculpt-polygon-retopo-affine-test tests/polygon-retopo-affine.cpp)
+  target_link_libraries(dome-sculpt-polygon-retopo-affine-test PRIVATE dome-sculpt-core)
+  add_test(NAME polygon-retopo-affine COMMAND dome-sculpt-polygon-retopo-affine-test ${CMAKE_CURRENT_BINARY_DIR}/polygon-retopo-affine)
+  set_tests_properties(polygon-retopo-affine PROPERTIES TIMEOUT 240)
+  add_executable(dome-sculpt-polygon-affine-test tests/polygon-affine.cpp)
+  target_include_directories(dome-sculpt-polygon-affine-test PRIVATE src)
+  target_link_libraries(dome-sculpt-polygon-affine-test PRIVATE dome-sculpt-core)
+  add_test(NAME polygon-affine COMMAND dome-sculpt-polygon-affine-test)
+  add_test(NAME polygon-affine-controller COMMAND dome-sculpt-polygon-affine-test --controller)
+  add_test(NAME polygon-affine-faults COMMAND dome-sculpt-polygon-affine-test --faults)
+  set_tests_properties(polygon-affine polygon-affine-controller PROPERTIES TIMEOUT 180)
+  set_tests_properties(polygon-affine-faults PROPERTIES TIMEOUT 600)
   add_executable(dome-sculpt-polygon-authoring-test tests/polygon-authoring.cpp)
   target_link_libraries(dome-sculpt-polygon-authoring-test PRIVATE dome-sculpt-core)
   add_test(NAME polygon-authoring COMMAND dome-sculpt-polygon-authoring-test)
@@ -557,6 +569,70 @@ if(BUILD_TESTING)
   add_executable(dome-sculpt-retopo-authoring-test tests/retopo-authoring.cpp)
   target_link_libraries(dome-sculpt-retopo-authoring-test PRIVATE dome-sculpt-core)
   add_test(NAME retopology-authoring COMMAND dome-sculpt-retopo-authoring-test)
+  add_executable(dome-sculpt-retopo-affine-test tests/retopo-affine.cpp)
+  target_link_libraries(dome-sculpt-retopo-affine-test PRIVATE dome-sculpt-core)
+  target_link_options(dome-sculpt-retopo-affine-test PRIVATE -Wl,--wrap=_ZN4dome6unwrapERNS_4MeshEjjRKSt8functionIFbvEE)
+  add_test(NAME retopology-affine COMMAND dome-sculpt-retopo-affine-test ${CMAKE_CURRENT_BINARY_DIR}/retopology-affine)
+  add_executable(dome-sculpt-retopo-save-handoff-test tests/retopo-save-handoff.cpp)
+  target_link_libraries(dome-sculpt-retopo-save-handoff-test PRIVATE dome-sculpt-core)
+  target_link_options(dome-sculpt-retopo-save-handoff-test PRIVATE
+    -Wl,--wrap=_ZN4dome6unwrapERNS_4MeshEjjRKSt8functionIFbvEE
+    -Wl,--wrap=_ZN4dome15RetopoWorkspace4editENS_12RetopoActionENS_4Vec3EfRKSt8functionIFbvEE)
+  add_test(NAME retopology-save-handoff COMMAND dome-sculpt-retopo-save-handoff-test ${CMAKE_CURRENT_BINARY_DIR}/retopology-save-handoff)
+  add_executable(dome-sculpt-retopo-held-admission-test tests/retopo-held-admission.cpp)
+  target_link_libraries(dome-sculpt-retopo-held-admission-test PRIVATE dome-sculpt-core)
+  target_link_options(dome-sculpt-retopo-held-admission-test PRIVATE
+    -Wl,--wrap=_ZN4dome6unwrapERNS_4MeshEjjRKSt8functionIFbvEE
+    -Wl,--wrap=_ZN4dome15RetopoWorkspace4editENS_12RetopoActionENS_4Vec3EfRKSt8functionIFbvEE)
+  add_test(NAME retopology-held-admission COMMAND dome-sculpt-retopo-held-admission-test ${CMAKE_CURRENT_BINARY_DIR}/retopology-held-admission)
+  add_executable(dome-sculpt-retopo-worker-faults-test tests/retopo-worker-faults.cpp)
+  target_link_libraries(dome-sculpt-retopo-worker-faults-test PRIVATE dome-sculpt-core)
+  target_link_options(dome-sculpt-retopo-worker-faults-test PRIVATE
+    -Wl,--wrap=_ZN4dome6unwrapERNS_4MeshEjjRKSt8functionIFbvEE
+    -Wl,--wrap=_ZN4dome8Document11retopo_loopEv
+    -Wl,--wrap=_ZN4dome15RetopoWorkspace4editENS_12RetopoActionENS_4Vec3EfRKSt8functionIFbvEE
+    -Wl,--wrap=_ZN4dome8Document14publish_lockedEbb)
+  add_test(NAME retopology-worker-faults COMMAND dome-sculpt-retopo-worker-faults-test)
+  add_test(NAME retopology-worker-reporter-recovery COMMAND dome-sculpt-retopo-worker-faults-test --persistent)
+  add_test(NAME retopology-worker-accepted-publication COMMAND dome-sculpt-retopo-worker-faults-test
+    --acceptance ${CMAKE_CURRENT_BINARY_DIR}/retopology-worker-accepted-publication)
+  set_tests_properties(retopology-worker-faults retopology-worker-reporter-recovery
+    retopology-worker-accepted-publication PROPERTIES TIMEOUT 120)
+  add_executable(dome-sculpt-retopo-caller-admission-test tests/retopo-caller-admission.cpp)
+  target_link_libraries(dome-sculpt-retopo-caller-admission-test PRIVATE dome-sculpt-core)
+  target_link_options(dome-sculpt-retopo-caller-admission-test PRIVATE
+    -Wl,--wrap=_ZN4dome6unwrapERNS_4MeshEjjRKSt8functionIFbvEE
+    -Wl,--wrap=_ZN4dome15RetopoWorkspace4editENS_12RetopoActionENS_4Vec3EfRKSt8functionIFbvEE
+    -Wl,--wrap=_ZN4dome8Document14publish_lockedEbb)
+  add_test(NAME retopology-caller-admission COMMAND dome-sculpt-retopo-caller-admission-test
+    ${CMAKE_CURRENT_BINARY_DIR}/retopology-caller-admission)
+  set_tests_properties(retopology-caller-admission PROPERTIES TIMEOUT 300)
+  add_executable(dome-sculpt-retopo-input-admission-test tests/retopo-input-admission.cpp)
+  target_link_libraries(dome-sculpt-retopo-input-admission-test PRIVATE dome-sculpt-core)
+  target_link_options(dome-sculpt-retopo-input-admission-test PRIVATE
+    -Wl,--wrap=_ZN4dome6unwrapERNS_4MeshEjjRKSt8functionIFbvEE
+    -Wl,--wrap=_ZN4dome15RetopoWorkspace4editENS_12RetopoActionENS_4Vec3EfRKSt8functionIFbvEE
+    -Wl,--wrap=_ZN4dome8Document14publish_lockedEbb
+    -Wl,--wrap=_ZN4dome12SpatialInput6updateERKNS_13SpatialSampleE
+    -Wl,--wrap=_ZN4dome8Document16RetopoInputScope6commitEv)
+  add_test(NAME retopology-input-admission COMMAND dome-sculpt-retopo-input-admission-test
+    ${CMAKE_CURRENT_BINARY_DIR}/retopology-input-admission)
+  set_tests_properties(retopology-input-admission PROPERTIES TIMEOUT 600)
+  add_executable(dome-sculpt-retopo-authority-admission-test tests/retopo-authority-admission.cpp)
+  target_link_libraries(dome-sculpt-retopo-authority-admission-test PRIVATE dome-sculpt-core)
+  target_link_options(dome-sculpt-retopo-authority-admission-test PRIVATE
+    -Wl,--wrap=_ZN4dome6unwrapERNS_4MeshEjjRKSt8functionIFbvEE
+    -Wl,--wrap=_ZN4dome12SpatialInput6updateERKNS_13SpatialSampleE
+    -Wl,--wrap=_ZN4dome8Document14publish_lockedEbb)
+  foreach(authority_case grab focus)
+    add_test(NAME retopology-authority-${authority_case} COMMAND dome-sculpt-retopo-authority-admission-test
+      ${authority_case} fixed ${CMAKE_CURRENT_BINARY_DIR}/retopology-authority-${authority_case}.dsculpt)
+    set_tests_properties(retopology-authority-${authority_case} PROPERTIES TIMEOUT 120)
+  endforeach()
+  add_executable(dome-sculpt-retopo-affine-ui-fixture tests/retopo-affine-ui-fixture.cpp)
+  target_link_libraries(dome-sculpt-retopo-affine-ui-fixture PRIVATE dome-sculpt-core)
+  add_test(NAME retopology-affine-ui-fixture COMMAND dome-sculpt-retopo-affine-ui-fixture ${CMAKE_CURRENT_BINARY_DIR}/retopology-affine-ui.dsculpt)
+  set_tests_properties(retopology-affine-ui-fixture PROPERTIES FIXTURES_SETUP retopology_affine_ui)
   add_executable(dome-sculpt-cut-color-publication-test tests/cut-color-publication.cpp)
   target_include_directories(dome-sculpt-cut-color-publication-test PRIVATE src)
   target_link_libraries(dome-sculpt-cut-color-publication-test PRIVATE dome-sculpt-core)
@@ -911,6 +987,18 @@ if(DOME_BUILD_UI OR DOME_BUILD_XR OR BUILD_TESTING)
     if(BUILD_TESTING)
         add_library(dome-sculpt-test-runtime SHARED tests/xr_runtime.cpp)
       target_link_libraries(dome-sculpt-test-runtime PRIVATE dome-sculpt-json PkgConfig::NATIVEGL)
+      add_executable(dome-sculpt-retopo-history-openxr-test tests/retopo-history-openxr.cpp)
+      target_link_libraries(dome-sculpt-retopo-history-openxr-test PRIVATE dome-sculpt-xr PkgConfig::RENDERFONTS)
+      add_dependencies(dome-sculpt-retopo-history-openxr-test dome-sculpt-test-runtime)
+      target_link_options(dome-sculpt-retopo-history-openxr-test PRIVATE
+        -Wl,--wrap=_ZN4dome6unwrapERNS_4MeshEjjRKSt8functionIFbvEE
+        -Wl,--wrap=_ZN4dome8Document6submitENS_12SpatialFrameE)
+      foreach(history_case apply cancel)
+        add_test(NAME retopology-history-openxr-${history_case} COMMAND dome-sculpt-retopo-history-openxr-test
+          $<TARGET_FILE:dome-sculpt-test-runtime> ${CMAKE_CURRENT_BINARY_DIR}/retopology-history-openxr-${history_case} history-${history_case})
+        set_tests_properties(retopology-history-openxr-${history_case} PROPERTIES TIMEOUT 180
+          ENVIRONMENT "LIBGL_ALWAYS_SOFTWARE=1;LP_NUM_THREADS=2")
+      endforeach()
       if(DOME_BUILD_UI)
         find_package(Python3 REQUIRED COMPONENTS Interpreter)
         add_test(NAME corner-color-uv23-xr COMMAND ${Python3_EXECUTABLE}
@@ -1144,7 +1232,7 @@ if(BUILD_TESTING)
 endif()
 
 if(BUILD_TESTING)
-  foreach(component import-skin authored-bind import-authoring mesh-import mesh-processing document-recovery document-assets voxel-authoring triangle-remesh deformation retopo remesh bake baked-textures bake-workflow bake-controls groups humanoid-creator projection source-maps vroid-creator creator-archive source-uv composite-cache mtoon vroid-groom vrm weight-edit uv-solve source-morph material-visibility)
+  foreach(component import-skin authored-bind import-authoring mesh-import mesh-processing surface-query-oblique document-recovery document-assets voxel-authoring triangle-remesh deformation retopo remesh bake baked-textures bake-workflow bake-controls groups humanoid-creator projection source-maps vroid-creator creator-archive source-uv composite-cache mtoon vroid-groom vrm weight-edit uv-solve source-morph material-visibility)
     add_executable(dome-sculpt-${component}-test tests/${component}.cpp)
     target_link_libraries(dome-sculpt-${component}-test PRIVATE dome-sculpt-core)
     if(component STREQUAL "authored-bind")
@@ -1154,6 +1242,8 @@ if(BUILD_TESTING)
       target_sources(dome-sculpt-${component}-test PRIVATE tests/triangle-remesh-kernel.cpp)
       target_include_directories(dome-sculpt-${component}-test PRIVATE src)
       target_link_options(dome-sculpt-${component}-test PRIVATE "-Wl,--wrap=_ZN4dome22create_triangle_remeshERNS_5SceneEfRKSt8functionIFbvEE")
+      add_executable(dome-sculpt-triangle-remesh-faults-test tests/triangle-remesh-faults.cpp)
+      target_link_libraries(dome-sculpt-triangle-remesh-faults-test PRIVATE dome-sculpt-core)
     endif()
     if(component STREQUAL "vrm")
       target_include_directories(dome-sculpt-${component}-test PRIVATE third_party/cgltf)
@@ -1175,6 +1265,8 @@ if(BUILD_TESTING)
   add_executable(dome-sculpt-avatar-test tests/avatar.cpp)
   target_link_libraries(dome-sculpt-avatar-test PRIVATE dome-sculpt-core)
   add_test(NAME humanoid-authoring COMMAND dome-sculpt-avatar-test)
+  add_test(NAME humanoid-authoring-rejection COMMAND dome-sculpt-avatar-test --verify-failure)
+  set_tests_properties(humanoid-authoring-rejection PROPERTIES WILL_FAIL TRUE)
 endif()
 
 install(DIRECTORY assets/humanoid DESTINATION ${CMAKE_INSTALL_DATADIR}/dome-sculpt/assets)
@@ -1514,6 +1606,14 @@ if(BUILD_TESTING)
 endif()
 
 if(BUILD_TESTING AND TARGET dome-sculpt-render)
+  add_executable(dome-sculpt-render-direct-upload-test tests/render-direct-upload.cpp)
+  target_link_libraries(dome-sculpt-render-direct-upload-test PRIVATE dome-sculpt-render)
+  target_link_options(dome-sculpt-render-direct-upload-test PRIVATE
+    -Wl,--wrap=glBufferData -Wl,--wrap=glBufferSubData)
+  add_test(NAME render-direct-upload COMMAND dome-sculpt-render-direct-upload-test
+    direct ${CMAKE_CURRENT_BINARY_DIR}/render-direct-upload)
+  set_tests_properties(render-direct-upload PROPERTIES
+    ENVIRONMENT "LIBGL_ALWAYS_SOFTWARE=1;LP_NUM_THREADS=2" TIMEOUT 120)
   add_executable(dome-sculpt-render-buffers-test tests/render-buffers.cpp)
   target_link_libraries(dome-sculpt-render-buffers-test PRIVATE dome-sculpt-render)
   target_link_options(dome-sculpt-render-buffers-test PRIVATE -Wl,--wrap=glBufferData)
@@ -3896,7 +3996,7 @@ if(BUILD_TESTING)
   endif()
 endif()
 
-target_sources(dome-sculpt-core PRIVATE src/anatomical-authoring.cpp)
+target_sources(dome-sculpt-core PRIVATE src/anatomical-authoring.cpp src/surface-heat-authoring.cpp)
 
 if(BUILD_TESTING)
   add_executable(dome-sculpt-anatomical-authoring-worker-test tests/anatomical-authoring-worker.cpp)
@@ -4239,4 +4339,140 @@ if(BUILD_TESTING)
   unset(_native_frame_fault_timeout)
   unset(_native_frame_fault_config)
   unset(_native_frame_fault_flags)
+endif()
+if(BUILD_TESTING AND TARGET dome-sculpt AND TARGET dome-sculpt-test-runtime AND TARGET dome-sculpt-native-authoring-inspect AND Python3_Interpreter_FOUND)
+  add_test(NAME retopology-affine-openxr COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/tests/retopo-affine-xr.py
+    $<TARGET_FILE:dome-sculpt> $<TARGET_FILE:dome-sculpt-test-runtime> $<TARGET_FILE:dome-sculpt-native-authoring-inspect>
+    ${CMAKE_CURRENT_BINARY_DIR}/retopology-affine-ui.dsculpt ${CMAKE_CURRENT_BINARY_DIR}/retopology-affine-openxr)
+  set_tests_properties(retopology-affine-openxr PROPERTIES FIXTURES_REQUIRED retopology_affine_ui TIMEOUT 600
+    ENVIRONMENT "LIBGL_ALWAYS_SOFTWARE=1;LP_NUM_THREADS=2")
+endif()
+
+# Reproducible surface-heat requests: real repository asset producer first;
+# no private artifact tree or precomputed source/model IDs are required.
+if(BUILD_TESTING)
+  add_executable(dome-sculpt-surface-heat-native-test tests/surface-heat-native.cpp)
+  target_include_directories(dome-sculpt-surface-heat-native-test PRIVATE src)
+  target_link_libraries(dome-sculpt-surface-heat-native-test PRIVATE dome-sculpt-core)
+  add_test(NAME surface-heat-native COMMAND dome-sculpt-surface-heat-native-test ${CMAKE_CURRENT_BINARY_DIR}/surface-heat/native)
+  set_tests_properties(surface-heat-native PROPERTIES TIMEOUT 300)
+
+  add_executable(dome-sculpt-surface-heat-owning-test tests/native-surface-heat.cpp)
+  target_include_directories(dome-sculpt-surface-heat-owning-test PRIVATE src)
+  target_link_libraries(dome-sculpt-surface-heat-owning-test PRIVATE dome-sculpt-core)
+  add_executable(dome-sculpt-surface-heat-public-test tests/surface-heat-public.cpp)
+  target_include_directories(dome-sculpt-surface-heat-public-test PRIVATE src)
+  target_link_libraries(dome-sculpt-surface-heat-public-test PRIVATE dome-sculpt-core)
+  target_link_options(dome-sculpt-surface-heat-public-test PRIVATE
+    -Wl,--wrap=_ZN4dome24author_surface_heat_skinERNS_5SceneESt4spanIKmLm18446744073709551615EERKNS_20SkinAuthoringOptionsERKSt8functionIFbvEE)
+  add_executable(dome-sculpt-surface-heat-articulation-test tests/visibility-articulation-quality.cpp)
+  target_include_directories(dome-sculpt-surface-heat-articulation-test PRIVATE src third_party/cgltf)
+  target_link_libraries(dome-sculpt-surface-heat-articulation-test PRIVATE dome-sculpt-core)
+  foreach(base IN ITEMS female male)
+    set(heat_input ${CMAKE_CURRENT_BINARY_DIR}/anatomical-native/${base}/fitted-unskinned.dsculpt)
+    set(heat_owning ${CMAKE_CURRENT_BINARY_DIR}/surface-heat/${base}-owning)
+    set(heat_public ${CMAKE_CURRENT_BINARY_DIR}/surface-heat/${base}-public)
+    add_test(NAME surface-heat-${base}-owning COMMAND dome-sculpt-surface-heat-owning-test ${heat_input} ${heat_owning})
+    set_tests_properties(surface-heat-${base}-owning PROPERTIES FIXTURES_REQUIRED anatomical_${base}_input FIXTURES_SETUP surface_heat_${base}_owning TIMEOUT 600)
+    add_test(NAME surface-heat-${base}-public COMMAND dome-sculpt-surface-heat-public-test ${heat_input} ${heat_owning}/bound.dsculpt ${heat_public})
+    set_tests_properties(surface-heat-${base}-public PROPERTIES FIXTURES_REQUIRED surface_heat_${base}_owning FIXTURES_SETUP surface_heat_${base}_public TIMEOUT 900)
+    add_test(NAME surface-heat-${base}-quality COMMAND dome-sculpt-native-unskinned-quality-test ${CMAKE_CURRENT_SOURCE_DIR}/assets/humanoid/vroid/base-${base}.vrm ${heat_public}/accepted.dsculpt ${CMAKE_CURRENT_BINARY_DIR}/surface-heat/${base}-quality)
+    set_tests_properties(surface-heat-${base}-quality PROPERTIES FIXTURES_REQUIRED surface_heat_${base}_public TIMEOUT 600)
+    add_test(NAME surface-heat-${base}-articulation COMMAND dome-sculpt-surface-heat-articulation-test ${CMAKE_CURRENT_SOURCE_DIR}/assets/humanoid/vroid/base-${base}.vrm ${heat_public}/accepted.dsculpt ${CMAKE_CURRENT_BINARY_DIR}/surface-heat/${base}-articulation local)
+    set_tests_properties(surface-heat-${base}-articulation PROPERTIES FIXTURES_REQUIRED surface_heat_${base}_public TIMEOUT 600)
+  endforeach()
+endif()
+
+if(BUILD_TESTING)
+  add_executable(dome-sculpt-surface-heat-native-humanoid-test tests/surface-heat-native-humanoid.cpp)
+  target_include_directories(dome-sculpt-surface-heat-native-humanoid-test PRIVATE src)
+  target_link_libraries(dome-sculpt-surface-heat-native-humanoid-test PRIVATE dome-sculpt-core)
+  add_executable(dome-sculpt-surface-heat-native-public-test tests/surface-heat-native-public.cpp)
+  target_include_directories(dome-sculpt-surface-heat-native-public-test PRIVATE src)
+  target_link_libraries(dome-sculpt-surface-heat-native-public-test PRIVATE dome-sculpt-core)
+  target_link_options(dome-sculpt-surface-heat-native-public-test PRIVATE -Wl,--wrap=_ZN4dome24author_surface_heat_skinERNS_5SceneESt4spanIKmLm18446744073709551615EERKNS_20SkinAuthoringOptionsERKSt8functionIFbvEE)
+  add_executable(dome-sculpt-surface-heat-native-articulation-test tests/surface-heat-native-articulation.cpp)
+  target_include_directories(dome-sculpt-surface-heat-native-articulation-test PRIVATE src third_party/cgltf)
+  target_link_libraries(dome-sculpt-surface-heat-native-articulation-test PRIVATE dome-sculpt-core)
+  foreach(base IN ITEMS female male)
+    set(native_input ${CMAKE_CURRENT_BINARY_DIR}/anatomical-native/${base}/fitted-unskinned.dsculpt)
+    set(native_owning ${CMAKE_CURRENT_BINARY_DIR}/surface-heat/native-${base}-owning)
+    set(native_public ${CMAKE_CURRENT_BINARY_DIR}/surface-heat/native-${base}-public)
+    add_test(NAME surface-heat-native-${base}-owning COMMAND dome-sculpt-surface-heat-native-humanoid-test ${native_input} ${native_owning})
+    set_tests_properties(surface-heat-native-${base}-owning PROPERTIES FIXTURES_REQUIRED anatomical_${base}_input FIXTURES_SETUP surface_heat_native_${base}_owning TIMEOUT 600)
+    add_test(NAME surface-heat-native-${base}-public COMMAND dome-sculpt-surface-heat-native-public-test ${native_owning}/native-unskinned.dsculpt ${native_owning}/bound.dsculpt ${native_public})
+    set_tests_properties(surface-heat-native-${base}-public PROPERTIES FIXTURES_REQUIRED surface_heat_native_${base}_owning FIXTURES_SETUP surface_heat_native_${base}_public TIMEOUT 900)
+    foreach(cohort IN ITEMS global local)
+      add_test(NAME surface-heat-native-${base}-${cohort} COMMAND dome-sculpt-surface-heat-native-articulation-test ${CMAKE_CURRENT_SOURCE_DIR}/assets/humanoid/vroid/base-${base}.vrm ${native_public}/accepted.dsculpt ${native_public}/${cohort} ${cohort} ${native_input} ${native_owning}/native-corner-map.json)
+      set_tests_properties(surface-heat-native-${base}-${cohort} PROPERTIES FIXTURES_REQUIRED surface_heat_native_${base}_public TIMEOUT 600)
+    endforeach()
+  endforeach()
+endif()
+
+if(BUILD_TESTING)
+  add_executable(dome-sculpt-surface-heat-component-test tests/surface-heat-component-counter.cpp)
+  target_link_libraries(dome-sculpt-surface-heat-component-test PRIVATE dome-sculpt-core)
+  add_test(NAME surface-heat-current-components COMMAND dome-sculpt-surface-heat-component-test ${CMAKE_CURRENT_BINARY_DIR}/surface-heat/current-components)
+  set_tests_properties(surface-heat-current-components PROPERTIES TIMEOUT 300)
+  add_executable(dome-sculpt-surface-heat-mixed-generic-test tests/surface-heat-mixed-generic.cpp)
+  target_link_libraries(dome-sculpt-surface-heat-mixed-generic-test PRIVATE dome-sculpt-core)
+  target_link_options(dome-sculpt-surface-heat-mixed-generic-test PRIVATE -Wl,--wrap=_ZN4dome24author_surface_heat_skinERNS_5SceneESt4spanIKmLm18446744073709551615EERKNS_20SkinAuthoringOptionsERKSt8functionIFbvEE)
+  add_test(NAME surface-heat-current-mixed-generic COMMAND dome-sculpt-surface-heat-mixed-generic-test ${CMAKE_CURRENT_BINARY_DIR}/surface-heat/current-mixed-generic)
+  set_tests_properties(surface-heat-current-mixed-generic PROPERTIES TIMEOUT 600)
+endif()
+if(BUILD_TESTING)
+  set_tests_properties(surface-heat-current-mixed-generic PROPERTIES FIXTURES_SETUP surface_heat_current_mixed_input)
+  add_executable(dome-sculpt-surface-heat-mixed-factory-faults-test tests/surface-heat-mixed-factory-faults.cpp)
+  target_link_libraries(dome-sculpt-surface-heat-mixed-factory-faults-test PRIVATE dome-sculpt-core)
+  add_test(NAME surface-heat-current-mixed-factory-faults COMMAND dome-sculpt-surface-heat-mixed-factory-faults-test ${CMAKE_CURRENT_BINARY_DIR}/surface-heat/current-mixed-generic/restored.dsculpt ${CMAKE_CURRENT_BINARY_DIR}/surface-heat/current-mixed-faults)
+  set_tests_properties(surface-heat-current-mixed-factory-faults PROPERTIES FIXTURES_REQUIRED surface_heat_current_mixed_input TIMEOUT 1800)
+endif()
+
+if(BUILD_TESTING AND DOME_BUILD_UI)
+  add_executable(dome-sculpt-surface-heat-component-ui-test tests/surface-heat-component-ui.cpp)
+  target_link_libraries(dome-sculpt-surface-heat-component-ui-test PRIVATE dome-sculpt-core)
+  set_target_properties(dome-sculpt-surface-heat-component-ui-test PROPERTIES OUTPUT_NAME surface-heat-ui)
+endif()
+if(BUILD_TESTING)
+  add_executable(dome-sculpt-surface-heat-head-stress-test tests/surface-heat-head-stress.cpp)
+  target_link_libraries(dome-sculpt-surface-heat-head-stress-test PRIVATE dome-sculpt-core)
+  add_test(NAME surface-heat-current-head-stress COMMAND dome-sculpt-surface-heat-head-stress-test ${CMAKE_CURRENT_BINARY_DIR}/surface-heat/current-head-stress)
+  set_tests_properties(surface-heat-current-head-stress PROPERTIES TIMEOUT 300)
+endif()
+
+# Actual SurfaceHeat5 allocation controls, independent of the implicit method.
+if(BUILD_TESTING)
+  foreach(kind IN ITEMS factory caller worker)
+    add_executable(dome-sculpt-surface-heat-${kind}-faults-test tests/surface-heat-${kind}-faults.cpp)
+    target_include_directories(dome-sculpt-surface-heat-${kind}-faults-test PRIVATE src)
+    target_link_libraries(dome-sculpt-surface-heat-${kind}-faults-test PRIVATE dome-sculpt-core)
+  endforeach()
+  foreach(kind IN ITEMS caller worker)
+    target_link_options(dome-sculpt-surface-heat-${kind}-faults-test PRIVATE
+      -Wl,--wrap=_ZN4dome24author_surface_heat_skinERNS_5SceneESt4spanIKmLm18446744073709551615EERKNS_20SkinAuthoringOptionsERKSt8functionIFbvEE)
+  endforeach()
+  add_test(NAME surface-heat-real-factory-faults COMMAND dome-sculpt-surface-heat-factory-faults-test
+    ${CMAKE_CURRENT_BINARY_DIR}/surface-heat/real-factory-faults all)
+  set_tests_properties(surface-heat-real-factory-faults PROPERTIES TIMEOUT 600)
+  add_test(NAME surface-heat-real-caller-faults COMMAND dome-sculpt-surface-heat-caller-faults-test
+    ${CMAKE_CURRENT_BINARY_DIR}/anatomical-native/female/fitted-unskinned.dsculpt
+    ${CMAKE_CURRENT_BINARY_DIR}/surface-heat/real-caller-faults)
+  set_tests_properties(surface-heat-real-caller-faults PROPERTIES FIXTURES_REQUIRED anatomical_female_input TIMEOUT 900)
+  add_test(NAME surface-heat-real-publication-faults COMMAND dome-sculpt-surface-heat-worker-faults-test
+    ${CMAKE_CURRENT_BINARY_DIR}/surface-heat/real-publication-faults)
+  set_tests_properties(surface-heat-real-publication-faults PROPERTIES TIMEOUT 600)
+  add_test(NAME surface-heat-real-publication-long-name COMMAND dome-sculpt-surface-heat-worker-faults-test
+    ${CMAKE_CURRENT_BINARY_DIR}/surface-heat/real-publication-long-name long-name-control)
+  set_tests_properties(surface-heat-real-publication-long-name PROPERTIES TIMEOUT 300)
+endif()
+
+# Complete caller and long-basename paths preserve the sampled controls above.
+if(BUILD_TESTING)
+  add_test(NAME surface-heat-real-caller-all-faults COMMAND dome-sculpt-surface-heat-caller-faults-test
+    ${CMAKE_CURRENT_BINARY_DIR}/anatomical-native/female/fitted-unskinned.dsculpt
+    ${CMAKE_CURRENT_BINARY_DIR}/surface-heat/real-caller-all-faults all)
+  set_tests_properties(surface-heat-real-caller-all-faults PROPERTIES FIXTURES_REQUIRED anatomical_female_input TIMEOUT 3600)
+  add_test(NAME surface-heat-real-publication-long-name-all COMMAND dome-sculpt-surface-heat-worker-faults-test
+    ${CMAKE_CURRENT_BINARY_DIR}/surface-heat/real-publication-long-name-all long-name-all)
+  set_tests_properties(surface-heat-real-publication-long-name-all PROPERTIES TIMEOUT 600)
 endif()

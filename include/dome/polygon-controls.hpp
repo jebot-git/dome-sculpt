@@ -4,7 +4,7 @@
 namespace dome {
 struct PolygonControls {
   // Displayed scene-world distance, consistent with sculpt resolution controls.
-  // Admission resolves current object/group scale; jobs carry local metres.
+  // Jobs retain an exact affine world metric where needed; no fitted scale.
   float distance_mm = 10;
   unsigned cuts = 1;
   bool move_mode = false, additive = false;

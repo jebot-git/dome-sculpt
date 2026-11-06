@@ -1,3 +1,174 @@
+## Direct immutable geometry uploads admitted — 2026-11-06
+
+Main integrates qualified9f89fce on537c98b. The renderer uploads immutable arrays
+without full interleaved CPU geometry copies; plain GPU geometry stores24 rather
+than56 bytes per vertex. Fresh whole renderer/reference, XR and ordinary app
+consumers pass matched R/S73 direct controls, existing renderer suites and13442
+current input checks. Ordinary desktop/software-loader58 per profile pass;
+58 corresponding frame/native pairs are exact. Root independently verifies501
+unique files,98 headers and the current complete nine input/query providers.
+Read RENDER-DIRECT-UPLOAD-INTEGRATION.md and its receipt. This is component/app
+qualification, not fresh ALL, new hardware/HMD or a frame-time benchmark. Full
+geometry uploads/derived-coordinate work, bounded local extraction, polygon
+fields, texture sets, avatar/interoperability/accelerator and drawers remain
+required. No installation or session restart. Full goal active and incomplete.
+
+## Caller and real XR input admission — 2026-11-06
+
+Main integrates qualified0cbc089 on5b02bfc: atomic caller/frame retopology
+admission, no retired-workspace revival, actual XR button levels and history
+consumption across focus/reference changes. Each R/S profile passes native13442
+with710 persistent boundaries, distinct current worker/held/composed/authority
+controls, actual-loader161Apply+156Cancel and ordinary app58.44 native/sentinel
+pairs are exact. Root source parity and receipt/archive/file rehash review pass.
+Read RETOPO-CALLER-INTEGRATION.md and the original admission receipt for scope.
+This is a matched component/application qualification, not fresh ALL or physical
+headset/accelerator completion. Full goal, polygon fields, texture sets, remaining
+geometry/rig/avatar/interoperability and controller drawers remain required.
+
+## Private qualified retopology caller/input repair — 2026-11-05
+
+This private descendant of main5b02 repairs the real post-enqueue caller refusal,
+whole-frame batch publication and retired-view resurrection, and supplies actual
+XR history levels with focus/rebase latches. R/S native13442/710 persistent,
+worker4308/251+42+97, held1419/73, composed1541/71 and26 boundaries pass.
+Real-loader observer161+156 per profile and ordinary app15normal+16unzoomedcompact+
+27loader per profile pass;44 R/S native/sentinel pairs are exact. Read
+[RETOPO-CALLER-ADMISSION.md](RETOPO-CALLER-ADMISSION.md) and its precise receipt.
+Matching whole-TU components and ordinary app relinks are qualified, not a fresh
+ALL build. The failed standalone Fontconfig leak/ELF and all old counterexamples
+remain preserved; fixed fixture uses the ordinary app's existing process owner.
+Main review/publication is separate; full sculpt/paint/retopo/rig/avatar/GPU and
+physical production requirements remain active. No new schema/outer layout.
+
+## Explicit surface-heat binding admitted — 2026-11-05
+
+Main admits corrected seal6bcc91b/runtimebef5876 via9c72cc2, with exact product,
+header, test and CMake parity. Surface heat is an explicit skin-binding choice;
+Automatic0 remains the default and existing saved weights stay unchanged until
+a new request. Native R/S controls,152 ordinary FLTK checks,56 software OpenXR
+checks and current publication fault controls pass. Read SURFACE-HEAT-ADMISSION.md.
+
+The historical3496 numeric/1052 caller/381 full-long/7667 mixed proofs retain
+their original component scope. The current long measurement is377 with tail
+373..377; no new complete-long sweep is claimed. Retopology251 cases are one-shot,
+not persistent; reporter/acceptance modes are not inferred. Complex37/38/prepared
+owners, broader weights, caller-input repair, full regression/interoperability,
+physical-device and accelerator work remain required. Full goal active.
+
+## Private opt-in mode 5 + current polygon/retopology integration — 2026-11-05
+
+This private candidate combines main `c55dc2f` (polygon + transactional
+retopology worker) with qualified opt-in weights `1e6d76d`. Automatic0 remains
+the default. All legacy methods, resource/quality limits and unsupported complex
+37/38 owner guards remain intact. The second bounded Release component phase now passes surface25, legacy38,
+combined affine polygon/retopology248 and worker251 one-shot-prefix/4,308 checks, with
+actual polygon payload/default parity. See [the R2 receipt](validation/MODE5-MAIN-POLY-INITIAL-R.json).
+The matched merged Release/SAN application phase now passes four native controls,
+152 actual normal/compact FLTK checks and 56 software synthetic-OpenXR loader
+checks. Fresh current worker publication remeasures 373 regular prefixes per
+profile and long-path 377 with the five tail controls 373..377, all passing
+real preparation/rollback/retry/ordered Save. The historical full-381 scope is
+separate. See [the application receipt](validation/MODE5-MAIN-APPLICATION-QUALIFICATION.json).
+This remains a private candidate; no main admission or default promotion.
+
+The initial merged Release proof on `8f43cae` covered the earlier `9dd63f9`
+retopology baseline only. Its 25 surface-heat checks, 38 legacy skin checks and
+251-one-shot-prefix/4,308-check worker result stay separate; they do not qualify the new
+polygon job/world payload. The second Release and sanitizer cohorts freshly compiled the complete merged
+Document and used qualified complete polygon providers. No old provider is
+accepted merely because outer Document size happens to match.
+
+The weight component's complete caller 1,052 and long-basename publication 381
+prefixes passed in both profiles, with timing variance and previous sampled
+scopes retained in [the component receipt](MODE5-COMPLETE-ADMISSION.md).
+Main's polygon/retopology changes and all current documentation remain below.
+No generic post-enqueue caller fix, default promotion or full-goal completion
+is implied by those component proofs.
+
+## Affine polygon admission — 2026-11-05
+
+Main now also admits qualified polygon/retopology composition8750f20 (runtime0567)
+via37c46b9, with exact source/header/test/CMake parity. True-affine polygon tools,
+held placement, source restoration and reflection-correct normals coexist with
+the admitted transactional retopology worker. Native248/profile,16 exact file
+pairs, ordinary normal+compact GUI77each/profile and actual Arc stereo flows pass.
+Read POLYGON-AFFINE-ADMISSION.md and its receipt. This is component qualification,
+not a fresh full-project build, physical headset test or full-goal completion.
+
+The caller-admission repair and automatic weights are separate continuations and
+must merge this current source before their final qualification. Remesh remains
+private until its frozen sweep and coherent integration close. Older private
+entries below retain their historical scope; the full goal remains active.
+
+## Current production admission — 2026-11-05
+
+Main integrates the qualified retopology worker publication repair from68daffe,
+on the admitted1a70 affine/ordered-Save/visible-marker foundation. Whole native
+Release/sanitizer fault, history and acceptance regressions plus58 matched
+ordinary Release application checks pass. Read
+[RETOPO-WORKER-PUBLICATION.md](RETOPO-WORKER-PUBLICATION.md) and
+[PRODUCTION-PROGRESS-2026-11-05.md](PRODUCTION-PROGRESS-2026-11-05.md).
+
+A separately reproduced caller-side post-enqueue publication failure remains
+open: caller refusal can leave an accepted Face command. Full production,
+interoperability, physical-device/accelerator and later controller-drawer targets
+remain required. Older private status entries below are historical evidence;
+this admission supersedes their retopology admission blockers only. No install,
+headset launch or session restart is part of this checkpoint.
+
+## Private marker device closure — 2026-11-05
+
+Exacted5renderer andwhole55scenario consumer nowpass observedPCI03ArcA770 with
+actualEGLdevice/renderD129/rdev226:129/sysfs8086:56a0/i915/openFDs andimmutableDSO
+maps; samebinaryforcedllvmpipe refuses1 afteractualrenderer observation. All30
+hardwarePPMs retained, no limits/source/tolerance changes. Finite7491closed0 and
+GPUlease explicitlyreleased; noSANhardwaredup/compute/HMD claim. See
+RETOPO-SCREEN-MARKERS.md/JSON. Rootheld-gesture repair/integration remainsrequired
+beforemainretopo admission; fullgoal staysactive.
+
+## Private default-view retopology marker repair — 2026-11-05
+
+Shader-only screen floor fixes the preserved unzoomed compact marker failure.
+Whole renderTU/consumer R/S pass55new scenarios plus every original cache/state/
+occlusion/linear/BDF/PBR assertion; actualnormal15+unzoomedcompact16 eachprofile
+pass cleanly,30renderer+2native pairs exact. Release isordinaryapp; SANexplicitly
+composes actualappmain andwhole renderer-test entry intooneELF undera mainwrapper,
+not anordinaryproductELF. No headers/layout/schema/archive change. Read
+RETOPO-SCREEN-MARKERS.md/receipt. Mainretopo stillrequiresroot's newlyidentified
+held-gesture admission/OOMrepair; earlier63prefixes covercompleted drafts only.
+No GPU/HMD/fullsuite/fullgoal claim.
+
+## Private matching affine retopology clients — 2026-11-05
+
+The fd66 production bytes now pass actual matched FLTK normal/compact and
+real-loader software clients: Release76/SAN59 UI/controller assertions, corrected
+whole cancellation-boundaries each0, six native pairs byte-identical, clean close
+and fresh-process reopen. Explicit canonical SDK/driver mappings and all inputs
+are pinned. No fresh whole-app build/main/GPU/HMD claim. Initial compact subpixel
+marker feedback remains an unresolved usability gap; positive compact editing
+uses real existing wheel zoom with all pixel/Cancel/history assertions retained.
+The first stale-/opt-Cairo800B setup failure is preserved; samebytes canonical
+runs are clean. Read RETOPO-AFFINE-UI.md/receipt. Full goal remains active.
+
+## Private immediate retopology Save repair — 2026-11-05
+
+The real affine-checkpoint Apply-to-Save gap now has an explicit independent-
+queue handoff:1445Release/1445ownedSAN including63persistent admission denials
+each,21native+5sentinel pairs exact and actual public layout equality. Read
+RETOPO-SAVE-HANDOFF.md/receipt. Original failures remain; no app/UI/main/fullgoal
+admission follows. Downstream fault/device/production and remesh/CATS/texture-set
+requirements remain open.
+
+## Private affine retopology component — 2026-11-05
+
+Exact main10944 child now qualifies full-affine manual retopo geometry/native
+controls:587Release/587ownedSAN, eight native pairs byte-identical, no layout/
+format or archive change. Read RETOPO-AFFINE.md/receipt for scope and preserved
+failed originals. Immediate accepted-input-to-Save still has a genuine gap;
+the positive gated Save covers only later accepted AssetWork. No app/frontend/
+main admission or full-goal claim; other production rows remain required.
+
 ## Exhaustive private physical-package fault closure — 2026-11-05
 
 Private frozen1f9fd48/owning5df now closes all128 partitions/profile:90,261

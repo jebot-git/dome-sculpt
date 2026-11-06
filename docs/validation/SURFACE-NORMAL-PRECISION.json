@@ -1,0 +1,356 @@
+{
+  "base": "23caa83960e47f3a6b9586f5e473b8de890cb7b5",
+  "scope": "Only geometric fallback in SurfaceQuery::Impl::hit; no public layout, scene format, authored normal interpolation or input validator change",
+  "source_sha256": {
+    "src/mesh-processing.cpp": "de51a40183e47f8bc1c6642b0468c0ae5276a2481ed78702d2607a704102db6b",
+    "tests/mesh-processing.cpp": "17d5add705f388491a26a0342edee8bd2649418e4ebbd52e2b989c88cc56e1a9",
+    "tests/surface-query-oblique.cpp": "9c799045fc7fe71fd196fc20417462d2289ff2fdfe3e2f4e0b790a5ee1bbd755"
+  },
+  "counter": {
+    "status": "artifacts/surface-query-robust-e79/normal-hit/v2/status.json",
+    "status_sha256": "6cd9f431a9b2adfe98cde2762d4f975e28f480f2583fa467cd17efa01e02d188",
+    "old_native_exit_per_profile": 1,
+    "actual_wrong_normal": [
+      0,
+      1,
+      0
+    ],
+    "actual_expected_normal": [
+      0,
+      0,
+      1
+    ],
+    "inputs": "Accepted valid thin geometry, zero and exactly cancelling authored normals; source-exact c3 whole providers"
+  },
+  "qualified": {
+    "status": "artifacts/surface-query-robust-e79/normal-proof-v1/status.json",
+    "status_sha256": "8b3e8849bff8f07a0dde9cce05f6b854ab2fb12d17fd29f738853389d7af7fd6",
+    "input_manifest": "artifacts/surface-query-robust-e79/normal-proof-v1/before.json",
+    "input_manifest_sha256": "3241029bfc37e3767fabefff0842b857e0bbf78eb680d5e1014a4f0c6d9cf90d",
+    "input_count": 386,
+    "input_drift": [],
+    "whole_provider": true,
+    "support": "Unchanged ABI-compatible c179; old mesh-processing archive member excluded in actual link maps",
+    "consumers": {
+      "/home/blux/de-xr/dome-sculpt/artifacts/surface-query-robust-e79/normal-proof-v1/release-counter": {
+        "sha256": "8451d532fcdb38950bcf8b553d70cbfbcd6d6f87bbee5c4b85149387910885b2",
+        "map_sha256": "fc1a61985be7b44123760e9dc0435e45b42d72fe3febca1a96a700095e149dd5",
+        "whole_mesh_provider_sha256": "f368e8baf37eff4ec525d9d9e9274c6ed351b53372698df3fe233d584ab307b5",
+        "pass_lines": 1
+      },
+      "/home/blux/de-xr/dome-sculpt/artifacts/surface-query-robust-e79/normal-proof-v1/release-mesh-processing": {
+        "sha256": "57efc6ff2d39aeaa7a327c794f5ece11ca059167cdadb410997c67217b0a5fc5",
+        "map_sha256": "ef742eb8e250b88d024ae78c79d1790dfb6a780908d583ffb2c4bb4bef8f8e0a",
+        "whole_mesh_provider_sha256": "f368e8baf37eff4ec525d9d9e9274c6ed351b53372698df3fe233d584ab307b5",
+        "pass_lines": 36
+      },
+      "/home/blux/de-xr/dome-sculpt/artifacts/surface-query-robust-e79/normal-proof-v1/release-remesh": {
+        "sha256": "31f1edbdcd3c2addeefe0d279769374ffa9001bec25018359e2eac1565b3be9d",
+        "map_sha256": "ca9e564ee8866e3a72af0cd0aa7293dc20bad312952a720c3eb5e4ab0e929d1b",
+        "whole_mesh_provider_sha256": "f368e8baf37eff4ec525d9d9e9274c6ed351b53372698df3fe233d584ab307b5",
+        "pass_lines": 29
+      },
+      "/home/blux/de-xr/dome-sculpt/artifacts/surface-query-robust-e79/normal-proof-v1/release-rig": {
+        "sha256": "c8f15af0427b495e9960e79245deef1aff4d9c3849166ac6cb3e28766f5aff37",
+        "map_sha256": "39838991f24174a1d861a4012414243cb2b8fcf9ba0c111652fdbb5644459f71",
+        "whole_mesh_provider_sha256": "f368e8baf37eff4ec525d9d9e9274c6ed351b53372698df3fe233d584ab307b5",
+        "pass_lines": 75
+      },
+      "/home/blux/de-xr/dome-sculpt/artifacts/surface-query-robust-e79/normal-proof-v1/release-bake": {
+        "sha256": "ae4458adef84704b2e101bfbe72a38b488f241136b318e7e0ac1d028510fd97a",
+        "map_sha256": "78d8edfabaa33998d12f68e8e0578d297a02bdbfd2fe26fadb89e1201815d9c5",
+        "whole_mesh_provider_sha256": "f368e8baf37eff4ec525d9d9e9274c6ed351b53372698df3fe233d584ab307b5",
+        "pass_lines": 39
+      },
+      "/home/blux/de-xr/dome-sculpt/artifacts/surface-query-robust-e79/normal-proof-v1/release-surface-query-oblique": {
+        "sha256": "68fee665761cc72dd1b856ffadb8bba6ff9c45efb4098b7dab2186bc862a493a",
+        "map_sha256": "bbfb36cbac4c266c7309fc8992eb19860e5de0de30f34e181a1f57273c4c67df",
+        "whole_mesh_provider_sha256": "f368e8baf37eff4ec525d9d9e9274c6ed351b53372698df3fe233d584ab307b5",
+        "pass_lines": 1
+      },
+      "/home/blux/de-xr/dome-sculpt/artifacts/surface-query-robust-e79/normal-proof-v1/release-normal-counter": {
+        "sha256": "6172094096f932f905fefdcf051a871749be385e0f4c0d9be6533eccd1a50224",
+        "map_sha256": "c95febea77217b1003b2d416f42241a8b831452902eb5cc28e20132b54130065",
+        "whole_mesh_provider_sha256": "f368e8baf37eff4ec525d9d9e9274c6ed351b53372698df3fe233d584ab307b5",
+        "pass_lines": 0
+      },
+      "/home/blux/de-xr/dome-sculpt/artifacts/surface-query-robust-e79/normal-proof-v1/sanitize-counter": {
+        "sha256": "71d9119da468e1ea7689f60b4bfdd81fc6156e66a2f7095ebe6765fb11fbbcd7",
+        "map_sha256": "a74d98ff46800f51fbd794448c4154c17d41bb9342c44977e69b5a38151c333b",
+        "whole_mesh_provider_sha256": "68eea15898922dc874e6973645abf8e3bc2fd7b5be6c1ad2e502ece99186e6b9",
+        "pass_lines": 1
+      },
+      "/home/blux/de-xr/dome-sculpt/artifacts/surface-query-robust-e79/normal-proof-v1/sanitize-mesh-processing": {
+        "sha256": "d0ab301f018cda6e55e877fe598498c26098c36b24649eddb34e6a4351f0d8d5",
+        "map_sha256": "181f341e9191a2a0d50145eec5fa3ac3f18bcfa2365a34611cc43684aabd001f",
+        "whole_mesh_provider_sha256": "68eea15898922dc874e6973645abf8e3bc2fd7b5be6c1ad2e502ece99186e6b9",
+        "pass_lines": 36
+      },
+      "/home/blux/de-xr/dome-sculpt/artifacts/surface-query-robust-e79/normal-proof-v1/sanitize-remesh": {
+        "sha256": "170fda292ff13917003275fdb53992412c448283b243aa1ac689e21d4affced1",
+        "map_sha256": "62efd550da71d848f94b4a0405c41f88f79c14a7ad066244ac3961343a7afda7",
+        "whole_mesh_provider_sha256": "68eea15898922dc874e6973645abf8e3bc2fd7b5be6c1ad2e502ece99186e6b9",
+        "pass_lines": 29
+      },
+      "/home/blux/de-xr/dome-sculpt/artifacts/surface-query-robust-e79/normal-proof-v1/sanitize-rig": {
+        "sha256": "957b4d6e9f6855138d0962aaf5e0ff67e61531df8e13d8f03311f8e53ffcfcb5",
+        "map_sha256": "c999f1d33b910ace544fe747d06a562db343ecce7fec8a3b9c49b0e3b882da89",
+        "whole_mesh_provider_sha256": "68eea15898922dc874e6973645abf8e3bc2fd7b5be6c1ad2e502ece99186e6b9",
+        "pass_lines": 75
+      },
+      "/home/blux/de-xr/dome-sculpt/artifacts/surface-query-robust-e79/normal-proof-v1/sanitize-bake": {
+        "sha256": "224ffee5b32cd1e06e743ea06792c444bc807e3a9718469455f81660ffe6cd4d",
+        "map_sha256": "b6be14e0f4007e095048f5d607ee420878bac73fb0fb5bdc81a84d0e111c1c6b",
+        "whole_mesh_provider_sha256": "68eea15898922dc874e6973645abf8e3bc2fd7b5be6c1ad2e502ece99186e6b9",
+        "pass_lines": 39
+      },
+      "/home/blux/de-xr/dome-sculpt/artifacts/surface-query-robust-e79/normal-proof-v1/sanitize-surface-query-oblique": {
+        "sha256": "fa7ea6f23fecd50a9be6c5cb4ada2c3e8f9db0bdea98947a213a0c16823894f5",
+        "map_sha256": "028574143df7d8d9a794f1396b09cbe32db95096402216f32db576654f0d8115",
+        "whole_mesh_provider_sha256": "68eea15898922dc874e6973645abf8e3bc2fd7b5be6c1ad2e502ece99186e6b9",
+        "pass_lines": 1
+      },
+      "/home/blux/de-xr/dome-sculpt/artifacts/surface-query-robust-e79/normal-proof-v1/sanitize-normal-counter": {
+        "sha256": "8c5236896ce74ee0c5f6c3e489d77a5c4f3c9bed7e069b4a48eff6e4e08a6f06",
+        "map_sha256": "81c502d5798f2023a2ef212dcb9d0cf92a785be100b842305c605360d0d16c2a",
+        "whole_mesh_provider_sha256": "68eea15898922dc874e6973645abf8e3bc2fd7b5be6c1ad2e502ece99186e6b9",
+        "pass_lines": 0
+      }
+    },
+    "steps": [
+      {
+        "name": "release-whole-provider",
+        "exit": 0,
+        "seconds": 2.916083992982749
+      },
+      {
+        "name": "release-counter-compile",
+        "exit": 0,
+        "seconds": 0.7069947030395269
+      },
+      {
+        "name": "release-counter-link",
+        "exit": 0,
+        "seconds": 0.11104956397321075
+      },
+      {
+        "name": "release-counter-exec",
+        "exit": 0,
+        "seconds": 0.00460707995807752
+      },
+      {
+        "name": "release-mesh-processing-compile",
+        "exit": 0,
+        "seconds": 1.9489454649738036
+      },
+      {
+        "name": "release-mesh-processing-link",
+        "exit": 0,
+        "seconds": 0.09831965900957584
+      },
+      {
+        "name": "release-mesh-processing-exec",
+        "exit": 0,
+        "seconds": 0.01852480199886486
+      },
+      {
+        "name": "release-remesh-compile",
+        "exit": 0,
+        "seconds": 1.8469606869621202
+      },
+      {
+        "name": "release-remesh-link",
+        "exit": 0,
+        "seconds": 0.11308017396368086
+      },
+      {
+        "name": "release-remesh-exec",
+        "exit": 0,
+        "seconds": 0.010759792989119887
+      },
+      {
+        "name": "release-rig-compile",
+        "exit": 0,
+        "seconds": 3.273486105958
+      },
+      {
+        "name": "release-rig-link",
+        "exit": 0,
+        "seconds": 0.11535218602512032
+      },
+      {
+        "name": "release-rig-exec",
+        "exit": 0,
+        "seconds": 0.005177813989575952
+      },
+      {
+        "name": "release-bake-compile",
+        "exit": 0,
+        "seconds": 2.981046888977289
+      },
+      {
+        "name": "release-bake-link",
+        "exit": 0,
+        "seconds": 0.22979110904270783
+      },
+      {
+        "name": "release-bake-exec",
+        "exit": 0,
+        "seconds": 0.36552343697985634
+      },
+      {
+        "name": "release-surface-query-oblique-compile",
+        "exit": 0,
+        "seconds": 0.8207032560021617
+      },
+      {
+        "name": "release-surface-query-oblique-link",
+        "exit": 0,
+        "seconds": 0.10662936297012493
+      },
+      {
+        "name": "release-surface-query-oblique-exec",
+        "exit": 0,
+        "seconds": 0.003972420992795378
+      },
+      {
+        "name": "release-normal-counter-compile",
+        "exit": 0,
+        "seconds": 0.702577713993378
+      },
+      {
+        "name": "release-normal-counter-link",
+        "exit": 0,
+        "seconds": 0.10819992097094655
+      },
+      {
+        "name": "release-normal-counter-exec",
+        "exit": 0,
+        "seconds": 0.0043562049977481365
+      },
+      {
+        "name": "sanitize-whole-provider",
+        "exit": 0,
+        "seconds": 5.2414352260529995
+      },
+      {
+        "name": "sanitize-counter-compile",
+        "exit": 0,
+        "seconds": 0.8560685450211167
+      },
+      {
+        "name": "sanitize-counter-link",
+        "exit": 0,
+        "seconds": 0.2185467680101283
+      },
+      {
+        "name": "sanitize-counter-exec",
+        "exit": 0,
+        "seconds": 0.01886979304254055
+      },
+      {
+        "name": "sanitize-mesh-processing-compile",
+        "exit": 0,
+        "seconds": 2.785669817996677
+      },
+      {
+        "name": "sanitize-mesh-processing-link",
+        "exit": 0,
+        "seconds": 0.20488723902963102
+      },
+      {
+        "name": "sanitize-mesh-processing-exec",
+        "exit": 0,
+        "seconds": 0.17910532897803932
+      },
+      {
+        "name": "sanitize-remesh-compile",
+        "exit": 0,
+        "seconds": 3.0777611779631115
+      },
+      {
+        "name": "sanitize-remesh-link",
+        "exit": 0,
+        "seconds": 0.21923956100363284
+      },
+      {
+        "name": "sanitize-remesh-exec",
+        "exit": 0,
+        "seconds": 0.06501708598807454
+      },
+      {
+        "name": "sanitize-rig-compile",
+        "exit": 0,
+        "seconds": 4.532192730985116
+      },
+      {
+        "name": "sanitize-rig-link",
+        "exit": 0,
+        "seconds": 0.2470436820294708
+      },
+      {
+        "name": "sanitize-rig-exec",
+        "exit": 0,
+        "seconds": 0.027177695999853313
+      },
+      {
+        "name": "sanitize-bake-compile",
+        "exit": 0,
+        "seconds": 4.384780786000192
+      },
+      {
+        "name": "sanitize-bake-link",
+        "exit": 0,
+        "seconds": 1.5859030940337107
+      },
+      {
+        "name": "sanitize-bake-exec",
+        "exit": 0,
+        "seconds": 3.1972049179603346
+      },
+      {
+        "name": "sanitize-surface-query-oblique-compile",
+        "exit": 0,
+        "seconds": 1.0384038009797223
+      },
+      {
+        "name": "sanitize-surface-query-oblique-link",
+        "exit": 0,
+        "seconds": 0.21594556100899354
+      },
+      {
+        "name": "sanitize-surface-query-oblique-exec",
+        "exit": 0,
+        "seconds": 0.017939052020665258
+      },
+      {
+        "name": "sanitize-normal-counter-compile",
+        "exit": 0,
+        "seconds": 0.8902931630145758
+      },
+      {
+        "name": "sanitize-normal-counter-link",
+        "exit": 0,
+        "seconds": 0.20812900102464482
+      },
+      {
+        "name": "sanitize-normal-counter-exec",
+        "exit": 0,
+        "seconds": 0.016011528961826116
+      }
+    ],
+    "axis_families_per_profile": 54,
+    "oblique_families_per_profile": 108,
+    "coverage": "Missing/cancelling normal nearest+ray checks, geometric winding, axis/reflection/scale/aspect; full mesh-processing/remesh/rig/bake and original positional counter",
+    "sanitizer_diagnostics": []
+  },
+  "preserved_fixture_failure": {
+    "path": "artifacts/surface-query-robust-e79/normal-hit/initial-status.json",
+    "reason": "Original fixture had above-threshold face and oversized authored normals correctly refused by existing structural guard; not a product-negative result"
+  },
+  "limitations": [
+    "Component qualification using current whole provider and complete native consumers; not fresh whole project",
+    "No new actual CTest, application GUI, hardware GPU or physical headset result",
+    "Full production goal remains active"
+  ]
+}

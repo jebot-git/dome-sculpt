@@ -1,9 +1,19 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/avatar.hpp"
-#include <cassert>
+#include <source_location>
+#include <stdexcept>
 #include <iostream>
 #include <nlohmann/json.hpp>
 using namespace dome;
+namespace {
+size_t checks = 0;
+void require(bool ok, const std::source_location where = std::source_location::current()) {
+  ++checks;
+  if (!ok)
+    throw std::runtime_error(std::string(where.file_name()) + ":" +
+                             std::to_string(where.line()) + ": avatar check failed");
+}
+}
 void rejects(auto f) {
   bool failed = false;
   try {
@@ -12,7 +22,7 @@ void rejects(auto f) {
     failed = true;
     std::cout << e.what() << '\n';
   }
-  assert(failed);
+  require(failed);
 }
 HumanLandmarks landmarks() {
   HumanLandmarks l;
@@ -42,22 +52,26 @@ Mesh surface(const HumanLandmarks &l) {
   m.uv.resize(m.positions.size());
   return m;
 }
-int main() {
-  assert(human_roles().size() == 55);
+int main(int argc, char **argv) try {
+  if (argc == 2 && std::string_view(argv[1]) == "--verify-failure")
+    require(false);
+  else if (argc != 1)
+    throw std::invalid_argument("Usage: avatar-test [--verify-failure]");
+  require(human_roles().size() == 55);
   auto l = landmarks();
   auto mesh = surface(l);
   auto fit = fit_humanoid(mesh, l);
-  assert(fit.skeleton.bones.size() == 15);
+  require(fit.skeleton.bones.size() == 15);
   fit.mapping.validate(fit.skeleton);
   auto segments = fit.skeleton.segments();
   for (auto [n, i] : fit.mapping.joints)
-    assert(length(segments[i][0] - l.points.at(n)) < 1e-5f);
+    require(length(segments[i][0] - l.points.at(n)) < 1e-5f);
   auto mirror = fit.mapping.mirror(fit.skeleton);
   for (size_t i = 0; i < mirror.size(); ++i)
-    assert(mirror[mirror[i]] == i);
-  assert(HumanoidMapping::decode(fit.mapping.encode(), fit.skeleton).joints ==
+    require(mirror[mirror[i]] == i);
+  require(HumanoidMapping::decode(fit.mapping.encode(), fit.skeleton).joints ==
          fit.mapping.joints);
-  assert(HumanLandmarks::decode(l.encode()).points.size() == 15);
+  require(HumanLandmarks::decode(l.encode()).points.size() == 15);
   auto broken = fit.mapping;
   broken.joints["head"] = broken.joints["spine"];
   rejects([&] { broken.validate(fit.skeleton); });
@@ -104,7 +118,7 @@ int main() {
   auto rf = fit_humanoid(surface(rotated), rotated);
   auto rs = rf.skeleton.segments();
   for (auto [n, i] : rf.mapping.joints)
-    assert(length(rs[i][0] - rotated.points.at(n)) < 1e-5f);
+    require(length(rs[i][0] - rotated.points.at(n)) < 1e-5f);
   auto bad = l;
   bad.points["leftHand"] = bad.points.at("leftLowerArm");
   rejects([&] { fit_humanoid(surface(bad), bad); });
@@ -140,13 +154,13 @@ int main() {
   w.vertices = {{{fit.mapping.joints.at("leftHand"), .3f},
                  {uint32_t(skeleton.bones.size() - 1), .7f}}};
   auto clean = compact_avatar(skeleton, w, fit.mapping);
-  assert(clean.skeleton.bones.size() == skeleton.bones.size() - 1);
-  assert(clean.old_to_new[skeleton.bones.size() - 2] == UINT32_MAX);
-  assert(clean.weights.vertices[0][0].weight == .3f);
+  require(clean.skeleton.bones.size() == skeleton.bones.size() - 1);
+  require(clean.old_to_new[skeleton.bones.size() - 2] == UINT32_MAX);
+  require(clean.weights.vertices[0][0].weight == .3f);
   auto before = skeleton.world(), after = clean.skeleton.world();
   for (size_t i = 0; i < before.size(); ++i)
     if (clean.old_to_new[i] != UINT32_MAX)
-      assert(before[i] == after[clean.old_to_new[i]]);
+      require(before[i] == after[clean.old_to_new[i]]);
   MorphSet morph(mesh);
   std::vector<Vec3> edited = mesh.positions;
   edited[0].z = .1f;
@@ -159,11 +173,11 @@ int main() {
   expr.validate(morph, true);
   expr.rename_shape(morph, "mouth", "vowel");
   for (auto [n, b] : expr.visemes)
-    assert(b[0].shape == "vowel");
+    require(b[0].shape == "vowel");
   auto decoded = AvatarExpressions::decode(expr.encode(), morph);
   decoded.validate(morph, true);
   rejects([&] { expr.rename_shape(morph, "vowel", "blink"); });
-  assert(morph.targets[0].name == "vowel");
+  require(morph.targets[0].name == "vowel");
   auto invalid = expr;
   invalid.visemes["aa"].push_back({"vowel", 1});
   rejects([&] { invalid.validate(morph); });
@@ -173,5 +187,9 @@ int main() {
   invalid = expr;
   invalid.visemes["aa"][0].weight = 2;
   rejects([&] { invalid.validate(morph); });
-  std::cout << "avatar fixtures passed\n";
+  std::cout << "PASS " << checks << " avatar checks\n";
+  return 0;
+} catch (const std::exception &e) {
+  std::cerr << "FAIL " << e.what() << '\n';
+  return 1;
 }
