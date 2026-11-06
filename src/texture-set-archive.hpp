@@ -25,7 +25,7 @@ public:
   using FieldDecoder = std::function<TextureSetArchiveField(
       const nlohmann::json &,
       const std::shared_ptr<const TextureSetFaceDomain> &, uint32_t,
-      const Material &, const PaintedMesh *)>;
+      const Material &, const PaintedMesh *,bool)>;
   explicit TextureSetArchive(TextureSetLimits limits = {});
   // Enable before emitting any holder. Ordinary current-only v1 is unchanged.
   void shared_records(bool = true);

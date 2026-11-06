@@ -889,7 +889,7 @@ TextureSetArchive::paint_at(uint32_t i, const Material &m, bool polygon,
     if (decode_field_)
       value = decode_field_(p.payload, domain,
                             topology_geometry_.at(domains_[r.domain].topology),
-                            m, r.decoded.get());
+                            m, r.decoded.get(),polygon);
     else {
       value.paint = TextureSetPaintAccess::decode(p.payload, &images, polygon,
                                                   normals, sampling, context,
