@@ -186,3 +186,31 @@ archive reuse is permitted. Complex per-set source/normal/recipe/retained-histor
 adapters, all-channel resolution/UV remap, independent real bake targets and
 shared-node multi-primitive glTF/VRM import/export remain required. This source
 checkpoint and earlier scoped plain Release controls do not complete texture sets.
+
+
+## Multi-primitive GLB export source continuation — 2026-11-06
+
+The separate export child of cdfadd18 adds one REST geometry/deformation
+expansion for each actual native mesh instance. Nonempty material ranges slice
+one index buffer and share real POSITION/NORMAL/UV/JOINTS/WEIGHTS and morph
+accessors, one surface node and one rig. Necessary canonical tangent conflicts
+split the actual REST vertices, with exact skin/morph remapping. Each emitted
+set keeps independent material/alpha and composited image fields. Empty slots
+remain in the native project but do not invent empty standard primitives.
+
+The generic material/image writer now accepts those independent fields. Scene
+portable export, native editable authoring extraction and Document file workers
+use owning bundles, with per-object and aggregate geometry/image/working bounds,
+actual plan/pose control-block checks and cancellation. HDR fields and complex
+source/normal/recipe adapters remain explicit refusals. Native authoring budgets
+charge actual bundle staging before the portable compiler; embedded Scene40
+authoring remains separate from the standard view.
+
+Six whole source/frontend/fixture TUs pass syntax only. The new registered test
+includes genuine native portable/editable export workers, exact Scene40 restore,
+shared skin/morph/node/index identities, independent cgltf buffer validation,
+empty slots and forged/stale/budget/Cancel controls. It has **not executed**; no
+new object/link/app/consumer/SAN/UI/device completion is claimed. Read
+validation/TEXTURE-SETS-MULTIPRIMITIVE-SOURCE.json. VRM semantic metadata,
+original source/HDR material compilation, multi-primitive import, deformed normal
+quality and all earlier production/workflow rows remain required.
