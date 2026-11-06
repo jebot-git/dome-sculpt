@@ -278,7 +278,14 @@ LocalSurfaceCache::Ptr LocalSurfaceCache::build(const Volume &field,
 LocalSurfaceCache::Ptr
 LocalSurfaceCache::update(const Volume &field, Cancel cancel,
                           LocalSurfaceUpdateReport *report) const {
+  return update_tracked(field, std::move(cancel), report, nullptr);
+}
+LocalSurfaceCache::Ptr
+LocalSurfaceCache::update_tracked(const Volume &field, Cancel cancel,
+                                  LocalSurfaceUpdateReport *report,
+                                  std::vector<Int3> *changed) const {
   stop(cancel);
+  if (changed) changed->clear();
   auto change = field.geometry_change(source_->geometry_owner());
   LocalSurfaceUpdateReport result;
   result.ancestry_events = change.events;
@@ -294,7 +301,7 @@ LocalSurfaceCache::update(const Volume &field, Cancel cancel,
       field.band() == source_->band() &&
       change.kind == Volume::GeometryChange::Kind::Local) {
     try {
-      auto next = update_regions(field, change.regions(), cancel);
+      auto next = update_regions(field, change.regions(), cancel, changed);
       result.kind = LocalSurfaceUpdateReport::Kind::Local;
       if (report)
         *report = result;
@@ -304,6 +311,7 @@ LocalSurfaceCache::update(const Volume &field, Cancel cancel,
       result.capacity_fallback = true;
     }
   }
+  if (changed) changed->clear();
   auto next = build(field, limits_, cancel);
   result.kind = LocalSurfaceUpdateReport::Kind::Rebuild;
   if (report)
@@ -313,7 +321,7 @@ LocalSurfaceCache::update(const Volume &field, Cancel cancel,
 LocalSurfaceCache::Ptr
 LocalSurfaceCache::update_regions(const Volume &field,
                                   std::span<const SurfaceSampleRegion> regions,
-                                  Cancel cancel) const {
+                                  Cancel cancel, std::vector<Int3> *changed) const {
   stop(cancel);
   if (field.voxel_size() != source_->voxel_size())
     throw std::invalid_argument(
@@ -396,6 +404,7 @@ LocalSurfaceCache::update_regions(const Volume &field,
   work.stats.tiles_reused = reused;
   result->stats_ = work.stats;
   stop(work.cancel);
+  if (changed) changed->assign(dirty.begin(), dirty.end());
   return result;
 }
 Mesh LocalSurfaceCache::materialize(Cancel cancel) const {

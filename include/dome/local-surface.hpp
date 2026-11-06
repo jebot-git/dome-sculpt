@@ -5,6 +5,7 @@
 #include <memory>
 #include <span>
 namespace dome {
+namespace detail { class SculptSurfaceChunks; }
 // Inclusive lattice SAMPLE bounds, before the mesher's support halo. Producers
 // must include every changed value (including erased values), not just
 // negatives.
@@ -89,9 +90,15 @@ public:
   static Int3 tile_coordinate(Int3 cell);
 
 private:
+  friend class detail::SculptSurfaceChunks;
   LocalSurfaceCache() = default;
+  // Internal authenticated change capture for the immutable chunk compiler.
+  // Populated only after a complete successful local extraction; rebuilds
+  // clear it. No caller-supplied dirty region becomes geometry authority.
+  Ptr update_tracked(const Volume &, Cancel, LocalSurfaceUpdateReport *,
+                     std::vector<Int3> *) const;
   Ptr update_regions(const Volume &, std::span<const SurfaceSampleRegion>,
-                     Cancel) const;
+                     Cancel, std::vector<Int3> *) const;
   Owner source_;
   LocalSurfaceLimits limits_;
   Tiles tiles_;
