@@ -1,3 +1,14 @@
+## Placed-owner workspace accounting source checkpoint — 2026-11-06
+
+Actual498 cold P1 reaches258852 triangles, but original warm-up refuses in the
+placed-directory byte guard. This separate child fixes proven repeated shared
+geometry reservations through explicit placement-owned versus full standalone
+scopes, retaining all caps and distinct old/new owners. Three providers plus a
+new meaningful native consumer pass warning-free optimized syntax only; no
+runtime/admission result yet. Read SCULPT-PLACED-WORKSPACE-SOURCE.md and its pinned
+receipt. The bounded native/software gate is only proposed. Existing qualified
+providers, original P1 failure and complete full-goal requirements remain intact.
+
 ## New authoring and production-memory source composition — 2026-11-06
 
 Read [SCULPT-AUTHORING-NEXT.md](SCULPT-AUTHORING-NEXT.md). This private child
