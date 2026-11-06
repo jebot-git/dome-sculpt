@@ -63,11 +63,11 @@ std::string_view instrumented_backend() {
 extern "C" dome::detail::SculptScenePreview real_capture(
     const dome::Scene &,dome::detail::SculptSceneChunkContext,
     const dome::detail::SculptSceneChunks::Ptr &,dome::detail::SculptSceneChunkLimits,
-    dome::LocalSurfaceCache::Cancel) asm("__real___ZN4dome6detail17SculptSceneChunks7captureERKNS_5SceneENS0_23SculptSceneChunkContextERKSt10shared_ptrIKS1_ENS0_22SculptSceneChunkLimitsESt8functionIFbvEE");
+    dome::LocalSurfaceCache::Cancel) asm("__real__ZN4dome6detail17SculptSceneChunks7captureERKNS_5SceneENS0_23SculptSceneChunkContextERKSt10shared_ptrIKS1_ENS0_22SculptSceneChunkLimitsESt8functionIFbvEE");
 extern "C" dome::detail::SculptScenePreview wrapped_capture(
     const dome::Scene &,dome::detail::SculptSceneChunkContext,
     const dome::detail::SculptSceneChunks::Ptr &,dome::detail::SculptSceneChunkLimits,
-    dome::LocalSurfaceCache::Cancel) asm("__wrap___ZN4dome6detail17SculptSceneChunks7captureERKNS_5SceneENS0_23SculptSceneChunkContextERKSt10shared_ptrIKS1_ENS0_22SculptSceneChunkLimitsESt8functionIFbvEE");
+    dome::LocalSurfaceCache::Cancel) asm("__wrap__ZN4dome6detail17SculptSceneChunks7captureERKNS_5SceneENS0_23SculptSceneChunkContextERKSt10shared_ptrIKS1_ENS0_22SculptSceneChunkLimitsESt8functionIFbvEE");
 extern "C" dome::detail::SculptScenePreview wrapped_capture(
     const dome::Scene &scene,dome::detail::SculptSceneChunkContext context,
     const dome::detail::SculptSceneChunks::Ptr &before,dome::detail::SculptSceneChunkLimits limits,
