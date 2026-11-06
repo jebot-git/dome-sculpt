@@ -5,15 +5,18 @@
 namespace dome::detail {
 struct TextureSetExportField {
   TextureSetId set=0;
+  std::string name;
   size_t first=0,count=0;
   Material material;
   std::shared_ptr<const TextureMaps> textures;
+  bool normal_role=false;
 };
 // One REST geometry and deformation expansion for the entire mesh instance.
 // Material ranges refer into one index stream; no per-material mesh/rig copies.
 struct TextureSetExport {
   ObjectSurface surface;
   std::vector<Tangent> tangents;
+  std::vector<std::array<float,2>>paint_coordinates,normal_coordinates;
   std::vector<TextureSetExportField> fields;
   size_t working_bound=0;
 };

@@ -1,0 +1,31 @@
+{
+  "status": "Source-only genuine standard-export compiler for representable retained role fields; runtime pending",
+  "base": "7f19ac30ef20e1392aa41cd523d94151450d05c3",
+  "syntax": {
+    "path": "/home/blux/de-xr/dome-sculpt/artifacts/texture-set-source-export-7f19/artifacts/portable-field-fixture-syntax-v3/status.json",
+    "sha256": "d0c25f8601df62b146a58261c3ba7c22b47c7e0b968116e88fe1492223fc4166",
+    "whole_TUs": 5,
+    "exit": 0,
+    "drift": []
+  },
+  "test": "dome-sculpt-texture-set-source-export (registered, unexecuted)",
+  "runtime_proposal": {
+    "path": "/home/blux/de-xr/dome-sculpt/artifacts/texture-set-source-export-7f19/artifacts/portable-field-runtime-plan/proposal.json",
+    "sha256": "855f7b668f9ea7d173fea4125bf331f04b87ea86938412c3485ecde0b29c0ce0",
+    "temporary_build_cap": 536870912,
+    "serial_link_reserve": 67108864,
+    "sdk_pins": 47,
+    "launch_status": "not launched, root approval/composition pending"
+  },
+  "preserved_failures": [
+    "portable-field-fixture-syntax: incomplete NativeAffineEdit type in new fixture",
+    "portable-field-fixture-syntax-v2: mixed-type auto declaration in new smooth branch"
+  ],
+  "remaining": [
+    "general varying/oblique role interpolation compiler",
+    "sourceful active deformation role transport",
+    "per-material FLOAT/HDR precision-qualified export",
+    "native toon typed material export",
+    "fresh own object/link/native/GL/UI/SAN/XR qualification"
+  ]
+}
