@@ -1489,12 +1489,17 @@ size_t detail::TextureSetPaintAccess::working_bytes(const PaintedMesh&paint,uint
   bytes+=sizeof(PaintedMesh::SurfaceMap)+size_t(r)*r*(sizeof(PaintedMesh::SurfaceMap::Texel)+2*sizeof(int32_t))+size_t(r/32)*(r/32)*sizeof(PaintedMesh::SurfaceMap::Bounds);
   return bytes;
 }
+bool detail::TextureSetPaintAccess::valid_source_member(const PaintedMesh&member,const PaintedMesh&original,
+    const std::shared_ptr<const TextureSetFaceDomain>&domain)noexcept{
+  using native_weight_state::owner;
+  return !(!domain||!owner(member.texture_set_domain_,domain)||!member.surface_||!owner(member.surface_->set_domain,domain)||!domain->matches(original.mesh_owner())||!owner(member.mesh_owner(),original.mesh_owner())||member.editing_||original.editing_||member.resolution()!=original.resolution()||!member.valid_paint_sampling_attachment()||!original.valid_paint_sampling_attachment()||!member.valid_source_sampling_attachment()||!original.valid_source_sampling_attachment()||!owner(member.surface_->paint_domain,original.surface_->paint_domain)||!owner(member.surface_->original_sampling,original.surface_->original_sampling)||!owner(member.source_maps_,original.source_maps_)||!owner(member.color_projection_,original.color_projection_)||!owner(member.normal_projection_,original.normal_projection_)||!owner(member.baked_,original.baked_));
+}
 std::shared_ptr<const PaintedMesh>detail::TextureSetPaintAccess::field_source_view(const PaintedMesh&member,
     const PaintedMesh&original,const std::shared_ptr<const TextureSetFaceDomain>&domain,const TextureSetLimits&limits){
   using native_weight_state::owner;
   limits.validate();if(limits.cancelled&&limits.cancelled())throw std::runtime_error("Texture-set source read view cancelled");
   if(domain)domain->authenticate_owner(domain);
-  if(!domain||!owner(member.texture_set_domain_,domain)||!member.surface_||!owner(member.surface_->set_domain,domain)||!domain->matches(original.mesh_owner())||!owner(member.mesh_owner(),original.mesh_owner())||member.editing_||original.editing_||member.resolution()!=original.resolution()||!member.valid_paint_sampling_attachment()||!original.valid_paint_sampling_attachment()||!member.valid_source_sampling_attachment()||!original.valid_source_sampling_attachment()||!owner(member.surface_->paint_domain,original.surface_->paint_domain)||!owner(member.surface_->original_sampling,original.surface_->original_sampling)||!owner(member.source_maps_,original.source_maps_)||!owner(member.color_projection_,original.color_projection_)||!owner(member.normal_projection_,original.normal_projection_)||!owner(member.baked_,original.baked_))throw std::invalid_argument("Texture-set member cannot borrow another original raster/source attachment");
+  if(!valid_source_member(member,original,domain))throw std::invalid_argument("Texture-set member cannot borrow another original raster/source attachment");
   if(snapshot_bytes(member)>limits.maximum_bytes)throw std::length_error("Texture-set source read metadata exceeds its byte quota");
   auto readable=member.snapshot();readable->surface_=original.surface_;readable->texture_set_domain_=original.texture_set_domain_;readable->sampling_attachment_=original.sampling_attachment_;readable->composite_cache_=std::make_shared<PaintedMesh::CompositeCache>();readable->composite_token_=next_composite_token();
   if(!valid_raster(*readable)||!readable->valid_paint_sampling_attachment()||!readable->valid_source_sampling_attachment())throw std::invalid_argument("Texture-set source view failed its actual original raster proof");
@@ -1599,6 +1604,7 @@ struct SourcePaintSamplingAccess {
   }
   template<class Geometry> static std::shared_ptr<PaintedMesh> retain(const PaintedMesh &before,Geometry &&authored,
       std::shared_ptr<const PaintSamplingDomain> domain,const PaintSamplingLimits &limits){
+    const Mesh&target=[&]()->const Mesh&{if constexpr(std::is_same_v<std::remove_cvref_t<Geometry>,std::shared_ptr<const Mesh>>){if(!authored)throw std::invalid_argument("Writable paint shared geometry is absent");return *authored;}else return authored;}();
     auto stop=[&]{if(limits.cancelled&&limits.cancelled())throw std::runtime_error("Writable paint-grid attachment cancelled");};stop();
     if(before.in_stroke()||!domain||!before.valid_paint_sampling_attachment())
       throw std::invalid_argument("Writable paint-grid attachment requires a finished valid source");
@@ -1608,7 +1614,7 @@ struct SourcePaintSamplingAccess {
        (before.baked_&&!before.baked_->maps.normal.rgba.empty())))
       throw std::invalid_argument("Retained paint with raw normal data requires independent prepared-normal authority");
     if(before.revision_==UINT64_MAX)throw std::overflow_error("Paint geometry identity exhausted");
-    domain->validate_current(authored,limits);
+    domain->validate_current(target,limits);
     if(const auto previous=before.paint_sampling_domain()){
       if(domain->basis()!=previous->basis()||domain->basis().owner_before(previous->basis())||previous->basis().owner_before(domain->basis()))
         throw std::invalid_argument("Repeated UV edits must retain their exact original paint basis owner");
@@ -1619,7 +1625,7 @@ struct SourcePaintSamplingAccess {
         throw std::invalid_argument("Writable paint basis is not the exact detached original authoring mesh");
     }
     const size_t pixels=size_t(before.resolution())*before.resolution();
-    const size_t raster_bytes=authored.indices.size()*(2*sizeof(Vec3)+sizeof(std::array<float,2>)+sizeof(uint32_t));
+    const size_t raster_bytes=target.indices.size()*(2*sizeof(Vec3)+sizeof(std::array<float,2>)+sizeof(uint32_t));
     const size_t grid_bytes=pixels*(sizeof(PaintedMesh::SurfaceMap::Texel)+2*sizeof(int32_t))+
       size_t(before.resolution()/32)*(before.resolution()/32)*sizeof(PaintedMesh::SurfaceMap::Bounds);
     const auto owned=domain->storage_bytes(limits);
@@ -1644,6 +1650,10 @@ size_t paint_sampling_surface_working_bytes(size_t vertices,size_t corners,uint3
 std::shared_ptr<PaintedMesh> retain_paint_grid(const PaintedMesh &before,Mesh authored,
     std::shared_ptr<const PaintSamplingDomain> domain,const PaintSamplingLimits &limits){
   return SourcePaintSamplingAccess::retain(before,std::move(authored),std::move(domain),limits);
+}
+std::shared_ptr<PaintedMesh> retain_paint_grid_shared(const PaintedMesh&before,std::shared_ptr<const Mesh>geometry,
+    std::shared_ptr<const PaintSamplingDomain>domain,const PaintSamplingLimits&limits){
+  return SourcePaintSamplingAccess::retain(before,std::move(geometry),std::move(domain),limits);
 }
 std::shared_ptr<PaintedMesh> retain_paint_grid_borrowed(const PaintedMesh &before,const Mesh &authored,
     std::shared_ptr<const PaintSamplingDomain> domain,const PaintSamplingLimits &limits){

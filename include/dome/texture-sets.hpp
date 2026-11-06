@@ -4,7 +4,7 @@
 #include <span>
 namespace dome {
 using TextureSetId = uint32_t;
-namespace detail { struct TextureSetAccess; struct TextureSetPaintAccess; class TextureSetArchive; }
+namespace detail { class TextureSetFieldSource; struct TextureSetAccess; struct TextureSetPaintAccess; class TextureSetArchive; }
 struct TextureSetInitialField {Material material;uint32_t resolution=512;};
 struct TextureSetLimits {
   size_t maximum_sets_per_object=64,maximum_sets_per_scene=256;
@@ -63,6 +63,7 @@ struct TextureSetRecord {
   std::shared_ptr<const SourceMaterialBindings> material_bindings;
   std::shared_ptr<const ObjectBakeRecipe> bake_recipe;
   std::shared_ptr<const TextureSetFaceDomain> domain;
+  std::shared_ptr<const detail::TextureSetFieldSource> source;
 };
 // Set0 uses the existing SculptObject paint/material/source fields. Additional
 // records never replace that geometry authority when the active set changes.
@@ -74,6 +75,7 @@ public:
   uint64_t next_id()const noexcept{return next_;}
   const std::shared_ptr<const TextureSetTopology>& topology()const noexcept{return topology_;}
   const std::shared_ptr<const TextureSetFaceDomain>& primary_domain()const noexcept{return primary_;}
+  const std::shared_ptr<const detail::TextureSetFieldSource>& primary_source()const noexcept{return primary_source_;}
   std::span<const TextureSetId> triangle_sets()const noexcept{return slots_?std::span<const TextureSetId>(*slots_):std::span<const TextureSetId>{};}
   const std::vector<TextureSetRecord>& additional()const noexcept{return additional_;}
   const TextureSetRecord& at(TextureSetId)const;
@@ -91,6 +93,7 @@ private:
   TextureSetCollection(const TextureSetCollection&)=default;
   std::shared_ptr<const TextureSetTopology> topology_;
   std::shared_ptr<const TextureSetFaceDomain> primary_;
+  std::shared_ptr<const detail::TextureSetFieldSource> primary_source_;
   std::shared_ptr<const std::vector<TextureSetId>> slots_;
   std::vector<TextureSetRecord> additional_;
   TextureSetId active_=0;
@@ -105,6 +108,7 @@ struct TextureSetView {
   std::shared_ptr<const SourceMaterialBindings> material_bindings;
   std::shared_ptr<const ObjectBakeRecipe> bake_recipe;
   std::shared_ptr<const TextureSetFaceDomain> domain;
+  std::shared_ptr<const detail::TextureSetFieldSource> source;
 };
 enum class TextureSetAction { Create, AssignFaces, Select, Rename, Material, LayerOpacity, LayerOrder, AddLayer, DeleteLayer, NextLayer, ToggleLayer };
 // Native/desktop/XR requests operate on persistent logical face IDs and one

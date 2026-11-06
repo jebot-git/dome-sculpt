@@ -1,0 +1,29 @@
+{
+  "status": "Source-only persistent field records and worker COW refresh; wire/render/export guards intact",
+  "parent": "6bc73578",
+  "syntax": {
+    "path": "/home/blux/de-xr/dome-sculpt/artifacts/texture-set-fields-e412/artifacts/record-syntax/status.json",
+    "sha256": "342fd91e287ae2d2c277c4198ac9c97428b5fb7ed2d1973dd9366d08eb265d41",
+    "whole_TUs": 10,
+    "exit": 0,
+    "source_drift": []
+  },
+  "implemented": [
+    "Primary and additional records retain real field-source descriptors",
+    "Accepted pixel/layer edits refresh immutable cached original-raster read views; stale current values cannot reuse old read authority",
+    "Repartition captures the actual current readable source and changes only genuine member domains",
+    "Scene pairing uses authenticated cached source reads while charging editable members",
+    "Source graph retains/charges original field and shared raw before input owners",
+    "Polygon replay can mint attachments on a supplied fully replay-validated shared Mesh; stage no longer copies its own immutable derived geometry"
+  ],
+  "layout": "TextureSetRecord/View and collection private records changed; fresh complete owning provider closure is required",
+  "not_executed": [
+    "new or existing native tests",
+    "objects/links/GUI/GL/XR/SAN/device"
+  ],
+  "remaining": [
+    "Source-backed Paint7 and actual alias-preserving PolygonSources8/source history wire",
+    "Actual GPU/query/native/export consumers for source-backed fields",
+    "Sourceful grid resolution and new normal-detail write transitions"
+  ]
+}

@@ -1,3 +1,4 @@
+#include "texture-set-field-source.hpp"
 #include "texture-set-surface.hpp"
 #include "dome/texture-sets.hpp"
 #include "texture-set-graph.hpp"
@@ -228,9 +229,9 @@ void Scene::validate(bool deep_sources) const {
     if(bytes>128*1024*1024-paint_domain_bytes)throw std::length_error("Scene retained writable paint basis exceeds aggregate bytes");paint_domain_bytes+=bytes;
     if(deep_sources)domain->storage_bytes();
   };
-  auto pair_domain=[&](const std::shared_ptr<const PaintedMesh> &paint,const std::shared_ptr<const SourceMaterialBindings> &binding,const CreatorAppearance *appearance){
+  auto pair_domain=[&](const std::shared_ptr<const PaintedMesh> &paint,const std::shared_ptr<const SourceMaterialBindings> &binding,const CreatorAppearance *appearance,const std::shared_ptr<const PaintedMesh>&source_view={}){
     if(!paint||!paint->paint_sampling_domain())return;
-    detail::source_paint_pairing(paint.get(),binding.get(),appearance,deep_sources);paired_domain_paints.insert(paint.get());
+    const auto&readable=source_view?source_view:paint;detail::source_paint_pairing(readable.get(),binding.get(),appearance,deep_sources);paired_domain_paints.insert(paint.get());if(source_view)paired_domain_paints.insert(source_view.get());
   };
   NormalSamplingArchiveLimits normal_limits;std::set<const NormalSamplingDomain*> cheap_normal_domains;std::set<const NormalDetailAuthority*> cheap_normal_details;size_t cheap_normal_bytes=0;
 
@@ -304,14 +305,17 @@ void Scene::validate(bool deep_sources) const {
       const std::shared_ptr<const SourceMaterialBindings>&binding,
       const std::shared_ptr<const CreatorAppearance>&appearance,
       const std::shared_ptr<const DeformationState>&deformation,
-      const std::shared_ptr<const PolygonAuthority>&polygon){
+      const std::shared_ptr<const PolygonAuthority>&polygon,
+      const std::shared_ptr<const detail::TextureSetFieldSource>&field_source={}){
+    std::shared_ptr<const PaintedMesh>source_view;
+    if(field_source){auto field=field_source->field();field.painted=paint;field.material_bindings=binding;field.appearance=appearance;source_view=field_source->read_view(field);}
     const auto projection=paint?paint->color_projection():nullptr;
     const auto preparation=binding?binding->color_preparation:nullptr;
     detail::polygon_color_owner(polygon.get(),preparation.get(),deep_sources);
     const auto normal_projection=paint?paint->normal_projection():nullptr;
     const auto normal_preparation=binding?binding->normal_preparation:nullptr;
     if(paint&&paint->baked()&&paint->baked()->normal_field)
-      detail::source_paint_pairing(paint.get(),binding.get(),appearance.get(),deep_sources);
+      detail::source_paint_pairing(source_view?source_view.get():paint.get(),binding.get(),appearance.get(),deep_sources);
     if(bool(normal_projection)!=bool(normal_preparation))throw std::invalid_argument("Current normal projection and retained interpretation differ");
     if(normal_projection){
       if(!detail::normal_projection_identity(*normal_projection,*normal_preparation->projection))throw std::invalid_argument("Prepared normal planes are not their recorded current intrinsic field");
@@ -329,7 +333,7 @@ void Scene::validate(bool deep_sources) const {
       source_materials.add(binding,deep_sources);
       if(deep_sources && binding->normal_frames)detail::normal_frame_current_authority(*binding,paint->mesh(),deformation.get());
     }
-    pair_domain(paint,binding,appearance.get());
+    pair_domain(paint,binding,appearance.get(),source_view);
   };
   for(const auto &g:groups_)if(g.source_placement)retain_model(g.source_placement->model);
   for (auto &o : objects_) {
@@ -375,10 +379,10 @@ void Scene::validate(bool deep_sources) const {
     }
     retain_paint(o.painted,false);
     if(o.texture_sets)for(const auto &set:o.texture_sets->additional())retain_paint(set.painted,false);
-    retain_surface_field(o.painted,o.material_bindings,o.appearance,o.deformation,o.polygon);
+    retain_surface_field(o.painted,o.material_bindings,o.appearance,o.deformation,o.polygon,o.texture_sets?o.texture_sets->primary_source():nullptr);
     if(o.texture_sets)for(const auto &set:o.texture_sets->additional()){
       if(set.appearance)retain_appearance(*set.appearance,*set.painted);
-      retain_surface_field(set.painted,set.material_bindings,set.appearance,o.deformation,o.polygon);
+      retain_surface_field(set.painted,set.material_bindings,set.appearance,o.deformation,o.polygon,set.source);
     }
     const auto mask_samples=o.volume->mask_values().size();
     count += std::max(o.volume->voxels().size(), o.volume->stored_samples()-mask_samples)+mask_samples;
@@ -426,7 +430,7 @@ void Scene::validate(bool deep_sources) const {
     pair_domain(origin->paint,origin->material_bindings,origin->appearance.get());
     if(origin->texture_sets)for(const auto &set:origin->texture_sets->additional()){
       retain_paint(set.painted,true);if(set.appearance)retain_appearance(*set.appearance,*set.painted);
-      retain_surface_field(set.painted,set.material_bindings,set.appearance,origin->deformation,origin->polygon);
+      retain_surface_field(set.painted,set.material_bindings,set.appearance,origin->deformation,origin->polygon,set.source);
     }
     if (origin->retopology) {
       const auto &t = origin->retopology->topology;

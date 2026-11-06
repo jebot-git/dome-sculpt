@@ -272,3 +272,15 @@ ranges/query/export/native-publication adapters remain unfinished. Existing
 Scene/codec/render/query/export guards remain intact. Current deformed inputs,
 multiple-material before models and unsupported original/prepared roles retain
 explicit diagnostics. No Scene41 or version-only permission is introduced.
+
+The next source boundary adds persistent primary/additional field descriptors
+and immutable current-readable COW refresh on accepted edits/repartition. Scene
+pairing consumes that proved read while editable Paint keeps the subset raster.
+The graph ledger counts original field and shared raw before-input owners.
+Source node staging now accepts an explicit replay-validated shared geometry
+owner and retains that owner through the real sampling-domain/raster factory,
+avoiding a second copy of its own immutable derivative. Ten whole TUs pass
+syntax; no new native execution or application qualification is claimed. Record,
+View and collection layouts changed. Read
+validation/TEXTURE-SETS-FIELD-RECORD-SOURCE.json. Paint7/PolygonSources8 wire and
+actual source-backed GPU/query/native/export adapters remain guarded work.

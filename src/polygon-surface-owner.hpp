@@ -63,6 +63,10 @@ public:
      const PolygonSurfaceTransferLimits & = {}) const;
  bool has_normal_field() const noexcept;
  PolygonSurfaceStage stage_paint(const PolygonSurfaceTransferLimits & = {}) const;
+ // Actual node replay may share the native geometry table after verifying the
+ // complete trace/attributes; this is a producer, never a version exemption.
+ PolygonSurfaceStage stage_paint(std::shared_ptr<const Mesh>,
+     const PolygonSurfaceTransferLimits &) const;
  bool matches_current(const PaintedMesh &) const noexcept;
  void validate_binding(const SourceMaterialBindings &,const PolygonSurfaceTransferLimits & = {}) const;
  void validate_current(const PaintedMesh &,const PolygonSurfaceTransferLimits & = {}) const;
@@ -70,6 +74,8 @@ public:
  // needs the genuine39 attachment and current normal-field binding adapter.
  std::shared_ptr<const PaintSamplingDomain> paint_domain(
      const PolygonSurfaceTransferLimits & = {}) const;
+ std::shared_ptr<const PaintSamplingDomain> paint_domain(std::shared_ptr<const Mesh>,
+     const PolygonSurfaceTransferLimits &) const;
 private:
  friend class PolygonSurfacePreview;
  PolygonSurfaceOwner()=default;

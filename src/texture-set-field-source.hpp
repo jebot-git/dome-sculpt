@@ -22,10 +22,15 @@ public:
       const TextureSetView &,std::shared_ptr<const TextureSetFaceDomain>,
       const TextureSetLimits & = {});
   void authenticate_owner(const std::shared_ptr<const TextureSetFieldSource>&)const;
-  void validate_field(const TextureSetView &,const TextureSetLimits & = {})const;
+  void validate_field(const TextureSetView &,const TextureSetLimits & = {},bool deep=true)const;
+  std::shared_ptr<const TextureSetFieldSource> with_current(const TextureSetView &,
+      const TextureSetLimits & = {})const;
+  std::shared_ptr<const TextureSetFieldSource> repartition(const TextureSetView &,
+      std::shared_ptr<const TextureSetFaceDomain>,const TextureSetLimits & = {})const;
   const TextureSetView&field()const noexcept{return field_;}
   const std::shared_ptr<const PaintedMesh>&original_paint()const noexcept{return original_;}
   const std::shared_ptr<const PolygonSurfaceOwner>&polygon_owner()const noexcept{return polygon_;}
+  const std::shared_ptr<const PolygonSurfacePreview>&source_preview()const noexcept{return preview_;}
   // The private source view uses the original proved raster/attachment and
   // current member COW values. Editable member Paint retains its subset raster.
   std::shared_ptr<const PaintedMesh> read_view(const TextureSetView &,
@@ -39,11 +44,12 @@ private:
   static std::shared_ptr<const TextureSetFieldSource> capture_prepared(
       const TextureSetView &,std::shared_ptr<const TextureSetFaceDomain>,
       std::shared_ptr<const PolygonSurfacePreview>,const TextureSetLimits &);
+  void validate_member(const TextureSetView &,const TextureSetLimits &)const;
   TextureSetFieldSource()=default;
   TextureSetFieldSource(TextureSetFieldSource&&)=default;
   mutable std::weak_ptr<const TextureSetFieldSource>self_;
   TextureSetView field_;
-  std::shared_ptr<const PaintedMesh>original_;
+  std::shared_ptr<const PaintedMesh>original_,readable_;
   std::shared_ptr<const PolygonSurfaceOwner>polygon_;
   std::shared_ptr<const PolygonSurfacePreview>preview_;
 };
@@ -52,4 +58,7 @@ private:
 // between sets. This does not mutate/publish the caller's Scene or collection.
 std::vector<std::shared_ptr<const TextureSetFieldSource>> prepare_texture_set_field_sources(
     const SculptObject &,std::span<const TextureSetId>,const TextureSetLimits & = {});
+// Current producer view; this never changes the editable membership/raster.
+std::shared_ptr<const PaintedMesh> texture_set_source_read_view(const TextureSetView &,
+    const TextureSetLimits & = {});
 } // namespace dome::detail
