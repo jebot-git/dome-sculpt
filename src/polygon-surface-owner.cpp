@@ -8,6 +8,7 @@
 #include "source-paint-pairing.hpp"
 #include "polygon-scene-archive.hpp"
 #include "paint-sampling-access.hpp"
+#include "native-paint-sampling.hpp"
 #include <limits>
 #include <numeric>
 #include <nlohmann/json.hpp>
@@ -51,7 +52,19 @@ SourceDomain source_domain(const PolygonOrigin&o,const PolygonSurfaceTransferLim
  const auto &binding=o.material_bindings;const auto field=o.paint->baked()?o.paint->baked()->normal_field:nullptr;
  if(!field&&o.paint->mesh().normals.size()!=o.paint->mesh().positions.size())throw std::invalid_argument("Polygon native N-only transfer requires its actual authored/evaluated normals");
  if(!field&&o.paint->baked()&&(!o.paint->baked()->maps.normal.rgba.empty()||!o.paint->baked()->maps.mtoon_normal.rgba.empty()))throw std::invalid_argument("Polygon raw baked normal detail requires its actual native/converted normal adapter");
- if(binding&&(binding->has_mtoon||binding->native_paint_sampling||binding->native_paint_frames||binding->normal_preparation||binding->color_preparation))
+ // A real normal-free native UV retention already owns a version1 original
+ // paint basis and ordered source corners. Keep that strong owner in before;
+ // paint_domain composes its exact correspondence into the current domain3.
+ // No normal/artist/prepared role is authorized by this paint-only adapter.
+ if(binding&&binding->native_paint_sampling){
+  const auto &native=binding->native_paint_sampling;
+  if(field||binding->has_mtoon||binding->native_paint_frames||binding->normal_frames||binding->canonical_attributes||binding->canonical_uv||binding->canonical_paint_sampling||binding->normal_preparation||binding->color_preparation||binding->key_derivation||binding->normal_frame!=SourceMaterialNormalFrame::UvDerivative||binding->sampling_reparameterized||!native->valid_owner(native)||!o.paint->paint_sampling_domain()||o.paint->paint_sampling_domain()->version()!=1)
+   throw std::invalid_argument("Polygon native UV field requires its genuine normal-free paint-only source adapter");
+  for(const auto &role:binding->roles)if(role.image)throw std::invalid_argument("Polygon native UV field cannot borrow an independently typed image role");
+  PaintSamplingLimits native_limits;native_limits.max_vertices=l.geometry.maximum_vertices;native_limits.max_triangles=l.geometry.maximum_faces;native_limits.max_work=l.geometry.maximum_work;native_limits.max_working_bytes=l.maximum_working_bytes;native_limits.max_basis_bytes=std::min(size_t(128*1024*1024),native_limits.max_working_bytes);native_limits.cancelled=l.geometry.cancelled;
+  native->validate_current(*o.paint,native_limits);
+ }
+ if(binding&&(binding->has_mtoon||binding->native_paint_frames||binding->normal_preparation||binding->color_preparation))
   throw std::invalid_argument("Polygon typed/native/prepared field needs its separate actual role adapter");
  if(binding&&binding->normal_frames&&!field)throw std::invalid_argument("Polygon retained artist frame without active canonical detail needs its separate native frame adapter");
  if(field){
