@@ -1,3 +1,12 @@
+## Goal resumed: current component integration — 2026-11-06
+
+The user has resumed the full goal and prioritized milestone integration and a
+combined build. Read [INTEGRATION-RESUME-20261106.md](INTEGRATION-RESUME-20261106.md).
+Fresh private2228 Release builds all32 selected targets; native21/22 and both
+independent workspace gates pass. Source-export failure is retained and a focused
+adapter repair is under verification. No main product admission or complete goal
+claim. The earlier pause instruction is superseded; historical notes follow.
+
 ## User-requested pause after authoring milestone — 2026-11-06
 
 Read [PAUSE-CHECKPOINT-20261106.md](PAUSE-CHECKPOINT-20261106.md). Ready source is
