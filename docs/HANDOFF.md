@@ -1,3 +1,15 @@
+## Combined Release, Arc and P1 milestone — 2026-11-06
+
+Private83805b87 now passes the fresh32-target build, selected native22+workspace2,
+current inherited35 logical role cases,1727 software+1727 strictArc GL checks,
+56 cross-device image pairs, ten Khronos exports and original P1 inventory with
+warm stroke/exactUndo. Both normal and clamped GUI profiles pass81 each.
+Read [SCULPT-INTEGRATION-RELEASE-83805.md](SCULPT-INTEGRATION-RELEASE-83805.md).
+The first XR fixture has a confirmed menu-reopen timing defect and is being
+repaired without changing product code or expected native endpoints. Corrected
+XR and matching sanitizer union remain pending. Main product admission and the
+complete original goal remain unfinished; work is resumed, not paused.
+
 ## Goal resumed: current component integration — 2026-11-06
 
 The user has resumed the full goal and prioritized milestone integration and a
