@@ -127,7 +127,7 @@ private:
                                   const PaintSamplingArchive *,
                                   const SourcePaintDecodeContext &);
   std::shared_ptr<TextureSetCollection>
-  collection_at(uint32_t, const PaintImageArchive &,
+  collection_at(uint32_t, bool polygon, const PaintImageArchive &,
                 const NormalSamplingArchive *, const PaintSamplingArchive *,
                 const SourcePaintDecodeContext &);
   Holder decode_holder(const nlohmann::json &, const Material &, bool,

@@ -1,0 +1,24 @@
+{
+  "scope": "Enclosing actual polygon capability forwarded to all shared collection fields; syntax only",
+  "base": "42cd102593f9697830dbd7eff1b736f5ee321aa6",
+  "files": {
+    "src/texture-set-archive.hpp": "fdb258fe6c6ff8b49b6c2eaf6aa3540e4e44c99f142764712738d2dd757f9662",
+    "src/texture-set-archive.cpp": "109d798311cffd7afffbff27f6805d2da3989bf00118fc04097f0c401a7cbf34",
+    "tests/texture-set-history.cpp": "02e2c3119585eb7c192944f9617854c632b142cfe5028c846ded7ececafec6c5"
+  },
+  "syntax": {
+    "state": "terminal",
+    "exits": [
+      0,
+      0
+    ],
+    "seconds": 5.034127287042793,
+    "input_count": 407,
+    "drift": [],
+    "allocated": 3579904,
+    "cap": 8388608
+  },
+  "runtime": "Not executed; requires coherent fresh providers",
+  "sourceful_guards": "Unchanged",
+  "legacy_v1": "Unchanged path and new source regression; no runtime claim"
+}

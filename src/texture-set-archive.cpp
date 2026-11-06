@@ -919,11 +919,10 @@ TextureSetArchive::paint_at(uint32_t i, const Material &m, bool polygon,
     throw;
   }
 }
-std::shared_ptr<TextureSetCollection>
-TextureSetArchive::collection_at(uint32_t i, const PaintImageArchive &images,
-                                 const NormalSamplingArchive *normals,
-                                 const PaintSamplingArchive *sampling,
-                                 const SourcePaintDecodeContext &context) {
+std::shared_ptr<TextureSetCollection> TextureSetArchive::collection_at(
+    uint32_t i, bool polygon, const PaintImageArchive &images,
+    const NormalSamplingArchive *normals, const PaintSamplingArchive *sampling,
+    const SourcePaintDecodeContext &context) {
   if (i >= collections_.size())
     throw std::out_of_range("Unknown shared collection");
   auto &entry = collections_[i];
@@ -950,7 +949,7 @@ TextureSetArchive::collection_at(uint32_t i, const PaintImageArchive &images,
       f.material = material(r.at("material"));
       f.domain = domain_at(index(r.at("domain"), domains_.size()));
       const auto p =
-          paint_at(index(r.at("painted"), paints_.size()), f.material, false,
+          paint_at(index(r.at("painted"), paints_.size()), f.material, polygon,
                    images, normals, sampling, context);
       f.painted = p.paint;
       f.source = p.source;
@@ -1029,7 +1028,7 @@ TextureSetArchive::decode_holder(const Json &j, const Material &m, bool polygon,
   const auto id = index(j.at("collection"), collections_.size());
   auto primary = paint_at(index(j.at("primary"), paints_.size()), m, polygon,
                           images, normals, sampling, context);
-  auto c = collection_at(id, images, normals, sampling, context);
+  auto c = collection_at(id, polygon, images, normals, sampling, context);
   auto &entry = collections_[id];
   if (entry.primary_source_ready) {
     if (!same(c->primary_source_, primary.source) &&

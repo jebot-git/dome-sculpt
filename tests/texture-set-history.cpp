@@ -208,6 +208,102 @@ void shared_history() {
             decoded.texture_sets == retained.texture_sets,
         "Failure leaves the actual recipient's complete owners unchanged");
 }
+void polygon_plain_members() {
+  // Start with a genuine strict native mesh, author a real polygon authority
+  // through the production conversion seam, then fork an actual logical face.
+  Scene scene;
+  Mesh mesh;
+  mesh.positions = {{-1, -1, 0},   {1, -1, 0},   {0, 1, 0},
+                    {-1, -1, .5f}, {1, -1, .5f}, {0, 1, .5f}};
+  mesh.normals.assign(6, {0, 0, 1});
+  mesh.indices = {0, 1, 2, 3, 4, 5};
+  mesh.uv = {{{.05f, .1f}}, {{.45f, .1f}}, {{.25f, .9f}},
+             {{.55f, .1f}}, {{.95f, .1f}}, {{.75f, .9f}}};
+  scene.active().painted =
+      PaintedMesh::from_mesh(mesh, 64, PaintSurfaceOptions{});
+  scene.active().mesh_active = true;
+  scene.validate();
+  const auto original = scene.snapshot();
+  const auto topology =
+      prepare_polygon_workspace_topology(scene.active(), false);
+  adopt_polygon_edit(scene, scene.active().id, topology, {}, original, false);
+  check(scene.active().polygon && scene.active().polygon->active &&
+            scene.active().polygon->topology.faces().size() == 2,
+        "Production polygon adoption creates the real active authority");
+  const auto face = scene.active().polygon->topology.faces().back().id;
+  const std::array<uint64_t, 1> faces{face};
+  const auto member =
+      create_texture_set(scene, scene.active().id, faces, "Polygon extra", 64);
+  check(
+      member != 0 && scene.active().texture_sets->topology()->polygon_ids() &&
+          scene.active().texture_sets->at(member).domain->triangles().size() ==
+              1,
+      "Production face fork creates actual polygon-authored additional "
+      "membership");
+  const auto before = capture(scene);
+  PaintImageArchive images;
+  TextureSetArchive legacy;
+  const auto legacy_holder =
+      legacy.encode(scene.active(), images, nullptr, nullptr);
+  const auto legacy_geometry = legacy.geometry_records();
+  check(legacy_holder.at("version") == 1 && legacy_geometry.at("version") == 1,
+        "Current-only polygon collections retain the explicit legacy v1 wire "
+        "shape");
+  auto legacy_reader = TextureSetArchive::decode_geometry(legacy_geometry);
+  auto legacy_object = scene.active();
+  legacy_object.painted.reset();
+  legacy_object.texture_sets.reset();
+  legacy_reader.decode(legacy_object, legacy_holder, images, nullptr, nullptr,
+                       {});
+  legacy_reader.require_reachable();
+  TextureSetArchive legacy_again;
+  check(legacy_again.encode(legacy_object, images, nullptr, nullptr) ==
+                legacy_holder &&
+            legacy_again.geometry_records() == legacy_geometry,
+        "Existing v1 polygon primary and additional policy roundtrip stays "
+        "unchanged");
+  TextureSetArchive writer;
+  writer.shared_records();
+  const auto current = writer.encode(scene.active(), images, nullptr, nullptr);
+  const auto retained = writer.encode(*before, images, nullptr, nullptr);
+  const auto geometry = writer.geometry_records();
+  const auto policy =
+      geometry.at("paints").at(1).at("painted").at("payload").at("uv_policy");
+  check(policy == "polygon-authored",
+        "Actual additional Paint7 declares polygon-authored policy");
+  auto reader = TextureSetArchive::decode_geometry(geometry);
+  auto decoded = scene.active();
+  decoded.painted.reset();
+  decoded.texture_sets.reset();
+  reader.decode(decoded, current, images, nullptr, nullptr, {});
+  auto origin = *before;
+  origin.paint.reset();
+  origin.texture_sets.reset();
+  reader.decode(origin, retained, images, nullptr, nullptr, {});
+  reader.require_reachable();
+  check(owner(decoded.texture_sets, origin.texture_sets) &&
+            owner(decoded.texture_sets->at(member).painted,
+                  origin.texture_sets->at(member).painted),
+        "Actual polygon capability reaches primary and additional retained "
+        "field readers");
+  decoded.texture_sets->validate(decoded, true);
+  origin.texture_sets->validate(origin, true);
+  check(decoded.texture_sets->at(member).domain->triangles().size() == 1 &&
+            decoded.texture_sets->topology()->triangle_faces().size() == 2,
+        "Fresh polygon members preserve full logical face ordering and "
+        "independent subset");
+  auto absent = decoded;
+  absent.polygon.reset();
+  absent.painted.reset();
+  absent.texture_sets.reset();
+  auto strict = TextureSetArchive::decode_geometry(geometry);
+  refuses([&] { strict.decode(absent, current, images, nullptr, nullptr, {}); },
+          "Absent actual enclosing polygon cannot borrow polygon-authored "
+          "field capability");
+  check(!absent.painted && !absent.texture_sets,
+        "Failed enclosing-authority read publishes no partial primary or "
+        "collection");
+}
 void distinct_equal_collections() {
   auto scene = fixture();
   const auto before = capture(scene);
@@ -253,6 +349,7 @@ void distinct_equal_collections() {
 int main() try {
   shared_history();
   distinct_equal_collections();
+  polygon_plain_members();
   std::cout << "PASS " << checks
             << " actual shared texture history codec checks\n";
   return 0;
