@@ -1,3 +1,21 @@
+## Private local-coordinate grouped sculpt fix — 2026-11-06
+
+The unchanged original grouped sphere exposed a real world-float coordinate
+collapse after72 original native controls. Local geometry stays strictly valid;
+only absolute world staging degenerates at originalsecondX1.37/scale1.25. No
+source, grouping, validation or face is weakened/dropped. Actual local immutable
+GPU/BVH geometry now retains its captured authored frame, with full binary64
+affine metric queries and GPU placement/normal/winding/clip transforms.
+
+Whole8provider/readers +app/framing+3consumer composition passes originalnative95,
+pipelinenative43, softwareEGL72, currentquery108 and corrected ordinaryappsmoke0.
+237prior outputs stay exact,16newwhole outputs/7exactRGBApairs are verified;
+old affected archive members are excluded. Read SCULPT-LOCAL-PLACEMENT.md and
+validation/SCULPT-LOCAL-PLACEMENT-RELEASE.json. The prior25dd narrower scope and
+all failures remain preserved. Main39/40 composition, SAN/fullALL/physical and
+production measurements remain open. The measurement plan is unexecuted; zero
+upload counters are not speed evidence. Full REQUIREMENTS goal remains active.
+
 ## Private immutable chunk pipeline Release checkpoint — 2026-11-06
 
 The real Document worker now publishes typed immutable generated chunks,
