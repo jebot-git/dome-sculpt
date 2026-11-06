@@ -134,6 +134,9 @@ public:
   PolygonSceneReader &operator=(const PolygonSceneReader &) = delete;
   const std::shared_ptr<const PolygonOrigin> &origin_at(uint32_t);
   const std::shared_ptr<const PolygonAuthority> &authority_at(uint32_t);
+  // Resolve only through this owning reader's currently installed material
+  // prefix. Remains readable after finish; no new origin/replay is opened.
+  std::shared_ptr<const SourceMaterialBindings> material_at(uint32_t)const;
   MaterialResolver material_resolver(MaterialResolver);
   void restore_material_resolver(MaterialResolver) noexcept;
   PolygonSceneArchive finish();

@@ -1,0 +1,25 @@
+{
+  "status": "Source-only complete retained-field graph preflight adapters +history8 and actual enclosing polygon policy; common Scene registration pending",
+  "integrated_archive_source": [
+    "42cd102593f9697830dbd7eff1b736f5ee321aa6",
+    "9de9f348c996fbd75d5bffac91843a2e57c3b869"
+  ],
+  "syntax": {
+    "path": "/home/blux/de-xr/dome-sculpt/artifacts/texture-set-fields-e412/artifacts/source-history-composed-syntax/status.json",
+    "sha256": "cb672a1cfc6cf31378535f0f2fe8c5df472eaae9029d445ed037788768b67540",
+    "whole_TUs": 7,
+    "exit": 0,
+    "drift": []
+  },
+  "preserved_attempts": [
+    "artifacts/source-history-preflight-seal/status.json: five core TUs0, missing sparse fixture1",
+    "artifacts/source-history-preflight-seal-v2/status.json: same missing fixture after invalid sparse option; setup failure preserved in tool record",
+    "artifacts/source-history-fixture-syntax/status.json: restored actual fixture0"
+  ],
+  "remaining": [
+    "root common Scene writer/reader callback registration and budgeting",
+    "fresh all-own object/link/runtime/native/GL/UI/SAN/XR qualification",
+    "sourceful frontend admission and sourceful standard export",
+    "actual multi-field polygon operation and source-grid resizing adapter"
+  ]
+}

@@ -13,18 +13,24 @@ size_t PolygonSurfacePaintCodec::preflight(const nlohmann::json&input,size_t nod
  stop(l);if(!input.is_object()||input.size()!=4||!input.at("version").is_number_integer()||input.at("version")!=6||!input.at("physical_paint").is_boolean()||!input.at("payload").is_object()||!nodes||nodes>128)throw std::invalid_argument("Invalid typed polygon Paint6 envelope");
  (void)reference(input.at("node"),nodes);const auto&payload=input.at("payload");
  for(const char*key:{"version","payload","domain","source_maps","normal_projection","color_projection","source_images","uv_policy"})if(payload.contains(key))throw std::invalid_argument("Polygon Paint6 payload contradicts its actual independent native grid model");
+ return preflight_grid(payload,input.at("physical_paint").get<bool>(),false,l);
+}
+size_t PolygonSurfacePaintCodec::preflight_grid(const nlohmann::json&payload,bool physical,bool shared_geometry,const PolygonSurfaceTransferLimits&l){
+ stop(l);
  const auto keys=[](const nlohmann::json&value,std::initializer_list<std::string_view>allowed){
   if(!value.is_object())throw std::invalid_argument("Polygon Paint6 payload record is not an object");
   for(auto i=value.begin();i!=value.end();++i)if(std::find(allowed.begin(),allowed.end(),std::string_view(i.key()))==allowed.end())throw std::invalid_argument("Unknown polygon Paint6 current-payload field");
  };
  keys(payload,{"mesh","resolution","active","next_id","layers","baked"});
- const auto&mesh=payload.at("mesh");keys(mesh,{"positions","normals","uv","indices","uv_pins","uv_seams"});
- if(mesh.size()!=6||!payload.at("layers").is_array()||payload.at("layers").empty()||payload.at("layers").size()>16)throw std::invalid_argument("Polygon Paint6 current mesh/layer dimensions differ");
+ if(shared_geometry){if(payload.contains("mesh"))throw std::invalid_argument("Source Paint7 raw grid cannot duplicate its actual shared geometry");}
+ else{const auto&mesh=payload.at("mesh");keys(mesh,{"positions","normals","uv","indices","uv_pins","uv_seams"});if(mesh.size()!=6)throw std::invalid_argument("Polygon Paint6 current mesh is incomplete");}
+ if(!payload.at("layers").is_array()||payload.at("layers").empty()||payload.at("layers").size()>16)throw std::invalid_argument("Polygon Paint6 current mesh/layer dimensions differ");
  for(const auto&layer:payload.at("layers")){
   stop(l);keys(layer,{"id","name","visible","opacity","tiles","physical_emission_tiles"});
   if(!layer.at("tiles").is_array()||layer.at("tiles").size()>4096)throw std::invalid_argument("Polygon Paint6 current tile table differs");
   for(const auto&tile:layer.at("tiles")){stop(l);keys(tile,{"index","data"});}
   if(layer.contains("physical_emission_tiles")){
+   if(!physical)throw std::invalid_argument("Raw polygon current FLOAT planes lack their actual enclosing physical context");
    const auto&tiles=layer.at("physical_emission_tiles");if(!tiles.is_array()||tiles.size()>4096)throw std::invalid_argument("Polygon Paint6 current float tile table differs");
    for(const auto&tile:tiles){stop(l);keys(tile,{"index","data"});}
   }

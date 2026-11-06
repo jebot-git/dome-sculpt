@@ -5,6 +5,7 @@
 #include "paint-archive-shape.hpp"
 #include "paint-sampling-access.hpp"
 #include "deformation-json.hpp"
+#include "texture-set-source-preflight.hpp"
 #include <nlohmann/json.hpp>
 #include <algorithm>
 namespace dome::detail {
@@ -28,7 +29,30 @@ size_t deformation_copy_bytes(const nlohmann::json&d){
 // Scene40 may carry an independent genuine39 actor. Establish the owning40
 // archive structurally before allowing that outer context; a larger version
 // alone never grants a polygon field or geometry/membership authority.
+void texture_set_context_v2(const nlohmann::json&scene){
+ const auto&t=scene.at("texture_set_geometry");if(!t.is_object()||t.size()!=9||!t.at("version").is_number_integer()||t.at("version")!=2)throw std::invalid_argument("Retained Scene40 needs the complete actual geometry2 owner table");
+ size_t bytes=0,entries=0;
+ const auto scan=[&](auto&&self,const nlohmann::json&v,size_t depth)->void{if(depth>24||++entries>64'000'000)throw std::length_error("Retained Scene40 owner tables exceed encoded depth/work quota");const auto charge=[&](size_t n){if(n>256*1024*1024-bytes)throw std::length_error("Retained Scene40 owner tables exceed encoded storage quota");bytes+=n;};charge(sizeof(nlohmann::json)+32);if(v.is_binary())charge(v.get_binary().size());else if(v.is_string())charge(v.get_ref<const std::string&>().size());else if(v.is_array())for(const auto&x:v)self(self,x,depth+1);else if(v.is_object())for(auto i=v.begin();i!=v.end();++i){charge(i.key().size()+32);self(self,i.value(),depth+1);}};
+ scan(scan,t,0);
+ for(const char*key:{"meshes","topologies","assignments","domains","rasters","paints","collections","field_sources"})if(!t.at(key).is_array()||t.at(key).size()>512||(std::string_view(key)!="field_sources"&&t.at(key).empty()))throw std::invalid_argument("Retained Scene40 bounded owner table is absent");
+ if(t.at("meshes").size()>256||t.at("topologies").size()>256)throw std::length_error("Retained Scene40 geometry owners exceed quota");
+ const auto integer=[](const nlohmann::json&v,uint64_t max){if((!v.is_number_unsigned()&&(!v.is_number_integer()||v.get<int64_t>()<0))||v.get<uint64_t>()>max)throw std::invalid_argument("Invalid retained material/domain integer");return v.get<uint64_t>();};
+ const auto word=[](const auto&v,size_t at,size_t stride){uint64_t n=0;for(size_t k=0;k<stride;++k)n|=uint64_t(v.at(at+k))<<(8*k);return n;};
+ const auto blob=[&](const nlohmann::json&v,size_t stride,size_t max,bool empty=false)->const auto&{if(!v.is_binary()||(!empty&&v.get_binary().empty())||v.get_binary().size()%stride||v.get_binary().size()/stride>max)throw std::invalid_argument("Invalid retained geometry/identity buffer");return v.get_binary();};
+ for(const auto&m:t.at("meshes")){if(!m.is_object()||m.size()!=6)throw std::invalid_argument("Incomplete retained shared Mesh");const auto&p=blob(m.at("positions"),12,2'000'000),&n=blob(m.at("normals"),12,2'000'000),&uv=blob(m.at("uv"),8,2'000'000),&ix=blob(m.at("indices"),12,2'000'000);if(p.size()!=n.size()||p.size()/12!=uv.size()/8)throw std::invalid_argument("Retained shared vertex arrays differ");const auto&pins=blob(m.at("uv_pins"),1,p.size()/12,true),&seams=blob(m.at("uv_seams"),1,ix.size()/4,true);if((!pins.empty()&&pins.size()!=p.size()/12)||(!seams.empty()&&seams.size()!=ix.size()/4))throw std::invalid_argument("Retained shared UV flags differ");for(size_t i=0;i<ix.size();i+=4)if(word(ix,i,4)>=p.size()/12)throw std::invalid_argument("Retained shared mesh index lies outside its actual vertices");}
+ for(const auto&top:t.at("topologies")){if(!top.is_object()||top.size()!=4||!top.at("polygon_ids").is_boolean())throw std::invalid_argument("Invalid retained shared topology");const auto&m=t.at("meshes").at(ref(top.at("mesh"),t.at("meshes").size()));const auto corners=m.at("indices").get_binary().size()/4;if(blob(top.at("faces"),8,2'000'000).size()/8!=corners/3||blob(top.at("corners"),8,6'000'000).size()/8!=corners)throw std::invalid_argument("Retained logical topology dimensions differ");for(const char*name:{"faces","corners"}){const auto&b=top.at(name).get_binary();for(size_t i=0;i<b.size();i+=8)if(!word(b,i,8))throw std::invalid_argument("Retained logical identity is absent");}}
+ for(const auto&a:t.at("assignments"))(void)blob(a,4,2'000'000);
+ for(const auto&d:t.at("domains")){if(!d.is_object()||d.size()!=3)throw std::invalid_argument("Invalid retained domain record");const auto&top=t.at("topologies").at(ref(d.at("topology"),t.at("topologies").size()));const auto&a=t.at("assignments").at(ref(d.at("assignments"),t.at("assignments").size()));(void)integer(d.at("set"),UINT32_MAX);if(a.get_binary().size()/4!=top.at("faces").get_binary().size()/8)throw std::invalid_argument("Retained domain omits logical faces");}
+ for(const auto&r:t.at("rasters")){if(!r.is_object()||r.size()!=2)throw std::invalid_argument("Invalid retained raster record");(void)ref(r.at("domain"),t.at("domains").size());const auto n=integer(r.at("resolution"),2048);if(n<64||(n&(n-1)))throw std::invalid_argument("Invalid retained grid resolution");}
+ for(const auto&p:t.at("paints")){if(!p.is_object()||p.size()!=2)throw std::invalid_argument("Invalid retained Paint owner record");const auto&r=t.at("rasters").at(ref(p.at("raster"),t.at("rasters").size()));const auto&d=t.at("domains").at(ref(r.at("domain"),t.at("domains").size()));const auto&paint=p.at("painted");if(!paint.is_object()||paint.at("version")!=7||paint.at("set")!=d.at("set")||paint.at("payload").at("resolution")!=r.at("resolution"))throw std::invalid_argument("Retained Paint7 changed its actual set/grid");if(const auto*seed=texture_source_seed(paint,t,scene.at("source_materials"),scene.at("polygon_surfaces"))){const auto&top=t.at("topologies").at(ref(d.at("topology"),t.at("topologies").size()));if(seed->at("geometry")!=top.at("mesh"))throw std::invalid_argument("Retained source seed borrowed another shared geometry");}else if(paint.size()!=3||paint.at("payload").contains("version")||paint.at("payload").contains("mesh"))throw std::invalid_argument("Plain retained Paint7 cannot conceal a source/grid envelope");}
+ size_t holders=0;
+ const auto holder=[&](const nlohmann::json&o){if(!o.contains("texture_sets"))throw std::invalid_argument("Retained Scene40 omits holder membership");if(o.at("texture_sets").is_null())return;if(!o.at("painted").is_null()||o.at("mesh_active")!=true)throw std::invalid_argument("Retained membership has two or inactive primary paint owners");TextureSetArchive::preflight_reference(o.at("texture_sets"),t);++holders;};
+ for(const auto&o:scene.at("objects"))holder(o);
+ if(scene.contains("polygon_sources")){const auto&ps=scene.at("polygon_sources");if(ps.at("version")==8)for(const auto&o:ps.at("origins"))holder(o);}
+ if(!holders)throw std::invalid_argument("Retained outer Scene40 has no genuine material holder");
+}
 void texture_set_context(const nlohmann::json&scene){
+ if(scene.at("texture_set_geometry").is_object()&&scene.at("texture_set_geometry").contains("version")&&scene.at("texture_set_geometry").at("version")==2){texture_set_context_v2(scene);return;}
  if(!scene.at("objects").is_array()||scene.at("objects").empty()||scene.at("objects").size()>256)throw std::invalid_argument("Mixed Scene40 object table exceeds its bounded domain");
  const auto&table=scene.at("texture_set_geometry");
  if(!table.is_object()||table.size()!=3||!table.at("version").is_number_integer()||table.at("version")!=1||!table.at("meshes").is_array()||table.at("meshes").empty()||table.at("meshes").size()>256||!table.at("topologies").is_array()||table.at("topologies").empty()||table.at("topologies").size()>256)throw std::invalid_argument("Mixed Scene40 needs its actual bounded texture-set geometry archive");
@@ -83,7 +107,7 @@ void graph_preflight(const nlohmann::json&scene){
  for(const char*name:{"paints","volumes"})if(!polygons.at(name).is_array()||polygons.at(name).size()>512)throw std::invalid_argument("Scene39 source payload tables exceed their actual bounded domain");
  size_t entries=0,working=0;std::array<uint8_t,128>used{};
  for(const auto&node:nodes){const auto n=preflight_polygon_surface_node(node,origins.size());if(n>8'000'000-entries)throw std::length_error("Scene39 aggregate polygon edit entries exceed quota");entries+=n;
-  const auto&before=origins.at(ref(node.at("before_origin"),origins.size()));const auto&encoded=polygons.at("paints").at(ref(before.at("painted"),polygons.at("paints").size()));const auto&paint=paint_archive_payload(encoded,true,SourcePaintDecodeContext{true,true});
+  const auto&before=origins.at(ref(node.at("before_origin"),origins.size()));if(before.contains("texture_sets")&&!before.at("texture_sets").is_null())throw std::invalid_argument("A polygon node operating on multiple before materials needs its actual per-field edit adapter");const auto&encoded=polygons.at("paints").at(ref(before.at("painted"),polygons.at("paints").size()));const auto&paint=paint_archive_payload(encoded,true,SourcePaintDecodeContext{true,true});
   const auto&mesh=paint.at("mesh");const auto&positions=mesh.at("positions"),&indices=mesh.at("indices");if(!positions.is_binary()||positions.get_binary().empty()||positions.get_binary().size()%12||positions.get_binary().size()/12>2'000'000||!indices.is_binary()||indices.get_binary().empty()||indices.get_binary().size()%12||indices.get_binary().size()/4>6'000'000)throw std::invalid_argument("Scene39 before geometry exceeds its actual replay domain");
   const auto vertices=positions.get_binary().size()/12,corners=indices.get_binary().size()/4;const auto&r=paint.at("resolution");if(!r.is_number_integer()||r.get<int64_t>()<64||r.get<int64_t>()>2048)throw std::invalid_argument("Scene39 source grid dimensions differ");
   const size_t grid=paint_sampling_surface_working_bytes(corners,corners,r.get<uint32_t>());const size_t bytes=65536+vertices*512+corners*1024+grid+n*(sizeof(PolygonId)+3*sizeof(nlohmann::json))+node.at("recipe").at("operations").size()*4096+deformation_copy_bytes(before.at("deformation"));if(bytes>256*1024*1024-working)throw std::length_error("Scene39 retained node/replay peaks exceed aggregate quota before allocation");working+=bytes;
@@ -96,7 +120,9 @@ void graph_preflight(const nlohmann::json&scene){
  const auto visit=[&](auto&&self,bool authority,size_t id,size_t depth)->Reach{
   if(depth>32)throw std::length_error("Scene39 before graph exceeds its bounded depth");auto&state=authority?as[id]:os[id];auto&saved=authority?aroot[id]:oroot[id];if(state==1)throw std::invalid_argument("Scene39 polygon field/source graph contains a cycle");if(state==2){if(saved.height>33-depth)throw std::length_error("Scene39 shared before graph exceeds depth");return saved;}state=1;Reach result;
   if(authority){const auto&a=authorities[id];if(!a.at("origin").is_null())merge(result,self(self,false,ref(a.at("origin"),origins.size()),depth),0);}
-  else{const auto&o=origins[id];if(!o.at("material_bindings").is_null()){result.has=true;result.material=ref(o.at("material_bindings"),bindings.size());}if(!o.at("polygon").is_null())merge(result,self(self,true,ref(o.at("polygon"),authorities.size()),depth+1),1);for(const char*field:{"shape_source","rig_source"})if(o.contains(field)&&!o.at(field).is_null())merge(result,self(self,false,ref(o.at(field),origins.size()),depth+1),1);}
+  else{const auto&o=origins[id];if(!o.at("material_bindings").is_null()){result.has=true;result.material=ref(o.at("material_bindings"),bindings.size());}
+   if(o.contains("texture_sets")&&!o.at("texture_sets").is_null()&&o.at("texture_sets").at("version")==2)for(const auto*paint:TextureSetArchive::referenced_paints(o.at("texture_sets"),scene.at("texture_set_geometry")))if(const auto*seed=texture_source_seed(*paint,scene.at("texture_set_geometry"),materials,pool)){result.has=true;result.material=std::max(result.material,ref(seed->at("binding"),bindings.size()));}
+if(!o.at("polygon").is_null())merge(result,self(self,true,ref(o.at("polygon"),authorities.size()),depth+1),1);for(const char*field:{"shape_source","rig_source"})if(o.contains(field)&&!o.at(field).is_null())merge(result,self(self,false,ref(o.at(field),origins.size()),depth+1),1);}
   state=2;saved=result;return result;
  };
  for(size_t id=0;id<bindings.size();++id){const auto&b=bindings[id];if(!b.contains("polygon_surface_transfer"))throw std::invalid_argument("Material21 lacks actual per-binding polygon field references");if(b.at("polygon_surface_transfer").is_null())continue;const auto node=ref(b.at("polygon_surface_transfer"),nodes.size());used[node]=1;const auto reach=visit(visit,false,ref(nodes[node].at("before_origin"),origins.size()),1);if(reach.has&&reach.material>=id)throw std::invalid_argument("Scene39 field before-root requires an incomplete/future material prefix");}
@@ -105,6 +131,11 @@ void graph_preflight(const nlohmann::json&scene){
  const auto nested=[&](const nlohmann::json&o){
   if(!o.contains("texture_sets")||o.at("texture_sets").is_null())return;
   const auto&collection=o.at("texture_sets");
+  if(collection.is_object()&&collection.contains("version")&&collection.at("version")==2){
+   const auto paints=TextureSetArchive::referenced_paints(collection,scene.at("texture_set_geometry"));bool first=true;
+   for(const auto*paint:paints){const auto*seed=texture_source_seed(*paint,scene.at("texture_set_geometry"),materials,pool);if(first){if(seed?o.at("material_bindings")!=seed->at("binding"):!o.at("material_bindings").is_null())throw std::invalid_argument("Retained primary and source seed material identities differ");first=false;}}
+   return;
+  }
   const auto field=[&](const nlohmann::json&paint,const nlohmann::json&binding){
    paired(paint,binding);
    if(paint.is_object()&&paint.contains("version")&&paint.at("version")==7&&paint.contains("payload"))paired(paint.at("payload"),binding);
