@@ -10,6 +10,16 @@ transaction, UI, source-grid adapter and validation plan coordinated with bridge
 6bc73578. This sparse child implements no resize API/code/layout or runtime;
 qualified root/12c sources remain untouched. Full production goal remains open.
 
+## New sculpt/authoring source composition — 2026-11-06
+
+This child combines qualified77e882bc with local-coordinate8a05e5f3.
+Read [SCULPT-AUTHORING-COMPOSITION-WIP.md](SCULPT-AUTHORING-COMPOSITION-WIP.md).
+Six whole units pass syntax only; no new executable/runtime/SAN/GPU claim.
+Worker capture retains both owning field/set bundles and local chunks. Typed
+material exclusions preserve chunk ownership and sibling material visibility;
+new three-feature/chunk-only regressions await execution. Both original cohorts
+remain immutable. Main admission and the full production goal remain open.
+
 ## Private coherent polygon/texture application — 2026-11-06
 
 This branch composes main44fe with polygon-field ownership39, plain texture
