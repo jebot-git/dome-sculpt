@@ -81,7 +81,8 @@ void query(){
  auto foreign=overlap(false);auto plan=detail::prepare_texture_set_surface(foreign.active());refuses([&]{layout->authenticate_plan(*plan);},"Numerically equal foreign geometry/membership owners cannot reuse the packed layout");
  const auto old_collection=s.active().texture_sets;edit_texture_set(s,s.active().id,1,[](PaintedMesh&p,Material&m){m.roughness=.25f;p.add_layer("Independent metadata");return true;});
  plan=detail::prepare_texture_set_surface(s.active());check(old_collection!=s.active().texture_sets&&layout->matches_plan(*plan),"A genuine paint/material edit changes its field owner without rebuilding the unchanged geometry-only layout");
- assign_texture_set_faces(s,s.active().id,1,std::array<uint64_t,1>{1});plan=detail::prepare_texture_set_surface(s.active());check(!layout->matches_plan(*plan),"Changing actual material membership invalidates the packed EBO dependency");
+ const auto before_invalid_merge=s.encode();refuses([&]{assign_texture_set_faces(s,s.active().id,1,std::array<uint64_t,1>{1});},"Two depth-separated faces with identical UVs cannot silently become independently writable in one Strict material grid");check(s.encode()==before_invalid_merge,"Ambiguous same-grid reassignment preserves every set, image, source and ID exactly");
+ create_texture_set(s,s.active().id,std::array<uint64_t,1>{1},"Genuine changed face membership");plan=detail::prepare_texture_set_surface(s.active());check(!layout->matches_plan(*plan),"Changing actual material membership invalidates the packed EBO dependency");
  check(exact!=s.encode(),"The COW/cache controls used actual state-changing edits");
 }
 Image image(uint8_t r,uint8_t g,uint8_t b){Image out{64,64,std::vector<uint8_t>(64*64*4)};for(size_t p=0;p<out.rgba.size();p+=4){out.rgba[p]=r;out.rgba[p+1]=g;out.rgba[p+2]=b;out.rgba[p+3]=255;}return out;}
