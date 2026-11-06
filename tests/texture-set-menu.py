@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Actual FLTK manager51 plus painted-field resize workflows; native file inspection only.
 Run against a fresh coherent app/inspector and the actual fixture producer manifest.
-DOME_FIELD_MENU_ROW defaults36 (canonical current bitmap metrics); use the measured
+DOME_FIELD_MENU_ROW defaults28 (canonical default16px bitmap metrics); use the measured
 row when qualifying another toolkit/font profile, including compact windows.
 """
 import asyncio,hashlib,json,os,signal,subprocess,sys,time,struct,math
@@ -103,7 +103,7 @@ async def main():
   for c in value:key('space' if c==' ' else 'period' if c=='.' else c)
  combo_state={}
  async def manager(command):
-  await command('Texture sets...');dialog=await wait(lambda:named('Material texture sets'));dialog.set_input_focus(X.RevertToParent,X.CurrentTime);d.sync();g=dialog.get_geometry();row=int(os.environ.get('DOME_FIELD_MENU_ROW','36'));assert 28<=row<=96;assert g.height<=row*20+2
+  await command('Texture sets...');dialog=await wait(lambda:named('Material texture sets'));dialog.set_input_focus(X.RevertToParent,X.CurrentTime);d.sync();g=dialog.get_geometry();row=int(os.environ.get('DOME_FIELD_MENU_ROW','28'));assert 28<=row<=96;assert g.height<=row*20+2
   check(dialog.get_wm_transient_for().id==w.id,'Texture manager is an actual document-owned FLTK modal')
   current=inspect();combo_state[(dialog.id,1)]=collection(current)['active'];combo_state[(dialog.id,2)]=0;active=primary(current) if collection(current)['active']==0 else next(v['painted'] for v in collection(current)['additional'] if v['id']==collection(current)['active']);combo_state[(dialog.id,3)]=int(math.log2(payload(active)['resolution']))-6
   return dialog,row

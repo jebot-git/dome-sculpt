@@ -1,0 +1,234 @@
+{
+  "scope": "Actual unchanged coherent838 CPU Release ordinary app and real OpenXR loader/GL, synthetic controllers; separately whole-built test runtime correction. No hardware/headset/SAN/new whole candidate claim",
+  "base": "83805b8731fa536abd0dc0f1a0ef25cf68cf925a",
+  "source_hashes": {
+    "tests/texture-set-resolution-runtime.cpp": "a7cfb3952601ed5b2bd982c9d58a091590e4e2d8154590661535f0ffd8aad7b9",
+    "tests/texture-set-menu.py": "b946f8860f0c76203af7752ffe0cb92ec5d3fc55a8043669b29ef32850066d88"
+  },
+  "GUI_source": {
+    "original_sha256": "8b28e61123d522fec3c3a571615aeb1aa32547d8e5d6f4e3beb0f8c10353e8d0",
+    "default_only_change": "36->28 with comment; explicit env28 path actually executed",
+    "all_check_predicate_ASTs_identical": true,
+    "GUI_profiles": [
+      {
+        "name": "gui-normal",
+        "checks": 81,
+        "geometry": {
+          "width": 576,
+          "height": 560,
+          "row": 28,
+          "expected_width": 576,
+          "expected_height": 560,
+          "clamped": false,
+          "scroll_viewport_height": 504
+        },
+        "report_sha256": "6fa50414cd6171377c6342ff6be948c9cd613d2aa89db8ef9b035f9a94b1fac5"
+      },
+      {
+        "name": "gui-compact",
+        "checks": 81,
+        "geometry": {
+          "width": 576,
+          "height": 480,
+          "row": 28,
+          "expected_width": 576,
+          "expected_height": 480,
+          "clamped": true,
+          "scroll_viewport_height": 424
+        },
+        "report_sha256": "6fa50414cd6171377c6342ff6be948c9cd613d2aa89db8ef9b035f9a94b1fac5"
+      }
+    ]
+  },
+  "XR": {
+    "status_path": "/tmp/dome-sculpt-resume-resolution-orchestration/xr-full-v2/status.json",
+    "status_sha256": "e85c577194b35279b812c338a531612b6c5689d4743ee3421e966216c9ccc623",
+    "report_sha256": "8fac11d536ec501e1be266d017fef6838c4fec7ffc31b9d9ebe087f97753c6cf",
+    "original_full8_script_sha256": "a84fc67c8ea7f7351c29ae29e09def44cbef3a87f61c4c421dc4de6d427b1c39",
+    "complete": true,
+    "checks": 99,
+    "cases": [
+      {
+        "name": "extra64",
+        "renderer": "llvmpipe (LLVM 19.1.7, 256 bits)",
+        "frames": 102,
+        "captures": 18,
+        "root_title_pixels": 19,
+        "root_visible": {
+          "39": {
+            "first": 41,
+            "last": 43,
+            "title_pixels": 19
+          },
+          "55": {
+            "first": 64,
+            "last": 66,
+            "title_pixels": 19
+          },
+          "69": {
+            "first": 85,
+            "last": 87,
+            "title_pixels": 19
+          }
+        },
+        "input_level_count": 15,
+        "pressure_count": 2
+      },
+      {
+        "name": "extra256",
+        "renderer": "llvmpipe (LLVM 19.1.7, 256 bits)",
+        "frames": 124,
+        "captures": 18,
+        "root_title_pixels": 19,
+        "root_visible": {
+          "39": {
+            "first": 45,
+            "last": 47,
+            "title_pixels": 19
+          },
+          "55": {
+            "first": 75,
+            "last": 78,
+            "title_pixels": 19
+          },
+          "69": {
+            "first": 99,
+            "last": 101,
+            "title_pixels": 19
+          }
+        },
+        "input_level_count": 13,
+        "pressure_count": 2
+      },
+      {
+        "name": "primary128",
+        "renderer": "llvmpipe (LLVM 19.1.7, 256 bits)",
+        "frames": 104,
+        "captures": 14,
+        "root_title_pixels": 19,
+        "root_visible": {
+          "39": {
+            "first": 41,
+            "last": 43,
+            "title_pixels": 19
+          },
+          "55": {
+            "first": 65,
+            "last": 67,
+            "title_pixels": 19
+          },
+          "69": {
+            "first": 86,
+            "last": 88,
+            "title_pixels": 19
+          }
+        },
+        "input_level_count": 13,
+        "pressure_count": 2
+      },
+      {
+        "name": "cancel",
+        "renderer": "llvmpipe (LLVM 19.1.7, 256 bits)",
+        "frames": 69,
+        "captures": 12,
+        "root_title_pixels": 19,
+        "root_visible": null,
+        "input_level_count": 5,
+        "pressure_count": 2
+      },
+      {
+        "name": "focus",
+        "renderer": "llvmpipe (LLVM 19.1.7, 256 bits)",
+        "frames": 70,
+        "captures": 10,
+        "root_title_pixels": 19,
+        "root_visible": null,
+        "input_level_count": 6,
+        "pressure_count": 1
+      },
+      {
+        "name": "reference",
+        "renderer": "llvmpipe (LLVM 19.1.7, 256 bits)",
+        "frames": 69,
+        "captures": 12,
+        "root_title_pixels": 19,
+        "root_visible": null,
+        "input_level_count": 6,
+        "pressure_count": 1
+      },
+      {
+        "name": "noop",
+        "renderer": "llvmpipe (LLVM 19.1.7, 256 bits)",
+        "frames": 70,
+        "captures": 10,
+        "root_title_pixels": 19,
+        "root_visible": null,
+        "input_level_count": 5,
+        "pressure_count": 2
+      },
+      {
+        "name": "quality",
+        "renderer": "llvmpipe (LLVM 19.1.7, 256 bits)",
+        "frames": 64,
+        "captures": 12,
+        "root_title_pixels": 19,
+        "root_visible": null,
+        "input_level_count": 4,
+        "pressure_count": 2
+      }
+    ],
+    "protected_count": 3896,
+    "drift": [],
+    "seconds": 76.1332795600174,
+    "allocated": 266657792,
+    "cap": 352321536,
+    "full_prospective": 67108864
+  },
+  "whole_runtime_build": {
+    "status_sha256": "187a244dbaa0826d89b0a8743ee327e101ca498b4123e25198d29acd6d4a93bd",
+    "exit": 0,
+    "protected_count": 3772,
+    "drift": [],
+    "runtime_sha256": "ed42afd94b5880a25df94f68d9f98d5e5fb6a21b96f31aa76bc4eec292c375a0",
+    "object_sha256": "eb589af3ff8ba73caa9c2240e15564725b18369ebab05a020c27eb771c30d80e",
+    "source_sha256": "a7cfb3952601ed5b2bd982c9d58a091590e4e2d8154590661535f0ffd8aad7b9"
+  },
+  "unchanged_original_owning_outputs": 312,
+  "quality_policy": {
+    "component": 0.3,
+    "RMS": 0.08,
+    "physical_frame_ceiling": 6000,
+    "per_case_seconds": 240,
+    "unchanged": true
+  },
+  "preserved_failures": [
+    "GUIv2 missing existing privateXvfb PATH",
+    "GUIv3 row36 instead of actual28",
+    "XRv4 missing radial reopen after changed worker",
+    "singlev1 early reopen not retained; public37/39/43 captures",
+    "fullv1 first6cases78 then noop incorrectly assumed worker; page31 retained",
+    "runtime-save-v3 copied if-token compile error; source/log preserved"
+  ],
+  "clone": {
+    "state": "terminal",
+    "source": "/home/blux/de-xr/dome-sculpt/artifacts/texture-source-export-fix-2228",
+    "destination": "/home/blux/de-xr/dome-sculpt/artifacts/texture-resolution-loader-838",
+    "base": "83805b8731fa536abd0dc0f1a0ef25cf68cf925a",
+    "workspace_initial_free": 21738979328,
+    "floor": 21692940288,
+    "metadata_allowance": 16777216,
+    "method": "git worktree --no-checkout; cp --reflink=always -a --parents; no ordinary checkout copy",
+    "exit": 0,
+    "files": 2679,
+    "same_inode": [],
+    "content_mismatch": [],
+    "source_drift": [],
+    "workspace_final_free": 21739020288,
+    "actual_observed_workspace_change": 40960
+  },
+  "remaining": [
+    "Fresh root-composed whole32 Release candidate after source merge",
+    "Matching whole sanitizer/native/graphics/GUI/loader qualification",
+    "Physical headset/current full production and original broader requirements remain pending"
+  ]
+}
