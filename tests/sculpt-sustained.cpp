@@ -5,8 +5,10 @@
 #include "sculpt-sustained-metrics.hpp"
 #include "graphics.h"
 #include <nlohmann/json.hpp>
+#include "sculpt-sustained-device.hpp"
 #include <algorithm>
 #include <bit>
+#include <charconv>
 #include <fstream>
 #include <iostream>
 #include <sys/resource.h>
@@ -19,23 +21,36 @@ struct Refusal:std::runtime_error{using std::runtime_error::runtime_error;};
 void require(bool yes,const std::string &why){if(!yes)throw std::runtime_error(why);}
 void write(const std::filesystem::path &p,const json &j){std::ofstream f(p);f<<j.dump(2)<<'\n';require(bool(f),"Cannot write benchmark evidence");}
 struct Options {
-  std::filesystem::path output;std::string tier="production";
-  size_t objects=4,strokes=300,masks=120,pairs=2000,repetitions=3;float voxel=.0125f;
-  int width=768,height=768;bool smoke=false,count_allocations=false;
+  std::filesystem::path output;std::string tier="production",device="software";
+  size_t objects=4,strokes=300,masks=120,pairs=2000,held_pairs=120,repetitions=3;float voxel=.0125f;
+  int width=768,height=768;bool smoke=false,count_allocations=false,inventory_only=false;
 };
 Options options(int argc,char **argv){
-  Options o;bool objects=false;
+  Options o;bool explicit_work=false,explicit_voxel=false,explicit_objects=false;
+  auto count=[](std::string_view text,size_t maximum){uint64_t n=0;auto result=std::from_chars(text.data(),text.data()+text.size(),n);require(result.ec==std::errc{}&&result.ptr==text.data()+text.size()&&n&&n<=maximum,"Workload integer outside declared bounds");return size_t(n);};
   for(int i=1;i<argc;++i){std::string k=argv[i];auto value=[&](){require(i+1<argc,"Missing value for "+k);return std::string(argv[++i]);};
-    if(k=="--output")o.output=value();else if(k=="--tier")o.tier=value();else if(k=="--objects"){o.objects=std::stoul(value());objects=true;}
+    if(k=="--output")o.output=value();else if(k=="--tier")o.tier=value();else if(k=="--device")o.device=value();
+    else if(k=="--objects"){o.objects=count(value(),16);explicit_objects=true;}
+    else if(k=="--voxel"){const auto raw=value();size_t used=0;o.voxel=std::stof(raw,&used);require(used==raw.size()&&std::isfinite(o.voxel)&&o.voxel>=.005f&&o.voxel<=.1f,"Benchmark sphere voxel must be .005 through .1 metres");explicit_voxel=true;}
+    else if(k=="--strokes"){o.strokes=count(value(),3000);explicit_work=true;}
+    else if(k=="--masks"){o.masks=count(value(),3000);explicit_work=true;}
+    else if(k=="--pairs"){o.pairs=count(value(),20000);explicit_work=true;}
+    else if(k=="--held-pairs"){o.held_pairs=count(value(),3000);explicit_work=true;}
+    else if(k=="--repetitions"){o.repetitions=count(value(),10);explicit_work=true;}
+    else if(k=="--width"){o.width=int(count(value(),2048));explicit_work=true;}
+    else if(k=="--height"){o.height=int(count(value(),2048));explicit_work=true;}
+    else if(k=="--inventory-only")o.inventory_only=true;
     else if(k=="--allocations")o.count_allocations=true;else if(k=="--smoke")o.smoke=true;else throw std::invalid_argument("Unknown benchmark argument: "+k);
   }
-  require(!o.output.empty(),"Usage: sculpt-sustained --output directory [--tier small|medium|production|dense] [--objects 1|4|16] [--smoke] [--allocations]");
+  require(!o.output.empty(),"Usage: sculpt-sustained --output NEW-directory [--tier small|medium|production|dense] [--objects 1|4|16] [--voxel metres] [--device software|arc] [--inventory-only] [--strokes N --masks N --pairs N --held-pairs N --repetitions N --width N --height N] [--smoke] [--allocations]");
   require(o.objects==1||o.objects==4||o.objects==16,"Object count must be 1, 4 or 16");
-  if(o.tier=="small")o.voxel=.025f;else if(o.tier=="medium"||o.tier=="production")o.voxel=.0125f;else if(o.tier=="dense")o.voxel=.00625f;else throw std::invalid_argument("Unknown tier");
-  if(o.smoke){require(!objects||o.objects==4,"Smoke uses four explicit objects");o.objects=4;o.voxel=.04f;o.strokes=4;o.masks=3;o.pairs=8;o.repetitions=1;o.width=o.height=128;}
+  require(o.device=="software"||o.device=="arc","Device must be software or arc");
+  float preset=0;if(o.tier=="small")preset=.025f;else if(o.tier=="medium"||o.tier=="production")preset=.0125f;else if(o.tier=="dense")preset=.00625f;else throw std::invalid_argument("Unknown tier");
+  if(!explicit_voxel)o.voxel=preset;
+  if(o.smoke){require(!explicit_voxel&&!explicit_work&&!o.inventory_only&&(!explicit_objects||o.objects==4),"Smoke has a fixed workload; explicit density/count/inventory overrides are refused");o.objects=4;o.voxel=.04f;o.strokes=4;o.masks=3;o.pairs=8;o.held_pairs=4;o.repetitions=1;o.width=o.height=128;}
   return o;
 }
-void ready(Document &d){require(d.wait_mesh(std::chrono::seconds(120)),"Mesh worker publication timed out");auto f=d.frame();require(f.state->error.empty(),"Document error: "+f.state->error);require(f.surface->generation==f.state->generation&&f.surface->revision==f.state->revision&&f.surface->view_epoch==f.state->view_epoch,"Worker did not publish the accepted current source");}
+void ready(Document &d){const auto until=std::chrono::steady_clock::now()+std::chrono::seconds(120);bool accepted=false;do{accepted=d.wait_mesh(std::chrono::milliseconds(100));require(d.frame().state->error.empty(),"Document error: "+d.frame().state->error);}while(!accepted&&std::chrono::steady_clock::now()<until);require(accepted,"Mesh worker publication timed out");auto f=d.frame();require(f.surface->generation==f.state->generation&&f.surface->revision==f.state->revision&&f.surface->view_epoch==f.state->view_epoch,"Worker did not publish the accepted current source");}
 Volume sphere(float voxel){
   // Genuine complete clipped SDF, including the negative interior. Omitting the
   // interior creates a different shell, so density/resource refusal stays real.
@@ -69,9 +84,30 @@ json counters(const Counters &a,const Counters &b){
 }
 template<class F>json measure(std::string kind,size_t index,F fn){
   const auto before=Counters::read();const auto wall=clock_ns(CLOCK_MONOTONIC),cpu=clock_ns(CLOCK_THREAD_CPUTIME_ID);
-  measuring.store(true);try{fn();}catch(...){measuring.store(false);throw;}measuring.store(false);
-  auto row=counters(before,Counters::read());row["kind"]=kind;row["index"]=index;row["wall_ns"]=clock_ns(CLOCK_MONOTONIC)-wall;row["caller_thread_cpu_ns"]=clock_ns(CLOCK_THREAD_CPUTIME_ID)-cpu;return row;
+  measuring.store(true);try{fn();}catch(...){measuring.store(false);throw;}
+  const auto end=clock_ns(CLOCK_MONOTONIC),end_cpu=clock_ns(CLOCK_THREAD_CPUTIME_ID);measuring.store(false);
+  auto row=counters(before,Counters::read());row["kind"]=kind;row["index"]=index;row["wall_ns"]=end-wall;row["caller_thread_cpu_ns"]=end_cpu-cpu;return row;
 }
+template<class P,class D>json publication_draw(std::string kind,size_t index,P publication,D draw){
+  uint64_t accepted=0,accepted_cpu=0,submitted=0,submitted_cpu=0;
+  auto row=measure(std::move(kind),index,[&]{
+    auto wall=clock_ns(CLOCK_MONOTONIC),cpu=clock_ns(CLOCK_THREAD_CPUTIME_ID);publication();accepted=clock_ns(CLOCK_MONOTONIC)-wall;accepted_cpu=clock_ns(CLOCK_THREAD_CPUTIME_ID)-cpu;
+    wall=clock_ns(CLOCK_MONOTONIC);cpu=clock_ns(CLOCK_THREAD_CPUTIME_ID);draw();submitted=clock_ns(CLOCK_MONOTONIC)-wall;submitted_cpu=clock_ns(CLOCK_THREAD_CPUTIME_ID)-cpu;
+  });
+  row["accepted_snapshot_ns"]=accepted;row["accepted_snapshot_caller_cpu_ns"]=accepted_cpu;row["first_draw_submission_ns"]=submitted;row["first_draw_caller_cpu_ns"]=submitted_cpu;
+  return row;
+}
+struct RawRows {
+  std::ofstream file;uint64_t sequence=0;
+  explicit RawRows(const std::filesystem::path &output):file(output/"raw-samples.ndjson"){require(bool(file),"Cannot create raw row evidence");}
+  void append(json &row,size_t repetition){
+    require(!measuring.load(),"Raw output must stay outside measured intervals");const auto begin=clock_ns(CLOCK_MONOTONIC);
+    row["repetition"]=repetition;row["sequence"]=sequence++;file<<row.dump()<<'\n';file.flush();require(bool(file),"Raw row evidence write failed");
+    // This field appears in the final report; a streamed row cannot contain
+    // the cost of its own flush. Completed rows survive a later interruption.
+    row["raw_write_ns_excluded"]=clock_ns(CLOCK_MONOTONIC)-begin;
+  }
+};
 json sizes(const Document &d){
   const auto f=d.frame();size_t vertices=f.surface->mesh.positions.size(),triangles=f.surface->mesh.indices.size()/3,chunks=0,samples=0,scalar_bytes=0;
   const auto scene=d.copy_scene();for(const auto &object:scene.objects())samples+=object.volume->stored_samples();
@@ -86,26 +122,52 @@ struct Fbo {
   std::vector<uint8_t> pixels(){std::vector<uint8_t> p(size_t(width)*height*4);glReadPixels(0,0,width,height,GL_RGBA,GL_UNSIGNED_BYTE,p.data());require(glGetError()==GL_NO_ERROR,"Diagnostic readback failed");return p;}
 };
 struct TimerPool {
-  struct Slot{GLuint query=0;bool pending=false;size_t frame=0;};std::array<Slot,16> slots{};std::vector<json> samples;size_t skipped=0;bool supported=false;Slot *active=nullptr;
-  TimerPool(){GLint bits=0;glGetQueryiv(GL_TIME_ELAPSED,GL_QUERY_COUNTER_BITS,&bits);supported=bits>0&&glGetError()==GL_NO_ERROR;if(supported)for(auto &s:slots)glGenQueries(1,&s.query);}
+  struct Slot{GLuint query=0;bool pending=false;size_t frame=0;};std::array<Slot,64> slots{};std::vector<json> samples;std::vector<size_t> skipped;
+  GLint bits=0;bool supported=false,disjoint_supported=false,disjoint=false;GLenum reset=GL_NO_ERROR;Slot *active=nullptr;
+  using Reset=GLenum(*)();Reset get_reset=nullptr;
+  TimerPool(){
+    glGetQueryiv(GL_TIME_ELAPSED,GL_QUERY_COUNTER_BITS,&bits);supported=bits>0&&glGetError()==GL_NO_ERROR;
+    disjoint_supported=sustained::device::extension("GL_EXT_disjoint_timer_query");
+    GLint major=0,minor=0;glGetIntegerv(GL_MAJOR_VERSION,&major);glGetIntegerv(GL_MINOR_VERSION,&minor);
+    if(major>4||(major==4&&minor>=5)||sustained::device::extension("GL_KHR_robustness"))get_reset=reinterpret_cast<Reset>(eglGetProcAddress("glGetGraphicsResetStatus"));
+    else if(sustained::device::extension("GL_ARB_robustness"))get_reset=reinterpret_cast<Reset>(eglGetProcAddress("glGetGraphicsResetStatusARB"));
+    health();if(supported)for(auto &s:slots)glGenQueries(1,&s.query);
+  }
   ~TimerPool(){for(auto &s:slots)if(s.query)glDeleteQueries(1,&s.query);}
-  void collect(){for(auto &s:slots)if(s.pending){GLuint available=0;glGetQueryObjectuiv(s.query,GL_QUERY_RESULT_AVAILABLE,&available);if(available){GLuint64 ns=0;glGetQueryObjectui64v(s.query,GL_QUERY_RESULT,&ns);samples.push_back({{"index",s.frame},{"gpu_ns",ns}});s.pending=false;}}}
-  void begin(size_t frame){if(!supported)return;for(auto &s:slots)if(!s.pending){active=&s;s.frame=frame;glBeginQuery(GL_TIME_ELAPSED,s.query);return;}++skipped;}
+  void health(){
+    if(disjoint_supported){GLboolean value=GL_FALSE;glGetBooleanv(0x8FBB,&value);disjoint|=value==GL_TRUE;}
+    if(get_reset){const auto observed=get_reset();if(observed!=GL_NO_ERROR)reset=observed;}
+    require(glGetError()==GL_NO_ERROR,"GPU timing health query failed");
+  }
+  void collect(){health();for(auto &s:slots)if(s.pending){GLuint available=0;glGetQueryObjectuiv(s.query,GL_QUERY_RESULT_AVAILABLE,&available);if(available){GLuint64 ns=0;glGetQueryObjectui64v(s.query,GL_QUERY_RESULT,&ns);samples.push_back({{"index",s.frame},{"gpu_ns",ns}});s.pending=false;}}require(glGetError()==GL_NO_ERROR,"GPU elapsed timer result query failed");}
+  void begin(size_t frame){if(!supported){skipped.push_back(frame);return;}for(auto &s:slots)if(!s.pending){active=&s;s.frame=frame;glBeginQuery(GL_TIME_ELAPSED,s.query);return;}skipped.push_back(frame);}
   void end(){if(active){glEndQuery(GL_TIME_ELAPSED);active->pending=true;active=nullptr;}}
-  json drain(){const auto until=std::chrono::steady_clock::now()+std::chrono::seconds(20);glFlush();while(std::any_of(slots.begin(),slots.end(),[](auto &s){return s.pending;})&&std::chrono::steady_clock::now()<until){collect();std::this_thread::sleep_for(std::chrono::milliseconds(1));}return {{"supported",supported},{"skipped_pool_full",skipped},{"pending_after_bounded_drain",std::count_if(slots.begin(),slots.end(),[](auto &s){return s.pending;})},{"samples",samples}};}
+  json drain(size_t expected){
+    const auto until=std::chrono::steady_clock::now()+std::chrono::seconds(20);glFlush();
+    while(std::any_of(slots.begin(),slots.end(),[](auto &s){return s.pending;})&&std::chrono::steady_clock::now()<until){collect();std::this_thread::sleep_for(std::chrono::milliseconds(1));}health();
+    const auto pending=std::count_if(slots.begin(),slots.end(),[](auto &s){return s.pending;});size_t valid=0;
+    for(auto &row:samples){const bool okay=!disjoint&&reset==GL_NO_ERROR&&row["gpu_ns"].get<uint64_t>()>0;row["valid"]=okay;if(okay)++valid;}
+    const auto coverage=expected?double(valid)/double(expected):0;
+    return {{"supported",supported},{"counter_bits",bits},{"disjoint_supported",disjoint_supported},{"disjoint_observed",disjoint},{"reset_query_supported",get_reset!=nullptr},{"reset_status",reset},{"skipped_indices",skipped},{"pending_after_bounded_drain",pending},{"expected_pairs",expected},{"valid_samples",valid},{"valid_coverage",coverage},{"distribution_qualified",supported&&!disjoint&&reset==GL_NO_ERROR&&!pending&&coverage>=.95},{"samples",samples}};
+  }
 };
-Mat4 view(const Options &o){const float extent=o.objects==1?1.f:o.objects==4?5.f:5.5f;return {1/extent,0,0,0,0,1/extent,0,0,0,0,.2f,0,-.35f,-.15f,0,1};}
+// Fixed declared overview contains every fixture object, including the reflected
+// instance and both unchanged original grouped spheres. No geometry is baked.
+Mat4 view(const Options &o){const float extent=o.objects==1?2.1f:o.objects==4?5.f:5.8f;return {1/extent,0,0,0,0,1/extent,0,0,0,0,.2f,0,0,0,0,1};}
 void draw(Document &d,SurfaceRenderer &r,Fbo &f,const Options &o,CanvasTransform canvas={},bool ghosts=false){
   auto frame=d.frame();auto display=frame.state->objects;if(ghosts)for(auto &x:display)x.ghost=x.id!=frame.state->active_object;
   f.bind();r.set_frame_time(0);r.draw(frame.surface,canvas,view(o),{0,0,3},f.width,f.height,true,false,false,display);
 }
 void source_changes(json &row,const std::shared_ptr<const MeshSnapshot> &old,const std::shared_ptr<const MeshSnapshot> &next){
+  const auto begin=clock_ns(CLOCK_MONOTONIC);
   size_t objects=0,changes=0,removed=0,extracted=0,assembled=0,reconciles=0,scalars=0,placements=0;
   for(const auto &n:next->sculpt_chunks->objects()){const auto *b=old->sculpt_chunks->find(n.object);if(!b||b->geometry!=n.geometry){++objects;const auto &r=n.geometry->report();extracted+=r.extracted_tiles;assembled+=r.assembled_chunks;
       if(!b||!n.geometry->for_each_change(b->geometry,[&](Int3,const auto &c){++changes;if(!c)++removed;})){++reconciles;n.geometry->for_each_chunk([&](const auto &){++changes;});}}
-    if(!b||b->masks!=n.masks)++scalars;if(!b||b->placed!=n.placed)++placements;
+    if(!b||b->masks!=n.masks)++scalars;
+    if(!b||b->placed!=n.placed)++placements;
   }
   row["owner_work"]={{"geometry_objects_changed",objects},{"chunk_delta_or_manifest_entries",changes},{"removed_chunks",removed},{"whole_manifest_reconciles",reconciles},{"reported_extracted_tiles_on_changed_owner",extracted},{"reported_assembled_chunks_on_changed_owner",assembled},{"scalar_directories_changed",scalars},{"placed_directories_changed",placements}};
+  row["owner_observer_ns_excluded"]=clock_ns(CLOCK_MONOTONIC)-begin;
 }
 bool bits(Vec3 a,Vec3 b){return std::bit_cast<std::array<uint32_t,3>>(a)==std::bit_cast<std::array<uint32_t,3>>(b);}
 // Independent whole extraction at each checkpoint. Compare real source-local
@@ -114,7 +176,8 @@ json checkpoint(Document &d,SurfaceRenderer &actual,Fbo &f,const Options &o){
   const auto start=clock_ns(CLOCK_MONOTONIC);const auto scene=d.copy_scene();const auto current=d.frame();auto whole=std::make_shared<MeshSnapshot>();whole->generation=current.surface->generation;whole->geometry_identity=std::make_shared<const int>(1);
   auto display=current.state->objects;size_t corners=0,scalars=0,queries=0;
   for(const auto &object:scene.objects()){
-    if(!object.visible)continue;const auto *captured=current.surface->sculpt_chunks->find(object.id);require(captured,"Visible object missing from actual publication");
+    if(!object.visible)continue;
+    const auto *captured=current.surface->sculpt_chunks->find(object.id);require(captured,"Visible object missing from actual publication");
     const auto reference=surface_mesh(*object.volume);size_t at=0;
     captured->geometry->for_each_run([&](const auto &run){const auto &m=run.chunk->mesh;for(size_t c=run.first;c<run.first+run.count;++c){require(at<reference.indices.size(),"Chunk stream exceeds whole reference");const auto i=m.indices.at(c),j=reference.indices.at(at++);require(bits(m.positions.at(i),reference.positions.at(j))&&bits(m.normals.at(i),reference.normals.at(j)),"Ordered local corner/normal differs from whole extraction");++corners;}});
     require(at==reference.indices.size(),"Whole reference corners missing from published stream");
@@ -126,7 +189,8 @@ json checkpoint(Document &d,SurfaceRenderer &actual,Fbo &f,const Options &o){
     SurfaceQuery independent(reference);const auto ray_reference=independent.raycast_result(origin,dir,5,matrix,{});require(ray_reference&&std::abs(ray->surface.distance-ray_reference->surface.distance)<3e-5f&&length(ray->surface.position-ray_reference->surface.position)<3e-5f&&length(ray->surface.normal-ray_reference->surface.normal)<3e-4f,"Typed production ray differs from independent whole-geometry metric");
     const auto nearest_reference=independent.nearest_result(ray->surface.position+ray->surface.normal*.003f,matrix,{});require(nearest_reference&&std::abs(near.surface.distance-nearest_reference->surface.distance)<3e-5f&&length(near.surface.position-nearest_reference->surface.position)<3e-5f,"Typed production nearest differs from independent whole-geometry metric");
     const auto offset=whole->mesh.positions.size(),first=whole->mesh.indices.size();whole->mesh.positions.insert(whole->mesh.positions.end(),reference.positions.begin(),reference.positions.end());whole->mesh.normals.insert(whole->mesh.normals.end(),reference.normals.begin(),reference.normals.end());whole->mesh.uv.resize(whole->mesh.positions.size());
-    for(auto i:reference.indices)whole->mesh.indices.push_back(uint32_t(offset+i));SurfaceRange range{};range.object=object.id;range.first=first;range.count=reference.indices.size();range.first_vertex=offset;range.material=object.material;range.world_frame_valid=true;range.affine_world=AffineTransform{};whole->ranges.push_back(range);
+    for(auto i:reference.indices)whole->mesh.indices.push_back(uint32_t(offset+i));
+    SurfaceRange range{};range.object=object.id;range.first=first;range.count=reference.indices.size();range.first_vertex=offset;range.material=object.material;range.world_frame_valid=true;range.affine_world=AffineTransform{};whole->ranges.push_back(range);
     for(size_t i=0;i<reference.positions.size();++i)whole->sculpt_masks.push_back(captured->masks?object.volume->mask_sample(reference.positions[i]):-1.f);
     auto item=std::find_if(display.begin(),display.end(),[&](const auto &x){return x.id==object.id;});require(item!=display.end(),"Live display object missing");item->affine_world=matrix;item->world_transform_valid=true;
   }
@@ -158,52 +222,109 @@ json history(Document &d,const std::filesystem::path &output){
   return {{"cancel_exact",true},{"undo_redo_exact",true},{"ordered_save_reopen_exact",true},{"real_factory_return_barrier_reached",true},{"retired_native_generation_exact",true}};
 }
 json distribution(std::vector<double> values){if(values.empty())return {{"count",0}};std::sort(values.begin(),values.end());auto p=[&](double q){return values[std::min(values.size()-1,size_t(std::ceil(q*values.size())-1))];};double sum=0;for(auto v:values)sum+=v;return {{"count",values.size()},{"mean_ns",sum/values.size()},{"p50_ns",p(.5)},{"p90_ns",p(.9)},{"p95_ns",p(.95)},{"p99_ns",p(.99)},{"max_ns",values.back()}};}
-json summarize(const json &rows){json report;for(const std::string kind:{"stroke","mask","view_pair","held_pair","authored_placement","mask_fill","mask_clear"}){std::vector<double> times;for(const auto &row:rows)if(row["kind"]==kind)times.push_back(row["wall_ns"].get<double>());report[kind]=distribution(std::move(times));}return report;}
+json summarize(const json &rows){
+  json report;for(const std::string kind:{"stroke","mask","mask_mode","view_pair","held_pair","authored_placement","mask_fill","mask_clear"}){
+    for(const std::string metric:{"wall_ns","caller_thread_cpu_ns","accepted_snapshot_ns","accepted_snapshot_caller_cpu_ns","first_draw_submission_ns","first_draw_caller_cpu_ns"}){
+      std::vector<double> times;for(const auto &row:rows)if(row["kind"]==kind&&row.contains(metric))times.push_back(row[metric].get<double>());report[kind][metric]=distribution(std::move(times));
+    }
+  }
+  return report;
+}
 }
 extern "C" void __real_glBufferData(GLenum,GLsizeiptr,const void*,GLenum);
 extern "C" void __real_glBufferSubData(GLenum,GLintptr,GLsizeiptr,const void*);
 extern "C" void __wrap_glBufferData(GLenum target,GLsizeiptr n,const void *data,GLenum usage){if(sustained::measuring.load()&&n>0){++sustained::buffer_calls;sustained::buffer_allocation_bytes+=uint64_t(n);if(data)sustained::buffer_payload_bytes+=uint64_t(n);if(target==GL_ARRAY_BUFFER&&usage==GL_DYNAMIC_DRAW&&data){++sustained::scalar_calls;sustained::scalar_payload_bytes+=uint64_t(n);}}__real_glBufferData(target,n,data,usage);}
 extern "C" void __wrap_glBufferSubData(GLenum target,GLintptr offset,GLsizeiptr n,const void *data){if(sustained::measuring.load()&&n>0){++sustained::buffer_calls;if(data)sustained::buffer_payload_bytes+=uint64_t(n);}__real_glBufferSubData(target,offset,n,data);}
 int main(int argc,char **argv){
-  json report={{"status","started"},{"scope","native CPU brushes, actual Document worker publication, immutable OpenGL renderer; no headset or OneAPI claim"},{"inclusive_stage_times_must_not_be_summed",true},{"allocations_scope","optional C++ new requested bytes only; no C malloc/driver/live-byte claim"},{"timing_scope","offscreen uncapped stereo pairs; asynchronous GL timer pool; no measured pixel readback or glFinish"}};
+  json report={{"schema",2},{"status","started"},{"scope","native CPU brushes, actual Document worker publication, immutable OpenGL renderer; no headset or OneAPI claim"},{"inclusive_stage_times_must_not_be_summed",true},{"allocations_scope","optional C++ new requested bytes only; no C malloc/driver/live-byte claim"},{"timing_scope","offscreen uncapped stereo pairs; asynchronous GL timers measure eye draws; CPU pair includes real controller queries; no measured pixel readback or glFinish"},{"natural_process_scope","allocation counters off still retains explicit factory/transfer instrumentation"},{"raw_rows","raw-samples.ndjson contains each completed sample before any later failure; final report adds each row flush cost"}};
   std::filesystem::path output;
   try{
-    const auto o=options(argc,argv);output=o.output;std::filesystem::create_directories(output);sustained::allocations=o.count_allocations;
-    report["options"]={{"tier",o.tier},{"smoke",o.smoke},{"objects",o.objects},{"voxel",o.voxel},{"strokes",o.strokes},{"masks",o.masks},{"pairs",o.pairs},{"repetitions",o.repetitions},{"width",o.width},{"height",o.height},{"allocation_instrumentation",o.count_allocations}};
+    const auto o=options(argc,argv);
+    if(!o.output.parent_path().empty())std::filesystem::create_directories(o.output.parent_path());
+    require(std::filesystem::create_directory(o.output),"Evidence output directory already exists; preserve it and choose a new directory");
+    output=o.output;RawRows raw(output);sustained::allocations=o.count_allocations;
+    report["options"]={{"tier",o.tier},{"device",o.device},{"inventory_only",o.inventory_only},{"smoke",o.smoke},{"objects",o.objects},{"voxel",o.voxel},{"strokes",o.strokes},{"masks",o.masks},{"pairs",o.pairs},{"held_pairs",o.held_pairs},{"repetitions",o.repetitions},{"width",o.width},{"height",o.height},{"allocation_instrumentation",o.count_allocations}};
     const auto allocation_before=Counters::read();bool aligned=true;sustained::measuring=true;
     for(size_t alignment:{size_t(1),size_t(2),size_t(4),size_t(8),size_t(16)}){void *p=::operator new(37,std::align_val_t(alignment));aligned=aligned&&reinterpret_cast<uintptr_t>(p)%alignment==0;::operator delete(p,std::align_val_t(alignment));}
     sustained::measuring=false;const auto allocation_after=Counters::read();require(aligned,"Actual aligned allocation control returned misaligned memory");require(allocation_after.news-allocation_before.news==(o.count_allocations?5u:0u)&&allocation_after.new_bytes-allocation_before.new_bytes==(o.count_allocations?185u:0u),"Actual aligned allocation counters differ from requested operations");report["aligned_cpp_new_controls"]={{"alignments",{1,2,4,8,16}},{"counted_calls",allocation_after.news-allocation_before.news},{"counted_requested_bytes",allocation_after.new_bytes-allocation_before.new_bytes}};
     report["backend"]=std::string(compute_backend());require(compute_backend()=="CPU","This gate is explicitly the CPU brush/mesher baseline");
-    NativeGraphics graphics;report["gl"]={{"renderer",reinterpret_cast<const char*>(glGetString(GL_RENDERER))},{"vendor",reinterpret_cast<const char*>(glGetString(GL_VENDOR))},{"version",reinterpret_cast<const char*>(glGetString(GL_VERSION))}};
-    const auto renderer=report["gl"]["renderer"].get<std::string>();require(renderer.find("llvmpipe")!=std::string::npos||renderer.find("softpipe")!=std::string::npos,"This executable stage requires actual software GL; strict Arc is a separately leased stage");
-    Fbo target(o.width,o.height);{Document original;SurfaceRenderer gpu;original.replace(grouped_regression());original.configure_object_grab(true,false);ready(original);report["unchanged_original_grouped_regression"]=checkpoint(original,gpu,target,o);}
-    const auto source=fixture(o);json inputs={{"strokes",json::array()},{"masks",json::array()}};for(size_t i=0;i<o.strokes;++i){auto s=input(i,false);inputs["strokes"].push_back({{"index",i},{"origin",{s.origin.x,s.origin.y,s.origin.z}},{"direction",{0,0,-1}},{"tool",int(s.brush.tool)},{"radius",s.brush.radius},{"strength",s.brush.strength},{"blend",s.brush.blend}});}for(size_t i=0;i<o.masks;++i){auto s=input(i/2,true);inputs["masks"].push_back({{"index",i},{"origin",{s.origin.x,s.origin.y,s.origin.z}},{"mask_tool",i%2?"subtract":"add"},{"radius",s.brush.radius},{"strength",s.brush.strength},{"blend",s.brush.blend}});}write(output/"fixed-inputs.json",inputs);
-    report["repetitions"]=json::array();
-    for(size_t rep=0;rep<o.repetitions;++rep){
-      Document d;SurfaceRenderer gpu;auto cold=measure("cold_publication",0,[&]{d.replace(source.snapshot());d.configure_object_grab(true,false);ready(d);draw(d,gpu,target,o);});
-      const auto size=sizes(d);report["initial_size"]=size;if(!o.smoke&&o.tier=="production"&&size["visible_triangles"].get<size_t>()<250000)throw Refusal("Production tier has fewer than 250,000 actual visible triangles");
+    NativeGraphics graphics;report["gl_observed"]={{"renderer",sustained::device::gl_string(GL_RENDERER)},{"vendor",sustained::device::gl_string(GL_VENDOR)},{"version",sustained::device::gl_string(GL_VERSION)}};
+    report["device_witness_initial"]=sustained::device::authenticate(o.device);
+    {std::ofstream maps(output/"context-initial.maps");maps<<sustained::device::text("/proc/self/maps");require(bool(maps),"Cannot preserve actual current context mappings");}
+    write(output/"result.json",report);
+    Fbo target(o.width,o.height);
+    {Document original;SurfaceRenderer gpu;original.replace(grouped_regression());original.configure_object_grab(true,false);ready(original);auto check=checkpoint(original,gpu,target,o);check["kind"]="original_grouped_regression";raw.append(check,0);report["unchanged_original_grouped_regression"]=std::move(check);}
+    const auto source=fixture(o);
+    json inputs={{"strokes",json::array()},{"masks",json::array()},{"view_pairs",json::array()},{"held_pairs",json::array()}};
+    for(size_t i=0;i<o.strokes;++i){auto s=input(i,false);inputs["strokes"].push_back({{"index",i},{"origin",{s.origin.x,s.origin.y,s.origin.z}},{"direction",{0,0,-1}},{"tool",int(s.brush.tool)},{"radius",s.brush.radius},{"strength",s.brush.strength},{"blend",s.brush.blend}});}
+    for(size_t i=0;i<o.masks;++i){auto s=input(i/2,true);inputs["masks"].push_back({{"index",i},{"origin",{s.origin.x,s.origin.y,s.origin.z}},{"mask_tool",i%2?"subtract":"add"},{"radius",s.brush.radius},{"strength",s.brush.strength},{"blend",s.brush.blend}});}
+    for(size_t i=0;i<o.pairs;++i)inputs["view_pairs"].push_back({{"index",i},{"canvas_x",.03f*std::sin(float(i)*.01f)},{"second_eye_offset_x",.004f},{"ghost_unselected",i%3==1}});
+    for(size_t i=0;i<o.held_pairs;++i)inputs["held_pairs"].push_back({{"index",i},{"world_delta_x",.025f*std::sin(float(i)*.1f)}});
+    write(output/"fixed-inputs.json",inputs);report["repetitions"]=json::array();
+    const auto repeats=o.inventory_only?1:o.repetitions;
+    for(size_t rep=0;rep<repeats;++rep){
+      Document d;SurfaceRenderer gpu;
+      auto cold=publication_draw("cold_publication",0,[&]{d.replace(source.snapshot());d.configure_object_grab(true,false);ready(d);},[&]{draw(d,gpu,target,o);});
+      raw.append(cold,rep);const auto size=sizes(d);report["initial_size"]=size;write(output/"result.json",report);
+      if(!o.smoke&&o.tier=="production"&&size["visible_triangles"].get<size_t>()<250000)throw Refusal("Production tier has fewer than 250,000 actual visible triangles");
       json run={{"index",rep},{"cold",cold},{"size",size},{"rows",json::array()},{"checkpoints",json::array()}};
-      run["checkpoints"].push_back(checkpoint(d,gpu,target,o));
-      // Declared unmeasured warm-up performs real work, then restores input.
-      stroke(d,input(0,false));require(d.undo(),"Warm-up Undo refused");ready(d);draw(d,gpu,target,o);const auto retained=d.frame().surface;
-      for(size_t i=0;i<o.strokes;++i){const auto before=d.frame().surface;auto row=measure("stroke",i,[&]{stroke(d,input(i,false));draw(d,gpu,target,o);});const auto after=d.frame().surface;require(before->sculpt_chunks->find(1)->geometry!=after->sculpt_chunks->find(1)->geometry,"Declared accepted local stroke made no geometry change");source_changes(row,before,after);run["rows"].push_back(std::move(row));if((i+1)%30==0)run["checkpoints"].push_back(checkpoint(d,gpu,target,o));}
-      auto settings=d.copy_scene().active().volume->sculpt_settings();settings.mask_edit=true;settings.mask_visible=true;d.sculpt_settings(settings);ready(d);
-      for(size_t i=0;i<o.masks;++i){settings.mask_tool=i%2?Volume::MaskTool::Subtract:Volume::MaskTool::Add;d.sculpt_settings(settings);ready(d);const auto before=d.frame().surface;const auto transfers=gpu.buffer_stats();auto row=measure("mask",i,[&]{stroke(d,input(i/2,true));draw(d,gpu,target,o);});const auto after=d.frame().surface;require(before->sculpt_chunks->find(1)->masks!=after->sculpt_chunks->find(1)->masks,"Declared mask stroke did no scalar work");require(before->sculpt_chunks->find(1)->geometry==after->sculpt_chunks->find(1)->geometry&&before->sculpt_chunks->find(1)->placed==after->sculpt_chunks->find(1)->placed,"Mask rebuilt geometry/query");require(gpu.buffer_stats().geometry_uploads==transfers.geometry_uploads,"Mask caused GPU geometry upload");source_changes(row,before,after);run["rows"].push_back(std::move(row));}
-      for(const auto value:{.7f,0.f}){auto row=measure(value?"mask_fill":"mask_clear",0,[&]{d.sculpt_mask_fill(value);require(d.wait_asset(std::chrono::seconds(120)),"Mask file worker timed out");ready(d);draw(d,gpu,target,o);});run["rows"].push_back(std::move(row));}
-      settings.mask_edit=false;d.sculpt_settings(settings);ready(d);run["checkpoints"].push_back(checkpoint(d,gpu,target,o));
-      TimerPool timers;timers.samples.reserve(o.pairs);run["timer_query_unit"]="one complete two-eye view pair";
-      for(size_t i=0;i<o.pairs;++i){CanvasTransform canvas;canvas.position.x=.03f*std::sin(float(i)*.01f);const auto before=gpu.buffer_stats();const auto observe=clock_ns(CLOCK_MONOTONIC);timers.collect();const auto observer_ns=clock_ns(CLOCK_MONOTONIC)-observe;auto row=measure("view_pair",i,[&]{require(d.pick_object({0,0,1.5f},{0,0,-1}).has_value(),"Real controller object ray missed");require(d.frame().surface->picking->nearby_target({0,0,.61f},.3f).has_value(),"Real direct controller contact missed");timers.begin(i);draw(d,gpu,target,o,canvas,i%3==1);canvas.position.x+=.004f;draw(d,gpu,target,o,canvas,i%3==1);timers.end();glFlush();});row["includes_actual_controller_ray_and_contact"]=true;row["timer_observer_ns_excluded"]=observer_ns;require(gpu.buffer_stats().geometry_uploads==before.geometry_uploads&&gpu.buffer_stats().mask_uploads==before.mask_uploads,"Unchanged stereo view caused geometry/scalar upload");run["rows"].push_back(std::move(row));}
-      run["gpu_timers"]=timers.drain();require(run["gpu_timers"]["pending_after_bounded_drain"]==0,"GPU timer drain timed out");
+      auto observe=[&]{auto row=checkpoint(d,gpu,target,o);row["kind"]="independent_checkpoint";row["index"]=run["checkpoints"].size();raw.append(row,rep);run["checkpoints"].push_back(std::move(row));};
+      auto record=[&](json row){raw.append(row,rep);run["rows"].push_back(std::move(row));};
+      observe();
+      // One genuine unmeasured stroke and exact Undo are required even for an
+      // inventory-only admission. These are never counted as sustained work.
+      const auto warm_start=clock_ns(CLOCK_MONOTONIC);const auto warm_source=d.copy_scene().encode();
+      stroke(d,input(0,false));require(d.undo(),"Warm-up Undo refused");ready(d);require(d.copy_scene().encode()==warm_source,"Warm-up Undo did not restore exact source");draw(d,gpu,target,o);
+      run["warmup"]={{"real_strokes",1},{"exact_undo",true},{"excluded_ns",clock_ns(CLOCK_MONOTONIC)-warm_start}};
+      const auto retained=d.frame().surface;
+      if(o.inventory_only){
+        observe();run["sustained_work_executed"]=false;report["repetitions"].push_back(std::move(run));
+        report["status"]=o.tier=="production"?"production-inventory-admitted":"inventory-pass-not-production";
+        report["device_witness_final"]=sustained::device::authenticate(o.device);{std::ofstream maps(output/"context-final.maps");maps<<sustained::device::text("/proc/self/maps");require(bool(maps),"Cannot preserve final inventory context mappings");}rusage usage{};getrusage(RUSAGE_SELF,&usage);report["peak_rss_kib"]=usage.ru_maxrss;
+        write(output/"result.json",report);std::cout<<report["status"]<<'\n';return 0;
+      }
+      for(size_t i=0;i<o.strokes;++i){
+        const auto before=d.frame().surface;auto row=publication_draw("stroke",i,[&]{stroke(d,input(i,false));},[&]{draw(d,gpu,target,o);});const auto after=d.frame().surface;
+        require(before->sculpt_chunks->find(1)->geometry!=after->sculpt_chunks->find(1)->geometry,"Declared accepted local stroke made no geometry change");source_changes(row,before,after);record(std::move(row));if((i+1)%30==0)observe();
+      }
+      auto settings=d.copy_scene().active().volume->sculpt_settings();settings.mask_edit=true;settings.mask_visible=true;
+      record(measure("mask_mode",0,[&]{d.sculpt_settings(settings);ready(d);}));
+      for(size_t i=0;i<o.masks;++i){
+        settings.mask_tool=i%2?Volume::MaskTool::Subtract:Volume::MaskTool::Add;const auto before=d.frame().surface;const auto transfers=gpu.buffer_stats();
+        auto row=publication_draw("mask",i,[&]{d.sculpt_settings(settings);ready(d);stroke(d,input(i/2,true));},[&]{draw(d,gpu,target,o);});const auto after=d.frame().surface;
+        row["publication_scope"]="mask mode change and accepted native stroke";
+        require(before->sculpt_chunks->find(1)->masks!=after->sculpt_chunks->find(1)->masks,"Declared mask stroke did no scalar work");require(before->sculpt_chunks->find(1)->geometry==after->sculpt_chunks->find(1)->geometry&&before->sculpt_chunks->find(1)->placed==after->sculpt_chunks->find(1)->placed,"Mask rebuilt geometry/query");require(gpu.buffer_stats().geometry_uploads==transfers.geometry_uploads,"Mask caused GPU geometry upload");source_changes(row,before,after);record(std::move(row));
+      }
+      for(const auto value:{.7f,0.f})record(publication_draw(value?"mask_fill":"mask_clear",0,[&]{d.sculpt_mask_fill(value);require(d.wait_asset(std::chrono::seconds(120)),"Mask file worker timed out");ready(d);},[&]{draw(d,gpu,target,o);}));
+      settings.mask_edit=false;record(measure("mask_mode",1,[&]{d.sculpt_settings(settings);ready(d);}));observe();
+      TimerPool timers;timers.samples.reserve(o.pairs);timers.skipped.reserve(o.pairs);run["timer_query_unit"]="one complete two-eye draw pair, excludes controller CPU queries";
+      for(size_t i=0;i<o.pairs;++i){
+        CanvasTransform canvas;canvas.position.x=.03f*std::sin(float(i)*.01f);const auto before=gpu.buffer_stats();const auto observe_start=clock_ns(CLOCK_MONOTONIC);timers.collect();const auto observer_ns=clock_ns(CLOCK_MONOTONIC)-observe_start;
+        auto row=measure("view_pair",i,[&]{require(d.pick_object({0,0,1.5f},{0,0,-1}).has_value(),"Real controller object ray missed");require(d.frame().surface->picking->nearby_target({0,0,.61f},.3f).has_value(),"Real direct controller contact missed");timers.begin(i);draw(d,gpu,target,o,canvas,i%3==1);canvas.position.x+=.004f;draw(d,gpu,target,o,canvas,i%3==1);timers.end();glFlush();});
+        row["includes_actual_controller_ray_and_contact"]=true;row["timer_observer_ns_excluded"]=observer_ns;require(gpu.buffer_stats().geometry_uploads==before.geometry_uploads&&gpu.buffer_stats().mask_uploads==before.mask_uploads,"Unchanged stereo view caused geometry/scalar upload");record(std::move(row));
+      }
+      run["gpu_timers"]=timers.drain(o.pairs);require(run["gpu_timers"]["pending_after_bounded_drain"]==0,"GPU timer drain timed out");
+      std::vector<double> gpu_times;for(auto &sample:run["gpu_timers"]["samples"])if(sample["valid"].get<bool>())gpu_times.push_back(sample["gpu_ns"].get<double>());
+      if(run["gpu_timers"]["distribution_qualified"].get<bool>())run["gpu_timers"]["distribution_ns"]=distribution(std::move(gpu_times));else run["gpu_timers"]["distribution_ns"]=nullptr;
+      auto timer_evidence=run["gpu_timers"];timer_evidence["kind"]="async_gpu_timers";raw.append(timer_evidence,rep);require(run["gpu_timers"]["distribution_qualified"].get<bool>(),"GPU timer coverage/reset/disjoint gate refused a distribution");
       require(d.begin_object_grab(1),"Held motion refused");const auto held=d.frame().surface;const auto transfers=gpu.buffer_stats();
-      for(size_t i=0;i<(o.smoke?4:120);++i){CanvasTransform delta;delta.position.x=.025f*std::sin(float(i)*.1f);run["rows"].push_back(measure("held_pair",i,[&]{d.move_held_object_world(delta);draw(d,gpu,target,o);draw(d,gpu,target,o);}));require(d.frame().surface==held,"Held motion baked a new geometry snapshot");}
+      for(size_t i=0;i<o.held_pairs;++i){CanvasTransform delta;delta.position.x=.025f*std::sin(float(i)*.1f);auto row=measure("held_pair",i,[&]{d.move_held_object_world(delta);draw(d,gpu,target,o);draw(d,gpu,target,o);});require(d.frame().surface==held,"Held motion baked a new geometry snapshot");record(std::move(row));}
       d.end_object_grab(false);ready(d);require(gpu.buffer_stats().geometry_uploads==transfers.geometry_uploads,"Held motion uploaded geometry");
       const auto ids=o.objects==1?std::vector<uint64_t>{1}:std::vector<uint64_t>{1,uint64_t(o.objects)};
-      for(auto id:ids){auto authored=d.copy_scene();auto &obj=authored.object(id);const auto before=d.frame().surface;obj.transform.position.x+=.02f;
-        auto move=measure("authored_placement",id,[&]{d.object_properties(obj.id,obj.name,obj.visible,obj.locked,obj.transform,obj.material);ready(d);draw(d,gpu,target,o);});const auto after=d.frame().surface;source_changes(move,before,after);const auto *old=before->sculpt_chunks->find(id),*now=after->sculpt_chunks->find(id);require(now->geometry==old->geometry,"Authored similarity/affine placement rebuilt local extraction");size_t reused=0;now->placed->for_each([&](const auto &p){const auto previous=old->placed->find(p->source());require(previous&&p->geometry_owner()==previous->geometry_owner()&&p->query()==previous->query(),"Authored similarity/affine motion rebuilt immutable local geometry/BVH");++reused;});move["actual_local_geometry_and_bvh_owners_reused"]=reused;run["rows"].push_back(std::move(move));}
-      run["checkpoints"].push_back(checkpoint(d,gpu,target,o));run["history"]=history(d,output/("rep-"+std::to_string(rep)));require(retained->sculpt_chunks->find(1)->geometry->report().indices>0,"Old acquired owner invalid after sustained work");run["checkpoints"].push_back(checkpoint(d,gpu,target,o));run["summary"]=summarize(run["rows"]);report["repetitions"].push_back(std::move(run));write(output/"result.json",report);
+      for(auto id:ids){
+        auto authored=d.copy_scene();auto &obj=authored.object(id);const auto before=d.frame().surface;obj.transform.position.x+=.02f;
+        auto move=publication_draw("authored_placement",id,[&]{d.object_properties(obj.id,obj.name,obj.visible,obj.locked,obj.transform,obj.material);ready(d);},[&]{draw(d,gpu,target,o);});const auto after=d.frame().surface;source_changes(move,before,after);const auto *old=before->sculpt_chunks->find(id),*now=after->sculpt_chunks->find(id);require(now->geometry==old->geometry,"Authored similarity/affine placement rebuilt local extraction");size_t reused=0;now->placed->for_each([&](const auto &p){const auto previous=old->placed->find(p->source());require(previous&&p->geometry_owner()==previous->geometry_owner()&&p->query()==previous->query(),"Authored similarity/affine motion rebuilt immutable local geometry/BVH");++reused;});move["actual_local_geometry_and_bvh_owners_reused"]=reused;record(std::move(move));
+      }
+      observe();const auto history_start=clock_ns(CLOCK_MONOTONIC);run["history"]=history(d,output/("rep-"+std::to_string(rep)));run["history_observer_ns_excluded"]=clock_ns(CLOCK_MONOTONIC)-history_start;
+      auto history_evidence=run["history"];history_evidence["kind"]="exact_history_and_stale_generation";raw.append(history_evidence,rep);
+      require(retained->sculpt_chunks->find(1)->geometry->report().indices>0,"Old acquired owner invalid after sustained work");observe();run["summary"]=summarize(run["rows"]);report["repetitions"].push_back(std::move(run));write(output/"result.json",report);
     }
     const auto observed=Counters::read();require(observed.stages[Capture].calls&&observed.stages[Placement].calls&&observed.stages[ExtractionUpdate].calls&&observed.stages[Ray].calls,"Actual measurement wrappers were not reached");
-    rusage usage{};getrusage(RUSAGE_SELF,&usage);report["peak_rss_kib"]=usage.ru_maxrss;report["status"]=o.smoke?"smoke-pass-not-production":"pass";report["remaining_costs"]={"whole GPU directory reconciliation","changed-mask object-wide scalar sampling","separate pre-chunk executable baseline","actual Arc device lease and measurements","physical headset pacing","affine Volume sculpt mutations remain refused"};write(output/"result.json",report);std::cout<<report["status"]<<'\n';return 0;
-  }catch(const Refusal &e){report["status"]="resource-or-size-refusal";report["reason"]=e.what();if(!output.empty())write(output/"result.json",report);std::cerr<<"REFUSED "<<e.what()<<'\n';return 3;}
+    const bool full=o.strokes>=300&&o.masks>=120&&o.pairs>=2000&&o.held_pairs>=120&&o.repetitions>=3;
+    report["complete_planned_counts"]=full;report["status"]=o.smoke?"smoke-pass-not-production":o.tier=="production"?(full?"production-workload-pass":"bounded-production-pass"):"workload-pass-not-production";
+    report["device_witness_final"]=sustained::device::authenticate(o.device);{std::ofstream maps(output/"context-final.maps");maps<<sustained::device::text("/proc/self/maps");require(bool(maps),"Cannot preserve final actual context mappings");}
+    rusage usage{};getrusage(RUSAGE_SELF,&usage);report["peak_rss_kib"]=usage.ru_maxrss;
+    report["remaining_costs"]={"whole GPU directory reconciliation","changed-mask object-wide scalar sampling","separate pre-chunk executable baseline","physical headset pacing","affine Volume sculpt mutations remain refused"};write(output/"result.json",report);std::cout<<report["status"]<<'\n';return 0;
+  }catch(const Refusal &e){sustained::measuring=false;report["status"]="resource-or-size-refusal";report["reason"]=e.what();if(!output.empty())write(output/"result.json",report);std::cerr<<"REFUSED "<<e.what()<<'\n';return 3;}
   catch(const std::exception &e){sustained::measuring=false;report["status"]="failed";report["reason"]=e.what();if(!output.empty())write(output/"result.json",report);std::cerr<<"FAIL "<<e.what()<<'\n';return 1;}
 }
