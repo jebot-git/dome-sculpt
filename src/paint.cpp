@@ -1575,28 +1575,33 @@ std::shared_ptr<PaintedMesh> detail::TextureSetPaintAccess::resample_plain(const
  if(before.revision_==UINT64_MAX)throw std::overflow_error("Texture-set paint revision exhausted");
  // Bound actual authored candidates before allocating layer output or raster.
  // Mesh/domain still keep the original logical triangle sequence.
- size_t candidate_bytes=0;
- if(before.surface_->options.policy!=PaintUvPolicy::Strict){
-  if(before.surface_->options.policy!=PaintUvPolicy::PolygonAuthored||!domain->topology()->polygon_ids())
-   throw std::invalid_argument("Source-authored grid resizing needs its actual source transition");
-  size_t samples=0;const auto r=options.resolution;const auto&mesh=before.mesh();
-  for(auto triangle:domain->triangles()){
-   if(limits.cancelled&&limits.cancelled())throw std::runtime_error("Texture-set candidate forecast cancelled");
-   const auto a=mesh.uv.at(mesh.indices.at(size_t(triangle)*3)),b=mesh.uv.at(mesh.indices.at(size_t(triangle)*3+1)),c=mesh.uv.at(mesh.indices.at(size_t(triangle)*3+2));
-   const int x0=std::max(0,int(std::floor(std::min({a[0],b[0],c[0]})*r))),x1=std::min(int(r)-1,int(std::ceil(std::max({a[0],b[0],c[0]})*r)));
-   const int y0=std::max(0,int(std::floor(std::min({a[1],b[1],c[1]})*r))),y1=std::min(int(r)-1,int(std::ceil(std::max({a[1],b[1],c[1]})*r)));
-   const size_t n=size_t(std::max(0,x1-x0+1))*std::max(0,y1-y0+1);
-   if(n>limits.maximum_work-samples)throw std::length_error("Texture-set candidate samples exceed their prospective work bound");samples+=n;
-  }
+ const size_t old_candidates=before.surface_->extra.capacity()*sizeof(PaintedMesh::SurfaceMap::Extra)+before.surface_->linked.bucket_count()*sizeof(void*)+before.surface_->linked.size()*(sizeof(PaintedMesh::SurfaceMap::Head)+4*sizeof(void*)+sizeof(uint32_t));
+ size_t candidate_bytes=old_candidates,samples=0;const auto r=options.resolution;const auto&mesh=before.mesh();
+ if(before.surface_->options.policy!=PaintUvPolicy::Strict&&
+    (before.surface_->options.policy!=PaintUvPolicy::PolygonAuthored||!domain->topology()->polygon_ids()))
+  throw std::invalid_argument("Source-authored grid resizing needs its actual source transition");
+ for(auto triangle:domain->triangles()){
+  if(limits.cancelled&&limits.cancelled())throw std::runtime_error("Texture-set candidate forecast cancelled");
+  const auto a=mesh.uv.at(mesh.indices.at(size_t(triangle)*3)),b=mesh.uv.at(mesh.indices.at(size_t(triangle)*3+1)),c=mesh.uv.at(mesh.indices.at(size_t(triangle)*3+2));
+  const int x0=std::max(0,int(std::floor(std::min({a[0],b[0],c[0]})*r))),x1=std::min(int(r)-1,int(std::ceil(std::max({a[0],b[0],c[0]})*r)));
+  const int y0=std::max(0,int(std::floor(std::min({a[1],b[1],c[1]})*r))),y1=std::min(int(r)-1,int(std::ceil(std::max({a[1],b[1],c[1]})*r)));
+  const size_t n=size_t(std::max(0,x1-x0+1))*std::max(0,y1-y0+1);
+  if(n>limits.maximum_work-samples)throw std::length_error("Texture-set raster samples exceed their prospective work bound");samples+=n;
+ }
+ const bool authored=before.surface_->options.policy!=PaintUvPolicy::Strict;
+ const size_t max_checks=authored?std::min(before.surface_->options.max_candidate_checks,samples*before.surface_->options.max_candidates_per_texel):0;
+ if(samples>limits.maximum_work-report.work||max_checks>limits.maximum_work-report.work-samples)throw std::length_error("Texture-set raster/candidate work exceeds the prospective complete budget");
+ auto filter_limits=limits;filter_limits.maximum_work-=samples+max_checks;
+ if(authored){
   const size_t candidates=domain->triangles().size()<2?0:std::min(samples,before.surface_->options.max_additional_candidates);
   constexpr size_t stride=2*sizeof(PaintedMesh::SurfaceMap::Extra)+8*sizeof(void*)+sizeof(PaintedMesh::SurfaceMap::Head)+sizeof(uint32_t);
-  if(candidates>limits.maximum_bytes/stride)throw std::length_error("Texture-set candidate storage exceeds its prospective byte bound");candidate_bytes=candidates*stride;
+  if(candidate_bytes>limits.maximum_bytes||candidates>(limits.maximum_bytes-candidate_bytes)/stride)throw std::length_error("Texture-set candidate storage exceeds its prospective byte bound");candidate_bytes+=candidates*stride;
  }
- auto filter_limits=limits;if(candidate_bytes>=filter_limits.maximum_bytes)throw std::length_error("Texture-set candidates exhaust its peak budget");filter_limits.maximum_bytes-=candidate_bytes;
+ if(candidate_bytes>=filter_limits.maximum_bytes)throw std::length_error("Texture-set candidates exhaust its peak budget");filter_limits.maximum_bytes-=candidate_bytes;
  auto layers=detail::resample_texture_set_layers(before,options,filter_limits,report);report.peak_bytes+=candidate_bytes;
  auto raster_options=before.surface_->options;raster_options.cancelled=limits.cancelled;
- raster_options.max_raster_samples=std::min(raster_options.max_raster_samples,limits.maximum_work-report.work);
- raster_options.max_candidate_checks=std::min(raster_options.max_candidate_checks,limits.maximum_work-report.work);
+ raster_options.max_raster_samples=std::min({raster_options.max_raster_samples,std::max(size_t(1),samples),limits.maximum_work-report.work});
+ raster_options.max_candidate_checks=std::min(raster_options.max_candidate_checks,std::max(size_t(1),max_checks));
  PaintSamplingLimits sampling_limits;sampling_limits.cancelled=limits.cancelled;
  auto surface=std::make_shared<PaintedMesh::SurfaceMap>(before.surface_->geometry,options.resolution,std::move(raster_options),nullptr,sampling_limits,domain);
  const auto raster_work=surface->diagnostics.raster_samples+surface->diagnostics.candidate_checks;

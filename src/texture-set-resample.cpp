@@ -17,6 +17,9 @@ void TextureSetResolutionOptions::validate() const {
 }
 namespace detail {
 namespace {
+uint8_t fallback_byte(float v) {
+  return uint8_t(std::lround(std::clamp(v, 0.f, 1.f) * 255));
+}
 uint8_t byte(double v) {
   return uint8_t(std::lround(std::clamp(v, 0., 1.) * 255));
 }
@@ -107,6 +110,7 @@ Sample filtered(const PaintLayer &l, uint32_t from, uint32_t to, uint32_t x,
   footprint(from, to, x, y, [&](uint32_t sx, uint32_t sy, double w) {
     work(report, 32, limits);
     ++report.filtered_samples;
+    if((report.filtered_samples&255)==0)stop(limits);
     const auto s = pixel(l, from, sx, sy);
     const auto &d = s.common.data;
     out.common_present |= s.common_present;
@@ -269,6 +273,10 @@ void material_quality(const PaintedMesh &before, const PaintedMesh &after,
   const auto old = before.composite(material, limits.cancelled),
              now = after.composite(material, limits.cancelled);
   const auto r = before.resolution();
+  work(report,
+       (size_t(r) * r + size_t(after.resolution()) * after.resolution()) *
+           (before.layers().size() + 1) * 32,
+       limits);
   const std::array<const Image *, 5> left{&old->color, &old->metal_rough,
                                           &old->emission, &old->color_coverage,
                                           &old->emission_coverage};
@@ -395,9 +403,10 @@ std::vector<PaintLayer> resample_texture_set_layers(
             // that tile must carry an exactly matching legacy fallback;
             // physical stays zero for samples that only owned the legacy plane.
             if (!layer.emission_tiles.empty()) {
-              s.common.data[12] = byte(s.emission.coverage);
+              s.common.data[12] = fallback_byte(s.emission.coverage);
               for (size_t k = 0; k < 3; ++k)
-                s.common.data[6 + k] = byte(encoded(s.emission.legacy[k]));
+                s.common.data[6 + k] =
+                    fallback_byte(linear_to_srgb(s.emission.legacy[k]));
             }
             common.pixels[i] = s.common;
             emission.pixels[i] = s.emission;
@@ -461,9 +470,10 @@ resample_texture_set(Scene &scene, uint64_t object, TextureSetId set,
                                field.painted->resolution(),
                after_pixels = size_t(options.resolution) * options.resolution;
   const size_t material_bytes = (before_pixels + after_pixels) * 128;
-  const size_t material_work = (before_pixels + after_pixels) *
-                                   (field.painted->layers().size() + 1) * 32 +
-                               before_pixels * 128;
+  const size_t material_work =
+      (before_pixels + after_pixels) * (field.painted->layers().size() + 1) *
+          32 +
+      14 * (before_pixels + std::max(after_pixels, 4 * before_pixels));
   if (material_bytes >= limits.maximum_bytes ||
       material_work >= limits.maximum_work)
     throw std::length_error("Material reconstruction exceeds the resolution "
