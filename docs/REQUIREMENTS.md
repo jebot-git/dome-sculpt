@@ -1,3 +1,17 @@
+## Private coherent polygon/texture Release candidate — 2026-11-06
+
+Current qualified sourceee557 composes the existing main44fe foundation with
+owning polygon fields39, plain native texture sets40 and shared-geometry export.
+Fresh reachable app/core/support/render/XR,8native modes577, actual FLTK70,
+software+authenticatedArc existingGL51 and independentappearance537 perdevice,
+and5Khronos outputs0errors pass. Read
+[COHERENT-POLYGON-TEXTURE-RELEASE.md](COHERENT-POLYGON-TEXTURE-RELEASE.md).
+This is a private Release checkpoint: new-layout sanitizer, broader compositor,
+XR/interoperability/accelerator/physical verification, source-backed fields,
+retained set history, all-channel resolution editing and the full remaining
+requirements are still required. Main admission and local-coordinate chunk
+composition are separate; no complete production or ALL claim.
+
 ## Current isotropic remeshing integration — 2026-11-06
 
 The source-retaining native desktop/XR isotropic-remesh workflow is now

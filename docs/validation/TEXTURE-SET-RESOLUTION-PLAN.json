@@ -1,0 +1,30 @@
+{
+  "status": "Concrete source/API plan only; no resampling implementation/build/link/runtime",
+  "base": "ee557a5962c0c101abbfbb6e4fa61f039543e018",
+  "coordinated_bridge": "6bc73578",
+  "source_references": {
+    "/home/blux/de-xr/dome-sculpt/artifacts/authoring-compose-44/include/dome/texture-sets.hpp": "09a403a8c9163a03b53f44b1c6c982ad340fd7170a9e9a736ed9a4b56df38b65",
+    "/home/blux/de-xr/dome-sculpt/artifacts/authoring-compose-44/include/dome/paint.hpp": "323d07d81de115fce590fcd2485f7402b6b524f63c83d434dbf0baae46f1554f",
+    "/home/blux/de-xr/dome-sculpt/artifacts/authoring-compose-44/include/dome/emission.hpp": "b85d7b4ec7b91a574a1e8604634e2550f552a1060c1daae50235d22e4eab438e",
+    "/home/blux/de-xr/dome-sculpt/artifacts/authoring-compose-44/src/paint.cpp": "4b9455a71d2e52c52d8ffdf984e6bd29036385243cafa993dbba688ba6a2e373",
+    "/home/blux/de-xr/dome-sculpt/artifacts/authoring-compose-44/src/document-texture-sets.cpp": "7cd0532b5effbd44771c03e3ef5084e843358ca2e24f48953aa9f74069f75d26",
+    "/home/blux/de-xr/dome-sculpt/artifacts/authoring-compose-44/src/texture-set-paint-access.hpp": "4a91801b2b3b7f46c92b401490e828cd58cf408d79b4e66194dfbe189ad0108d",
+    "/home/blux/de-xr/dome-sculpt/artifacts/authoring-compose-44/src/texture-set-editor.cpp": "47da1639516fc1b8ea7cb3c1eb1c883bda1beef6db816714b40514642ca3acb6"
+  },
+  "GUI_qualification": {
+    "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-compose-44/artifacts/composed-gui-ee557/QUALIFICATION.json",
+    "sha256": "559ab496e7ba627aafbde9a01bf32e496178c44802e1fd4b0a17943537a5bbcb",
+    "checks": 70
+  },
+  "required_plane_contract": [
+    "all14 common components withindependentmask/coverage",
+    "optionalPBRcolorRGBA",
+    "FLOATlegacyRGB+physicalRGB+authoritativecoverage",
+    "hidden/zero-opacity/unassignedauthoredvalues",
+    "exactmetadata/sibling/domain/geometryretention"
+  ],
+  "existing_guards_kept": true,
+  "sourceful_grid_transition_still_required": true,
+  "root_qualified_sources_unchanged": true,
+  "implementation_next": "Private immutable tile filtering+bounded detached actual-recipient transaction; real sourceful writable-grid adapter later, no relabelled original raster"
+}

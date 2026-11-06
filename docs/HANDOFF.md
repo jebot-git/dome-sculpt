@@ -1,3 +1,29 @@
+## Coherent FLTK qualification and resolution plan — 2026-11-06
+
+Actual whole-ownedee557 Release passes19 polygon and51 texture-manager GUI
+controls, with four clean application closes and exact sources/258 providers/
+SDK/observed maps. Read validation/COHERENT-FLTK-WORKFLOWS-ee557.json; reusable
+tests/texture-set-menu.py matches executedv5 code except its module docstring.
+The manager preserves independent64/128 grids but has no resize control.
+TEXTURE-SET-RESOLUTION-PLAN.md gives the concrete all14-channel/PBR/FLOAT worker,
+transaction, UI, source-grid adapter and validation plan coordinated with bridge
+6bc73578. This sparse child implements no resize API/code/layout or runtime;
+qualified root/12c sources remain untouched. Full production goal remains open.
+
+## Private coherent polygon/texture application — 2026-11-06
+
+This branch composes main44fe with polygon-field ownership39, plain texture
+sets40 and shared-geometry multi-primitive export. Read
+[COHERENT-POLYGON-TEXTURE-RELEASE.md](COHERENT-POLYGON-TEXTURE-RELEASE.md).
+Current whole reachable optimized providers and ten consumers have258 own
+outputs rechecked. Native8/8 (577), actual FLTK19+51, software and authenticated
+Arc existingGL51+independent appearance537/device pass. Pixel reference error
+is2 software/1 Arc within unchanged6; eight cross-device pairs differ at most2.
+Five actual emitted GLBs pass official Khronos with0errors/5warnings/2infos.
+Private Release scope only: no new sanitizer/ALL/XR/Wayland/physical claim and
+no main admission. Main remains44fe. Sourceful per-set/history, measured resizing,
+local-coordinate chunk composition and the full remaining goal stay required.
+
 ## Current isotropic remeshing integrated — 2026-11-06
 
 Main integrates qualified c618c828 on the current direct-upload/input foundation.
