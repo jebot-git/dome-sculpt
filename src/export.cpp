@@ -342,6 +342,17 @@ static GltfDocument make_gltf_impl(const std::vector<ObjectSurface> &input_objec
       }
       retained_paint_sets.back()=coordinate;
     }
+    if(bundles[object_index]){
+      const auto coordinate=[&](const std::vector<std::array<float,2>>&values)->unsigned{
+        if(values.size()!=mesh.positions.size())throw std::invalid_argument("Compiled texture-set coordinate domain differs from its one emitted geometry");
+        if(values==mesh.uv)return 0;
+        if(attributes.contains("TEXCOORD_1")&&values==emitted_uv1)return 1;
+        for(const auto&[set,existing]:emitted_extra_uv)if(values==existing)return set;
+        unsigned set=1;while(set<8&&attributes.contains("TEXCOORD_"+std::to_string(set)))++set;if(set==8)throw std::length_error("Texture-set export has no free genuine glTF coordinate domain");
+        begin=data.size();for(auto uv:values){checkpoint();floats(uv);}attributes["TEXCOORD_"+std::to_string(set)]=add(begin,data.size()-begin,34962,mesh.positions.size(),5126,"VEC2");emitted_extra_uv[set]=values;return set;
+      };
+      const auto&bundle=*bundles[object_index];if(!bundle.paint_coordinates.empty())retained_paint_sets.back()=coordinate(bundle.paint_coordinates);if(!bundle.normal_coordinates.empty())retained_normal_sets.back()=coordinate(bundle.normal_coordinates);
+    }
     bool uv_gap=false;
     for(unsigned coordinate=0;coordinate<8;++coordinate) {
       if(!attributes.contains("TEXCOORD_"+std::to_string(coordinate)))uv_gap=true;
@@ -638,7 +649,7 @@ static GltfDocument make_gltf_impl(const std::vector<ObjectSurface> &input_objec
       stop();const auto&field=bundle.fields[f];auto primitive=base;auto accessor=index_template;
       accessor["count"]=field.count;accessor["byteOffset"]=field.first*sizeof(uint32_t);
       int index=first_accessor;if(f){index=int(j["accessors"].size());j["accessors"].push_back(std::move(accessor));}else j["accessors"][index]=std::move(accessor);
-      primitive["indices"]=index;
+      primitive["indices"]=index;primitive["extras"]["dome_sculpt_texture_set"]={{"id",field.set},{"name",field.name}};
       if(f){const int material=append_material(field.material,false);primitive["material"]=material;extra_materials.push_back({i,f,material});}
       primitives.push_back(std::move(primitive));
     }
@@ -707,7 +718,7 @@ static GltfDocument make_gltf_impl(const std::vector<ObjectSurface> &input_objec
     }
     return info;
   };
-  auto write_textures=[&](const ObjectSurface&object,size_t i,int material_id){
+  auto write_textures=[&](const ObjectSurface&object,size_t i,int material_id,bool compiled_paint=false,bool compiled_role=false){
     if(!object.textures)return;
     if(!j["meshes"][result.objects[i].mesh]["primitives"][0]["attributes"].contains("TEXCOORD_0")) throw std::invalid_argument("Textured meshes require UV coordinates");
     for(size_t coordinate=0;coordinate<8;++coordinate)uv_available[coordinate]=j["meshes"][result.objects[i].mesh]["primitives"][0]["attributes"].contains("TEXCOORD_"+std::to_string(coordinate));
@@ -748,12 +759,17 @@ static GltfDocument make_gltf_impl(const std::vector<ObjectSurface> &input_objec
       if(!maps.normal.rgba.empty()&&!(maps.normal_projection&&maps.normal_projection->version==2)) material["normalTexture"]={{"index",texture(maps.normal,sampler)}};
       material["emissiveTexture"]={{"index",texture(maps.emission,emission_sampler)}};
       material["emissiveFactor"]={1,1,1};
-      if(object.paint_sampling_attachment) {
+      if(object.paint_sampling_attachment||compiled_paint) {
         const auto coordinate=retained_paint_sets.at(i);
         const auto &attributes=j["meshes"][result.objects[i].mesh]["primitives"][0]["attributes"];
         if(!attributes.contains("TEXCOORD_"+std::to_string(coordinate)))throw std::logic_error("Compiled paint coordinate accessor is missing");
         if(coordinate)for(auto *info:{&pbr["baseColorTexture"],&pbr["metallicRoughnessTexture"],&material["occlusionTexture"],&material["emissiveTexture"]})(*info)["texCoord"]=coordinate;
       }
+    }
+    if(compiled_role&&!maps.normal.rgba.empty()){
+      const auto coordinate=retained_normal_sets.at(i);const auto&attributes=j["meshes"][result.objects[i].mesh]["primitives"][0]["attributes"];
+      if(!attributes.contains("TEXCOORD_"+std::to_string(coordinate)))throw std::logic_error("Compiled texture-set normal role accessor is missing");
+      if(coordinate)material["normalTexture"]["texCoord"]=coordinate;material["normalTexture"]["scale"]=1;
     }
     if(maps.source_maps) {
       const auto &source=*maps.source_maps; source.validate();
@@ -782,11 +798,11 @@ static GltfDocument make_gltf_impl(const std::vector<ObjectSurface> &input_objec
       material["normalTexture"]["scale"]=1;
     }
   };
-  for(size_t i=0;i<objects.size();++i)write_textures(object_at(i),i,result.objects[i].material);
+  for(size_t i=0;i<objects.size();++i)write_textures(object_at(i),i,result.objects[i].material,bundles[i]&&!bundles[i]->paint_coordinates.empty(),bundles[i]&&bundles[i]->fields.front().normal_role);
   for(const auto&extra:extra_materials){
     stop();const auto&field=bundles[extra.object]->fields[extra.field];ObjectSurface material_view;
     material_view.material=field.material;material_view.textures=field.textures;
-    write_textures(material_view,extra.object,extra.material);
+    write_textures(material_view,extra.object,extra.material,!bundles[extra.object]->paint_coordinates.empty(),field.normal_role);
   }
   return result;
 }
