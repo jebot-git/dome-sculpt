@@ -1,3 +1,32 @@
+## Final integration candidate frozen for matched builds — 2026-11-06
+
+Ready product milestones and repaired test drivers are now composed with main
+a1f99757. Production files remain unchanged from qualified Release83805b87.
+The corrected whole runtime from a9457dc9 passes all eight actual-loader cases,
+99 original checks, against that frozen application; both real GUI profiles pass
+81 checks each with the canonical row28. Original failures remain preserved.
+Read TEXTURE-RESOLUTION-LOADER-WORKFLOWS-838.md and
+SCULPT-INTEGRATION-RELEASE-83805.md for exact scopes.
+
+Fresh whole32-target Release and matching ASan/UBSan on this committed union are
+next, with current native/graphics/GUI/loader/P1 and inherited-role regressions.
+Latest fetched DomeD and clean canonical toolkit source are still341152b; SDKs
+stay frozen. The complete original goal is resumed and incomplete. Main product
+admission, broader production/interoperability/accelerator and controller-drawer
+requirements remain required. No install or physical-headset acceptance.
+
+## Combined Release, Arc and P1 milestone — 2026-11-06
+
+Private83805b87 now passes the fresh32-target build, selected native22+workspace2,
+current inherited35 logical role cases,1727 software+1727 strictArc GL checks,
+56 cross-device image pairs, ten Khronos exports and original P1 inventory with
+warm stroke/exactUndo. Both normal and clamped GUI profiles pass81 each.
+Read [SCULPT-INTEGRATION-RELEASE-83805.md](SCULPT-INTEGRATION-RELEASE-83805.md).
+The first XR fixture has a confirmed menu-reopen timing defect and is being
+repaired without changing product code or expected native endpoints. Corrected
+XR and matching sanitizer union remain pending. Main product admission and the
+complete original goal remain unfinished; work is resumed, not paused.
+
 ## Resumed combined candidate: source frozen for fresh verification — 2026-11-06
 
 The complete original goal is resumed, with current milestone integration first.
