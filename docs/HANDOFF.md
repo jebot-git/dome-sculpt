@@ -1,3 +1,16 @@
+## Balanced39/40 appearance source checkpoint — 2026-11-06
+
+This sparse child of closed12c adds an unexecuted self-contained mixed39/40
+regression with balanced actor sizes, real primary/additional face identities,
+actual before N/T/W and retained UVs, and independent binary64 geometry/pixel/
+normal/GGX expectations. Final syntax against actual roote412 headers passes
+with629 protected inputs unchanged; no executable/link/runtime result follows.
+Arithmetic-only sensitivity analysis is separate from product tests. Read
+BALANCED-POLYGON-TEXTURE-APPEARANCE-WIP.md and its pinned source receipt. Root
+must register and execute the consumer on its coherent fresh providers after
+its live gate closes. No public layout/guard or qualified12c tree changed;
+full production, appearance, interoperability, SAN/device and drawers remain.
+
 
 ## Initial owning39 actual application and GL workflow — 2026-11-06
 
