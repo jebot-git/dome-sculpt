@@ -27,7 +27,7 @@ uint64_t add_sets(Scene&s){
  initialize_texture_sets(s,id,m,fields,std::array<TextureSetId,2>{0,1});select_texture_set(s,id,1);return id;
 }
 void owners(const Scene&s,uint64_t field,uint64_t sets){
- const auto&o=s.object(field);const auto&owner=o.material_bindings->polygon_surface_transfer;check(owner&&owner->matches_current(*o.painted)&&o.polygon->origin==owner->before(),"Mixed Scene40 retains the real39 current Paint, material field and exact before-root alias");
+ const auto&o=s.object(field);check(bool(o.material_bindings),"Mixed actor retains its actual material-binding owner");const auto&owner=o.material_bindings->polygon_surface_transfer;check(owner&&owner->matches_current(*o.painted)&&o.polygon->origin==owner->before(),"Mixed Scene40 retains the real39 current Paint, material field and exact before-root alias");
  check(owner->before()->paint->has_physical_emission(),"The nested39 before graph retains actual FLOAT paint planes");const auto&multi=s.object(sets);check(multi.texture_sets&&multi.texture_sets->active()==1&&multi.painted->mesh_owner()==multi.texture_sets->at(1).painted->mesh_owner(),"Independent40 fields retain genuine object/set identity and one actual geometry owner");
 }
 void mixed(){
@@ -45,6 +45,14 @@ void mixed(){
   check(hit&&frame.surface->picking->material_identity(hit->triangle)==SurfaceMaterialIdentity{r.object,r.texture_set},"Mixed actual ray preserves object/set material identity and logical range ownership");
  }
  check(field_range&&set_ranges==2,"Mixed publication neither drops39 nor collapses40 onto the primary material");
+ auto nested=wire;const auto&genuine_field=wire.at("objects")[0].at("painted");nested["objects"][1]["texture_sets"]["additional"][0]["painted"]["payload"]=genuine_field;
+ refuses([&]{Scene::decode(nested);},"A real39 Paint6 nested under Paint7 cannot borrow a different object's material/source authority");
+ nested=wire;nested["objects"][1]["texture_sets"]["additional"][0]["material_bindings"]=wire.at("objects")[0].at("material_bindings");
+ refuses([&]{Scene::decode(nested);},"An injected nested material edge cannot bypass genuine per-set source ownership or graph walks");
+ nested=wire;nested["texture_set_geometry"]["topologies"][0]["mesh"]=nested["texture_set_geometry"]["meshes"].size();
+ refuses([&]{Scene::decode(nested);},"Outer40 version and real39 nodes cannot authorize a foreign actual texture-set geometry reference");
+ nested=wire;for(auto&object:nested["objects"])object["texture_sets"]=nullptr;
+ refuses([&]{Scene::decode(nested);},"Larger outer40 number with an orphan geometry table cannot grant mixed-field capability");
  auto bad=wire;bad["version"]=39;refuses([&]{Scene::decode(bad);},"Outer39 cannot conceal an actual40 material collection");bad=wire;bad.erase("polygon_surfaces");refuses([&]{Scene::decode(bad);},"Outer40 cannot discard the actual39 owning recipe pool");
  bad=wire;bad["polygon_surfaces"]["nodes"][0]["before_origin"]=bad["polygon_sources"]["origins"].size();refuses([&]{Scene::decode(bad);},"Mixed40 cannot borrow an out-of-range39 before owner");bad=wire;bad["objects"][0]["painted"]["node"]=bad["polygon_surfaces"]["nodes"].size();refuses([&]{Scene::decode(bad);},"Mixed40 Paint6 remains paired to its own actual material field node");
  auto before_only=scene.snapshot();auto authority=std::make_shared<PolygonAuthority>();authority->origin=capture_polygon_origin(scene,field_id);auto&shell=before_only.object(field_id);shell.mesh_active=false;shell.painted.reset();shell.material_bindings.reset();shell.deformation.reset();shell.appearance.reset();shell.retopology.reset();shell.shape_source.reset();shell.rig_source.reset();shell.bake_recipe.reset();shell.polygon=authority;
