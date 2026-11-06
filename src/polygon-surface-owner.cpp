@@ -55,10 +55,12 @@ SourceDomain source_domain(const PolygonOrigin&o,const PolygonSurfaceTransferLim
  // A real normal-free native UV retention already owns a version1 original
  // paint basis and ordered source corners. Keep that strong owner in before;
  // paint_domain composes its exact correspondence into the current domain3.
+ // Native KeepPaint requires sampling_reparameterized=true for its before
+ // binding. The new current polygon binding separately requires false.
  // No normal/artist/prepared role is authorized by this paint-only adapter.
  if(binding&&binding->native_paint_sampling){
   const auto &native=binding->native_paint_sampling;
-  if(field||binding->has_mtoon||binding->native_paint_frames||binding->normal_frames||binding->canonical_attributes||binding->canonical_uv||binding->canonical_paint_sampling||binding->normal_preparation||binding->color_preparation||binding->key_derivation||binding->normal_frame!=SourceMaterialNormalFrame::UvDerivative||binding->sampling_reparameterized||!native->valid_owner(native)||!o.paint->paint_sampling_domain()||o.paint->paint_sampling_domain()->version()!=1)
+  if(field||binding->has_mtoon||binding->native_paint_frames||binding->normal_frames||binding->canonical_attributes||binding->canonical_uv||binding->canonical_paint_sampling||binding->normal_preparation||binding->color_preparation||binding->key_derivation||binding->normal_frame!=SourceMaterialNormalFrame::UvDerivative||!binding->sampling_reparameterized||!native->valid_owner(native)||!o.paint->paint_sampling_domain()||o.paint->paint_sampling_domain()->version()!=1)
    throw std::invalid_argument("Polygon native UV field requires its genuine normal-free paint-only source adapter");
   for(const auto &role:binding->roles)if(role.image)throw std::invalid_argument("Polygon native UV field cannot borrow an independently typed image role");
   PaintSamplingLimits native_limits;native_limits.max_vertices=l.geometry.maximum_vertices;native_limits.max_triangles=l.geometry.maximum_faces;native_limits.max_work=l.geometry.maximum_work;native_limits.max_working_bytes=l.maximum_working_bytes;native_limits.max_basis_bytes=std::min(size_t(128*1024*1024),native_limits.max_working_bytes);native_limits.cancelled=l.geometry.cancelled;

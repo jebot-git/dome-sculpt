@@ -1,0 +1,212 @@
+{
+  "state": "PASS focused optimized Release; fresh whole32/application not claimed",
+  "base": "2228dab806ef45ad1381f9795ff7eb4dd1adca2d",
+  "product_delta": "Require native sampling_reparameterized=true on actual native before owner; current polygon false guard unchanged",
+  "fixture_delta": [
+    "explicit true-before/false-current and cleared-flag control",
+    "stable objectID across atomic collection Scene publication",
+    "actual integer JSON array indices; original independent validation retained"
+  ],
+  "native_ctest": {
+    "passed": 8,
+    "total": 8,
+    "log": "/tmp/dome-sculpt-source-export-repair-2228/logs/native8.v4.log",
+    "sha256": "f32f5886fc9a99add106b574f069969d7d38141eb09b893f2b1c028aca744bb9"
+  },
+  "explicit_export": {
+    "controls": 655,
+    "log": "/tmp/dome-sculpt-source-export-repair-2228/logs/source-export-explicit.v4.log",
+    "sha256": "72ee707febb3b1cc313a5ffce2ba467457d59d097ce3835e16a566b9134f3fc0",
+    "independent_consumer": "cgltf parse_file/load_buffers/validate for each of5actualGLBs"
+  },
+  "exact_glb_pairs": {
+    "native-sheared.glb": {
+      "ctest_sha256": "4859022987b4e98a8a23818983da74e5675beb745a51e91d25918c55706b9c46",
+      "explicit_sha256": "4859022987b4e98a8a23818983da74e5675beb745a51e91d25918c55706b9c46"
+    },
+    "native-reflected.glb": {
+      "ctest_sha256": "732d3aaf84d2778124b4617c874a943bf48189b3f6aa320a996de3efb9bfdccf",
+      "explicit_sha256": "732d3aaf84d2778124b4617c874a943bf48189b3f6aa320a996de3efb9bfdccf"
+    },
+    "prepared-sheared.glb": {
+      "ctest_sha256": "acb2207643b6ef5aaea9662b674c066e3e090ff204259a1bad0f543573b0911f",
+      "explicit_sha256": "acb2207643b6ef5aaea9662b674c066e3e090ff204259a1bad0f543573b0911f"
+    },
+    "prepared-reflected.glb": {
+      "ctest_sha256": "77f6cb627d368e480a59456864ad6f7e7d19d4aea4823533ebbf6b11920bad27",
+      "explicit_sha256": "77f6cb627d368e480a59456864ad6f7e7d19d4aea4823533ebbf6b11920bad27"
+    },
+    "native-smooth.glb": {
+      "ctest_sha256": "4062ff92ef560492cc9c36708bacbade66489158bdc7cd6feec1f7f50a6609d5",
+      "explicit_sha256": "4062ff92ef560492cc9c36708bacbade66489158bdc7cd6feec1f7f50a6609d5"
+    }
+  },
+  "status": {
+    "path": "/home/blux/de-xr/dome-sculpt/artifacts/texture-source-export-fix-2228/artifacts/source-export-component/status-v4.json",
+    "sha256": "c228a61fe54601766ec18411917bfda23667ef5e26d10f52f5b0d59a2b9d3988",
+    "receipt": {
+      "state": "terminal",
+      "pid": 2435023,
+      "base": "2228dab806ef45ad1381f9795ff7eb4dd1adca2d",
+      "scope": "Same corrected component owner/core +eight whole consumers; whole fixture TU retains stable objectID and uses exact integer JSON indices for emitted arrays; every numeric/buffer/cgltf check retained; v1 resource/v2 runtime failures retained",
+      "pins": 6079,
+      "steps": [
+        {
+          "name": "compile-export-fixture",
+          "args": [
+            "/usr/bin/c++",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/sculpt-authoring-5301/src",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/sculpt-authoring-5301/third_party/cgltf",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/sculpt-authoring-5301/include",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/sculpt-authoring-5301/third_party/openbrush",
+            "-I/home/blux/de-xr/dome-sculpt/artifacts/sculpt-authoring-5301/third_party/nlohmann",
+            "-O3",
+            "-DNDEBUG",
+            "-ffunction-sections",
+            "-fdata-sections",
+            "-std=gnu++20",
+            "-o",
+            "/tmp/dome-sculpt-source-export-repair-2228/obj/dome-sculpt-texture-set-source-export-test.o",
+            "-c",
+            "/home/blux/de-xr/dome-sculpt/artifacts/texture-source-export-fix-2228/tests/texture-set-source-export.cpp"
+          ],
+          "exit": 0,
+          "seconds": 3.534171820967458,
+          "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "name": "link-export-fixture",
+          "args": [
+            "python3",
+            "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-authoring-5301/artifacts/integration-2228-release/guard.py",
+            "/usr/bin/c++",
+            "-O3",
+            "-DNDEBUG",
+            "-ffunction-sections",
+            "-fdata-sections",
+            "-Wl,--gc-sections",
+            "-Wl,--dependency-file=/tmp/dome-sculpt-source-export-repair-2228/dome-sculpt-texture-set-source-export-test.v4.link.d",
+            "/tmp/dome-sculpt-source-export-repair-2228/obj/dome-sculpt-texture-set-source-export-test.o",
+            "-o",
+            "/tmp/dome-sculpt-source-export-repair-2228/bin/dome-sculpt-texture-set-source-export-test",
+            "/tmp/dome-sculpt-source-export-repair-2228/libdome-sculpt-core.a",
+            "libdome-sculpt-affine.a",
+            "/usr/lib64/liblapacke.so",
+            "libdome-sculpt-polygon.a",
+            "libxatlas.a",
+            "libmikktspace.a",
+            "libmikktspace-robust.a",
+            "libufbx.a",
+            "/usr/lib64/libpng.so",
+            "/usr/lib64/libjpeg.so",
+            "/usr/lib64/libz.so",
+            "libdome-sculpt-emission-codec.a",
+            "/usr/lib64/libOpenEXR-3_2.so",
+            "/usr/lib64/libOpenEXRUtil-3_2.so",
+            "/usr/lib64/libOpenEXRCore-3_2.so",
+            "/usr/lib64/libIex-3_2.so",
+            "/usr/lib64/libIlmThread-3_2.so",
+            "/usr/lib64/libImath-3_1.so",
+            "-lgcc_s_asneeded",
+            "-lgcc_s_asneeded",
+            "-Wl,-t,-t"
+          ],
+          "exit": 0,
+          "seconds": 0.4044408400077373,
+          "log_sha256": "0092f4d69337160b32785ad2923bb41d896febc5e7eb47b8a51733c6bc595610"
+        },
+        {
+          "name": "native8",
+          "args": [
+            "ctest",
+            "--test-dir",
+            "/tmp/dome-sculpt-source-export-repair-2228/runtime",
+            "--output-on-failure"
+          ],
+          "exit": 0,
+          "seconds": 1.4154634959995747,
+          "log_sha256": "f32f5886fc9a99add106b574f069969d7d38141eb09b893f2b1c028aca744bb9"
+        },
+        {
+          "name": "source-export-explicit",
+          "args": [
+            "/tmp/dome-sculpt-source-export-repair-2228/bin/dome-sculpt-texture-set-source-export-test",
+            "/tmp/dome-sculpt-source-export-repair-2228/runtime/explicit-source-export"
+          ],
+          "exit": 0,
+          "seconds": 0.5060038859955966,
+          "log_sha256": "72ee707febb3b1cc313a5ffce2ba467457d59d097ce3835e16a566b9134f3fc0"
+        }
+      ],
+      "allocated_bytes": 171503616,
+      "phase": "source-export-explicit",
+      "child_pid": null,
+      "exit": 0,
+      "input_drift": [],
+      "seconds": 6.485583670029882
+    }
+  },
+  "whole_provider_method": {
+    "changed_provider_tus": 1,
+    "whole_test_tus": 8,
+    "new_elves": 8,
+    "old_owner_member_excluded": true,
+    "source_headers_layout_change": false,
+    "original_outputs_pinned": 312
+  },
+  "source_reflink": {
+    "base": "2228dab806ef45ad1381f9795ff7eb4dd1adca2d",
+    "method": "cp -a --reflink=always --parents of all tracked files; independent worktree index, independent inodes; no ordinary full source checkout/copy",
+    "files": 2673,
+    "independent_inodes": true,
+    "workspace_free_before": 21775183872,
+    "workspace_free_after": 21775011840
+  },
+  "source_hashes": {
+    "src/polygon-surface-owner.cpp": "287bf08458e849ce8666e4e8105e13fbbad5f218a21567620bc63a0c74d701a3",
+    "tests/texture-set-source-export.cpp": "8674606c901bdf29a6b5d4657eff2d75f5c64202d708c8741bca61638d86ec09"
+  },
+  "previous_failures": {
+    "resource-failure-closure.json": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/texture-source-export-fix-2228/artifacts/source-export-component/resource-failure-closure.json",
+      "sha256": "c2fce011dc1cbb6d5a295c8658780381afdb7eea3434c419647503865aecade5"
+    },
+    "status-v2.json": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/texture-source-export-fix-2228/artifacts/source-export-component/status-v2.json",
+      "sha256": "4ec33d73cb46bdc8f82cf6410f2c31a3e2a5a6b95bb78a7fef67b4b6f06f5a28"
+    },
+    "preserved-v2.json": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/texture-source-export-fix-2228/artifacts/source-export-component/preserved-v2.json",
+      "sha256": "7a83640946d1959460bb3af13561f9da574888d1e8efae45508e3abc0b6b6f6d"
+    },
+    "status-v3.json": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/texture-source-export-fix-2228/artifacts/source-export-component/status-v3.json",
+      "sha256": "b4237f7d97e4b3f96d4d1df81ac4c7db592673e7b9954868728fb9d24ce1817b"
+    },
+    "preserved-v3.json": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/texture-source-export-fix-2228/artifacts/source-export-component/preserved-v3.json",
+      "sha256": "20990c703b341ae1160f4dde37726ba1d432ca4616c51bdf5628002314d30ab5"
+    }
+  },
+  "map_restore_manifest": {
+    "path": "/home/blux/de-xr/dome-sculpt/artifacts/texture-source-export-fix-2228/artifacts/source-export-component/maps-lossless.json",
+    "sha256": "ad827902498555795b47b17d8bbdac1d284d2c5acc58ebd284095b3d82c9d0d3",
+    "records": 7,
+    "actual_original_path_restoration_verified": true
+  },
+  "limits": {
+    "tmp_cap": 268435456,
+    "serial_prospective": 67108864,
+    "actual_final": 171503616,
+    "workspace_free_floor": 21692940288,
+    "workspace_metadata_cap": 16777216
+  },
+  "remaining": [
+    "fresh whole32 current-source Release/native/GL/application",
+    "matching sanitizer",
+    "GUI/actual-loader",
+    "authenticated hardware",
+    "main admission",
+    "full goal"
+  ]
+}
