@@ -6,7 +6,7 @@
 #include <optional>
 namespace dome {
 // Shared page registry:18 procedural,19/22 polygon,20 holding,21/23 import.
-inline constexpr int spatial_page_count=31; //25 projection;26 preview;27 rig fitting;28 export;29 expressions;30 emission.
+inline constexpr int spatial_page_count=32; //25 projection;26 preview;27 rig fitting;28 export;29 expressions;30 emission;31 material texture sets.
 inline constexpr int spatial_max_page=spatial_page_count-1;
 enum class DeviceKind { Controller, SpatialStylus };
 enum class SpatialCommand {
@@ -99,8 +99,10 @@ enum class SpatialCommand {
   ExportEditableAvatar256=4100, ExportEditableAvatar512, ExportEditableAvatar1024,
   ExpressionBegin=6144, ExpressionPrevious, ExpressionNext, ExpressionDecrease,
   ExpressionIncrease, ExpressionReset, ExpressionApply, ExpressionCancel,
-  EmissionRelative=16384, EmissionPhysical, EmissionBlack
+  EmissionRelative=16384, EmissionPhysical, EmissionBlack,
+  TexturePrevious=32768, TextureNext, TexturePickFaces, TextureClearFaces, TextureCreate, TextureAssign
 };
+inline bool texture_set_command(SpatialCommand c){return c>=SpatialCommand::TexturePrevious&&c<=SpatialCommand::TextureAssign;}
 inline bool editable_export_command(SpatialCommand c){return c>=SpatialCommand::ExportEditable256&&c<=SpatialCommand::ExportEditable1024;}
 inline bool expression_command(SpatialCommand c){return c>=SpatialCommand::ExpressionBegin&&c<=SpatialCommand::ExpressionCancel;}
 inline bool editable_avatar_export_command(SpatialCommand c){return c>=SpatialCommand::ExportEditableAvatar256&&c<=SpatialCommand::ExportEditableAvatar1024;}

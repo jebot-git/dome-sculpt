@@ -15,8 +15,10 @@
 #include "raw-source-emission.hpp"
 #include "native-authoring-compiler.hpp"
 #include "normal-frame-export.hpp"
+#include "vrm1-normal-export.hpp"
 #include "prepared-color-state.hpp"
 #include "current-colors.hpp"
+#include "texture-set-export.hpp"
 #include "bone-metadata.hpp"
 #include "humanoid-placement.hpp"
 #include <bit>
@@ -62,7 +64,8 @@ GltfExportReport export_glb(const std::vector<ObjectSurface> &objects,
 namespace detail {
 static GltfDocument make_gltf_impl(const std::vector<ObjectSurface> &input_objects,
     SourceMorphSpace source_space,bool recompute_changed_normals,std::function<bool()> cancelled,
-    const NativeAuthoringCapture *raw_authority,const EmissionExportPrepared *physical) {
+    const NativeAuthoringCapture *raw_authority,const EmissionExportPrepared *physical,
+    const Vrm1AuthoringCompilation *normal_owner) {
   auto stop=[&]{if(cancelled && cancelled())throw std::runtime_error("glTF export cancelled");};
   size_t work=0;auto checkpoint=[&]{if((++work&1023)==0)stop();};
   stop();
@@ -81,6 +84,17 @@ static GltfDocument make_gltf_impl(const std::vector<ObjectSurface> &input_objec
   const auto &objects=input_objects;
   if (objects.empty() || objects.size()>256)
     throw std::invalid_argument("The scene has no visible surface to export");
+
+  std::vector<std::optional<TextureSetExport>> bundles(objects.size());
+  size_t bundle_working_bytes=0;
+  for(size_t i=0;i<objects.size();++i)if(objects[i].texture_set_surface){
+    TextureSetLimits limits;limits.cancelled=cancelled;
+    if(bundle_working_bytes>=limits.maximum_bytes)throw std::length_error("Aggregate texture-set export budget exhausted");
+    limits.maximum_bytes-=bundle_working_bytes;
+    bundles[i]=compile_texture_set_export(objects[i],limits);
+    bundle_working_bytes+=bundles[i]->working_bound;
+  }
+  auto object_at=[&](size_t i)->const ObjectSurface&{return bundles[i]?bundles[i]->surface:objects[i];};
 
   for(const auto &object:objects)if(object.source_dormant)
     throw std::invalid_argument("Source attributes are dormant for "+object.name+
@@ -175,7 +189,17 @@ static GltfDocument make_gltf_impl(const std::vector<ObjectSurface> &input_objec
   // Compiled coordinate bindings are not native PaintSourceTexture authority.
   std::vector<unsigned> retained_normal_sets;retained_normal_sets.reserve(objects.size());
   std::vector<unsigned> retained_paint_sets;retained_paint_sets.reserve(objects.size());
-  for (const auto &input : objects) {
+  auto append_material=[&](const Material&m,bool vertex_alpha){
+    m.validate();const int id=int(j["materials"].size());
+    j["materials"].push_back({{"name",m.name},{"pbrMetallicRoughness",{{"baseColorFactor",m.color},{"metallicFactor",m.metallic},{"roughnessFactor",m.roughness}}},{"emissiveFactor",m.emissive},{"doubleSided",m.double_sided},{"alphaMode",m.color[3]<1||vertex_alpha?"BLEND":"OPAQUE"}});
+    auto&encoded=j["materials"].back();
+    if(m.alpha!=Material::AlphaMode::Automatic)encoded["alphaMode"]=m.alpha==Material::AlphaMode::Mask?"MASK":m.alpha==Material::AlphaMode::Blend?"BLEND":"OPAQUE";
+    if(m.alpha==Material::AlphaMode::Mask)encoded["alphaCutoff"]=m.alpha_cutoff;
+    if(m.unlit){encoded["extensions"]["KHR_materials_unlit"]=nlohmann::json::object();auto&used=j["extensionsUsed"];if(!used.is_array())used=nlohmann::json::array();if(std::find(used.begin(),used.end(),"KHR_materials_unlit")==used.end())used.push_back("KHR_materials_unlit");}
+    return id;
+  };
+  for (size_t object_index=0;object_index<objects.size();++object_index) {
+    const auto&input=object_at(object_index);
     stop();
     retained_normal_sets.push_back(0);retained_paint_sets.push_back(0);
     auto validated_colors=detail::current_vertex_colors(input,cancelled);
@@ -187,7 +211,7 @@ static GltfDocument make_gltf_impl(const std::vector<ObjectSurface> &input_objec
     if(input.material_bindings&&input.material_bindings->color_preparation)
       input.material_bindings->color_preparation->validate_current(input.mesh,input.appearance.get(),cancelled);
     std::optional<NormalFrameExport> prepared;
-    if(input.material_bindings && input.material_bindings->normal_frames)prepared=normal_frame_export(input,source_space,cancelled,source_space==SourceMorphSpace::Native);
+    if(input.material_bindings && input.material_bindings->normal_frames)prepared=normal_owner?normal_frame_export_vrm1(*normal_owner,input,cancelled):normal_frame_export(input,source_space,cancelled,source_space==SourceMorphSpace::Native);
     else if(input.material_bindings&&input.material_bindings->native_paint_sampling)prepared=native_paint_export(input,source_space,cancelled);
     const auto &o=prepared?prepared->surface:input;auto *frame=prepared?&*prepared:nullptr;
     GltfObjectIdentity emission;
@@ -236,7 +260,7 @@ static GltfDocument make_gltf_impl(const std::vector<ObjectSurface> &input_objec
       begin=data.size();for(const auto &color:current_colors)floats(color);
       attributes["COLOR_0"]=add(begin,data.size()-begin,34962,current_colors.size(),5126,"VEC4");
     }
-    std::vector<Tangent> tangents=frame?frame->tangents:std::vector<Tangent>{};
+    std::vector<Tangent> tangents=frame?frame->tangents:bundles[object_index]?bundles[object_index]->tangents:std::vector<Tangent>{};
     if(auto source=frame?frame->source:source_attributes->source()) {
       const auto &a=*o.appearance;
       auto attribute=[&](const auto &values,const char *name,const char *type) {
@@ -594,15 +618,7 @@ static GltfDocument make_gltf_impl(const std::vector<ObjectSurface> &input_objec
     }
     if (data.size() > 256 * 1024 * 1024)
       throw std::length_error("glTF geometry resource limit exceeded");
-    j["materials"].push_back(
-        {{"name", m.name},
-         {"pbrMetallicRoughness",
-          {{"baseColorFactor", m.color},
-           {"metallicFactor", m.metallic},
-           {"roughnessFactor", m.roughness}}},
-         {"emissiveFactor", m.emissive},
-         {"doubleSided", m.double_sided},
-         {"alphaMode", m.color[3] < 1 || vertex_alpha ? "BLEND" : "OPAQUE"}});
+    append_material(m,vertex_alpha);
     // A native paint coordinate expansion has no artist normal-frame owner.
     // Only the real frame-backed route carries this deformation policy receipt.
     if(frame&&o.material_bindings&&o.material_bindings->normal_frames) {
@@ -611,17 +627,20 @@ static GltfDocument make_gltf_impl(const std::vector<ObjectSurface> &input_objec
       for(auto id:o.material_bindings->normal_frames->current_targets)extra["frameTargetIds"].push_back(std::to_string(id));
     }
     result.objects.push_back(std::move(emission));
-    auto &encoded = j["materials"].back();
-    if (m.alpha != Material::AlphaMode::Automatic)
-      encoded["alphaMode"] = m.alpha == Material::AlphaMode::Mask ? "MASK" :
-                             m.alpha == Material::AlphaMode::Blend ? "BLEND" : "OPAQUE";
-    if (m.alpha == Material::AlphaMode::Mask) encoded["alphaCutoff"] = m.alpha_cutoff;
-    if (m.unlit) {
-      encoded["extensions"]["KHR_materials_unlit"] = nlohmann::json::object();
-      auto &used = j["extensionsUsed"];
-      if (!used.is_array()) used = nlohmann::json::array();
-      if (std::find(used.begin(), used.end(), "KHR_materials_unlit") == used.end())
-        used.push_back("KHR_materials_unlit");
+  }
+  struct ExtraMaterial {size_t object,field;int material;};
+  std::vector<ExtraMaterial>extra_materials;
+  for(size_t i=0;i<objects.size();++i)if(bundles[i]){
+    stop();const auto&bundle=*bundles[i];auto&primitives=j["meshes"][result.objects[i].mesh]["primitives"];
+    const auto base=primitives.at(0);const int first_accessor=base.at("indices");const auto index_template=j["accessors"].at(first_accessor);
+    primitives=nlohmann::json::array();
+    for(size_t f=0;f<bundle.fields.size();++f){
+      stop();const auto&field=bundle.fields[f];auto primitive=base;auto accessor=index_template;
+      accessor["count"]=field.count;accessor["byteOffset"]=field.first*sizeof(uint32_t);
+      int index=first_accessor;if(f){index=int(j["accessors"].size());j["accessors"].push_back(std::move(accessor));}else j["accessors"][index]=std::move(accessor);
+      primitive["indices"]=index;
+      if(f){const int material=append_material(field.material,false);primitive["material"]=material;extra_materials.push_back({i,f,material});}
+      primitives.push_back(std::move(primitive));
     }
   }
   // Images are shared independently of samplers and texture-coordinate transforms.
@@ -688,13 +707,14 @@ static GltfDocument make_gltf_impl(const std::vector<ObjectSurface> &input_objec
     }
     return info;
   };
-  for(size_t i=0;i<objects.size();++i) if(objects[i].textures) {
-    if(objects[i].mesh.uv.empty()) throw std::invalid_argument("Textured meshes require UV coordinates");
+  auto write_textures=[&](const ObjectSurface&object,size_t i,int material_id){
+    if(!object.textures)return;
+    if(!j["meshes"][result.objects[i].mesh]["primitives"][0]["attributes"].contains("TEXCOORD_0")) throw std::invalid_argument("Textured meshes require UV coordinates");
     for(size_t coordinate=0;coordinate<8;++coordinate)uv_available[coordinate]=j["meshes"][result.objects[i].mesh]["primitives"][0]["attributes"].contains("TEXCOORD_"+std::to_string(coordinate));
-    const auto &maps=*objects[i].textures;
-    const bool prepared_color=detail::prepared_color_state(objects[i].material_bindings.get(),&maps);
-    detail::prepared_normal_state(objects[i].material_bindings.get(),&maps);
-    auto &material=j["materials"][i]; auto &pbr=material["pbrMetallicRoughness"];
+    const auto &maps=*object.textures;
+    const bool prepared_color=detail::prepared_color_state(object.material_bindings.get(),&maps);
+    detail::prepared_normal_state(object.material_bindings.get(),&maps);
+    auto &material=j["materials"][material_id]; auto &pbr=material["pbrMetallicRoughness"];
     if(maps.source_only) {
       auto present=[](const Image &image){return image.width || image.height || !image.rgba.empty();};
       if(!maps.source_maps || present(maps.color) || present(maps.metal_rough) || present(maps.emission) || present(maps.normal) || present(maps.color_coverage) || maps.baked_base || present(maps.baked_normal) || present(maps.baked_coverage) || present(maps.emission_coverage)||present(maps.mtoon_normal)||maps.normal_projection)
@@ -728,7 +748,7 @@ static GltfDocument make_gltf_impl(const std::vector<ObjectSurface> &input_objec
       if(!maps.normal.rgba.empty()&&!(maps.normal_projection&&maps.normal_projection->version==2)) material["normalTexture"]={{"index",texture(maps.normal,sampler)}};
       material["emissiveTexture"]={{"index",texture(maps.emission,emission_sampler)}};
       material["emissiveFactor"]={1,1,1};
-      if(objects[i].paint_sampling_attachment) {
+      if(object.paint_sampling_attachment) {
         const auto coordinate=retained_paint_sets.at(i);
         const auto &attributes=j["meshes"][result.objects[i].mesh]["primitives"][0]["attributes"];
         if(!attributes.contains("TEXCOORD_"+std::to_string(coordinate)))throw std::logic_error("Compiled paint coordinate accessor is missing");
@@ -746,14 +766,14 @@ static GltfDocument make_gltf_impl(const std::vector<ObjectSurface> &input_objec
         material["occlusionTexture"]["strength"]=source.occlusion_strength;
       }
     }
-    if(objects[i].material.alpha==Material::AlphaMode::Automatic)
-      material["alphaMode"]=(objects[i].material.color[3]<1 || vertex_transparency[i] ||
+    if(object.material.alpha==Material::AlphaMode::Automatic)
+      material["alphaMode"]=(object.material.color[3]<1 || vertex_transparency[i] ||
           (prepared_color?maps.pbr_transparent:maps.transparent))?"BLEND":"OPAQUE";
     if(result.objects[i].canonical_normal.image) {
       material["normalTexture"]=source_info(result.objects[i].canonical_normal);
       material["normalTexture"]["scale"]=1;
     }
-    if(detail::retained_normal_coordinates(objects[i].material_bindings.get(),&maps)){
+    if(detail::retained_normal_coordinates(object.material_bindings.get(),&maps)){
       material["normalTexture"]=source_info(result.objects[i].prepared_normal);
       const auto coordinate=retained_normal_sets.at(i);
       const auto &attributes=j["meshes"][result.objects[i].mesh]["primitives"][0]["attributes"];
@@ -761,21 +781,27 @@ static GltfDocument make_gltf_impl(const std::vector<ObjectSurface> &input_objec
       if(coordinate)material["normalTexture"]["texCoord"]=coordinate;
       material["normalTexture"]["scale"]=1;
     }
+  };
+  for(size_t i=0;i<objects.size();++i)write_textures(object_at(i),i,result.objects[i].material);
+  for(const auto&extra:extra_materials){
+    stop();const auto&field=bundles[extra.object]->fields[extra.field];ObjectSurface material_view;
+    material_view.material=field.material;material_view.textures=field.textures;
+    write_textures(material_view,extra.object,extra.material);
   }
   return result;
 }
 GltfDocument make_gltf(const std::vector<ObjectSurface> &objects,SourceMorphSpace space,
     bool recompute_changed_normals,std::function<bool()> cancelled) {
-  return make_gltf_impl(objects,space,recompute_changed_normals,std::move(cancelled),nullptr,nullptr);
+  return make_gltf_impl(objects,space,recompute_changed_normals,std::move(cancelled),nullptr,nullptr,nullptr);
 }
 GltfDocument make_gltf_emission(const EmissionExportPrepared &prepared,bool recompute_changed_normals,std::function<bool()> cancelled){
  validate_native_emission_surfaces(prepared,cancelled);
- return make_gltf_impl(prepared.surfaces,SourceMorphSpace::Native,recompute_changed_normals,std::move(cancelled),nullptr,&prepared);
+ return make_gltf_impl(prepared.surfaces,SourceMorphSpace::Native,recompute_changed_normals,std::move(cancelled),nullptr,&prepared,nullptr);
 }
 GltfDocument make_gltf_authoring(const NativeAuthoringCapture &capture,
     const std::vector<ObjectSurface> &objects,bool recompute_changed_normals,
     std::function<bool()> cancelled) {
-  auto document=make_gltf_impl(objects,SourceMorphSpace::Native,recompute_changed_normals,cancelled,&capture,nullptr);
+  auto document=make_gltf_impl(objects,SourceMorphSpace::Native,recompute_changed_normals,cancelled,&capture,nullptr,nullptr);
   auto &j=document.json;
   for(size_t i=0;i<objects.size();++i) {
     if(cancelled&&cancelled())throw std::runtime_error("Raw source emission finish cancelled");
@@ -814,6 +840,11 @@ GltfDocument make_gltf_authoring(const NativeAuthoringCapture &capture,
   }
   return document;
 }
+GltfDocument make_vrm1_authoring_gltf(const Vrm1AuthoringCompilation &owner,
+ const std::function<bool()> &cancelled){
+ return make_gltf_impl(owner.surfaces(),SourceMorphSpace::Native,true,cancelled,nullptr,nullptr,&owner);
+}
+
 } // namespace detail
 void detail::write_glb(GltfDocument document,const std::filesystem::path &path) {
   write_glb(std::move(document),path,{},{});

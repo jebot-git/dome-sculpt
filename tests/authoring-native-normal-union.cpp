@@ -5,11 +5,30 @@
 #include "dome/native-scene-append.hpp"
 #include "dome/native-authoring.hpp"
 #include "native-weight-retention.hpp"
+#include "canonical-paint-sampling.hpp"
+#include "baked-normal-field.hpp"
 #include <fstream>
 namespace {
 std::vector<uint8_t> union_bytes(const std::filesystem::path &path){
  std::ifstream f(path,std::ios::binary);if(!f)throw std::runtime_error("Missing union output");
  return {std::istreambuf_iterator<char>(f),{}};
+}
+bool normal_owner(const SculptObject &o){
+ const auto b=o.material_bindings;
+ check(b&&b->canonical_attributes&&b->canonical_attributes->valid_owner(b->canonical_attributes),
+  "Normal object retains its factory-owned original conversion after append and restart");
+ if(b->canonical_uv)check(b->canonical_uv->valid_owner(b->canonical_uv)&&b->canonical_uv->origin()==b->canonical_attributes,
+  "Retained normal UV has the same authentic conversion root");
+ if(o.painted->baked())check(o.painted->baked()->normal_field&&o.painted->baked()->normal_field->origin()==b->canonical_attributes,
+  "Active normal detail belongs to the original conversion; Clear may release it");
+ const auto p=b->canonical_paint_sampling;
+ if(p){
+  check(p->valid_owner(p)&&p->matches_current(*o.painted)&&p->normal_uv()==b->canonical_uv&&
+    o.painted->paint_sampling_domain()==p->attachment()->domain(),
+    "Current editable paint and normal coordinates retain their separate genuine owners");
+  p->validate_binding(*b);p->validate_current(*o.painted);
+ }
+ return bool(p);
 }
 }
 int main(int argc,char **argv)try{
@@ -28,15 +47,29 @@ int main(int argc,char **argv)try{
   const auto normals=Scene::load(normal_file);const auto normal_exact=normals.encode();
   check(rejects([&]{detail::native_weight_retention_impl::Counter budget(512*1024*1024,500'000'000);budget.material(normals.active().material_bindings);}),
     "Anatomical ownership budget refuses unrepresented authentic canonical roots, including after Clear");
-  check(normal_exact.at("version")==33||normal_exact.at("version")==34,"Normal side owns actual converted/UV/Clear/rebake history");
+  const bool retained_paint=normal_owner(normals.active());
+  check(retained_paint?(normal_exact.at("version")==37&&normal_exact.at("source_materials").at("version")==19):
+    (normal_exact.at("version")==33||normal_exact.at("version")==34),
+    "Normal history format follows its actual conversion and retained writable owner");
   for(bool reverse:{false,true}){
    const auto &destination=reverse?native:normals,&package=reverse?normals:native;
    const auto dst=destination.encode(),src=package.encode();
    auto appended=append_native_scene(destination,package);auto combined=std::move(appended.scene);const auto exact=combined.encode();
    const auto &materials=exact.at("source_materials");
-   check(exact.at("version")==35&&materials.at("version")==17&&materials.at("native_paint_sampling")==true&&materials.at("layered_normals")==true,
-    "Actual native append owns both bounded material graphs in Scene35/material17");
+   const auto normal_object=std::find_if(combined.objects().begin(),combined.objects().end(),[](const auto &o){return o.material_bindings&&o.material_bindings->canonical_attributes;});
+   check(normal_object!=combined.objects().end()&&normal_owner(*normal_object)==retained_paint,
+    "Actual append preserves the normal object's independently owned writable correspondence");
+   check(exact.at("version")== (retained_paint?37:35)&&materials.at("version")== (retained_paint?19:17)&&materials.at("native_paint_sampling")==true&&materials.at("layered_normals")==true,
+    "Actual native append declares the complete native, normal and current paint capabilities");
    check(Scene::decode(exact).encode()==exact,"Independent owning decoder replays all combined paint/normal roots exactly");
+   if(retained_paint)for(int fault=0;fault<5;++fault){auto bad=exact;
+    if(fault==0)bad["version"]=35;
+    if(fault==1)bad["source_materials"]["version"]=17;
+    if(fault==2)bad.erase("canonical_paint");
+    if(fault==3)bad["canonical_paint"]["nodes"][0]["before_origin"]=uint64_t(1)<<32;
+    if(fault==4)for(auto &binding:bad["source_materials"]["bindings"])binding["canonical_paint_sampling"]=nullptr;
+    check(rejects([&]{Scene::decode(bad);}),"Mixed retained paint cannot borrow authority from missing, downgraded or foreign owners");
+   }
    check(destination.encode()==dst&&package.encode()==src,"Successful append leaves both original projects exact");
    const auto prefix=out/std::to_string(number);combined.save(prefix.string()+".dsculpt");
    check(Scene::load(prefix.string()+".dsculpt").encode()==exact,"Combined native file saves and restarts every capability exactly");

@@ -35,7 +35,7 @@ async def main():
   def named(title):
    for w in d.screen().root.query_tree().children:
     try:
-     if title in str(w.get_wm_name() or ''):return w
+     if title in str(w.get_wm_name() or '') and w.get_attributes().map_state==X.IsViewable:return w
     except error.BadWindow:pass
   window=await wait(lambda:named('Dome Sculpt'));window.set_input_focus(X.RevertToParent,X.CurrentTime);d.sync()
   def prop(name):
@@ -95,7 +95,7 @@ async def main():
   await enabled('Start preview');await command('Frame all');await asyncio.sleep(.5);before=model_image('before');(out/'runtime-maps.txt').write_text(Path('/proc/'+str(app.pid)+'/maps').read_text());await command('Start preview');await enabled('Apply static pose');values=await nodes();check(not values['Save'][1].get('enabled',True) and not values['Open...'][1].get('enabled',True),'Actual pending preview disables implicit Save/Open');check(project.read_bytes()==original,'Starting real expression preview preserves project bytes');
   await command('Choose expression...');choice=await wait(lambda:named('Choose VRM1 expression'));visible_dialog(choice,'choose-expression');await command('Close Window');await wait(lambda:named('Choose VRM1 expression') is None);check(project.read_bytes()==original,'Native Close cancels expression selection without a source edit');
   # Use actual original catalog ordering, never manufactured menu IDs.
-  source=(fixture.parent/'source.vrm').read_bytes();import struct;program=json.loads(source[20:20+struct.unpack_from('<I',source,12)[0]])['extensions']['VRMC_vrm']['expressions'];names=[(custom,name) for custom,table in [(False,'preset'),(True,'custom')] for name in sorted(program.get(table,{}))];index=names.index((False,'happy'))
+  source=Path(os.environ.get('DOME_EXPRESSION_ORIGINAL_SOURCE',str(fixture.parent/'source.vrm'))).read_bytes();import struct;program=json.loads(source[20:20+struct.unpack_from('<I',source,12)[0]])['extensions']['VRMC_vrm']['expressions'];names=[(custom,name) for custom,table in [(False,'preset'),(True,'custom')] for name in sorted(program.get(table,{}))];index=names.index((False,'happy'))
   async def select_happy():
    await command('Choose expression...');w=await wait(lambda:named('Choose VRM1 expression'));g=w.get_geometry();row=46 if compact else 34;tap(w,g.width*.5,row*3+row/2);await asyncio.sleep(.15)
    for _ in names:key('Up')

@@ -5,6 +5,8 @@ namespace dome {
 const std::array<const char *, 12> &spatial_labels(int page) {
   static const std::array<const char*,12> emission={"Brush RGB","Brush units","Material radiance","Source factors","Relative / normalize","Physical brush","Brush black","Paint emission","Back","Undo","Redo","Close"};
   if(page==30)return emission;
+  static const std::array<const char*,12> sets={"Previous set","Next set","Pick faces","Clear faces","New from faces","Assign to set","Layer opacity","Material color","Back","Undo","Redo","Save"};
+  if(page==31)return sets;
   static const std::array<const char *,12> exporting={"Strict glTF","Editable 256","Editable 512","Editable 1024","Avatar VRM","Native Save","V1 edit256","Cancel work","Back","Close","V1 edit512","V1 edit1024"};
   if(page==28)return exporting;
   static const std::array<const char*,12> expressions={"Previous expression","Next expression","Weight -","Weight +","Reset weights","Apply static pose","Cancel preview","Authored","Back","Core PBR","",""};
@@ -19,7 +21,7 @@ const std::array<const char *, 12> &spatial_labels(int page) {
       "Previous",   "Visibility", "Lock",       "Delete",
       "Back",       "Mesh tools", "Avatars",    "Sculpt layers"};
   static const std::array<const char *, 12> materials = {
-      "Base color", "Blue",      "White",   "Paint tools",
+      "Base color", "Texture sets", "White",   "Paint tools",
       "Metallic",   "Roughness", "Opacity", "UV editor",
       "Back",       "View options",      "PBR",     "Flow"};
   static const std::array<const char *, 12> paint = {
@@ -88,6 +90,7 @@ const std::array<const char *, 12> &spatial_labels(int page) {
                      : root;
 }
 std::optional<VrParameter> spatial_parameter(int page, int sector) {
+  if(page==31){if(sector==6)return VrParameter::LayerOpacity;if(sector==7)return VrParameter::BaseColor;return {};}
   if(page==24&&sector==3)return VrParameter::ShapeMirror;
   if(page==30){if(sector==0)return VrParameter::InkEmission;if(sector==1)return VrParameter::InkEmissionUnits;if(sector==2)return VrParameter::MaterialEmission;if(sector==3)return VrParameter::EmissionSource;return {};}
   if(page==24&&sector==4)return VrParameter::MorphWeight;
@@ -164,6 +167,7 @@ std::optional<VrParameter> spatial_parameter(int page, int sector) {
   return {};
 }
 std::optional<SpatialCommand> spatial_action(int page, int index) {
+  if(page==31){if(index>=0&&index<6)return SpatialCommand(int(SpatialCommand::TexturePrevious)+index);if(index==9)return SpatialCommand::Undo;if(index==10)return SpatialCommand::Redo;if(index==11)return SpatialCommand::Save;return {};}
   if(page==30){if(index==4)return SpatialCommand::EmissionRelative;if(index==5)return SpatialCommand::EmissionPhysical;if(index==6)return SpatialCommand::EmissionBlack;if(index==7)return SpatialCommand::PaintGlow;if(index==9)return SpatialCommand::Undo;if(index==10)return SpatialCommand::Redo;return {};}
   if(page==29){
     switch(index){case 0:return SpatialCommand::ExpressionPrevious;case 1:return SpatialCommand::ExpressionNext;case 2:return SpatialCommand::ExpressionDecrease;case 3:return SpatialCommand::ExpressionIncrease;case 4:return SpatialCommand::ExpressionReset;case 5:return SpatialCommand::ExpressionApply;case 6:return SpatialCommand::ExpressionCancel;case 7:return SpatialCommand::PreviewAuthored;case 9:return SpatialCommand::PreviewPbr;default:return {};}
@@ -740,6 +744,7 @@ void SpatialInput::update(const SpatialSample &s) {
     } else if (page_ == 10 && (selected_ == 6 || selected_ == 7)) {
       page_ = selected_ == 6 ? 12 : 24;
       selected_ = 0;
+    } else if(page_==2&&selected_==1){page_=31;selected_=0;
     } else if (page_ == 3 && selected_ == 11) {
       page_ = 6;
       selected_ = 0;
@@ -767,7 +772,7 @@ void SpatialInput::update(const SpatialSample &s) {
       controls_.push_back({VrControlEventType::Begin, parameter_});
     } else if (page_ != 0 && page_ != 27 && selected_ == 8) {
       const bool export_back=page_==28||page_==30;
-      page_ = page_==30 ? 6 : page_==29 ? 26 : page_==26 ? 2 : page_==25 ? 3 : page_==24 ? 10 : page_==22 ? 19 : page_==19 ? 10 : page_==23 ? 21 : (page_ == 16 || page_ == 17 || page_==20 || page_==21) ? 10 : (page_ == 18 || page_ == 15) ? 7 : page_ == 14 ? 13 : page_ == 13 ? 11
+      page_ = page_==31 ? 2 : page_==30 ? 6 : page_==29 ? 26 : page_==26 ? 2 : page_==25 ? 3 : page_==24 ? 10 : page_==22 ? 19 : page_==19 ? 10 : page_==23 ? 21 : (page_ == 16 || page_ == 17 || page_==20 || page_==21) ? 10 : (page_ == 18 || page_ == 15) ? 7 : page_ == 14 ? 13 : page_ == 13 ? 11
               : page_ == 12 ? 10
               : page_ == 11 ? 9
               : (page_ == 9 || page_ == 10) ? 1

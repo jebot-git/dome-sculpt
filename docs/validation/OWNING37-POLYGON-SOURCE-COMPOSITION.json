@@ -1,0 +1,21 @@
+{
+  "scope": "Unbuilt source composition only, latest admitted polygon/main and historical owning37/key source",
+  "parents": [
+    "7c36055",
+    "c55dc2f708cdb6b267a40e6ac26f5757fcfae7d3"
+  ],
+  "source_auto_merge": "Document.cpp; canonical-owner guards plus admitted affine polygon gate",
+  "main_polygon_provider_and_Document_header_parity_exact": true,
+  "material_header_exact_prior_owning37": true,
+  "public_layout_probe": "Document 6968 8\nEditorState 1896 8\nScene 72 8\nSourceMaterialBindings 1704 8\n",
+  "headless_registered_count": 1214,
+  "duplicate_registrations": false,
+  "SourceMaterialBindings_append_requires_all_fresh_owning_consumers": true,
+  "product_build_or_execution": false,
+  "partial_archive_qualification_allowed": false,
+  "remaining": [
+    "Admitted automatic-weight and complete caller-input source",
+    "Storage headroom and fresh coherent Release/sanitizer builds",
+    "Actual native/GUI/interop/device/accelerator and broader requirements"
+  ]
+}

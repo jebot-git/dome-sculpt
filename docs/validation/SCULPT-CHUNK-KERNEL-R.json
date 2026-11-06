@@ -1,0 +1,438 @@
+{
+  "scope": "Private CPU kernel component only; no Scene/snapshot/worker/app/SAN/GPU/full-performance admission",
+  "base": "f9073165040eb3140bf312710fd4b961af43bed5",
+  "native_checks": 22,
+  "handle": 14581,
+  "wrapper_pid": 1567262,
+  "steps": [
+    {
+      "name": "compile-product-local-surface",
+      "args": [
+        "/usr/bin/c++",
+        "-O3",
+        "-DNDEBUG",
+        "-std=gnu++20",
+        "-pthread",
+        "-pipe",
+        "-I/home/blux/de-xr/dome-sculpt/artifacts/local-sculpt-chunks-f907/include",
+        "-I/home/blux/de-xr/dome-sculpt/artifacts/bounded-render-5b02/third_party/nlohmann",
+        "-MMD",
+        "-MF",
+        "/home/blux/de-xr/dome-sculpt/artifacts/local-sculpt-chunks-f907/artifacts/native-kernel-release-v1/product-local-surface.d",
+        "-c",
+        "/home/blux/de-xr/dome-sculpt/artifacts/local-sculpt-chunks-f907/src/local-surface.cpp",
+        "-o",
+        "/home/blux/de-xr/dome-sculpt/artifacts/local-sculpt-chunks-f907/artifacts/native-kernel-release-v1/product-local-surface.o"
+      ],
+      "code": 0,
+      "seconds": 3.3918808399466798,
+      "log": "/home/blux/de-xr/dome-sculpt/artifacts/local-sculpt-chunks-f907/artifacts/native-kernel-release-v1/compile-product-local-surface.log",
+      "sha": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "compile-product-sculpt-surface-chunks",
+      "args": [
+        "/usr/bin/c++",
+        "-O3",
+        "-DNDEBUG",
+        "-std=gnu++20",
+        "-pthread",
+        "-pipe",
+        "-I/home/blux/de-xr/dome-sculpt/artifacts/local-sculpt-chunks-f907/include",
+        "-I/home/blux/de-xr/dome-sculpt/artifacts/bounded-render-5b02/third_party/nlohmann",
+        "-MMD",
+        "-MF",
+        "/home/blux/de-xr/dome-sculpt/artifacts/local-sculpt-chunks-f907/artifacts/native-kernel-release-v1/product-sculpt-surface-chunks.d",
+        "-c",
+        "/home/blux/de-xr/dome-sculpt/artifacts/local-sculpt-chunks-f907/src/sculpt-surface-chunks.cpp",
+        "-o",
+        "/home/blux/de-xr/dome-sculpt/artifacts/local-sculpt-chunks-f907/artifacts/native-kernel-release-v1/product-sculpt-surface-chunks.o"
+      ],
+      "code": 0,
+      "seconds": 3.1590952709666453,
+      "log": "/home/blux/de-xr/dome-sculpt/artifacts/local-sculpt-chunks-f907/artifacts/native-kernel-release-v1/compile-product-sculpt-surface-chunks.log",
+      "sha": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "compile-test-sculpt-surface-chunks",
+      "args": [
+        "/usr/bin/c++",
+        "-O3",
+        "-DNDEBUG",
+        "-std=gnu++20",
+        "-pthread",
+        "-pipe",
+        "-I/home/blux/de-xr/dome-sculpt/artifacts/local-sculpt-chunks-f907/include",
+        "-I/home/blux/de-xr/dome-sculpt/artifacts/bounded-render-5b02/third_party/nlohmann",
+        "-MMD",
+        "-MF",
+        "/home/blux/de-xr/dome-sculpt/artifacts/local-sculpt-chunks-f907/artifacts/native-kernel-release-v1/test-sculpt-surface-chunks.d",
+        "-c",
+        "/home/blux/de-xr/dome-sculpt/artifacts/local-sculpt-chunks-f907/tests/sculpt-surface-chunks.cpp",
+        "-o",
+        "/home/blux/de-xr/dome-sculpt/artifacts/local-sculpt-chunks-f907/artifacts/native-kernel-release-v1/test-sculpt-surface-chunks.o"
+      ],
+      "code": 0,
+      "seconds": 2.3867883519851603,
+      "log": "/home/blux/de-xr/dome-sculpt/artifacts/local-sculpt-chunks-f907/artifacts/native-kernel-release-v1/compile-test-sculpt-surface-chunks.log",
+      "sha": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "link-kernel",
+      "args": [
+        "/usr/bin/c++",
+        "-O3",
+        "-DNDEBUG",
+        "-pthread",
+        "-Wl,-t,-t",
+        "-Wl,-Map=/home/blux/de-xr/dome-sculpt/artifacts/local-sculpt-chunks-f907/artifacts/native-kernel-release-v1/kernel.map",
+        "/home/blux/de-xr/dome-sculpt/artifacts/local-sculpt-chunks-f907/artifacts/native-kernel-release-v1/product-local-surface.o",
+        "/home/blux/de-xr/dome-sculpt/artifacts/local-sculpt-chunks-f907/artifacts/native-kernel-release-v1/product-sculpt-surface-chunks.o",
+        "/home/blux/de-xr/dome-sculpt/artifacts/local-sculpt-chunks-f907/artifacts/native-kernel-release-v1/test-sculpt-surface-chunks.o",
+        "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-preflight-qualified-0b6/artifacts/final-preflight/release/stage/libdome-sculpt-core.a",
+        "-lz",
+        "-o",
+        "/home/blux/de-xr/dome-sculpt/artifacts/local-sculpt-chunks-f907/artifacts/native-kernel-release-v1/sculpt-surface-chunks"
+      ],
+      "code": 0,
+      "seconds": 0.06917352799791843,
+      "log": "/home/blux/de-xr/dome-sculpt/artifacts/local-sculpt-chunks-f907/artifacts/native-kernel-release-v1/link-kernel.log",
+      "sha": "c86aba3ef40f197ec58c3ebd7367bb136e62a57ef6c8020ba5664513471c70a0"
+    },
+    {
+      "name": "ldd-kernel",
+      "args": [
+        "ldd",
+        "/home/blux/de-xr/dome-sculpt/artifacts/local-sculpt-chunks-f907/artifacts/native-kernel-release-v1/sculpt-surface-chunks"
+      ],
+      "code": 0,
+      "seconds": 0.005245661013759673,
+      "log": "/home/blux/de-xr/dome-sculpt/artifacts/local-sculpt-chunks-f907/artifacts/native-kernel-release-v1/ldd-kernel.log",
+      "sha": "534fb2097b0ba7e5899b63b8fd42e5a980cc0761dfc713e5395a17163eeda1d3"
+    },
+    {
+      "name": "run-kernel",
+      "args": [
+        "/home/blux/de-xr/dome-sculpt/artifacts/local-sculpt-chunks-f907/artifacts/native-kernel-release-v1/sculpt-surface-chunks"
+      ],
+      "code": 0,
+      "seconds": 0.12713739200262353,
+      "log": "/home/blux/de-xr/dome-sculpt/artifacts/local-sculpt-chunks-f907/artifacts/native-kernel-release-v1/run-kernel.log",
+      "sha": "8b36aed9a443a79f3400658dfbf00c67d8d6d286560fd56d141e91f207c52905"
+    }
+  ],
+  "binary": {
+    "path": "/home/blux/de-xr/dome-sculpt/artifacts/local-sculpt-chunks-f907/artifacts/native-kernel-release-v1/sculpt-surface-chunks",
+    "sha": "e7505c9a7f4a32c7ffd1b78252d5300b0a43cb378d7de966bdd601a7ef721f69"
+  },
+  "objects": {
+    "/home/blux/de-xr/dome-sculpt/artifacts/local-sculpt-chunks-f907/artifacts/native-kernel-release-v1/product-local-surface.o": "b975f5e0166564ce830a464bb593d0be8b481c3b6f8551f7ff38b09035132724",
+    "/home/blux/de-xr/dome-sculpt/artifacts/local-sculpt-chunks-f907/artifacts/native-kernel-release-v1/product-sculpt-surface-chunks.o": "beb79a1fdde9109e3d170eec276047e103e31614fa5190cb63d2832eaf48b179",
+    "/home/blux/de-xr/dome-sculpt/artifacts/local-sculpt-chunks-f907/artifacts/native-kernel-release-v1/test-sculpt-surface-chunks.o": "942d1294cf2ed1838d78b2f1a115a80fc9b2422f618ebe5bc23739d9d78f8d3a"
+  },
+  "archive": {
+    "path": "/home/blux/de-xr/dome-sculpt/artifacts/vrm1-preflight-qualified-0b6/artifacts/final-preflight/release/stage/libdome-sculpt-core.a",
+    "sha": "6a85f9f51515fa3bf3c3f04cf589e726837354b0a6ef5d55ed5609a3927848ce",
+    "proof_base": "0b6b59f; extracted member source bodies must exactly match f907"
+  },
+  "extracted_members": [
+    "backend_cpu.cpp.o",
+    "mesh.cpp.o",
+    "ray-index.cpp.o",
+    "sculpt-mask.cpp.o",
+    "sculpt-storage.cpp.o",
+    "volume-geometry.cpp.o",
+    "volume-raycast.cpp.o",
+    "volume.cpp.o"
+  ],
+  "member_sources": {
+    "backend_cpu.cpp.o": {
+      "source": "src/backend_cpu.cpp",
+      "f907_source_sha": "4a49fdbf165f7c752f728bca52fad4f7e3803dbf225930d6c3291a6b03da3c6d",
+      "member_sha": "4eb06dcda9ba2779c5e168bbcc21f4bf26ab514e1741d99e3e25c7d9379c15f1"
+    },
+    "mesh.cpp.o": {
+      "source": "src/mesh.cpp",
+      "f907_source_sha": "1eb6bc7299dc2d774cd84f7fdf73131455169b876c046a6d47aa794c9840d17b",
+      "member_sha": "89b6555492d3f280a8a9eaa2e523d5f9d050b8f49c576359cf5e852ab85ac7c9"
+    },
+    "ray-index.cpp.o": {
+      "source": "src/ray-index.cpp",
+      "f907_source_sha": "75ff77879b7777227261a1472af554528e7c32a367cb81e6675242b6567f86d5",
+      "member_sha": "4903e16a8324632318dadafd0f95636d4a309050e36d0d4d4cbb0fded1ac098b"
+    },
+    "sculpt-mask.cpp.o": {
+      "source": "src/sculpt-mask.cpp",
+      "f907_source_sha": "61ab8a67fa49f111fda71761862b730015aa7501ed8e8238007634b6f4b89b01",
+      "member_sha": "3805d28777e39913dc8c19108d8e592780c347ad3720eff171b9b8ee726618c5"
+    },
+    "sculpt-storage.cpp.o": {
+      "source": "src/sculpt-storage.cpp",
+      "f907_source_sha": "4e8b20338b5e0baeaa5224ac94aa1a5dcbf8fe8dace4f2bcbe3851edc0b01970",
+      "member_sha": "0f2006f62859887f51fca42ecc4d86adc5b7625fea54ab2bd8f6c76fa02096ee"
+    },
+    "volume-geometry.cpp.o": {
+      "source": "src/volume-geometry.cpp",
+      "f907_source_sha": "2a988ba60275102a4ad4e112e5953024f118320e3c8e39c3de3f28e129b026a2",
+      "member_sha": "8ffb194de787d7ac3dcdf09383a20b189b98c9ded138d03ff48eb38008439ae5"
+    },
+    "volume-raycast.cpp.o": {
+      "source": "src/volume-raycast.cpp",
+      "f907_source_sha": "524c9c6a7415b6ee35b31b7ff4d193b6e81d73a4c586f027de7300c9598d1a8d",
+      "member_sha": "803360877305ccebae0f91a11f8c0da15e5e397fd2ca477fa4b8a20403bd2699"
+    },
+    "volume.cpp.o": {
+      "source": "src/volume.cpp",
+      "f907_source_sha": "3a426c64ecd0a4a9febc05dc15f6d8fe24b7f49295865532e6c198c23010f4be",
+      "member_sha": "54c08af6df5d0b358468bfd9f1ace1bac002b1c5977f4333665d7b3b3ca0f6dd"
+    }
+  },
+  "dependencies": {
+    "/home/blux/de-xr/dome-sculpt/artifacts/bounded-render-5b02/third_party/nlohmann/nlohmann/json_fwd.hpp": "fb6aa70cbece087f37ab4685c182b287c53be54f785f981b9db9d30d2d028b37",
+    "/home/blux/de-xr/dome-sculpt/artifacts/local-sculpt-chunks-f907/include/dome/brush.hpp": "60b61ab21cae66c2a5fdf560c610c1b9a0ba600953d44baa90a97ef8dfc4aac1",
+    "/home/blux/de-xr/dome-sculpt/artifacts/local-sculpt-chunks-f907/include/dome/cow-map.hpp": "313ed0271bd68475b309518aca3d66ecb583936eba4f134211dfcda38cbd98d2",
+    "/home/blux/de-xr/dome-sculpt/artifacts/local-sculpt-chunks-f907/include/dome/local-surface.hpp": "9180614ebe91d71d905c77f857528f43960181d345b0361b64ae1ce96b44e532",
+    "/home/blux/de-xr/dome-sculpt/artifacts/local-sculpt-chunks-f907/include/dome/math.hpp": "838e53b6c6c3881b3b73ea93bb680be268947a5b28b6e4657771e43b1f1d1f3f",
+    "/home/blux/de-xr/dome-sculpt/artifacts/local-sculpt-chunks-f907/include/dome/mesh.hpp": "c4d9196f4d6c8a817da71b7849a44196f5f317ad05da59cb5efae1ccb932fd5f",
+    "/home/blux/de-xr/dome-sculpt/artifacts/local-sculpt-chunks-f907/include/dome/sculpt-storage.hpp": "33c6f86d8d4ef6d5d3be560da2ccbeca9ded02491c1045213479ce056dc7d9bc",
+    "/home/blux/de-xr/dome-sculpt/artifacts/local-sculpt-chunks-f907/include/dome/volume.hpp": "9ec1223891ac34cb1196cbf04e55091a73dabcc40dbd341d5d134fc5be462514",
+    "/home/blux/de-xr/dome-sculpt/artifacts/local-sculpt-chunks-f907/src/local-surface.cpp": "fb5d6468ca45d4a68ffa90fbbbbdbed201d0521a70c31f291016aa6bc0ec545d",
+    "/home/blux/de-xr/dome-sculpt/artifacts/local-sculpt-chunks-f907/src/sculpt-surface-chunks.cpp": "bc73003aac74140f4b6e24a1c00acf5fb7f7c80bf7d3a876e654407805f52e10",
+    "/home/blux/de-xr/dome-sculpt/artifacts/local-sculpt-chunks-f907/src/sculpt-surface-chunks.hpp": "52232973d983bc8b2d81d7c98d596116f8400d8267d209d60079a443a94b60f9",
+    "/home/blux/de-xr/dome-sculpt/artifacts/local-sculpt-chunks-f907/src/sculpt-surface-tile.hpp": "2de5a8c2aeff0afa55cc83abe148ebe5b48adc9a8e94c4b9456b3d8a8b66919d",
+    "/home/blux/de-xr/dome-sculpt/artifacts/local-sculpt-chunks-f907/src/surface-topology.hpp": "f24896ffe297ee4a2242e5f9987283ca6c6d44883154e4f1a2d5d03695022df4",
+    "/home/blux/de-xr/dome-sculpt/artifacts/local-sculpt-chunks-f907/tests/../src/sculpt-surface-chunks.hpp": "52232973d983bc8b2d81d7c98d596116f8400d8267d209d60079a443a94b60f9",
+    "/home/blux/de-xr/dome-sculpt/artifacts/local-sculpt-chunks-f907/tests/sculpt-surface-chunks.cpp": "e8d3de52dcc1a9629847a2f24ae129da73a0729fac976525a191982183560799"
+  },
+  "drift": [],
+  "archive_drift": false,
+  "space": {
+    "allocated_total": 1563635712,
+    "phase_allocated": 1908736,
+    "free": 22682996736,
+    "phase_reserve": 262144,
+    "overall_reserve": 262144
+  },
+  "runtime_sources": {
+    "include/dome/local-surface.hpp": "9180614ebe91d71d905c77f857528f43960181d345b0361b64ae1ce96b44e532",
+    "src/local-surface.cpp": "fb5d6468ca45d4a68ffa90fbbbbdbed201d0521a70c31f291016aa6bc0ec545d",
+    "src/sculpt-surface-tile.hpp": "2de5a8c2aeff0afa55cc83abe148ebe5b48adc9a8e94c4b9456b3d8a8b66919d",
+    "src/sculpt-surface-chunks.hpp": "52232973d983bc8b2d81d7c98d596116f8400d8267d209d60079a443a94b60f9",
+    "src/sculpt-surface-chunks.cpp": "bc73003aac74140f4b6e24a1c00acf5fb7f7c80bf7d3a876e654407805f52e10",
+    "tests/sculpt-surface-chunks.cpp": "e8d3de52dcc1a9629847a2f24ae129da73a0729fac976525a191982183560799"
+  },
+  "raw_status": {
+    "path": "/home/blux/de-xr/dome-sculpt/artifacts/local-sculpt-chunks-f907/artifacts/native-kernel-release-v1/status.json",
+    "sha": "570187983893b7e46b8595f644955205169d81911b17e0b5b0245ad7b7ee874c"
+  },
+  "syntax_only": [
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/local-sculpt-chunks-f907/artifacts/source-check-v1/status.json",
+      "sha": "9e43adc7eb64b0abb15c3ddacbd369fbd5f7671362844ea0091e841d51c9cebb",
+      "code": 0,
+      "scope": "syntax-only; no objects, links or runtime",
+      "steps": [
+        {
+          "source": "src/local-surface.cpp",
+          "code": 0,
+          "seconds": 1.0794902270426974,
+          "log": "/home/blux/de-xr/dome-sculpt/artifacts/local-sculpt-chunks-f907/artifacts/source-check-v1/local-surface.cpp.log",
+          "log_sha": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "source": "src/sculpt-surface-chunks.cpp",
+          "code": 0,
+          "seconds": 0.8764961450360715,
+          "log": "/home/blux/de-xr/dome-sculpt/artifacts/local-sculpt-chunks-f907/artifacts/source-check-v1/sculpt-surface-chunks.cpp.log",
+          "log_sha": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "source": "tests/sculpt-surface-chunks.cpp",
+          "code": 0,
+          "seconds": 0.8409665880026296,
+          "log": "/home/blux/de-xr/dome-sculpt/artifacts/local-sculpt-chunks-f907/artifacts/source-check-v1/sculpt-surface-chunks.cpp.log",
+          "log_sha": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      ],
+      "drift": []
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/local-sculpt-chunks-f907/artifacts/source-check-v2/status.json",
+      "sha": "4e9e75f38cebaa7ce6b2ee504609b49baede6bb9568c7ecd23483a3ecbed53d2",
+      "code": 0,
+      "scope": "syntax only; no objects/link/runtime",
+      "steps": [
+        {
+          "source": "src/local-surface.cpp",
+          "code": 0,
+          "seconds": 0.8921898530097678,
+          "log": "/home/blux/de-xr/dome-sculpt/artifacts/local-sculpt-chunks-f907/artifacts/source-check-v2/src-local-surface.cpp.log",
+          "log_sha": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "source": "src/sculpt-surface-chunks.cpp",
+          "code": 0,
+          "seconds": 0.8260436960263178,
+          "log": "/home/blux/de-xr/dome-sculpt/artifacts/local-sculpt-chunks-f907/artifacts/source-check-v2/src-sculpt-surface-chunks.cpp.log",
+          "log_sha": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "source": "tests/sculpt-surface-chunks.cpp",
+          "code": 0,
+          "seconds": 0.7444912660284899,
+          "log": "/home/blux/de-xr/dome-sculpt/artifacts/local-sculpt-chunks-f907/artifacts/source-check-v2/tests-sculpt-surface-chunks.cpp.log",
+          "log_sha": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      ],
+      "drift": []
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/local-sculpt-chunks-f907/artifacts/source-check-v3/status.json",
+      "sha": "abdd673dab428fd59984b0bc365ff4afbe138c5fc8b8b6bda91b4aef42e3520f",
+      "code": 1,
+      "scope": "syntax only; no objects/link/runtime",
+      "steps": [
+        {
+          "source": "src/local-surface.cpp",
+          "code": 0,
+          "seconds": 0.851122003979981,
+          "log": "/home/blux/de-xr/dome-sculpt/artifacts/local-sculpt-chunks-f907/artifacts/source-check-v3/src-local-surface.cpp.log",
+          "log_sha": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "source": "src/sculpt-surface-chunks.cpp",
+          "code": 0,
+          "seconds": 0.8727682830067351,
+          "log": "/home/blux/de-xr/dome-sculpt/artifacts/local-sculpt-chunks-f907/artifacts/source-check-v3/src-sculpt-surface-chunks.cpp.log",
+          "log_sha": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "source": "src/sculpt-scene-chunks.cpp",
+          "code": 1,
+          "seconds": 0.096553495968692,
+          "log": "/home/blux/de-xr/dome-sculpt/artifacts/local-sculpt-chunks-f907/artifacts/source-check-v3/src-sculpt-scene-chunks.cpp.log",
+          "log_sha": "836b4aeedd91f229a3b4c934b0cd1ec5f3ece586baa9edeeb32027bed3dd747c"
+        },
+        {
+          "source": "src/scene.cpp",
+          "code": 1,
+          "seconds": 0.09308607300044969,
+          "log": "/home/blux/de-xr/dome-sculpt/artifacts/local-sculpt-chunks-f907/artifacts/source-check-v3/src-scene.cpp.log",
+          "log_sha": "3dfd1dae1cd23ff9b9649aa4366322b9cc47bdffe61476af12b806ac1a5d935a"
+        },
+        {
+          "source": "tests/sculpt-surface-chunks.cpp",
+          "code": 0,
+          "seconds": 0.7790158509742469,
+          "log": "/home/blux/de-xr/dome-sculpt/artifacts/local-sculpt-chunks-f907/artifacts/source-check-v3/tests-sculpt-surface-chunks.cpp.log",
+          "log_sha": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      ],
+      "drift": []
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/local-sculpt-chunks-f907/artifacts/source-check-v4/status.json",
+      "sha": "8e788d0c3354e9d2994140d8860d7ee7f41c72b4c451f50f7ea4a57bcd47aa2f",
+      "code": 0,
+      "scope": "syntax only; no objects/link/runtime; immutable f907 third_party headers reused read-only",
+      "steps": [
+        {
+          "source": "src/local-surface.cpp",
+          "code": 0,
+          "seconds": 0.8837596790399402,
+          "log": "/home/blux/de-xr/dome-sculpt/artifacts/local-sculpt-chunks-f907/artifacts/source-check-v4/src-local-surface.cpp.log",
+          "log_sha": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "source": "src/sculpt-surface-chunks.cpp",
+          "code": 0,
+          "seconds": 0.8516907580196857,
+          "log": "/home/blux/de-xr/dome-sculpt/artifacts/local-sculpt-chunks-f907/artifacts/source-check-v4/src-sculpt-surface-chunks.cpp.log",
+          "log_sha": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "source": "src/sculpt-scene-chunks.cpp",
+          "code": 0,
+          "seconds": 0.8791137459920719,
+          "log": "/home/blux/de-xr/dome-sculpt/artifacts/local-sculpt-chunks-f907/artifacts/source-check-v4/src-sculpt-scene-chunks.cpp.log",
+          "log_sha": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "source": "src/scene.cpp",
+          "code": 0,
+          "seconds": 2.931192377989646,
+          "log": "/home/blux/de-xr/dome-sculpt/artifacts/local-sculpt-chunks-f907/artifacts/source-check-v4/src-scene.cpp.log",
+          "log_sha": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "source": "tests/sculpt-surface-chunks.cpp",
+          "code": 0,
+          "seconds": 0.8537456320482306,
+          "log": "/home/blux/de-xr/dome-sculpt/artifacts/local-sculpt-chunks-f907/artifacts/source-check-v4/tests-sculpt-surface-chunks.cpp.log",
+          "log_sha": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      ],
+      "drift": []
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/local-sculpt-chunks-f907/artifacts/source-check-v5/status.json",
+      "sha": "30eb953a8408d4e3c03f0d74b1858e85fc95829ff00d5b3618c6ede568f2ab65",
+      "code": 0,
+      "scope": "syntax only; no objects/link/runtime; immutable f907 third_party headers reused read-only",
+      "steps": [
+        {
+          "source": "src/local-surface.cpp",
+          "code": 0,
+          "seconds": 0.9127080070320517,
+          "log": "/home/blux/de-xr/dome-sculpt/artifacts/local-sculpt-chunks-f907/artifacts/source-check-v5/src-local-surface.cpp.log",
+          "log_sha": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "source": "src/sculpt-surface-chunks.cpp",
+          "code": 0,
+          "seconds": 0.8522282090270892,
+          "log": "/home/blux/de-xr/dome-sculpt/artifacts/local-sculpt-chunks-f907/artifacts/source-check-v5/src-sculpt-surface-chunks.cpp.log",
+          "log_sha": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "source": "src/sculpt-scene-chunks.cpp",
+          "code": 0,
+          "seconds": 0.889375213009771,
+          "log": "/home/blux/de-xr/dome-sculpt/artifacts/local-sculpt-chunks-f907/artifacts/source-check-v5/src-sculpt-scene-chunks.cpp.log",
+          "log_sha": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "source": "src/scene.cpp",
+          "code": 0,
+          "seconds": 3.049619811004959,
+          "log": "/home/blux/de-xr/dome-sculpt/artifacts/local-sculpt-chunks-f907/artifacts/source-check-v5/src-scene.cpp.log",
+          "log_sha": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "source": "tests/sculpt-surface-chunks.cpp",
+          "code": 0,
+          "seconds": 0.7622875240049325,
+          "log": "/home/blux/de-xr/dome-sculpt/artifacts/local-sculpt-chunks-f907/artifacts/source-check-v5/tests-sculpt-surface-chunks.cpp.log",
+          "log_sha": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "source": "snapshot-header",
+          "code": 0,
+          "seconds": 1.1957512619555928,
+          "log": "/home/blux/de-xr/dome-sculpt/artifacts/local-sculpt-chunks-f907/artifacts/source-check-v5/snapshot-header.log",
+          "log_sha": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      ],
+      "drift": []
+    }
+  ],
+  "limitations": [
+    "No CTest/configure claim: the consumer was manually compiled and linked transparently.",
+    "No actual process DSO mapping/immutability claim; ldd output only.",
+    "No Scene or new MeshSnapshot-layout execution; unqualified source scaffolding is present but inactive.",
+    "No SAN/GPU/application/worker/native-file/history/Save or full allocation/cancel-sweep result.",
+    "Two zero-crossing outputs match, but exact collinear-repair fallback entry is not separately proved.",
+    "Working-limit negative is an early refusal, not an allocation-boundary sweep.",
+    "Full worker-to-GPU locality and all original owner-domain adapters remain required."
+  ]
+}

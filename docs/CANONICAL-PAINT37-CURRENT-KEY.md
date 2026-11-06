@@ -1,0 +1,13 @@
+# Current key authoring after canonical paint UV37
+
+Private functional milestone, runtime4df8d14. The actual Document can create a new key and replace independent current endpoints after writable canonical UV37. The existing CPS node remains the paint/UV authority. A genuine current SourceKeyDerivation instead owns and replays the new frame-position/N/T endpoint, rooted in its actual current37 beforePaint and material. No permission flag, old normal-owner rebind, raw ID relabel, image reset, averaging, public layout or schema number was introduced.
+
+The old exact frame branch remains. The later-key branch checks exact strong CPS/canonicalUV/attribute/uv-origin owners, captured Paint/current geometry, current key/frame identity and full replay even during shallow validation. New before-model accounting follows CPS origins and layered canonical ownership. Material19 decode now admits retained key-before Paint only under the actual owning canonical-paint context; the initial genuine restart refusal remains preserved.
+
+Matched Release and whole-owned O1 ASan/UBSan/leaks each pass19 actual native Create/Replace/artistN/T/stable-ID/Save/UndoRedo/Restore checks;226 image checks across63 real alpha/available-pose/morph cases (zero-key and key↔UV order max0, independently parsed ordinary physical GLB max1 at unchanged2); and26 genuine owner/tamper/internal/late worker Cancel+dependent Save controls. Actual FLTK normal Release34 and640×360/font32 sanitizer36 pass: explicit existing-target popup choice, selected-only nonzero freehand, complete Paint/F32/normal/rig/firstsource preservation, UndoRedo, held EscapeCancel, reopen and CtrlW. The earlier unsupported End-key test input and wrong-target output are retained.
+
+Strict PCI03 A770226 passes; real llvmpipe and UHD770 refuse requested hardware identity. All63 GLBs are byte-exact across R/S/Arc;189 unfiltered Khronos validations report0errors/162warnings. Scope is complete fresh owning39 support plus actual corrected cdbd/three-TU implementations, whole new consumers and full app relinks with identical headers, not a new all-source rebuild of this endpoint.
+
+This does not complete new-key quota/OOM or all commands. Exact prospective cap/replacement/shared-owner/resource differentials, additional capture adversaries, repeated UV after the new key, named commands/typed/general-refinement paths and a fresh current-root all-layout integration/regression remain required. The separate package4 sanitizer allocation sweep stays live on immutable f803. Nothing here claims main admission or whole-goal completion.
+
+See [the scoped receipt](validation/CANONICAL-PAINT37-CURRENT-KEY.json).

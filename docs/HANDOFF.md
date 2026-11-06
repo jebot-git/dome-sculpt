@@ -20,7 +20,7 @@ restore before using its thin indexes. Current raw builds/verified full Release
 backup are RAM-backed and need durable restaging before cleanup. Full goal active;
 no installation or new physical-headset acceptance.
 
-## Private combined sculpt/material Release checkpoint — 2026-11-06
+## Historical private combined sculpt/material Release checkpoint — 2026-11-06
 
 Private `d1f40159` combines local sculpt chunks, owning polygon fields and plain
 texture sets. Its fresh reachable Release application and 15 selected native
@@ -34,6 +34,84 @@ and resolution changes are separate agent work. Read
 [SCULPT-AUTHORING-RELEASE.md](SCULPT-AUTHORING-RELEASE.md) and its receipt. This is
 private Release qualification, with no product admission, installation or full
 goal completion. Preserve RAM-backed outputs explicitly before cleanup.
+
+Historical private-branch notes follow. Their original scope is retained;
+the matched current qualification above supersedes their runtime status.
+
+## Coherent FLTK qualification and resolution plan — 2026-11-06
+
+Actual whole-ownedee557 Release passes19 polygon and51 texture-manager GUI
+controls, with four clean application closes and exact sources/258 providers/
+SDK/observed maps. Read validation/COHERENT-FLTK-WORKFLOWS-ee557.json; reusable
+tests/texture-set-menu.py matches executedv5 code except its module docstring.
+The manager preserves independent64/128 grids but has no resize control.
+TEXTURE-SET-RESOLUTION-PLAN.md gives the concrete all14-channel/PBR/FLOAT worker,
+transaction, UI, source-grid adapter and validation plan coordinated with bridge
+6bc73578. This sparse child implements no resize API/code/layout or runtime;
+qualified root/12c sources remain untouched. Full production goal remains open.
+
+## New sculpt/authoring source composition — 2026-11-06
+
+This child combines qualified77e882bc with local-coordinate8a05e5f3.
+Read [SCULPT-AUTHORING-COMPOSITION-WIP.md](SCULPT-AUTHORING-COMPOSITION-WIP.md).
+Six whole units pass syntax only; no new executable/runtime/SAN/GPU claim.
+Worker capture retains both owning field/set bundles and local chunks. Typed
+material exclusions preserve chunk ownership and sibling material visibility;
+new three-feature/chunk-only regressions await execution. Both original cohorts
+remain immutable. Main admission and the full production goal remain open.
+
+## Private coherent polygon/texture application — 2026-11-06
+
+This branch composes main44fe with polygon-field ownership39, plain texture
+sets40 and shared-geometry multi-primitive export. Read
+[COHERENT-POLYGON-TEXTURE-RELEASE.md](COHERENT-POLYGON-TEXTURE-RELEASE.md).
+Current whole reachable optimized providers and ten consumers have258 own
+outputs rechecked. Native8/8 (577), actual FLTK19+51, software and authenticated
+Arc existingGL51+independent appearance537/device pass. Pixel reference error
+is2 software/1 Arc within unchanged6; eight cross-device pairs differ at most2.
+Five actual emitted GLBs pass official Khronos with0errors/5warnings/2infos.
+Private Release scope only: no new sanitizer/ALL/XR/Wayland/physical claim and
+no main admission. Main remains44fe. Sourceful per-set/history, measured resizing,
+local-coordinate chunk composition and the full remaining goal stay required.
+
+## Private local-coordinate grouped sculpt fix — 2026-11-06
+
+The unchanged original grouped sphere exposed a real world-float coordinate
+collapse after72 original native controls. Local geometry stays strictly valid;
+only absolute world staging degenerates at originalsecondX1.37/scale1.25. No
+source, grouping, validation or face is weakened/dropped. Actual local immutable
+GPU/BVH geometry now retains its captured authored frame, with full binary64
+affine metric queries and GPU placement/normal/winding/clip transforms.
+
+Whole8provider/readers +app/framing+3consumer composition passes originalnative95,
+pipelinenative43, softwareEGL72, currentquery108 and corrected ordinaryappsmoke0.
+237prior outputs stay exact,16newwhole outputs/7exactRGBApairs are verified;
+old affected archive members are excluded. Read SCULPT-LOCAL-PLACEMENT.md and
+validation/SCULPT-LOCAL-PLACEMENT-RELEASE.json. The prior25dd narrower scope and
+all failures remain preserved. Main39/40 composition, SAN/fullALL/physical and
+production measurements remain open. The measurement plan is unexecuted; zero
+upload counters are not speed evidence. Full REQUIREMENTS goal remains active.
+
+## Private immutable chunk pipeline Release checkpoint — 2026-11-06
+
+The real Document worker now publishes typed immutable generated chunks,
+independent protection scalars and persistent authored placement/query owners.
+SurfaceRenderer caches per-object actual geometry and staged scalar GL buffers,
+keeps held/canvas motion in uniforms and preserves actual Scene/global triangle
+ordering. The fresh235-step/233-project-output optimized cohort plus corrected
+whole renderer/native/GL units passes kernel22, query108, native43, real software
+EGL65 and ordinary corrected-app smoke.237 prior outputs including4 compiler
+probes remain exact;6 new whole outputs and6 exact RGBA reference pairs are
+verified. Read SCULPT-CHUNK-PIPELINE.md and its Release receipt. Initial sparse
+configuration failures and invalid32→genuine64 paint fixture failure remain
+preserved. No old renderer member is pulled into the corrected app/GL links.
+
+This is private Release component/application qualification, not main admission,
+SAN, fullALL, hardware/physical or performance completion. Historical flat-only
+integration tests, source39/40 composition, broad paint/normal/source transport,
+GPU metadata/scalar locality and sustained production measurements remain open.
+The full REQUIREMENTS/HANDOFF objective remains active and incomplete. No install,
+headset test or active-session restart was performed.
 
 ## Current isotropic remeshing integrated — 2026-11-06
 
@@ -67,6 +145,109 @@ not qualify the changed current map or relabel original native failures. Remesh
 is still private; full production, interoperability, acceleration and drawers
 remain required. No installation/headset/session restart; full goal active.
 
+## Balanced39/40 appearance source checkpoint — 2026-11-06
+
+This sparse child of closed12c adds an unexecuted self-contained mixed39/40
+regression with balanced actor sizes, real primary/additional face identities,
+actual before N/T/W and retained UVs, and independent binary64 geometry/pixel/
+normal/GGX expectations. Final syntax against actual root9b491228 headers passes
+with629 protected inputs unchanged; no executable/link/runtime result follows.
+Arithmetic-only sensitivity analysis is separate from product tests. Read
+BALANCED-POLYGON-TEXTURE-APPEARANCE-WIP.md and its pinned source receipt. Root
+must register and execute the consumer on its coherent fresh providers after
+its live gate closes. No public layout/guard or qualified12c tree changed;
+full production, appearance, interoperability, SAN/device and drawers remain.
+
+
+## Initial owning39 actual application and GL workflow — 2026-11-06
+
+The private same-layout application now links complete Archive0ae, Render2aacc
+and Documentf20 TUs against the233 fresh e754 providers; both old core members
+and the old renderer member are explicitly excluded. Public layouts stay exact.
+The first actual GL test exposed a real missing first-object source attribute
+publication: an empty packed prefix never entered the append branch. Document
+now explicitly includes the polygon-field owner; no renderer validator was
+relaxed. The earlier292 native/five-consumer proof keeps its earlier Document
+scope and is not silently relabelled as a rerun withf20.
+
+The actual corrected application passes19 ordinary FLTK controls: pointer paint
+on real canonical baked-normal/key/FLOAT source, native confirmation/default
+Cancel, draft Flip Cancel, Apply plus Save, exact Undo/Redo, clean process close
+and fresh reopen, exact source Restore and its Undo/Redo. The actual new GL
+consumer passes51 controls over eight N-only/canonical, affine/reflected and
+Move/Flip files plus actual imported tiny MToon GLB/image actors. Two polygon
+programs use13 and16 active fragment samplers, respectively; shared unit14 now
+uses one sampler declaration, preserving the OpenGL3.3 minimum. Exact second-eye
+pixels and unchanged geometry/image uploads pass, including mixed ranges.
+
+All observed ELF maps, protected prior inputs and tracked sources remain exact.
+The prior GL failures/ELFs/objects and invalid snapshot-only MToon fixture remain
+preserved. The corrected mixed producer imports its real original GLB, materials
+and images through import_glb; it does not bypass Scene source identity. Read
+[the application receipt](validation/POLYGON-SURFACE-OWNING39-APPLICATION.json).
+
+This is matched component/application proof on software GL and one normal-size
+ordinary X11 opt-in workflow, not SAN, compact/Wayland, hardware/HMD, independent
+full shading oracle or production completion. Root owns a fresh coherent39+40
+composition; repeated edits, broader topology/source/typed domains and portable
+GLB/VRM adapters remain required. Source/ABI reservations are unchanged.
+
+
+## Remaining five owning39 native consumers closed — 2026-11-06
+
+All five originally planned downstream consumers now pass on the same actual
+fresh e754 ABI cohort with the complete0ae Archive override: node codec56,
+current Paint6 byte/FLOAT16408, combined affine polygon/retopology248, canonical37
+key controls29 and emission package4 contracts28. Each fixture TU is compiled
+whole at O3/NDEBUG; every link explicitly excludes the old Archive member. All241
+prior binary inputs, tracked sources and observed ELF maps remain unchanged.
+The292-control native authoring closure remains separately pinned. Read
+validation/POLYGON-SURFACE-OWNING39-NATIVE.json for both scopes.
+
+Root approved a304MiB phase cap with the complete64MiB serial-link prospective
+reserve, unchanged1536MiB cumulative bound and20GiB+192MiB global free floor.
+Actual phase207228928 and cumulative1275940864 bytes stay inside those limits.
+No extra archival was needed. Actual renderer/shader, SAN, FLTK/OpenXR, device,
+repeated edits, broader topology/source and portable export remain required.
+
+
+## Initial owning polygon-field native workflow qualified — 2026-11-06
+
+Source643dec72 now passes292 actual native controls across eight N-only/canonical,
+affine/reflected and Move/Flip combinations. The run uses the fresh e754 all-own
+app/core/support/render/XR/inspector ABI cohort, with the complete Archive TU from
+0ae2726 and the complete corrected fixture TU. No old Archive member is linked.
+All233 fresh inputs,252 previous qualified inputs and239 prior inputs captured
+by the final native wrapper remain unchanged. The genuine product fix retains
+resolved source roots while the enclosing Paint6 callback is still needed; it
+does not reopen a closed reader or weaken prefix/cycle validation.
+
+The real workflow now preserves writable FLOAT paint, independent baked normal
+and key owners, original source/placement, accepted polygon Move/Flip, immediate
+ordered Save, full and before-only Scene39 second-cycle loading, exact Undo/Redo
+and restarted source Restore. The before-only fixture retains actual hidden Bake
+actors; discarding them was an invalid fixture, not permission to relax recipes.
+Old-context, false-feature, foreign-root, cyclic/future-prefix and mismatched
+current-owner controls still refuse. See
+[the pinned native receipt](validation/POLYGON-SURFACE-OWNING39-NATIVE.json).
+
+The preceding resource/fixture/product failures remain preserved. Root authorized
+lossless archival of only the closed reader-v3 linker map; its735500-byte archive
+passes full-stream hash/metadata and an actual original-path restore before the
+duplicate is removed. No failed ELF, object, library or source was removed.
+
+This closes the initial native workflow, not the full polygon-field requirement.
+The original five downstream codec/paint/legacy consumers, actual shader/mixed-
+material rendering, sanitizer/FLTK/OpenXR/device proof, repeated edits and general
+topology/source domains, and portable GLB/VRM adapters remain required. The fresh
+stage is152244224 bytes; another64MiB prospective link does not fit its unchanged
+200MiB cap. Further links require a concrete resource adjustment first.
+
+Private39 source now includes admitted mainf907316 direct uploads after the
+closed8f R cohort. This merge has not been executed against39 yet. Preserve all
+252 prior qualified providers and do not relabel their scope as current renderer
+qualification; later actual39 renderer/codec/query integration remains required.
+
 ## Direct immutable geometry uploads admitted — 2026-11-06
 
 Main integrates qualified9f89fce on537c98b. The renderer uploads immutable arrays
@@ -81,6 +262,26 @@ qualification, not fresh ALL, new hardware/HMD or a frame-time benchmark. Full
 geometry uploads/derived-coordinate work, bounded local extraction, polygon
 fields, texture sets, avatar/interoperability/accelerator and drawers remain
 required. No installation or session restart. Full goal active and incomplete.
+
+## Private polygon39 first owning Release gate — 2026-11-06
+
+Frozen8f1892b (including admitted main537c98b) now passes a fully fresh reachable
+CPU Release12 build:254 steps, app/core/support/render/XR/frontend/inspector.
+Runtime8/8 old native/codec/owner/poly,math1097,new actual source/paint-stage182,
+legacy keycontrols29 andpackage4contracts28 all0. All252 own inputs,source,actual
+ELF maps and native fixture hashes remain exact. See
+validation/POLYGON-SURFACE-STAGE39-RELEASE.json. This is actual typed/current
+Paint staging only: Scene39/publication/render/query/codec/export stay guarded
+and required; SAN/UI/hardware are not run or reserved. Full goal remains active.
+
+## Private polygon39 source boundary — 2026-11-06
+
+This source merges admitted main537c98b caller/input repair before the first
+fresh all-own Release39 gate. Public layouts include the unqualified typed
+polygon owner and domain3; no old-size own support may run with these headers.
+Only the earlier private math/source-owner slices are qualified; current Scene39
+codec/publication/render/query/export remain guarded and required. All historical
+receipts below retain their original scope. See POLYGON-SURFACE-TRANSFER39-PLAN.md.
 
 ## Caller and real XR input admission — 2026-11-06
 
@@ -109,6 +310,48 @@ ALL build. The failed standalone Fontconfig leak/ELF and all old counterexamples
 remain preserved; fixed fixture uses the ordinary app's existing process owner.
 Main review/publication is separate; full sculpt/paint/retopo/rig/avatar/GPU and
 physical production requirements remain active. No new schema/outer layout.
+
+## Owning37 continuation with current main — 2026-11-05
+
+This private tree now combines owning37 candidate c6e6cd5 with admitted main
+c53e0b6 (explicit SurfaceHeat5, Automatic0 default unchanged). This merge has
+not yet been compiled or qualified. The earlier c6 cohort has a fresh optimized
+Release application and selected native/key/codec/package checks, not full-suite
+or sanitizer qualification. All 244 actual own objects, archives and executables
+are preserved in verified separate-inode copy-on-write snapshots before this
+source merge. Existing component results retain their exact original scope.
+
+A genuine manifold affine/reflected source now proves retained-domain polygon
+refusal, Save/history/cancellation/retry and before-only37 persistence/Restore.
+The required changed-polygon positive after canonical-paint Restore still fails:
+"Baked normal field lost its actual separate attribute origin". The conversion
+keeps the baked field but drops its material origin; new geometry also needs
+real current normal/paint correspondence. This is an unimplemented adapter,
+not a reason to discard fields, counterfeit owners or bypass validation.
+All production, caller-input, remesh, interoperability, accelerator, device and
+controller-drawer requirements remain active. Entries below retain checkpoint
+history; this source merge is not main admission or a completed release.
+
+## Unqualified owning37 source composition — 2026-11-05
+
+This private continuation now also merges admitted affine polygon mainc55dc2f
+on top of main9dd63f9, admission candidate93c1fad and historical key seal508338c4
+by real history. It retains the current affine retopology, ordered Save, held-input
+admission repair, visible markers, worker publication repair and active avatar
+assertions, plus the canonical-paint/material/physical-package component sources.
+Only CMake and this handoff required textual resolution; source merged normally.
+
+This merged tree has NOT been built or executed. SourceMaterialBindings adds a
+real canonical-paint owner, so a fresh coherent build of all consumers is required;
+older support archives cannot qualify its public layout. Existing component
+results below remain scoped to their original source and binaries. Full goal
+active; no new main admission, installation, headset or session restart follows.
+
+The admitted polygon source is now included. Automatic-weight and caller-input
+repairs remain separate continuations; merge their admitted current-main results
+before freezing the new owning build. Physical-package exhaustive parent results and all four fresh-caller key
+Create/Replace coverage aggregates have closed. Their actual receipts have been
+rehashed; original product scopes remain distinct from this unqualified tree.
 
 ## Explicit surface-heat binding admitted — 2026-11-05
 
@@ -249,6 +492,18 @@ has separate40-point smoke evidence only. Main runtime remainsc179/615/native36;
 37, physical4, broader integration, weights/Mirror/material/device/accelerator
 requirements and later controller drawers remain open. Full goal active;
 no installation or headset launch.
+
+## Integrated admission candidate — 2026-11-05
+
+This branch integrates227c11c material qualification,1f9fd48 package partitions
+andmainb3b4d00 standards/handoff by real merges. Production/header/assets remain
+exact eacfba7; whole new package consumers R/S contracts and40explicit smoke
+points/profile pass with exact hashes.28verifiercontrols pass;967registered is
+not fullruntime. Read ADMISSION-CANDIDATE-37.md/receipt. Parent5df packageSAN43091
+andfresh-key sanitizer partitions remainlive andoutside this smoke scope.
+No main37/public38/default-weight/fullgoal claim. Preserve frozen original job
+inputs and inspect actualhandles before restart. Controllerdrawers remain after
+basic targets; allfullmatrix/device/accelerator work stays required.
 
 ## Matching material clients and exhaustive factories closed — 2026-11-05
 
@@ -2940,3 +3195,13 @@ native/UI/persistence/render/export remain required; no public DTO/schema edits.
 Read KEY-MIRROR-PLANE.md and its receipt.
 
 Public-main-matched VRM1 preflight repair62ec13e: one Layer TU +two lasting controls in existing registered targets-faults, no layout/schema/shader/API change. Allfive strict fault/worker domains plus actualactiveRim fullcontrols R/S0 (268.013/1953.161s), final1857 defaulttarget checks R/S0, actualold-main app/inspector relink+normal22/compact22 perprofile0 (55.274/74.379s), canonicalSDKmaps exact. Distinct current37 ABI also qualifies; original late failures/prototype/wrapper statuses remain. See VRM1-EXPRESSION-PREFLIGHT.md/JSON. Parent review/main publication remains separate; full VRM goal continues.
+
+Private polygon source-owner continuation: math00c9b46 (corrected Release1097)
+and source-owner02c7cfd (Release107) are scoped detached proofs, not changed
+polygon admission. Source-only39 now appends a real current field owner and
+kind3 paint correspondence; legacy writers and Scene publication remain guarded.
+See POLYGON-SURFACE-TRANSFER39-PLAN.md. A fresh all-own Release12 gate is approved
+under320MiB phase/1152MiB cumulative and20GiB actual-free floor; no SAN/UI/GPU
+reserve. All earlier source/proof inputs stay immutable. Full codec/native,
+current paint capture, normal render/query, general topology and export remain
+required; no old public-size archives may be mixed with these headers.

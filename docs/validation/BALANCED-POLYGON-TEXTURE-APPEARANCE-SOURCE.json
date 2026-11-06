@@ -1,0 +1,95 @@
+{
+  "status": "Source/syntax only; balanced mixed appearance consumer has not been linked or executed",
+  "parent": "12c19767434b6165ca97f487f5fc165400429240",
+  "intended_API_root": "9b4912282b7f399ff4991ca59c6e787842455de4",
+  "test": {
+    "path": "/home/blux/de-xr/dome-sculpt/artifacts/polygon-field-quality-12c/tests/texture-set-polygon-render.cpp",
+    "sha256": "c81b62856234d3e3737c34abd50e1e0a32fd62b6226f0851a1643b8fd4aed73a"
+  },
+  "syntax": {
+    "path": "/home/blux/de-xr/dome-sculpt/artifacts/polygon-field-quality-12c/artifacts/balanced-mixed-syntax/v3/status.json",
+    "sha256": "051133d3632873b5e0aa71615d148d501a69975fc6b8e430c0034d369774aa44"
+  },
+  "syntax_plan": {
+    "path": "/home/blux/de-xr/dome-sculpt/artifacts/polygon-field-quality-12c/artifacts/balanced-mixed-syntax/v3/plan.json",
+    "sha256": "c0c084ace5b088326c5b3dec57655db6d2e09b1105c253b9422a28fd286e9966"
+  },
+  "protected_inputs": 629,
+  "input_drift": [],
+  "caps": {
+    "sparse_child": 8388608,
+    "actual_at_syntax_close": 679936,
+    "regular_user_builds_only": true
+  },
+  "fixture_matrix": [
+    "actual N-only / prepared before N/T/W",
+    "ordinary / reflected affine",
+    "Move / Move+Flip"
+  ],
+  "actual_requested_owners": [
+    "one genuine39 actor and its complete original paint/normal graph",
+    "one independent40 actor with real primary0/additional1 face domains",
+    "shared actual40 geometry plus separate material/color identities",
+    "native canonical UVScale separates original grids from current mesh UV"
+  ],
+  "independent_expectations": [
+    "authored triangle geometry and pixel masks with comparable actor areas",
+    "primary red and additional green per-face interiors",
+    "retained before N/T direction transport from independent binary64 geometry math",
+    "asymmetric original normal-image encoding and bilinear sampling",
+    "binary64 specified GGX, tone mapping and sRGB conversion",
+    "transparent background outside authored silhouettes"
+  ],
+  "forbidden_oracle_inputs": [
+    "product pbr_normal/native_normal/normal_at",
+    "product geometric_frames/placed_frames",
+    "product shader source",
+    "nonblank or cache counters as a replacement for pixel expectations"
+  ],
+  "pixel_bounds": {
+    "field39_RGBA_max_byte_error": 4,
+    "unlit40_RGBA_max_byte_error": 1,
+    "each_material_minimum_interior_pixels": 400,
+    "actor_area_ratio": [
+      0.6,
+      1.7
+    ],
+    "normal_and_wrong_UV_counter_minimum_byte_difference": 6
+  },
+  "arithmetic_only_feasibility": {
+    "script": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/polygon-field-quality-12c/artifacts/balanced-mixed-syntax/oracle-feasibility-v2.py",
+      "sha256": "a2670ac95714332bee2672ad35ca66404aa46a9f7149f5257bf518b36cf6e8ef"
+    },
+    "result": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/polygon-field-quality-12c/artifacts/balanced-mixed-syntax/oracle-feasibility-v2.json",
+      "sha256": "27851fecaffe7ad76b493657cac3e6ffa2b458ab9547b4add2b4d65bb53baaa7"
+    },
+    "normal_counter_range": [
+      76,
+      109
+    ],
+    "prepared_wrong_UV_counter_range": [
+      26,
+      33
+    ],
+    "runtime_product_execution": false
+  },
+  "preserved_first_syntax_failure": {
+    "path": "/home/blux/de-xr/dome-sculpt/artifacts/polygon-field-quality-12c/artifacts/balanced-mixed-syntax/status.json",
+    "sha256": "2a9bc1be71ab31ffbb7688215b080f0ce6e01479478481f365cbb6ba0a30fe30"
+  },
+  "preserved_failed_source": {
+    "path": "/home/blux/de-xr/dome-sculpt/artifacts/polygon-field-quality-12c/artifacts/balanced-mixed-syntax/source-v1.cpp",
+    "sha256": "6ce268971d7dcb556c149b329c294ff07776b26a623036f80b277ff6b5712759"
+  },
+  "remaining": [
+    "root target registration after its live gate closes",
+    "actual complete-TU compile/link against coherent current providers",
+    "native producer and codec behavior in this fixture",
+    "software/strict-device independent pixel execution",
+    "sanitizer and broader production/device quality"
+  ],
+  "no_new_public_layout_or_guard_change": true,
+  "closed12c_tree_untouched": true
+}

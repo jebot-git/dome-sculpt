@@ -1,3 +1,5 @@
+#include "polygon-surface-preview.hpp"
+#include "canonical-paint-native.hpp"
 #include "dome/bake-distance.hpp"
 #include "dome/bake-recipe.hpp"
 #include "paint-overlay-packet.hpp"
@@ -44,6 +46,11 @@
 #include "sculpt-ui-values.hpp"
 #include "dome/local-surface.hpp"
 #include "geometry-identity.hpp"
+#include "texture-set-worker.hpp"
+#include "texture-set-stroke.hpp"
+#include "texture-set-controls.hpp"
+#include "texture-set-surface.hpp"
+#include "sculpt-scene-chunks.hpp"
 #include "document-transaction.hpp"
 #include "document-retopo-input.hpp"
 #include "spatial-history-levels.hpp"
@@ -215,12 +222,13 @@ bool Document::pending_locked() const {
 bool Document::reject_texture_paint_locked() {
   const auto &o=scene_.active();
   if(!o.mesh_active || !o.painted)return false;
-  const bool raw_physical=o.painted->surface_diagnostics().policy==PaintUvPolicy::SourceAuthored &&
-      !o.painted->source_sampling_prepared() &&
-      (detail::hdr_emission(o.material.emissive)||o.painted->has_physical_emission()||
-       (o.material_bindings&&detail::physical_emission(*o.material_bindings))||
+  const auto field=active_texture_set(o);const auto&paint=*field.painted;
+  const bool raw_physical=paint.surface_diagnostics().policy==PaintUvPolicy::SourceAuthored &&
+      !paint.source_sampling_prepared() &&
+      (detail::hdr_emission(field.material.emissive)||paint.has_physical_emission()||
+       (field.material_bindings&&detail::physical_emission(*field.material_bindings))||
        (state_.paint.channel==PaintChannel::Emission&&state_.paint.emission_units==PaintEmissionUnits::Physical));
-  if(!raw_physical&&!detail::paint_requires_editable_atlas(*o.painted))return false;
+  if(!raw_physical&&!detail::paint_requires_editable_atlas(paint))return false;
   Transaction transaction(*this);
   state_.message=detail::editable_texture_atlas_notice;
   state_.error.clear();publish_locked(false,false);transaction.commit(false);
@@ -251,6 +259,7 @@ void Document::begin_action_locked() {
     weight_joint_ = uint32_t(state_.rig_joint);
     return;
   }
+  if(scene_.active().texture_sets)throw std::logic_error("Texture-set painting requires its owning native field transaction");
   if(reject_texture_paint_locked())throw std::logic_error(detail::editable_texture_atlas_notice);
   if (scene_.active().mesh_active)
     scene_.active().painted->begin_stroke();
@@ -620,9 +629,9 @@ void Document::publish_locked(bool force,bool checkpoint) {
     view->normal_sampling_required=view->normal_sampling_available&&(source.material_bindings->canonical_attributes||(source.painted->normal_projection()&&source.painted->normal_projection()->version==2));
     view->retain_normal_sampling=uv_retention_requested_locked();
     view->paint_sampling_available=uv_paint_retention_available_locked();
-    view->paint_sampling_required=bool(source.painted&&source.painted->paint_sampling_domain());
+    view->paint_sampling_required=detail::canonical_paint_retention_supported(source)||bool(source.painted&&source.painted->paint_sampling_domain());
     view->retain_paint_sampling=uv_paint_retention_requested_locked();
-    view->can_restore_paint_source=detail::native_paint_source_restorable(source);
+    view->can_restore_paint_source=detail::canonical_paint_source_restorable(source)||detail::native_paint_source_restorable(source);
     view->committing = uv_accept_pending_;
     view->solving = uv_solving_;
     if (view->solving) { view->can_undo = view->can_redo = false; view->valid = false; }
@@ -712,11 +721,20 @@ void Document::publish_locked(bool force,bool checkpoint) {
       state_.sculpt_layer_opacity = l.opacity;
     }
   }
-  state_.active_layer = active.mesh_active ? active.painted->active_layer() : 0;
+  const auto selected_field=active.mesh_active?std::optional<TextureSetView>(active_texture_set(active)):std::nullopt;
+  if(texture_face_object_!=active.id||!active.mesh_active||!active.painted||texture_face_geometry_!=active.painted->mesh_owner()){state_.texture_faces.clear();state_.texture_face_select=false;texture_face_geometry_.reset();texture_face_object_=0;}
+  state_.texture_sets.clear();state_.active_texture_set=active.texture_sets?active.texture_sets->active():0;
+  state_.texture_material=selected_field?selected_field->material:active.material;
+  state_.can_edit_texture_sets=selected_field&&(!active.polygon||active.texture_sets)&&detail::texture_set_plain_fields(active)&&object_editable_locked(active.id)&&!state_.asset_busy&&!state_.recovery_busy&&!native_stroke_&&!control_before_&&!state_.polygon&&!state_.retopology&&!state_.cut&&!uv_;
+  if(selected_field){
+    const auto primary=texture_set_view(active,0);state_.texture_sets.push_back({0,primary.name,primary.painted->resolution(),primary.domain?primary.domain->triangles().size():primary.painted->mesh().indices.size()/3});
+    if(active.texture_sets)for(const auto&s:active.texture_sets->additional())state_.texture_sets.push_back({s.id,s.name,s.painted->resolution(),s.domain->triangles().size()});
+  }
+  state_.active_layer = selected_field ? selected_field->painted->active_layer() : 0;
   state_.paint_layers.clear();
   state_.layer_visible = false;
-  if (active.mesh_active)
-    for (auto &l : active.painted->layers()) {
+  if (selected_field)
+    for (auto &l : selected_field->painted->layers()) {
       state_.paint_layers.push_back(l.name);
       if (l.id == state_.active_layer)
         state_.layer_visible = l.visible;
@@ -884,6 +902,7 @@ void Document::seed() {
 bool Document::begin_desktop() {
   std::lock_guard lock(model_mutex_);
   if(state_.cut)return false;
+  if(scene_.active().texture_sets&&!state_.weights.enabled&&!state_.retopology)return begin_native_locked(0,NativeStrokeSpace::EvaluatedWorldBrush);
   if (control_before_ || uv_ || state_.asset_busy || action_active_locked() ||
       input_.menu_open() || !scene_.active().visible ||
       !object_editable_locked(scene_.active().id) ||
@@ -902,6 +921,7 @@ void Document::stamp_desktop(Brush b) {
   std::lock_guard lock(model_mutex_);
   if (!desktop_)
     throw std::logic_error("Desktop does not own the active stroke");
+  if(native_stroke_&&native_stroke_->texture_set){NativeStrokeSample sample;sample.space=NativeStrokeSpace::EvaluatedWorldBrush;sample.brush=b;if(!sample_native_locked(std::move(sample)))throw std::logic_error("The selected field no longer accepts desktop samples");return;}
   RetopoInputScope admission(*this,bool(state_.retopology));
   auto t = state_.retopology ? state_.retopology->transform
                             : object_world_transform_locked(scene_.active().id);
@@ -949,8 +969,8 @@ std::optional<Vec3> Document::raycast(Vec3 p, Vec3 d, double material_time) cons
   if(!state_.retopology && scene_.has_affine_placement(scene_.active().id)) {
     auto snapshot=mesh_.load();
     if(!object_editable_locked(scene_.active().id)||snapshot->generation!=state_.generation||snapshot->revision!=state_.revision||!snapshot->picking)return {};
-    auto hit=snapshot->picking->raycast(p,d,10,material_time,scene_.active().id);
-    return hit?std::optional<Vec3>(hit->position):std::nullopt;
+    auto hit=snapshot->picking->raycast_target(p,d,10,material_time,scene_.active().id);
+    return hit?std::optional<Vec3>(hit->surface.position):std::nullopt;
   }
   if (state_.weights.enabled) {
     auto mesh = mesh_.load();
@@ -959,11 +979,14 @@ std::optional<Vec3> Document::raycast(Vec3 p, Vec3 d, double material_time) cons
     auto delta=held?ob::compose(object_world_transform_locked(state_.held_object),ob::inverse(scene_.world_transform(state_.held_object))):CanvasTransform{};
     auto origin=held?world_to_model(delta,p):p;
     auto direction=held?vec(ob::rotate(ob::conjugate(delta.orientation),obv(d))):d;
-    auto hit = mesh->picking->raycast(origin, direction, held?20/delta.scale:20, material_time,(held||state_.isolate_held)?state_.held_object:0);
+    auto hit = mesh->picking->raycast_target(origin, direction, held?20/delta.scale:20, material_time,(held||state_.isolate_held)?state_.held_object:0);
     if (!hit) return {};
-    if(held)hit->position=vec(ob::transform(delta,obv(hit->position)));
-    auto vertex = mesh->mesh.indices.at(size_t(hit->triangle) * 3);
-    return mesh->selected_weights.at(vertex) >= 0 ? std::optional<Vec3>(hit->position) : std::nullopt;
+    // A separate ordinary Volume is an unselected occluder. It has no packed
+    // weight vertex and cannot be mapped into a different object's namespace.
+    if(!hit->packed())return {};
+    if(held)hit->surface.position=vec(ob::transform(delta,obv(hit->surface.position)));
+    auto vertex = mesh->mesh.indices.at(size_t(hit->surface.triangle) * 3);
+    return mesh->selected_weights.at(vertex) >= 0 ? std::optional<Vec3>(hit->surface.position) : std::nullopt;
   }
   const auto &active=scene_.active();
   if(!state_.retopology && active.mesh_active && active.polygon && active.polygon->active && active.polygon->colors) {
@@ -973,9 +996,9 @@ std::optional<Vec3> Document::raycast(Vec3 p, Vec3 d, double material_time) cons
     auto delta=held?ob::compose(object_world_transform_locked(active.id),ob::inverse(scene_.world_transform(active.id))):CanvasTransform{};
     auto origin=held?world_to_model(delta,p):p;
     auto direction=held?vec(ob::rotate(ob::conjugate(delta.orientation),obv(d))):d;
-    auto hit=mesh->picking->raycast(origin,direction,held?20/delta.scale:20,material_time,active.id);
+    auto hit=mesh->picking->raycast_target(origin,direction,held?20/delta.scale:20,material_time,active.id);
     if(!hit)return {};
-    return held?std::optional<Vec3>(vec(ob::transform(delta,obv(hit->position)))):std::optional<Vec3>(hit->position);
+    return held?std::optional<Vec3>(vec(ob::transform(delta,obv(hit->surface.position)))):std::optional<Vec3>(hit->surface.position);
   }
   auto t = state_.retopology ? state_.retopology->transform
                             : object_world_transform_locked(scene_.active().id);
@@ -1011,12 +1034,12 @@ Vec3 Document::gradient(Vec3 p) const {
     auto snapshot=mesh_.load();
     if(snapshot->generation!=state_.generation||snapshot->revision!=state_.revision||!snapshot->picking)
       throw std::logic_error("Wait for the current affine surface before querying its normal");
-    return snapshot->picking->closest(p,scene_.active().id).normal;
+    return snapshot->picking->closest_target(p,scene_.active().id).surface.normal;
   }
   if (state_.weights.enabled) {
     auto mesh = mesh_.load();
     if (mesh->generation == state_.generation && mesh->revision == state_.revision && mesh->picking)
-      return mesh->picking->closest(p).normal;
+      return mesh->picking->closest_target(p).surface.normal;
   }
   auto t = object_world_transform_locked(scene_.active().id);
   return vec(
@@ -1312,6 +1335,7 @@ void Document::prepare_locked(uint32_t resolution) {
   if (state_.asset_busy)
     throw std::logic_error("A painting mesh is already being prepared");
   auto &o = scene_.active();
+  if(o.texture_sets)throw std::logic_error("Texture-set geometry replacement needs its owning membership/field remap");
   if(o.polygon&&o.polygon->active)throw std::logic_error("Use the polygon or UV editor for this native polygon mesh; restore its source before rebuilding sculpt geometry");
   if (o.painted && o.painted->has_paint_data())
     throw std::logic_error("The existing mesh has paint data; use the UV editor or transfer paint before rebuilding its geometry");
@@ -1446,7 +1470,15 @@ void Document::process_locked(const SpatialFrame &incoming) {
     state_.canvas.orientation = {};
     anchored_ = true;
   }
-  if(process_object_selection_locked(f)){
+  if(state_.texture_face_select&&!input_.menu_open()&&!control_before_&&!state_.asset_busy){
+    for(size_t i=0;i<2;++i){const auto&h=f.hands[i];const bool pressed=h.tracked.valid&&std::isfinite(h.tracked.trigger)&&h.tracked.trigger>.02f;
+      if(pressed&&!texture_face_pressed_[i]&&!h.joystick){const auto aim=h.tracked.aimValid?h.tracked.aim:h.tracked.grip;if(ob::finite(aim)){
+        const auto local=ob::inverse(state_.canvas);const auto p=ob::transform(local,aim.position);const auto d=ob::rotate(ob::conjugate(state_.canvas.orientation),ob::rotate(aim.orientation,{0,0,-1}));
+        texture_face_pointer_locked({p.x,p.y,p.z},{d.x,d.y,d.z},true,f.time);}}
+      texture_face_pressed_[i]=pressed;
+    }
+  }
+  if(!state_.texture_face_select&&process_object_selection_locked(f)){
     // The hierarchy owns trigger events, but the shared menu still receives
     // neutral releases so a thumbstick/menu button can reopen it immediately.
     for(size_t i=0;i<2;++i){SpatialSample release;release.id=i+1;release.sequence=f.sequence;release.time=f.time;release.focused=f.focused;release.tracked=f.hands[i].tracked.valid;input_.update(release);}
@@ -1476,7 +1508,7 @@ void Document::process_locked(const SpatialFrame &incoming) {
       return;
     }
   }
-  if(!state_.selection_mode&&process_affine_paint_spatial_locked(f)){return;}
+  if(!state_.texture_face_select&&!state_.selection_mode&&process_affine_paint_spatial_locked(f)){return;}
   const bool affine_target=scene_.has_affine_placement(scene_.active().id);
   auto object_canvas = state_.retopology
       ? ob::compose(state_.canvas, state_.retopology->transform)
@@ -1486,9 +1518,10 @@ void Document::process_locked(const SpatialFrame &incoming) {
       !affine_target && (!scene_.active().mesh_active||!scene_.active().deformation||state_.weights.enabled) && !state_.asset_busy && object_editable_locked(scene_.active().id) &&
       (scene_.active().mesh_active || volume().editable_layer() || volume().sculpt_settings().mask_edit) &&
       (!state_.weights.enabled || (mesh_.load()->generation == state_.generation && mesh_.load()->revision == state_.revision));
-  if(state_.shape_sculpt||state_.selection_mode||state_.rig_fit)input_.edit_allowed=false;
+  if(state_.texture_face_select||state_.shape_sculpt||state_.selection_mode||state_.rig_fit)input_.edit_allowed=false;
   if (state_.retopology) input_.edit_allowed = bool(state_.retopology->source) && !retopo_accepting_ && !state_.asset_busy;
   if(state_.cut)input_.edit_allowed=false;
+  if(scene_.active().texture_sets&&!state_.weights.enabled)input_.edit_allowed=false;
   input_.painting = scene_.active().mesh_active&&!state_.shape_sculpt;
   input_.retopology = bool(state_.retopology);
   input_.cutting = bool(state_.cut);
@@ -1523,7 +1556,7 @@ void Document::process_locked(const SpatialFrame &incoming) {
     const bool owned_control=control_before_&&!state_.asset_busy&&!uv_accept_pending_&&
       control_object_==scene_.active().id&&control_source_.generation==state_.generation&&
       control_source_.edit_authority==state_.edit_authority&&input_.owns_control(state_.controls.parameter);
-    if(state_.selection_mode&&!owned_control)s.pressure=0;
+    if((state_.texture_face_select||state_.selection_mode)&&!owned_control)s.pressure=0;
     s.trigger = s.pressure > .02f;
     s.joystick_press = h.joystick;
     s.stick_x = h.x;
@@ -1562,13 +1595,13 @@ void Document::process_locked(const SpatialFrame &incoming) {
     // live page so toggles and Fill can be followed by Resume without losing it.
     if (!state_.retopology && !state_.cut && !sculpt_mask_command(*c) && !import_command(*c) && !projection_command(*c) && !preview_command(*c) && !rig_fit_command(*c) && !expression_command(*c) &&
         !(input_.menu_page()==15 && *c==SpatialCommand::CancelWork) &&
-        input_.menu_page()!=30 && input_.menu_page()!=24 && input_.menu_page()!=18 && input_.menu_page()!=20 && input_.menu_page()!=19 && input_.menu_page()!=22 && !state_.polygon) finish_locked();
+        input_.menu_page()!=31 && input_.menu_page()!=30 && input_.menu_page()!=24 && input_.menu_page()!=18 && input_.menu_page()!=20 && input_.menu_page()!=19 && input_.menu_page()!=22 && !state_.polygon) finish_locked();
     auto command_publication=published_.load();
     command_locked(*c);
     import_published=(import_command(*c)||projection_command(*c)||rig_fit_command(*c)||expression_command(*c)||
                       *c==SpatialCommand::RetopoBegin||*c==SpatialCommand::RetopoApply||*c==SpatialCommand::RetopoCancel)&&
                      published_.load()!=command_publication;
-    if((command_page==30)||(command_page==20)||(command_page==24&&*c!=SpatialCommand::ShapeSculpt)){input_.retain_page(command_page,command_owner,command_sector);publish_locked(false,false);}
+    if((command_page==31&&*c!=SpatialCommand::TexturePickFaces)||(command_page==30)||(command_page==20)||(command_page==24&&*c!=SpatialCommand::ShapeSculpt)){input_.retain_page(command_page,command_owner,command_sector);publish_locked(false,false);}
     // Opening/Apply/Cancel already published this frame's actual hands and
     // immutable owner. Do not reinterpret simultaneous history against the
     // newly opened/closed namespace or add a fallible second publication.
@@ -1665,12 +1698,7 @@ void Document::input_loop() {
   }
 }
 void Document::mesh_loop() {
-  struct CachedSculpt {
-    LocalSurfaceCache::Ptr tiles;
-    Mesh mesh;
-  };
-  std::unordered_map<uint64_t, CachedSculpt> sculpt_cache;
-  uint64_t cache_generation = 0;
+  detail::SculptSceneChunks::Ptr sculpt_cache;
   struct FrameLayoutCache {
     std::weak_ptr<const Mesh> mesh;
     std::weak_ptr<const NormalFrameSet> frames;
@@ -1681,8 +1709,18 @@ void Document::mesh_loop() {
     bool dynamic_canonical=false;
   };
   std::unordered_map<uint64_t,FrameLayoutCache> frame_layouts;
+  std::unordered_map<uint64_t,std::shared_ptr<const detail::TextureSetPackedGeometry>> texture_layouts;
+  size_t texture_layout_bytes=0;
   size_t frame_layout_bytes=0;uint64_t frame_layout_builds=0;
   constexpr size_t frame_layout_limit=128*1024*1024;
+  auto reserve_layout=[&](size_t bytes){
+    if(bytes>frame_layout_limit)throw std::length_error("Immutable surface layout exceeds the shared cache budget");
+    while(frame_layouts.size()+texture_layouts.size()>=256||frame_layout_bytes+texture_layout_bytes>frame_layout_limit-bytes){
+      if(!frame_layouts.empty()){auto old=frame_layouts.begin();frame_layout_bytes-=old->second.bytes;frame_layouts.erase(old);}
+      else if(!texture_layouts.empty()){auto old=texture_layouts.begin();texture_layout_bytes-=old->second->owned_bytes();texture_layouts.erase(old);}
+      else break;
+    }
+  };
   std::shared_ptr<const geometry_detail::Identity> geometry_identity;
   while (!stopping_) {
     std::optional<MeshJob> job;
@@ -1719,44 +1757,33 @@ void Document::mesh_loop() {
         paint_scene_weights(*proposed, job->scene.active().id, job->weight_samples,
                             job->weight_settings, cancelled);
       }
-      // Keep the gesture's posed geometry fixed. Preview only the candidate
-      // influences, so every capsule addresses the same displayed surface.
-      if (cache_generation != job->generation) { sculpt_cache.clear(); cache_generation = job->generation; }
-      std::erase_if(sculpt_cache, [&](const auto &entry) {
-        return std::none_of(job->scene.objects().begin(), job->scene.objects().end(), [&](const auto &o) {
-          return o.id == entry.first && o.visible && !o.mesh_active;
-        });
-      });
+      // All geometry/scalar/query preparation stays on this worker. Candidate
+      // owners remain detached until the exact generation/revision/view fences
+      // accept the completed immutable snapshot below.
+      const auto policy=published_.load();
+      const bool wants_query=job->weight_view||policy->selection_mode||policy->object_grab_mode||
+        std::any_of(job->scene.objects().begin(),job->scene.objects().end(),[](const auto &o){return o.visible&&(o.mesh_active||(o.polygon&&o.polygon->active));})||
+        std::any_of(job->scene.objects().begin(),job->scene.objects().end(),[&](const auto &o){return o.visible&&job->scene.has_affine_placement(o.id);});
       SculptMeshingStats meshing;
       auto worker_start=std::chrono::steady_clock::now();
-      auto objects=job->scene.preview_surfaces(cancelled,[&](uint64_t id,const Volume &source) {
-        auto &cache=sculpt_cache[id];
-        auto start=std::chrono::steady_clock::now();
-        LocalSurfaceUpdateReport report;
-        auto candidate=cache.tiles?cache.tiles->update(source,cancelled,&report):LocalSurfaceCache::build(source,{},cancelled);
-        meshing.extraction_ms+=std::chrono::duration<double,std::milli>(std::chrono::steady_clock::now()-start).count();
-        if(candidate==cache.tiles) {
-          ++meshing.objects_reused;meshing.reused_tiles+=candidate->tiles().size();
-        } else {
-          if(report.kind==LocalSurfaceUpdateReport::Kind::Local)++meshing.local_updates;
-          else {++meshing.full_rebuilds;if(cache.tiles)++meshing.history_fallbacks;}
-          if(report.capacity_fallback)++meshing.capacity_fallbacks;
-          meshing.rebuilt_tiles+=candidate->stats().tiles_built;
-          meshing.reused_tiles+=candidate->stats().tiles_reused;
-          meshing.samples_scanned+=candidate->stats().samples_scanned;
-          meshing.cells_evaluated+=candidate->stats().cells_evaluated;
-          start=std::chrono::steady_clock::now();
-          auto mesh=candidate->materialize(cancelled);
-          meshing.materialize_ms+=std::chrono::duration<double,std::milli>(std::chrono::steady_clock::now()-start).count();
-          if(cancelled())throw std::runtime_error("Stale local surface preview");
-          cache={std::move(candidate),std::move(mesh)};
+      auto sculpt_preview=detail::SculptSceneChunks::capture(job->scene,
+          {job->generation,job->revision,job->view_epoch,job->sculpt_mask_view,wants_query},
+          sculpt_cache,{},cancelled);
+      auto objects=std::move(sculpt_preview.legacy);
+      for(const auto &object:sculpt_preview.chunks->objects()) {
+        const auto *previous=sculpt_cache?sculpt_cache->find(object.object):nullptr;
+        const auto &report=object.geometry->report();
+        if(previous&&previous->geometry==object.geometry)++meshing.objects_reused;
+        else {
+          if(report.kind==detail::SculptChunkReport::Kind::Local)++meshing.local_updates;
+          else {++meshing.full_rebuilds;if(previous)++meshing.history_fallbacks;}
+          meshing.rebuilt_tiles+=report.extracted_tiles;
         }
-        return cache.mesh;
-      });
+      }
       auto dependencies=std::make_shared<geometry_detail::Identity>();
       dependencies->generation=job->generation;
       dependencies->objects.reserve(job->scene.objects().size());
-      for(const auto &o:job->scene.objects())if(o.visible) {
+      for(const auto &o:job->scene.objects())if(o.visible&&!sculpt_preview.chunks->captures(o.id)) {
         geometry_detail::Dependency dep;dep.object=o.id;
         if(job->scene.has_affine_placement(o.id))dep.affine_world=job->scene.world_matrix(o.id);
         else dep.world=job->scene.world_transform(o.id);
@@ -1769,11 +1796,16 @@ void Document::mesh_loop() {
         }
         auto surface=std::find_if(objects.begin(),objects.end(),[&](const auto &s){return s.id==o.id;});
         dep.canonical=surface!=objects.end()&&surface->textures&&!surface->textures->normal.rgba.empty();
+        if(surface!=objects.end()&&surface->texture_set_surface){
+          const auto&plan=*surface->texture_set_surface;dep.texture_membership=plan.collection()->primary_domain();
+          for(const auto&field:plan.fields())dep.texture_frames.push_back({field.id,field.painted->baked()&&!field.painted->baked()->maps.normal.rgba.empty()});
+        }
         dependencies->objects.push_back(std::move(dep));
       }
       std::shared_ptr<const geometry_detail::Identity> identity=geometry_identity&&geometry_identity->matches(*dependencies)?geometry_identity:std::move(dependencies);
       auto snapshot = std::make_shared<MeshSnapshot>();
       snapshot->geometry_identity=identity;
+      snapshot->sculpt_chunks=sculpt_preview.chunks;
       snapshot->sculpt_meshing=meshing;
       snapshot->revision = job->revision;
       snapshot->generation = job->generation;
@@ -1784,10 +1816,29 @@ void Document::mesh_loop() {
       snapshot->native_gesture=job->native_gesture;snapshot->native_samples=job->native_samples;
       auto weighted = job->weight_view ? weight_objects(job->scene, job->scene.active().id, job->linked_weights)
                                       : std::vector<uint64_t>{};
-      std::unordered_set<uint64_t> frame_objects;
+      std::unordered_set<uint64_t> frame_objects,texture_objects;
       for (auto &o : objects) {
+        if(o.texture_set_surface){
+          texture_objects.insert(o.id);TextureSetLimits limits;limits.cancelled=cancelled;
+          auto cached=texture_layouts.find(o.id);std::shared_ptr<const detail::TextureSetPackedGeometry>layout;
+          if(cached!=texture_layouts.end()&&cached->second->matches_plan(*o.texture_set_surface))layout=cached->second;
+          else{
+            layout=detail::prepare_texture_set_packed(o.texture_set_surface,limits);const auto bytes=layout->owned_bytes();
+            if(bytes>frame_layout_limit)throw std::length_error("Texture-set geometry exceeds the immutable layout cache bound");
+            if(cached!=texture_layouts.end()){texture_layout_bytes-=cached->second->owned_bytes();texture_layouts.erase(cached);}
+            reserve_layout(bytes);
+            texture_layouts.emplace(o.id,layout);texture_layout_bytes+=bytes;++frame_layout_builds;
+          }
+          detail::TextureSetWorkerView view;view.pbr=job->pbr_view;view.weights=job->weight_view;view.masks=job->sculpt_mask_view;
+          view.selected=std::find(weighted.begin(),weighted.end(),o.id)!=weighted.end();view.joint=job->weight_joint;
+          view.weight_values=proposed?proposed->object(o.id).deformation:o.deformation;
+          if(view.masks&&o.id==job->scene.active().id)view.mask=[&](uint32_t v){return job->scene.object(o.id).volume->mask_sample(layout->posed()->positions.at(v));};
+          detail::append_texture_set_surface(*snapshot,o,layout,view,limits);continue;
+        }
         auto colors=detail::current_vertex_colors(o,cancelled);
         const auto paint_attachment=o.paint_sampling_attachment;
+        const auto polygon_field=o.textures?o.textures->polygon_surface:nullptr;
+        if(polygon_field){polygon_field->validate_maps(*o.textures);if(!polygon_field->matches(o.material_bindings,paint_attachment))throw std::invalid_argument("Polygon worker field lost its current paint/material attachment");polygon_field->validate_world(o.world_matrix(),1e-6,cancelled);}
         if(paint_attachment&&snapshot->paint_coordinates.empty())snapshot->paint_coordinates=snapshot->mesh.uv;
         std::shared_ptr<const std::vector<std::array<float,2>>> paint_coordinates;
         const auto normal_domain=detail::retained_normal_coordinates(o.material_bindings.get(),o.textures.get());
@@ -1802,7 +1853,7 @@ void Document::mesh_loop() {
         }
         if(!colors.empty() && snapshot->source_colors.empty())snapshot->source_colors.assign(snapshot->mesh.positions.size(),{1,1,1,1});
         auto retained=o.material_bindings?o.material_bindings->normal_frames:nullptr;
-        const bool canonical=o.textures && !o.textures->normal_projection && !o.textures->normal.rgba.empty();
+        const bool canonical=!polygon_field && o.textures && !o.textures->normal_projection && !o.textures->normal.rgba.empty();
         // Existing bakes without captured canonical authority use the historical
         // posed-mesh Mikk basis. Do not invent a persisted/rest export basis.
         const bool dynamic_canonical=retained && canonical && !retained->canonical;
@@ -1813,7 +1864,7 @@ void Document::mesh_loop() {
           detail::normal_frame_current_authority(*o.material_bindings,o.mesh,o.deformation.get(),cancelled);
           if(!(source_role?retained->mtoon:retained->pbr))throw std::invalid_argument("Selected material has no retained source normal frame");
         }
-        if(retained||paint_attachment) {
+        if(!polygon_field&&(retained||paint_attachment)) {
           frame_objects.insert(o.id);auto mesh_owner=job->scene.object(o.id).painted->mesh_owner();
           auto old=frame_layouts.find(o.id);
           if(old!=frame_layouts.end() && old->second.mesh.lock()==mesh_owner && old->second.frames.lock()==retained && old->second.paint.lock()==paint_attachment && old->second.dynamic_canonical==dynamic_canonical) {
@@ -1847,9 +1898,15 @@ void Document::mesh_loop() {
             size_t bytes=(retained_layout->vertices.size()+retained_layout->corners.size()+retained_layout->indices.size())*sizeof(uint32_t)+(paint_coordinates?paint_coordinates->size()*sizeof(std::array<float,2>):0);
             if(bytes>frame_layout_limit)throw std::length_error("Immutable surface layout exceeds cache budget");
             if(old!=frame_layouts.end()){frame_layout_bytes-=old->second.bytes;frame_layouts.erase(old);}
-            while(!frame_layouts.empty() && (frame_layouts.size()>=256 || bytes>frame_layout_limit-frame_layout_bytes)){auto expired=frame_layouts.begin();frame_layout_bytes-=expired->second.bytes;frame_layouts.erase(expired);}
+            reserve_layout(bytes);
             frame_layouts.emplace(o.id,FrameLayoutCache{mesh_owner,retained,paint_attachment,paint_coordinates,retained_layout,bytes,dynamic_canonical});frame_layout_bytes+=bytes;++frame_layout_builds;
           }
+        }
+        if(polygon_field){
+          auto layout=std::make_shared<detail::NormalFrameLayout>();layout->vertices=o.mesh.indices;layout->corners.resize(o.mesh.indices.size());std::iota(layout->corners.begin(),layout->corners.end(),0u);layout->indices=layout->corners;retained_layout=std::move(layout);
+          paint_coordinates=std::make_shared<const std::vector<std::array<float,2>>>(polygon_field->paint_coordinates());
+          if(snapshot->source_normals.empty()){snapshot->source_normals=snapshot->mesh.normals;snapshot->canonical_normals=snapshot->mesh.normals;snapshot->source_tangents.assign(snapshot->mesh.positions.size(),{1,0,0,1});}
+          if(polygon_field->model()==detail::PolygonSurfaceNormalModel::PreparedCorePbr&&snapshot->normal_coordinates.empty()){for(auto uv:snapshot->mesh.uv)snapshot->normal_coordinates.push_back({uv[0],uv[1],uv[0],uv[1]});}
         }
         if(retained) {
           retained_pose=detail::normal_frame_preview(*retained,*retained_layout,o.deformation.get(),cancelled,(1u<<source_role)|(canonical?4u:0u));
@@ -1869,7 +1926,7 @@ void Document::mesh_loop() {
           }
         }
         if (cancelled()) throw std::runtime_error("Stale surface preview");
-        const bool affine=bool(o.affine_edit)||std::any_of(o.groups.begin(),o.groups.end(),[](const auto &g){return g.source_placement||g.affine_edit;});
+        const bool affine=bool(polygon_field)||bool(o.affine_edit)||std::any_of(o.groups.begin(),o.groups.end(),[](const auto &g){return g.source_placement||g.affine_edit;});
         const auto frame=affine?std::optional<detail::AffineInteractionFrame>(detail::placement_frame(o)):std::nullopt;
         const bool reflected=frame&&frame->orientation()==AffineOrientation::Reversing;
         auto world = affine?CanvasTransform{}:o.world_transform();
@@ -1897,8 +1954,8 @@ void Document::mesh_loop() {
           if(paint_attachment||!snapshot->paint_coordinates.empty())snapshot->paint_coordinates.push_back(paint_attachment?paint_coordinates->at(frame_vertex):o.mesh.uv.empty()?std::array<float,2>{}:o.mesh.uv.at(vertex));
           if(packed_uv1)packed_uv1->push_back(o.textures->source_maps->uv1->at(vertex));
           for(auto &[set,values]:packed_extra_uv)values->push_back(o.textures->source_maps->extra_uv_sets.at(set)->at(vertex));
-          if(normal_domain||!snapshot->normal_coordinates.empty()){
-            const auto uv=normal_domain?normal_domain->coordinates.at(vertex):o.mesh.uv.empty()?std::array<float,2>{}:o.mesh.uv.at(vertex);
+          if(normal_domain||polygon_field&&polygon_field->model()==detail::PolygonSurfaceNormalModel::PreparedCorePbr||!snapshot->normal_coordinates.empty()){
+            const auto uv=polygon_field&&polygon_field->model()==detail::PolygonSurfaceNormalModel::PreparedCorePbr?polygon_field->normal_coordinates().at(frame_vertex):normal_domain?normal_domain->coordinates.at(vertex):o.mesh.uv.empty()?std::array<float,2>{}:o.mesh.uv.at(vertex);
             const auto toon=normal_domain&&!normal_domain->mtoon_coordinates.empty()?normal_domain->mtoon_coordinates.at(vertex):uv;
             snapshot->normal_coordinates.push_back({uv[0],uv[1],toon[0],toon[1]});
           }
@@ -1908,9 +1965,12 @@ void Document::mesh_loop() {
           snapshot->mesh.uv.push_back(o.mesh.uv.empty() ? std::array<float,2>{0,0} : o.mesh.uv.at(vertex));
           auto direction = vec(ob::rotate(world.orientation, obv({tangent[0],tangent[1],tangent[2]})));
           snapshot->tangents.push_back(frame?detail::placed_tangent(*frame,tangent):Tangent{direction.x,direction.y,direction.z,tangent[3]});
-          if(retained || !snapshot->source_normals.empty()) {
+          // A first polygon-field object has no earlier mesh to seed these arrays.
+          // Publish its actual before attributes even while the packed prefix is empty.
+          if(polygon_field || retained || !snapshot->source_normals.empty()) {
             auto source=o.mesh.normals.at(vertex),canonical_normal=source;
             std::array<float,4> source_tangent{1,0,0,1};
+            if(polygon_field){source=polygon_field->normals().at(frame_vertex);if(!polygon_field->tangents().empty())source_tangent=polygon_field->tangents().at(frame_vertex);}
             if(retained) {
               source=retained_pose->normals[source_role].at(frame_vertex);
               if(!retained_pose->normals[2].empty())canonical_normal=retained_pose->normals[2].at(frame_vertex);
@@ -1975,24 +2035,31 @@ void Document::mesh_loop() {
         if(o.normal_preview_proof&&o.normal_preview_proof->matches(o.material_bindings,snapshot->ranges.back().textures))snapshot->ranges.back().normal_preview_proof=o.normal_preview_proof;
         snapshot->ranges.back().paint_winding_reversed=reflected;
         snapshot->ranges.back().pbr_view=job->pbr_view;
+        if(polygon_field){snapshot->ranges.back().source_frame=true;snapshot->ranges.back().canonical_frame=false;snapshot->ranges.back().source_normal_only=polygon_field->model()==detail::PolygonSurfaceNormalModel::NativeNOnly;}
         if(frame)snapshot->ranges.back().affine_world=frame->world();
       }
       for(auto it=frame_layouts.begin();it!=frame_layouts.end();)if(!frame_objects.contains(it->first) || it->second.mesh.expired() || (it->second.frames.expired()&&it->second.paint.expired())){frame_layout_bytes-=it->second.bytes;it=frame_layouts.erase(it);}else ++it;
+      for(auto it=texture_layouts.begin();it!=texture_layouts.end();)if(!texture_objects.contains(it->first)){texture_layout_bytes-=it->second->owned_bytes();it=texture_layouts.erase(it);}else ++it;
       snapshot->normal_frame_layout_builds=frame_layout_builds;
       const bool has_polygon_colors=std::any_of(objects.begin(),objects.end(),[](const ObjectSurface &o){return bool(o.polygon_colors);});
-      if ((has_polygon_colors || !snapshot->paint_coordinates.empty() || job->weight_view || std::any_of(snapshot->ranges.begin(),snapshot->ranges.end(),[](const auto&r){return bool(r.affine_world);}) || ((published_.load()->object_grab_mode&&!published_.load()->object_grabbing)||published_.load()->selection_mode)) && !snapshot->mesh.indices.empty())
-        snapshot->picking = std::make_shared<MaterialSurfaceQuery>(snapshot->mesh, snapshot->ranges, cancelled,snapshot->source_colors,PaintVertexCoordinates{snapshot->paint_coordinates});
+      if (!texture_objects.empty()||has_polygon_colors||!snapshot->paint_coordinates.empty()||wants_query) {
+        // The actual typed owner retains separate packed and chunk triangle
+        // spaces, with one total query budget. No whole sculpt flatten occurs.
+        if(!snapshot->mesh.indices.empty()||!snapshot->sculpt_chunks->objects().empty())
+          snapshot->picking=std::make_shared<MaterialSurfaceQuery>(snapshot->mesh,snapshot->ranges,cancelled,
+              snapshot->source_colors,PaintVertexCoordinates{snapshot->paint_coordinates},snapshot->sculpt_chunks);
+      }
       snapshot->sculpt_meshing.worker_ms=std::chrono::duration<double,std::milli>(std::chrono::steady_clock::now()-worker_start).count();
       if(expression_result){
         std::lock_guard model_lock(model_mutex_);
         if(cancelled()||!state_.expressions||state_.expressions->request!=job->expressions->request)continue;
         expression_result->selected=state_.expressions->selected;
         Transaction transaction(*this);state_.expressions=std::move(expression_result);state_.message="Expression preview only; Apply static pose or Cancel";publish_locked(false,false);
-        {std::lock_guard mesh_lock(mesh_mutex_);geometry_identity=std::move(identity);mesh_.store(std::move(snapshot));}
+        {std::lock_guard mesh_lock(mesh_mutex_);geometry_identity=std::move(identity);sculpt_cache=snapshot->sculpt_chunks;mesh_.store(std::move(snapshot));}
         transaction.commit(false);
       }else{
         std::lock_guard lock(mesh_mutex_);
-        if(!cancelled()){geometry_identity=std::move(identity);mesh_.store(std::move(snapshot));}
+        if(!cancelled()){geometry_identity=std::move(identity);sculpt_cache=snapshot->sculpt_chunks;mesh_.store(std::move(snapshot));}
       }
     } catch (const std::exception &e) {
       if (!cancelled()) {
@@ -2257,16 +2324,24 @@ bool Document::parameter_enabled_locked(VrParameter parameter) const {
   if (state_.asset_busy || parameter == VrParameter::None)
     return false;
   auto &o = scene_.active();
+  if(o.texture_sets&&detail::texture_set_control(parameter))return object_editable_locked(o.id)&&detail::texture_set_plain_fields(o)&&!action_active_locked()&&!state_.recovery_busy;
   if (parameter == VrParameter::LayerOpacity ||
       parameter == VrParameter::LayerOrder)
     return o.mesh_active && o.painted &&
            (parameter != VrParameter::LayerOrder ||
-            o.painted->layers().size() > 1);
+            active_texture_set(o).painted->layers().size() > 1);
   return true;
 }
 void Document::finish_control_locked(bool accept) {
   if (!control_before_)
     return;
+  if(control_before_->object(control_object_).texture_sets&&detail::texture_set_control(state_.controls.parameter)){
+    auto controls=std::move(state_.controls);const auto source=control_source_;
+    auto before=std::move(control_before_);control_before_.reset();state_.controls={};const bool changed=control_changed_;control_changed_=false;
+    try{if(accept&&changed){auto edit=detail::texture_set_control_request(before->object(control_object_),controls);queue_texture_set_locked(std::move(edit),source);}}
+    catch(...){control_before_=std::move(before);state_.controls=std::move(controls);control_changed_=changed;input_.resume_control(state_.controls.parameter);throw;}
+    return;
+  }
   if(state_.controls.parameter==VrParameter::BakeSource){
     static_assert(std::is_nothrow_move_constructible_v<VrControlState> && std::is_nothrow_move_assignable_v<VrControlState>);
     auto controls=std::move(state_.controls);
@@ -2526,7 +2601,7 @@ void Document::control_event_locked(VrControlEvent event) {
         ++uv_session_;
         uv_.emplace(std::shared_ptr<const Mesh>(o.painted, &o.painted->mesh()),
                     o.painted->resolution());
-        c.value[3]=o.painted->paint_sampling_domain()?2.f:(o.material_bindings&&o.material_bindings->canonical_attributes)||(o.painted->normal_projection()&&o.painted->normal_projection()->version==2)?1.f:0.f;
+        c.value[3]=(detail::canonical_paint_retention_supported(o)||o.painted->paint_sampling_domain())?2.f:(o.material_bindings&&o.material_bindings->canonical_attributes)||(o.painted->normal_projection()&&o.painted->normal_projection()->version==2)?1.f:0.f;
         c.title = "UV editor";
       } catch (...) {
         control_before_.reset();
@@ -2676,20 +2751,20 @@ void Document::control_event_locked(VrControlEvent event) {
       break;
     case VrParameter::Metallic:
       c.title = "Material metalness";
-      c.value[0] = o.material.metallic;
+      c.value[0] = o.texture_sets?active_texture_set(o).material.metallic:o.material.metallic;
       break;
     case VrParameter::Roughness:
       c.title = "Material roughness";
-      c.value[0] = o.material.roughness;
+      c.value[0] = o.texture_sets?active_texture_set(o).material.roughness:o.material.roughness;
       break;
     case VrParameter::Opacity:
       c.title = "Material opacity";
-      c.value[0] = o.material.color[3];
+      c.value[0] = o.texture_sets?active_texture_set(o).material.color[3]:o.material.color[3];
       break;
     case VrParameter::BaseColor:
       c.title = "Material color";
       c.components = 4;
-      c.value = o.material.color;
+      c.value = o.texture_sets?active_texture_set(o).material.color:o.material.color;
       break;
     case VrParameter::InkColor:
       c.title = "Brush color";
@@ -2704,8 +2779,10 @@ void Document::control_event_locked(VrControlEvent event) {
     case VrParameter::InkEmissionUnits:
       c.title="Brush units / relative normalizes";c.value[0]=state_.paint.emission_units==PaintEmissionUnits::Physical?1:0;break;
     case VrParameter::MaterialEmission: {
-      c.title=o.material.unlit?"Unlit material ignores emission":o.material_bindings&&o.material_bindings->physical_emission?"Absolute background radiance":"Material emission / linear radiance";
-      c.components=3;c.maximum=maximum_native_emission;const auto &value=o.material_bindings&&o.material_bindings->physical_emission?*o.material_bindings->physical_emission:o.material.emissive;
+      const auto material=o.texture_sets?active_texture_set(o).material:o.material;
+      const auto binding=o.texture_sets?active_texture_set(o).material_bindings:o.material_bindings;
+      c.title=material.unlit?"Unlit material ignores emission":binding&&binding->physical_emission?"Absolute background radiance":"Material emission / linear radiance";
+      c.components=3;c.maximum=maximum_native_emission;const auto &value=binding&&binding->physical_emission?*binding->physical_emission:material.emissive;
       for(size_t k=0;k<3;++k)c.value[k]=value[k];break;
     }
     case VrParameter::InkEmission:
@@ -2735,9 +2812,9 @@ void Document::control_event_locked(VrControlEvent event) {
     }
     case VrParameter::LayerOpacity:
     case VrParameter::LayerOrder: {
-      auto &layers = o.painted->layers();
+      const auto field=active_texture_set(o);const auto &layers = field.painted->layers();
       auto it = std::find_if(layers.begin(), layers.end(), [&](auto &l) {
-        return l.id == o.painted->active_layer();
+        return l.id == field.painted->active_layer();
       });
       c.title = event.parameter == VrParameter::LayerOpacity ? "Layer opacity"
                                                              : "Layer order";
@@ -2746,13 +2823,13 @@ void Document::control_event_locked(VrControlEvent event) {
                        : float(it - layers.begin());
       if (event.parameter == VrParameter::LayerOrder)
         c.maximum = float(layers.size() - 1);
-      o.painted = o.painted->snapshot();
+      if(!o.texture_sets)o.painted = o.painted->snapshot();
       break;
     }
     default:
       break;
     }
-    state_.message.clear();
+    state_.message=o.texture_sets&&detail::texture_set_control(event.parameter)?"Texture-set changes are staged until Apply":std::string{};
     return;
   }
   if (!control_before_ || event.parameter != state_.controls.parameter)
@@ -2835,6 +2912,14 @@ void Document::control_event_locked(VrControlEvent event) {
   c.value[event.component] = value;
   auto &o = scene_.object(control_object_);
   auto &before = control_before_->object(control_object_);
+  if(o.texture_sets&&detail::texture_set_control(c.parameter)){
+    const auto original=active_texture_set(before);auto request=detail::texture_set_control_request(before,c);
+    if(request.action==TextureSetAction::Material)control_changed_=!detail::same_texture_material(request.material,original.material);
+    else{const auto&layers=original.painted->layers();const auto at=std::find_if(layers.begin(),layers.end(),[&](const auto&l){return l.id==request.layer;});
+      if(at==layers.end())throw std::logic_error("Texture-set controls lost their selected layer");
+      control_changed_=request.action==TextureSetAction::LayerOpacity?request.value!=at->opacity:int(std::lround(request.value))!=int(at-layers.begin());}
+    publish_locked(false,false);return;
+  }
   bool scene_changed = false;
   switch (c.parameter) {
   case VrParameter::CutOffset:
@@ -3002,6 +3087,7 @@ void Document::control_event_locked(VrControlEvent event) {
 }
 
 bool Document::command_enabled_locked(SpatialCommand command) const {
+  if(texture_set_command(command))return texture_set_command_enabled_locked(command);
   if(expression_command(command))return expression_command_enabled_locked(command);
   if(state_.expressions&&!preview_command(command)&&command!=SpatialCommand::CancelWork&&command!=SpatialCommand::Center)return false;
   if(editable_avatar_export_command(command))return
@@ -3165,9 +3251,9 @@ bool Document::command_enabled_locked(SpatialCommand command) const {
   case SpatialCommand::Duplicate:
     return scene_.objects().size() < 256;
   case SpatialCommand::MakeMesh:
-    return o.visible && !o.locked && !o.deformation;
+    return !o.texture_sets&&o.visible && !o.locked && !o.deformation;
   case SpatialCommand::EditSource:
-    return o.visible && !o.locked && (o.mesh_active || volume().sculpt_settings().mask_edit);
+    return !o.texture_sets&&o.visible && !o.locked && (o.mesh_active || volume().sculpt_settings().mask_edit);
   case SpatialCommand::PaintColor:
   case SpatialCommand::PaintMetal:
   case SpatialCommand::PaintRough:
@@ -3175,10 +3261,10 @@ bool Document::command_enabled_locked(SpatialCommand command) const {
   case SpatialCommand::PaintMask:
     return o.visible && !o.locked;
   case SpatialCommand::AddLayer:
-    return o.mesh_active && o.painted && o.painted->layers().size() < 16;
+    return o.mesh_active && o.painted && active_texture_set(o).painted->layers().size() < 16;
   case SpatialCommand::DeleteLayer:
   case SpatialCommand::NextLayer:
-    return o.mesh_active && o.painted && o.painted->layers().size() > 1;
+    return o.mesh_active && o.painted && active_texture_set(o).painted->layers().size() > 1;
   case SpatialCommand::LayerVisible:
   case SpatialCommand::LayerOpacity:
     return o.mesh_active && bool(o.painted);
@@ -3216,6 +3302,7 @@ void Document::sculpt_command(SpatialCommand command) {
   if(published_.load()==publication)publish_locked();
 }
 void Document::command_locked(SpatialCommand command) {
+  if(texture_set_command(command)){texture_set_command_locked(command);return;}
   if(expression_command(command)){expression_command_locked(command);return;}
   if(state_.expressions&&command==SpatialCommand::CancelWork){end_expression_preview_locked(false);return;}
   if(state_.expressions&&!preview_command(command)&&command!=SpatialCommand::Center)return;
@@ -3519,6 +3606,15 @@ void Document::command_locked(SpatialCommand command) {
     auto &o = scene_.active();
     if (!o.painted || !o.mesh_active)
       throw std::logic_error("Prepare or select a painting mesh first");
+    if(o.texture_sets){
+      const auto field=active_texture_set(o);TextureSetEdit edit;edit.set=field.id;edit.layer=field.painted->active_layer();
+      if(command==SpatialCommand::AddLayer)edit.action=TextureSetAction::AddLayer;
+      else if(command==SpatialCommand::DeleteLayer)edit.action=TextureSetAction::DeleteLayer;
+      else if(command==SpatialCommand::NextLayer)edit.action=TextureSetAction::NextLayer;
+      else if(command==SpatialCommand::LayerVisible)edit.action=TextureSetAction::ToggleLayer;
+      else{edit.action=TextureSetAction::LayerOpacity;const auto&layers=field.painted->layers();const auto at=std::find_if(layers.begin(),layers.end(),[&](const auto&l){return l.id==edit.layer;});if(at==layers.end())throw std::logic_error("Texture-set layer is unavailable");edit.value=at->opacity>.26f?at->opacity-.25f:1.f;}
+      queue_texture_set_locked(std::move(edit));return;
+    }
     if (command == SpatialCommand::NextLayer) {
       auto &layers = o.painted->layers();
       auto i = std::find_if(layers.begin(), layers.end(), [&](auto &l) {
@@ -3572,6 +3668,17 @@ void Document::command_locked(SpatialCommand command) {
     return;
   default:
     break;
+  }
+  if(scene_.active().texture_sets&&((command>=SpatialCommand::Warm&&command<=SpatialCommand::Opacity))){
+    TextureSetEdit edit;edit.action=TextureSetAction::Material;const auto field=active_texture_set(scene_.active());edit.set=field.id;edit.material=field.material;auto&m=edit.material;
+    switch(command){
+    case SpatialCommand::Warm:m.color={.58f,.30f,.15f,1};break;case SpatialCommand::Blue:m.color={.04f,.12f,.8f,1};break;
+    case SpatialCommand::White:m.color={.8f,.8f,.8f,1};break;case SpatialCommand::Dark:m.color={.04f,.04f,.04f,1};break;
+    case SpatialCommand::MetalUp:m.metallic=std::min(1.f,m.metallic+.1f);break;case SpatialCommand::MetalDown:m.metallic=std::max(0.f,m.metallic-.1f);break;
+    case SpatialCommand::RoughUp:m.roughness=std::min(1.f,m.roughness+.1f);break;case SpatialCommand::RoughDown:m.roughness=std::max(0.f,m.roughness-.1f);break;
+    case SpatialCommand::Toon:m.toon=true;break;case SpatialCommand::Pbr:m.toon=false;break;case SpatialCommand::Opacity:m.color[3]=m.color[3]>.26f?m.color[3]-.25f:1.f;break;
+    default:throw std::logic_error("Unknown material command");}
+    queue_texture_set_locked(std::move(edit));return;
   }
   Scene before = scene_;
   auto &o = scene_.active();
@@ -3748,6 +3855,7 @@ void Document::file_loop() {
           return stopping_.load() || (job->work && job->work->cancelled.load()) || state->generation != job->generation ||
                  state->revision != job->revision || state->active_object != job->object || state->edit_authority!=job->edit_authority;
         };
+        if(job->texture_set_source){job->texture_set_source->authenticate_owner(job->texture_set_source);job->texture_set_source->authenticate_scene(job->scene);}
         job->scene_operation(job->scene, cancelled);
         if (cancelled()) throw std::runtime_error("Scene changed during " + job->operation_label);
         if(job->cut_handoff){
@@ -3772,6 +3880,7 @@ void Document::file_loop() {
           if (job->content != content_ || job->revision != state_.revision ||
               job->object != scene_.active().id || state_.edit_authority!=job->edit_authority || action_active_locked() || control_before_)
             throw std::runtime_error("Scene changed during " + job->operation_label);
+          if(job->texture_set_source)job->texture_set_source->authenticate_scene(scene_);
           if(accepted_result)accepted_result->recovery=recovery_source_;
           Transaction transaction(*this);
           state_.asset_busy=false;
@@ -3954,7 +4063,7 @@ void Document::file_loop() {
           auto native_owner=physical?std::make_shared<const Scene>(job->scene.snapshot()):nullptr;
           auto surfaces = physical?emission_export_surfaces(*native_owner,cancelled):job->scene.export_surfaces(cancelled);
           for (auto &surface : surfaces)
-            if (surface.mesh.uv.empty()) unwrap(surface.mesh,1024,4,cancelled);
+            if (!surface.texture_set_surface && surface.mesh.uv.empty()) unwrap(surface.mesh,1024,4,cancelled);
           GltfExportOptions options; options.recompute_changed_normals = true;
           options.cancelled=cancelled;options.before_commit=before_commit;
           if(physical){auto emission=std::make_shared<NativeEmissionExport>();emission->scene=std::move(native_owner);emission->scope=NativeEmissionExport::Scope::WholeScene;emission->allow_measured_core_fallback=true;options.emission=std::move(emission);}

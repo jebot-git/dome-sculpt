@@ -1,10 +1,12 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #pragma once
 #include "mesh-processing.hpp"
+#include "surface-material.hpp"
 #include "mtoon.hpp"
 #include <optional>
 #include <span>
 namespace dome {
+namespace detail {struct SculptSurfaceChunk; class SculptSceneChunks;}
 struct CreatorAppearance;
 struct SurfaceRange;
 struct SourceNativeMaterial;
@@ -15,6 +17,15 @@ SourceNativeMaterial native_source(const CreatorAppearance &);
 float mtoon_factor(float typed, float original, float current);
 struct PaintCornerCoordinates { std::span<const std::array<float,2>> values; };
 struct PaintVertexCoordinates { std::span<const std::array<float,2>> values; };
+// Distinguishes an actual packed triangle from a chunk-local triangle. A
+// caller selecting an object must use object, never manufacture a global
+// packed offset for a separate immutable geometry owner.
+struct MaterialSurfaceHit {
+  SurfaceHit surface;
+  uint64_t object=0;
+  std::shared_ptr<const detail::SculptSurfaceChunk> chunk;
+  bool packed() const {return !chunk;}
+};
 class MaterialSurfaceQuery {
   struct Impl;
   std::unique_ptr<Impl> impl_;
@@ -31,9 +42,19 @@ public:
                        std::span<const std::array<float,4>>,PaintCornerCoordinates);
   MaterialSurfaceQuery(const Mesh &,std::span<const SurfaceRange>,const std::function<bool()> &,
                        std::span<const std::array<float,4>>,PaintVertexCoordinates);
+  // A real mixed immutable scene, retaining chunk-local namespaces. This does
+  // not flatten generated geometry into the packed paint/source namespace.
+  MaterialSurfaceQuery(const Mesh &,std::span<const SurfaceRange>,const std::function<bool()> &,
+      std::span<const std::array<float,4>>,PaintVertexCoordinates,
+      std::shared_ptr<const detail::SculptSceneChunks>);
   ~MaterialSurfaceQuery();
   MaterialSurfaceQuery(const MaterialSurfaceQuery &) = delete;
   MaterialSurfaceQuery &operator=(const MaterialSurfaceQuery &) = delete;
+  SurfaceMaterialIdentity material_identity(uint32_t query_triangle)const;
+  uint32_t logical_triangle(uint32_t query_triangle)const;
+  // Per-material exclusion leaves other sets on the same object visible.
+  std::optional<SurfaceHit> raycast_excluding_materials(Vec3,Vec3,float,double,
+      std::span<const SurfaceMaterialIdentity>)const;
   SurfaceHit closest(Vec3) const;
   SurfaceHit closest(Vec3,uint64_t only_object) const;
   std::optional<SurfaceHit> nearby(Vec3, float maximum, double seconds=0) const;
@@ -44,5 +65,13 @@ public:
   // Excluded objects are a captured visibility/edit policy, never an alpha override.
   std::optional<SurfaceHit> raycast_excluding(Vec3 origin, Vec3 direction, float maximum,
                                     double seconds, std::span<const uint64_t> excluded) const;
+  MaterialSurfaceHit closest_target(Vec3,uint64_t only_object=0) const;
+  std::optional<MaterialSurfaceHit> nearby_target(Vec3,float maximum,double seconds=0) const;
+  std::optional<MaterialSurfaceHit> raycast_target(Vec3,Vec3,float maximum=100,
+                                                double seconds=0,uint64_t only_object=0) const;
+  std::optional<MaterialSurfaceHit> raycast_excluding_target(Vec3,Vec3,float maximum,
+                                                double seconds,std::span<const uint64_t>) const;
+  std::optional<MaterialSurfaceHit> raycast_excluding_materials_target(Vec3,Vec3,float maximum,
+      double seconds,std::span<const SurfaceMaterialIdentity>) const;
 };
 } // namespace dome

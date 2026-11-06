@@ -589,6 +589,22 @@ Json MToonMaterial::known() const {
   }
   return j;
 }
+size_t MToonMaterial::copy_working_bytes(size_t maximum,const std::function<bool()> &cancelled) const {
+  size_t bytes=0,work=0;
+  auto stop=[&]{if(cancelled&&cancelled())throw std::runtime_error("MToon material copy preflight cancelled");};
+  auto add=[&](size_t count,size_t stride=1){if(stride&&count>(maximum-bytes)/stride)throw std::length_error("Material value copy exceeds working budget before allocation");bytes+=count*stride;};
+  auto visit=[&](auto &&self,const Json &value,size_t depth)->void {
+    if((++work&255)==0)stop();if(depth>128)throw std::length_error("Material value copy exceeds JSON depth before allocation");
+    if(value.is_object()){
+      add(1,64);for(auto it=value.begin();it!=value.end();++it){add(1,sizeof(Json::object_t::value_type)+64);add(it.key().size()+1);self(self,it.value(),depth+1);}
+    }else if(value.is_array()){
+      add(1,sizeof(Json::array_t)+64);add(value.size(),sizeof(Json));for(const auto &child:value)self(self,child,depth+1);
+    }else if(value.is_string()){add(1,sizeof(Json::string_t)+64);add(value.get_ref<const Json::string_t&>().size()+1);}
+    else if(value.is_binary()){add(1,sizeof(Json::binary_t)+64);add(value.get_binary().size());}
+  };
+  stop();add(diagnostics.size(),sizeof(std::string));for(const auto &text:diagnostics){add(text.size()+1);add(1,64);}
+  visit(visit,source_,0);visit(visit,initial_known_,0);stop();return bytes;
+}
 void MToonMaterial::validate(size_t count) const {
   auto &p = parameters;
   for (auto x : p.base_color)

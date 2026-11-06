@@ -29,6 +29,8 @@ class SurfaceRenderer {
   size_t count_ = 0;
   SurfaceBufferStats buffers_;
   std::shared_ptr<const MeshSnapshot> cached_;
+  struct ChunkState;
+  std::unique_ptr<ChunkState> chunks_;
   struct TextureState;
   std::unique_ptr<TextureState> textures_;
 
@@ -36,7 +38,7 @@ public:
   SurfaceRenderer();
   explicit SurfaceRenderer(SurfaceTextureLimits);
   SurfaceTextureStats texture_stats() const;
-  SurfaceBufferStats buffer_stats() const { return buffers_; }
+  SurfaceBufferStats buffer_stats() const;
   void set_frame_time(double seconds);
   void set_output_encoding(SurfaceOutputEncoding);
   // Deferred draw leaves a linear framebuffer bound for Cursor/Palette overlays.

@@ -1,3 +1,4 @@
+#include "dome/texture-sets.hpp"
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "polygon-conversion.hpp"
 #include "document-authority.hpp"
@@ -128,6 +129,7 @@ capture_origin(const SculptObject &source, CanvasTransform world,
   origin->shape_source = source.shape_source;
   origin->rig_source = source.rig_source;
   origin->bake_recipe = source.bake_recipe;
+  origin->texture_sets=source.texture_sets;
   origin->retopology = source.retopology;
   origin->polygon = source.polygon;
   origin->mesh_active = source.mesh_active;
@@ -270,6 +272,9 @@ PolygonMesh prepare_unpainted_polygon_atlas(const PolygonMesh &source,
     uint32_t resolution,const std::function<bool()> &cancelled) {
   PolygonLimits limits;limits.cancelled=cancelled;
   return PolygonConversionAccess::atlas(source,resolution,limits);
+}
+PolygonMesh evaluate_polygon_source_topology(const PolygonAuthority&authority,const Mesh&rest,const Mesh&posed,const PolygonLimits&limits){
+ return PolygonConversionAccess::evaluated(authority.topology,rest,posed,limits);
 }
 bool polygon_conversion_required(const SculptObject &object) {
   const bool current_polygon = object.polygon && object.polygon->active;
@@ -558,6 +563,7 @@ void restore_polygon_origin(Scene &scene, uint64_t id,
   target.shape_source = origin.shape_source;
   target.rig_source = origin.rig_source;
   target.bake_recipe = origin.bake_recipe;
+  target.texture_sets=origin.texture_sets;
   target.retopology = origin.retopology;
   target.polygon = origin.polygon;
   // Keep current object identity, placement/group and user name. Original

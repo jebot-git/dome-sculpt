@@ -1,0 +1,357 @@
+{
+  "scope": "Private source composition, not built or runtime-qualified",
+  "parents": [
+    "c6e6cd50cf06435a8523954de028201e130fe75a",
+    "c53e0b65ed1ebadfb60a7c115a05701762c4bfc6"
+  ],
+  "main_product_test_audit": [
+    {
+      "path": "include/dome/skin-authoring.hpp",
+      "main_exact": true,
+      "sha256": "b8dc8a30504026b8ffc7dec3e9eaace29272d39094170f295278e24e75678495"
+    },
+    {
+      "path": "src/closed-mesh-source-domain.hpp",
+      "main_exact": true,
+      "sha256": "e637e0674c249d033618eb05237cc4e6e73ac4c0f2307cae8146b9dd0e4a2eea"
+    },
+    {
+      "path": "src/closest-ray-visibility.hpp",
+      "main_exact": true,
+      "sha256": "c9f903d57c3c80fe59123e876418b4b72b4c1f937d2a44fe4d8b8bdfa35f9db1"
+    },
+    {
+      "path": "src/current-humanoid-heat-domains.hpp",
+      "main_exact": true,
+      "sha256": "c0a4378ed137e475e2b7df524a3e76dab97fe5f9dc648deac8e098ac8f4c2db5"
+    },
+    {
+      "path": "src/document-skin.cpp",
+      "main_exact": true,
+      "sha256": "b137e831807781ad76f39826e274bc84fc6f1350009a9874bf8155889767c28b"
+    },
+    {
+      "path": "src/document.cpp",
+      "main_exact": false,
+      "sha256": "be53437c54d52785383023cd52ef96b3bed92a6cc0250f46d2285cbfdb4ad386"
+    },
+    {
+      "path": "src/humanoid-heat-domains.hpp",
+      "main_exact": true,
+      "sha256": "666dfc389a3d07871f6edea412623c7b0d49b3e599184a59103979f627e6416d"
+    },
+    {
+      "path": "src/humanoid-heat-sources.hpp",
+      "main_exact": true,
+      "sha256": "aed3164b28ec17e756998e26e98cc0ec67eb215122d9d20b2e1321f7c616c349"
+    },
+    {
+      "path": "src/native-surface-heat.hpp",
+      "main_exact": true,
+      "sha256": "469bfa9e107b5a759b3a8b6b5406d38a2da0bd67937b3b13d9f0f60353888ec9"
+    },
+    {
+      "path": "src/native-weight-retention.hpp",
+      "main_exact": true,
+      "sha256": "21f34a930e35290815887f5597067f555f5ee24f8fe0095283470dc48798cf39"
+    },
+    {
+      "path": "src/palette.cpp",
+      "main_exact": true,
+      "sha256": "921bd33d465210be51aa6a0867907cd03e396d9d4c19d0a1f7eeea2fb8053c04"
+    },
+    {
+      "path": "src/partial-current-surface-heat.hpp",
+      "main_exact": true,
+      "sha256": "23b4983fee98a7a4a2dcc3ae631d06a0dc9d43727c2d114d1cf657b7cfc2360d"
+    },
+    {
+      "path": "src/skin-authoring.cpp",
+      "main_exact": true,
+      "sha256": "b148e42e45923c8d27e7fa7ce4d679bc75b20a5173a2dca3eb994257c2b9f2e8"
+    },
+    {
+      "path": "src/skin-editor.cpp",
+      "main_exact": true,
+      "sha256": "ae784149bc119b7fc54814f15a1c9673c408315c3919832de21d30fad1bfaaf8"
+    },
+    {
+      "path": "src/skin-methods.hpp",
+      "main_exact": true,
+      "sha256": "d8fbbfd50dc9ab950973a73768dab80fe09d01d753bd3cac34b152c8d9484215"
+    },
+    {
+      "path": "src/surface-heat-authoring.cpp",
+      "main_exact": true,
+      "sha256": "56d920fbfd65ee884e0b3e30b654a20bfe770cc18dae94e24f96b9b025e0d538"
+    },
+    {
+      "path": "src/visibility-geodesic-bind.hpp",
+      "main_exact": true,
+      "sha256": "593d369b751f4ccc69fdce46e075d3d7d08f2b4c0ef5f44668cb3d84d1882db4"
+    },
+    {
+      "path": "src/visibility-heat-bind.hpp",
+      "main_exact": true,
+      "sha256": "975e4fb272b0c93a0141c03f53113b1347bdefc76184b14717f3f20a45a3255b"
+    },
+    {
+      "path": "tests/automatic-visibility-audit.cpp",
+      "main_exact": true,
+      "sha256": "5819494f1231d4df32b27301f826bea64e7be310fdc43b27dc0dabd5a3264e6f"
+    },
+    {
+      "path": "tests/closed-mesh-source-domain.cpp",
+      "main_exact": true,
+      "sha256": "0cfca868245df439a63f3c3852ed26b87192452398151d3e64f333fda1631072"
+    },
+    {
+      "path": "tests/closed-source-boundary.cpp",
+      "main_exact": true,
+      "sha256": "a94839681684e44b88a89d1c067df29bcdc0f6715f2591625a377fa0a1d6b951"
+    },
+    {
+      "path": "tests/closed-source-diagnostic.cpp",
+      "main_exact": true,
+      "sha256": "67201af5db29fc6f94886aea84e6524527c516a15df20b935535fe7a728402a3"
+    },
+    {
+      "path": "tests/handle-source-domain.cpp",
+      "main_exact": true,
+      "sha256": "00ee9b8d7f518fd0249fcccd9b0b079de86f5fd1a5abb3a576c0b3b1f886a225"
+    },
+    {
+      "path": "tests/handle-support-regression.cpp",
+      "main_exact": true,
+      "sha256": "e46025dff5156b985bb2dca2e1f41036df2df561bf9cc8302c424a8f90d1470f"
+    },
+    {
+      "path": "tests/humanoid-heat-sources.cpp",
+      "main_exact": true,
+      "sha256": "34ed83d69a4013229cf81177a6a0fef04aacf19d86302d563e4601dcf614b548"
+    },
+    {
+      "path": "tests/native-surface-heat-export.cpp",
+      "main_exact": true,
+      "sha256": "0ae142178fd5ea7189ebe6fa61f3012842ebdd46ff149c1e33216a1fcb150e23"
+    },
+    {
+      "path": "tests/native-surface-heat-worker.cpp",
+      "main_exact": true,
+      "sha256": "329b9afbb43054ae18e27542086deadf4f6346406940d582b492e494b78767a3"
+    },
+    {
+      "path": "tests/native-surface-heat.cpp",
+      "main_exact": true,
+      "sha256": "dad011a8e78258a39026cebc8d3aa03589ed4d70648373419d6dcf7c46681b31"
+    },
+    {
+      "path": "tests/skin-authoring.cpp",
+      "main_exact": true,
+      "sha256": "1c974340ae1fd96d652dea8dfdbbb08482d4e7a67074dbfd44da1330a350815a"
+    },
+    {
+      "path": "tests/surface-heat-caller-faults.cpp",
+      "main_exact": true,
+      "sha256": "a35f930bc3ddd7c720487063f6c0409ce8eef8a828259089a0a2525e02eb1eb0"
+    },
+    {
+      "path": "tests/surface-heat-component-counter.cpp",
+      "main_exact": true,
+      "sha256": "83dd3b103735b7b5c5d7a591ccd60f4c3befe5f2b28ce8d092f9aea30a7b41b9"
+    },
+    {
+      "path": "tests/surface-heat-component-menu.py",
+      "main_exact": true,
+      "sha256": "3da3abbf18a3f3665e5361404e98de1ff905372df104de79dc17a243d2e7d38b"
+    },
+    {
+      "path": "tests/surface-heat-component-ui.cpp",
+      "main_exact": true,
+      "sha256": "22bf64692fe97cce9a8c846c6af3749f14b842dc91de62b712b5cb65ac33a08e"
+    },
+    {
+      "path": "tests/surface-heat-current-domain-audit.cpp",
+      "main_exact": true,
+      "sha256": "b8f43294501a684262d6fe1286d8d787676a149b30e3d0242d3256fdee23158a"
+    },
+    {
+      "path": "tests/surface-heat-factory-faults.cpp",
+      "main_exact": true,
+      "sha256": "4ac697474ec5cbce28f1d79b4fd8bd93d2bb5099308763a949bfa0033e51186e"
+    },
+    {
+      "path": "tests/surface-heat-head-stress.cpp",
+      "main_exact": true,
+      "sha256": "934a401304dd6f3e4a29e5d5de18bef2c3a06be4337bd4cedb0f3d33a36f2cdd"
+    },
+    {
+      "path": "tests/surface-heat-mixed-factory-faults.cpp",
+      "main_exact": true,
+      "sha256": "249ec4611cb73e42fd595c2f7cfa6b412ecf4a829930936c3f59780d595f5bc4"
+    },
+    {
+      "path": "tests/surface-heat-mixed-generic.cpp",
+      "main_exact": true,
+      "sha256": "dfa3b0c9e48c9cb81d61dfd79805afce9b9842e1d7c0602336e62a77e628fe14"
+    },
+    {
+      "path": "tests/surface-heat-native-articulation.cpp",
+      "main_exact": true,
+      "sha256": "2a4a897abe3185d68d8c18c4cdc057fb4b95752db440b3b49ac94927dc98904e"
+    },
+    {
+      "path": "tests/surface-heat-native-fixture.hpp",
+      "main_exact": true,
+      "sha256": "7cb0976bff28d58df629699f0489b347ae5f80dee3f67e26346c5aa2471afa1a"
+    },
+    {
+      "path": "tests/surface-heat-native-humanoid.cpp",
+      "main_exact": true,
+      "sha256": "4bd6ad4d35f3b624ba21a5c5bca2f98cb9e27ed4f7a4d0f08310500913ab570a"
+    },
+    {
+      "path": "tests/surface-heat-native-public.cpp",
+      "main_exact": true,
+      "sha256": "21841c51b407a32924c88bebae39998dae96c530112bbe2b783348355b4243fa"
+    },
+    {
+      "path": "tests/surface-heat-native.cpp",
+      "main_exact": true,
+      "sha256": "c6e1bff2509c1abed799c0cfefcfe5cc87aee73bbe24f642a11f674f6d77c562"
+    },
+    {
+      "path": "tests/surface-heat-public.cpp",
+      "main_exact": true,
+      "sha256": "4fa7bbb30815f19015946866e82b71b0006284945896930551fac558174bf317"
+    },
+    {
+      "path": "tests/surface-heat-worker-faults.cpp",
+      "main_exact": true,
+      "sha256": "7dcd2f554885f1ec6358d31e9de6d1e390db5683d6da0e4de1ae074b542c90ff"
+    },
+    {
+      "path": "tests/visibility-articulation-quality.cpp",
+      "main_exact": true,
+      "sha256": "965ad79e015e2cfd03c76c7ded310c1ac1e4f0db6448bb2881270c246f57d10a"
+    },
+    {
+      "path": "tests/visibility-closed-heat.cpp",
+      "main_exact": true,
+      "sha256": "dc0ed0f2da7e52f569ed6f8e230a99ca1e8e095218e01cf48f8ae4f77da8a5ac"
+    },
+    {
+      "path": "tests/visibility-closed-source-domain-avatar.cpp",
+      "main_exact": true,
+      "sha256": "503da66dbd7bcce71ed8b137d8d97bdedce0de593aa14edaa5779fb6d13d1c78"
+    },
+    {
+      "path": "tests/visibility-component-audit.cpp",
+      "main_exact": true,
+      "sha256": "2ffd74f41f93b154fb4a7c109475e0c9197169e9963f246354252bc71fcd0f46"
+    },
+    {
+      "path": "tests/visibility-field-inspect.cpp",
+      "main_exact": true,
+      "sha256": "ab9b818b436d3bc482b0486f58f8914dc1a45e81957171b2e1570e4a6f4eeeb5"
+    },
+    {
+      "path": "tests/visibility-geodesic-avatar.cpp",
+      "main_exact": true,
+      "sha256": "ef1029ccfbd302891fe9329f014e58ab854ab6a9bd2d5257a9c3c20889142d1d"
+    },
+    {
+      "path": "tests/visibility-geodesic.cpp",
+      "main_exact": true,
+      "sha256": "39593eb12a610b1f05e8d8c15f6fc8402db0f8a593a8176d1150f658ad2754ef"
+    },
+    {
+      "path": "tests/visibility-handle-heat.cpp",
+      "main_exact": true,
+      "sha256": "f08af88747898d9c6e047c85a23e95ddf9ec97c43f3ce4e18aec36434259d0dc"
+    },
+    {
+      "path": "tests/visibility-handle-source-avatar.cpp",
+      "main_exact": true,
+      "sha256": "4927ec665a3c49b559a22f0c136a08df43b0b10f1e26e5fae8e8629f1191feac"
+    },
+    {
+      "path": "tests/visibility-heat-avatar.cpp",
+      "main_exact": true,
+      "sha256": "ffaa0aa514140548b05a9b6b3a4b9405aae5e03edb4215a3c04aad8941e4427c"
+    },
+    {
+      "path": "tests/visibility-heat.cpp",
+      "main_exact": true,
+      "sha256": "8eea45112331c2ddeff0ecaec752149dff80bb966653257c4aa700080d9bf5e0"
+    },
+    {
+      "path": "tests/visibility-humanoid-heat-avatar.cpp",
+      "main_exact": true,
+      "sha256": "7130e92012c52830af9565c72224f396b4da558c1bb07a484469fa604e3117c9"
+    },
+    {
+      "path": "tests/visibility-local-quality.cpp",
+      "main_exact": true,
+      "sha256": "6a91431b6cc61bfb3dedcc93f001ea33e63b83ab60274c64c46480bc9546463b"
+    },
+    {
+      "path": "tests/visibility-source-domain-heat-avatar.cpp",
+      "main_exact": true,
+      "sha256": "799d95769a3ed5f198d36964d089f36ebc5946f166627f26673be741384b11cc"
+    },
+    {
+      "path": "tests/visibility-source-head-heat-avatar.cpp",
+      "main_exact": true,
+      "sha256": "0b79b7133889c28cfc52ad64522e5a6e47f9df710cf9887bb62a2dfddca4f5b1"
+    },
+    {
+      "path": "tests/visibility-stress.cpp",
+      "main_exact": true,
+      "sha256": "515a3984287f18a0e7e0f145e703773337175c8a47a5fa770a62d02683e6fa6c"
+    }
+  ],
+  "document_cpp": "Auto merge retains owning37 authority plus current SurfaceHeat controls; requires fresh merged owning compilation.",
+  "conflicts": {
+    "CMakeLists.txt": "Both independent test blocks retained; explicit endif separates owning key tests from surface heat tests.",
+    "docs/HANDOFF.md": "Both checkpoint histories retained, new scope header.",
+    "docs/REQUIREMENTS.md": "Both checkpoint histories retained, new scope header."
+  },
+  "metadata_config": {
+    "ui": false,
+    "xr": false,
+    "backend": "CPU",
+    "tests": 1241,
+    "unique": 1241,
+    "surface_heat": 27,
+    "canonical_paint37": 414,
+    "executed": false
+  },
+  "prior_release": {
+    "summary_sha256": "14b8d4093a1b54df9f7b758e8d26fc976e898991fa4182a38af63f41f625e4c5",
+    "runtime_inputs_sha256": "a0c81522d904df681ccb35121d9bdc9f0319d3d39b2ad906b7f95eff029e381c",
+    "own_inputs": 244,
+    "snapshot_ledger": "artifacts/owning37-c6-proof-snapshot/ledger.json",
+    "snapshot_ledger_sha256": "41f44e886b48e03fff78ca098f9674a91b181652b9ff67f1c31a987bb3203c3d",
+    "copy_method": "cp --reflink=always --preserve=all; no hardlinks or original removal",
+    "original_inputs_retained": true,
+    "source": "c6e6cd50cf06435a8523954de028201e130fe75a",
+    "status": "Fresh optimized app/selected native only; not full runtime or sanitizer"
+  },
+  "polygon_counter": {
+    "status_sha256": "35fee2be8cfd645576834917c8c776213061503b3ceeecd1212def9e0819cc1a",
+    "actual_exit": 1,
+    "guard_history_checks": 65,
+    "required_restored_positives_passed": 0,
+    "required_restored_positives_failed": 2,
+    "error": "Baked normal field lost its actual separate attribute origin",
+    "diagnosis": "Polygon Paint clone retains field but conversion drops non-MToon origin binding; geometry also lacks current normal/paint correspondence.",
+    "guard_relaxation": false
+  },
+  "goal": "active and incomplete",
+  "next": [
+    "Authentic source-retaining normal/paint polygon conversion",
+    "Current caller input composition after full XR adapter/authority qualification",
+    "Fresh owning sanitizer and wider runtime/device/interoperability coverage"
+  ]
+}

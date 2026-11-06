@@ -1,0 +1,219 @@
+{
+  "status": "PRIVATE scoped Release component qualified; complete texture-set workflow unfinished",
+  "production_source": "11cf67d9539c8f4f7a6a44595e157d22812e8e80",
+  "final_consumer_source": "dbc907d57454234a3d7f4717f7aabdfa403acb59",
+  "base": "72238fcf4e83001bb3d0df659ba5069e1279035e",
+  "feature": {
+    "new_api": "initialize_texture_sets on a genuinely new empty actor",
+    "authority": "Exact current triangle membership is minted before any Strict paint raster. It does not invent original-source authority, reinterpret an old version or erase metadata.",
+    "ownership": "One detached immutable Mesh, independent per-member rasters and COW fields. Existing Scene/SurfaceRange/ObjectSurface/Paint/collection layouts and existing inline ownership remain unchanged.",
+    "resource_forecast": "Aggregate slots/domains, geometry copy/identity/assignment/recipient metadata, every initial raster and geometry/raster work charged before staging. Old64M/256MiB defaults unchanged. Final Scene/owner validation before no-throw Scene replacement.",
+    "retention": "Caller input positions/normals/UV/index values remain exact; mutable caller vector cannot mutate the owning Scene; existing authored actors cannot be initialized/discarded."
+  },
+  "cohorts": [
+    {
+      "source": "72238fcf4e83001bb3d0df659ba5069e1279035e",
+      "handle": 85001,
+      "wrapper_exit": 1,
+      "fresh_reachable_steps": 231,
+      "configure_exit": 0,
+      "configure_seconds": 5.311545716016553,
+      "build_exit": 0,
+      "build_seconds": 504.98008566797944,
+      "CTest": "3/4 pass, new surface test fails",
+      "failure": "Bare public PaintedMesh::from_mesh SourceAuthored option correctly refuses before any set/Scene construction. Original source/ELF/map/logs retained.",
+      "scope": "Fresh own optimized CPU app/core/support/render/XR and two consumers; app built but not launched."
+    },
+    {
+      "source": "11cf67d9539c8f4f7a6a44595e157d22812e8e80",
+      "handle": 35483,
+      "wrapper_exit": 1,
+      "compiled_whole_production_TUs": [
+        "src/paint.cpp",
+        "src/texture-sets.cpp"
+      ],
+      "compiled_whole_consumers": [
+        "tests/texture-sets.cpp",
+        "tests/texture-set-surfaces.cpp"
+      ],
+      "links": 2,
+      "link_exclusion": "Both maps exclude old core paint.cpp.o and texture-sets.cpp.o",
+      "tests": "Model32, polygon6, partition24 pass; surface reaches the new producer/paint/codec/occlusion/owner controls then fails an attempted same-grid UV merge.",
+      "failure": "Two depth-separated same-UV faces reassigned into one Strict grid correctly refuse ambiguous independent painting. Original failed consumer and logs retained."
+    },
+    {
+      "source": "dbc907d57454234a3d7f4717f7aabdfa403acb59",
+      "handle": 71163,
+      "wrapper_exit": 0,
+      "compiled_whole_consumers": [
+        "tests/texture-set-surfaces.cpp"
+      ],
+      "reused_qualified_production": "Exact unchanged11cf whole Paint/TextureSets plus exact frozen722 other own support; no native-child headers/objects or old SurfaceRange ABI.",
+      "tests": {
+        "model": 32,
+        "polygon": 6,
+        "partition_plan": 24,
+        "surface": 72
+      },
+      "strict_negative": "Original ambiguous merge is now independently asserted as a complete model/native rollback with exact collection/paint/geometry owner and history preservation. Subsequent actual native Save/reopen equals its pre-refusal Scene.",
+      "positive": "A genuine new-set reassignment keeps the original UV/depth data and verifies the original geometry-only cache invalidation assertion.",
+      "not_claimed": "No new app relink, sanitizer, GUI, GL pixels, GPU or full-workflow admission."
+    }
+  ],
+  "layout_audit": {
+    "src/paint.cpp": true,
+    "src/texture-sets.cpp": true,
+    "include/dome/texture-sets.hpp": true,
+    "src/texture-set-paint-access.hpp": true
+  },
+  "final_drift": {
+    "source_drift": [],
+    "old722_drift": [],
+    "past984_drift": [],
+    "previous11cf_drift": [],
+    "new_binary_drift": [],
+    "sdk_drift": []
+  },
+  "storage": {
+    "initial_fresh_R_bytes": 151846912,
+    "first_followup_bytes": 41230336,
+    "fixture_followup_bytes": 24866816,
+    "fixture_cap_bytes": 25165824,
+    "old_immutable_phase_bytes": 178302976,
+    "all_fresh_R_phase_bytes": 217944064,
+    "all_fresh_R_phase_cap_bytes": 301989888,
+    "old_plus_fresh_cap_bytes": 536870912,
+    "actual_free_observed_bytes": 22354313216,
+    "reserve_policy": "Actual20GiB floor plus root192MiB and prospective own64MiB before every serialized link. No library/archive copies or failure overwrites."
+  },
+  "scope_limits": [
+    "The original722 fresh all-reachable build is preserved separately from the additive11cf component and fixture-only follow-up.",
+    "Runtime counters are explicit native/model/query/codec controls; no renderer image or actual GL execution.",
+    "Complete active-set native stroke/controller/FLTK/XR/Undo/Cancel/ordered Save remains a separate source-only child.",
+    "Original/source/canonical/normal/retained-domain/recipe and polygon39 packet subset adapters remain guarded and required.",
+    "Per-set bake/resolution/UV/topology/history/import/export adapters, broad fault/resource/SAN/current app qualification remain required.",
+    "No main/default promotion or full texture-set completion."
+  ],
+  "artifacts": [
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/native-texture-sets-e79dbe9/artifacts/texture-set-surfaces-release/status.json",
+      "sha256": "043646ea6065b499cfccfb68375a91179be99aae6925f61c6618876a1529748d",
+      "bytes": 3944
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/native-texture-sets-e79dbe9/artifacts/texture-set-surfaces-release/model-codec.log",
+      "sha256": "c683269e7582bf281962049db138d7ca23c11a281df942f33c68a33f66417f3b",
+      "bytes": 875
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/native-texture-sets-e79dbe9/artifacts/texture-set-surfaces-release/source-before.json",
+      "sha256": "2a659b80a160f3764015743ff0c5be10b786513b2fa16004f49e26594aa42c78",
+      "bytes": 153492
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/native-texture-sets-e79dbe9/artifacts/texture-set-surfaces-release/source-after.json",
+      "sha256": "2a659b80a160f3764015743ff0c5be10b786513b2fa16004f49e26594aa42c78",
+      "bytes": 153492
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/native-texture-sets-e79dbe9/artifacts/texture-set-surfaces-release/sdk-before.json",
+      "sha256": "390bf0387f24ffb706b75d940f48aadd9ec3d984d2b1b6a32266f79a47ddf906",
+      "bytes": 90064
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/native-texture-sets-e79dbe9/artifacts/texture-set-surfaces-release/sdk-after.json",
+      "sha256": "390bf0387f24ffb706b75d940f48aadd9ec3d984d2b1b6a32266f79a47ddf906",
+      "bytes": 90064
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/native-texture-sets-e79dbe9/artifacts/texture-set-surfaces-release/binaries-before-test.json",
+      "sha256": "8330ed7345e821597d122bf9fea1b2dbf67daa02a010d957e61957c1899efcb6",
+      "bytes": 39733
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/native-texture-sets-e79dbe9/artifacts/texture-set-surfaces-release/actual-dependencies.txt",
+      "sha256": "a6b2a9aed3180f786444707d257e522195921fab46e072d2d46fe167cb67ac91",
+      "bytes": 3860313
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/native-texture-sets-e79dbe9/artifacts/texture-set-surfaces-release/actual-dependency-hashes.json",
+      "sha256": "fc9156fba6523127b3e5bb6f3e282f22c324237e9d11c8c7580c13c8b48e96d4",
+      "bytes": 219186
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/native-texture-sets-e79dbe9/artifacts/texture-set-surfaces-release/initial-owner-component/status.json",
+      "sha256": "c64d682227371e5f108ff3ab191bb09c69beb4e8b10b5466d651bf6ac4127dee",
+      "bytes": 19613
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/native-texture-sets-e79dbe9/artifacts/texture-set-surfaces-release/initial-owner-component/source-before.json",
+      "sha256": "abc4c43d2f7ba432a104619628e1d385ceaf8c325a0922d6a3a948f20f13c2b3",
+      "bytes": 45211
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/native-texture-sets-e79dbe9/artifacts/texture-set-surfaces-release/initial-owner-component/source-after.json",
+      "sha256": "abc4c43d2f7ba432a104619628e1d385ceaf8c325a0922d6a3a948f20f13c2b3",
+      "bytes": 45211
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/native-texture-sets-e79dbe9/artifacts/texture-set-surfaces-release/initial-owner-component/exclusion.json",
+      "sha256": "6217003fad5472a5ed3baa7904492890232aa4a0b1f39b97dd22a7b4729ae6a7",
+      "bytes": 451
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/native-texture-sets-e79dbe9/artifacts/texture-set-surfaces-release/initial-owner-component/test-surface.log",
+      "sha256": "f319e23b46fffc5b4bcbd729b01e69ae6a8458d00f080ced2ba948529cb5d94c",
+      "bytes": 2422
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/native-texture-sets-e79dbe9/artifacts/texture-set-surfaces-release/initial-owner-fixture2/status.json",
+      "sha256": "a650ad07dd5f1d3b9e2d9bd45324f5e7a2fbb6b15e8bb928ffc4b3e1401abdf0",
+      "bytes": 9502
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/native-texture-sets-e79dbe9/artifacts/texture-set-surfaces-release/initial-owner-fixture2/source-before.json",
+      "sha256": "11dc4f0c6eb47096b1e76f30fab5b1c0c2b0714f925a6e1301f09901202c4af0",
+      "bytes": 45211
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/native-texture-sets-e79dbe9/artifacts/texture-set-surfaces-release/initial-owner-fixture2/source-after.json",
+      "sha256": "11dc4f0c6eb47096b1e76f30fab5b1c0c2b0714f925a6e1301f09901202c4af0",
+      "bytes": 45211
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/native-texture-sets-e79dbe9/artifacts/texture-set-surfaces-release/initial-owner-fixture2/new-binaries-before-test.json",
+      "sha256": "5b60a626192ac60bc5dc854aa7d5b3e6d0589a30c16081f13e90f93677f6dc7e",
+      "bytes": 167
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/native-texture-sets-e79dbe9/artifacts/texture-set-surfaces-release/initial-owner-fixture2/new-binaries-after-test.json",
+      "sha256": "5b60a626192ac60bc5dc854aa7d5b3e6d0589a30c16081f13e90f93677f6dc7e",
+      "bytes": 167
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/native-texture-sets-e79dbe9/artifacts/texture-set-surfaces-release/initial-owner-fixture2/test-surface.log",
+      "sha256": "8ef7281e67f82ac152347b23c1dc44af91d720628ae15ae050d862f018e2a705",
+      "bytes": 2475
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/native-texture-sets-e79dbe9/artifacts/texture-set-surfaces-release/initial-owner-fixture2/surface.map",
+      "sha256": "67db16fd40c3b6d0ff47d86cf7cb7a14a508cd3292d2f53b4c3cad2dde6228c8",
+      "bytes": 10721089
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/native-texture-sets-e79dbe9/artifacts/texture-set-surfaces-release/initial-owner-fixture2/surface.d",
+      "sha256": "a6e9586101fc76f77b3561b665bb65e2a5dc71322167627d29b6eee9f9f2c06e",
+      "bytes": 21192
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/native-texture-sets-e79dbe9/artifacts/texture-set-surfaces-release/initial-owner-fixture2/strict-reassignment-preserved.dsculpt",
+      "sha256": "a83390cf7f7db421600c03df9dc16468faed07aac9defe86bc1a40151b85dc34",
+      "bytes": 1702
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/texture-set-initial-owner-722/artifacts/initial-owner-component-plan/plan.json",
+      "sha256": "8e41e434bf0bc8f51f2545439a943f6416e2f34de3ed8e1177ab923812a4f572",
+      "bytes": 2962
+    }
+  ]
+}

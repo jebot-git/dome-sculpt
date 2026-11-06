@@ -1,0 +1,133 @@
+{
+  "status": "Qualified private same-layout native/application component; no main/full-production admission",
+  "source": "0c99ac4549f7bf43b24d9def4bd4a506ae8b7f41",
+  "fresh_all_reachable_ABI_base": "e75409d3bc66cd16963f1a48cd45a2ca364376f6",
+  "complete_current_overrides": {
+    "Archive": {
+      "source": "0ae2726b",
+      "object": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/owning37-main-9dd/artifacts/polygon-transfer39-owning-release/reader-lifecycle-v3/polygon-surface-archive.cpp.o",
+        "sha256": "20232b540a85af90b2170b6a11cdb59c7b96a9d9af021c6c7160b4e230122d5a"
+      }
+    },
+    "Render": {
+      "source": "2aacc340",
+      "object": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/owning37-main-9dd/artifacts/polygon-transfer39-owning-release/render-v7/render.cpp.o",
+        "sha256": "1cdd332f7afe6dd8b04d978ae20943594533f05e971538e7596e9441f653d65d"
+      },
+      "private_header": "src/polygon-surface-gpu.hpp"
+    },
+    "Document": {
+      "source": "f20a5617",
+      "object": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/owning37-main-9dd/artifacts/polygon-transfer39-owning-release/render-v8/document.cpp.o",
+        "sha256": "a1ba172f6f28887120272972600e8b6b5c75e739bf962c0d159b46d0ce306000"
+      }
+    }
+  },
+  "public_layouts_since_fresh_base_unchanged": true,
+  "whole_current_application": {
+    "path": "/home/blux/de-xr/dome-sculpt/artifacts/owning37-main-9dd/artifacts/polygon-transfer39-owning-release/render-v8/dome-sculpt",
+    "sha256": "d9058add071b298a6f797bf51891622e200fc715ca9cc55bcd38194f63aa90dc"
+  },
+  "matched_inspector": {
+    "path": "/home/blux/de-xr/dome-sculpt/artifacts/owning37-main-9dd/artifacts/polygon-transfer39-owning-release/render-v7/dome-sculpt-native-authoring-inspect",
+    "sha256": "38e12215466db2fa66333c47fcec2f7dd76d6eb3405775f54d5d660d5edfbf95"
+  },
+  "old_overridden_members_excluded": true,
+  "fresh233_and_prior252_hashes_rechecked": true,
+  "earlier_native_scope": {
+    "receipt": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/owning37-main-9dd/docs/validation/POLYGON-SURFACE-OWNING39-NATIVE.json",
+      "sha256": "256946bad0cd47beb5a20e96f7d84be82700f49176463cacf43799a202ac412a"
+    },
+    "warning": "292 authoring +five downstream controls precede the corrected Document packing TU; retain their earlier native scope, not rerun by this application gate"
+  },
+  "GL": {
+    "status": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/owning37-main-9dd/artifacts/polygon-transfer39-owning-release/render-v9/status.json",
+      "sha256": "58b1fbc2ddc657d45a287cb7f234fcea3198abba1cb6d5a3aeb2afda14b4f92a"
+    },
+    "log": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/owning37-main-9dd/artifacts/polygon-transfer39-owning-release/render-v9/graphical-native.log",
+      "sha256": "2d656815b696f7d16c0fe804d9d4964ec410a557acaccce7ac26f13b8d792dd6"
+    },
+    "fixture_source": "dadad250",
+    "checks": 51,
+    "actual_programs": 2,
+    "active_fragment_samplers": {
+      "PBR": 13,
+      "mixed_MToon": 16
+    },
+    "cases": 8,
+    "matrix": "N-only/canonical \u00d7affine/reflected \u00d7Move/Flip",
+    "actual_mixed_import": "Small original GLB with VRMC_materials_mtoon/images parsed by real import_glb, captured original bytes and images; Scene validates actual source identity",
+    "software_renderer": "llvmpipe LLVM19.1.7 through pinned private Mesa26.2.5",
+    "exact_second_eye_and_unchanged_uploads": true,
+    "protected_prior_inputs": 262,
+    "limit": "Visibility, shader/ownership, actual active-sampler bound and stereo/cache proof; not an independent full lighting/normal oracle or hardware/performance proof"
+  },
+  "FLTK": {
+    "status": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/owning37-main-9dd/artifacts/polygon-transfer39-owning-release/ordinary-ui-v10/status.json",
+      "sha256": "514e29a827b449199caf7285324a5abb6821c7c0bd3f9730de13a6d90a13213e"
+    },
+    "log": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/owning37-main-9dd/artifacts/polygon-transfer39-owning-release/ordinary-ui-v10/native.log",
+      "sha256": "bba814bc7465e8f46334ac7bc581789e4e62cb3349a11d19c637b11d7553fa4c"
+    },
+    "report": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/owning37-main-9dd/artifacts/polygon-transfer39-owning-release/ordinary-ui-v10/actual/report.json",
+      "sha256": "5e0f794b65206d49bf854a551e3ca13a8f66d8b7532650fe6843b6a749fef177"
+    },
+    "checks": 19,
+    "ordinary_clean_app_processes": 2,
+    "protected_inputs": 257,
+    "scope": "Actual pointer paint on genuine canonical baked-normal/key/FLOAT prior; native universal-menu Cancel/Flip Apply\u2192Save\u2192Undo/Redo; real close/reopen/Save\u2192source Restore\u2192Undo/Redo; full source/normal/key/paint Scene equality",
+    "display": "Private ordinary X11 opt-in display; canonical DomeD FLTK/bitmap SDK, no desktop restart/HMD",
+    "limits": "One normal-size canonical workflow, not compact/Wayland/physical-device/full production qualification"
+  },
+  "preserved_failures": [
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/owning37-main-9dd/artifacts/polygon-transfer39-owning-release/render-v7/status.json",
+      "sha256": "dc22949f80460282f6493c17885aca1c00b89cd6f60dd6c62405a3791285b11f"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/owning37-main-9dd/artifacts/polygon-transfer39-owning-release/render-v8/status.json",
+      "sha256": "cfcf6526c2183c9c21940aadc97d7d3507fdc4592b7e9fec97f5fed14c1b29dc"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/owning37-main-9dd/artifacts/polygon-transfer39-owning-release/render-v8/WRAPPER-V1-ASSERTION.json",
+      "sha256": "9de07023bb03b82398e1d826a065a689201cbe71a28551b773935cb9fdc49d8a"
+    }
+  ],
+  "failure_meanings": [
+    "First-field source arrays missing in original Document append predicate: genuine product defect, corrected by including polygon_field",
+    "Initial mixed producer used a snapshot-only helper without original bytes: invalid fixture; corrected by actual GLB import, no Scene guard weakening",
+    "Firstv8 wrapper allowed-delta list order mismatch before any compiler/runtime, exact predicate retained"
+  ],
+  "resource": {
+    "approved_phase_cap": 369098752,
+    "full_link_prospective": 67108864,
+    "cumulative_cap": 1610612736,
+    "global_floor": 21474836480,
+    "root_reserve": 201326592,
+    "actual_after_UI": {
+      "phase": 294461440,
+      "cumulative": 1363238912,
+      "actual_free": 22104977408,
+      "prospective": 0
+    },
+    "failed_binaries_objects_archives_sources_preserved": true
+  },
+  "remaining": [
+    "fresh coherent all-own39+40 composition and cross-feature codecs/render/export",
+    "sanitizer and broader native/application regression on final composition",
+    "normal/lighting independent graphical oracle and hardware/physical-device qualification",
+    "compact and native Wayland authoring workflows",
+    "repeated connected edits/general topology/source-aware/typed-role transitions",
+    "portable GLB/VRM field representation"
+  ],
+  "no_default_schema_guard_relaxation": true
+}

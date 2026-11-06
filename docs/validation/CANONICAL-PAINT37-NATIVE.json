@@ -1,0 +1,2276 @@
+{
+  "runtime": "ac0d698",
+  "product_copy_preflight": "68c237c",
+  "qualified_test_source": "b5918be06f8348e3a36d29ffcb74cba4e5e19309",
+  "scope": "Private genuine canonical paint37 native/owning persistence and LDR GLB current-frame compiler; coherent wholly-owning ac0 R/S app/core/render/support/XR plus explicitly test-only corrected callers. Not main, full regression, Wayland, new controller execution, complete reader/writer fault sweep or HDR package4 admission.",
+  "implementation": [
+    "Scene37/material19 typed canonical writable owner with actual full before-origin, independent normal UV and genuine retained paint basis/current corner map",
+    "Required lossless paint+normal policy on supported canonical native UV actors; unchanged Accept no-op; exact real worker Save/Undo/Cancel/restart/source Restore",
+    "Current-frame exporter refines its genuine layout by authenticated paint corners; does not borrow color/native32 authority or relabel normal UV",
+    "Read-only bounded MToon value-copy forecast charges actual private JSON/diagnostics even for inactive has_mtoon=false holders; no stored layout or old wire change"
+  ],
+  "profiles": {
+    "release": {
+      "original_whole_source_cohort": {
+        "source": "ac0d69893b49d91b621ac435f2d23cb9cd1a1f6c",
+        "profile": "release",
+        "scope": "fresh whole owned current37 app/core/render/support/XR with native default-required Apply/Restore, owning codec, exact-input native/GLB software comparison and legacy controls; no GUI/hardware/package4 or complete new owning fault safety",
+        "results": [
+          {
+            "phase": "configure",
+            "command": [
+              "cmake",
+              "-S",
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-copy-b841",
+              "-B",
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-copy-b841/build-release",
+              "-G",
+              "Ninja",
+              "-DCMAKE_BUILD_TYPE=Release",
+              "-DBUILD_TESTING=ON",
+              "-DDOME_BUILD_UI=ON",
+              "-DDOME_BUILD_XR=ON",
+              "-DDOME_COMPUTE_BACKEND=CPU",
+              "-DFLTK_DIR=/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-release/share/fltk"
+            ],
+            "exit": 0,
+            "seconds": 5.143086588010192
+          },
+          {
+            "phase": "build",
+            "command": [
+              "nice",
+              "-n",
+              "15",
+              "cmake",
+              "--build",
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-copy-b841/build-release",
+              "-j2",
+              "--target",
+              "dome-sculpt",
+              "dome-sculpt-canonical-paint-native-test",
+              "dome-sculpt-canonical-paint-key-uv-render-test",
+              "dome-sculpt-canonical-paint-codec-test",
+              "dome-sculpt-canonical-paint-owner-test",
+              "dome-sculpt-canonical-paint-owner-cap-test",
+              "dome-sculpt-canonical-paint-origin-reader-test",
+              "dome-sculpt-canonical-paint-uv-kernel-test",
+              "dome-sculpt-scene-test",
+              "dome-sculpt-scene-file-test",
+              "dome-sculpt-polygon-scene-test",
+              "dome-sculpt-native-paint-key-frames-test",
+              "dome-sculpt-native-paint-rig-uv-test",
+              "dome-sculpt-rig-after-authoring-test",
+              "dome-sculpt-native-paint32-emission-test",
+              "dome-sculpt-native-paint32-emission-mixed-test"
+            ],
+            "exit": 0,
+            "seconds": 739.1263843519846
+          },
+          {
+            "phase": "app-version",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-copy-b841/build-release/dome-sculpt",
+              "--version"
+            ],
+            "exit": 0,
+            "seconds": 0.037033299973700196
+          },
+          {
+            "phase": "native-0-0",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-copy-b841/build-release/dome-sculpt-canonical-paint-native-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native35-physical-1f4f55c/artifacts/canonical-physical-controls/output/0-0.dsculpt",
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-copy-b841/artifacts/native-owned/release/native-0-0"
+            ],
+            "exit": 1,
+            "seconds": 0.01601266796933487
+          }
+        ],
+        "exit": 1,
+        "inputs": 2412,
+        "unchanged": true
+      },
+      "legal_test_only_correction": {
+        "source": "f187b638880a4e58a3ab736b903174c17269bff3",
+        "runtime": "ac0d698",
+        "scope": "test-only legal constructor correction over completed matching full-own ac0 profile archives; no production/header delta",
+        "results": [
+          {
+            "phase": "compile-consumer",
+            "command": [
+              "/usr/bin/c++",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-fixture-ac0/src",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-fixture-ac0/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-fixture-ac0/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-fixture-ac0/third_party/nlohmann",
+              "-O3",
+              "-DNDEBUG",
+              "-std=gnu++20",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-fixture-ac0/src",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-fixture-ac0/tests/canonical-paint-native.cpp",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-fixture-ac0/artifacts/legal-native/release/consumer.o"
+            ],
+            "exit": 0,
+            "expected": 0,
+            "seconds": 7.1056099309935234
+          },
+          {
+            "phase": "link-consumer",
+            "command": [
+              "/usr/bin/c++",
+              "-O3",
+              "-DNDEBUG",
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-fixture-ac0/artifacts/legal-native/release/consumer.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-fixture-ac0/artifacts/legal-native/release/consumer",
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-fixture-ac0/artifacts/legal-native/release/support/libdome-sculpt-core.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-fixture-ac0/artifacts/legal-native/release/support/libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-fixture-ac0/artifacts/legal-native/release/support/libdome-sculpt-polygon.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-fixture-ac0/artifacts/legal-native/release/support/libxatlas.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-fixture-ac0/artifacts/legal-native/release/support/libmikktspace.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-fixture-ac0/artifacts/legal-native/release/support/libmikktspace-robust.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-fixture-ac0/artifacts/legal-native/release/support/libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-fixture-ac0/artifacts/legal-native/release/support/libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit": 0,
+            "expected": 0,
+            "seconds": 0.497936611995101
+          },
+          {
+            "phase": "native-0-0",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-fixture-ac0/artifacts/legal-native/release/consumer",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native35-physical-1f4f55c/artifacts/canonical-physical-controls/output/0-0.dsculpt",
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-fixture-ac0/artifacts/legal-native/release/output-0-0"
+            ],
+            "exit": 0,
+            "expected": 0,
+            "seconds": 0.0830865460447967
+          },
+          {
+            "phase": "native-7-0",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-fixture-ac0/artifacts/legal-native/release/consumer",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native35-physical-1f4f55c/artifacts/canonical-physical-controls/output/7-0.dsculpt",
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-fixture-ac0/artifacts/legal-native/release/output-7-0"
+            ],
+            "exit": 0,
+            "expected": 0,
+            "seconds": 0.08719632599968463
+          },
+          {
+            "phase": "native-0-3",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-fixture-ac0/artifacts/legal-native/release/consumer",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native35-physical-1f4f55c/artifacts/canonical-physical-controls/output/0-3.dsculpt",
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-fixture-ac0/artifacts/legal-native/release/output-0-3"
+            ],
+            "exit": 0,
+            "expected": 0,
+            "seconds": 0.1365033199544996
+          },
+          {
+            "phase": "native-7-4",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-fixture-ac0/artifacts/legal-native/release/consumer",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native35-physical-1f4f55c/artifacts/canonical-physical-controls/output/7-4.dsculpt",
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-fixture-ac0/artifacts/legal-native/release/output-7-4"
+            ],
+            "exit": 0,
+            "expected": 0,
+            "seconds": 0.15971252298913896
+          },
+          {
+            "phase": "native-converted-key",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-fixture-ac0/artifacts/legal-native/release/consumer",
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-key-uv-current-0e56/artifacts/canonical-key-uv/data-v2/converted-key.dsculpt",
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-fixture-ac0/artifacts/legal-native/release/output-converted-key"
+            ],
+            "exit": 0,
+            "expected": 0,
+            "seconds": 0.12446259398711845
+          },
+          {
+            "phase": "compile-counter",
+            "command": [
+              "/usr/bin/c++",
+              "-DDOME_SCULPT_INSTALLED_ASSETS=\"/usr/local/share/dome-sculpt/assets/humanoid\"",
+              "-DDOME_SCULPT_SOURCE_ASSETS=\"/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-fixture-ac0/assets/humanoid\"",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-fixture-ac0/third_party",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-fixture-ac0/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-fixture-ac0/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-fixture-ac0/third_party/cgltf",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-fixture-ac0/third_party/nlohmann",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-fixture-ac0/third_party/xatlas",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-fixture-ac0/third_party/mikktspace",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-fixture-ac0/third_party/ufbx",
+              "-O3",
+              "-DNDEBUG",
+              "-std=gnu++20",
+              "-Wall",
+              "-Wextra",
+              "-Wpedantic",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-fixture-ac0/src",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-fixture-ac0/artifacts/legal-native/release/canonical-paint-sampling.cpp",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-fixture-ac0/artifacts/legal-native/release/canonical-paint-sampling.cpp.o"
+            ],
+            "exit": 0,
+            "expected": 0,
+            "seconds": 5.930801809998229
+          },
+          {
+            "phase": "archive-counter",
+            "command": [
+              "ar",
+              "r",
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-fixture-ac0/artifacts/legal-native/release/counter-core.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-fixture-ac0/artifacts/legal-native/release/canonical-paint-sampling.cpp.o"
+            ],
+            "exit": 0,
+            "expected": 0,
+            "seconds": 0.3308666439843364
+          },
+          {
+            "phase": "index-counter",
+            "command": [
+              "ranlib",
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-fixture-ac0/artifacts/legal-native/release/counter-core.a"
+            ],
+            "exit": 0,
+            "expected": 0,
+            "seconds": 0.2485011460375972
+          },
+          {
+            "phase": "link-counter",
+            "command": [
+              "/usr/bin/c++",
+              "-O3",
+              "-DNDEBUG",
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-fixture-ac0/artifacts/legal-native/release/consumer.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-fixture-ac0/artifacts/legal-native/release/counter",
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-fixture-ac0/artifacts/legal-native/release/counter-core.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-fixture-ac0/artifacts/legal-native/release/support/libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-fixture-ac0/artifacts/legal-native/release/support/libdome-sculpt-polygon.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-fixture-ac0/artifacts/legal-native/release/support/libxatlas.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-fixture-ac0/artifacts/legal-native/release/support/libmikktspace.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-fixture-ac0/artifacts/legal-native/release/support/libmikktspace-robust.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-fixture-ac0/artifacts/legal-native/release/support/libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-fixture-ac0/artifacts/legal-native/release/support/libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit": 0,
+            "expected": 0,
+            "seconds": 0.42795020597986877
+          },
+          {
+            "phase": "counter-runtime",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-fixture-ac0/artifacts/legal-native/release/counter",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native35-physical-1f4f55c/artifacts/canonical-physical-controls/output/0-0.dsculpt",
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-fixture-ac0/artifacts/legal-native/release/counter-output"
+            ],
+            "exit": 1,
+            "expected": 1,
+            "seconds": 0.020923738018609583
+          }
+        ],
+        "exit": 0,
+        "inputs": 2164,
+        "unchanged": true,
+        "counter_core_sha256": "8abffff68dfcf0607ca675120b2342b10d4cb4ef94f2da12d6a70cc5a6aa81d1"
+      },
+      "affected_gate_continuation": {
+        "source": "f187b638880a4e58a3ab736b903174c17269bff3",
+        "runtime": "ac0d698",
+        "scope": "Continuation of actual whole-own ac0 affected gates after preserved invalid test-construction failure; test-only correction in legal-native cohort, no changed runtime/header or archive pairing",
+        "results": [
+          {
+            "phase": "quality",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-copy-b841/build-release/dome-sculpt-canonical-paint-key-uv-render-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-key-uv-current-0e56/artifacts/canonical-key-uv/data-v2/converted-key.dsculpt",
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-key-uv-current-0e56/artifacts/canonical-key-uv/data-v2/converted-uv.dsculpt",
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-fixture-ac0/artifacts/affected-continuation/release/quality"
+            ],
+            "exit": 0,
+            "seconds": 8.659592117997818
+          },
+          {
+            "phase": "factory-persistent-prefix",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-copy-b841/build-release/dome-sculpt-canonical-paint-owner-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native35-physical-1f4f55c/artifacts/canonical-physical-controls/output/0-0.dsculpt",
+              "--oom"
+            ],
+            "exit": 0,
+            "seconds": 0.25479516002815217
+          },
+          {
+            "phase": "actual-model-cap",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-copy-b841/build-release/dome-sculpt-canonical-paint-owner-cap-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-copy-b841/tests/fixtures/layered-normal/original-0.dsculpt"
+            ],
+            "exit": 0,
+            "seconds": 1.0026080000097863
+          },
+          {
+            "phase": "codec-0-0",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-copy-b841/build-release/dome-sculpt-canonical-paint-codec-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native35-physical-1f4f55c/artifacts/canonical-physical-controls/output/0-0.dsculpt",
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-fixture-ac0/artifacts/affected-continuation/release/codec-0-0"
+            ],
+            "exit": 0,
+            "seconds": 0.06501937995199114
+          },
+          {
+            "phase": "codec-7-0",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-copy-b841/build-release/dome-sculpt-canonical-paint-codec-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native35-physical-1f4f55c/artifacts/canonical-physical-controls/output/7-0.dsculpt",
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-fixture-ac0/artifacts/affected-continuation/release/codec-7-0"
+            ],
+            "exit": 0,
+            "seconds": 0.06041686097159982
+          },
+          {
+            "phase": "codec-0-3",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-copy-b841/build-release/dome-sculpt-canonical-paint-codec-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native35-physical-1f4f55c/artifacts/canonical-physical-controls/output/0-3.dsculpt",
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-fixture-ac0/artifacts/affected-continuation/release/codec-0-3"
+            ],
+            "exit": 0,
+            "seconds": 0.08765364898135886
+          },
+          {
+            "phase": "codec-7-4",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-copy-b841/build-release/dome-sculpt-canonical-paint-codec-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native35-physical-1f4f55c/artifacts/canonical-physical-controls/output/7-4.dsculpt",
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-fixture-ac0/artifacts/affected-continuation/release/codec-7-4"
+            ],
+            "exit": 0,
+            "seconds": 0.10687414300628006
+          },
+          {
+            "phase": "regressions",
+            "command": [
+              "ctest",
+              "--test-dir",
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-copy-b841/build-release",
+              "--output-on-failure",
+              "-R",
+              "^(scene-authoring|scene-file|polygon-scene-archive|native-paint-key-frames|native-paint-rig-uv|rig-after-authoring|native-paint32-emission|native-paint32-emission-mixed)$"
+            ],
+            "exit": 0,
+            "seconds": 18.094338696973864
+          }
+        ],
+        "exit": 0,
+        "inputs": 2181,
+        "unchanged": true
+      },
+      "actual_native_images": {
+        "source": "11918355d72d3252c90c91ab43751c013fd830d4",
+        "runtime": "ac0d698",
+        "scope": "new actual-native-UV image consumers over complete matching wholly owned ac0 archives; all product/header bytes identical; software only",
+        "results": [
+          {
+            "phase": "quality",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-native-quality-f187/artifacts/native-images-r2/release/consumer-quality",
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-key-uv-current-0e56/artifacts/canonical-key-uv/data-v2/converted-key.dsculpt",
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-key-uv-current-0e56/artifacts/canonical-key-uv/data-v2/converted-uv.dsculpt",
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-native-quality-f187/artifacts/native-images-r2/release/quality-images"
+            ],
+            "exit": 0,
+            "seconds": 5.337531052005943
+          },
+          {
+            "phase": "compile-physical",
+            "command": [
+              "/usr/bin/c++",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-native-quality-f187/src",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-native-quality-f187/third_party/cgltf",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-native-quality-f187/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-native-quality-f187/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-native-quality-f187/third_party/nlohmann",
+              "-isystem",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/harfbuzz",
+              "-isystem",
+              "/usr/include/glib-2.0",
+              "-isystem",
+              "/usr/lib64/glib-2.0/include",
+              "-isystem",
+              "/usr/include/sysprof-6",
+              "-isystem",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/freetype2",
+              "-isystem",
+              "/usr/include/libpng16",
+              "-isystem",
+              "/usr/include/libxml2",
+              "-O3",
+              "-DNDEBUG",
+              "-std=gnu++20",
+              "-pthread",
+              "-DWITH_GZFILEOP",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-native-quality-f187/tests/canonical-paint-physical-render.cpp",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-native-quality-f187/artifacts/native-images-r2/release/physical.o"
+            ],
+            "exit": 0,
+            "seconds": 13.286099994031247
+          },
+          {
+            "phase": "link-physical",
+            "command": [
+              "/usr/bin/c++",
+              "-O3",
+              "-DNDEBUG",
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-native-quality-f187/artifacts/native-images-r2/release/physical.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-native-quality-f187/artifacts/native-images-r2/release/consumer-physical",
+              "-Wl,-rpath,/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib",
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-native-quality-f187/artifacts/native-images-r2/release/support/libdome-sculpt-render.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-native-quality-f187/artifacts/native-images-r2/release/support/libdome-sculpt-core.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-native-quality-f187/artifacts/native-images-r2/release/support/libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-native-quality-f187/artifacts/native-images-r2/release/support/libdome-sculpt-polygon.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-native-quality-f187/artifacts/native-images-r2/release/support/libxatlas.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-native-quality-f187/artifacts/native-images-r2/release/support/libmikktspace.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-native-quality-f187/artifacts/native-images-r2/release/support/libmikktspace-robust.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-native-quality-f187/artifacts/native-images-r2/release/support/libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-native-quality-f187/artifacts/native-images-r2/release/support/libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libharfbuzz.so",
+              "/usr/lib64/libEGL.so",
+              "/usr/lib64/libGL.so",
+              "/usr/lib64/libfontconfig.so",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libfreetype.so",
+              "/usr/lib64/libicui18n.so",
+              "/usr/lib64/libicuuc.so",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit": 0,
+            "seconds": 0.3698277789517306
+          },
+          {
+            "phase": "physical",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-native-quality-f187/artifacts/native-images-r2/release/consumer-physical",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native35-physical-1f4f55c/artifacts/canonical-physical-controls/output",
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-native-quality-f187/artifacts/native-images-r2/release/physical-images"
+            ],
+            "exit": 0,
+            "seconds": 8.89792745304294
+          }
+        ],
+        "exit": 0,
+        "inputs": 2166,
+        "unchanged": true
+      },
+      "native_GUI": {
+        "source": "b5918be06f8348e3a36d29ffcb74cba4e5e19309",
+        "runtime": "ac0d698",
+        "scope": "actual FLTK app/private Dbus+Xvfb/software GL; matching own whole ac0 app/core and freshly matching inspector; normal Release/640x360 font32 SAN; no HMD/system session",
+        "profile": "release",
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/selection-gui-venv/bin/python",
+          "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-gui-119/tests/canonical-paint37-menu.py"
+        ],
+        "exit": 0,
+        "seconds": 27.410239909950178,
+        "inputs": 2420,
+        "unchanged": true
+      }
+    },
+    "sanitize": {
+      "original_whole_source_cohort": {
+        "source": "ac0d69893b49d91b621ac435f2d23cb9cd1a1f6c",
+        "profile": "sanitize",
+        "scope": "fresh whole owned current37 app/core/render/support/XR with native default-required Apply/Restore, owning codec, exact-input native/GLB software comparison and legacy controls; no GUI/hardware/package4 or complete new owning fault safety",
+        "results": [
+          {
+            "phase": "configure",
+            "command": [
+              "cmake",
+              "-S",
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-copy-b841",
+              "-B",
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-copy-b841/build-sanitize",
+              "-G",
+              "Ninja",
+              "-DCMAKE_BUILD_TYPE=Release",
+              "-DBUILD_TESTING=ON",
+              "-DDOME_BUILD_UI=ON",
+              "-DDOME_BUILD_XR=ON",
+              "-DDOME_COMPUTE_BACKEND=CPU",
+              "-DFLTK_DIR=/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-sanitize/share/fltk",
+              "-DCMAKE_C_FLAGS_RELEASE=-O1 -g1 -DNDEBUG -fsanitize=address,undefined -fno-omit-frame-pointer",
+              "-DCMAKE_CXX_FLAGS_RELEASE=-O1 -g1 -DNDEBUG -fsanitize=address,undefined -fno-omit-frame-pointer"
+            ],
+            "exit": 0,
+            "seconds": 6.2549756549997255
+          },
+          {
+            "phase": "build",
+            "command": [
+              "nice",
+              "-n",
+              "15",
+              "cmake",
+              "--build",
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-copy-b841/build-sanitize",
+              "-j2",
+              "--target",
+              "dome-sculpt",
+              "dome-sculpt-canonical-paint-native-test",
+              "dome-sculpt-canonical-paint-key-uv-render-test",
+              "dome-sculpt-canonical-paint-codec-test",
+              "dome-sculpt-canonical-paint-owner-test",
+              "dome-sculpt-canonical-paint-owner-cap-test",
+              "dome-sculpt-canonical-paint-origin-reader-test",
+              "dome-sculpt-canonical-paint-uv-kernel-test",
+              "dome-sculpt-scene-test",
+              "dome-sculpt-scene-file-test",
+              "dome-sculpt-polygon-scene-test",
+              "dome-sculpt-native-paint-key-frames-test",
+              "dome-sculpt-native-paint-rig-uv-test",
+              "dome-sculpt-rig-after-authoring-test",
+              "dome-sculpt-native-paint32-emission-test",
+              "dome-sculpt-native-paint32-emission-mixed-test"
+            ],
+            "exit": 0,
+            "seconds": 1217.9780674779904
+          },
+          {
+            "phase": "app-version",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-copy-b841/build-sanitize/dome-sculpt",
+              "--version"
+            ],
+            "exit": 0,
+            "seconds": 0.20697581599233672
+          },
+          {
+            "phase": "native-0-0",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-copy-b841/build-sanitize/dome-sculpt-canonical-paint-native-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native35-physical-1f4f55c/artifacts/canonical-physical-controls/output/0-0.dsculpt",
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-copy-b841/artifacts/native-owned/sanitize/native-0-0"
+            ],
+            "exit": 1,
+            "seconds": 0.20868638099636883
+          }
+        ],
+        "exit": 1,
+        "inputs": 2412,
+        "unchanged": true
+      },
+      "legal_test_only_correction": {
+        "source": "f187b638880a4e58a3ab736b903174c17269bff3",
+        "runtime": "ac0d698",
+        "scope": "test-only legal constructor correction over completed matching full-own ac0 profile archives; no production/header delta",
+        "results": [
+          {
+            "phase": "compile-consumer",
+            "command": [
+              "/usr/bin/c++",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-fixture-ac0/src",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-fixture-ac0/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-fixture-ac0/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-fixture-ac0/third_party/nlohmann",
+              "-O1",
+              "-g1",
+              "-DNDEBUG",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "-std=gnu++20",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-fixture-ac0/src",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-fixture-ac0/tests/canonical-paint-native.cpp",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-fixture-ac0/artifacts/legal-native/sanitize/consumer.o"
+            ],
+            "exit": 0,
+            "expected": 0,
+            "seconds": 9.071079091983847
+          },
+          {
+            "phase": "link-consumer",
+            "command": [
+              "/usr/bin/c++",
+              "-O1",
+              "-g1",
+              "-DNDEBUG",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-fixture-ac0/artifacts/legal-native/sanitize/consumer.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-fixture-ac0/artifacts/legal-native/sanitize/consumer",
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-fixture-ac0/artifacts/legal-native/sanitize/support/libdome-sculpt-core.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-fixture-ac0/artifacts/legal-native/sanitize/support/libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-fixture-ac0/artifacts/legal-native/sanitize/support/libdome-sculpt-polygon.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-fixture-ac0/artifacts/legal-native/sanitize/support/libxatlas.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-fixture-ac0/artifacts/legal-native/sanitize/support/libmikktspace.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-fixture-ac0/artifacts/legal-native/sanitize/support/libmikktspace-robust.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-fixture-ac0/artifacts/legal-native/sanitize/support/libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-fixture-ac0/artifacts/legal-native/sanitize/support/libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit": 0,
+            "expected": 0,
+            "seconds": 4.114749152970035
+          },
+          {
+            "phase": "native-0-0",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-fixture-ac0/artifacts/legal-native/sanitize/consumer",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native35-physical-1f4f55c/artifacts/canonical-physical-controls/output/0-0.dsculpt",
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-fixture-ac0/artifacts/legal-native/sanitize/output-0-0"
+            ],
+            "exit": 0,
+            "expected": 0,
+            "seconds": 0.8810826010303572
+          },
+          {
+            "phase": "native-7-0",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-fixture-ac0/artifacts/legal-native/sanitize/consumer",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native35-physical-1f4f55c/artifacts/canonical-physical-controls/output/7-0.dsculpt",
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-fixture-ac0/artifacts/legal-native/sanitize/output-7-0"
+            ],
+            "exit": 0,
+            "expected": 0,
+            "seconds": 0.9719557560165413
+          },
+          {
+            "phase": "native-0-3",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-fixture-ac0/artifacts/legal-native/sanitize/consumer",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native35-physical-1f4f55c/artifacts/canonical-physical-controls/output/0-3.dsculpt",
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-fixture-ac0/artifacts/legal-native/sanitize/output-0-3"
+            ],
+            "exit": 0,
+            "expected": 0,
+            "seconds": 1.8478950479766354
+          },
+          {
+            "phase": "native-7-4",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-fixture-ac0/artifacts/legal-native/sanitize/consumer",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native35-physical-1f4f55c/artifacts/canonical-physical-controls/output/7-4.dsculpt",
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-fixture-ac0/artifacts/legal-native/sanitize/output-7-4"
+            ],
+            "exit": 0,
+            "expected": 0,
+            "seconds": 2.2699538849992678
+          },
+          {
+            "phase": "native-converted-key",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-fixture-ac0/artifacts/legal-native/sanitize/consumer",
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-key-uv-current-0e56/artifacts/canonical-key-uv/data-v2/converted-key.dsculpt",
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-fixture-ac0/artifacts/legal-native/sanitize/output-converted-key"
+            ],
+            "exit": 0,
+            "expected": 0,
+            "seconds": 1.7954990420257673
+          },
+          {
+            "phase": "compile-counter",
+            "command": [
+              "/usr/bin/c++",
+              "-DDOME_SCULPT_INSTALLED_ASSETS=\"/usr/local/share/dome-sculpt/assets/humanoid\"",
+              "-DDOME_SCULPT_SOURCE_ASSETS=\"/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-fixture-ac0/assets/humanoid\"",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-fixture-ac0/third_party",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-fixture-ac0/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-fixture-ac0/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-fixture-ac0/third_party/cgltf",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-fixture-ac0/third_party/nlohmann",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-fixture-ac0/third_party/xatlas",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-fixture-ac0/third_party/mikktspace",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-fixture-ac0/third_party/ufbx",
+              "-O1",
+              "-g1",
+              "-DNDEBUG",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "-std=gnu++20",
+              "-Wall",
+              "-Wextra",
+              "-Wpedantic",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-fixture-ac0/src",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-fixture-ac0/artifacts/legal-native/sanitize/canonical-paint-sampling.cpp",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-fixture-ac0/artifacts/legal-native/sanitize/canonical-paint-sampling.cpp.o"
+            ],
+            "exit": 0,
+            "expected": 0,
+            "seconds": 11.259864736988675
+          },
+          {
+            "phase": "archive-counter",
+            "command": [
+              "ar",
+              "r",
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-fixture-ac0/artifacts/legal-native/sanitize/counter-core.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-fixture-ac0/artifacts/legal-native/sanitize/canonical-paint-sampling.cpp.o"
+            ],
+            "exit": 0,
+            "expected": 0,
+            "seconds": 2.334939375985414
+          },
+          {
+            "phase": "index-counter",
+            "command": [
+              "ranlib",
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-fixture-ac0/artifacts/legal-native/sanitize/counter-core.a"
+            ],
+            "exit": 0,
+            "expected": 0,
+            "seconds": 1.7416739480104297
+          },
+          {
+            "phase": "link-counter",
+            "command": [
+              "/usr/bin/c++",
+              "-O1",
+              "-g1",
+              "-DNDEBUG",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-fixture-ac0/artifacts/legal-native/sanitize/consumer.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-fixture-ac0/artifacts/legal-native/sanitize/counter",
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-fixture-ac0/artifacts/legal-native/sanitize/counter-core.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-fixture-ac0/artifacts/legal-native/sanitize/support/libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-fixture-ac0/artifacts/legal-native/sanitize/support/libdome-sculpt-polygon.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-fixture-ac0/artifacts/legal-native/sanitize/support/libxatlas.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-fixture-ac0/artifacts/legal-native/sanitize/support/libmikktspace.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-fixture-ac0/artifacts/legal-native/sanitize/support/libmikktspace-robust.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-fixture-ac0/artifacts/legal-native/sanitize/support/libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-fixture-ac0/artifacts/legal-native/sanitize/support/libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit": 0,
+            "expected": 0,
+            "seconds": 3.0667297879699618
+          },
+          {
+            "phase": "counter-runtime",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-fixture-ac0/artifacts/legal-native/sanitize/counter",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native35-physical-1f4f55c/artifacts/canonical-physical-controls/output/0-0.dsculpt",
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-fixture-ac0/artifacts/legal-native/sanitize/counter-output"
+            ],
+            "exit": 1,
+            "expected": 1,
+            "seconds": 0.23564839299069718
+          }
+        ],
+        "exit": 0,
+        "inputs": 2164,
+        "unchanged": true,
+        "counter_core_sha256": "4dbe08cfe3256e94e0d9f120ffd6fd1c447d22a3a4d5a91c203dd17b81fe0663"
+      },
+      "affected_gate_continuation": {
+        "source": "f187b638880a4e58a3ab736b903174c17269bff3",
+        "runtime": "ac0d698",
+        "scope": "Continuation of actual whole-own ac0 affected gates after preserved invalid test-construction failure; test-only correction in legal-native cohort, no changed runtime/header or archive pairing",
+        "results": [
+          {
+            "phase": "quality",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-copy-b841/build-sanitize/dome-sculpt-canonical-paint-key-uv-render-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-key-uv-current-0e56/artifacts/canonical-key-uv/data-v2/converted-key.dsculpt",
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-key-uv-current-0e56/artifacts/canonical-key-uv/data-v2/converted-uv.dsculpt",
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-fixture-ac0/artifacts/affected-continuation/sanitize/quality"
+            ],
+            "exit": 0,
+            "seconds": 14.759736098989379
+          },
+          {
+            "phase": "factory-persistent-prefix",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-copy-b841/build-sanitize/dome-sculpt-canonical-paint-owner-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native35-physical-1f4f55c/artifacts/canonical-physical-controls/output/0-0.dsculpt",
+              "--oom"
+            ],
+            "exit": 0,
+            "seconds": 3.6335508810007013
+          },
+          {
+            "phase": "actual-model-cap",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-copy-b841/build-sanitize/dome-sculpt-canonical-paint-owner-cap-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-copy-b841/tests/fixtures/layered-normal/original-0.dsculpt"
+            ],
+            "exit": 0,
+            "seconds": 7.505740285036154
+          },
+          {
+            "phase": "codec-0-0",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-copy-b841/build-sanitize/dome-sculpt-canonical-paint-codec-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native35-physical-1f4f55c/artifacts/canonical-physical-controls/output/0-0.dsculpt",
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-fixture-ac0/artifacts/affected-continuation/sanitize/codec-0-0"
+            ],
+            "exit": 0,
+            "seconds": 0.5910184130189009
+          },
+          {
+            "phase": "codec-7-0",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-copy-b841/build-sanitize/dome-sculpt-canonical-paint-codec-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native35-physical-1f4f55c/artifacts/canonical-physical-controls/output/7-0.dsculpt",
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-fixture-ac0/artifacts/affected-continuation/sanitize/codec-7-0"
+            ],
+            "exit": 0,
+            "seconds": 0.762068020994775
+          },
+          {
+            "phase": "codec-0-3",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-copy-b841/build-sanitize/dome-sculpt-canonical-paint-codec-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native35-physical-1f4f55c/artifacts/canonical-physical-controls/output/0-3.dsculpt",
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-fixture-ac0/artifacts/affected-continuation/sanitize/codec-0-3"
+            ],
+            "exit": 0,
+            "seconds": 1.1772116430220194
+          },
+          {
+            "phase": "codec-7-4",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-copy-b841/build-sanitize/dome-sculpt-canonical-paint-codec-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native35-physical-1f4f55c/artifacts/canonical-physical-controls/output/7-4.dsculpt",
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-fixture-ac0/artifacts/affected-continuation/sanitize/codec-7-4"
+            ],
+            "exit": 0,
+            "seconds": 1.6501581619959325
+          },
+          {
+            "phase": "regressions",
+            "command": [
+              "ctest",
+              "--test-dir",
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-copy-b841/build-sanitize",
+              "--output-on-failure",
+              "-R",
+              "^(scene-authoring|scene-file|polygon-scene-archive|native-paint-key-frames|native-paint-rig-uv|rig-after-authoring|native-paint32-emission|native-paint32-emission-mixed)$"
+            ],
+            "exit": 0,
+            "seconds": 32.74204382998869
+          }
+        ],
+        "exit": 0,
+        "inputs": 2181,
+        "unchanged": true
+      },
+      "actual_native_images": {
+        "source": "11918355d72d3252c90c91ab43751c013fd830d4",
+        "runtime": "ac0d698",
+        "scope": "new actual-native-UV image consumers over complete matching wholly owned ac0 archives; all product/header bytes identical; software only",
+        "results": [
+          {
+            "phase": "quality",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-native-quality-f187/artifacts/native-images-r2/sanitize/consumer-quality",
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-key-uv-current-0e56/artifacts/canonical-key-uv/data-v2/converted-key.dsculpt",
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-key-uv-current-0e56/artifacts/canonical-key-uv/data-v2/converted-uv.dsculpt",
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-native-quality-f187/artifacts/native-images-r2/sanitize/quality-images"
+            ],
+            "exit": 0,
+            "seconds": 10.39665331604192
+          },
+          {
+            "phase": "compile-physical",
+            "command": [
+              "/usr/bin/c++",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-native-quality-f187/src",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-native-quality-f187/third_party/cgltf",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-native-quality-f187/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-native-quality-f187/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-native-quality-f187/third_party/nlohmann",
+              "-isystem",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/harfbuzz",
+              "-isystem",
+              "/usr/include/glib-2.0",
+              "-isystem",
+              "/usr/lib64/glib-2.0/include",
+              "-isystem",
+              "/usr/include/sysprof-6",
+              "-isystem",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/include/freetype2",
+              "-isystem",
+              "/usr/include/libpng16",
+              "-isystem",
+              "/usr/include/libxml2",
+              "-O1",
+              "-g1",
+              "-DNDEBUG",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "-std=gnu++20",
+              "-pthread",
+              "-DWITH_GZFILEOP",
+              "-c",
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-native-quality-f187/tests/canonical-paint-physical-render.cpp",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-native-quality-f187/artifacts/native-images-r2/sanitize/physical.o"
+            ],
+            "exit": 0,
+            "seconds": 20.703704999992624
+          },
+          {
+            "phase": "link-physical",
+            "command": [
+              "/usr/bin/c++",
+              "-O1",
+              "-g1",
+              "-DNDEBUG",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer",
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-native-quality-f187/artifacts/native-images-r2/sanitize/physical.o",
+              "-o",
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-native-quality-f187/artifacts/native-images-r2/sanitize/consumer-physical",
+              "-Wl,-rpath,/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib",
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-native-quality-f187/artifacts/native-images-r2/sanitize/support/libdome-sculpt-render.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-native-quality-f187/artifacts/native-images-r2/sanitize/support/libdome-sculpt-core.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-native-quality-f187/artifacts/native-images-r2/sanitize/support/libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-native-quality-f187/artifacts/native-images-r2/sanitize/support/libdome-sculpt-polygon.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-native-quality-f187/artifacts/native-images-r2/sanitize/support/libxatlas.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-native-quality-f187/artifacts/native-images-r2/sanitize/support/libmikktspace.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-native-quality-f187/artifacts/native-images-r2/sanitize/support/libmikktspace-robust.a",
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-native-quality-f187/artifacts/native-images-r2/sanitize/support/libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-native-quality-f187/artifacts/native-images-r2/sanitize/support/libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libharfbuzz.so",
+              "/usr/lib64/libEGL.so",
+              "/usr/lib64/libGL.so",
+              "/usr/lib64/libfontconfig.so",
+              "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libfreetype.so",
+              "/usr/lib64/libicui18n.so",
+              "/usr/lib64/libicuuc.so",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit": 0,
+            "seconds": 2.3361268250155263
+          },
+          {
+            "phase": "physical",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-native-quality-f187/artifacts/native-images-r2/sanitize/consumer-physical",
+              "/home/blux/de-xr/dome-sculpt/artifacts/native35-physical-1f4f55c/artifacts/canonical-physical-controls/output",
+              "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-native-quality-f187/artifacts/native-images-r2/sanitize/physical-images"
+            ],
+            "exit": 0,
+            "seconds": 15.975153146020602
+          }
+        ],
+        "exit": 0,
+        "inputs": 2166,
+        "unchanged": true
+      },
+      "native_GUI": {
+        "source": "b5918be06f8348e3a36d29ffcb74cba4e5e19309",
+        "runtime": "ac0d698",
+        "scope": "actual FLTK app/private Dbus+Xvfb/software GL; matching own whole ac0 app/core and freshly matching inspector; normal Release/640x360 font32 SAN; no HMD/system session",
+        "profile": "sanitize",
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/selection-gui-venv/bin/python",
+          "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-gui-119/tests/canonical-paint37-menu.py"
+        ],
+        "exit": 0,
+        "seconds": 47.101567985955626,
+        "inputs": 2420,
+        "unchanged": true
+      }
+    }
+  },
+  "actual_A770": {
+    "source": "11918355d72d3252c90c91ab43751c013fd830d4",
+    "runtime": "ac0d698",
+    "scope": "strict actual PCI03 A770 GL/native UV/independent consumer only; CPU compute backend, no physical HMD/session",
+    "pci": {
+      "vendor": "0x8086",
+      "device": "0x56a0",
+      "class": "0x030000",
+      "driver": "/sys/bus/pci/drivers/i915"
+    },
+    "results": [
+      {
+        "kind": "quality",
+        "name": "arc",
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-native-quality-f187/artifacts/native-images-r2/release/consumer-quality",
+          "/home/blux/de-xr/dome-sculpt/artifacts/canonical-key-uv-current-0e56/artifacts/canonical-key-uv/data-v2/converted-key.dsculpt",
+          "/home/blux/de-xr/dome-sculpt/artifacts/canonical-key-uv-current-0e56/artifacts/canonical-key-uv/data-v2/converted-uv.dsculpt",
+          "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-native-quality-f187/artifacts/native37-arc/quality-arc",
+          "--hardware"
+        ],
+        "DRI_PRIME": "pci-0000_03_00_0",
+        "exit": 0,
+        "expected": 0,
+        "renderer": "ACTUAL_RENDERER Mesa Intel(R) Arc(tm) A770 Graphics (DG2)",
+        "seconds": 5.97562454699073,
+        "qualified": true
+      },
+      {
+        "kind": "quality",
+        "name": "software",
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-native-quality-f187/artifacts/native-images-r2/release/consumer-quality",
+          "/home/blux/de-xr/dome-sculpt/artifacts/canonical-key-uv-current-0e56/artifacts/canonical-key-uv/data-v2/converted-key.dsculpt",
+          "/home/blux/de-xr/dome-sculpt/artifacts/canonical-key-uv-current-0e56/artifacts/canonical-key-uv/data-v2/converted-uv.dsculpt",
+          "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-native-quality-f187/artifacts/native37-arc/quality-software",
+          "--hardware"
+        ],
+        "DRI_PRIME": "pci-0000_03_00_0",
+        "exit": 1,
+        "expected": 1,
+        "renderer": "ACTUAL_RENDERER llvmpipe (LLVM 22.1.8, 256 bits)",
+        "seconds": 0.06572464597411454,
+        "qualified": true
+      },
+      {
+        "kind": "quality",
+        "name": "uhd",
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-native-quality-f187/artifacts/native-images-r2/release/consumer-quality",
+          "/home/blux/de-xr/dome-sculpt/artifacts/canonical-key-uv-current-0e56/artifacts/canonical-key-uv/data-v2/converted-key.dsculpt",
+          "/home/blux/de-xr/dome-sculpt/artifacts/canonical-key-uv-current-0e56/artifacts/canonical-key-uv/data-v2/converted-uv.dsculpt",
+          "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-native-quality-f187/artifacts/native37-arc/quality-uhd",
+          "--hardware"
+        ],
+        "DRI_PRIME": "pci-0000_00_02_0",
+        "exit": 1,
+        "expected": 1,
+        "renderer": "ACTUAL_RENDERER Mesa Intel(R) UHD Graphics 770 (ADL-S GT1)",
+        "seconds": 0.0603371339966543,
+        "qualified": true
+      },
+      {
+        "kind": "physical",
+        "name": "arc",
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-native-quality-f187/artifacts/native-images-r2/release/consumer-physical",
+          "/home/blux/de-xr/dome-sculpt/artifacts/native35-physical-1f4f55c/artifacts/canonical-physical-controls/output",
+          "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-native-quality-f187/artifacts/native37-arc/physical-arc",
+          "--hardware"
+        ],
+        "DRI_PRIME": "pci-0000_03_00_0",
+        "exit": 0,
+        "expected": 0,
+        "renderer": "ACTUAL_RENDERER Mesa Intel(R) Arc(tm) A770 Graphics (DG2)",
+        "seconds": 7.307678993034642,
+        "qualified": true
+      },
+      {
+        "kind": "physical",
+        "name": "software",
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-native-quality-f187/artifacts/native-images-r2/release/consumer-physical",
+          "/home/blux/de-xr/dome-sculpt/artifacts/native35-physical-1f4f55c/artifacts/canonical-physical-controls/output",
+          "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-native-quality-f187/artifacts/native37-arc/physical-software",
+          "--hardware"
+        ],
+        "DRI_PRIME": "pci-0000_03_00_0",
+        "exit": 1,
+        "expected": 1,
+        "renderer": "ACTUAL_RENDERER llvmpipe (LLVM 22.1.8, 256 bits)",
+        "seconds": 0.07927090098382905,
+        "qualified": true
+      },
+      {
+        "kind": "physical",
+        "name": "uhd",
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-native-quality-f187/artifacts/native-images-r2/release/consumer-physical",
+          "/home/blux/de-xr/dome-sculpt/artifacts/native35-physical-1f4f55c/artifacts/canonical-physical-controls/output",
+          "/home/blux/de-xr/dome-sculpt/artifacts/canonical-paint37-native-quality-f187/artifacts/native37-arc/physical-uhd",
+          "--hardware"
+        ],
+        "DRI_PRIME": "pci-0000_00_02_0",
+        "exit": 1,
+        "expected": 1,
+        "renderer": "ACTUAL_RENDERER Mesa Intel(R) UHD Graphics 770 (ADL-S GT1)",
+        "seconds": 0.042839993024244905,
+        "qualified": true
+      }
+    ],
+    "exit": 0,
+    "inputs": 2168,
+    "unchanged": true,
+    "pci_unchanged": true
+  },
+  "interoperability": {
+    "files": 27,
+    "errors": 0,
+    "warnings": 27,
+    "warning_code": "NODE_SKINNED_MESH_NON_ROOT",
+    "maxIssues": 0,
+    "issueFilters": [],
+    "report_sha256": "86e87b333a05e785b42666279501fd1cd86fc0f578673b6151949aea063481ca"
+  },
+  "output_bytes": {
+    "RS_files_byte_equal": 181,
+    "RS_files": [
+      {
+        "kind": "quality",
+        "file": "retained.dsculpt",
+        "sha256": "577be4290941d63f6bd3ef748cc080f2b10d9307b8461a3067099d1ea2c500e3"
+      },
+      {
+        "kind": "quality",
+        "file": "0-before.png",
+        "sha256": "8ba8e2b80f42838f31ccb28b8a6a4a6bbc22afd5b919dbe77e89b4edf4a14d51"
+      },
+      {
+        "kind": "quality",
+        "file": "0-retained.png",
+        "sha256": "8ba8e2b80f42838f31ccb28b8a6a4a6bbc22afd5b919dbe77e89b4edf4a14d51"
+      },
+      {
+        "kind": "quality",
+        "file": "1-before.png",
+        "sha256": "27e4021a9649ee6d159052d3b805646777a18dcb1357716ecfe478e4e2b57d55"
+      },
+      {
+        "kind": "quality",
+        "file": "1-retained.png",
+        "sha256": "27e4021a9649ee6d159052d3b805646777a18dcb1357716ecfe478e4e2b57d55"
+      },
+      {
+        "kind": "quality",
+        "file": "2-before.png",
+        "sha256": "0611868d1f399e3882571ce8224e9d1c1c569e6bb793aa8feb05188c51382908"
+      },
+      {
+        "kind": "quality",
+        "file": "2-retained.png",
+        "sha256": "0611868d1f399e3882571ce8224e9d1c1c569e6bb793aa8feb05188c51382908"
+      },
+      {
+        "kind": "quality",
+        "file": "3-before.png",
+        "sha256": "4919c30b9dee35651b581f3cba9e31678a515f51ba5339f8f3d32591ff4f8e57"
+      },
+      {
+        "kind": "quality",
+        "file": "3-retained.png",
+        "sha256": "4919c30b9dee35651b581f3cba9e31678a515f51ba5339f8f3d32591ff4f8e57"
+      },
+      {
+        "kind": "quality",
+        "file": "4-before.png",
+        "sha256": "edf80184f652f1f1835e720849a19540653421da99906fc88cbb427320360b37"
+      },
+      {
+        "kind": "quality",
+        "file": "4-retained.png",
+        "sha256": "edf80184f652f1f1835e720849a19540653421da99906fc88cbb427320360b37"
+      },
+      {
+        "kind": "quality",
+        "file": "5-before.png",
+        "sha256": "7ab3d95e8146826c21c66d9691aab8a6f91a0933a3ede27957fc26fe7276324a"
+      },
+      {
+        "kind": "quality",
+        "file": "5-retained.png",
+        "sha256": "7ab3d95e8146826c21c66d9691aab8a6f91a0933a3ede27957fc26fe7276324a"
+      },
+      {
+        "kind": "quality",
+        "file": "6-before.png",
+        "sha256": "b04d01d55b2c6d12dfa52be39ae92d3b08d0b31ab6a9a26c87bb90ed30ee8a59"
+      },
+      {
+        "kind": "quality",
+        "file": "6-retained.png",
+        "sha256": "b04d01d55b2c6d12dfa52be39ae92d3b08d0b31ab6a9a26c87bb90ed30ee8a59"
+      },
+      {
+        "kind": "quality",
+        "file": "7-before.png",
+        "sha256": "fdc88dd6bdb56eb735d69a3160c7576f93f4b25ff3aaa722aed125cc2f206975"
+      },
+      {
+        "kind": "quality",
+        "file": "7-retained.png",
+        "sha256": "fdc88dd6bdb56eb735d69a3160c7576f93f4b25ff3aaa722aed125cc2f206975"
+      },
+      {
+        "kind": "quality",
+        "file": "8-before.png",
+        "sha256": "a6e08244948741317309982295366b69b7939233f0c0e929ca1cabb26c241179"
+      },
+      {
+        "kind": "quality",
+        "file": "8-retained.png",
+        "sha256": "a6e08244948741317309982295366b69b7939233f0c0e929ca1cabb26c241179"
+      },
+      {
+        "kind": "quality",
+        "file": "0.glb",
+        "sha256": "52d4070c699b00f2557f4b748fc2a746da6019758e295dc330a49fd746ceb448"
+      },
+      {
+        "kind": "quality",
+        "file": "0-portable.png",
+        "sha256": "8ba8e2b80f42838f31ccb28b8a6a4a6bbc22afd5b919dbe77e89b4edf4a14d51"
+      },
+      {
+        "kind": "quality",
+        "file": "1.glb",
+        "sha256": "49048e46000f4400f7253d51734812d1b5ef6db60425e2ed4f336d10c0682234"
+      },
+      {
+        "kind": "quality",
+        "file": "1-portable.png",
+        "sha256": "27e4021a9649ee6d159052d3b805646777a18dcb1357716ecfe478e4e2b57d55"
+      },
+      {
+        "kind": "quality",
+        "file": "2.glb",
+        "sha256": "e960b42fcb9b02c0e465d64dec8b0e223960262f221353a2fd8149e6fabf4f81"
+      },
+      {
+        "kind": "quality",
+        "file": "2-portable.png",
+        "sha256": "0611868d1f399e3882571ce8224e9d1c1c569e6bb793aa8feb05188c51382908"
+      },
+      {
+        "kind": "quality",
+        "file": "3.glb",
+        "sha256": "d7b994c11b2313d4badcb67ee5bf35971979bf73c2ae06517702bc1e72bd1b51"
+      },
+      {
+        "kind": "quality",
+        "file": "3-portable.png",
+        "sha256": "4919c30b9dee35651b581f3cba9e31678a515f51ba5339f8f3d32591ff4f8e57"
+      },
+      {
+        "kind": "quality",
+        "file": "4.glb",
+        "sha256": "768b0dd03ac06c56bb2d7bc7799525ab2698ef28909c9d896ac4fb7a061bfde2"
+      },
+      {
+        "kind": "quality",
+        "file": "4-portable.png",
+        "sha256": "edf80184f652f1f1835e720849a19540653421da99906fc88cbb427320360b37"
+      },
+      {
+        "kind": "quality",
+        "file": "5.glb",
+        "sha256": "a737da63b23c1e4cf67979157cc5cba06dd364d3d04f1c34dc18ed1972bdd9d4"
+      },
+      {
+        "kind": "quality",
+        "file": "5-portable.png",
+        "sha256": "7ab3d95e8146826c21c66d9691aab8a6f91a0933a3ede27957fc26fe7276324a"
+      },
+      {
+        "kind": "quality",
+        "file": "6.glb",
+        "sha256": "1c7fd60da8e19187e356f82c63a8071c894918d71acd53b88d4871f323932211"
+      },
+      {
+        "kind": "quality",
+        "file": "6-portable.png",
+        "sha256": "b04d01d55b2c6d12dfa52be39ae92d3b08d0b31ab6a9a26c87bb90ed30ee8a59"
+      },
+      {
+        "kind": "quality",
+        "file": "7.glb",
+        "sha256": "e4f1a0c2ecf32fc259534afa544ea9339fc80d517eb785b07a51d5b9f518f47d"
+      },
+      {
+        "kind": "quality",
+        "file": "7-portable.png",
+        "sha256": "fdc88dd6bdb56eb735d69a3160c7576f93f4b25ff3aaa722aed125cc2f206975"
+      },
+      {
+        "kind": "quality",
+        "file": "8.glb",
+        "sha256": "fabc836cd02bbf76dfeba563b6276512e8571dc0ec78c5596201d2bd9572f33d"
+      },
+      {
+        "kind": "quality",
+        "file": "8-portable.png",
+        "sha256": "a6e08244948741317309982295366b69b7939233f0c0e929ca1cabb26c241179"
+      },
+      {
+        "kind": "physical",
+        "file": "0.dsculpt",
+        "sha256": "e26773e10e7cd5d3fa13ffa3b5a690df2e753052da01e6585e4b704312f01ec4"
+      },
+      {
+        "kind": "physical",
+        "file": "0-0-0-before.png",
+        "sha256": "9d81822c5f1c996c8bbb606a65a526c4a107ca37cae5d0a67ce413e63d42e448"
+      },
+      {
+        "kind": "physical",
+        "file": "0-0-0-after.png",
+        "sha256": "9d81822c5f1c996c8bbb606a65a526c4a107ca37cae5d0a67ce413e63d42e448"
+      },
+      {
+        "kind": "physical",
+        "file": "1.dsculpt",
+        "sha256": "c41f9dbf7115c05414af99b32ee405f8b87fdcc289f046b35e02c6829e247b4e"
+      },
+      {
+        "kind": "physical",
+        "file": "1-0-0-before.png",
+        "sha256": "9d81822c5f1c996c8bbb606a65a526c4a107ca37cae5d0a67ce413e63d42e448"
+      },
+      {
+        "kind": "physical",
+        "file": "1-0-0-after.png",
+        "sha256": "9d81822c5f1c996c8bbb606a65a526c4a107ca37cae5d0a67ce413e63d42e448"
+      },
+      {
+        "kind": "physical",
+        "file": "2.dsculpt",
+        "sha256": "d38c6c08106b21f7647e316f878cccaeb6229b0d583c2966a022cd8a1ae99eea"
+      },
+      {
+        "kind": "physical",
+        "file": "2-0-0-before.png",
+        "sha256": "9732f0ce793d9b0b5ccc8845c5aa7dae12c8f785a43aaeb27fac610d54e5abe6"
+      },
+      {
+        "kind": "physical",
+        "file": "2-0-0-after.png",
+        "sha256": "9732f0ce793d9b0b5ccc8845c5aa7dae12c8f785a43aaeb27fac610d54e5abe6"
+      },
+      {
+        "kind": "physical",
+        "file": "3.dsculpt",
+        "sha256": "6904b8111734fb1392c2f8abc7a40cea2361325d9443a2fd4600a5c6f5f4ed19"
+      },
+      {
+        "kind": "physical",
+        "file": "3-0-0-before.png",
+        "sha256": "8247737fd21c16c6fac74b02aacc358c2b7a47d238515023a802125a57f85853"
+      },
+      {
+        "kind": "physical",
+        "file": "3-0-0-after.png",
+        "sha256": "8247737fd21c16c6fac74b02aacc358c2b7a47d238515023a802125a57f85853"
+      },
+      {
+        "kind": "physical",
+        "file": "3-0-35-before.png",
+        "sha256": "d6285924b589c1a2df161a9d5f15b234d9b8a9eb4f42b6b22fcc7988268bae5c"
+      },
+      {
+        "kind": "physical",
+        "file": "3-0-35-after.png",
+        "sha256": "d6285924b589c1a2df161a9d5f15b234d9b8a9eb4f42b6b22fcc7988268bae5c"
+      },
+      {
+        "kind": "physical",
+        "file": "3-0-100-before.png",
+        "sha256": "583ff733829becca7237155942b0aedcd3d5b784e94c35245611ae183c110bc1"
+      },
+      {
+        "kind": "physical",
+        "file": "3-0-100-after.png",
+        "sha256": "583ff733829becca7237155942b0aedcd3d5b784e94c35245611ae183c110bc1"
+      },
+      {
+        "kind": "physical",
+        "file": "3-1-0-before.png",
+        "sha256": "f4a71863f68443efddfc3d96c3d5b297896a56cb2ad0b786141aa3e28cf189ee"
+      },
+      {
+        "kind": "physical",
+        "file": "3-1-0-after.png",
+        "sha256": "f4a71863f68443efddfc3d96c3d5b297896a56cb2ad0b786141aa3e28cf189ee"
+      },
+      {
+        "kind": "physical",
+        "file": "3-1-35-before.png",
+        "sha256": "eaecf379485c2d5f8551c25ca86fc06cca1679183eff3f8d5dc8b4a6a26f1e60"
+      },
+      {
+        "kind": "physical",
+        "file": "3-1-35-after.png",
+        "sha256": "eaecf379485c2d5f8551c25ca86fc06cca1679183eff3f8d5dc8b4a6a26f1e60"
+      },
+      {
+        "kind": "physical",
+        "file": "3-1-100-before.png",
+        "sha256": "28a30f6acd9ce2e151ed7fd56573a9e791e7e5568a5e3cfd70861ef8c4f4e01e"
+      },
+      {
+        "kind": "physical",
+        "file": "3-1-100-after.png",
+        "sha256": "28a30f6acd9ce2e151ed7fd56573a9e791e7e5568a5e3cfd70861ef8c4f4e01e"
+      },
+      {
+        "kind": "physical",
+        "file": "3-2-0-before.png",
+        "sha256": "3c1996afa5701901aec8de180e38c89958c397b5d71a67a07bdedbbee3ce7ba1"
+      },
+      {
+        "kind": "physical",
+        "file": "3-2-0-after.png",
+        "sha256": "3c1996afa5701901aec8de180e38c89958c397b5d71a67a07bdedbbee3ce7ba1"
+      },
+      {
+        "kind": "physical",
+        "file": "3-2-35-before.png",
+        "sha256": "ffb12c4724985c975e2b4cf884d1531f123444124837d9a7b92afe268434121e"
+      },
+      {
+        "kind": "physical",
+        "file": "3-2-35-after.png",
+        "sha256": "ffb12c4724985c975e2b4cf884d1531f123444124837d9a7b92afe268434121e"
+      },
+      {
+        "kind": "physical",
+        "file": "3-2-100-before.png",
+        "sha256": "99ca2188668d3309ef68de455683bcfb0ba30b378072e0d85f317ea71da20af7"
+      },
+      {
+        "kind": "physical",
+        "file": "3-2-100-after.png",
+        "sha256": "99ca2188668d3309ef68de455683bcfb0ba30b378072e0d85f317ea71da20af7"
+      },
+      {
+        "kind": "physical",
+        "file": "4.dsculpt",
+        "sha256": "889fd6533df827114e466377f52cd2af45630813c13c85cea00ef2d8bcd3ea63"
+      },
+      {
+        "kind": "physical",
+        "file": "4-0-0-before.png",
+        "sha256": "8247737fd21c16c6fac74b02aacc358c2b7a47d238515023a802125a57f85853"
+      },
+      {
+        "kind": "physical",
+        "file": "4-0-0-after.png",
+        "sha256": "8247737fd21c16c6fac74b02aacc358c2b7a47d238515023a802125a57f85853"
+      },
+      {
+        "kind": "physical",
+        "file": "4-0-35-before.png",
+        "sha256": "d6285924b589c1a2df161a9d5f15b234d9b8a9eb4f42b6b22fcc7988268bae5c"
+      },
+      {
+        "kind": "physical",
+        "file": "4-0-35-after.png",
+        "sha256": "d6285924b589c1a2df161a9d5f15b234d9b8a9eb4f42b6b22fcc7988268bae5c"
+      },
+      {
+        "kind": "physical",
+        "file": "4-0-100-before.png",
+        "sha256": "583ff733829becca7237155942b0aedcd3d5b784e94c35245611ae183c110bc1"
+      },
+      {
+        "kind": "physical",
+        "file": "4-0-100-after.png",
+        "sha256": "583ff733829becca7237155942b0aedcd3d5b784e94c35245611ae183c110bc1"
+      },
+      {
+        "kind": "physical",
+        "file": "4-1-0-before.png",
+        "sha256": "f4a71863f68443efddfc3d96c3d5b297896a56cb2ad0b786141aa3e28cf189ee"
+      },
+      {
+        "kind": "physical",
+        "file": "4-1-0-after.png",
+        "sha256": "f4a71863f68443efddfc3d96c3d5b297896a56cb2ad0b786141aa3e28cf189ee"
+      },
+      {
+        "kind": "physical",
+        "file": "4-1-35-before.png",
+        "sha256": "eaecf379485c2d5f8551c25ca86fc06cca1679183eff3f8d5dc8b4a6a26f1e60"
+      },
+      {
+        "kind": "physical",
+        "file": "4-1-35-after.png",
+        "sha256": "eaecf379485c2d5f8551c25ca86fc06cca1679183eff3f8d5dc8b4a6a26f1e60"
+      },
+      {
+        "kind": "physical",
+        "file": "4-1-100-before.png",
+        "sha256": "28a30f6acd9ce2e151ed7fd56573a9e791e7e5568a5e3cfd70861ef8c4f4e01e"
+      },
+      {
+        "kind": "physical",
+        "file": "4-1-100-after.png",
+        "sha256": "28a30f6acd9ce2e151ed7fd56573a9e791e7e5568a5e3cfd70861ef8c4f4e01e"
+      },
+      {
+        "kind": "physical",
+        "file": "4-2-0-before.png",
+        "sha256": "3c1996afa5701901aec8de180e38c89958c397b5d71a67a07bdedbbee3ce7ba1"
+      },
+      {
+        "kind": "physical",
+        "file": "4-2-0-after.png",
+        "sha256": "3c1996afa5701901aec8de180e38c89958c397b5d71a67a07bdedbbee3ce7ba1"
+      },
+      {
+        "kind": "physical",
+        "file": "4-2-35-before.png",
+        "sha256": "ffb12c4724985c975e2b4cf884d1531f123444124837d9a7b92afe268434121e"
+      },
+      {
+        "kind": "physical",
+        "file": "4-2-35-after.png",
+        "sha256": "ffb12c4724985c975e2b4cf884d1531f123444124837d9a7b92afe268434121e"
+      },
+      {
+        "kind": "physical",
+        "file": "4-2-100-before.png",
+        "sha256": "99ca2188668d3309ef68de455683bcfb0ba30b378072e0d85f317ea71da20af7"
+      },
+      {
+        "kind": "physical",
+        "file": "4-2-100-after.png",
+        "sha256": "99ca2188668d3309ef68de455683bcfb0ba30b378072e0d85f317ea71da20af7"
+      },
+      {
+        "kind": "physical",
+        "file": "5.dsculpt",
+        "sha256": "ece58e7f3445fc67ee22b082547163243c495eb1aa6e9cda5c47d6986f69d41d"
+      },
+      {
+        "kind": "physical",
+        "file": "5-0-0-before.png",
+        "sha256": "5fe6df178017695febb4ca19e6227cd6eb4ca3e7c18c55077ac40badd0a523ed"
+      },
+      {
+        "kind": "physical",
+        "file": "5-0-0-after.png",
+        "sha256": "5fe6df178017695febb4ca19e6227cd6eb4ca3e7c18c55077ac40badd0a523ed"
+      },
+      {
+        "kind": "physical",
+        "file": "5-0-35-before.png",
+        "sha256": "fbf390648510016eb499d15b257a9c57fbe5b3ec7cd74b8ac220f547dc90fe7a"
+      },
+      {
+        "kind": "physical",
+        "file": "5-0-35-after.png",
+        "sha256": "fbf390648510016eb499d15b257a9c57fbe5b3ec7cd74b8ac220f547dc90fe7a"
+      },
+      {
+        "kind": "physical",
+        "file": "5-0-100-before.png",
+        "sha256": "fde76a9d59ada679e7f47000421cd35bb8bb75a28b0785f2695d7b9605926113"
+      },
+      {
+        "kind": "physical",
+        "file": "5-0-100-after.png",
+        "sha256": "fde76a9d59ada679e7f47000421cd35bb8bb75a28b0785f2695d7b9605926113"
+      },
+      {
+        "kind": "physical",
+        "file": "5-1-0-before.png",
+        "sha256": "3e36beea521a5e59d5047053d7722c7fab3bb13c0bc1de5a445065422c088a1d"
+      },
+      {
+        "kind": "physical",
+        "file": "5-1-0-after.png",
+        "sha256": "3e36beea521a5e59d5047053d7722c7fab3bb13c0bc1de5a445065422c088a1d"
+      },
+      {
+        "kind": "physical",
+        "file": "5-1-35-before.png",
+        "sha256": "3c2af8889a9137f66b5cc5117e4c96b2c4801254563745f50085808034b68680"
+      },
+      {
+        "kind": "physical",
+        "file": "5-1-35-after.png",
+        "sha256": "3c2af8889a9137f66b5cc5117e4c96b2c4801254563745f50085808034b68680"
+      },
+      {
+        "kind": "physical",
+        "file": "5-1-100-before.png",
+        "sha256": "d4bc155b4985b10d6ccb58d249132cbfc07c422613fb580531c7d399c1bd790c"
+      },
+      {
+        "kind": "physical",
+        "file": "5-1-100-after.png",
+        "sha256": "d4bc155b4985b10d6ccb58d249132cbfc07c422613fb580531c7d399c1bd790c"
+      },
+      {
+        "kind": "physical",
+        "file": "5-2-0-before.png",
+        "sha256": "dbebfc4012893e7199af257ed5d452592cf5ce9b742f5ba35ecb35b0875ddd8f"
+      },
+      {
+        "kind": "physical",
+        "file": "5-2-0-after.png",
+        "sha256": "dbebfc4012893e7199af257ed5d452592cf5ce9b742f5ba35ecb35b0875ddd8f"
+      },
+      {
+        "kind": "physical",
+        "file": "5-2-35-before.png",
+        "sha256": "1fdae6f21fc11bafbeb55c09ef1ea6de924f5495ce8634bf24696d7b2b3e686f"
+      },
+      {
+        "kind": "physical",
+        "file": "5-2-35-after.png",
+        "sha256": "1fdae6f21fc11bafbeb55c09ef1ea6de924f5495ce8634bf24696d7b2b3e686f"
+      },
+      {
+        "kind": "physical",
+        "file": "5-2-100-before.png",
+        "sha256": "41ea0777402cfdf057ec16e704cb9fc2d7155d81ba4bebcd19716736de5f8bc1"
+      },
+      {
+        "kind": "physical",
+        "file": "5-2-100-after.png",
+        "sha256": "41ea0777402cfdf057ec16e704cb9fc2d7155d81ba4bebcd19716736de5f8bc1"
+      },
+      {
+        "kind": "physical",
+        "file": "6.dsculpt",
+        "sha256": "28aba2f47dfe02f9905940d494401d40f84827c07b25542368861262406f1a81"
+      },
+      {
+        "kind": "physical",
+        "file": "6-0-0-before.png",
+        "sha256": "9d81822c5f1c996c8bbb606a65a526c4a107ca37cae5d0a67ce413e63d42e448"
+      },
+      {
+        "kind": "physical",
+        "file": "6-0-0-after.png",
+        "sha256": "9d81822c5f1c996c8bbb606a65a526c4a107ca37cae5d0a67ce413e63d42e448"
+      },
+      {
+        "kind": "physical",
+        "file": "6-0-35-before.png",
+        "sha256": "9d1e10ac8c12541fbc930bbfd1f6af74284cc7c3e7fec6b2c3c4d38585257b07"
+      },
+      {
+        "kind": "physical",
+        "file": "6-0-35-after.png",
+        "sha256": "9d1e10ac8c12541fbc930bbfd1f6af74284cc7c3e7fec6b2c3c4d38585257b07"
+      },
+      {
+        "kind": "physical",
+        "file": "6-0-100-before.png",
+        "sha256": "9d27bba21017a30f923371b311b20a46a8fda6fb71971bef2b3557128b1aa9f1"
+      },
+      {
+        "kind": "physical",
+        "file": "6-0-100-after.png",
+        "sha256": "9d27bba21017a30f923371b311b20a46a8fda6fb71971bef2b3557128b1aa9f1"
+      },
+      {
+        "kind": "physical",
+        "file": "7.dsculpt",
+        "sha256": "e6f07fc320226c7da06cf4ba22fa8f1bb5edf6d4cd1df32bc121320e78e0c3ef"
+      },
+      {
+        "kind": "physical",
+        "file": "7-0-0-before.png",
+        "sha256": "9d81822c5f1c996c8bbb606a65a526c4a107ca37cae5d0a67ce413e63d42e448"
+      },
+      {
+        "kind": "physical",
+        "file": "7-0-0-after.png",
+        "sha256": "9d81822c5f1c996c8bbb606a65a526c4a107ca37cae5d0a67ce413e63d42e448"
+      },
+      {
+        "kind": "physical",
+        "file": "7-0-35-before.png",
+        "sha256": "9d1e10ac8c12541fbc930bbfd1f6af74284cc7c3e7fec6b2c3c4d38585257b07"
+      },
+      {
+        "kind": "physical",
+        "file": "7-0-35-after.png",
+        "sha256": "9d1e10ac8c12541fbc930bbfd1f6af74284cc7c3e7fec6b2c3c4d38585257b07"
+      },
+      {
+        "kind": "physical",
+        "file": "7-0-100-before.png",
+        "sha256": "9d27bba21017a30f923371b311b20a46a8fda6fb71971bef2b3557128b1aa9f1"
+      },
+      {
+        "kind": "physical",
+        "file": "7-0-100-after.png",
+        "sha256": "9d27bba21017a30f923371b311b20a46a8fda6fb71971bef2b3557128b1aa9f1"
+      },
+      {
+        "kind": "physical",
+        "file": "8.dsculpt",
+        "sha256": "dd95c8e7868480f80d68bd43149771b8672c5baa3ac500145e4f20d8bdb8f489"
+      },
+      {
+        "kind": "physical",
+        "file": "8-0-0-before.png",
+        "sha256": "9732f0ce793d9b0b5ccc8845c5aa7dae12c8f785a43aaeb27fac610d54e5abe6"
+      },
+      {
+        "kind": "physical",
+        "file": "8-0-0-after.png",
+        "sha256": "9732f0ce793d9b0b5ccc8845c5aa7dae12c8f785a43aaeb27fac610d54e5abe6"
+      },
+      {
+        "kind": "physical",
+        "file": "8-0-35-before.png",
+        "sha256": "c81d2180f3f4ad05d4c5caad56713ce40bc94a9734bf7fd532505cde8f83ddbc"
+      },
+      {
+        "kind": "physical",
+        "file": "8-0-35-after.png",
+        "sha256": "c81d2180f3f4ad05d4c5caad56713ce40bc94a9734bf7fd532505cde8f83ddbc"
+      },
+      {
+        "kind": "physical",
+        "file": "8-0-100-before.png",
+        "sha256": "63a0b2664c4798c307e6f8a59d9d7fec087fa79fd8060434964c19b462b42920"
+      },
+      {
+        "kind": "physical",
+        "file": "8-0-100-after.png",
+        "sha256": "63a0b2664c4798c307e6f8a59d9d7fec087fa79fd8060434964c19b462b42920"
+      },
+      {
+        "kind": "physical",
+        "file": "9.dsculpt",
+        "sha256": "186f974b6f18291e1dbd1fe7dbfd2ec05a73257436561fd27ce00c76ce91a7c7"
+      },
+      {
+        "kind": "physical",
+        "file": "9-0-0-before.png",
+        "sha256": "f9134ca04674bb1fa386fbd2ddfdc418ff4c937742edb2a723ece0a78d7f26e4"
+      },
+      {
+        "kind": "physical",
+        "file": "9-0-0-after.png",
+        "sha256": "f9134ca04674bb1fa386fbd2ddfdc418ff4c937742edb2a723ece0a78d7f26e4"
+      },
+      {
+        "kind": "physical",
+        "file": "9-0-35-before.png",
+        "sha256": "669f85dce6cdb4cd3dc74afa107f037872a2956d6943d74526c3a0cc730b4426"
+      },
+      {
+        "kind": "physical",
+        "file": "9-0-35-after.png",
+        "sha256": "669f85dce6cdb4cd3dc74afa107f037872a2956d6943d74526c3a0cc730b4426"
+      },
+      {
+        "kind": "physical",
+        "file": "9-0-100-before.png",
+        "sha256": "61109202cbf9c676c0cf57f56eb997f0a7ca3937e24aaaa02c394e09e7581bb5"
+      },
+      {
+        "kind": "physical",
+        "file": "9-0-100-after.png",
+        "sha256": "61109202cbf9c676c0cf57f56eb997f0a7ca3937e24aaaa02c394e09e7581bb5"
+      },
+      {
+        "kind": "physical",
+        "file": "9-1-0-before.png",
+        "sha256": "6dd0cda326fc1756e4c642246ffaf3086ce350220fdba27685c2fdded59a1012"
+      },
+      {
+        "kind": "physical",
+        "file": "9-1-0-after.png",
+        "sha256": "6dd0cda326fc1756e4c642246ffaf3086ce350220fdba27685c2fdded59a1012"
+      },
+      {
+        "kind": "physical",
+        "file": "9-1-35-before.png",
+        "sha256": "3ef4b8d876ae1011dae91267234a6f4437ee096055e775b4b5f8f797cd9d2f72"
+      },
+      {
+        "kind": "physical",
+        "file": "9-1-35-after.png",
+        "sha256": "3ef4b8d876ae1011dae91267234a6f4437ee096055e775b4b5f8f797cd9d2f72"
+      },
+      {
+        "kind": "physical",
+        "file": "9-1-100-before.png",
+        "sha256": "acad3dd74d09db830bfefc1fcc3041cbd53cbb750ac7cbed41a2e67d858879d2"
+      },
+      {
+        "kind": "physical",
+        "file": "9-1-100-after.png",
+        "sha256": "acad3dd74d09db830bfefc1fcc3041cbd53cbb750ac7cbed41a2e67d858879d2"
+      },
+      {
+        "kind": "physical",
+        "file": "9-2-0-before.png",
+        "sha256": "e3b9205113608d9479993fce975a03941c7f8061893d7164bc5d61c1f12034c9"
+      },
+      {
+        "kind": "physical",
+        "file": "9-2-0-after.png",
+        "sha256": "e3b9205113608d9479993fce975a03941c7f8061893d7164bc5d61c1f12034c9"
+      },
+      {
+        "kind": "physical",
+        "file": "9-2-35-before.png",
+        "sha256": "32b2b0e71afacf51da8b5dcc6fe614abff94942af20fb12ca198980e7a04ff4f"
+      },
+      {
+        "kind": "physical",
+        "file": "9-2-35-after.png",
+        "sha256": "32b2b0e71afacf51da8b5dcc6fe614abff94942af20fb12ca198980e7a04ff4f"
+      },
+      {
+        "kind": "physical",
+        "file": "9-2-100-before.png",
+        "sha256": "bb2ddf25b4f9bc2fd2510b8068f210561dbc303b1f57047ad7dee0ddd8b14c97"
+      },
+      {
+        "kind": "physical",
+        "file": "9-2-100-after.png",
+        "sha256": "bb2ddf25b4f9bc2fd2510b8068f210561dbc303b1f57047ad7dee0ddd8b14c97"
+      },
+      {
+        "kind": "physical",
+        "file": "10.dsculpt",
+        "sha256": "6f26de9f4716b1558b15cf6191cf99ebfc13722d58a9d8fc0e2c5422fcba8218"
+      },
+      {
+        "kind": "physical",
+        "file": "10-0-0-before.png",
+        "sha256": "f9134ca04674bb1fa386fbd2ddfdc418ff4c937742edb2a723ece0a78d7f26e4"
+      },
+      {
+        "kind": "physical",
+        "file": "10-0-0-after.png",
+        "sha256": "f9134ca04674bb1fa386fbd2ddfdc418ff4c937742edb2a723ece0a78d7f26e4"
+      },
+      {
+        "kind": "physical",
+        "file": "10-0-35-before.png",
+        "sha256": "669f85dce6cdb4cd3dc74afa107f037872a2956d6943d74526c3a0cc730b4426"
+      },
+      {
+        "kind": "physical",
+        "file": "10-0-35-after.png",
+        "sha256": "669f85dce6cdb4cd3dc74afa107f037872a2956d6943d74526c3a0cc730b4426"
+      },
+      {
+        "kind": "physical",
+        "file": "10-0-100-before.png",
+        "sha256": "61109202cbf9c676c0cf57f56eb997f0a7ca3937e24aaaa02c394e09e7581bb5"
+      },
+      {
+        "kind": "physical",
+        "file": "10-0-100-after.png",
+        "sha256": "61109202cbf9c676c0cf57f56eb997f0a7ca3937e24aaaa02c394e09e7581bb5"
+      },
+      {
+        "kind": "physical",
+        "file": "10-1-0-before.png",
+        "sha256": "6dd0cda326fc1756e4c642246ffaf3086ce350220fdba27685c2fdded59a1012"
+      },
+      {
+        "kind": "physical",
+        "file": "10-1-0-after.png",
+        "sha256": "6dd0cda326fc1756e4c642246ffaf3086ce350220fdba27685c2fdded59a1012"
+      },
+      {
+        "kind": "physical",
+        "file": "10-1-35-before.png",
+        "sha256": "3ef4b8d876ae1011dae91267234a6f4437ee096055e775b4b5f8f797cd9d2f72"
+      },
+      {
+        "kind": "physical",
+        "file": "10-1-35-after.png",
+        "sha256": "3ef4b8d876ae1011dae91267234a6f4437ee096055e775b4b5f8f797cd9d2f72"
+      },
+      {
+        "kind": "physical",
+        "file": "10-1-100-before.png",
+        "sha256": "acad3dd74d09db830bfefc1fcc3041cbd53cbb750ac7cbed41a2e67d858879d2"
+      },
+      {
+        "kind": "physical",
+        "file": "10-1-100-after.png",
+        "sha256": "acad3dd74d09db830bfefc1fcc3041cbd53cbb750ac7cbed41a2e67d858879d2"
+      },
+      {
+        "kind": "physical",
+        "file": "10-2-0-before.png",
+        "sha256": "e3b9205113608d9479993fce975a03941c7f8061893d7164bc5d61c1f12034c9"
+      },
+      {
+        "kind": "physical",
+        "file": "10-2-0-after.png",
+        "sha256": "e3b9205113608d9479993fce975a03941c7f8061893d7164bc5d61c1f12034c9"
+      },
+      {
+        "kind": "physical",
+        "file": "10-2-35-before.png",
+        "sha256": "32b2b0e71afacf51da8b5dcc6fe614abff94942af20fb12ca198980e7a04ff4f"
+      },
+      {
+        "kind": "physical",
+        "file": "10-2-35-after.png",
+        "sha256": "32b2b0e71afacf51da8b5dcc6fe614abff94942af20fb12ca198980e7a04ff4f"
+      },
+      {
+        "kind": "physical",
+        "file": "10-2-100-before.png",
+        "sha256": "bb2ddf25b4f9bc2fd2510b8068f210561dbc303b1f57047ad7dee0ddd8b14c97"
+      },
+      {
+        "kind": "physical",
+        "file": "10-2-100-after.png",
+        "sha256": "bb2ddf25b4f9bc2fd2510b8068f210561dbc303b1f57047ad7dee0ddd8b14c97"
+      },
+      {
+        "kind": "physical",
+        "file": "11.dsculpt",
+        "sha256": "1351d7e4b8ddcde3f170beebdd4d2d55b1069a223df8e12be1f15d84d79a79b5"
+      },
+      {
+        "kind": "physical",
+        "file": "11-0-0-before.png",
+        "sha256": "7b4508f13e5c855b58e0e3d270e8993ccf00f396535748d0f46658b1e775aaad"
+      },
+      {
+        "kind": "physical",
+        "file": "11-0-0-after.png",
+        "sha256": "7b4508f13e5c855b58e0e3d270e8993ccf00f396535748d0f46658b1e775aaad"
+      },
+      {
+        "kind": "physical",
+        "file": "11-0-35-before.png",
+        "sha256": "b1914feb3e304a60146e6f74045576c2de13a78538bfd4ec9906eebc188b0ec4"
+      },
+      {
+        "kind": "physical",
+        "file": "11-0-35-after.png",
+        "sha256": "b1914feb3e304a60146e6f74045576c2de13a78538bfd4ec9906eebc188b0ec4"
+      },
+      {
+        "kind": "physical",
+        "file": "11-0-100-before.png",
+        "sha256": "2dc63b21db8f24302143e2752d4358d0a7d3eacaef62ddb0018d0ffc6626c459"
+      },
+      {
+        "kind": "physical",
+        "file": "11-0-100-after.png",
+        "sha256": "2dc63b21db8f24302143e2752d4358d0a7d3eacaef62ddb0018d0ffc6626c459"
+      },
+      {
+        "kind": "physical",
+        "file": "11-1-0-before.png",
+        "sha256": "2a565118dfd3ad61b1c03142e4a0e522fda2ab5582d96d24caa47ac4b20d2561"
+      },
+      {
+        "kind": "physical",
+        "file": "11-1-0-after.png",
+        "sha256": "2a565118dfd3ad61b1c03142e4a0e522fda2ab5582d96d24caa47ac4b20d2561"
+      },
+      {
+        "kind": "physical",
+        "file": "11-1-35-before.png",
+        "sha256": "b83ecd3c31a203744a442f3310e00d5da7f93b74f8104a2c7aef5a1eca2afee1"
+      },
+      {
+        "kind": "physical",
+        "file": "11-1-35-after.png",
+        "sha256": "b83ecd3c31a203744a442f3310e00d5da7f93b74f8104a2c7aef5a1eca2afee1"
+      },
+      {
+        "kind": "physical",
+        "file": "11-1-100-before.png",
+        "sha256": "551c53ce695f1fc62b0808a5649aa2464744b1e621d4dc73d89a1de99f2390a4"
+      },
+      {
+        "kind": "physical",
+        "file": "11-1-100-after.png",
+        "sha256": "551c53ce695f1fc62b0808a5649aa2464744b1e621d4dc73d89a1de99f2390a4"
+      },
+      {
+        "kind": "physical",
+        "file": "11-2-0-before.png",
+        "sha256": "8e4a74b678dc74d6a1d531228fac288ffd10c4189261430908af183ce5201b22"
+      },
+      {
+        "kind": "physical",
+        "file": "11-2-0-after.png",
+        "sha256": "8e4a74b678dc74d6a1d531228fac288ffd10c4189261430908af183ce5201b22"
+      },
+      {
+        "kind": "physical",
+        "file": "11-2-35-before.png",
+        "sha256": "d2ad744cbb8a738f4a617ddff8bd40701e78bcf0feda5480097ca2a862382a96"
+      },
+      {
+        "kind": "physical",
+        "file": "11-2-35-after.png",
+        "sha256": "d2ad744cbb8a738f4a617ddff8bd40701e78bcf0feda5480097ca2a862382a96"
+      },
+      {
+        "kind": "physical",
+        "file": "11-2-100-before.png",
+        "sha256": "7e1debdf09bdab24167df54fa660a1031b2305fed3a282ab0a1d001ee36b7af5"
+      },
+      {
+        "kind": "physical",
+        "file": "11-2-100-after.png",
+        "sha256": "7e1debdf09bdab24167df54fa660a1031b2305fed3a282ab0a1d001ee36b7af5"
+      }
+    ],
+    "RS_Arc_nonPNG_equal": 22,
+    "RS_Arc_nonPNG": [
+      {
+        "kind": "quality",
+        "file": "retained.dsculpt",
+        "sha256": "577be4290941d63f6bd3ef748cc080f2b10d9307b8461a3067099d1ea2c500e3"
+      },
+      {
+        "kind": "quality",
+        "file": "0.glb",
+        "sha256": "52d4070c699b00f2557f4b748fc2a746da6019758e295dc330a49fd746ceb448"
+      },
+      {
+        "kind": "quality",
+        "file": "1.glb",
+        "sha256": "49048e46000f4400f7253d51734812d1b5ef6db60425e2ed4f336d10c0682234"
+      },
+      {
+        "kind": "quality",
+        "file": "2.glb",
+        "sha256": "e960b42fcb9b02c0e465d64dec8b0e223960262f221353a2fd8149e6fabf4f81"
+      },
+      {
+        "kind": "quality",
+        "file": "3.glb",
+        "sha256": "d7b994c11b2313d4badcb67ee5bf35971979bf73c2ae06517702bc1e72bd1b51"
+      },
+      {
+        "kind": "quality",
+        "file": "4.glb",
+        "sha256": "768b0dd03ac06c56bb2d7bc7799525ab2698ef28909c9d896ac4fb7a061bfde2"
+      },
+      {
+        "kind": "quality",
+        "file": "5.glb",
+        "sha256": "a737da63b23c1e4cf67979157cc5cba06dd364d3d04f1c34dc18ed1972bdd9d4"
+      },
+      {
+        "kind": "quality",
+        "file": "6.glb",
+        "sha256": "1c7fd60da8e19187e356f82c63a8071c894918d71acd53b88d4871f323932211"
+      },
+      {
+        "kind": "quality",
+        "file": "7.glb",
+        "sha256": "e4f1a0c2ecf32fc259534afa544ea9339fc80d517eb785b07a51d5b9f518f47d"
+      },
+      {
+        "kind": "quality",
+        "file": "8.glb",
+        "sha256": "fabc836cd02bbf76dfeba563b6276512e8571dc0ec78c5596201d2bd9572f33d"
+      },
+      {
+        "kind": "physical",
+        "file": "0.dsculpt",
+        "sha256": "e26773e10e7cd5d3fa13ffa3b5a690df2e753052da01e6585e4b704312f01ec4"
+      },
+      {
+        "kind": "physical",
+        "file": "1.dsculpt",
+        "sha256": "c41f9dbf7115c05414af99b32ee405f8b87fdcc289f046b35e02c6829e247b4e"
+      },
+      {
+        "kind": "physical",
+        "file": "2.dsculpt",
+        "sha256": "d38c6c08106b21f7647e316f878cccaeb6229b0d583c2966a022cd8a1ae99eea"
+      },
+      {
+        "kind": "physical",
+        "file": "3.dsculpt",
+        "sha256": "6904b8111734fb1392c2f8abc7a40cea2361325d9443a2fd4600a5c6f5f4ed19"
+      },
+      {
+        "kind": "physical",
+        "file": "4.dsculpt",
+        "sha256": "889fd6533df827114e466377f52cd2af45630813c13c85cea00ef2d8bcd3ea63"
+      },
+      {
+        "kind": "physical",
+        "file": "5.dsculpt",
+        "sha256": "ece58e7f3445fc67ee22b082547163243c495eb1aa6e9cda5c47d6986f69d41d"
+      },
+      {
+        "kind": "physical",
+        "file": "6.dsculpt",
+        "sha256": "28aba2f47dfe02f9905940d494401d40f84827c07b25542368861262406f1a81"
+      },
+      {
+        "kind": "physical",
+        "file": "7.dsculpt",
+        "sha256": "e6f07fc320226c7da06cf4ba22fa8f1bb5edf6d4cd1df32bc121320e78e0c3ef"
+      },
+      {
+        "kind": "physical",
+        "file": "8.dsculpt",
+        "sha256": "dd95c8e7868480f80d68bd43149771b8672c5baa3ac500145e4f20d8bdb8f489"
+      },
+      {
+        "kind": "physical",
+        "file": "9.dsculpt",
+        "sha256": "186f974b6f18291e1dbd1fe7dbfd2ec05a73257436561fd27ce00c76ce91a7c7"
+      },
+      {
+        "kind": "physical",
+        "file": "10.dsculpt",
+        "sha256": "6f26de9f4716b1558b15cf6191cf99ebfc13722d58a9d8fc0e2c5422fcba8218"
+      },
+      {
+        "kind": "physical",
+        "file": "11.dsculpt",
+        "sha256": "1351d7e4b8ddcde3f170beebdd4d2d55b1069a223df8e12be1f15d84d79a79b5"
+      }
+    ],
+    "pixel_maxima": {
+      "release-quality": {
+        "images": 18,
+        "maximum": 0
+      },
+      "release-physical": {
+        "images": 66,
+        "maximum": 0
+      },
+      "sanitize-quality": {
+        "images": 18,
+        "maximum": 0
+      },
+      "sanitize-physical": {
+        "images": 66,
+        "maximum": 0
+      },
+      "arc-quality": {
+        "images": 18,
+        "maximum": 0
+      },
+      "arc-physical": {
+        "images": 66,
+        "maximum": 0
+      }
+    }
+  },
+  "checks": {
+    "native_workflow_each": 170,
+    "GUI_each": 18,
+    "actual_native_key_UV_GLB_images_each": 39,
+    "physical_before_UV_images_each": 331,
+    "physical_native_pairs_each": 66,
+    "key_native_pairs_each": 9,
+    "key_parsed_GLBs_each": 9,
+    "pixel_bound": 2,
+    "actual_maximum": 0,
+    "current_factory_each": 1055,
+    "persistent_factory_denied_prefixes_each": 441,
+    "factory_cancel_each": 148,
+    "codec_each": 260,
+    "selected_regressions_each": 8,
+    "actual_model_cap": 8000000,
+    "actual_next_model_entries": 8000128,
+    "old_native_files_byte_preserved_each": 5
+  },
+  "preserved_negatives": [
+    "Original strict2 legacy editable-grid raster key/UV failure lit3/unlit4 with same saved input, before new retention",
+    "Original physical-before-UV guard/17-pixel controls remain separate; supported37 default/native path now measured exact",
+    "Old matched37 export guard refusal before genuine corner compiler",
+    "Initial ready-UV Restore guard omission, corrected with the same exact session/stroke transaction checks",
+    "Initial over-limit8MiB JSON fixture construction in BOTH whole ac0 cohorts; corrected test input obeys existing2MiB JSON cap and tests copied diagnostics",
+    "New holder-copy omission counterfactual R/S reaches intended over-budget-copy assertion, fixed code refuses before output allocations",
+    "Initial image-runner executable/output-directory collision R/S; retry changes driver paths only",
+    "Actual llvmpipe and UHD770 each refuse required-A770 for both graphics consumers"
+  ],
+  "remaining_required": [
+    "Actual Scene37 owning reader/writer persistent-allocation and cross-pool mixed-actor/boundary/foreign-owner sweeps; do not borrow factory or old reader proofs",
+    "GUI source currently plain canonical float input; more actual controller/gesture/held-input/late-publication Cancel gates",
+    "Post37 new key/Mirror/freehand composition and complete field/rig/polygon/source domain authoring remain required",
+    "Intentional current-main/normal36 semantic integration and full optimized regression; private37 is not main delivered",
+    "Genuine physical HDR package4 export/import and typed/source-only domains; existing unsupported guards not completion"
+  ]
+}

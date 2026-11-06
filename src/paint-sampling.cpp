@@ -24,10 +24,10 @@ size_t mesh_bytes(const Mesh &m,Budget &budget,bool paint){
  return bytes;
 }
 size_t own_bytes(const PaintSamplingDomain &domain,Budget &budget){
- if(domain.version()!=1||!domain.basis())throw std::invalid_argument("Writable paint-domain requires its immutable geometry basis");
+ if((domain.version()!=1&&domain.version()!=3)||!domain.basis()||bool(domain.derived_geometry())!=(domain.version()==3))throw std::invalid_argument("Writable paint-domain requires its immutable geometry basis");
  const auto bytes=mesh_bytes(*domain.basis(),budget,true);
  if(domain.source_corners().size()!=domain.basis()->indices.size())throw std::invalid_argument("Writable paint-domain lost complete source-corner correspondence");
- const auto all=bytes+domain.source_corners().size()*sizeof(uint32_t);
+ const auto all=bytes+domain.source_corners().size()*sizeof(uint32_t)+(domain.derived_geometry()?mesh_bytes(*domain.derived_geometry(),budget,false):0);
  if(all>budget.limits.max_basis_bytes)throw std::length_error("Writable paint-domain retained basis exceeds its byte limit");budget.bytes(all);return all;
 }
 void correspondence(const Mesh &source,const Mesh &current,std::span<const uint32_t> corners,Budget &budget,size_t owned){
@@ -44,7 +44,20 @@ void correspondence(const Mesh &source,const Mesh &current,std::span<const uint3
 }
 size_t validate(const PaintSamplingDomain &domain,const Mesh &current,Budget &budget){
  const auto owned=own_bytes(domain,budget);const auto bytes=mesh_bytes(current,budget,false);budget.bytes(owned+bytes+domain.basis()->indices.size()/3);
- correspondence(*domain.basis(),current,domain.source_corners(),budget,owned+bytes);return owned;
+ if(domain.version()==1)correspondence(*domain.basis(),current,domain.source_corners(),budget,owned+bytes);
+ else {
+  const auto &derived=*domain.derived_geometry();
+  const auto same_vectors=[](const std::vector<Vec3>&a,const std::vector<Vec3>&b){return a.size()==b.size()&&std::equal(a.begin(),a.end(),b.begin(),[](Vec3 x,Vec3 y){return same(x,y);});};
+  if(!same_vectors(current.positions,derived.positions)||!same_vectors(current.normals,derived.normals)||current.indices!=derived.indices||current.uv!=derived.uv||current.uv_pins!=derived.uv_pins||current.uv_seams!=derived.uv_seams)throw std::invalid_argument("Polygon paint domain differs from its exact current derivative snapshot");
+  const auto corners=domain.source_corners();if(corners.size()!=current.indices.size())throw std::invalid_argument("Polygon paint domain lost its complete current corner stream");
+  // Kind3 first boundary is a genuine triangle/corner bijection with changed
+  // positions. A future refinement record must carry actual barycentrics; it
+  // cannot turn duplicate or missing source triangles into this kind.
+  const auto faces=domain.basis()->indices.size()/3;budget.bytes(owned+bytes+faces);std::vector<uint8_t>seen(faces);
+  for(size_t c=0;c<corners.size();c+=3){budget.work(3);const auto source=corners[c];if(source>=domain.basis()->indices.size()||seen[source/3]++)throw std::invalid_argument("Polygon paint domain duplicated or lost an actual source triangle");std::array<uint32_t,3>ids{corners[c],corners[c+1],corners[c+2]};std::sort(ids.begin(),ids.end());if(ids!=std::array<uint32_t,3>{(source/3)*3,(source/3)*3+1,(source/3)*3+2})throw std::invalid_argument("Polygon paint domain changed its actual source corner sides");}
+  if(corners.size()!=domain.basis()->indices.size())throw std::invalid_argument("Polygon paint domain requires its separate refinement/coverage adapter");
+ }
+ return owned;
 }
 }
 size_t PaintSamplingDomain::storage_bytes(const PaintSamplingLimits &limits)const{Budget b(limits);return own_bytes(*this,b);}
@@ -61,7 +74,7 @@ Mesh PaintSamplingDomain::raster_mesh(const Mesh &current,const PaintSamplingLim
 std::shared_ptr<const PaintSamplingDomain> retain_paint_sampling(const Mesh &before,
  std::shared_ptr<const PaintSamplingDomain> previous,const Mesh &current,
  std::span<const uint32_t> corners,const PaintSamplingLimits &limits){
- Budget b(limits);const auto before_bytes=mesh_bytes(before,b,false),current_bytes=mesh_bytes(current,b,false);
+ Budget b(limits);if(previous&&previous->version()!=1)throw std::invalid_argument("Polygon paint UV changes require their actual owning transition adapter");const auto before_bytes=mesh_bytes(before,b,false),current_bytes=mesh_bytes(current,b,false);
  if(corners.size()!=current.indices.size()||corners.size()!=before.indices.size())throw std::invalid_argument("Writable paint-domain source-corner map dimensions differ");
  b.bytes(before_bytes+current_bytes+corners.size()*sizeof(uint32_t));
  correspondence(before,current,corners,b,before_bytes+current_bytes);

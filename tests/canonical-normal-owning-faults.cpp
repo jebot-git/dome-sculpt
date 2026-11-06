@@ -9,11 +9,12 @@ int main()try{
  const auto paint=scene.active().painted;const auto deformation=scene.active().deformation;
  const ColorPreparationInput input{paint,{},nullptr,deformation,scene.active().material,{}};
  auto produce=[&]{return convert_canonical_normals(input);};
- auto signature=[](const NormalPreparationResult &r){
-  NormalFrameArchive frames;frames.add(r.material_bindings->normal_frames);
-  const auto &p=*r.material_bindings->normal_preparation;
-  return nlohmann::json{{"paint",r.paint->encode()},{"frames",frames.encode()},
-   {"receipt",p.canonical_conversion->encode()},{"before",p.original_paint->encode()}};
+ auto signature=[&](const NormalPreparationResult &r){
+  auto output=scene;output.active().painted=r.paint;output.active().material_bindings=r.material_bindings;
+  // The actual output includes independent BakedNormalField references. Its
+  // genuine Scene closure owns the image/origin/material contexts; bare Paint
+  // encoding must continue to refuse rather than fabricate those contexts.
+  output.validate();return output.encode();
  };
  auto warm=produce();const auto expected=signature(warm);
  conversion_fault::calls=0;conversion_fault::at=SIZE_MAX;conversion_fault::enabled=true;
