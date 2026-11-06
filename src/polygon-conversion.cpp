@@ -268,6 +268,11 @@ struct PolygonConversionAccess {
     return out;
   }
 };
+PolygonMesh prepare_unpainted_polygon_atlas(const PolygonMesh &source,
+    uint32_t resolution,const std::function<bool()> &cancelled) {
+  PolygonLimits limits;limits.cancelled=cancelled;
+  return PolygonConversionAccess::atlas(source,resolution,limits);
+}
 bool polygon_conversion_required(const SculptObject &object) {
   const bool current_polygon = object.polygon && object.polygon->active;
   if (current_polygon && !object.deformation && !object.appearance &&

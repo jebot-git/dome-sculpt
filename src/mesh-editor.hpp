@@ -3,6 +3,7 @@
 #include "dome/document.hpp"
 namespace dome {
 void edit_voxel_remesh(Document &);
+void edit_triangle_remesh(Document &);
 void edit_retopology_distance(Document &);
 void edit_cut_parameters(Document &, VrParameter);
 }

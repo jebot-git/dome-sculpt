@@ -5,6 +5,7 @@
 // integration.
 #include "dome/remesh.hpp"
 #include <bit>
+#include <limits>
 #include <map>
 #include <numeric>
 #include <set>
@@ -146,16 +147,35 @@ struct Worker {
                      h.barycentric[k];
     return v;
   }
+  bool shape_points(const std::array<Vec3, 3> &p, Vec3 old) const {
+    const auto n = cross(p[1] - p[0], p[2] - p[0]);
+    const double area2 = dot(n, n), old2 = dot(old, old);
+    double magnitude = 0, edge_length = 0;
+    for (size_t i = 0; i < 3; ++i) {
+      magnitude = std::max({magnitude, std::abs(double(p[i].x)),
+                            std::abs(double(p[i].y)), std::abs(double(p[i].z))});
+      const auto &a = p[i], &b = p[(i + 1) % 3];
+      edge_length = std::max(edge_length, std::hypot(double(b.x) - a.x,
+                               double(b.y) - a.y, double(b.z) - a.z));
+    }
+    // A positive but extremely thin triangle can be dominated by coordinate
+    // quantization after a translated/sheared projection. Its normal may turn
+    // sideways despite a locally positive signed area. Keep the old topology
+    // whenever the candidate's area is not resolvable in the actual F32 frame.
+    const double epsilon = std::numeric_limits<float>::epsilon();
+    const double rounding =
+        8 * epsilon * (magnitude * edge_length + edge_length * edge_length) +
+        8 * epsilon * epsilon * magnitude * magnitude;
+    return area2 > std::max(1e-20, 16 * rounding * rounding) &&
+           std::isfinite(area2) && dot(n, old) > std::sqrt(area2 * old2) * .1;
+  }
   bool shape(std::array<uint32_t, 3> ids, Vec3 old,
              std::optional<std::pair<uint32_t, Vec3>> replacement = {}) const {
     std::array<Vec3, 3> p;
-    for (size_t k = 0; k < 3; k++)
-      p[k] = replacement && replacement->first == ids[k] ? replacement->second
-                                                         : vertices[ids[k]].p;
-    auto n = cross(p[1] - p[0], p[2] - p[0]);
-    double area2 = dot(n, n), old2 = dot(old, old);
-    return area2 > 1e-20 && std::isfinite(area2) &&
-           dot(n, old) > std::sqrt(area2 * old2) * .1;
+    for (size_t k = 0; k < 3; ++k)
+      p[k] = replacement && replacement->first == ids[k]
+                 ? replacement->second : vertices[ids[k]].p;
+    return shape_points(p, old);
   }
   void validate(const Adjacency &a) {
     for (auto &[e, uses] : a.edges) {
@@ -247,8 +267,8 @@ struct Worker {
                c = old.v[(use.corner + 2) % 3];
           auto n = normal(old);
           auto p0 = vertices[aa].p, p1 = vertices[bb].p, pc = vertices[c].p;
-          if (dot(cross(v.p - p0, pc - p0), n) <= 0 ||
-              dot(cross(p1 - v.p, pc - v.p), n) <= 0) {
+          if (!shape_points({p0, v.p, pc}, n) ||
+              !shape_points({v.p, p1, pc}, n)) {
             available = false;
             break;
           }

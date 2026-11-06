@@ -106,6 +106,17 @@ void Document::queue_voxel_sculpt_locked(float world_voxel_mm, AssetSource expec
     create_voxel_sculpt(scene, world_voxel_mm, cancelled);
   }, expected, {});
 }
+void Document::remesh_to_triangles(float world_edge_mm,AssetSource expected) {
+  std::lock_guard lock(model_mutex_);
+  queue_triangle_remesh_locked(world_edge_mm,expected);
+}
+void Document::queue_triangle_remesh_locked(float world_edge_mm,AssetSource expected) {
+  if(!std::isfinite(world_edge_mm)||world_edge_mm<.01f||world_edge_mm>1000)
+    throw std::invalid_argument("Edge length must be between 0.01 and 1000 mm");
+  queue_scene_operation_locked("Isotropic remesh",[world_edge_mm](Scene &scene,const auto &cancelled){
+    create_triangle_remesh(scene,world_edge_mm,cancelled);
+  },expected,{});
+}
 void Document::import_asset(const std::filesystem::path &path,uint32_t resolution) {
   ImportSettings settings;settings.paint_resolution=resolution;import_asset(path,settings);
 }

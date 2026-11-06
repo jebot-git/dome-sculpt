@@ -656,6 +656,7 @@ struct App {
     menu.add("&Scene/Shapekeys/Restore before shape authoring...",0,command,this);
 
     menu.add("&Mesh/Voxel remesh...", 0, command, this);
+    menu.add("&Mesh/Isotropic remesh...",0,command,this);
     menu.add("&Mesh/Bake surface...",0,command,this);
     menu.add("&Mesh/Clear baked surface",0,command,this);
     menu.add("&Mesh/Convert to portable normals",0,command,this);
@@ -804,6 +805,7 @@ struct App {
     enable("&File/Recovery/Recover project...", !modal && !s->recovery_busy &&
            !s->dirty && !s->asset_busy && !s->recovery_candidates.empty());
     enable("&Mesh/Voxel remesh...", !modal && s->can_voxel_remesh);
+    enable("&Mesh/Isotropic remesh...",!modal&&s->can_retopologize&&s->objects.size()<256);
     enable("&Mesh/Bake surface...",!modal && s->can_bake);
     enable("&Mesh/Clear baked surface",!modal && s->can_clear_bake);
     enable("&Mesh/Convert to portable normals",!modal && s->can_convert_bake);
@@ -1337,6 +1339,8 @@ struct App {
       SculptResolutionOptions initial;initial.voxel_size=source.volume->voxel_size();
       auto options=sculpt_resolution_dialog(initial.voxel_size,draft.scene.world_transform(source.id).scale,initial);
       if(options)canvas.document.change_sculpt_resolution(std::move(*options),draft.source);
+    } else if(label=="Isotropic remesh...") {
+      edit_triangle_remesh(canvas.document);
     } else if (label == "Voxel remesh...") {
       edit_voxel_remesh(canvas.document);
     } else if(label=="VR selection mode"){canvas.document.configure_selection(!canvas.document.frame().state->selection_mode);

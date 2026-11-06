@@ -1,3 +1,35 @@
+## Current isotropic remeshing integrated — 2026-11-06
+
+Main integrates qualified c618c828 on the current direct-upload/input foundation.
+Read [TRIANGLE-REMESH-INTEGRATION.md](TRIANGLE-REMESH-INTEGRATION.md) and its matched
+receipt. Fresh complete reachable Release/SAN providers pass native remeshing,
+42 ordinary FLTK and 103 actual-loader/synthetic-controller checks per profile;
+43 corresponding output pairs are exact. A separate unchanged ordinary app
+passes 24 checks on authenticated Arc A770 GL. The current Release exhaustive
+allocation sweep closes 116337 denials plus endpoint. The current sanitizer
+sweep is incomplete: old coordinator gone, 24 completed receipts verified and
+resumed under a separate coordinator; unreceipted passing logs are rerun.
+No physical HMD, fresh ALL, installation or full production completion claim.
+The full goal remains active. Private paint-field preservation now has 292
+native workflow controls and its five remaining Release codec/paint/affine/key/
+package consumers passing; actual app/render integration is next. Texture sets
+and local chunk publication remain separate active integration branches.
+
+## Private current remesh Release composition (historical) — 2026-11-06
+
+Privatec618c82 combines isotropic remeshing with current mainf907. Its fresh235-step
+optimized Release build owns233 project objects/archives/ELFs and all reachable
+app/core/render/XR providers. Full remesh authoring now passes the original affine
+gate;248 polygon/retopo,13442 input,108 query families and73 direct-upload controls
+pass. Its measured allocation map is116337;32 prefix+32 tail denials and endpoint
+pass. Fresh whole-owned sanitizer and a new complete current Release sweep remain
+live. See validation/TRIANGLE-REMESH-CURRENT-RELEASE.json. Separately, original
+kernela7ec25b closes116325 persistent denials+endpoint in both profiles, all128
+partitions/profile and2288 protected inputs unchanged. That historical proof does
+not qualify the changed current map or relabel original native failures. Remesh
+is still private; full production, interoperability, acceleration and drawers
+remain required. No installation/headset/session restart; full goal active.
+
 ## Direct immutable geometry uploads admitted — 2026-11-06
 
 Main integrates qualified9f89fce on537c98b. The renderer uploads immutable arrays

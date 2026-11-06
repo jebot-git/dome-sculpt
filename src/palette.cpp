@@ -363,7 +363,7 @@ void SpatialPalette::raster(const EditorState &s) {
         label += std::to_string(int(std::lround(value))) + " deg";
       else if (c.parameter == VrParameter::BrushRadius)
         label += std::to_string(int(std::lround(value * 1000))) + " mm";
-      else if (c.parameter == VrParameter::VoxelSize || c.parameter == VrParameter::RetopoDistance) {
+      else if (c.parameter == VrParameter::VoxelSize || c.parameter == VrParameter::TriangleEdge || c.parameter == VrParameter::RetopoDistance) {
         char size[48];
         snprintf(size, sizeof(size), "%.2f mm", double(value));
         label += size;
@@ -409,11 +409,11 @@ void SpatialPalette::raster(const EditorState &s) {
     rect(360 * unit_, 588 * unit_, 220 * unit_, 42 * unit_, accent);
     text(170 * unit_, 616 * unit_, "Cancel", fg);
     text(470 * unit_, 616 * unit_,
-         c.parameter == VrParameter::ShapeMirror ? "Mirror / Press" : c.parameter == VrParameter::VoxelSize ? "Remesh / Press" : "Done / Press", fg);
+         c.parameter == VrParameter::ShapeMirror ? "Mirror / Press" : (c.parameter == VrParameter::VoxelSize || c.parameter == VrParameter::TriangleEdge) ? "Remesh / Press" : "Done / Press", fg);
     if (c.parameter == VrParameter::RigRotation || c.parameter == VrParameter::MorphWeight)
       text(320 * unit_, 480 * unit_, "Apply on Done / Press", fg);
-    if (c.parameter == VrParameter::VoxelSize) {
-      text(320 * unit_, 470 * unit_, "New sculpt from the displayed shape", fg);
+    if (c.parameter == VrParameter::VoxelSize || c.parameter == VrParameter::TriangleEdge) {
+      text(320 * unit_,470 * unit_,c.parameter==VrParameter::TriangleEdge?"New unpainted polygon surface":"New sculpt from the displayed shape",fg);
       text(320 * unit_, 505 * unit_, "Source retained and hidden", fg);
     }
     return;

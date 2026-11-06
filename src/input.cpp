@@ -47,7 +47,7 @@ const std::array<const char *, 12> &spatial_labels(int page) {
       "Delete group", "Ungroup", "Back", "Undo", "Redo", "Save"};
   static const std::array<const char *, 12> mesh = {
       "Prepare paint", "Voxel remesh", "Polygon edit", "UV editor",
-      "Plane cut", "Paint tools", "Baking", "Shapekeys",
+      "Plane cut", "Isotropic remesh", "Baking", "Shapekeys",
       "Back", "Holding", "Import", "Retopology"};
   static const std::array<const char *, 12> rig = {
       "Rotate joint", "Next joint", "Previous joint", "Shapekey weight",
@@ -125,6 +125,7 @@ std::optional<VrParameter> spatial_parameter(int page, int sector) {
     return VrParameter::VoxelSize;
   if (page == 10 && sector == 3)
     return VrParameter::UvEdit;
+  if(page==10&&sector==5)return VrParameter::TriangleEdge;
   if (page == 7 && sector == 7)
     return VrParameter::SculptResolution;
   if (page == 7 && sector == 5)
@@ -740,8 +741,8 @@ void SpatialInput::update(const SpatialSample &s) {
       page_ = 16; selected_ = 0;
     } else if(page_==10&&selected_==4){
       page_=17;selected_=0;
-    } else if (page_ == 10 && (selected_ == 5 || selected_ == 6 || selected_ == 7)) {
-      page_ = selected_ == 5 ? 3 : selected_ == 6 ? 12 : 24;
+    } else if (page_ == 10 && (selected_ == 6 || selected_ == 7)) {
+      page_ = selected_ == 6 ? 12 : 24;
       selected_ = 0;
     } else if(page_==2&&selected_==1){page_=31;selected_=0;
     } else if (page_ == 3 && selected_ == 11) {
