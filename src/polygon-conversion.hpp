@@ -9,6 +9,10 @@ capture_polygon_origin(const SculptObject &, CanvasTransform);
 std::shared_ptr<const PolygonOrigin> capture_polygon_origin(const Scene &,uint64_t);
 std::shared_ptr<const PolygonOrigin> capture_polygon_origin(const SculptObject &,CanvasTransform,
     std::shared_ptr<const SourcePlacementCapsule>);
+// Pure atlas preparation for a fresh unpainted authority. Stable logical vertex
+// and corner identities survive UV seam splits in its packed derivative.
+PolygonMesh prepare_unpainted_polygon_atlas(const PolygonMesh &,uint32_t,
+    const std::function<bool()> & = {});
 bool polygon_conversion_required(const SculptObject &);
 struct PolygonWorkspaceSource {
   PolygonMesh topology;

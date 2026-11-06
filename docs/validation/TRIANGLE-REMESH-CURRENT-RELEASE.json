@@ -1,0 +1,148 @@
+{
+  "status": "Qualified private fresh Release component; no main remesh admission",
+  "source": "c618c82",
+  "main_parent": "f9073165040eb3140bf312710fd4b961af43bed5",
+  "historical_kernel_closure": "a7ec25b",
+  "fresh_build": {
+    "path": "/home/blux/de-xr/dome-sculpt/artifacts/triangle-remesh-f907/artifacts/current-release/status.json",
+    "sha256": "a2abb8331ee05cc01f99fdb98a54b1027543896907d4683bb970baf3305a8a47",
+    "exit": 0,
+    "steps": 235,
+    "own_objects_archives_ELFs": 233,
+    "eight_targets": [
+      "dome-sculpt",
+      "dome-sculpt-native-authoring-inspect",
+      "dome-sculpt-triangle-remesh-test",
+      "dome-sculpt-triangle-remesh-faults-test",
+      "dome-sculpt-polygon-retopo-affine-test",
+      "dome-sculpt-surface-query-oblique-test",
+      "dome-sculpt-retopo-input-admission-test",
+      "dome-sculpt-render-direct-upload-test"
+    ],
+    "seconds": 468.92056495003635,
+    "all_reachable_providers_fresh": true,
+    "no_old_project_support_binaries": true
+  },
+  "runtime": {
+    "path": "/home/blux/de-xr/dome-sculpt/artifacts/triangle-remesh-f907/artifacts/current-release/runtime-status.json",
+    "sha256": "cd63b2688b60d0824bbc18f454ec1384efedba477d9031611876bfd1f93529d8",
+    "exit": 0,
+    "seconds": 19.176028186047915,
+    "steps": [
+      {
+        "name": "app-version",
+        "exit": 0,
+        "log_sha256": "9455a20a636a6599ace60120261649d3b29dc51fe2c774305994879190e7336b",
+        "PASS_lines": 0,
+        "last_lines": [
+          "Dome Sculpt 0.1.0 / CPU / Blender 5.4 Alpha trackball basis"
+        ]
+      },
+      {
+        "name": "triangle-remesh",
+        "exit": 0,
+        "log_sha256": "a6b982be4d0d5aa5e3c5e6909f94486cd094ddcc4f8d01f538297f927b7f0980",
+        "PASS_lines": 2166,
+        "last_lines": [
+          "PASS Scalar-source remeshing has exact scene undo",
+          "PASS Unchanged complete voxel remeshing and controller regression still passes",
+          "PASS All polygon integration workflows pass"
+        ]
+      },
+      {
+        "name": "affine-polygon-retopo",
+        "exit": 0,
+        "log_sha256": "cbae4ada8c03d42fdc6f4e46df70f38a3ff0dcf9c71a932614a65021a0b469d9",
+        "PASS_lines": 249,
+        "last_lines": [
+          "PASS Ordered native publication and geometry finish",
+          "PASS Immediate ordered Save/reopen retains complete current native authority",
+          "PASS 248 combined affine polygon/retopo checks"
+        ]
+      },
+      {
+        "name": "surface-query",
+        "exit": 0,
+        "log_sha256": "2d24410ab4969e67baa6acd7cb2965145a0db5a5d2809cf945cebb82ada7f712",
+        "PASS_lines": 1,
+        "last_lines": [
+          "PASS 108 oblique scale/aspect/axis/reflection/winding families"
+        ]
+      },
+      {
+        "name": "current-input",
+        "exit": 0,
+        "log_sha256": "206f4ba19c21a4264aea0102255eee364ee669904890ba3a44156d408fa58d85",
+        "PASS_lines": 2,
+        "last_lines": [
+          "CALLER held=1 action=13 allocations=30",
+          "PASS 13441 caller admission checks; 228 persistent caller boundaries",
+          "PASS 13442 full input admission checks; 424 route persistent boundaries"
+        ]
+      },
+      {
+        "name": "direct-render",
+        "exit": 0,
+        "log_sha256": "88f7e637ac7b0c8af710ec73cd3bc8a8847c36a826960be012656f015afa031e",
+        "PASS_lines": 74,
+        "last_lines": [
+          "PASS A real valid draw recovers exact cached/default pixels after stream refusal",
+          "PASS Direct-buffer rendering leaves actual GL state error-free",
+          "PASS 73 direct-upload checks"
+        ]
+      },
+      {
+        "name": "fault-measure",
+        "exit": 0,
+        "log_sha256": "d7d379eab5a938500a6d9500923f70577a569d5c13143e39536b836216cc071a",
+        "PASS_lines": 0,
+        "last_lines": [
+          "BASELINE 116337"
+        ]
+      },
+      {
+        "name": "fault-prefix",
+        "exit": 0,
+        "log_sha256": "3619fba53d1378430efae30e043b12aa2645d345653901227b779366d6b4247f",
+        "PASS_lines": 1,
+        "last_lines": [
+          "BASELINE 116337",
+          "PASS range [1,33) refused=32 optional=0 endpoint=0"
+        ]
+      },
+      {
+        "name": "fault-tail",
+        "exit": 0,
+        "log_sha256": "f8a09ca5a874155ed2cd28a5306a4c1b89f99f1ffc66e0a29184745a23d11c22",
+        "PASS_lines": 1,
+        "last_lines": [
+          "BASELINE 116337",
+          "PASS range [116306,116339) refused=32 optional=0 endpoint=1"
+        ]
+      }
+    ],
+    "mapped_elf_records": 89,
+    "before_baseline_ctime_inode_hashes_unchanged": true
+  },
+  "root_review": {
+    "own_outputs_rehashed": 233,
+    "runtime_logs_rehashed": 9,
+    "build_and_runtime_drift": []
+  },
+  "counts": {
+    "native_remesh_PASS_lines_not_independent_case_count": 2166,
+    "affine_polygon_retopo": 248,
+    "surface_query_families": 108,
+    "current_input_checks": 13442,
+    "direct_upload_checks": 73,
+    "new_fault_baseline": 116337,
+    "current_prefix_persistent_denials": 32,
+    "current_tail_persistent_denials": 32,
+    "successful_endpoint": 1
+  },
+  "live_followups": {
+    "fresh_owned_SAN_build": 68117,
+    "new_current_Release_full_sweep": 8969
+  },
+  "remaining": "Current sanitizer runtime/application/device and full116337-point proof remain open. Historical116325 kernel proof cannot establish coverage for new allocation map. Full production goal active; no install/headset/session restart."
+}
