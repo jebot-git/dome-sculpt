@@ -21,6 +21,16 @@ runtime/admission result yet. Read SCULPT-PLACED-WORKSPACE-SOURCE.md and its pin
 receipt. The bounded native/software gate is only proposed. Existing qualified
 providers, original P1 failure and complete full-goal requirements remain intact.
 
+## User-requested pause checkpoint — 2026-11-06
+
+Read [PAUSE-CHECKPOINT-20261106.md](PAUSE-CHECKPOINT-20261106.md) before resuming.
+Ready source is composed through producte8d6b9e1; full combined runtime is still
+pending. Separate resize component2319, coldP1 publication258852 and completed
+old remesh SAN sweep are recorded with exact scopes. WarmP1 remains failed.
+All owned agent jobs are terminal; oldcontractsOOM is SIGSTOP-preserved with
+PID/start-time resume instructions. The complete original goal is paused at
+the user's request, not complete. Do not start further work until resumed.
+
 ## New authoring and production-memory source composition — 2026-11-06
 
 Read [SCULPT-AUTHORING-NEXT.md](SCULPT-AUTHORING-NEXT.md). This private child
