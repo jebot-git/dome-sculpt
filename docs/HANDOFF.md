@@ -1,3 +1,36 @@
+
+## Initial owning polygon-field native workflow qualified — 2026-11-06
+
+Source643dec72 now passes292 actual native controls across eight N-only/canonical,
+affine/reflected and Move/Flip combinations. The run uses the fresh e754 all-own
+app/core/support/render/XR/inspector ABI cohort, with the complete Archive TU from
+0ae2726 and the complete corrected fixture TU. No old Archive member is linked.
+All233 fresh inputs,252 previous qualified inputs and239 prior inputs captured
+by the final native wrapper remain unchanged. The genuine product fix retains
+resolved source roots while the enclosing Paint6 callback is still needed; it
+does not reopen a closed reader or weaken prefix/cycle validation.
+
+The real workflow now preserves writable FLOAT paint, independent baked normal
+and key owners, original source/placement, accepted polygon Move/Flip, immediate
+ordered Save, full and before-only Scene39 second-cycle loading, exact Undo/Redo
+and restarted source Restore. The before-only fixture retains actual hidden Bake
+actors; discarding them was an invalid fixture, not permission to relax recipes.
+Old-context, false-feature, foreign-root, cyclic/future-prefix and mismatched
+current-owner controls still refuse. See
+[the pinned native receipt](validation/POLYGON-SURFACE-OWNING39-NATIVE.json).
+
+The preceding resource/fixture/product failures remain preserved. Root authorized
+lossless archival of only the closed reader-v3 linker map; its735500-byte archive
+passes full-stream hash/metadata and an actual original-path restore before the
+duplicate is removed. No failed ELF, object, library or source was removed.
+
+This closes the initial native workflow, not the full polygon-field requirement.
+The original five downstream codec/paint/legacy consumers, actual shader/mixed-
+material rendering, sanitizer/FLTK/OpenXR/device proof, repeated edits and general
+topology/source domains, and portable GLB/VRM adapters remain required. The fresh
+stage is152244224 bytes; another64MiB prospective link does not fit its unchanged
+200MiB cap. Further links require a concrete resource adjustment first.
+
 Private39 source now includes admitted mainf907316 direct uploads after the
 closed8f R cohort. This merge has not been executed against39 yet. Preserve all
 252 prior qualified providers and do not relabel their scope as current renderer
