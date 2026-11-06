@@ -1,3 +1,15 @@
+## Sourceful same-object field appearance regression — 2026-11-06
+
+Separate manual sourceful39+40 GPU consumer now follows real field preparation,
+public collection creation and codec replay on one shared-geometry object.
+Independent binary64 geometry/normal/role-image/GGX and member-color pixels,
+negative sibling/roleUV controls, held/canvas, ghost/cull/state and history remain
+runtime requirements. Complete consumer optimized syntax passes warning-free;
+no executable, GPU or runtime claim. Read
+[TEXTURE-SET-SOURCE-APPEARANCE-SOURCE.md](TEXTURE-SET-SOURCE-APPEARANCE-SOURCE.md)
+and its pinned source receipt. Frozen current providers remain unchanged; no
+installation, headset test or full-goal completion.
+
 ## New authoring and production-memory source composition — 2026-11-06
 
 Read [SCULPT-AUTHORING-NEXT.md](SCULPT-AUTHORING-NEXT.md). This private child
