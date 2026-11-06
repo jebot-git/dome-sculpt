@@ -5,6 +5,7 @@
 #include <limits>
 #include <stdexcept>
 namespace dome {
+namespace detail {class SculptPlacedChunk;}
 struct TopologyReport {
   size_t vertices = 0, triangles = 0, geometric_vertices = 0,
          unused_vertices = 0;
@@ -51,8 +52,13 @@ struct SurfaceHit {
 // Owns an immutable mesh/BVH copy; concurrent read-only queries are safe.
 // Distances are metres and ray direction is normalized internally.
 class SurfaceQuery {
+  friend class detail::SculptPlacedChunk;
   struct Impl;
   std::unique_ptr<Impl> impl_;
+  struct ImmutableGeometry {};
+  SurfaceQuery(ImmutableGeometry,std::shared_ptr<const Mesh>,
+               const std::function<bool()> &);
+  static size_t immutable_working_bytes(const Mesh &);
 
 public:
   explicit SurfaceQuery(const Mesh &,

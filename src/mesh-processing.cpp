@@ -219,8 +219,9 @@ struct Bvh {
   };
   std::vector<Node> nodes;
   std::function<bool()> cancelled;
-  Bvh(const Mesh &mesh, std::function<bool()> fn)
+  Bvh(const Mesh &mesh, std::function<bool()> fn,size_t reserved_nodes=0)
       : m(mesh), cancelled(std::move(fn)) {
+    if(reserved_nodes)nodes.reserve(reserved_nodes);
     order.resize(m.indices.size() / 3);
     std::iota(order.begin(), order.end(), 0);
     build(0, order.size());
@@ -398,10 +399,21 @@ struct Bvh {
 };
 } // namespace
 struct SurfaceQuery::Impl {
-  Mesh mesh;
+  // Public construction retains its old defensive Mesh copy. Only the sealed
+  // private placed-chunk factory can share an actually const geometry owner.
+  Mesh copied;
+  std::shared_ptr<const Mesh> immutable;
+  const Mesh &mesh;
   Bvh tree;
   Impl(const Mesh &m, const std::function<bool()> &fn)
-      : mesh(m), tree(mesh, fn) {}
+      : copied(m),mesh(copied),tree(mesh, fn) {}
+  Impl(std::shared_ptr<const Mesh> m,const std::function<bool()> &fn,size_t nodes)
+      : immutable(std::move(m)),mesh(*immutable),
+        tree(mesh,fn?std::function<bool()>(std::cref(fn)):std::function<bool()>{},nodes) {
+    // Build-only borrowed callback. Never retain a model/Scene callback or a
+    // reference to a completed worker operation in the immutable query owner.
+    tree.cancelled={};
+  }
   SurfaceHit hit(uint32_t triangle, Vec3 position, std::array<float, 3> bary,
                  float distance) const {
     auto a = mesh.indices[triangle * 3], b = mesh.indices[triangle * 3 + 1],
@@ -427,6 +439,33 @@ SurfaceQuery::SurfaceQuery(const Mesh &m, const std::function<bool()> &fn) {
   m.validate();
   impl_ = std::make_unique<Impl>(m, fn);
   cancel(fn);
+}
+namespace {
+size_t chunk_bvh_nodes(size_t triangles) {
+  if(triangles<=8)return 1;
+  auto a=chunk_bvh_nodes(triangles/2),b=chunk_bvh_nodes(triangles-triangles/2);
+  if(b==SIZE_MAX||a>SIZE_MAX-b-1)throw std::length_error("Chunk BVH node count overflow");
+  return 1+a+b;
+}
+}
+size_t SurfaceQuery::immutable_working_bytes(const Mesh &mesh) {
+  const auto triangles=mesh.indices.size()/3;
+  if(!triangles||mesh.indices.size()%3)throw std::invalid_argument("Invalid immutable query triangle count");
+  size_t bytes=sizeof(Impl)+sizeof(SurfaceQuery)+256;
+  auto charge=[&](size_t n,size_t width){
+    if(n>(SIZE_MAX-bytes)/width)throw std::length_error("Immutable query byte count overflow");
+    bytes+=n*width;
+  };
+  charge(triangles,sizeof(uint32_t));charge(chunk_bvh_nodes(triangles),sizeof(Bvh::Node));
+  return bytes;
+}
+SurfaceQuery::SurfaceQuery(ImmutableGeometry,std::shared_ptr<const Mesh> mesh,
+                           const std::function<bool()> &fn) {
+  cancel(fn);
+  if(!mesh)throw std::invalid_argument("Missing immutable query geometry owner");
+  structural(*mesh,fn);mesh->validate();
+  const auto nodes=chunk_bvh_nodes(mesh->indices.size()/3);
+  impl_=std::make_unique<Impl>(std::move(mesh),fn,nodes);cancel(fn);
 }
 SurfaceQuery::~SurfaceQuery() = default;
 const Mesh &SurfaceQuery::mesh() const {

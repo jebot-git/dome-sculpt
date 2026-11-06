@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "sculpt-surface-chunks.hpp"
 #include "sculpt-surface-tile.hpp"
+#include "sculpt-chunk-index.hpp"
 #include <bit>
 #include <limits>
 #include <queue>
@@ -72,6 +73,7 @@ struct Work {
 };
 template<class T> SculptChunkBounds value_bounds(const T &) { return {}; }
 SculptChunkBounds value_bounds(const Chunk &c) { return c ? c->bounds : SculptChunkBounds{}; }
+SculptChunkBounds value_bounds(const SculptSurfaceRun &run) {return run.bounds;}
 template<class T> size_t value_bytes(const T &) { return 0; }
 size_t value_bytes(const Chunk &c) { return c?c->bytes:0; }
 size_t value_bytes(const Tile &t) { return t?t->bytes:0; }
@@ -80,88 +82,15 @@ size_t sum(size_t a,size_t b) {
   return a+b;
 }
 
-// Persistent AVL directory. Updates clone only the search/rotation path; a
-// complete next manifest does not copy all previous tile/edge metadata. There
-// is no parent pointer or global cache retaining obsolete manifests.
-template<class K,class V> struct Directory {
-  struct Node;
-  using Ptr = std::shared_ptr<const Node>;
-  struct Node {
-    K key;
-    V value;
-    Ptr left,right;
-    unsigned height;
-    size_t count,payload_bytes;
-    SculptChunkBounds bounds;
-    Node(K k,V v,Ptr a,Ptr b) : key(std::move(k)),value(std::move(v)),
-        left(std::move(a)),right(std::move(b)),
-        height(1+std::max(h(left),h(right))),count(sum(1,sum(n(left),n(right)))),
-        payload_bytes(sum(value_bytes(value),sum(left?left->payload_bytes:0,right?right->payload_bytes:0))),
-        bounds(value_bounds(value)) {
-      if(left)bounds.include(left->bounds);
-      if(right)bounds.include(right->bounds);
-    }
-  };
-  Ptr root;
-  static unsigned h(const Ptr &p) { return p?p->height:0; }
-  static size_t n(const Ptr &p) { return p?p->count:0; }
-  static Ptr node(const K &k,const V &v,Ptr a,Ptr b,Work &w) {
-    w.tick();
-    // Requested node/control-block storage plus a conservative allocation
-    // allowance. This is an owning working budget, not an RSS measurement.
-    w.charge(sizeof(Node)+128);
-    return std::make_shared<const Node>(k,v,std::move(a),std::move(b));
-  }
-  static Ptr balanced(const K &k,const V &v,Ptr a,Ptr b,Work &w) {
-    if(h(a)>h(b)+1) {
-      if(h(a->left)>=h(a->right))
-        return node(a->key,a->value,a->left,node(k,v,a->right,b,w),w);
-      auto c=a->right;
-      return node(c->key,c->value,node(a->key,a->value,a->left,c->left,w),
-                  node(k,v,c->right,b,w),w);
-    }
-    if(h(b)>h(a)+1) {
-      if(h(b->right)>=h(b->left))
-        return node(b->key,b->value,node(k,v,a,b->left,w),b->right,w);
-      auto c=b->left;
-      return node(c->key,c->value,node(k,v,a,c->left,w),
-                  node(b->key,b->value,c->right,b->right,w),w);
-    }
-    return node(k,v,std::move(a),std::move(b),w);
-  }
-  static Ptr put(Ptr p,const K &k,const V &v,Work &w) {
-    w.tick();
-    if(!p)return node(k,v,{},{},w);
-    if(k<p->key)return balanced(p->key,p->value,put(p->left,k,v,w),p->right,w);
-    if(p->key<k)return balanced(p->key,p->value,p->left,put(p->right,k,v,w),w);
-    return node(k,v,p->left,p->right,w);
-  }
-  static Ptr remove(Ptr p,const K &k,Work &w) {
-    w.tick();
-    if(!p)return {};
-    if(k<p->key)return balanced(p->key,p->value,remove(p->left,k,w),p->right,w);
-    if(p->key<k)return balanced(p->key,p->value,p->left,remove(p->right,k,w),w);
-    if(!p->left)return p->right;
-    if(!p->right)return p->left;
-    auto next=p->right.get();while(next->left) { w.tick(); next=next->left.get(); }
-    return balanced(next->key,next->value,p->left,remove(p->right,next->key,w),w);
-  }
-  const V *find(const K &k) const {
-    auto p=root.get();
-    while(p) { if(k<p->key)p=p->left.get();else if(p->key<k)p=p->right.get();else return &p->value; }
-    return nullptr;
-  }
-  void put(const K &k,const V &v,Work &w) { root=put(root,k,v,w); }
-  void erase(const K &k,Work &w) { root=remove(root,k,w); }
-  template<class F> static void visit(const Ptr &p,F &fn,Work &w) {
-    if(!p)return;
-    visit(p->left,fn,w);w.tick();fn(p->key,p->value);visit(p->right,fn,w);
-  }
-  template<class F> void visit(F fn,Work &w) const { visit(root,fn,w); }
+struct KernelIndexTraits {
+  template<class V> static SculptChunkBounds bounds(const V &value) {return value_bounds(value);}
+  template<class V> static size_t bytes(const V &value) {return value_bytes(value);}
 };
+template<class K,class V> using Directory=PersistentSculptIndex<K,V,KernelIndexTraits>;
 using Edges=Directory<SurfaceEdge,EdgeRecord>;
 using Positions=Directory<PositionRequest,EdgeRecord>;
 using Chunks=Directory<Int3,Chunk>;
+using Runs=Directory<Int3,SculptSurfaceRun>;
 using Tiles=Directory<Int3,Tile>;
 template<class T> void scratch_insert(std::set<T> &,const T &,size_t,Work &);
 
@@ -403,6 +332,7 @@ struct SculptSurfaceChunks::State {
   Edges edges;
   Positions positions;
   Chunks chunks;
+  Runs runs;
   SculptChunkReport report;
   SculptChunkBounds bounds;
   std::weak_ptr<const State> base;
@@ -426,7 +356,7 @@ struct SculptSurfaceChunks::State {
         scratch_insert(dirty_edges,v.edge,limits.dependency_edges,w);
     };
     if(before) {
-      out->edges=before->edges;out->positions=before->positions;out->chunks=before->chunks;
+      out->edges=before->edges;out->positions=before->positions;out->chunks=before->chunks;out->runs=before->runs;
       out->report.vertices=before->report.vertices;out->report.indices=before->report.indices;
       for(auto tile:changed) {
         collect_tile(*before->cache,tile);collect_tile(*out->cache,tile);
@@ -478,6 +408,24 @@ struct SculptSurfaceChunks::State {
       w.charge(dirty_chunks.size(),sizeof(std::pair<Int3,Chunk>));
       out->changes.reserve(dirty_chunks.size());
     }
+    auto erase_runs=[&](const Chunk &chunk){
+      if(!chunk)return;
+      for(size_t t=0;t<chunk->triangles.size();) {
+        w.tick();const auto cell=chunk->triangles[t].cell;out->runs.erase(cell,w);
+        do {w.tick();++t;}while(t<chunk->triangles.size()&&chunk->triangles[t].cell==cell);
+      }
+    };
+    auto add_runs=[&](const Chunk &chunk){
+      for(size_t t=0;t<chunk->triangles.size();) {
+        w.tick();const auto first=t;const auto cell=chunk->triangles[t].cell;
+        do {w.tick();++t;}while(t<chunk->triangles.size()&&chunk->triangles[t].cell==cell);
+        SculptSurfaceRun run{chunk,3*first,3*(t-first),{}};
+        for(size_t c=run.first;c<run.first+run.count;++c) {
+          w.tick();run.bounds.include(chunk->mesh.positions.at(chunk->mesh.indices.at(c)));
+        }
+        out->runs.put(cell,run,w);
+      }
+    };
     try {
       for(auto tile:dirty_chunks) {
         w.tick();
@@ -489,11 +437,13 @@ struct SculptSurfaceChunks::State {
         }
         auto i=out->cache->find(tile);
         if(!i) {
+          erase_runs(old_chunk);
           if(before&&old_chunk)out->changes.push_back({tile,{}});
           continue;
         }
         auto chunk=assemble(**i,out->edges,out->positions,w);
         if(chunk->mesh.indices.empty()) {
+          erase_runs(old_chunk);
           if(before&&old_chunk)out->changes.push_back({tile,{}});
           continue;
         }
@@ -502,6 +452,7 @@ struct SculptSurfaceChunks::State {
         // unchanged, so GPU clients do not upload merely because Volume COW
         // ownership changed.
         if(old_chunk&&same_chunk(*old_chunk,*chunk,w))chunk=old_chunk;
+        if(chunk!=old_chunk){erase_runs(old_chunk);add_runs(chunk);}
         if(chunk->mesh.positions.size()>limits.extraction.vertices-out->report.vertices||
             chunk->mesh.indices.size()>limits.extraction.indices-out->report.indices)
           throw std::length_error("Sculpt manifest geometry limit exceeded");
@@ -514,7 +465,7 @@ struct SculptSurfaceChunks::State {
       // The caller gets an explicit exact-legacy representation to flatten at
       // its cancellable operation/worker boundary. No partial chunk set leaks.
       out->representation=Representation::ExactLegacyRepair;
-      out->edges={};out->positions={};out->chunks={};out->bounds={};
+      out->edges={};out->positions={};out->chunks={};out->runs={};out->bounds={};
       out->changes.clear();out->base.reset();
       out->report.vertices=out->report.indices=0;
     }
@@ -528,6 +479,7 @@ struct SculptSurfaceChunks::State {
     retain(Edges::n(out->edges.root),sizeof(Edges::Node)+128);
     retain(Positions::n(out->positions.root),sizeof(Positions::Node)+128);
     retain(Chunks::n(out->chunks.root),sizeof(Chunks::Node)+128);
+    retain(Runs::n(out->runs.root),sizeof(Runs::Node)+128);
     retain(out->changes.capacity(),sizeof(std::pair<Int3,Chunk>));
     if(out->chunks.root)retain(1,out->chunks.root->payload_bytes);
     if(out->chunks.root)out->bounds=out->chunks.root->bounds;
@@ -572,10 +524,20 @@ SculptSurfaceChunks::Representation SculptSurfaceChunks::representation() const 
 const SculptChunkReport &SculptSurfaceChunks::report() const {return state_->report;}
 const LocalSurfaceCache::Owner &SculptSurfaceChunks::source_owner() const {return state_->cache->source_owner();}
 const SculptChunkBounds &SculptSurfaceChunks::bounds() const {return state_->bounds;}
+bool SculptSurfaceChunks::owns(const Chunk &chunk) const {
+  if(!chunk)return false;
+  const auto actual=state_->chunks.find(chunk->coordinate);
+  return actual&&actual->get()==chunk.get()&&!actual->owner_before(chunk)&&!chunk.owner_before(*actual);
+}
 void SculptSurfaceChunks::for_each_chunk(const std::function<void(const Chunk &)> &fn,Cancel cancel) const {
   if(representation()!=Representation::Chunks)throw std::logic_error("Exact repair requires legacy surface materialization");
   Work w{state_->limits,std::move(cancel)};w.stop();
   state_->chunks.visit([&](const Int3 &,const Chunk &c){fn(c);},w);w.stop();
+}
+void SculptSurfaceChunks::for_each_run(const std::function<void(const SculptSurfaceRun &)> &fn,Cancel cancel) const {
+  if(representation()!=Representation::Chunks)throw std::logic_error("Exact repair requires legacy surface traversal");
+  Work work{state_->limits,std::move(cancel)};work.stop();
+  state_->runs.visit([&](Int3,const auto &run){fn(run);},work);work.stop();
 }
 bool SculptSurfaceChunks::for_each_change(const Ptr &base,
     const std::function<void(Int3,const Chunk &)> &fn,Cancel cancel) const {
@@ -603,23 +565,17 @@ void SculptSurfaceChunks::for_each_ordered_triangle(
     const std::function<void(const Chunk &,size_t,const std::array<Vec3,3> &,const std::array<Vec3,3> &)> &fn,
     Cancel cancel) const {
   if(representation()!=Representation::Chunks)throw std::logic_error("Exact repair requires legacy surface traversal");
-  Work w{state_->limits,std::move(cancel)};w.stop();w.charge(state_->report.retained_bytes);
-  struct Cursor {Chunk chunk;size_t triangle;};
-  auto later=[](const Cursor &a,const Cursor &b){return a.chunk->triangles[a.triangle]>b.chunk->triangles[b.triangle];};
-  w.charge(Chunks::n(state_->chunks.root),sizeof(Cursor));
-  std::vector<Cursor> storage;storage.reserve(Chunks::n(state_->chunks.root));
-  std::priority_queue<Cursor,std::vector<Cursor>,decltype(later)> queue(later,std::move(storage));
-  state_->chunks.visit([&](const Int3 &,const Chunk &c){queue.push({c,0});},w);
-  while(!queue.empty()) {
-    w.tick();auto cursor=queue.top();queue.pop();
-    std::array<Vec3,3> points,normals;
-    for(size_t k=0;k<3;++k) {
-      const auto vertex=cursor.chunk->mesh.indices.at(3*cursor.triangle+k);
-      points[k]=cursor.chunk->mesh.positions.at(vertex);normals[k]=cursor.chunk->mesh.normals.at(vertex);
+  Work w{state_->limits,cancel};w.stop();
+  for_each_run([&](const auto &run){
+    for(size_t first=run.first;first<run.first+run.count;first+=3) {
+      w.tick();std::array<Vec3,3> points,normals;
+      for(size_t k=0;k<3;++k) {
+        const auto vertex=run.chunk->mesh.indices.at(first+k);
+        points[k]=run.chunk->mesh.positions.at(vertex);normals[k]=run.chunk->mesh.normals.at(vertex);
+      }
+      fn(run.chunk,first/3,points,normals);
     }
-    fn(cursor.chunk,cursor.triangle,points,normals);
-    if(++cursor.triangle<cursor.chunk->triangles.size())queue.push(std::move(cursor));
-  }
+  },cancel);
   w.stop();
 }
 Mesh SculptSurfaceChunks::materialize(Cancel cancel) const {

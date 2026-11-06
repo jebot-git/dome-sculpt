@@ -5,6 +5,7 @@
 #include "affine-interaction.hpp"
 
 namespace dome::detail {
+class SculptPlacedChunks;
 // Scalar ownership is intentionally separate from geometry. Captures only the
 // actual immutable mask map/background/voxel meaning, never Volume history or
 // a paint/material collection. A mask edit must not become a geometry key.
@@ -27,17 +28,22 @@ struct SculptObjectChunks {
   SculptSurfaceChunks::Ptr geometry;
   std::shared_ptr<const SculptMaskSnapshot> mask;
   bool source_dormant=false;
+  std::shared_ptr<const SculptPlacedChunks> placed;
   Vec3 placed_position(Vec3) const;
   Vec3 placed_normal(Vec3) const;
   bool reflected() const;
 };
 struct SculptSceneChunkLimits {
+  // Chunk cache/assembly envelopes. Legacy painted surfaces retain their
+  // existing independent producer limits; this is not a replacement for the
+  // Scene/native reader or texture-composite resource policy.
   SculptChunkLimits geometry;
   size_t retained_bytes=512*1024*1024,working_bytes=1024*1024*1024;
 };
 struct SculptSceneChunkContext {
   uint64_t generation=0,revision=0,view_epoch=0;
   bool mask_view=false;
+  bool queries=false;
 };
 class SculptSceneChunks;
 struct SculptScenePreview {
@@ -62,6 +68,8 @@ public:
   // the existing exact world placement/reflection policy is applied once.
   Mesh materialize(uint64_t,LocalSurfaceCache::Cancel={}) const;
 private:
+  static SculptScenePreview capture_geometry(const Scene &,SculptSceneChunkContext,
+      const Ptr &,SculptSceneChunkLimits,LocalSurfaceCache::Cancel);
   struct Cache {uint64_t object;SculptSurfaceChunks::Ptr geometry;};
   SculptSceneChunks()=default;
   SculptSceneChunkContext context_;

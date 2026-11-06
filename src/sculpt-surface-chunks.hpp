@@ -36,6 +36,11 @@ struct SculptSurfaceChunk {
   SculptChunkBounds bounds;
   size_t bytes = 0;
 };
+struct SculptSurfaceRun {
+  std::shared_ptr<const SculptSurfaceChunk> chunk;
+  size_t first=0,count=0;
+  SculptChunkBounds bounds;
+};
 struct SculptChunkReport {
   enum class Kind { Reused, Local, Rebuild };
   Kind kind = Kind::Rebuild;
@@ -63,11 +68,16 @@ public:
   const SculptChunkReport &report() const;
   const LocalSurfaceCache::Owner &source_owner() const;
   const SculptChunkBounds &bounds() const;
+  bool owns(const Chunk &) const;
   // No borrowed span survives the callback. The actual shared Chunk owner is
   // provided so query/GPU clients cannot confuse recycled addresses or packed
   // offsets with geometry identity. Never invokes full materialize().
   void for_each_chunk(const std::function<void(const Chunk &)> &,
                       Cancel = {}) const;
+  // Actual globally cell-ordered ranges into their own immutable chunk EBO.
+  // Consumers may merge only adjacent contiguous ranges of the same owner.
+  void for_each_run(const std::function<void(const SculptSurfaceRun &)> &,
+                    Cancel = {}) const;
   // Sealed base->next changes, including removals (null Chunk). Returns false
   // without callbacks if this is not the actual retained base owner; callers
   // must then reconcile the complete manifest. No revision/directory address

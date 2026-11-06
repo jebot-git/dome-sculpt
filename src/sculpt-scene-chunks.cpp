@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "sculpt-scene-chunks.hpp"
+#include "sculpt-placed-chunks.hpp"
 #include "affine-surface.hpp"
 #include "dome/polygon-scene.hpp"
 #include <bit>
@@ -61,7 +62,7 @@ bool SculptSceneChunks::captures(uint64_t object) const {
     return cache.geometry->representation()==SculptSurfaceChunks::Representation::Chunks;
   return false;
 }
-SculptScenePreview SculptSceneChunks::capture(const Scene &scene,SculptSceneChunkContext context,
+SculptScenePreview SculptSceneChunks::capture_geometry(const Scene &scene,SculptSceneChunkContext context,
     const Ptr &before,SculptSceneChunkLimits limits,LocalSurfaceCache::Cancel cancel) {
   stop(cancel);
   if(scene.objects().size()>256||scene.groups().size()>128)throw std::length_error("Sculpt scene object/group limit exceeded");
@@ -146,6 +147,50 @@ SculptScenePreview SculptSceneChunks::capture(const Scene &scene,SculptSceneChun
   };
   auto legacy=SculptScenePreviewAccess::surfaces(scene,cancel,legacy_mesher,capture_volume);
   stop(cancel);return {std::move(legacy),std::move(out)};
+}
+SculptScenePreview SculptSceneChunks::capture(const Scene &scene,SculptSceneChunkContext context,
+    const Ptr &before,SculptSceneChunkLimits limits,LocalSurfaceCache::Cancel cancel) {
+  auto preview=capture_geometry(scene,context,before,limits,cancel);
+  const auto geometry=preview.chunks;
+  // Geometry metadata is fully immutable before a placed/query factory reads
+  // it. Build a separate final owner afterward; never mutate a published const
+  // geometry view while asking another factory to authenticate that view.
+  size_t clone=sizeof(SculptSceneChunks)+256+
+      geometry->objects_.size()*(sizeof(SculptObjectChunks)+sizeof(SculptPlacedChunks::Ptr))+
+      geometry->caches_.size()*sizeof(Cache);
+  for(const auto &object:geometry->objects_) {
+    if(object.name.size()+object.material.name.size()+256>SIZE_MAX-clone)
+      throw std::length_error("Sculpt view metadata copy overflow");
+    clone+=object.name.size()+object.material.name.size()+256;
+  }
+  const size_t prior=before?before->bytes_:0;
+  if(geometry->bytes_>limits.working_bytes||prior>limits.working_bytes-geometry->bytes_||
+      clone>limits.working_bytes-geometry->bytes_-prior)
+    throw std::length_error("Sculpt placed view working envelope exceeded");
+  size_t retained=geometry->bytes_;
+  std::vector<SculptPlacedChunks::Ptr> placed;
+  if(geometry->objects_.size()>limits.working_bytes/sizeof(SculptPlacedChunks::Ptr))
+    throw std::length_error("Sculpt placed owner vector byte limit exceeded");
+  placed.reserve(geometry->objects_.size());
+  for(const auto &object:geometry->objects_) {
+    stop(cancel);
+    if(retained>limits.retained_bytes||retained>limits.working_bytes-prior-clone)
+      throw std::length_error("Sculpt placed view remaining budget exceeded");
+    SculptPlacedChunksLimits own;
+    own.retained_bytes=std::min(own.retained_bytes,limits.retained_bytes-retained);
+    own.working_bytes=std::min(own.working_bytes,limits.working_bytes-retained-prior-clone);
+    if(!own.retained_bytes||!own.working_bytes)throw std::length_error("No sculpt placed capacity remains");
+    const auto *previous=before?before->find(object.object):nullptr;
+    auto result=SculptPlacedChunks::capture(geometry,object.object,previous?previous->placed:nullptr,
+                                           context.queries,own,cancel);
+    if(result->report().retained_bytes>limits.retained_bytes-retained)
+      throw std::length_error("Sculpt placed result exceeded its prospective envelope");
+    retained+=result->report().retained_bytes;placed.push_back(std::move(result));
+  }
+  stop(cancel);
+  auto final=std::shared_ptr<SculptSceneChunks>(new SculptSceneChunks(*geometry));
+  for(size_t i=0;i<placed.size();++i)final->objects_[i].placed=std::move(placed[i]);
+  final->bytes_=retained;preview.chunks=std::move(final);stop(cancel);return preview;
 }
 Mesh SculptSceneChunks::materialize(uint64_t object,LocalSurfaceCache::Cancel cancel) const {
   const auto *view=find(object);
