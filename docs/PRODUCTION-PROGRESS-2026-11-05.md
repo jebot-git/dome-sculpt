@@ -14,12 +14,14 @@ completion.
 
 | Workstream | Verified checkpoint | Remaining integration |
 | --- | --- | --- |
+| Direct immutable uploads | Admitted9f89fce: full CPU interleaving removed,24 versus56 bytes/plain vertex; current R/S73 direct +existing renderer/native suites, ordinary58/profile,58 exact frame/native pairs | Local bounded extraction/upload, derived-coordinate preparation, broader performance/device and full-project qualification remain; no frame-time benchmark |
 | Retopology | Admitted71270a9: affine workspace/ordered Save/held-admission rollback and GPU marker floor; native1267+1445+26/profile, matched final Release75/sanitizer58 clients, actual Arc marker proof | Fresh full-project/accelerator regression, broader geometry/input/worker stress and physical-device qualification remain |
 | Affine polygon editing | Admitted8750f20/runtime0567 with current worker: native248/profile,16 file pairs, ordinaryGUI77 normal+77compact/profile, actual Arc stereo Apply/Restore; complete private-payload/provider closure | Fresh full-project/device qualification and remesh/weights/caller composition remain required |
 | Nearest-surface precision | Whole provider and complete mesh-processing/remesh/rig/bake consumers pass Release/sanitizer; valid thin-face interiors, winding-independent edge selection, exact source barycentrics and range bounds; independent oblique108/profile and registered CTest1/1/profile | Component evidence only; matched application/device and broader production qualification remain required; see SURFACE-QUERY-PRECISION.md |
 | Retopology worker | Detached geometry/history and atomic publication; current caller composition remeasures251 one-shot points/4308 checks,42 reporter and97 accepted-publication/file-cancel checks per profile | Whole-project and broader production/device qualification remain required |
 | Retopology caller and XR input | Admitted0cbc089: atomic caller/frame batches, retired-session safety, actual XR button levels;13,442 native/710 persistent boundaries, loader161+156 and ordinary app58 per profile;44 exact file pairs | Component/application qualification only; full production/device requirements remain open; see RETOPO-CALLER-INTEGRATION.md |
-| Owning37 paint/material integration | Exact c6e6cd5 fresh optimized Release application and selected native/codec/key/package controls pass; all 244 own binary inputs are preserved before later source changes | New bf9e6f3 source merge includes current SurfaceHeat main, but is not rebuilt; changed polygon normal/paint transport, sanitizer and broad production qualification remain open |
+| Owning paint/material and polygon transport | Private8f1892b/sealf083711: fresh254-task Release app/core/support/render/XR/inspector cohort; eight legacy tests,1097 transfer-math and182 actual polygon source/paint-stage controls pass; all252 own binary inputs remain immutable | New domain3 staging is not Scene39 publication, shader, codec or export admission. Those adapters, sanitizer/application/device evidence and broader topology transport remain open |
+| Same-mesh texture sets | Private2249d08 retains fresh plain model/codec32 and separately matched polygon-association repair6; bounded corner-partition/cache-isolation source passes three syntax units | Per-set material/render/query consumers, complex codec, desktop/XR workflows, export and coherent runtime qualification remain open; new partition plan is not executed |
 | Automatic weights | Admitted6bcc91b/bef5876: explicit SurfaceHeat5, default0; fresh R/S native25+38+248+4308, FLTK152, softwareXR56, current worker regular373+longtail5/profile; historical solver scope retained separately | Prepared/complex37/38 domains, broader production deformation/quality, complete current caller/factory and physical/accelerator qualification remain required |
 | Opaque unlit world outlines | 4ae4574: matching worker/render/factory, normal/compact FLTK, synthetic-XR, actual Arc and schema scopes pass | Main owning37 integration and remaining material/outline domains; no general Normal/Width-image/lit/screen/MASK/BLEND outline completion |
 | Physical-package fault coverage | 1f9fd48: all90262 points per profile close, including90261 persistent denials and one successful endpoint | The original whole-test sanitizer timeout remains failed; the integrated93c candidate has separate40-point smoke evidence, not a second exhaustive sweep |
@@ -48,9 +50,18 @@ scoped positive evidence within failed full runs, not a green authoring release.
 The new remesh fault test measures116325 calling-thread C++ allocations stably
 three times per profile. Both final32-denial/one-success pilots pass exact
 rollback and real retry. All 128 Release partitions have closed successfully;
-the sanitizer sweep remains live, with 96 of 128 partitions passing at this
+the sanitizer sweep remains live, with 123 of 128 partitions passing at this
 checkpoint. It must close before claiming complete paired coverage. C allocator and other-thread
 allocation injection are outside this test's scope.
+
+The later private polygon transport checkpoint does not relabel the two original
+owning37 positives below. It builds a genuine before/current correspondence and
+separate paint/normal domains, then stages those fields through actual Paint
+ownership on changed geometry. The new source/paint-stage182 proof is Release
+only; unsupported writers and repeated edits retain explicit guards. Its fresh
+providers include the current caller/input boundary. Read the pinned
+[polygon stage receipt](https://github.com/jebot-git/dome-sculpt/blob/f083711/docs/validation/POLYGON-SURFACE-STAGE39-RELEASE.json)
+and [texture-set source checkpoint](https://github.com/jebot-git/dome-sculpt/blob/2249d082c728ab1f6b5485df077e76b521595221/docs/TEXTURE-SETS-WIP.md).
 
 The owning37 polygon test now uses genuine manifold sheared/reflected sources.
 It passes 65 controls for the retained-domain diagnostic, ordered Save, exact
