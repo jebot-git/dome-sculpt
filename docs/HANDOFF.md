@@ -1,3 +1,24 @@
+## Private immutable chunk pipeline Release checkpoint — 2026-11-06
+
+The real Document worker now publishes typed immutable generated chunks,
+independent protection scalars and persistent authored placement/query owners.
+SurfaceRenderer caches per-object actual geometry and staged scalar GL buffers,
+keeps held/canvas motion in uniforms and preserves actual Scene/global triangle
+ordering. The fresh235-step/233-project-output optimized cohort plus corrected
+whole renderer/native/GL units passes kernel22, query108, native43, real software
+EGL65 and ordinary corrected-app smoke.237 prior outputs including4 compiler
+probes remain exact;6 new whole outputs and6 exact RGBA reference pairs are
+verified. Read SCULPT-CHUNK-PIPELINE.md and its Release receipt. Initial sparse
+configuration failures and invalid32→genuine64 paint fixture failure remain
+preserved. No old renderer member is pulled into the corrected app/GL links.
+
+This is private Release component/application qualification, not main admission,
+SAN, fullALL, hardware/physical or performance completion. Historical flat-only
+integration tests, source39/40 composition, broad paint/normal/source transport,
+GPU metadata/scalar locality and sustained production measurements remain open.
+The full REQUIREMENTS/HANDOFF objective remains active and incomplete. No install,
+headset test or active-session restart was performed.
+
 ## Current isotropic remeshing integrated — 2026-11-06
 
 Main integrates qualified c618c828 on the current direct-upload/input foundation.

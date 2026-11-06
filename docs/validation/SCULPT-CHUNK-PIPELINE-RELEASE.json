@@ -1,0 +1,146 @@
+{
+  "state": "Private optimized Release native/software-EGL/ordinary-app component qualification; not main integration or production completion",
+  "product_source": "ac1d752b",
+  "fresh_base_source": "5e825e9ffdbb17cfcff0f2c1f501bbc20ffa0557",
+  "main_composition": "44fe3742 current remesh plus144767c8 chunk worker/query/GPU source",
+  "layout": "All reachable application/core/support/render/XR translation units initially rebuilt; MeshSnapshot::sculpt_chunks and SurfaceRenderer private ChunkState layout not borrowed from old objects. Final ac1 correction changes only whole render TU and fixture32\u2192supported64 resolution, no header/layout change.",
+  "fresh_build": {
+    "tasks": 235,
+    "exit": 0,
+    "seconds": 570.3152878669789,
+    "all_project_objects_archives_ELFs": 233,
+    "compiler_probe_ELFs": 4,
+    "protected_outputs_total": 237,
+    "artifacts": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/local-sculpt-runtime-1721/artifacts/current-release-v3/owned.json",
+      "sha256": "a157b2c3122837a2f444e59e808fdd21c407c7150b5eb48dc731f19cf130457b"
+    }
+  },
+  "final_composition": {
+    "old_protected_outputs_unchanged": 237,
+    "new_whole_objects_and_ELFs": {
+      "/home/blux/de-xr/dome-sculpt/artifacts/local-sculpt-runtime-1721/artifacts/current-release-v4/dome-sculpt": "f339d94916bbddf90a8d3e7ef5d8b87b8fa7b7a6479d8c6098fc7d93a796cd5d",
+      "/home/blux/de-xr/dome-sculpt/artifacts/local-sculpt-runtime-1721/artifacts/current-release-v4/dome-sculpt-sculpt-chunk-pipeline-test": "528c0fb6c15dff6245b3ec91a041298e54c52b6c0d976758d47c4946d088e74a",
+      "/home/blux/de-xr/dome-sculpt/artifacts/local-sculpt-runtime-1721/artifacts/current-release-v4/dome-sculpt-sculpt-chunk-render-test": "9b997f9d2f89764fe37a4e45e6fd0f03c383c4aaff72cfc008b9731ac722a350",
+      "/home/blux/de-xr/dome-sculpt/artifacts/local-sculpt-runtime-1721/artifacts/current-release-v4/objects/render.o": "8cb2b19df198981c9f031a37ad97c94405e9575236d14e69c68a00249104b8e6",
+      "/home/blux/de-xr/dome-sculpt/artifacts/local-sculpt-runtime-1721/artifacts/current-release-v4/objects/native.o": "ce9c8897e7c382a9e0848e8a94c598d5d430ff356f3c268cb75d5a99ea578d8c",
+      "/home/blux/de-xr/dome-sculpt/artifacts/local-sculpt-runtime-1721/artifacts/current-release-v4/objects/GL.o": "7730201cd7cab7ed701c0c5dc6cb612f2251dfdb998689e537fdc3cd688ab822"
+    },
+    "old_renderer_archive_member_excluded_from_actual_new_app_and_GL_links": true,
+    "native_query_material_scene_providers_are_fresh_matching_base": "Whole immutable237-output cohort; no old Document/Scene/MeshSnapshot provider reuse"
+  },
+  "actual_checks": {
+    "fresh_app_version": 0,
+    "current_corrected_app_version": 0,
+    "original_independent_sculpt_kernel": 22,
+    "oblique_query_scale_aspect_axis_reflection_winding_families": 108,
+    "native_mixed_pipeline": 43,
+    "real_software_EGL": 65,
+    "ordinary_corrected_product_app_smoke": {
+      "exit": 0,
+      "image_size": [
+        1100,
+        744
+      ],
+      "actual_clay_pixels": 74853,
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/local-sculpt-runtime-1721/artifacts/current-release-v4/dome-sculpt",
+      "sha256": "f339d94916bbddf90a8d3e7ef5d8b87b8fa7b7a6479d8c6098fc7d93a796cd5d",
+      "capture": "/home/blux/de-xr/dome-sculpt/artifacts/local-sculpt-runtime-1721/artifacts/current-release-v5/viewport.png",
+      "capture_sha256": "a617fa88a5c3ba00b399118c8057bf5df64dc16fad42eb3d735acac6abc79515",
+      "lossless_PPM_to_PNG": true,
+      "visually_inspected": true
+    }
+  },
+  "byte_exact_full_reference_RGBA_pairs": [
+    {
+      "reference": "/home/blux/de-xr/dome-sculpt/artifacts/local-sculpt-runtime-1721/artifacts/current-release-v4/GL/case-0-reference.rgba",
+      "chunk": "/home/blux/de-xr/dome-sculpt/artifacts/local-sculpt-runtime-1721/artifacts/current-release-v4/GL/case-0-chunk.rgba",
+      "sha256": "67bbaa966bcd263aa4f7d2ea6d6d145a9cc6fd7a6b6430c1eaac398fc73e1c30",
+      "bytes": 36864
+    },
+    {
+      "reference": "/home/blux/de-xr/dome-sculpt/artifacts/local-sculpt-runtime-1721/artifacts/current-release-v4/GL/case-1-reference.rgba",
+      "chunk": "/home/blux/de-xr/dome-sculpt/artifacts/local-sculpt-runtime-1721/artifacts/current-release-v4/GL/case-1-chunk.rgba",
+      "sha256": "6b67bb6f79b9ef4ef8b879e64b7c14c177f3db411557bd89b482e422f04b2b29",
+      "bytes": 36864
+    },
+    {
+      "reference": "/home/blux/de-xr/dome-sculpt/artifacts/local-sculpt-runtime-1721/artifacts/current-release-v4/GL/case-2-reference.rgba",
+      "chunk": "/home/blux/de-xr/dome-sculpt/artifacts/local-sculpt-runtime-1721/artifacts/current-release-v4/GL/case-2-chunk.rgba",
+      "sha256": "43dde08353bf84139fa3ef1f039054c574acb212dec944a4ba8d90e5deb70868",
+      "bytes": 36864
+    },
+    {
+      "reference": "/home/blux/de-xr/dome-sculpt/artifacts/local-sculpt-runtime-1721/artifacts/current-release-v4/GL/case-3-reference.rgba",
+      "chunk": "/home/blux/de-xr/dome-sculpt/artifacts/local-sculpt-runtime-1721/artifacts/current-release-v4/GL/case-3-chunk.rgba",
+      "sha256": "f131dbe6298652ea5d4ec78ee03664049e3d03f9ee6abb26b0ec921f4464e487",
+      "bytes": 36864
+    },
+    {
+      "reference": "/home/blux/de-xr/dome-sculpt/artifacts/local-sculpt-runtime-1721/artifacts/current-release-v4/GL/case-4-reference.rgba",
+      "chunk": "/home/blux/de-xr/dome-sculpt/artifacts/local-sculpt-runtime-1721/artifacts/current-release-v4/GL/case-4-chunk.rgba",
+      "sha256": "e49ea0f15ecb70a2dc2936b09bd4c28edcf46696d13d007c2c026de607bef858",
+      "bytes": 36864
+    },
+    {
+      "reference": "/home/blux/de-xr/dome-sculpt/artifacts/local-sculpt-runtime-1721/artifacts/current-release-v4/GL/case-5-reference.rgba",
+      "chunk": "/home/blux/de-xr/dome-sculpt/artifacts/local-sculpt-runtime-1721/artifacts/current-release-v4/GL/case-5-chunk.rgba",
+      "sha256": "13beb691cf6ed0a6694ab701ca3d23a00586128c39f5ae92f7cc8db4027a4146",
+      "bytes": 36864
+    }
+  ],
+  "runtime_maps": {
+    "native_and_GL_ELFs": 70,
+    "ordinary_app_ELFs": 98,
+    "hashes_captured_during_actual_execution_and_rechecked_after": true,
+    "drift": [],
+    "canonical_FlTK_observed_in_ordinary_app": true,
+    "system_DSO_preexecution_pin_not_claimed": true
+  },
+  "receipts": {
+    "current-release/status.json": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/local-sculpt-runtime-1721/artifacts/current-release/status.json",
+      "sha256": "60607e6885740498afade42025fe3213629edc60485b478d1b7b29a80869d81f",
+      "exit": 1
+    },
+    "current-release-v2/status.json": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/local-sculpt-runtime-1721/artifacts/current-release-v2/status.json",
+      "sha256": "174df36d33838caca121467db08ff78b9b839a78c054679bb863b31b3924c484",
+      "exit": 1
+    },
+    "current-release-v3/status.json": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/local-sculpt-runtime-1721/artifacts/current-release-v3/status.json",
+      "sha256": "24b95534796376604aaa4e58470742229e5c7f9b8035bb790203063f7c2102d3",
+      "exit": 1
+    },
+    "current-release-v4/status.json": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/local-sculpt-runtime-1721/artifacts/current-release-v4/status.json",
+      "sha256": "20a73fe28b00fe3bbf5829560a5a7253769d8a634b198eb813c78f43900e44a6",
+      "exit": 0
+    },
+    "current-release-v5/status.json": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/local-sculpt-runtime-1721/artifacts/current-release-v5/status.json",
+      "sha256": "682cac7513baa5e4459b09cd82a7867bb69de603569ec21b10201b73534e90d2",
+      "exit": 0
+    }
+  },
+  "preserved_failures": [
+    "First sparse CMake generation lacks tools; configure/probes only, source/SDK drift[]",
+    "Second configure observer du races vanished CTest tmp; process group stopped, source/SDK drift[]; allocation scanner now tolerates only vanished entries under unchanged actual floor+reserve",
+    "Initial fresh237-output build/kernel/query/appversion pass, native fixture exits1 at unsupported32 paint resolution before any positive; failed full run staysfailed, actual strict64 guard unchanged",
+    "Final corrected component/native/GL and ordinary product stages eachclose0; initial binaries/objects/archives/logs/source hashes retained"
+  ],
+  "resource": {
+    "actual_free_bytes": 21941932032,
+    "cumulative_allocated_bytes": 135950336,
+    "prospective_bytes": 67108864,
+    "cap_bytes": 209715200
+  },
+  "scope_limits": [
+    "Release CPU backend + software EGL and explicit Xvfb ordinary app only; no sanitizer/Wayland/physical headset/hardware GPU/accelerator/fullALL/performance completion",
+    "Old flat-only local integration suite must be adapted to real typed chunk contract before broader regression admission",
+    "GPU directory reconciliation still O(number of chunks) on accepted snapshot; changed mask owner resamples its whole object scalar packets",
+    "Explicit authenticated exact legacy repair can still materialize its real selected geometry",
+    "Private polygon39/Texture40 source composition, full authoring/paint/normal/source preservation, sustained production-scale measurements and allocation/cancel sweep remain required"
+  ]
+}
