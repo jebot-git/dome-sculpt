@@ -10,18 +10,19 @@
     },
     {
       "file": "src/polygon-surface-paint.cpp",
-      "sha256": "50a4a4e2583fb3853f431dbd7c7dd23eca2c87f78c51af2b35e047d6c2399914",
+      "sha256": "dbf0b8870080563f13366a421f3cefb56ed3fe7b29b8a61b373b05bdc7b5dd7a",
       "exit": 0,
       "stderr": ""
     },
     {
       "file": "tests/polygon-surface-paint.cpp",
-      "sha256": "5b990b6f60051f2e096a276de61b11632cd7fa6b18b276ee7af88a596e1280bd",
+      "sha256": "014d822f959dc0bab847f3f16e0876cefe5d6ce502f2ffb1556fb59c9e0cb802",
       "exit": 0,
       "stderr": ""
     }
   ],
   "no_data_layout_append": true,
   "legacy_entrypoints": "null typed context; old path unchanged in source, byte comparison remains required",
-  "actual_runtime": "not started; held by coordinated storage reservation"
+  "actual_runtime": "not started; held by coordinated storage reservation",
+  "strict_payload": "Unknown current-payload semantics refuse; exact native mesh flag keys; bounded4096 tile records/layer before scan"
 }
