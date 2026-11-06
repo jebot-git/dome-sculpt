@@ -74,6 +74,7 @@ std::array<float,2> interpolate(const std::vector<std::array<float,2>>&uv,size_t
 }
 bool PolygonSurfaceOwner::valid_owner(const std::shared_ptr<const PolygonSurfaceOwner>&p)const noexcept{return p.get()==this&&!self_.expired()&&!self_.owner_before(p)&&!p.owner_before(self_);}
 bool PolygonSurfaceOwner::has_normal_field()const noexcept{return before_&&before_->paint&&before_->paint->baked()&&bool(before_->paint->baked()->normal_field);}
+size_t PolygonSurfaceOwner::source_working_bytes(const PolygonOrigin&before,const PolygonSurfaceTransferLimits&l){return forecast(before,l);}
 std::shared_ptr<const PolygonSurfaceOwner> PolygonSurfaceOwner::capture(const Scene&s,uint64_t id,const PolygonSurfaceTransferLimits&l){
  stop(l);const auto &object=s.object(id);if(!object.painted||!object.volume||object.volume->in_stroke()||object.painted->in_stroke())throw std::invalid_argument("Polygon field capture requires finalized current source state");
  PolygonOrigin forecast_source;forecast_source.paint=object.painted;forecast_source.deformation=object.deformation;forecast_source.material_bindings=object.material_bindings;forecast_source.name=object.name;forecast_source.material=object.material;auto prospective=forecast(forecast_source,l);
@@ -133,7 +134,12 @@ uint64_t number(const nlohmann::json &j,uint64_t limit){
 }
 }
 nlohmann::json PolygonSurfaceOwner::encode_recipe(const PolygonSurfaceTransferLimits&l)const{
- validate(l);nlohmann::json operations=nlohmann::json::array();
+ validate(l);size_t bytes=trace_.storage_bytes();
+ // JSON arrays/object nodes coexist with the full immutable trace. Count the
+ // actual edit-ID payload before constructing any encoded selection array.
+ charge(bytes,trace_.steps().size(),4096,l);
+ for(const auto&step:trace_.steps())charge(bytes,step.edit.selection.ids.size(),sizeof(nlohmann::json)+sizeof(PolygonId),l);
+ nlohmann::json operations=nlohmann::json::array();
  for(const auto&s:trace_.steps()){
   stop(l);const auto&e=s.edit;operations.push_back({{"operation",e.operation==PolygonOperation::Move?"move":"flip"},{"selection",{{"mode",int(e.selection.mode)},{"ids",e.selection.ids}}},{"delta",{e.delta.x,e.delta.y,e.delta.z}},{"amount",e.amount},{"cuts",e.cuts},{"first_id",e.first_id},{"world",s.world?nlohmann::json(s.world->matrix()):nlohmann::json(nullptr)}});
  }

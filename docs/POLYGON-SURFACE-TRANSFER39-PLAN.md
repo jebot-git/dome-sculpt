@@ -94,3 +94,36 @@ Scene39/material21/Paint6. Source/current value payload parsing, exact decoded
 alias rebinding, recursive preallocation and outer mixed-feature closure remain
 required before writer admission. All252 qualified R providers remain immutable;
 follow-up whole-TU outputs must use different paths.
+
+
+The next source-only checkpoint merges admitted renderer main f907316 and adds
+private before-attribute/current-corner packing. Actual posed raw N/T and real W
+remain separate from per-primitive geometric frames; native N-only carries no
+normal UV or artist T/W. Paint and normal coordinate streams remain independent.
+The proposed whole-triangle proof bounds interpolation of the before role basis
+using all cubic Bernstein coefficients; it does not certify every filtered
+normal sample or GPU arithmetic. Actual shader/query/held-world proof is still
+required. Matching checks strong owners and current material scalars/roles,
+including legal same-address edits. Packing forecasts source vertices as well as
+current corners before allocating buffers.
+
+A private per-call owning-node reader now scans every node's record/selection
+budget before source replay, checks recursion before completed hits, and checks
+actual source control blocks and exact recipe again on every hit. Replay
+reserves each node's full source/raster-constructor peak before the next node;
+keeping those peak reservations for the call is deliberately conservative.
+Exceptions leave no committed slot/reservation or busy state. Pool completion
+requires every record to be consumed and revalidated. These source controls cover
+foreign equal-valued roots, live JSON recipe edits, real resolver reentry and
+retry, aggregate metadata budgets and exact basis aliases. They have not run.
+The enclosing Scene still must preflight every payload and dependency, enforce
+actual earlier-material prefixes, and compose current Paint6/material21 with
+legacy pools before this reader can grant any publication authority.
+
+These follow-ups have syntax-only checks against current own headers. No fresh
+object, link, runtime, SAN, UI or GPU job was started. The original252 providers
+remain byte-exact. Source tests and their CMake targets are preparation for a
+future coordinated cohort, not new qualification. Runtime/publication and old
+writer guards remain unchanged. Repeated post-paint edits, full owning Scene39
+codec, current renderer/query, general topology, portable output, and native
+Apply/Cancel/Undo/Save/Restore still require their actual adapters and tests.

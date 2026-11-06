@@ -25,6 +25,10 @@ public:
  static std::shared_ptr<const PolygonSurfaceOwner> replay(
      std::shared_ptr<const PolygonOrigin>,const nlohmann::json &,
      const PolygonSurfaceTransferLimits & = {});
+ // Conservative simultaneous capture/replay forecast, before source copies.
+ // This is a resource bound only and authenticates no source or current owner.
+ static size_t source_working_bytes(const PolygonOrigin &,
+     const PolygonSurfaceTransferLimits & = {});
  void validate_current_geometry(const Mesh &,const PolygonSurfaceTransferLimits & = {}) const;
  bool valid_owner(const std::shared_ptr<const PolygonSurfaceOwner> &) const noexcept;
  void validate(const PolygonSurfaceTransferLimits & = {}) const;
@@ -57,6 +61,7 @@ public:
  std::shared_ptr<const PaintSamplingDomain> paint_domain(
      const PolygonSurfaceTransferLimits & = {}) const;
 private:
+ friend class PolygonSurfacePreview;
  PolygonSurfaceOwner()=default;
  PolygonSurfaceOwner(const PolygonSurfaceOwner&)=delete;
  std::weak_ptr<const PolygonSurfaceOwner> self_;
