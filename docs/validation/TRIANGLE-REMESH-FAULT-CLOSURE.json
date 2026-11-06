@@ -1,0 +1,56 @@
+{
+  "status": "Private historical kernel exhaustive paired fault proof, not current-main remesh admission",
+  "product_base": "b441ad39f95ec524a1cd0d09f764b16e900522ab",
+  "scope": "Persistent calling-thread C++ new/new[]/aligned-new denial at every measured point, complete immutable scene/owner rollback, deterministic endpoint and genuine retry. No C allocator or other-thread injection claim.",
+  "state": "terminal",
+  "exit": 0,
+  "job_session": 98490,
+  "actual_parent_pid": 2203140,
+  "seconds": 26286.687612701964,
+  "status_path": "/home/blux/de-xr/dome-sculpt/artifacts/triangle-remesh-10944/artifacts/triangle-proof/fault-sweep-v2/status.json",
+  "status_sha256": "2303a38d8325af3d287f1e56c3c49db472d196a61bdccd473195bab333df98a5",
+  "before_path": "/home/blux/de-xr/dome-sculpt/artifacts/triangle-remesh-10944/artifacts/triangle-proof/fault-sweep-v2/before.json",
+  "before_sha256": "c80e17706b5c1aa22f23f76406b8b9c25f228f74742b9348b445b940df174c31",
+  "after_path": "/home/blux/de-xr/dome-sculpt/artifacts/triangle-remesh-10944/artifacts/triangle-proof/fault-sweep-v2/after.json",
+  "after_sha256": "c80e17706b5c1aa22f23f76406b8b9c25f228f74742b9348b445b940df174c31",
+  "protected_inputs_rehashed": 2288,
+  "source_sha256": {
+    "CMakeLists.txt": "d26e9a1acb3cefdc4442f3b9ba743f7dc3b55ab368b39c1be10d4b619895c28f",
+    "tests/triangle-remesh-faults.cpp": "c00111e99ea43d7926b29519f0f66ba231679df601aae0a2d7970919ed6271b5",
+    "src/remesh.cpp": "dfbacf92fb3e22e26f0519b1d15c6290d5c3cfa5f45dcdc11f1012b904c458ce",
+    "src/mesh-authoring.cpp": "4ae42d33b1a17d87016bcd5605863b302932d9ebf3093429c92e4634224985fd",
+    "src/polygon-conversion.cpp": "94def986567d34c7cbbdb4b8cc2a919bec0f7a8fcdd9e9f77037017122b604bc"
+  },
+  "baseline_per_profile": 116325,
+  "parts_per_profile": 128,
+  "workers_per_profile": 2,
+  "coverage": {
+    "release": {
+      "refused": 116325,
+      "optional": 0,
+      "endpoint": 1
+    },
+    "sanitize": {
+      "refused": 116325,
+      "optional": 0,
+      "endpoint": 1
+    }
+  },
+  "root_independent_review": {
+    "partitions": 256,
+    "individual_logs_and_receipts_verified": 256,
+    "ordered_range_coverage_exact": true,
+    "before_after_current_hashes_exact": true
+  },
+  "original_failed_native_runs": "R/S full authoring tests remain exit1 at the affine polygon gate; not relabelled.",
+  "new_current_source_candidate": {
+    "source": "c618c82",
+    "fresh_release_native_exit": 0,
+    "current_baseline": 116337,
+    "current_prefix_denials": 32,
+    "current_tail_denials": 32,
+    "current_successful_endpoint": 1,
+    "current_sanitizer": "Fresh whole-owned build68117 live; no current sanitizer/runtime or complete116337 sweep claim."
+  },
+  "remaining": "Current all-own Release/SAN/application/device composition and full production objective remain; no install/headset/session restart."
+}

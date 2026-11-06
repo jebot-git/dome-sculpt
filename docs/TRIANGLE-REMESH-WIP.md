@@ -1,3 +1,12 @@
+## Paired kernel fault closure — 2026-11-06
+
+The original frozen kernel now closes116325 persistent denials plus one endpoint
+per Release/sanitizer profile, all128 partitions each, with exact rollback/retry
+and no input drift. Read TRIANGLE-REMESH-FAULT-CLOSURE.md. The native failures
+below remain historical failures. Current compositionc618 has separate fresh
+Release authoring success and a different116337 allocation baseline; its fresh
+sanitizer and complete current proof remain pending. Full goal active.
+
 # Isotropic remeshing authoring checkpoint
 
 This private continuation of main10944 connects the existing native isotropic
