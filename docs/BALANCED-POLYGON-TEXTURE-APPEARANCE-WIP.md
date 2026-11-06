@@ -53,7 +53,7 @@ unverified until the new consumer is executed. Diagnose any discrepancy before
 changing the tolerance; matching an old renderer is not evidence to weaken the
 independent source, identity, grid or lighting predicates.
 
-Final source syntax passes against roote4129237's actual composed headers with
+Final source syntax passes against root9b491228's actual composed headers with
 629 protected source inputs unchanged. The first syntax attempt lacked the
 complete NativeAffineEdit declaration; that failed log/source and the corrected
 intermediate source are retained. The entire sparse source/proof directory uses

@@ -3,7 +3,7 @@
 This sparse child of closed12c adds an unexecuted self-contained mixed39/40
 regression with balanced actor sizes, real primary/additional face identities,
 actual before N/T/W and retained UVs, and independent binary64 geometry/pixel/
-normal/GGX expectations. Final syntax against actual roote412 headers passes
+normal/GGX expectations. Final syntax against actual root9b491228 headers passes
 with629 protected inputs unchanged; no executable/link/runtime result follows.
 Arithmetic-only sensitivity analysis is separate from product tests. Read
 BALANCED-POLYGON-TEXTURE-APPEARANCE-WIP.md and its pinned source receipt. Root
