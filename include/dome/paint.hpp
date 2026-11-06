@@ -266,7 +266,8 @@ private:
       const std::shared_ptr<const TextureSetFaceDomain> &,const detail::PolygonSurfaceOwner * = nullptr) const;
   static std::shared_ptr<PaintedMesh> decode_impl(const nlohmann::json &,const PaintImageArchive *,
       bool,const NormalSamplingArchive *,const PaintSamplingArchive *,const SourcePaintDecodeContext &,
-      const std::shared_ptr<const TextureSetFaceDomain> &,const detail::PolygonSurfaceStage * = nullptr);
+      const std::shared_ptr<const TextureSetFaceDomain> &,const detail::PolygonSurfaceStage * = nullptr,
+      const PaintedMesh*shared_raster=nullptr);
   PaintedMesh() = default;
   PaintedMesh(Mesh, uint32_t, const PaintSurfaceOptions &);
   PaintedMesh(Mesh, uint32_t, const PaintSurfaceOptions &,std::shared_ptr<const PaintSamplingDomain>);

@@ -1446,6 +1446,7 @@ std::shared_ptr<PaintedMesh> PaintedMesh::snapshot() const {
   return p;
 }
 const std::shared_ptr<const TextureSetFaceDomain>&detail::TextureSetPaintAccess::domain(const PaintedMesh&paint)noexcept{return paint.texture_set_domain_;}
+std::shared_ptr<const void>detail::TextureSetPaintAccess::raster_owner(const PaintedMesh&paint)noexcept{return paint.surface_;}
 bool detail::TextureSetPaintAccess::valid_raster(const PaintedMesh&paint)noexcept{
  return paint.surface_&&paint.surface_->set_domain==paint.texture_set_domain_&&(!paint.texture_set_domain_||paint.texture_set_domain_->matches(paint.mesh_owner()));
 }
@@ -3207,7 +3208,7 @@ std::shared_ptr<PaintedMesh> PaintedMesh::decode_native_payload(const nlohmann::
 std::shared_ptr<PaintedMesh> detail::TextureSetPaintAccess::decode(const nlohmann::json &input,
     const PaintImageArchive *images,bool polygon,const NormalSamplingArchive *normals,
     const PaintSamplingArchive *sampling,const SourcePaintDecodeContext &context,
-    const std::shared_ptr<const TextureSetFaceDomain> &membership){
+    const std::shared_ptr<const TextureSetFaceDomain> &membership,const PaintedMesh*shared_raster){
   if(!images||!membership||!membership->topology()||!membership->topology()->geometry()||
      !input.is_object()||input.size()!=3||!input.at("version").is_number_integer()||input.at("version")!=7||
      !input.at("set").is_number_integer()||input.at("set").get<int64_t>()<0||
@@ -3216,11 +3217,11 @@ std::shared_ptr<PaintedMesh> detail::TextureSetPaintAccess::decode(const nlohman
   const auto &payload=input.at("payload");
   if(payload.contains("version")&&(payload.at("version")==4||payload.at("version")==6))
     throw std::invalid_argument("Independent source or polygon field needs its geometry-deduplicated Paint7 adapter");
-  return PaintedMesh::decode_impl(payload,images,polygon,normals,sampling,context,membership);
+  return PaintedMesh::decode_impl(payload,images,polygon,normals,sampling,context,membership,nullptr,shared_raster);
 }
 std::shared_ptr<PaintedMesh> PaintedMesh::decode_impl(const nlohmann::json &input,const PaintImageArchive *archive,
     bool allow_polygon,const NormalSamplingArchive *domains,const PaintSamplingArchive *paint_domains,
-    const SourcePaintDecodeContext &context,const std::shared_ptr<const TextureSetFaceDomain> &membership,const detail::PolygonSurfaceStage *polygon) {
+    const SourcePaintDecodeContext &context,const std::shared_ptr<const TextureSetFaceDomain> &membership,const detail::PolygonSurfaceStage *polygon,const PaintedMesh*shared_raster) {
   if(polygon&&membership)throw std::invalid_argument("Polygon field Paint6 and texture-set Paint7 require their complete shared-field adapter");
   const bool independent=input.is_object()&&input.contains("version")&&input.at("version")==4;
   std::optional<PaintImageArchive> independent_images;
@@ -3324,7 +3325,11 @@ std::shared_ptr<PaintedMesh> PaintedMesh::decode_impl(const nlohmann::json &inpu
     }
   }
   std::shared_ptr<PaintedMesh>result;
-  if(polygon){
+  if(shared_raster){
+    using detail::native_weight_state::owner;
+    if(polygon||!membership||!shared_raster->valid_source_sampling_attachment()||shared_raster->in_stroke()||!detail::TextureSetPaintAccess::valid_raster(*shared_raster)||!owner(shared_raster->texture_set_domain_,membership)||!owner(shared_raster->mesh_owner(),geometry)||shared_raster->resolution()!=resolution.get<uint64_t>()||shared_raster->surface_->options.policy!=surface_options.policy||shared_raster->surface_->paint_domain||shared_raster->source_sampling_prepared())throw std::invalid_argument("Paint7 shared raster differs from its actual membership/geometry/resolution/policy");
+    result=std::shared_ptr<PaintedMesh>(new PaintedMesh);result->surface_=shared_raster->surface_;result->texture_set_domain_=membership;result->sampling_attachment_=shared_raster->sampling_attachment_;result->composite_cache_=std::make_shared<CompositeCache>();result->composite_token_=next_composite_token();
+  }else if(polygon){
     if(!archive||membership||!polygon->owner||!polygon->paint||independent||sampling||surface_options.policy!=PaintUvPolicy::Strict||j.contains("source_maps")||j.contains("normal_projection")||j.contains("color_projection")||j.contains("source_images"))throw std::invalid_argument("Polygon Paint6 payload contradicts its actual independent field/grid model");
     polygon->owner->validate_current(*polygon->paint);polygon->owner->validate_current_geometry(*geometry);
     if(resolution.get<uint64_t>()!=polygon->paint->resolution())throw std::invalid_argument("Polygon Paint6 changed its actual source grid resolution");

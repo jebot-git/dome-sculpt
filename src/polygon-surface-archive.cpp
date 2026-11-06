@@ -129,7 +129,7 @@ const nlohmann::json&PolygonSurfacePreflight::nodes()const{return scene_.at("pol
 const nlohmann::json&polygon_surface_payload_shape(const nlohmann::json&paint){const auto&pool=PolygonSurfacePreflight::current().nodes();PolygonSurfacePaintCodec::preflight(paint,pool.at("nodes").size());return paint.at("payload");}
 bool polygon_surface_physical_payload(const nlohmann::json&paint){(void)polygon_surface_payload_shape(paint);return paint.at("physical_paint").get<bool>();}
 PolygonSurfaceArchive::PolygonSurfaceArchive(PolygonSceneArchive&origins):previous_(current_),origins_(&origins),writer_(std::make_unique<PolygonSurfaceNodeWriter>()){current_=this;}
-PolygonSurfaceArchive::PolygonSurfaceArchive(const nlohmann::json&pool,PolygonSceneReader&origins,size_t count):previous_(current_),read_origins_(&origins){
+PolygonSurfaceArchive::PolygonSurfaceArchive(const nlohmann::json&pool,PolygonSceneReader&origins,size_t count,PolygonSurfaceGeometryReader geometry):previous_(current_),read_origins_(&origins){
  if(&pool!=&PolygonSurfacePreflight::current().nodes()||!count||count>512)throw std::invalid_argument("Polygon reader borrowed another Scene39 pool context");
  using Roots=std::array<std::shared_ptr<const PolygonOrigin>,512>;
  static_assert(sizeof(Roots)+256<=reader_root_index_bytes);
@@ -137,13 +137,14 @@ PolygonSurfaceArchive::PolygonSurfaceArchive(const nlohmann::json&pool,PolygonSc
  reader_=std::make_unique<PolygonSurfaceNodeReader>(pool,count,[&origins,roots,count](uint32_t id){
   if(id>=count)throw std::invalid_argument("Polygon field before-root exceeds its actual source index");
   auto&root=roots->at(id);if(!root)root=origins.origin_at(id);return root;
- },reader_limits());current_=this;
+ },reader_limits(),std::move(geometry));current_=this;
 }
 PolygonSurfaceArchive::~PolygonSurfaceArchive(){current_=previous_;}
 PolygonSurfaceArchive&PolygonSurfaceArchive::writer(){if(!current_||!current_->writer_)throw std::invalid_argument("Polygon Paint6 requires its actual owning Scene39 writer");return *current_;}
 PolygonSurfaceArchive&PolygonSurfaceArchive::reader(){if(!current_||!current_->reader_)throw std::invalid_argument("Polygon Paint6 requires its actual owning Scene39 reader");return *current_;}
 uint32_t PolygonSurfaceArchive::add(const std::shared_ptr<const SourceMaterialBindings>&b){if(!writer_||!b||!b->polygon_surface_transfer)throw std::invalid_argument("Polygon archive requires an actual material field owner");b->validate();const auto id=writer_->add(b->polygon_surface_transfer);origins_->add_origin(b->polygon_surface_transfer->before());if(std::find(bindings_.begin(),bindings_.end(),b)==bindings_.end())bindings_.push_back(b);return id;}
 std::shared_ptr<const PolygonSurfaceOwner>PolygonSurfaceArchive::at(uint32_t id){return reader_->at(id).owner;}
+const PolygonSurfaceStage&PolygonSurfaceArchive::stage_at(uint32_t id){if(!reader_)throw std::invalid_argument("Polygon field staging requires its actual owning reader");return reader_->at(id);}
 size_t PolygonSurfaceArchive::size()const noexcept{return writer_?writer_->size():reader_->size();}
 nlohmann::json PolygonSurfaceArchive::encode(){const auto count=origins_->origins().size();auto result=writer_->encode([&](auto origin){return origins_->add_origin(std::move(origin));});if(origins_->origins().size()!=count)throw std::logic_error("Polygon field writer changed a closed source-root pool");return result;}
 nlohmann::json PolygonSurfaceArchive::encode_paint(const PaintedMesh&paint,PaintImageArchive&images,NormalSamplingArchive*normal){for(const auto&b:bindings_)if(b->polygon_surface_transfer->matches_current(paint))return PolygonSurfacePaintCodec::encode(paint,b,*writer_,images,normal);throw std::invalid_argument("Polygon Paint6 has no actual matching current material owner");}

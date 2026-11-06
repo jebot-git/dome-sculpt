@@ -7,6 +7,7 @@ namespace dome::detail {
 // The real before-root is replayed before current geometry/attachment is minted.
 using PolygonSurfaceOriginWriter=std::function<uint32_t(std::shared_ptr<const PolygonOrigin>)>;
 using PolygonSurfaceOriginReader=std::function<std::shared_ptr<const PolygonOrigin>(uint32_t)>;
+using PolygonSurfaceGeometryReader=std::function<std::shared_ptr<const Mesh>(uint32_t)>;
 nlohmann::json encode_polygon_surface_node(
  const std::shared_ptr<const PolygonSurfaceOwner> &,const PolygonSurfaceOriginWriter &,
  const PolygonSurfaceTransferLimits & = {});
@@ -37,7 +38,8 @@ private:
 class PolygonSurfaceNodeReader final {
 public:
  PolygonSurfaceNodeReader(const nlohmann::json &,size_t origin_count,
-     PolygonSurfaceOriginReader,const PolygonSurfaceTransferLimits & = {});
+     PolygonSurfaceOriginReader,const PolygonSurfaceTransferLimits & = {},
+     PolygonSurfaceGeometryReader = {});
  const PolygonSurfaceStage &at(uint32_t);
  void require_complete();
  size_t size()const noexcept{return stages_.size();}
@@ -46,6 +48,7 @@ private:
  const nlohmann::json &input_;
  size_t origin_count_=0,reserved_=0;
  PolygonSurfaceOriginReader origin_;
+ PolygonSurfaceGeometryReader geometry_;
  PolygonSurfaceTransferLimits limits_;
  std::vector<std::optional<PolygonSurfaceStage>>stages_;
  std::vector<uint8_t>busy_;
