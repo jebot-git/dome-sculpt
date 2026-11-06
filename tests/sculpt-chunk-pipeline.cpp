@@ -29,7 +29,7 @@ Scene fixture(){
   Scene scene;scene.active().volume=std::make_shared<Volume>(shells());scene.active().material.double_sided=true;
   auto plane=scene.add("Packed intervening plane",Volume{});auto &o=scene.object(plane);o.mesh_active=true;
   Mesh mesh;mesh.positions={{-.3f,-.3f,-.9f},{.3f,-.3f,-.9f},{0,.3f,-.9f}};mesh.normals.assign(3,{0,0,1});mesh.indices={0,1,2};mesh.uv={{0,0},{1,0},{.5f,1}};
-  o.painted=std::make_shared<PaintedMesh>(std::move(mesh),32);o.material.double_sided=true;
+  o.painted=std::make_shared<PaintedMesh>(std::move(mesh),64);o.material.double_sided=true;
   auto second=scene.add("Second sculpt",shells());scene.object(second).transform.position={1.3f,0,0};scene.object(second).material.double_sided=true;
   const auto hidden=scene.add("Hidden sculpt",shells());scene.object(hidden).visible=false;scene.select(1);return scene;
 }

@@ -656,12 +656,20 @@ struct SurfaceRenderer::ChunkState {
       if(mask!=entry.mask) {
         const auto needed=mask?render_detail::buffer_bytes(mask->values.size(),sizeof(float)):0;
         if(mask&&mask->values.size()!=owner->positions.size())throw std::invalid_argument("Sculpt scalar GPU alignment differs from geometry");
-        if(bytes-entry.mask_bytes>limit||needed>limit-(bytes-entry.mask_bytes))throw std::length_error("Sculpt GPU scalar byte limit exceeded");
+        // Both prior accepted bytes and the staged allocation are live until
+        // commit; the prospective peak must fit, not only the final total.
+        if(bytes>limit||needed>limit-bytes)throw std::length_error("Sculpt GPU scalar staging byte limit exceeded");
         // Stage a separate buffer before replacing the accepted scalar owner.
         // A failed allocation/upload cannot mutate the prior packet in place.
         GLuint next=0;
         try {
           if(mask){glGenBuffers(1,&next);glBindBuffer(GL_ARRAY_BUFFER,next);glBufferData(GL_ARRAY_BUFFER,GLsizeiptr(needed),mask->values.data(),GL_DYNAMIC_DRAW);check_surface_buffer("Sculpt scalar upload failed");}
+          // Detach the old scalar association even when disabling protection.
+          // Merely disabling an attribute retains its buffer in an unbound VAO.
+          glBindVertexArray(entry.vao);glBindBuffer(GL_ARRAY_BUFFER,mask?next:entry.vertices);
+          glVertexAttribPointer(6,1,GL_FLOAT,GL_FALSE,sizeof(float),nullptr);
+          if(mask)glEnableVertexAttribArray(6);else glDisableVertexAttribArray(6);
+          check_surface_buffer("Sculpt scalar attribute staging failed");
         }catch(...){glDeleteBuffers(1,&next);throw;}
         glDeleteBuffers(1,&entry.scalar);entry.scalar=next;
         bytes=bytes-entry.mask_bytes+needed;entry.mask_bytes=needed;entry.mask=mask;++scalar_uploads;
