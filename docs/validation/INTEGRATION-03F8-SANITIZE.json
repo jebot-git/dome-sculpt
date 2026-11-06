@@ -1,0 +1,274 @@
+{
+  "schema": 1,
+  "source": "03f8edf15b265932cab5e1ddbd22d5878f1d8c26",
+  "source_root": "/home/blux/de-xr/dome-sculpt/artifacts/texture-resolution-loader-838",
+  "profile": "ASan+UBSan",
+  "scope": "Selected current32 sanitizer build/native/manual gates; five software GL and two ordinary FLTK GUI stages passed. Synthetic-loader XR workflow failed and remains unqualified.",
+  "state": "terminal-stopped-at-user-pause-boundary",
+  "sanitizer_environment": {
+    "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1:abort_on_error=1",
+    "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=1",
+    "LSAN_suppressions": false
+  },
+  "sanitize32": {
+    "exit": 0,
+    "targets": 32,
+    "build_steps": 314,
+    "initial_owned_outputs": 312,
+    "native_suites": 22,
+    "manual_workspaces": [
+      "workspace-small",
+      "placed-workspace-small"
+    ],
+    "build_and_log_allocated_bytes": 11748143104,
+    "commands": {
+      "configure": [
+        "cmake",
+        "-S",
+        "/home/blux/de-xr/dome-sculpt/artifacts/texture-resolution-loader-838",
+        "-B",
+        "/tmp/dome-sculpt-integration-final-sanitize",
+        "-G",
+        "Ninja",
+        "-DCMAKE_BUILD_TYPE=RelWithDebInfo",
+        "-DDOME_COMPUTE_BACKEND=CPU",
+        "-DDOME_BUILD_UI=ON",
+        "-DDOME_BUILD_XR=ON",
+        "-DBUILD_TESTING=ON",
+        "-DCMAKE_EXPORT_COMPILE_COMMANDS=ON",
+        "-DFLTK_DIR=/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-sanitize/share/fltk",
+        "-U*DOME_BITMAP_RUNTIME*",
+        "-U*NATIVEGL*",
+        "-U*RENDERFONTS*",
+        "-DCMAKE_CXX_FLAGS_RELWITHDEBINFO=-O1 -g1 -DNDEBUG -fsanitize=address,undefined -fno-omit-frame-pointer -ffunction-sections -fdata-sections",
+        "-DCMAKE_C_FLAGS_RELWITHDEBINFO=-O1 -g1 -DNDEBUG -fsanitize=address,undefined -fno-omit-frame-pointer -ffunction-sections -fdata-sections",
+        "-DCMAKE_EXE_LINKER_FLAGS=-fsanitize=address,undefined -Wl,--gc-sections,--compress-debug-sections=zstd",
+        "-DCMAKE_CXX_ARCHIVE_CREATE=<CMAKE_AR> qcT <TARGET> <LINK_FLAGS> <OBJECTS>",
+        "-DCMAKE_C_ARCHIVE_CREATE=<CMAKE_AR> qcT <TARGET> <LINK_FLAGS> <OBJECTS>",
+        "-DCMAKE_PROJECT_INCLUDE=/home/blux/de-xr/dome-sculpt/artifacts/integration-final-sanitize/orchestration.cmake"
+      ],
+      "build": [
+        "cmake",
+        "--build",
+        "/tmp/dome-sculpt-integration-final-sanitize",
+        "--parallel",
+        "2",
+        "--target",
+        "dome-sculpt",
+        "dome-sculpt-native-authoring-inspect",
+        "dome-sculpt-texture-sets-test",
+        "dome-sculpt-texture-set-surfaces-test",
+        "dome-sculpt-texture-set-native-test",
+        "dome-sculpt-texture-set-export-test",
+        "dome-sculpt-texture-set-polygon-mixed-test",
+        "dome-sculpt-polygon-surface-native-test",
+        "dome-sculpt-polygon-surface-render-test",
+        "dome-sculpt-texture-set-polygon-render-test",
+        "dome-sculpt-sculpt-surface-chunks-test",
+        "dome-sculpt-sculpt-chunk-pipeline-test",
+        "dome-sculpt-sculpt-chunk-render-test",
+        "dome-sculpt-local-surface-integration-test",
+        "dome-sculpt-surface-query-oblique-test",
+        "dome-sculpt-retopo-input-admission-test",
+        "dome-sculpt-polygon-retopo-affine-test",
+        "dome-sculpt-render-direct-upload-test",
+        "dome-sculpt-triangle-remesh-test",
+        "dome-sculpt-texture-set-field-source-test",
+        "dome-sculpt-texture-set-history-test",
+        "dome-sculpt-texture-set-resolution-test",
+        "dome-sculpt-texture-set-source-export-test",
+        "dome-sculpt-texture-set-resolution-fixture",
+        "dome-sculpt-texture-resolution-runtime",
+        "dome-sculpt-sculpt-chunk-workspace-test",
+        "dome-sculpt-sculpt-sustained",
+        "dome-sculpt-vrm1-background-fixture-test",
+        "dome-sculpt-vrm1-expression-layer-authoring-test",
+        "dome-sculpt-vrm1-expression-targets-faults-test",
+        "dome-sculpt-sculpt-placed-workspace-test",
+        "dome-sculpt-texture-set-source-render-test"
+      ],
+      "app-version": [
+        "/tmp/dome-sculpt-integration-final-sanitize/dome-sculpt",
+        "--version"
+      ],
+      "native": [
+        "ctest",
+        "--test-dir",
+        "/tmp/dome-sculpt-integration-final-sanitize",
+        "--output-on-failure",
+        "-R",
+        "^(polygon-retopo-affine|retopology-input-admission|surface-query-oblique|triangle-remesh|sculpt-surface-chunks|sculpt-chunk-pipeline|authenticated-local-surface|vrm1-background-fixture|vrm1-targets-uniform-roles-uv-authoring|vrm1-targets-preflight-order|dome-sculpt-texture-sets|dome-sculpt-texture-sets-polygon|dome-sculpt-texture-sets-plan|dome-sculpt-texture-set-surfaces|dome-sculpt-texture-set-native|dome-sculpt-texture-set-export|polygon-surface-native-owning|dome-sculpt-texture-set-polygon-mixed|dome-sculpt-texture-set-field-source|dome-sculpt-texture-set-source-export|dome-sculpt-texture-set-history|dome-sculpt-texture-set-resolution)$"
+      ],
+      "workspace-small": [
+        "/tmp/dome-sculpt-integration-final-sanitize/dome-sculpt-sculpt-chunk-workspace-test"
+      ],
+      "placed-workspace-small": [
+        "/tmp/dome-sculpt-integration-final-sanitize/dome-sculpt-sculpt-placed-workspace-test"
+      ]
+    },
+    "status_sha256": "51ac0bb30c49782ac22ac204e9e83551c4333c8a1e26ab089aee84101159cdee"
+  },
+  "software_GL": {
+    "exit": 0,
+    "checks": 1727,
+    "consumers": {
+      "existing-field-GL": 51,
+      "balanced-mixed-GL": 537,
+      "sculpt-chunk-GL": 72,
+      "direct-upload-GL": 73,
+      "sourceful-same-object-GL": 994
+    },
+    "commands": {
+      "existing-field-GL": [
+        "/tmp/dome-sculpt-integration-final-sanitize/dome-sculpt-polygon-surface-render-test",
+        "/tmp/dome-sculpt-integration-final-sanitize/polygon-surface-native",
+        "/tmp/dome-sculpt-final-sanitize-03f8/graphics/sanitize-v2/existing-field-GL"
+      ],
+      "balanced-mixed-GL": [
+        "/tmp/dome-sculpt-integration-final-sanitize/dome-sculpt-texture-set-polygon-render-test",
+        "/tmp/dome-sculpt-final-sanitize-03f8/graphics/sanitize-v2/balanced-mixed-GL"
+      ],
+      "sculpt-chunk-GL": [
+        "/tmp/dome-sculpt-integration-final-sanitize/dome-sculpt-sculpt-chunk-render-test",
+        "/tmp/dome-sculpt-final-sanitize-03f8/graphics/sanitize-v2/sculpt-chunk-GL"
+      ],
+      "direct-upload-GL": [
+        "/tmp/dome-sculpt-integration-final-sanitize/dome-sculpt-render-direct-upload-test",
+        "direct",
+        "/tmp/dome-sculpt-final-sanitize-03f8/graphics/sanitize-v2/direct-upload-GL"
+      ],
+      "sourceful-same-object-GL": [
+        "/tmp/dome-sculpt-integration-final-sanitize/dome-sculpt-texture-set-source-render-test",
+        "/tmp/dome-sculpt-final-sanitize-03f8/graphics/sanitize-v2/sourceful-same-object-GL"
+      ]
+    },
+    "status_sha256": "145897c5764d92accce2950867c2963a6b7d3e56e123769bf52bfa4e9a147aec",
+    "earlier_refusal": {
+      "exit": 1,
+      "error": "RuntimeError(('Descendant RSS3GiB refusal', 3312721920))",
+      "meaning": "First harness RSS ceiling refusal, preserved; not a product assertion or sanitizer diagnostic. Retry retained same product source/owned providers with declared measured orchestration limits.",
+      "status_sha256": "735bcab53fe8219ba4701c3c0ddf4c6e06116c1bf86173f008b71cf11f6c2c83"
+    },
+    "hardware_claim": false
+  },
+  "GUI": {
+    "normal": {
+      "complete": true,
+      "checks": 81
+    },
+    "compact": {
+      "complete": true,
+      "checks": 81
+    },
+    "whole_workflow_exit": 1,
+    "whole_workflow_error": "AssertionError(('actual workflow failed', 'xr-eight-cases', 1))",
+    "commands": {
+      "fixture-producer": [
+        "/tmp/dome-sculpt-integration-final-sanitize/dome-sculpt-texture-set-resolution-fixture",
+        "/tmp/dome-sculpt-final-sanitize-03f8/workflows/sanitize-v1/fixtures"
+      ],
+      "gui-normal": [
+        "/home/blux/de-xr/dome-sculpt/artifacts/selection-gui-venv/bin/python",
+        "/home/blux/de-xr/dome-sculpt/artifacts/texture-resolution-loader-838/tests/texture-set-menu.py"
+      ],
+      "gui-compact": [
+        "/home/blux/de-xr/dome-sculpt/artifacts/selection-gui-venv/bin/python",
+        "/home/blux/de-xr/dome-sculpt/artifacts/texture-resolution-loader-838/tests/texture-set-menu.py"
+      ],
+      "xr-eight-cases": [
+        "/home/blux/de-xr/dome-sculpt/artifacts/selection-gui-venv/bin/python",
+        "/home/blux/de-xr/dome-sculpt/artifacts/texture-resolution-loader-838/tests/texture-set-resolution-xr.py",
+        "/tmp/dome-sculpt-integration-final-sanitize/dome-sculpt",
+        "/tmp/dome-sculpt-integration-final-sanitize/libdome-sculpt-texture-resolution-runtime.so",
+        "/tmp/dome-sculpt-integration-final-sanitize/dome-sculpt-native-authoring-inspect",
+        "/tmp/dome-sculpt-final-sanitize-03f8/workflows/sanitize-v1/fixtures/manifest.json",
+        "/tmp/dome-sculpt-final-sanitize-03f8/workflows/sanitize-v1/xr"
+      ]
+    },
+    "scope": "Private Xvfb/GLX ordinary FLTK; physical/Wayland acceptance excluded"
+  },
+  "XR": {
+    "complete": false,
+    "report_count": 20,
+    "check_breakdown": {
+      "extra64": 15,
+      "extra256_partial": 4,
+      "fixture": 1
+    },
+    "successful_cases": [
+      "extra64"
+    ],
+    "remaining_cases_not_run": 6,
+    "error": "RuntimeError(('extra256', 'app ended before durable native phase', 'redone', 1))",
+    "failed_case": "extra256",
+    "phase": "redone",
+    "logical_gate": 73,
+    "gate_exhausted": true,
+    "ended_frames": 6000,
+    "gate_wait_frames": 5928,
+    "accepted_and_undone_native_endpoints_exact": true,
+    "durable_saved_redo_observed": false,
+    "internal_Redo_outcome": "unknown; cannot infer from retained persisted native data",
+    "no_ASan_UBSan_LSan_report_before_failure": true,
+    "retained_input": "Byte-exact original Release128 fixture; no replacement/reduced fallback",
+    "tracking": "synthetic",
+    "scope": "Actual ordinary XR app/loader/GL, synthetic actions and durable native Save inspection; no observer or physical headset claim",
+    "status_sha256": "9b01ce38fc99ad7e4f5f0e1fc602ed91f7c8cbe1bb3524505df2fd0ad265bff1"
+  },
+  "matching_Release_SAN_comparison": {
+    "state": "NOT RUN",
+    "reason": "Required whole sanitizer XR workflow success gate failed"
+  },
+  "extra11_sanitizer_readers": {
+    "state": "DEFERRED at explicit user pause boundary",
+    "new_targets_built": 0,
+    "new_cases_run": 0,
+    "storage_measurement_exit": 0,
+    "storage_measurement_sha256": "0d09f0a8a6f5b97e817f992d4026e110afdf949f9a786ddd66c129bf4dc7c250",
+    "measurement_scope": "Read-only completed current SAN32 storage metadata; not an extra-reader execution/resource authorization",
+    "build_allocated_bytes": 11747684352,
+    "raw_logs_allocated_bytes": 458752,
+    "ELF_allocated_bytes": 9839091712,
+    "object_allocated_bytes": 1876623360,
+    "headroom_after_1GiB_prospective": 4357984256,
+    "earlier_metadata_helper_failure": "Original exact32-executable selector refused actual31 executables+1 shared runtime; corrected measurement-only helper retained. Neither ran a product/test or compiled anything."
+  },
+  "closure": {
+    "receipt_sha256": "e71f5783b8cfa71cbc18eeedcb527af9b39848bbe28bbe746dd6f3d0adb1eff7",
+    "captured_PID_count": 200,
+    "matching_live": [],
+    "matching_zombies": [],
+    "reused_PIDs": [],
+    "pending_conditional_execution": false
+  },
+  "not_qualified": [
+    "Complete sanitizer XR workflow",
+    "Matching Release/sanitizer native and image comparison",
+    "Separate11-target33-case sanitizer reader coverage",
+    "default ALL",
+    "physical HMD/controller acceptance",
+    "main admission",
+    "goal completion",
+    "sustained production performance"
+  ],
+  "matching_release_reference": {
+    "summary_sha256": "28e6868614ac097831d38be2260919f77fcb39fee8dea9aa66c51f5b007b2d34",
+    "scope": "Separate passed selected optimized Release qualification; not relabelled sanitizer coverage"
+  },
+  "collection": {
+    "metadata_only": true,
+    "closed_control_files": 161,
+    "raw_control_logical_bytes": 9070029,
+    "archived_member_count": 162,
+    "archive_SHA256": "95d10b2c8e25c201855875af329efb33dcc4444c909533ea018cb82005b7c89b",
+    "all_archived_file_bytes_SHA256_verified": true,
+    "selected_raw_control_drift": [],
+    "approved_old_input_rehash_count": 3910,
+    "approved_old_input_drift": [],
+    "raw_deleted": false,
+    "private_HOME_captured": false,
+    "binaries_images_native_projects_copied": false,
+    "source_or_docs_edits": false,
+    "source_or_docs_commits": false
+  }
+}

@@ -1,0 +1,38 @@
+{
+  "schema": 1,
+  "source": "03f8edf15b265932cab5e1ddbd22d5878f1d8c26",
+  "branch": "work/authoring-final-integration",
+  "user_requested_pause_after_current_build": true,
+  "build_finalised": true,
+  "full_goal_complete": false,
+  "main_product_admitted": false,
+  "records": {
+    "release": {
+      "summary_sha256": "28e6868614ac097831d38be2260919f77fcb39fee8dea9aa66c51f5b007b2d34",
+      "archive_sha256": "71b0474956b522f68e6ef64b7835311c0b3e4defcc57b30295fdfb448cef3d34",
+      "controls": 356,
+      "root_independently_verified": true,
+      "public_receipt": "docs/validation/INTEGRATION-03F8-RELEASE.json"
+    },
+    "sanitize": {
+      "summary_sha256": "c3441a43084f26ebbca6559a7523cca64e44abaaba7636da00867c664383c48c",
+      "archive_sha256": "95d10b2c8e25c201855875af329efb33dcc4444c909533ea018cb82005b7c89b",
+      "controls": 161,
+      "root_independently_verified": true,
+      "public_receipt": "docs/validation/INTEGRATION-03F8-SANITIZE.json"
+    }
+  },
+  "unresolved": [
+    "SAN extra256 saved-Redo XR gate73 reached original6000-frame ceiling; internal Redo outcome unproven",
+    "Remaining SAN XR cases and exact Release-SAN comparison not run",
+    "Separate11-target inherited-role sanitizer suite deferred",
+    "All broader original unfinished requirements preserved"
+  ],
+  "test_process_closure": "/tmp/dome-sculpt-final-sanitize-03f8/pause-closure.json",
+  "legacy_preserved_process": {
+    "pid": 2385980,
+    "pgrp": 2385873,
+    "observed_state": "TN",
+    "scope": "older unrelated allocation sweep, remains SIGSTOP-preserved"
+  }
+}
