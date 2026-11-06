@@ -1604,6 +1604,11 @@ std::shared_ptr<PaintedMesh> detail::TextureSetPaintAccess::resample_plain(const
  raster_options.max_candidate_checks=std::min(raster_options.max_candidate_checks,std::max(size_t(1),max_checks));
  PaintSamplingLimits sampling_limits;sampling_limits.cancelled=limits.cancelled;
  auto surface=std::make_shared<PaintedMesh::SurfaceMap>(before.surface_->geometry,options.resolution,std::move(raster_options),nullptr,sampling_limits,domain);
+ // The exact current-grid forecast bounds this construction only. Retain the
+ // original caller ceilings for a later larger grid, rather than persisting a
+ // downsample's smaller sample/check forecast as a lifetime size restriction.
+ surface->options.max_raster_samples=before.surface_->options.max_raster_samples;
+ surface->options.max_candidate_checks=before.surface_->options.max_candidate_checks;
  const auto raster_work=surface->diagnostics.raster_samples+surface->diagnostics.candidate_checks;
  if(raster_work>limits.maximum_work-report.work)throw std::length_error("Texture-set resolution raster exceeds complete work budget");report.work+=raster_work;
  auto result=before.snapshot();result->surface_=std::move(surface);result->layers_=std::move(layers);

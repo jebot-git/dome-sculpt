@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "texture-set-resample.hpp"
 #include "dome/source-maps.hpp"
+#include "emission-paint-access.hpp"
+#include "paint-overlay-sample.hpp"
 #include "texture-set-graph.hpp"
 #include "texture-set-paint-access.hpp"
 #include <algorithm>
@@ -270,8 +272,16 @@ void material_quality(const PaintedMesh &before, const PaintedMesh &after,
                       const TextureSetLimits &limits,
                       TextureSetResolutionReport &report) {
   stop(limits);
-  const auto old = before.composite(material, limits.cancelled),
-             now = after.composite(material, limits.cancelled);
+  // Ordinary composites intentionally refuse physical emission. Retain their
+  // exact legacy filtering, but use the renderer's genuine independent linear
+  // packet for FLOAT/HDR fields instead of quantizing or dropping that plane.
+  const bool physical = before.has_physical_emission() ||
+      std::any_of(material.emissive.begin(), material.emissive.end(),
+                  [](float v) { return v > 1; });
+  const auto old = physical ? EmissionExportAccess::preview(before, material, limits.cancelled)
+                            : before.composite(material, limits.cancelled),
+             now = physical ? EmissionExportAccess::preview(after, material, limits.cancelled)
+                            : after.composite(material, limits.cancelled);
   const auto r = before.resolution();
   work(report,
        (size_t(r) * r + size_t(after.resolution()) * after.resolution()) *
@@ -285,6 +295,44 @@ void material_quality(const PaintedMesh &before, const PaintedMesh &after,
                                            &now->emission_coverage};
   double squares = 0;
   size_t count = 0;
+  const auto emission_texel = [&](const PaintOverlayPacket &packet,
+                                  uint32_t x, uint32_t y) {
+    work(report, (packet.layers().size() + 1) * 32, limits);
+    const auto values = sample_overlay_texel_values(packet, int(x), int(y), true);
+    std::array<double, 4> result{};
+    result[3] = values[3][3];
+    for (size_t k = 0; k < 3; ++k)
+      result[k] = double(material.emissive[k]) * (1 - result[3]) +
+                  values[2][k] + double(values[4][k]);
+    return result;
+  };
+  double emission_peak = 1;
+  // Quality reconstruction repeatedly visits the same target texels. Evaluate
+  // the immutable native packets once per grid and reuse bounded linear values;
+  // this spends no layer evaluations or quantization on repeated samples.
+  std::vector<std::array<double, 4>> old_emission_grid, new_emission_grid;
+  if (physical) {
+    if (!old->overlay || !now->overlay || old->overlay->resolution() != r ||
+        now->overlay->resolution() != after.resolution())
+      throw std::invalid_argument("Material quality lost actual native emission grids");
+    old_emission_grid.resize(size_t(r) * r);
+    const auto nr = after.resolution();
+    new_emission_grid.resize(size_t(nr) * nr);
+    for (uint32_t y = 0; y < r; ++y) {
+      stop(limits);
+      for (uint32_t x = 0; x < r; ++x) {
+        auto &v = old_emission_grid[size_t(y) * r + x];
+        v = emission_texel(*old->overlay, x, y);
+        for (size_t k = 0; k < 3; ++k)
+          emission_peak = std::max(emission_peak, v[k]);
+      }
+    }
+    for (uint32_t y = 0; y < nr; ++y) {
+      stop(limits);
+      for (uint32_t x = 0; x < nr; ++x)
+        new_emission_grid[size_t(y) * nr + x] = emission_texel(*now->overlay, x, y);
+    }
+  }
   const auto sample = [&](const Image &im, uint32_t x, uint32_t y,
                           size_t channel, bool srgb) {
     if (!im.width || im.width != im.height || (im.width & (im.width - 1)) ||
@@ -302,13 +350,29 @@ void material_quality(const PaintedMesh &before, const PaintedMesh &after,
   for (uint32_t y = 0; y < r; ++y) {
     stop(limits);
     for (uint32_t x = 0; x < r; ++x) {
+      std::array<double, 4> old_emission{}, new_emission{};
+      if (physical) {
+        old_emission = old_emission_grid[size_t(y) * r + x];
+        footprint(after.resolution(), r, x, y,
+                  [&](uint32_t sx, uint32_t sy, double weight) {
+          work(report, 4, limits);
+          const auto &v = new_emission_grid[size_t(sy) * after.resolution() + sx];
+          for (size_t k = 0; k < 4; ++k)
+            new_emission[k] += weight * v[k];
+        });
+      }
       size_t component = 0;
       for (size_t image = 0; image < 5; ++image) {
         const size_t n = image < 3 ? 4 : 1;
         for (size_t k = 0; k < n; ++k) {
           const bool srgb = (image == 0 || image == 2) && k < 3;
-          const auto e = std::abs(sample(*left[image], x, y, k, srgb) -
-                                  sample(*right[image], x, y, k, srgb));
+          const bool linear_emission = physical && (image == 2 || image == 4);
+          const auto channel = image == 4 ? size_t(3) : k;
+          const auto scale = channel < 3 ? emission_peak : 1;
+          const auto e = linear_emission
+              ? std::abs(old_emission[channel] - new_emission[channel]) / scale
+              : std::abs(sample(*left[image], x, y, k, srgb) -
+                         sample(*right[image], x, y, k, srgb));
           report.material_error[component] =
               std::max(report.material_error[component], e);
           squares += e * e;
@@ -469,11 +533,25 @@ resample_texture_set(Scene &scene, uint64_t object, TextureSetId set,
   const size_t before_pixels = size_t(field.painted->resolution()) *
                                field.painted->resolution(),
                after_pixels = size_t(options.resolution) * options.resolution;
-  const size_t material_bytes = (before_pixels + after_pixels) * 128;
+  // Native previews retain sparse packets and may detach common emission
+  // tiles. Reserve both full grids and every layer before any preview capture.
+  const size_t layer_count = field.painted->layers().size();
+  const bool physical = field.painted->has_physical_emission() ||
+      std::any_of(field.material.emissive.begin(), field.material.emissive.end(),
+                  [](float v) { return v > 1; });
+  const size_t material_bytes = (before_pixels + after_pixels) *
+                               (128 + (physical ? layer_count * 32 + sizeof(std::array<double, 4>) : 0)) +
+      (physical ? 2 * sizeof(std::vector<std::array<double, 4>>) : 0);
   const size_t material_work =
       (before_pixels + after_pixels) * (field.painted->layers().size() + 1) *
           32 +
-      14 * (before_pixels + std::max(after_pixels, 4 * before_pixels));
+      14 * (before_pixels + std::max(after_pixels, 4 * before_pixels)) +
+      // Each native layer/texel is evaluated once into the bounded caches.
+      // The original peak uses that same evaluation. Reconstruction reads four
+      // cached components per footprint, never reevaluating the layers.
+      (physical ? 32 * (layer_count + 1) * (before_pixels + after_pixels) +
+                      4 * std::max(after_pixels, 4 * before_pixels)
+                : 0);
   if (material_bytes >= limits.maximum_bytes ||
       material_work >= limits.maximum_work)
     throw std::length_error("Material reconstruction exceeds the resolution "
