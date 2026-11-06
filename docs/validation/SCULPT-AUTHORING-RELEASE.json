@@ -1,0 +1,83 @@
+{
+  "status": "Private combined Release milestone; full production goal remains active",
+  "product_source": "d1f4015995c48ee582b9478d99cb521a1101571b",
+  "branch": "work/sculpt-authoring-77e",
+  "base_main": "44fe3742bb7577fb09f73762da0aed38677ec91f",
+  "composition": "Local-coordinate immutable sculpt chunks + owning polygon fields + ordinary texture sets; sourceful texture-set and resolution agent changes are separate",
+  "receipts": {
+    "release": {
+      "path": "artifacts/sculpt-authoring-77e/artifacts/current-release-tmp-v2/status.json",
+      "sha256": "41481a7a512b170842a24720aed9edbfb30aff75c590c38e9be8a40f1aa48f31"
+    },
+    "software_GL": {
+      "path": "artifacts/sculpt-authoring-77e/artifacts/current-graphics/status.json",
+      "sha256": "609f19e72c2ad1af869d75da386048d84836dbff248b95522cf59e9ccba28029"
+    },
+    "Arc_GL": {
+      "path": "artifacts/sculpt-authoring-77e/artifacts/current-arc/status.json",
+      "sha256": "93dad7cff2b9689afabfa4a471dc523bdd1bf97e2dd66c10de11ad24f392f1fb"
+    },
+    "GUI_polygon": {
+      "path": "artifacts/sculpt-authoring-77e/artifacts/current-gui/polygon-normal/status.json",
+      "sha256": "234e7af14c9c1503c35efcd330a0fd680d84ea02e98eb7e606c3ab3126eda816"
+    },
+    "GUI_texture_sets": {
+      "path": "artifacts/sculpt-authoring-77e/artifacts/current-gui/texture-normal/status.json",
+      "sha256": "f308be189a2f802c463f3fe11ec8c56e9811224b6c478384154a126b32410a74"
+    },
+    "Khronos": {
+      "path": "artifacts/sculpt-authoring-77e/artifacts/current-gltf-validation/status.json",
+      "sha256": "f21254bd8af621fa557860135ded3efdbd82b6f0522ed845b824a8131781f0c9"
+    }
+  },
+  "release": {
+    "selected_targets": 19,
+    "selected_native_suites": 15,
+    "own_outputs": 282,
+    "all_owned_bytes_rehashed": true,
+    "fresh_reachable_providers": "Optimized CPU app/core/support/render/OpenXR; thin archives, current canonical DomeD FLTK poll SDK and bitmap runtime",
+    "fixed_regression": "Empty sculpt directory no longer forces packed-only queries into mixed typed namespace; original failed build/test receipts and affected raw outputs preserved"
+  },
+  "graphics": {
+    "checks_per_device": {
+      "existing_polygon": 51,
+      "independent_balanced_mixed": 537,
+      "sculpt_chunks": 72,
+      "direct_upload": 73
+    },
+    "devices": [
+      "software llvmpipe",
+      "authenticated Intel Arc A770 PCI03/renderD129/8086:56a0/i915 with actual EGL and openFD witnesses"
+    ],
+    "same_immutable_consumers": true,
+    "actual_UHD_rejected": true,
+    "balanced_RGBA_pairs": 8,
+    "max_byte_difference": 2,
+    "alpha_exact": true,
+    "tolerance_unchanged": 6
+  },
+  "desktop_GUI": {
+    "polygon": 19,
+    "texture_sets": 51,
+    "scope": "Actual normal private X11 FLTK/universal-menu events, Save/history/cancellation, clean close and fresh process reopen; current own/source/SDK/mapped DSOs unchanged",
+    "compact_Wayland": "No new qualification in this milestone"
+  },
+  "Khronos": {
+    "actual_current_exports": 5,
+    "errors": 0,
+    "warnings": 5,
+    "infos": 2,
+    "issues_unfiltered": true,
+    "remaining_warning": "NODE_SKINNED_MESH_NON_ROOT; broader independent deformation/transform work remains"
+  },
+  "sanitizer": "Fresh matching full-reachable ASan+UBSan build running at snapshot; no pass claimed",
+  "persistence": "Release own outputs and Arc raw images currently under RAM-backed /tmp. Raw paths are not reboot durable; persistent raw logs/hash receipts remain under repository artifacts. Preserve outputs explicitly before any later cleanup.",
+  "remaining": [
+    "Finish matching current sanitizer checks",
+    "Current combined compact/Wayland/OpenXR/physical workflow coverage",
+    "Qualify independent sourceful texture-set/persistence and all-channel resolution branches",
+    "Sustained production-size performance and broader original requirements",
+    "Controller spatial drawers after basic targets"
+  ],
+  "installation": "No new installation/headset launch/session restart"
+}

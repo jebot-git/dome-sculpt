@@ -1,3 +1,18 @@
+## Private combined sculpt/material Release checkpoint — 2026-11-06
+
+Private `d1f40159` combines local sculpt chunks, owning polygon fields and plain
+texture sets. Its fresh reachable Release application and 15 selected native
+suites pass, along with 733 graphics controls on each of software GL and strict
+Arc A770, 70 ordinary FLTK workflow checks and five Khronos exports with zero
+errors. All current owned inputs remain unchanged. The picking integration
+regression and its original failure are recorded. Matching whole-reachable
+ASan/UBSan is running; new combined XR/compositor/physical and production-size
+performance qualification remain required. New sourceful texture-set persistence
+and resolution changes are separate agent work. Read
+[SCULPT-AUTHORING-RELEASE.md](SCULPT-AUTHORING-RELEASE.md) and its receipt. This is
+private Release qualification, with no product admission, installation or full
+goal completion. Preserve RAM-backed outputs explicitly before cleanup.
+
 ## Current isotropic remeshing integrated — 2026-11-06
 
 Main integrates qualified c618c828 on the current direct-upload/input foundation.

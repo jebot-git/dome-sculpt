@@ -1,3 +1,15 @@
+## Private combined sculpt/material Release evidence — 2026-11-06
+
+Private `d1f40159` now has fresh reachable Release application/core/render/XR
+providers, 15 selected native suites, 733 software and 733 authenticated Arc GL
+controls, 70 ordinary FLTK workflows and five actual Khronos GLB exports with
+zero errors. Read [SCULPT-AUTHORING-RELEASE.md](SCULPT-AUTHORING-RELEASE.md) for
+exact scope, retained warnings and original failures. Matching ASan/UBSan is
+running. This does not admit the source into main or complete current combined
+XR/Wayland/physical, production performance, sourceful texture sets, resolution,
+broader authoring/interoperability/accelerator or controller-drawer requirements.
+The full objective remains active and incomplete.
+
 ## Current isotropic remeshing integration — 2026-11-06
 
 The source-retaining native desktop/XR isotropic-remesh workflow is now
