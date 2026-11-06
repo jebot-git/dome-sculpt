@@ -54,3 +54,18 @@ Production runs need a new explicit output/RSS/time envelope after the admitted
 sizes and smoke logic are known. Strict Arc runs additionally need an exclusive
 device lease, actual GL/EGL render-node FD and sysfs8086:56a0/PCI03/i915 receipts;
 environment selection alone is insufficient.
+
+The corrected29caadf1 consumer passes the explicit small software logic gate:
+whole optimized compile/link/runtime0, five real aligned-allocation controls,
+4 native geometry changes,3 real masks,8 stereo pairs,4 held pairs,2 authored
+similarity/affine moves and unchanged original grouped regression. Independent
+whole corner/scalar/affine-query and exact3-mode frame checkpoints pass, as do
+Cancel/Undo/Redo/ordered Save and the witnessed real-factory stale-generation
+barrier. Actual size is100704 visible triangles/224 chunks, so this is explicitly
+not production performance. All8 affected old members are excluded; protected
+provider/source/runtime drift is empty. Cumulative30,138,368B plus64MiB prospective
+fits96MiB; new binaries/runtime files are retained on executable tmpfs. See
+validation/SCULPT-SUSTAINED-SMOKE-V2.json. The original1872 startup failure and
+allocator probe remain preserved; existing base link.d metadata was inadvertently
+written by that first inherited command, while all237 protected outputs remain
+exact. The corrected command redirects dependency metadata into tmpfs.

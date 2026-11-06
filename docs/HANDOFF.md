@@ -1,3 +1,16 @@
+## Private sustained sculpt workload logic checkpoint — 2026-11-06
+
+The real Document/renderer manual benchmark now passes a small optimized software
+logic gate on private8a05-compatible providers:4 native geometry strokes,3 masks,
+8 stereo pairs,4 held pairs,2 authored similarity/affine moves, original grouped
+regression, independent whole geometry/scalars/query/frame and exact history/
+stale-generation controls. Actual100704 triangles is not production performance.
+All old8 affected members are excluded and pinned providers stay exact. First
+allocator-instrumentation failure remains preserved; small alignment handling
+is corrected with real controls. See SCULPT-SUSTAINED-WORK.md and its V2 receipt.
+Production/source39/40 composition and actual Arc measurement remain unexecuted.
+The full goal remains active/incomplete; no install or headset launch occurred.
+
 ## Private local-coordinate grouped sculpt fix — 2026-11-06
 
 The unchanged original grouped sphere exposed a real world-float coordinate

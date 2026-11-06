@@ -1,0 +1,134 @@
+{
+  "source": "29caadf1a49f8ad5a8434fa11d5cccd9ad709307",
+  "scope": "One whole new Release consumer, all exact-compatible8a05 affected providers before immutable233+4 base; small smoke logic only, no production/Arc timing claim",
+  "state": "terminal",
+  "exit": 0,
+  "steps": [
+    {
+      "name": "compile",
+      "exit": 0,
+      "seconds": 11.568341759033501,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "link",
+      "exit": 0,
+      "seconds": 0.8075165249756537,
+      "sha256": "3168e474f66556675f6ce1221a6dcf5cf1be4a8da260f38543742757e698b901"
+    },
+    {
+      "name": "smoke",
+      "exit": 0,
+      "seconds": 11.900112845993135,
+      "sha256": "3e6b064c74fbe50f507cd0af36949b7e32dee849fe01d6df388d726f76b6dc79"
+    }
+  ],
+  "actual_gl": {
+    "renderer": "llvmpipe (LLVM 22.1.8, 256 bits)",
+    "vendor": "Mesa",
+    "version": "4.6 (Core Profile) Mesa 26.2.5"
+  },
+  "actual_size": {
+    "chunks": 224,
+    "retained_chunk_bytes": 168124057,
+    "scalar_bytes": 57176,
+    "stored_samples": 114620,
+    "visible_triangles": 100704,
+    "visible_vertices": 57176
+  },
+  "aligned_allocation_controls": {
+    "alignments": [
+      1,
+      2,
+      4,
+      8,
+      16
+    ],
+    "counted_calls": 5,
+    "counted_requested_bytes": 185
+  },
+  "original_grouped_regression": {
+    "checked_scalars": 5092,
+    "exact_frame_modes": 3,
+    "observer_ns_excluded": 1462528980,
+    "ordered_corners": 52008,
+    "typed_queries": 4,
+    "whole_extraction_and_checks_ns": 36311788
+  },
+  "workload": {
+    "accepted_native_geometry_strokes": 4,
+    "real_mask_strokes": 3,
+    "stereo_view_pairs": 8,
+    "held_pairs": 4,
+    "authored_similarity_and_affine_moves": 2
+  },
+  "independent_checkpoints": [
+    {
+      "checked_scalars": 14294,
+      "exact_frame_modes": 3,
+      "observer_ns_excluded": 1056565284,
+      "ordered_corners": 302112,
+      "typed_queries": 8,
+      "whole_extraction_and_checks_ns": 163366897
+    },
+    {
+      "checked_scalars": 14302,
+      "exact_frame_modes": 3,
+      "observer_ns_excluded": 1135462558,
+      "ordered_corners": 302160,
+      "typed_queries": 8,
+      "whole_extraction_and_checks_ns": 176120474
+    },
+    {
+      "checked_scalars": 14302,
+      "exact_frame_modes": 3,
+      "observer_ns_excluded": 1035564463,
+      "ordered_corners": 302160,
+      "typed_queries": 8,
+      "whole_extraction_and_checks_ns": 177997548
+    },
+    {
+      "checked_scalars": 14308,
+      "exact_frame_modes": 3,
+      "observer_ns_excluded": 1094619699,
+      "ordered_corners": 302196,
+      "typed_queries": 8,
+      "whole_extraction_and_checks_ns": 174522944
+    }
+  ],
+  "history": {
+    "cancel_exact": true,
+    "ordered_save_reopen_exact": true,
+    "real_factory_return_barrier_reached": true,
+    "retired_native_generation_exact": true,
+    "undo_redo_exact": true
+  },
+  "gpu_timer_logic": {
+    "supported": true,
+    "skipped_pool_full": 0,
+    "pending_after_bounded_drain": 0
+  },
+  "gpu_timer_samples": 8,
+  "old_affected_members_excluded": true,
+  "drift": [],
+  "runtime_post_drift": [],
+  "outputs": {
+    "/tmp/dome-sculpt-sustained-1872-v2/dome-sculpt-sculpt-sustained": "6b5b38f41d93320dad7b3b8d6fb97b85bc093b4eddc5021e0c7c12bd06d3ec47",
+    "/tmp/dome-sculpt-sustained-1872-v2/sustained.o": "a9ae0f8455c9bb0f8117f235f697e4002ee60df988f92d019681de89ca9e16da"
+  },
+  "space_final": {
+    "actual_workspace_free_bytes": 21757132800,
+    "actual_tmpfs_free_bytes": 31761522688,
+    "cumulative_allocated_bytes": 30138368,
+    "cap_bytes": 100663296,
+    "tmpfs_prospective_bytes": 67108864,
+    "workspace_metadata_reserve_bytes": 16777216
+  },
+  "peak_rss_kib": 410300,
+  "artifact_status_sha256": "80b8d4906601310efcedeee6e8057b9fb56e92b8922fbced9dd2d4a69ccf4934",
+  "artifact_status": "artifacts/sustained-smoke-v2/status.json",
+  "heavy_output_directory": "/tmp/dome-sculpt-sustained-1872-v2",
+  "first_failure_seal": "7b3db928",
+  "first_failure_preserved": "artifacts/sculpt-sustained-8a05/artifacts/sustained-smoke-v1",
+  "conclusion": "Small logic qualification only, 100704 visible triangles. No sustained production performance, speedup, Arc, OneAPI or physical headset claim."
+}
