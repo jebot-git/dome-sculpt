@@ -95,7 +95,7 @@ target_sources(dome-sculpt-core PRIVATE src/object-selection.cpp)
 target_sources(dome-sculpt-core PRIVATE src/source-sampling-transport.cpp)
 target_sources(dome-sculpt-core PRIVATE src/source-placement.cpp src/source-placement-archive.cpp)
 target_sources(dome-sculpt-core PRIVATE src/polygon-authoring.cpp src/polygon-source.cpp src/polygon-color-source.cpp src/polygon-color-archive.cpp src/polygon-scene.cpp src/polygon-conversion.cpp src/document-polygon.cpp)
-target_sources(dome-sculpt-core PRIVATE src/polygon-surface-transfer.cpp src/polygon-surface-owner.cpp)
+target_sources(dome-sculpt-core PRIVATE src/polygon-surface-transfer.cpp src/polygon-surface-owner.cpp src/polygon-surface-codec.cpp)
 target_include_directories(dome-sculpt-core PRIVATE third_party/cgltf)
 target_compile_definitions(dome-sculpt-core PRIVATE
   DOME_SCULPT_SOURCE_ASSETS="${CMAKE_CURRENT_SOURCE_DIR}/assets/humanoid"

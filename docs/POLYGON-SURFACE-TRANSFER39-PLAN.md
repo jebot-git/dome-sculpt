@@ -83,3 +83,14 @@ remain exact. Actual phase253,771,776B/cumulative1,067,814,912B stayed within
 limits. This proves executed CPU staging and compatibility scopes, not the
 remaining Scene39/current shader/native/export/SAN/UI work above. See
 validation/POLYGON-SURFACE-STAGE39-RELEASE.json.
+
+After the R seal, the source-only private node codec now describes
+`before_origin`, an explicit captured-native-grid/captured-retained-grid alias
+witness and the replayable edit recipe. Its reader receives the actual enclosing
+origin resolver, replays that complete genuine source, then stages its real
+SurfaceMap/attachment. The source basis is selected from the authenticated root;
+matching mesh values never merge two owners. This is not yet wired into
+Scene39/material21/Paint6. Source/current value payload parsing, exact decoded
+alias rebinding, recursive preallocation and outer mixed-feature closure remain
+required before writer admission. All252 qualified R providers remain immutable;
+follow-up whole-TU outputs must use different paths.

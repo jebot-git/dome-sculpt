@@ -30,6 +30,7 @@ public:
  void validate(const PolygonSurfaceTransferLimits & = {}) const;
  const auto &before() const noexcept{return before_;}
  const auto &trace() const noexcept{return trace_;}
+ const auto &current_attachment() const noexcept{return attachment_;}
  // These two streams are intentionally independent. The first addresses the
  // exact sparse editable Paint/F32 grid; the second addresses the old resolved
  // canonical normal field. Neither is the new triangulation's atlas.
