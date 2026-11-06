@@ -4887,3 +4887,5 @@ if(BUILD_TESTING)
   add_test(NAME dome-sculpt-texture-set-resolution COMMAND dome-sculpt-texture-set-resolution-test ${CMAKE_CURRENT_BINARY_DIR}/texture-set-resolution-output)
   set_tests_properties(dome-sculpt-texture-set-resolution PROPERTIES TIMEOUT 300)
 endif()
+
+include(tests/texture-set-resolution-workflows.cmake)
