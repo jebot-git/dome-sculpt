@@ -10,7 +10,8 @@ namespace dome::detail {
 struct PolygonSurfacePaintCodec {
  static std::shared_ptr<const TextureMaps> preview(const PaintedMesh &,
      const std::shared_ptr<const SourceMaterialBindings> &,const Material &,
-     const std::function<bool()> &cancelled={});
+     const std::function<bool()> &cancelled={},
+     std::shared_ptr<const PolygonSurfacePreview> cached={});
  static nlohmann::json encode(const PaintedMesh &,
      const std::shared_ptr<const SourceMaterialBindings> &,PolygonSurfaceNodeWriter &,
      PaintImageArchive &,NormalSamplingArchive * = nullptr,

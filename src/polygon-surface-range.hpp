@@ -4,8 +4,10 @@
 #include "dome/paint-sampling.hpp"
 #include "dome/document.hpp"
 #include "affine-surface.hpp"
+#include "texture-set-range.hpp"
 namespace dome::detail {
 inline AffineTransform polygon_range_world(const SurfaceRange&r){return r.affine_world?*r.affine_world:r.world_frame_valid?affine_similarity(r.object_world):AffineTransform{};}
+inline size_t surface_logical_corner(const SurfaceRange&r,size_t c){return r.texture_set_proof?r.texture_set_proof->logical_corner(c,r.paint_winding_reversed):r.paint_winding_reversed&&c%3?c+(c%3==1?1:-1):c;}
 inline void validate_polygon_range(const Mesh&mesh,const SurfaceRange&r,
  std::span<const std::array<float,2>>paint,bool vertex_coordinates,
  std::span<const Vec3>normals={},std::span<const std::array<float,4>>tangents={},
@@ -16,10 +18,11 @@ inline void validate_polygon_range(const Mesh&mesh,const SurfaceRange&r,
  if(!packet->matches(r.material_bindings,r.paint_sampling_attachment))throw std::invalid_argument("Polygon range lost its exact field/binding/paint attachment");packet->validate_maps(*r.textures);
  const auto world=polygon_range_world(r);const AffineInteractionFrame frame(world);packet->validate_world(world,1e-6,cancelled);
  const auto&source=*packet->attachment()->authored_geometry();
- if(r.first>mesh.indices.size()||r.count!=source.indices.size()||r.count>mesh.indices.size()-r.first||paint.size()!=(vertex_coordinates?mesh.positions.size():mesh.indices.size()))throw std::invalid_argument("Polygon range current corner dimensions differ from its owning field");
+ if(r.texture_set_proof)r.texture_set_proof->authenticate(r);
+ if(r.first>mesh.indices.size()||(r.texture_set_proof?r.count!=r.texture_set_proof->draw().count:r.count!=source.indices.size())||r.count>mesh.indices.size()-r.first||paint.size()!=(vertex_coordinates?mesh.positions.size():mesh.indices.size()))throw std::invalid_argument("Polygon range current corner dimensions differ from its owning field");
  if(renderer&&(!r.source_frame||r.canonical_frame||r.source_normal_only!=(packet->model()==PolygonSurfaceNormalModel::NativeNOnly)||normals.size()!=mesh.positions.size()||(!packet->tangents().empty()&&tangents.size()!=mesh.positions.size())||(!packet->normal_coordinates().empty()&&role_uv.size()!=mesh.positions.size())))throw std::invalid_argument("Polygon range omitted its actual before role streams");
  const auto same=[](Vec3 a,Vec3 b){return a.x==b.x&&a.y==b.y&&a.z==b.z;};
- for(size_t c=0;c<r.count;++c){if((c&1023)==0&&cancelled&&cancelled())throw std::runtime_error("Polygon field range validation cancelled");const auto logical=r.paint_winding_reversed&&c%3?c+(c%3==1?1:-1):c;const auto v=mesh.indices.at(r.first+c),sv=source.indices.at(logical);
+ for(size_t c=0;c<r.count;++c){if((c&1023)==0&&cancelled&&cancelled())throw std::runtime_error("Polygon field range validation cancelled");const auto logical=surface_logical_corner(r,c);const auto v=mesh.indices.at(r.first+c),sv=source.indices.at(logical);
   if(v<r.first_vertex||v>=mesh.positions.size()||!same(mesh.positions[v],placed_position(frame,source.positions.at(sv)))||mesh.uv.at(v)!=source.uv.at(sv))throw std::invalid_argument("Polygon range geometry/UV differs from its actual field and world context");
   if(paint[vertex_coordinates?v:r.first+c]!=packet->paint_coordinates().at(logical))throw std::invalid_argument("Polygon range writable grid coordinates differ from its actual field");
   if(renderer){

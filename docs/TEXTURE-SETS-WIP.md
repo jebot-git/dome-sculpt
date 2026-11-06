@@ -297,3 +297,25 @@ Four whole TUs pass syntax only; the first nonexistent counter-name failure and
 its log remain preserved. Decode now also creates a fresh composite cache when
 replacing prototype layers. Read validation/TEXTURE-SETS-FIELD-CODEC-SOURCE.json.
 GPU/range/query/native/export and PolygonSources8 integration remain required.
+
+Retained source fields now have a separate actual corner-layout producer. Its
+complete signature includes current vertex/canonical tangent, before raw N/T/W,
+original paint coordinates and independent normal-role coordinates. Genuine
+source packets remain shared independently from current pixels. Workers publish
+all required streams even when this is the first object, and source ranges
+retain their real binding/attachment and subset membership. CPU visibility and
+GPU validation resolve each subset corner through its actual logical identity.
+Primitive-frame GPU uploads use the actual membership triangle order and retain
+that domain control block in their cache; no readback is introduced.
+
+The real collection fixture now creates two fields from an accepted native39
+Flip, builds the actual worker packet and MaterialSurfaceQuery, and includes
+independent coordinate/control-block corruptions. It is **unexecuted**. Nine
+whole TUs pass syntax with unchanged source hashes. This is no object/link,
+runtime/native/GL/UI/SAN/XR/device qualification. Sourceful frontend eligibility
+remains disabled pending the complete shared/history Scene codec and fresh
+qualification. Source-backed export explicitly refuses pending its genuine
+before-normal and independent paint/role coordinate compiler; generic plain
+export cannot silently consume these new source plans. Posed source fields,
+multimaterial-before polygon operations and source grid resizing stay guarded.
+Read validation/TEXTURE-SETS-RETAINED-STREAM-SOURCE.json.

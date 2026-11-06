@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "texture-set-surface.hpp"
 #include "texture-set-paint-access.hpp"
+#include "texture-set-field-source.hpp"
 #include "dome/polygon-scene.hpp"
 #include <bit>
 namespace dome::detail {
@@ -28,11 +29,12 @@ std::shared_ptr<const TextureSetSurfacePlan> prepare_texture_set_surface(const S
  if(o.polygon&&o.polygon->colors)throw std::invalid_argument("Texture-set corner colours need their complete source/corner surface adapter");
  const auto&m=o.painted->mesh();const auto corners=m.indices.size(),faces=corners/3;
  if(corners>limits.maximum_corners||faces>limits.maximum_triangles)throw std::length_error("Texture-set surface geometry exceeds its declared bounds");
- plain(*o.painted,o.appearance.get(),o.material_bindings.get(),o.bake_recipe.get());
- for(const auto&field:o.texture_sets->additional()){
+ const auto validate_field=[&](const TextureSetView&field){
   if(!field.painted)throw std::invalid_argument("Texture-set surface field has no actual paint owner");
-  plain(*field.painted,field.appearance.get(),field.material_bindings.get(),field.bake_recipe.get());
- }
+  if(field.source){if(o.deformation)throw std::invalid_argument("Retained texture-set fields require their actual posed before-frame adapter");field.source->authenticate_owner(field.source);field.source->validate_field(field,limits);if(!field.source->source_preview())throw std::invalid_argument("Retained texture-set field has no genuine before-role packet");}
+  else plain(*field.painted,field.appearance.get(),field.material_bindings.get(),field.bake_recipe.get());
+ };
+ validate_field(texture_set_view(o,0));for(const auto&field:o.texture_sets->additional())validate_field(texture_set_view(o,field.id));
  size_t forecast=0;
  if(o.polygon&&o.polygon->active)for(const auto&face:o.polygon->topology.faces()){
   stop(limits);bounded_product(forecast,face.corners.size(),8*face.corners.size()+32,limits);

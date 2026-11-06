@@ -2,6 +2,7 @@
 #include "texture-set-worker.hpp"
 #include "affine-surface.hpp"
 #include "paint-overlay-packet.hpp"
+#include "polygon-surface-preview.hpp"
 #include <limits>
 namespace dome::detail {
 namespace {
@@ -39,10 +40,10 @@ void append_texture_set_surface(MeshSnapshot&snapshot,const ObjectSurface&o,
  // per-set mesh/tint copy for these plain ranges.
  charge(bytes,offset+vertices,2*sizeof(Vec3)+sizeof(std::array<float,2>),limits);
  charge(bytes,first+corners,sizeof(uint32_t),limits);charge(bytes,(first+corners)/3,256,limits);
- if(!snapshot.source_normals.empty())charge(bytes,offset+vertices,2*sizeof(Vec3)+sizeof(Tangent),limits);
+ if(layout->has_source()||!snapshot.source_normals.empty())charge(bytes,offset+vertices,2*sizeof(Vec3)+sizeof(Tangent),limits);
  if(!snapshot.source_colors.empty())charge(bytes,offset+vertices,sizeof(std::array<float,4>),limits);
- if(!snapshot.normal_coordinates.empty())charge(bytes,offset+vertices,sizeof(std::array<float,4>),limits);
- if(!snapshot.paint_coordinates.empty())charge(bytes,offset+vertices,sizeof(std::array<float,2>),limits);
+ if(layout->has_source()||!snapshot.normal_coordinates.empty())charge(bytes,offset+vertices,sizeof(std::array<float,4>),limits);
+ if(layout->has_source()||!snapshot.paint_coordinates.empty())charge(bytes,offset+vertices,sizeof(std::array<float,2>),limits);
  if(view.weights||!snapshot.selected_weights.empty())charge(bytes,offset+vertices,sizeof(float),limits);
  if(view.masks||!snapshot.sculpt_masks.empty())charge(bytes,offset+vertices,sizeof(float),limits);
  charge(bytes,snapshot.ranges.size()+plan->fields().size(),sizeof(SurfaceRange)+sizeof(TextureSetRangeProof)+128,limits);
@@ -59,7 +60,7 @@ void append_texture_set_surface(MeshSnapshot&snapshot,const ObjectSurface&o,
   if(pixels&&(layers+1)>(limits.maximum_work-preview_work)/pixels/32)throw std::length_error("Texture-set field preview exceeds its charged work bound");
   preview_work+=pixels*(layers+1)*32;
  }
- const bool affine=bool(o.affine_edit)||std::any_of(o.groups.begin(),o.groups.end(),[](const auto&g){return g.source_placement||g.affine_edit;});
+ const bool affine=layout->has_source()||bool(o.affine_edit)||std::any_of(o.groups.begin(),o.groups.end(),[](const auto&g){return g.source_placement||g.affine_edit;});
  const auto frame=affine?std::optional<AffineInteractionFrame>(placement_frame(o)):std::nullopt;
  const bool reflected=frame&&frame->orientation()==AffineOrientation::Reversing;const auto world=affine?CanvasTransform{}:o.world_transform();
  // Seal every field first. A late allocation/preview failure cannot expose a
@@ -70,8 +71,14 @@ void append_texture_set_surface(MeshSnapshot&snapshot,const ObjectSurface&o,
   auto proof=prepare_texture_set_range(plan,layout,f,first,offset,limits.cancelled);
   SurfaceRange range{o.id,proof->first_index(),proof->draw().count,proof->field().material,proof->textures(),nullptr,offset};
   range.object_world=world;range.world_frame_valid=!affine;if(frame)range.affine_world=frame->world();
+  if(const auto&packet=range.textures->polygon_surface){packet->validate_world(frame->world(),1e-6,limits.cancelled);range.material_bindings=proof->field().material_bindings;range.paint_sampling_attachment=packet->attachment();range.source_frame=true;range.source_normal_only=packet->model()==PolygonSurfaceNormalModel::NativeNOnly;}
   range.paint_winding_reversed=reflected;range.pbr_view=view.pbr;range.texture_set=proof->field().id;range.texture_set_proof=std::move(proof);
   ranges.push_back(std::move(range));
+ }
+ if(layout->has_source()){
+  if(snapshot.source_normals.empty()){snapshot.source_normals=snapshot.mesh.normals;snapshot.canonical_normals=snapshot.mesh.normals;snapshot.source_tangents.assign(offset,{1,0,0,1});}
+  if(snapshot.paint_coordinates.empty())snapshot.paint_coordinates=snapshot.mesh.uv;
+  if(snapshot.normal_coordinates.empty())for(auto uv:snapshot.mesh.uv)snapshot.normal_coordinates.push_back({uv[0],uv[1],uv[0],uv[1]});
  }
  for(size_t p=0;p<vertices;++p){
   if((p&1023)==0)stop(limits);const auto vertex=layout->vertices()[p];const auto uv=posed.uv.at(vertex);const auto native_normal=posed.normals.at(vertex);
@@ -81,10 +88,13 @@ void append_texture_set_surface(MeshSnapshot&snapshot,const ObjectSurface&o,
   snapshot.mesh.positions.push_back(frame?placed_position(*frame,position):Vec3{transformed.x,transformed.y,transformed.z});snapshot.mesh.normals.push_back(normal);snapshot.mesh.uv.push_back(uv);
   const auto tangent=layout->tangents()[p];const auto direction=ob::rotate(world.orientation,{tangent[0],tangent[1],tangent[2]});
   snapshot.tangents.push_back(frame?placed_tangent(*frame,tangent):Tangent{direction.x,direction.y,direction.z,tangent[3]});
-  if(!snapshot.source_normals.empty()){snapshot.source_normals.push_back(normal);snapshot.canonical_normals.push_back(normal);const auto native_tangent=ob::rotate(world.orientation,{1,0,0});snapshot.source_tangents.push_back(frame?placed_tangent(*frame,{1,0,0,1}):Tangent{native_tangent.x,native_tangent.y,native_tangent.z,1});}
+  if(layout->has_source()||!snapshot.source_normals.empty()){
+   const auto n=layout->has_source()?layout->source_normals()[p]:native_normal;const auto rotated=ob::rotate(world.orientation,{n.x,n.y,n.z});snapshot.source_normals.push_back(frame?placed_normal(*frame,n):Vec3{rotated.x,rotated.y,rotated.z});snapshot.canonical_normals.push_back(normal);
+   const auto t=layout->has_source()?layout->source_tangents()[p]:Tangent{1,0,0,1};const auto direction=ob::rotate(world.orientation,{t[0],t[1],t[2]});snapshot.source_tangents.push_back(frame?placed_tangent(*frame,t):Tangent{direction.x,direction.y,direction.z,t[3]});
+  }
   if(!snapshot.source_colors.empty())snapshot.source_colors.push_back({1,1,1,1});
-  if(!snapshot.normal_coordinates.empty())snapshot.normal_coordinates.push_back({uv[0],uv[1],uv[0],uv[1]});
-  if(!snapshot.paint_coordinates.empty())snapshot.paint_coordinates.push_back(uv);
+  if(layout->has_source()||!snapshot.normal_coordinates.empty()){const auto role=layout->has_source()?layout->normal_coordinates()[p]:uv;snapshot.normal_coordinates.push_back({role[0],role[1],role[0],role[1]});}
+  if(layout->has_source()||!snapshot.paint_coordinates.empty())snapshot.paint_coordinates.push_back(layout->has_source()?layout->paint_coordinates()[p]:uv);
   if(view.weights){float weight=view.selected?0.f:-1.f;if(view.selected)for(const auto&i:view.weight_values->skin->vertices.at(vertex))if(i.joint==view.joint)weight=i.weight;snapshot.selected_weights.push_back(weight);}
   if(view.masks)snapshot.sculpt_masks.push_back(view.mask?view.mask(vertex):-1.f);
  }

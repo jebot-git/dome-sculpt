@@ -5,6 +5,9 @@
 #include "polygon-surface-owner.hpp"
 #include "polygon-surface-preview.hpp"
 #include "polygon-surface-paint.hpp"
+#include "texture-set-worker.hpp"
+#include "polygon-surface-range.hpp"
+#include "dome/material-visibility.hpp"
 #include <nlohmann/json.hpp>
 #include <iostream>
 using namespace dome;
@@ -30,6 +33,21 @@ void run(){
   const auto world=AffineTransform(std::array<double,16>{-1.2,.1,0,0,.3,.8,0,0,0,.15,1.1,0,.02,0,.1,1});const auto actual=f->normal(triangle,{.2,.3,.5},world,false);const auto expected=owner->native_normal(triangle,{.2,.3,.5},world);check(length(actual-expected)<1e-6f,"Field normal keeps original raw N and exact reflected/sheared world interpretation");check(length(f->normal(triangle,{.2,.3,.5},world,true)-expected)<1e-6f,"PBR shading of an N-only source uses its actual native N without inventing a prepared role");
   refuses([&]{f->sample(uint32_t(1-triangle),{.2,.3,.5});},"A foreign logical triangle cannot borrow another material field");refuses([&]{f->sample(triangle,{.2,.3,.6});},"Malformed barycentrics cannot mint a field sample");
  }
+ auto partitioned=scene.snapshot();const auto face=fields[1]->field().domain->topology()->triangle_faces()[1];
+ const auto set=create_texture_set(partitioned,actor.id,std::array<uint64_t,1>{face},"Actual source material",64);const auto&split=partitioned.active();
+ check(set==1&&split.texture_sets&&split.texture_sets->primary_source()&&split.texture_sets->additional()[0].source,"Real collection creation retains both source field descriptors");
+ ObjectSurface bundle;bundle.id=split.id;bundle.name=split.name;bundle.material=split.material;bundle.transform=split.transform;bundle.groups=partitioned.group_path(split.group);bundle.affine_edit=split.affine_edit;bundle.texture_set_surface=detail::prepare_texture_set_surface(split);
+ const auto layout=detail::prepare_texture_set_packed(bundle.texture_set_surface);check(layout->has_source()&&layout->posed()==actor.painted->mesh_owner(),"One actual REST geometry feeds all retained field ranges");
+ MeshSnapshot snapshot;detail::append_texture_set_surface(snapshot,bundle,layout,{});check(snapshot.ranges.size()==2&&snapshot.source_normals.size()==snapshot.mesh.positions.size()&&snapshot.paint_coordinates.size()==snapshot.mesh.positions.size(),"A first retained-set object publishes complete before-N and paint streams from an empty prefix");
+ for(const auto&r:snapshot.ranges){
+  r.texture_set_proof->authenticate(r);detail::validate_polygon_range(snapshot.mesh,r,snapshot.paint_coordinates,true,snapshot.source_normals,snapshot.source_tangents,snapshot.normal_coordinates,true);
+  check(r.count==3&&r.source_frame&&r.source_normal_only&&r.textures->polygon_surface==r.texture_set_proof->field().source->source_preview(),"Each genuine range retains its shared raw-input packet and actual subset");
+  for(size_t c=0;c<r.count;++c){const auto logical=r.texture_set_proof->logical_corner(c,r.paint_winding_reversed);const auto v=snapshot.mesh.indices[r.first+c];check(snapshot.paint_coordinates[v]==r.textures->polygon_surface->paint_coordinates()[logical],"Packed material range uses actual original paint logical corners");}
+ }
+ MaterialSurfaceQuery query(snapshot.mesh,snapshot.ranges,{},snapshot.source_colors,PaintVertexCoordinates{snapshot.paint_coordinates});
+ for(uint32_t t=0;t<2;++t){check(query.material_identity(t).texture_set==snapshot.ranges[t].texture_set&&query.logical_triangle(t)==snapshot.ranges[t].texture_set_proof->logical_corner(0,false)/3,"Actual material query maps subset draws back to shared logical triangles");}
+ auto corrupted=snapshot.paint_coordinates;corrupted[snapshot.mesh.indices[0]][0]+=.0625f;refuses([&]{MaterialSurfaceQuery wrong(snapshot.mesh,snapshot.ranges,{},snapshot.source_colors,PaintVertexCoordinates{corrupted});},"Independent paint stream corruption cannot pass actual source range validation");
+ auto borrowedRange=snapshot.ranges[0];borrowedRange.material_bindings=snapshot.ranges[1].material_bindings?std::shared_ptr<const SourceMaterialBindings>(snapshot.ranges[1].material_bindings.get(),[](auto*){}):nullptr;refuses([&]{borrowedRange.texture_set_proof->authenticate(borrowedRange);},"Retained range cannot borrow a binding address from a foreign control block");
  auto changed=fields[1]->field();auto draft=changed.painted->snapshot();PaintSettings ink;ink.front_only=false;ink.color={.1f,.8f,.2f,1};Brush brush;brush.from=brush.to={.5f,0,0};brush.normal={0,0,1};brush.radius=1;brush.strength=1;draft->begin_stroke();draft->stamp(brush,ink);check(draft->end_stroke(),"Actual detached member field receives a genuine paint edit");changed.painted=draft->snapshot();auto updated=fields[1]->with_current(changed);updated->validate_field(updated->field());const auto readable=updated->read_view(updated->field());check(owner->matches_current(*readable)&&readable->has_physical_emission(),"New member pixels preserve independent FLOAT/original normal/source ownership");
  auto forged=updated->field();forged.domain=fields[0]->field().domain;refuses([&]{updated->validate_field(forged);},"Another actual set domain cannot authorize the current member");forged=updated->field();forged.material_bindings=std::shared_ptr<const SourceMaterialBindings>(changed.material_bindings.get(),[](auto*){});refuses([&]{updated->validate_field(forged);},"The same binding address with another control block cannot replace field provenance");
  const auto borrowed=std::shared_ptr<const detail::TextureSetFieldSource>(fields[1].get(),[](auto*){});refuses([&]{fields[1]->authenticate_owner(borrowed);},"Field descriptor control blocks remain genuine owners");const auto domain=changed.domain;const auto alias=std::shared_ptr<const TextureSetFaceDomain>(domain.get(),[](auto*){});refuses([&]{domain->authenticate_owner(alias);},"Membership control blocks cannot be fabricated by address equality");

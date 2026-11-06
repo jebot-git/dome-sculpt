@@ -7,9 +7,9 @@ struct TextureSetDraw {
   size_t first=0,count=0;
 };
 // One current geometry authority, one partitioned EBO and one explicit logical
-// corner stream. No per-set Mesh or deformation copy. This immutable plan does
-// not authorize a normal/source/paint sampling field; its first producer guards
-// those owners until the complete per-corner attribute adapter is implemented.
+// corner stream. No per-set Mesh or deformation copy. Plain fields and genuine
+// retained polygon field descriptors have separate owning producers; unsupported
+// source roles and posed retained frames remain explicitly guarded.
 class TextureSetSurfacePlan {
 public:
   uint64_t object()const noexcept{return object_;}
