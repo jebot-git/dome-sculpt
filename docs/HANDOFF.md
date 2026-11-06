@@ -1,4 +1,38 @@
 
+## Initial owning39 actual application and GL workflow — 2026-11-06
+
+The private same-layout application now links complete Archive0ae, Render2aacc
+and Documentf20 TUs against the233 fresh e754 providers; both old core members
+and the old renderer member are explicitly excluded. Public layouts stay exact.
+The first actual GL test exposed a real missing first-object source attribute
+publication: an empty packed prefix never entered the append branch. Document
+now explicitly includes the polygon-field owner; no renderer validator was
+relaxed. The earlier292 native/five-consumer proof keeps its earlier Document
+scope and is not silently relabelled as a rerun withf20.
+
+The actual corrected application passes19 ordinary FLTK controls: pointer paint
+on real canonical baked-normal/key/FLOAT source, native confirmation/default
+Cancel, draft Flip Cancel, Apply plus Save, exact Undo/Redo, clean process close
+and fresh reopen, exact source Restore and its Undo/Redo. The actual new GL
+consumer passes51 controls over eight N-only/canonical, affine/reflected and
+Move/Flip files plus actual imported tiny MToon GLB/image actors. Two polygon
+programs use13 and16 active fragment samplers, respectively; shared unit14 now
+uses one sampler declaration, preserving the OpenGL3.3 minimum. Exact second-eye
+pixels and unchanged geometry/image uploads pass, including mixed ranges.
+
+All observed ELF maps, protected prior inputs and tracked sources remain exact.
+The prior GL failures/ELFs/objects and invalid snapshot-only MToon fixture remain
+preserved. The corrected mixed producer imports its real original GLB, materials
+and images through import_glb; it does not bypass Scene source identity. Read
+[the application receipt](validation/POLYGON-SURFACE-OWNING39-APPLICATION.json).
+
+This is matched component/application proof on software GL and one normal-size
+ordinary X11 opt-in workflow, not SAN, compact/Wayland, hardware/HMD, independent
+full shading oracle or production completion. Root owns a fresh coherent39+40
+composition; repeated edits, broader topology/source/typed domains and portable
+GLB/VRM adapters remain required. Source/ABI reservations are unchanged.
+
+
 ## Remaining five owning39 native consumers closed — 2026-11-06
 
 All five originally planned downstream consumers now pass on the same actual
