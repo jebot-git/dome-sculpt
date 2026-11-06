@@ -1,0 +1,508 @@
+{
+  "source": "769ce32",
+  "baseline_full_build": "984de42f765babb45efcea4128db8c851b7d01a5",
+  "scope": "Complete two changed production TUs plus new whole test and current app link over immutable fresh984 compatible support. No public/private header changes, archive rewrite or copy.",
+  "old_counterexample": {
+    "source": "984de42 production, new test-only polygon controls",
+    "steps": [
+      {
+        "name": "link-unchanged-core",
+        "command": [
+          "/usr/bin/c++",
+          "-O3",
+          "-DNDEBUG",
+          "-Wl,--dependency-file=/home/blux/de-xr/dome-sculpt/artifacts/native-texture-sets-e79dbe9/artifacts/texture-set-initial-release/polygon-counter/link.d",
+          "/home/blux/de-xr/dome-sculpt/artifacts/native-texture-sets-e79dbe9/artifacts/texture-set-initial-release/polygon-counter/test.o",
+          "-o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/native-texture-sets-e79dbe9/artifacts/texture-set-initial-release/polygon-counter/old-policy",
+          "libdome-sculpt-core.a",
+          "libdome-sculpt-affine.a",
+          "/usr/lib64/liblapacke.so",
+          "libdome-sculpt-polygon.a",
+          "libxatlas.a",
+          "libmikktspace.a",
+          "libmikktspace-robust.a",
+          "libufbx.a",
+          "/usr/lib64/libpng.so",
+          "/usr/lib64/libjpeg.so",
+          "/usr/lib64/libz.so",
+          "libdome-sculpt-emission-codec.a",
+          "/usr/lib64/libOpenEXR-3_2.so",
+          "/usr/lib64/libOpenEXRUtil-3_2.so",
+          "/usr/lib64/libOpenEXRCore-3_2.so",
+          "/usr/lib64/libIex-3_2.so",
+          "/usr/lib64/libIlmThread-3_2.so",
+          "/usr/lib64/libImath-3_1.so",
+          "-lgcc_s_asneeded",
+          "-lgcc_s_asneeded"
+        ],
+        "exit": 0,
+        "seconds": 0.35549363400787115
+      },
+      {
+        "name": "actual-old-marker-counter",
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/native-texture-sets-e79dbe9/artifacts/texture-set-initial-release/polygon-counter/old-policy",
+          "/home/blux/de-xr/dome-sculpt/artifacts/native-texture-sets-e79dbe9/artifacts/texture-set-initial-release/polygon-counter/output",
+          "--polygon"
+        ],
+        "exit": 1,
+        "seconds": 0.00782217999221757
+      }
+    ],
+    "before": {
+      "phase": 130097152,
+      "source": 56795136,
+      "free": 23438819328,
+      "prospective": 0
+    },
+    "old_core_sha256": "55b37dbd70e6d7710acc06fc2b3ea8b6abf2b5ae02e82f143f38b2625485f5f3",
+    "test_source_sha256": "f6e4131b5ab6bdc18f5f70c2ddeca19897c5173db84ca99b0593e65adfaa5301",
+    "log": "FAIL Forged raw identity marker must not reinterpret genuine polygon IDs\n",
+    "old_binary_drift": [],
+    "after": {
+      "phase": 142409728,
+      "source": 56795136,
+      "free": 23438819328,
+      "prospective": 0
+    },
+    "expected_counterexample": true,
+    "exit": 0
+  },
+  "current_component": {
+    "state": "terminal",
+    "pid": 2826270,
+    "source": "769ce32",
+    "scope": "Complete two changed production TUs plus new whole test and current app link over immutable fresh984 compatible support. No public/private header changes, archive rewrite or copy.",
+    "steps": [
+      {
+        "name": "compile-texture-sets",
+        "command": [
+          "/usr/bin/c++",
+          "-DDOME_SCULPT_INSTALLED_ASSETS=\"/usr/local/share/dome-sculpt/assets/humanoid\"",
+          "-DDOME_SCULPT_SOURCE_ASSETS=\"/home/blux/de-xr/dome-sculpt/artifacts/native-texture-sets-e79dbe9/assets/humanoid\"",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/native-texture-sets-e79dbe9/third_party",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/native-texture-sets-e79dbe9/include",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/native-texture-sets-e79dbe9/third_party/openbrush",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/native-texture-sets-e79dbe9/third_party/cgltf",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/native-texture-sets-e79dbe9/third_party/nlohmann",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/native-texture-sets-e79dbe9/third_party/xatlas",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/native-texture-sets-e79dbe9/third_party/mikktspace",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/native-texture-sets-e79dbe9/third_party/ufbx",
+          "-O3",
+          "-DNDEBUG",
+          "-std=gnu++20",
+          "-Wall",
+          "-Wextra",
+          "-Wpedantic",
+          "-o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/native-texture-sets-e79dbe9/artifacts/texture-set-initial-release/fixed-component/texture-sets.o",
+          "-c",
+          "/home/blux/de-xr/dome-sculpt/artifacts/native-texture-sets-e79dbe9/src/texture-sets.cpp"
+        ],
+        "before": {
+          "phase": 142577664,
+          "source": 56795136,
+          "free": 23433494528,
+          "prospective": 4194304
+        },
+        "exit": 0,
+        "seconds": 2.4189600779791363,
+        "after": {
+          "phase": 142725120,
+          "source": 56795136,
+          "free": 23433494528,
+          "prospective": 0
+        }
+      },
+      {
+        "name": "compile-texture-set-archive",
+        "command": [
+          "/usr/bin/c++",
+          "-DDOME_SCULPT_INSTALLED_ASSETS=\"/usr/local/share/dome-sculpt/assets/humanoid\"",
+          "-DDOME_SCULPT_SOURCE_ASSETS=\"/home/blux/de-xr/dome-sculpt/artifacts/native-texture-sets-e79dbe9/assets/humanoid\"",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/native-texture-sets-e79dbe9/third_party",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/native-texture-sets-e79dbe9/include",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/native-texture-sets-e79dbe9/third_party/openbrush",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/native-texture-sets-e79dbe9/third_party/cgltf",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/native-texture-sets-e79dbe9/third_party/nlohmann",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/native-texture-sets-e79dbe9/third_party/xatlas",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/native-texture-sets-e79dbe9/third_party/mikktspace",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/native-texture-sets-e79dbe9/third_party/ufbx",
+          "-O3",
+          "-DNDEBUG",
+          "-std=gnu++20",
+          "-Wall",
+          "-Wextra",
+          "-Wpedantic",
+          "-o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/native-texture-sets-e79dbe9/artifacts/texture-set-initial-release/fixed-component/texture-set-archive.o",
+          "-c",
+          "/home/blux/de-xr/dome-sculpt/artifacts/native-texture-sets-e79dbe9/src/texture-set-archive.cpp"
+        ],
+        "before": {
+          "phase": 142725120,
+          "source": 56795136,
+          "free": 23433494528,
+          "prospective": 4194304
+        },
+        "exit": 0,
+        "seconds": 4.723533904994838,
+        "after": {
+          "phase": 142999552,
+          "source": 56795136,
+          "free": 23433494528,
+          "prospective": 0
+        }
+      },
+      {
+        "name": "compile-test",
+        "command": [
+          "/usr/bin/c++",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/native-texture-sets-e79dbe9/include",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/native-texture-sets-e79dbe9/third_party/openbrush",
+          "-I/home/blux/de-xr/dome-sculpt/artifacts/native-texture-sets-e79dbe9/third_party/nlohmann",
+          "-O3",
+          "-DNDEBUG",
+          "-std=gnu++20",
+          "-o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/native-texture-sets-e79dbe9/artifacts/texture-set-initial-release/fixed-component/test.o",
+          "-c",
+          "/home/blux/de-xr/dome-sculpt/artifacts/native-texture-sets-e79dbe9/tests/texture-sets.cpp"
+        ],
+        "before": {
+          "phase": 142999552,
+          "source": 56795136,
+          "free": 23433494528,
+          "prospective": 4194304
+        },
+        "exit": 0,
+        "seconds": 2.969863227044698,
+        "after": {
+          "phase": 143171584,
+          "source": 56795136,
+          "free": 23433494528,
+          "prospective": 0
+        }
+      },
+      {
+        "name": "link-model",
+        "command": [
+          "/usr/bin/c++",
+          "/home/blux/de-xr/dome-sculpt/artifacts/native-texture-sets-e79dbe9/artifacts/texture-set-initial-release/fixed-component/texture-sets.o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/native-texture-sets-e79dbe9/artifacts/texture-set-initial-release/fixed-component/texture-set-archive.o",
+          "-O3",
+          "-DNDEBUG",
+          "-Wl,--dependency-file=/home/blux/de-xr/dome-sculpt/artifacts/native-texture-sets-e79dbe9/artifacts/texture-set-initial-release/fixed-component/model.link.d",
+          "/home/blux/de-xr/dome-sculpt/artifacts/native-texture-sets-e79dbe9/artifacts/texture-set-initial-release/fixed-component/test.o",
+          "-o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/native-texture-sets-e79dbe9/artifacts/texture-set-initial-release/fixed-component/model",
+          "libdome-sculpt-core.a",
+          "libdome-sculpt-affine.a",
+          "/usr/lib64/liblapacke.so",
+          "libdome-sculpt-polygon.a",
+          "libxatlas.a",
+          "libmikktspace.a",
+          "libmikktspace-robust.a",
+          "libufbx.a",
+          "/usr/lib64/libpng.so",
+          "/usr/lib64/libjpeg.so",
+          "/usr/lib64/libz.so",
+          "libdome-sculpt-emission-codec.a",
+          "/usr/lib64/libOpenEXR-3_2.so",
+          "/usr/lib64/libOpenEXRUtil-3_2.so",
+          "/usr/lib64/libOpenEXRCore-3_2.so",
+          "/usr/lib64/libIex-3_2.so",
+          "/usr/lib64/libIlmThread-3_2.so",
+          "/usr/lib64/libImath-3_1.so",
+          "-lgcc_s_asneeded",
+          "-lgcc_s_asneeded",
+          "-Wl,-Map,/home/blux/de-xr/dome-sculpt/artifacts/native-texture-sets-e79dbe9/artifacts/texture-set-initial-release/fixed-component/model.map"
+        ],
+        "before": {
+          "phase": 143171584,
+          "source": 56795136,
+          "free": 23433494528,
+          "prospective": 13942374
+        },
+        "exit": 0,
+        "seconds": 0.26447418599855155,
+        "after": {
+          "phase": 155512832,
+          "source": 56795136,
+          "free": 23433494528,
+          "prospective": 0
+        }
+      },
+      {
+        "name": "link-app",
+        "command": [
+          "/usr/bin/c++",
+          "/home/blux/de-xr/dome-sculpt/artifacts/native-texture-sets-e79dbe9/artifacts/texture-set-initial-release/fixed-component/texture-sets.o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/native-texture-sets-e79dbe9/artifacts/texture-set-initial-release/fixed-component/texture-set-archive.o",
+          "-O3",
+          "-DNDEBUG",
+          "-Wl,--dependency-file=/home/blux/de-xr/dome-sculpt/artifacts/native-texture-sets-e79dbe9/artifacts/texture-set-initial-release/fixed-component/app.link.d",
+          "CMakeFiles/dome-sculpt.dir/src/native-display-runtime.cpp.o",
+          "CMakeFiles/dome-sculpt.dir/src/vrm-expression-editor.cpp.o",
+          "CMakeFiles/dome-sculpt.dir/src/rig-fit-editor.cpp.o",
+          "CMakeFiles/dome-sculpt.dir/src/projection-editor.cpp.o",
+          "CMakeFiles/dome-sculpt.dir/src/spacenav-options.cpp.o",
+          "CMakeFiles/dome-sculpt.dir/src/app.cpp.o",
+          "CMakeFiles/dome-sculpt.dir/src/polygon-editor.cpp.o",
+          "CMakeFiles/dome-sculpt.dir/src/import-editor.cpp.o",
+          "CMakeFiles/dome-sculpt.dir/src/procedural-editor.cpp.o",
+          "CMakeFiles/dome-sculpt.dir/src/resolution-editor.cpp.o",
+          "CMakeFiles/dome-sculpt.dir/src/sculpt-editor.cpp.o",
+          "CMakeFiles/dome-sculpt.dir/src/creator-editor.cpp.o",
+          "CMakeFiles/dome-sculpt.dir/src/rig-editor.cpp.o",
+          "CMakeFiles/dome-sculpt.dir/src/shapekey-editor.cpp.o",
+          "CMakeFiles/dome-sculpt.dir/src/weight-editor.cpp.o",
+          "CMakeFiles/dome-sculpt.dir/src/skin-editor.cpp.o",
+          "CMakeFiles/dome-sculpt.dir/src/mesh-editor.cpp.o",
+          "CMakeFiles/dome-sculpt.dir/src/bake-editor.cpp.o",
+          "CMakeFiles/dome-sculpt.dir/src/object-editor.cpp.o",
+          "CMakeFiles/dome-sculpt.dir/src/paint-editor.cpp.o",
+          "CMakeFiles/dome-sculpt.dir/src/uv-editor.cpp.o",
+          "CMakeFiles/dome-sculpt.dir/src/ui-conventions.cpp.o",
+          "CMakeFiles/dome-sculpt.dir/src/session-appearance.cpp.o",
+          "CMakeFiles/dome-sculpt.dir/src/export-editor.cpp.o",
+          "CMakeFiles/dome-sculpt.dir/third_party/desktop/desktop-menu.cpp.o",
+          "CMakeFiles/dome-sculpt.dir/appmenu-protocol.c.o",
+          "-o",
+          "/home/blux/de-xr/dome-sculpt/artifacts/native-texture-sets-e79dbe9/artifacts/texture-set-initial-release/fixed-component/app",
+          "-L/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-release/lib",
+          "-L/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib",
+          "-Wl,-rpath,/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-release/lib:/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib:",
+          "libdome-sculpt-spacenav.a",
+          "libdome-sculpt-core.a",
+          "libdome-sculpt-render.a",
+          "/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-release/lib/libfltk_images.so.1.4.5",
+          "/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-release/lib/libfltk_gl.so.1.4.5",
+          "/usr/lib64/libGLU.so",
+          "libdome-sculpt-xr.a",
+          "/usr/lib64/libjpeg.so",
+          "/usr/lib64/libpng.so",
+          "/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-release/lib/libfltk.so.1.4.5",
+          "-lcairo",
+          "-L/usr/lib64",
+          "-lX11",
+          "-lGLU",
+          "-lGL",
+          "/usr/lib64/libdl.a",
+          "/usr/lib64/libSM.so",
+          "/usr/lib64/libICE.so",
+          "/usr/lib64/libXext.so",
+          "/usr/lib64/libXinerama.so",
+          "/usr/lib64/libXfixes.so",
+          "/usr/lib64/libXcursor.so",
+          "/usr/lib64/libXrender.so",
+          "/usr/lib64/libXft.so",
+          "/usr/lib64/libwayland-egl.so",
+          "/usr/lib64/libwayland-cursor.so",
+          "/usr/lib64/libxkbcommon.so",
+          "/usr/lib64/libGLX.so",
+          "/usr/lib64/libOpenGL.so",
+          "/usr/lib64/libz.so",
+          "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libcairo.so",
+          "libdome-sculpt-render.a",
+          "libdome-sculpt-core.a",
+          "libdome-sculpt-affine.a",
+          "/usr/lib64/liblapacke.so",
+          "libdome-sculpt-polygon.a",
+          "libxatlas.a",
+          "libmikktspace.a",
+          "libmikktspace-robust.a",
+          "libufbx.a",
+          "/usr/lib64/libpng.so",
+          "/usr/lib64/libjpeg.so",
+          "/usr/lib64/libz.so",
+          "libdome-sculpt-emission-codec.a",
+          "/usr/lib64/libOpenEXR-3_2.so",
+          "/usr/lib64/libOpenEXRUtil-3_2.so",
+          "/usr/lib64/libOpenEXRCore-3_2.so",
+          "/usr/lib64/libIex-3_2.so",
+          "/usr/lib64/libIlmThread-3_2.so",
+          "/usr/lib64/libImath-3_1.so",
+          "/usr/lib64/libEGL.so",
+          "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libharfbuzz.so",
+          "/usr/lib64/libGL.so",
+          "/usr/lib64/libfontconfig.so",
+          "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime/lib/libfreetype.so",
+          "/usr/lib64/libicui18n.so",
+          "/usr/lib64/libicuuc.so",
+          "/usr/lib64/libopenxr_loader.so",
+          "/usr/lib64/libgio-2.0.so",
+          "/usr/lib64/libgobject-2.0.so",
+          "/usr/lib64/libglib-2.0.so",
+          "/usr/lib64/libX11.so",
+          "/usr/lib64/libwayland-client.so",
+          "-lm",
+          "-lgcc_s_asneeded",
+          "-lgcc_s_asneeded",
+          "-Wl,-Map,/home/blux/de-xr/dome-sculpt/artifacts/native-texture-sets-e79dbe9/artifacts/texture-set-initial-release/fixed-component/app.map"
+        ],
+        "before": {
+          "phase": 155512832,
+          "source": 56795136,
+          "free": 23433494528,
+          "prospective": 24634163
+        },
+        "exit": 0,
+        "seconds": 0.46514972497243434,
+        "after": {
+          "phase": 178044928,
+          "source": 56795136,
+          "free": 23433494528,
+          "prospective": 0
+        }
+      },
+      {
+        "name": "native-original32",
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/native-texture-sets-e79dbe9/artifacts/texture-set-initial-release/fixed-component/model",
+          "/home/blux/de-xr/dome-sculpt/artifacts/native-texture-sets-e79dbe9/artifacts/texture-set-initial-release/fixed-component/model-output"
+        ],
+        "before": {
+          "phase": 178044928,
+          "source": 56795136,
+          "free": 23433494528,
+          "prospective": 0
+        },
+        "exit": 0,
+        "seconds": 0.015770450001582503,
+        "after": {
+          "phase": 178139136,
+          "source": 56795136,
+          "free": 23433494528,
+          "prospective": 0
+        }
+      },
+      {
+        "name": "native-polygon6",
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/native-texture-sets-e79dbe9/artifacts/texture-set-initial-release/fixed-component/model",
+          "/home/blux/de-xr/dome-sculpt/artifacts/native-texture-sets-e79dbe9/artifacts/texture-set-initial-release/fixed-component/polygon-output",
+          "--polygon"
+        ],
+        "before": {
+          "phase": 178139136,
+          "source": 56795136,
+          "free": 23433494528,
+          "prospective": 0
+        },
+        "exit": 0,
+        "seconds": 0.007797377009410411,
+        "after": {
+          "phase": 178143232,
+          "source": 56795136,
+          "free": 23433494528,
+          "prospective": 0
+        }
+      }
+    ],
+    "product_delta": [
+      "src/texture-set-archive.cpp",
+      "src/texture-sets.cpp"
+    ],
+    "headers_exact_984": true,
+    "model_old_two_members_absent": true,
+    "app_old_two_members_absent": true,
+    "exit": 0,
+    "source_drift": [],
+    "old_binary_drift": [],
+    "space": {
+      "phase": 178298880,
+      "source": 56795136,
+      "free": 23433494528,
+      "prospective": 0
+    }
+  },
+  "tests": {
+    "original_model": 32,
+    "polygon": 6,
+    "ctest_registration": "Original32 was executed through CTest on984; final32+6 are actual explicit whole-consumer commands in fixed status. New polygon CTest is registered in source for next fresh configure."
+  },
+  "binary_hash_scope": "New component hashes are captured after execution. Original223 immutable984 binary hashes checked before/after and exact. No retroactive new before-run hash claim.",
+  "no_source_header_or_api_delta": true,
+  "old_two_archive_members_absent_both_links": true,
+  "no_archive_rewrite_or_copy": true,
+  "additional_phase_blocks_from_first_gate": 48394240,
+  "maximum_incremental_allowance": 50331648,
+  "first_fresh_gate_scope_preserved": true,
+  "evidence": {
+    "polygon-counter/status.json": {
+      "path": "artifacts/texture-set-initial-release/polygon-counter/status.json",
+      "sha256": "fad8ad3db1c7452376e0a610bb6aacf4267a4eea5037284784fc72dc32a15ded"
+    },
+    "polygon-counter/compile-command.json": {
+      "path": "artifacts/texture-set-initial-release/polygon-counter/compile-command.json",
+      "sha256": "8b0870d536df039d2ea204c038413a36c78ec97274cf1e6041a1628459ab7d29"
+    },
+    "polygon-counter/test-source.cpp": {
+      "path": "artifacts/texture-set-initial-release/polygon-counter/test-source.cpp",
+      "sha256": "f6e4131b5ab6bdc18f5f70c2ddeca19897c5173db84ca99b0593e65adfaa5301"
+    },
+    "polygon-counter/old-policy.log": {
+      "path": "artifacts/texture-set-initial-release/polygon-counter/old-policy.log",
+      "sha256": "d16853c525db013bf704774e2090530090a49a1bb0b8d7890c1b80f8811714d9"
+    },
+    "fixed-component/run.py": {
+      "path": "artifacts/texture-set-initial-release/fixed-component/run.py",
+      "sha256": "7b688283eaee534efa350d7878d214f38490a14524ff0f5387c0a709ac4e7b81"
+    },
+    "fixed-component/status.json": {
+      "path": "artifacts/texture-set-initial-release/fixed-component/status.json",
+      "sha256": "59532beadef231f3cd61a249424d967e0bbc0ec4afe784ae37c255964645e65d"
+    },
+    "fixed-component/source-before.json": {
+      "path": "artifacts/texture-set-initial-release/fixed-component/source-before.json",
+      "sha256": "b3356d67620081ab02d375c7225e943f4f6fabeb687c3af048eee78e6b0719d5"
+    },
+    "fixed-component/source-after.json": {
+      "path": "artifacts/texture-set-initial-release/fixed-component/source-after.json",
+      "sha256": "b3356d67620081ab02d375c7225e943f4f6fabeb687c3af048eee78e6b0719d5"
+    },
+    "fixed-component/binary-hashes.json": {
+      "path": "artifacts/texture-set-initial-release/fixed-component/binary-hashes.json",
+      "sha256": "656d80dc81ef9ade09aa54b5c033db644c35a7ced2c63c5b78e3d9d426a1a326"
+    },
+    "fixed-component/compile-texture-sets.log": {
+      "path": "artifacts/texture-set-initial-release/fixed-component/compile-texture-sets.log",
+      "sha256": "e7e66598117615fd23ac9a1846c7d66bffa537e7280a80cb93231ce5ccbf78cf"
+    },
+    "fixed-component/compile-texture-set-archive.log": {
+      "path": "artifacts/texture-set-initial-release/fixed-component/compile-texture-set-archive.log",
+      "sha256": "f2157e345ca44a4463f84dfcb0cb4a56a6d9959f5907685e7d3a86f30933dcd2"
+    },
+    "fixed-component/compile-test.log": {
+      "path": "artifacts/texture-set-initial-release/fixed-component/compile-test.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "fixed-component/link-model.log": {
+      "path": "artifacts/texture-set-initial-release/fixed-component/link-model.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "fixed-component/link-app.log": {
+      "path": "artifacts/texture-set-initial-release/fixed-component/link-app.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "fixed-component/native-original32.log": {
+      "path": "artifacts/texture-set-initial-release/fixed-component/native-original32.log",
+      "sha256": "e49e116ed15972c5d72bf12a3f1c32f674ee8ecc36b971e3b80a9aa200e1ff64"
+    },
+    "fixed-component/native-polygon6.log": {
+      "path": "artifacts/texture-set-initial-release/fixed-component/native-polygon6.log",
+      "sha256": "0935d81c0d856b1b25214894cea1b1fd2e9a1ffd1a488084b134e28f489287d9"
+    },
+    "fixed-component/model.map": {
+      "path": "artifacts/texture-set-initial-release/fixed-component/model.map",
+      "sha256": "4e2138b175991518beb4cf74851eb1614b2f42e82ba21d84ef70699e7690f806"
+    },
+    "fixed-component/app.map": {
+      "path": "artifacts/texture-set-initial-release/fixed-component/app.map",
+      "sha256": "5d19850861da4a7ab989cc0e2d42e90ae71ae347b9d112f63e0a4683138647bb"
+    }
+  },
+  "remaining": "All complex codec/retained history, full resource/fault proof, subset renderer/query/stencil, native Document/FLTK/XR controls, per-set Bake/resolution/UV/topology and actual multi-primitive import/export remain required. No sanitizer/device/UI or main admission claim."
+}

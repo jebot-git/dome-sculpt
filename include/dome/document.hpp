@@ -18,6 +18,7 @@
 #include "polygon-controls.hpp"
 #include "cut-authoring.hpp"
 #include "native-stroke.hpp"
+#include "texture-sets.hpp"
 #include "projection-tool.hpp"
 #include "shapekey-authoring.hpp"
 #include <atomic>
@@ -30,6 +31,7 @@
 #include <thread>
 namespace dome {
 class MaterialSurfaceQuery;
+namespace detail {class TextureSetRangeProof;class TextureSetStrokeLease;}
 struct SpatialHand {
   TrackedHand tracked;
   bool joystick = false;
@@ -80,6 +82,7 @@ struct AssetWork {
   std::atomic_bool done{false};
 };
 struct AssetStatus { bool cancellable=false, cancelling=false; float progress=0; };
+struct TextureSetInfo {uint32_t id=0;std::string name;uint32_t resolution=0;size_t triangles=0;};
 struct EditorState {
   uint64_t revision = 1, generation = 1, input_epoch = 1;
   bool dirty = false, stroking = false, menu = false;
@@ -180,6 +183,11 @@ struct EditorState {
   uint64_t view_epoch = 1;
   std::shared_ptr<const RigFitView> rig_fit;
   std::shared_ptr<const VrmExpressionView> expressions;
+  uint32_t active_texture_set=0;
+  std::vector<TextureSetInfo> texture_sets;
+  Material texture_material;
+  bool can_edit_texture_sets=false,texture_face_select=false;
+  std::vector<uint64_t> texture_faces;
 };
 struct SurfaceRange {
   uint64_t object;
@@ -197,6 +205,8 @@ struct SurfaceRange {
   bool paint_winding_reversed=false; // Actual packed index flip, not cull mode.
   std::shared_ptr<const NormalPreviewProof> normal_preview_proof{};
   bool pbr_view = false;
+  uint32_t texture_set=0; // Object-local persistent material slot, not a raw material table index.
+  std::shared_ptr<const detail::TextureSetRangeProof> texture_set_proof;
 };
 struct SculptMeshingStats {
   size_t objects_reused=0,local_updates=0,full_rebuilds=0,history_fallbacks=0,capacity_fallbacks=0;
@@ -293,6 +303,9 @@ public:
   std::optional<uint64_t> pick_object(Vec3,Vec3,double material_time=0) const;
   void replace(Volume, bool clean = true);
   void seed();
+  void edit_texture_set(TextureSetEdit,AssetSource expected = {});
+  void texture_set_action(SpatialCommand);
+  bool texture_face_pointer(Vec3 origin,Vec3 direction,bool additive=false,double material_time=0);
   bool begin_native_stroke();
   void configure_shape_sculpt(bool enabled);
   void select_shape_target(uint32_t target, AssetSource expected = {});
@@ -688,6 +701,7 @@ private:
     std::optional<AffineTransform> affine_world;
     std::shared_ptr<const DeformationState> deformation;
     std::shared_ptr<const Scene> initial;
+    std::shared_ptr<const detail::TextureSetStrokeLease> texture_set;
     std::shared_ptr<const MeshSnapshot> original_preview;
     std::optional<size_t> shape_target;
     uint32_t spatial_owner=0;
@@ -825,6 +839,7 @@ private:
     bool uv_keep_normals=false;
     bool uv_keep_paint=false;
     std::shared_ptr<ProjectionLoad> projection_load;
+    std::shared_ptr<const detail::TextureSetStrokeLease> texture_set_source;
   };
   // One running job plus the bounded eight-entry ordered file queue.
   // Protected by model_mutex_; explicit Cancel owns the phase transition.
@@ -900,11 +915,19 @@ private:
     std::vector<uint8_t> locks;
     bool use_locks=false;
   };
+  void queue_texture_set_locked(TextureSetEdit,AssetSource = {});
+  bool texture_face_pointer_locked(Vec3,Vec3,bool,double);
+  void texture_set_command_locked(SpatialCommand);
+  bool texture_set_command_enabled_locked(SpatialCommand)const;
+  std::shared_ptr<const Mesh> texture_face_geometry_;
+  uint64_t texture_face_object_=0;
+  std::array<bool,2> texture_face_pressed_{true,true};
   void queue_scene_operation_locked(std::string, SceneOperation, AssetSource,
                                     std::shared_ptr<std::string>, std::shared_ptr<AssetWork> = {}, std::shared_ptr<bool> = {},
                                     std::shared_ptr<const MeshSnapshot> = {}, uint64_t retopo_session = 0,
                                     uint64_t cut_session = 0, std::shared_ptr<CutHandoff> = {},
-                                    std::optional<BakeAdmission> = {}, uint64_t uv_restore_session = 0, std::optional<SkinAdmission> = {});
+                                    std::optional<BakeAdmission> = {}, uint64_t uv_restore_session = 0, std::optional<SkinAdmission> = {},
+                                    std::shared_ptr<const detail::TextureSetStrokeLease> texture_set_source = {});
   std::vector<uint64_t> bake_sources_locked() const;
   bool bake_source_eligible_locked(uint64_t) const;
   std::vector<uint64_t> bake_cages_locked() const;

@@ -1,0 +1,64 @@
+{
+  "status": "PROPOSAL ONLY; root has not released configure/build/link slot",
+  "source_commit": "cf5c672c9b3c6174ee00d0c22f05d5c64776878d",
+  "source_receipt": "docs/validation/TEXTURE-SETS-SURFACE-SOURCE.json",
+  "new_directory": "/home/blux/de-xr/dome-sculpt/artifacts/native-texture-sets-e79dbe9/artifacts/texture-set-surfaces-release",
+  "old_directory_readonly": "/home/blux/de-xr/dome-sculpt/artifacts/native-texture-sets-e79dbe9/artifacts/texture-set-initial-release",
+  "fresh_project_inputs": "No reused project .o/.a/.so/app/test; existing first225-step Release products remain byte protected. Canonical external SDK is read only.",
+  "profile": "Optimized Release CPU; default FLTK and XR targets enabled; no GPU/UI/HMD execution",
+  "targets": [
+    "dome-sculpt",
+    "dome-sculpt-texture-sets-test",
+    "dome-sculpt-texture-set-surfaces-test"
+  ],
+  "tests_after_build": [
+    "dome-sculpt-texture-sets",
+    "dome-sculpt-texture-sets-polygon",
+    "dome-sculpt-texture-sets-plan",
+    "dome-sculpt-texture-set-surfaces"
+  ],
+  "commands_profile": {
+    "generator": "Ninja",
+    "build_type": "Release",
+    "backend": "CPU",
+    "UI": true,
+    "XR": true,
+    "BUILD_TESTING": true,
+    "parallel": 2,
+    "nice": 15
+  },
+  "sdk": {
+    "fltk": "/home/blux/de-xr/DomeD/artifacts/fltk-poll-final/artifacts/toolkit-poll-final-release",
+    "bitmap": "/home/blux/de-xr/DomeD/artifacts/cairo-shm-drain-f797/artifacts/bitmap-runtime",
+    "acceptance": "Current canonical27/poll and53 manifest/library acceptance must pass CMake, exact current inputs hashed before/after."
+  },
+  "storage": {
+    "source_metadata_existing_cap_bytes": 268435456,
+    "existing_phase_allocated_blocks_bytes": 178302976,
+    "combined_phase_hard_cap_bytes": 402653184,
+    "combined_phase_includes": "Original immutable first Release/counter/component artifacts plus all new build/output/maps/metadata in separate directory.",
+    "remaining_phase_bytes": 224350208,
+    "estimated_new_actual_bytes": 155189248,
+    "prospective_serial_link_reserve_bytes": 67108864,
+    "estimate_plus_reserve_and_existing_bytes": 400601088,
+    "estimate_margin_bytes": 2052096,
+    "actual_free_observed_bytes": 22689099776,
+    "hard_floor_bytes": 21474836480,
+    "correction": "Earlier informal150MiB upper forecast plus64MiB reserve exceeded384MiB by40,960B. Formal estimate is148MiB; cumulative cap remains unchanged. Actual guard, not this estimate, controls every launch."
+  },
+  "finite_budgets_seconds": {
+    "configure": 120,
+    "build": 2400,
+    "each_test": 180
+  },
+  "guards": [
+    "No launch before root capacity release",
+    "Hard actual free>=20GiB with prospective link reserve and root concurrency coordination",
+    "Combined old+new allocated-block cap384MiB and separate source/metadata256MiB",
+    "Serialized links; stop before link if cap/floor+reserve cannot fit",
+    "Preserve all original failures, immutable first223 hashes and source/SDK/index hashes",
+    "Capture fresh compile flags/commands, actual dependency hashes, project binaries and link maps before/after tests",
+    "On any failed build/test retain result/source and close job before edits; no old library overlay",
+    "No SAN/UI/device claim or action; current tests only after complete fresh reachable cohort closes"
+  ]
+}

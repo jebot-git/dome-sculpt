@@ -1,0 +1,91 @@
+{
+  "scope": "Unbuilt public SurfaceRange append and private per-set field/query stage",
+  "base": "2249d08",
+  "syntax_path": "artifacts/texture-set-syntax/range-query/status.json",
+  "syntax_sha256": "68b30b1fe1dce71e9bdcf6286df72d6936f603ad5df39947b2646cabc8ee3790",
+  "syntax": {
+    "scope": "Syntax only; no objects, link, build or execution evidence",
+    "compiler": "g++ (GCC) 16.2.1 20260819 (Red Hat 16.2.1-2)\nCopyright (C) 2026 Free Software Foundation, Inc.\nThis is free software; see the source for copying conditions.  There is NO\nwarranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\n",
+    "results": [
+      {
+        "source": "src/texture-set-surface.cpp",
+        "args": [
+          "/usr/bin/g++",
+          "-std=c++20",
+          "-fsyntax-only",
+          "-Iinclude",
+          "-Isrc",
+          "-Ithird_party",
+          "-Ithird_party/openbrush",
+          "-Ithird_party/nlohmann",
+          "src/texture-set-surface.cpp"
+        ],
+        "returncode": 0,
+        "seconds": 0.795150657009799
+      },
+      {
+        "source": "src/texture-set-range.cpp",
+        "args": [
+          "/usr/bin/g++",
+          "-std=c++20",
+          "-fsyntax-only",
+          "-Iinclude",
+          "-Isrc",
+          "-Ithird_party",
+          "-Ithird_party/openbrush",
+          "-Ithird_party/nlohmann",
+          "src/texture-set-range.cpp"
+        ],
+        "returncode": 0,
+        "seconds": 1.4186281050206162
+      },
+      {
+        "source": "src/material-visibility.cpp",
+        "args": [
+          "/usr/bin/g++",
+          "-std=c++20",
+          "-fsyntax-only",
+          "-Iinclude",
+          "-Isrc",
+          "-Ithird_party",
+          "-Ithird_party/openbrush",
+          "-Ithird_party/nlohmann",
+          "src/material-visibility.cpp"
+        ],
+        "returncode": 0,
+        "seconds": 2.0376423730049282
+      },
+      {
+        "source": "tests/texture-sets.cpp",
+        "args": [
+          "/usr/bin/g++",
+          "-std=c++20",
+          "-fsyntax-only",
+          "-Iinclude",
+          "-Isrc",
+          "-Ithird_party",
+          "-Ithird_party/openbrush",
+          "-Ithird_party/nlohmann",
+          "tests/texture-sets.cpp"
+        ],
+        "returncode": 0,
+        "seconds": 1.3449299249914475
+      }
+    ],
+    "drift": []
+  },
+  "field_api": [
+    "SurfaceRange.texture_set uint32, default0",
+    "SurfaceRange.texture_set_proof shared<const private proof>",
+    "MaterialSurfaceQuery material_identity/logical_triangle/raycast_excluding_materials"
+  ],
+  "source_only_guards": "Scene surfaces remain refused until the complete per-set producer/consumer and packed-map proof exists. Complex owners remain guarded.",
+  "future_required": [
+    "Full object+set renderer cache identity",
+    "Exact packed index/logical corner maps and necessary attribute boundary splits",
+    "Single geometry/pose stream worker producer",
+    "Independent old object exclusion and new same-object set occlusion tests",
+    "Fresh complete new-header consumers before runtime"
+  ],
+  "no_runtime_scope_extension": true
+}

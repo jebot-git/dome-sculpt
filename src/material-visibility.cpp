@@ -1,5 +1,6 @@
 #include "native-paint-sampling.hpp"
 #include "native-paint-metadata.hpp"
+#include "texture-set-range.hpp"
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/material-visibility.hpp"
 #include "dome/document.hpp"
@@ -55,6 +56,8 @@ struct Visibility {
   std::vector<std::array<float,2>> paint_corners;
   explicit Visibility(const SurfaceRange &r, const Mesh &mesh,
                       std::span<const std::array<float,4>> packed_colors, bool explicit_colors, std::span<const std::array<float,2>> coordinates, bool per_vertex) : range(r) {
+    if(r.texture_set_proof){r.texture_set_proof->authenticate_stream(mesh,r);r.texture_set_proof->authenticate_tint(mesh,r,packed_colors);}
+    else if(r.texture_set)throw std::invalid_argument("Visibility texture set lacks its actual field/range proof");
     cull = r.material.double_sided ? MToonCull::Off : MToonCull::Back;
     alpha = r.material.alpha; cutoff = r.material.alpha_cutoff; factor = r.material.color[3];
     auto maps = r.textures;
@@ -137,7 +140,7 @@ struct Visibility {
       color.validate(maps&&maps->source_maps?maps->source_maps->coordinate_count():owned_uv1?2:1);
       if(prepared){color=derived_view(maps,maps->pbr_color);color.wrap_s=color.wrap_t=33071;color.min_filter=color.mag_filter=9729;}
       if(explicit_colors) {
-        if(!packed_colors.empty()) {
+        if(!packed_colors.empty()&&!r.texture_set_proof) {
           size_t end=r.first_vertex;
           for(size_t c=r.first;c<r.first+r.count;++c){auto v=mesh.indices.at(c);if(v<r.first_vertex)throw std::invalid_argument("Packed visibility color offset is outside its range");end=std::max(end,size_t(v)+1);}
           if(end>packed_colors.size())throw std::invalid_argument("Packed visibility color range is incomplete");
@@ -371,5 +374,31 @@ std::optional<SurfaceHit> MaterialSurfaceQuery::raycast_excluding(Vec3 origin, V
       found->visible(impl_->query.mesh(),triangle,bary,direction,seconds);
   };
   return impl_->query.raycast(origin,direction,maximum,options);
+}
+SurfaceMaterialIdentity MaterialSurfaceQuery::material_identity(uint32_t triangle)const{
+ const auto corner=size_t(triangle)*3;
+ auto found=std::upper_bound(impl_->surfaces.begin(),impl_->surfaces.end(),corner,[](size_t at,const Visibility&v){return at<v.range.first;});
+ if(found==impl_->surfaces.begin())throw std::out_of_range("Material query triangle has no range");--found;
+ if(corner>=found->range.first+found->range.count)throw std::out_of_range("Material query triangle is outside its range");
+ return {found->range.object,found->range.texture_set};
+}
+uint32_t MaterialSurfaceQuery::logical_triangle(uint32_t triangle)const{
+ (void)material_identity(triangle);const auto corner=size_t(triangle)*3;
+ auto found=std::upper_bound(impl_->surfaces.begin(),impl_->surfaces.end(),corner,[](size_t at,const Visibility&v){return at<v.range.first;});--found;
+ const auto local=corner-found->range.first;
+ return found->range.texture_set_proof?found->range.texture_set_proof->logical_corner(local,false)/3:uint32_t(local/3);
+}
+std::optional<SurfaceHit> MaterialSurfaceQuery::raycast_excluding_materials(Vec3 origin,Vec3 direction,
+    float maximum,double seconds,std::span<const SurfaceMaterialIdentity>excluded)const{
+ if(!std::isfinite(seconds))throw std::invalid_argument("Invalid visibility animation time");
+ SurfaceQueryOptions options;options.max_triangle_tests=65536;
+ options.ray_filter=[&](uint32_t triangle,const std::array<float,3>&bary){
+  const auto corner=size_t(triangle)*3;
+  auto found=std::upper_bound(impl_->surfaces.begin(),impl_->surfaces.end(),corner,[](size_t at,const Visibility&v){return at<v.range.first;});
+  if(found==impl_->surfaces.begin())return false;--found;
+  const SurfaceMaterialIdentity identity{found->range.object,found->range.texture_set};
+  return corner<found->range.first+found->range.count&&std::find(excluded.begin(),excluded.end(),identity)==excluded.end()&&found->visible(impl_->query.mesh(),triangle,bary,direction,seconds);
+ };
+ return impl_->query.raycast(origin,direction,maximum,options);
 }
 } // namespace dome

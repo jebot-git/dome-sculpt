@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #pragma once
 #include "mesh-processing.hpp"
+#include "surface-material.hpp"
 #include "mtoon.hpp"
 #include <optional>
 #include <span>
@@ -34,6 +35,11 @@ public:
   ~MaterialSurfaceQuery();
   MaterialSurfaceQuery(const MaterialSurfaceQuery &) = delete;
   MaterialSurfaceQuery &operator=(const MaterialSurfaceQuery &) = delete;
+  SurfaceMaterialIdentity material_identity(uint32_t query_triangle)const;
+  uint32_t logical_triangle(uint32_t query_triangle)const;
+  // Per-material exclusion leaves other sets on the same object visible.
+  std::optional<SurfaceHit> raycast_excluding_materials(Vec3,Vec3,float,double,
+      std::span<const SurfaceMaterialIdentity>)const;
   SurfaceHit closest(Vec3) const;
   SurfaceHit closest(Vec3,uint64_t only_object) const;
   std::optional<SurfaceHit> nearby(Vec3, float maximum, double seconds=0) const;
