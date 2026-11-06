@@ -81,7 +81,7 @@ void query(){
  auto foreign=overlap(false);auto plan=detail::prepare_texture_set_surface(foreign.active());refuses([&]{layout->authenticate_plan(*plan);},"Numerically equal foreign geometry/membership owners cannot reuse the packed layout");
  const auto old_collection=s.active().texture_sets;edit_texture_set(s,s.active().id,1,[](PaintedMesh&p,Material&m){m.roughness=.25f;p.add_layer("Independent metadata");return true;});
  plan=detail::prepare_texture_set_surface(s.active());check(old_collection!=s.active().texture_sets&&layout->matches_plan(*plan),"A genuine paint/material edit changes its field owner without rebuilding the unchanged geometry-only layout");
- const auto before_invalid_merge=s.encode();refuses([&]{assign_texture_set_faces(s,s.active().id,1,std::array<uint64_t,1>{1});},"Two depth-separated faces with identical UVs cannot silently become independently writable in one Strict material grid");check(s.encode()==before_invalid_merge,"Ambiguous same-grid reassignment preserves every set, image, source and ID exactly");
+ const auto before_invalid_merge=s.encode();const auto merge_collection=s.active().texture_sets;const auto merge_primary=s.active().painted;const auto merge_extra=s.active().texture_sets->at(1).painted;refuses([&]{assign_texture_set_faces(s,s.active().id,1,std::array<uint64_t,1>{1});},"Two depth-separated faces with identical UVs cannot silently become independently writable in one Strict material grid");check(s.encode()==before_invalid_merge,"Ambiguous same-grid reassignment preserves every set, image, source and ID exactly");check(s.active().texture_sets==merge_collection&&s.active().painted==merge_primary&&s.active().texture_sets->at(1).painted==merge_extra,"Strict reassignment refusal preserves the actual collection and both field owners");
  create_texture_set(s,s.active().id,std::array<uint64_t,1>{1},"Genuine changed face membership");plan=detail::prepare_texture_set_surface(s.active());check(!layout->matches_plan(*plan),"Changing actual material membership invalidates the packed EBO dependency");
  check(exact!=s.encode(),"The COW/cache controls used actual state-changing edits");
 }
@@ -102,6 +102,13 @@ void native(){
  check(f.state->error.empty()&&f.surface->ranges.size()==2&&f.surface->picking,"Actual immutable native endpoint contains both genuine ranges and material-aware picking");
  check(f.surface->ranges[0].object==f.surface->ranges[1].object&&f.surface->ranges[0].texture_set!=f.surface->ranges[1].texture_set,"Actual producer keeps one native object and distinct persistent material slots");
  check(doc.copy_scene().encode()==original,"Worker surface preparation cannot mutate native paint, memberships, history or source state");
+ auto distinct=overlap(false);Document denied;denied.replace(distinct);check(denied.wait_mesh(std::chrono::seconds(30)),"Distinct-depth actual native endpoint is ready before the rejected assignment");
+ const auto before=denied.copy_scene();const auto values=before.encode();const auto owner=before.active().texture_sets;const auto history=denied.frame().state->can_undo;
+ denied.edit_scene("Reject ambiguous same-grid material assignment",[object=distinct.active().id](Scene&scene,const auto&cancelled){TextureSetLimits limits;limits.cancelled=cancelled;assign_texture_set_faces(scene,object,1,std::array<uint64_t,1>{1},limits);});
+ check(denied.wait_asset(std::chrono::seconds(30)),"Actual rejected material worker terminates without publishing a partial endpoint");
+ const auto refused=denied.copy_scene();check(refused.encode()==values&&refused.active().texture_sets==owner&&refused.active().painted->mesh_owner()==before.active().painted->mesh_owner(),"Actual native worker refusal preserves full Scene and genuine geometry/collection owners");
+ check(denied.frame().state->can_undo==history&&denied.frame().state->error.find("Overlapping UV islands")!=std::string::npos,"Actual native refusal retains its strict cause and adds no history entry");
+ denied.save("strict-reassignment-preserved.dsculpt");check(Scene::load("strict-reassignment-preserved.dsculpt").encode()==values,"Subsequent real native Save/reopen retains the exact pre-refusal material fields");
 }
 }
 int main()try{initial_controls();raster();query();boundary();native();std::cout<<"PASS "<<checks<<" texture-set raster/worker/query controls\n";return 0;}catch(const std::exception&e){std::cerr<<"FAIL "<<e.what()<<'\n';return 1;}
