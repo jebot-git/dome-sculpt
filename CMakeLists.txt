@@ -4916,6 +4916,7 @@ if(BUILD_TESTING)
 endif()
 
 include(tests/texture-set-resolution-workflows.cmake)
+include(tests/sculpt-sustained.cmake)
 
 # Manual owning-workspace regression; production reference is an explicit argv.
 if(BUILD_TESTING)

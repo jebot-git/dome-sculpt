@@ -1,3 +1,14 @@
+## New authoring and production-memory source composition — 2026-11-06
+
+Read [SCULPT-AUTHORING-NEXT.md](SCULPT-AUTHORING-NEXT.md). This private child
+combines matched d1 with14eb983f,4d1466b0,d84f5450: source-preserving texture
+fields/history/export, all-channel resize and actual UI/loader tests, plus bounded
+cold index construction and scoped scratch. Renderer tuple identity and actual
+member-domain checks are both retained. No runtime qualification of this union
+yet; fresh whole providers and the unchanged production predicates are required.
+The complete original goal remains active. Independent d1 is frozen for current
+inherited VRM1 role regression. No install or desktop-session restart.
+
 ## Private matched sculpt/material qualification — 2026-11-06
 
 Current `d1f40159` now passes matched Release/SAN: 15 selected native suites,
