@@ -345,7 +345,10 @@ MaterialSurfaceQuery::MaterialSurfaceQuery(const Mesh &mesh,std::span<const Surf
     if(std::any_of(ranges.begin(),ranges.end(),[&](const auto &range){return range.object==object.object;}))
       throw std::invalid_argument("A mixed object cannot occupy both packed and chunk namespaces");
   }
-  impl_->chunks=std::move(chunks);
+  // An empty generated-geometry directory carries capture metadata only.
+  // Its packed triangles still have the single legacy namespace. Retain a
+  // mixed namespace only when it actually contains generated geometry.
+  if(!chunks->objects().empty())impl_->chunks=std::move(chunks);
 }
 MaterialSurfaceQuery::~MaterialSurfaceQuery() = default;
 namespace {
