@@ -1,3 +1,34 @@
+## Resumed combined candidate: source frozen for fresh verification — 2026-11-06
+
+The complete original goal is resumed, with current milestone integration first.
+The native paint adapter repair ccdf59e1 passes eight focused native routes and
+655 export controls; root additionally validates all five sourceful GLBs with
+the pinned Khronos validator: zero errors and warnings, two infos per file.
+Main62981755 status/remesh records are now composed with the current product
+candidate. A fresh whole32-target Release/native/graphics/GUI/loader/P1 cycle is
+next; focused component evidence does not qualify that full union. Matching SAN,
+current inherited role readers and appropriate device evidence remain required.
+Earlier paused and pending status entries below are historical. All original
+requirements remain incomplete; no installation or new headset acceptance.
+
+## Goal resumed: current component integration — 2026-11-06
+
+The user has resumed the full goal and prioritized milestone integration and a
+combined build. Read [INTEGRATION-RESUME-20261106.md](INTEGRATION-RESUME-20261106.md).
+Fresh private2228 Release builds all32 selected targets; native21/22 and both
+independent workspace gates pass. Source-export failure is retained and a focused
+adapter repair is under verification. No main product admission or complete goal
+claim. The earlier pause instruction is superseded; historical notes follow.
+
+## User-requested pause — 2026-11-06
+
+The original objective and every unfinished row remain required. The goal is
+paused after the source/resize/cold-publication milestone, not completed. Read
+[PAUSE-CHECKPOINT-20261106.md](PAUSE-CHECKPOINT-20261106.md) for exact source and
+verification scopes, outstanding failures and guarded process resumption. The
+old c618 remesh SAN sweep now has complete final coverage; this does not admit
+the changed later authoring candidates or complete broader production work.
+
 ## Private matched sculpt/material evidence — 2026-11-06
 
 Private `d1f40159` has matching Release/SAN qualification for 15 selected native

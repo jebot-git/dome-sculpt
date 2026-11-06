@@ -1,3 +1,36 @@
+## Resumed combined candidate: source frozen for fresh verification — 2026-11-06
+
+The complete original goal is resumed, with current milestone integration first.
+The native paint adapter repair ccdf59e1 passes eight focused native routes and
+655 export controls; root additionally validates all five sourceful GLBs with
+the pinned Khronos validator: zero errors and warnings, two infos per file.
+Main62981755 status/remesh records are now composed with the current product
+candidate. A fresh whole32-target Release/native/graphics/GUI/loader/P1 cycle is
+next; focused component evidence does not qualify that full union. Matching SAN,
+current inherited role readers and appropriate device evidence remain required.
+Earlier paused and pending status entries below are historical. All original
+requirements remain incomplete; no installation or new headset acceptance.
+
+## Goal resumed: current component integration — 2026-11-06
+
+The user has resumed the full goal and prioritized milestone integration and a
+combined build. Read [INTEGRATION-RESUME-20261106.md](INTEGRATION-RESUME-20261106.md).
+Fresh private2228 Release builds all32 selected targets; native21/22 and both
+independent workspace gates pass. Source-export failure is retained and a focused
+adapter repair is under verification. No main product admission or complete goal
+claim. The earlier pause instruction is superseded; historical notes follow.
+
+## User-requested pause after authoring milestone — 2026-11-06
+
+Read [PAUSE-CHECKPOINT-20261106.md](PAUSE-CHECKPOINT-20261106.md). Ready source is
+composed privately through producte8d6b9e1; no main product admission. Separate
+resize2319 passes, coldP1 publishes258852 but warm-up remains failed, and the
+old c618 remesh SAN128-part sweep now closes116337denials+endpoint. New combined
+runtime/SAN/GUI/loader/device and original broader requirements remain pending.
+All agent work is stopped; oldcontractsOOM is SIGSTOP-preserved with exact
+process identity/resume instructions. The full goal is paused at the user's
+request. Do not resume work or the process until the user resumes the goal.
+
 ## Sourceful same-object field appearance regression — 2026-11-06
 
 Separate manual sourceful39+40 GPU consumer now follows real field preparation,

@@ -43,12 +43,18 @@ Validation is recorded in
 - The current Release allocation-failure sweep closes all 128 partitions:
   116,337 persistent denials and one successful endpoint, with no input drift.
 
-The current exhaustive sanitizer allocation sweep is **incomplete**. Its old
-coordinator and recorded children disappeared while the status still said
-running. After rechecking all 3,067 protected inputs, a separate coordinator
-resumes from 24 completed receipts. Two additional passing logs without exit
-receipts are preserved and rerun. The old status is not rewritten as success.
-The original historical 116,325-point paired sweep retains its separate scope.
+The current exhaustive sanitizer allocation sweep is now **complete**: all 128
+partitions cover 116,337 persistent denials and the successful endpoint. Root
+rechecks every completed receipt/log, the contiguous half-open range
+[1,116339), and all 3,118 final protected inputs. Read
+[the final receipt](validation/TRIANGLE-REMESH-SAN-FINAL.json).
+
+The original coordinator and recorded children disappeared while its status
+still said running. The separate continuation reused 24 completed receipts after
+verifying the original inputs. Two passing logs without exit receipts were
+preserved and rerun. That original interrupted status is not rewritten as
+success. The historical 116,325-point paired sweep retains its separate scope;
+later authoring candidates require their own changed-map qualification.
 
 No fresh full-project ALL regression, complete production remeshing quality,
 physical-headset acceptance, new compute acceleration or installation is claimed.
