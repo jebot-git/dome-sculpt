@@ -1212,7 +1212,8 @@ std::vector<ObjectSurface> Scene::export_surfaces(const std::function<bool()> &c
 std::vector<ObjectSurface> Scene::preview_surfaces(const std::function<bool()> &cancelled, const SculptMesher &mesher) const {
   return surfaces_impl(false, true, cancelled, mesher);
 }
-std::vector<ObjectSurface> Scene::surfaces_impl(bool atlas, bool preview, const std::function<bool()> &cancelled, const SculptMesher &mesher) const {
+std::vector<ObjectSurface> Scene::surfaces_impl(bool atlas, bool preview, const std::function<bool()> &cancelled, const SculptMesher &mesher,
+    const std::function<bool(const SculptObject &)> *capture_sculpt) const {
   std::vector<ObjectSurface> result;
   for (auto &o : objects_)
     if (o.visible) {
@@ -1223,6 +1224,7 @@ std::vector<ObjectSurface> Scene::surfaces_impl(bool atlas, bool preview, const 
         o.material_bindings->validate(false);detail::source_paint_pairing(o.painted.get(),o.material_bindings.get(),o.appearance.get(),false);
       }
       if(o.polygon && o.polygon->active && o.polygon->topology.faces().empty())continue;
+      if(!o.mesh_active&&capture_sculpt&&(*capture_sculpt)(o))continue;
       auto mesh = o.mesh_active ? o.painted->mesh()
                                 : mesher ? mesher(o.id, *o.volume) : surface_mesh(*o.volume, cancelled);
       if (mesh.indices.empty())

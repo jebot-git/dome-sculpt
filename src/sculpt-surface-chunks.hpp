@@ -41,8 +41,9 @@ struct SculptChunkReport {
   Kind kind = Kind::Rebuild;
   size_t extracted_tiles = 0, dependency_edges = 0, assembled_chunks = 0;
   size_t vertices = 0, indices = 0, retained_bytes = 0, working_bytes = 0;
-  // Full cache directory copying is still present in LocalSurfaceCache. This
-  // private stage does not claim the complete pipeline has bounded metadata.
+  // Explicit diagnostic: persistent local packet updates do not copy the
+  // complete legacy tile directory. Whole replacement/legacy flatten remain
+  // separate operations; worker/render integration is not implied by this.
   bool extraction_directory_copy = false;
 };
 class SculptSurfaceChunks
@@ -54,6 +55,10 @@ public:
   enum class Representation { Chunks, ExactLegacyRepair };
   static Ptr build(const Volume &, SculptChunkLimits = {}, Cancel = {});
   Ptr update(const Volume &, Cancel = {}) const;
+  // A caller composing multiple objects can tighten the actual operation
+  // envelope. Existing owner limits must never override a smaller aggregate
+  // budget supplied by the current immutable worker operation.
+  Ptr update(const Volume &,SculptChunkLimits,Cancel = {}) const;
   Representation representation() const;
   const SculptChunkReport &report() const;
   const LocalSurfaceCache::Owner &source_owner() const;
@@ -82,6 +87,7 @@ public:
   // Exact repair delegates to the existing authenticated cache materializer.
   // Ordinary chunk flatten preserves its global first-use vertex ordering.
   Mesh materialize(Cancel = {}) const;
+  Mesh materialize(size_t working_bytes,Cancel = {}) const;
 
 private:
   struct State;

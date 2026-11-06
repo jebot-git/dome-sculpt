@@ -1546,7 +1546,7 @@ if(BUILD_TESTING AND TARGET dome-sculpt-render)
 endif()
 
 # Local extraction shares the core ABI with its Volume producer and Document.
-target_sources(dome-sculpt-core PRIVATE src/local-surface.cpp src/volume-geometry.cpp src/sculpt-storage.cpp src/ray-index.cpp src/sculpt-surface-chunks.cpp)
+target_sources(dome-sculpt-core PRIVATE src/local-surface.cpp src/volume-geometry.cpp src/sculpt-storage.cpp src/ray-index.cpp src/sculpt-surface-chunks.cpp src/sculpt-scene-chunks.cpp)
 if(BUILD_TESTING)
   add_executable(dome-sculpt-local-surface-test tests/local-surface.cpp tests/local-surface-reference.cpp)
   target_link_libraries(dome-sculpt-local-surface-test PRIVATE dome-sculpt-core)

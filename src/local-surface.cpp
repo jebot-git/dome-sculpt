@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/local-surface.hpp"
+#include "sculpt-surface-tile.hpp"
 #include "surface-topology.hpp"
 #include <limits>
 #include <queue>
@@ -133,11 +134,7 @@ std::shared_ptr<const SurfaceTile> make_tile(const SurfaceGeometry &field,
                                              size_t available) {
   stop(work.cancel);
   // Preflight the exact fixed maximum before allocating transient packets.
-  constexpr size_t maximum =
-      sizeof(SurfaceTile) +
-      512 * (sizeof(SurfaceCell) + 19 * sizeof(SurfaceEdgeVertex) +
-             36 * sizeof(uint32_t) + 12 * sizeof(Vec3)) +
-      4096;
+  constexpr size_t maximum = detail::sculpt_surface_tile_working_bytes;
   if (available < maximum)
     throw std::length_error("Local surface tile working-memory limit exceeded");
   auto result = std::make_shared<SurfaceTile>();
@@ -278,14 +275,7 @@ LocalSurfaceCache::Ptr LocalSurfaceCache::build(const Volume &field,
 LocalSurfaceCache::Ptr
 LocalSurfaceCache::update(const Volume &field, Cancel cancel,
                           LocalSurfaceUpdateReport *report) const {
-  return update_tracked(field, std::move(cancel), report, nullptr);
-}
-LocalSurfaceCache::Ptr
-LocalSurfaceCache::update_tracked(const Volume &field, Cancel cancel,
-                                  LocalSurfaceUpdateReport *report,
-                                  std::vector<Int3> *changed) const {
   stop(cancel);
-  if (changed) changed->clear();
   auto change = field.geometry_change(source_->geometry_owner());
   LocalSurfaceUpdateReport result;
   result.ancestry_events = change.events;
@@ -301,7 +291,7 @@ LocalSurfaceCache::update_tracked(const Volume &field, Cancel cancel,
       field.band() == source_->band() &&
       change.kind == Volume::GeometryChange::Kind::Local) {
     try {
-      auto next = update_regions(field, change.regions(), cancel, changed);
+      auto next = update_regions(field, change.regions(), cancel);
       result.kind = LocalSurfaceUpdateReport::Kind::Local;
       if (report)
         *report = result;
@@ -311,7 +301,6 @@ LocalSurfaceCache::update_tracked(const Volume &field, Cancel cancel,
       result.capacity_fallback = true;
     }
   }
-  if (changed) changed->clear();
   auto next = build(field, limits_, cancel);
   result.kind = LocalSurfaceUpdateReport::Kind::Rebuild;
   if (report)
@@ -321,7 +310,7 @@ LocalSurfaceCache::update_tracked(const Volume &field, Cancel cancel,
 LocalSurfaceCache::Ptr
 LocalSurfaceCache::update_regions(const Volume &field,
                                   std::span<const SurfaceSampleRegion> regions,
-                                  Cancel cancel, std::vector<Int3> *changed) const {
+                                  Cancel cancel) const {
   stop(cancel);
   if (field.voxel_size() != source_->voxel_size())
     throw std::invalid_argument(
@@ -404,7 +393,6 @@ LocalSurfaceCache::update_regions(const Volume &field,
   work.stats.tiles_reused = reused;
   result->stats_ = work.stats;
   stop(work.cancel);
-  if (changed) changed->assign(dirty.begin(), dirty.end());
   return result;
 }
 Mesh LocalSurfaceCache::materialize(Cancel cancel) const {
@@ -519,4 +507,36 @@ Mesh LocalSurfaceCache::materialize(Cancel cancel) const {
   stop(cancel);
   return result;
 }
+Mesh LocalSurfaceCache::materialize_packets(Owner source,Tiles tiles,
+                                           LocalSurfaceLimits limits,Cancel cancel) {
+  validate_limits(limits);stop(cancel);
+  LocalSurfaceCache cache;cache.source_=std::move(source);cache.limits_=limits;
+  cache.stats_.source_bytes=cache.source_->geometry_owner()->retained_bytes();
+  size_t bytes=sizeof(LocalSurfaceCache)+sizeof(SurfaceGeometry);
+  auto charge=[&](size_t amount){
+    if(bytes>limits.bytes||amount>limits.bytes-bytes)
+      throw std::length_error("Legacy packet materialization byte limit exceeded");
+    bytes+=amount;
+  };
+  charge(cache.stats_.source_bytes);
+  if(tiles.size()>limits.tiles)throw std::length_error("Legacy packet tile limit exceeded");
+  size_t visited=0;
+  for(const auto &[coordinate,tile]:tiles) {
+    if((++visited&255)==0)stop(cancel);
+    if(!tile||tile->coordinate!=coordinate)throw std::logic_error("Legacy packet coordinate lost its owned tile");
+    charge(tile->bytes);charge(index_node_bytes);
+  }
+  cache.tiles_=std::move(tiles);cache.stats_.bytes=bytes;
+  return cache.materialize(std::move(cancel));
+}
+namespace detail {
+SculptTileExtraction extract_sculpt_surface_tile(const SurfaceGeometry &source,
+    Int3 coordinate,const LocalSurfaceLimits &limits,size_t available,
+    LocalSurfaceCache::Cancel cancel) {
+  validate_limits(limits);
+  Work work{limits,{},std::move(cancel)};
+  auto tile=make_tile(source,coordinate,work,available);
+  return {std::move(tile),work.stats};
+}
+} // namespace detail
 } // namespace dome

@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "sculpt-surface-chunks.hpp"
+#include "sculpt-surface-tile.hpp"
 #include <bit>
 #include <limits>
 #include <queue>
@@ -17,6 +18,7 @@ void SculptChunkBounds::include(const SculptChunkBounds &b) {
 }
 namespace {
 using Chunk = SculptSurfaceChunks::Chunk;
+using Tile = std::shared_ptr<const SurfaceTile>;
 using Position = std::array<float,3>;
 Position position(Vec3 p) { return {p.x,p.y,p.z}; }
 struct Request {
@@ -41,10 +43,22 @@ struct Work {
   const SculptChunkLimits &limits;
   SculptSurfaceChunks::Cancel cancel;
   size_t bytes = 0, steps = 0;
+  void validate() const {
+    const auto &e=limits.extraction;
+    if(!limits.working_bytes||!limits.retained_bytes||!limits.dependency_edges||
+        !limits.dependency_chunks||!limits.steps||!e.samples||!e.tiles||!e.dirty_tiles||
+        !e.evaluated_cells||!e.bytes||!e.vertices||e.vertices>UINT32_MAX||!e.indices||!e.regions)
+      throw std::invalid_argument("Invalid sculpt chunk operation limits");
+  }
   void tick() {
     if (steps >= limits.steps) throw std::length_error("Sculpt chunk work limit exceeded");
     ++steps;
     if ((steps & 63) == 0) stop();
+  }
+  void advance(size_t n) {
+    if(steps>limits.steps||n>limits.steps-steps)
+      throw std::length_error("Sculpt chunk work limit exceeded");
+    steps+=n;stop();
   }
   void stop() const {
     if (cancel && cancel()) throw std::runtime_error("Sculpt chunk operation cancelled");
@@ -60,6 +74,7 @@ template<class T> SculptChunkBounds value_bounds(const T &) { return {}; }
 SculptChunkBounds value_bounds(const Chunk &c) { return c ? c->bounds : SculptChunkBounds{}; }
 template<class T> size_t value_bytes(const T &) { return 0; }
 size_t value_bytes(const Chunk &c) { return c?c->bytes:0; }
+size_t value_bytes(const Tile &t) { return t?t->bytes:0; }
 size_t sum(size_t a,size_t b) {
   if(b>std::numeric_limits<size_t>::max()-a)throw std::length_error("Sculpt chunk accounting overflow");
   return a+b;
@@ -147,11 +162,113 @@ template<class K,class V> struct Directory {
 using Edges=Directory<SurfaceEdge,EdgeRecord>;
 using Positions=Directory<PositionRequest,EdgeRecord>;
 using Chunks=Directory<Int3,Chunk>;
+using Tiles=Directory<Int3,Tile>;
+template<class T> void scratch_insert(std::set<T> &,const T &,size_t,Work &);
 
-const SurfaceCell *cell_at(const LocalSurfaceCache &cache,Int3 p) {
-  auto tile=cache.tiles().find(LocalSurfaceCache::tile_coordinate(p));
-  if(tile==cache.tiles().end())return nullptr;
-  const auto &cells=tile->second->cells;
+// Geometry-only persistent extraction owner. It never copies the complete
+// legacy std::map on a local update. The initial/replacement factory may use
+// the legacy extractor, then shares its actual immutable tile packets.
+struct TilePackets {
+  using Ptr=std::shared_ptr<const TilePackets>;
+  LocalSurfaceCache::Owner source;
+  Tiles tiles;
+  LocalSurfaceStats metrics;
+  int support_halo=1;
+  const LocalSurfaceStats &stats() const {return metrics;}
+  const LocalSurfaceCache::Owner &source_owner() const {return source;}
+  const Tile *find(Int3 p) const {return tiles.find(p);}
+  size_t size() const {return Tiles::n(tiles.root);}
+  size_t retained_bytes() const {
+    size_t total=sum(sizeof(TilePackets)+sizeof(SurfaceGeometry)+256,metrics.source_bytes);
+    const auto nodes=Tiles::n(tiles.root);
+    if(nodes>SIZE_MAX/(sizeof(Tiles::Node)+128))throw std::length_error("Tile directory byte overflow");
+    total=sum(total,nodes*(sizeof(Tiles::Node)+128));
+    return sum(total,tiles.root?tiles.root->payload_bytes:0);
+  }
+  static Ptr capture(const LocalSurfaceCache &legacy,Work &w) {
+    w.charge(sizeof(TilePackets)+128);
+    auto out=std::make_shared<TilePackets>();out->source=legacy.source_owner();out->metrics=legacy.stats();
+    for(const auto &[key,tile]:legacy.tiles()) {
+      out->tiles.put(key,tile,w);out->support_halo=std::max(out->support_halo,tile->support_halo);
+    }
+    out->metrics.bytes=out->retained_bytes();
+    if(out->metrics.bytes>w.limits.extraction.bytes)throw std::length_error("Persistent extraction byte limit exceeded");
+    return out;
+  }
+  static int bounded(int64_t n) {
+    if(n<int64_t(INT32_MIN)+16||n>int64_t(INT32_MAX)-16)
+      throw std::invalid_argument("Local surface region coordinate overflow");
+    return int(n);
+  }
+  Ptr local_update(const Volume &field,std::span<const SurfaceSampleRegion> regions,
+                   std::vector<Int3> &changed,Work &w) const {
+    const auto &limits=w.limits.extraction;
+    if(field.voxels().size()>limits.samples)throw std::length_error("Local surface sample limit exceeded");
+    if(regions.empty()||regions.size()>limits.regions)throw std::length_error("Invalid local surface region count");
+    std::set<Int3> dirty;
+    for(auto r:regions) {
+      w.tick();
+      if(r.minimum.x>r.maximum.x||r.minimum.y>r.maximum.y||r.minimum.z>r.maximum.z)
+        throw std::invalid_argument("Invalid local surface dirty region");
+      const auto low=LocalSurfaceCache::tile_coordinate({bounded(int64_t(r.minimum.x)-support_halo),
+          bounded(int64_t(r.minimum.y)-support_halo),bounded(int64_t(r.minimum.z)-support_halo)});
+      const auto high=LocalSurfaceCache::tile_coordinate({bounded(int64_t(r.maximum.x)+support_halo),
+          bounded(int64_t(r.maximum.y)+support_halo),bounded(int64_t(r.maximum.z)+support_halo)});
+      const uint64_t nx=uint64_t(int64_t(high.x)-low.x+1),ny=uint64_t(int64_t(high.y)-low.y+1),nz=uint64_t(int64_t(high.z)-low.z+1);
+      if(nx>limits.dirty_tiles||ny>limits.dirty_tiles/nx||nz>limits.dirty_tiles/(nx*ny))
+        throw std::length_error("Persistent extraction dirty tile limit exceeded");
+      for(int64_t x=low.x;x<=high.x;++x)for(int64_t y=low.y;y<=high.y;++y)for(int64_t z=low.z;z<=high.z;++z)
+        scratch_insert(dirty,Int3{int(x),int(y),int(z)},limits.dirty_tiles,w);
+    }
+    w.charge(sizeof(TilePackets)+sizeof(SurfaceGeometry)+256);
+    w.charge(field.geometry_owner()->retained_bytes());
+    auto out=std::make_shared<TilePackets>();out->source=std::make_shared<const SurfaceGeometry>(field);
+    out->tiles=tiles;out->support_halo=support_halo;out->metrics.source_bytes=out->source->geometry_owner()->retained_bytes();
+    out->metrics.tiles_reused=size();
+    for(auto key:dirty) {
+      w.tick();
+      if(out->tiles.find(key)) {out->tiles.erase(key,w);--out->metrics.tiles_reused;}
+      const auto retained=out->retained_bytes();
+      if(retained>limits.bytes)throw std::length_error("Persistent extraction byte limit exceeded");
+      // The exact maximum is shared with legacy make_tile. Charge before
+      // extraction, even for a packet which ultimately contains no crossing.
+      w.charge(sculpt_surface_tile_working_bytes);w.advance(512);
+      if(out->metrics.cells_evaluated>limits.evaluated_cells||512>limits.evaluated_cells-out->metrics.cells_evaluated)
+        throw std::length_error("Local surface cell evaluation limit exceeded");
+      const auto extracted=extract_sculpt_surface_tile(*out->source,key,limits,limits.bytes-retained,w.cancel);
+      out->metrics.cells_evaluated+=extracted.stats.cells_evaluated;
+      out->metrics.tiles_built+=extracted.stats.tiles_built;
+      if(extracted.tile) {
+        if(out->size()>=limits.tiles)throw std::length_error("Local surface tile limit exceeded");
+        out->tiles.put(key,extracted.tile,w);
+        out->support_halo=std::max(out->support_halo,extracted.tile->support_halo);
+      }
+      if(out->retained_bytes()>limits.bytes)throw std::length_error("Persistent extraction byte limit exceeded");
+    }
+    w.charge(dirty.size(),sizeof(Int3));changed.assign(dirty.begin(),dirty.end());
+    out->metrics.bytes=out->retained_bytes();w.stop();return out;
+  }
+};
+TilePackets::Ptr full_packets(const Volume &field,Work &w) {
+  w.stop();
+  // Legacy initial/replacement extraction has its own prospective envelope.
+  // Check it before entry while prior immutable owners are still charged.
+  if(w.bytes>w.limits.working_bytes||w.limits.extraction.bytes>w.limits.working_bytes-w.bytes)
+    throw std::length_error("Initial extraction working byte limit exceeded");
+  const auto remaining=w.limits.steps-w.steps;
+  if(w.limits.extraction.evaluated_cells>remaining||
+      field.voxels().size()>remaining-w.limits.extraction.evaluated_cells)
+    throw std::length_error("Initial extraction work limit exceeded");
+  auto legacy=LocalSurfaceCache::build(field,w.limits.extraction,w.cancel);
+  w.charge(legacy->stats().bytes);
+  w.advance(legacy->stats().samples_scanned);w.advance(legacy->stats().cells_evaluated);
+  return TilePackets::capture(*legacy,w);
+}
+
+const SurfaceCell *cell_at(const TilePackets &cache,Int3 p) {
+  auto tile=cache.find(LocalSurfaceCache::tile_coordinate(p));
+  if(!tile)return nullptr;
+  const auto &cells=(*tile)->cells;
   auto i=std::lower_bound(cells.begin(),cells.end(),p,
                          [](const auto &c,Int3 q){return c.coordinate<q;});
   return i!=cells.end()&&i->coordinate==p?&*i:nullptr;
@@ -172,7 +289,7 @@ template<class F> void edge_cells(SurfaceEdge edge,F fn,Work &w) {
         fn(Int3{int(x),int(y),int(z)});
       }
 }
-std::optional<EdgeRecord> first_request(const LocalSurfaceCache &cache,
+std::optional<EdgeRecord> first_request(const TilePackets &cache,
                                        SurfaceEdge edge,Work &w) {
   std::optional<EdgeRecord> result;
   edge_cells(edge,[&](Int3 p){
@@ -282,7 +399,7 @@ Chunk assemble(const SurfaceTile &tile,const Edges &edges,const Positions &posit
 
 struct SculptSurfaceChunks::State {
   SculptChunkLimits limits;
-  LocalSurfaceCache::Ptr cache;
+  TilePackets::Ptr cache;
   Edges edges;
   Positions positions;
   Chunks chunks;
@@ -291,26 +408,21 @@ struct SculptSurfaceChunks::State {
   std::weak_ptr<const State> base;
   std::vector<std::pair<Int3,Chunk>> changes;
   Representation representation=Representation::Chunks;
-  static std::shared_ptr<const State> compile(LocalSurfaceCache::Ptr cache,
+  static std::shared_ptr<const State> compile(TilePackets::Ptr cache,
       SculptChunkLimits limits,std::shared_ptr<const State> before,const std::vector<Int3> &changed,
-      size_t prior_bytes,Cancel cancel) {
-    Work w{limits,std::move(cancel)};w.stop();
-    // Both source owners coexist throughout a local operation. Count both
-    // conservatively even where the sample-page implementation shares pages.
-    w.charge(cache->stats().bytes);
-    w.charge(prior_bytes);
-    w.charge(changed.capacity(),sizeof(Int3));
+      Work &w) {
+    w.stop();
     w.charge(sizeof(State)+sizeof(SculptSurfaceChunks)+256);
     auto out=std::make_shared<State>();out->cache=std::move(cache);out->limits=limits;
     out->base=before;
     out->report.kind=before?SculptChunkReport::Kind::Local:SculptChunkReport::Kind::Rebuild;
-    out->report.extraction_directory_copy=bool(before);
+    out->report.extraction_directory_copy=false;
     std::set<SurfaceEdge> dirty_edges;
     std::set<Position> dirty_positions;
     std::set<Int3> dirty_chunks;
-    auto collect_tile=[&](const LocalSurfaceCache &source,Int3 tile){
-      auto i=source.tiles().find(tile);if(i==source.tiles().end())return;
-      for(const auto &cell:i->second->cells)for(const auto &v:cell.vertices)
+    auto collect_tile=[&](const TilePackets &source,Int3 tile){
+      auto i=source.find(tile);if(!i)return;
+      for(const auto &cell:(*i)->cells)for(const auto &v:cell.vertices)
         scratch_insert(dirty_edges,v.edge,limits.dependency_edges,w);
     };
     if(before) {
@@ -321,12 +433,12 @@ struct SculptSurfaceChunks::State {
         scratch_insert(dirty_chunks,tile,limits.dependency_chunks,w);
       }
     } else {
-      for(const auto &[tile,packet]:out->cache->tiles()) {
-        (void)packet;collect_tile(*out->cache,tile);
+      out->cache->tiles.visit([&](Int3 tile,const Tile &){
+        collect_tile(*out->cache,tile);
         scratch_insert(dirty_chunks,tile,limits.extraction.tiles,w);
-      }
+      },w);
     }
-    out->report.extracted_tiles=before?changed.size():out->cache->tiles().size();
+    out->report.extracted_tiles=out->cache->stats().tiles_built;
     out->report.dependency_edges=dirty_edges.size();
     for(auto edge:dirty_edges) {
       w.tick();
@@ -348,7 +460,7 @@ struct SculptSurfaceChunks::State {
       // representative which disappeared, instead of assuming one tile halo.
       auto affected=[&](const EdgeRecord &record){
         edge_cells(record.vertex.edge,[&](Int3 cell){
-          auto add=[&](const LocalSurfaceCache &source){
+          auto add=[&](const TilePackets &source){
             if(auto packet=cell_at(source,cell))
               for(const auto &v:packet->vertices)if(v.edge==record.vertex.edge) {
                 scratch_insert(dirty_chunks,LocalSurfaceCache::tile_coordinate(cell),limits.dependency_chunks,w);break;
@@ -375,12 +487,12 @@ struct SculptSurfaceChunks::State {
           out->report.vertices-=(*old)->mesh.positions.size();
           out->report.indices-=(*old)->mesh.indices.size();out->chunks.erase(tile,w);
         }
-        auto i=out->cache->tiles().find(tile);
-        if(i==out->cache->tiles().end()) {
+        auto i=out->cache->find(tile);
+        if(!i) {
           if(before&&old_chunk)out->changes.push_back({tile,{}});
           continue;
         }
-        auto chunk=assemble(*i->second,out->edges,out->positions,w);
+        auto chunk=assemble(**i,out->edges,out->positions,w);
         if(chunk->mesh.indices.empty()) {
           if(before&&old_chunk)out->changes.push_back({tile,{}});
           continue;
@@ -426,35 +538,34 @@ struct SculptSurfaceChunks::State {
 
 SculptSurfaceChunks::SculptSurfaceChunks(std::shared_ptr<const State> s):state_(std::move(s)) {}
 SculptSurfaceChunks::Ptr SculptSurfaceChunks::build(const Volume &v,SculptChunkLimits limits,Cancel cancel) {
-  Work forecast{limits,cancel};forecast.stop();
-  forecast.charge(limits.extraction.bytes);
-  forecast.charge(sizeof(State)+sizeof(SculptSurfaceChunks)+256);
-  auto cache=LocalSurfaceCache::build(v,limits.extraction,cancel);
-  auto state=State::compile(std::move(cache),limits,{}, {},0,cancel);
+  Work work{limits,cancel};work.validate();work.stop();
+  auto cache=full_packets(v,work);
+  auto state=State::compile(std::move(cache),limits,{}, {},work);
   return Ptr(new SculptSurfaceChunks(std::move(state)));
 }
 SculptSurfaceChunks::Ptr SculptSurfaceChunks::update(const Volume &v,Cancel cancel) const {
-  Work forecast{state_->limits,cancel};forecast.stop();
+  return update(v,state_->limits,std::move(cancel));
+}
+SculptSurfaceChunks::Ptr SculptSurfaceChunks::update(const Volume &v,SculptChunkLimits limits,Cancel cancel) const {
+  Work work{limits,cancel};work.validate();work.stop();
+  if(state_->report.retained_bytes>limits.retained_bytes||state_->cache->stats().bytes>limits.extraction.bytes||
+      state_->report.retained_bytes>limits.working_bytes||
+      state_->report.vertices>limits.extraction.vertices||state_->report.indices>limits.extraction.indices||
+      state_->cache->size()>limits.extraction.tiles||v.voxels().size()>limits.extraction.samples)
+    throw std::length_error("Current sculpt owner exceeds the requested operation limits");
   const auto &source=*state_->cache->source_owner();
-  if(v.voxel_size()==source.voxel_size()&&v.band()==source.band()&&
-      v.geometry_change(source.geometry_owner()).kind==Volume::GeometryChange::Kind::Unchanged)
+  const auto change=v.geometry_change(source.geometry_owner());
+  const bool context=v.voxel_size()==source.voxel_size()&&v.band()==source.band();
+  if(context&&change.kind==Volume::GeometryChange::Kind::Unchanged)
     return shared_from_this();
-  forecast.charge(state_->report.retained_bytes);
-  // Extraction itself precedes compilation. Reserve its complete configured
-  // envelope before any cache allocation; checking actual stats only after
-  // extraction would be a late resource refusal. Include its bounded dirty
-  // set/vector scratch, which is not retained by the resulting cache.
-  forecast.charge(state_->limits.extraction.bytes);
-  forecast.charge(state_->limits.extraction.dirty_tiles,sizeof(Int3)+128);
-  forecast.charge(state_->limits.extraction.dirty_tiles,sizeof(Int3));
-  std::vector<Int3> changed;changed.reserve(state_->limits.extraction.dirty_tiles);
-  LocalSurfaceUpdateReport report;
-  auto cache=state_->cache->update_tracked(v,cancel,&report,&changed);
-  if(report.kind==LocalSurfaceUpdateReport::Kind::Reused)return shared_from_this();
-  auto before=report.kind==LocalSurfaceUpdateReport::Kind::Local&&
+  work.charge(state_->report.retained_bytes);
+  std::vector<Int3> changed;
+  const bool local=context&&change.kind==Volume::GeometryChange::Kind::Local;
+  auto cache=local?state_->cache->local_update(v,change.regions(),changed,work):full_packets(v,work);
+  auto before=local&&
       representation()==Representation::Chunks?state_:std::shared_ptr<const State>{};
-  auto state=State::compile(std::move(cache),state_->limits,before,changed,
-                            state_->report.retained_bytes,cancel);
+  auto state=State::compile(std::move(cache),limits,before,changed,
+                            work);
   return Ptr(new SculptSurfaceChunks(std::move(state)));
 }
 SculptSurfaceChunks::Representation SculptSurfaceChunks::representation() const {return state_->representation;}
@@ -489,8 +600,23 @@ void SculptSurfaceChunks::for_each_triangle(
   },cancel);w.stop();
 }
 Mesh SculptSurfaceChunks::materialize(Cancel cancel) const {
-  if(representation()==Representation::ExactLegacyRepair)return state_->cache->materialize(std::move(cancel));
-  Work w{state_->limits,std::move(cancel)};w.stop();w.charge(state_->report.retained_bytes);
+  return materialize(state_->limits.working_bytes,std::move(cancel));
+}
+Mesh SculptSurfaceChunks::materialize(size_t working_bytes,Cancel cancel) const {
+  auto limits=state_->limits;limits.working_bytes=std::min(limits.working_bytes,working_bytes);
+  Work w{limits,std::move(cancel)};w.validate();w.stop();w.charge(state_->report.retained_bytes);
+  if(representation()==Representation::ExactLegacyRepair) {
+    LocalSurfaceCache::Tiles packets;
+    state_->cache->tiles.visit([&](Int3 coordinate,const Tile &tile){
+      w.charge(sizeof(std::pair<const Int3,Tile>)+128);packets.emplace(coordinate,tile);
+    },w);
+    // Tighten the existing legacy materializer's actual prospective envelope,
+    // rather than allowing the retained owner's older, larger cap to win.
+    auto legacy_limits=state_->limits.extraction;
+    legacy_limits.bytes=std::min(legacy_limits.bytes,w.limits.working_bytes-w.bytes);
+    return LocalSurfaceCache::materialize_packets(state_->cache->source_owner(),
+        std::move(packets),legacy_limits,w.cancel);
+  }
   struct Cursor {Chunk chunk;size_t triangle;};
   auto later=[](const Cursor &a,const Cursor &b){return a.chunk->triangles[a.triangle]>b.chunk->triangles[b.triangle];};
   w.charge(Chunks::n(state_->chunks.root),sizeof(Cursor));

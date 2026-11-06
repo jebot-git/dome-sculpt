@@ -92,13 +92,12 @@ public:
 private:
   friend class detail::SculptSurfaceChunks;
   LocalSurfaceCache() = default;
-  // Internal authenticated change capture for the immutable chunk compiler.
-  // Populated only after a complete successful local extraction; rebuilds
-  // clear it. No caller-supplied dirty region becomes geometry authority.
-  Ptr update_tracked(const Volume &, Cancel, LocalSurfaceUpdateReport *,
-                     std::vector<Int3> *) const;
+  // Explicit legacy operation adapter for genuine private packet owners. A
+  // complete ordered map is assembled only at Cut/export/repair boundaries.
+  // Never used by the incremental preview update itself.
+  static Mesh materialize_packets(Owner,Tiles,LocalSurfaceLimits,Cancel);
   Ptr update_regions(const Volume &, std::span<const SurfaceSampleRegion>,
-                     Cancel, std::vector<Int3> *) const;
+                     Cancel) const;
   Owner source_;
   LocalSurfaceLimits limits_;
   Tiles tiles_;
