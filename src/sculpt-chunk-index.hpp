@@ -3,6 +3,7 @@
 #include "sculpt-surface-chunks.hpp"
 #include <algorithm>
 #include <memory>
+#include <optional>
 #include <stdexcept>
 #include <utility>
 namespace dome::detail {
@@ -83,6 +84,32 @@ template<class K,class V,class Traits> struct PersistentSculptIndex {
   }
   void put(const K &k,const V &v,auto &w) { root=put(root,k,v,w); }
   void erase(const K &k,auto &w) { root=remove(root,k,w); }
+  // Cold construction is not a sequence of persistent edits. Building a new
+  // balanced tree directly from strict sorted keys allocates one final node
+  // per key, rather than repeatedly cloning then discarding insertion paths.
+  // The old root stays owned until the complete candidate succeeds. Callers
+  // must account their input/old owner and the sorted input array separately.
+  template<class Next> static Ptr sorted_tree(size_t count,Next &next,auto &w) {
+    if(!count)return {};
+    auto left=sorted_tree(count/2,next,w);
+    auto entry=next();
+    auto right=sorted_tree(count-count/2-1,next,w);
+    return node(entry.first,entry.second,std::move(left),std::move(right),w);
+  }
+  template<class Iterator> void assign_sorted(Iterator first,Iterator last,auto &w) {
+    size_t count=0;
+    for(auto i=first;i!=last;++i){w.tick();if(count==SIZE_MAX)throw std::length_error("Sculpt sorted index size overflow");++count;}
+    auto cursor=first;std::optional<K> previous;
+    auto next=[&]() -> std::pair<K,V> {
+      w.tick();if(cursor==last)throw std::logic_error("Sculpt sorted index input ended early");
+      auto entry=*cursor++;
+      if(previous&&!(*previous<entry.first))throw std::invalid_argument("Sculpt sorted index keys are not strictly increasing");
+      previous=entry.first;return {entry.first,entry.second};
+    };
+    auto candidate=sorted_tree(count,next,w);
+    if(cursor!=last)throw std::logic_error("Sculpt sorted index input changed during construction");
+    root=std::move(candidate);
+  }
   template<class F> static void visit(const Ptr &p,F &fn,auto &w) {
     if(!p)return;
     visit(p->left,fn,w);w.tick();fn(p->key,p->value);visit(p->right,fn,w);

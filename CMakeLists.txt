@@ -4916,3 +4916,10 @@ if(BUILD_TESTING)
 endif()
 
 include(tests/texture-set-resolution-workflows.cmake)
+
+# Manual owning-workspace regression; production reference is an explicit argv.
+if(BUILD_TESTING)
+  add_executable(dome-sculpt-sculpt-chunk-workspace-test EXCLUDE_FROM_ALL tests/sculpt-chunk-workspace.cpp)
+  target_include_directories(dome-sculpt-sculpt-chunk-workspace-test PRIVATE src)
+  target_link_libraries(dome-sculpt-sculpt-chunk-workspace-test PRIVATE dome-sculpt-core)
+endif()

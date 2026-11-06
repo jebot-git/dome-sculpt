@@ -3,9 +3,11 @@
 #include "sculpt-surface-tile.hpp"
 #include "sculpt-chunk-index.hpp"
 #include <bit>
+#include <exception>
 #include <limits>
 #include <queue>
 #include <set>
+#include <string>
 
 namespace dome::detail {
 bool SculptChunkBounds::empty() const { return minimum.x > maximum.x; }
@@ -43,7 +45,22 @@ PositionRequest key(const EdgeRecord &r) {
 struct Work {
   const SculptChunkLimits &limits;
   SculptSurfaceChunks::Cancel cancel;
-  size_t bytes = 0, steps = 0;
+  size_t bytes = 0, steps = 0, peak = 0;
+  const char *phase="initial extraction";
+  struct Phase {
+    Work &work;const char *previous;
+    Phase(Work &w,const char *next):work(w),previous(w.phase){w.phase=next;}
+    ~Phase(){work.phase=previous;}
+  };
+  // Only lexical transient storage may be released. Persistent packet/index
+  // charges deliberately remain conservative through the complete operation.
+  struct Scratch {
+    Work &work;size_t bytes;
+    Scratch(Work &w,size_t n,size_t width=1):work(w),bytes(0){work.charge(n,width);bytes=n*width;}
+    Scratch(const Scratch &)=delete;
+    Scratch &operator=(const Scratch &)=delete;
+    ~Scratch(){if(work.bytes<bytes)std::terminate();work.bytes-=bytes;}
+  };
   void validate() const {
     const auto &e=limits.extraction;
     if(!limits.working_bytes||!limits.retained_bytes||!limits.dependency_edges||
@@ -67,8 +84,10 @@ struct Work {
   void charge(size_t n, size_t width = 1) {
     if (bytes > limits.working_bytes ||
         (width && n > (limits.working_bytes-bytes)/width))
-      throw std::length_error("Sculpt chunk working byte limit exceeded");
-    bytes += n*width;
+      throw std::length_error(std::string("Sculpt chunk working byte limit exceeded during ")+phase+
+          " (charged="+std::to_string(bytes)+", count="+std::to_string(n)+
+          ", width="+std::to_string(width)+", limit="+std::to_string(limits.working_bytes)+")");
+    bytes += n*width;peak=std::max(peak,bytes);
   }
 };
 template<class T> SculptChunkBounds value_bounds(const T &) { return {}; }
@@ -115,11 +134,11 @@ struct TilePackets {
     return sum(total,tiles.root?tiles.root->payload_bytes:0);
   }
   static Ptr capture(const LocalSurfaceCache &legacy,Work &w) {
+    Work::Phase phase(w,"initial tile directory");
     w.charge(sizeof(TilePackets)+128);
     auto out=std::make_shared<TilePackets>();out->source=legacy.source_owner();out->metrics=legacy.stats();
-    for(const auto &[key,tile]:legacy.tiles()) {
-      out->tiles.put(key,tile,w);out->support_halo=std::max(out->support_halo,tile->support_halo);
-    }
+    out->tiles.assign_sorted(legacy.tiles().begin(),legacy.tiles().end(),w);
+    for(const auto &[key,tile]:legacy.tiles()){(void)key;w.tick();out->support_halo=std::max(out->support_halo,tile->support_halo);}
     out->metrics.bytes=out->retained_bytes();
     if(out->metrics.bytes>w.limits.extraction.bytes)throw std::length_error("Persistent extraction byte limit exceeded");
     return out;
@@ -155,13 +174,14 @@ struct TilePackets {
     out->tiles=tiles;out->support_halo=support_halo;out->metrics.source_bytes=out->source->geometry_owner()->retained_bytes();
     out->metrics.tiles_reused=size();
     for(auto key:dirty) {
+      Work::Phase phase(w,"local tile extraction");
       w.tick();
       if(out->tiles.find(key)) {out->tiles.erase(key,w);--out->metrics.tiles_reused;}
       const auto retained=out->retained_bytes();
       if(retained>limits.bytes)throw std::length_error("Persistent extraction byte limit exceeded");
       // The exact maximum is shared with legacy make_tile. Charge before
       // extraction, even for a packet which ultimately contains no crossing.
-      w.charge(sculpt_surface_tile_working_bytes);w.advance(512);
+      Work::Scratch scratch(w,sculpt_surface_tile_working_bytes);w.advance(512);
       if(out->metrics.cells_evaluated>limits.evaluated_cells||512>limits.evaluated_cells-out->metrics.cells_evaluated)
         throw std::length_error("Local surface cell evaluation limit exceeded");
       const auto extracted=extract_sculpt_surface_tile(*out->source,key,limits,limits.bytes-retained,w.cancel);
@@ -169,6 +189,10 @@ struct TilePackets {
       out->metrics.tiles_built+=extracted.stats.tiles_built;
       if(extracted.tile) {
         if(out->size()>=limits.tiles)throw std::length_error("Local surface tile limit exceeded");
+        // The returned immutable tile survives the scratch scope through the
+        // next directory. Charge its full retained payload before publishing
+        // that pointer; the transient maximum remains charged simultaneously.
+        w.charge(extracted.tile->bytes);
         out->tiles.put(key,extracted.tile,w);
         out->support_halo=std::max(out->support_halo,extracted.tile->support_halo);
       }
@@ -184,6 +208,10 @@ TilePackets::Ptr full_packets(const Volume &field,Work &w) {
   // Check it before entry while prior immutable owners are still charged.
   if(w.bytes>w.limits.working_bytes||w.limits.extraction.bytes>w.limits.working_bytes-w.bytes)
     throw std::length_error("Initial extraction working byte limit exceeded");
+  // During this sequential factory no other Work allocation runs. Its own
+  // extraction cap bounds all simultaneous legacy temporaries; after return
+  // stats.bytes owns the retained source/packets while the directory is cloned.
+  w.peak=std::max(w.peak,w.bytes+w.limits.extraction.bytes);
   const auto remaining=w.limits.steps-w.steps;
   if(w.limits.extraction.evaluated_cells>remaining||
       field.voxels().size()>remaining-w.limits.extraction.evaluated_cells)
@@ -245,7 +273,8 @@ const EdgeRecord &first_position(const Positions &positions,Position point) {
   return best->value;
 }
 template<class F> void position_members(const Positions::Ptr &p,Position point,F &fn,Work &w) {
-  if(!p)return;w.tick();
+  if(!p)return;
+  w.tick();
   if(!(p->key.point<point))position_members(p->left,point,fn,w);
   if(!(p->key.point<point)&&!(point<p->key.point))fn(p->value);
   if(!(point<p->key.point))position_members(p->right,point,fn,w);
@@ -285,6 +314,10 @@ Chunk assemble(const SurfaceTile &tile,const Edges &edges,const Positions &posit
   w.charge(sizeof(SculptSurfaceChunk)+128);
   w.charge(maximum,2*sizeof(Vec3)+sizeof(uint32_t));
   w.charge(maximum/3,sizeof(SculptTriangleOrigin));
+  // The deduplication map is local to this one assemble() call. Reserve its
+  // worst case before any output allocation; the output arrays remain charged
+  // permanently, while map nodes die before this lexical lease is released.
+  Work::Scratch vertex_map(w,maximum,sizeof(std::pair<const Position,uint32_t>)+128);
   auto out=std::make_shared<SculptSurfaceChunk>();out->coordinate=tile.coordinate;
   out->mesh.positions.reserve(maximum);out->mesh.normals.reserve(maximum);
   out->mesh.indices.reserve(maximum);out->triangles.reserve(maximum/3);
@@ -307,7 +340,6 @@ Chunk assemble(const SurfaceTile &tile,const Edges &edges,const Positions &posit
       for(const auto *record:records) {
         auto p=position(record->vertex.position);auto i=vertices.find(p);
         if(i==vertices.end()) {
-          w.charge(sizeof(std::pair<const Position,uint32_t>)+128);
           const auto id=uint32_t(out->mesh.positions.size());
           i=vertices.emplace(p,id).first;
           out->mesh.positions.push_back(record->vertex.position);
@@ -370,18 +402,42 @@ struct SculptSurfaceChunks::State {
     }
     out->report.extracted_tiles=out->cache->stats().tiles_built;
     out->report.dependency_edges=dirty_edges.size();
-    for(auto edge:dirty_edges) {
-      w.tick();
-      if(auto old=out->edges.find(edge)) {
-        const auto old_key=key(*old);
-        scratch_insert(dirty_positions,old_key.point,limits.dependency_edges,w);
-        out->positions.erase(old_key,w);out->edges.erase(edge,w);
-      }
-      if(auto next=first_request(*out->cache,edge,w)) {
-        if(!finite(next->vertex.position)||!finite(next->vertex.normal))
-          throw std::invalid_argument("Nonfinite sculpt representative");
-        scratch_insert(dirty_positions,position(next->vertex.position),limits.dependency_edges,w);
-        out->edges.put(edge,*next,w);out->positions.put(key(*next),*next,w);
+    {
+      Work::Phase phase(w,"representative indexes");
+      if(before) {
+        for(auto edge:dirty_edges) {
+          w.tick();
+          if(auto old=out->edges.find(edge)) {
+            const auto old_key=key(*old);
+            scratch_insert(dirty_positions,old_key.point,limits.dependency_edges,w);
+            out->positions.erase(old_key,w);out->edges.erase(edge,w);
+          }
+          if(auto next=first_request(*out->cache,edge,w)) {
+            if(!finite(next->vertex.position)||!finite(next->vertex.normal))
+              throw std::invalid_argument("Nonfinite sculpt representative");
+            scratch_insert(dirty_positions,position(next->vertex.position),limits.dependency_edges,w);
+            out->edges.put(edge,*next,w);out->positions.put(key(*next),*next,w);
+          }
+        }
+      }else {
+        // These bounded arrays are real cold-build scratch, charged in full
+        // before reservation. Every representative is selected by the same
+        // exact first_request rule; only construction of its indexes differs.
+        using E=std::pair<SurfaceEdge,EdgeRecord>;
+        using P=std::pair<PositionRequest,EdgeRecord>;
+        Work::Scratch arrays(w,dirty_edges.size(),sizeof(E)+sizeof(P));
+        std::vector<E> edges;std::vector<P> positions;
+        edges.reserve(dirty_edges.size());positions.reserve(dirty_edges.size());
+        for(auto edge:dirty_edges) {
+          w.tick();if(auto next=first_request(*out->cache,edge,w)) {
+            if(!finite(next->vertex.position)||!finite(next->vertex.normal))
+              throw std::invalid_argument("Nonfinite sculpt representative");
+            edges.emplace_back(edge,*next);positions.emplace_back(key(*next),*next);
+          }
+        }
+        out->edges.assign_sorted(edges.begin(),edges.end(),w);
+        std::sort(positions.begin(),positions.end(),[&](const auto &a,const auto &b){w.tick();return a.first<b.first;});
+        out->positions.assign_sorted(positions.begin(),positions.end(),w);
       }
     }
     if(before) {
@@ -408,6 +464,24 @@ struct SculptSurfaceChunks::State {
       w.charge(dirty_chunks.size(),sizeof(std::pair<Int3,Chunk>));
       out->changes.reserve(dirty_chunks.size());
     }
+    Work::Phase assembly_phase(w,"chunk assembly and ordered runs");
+    using C=std::pair<Int3,Chunk>;
+    using R=std::pair<Int3,SculptSurfaceRun>;
+    std::optional<Work::Scratch> chunk_array,run_array;
+    size_t run_capacity=0;
+    if(!before){
+      out->cache->tiles.visit([&](Int3,const Tile &tile){
+        if(tile->cells.size()>limits.extraction.evaluated_cells-run_capacity)
+          throw std::length_error("Sculpt initial run scratch limit exceeded");
+        run_capacity+=tile->cells.size();
+      },w);
+      chunk_array.emplace(w,dirty_chunks.size(),sizeof(C));
+      run_array.emplace(w,run_capacity,sizeof(R));
+    }
+    // Constructed after their reservations, so vectors and all element owners
+    // die before the lexical scratch leases release on success or exception.
+    std::vector<C> initial_chunks;std::vector<R> initial_runs;
+    if(!before){initial_chunks.reserve(dirty_chunks.size());initial_runs.reserve(run_capacity);}
     auto erase_runs=[&](const Chunk &chunk){
       if(!chunk)return;
       for(size_t t=0;t<chunk->triangles.size();) {
@@ -423,7 +497,11 @@ struct SculptSurfaceChunks::State {
         for(size_t c=run.first;c<run.first+run.count;++c) {
           w.tick();run.bounds.include(chunk->mesh.positions.at(chunk->mesh.indices.at(c)));
         }
-        out->runs.put(cell,run,w);
+        if(before)out->runs.put(cell,run,w);
+        else {
+          if(initial_runs.size()>=run_capacity)throw std::length_error("Sculpt initial run scratch capacity exceeded");
+          initial_runs.emplace_back(cell,std::move(run));
+        }
       }
     };
     try {
@@ -457,8 +535,15 @@ struct SculptSurfaceChunks::State {
             chunk->mesh.indices.size()>limits.extraction.indices-out->report.indices)
           throw std::length_error("Sculpt manifest geometry limit exceeded");
         out->report.vertices+=chunk->mesh.positions.size();out->report.indices+=chunk->mesh.indices.size();
-        out->chunks.put(tile,chunk,w);++out->report.assembled_chunks;
+        if(before)out->chunks.put(tile,chunk,w);else initial_chunks.emplace_back(tile,chunk);
+        ++out->report.assembled_chunks;
         if(before&&chunk!=old_chunk)out->changes.push_back({tile,chunk});
+      }
+      if(!before){
+        Work::Phase phase(w,"initial chunk and ordered-run indexes");
+        out->chunks.assign_sorted(initial_chunks.begin(),initial_chunks.end(),w);
+        std::sort(initial_runs.begin(),initial_runs.end(),[&](const auto &a,const auto &b){w.tick();return a.first<b.first;});
+        out->runs.assign_sorted(initial_runs.begin(),initial_runs.end(),w);
       }
     } catch(const ExactRepair &) {
       // No approximation, local orientation guess, or permanent guard lift.
@@ -483,7 +568,7 @@ struct SculptSurfaceChunks::State {
     retain(out->changes.capacity(),sizeof(std::pair<Int3,Chunk>));
     if(out->chunks.root)retain(1,out->chunks.root->payload_bytes);
     if(out->chunks.root)out->bounds=out->chunks.root->bounds;
-    out->report.retained_bytes=retained;out->report.working_bytes=w.bytes;
+    out->report.retained_bytes=retained;out->report.working_bytes=w.peak;
     w.stop();return out;
   }
 };
