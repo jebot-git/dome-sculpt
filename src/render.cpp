@@ -872,7 +872,7 @@ void SurfaceRenderer::draw(std::shared_ptr<const MeshSnapshot> mesh,
   auto draw_range = [&](const Material &original, size_t first, size_t count,
                         uint64_t id, const TextureMaps *maps,bool use_source=false,bool use_canonical=false,bool force_pbr=false,bool paint_domain=false,bool normal_domain=false,const SourceMaterialBindings *binding=nullptr,const detail::Vrm1SourceBackground *background=nullptr) {
     const bool native_float=TextureState::native_float(original,maps,binding);
-    const auto polygon=maps?maps->polygon_surface:nullptr;glUniform1i(glGetUniformLocation(program_,"polygon_mode"),polygon?int(polygon->model()):0);glUniform1i(glGetUniformLocation(program_,"polygon_frames"),14);
+    const auto polygon=maps?maps->polygon_surface:nullptr;glUniform1i(glGetUniformLocation(program_,"polygon_mode"),polygon?int(polygon->model()):0);
     Material material = original;if(background){material.color=background->color;material.emissive=background->emission;}
     glUniform1f(glGetUniformLocation(program_,"relative_emission_strength"),background?background->relative_emission_strength:1);
     glDepthFunc(GL_LESS);glBlendEquationSeparate(GL_FUNC_ADD,GL_FUNC_ADD);glDisable(GL_SAMPLE_ALPHA_TO_COVERAGE);

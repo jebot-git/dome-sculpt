@@ -4,8 +4,11 @@
 #include <utility>
 namespace dome::detail {
 // Per-renderer immutable primitive frames. Unit14 already carries a sampler-
-// buffer for MToon; both samplerBuffer uniforms share that type and never alias
-// a sampler2D. No vertex attribute or GPU readback is added.
+// buffer for MToon. Reuse that same sampler declaration as well as its unit:
+// two active aliases would consume17 fragment samplers on a minimum16 device.
+// Polygon packets reject source/typed roles on their own primitive; the scoped
+// binding restores a mixed legacy range's actual source pack after each draw.
+// No vertex attribute or GPU readback is added.
 class PolygonSurfaceGpu {
  struct Chunk {
   GLuint buffer=0,texture=0;size_t first=0,count=0;
@@ -52,9 +55,9 @@ public:
  }
 };
 inline std::string polygon_surface_glsl(){return R"GLSL(
-uniform int polygon_mode;uniform samplerBuffer polygon_frames;
+uniform int polygon_mode;
 uniform mat4 model;uniform mat3 normal_model;uniform int affine_motion;uniform float model_hand;
-mat3 polygon_basis(int first){vec4 a=texelFetch(polygon_frames,gl_PrimitiveID*4+first);vec3 t=texelFetch(polygon_frames,gl_PrimitiveID*4+first+1).xyz;
+mat3 polygon_basis(int first){vec4 a=texelFetch(packedSources,gl_PrimitiveID*4+first);vec3 t=texelFetch(packedSources,gl_PrimitiveID*4+first+1).xyz;
 mat3 normal_transform=affine_motion==1?normal_model:mat3(model);vec3 N=unit(normal_transform*a.xyz);vec3 T=mat3(model)*t;T=unit(T-N*dot(N,T));return mat3(T,unit(cross(N,T))*a.w*model_hand,N);}
 vec3 polygon_transport(vec3 before){if(polygon_mode==0)return before;mat3 a=polygon_basis(0),b=polygon_basis(2);return unit(b*transpose(a)*before);}
 )GLSL";}
