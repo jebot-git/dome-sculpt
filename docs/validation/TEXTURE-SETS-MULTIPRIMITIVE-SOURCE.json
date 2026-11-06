@@ -1,0 +1,33 @@
+{
+  "status": "SOURCE ONLY; no object/link/runtime/application/SAN/device evidence",
+  "parent": "cdfadd18b7728dd8899be8c8dd19ea51c168db40",
+  "source_files": {
+    "CMakeLists.txt": "d4c8f47ae1e8104e2c3ed28f0bb3b20786d7bfce15394cca6a8d2a8c1186f3a8",
+    "src/document.cpp": "992bb4fff69c48f0d45853ebfba92b731532cfa5b7e690c1128b15fcb8c0a48e",
+    "src/export.cpp": "88a41debc2ea91b2a10af562ddfcb837c237c2036edc695c7e02fd6659ea948f",
+    "src/native-authoring-compiler.cpp": "afe696873819362d4606561aef76f07c80ac132796ead6cb1fd2068731b49b3b",
+    "src/scene.cpp": "480fdf7a9169c4d5fdb818b6c22342224710f00bfb8329a3cdbd8553c8bc06b9",
+    "src/texture-set-export.cpp": "9607f9f33244497d57dcf40423ed77abf1989800b18dfe47302cbc2045523ff6",
+    "src/texture-set-export.hpp": "8fb360188f12a16bae7b60809cf7c3b8675bc3b34a96160fd4e0b1c5ee7e7cce",
+    "tests/texture-set-export.cpp": "419c9b882cd3abe39d7a2b9fd1ad8b672eb96f5665b3d5f7332ee616e69f8fa1"
+  },
+  "syntax_receipt": {
+    "path": "/home/blux/de-xr/dome-sculpt/artifacts/texture-set-export-cdf/artifacts/export-syntax-v2/status.json",
+    "sha256": "184acc4b0ee1cb15473bf58afa4109625165b57e555370a41a3d0008d54b2b0a",
+    "whole_translation_units": 6,
+    "all_exit_zero": true
+  },
+  "scope": "One REST geometry/deformation expansion and shared primitive attribute/skin/morph identities; nonempty independent set material/images; owning plain Scene/native authoring/Document export routes; exact source/pose/plan, aggregate working/output bounds and cancellation guards.",
+  "unexecuted": [
+    "new actual cgltf/native-worker/export fixture",
+    "GLB output/schema and independent graphical consumer",
+    "full application and GL/XR/GUI/SAN/device"
+  ],
+  "remaining": [
+    "original per-set source/normal/canonical recipes and retained topology histories",
+    "per-set precision-qualified HDR emission",
+    "VRM semantic/source metadata multi-primitive adapter and import",
+    "per-set deformation normal/tangent quality and production fixtures",
+    "independent Bake/Clear/all-channel resolution/UV remap"
+  ]
+}

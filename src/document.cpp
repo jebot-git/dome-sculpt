@@ -4055,7 +4055,7 @@ void Document::file_loop() {
           auto native_owner=physical?std::make_shared<const Scene>(job->scene.snapshot()):nullptr;
           auto surfaces = physical?emission_export_surfaces(*native_owner,cancelled):job->scene.export_surfaces(cancelled);
           for (auto &surface : surfaces)
-            if (surface.mesh.uv.empty()) unwrap(surface.mesh,1024,4,cancelled);
+            if (!surface.texture_set_surface && surface.mesh.uv.empty()) unwrap(surface.mesh,1024,4,cancelled);
           GltfExportOptions options; options.recompute_changed_normals = true;
           options.cancelled=cancelled;options.before_commit=before_commit;
           if(physical){auto emission=std::make_shared<NativeEmissionExport>();emission->scene=std::move(native_owner);emission->scope=NativeEmissionExport::Scope::WholeScene;emission->allow_measured_core_fallback=true;options.emission=std::move(emission);}

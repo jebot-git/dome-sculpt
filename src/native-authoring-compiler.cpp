@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "native-authoring-compiler.hpp"
+#include "texture-set-export.hpp"
 #include "dome/source-paint-bake.hpp"
 #include "source-paint-export.hpp"
 #include "source-paint-physical.hpp"
@@ -219,11 +220,18 @@ std::vector<ObjectSurface> native_authoring_surfaces(const Scene &scene,
   // The capture owns the immutable snapshot. Only explicitly replaced metadata
   // is copied; read-only mesh/Volume/paint owners remain shared.
   auto detached=scene;
+  bool sets=false;
   for(const auto &original:scene.objects()){
     if(cancelled&&cancelled())throw std::runtime_error("Native physical surface extraction cancelled");
+    if(original.visible&&original.texture_sets){
+      sets=true;TextureSetLimits limits;limits.cancelled=cancelled;limits.maximum_bytes=std::min(limits.maximum_bytes,policy.max_working_bytes);
+      const auto plan=prepare_texture_set_surface(original,limits);
+      for(const auto&field:plan->fields())if(hdr_emission(field.material.emissive)||field.painted->has_physical_emission())
+        throw std::invalid_argument("Texture-set native HDR export needs its per-material precision-qualified compiler");
+    }
     if(original.visible&&native_physical(original))omit_current_emission(detached.object(original.id));
   }
-  auto surfaces=detached.preview_surfaces(cancelled);
+  auto surfaces=sets?detached.preview_surface_bundles(cancelled,{}):detached.preview_surfaces(cancelled);
   for(auto &surface:surfaces){const auto &original=scene.object(surface.id);
     if(native_physical(original)){
       if(surface.mesh.positions.size()>policy.max_vertices||surface.mesh.indices.size()/3>policy.max_triangles)
@@ -266,6 +274,12 @@ NativeAuthoringCompilation compile_native_authoring(
     check();
     const auto &mesh = surface.mesh;
     const auto &object = capture.scene().object(surface.id);
+    if(surface.texture_set_surface){
+      TextureSetLimits limits;limits.cancelled=stop;
+      if(fixed>=policy.max_working_bytes)throw std::length_error("Native texture-set export working budget exhausted");
+      limits.maximum_bytes=std::min(limits.maximum_bytes,policy.max_working_bytes-fixed);
+      reserve(texture_set_export_working_bound(surface,limits),1);continue;
+    }
     if(native_physical(object)&&(mesh.positions.size()>policy.max_vertices||mesh.indices.size()/3>policy.max_triangles))
       throw std::length_error("Native physical captured geometry exceeds its budget before staging");
     reserve(mesh.positions.size()+mesh.normals.size(),sizeof(Vec3));

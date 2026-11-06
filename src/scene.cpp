@@ -1301,7 +1301,8 @@ std::vector<ObjectSurface> Scene::preview_surfaces(const std::function<bool()> &
   return surfaces_impl(false, true, cancelled);
 }
 std::vector<ObjectSurface> Scene::export_surfaces(const std::function<bool()> &cancelled) const {
-  auto result=preview_surfaces(cancelled);
+  bool sets=false;for(const auto&o:objects_)sets|=o.visible&&bool(o.texture_sets);
+  auto result=sets?preview_surface_bundles(cancelled,{}):preview_surfaces(cancelled);
   for(auto &surface:result){
     if(cancelled&&cancelled())throw std::runtime_error("Source paint export cancelled");
     const auto &o=object(surface.id);
