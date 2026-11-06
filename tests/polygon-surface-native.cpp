@@ -28,7 +28,7 @@ void drag(Document&d,bool cancel){
 }
 void owning_negatives(const nlohmann::json&wire){
  expect(wire.at("version")==39&&wire.at("source_materials").at("version")==21&&wire.at("objects").at(0).at("painted").at("version")==6,"Actual field publication emits Scene39/material21/Paint6");
- auto bad=wire;bad["version"]=37;expect(owning_failure([&]{Scene::decode(bad);},"Scene39"),"Older owning context cannot borrow current polygon field capability");
+ auto bad=wire;bad["version"]=37;expect(owning_failure([&]{Scene::decode(bad);},"genuine material21/current field ownership"),"Older owning context cannot borrow current polygon field capability");
  bad=wire;bad["polygon_surfaces"]["nodes"][0]["before_origin"]=bad["polygon_sources"]["origins"].size();expect(owning_failure([&]{Scene::decode(bad);},"reference"),"Out-of-range actual before-root reference refuses before replay");
  bad=wire;bad["source_materials"]["polygon_surface_transfer"]=false;expect(owning_failure([&]{Scene::decode(bad);},"declared capabilities"),"Version alone does not grant polygon field semantics");
  bad=wire;size_t field_binding=0;while(bad["source_materials"]["bindings"][field_binding]["polygon_surface_transfer"].is_null())++field_binding;const auto root=bad["polygon_surfaces"]["nodes"][0]["before_origin"].get<size_t>();bad["polygon_sources"]["origins"][root]["material_bindings"]=field_binding;expect(owning_failure([&]{Scene::decode(bad);},"incomplete/future material prefix"),"Cross-pool owning cycle refuses before allocating/replaying current paint");
