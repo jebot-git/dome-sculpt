@@ -1,0 +1,254 @@
+{
+  "state": "current-d1 corrected complete Release consumer PASS; future57e whole-TU syntax PASS",
+  "source_base": "57e422650b2a5588eeeebc01d17df290057e8b18",
+  "product_change": false,
+  "product_guard_introduced": "ff734178f1914398035ef51971c614d27009e4cd",
+  "current_product": "d1f4015995c48ee582b9478d99cb521a1101571b",
+  "original_full_matrix": {
+    "commands": 35,
+    "passed": 34,
+    "failed": [
+      "vrm1-targets-faults"
+    ],
+    "status_path": "/home/blux/de-xr/dome-sculpt/artifacts/inherited-vrm-admission-audit-d1/current-release-status.json",
+    "status_sha256": "0a96e19e50c49c2cabbb8a76325a6997ffa41cf5727eb76f850f3f2eb1db67ef"
+  },
+  "original_failed_log": "LAYER_BOUNDARIES allocations=940 cancel=909 continuousRGB=0.00290593 coverage=0.00343137 working=2888768 operations=8415312\nFAIL Actual target preflight refused late, changed source authority or did not refuse precisely\n",
+  "diagnostic_log": "LAYER_BOUNDARIES allocations=940 cancel=909 continuousRGB=0.00290593 coverage=0.00343137 working=2888768 operations=8415312\nPREFLIGHT_DIAGNOSTIC expected=invariant-role prospective observed=VRM1 invariant-role prospective pixel/work limit exceeded polls=133 maximum=133 source_unchanged=1\nPREFLIGHT_DIAGNOSTIC expected=invariant-role prospective observed=VRM1 expression-layer pixel limit exceeded polls=1 maximum=3 source_unchanged=1\nFAIL Actual target preflight refused late, changed source authority or did not refuse precisely\n",
+  "corrected_full_log": "LAYER_BOUNDARIES allocations=940 cancel=909 continuousRGB=0.00290593 coverage=0.00343137 working=2888768 operations=8415312\nPREFLIGHT_CONTROL invariant-role-work observed=VRM1 invariant-role prospective pixel/work limit exceeded expected=invariant-role prospective polls=133 maximum=133 source_unchanged=1\nPREFLIGHT_CONTROL native-output-pixel-cap observed=VRM1 expression-layer pixel limit exceeded expected=VRM1 expression-layer pixel limit exceeded polls=1 maximum=1 source_unchanged=1\nPREFLIGHT_CONTROL output-only-pixel-cap observed=VRM1 expression-layer pixel limit exceeded expected=VRM1 expression-layer pixel limit exceeded polls=1 maximum=1 source_unchanged=1\nPREFLIGHT_CONTROL source-role-only-pixel-cap observed=VRM1 invariant-role prospective pixel/work limit exceeded expected=VRM1 invariant-role prospective pixel/work limit exceeded polls=3 maximum=3 source_unchanged=1\nNATIVE_ONLY_PIXEL_CONTROL unavailable native=64 minimum_output=64\nPREFLIGHT_CONTROL pixel-before-role-work observed=VRM1 expression-layer pixel limit exceeded expected=VRM1 expression-layer pixel limit exceeded polls=1 maximum=1 source_unchanged=1\nPREFLIGHT_CONTROL metadata-target-bound observed=VRM1 texture target is outside finite source metadata bounds expected=source metadata bounds polls=1 maximum=1 source_unchanged=1\nPREFLIGHT_CONTROL empty-binding-authority observed=VRM1 expression layer has no relevant original binding expected=no relevant original binding polls=1 maximum=1 source_unchanged=1\nPREFLIGHT_CONTROL foreign-only-binding-authority observed=VRM1 expression layer has no relevant original binding expected=no relevant original binding polls=1 maximum=1 source_unchanged=1\nPASS 1862 actual invariant-role allocation/cancel/target/retry checks\n",
+  "status_receipts": {
+    "preflight-diagnostic-status.json": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/inherited-vrm-admission-audit-d1/preflight-diagnostic-status.json",
+      "sha256": "5c7232dfde5092a7129b5aaabce94ee359f96ac6b8d3788ece02eb2fe0bcdb8b",
+      "receipt": {
+        "state": "terminal",
+        "pid": 3600490,
+        "source": "d1f4015995c48ee582b9478d99cb521a1101571b",
+        "scope": "One whole diagnostic TU and ELF against exact CURRENTd1 own headers/providers; old tests/fixture/guards unchanged; logging only in rejects helper, original bounds/expectations unchanged",
+        "steps": [
+          {
+            "name": "compile",
+            "args": [
+              "/usr/bin/c++",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/sculpt-authoring-77e/src",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/sculpt-authoring-77e/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/sculpt-authoring-77e/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/sculpt-authoring-77e/third_party/nlohmann",
+              "-O3",
+              "-DNDEBUG",
+              "-ffunction-sections",
+              "-fdata-sections",
+              "-std=gnu++20",
+              "-o",
+              "/tmp/dome-sculpt-d1-preflight-diagnostic/diagnostic.cpp.o",
+              "-c",
+              "/tmp/dome-sculpt-d1-preflight-diagnostic/vrm1-expression-targets-faults-diagnostic.cpp"
+            ],
+            "exit": 0,
+            "seconds": 6.033826538012363,
+            "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "name": "link",
+            "args": [
+              "python3",
+              "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-authoring-77e/artifacts/current-release-tmp/guard.py",
+              "/usr/bin/c++",
+              "-O3",
+              "-DNDEBUG",
+              "-ffunction-sections",
+              "-fdata-sections",
+              "-Wl,--gc-sections",
+              "-Wl,--dependency-file=CMakeFiles/dome-sculpt-vrm1-expression-targets-faults-test.dir/link.d",
+              "/tmp/dome-sculpt-d1-preflight-diagnostic/diagnostic.cpp.o",
+              "-o",
+              "/tmp/dome-sculpt-d1-preflight-diagnostic/vrm1-targets-faults-diagnostic",
+              "libdome-sculpt-core.a",
+              "libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "libdome-sculpt-polygon.a",
+              "libxatlas.a",
+              "libmikktspace.a",
+              "libmikktspace-robust.a",
+              "libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit": 0,
+            "seconds": 0.5034226030111313,
+            "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "name": "run",
+            "args": [
+              "/tmp/dome-sculpt-d1-preflight-diagnostic/vrm1-targets-faults-diagnostic",
+              "/tmp/dome-sculpt-d1-vrm-regression-release/runtime/vrm1-targets-uniform-roles-uv/nonuniform-source.dsculpt"
+            ],
+            "exit": 1,
+            "seconds": 25.354214547027368,
+            "log_sha256": "ef68380cfe0fa5d1529a67b5fa3e3d0c59416bbe8f5dbbbebde1bbb00c030daf"
+          }
+        ],
+        "original_source_sha256": "46e66b4d596abc2a7e51e63ec79f0ac24abf172a3eb01c212e8e8b9a75184025",
+        "diagnostic_source_sha256": "f6683b1129b2b27b2e99eddc659502cfdebfeb4f53d2fc62730e8d5b895e214f",
+        "source_exact_body_except_logging": true,
+        "original_compile": "/usr/bin/c++ -I/home/blux/de-xr/dome-sculpt/artifacts/sculpt-authoring-77e/src -I/home/blux/de-xr/dome-sculpt/artifacts/sculpt-authoring-77e/include -I/home/blux/de-xr/dome-sculpt/artifacts/sculpt-authoring-77e/third_party/openbrush -I/home/blux/de-xr/dome-sculpt/artifacts/sculpt-authoring-77e/third_party/nlohmann -O3 -DNDEBUG -ffunction-sections -fdata-sections -std=gnu++20 -o CMakeFiles/dome-sculpt-vrm1-expression-targets-faults-test.dir/tests/vrm1-expression-targets-faults.cpp.o -c /home/blux/de-xr/dome-sculpt/artifacts/sculpt-authoring-77e/tests/vrm1-expression-targets-faults.cpp",
+        "original_link": ": && python3 /home/blux/de-xr/dome-sculpt/artifacts/sculpt-authoring-77e/artifacts/current-release-tmp/guard.py /usr/bin/c++ -O3 -DNDEBUG -ffunction-sections -fdata-sections -Wl,--gc-sections -Wl,--dependency-file=CMakeFiles/dome-sculpt-vrm1-expression-targets-faults-test.dir/link.d CMakeFiles/dome-sculpt-vrm1-expression-targets-faults-test.dir/tests/vrm1-expression-targets-faults.cpp.o -o dome-sculpt-vrm1-expression-targets-faults-test  libdome-sculpt-core.a  libdome-sculpt-affine.a  /usr/lib64/liblapacke.so  libdome-sculpt-polygon.a  libxatlas.a  libmikktspace.a  libmikktspace-robust.a  libufbx.a  /usr/lib64/libpng.so  /usr/lib64/libjpeg.so  /usr/lib64/libz.so  libdome-sculpt-emission-codec.a  /usr/lib64/libOpenEXR-3_2.so  /usr/lib64/libOpenEXRUtil-3_2.so  /usr/lib64/libOpenEXRCore-3_2.so  /usr/lib64/libIex-3_2.so  /usr/lib64/libIlmThread-3_2.so  /usr/lib64/libImath-3_1.so  -lgcc_s_asneeded  -lgcc_s_asneeded && :",
+        "allocated_bytes": 5607424,
+        "phase": "run",
+        "child_pid": 3604646,
+        "unchanged_pins": [],
+        "exit": 0,
+        "original_negative_exit": 1
+      }
+    },
+    "preflight-corrected-status.json": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/inherited-vrm-admission-audit-d1/preflight-corrected-status.json",
+      "sha256": "c1521b3fb7c0dd846f49a4ed3a2e9530dd09f45c6a1fbead78b4643c4c5c895e",
+      "receipt": {
+        "state": "terminal",
+        "pid": 3664400,
+        "source": "d1f4015995c48ee582b9478d99cb521a1101571b",
+        "scope": "One corrected whole test TU and ELF against exact CURRENTd1 own headers/providers; complete original allocation/cancel sweeps and old controls retained; exact pixel diagnostic/max1poll plus real output/source-image boundaries/endpoint/earlycancel; frozen product/failed original/diagnostic unchanged",
+        "steps": [
+          {
+            "name": "compile",
+            "args": [
+              "/usr/bin/c++",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/sculpt-authoring-77e/src",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/sculpt-authoring-77e/include",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/sculpt-authoring-77e/third_party/openbrush",
+              "-I/home/blux/de-xr/dome-sculpt/artifacts/sculpt-authoring-77e/third_party/nlohmann",
+              "-O3",
+              "-DNDEBUG",
+              "-ffunction-sections",
+              "-fdata-sections",
+              "-std=gnu++20",
+              "-o",
+              "/tmp/dome-sculpt-d1-preflight-corrected/corrected.cpp.o",
+              "-c",
+              "/tmp/dome-sculpt-d1-preflight-corrected/vrm1-expression-targets-faults-corrected.cpp"
+            ],
+            "exit": 0,
+            "seconds": 4.933769516006578,
+            "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "name": "link",
+            "args": [
+              "python3",
+              "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-authoring-77e/artifacts/current-release-tmp/guard.py",
+              "/usr/bin/c++",
+              "-O3",
+              "-DNDEBUG",
+              "-ffunction-sections",
+              "-fdata-sections",
+              "-Wl,--gc-sections",
+              "-Wl,--dependency-file=CMakeFiles/dome-sculpt-vrm1-expression-targets-faults-test.dir/link.d",
+              "/tmp/dome-sculpt-d1-preflight-corrected/corrected.cpp.o",
+              "-o",
+              "/tmp/dome-sculpt-d1-preflight-corrected/vrm1-targets-faults-corrected",
+              "libdome-sculpt-core.a",
+              "libdome-sculpt-affine.a",
+              "/usr/lib64/liblapacke.so",
+              "libdome-sculpt-polygon.a",
+              "libxatlas.a",
+              "libmikktspace.a",
+              "libmikktspace-robust.a",
+              "libufbx.a",
+              "/usr/lib64/libpng.so",
+              "/usr/lib64/libjpeg.so",
+              "/usr/lib64/libz.so",
+              "libdome-sculpt-emission-codec.a",
+              "/usr/lib64/libOpenEXR-3_2.so",
+              "/usr/lib64/libOpenEXRUtil-3_2.so",
+              "/usr/lib64/libOpenEXRCore-3_2.so",
+              "/usr/lib64/libIex-3_2.so",
+              "/usr/lib64/libIlmThread-3_2.so",
+              "/usr/lib64/libImath-3_1.so",
+              "-lgcc_s_asneeded",
+              "-lgcc_s_asneeded"
+            ],
+            "exit": 0,
+            "seconds": 0.40367075300309807,
+            "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "name": "run",
+            "args": [
+              "/tmp/dome-sculpt-d1-preflight-corrected/vrm1-targets-faults-corrected",
+              "/tmp/dome-sculpt-d1-vrm-regression-release/runtime/vrm1-targets-uniform-roles-uv/nonuniform-source.dsculpt"
+            ],
+            "exit": 0,
+            "seconds": 23.374182659958024,
+            "log_sha256": "62e29a63036eb2a3a1969cf7eab236676d1eeed8a437fecb065cda8923bb39d2"
+          }
+        ],
+        "original_source_sha256": "46e66b4d596abc2a7e51e63ec79f0ac24abf172a3eb01c212e8e8b9a75184025",
+        "diagnostic_source_sha256": "e028220d7b9de8547225dedc75cd212b47f7aff618177aa51bbecf631ff4e6b3",
+        "full_original_sweeps_and_controls": true,
+        "original_compile": "/usr/bin/c++ -I/home/blux/de-xr/dome-sculpt/artifacts/sculpt-authoring-77e/src -I/home/blux/de-xr/dome-sculpt/artifacts/sculpt-authoring-77e/include -I/home/blux/de-xr/dome-sculpt/artifacts/sculpt-authoring-77e/third_party/openbrush -I/home/blux/de-xr/dome-sculpt/artifacts/sculpt-authoring-77e/third_party/nlohmann -O3 -DNDEBUG -ffunction-sections -fdata-sections -std=gnu++20 -o CMakeFiles/dome-sculpt-vrm1-expression-targets-faults-test.dir/tests/vrm1-expression-targets-faults.cpp.o -c /home/blux/de-xr/dome-sculpt/artifacts/sculpt-authoring-77e/tests/vrm1-expression-targets-faults.cpp",
+        "original_link": ": && python3 /home/blux/de-xr/dome-sculpt/artifacts/sculpt-authoring-77e/artifacts/current-release-tmp/guard.py /usr/bin/c++ -O3 -DNDEBUG -ffunction-sections -fdata-sections -Wl,--gc-sections -Wl,--dependency-file=CMakeFiles/dome-sculpt-vrm1-expression-targets-faults-test.dir/link.d CMakeFiles/dome-sculpt-vrm1-expression-targets-faults-test.dir/tests/vrm1-expression-targets-faults.cpp.o -o dome-sculpt-vrm1-expression-targets-faults-test  libdome-sculpt-core.a  libdome-sculpt-affine.a  /usr/lib64/liblapacke.so  libdome-sculpt-polygon.a  libxatlas.a  libmikktspace.a  libmikktspace-robust.a  libufbx.a  /usr/lib64/libpng.so  /usr/lib64/libjpeg.so  /usr/lib64/libz.so  libdome-sculpt-emission-codec.a  /usr/lib64/libOpenEXR-3_2.so  /usr/lib64/libOpenEXRUtil-3_2.so  /usr/lib64/libOpenEXRCore-3_2.so  /usr/lib64/libIex-3_2.so  /usr/lib64/libIlmThread-3_2.so  /usr/lib64/libImath-3_1.so  -lgcc_s_asneeded  -lgcc_s_asneeded && :",
+        "allocated_bytes": 11239424,
+        "phase": "run",
+        "child_pid": 3668257,
+        "unchanged_pins": [],
+        "exit": 0,
+        "original_negative_exit": 0
+      }
+    }
+  },
+  "runtime_input": {
+    "path": "/tmp/dome-sculpt-d1-vrm-regression-release/runtime/vrm1-targets-uniform-roles-uv/nonuniform-source.dsculpt",
+    "sha256": "cbdc19a0471d3672c287c718c204ff1efc60b56841ccf0dd3e0baf2180ef8529"
+  },
+  "corrected_source_sha256": "e028220d7b9de8547225dedc75cd212b47f7aff618177aa51bbecf631ff4e6b3",
+  "original_whole_inputs": {
+    "count": 3757,
+    "original_outputs": 564,
+    "manifest_path": "/home/blux/de-xr/dome-sculpt/artifacts/inherited-vrm-admission-audit-d1/current-release-input-manifest.json",
+    "manifest_sha256": "140df79ab93d65810737c3ba9586a58a8fcdb2388339b28a5574c759c1babf34",
+    "post_build_drift": [],
+    "post_runtime_drift": []
+  },
+  "native_only_control": "Unavailable: genuine native64 equals minimum output64; source/packet not relabelled",
+  "unexecuted": [
+    "separately registered preflight-only invocation",
+    "future57e runtime",
+    "sanitizer",
+    "hardware",
+    "physical XR",
+    "fullALL"
+  ],
+  "scope": "Test/CMake/docs-only correction; production guard/owner behavior unchanged",
+  "future_syntax": {
+    "args": [
+      "/usr/bin/c++",
+      "-I/home/blux/de-xr/dome-sculpt/artifacts/sculpt-authoring-5301/src",
+      "-I/home/blux/de-xr/dome-sculpt/artifacts/sculpt-authoring-5301/include",
+      "-I/home/blux/de-xr/dome-sculpt/artifacts/sculpt-authoring-5301/third_party/openbrush",
+      "-I/home/blux/de-xr/dome-sculpt/artifacts/sculpt-authoring-5301/third_party/nlohmann",
+      "-O3",
+      "-DNDEBUG",
+      "-ffunction-sections",
+      "-fdata-sections",
+      "-std=gnu++20",
+      "-fsyntax-only",
+      "/home/blux/de-xr/dome-sculpt/artifacts/vrm-preflight-order-57e/tests/vrm1-expression-targets-faults.cpp"
+    ],
+    "exit": 0,
+    "source_sha256": "e028220d7b9de8547225dedc75cd212b47f7aff618177aa51bbecf631ff4e6b3",
+    "headers_base": "a55960259f2807ab99bab76a96d3f59b93260131",
+    "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  }
+}
