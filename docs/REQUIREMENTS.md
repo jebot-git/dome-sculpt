@@ -1,3 +1,12 @@
+## User-requested pause — 2026-11-06
+
+The original objective and every unfinished row remain required. The goal is
+paused after the source/resize/cold-publication milestone, not completed. Read
+[PAUSE-CHECKPOINT-20261106.md](PAUSE-CHECKPOINT-20261106.md) for exact source and
+verification scopes, outstanding failures and guarded process resumption. The
+old c618 remesh SAN sweep now has complete final coverage; this does not admit
+the changed later authoring candidates or complete broader production work.
+
 ## Private matched sculpt/material evidence — 2026-11-06
 
 Private `d1f40159` has matching Release/SAN qualification for 15 selected native

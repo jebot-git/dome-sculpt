@@ -1,3 +1,14 @@
+## User-requested pause after authoring milestone — 2026-11-06
+
+Read [PAUSE-CHECKPOINT-20261106.md](PAUSE-CHECKPOINT-20261106.md). Ready source is
+composed privately through producte8d6b9e1; no main product admission. Separate
+resize2319 passes, coldP1 publishes258852 but warm-up remains failed, and the
+old c618 remesh SAN128-part sweep now closes116337denials+endpoint. New combined
+runtime/SAN/GUI/loader/device and original broader requirements remain pending.
+All agent work is stopped; oldcontractsOOM is SIGSTOP-preserved with exact
+process identity/resume instructions. The full goal is paused at the user's
+request. Do not resume work or the process until the user resumes the goal.
+
 ## Private matched sculpt/material qualification — 2026-11-06
 
 Current `d1f40159` now passes matched Release/SAN: 15 selected native suites,
