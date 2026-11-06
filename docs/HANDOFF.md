@@ -1,3 +1,15 @@
+## Coherent FLTK qualification and resolution plan — 2026-11-06
+
+Actual whole-ownedee557 Release passes19 polygon and51 texture-manager GUI
+controls, with four clean application closes and exact sources/258 providers/
+SDK/observed maps. Read validation/COHERENT-FLTK-WORKFLOWS-ee557.json; reusable
+tests/texture-set-menu.py matches executedv5 code except its module docstring.
+The manager preserves independent64/128 grids but has no resize control.
+TEXTURE-SET-RESOLUTION-PLAN.md gives the concrete all14-channel/PBR/FLOAT worker,
+transaction, UI, source-grid adapter and validation plan coordinated with bridge
+6bc73578. This sparse child implements no resize API/code/layout or runtime;
+qualified root/12c sources remain untouched. Full production goal remains open.
+
 ## Current isotropic remeshing integrated — 2026-11-06
 
 Main integrates qualified c618c828 on the current direct-upload/input foundation.

@@ -1,0 +1,149 @@
+{
+  "state": "terminal",
+  "exit": 0,
+  "source": "ee557a5962c0c101abbfbb6e4fa61f039543e018",
+  "scope": "Fresh coherent all-owned Release actual ordinary FLTK workflows; no component-old-layout providers or fake product observer",
+  "cases": [
+    {
+      "name": "polygon-normal",
+      "checks": 19,
+      "status": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-compose-44/artifacts/composed-gui-ee557/polygon-normal/status.json",
+        "sha256": "5992af040e06f852dd6fe2e665024473e0c2c9d222aab389cf1025cb4dccdd67"
+      },
+      "before": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-compose-44/artifacts/composed-gui-ee557/polygon-normal/before.json",
+        "sha256": "7d273ba04d853f961e356ece21f16da9174ac45ff3fe0e6d75d26e0cd3007346"
+      },
+      "report": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-compose-44/artifacts/composed-gui-ee557/polygon-normal/actual/report.json",
+        "sha256": "004452db7353d0854d49abae1ab4a459b2aa289ad2111dfd58bc8e9f7015979f"
+      },
+      "log": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-compose-44/artifacts/composed-gui-ee557/polygon-normal/native.log",
+        "sha256": "bba814bc7465e8f46334ac7bc581789e4e62cb3349a11d19c637b11d7553fa4c"
+      },
+      "own_inputs": 258,
+      "observed_ELF_maps": 98,
+      "independent_clean_app_processes": 2,
+      "seconds": 25.025143879989628,
+      "source": "ee557a5962c0c101abbfbb6e4fa61f039543e018"
+    },
+    {
+      "name": "texture-normal-v5",
+      "checks": 51,
+      "status": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-compose-44/artifacts/composed-gui-ee557/texture-normal-v5/status.json",
+        "sha256": "11989fecc2700a7a9c85baca9ed613d5869794e41b7431b6f3c0e443ae4de88f"
+      },
+      "before": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-compose-44/artifacts/composed-gui-ee557/texture-normal-v5/before.json",
+        "sha256": "b93bcec100b32dd4a0d6d83d3f247c5a732c16b41efb03dc3df726e68ec91298"
+      },
+      "report": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-compose-44/artifacts/composed-gui-ee557/texture-normal-v5/actual/report.json",
+        "sha256": "d2f4b2b5e922bb843c1dec97b2be3185bc9390e2d464788ce3f6c61c84e627b7"
+      },
+      "log": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-compose-44/artifacts/composed-gui-ee557/texture-normal-v5/native.log",
+        "sha256": "673aa4b9df100060e569298e06ea2feadb74626032fdd77ef4f54a1cb665cdd6"
+      },
+      "own_inputs": 258,
+      "observed_ELF_maps": 98,
+      "independent_clean_app_processes": 2,
+      "seconds": 42.8002668810077,
+      "source": "ee557a5962c0c101abbfbb6e4fa61f039543e018"
+    }
+  ],
+  "total_checks": 70,
+  "ordinary_clean_app_processes": 4,
+  "app": {
+    "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-compose-44/artifacts/composed-release-v3/build/dome-sculpt",
+    "sha256": "479b47444d1409e09acb8c8865a1176788956ac2f3649b884368586cd32309de"
+  },
+  "inspector": {
+    "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-compose-44/artifacts/composed-release-v3/build/dome-sculpt-native-authoring-inspect",
+    "sha256": "09207f77eab8bdaaba24c641e0dd4835b0eddd70e7440114c5b29224edd28265"
+  },
+  "source_root_frozen": true,
+  "scripts": {
+    "runner": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-compose-44/artifacts/composed-gui-ee557/run-case.py",
+      "sha256": "666ab6f7ad87486dad2a45a5c9e56039a05ba8918d497c004d7f6f1c8abf6903"
+    },
+    "polygon": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-compose-44/tests/polygon-surface-menu.py",
+      "sha256": "3cb24ab09bf474d076faa603a5ae0da2778b137620c23a9c8a08c61f82855c84"
+    },
+    "texture_final": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-compose-44/artifacts/composed-gui-ee557/texture-menu-v5.py",
+      "sha256": "995799a61a6315d474e7dd32b5d1c0a26d7463bbbe77c93da24cb93e0440fa71"
+    }
+  },
+  "texture_scope": [
+    "actual document-owned manager, selection and independent rename",
+    "active selected128 layer creation, pointer paint and Escape cancellation",
+    "exact source/sibling64 paint/material/mesh/topology membership preservation",
+    "per-field visibility/opacity/next/delete and exact Undo/Redo",
+    "actual editable selected RGB/roughness/HDR material Apply and Cancel",
+    "primary material/layer operations retain additional pixels",
+    "unselected foreground material correctly occludes primary painting",
+    "independent64/128 resolutions preserved through Save and fresh reopen",
+    "native Ctrl+W modal text cancellation and four clean application closes across two workflows"
+  ],
+  "resolution_limit": "Manager shows64/128 but has no resize control. Current painted bind guard is correct; measured all-channel/FLOAT resampling and sourceful writable-grid transition are still required. No resize functionality claimed.",
+  "preserved_failed_runs": [
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-compose-44/artifacts/composed-gui-ee557/texture-normal-v1/status.json",
+      "sha256": "72835f9ab0449e7a8db795c77fed30d5119e7b184ee29b1fd2dcda2fe3906554"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-compose-44/artifacts/composed-gui-ee557/texture-normal-v2/status.json",
+      "sha256": "e0d1553f7c22ea4b6055ee9fe4319ceb35d810c866fa66a48d58feb3eb308299"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-compose-44/artifacts/composed-gui-ee557/texture-material-pilot-v3/status.json",
+      "sha256": "c21716b657526e7486a5147fe59b907d5aa92c34844c1134d372e2220d8e9afc"
+    }
+  ],
+  "numeric_input_pilot_separate": {
+    "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-compose-44/artifacts/composed-gui-ee557/texture-material-pilot-v4/status.json",
+    "sha256": "6ba0e03048910599945f071afbb9461d73f65aed73e147c97936b790d21022e8"
+  },
+  "observer_corrections": [
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-compose-44/artifacts/composed-gui-ee557/TEXTURE-COMBO-INPUT-CORRECTION.json",
+      "sha256": "2c1ce9dda66cc4e5f6306c904cf534c2adf050ef86e3f097e1cff6d18e7300e6"
+    },
+    {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-compose-44/artifacts/composed-gui-ee557/TEXTURE-NUMERIC-INPUT-CORRECTION.json",
+      "sha256": "48772499063281bb8d3fde3f22b9b6bb48bac6a74e157c0eac437acc20840002"
+    }
+  ],
+  "failure_meanings": [
+    "Home did not select first native choice; Up/Down from actual active index preserves exact selection predicate",
+    "Duplicate synthetic MotionNotify while pressed turned click into drag; genuine one-motion click correctly transfers numeric input focus. All original numerical/ownership predicates remain."
+  ],
+  "resource": {
+    "scope_cap": 33554432,
+    "allocated_at_closure": 24219648,
+    "actual_free_at_closure": 21798854656,
+    "global_floor": 21474836480,
+    "root_reserve": 201326592,
+    "own_reserve": 16777216,
+    "new_software_disk_shader_cache_disabled_only_to_bound_outputs": true,
+    "all_prior_failure_caches_retained": true
+  },
+  "limits": [
+    "Release only; no sanitizer GUI execution",
+    "normal-size private X11 opt-in display, not native Wayland or physical headset",
+    "no resolution editing UI or sourceful resize",
+    "sourceful per-set bridges/full production still require real adapters and qualification"
+  ],
+  "repository_test": {
+    "path": "tests/texture-set-menu.py",
+    "sha256": "2269b4945c5cc677600fd52cbf6b130f3c7cc80693d7a207f35a1e96f52a6d8e",
+    "executed_v5": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-compose-44/artifacts/composed-gui-ee557/texture-menu-v5.py",
+    "executable_AST_exact_to_executed_v5_excluding_module_docstring": true
+  }
+}
