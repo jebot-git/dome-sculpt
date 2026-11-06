@@ -37,6 +37,12 @@ const SculptChunkBounds &SculptPlacedChunks::bounds() const {
   return state_->chunks.root?state_->chunks.root->bounds:empty;
 }
 bool SculptPlacedChunks::has_queries() const {return state_->queries;}
+SculptPlacedChunk::Ptr SculptPlacedChunks::find(const SculptSurfaceChunks::Chunk &source) const {
+  const auto found=state_->chunks.find(source->coordinate);
+  if(!found||(*found)->source()!=source||(*found)->source().owner_before(source)||source.owner_before((*found)->source()))
+    throw std::invalid_argument("Placed lookup lost its actual immutable chunk owner");
+  return *found;
+}
 SculptPlacedChunks::Ptr SculptPlacedChunks::capture(const SculptSceneChunks::Ptr &scene,uint64_t object,
     const Ptr &before,bool queries,SculptPlacedChunksLimits limits,LocalSurfaceCache::Cancel cancel) {
   Work work{limits,cancel};work.stop();

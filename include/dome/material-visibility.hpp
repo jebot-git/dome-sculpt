@@ -5,7 +5,7 @@
 #include <optional>
 #include <span>
 namespace dome {
-namespace detail {struct SculptSurfaceChunk;}
+namespace detail {struct SculptSurfaceChunk; class SculptSceneChunks;}
 struct CreatorAppearance;
 struct SurfaceRange;
 struct SourceNativeMaterial;
@@ -41,6 +41,11 @@ public:
                        std::span<const std::array<float,4>>,PaintCornerCoordinates);
   MaterialSurfaceQuery(const Mesh &,std::span<const SurfaceRange>,const std::function<bool()> &,
                        std::span<const std::array<float,4>>,PaintVertexCoordinates);
+  // A real mixed immutable scene, retaining chunk-local namespaces. This does
+  // not flatten generated geometry into the packed paint/source namespace.
+  MaterialSurfaceQuery(const Mesh &,std::span<const SurfaceRange>,const std::function<bool()> &,
+      std::span<const std::array<float,4>>,PaintVertexCoordinates,
+      std::shared_ptr<const detail::SculptSceneChunks>);
   ~MaterialSurfaceQuery();
   MaterialSurfaceQuery(const MaterialSurfaceQuery &) = delete;
   MaterialSurfaceQuery &operator=(const MaterialSurfaceQuery &) = delete;

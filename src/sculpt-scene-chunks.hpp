@@ -6,6 +6,7 @@
 
 namespace dome::detail {
 class SculptPlacedChunks;
+class SculptChunkMasks;
 // Scalar ownership is intentionally separate from geometry. Captures only the
 // actual immutable mask map/background/voxel meaning, never Volume history or
 // a paint/material collection. A mask edit must not become a geometry key.
@@ -29,6 +30,7 @@ struct SculptObjectChunks {
   std::shared_ptr<const SculptMaskSnapshot> mask;
   bool source_dormant=false;
   std::shared_ptr<const SculptPlacedChunks> placed;
+  std::shared_ptr<const SculptChunkMasks> masks;
   Vec3 placed_position(Vec3) const;
   Vec3 placed_normal(Vec3) const;
   bool reflected() const;
@@ -59,6 +61,7 @@ public:
       const Ptr &before={},SculptSceneChunkLimits={},LocalSurfaceCache::Cancel={});
   const std::vector<SculptObjectChunks> &objects() const {return objects_;}
   const SculptSceneChunkContext &context() const {return context_;}
+  const std::vector<uint64_t> &object_order() const {return order_;}
   size_t retained_bytes() const {return bytes_;}
   const SculptObjectChunks *find(uint64_t) const;
   // Includes a genuinely captured empty Volume. Such an owner has no draw
@@ -74,6 +77,7 @@ private:
   SculptSceneChunks()=default;
   SculptSceneChunkContext context_;
   std::vector<SculptObjectChunks> objects_;
+  std::vector<uint64_t> order_;
   std::vector<Cache> caches_;
   size_t bytes_=0;
   SculptSceneChunkLimits limits_;

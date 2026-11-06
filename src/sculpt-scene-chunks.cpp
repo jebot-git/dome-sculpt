@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "sculpt-scene-chunks.hpp"
 #include "sculpt-placed-chunks.hpp"
+#include "sculpt-chunk-masks.hpp"
 #include "affine-surface.hpp"
 #include "dome/polygon-scene.hpp"
 #include <bit>
@@ -69,7 +70,7 @@ SculptScenePreview SculptSceneChunks::capture_geometry(const Scene &scene,Sculpt
   // Object metadata has the existing fixed Scene quota. Chunk geometry itself
   // stays in persistent directories; no per-object vector of all chunks.
   size_t metadata=sizeof(SculptSceneChunks)+256+
-      scene.objects().size()*(sizeof(SculptObjectChunks)+sizeof(Cache)+sizeof(std::pair<uint64_t,SculptSurfaceChunks::Ptr>));
+      scene.objects().size()*(sizeof(SculptObjectChunks)+sizeof(Cache)+sizeof(std::pair<uint64_t,SculptSurfaceChunks::Ptr>)+sizeof(uint64_t));
   auto add=[&](size_t n){
     if(metadata>limits.retained_bytes||n>limits.retained_bytes-metadata)
       throw std::length_error("Sculpt scene retained metadata limit exceeded");
@@ -89,6 +90,8 @@ SculptScenePreview SculptSceneChunks::capture_geometry(const Scene &scene,Sculpt
     throw std::length_error("Sculpt scene metadata limit exceeded");
   auto out=std::shared_ptr<SculptSceneChunks>(new SculptSceneChunks);out->context_=context;out->limits_=limits;
   out->objects_.reserve(scene.objects().size());out->caches_.reserve(scene.objects().size());
+  out->order_.reserve(scene.objects().size());
+  for(const auto &object:scene.objects())out->order_.push_back(object.id);
   out->bytes_=metadata;
   const size_t prior=before?before->bytes_:0;
   if(prior>limits.working_bytes-metadata||group_scratch>limits.working_bytes-metadata-prior)
@@ -156,8 +159,8 @@ SculptScenePreview SculptSceneChunks::capture(const Scene &scene,SculptSceneChun
   // it. Build a separate final owner afterward; never mutate a published const
   // geometry view while asking another factory to authenticate that view.
   size_t clone=sizeof(SculptSceneChunks)+256+
-      geometry->objects_.size()*(sizeof(SculptObjectChunks)+sizeof(SculptPlacedChunks::Ptr))+
-      geometry->caches_.size()*sizeof(Cache);
+      geometry->objects_.size()*(sizeof(SculptObjectChunks)+sizeof(SculptPlacedChunks::Ptr)+sizeof(SculptChunkMasks::Ptr))+
+      geometry->caches_.size()*sizeof(Cache)+geometry->order_.size()*sizeof(uint64_t);
   for(const auto &object:geometry->objects_) {
     if(object.name.size()+object.material.name.size()+256>SIZE_MAX-clone)
       throw std::length_error("Sculpt view metadata copy overflow");
@@ -169,6 +172,7 @@ SculptScenePreview SculptSceneChunks::capture(const Scene &scene,SculptSceneChun
     throw std::length_error("Sculpt placed view working envelope exceeded");
   size_t retained=geometry->bytes_;
   std::vector<SculptPlacedChunks::Ptr> placed;
+  std::vector<SculptChunkMasks::Ptr> masks; masks.reserve(geometry->objects_.size());
   if(geometry->objects_.size()>limits.working_bytes/sizeof(SculptPlacedChunks::Ptr))
     throw std::length_error("Sculpt placed owner vector byte limit exceeded");
   placed.reserve(geometry->objects_.size());
@@ -186,10 +190,20 @@ SculptScenePreview SculptSceneChunks::capture(const Scene &scene,SculptSceneChun
     if(result->report().retained_bytes>limits.retained_bytes-retained)
       throw std::length_error("Sculpt placed result exceeded its prospective envelope");
     retained+=result->report().retained_bytes;placed.push_back(std::move(result));
+    SculptChunkMasks::Ptr scalar;
+    if(object.mask) {
+      if(retained>=limits.retained_bytes||retained>=limits.working_bytes-prior-clone)
+        throw std::length_error("No sculpt scalar capacity remains");
+      scalar=SculptChunkMasks::capture(object.geometry,object.mask,previous?previous->masks:nullptr,
+          limits.retained_bytes-retained,limits.working_bytes-prior-clone-retained,cancel);
+      if(scalar->retained_bytes()>limits.retained_bytes-retained)throw std::length_error("Sculpt scalar result exceeds aggregate budget");
+      retained+=scalar->retained_bytes();
+    }
+    masks.push_back(std::move(scalar));
   }
   stop(cancel);
   auto final=std::shared_ptr<SculptSceneChunks>(new SculptSceneChunks(*geometry));
-  for(size_t i=0;i<placed.size();++i)final->objects_[i].placed=std::move(placed[i]);
+  for(size_t i=0;i<placed.size();++i){final->objects_[i].placed=std::move(placed[i]);final->objects_[i].masks=std::move(masks[i]);}
   final->bytes_=retained;preview.chunks=std::move(final);stop(cancel);return preview;
 }
 Mesh SculptSceneChunks::materialize(uint64_t object,LocalSurfaceCache::Cancel cancel) const {

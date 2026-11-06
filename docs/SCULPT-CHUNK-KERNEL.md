@@ -13,3 +13,36 @@ The sparse child also contains deliberately unqualified source scaffolding: a pr
 Remaining production work includes live worker publication and geometry/scalar cache separation, chunk GPU resources and exact ordered transparent/ghost draws, object/chunk-aware query identity, tight framing and cancellable selected Cut adapters, persistent fault/cancel/history/Save/native-app proofs and meaningful CPU/GPU work measurements. Per-tile winding approximation, hidden whole-mesh flatten on every stroke, or a GPU-statistics-only change cannot close the objective. Global repair/component orientation and actual 39/40/paint/normal/source adapters remain required beyond the initial ordinary Volume route.
 
 Exact evidence: `docs/validation/SCULPT-CHUNK-KERNEL-R.json`. Ignored raw artifacts remain at `artifacts/native-kernel-release-v1`; the kernel execution takes 0.127 seconds after whole optimized compilation. All phase guards retained the 20 GiB actual-free floor plus the coordinator's 192 MiB reserve, the 20 MiB finite output limit and the cumulative 1.5 GiB allocation cap.
+
+## Worker, query and GPU source continuation
+
+The later runtime child connects generated chunks to the real Document worker
+and SurfaceRenderer. Detached caches publish only with the accepted snapshot
+under actual generation/revision/view fences. Painted/source surfaces keep their
+packed representation; Volume objects retain typed chunk geometry without fake
+packed ranges. Protection scalars have independent persistent mask owners.
+
+Typed material queries combine actual world chunk BVHs and packed geometry
+under one total 65,536-triangle and 262,144-bounds work envelope, retaining real
+object/source-chunk identity and reflection corner mapping. GL caches key both
+object and immutable placed Mesh owner, upload positions/normals directly, stage
+new scalar buffers before replacing accepted owners, prune unused packets, clear
+on failed draws, and support context abandonment. The cap is 512 MiB/65,536
+packets. Held/canvas motion stays in uniforms. Draws retain original Scene order
+within material queues and global cell/triangle order, including opaque ties,
+Blend and ghosts; only adjacent contiguous same-owner ranges can merge.
+
+Seven whole source/renderer/test units pass syntax checks. The genuine native
+fixture remains unexecuted. It covers an independent whole-mesher corner/order
+oracle, typed hits, masks, shear/reflection and actual Document Cancel, Apply,
+Save, Undo and Redo. No application, GL, performance or sanitizer qualification
+is claimed. Fresh complete own providers on latest main are required.
+
+GPU manifest reconciliation still scans whole chunk-directory metadata per new
+accepted snapshot. Changed mask owners resample all current object packets. The
+exact-repair fallback retains its real materializer. These costs remain open;
+Polygon39/Texture40 fields, broader production, runtime/device and sustained
+performance requirements remain open. The earlier22 kernel checks keep their
+original isolated scope.
+
+Receipt: `docs/validation/SCULPT-CHUNK-PIPELINE-SOURCE.json`.

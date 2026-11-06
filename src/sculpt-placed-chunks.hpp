@@ -23,6 +23,7 @@ public:
   const SculptPlacedChunksReport &report() const;
   const SculptChunkBounds &bounds() const;
   bool has_queries() const;
+  SculptPlacedChunk::Ptr find(const SculptSurfaceChunks::Chunk &) const;
   void for_each(const std::function<void(const SculptPlacedChunk::Ptr &)> &,
                 LocalSurfaceCache::Cancel={}) const;
   // Traverse actual aggregate world bounds without rebuilding/flattening any
