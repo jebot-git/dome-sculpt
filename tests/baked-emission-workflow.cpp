@@ -67,10 +67,11 @@ void quality_oracle(const detail::GltfDocument &d,const EmissionInterchangeImage
  check(std::abs(static_cast<long double>(f.at("maximumRelativeError").get<double>())-maximum_relative)<=precision*std::max(1.L,maximum_relative),"reported dimensionless ratio agrees with independent extended-precision oracle");
  check(f.at("erasedNonzeroSamples")==erased&&erased==0,"measured current fallback retains every nonzero sample in this actual HDR/tiny-value fixture");
 }
-void uv1_worker_controls(const std::filesystem::path &directory){
+void uv1_worker_controls(const std::filesystem::path &directory,bool raw_only=false){
   std::filesystem::create_directories(directory);
   for(const bool typed:{false,true})for(const float coverage:{.25f,0x1p-24f}){
-    const auto name=std::string(typed?"mtoon-":"pbr-")+(coverage<.001f?"tiny":"quarter");
+    if(raw_only&&coverage<.001f)continue;
+    const auto name=std::string(typed?"mtoon-":"pbr-")+(raw_only?"raw-original":(coverage<.001f?"tiny":"quarter"));
     const auto folder=directory/name;std::filesystem::create_directories(folder);
     std::cout<<"UV1_WORKER_CASE "<<name<<std::endl;
     auto f=fixture();const auto sibling=f.scene.add("Retained hidden physical sibling",Volume{});
@@ -88,7 +89,7 @@ void uv1_worker_controls(const std::filesystem::path &directory){
     for(size_t i=0;i<4096;++i)base.coverage[i]=coverage<.001f?0:(i%64<32?191:65);
     std::vector<BakedEmissionSample> input(4096);
     for(size_t i=0;i<input.size();++i)input[i]={{coverage*.25f,coverage*.5f,0},{coverage*(50000+32*float(i%64)),coverage*.00001f*float(i/64+1),coverage*2},coverage};
-    base.emission_field=BakedEmissionField::create(64,input);source.painted->install_bake(std::move(base));
+    base.emission_field=BakedEmissionField::create(64,input);if(!raw_only)source.painted->install_bake(std::move(base));
     source.material.emissive=typed?std::array<float,3>{.4f,.15f,.4f}:std::array<float,3>{2,4,8};
     if(typed){
       auto binding=std::make_shared<SourceMaterialBindings>();binding->native_reference.emission={.2f,.3f,.4f};binding->native_reference.color=source.material.color;
@@ -127,14 +128,14 @@ void uv1_worker_controls(const std::filesystem::path &directory){
     for(size_t i=0;i<values.size();++i){
       const auto x=i%64,y=i/64;const std::array<double,3> texture=y<32?(x<32?std::array<double,3>{1,0,1}:std::array<double,3>{0,1,0}):(x<32?std::array<double,3>{0,0,0}:std::array<double,3>{1,1,1});
       check(values[i].coverage==1&&values[i].legacy==std::array<float,3>{},"actual target FLOAT grid is resolved absolute with full projection coverage");
-      for(size_t k=0;k<3;++k){const double wanted=background[k]*texture[k]*(1-coverage)+double(input[i].legacy[k])*strength+input[i].absolute[k];check(std::isfinite(values[i].absolute[k])&&std::abs(double(values[i].absolute[k])-wanted)<=std::max(1e-10,std::abs(wanted)*2e-6),"actual worker agrees with independent authored UV1/filter/affine/FLOAT coverage oracle");}
+      for(size_t k=0;k<3;++k){const double wanted=raw_only?background[k]*texture[k]:background[k]*texture[k]*(1-coverage)+double(input[i].legacy[k])*strength+input[i].absolute[k];check(std::isfinite(values[i].absolute[k])&&std::abs(double(values[i].absolute[k])-wanted)<=std::max(1e-10,std::abs(wanted)*2e-6),"actual worker agrees with independent authored UV1/filter/affine/FLOAT coverage oracle");}
     }
     // Independent planar-frame oracle: original UV1 mirrors U; current baked
     // normal is in UV0. Decode before filtering/blending and normalize in the
     // common geometry space, independently of the emission-specific coverage.
     const auto original=normalized(Vec3{-(156.f/255*2-1),128.f/255*2-1,250.f/255*2-1});
     const auto detail=normalized(Vec3{128.f/255*2-1,204.f/255*2-1,230.f/255*2-1});
-    for(size_t i=0;i<4096;++i){const float a=coverage<.001f?0:float(i%64<32?191:65)/255;
+    for(size_t i=0;i<4096;++i){const float a=raw_only||coverage<.001f?0:float(i%64<32?191:65)/255;
       const auto n=normalized(original*(1-a)+detail*a);const std::array<float,3> v{n.x,n.y,n.z};
       for(size_t k=0;k<3;++k){const int wanted=int(std::lround((v[k]*.5f+.5f)*255));
         check(std::abs(int(paint.baked()->maps.normal.rgba[i*4+k])-wanted)<=1,"actual UV1 original and current canonical normal blend matches independent geometry-space oracle");}
@@ -142,7 +143,7 @@ void uv1_worker_controls(const std::filesystem::path &directory){
     // An emission-stripped ordinary control carries the exact same visible
     // color/normal/ORM source. It never replaces the actual hidden source.
     auto ordinary=f.scene.snapshot();auto &control=ordinary.object(f.source);control.painted=control.painted->snapshot();
-    auto old=*control.painted->baked();old.emission_field.reset();old.maps.emission=image({0,0,0,255});control.painted->clear_bake();control.painted->install_bake(std::move(old));control.material.emissive={};
+    if(!raw_only){auto old=*control.painted->baked();old.emission_field.reset();old.maps.emission=image({0,0,0,255});control.painted->clear_bake();control.painted->install_bake(std::move(old));}control.material.emissive={};
     if(typed){auto binding=std::make_shared<SourceMaterialBindings>(*control.material_bindings);binding->material.parameters.emission={};binding->material.parameters.emission_strength=1;control.material_bindings=std::move(binding);}
     bake_object(ordinary,f.source,options);const auto &other=*ordinary.active().painted->baked(),&actual=*paint.baked();
     check(actual.maps.color.rgba==other.maps.color.rgba&&actual.maps.metal_rough.rgba==other.maps.metal_rough.rgba&&actual.maps.normal.rgba==other.maps.normal.rgba&&actual.coverage==other.coverage&&actual.color_interpretation==other.color_interpretation&&actual.normal_interpretation==other.normal_interpretation,"actual FLOAT Bake leaves every other color/ORM/normal/common-coverage interpretation byte-exact to nonemissive Bake control");
@@ -268,6 +269,9 @@ void public_fixtures(const std::filesystem::path &directory){
 } // namespace
 int main(int argc,char **argv)try{
   using namespace dome;
+  if(argc==3&&std::string_view(argv[1])=="--raw-source-worker-controls"){
+    uv1_worker_controls(argv[2],true);std::cout<<"Baked emission raw UV1 worker "<<checks<<" checks PASS\n";return 0;
+  }
   if(argc==3&&std::string_view(argv[1])=="--source-worker-controls"){
     uv1_worker_controls(argv[2]);std::cout<<"Baked emission UV1 worker "<<checks<<" checks PASS\n";return 0;
   }

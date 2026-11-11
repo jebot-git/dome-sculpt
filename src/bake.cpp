@@ -262,8 +262,8 @@ BakeResult bake_mesh(const Mesh &low,const BakeSource &source,const BakeOptions 
     return m.maps&&m.maps->source_only&&m.maps->overlay&&m.maps->baked_base&&
         !m.maps->baked_base->maps.normal.rgba.empty()&&m.normal_strength>0;
   });
-  if (source.tangents.empty() && (std::any_of(source.materials.begin(), source.materials.end(),
-        [](const auto &material) { return normal_image(material) && material.normal_strength > 0; }) || raw_baked_normals)) {
+  if ((source.tangents.empty() && std::any_of(source.materials.begin(), source.materials.end(),
+        [](const auto &material) { return normal_image(material) && material.normal_strength > 0; })) || raw_baked_normals) {
     high_frames = tangent_corners(source.mesh, o.cancelled);
     for (size_t t = 0; t < source.mesh.indices.size()/3; ++t) {
       auto id = source.triangle_materials.empty() ? 0 : source.triangle_materials[t];
@@ -394,9 +394,7 @@ BakeResult bake_mesh(const Mesh &low,const BakeSource &source,const BakeOptions 
           sum+=Vec3{q[0]/255.f*2-1,q[1]/255.f*2-1,q[2]/255.f*2-1}*w;
         }
         if(coverage>0){
-          TangentFrame canonical;
-          if(source.tangents.empty())canonical=tangent_frame(source.mesh,high_frames,hit->triangle,hit->barycentric);
-          else {auto b=basis(source.mesh,hit->triangle,normalized(hit->normal),hit->barycentric,source.tangents);canonical={b.tangent,b.bitangent,b.normal};}
+          const auto canonical=tangent_frame(source.mesh,high_frames,hit->triangle,hit->barycentric);
           const auto baked_world=canonical.to_world(sum/coverage);
           high_normal=normalized(high_normal*(1-coverage)+baked_world*coverage);
         }
