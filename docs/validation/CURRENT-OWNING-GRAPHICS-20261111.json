@@ -1,0 +1,551 @@
+{
+  "schema": 1,
+  "source": "a904a2d644eca7885e38e51528057790232e8418",
+  "kind": "Scoped actual current owning graphics/software/strictArc/image qualification",
+  "source_tree": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-union-20261111",
+  "build_root": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-build-20261111",
+  "root_owning_provenance": {
+    "release": {
+      "state": "terminal",
+      "build_step_exit": 0,
+      "owning_target_count": 63,
+      "owning_outputs": 381,
+      "initial_objects": 0,
+      "selected_native_software_exit": 8,
+      "overall_parent_exit": 1,
+      "qualification_boundary": "Actual fresh owning providers complete; original selected53 has five preserved failures. This graphics receipt does not change or relabel that result."
+    },
+    "sanitize": {
+      "state": "terminal",
+      "build_step_exit": 0,
+      "owning_target_count": 63,
+      "owning_outputs": 381,
+      "initial_objects": 0,
+      "selected_native_software_exit": 8,
+      "overall_parent_exit": 1,
+      "qualification_boundary": "Actual fresh owning providers complete; original selected53 has five preserved failures. This graphics receipt does not change or relabel that result."
+    }
+  },
+  "profiles": {
+    "release": {
+      "software": {
+        "status": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-current-graphics-20261111/software-release-v1/status.json",
+        "status_sha256": "7b9d77957b849fc4385502f91c98c6c51aabe51c757cc1a03a04811d68e7e1f1",
+        "exit": 0,
+        "source_provider_SDK_input_mapped_output_drift": [],
+        "provider_files": 381,
+        "environment": {
+          "LD_LIBRARY_PATH": "/home/blux/de-xr/dome-sculpt/artifacts/sdk-20261111/toolkit-release/lib:/usr/lib64",
+          "LIBGL_ALWAYS_SOFTWARE": "1",
+          "LP_NUM_THREADS": "2",
+          "ASAN_OPTIONS": null,
+          "UBSAN_OPTIONS": null,
+          "LSAN_OPTIONS": null,
+          "LD_PRELOAD": null
+        },
+        "cases": [
+          {
+            "name": "direct",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-build-20261111/release/dome-sculpt-render-direct-upload-test",
+              "direct",
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-current-graphics-20261111/software-release-v1/direct"
+            ],
+            "timeout_seconds": 180,
+            "max_RSS": 146481152,
+            "exit": 0,
+            "seconds": 0.4603717550053261,
+            "actual_checks": 68
+          },
+          {
+            "name": "polygon",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-build-20261111/release/dome-sculpt-polygon-surface-render-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-build-20261111/release/polygon-surface-native",
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-current-graphics-20261111/software-release-v1/polygon"
+            ],
+            "timeout_seconds": 180,
+            "max_RSS": 357883904,
+            "exit": 0,
+            "seconds": 9.433437575993594,
+            "actual_checks": 51
+          },
+          {
+            "name": "chunk",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-build-20261111/release/dome-sculpt-sculpt-chunk-render-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-current-graphics-20261111/software-release-v1/chunk"
+            ],
+            "timeout_seconds": 180,
+            "max_RSS": 168935424,
+            "exit": 0,
+            "seconds": 2.186174969014246,
+            "actual_checks": 98
+          },
+          {
+            "name": "mixed",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-build-20261111/release/dome-sculpt-texture-set-polygon-render-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-current-graphics-20261111/software-release-v1/mixed"
+            ],
+            "timeout_seconds": 180,
+            "max_RSS": 174202880,
+            "exit": 0,
+            "seconds": 1.301858455000911,
+            "actual_checks": 537
+          },
+          {
+            "name": "source",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-build-20261111/release/dome-sculpt-texture-set-source-render-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-current-graphics-20261111/software-release-v1/source"
+            ],
+            "timeout_seconds": 180,
+            "max_RSS": 179449856,
+            "exit": 0,
+            "seconds": 3.02457259001676,
+            "actual_checks": 994
+          },
+          {
+            "name": "arena",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-build-20261111/release/dome-sculpt-sculpt-gpu-arena-test"
+            ],
+            "timeout_seconds": 180,
+            "max_RSS": 109703168,
+            "exit": 0,
+            "seconds": 0.1875396830146201,
+            "actual_checks": 405
+          },
+          {
+            "name": "layout",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-build-20261111/release/dome-sculpt-sculpt-gpu-arena-layout-test"
+            ],
+            "timeout_seconds": 180,
+            "max_RSS": 3952640,
+            "exit": 0,
+            "seconds": 0.15366896899649873,
+            "actual_checks": 2097166
+          }
+        ]
+      },
+      "arc": {
+        "status": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-current-graphics-20261111/arc-release-v1/status.json",
+        "status_sha256": "af1efb1204398b51fbe01a800efdb6b5766f39a12c205d9d9930a8059c2f332d",
+        "exit": 0,
+        "source_provider_SDK_input_mapped_output_drift": [],
+        "provider_files": 381,
+        "environment": {
+          "LD_LIBRARY_PATH": "/home/blux/de-xr/dome-sculpt/artifacts/sdk-20261111/toolkit-release/lib:/usr/lib64",
+          "LD_PRELOAD": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-current-graphics-20261111/control/device-auth-release.so",
+          "LIBGL_ALWAYS_SOFTWARE": "0",
+          "DRI_PRIME": "pci-0000_03_00_0",
+          "LP_NUM_THREADS": "2",
+          "ASAN_OPTIONS": null,
+          "UBSAN_OPTIONS": null,
+          "LSAN_OPTIONS": null
+        },
+        "cases": [
+          {
+            "name": "direct",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-build-20261111/release/dome-sculpt-render-direct-upload-test",
+              "direct",
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-current-graphics-20261111/arc-release-v1/direct"
+            ],
+            "timeout_seconds": 180,
+            "max_RSS": 98828288,
+            "lease_acquired": true,
+            "exit": 0,
+            "seconds": 0.3745004190132022,
+            "actual_checks": 68,
+            "lease_released": true
+          },
+          {
+            "name": "polygon",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-build-20261111/release/dome-sculpt-polygon-surface-render-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-build-20261111/release/polygon-surface-native",
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-current-graphics-20261111/arc-release-v1/polygon"
+            ],
+            "timeout_seconds": 180,
+            "max_RSS": 560685056,
+            "lease_acquired": true,
+            "exit": 0,
+            "seconds": 4.768071834987495,
+            "actual_checks": 51,
+            "lease_released": true
+          },
+          {
+            "name": "chunk",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-build-20261111/release/dome-sculpt-sculpt-chunk-render-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-current-graphics-20261111/arc-release-v1/chunk"
+            ],
+            "timeout_seconds": 180,
+            "max_RSS": 106893312,
+            "lease_acquired": true,
+            "exit": 0,
+            "seconds": 1.025087961985264,
+            "actual_checks": 98,
+            "lease_released": true
+          },
+          {
+            "name": "mixed",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-build-20261111/release/dome-sculpt-texture-set-polygon-render-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-current-graphics-20261111/arc-release-v1/mixed"
+            ],
+            "timeout_seconds": 180,
+            "max_RSS": 130162688,
+            "lease_acquired": true,
+            "exit": 0,
+            "seconds": 0.8081249420065433,
+            "actual_checks": 537,
+            "lease_released": true
+          },
+          {
+            "name": "source",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-build-20261111/release/dome-sculpt-texture-set-source-render-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-current-graphics-20261111/arc-release-v1/source"
+            ],
+            "timeout_seconds": 180,
+            "max_RSS": 126021632,
+            "lease_acquired": true,
+            "exit": 0,
+            "seconds": 2.119780497974716,
+            "actual_checks": 994,
+            "lease_released": true
+          },
+          {
+            "name": "arena",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-build-20261111/release/dome-sculpt-sculpt-gpu-arena-test"
+            ],
+            "timeout_seconds": 180,
+            "max_RSS": 81588224,
+            "lease_acquired": true,
+            "exit": 0,
+            "seconds": 0.4110885619884357,
+            "actual_checks": 405,
+            "lease_released": true
+          }
+        ]
+      }
+    },
+    "sanitize": {
+      "software": {
+        "status": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-current-graphics-20261111/software-sanitize-v1/status.json",
+        "status_sha256": "e10db240db82a0007db4e173911b511896d757d90d76ce819e61b8c4e043b4b7",
+        "exit": 0,
+        "source_provider_SDK_input_mapped_output_drift": [],
+        "provider_files": 381,
+        "environment": {
+          "LD_LIBRARY_PATH": "/home/blux/de-xr/dome-sculpt/artifacts/sdk-20261111/toolkit-sanitize/lib:/usr/lib64",
+          "LIBGL_ALWAYS_SOFTWARE": "1",
+          "LP_NUM_THREADS": "2",
+          "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1:abort_on_error=1",
+          "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=1",
+          "LSAN_OPTIONS": null,
+          "LD_PRELOAD": null
+        },
+        "cases": [
+          {
+            "name": "direct",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-build-20261111/sanitize/dome-sculpt-render-direct-upload-test",
+              "direct",
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-current-graphics-20261111/software-sanitize-v1/direct"
+            ],
+            "timeout_seconds": 180,
+            "max_RSS": 860200960,
+            "exit": 0,
+            "seconds": 0.8733120820252225,
+            "actual_checks": 68
+          },
+          {
+            "name": "polygon",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-build-20261111/sanitize/dome-sculpt-polygon-surface-render-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-build-20261111/sanitize/polygon-surface-native",
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-current-graphics-20261111/software-sanitize-v1/polygon"
+            ],
+            "timeout_seconds": 180,
+            "max_RSS": 2289639424,
+            "exit": 0,
+            "seconds": 17.31977832200937,
+            "actual_checks": 51
+          },
+          {
+            "name": "chunk",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-build-20261111/sanitize/dome-sculpt-sculpt-chunk-render-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-current-graphics-20261111/software-sanitize-v1/chunk"
+            ],
+            "timeout_seconds": 180,
+            "max_RSS": 1141293056,
+            "exit": 0,
+            "seconds": 6.211485503008589,
+            "actual_checks": 98
+          },
+          {
+            "name": "mixed",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-build-20261111/sanitize/dome-sculpt-texture-set-polygon-render-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-current-graphics-20261111/software-sanitize-v1/mixed"
+            ],
+            "timeout_seconds": 180,
+            "max_RSS": 1248776192,
+            "exit": 0,
+            "seconds": 4.416460968030151,
+            "actual_checks": 537
+          },
+          {
+            "name": "source",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-build-20261111/sanitize/dome-sculpt-texture-set-source-render-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-current-graphics-20261111/software-sanitize-v1/source"
+            ],
+            "timeout_seconds": 180,
+            "max_RSS": 1625116672,
+            "exit": 0,
+            "seconds": 25.028399155999068,
+            "actual_checks": 994
+          },
+          {
+            "name": "arena",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-build-20261111/sanitize/dome-sculpt-sculpt-gpu-arena-test"
+            ],
+            "timeout_seconds": 180,
+            "max_RSS": 716267520,
+            "exit": 0,
+            "seconds": 0.858563399000559,
+            "actual_checks": 405
+          },
+          {
+            "name": "layout",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-build-20261111/sanitize/dome-sculpt-sculpt-gpu-arena-layout-test"
+            ],
+            "timeout_seconds": 180,
+            "max_RSS": 310226944,
+            "exit": 0,
+            "seconds": 1.1260282329749316,
+            "actual_checks": 2097166
+          }
+        ]
+      },
+      "arc": {
+        "status": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-current-graphics-20261111/arc-sanitize-v1/status.json",
+        "status_sha256": "2c1e76fe5c8f13381f1166fd1666e36931e35e026a043d764d2a00c9fb70d2fa",
+        "exit": 0,
+        "source_provider_SDK_input_mapped_output_drift": [],
+        "provider_files": 381,
+        "environment": {
+          "LD_LIBRARY_PATH": "/home/blux/de-xr/dome-sculpt/artifacts/sdk-20261111/toolkit-sanitize/lib:/usr/lib64",
+          "LD_PRELOAD": "/usr/lib64/libasan.so.8.0.0:/home/blux/de-xr/dome-sculpt/artifacts/authoring-current-graphics-20261111/control/device-auth-sanitize.so",
+          "LIBGL_ALWAYS_SOFTWARE": "0",
+          "DRI_PRIME": "pci-0000_03_00_0",
+          "LP_NUM_THREADS": "2",
+          "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1:abort_on_error=1",
+          "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=1",
+          "LSAN_OPTIONS": null
+        },
+        "cases": [
+          {
+            "name": "direct",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-build-20261111/sanitize/dome-sculpt-render-direct-upload-test",
+              "direct",
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-current-graphics-20261111/arc-sanitize-v1/direct"
+            ],
+            "timeout_seconds": 180,
+            "max_RSS": 516022272,
+            "lease_acquired": true,
+            "exit": 0,
+            "seconds": 0.7330265879863873,
+            "actual_checks": 68,
+            "lease_released": true
+          },
+          {
+            "name": "polygon",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-build-20261111/sanitize/dome-sculpt-polygon-surface-render-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-build-20261111/sanitize/polygon-surface-native",
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-current-graphics-20261111/arc-sanitize-v1/polygon"
+            ],
+            "timeout_seconds": 180,
+            "max_RSS": 2767511552,
+            "lease_acquired": true,
+            "exit": 0,
+            "seconds": 10.203038767969701,
+            "actual_checks": 51,
+            "lease_released": true
+          },
+          {
+            "name": "chunk",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-build-20261111/sanitize/dome-sculpt-sculpt-chunk-render-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-current-graphics-20261111/arc-sanitize-v1/chunk"
+            ],
+            "timeout_seconds": 180,
+            "max_RSS": 965783552,
+            "lease_acquired": true,
+            "exit": 0,
+            "seconds": 4.694671717006713,
+            "actual_checks": 98,
+            "lease_released": true
+          },
+          {
+            "name": "mixed",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-build-20261111/sanitize/dome-sculpt-texture-set-polygon-render-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-current-graphics-20261111/arc-sanitize-v1/mixed"
+            ],
+            "timeout_seconds": 180,
+            "max_RSS": 1257201664,
+            "lease_acquired": true,
+            "exit": 0,
+            "seconds": 3.9403135770116933,
+            "actual_checks": 537,
+            "lease_released": true
+          },
+          {
+            "name": "source",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-build-20261111/sanitize/dome-sculpt-texture-set-source-render-test",
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-current-graphics-20261111/arc-sanitize-v1/source"
+            ],
+            "timeout_seconds": 180,
+            "max_RSS": 1485942784,
+            "lease_acquired": true,
+            "exit": 0,
+            "seconds": 23.092261319980025,
+            "actual_checks": 994,
+            "lease_released": true
+          },
+          {
+            "name": "arena",
+            "command": [
+              "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-build-20261111/sanitize/dome-sculpt-sculpt-gpu-arena-test"
+            ],
+            "timeout_seconds": 180,
+            "max_RSS": 546906112,
+            "lease_acquired": true,
+            "exit": 0,
+            "seconds": 1.2771812439896166,
+            "actual_checks": 405,
+            "lease_released": true
+          }
+        ]
+      }
+    }
+  },
+  "comparisons": {
+    "release-software-Arc": {
+      "scope": "Actual same-current-cohort image/native comparisons. Every image, not only selected PNG groups. Original RGB bound6/alphaexact on software\u2192Arc; byteexact R\u2192S; native byteexact always.",
+      "comparison": "release-software-Arc",
+      "state": "terminal",
+      "exit": 0,
+      "pairs": 98,
+      "image_pairs": 94,
+      "native_pairs": 4,
+      "maximum_RGB_difference": 2,
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-current-graphics-20261111/compare-release-software-Arc.json",
+      "sha256": "e30e27743d3639b637d7ecaa28862613e11eabec711e870cb2b6748db791fc5f"
+    },
+    "sanitize-software-Arc": {
+      "scope": "Actual same-current-cohort image/native comparisons. Every image, not only selected PNG groups. Original RGB bound6/alphaexact on software\u2192Arc; byteexact R\u2192S; native byteexact always.",
+      "comparison": "sanitize-software-Arc",
+      "state": "terminal",
+      "exit": 0,
+      "pairs": 98,
+      "image_pairs": 94,
+      "native_pairs": 4,
+      "maximum_RGB_difference": 2,
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-current-graphics-20261111/compare-sanitize-software-Arc.json",
+      "sha256": "d1414d1cb6c3e7c5d2885c4eeb30bec149cff6d4e6e2f2328c62815dc3577a60"
+    },
+    "software-R-S": {
+      "scope": "Actual same-current-cohort image/native comparisons. Every image, not only selected PNG groups. Original RGB bound6/alphaexact on software\u2192Arc; byteexact R\u2192S; native byteexact always.",
+      "comparison": "software-R-S",
+      "state": "terminal",
+      "exit": 0,
+      "pairs": 98,
+      "image_pairs": 94,
+      "native_pairs": 4,
+      "maximum_RGB_difference": 0,
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-current-graphics-20261111/compare-software-R-S.json",
+      "sha256": "d688429b979f93da91395a711d1389f21015b4ac266b8802ddf4a2580a5b50a5"
+    },
+    "arc-R-S": {
+      "scope": "Actual same-current-cohort image/native comparisons. Every image, not only selected PNG groups. Original RGB bound6/alphaexact on software\u2192Arc; byteexact R\u2192S; native byteexact always.",
+      "comparison": "arc-R-S",
+      "state": "terminal",
+      "exit": 0,
+      "pairs": 98,
+      "image_pairs": 94,
+      "native_pairs": 4,
+      "maximum_RGB_difference": 0,
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-current-graphics-20261111/compare-arc-R-S.json",
+      "sha256": "ce4ec2644a25125fdc1f56dcd6bb8bb42972c20f74957c2bbf9ac2ace015e3a8"
+    }
+  },
+  "producer": {
+    "same_profile_root": "<build>/polygon-surface-native",
+    "existing_completed_CTest_positive": "polygon-surface-native-owning",
+    "rerun": false,
+    "accepted_native_inputs_per_profile": 8,
+    "all_inputs_before_after_SHA": true,
+    "R_S_accepted_inputs_byte_exact": true,
+    "comparison_path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-current-graphics-20261111/producer-R-S-comparison.json",
+    "comparison_sha256": "68ae9e7c83a12a4de1849d0cbdfb2710c71ecdced0082cb794faa26db344e044"
+  },
+  "graphics_controls": {
+    "actual_five_counts": [
+      68,
+      51,
+      98,
+      537,
+      994
+    ],
+    "actual_five_total": 1748,
+    "arena": 405,
+    "CPU_layout_per_profile": 2097166,
+    "deadline_seconds_each": 180,
+    "external_RSS_guard_bytes": 4294967296,
+    "bounds_changed": false,
+    "old_total_1753_not_relabelled": "Old direct73 performed26 repeated actual-transfer byte comparisons. Current direct68 performs21 because accepted caches survive rejected proposals, with added index/scalar byte checks and exactly3 initial transfers. All other semantic PASS messages remain identical; current actual1748 is recorded."
+  },
+  "device_proof": {
+    "actual_renderer": "Intel Arc A770",
+    "actual_pci": "0000:03:00.0",
+    "actual_device": "8086:56a0",
+    "kernel_driver": "i915",
+    "proof": "Actual current GL renderer + EGL display device + actual rendernode char device + sysfs PCI/vendor/device + matching openFDs + pre-assertion paused live mount-certified inode/device/ELF SHA maps. DRI_PRIME alone is not accepted.",
+    "observer": "Fresh API-only GL query forwarding library with no project class ABI; unchanged renderer string and no numerical/argument edits. SANobserver instrumented, actual libasan first.",
+    "lease": "Exclusive /tmp/dome-sculpt-arc-device.lock separately for each of12 device cases; all released.",
+    "timings": "Observed functional elapsed includes identity pause/mapped-file hashing and nonexclusive host load. No quiet performance/XR acceptance."
+  },
+  "strict_sanitizer": "ASAN_OPTIONS=detect_leaks=1:halt_on_error=1:abort_on_error=1; UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1; LSAN_OPTIONS unset; no suppressions. All SAN native processes terminal0 without diagnostics.",
+  "persistent_evidence": {
+    "archive": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-current-graphics-20261111/current-graphics-evidence.tar.zst",
+    "sha256": "de0f89e5e63613f9fa81caf3571e2343c4c9fba367803394d308ba3f1a27be9e",
+    "bytes": 1198042,
+    "members": 493,
+    "member_manifest": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-current-graphics-20261111/evidence-members.json",
+    "member_manifest_sha256": "802a899ac548c6d6e93551747476131e12f47fe58de3e243bd35450fcca233b3",
+    "full_decode_SHA_mode_UID_GID_nsmtime": true,
+    "all_originals_retained": true
+  },
+  "scope_limits": [
+    "No whole-goal/main admission, P1/performance, native application GUI/XR, physical HMD, compute-backend or large-scene capacity claim.",
+    "Currenta904 full selected53 remains48pass/fivefail. Later sourcecolor/extraUV/Doc/local-observer test repairs are separate source checkpoints.",
+    "Original4.8M/new9.6M native aggregate capacity remains a REAL MaterialSurfaceQuery admission blocker at the SurfaceQuery2M per-mesh bound; future private partition adapter is unqualified and not consumed.",
+    "All consumers/providers/native inputs are fresh current-owning ABI; no old03f8/b8/f473 executable/provider/producer reused. Old API-only observational source is freshly compiled and declared.",
+    "No root/frozen source/provider/shared-build mutation. Metadata-only child branch; all product/header/test/source assets byteexacta904."
+  ]
+}
