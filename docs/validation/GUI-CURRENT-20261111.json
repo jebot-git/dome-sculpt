@@ -1,0 +1,229 @@
+{
+  "source": "b8c469ce875eb2542c220300c3c63edbf1526570",
+  "status": "Four current functional cases pass with retained intermittent compact failure; cause unproven",
+  "scope": "Actual ordinary FLTK/Xvfb/GLX, normal+compact, Release+strictASAN/LSAN/UBSAN. No nativeWayland/compositor/physical qualification.",
+  "cases": [
+    {
+      "profile": "release",
+      "mode": "normal",
+      "exit": 0,
+      "checks": 81,
+      "seconds": 67.83811854204396,
+      "log_sha256": "fe272b9d8e76ca78ef4ddd5c29e9743625185728e9fb34648340467a8990a99e",
+      "scope": "Actual6launch workflow with native Save/history/Cancel and source preservation",
+      "report_input_drift": []
+    },
+    {
+      "profile": "release",
+      "mode": "compact",
+      "exit": 0,
+      "checks": 81,
+      "seconds": 82.68999879597686,
+      "log_sha256": "fe272b9d8e76ca78ef4ddd5c29e9743625185728e9fb34648340467a8990a99e",
+      "scope": "Actual6launch workflow with native Save/history/Cancel and source preservation",
+      "report_input_drift": []
+    },
+    {
+      "profile": "sanitize",
+      "mode": "normal",
+      "exit": 0,
+      "checks": 81,
+      "seconds": 422.9619270749972,
+      "log_sha256": "fe272b9d8e76ca78ef4ddd5c29e9743625185728e9fb34648340467a8990a99e",
+      "scope": "Actual6launch workflow with native Save/history/Cancel and source preservation",
+      "report_input_drift": []
+    },
+    {
+      "profile": "sanitize",
+      "mode": "compact",
+      "exit": 0,
+      "checks": 81,
+      "seconds": 382.47985974000767,
+      "log_sha256": "fe272b9d8e76ca78ef4ddd5c29e9743625185728e9fb34648340467a8990a99e",
+      "scope": "Actual6launch workflow with native Save/history/Cancel and source preservation",
+      "report_input_drift": []
+    }
+  ],
+  "failure": {
+    "profile": "sanitize",
+    "mode": "compact",
+    "checks_before_timeout": 58,
+    "exit": 1,
+    "seconds": 301.4205929679447,
+    "error": "TimeoutError('Actual FLTK workflow did not reach its expected state')",
+    "location": "same-size128 Apply waiting for actual modal disappearance, original50second wait",
+    "log_sha256": "ae7c95a5bdc0114306001e796ebc4403097d97a7a56131aefc3976936acc2557",
+    "retained_output": "artifacts/gui-recovery-20261111/execution-v2/sanitize-compact",
+    "diagnosis": "Unproven. Timeout-only public-window snapshot diagnostic rerun changes no input/oracle/deadline and passes81; original failure remains an intermittent qualification limitation."
+  },
+  "image_pairs": [
+    {
+      "mode": "normal",
+      "image": "before-front-paint.png",
+      "release_sha256": "80a1a62891c0a80ebd1ab6f6b324455582096c835b2f8679e0957b1e7b8fa16b",
+      "sanitize_sha256": "80a1a62891c0a80ebd1ab6f6b324455582096c835b2f8679e0957b1e7b8fa16b",
+      "exact": true,
+      "difference_bbox": null,
+      "max_rgb_difference": 0,
+      "outside_bottom_status_28px_exact": true
+    },
+    {
+      "mode": "normal",
+      "image": "front-painted.png",
+      "release_sha256": "296017d7352f0b138b1dea6ab80f83ee94f81ed206cdbacfec1c6c0cc6452546",
+      "sanitize_sha256": "f3b927b769086f47650d37d333e97036ca0495def5e6c26379d86348a345d9b5",
+      "exact": false,
+      "difference_bbox": [
+        644,
+        741,
+        921,
+        754
+      ],
+      "max_rgb_difference": 200,
+      "outside_bottom_status_28px_exact": true
+    },
+    {
+      "mode": "normal",
+      "image": "manager-initial.png",
+      "release_sha256": "f819b69a2dcc79e56fb12dabba13ab6decab07a3a3c5c4ab60a7d180a2966ce5",
+      "sanitize_sha256": "f819b69a2dcc79e56fb12dabba13ab6decab07a3a3c5c4ab60a7d180a2966ce5",
+      "exact": true,
+      "difference_bbox": null,
+      "max_rgb_difference": 0,
+      "outside_bottom_status_28px_exact": true
+    },
+    {
+      "mode": "normal",
+      "image": "quality-before.png",
+      "release_sha256": "f38f65d15ceb7b3c3a38f00496b2531f1532f8126ed305a3dc03443acfbeb4a5",
+      "sanitize_sha256": "a8e2b5b83a1062bd70a240e323e366d38af3aa54d7034cf099f9b972caf43cc7",
+      "exact": false,
+      "difference_bbox": [
+        10,
+        0,
+        1050,
+        754
+      ],
+      "max_rgb_difference": 201,
+      "outside_bottom_status_28px_exact": false
+    },
+    {
+      "mode": "normal",
+      "image": "quality-refusal.png",
+      "release_sha256": "fa6fedcef2bddca4dd25df03d834e8c6a9da9af1841999d8b5905695e0bb837f",
+      "sanitize_sha256": "fa6fedcef2bddca4dd25df03d834e8c6a9da9af1841999d8b5905695e0bb837f",
+      "exact": true,
+      "difference_bbox": null,
+      "max_rgb_difference": 0,
+      "outside_bottom_status_28px_exact": true
+    },
+    {
+      "mode": "normal",
+      "image": "resized-extra64.png",
+      "release_sha256": "b17c936137c6899db0834248b5014e67420aaac3ef5c27d6d69f75abca5c50a9",
+      "sanitize_sha256": "4ae56ae0de69078e5124dd4e21ca6184a50469e7798ceb998f6f2a7e14681212",
+      "exact": false,
+      "difference_bbox": [
+        644,
+        741,
+        921,
+        754
+      ],
+      "max_rgb_difference": 200,
+      "outside_bottom_status_28px_exact": true
+    },
+    {
+      "mode": "compact",
+      "image": "before-front-paint.png",
+      "release_sha256": "1632a7df80bdc2097e022a09a2b99246dc8249aa0024c5a848bf902ce67c46b0",
+      "sanitize_sha256": "1632a7df80bdc2097e022a09a2b99246dc8249aa0024c5a848bf902ce67c46b0",
+      "exact": true,
+      "difference_bbox": null,
+      "max_rgb_difference": 0,
+      "outside_bottom_status_28px_exact": true
+    },
+    {
+      "mode": "compact",
+      "image": "front-painted.png",
+      "release_sha256": "63c23982be7f64f2299673f07b8a5cefc89c7645d6e9c03e81e52b4c3b92d552",
+      "sanitize_sha256": "423b02a8a329bd1f226bbdb65ef54e68199d203b3c0a16ebf885510ec7926ff0",
+      "exact": false,
+      "difference_bbox": [
+        628,
+        481,
+        929,
+        494
+      ],
+      "max_rgb_difference": 200,
+      "outside_bottom_status_28px_exact": true
+    },
+    {
+      "mode": "compact",
+      "image": "manager-initial.png",
+      "release_sha256": "371994e85f1f16a9f73c1026e3f81180160679ec7f0143f81991fbfb810297b5",
+      "sanitize_sha256": "371994e85f1f16a9f73c1026e3f81180160679ec7f0143f81991fbfb810297b5",
+      "exact": true,
+      "difference_bbox": null,
+      "max_rgb_difference": 0,
+      "outside_bottom_status_28px_exact": true
+    },
+    {
+      "mode": "compact",
+      "image": "quality-before.png",
+      "release_sha256": "5e4f8fcb46bc74bd59cbe3f77c36485ce3d1422f2749dce2a3014a6c316ed15d",
+      "sanitize_sha256": "604a888bed8a281bb30a283e4eb497d6950bd59d31b3c0a0512e3be6e737a91b",
+      "exact": false,
+      "difference_bbox": [
+        636,
+        481,
+        937,
+        494
+      ],
+      "max_rgb_difference": 200,
+      "outside_bottom_status_28px_exact": true
+    },
+    {
+      "mode": "compact",
+      "image": "quality-refusal.png",
+      "release_sha256": "43a59b8c11992c221bf82308b9366ca70389b3318b80c27e113441e95786c200",
+      "sanitize_sha256": "43a59b8c11992c221bf82308b9366ca70389b3318b80c27e113441e95786c200",
+      "exact": true,
+      "difference_bbox": null,
+      "max_rgb_difference": 0,
+      "outside_bottom_status_28px_exact": true
+    },
+    {
+      "mode": "compact",
+      "image": "resized-extra64.png",
+      "release_sha256": "8abbebecedef3909e70d0d20f9cf1dda438bdc5f5860eacd4c234fb33c0222be",
+      "sanitize_sha256": "b8cf25f2bbfa9ca9c648c01966a647299ee56f3aa475645f09b5f53d203e32c2",
+      "exact": false,
+      "difference_bbox": [
+        628,
+        481,
+        929,
+        494
+      ],
+      "max_rgb_difference": 200,
+      "outside_bottom_status_28px_exact": true
+    }
+  ],
+  "all_image_pairs_exact": false,
+  "evidence": {
+    "artifacts/gui-recovery-20261111/packages.json": "24c5b910e2f2bc8934ae54ab3640ab2ed97f21ccf8cb2a2b193a765b6f97e67c",
+    "artifacts/gui-recovery-20261111/xvfb-shell-helper.json": "ae562a9af3b0666215f0731388180e26911c398cce087f5ebe8d7572b3b74ae8",
+    "artifacts/gui-recovery-20261111/diagnostic-derivation.json": "500f7958c65d7ac8eaaa416bdfe5b4bf872dbf7345c3879fa0c90bdbd0981f07",
+    "artifacts/gui-recovery-20261111/reuse-v3.json": "c371eb9f4224ad74b6b00d5a3e0a7d790aac7e3956fe600165ba697dc5810d26",
+    "artifacts/gui-recovery-20261111/execution-v2/status.json": "6c9b5107286369d77f458a802476667f6378ad5a5399aad75391e552be9ac9bf",
+    "artifacts/gui-recovery-20261111/execution-v3/status.json": "233975bba41ab637a57a6ab22246b797c87447c96459152b125d7194d218f105"
+  },
+  "no_system_install": true,
+  "no_session_restart": true,
+  "image_comparison_scope": {
+    "raw_png_pairs": 12,
+    "raw_exact": 6,
+    "outside_status_28px_exact": 11,
+    "status_region_basis": "src/app.cpp:444 fixed28px status box; observed saved/opened project-path text differs by execution/profile namespace. All raw mismatches retained, not normalized away.",
+    "unqualified_view": "normal quality-before.png differs over viewport: Release shows framed plane, sanitizer capture is still over-zoomed after fixed.15s Frameall sleep. Public-presentation acknowledgment is being added; this is not a renderer-equivalence pass."
+  }
+}

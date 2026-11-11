@@ -7,7 +7,12 @@ for precise scopes, retained warnings and log limitation. Stronger XR workflows
 now pass8cases/117checks perprofile, with16exact native pairs; read
 [XR-SAVED-REDO-20261111.md](XR-SAVED-REDO-20261111.md). Fixture-only causation is
 unproven; original failures and the separate systemMesa leak remain preserved.
-Current11-TU inherited-role SAN and ordinary GUI qualification are in progress.
+Current strictArc positives also pass1727/profile and56software/device pairs;
+SANUHD negative teardown leaks remain failures, described in
+[STRICT-ARC-20261111.md](STRICT-ARC-20261111.md). Ordinary GUI81 perprofile/size
+passes with one retained intermittent sanitizer-compact timeout and a screenshot
+presentation gap; read [GUI-CURRENT-20261111.md](GUI-CURRENT-20261111.md).
+Current11-TU inherited-role SAN and stronger GUI acknowledgments remain live.
 Main product admission, broader current regression and full requirements remain
 pending. All historical pause notes below remain historical; the goal is active.
 
@@ -15,6 +20,16 @@ Main9ee7a2b3 also includes the reviewed opt-in ArmorPaint blur extraction,
 independent software/Arc and unsuppressed sanitizer controls, licenses and the
 native hosting boundary in [ARMORPAINT-EXPERIMENT.md](ARMORPAINT-EXPERIMENT.md).
 It does not implement the full painting backend or alter product defaults.
+
+The reviewable production-source union is0b4991ba on
+work/combined-authoring-20261111; main still records evidence/experiment rather
+than admitting that source. Root's isolated sculpt-state repair49465f29 passes
+Release/SAN1733software checks and94exact original/output pairs perprofile,
+reducing the real regression's material setups581to3 with original draw order.
+Hardware/whole-workload acceptance of that repair is pending. Original full P1
+is running with all300stroke/120mask/2000view/120held counts across3repetitions;
+no inventory-only or quiet-performance claim. Active-layer GPU painting and
+shared EGL-display lifetime handling are being implemented separately.
 
 ## Goal active; additional spatial node/history phase — 2026-11-11
 
