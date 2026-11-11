@@ -26,6 +26,15 @@ void *operator new(size_t n,std::align_val_t a){count_allocation();void *p=nullp
 void *operator new[](size_t n,std::align_val_t a){return ::operator new(n,a);}
 void operator delete(void*p,std::align_val_t)noexcept{std::free(p);}void operator delete[](void*p,std::align_val_t)noexcept{std::free(p);}
 void operator delete(void*p,size_t,std::align_val_t)noexcept{std::free(p);}void operator delete[](void*p,size_t,std::align_val_t)noexcept{std::free(p);}
+// Complete replacement family: sanitizer/LLVM may call nothrow forms even
+// before this test arms a fault. Mixing ASan's default nothrow new with our
+// malloc/free replacement is an allocator mismatch, never a suppression case.
+void *operator new(size_t n,const std::nothrow_t&)noexcept{try{return ::operator new(n);}catch(...){return nullptr;}}
+void *operator new[](size_t n,const std::nothrow_t&)noexcept{try{return ::operator new[](n);}catch(...){return nullptr;}}
+void operator delete(void*p,const std::nothrow_t&)noexcept{std::free(p);}void operator delete[](void*p,const std::nothrow_t&)noexcept{std::free(p);}
+void *operator new(size_t n,std::align_val_t a,const std::nothrow_t&)noexcept{try{return ::operator new(n,a);}catch(...){return nullptr;}}
+void *operator new[](size_t n,std::align_val_t a,const std::nothrow_t&)noexcept{try{return ::operator new[](n,a);}catch(...){return nullptr;}}
+void operator delete(void*p,std::align_val_t,const std::nothrow_t&)noexcept{std::free(p);}void operator delete[](void*p,std::align_val_t,const std::nothrow_t&)noexcept{std::free(p);}
 extern "C" void __real_glBufferData(GLenum,GLsizeiptr,const void*,GLenum);
 extern "C" void __wrap_glBufferData(GLenum t,GLsizeiptr n,const void *p,GLenum u){++gpu_allocations;__real_glBufferData(t,reject_at(deny_allocate)?-1:n,p,u);}
 extern "C" void __real_glBufferSubData(GLenum,GLintptr,GLsizeiptr,const void*);
@@ -33,6 +42,12 @@ extern "C" void __wrap_glBufferSubData(GLenum t,GLintptr o,GLsizeiptr n,const vo
 extern "C" void __real_glCopyBufferSubData(GLenum,GLenum,GLintptr,GLintptr,GLsizeiptr);
 extern "C" void __wrap_glCopyBufferSubData(GLenum a,GLenum b,GLintptr i,GLintptr j,GLsizeiptr n){++gpu_copies;__real_glCopyBufferSubData(a,b,i,j,reject_at(deny_copy)?-1:n);}
 int main()try{
+  allocations=0;measure=true;
+  void *p=::operator new(17,std::nothrow);::operator delete(p,std::nothrow);
+  p=::operator new[](17,std::nothrow);::operator delete[](p,std::nothrow);
+  p=::operator new(17,std::align_val_t(32),std::nothrow);::operator delete(p,std::align_val_t(32),std::nothrow);
+  p=::operator new[](17,std::align_val_t(32),std::nothrow);::operator delete[](p,std::align_val_t(32),std::nothrow);
+  measure=false;check(allocations==4,"All nothrow and aligned replacement forms share the same actual allocation hook");
   NativeGraphics context;std::cout<<"GPU "<<glGetString(GL_RENDERER)<<'\n';
   auto scene=fixture();const auto native=scene.encode();auto base=SculptSceneChunks::capture(scene,{7,1,1,true,true}).chunks;
   auto changed=scene.snapshot();changed.object(1).volume=std::make_shared<Volume>(*scene.object(1).volume);changed.object(1).volume->fill_mask(.71f);
