@@ -69,7 +69,7 @@ void quality_oracle(const detail::GltfDocument &d,const EmissionInterchangeImage
 }
 void source_controls(){
   Scene scene;auto &source=scene.active();source.mesh_active=true;
-  auto maps=std::make_shared<PaintSourceMaps>();maps->color.image=std::make_shared<const Image>(image({255,255,255,255}));
+  auto maps=std::make_shared<PaintSourceMaps>();maps->color.image=std::make_shared<const Image>(image({255,255,255,255}));maps->color.texcoord=1;
   maps->uv1=std::make_shared<const std::vector<std::array<float,2>>>(std::vector<std::array<float,2>>{{1,0},{0,0},{0,1},{1,1}});
   source.painted=PaintedMesh::from_maps(quad(),maps,64);
   const float coverage=.25f;
