@@ -11,6 +11,8 @@
 #include <optional>
 #include <set>
 #include <zlib.h>
+#include <barrier>
+#include <thread>
 using namespace dome;
 namespace {
 size_t checks=0;
@@ -80,13 +82,24 @@ void wrappers(const Scene&s,const std::filesystem::path&dir){
  check(detail::restore_native_scene_payload(payload.stored,payload.compressed,payload.decoded_bytes,256ull*1024*1024,[&]{++restore_calls;return false;}).encode()==wire,"Direct authenticated native payload restores exactly");
  check(restore_calls>8,"Native payload restoration propagates its callback into decoding");
  for(size_t stop:{size_t(1),restore_calls/2,restore_calls}){size_t calls=0;std::optional<Scene> result;check(cancelled([&]{result=detail::restore_native_scene_payload(payload.stored,payload.compressed,payload.decoded_bytes,256ull*1024*1024,[&]{return ++calls==stop;});},true),"Direct native payload cancellation propagates");check(!result&&calls==stop&&payload.stored==saved,"Cancelled payload restoration preserves encoded input and publishes nothing");check(detail::restore_native_scene_payload(payload.stored,payload.compressed,payload.decoded_bytes,256ull*1024*1024,{}).encode()==wire,"Payload cancellation permits an exact retry");}
+ size_t late_calls=0;std::optional<Scene> late_result;
+ check(cancelled([&]{late_result=detail::restore_native_scene_payload(payload.stored,payload.compressed,payload.decoded_bytes,256ull*1024*1024,[&]{return ++late_calls==restore_calls-1;});}),"Late payload callback reaches the NEW Scene scope and reports its exact Project loading cancellation message");
+ check(!late_result&&late_calls==restore_calls-1&&payload.stored==saved,"New Scene-scope cancellation preserves payload and prevents publication before the old final HDR check");
  std::cout<<"file_checkpoints="<<count<<" payload_compressed="<<compressed<<" payload_checkpoints="<<restore_calls<<'\n';
  }
+}
+void parallel_readers(const nlohmann::json&volume){
+ std::barrier together(2);std::array<std::optional<nlohmann::json>,2>result;std::array<std::exception_ptr,2>errors;std::array<size_t,2>calls{};bool rejected=false;
+ auto worker=[&](size_t i){try{detail::NativeReadScope scope([&]{++calls[i];return i==0;});together.arrive_and_wait();if(i==0)rejected=cancelled([&]{result[i]=Volume::decode(volume).encode();});else result[i]=Volume::decode(volume).encode();}catch(...){errors[i]=std::current_exception();together.arrive_and_drop();}};
+ std::thread a(worker,0),b(worker,1);a.join();b.join();for(auto&e:errors)if(e)std::rethrow_exception(e);
+ check(rejected&&!result[0]&&calls[0]==1,"One concurrent native reader cancels its own real Volume read");
+ check(result[1]&&*result[1]==volume&&calls[1]>4,"Another simultaneous reader retains its independent callback and completes exactly");
+ detail::NativeReadScope::check();
 }
 }
 int main(int argc,char**argv)try{
  const auto s=fixture();const auto wire=s.encode(),v=s.active().volume->encode();const auto original=nlohmann::json::to_cbor(wire);
- scopes(v);decoding("Volume",[&]{return Volume::decode(v).encode();},v);decoding("Scene",[&]{return Scene::decode(wire).encode();},wire);pool();wrappers(s,argc>1?argv[1]:"native-read-cancel-output");
+ scopes(v);decoding("Volume",[&]{return Volume::decode(v).encode();},v);decoding("Scene",[&]{return Scene::decode(wire).encode();},wire);pool();wrappers(s,argc>1?argv[1]:"native-read-cancel-output");parallel_readers(v);
  check(nlohmann::json::to_cbor(wire)==original&&s.encode()==wire,"All decoder/exception controls preserve original Scene and complete wire");
  std::cout<<"PASS "<<checks<<" native read cancellation controls\n";return 0;
 }catch(const std::exception&e){std::cerr<<"FAIL "<<e.what()<<'\n';return 1;}
