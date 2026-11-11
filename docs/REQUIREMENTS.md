@@ -1,3 +1,32 @@
+## Private large-mesh query repair qualified; owning integration pending — 2026-11-11
+
+Private runtime source `2ef16028` passes matching Release/strict sanitizer controls:
+61 native queries, 64 original 4.8M-vertex/indexed-6.48M controls and 63 separate
+9.6M-vertex controls in each profile. Actual VBO stores include canonical tangents:
+230,400,576 B and 460,801,152 B respectively. Read
+[PACKED-MATERIAL-QUERY-20261111.md](PACKED-MATERIAL-QUERY-20261111.md).
+
+The fix preserves standalone limits, the shared 65536 triangle budget, exact global
+IDs and original small behavior. Independent root probes confirm old small API
+success, intermediate metadata-budget rejection, then final success on identical
+65000-triangle/eight-exclusion inputs; old/fixed logs match byte-for-byte. Read
+[the counterfactual receipt](validation/SMALL-QUERY-POLICY-20261111.json).
+
+Earlier combined `44be6d0d` built all 65 consumers in each profile; a linker-option
+classification error in the driver is preserved separately from the verified
+remaining-link completion. Its actual native/software run remains 54/56 per
+profile, with both original upload-forecast failures intact; workspace27/373 pass.
+The later 48-byte trace and real indexed traversal failures are preserved too.
+None of those raw statuses is relabelled as a pass.
+
+Canonical candidate `e9931f72` in `artifacts/authoring-eligible-integration-20261111`
+has the exact qualified product bytes, with new complete owning/application
+integration being prepared. Appropriate current regression/GUI/XR/hardware/P1
+qualification and main product admission remain required. The full original goal,
+remaining painting/baking/avatar/interoperability/accelerator requirements and
+later controller trays/spatial node editing/history remain active and incomplete.
+No installation or physical session change is claimed.
+
 ## Combined owning build complete; large-scene query repair pending — 2026-11-11
 
 Frozen private source `a904a2d6` completed fresh Release and strict sanitizer

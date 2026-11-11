@@ -1,0 +1,89 @@
+{
+  "schema": 1,
+  "scope": "Independent public small-query API counterfactual over three actual core versions. Same complete probe TU/object and unchanged public ABI; no graphics/application/hardware claim.",
+  "triangles": 65000,
+  "nonmatching_exclusions": 8,
+  "facades": [
+    "legacy_object",
+    "typed_object",
+    "legacy_material",
+    "typed_material"
+  ],
+  "original_current": {
+    "product": "5e06c465",
+    "raw_exit": 0,
+    "elf_sha256": "53664ba68a2b915875d04f133edd935577df64073154ddfeaf868217201c4f5c",
+    "log_sha256": "4e3f3ac1be14aac7cffa9f9c1308f6c59464456caafa6e144b73acd40223dd27"
+  },
+  "intermediate": {
+    "source": "c84d14f755ab69d5bd1cc762ec33d43762823eb9",
+    "raw_exit": 1,
+    "verified": true,
+    "elf_sha256": "13a07ee56117df1b7a333799ce2c07d0fe1bc7e9f3fd9afb351c0bcd8ff0ab0a",
+    "log_sha256": "3cff850b625973560558badbea566ba42d505e178692dfd4fbf12e0ffd732d0b",
+    "log": "FAIL Material query bounds work budget exceeded"
+  },
+  "fixed": {
+    "source": "2ef16028ae3928a7907f8f7fc46a76d673eb261d",
+    "raw_exit": 0,
+    "verified": true,
+    "elf_sha256": "3e2a397f5d36e0d8da33729f321d86a4330c0b421201214dbef97c44c1959f97",
+    "log_sha256": "4e3f3ac1be14aac7cffa9f9c1308f6c59464456caafa6e144b73acd40223dd27",
+    "log": "PASS four actual small legacy/typed object/material exclusion calls;65000 native triangles,8 nonmatching exclusions, original65536 triangle budget"
+  },
+  "original_fixed_logs_byte_exact": true,
+  "all_provider_drift": [],
+  "files": {
+    "artifacts/small-query-policy-counterfactual-20261111/probe.cpp": {
+      "sha256": "783c99d97f0dee727bc37c1d973d967569f658fd4d55f1c0739f8d6b6abae47e",
+      "bytes": 2136
+    },
+    "artifacts/small-query-policy-counterfactual-20261111/status.json": {
+      "sha256": "f7e6801ad24eb448de949b138b4b2ab0a8784e0979e6837bfa65d8e31f3b9e09",
+      "bytes": 1180286
+    },
+    "artifacts/small-query-policy-counterfactual-20261111/native.log": {
+      "sha256": "4e3f3ac1be14aac7cffa9f9c1308f6c59464456caafa6e144b73acd40223dd27",
+      "bytes": 147
+    },
+    "artifacts/small-query-policy-counterfactual-20261111/compile.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/small-query-policy-counterfactual-20261111/link.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/small-query-policy-counterfactual-20261111/intermediate-c84.json": {
+      "sha256": "63c1bbb3166d26e703f8f526ae056b0c9c5a2be8087e091ae08ae0b4e1ac79d0",
+      "bytes": 1180200
+    },
+    "artifacts/small-query-policy-counterfactual-20261111/intermediate-c84.log": {
+      "sha256": "3cff850b625973560558badbea566ba42d505e178692dfd4fbf12e0ffd732d0b",
+      "bytes": 48
+    },
+    "artifacts/small-query-policy-counterfactual-20261111/intermediate-c84.link.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/small-query-policy-counterfactual-20261111/fixed-2ef.json": {
+      "sha256": "1f5cdb61c331cf7eb18db16b6d91e68485596b2b22d9723ff306394091ffd849",
+      "bytes": 1180304
+    },
+    "artifacts/small-query-policy-counterfactual-20261111/fixed-2ef.log": {
+      "sha256": "4e3f3ac1be14aac7cffa9f9c1308f6c59464456caafa6e144b73acd40223dd27",
+      "bytes": 147
+    },
+    "artifacts/small-query-policy-counterfactual-20261111/fixed-2ef.link.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    }
+  },
+  "archive": {
+    "path": "docs/validation/SMALL-QUERY-POLICY-20261111.tar.gz",
+    "sha256": "9f9dcbcc9f5796a814d9638c99084a93a8d4a7af93f771e19091d2a36a1220eb",
+    "bytes": 961792,
+    "members": 11,
+    "decoded_content_verified": true
+  }
+}

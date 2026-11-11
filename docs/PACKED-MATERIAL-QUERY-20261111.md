@@ -62,7 +62,11 @@ The earlier renderer-recovery receipt's 153.6/307.2 MB figures were unrendered
 forecasts omitting canonical tangents. This actual trace corrects those figures;
 the historical source, failed assertions and receipts remain preserved. The
 separate six-actor case still proves a real >256 MiB requested vertex store, with
-its small old owner plus new stores below the unchanged 512 MiB geometry budget.
+its small old owner plus new stores below the test's 512 MiB endpoint envelope.
+The flat renderer's product geometry ledger defaults to 1 GiB; the separate
+sculpt arena retains its 512 MiB hard bound. The test envelope is not a new or
+changed product cap. Earlier sealed wording conflated these distinct limits;
+its original archive remains intact.
 
 The corrected forecast `7eecb416` preserves all inputs, picking checks and exact
 pixels; both profiles then expose the genuine indexed selection-budget failure.

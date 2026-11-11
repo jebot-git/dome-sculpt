@@ -1,0 +1,397 @@
+{
+  "schema": 1,
+  "captured_UTC": "2026-11-11T22:08:59Z",
+  "documentation_branch_base_main": "e2efd373a319b477c56f4da96920d4d2f82de368",
+  "candidate_source": "e9931f7286f75746af47d52f2d901b731510cbb5",
+  "qualified_private_runtime_code": "2ef16028ae3928a7907f8f7fc46a76d673eb261d",
+  "scope": "Docs-only bounded current owning/runtime milestone. No source, handoff, requirements, main, frozen provider or canonical edits; no new tests, GPU, installation or session actions.",
+  "ownership": "Audited incremental integration, NOT a new zero-object fresh whole compilation.307 required object providers:4 qualified2ef complete TUs+7 complete44be manually compiled TUs at actual recorded-o+296 authenticated unchanged a904 objects.192-member core with190 independently byteequal unchanged members; exactly63 fresh links plus2 already fresh qualified matched consumers perprofile.58 targets really own current core,7 genuinely independent helpers retain original CMake dependency shapes.",
+  "profiles": {
+    "release": {
+      "closure": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-eligible-owning-20261111/release-v3/status.json",
+        "sha256": "7b2e4a34d29717b151db576b95a860414f674ef1ac251f8412c7a48381d58992"
+      },
+      "audit": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-eligible-owning-20261111/release-v3/audit.json",
+        "sha256": "d5279d86f7ca70335345786663c4236e3e31416b392d4e379f6cf692a6c1dca9"
+      },
+      "native_software": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-eligible-owning-20261111/release-gates/status.json",
+        "sha256": "9c82495259bb4ffb3a0283c838f8e358d84661e9005fd79235fe1e6b88e58edd"
+      },
+      "state": "terminal",
+      "exit": 0,
+      "actual_fresh_links": 63,
+      "retained_byteexact_qualified_current_consumers": 2,
+      "selected_outputs": 65,
+      "core_owning_targets": 58,
+      "genuine_independent_targets": 7,
+      "objects": 307,
+      "object_routes": {
+        "qualified2ef-completeTU": 4,
+        "44be-completeTU-actual-recorded-o": 7,
+        "a904-authenticated-unchanged-object": 296
+      },
+      "core_member_count": 192,
+      "independently_equal_unchanged_core_members": 190,
+      "sdk_pins": 418,
+      "postchecked_pins_including_audit": 7390,
+      "historical_source_proof": {
+        "44be_files": 1654,
+        "a904_files": 1651,
+        "all_equal_to_qualified_provider_receipt": true
+      },
+      "literal_asset_macro": {
+        "effective_root": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-union-20261111/assets/humanoid",
+        "configured_root": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-eligible-integration-20261111/assets/humanoid",
+        "exact_asset_files": 7,
+        "semantics": "The exact old literal token is used for command comparison/reuse. Full asset bytes are pinned/equal; no other -D token is normalized."
+      },
+      "core_sha256": "01bffade1ad7d05afff81b13e8e3b8d76c9bd10d22445e7da47bf1598df836e7",
+      "native_software_suites": 56,
+      "version_exit": 0,
+      "workspaces": [
+        27,
+        373
+      ],
+      "all_original_guard_limits": {
+        "per_process_RSS_bytes": 4294967296,
+        "selected_tests_seconds": 2400,
+        "capacity_test_seconds": 240,
+        "default_test_seconds": 180
+      },
+      "runtime_environment": {
+        "ASAN_OPTIONS": null,
+        "LSAN_OPTIONS": null,
+        "UBSAN_OPTIONS": null,
+        "LIBGL_ALWAYS_SOFTWARE": "1",
+        "LP_NUM_THREADS": "2"
+      },
+      "all_drift_lists_empty": true,
+      "actual_link_seconds_not_performance": 21.484509611851536
+    },
+    "sanitize": {
+      "closure": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-eligible-owning-20261111/sanitize-v3/status.json",
+        "sha256": "54879c928836bf32d56d44bbf049165401ebc3aa5b12069ce1300eab028c3201"
+      },
+      "audit": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-eligible-owning-20261111/sanitize-v3/audit.json",
+        "sha256": "c17f22f5199af47fdf38d64182067712b3047c64b58106c9ad4f9da964f89723"
+      },
+      "native_software": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-eligible-owning-20261111/sanitize-gates/status.json",
+        "sha256": "3ae4bb3d97918bc1fb51b2ea10bca923b6fe152e70807408b061b111c9f81664"
+      },
+      "state": "terminal",
+      "exit": 0,
+      "actual_fresh_links": 63,
+      "retained_byteexact_qualified_current_consumers": 2,
+      "selected_outputs": 65,
+      "core_owning_targets": 58,
+      "genuine_independent_targets": 7,
+      "objects": 307,
+      "object_routes": {
+        "qualified2ef-completeTU": 4,
+        "44be-completeTU-actual-recorded-o": 7,
+        "a904-authenticated-unchanged-object": 296
+      },
+      "core_member_count": 192,
+      "independently_equal_unchanged_core_members": 190,
+      "sdk_pins": 418,
+      "postchecked_pins_including_audit": 7390,
+      "historical_source_proof": {
+        "44be_files": 1654,
+        "a904_files": 1651,
+        "all_equal_to_qualified_provider_receipt": true
+      },
+      "literal_asset_macro": {
+        "effective_root": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-union-20261111/assets/humanoid",
+        "configured_root": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-eligible-integration-20261111/assets/humanoid",
+        "exact_asset_files": 7,
+        "semantics": "The exact old literal token is used for command comparison/reuse. Full asset bytes are pinned/equal; no other -D token is normalized."
+      },
+      "core_sha256": "a80503744d7342f7f7137db4c580d6c818c5fe5eb9bae6d7e522e1c5104c81cb",
+      "native_software_suites": 56,
+      "version_exit": 0,
+      "workspaces": [
+        27,
+        373
+      ],
+      "all_original_guard_limits": {
+        "per_process_RSS_bytes": 8589934592,
+        "selected_tests_seconds": 2400,
+        "capacity_test_seconds": 240,
+        "default_test_seconds": 180
+      },
+      "runtime_environment": {
+        "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1:abort_on_error=1",
+        "LSAN_OPTIONS": null,
+        "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=1",
+        "LIBGL_ALWAYS_SOFTWARE": "1",
+        "LP_NUM_THREADS": "2"
+      },
+      "all_drift_lists_empty": true,
+      "actual_link_seconds_not_performance": 600.7623689631582
+    }
+  },
+  "history": {
+    "initial_v1_audit": {
+      "receipt": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-eligible-owning-20261111/release/audit.json",
+        "sha256": "dd929f75c5f6464f54f828f2f0ebaac0c9b1b96d9d30839ac5843ea44a9dafd9"
+      },
+      "exit": 1,
+      "phase": "Preprocessor dependency-path metadata validation; compiler emitted tests/../src lexical path. No C++ compilation, link or GPU execution.",
+      "source_provider_drift": []
+    },
+    "v2_audit": {
+      "receipt": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-eligible-owning-20261111/release-v2/audit.json",
+        "sha256": "3ceaa141c3ac37da549e07c6059167a4ce4939328c9dbdeb6005b81ffafbdc3b"
+      },
+      "exit": 0,
+      "change": "Resolve actual filesystem dependency paths only; compiler -D literals remain exact.",
+      "scope": "307object/418SDK/63link+2matchedconsumer current-byte/flags/member proof; no execute."
+    },
+    "v3_audits": {
+      "script": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-eligible-owning-20261111/build-closure-v3.py",
+        "sha256": "770244da50fb38fdb3f6ec2776cef2d297999d3abd4c063593272cfe3dcfc535"
+      },
+      "change": "Explicitly authenticate all1654 old44be and1651 a904 source/public-header/asset/third-party/tool bytes against historical qualified provider receipt hashes, rather than only current clean Git/tree equality.",
+      "both_profiles_exit": 0
+    },
+    "old44be": {
+      "release": {
+        "source": "44be6d0d7ffc4c7d7f94d9e629c3aa8ed69beb2e",
+        "raw_partial_soname_driver_failure": {
+          "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-query-owning-20261111/release/status.json",
+          "sha256": "cf23e76465c0c3917a5f42ae322671d50befe3ddf6a51d497fb4a467decf5243"
+        },
+        "partial_exit": 1,
+        "completed_compiled_TUs": 11,
+        "completed_links_before_driver_refusal": 24,
+        "raw_resume": {
+          "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-query-owning-20261111/release-resume/status.json",
+          "sha256": "35f2b2acb5636d87647ecdc0b9cacc761724641ac9ffd31f4fcd79d7a3b07600"
+        },
+        "resume_exit": 0,
+        "additional_links_without_recompiling": 41,
+        "raw_gates": {
+          "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-query-owning-20261111/release-gates/status.json",
+          "sha256": "346e4d7cf9f5a4fd078024c96664b9bf4a6d0fbf7435f3bd18ad8dd5e9d3c56e"
+        },
+        "raw_gates_exit": 1,
+        "actual_native_software_pass": 54,
+        "actual_native_software_total": 56,
+        "preserved_failures": [
+          "document-render-capacity",
+          "document-render-large-buffer"
+        ],
+        "meaning": "Old44be scope only; no current e993 success is attributed to these raw records."
+      },
+      "sanitize": {
+        "source": "44be6d0d7ffc4c7d7f94d9e629c3aa8ed69beb2e",
+        "raw_partial_soname_driver_failure": {
+          "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-query-owning-20261111/sanitize/status.json",
+          "sha256": "3842f139ea70b7a6038154218ed1aed4466d9f8182b27be5d754975236045750"
+        },
+        "partial_exit": 1,
+        "completed_compiled_TUs": 11,
+        "completed_links_before_driver_refusal": 24,
+        "raw_resume": {
+          "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-query-owning-20261111/sanitize-resume/status.json",
+          "sha256": "b5eea3a77a434f45bb979606881c732d961513247565d762e53977cffcfd3de8"
+        },
+        "resume_exit": 0,
+        "additional_links_without_recompiling": 41,
+        "raw_gates": {
+          "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-query-owning-20261111/sanitize-gates/status.json",
+          "sha256": "239bf553392ad91fb3f8fb875eb28fcacce785e620db437b939da5cb63015363"
+        },
+        "raw_gates_exit": 1,
+        "actual_native_software_pass": 54,
+        "actual_native_software_total": 56,
+        "preserved_failures": [
+          "document-render-capacity",
+          "document-render-large-buffer"
+        ],
+        "meaning": "Old44be scope only; no current e993 success is attributed to these raw records."
+      }
+    },
+    "small_query_counterfactual": {
+      "old44be_actual_exit": 0,
+      "intermediate_c84_actual_exit": 1,
+      "fixed2ef_actual_exit": 0,
+      "input": "Same public-header TU/object;65000coplanar triangles/eight nonmatching exclusions, four legacy/typed object/material calls.",
+      "old_and_fixed_log_sha256": "4e3f3ac1be14aac7cffa9f9c1308f6c59464456caafa6e144b73acd40223dd27",
+      "raw_files": "/home/blux/de-xr/dome-sculpt/artifacts/small-query-policy-counterfactual-20261111"
+    }
+  },
+  "limits_and_identity": {
+    "standalone_SurfaceQuery_structural_vertex_and_triangle_caps": 2000000,
+    "packed_retained_CPU_bytes": 536870912,
+    "packed_retained_plus_build_peak_CPU_bytes": 805306368,
+    "packed_max_parts": 128,
+    "packed_triangles_per_part": 262144,
+    "packed_total_BVH_nodes": 4194304,
+    "packed_interval_sidecar_bytes_per_node": 8,
+    "legacy_default_closest_total_triangle_tests": 2000000,
+    "filtered_and_mixed_total_triangle_tests": 65536,
+    "new_partitioned_metadata_policy_tests": 262144,
+    "small_delegated_metadata_policy": "New comparison charge disabled; original standalone/small/mixed behavior retained.",
+    "capacity_case_geometry_endpoint_TEST_BOUND_bytes": 536870912,
+    "actual_flat_ContextStoreLedger_default_geometry_limit_bytes": 1073741824,
+    "actual_SculptGpuArena_separate_hard_GPU_limit_bytes": 536870912,
+    "actual_material_default_bytes": 1073741824,
+    "actual_material_default_images": 1024,
+    "actual_material_default_samplers": 128,
+    "ledger_max_stores": 65536,
+    "ledger_CPU_metadata_bytes": 134217728,
+    "budget_wording_correction": "Earlier PACKED-MATERIAL-QUERY note called512MiB the flat geometry budget. It is the capacity test endpoint envelope; actual flat ledger default is1GiB, while the separate sculpt arena hardcap is512MiB. No cap, native data, assertions or result changed.",
+    "identity": "All original native draw arrays/material/source/global triangle IDs,barycentrics,normal/UV/color/paint authority retained.Eligibility skips only min/max intervals proved wholly ineligible under known object/material policy. Arbitrary filters spend the unchanged shared budget; alpha/dynamicUV never imply coarse eligibility."
+  },
+  "actual_capacity": {
+    "ordinary_vertices": 4800012,
+    "ordinary_VBO_bytes": 230400576,
+    "ordinary_EBO_bytes": 72,
+    "large_vertices": 9600024,
+    "large_VBO_bytes": 460801152,
+    "large_EBO_bytes": 144,
+    "indexed_vertices": 1083603,
+    "indexed_indices": 6480000,
+    "indexed_VBO_bytes": 52012944,
+    "indexed_EBO_bytes": 25920000,
+    "actual_vertex_streams": [
+      "position12",
+      "normal12",
+      "UV0_8",
+      "canonical_tangent16"
+    ],
+    "full_native_inputs_and_exact_pixel_bary_picking_recovery_zero_eye_assertions_unchanged": true
+  },
+  "Arc_functional_cases": [
+    {
+      "status": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-eligible-capacity-arc-20261111/release-original/status.json",
+        "sha256": "237f6f5476d16cf527289469e63dd54ddae382278a534db4ef51cd6f51cf91f4"
+      },
+      "profile": "release",
+      "case": "original",
+      "native_checks": 64,
+      "exit": 0,
+      "actual_device_authenticated": true,
+      "mapped_ELFs_first_live_and_posthash": 71,
+      "seconds_functional_only": 2.1671263090102,
+      "maxrss_bytes": 1016365056,
+      "limits": {
+        "seconds": 240,
+        "rss_bytes": 4294967296
+      },
+      "lease_released": true,
+      "all_drift_lists_empty": true
+    },
+    {
+      "status": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-eligible-capacity-arc-20261111/release-large/status.json",
+        "sha256": "8e5ce8a4b36bf86a0fb0ccee3d851dbc36d79f0837a65632617da1bb9583bfa2"
+      },
+      "profile": "release",
+      "case": "large",
+      "native_checks": 63,
+      "exit": 0,
+      "actual_device_authenticated": true,
+      "mapped_ELFs_first_live_and_posthash": 71,
+      "seconds_functional_only": 1.4684561170288362,
+      "maxrss_bytes": 1469681664,
+      "limits": {
+        "seconds": 240,
+        "rss_bytes": 4294967296
+      },
+      "lease_released": true,
+      "all_drift_lists_empty": true
+    },
+    {
+      "status": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-eligible-capacity-arc-20261111/sanitize-original/status.json",
+        "sha256": "21c23b3653e72a309d69bfff6255e61965616c8ad89fcdbfbda189be93efa534"
+      },
+      "profile": "sanitize",
+      "case": "original",
+      "native_checks": 64,
+      "exit": 0,
+      "actual_device_authenticated": true,
+      "mapped_ELFs_first_live_and_posthash": 73,
+      "seconds_functional_only": 20.674579708022065,
+      "maxrss_bytes": 1845641216,
+      "limits": {
+        "seconds": 240,
+        "rss_bytes": 8589934592
+      },
+      "lease_released": true,
+      "all_drift_lists_empty": true
+    },
+    {
+      "status": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-eligible-capacity-arc-20261111/sanitize-large/status.json",
+        "sha256": "725c467d5ae11eb74dcda8c6d59043650063b88099bc0b7617c3be1abf015266"
+      },
+      "profile": "sanitize",
+      "case": "large",
+      "native_checks": 63,
+      "exit": 0,
+      "actual_device_authenticated": true,
+      "mapped_ELFs_first_live_and_posthash": 73,
+      "seconds_functional_only": 7.4747664230526425,
+      "maxrss_bytes": 2289598464,
+      "limits": {
+        "seconds": 240,
+        "rss_bytes": 8589934592
+      },
+      "lease_released": true,
+      "all_drift_lists_empty": true
+    }
+  ],
+  "Arc_scope": "Actual IntelArcA770/DG2 GL4.6, current EGLDevice to PCI0000:03:00.0/8086:56a0/renderD129, actual open DRM FDs and first-live/posthash mapped ELF identities; observational unchanged-result GL query only. Four separately released common-flock leases. Functional under permitted CPU contention, NOT quiet performance/P1.",
+  "Release_public_reference": {
+    "summary": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-eligible-public-20261111/release-summary.json",
+      "sha256": "1354eba48106c9597525eb4c3727fea4b56461f7dfe5e7c174761e8ee6e2ca0b"
+    },
+    "verified_referenced_file_hashes": 46,
+    "public_checks": 98,
+    "source_plain_GUI10_and_XR39_each": true,
+    "native_producer_checks": [
+      57853,
+      67677
+    ],
+    "font": "Actual current bitmap Unifont17.0.04,16pixels/unit1,dark/opacity255.",
+    "limitations": [
+      "GUI uses privateXvfb exported-menu actions; no shell-globalmenu or nativeWayland claim. GUI GLX canvas may be software while actual native EGL blur worker authenticatesArc.",
+      "XR uses real OpenXR loader and actualArc stereo with synthetic poses/actions; no physical headset.",
+      "Public Save is the next actual public action, not a forced busyworker concurrency seam; separate native transaction controls retain authority.",
+      "Measured timings are observed under other functional CPU work, not exclusive-system performance.",
+      "SAN public workflows and current four-object P1 remain unexecuted in this Release-only receipt."
+    ],
+    "admission": "Only the verified Release summary is referenced; its own partial public scope is retained. Full SAN-public98 is not admitted by this seal."
+  },
+  "remaining_not_admitted": [
+    "Full current public SAN98 workflow receipt",
+    "Current quiet full original four-object sustained P1",
+    "Main PRODUCT source admission and any install or physical headset acceptance",
+    "Original full layered painting/material/baking/source/projected/physical adapter objective"
+  ],
+  "full_goal_complete": false,
+  "no_product_or_threshold_changes": true,
+  "evidence": {
+    "path": "docs/validation/AUTHORING-ELIGIBLE-OWNERSHIP-20261111-evidence.tar.gz",
+    "sha256": "f5d1553f2fa7573cfe39040a4de7a2f3fda2e7e01895f261c29c0b8df16f0dcc",
+    "bytes": 11956384,
+    "members": 467,
+    "all_members_fully_decoded_and_sha256_verified": true,
+    "offline_verifier": "Extract archive then python3 verify-evidence.py; integrity/scope only, no application/GPU invocation.",
+    "binary_ELFs_and_native_saved_assets": "Retained in actual artifact paths, deliberately not packaged."
+  }
+}
