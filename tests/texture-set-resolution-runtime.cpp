@@ -557,11 +557,12 @@ FN(ReleaseSwapchainImage, XrSwapchain p, const XrSwapchainImageReleaseInfo *) {
       const auto lit=std::count(signature.begin(),signature.end(),uint8_t(1));
       if(field_step==9&&lit>=12){field_root_signature=signature;report["field_root_signature_pixels"]=lit;}
       const bool same=!field_root_signature.empty()&&signature==field_root_signature;
-      // Four empty panel corners distinguish an absent palette from a changed
+      // Four empty panel margins distinguish an absent palette from a changed
       // title or page. Dark bg=(31,37,45), fg=(231,235,241), disabled fg is their
       // integer midpoint. The separated bands allow framebuffer quantization.
       int background=0,background_total=0,accent=0,accent_total=0,redo_bright=0,redo_dim=0;
-      for(const auto &corner:std::array<std::array<int,2>,4>{{{16,16},{600,16},{16,600},{600,600}}})
+      // The root's selection toolbar occupies y12..64; sample below it.
+      for(const auto &corner:std::array<std::array<int,2>,4>{{{16,100},{600,100},{16,500},{600,500}}})
         pixels(corner[0],corner[1],corner[0]+24,corner[1]+24,[&](int r,int g,int b){++background_total;background+=r>=25&&r<=40&&g>=30&&g<=45&&b>=38&&b<=55;});
       // Left interior of Save's cell excludes its centered text and border.
       pixels(56,307,70,333,[&](int r,int g,int b){++accent_total;accent+=r<150&&g>130&&b>220;});
