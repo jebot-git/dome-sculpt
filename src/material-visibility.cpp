@@ -17,6 +17,7 @@
 #include "current-paint-preview.hpp"
 #include "source-vrm1-background.hpp"
 #include "sculpt-placed-chunks.hpp"
+#include "packed-material-query.hpp"
 namespace dome {
 std::optional<MToonMaterial> retained_mtoon(const CreatorAppearance *appearance){
   if(!appearance)return {};
@@ -43,6 +44,20 @@ PaintSourceTexture derived_view(const std::shared_ptr<const TextureMaps> &maps,
   view.uv_transform = {1,0,0,1,0,0};
   return view;
 }
+// SAX preflight counts the same bounded source tokens without constructing a
+// second retained JSON tree. It covers decoded strings, map/array nodes and
+// temporary/copy growth before the ordinary typed parser makes those copies.
+struct VisibilityJsonBudget : nlohmann::json_sax<nlohmann::json> {
+ size_t &bytes;const std::function<bool()>&cancelled;size_t events=0,depth=0;
+ VisibilityJsonBudget(size_t&n,const std::function<bool()>&fn):bytes(n),cancelled(fn){}
+ void add(size_t n,size_t width=1){if(bytes>512ull*1024*1024||(width&&n>(512ull*1024*1024-bytes)/width))throw std::length_error("Material query typed metadata exceeds prospective budget");bytes+=n*width;}
+ bool event(){if(depth>32||++events>100000)throw std::length_error("Material query typed metadata exceeds source depth/token bounds");if((events&255)==0&&cancelled&&cancelled())throw std::runtime_error("Material query JSON preflight cancelled");add(1,256);return true;}
+ bool null()override{return event();}bool boolean(bool)override{return event();}bool number_integer(number_integer_t)override{return event();}bool number_unsigned(number_unsigned_t)override{return event();}bool number_float(number_float_t,const string_t&)override{return event();}
+ bool string(string_t&s)override{add(s.size()+1,4);return event();}bool binary(binary_t&s)override{add(s.size(),4);return event();}bool key(string_t&s)override{add(s.size()+1,4);return event();}
+ bool start_object(std::size_t)override{event();++depth;return true;}bool end_object()override{if(!depth)throw std::invalid_argument("Invalid typed JSON object depth");--depth;return event();}bool start_array(std::size_t)override{event();++depth;return true;}bool end_array()override{if(!depth)throw std::invalid_argument("Invalid typed JSON array depth");--depth;return event();}
+ bool parse_error(std::size_t,const std::string&,const nlohmann::detail::exception&)override{return false;}
+};
+void visibility_json_budget(size_t&bytes,const std::string&text,const std::function<bool()>&cancelled){if(text.empty())return;if(text.size()>2*1024*1024)throw std::length_error("MToon source metadata exceeds renderer bounds");if(cancelled&&cancelled())throw std::runtime_error("Material query JSON preflight cancelled");VisibilityJsonBudget budget(bytes,cancelled);if(!nlohmann::json::sax_parse(text,&budget))throw std::invalid_argument("Malformed material query typed JSON");}
 struct Visibility {
   SurfaceRange range;
   MToonCull cull = MToonCull::Back;
@@ -291,7 +306,7 @@ struct Visibility {
 };
 } // namespace
 struct MaterialSurfaceQuery::Impl {
-  std::unique_ptr<SurfaceQuery> query;
+  std::unique_ptr<detail::PackedMaterialQuery> query;
   detail::SculptSceneChunks::Ptr chunks;
   std::vector<Visibility> surfaces;
   uint64_t object_for(uint32_t triangle) const {
@@ -305,20 +320,35 @@ struct MaterialSurfaceQuery::Impl {
   }
   Impl(const Mesh &mesh, std::span<const SurfaceRange> ranges, const std::function<bool()> &cancelled,
        std::span<const std::array<float,4>> colors,bool explicit_colors, std::span<const std::array<float,2>> paint={},bool per_vertex=false)
-      : query(mesh.indices.empty()?nullptr:std::make_unique<SurfaceQuery>(mesh,cancelled)) {
+      : query(nullptr) {
+    auto charge=[](size_t&bytes,size_t count,size_t width){if(width&&count>(SIZE_MAX-bytes)/width)throw std::length_error("Material query metadata forecast overflow");bytes+=count*width;};
+    size_t metadata=0;charge(metadata,ranges.size(),16384);charge(metadata,mesh.indices.size(),8);if(metadata>512ull*1024*1024)throw std::length_error("Material query metadata budget exceeded before allocation");
     if(!colors.empty()&&colors.size()!=mesh.positions.size())throw std::invalid_argument("Packed visibility color vertex count differs from geometry");
     for(size_t i=0;i<colors.size();++i){if((i&1023)==0&&cancelled&&cancelled())throw std::runtime_error("Visibility color validation cancelled");for(float c:colors[i])if(!std::isfinite(c)||c<0||c>1)throw std::invalid_argument("Packed visibility requires finite linear unit RGBA");}
     if(!paint.empty()&&paint.size()!=(per_vertex?mesh.positions.size():mesh.indices.size()))throw std::invalid_argument("Visibility paint coordinate alignment differs from geometry");
     for(size_t c=0;c<paint.size();++c){if((c&1023)==0&&cancelled&&cancelled())throw std::runtime_error("Visibility paint validation cancelled");for(float v:paint[c])if(!std::isfinite(v))throw std::invalid_argument("Visibility paint coordinates are nonfinite");}
-    size_t end = 0;
-    for (const auto &range : ranges) {
-      if (cancelled && cancelled()) throw std::runtime_error("Visibility build cancelled");
-      if (range.first != end || range.count % 3 || range.count > mesh.indices.size() - end)
-        throw std::invalid_argument("Visibility requires contiguous triangle-aligned surface ranges");
-      end += range.count;
-      surfaces.emplace_back(range, mesh,colors,explicit_colors,paint,per_vertex,cancelled);
+    size_t end=0;
+    for(const auto&range:ranges){
+      if(cancelled&&cancelled())throw std::runtime_error("Visibility build cancelled");
+      if(end>mesh.indices.size()||range.first!=end||range.count%3||range.count>mesh.indices.size()-end)throw std::invalid_argument("Visibility requires contiguous triangle-aligned surface ranges");
+      end+=range.count;size_t color_domain=0;
+      if(explicit_colors&&!colors.empty()){
+        if(range.first_vertex>mesh.positions.size())throw std::invalid_argument("Packed visibility color origin is outside geometry");size_t last=range.first_vertex;
+        for(size_t c=range.first;c<end;++c){if((c&1023)==0&&cancelled&&cancelled())throw std::runtime_error("Visibility color forecast cancelled");const auto v=mesh.indices[c];if(v<range.first_vertex||v>=mesh.positions.size())throw std::invalid_argument("Packed visibility color offset is outside its range");last=std::max(last,size_t(v)+1);}color_domain=last-range.first_vertex;
+      }
+      if(range.appearance){const auto&appearance=*range.appearance;color_domain=std::max(color_domain,appearance.source_vertices.size());charge(metadata,appearance.source_vertices.size(),sizeof(std::array<float,2>));}
+      if(range.material_bindings){if(range.material_bindings->has_mtoon&&!range.pbr_view){if(metadata>512ull*1024*1024)throw std::length_error("Material query metadata exceeds budget");charge(metadata,range.material_bindings->material.copy_working_bytes(512ull*1024*1024-metadata,cancelled),1);}}
+      else if(range.appearance&&!range.pbr_view){visibility_json_budget(metadata,range.appearance->mtoon_json,cancelled);visibility_json_budget(metadata,range.appearance->material_json,cancelled);}
+      // Color copies cover the complete referenced/source vertex DOMAIN,
+      // including unused gaps. They are independent of corner paint coordinates.
+      charge(metadata,color_domain,sizeof(std::array<float,4>));
+      if(metadata>512ull*1024*1024)throw std::length_error("Material query attribute/typed metadata budget exceeded before allocation");
     }
-    if (end != mesh.indices.size()) throw std::invalid_argument("Visibility surface ranges are incomplete");
+    if(end!=mesh.indices.size())throw std::invalid_argument("Visibility surface ranges are incomplete");
+    if(!mesh.indices.empty())query=std::make_unique<detail::PackedMaterialQuery>(mesh,cancelled,detail::PackedMaterialQuery::Limits{},metadata);
+    surfaces.reserve(ranges.size());
+    for(const auto&range:ranges){if(cancelled&&cancelled())throw std::runtime_error("Visibility build cancelled");surfaces.emplace_back(range,mesh,colors,explicit_colors,paint,per_vertex,cancelled);}
+
   }
   std::optional<MaterialSurfaceHit> target(Vec3 point,Vec3 direction,float maximum,double seconds,
       uint64_t only,std::span<const uint64_t> excluded,bool ray,bool visibility,
