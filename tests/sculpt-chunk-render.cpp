@@ -5,9 +5,12 @@
 #define main existing_native_chunk_main
 #include "sculpt-chunk-pipeline.cpp"
 #undef main
+#include <cstring>
 #include <fstream>
 namespace {
 bool fail_scalar_upload=false;
+bool count_material_setups=false;
+size_t material_setups=0;
 std::shared_ptr<MeshSnapshot> mixed(const Scene &scene,const SculptSceneChunks::Ptr &previous={},bool masks=false,
     const std::shared_ptr<const void> &flat_identity={}) {
   const auto full=reference(scene);auto captured=SculptSceneChunks::capture(scene,{7,1,1,masks,true},previous);
@@ -28,6 +31,11 @@ Pixels render(SurfaceRenderer &renderer,const std::shared_ptr<MeshSnapshot> &sce
   renderer.draw(scene,canvas,identity,{0,0,2},Fbo::size,Fbo::size,true,false,false,display);return read();
 }
 }
+extern "C" GLint __real_glGetUniformLocation(GLuint,const GLchar*);
+extern "C" GLint __wrap_glGetUniformLocation(GLuint program,const GLchar *name) {
+  if(count_material_setups&&std::strcmp(name,"base_color")==0)++material_setups;
+  return __real_glGetUniformLocation(program,name);
+}
 extern "C" void __real_glBufferData(GLenum,GLsizeiptr,const void*,GLenum);
 extern "C" void __wrap_glBufferData(GLenum target,GLsizeiptr size,const void *data,GLenum usage) {
   if(fail_scalar_upload&&target==GL_ARRAY_BUFFER&&usage==GL_DYNAMIC_DRAW&&data){fail_scalar_upload=false;__real_glBufferData(target,-1,data,usage);return;}
@@ -42,8 +50,12 @@ int main(int argc,char **argv)try{
     scene.object(3).material=scene.object(1).material;scene.object(3).material.color={.1f,.2f,.8f,.65f};scene.object(3).transform.position={.12f,.08f,-.04f};
     scene.object(2).material=scene.object(1).material;scene.object(2).material.color={.1f,.8f,.2f,.4f};
     if(sign<0)scene.object(1).affine_edit=std::make_shared<NativeAffineEdit>(AffineTransform(std::array<double,16>{-1,0,0,0,.27,1.2,0,0,.13,.09,.8,0,.1,-.2,.15,1}));
-    const auto flat=reference(scene);auto chunked=mixed(scene);auto oracle=render(expected,flat);auto image=render(actual,chunked);
+    const auto flat=reference(scene);auto chunked=mixed(scene);auto oracle=render(expected,flat);
+    material_setups=0;count_material_setups=true;auto image=render(actual,chunked);count_material_setups=false;
     check(image==oracle,"Actual GL chunk draw equals independent whole-mesher reference for opaque/Blend/Mask and reflected/sheared geometry");
+    const auto setup_limit=chunked->ranges.size()+chunked->sculpt_chunks->objects().size();
+    std::cout<<"MATERIAL_SETUP case="<<cases<<" actual="<<material_setups<<" object_range_limit="<<setup_limit<<'\n';
+    check(material_setups>0&&material_setups<=setup_limit,"Material state submission is bounded by actual objects/ranges, not ordered sculpt cell runs");
     check(std::any_of(image.begin(),image.end(),[](uint8_t v){return v!=0;}),"Reference and chunk geometry produce a nonblank framebuffer");
     const auto prefix=output/("case-"+std::to_string(cases++));pixel_file(prefix.string()+"-reference.rgba",oracle);pixel_file(prefix.string()+"-chunk.rgba",image);
     const auto transfers=actual.buffer_stats();check(render(actual,chunked)==image&&actual.buffer_stats().geometry_uploads==transfers.geometry_uploads&&actual.buffer_stats().mask_uploads==transfers.mask_uploads,"Second eye reuses actual GPU geometry/scalar packets without a transfer");
