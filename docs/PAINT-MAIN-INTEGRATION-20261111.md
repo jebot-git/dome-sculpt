@@ -61,3 +61,19 @@ failures must remain recorded separately from its explicit extended
 instrumentation profile. Broader typed source domains/channels, production
 throughput, hardware/compiler backends, physical controllers and the remaining
 full authoring requirements are not completed by these helper checks.
+
+## Subsequent XR palette correction
+
+Review of the actual shared palette found that Controls sector10 still displayed
+the Erase check state after that sector became Filters. Remove that stale
+checkbox; the direct Painting Erase checkbox remains unchanged. Give page6 the
+explicit title `Brush controls` instead of its generic fallback title.
+
+The complete changed palette translation unit compiles successfully in both
+existing configured Release/SAN profiles. This is compile evidence only, not
+an application link or rendered/interactive acceptance. Exact commands, source,
+object and log hashes are in
+[validation/PAINT-FILTER-PALETTE-20261111.json](validation/PAINT-FILTER-PALETTE-20261111.json).
+The separately prepared public desktop/loader scenarios still need to run on a
+coherent complete candidate. The earlier helper tests remain tied to source82;
+this later source change does not relabel them as full-candidate qualification.

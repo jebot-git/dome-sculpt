@@ -483,8 +483,6 @@ void SpatialPalette::raster(const EditorState &s) {
       return s.sculpt_layer_locked;
     if (s.menu_page == 4 && sector == 9)
       return s.layer_visible;
-    if (s.menu_page == 6 && sector == 10)
-      return s.paint.erase;
     return {};
   };
   const auto &labels = spatial_labels(s.menu_page);
@@ -550,6 +548,7 @@ void SpatialPalette::raster(const EditorState &s) {
                      : s.menu_page == 9 ? "Avatars"
                      : s.menu_page == 8 ? "Recovery"
                      : s.menu_page == 7   ? "Sculpt layers"
+                     : s.menu_page == 6 ? "Brush controls"
                      : s.menu_page == 1 ? "Objects"
                      : s.menu_page == 2 ? "Material"
                      : s.menu_page == 3 ? "Painting"

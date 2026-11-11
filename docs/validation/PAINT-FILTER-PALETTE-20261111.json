@@ -1,0 +1,46 @@
+{
+  "scope": "Fix stale Filters Erase checkbox and title; complete changed palette TU compiles only, no new full app/link/interactive acceptance.",
+  "base": "173f9a0179a4a8f9992b5c2efe985107bc79d9c3",
+  "profiles": {
+    "release": {
+      "command": [
+        "nice",
+        "-n",
+        "10",
+        "cmake",
+        "--build",
+        "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/release",
+        "--parallel",
+        "1",
+        "--target",
+        "CMakeFiles/dome-sculpt-render.dir/src/palette.cpp.o"
+      ],
+      "exit": 0,
+      "seconds": 4.724924526992254,
+      "scope": "One complete palette translation unit only; no app link or interactive workflow qualification.",
+      "log_sha256": "0bc9188c8ebfd05e5ddb83547504cb3116fde4738b598d6a7d62c1226e4124b8",
+      "object_sha256": "6a5392330f15cadd55c6dfc4450977dc7e8366d4ffad895e908cd857fa5cfe30",
+      "source_sha256": "f3cfe0bc0722c5f87c678091215b7e26faa3024414756332fe33db7a399d9917"
+    },
+    "sanitize": {
+      "command": [
+        "nice",
+        "-n",
+        "10",
+        "cmake",
+        "--build",
+        "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/sanitize",
+        "--parallel",
+        "1",
+        "--target",
+        "CMakeFiles/dome-sculpt-render.dir/src/palette.cpp.o"
+      ],
+      "exit": 0,
+      "seconds": 7.079520002007484,
+      "scope": "One complete palette translation unit only; no app link or interactive workflow qualification.",
+      "log_sha256": "0bc9188c8ebfd05e5ddb83547504cb3116fde4738b598d6a7d62c1226e4124b8",
+      "object_sha256": "be6941ce4cc78e5ac51c4be5305826940422404851ae617c716e165ff268829b",
+      "source_sha256": "f3cfe0bc0722c5f87c678091215b7e26faa3024414756332fe33db7a399d9917"
+    }
+  }
+}
