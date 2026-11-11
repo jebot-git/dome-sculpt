@@ -41,7 +41,7 @@
   ],
   "source_pins": {
     "CMakeLists.txt": "9699592ddeebcb5e25cca5d1feeb41106b6205eee38441b605c6063389f7753e",
-    "tests/gpu-color-blur-native.cpp": "c007ae1c9d9f9eecdfe29aebcb459fb7f27cf6cf2b03d1804cb3b97c2544af4a",
+    "tests/gpu-color-blur-native.cpp": "c269dfc3700c2f23a6f53b538957666d78e73eea6da80f1758c69bd0f1057a3c",
     "tests/gpu-color-blur-runtime.cpp": "c46f24a5240042a3cb63e49d88ae4778f641365ad7446187fd10ec0ecfa4118e",
     "tests/gpu-color-blur-menu.py": "9d2e0a1e5f235573d86ca47273ada6fa3eafef7fc68cec375ef27b9622c7fbf2",
     "tests/gpu-color-blur-xr.py": "416870cc43dc1228e428532be9961a1ee6ecbe736f8c6c6bfa8fcaf454ec847e",
@@ -88,6 +88,8 @@
     "exit": 0,
     "seconds": 2.1259466820047237,
     "log": "artifacts/paint-workflow-source-review-v2/0.log",
-    "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
-  }
+    "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "scope_limit": "Prior native syntax belongs to earlier unexecuted producer before Flow binding correction; new corrected TU still requires fresh compile."
+  },
+  "producer_review_correction": "Beforeanyproducerbuild/run: directblurdefaultstrength.5 differedfrompublicFlow1. Producer now assertsactual public defaultFlow1 thenpaint_command(BlurColorLayer); independentoracle1 retained; productdefaults unchanged. Previoussource-onlyc74/503 neverexecutedproducer."
 }

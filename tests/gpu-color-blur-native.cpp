@@ -99,7 +99,9 @@ void workflow_fixtures(const std::filesystem::path&out){
  Scene scene;scene.active().name="Nonuniform color 日本語";scene.active().mesh_active=true;
  scene.active().painted=field(true);scene.validate();
  const auto before=scene.snapshot();scene.save(out/"original.dsculpt");
- Document document;document.replace(scene);ready(document);document.blur_color_layer();
+ Document document;document.replace(scene);ready(document);
+ check(document.frame().state->paint.flow==1,"Workflow starts with the actual public default Flow1");
+ document.paint_command(SpatialCommand::BlurColorLayer);
  auto saved=document.save_async(out/"accepted.dsculpt");saved.get();ready(document);
  const auto accepted=document.copy_scene();check(accepted.encode()!=before.encode(),"Workflow fixture contains a genuine nonuniform accepted color change");
  oracle(*before.active().painted,*accepted.active().painted,1);

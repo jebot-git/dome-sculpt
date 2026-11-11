@@ -4,7 +4,11 @@ This test-only continuation adds actual universal-menu and OpenXR-loader workflo
 for native GPU blur. C++/Python syntax and source checks pass. No new target link,
 GUI, loader or hardware execution is claimed yet. The private branch now starts
 from root `775f92b8`; product sources and canonical dependency metadata are unchanged.
-Root's frozen build is untouched. The earlier 82-based review remains archived.
+Root's frozen build is untouched. The earlier 82-based review remains archived. Root source review caught an
+unexecuted producer mismatch: direct blur options default to0.5 while public
+commands use default Flow1. The producer now asserts actual public Flow1 and
+invokes `paint_command(BlurColorLayer)`; the independent oracle still checks1.
+Existing product defaults remain unchanged.
 
 Existing GUI 81/XR 117 scripts, inputs and deadlines remain byte-identical. Current
 139378 software/139458 Arc native controls retain their original dispatch. An
