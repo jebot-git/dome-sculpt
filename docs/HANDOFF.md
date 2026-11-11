@@ -1,32 +1,43 @@
-## Next combined HDR authoring candidate: fresh owning build started — 2026-11-11
+## Current integration and qualified component fixes — 2026-11-12
 
-Private candidate `4977fb32` combines the current main authoring/query source,
-reviewed empty-flat renderer fix `82257f3b`, radiance-preserving Bake `2238315b`
-and public Bake workflow fixture prototype `305d2cb7`. Its configured ALL Release
-build has started from zero project objects: 1,738 Ninja actions, current owning
-FLTK/OpenXR/core/renderer consumers, and no object borrowing across changed public
-paint/scene layouts. Configure passed; compilation and subsequent selected gates
-are not yet qualified. Follow `artifacts/authoring-hdr-owning-build-20261111/`
-and inspect the actual live job before resuming; do not restart on observation
-timeout. The candidate's full scope is in
-private `docs/AUTHORING-HDR-OWNING-CANDIDATE-20261111.md` in that worktree.
+Main runtime remains the qualified e993 integration (`0d3965ff`). Private
+combined candidate `4977fb32` has an active fresh configured ALL Release build
+from zero project objects: 1,738 actions, current owning FLTK/OpenXR/core/renderer
+consumers, no borrowing across changed paint/scene layouts. Core193 and renderer4
+are fully linked and pinned, but the complete build and subsequent selected
+native/software/workspace gates are not yet qualified. Inspect the actual live
+job and logs in `artifacts/authoring-hdr-owning-build-20261111/` before resuming;
+do not restart after an observation timeout. Frozen sources/providers stay intact.
 
-The separate empty-flat fix passes nine actual native/software cases and four
-authenticated Arc cases in each Release/strict sanitizer profile. Its complete
-new test TUs reject the old wasted-work behavior. An independent same-object
-probe preserves old success, intermediate GL error1282, then fixed success with
-byte-identical old/fixed logs. These are component proofs, not combined public
-GUI/XR or new sustained-workload acceptance. The original timing tails remain
-open; no frame-rate improvement is claimed.
+The reviewed empty-flat patch822 passes nine actual software cases and four Arc
+cases in each Release/strict sanitizer profile. Read
+[EMPTY-FLAT-RENDERER-20261111.md](EMPTY-FLAT-RENDERER-20261111.md).
+Its retained-zero-range regression and initial observer failure remain preserved.
+Those component results do not rerun the earlier196 public workflows/P1 or prove
+a frame-rate improvement. Actual slower timing tails and physical90Hz acceptance
+remain open.
 
-HDR Bake's own Release worker/export path now passes its former 52,016-radiance
-fallback failure; its standalone seven-FLOAT GPU fixture passes 172,040 checks
-each on software and authenticated Arc. Fresh component sanitizer compilation,
-combined owning qualification, actual public Bake workflows and broader typed
-source/frame/normal/painting/avatar/interoperability/device/accelerator work remain
-required. Main's runtime below remains the qualified e993 integration. The full
-goal and later controller trays/spatial node editing/history remain active and
-incomplete. No system installation or physical session changed.
+A separate source-role defect was reproduced and corrected privately in63c3199d:
+actual original UV1 coordinates were resolved, then incorrectly sent to a sampler
+still marked unresolved. Release callback27, original worker16417, default public
+fixture producer32794 and all seven native inspectors pass against a matched
+current core. Read [the scoped source fix](RADIANCE-PRESERVING-BAKE-SOURCE-RESOLUTION-20261112.md).
+Full UV1/typed-source Document Bake, actual public app/stereo, high-range final
+framebuffer and corrected-source sanitizer checks remain separate requirements.
+
+Private anatomical fitting improvements now align hand/finger continuations with
+declared landmarks/parent chains and preserve world terminal length under affine
+placement. Both actual CC0 VRoid meshes gain fingertip support from roughly0.35
+to0.78 with the existing solver. Eleven Release native suites pass; strengthened
+thumb/sparse-landmark coverage and strict sanitizer qualification are proceeding
+on separate branches. They are not admitted to main or claimed as full automatic
+weight/fitting completion. Existing-rig/rest, landmark recognition, heat weighting
+and wider avatar/interoperability requirements remain open.
+
+The full production goal remains active and incomplete. Fresh combined owning,
+public desktop/real-loader XR, sanitizer/hardware/sustained/device/accelerator
+qualification still remains. Controller trays and spatial node editing/history
+stay required after basic targets. No installation or physical session changed.
 
 ## Integrated authoring and large-mesh query milestone — 2026-11-11
 
