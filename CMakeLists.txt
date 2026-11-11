@@ -137,6 +137,12 @@ target_sources(dome-sculpt-core PRIVATE src/emission-package.cpp src/native-auth
 target_link_libraries(dome-sculpt-core PRIVATE dome-sculpt-emission-codec)
 include(CTest)
 if(BUILD_TESTING)
+  # Standalone typed field: no borrowed core objects/public TextureMaps ABI.
+  add_executable(dome-sculpt-baked-emission-test tests/baked-emission.cpp src/baked-emission.cpp)
+  target_include_directories(dome-sculpt-baked-emission-test PRIVATE include)
+  target_compile_options(dome-sculpt-baked-emission-test PRIVATE -Wall -Wextra -Wpedantic)
+  add_test(NAME baked-emission COMMAND dome-sculpt-baked-emission-test)
+  set_tests_properties(baked-emission PROPERTIES TIMEOUT 60)
   set_property(GLOBAL APPEND PROPERTY JOB_POOLS dome_blur_links=1)
   add_executable(dome-sculpt-native-graphics-shared-test tests/native-graphics-shared.cpp)
   target_include_directories(dome-sculpt-native-graphics-shared-test PRIVATE src)
