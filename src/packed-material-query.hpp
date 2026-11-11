@@ -12,6 +12,10 @@ class PackedMaterialQuery {
  struct Impl;
  std::unique_ptr<Impl> impl_;
 public:
+ // Trusted private material policy: false proves that a whole original
+ // triangle interval contains no eligible object/material. It never replaces
+ // arbitrary per-triangle/barycentric filters or their shared work budget.
+ using Eligibility=std::function<bool(uint32_t first,uint32_t count)>;
  struct Limits {
   size_t retained_bytes=512ull*1024*1024;
   size_t working_bytes=768ull*1024*1024;
@@ -30,10 +34,10 @@ public:
  const Mesh&mesh()const;
  Usage usage()const noexcept;
  SurfaceHit closest(Vec3)const; // Existing default2M total triangle-test budget.
- SurfaceHit closest(Vec3,const SurfaceQueryOptions&)const;
- std::optional<SurfaceHit> nearest(Vec3,const SurfaceQueryOptions&)const;
- std::optional<SurfaceQueryResult> nearest_result(Vec3,const SurfaceQueryOptions&)const;
- std::optional<SurfaceHit> raycast(Vec3,Vec3,float,const SurfaceQueryOptions&)const;
- std::optional<SurfaceQueryResult> raycast_result(Vec3,Vec3,float,const SurfaceQueryOptions&)const;
+ SurfaceHit closest(Vec3,const SurfaceQueryOptions&,const Eligibility & = {})const;
+ std::optional<SurfaceHit> nearest(Vec3,const SurfaceQueryOptions&,const Eligibility & = {})const;
+ std::optional<SurfaceQueryResult> nearest_result(Vec3,const SurfaceQueryOptions&,const Eligibility & = {})const;
+ std::optional<SurfaceHit> raycast(Vec3,Vec3,float,const SurfaceQueryOptions&,const Eligibility & = {})const;
+ std::optional<SurfaceQueryResult> raycast_result(Vec3,Vec3,float,const SurfaceQueryOptions&,const Eligibility & = {})const;
 };
 }
