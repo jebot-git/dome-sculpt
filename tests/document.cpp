@@ -1,10 +1,32 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/document.hpp"
+#include "../src/sculpt-scene-chunks.hpp"
+#include <bit>
 #include <fstream>
 #include <future>
 #include <iostream>
 #include <unistd.h>
 using namespace dome;
+// Independent value copy, not a pair of aliases into the same held snapshot.
+// Sculpt chunks and packed painted surfaces retain separate indexed geometry.
+static std::vector<std::array<uint32_t,18>> geometry(const MeshSnapshot &surface) {
+  std::vector<std::array<uint32_t,18>> result;
+  auto append=[&](const std::array<Vec3,3> &positions,const std::array<Vec3,3> &normals){
+    std::array<uint32_t,18> values{};size_t at=0;
+    for(const auto &vertices:{positions,normals})for(auto v:vertices)
+      for(float f:{v.x,v.y,v.z})values[at++]=std::bit_cast<uint32_t>(f);
+    result.push_back(values);
+  };
+  const auto &mesh=surface.mesh;
+  for(size_t i=0;i<mesh.indices.size();i+=3){
+    std::array<Vec3,3> positions,normals;
+    for(size_t k=0;k<3;++k){positions[k]=mesh.positions.at(mesh.indices.at(i+k));normals[k]=mesh.normals.at(mesh.indices.at(i+k));}
+    append(positions,normals);
+  }
+  if(surface.sculpt_chunks)for(const auto &object:surface.sculpt_chunks->objects())
+    object.geometry->for_each_ordered_triangle([&](const auto &,size_t,const auto &positions,const auto &normals){append(positions,normals);});
+  return result;
+}
 int main() try {
   auto require = [](bool v, const char *name) {
     if (!v)
@@ -15,7 +37,8 @@ int main() try {
   doc.seed();
   require(doc.wait_mesh(), "Mesher publishes an initial immutable surface");
   auto first = doc.frame();
-  require(!first.state->dirty && !first.surface->mesh.indices.empty(),
+  const auto original_geometry=geometry(*first.surface);
+  require(!first.state->dirty && !original_geometry.empty(),
           "A clean document has a rendered surface");
   auto held = first.surface;
   require(doc.begin_desktop(),
@@ -31,12 +54,13 @@ int main() try {
   auto edited = doc.frame();
   require(edited.state->dirty && edited.surface->revision > held->revision,
           "Model revisions and mesh snapshots advance together");
-  require(held->mesh.indices == first.surface->mesh.indices,
+  require(geometry(*edited.surface)!=original_geometry,
+          "A sculpt stroke changes actual independently copied triangle values");
+  require(geometry(*held)==original_geometry,
           "An acquired render snapshot remains immutable across edits");
   require(doc.undo() && doc.wait_mesh(),
           "Shared undo regenerates the earlier surface");
-  require(doc.frame().surface->mesh.positions.size() ==
-              first.surface->mesh.positions.size(),
+  require(geometry(*doc.frame().surface)==original_geometry && geometry(*held)==original_geometry,
           "Shared undo returns the original geometry");
   SpatialFrame f;
   f.sequence = 1;
@@ -136,7 +160,7 @@ int main() try {
           "Replacing the document publishes its new mesh generation");
   auto empty = doc.frame();
   require(empty.state->generation > old_generation &&
-              empty.surface->mesh.indices.empty(),
+              geometry(*empty.surface).empty(),
           "Old geometry cannot appear in a new document generation");
   auto directory = std::filesystem::temp_directory_path() /
                    ("dome-document-" + std::to_string(getpid()));

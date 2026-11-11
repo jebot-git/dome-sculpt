@@ -3,6 +3,8 @@
 #include "dome/uv.hpp"
 namespace dome {
 const std::array<const char *, 12> &spatial_labels(int page) {
+  static const std::array<const char*,12> filters={"Brush controls","Blur color layer","","","","","Cancel work","Save","Back","Undo","Redo",""};
+  if(page==32)return filters;
   static const std::array<const char*,12> emission={"Brush RGB","Brush units","Material radiance","Source factors","Relative / normalize","Physical brush","Brush black","Paint emission","Back","Undo","Redo","Close"};
   if(page==30)return emission;
   static const std::array<const char*,12> sets={"Previous set","Next set","Pick faces","Clear faces","New from faces","Assign to set","Resolution","Material color","Back","Undo","Redo","Save"};
@@ -34,7 +36,7 @@ const std::array<const char *, 12> &spatial_labels(int page) {
   static const std::array<const char *, 12> controls = {
       "Color",      "Metal value", "Rough value", "Emission / HDR",
       "Mask value", "Flow",        "Layer alpha", "Brush size",
-      "Back",       "Image projection",     "Erase",       "Layer order"};
+      "Back",       "Image projection",     "Filters",     "Layer order"};
   static const std::array<const char *, 12> sculpt = {
       "Add layer",  "Next layer", "Previous",     "Show layer",
       "Lock layer", "Strength",   "Delete layer", "Resolution",
@@ -167,6 +169,7 @@ std::optional<VrParameter> spatial_parameter(int page, int sector) {
   return {};
 }
 std::optional<SpatialCommand> spatial_action(int page, int index) {
+  if(page==32){if(index==1)return SpatialCommand::BlurColorLayer;if(index==6)return SpatialCommand::CancelWork;if(index==7)return SpatialCommand::Save;if(index==9)return SpatialCommand::Undo;if(index==10)return SpatialCommand::Redo;return {};}
   if(page==31){if(index>=0&&index<6)return SpatialCommand(int(SpatialCommand::TexturePrevious)+index);if(index==9)return SpatialCommand::Undo;if(index==10)return SpatialCommand::Redo;if(index==11)return SpatialCommand::Save;return {};}
   if(page==30){if(index==4)return SpatialCommand::EmissionRelative;if(index==5)return SpatialCommand::EmissionPhysical;if(index==6)return SpatialCommand::EmissionBlack;if(index==7)return SpatialCommand::PaintGlow;if(index==9)return SpatialCommand::Undo;if(index==10)return SpatialCommand::Redo;return {};}
   if(page==29){
@@ -345,10 +348,7 @@ std::optional<SpatialCommand> spatial_action(int page, int index) {
       SpatialCommand::FlowUp,      SpatialCommand::FlowDown,
       SpatialCommand::Undo,        SpatialCommand::LayerVisible,
       SpatialCommand::DeleteLayer, SpatialCommand::LayerOpacity};
-  if (page == 6)
-    return index == 10
-               ? std::optional<SpatialCommand>(SpatialCommand::ErasePaint)
-               : std::nullopt;
+  if (page == 6) return {};
   // Future registered-page handlers must return above; unknown pages cannot
   // accidentally fall through to the root menu's commands.
   if(page>4)return {};
@@ -748,6 +748,8 @@ void SpatialInput::update(const SpatialSample &s) {
     } else if (page_ == 3 && selected_ == 11) {
       page_ = 6;
       selected_ = 0;
+    } else if(page_==6&&selected_==10){page_=32;selected_=0;
+    } else if(page_==32&&selected_==0){page_=6;selected_=0;
     } else if(page_==25&&selected_==9){page_=4;selected_=0;
     } else if(page_==6 && selected_==3){page_=30;selected_=0;
     } else if (page_ == 6 && selected_ == 9) {
@@ -772,7 +774,7 @@ void SpatialInput::update(const SpatialSample &s) {
       controls_.push_back({VrControlEventType::Begin, parameter_});
     } else if (page_ != 0 && page_ != 27 && selected_ == 8) {
       const bool export_back=page_==28||page_==30;
-      page_ = page_==31 ? 2 : page_==30 ? 6 : page_==29 ? 26 : page_==26 ? 2 : page_==25 ? 3 : page_==24 ? 10 : page_==22 ? 19 : page_==19 ? 10 : page_==23 ? 21 : (page_ == 16 || page_ == 17 || page_==20 || page_==21) ? 10 : (page_ == 18 || page_ == 15) ? 7 : page_ == 14 ? 13 : page_ == 13 ? 11
+      page_ = page_==32 ? 6 : page_==31 ? 2 : page_==30 ? 6 : page_==29 ? 26 : page_==26 ? 2 : page_==25 ? 3 : page_==24 ? 10 : page_==22 ? 19 : page_==19 ? 10 : page_==23 ? 21 : (page_ == 16 || page_ == 17 || page_==20 || page_==21) ? 10 : (page_ == 18 || page_ == 15) ? 7 : page_ == 14 ? 13 : page_ == 13 ? 11
               : page_ == 12 ? 10
               : page_ == 11 ? 9
               : (page_ == 9 || page_ == 10) ? 1

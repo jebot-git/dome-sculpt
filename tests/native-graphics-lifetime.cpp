@@ -16,6 +16,7 @@ enum class Fail { None, Platform, Display, Initialize, Bind, Config, NoConfig,
 Fail fail=Fail::None;
 bool fallback=false, initialized=false, context_live=false, surface_live=false;
 bool invalid_cleanup=false;
+EGLenum selected_api=EGL_OPENGL_ES_API;
 int display_token, candidate_token, context_token, surface_token, foreign_token;
 EGLDisplay owned_display=EGL_NO_DISPLAY, current_display=EGL_NO_DISPLAY;
 EGLContext current_context=EGL_NO_CONTEXT;
@@ -30,6 +31,7 @@ EGLDisplay candidate_handle(){return reinterpret_cast<EGLDisplay>(&candidate_tok
 EGLContext context_handle(){return reinterpret_cast<EGLContext>(&context_token);}
 EGLSurface surface_handle(){return reinterpret_cast<EGLSurface>(&surface_token);}
 void reset(Fail failure,bool use_fallback=false) {
+  selected_api=EGL_OPENGL_ES_API;
   fail=failure;fallback=use_fallback;initialized=context_live=surface_live=false;
   invalid_cleanup=false;owned_display=current_display=EGL_NO_DISPLAY;
   current_context=EGL_NO_CONTEXT;cleanup.clear();
@@ -59,9 +61,13 @@ EGLBoolean EGLAPIENTRY eglInitialize(EGLDisplay d,EGLint *major,EGLint *minor) {
   if(d==EGL_NO_DISPLAY||initialized){invalid_cleanup=true;return EGL_FALSE;}
   initialized=true;owned_display=d;*major=1;*minor=5;return EGL_TRUE;
 }
+const char*EGLAPIENTRY eglQueryString(EGLDisplay d,EGLint name){return d==owned_display&&initialized&&name==EGL_VERSION?"1.5":nullptr;}
+EGLint EGLAPIENTRY eglGetError(){return EGL_SUCCESS;}
+EGLenum EGLAPIENTRY eglQueryAPI(){return selected_api;}
 EGLBoolean EGLAPIENTRY eglBindAPI(EGLenum api) {
-  if(!initialized||api!=EGL_OPENGL_API)invalid_cleanup=true;
-  return fail==Fail::Bind?EGL_FALSE:EGL_TRUE;
+  if(api!=EGL_OPENGL_API&&api!=EGL_OPENGL_ES_API)invalid_cleanup=true;
+  if(fail==Fail::Bind)return EGL_FALSE;
+  selected_api=api;return EGL_TRUE;
 }
 EGLBoolean EGLAPIENTRY eglChooseConfig(EGLDisplay d,const EGLint*,EGLConfig *config,EGLint count,EGLint *found) {
   if(d!=owned_display||count!=1)invalid_cleanup=true;
@@ -114,6 +120,7 @@ int main() try {
     check(refused,"A failing vendor stage refuses construction");
     check(!initialized&&!context_live&&!surface_live&&!invalid_cleanup,
           "Failed construction releases only successfully acquired vendor resources");
+    check(selected_api==EGL_OPENGL_ES_API,"Failed construction restores the caller's selected rendering API");
   }
   for(bool use_fallback:{false,true}) {
     reset(Fail::None,use_fallback);
@@ -151,10 +158,11 @@ int main() try {
     NativeGraphics graphics;
     current_display=reinterpret_cast<EGLDisplay>(&foreign_token);
     current_context=reinterpret_cast<EGLContext>(&foreign_token);
+    selected_api=EGL_OPENGL_ES_API;
     previous_display=current_display;previous_context=current_context;
   }
   check(current_display==previous_display&&current_context==previous_context&&
-        cleanup==std::vector<char>({'S','C','T'})&&!invalid_cleanup,
+        cleanup==std::vector<char>({'S','C','T'})&&!invalid_cleanup&&selected_api==EGL_OPENGL_ES_API,
         "Teardown never unbinds an unrelated context made current by another owner");
   check(!std::is_copy_constructible_v<NativeGraphics>&&!std::is_copy_assignable_v<NativeGraphics>,
         "An EGL resource owner cannot be copied into a second destructor");

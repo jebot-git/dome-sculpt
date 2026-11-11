@@ -116,6 +116,7 @@ struct EditorState {
   std::vector<uint64_t> skin_sources;
   bool skin_use_locks = true, can_configure_skin = false, can_bind_skin = false;
   bool can_bake = false, can_clear_bake = false, can_cancel_asset = false, can_convert_bake = false;
+  bool can_blur_color_layer=false;
   float asset_progress = 0;
   uint64_t bake_source = 0;
   std::vector<uint64_t> bake_sources;
@@ -411,6 +412,7 @@ public:
   void cancel_rig_fit(AssetSource expected = {});
   void rig_fit_action(SpatialCommand);
   void paint_command(SpatialCommand);
+  void blur_color_layer(PaintBlurOptions = {},AssetSource = {});
   void sculpt_command(SpatialCommand);
   void sculpt_settings(Volume::SculptSettings, AssetSource expected = {});
   void apply_procedural_sculpt(ProceduralSculptOptions, AssetSource expected = {});
@@ -922,6 +924,7 @@ private:
     bool use_locks=false;
   };
   void queue_texture_set_locked(TextureSetEdit,AssetSource = {});
+  void queue_blur_color_locked(PaintBlurOptions,AssetSource = {});
   bool texture_face_pointer_locked(Vec3,Vec3,bool,double);
   void texture_set_command_locked(SpatialCommand);
   bool texture_set_command_enabled_locked(SpatialCommand)const;
