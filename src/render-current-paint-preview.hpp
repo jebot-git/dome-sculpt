@@ -134,8 +134,8 @@ float unit_value(uint at){return uintBitsToFloat(word(int(at)));}float srgb_valu
 uint byte_at(uvec4 p,int at){return (p[at/4]>>uint((at%4)*8))&255u;}
 float mul(float a,float b){precise float v=a*b;return v;}float add(float a,float b){precise float v=a+b;return v;}float sub(float a,float b){precise float v=a-b;return v;}
 float blend(float a,float b,float opacity){return add(mul(a,sub(1,opacity)),mul(b,opacity));}
-float linear_byte(float v){if(v<=0)return 0;if(v>=1)return 1;float scaled=mul(v,255);uint integer=uint(scaled);return float(integer+uint(sub(scaled,float(integer))>=.5))/255;}
-float srgb_byte(float v){if(v<=0)return 0;if(v>=1)return 1;uint bits=floatBitsToUint(v);int lo=0,hi=255;while(lo<hi){int mid=(lo+hi)/2;if(bits>=word(512+mid))lo=mid+1;else hi=mid;}return float(lo)/255;}
+float linear_byte(float v){if(v<=0)return 0.0;if(v>=1)return 1.0;float scaled=mul(v,255);uint integer=uint(scaled);return float(integer+uint(sub(scaled,float(integer))>=.5))/255;}
+float srgb_byte(float v){if(v<=0)return 0.0;if(v>=1)return 1.0;uint bits=floatBitsToUint(v);int lo=0,hi=255;while(lo<hi){int mid=(lo+hi)/2;if(bits>=word(512+mid))lo=mid+1;else hi=mid;}return float(lo)/255;}
 void main(){
  vec4 c=background_color;float rough=background_rough,metal=background_metal;vec3 l=physical_mode==1?vec3(0):background_emission,h=vec3(0);float ec=0;
  ivec2 xy=ivec2(gl_FragCoord.xy);int owner=texelFetch(padding,xy.y*resolution+xy.x).r;
