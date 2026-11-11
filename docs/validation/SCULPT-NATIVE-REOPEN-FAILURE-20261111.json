@@ -21,5 +21,5 @@
   "log": "loaded_geometry_owners=4\nready=0 error=Sculpt manifest retained byte limit exceeded\n",
   "scope": "Real nativeDocument reopen diagnostic on b6 matching current-ABI core; noGL caller, no repaired qualification.",
   "initial_unused_probe": "Original unused source/ELF preserved before run when review caught temporary Scene range lifetime. The actual run uses an explicitly retained Scene.",
-  "next_candidate": "e3ccf2a0; native-reader bit-exact COW storage interning, unqualified/private."
+  "next_candidate": "9c521366; native-reader scoped bit-exact COW storage interning, public headers unchanged, unqualified/private. e3friend prototype superseded before compilation/runtime."
 }

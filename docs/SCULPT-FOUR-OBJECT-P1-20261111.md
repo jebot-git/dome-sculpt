@@ -64,10 +64,15 @@ and the 512 MiB manifest limit is exceeded. The corrected probe exits 1 after
 external guard. No GL renderer is involved. Read the
 [separate failure receipt](validation/SCULPT-NATIVE-REOPEN-FAILURE-20261111.json).
 
-Private follow-on `e3ccf2a0` adds reader-local sharing of actual fully validated
+Private follow-on `9c521366` adds reader-local sharing of actual fully validated
 evaluated COW data only after complete key/value-bit comparison and equal
 voxel/band context. It preserves independent layers, masks, histories, native
 schema and resource caps; fingerprint candidates are not equality authority.
-Work and metadata are bounded. Its native and real reopening qualification is
-pending. Neither this private reader change nor the broader preview composition
+Work and metadata are bounded. The private pool is scoped to native reading;
+Volume decoding passes its actual evaluated storage after complete validation.
+Public headers remain byte-exact with `b6e366fd`. An earlier unexecuted friend-
+declaration prototype `e3ccf2a0` was superseded: layout compatibility alone would
+not justify combining token-different class definitions with reused objects.
+The new design replaces both complete Scene and Volume translation units. Its
+native and real reopening qualification is pending. Neither this private reader change nor the broader preview composition
 is admitted by this workload pass. The full goal remains active and incomplete.
