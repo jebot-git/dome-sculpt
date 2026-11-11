@@ -10,7 +10,8 @@ size_t checks=0;
 void check(bool ok,const char*why){if(!ok)throw std::runtime_error(why);++checks;}
 Mesh fixture(){Mesh m;for(uint32_t i=0;i<64;++i){const float x=float(i)*.1f;const auto first=uint32_t(m.positions.size());m.positions.insert(m.positions.end(),{{x,0,0},{x+.01f,0,0},{x,.01f,0}});m.normals.insert(m.normals.end(),3,Vec3{0,0,1});m.indices.insert(m.indices.end(),{first,first+1,first+2});}m.validate();return m;}
 struct Payload {std::vector<uint8_t>bytes=std::vector<uint8_t>(1<<20,42);};
-bool equal(const SurfaceQueryResult&a,const SurfaceQueryResult&b){return a.surface.triangle==b.surface.triangle&&a.surface.position==b.surface.position&&a.surface.normal==b.surface.normal&&a.surface.barycentric==b.surface.barycentric&&a.surface.distance==b.surface.distance&&a.squared_distance==b.squared_distance;}
+bool equal(Vec3 a,Vec3 b){return a.x==b.x&&a.y==b.y&&a.z==b.z;}
+bool equal(const SurfaceQueryResult&a,const SurfaceQueryResult&b){return a.surface.triangle==b.surface.triangle&&equal(a.surface.position,b.surface.position)&&equal(a.surface.normal,b.surface.normal)&&a.surface.barycentric==b.surface.barycentric&&a.surface.distance==b.surface.distance&&a.squared_distance==b.squared_distance;}
 template<class F>bool cancels(F f){try{f();}catch(const std::runtime_error&e){return std::string(e.what())=="Mesh processing cancelled";}return false;}
 void copied_query(){
  auto mesh=fixture();SurfaceQuery reference(mesh);auto owner=std::make_shared<Payload>();std::weak_ptr<Payload>weak=owner;size_t calls=0;
