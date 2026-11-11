@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/volume.hpp"
+#include "native-scene-geometry-intern.hpp"
 #include "io.hpp"
 #include "sculpt-mask.hpp"
 #include "sculpt-symmetry.hpp"
@@ -822,6 +823,7 @@ Volume Volume::decode(const nlohmann::json &j) {
     throw std::runtime_error("Sculpt mask/controls require volume version 3 or later");
   }
   v.geometry_history_.reset();
+  detail::NativeSceneGeometryIntern::intern_decoded(v.cells_,v.voxel_,v.band_);
   return v;
 }
 void Volume::swap_state(Volume &other) noexcept {

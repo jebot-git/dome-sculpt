@@ -1233,7 +1233,6 @@ Scene Scene::decode(const nlohmann::json &j) {
     if (samples > 4'000'000)
       throw std::length_error("Scene sample limit exceeded");
     o.volume = std::make_shared<Volume>(Volume::decode(v.at("volume")));
-    decoded_geometry.intern(*o.volume);
     if (o.volume->stored_samples() > v.at("volume").at("samples").size())
       samples +=
           o.volume->stored_samples() - v.at("volume").at("samples").size();
