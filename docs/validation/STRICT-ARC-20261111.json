@@ -1,0 +1,434 @@
+{
+  "state": "positive-qualified-negative-sanitizer-cleanup-open",
+  "product_source": "b8c469ce875eb2542c220300c3c63edbf1526570",
+  "domed_source": "acc2b70ae61dedec2a23727f67c60c0303d0f76f",
+  "scope": "Five actual unchanged GL consumers on authenticated physical Intel Arc A770. Two actual UHD renderer-refusal controls per profile. No source/product rebuild, installation, HMD or throughput claim.",
+  "source_before": {
+    "path": "artifacts/build-20261111/source-before.json",
+    "sha256": "9244fb9bfffd6ea457abfe2b3a13808a209968796793a94c9b51908b5d99aa7a"
+  },
+  "sdk_receipt": {
+    "path": "artifacts/sdk-20261111/verified-sdk.json",
+    "sha256": "3a1d3014a5eb13e37f28f39e60b0d8596a5accf80a540b516aa88806b86983f0"
+  },
+  "original_counts": [
+    51,
+    537,
+    72,
+    73,
+    994
+  ],
+  "original_total": 1727,
+  "RGB_tolerance": 6,
+  "alpha_exact": true,
+  "consumer_timeout_seconds": 180,
+  "arc_flock": "/tmp/dome-sculpt-arc-device.lock",
+  "tools": {
+    "arc-final-original.py": {
+      "path": "artifacts/strict-arc-20261111/control/arc-final-original.py",
+      "sha256": "76f1c15568fc8c786b687f609aaf83f2f6a3b2cad7ee3de55e6720a93830641b"
+    },
+    "graphics-v3.py": {
+      "path": "artifacts/strict-arc-20261111/control/graphics-v3.py",
+      "sha256": "0606a923f5fbe1a4da5ffd973ae3b541d0bb343cd55614a33ee2f3edef9f6a7a"
+    },
+    "mount_identity.py": {
+      "path": "artifacts/strict-arc-20261111/control/mount_identity.py",
+      "sha256": "1e2c6a322ae8797c78f9a2693d7e2e18aab9dd8d6472babbeb81334971904c81"
+    },
+    "arc-current.py": {
+      "path": "artifacts/strict-arc-20261111/control/arc-current.py",
+      "sha256": "66e9623907989fb538ccde533ff34dc0f6205d2b0bb13d00abed1efaacbf537a"
+    },
+    "arc-coordinator-adaptation.patch": {
+      "path": "artifacts/strict-arc-20261111/control/arc-coordinator-adaptation.patch",
+      "sha256": "48ff6679d6682e99ace0e545de279ec4a092de67f90c1f61d825f5fd10b26ab1"
+    },
+    "device-auth.cpp": {
+      "path": "artifacts/strict-arc-20261111/control/device-auth.cpp",
+      "sha256": "f13b90442862bdc64bd0e707a728305a68ecd45d726d54a09982b6c1bdae260e"
+    },
+    "device-auth-release.so": {
+      "path": "artifacts/strict-arc-20261111/control/device-auth-release.so",
+      "sha256": "c27dbee4f9dfbe6318da3380b3ca4fb6b9c2d9630905aaa66a8eb5d4ac140edb"
+    },
+    "device-auth-sanitize.so": {
+      "path": "artifacts/strict-arc-20261111/control/device-auth-sanitize.so",
+      "sha256": "8fa0baa9fe46b921f2524e9ac09b9d27e2e50eccf384e03449f19d5238ad0aa9"
+    },
+    "device-auth-derivation.json": {
+      "path": "artifacts/strict-arc-20261111/control/device-auth-derivation.json",
+      "sha256": "972b56ca386d07204223a34470cc0591bd77fca74bbce6463b66c40d3e6d934b"
+    }
+  },
+  "negative_cleanup_audit": {
+    "observer_exit_or_abort": false,
+    "observer_refusal": "std::runtime_error, caught by actual consumer main",
+    "context_owner": "third_party/openbrush/graphics.cpp",
+    "owner_release": "unbinds its own current context, destroys surface/context, eglTerminate; does not eglReleaseThread",
+    "scope_limit": "Actual refusal is proved; cleanup leak cause remains unproven. No product patch, suppression, extra GPU diagnosis or raw-status rewriting."
+  },
+  "observer_derivation": {
+    "source": "/home/blux/de-xr/dome-sculpt/artifacts/resume-integration-20261111/tests/retopo-marker-device.cpp",
+    "source_sha256": "9736c98298adb754c6bb43eaf195083c9b95758f56b660777229eb9c55ca21ee",
+    "preload_source_sha256": "f13b90442862bdc64bd0e707a728305a68ecd45d726d54a09982b6c1bdae260e",
+    "changes": [
+      "Add dlfcn.h",
+      "Replace linker __wrap/__real seam with exported glGetString and RTLD_NEXT forwarding",
+      "Update comment only"
+    ],
+    "all_authentication_body_checks_unchanged": true,
+    "historical_preload_binary_not_reused": true
+  },
+  "tool_authenticity": "Historical monitor and mount helper are archive-hash verified, not cryptographically signed; historical preload unavailable, current forwarding seam is explicitly derived and compiled.",
+  "read_only_Arc_RS_image_comparison": {
+    "scope": "Additional filesystem-only comparison; no GPU rerun or modified pass threshold.",
+    "pairs": 56,
+    "max_RGB": 0,
+    "max_alpha": 0,
+    "byte_exact_pairs": 56,
+    "receipt": "artifacts/strict-arc-20261111/control/Arc-RS-images.json",
+    "receipt_sha256": "b78f35bfdd954e8b9e32842dfec829d3d2f01ab1e8ca439e89a08f0d4ddcc13d"
+  },
+  "no_live_owned_GPU_processes_after_batch": true,
+  "no_product_source_changes": true,
+  "no_system_installation": true,
+  "no_display_session_restart": true,
+  "no_suppressions": true,
+  "profiles": {
+    "release": {
+      "positive_checks": 1727,
+      "positive_all_clean_exit0": true,
+      "raw_status_exit": 0,
+      "raw_status_scope": "Original positive/count/image checks and expected-nonzero actual-UHD refusal oracle; does not certify clean SAN negative teardown.",
+      "status": "artifacts/strict-arc-20261111/control/release-v1/status.json",
+      "status_sha256": "023457a2dcc05f4a7cb2705ce578f09781d860a9c8bbf13dba1432b6ed2a4a6c",
+      "before_sha256": "e66e16a3f0ea4133d736c2e5d07244336cd23a0beccfc957f7e6b26f6af99369",
+      "after_sha256": "9ca7cc9d86d0d7e7721afa986aecfb5857ff6e199f0b69647b5b94235940ac78",
+      "seconds": 54.1543898069649,
+      "protected_count": 3277,
+      "owned_count": 312,
+      "protected_drift": [],
+      "RSS_envelope_bytes": 3221225472,
+      "maximum_observed_tree_RSS": 612491264,
+      "negative_all_sanitizer_clean": null,
+      "software_Arc_images": {
+        "pair_count": 56,
+        "maximum_RGB_difference": 2,
+        "maximum_alpha_difference": 0,
+        "RGB_tolerance": 6,
+        "alpha_exact": true,
+        "input_drift": []
+      },
+      "software_Arc_images_receipt": "artifacts/strict-arc-20261111/control/release-v1/software-image-pairs.json",
+      "software_Arc_images_receipt_sha256": "129eae93e618cd74fba563d381cd8cca28c9e3f831664a23d57e6a40a559685a",
+      "sanitizer_instrumented": false,
+      "actual_Arc_node": {
+        "by_path": "/dev/dri/by-path/pci-0000:03:00.0-render",
+        "resolved": "/dev/dri/renderD129",
+        "stat_device": 9,
+        "inode": 1171,
+        "rdev": 57985,
+        "major": 226,
+        "minor": 129,
+        "pci": "0000:03:00.0",
+        "vendor": "0x8086",
+        "device": "0x56a0",
+        "driver": "i915"
+      },
+      "positive_consumers": [
+        {
+          "name": "existing-field-GL",
+          "checks": 51,
+          "exit": 0,
+          "seconds": 12.6450049970299,
+          "peak_descendant_RSS": 612491264,
+          "consumer_sha256": "83f5fff31c0ca78c30a56c1836aac8cbea1c17e6697a0f6b31e0ef4e80ff34b5",
+          "critical_observed": [
+            "consumer",
+            "strict_observer",
+            "system_EGL",
+            "system_gallium"
+          ],
+          "observed_matching_dri_fds": 4,
+          "log": "artifacts/strict-arc-20261111/control/release-v1/control-existing-field-GL/process.log",
+          "log_sha256": "8a7f2769aad56fb37eb1a65753e0b2d2367da6e2e59abd54440321d12fa0b98c",
+          "device_report_sha256": "263bf74fabdab2191523e95d249385e17ed264aea37f8d6168bb195da85e0324",
+          "sanitizer_diagnostic": false
+        },
+        {
+          "name": "balanced-mixed-GL",
+          "checks": 537,
+          "exit": 0,
+          "seconds": 1.25224587705452,
+          "peak_descendant_RSS": 134938624,
+          "consumer_sha256": "11fdfe8793a9ed35be2e7f766017d404efddc534d1bb311b1df8b007074e4641",
+          "critical_observed": [
+            "consumer",
+            "strict_observer",
+            "system_EGL",
+            "system_gallium"
+          ],
+          "observed_matching_dri_fds": 4,
+          "log": "artifacts/strict-arc-20261111/control/release-v1/control-balanced-mixed-GL/process.log",
+          "log_sha256": "5d7a02cab066c023c00139811f8030477488c129417de0aaebe0e0d06b067ae8",
+          "device_report_sha256": "263bf74fabdab2191523e95d249385e17ed264aea37f8d6168bb195da85e0324",
+          "sanitizer_diagnostic": false
+        },
+        {
+          "name": "sculpt-chunk-GL",
+          "checks": 72,
+          "exit": 0,
+          "seconds": 4.533651139005087,
+          "peak_descendant_RSS": 122073088,
+          "consumer_sha256": "7d5e5b60a3ae75f2682588ebb924c6aceccd40febb9018e1c7fd60773c76ee54",
+          "critical_observed": [
+            "consumer",
+            "strict_observer",
+            "system_EGL",
+            "system_gallium"
+          ],
+          "observed_matching_dri_fds": 4,
+          "log": "artifacts/strict-arc-20261111/control/release-v1/control-sculpt-chunk-GL/process.log",
+          "log_sha256": "fb5a94446ccf61b1f3bdb3c6f26d966dd6383a8d1a0bcc28d966fafa1d815270",
+          "device_report_sha256": "263bf74fabdab2191523e95d249385e17ed264aea37f8d6168bb195da85e0324",
+          "sanitizer_diagnostic": false
+        },
+        {
+          "name": "direct-upload-GL",
+          "checks": 73,
+          "exit": 0,
+          "seconds": 0.4089847799623385,
+          "peak_descendant_RSS": 88948736,
+          "consumer_sha256": "1fe5785147704eda7618bf87b9ac09ba90ab40920b16085aef60c7865a16f257",
+          "critical_observed": [
+            "consumer",
+            "strict_observer",
+            "system_EGL",
+            "system_gallium"
+          ],
+          "observed_matching_dri_fds": 4,
+          "log": "artifacts/strict-arc-20261111/control/release-v1/control-direct-upload-GL/process.log",
+          "log_sha256": "1e8dd352a7875121e9cc7010c69cf20801a33ba7b8a5ec51d148cfb3a6345f42",
+          "device_report_sha256": "263bf74fabdab2191523e95d249385e17ed264aea37f8d6168bb195da85e0324",
+          "sanitizer_diagnostic": false
+        },
+        {
+          "name": "sourceful-same-object-GL",
+          "checks": 994,
+          "exit": 0,
+          "seconds": 13.985332188021857,
+          "peak_descendant_RSS": 137793536,
+          "consumer_sha256": "c66d63ef1a091b6f74718a71973b4b90fd7c4659e401df6affb25eff5c7ee3dc",
+          "critical_observed": [
+            "consumer",
+            "strict_observer",
+            "system_EGL",
+            "system_gallium"
+          ],
+          "observed_matching_dri_fds": 4,
+          "log": "artifacts/strict-arc-20261111/control/release-v1/control-sourceful-same-object-GL/process.log",
+          "log_sha256": "441ca007cabdc50ced53ca0a09ea4ff01baf5b561465448264c66287fb27cb6b",
+          "device_report_sha256": "263bf74fabdab2191523e95d249385e17ed264aea37f8d6168bb195da85e0324",
+          "sanitizer_diagnostic": false
+        }
+      ],
+      "actual_UHD_refusals": [
+        {
+          "name": "uhd-counter-balanced-mixed-GL",
+          "exit": 1,
+          "actual_UHD_refusal": true,
+          "clean_sanitizer_negative_exit": true,
+          "leak_reports": [],
+          "log": "artifacts/strict-arc-20261111/control/release-v1/control-uhd-counter-balanced-mixed-GL/process.log",
+          "log_sha256": "cfd488e8ac6469bf4dd8e13b5695ddae37a119a994c76e47a3721ec3854c6df3",
+          "observed_matching_dri_fds": 0
+        },
+        {
+          "name": "uhd-counter-sourceful-same-object-GL",
+          "exit": 1,
+          "actual_UHD_refusal": true,
+          "clean_sanitizer_negative_exit": true,
+          "leak_reports": [],
+          "log": "artifacts/strict-arc-20261111/control/release-v1/control-uhd-counter-sourceful-same-object-GL/process.log",
+          "log_sha256": "cfd488e8ac6469bf4dd8e13b5695ddae37a119a994c76e47a3721ec3854c6df3",
+          "observed_matching_dri_fds": 0
+        }
+      ]
+    },
+    "sanitize": {
+      "positive_checks": 1727,
+      "positive_all_clean_exit0": true,
+      "raw_status_exit": 0,
+      "raw_status_scope": "Original positive/count/image checks and expected-nonzero actual-UHD refusal oracle; does not certify clean SAN negative teardown.",
+      "status": "artifacts/strict-arc-20261111/control/sanitize-v1/status.json",
+      "status_sha256": "9a1f69b6ca4192614e0a6f2533ebe9ab6bdfbc4973850f126575b87b83d409f0",
+      "before_sha256": "66ac28e97b5100be61a1b726cd6db41a8e405c1fd13e96bc3b3fbd7343e4f1ad",
+      "after_sha256": "674295d81fa32c6c6dce00bd315cafe1fee2409d9c48fd6c084e5b0d8597f361",
+      "seconds": 400.6569979409687,
+      "protected_count": 3279,
+      "owned_count": 312,
+      "protected_drift": [],
+      "RSS_envelope_bytes": 4294967296,
+      "maximum_observed_tree_RSS": 3054460928,
+      "negative_all_sanitizer_clean": false,
+      "software_Arc_images": {
+        "pair_count": 56,
+        "maximum_RGB_difference": 2,
+        "maximum_alpha_difference": 0,
+        "RGB_tolerance": 6,
+        "alpha_exact": true,
+        "input_drift": []
+      },
+      "software_Arc_images_receipt": "artifacts/strict-arc-20261111/control/sanitize-v1/software-image-pairs.json",
+      "software_Arc_images_receipt_sha256": "56220d82b29001a96b468bef338f3935e2e47d3d111ba96c7081e26a217e5de2",
+      "sanitizer_instrumented": true,
+      "actual_Arc_node": {
+        "by_path": "/dev/dri/by-path/pci-0000:03:00.0-render",
+        "resolved": "/dev/dri/renderD129",
+        "stat_device": 9,
+        "inode": 1171,
+        "rdev": 57985,
+        "major": 226,
+        "minor": 129,
+        "pci": "0000:03:00.0",
+        "vendor": "0x8086",
+        "device": "0x56a0",
+        "driver": "i915"
+      },
+      "positive_consumers": [
+        {
+          "name": "existing-field-GL",
+          "checks": 51,
+          "exit": 0,
+          "seconds": 23.927013222011738,
+          "peak_descendant_RSS": 3054460928,
+          "consumer_sha256": "34a44d276679cc29785ceca90d8d565700ea33c5c538c0316b577668e1f5b2e7",
+          "critical_observed": [
+            "consumer",
+            "strict_observer",
+            "system_EGL",
+            "system_gallium"
+          ],
+          "observed_matching_dri_fds": 4,
+          "log": "artifacts/strict-arc-20261111/control/sanitize-v1/control-existing-field-GL/process.log",
+          "log_sha256": "8a7f2769aad56fb37eb1a65753e0b2d2367da6e2e59abd54440321d12fa0b98c",
+          "device_report_sha256": "263bf74fabdab2191523e95d249385e17ed264aea37f8d6168bb195da85e0324",
+          "sanitizer_diagnostic": false
+        },
+        {
+          "name": "balanced-mixed-GL",
+          "checks": 537,
+          "exit": 0,
+          "seconds": 27.35206320800353,
+          "peak_descendant_RSS": 2113708032,
+          "consumer_sha256": "f37ee7e51912249927c49fdba2ce61ee3c13caa11bd600c7b28fd6ad851b9e78",
+          "critical_observed": [
+            "consumer",
+            "strict_observer",
+            "system_EGL",
+            "system_gallium"
+          ],
+          "observed_matching_dri_fds": 4,
+          "log": "artifacts/strict-arc-20261111/control/sanitize-v1/control-balanced-mixed-GL/process.log",
+          "log_sha256": "5d7a02cab066c023c00139811f8030477488c129417de0aaebe0e0d06b067ae8",
+          "device_report_sha256": "263bf74fabdab2191523e95d249385e17ed264aea37f8d6168bb195da85e0324",
+          "sanitizer_diagnostic": false
+        },
+        {
+          "name": "sculpt-chunk-GL",
+          "checks": 72,
+          "exit": 0,
+          "seconds": 28.685771882010158,
+          "peak_descendant_RSS": 1856987136,
+          "consumer_sha256": "21956e2fef95c1a57fa617702b16cfb35bf32be19d86639173d6f3289bd0d589",
+          "critical_observed": [
+            "consumer",
+            "strict_observer",
+            "system_EGL",
+            "system_gallium"
+          ],
+          "observed_matching_dri_fds": 4,
+          "log": "artifacts/strict-arc-20261111/control/sanitize-v1/control-sculpt-chunk-GL/process.log",
+          "log_sha256": "fb5a94446ccf61b1f3bdb3c6f26d966dd6383a8d1a0bcc28d966fafa1d815270",
+          "device_report_sha256": "263bf74fabdab2191523e95d249385e17ed264aea37f8d6168bb195da85e0324",
+          "sanitizer_diagnostic": false
+        },
+        {
+          "name": "direct-upload-GL",
+          "checks": 73,
+          "exit": 0,
+          "seconds": 4.056129169999622,
+          "peak_descendant_RSS": 1049927680,
+          "consumer_sha256": "f46d98b2b6936c3f1f7940bcdae51b75d03b28f24eef76447e68e63770823514",
+          "critical_observed": [
+            "consumer",
+            "strict_observer",
+            "system_EGL",
+            "system_gallium"
+          ],
+          "observed_matching_dri_fds": 4,
+          "log": "artifacts/strict-arc-20261111/control/sanitize-v1/control-direct-upload-GL/process.log",
+          "log_sha256": "1e8dd352a7875121e9cc7010c69cf20801a33ba7b8a5ec51d148cfb3a6345f42",
+          "device_report_sha256": "263bf74fabdab2191523e95d249385e17ed264aea37f8d6168bb195da85e0324",
+          "sanitizer_diagnostic": false
+        },
+        {
+          "name": "sourceful-same-object-GL",
+          "checks": 994,
+          "exit": 0,
+          "seconds": 104.28736329899402,
+          "peak_descendant_RSS": 2714107904,
+          "consumer_sha256": "12d7ffb0916fd572defd11b47f6e87970f7b93e88ce04e213f6ea3ee9dcfabfd",
+          "critical_observed": [
+            "consumer",
+            "strict_observer",
+            "system_EGL",
+            "system_gallium"
+          ],
+          "observed_matching_dri_fds": 4,
+          "log": "artifacts/strict-arc-20261111/control/sanitize-v1/control-sourceful-same-object-GL/process.log",
+          "log_sha256": "441ca007cabdc50ced53ca0a09ea4ff01baf5b561465448264c66287fb27cb6b",
+          "device_report_sha256": "263bf74fabdab2191523e95d249385e17ed264aea37f8d6168bb195da85e0324",
+          "sanitizer_diagnostic": false
+        }
+      ],
+      "actual_UHD_refusals": [
+        {
+          "name": "uhd-counter-balanced-mixed-GL",
+          "exit": -6,
+          "actual_UHD_refusal": true,
+          "clean_sanitizer_negative_exit": false,
+          "leak_reports": [
+            {
+              "bytes": 132268,
+              "allocations": 1142
+            }
+          ],
+          "log": "artifacts/strict-arc-20261111/control/sanitize-v1/control-uhd-counter-balanced-mixed-GL/process.log",
+          "log_sha256": "bc2b2c46f816c0152bdf18d5fbf7279095b09aceea506242d5868bee2b0704e9",
+          "observed_matching_dri_fds": 0
+        },
+        {
+          "name": "uhd-counter-sourceful-same-object-GL",
+          "exit": -6,
+          "actual_UHD_refusal": true,
+          "clean_sanitizer_negative_exit": false,
+          "leak_reports": [
+            {
+              "bytes": 132268,
+              "allocations": 1142
+            }
+          ],
+          "log": "artifacts/strict-arc-20261111/control/sanitize-v1/control-uhd-counter-sourceful-same-object-GL/process.log",
+          "log_sha256": "2d86725b69d8c85d827c847f4c9fb5e244591fe6a0d8270e511d724f3b09ca47",
+          "observed_matching_dri_fds": 0
+        }
+      ]
+    }
+  },
+  "qualification_receipt": {
+    "path": "artifacts/strict-arc-20261111/qualification.json",
+    "sha256": "c9339dcc05c75430c5d69fc0e2b2c1275b24cf213c137c1d526c48bd325548a3"
+  }
+}
