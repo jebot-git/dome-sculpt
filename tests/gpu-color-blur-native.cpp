@@ -6,6 +6,7 @@
 #include "texture-set-stroke.hpp"
 #include "texture-set-paint-access.hpp"
 #include "source-color-fixtures.hpp"
+#include "current-paint-preview.hpp"
 #include <EGL/egl.h>
 #include <condition_variable>
 #include <iostream>
@@ -120,6 +121,47 @@ void workflow_fixtures(const std::filesystem::path&out){
  check(Scene::load(out/"original.dsculpt").encode()==before.encode()&&Scene::load(out/"accepted.dsculpt").encode()==accepted.encode(),"Both workflow fixtures reopen with exact full native ownership");
  std::ofstream manifest(out/"manifest.json");manifest<<nlohmann::json{{"version",1},{"flow",1},{"resolution",64},{"independent_pixel_oracle",true},{"native_checks",checks},{"files",{{"original","original.dsculpt"},{"accepted","accepted.dsculpt"}}}}.dump(2)<<'\n';check(bool(manifest),"Workflow manifest writes completely");
 }
+// Separate genuine plain Document input for the same public menu/loader drivers.
+// These packet assertions belong only to offline fixture construction. No app
+// callback, private state or observer is used to authorize GUI/XR progress.
+void plain_workflow_frame(Document&document){
+ ready(document);const auto scene=document.copy_scene();const auto&o=scene.active();
+ check(detail::CurrentGridPaintPreview::eligible(o),"Workflow actor is genuinely eligible for the plain current-grid route");
+ check(!o.appearance&&!o.material_bindings&&!o.deformation&&!o.bake_recipe&&!o.polygon&&!o.texture_sets,"Plain workflow does not invent retained/imported/material/rig authority");
+ const auto frame=document.frame().surface;check(frame&&frame->ranges.size()==1,"Plain Document publishes one genuine rendered actor");
+ const auto&r=frame->ranges.front();const auto maps=r.textures;
+ check(maps&&maps->current_grid_preview&&maps->current_grid_preview->physical_emission(),"Actual Document frame selects the current-grid FLOAT render packet");
+ maps->current_grid_preview->authenticate_range(frame->mesh,r,true);
+ check(maps->color.rgba.empty()&&maps->metal_rough.rgba.empty()&&maps->emission.rgba.empty()&&!maps->source_maps&&!maps->overlay,"Actual plain render packet has no legacy CPU image substitute");
+}
+void plain_workflow_fixtures(const std::filesystem::path&out){
+ if(std::filesystem::exists(out/"original.dsculpt")||std::filesystem::exists(out/"accepted.dsculpt")||std::filesystem::exists(out/"manifest.json"))throw std::runtime_error("Use fresh plain workflow fixture outputs");
+ std::filesystem::create_directories(out);
+ Scene scene;auto&o=scene.active();o.mesh_active=true;o.name="Plain current-grid 日本語";o.painted=std::make_shared<PaintedMesh>(quad(),64);
+ PaintSettings ink;ink.color={.9f,.1f,.4f,.23f};stroke(*o.painted,ink,{-.13f,.03f,0},.63f);ink.color={.1f,.8f,.3f,.83f};stroke(*o.painted,ink,{.2f,.08f,0},.57f);
+ ink.channel=PaintChannel::Metallic;ink.metallic=.67f;stroke(*o.painted,ink,{.02f,-.1f,0},.71f);
+ ink.channel=PaintChannel::Roughness;ink.roughness=.21f;stroke(*o.painted,ink,{.1f,.1f,0},.66f);
+ ink.channel=PaintChannel::Emission;ink.emission={.13f,.4f,.07f};stroke(*o.painted,ink,{.3f,.3f,0},.37f);
+ ink.emission_units=PaintEmissionUnits::Physical;ink.emission={10000,.0003f,7};stroke(*o.painted,ink,{.03f,0,0},.00002f);
+ ink.channel=PaintChannel::Mask;ink.mask=.23f;stroke(*o.painted,ink,{-.1f,.13f,0},.81f);
+ const auto first=o.painted->active_layer();o.painted->add_layer("Hidden untouched 日本語");ink.channel=PaintChannel::Color;ink.color={.2f,.4f,.8f,.45f};stroke(*o.painted,ink,{0,0,0},.4f);o.painted->layer_properties("Hidden untouched 日本語",false,0);o.painted->select_layer(first);
+ check(o.painted->has_physical_emission()&&o.painted->surface_diagnostics().policy==PaintUvPolicy::Strict,"Plain workflow retains genuine physical FLOAT and strict native UV data");
+ size_t tiny_hdr=0,legacy_emission=0,independent_mask=0;
+ for(uint32_t y=0;y<64;++y)for(uint32_t x=0;x<64;++x){const auto q=o.painted->pixel(first,x,y);const auto e=o.painted->emission_pixel(first,x,y);tiny_hdr+=e.coverage>0&&e.coverage<1.f/255&&e.physical[0]>9000;legacy_emission+=e.coverage>0&&e.legacy[0]>0;independent_mask+=q.data[13]>0&&q.data[13]<255;}
+ check(tiny_hdr>0&&legacy_emission>0&&independent_mask>0,"Plain workflow demonstrably contains mixed legacy/physical emission, subUNORM8 FLOAT HDR coverage and independent mask values");
+ scene.validate();const auto before=scene.snapshot();scene.save(out/"original.dsculpt");
+ Document document;document.replace(scene);plain_workflow_frame(document);
+ check(document.frame().state->paint.flow==1,"Plain workflow uses the actual public default Flow1");
+ document.paint_command(SpatialCommand::BlurColorLayer);document.save_async(out/"accepted.dsculpt").get();plain_workflow_frame(document);
+ const auto accepted=document.copy_scene();check(accepted.encode()!=before.encode(),"Plain public command produces a genuine nonuniform accepted change");
+ oracle(*before.active().painted,*accepted.active().painted,1);
+ check(document.undo()&&document.copy_scene().encode()==before.encode(),"Plain workflow has one exact global Undo");plain_workflow_frame(document);
+ check(document.redo()&&document.copy_scene().encode()==accepted.encode(),"Plain workflow has one exact global Redo");plain_workflow_frame(document);
+ const auto original_reopened=Scene::load(out/"original.dsculpt"),accepted_reopened=Scene::load(out/"accepted.dsculpt");
+ check(original_reopened.encode()==before.encode()&&accepted_reopened.encode()==accepted.encode(),"Plain workflow complete native endpoints reopen exactly");
+ document.replace(original_reopened);plain_workflow_frame(document);document.replace(accepted_reopened);plain_workflow_frame(document);
+ std::ofstream manifest(out/"manifest.json");manifest<<nlohmann::json{{"version",1},{"flow",1},{"resolution",64},{"independent_pixel_oracle",true},{"domain","plain-current-grid"},{"producer_render_packet",true},{"physical_emission",true},{"native_checks",checks},{"files",{{"original","original.dsculpt"},{"accepted","accepted.dsculpt"}}}}.dump(2)<<'\n';check(bool(manifest),"Plain workflow manifest writes completely");
+}
 void document(){
  Scene scene;scene.active().mesh_active=true;scene.active().painted=field(false);const auto original=scene.encode();Document d;d.replace(scene);ready(d);check(d.frame().state->can_blur_color_layer,"Desktop/XR availability advertises the genuine current field");
  d.blur_color_layer();auto save=d.save_async("gpu-layer-blur.dsculpt");save.get();ready(d);const auto after=d.copy_scene().encode();check(after!=original&&Scene::load("gpu-layer-blur.dsculpt").encode()==after,"Ordered Save/reopen captures the full GPU-accepted layer");check(d.undo()&&d.copy_scene().encode()==original,"One global Undo restores the exact pre-tool Scene");check(d.redo()&&d.copy_scene().encode()==after,"One global Redo restores the exact accepted Scene");
@@ -146,4 +188,4 @@ extern "C" EGLContext __wrap_eglCreateContext(EGLDisplay d,EGLConfig c,EGLContex
  if(gate.exchange(false)){std::unique_lock lock(gate_mutex);entered=true;gate_changed.notify_all();gate_changed.wait(lock,[]{return released;});}
  return __real_eglCreateContext(d,c,shared,attributes);
 }
-int main(int argc,char**argv)try{if(argc==3&&std::string(argv[1])=="--workflow-fixtures"){workflow_fixtures(std::filesystem::absolute(argv[2]));std::cout<<"PASS "<<checks<<" native workflow fixture controls\n";return 0;}const bool software=argc>1&&std::string(argv[1])=="software";if(argc>2){std::filesystem::create_directories(argv[2]);std::filesystem::current_path(argv[2]);}detached(software);if(software)software_document_refusal();else document();std::cout<<"PASS "<<checks<<" actual native GPU color blur controls\n";return 0;}catch(const std::exception&e){release();std::cerr<<"FAIL "<<e.what()<<'\n';return 1;}
+int main(int argc,char**argv)try{if(argc==3&&std::string(argv[1])=="--plain-workflow-fixtures"){plain_workflow_fixtures(std::filesystem::absolute(argv[2]));std::cout<<"PASS "<<checks<<" plain current-grid native workflow fixture controls\n";return 0;}if(argc==3&&std::string(argv[1])=="--workflow-fixtures"){workflow_fixtures(std::filesystem::absolute(argv[2]));std::cout<<"PASS "<<checks<<" native workflow fixture controls\n";return 0;}const bool software=argc>1&&std::string(argv[1])=="software";if(argc>2){std::filesystem::create_directories(argv[2]);std::filesystem::current_path(argv[2]);}detached(software);if(software)software_document_refusal();else document();std::cout<<"PASS "<<checks<<" actual native GPU color blur controls\n";return 0;}catch(const std::exception&e){release();std::cerr<<"FAIL "<<e.what()<<'\n';return 1;}
