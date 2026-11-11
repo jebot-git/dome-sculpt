@@ -71,9 +71,55 @@ void corners_equal(const Scene &scene,const SculptScenePreview &preview){
   }
 }
 void ready(Document &document){if(!document.wait_mesh(std::chrono::seconds(45)))throw std::runtime_error("Mesh worker did not publish: "+document.frame().state->error);if(!document.frame().state->error.empty())throw std::runtime_error(document.frame().state->error);}
+void shared_instances(){
+  Scene scene;const auto field=shells();scene.active().volume=std::make_shared<Volume>(field);
+  for(size_t i=1;i<4;++i){auto id=scene.add("Shared immutable sculpt",field);scene.object(id).transform.position={float(i)*1.3f,0,0};}
+  scene.object(4).affine_edit=std::make_shared<NativeAffineEdit>(AffineTransform(std::array<double,16>{-1,0,0,0,.17,1.1,0,0,.07,.09,.85,0,0,0,0,1}));
+  scene.select(1);
+  auto first=SculptSceneChunks::capture(scene,{27,1,1,true,true});
+  const auto owner=first.chunks->find(1)->geometry;
+  for(uint64_t id=2;id<=4;++id)
+    pipeline_check(first.chunks->find(id)->geometry==owner&&first.chunks->find(id)->placed!=first.chunks->find(1)->placed,
+        "COW duplicate shares genuine local geometry while placement/query ownership remains object-specific");
+  corners_equal(scene,first);
+  pipeline_check(first.chunks->retained_bytes()<owner->report().retained_bytes*4,
+      "Actual shared scene retains less than four separately reserved complete geometry owners");
+  SculptSceneChunkLimits tight;tight.retained_bytes=first.chunks->retained_bytes();
+  auto exact=SculptSceneChunks::capture(scene,{27,2,1,true,true},{},tight);
+  pipeline_check(exact.chunks->retained_bytes()==tight.retained_bytes,
+      "Cold duplicate scene fits its exact shared retained budget without raising the scene limit");
+  --tight.retained_bytes;
+  pipeline_check(fails([&]{SculptSceneChunks::capture(scene,{27,2,1,true,true},{},tight);}),
+      "One-byte-too-small actual shared scene budget refuses rather than undercharging owners");
+  scene.object(1).volume->fill_mask(.7f);
+  auto masked=SculptSceneChunks::capture(scene,{27,3,1,true,true},first.chunks);
+  pipeline_check(masked.chunks->find(1)->geometry==owner&&masked.chunks->find(1)->masks!=first.chunks->find(1)->masks&&
+      masked.chunks->find(2)->geometry==owner&&!masked.chunks->find(2)->masks,
+      "Independent mask edit preserves shared geometry without sharing active scalar authority");
+  stamp(*scene.object(1).volume,{.08f,.04f,0});
+  auto changed=SculptSceneChunks::capture(scene,{27,4,1,true,true},masked.chunks);
+  pipeline_check(changed.chunks->find(1)->geometry!=owner&&changed.chunks->find(2)->geometry==owner&&
+      changed.chunks->find(3)->geometry==owner&&changed.chunks->find(4)->geometry==owner,
+      "Real COW geometry edit detaches only its object and retains every unaffected duplicate owner");
+  corners_equal(scene,changed);
+  scene.object(1).volume=std::make_shared<Volume>(field);
+  auto restored=SculptSceneChunks::capture(scene,{27,5,1,true,true},changed.chunks);
+  pipeline_check(restored.chunks->find(1)->geometry==owner&&restored.chunks->find(4)->geometry==owner,
+      "Restoring the genuine COW source reuses an unaffected prior owner instead of rebuilding its geometry");
+  corners_equal(scene,restored);
+  auto independent=scene.snapshot();independent.object(1).volume=std::make_shared<Volume>(shells());
+  auto distinct=SculptSceneChunks::capture(independent,{27,6,1,true,true},restored.chunks);
+  pipeline_check(distinct.chunks->find(1)->geometry!=owner&&distinct.chunks->find(2)->geometry==owner,
+      "Numerically equal but independently allocated fields never impersonate shared immutable identity");
+  size_t polls=0;
+  pipeline_check(fails([&]{SculptSceneChunks::capture(scene,{27,7,1,true,true},restored.chunks,{},[&]{return ++polls>=8;});})&&
+      restored.chunks->find(1)->geometry==owner,
+      "Cancellation during shared scene capture preserves the preceding complete owner");
+}
 }
 int main(int argc,char **argv)try{
   if(argc!=2)throw std::runtime_error("Usage: sculpt-chunk-pipeline output-directory");const std::filesystem::path output=argv[1];std::filesystem::create_directories(output);
+  shared_instances();
   auto scene=fixture();const auto original=scene.encode();
   auto first=SculptSceneChunks::capture(scene,{7,1,1,true,true});
   pipeline_check(first.chunks->objects().size()==2&&first.legacy.size()==1,"Actual mixed capture includes two generated objects and one genuine packed object, excluding hidden geometry");
