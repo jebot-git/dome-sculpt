@@ -3,6 +3,14 @@
 The combined Dome Sculpt application is GPL-3.0-or-later; see LICENSE.
 The original notices and licenses on reused source files remain in force.
 
+- ArmorPaint native C, commit `629f8e77b3f19d533c60a1baa4fe9d4db9ee1163`:
+  zlib/libpng license. The opt-in `experiments/armorpaint-blur` retains unchanged
+  `make_blur.c` and the root license in `vendor/`, with exact hashes in
+  `third_party/sources.json`. Its GLSL extraction is explicitly marked altered;
+  the independent host/validation glue is GPL-3.0-or-later. It reuses the existing
+  MIT native EGL helper and introduces no stock ArmorPaint frontend or engine
+  runtime. It is excluded from normal application builds and installations.
+
 - Blender 5.4 Alpha source excerpts/reference files: GPL-2.0-or-later.
   Trackball sphere/hyperbola projection is adapted from `calctrackballvec`;
   surface picking adapts `isect_ray_tri_v3` with a relative determinant epsilon.

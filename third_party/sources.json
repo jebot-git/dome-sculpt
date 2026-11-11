@@ -101,7 +101,9 @@
     "third_party/mikktspace/mikktspace.h": "17fc433894f24c73753d548086cc4d8c5c0379f4a6edfb98b5da243e4f0bc3d0",
     "third_party/mikktspace/mikktspace.c": "ce57892bc90a4974b0eedd582a5ed75a54c2b1cad681c278158c49faa877b62f",
     "third_party/mikktspace/0001-defined-seed-rotate.patch": "c5349269bf6fbb6c7a257f870872912676712ad5b6f499559406a40e09f60e5c",
-    "third_party/mikktspace/0002-retry-acute-corner-angles.patch": "0e24c04da792355ff5a513fe064bc3c062f6b2b36a40b7144ce7ce5bb78fa799"
+    "third_party/mikktspace/0002-retry-acute-corner-angles.patch": "0e24c04da792355ff5a513fe064bc3c062f6b2b36a40b7144ce7ce5bb78fa799",
+    "experiments/armorpaint-blur/vendor/make_blur.c": "a2403c5ef2ffd23fc5a1798b47c04b29ecc9e5362faa8f16f20e4f842314fbf4",
+    "experiments/armorpaint-blur/vendor/LICENSE.armorpaint": "a3efbc800206c5e0d24dfc38dfdc1997cef977cb2e48d77c64ae30427a9a4e84"
   },
   "cgltf": {
     "repository": "https://github.com/jkuhlmann/cgltf",
@@ -646,5 +648,17 @@
     "license": "MIT",
     "manifest": "third_party/mesa/SOURCES.json",
     "used": "Optional source patch for empty POSIX rtasm executable pool and partial initialization cleanup. No Mesa source/library bundled, no app ABI/shader/compute change, no automatic application/install. See docs/MESA-XR-RTASM-LIFETIME.md."
+  },
+  "armorpaint_blur_experiment": {
+    "repository": "https://github.com/armory3d/armorpaint",
+    "commit": "629f8e77b3f19d533c60a1baa4fe9d4db9ee1163",
+    "license": "zlib/libpng",
+    "used": "Opt-in UI-free texture-space blur-family source extraction only, built independently under experiments/armorpaint-blur. Root application build/install and native document authority unchanged.",
+    "source": "paint/sources/render/make_blur.c",
+    "source_sha256": "a2403c5ef2ffd23fc5a1798b47c04b29ecc9e5362faa8f16f20e4f842314fbf4",
+    "license_sha256": "a3efbc800206c5e0d24dfc38dfdc1997cef977cb2e48d77c64ae30427a9a4e84",
+    "alterations": "Original weight function copied deterministically from unchanged pinned C source; cross-shaped associated-color gather translated to GLSL330 with integer rectangular clamp sampling, explicit independent FLOAT coverage/R32F mask, and documented altered associated-space destination blend. No packed normal/material-ID/emission interpretation or .arm/app/UI/history import.",
+    "notice": "experiments/armorpaint-blur/NOTICE.txt",
+    "assessment": "docs/ARMORPAINT-EXPERIMENT.md"
   }
 }
