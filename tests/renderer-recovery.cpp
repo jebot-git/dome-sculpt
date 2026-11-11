@@ -17,7 +17,7 @@
 using namespace dome;
 namespace {
 thread_local bool allocation_failure=false;
-enum class Fault {None,Index,Polygon,Texture,EarlyFence,CommitFence,Query,AfterPolygon,Resolve,Mips};
+enum class Fault {None,Index,Polygon,Texture,EarlyFence,CommitFence,Query,AfterPolygon,Resolve,Mips,Arena};
 Fault fault=Fault::None;bool pending=false,audit=false,capture=false,surface_drawn=false;size_t fired=0,allocations=0,fences=0,reads=0,waits=0,finishes=0;GLsizeiptr index_bytes=0;
 struct Names {std::set<GLuint>textures,buffers,samplers,vaos;};Names names;
 void allocation(){if(allocation_failure){allocation_failure=false;throw std::bad_alloc();}}
@@ -40,7 +40,7 @@ void __real_glGenBuffers(GLsizei,GLuint*);void __wrap_glGenBuffers(GLsizei n,GLu
 void __real_glGenTextures(GLsizei,GLuint*);void __wrap_glGenTextures(GLsizei n,GLuint*p){if(audit)allocations+=size_t(n);__real_glGenTextures(n,p);}
 void __real_glGenSamplers(GLsizei,GLuint*);void __wrap_glGenSamplers(GLsizei n,GLuint*p){if(audit)allocations+=size_t(n);__real_glGenSamplers(n,p);}
 void __real_glGenVertexArrays(GLsizei,GLuint*);void __wrap_glGenVertexArrays(GLsizei n,GLuint*p){if(audit)allocations+=size_t(n);__real_glGenVertexArrays(n,p);}
-void __real_glBufferData(GLenum,GLsizeiptr,const void*,GLenum);void __wrap_glBufferData(GLenum a,GLsizeiptr b,const void*c,GLenum d){if((fault==Fault::Index&&a==GL_COPY_WRITE_BUFFER&&b==index_bytes)||(fault==Fault::Polygon&&a==GL_TEXTURE_BUFFER&&b==128)){fault=Fault::None;++fired;__real_glBufferData(a,-1,c,d);}else __real_glBufferData(a,b,c,d);}
+void __real_glBufferData(GLenum,GLsizeiptr,const void*,GLenum);void __wrap_glBufferData(GLenum a,GLsizeiptr b,const void*c,GLenum d){if((fault==Fault::Arena&&a==GL_ARRAY_BUFFER&&b>0)||(fault==Fault::Index&&a==GL_COPY_WRITE_BUFFER&&b==index_bytes)||(fault==Fault::Polygon&&a==GL_TEXTURE_BUFFER&&b==128)){fault=Fault::None;++fired;__real_glBufferData(a,-1,c,d);}else __real_glBufferData(a,b,c,d);}
 void __real_glTexBuffer(GLenum,GLenum,GLuint);void __wrap_glTexBuffer(GLenum a,GLenum b,GLuint c){__real_glTexBuffer(a,b,c);if(fault==Fault::AfterPolygon&&b==GL_RGBA32F){GLint bound=0;glGetIntegerv(GL_TEXTURE_BUFFER_BINDING,&bound);if(GLuint(bound)==c){GLint64 bytes=0;glGetBufferParameteri64v(GL_TEXTURE_BUFFER,GL_BUFFER_SIZE,&bytes);if(bytes==128){fault=Fault::None;++fired;allocation_failure=true;}}}}
 void __real_glGenerateMipmap(GLenum);void __wrap_glGenerateMipmap(GLenum a){if(fault==Fault::Mips){fault=Fault::None;++fired;__real_glGenerateMipmap(GLenum(0xdead));}else __real_glGenerateMipmap(a);}
 void __real_glTexImage2D(GLenum,GLint,GLint,GLsizei,GLsizei,GLint,GLenum,GLenum,const void*);void __wrap_glTexImage2D(GLenum a,GLint b,GLint c,GLsizei d,GLsizei e,GLint f,GLenum g,GLenum h,const void*i){if(fault==Fault::Texture&&d==2&&e==2&&i){fault=Fault::None;++fired;__real_glTexImage2D(a,b,c,-1,e,f,g,h,i);}else __real_glTexImage2D(a,b,c,d,e,f,g,h,i);}
@@ -97,6 +97,12 @@ void mip_controls(){
  Fbo fbo;auto image=std::make_shared<const Image>(Image{2,2,{255,0,0,255,0,255,0,255,0,0,255,255,255,255,0,255}});auto maps=std::make_shared<PaintSourceMaps>();maps->color.image=image;maps->color.min_filter=maps->color.mag_filter=GL_NEAREST;auto old=snapshot();auto paint=PaintedMesh::from_maps(old->mesh,maps,64);old->ranges[0].textures=paint->preview(old->ranges[0].material);
  auto mip=std::make_shared<PaintSourceMaps>(*maps);mip->color.min_filter=GL_LINEAR_MIPMAP_LINEAR;auto next=std::make_shared<MeshSnapshot>(*old);auto changed=PaintedMesh::from_maps(old->mesh,mip,64);next->ranges[0].textures=changed->preview(next->ranges[0].material);SurfaceRenderer renderer;renderer.set_frame_time(0);auto accepted=warm(renderer,old,fbo,false);pending=true;arm(Fault::Mips);fbo.bind();check(reject([&]{render(renderer,next);})&&fired==1,"A real mip upgrade API failure leaves the same native source image's accepted mipless version intact");fault=Fault::None;live(accepted.resources);const auto generated=allocations;fbo.bind();check(render(renderer,accepted.frame)==accepted.pixels&&allocations==generated,"Rejected immutable mip upgrade preserves exact accepted pixels without rebuilding image/geometry");pending=false;fbo.bind();auto actual=render(renderer,next);SurfaceRenderer reference;reference.set_frame_time(0);fbo.bind();check(actual==render(reference,next),"Same native image successfully retries with a new immutable mipped GPU version");
 }
+
+void abandoned_control(const Fixture&f){
+ const auto display=eglGetCurrentDisplay(),draw=eglGetCurrentSurface(EGL_DRAW),read_surface=eglGetCurrentSurface(EGL_READ);const auto context=eglGetCurrentContext();std::unique_ptr<SurfaceRenderer>lost;
+ {NativeGraphics separate;Fbo fbo;lost=std::make_unique<SurfaceRenderer>();lost->set_deferred_resolve(true);fbo.bind();lost->draw(f.old_frame,{},identity,{0,0,3},96,96,true);check(glGetError()==GL_NO_ERROR,"Real unresolved transaction exists before its separate GL context is destroyed");}
+ check(eglGetCurrentContext()==EGL_NO_CONTEXT,"Abandon control really loses its own current GL context");lost->abandon();check(eglMakeCurrent(display,draw,read_surface,context)==EGL_TRUE,"Caller context restores after lost-context Pending abandonment");lost.reset();check(glGetError()==GL_NO_ERROR,"Pending abandonment after real context destruction invokes no stale resource cleanup on the caller context");
+}
 void identity_check(bool hardware){
  const auto renderer=std::string(reinterpret_cast<const char*>(glGetString(GL_RENDERER)));std::cout<<"GL_RENDERER "<<renderer<<'\n';if(!hardware)return;
  auto query=reinterpret_cast<PFNEGLQUERYDISPLAYATTRIBEXTPROC>(eglGetProcAddress("eglQueryDisplayAttribEXT"));auto device_string=reinterpret_cast<PFNEGLQUERYDEVICESTRINGEXTPROC>(eglGetProcAddress("eglQueryDeviceStringEXT"));EGLAttrib device=0;check(query&&device_string&&query(eglGetCurrentDisplay(),EGL_DEVICE_EXT,&device),"Strict hardware control authenticates actual EGLDevice");const char*node=device_string(reinterpret_cast<EGLDeviceEXT>(device),EGL_DRM_RENDER_NODE_FILE_EXT);check(node&&std::string(node)=="/dev/dri/renderD129","Strict Arc control authenticates actual DRM rendernode");std::string vendor,id;const auto sys=std::filesystem::path("/sys/class/drm/renderD129/device");std::ifstream(sys/"vendor")>>vendor;std::ifstream(sys/"device")>>id;check(std::filesystem::canonical(sys).filename()=="0000:03:00.0"&&vendor=="0x8086"&&id=="0x56a0"&&renderer.find("Arc")!=std::string::npos&&renderer.find("UHD")==std::string::npos,"Strict Arc control verifies actual EGL/DRM/PCI paired with GL renderer");std::cout<<"EGL_NODE "<<node<<" PCI 0000:03:00.0 "<<vendor<<' '<<id<<'\n';
@@ -105,7 +111,7 @@ void identity_check(bool hardware){
 }
 int main(int argc,char**argv)try{
  std::cout<<std::unitbuf;NativeGraphics graphics;identity_check(argc>1&&std::string_view(argv[1])=="--hardware");auto f=fixture();const auto original=f.before.encode(),after=f.after.encode();
- for(auto which:{Fault::Texture,Fault::Polygon,Fault::AfterPolygon,Fault::Index,Fault::EarlyFence,Fault::CommitFence,Fault::Resolve})recovery(f,which,false);
- recovery(f,Fault::Index,true);recovery(f,Fault::Resolve,true);budget(f);deferred_controls(f);mip_controls();polygon_controls(f);
+ for(auto which:{Fault::Texture,Fault::Polygon,Fault::AfterPolygon,Fault::Arena,Fault::Index,Fault::EarlyFence,Fault::CommitFence,Fault::Resolve})recovery(f,which,false);
+ recovery(f,Fault::Index,true);recovery(f,Fault::Resolve,true);budget(f);deferred_controls(f);mip_controls();polygon_controls(f);abandoned_control(f);
  check(f.before.encode()==original&&f.after.encode()==after,"Complete old/new native scenes remain immutable through all real renderer failures");check(reads==0&&waits==0&&finishes==0,"Production recovery performs no host readback, nonzero CPU sync wait or glFinish");check(glGetError()==GL_NO_ERROR,"Actual recovery leaves no outstanding GL error");std::cout<<"PASS "<<checks<<" actual accepted/Pending renderer recovery checks\n";return 0;
 }catch(const std::exception&e){allocation_failure=audit=capture=pending=false;std::cerr<<"FAIL "<<e.what()<<'\n';return 1;}
