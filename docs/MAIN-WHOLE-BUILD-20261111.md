@@ -51,9 +51,10 @@ and driver teardown issues remain documented rather than relabeled as passes.
 The genuine GPU painting implementation is composed separately with main in
 candidate `775f92b8`, including its shared EGL lifetime prerequisite and the
 Filters checkbox correction. Its complete Release 39-target closure, 29 selected
-suites and 27/373 workspaces also pass, but its sanitizer build and new public
-desktop/OpenXR workflows remain in progress. This main820 proof does not qualify
-that candidate. Ordered GPU arena batching also remains private pending its
+suites and 27/373 workspaces also pass. Its matched sanitizer closure now also
+passes; read [GPU-PAINT-COMBINED-BUILDS-20261111.md](GPU-PAINT-COMBINED-BUILDS-20261111.md).
+New public desktop/OpenXR workflows remain in qualification. This main820 proof
+does not qualify that candidate. Ordered GPU arena batching remains private pending its
 resource-lifetime and actual-device gates.
 
 The full original authoring objective remains active and incomplete. Controller

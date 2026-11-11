@@ -16,10 +16,12 @@ failures are retained. Fresh whole-main Release/SAN 32-target closures now pass
 at `82074315`, with 22 native suites and 27/373 workspace controls per profile. Read
 [MAIN-WHOLE-BUILD-20261111.md](MAIN-WHOLE-BUILD-20261111.md) for exact scope.
 
-The separate GPU painting candidate `775f92b8` passes its complete Release
-39-target closure and 29 selected suites plus 27/373 workspaces. Its sanitizer
-build and new public desktop/OpenXR command scenarios remain in progress. This
-candidate is not yet main product admission or full painting completion.
+The separate GPU painting candidate `775f92b8` passes matched Release/SAN
+39-target closures and 29 selected suites plus 27/373 workspaces in each profile.
+Read [GPU-PAINT-COMBINED-BUILDS-20261111.md](GPU-PAINT-COMBINED-BUILDS-20261111.md).
+New public desktop/OpenXR command scenarios and current device controls remain
+in qualification. This candidate is not yet main product admission or full
+painting completion.
 
 Real GPU layer authoring/shared-EGL lifetime and ordered GPU draw batching remain
 separate implementation branches. Their earlier prototypes do not complete the

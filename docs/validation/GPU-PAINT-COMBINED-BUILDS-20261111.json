@@ -1,0 +1,889 @@
+{
+  "source": "775f92b837da757aa5bfb8583e2f426685eade50",
+  "source_root": "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-integration-20261111",
+  "scope": "Complete coherent combined Release/SAN39target owning app/core closures and29selected native/software/legacy suites plus27/373workspaces each. Five matching TUs were built earlier in the same candidate/profile directories; no project providers borrowed from another source. Not new desktop/OpenXR/Arc/performance/headset qualification.",
+  "source_before_sha256": {
+    "release": "f0dc5c31538caf33a001e7d62e59efeadb39d80f44117f896e6978e58fda4f88",
+    "sanitize": "f0dc5c31538caf33a001e7d62e59efeadb39d80f44117f896e6978e58fda4f88"
+  },
+  "sdk_receipt_sha256": "3a1d3014a5eb13e37f28f39e60b0d8596a5accf80a540b516aa88806b86983f0",
+  "sdk_rechecked_files": 418,
+  "source_drift": [],
+  "profiles": {
+    "release": {
+      "steps": [
+        {
+          "name": "build39",
+          "command": [
+            "nice",
+            "-n",
+            "10",
+            "cmake",
+            "--build",
+            "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/release",
+            "--parallel",
+            "2",
+            "--target",
+            "dome-sculpt",
+            "dome-sculpt-native-authoring-inspect",
+            "dome-sculpt-texture-sets-test",
+            "dome-sculpt-texture-set-surfaces-test",
+            "dome-sculpt-texture-set-native-test",
+            "dome-sculpt-texture-set-export-test",
+            "dome-sculpt-texture-set-polygon-mixed-test",
+            "dome-sculpt-polygon-surface-native-test",
+            "dome-sculpt-polygon-surface-render-test",
+            "dome-sculpt-texture-set-polygon-render-test",
+            "dome-sculpt-sculpt-surface-chunks-test",
+            "dome-sculpt-sculpt-chunk-pipeline-test",
+            "dome-sculpt-sculpt-chunk-render-test",
+            "dome-sculpt-local-surface-integration-test",
+            "dome-sculpt-surface-query-oblique-test",
+            "dome-sculpt-retopo-input-admission-test",
+            "dome-sculpt-polygon-retopo-affine-test",
+            "dome-sculpt-render-direct-upload-test",
+            "dome-sculpt-triangle-remesh-test",
+            "dome-sculpt-texture-set-field-source-test",
+            "dome-sculpt-texture-set-history-test",
+            "dome-sculpt-texture-set-resolution-test",
+            "dome-sculpt-texture-set-source-export-test",
+            "dome-sculpt-texture-set-resolution-fixture",
+            "dome-sculpt-texture-resolution-runtime",
+            "dome-sculpt-sculpt-chunk-workspace-test",
+            "dome-sculpt-sculpt-sustained",
+            "dome-sculpt-vrm1-background-fixture-test",
+            "dome-sculpt-vrm1-expression-layer-authoring-test",
+            "dome-sculpt-vrm1-expression-targets-faults-test",
+            "dome-sculpt-sculpt-placed-workspace-test",
+            "dome-sculpt-texture-set-source-render-test",
+            "dome-sculpt-gpu-color-blur-kernel-test",
+            "dome-sculpt-gpu-color-blur-native-test",
+            "dome-sculpt-native-graphics-shared-test",
+            "dome-sculpt-native-graphics-lifetime-test",
+            "dome-sculpt-controls-test",
+            "dome-sculpt-paint-test",
+            "dome-sculpt-document-test"
+          ],
+          "exit": 0,
+          "seconds": 450.7915557619999,
+          "log_sha256": "e2230d291944fdc19fab73b176a5196491e781e5eef34195f13bca3ad181168d"
+        },
+        {
+          "name": "app-version",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/release/dome-sculpt",
+            "--version"
+          ],
+          "exit": 0,
+          "seconds": 0.015898828976787627,
+          "log_sha256": "9455a20a636a6599ace60120261649d3b29dc51fe2c774305994879190e7336b"
+        },
+        {
+          "name": "native29",
+          "command": [
+            "ctest",
+            "--test-dir",
+            "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/release",
+            "--output-on-failure",
+            "-R",
+            "^(polygon-retopo-affine|retopology-input-admission|surface-query-oblique|triangle-remesh|sculpt-surface-chunks|sculpt-chunk-pipeline|authenticated-local-surface|vrm1-background-fixture|vrm1-targets-uniform-roles-uv-authoring|vrm1-targets-preflight-order|dome-sculpt-texture-sets|dome-sculpt-texture-sets-polygon|dome-sculpt-texture-sets-plan|dome-sculpt-texture-set-surfaces|dome-sculpt-texture-set-native|dome-sculpt-texture-set-export|polygon-surface-native-owning|dome-sculpt-texture-set-polygon-mixed|dome-sculpt-texture-set-field-source|dome-sculpt-texture-set-source-export|dome-sculpt-texture-set-history|dome-sculpt-texture-set-resolution|gpu-color-blur-kernel-software|gpu-color-blur-native-software|native-graphics-shared-software|native-graphics-lifetime|controller-controls|texture-painting|shared-document)$"
+          ],
+          "exit": 0,
+          "seconds": 25.911895033030305,
+          "log_sha256": "f145c3856bde15feb8964efb596ef9714e00b5903ebedd1d3c9b2e871746f405"
+        },
+        {
+          "name": "workspace27",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/release/dome-sculpt-sculpt-chunk-workspace-test"
+          ],
+          "exit": 0,
+          "seconds": 0.2646457480150275,
+          "log_sha256": "b4dacfac59d17baa45a405a3cd0a456d3191e1f5aeb8391bc762fdb204ca6d49"
+        },
+        {
+          "name": "placed-workspace373",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/release/dome-sculpt-sculpt-placed-workspace-test"
+          ],
+          "exit": 0,
+          "seconds": 0.3646761439740658,
+          "log_sha256": "53a3b8e6830069870da4df30cbce96abe0e5c16cd46970899a0f714c8d42b46d"
+        }
+      ],
+      "sanitizer_environment": {
+        "ASAN_OPTIONS": null,
+        "UBSAN_OPTIONS": null,
+        "LSAN_OPTIONS": null
+      },
+      "owned_count": 331,
+      "compiled_translation_units": 279,
+      "owned_type_counts": {
+        ".a": 13,
+        "executable": 38,
+        ".so": 1,
+        ".o": 279
+      },
+      "earlier_matching_five_objects": {
+        "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/release/CMakeFiles/dome-sculpt-render.dir/src/palette.cpp.o": "6a5392330f15cadd55c6dfc4450977dc7e8366d4ffad895e908cd857fa5cfe30",
+        "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/release/CMakeFiles/dome-sculpt-gpu-color-blur-kernel-test.dir/tests/gpu-color-blur-kernel.cpp.o": "b2d9cbe68c4121f773cbc785b08366b77d412bba72f212b65dbadbbb0e2a6d72",
+        "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/release/CMakeFiles/dome-sculpt-native-graphics-shared-test.dir/tests/native-graphics-shared.cpp.o": "3c0e8ab99400dd0978e88ef19711384005246fd2778113008a55a676ca210873",
+        "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/release/CMakeFiles/dome-sculpt-paint-gpu.dir/src/paint-blur-gpu.cpp.o": "3509ab0a38c699be959a832d5a497aecebbca0363de217602b4f7c6ffd05072d",
+        "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/release/CMakeFiles/dome-sculpt-native-graphics.dir/third_party/openbrush/graphics.cpp.o": "1eeefe19a0be0971636d358f58921874bf45ff5039c545dbbe466c1e687f6d5b"
+      },
+      "registered_native29": {
+        "gpu-color-blur-kernel-software": {
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/release/dome-sculpt-gpu-color-blur-kernel-test",
+            "software"
+          ],
+          "properties": {
+            "ENVIRONMENT": [
+              "LIBGL_ALWAYS_SOFTWARE=1",
+              "LP_NUM_THREADS=2"
+            ],
+            "TIMEOUT": 180.0
+          }
+        },
+        "gpu-color-blur-native-software": {
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/release/dome-sculpt-gpu-color-blur-native-test",
+            "software",
+            "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/release/gpu-color-blur-software"
+          ],
+          "properties": {
+            "ENVIRONMENT": [
+              "LIBGL_ALWAYS_SOFTWARE=1",
+              "LP_NUM_THREADS=2"
+            ],
+            "TIMEOUT": 180.0
+          }
+        },
+        "native-graphics-shared-software": {
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/release/dome-sculpt-native-graphics-shared-test",
+            "software"
+          ],
+          "properties": {
+            "ENVIRONMENT": [
+              "LIBGL_ALWAYS_SOFTWARE=1",
+              "LP_NUM_THREADS=2"
+            ],
+            "TIMEOUT": 180.0
+          }
+        },
+        "polygon-retopo-affine": {
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/release/dome-sculpt-polygon-retopo-affine-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/release/polygon-retopo-affine"
+          ],
+          "properties": {
+            "TIMEOUT": 240.0
+          }
+        },
+        "retopology-input-admission": {
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/release/dome-sculpt-retopo-input-admission-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/release/retopology-input-admission"
+          ],
+          "properties": {
+            "TIMEOUT": 600.0
+          }
+        },
+        "controller-controls": {
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/release/dome-sculpt-controls-test"
+          ],
+          "properties": {}
+        },
+        "texture-painting": {
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/release/dome-sculpt-paint-test"
+          ],
+          "properties": {}
+        },
+        "shared-document": {
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/release/dome-sculpt-document-test"
+          ],
+          "properties": {}
+        },
+        "native-graphics-lifetime": {
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/release/dome-sculpt-native-graphics-lifetime-test"
+          ],
+          "properties": {
+            "TIMEOUT": 30.0
+          }
+        },
+        "surface-query-oblique": {
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/release/dome-sculpt-surface-query-oblique-test"
+          ],
+          "properties": {}
+        },
+        "triangle-remesh": {
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/release/dome-sculpt-triangle-remesh-test"
+          ],
+          "properties": {}
+        },
+        "sculpt-surface-chunks": {
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/release/dome-sculpt-sculpt-surface-chunks-test"
+          ],
+          "properties": {}
+        },
+        "sculpt-chunk-pipeline": {
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/release/dome-sculpt-sculpt-chunk-pipeline-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/release/sculpt-chunk-pipeline"
+          ],
+          "properties": {}
+        },
+        "authenticated-local-surface": {
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/release/dome-sculpt-local-surface-integration-test"
+          ],
+          "properties": {}
+        },
+        "vrm1-background-fixture": {
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/release/dome-sculpt-vrm1-background-fixture-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/release/vrm1-background-fixture"
+          ],
+          "properties": {
+            "TIMEOUT": 300.0
+          }
+        },
+        "vrm1-targets-uniform-roles-uv-authoring": {
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/release/dome-sculpt-vrm1-expression-layer-authoring-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/release/vrm1-background-fixture/source.vrm",
+            "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/release/vrm1-targets-uniform-roles-uv",
+            "--positive",
+            "--uniform-roles-uv"
+          ],
+          "properties": {
+            "TIMEOUT": 900.0
+          }
+        },
+        "vrm1-targets-preflight-order": {
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/release/dome-sculpt-vrm1-expression-targets-faults-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/release/vrm1-targets-uniform-roles-uv/nonuniform-source.dsculpt",
+            "--preflight-only"
+          ],
+          "properties": {
+            "TIMEOUT": 900.0
+          }
+        },
+        "dome-sculpt-texture-sets": {
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/release/dome-sculpt-texture-sets-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/release/texture-set-model-output"
+          ],
+          "properties": {
+            "TIMEOUT": 180.0
+          }
+        },
+        "dome-sculpt-texture-sets-polygon": {
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/release/dome-sculpt-texture-sets-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/release/texture-set-polygon-output",
+            "--polygon"
+          ],
+          "properties": {
+            "TIMEOUT": 180.0
+          }
+        },
+        "dome-sculpt-texture-sets-plan": {
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/release/dome-sculpt-texture-sets-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/release/texture-set-plan-output",
+            "--plan"
+          ],
+          "properties": {
+            "TIMEOUT": 180.0
+          }
+        },
+        "dome-sculpt-texture-set-surfaces": {
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/release/dome-sculpt-texture-set-surfaces-test"
+          ],
+          "properties": {
+            "TIMEOUT": 180.0
+          }
+        },
+        "dome-sculpt-texture-set-native": {
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/release/dome-sculpt-texture-set-native-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/release/texture-set-native-output"
+          ],
+          "properties": {
+            "TIMEOUT": 180.0
+          }
+        },
+        "dome-sculpt-texture-set-export": {
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/release/dome-sculpt-texture-set-export-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/release/texture-set-export-output"
+          ],
+          "properties": {
+            "TIMEOUT": 180.0
+          }
+        },
+        "polygon-surface-native-owning": {
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/release/dome-sculpt-polygon-surface-native-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/release/polygon-surface-native"
+          ],
+          "properties": {
+            "TIMEOUT": 240.0
+          }
+        },
+        "dome-sculpt-texture-set-polygon-mixed": {
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/release/dome-sculpt-texture-set-polygon-mixed-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/release/texture-set-polygon-mixed-output"
+          ],
+          "properties": {
+            "TIMEOUT": 300.0
+          }
+        },
+        "dome-sculpt-texture-set-field-source": {
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/release/dome-sculpt-texture-set-field-source-test"
+          ],
+          "properties": {
+            "TIMEOUT": 300.0
+          }
+        },
+        "dome-sculpt-texture-set-source-export": {
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/release/dome-sculpt-texture-set-source-export-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/release/texture-set-source-export-output"
+          ],
+          "properties": {
+            "TIMEOUT": 300.0
+          }
+        },
+        "dome-sculpt-texture-set-history": {
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/release/dome-sculpt-texture-set-history-test"
+          ],
+          "properties": {
+            "TIMEOUT": 300.0
+          }
+        },
+        "dome-sculpt-texture-set-resolution": {
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/release/dome-sculpt-texture-set-resolution-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/release/texture-set-resolution-output"
+          ],
+          "properties": {
+            "TIMEOUT": 300.0
+          }
+        }
+      },
+      "status_sha256": "6b6a2ffd450cc61a62bb42a7ccb108a203abf733d0f5328af6d9d4409ab2e63a",
+      "compile_commands_sha256": "8f8540dc5549749b9002af197046327392acb99f731402e038d88aa44c91f46c",
+      "selected_target_sha256": {
+        "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/release/libdome-sculpt-native-graphics.a": "d83d1b357a1466ccd482455e17c7fb38fe47bbb04fbc777ff4b9234f9bc535a2",
+        "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/release/libdome-sculpt-paint-gpu.a": "070cd4686a47b1936256d9dcd3213ec0d11f3ff3d2711bac0b7252f111b0d2ae",
+        "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/release/dome-sculpt-native-graphics-shared-test": "56a94fe9bb0718118b36a89fd6d1bceb05964e322823b8fb606309fe9459050b",
+        "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/release/dome-sculpt-gpu-color-blur-kernel-test": "4ffd937814d1832b0f92b1eacd1dc3d57bc23cf7ffcf70a19aa455f866f37acb",
+        "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/release/libdome-sculpt-affine.a": "cdc8b87f5f931ba16ec66e959c9005f6999abacca33a19bebca0498e213f0b80",
+        "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/release/libxatlas.a": "507e6330503426409b2115ca2bc60dd8d57054b89ef67a058116eab776aa6847",
+        "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/release/libufbx.a": "49a5a4398ead8df1f350d61fdaa8e5f1cae70d999a57b9e19d823e6e088930bb",
+        "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/release/libmikktspace.a": "45314706dbfcdd611404ab477158c99857cea0b54c62cba697e9f883897eaa3c",
+        "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/release/libdome-sculpt-polygon.a": "48af6d582353c783942a8fcb6e0a027ed254bfcff32294244216c4aa922e1c9c",
+        "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/release/libmikktspace-robust.a": "59b059258e0bf44e6c8029f13b1e80a510868ebd33b9ec5cf780d159282653e9",
+        "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/release/libdome-sculpt-emission-codec.a": "5054f46f934033a351aa53ceb90b973e6c1f6fb1e2c1ca4bcb5e2ab4dcc3d61b",
+        "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/release/libdome-sculpt-core.a": "6d2ab745972196bd2ee1154e1982837b1b259be6c1dc5c4befa77c90fa201d7b",
+        "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/release/libdome-sculpt-spacenav.a": "ead4c20a0b7fa6fcf335beaafd4170741f3cfbc3be5b8b82158ea6d7f273073e",
+        "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/release/libdome-sculpt-render.a": "1179413cc63bf934da39950a42f257ae7aae1866779deb2122eb3b793cf4cb51",
+        "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/release/libdome-sculpt-xr.a": "12d79ec646320156a67877869000ad6dc02f3d41501d106aec1b7dff4fb1298a",
+        "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/release/dome-sculpt-gpu-color-blur-native-test": "68c09891cb0c1e4eafffe6c7f1b77ea2a040b5e3f5c2300830d61b453b6cb5cb",
+        "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/release/dome-sculpt-native-authoring-inspect": "665589e864c5982310b92c6e4350dd9c81ac0be1ac8617728315332aaece0a25",
+        "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/release/dome-sculpt-polygon-retopo-affine-test": "bba1a69fddac362afc98001f77eca398620addc761f632ba64801d20811ae5b8",
+        "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/release/dome-sculpt-retopo-input-admission-test": "ade1530c0a977b9fc7f33e3bc798ad4bf82edf8a8a0dba9d9530689d852b1111",
+        "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/release/dome-sculpt-controls-test": "34398309704b4167aa099b62c71580c3b8cc2a0ca57867340d70bd652599562b",
+        "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/release/dome-sculpt-paint-test": "066a2f9b2d47e81c6a852ba7a29fb231f737f56aa9d5dcb28afc98f07773f3db",
+        "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/release/dome-sculpt-document-test": "0e84bc8a2315ff0f8d58b439a4178de4712db6ac38fb4ff0f3346a5b4ca4b0ed",
+        "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/release/dome-sculpt-native-graphics-lifetime-test": "f7ab739799887203e6a4f6ece8093ffb3bde49216bb7f1a9ac56825e811d9b17",
+        "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/release/dome-sculpt": "fae2dc2da6b62ff90ca42a37d378d1425ef548d3772065f840a1baf14f6c111d",
+        "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/release/dome-sculpt-surface-query-oblique-test": "08a3d304a39ae4aca392f130d5d7754d0861efd2457e389a6feea6f3482d24a9",
+        "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/release/dome-sculpt-triangle-remesh-test": "23cda6cfdb614d09a0ababffe4b05615bb708ade0a9dd6cd667383b8a14f5549",
+        "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/release/dome-sculpt-sculpt-surface-chunks-test": "e70d6714497b6d9a1b6a2e0521957189d9d1d91349077babc52d2184a5896737",
+        "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/release/dome-sculpt-sculpt-chunk-pipeline-test": "8421ebb94fc05ea4dc80e74d1be68bf24297bbda7051f195665950d3cd2050c9",
+        "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/release/dome-sculpt-local-surface-integration-test": "a4a70ca57caceaeaee9134b3e424b38eab60433e13d7ec3d8d6ddf4e9dd64062",
+        "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/release/dome-sculpt-render-direct-upload-test": "50e76f12523f7dff3683b26e230f974019b19392afe2d77a292f797270a0a1fb",
+        "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/release/dome-sculpt-vrm1-background-fixture-test": "bf9eb38bf997544076544d465eb22e696723e2b7719001a008738a48cb24e36a",
+        "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/release/dome-sculpt-vrm1-expression-layer-authoring-test": "32b07714dc26620f770d10bdc36cc1c7667ebad99689490130189eff081004c5",
+        "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/release/dome-sculpt-vrm1-expression-targets-faults-test": "1070ba974f59eb24acfc30c53e9a99f731a925db8fda70c5d6927d80ca9e6653",
+        "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/release/dome-sculpt-texture-sets-test": "db9f065bdf98df7a9a0e37df032ee9241e50d9c0e899da3424b9e50547443aec",
+        "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/release/dome-sculpt-texture-set-surfaces-test": "c652bda0f80ad0cf33967d8aa21725765ae19be9b6b51744b92d0496d6c4ff2c",
+        "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/release/dome-sculpt-texture-set-native-test": "8d304cd3fb290b7a979cfe5e83ecfe6e2adbe69753173a4f8f14b49e1c8b9af1",
+        "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/release/dome-sculpt-texture-set-export-test": "0ccea27f3ece365a01cd88a58e4e3eea081cc77930f0fd5d204ebc3620588e8f",
+        "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/release/dome-sculpt-polygon-surface-native-test": "fdaedf664adae9412cb3b2b87152c9c1dce39153009816148a4fafe8c1daf400",
+        "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/release/dome-sculpt-polygon-surface-render-test": "29d1773f40aa0335b84dcec014cad2a86c4925832a3b09a3f5060f79dfece858",
+        "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/release/dome-sculpt-texture-set-polygon-mixed-test": "e25bfb25a9632ebb7cca9cd207904aafa08310b8a7fbc9ab8b7705c2ddb4093b",
+        "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/release/dome-sculpt-texture-set-polygon-render-test": "f54113bf163b8b4a2f5b7d1495cbc5f1e45a123308ed3abe9bf03ef8fc1c7f17",
+        "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/release/dome-sculpt-sculpt-chunk-render-test": "2dcf769e7425f3f9fdca1e1492e44d36ba2d0f0c52c7b27b3dce88638b0a01b3",
+        "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/release/dome-sculpt-texture-set-field-source-test": "545ef73b9f1c83345b5224700871f85c62a9cfdfde56a88405ed38a844e0b44d",
+        "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/release/dome-sculpt-texture-set-source-export-test": "b6c34314695ae0205ec4b08b47cf242766e8a12762a3cedd91cd03a84d4a2e42",
+        "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/release/dome-sculpt-texture-set-history-test": "2003fe0897d31562aa4384df69e139ae382aca9fed273482afbaa318ca8d6345",
+        "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/release/dome-sculpt-texture-set-resolution-test": "c201a23371235207bdbc1151a6f474c1ab5688751f68c8d59ddb8b0930811b64",
+        "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/release/dome-sculpt-texture-set-resolution-fixture": "216352ef2ce4410b381bdc3dd44654c8276f5926a49cca764fddb72cf00dd56d",
+        "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/release/libdome-sculpt-texture-resolution-runtime.so": "4b98070cbb416ff8bdb920433a05c3afd7d92637d793e27677d6efc5b05833d5",
+        "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/release/dome-sculpt-sculpt-sustained": "87a5371f55018e401b11cb619834c16de7a6b21eb14c53d0fe07777d09571cbd",
+        "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/release/dome-sculpt-texture-set-source-render-test": "08f35af5bc273c1b094bd810a0bd42c224dbcb09cd51649566cba7bd713805f9",
+        "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/release/dome-sculpt-sculpt-placed-workspace-test": "0e8273f2c8d8c3ebe19702891996223e0765f9c3128ecf8703e51eb947a02ad4",
+        "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/release/dome-sculpt-sculpt-chunk-workspace-test": "b6d876c79d5b581281507bb11fb2e3e248d1d9a634aaecaaa724eee4ea82d04a"
+      },
+      "source_drift": []
+    },
+    "sanitize": {
+      "steps": [
+        {
+          "name": "build39",
+          "command": [
+            "nice",
+            "-n",
+            "10",
+            "cmake",
+            "--build",
+            "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/sanitize",
+            "--parallel",
+            "2",
+            "--target",
+            "dome-sculpt",
+            "dome-sculpt-native-authoring-inspect",
+            "dome-sculpt-texture-sets-test",
+            "dome-sculpt-texture-set-surfaces-test",
+            "dome-sculpt-texture-set-native-test",
+            "dome-sculpt-texture-set-export-test",
+            "dome-sculpt-texture-set-polygon-mixed-test",
+            "dome-sculpt-polygon-surface-native-test",
+            "dome-sculpt-polygon-surface-render-test",
+            "dome-sculpt-texture-set-polygon-render-test",
+            "dome-sculpt-sculpt-surface-chunks-test",
+            "dome-sculpt-sculpt-chunk-pipeline-test",
+            "dome-sculpt-sculpt-chunk-render-test",
+            "dome-sculpt-local-surface-integration-test",
+            "dome-sculpt-surface-query-oblique-test",
+            "dome-sculpt-retopo-input-admission-test",
+            "dome-sculpt-polygon-retopo-affine-test",
+            "dome-sculpt-render-direct-upload-test",
+            "dome-sculpt-triangle-remesh-test",
+            "dome-sculpt-texture-set-field-source-test",
+            "dome-sculpt-texture-set-history-test",
+            "dome-sculpt-texture-set-resolution-test",
+            "dome-sculpt-texture-set-source-export-test",
+            "dome-sculpt-texture-set-resolution-fixture",
+            "dome-sculpt-texture-resolution-runtime",
+            "dome-sculpt-sculpt-chunk-workspace-test",
+            "dome-sculpt-sculpt-sustained",
+            "dome-sculpt-vrm1-background-fixture-test",
+            "dome-sculpt-vrm1-expression-layer-authoring-test",
+            "dome-sculpt-vrm1-expression-targets-faults-test",
+            "dome-sculpt-sculpt-placed-workspace-test",
+            "dome-sculpt-texture-set-source-render-test",
+            "dome-sculpt-gpu-color-blur-kernel-test",
+            "dome-sculpt-gpu-color-blur-native-test",
+            "dome-sculpt-native-graphics-shared-test",
+            "dome-sculpt-native-graphics-lifetime-test",
+            "dome-sculpt-controls-test",
+            "dome-sculpt-paint-test",
+            "dome-sculpt-document-test"
+          ],
+          "exit": 0,
+          "seconds": 1023.1770545030013,
+          "log_sha256": "4c0b9814bab6c7cd3b29fb3957350d3a6c33b6735039173aa96da1ac4d1c8a7c"
+        },
+        {
+          "name": "app-version",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/sanitize/dome-sculpt",
+            "--version"
+          ],
+          "exit": 0,
+          "seconds": 0.16421840601833537,
+          "log_sha256": "9455a20a636a6599ace60120261649d3b29dc51fe2c774305994879190e7336b"
+        },
+        {
+          "name": "native29",
+          "command": [
+            "ctest",
+            "--test-dir",
+            "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/sanitize",
+            "--output-on-failure",
+            "-R",
+            "^(polygon-retopo-affine|retopology-input-admission|surface-query-oblique|triangle-remesh|sculpt-surface-chunks|sculpt-chunk-pipeline|authenticated-local-surface|vrm1-background-fixture|vrm1-targets-uniform-roles-uv-authoring|vrm1-targets-preflight-order|dome-sculpt-texture-sets|dome-sculpt-texture-sets-polygon|dome-sculpt-texture-sets-plan|dome-sculpt-texture-set-surfaces|dome-sculpt-texture-set-native|dome-sculpt-texture-set-export|polygon-surface-native-owning|dome-sculpt-texture-set-polygon-mixed|dome-sculpt-texture-set-field-source|dome-sculpt-texture-set-source-export|dome-sculpt-texture-set-history|dome-sculpt-texture-set-resolution|gpu-color-blur-kernel-software|gpu-color-blur-native-software|native-graphics-shared-software|native-graphics-lifetime|controller-controls|texture-painting|shared-document)$"
+          ],
+          "exit": 0,
+          "seconds": 211.32159520697314,
+          "log_sha256": "5ae75425a76ee7a9cc01c6aac2c7bd1d565a7af000b600066835ea6cf7b4046c"
+        },
+        {
+          "name": "workspace27",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/sanitize/dome-sculpt-sculpt-chunk-workspace-test"
+          ],
+          "exit": 0,
+          "seconds": 2.4187457610387355,
+          "log_sha256": "b4dacfac59d17baa45a405a3cd0a456d3191e1f5aeb8391bc762fdb204ca6d49"
+        },
+        {
+          "name": "placed-workspace373",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/sanitize/dome-sculpt-sculpt-placed-workspace-test"
+          ],
+          "exit": 0,
+          "seconds": 4.071662219008431,
+          "log_sha256": "53a3b8e6830069870da4df30cbce96abe0e5c16cd46970899a0f714c8d42b46d"
+        }
+      ],
+      "sanitizer_environment": {
+        "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1:abort_on_error=1",
+        "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=1",
+        "LSAN_OPTIONS": null
+      },
+      "owned_count": 331,
+      "compiled_translation_units": 279,
+      "owned_type_counts": {
+        ".a": 13,
+        "executable": 38,
+        ".so": 1,
+        ".o": 279
+      },
+      "earlier_matching_five_objects": {
+        "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/sanitize/CMakeFiles/dome-sculpt-render.dir/src/palette.cpp.o": "be6941ce4cc78e5ac51c4be5305826940422404851ae617c716e165ff268829b",
+        "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/sanitize/CMakeFiles/dome-sculpt-gpu-color-blur-kernel-test.dir/tests/gpu-color-blur-kernel.cpp.o": "624461d471d01a73e641272ea45490907948f6624face25bbc3629cdc10c9dc9",
+        "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/sanitize/CMakeFiles/dome-sculpt-native-graphics-shared-test.dir/tests/native-graphics-shared.cpp.o": "571ec6c906c168baaf0592dd1d6f4d65af2413955d13c60b8a3b318a736227d7",
+        "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/sanitize/CMakeFiles/dome-sculpt-paint-gpu.dir/src/paint-blur-gpu.cpp.o": "e6c04029fd998c02778bd8c4d3f5b3f59b8d65209328040c0dff678eb2ce0560",
+        "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/sanitize/CMakeFiles/dome-sculpt-native-graphics.dir/third_party/openbrush/graphics.cpp.o": "1aea52680ff970add83af2639328f593f2c5119d2f37c2568405057f16ca95ca"
+      },
+      "registered_native29": {
+        "gpu-color-blur-kernel-software": {
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/sanitize/dome-sculpt-gpu-color-blur-kernel-test",
+            "software"
+          ],
+          "properties": {
+            "ENVIRONMENT": [
+              "LIBGL_ALWAYS_SOFTWARE=1",
+              "LP_NUM_THREADS=2"
+            ],
+            "TIMEOUT": 180.0
+          }
+        },
+        "gpu-color-blur-native-software": {
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/sanitize/dome-sculpt-gpu-color-blur-native-test",
+            "software",
+            "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/sanitize/gpu-color-blur-software"
+          ],
+          "properties": {
+            "ENVIRONMENT": [
+              "LIBGL_ALWAYS_SOFTWARE=1",
+              "LP_NUM_THREADS=2"
+            ],
+            "TIMEOUT": 180.0
+          }
+        },
+        "native-graphics-shared-software": {
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/sanitize/dome-sculpt-native-graphics-shared-test",
+            "software"
+          ],
+          "properties": {
+            "ENVIRONMENT": [
+              "LIBGL_ALWAYS_SOFTWARE=1",
+              "LP_NUM_THREADS=2"
+            ],
+            "TIMEOUT": 180.0
+          }
+        },
+        "polygon-retopo-affine": {
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/sanitize/dome-sculpt-polygon-retopo-affine-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/sanitize/polygon-retopo-affine"
+          ],
+          "properties": {
+            "TIMEOUT": 240.0
+          }
+        },
+        "retopology-input-admission": {
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/sanitize/dome-sculpt-retopo-input-admission-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/sanitize/retopology-input-admission"
+          ],
+          "properties": {
+            "TIMEOUT": 600.0
+          }
+        },
+        "controller-controls": {
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/sanitize/dome-sculpt-controls-test"
+          ],
+          "properties": {}
+        },
+        "texture-painting": {
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/sanitize/dome-sculpt-paint-test"
+          ],
+          "properties": {}
+        },
+        "shared-document": {
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/sanitize/dome-sculpt-document-test"
+          ],
+          "properties": {}
+        },
+        "native-graphics-lifetime": {
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/sanitize/dome-sculpt-native-graphics-lifetime-test"
+          ],
+          "properties": {
+            "TIMEOUT": 30.0
+          }
+        },
+        "surface-query-oblique": {
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/sanitize/dome-sculpt-surface-query-oblique-test"
+          ],
+          "properties": {}
+        },
+        "triangle-remesh": {
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/sanitize/dome-sculpt-triangle-remesh-test"
+          ],
+          "properties": {}
+        },
+        "sculpt-surface-chunks": {
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/sanitize/dome-sculpt-sculpt-surface-chunks-test"
+          ],
+          "properties": {}
+        },
+        "sculpt-chunk-pipeline": {
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/sanitize/dome-sculpt-sculpt-chunk-pipeline-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/sanitize/sculpt-chunk-pipeline"
+          ],
+          "properties": {}
+        },
+        "authenticated-local-surface": {
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/sanitize/dome-sculpt-local-surface-integration-test"
+          ],
+          "properties": {}
+        },
+        "vrm1-background-fixture": {
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/sanitize/dome-sculpt-vrm1-background-fixture-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/sanitize/vrm1-background-fixture"
+          ],
+          "properties": {
+            "TIMEOUT": 300.0
+          }
+        },
+        "vrm1-targets-uniform-roles-uv-authoring": {
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/sanitize/dome-sculpt-vrm1-expression-layer-authoring-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/sanitize/vrm1-background-fixture/source.vrm",
+            "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/sanitize/vrm1-targets-uniform-roles-uv",
+            "--positive",
+            "--uniform-roles-uv"
+          ],
+          "properties": {
+            "TIMEOUT": 900.0
+          }
+        },
+        "vrm1-targets-preflight-order": {
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/sanitize/dome-sculpt-vrm1-expression-targets-faults-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/sanitize/vrm1-targets-uniform-roles-uv/nonuniform-source.dsculpt",
+            "--preflight-only"
+          ],
+          "properties": {
+            "TIMEOUT": 900.0
+          }
+        },
+        "dome-sculpt-texture-sets": {
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/sanitize/dome-sculpt-texture-sets-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/sanitize/texture-set-model-output"
+          ],
+          "properties": {
+            "TIMEOUT": 180.0
+          }
+        },
+        "dome-sculpt-texture-sets-polygon": {
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/sanitize/dome-sculpt-texture-sets-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/sanitize/texture-set-polygon-output",
+            "--polygon"
+          ],
+          "properties": {
+            "TIMEOUT": 180.0
+          }
+        },
+        "dome-sculpt-texture-sets-plan": {
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/sanitize/dome-sculpt-texture-sets-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/sanitize/texture-set-plan-output",
+            "--plan"
+          ],
+          "properties": {
+            "TIMEOUT": 180.0
+          }
+        },
+        "dome-sculpt-texture-set-surfaces": {
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/sanitize/dome-sculpt-texture-set-surfaces-test"
+          ],
+          "properties": {
+            "TIMEOUT": 180.0
+          }
+        },
+        "dome-sculpt-texture-set-native": {
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/sanitize/dome-sculpt-texture-set-native-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/sanitize/texture-set-native-output"
+          ],
+          "properties": {
+            "TIMEOUT": 180.0
+          }
+        },
+        "dome-sculpt-texture-set-export": {
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/sanitize/dome-sculpt-texture-set-export-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/sanitize/texture-set-export-output"
+          ],
+          "properties": {
+            "TIMEOUT": 180.0
+          }
+        },
+        "polygon-surface-native-owning": {
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/sanitize/dome-sculpt-polygon-surface-native-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/sanitize/polygon-surface-native"
+          ],
+          "properties": {
+            "TIMEOUT": 240.0
+          }
+        },
+        "dome-sculpt-texture-set-polygon-mixed": {
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/sanitize/dome-sculpt-texture-set-polygon-mixed-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/sanitize/texture-set-polygon-mixed-output"
+          ],
+          "properties": {
+            "TIMEOUT": 300.0
+          }
+        },
+        "dome-sculpt-texture-set-field-source": {
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/sanitize/dome-sculpt-texture-set-field-source-test"
+          ],
+          "properties": {
+            "TIMEOUT": 300.0
+          }
+        },
+        "dome-sculpt-texture-set-source-export": {
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/sanitize/dome-sculpt-texture-set-source-export-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/sanitize/texture-set-source-export-output"
+          ],
+          "properties": {
+            "TIMEOUT": 300.0
+          }
+        },
+        "dome-sculpt-texture-set-history": {
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/sanitize/dome-sculpt-texture-set-history-test"
+          ],
+          "properties": {
+            "TIMEOUT": 300.0
+          }
+        },
+        "dome-sculpt-texture-set-resolution": {
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/sanitize/dome-sculpt-texture-set-resolution-test",
+            "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/sanitize/texture-set-resolution-output"
+          ],
+          "properties": {
+            "TIMEOUT": 300.0
+          }
+        }
+      },
+      "status_sha256": "be167d0edd02abbd6e37405e0e2e451c8f438fe168746ccc681a956e47d9f3e9",
+      "compile_commands_sha256": "ae9ce25d5cb129f1ca9a28f358aa8b4ba3401b10651751e02fe229d071c0dd3f",
+      "selected_target_sha256": {
+        "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/sanitize/libdome-sculpt-native-graphics.a": "862a637004de382677bb103e9c671ced46511dfb4ceb0ce8ac599006f33b7416",
+        "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/sanitize/libdome-sculpt-paint-gpu.a": "c95b8a5f1f9ff807700ea5237707d5a0cb7b6e505e7aef043ff56cd7cc6ad45a",
+        "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/sanitize/dome-sculpt-native-graphics-shared-test": "19f605f639e0614a1913cff0272c66a21948688c1ca42dc1c9b8af685adb1c6d",
+        "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/sanitize/dome-sculpt-gpu-color-blur-kernel-test": "b38c9309038c9d3876bc332b4cf31aaf2a99b9a5e16fc90a1f33010375687b13",
+        "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/sanitize/libdome-sculpt-affine.a": "647cbd598537c03dfa989ea3e5d9d8a19592020075a8113847c31a4d197f2cad",
+        "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/sanitize/libxatlas.a": "d6995ddb279a9a887db4dadf2774e137e572bb61223f417fdaf7a2fa3c9a9ea0",
+        "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/sanitize/libufbx.a": "81ada8f498bb3bbdbb25915e107ac5110f9bc1930a3c13570ae797842c88f115",
+        "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/sanitize/libmikktspace.a": "8b878b2beddc04257981c7581a19a0a6990eeac2606941cf779f10c99ee38738",
+        "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/sanitize/libmikktspace-robust.a": "6f21ca09c2376e33c66e9d85c4b19ae8013ef4f1b94b1ea7be4bb204fa5ed416",
+        "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/sanitize/libdome-sculpt-emission-codec.a": "d59cc106a82e07ede55a2f9fadb635e71671d33db8194c243b2814c922cab03a",
+        "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/sanitize/libdome-sculpt-polygon.a": "341ebfc0e9a400560fae79b003840f5964dfdf4771ccb19a88dc4fe1519ba589",
+        "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/sanitize/libdome-sculpt-core.a": "131b1f7041ffb0ae69f30d278dde11dedfd8979fe9d2706655abaf7e1b46f172",
+        "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/sanitize/libdome-sculpt-spacenav.a": "d53321d9d46e6ca96100616d2c592742179f030bf8cbbdbd8f0b0cc2f2f2a981",
+        "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/sanitize/libdome-sculpt-render.a": "879cbb7d1e5e5b01b599af715b0f345ca35c94bbe54c427662571d69ba790382",
+        "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/sanitize/libdome-sculpt-xr.a": "6ae8399de691e4f7dd19103be02305b28e156d0b25b97519c1bb35b7ad3da2b0",
+        "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/sanitize/dome-sculpt-gpu-color-blur-native-test": "f227a0b04204a9e9bb03483546acc4bedc16dd33bcbac43c47e70c413b42cfeb",
+        "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/sanitize/dome-sculpt-native-authoring-inspect": "a13d04ae9d799679e1adaa1de34b36b03b2450373b3cd064a97198ee949d6f7c",
+        "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/sanitize/dome-sculpt-polygon-retopo-affine-test": "a3e43c95991d546748a2b73f74760bcd8c772127394eae917de21f019c0335b1",
+        "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/sanitize/dome-sculpt-retopo-input-admission-test": "bd54d510e9a975a1ec27dd0ce30279540ae7475c491c57ade707b80887eb6cdf",
+        "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/sanitize/dome-sculpt-controls-test": "0b5e78e0c53226c17283a65ea607934295a11f7816c2e3ab8a9d2fb284fc29cd",
+        "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/sanitize/dome-sculpt-paint-test": "2bc4cb00104d61912861120d38e6355fec89d2bcc70375eef49ae72ccde9e2f0",
+        "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/sanitize/dome-sculpt-document-test": "b3a7731a4a51c2d39667ac450d96d6c9f3916ce07c972cd6cceac7bbbcd7fcbb",
+        "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/sanitize/dome-sculpt-native-graphics-lifetime-test": "e701961eb1918ddb2999672fd4c4eb59a15f459b88bbc32644860e5bd57c821d",
+        "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/sanitize/dome-sculpt": "d963208b3326efae400ca76b1080d1eb42b48bf6f22f8090c9a2418a592ce2a0",
+        "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/sanitize/dome-sculpt-surface-query-oblique-test": "e236702e824498dd8a72432d03814337b1f706eb6306904d668ba79ae5da5d50",
+        "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/sanitize/dome-sculpt-triangle-remesh-test": "47044b9460c365676c32c596ce7b8dd702cab2ffdc32a1416fe439ba79c63f4e",
+        "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/sanitize/dome-sculpt-sculpt-surface-chunks-test": "5cec439e369d1b2a29a60e472cfb3cca990626d5ae4865e6a6da7a28a9c538b7",
+        "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/sanitize/dome-sculpt-sculpt-chunk-pipeline-test": "a872c1569c90d780db0f894c2234d3ac3ab85d1b4b53d225b6cd20a798f0733f",
+        "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/sanitize/dome-sculpt-local-surface-integration-test": "ecdd06abeb8d2bbb5c4d42dc632f3737322a410c7553fecd2b9ba37a5abdaeea",
+        "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/sanitize/dome-sculpt-render-direct-upload-test": "e9ad4ddd3a1f9a1ce9f4b4178860a62b72a57665d108e4c4309821514607abae",
+        "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/sanitize/dome-sculpt-vrm1-background-fixture-test": "7473a3f1cb9f8a4537dd857885fb02d946d19412e9a1ba17c4cff1ab540e8cc8",
+        "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/sanitize/dome-sculpt-vrm1-expression-layer-authoring-test": "1f5757eb027226a51926d9cea6c3b3adf32eb239c9523580815559da1b2a2544",
+        "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/sanitize/dome-sculpt-vrm1-expression-targets-faults-test": "5cb91e8d6870dd68037cc981625b7d3296b11196b95acee9d7b34454b00272e4",
+        "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/sanitize/dome-sculpt-texture-sets-test": "d52cb58af508e9665f993cdb297d5ee8c71b4d0922241752cb01f994bfbb32cf",
+        "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/sanitize/dome-sculpt-texture-set-surfaces-test": "d945d8bdff6c71f270257564a4ecc798ce1d16cc32cb4d5ab8c012c0c355089f",
+        "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/sanitize/dome-sculpt-texture-set-native-test": "57ef0f0a04beb8e27fb46872eec5f8c21d609abfd6cb00c357ae57917e0c67d1",
+        "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/sanitize/dome-sculpt-texture-set-export-test": "74281a217fe1caf95154f72fe893100c9a48ab7e7e70d5be8f342550e0803989",
+        "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/sanitize/dome-sculpt-polygon-surface-native-test": "b8fb77ad91816c6a198f393470a2808197357aac03d80880b90d7f418145d15e",
+        "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/sanitize/dome-sculpt-polygon-surface-render-test": "b87549cc2cf956b476b4fb04811c5727032a5930fb4d72bc857ec34e1a78b670",
+        "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/sanitize/dome-sculpt-texture-set-polygon-mixed-test": "8f0d45c19164eccafabe530985d507b8757fa6d888ef66952c64f660e45fbc76",
+        "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/sanitize/dome-sculpt-texture-set-polygon-render-test": "c633fce5bacb0b2c2e9ac2c573051aa945b76ea5df8e580c1b039b8864d0f83a",
+        "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/sanitize/dome-sculpt-sculpt-chunk-render-test": "9ffee08b6d348e2c82595870b2d0816580b8fe6264565b140932787852bdaf06",
+        "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/sanitize/dome-sculpt-texture-set-field-source-test": "43a003d3f76bd258a99016ecb4c0672bd62f8da6f1f2bd03342a01b628251fac",
+        "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/sanitize/dome-sculpt-texture-set-source-export-test": "d547da19c83475b649031fe4728d155b71976ec8fd9668b3ecb9926612b066b6",
+        "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/sanitize/dome-sculpt-texture-set-history-test": "6dc9c43df5c15db1024cde66f079625cb0f13dcad479fc25d804fdf083b60889",
+        "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/sanitize/dome-sculpt-texture-set-resolution-test": "adcc53c9201712f4f4085df756ab8848f04c351e46d6f6554019e467366f6e9f",
+        "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/sanitize/dome-sculpt-texture-set-resolution-fixture": "a406d6fcb78f7edd90ad69ff6c65272884b614aa5326eee888cf0d3b76726380",
+        "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/sanitize/libdome-sculpt-texture-resolution-runtime.so": "db476f02f3c2fd1aa92bdcf26bbcaba7af293469259a8ed5e7400f8d21acf4ae",
+        "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/sanitize/dome-sculpt-sculpt-sustained": "8f3971ad979c6471593296850ecef62e19400b9025b5c2e939759fc906fc2e1f",
+        "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/sanitize/dome-sculpt-texture-set-source-render-test": "8794607759f66d62fc08afd2e254d70ad5424e2f5667ddfad7c8dadf982ed4be",
+        "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/sanitize/dome-sculpt-sculpt-placed-workspace-test": "278255b9d51b350198eb3e359ecd5d731492ea00acba13e2dff28c6f699a8fc4",
+        "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/sanitize/dome-sculpt-sculpt-chunk-workspace-test": "2550cdf52414b02f1e6d6f6e7e51cb67568ee1e66945bdde87d30abfee05031a"
+      },
+      "source_drift": []
+    }
+  },
+  "remaining": "Actual current hardware and public desktop/OpenXR workflows; source-domain/painting/baking/GPU-cache/production/physical/backends and every original unfinished requirement. Private arena batching has separate resource retirement work.",
+  "evidence_archive": {
+    "path": "/home/blux/de-xr/dome-sculpt/artifacts/gpu-paint-combined-build-evidence-20261111.tar.gz",
+    "sha256": "2e488026337fe04d3c96ebaf878998a0ff07e9fce966c1b853dc4a46d9ca7e8e",
+    "members": 35,
+    "bytes": 498165
+  }
+}
