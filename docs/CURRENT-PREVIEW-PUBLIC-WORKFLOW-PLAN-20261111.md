@@ -21,7 +21,7 @@ The separate native producer option `--plain-workflow-fixtures OUTPUT` creates a
 genuine strict-UV64 `PaintedMesh` without imported/projected/baked/polygon or
 retained-domain authority. Actual native stamps create nonuniform color,
 authored alpha distinct from coverage, metallic/roughness, independent mask,
-physical FLOAT emission with tiny coverage, and a hidden zero-opacity layer.
+mixed legacy/physical FLOAT emission with tiny coverage, and a hidden zero-opacity layer.
 It uses the same public default Flow1 Blur command and existing independent
 per-texel oracle. Exact whole-scene Undo/Redo/Save/reopen remains required.
 

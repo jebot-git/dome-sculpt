@@ -3,7 +3,7 @@
   "base": "ccb2b7b5803d92b1b3bf65c38f422366c9128b94",
   "producer": {
     "path": "/home/blux/de-xr/dome-sculpt/artifacts/current-preview-public-workflow-20261111/tests/gpu-color-blur-native.cpp",
-    "sha256": "157f9e405f983643069a669d62a690e3bb4f9552fd87539056c600e7fc69ae0a"
+    "sha256": "b62f6ed531f9bf227bce613034dcc11c93bdb4e0812d460e7a013dfc1adc12ee"
   },
   "original_source_workflow_body_identical": true,
   "old_public_drivers_runtime_reference_unchanged": {
@@ -14,8 +14,8 @@
     "tests/gpu-color-blur-font-reference.cpp": "d5093a6e3134568b704f292a38bf42ff271121d7539f8b338c9c3b74e2a7687d"
   },
   "syntax": {
-    "path": "/home/blux/de-xr/dome-sculpt/artifacts/current-preview-public-proof-20261111/producer-syntax-v2.json",
-    "sha256": "9e4166d36457429db214a6f549372c396816ab61b171bc9a5a7072ec5078adf4"
+    "path": "/home/blux/de-xr/dome-sculpt/artifacts/current-preview-public-proof-20261111/producer-syntax-v3.json",
+    "sha256": "130407edaf701da5338da95dfd6c6fe25c2df24ebfd5dc494ee46f8f8523ba98"
   },
   "actual_producer_link_or_run": false,
   "actual_application_or_GPU_cases": false,

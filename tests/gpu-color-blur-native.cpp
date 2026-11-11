@@ -141,13 +141,14 @@ void plain_workflow_fixtures(const std::filesystem::path&out){
  PaintSettings ink;ink.color={.9f,.1f,.4f,.23f};stroke(*o.painted,ink,{-.13f,.03f,0},.63f);ink.color={.1f,.8f,.3f,.83f};stroke(*o.painted,ink,{.2f,.08f,0},.57f);
  ink.channel=PaintChannel::Metallic;ink.metallic=.67f;stroke(*o.painted,ink,{.02f,-.1f,0},.71f);
  ink.channel=PaintChannel::Roughness;ink.roughness=.21f;stroke(*o.painted,ink,{.1f,.1f,0},.66f);
- ink.channel=PaintChannel::Emission;ink.emission_units=PaintEmissionUnits::Physical;ink.emission={10000,.0003f,7};stroke(*o.painted,ink,{.03f,0,0},.00002f);
+ ink.channel=PaintChannel::Emission;ink.emission={.13f,.4f,.07f};stroke(*o.painted,ink,{.3f,.3f,0},.37f);
+ ink.emission_units=PaintEmissionUnits::Physical;ink.emission={10000,.0003f,7};stroke(*o.painted,ink,{.03f,0,0},.00002f);
  ink.channel=PaintChannel::Mask;ink.mask=.23f;stroke(*o.painted,ink,{-.1f,.13f,0},.81f);
  const auto first=o.painted->active_layer();o.painted->add_layer("Hidden untouched 日本語");ink.channel=PaintChannel::Color;ink.color={.2f,.4f,.8f,.45f};stroke(*o.painted,ink,{0,0,0},.4f);o.painted->layer_properties("Hidden untouched 日本語",false,0);o.painted->select_layer(first);
  check(o.painted->has_physical_emission()&&o.painted->surface_diagnostics().policy==PaintUvPolicy::Strict,"Plain workflow retains genuine physical FLOAT and strict native UV data");
- size_t tiny_hdr=0,independent_mask=0;
- for(uint32_t y=0;y<64;++y)for(uint32_t x=0;x<64;++x){const auto q=o.painted->pixel(first,x,y);const auto e=o.painted->emission_pixel(first,x,y);tiny_hdr+=e.coverage>0&&e.coverage<1.f/255&&e.physical[0]>9000;independent_mask+=q.data[13]>0&&q.data[13]<255;}
- check(tiny_hdr>0&&independent_mask>0,"Plain workflow demonstrably contains subUNORM8 FLOAT HDR coverage and independent mask values");
+ size_t tiny_hdr=0,legacy_emission=0,independent_mask=0;
+ for(uint32_t y=0;y<64;++y)for(uint32_t x=0;x<64;++x){const auto q=o.painted->pixel(first,x,y);const auto e=o.painted->emission_pixel(first,x,y);tiny_hdr+=e.coverage>0&&e.coverage<1.f/255&&e.physical[0]>9000;legacy_emission+=e.coverage>0&&e.legacy[0]>0;independent_mask+=q.data[13]>0&&q.data[13]<255;}
+ check(tiny_hdr>0&&legacy_emission>0&&independent_mask>0,"Plain workflow demonstrably contains mixed legacy/physical emission, subUNORM8 FLOAT HDR coverage and independent mask values");
  scene.validate();const auto before=scene.snapshot();scene.save(out/"original.dsculpt");
  Document document;document.replace(scene);plain_workflow_frame(document);
  check(document.frame().state->paint.flow==1,"Plain workflow uses the actual public default Flow1");
