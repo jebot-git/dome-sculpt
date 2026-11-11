@@ -4,10 +4,14 @@
 #include "dome/gltf-export.hpp"
 #include "emission-bake-source.hpp"
 #include "emission-export.hpp"
+#include "humanoid-sha256.hpp"
 #include <filesystem>
+#include <algorithm>
 #include <fstream>
+#include <limits>
 #include <iostream>
 #include <nlohmann/json.hpp>
+#include <png.h>
 
 namespace {
 using namespace dome;
@@ -29,6 +33,37 @@ Fixture fixture(){
 }
 void finish(Document &doc){check(doc.wait_asset(std::chrono::seconds(120)),"actual worker finishes within original120s bound");if(!doc.frame().state->error.empty())throw std::runtime_error(doc.frame().state->error);}
 void saved(std::future<void> f){check(f.wait_for(std::chrono::seconds(120))==std::future_status::ready,"ordered Save finishes within120s");f.get();}
+uint32_t word(std::span<const uint8_t> b,size_t p){return uint32_t(b[p])|uint32_t(b[p+1])<<8|uint32_t(b[p+2])<<16|uint32_t(b[p+3])<<24;}
+detail::GltfDocument gltf(const std::vector<uint8_t> &bytes){detail::GltfDocument d;const size_t n=word(bytes,12);d.json=nlohmann::json::parse(bytes.begin()+20,bytes.begin()+20+n);d.binary.assign(bytes.begin()+28+n,bytes.end());return d;}
+std::vector<uint8_t> read(const std::filesystem::path &path){std::ifstream f(path,std::ios::binary);return {std::istreambuf_iterator<char>(f),{}};}
+Image png(std::span<const uint8_t> bytes){png_image p{};p.version=PNG_IMAGE_VERSION;struct Cleanup{png_image *p;~Cleanup(){png_image_free(p);}}cleanup{&p};if(!png_image_begin_read_from_memory(&p,bytes.data(),bytes.size()))throw std::runtime_error("Independent PNG header decode failed");p.format=PNG_FORMAT_RGBA;Image image{p.width,p.height,std::vector<uint8_t>(size_t(p.width)*p.height*4)};if(!png_image_finish_read(&p,nullptr,image.rgba.data(),0,nullptr))throw std::runtime_error("Independent PNG decode failed");return image;}
+std::span<const uint8_t> view(const detail::GltfDocument &d,size_t id){const auto &v=d.json.at("bufferViews").at(id);return std::span<const uint8_t>(d.binary).subspan(v.at("byteOffset").get<size_t>(),v.at("byteLength").get<size_t>());}
+void resign(detail::GltfDocument &d){auto &p=d.json["extras"]["domeSculptEmission"];p["binarySha256"]=creator_detail::sha256(d.binary);auto copy=d.json;copy["extras"]["domeSculptEmission"].erase("documentSha256");p["documentSha256"]=creator_detail::sha256(nlohmann::json::to_cbor(copy));}
+size_t append(detail::GltfDocument &d,std::span<const uint8_t> bytes){d.binary.insert(d.binary.end(),(4-d.binary.size()%4)%4,0);const auto offset=d.binary.size();d.binary.insert(d.binary.end(),bytes.begin(),bytes.end());d.binary.insert(d.binary.end(),(4-d.binary.size()%4)%4,0);const auto id=d.json["bufferViews"].size();d.json["bufferViews"].push_back({{"buffer",0},{"byteOffset",offset},{"byteLength",bytes.size()}});d.json["buffers"][0]["byteLength"]=d.binary.size();return id;}
+void refuses_package(detail::GltfDocument d,const std::filesystem::path &path,const char *message){resign(d);detail::write_glb(std::move(d),path);bool caught=false;try{extract_native_emission(read(path));}catch(const std::exception&){caught=true;}check(caught,message);}
+void quality_oracle(const detail::GltfDocument &d,const EmissionInterchangeImage &source){
+ const auto &record=d.json.at("extras").at("domeSculptEmission").at("images").at(0),&f=record.at("fallback");
+ check(f.at("version")==2&&f.at("view")=="pbr"&&f.at("units")=="strength:linear-cd/m2;maximumAbsoluteError:linear-cd/m2;maximumRelativeError:dimensionless","actual fallback2 declares exact typed view and metric units");
+ const auto &material=d.json.at("materials").at(record.at("material").get<size_t>());
+ const auto texture=material.at("emissiveTexture").at("index").get<size_t>();const auto image_id=d.json.at("textures").at(texture).at("source").get<size_t>();
+ const auto image=png(view(d,d.json.at("images").at(image_id).at("bufferView").get<size_t>()));
+ check(image.width==source.width&&image.height==source.height,"independent standard PNG decoder sees genuine current raster dimensions");
+ const auto factors=f.at("emissiveFactor").get<std::array<double,3>>();const double strength=f.at("strength").get<double>();
+ std::array<double,3> peak{};for(const auto &p:source.pixels)for(size_t k=0;k<3;++k)peak[k]=std::max(peak[k],double(p[k]));
+ check(strength==std::max({1.,peak[0],peak[1],peak[2]})&&strength==52016,"actual FLOAT normalization preserves independently authored52016 peak above old30000 guard");
+ long double maximum_absolute=0,maximum_relative=0;size_t erased=0;
+ for(size_t i=0;i<source.pixels.size();++i)for(size_t k=0;k<3;++k){
+  const long double x=static_cast<long double>(image.rgba[i*4+k])/255;
+  const long double linear=x<=.04045L?x/12.92L:std::pow((x+.055L)/1.055L,2.4L);
+  const long double reconstructed=linear*factors[k]*strength,original=source.pixels[i][k];
+  const long double error=std::abs(original-reconstructed);maximum_absolute=std::max(maximum_absolute,error);
+  if(original>0){maximum_relative=std::max(maximum_relative,error/original);erased+=reconstructed==0;}else check(reconstructed==0,"zero source has zero reconstructed energy");
+ }
+ const double precision=64*std::numeric_limits<double>::epsilon();
+ check(std::abs(static_cast<long double>(f.at("maximumAbsoluteError").get<double>())-maximum_absolute)<=precision*strength,"reported physical absolute error agrees with independent extended-precision PNG reconstruction");
+ check(std::abs(static_cast<long double>(f.at("maximumRelativeError").get<double>())-maximum_relative)<=precision*std::max(1.L,maximum_relative),"reported dimensionless ratio agrees with independent extended-precision oracle");
+ check(f.at("erasedNonzeroSamples")==erased&&erased==0,"measured current fallback retains every nonzero sample in this actual HDR/tiny-value fixture");
+}
 } // namespace
 int main(int argc,char **argv)try{
   using namespace dome;
@@ -77,5 +112,18 @@ int main(int argc,char **argv)try{
   std::ifstream stream(glb,std::ios::binary);std::vector<uint8_t> payload((std::istreambuf_iterator<char>(stream)),{});
   const auto imported=extract_native_emission(payload);
   check(imported&&imported->encode()==after,"actual GLB native/FLOAT export restores full source/target/current material/history recipe state");
+  const auto document_gltf=gltf(payload);quality_oracle(document_gltf,field);
+  auto bad=document_gltf;bad.json["extras"]["domeSculptEmission"]["images"][0]["fallback"]["maximumAbsoluteError"]=0;
+  refuses_package(std::move(bad),directory/"forged-metric.glb","rehashed fake version2 quality metric refuses independently of document checksums");
+  bad=document_gltf;bad.json["extras"]["domeSculptEmission"]["images"][0]["fallback"]["units"]="half";
+  refuses_package(std::move(bad),directory/"forged-units.glb","rehashed unsupported FLOAT fallback units refuse");
+  bad=document_gltf;auto &downgraded=bad.json["extras"]["domeSculptEmission"]["images"][0]["fallback"];downgraded.erase("version");downgraded.erase("units");downgraded.erase("view");downgraded["strength"]=1;downgraded["maximumAbsoluteError"]=0;downgraded["maximumRelativeError"]=0;
+  refuses_package(std::move(bad),directory/"stripped-fallback2.glb","actual EXR2 cannot masquerade as legacy fallback metadata");
+  bad=document_gltf;EmissionInterchangeImage legacy_image;legacy_image.width=legacy_image.height=64;legacy_image.pixels.resize(4096);const auto legacy_exr=encode_emission_exr(legacy_image);const auto legacy_view=append(bad,legacy_exr);auto &legacy_record=bad.json["extras"]["domeSculptEmission"]["images"][0];legacy_record["bufferView"]=legacy_view;legacy_record["sha256"]=creator_detail::sha256(legacy_exr);
+  refuses_package(std::move(bad),directory/"fake-fallback2.glb","version2 metadata cannot raise bounds or reinterpret an actual legacy EXR1");
+  bad=document_gltf;auto altered=field;altered.pixels[0][3]=.5f;const auto altered_exr=encode_emission_exr(altered);const auto altered_view=append(bad,altered_exr);auto &altered_record=bad.json["extras"]["domeSculptEmission"]["images"][0];altered_record["bufferView"]=altered_view;altered_record["sha256"]=creator_detail::sha256(altered_exr);
+  refuses_package(std::move(bad),directory/"foreign-float-contribution.glb","rehashed FLOAT coefficients with unchanged RGB/quality cannot borrow actual native field authority");
+  bad=document_gltf;auto missing=accepted;missing.active().painted=missing.active().painted->snapshot();missing.active().painted->clear_bake();const auto missing_value=missing.encode();check(missing_value.at("version")==41,"counterexample still owns a genuine hidden FLOAT source");const auto missing_native=nlohmann::json::to_cbor(missing_value);const auto missing_view=append(bad,missing_native);auto &package=bad.json["extras"]["domeSculptEmission"];package["version"]=1;package["encoding"]="scene-cbor+openexr-float32-zip";package["native"]={{"bufferView",missing_view},{"sha256",creator_detail::sha256(missing_native)}};
+  refuses_package(std::move(bad),directory/"foreign-current-owner.glb","real unrelated Scene41 hidden source cannot authorize a missing current FLOAT field");
   std::cout<<"Baked emission worker "<<checks<<" checks PASS\n";return 0;
 }catch(const std::exception &e){std::cerr<<"Baked emission worker FAIL after "<<checks<<": "<<e.what()<<'\n';return 1;}

@@ -13,6 +13,7 @@ void EmissionInterchangeImage::validate(const EmissionInterchangeLimits &l)const
  for(size_t i=0;i<pixels.size();++i){if((i&4095)==0)stop(l);const auto &p=pixels[i];for(float v:p)if(!std::isfinite(v)||v<0)throw std::invalid_argument("Invalid HDR emission sample");if(p[9]>1)throw std::invalid_argument("Invalid HDR emission coverage");if(version==2){BakedEmissionSample{{p[3],p[4],p[5]},{p[6],p[7],p[8]},p[9]}.validate();continue;}for(size_t c=0;c<3;++c){if(p[c]>3*maximum_native_emission)throw std::invalid_argument("HDR resolved radiance exceeds native bound");if((p[9]==0&&(p[3+c]!=0||p[6+c]!=0))||p[3+c]>p[9]*(1+4e-6f)||p[6+c]>maximum_native_emission*p[9]*(1+4e-6f))throw std::invalid_argument("HDR emission coefficients are not premultiplied");}}
 }
 size_t detail::emission_exr_decoded_bytes(std::span<const uint8_t> bytes,const EmissionInterchangeLimits &l){return emission_exr_owned_decoded_bytes(bytes,l);}
+detail::EmissionExrDescription detail::emission_exr_description(std::span<const uint8_t> bytes,const EmissionInterchangeLimits &l){return emission_exr_owned_description(bytes,l);}
 std::vector<uint8_t> encode_emission_exr(const EmissionInterchangeImage &image,const EmissionInterchangeLimits &l){return detail::encode_emission_exr_owned(image,l);}
 EmissionInterchangeImage decode_emission_exr(std::span<const uint8_t> bytes,const EmissionInterchangeLimits &l){return detail::decode_emission_exr_owned(bytes,l);}
 }
