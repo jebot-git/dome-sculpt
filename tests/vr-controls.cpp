@@ -79,7 +79,11 @@ struct Driver {
     }
   }
 };
-int main() try {
+int main(int argc,char **argv) try {
+  auto asset_timeout=std::chrono::seconds(180);
+  if(argc==2&&std::string(argv[1])=="--instrumented-assets")
+    asset_timeout=std::chrono::seconds(600);
+  else if(argc!=1)throw std::invalid_argument("Use --instrumented-assets only for the explicitly extended diagnostic profile");
   auto require = [](bool v, const char *s) {
     if (!v)
       throw std::runtime_error(s);
@@ -164,7 +168,10 @@ int main() try {
           "A ray-clickable Cancel button restores the original color without "
           "recording an edit");
   doc.prepare_mesh(64);
-  require(doc.wait_asset(std::chrono::seconds(180)) &&
+  // Keep the ordinary 180s gate. The explicit instrumentation profile allows
+  // a bounded 600s diagnostic margin for this same real sculpt/xatlas producer;
+  // it never substitutes a fabricated paint mesh or changes product deadlines.
+  require(doc.wait_asset(asset_timeout) &&
               doc.frame().state->mesh_active,
           "Layer controls use a prepared stable painting mesh");
   auto path = std::filesystem::temp_directory_path() /

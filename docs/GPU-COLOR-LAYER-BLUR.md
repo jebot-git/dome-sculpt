@@ -68,8 +68,9 @@ entry on Controls; Painting → Erase remains directly available and toggles the
 actual brush. The
 existing paint Flow setting supplies strength for commands. No new frontend,
 font path, keybinding override or application-owned menu bar is introduced.
-Actual controller qualification uses public synthetic SpatialFrame routing;
-physical headset/controller usability remains required.
+Actual controller qualification uses public synthetic SpatialFrame routing,
+including Filters Cancel against a blocked real GPU worker; physical headset/
+controller usability remains required.
 
 ## EGL lifetime prerequisite
 
@@ -105,6 +106,9 @@ Hardware native checks exercise actual accepted worker operations, ordered
 Save/reopen, one global Undo/Redo, cancellation behind an actual EGL-acquisition
 barrier, stale-generation rejection, imported source/rig/morph/material owners,
 genuine extra texture-set membership and public synthetic controller routing.
+A real software-routed Document also refuses the default GPU command with
+unchanged native fields, dirty state and history; supplying the detached
+software-validation flag to Document is itself rejected.
 The first real plain-object recipient adoption failed because the previous
 texture-set adapter required an explicit collection. Its original failure is
 retained; the repaired adapter preserves genuine plain-recipient authority and
@@ -119,14 +123,25 @@ triangles. The repaired test captures independent exact triangle-value copies,
 requires the edit to change them, checks the held owner remains unchanged and
 requires Undo to return those exact values. The original failure is preserved.
 Legacy controller controls also test the retained slider shortcut, filter Back,
-focus-loss cleanup and the direct Erase toggle. Compact receipts pin actual
-sources, commands, outputs, retained failures and their verification limits.
+focus-loss cleanup and the direct Erase toggle. The selected nine Release tests
+pass. The ordinary SAN nine-test run passed seven, including strengthened
+shared-document, but both real seeded-sphere/xatlas preparations exceeded their
+existing 180-second asset waits (206.78s controller / 190.72s painting process
+elapsed). Those failures remain recorded. Explicit test-only
+`--instrumented-assets` profiles retain that genuine producer and every assertion
+with a bounded 600-second allowance; they passed in 77.17s and 157.09s respectively.
+Those are separate instrumentation results, not a claim that the original
+180-second attempts passed. Defaults and product deadlines remain unchanged.
+Compact receipts pin actual sources, commands, outputs, retained failures and
+their verification limits.
 
 Reproduction targets are `dome-sculpt-gpu-color-blur-kernel-test`,
 `dome-sculpt-gpu-color-blur-native-test`, `dome-sculpt-native-graphics-shared-test`
 and the existing `dome-sculpt-native-graphics-lifetime-test`. The first three
-are registered as explicit software CTests. Pass `software` for detached
-validation; native document/controller success controls require hardware.
+are registered as explicit software CTests. For detached software validation use
+`LIBGL_ALWAYS_SOFTWARE=1 LP_NUM_THREADS=2` and the `software` argument; the native
+software entry also verifies actual worker hardware refusal. Native document/
+controller success controls require hardware.
 Native hardware checks also take an output directory as their second argument.
 For Arc validation use `DRI_PRIME=pci-0000_03_00_0`, remove software overrides
 and hold the exclusive `/tmp/dome-sculpt-arc-device.lock` for the entire process.
@@ -135,6 +150,11 @@ machine-specific test policy is not a product vendor restriction.
 Weights are generated offline with CMake in the build directory; Python is not
 required for the native product build. No installation or running root-candidate
 session is changed by these checks.
+
+Software receipts explicitly record system llvmpipe LLVM 22.1.8, with
+`LD_LIBRARY_PATH=/usr/lib64`; they do not qualify a patched LLVM19 provider or
+the separate XR-renderer workload. Sanitizer graphics/runtime qualification is
+limited to these actual kernel, native authoring and context-lifetime workloads.
 
 Device identity has two distinct observations: the GL renderer describes the
 rendering context, and EGLDevice/DRM describes the EGL display. DRI_PRIME can
