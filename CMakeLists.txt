@@ -1610,6 +1610,12 @@ if(BUILD_TESTING)
   target_link_libraries(dome-sculpt-sculpt-chunk-pipeline-test PRIVATE dome-sculpt-core)
   add_test(NAME sculpt-chunk-pipeline COMMAND dome-sculpt-sculpt-chunk-pipeline-test ${CMAKE_CURRENT_BINARY_DIR}/sculpt-chunk-pipeline)
 
+  add_executable(dome-sculpt-native-scene-geometry-intern-test tests/native-scene-geometry-intern.cpp)
+  target_include_directories(dome-sculpt-native-scene-geometry-intern-test PRIVATE src)
+  target_link_libraries(dome-sculpt-native-scene-geometry-intern-test PRIVATE dome-sculpt-core)
+  add_test(NAME native-scene-geometry-intern COMMAND dome-sculpt-native-scene-geometry-intern-test)
+  set_tests_properties(native-scene-geometry-intern PROPERTIES TIMEOUT 180)
+
   add_executable(dome-sculpt-cut-boundaries-test tests/cut-boundaries.cpp)
   target_link_libraries(dome-sculpt-cut-boundaries-test PRIVATE dome-sculpt-core)
   target_link_options(dome-sculpt-cut-boundaries-test PRIVATE -Wl,--wrap=fsync)
