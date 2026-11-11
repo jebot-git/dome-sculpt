@@ -1240,8 +1240,19 @@ void SurfaceRenderer::draw(std::shared_ptr<const MeshSnapshot> mesh,
         // Always retain original cell/triangle order, including opaque ties.
         // Chunk-major sorting would change Blend/ghost and GL_LESS results.
         std::optional<detail::SculptSurfaceRun> pending;
+        // Every run of this object has the same immutable material and plain
+        // (untextured) shader state. Binding the next chunk changes only vertex
+        // inputs; it cannot change those uniforms, textures or raster settings.
+        // Set them once, rather than repeating material setup for every cell-
+        // ordered run. Keep all draws in their original order.
+        bool material_bound=false;
         auto flush=[&]{if(!pending)return;const auto placed=object.placed->find(pending->chunk);chunks_->bind(object.object,placed);
-          draw_range(object.material,pending->first,pending->count,object.object,nullptr,false,false,cached_->pbr_view);pending.reset();};
+          if(!material_bound){
+            draw_range(object.material,pending->first,pending->count,object.object,nullptr,false,false,cached_->pbr_view);
+            material_bound=true;
+          }else glDrawElements(GL_TRIANGLES,GLsizei(pending->count),GL_UNSIGNED_INT,
+                              reinterpret_cast<void*>(pending->first*sizeof(uint32_t)));
+          pending.reset();};
         object.geometry->for_each_run([&](const detail::SculptSurfaceRun &run){
           if(pending&&pending->chunk==run.chunk&&pending->first+pending->count==run.first)pending->count+=run.count;
           else {flush();pending=run;}
