@@ -1,0 +1,1324 @@
+{
+  "date": "2026-11-11",
+  "state": "diagnosed-reproduced-cleanup-failure-no-product-fix",
+  "scope": "Isolated strictSAN exactb8 NativeGraphics context lifecycle; diagnosis only, not replacement for fullconsumerUHD controls or proof allgraphicsownershipcorrect",
+  "product_source": "b8c469ce875eb2542c220300c3c63edbf1526570",
+  "no_product_edits": true,
+  "no_GL_interposition": true,
+  "source_TU_sha256": "33a1dcc1dea8b4890aa9e233f0266e113bf94d2c4fda2ff5448b0b3c0f63bd38",
+  "source_header_sha256": "003741d9689a4c3a1e6af7c06d7462fee0e88fb302a1a1fb7ccc1d7221d13f5c",
+  "sanitizer": {
+    "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1:abort_on_error=1",
+    "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=1",
+    "LSAN_OPTIONS": null,
+    "suppressions": false
+  },
+  "limits": {
+    "process_seconds": 30,
+    "process_tree_RSS_bytes": 1073741824
+  },
+  "compiled_v2": {
+    "path": "/home/blux/de-xr/dome-sculpt/artifacts/context-lifecycle-v2-20261111/prepared.json",
+    "sha256": "ce96356caff73726f8e898b295c3d14f3016b1cea323f45ce6a23e8ecc80d7e6"
+  },
+  "runs": [
+    {
+      "status": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/context-lifecycle-20261111/run-1794402430792961823/status.json",
+        "sha256": "6dc0d8884b5e429fadb3cc9234aa5d28abff706d5f7e052e5b2a5dad7d095295"
+      },
+      "diagnostic_status_exit": 1,
+      "wrapper_process_exit": 0,
+      "input_drift": [],
+      "source_inputs": {
+        "/home/blux/de-xr/dome-sculpt/artifacts/context-lifecycle-20261111/probe.cpp": "363974327aa62edf645392862ef6616f09fefadc5fca0953fe1bcb474caa1d41",
+        "/home/blux/de-xr/dome-sculpt/artifacts/context-lifecycle-20261111/probe-sanitize": "3eb1a2ee8e980125097985179ae47ae97eca0914f94d4aa21500244073932583",
+        "/home/blux/de-xr/dome-sculpt/artifacts/context-lifecycle-20261111/run.py": "2ab677c5e110818cf5b57e5088b0615a6a1f7dfcc4ca1ab5b9b17aaf55a9eec9",
+        "/home/blux/de-xr/dome-sculpt/artifacts/resume-integration-20261111/third_party/openbrush/graphics.cpp": "33a1dcc1dea8b4890aa9e233f0266e113bf94d2c4fda2ff5448b0b3c0f63bd38",
+        "/home/blux/de-xr/dome-sculpt/artifacts/resume-integration-20261111/third_party/openbrush/graphics.h": "003741d9689a4c3a1e6af7c06d7462fee0e88fb302a1a1fb7ccc1d7221d13f5c",
+        "/usr/lib64/libEGL_mesa.so.0.0.0": "c786fa61da74b62ae0b8ab9fdb9bc020be92c02896d37220c58724107195002c",
+        "/usr/lib64/libgallium-26.2.5.so": "033e3135e977d3e5fc6b63624573febe48b2e567c0e47da49d3125d9de8d1839",
+        "/home/blux/de-xr/dome-sculpt/artifacts/strict-arc-20261111/control/graphics-v3.py": "0606a923f5fbe1a4da5ffd973ae3b541d0bb343cd55614a33ee2f3edef9f6a7a",
+        "/home/blux/de-xr/dome-sculpt/artifacts/strict-arc-20261111/control/mount_identity.py": "1e2c6a322ae8797c78f9a2693d7e2e18aab9dd8d6472babbeb81334971904c81"
+      },
+      "cases": [
+        {
+          "device": "arc",
+          "mode": "success",
+          "exit": 0,
+          "intended_exit": 0,
+          "body_completed": true,
+          "clean_expected_exit": true,
+          "sanitizer_diagnostic": false,
+          "peak_RSS": 85639168,
+          "seconds": 0.19609462097287178,
+          "leak_summaries": [],
+          "failure_lines": [],
+          "identity_lines": [],
+          "after_owned_scope": {
+            "client_api": 12450,
+            "context": "0",
+            "display": "0"
+          },
+          "after_thread_release": null,
+          "caught_refusal": null,
+          "EGL_screen_node": "/dev/dri/renderD129",
+          "GL_renderer": "Mesa Intel(R) Arc(tm) A770 Graphics (DG2)",
+          "requested_render_node": null,
+          "live_screen_FDs": [
+            {
+              "fd": "3",
+              "inode": 1171,
+              "rdev": 57985,
+              "target": "/dev/dri/renderD129"
+            },
+            {
+              "fd": "4",
+              "inode": 1171,
+              "rdev": 57985,
+              "target": "/dev/dri/renderD129"
+            },
+            {
+              "fd": "5",
+              "inode": 1171,
+              "rdev": 57985,
+              "target": "/dev/dri/renderD129"
+            },
+            {
+              "fd": "6",
+              "inode": 1171,
+              "rdev": 57985,
+              "target": "/dev/dri/renderD129"
+            }
+          ],
+          "live_requested_render_FDs": null,
+          "log": {
+            "path": "/home/blux/de-xr/dome-sculpt/artifacts/context-lifecycle-20261111/run-1794402430792961823/arc-success/process.log",
+            "sha256": "f5ef690ae67973f7fe5c1510a6b83fb7f005dfbf58ec5a46357629ffb309d576"
+          }
+        },
+        {
+          "device": "arc",
+          "mode": "refusal",
+          "exit": 1,
+          "intended_exit": 1,
+          "body_completed": true,
+          "clean_expected_exit": true,
+          "sanitizer_diagnostic": false,
+          "peak_RSS": 85712896,
+          "seconds": 0.18227396497968584,
+          "leak_summaries": [],
+          "failure_lines": [],
+          "identity_lines": [],
+          "after_owned_scope": {
+            "client_api": 12450,
+            "context": "0",
+            "display": "0"
+          },
+          "after_thread_release": null,
+          "caught_refusal": "deliberate typed early C++ refusal after a ready owned context",
+          "EGL_screen_node": "/dev/dri/renderD129",
+          "GL_renderer": "Mesa Intel(R) Arc(tm) A770 Graphics (DG2)",
+          "requested_render_node": null,
+          "live_screen_FDs": [
+            {
+              "fd": "3",
+              "inode": 1171,
+              "rdev": 57985,
+              "target": "/dev/dri/renderD129"
+            },
+            {
+              "fd": "4",
+              "inode": 1171,
+              "rdev": 57985,
+              "target": "/dev/dri/renderD129"
+            },
+            {
+              "fd": "5",
+              "inode": 1171,
+              "rdev": 57985,
+              "target": "/dev/dri/renderD129"
+            },
+            {
+              "fd": "6",
+              "inode": 1171,
+              "rdev": 57985,
+              "target": "/dev/dri/renderD129"
+            }
+          ],
+          "live_requested_render_FDs": null,
+          "log": {
+            "path": "/home/blux/de-xr/dome-sculpt/artifacts/context-lifecycle-20261111/run-1794402430792961823/arc-refusal/process.log",
+            "sha256": "1aefbe34b2e70f86ced8fbb857ca134ee4697f72c2f06915801f9cb00209c783"
+          }
+        },
+        {
+          "device": "arc",
+          "mode": "success-release",
+          "exit": 0,
+          "intended_exit": 0,
+          "body_completed": true,
+          "clean_expected_exit": true,
+          "sanitizer_diagnostic": false,
+          "peak_RSS": 93609984,
+          "seconds": 0.253926909994334,
+          "leak_summaries": [],
+          "failure_lines": [],
+          "identity_lines": [],
+          "after_owned_scope": {
+            "client_api": 12450,
+            "context": "0",
+            "display": "0"
+          },
+          "after_thread_release": {
+            "client_api": 12448,
+            "context": "0",
+            "display": "0"
+          },
+          "caught_refusal": null,
+          "EGL_screen_node": "/dev/dri/renderD129",
+          "GL_renderer": "Mesa Intel(R) Arc(tm) A770 Graphics (DG2)",
+          "requested_render_node": null,
+          "live_screen_FDs": [
+            {
+              "fd": "3",
+              "inode": 1171,
+              "rdev": 57985,
+              "target": "/dev/dri/renderD129"
+            },
+            {
+              "fd": "4",
+              "inode": 1171,
+              "rdev": 57985,
+              "target": "/dev/dri/renderD129"
+            },
+            {
+              "fd": "5",
+              "inode": 1171,
+              "rdev": 57985,
+              "target": "/dev/dri/renderD129"
+            },
+            {
+              "fd": "6",
+              "inode": 1171,
+              "rdev": 57985,
+              "target": "/dev/dri/renderD129"
+            }
+          ],
+          "live_requested_render_FDs": null,
+          "log": {
+            "path": "/home/blux/de-xr/dome-sculpt/artifacts/context-lifecycle-20261111/run-1794402430792961823/arc-success-release/process.log",
+            "sha256": "d7e65f0765f5792ef146bfc72131f793345a806a9a56e948886c74bb59df99e0"
+          }
+        },
+        {
+          "device": "arc",
+          "mode": "refusal-release",
+          "exit": 1,
+          "intended_exit": 1,
+          "body_completed": true,
+          "clean_expected_exit": true,
+          "sanitizer_diagnostic": false,
+          "peak_RSS": 85716992,
+          "seconds": 0.21161891304655,
+          "leak_summaries": [],
+          "failure_lines": [],
+          "identity_lines": [],
+          "after_owned_scope": {
+            "client_api": 12450,
+            "context": "0",
+            "display": "0"
+          },
+          "after_thread_release": {
+            "client_api": 12448,
+            "context": "0",
+            "display": "0"
+          },
+          "caught_refusal": "deliberate typed early C++ refusal after a ready owned context",
+          "EGL_screen_node": "/dev/dri/renderD129",
+          "GL_renderer": "Mesa Intel(R) Arc(tm) A770 Graphics (DG2)",
+          "requested_render_node": null,
+          "live_screen_FDs": [
+            {
+              "fd": "3",
+              "inode": 1171,
+              "rdev": 57985,
+              "target": "/dev/dri/renderD129"
+            },
+            {
+              "fd": "4",
+              "inode": 1171,
+              "rdev": 57985,
+              "target": "/dev/dri/renderD129"
+            },
+            {
+              "fd": "5",
+              "inode": 1171,
+              "rdev": 57985,
+              "target": "/dev/dri/renderD129"
+            },
+            {
+              "fd": "6",
+              "inode": 1171,
+              "rdev": 57985,
+              "target": "/dev/dri/renderD129"
+            }
+          ],
+          "live_requested_render_FDs": null,
+          "log": {
+            "path": "/home/blux/de-xr/dome-sculpt/artifacts/context-lifecycle-20261111/run-1794402430792961823/arc-refusal-release/process.log",
+            "sha256": "69379d64305e33b195c82d149f5c5f68806c3762c29b1e1320937be51ee953c0"
+          }
+        },
+        {
+          "device": "arc",
+          "mode": "other-current",
+          "exit": 0,
+          "intended_exit": 0,
+          "body_completed": true,
+          "clean_expected_exit": true,
+          "sanitizer_diagnostic": false,
+          "peak_RSS": 69517312,
+          "seconds": 0.1738694419618696,
+          "leak_summaries": [],
+          "failure_lines": [],
+          "identity_lines": [],
+          "after_owned_scope": null,
+          "after_thread_release": {
+            "client_api": 12448,
+            "context": "0",
+            "display": "0"
+          },
+          "caught_refusal": null,
+          "EGL_screen_node": "/dev/dri/renderD129",
+          "GL_renderer": "Mesa Intel(R) Arc(tm) A770 Graphics (DG2)",
+          "requested_render_node": null,
+          "live_screen_FDs": [
+            {
+              "fd": "3",
+              "inode": 1171,
+              "rdev": 57985,
+              "target": "/dev/dri/renderD129"
+            },
+            {
+              "fd": "4",
+              "inode": 1171,
+              "rdev": 57985,
+              "target": "/dev/dri/renderD129"
+            },
+            {
+              "fd": "5",
+              "inode": 1171,
+              "rdev": 57985,
+              "target": "/dev/dri/renderD129"
+            },
+            {
+              "fd": "6",
+              "inode": 1171,
+              "rdev": 57985,
+              "target": "/dev/dri/renderD129"
+            },
+            {
+              "fd": "7",
+              "inode": 1171,
+              "rdev": 57985,
+              "target": "/dev/dri/renderD129"
+            },
+            {
+              "fd": "8",
+              "inode": 1171,
+              "rdev": 57985,
+              "target": "/dev/dri/renderD129"
+            },
+            {
+              "fd": "9",
+              "inode": 1171,
+              "rdev": 57985,
+              "target": "/dev/dri/renderD129"
+            }
+          ],
+          "live_requested_render_FDs": null,
+          "log": {
+            "path": "/home/blux/de-xr/dome-sculpt/artifacts/context-lifecycle-20261111/run-1794402430792961823/arc-other-current/process.log",
+            "sha256": "0067d6afb9eb22d0a5e0a9e7ee9b77d8f993fff7e7fab83b16f71ab90b9880dc"
+          }
+        },
+        {
+          "device": "uhd",
+          "mode": "success",
+          "exit": -6,
+          "intended_exit": 0,
+          "body_completed": false,
+          "clean_expected_exit": false,
+          "sanitizer_diagnostic": true,
+          "peak_RSS": 134283264,
+          "seconds": 0.5522198340040632,
+          "leak_summaries": [
+            "SUMMARY: AddressSanitizer: 132268 byte(s) leaked in 1142 allocation(s)."
+          ],
+          "failure_lines": [
+            "PROBE_FAILURE Unexpected actual DRM device"
+          ],
+          "identity_lines": [],
+          "after_owned_scope": null,
+          "after_thread_release": null,
+          "caught_refusal": null,
+          "EGL_screen_node": null,
+          "GL_renderer": null,
+          "requested_render_node": null,
+          "live_screen_FDs": null,
+          "live_requested_render_FDs": null,
+          "log": {
+            "path": "/home/blux/de-xr/dome-sculpt/artifacts/context-lifecycle-20261111/run-1794402430792961823/uhd-success/process.log",
+            "sha256": "11741a00ec0e199c2e369697e93fba3b833f57d789839eec39b3422cd6066351"
+          }
+        },
+        {
+          "device": "uhd",
+          "mode": "refusal",
+          "exit": -6,
+          "intended_exit": 1,
+          "body_completed": false,
+          "clean_expected_exit": false,
+          "sanitizer_diagnostic": true,
+          "peak_RSS": 134180864,
+          "seconds": 0.5429179890197702,
+          "leak_summaries": [
+            "SUMMARY: AddressSanitizer: 132268 byte(s) leaked in 1142 allocation(s)."
+          ],
+          "failure_lines": [
+            "PROBE_FAILURE Unexpected actual DRM device"
+          ],
+          "identity_lines": [],
+          "after_owned_scope": null,
+          "after_thread_release": null,
+          "caught_refusal": null,
+          "EGL_screen_node": null,
+          "GL_renderer": null,
+          "requested_render_node": null,
+          "live_screen_FDs": null,
+          "live_requested_render_FDs": null,
+          "log": {
+            "path": "/home/blux/de-xr/dome-sculpt/artifacts/context-lifecycle-20261111/run-1794402430792961823/uhd-refusal/process.log",
+            "sha256": "6f3138254246f5ad98f714d96f5dab857db48a6925a01d63a5d23bbb2c6e870c"
+          }
+        },
+        {
+          "device": "uhd",
+          "mode": "success-release",
+          "exit": -6,
+          "intended_exit": 0,
+          "body_completed": false,
+          "clean_expected_exit": false,
+          "sanitizer_diagnostic": true,
+          "peak_RSS": 134197248,
+          "seconds": 0.5313808869686909,
+          "leak_summaries": [
+            "SUMMARY: AddressSanitizer: 132268 byte(s) leaked in 1142 allocation(s)."
+          ],
+          "failure_lines": [
+            "PROBE_FAILURE Unexpected actual DRM device"
+          ],
+          "identity_lines": [],
+          "after_owned_scope": null,
+          "after_thread_release": null,
+          "caught_refusal": null,
+          "EGL_screen_node": null,
+          "GL_renderer": null,
+          "requested_render_node": null,
+          "live_screen_FDs": null,
+          "live_requested_render_FDs": null,
+          "log": {
+            "path": "/home/blux/de-xr/dome-sculpt/artifacts/context-lifecycle-20261111/run-1794402430792961823/uhd-success-release/process.log",
+            "sha256": "1e1297a7e0bac60337884f1dc0565f0b590d36cbf6e25cef7429d77503f2e1eb"
+          }
+        },
+        {
+          "device": "uhd",
+          "mode": "refusal-release",
+          "exit": -6,
+          "intended_exit": 1,
+          "body_completed": false,
+          "clean_expected_exit": false,
+          "sanitizer_diagnostic": true,
+          "peak_RSS": 132194304,
+          "seconds": 0.6525433200295083,
+          "leak_summaries": [
+            "SUMMARY: AddressSanitizer: 132268 byte(s) leaked in 1142 allocation(s)."
+          ],
+          "failure_lines": [
+            "PROBE_FAILURE Unexpected actual DRM device"
+          ],
+          "identity_lines": [],
+          "after_owned_scope": null,
+          "after_thread_release": null,
+          "caught_refusal": null,
+          "EGL_screen_node": null,
+          "GL_renderer": null,
+          "requested_render_node": null,
+          "live_screen_FDs": null,
+          "live_requested_render_FDs": null,
+          "log": {
+            "path": "/home/blux/de-xr/dome-sculpt/artifacts/context-lifecycle-20261111/run-1794402430792961823/uhd-refusal-release/process.log",
+            "sha256": "ac5bf046234946e4b2d34642282126810b66ee837f44f0812c8739e2ed68a64b"
+          }
+        },
+        {
+          "device": "uhd",
+          "mode": "other-current",
+          "exit": -6,
+          "intended_exit": 0,
+          "body_completed": false,
+          "clean_expected_exit": false,
+          "sanitizer_diagnostic": true,
+          "peak_RSS": 140111872,
+          "seconds": 0.5909824679838493,
+          "leak_summaries": [
+            "SUMMARY: AddressSanitizer: 132268 byte(s) leaked in 1142 allocation(s)."
+          ],
+          "failure_lines": [
+            "PROBE_FAILURE Unexpected actual DRM device"
+          ],
+          "identity_lines": [],
+          "after_owned_scope": null,
+          "after_thread_release": null,
+          "caught_refusal": null,
+          "EGL_screen_node": null,
+          "GL_renderer": null,
+          "requested_render_node": null,
+          "live_screen_FDs": null,
+          "live_requested_render_FDs": null,
+          "log": {
+            "path": "/home/blux/de-xr/dome-sculpt/artifacts/context-lifecycle-20261111/run-1794402430792961823/uhd-other-current/process.log",
+            "sha256": "20f7536b8ea20ee0a0df8f911e8a19bd179f3272b731e9187878f3e6d0130dfc"
+          }
+        }
+      ]
+    },
+    {
+      "status": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/context-lifecycle-v2-20261111/run-1794402945058965619/status.json",
+        "sha256": "841608b55b6c1f4f8077c0901f6a67b5176a79b900193df21507e262f54f8a36"
+      },
+      "diagnostic_status_exit": 1,
+      "wrapper_process_exit": 0,
+      "input_drift": [],
+      "source_inputs": {
+        "/home/blux/de-xr/dome-sculpt/artifacts/context-lifecycle-v2-20261111/probe.cpp": "aab9e34fc1ae7387e71ff727bd24ffe3f50ba9da8647134a793d7e0f7ca1faec",
+        "/home/blux/de-xr/dome-sculpt/artifacts/context-lifecycle-v2-20261111/probe-sanitize": "49e2ac940d331b7d89687cb8bf493945806d5df3cb2beb846a38e96114e23d41",
+        "/home/blux/de-xr/dome-sculpt/artifacts/context-lifecycle-v2-20261111/run.py": "b739c6ad5146e1dfc93c7a9148309d7155ebfe7d50e991549f149322929f7865",
+        "/home/blux/de-xr/dome-sculpt/artifacts/resume-integration-20261111/third_party/openbrush/graphics.cpp": "33a1dcc1dea8b4890aa9e233f0266e113bf94d2c4fda2ff5448b0b3c0f63bd38",
+        "/home/blux/de-xr/dome-sculpt/artifacts/resume-integration-20261111/third_party/openbrush/graphics.h": "003741d9689a4c3a1e6af7c06d7462fee0e88fb302a1a1fb7ccc1d7221d13f5c",
+        "/usr/lib64/libEGL_mesa.so.0.0.0": "c786fa61da74b62ae0b8ab9fdb9bc020be92c02896d37220c58724107195002c",
+        "/usr/lib64/libgallium-26.2.5.so": "033e3135e977d3e5fc6b63624573febe48b2e567c0e47da49d3125d9de8d1839",
+        "/home/blux/de-xr/dome-sculpt/artifacts/strict-arc-20261111/control/graphics-v3.py": "0606a923f5fbe1a4da5ffd973ae3b541d0bb343cd55614a33ee2f3edef9f6a7a",
+        "/home/blux/de-xr/dome-sculpt/artifacts/strict-arc-20261111/control/mount_identity.py": "1e2c6a322ae8797c78f9a2693d7e2e18aab9dd8d6472babbeb81334971904c81"
+      },
+      "cases": [
+        {
+          "device": "arc",
+          "mode": "success",
+          "exit": 0,
+          "intended_exit": 0,
+          "body_completed": true,
+          "clean_expected_exit": true,
+          "sanitizer_diagnostic": false,
+          "peak_RSS": 83935232,
+          "seconds": 0.2160628249985166,
+          "leak_summaries": [],
+          "failure_lines": [],
+          "identity_lines": [
+            "DIAGNOSTIC_IDENTITY renderer=Mesa Intel(R) Arc(tm) A770 Graphics (DG2) EGLDeviceNode=\"/dev/dri/renderD129\" requestedRenderNode=\"/dev/dri/renderD129\""
+          ],
+          "after_owned_scope": {
+            "client_api": 12450,
+            "context": "0",
+            "display": "0"
+          },
+          "after_thread_release": null,
+          "caught_refusal": null,
+          "EGL_screen_node": "/dev/dri/renderD129",
+          "GL_renderer": "Mesa Intel(R) Arc(tm) A770 Graphics (DG2)",
+          "requested_render_node": "/dev/dri/renderD129",
+          "live_screen_FDs": [
+            {
+              "fd": "3",
+              "inode": 1171,
+              "rdev": 57985,
+              "target": "/dev/dri/renderD129"
+            },
+            {
+              "fd": "4",
+              "inode": 1171,
+              "rdev": 57985,
+              "target": "/dev/dri/renderD129"
+            },
+            {
+              "fd": "5",
+              "inode": 1171,
+              "rdev": 57985,
+              "target": "/dev/dri/renderD129"
+            },
+            {
+              "fd": "6",
+              "inode": 1171,
+              "rdev": 57985,
+              "target": "/dev/dri/renderD129"
+            }
+          ],
+          "live_requested_render_FDs": [
+            {
+              "fd": "3",
+              "inode": 1171,
+              "rdev": 57985,
+              "target": "/dev/dri/renderD129"
+            },
+            {
+              "fd": "4",
+              "inode": 1171,
+              "rdev": 57985,
+              "target": "/dev/dri/renderD129"
+            },
+            {
+              "fd": "5",
+              "inode": 1171,
+              "rdev": 57985,
+              "target": "/dev/dri/renderD129"
+            },
+            {
+              "fd": "6",
+              "inode": 1171,
+              "rdev": 57985,
+              "target": "/dev/dri/renderD129"
+            }
+          ],
+          "log": {
+            "path": "/home/blux/de-xr/dome-sculpt/artifacts/context-lifecycle-v2-20261111/run-1794402945058965619/arc-success/process.log",
+            "sha256": "1d010262ecd8941d4ce2f540ee95d2f392f1a52daffe2a185a78e6d8b784f92f"
+          }
+        },
+        {
+          "device": "arc",
+          "mode": "refusal",
+          "exit": 1,
+          "intended_exit": 1,
+          "body_completed": true,
+          "clean_expected_exit": true,
+          "sanitizer_diagnostic": false,
+          "peak_RSS": 86310912,
+          "seconds": 0.18886105302954093,
+          "leak_summaries": [],
+          "failure_lines": [],
+          "identity_lines": [
+            "DIAGNOSTIC_IDENTITY renderer=Mesa Intel(R) Arc(tm) A770 Graphics (DG2) EGLDeviceNode=\"/dev/dri/renderD129\" requestedRenderNode=\"/dev/dri/renderD129\""
+          ],
+          "after_owned_scope": {
+            "client_api": 12450,
+            "context": "0",
+            "display": "0"
+          },
+          "after_thread_release": null,
+          "caught_refusal": "deliberate typed early C++ refusal after a ready owned context",
+          "EGL_screen_node": "/dev/dri/renderD129",
+          "GL_renderer": "Mesa Intel(R) Arc(tm) A770 Graphics (DG2)",
+          "requested_render_node": "/dev/dri/renderD129",
+          "live_screen_FDs": [
+            {
+              "fd": "3",
+              "inode": 1171,
+              "rdev": 57985,
+              "target": "/dev/dri/renderD129"
+            },
+            {
+              "fd": "4",
+              "inode": 1171,
+              "rdev": 57985,
+              "target": "/dev/dri/renderD129"
+            },
+            {
+              "fd": "5",
+              "inode": 1171,
+              "rdev": 57985,
+              "target": "/dev/dri/renderD129"
+            },
+            {
+              "fd": "6",
+              "inode": 1171,
+              "rdev": 57985,
+              "target": "/dev/dri/renderD129"
+            }
+          ],
+          "live_requested_render_FDs": [
+            {
+              "fd": "3",
+              "inode": 1171,
+              "rdev": 57985,
+              "target": "/dev/dri/renderD129"
+            },
+            {
+              "fd": "4",
+              "inode": 1171,
+              "rdev": 57985,
+              "target": "/dev/dri/renderD129"
+            },
+            {
+              "fd": "5",
+              "inode": 1171,
+              "rdev": 57985,
+              "target": "/dev/dri/renderD129"
+            },
+            {
+              "fd": "6",
+              "inode": 1171,
+              "rdev": 57985,
+              "target": "/dev/dri/renderD129"
+            }
+          ],
+          "log": {
+            "path": "/home/blux/de-xr/dome-sculpt/artifacts/context-lifecycle-v2-20261111/run-1794402945058965619/arc-refusal/process.log",
+            "sha256": "098f363547f1380084cb535a6aa8b271d1cce7fbe40f61904def1ef8eb89240b"
+          }
+        },
+        {
+          "device": "arc",
+          "mode": "success-release",
+          "exit": 0,
+          "intended_exit": 0,
+          "body_completed": true,
+          "clean_expected_exit": true,
+          "sanitizer_diagnostic": false,
+          "peak_RSS": 85282816,
+          "seconds": 0.19127247197320685,
+          "leak_summaries": [],
+          "failure_lines": [],
+          "identity_lines": [
+            "DIAGNOSTIC_IDENTITY renderer=Mesa Intel(R) Arc(tm) A770 Graphics (DG2) EGLDeviceNode=\"/dev/dri/renderD129\" requestedRenderNode=\"/dev/dri/renderD129\""
+          ],
+          "after_owned_scope": {
+            "client_api": 12450,
+            "context": "0",
+            "display": "0"
+          },
+          "after_thread_release": {
+            "client_api": 12448,
+            "context": "0",
+            "display": "0"
+          },
+          "caught_refusal": null,
+          "EGL_screen_node": "/dev/dri/renderD129",
+          "GL_renderer": "Mesa Intel(R) Arc(tm) A770 Graphics (DG2)",
+          "requested_render_node": "/dev/dri/renderD129",
+          "live_screen_FDs": [
+            {
+              "fd": "3",
+              "inode": 1171,
+              "rdev": 57985,
+              "target": "/dev/dri/renderD129"
+            },
+            {
+              "fd": "4",
+              "inode": 1171,
+              "rdev": 57985,
+              "target": "/dev/dri/renderD129"
+            },
+            {
+              "fd": "5",
+              "inode": 1171,
+              "rdev": 57985,
+              "target": "/dev/dri/renderD129"
+            },
+            {
+              "fd": "6",
+              "inode": 1171,
+              "rdev": 57985,
+              "target": "/dev/dri/renderD129"
+            }
+          ],
+          "live_requested_render_FDs": [
+            {
+              "fd": "3",
+              "inode": 1171,
+              "rdev": 57985,
+              "target": "/dev/dri/renderD129"
+            },
+            {
+              "fd": "4",
+              "inode": 1171,
+              "rdev": 57985,
+              "target": "/dev/dri/renderD129"
+            },
+            {
+              "fd": "5",
+              "inode": 1171,
+              "rdev": 57985,
+              "target": "/dev/dri/renderD129"
+            },
+            {
+              "fd": "6",
+              "inode": 1171,
+              "rdev": 57985,
+              "target": "/dev/dri/renderD129"
+            }
+          ],
+          "log": {
+            "path": "/home/blux/de-xr/dome-sculpt/artifacts/context-lifecycle-v2-20261111/run-1794402945058965619/arc-success-release/process.log",
+            "sha256": "95e7aae71f6653a9183eabe67090aaa271e214c8a1de7fe1143003e72d2f2b92"
+          }
+        },
+        {
+          "device": "arc",
+          "mode": "refusal-release",
+          "exit": 1,
+          "intended_exit": 1,
+          "body_completed": true,
+          "clean_expected_exit": true,
+          "sanitizer_diagnostic": false,
+          "peak_RSS": 85544960,
+          "seconds": 0.1881283280090429,
+          "leak_summaries": [],
+          "failure_lines": [],
+          "identity_lines": [
+            "DIAGNOSTIC_IDENTITY renderer=Mesa Intel(R) Arc(tm) A770 Graphics (DG2) EGLDeviceNode=\"/dev/dri/renderD129\" requestedRenderNode=\"/dev/dri/renderD129\""
+          ],
+          "after_owned_scope": {
+            "client_api": 12450,
+            "context": "0",
+            "display": "0"
+          },
+          "after_thread_release": {
+            "client_api": 12448,
+            "context": "0",
+            "display": "0"
+          },
+          "caught_refusal": "deliberate typed early C++ refusal after a ready owned context",
+          "EGL_screen_node": "/dev/dri/renderD129",
+          "GL_renderer": "Mesa Intel(R) Arc(tm) A770 Graphics (DG2)",
+          "requested_render_node": "/dev/dri/renderD129",
+          "live_screen_FDs": [
+            {
+              "fd": "3",
+              "inode": 1171,
+              "rdev": 57985,
+              "target": "/dev/dri/renderD129"
+            },
+            {
+              "fd": "4",
+              "inode": 1171,
+              "rdev": 57985,
+              "target": "/dev/dri/renderD129"
+            },
+            {
+              "fd": "5",
+              "inode": 1171,
+              "rdev": 57985,
+              "target": "/dev/dri/renderD129"
+            },
+            {
+              "fd": "6",
+              "inode": 1171,
+              "rdev": 57985,
+              "target": "/dev/dri/renderD129"
+            }
+          ],
+          "live_requested_render_FDs": [
+            {
+              "fd": "3",
+              "inode": 1171,
+              "rdev": 57985,
+              "target": "/dev/dri/renderD129"
+            },
+            {
+              "fd": "4",
+              "inode": 1171,
+              "rdev": 57985,
+              "target": "/dev/dri/renderD129"
+            },
+            {
+              "fd": "5",
+              "inode": 1171,
+              "rdev": 57985,
+              "target": "/dev/dri/renderD129"
+            },
+            {
+              "fd": "6",
+              "inode": 1171,
+              "rdev": 57985,
+              "target": "/dev/dri/renderD129"
+            }
+          ],
+          "log": {
+            "path": "/home/blux/de-xr/dome-sculpt/artifacts/context-lifecycle-v2-20261111/run-1794402945058965619/arc-refusal-release/process.log",
+            "sha256": "e6c3a5d0c33dea72cb27918b7a476eca8d33f27db961a223ceb01314d738d83c"
+          }
+        },
+        {
+          "device": "arc",
+          "mode": "other-current",
+          "exit": 0,
+          "intended_exit": 0,
+          "body_completed": true,
+          "clean_expected_exit": true,
+          "sanitizer_diagnostic": false,
+          "peak_RSS": 84856832,
+          "seconds": 0.18343031901167706,
+          "leak_summaries": [],
+          "failure_lines": [],
+          "identity_lines": [
+            "DIAGNOSTIC_IDENTITY renderer=Mesa Intel(R) Arc(tm) A770 Graphics (DG2) EGLDeviceNode=\"/dev/dri/renderD129\" requestedRenderNode=\"/dev/dri/renderD129\"",
+            "DIAGNOSTIC_IDENTITY renderer=Mesa Intel(R) Arc(tm) A770 Graphics (DG2) EGLDeviceNode=\"/dev/dri/renderD129\" requestedRenderNode=\"/dev/dri/renderD129\"",
+            "DIAGNOSTIC_IDENTITY renderer=Mesa Intel(R) Arc(tm) A770 Graphics (DG2) EGLDeviceNode=\"/dev/dri/renderD129\" requestedRenderNode=\"/dev/dri/renderD129\""
+          ],
+          "after_owned_scope": null,
+          "after_thread_release": {
+            "client_api": 12448,
+            "context": "0",
+            "display": "0"
+          },
+          "caught_refusal": null,
+          "EGL_screen_node": "/dev/dri/renderD129",
+          "GL_renderer": "Mesa Intel(R) Arc(tm) A770 Graphics (DG2)",
+          "requested_render_node": "/dev/dri/renderD129",
+          "live_screen_FDs": [
+            {
+              "fd": "3",
+              "inode": 1171,
+              "rdev": 57985,
+              "target": "/dev/dri/renderD129"
+            },
+            {
+              "fd": "4",
+              "inode": 1171,
+              "rdev": 57985,
+              "target": "/dev/dri/renderD129"
+            },
+            {
+              "fd": "5",
+              "inode": 1171,
+              "rdev": 57985,
+              "target": "/dev/dri/renderD129"
+            },
+            {
+              "fd": "6",
+              "inode": 1171,
+              "rdev": 57985,
+              "target": "/dev/dri/renderD129"
+            },
+            {
+              "fd": "7",
+              "inode": 1171,
+              "rdev": 57985,
+              "target": "/dev/dri/renderD129"
+            },
+            {
+              "fd": "8",
+              "inode": 1171,
+              "rdev": 57985,
+              "target": "/dev/dri/renderD129"
+            },
+            {
+              "fd": "9",
+              "inode": 1171,
+              "rdev": 57985,
+              "target": "/dev/dri/renderD129"
+            }
+          ],
+          "live_requested_render_FDs": [
+            {
+              "fd": "3",
+              "inode": 1171,
+              "rdev": 57985,
+              "target": "/dev/dri/renderD129"
+            },
+            {
+              "fd": "4",
+              "inode": 1171,
+              "rdev": 57985,
+              "target": "/dev/dri/renderD129"
+            },
+            {
+              "fd": "5",
+              "inode": 1171,
+              "rdev": 57985,
+              "target": "/dev/dri/renderD129"
+            },
+            {
+              "fd": "6",
+              "inode": 1171,
+              "rdev": 57985,
+              "target": "/dev/dri/renderD129"
+            },
+            {
+              "fd": "7",
+              "inode": 1171,
+              "rdev": 57985,
+              "target": "/dev/dri/renderD129"
+            },
+            {
+              "fd": "8",
+              "inode": 1171,
+              "rdev": 57985,
+              "target": "/dev/dri/renderD129"
+            },
+            {
+              "fd": "9",
+              "inode": 1171,
+              "rdev": 57985,
+              "target": "/dev/dri/renderD129"
+            }
+          ],
+          "log": {
+            "path": "/home/blux/de-xr/dome-sculpt/artifacts/context-lifecycle-v2-20261111/run-1794402945058965619/arc-other-current/process.log",
+            "sha256": "96d08c0aeb17d0f41e10748571f6ba0be2eccf23cec9eee36a4fc84560e569dc"
+          }
+        },
+        {
+          "device": "uhd",
+          "mode": "success",
+          "exit": -6,
+          "intended_exit": 0,
+          "body_completed": true,
+          "clean_expected_exit": false,
+          "sanitizer_diagnostic": true,
+          "peak_RSS": 135315456,
+          "seconds": 0.4260697519639507,
+          "leak_summaries": [
+            "SUMMARY: AddressSanitizer: 132268 byte(s) leaked in 1142 allocation(s)."
+          ],
+          "failure_lines": [],
+          "identity_lines": [
+            "DIAGNOSTIC_IDENTITY renderer=Mesa Intel(R) UHD Graphics 770 (ADL-S GT1) EGLDeviceNode=\"/dev/dri/renderD129\" requestedRenderNode=\"/dev/dri/renderD128\""
+          ],
+          "after_owned_scope": {
+            "client_api": 12450,
+            "context": "0",
+            "display": "0"
+          },
+          "after_thread_release": null,
+          "caught_refusal": null,
+          "EGL_screen_node": "/dev/dri/renderD129",
+          "GL_renderer": "Mesa Intel(R) UHD Graphics 770 (ADL-S GT1)",
+          "requested_render_node": "/dev/dri/renderD128",
+          "live_screen_FDs": [
+            {
+              "fd": "3",
+              "inode": 1171,
+              "rdev": 57985,
+              "target": "/dev/dri/renderD129"
+            },
+            {
+              "fd": "5",
+              "inode": 1171,
+              "rdev": 57985,
+              "target": "/dev/dri/renderD129"
+            },
+            {
+              "fd": "6",
+              "inode": 1171,
+              "rdev": 57985,
+              "target": "/dev/dri/renderD129"
+            },
+            {
+              "fd": "7",
+              "inode": 1171,
+              "rdev": 57985,
+              "target": "/dev/dri/renderD129"
+            }
+          ],
+          "live_requested_render_FDs": [
+            {
+              "fd": "4",
+              "inode": 1159,
+              "rdev": 57984,
+              "target": "/dev/dri/renderD128"
+            },
+            {
+              "fd": "8",
+              "inode": 1159,
+              "rdev": 57984,
+              "target": "/dev/dri/renderD128"
+            },
+            {
+              "fd": "9",
+              "inode": 1159,
+              "rdev": 57984,
+              "target": "/dev/dri/renderD128"
+            },
+            {
+              "fd": "10",
+              "inode": 1159,
+              "rdev": 57984,
+              "target": "/dev/dri/renderD128"
+            }
+          ],
+          "log": {
+            "path": "/home/blux/de-xr/dome-sculpt/artifacts/context-lifecycle-v2-20261111/run-1794402945058965619/uhd-success/process.log",
+            "sha256": "1eeb6b5e2e74d8c7f05cd9ac6fc57c3a761d0a0e14dc00a3e8ad9bfd57b34ca2"
+          }
+        },
+        {
+          "device": "uhd",
+          "mode": "refusal",
+          "exit": -6,
+          "intended_exit": 1,
+          "body_completed": true,
+          "clean_expected_exit": false,
+          "sanitizer_diagnostic": true,
+          "peak_RSS": 135446528,
+          "seconds": 0.5060539819533005,
+          "leak_summaries": [
+            "SUMMARY: AddressSanitizer: 132268 byte(s) leaked in 1142 allocation(s)."
+          ],
+          "failure_lines": [],
+          "identity_lines": [
+            "DIAGNOSTIC_IDENTITY renderer=Mesa Intel(R) UHD Graphics 770 (ADL-S GT1) EGLDeviceNode=\"/dev/dri/renderD129\" requestedRenderNode=\"/dev/dri/renderD128\""
+          ],
+          "after_owned_scope": {
+            "client_api": 12450,
+            "context": "0",
+            "display": "0"
+          },
+          "after_thread_release": null,
+          "caught_refusal": "deliberate typed early C++ refusal after a ready owned context",
+          "EGL_screen_node": "/dev/dri/renderD129",
+          "GL_renderer": "Mesa Intel(R) UHD Graphics 770 (ADL-S GT1)",
+          "requested_render_node": "/dev/dri/renderD128",
+          "live_screen_FDs": [
+            {
+              "fd": "3",
+              "inode": 1171,
+              "rdev": 57985,
+              "target": "/dev/dri/renderD129"
+            },
+            {
+              "fd": "5",
+              "inode": 1171,
+              "rdev": 57985,
+              "target": "/dev/dri/renderD129"
+            },
+            {
+              "fd": "6",
+              "inode": 1171,
+              "rdev": 57985,
+              "target": "/dev/dri/renderD129"
+            },
+            {
+              "fd": "7",
+              "inode": 1171,
+              "rdev": 57985,
+              "target": "/dev/dri/renderD129"
+            }
+          ],
+          "live_requested_render_FDs": [
+            {
+              "fd": "4",
+              "inode": 1159,
+              "rdev": 57984,
+              "target": "/dev/dri/renderD128"
+            },
+            {
+              "fd": "8",
+              "inode": 1159,
+              "rdev": 57984,
+              "target": "/dev/dri/renderD128"
+            },
+            {
+              "fd": "9",
+              "inode": 1159,
+              "rdev": 57984,
+              "target": "/dev/dri/renderD128"
+            },
+            {
+              "fd": "10",
+              "inode": 1159,
+              "rdev": 57984,
+              "target": "/dev/dri/renderD128"
+            }
+          ],
+          "log": {
+            "path": "/home/blux/de-xr/dome-sculpt/artifacts/context-lifecycle-v2-20261111/run-1794402945058965619/uhd-refusal/process.log",
+            "sha256": "27bed7696fd51014599a79b37b05201d40a4a7dda83453e48179a008b987d7ef"
+          }
+        },
+        {
+          "device": "uhd",
+          "mode": "success-release",
+          "exit": -6,
+          "intended_exit": 0,
+          "body_completed": true,
+          "clean_expected_exit": false,
+          "sanitizer_diagnostic": true,
+          "peak_RSS": 135323648,
+          "seconds": 0.43791434000013396,
+          "leak_summaries": [
+            "SUMMARY: AddressSanitizer: 132268 byte(s) leaked in 1142 allocation(s)."
+          ],
+          "failure_lines": [],
+          "identity_lines": [
+            "DIAGNOSTIC_IDENTITY renderer=Mesa Intel(R) UHD Graphics 770 (ADL-S GT1) EGLDeviceNode=\"/dev/dri/renderD129\" requestedRenderNode=\"/dev/dri/renderD128\""
+          ],
+          "after_owned_scope": {
+            "client_api": 12450,
+            "context": "0",
+            "display": "0"
+          },
+          "after_thread_release": {
+            "client_api": 12448,
+            "context": "0",
+            "display": "0"
+          },
+          "caught_refusal": null,
+          "EGL_screen_node": "/dev/dri/renderD129",
+          "GL_renderer": "Mesa Intel(R) UHD Graphics 770 (ADL-S GT1)",
+          "requested_render_node": "/dev/dri/renderD128",
+          "live_screen_FDs": [
+            {
+              "fd": "3",
+              "inode": 1171,
+              "rdev": 57985,
+              "target": "/dev/dri/renderD129"
+            },
+            {
+              "fd": "5",
+              "inode": 1171,
+              "rdev": 57985,
+              "target": "/dev/dri/renderD129"
+            },
+            {
+              "fd": "6",
+              "inode": 1171,
+              "rdev": 57985,
+              "target": "/dev/dri/renderD129"
+            },
+            {
+              "fd": "7",
+              "inode": 1171,
+              "rdev": 57985,
+              "target": "/dev/dri/renderD129"
+            }
+          ],
+          "live_requested_render_FDs": [
+            {
+              "fd": "4",
+              "inode": 1159,
+              "rdev": 57984,
+              "target": "/dev/dri/renderD128"
+            },
+            {
+              "fd": "8",
+              "inode": 1159,
+              "rdev": 57984,
+              "target": "/dev/dri/renderD128"
+            },
+            {
+              "fd": "9",
+              "inode": 1159,
+              "rdev": 57984,
+              "target": "/dev/dri/renderD128"
+            },
+            {
+              "fd": "10",
+              "inode": 1159,
+              "rdev": 57984,
+              "target": "/dev/dri/renderD128"
+            }
+          ],
+          "log": {
+            "path": "/home/blux/de-xr/dome-sculpt/artifacts/context-lifecycle-v2-20261111/run-1794402945058965619/uhd-success-release/process.log",
+            "sha256": "2effaa5b3e5782f818bb059cdf98b60b33de701ddfb8ec8632c1f071f107365d"
+          }
+        },
+        {
+          "device": "uhd",
+          "mode": "refusal-release",
+          "exit": -6,
+          "intended_exit": 1,
+          "body_completed": true,
+          "clean_expected_exit": false,
+          "sanitizer_diagnostic": true,
+          "peak_RSS": 135675904,
+          "seconds": 0.47706668300088495,
+          "leak_summaries": [
+            "SUMMARY: AddressSanitizer: 132268 byte(s) leaked in 1142 allocation(s)."
+          ],
+          "failure_lines": [],
+          "identity_lines": [
+            "DIAGNOSTIC_IDENTITY renderer=Mesa Intel(R) UHD Graphics 770 (ADL-S GT1) EGLDeviceNode=\"/dev/dri/renderD129\" requestedRenderNode=\"/dev/dri/renderD128\""
+          ],
+          "after_owned_scope": {
+            "client_api": 12450,
+            "context": "0",
+            "display": "0"
+          },
+          "after_thread_release": {
+            "client_api": 12448,
+            "context": "0",
+            "display": "0"
+          },
+          "caught_refusal": "deliberate typed early C++ refusal after a ready owned context",
+          "EGL_screen_node": "/dev/dri/renderD129",
+          "GL_renderer": "Mesa Intel(R) UHD Graphics 770 (ADL-S GT1)",
+          "requested_render_node": "/dev/dri/renderD128",
+          "live_screen_FDs": [
+            {
+              "fd": "3",
+              "inode": 1171,
+              "rdev": 57985,
+              "target": "/dev/dri/renderD129"
+            },
+            {
+              "fd": "5",
+              "inode": 1171,
+              "rdev": 57985,
+              "target": "/dev/dri/renderD129"
+            },
+            {
+              "fd": "6",
+              "inode": 1171,
+              "rdev": 57985,
+              "target": "/dev/dri/renderD129"
+            },
+            {
+              "fd": "7",
+              "inode": 1171,
+              "rdev": 57985,
+              "target": "/dev/dri/renderD129"
+            }
+          ],
+          "live_requested_render_FDs": [
+            {
+              "fd": "4",
+              "inode": 1159,
+              "rdev": 57984,
+              "target": "/dev/dri/renderD128"
+            },
+            {
+              "fd": "8",
+              "inode": 1159,
+              "rdev": 57984,
+              "target": "/dev/dri/renderD128"
+            },
+            {
+              "fd": "9",
+              "inode": 1159,
+              "rdev": 57984,
+              "target": "/dev/dri/renderD128"
+            },
+            {
+              "fd": "10",
+              "inode": 1159,
+              "rdev": 57984,
+              "target": "/dev/dri/renderD128"
+            }
+          ],
+          "log": {
+            "path": "/home/blux/de-xr/dome-sculpt/artifacts/context-lifecycle-v2-20261111/run-1794402945058965619/uhd-refusal-release/process.log",
+            "sha256": "1102d472f0d583495f5cf4a65f1210f14501c96ae33248a325d32f00c10ad172"
+          }
+        }
+      ]
+    }
+  ],
+  "conclusion": "Arc ordinarysuccess/typedrefusal \u00b1successfulpostscopeeglReleaseThread clean; distinctothercurrentArc preservationclean. UHDoffload all4 bodiescompleted withno-current afterscope; all4same132268B/1142leak evenordinarysuccess andsuccessfulpostscopeeglReleaseThread. Earlyrefusal notnecessary; blanketthreadrelease notfix inthissetup. Exactprovider/rootcauseunresolved.",
+  "identity_limit": "UHDGLrenderer with ArcEGLDevice129 screen and bothArc/UHDliveFDs; originalUHDobserverthrows atGLrenderer beforeEGLdevicechecks. v1strictsame-nodeidentityfails retained. No UHDRendering==UHDEGLDevice assertion. Othercurrent onlydistinctArcOpenGLdisplays, not same-display/sharedowner/allAPIs.",
+  "coordination": "Shared Arcflock afterrootP1 terminal0 andarmoragentyield; allleasesreleased aftermatrix."
+}
