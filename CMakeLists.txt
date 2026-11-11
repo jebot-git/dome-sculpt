@@ -1610,6 +1610,12 @@ if(BUILD_TESTING)
   target_link_libraries(dome-sculpt-sculpt-chunk-pipeline-test PRIVATE dome-sculpt-core)
   add_test(NAME sculpt-chunk-pipeline COMMAND dome-sculpt-sculpt-chunk-pipeline-test ${CMAKE_CURRENT_BINARY_DIR}/sculpt-chunk-pipeline)
 
+  add_executable(dome-sculpt-native-read-cancel-test tests/native-read-cancel.cpp)
+  target_include_directories(dome-sculpt-native-read-cancel-test PRIVATE src)
+  target_link_libraries(dome-sculpt-native-read-cancel-test PRIVATE dome-sculpt-core)
+  add_test(NAME native-read-cancel COMMAND dome-sculpt-native-read-cancel-test ${CMAKE_CURRENT_BINARY_DIR}/native-read-cancel-output)
+  set_tests_properties(native-read-cancel PROPERTIES TIMEOUT 180)
+
   add_executable(dome-sculpt-native-scene-geometry-intern-test tests/native-scene-geometry-intern.cpp)
   target_include_directories(dome-sculpt-native-scene-geometry-intern-test PRIVATE src)
   target_link_libraries(dome-sculpt-native-scene-geometry-intern-test PRIVATE dome-sculpt-core)
