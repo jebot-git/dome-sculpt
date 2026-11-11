@@ -1,0 +1,327 @@
+{
+  "tested_source": "82f527570e9727df12632b6339f7c2cb59afb4c4",
+  "base_main": "820743158d81f3cc5cd47d12fd7592ff5c23f78d",
+  "product_source": "507d6edaae1abd0e9172b28fe8ace7d600c46131",
+  "scope": "Fresh combined configure and small GPU kernel/shared EGL helper compilation/software controls only. No combined core/app/UI/OpenXR/Arc/headset qualification.",
+  "source_before_sha256": "661b105b27ccaf13fdba088581171838a00384dadfc8bafdade8a8c2011bb798",
+  "source_drift_during_tests": [],
+  "tested_file_sha256": {
+    "CMakeLists.txt": "c36686146eef8c04e9faac6d93d7450b3b8a296fdb5d2a0779350acf10908e84",
+    "src/render.cpp": "ee2b50209e9f031a5cdc3463f49c647716dfea43b58a62d486f72227567f7452",
+    "tests/sculpt-chunk-render.cpp": "3417934f77801341f3b7a126ab76c477151c9153cc6667a40180a35537fae6e6",
+    "src/paint.cpp": "24e4c67437aeac7324473b75f7148e853209e87c62042b9624b996b5fdfc65a6",
+    "src/paint-blur-gpu.cpp": "638f54652fb2556f992e5279b0498908b5e99fde17fbd3189b4f2a2c4af0bebe",
+    "src/document-paint-blur.cpp": "7a70cdcd20afb404e65473edc6c3508f4b645c8019eee1d8e8da88dea50364da",
+    "src/texture-set-stroke.cpp": "f4c5788c4a8dc4f09c375de36b25f93f94f4e5a93df56403221bd29dcdbb076a",
+    "third_party/openbrush/graphics.cpp": "49d48cb07bbbf3b57ec3845d3dec4a67a40a066b867b8b3c23a8a062c56e2016",
+    "third_party/desktop/bdf_font.hpp": "2c4f7bc4af8f9eb715271e4a2b226c1bd7a07480469ea0e4678493a5822e3267",
+    "tests/gpu-color-blur-kernel.cpp": "5ae16c790d3838a2ae8a24cac81e0b1cd330fc411ed20a19bf35cbf9e336ae9c",
+    "tests/native-graphics-shared.cpp": "ce69c4af7429c7f52705905c196c8e61178bcae9424feb92e859c0f51233e6e4",
+    "cmake/armorpaint-blur-weights.cmake": "428485bdaa5c109cdc92e44fcfa33e161066c83135ae7bdd32f97ec15797cf75",
+    "experiments/armorpaint-blur/vendor/make_blur.c": "a2403c5ef2ffd23fc5a1798b47c04b29ecc9e5362faa8f16f20e4f842314fbf4"
+  },
+  "profiles": {
+    "release": {
+      "configure": {
+        "profile": "release",
+        "source": "82f527570e9727df12632b6339f7c2cb59afb4c4",
+        "command": [
+          "cmake",
+          "-S",
+          "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-integration-20261111",
+          "-B",
+          "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/release",
+          "-G",
+          "Ninja",
+          "-DDOME_COMPUTE_BACKEND=CPU",
+          "-DDOME_BUILD_UI=ON",
+          "-DDOME_BUILD_XR=ON",
+          "-DBUILD_TESTING=ON",
+          "-DCMAKE_EXPORT_COMPILE_COMMANDS=ON",
+          "-DFLTK_DIR=/home/blux/de-xr/dome-sculpt/artifacts/sdk-20261111/toolkit-release/share/fltk",
+          "-DCMAKE_PROJECT_INCLUDE=/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/pools.cmake",
+          "-DCMAKE_CXX_ARCHIVE_CREATE=<CMAKE_AR> qcT <TARGET> <LINK_FLAGS> <OBJECTS>",
+          "-DCMAKE_C_ARCHIVE_CREATE=<CMAKE_AR> qcT <TARGET> <LINK_FLAGS> <OBJECTS>",
+          "-DCMAKE_BUILD_TYPE=Release",
+          "-DCMAKE_CXX_FLAGS_RELEASE=-O3 -DNDEBUG -ffunction-sections -fdata-sections",
+          "-DCMAKE_C_FLAGS_RELEASE=-O3 -DNDEBUG -ffunction-sections -fdata-sections",
+          "-DCMAKE_EXE_LINKER_FLAGS=-Wl,--gc-sections"
+        ],
+        "exit": 0,
+        "seconds": 8.75413595099235,
+        "log_sha256": "dc38d3cbfc1aaf23a0f6787d6dee34b88a7b53f32623c428cd33d5e22c105dcb",
+        "sdk_receipt_sha256": "3a1d3014a5eb13e37f28f39e60b0d8596a5accf80a540b516aa88806b86983f0",
+        "scope": "Configure only, no new combined runtime qualification."
+      },
+      "build": {
+        "state": "terminal",
+        "pid": 1997685,
+        "child_pid": 1997738,
+        "command": [
+          "nice",
+          "-n",
+          "10",
+          "cmake",
+          "--build",
+          "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/release",
+          "--parallel",
+          "1",
+          "--target",
+          "dome-sculpt-gpu-color-blur-kernel-test",
+          "dome-sculpt-native-graphics-shared-test"
+        ],
+        "scope": "Fresh small GPU kernel/shared helper targets only; no combined core/app build or command-workflow claim.",
+        "exit": 0,
+        "seconds": 7.622617429995444,
+        "log_sha256": "c4889eec713e49c036fe03d5e54a7e08f37f5c5d96d8e2740ca7d97963209377"
+      },
+      "compiled": [
+        {
+          "file": "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-integration-20261111/third_party/openbrush/graphics.cpp",
+          "command": "/usr/bin/c++ -I/home/blux/de-xr/dome-sculpt/artifacts/paint-main-integration-20261111/third_party/openbrush -O3 -DNDEBUG -ffunction-sections -fdata-sections -std=gnu++20 -o CMakeFiles/dome-sculpt-native-graphics.dir/third_party/openbrush/graphics.cpp.o -c /home/blux/de-xr/dome-sculpt/artifacts/paint-main-integration-20261111/third_party/openbrush/graphics.cpp",
+          "object": "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/release/CMakeFiles/dome-sculpt-native-graphics.dir/third_party/openbrush/graphics.cpp.o",
+          "object_sha256": "1eeefe19a0be0971636d358f58921874bf45ff5039c545dbbe466c1e687f6d5b"
+        },
+        {
+          "file": "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-integration-20261111/src/paint-blur-gpu.cpp",
+          "command": "/usr/bin/c++ -I/home/blux/de-xr/dome-sculpt/artifacts/paint-main-integration-20261111/include -I/home/blux/de-xr/dome-sculpt/artifacts/paint-main-integration-20261111/src -I/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/release/armorpaint-blur-generated -I/home/blux/de-xr/dome-sculpt/artifacts/paint-main-integration-20261111/third_party/openbrush -O3 -DNDEBUG -ffunction-sections -fdata-sections -std=gnu++20 -Wall -Wextra -Wpedantic -o CMakeFiles/dome-sculpt-paint-gpu.dir/src/paint-blur-gpu.cpp.o -c /home/blux/de-xr/dome-sculpt/artifacts/paint-main-integration-20261111/src/paint-blur-gpu.cpp",
+          "object": "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/release/CMakeFiles/dome-sculpt-paint-gpu.dir/src/paint-blur-gpu.cpp.o",
+          "object_sha256": "3509ab0a38c699be959a832d5a497aecebbca0363de217602b4f7c6ffd05072d"
+        },
+        {
+          "file": "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-integration-20261111/tests/native-graphics-shared.cpp",
+          "command": "/usr/bin/c++ -I/home/blux/de-xr/dome-sculpt/artifacts/paint-main-integration-20261111/src -I/home/blux/de-xr/dome-sculpt/artifacts/paint-main-integration-20261111/include -I/home/blux/de-xr/dome-sculpt/artifacts/paint-main-integration-20261111/third_party/openbrush -O3 -DNDEBUG -ffunction-sections -fdata-sections -std=gnu++20 -o CMakeFiles/dome-sculpt-native-graphics-shared-test.dir/tests/native-graphics-shared.cpp.o -c /home/blux/de-xr/dome-sculpt/artifacts/paint-main-integration-20261111/tests/native-graphics-shared.cpp",
+          "object": "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/release/CMakeFiles/dome-sculpt-native-graphics-shared-test.dir/tests/native-graphics-shared.cpp.o",
+          "object_sha256": "3c0e8ab99400dd0978e88ef19711384005246fd2778113008a55a676ca210873"
+        },
+        {
+          "file": "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-integration-20261111/tests/gpu-color-blur-kernel.cpp",
+          "command": "/usr/bin/c++ -I/home/blux/de-xr/dome-sculpt/artifacts/paint-main-integration-20261111/src -I/home/blux/de-xr/dome-sculpt/artifacts/paint-main-integration-20261111/include -O3 -DNDEBUG -ffunction-sections -fdata-sections -std=gnu++20 -o CMakeFiles/dome-sculpt-gpu-color-blur-kernel-test.dir/tests/gpu-color-blur-kernel.cpp.o -c /home/blux/de-xr/dome-sculpt/artifacts/paint-main-integration-20261111/tests/gpu-color-blur-kernel.cpp",
+          "object": "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/release/CMakeFiles/dome-sculpt-gpu-color-blur-kernel-test.dir/tests/gpu-color-blur-kernel.cpp.o",
+          "object_sha256": "b2d9cbe68c4121f773cbc785b08366b77d412bba72f212b65dbadbbb0e2a6d72"
+        }
+      ],
+      "generated_weights_sha256": "c0f95024fb12f1f9a71de70aed17cefd76cffab4bbd2686b651050a06d0d2560",
+      "tests": [
+        {
+          "profile": "release",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/release/dome-sculpt-gpu-color-blur-kernel-test",
+            "software"
+          ],
+          "exit": 0,
+          "timeout": false,
+          "seconds": 3.9019333249889314,
+          "log_sha256": "1cb3cf79e0f1db93f1a8b832d3e09b794892bf860f7705c8f3f68680f90e4374",
+          "maps_sha256": "5a5f04c1e19874b21ac1b9619638522838493ace3df16a3d6ac0602a1b3d307c",
+          "binary_sha256": "4ffd937814d1832b0f92b1eacd1dc3d57bc23cf7ffcf70a19aa455f866f37acb",
+          "libraries": {
+            "/usr/lib64/libgallium-26.2.5.so": "033e3135e977d3e5fc6b63624573febe48b2e567c0e47da49d3125d9de8d1839",
+            "/usr/lib64/libEGL_mesa.so.0.0.0": "c786fa61da74b62ae0b8ab9fdb9bc020be92c02896d37220c58724107195002c",
+            "/usr/lib64/libOpenGL.so.0.0.0": "07a014ea0624d5d9711f941fb0401a203c2025b683d34897bd1b261a32a83d69",
+            "/usr/lib64/libEGL.so.1.1.0": "76ffc090b8990696d028e7d1bc82606c564565fb05d2fa9e5f6122b61e9f1b60",
+            "/usr/lib64/libLLVM.so.22.1": "aec1ccf02e5cc4d161920d76dce31dbbb22efebf62da71ec3180b70ff15d77bb"
+          },
+          "environment": {
+            "LIBGL_ALWAYS_SOFTWARE": "1",
+            "LP_NUM_THREADS": "2",
+            "LD_LIBRARY_PATH": "/usr/lib64",
+            "ASAN_OPTIONS": null,
+            "UBSAN_OPTIONS": null,
+            "LSAN_OPTIONS": null
+          }
+        },
+        {
+          "profile": "release",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/release/dome-sculpt-native-graphics-shared-test",
+            "software"
+          ],
+          "exit": 0,
+          "timeout": false,
+          "seconds": 2.2789057279587723,
+          "log_sha256": "13dce0a6329f64c28cc1c58079662cdc14d9a3757d4d78995ba97f1bbe559cf2",
+          "maps_sha256": "923303e19bd57f483059fc7361b7a7830e0f67ed52da473f8d98cc29c27e51a9",
+          "binary_sha256": "56a94fe9bb0718118b36a89fd6d1bceb05964e322823b8fb606309fe9459050b",
+          "libraries": {
+            "/usr/lib64/libEGL_mesa.so.0.0.0": "c786fa61da74b62ae0b8ab9fdb9bc020be92c02896d37220c58724107195002c",
+            "/usr/lib64/libEGL.so.1.1.0": "76ffc090b8990696d028e7d1bc82606c564565fb05d2fa9e5f6122b61e9f1b60",
+            "/usr/lib64/libOpenGL.so.0.0.0": "07a014ea0624d5d9711f941fb0401a203c2025b683d34897bd1b261a32a83d69",
+            "/usr/lib64/libLLVM.so.22.1": "aec1ccf02e5cc4d161920d76dce31dbbb22efebf62da71ec3180b70ff15d77bb",
+            "/usr/lib64/libgallium-26.2.5.so": "033e3135e977d3e5fc6b63624573febe48b2e567c0e47da49d3125d9de8d1839"
+          },
+          "environment": {
+            "LIBGL_ALWAYS_SOFTWARE": "1",
+            "LP_NUM_THREADS": "2",
+            "LD_LIBRARY_PATH": "/usr/lib64",
+            "ASAN_OPTIONS": null,
+            "UBSAN_OPTIONS": null,
+            "LSAN_OPTIONS": null
+          }
+        }
+      ]
+    },
+    "sanitize": {
+      "configure": {
+        "profile": "sanitize",
+        "source": "82f527570e9727df12632b6339f7c2cb59afb4c4",
+        "command": [
+          "cmake",
+          "-S",
+          "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-integration-20261111",
+          "-B",
+          "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/sanitize",
+          "-G",
+          "Ninja",
+          "-DDOME_COMPUTE_BACKEND=CPU",
+          "-DDOME_BUILD_UI=ON",
+          "-DDOME_BUILD_XR=ON",
+          "-DBUILD_TESTING=ON",
+          "-DCMAKE_EXPORT_COMPILE_COMMANDS=ON",
+          "-DFLTK_DIR=/home/blux/de-xr/dome-sculpt/artifacts/sdk-20261111/toolkit-sanitize/share/fltk",
+          "-DCMAKE_PROJECT_INCLUDE=/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/pools.cmake",
+          "-DCMAKE_CXX_ARCHIVE_CREATE=<CMAKE_AR> qcT <TARGET> <LINK_FLAGS> <OBJECTS>",
+          "-DCMAKE_C_ARCHIVE_CREATE=<CMAKE_AR> qcT <TARGET> <LINK_FLAGS> <OBJECTS>",
+          "-DCMAKE_BUILD_TYPE=RelWithDebInfo",
+          "-DCMAKE_CXX_FLAGS_RELWITHDEBINFO=-O1 -g1 -DNDEBUG -fsanitize=address,undefined -fno-omit-frame-pointer -ffunction-sections -fdata-sections",
+          "-DCMAKE_C_FLAGS_RELWITHDEBINFO=-O1 -g1 -DNDEBUG -fsanitize=address,undefined -fno-omit-frame-pointer -ffunction-sections -fdata-sections",
+          "-DCMAKE_EXE_LINKER_FLAGS=-fsanitize=address,undefined -Wl,--gc-sections,--compress-debug-sections=zstd",
+          "-DCMAKE_SHARED_LINKER_FLAGS=-fsanitize=address,undefined"
+        ],
+        "exit": 0,
+        "seconds": 8.749146088026464,
+        "log_sha256": "8dd6517dcdba6612807ba05930e13bf956035ac8bb11a83455989725113c3915",
+        "sdk_receipt_sha256": "3a1d3014a5eb13e37f28f39e60b0d8596a5accf80a540b516aa88806b86983f0",
+        "scope": "Configure only, no new combined runtime qualification."
+      },
+      "build": {
+        "state": "terminal",
+        "pid": 1997685,
+        "child_pid": 1997740,
+        "command": [
+          "nice",
+          "-n",
+          "10",
+          "cmake",
+          "--build",
+          "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/sanitize",
+          "--parallel",
+          "1",
+          "--target",
+          "dome-sculpt-gpu-color-blur-kernel-test",
+          "dome-sculpt-native-graphics-shared-test"
+        ],
+        "scope": "Fresh small GPU kernel/shared helper targets only; no combined core/app build or command-workflow claim.",
+        "exit": 0,
+        "seconds": 10.240934244997334,
+        "log_sha256": "c4889eec713e49c036fe03d5e54a7e08f37f5c5d96d8e2740ca7d97963209377"
+      },
+      "compiled": [
+        {
+          "file": "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-integration-20261111/third_party/openbrush/graphics.cpp",
+          "command": "/usr/bin/c++ -I/home/blux/de-xr/dome-sculpt/artifacts/paint-main-integration-20261111/third_party/openbrush -O1 -g1 -DNDEBUG -fsanitize=address,undefined -fno-omit-frame-pointer -ffunction-sections -fdata-sections -std=gnu++20 -o CMakeFiles/dome-sculpt-native-graphics.dir/third_party/openbrush/graphics.cpp.o -c /home/blux/de-xr/dome-sculpt/artifacts/paint-main-integration-20261111/third_party/openbrush/graphics.cpp",
+          "object": "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/sanitize/CMakeFiles/dome-sculpt-native-graphics.dir/third_party/openbrush/graphics.cpp.o",
+          "object_sha256": "1aea52680ff970add83af2639328f593f2c5119d2f37c2568405057f16ca95ca"
+        },
+        {
+          "file": "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-integration-20261111/src/paint-blur-gpu.cpp",
+          "command": "/usr/bin/c++ -I/home/blux/de-xr/dome-sculpt/artifacts/paint-main-integration-20261111/include -I/home/blux/de-xr/dome-sculpt/artifacts/paint-main-integration-20261111/src -I/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/sanitize/armorpaint-blur-generated -I/home/blux/de-xr/dome-sculpt/artifacts/paint-main-integration-20261111/third_party/openbrush -O1 -g1 -DNDEBUG -fsanitize=address,undefined -fno-omit-frame-pointer -ffunction-sections -fdata-sections -std=gnu++20 -Wall -Wextra -Wpedantic -o CMakeFiles/dome-sculpt-paint-gpu.dir/src/paint-blur-gpu.cpp.o -c /home/blux/de-xr/dome-sculpt/artifacts/paint-main-integration-20261111/src/paint-blur-gpu.cpp",
+          "object": "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/sanitize/CMakeFiles/dome-sculpt-paint-gpu.dir/src/paint-blur-gpu.cpp.o",
+          "object_sha256": "e6c04029fd998c02778bd8c4d3f5b3f59b8d65209328040c0dff678eb2ce0560"
+        },
+        {
+          "file": "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-integration-20261111/tests/native-graphics-shared.cpp",
+          "command": "/usr/bin/c++ -I/home/blux/de-xr/dome-sculpt/artifacts/paint-main-integration-20261111/src -I/home/blux/de-xr/dome-sculpt/artifacts/paint-main-integration-20261111/include -I/home/blux/de-xr/dome-sculpt/artifacts/paint-main-integration-20261111/third_party/openbrush -O1 -g1 -DNDEBUG -fsanitize=address,undefined -fno-omit-frame-pointer -ffunction-sections -fdata-sections -std=gnu++20 -o CMakeFiles/dome-sculpt-native-graphics-shared-test.dir/tests/native-graphics-shared.cpp.o -c /home/blux/de-xr/dome-sculpt/artifacts/paint-main-integration-20261111/tests/native-graphics-shared.cpp",
+          "object": "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/sanitize/CMakeFiles/dome-sculpt-native-graphics-shared-test.dir/tests/native-graphics-shared.cpp.o",
+          "object_sha256": "571ec6c906c168baaf0592dd1d6f4d65af2413955d13c60b8a3b318a736227d7"
+        },
+        {
+          "file": "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-integration-20261111/tests/gpu-color-blur-kernel.cpp",
+          "command": "/usr/bin/c++ -I/home/blux/de-xr/dome-sculpt/artifacts/paint-main-integration-20261111/src -I/home/blux/de-xr/dome-sculpt/artifacts/paint-main-integration-20261111/include -O1 -g1 -DNDEBUG -fsanitize=address,undefined -fno-omit-frame-pointer -ffunction-sections -fdata-sections -std=gnu++20 -o CMakeFiles/dome-sculpt-gpu-color-blur-kernel-test.dir/tests/gpu-color-blur-kernel.cpp.o -c /home/blux/de-xr/dome-sculpt/artifacts/paint-main-integration-20261111/tests/gpu-color-blur-kernel.cpp",
+          "object": "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/sanitize/CMakeFiles/dome-sculpt-gpu-color-blur-kernel-test.dir/tests/gpu-color-blur-kernel.cpp.o",
+          "object_sha256": "624461d471d01a73e641272ea45490907948f6624face25bbc3629cdc10c9dc9"
+        }
+      ],
+      "generated_weights_sha256": "c0f95024fb12f1f9a71de70aed17cefd76cffab4bbd2686b651050a06d0d2560",
+      "tests": [
+        {
+          "profile": "sanitize",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/sanitize/dome-sculpt-gpu-color-blur-kernel-test",
+            "software"
+          ],
+          "exit": 0,
+          "timeout": false,
+          "seconds": 3.1950280779856257,
+          "log_sha256": "1cb3cf79e0f1db93f1a8b832d3e09b794892bf860f7705c8f3f68680f90e4374",
+          "maps_sha256": "9e7708f7f1c91b0f8696ee6ed0561d22f1a7b8f4ea3dc3e42dae51557b25be3d",
+          "binary_sha256": "b38c9309038c9d3876bc332b4cf31aaf2a99b9a5e16fc90a1f33010375687b13",
+          "libraries": {
+            "/usr/lib64/libEGL_mesa.so.0.0.0": "c786fa61da74b62ae0b8ab9fdb9bc020be92c02896d37220c58724107195002c",
+            "/usr/lib64/libOpenGL.so.0.0.0": "07a014ea0624d5d9711f941fb0401a203c2025b683d34897bd1b261a32a83d69",
+            "/usr/lib64/libubsan.so.1.0.0": "7a86e4af33a636ea89cc64295e04bb02fc067d8f2f929d87475d971f852b4f17",
+            "/usr/lib64/libLLVM.so.22.1": "aec1ccf02e5cc4d161920d76dce31dbbb22efebf62da71ec3180b70ff15d77bb",
+            "/usr/lib64/libEGL.so.1.1.0": "76ffc090b8990696d028e7d1bc82606c564565fb05d2fa9e5f6122b61e9f1b60",
+            "/usr/lib64/libasan.so.8.0.0": "e4a7dbd1207e0140f2ddedecdf6ffaba87e542693247d9f51b5ec1e9b320da9f",
+            "/usr/lib64/libgallium-26.2.5.so": "033e3135e977d3e5fc6b63624573febe48b2e567c0e47da49d3125d9de8d1839"
+          },
+          "environment": {
+            "LIBGL_ALWAYS_SOFTWARE": "1",
+            "LP_NUM_THREADS": "2",
+            "LD_LIBRARY_PATH": "/usr/lib64",
+            "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1:abort_on_error=1",
+            "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=1",
+            "LSAN_OPTIONS": null
+          }
+        },
+        {
+          "profile": "sanitize",
+          "command": [
+            "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111/sanitize/dome-sculpt-native-graphics-shared-test",
+            "software"
+          ],
+          "exit": 0,
+          "timeout": false,
+          "seconds": 2.995960095024202,
+          "log_sha256": "13dce0a6329f64c28cc1c58079662cdc14d9a3757d4d78995ba97f1bbe559cf2",
+          "maps_sha256": "3b991e21cfe642a23bc55cc17b5396e761dc1f0fef6cf97735513816a8c4891e",
+          "binary_sha256": "19f605f639e0614a1913cff0272c66a21948688c1ca42dc1c9b8af685adb1c6d",
+          "libraries": {
+            "/usr/lib64/libEGL.so.1.1.0": "76ffc090b8990696d028e7d1bc82606c564565fb05d2fa9e5f6122b61e9f1b60",
+            "/usr/lib64/libasan.so.8.0.0": "e4a7dbd1207e0140f2ddedecdf6ffaba87e542693247d9f51b5ec1e9b320da9f",
+            "/usr/lib64/libOpenGL.so.0.0.0": "07a014ea0624d5d9711f941fb0401a203c2025b683d34897bd1b261a32a83d69",
+            "/usr/lib64/libLLVM.so.22.1": "aec1ccf02e5cc4d161920d76dce31dbbb22efebf62da71ec3180b70ff15d77bb",
+            "/usr/lib64/libubsan.so.1.0.0": "7a86e4af33a636ea89cc64295e04bb02fc067d8f2f929d87475d971f852b4f17",
+            "/usr/lib64/libEGL_mesa.so.0.0.0": "c786fa61da74b62ae0b8ab9fdb9bc020be92c02896d37220c58724107195002c",
+            "/usr/lib64/libgallium-26.2.5.so": "033e3135e977d3e5fc6b63624573febe48b2e567c0e47da49d3125d9de8d1839"
+          },
+          "environment": {
+            "LIBGL_ALWAYS_SOFTWARE": "1",
+            "LP_NUM_THREADS": "2",
+            "LD_LIBRARY_PATH": "/usr/lib64",
+            "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1:abort_on_error=1",
+            "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=1",
+            "LSAN_OPTIONS": null
+          }
+        }
+      ]
+    }
+  },
+  "artifact_root": "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-build-20261111",
+  "post_test_metadata_repair": {
+    "file": "third_party/sources.json",
+    "changed_entry": "source_sha256.third_party/desktop/bdf_font.hpp",
+    "actual_sha256": "2c4f7bc4af8f9eb715271e4a2b226c1bd7a07480469ea0e4678493a5822e3267",
+    "all_generic_source_entries_verified": 33
+  },
+  "receipt_setup_errors": [
+    "Initial sealer named a nonexistent src/sculpt-chunk-render.cpp; corrected to actual tests/sculpt-chunk-render.cpp.",
+    "Second sealer matched the unbuilt mock lifetime graphics TU as well; corrected to select the four actually built owning targets. No build or test was restarted."
+  ],
+  "original_evidence_archive": {
+    "path": "/home/blux/de-xr/dome-sculpt/artifacts/paint-main-small-evidence-20261111.tar.gz",
+    "sha256": "e4a2d6c9e955c135cfa78a1692d8a2ea9b40fd5e9462bbda6dc554eff5b3b83d",
+    "members": 19,
+    "bytes": 159071
+  }
+}

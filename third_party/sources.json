@@ -72,7 +72,7 @@
   },
   "source_sha256": {
     "third_party/desktop/appearance.h": "25525e1d43c3036c5fc9ddd99e3c9621e8f9439147412b9bcfc1f2152201f591",
-    "third_party/desktop/bdf_font.hpp": "bf53e1f94e9e49de92ff9aa19aa336c93bcdbdafd06c52c30631475eaa2a258c",
+    "third_party/desktop/bdf_font.hpp": "2c4f7bc4af8f9eb715271e4a2b226c1bd7a07480469ea0e4678493a5822e3267",
     "third_party/desktop/desktop-menu.h": "cfbd67120ea23a607e158ef7260409ce4fc5201915e5791096be3b6962f196f5",
     "third_party/desktop/desktop-menu.cpp": "51ab33c3d7a2d8cd76a4cedbfd05d410a7d5d7137b94f89b3e9f9e54562c4cab",
     "third_party/desktop/desktop-menu.cmake": "2520c100f2828747a4b8dfdee2f3faa742faf43c02fa73c6adba8d9ad6ce8ada",
