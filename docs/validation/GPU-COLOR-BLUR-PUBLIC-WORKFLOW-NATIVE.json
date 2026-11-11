@@ -1,0 +1,76 @@
+{
+  "state": "nativeproducer-qualified-publicUI-not-executed",
+  "product_source": "775f92b837da757aa5bfb8583e2f426685eade50",
+  "runtime_TU_source": "503a3e081eedaa77f29c2f3d819cd4f03900f89b",
+  "runtime_DSO_build": {
+    "path": "/home/blux/de-xr/dome-sculpt/artifacts/paint-workflow-dso-build-20261111/status.json",
+    "sha256": "951fef4f76ca9606bc05956f7f6aad0f21c3fd29306bd470124b78b4abb767b3"
+  },
+  "runtime_steps": [
+    {
+      "name": "release-configure",
+      "exit": 0,
+      "seconds": 4.495379265979864
+    },
+    {
+      "name": "release-runtime-DSO",
+      "exit": 0,
+      "seconds": 6.281210607965477
+    },
+    {
+      "name": "sanitize-configure",
+      "exit": 0,
+      "seconds": 4.6910055539919995
+    },
+    {
+      "name": "sanitize-runtime-DSO",
+      "exit": 0,
+      "seconds": 9.827254109026399
+    }
+  ],
+  "corrected_native_producer_build": {
+    "path": "/home/blux/de-xr/dome-sculpt/artifacts/paint-workflow-dso-build-20261111/release-producer-build-v3.json",
+    "sha256": "fdda9d0a20e41e0f5b570f24942805286a7be449c384b1d03356a97020344642"
+  },
+  "native_producer": {
+    "path": "/home/blux/de-xr/dome-sculpt/artifacts/paint-workflow-dso-build-20261111/release-fixtures-v4/status.json",
+    "sha256": "e1ce1ad67fe00dba86bcc98813ca8b3533dadb7e640b5bb6bb9ec9ec77e8e65f"
+  },
+  "native_checks": 57853,
+  "manifest_checks_before_write": 57852,
+  "native_exit": 0,
+  "strictArccriticalELFs": [
+    "consumer",
+    "observer",
+    "system_EGL",
+    "system_gallium"
+  ],
+  "peak_RSS": 79564800,
+  "seconds": 0.15525771700777113,
+  "root331_provider_drift": [],
+  "prior_failures": [
+    {
+      "receipt": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/paint-workflow-dso-build-20261111/release-fixtures-v1/status.json",
+        "sha256": "8e68e8a22db0e76a0b56293b7ff8cf9395e1db3e03f2079961fa267432106ed4"
+      },
+      "scope": "preEGLfixturepairing"
+    },
+    {
+      "receipt": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/paint-workflow-dso-build-20261111/release-fixtures-v2/status.json",
+        "sha256": "2e8b38a9b3eb392017f54659eb0780890cde40870d995d50dbf1807fd59978d9"
+      },
+      "scope": "preEGLphysicalcoloradapter"
+    },
+    {
+      "receipt": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/paint-workflow-dso-build-20261111/release-fixtures-v3/status.json",
+        "sha256": "34de816d09700334f5e05974fec69cfd6e92f3a1328950c0894f1daf8367d77d"
+      },
+      "scope": "nativebodyPASS57853butcoordinatorwrongdevice.txtformat"
+    }
+  ],
+  "limits": "No GUI/OpenXR/HMD/performance/goal-completion claim. Current775 originalhardware3targetcohort and publicGUI/loader qualification stillpending.",
+  "sourcecolor_adapter_limit": "Alreadyphysical-emission sourcecolor preparation remains unsupported without actual linearcompositeadapter; fixtureordering doesnotfixproduct."
+}
