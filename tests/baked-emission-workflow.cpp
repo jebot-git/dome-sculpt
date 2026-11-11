@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "dome/bake-authoring.hpp"
+#include "dome/bake-distance.hpp"
 #include "dome/document.hpp"
 #include "dome/gltf-export.hpp"
 #include "emission-bake-source.hpp"
@@ -9,6 +10,7 @@
 #include <algorithm>
 #include <fstream>
 #include <limits>
+#include <string_view>
 #include <iostream>
 #include <nlohmann/json.hpp>
 #include <png.h>
@@ -64,10 +66,63 @@ void quality_oracle(const detail::GltfDocument &d,const EmissionInterchangeImage
  check(std::abs(static_cast<long double>(f.at("maximumRelativeError").get<double>())-maximum_relative)<=precision*std::max(1.L,maximum_relative),"reported dimensionless ratio agrees with independent extended-precision oracle");
  check(f.at("erasedNonzeroSamples")==erased&&erased==0,"measured current fallback retains every nonzero sample in this actual HDR/tiny-value fixture");
 }
+// New producer modes supply real native files and independent numeric oracles
+// for ordinary app tests. They never observe or manipulate the application.
+void public_endpoint(const Fixture &f,const ObjectBakeSettings &settings,
+                     const std::filesystem::path &directory,const std::string &name){
+  auto independent=f.scene;
+  const auto report=bake_object(independent,f.source,settings);
+  check(report.projected==4096&&report.missed==0,"public fixture has actual full source-to-target projection");
+  const auto before=f.scene.encode(),expected=independent.encode();
+  Document doc;doc.replace(f.scene);
+  check(doc.frame().state->can_bake&&doc.frame().state->bake_sources==std::vector<uint64_t>{f.source}&&doc.frame().state->bake_source==f.source,"actual fresh document selects the sole genuine hidden source by default");
+  doc.bake_from_object(f.source,settings);
+  auto save=doc.save_async(directory/(name+"-accepted.dsculpt"));finish(doc);saved(std::move(save));
+  const auto actual=doc.copy_scene();
+  check(actual.encode()==expected,"actual public fixture worker matches complete independent synchronous native endpoint");
+  check(actual.object(f.source).painted->encode()==f.scene.object(f.source).painted->encode(),"public fixture preserves full hidden locked source owner");
+  const auto &paint=*actual.active().painted;
+  check(paint.baked()&&paint.baked()->emission_field&&paint.baked()->maps.emission.rgba.empty(),"public fixture owns actual FLOAT emission and no RGB8 emission substitute");
+  const auto values=paint.baked()->emission_field->values();
+  check(values.size()==f.radiance.size(),"actual public endpoint keeps exact independent authoring grid");
+  for(size_t i=0;i<values.size();++i){
+    check(values[i].coverage==1&&values[i].legacy==std::array<float,3>{},"public endpoint is an absolute fully covered FLOAT seed");
+    for(size_t k=0;k<3;++k)check(std::abs(double(values[i].absolute[k])-f.radiance[i].absolute[k])<=std::max(1e-10,double(f.radiance[i].absolute[k])*2e-6),"public endpoint projection matches independent authored HDR/tiny-value samples");
+  }
+  Document reopened;reopened.open(directory/(name+"-accepted.dsculpt"));
+  check(reopened.copy_scene().encode()==expected,"public producer fresh Document reopen preserves entire exact accepted native payload");
+  check(doc.undo()&&doc.copy_scene().encode()==before,"public producer has one exact complete Undo boundary");
+  saved(doc.save_async(directory/(name+"-undone.dsculpt")));
+  check(doc.redo()&&doc.copy_scene().encode()==expected,"public producer has one exact complete Redo boundary");
+  saved(doc.save_async(directory/(name+"-redone.dsculpt")));
+}
+void public_fixtures(const std::filesystem::path &directory){
+  std::filesystem::create_directories(directory);auto f=fixture();f.scene.save(directory/"original.dsculpt");
+  ObjectBakeSettings defaults;
+  // Source-derived BakeSlider physical initialization and callback arithmetic
+  // from src/bake-editor.cpp. This is expected-data construction, not app state.
+  auto desktop=defaults;
+  auto distance=[](float value){return float(bake_distance_from_unit(bake_distance_to_unit(value)));};
+  desktop.front_mm=distance(defaults.front_mm);desktop.back_mm=distance(defaults.back_mm);desktop.ao_distance_mm=distance(defaults.ao_distance_mm);
+  constexpr double degrees=57.29577951308232;
+  const double units=.25*degrees;
+  desktop.normal_error=float(((double(defaults.normal_error)*degrees/units)*units)/degrees);
+  public_endpoint(f,defaults,directory,"xr");public_endpoint(f,desktop,directory,"desktop");
+  auto settings=[](const ObjectBakeSettings &v){return nlohmann::json{{"front_mm",v.front_mm},{"back_mm",v.back_mm},{"ao_distance_mm",v.ao_distance_mm},{"ao_samples",v.ao_samples},{"padding",v.padding},{"allow_partial",v.allow_partial},{"allow_backfaces",v.allow_backfaces},{"prepare_colors",v.prepare_colors},{"color_error",v.color_error},{"prepare_normals",v.prepare_normals},{"normal_error",v.normal_error},{"cage_object",v.cage_object}};};
+  const nlohmann::json manifest{{"version",1},{"resolution",64},{"independent_pixel_oracle",true},{"source",f.source},{"target",f.target},{"peak",52016},{"tiny_nonzero",.00001f},{"hidden_locked_source",true},{"default_settings",settings(defaults)},{"desktop_slider_settings",settings(desktop)},{"files",{{"original","original.dsculpt"},{"xr-accepted","xr-accepted.dsculpt"},{"xr-undone","xr-undone.dsculpt"},{"xr-redone","xr-redone.dsculpt"},{"desktop-accepted","desktop-accepted.dsculpt"},{"desktop-undone","desktop-undone.dsculpt"},{"desktop-redone","desktop-redone.dsculpt"}}}};
+  std::ofstream out(directory/"manifest.json");out<<manifest.dump(2)<<'\n';
+  if(!out)throw std::runtime_error("Cannot publish public fixture manifest");
+}
 } // namespace
 int main(int argc,char **argv)try{
   using namespace dome;
-  if(argc!=2)throw std::invalid_argument("baked-emission-workflow output-directory");
+  if(argc==3&&std::string_view(argv[1])=="--inspect"){
+    std::cout<<Scene::load(argv[2]).encode().dump()<<'\n';return 0;
+  }
+  if(argc==3&&std::string_view(argv[1])=="--public-fixtures"){
+    public_fixtures(argv[2]);std::cout<<"Baked emission public producer "<<checks<<" checks PASS\n";return 0;
+  }
+  if(argc!=2)throw std::invalid_argument("baked-emission-workflow output-directory | --inspect FILE | --public-fixtures DIRECTORY");
   const auto directory=std::filesystem::path(argv[1]);std::filesystem::create_directories(directory);
   auto f=fixture();const auto before=f.scene.encode();const auto source=f.scene.object(f.source).painted;
   const auto source_value=source->encode();const auto target_layers=f.scene.active().painted->layers();
