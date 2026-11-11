@@ -1,0 +1,308 @@
+{
+  "schema": 1,
+  "date": "2026-11-11",
+  "state": "qualified-scoped",
+  "source": "27f01cad7910a9c6b6dd383a4422f3feffdbc61c",
+  "documentation_only": true,
+  "scope": "Fresh current ONEAPI standalone actual-backend aggregate numerical/trace/missing-device execution. Not a fullcore/app/SAN/benchmark/Document admission.",
+  "build": {
+    "handle": 64008,
+    "pid": 3372935,
+    "profile": "Release",
+    "backend": "ONEAPI",
+    "max_jobs": 1,
+    "fresh_project_TUs": 3,
+    "project_archive_links": 0,
+    "reused_project_objects": 0,
+    "compiler": "DPC++7.2.0 Clang23.1.1 commit5680988bb38bd45f13081394fba43588c5f5e395",
+    "flags": [
+      "-O3",
+      "-DNDEBUG",
+      "-ffp-contract=off",
+      "-fsycl"
+    ],
+    "steps": [
+      {
+        "name": "compiler-version",
+        "command": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/oneapi/7.2.0/bin/clang++",
+          "--version"
+        ],
+        "exit": 0,
+        "seconds": 0.007686595025006682,
+        "log_sha256": "d9a537043b3e9302102d0f1e6f89af2d01b03496c401434871b518da9f1844f8"
+      },
+      {
+        "name": "configure",
+        "command": [
+          "cmake",
+          "-S",
+          "/home/blux/de-xr/dome-sculpt/artifacts/oneapi-quality-20261111",
+          "-B",
+          "/home/blux/de-xr/dome-sculpt/artifacts/oneapi-quality-build-20261111/release",
+          "-G",
+          "Ninja",
+          "-DCMAKE_BUILD_TYPE=Release",
+          "-DCMAKE_EXPORT_COMPILE_COMMANDS=ON",
+          "-DCMAKE_CXX_COMPILER=/home/blux/de-xr/dome-sculpt/artifacts/oneapi/7.2.0/bin/clang++",
+          "-DCMAKE_C_COMPILER=/usr/bin/cc",
+          "-DDOME_COMPUTE_BACKEND=ONEAPI",
+          "-DDOME_BUILD_UI=OFF",
+          "-DDOME_BUILD_XR=OFF",
+          "-DBUILD_TESTING=ON",
+          "-DCMAKE_PREFIX_PATH=/home/blux/de-xr/dome-sculpt/artifacts/sdk-20261111/toolkit-release;/home/blux/de-xr/dome-sculpt/artifacts/sdk-20261111/bitmap-runtime"
+        ],
+        "exit": 0,
+        "seconds": 9.13169765099883,
+        "log_sha256": "7a73ad5df24ad8ca1523ebb704c85ff2d7de68d858158a6e7651b757f8fb13c2"
+      },
+      {
+        "name": "build",
+        "command": [
+          "nice",
+          "-n",
+          "10",
+          "cmake",
+          "--build",
+          "/home/blux/de-xr/dome-sculpt/artifacts/oneapi-quality-build-20261111/release",
+          "--target",
+          "dome-sculpt-resample-quality-test",
+          "--parallel",
+          "1"
+        ],
+        "exit": 0,
+        "seconds": 10.585004820022732,
+        "log_sha256": "a16133de2f3b8e136c9db3ee487cb8c06d7be9e43ea27f68f63431cb8fe3d7b6"
+      }
+    ],
+    "owned": {
+      "/home/blux/de-xr/dome-sculpt/artifacts/oneapi-quality-build-20261111/release/CMakeFiles/dome-sculpt-resample-quality-test.dir/tests/resample-quality.cpp.o": "9c848117943cd45b37eaf2214f44c04a48020be0fae938a82cf683e7efbb649d",
+      "/home/blux/de-xr/dome-sculpt/artifacts/oneapi-quality-build-20261111/release/CMakeFiles/dome-sculpt-resample-quality-test.dir/src/sculpt-storage.cpp.o": "ff9521bc4761dfbb238102038ce33dbfc77ec7be53625613cd627ada53dd3736",
+      "/home/blux/de-xr/dome-sculpt/artifacts/oneapi-quality-build-20261111/release/CMakeFiles/dome-sculpt-resample-quality-test.dir/src/backend_sycl.cpp.o": "2913ea9aea1bce94606d0c0c6de6d37a466844dfe3a83d7c1d2ae4b120049f23",
+      "/home/blux/de-xr/dome-sculpt/artifacts/oneapi-quality-build-20261111/release/dome-sculpt-resample-quality-test": "f7845cc933d5d0b8b2b28e474f348fa5e1b5d64800a8da516aa953e48b0cbc89",
+      "/home/blux/de-xr/dome-sculpt/artifacts/oneapi-quality-build-20261111/release/CMakeCache.txt": "0e5081bc3dae2afa63845afa76cd722de5e5ae09467fc741a31736c9f2a8e9b3",
+      "/home/blux/de-xr/dome-sculpt/artifacts/oneapi-quality-build-20261111/release/compile_commands.json": "37c6535290883ec3b1c6cde9c1dfd64f247865e5d5cf2a37372b6b38af56bf39"
+    },
+    "compiled_dependency_files": 733,
+    "source_drift": [],
+    "toolchain_drift": []
+  },
+  "runtime": {
+    "handle": 94091,
+    "pid": 3426422,
+    "lease_released": true,
+    "exit": 0,
+    "steps": [
+      {
+        "name": "trace",
+        "argv": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/oneapi-quality-build-20261111/release/dome-sculpt-resample-quality-test",
+          "--trace"
+        ],
+        "state": "terminal",
+        "deadline_seconds": 300,
+        "RSS_peak_bytes": 90030080,
+        "environment_overrides": {
+          "ONEAPI_DEVICE_SELECTOR": "level_zero:0",
+          "LD_PRELOAD": "/home/blux/de-xr/dome-sculpt/artifacts/oneapi-quality-build-20261111/control/levelzero-auth.so"
+        },
+        "pid": 3426468,
+        "exit": 0,
+        "seconds": 0.4248200299916789,
+        "log_sha256": "dd60986eaf89792c723ed4de5170cc32e8f3af860eb39691816a97b399b3021f",
+        "actual_LevelZero": {
+          "queues": 0,
+          "lists": 3,
+          "kernels": 6,
+          "auth_log_sha256": "ebde599ee8081854a3ac44777b34e9d2bfaf22934fe0852164f0709ad88bce24"
+        }
+      },
+      {
+        "name": "numeric",
+        "argv": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/oneapi-quality-build-20261111/release/dome-sculpt-resample-quality-test"
+        ],
+        "state": "terminal",
+        "deadline_seconds": 300,
+        "RSS_peak_bytes": 94527488,
+        "environment_overrides": {
+          "ONEAPI_DEVICE_SELECTOR": "level_zero:0",
+          "LD_PRELOAD": "/home/blux/de-xr/dome-sculpt/artifacts/oneapi-quality-build-20261111/control/levelzero-auth.so"
+        },
+        "pid": 3426522,
+        "exit": 0,
+        "seconds": 1.156662026012782,
+        "log_sha256": "c61154db952dd65ac795f32a19f38cbb365991748b797b7ae73480e3196b26d7",
+        "actual_LevelZero": {
+          "queues": 0,
+          "lists": 9,
+          "kernels": 3200,
+          "auth_log_sha256": "172692e9b2f4c7ce496e480bcf9b52a75f9ed81e75991ef23cf34ebb1423d1b5"
+        },
+        "exact_numeric_checks": 94
+      },
+      {
+        "name": "missing",
+        "argv": [
+          "/home/blux/de-xr/dome-sculpt/artifacts/oneapi-quality-build-20261111/release/dome-sculpt-resample-quality-test",
+          "--missing"
+        ],
+        "state": "terminal",
+        "deadline_seconds": 300,
+        "RSS_peak_bytes": 80949248,
+        "environment_overrides": {
+          "ONEAPI_DEVICE_SELECTOR": "opencl:cpu",
+          "LD_PRELOAD": null
+        },
+        "pid": 3426678,
+        "exit": 0,
+        "seconds": 0.06385908200172707,
+        "log_sha256": "8691c9d7b3dab9b0b7e8a5c0e5ccc9c45de5aeb426657917ab30a6021d7f66c3"
+      }
+    ],
+    "environment": {
+      "LD_LIBRARY_PATH": "/home/blux/de-xr/dome-sculpt/artifacts/oneapi/compat:/home/blux/de-xr/dome-sculpt/artifacts/oneapi/7.2.0/lib:/usr/lib64",
+      "ONEAPI_DEVICE_SELECTOR": "level_zero:0",
+      "DRI_PRIME": "pci-0000_03_00_0",
+      "SYCL_UR_TRACE": "2",
+      "ZE_ENABLE_TRACING_LAYER": "1",
+      "LD_PRELOAD": "/home/blux/de-xr/dome-sculpt/artifacts/oneapi-quality-build-20261111/control/levelzero-auth.so",
+      "LSAN_OPTIONS": null
+    },
+    "source_toolchain_binary_dependency_drift": [],
+    "actual_selected_device": "Intel Arc A770 8086:56a0 PCI0000:03:00.0",
+    "authentication": "Official LevelZero loader epilogues query actual command-list hDevice and authenticate each kernel list; no numerical modification. Immediate-list route, not enumeration/FD inference.",
+    "actual_mapped_ELFs": 34,
+    "map_drift": []
+  },
+  "trace": {
+    "trace_device_allocations": [
+      {
+        "address": "0xffffc001ffae0000",
+        "bytes": 48
+      },
+      {
+        "address": "0xffffc001ffad0000",
+        "bytes": 1524
+      },
+      {
+        "address": "0xffffc001ffac0000",
+        "bytes": 1016
+      },
+      {
+        "address": "0xffffc001ff830000",
+        "bytes": 3048
+      },
+      {
+        "address": "0xffffc001ffae0200",
+        "bytes": 8
+      }
+    ],
+    "trace_copies": [
+      {
+        "bytes": 48,
+        "kind": "upload",
+        "source": "0x196d0c30",
+        "destination": "0xffffc001ffae0000"
+      },
+      {
+        "bytes": 3048,
+        "kind": "upload",
+        "source": "0x196ded10",
+        "destination": "0xffffc001ff830000"
+      },
+      {
+        "bytes": 8,
+        "kind": "readback",
+        "source": "0xffffc001ffac0000",
+        "destination": "0x7ffd490dba30"
+      },
+      {
+        "bytes": 3048,
+        "kind": "upload",
+        "source": "0x196df8f8",
+        "destination": "0xffffc001ff830000"
+      },
+      {
+        "bytes": 8,
+        "kind": "readback",
+        "source": "0xffffc001ffac0000",
+        "destination": "0x7ffd490dba30"
+      },
+      {
+        "bytes": 72,
+        "kind": "upload",
+        "source": "0x196e04e0",
+        "destination": "0xffffc001ff830000"
+      },
+      {
+        "bytes": 8,
+        "kind": "readback",
+        "source": "0xffffc001ffac0000",
+        "destination": "0x7ffd490dba30"
+      }
+    ],
+    "trace_actual_kernel_launches": 6,
+    "trace_distinct_kernels": 2,
+    "trace_one_actual_UR_queue": true,
+    "trace_upload_bytes": 6216,
+    "trace_readback_bytes": 24
+  },
+  "numeric_checks": 94,
+  "missing_device": {
+    "actual_refusal": "No device of requested type 'info::device_type::gpu' available.",
+    "device_allocations": 0,
+    "kernel_launches": 0,
+    "CPU_fallback": false
+  },
+  "preserved_limits": {
+    "maximum_source_entries": 4000000,
+    "maximum_queries": 16000000,
+    "maximum_probe": 128,
+    "maximum_chunk_capacity": 65536,
+    "reduction_width": 128,
+    "original_CTest_timeout_seconds": 300,
+    "external_validation_RSS_bytes": 4294967296,
+    "exact_word_comparisons": true
+  },
+  "runtime_compatibility": {
+    "official_SDK_unchanged": true,
+    "explicit_existing_UMF_compatibility": true,
+    "original_and_compatibility_hashes_match_provenance": true,
+    "Mesa_LLVM19_used": false
+  },
+  "setup_diagnostics": [
+    "Initial ldd without explicit SDK library path reports missinglibsycl; actual configure/build/native commands use pinnedexplicit path.",
+    "Read-only ledger query used wrongworktree-relative path; correctedabsolute lookup, no native rerun/change."
+  ],
+  "not_claimed": [
+    "full ONEAPI app/core build",
+    "sanitizer qualification",
+    "long P1 or --bench performance",
+    "current Document/Volume transactions",
+    "physical AMD/NVIDIA hardware",
+    "physical HMD/session actions",
+    "full accelerator completion"
+  ],
+  "artifacts": {
+    "/home/blux/de-xr/dome-sculpt/artifacts/oneapi-quality-build-20261111/build-status.json": "fbdaa2cde58517ece62e9480580d2f209141d785d32154c22efc574344c90d9d",
+    "/home/blux/de-xr/dome-sculpt/artifacts/oneapi-quality-build-20261111/source-before.json": "759eaba736bf34795c6a707d2e57999022dbdf82a9d66399730b2fa67e6ab924",
+    "/home/blux/de-xr/dome-sculpt/artifacts/oneapi-quality-build-20261111/toolchain-before.json": "0a902f15560546a590561cfdba5f751249175983f299c0f94483e7308d8a7369",
+    "/home/blux/de-xr/dome-sculpt/artifacts/oneapi-quality-build-20261111/dependency-pins.json": "8c0f15f7a14f484093913c6c35417e9d8500402b390adc0172009d8f7819806a",
+    "/home/blux/de-xr/dome-sculpt/artifacts/oneapi-quality-build-20261111/actual-build-commands.txt": "86f7a920c41174fff8285d17e5c88d1cfdace3acae3df9fc4a77e1244475d921",
+    "/home/blux/de-xr/dome-sculpt/artifacts/oneapi-quality-build-20261111/actual-dependencies.txt": "41f426b25f1eeba53e9d1cfd20c1336b417fc4e47f9f8f1dbe7cc21bfa80b20c",
+    "/home/blux/de-xr/dome-sculpt/artifacts/oneapi-quality-build-20261111/runtime-v1/status.json": "957725e2f2d70d60bfc1dab68ca5c7a839377b721f43e67350639e0a94c3252e",
+    "/home/blux/de-xr/dome-sculpt/artifacts/oneapi-quality-build-20261111/runtime-audit.json": "124948d5f46f0cd02d31ca8b578df06dec5e1731119665f7c24dc05cb5c51859",
+    "/home/blux/de-xr/dome-sculpt/artifacts/oneapi-quality-build-20261111/seal/evidence-ledger.json": "b29cfb6b6688c30aa293db0596341ccc2a9dac5301229802f6301f9e7d8cdff5",
+    "/home/blux/de-xr/dome-sculpt/artifacts/oneapi-quality-build-20261111/control/levelzero-auth.cpp": "c1af6a134bce8e59b3f7669ab608e2a026c0a7b49b8b76c39ca6c6f13ac99f26",
+    "/home/blux/de-xr/dome-sculpt/artifacts/oneapi-quality-build-20261111/control/runtime.py": "96b1558ca0782926e9cb53d97f105c9c5c1bc33c75e23f315be06d7cdb8f6495"
+  },
+  "evidence_archive": {
+    "path": "/home/blux/de-xr/dome-sculpt/artifacts/oneapi-quality-build-20261111/seal/oneapi-quality-evidence.tar.zst",
+    "sha256": "7444bf4168190a58ae67cd46bd16b3260a47acb4b6aaf2d31c31b4628652976d",
+    "bytes": 739799,
+    "verified_all_members": true,
+    "raw_bytes": 40296437,
+    "scope": "Additional self-contained evidence copy; originals retained; not archival deletion or a project build/provider distribution."
+  }
+}
