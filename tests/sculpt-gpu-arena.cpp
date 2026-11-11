@@ -65,6 +65,11 @@ int main()try{
   p=::operator new[](17,std::align_val_t(32),std::nothrow);::operator delete[](p,std::align_val_t(32),std::nothrow);
   measure=false;check(allocations==4,"All nothrow and aligned replacement forms share the same actual allocation hook");
   NativeGraphics context;std::cout<<"GPU "<<glGetString(GL_RENDERER)<<'\n';
+  {
+    render_detail::SculptGpuArena zero(render_detail::SculptGpuArena::gpu_limit,0);
+    const auto allocation_calls=gpu_allocations;
+    check(rejects([&]{zero.stage({});})&&gpu_allocations==allocation_calls,"Empty scene still requires fixed CPU snapshot metadata and refuses zero workspace before GPU calls");
+  }
   auto scene=fixture();const auto native=scene.encode();auto base=SculptSceneChunks::capture(scene,{7,1,1,true,true}).chunks;
   auto changed=scene.snapshot();changed.object(1).volume=std::make_shared<Volume>(*scene.object(1).volume);changed.object(1).volume->fill_mask(.71f);
   auto masks=SculptSceneChunks::capture(changed,{7,2,2,true,true},base).chunks;

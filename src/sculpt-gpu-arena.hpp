@@ -10,6 +10,7 @@ namespace dome::render_detail {
 // Context-local plain sculpt geometry only. No Paint/Material/normal-field or
 // packed-primitive authority is manufactured by GPU placement.
 class SculptGpuArena {
+  static_assert(sizeof(Vec3)==3*sizeof(float),"Sculpt arena stride forecast needs actual packed float3");
   struct Ledger {
     size_t bytes=0,peak=0,limit=gpu_limit,retired=0;
     bool context=true,needs_fence=false;
@@ -157,10 +158,11 @@ private:
     ++next.scalar_transfers;
   }
   static size_t cpu_forecast(size_t entries,size_t objects,size_t runs) {
+    // Fixed1KiB covers Ledger/Snapshot/control blocks even for empty scenes.
     // Conservatively covers map nodes/buckets +both span free lists. Command
     // vectors reserve their exact counts; no geometry/vertex CPU copy exists.
-    return sculpt_arena_add(sculpt_arena_add(sculpt_arena_multiply(entries,512),sculpt_arena_multiply(objects,256)),
-      sculpt_arena_multiply(runs,sizeof(GLsizei)+sizeof(void*)+sizeof(GLint)));
+    return sculpt_arena_add(1024,sculpt_arena_add(sculpt_arena_add(sculpt_arena_multiply(entries,512),sculpt_arena_multiply(objects,256)),
+      sculpt_arena_multiply(runs,sizeof(GLsizei)+sizeof(void*)+sizeof(GLint))));
   }
 public:
   explicit SculptGpuArena(size_t gpu_bytes=gpu_limit,size_t cpu_bytes=metadata_limit):cpu_limit_(cpu_bytes) {
