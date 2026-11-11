@@ -1,0 +1,904 @@
+{
+  "state": "current-owning-small-public-workflows-qualified",
+  "date": "2026-11-11",
+  "source": "a904a2d644eca7885e38e51528057790232e8418",
+  "DomeD_SDK_source": "acc2b70ae61dedec2a23727f67c60c0303d0f76f",
+  "scope": "Actual coherent owning app/inspector/producer/font/runtime from a904; source-backed and genuinely plain domains in Release/SAN. Four GUI10 and four actual-loader XR39 cases. No oldABI consumer supplies pass authority; privateXvfb/syntheticXR, no physicalheadset/install/performance/largecapacity/finaladmission claim.",
+  "public_checks": 196,
+  "old_81_117_unchanged_not_reexecuted_here": true,
+  "profiles": {
+    "release": {
+      "cohort": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-public-workflows-20261111/cohort-release/receipt.json",
+        "sha256": "5b3137b26c9e836007f95c72cfe8d7f9aff6b6078eb2f81a1bfd0405ede1c80e"
+      },
+      "source_files": 2804,
+      "SDK_pins": 418,
+      "owning_outputs": 381,
+      "fresh_objects": 305,
+      "owning_targets": 63,
+      "fresh_whole_build_step": {
+        "name": "build",
+        "command": [
+          "nice",
+          "-n",
+          "10",
+          "cmake",
+          "--build",
+          "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-build-20261111/release",
+          "--parallel",
+          "2",
+          "--target",
+          "dome-sculpt",
+          "dome-sculpt-native-authoring-inspect",
+          "dome-sculpt-texture-sets-test",
+          "dome-sculpt-texture-set-surfaces-test",
+          "dome-sculpt-texture-set-native-test",
+          "dome-sculpt-texture-set-export-test",
+          "dome-sculpt-texture-set-polygon-mixed-test",
+          "dome-sculpt-polygon-surface-native-test",
+          "dome-sculpt-polygon-surface-render-test",
+          "dome-sculpt-texture-set-polygon-render-test",
+          "dome-sculpt-sculpt-surface-chunks-test",
+          "dome-sculpt-sculpt-chunk-pipeline-test",
+          "dome-sculpt-sculpt-chunk-render-test",
+          "dome-sculpt-local-surface-integration-test",
+          "dome-sculpt-surface-query-oblique-test",
+          "dome-sculpt-retopo-input-admission-test",
+          "dome-sculpt-polygon-retopo-affine-test",
+          "dome-sculpt-render-direct-upload-test",
+          "dome-sculpt-triangle-remesh-test",
+          "dome-sculpt-texture-set-field-source-test",
+          "dome-sculpt-texture-set-history-test",
+          "dome-sculpt-texture-set-resolution-test",
+          "dome-sculpt-texture-set-source-export-test",
+          "dome-sculpt-texture-set-resolution-fixture",
+          "dome-sculpt-texture-resolution-runtime",
+          "dome-sculpt-sculpt-chunk-workspace-test",
+          "dome-sculpt-sculpt-sustained",
+          "dome-sculpt-vrm1-background-fixture-test",
+          "dome-sculpt-vrm1-expression-layer-authoring-test",
+          "dome-sculpt-vrm1-expression-targets-faults-test",
+          "dome-sculpt-sculpt-placed-workspace-test",
+          "dome-sculpt-texture-set-source-render-test",
+          "dome-sculpt-gpu-color-blur-kernel-test",
+          "dome-sculpt-gpu-color-blur-native-test",
+          "dome-sculpt-native-graphics-shared-test",
+          "dome-sculpt-native-graphics-lifetime-test",
+          "dome-sculpt-controls-test",
+          "dome-sculpt-paint-test",
+          "dome-sculpt-document-test",
+          "dome-sculpt-current-paint-preview-native-test",
+          "dome-sculpt-current-paint-preview-gpu-test",
+          "dome-sculpt-sculpt-gpu-arena-layout-test",
+          "dome-sculpt-sculpt-gpu-arena-test",
+          "dome-sculpt-gpu-color-blur-font-reference",
+          "dome-sculpt-gpu-color-blur-runtime",
+          "dome-sculpt-paint-composite-native-test",
+          "dome-sculpt-paint-composite-render-test",
+          "dome-sculpt-mtoon-render-test",
+          "dome-sculpt-paint-overlay-gpu-test",
+          "dome-sculpt-source-paint-overlay-test",
+          "dome-sculpt-polygon-render-test",
+          "dome-sculpt-render-buffers-test",
+          "dome-sculpt-render-store-ledger-test",
+          "dome-sculpt-renderer-recovery-test",
+          "dome-sculpt-native-scene-geometry-intern-test",
+          "dome-sculpt-native-read-cancel-test",
+          "dome-sculpt-affine-document-render-test",
+          "dome-sculpt-affine-held-render-test",
+          "dome-sculpt-document-render-buffers-test",
+          "dome-sculpt-document-render-capacity-test",
+          "dome-sculpt-normal-frame-render-test",
+          "dome-sculpt-source-color-render-test",
+          "dome-sculpt-source-extra-uv-render-test"
+        ],
+        "exit": 0,
+        "seconds": 883.3595254520187,
+        "log_sha256": "74751a5493827c1c6832db2e261d027af2051020a8522f5ef8d332ac32e1cb66"
+      },
+      "root_native_gate_status": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-build-20261111/release-owning-status.json",
+        "sha256": "9231c31df4545e2391f6dcd8f7af5e6bcd1afaf8d00d91ad2c9b1281fcbd2396"
+      },
+      "root_native_gate_exit": 1,
+      "root_native_gates_not_renamed_pass": true,
+      "actual_owning_app": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-build-20261111/release/dome-sculpt",
+        "sha256": "91d33b82a67056c4cf40184335314af56b2a12e4f5f6b0a0a01c0d923761ad35",
+        "bytes": 16215184
+      },
+      "actual_owning_inspector": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-build-20261111/release/dome-sculpt-native-authoring-inspect",
+        "sha256": "10ea34f58ea076b01a279daf085b742bf97c2f6aba97c7b1f293dc782e1218c6",
+        "bytes": 5487976
+      },
+      "actual_owning_runtime": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-build-20261111/release/libdome-sculpt-gpu-color-blur-runtime.so",
+        "sha256": "1d856e0a2e86c0347dcf44b34b6334746918e241d4e76924d1bdb0c2d881d8ae",
+        "bytes": 451008
+      },
+      "input_admission": "Configure/build all63 target links0/appversion0; later native/software fixture failure independent."
+    },
+    "sanitize": {
+      "cohort": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-public-workflows-20261111/cohort-sanitize/receipt.json",
+        "sha256": "b2aa3ac6698243f7d37132e5fe2d6d7455b236c276313a0c8b5529bf4b840011"
+      },
+      "source_files": 2804,
+      "SDK_pins": 418,
+      "owning_outputs": 381,
+      "fresh_objects": 305,
+      "owning_targets": 63,
+      "fresh_whole_build_step": {
+        "name": "build",
+        "command": [
+          "nice",
+          "-n",
+          "10",
+          "cmake",
+          "--build",
+          "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-build-20261111/sanitize",
+          "--parallel",
+          "2",
+          "--target",
+          "dome-sculpt",
+          "dome-sculpt-native-authoring-inspect",
+          "dome-sculpt-texture-sets-test",
+          "dome-sculpt-texture-set-surfaces-test",
+          "dome-sculpt-texture-set-native-test",
+          "dome-sculpt-texture-set-export-test",
+          "dome-sculpt-texture-set-polygon-mixed-test",
+          "dome-sculpt-polygon-surface-native-test",
+          "dome-sculpt-polygon-surface-render-test",
+          "dome-sculpt-texture-set-polygon-render-test",
+          "dome-sculpt-sculpt-surface-chunks-test",
+          "dome-sculpt-sculpt-chunk-pipeline-test",
+          "dome-sculpt-sculpt-chunk-render-test",
+          "dome-sculpt-local-surface-integration-test",
+          "dome-sculpt-surface-query-oblique-test",
+          "dome-sculpt-retopo-input-admission-test",
+          "dome-sculpt-polygon-retopo-affine-test",
+          "dome-sculpt-render-direct-upload-test",
+          "dome-sculpt-triangle-remesh-test",
+          "dome-sculpt-texture-set-field-source-test",
+          "dome-sculpt-texture-set-history-test",
+          "dome-sculpt-texture-set-resolution-test",
+          "dome-sculpt-texture-set-source-export-test",
+          "dome-sculpt-texture-set-resolution-fixture",
+          "dome-sculpt-texture-resolution-runtime",
+          "dome-sculpt-sculpt-chunk-workspace-test",
+          "dome-sculpt-sculpt-sustained",
+          "dome-sculpt-vrm1-background-fixture-test",
+          "dome-sculpt-vrm1-expression-layer-authoring-test",
+          "dome-sculpt-vrm1-expression-targets-faults-test",
+          "dome-sculpt-sculpt-placed-workspace-test",
+          "dome-sculpt-texture-set-source-render-test",
+          "dome-sculpt-gpu-color-blur-kernel-test",
+          "dome-sculpt-gpu-color-blur-native-test",
+          "dome-sculpt-native-graphics-shared-test",
+          "dome-sculpt-native-graphics-lifetime-test",
+          "dome-sculpt-controls-test",
+          "dome-sculpt-paint-test",
+          "dome-sculpt-document-test",
+          "dome-sculpt-current-paint-preview-native-test",
+          "dome-sculpt-current-paint-preview-gpu-test",
+          "dome-sculpt-sculpt-gpu-arena-layout-test",
+          "dome-sculpt-sculpt-gpu-arena-test",
+          "dome-sculpt-gpu-color-blur-font-reference",
+          "dome-sculpt-gpu-color-blur-runtime",
+          "dome-sculpt-paint-composite-native-test",
+          "dome-sculpt-paint-composite-render-test",
+          "dome-sculpt-mtoon-render-test",
+          "dome-sculpt-paint-overlay-gpu-test",
+          "dome-sculpt-source-paint-overlay-test",
+          "dome-sculpt-polygon-render-test",
+          "dome-sculpt-render-buffers-test",
+          "dome-sculpt-render-store-ledger-test",
+          "dome-sculpt-renderer-recovery-test",
+          "dome-sculpt-native-scene-geometry-intern-test",
+          "dome-sculpt-native-read-cancel-test",
+          "dome-sculpt-affine-document-render-test",
+          "dome-sculpt-affine-held-render-test",
+          "dome-sculpt-document-render-buffers-test",
+          "dome-sculpt-document-render-capacity-test",
+          "dome-sculpt-normal-frame-render-test",
+          "dome-sculpt-source-color-render-test",
+          "dome-sculpt-source-extra-uv-render-test"
+        ],
+        "exit": 0,
+        "seconds": 1754.2886863290332,
+        "log_sha256": "8e2aacb27d99c8bd1539ee9341cd22e024937d5acd664df4783a24ed9b65c636"
+      },
+      "root_native_gate_status": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-build-20261111/sanitize-owning-status.json",
+        "sha256": "1ad0b506ce5dbb181fab6edb7ae4cea636536d6495fd20813d5d9da90a4923ec"
+      },
+      "root_native_gate_exit": 1,
+      "root_native_gates_not_renamed_pass": true,
+      "actual_owning_app": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-build-20261111/sanitize/dome-sculpt",
+        "sha256": "d0112889e871137e085b1c91bbdf7342956c699e82d9bf7e8ad17958aa68708f",
+        "bytes": 483181744
+      },
+      "actual_owning_inspector": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-build-20261111/sanitize/dome-sculpt-native-authoring-inspect",
+        "sha256": "56ec45156042e08c1f79a76eac9607a1c64e388d1566b569aaf238b748149909",
+        "bytes": 257014928
+      },
+      "actual_owning_runtime": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-build-20261111/sanitize/libdome-sculpt-gpu-color-blur-runtime.so",
+        "sha256": "0de8c0493527110b49df3e3aaa8d524f20f172d371fe3ed3a786aed3839d6e11",
+        "bytes": 10350728
+      },
+      "input_admission": "Configure/build all63 target links0/appversion0; later native/software fixture failure independent."
+    }
+  },
+  "app_cases": [
+    {
+      "profile": "release",
+      "domain": "source",
+      "interface": "gui",
+      "status": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-public-workflows-20261111/release-gui-source-v1/status.json",
+        "sha256": "21a75576425fd5245c0fa0a078763c719ee6bad66bcdf85fe591bf746bef0588"
+      },
+      "report": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-public-workflows-20261111/release-gui-source-v1/workflow/report.json",
+        "sha256": "38ead45fca41b293c4140c19edbb807f0072138dca1c53f29b4df344224756c0"
+      },
+      "checks": 10,
+      "seconds": 18.428148760984186,
+      "peak_RSS": 383238144,
+      "actual_app_launches": 2,
+      "critical_observed": [
+        "canonical_FLTK",
+        "consumer",
+        "observer",
+        "system_EGL",
+        "system_gallium"
+      ],
+      "actual_device_reports": {
+        "/home/blux/de-xr/dome-sculpt/artifacts/authoring-public-workflows-20261111/release-gui-source-v1/actual-device/egl-query-0/device.txt": "770fb2eb8b576af777c0801268c3e4e98d9d793cae9a11e8d220a0d238c94adf"
+      },
+      "maps": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-public-workflows-20261111/release-gui-source-v1/mapped-app-ELFs.json",
+        "sha256": "0d03296f34f8f73b6d445e9cb097cc5093ae6b9ca67e1fb0c72c75235ed3d06d"
+      },
+      "external_FD_sampler": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-public-workflows-20261111/release-gui-source-v1/readable-app-DRI.json",
+        "sha256": "dc6b1441c23e6c3a8a6122f483983bcd7e48a9ec40012233b836a0eee079e951"
+      },
+      "source_SDK_allowning_provider_drift": [],
+      "limits": {
+        "public_step_seconds": 50,
+        "phase_seconds": 900
+      }
+    },
+    {
+      "profile": "release",
+      "domain": "source",
+      "interface": "xr",
+      "status": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-public-workflows-20261111/release-xr-source-v1/status.json",
+        "sha256": "f119ffb09ab1383a35c401a3f85673835b724dba9b7316c1a73346a61d571248"
+      },
+      "report": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-public-workflows-20261111/release-xr-source-v1/workflow/report.json",
+        "sha256": "154e59af74695dc9f5308ea24c9fe6eeb64b961106ea55c3b0ceea2e010f30a3"
+      },
+      "checks": 39,
+      "seconds": 13.460733858984895,
+      "peak_RSS": 226185216,
+      "actual_app_launches": 1,
+      "critical_observed": [
+        "canonical_FLTK",
+        "consumer",
+        "observer",
+        "real_OpenXR_loader",
+        "runtime",
+        "system_EGL",
+        "system_gallium"
+      ],
+      "actual_device_reports": {
+        "/home/blux/de-xr/dome-sculpt/artifacts/authoring-public-workflows-20261111/release-xr-source-v1/actual-device/egl-query-0/device.txt": "1d40a66bc6874024ed6678251c9076fed20aab1634e4d65aa5fa5d0017de733f",
+        "/home/blux/de-xr/dome-sculpt/artifacts/authoring-public-workflows-20261111/release-xr-source-v1/actual-device/egl-query-1/device.txt": "1d40a66bc6874024ed6678251c9076fed20aab1634e4d65aa5fa5d0017de733f",
+        "/home/blux/de-xr/dome-sculpt/artifacts/authoring-public-workflows-20261111/release-xr-source-v1/actual-device/egl-query-2/device.txt": "ebaebb36fd40dc8683dfe3fab1f7063c8f73f6f79df3ee40a7895ebf622093c9"
+      },
+      "maps": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-public-workflows-20261111/release-xr-source-v1/mapped-app-ELFs.json",
+        "sha256": "f8b466a56c8e391e0855c084c3680f30b552e6db8bcb79f7c56cd827d2f24794"
+      },
+      "external_FD_sampler": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-public-workflows-20261111/release-xr-source-v1/readable-app-DRI.json",
+        "sha256": "6c436e4f5993139dd162016d194b15c074208acd94e2af7fff30dc1e71ab804b"
+      },
+      "source_SDK_allowning_provider_drift": [],
+      "runtime": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-public-workflows-20261111/release-xr-source-v1/workflow/apply-history/runtime.json",
+        "sha256": "ba72e5e50bcbc2b90b21c249f9effa6d489c45d4424357d4e4b15249c1f98e5f"
+      },
+      "frames": 164,
+      "both_eye_ROOT_and_page_shapes_zero_mismatches": true,
+      "checked_vs_unchecked_observable_pixels_per_eye": 1,
+      "limits": {
+        "frames": 6000,
+        "seconds": 240
+      }
+    },
+    {
+      "profile": "release",
+      "domain": "plain",
+      "interface": "gui",
+      "status": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-public-workflows-20261111/release-gui-plain-v1/status.json",
+        "sha256": "5f5ee4916f9aa2b7e292ccdba47588bd3e54e952a04f5eaa4b65741293c92e90"
+      },
+      "report": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-public-workflows-20261111/release-gui-plain-v1/workflow/report.json",
+        "sha256": "a2e5757e06694eed380aa2c5857ff4a724144f971c74ac633c4b57eae3917fba"
+      },
+      "checks": 10,
+      "seconds": 13.160289965977427,
+      "peak_RSS": 382275584,
+      "actual_app_launches": 2,
+      "critical_observed": [
+        "canonical_FLTK",
+        "consumer",
+        "observer",
+        "system_EGL",
+        "system_gallium"
+      ],
+      "actual_device_reports": {
+        "/home/blux/de-xr/dome-sculpt/artifacts/authoring-public-workflows-20261111/release-gui-plain-v1/actual-device/egl-query-0/device.txt": "5fab145f63fe2911d5ba2eb3debb2250fc9b27ab2fae0d495fe529d9721e8a85"
+      },
+      "maps": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-public-workflows-20261111/release-gui-plain-v1/mapped-app-ELFs.json",
+        "sha256": "7825f4a34df901eb73665de93d75b0fb478cc5cba44d6bc3ab5a3a95b5c398dd"
+      },
+      "external_FD_sampler": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-public-workflows-20261111/release-gui-plain-v1/readable-app-DRI.json",
+        "sha256": "df2acfbe4f488bf1f04f02832c31d7755418ffbcfa35915fea89ce2eac605205"
+      },
+      "source_SDK_allowning_provider_drift": [],
+      "limits": {
+        "public_step_seconds": 50,
+        "phase_seconds": 900
+      }
+    },
+    {
+      "profile": "release",
+      "domain": "plain",
+      "interface": "xr",
+      "status": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-public-workflows-20261111/release-xr-plain-v1/status.json",
+        "sha256": "d5dde245a12f2308033ec9cbbfc8dd53ef8e9b2857afee8aa3895af7a3bb0b9d"
+      },
+      "report": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-public-workflows-20261111/release-xr-plain-v1/workflow/report.json",
+        "sha256": "d1b335f0176ccebe275b733d7483001e46b18ccdfc37c4cc09955250004893a0"
+      },
+      "checks": 39,
+      "seconds": 12.601055298000574,
+      "peak_RSS": 205201408,
+      "actual_app_launches": 1,
+      "critical_observed": [
+        "canonical_FLTK",
+        "consumer",
+        "observer",
+        "real_OpenXR_loader",
+        "runtime",
+        "system_EGL",
+        "system_gallium"
+      ],
+      "actual_device_reports": {
+        "/home/blux/de-xr/dome-sculpt/artifacts/authoring-public-workflows-20261111/release-xr-plain-v1/actual-device/egl-query-0/device.txt": "334bc937ebf0a7b289526f69046d9a22e21e2ec52c187d5236db32cb2890af58",
+        "/home/blux/de-xr/dome-sculpt/artifacts/authoring-public-workflows-20261111/release-xr-plain-v1/actual-device/egl-query-1/device.txt": "334bc937ebf0a7b289526f69046d9a22e21e2ec52c187d5236db32cb2890af58",
+        "/home/blux/de-xr/dome-sculpt/artifacts/authoring-public-workflows-20261111/release-xr-plain-v1/actual-device/egl-query-2/device.txt": "4839901384d241d7932143609c3d7cf2515302faa62806b826b984293c9b7503"
+      },
+      "maps": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-public-workflows-20261111/release-xr-plain-v1/mapped-app-ELFs.json",
+        "sha256": "502ea9ecd378f953606254873ccd0457cdcc56ef501c1c40383f8f6d5ee8f0cf"
+      },
+      "external_FD_sampler": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-public-workflows-20261111/release-xr-plain-v1/readable-app-DRI.json",
+        "sha256": "83721b31f3b41bc2c9357226acd3125e80b41f7580ca228eda845f0dac7a7742"
+      },
+      "source_SDK_allowning_provider_drift": [],
+      "runtime": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-public-workflows-20261111/release-xr-plain-v1/workflow/apply-history/runtime.json",
+        "sha256": "6cf86abbb717764151cf7ba26dcea1defe86d70fd3d0640f0cd627884e46eac9"
+      },
+      "frames": 160,
+      "both_eye_ROOT_and_page_shapes_zero_mismatches": true,
+      "checked_vs_unchecked_observable_pixels_per_eye": 1,
+      "limits": {
+        "frames": 6000,
+        "seconds": 240
+      }
+    },
+    {
+      "profile": "sanitize",
+      "domain": "source",
+      "interface": "gui",
+      "status": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-public-workflows-20261111/sanitize-gui-source-v1/status.json",
+        "sha256": "10ea6989c800c76a51fbebca24194632002612a9caacf28193b94197ad761f54"
+      },
+      "report": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-public-workflows-20261111/sanitize-gui-source-v1/workflow/report.json",
+        "sha256": "00c57cb8751b6e17eaca2a6f365ce4233955c8d4fe5747119c5e9f02477a3a5c"
+      },
+      "checks": 10,
+      "seconds": 33.35217152198311,
+      "peak_RSS": 2498052096,
+      "actual_app_launches": 4,
+      "critical_observed": [
+        "canonical_FLTK",
+        "consumer",
+        "observer",
+        "system_EGL",
+        "system_gallium"
+      ],
+      "actual_device_reports": {
+        "/home/blux/de-xr/dome-sculpt/artifacts/authoring-public-workflows-20261111/sanitize-gui-source-v1/actual-device/egl-query-0/device.txt": "791e40abe19293e00294680f75da300d16d6e7f8ad41477f13d381e5324cca56"
+      },
+      "maps": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-public-workflows-20261111/sanitize-gui-source-v1/mapped-app-ELFs.json",
+        "sha256": "dede55a0d95fa6c31970c270455c215ed58c858b4589a73d5ca7698a44554e3c"
+      },
+      "external_FD_sampler": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-public-workflows-20261111/sanitize-gui-source-v1/readable-app-DRI.json",
+        "sha256": "ab73d96982abaa0ed0753faa3308e8bf9de396eb553b99e2c6b922d163aee99f"
+      },
+      "source_SDK_allowning_provider_drift": [],
+      "limits": {
+        "public_step_seconds": 50,
+        "phase_seconds": 900
+      }
+    },
+    {
+      "profile": "sanitize",
+      "domain": "source",
+      "interface": "xr",
+      "status": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-public-workflows-20261111/sanitize-xr-source-v1/status.json",
+        "sha256": "4f6426f5f383b7907fa94b412aecfc2ab5a5a3e99eaa3f850c49e322f1ef5b08"
+      },
+      "report": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-public-workflows-20261111/sanitize-xr-source-v1/workflow/report.json",
+        "sha256": "c83a15e6031c3d7a8af92ffdc3833855e4278cb04dd8c89a9f310bb9497f26d9"
+      },
+      "checks": 39,
+      "seconds": 45.4844441699679,
+      "peak_RSS": 2082074624,
+      "actual_app_launches": 2,
+      "critical_observed": [
+        "canonical_FLTK",
+        "consumer",
+        "observer",
+        "real_OpenXR_loader",
+        "runtime",
+        "system_EGL",
+        "system_gallium"
+      ],
+      "actual_device_reports": {
+        "/home/blux/de-xr/dome-sculpt/artifacts/authoring-public-workflows-20261111/sanitize-xr-source-v1/actual-device/egl-query-0/device.txt": "e56215636a2d3391369dc0ee0bd5daecc8131abee72a908e89ae028a2053506d",
+        "/home/blux/de-xr/dome-sculpt/artifacts/authoring-public-workflows-20261111/sanitize-xr-source-v1/actual-device/egl-query-1/device.txt": "e56215636a2d3391369dc0ee0bd5daecc8131abee72a908e89ae028a2053506d",
+        "/home/blux/de-xr/dome-sculpt/artifacts/authoring-public-workflows-20261111/sanitize-xr-source-v1/actual-device/egl-query-2/device.txt": "57a4de681bc42169e7f71f886faa695a5e84509758142106d316b9a254155892"
+      },
+      "maps": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-public-workflows-20261111/sanitize-xr-source-v1/mapped-app-ELFs.json",
+        "sha256": "c54a2d3fd2afd31543570318f5cc6c7755707283fef22b0dbf1a53a01be0611f"
+      },
+      "external_FD_sampler": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-public-workflows-20261111/sanitize-xr-source-v1/readable-app-DRI.json",
+        "sha256": "9d21b5165d7387c9b443301f014b11f8de4b4f83dc78b82e47fdf50673a6274f"
+      },
+      "source_SDK_allowning_provider_drift": [],
+      "runtime": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-public-workflows-20261111/sanitize-xr-source-v1/workflow/apply-history/runtime.json",
+        "sha256": "e7f068648fc7f267d36102b390edb264a03a25cd3ed5c1404161651f69b5c3a9"
+      },
+      "frames": 447,
+      "both_eye_ROOT_and_page_shapes_zero_mismatches": true,
+      "checked_vs_unchecked_observable_pixels_per_eye": 1,
+      "limits": {
+        "frames": 6000,
+        "seconds": 240
+      }
+    },
+    {
+      "profile": "sanitize",
+      "domain": "plain",
+      "interface": "gui",
+      "status": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-public-workflows-20261111/sanitize-gui-plain-v1/status.json",
+        "sha256": "d31956d22679c8c32f42d51fb185c37fab03b283c1fb80def5a17639b88e798b"
+      },
+      "report": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-public-workflows-20261111/sanitize-gui-plain-v1/workflow/report.json",
+        "sha256": "7559098fbf19c8db14d78024075454ed935618f20495975201cc2879c87887fd"
+      },
+      "checks": 10,
+      "seconds": 32.64656865602592,
+      "peak_RSS": 2470641664,
+      "actual_app_launches": 4,
+      "critical_observed": [
+        "canonical_FLTK",
+        "consumer",
+        "observer",
+        "system_EGL",
+        "system_gallium"
+      ],
+      "actual_device_reports": {
+        "/home/blux/de-xr/dome-sculpt/artifacts/authoring-public-workflows-20261111/sanitize-gui-plain-v1/actual-device/egl-query-0/device.txt": "e4d35b0f054cc7dd672c03a5748b7718a4da484e379aa273f2f38230867499a1"
+      },
+      "maps": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-public-workflows-20261111/sanitize-gui-plain-v1/mapped-app-ELFs.json",
+        "sha256": "eb1675aa6f6ab342d68e1fd443c56910f60d7af45f0649490a8feb9c2ea39648"
+      },
+      "external_FD_sampler": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-public-workflows-20261111/sanitize-gui-plain-v1/readable-app-DRI.json",
+        "sha256": "b72914ea945f37a727c32981897e4f9f78b75666efbc716e5aa477b4e5eee108"
+      },
+      "source_SDK_allowning_provider_drift": [],
+      "limits": {
+        "public_step_seconds": 50,
+        "phase_seconds": 900
+      }
+    },
+    {
+      "profile": "sanitize",
+      "domain": "plain",
+      "interface": "xr",
+      "status": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-public-workflows-20261111/sanitize-xr-plain-v1/status.json",
+        "sha256": "081c48b9502283c89d854c65fe3ce1a5d41bd4c5a0af3c1d26514409a40a26a9"
+      },
+      "report": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-public-workflows-20261111/sanitize-xr-plain-v1/workflow/report.json",
+        "sha256": "b6c9d6ac4132f1e3a1cee89856d02248bcff65baf167505da938ef0c60d7c749"
+      },
+      "checks": 39,
+      "seconds": 43.86800055403728,
+      "peak_RSS": 2064101376,
+      "actual_app_launches": 2,
+      "critical_observed": [
+        "canonical_FLTK",
+        "consumer",
+        "observer",
+        "real_OpenXR_loader",
+        "runtime",
+        "system_EGL",
+        "system_gallium"
+      ],
+      "actual_device_reports": {
+        "/home/blux/de-xr/dome-sculpt/artifacts/authoring-public-workflows-20261111/sanitize-xr-plain-v1/actual-device/egl-query-0/device.txt": "8a91c56d673740f5e75739a795711f0e16253dbf4338298e5daf704fea726675",
+        "/home/blux/de-xr/dome-sculpt/artifacts/authoring-public-workflows-20261111/sanitize-xr-plain-v1/actual-device/egl-query-1/device.txt": "8a91c56d673740f5e75739a795711f0e16253dbf4338298e5daf704fea726675",
+        "/home/blux/de-xr/dome-sculpt/artifacts/authoring-public-workflows-20261111/sanitize-xr-plain-v1/actual-device/egl-query-2/device.txt": "285fe8e55e55d1a45437e8984ac11d36cfe7dff1db3ba44f64a49adc57f2e4b5"
+      },
+      "maps": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-public-workflows-20261111/sanitize-xr-plain-v1/mapped-app-ELFs.json",
+        "sha256": "9253f24aaf06874418eea7608029d4b67079b174fc73b459815cf15d2fde6fe4"
+      },
+      "external_FD_sampler": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-public-workflows-20261111/sanitize-xr-plain-v1/readable-app-DRI.json",
+        "sha256": "8656dc4ff4446824f897ece8c675dc49c19a377c668831556b35071b57fa241d"
+      },
+      "source_SDK_allowning_provider_drift": [],
+      "runtime": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-public-workflows-20261111/sanitize-xr-plain-v1/workflow/apply-history/runtime.json",
+        "sha256": "f465f60c17c75f3ce20dbf519f488d5609c97aad535c6bdea05c1a1e2debcb30"
+      },
+      "frames": 446,
+      "both_eye_ROOT_and_page_shapes_zero_mismatches": true,
+      "checked_vs_unchecked_observable_pixels_per_eye": 1,
+      "limits": {
+        "frames": 6000,
+        "seconds": 240
+      }
+    }
+  ],
+  "native_producers": [
+    {
+      "profile": "release",
+      "domain": "source",
+      "status": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-public-workflows-20261111/release-producer-source-v1/status.json",
+        "sha256": "9587641d58d2bab5c59871bc9b0fd0c4b264d491cada3dc6fee4cfd0a6a9d430"
+      },
+      "manifest": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-public-workflows-20261111/release-producer-source-v1/native/manifest.json",
+        "sha256": "073390c6087ab68025a6fa6f6aae88cf34339160eed58549af0c474c391e166b"
+      },
+      "native_checks": 57853,
+      "seconds": 0.23946136800805107,
+      "peak_RSS": 78856192,
+      "critical_observed": [
+        "consumer",
+        "observer",
+        "system_EGL",
+        "system_gallium"
+      ],
+      "actual_device_reports": {
+        "/home/blux/de-xr/dome-sculpt/artifacts/authoring-public-workflows-20261111/release-producer-source-v1/actual-device/egl-query-0/device.txt": "f90c57e509a83e039816b4f191c3bf6977b19f5926fae6b205f057ece22dad56"
+      },
+      "in_context_maps": {
+        "/home/blux/de-xr/dome-sculpt/artifacts/authoring-public-workflows-20261111/release-producer-source-v1/actual-device/egl-query-0/context-maps.txt": "2f66000fea606e373c31747118c5b378484556d8d26b2f9f0efda34bba2b3baf"
+      },
+      "native_files": {
+        "accepted": {
+          "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-public-workflows-20261111/release-producer-source-v1/native/accepted.dsculpt",
+          "sha256": "03fbccd73dfe743f2f316dab8d911ee73b4f8c8739880926c8cc0916346a9a3c"
+        },
+        "original": {
+          "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-public-workflows-20261111/release-producer-source-v1/native/original.dsculpt",
+          "sha256": "8c88f694b1300793c9fce4c82cf1c7b6638a5b95f66746fbe948c0a8134500c1"
+        }
+      },
+      "external_FD_sampler": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-public-workflows-20261111/release-producer-source-v1/readable-DRI.json",
+        "sha256": "54ae6c7a2e4bc70f8ea476e246a559aee52a19f3ce3edbd1ab2a6c475fcedf94"
+      },
+      "scope": "Actual GPU EGL/GL/DRM/PCI with direct in-context fstat/read_symlink FD evidence; external sampler window retained exactly, no global node exclusivity claim."
+    },
+    {
+      "profile": "release",
+      "domain": "plain",
+      "status": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-public-workflows-20261111/release-producer-plain-v1/status.json",
+        "sha256": "cdc2025ff40ce98525452d1d0fa23bd707c3c8b4a2a76fc165656ba8de469a7d"
+      },
+      "manifest": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-public-workflows-20261111/release-producer-plain-v1/native/manifest.json",
+        "sha256": "3159714e844419fee87380c4707202eb1004b8c75c8a7607473e7c95037f8864"
+      },
+      "native_checks": 67677,
+      "seconds": 0.5141124919755384,
+      "peak_RSS": 56803328,
+      "critical_observed": [
+        "consumer",
+        "observer",
+        "system_EGL",
+        "system_gallium"
+      ],
+      "actual_device_reports": {
+        "/home/blux/de-xr/dome-sculpt/artifacts/authoring-public-workflows-20261111/release-producer-plain-v1/actual-device/egl-query-0/device.txt": "5616d49af0d3151cb2fb2661859748456abd12332612e3fa0e81110da2049bcb"
+      },
+      "in_context_maps": {
+        "/home/blux/de-xr/dome-sculpt/artifacts/authoring-public-workflows-20261111/release-producer-plain-v1/actual-device/egl-query-0/context-maps.txt": "ef45e1647ed9f59ede6926ef88c1f3cdaf0c4fcead6437555dbe85f755ec1adc"
+      },
+      "native_files": {
+        "accepted": {
+          "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-public-workflows-20261111/release-producer-plain-v1/native/accepted.dsculpt",
+          "sha256": "4ee109172943e381108637404c16558b0d49bd1569e70fb542d55fa98bc1bb1a"
+        },
+        "original": {
+          "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-public-workflows-20261111/release-producer-plain-v1/native/original.dsculpt",
+          "sha256": "0ae76f7679a0de2fd993179f7e702928b34a0e6c3761daa0cfff56c3216ab678"
+        }
+      },
+      "external_FD_sampler": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-public-workflows-20261111/release-producer-plain-v1/readable-DRI.json",
+        "sha256": "cac2b075c57e2ec4fe28bd5b9a81b9c069de8f9512363cfd3d35a3cf34317129"
+      },
+      "scope": "Actual GPU EGL/GL/DRM/PCI with direct in-context fstat/read_symlink FD evidence; external sampler window retained exactly, no global node exclusivity claim."
+    },
+    {
+      "profile": "sanitize",
+      "domain": "source",
+      "status": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-public-workflows-20261111/sanitize-producer-source-v1/status.json",
+        "sha256": "2cc267b966d6ddc24e370a938b7e99ccb4d9b5be9855f0267a10c1e2ea90675f"
+      },
+      "manifest": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-public-workflows-20261111/sanitize-producer-source-v1/native/manifest.json",
+        "sha256": "073390c6087ab68025a6fa6f6aae88cf34339160eed58549af0c474c391e166b"
+      },
+      "native_checks": 57853,
+      "seconds": 1.0424760250025429,
+      "peak_RSS": 1106509824,
+      "critical_observed": [
+        "consumer",
+        "observer",
+        "system_EGL",
+        "system_gallium"
+      ],
+      "actual_device_reports": {
+        "/home/blux/de-xr/dome-sculpt/artifacts/authoring-public-workflows-20261111/sanitize-producer-source-v1/actual-device/egl-query-0/device.txt": "c5850c6af349f9405f99f412e8252fa9fdbe89d22e438f46f76be68735c0aa42"
+      },
+      "in_context_maps": {
+        "/home/blux/de-xr/dome-sculpt/artifacts/authoring-public-workflows-20261111/sanitize-producer-source-v1/actual-device/egl-query-0/context-maps.txt": "1485b14b63ea5528af06004c6460f69b75d290455ec8723c3f1ce46589b7260f"
+      },
+      "native_files": {
+        "accepted": {
+          "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-public-workflows-20261111/sanitize-producer-source-v1/native/accepted.dsculpt",
+          "sha256": "03fbccd73dfe743f2f316dab8d911ee73b4f8c8739880926c8cc0916346a9a3c"
+        },
+        "original": {
+          "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-public-workflows-20261111/sanitize-producer-source-v1/native/original.dsculpt",
+          "sha256": "8c88f694b1300793c9fce4c82cf1c7b6638a5b95f66746fbe948c0a8134500c1"
+        }
+      },
+      "external_FD_sampler": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-public-workflows-20261111/sanitize-producer-source-v1/readable-DRI.json",
+        "sha256": "fbfdb545246c1396c3b0968f04c873d34acd724698da8bd26d09065366a83266"
+      },
+      "scope": "Actual GPU EGL/GL/DRM/PCI with direct in-context fstat/read_symlink FD evidence; external sampler window retained exactly, no global node exclusivity claim."
+    },
+    {
+      "profile": "sanitize",
+      "domain": "plain",
+      "status": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-public-workflows-20261111/sanitize-producer-plain-v1/status.json",
+        "sha256": "e720ff3896ccf899f2269c7eab38d1c4bc0e0260cc24464856c1389befa55c98"
+      },
+      "manifest": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-public-workflows-20261111/sanitize-producer-plain-v1/native/manifest.json",
+        "sha256": "3159714e844419fee87380c4707202eb1004b8c75c8a7607473e7c95037f8864"
+      },
+      "native_checks": 67677,
+      "seconds": 0.39926277002086863,
+      "peak_RSS": 518991872,
+      "critical_observed": [
+        "consumer",
+        "observer",
+        "system_EGL",
+        "system_gallium"
+      ],
+      "actual_device_reports": {
+        "/home/blux/de-xr/dome-sculpt/artifacts/authoring-public-workflows-20261111/sanitize-producer-plain-v1/actual-device/egl-query-0/device.txt": "2fe479ee33e999f9d0b6a369bd128cd2e005a4203724489d07e895172777ede7"
+      },
+      "in_context_maps": {
+        "/home/blux/de-xr/dome-sculpt/artifacts/authoring-public-workflows-20261111/sanitize-producer-plain-v1/actual-device/egl-query-0/context-maps.txt": "eb7e2bc6702df30b4867f92a2c2f741605e1259ed6b034847262a6ad315ee83b"
+      },
+      "native_files": {
+        "accepted": {
+          "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-public-workflows-20261111/sanitize-producer-plain-v1/native/accepted.dsculpt",
+          "sha256": "4ee109172943e381108637404c16558b0d49bd1569e70fb542d55fa98bc1bb1a"
+        },
+        "original": {
+          "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-public-workflows-20261111/sanitize-producer-plain-v1/native/original.dsculpt",
+          "sha256": "0ae76f7679a0de2fd993179f7e702928b34a0e6c3761daa0cfff56c3216ab678"
+        }
+      },
+      "external_FD_sampler": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-public-workflows-20261111/sanitize-producer-plain-v1/readable-DRI.json",
+        "sha256": "7001912f3b4d279b70e0e0f1abb5694e7d543f01de4e2d5767632fcfbbd401b1"
+      },
+      "scope": "Actual GPU EGL/GL/DRM/PCI with direct in-context fstat/read_symlink FD evidence; external sampler window retained exactly, no global node exclusivity claim."
+    }
+  ],
+  "fonts": {
+    "release": {
+      "status": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-public-workflows-20261111/font-release/status.json",
+        "sha256": "b9ada8b0be86581ee68669b3d4bd38da405b752e44a179989c9aba3208871a07"
+      },
+      "reference": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-public-workflows-20261111/font-release/titles.json",
+        "sha256": "688507b89f7eb34f7492ebdaa327f9090976636877e5f45c5ae16a0bf8562566"
+      },
+      "actual_font": {
+        "path": "/home/blux/.cache/de-xr/bundled/fonts/unifont-17.0.04.bdf",
+        "sha256": "f2b2952312fa189f8963c85eb50fda14606a6df5d8dbe9e01651138eb2cecea9"
+      },
+      "style": {
+        "font_pixels": 16,
+        "unit": 1,
+        "light": false,
+        "opacity": 255
+      }
+    },
+    "sanitize": {
+      "status": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-public-workflows-20261111/font-sanitize/status.json",
+        "sha256": "d9a2da2cc61d0404a7c2dd4c6067e9f1ce328d6971685e0c64846c025fc02475"
+      },
+      "reference": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-public-workflows-20261111/font-sanitize/titles.json",
+        "sha256": "688507b89f7eb34f7492ebdaa327f9090976636877e5f45c5ae16a0bf8562566"
+      },
+      "actual_font": {
+        "path": "/home/blux/.cache/de-xr/bundled/fonts/unifont-17.0.04.bdf",
+        "sha256": "f2b2952312fa189f8963c85eb50fda14606a6df5d8dbe9e01651138eb2cecea9"
+      },
+      "style": {
+        "font_pixels": 16,
+        "unit": 1,
+        "light": false,
+        "opacity": 255
+      }
+    }
+  },
+  "comparisons": {
+    "all-canvas-analysis.json": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-public-workflows-20261111/all-canvas-analysis.json",
+      "sha256": "0d463f68a1b616a3db213ea63821a8cc0d23e97b38435ab2cbd49cfc5d4586e7"
+    },
+    "all-native-pairs.json": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-public-workflows-20261111/all-native-pairs.json",
+      "sha256": "cb76e8757f9aabc3366e983707989006a41680921f16fcad0bf9d175045ba2db"
+    }
+  },
+  "recipes": {
+    "cohort.py": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-public-workflows-20261111/cohort.py",
+      "sha256": "faed8a047973eae9b25fe82ccba408ae6ed47687fa28bd44af39f9aa4d903999"
+    },
+    "font.py": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-public-workflows-20261111/font.py",
+      "sha256": "1ef2b0e5d4254c547e3f792ee063f9bb9e2b11f09cdfd9dac87d3ca351176938"
+    },
+    "producer.py": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-public-workflows-20261111/producer.py",
+      "sha256": "31d64394e99abd6aa1c89107ba5d8c2e7338157cbaf1e0d2595834845f43d13c"
+    },
+    "gui.py": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-public-workflows-20261111/gui.py",
+      "sha256": "58a7465403e672ca097e502478694cf07dc0768c318e101c87ca791478105745"
+    },
+    "xr.py": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-public-workflows-20261111/xr.py",
+      "sha256": "ab91fd9514a45e87cd37882cf5304849c21be2a1c8d6ec9eb57804d99c20712f"
+    },
+    "seal.py": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-public-workflows-20261111/seal.py",
+      "sha256": "9b6c8fd06076f34ef0faa4cede8902be303c63a7d40001d3b135beca289c6836"
+    }
+  },
+  "original_GUI10_XR39_runtime_producer_modes_unchanged_from_b795": true,
+  "unchanged_scenario_sources": {
+    "tests/gpu-color-blur-menu.py": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-union-20261111/tests/gpu-color-blur-menu.py",
+      "sha256": "5f6383649fb7ca807b99f35571956c9983dca6b34820dcbf6ceec0471c91b392"
+    },
+    "tests/gpu-color-blur-xr.py": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-union-20261111/tests/gpu-color-blur-xr.py",
+      "sha256": "5241d6323274ef2bba67975a494c99358f4eeedd52bf3739cd119c065f41e722"
+    },
+    "tests/gpu-color-blur-runtime.cpp": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-union-20261111/tests/gpu-color-blur-runtime.cpp",
+      "sha256": "fd9adaf602fc2de114fad2917d401a9e18adf3068ba13fe0757934bcc2155fd8"
+    },
+    "tests/gpu-color-blur-native.cpp": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-union-20261111/tests/gpu-color-blur-native.cpp",
+      "sha256": "b62f6ed531f9bf227bce613034dcc11c93bdb4e0812d460e7a013dfc1adc12ee"
+    },
+    "tests/gpu-color-blur-font-reference.cpp": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-union-20261111/tests/gpu-color-blur-font-reference.cpp",
+      "sha256": "d5093a6e3134568b704f292a38bf42ff271121d7539f8b338c9c3b74e2a7687d"
+    },
+    "tests/gpu-color-blur-visual-reference.hpp": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/authoring-production-union-20261111/tests/gpu-color-blur-visual-reference.hpp",
+      "sha256": "716911f655b1ce44a6300949e8ed6b0e4203638f092c782d5aa10c0405767a11"
+    }
+  },
+  "actual_visual_native_scope": [
+    "Source input retains imported source/normal/rig/morph/material and PBR/FLOAT/hidden/mask/source obligations.",
+    "Plain input genuinely eligible: actual native Document authenticates current-grid FLOAT packet with no CPU image substitute. Current app visibly renders colored model/Blur, actual Arc XR uses new renderer.",
+    "Complete desktop canvas before=Undo,accepted=Redo=freshreopen. Allfive canvases/domain exactR/S;source234080 changedRGB/max5,plain129203/max3. Only source-defined status28 excluded; no arbitrary canvas masks.",
+    "ActualSave/Undo/Redo and freshreopen nativeendpoints exact. OwnproducerR/S+actualXRfinalR/S files byte-exact; source03fbccd7 andplain4ee10917. Old files referenceonly.",
+    "Both-eye actualfont/NEAREST ROOT/pose/title/checkbox and selectedSave/publicUndoRedo/paletteclose acknowledgments pass; stereo frame/image/session lifecycle and cleanexit pass."
+  ],
+  "strict_SAN": {
+    "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1:abort_on_error=1",
+    "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=1",
+    "LSAN_OPTIONS": null,
+    "suppressions": false,
+    "observed_reports": false,
+    "all_actual_native_app_exits": 0
+  },
+  "limitations": [
+    "Root native/software coordinator status1 in each profile is preserved independently; current63target ownership is admitted, not all nativegates passed.",
+    "Known real larger query/capacity blocker remains separate; positive small callers do not qualify largecapacity or final productadmission.",
+    "PrivateXvfb exportedmenu actions do not show shell globalmenu/nativeWayland. GUI may use softwareGLX while actual EGLblur worker authenticatesArc.",
+    "RealOpenXRloader/Arc stereo with syntheticposes/actions; no physicalheadset/controllerusability claim.",
+    "Save is nextpublicaction, notforced busyworker concurrency; separate nativependingSave controls retain authority.",
+    "Broader source/projected/baked/polygon/nativeemission and fullmaterial/baking goals, physicaltesting andinstall remain pending."
+  ],
+  "measurement_tool": "Reused independent GL/EGL observer DSO without projectTextureMaps dependency: actualunmodified glGetString, actualEGLDevice/nodePCI/incontextFD/maps, no appstate/UIprogress authority. All project consumers newlybuilt.",
+  "no_timeouts_restarts_or_product_edits": true,
+  "all_device_leases_released": true
+}
