@@ -1,35 +1,25 @@
-## Fresh combined native/software-GL milestone — 2026-11-11
+## Integrated authoring milestone — 2026-11-11
 
-Current b8c469ce passes matched Release/SAN32-target builds, native22,
-workspace27/373, softwareGL1727 perprofile,42 exact native pairs/168crossreads
-and94 exact image pairs. Read [COMBINED-BUILD-20261111.md](COMBINED-BUILD-20261111.md)
-for precise scopes, retained warnings and log limitation. Stronger XR workflows
-now pass8cases/117checks perprofile, with16exact native pairs; read
-[XR-SAVED-REDO-20261111.md](XR-SAVED-REDO-20261111.md). Fixture-only causation is
-unproven; original failures and the separate systemMesa leak remain preserved.
-Current strictArc positives also pass1727/profile and56software/device pairs;
-SANUHD negative teardown leaks remain failures, described in
-[STRICT-ARC-20261111.md](STRICT-ARC-20261111.md). Ordinary GUI81 perprofile/size
-passes with one retained intermittent sanitizer-compact timeout and a screenshot
-presentation gap; read [GUI-CURRENT-20261111.md](GUI-CURRENT-20261111.md).
-Current11-TU inherited-role SAN and stronger GUI acknowledgments remain live.
-Main product admission, broader current regression and full requirements remain
-pending. All historical pause notes below remain historical; the goal is active.
+Main now includes the qualified source-preserving texture fields/sets, resolution
+and history/export work, local sculpt chunks and current inherited VRM material
+adapters, together with current DomeD bitmap-cache integration. Read
+[INTEGRATED-AUTHORING-20261111.md](INTEGRATED-AUTHORING-20261111.md) for exact
+source composition and proof. The original full goal remains active/incomplete.
 
-Main9ee7a2b3 also includes the reviewed opt-in ArmorPaint blur extraction,
-independent software/Arc and unsuppressed sanitizer controls, licenses and the
-native hosting boundary in [ARMORPAINT-EXPERIMENT.md](ARMORPAINT-EXPERIMENT.md).
-It does not implement the full painting backend or alter product defaults.
+Matched native/software/Arc, actual-loader XR, stronger ordinary GUI and current
+inherited-role sanitizer scopes are closed. Original full P1 correctness also
+passes all three repetitions; its observed frame costs do not qualify XR
+performance. Per-object shader/default-attribute repairs retain exact images;
+optimized full workload, broader production/interoperability/accelerator and
+physical acceptance remain required. Driver cleanup failures and earlier test
+failures are retained. Fresh whole-main builds are the next integration gate.
 
-The reviewable production-source union is0b4991ba on
-work/combined-authoring-20261111; main still records evidence/experiment rather
-than admitting that source. Root's isolated sculpt-state repair49465f29 passes
-Release/SAN1733software checks and94exact original/output pairs perprofile,
-reducing the real regression's material setups581to3 with original draw order.
-Hardware/whole-workload acceptance of that repair is pending. Original full P1
-is running with all300stroke/120mask/2000view/120held counts across3repetitions;
-no inventory-only or quiet-performance claim. Active-layer GPU painting and
-shared EGL-display lifetime handling are being implemented separately.
+Real GPU layer authoring/shared-EGL lifetime and ordered GPU draw batching remain
+separate implementation branches. Their earlier prototypes do not complete the
+full layered painting/material/baking objective. Controller trays and spatial
+node-based editing/history remain later requirements after basic targets.
+Earlier checkpoint/pause records below are historical; they do not revoke the
+user's resumption or redefine the complete requirements.
 
 ## Goal active; additional spatial node/history phase — 2026-11-11
 

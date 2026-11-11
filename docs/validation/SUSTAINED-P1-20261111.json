@@ -1,0 +1,528 @@
+{
+  "source": "b8c469ce875eb2542c220300c3c63edbf1526570",
+  "status": "Full original P1 correctness workload completed; interactiveXR performance NOT qualified",
+  "scope": "Full original P1 sustained single-object correctness workload on actual Arc graphics with CPU brushes/mesher. Not physical headset pacing, exclusive-system performance or full production-matrix qualification.",
+  "command": [
+    "/home/blux/de-xr/dome-sculpt/artifacts/build-20261111/release/dome-sculpt-sculpt-sustained",
+    "--output",
+    "/home/blux/de-xr/dome-sculpt/artifacts/sustained-current-20261111/full-p1",
+    "--device",
+    "arc",
+    "--tier",
+    "production",
+    "--objects",
+    "1",
+    "--voxel",
+    ".0125",
+    "--width",
+    "768",
+    "--height",
+    "768",
+    "--strokes",
+    "300",
+    "--masks",
+    "120",
+    "--pairs",
+    "2000",
+    "--held-pairs",
+    "120",
+    "--repetitions",
+    "3"
+  ],
+  "binary_sha256": "a0685fa27ee98047e1b20863cddbd0e5baf5fa732d97852dbb0bfdb120e2dab0",
+  "total_seconds": 3441.164233067946,
+  "peak_external_RSS_bytes": 2124296192,
+  "allocated_output_bytes": 58990592,
+  "initial_size": {
+    "chunks": 632,
+    "retained_chunk_bytes": 210674322,
+    "scalar_bytes": 591728,
+    "stored_samples": 588739,
+    "visible_triangles": 258852,
+    "visible_vertices": 147932
+  },
+  "options": {
+    "allocation_instrumentation": false,
+    "device": "arc",
+    "height": 768,
+    "held_pairs": 120,
+    "inventory_only": false,
+    "masks": 120,
+    "objects": 1,
+    "pairs": 2000,
+    "repetitions": 3,
+    "smoke": false,
+    "strokes": 300,
+    "tier": "production",
+    "voxel": 0.012500000186264515,
+    "width": 768
+  },
+  "totals": {
+    "measured_strokes": 900,
+    "measured_mask_edits": 360,
+    "view_pairs": 6000,
+    "held_pairs": 360,
+    "repetitions": 3,
+    "separate_unmeasured_warm_strokes_with_exact_undo": 3,
+    "independent_checkpoints": 42,
+    "original_grouped_regression": true
+  },
+  "device_initial": {
+    "authenticated": true,
+    "device_id": "0x56a0\n",
+    "device_major": 226,
+    "device_minor": 129,
+    "driver": "/sys/bus/pci/drivers/i915",
+    "open_fds": [
+      {
+        "fd": 4,
+        "target": "/dev/dri/renderD129"
+      },
+      {
+        "fd": 5,
+        "target": "/dev/dri/renderD129"
+      },
+      {
+        "fd": 6,
+        "target": "/dev/dri/renderD129"
+      },
+      {
+        "fd": 7,
+        "target": "/dev/dri/renderD129"
+      }
+    ],
+    "pci": "/sys/devices/pci0000:00/0000:00:01.0/0000:01:00.0/0000:02:01.0/0000:03:00.0",
+    "render_node": "/dev/dri/renderD129",
+    "renderer": "Mesa Intel(R) Arc(tm) A770 Graphics (DG2)",
+    "requested": "arc",
+    "vendor": "Intel",
+    "vendor_id": "0x8086\n",
+    "version": "4.6 (Core Profile) Mesa 26.2.5"
+  },
+  "device_final": {
+    "authenticated": true,
+    "device_id": "0x56a0\n",
+    "device_major": 226,
+    "device_minor": 129,
+    "driver": "/sys/bus/pci/drivers/i915",
+    "open_fds": [
+      {
+        "fd": 4,
+        "target": "/dev/dri/renderD129"
+      },
+      {
+        "fd": 5,
+        "target": "/dev/dri/renderD129"
+      },
+      {
+        "fd": 6,
+        "target": "/dev/dri/renderD129"
+      },
+      {
+        "fd": 7,
+        "target": "/dev/dri/renderD129"
+      }
+    ],
+    "pci": "/sys/devices/pci0000:00/0000:00:01.0/0000:01:00.0/0000:02:01.0/0000:03:00.0",
+    "render_node": "/dev/dri/renderD129",
+    "renderer": "Mesa Intel(R) Arc(tm) A770 Graphics (DG2)",
+    "requested": "arc",
+    "vendor": "Intel",
+    "vendor_id": "0x8086\n",
+    "version": "4.6 (Core Profile) Mesa 26.2.5"
+  },
+  "repetitions": [
+    {
+      "index": 0,
+      "history": {
+        "cancel_exact": true,
+        "ordered_save_reopen_exact": true,
+        "real_factory_return_barrier_reached": true,
+        "retired_native_generation_exact": true,
+        "undo_redo_exact": true
+      },
+      "checkpoints": 14,
+      "warmup": {
+        "exact_undo": true,
+        "excluded_ns": 3220941962,
+        "real_strokes": 1
+      },
+      "timers": {
+        "valid_samples": 2000,
+        "valid_coverage": 1.0,
+        "pending_after_bounded_drain": 0,
+        "distribution_qualified": true,
+        "distribution_ns": {
+          "count": 2000,
+          "max_ns": 2624114270.0,
+          "mean_ns": 376642773.032,
+          "p50_ns": 311819739.0,
+          "p90_ns": 543867708.0,
+          "p95_ns": 888865416.0,
+          "p99_ns": 1532564947.0
+        }
+      },
+      "stages": {
+        "stroke": {
+          "wall_ns": {
+            "count": 300,
+            "max_ns": 2364033906.0,
+            "mean_ns": 582850486.74,
+            "p50_ns": 378547041.0,
+            "p90_ns": 1336537560.0,
+            "p95_ns": 1586685599.0,
+            "p99_ns": 1985830816.0
+          },
+          "caller_thread_cpu_ns": {
+            "count": 300,
+            "max_ns": 234582057.0,
+            "mean_ns": 147876760.05666667,
+            "p50_ns": 131027657.0,
+            "p90_ns": 205589186.0,
+            "p95_ns": 212199590.0,
+            "p99_ns": 220279883.0
+          }
+        },
+        "mask": {
+          "wall_ns": {
+            "count": 120,
+            "max_ns": 489055986.0,
+            "mean_ns": 288054187.625,
+            "p50_ns": 279099639.0,
+            "p90_ns": 355640716.0,
+            "p95_ns": 373228808.0,
+            "p99_ns": 476354078.0
+          },
+          "caller_thread_cpu_ns": {
+            "count": 120,
+            "max_ns": 206243765.0,
+            "mean_ns": 139179500.35,
+            "p50_ns": 133318543.0,
+            "p90_ns": 172186928.0,
+            "p95_ns": 177900600.0,
+            "p99_ns": 195384943.0
+          }
+        },
+        "view_pair": {
+          "wall_ns": {
+            "count": 2000,
+            "max_ns": 2728558611.0,
+            "mean_ns": 388550629.9115,
+            "p50_ns": 322774265.0,
+            "p90_ns": 554110932.0,
+            "p95_ns": 914999060.0,
+            "p99_ns": 1619662826.0
+          },
+          "caller_thread_cpu_ns": {
+            "count": 2000,
+            "max_ns": 470906890.0,
+            "mean_ns": 257418797.572,
+            "p50_ns": 248109082.0,
+            "p90_ns": 338973394.0,
+            "p95_ns": 392047430.0,
+            "p99_ns": 436828764.0
+          }
+        },
+        "held_pair": {
+          "wall_ns": {
+            "count": 120,
+            "max_ns": 370893733.0,
+            "mean_ns": 198219912.26666668,
+            "p50_ns": 187746521.0,
+            "p90_ns": 232799303.0,
+            "p95_ns": 298136664.0,
+            "p99_ns": 369002501.0
+          },
+          "caller_thread_cpu_ns": {
+            "count": 120,
+            "max_ns": 286836058.0,
+            "mean_ns": 192612092.425,
+            "p50_ns": 186603466.0,
+            "p90_ns": 229765025.0,
+            "p95_ns": 242965476.0,
+            "p99_ns": 279942663.0
+          }
+        }
+      }
+    },
+    {
+      "index": 1,
+      "history": {
+        "cancel_exact": true,
+        "ordered_save_reopen_exact": true,
+        "real_factory_return_barrier_reached": true,
+        "retired_native_generation_exact": true,
+        "undo_redo_exact": true
+      },
+      "checkpoints": 14,
+      "warmup": {
+        "exact_undo": true,
+        "excluded_ns": 972100253,
+        "real_strokes": 1
+      },
+      "timers": {
+        "valid_samples": 2000,
+        "valid_coverage": 1.0,
+        "pending_after_bounded_drain": 0,
+        "distribution_qualified": true,
+        "distribution_ns": {
+          "count": 2000,
+          "max_ns": 5849930937.0,
+          "mean_ns": 544228076.751,
+          "p50_ns": 336084322.0,
+          "p90_ns": 1194486979.0,
+          "p95_ns": 2234972500.0,
+          "p99_ns": 3758633750.0
+        }
+      },
+      "stages": {
+        "stroke": {
+          "wall_ns": {
+            "count": 300,
+            "max_ns": 232915493.0,
+            "mean_ns": 153879949.12,
+            "p50_ns": 159390846.0,
+            "p90_ns": 183506689.0,
+            "p95_ns": 189572540.0,
+            "p99_ns": 208871012.0
+          },
+          "caller_thread_cpu_ns": {
+            "count": 300,
+            "max_ns": 118319360.0,
+            "mean_ns": 83932366.54333334,
+            "p50_ns": 84070714.0,
+            "p90_ns": 91040049.0,
+            "p95_ns": 92823597.0,
+            "p99_ns": 96067125.0
+          }
+        },
+        "mask": {
+          "wall_ns": {
+            "count": 120,
+            "max_ns": 134358333.0,
+            "mean_ns": 119887227.80833334,
+            "p50_ns": 119400082.0,
+            "p90_ns": 127671100.0,
+            "p95_ns": 129172852.0,
+            "p99_ns": 133293977.0
+          },
+          "caller_thread_cpu_ns": {
+            "count": 120,
+            "max_ns": 96046554.0,
+            "mean_ns": 86236982.91666667,
+            "p50_ns": 85731691.0,
+            "p90_ns": 92150259.0,
+            "p95_ns": 93646182.0,
+            "p99_ns": 94711336.0
+          }
+        },
+        "view_pair": {
+          "wall_ns": {
+            "count": 2000,
+            "max_ns": 6007988701.0,
+            "mean_ns": 562291321.215,
+            "p50_ns": 351524108.0,
+            "p90_ns": 1231354574.0,
+            "p95_ns": 2311941805.0,
+            "p99_ns": 3897461618.0
+          },
+          "caller_thread_cpu_ns": {
+            "count": 2000,
+            "max_ns": 544223568.0,
+            "mean_ns": 259117207.203,
+            "p50_ns": 234629001.0,
+            "p90_ns": 413438173.0,
+            "p95_ns": 436482792.0,
+            "p99_ns": 527381142.0
+          }
+        },
+        "held_pair": {
+          "wall_ns": {
+            "count": 120,
+            "max_ns": 1729729414.0,
+            "mean_ns": 549281603.5333333,
+            "p50_ns": 433665888.0,
+            "p90_ns": 946879059.0,
+            "p95_ns": 1035567727.0,
+            "p99_ns": 1568412795.0
+          },
+          "caller_thread_cpu_ns": {
+            "count": 120,
+            "max_ns": 441747806.0,
+            "mean_ns": 309689702.5083333,
+            "p50_ns": 282311919.0,
+            "p90_ns": 416051355.0,
+            "p95_ns": 426606574.0,
+            "p99_ns": 438973794.0
+          }
+        }
+      }
+    },
+    {
+      "index": 2,
+      "history": {
+        "cancel_exact": true,
+        "ordered_save_reopen_exact": true,
+        "real_factory_return_barrier_reached": true,
+        "retired_native_generation_exact": true,
+        "undo_redo_exact": true
+      },
+      "checkpoints": 14,
+      "warmup": {
+        "exact_undo": true,
+        "excluded_ns": 2543702042,
+        "real_strokes": 1
+      },
+      "timers": {
+        "valid_samples": 2000,
+        "valid_coverage": 1.0,
+        "pending_after_bounded_drain": 0,
+        "distribution_qualified": true,
+        "distribution_ns": {
+          "count": 2000,
+          "max_ns": 1649996510.0,
+          "mean_ns": 382969962.4305,
+          "p50_ns": 350051875.0,
+          "p90_ns": 468744010.0,
+          "p95_ns": 641710104.0,
+          "p99_ns": 1095348020.0
+        }
+      },
+      "stages": {
+        "stroke": {
+          "wall_ns": {
+            "count": 300,
+            "max_ns": 1861904547.0,
+            "mean_ns": 528343657.2733333,
+            "p50_ns": 453826440.0,
+            "p90_ns": 843719792.0,
+            "p95_ns": 983578615.0,
+            "p99_ns": 1405306639.0
+          },
+          "caller_thread_cpu_ns": {
+            "count": 300,
+            "max_ns": 228395984.0,
+            "mean_ns": 155283521.49,
+            "p50_ns": 148676651.0,
+            "p90_ns": 196872452.0,
+            "p95_ns": 208863342.0,
+            "p99_ns": 220123536.0
+          }
+        },
+        "mask": {
+          "wall_ns": {
+            "count": 120,
+            "max_ns": 1149484148.0,
+            "mean_ns": 329627640.25,
+            "p50_ns": 296772059.0,
+            "p90_ns": 405270529.0,
+            "p95_ns": 598861109.0,
+            "p99_ns": 1031329586.0
+          },
+          "caller_thread_cpu_ns": {
+            "count": 120,
+            "max_ns": 240141463.0,
+            "mean_ns": 147831018.73333332,
+            "p50_ns": 138536332.0,
+            "p90_ns": 197131685.0,
+            "p95_ns": 209786669.0,
+            "p99_ns": 214592653.0
+          }
+        },
+        "view_pair": {
+          "wall_ns": {
+            "count": 2000,
+            "max_ns": 1692856887.0,
+            "mean_ns": 395213613.5475,
+            "p50_ns": 359482549.0,
+            "p90_ns": 489571883.0,
+            "p95_ns": 660100532.0,
+            "p99_ns": 1125859463.0
+          },
+          "caller_thread_cpu_ns": {
+            "count": 2000,
+            "max_ns": 466325169.0,
+            "mean_ns": 262689733.409,
+            "p50_ns": 251637000.0,
+            "p90_ns": 303441638.0,
+            "p95_ns": 364596935.0,
+            "p99_ns": 419297863.0
+          }
+        },
+        "held_pair": {
+          "wall_ns": {
+            "count": 120,
+            "max_ns": 392572621.0,
+            "mean_ns": 300715661.23333335,
+            "p50_ns": 298082229.0,
+            "p90_ns": 336714211.0,
+            "p95_ns": 351108383.0,
+            "p99_ns": 381755006.0
+          },
+          "caller_thread_cpu_ns": {
+            "count": 120,
+            "max_ns": 274192634.0,
+            "mean_ns": 239209608.91666666,
+            "p50_ns": 239519879.0,
+            "p90_ns": 256550025.0,
+            "p95_ns": 259728063.0,
+            "p99_ns": 272337171.0
+          }
+        }
+      }
+    }
+  ],
+  "conditions": {
+    "concurrent_CPU_qualification_and_external_builds": true,
+    "exclusive_cooperating_Arc_test_lock": "/tmp/dome-sculpt-arc-device.lock",
+    "physical_headset": false,
+    "natural_CPP_allocation_counters_enabled": false,
+    "stack_observer": {
+      "artifact": "artifacts/sustained-current-20261111/stack-samples",
+      "caveat": "One main-thread eu-stack sample may briefly pause target; timingrecord retained. Hostloadlater exceeded270 on20logicalCPUs. No exclusive-system/performanceacceptance claim."
+    },
+    "timer_scope": "Actual two-eye GL elapsed query interval, not isolated GPU busy percentage; CPU submission gaps/preemption can be included. Stage timings overlap and must not be summed."
+  },
+  "remaining_costs": [
+    "whole GPU directory reconciliation",
+    "changed-mask object-wide scalar sampling",
+    "separate pre-chunk executable baseline",
+    "physical headset pacing",
+    "affine Volume sculpt mutations remain refused"
+  ],
+  "evidence": {
+    "artifacts/sustained-current-20261111/status.json": {
+      "sha256": "489f9c5953b286d0d77cd22ab6b9f8524b308caad4b19acf903d1c88bb2609b1",
+      "bytes": 2482
+    },
+    "artifacts/sustained-current-20261111/run.py": {
+      "sha256": "00a7765fcd73b98b8fbcea44470434d0a7e13d724214d656aa1bf1328a7c40c2",
+      "bytes": 6435
+    },
+    "artifacts/sustained-current-20261111/process.log": {
+      "sha256": "2794e9f49f0d736f5a0194a7d9d5fa9e1efe038fed429ee42bcd8d32c8fad17b",
+      "bytes": 66
+    },
+    "artifacts/sustained-current-20261111/full-p1/result.json": {
+      "sha256": "de8d55bfe48f2d0bb66ddc123ba74a64e6c02ebe8c73f82541aded25d3bd506e",
+      "bytes": 13709189
+    },
+    "artifacts/sustained-current-20261111/full-p1/raw-samples.ndjson": {
+      "sha256": "6293773902493aa0e1f403ac55c13a1af8d81017a95b82188a8c0deabe017091",
+      "bytes": 7047188
+    },
+    "artifacts/sustained-current-20261111/full-p1/fixed-inputs.json": {
+      "sha256": "85e82de7824ea1d90ff79938d46a4e8dbfc2e3c81602b6cdc4d5dc428aa4419d",
+      "bytes": 450786
+    },
+    "artifacts/sustained-current-20261111/full-p1/context-initial.maps": {
+      "sha256": "8bc04bacbcfa316857a2c654f450f83f82e568954bfa563864a1678558454d0c",
+      "bytes": 30972
+    },
+    "artifacts/sustained-current-20261111/full-p1/context-final.maps": {
+      "sha256": "d15c04c1f174ba7875f195214369bd8171469c8bd311558638cb54a7e4c3e155",
+      "bytes": 62202
+    }
+  },
+  "interpretation": "Observed view/held latencies are unsuitable as XR performance acceptance. Root implemented per-object material/constant submission repairs with matching software/hardware images; full optimized workload and productionmatrix/physicalpacing remain required."
+}

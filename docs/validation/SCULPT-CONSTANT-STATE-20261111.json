@@ -1,0 +1,102 @@
+{
+  "source": "7415d581b1a4ba4fbecc6aefdd08d0aa20b6b9fb",
+  "scope": "Per-object disabled constant attributes on top of material submission repair; scalar6 remains reset per unmasked run. Incremental whole2TU/sevenELFrelink qualification with exact frozenb8 remaining providers, not a freshwholemainbuild.",
+  "profiles": {
+    "release": {
+      "build_exit": 0,
+      "fresh_complete_TUs": 2,
+      "relinked_consumers": 7,
+      "softwareGL_checks": 1739,
+      "exit": 0,
+      "chunk_consumer_checks": 84,
+      "actual_material_setups": [
+        3,
+        3,
+        3,
+        3,
+        3,
+        3
+      ],
+      "actual_tangent_constant_submissions": [
+        4,
+        4,
+        4,
+        4,
+        4,
+        4
+      ],
+      "old_new_images": 94,
+      "all_old_new_exact": true,
+      "build_status_sha256": "4bb7c1b2b4d40680c307d0e579d0bbb1b4fd85542df3a4130561bb77befb5966",
+      "graphics_status_sha256": "d327c33f16b01079f2838fef037977da105728f189cf24fc20e012a72bc43f84",
+      "image_comparison_sha256": "7480c87deaa6e2745fcd0a433a4f9b7ab97c2b8ab61e15b61dea5e1603a6fd02",
+      "application_sha256": "e82df5662ed9c66f5e23275658bf565ac37cffeeb88b4423f9f4105529c8d0a3",
+      "asan_options": null,
+      "ubsan_options": null,
+      "lsan_options": null
+    },
+    "sanitize": {
+      "build_exit": 0,
+      "fresh_complete_TUs": 2,
+      "relinked_consumers": 7,
+      "softwareGL_checks": 1739,
+      "exit": 0,
+      "chunk_consumer_checks": 84,
+      "actual_material_setups": [
+        3,
+        3,
+        3,
+        3,
+        3,
+        3
+      ],
+      "actual_tangent_constant_submissions": [
+        4,
+        4,
+        4,
+        4,
+        4,
+        4
+      ],
+      "old_new_images": 94,
+      "all_old_new_exact": true,
+      "build_status_sha256": "78ce3c8efe5867e45a8b50c7d1b043fcbddcc9310428dfb10d73af72384e006a",
+      "graphics_status_sha256": "24c171822413deb7a8b8b4b844d9f4b258c55a6d8036dc866c8acef8e8cb3830",
+      "image_comparison_sha256": "7480c87deaa6e2745fcd0a433a4f9b7ab97c2b8ab61e15b61dea5e1603a6fd02",
+      "application_sha256": "1efb96511d04d5a4bb03f3b1f5932a5067d28617539cc9dc6e34d2300ce888f0",
+      "asan_options": "detect_leaks=1:halt_on_error=1:abort_on_error=1",
+      "ubsan_options": "halt_on_error=1:print_stacktrace=1",
+      "lsan_options": null
+    }
+  },
+  "counterexample": {
+    "source_of_prior_renderer": "49465f294baa0547ec724938a0f0fa91cdb3e125",
+    "exit": 1,
+    "expected_failure": true,
+    "seconds": 2.0879046479822136,
+    "command": [
+      "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-constant-state-build-20261111/release/old-renderer-counterexample",
+      "/home/blux/de-xr/dome-sculpt/artifacts/sculpt-constant-state-build-20261111/old-renderer-counterexample-output"
+    ],
+    "old_archive_sha256": "a6f566bf2234d685bf32f4bd4b5cd976380b88cb31198e0fffec906c19df6f4e",
+    "binary_sha256": "9a8d1620f701d57bba689189cc7c92d9142cf26038998714ac5f6646f4405014",
+    "log_sha256": "6c6b4af5a0cd0d91820a2b2599215b3730846c0e9f7b70d4eb0ae8b1fe02c356",
+    "actual_setup_lines": [
+      "MATERIAL_SETUP case=0 actual=3 object_range_limit=3",
+      "CONSTANT_ATTRIBUTES case=0 actual=582 object_range_limit=4"
+    ],
+    "original_pixel_and_material_submission_oracles_pass": true
+  },
+  "specification": {
+    "primary_source": "https://raw.githubusercontent.com/KhronosGroup/OpenGL-Refpages/main/gl4/glDrawElements.xml",
+    "reference_page": "https://registry.khronos.org/OpenGL-Refpages/gl4/html/glDrawElements.xhtml",
+    "checked": "2026-11-11",
+    "basis": "Draws can leave enabled-array current attribute values unspecified; unmodified attributes retain their values. The hoist includes only arrays disabled for every chunk. Scalar6 can be enabled and therefore retains its explicit per-unmasked-run reset."
+  },
+  "hardware_receipt": "docs/validation/STRICT-ARC-CONSTANT-20261111.json",
+  "remaining": "Optimized fullP1/productionmatrix/headset pacing remain required; further orderedGPUbatching is independent pending work.",
+  "release_sanitize_image_pairs": {
+    "pairs": 94,
+    "all_byte_exact": true
+  }
+}

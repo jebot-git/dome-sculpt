@@ -1,17 +1,25 @@
-## Fresh combined native/software-GL milestone — 2026-11-11
+## Integrated authoring milestone — 2026-11-11
 
-The full goal is active. Current b8c469ce has matched Release/SAN32-target
-builds,22native suites, workspace27/373, softwareGL1727 perprofile,42exact native
-pairs/168crossreads and94exact image pairs. Read
-[COMBINED-BUILD-20261111.md](COMBINED-BUILD-20261111.md) for actual scope and limits.
-The stronger XR/public-menu fixture passes8cases/117checks perprofile and16exact
-native pairs; see [XR-SAVED-REDO-20261111.md](XR-SAVED-REDO-20261111.md) for scope,
-driver recovery and retained failures. Inherited-role sanitizer readers, ordinary
-GUI and broader current qualification remain pending; no main product admission
-or full completion. The opt-in ArmorPaint extraction is a bounded GPU proof,
-not the full painting backend; see [ARMORPAINT-EXPERIMENT.md](ARMORPAINT-EXPERIMENT.md).
-The later controller-tray and spatial node/history requirements remain required.
-Historical pause entries follow and do not revoke the user's resumption.
+Main now includes the qualified source-preserving texture fields/sets, resolution
+and history/export work, local sculpt chunks and current inherited VRM material
+adapters, together with current DomeD bitmap-cache integration. Read
+[INTEGRATED-AUTHORING-20261111.md](INTEGRATED-AUTHORING-20261111.md) for exact
+source composition and proof. The original full goal remains active/incomplete.
+
+Matched native/software/Arc, actual-loader XR, stronger ordinary GUI and current
+inherited-role sanitizer scopes are closed. Original full P1 correctness also
+passes all three repetitions; its observed frame costs do not qualify XR
+performance. Per-object shader/default-attribute repairs retain exact images;
+optimized full workload, broader production/interoperability/accelerator and
+physical acceptance remain required. Driver cleanup failures and earlier test
+failures are retained. Fresh whole-main builds are the next integration gate.
+
+Real GPU layer authoring/shared-EGL lifetime and ordered GPU draw batching remain
+separate implementation branches. Their earlier prototypes do not complete the
+full layered painting/material/baking objective. Controller trays and spatial
+node-based editing/history remain later requirements after basic targets.
+Earlier checkpoint/pause records below are historical; they do not revoke the
+user's resumption or redefine the complete requirements.
 
 ## Goal resumed with restored sources — 2026-11-11
 

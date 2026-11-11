@@ -1,0 +1,39 @@
+{
+  "code_parent": "8f9daa9f8df29bbc3bf5cb7c35a547c03f58399e",
+  "production_source_equal_to": "7415d581b1a4ba4fbecc6aefdd08d0aa20b6b9fb",
+  "differences_from_that_tree": [
+    "docs/GUI-CURRENT-20261111.md",
+    "docs/GUI-PUBLIC-ACK-20261111.md",
+    "docs/HANDOFF.md",
+    "docs/NATIVE-GRAPHICS-LIFECYCLE-20261111.md",
+    "docs/READERS-SAN-20261111.md",
+    "docs/STRICT-ARC-20261111.md",
+    "docs/STRICT-ARC-CONSTANT-20261111.md",
+    "docs/validation/GUI-CURRENT-20261111.json",
+    "docs/validation/GUI-PUBLIC-ACK-20261111.json",
+    "docs/validation/NATIVE-GRAPHICS-LIFECYCLE-20261111.json",
+    "docs/validation/READERS-SAN-20261111.json",
+    "docs/validation/STRICT-ARC-20261111.json",
+    "docs/validation/STRICT-ARC-CONSTANT-20261111.json",
+    "tests/texture-set-menu.py"
+  ],
+  "gui_fixture_equal_to": "479ceadc0c56380f846e0d722dd21b546767a03d",
+  "domed_latest_local_and_fetched_main": "acc2b70ae61dedec2a23727f67c60c0303d0f76f",
+  "native_bdf_helper_sha256": "2c4f7bc4af8f9eb715271e4a2b226c1bd7a07480469ea0e4678493a5822e3267",
+  "scope": "Main code composition/admission of qualified component milestones; pending freshwholemain build. Fullobjective remains active.",
+  "preserved_limits": [
+    "Fulloriginalrequirements and latertrays/spatialnodes remain required",
+    "No wholeoptimizedP1 or physicalperformance acceptance inferred",
+    "SANUHDdrivercleanup failures remain preserved",
+    "GPUlayercommand/arena implementation excluded until qualified"
+  ],
+  "evidence": [
+    "docs/COMBINED-BUILD-20261111.md",
+    "docs/READERS-SAN-20261111.md",
+    "docs/GUI-PUBLIC-ACK-20261111.md",
+    "docs/XR-SAVED-REDO-20261111.md",
+    "docs/SCULPT-CONSTANT-STATE-20261111.md",
+    "docs/STRICT-ARC-CONSTANT-20261111.md",
+    "docs/SUSTAINED-P1-20261111.md"
+  ]
+}
