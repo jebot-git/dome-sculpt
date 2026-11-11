@@ -1,4 +1,34 @@
-## Active combined owning build — 2026-11-11
+## Combined owning build complete; large-scene query repair pending — 2026-11-11
+
+Frozen private source `a904a2d6` completed fresh Release and strict sanitizer
+builds of all 63 selected owning targets from zero project objects. Each selected
+CTest run passed 48/53; the original five failures remain preserved. Supplemental
+workspace checks pass 27 chunk and 373 placed-owner controls in each profile.
+Read [OWNING-BUILD-OBSERVER-20261111.md](OWNING-BUILD-OBSERVER-20261111.md).
+
+The native color test-only correction passes 96 controls in both profiles against
+those exact owning providers. Other private fixture corrections preserve genuine
+images/native scenes, zero unchanged transfers and original capacity inputs.
+**Capacity is a real product blocker:** the single global material query rejects
+valid combined meshes above standalone SurfaceQuery limits. A bounded private
+partitioned query is being implemented with original global primitive/attribute
+identity, shared work budgets and full validation. No cap increase, disabled
+picking or capacity pass is claimed. The frozen source/providers stay unchanged
+while current application proofs finish.
+
+Current owning software and authenticated Arc graphics pass in both profiles;
+all 98 image/native pairs match exactly across Release/sanitizer, with maximum
+software/Arc RGB difference 2 within bound 6 and exact alpha/native scenes. Read
+[CURRENT-OWNING-GRAPHICS-20261111.md](CURRENT-OWNING-GRAPHICS-20261111.md).
+Actual current public source/plain GUI and real-loader XR workflows are separate
+qualification. Final query integration and current production workload acceptance
+remain required; the combined product is not admitted to main.
+
+The complete original objective and later controller trays/spatial node editing
+and history remain active and incomplete. No installation or headset/session
+restart occurs. The earlier build-running checkpoint below is historical.
+
+## Historical combined owning build launch — 2026-11-11
 
 Private combined source `a904a2d6` is frozen in
 `artifacts/authoring-production-union-20261111`. Fresh Release and strict-SAN

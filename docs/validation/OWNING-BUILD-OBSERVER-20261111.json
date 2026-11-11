@@ -1,0 +1,210 @@
+{
+  "schema": 1,
+  "scope": "Complete fresh 63-target owning Release/SAN builds plus narrow faithful native color test-observer correction; whole candidate remains unadmitted and original five CTest failures retained.",
+  "combined_source": "a904a2d644eca7885e38e51528057790232e8418",
+  "observer_source": "e81ac048f9fd8285af74a88d8b1094590ff1af0a",
+  "product_delta": [],
+  "whole_profiles": {
+    "release": {
+      "status": "artifacts/authoring-production-build-20261111/release-owning-status.json",
+      "status_sha256": "9231c31df4545e2391f6dcd8f7af5e6bcd1afaf8d00d91ad2c9b1281fcbd2396",
+      "initial_project_objects": 0,
+      "owned_outputs": 381,
+      "project_objects": 305,
+      "steps": [
+        {
+          "name": "configure",
+          "exit": 0,
+          "seconds": 4.172183886053972,
+          "log_sha256": "40d8ca9460b5df4e91b96cd2fd364132b7c874d4fd69386d21dec19d540947ce"
+        },
+        {
+          "name": "build",
+          "exit": 0,
+          "seconds": 883.3595254520187,
+          "log_sha256": "74751a5493827c1c6832db2e261d027af2051020a8522f5ef8d332ac32e1cb66"
+        },
+        {
+          "name": "app-version",
+          "exit": 0,
+          "seconds": 0.06268393201753497,
+          "log_sha256": "9455a20a636a6599ace60120261649d3b29dc51fe2c774305994879190e7336b"
+        },
+        {
+          "name": "selected-native-software",
+          "exit": 8,
+          "seconds": 101.8152707380359,
+          "log_sha256": "c21140388ed76f6c9f7eaccdb3c9ae6ca613b1ee267f2d7b583c711476fc4bfb"
+        }
+      ],
+      "ctest_pass": 48,
+      "ctest_fail": 5,
+      "workspace_status": "artifacts/authoring-production-build-20261111/release-supplemental-workspaces/status.json",
+      "workspace_controls": [
+        27,
+        373
+      ],
+      "source_drift": [],
+      "sdk_drift": []
+    },
+    "sanitize": {
+      "status": "artifacts/authoring-production-build-20261111/sanitize-owning-status.json",
+      "status_sha256": "1ad0b506ce5dbb181fab6edb7ae4cea636536d6495fd20813d5d9da90a4923ec",
+      "initial_project_objects": 0,
+      "owned_outputs": 381,
+      "project_objects": 305,
+      "steps": [
+        {
+          "name": "configure",
+          "exit": 0,
+          "seconds": 4.322211938968394,
+          "log_sha256": "6999d903c4c955cb6c2c81db1f4d1bf93e0938457df088f00417634397534da7"
+        },
+        {
+          "name": "build",
+          "exit": 0,
+          "seconds": 1754.2886863290332,
+          "log_sha256": "8e2aacb27d99c8bd1539ee9341cd22e024937d5acd664df4783a24ed9b65c636"
+        },
+        {
+          "name": "app-version",
+          "exit": 0,
+          "seconds": 0.16583946900209412,
+          "log_sha256": "9455a20a636a6599ace60120261649d3b29dc51fe2c774305994879190e7336b"
+        },
+        {
+          "name": "selected-native-software",
+          "exit": 8,
+          "seconds": 288.36148539197166,
+          "log_sha256": "91094cc327fcf6d76434f9669f9f40b0695b22d2aad3d12bbb737d97cae2a9ed"
+        }
+      ],
+      "ctest_pass": 48,
+      "ctest_fail": 5,
+      "workspace_status": "artifacts/authoring-production-build-20261111/sanitize-supplemental-workspaces/status.json",
+      "workspace_controls": [
+        27,
+        373
+      ],
+      "source_drift": [],
+      "sdk_drift": []
+    }
+  },
+  "observer_profiles": {
+    "release": {
+      "status": "artifacts/local-paint-observer-build-20261111/release-e81/status.json",
+      "status_sha256": "e93a8fc579868c12a4166a40105e7ea2e274a8d0a4e7767318332329bddf0a68",
+      "controls": 96,
+      "exit": 0,
+      "seconds": 0.8157827999675646,
+      "elf_sha256": "4ba51aec26e8fa74792ca82afa0b63b9acb2434c5681cdd36fdcad8bba4af5c3",
+      "log_sha256": "2a4c62002d6d648d0cd1c86b2fe36c2593bbf781937e8abde45db1525ef79c56",
+      "sanitizer_environment": {
+        "ASAN_OPTIONS": null,
+        "LSAN_OPTIONS": null,
+        "UBSAN_OPTIONS": null
+      },
+      "provider_drift": []
+    },
+    "sanitize": {
+      "status": "artifacts/local-paint-observer-build-20261111/sanitize-e81/status.json",
+      "status_sha256": "82c2d355911862aa652b742f3ceccd47ec3309d5ef4d8898b126c3076a8bcce0",
+      "controls": 96,
+      "exit": 0,
+      "seconds": 7.027168961009011,
+      "elf_sha256": "70b2e113912621f6e080aa23089b9b52101f8c6371ec8a8fa8c1d07126cdcb22",
+      "log_sha256": "2a4c62002d6d648d0cd1c86b2fe36c2593bbf781937e8abde45db1525ef79c56",
+      "sanitizer_environment": {
+        "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1:abort_on_error=1",
+        "LSAN_OPTIONS": null,
+        "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=1"
+      },
+      "provider_drift": []
+    }
+  },
+  "files": {
+    "artifacts/local-paint-observer-build-20261111/run-profile.py": {
+      "sha256": "bb25cd7ee50f3e0d1f2beeb2438ca0c0c47794c5bdce2890f2255798c469862c",
+      "bytes": 3844
+    },
+    "artifacts/authoring-production-build-20261111/release-owning-status.json": {
+      "sha256": "9231c31df4545e2391f6dcd8f7af5e6bcd1afaf8d00d91ad2c9b1281fcbd2396",
+      "bytes": 92730
+    },
+    "artifacts/authoring-production-build-20261111/release-supplemental-workspaces/status.json": {
+      "sha256": "859c191424863e84f26075b992aef2309a607cccd59435930585afc4ab82b74b",
+      "bytes": 1100
+    },
+    "artifacts/authoring-production-build-20261111/release-selected-native-software.log": {
+      "sha256": "c21140388ed76f6c9f7eaccdb3c9ae6ca613b1ee267f2d7b583c711476fc4bfb",
+      "bytes": 33618
+    },
+    "artifacts/authoring-production-build-20261111/release/Testing/Temporary/LastTestsFailed.log": {
+      "sha256": "c56ad01f4cdf5ec2296bf6e16673751101e04f83af67da84f1281da9ebf7ef87",
+      "bytes": 145
+    },
+    "artifacts/local-paint-observer-build-20261111/release-e81/status.json": {
+      "sha256": "e93a8fc579868c12a4166a40105e7ea2e274a8d0a4e7767318332329bddf0a68",
+      "bytes": 86414
+    },
+    "artifacts/local-paint-observer-build-20261111/release-e81/native.log": {
+      "sha256": "2a4c62002d6d648d0cd1c86b2fe36c2593bbf781937e8abde45db1525ef79c56",
+      "bytes": 7827
+    },
+    "artifacts/local-paint-observer-build-20261111/release-e81/compile.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/local-paint-observer-build-20261111/release-e81/link.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/authoring-production-build-20261111/sanitize-owning-status.json": {
+      "sha256": "1ad0b506ce5dbb181fab6edb7ae4cea636536d6495fd20813d5d9da90a4923ec",
+      "bytes": 93206
+    },
+    "artifacts/authoring-production-build-20261111/sanitize-supplemental-workspaces/status.json": {
+      "sha256": "ed6df2695bb1c839db0159a7a1a2fa465c9a941846c2a4d9584080e6cb82e8f9",
+      "bytes": 1141
+    },
+    "artifacts/authoring-production-build-20261111/sanitize-selected-native-software.log": {
+      "sha256": "91094cc327fcf6d76434f9669f9f40b0695b22d2aad3d12bbb737d97cae2a9ed",
+      "bytes": 33619
+    },
+    "artifacts/authoring-production-build-20261111/sanitize/Testing/Temporary/LastTestsFailed.log": {
+      "sha256": "c56ad01f4cdf5ec2296bf6e16673751101e04f83af67da84f1281da9ebf7ef87",
+      "bytes": 145
+    },
+    "artifacts/local-paint-observer-build-20261111/sanitize-e81/status.json": {
+      "sha256": "82c2d355911862aa652b742f3ceccd47ec3309d5ef4d8898b126c3076a8bcce0",
+      "bytes": 87078
+    },
+    "artifacts/local-paint-observer-build-20261111/sanitize-e81/native.log": {
+      "sha256": "2a4c62002d6d648d0cd1c86b2fe36c2593bbf781937e8abde45db1525ef79c56",
+      "bytes": 7827
+    },
+    "artifacts/local-paint-observer-build-20261111/sanitize-e81/compile.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/local-paint-observer-build-20261111/sanitize-e81/link.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "artifacts/authoring-production-union-20261111/tests/local-surface-integration.cpp": {
+      "sha256": "880adb6a9ba9c423bc8cdc7b047274c25c119a19ab4280752edf78dbab51e330",
+      "bytes": 33762
+    },
+    "artifacts/local-paint-observer-20261111/tests/local-surface-integration.cpp": {
+      "sha256": "40eefbf4ad76c8bdc4a707cef989ed284fdc098c9e4aa1d1f3e72172c4ff7e11",
+      "bytes": 34648
+    }
+  },
+  "archive": {
+    "path": "docs/validation/OWNING-BUILD-OBSERVER-20261111.tar.gz",
+    "sha256": "cf6b457cf32157fe2f50b2a54a136f44970d04757aad7111dbf13ba4120921bf",
+    "bytes": 119886,
+    "members": 19,
+    "content_verified": true
+  }
+}
