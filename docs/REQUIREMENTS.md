@@ -1,3 +1,33 @@
+## Next combined HDR authoring candidate: fresh owning build started — 2026-11-11
+
+Private candidate `4977fb32` combines the current main authoring/query source,
+reviewed empty-flat renderer fix `82257f3b`, radiance-preserving Bake `2238315b`
+and public Bake workflow fixture prototype `305d2cb7`. Its configured ALL Release
+build has started from zero project objects: 1,738 Ninja actions, current owning
+FLTK/OpenXR/core/renderer consumers, and no object borrowing across changed public
+paint/scene layouts. Configure passed; compilation and subsequent selected gates
+are not yet qualified. Follow `artifacts/authoring-hdr-owning-build-20261111/`
+and inspect the actual live job before resuming; do not restart on observation
+timeout. The candidate's full scope is in
+private `docs/AUTHORING-HDR-OWNING-CANDIDATE-20261111.md` in that worktree.
+
+The separate empty-flat fix passes nine actual native/software cases and four
+authenticated Arc cases in each Release/strict sanitizer profile. Its complete
+new test TUs reject the old wasted-work behavior. An independent same-object
+probe preserves old success, intermediate GL error1282, then fixed success with
+byte-identical old/fixed logs. These are component proofs, not combined public
+GUI/XR or new sustained-workload acceptance. The original timing tails remain
+open; no frame-rate improvement is claimed.
+
+HDR Bake's own Release worker/export path now passes its former 52,016-radiance
+fallback failure; its standalone seven-FLOAT GPU fixture passes 172,040 checks
+each on software and authenticated Arc. Fresh component sanitizer compilation,
+combined owning qualification, actual public Bake workflows and broader typed
+source/frame/normal/painting/avatar/interoperability/device/accelerator work remain
+required. Main's runtime below remains the qualified e993 integration. The full
+goal and later controller trays/spatial node editing/history remain active and
+incomplete. No system installation or physical session changed.
+
 ## Integrated authoring and large-mesh query milestone — 2026-11-11
 
 Main now contains the qualified `e9931f72` product source, preserving all prior
