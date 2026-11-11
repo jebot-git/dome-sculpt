@@ -175,5 +175,14 @@
     "full UV1 typed-source Document Bake worker/history/persistence/export",
     "actual highrange SurfaceRenderer precision/finiteness",
     "fresh current owning public app desktop/stereo Bake workflows"
-  ]
+  ],
+  "profile_pair_differences": {
+    "raw_file": "emission-scene-outputs/genuine-uv24-hdr.dsculpt",
+    "decoded_owning_difference": "/groups/0/name; process-specific dome-cut-color-source-<PID> fixture name",
+    "raw_log": "bake-workflow.log",
+    "log_difference": "First line process-specific /tmp/dome-bake-workflow-<PID> path",
+    "diagnostic_receipt": "/home/blux/de-xr/dome-sculpt/artifacts/radiance-bake-sanitize-proof-20261111/genuine24-pair-diagnostic-v1/receipt.json",
+    "diagnostic_sha256": "5f9e085e2151b4038bde15e86942387195ff8e5ecdb2e88ae497d0d2da8e12c6",
+    "scope": "Raw nonidentical files/logs remain nonidentical in receipts. Actual complete owning decode/encode compared without arbitrary masks; no normalization or false exact-file claim."
+  }
 }

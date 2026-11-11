@@ -22,3 +22,11 @@ This is the5bb baseline only. The corrected63 source-role callback, current4977
 query/renderer integration, actual full UV1/typed-source Bake workers, high-range
 final renderer and public desktop/stereo application are distinct remaining
 qualifications. No sanitizer GL/GPU/hardware or physical headset run is claimed.
+
+Actual profile comparison retains19/20 raw native/output files and10/11 raw logs
+byte-exact. The other log differs in its process-specific fixture path. The other
+native file is still reported nonidentical: a diagnostic with the actual owning
+reader/full Scene encode found one property difference, `/groups/0/name`, authored
+from the fixture's process-specific import filename. Both complete native values,
+raw hashes and exact difference are retained. No arbitrary exclusion, rewritten
+input, normalized-file equality or additional renderer equivalence is claimed.
