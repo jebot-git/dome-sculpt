@@ -10,14 +10,58 @@ namespace dome::render_detail {
 // Context-local plain sculpt geometry only. No Paint/Material/normal-field or
 // packed-primitive authority is manufactured by GPU placement.
 class SculptGpuArena {
-  struct Ledger {size_t bytes=0,peak=0,limit=gpu_limit;bool context=true;};
+  struct Ledger {
+    size_t bytes=0,peak=0,limit=gpu_limit,retired=0;
+    bool context=true,needs_fence=false;
+    GLsync fence=nullptr;
+    enum class Failure { None, Create, Wait } failure=Failure::None;
+    GLenum error=GL_NO_ERROR;
+    ~Ledger(){if(context&&fence)glDeleteSync(fence);}
+    void failed(Failure kind)noexcept {
+      if(failure==Failure::None){failure=kind;error=glGetError();}
+      for(unsigned n=0;n<16&&glGetError()!=GL_NO_ERROR;++n){}
+    }
+    void report_failure() {
+      if(failure==Failure::None)return;
+      const auto kind=failure;const auto code=error;failure=Failure::None;error=GL_NO_ERROR;
+      throw std::runtime_error(std::string(kind==Failure::Create?"Sculpt GPU retirement fence failed":"Sculpt GPU retirement query failed")+" (GL error "+std::to_string(code)+")");
+    }
+    void seal()noexcept {
+      if(!context||!needs_fence)return;
+      GLsync next=nullptr;
+      try{next=glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE,0);}catch(...){failed(Failure::Create);return;}
+      if(!next){failed(Failure::Create);return;}
+      if(fence)glDeleteSync(fence);fence=next;needs_fence=false;
+      // Submit the latest fence even in a headless client with no swap. This
+      // flush is nonblocking and only follows actual retired resource stores.
+      try{glFlush();}catch(...){failed(Failure::Create);}
+    }
+    void collect()noexcept {
+      if(!context||!retired)return;
+      if(needs_fence)seal();
+      if(needs_fence||failure!=Failure::None||!fence)return;
+      GLenum result=GL_WAIT_FAILED;
+      try{result=glClientWaitSync(fence,0,0);}catch(...){failed(Failure::Wait);return;}
+      if(result==GL_ALREADY_SIGNALED||result==GL_CONDITION_SATISFIED){
+        bytes-=retired;retired=0;glDeleteSync(fence);fence=nullptr;
+      }else if(result==GL_WAIT_FAILED)failed(Failure::Wait);
+    }
+    void retire(GLuint id,size_t count,bool allocated)noexcept {
+      if(!context){bytes-=count;return;}
+      glDeleteBuffers(1,&id);
+      if(!allocated){bytes-=count;return;}
+      // Deleting a GL name does not finish queued copies/draws. Keep every
+      // known requested store charged until the actual latest fence signals.
+      retired+=count;needs_fence=true;
+    }
+  };
   struct Buffer {
-    std::shared_ptr<Ledger> ledger;GLuint id=0;size_t bytes=0;
+    std::shared_ptr<Ledger> ledger;GLuint id=0;size_t bytes=0;bool allocated=false;
     Buffer(std::shared_ptr<Ledger> l,size_t b):ledger(std::move(l)),bytes(b) {
       sculpt_arena_peak(ledger->bytes,b,ledger->limit);ledger->bytes+=b;
       ledger->peak=std::max(ledger->peak,ledger->bytes);
     }
-    ~Buffer(){if(ledger->context)glDeleteBuffers(1,&id);ledger->bytes-=bytes;}
+    ~Buffer(){ledger->retire(id,bytes,allocated);}
   };
   using BufferPtr=std::shared_ptr<Buffer>;
   struct Key {uint64_t object;const Mesh *mesh;bool operator==(const Key &) const=default;};
@@ -47,7 +91,13 @@ public:
     std::shared_ptr<Ledger> ledger;
     GLuint vao=0;
     size_t metadata_bytes=0,geometry_transfers=0,scalar_transfers=0,copy_bytes=0;
-    ~Snapshot(){if(ledger&&ledger->context)glDeleteVertexArrays(1,&vao);}
+    ~Snapshot(){
+      if(!ledger)return;
+      if(ledger->context)glDeleteVertexArrays(1,&vao);
+      // Release all store leases before inserting ONE latest fence. No heap
+      // allocation or blocking wait is performed by these destructors.
+      positions.reset();normals.reset();indices.reset();masks.reset();ledger->seal();
+    }
   };
   using Pending=std::shared_ptr<Snapshot>;
 private:
@@ -63,13 +113,18 @@ private:
   template<class T>static bool same_owner(const std::shared_ptr<T> &a,const std::shared_ptr<T> &b) {
     return a==b&&!a.owner_before(b)&&!b.owner_before(a);
   }
+  void admit(size_t bytes) {
+    ledger_->report_failure();ledger_->collect();ledger_->report_failure();
+    sculpt_arena_peak(ledger_->bytes,bytes,ledger_->limit);
+  }
   BufferPtr buffer(size_t bytes,GLenum usage) {
     if(!bytes)return {};
+    admit(bytes);
     auto result=std::make_shared<Buffer>(ledger_,bytes);
     glGenBuffers(1,&result->id);check("Sculpt arena buffer name allocation failed");
     if(!result->id)throw std::runtime_error("Sculpt arena buffer name missing");
     glBindBuffer(GL_ARRAY_BUFFER,result->id);
-    glBufferData(GL_ARRAY_BUFFER,GLsizeiptr(bytes),nullptr,usage);
+    glBufferData(GL_ARRAY_BUFFER,GLsizeiptr(bytes),nullptr,usage);result->allocated=true;
     check("Sculpt arena buffer allocation failed");return result;
   }
   static void copy(const BufferPtr &from,const BufferPtr &to,size_t start,size_t target,size_t bytes,Snapshot &next) {
@@ -115,6 +170,10 @@ public:
   uint64_t uploads=0,scalar_uploads=0,gpu_copy_bytes=0;
   size_t live_bytes()const{return ledger_->bytes;}
   size_t peak_bytes()const{return ledger_->peak;}
+  size_t retired_bytes()const{return ledger_->retired;}
+  // Nonblocking, explicit maintenance. No collection/wait is inserted into an
+  // unchanged/held/canvas draw. Dirty allocation admission calls this logic.
+  bool collect_retired(){ledger_->report_failure();ledger_->collect();ledger_->report_failure();return ledger_->retired==0;}
   size_t metadata_bytes()const{return accepted_?accepted_->metadata_bytes:0;}
   size_t vertex_bytes()const{return accepted_&&accepted_->positions?accepted_->positions->bytes+accepted_->normals->bytes:0;}
   size_t index_bytes()const{return accepted_&&accepted_->indices?accepted_->indices->bytes:0;}
@@ -167,7 +226,7 @@ public:
     if(rebuild){
       const size_t vc=sculpt_arena_capacity(vertices),ic=sculpt_arena_capacity(indices);
       if(vc>size_t(std::numeric_limits<GLint>::max()))throw std::length_error("Sculpt arena basevertex exceeds signed index range");
-      const auto storage=sculpt_arena_storage(vc,ic);sculpt_arena_peak(ledger_->bytes,storage,ledger_->limit);
+      const auto storage=sculpt_arena_storage(vc,ic);admit(storage);
       next->vertex_slots=SculptArenaSlots(vc);next->index_slots=SculptArenaSlots(ic);
       for(auto &[_,entry]:next->entries){entry.vertices=*next->vertex_slots.reserve(entry.geometry->positions.size());entry.indices=*next->index_slots.reserve(entry.geometry->indices.size());}
       // Reserve/forecast all old+new requested GPU stores before the first GL
@@ -179,7 +238,7 @@ public:
     }else {
       next->positions=accepted_->positions;next->normals=accepted_->normals;next->indices=accepted_->indices;
       if(mask_change){
-        sculpt_arena_peak(ledger_->bytes,accepted_->masks->bytes,ledger_->limit);
+        admit(accepted_->masks->bytes);
         next->masks=buffer(accepted_->masks->bytes,GL_DYNAMIC_DRAW);
         copy(accepted_->masks,next->masks,0,0,accepted_->masks->bytes,*next);
       }else next->masks=accepted_->masks;
