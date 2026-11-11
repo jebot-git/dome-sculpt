@@ -136,6 +136,9 @@ GLenum mtoon_blend(int value){constexpr GLenum factors[]={GL_ZERO,GL_ONE,GL_DST_
 }
 
 struct SurfaceRenderer::TextureState {
+  using Ledger=detail::ContextStoreLedger;
+  std::shared_ptr<Ledger> ledger;
+  Ledger::Group image_group=0,sampler_group=0,flat_group=0;
   GLuint pbr_program=0,typed_program=0,polygon_pbr_program=0,polygon_typed_program=0;bool polygon_active=false;
   std::string typed_vertex,typed_fragment,polygon_fragment;
   ~TextureState(){glDeleteProgram(pbr_program);glDeleteProgram(typed_program);glDeleteProgram(polygon_pbr_program);glDeleteProgram(polygon_typed_program);}
@@ -147,11 +150,11 @@ struct SurfaceRenderer::TextureState {
     if(!typed_program)typed_program=surface_program(typed_vertex,typed_fragment);
     return typed_program;
   }
-  struct Key {const Image *image=nullptr;bool srgb=false;bool operator==(const Key&)const=default;};
-  struct KeyHash {size_t operator()(const Key&k)const{return std::hash<const Image*>{}(k.image)^(size_t(k.srgb)<<1);}};
+  struct Key {const Image *image=nullptr;bool srgb=false,mips=false;bool operator==(const Key&)const=default;};
+  struct KeyHash {size_t operator()(const Key&k)const{return std::hash<const Image*>{}(k.image)^(size_t(k.srgb)<<1)^(size_t(k.mips)<<2);}};
   using Sampler=std::array<int,4>;
   struct SamplerHash {size_t operator()(const Sampler&s)const{size_t h=0;for(int n:s)h=h*131+size_t(n);return h;}};
-  struct ImageResource {std::shared_ptr<const Image> owner;GLuint id=0;bool mips=false;size_t bytes=0;};
+  struct ImageResource {std::shared_ptr<const Image> owner;Ledger::Store store;GLuint id=0;bool mips=false;size_t bytes=0;};
   struct Slot {GLuint image=0,sampler=0;std::array<float,6> uv{1,0,0,1,0,0};int coordinate=0;};
   using Binding=std::array<Slot,16>;
   struct Toon {
@@ -206,18 +209,96 @@ struct SurfaceRenderer::TextureState {
   bool deferred=false;
   uint64_t uploads=0;
   std::unordered_map<Key,ImageResource,KeyHash> images;
-  std::unordered_map<Sampler,GLuint,SamplerHash> samplers;
+  std::unordered_map<Sampler,Ledger::Store,SamplerHash> samplers;
   MaterialMap<Binding> bindings;
-  explicit TextureState(SurfaceTextureLimits l):limits(l){
+  struct FlatFrame {
+    Ledger::Store vao,vertices,indices,weights,masks;
+    SurfaceBufferStats stats;
+  } flat;
+  FlatFrame prepare_flat(const MeshSnapshot&mesh,bool reuse,const SurfaceBufferStats&accepted){
+    FlatFrame next;next.stats=accepted;
+    struct Stream {GLuint attribute;GLint components;GLsizei stride;size_t offset,bytes;const void*data;bool enabled;};
+    std::array<Stream,14>streams{};size_t stream_count=0,geometry_bytes=0;
+    const auto count=mesh.mesh.positions.size();
+    auto add=[&](GLuint attribute,GLint components,const auto&values){if(stream_count==streams.size())throw std::length_error("Too many surface attribute streams");if(!values.empty()&&values.size()!=count)throw std::invalid_argument("Surface attribute stream differs from vertex count");const auto offset=geometry_bytes,bytes=render_detail::buffer_bytes(values.size(),sizeof(values[0]));geometry_bytes=render_detail::buffer_sum(geometry_bytes,bytes);streams[stream_count++]={attribute,components,GLsizei(sizeof(values[0])),offset,bytes,values.data(),!values.empty()};return offset;};
+    auto alias=[&](GLuint attribute,GLint components,size_t offset){if(stream_count==streams.size())throw std::length_error("Too many surface attribute streams");streams[stream_count++]={attribute,components,GLsizei(sizeof(Vec3)),offset,0,nullptr,count!=0};};
+    add(0,3,mesh.mesh.positions);const auto normal=add(1,3,mesh.mesh.normals);add(2,2,original_uv0.empty()?mesh.mesh.uv:original_uv0);add(3,2,uv1);add(5,4,mesh.tangents);
+    const bool frames=!mesh.source_normals.empty()||!mesh.canonical_normals.empty()||!mesh.source_tangents.empty();if(frames&&mesh.source_normals.empty())alias(7,3,normal);else add(7,3,mesh.source_normals);add(8,4,mesh.source_tangents);if(frames&&mesh.canonical_normals.empty())alias(9,3,normal);else add(9,3,mesh.canonical_normals);add(10,4,mesh.source_colors);add(11,4,mesh.normal_coordinates);add(12,2,paint_coordinates);for(size_t i=0;i<3;++i)add(GLuint(13+i),4,extra_uv[i]);
+    const auto index_bytes=render_detail::buffer_bytes(mesh.mesh.indices.size(),sizeof(uint32_t));
+    size_t new_bytes=reuse?0:render_detail::buffer_sum(geometry_bytes,index_bytes);for(const auto*v:{&mesh.selected_weights,&mesh.sculpt_masks})new_bytes=render_detail::buffer_sum(new_bytes,render_detail::buffer_bytes(v->size(),sizeof(float)));ledger->preflight(Ledger::Domain::Geometry,new_bytes);
+    if(reuse){if(geometry_bytes!=flat.stats.vertex_bytes||index_bytes!=flat.stats.index_bytes||!flat.vao)throw std::invalid_argument("Shared flat geometry lost its exact accepted layout");next.vertices=flat.vertices;next.indices=flat.indices;}
+    else{
+      next.vertices=ledger->create(Ledger::Kind::Buffer,geometry_bytes,Ledger::Domain::Geometry,flat_group);glBindBuffer(GL_COPY_WRITE_BUFFER,next.vertices.name());glBufferData(GL_COPY_WRITE_BUFFER,GLsizeiptr(geometry_bytes),nullptr,GL_STATIC_DRAW);check_surface_buffer("Surface staged geometry allocation failed");
+      for(const auto&stream:streams)if(stream.bytes)glBufferSubData(GL_COPY_WRITE_BUFFER,GLintptr(stream.offset),GLsizeiptr(stream.bytes),stream.data);check_surface_buffer("Surface staged vertex upload failed");
+      next.indices=ledger->create(Ledger::Kind::Buffer,index_bytes,Ledger::Domain::Geometry,flat_group);glBindBuffer(GL_COPY_WRITE_BUFFER,next.indices.name());glBufferData(GL_COPY_WRITE_BUFFER,GLsizeiptr(index_bytes),mesh.mesh.indices.data(),GL_STATIC_DRAW);check_surface_buffer("Surface staged index upload failed");next.stats.vertex_bytes=geometry_bytes;next.stats.index_bytes=index_bytes;++next.stats.geometry_uploads;
+    }
+    auto scalar=[&](const std::vector<float>&values,size_t&bytes,uint64_t&uploads){Ledger::Store store;bytes=render_detail::buffer_bytes(values.size(),sizeof(float));if(bytes){store=ledger->create(Ledger::Kind::Buffer,bytes,Ledger::Domain::Geometry,flat_group);glBindBuffer(GL_COPY_WRITE_BUFFER,store.name());glBufferData(GL_COPY_WRITE_BUFFER,GLsizeiptr(bytes),values.data(),GL_DYNAMIC_DRAW);check_surface_buffer("Surface staged scalar upload failed");++uploads;}return store;};
+    next.weights=scalar(mesh.selected_weights,next.stats.weight_bytes,next.stats.weight_uploads);next.masks=scalar(mesh.sculpt_masks,next.stats.mask_bytes,next.stats.mask_uploads);
+    std::array<Ledger::Store,4>dependencies;size_t n=0;for(const auto*store:{&next.vertices,&next.indices,&next.weights,&next.masks})if(*store)dependencies[n++]=*store;
+    next.vao=ledger->create(Ledger::Kind::VertexArray,0,Ledger::Domain::Geometry,flat_group,std::span(dependencies).first(n));glBindVertexArray(next.vao.name());glBindBuffer(GL_ARRAY_BUFFER,next.vertices.name());glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,next.indices.name());
+    for(const auto&stream:streams){if(stream.attribute>=GLuint(vertex_attributes)){if(stream.enabled)throw std::runtime_error("Surface attribute exceeds actual GL limit");continue;}if(stream.enabled){glVertexAttribPointer(stream.attribute,stream.components,GL_FLOAT,GL_FALSE,stream.stride,reinterpret_cast<void*>(stream.offset));glEnableVertexAttribArray(stream.attribute);}else glDisableVertexAttribArray(stream.attribute);}
+    for(const auto&item:{std::pair{GLuint(4),&next.weights},std::pair{GLuint(6),&next.masks}}){if(*item.second){glBindBuffer(GL_ARRAY_BUFFER,item.second->name());glVertexAttribPointer(item.first,1,GL_FLOAT,GL_FALSE,sizeof(float),nullptr);glEnableVertexAttribArray(item.first);}else glDisableVertexAttribArray(item.first);}check_surface_buffer("Surface staged VAO setup failed");return next;
+  }
+  struct FrameSelection {
+    std::unordered_set<Key,KeyHash> images;
+    std::unordered_set<Sampler,SamplerHash> samplers;
+    MToonSourcePacks::Selection packs;
+    detail::PaintOverlayCompiler::Selection overlays;
+    detail::CurrentPaintPreviewCompiler::Selection current;
+    detail::PolygonSurfaceGpu::Selection polygons;
+  } selection;
+  struct Metadata {
+    MaterialMap<Toon> toons;
+    MaterialMap<std::array<float,3>> physical_backgrounds;
+    std::vector<std::array<float,2>> uv1,original_uv0,paint_coordinates;
+    std::array<std::vector<std::array<float,4>>,3> extra_uv;
+    MaterialMap<std::shared_ptr<const PaintSourceMaps>> source_maps;
+    std::unordered_set<uint64_t> weighted;
+    std::unordered_set<MaterialKey,MaterialHash> vertex_alpha;
+    MaterialMap<Binding> bindings;
+    bool polygon_active=false;
+    FrameSelection selection;
+    void swap(TextureState&s,bool geometry)noexcept {
+      toons.swap(s.toons);physical_backgrounds.swap(s.physical_backgrounds);
+      source_maps.swap(s.source_maps);weighted.swap(s.weighted);vertex_alpha.swap(s.vertex_alpha);bindings.swap(s.bindings);
+      std::swap(polygon_active,s.polygon_active);std::swap(selection,s.selection);
+      if(geometry){uv1.swap(s.uv1);original_uv0.swap(s.original_uv0);paint_coordinates.swap(s.paint_coordinates);extra_uv.swap(s.extra_uv);}
+    }
+  };
+  void retain_selected()noexcept {
+    for(auto i=images.begin();i!=images.end();)if(!selection.images.contains(i->first)){i=images.erase(i);}else ++i;
+    for(auto i=samplers.begin();i!=samplers.end();)if(!selection.samplers.contains(i->first)){i=samplers.erase(i);}else ++i;
+    packed_sources.retain(selection.packs);paint_overlays.retain(selection.overlays);current_paint.retain(selection.current);polygon_frames.retain(selection.polygons);
+  }
+  struct Pending {
+    TextureState*owner=nullptr;Metadata old;bool geometry=false;
+    Pending()=default;Pending(const Pending&)=delete;Pending&operator=(const Pending&)=delete;
+    Pending(TextureState&s,Metadata next,bool changed):owner(&s),geometry(changed){old.swap(s,geometry);next.swap(s,geometry);}
+    Pending(Pending&&p)noexcept:owner(std::exchange(p.owner,nullptr)),old(std::move(p.old)),geometry(p.geometry){}
+    Pending&operator=(Pending&&p)noexcept {if(this!=&p){rollback();owner=std::exchange(p.owner,nullptr);old=std::move(p.old);geometry=p.geometry;}return *this;}
+    void rollback()noexcept {if(owner){old.swap(*owner,geometry);owner->retain_selected();owner=nullptr;}}
+    void commit()noexcept {if(owner){owner->retain_selected();owner=nullptr;}}
+    ~Pending(){rollback();}
+  };
+  struct DrawPending {
+    Pending material;std::optional<FlatFrame> flat;render_detail::SculptGpuArena::Pending chunks;
+    std::shared_ptr<const MeshSnapshot> mesh;GLuint previous_program=0;
+  };
+  std::optional<DrawPending> deferred_pending;
+  void commit_frame(SurfaceRenderer&,DrawPending&);
+  void rollback_frame(SurfaceRenderer&,DrawPending&)noexcept;
+  explicit TextureState(SurfaceTextureLimits l):ledger(std::make_shared<Ledger>(Ledger::Limits{l.max_bytes,l.max_images,l.max_samplers})),packed_sources(ledger),polygon_frames(ledger),paint_overlays(ledger),current_paint(ledger),limits(l){
+    image_group=ledger->create_group();sampler_group=ledger->create_group();flat_group=ledger->create_group();
     if(!l.max_bytes||l.max_bytes>2ull*1024*1024*1024||!l.max_images||l.max_images>2048||!l.max_samplers||l.max_samplers>256)
       throw std::invalid_argument("Invalid GPU source texture resource bounds");
   }
   static size_t storage(const Image&i,bool mips){size_t bytes=0;uint32_t w=i.width,h=i.height;for(;;){bytes+=size_t(w)*h*4;if(!mips||(w==1&&h==1))return bytes;w=std::max(1u,w/2);h=std::max(1u,h/2);}}
   static Sampler sampler(const PaintSourceTexture&s){return {s.wrap_s,s.wrap_t,s.min_filter?s.min_filter:GL_LINEAR,s.mag_filter?s.mag_filter:GL_LINEAR};}
   static bool mipmapped(const Sampler&s){return s[2]>=9984&&s[2]<=9987;}
-  SurfaceTextureStats stats()const{size_t bytes=0;for(auto &[key,r]:images)bytes+=r.bytes;return {images.size()+packed_sources.size()+paint_overlays.image_count()+polygon_frames.images()+current_paint.image_count(),samplers.size(),bytes+packed_sources.bytes()+paint_overlays.bytes()+polygon_frames.bytes()+current_paint.bytes(),uploads,packed_sources.bytes()+polygon_frames.bytes(),packed_sources.builds()};}
-  void clear(bool release){current_paint.clear(release);polygon_frames.clear(release);paint_overlays.clear(release);physical_backgrounds.clear();packed_sources.clear(release);if(release){for(auto &[key,r]:images)glDeleteTextures(1,&r.id);for(auto &[key,id]:samplers)glDeleteSamplers(1,&id);}bindings.clear();images.clear();samplers.clear();toons.clear();uv1.clear();original_uv0.clear();paint_coordinates.clear();for(auto &values:extra_uv)values.clear();source_maps.clear();weighted.clear();vertex_alpha.clear();}
-  void prepare(const MeshSnapshot&mesh,bool geometry_changed){
+  SurfaceTextureStats stats()const{const auto u=ledger->usage(Ledger::Domain::Material);return {u.images,u.samplers,u.bytes,uploads,packed_sources.bytes()+polygon_frames.bytes(),packed_sources.builds()};}
+  void clear(bool release){current_paint.clear(release);polygon_frames.clear(release);paint_overlays.clear(release);physical_backgrounds.clear();packed_sources.clear(release);bindings.clear();images.clear();samplers.clear();toons.clear();uv1.clear();original_uv0.clear();paint_coordinates.clear();for(auto &values:extra_uv)values.clear();source_maps.clear();weighted.clear();vertex_alpha.clear();flat={};ledger->clear(release);}
+  Pending prepare(const MeshSnapshot&mesh,bool geometry_changed){
+    std::unordered_set<MaterialKey,MaterialHash> next_vertex_alpha=vertex_alpha;
     if(geometry_changed && (!mesh.mesh.positions.empty() || !mesh.mesh.indices.empty()))mesh.mesh.validate();
     const auto count=mesh.mesh.positions.size();
     if(!mesh.paint_coordinates.empty()&&mesh.paint_coordinates.size()!=count)throw std::invalid_argument("Paint coordinate vertex count differs from geometry");
@@ -231,11 +312,11 @@ struct SurfaceRenderer::TextureState {
     if(!mesh.source_colors.empty() && mesh.source_colors.size()!=count)throw std::invalid_argument("Source vertex-color count differs from geometry");
     if(geometry_changed) {
       for(auto color:mesh.source_colors)for(float c:color)if(!std::isfinite(c) || c<0 || c>1)throw std::invalid_argument("Source vertex colors must be finite linear RGBA");
-      vertex_alpha.clear();
-      if(mesh.ranges.empty() && std::any_of(mesh.source_colors.begin(),mesh.source_colors.end(),[](const auto &c){return c[3]<1;}))vertex_alpha.insert({0,0});
+      next_vertex_alpha.clear();
+      if(mesh.ranges.empty() && std::any_of(mesh.source_colors.begin(),mesh.source_colors.end(),[](const auto &c){return c[3]<1;}))next_vertex_alpha.insert({0,0});
       if(!mesh.source_colors.empty())for(const auto &r:mesh.ranges) {
         if(r.first>mesh.mesh.indices.size() || r.count>mesh.mesh.indices.size()-r.first)throw std::invalid_argument("Source vertex-alpha range is invalid");
-        for(size_t c=r.first;c<r.first+r.count;++c)if(mesh.source_colors.at(mesh.mesh.indices[c])[3]<1){vertex_alpha.insert(material_key(r));break;}
+        for(size_t c=r.first;c<r.first+r.count;++c)if(mesh.source_colors.at(mesh.mesh.indices[c])[3]<1){next_vertex_alpha.insert(material_key(r));break;}
       }
     }
     if(!mesh.source_tangents.empty() && mesh.source_tangents.size()!=count)throw std::invalid_argument("Retained tangent frame size differs from geometry");
@@ -542,7 +623,7 @@ struct SurfaceRenderer::TextureState {
     if(wanted.size()>limits.max_images||wanted_samplers.size()>limits.max_samplers)throw std::length_error("GPU source texture count budget exceeded");
     size_t bytes=0;GLint maximum=0;glGetIntegerv(GL_MAX_TEXTURE_SIZE,&maximum);
     for(auto &[key,desired]:wanted){
-      if(auto previous=images.find(key);previous!=images.end())desired.mips|=previous->second.mips;
+      if(images.contains(Key{key.image,key.srgb,true}))desired.mips=true;
       auto &i=*desired.owner;if(i.width>uint32_t(maximum)||i.height>uint32_t(maximum))throw std::length_error("Original image exceeds hardware texture dimensions");
       size_t count=storage(i,desired.mips);if(count>limits.max_bytes-bytes)throw std::length_error("GPU original texture byte budget exceeded");bytes+=count;
     }
@@ -567,47 +648,39 @@ struct SurfaceRenderer::TextureState {
       }
       source_packs.push_back(toon.packed_inputs);
     }
-    std::map<const detail::PaintOverlayPacket*,size_t> overlay_sizes;size_t overlay_bytes=0,overlay_images=0;
-    for(const auto &input:overlay_inputs){
-      const auto *identity=input.owner->contribution_owner()?input.owner->contribution_owner().get():input.owner.get();
-      if(overlay_sizes.contains(identity))continue;
-      const size_t size=detail::PaintOverlayCompiler::texture_bytes(input.owner);
-      overlay_images+=detail::PaintOverlayCompiler::texture_images(input.owner);
-      if(size>limits.max_bytes-bytes||overlay_bytes>limits.max_bytes-bytes-size)throw std::length_error("GPU overlay byte budget exceeded");
-      overlay_sizes.emplace(identity,size);overlay_bytes+=size;
-    }
-    if(overlay_images>limits.max_images-wanted.size())throw std::length_error("GPU overlay image count exceeded");
+    auto image_key=[&](Key key){key.mips=wanted.at(Key{key.image,key.srgb}).mips;return key;};
+    size_t additional_bytes=0,additional_images=0,additional_samplers=0;
+    auto add=[&](size_t bytes,size_t images){if(bytes>SIZE_MAX-additional_bytes||images>SIZE_MAX-additional_images)throw std::length_error("Material store forecast overflow");additional_bytes+=bytes;additional_images+=images;};
+    for(const auto&[key,desired]:wanted)if(!images.contains(image_key(key)))add(storage(*desired.owner,desired.mips),1);
+    for(const auto&key:wanted_samplers)additional_samplers+=!samplers.contains(key);
+    const auto overlay_demand=paint_overlays.additional(overlay_inputs);add(overlay_demand.bytes,overlay_demand.images);
+    const auto pack_demand=packed_sources.additional(source_packs,limits);add(pack_demand.bytes,pack_demand.images);
     const size_t current_bytes=current_paint.forecast(current_inputs),current_images=current_paint.forecast_images(current_inputs);
-    if(bytes>limits.max_bytes||overlay_bytes>limits.max_bytes-bytes||current_bytes>limits.max_bytes-bytes-overlay_bytes||
-       wanted.size()+overlay_images>limits.max_images||current_images>limits.max_images-wanted.size()-overlay_images)
-      throw std::length_error("Current-grid old/new/retirement stores exceed shared material GPU budget");
-    packed_sources.preflight(source_packs,bytes+overlay_bytes+current_bytes,wanted.size()+overlay_images+current_images,limits);
-    for(auto it=images.begin();it!=images.end();)if(!wanted.contains(it->first)){glDeleteTextures(1,&it->second.id);it=images.erase(it);}else ++it;
-    for(auto it=samplers.begin();it!=samplers.end();)if(!wanted_samplers.contains(it->first)){glDeleteSamplers(1,&it->second);it=samplers.erase(it);}else ++it;
-    if(packed_sources.bytes()>limits.max_bytes-bytes-current_bytes||packed_sources.size()>limits.max_images-wanted.size()-current_images)
-      throw std::length_error("GPU source pack leaves no overlay budget");
-    paint_overlays.prepare(overlay_inputs,limits.max_bytes-bytes-packed_sources.bytes()-current_bytes,limits.max_images-wanted.size()-packed_sources.size()-current_images);
+    add(current_bytes-current_paint.bytes(),current_images-current_paint.image_count());
+    const auto polygon_demand=polygon_frames.additional(mesh);add(polygon_demand.bytes,polygon_demand.images);
+    ledger->preflight(Ledger::Domain::Material,additional_bytes,additional_images,additional_samplers);
+    paint_overlays.prepare(overlay_inputs,limits.max_bytes,limits.max_images,256ull*1024*1024,true);
     glActiveTexture(GL_TEXTURE0);glPixelStorei(GL_UNPACK_ALIGNMENT,1);
     for(auto &[key,desired]:wanted){
-      auto found=images.find(key);
+      const auto resource_key=image_key(key);auto found=images.find(resource_key);
       if(found==images.end()){
-        ImageResource resource;resource.owner=desired.owner;glGenTextures(1,&resource.id);glBindTexture(GL_TEXTURE_2D,resource.id);
+        ImageResource resource;resource.owner=desired.owner;resource.store=ledger->create(Ledger::Kind::Texture,storage(*resource.owner,desired.mips),Ledger::Domain::Material,image_group);resource.id=resource.store.name();glBindTexture(GL_TEXTURE_2D,resource.id);
         glTexImage2D(GL_TEXTURE_2D,0,key.srgb?GL_SRGB8_ALPHA8:GL_RGBA8,resource.owner->width,resource.owner->height,0,GL_RGBA,GL_UNSIGNED_BYTE,resource.owner->rgba.data());
-        if(glGetError()!=GL_NO_ERROR){glDeleteTextures(1,&resource.id);throw std::runtime_error("Original GPU texture allocation failed");}
-        try{found=images.emplace(key,std::move(resource)).first;}catch(...){glDeleteTextures(1,&resource.id);throw;}++uploads;
+        if(glGetError()!=GL_NO_ERROR)throw std::runtime_error("Original GPU texture allocation failed");
+        found=images.emplace(resource_key,std::move(resource)).first;++uploads;
       }
       auto &resource=found->second;
       if(desired.mips&&!resource.mips){glBindTexture(GL_TEXTURE_2D,resource.id);glGenerateMipmap(GL_TEXTURE_2D);if(glGetError()!=GL_NO_ERROR)throw std::runtime_error("Original GPU mip generation failed");resource.mips=true;}
       resource.bytes=storage(*resource.owner,resource.mips);
     }
     for(auto &sample:wanted_samplers)if(!samplers.contains(sample)){
-      GLuint id=0;glGenSamplers(1,&id);glSamplerParameteri(id,GL_TEXTURE_WRAP_S,sample[0]);glSamplerParameteri(id,GL_TEXTURE_WRAP_T,sample[1]);glSamplerParameteri(id,GL_TEXTURE_MIN_FILTER,sample[2]);glSamplerParameteri(id,GL_TEXTURE_MAG_FILTER,sample[3]);
-      if(glGetError()!=GL_NO_ERROR){glDeleteSamplers(1,&id);throw std::runtime_error("Original GPU sampler allocation failed");}
-      try{samplers.emplace(sample,id);}catch(...){glDeleteSamplers(1,&id);throw;}
+      auto store=ledger->create(Ledger::Kind::Sampler,0,Ledger::Domain::Material,sampler_group);const auto id=store.name();glSamplerParameteri(id,GL_TEXTURE_WRAP_S,sample[0]);glSamplerParameteri(id,GL_TEXTURE_WRAP_T,sample[1]);glSamplerParameteri(id,GL_TEXTURE_MIN_FILTER,sample[2]);glSamplerParameteri(id,GL_TEXTURE_MAG_FILTER,sample[3]);
+      if(glGetError()!=GL_NO_ERROR)throw std::runtime_error("Original GPU sampler allocation failed");
+      samplers.emplace(sample,std::move(store));
     }
     source_packs.clear();
     for(auto &[object,toon]:next_toons)if(toon.derived||toon.overlay) {
-      for(auto &view:toon.packed_inputs)if(view.owner)view.texture=images.at(Key{view.owner.get(),view.srgb}).id;
+      for(auto &view:toon.packed_inputs)if(view.owner)view.texture=images.at(image_key(Key{view.owner.get(),view.srgb})).id;
       if(toon.overlay){const auto &resource=paint_overlays.at(toon.overlay,true);
         if(toon.native_emission){
           toon.packed_inputs[4]=MToonSourcePacks::Input::linear(resource,2);
@@ -622,24 +695,41 @@ struct SurfaceRenderer::TextureState {
       }
       source_packs.push_back(toon.packed_inputs);
     }
-    packed_sources.prepare(source_packs,bytes+overlay_bytes+current_bytes,wanted.size()+overlay_images+current_images,limits);
-    current_paint.prepare(current_inputs,limits.max_bytes-bytes-paint_overlays.bytes()-packed_sources.bytes(),limits.max_images-wanted.size()-paint_overlays.image_count()-packed_sources.size());
-    polygon_frames.prepare(mesh,bytes+paint_overlays.bytes()+packed_sources.bytes()+current_paint.bytes(),wanted.size()+paint_overlays.image_count()+packed_sources.size()+current_paint.image_count(),limits);
-    polygon_active=std::any_of(mesh.ranges.begin(),mesh.ranges.end(),[](const auto&r){return r.textures&&bool(r.textures->polygon_surface);});
+    packed_sources.prepare(source_packs,0,0,limits,true);
+    current_paint.prepare(current_inputs,limits.max_bytes,limits.max_images,256ull*1024*1024,true);
+    polygon_frames.prepare(mesh,0,0,limits,true);
+
     MaterialMap<Binding> ready;
-    for(auto &[object,plan]:planned){auto &binding=ready[object];for(int n=0;n<16;++n)if(plan[n].present)binding[n]={images.at(plan[n].key).id,samplers.at(plan[n].sampler),plan[n].uv,plan[n].coordinate};}
+    for(auto &[object,plan]:planned){auto &binding=ready[object];for(int n=0;n<16;++n)if(plan[n].present)binding[n]={images.at(image_key(plan[n].key)).id,samplers.at(plan[n].sampler).name(),plan[n].uv,plan[n].coordinate};}
     for(const auto&[key,owner]:current_fields){const auto&resource=current_paint.at(owner);auto&binding=ready[key];
-      const auto sampler=samplers.at(current_sampler);binding[0]={resource.textures[0],sampler};binding[1]={resource.textures[1],sampler};
+      const auto sampler=samplers.at(current_sampler).name();binding[0]={resource.textures[0],sampler};binding[1]={resource.textures[1],sampler};
       if(!resource.physical)binding[2]={resource.textures[2],sampler};
       else{binding[9]={resource.textures[2],sampler};binding[10]={resource.textures[3],sampler};binding[13]={resource.textures[4],sampler};}
     }
-    bindings=std::move(ready);toons=std::move(next_toons);physical_backgrounds=std::move(next_physical_backgrounds);if(geometry_changed){uv1=std::move(next_uv1);extra_uv=std::move(next_extra_uv);original_uv0=std::move(next_original_uv0);paint_coordinates=next_paint_coordinates.empty()?mesh.paint_coordinates:std::move(next_paint_coordinates);}source_maps=std::move(next_source_maps);weighted=std::move(next_weighted);
+    Metadata next;next.bindings=std::move(ready);next.toons=std::move(next_toons);next.physical_backgrounds=std::move(next_physical_backgrounds);
+    if(geometry_changed){next.uv1=std::move(next_uv1);next.extra_uv=std::move(next_extra_uv);next.original_uv0=std::move(next_original_uv0);next.paint_coordinates=next_paint_coordinates.empty()?mesh.paint_coordinates:std::move(next_paint_coordinates);}
+    next.source_maps=std::move(next_source_maps);next.weighted=std::move(next_weighted);next.vertex_alpha=std::move(next_vertex_alpha);
+    next.polygon_active=std::any_of(mesh.ranges.begin(),mesh.ranges.end(),[](const auto&r){return r.textures&&bool(r.textures->polygon_surface);});
+    for(const auto&[key,value]:wanted)next.selection.images.insert(image_key(key));next.selection.samplers=std::move(wanted_samplers);
+    next.selection.packs=MToonSourcePacks::selection(source_packs);next.selection.overlays=detail::PaintOverlayCompiler::selection(overlay_inputs);next.selection.current=detail::CurrentPaintPreviewCompiler::selection(current_inputs);next.selection.polygons=detail::PolygonSurfaceGpu::selection(mesh);
+    return Pending(*this,std::move(next),geometry_changed);
   }
 };
 // GL context-owned cache, independently keyed by actual immutable placed
 // geometry and scalar owners. CPU arrays go directly to the driver; live
 // held/canvas motion never enters either key or rebuilds geometry.
 struct SurfaceRenderer::ChunkState : render_detail::SculptGpuArena {};
+void SurfaceRenderer::TextureState::commit_frame(SurfaceRenderer&r,DrawPending&next){
+  if(next.mesh==r.cached_)return;
+  if(next.chunks)r.chunks_->commit(std::move(next.chunks));
+  next.material.commit();
+  if(next.flat){std::swap(flat,*next.flat);r.buffers_=flat.stats;r.vao_=flat.vao.name();r.vertices_=flat.vertices.name();r.indices_=flat.indices.name();r.weights_=flat.weights.name();r.masks_=flat.masks.name();}
+  r.count_=next.mesh->mesh.indices.size();r.cached_=next.mesh;
+}
+void SurfaceRenderer::TextureState::rollback_frame(SurfaceRenderer&r,DrawPending&next)noexcept{
+  next.material.rollback();next.flat.reset();retain_selected();ledger->seal_noexcept();r.program_=next.previous_program;target.abort();
+}
+
 SurfaceBufferStats SurfaceRenderer::buffer_stats() const {
   auto result=buffers_;
   if(chunks_) {
@@ -652,9 +742,14 @@ SurfaceRenderer::SurfaceRenderer():SurfaceRenderer(SurfaceTextureLimits{}){}
 SurfaceTextureStats SurfaceRenderer::texture_stats()const{return textures_->stats();}
 void SurfaceRenderer::set_output_encoding(SurfaceOutputEncoding encoding){if(textures_->target.pending())throw std::logic_error("Resolve current view before changing output encoding");textures_->output=encoding;}
 void SurfaceRenderer::set_deferred_resolve(bool value){if(textures_->target.pending())throw std::logic_error("Resolve current view before changing deferred output");textures_->deferred=value;}
-void SurfaceRenderer::resolve(){textures_->target.resolve(textures_->output);}
+void SurfaceRenderer::resolve(){
+  if(!textures_->deferred_pending){textures_->target.resolve(textures_->output);return;}
+  auto next=std::move(*textures_->deferred_pending);textures_->deferred_pending.reset();
+  try{textures_->target.resolve(textures_->output);textures_->commit_frame(*this,next);}
+  catch(...){textures_->rollback_frame(*this,next);throw;}
+}
 void SurfaceRenderer::set_frame_time(double seconds){if(!std::isfinite(seconds)||seconds<0||seconds>std::numeric_limits<float>::max())throw std::invalid_argument("Invalid GPU animation frame time");textures_->frame_time=seconds;}
-void SurfaceRenderer::abandon(){chunks_->clear(false);program_=vao_=vertices_=indices_=weights_=masks_=0;textures_->pbr_program=textures_->typed_program=textures_->polygon_pbr_program=textures_->polygon_typed_program=0;buffers_.vertex_bytes=buffers_.index_bytes=buffers_.weight_bytes=buffers_.mask_bytes=0;cached_.reset();textures_->clear(false);textures_->target.clear(false);count_=0;}
+void SurfaceRenderer::abandon(){chunks_->clear(false);if(textures_->deferred_pending){textures_->deferred_pending->material.rollback();textures_->deferred_pending.reset();}program_=vao_=vertices_=indices_=weights_=masks_=0;textures_->pbr_program=textures_->typed_program=textures_->polygon_pbr_program=textures_->polygon_typed_program=0;buffers_.vertex_bytes=buffers_.index_bytes=buffers_.weight_bytes=buffers_.mask_bytes=0;cached_.reset();textures_->clear(false);textures_->target.clear(false);count_=0;}
 
 SurfaceRenderer::SurfaceRenderer(SurfaceTextureLimits limits):chunks_(std::make_unique<ChunkState>()),textures_(std::make_unique<TextureState>(limits)) {
   GLint attributes=0;glGetIntegerv(GL_MAX_VERTEX_ATTRIBS,&attributes);
@@ -732,28 +827,24 @@ result+=glow;result=result/(result+vec3(1));color=ghost_color(vec4(sculpt_mask_c
   textures_->typed_vertex=std::move(vertex);textures_->typed_fragment=std::move(fragment);
   textures_->pbr_program=surface_program(pbr_surface_source(textures_->typed_vertex),pbr_surface_source(textures_->typed_fragment));
   program_=textures_->pbr_program;
-  glGenVertexArrays(1, &vao_);
-  glGenBuffers(1, &vertices_);
-  glGenBuffers(1, &indices_);
-  glGenBuffers(1, &weights_);
-  glGenBuffers(1, &masks_);
+
 }
 SurfaceRenderer::~SurfaceRenderer() {
+  if(textures_->deferred_pending){textures_->rollback_frame(*this,*textures_->deferred_pending);textures_->deferred_pending.reset();}
   textures_->target.clear(true);
   textures_->clear(true);
-  glDeleteBuffers(1, &indices_);
-  glDeleteBuffers(1, &weights_);
-  glDeleteBuffers(1, &masks_);
-  glDeleteBuffers(1, &vertices_);
-  glDeleteVertexArrays(1, &vao_);
+
 }
 void SurfaceRenderer::draw(std::shared_ptr<const MeshSnapshot> mesh,
                            CanvasTransform model, const Mat4 &vp,
                            ob::Vec3 camera, int width, int height,
                            bool transparent, bool toon, bool light, std::span<const ObjectInfo> display, uint64_t replaced_object) {
   if(!mesh)throw std::invalid_argument("Missing sculpt mesh snapshot");
-  ChunkState::Pending staged_chunks;
+  if(textures_->target.pending())throw std::logic_error("Resolve the previous frame before drawing another snapshot");
+  TextureState::DrawPending next;next.mesh=mesh;next.previous_program=program_;auto&staged_chunks=next.chunks;auto&staged_material=next.material;auto&staged_flat=next.flat;
+  auto drawing=mesh;const auto drawing_count=mesh->mesh.indices.size();
   try{
+  if(mesh!=cached_)textures_->ledger->collect();textures_->ledger->mark_used();
   textures_->target.begin(width,height,textures_->output);
   glViewport(0, 0, width, height);
   glDisable(GL_FRAMEBUFFER_SRGB);
@@ -790,104 +881,20 @@ void SurfaceRenderer::draw(std::shared_ptr<const MeshSnapshot> mesh,
                  mesh->normal_coordinates.size()!=cached_->normal_coordinates.size() ||
                  mesh->paint_coordinates.size()!=cached_->paint_coordinates.size()))
       throw std::invalid_argument("Shared geometry identity has inconsistent packed counts");
-    try{textures_->prepare(*mesh,!reuse);}catch(...){textures_->clear(true);cached_.reset();count_=0;throw;}
-    glBindVertexArray(vao_);
-    if(!reuse) {
-      struct Stream {
-        GLuint attribute;
-        GLint components;
-        GLsizei stride;
-        size_t offset,bytes;
-        const void *data;
-        bool enabled;
-      };
-      std::array<Stream,14> streams{};
-      size_t stream_count=0,geometry_bytes=0;
-      auto add=[&](GLuint attribute,GLint components,const auto &values) {
-        if(stream_count==streams.size())throw std::length_error("Too many surface attribute streams");
-        if(!values.empty()&&values.size()!=count)
-          throw std::invalid_argument("Surface attribute stream differs from vertex count");
-        const size_t offset=geometry_bytes;
-        const size_t bytes=render_detail::buffer_bytes(values.size(),sizeof(values[0]));
-        geometry_bytes=render_detail::buffer_sum(geometry_bytes,bytes);
-        streams[stream_count++]={attribute,components,GLsizei(sizeof(values[0])),offset,bytes,values.data(),!values.empty()};
-        return offset;
-      };
-      auto alias=[&](GLuint attribute,GLint components,size_t offset) {
-        if(stream_count==streams.size())throw std::length_error("Too many surface attribute streams");
-        streams[stream_count++]={attribute,components,GLsizei(sizeof(Vec3)),offset,0,nullptr,count!=0};
-      };
-      add(0,3,mesh->mesh.positions);
-      const auto normal_offset=add(1,3,mesh->mesh.normals);
-      add(2,2,textures_->original_uv0.empty()?mesh->mesh.uv:textures_->original_uv0);
-      add(3,2,textures_->uv1);
-      add(5,4,mesh->tangents);
-      const bool has_frames=!mesh->source_normals.empty()||!mesh->canonical_normals.empty()||!mesh->source_tangents.empty();
-      if(has_frames&&mesh->source_normals.empty())alias(7,3,normal_offset);
-      else add(7,3,mesh->source_normals);
-      add(8,4,mesh->source_tangents);
-      if(has_frames&&mesh->canonical_normals.empty())alias(9,3,normal_offset);
-      else add(9,3,mesh->canonical_normals);
-      add(10,4,mesh->source_colors);
-      add(11,4,mesh->normal_coordinates);
-      add(12,2,textures_->paint_coordinates);
-      for(size_t block=0;block<3;++block)add(GLuint(13+block),4,textures_->extra_uv[block]);
-      const size_t index_bytes=render_detail::buffer_bytes(mesh->mesh.indices.size(),sizeof(uint32_t));
-      // Upload the immutable source arrays directly. No mesh-sized interleaved
-      // Vertex/FrameVertex copies or repeated default attribute arrays exist.
-      glBindBuffer(GL_ARRAY_BUFFER,vertices_);
-      glBufferData(GL_ARRAY_BUFFER,GLsizeiptr(geometry_bytes),nullptr,GL_STATIC_DRAW);
-      check_surface_buffer("Surface geometry buffer allocation failed");
-      const auto active_streams=std::span(streams).first(stream_count);
-      for(const auto &stream:active_streams)if(stream.bytes)
-        glBufferSubData(GL_ARRAY_BUFFER,GLintptr(stream.offset),GLsizeiptr(stream.bytes),stream.data);
-      for(const auto &stream:active_streams) {
-        if(stream.attribute>=GLuint(textures_->vertex_attributes)) {
-          if(stream.enabled)throw std::runtime_error("Surface attribute exceeds the actual vertex attribute limit");
-          continue;
-        }
-        if(stream.enabled) {
-          glVertexAttribPointer(stream.attribute,stream.components,GL_FLOAT,GL_FALSE,stream.stride,reinterpret_cast<void*>(stream.offset));
-          glEnableVertexAttribArray(stream.attribute);
-        }else glDisableVertexAttribArray(stream.attribute);
-      }
-      check_surface_buffer("Surface vertex buffer upload failed");
-      glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,indices_);
-      glBufferData(GL_ELEMENT_ARRAY_BUFFER,GLsizeiptr(index_bytes),mesh->mesh.indices.data(),GL_STATIC_DRAW);
-      check_surface_buffer("Surface index buffer upload failed");
-      buffers_.vertex_bytes=geometry_bytes;
-      buffers_.index_bytes=index_bytes;
-      ++buffers_.geometry_uploads;
-    }
-    auto scalar=[&](GLuint buffer,GLuint attribute,const std::vector<float>&values,size_t&bytes,uint64_t&uploads) {
-      if(values.empty()) {
-        glDisableVertexAttribArray(attribute);
-        if(bytes){glBindBuffer(GL_ARRAY_BUFFER,buffer);glBufferData(GL_ARRAY_BUFFER,0,nullptr,GL_DYNAMIC_DRAW);check_surface_buffer("Surface scalar buffer release failed");}
-        bytes=0;return;
-      }
-      glBindBuffer(GL_ARRAY_BUFFER,buffer);
-      const size_t scalar_bytes=render_detail::buffer_bytes(values.size(),sizeof(float));
-      glBufferData(GL_ARRAY_BUFFER,GLsizeiptr(scalar_bytes),values.data(),GL_DYNAMIC_DRAW);
-      check_surface_buffer("Surface scalar buffer upload failed");
-      glVertexAttribPointer(attribute,1,GL_FLOAT,GL_FALSE,sizeof(float),nullptr);glEnableVertexAttribArray(attribute);
-      bytes=scalar_bytes;++uploads;
-    };
-    scalar(weights_,4,mesh->selected_weights,buffers_.weight_bytes,buffers_.weight_uploads);
-    scalar(masks_,6,mesh->sculpt_masks,buffers_.mask_bytes,buffers_.mask_uploads);
-    count_=mesh->mesh.indices.size();
-    cached_=std::move(mesh);
+    staged_material=textures_->prepare(*mesh,!reuse);
+    staged_flat=textures_->prepare_flat(*mesh,reuse,buffers_);
   }
   // Disabled array constants are context state, rather than VAO state. Set
   // them for every draw, including stereo reuse and interleaved renderers.
-  if(cached_->selected_weights.empty())glVertexAttrib1f(4,-1);
-  if(cached_->sculpt_masks.empty())glVertexAttrib1f(6,-1);
-  if(textures_->original_uv0.empty()&&cached_->mesh.uv.empty())glVertexAttrib2f(2,0,0);
+  if(drawing->selected_weights.empty())glVertexAttrib1f(4,-1);
+  if(drawing->sculpt_masks.empty())glVertexAttrib1f(6,-1);
+  if(textures_->original_uv0.empty()&&drawing->mesh.uv.empty())glVertexAttrib2f(2,0,0);
   if(textures_->uv1.empty())glVertexAttrib2f(3,0,0);
-  if(cached_->tangents.empty())glVertexAttrib4f(5,1,0,0,1);
-  if(cached_->source_tangents.empty())glVertexAttrib4f(8,1,0,0,1);
-  if(cached_->source_colors.empty())glVertexAttrib4f(10,1,1,1,1);
-  if(cached_->normal_coordinates.empty())glVertexAttrib4f(11,0,0,0,0);
-  if(cached_->source_normals.empty() && cached_->canonical_normals.empty() && cached_->source_tangents.empty()) {
+  if(drawing->tangents.empty())glVertexAttrib4f(5,1,0,0,1);
+  if(drawing->source_tangents.empty())glVertexAttrib4f(8,1,0,0,1);
+  if(drawing->source_colors.empty())glVertexAttrib4f(10,1,1,1,1);
+  if(drawing->normal_coordinates.empty())glVertexAttrib4f(11,0,0,0,0);
+  if(drawing->source_normals.empty() && drawing->canonical_normals.empty() && drawing->source_tangents.empty()) {
     glVertexAttrib3f(7,0,0,1);glVertexAttrib4f(8,1,0,0,1);glVertexAttrib3f(9,0,0,1);
   }
   program_=textures_->program();
@@ -900,7 +907,7 @@ void SurfaceRenderer::draw(std::shared_ptr<const MeshSnapshot> mesh,
   glUniform1f(glGetUniformLocation(program_,"ghost_opacity"),1);
   glUniform1f(glGetUniformLocation(program_,"selection_amount"),0);
   glUniform1i(glGetUniformLocation(program_,"clip_enabled"),0);
-  auto plane=cached_->clip_plane;
+  auto plane=drawing->clip_plane;
   glUniform4f(glGetUniformLocation(program_,"clip_plane"),plane.normal.x,plane.normal.y,plane.normal.z,plane.offset);
   auto m = model_matrix(model), mvp = multiply(vp, m);
   glUniformMatrix4fv(glGetUniformLocation(program_, "model"), 1, GL_FALSE,
@@ -915,7 +922,7 @@ void SurfaceRenderer::draw(std::shared_ptr<const MeshSnapshot> mesh,
   glUniform3f(glGetUniformLocation(program_,"mt_camera_up"),up.x,up.y,up.z);glUniform3f(glGetUniformLocation(program_,"mt_camera_forward"),forward.x,forward.y,forward.z);
   glUniform1f(glGetUniformLocation(program_,"mt_aspect"),float(width)/height);
   auto seconds=textures_->frame_time.value_or(std::chrono::duration<double>(std::chrono::steady_clock::now()-textures_->started).count());glUniform1f(glGetUniformLocation(program_,"mt_time"),float(seconds));
-  glBindVertexArray(vao_);
+  glBindVertexArray(staged_flat?staged_flat->vao.name():vao_);
   auto blended = [&](const Material &m, const TextureMaps *maps,TextureState::MaterialKey key,std::optional<float> alpha={}) {
     if (m.alpha == Material::AlphaMode::Blend) return true;
     if (m.alpha != Material::AlphaMode::Automatic) return false;
@@ -1001,7 +1008,7 @@ void SurfaceRenderer::draw(std::shared_ptr<const MeshSnapshot> mesh,
     if(ghost_pass){glEnable(GL_BLEND);glBlendFuncSeparate(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA,GL_ONE,GL_ONE_MINUS_SRC_ALPHA);glDepthMask(GL_FALSE);glDisable(GL_SAMPLE_ALPHA_TO_COVERAGE);}
     if(!submit)return;
     if(polygon){
-      const auto range=std::find_if(cached_->ranges.begin(),cached_->ranges.end(),[&](const auto&r){return r.object==id&&r.texture_set==texture_set&&r.first==first&&r.count==count;});if(range==cached_->ranges.end())throw std::invalid_argument("Polygon draw lost its actual current range");
+      const auto range=std::find_if(drawing->ranges.begin(),drawing->ranges.end(),[&](const auto&r){return r.object==id&&r.texture_set==texture_set&&r.first==first&&r.count==count;});if(range==drawing->ranges.end())throw std::invalid_argument("Polygon draw lost its actual current range");
       textures_->polygon_frames.draw(*polygon,detail::polygon_range_world(*range),first,count,range->texture_set_proof?range->texture_set_proof->field().domain:nullptr,[&](size_t offset,size_t n){glDrawElements(GL_TRIANGLES,GLsizei(n),GL_UNSIGNED_INT,reinterpret_cast<void*>(offset*sizeof(uint32_t)));});
     }else glDrawElements(GL_TRIANGLES, GLsizei(count), GL_UNSIGNED_INT,
                    reinterpret_cast<void *>(first * sizeof(uint32_t)));
@@ -1079,9 +1086,9 @@ void SurfaceRenderer::draw(std::shared_ptr<const MeshSnapshot> mesh,
     glDrawElements(GL_TRIANGLES,GLsizei(r.count),GL_UNSIGNED_INT,reinterpret_cast<void*>(r.first*sizeof(uint32_t)));glDisable(GL_POLYGON_OFFSET_FILL);
   };
 
-  if(cached_->ranges.empty()&&!cached_->sculpt_chunks) {
-    glUniform1i(glGetUniformLocation(program_,"weight_pass"),!cached_->selected_weights.empty());
-    draw_range(Material{},0,count_,0,nullptr,false,false,cached_->pbr_view);
+  if(drawing->ranges.empty()&&!drawing->sculpt_chunks) {
+    glUniform1i(glGetUniformLocation(program_,"weight_pass"),!drawing->selected_weights.empty());
+    draw_range(Material{},0,drawing_count,0,nullptr,false,false,drawing->pbr_view);
   }else {
     auto is_ghost=[&](uint64_t id){auto i=std::find_if(display.begin(),display.end(),[&](const auto &o){return o.id==id;});return i!=display.end()&&i->ghost;};
     auto begin_object=[&](uint64_t id,bool world_valid,CanvasTransform world,const std::optional<AffineTransform> &affine,bool local_geometry=false,const SurfaceRange *range=nullptr){
@@ -1103,7 +1110,7 @@ void SurfaceRenderer::draw(std::shared_ptr<const MeshSnapshot> mesh,
         glUniform1i(glGetUniformLocation(program_,"affine_motion"),1);reversing=authored.orientation()==AffineOrientation::Reversing;
         // cut_position is now the real local vertex. Transport the same exact
         // authored world halfspace once; canvas/held motion never bakes Meshes.
-        const auto &matrix=authored.matrix();const auto &plane=cached_->clip_plane;
+        const auto &matrix=authored.matrix();const auto &plane=drawing->clip_plane;
         const double n[3]={plane.normal.x,plane.normal.y,plane.normal.z};double local[3]{};
         for(size_t col=0;col<3;++col)for(size_t row=0;row<3;++row)local[col]+=matrix[col*4+row]*n[row];
         const double offset=plane.offset-n[0]*matrix[12]-n[1]*matrix[13]-n[2]*matrix[14];
@@ -1141,17 +1148,17 @@ void SurfaceRenderer::draw(std::shared_ptr<const MeshSnapshot> mesh,
       glUniform3f(glGetUniformLocation(program_,"selection_color"),float((accent>>16)&255)/255,float((accent>>8)&255)/255,float(accent&255)/255);
       glUniform1f(glGetUniformLocation(program_,"selection_amount"),selected==display.end()?0:selected->hovered?.3f:selected->active?.12f:selected->selected?.05f:0);
 
-      glUniform1i(glGetUniformLocation(program_,"clip_enabled"),cached_->clipped_object&&id==cached_->clipped_object);
+      glUniform1i(glGetUniformLocation(program_,"clip_enabled"),drawing->clipped_object&&id==drawing->clipped_object);
 
       return true;
     };
     struct DrawItem {const SurfaceRange *packed=nullptr;const detail::SculptObjectChunks *chunk=nullptr;uint64_t object=0;};
     std::vector<DrawItem> ordered;
-    ordered.reserve(cached_->ranges.size()+(cached_->sculpt_chunks?cached_->sculpt_chunks->objects().size():0));
-    for(const auto &range:cached_->ranges)ordered.push_back({&range,nullptr,range.object});
-    if(cached_->sculpt_chunks) {
-      for(const auto &object:cached_->sculpt_chunks->objects())ordered.push_back({nullptr,&object,object.object});
-      const auto &scene_order=cached_->sculpt_chunks->object_order();
+    ordered.reserve(drawing->ranges.size()+(drawing->sculpt_chunks?drawing->sculpt_chunks->objects().size():0));
+    for(const auto &range:drawing->ranges)ordered.push_back({&range,nullptr,range.object});
+    if(drawing->sculpt_chunks) {
+      for(const auto &object:drawing->sculpt_chunks->objects())ordered.push_back({nullptr,&object,object.object});
+      const auto &scene_order=drawing->sculpt_chunks->object_order();
       auto rank=[&](uint64_t id){return std::find(scene_order.begin(),scene_order.end(),id)-scene_order.begin();};
       std::stable_sort(ordered.begin(),ordered.end(),[&](const auto &a,const auto &b){return rank(a.object)<rank(b.object);});
     }
@@ -1176,24 +1183,24 @@ void SurfaceRenderer::draw(std::shared_ptr<const MeshSnapshot> mesh,
         // Commands keep exact original cell/triangle order. Basevertex changes
         // only arena placement: raw immutable local indices remain unchanged.
         if(chunks_->has_commands(object.object,staged_chunks)){
-          draw_range(object.material,0,0,object.object,nullptr,false,false,cached_->pbr_view,false,false,nullptr,nullptr,0,false);
+          draw_range(object.material,0,0,object.object,nullptr,false,false,drawing->pbr_view,false,false,nullptr,nullptr,0,false);
           chunks_->draw(object.object,staged_chunks);
         }
         continue;
       }
       auto r=item.packed;
       if(!begin_object(r->object,r->world_frame_valid,r->object_world,r->affine_world,false,r))continue;
-      glBindVertexArray(vao_);
+      glBindVertexArray(staged_flat?staged_flat->vao.name():vao_);
       // Constants are context state and a preceding chunk draw may change them.
-      if(cached_->selected_weights.empty())glVertexAttrib1f(4,-1);
-      if(cached_->sculpt_masks.empty())glVertexAttrib1f(6,-1);
-      if(textures_->original_uv0.empty()&&cached_->mesh.uv.empty())glVertexAttrib2f(2,0,0);
+      if(drawing->selected_weights.empty())glVertexAttrib1f(4,-1);
+      if(drawing->sculpt_masks.empty())glVertexAttrib1f(6,-1);
+      if(textures_->original_uv0.empty()&&drawing->mesh.uv.empty())glVertexAttrib2f(2,0,0);
       if(textures_->uv1.empty())glVertexAttrib2f(3,0,0);
-      if(cached_->tangents.empty())glVertexAttrib4f(5,1,0,0,1);
-      if(cached_->source_tangents.empty())glVertexAttrib4f(8,1,0,0,1);
-      if(cached_->source_colors.empty())glVertexAttrib4f(10,1,1,1,1);
-      if(cached_->normal_coordinates.empty())glVertexAttrib4f(11,0,0,0,0);
-      if(cached_->source_normals.empty()&&cached_->canonical_normals.empty()&&cached_->source_tangents.empty()) {glVertexAttrib3f(7,0,0,1);glVertexAttrib3f(9,0,0,1);}
+      if(drawing->tangents.empty())glVertexAttrib4f(5,1,0,0,1);
+      if(drawing->source_tangents.empty())glVertexAttrib4f(8,1,0,0,1);
+      if(drawing->source_colors.empty())glVertexAttrib4f(10,1,1,1,1);
+      if(drawing->normal_coordinates.empty())glVertexAttrib4f(11,0,0,0,0);
+      if(drawing->source_normals.empty()&&drawing->canonical_normals.empty()&&drawing->source_tangents.empty()) {glVertexAttrib3f(7,0,0,1);glVertexAttrib3f(9,0,0,1);}
       bool weighted=!ghost_pass && textures_->weighted.contains(r->object);
       glUniform1i(glGetUniformLocation(program_,"weight_pass"),weighted);
       auto typed=textures_->toons.find(TextureState::material_key(*r));
@@ -1214,10 +1221,14 @@ void SurfaceRenderer::draw(std::shared_ptr<const MeshSnapshot> mesh,
   glDisable(GL_CULL_FACE);
   glBindVertexArray(0);
   glUseProgram(0);
-  if (glGetError() != GL_NO_ERROR){textures_->clear(true);cached_.reset();count_=0;throw std::runtime_error("Sculpt GPU rendering failed");}
-  if(!textures_->deferred)resolve();
-  if(staged_chunks)chunks_->commit(std::move(staged_chunks));
-  }catch(...){cached_.reset();count_=0;textures_->target.abort();throw;}
+  if (glGetError() != GL_NO_ERROR)throw std::runtime_error("Sculpt GPU rendering failed");
+  // Resolve/UI sampling uses only the independent linear target. Seal actual
+  // material/flat stores after their final draw, before any destination write.
+  // Deferred UI work cannot name these private stores or dirty their epoch.
+  if(mesh!=cached_)textures_->ledger->seal(true);
+  if(textures_->deferred){textures_->deferred_pending.emplace(std::move(next));}
+  else{textures_->target.resolve(textures_->output);textures_->commit_frame(*this,next);}
+  }catch(...){textures_->rollback_frame(*this,next);throw;}
 }
 
 namespace {

@@ -3,6 +3,7 @@
 #include "current-paint-preview.hpp"
 #include "paint-composite-backend.hpp"
 #include "render-paint-state.hpp"
+#include "render-store-ledger.hpp"
 #include <map>
 #include <set>
 #include <cstring>
@@ -19,7 +20,8 @@ public:
   bool physical=false;
  };
 private:
- struct Store {GLuint name=0;bool texture=false;size_t bytes=0;};
+ using Ledger=ContextStoreLedger;
+ struct Store {GLuint name=0;bool texture=false;size_t bytes=0;Ledger::Store lease;};
  template<class T>struct OwnerLess {
   bool operator()(const std::shared_ptr<const T>&a,const std::shared_ptr<const T>&b)const noexcept {
    if(a.get()!=b.get())return std::less<const T*>{}(a.get(),b.get());return a.owner_before(b);
@@ -37,45 +39,46 @@ private:
  std::map<Data,Entry,OwnerLess<CurrentGridPaintPreview>> entries_;
  std::map<PaddingOwner,Padding,OwnerLess<std::vector<int32_t>>> padding_;
  Pool<PaintTile> common_;Pool<PaintEmissionTile> emission_;
- std::vector<Store> retired_;GLsync fence_=nullptr;uint64_t epoch_=0,sealed_=0,completed_=0;
+ std::shared_ptr<Ledger> ledger_;Ledger::Group group_=0;bool own_ledger_=false;GLsync fence_=nullptr;uint64_t epoch_=0,sealed_=0,completed_=0;
  bool dirty_=false;size_t requested_=0,images_=0,budget_=0,max_images_=0;Stats stats_;
  GLuint program_=0,vao_=0;
  static Data data(const Data&owner){
   if(!owner)throw std::invalid_argument("Missing actual current-grid preview owner");owner->authenticate_owner(owner);
   auto result=owner->contribution_owner()?owner->contribution_owner():owner;result->authenticate_owner(result);return result;
  }
- void charge(size_t n){if(requested_>budget_||n>budget_-requested_)throw std::length_error("Current-grid requested GPU stores exceed old/new/retirement budget");}
+ void sync_usage(){const auto u=ledger_->usage(group_);requested_=u.bytes;images_=u.images;stats_.retired_bytes=u.retired_bytes;stats_.peak_bytes=std::max(stats_.peak_bytes,u.peak_bytes);}
+ void charge(size_t n){sync_usage();if(requested_>budget_||n>budget_-requested_)throw std::length_error("Current-grid requested GPU stores exceed old/new/retirement budget");}
  void check(){if(glGetError()!=GL_NO_ERROR)throw std::runtime_error("Current-grid GPU allocation/upload failed");}
- void retire(Store&s)noexcept{if(s.name){retired_.push_back(s);stats_.retired_bytes+=s.bytes;s={};}}
+ void retire(Store&s)noexcept{s.lease.reset();s={};}
  void retire(Entry&e)noexcept{for(auto&s:e.images)retire(s);retire(e.view);retire(e.directory);}
- void destroy(Store&s)noexcept{if(!s.name)return;if(s.texture){glDeleteTextures(1,&s.name);--images_;}else glDeleteBuffers(1,&s.name);requested_-=s.bytes;s={};}
+ void destroy(Store&s)noexcept{retire(s);}
  void seal(bool force=false){
   if(!dirty_&&!force)return;const auto next=glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE,0);
   if(!next){(void)glGetError();throw std::runtime_error("Current-grid GPU retirement fence creation failed; debt retained");}
   if(fence_)glDeleteSync(fence_);fence_=next;sealed_=epoch_;dirty_=false;glFlush();
  }
  void collect(){
-  if(dirty_)seal();if(!fence_)return;const auto status=glClientWaitSync(fence_,0,0);
+  if(own_ledger_)ledger_->collect();sync_usage();if(dirty_)seal();if(!fence_)return;const auto status=glClientWaitSync(fence_,0,0);
   if(status==GL_WAIT_FAILED){(void)glGetError();throw std::runtime_error("Current-grid GPU retirement fence query failed; debt retained");}
   if(status!=GL_ALREADY_SIGNALED&&status!=GL_CONDITION_SATISFIED)return;
   completed_=sealed_;glDeleteSync(fence_);fence_=nullptr;
-  for(auto&s:retired_)destroy(s);retired_.clear();stats_.retired_bytes=0;
+  sync_usage();
  }
  Store buffer(size_t bytes){
-  charge(bytes);Store out;out.bytes=bytes;glGenBuffers(1,&out.name);if(!out.name)throw std::runtime_error("Cannot allocate current-grid GPU buffer");
+  charge(bytes);Store out;out.bytes=bytes;out.lease=ledger_->create(Ledger::Kind::Buffer,bytes,Ledger::Domain::Material,group_);out.name=out.lease.name();
   glBindBuffer(GL_COPY_WRITE_BUFFER,out.name);glBufferData(GL_COPY_WRITE_BUFFER,GLsizeiptr(bytes),nullptr,GL_DYNAMIC_DRAW);
-  requested_+=bytes;stats_.peak_bytes=std::max(stats_.peak_bytes,requested_);dirty_=true;
+  sync_usage();dirty_=true;
   try{check();}catch(...){retire(out);throw;}return out;
  }
- Store view(GLuint storage,GLenum format){
+ Store view(const Store&storage,GLenum format){
   if(images_>=max_images_)throw std::length_error("Current-grid GPU texture/view count exceeded");
-  Store out;out.texture=true;glGenTextures(1,&out.name);if(!out.name)throw std::runtime_error("Cannot allocate current-grid GPU buffer view");++images_;dirty_=true;
-  try{glBindTexture(GL_TEXTURE_BUFFER,out.name);glTexBuffer(GL_TEXTURE_BUFFER,format,storage);check();}catch(...){retire(out);throw;}return out;
+  Store out;out.texture=true;out.lease=ledger_->create(Ledger::Kind::Texture,0,Ledger::Domain::Material,group_,std::span(&storage.lease,1));out.name=out.lease.name();sync_usage();dirty_=true;
+  try{glBindTexture(GL_TEXTURE_BUFFER,out.name);glTexBuffer(GL_TEXTURE_BUFFER,format,storage.name);check();}catch(...){retire(out);throw;}return out;
  }
  Store image(uint32_t r,GLenum format){
   const size_t bytes=size_t(r)*r*(format==GL_RGBA32F?16:4);charge(bytes);
   if(images_>=max_images_)throw std::length_error("Current-grid GPU texture/view count exceeded");
-  Store out;out.texture=true;out.bytes=bytes;glGenTextures(1,&out.name);if(!out.name)throw std::runtime_error("Cannot allocate current-grid resolved image");++images_;requested_+=bytes;stats_.peak_bytes=std::max(stats_.peak_bytes,requested_);dirty_=true;
+  Store out;out.texture=true;out.bytes=bytes;out.lease=ledger_->create(Ledger::Kind::Texture,bytes,Ledger::Domain::Material,group_);out.name=out.lease.name();sync_usage();dirty_=true;
   try{glBindTexture(GL_TEXTURE_2D,out.name);glTexImage2D(GL_TEXTURE_2D,0,GLint(format),GLsizei(r),GLsizei(r),0,GL_RGBA,GL_UNSIGNED_BYTE,nullptr);
    for(auto parameter:{GL_TEXTURE_MIN_FILTER,GL_TEXTURE_MAG_FILTER})glTexParameteri(GL_TEXTURE_2D,parameter,GL_LINEAR);
    for(auto parameter:{GL_TEXTURE_WRAP_S,GL_TEXTURE_WRAP_T})glTexParameteri(GL_TEXTURE_2D,parameter,GL_CLAMP_TO_EDGE);
@@ -91,17 +94,16 @@ private:
   size_t next=std::max(size_t(4),pool.capacity);while(next-pool.capacity<needed-free){if(next>SIZE_MAX/2)throw std::length_error("Current-grid input pool overflow");next*=2;}return next;
  }
  template<class T>void reserve(Pool<T>&pool,size_t capacity,size_t prefix,size_t tile_bytes,GLenum format){
-  if(capacity==pool.capacity&&pool.buffer.name){if(!pool.view.name)pool.view=view(pool.buffer.name,format);return;}
+  if(capacity==pool.capacity&&pool.buffer.name){if(!pool.view.name)pool.view=view(pool.buffer,format);return;}
   if(capacity>(SIZE_MAX-prefix)/tile_bytes)throw std::length_error("Current-grid input store overflow");
   const size_t bytes=std::max(size_t(4),prefix+capacity*tile_bytes);pool.slots.reserve(capacity);
   Store next=buffer(bytes);
   try{
    if(pool.buffer.name){glBindBuffer(GL_COPY_READ_BUFFER,pool.buffer.name);glBindBuffer(GL_COPY_WRITE_BUFFER,next.name);glCopyBufferSubData(GL_COPY_READ_BUFFER,GL_COPY_WRITE_BUFFER,0,0,GLsizeiptr(pool.buffer.bytes));check();}
    else if(prefix){const auto&q=paint_compute::quantization();static_assert(sizeof(q)==3072);glBindBuffer(GL_COPY_WRITE_BUFFER,next.name);glBufferSubData(GL_COPY_WRITE_BUFFER,0,sizeof(q),&q);stats_.quantization_bytes+=sizeof(q);check();}
-   if(!pool.view.name)pool.view=view(next.name,format);
-   else{glBindTexture(GL_TEXTURE_BUFFER,pool.view.name);glTexBuffer(GL_TEXTURE_BUFFER,format,next.name);check();}
-  }catch(...){retire(pool.view);retire(next);throw;}
-  retire(pool.buffer);pool.buffer=next;pool.capacity=capacity;
+  }catch(...){retire(next);throw;}
+  Store next_view;try{next_view=view(next,format);}catch(...){retire(next);throw;}
+  retire(pool.view);retire(pool.buffer);pool.buffer=std::move(next);pool.view=std::move(next_view);pool.capacity=capacity;
  }
  template<class T,class Pack>size_t slot(Pool<T>&pool,const std::shared_ptr<const T>&owner,
      const std::set<std::shared_ptr<const T>,OwnerLess<T>>&wanted,size_t prefix,size_t tile_bytes,Pack pack){
@@ -183,7 +185,7 @@ void main(){
   if(builds){
    if(!common_.buffer.name||p.common_capacity!=common_.capacity)bytes(3072+p.common_capacity*16384);
    if(!emission_.buffer.name||p.emission_capacity!=emission_.capacity)bytes(std::max(size_t(4),p.emission_capacity*28672));
-   if(!common_.view.name)++p.names;if(!emission_.view.name)++p.names;
+   if(!common_.view.name||p.common_capacity!=common_.capacity)++p.names;if(!emission_.view.name||p.emission_capacity!=emission_.capacity)++p.names;
   }
   return p;
  }
@@ -193,7 +195,7 @@ void main(){
   auto common_pack=[](const PaintTile&t){std::array<std::array<uint32_t,4>,1024> out{};for(size_t i=0;i<1024;++i)for(size_t k=0;k<14;++k)out[i][k/4]|=uint32_t(t.pixels[i].data[k])<<((k%4)*8);return out;};
   auto emission_pack=[](const PaintEmissionTile&t){std::array<float,7168> out{};for(size_t i=0;i<1024;++i){const auto&v=t.pixels[i];v.validate();for(size_t k=0;k<3;++k){out[i*7+k]=v.legacy[k];out[i*7+3+k]=v.physical[k];}out[i*7+6]=v.coverage;}return out;};
   for(size_t li=0;li<field.layers().size();++li){const auto&l=field.layers()[li];for(size_t t=0;t<grid;++t)if(l.tiles[t]){auto&o=offsets[li*grid+t];o[0]=int32_t(slot(common_,l.tiles[t],p.common,3072,16384,common_pack));if(!l.emission_tiles.empty()&&l.emission_tiles[t])o[1]=int32_t(slot(emission_,l.emission_tiles[t],p.emission,0,28672,emission_pack));}}
-  entry.directory=buffer(offsets.size()*8);glBindBuffer(GL_COPY_WRITE_BUFFER,entry.directory.name);glBufferSubData(GL_COPY_WRITE_BUFFER,0,GLsizeiptr(offsets.size()*8),offsets.data());check();stats_.directory_bytes+=offsets.size()*8;entry.view=view(entry.directory.name,GL_RG32I);
+  entry.directory=buffer(offsets.size()*8);glBindBuffer(GL_COPY_WRITE_BUFFER,entry.directory.name);glBufferSubData(GL_COPY_WRITE_BUFFER,0,GLsizeiptr(offsets.size()*8),offsets.data());check();stats_.directory_bytes+=offsets.size()*8;entry.view=view(entry.directory,GL_RG32I);
   auto pad=padding_.find(field.padding());if(pad==padding_.end())throw std::logic_error("Current-grid padding forecast lost its owner");
   entry.resource.physical=d->physical_emission();const auto images=entry.resource.physical?5:3;
   for(int i=0;i<images;++i){const auto format=i==0?GL_SRGB8_ALPHA8:i==1?GL_RGBA8:i==2&&!entry.resource.physical?GL_SRGB8_ALPHA8:GL_RGBA32F;entry.images[size_t(i)]=image(r,GLenum(format));entry.resource.textures[size_t(i)]=entry.images[size_t(i)].name;}
@@ -206,13 +208,22 @@ void main(){
   }catch(...){glDeleteFramebuffers(1,&fbo);throw;}glDeleteFramebuffers(1,&fbo);
  }
 public:
- CurrentPaintPreviewCompiler()=default;CurrentPaintPreviewCompiler(const CurrentPaintPreviewCompiler&)=delete;
+ explicit CurrentPaintPreviewCompiler(std::shared_ptr<Ledger> ledger={}):ledger_(ledger?ledger:std::make_shared<Ledger>(Ledger::Limits{2ull*1024*1024*1024,2048,256})),own_ledger_(!ledger){group_=ledger_->create_group();}
+ CurrentPaintPreviewCompiler(const CurrentPaintPreviewCompiler&)=delete;
+ Ledger::Group group()const noexcept{return group_;}
  size_t forecast(const std::vector<Data>&inputs,size_t working=256ull*1024*1024){collect();return plan(inputs,working).peak;}
  size_t forecast_images(const std::vector<Data>&inputs,size_t working=256ull*1024*1024){collect();return plan(inputs,working).names;}
- void prepare(const std::vector<Data>&inputs,size_t budget=1024ull*1024*1024,size_t max_images=1024,size_t working=256ull*1024*1024){
+ using Selection=std::set<Data,OwnerLess<CurrentGridPaintPreview>>;
+ static Selection selection(const std::vector<Data>&inputs){Selection result;for(const auto&i:inputs)result.insert(data(i));return result;}
+ void retain(const Selection&wanted)noexcept {
+  for(auto it=entries_.begin();it!=entries_.end();)if(!wanted.contains(it->first)){retire(it->second);it=entries_.erase(it);}else ++it;
+  for(auto it=padding_.begin();it!=padding_.end();)if(!std::any_of(wanted.begin(),wanted.end(),[&](const auto&d){const auto&p=d->layers()->padding();return it->first==p&&!it->first.owner_before(p)&&!p.owner_before(it->first);})){retire(it->second.view);retire(it->second.buffer);it=padding_.erase(it);}else ++it;
+  if(wanted.empty()){common_={};emission_={};}
+ }
+ void prepare(const std::vector<Data>&inputs,size_t budget=1024ull*1024*1024,size_t max_images=1024,size_t working=256ull*1024*1024,bool preserve_existing=false){
   collect();auto p=plan(inputs,working);if(p.peak>budget||p.names>max_images)throw std::length_error("Current-grid old/new/retirement GPU budget exceeded");budget_=budget;max_images_=max_images;
   if(epoch_==UINT64_MAX)throw std::overflow_error("Current-grid GPU operation epoch exhausted");++epoch_;
-  retired_.reserve(retired_.size()+(entries_.size()+p.wanted.size()+padding_.size()+p.padding.size()+4)*10);
+  ledger_->mark_used();
   std::map<Data,Entry,OwnerLess<CurrentGridPaintPreview>> added;
   for(const auto&d:p.wanted)if(!entries_.contains(d)){auto&entry=added[d];entry.resource.owner=d;}
   if(added.empty()&&p.wanted.size()==entries_.size()&&p.padding.size()==padding_.size())return;
@@ -226,24 +237,24 @@ public:
    }
    for(const auto&owner:p.padding)if(!padding_.contains(owner)){
     auto inserted=padding_.emplace(owner,Padding{});auto&pad=inserted.first->second;
-    try{pad.buffer=buffer(owner->size()*4);glBindBuffer(GL_COPY_WRITE_BUFFER,pad.buffer.name);glBufferSubData(GL_COPY_WRITE_BUFFER,0,GLsizeiptr(owner->size()*4),owner->data());check();stats_.padding_bytes+=owner->size()*4;pad.view=view(pad.buffer.name,GL_R32I);}catch(...){retire(pad.buffer);retire(pad.view);padding_.erase(inserted.first);throw;}
+    try{pad.buffer=buffer(owner->size()*4);glBindBuffer(GL_COPY_WRITE_BUFFER,pad.buffer.name);glBufferSubData(GL_COPY_WRITE_BUFFER,0,GLsizeiptr(owner->size()*4),owner->data());check();stats_.padding_bytes+=owner->size()*4;pad.view=view(pad.buffer,GL_R32I);}catch(...){retire(pad.buffer);retire(pad.view);padding_.erase(inserted.first);throw;}
    }
    for(auto&[key,entry]:added)build(entry,p);
    // Fence all new resolves and the prior frame's last uses BEFORE replacing
    // the old cache. A rejected fence cannot invalidate the still-live frame.
-   seal(true);
-   for(auto it=entries_.begin();it!=entries_.end();)if(!p.wanted.contains(it->first)){retire(it->second);it=entries_.erase(it);}else ++it;
+   seal(true);if(own_ledger_)ledger_->seal(true);
+   if(!preserve_existing)for(auto it=entries_.begin();it!=entries_.end();)if(!p.wanted.contains(it->first)){retire(it->second);it=entries_.erase(it);}else ++it;
    entries_.merge(added);
-   for(auto it=padding_.begin();it!=padding_.end();)if(!p.padding.contains(it->first)){retire(it->second.view);retire(it->second.buffer);it=padding_.erase(it);}else ++it;
-   if(p.wanted.empty()){retire(common_.view);retire(common_.buffer);retire(emission_.view);retire(emission_.buffer);common_={};emission_={};}
-  }catch(...){for(auto&[key,entry]:added)retire(entry);try{seal();}catch(...){}throw;}
+   if(!preserve_existing)for(auto it=padding_.begin();it!=padding_.end();)if(!p.padding.contains(it->first)){retire(it->second.view);retire(it->second.buffer);it=padding_.erase(it);}else ++it;
+   if(p.wanted.empty()&&!preserve_existing){retire(common_.view);retire(common_.buffer);retire(emission_.view);retire(emission_.buffer);common_={};emission_={};}
+  }catch(...){for(auto&[key,entry]:added)retire(entry);try{seal();}catch(...){}if(own_ledger_)ledger_->seal_noexcept();throw;}
  }
  const Resource&at(const Data&owner)const{return entries_.at(owner->contribution_owner()?owner->contribution_owner():owner).resource;}
- Stats stats()const{auto out=stats_;out.requested_bytes=requested_;return out;}
- size_t bytes()const noexcept{return requested_;}size_t image_count()const noexcept{return images_;}
+ Stats stats()const{auto out=stats_;const auto u=ledger_->usage(group_);out.requested_bytes=u.bytes;out.retired_bytes=u.retired_bytes;out.peak_bytes=std::max(out.peak_bytes,u.peak_bytes);return out;}
+ size_t bytes()const noexcept{return ledger_->usage(group_).bytes;}size_t image_count()const noexcept{return ledger_->usage(group_).images;}
  void clear(bool release){
-  if(release){for(auto&[key,e]:entries_){for(auto&s:e.images)destroy(s);destroy(e.directory);destroy(e.view);}for(auto&[key,p]:padding_){destroy(p.buffer);destroy(p.view);}destroy(common_.buffer);destroy(common_.view);destroy(emission_.buffer);destroy(emission_.view);for(auto&s:retired_)destroy(s);if(fence_)glDeleteSync(fence_);if(program_)glDeleteProgram(program_);if(vao_)glDeleteVertexArrays(1,&vao_);}
-  entries_.clear();padding_.clear();common_={};emission_={};retired_.clear();fence_=nullptr;program_=vao_=0;requested_=images_=0;epoch_=sealed_=completed_=0;dirty_=false;stats_.retired_bytes=0;
+  if(release){for(auto&[key,e]:entries_){for(auto&s:e.images)destroy(s);destroy(e.directory);destroy(e.view);}for(auto&[key,p]:padding_){destroy(p.buffer);destroy(p.view);}destroy(common_.buffer);destroy(common_.view);destroy(emission_.buffer);destroy(emission_.view);if(fence_)glDeleteSync(fence_);if(program_)glDeleteProgram(program_);if(vao_)glDeleteVertexArrays(1,&vao_);}
+  entries_.clear();padding_.clear();common_={};emission_={};fence_=nullptr;program_=vao_=0;requested_=images_=0;epoch_=sealed_=completed_=0;dirty_=false;stats_.retired_bytes=0;if(own_ledger_)ledger_->clear(release);
  }
  ~CurrentPaintPreviewCompiler(){clear(true);}
 };

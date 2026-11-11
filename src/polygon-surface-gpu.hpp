@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #pragma once
 #include "polygon-surface-range.hpp"
+#include "render-store-ledger.hpp"
 #include <utility>
 namespace dome::detail {
 // Per-renderer immutable primitive frames. Unit14 already carries a sampler-
@@ -10,11 +11,13 @@ namespace dome::detail {
 // binding restores a mixed legacy range's actual source pack after each draw.
 // No vertex attribute or GPU readback is added.
 class PolygonSurfaceGpu {
+ using Ledger=ContextStoreLedger;
+ std::shared_ptr<Ledger>ledger_;Ledger::Group group_=0;bool own_ledger_=false;
  struct Chunk {
-  GLuint buffer=0,texture=0;size_t first=0,count=0;
+  GLuint buffer=0,texture=0;Ledger::Store buffer_store,texture_store;size_t first=0,count=0;
   Chunk()=default;Chunk(const Chunk&)=delete;Chunk&operator=(const Chunk&)=delete;
-  Chunk(Chunk&&o)noexcept:buffer(std::exchange(o.buffer,0)),texture(std::exchange(o.texture,0)),first(o.first),count(o.count){}
-  ~Chunk(){if(texture)glDeleteTextures(1,&texture);if(buffer)glDeleteBuffers(1,&buffer);}
+  Chunk(Chunk&&o)noexcept:buffer(std::exchange(o.buffer,0)),texture(std::exchange(o.texture,0)),buffer_store(std::move(o.buffer_store)),texture_store(std::move(o.texture_store)),first(o.first),count(o.count){}
+  ~Chunk()=default;
  };
  struct Entry {std::shared_ptr<const PolygonSurfaceOwner>owner;std::shared_ptr<const TextureSetFaceDomain>domain;AffineTransform world;std::vector<Chunk>chunks;size_t bytes=0;};
  std::vector<Entry>entries_;
@@ -25,12 +28,21 @@ class PolygonSurfaceGpu {
   ~Bind(){glBindBuffer(GL_TEXTURE_BUFFER,GLuint(buffer));glBindTexture(GL_TEXTURE_BUFFER,GLuint(texture));glActiveTexture(GLenum(active));}
  };
 public:
- size_t bytes()const{size_t n=0;for(const auto&e:entries_)n+=e.bytes;return n;}
- size_t images()const{size_t n=0;for(const auto&e:entries_)n+=e.chunks.size();return n;}
- void clear(bool release){if(!release)for(auto&e:entries_)for(auto&c:e.chunks)c.texture=c.buffer=0;entries_.clear();}
- void prepare(const MeshSnapshot&snapshot,size_t other_bytes,size_t other_images,const SurfaceTextureLimits&limits){
+ explicit PolygonSurfaceGpu(std::shared_ptr<Ledger>ledger={}):ledger_(ledger?ledger:std::make_shared<Ledger>(Ledger::Limits{2ull*1024*1024*1024,2048,256})),own_ledger_(!ledger){group_=ledger_->create_group();}
+ Ledger::Group group()const noexcept{return group_;}
+ struct Key {std::shared_ptr<const PolygonSurfaceOwner>owner;std::shared_ptr<const TextureSetFaceDomain>domain;AffineTransform world;};
+ using Selection=std::vector<Key>;
+ static Selection selection(const MeshSnapshot&snapshot){Selection result;for(const auto&r:snapshot.ranges)if(r.textures&&r.textures->polygon_surface){const auto&packet=*r.textures->polygon_surface;Key key{packet.field_owner(),r.texture_set_proof?r.texture_set_proof->field().domain:nullptr,polygon_range_world(r)};if(std::none_of(result.begin(),result.end(),[&](const auto&k){return k.owner==key.owner&&!k.owner.owner_before(key.owner)&&!key.owner.owner_before(k.owner)&&k.domain==key.domain&&!k.domain.owner_before(key.domain)&&!key.domain.owner_before(k.domain)&&k.world.matrix()==key.world.matrix();}))result.push_back(std::move(key));}return result;}
+ void retain(const Selection&wanted)noexcept {std::erase_if(entries_,[&](const Entry&e){return std::none_of(wanted.begin(),wanted.end(),[&](const auto&k){return e.owner==k.owner&&!e.owner.owner_before(k.owner)&&!k.owner.owner_before(e.owner)&&e.domain==k.domain&&!e.domain.owner_before(k.domain)&&!k.domain.owner_before(e.domain)&&e.world.matrix()==k.world.matrix();});});}
+ size_t bytes()const{return ledger_->usage(group_).bytes;}
+ size_t images()const{return ledger_->usage(group_).images;}
+ void clear(bool release){entries_.clear();if(own_ledger_)ledger_->clear(release);}
+ struct Demand{size_t bytes=0,images=0;};
+ Demand additional(const MeshSnapshot&snapshot)const {Demand result;const auto keys=selection(snapshot);if(keys.empty())return result;GLint texels=0;glGetIntegerv(GL_MAX_TEXTURE_BUFFER_SIZE,&texels);if(texels<4)throw std::runtime_error("Polygon primitive frame capacity unavailable");const auto chunk=size_t(texels)/4;for(const auto&k:keys){if(std::any_of(entries_.begin(),entries_.end(),[&](const auto&e){return e.owner==k.owner&&!e.owner.owner_before(k.owner)&&!k.owner.owner_before(e.owner)&&e.domain==k.domain&&!e.domain.owner_before(k.domain)&&!k.domain.owner_before(e.domain)&&e.world.matrix()==k.world.matrix();}))continue;auto r=std::find_if(snapshot.ranges.begin(),snapshot.ranges.end(),[&](const auto&r){return r.textures&&r.textures->polygon_surface&&r.textures->polygon_surface->field_owner()==k.owner&&polygon_range_world(r).matrix()==k.world.matrix()&&(r.texture_set_proof?r.texture_set_proof->field().domain:nullptr)==k.domain;});if(r==snapshot.ranges.end())throw std::logic_error("Missing actual polygon range during forecast");const auto n=k.domain?k.domain->triangles().size():r->textures->polygon_surface->geometric_frames().size();if(n>SIZE_MAX/64||n*64>SIZE_MAX-result.bytes)throw std::length_error("Polygon frame store forecast overflow");result.bytes+=n*64;result.images+=(n+chunk-1)/chunk;}return result;}
+ void prepare(const MeshSnapshot&snapshot,size_t other_bytes,size_t other_images,const SurfaceTextureLimits&limits,bool preserve_existing=false){
+  if(own_ledger_)ledger_->collect();const auto delta=additional(snapshot);const auto used=ledger_->usage(group_);if(other_bytes>limits.max_bytes||used.bytes>limits.max_bytes-other_bytes||delta.bytes>limits.max_bytes-other_bytes-used.bytes||other_images>limits.max_images||used.images>limits.max_images-other_images||delta.images>limits.max_images-other_images-used.images)throw std::length_error("Polygon old/new/debt quota exceeded");ledger_->preflight(Ledger::Domain::Material,delta.bytes,delta.images);
   struct Wanted {std::shared_ptr<const PolygonSurfacePreview>packet;AffineTransform world;std::shared_ptr<const TextureSetFaceDomain>domain;};std::vector<Wanted>wanted;
-  if(std::none_of(snapshot.ranges.begin(),snapshot.ranges.end(),[](const auto&r){return r.textures&&bool(r.textures->polygon_surface);})){clear(true);return;}
+  if(std::none_of(snapshot.ranges.begin(),snapshot.ranges.end(),[](const auto&r){return r.textures&&bool(r.textures->polygon_surface);})){if(!preserve_existing)clear(true);return;}
   GLint texels=0;glGetIntegerv(GL_MAX_TEXTURE_BUFFER_SIZE,&texels);if(texels<4)throw std::runtime_error("Polygon primitive frames require an actual texture-buffer capacity");const size_t chunk_triangles=size_t(texels)/4;
   size_t all_bytes=0,all_images=0;
   for(const auto&r:snapshot.ranges)if(r.textures&&r.textures->polygon_surface){
@@ -42,7 +54,7 @@ public:
    if(all_bytes>limits.max_bytes||other_bytes>limits.max_bytes-all_bytes||bytes>limits.max_bytes-all_bytes-other_bytes||all_images>limits.max_images||other_images>limits.max_images-all_images||images>limits.max_images-all_images-other_images)throw std::length_error("Polygon primitive frames exceed aggregate image/buffer quota before upload");
    all_bytes+=bytes;all_images+=images;wanted.push_back({p,world,domain});
   }
-  std::erase_if(entries_,[&](const Entry&e){return !std::any_of(wanted.begin(),wanted.end(),[&](const auto&w){return same(e,*w.packet,w.world,w.domain);});});
+  if(!preserve_existing)std::erase_if(entries_,[&](const Entry&e){return !std::any_of(wanted.begin(),wanted.end(),[&](const auto&w){return same(e,*w.packet,w.world,w.domain);});});
   Bind restore;
   for(const auto&w:wanted){if(std::any_of(entries_.begin(),entries_.end(),[&](const Entry&e){return same(e,*w.packet,w.world,w.domain);}))continue;
    // Reserve the full placement scratch plus the retained subset before allocation.
@@ -50,9 +62,10 @@ public:
    auto frames=w.packet->placed_frames(w.world);
    if(w.domain){std::vector<std::array<std::array<float,4>,4>>subset;subset.reserve(w.domain->triangles().size());for(auto triangle:w.domain->triangles())subset.push_back(frames.at(triangle));frames=std::move(subset);}
    Entry entry;entry.owner=w.packet->field_owner();entry.domain=w.domain;entry.world=w.world;entry.bytes=frames.size()*64;
-   for(size_t first=0;first<frames.size();first+=chunk_triangles){Chunk c;c.first=first;c.count=std::min(chunk_triangles,frames.size()-first);glGenBuffers(1,&c.buffer);glGenTextures(1,&c.texture);if(!c.buffer||!c.texture)throw std::runtime_error("Polygon primitive frame allocation failed");glBindBuffer(GL_TEXTURE_BUFFER,c.buffer);glBufferData(GL_TEXTURE_BUFFER,GLsizeiptr(c.count*64),frames.data()+first,GL_STATIC_DRAW);glBindTexture(GL_TEXTURE_BUFFER,c.texture);glTexBuffer(GL_TEXTURE_BUFFER,GL_RGBA32F,c.buffer);if(glGetError()!=GL_NO_ERROR)throw std::runtime_error("Polygon primitive frame upload failed");entry.chunks.push_back(std::move(c));}
+   for(size_t first=0;first<frames.size();first+=chunk_triangles){Chunk c;c.first=first;c.count=std::min(chunk_triangles,frames.size()-first);c.buffer_store=ledger_->create(Ledger::Kind::Buffer,c.count*64,Ledger::Domain::Material,group_);c.buffer=c.buffer_store.name();c.texture_store=ledger_->create(Ledger::Kind::Texture,0,Ledger::Domain::Material,group_,std::span(&c.buffer_store,1));c.texture=c.texture_store.name();glBindBuffer(GL_TEXTURE_BUFFER,c.buffer);glBufferData(GL_TEXTURE_BUFFER,GLsizeiptr(c.count*64),frames.data()+first,GL_STATIC_DRAW);glBindTexture(GL_TEXTURE_BUFFER,c.texture);glTexBuffer(GL_TEXTURE_BUFFER,GL_RGBA32F,c.buffer);if(glGetError()!=GL_NO_ERROR)throw std::runtime_error("Polygon primitive frame upload failed");entry.chunks.push_back(std::move(c));}
    entries_.push_back(std::move(entry));
   }
+  if(own_ledger_&&delta.bytes)ledger_->seal(true);
  }
  template<class Draw>void draw(const PolygonSurfacePreview&p,const AffineTransform&world,size_t first,size_t count,const std::shared_ptr<const TextureSetFaceDomain>&domain,Draw&&draw){
   auto found=std::find_if(entries_.begin(),entries_.end(),[&](const Entry&e){return same(e,p,world,domain);});if(found==entries_.end()||count!=(domain?domain->triangles().size():p.geometric_frames().size())*3)throw std::invalid_argument("Polygon draw has no matching immutable primitive-frame upload");
