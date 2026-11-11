@@ -1,0 +1,1344 @@
+{
+  "schema": 1,
+  "date": "2026-11-11",
+  "result": "PASS: scoped current-source sanitizer reader qualification; main product admission remains separate",
+  "source": {
+    "commit": "b8c469ce875eb2542c220300c3c63edbf1526570",
+    "root": "artifacts/resume-integration-20261111",
+    "modified_source_files": [],
+    "historical_commit": "03f8edf15b265932cab5e1ddbd22d5878f1d8c26",
+    "production_manifest_delta_from_historical": [
+      "third_party/desktop/bdf_font.hpp",
+      "third_party/sources.json"
+    ],
+    "src_include_tests_CMake_delta_from_historical": []
+  },
+  "scope": {
+    "fresh_whole_test_translation_units": 11,
+    "fresh_qualified_reader_ELFs": 11,
+    "new_executions": 33,
+    "reused_current_native_endpoints": 2,
+    "logical_cases": 35,
+    "software_graphics_cases": 11,
+    "compile_jobs_max": 2,
+    "links_max": 1,
+    "runtime_jobs_max": 1,
+    "fresh_ALL_build": false,
+    "hardware": false,
+    "physical_XR": false,
+    "current_Release35_rerun": false,
+    "historical_results_relabelled": false
+  },
+  "build": {
+    "source_and_provider_unique_pins": 2066,
+    "archive_or_member_provider_pins": 216,
+    "current_native_owned_files_verified": 312,
+    "source_header_provider_output_drift": [],
+    "compile_flags": [
+      "-O1",
+      "-g1",
+      "-DNDEBUG",
+      "-fsanitize=address,undefined",
+      "-fno-omit-frame-pointer",
+      "-ffunction-sections",
+      "-fdata-sections",
+      "-std=gnu++20"
+    ],
+    "link_flags": [
+      "-fsanitize=address,undefined",
+      "-Wl,--gc-sections,--compress-debug-sections=zstd"
+    ],
+    "recipe_adjustments": [
+      "Private object/ELF/depfile paths",
+      "Added private link-map output paths"
+    ],
+    "recipes": {
+      "path": "artifacts/readers-sanitize-20261111/control/plan-v2.json",
+      "sha256": "b2fa4ef4b2da477fb620cb06af106f03828deaf036acb8801aa7eb5679543e88",
+      "bytes": 92892
+    },
+    "targets": [
+      {
+        "target": "dome-sculpt-vrm1-expression-targets-render-test",
+        "source": "tests/vrm1-expression-targets-render.cpp",
+        "source_sha256": "6cb2d01e0cc9938778b66acb78f101c91c360994597750c6bfce6c7acd419bc8",
+        "object": {
+          "path": "artifacts/readers-sanitize-20261111/build/objects/dome-sculpt-vrm1-expression-targets-render-test.o",
+          "sha256": "daa11f521135c144e92d6c7c3ee0eb5bb6cc7c9081e3f602c254200053781c6d",
+          "bytes": 28211776
+        },
+        "elf": {
+          "path": "artifacts/readers-sanitize-20261111/build/bin/dome-sculpt-vrm1-expression-targets-render-test",
+          "sha256": "4329b737d25534657fd9939c3363b19635ed5124b14d2855e016aa4b581a757e",
+          "bytes": 388742312
+        },
+        "dependency": {
+          "path": "artifacts/readers-sanitize-20261111/build/objects/dome-sculpt-vrm1-expression-targets-render-test.o.d",
+          "sha256": "5f38ec52f29884d0178b523810a985d5dc295134685459d76646de1de4e0d220",
+          "bytes": 21938
+        }
+      },
+      {
+        "target": "dome-sculpt-vrm1-mask-support-faults-test",
+        "source": "tests/vrm1-mask-support-faults.cpp",
+        "source_sha256": "cc69a6238b3039876ee31663d020798be42ad7c781eb38d690d6c594f8860a67",
+        "object": {
+          "path": "artifacts/readers-sanitize-20261111/build/objects/dome-sculpt-vrm1-mask-support-faults-test.o",
+          "sha256": "1db28dcdd448f5d4f9055e2cb94342fe3f85c540945933efdf60f5b0c78c345b",
+          "bytes": 8013008
+        },
+        "elf": {
+          "path": "artifacts/readers-sanitize-20261111/build/bin/dome-sculpt-vrm1-mask-support-faults-test",
+          "sha256": "12bda2eb30b576df005fdf028c4c8072068aad16da718217f1b34bbc16547be3",
+          "bytes": 214342696
+        },
+        "dependency": {
+          "path": "artifacts/readers-sanitize-20261111/build/objects/dome-sculpt-vrm1-mask-support-faults-test.o.d",
+          "sha256": "1716a27d69d29d3511c2f24ebe57c551a97a78a894d8e78f78a1a65419920329",
+          "bytes": 19046
+        }
+      },
+      {
+        "target": "dome-sculpt-vrm1-normal-authoring-workflow-test",
+        "source": "tests/vrm1-normal-authoring-workflow.cpp",
+        "source_sha256": "1cec4292c7c8e0c120cabda71b1858affd98d220f9b02d19f63659c39d3710f4",
+        "object": {
+          "path": "artifacts/readers-sanitize-20261111/build/objects/dome-sculpt-vrm1-normal-authoring-workflow-test.o",
+          "sha256": "a20467e300f55c6d958437ca4b5fd657e1022affcfef76eec944fff952156ff6",
+          "bytes": 17544952
+        },
+        "elf": {
+          "path": "artifacts/readers-sanitize-20261111/build/bin/dome-sculpt-vrm1-normal-authoring-workflow-test",
+          "sha256": "63dfe8edb4d1eeccbd5458921abdaf140ffe4bf0dcc4bd99df61d0afeb26b5fd",
+          "bytes": 378730432
+        },
+        "dependency": {
+          "path": "artifacts/readers-sanitize-20261111/build/objects/dome-sculpt-vrm1-normal-authoring-workflow-test.o.d",
+          "sha256": "4c8c6d4584d1a244a656c5f6889733b2224c47fc0e1bb28c95aa47a578ce3b97",
+          "bytes": 25061
+        }
+      },
+      {
+        "target": "dome-sculpt-vrm1-normal-faults-test",
+        "source": "tests/vrm1-normal-faults.cpp",
+        "source_sha256": "5742e28fbe0446514583dcf452c0ede244115c0e4444b390a08e99650aefc12c",
+        "object": {
+          "path": "artifacts/readers-sanitize-20261111/build/objects/dome-sculpt-vrm1-normal-faults-test.o",
+          "sha256": "ae2b55e10a867dc97e6205881051c6a6e6973bbe9dee78e87e8da39b5667f70c",
+          "bytes": 12290760
+        },
+        "elf": {
+          "path": "artifacts/readers-sanitize-20261111/build/bin/dome-sculpt-vrm1-normal-faults-test",
+          "sha256": "fa00933f3daf4a03b6ea6fbcb4cba1aa19fced2a9b8d14f34ce6f2c859960ff1",
+          "bytes": 215382184
+        },
+        "dependency": {
+          "path": "artifacts/readers-sanitize-20261111/build/objects/dome-sculpt-vrm1-normal-faults-test.o.d",
+          "sha256": "69a313161bf171ec4f45e0ad2c31555246132b5ae8c02b32f5e1549940dd93d2",
+          "bytes": 17099
+        }
+      },
+      {
+        "target": "dome-sculpt-vrm1-normal-pristine-render-test",
+        "source": "tests/vrm1-normal-pristine-render.cpp",
+        "source_sha256": "41b18fe73be372e703cac343370760fe989f3fb0ed5bef60ad0619d552a893d2",
+        "object": {
+          "path": "artifacts/readers-sanitize-20261111/build/objects/dome-sculpt-vrm1-normal-pristine-render-test.o",
+          "sha256": "0c74089620187fb88ab8041b4e7569c21d94897042edffd4ececd9cee51ad537",
+          "bytes": 28027024
+        },
+        "elf": {
+          "path": "artifacts/readers-sanitize-20261111/build/bin/dome-sculpt-vrm1-normal-pristine-render-test",
+          "sha256": "d937663b43175c5ea023f6cff733dc698e43e9702af6e8d5382c679aad86f89c",
+          "bytes": 388685048
+        },
+        "dependency": {
+          "path": "artifacts/readers-sanitize-20261111/build/objects/dome-sculpt-vrm1-normal-pristine-render-test.o.d",
+          "sha256": "7e3a2803263dcf7e1e2bdd6efe8268164717c3204e3e44d6557f47f082cbf37a",
+          "bytes": 21932
+        }
+      },
+      {
+        "target": "dome-sculpt-vrm1-rim-faults-test",
+        "source": "tests/vrm1-rim-faults.cpp",
+        "source_sha256": "a6afd8969a0b10f10f90877a6caa46527a6a42a9806870ccce9d8b1ff37118b0",
+        "object": {
+          "path": "artifacts/readers-sanitize-20261111/build/objects/dome-sculpt-vrm1-rim-faults-test.o",
+          "sha256": "0864591659438c59cb0397217ad808ae8aeee9d418705b93abc3632b1d0adb8a",
+          "bytes": 7113512
+        },
+        "elf": {
+          "path": "artifacts/readers-sanitize-20261111/build/bin/dome-sculpt-vrm1-rim-faults-test",
+          "sha256": "594ccc3b397d729613641e385f0eb2c2d631b63bcffd61a71eee1c50ec15dd16",
+          "bytes": 214115128
+        },
+        "dependency": {
+          "path": "artifacts/readers-sanitize-20261111/build/objects/dome-sculpt-vrm1-rim-faults-test.o.d",
+          "sha256": "c93464290c05d7304b0278d384fecc46a3bcb0fa41a2d76ed4b115f2481d1960",
+          "bytes": 16200
+        }
+      },
+      {
+        "target": "dome-sculpt-vrm1-rim-mask-authoring-workflow-test",
+        "source": "tests/vrm1-rim-mask-authoring-workflow.cpp",
+        "source_sha256": "0337299c9539c17c23e3e32c9760158007cc4ac134b535958145b90b1daa222a",
+        "object": {
+          "path": "artifacts/readers-sanitize-20261111/build/objects/dome-sculpt-vrm1-rim-mask-authoring-workflow-test.o",
+          "sha256": "53ed46f08f551ff22cc7c3466c21ddb94b7a4ad92ebbf5f6c24203587b7cc35b",
+          "bytes": 7044696
+        },
+        "elf": {
+          "path": "artifacts/readers-sanitize-20261111/build/bin/dome-sculpt-vrm1-rim-mask-authoring-workflow-test",
+          "sha256": "73a6b2a2329800a129e871d5a72529359a816b18432ac04c09e3db7e36fe772f",
+          "bytes": 376427672
+        },
+        "dependency": {
+          "path": "artifacts/readers-sanitize-20261111/build/objects/dome-sculpt-vrm1-rim-mask-authoring-workflow-test.o.d",
+          "sha256": "25c1179704af602aeb9c0b4cbd67e6ebf4acb3a1797ed88c6d138fcc3fb89d45",
+          "bytes": 25065
+        }
+      },
+      {
+        "target": "dome-sculpt-vrm1-rim-mask-pristine-render-test",
+        "source": "tests/vrm1-rim-mask-pristine-render.cpp",
+        "source_sha256": "17154cf78ab0ba3053789f22e53aac5471e149daba2cf474d15dd222cc9f2b85",
+        "object": {
+          "path": "artifacts/readers-sanitize-20261111/build/objects/dome-sculpt-vrm1-rim-mask-pristine-render-test.o",
+          "sha256": "1f95ecdca1a1b9d4b2518628c2e1a359c6373bda81f48d6f1f4f25c868217c50",
+          "bytes": 28049376
+        },
+        "elf": {
+          "path": "artifacts/readers-sanitize-20261111/build/bin/dome-sculpt-vrm1-rim-mask-pristine-render-test",
+          "sha256": "f5b423bae6020e6db0f9ccf2811adb1caacf73241f9ec900ae746b03a2999bbb",
+          "bytes": 388696248
+        },
+        "dependency": {
+          "path": "artifacts/readers-sanitize-20261111/build/objects/dome-sculpt-vrm1-rim-mask-pristine-render-test.o.d",
+          "sha256": "dd2c7fb82bf65e2f675f78c1fdb9cff6ffbd0097b8c943883c33917d9b901c67",
+          "bytes": 21936
+        }
+      },
+      {
+        "target": "dome-sculpt-vrm1-shift-default-pristine-render-test",
+        "source": "tests/vrm1-shift-default-pristine-render.cpp",
+        "source_sha256": "5fac81c423f57a9489eadc9edd8c1764d488baed7abf9adccabda330301b93dc",
+        "object": {
+          "path": "artifacts/readers-sanitize-20261111/build/objects/dome-sculpt-vrm1-shift-default-pristine-render-test.o",
+          "sha256": "c248a903cc8646798837ed7789e050a3f9fc071410fbd7dd607d5844625b40d9",
+          "bytes": 28031920
+        },
+        "elf": {
+          "path": "artifacts/readers-sanitize-20261111/build/bin/dome-sculpt-vrm1-shift-default-pristine-render-test",
+          "sha256": "5b9143a6d200f377aceaecff233e8134e85fb5a2903ba913409b9995977f0555",
+          "bytes": 388689448
+        },
+        "dependency": {
+          "path": "artifacts/readers-sanitize-20261111/build/objects/dome-sculpt-vrm1-shift-default-pristine-render-test.o.d",
+          "sha256": "6354d16ae81f19822f517252ae6e0dc28f91a41922b059558452906dfbc97d25",
+          "bytes": 21946
+        }
+      },
+      {
+        "target": "dome-sculpt-vrm1-shift-faults-test",
+        "source": "tests/vrm1-shift-faults.cpp",
+        "source_sha256": "98b3a15087b398424009463b89aaa31729a649d42f811cf8b051b89c394f205c",
+        "object": {
+          "path": "artifacts/readers-sanitize-20261111/build/objects/dome-sculpt-vrm1-shift-faults-test.o",
+          "sha256": "9795e3d7076b4665b6ca946cf1b7b140fb742c5bc088d53ff6a8ce5c2928098f",
+          "bytes": 12290760
+        },
+        "elf": {
+          "path": "artifacts/readers-sanitize-20261111/build/bin/dome-sculpt-vrm1-shift-faults-test",
+          "sha256": "61f08a084932d9833190a992116784d642487dc8b2d92fcd2b1aeda322761a16",
+          "bytes": 215382616
+        },
+        "dependency": {
+          "path": "artifacts/readers-sanitize-20261111/build/objects/dome-sculpt-vrm1-shift-faults-test.o.d",
+          "sha256": "7cfec3d508f27eb23dfda4d1d805c01b8ae3e6a01bd4d791ae0c82a7957aee64",
+          "bytes": 17097
+        }
+      },
+      {
+        "target": "dome-sculpt-vrm1-shift-pristine-render-test",
+        "source": "tests/vrm1-shift-pristine-render.cpp",
+        "source_sha256": "14b5bb02ebf0e3a35a8b305a2df69ec84a35a8fe32d91d0f7f0fed91aa54e436",
+        "object": {
+          "path": "artifacts/readers-sanitize-20261111/build/objects/dome-sculpt-vrm1-shift-pristine-render-test.o",
+          "sha256": "b09709e741e25fc294b51ae0563ea6e97db6ce70be63776242663c071be6dd59",
+          "bytes": 28029048
+        },
+        "elf": {
+          "path": "artifacts/readers-sanitize-20261111/build-resume/dome-sculpt-vrm1-shift-pristine-render-test",
+          "sha256": "fff781e4eaa345881748f17a851adedde2b02d52a9d3188429a3833340b95ee9",
+          "bytes": 388695696
+        },
+        "dependency": {
+          "path": "artifacts/readers-sanitize-20261111/build/objects/dome-sculpt-vrm1-shift-pristine-render-test.o.d",
+          "sha256": "23456e3aafbb83d6fc68191dd8da43f5ab2111788b30dc0ce5e1980ab2b449c2",
+          "bytes": 21930
+        }
+      }
+    ]
+  },
+  "sdk": {
+    "verified": {
+      "path": "artifacts/sdk-20261111/verified-sdk.json",
+      "sha256": "3a1d3014a5eb13e37f28f39e60b0d8596a5accf80a540b516aa88806b86983f0",
+      "bytes": 46384
+    },
+    "DomeD_commit": "acc2b70ae61dedec2a23727f67c60c0303d0f76f",
+    "sanitize_profile_sha256": "cb0834a42140b5b80cd079d93c601718ad1ce6f02cbd5cd6cc91a24720bb4a3d",
+    "system_bitmap_manifest_sha256": "2df66f7a0168960f890f5326552424b4ee9c0d3743909fdd2f3a03429a6d9715",
+    "scope": "Project core/render/support/readers and sanitizer toolkit instrumented; current official optimized system bitmap/external libraries are not claimed instrumented."
+  },
+  "sanitizers": {
+    "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1:abort_on_error=1",
+    "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=1",
+    "LSAN_OPTIONS": null,
+    "suppressions": false,
+    "diagnostics_in_successful_logs": []
+  },
+  "graphics": {
+    "renderer": [
+      "UV_TARGET_DEVICE vendor=Mesa renderer=llvmpipe (LLVM 19.1.7, 256 bits)"
+    ],
+    "actual_recovered_runtime_files": [
+      {
+        "path": "artifacts/mesa-xr-leak-26.2.5/build-patched-v2/src/egl/libEGL_mesa.so.0.0.0",
+        "sha256": "1a6aedf2eb11801863d1d24fdb8880a16a5ced8feb437d54916dec1b57e4a75e",
+        "bytes": 2043272
+      },
+      {
+        "path": "artifacts/mesa-xr-leak-26.2.5/build-patched-v2/src/gallium/targets/dri/libgallium-26.2.5.so",
+        "sha256": "d8cf7ee81cf354f7595d5b98c5d2e45d5d52cf06e88fb6a82edf08bd203fd132",
+        "bytes": 38929984
+      },
+      {
+        "path": "artifacts/xr-recovery-20261111/llvm19-package/usr/lib64/llvm19/lib/libLLVM.so.19.1",
+        "sha256": "b4bc4658b1ad3d53bd8c9d8d507cf7bc985bb13bb08e0814390c7070e267639a",
+        "bytes": 129817848
+      }
+    ],
+    "package_provenance": {
+      "path": "artifacts/readers-sanitize-20261111/control/recovered-driver-package-provenance.json",
+      "sha256": "25790efde7c7c0ec8d35ce1aefee99c3403bb29a6503f8826c17eb4f99ab62a1",
+      "bytes": 729
+    },
+    "observations": [
+      {
+        "name": "vrm1-normal-render",
+        "log": {
+          "path": "/home/blux/de-xr/dome-sculpt/artifacts/readers-sanitize-20261111/execution-patched-v2/vrm1-normal-render.log",
+          "sha256": "ece119f792703ee018bc4f06532f66f6f171b6466acabc9d5980ef6510c5a6c9",
+          "bytes": 20843
+        },
+        "observations": {
+          "path": "/home/blux/de-xr/dome-sculpt/artifacts/readers-sanitize-20261111/execution-patched-v2/vrm1-normal-render-observed.json",
+          "sha256": "a425d6d30dd208d0a524e34a620a21259dccaea47e2a290fcb299547f6d741b6",
+          "bytes": 2744
+        }
+      },
+      {
+        "name": "vrm1-normal-pristine-render",
+        "log": {
+          "path": "/home/blux/de-xr/dome-sculpt/artifacts/readers-sanitize-20261111/execution-patched-v3/vrm1-normal-pristine-render.log",
+          "sha256": "6b6a720422617130970ceb1ca5ddee57c685ff11ef51750c0df460a67a49a726",
+          "bytes": 6605
+        },
+        "observations": {
+          "path": "/home/blux/de-xr/dome-sculpt/artifacts/readers-sanitize-20261111/execution-patched-v3/vrm1-normal-pristine-render-observed.json",
+          "sha256": "aab34d7180fc9137330d79e22b0493fbffa0fb2aa15890ed5cf3c086a980ef9f",
+          "bytes": 2741
+        }
+      },
+      {
+        "name": "vrm1-shift-render",
+        "log": {
+          "path": "/home/blux/de-xr/dome-sculpt/artifacts/readers-sanitize-20261111/execution-patched-v3/vrm1-shift-render.log",
+          "sha256": "9115a35de8e75c64845b65f1684e57596d92833041ee931be82ebf6c7913f5a2",
+          "bytes": 22310
+        },
+        "observations": {
+          "path": "/home/blux/de-xr/dome-sculpt/artifacts/readers-sanitize-20261111/execution-patched-v3/vrm1-shift-render-observed.json",
+          "sha256": "a425d6d30dd208d0a524e34a620a21259dccaea47e2a290fcb299547f6d741b6",
+          "bytes": 2744
+        }
+      },
+      {
+        "name": "vrm1-shift-pristine-render",
+        "log": {
+          "path": "/home/blux/de-xr/dome-sculpt/artifacts/readers-sanitize-20261111/execution-patched-v4/vrm1-shift-pristine-render.log",
+          "sha256": "b3328ec414022a77e24ba55ca048cf1506af2f6fbd4f69acb1c81ecaabfbde0a",
+          "bytes": 7081
+        },
+        "observations": {
+          "path": "/home/blux/de-xr/dome-sculpt/artifacts/readers-sanitize-20261111/execution-patched-v4/vrm1-shift-pristine-render-observed.json",
+          "sha256": "f123da5cf3fe0d3689d1cfdabd35c3f00b034b190952e8417be9349bdd8b046a",
+          "bytes": 2743
+        }
+      },
+      {
+        "name": "vrm1-shift-invariant-render",
+        "log": {
+          "path": "/home/blux/de-xr/dome-sculpt/artifacts/readers-sanitize-20261111/execution-patched-v4/vrm1-shift-invariant-render.log",
+          "sha256": "a919006128f0544663b56e05529f2a9849e568987917d0a1fa314415aa3d7dce",
+          "bytes": 38723
+        },
+        "observations": {
+          "path": "/home/blux/de-xr/dome-sculpt/artifacts/readers-sanitize-20261111/execution-patched-v4/vrm1-shift-invariant-render-observed.json",
+          "sha256": "a425d6d30dd208d0a524e34a620a21259dccaea47e2a290fcb299547f6d741b6",
+          "bytes": 2744
+        }
+      },
+      {
+        "name": "vrm1-shift-mask-zero-rim-render",
+        "log": {
+          "path": "/home/blux/de-xr/dome-sculpt/artifacts/readers-sanitize-20261111/execution-patched-v4/vrm1-shift-mask-zero-rim-render.log",
+          "sha256": "3f3bc31121f9c2484b20c1e79b9c9806221fc5306b1443acf9b44e1e3659a3e5",
+          "bytes": 20465
+        },
+        "observations": {
+          "path": "/home/blux/de-xr/dome-sculpt/artifacts/readers-sanitize-20261111/execution-patched-v4/vrm1-shift-mask-zero-rim-render-observed.json",
+          "sha256": "a425d6d30dd208d0a524e34a620a21259dccaea47e2a290fcb299547f6d741b6",
+          "bytes": 2744
+        }
+      },
+      {
+        "name": "vrm1-shift-mask-render",
+        "log": {
+          "path": "/home/blux/de-xr/dome-sculpt/artifacts/readers-sanitize-20261111/execution-patched-v4/vrm1-shift-mask-render.log",
+          "sha256": "3f3bc31121f9c2484b20c1e79b9c9806221fc5306b1443acf9b44e1e3659a3e5",
+          "bytes": 20465
+        },
+        "observations": {
+          "path": "/home/blux/de-xr/dome-sculpt/artifacts/readers-sanitize-20261111/execution-patched-v4/vrm1-shift-mask-render-observed.json",
+          "sha256": "a425d6d30dd208d0a524e34a620a21259dccaea47e2a290fcb299547f6d741b6",
+          "bytes": 2744
+        }
+      },
+      {
+        "name": "vrm1-shift-defaults-render",
+        "log": {
+          "path": "/home/blux/de-xr/dome-sculpt/artifacts/readers-sanitize-20261111/execution-patched-v4/vrm1-shift-defaults-render.log",
+          "sha256": "d92ad7958ec487021cdc7d4478a1ede67eacb914164f9a11a2a222a9c80be8e1",
+          "bytes": 21993
+        },
+        "observations": {
+          "path": "/home/blux/de-xr/dome-sculpt/artifacts/readers-sanitize-20261111/execution-patched-v4/vrm1-shift-defaults-render-observed.json",
+          "sha256": "a425d6d30dd208d0a524e34a620a21259dccaea47e2a290fcb299547f6d741b6",
+          "bytes": 2744
+        }
+      },
+      {
+        "name": "vrm1-shift-defaults-pristine",
+        "log": {
+          "path": "/home/blux/de-xr/dome-sculpt/artifacts/readers-sanitize-20261111/execution-patched-v4/vrm1-shift-defaults-pristine.log",
+          "sha256": "8c45f8479b8267a18eda92ae312f4b9e025212567dbcd4d9ee8a236b17e81fcf",
+          "bytes": 7119
+        },
+        "observations": {
+          "path": "/home/blux/de-xr/dome-sculpt/artifacts/readers-sanitize-20261111/execution-patched-v4/vrm1-shift-defaults-pristine-observed.json",
+          "sha256": "1630504dda8ceb8f9c92e768044ba9591946c2bbf8c8744a2dcb6a6311f0fd18",
+          "bytes": 2748
+        }
+      },
+      {
+        "name": "vrm1-rim-mask-render",
+        "log": {
+          "path": "/home/blux/de-xr/dome-sculpt/artifacts/readers-sanitize-20261111/execution-patched-v4/vrm1-rim-mask-render.log",
+          "sha256": "f4f84446f5bf144d675761b64a3d44baa125f0881fed7a5f29af0bed645c0fa6",
+          "bytes": 19724
+        },
+        "observations": {
+          "path": "/home/blux/de-xr/dome-sculpt/artifacts/readers-sanitize-20261111/execution-patched-v4/vrm1-rim-mask-render-observed.json",
+          "sha256": "a425d6d30dd208d0a524e34a620a21259dccaea47e2a290fcb299547f6d741b6",
+          "bytes": 2744
+        }
+      },
+      {
+        "name": "vrm1-rim-mask-pristine-render",
+        "log": {
+          "path": "/home/blux/de-xr/dome-sculpt/artifacts/readers-sanitize-20261111/execution-patched-v4/vrm1-rim-mask-pristine-render.log",
+          "sha256": "e13bb0e19170d2185b22d902b4c68cd2f344e52981270aaf87758aecffab0508",
+          "bytes": 6257
+        },
+        "observations": {
+          "path": "/home/blux/de-xr/dome-sculpt/artifacts/readers-sanitize-20261111/execution-patched-v4/vrm1-rim-mask-pristine-render-observed.json",
+          "sha256": "114706d7662ac043567d56bb82fbda0b94e178056934f17b2ff819899d75a253",
+          "bytes": 2743
+        }
+      }
+    ],
+    "maximum_UV_TARGET_IMAGE_byte_error": 2,
+    "unchanged_assertion_bound": 4,
+    "historical_Release_observed_maximum": 1,
+    "historical_comparison_scope": "Different current SDK and font source/manifest; old Release35 remains historical. No unchanged-current-cross-profile error claim.",
+    "identity_scope": "Actual sampled process maps/renderer and on-disk SHA; no mount-certified file identity or hardware claim.",
+    "system_Mesa_reader_execution": false
+  },
+  "execution": {
+    "argv_path_base": "/home/blux/de-xr/dome-sculpt",
+    "cases": [
+      {
+        "name": "vrm1-normal-authoring",
+        "execution_namespace": "execution-patched-v2",
+        "executable": "artifacts/build-20261111/sanitize/dome-sculpt-vrm1-expression-layer-authoring-test",
+        "argv": [
+          "artifacts/build-20261111/sanitize/dome-sculpt-vrm1-expression-layer-authoring-test",
+          "artifacts/build-20261111/sanitize/vrm1-background-fixture/source.vrm",
+          "artifacts/readers-sanitize-20261111/runtime-patched-v2/vrm1-normal-authoring",
+          "--positive",
+          "--normal"
+        ],
+        "timeout_seconds": 900,
+        "software_graphics": false,
+        "pid": 1169898,
+        "exit": 0,
+        "seconds": 24.85844022798119,
+        "rss_tree_peak_bytes": 1713848320,
+        "log_sha256": "36e48ab624d379d3357ba43b3d69187975df62a4ecbbdb9f91452749358540d7"
+      },
+      {
+        "name": "vrm1-normal-render",
+        "execution_namespace": "execution-patched-v2",
+        "executable": "artifacts/readers-sanitize-20261111/build/bin/dome-sculpt-vrm1-expression-targets-render-test",
+        "argv": [
+          "artifacts/readers-sanitize-20261111/build/bin/dome-sculpt-vrm1-expression-targets-render-test",
+          "artifacts/readers-sanitize-20261111/runtime-patched-v2/vrm1-normal-authoring",
+          "artifacts/readers-sanitize-20261111/runtime-patched-v2/vrm1-normal-render"
+        ],
+        "timeout_seconds": 900,
+        "software_graphics": true,
+        "pid": 1177896,
+        "exit": 0,
+        "seconds": 17.555631430994254,
+        "rss_tree_peak_bytes": 2335539200,
+        "log_sha256": "ece119f792703ee018bc4f06532f66f6f171b6466acabc9d5980ef6510c5a6c9"
+      },
+      {
+        "name": "vrm1-normal-pristine-render",
+        "execution_namespace": "execution-patched-v3",
+        "executable": "artifacts/readers-sanitize-20261111/build/bin/dome-sculpt-vrm1-normal-pristine-render-test",
+        "argv": [
+          "artifacts/readers-sanitize-20261111/build/bin/dome-sculpt-vrm1-normal-pristine-render-test",
+          "artifacts/readers-sanitize-20261111/runtime-patched-v2/vrm1-normal-authoring",
+          "artifacts/readers-sanitize-20261111/runtime-patched-v3/vrm1-normal-pristine-render"
+        ],
+        "timeout_seconds": 900,
+        "software_graphics": true,
+        "pid": 1231337,
+        "exit": 0,
+        "seconds": 11.478142969019245,
+        "rss_tree_peak_bytes": 2646663168,
+        "log_sha256": "6b6a720422617130970ceb1ca5ddee57c685ff11ef51750c0df460a67a49a726"
+      },
+      {
+        "name": "vrm1-normal-faults",
+        "execution_namespace": "execution-patched-v3",
+        "executable": "artifacts/readers-sanitize-20261111/build/bin/dome-sculpt-vrm1-normal-faults-test",
+        "argv": [
+          "artifacts/readers-sanitize-20261111/build/bin/dome-sculpt-vrm1-normal-faults-test",
+          "artifacts/readers-sanitize-20261111/runtime-patched-v2/vrm1-normal-authoring/nonuniform-source.dsculpt"
+        ],
+        "timeout_seconds": 1800,
+        "software_graphics": false,
+        "pid": 1234896,
+        "exit": 0,
+        "seconds": 408.3129263109877,
+        "rss_tree_peak_bytes": 1578704896,
+        "log_sha256": "7281efee16959d582573798a35e8190ccf4dc82aece4a0dfab58f71e0b4c2dd1"
+      },
+      {
+        "name": "vrm1-normal-native-workflow",
+        "execution_namespace": "execution-patched-v3",
+        "executable": "artifacts/readers-sanitize-20261111/build/bin/dome-sculpt-vrm1-normal-authoring-workflow-test",
+        "argv": [
+          "artifacts/readers-sanitize-20261111/build/bin/dome-sculpt-vrm1-normal-authoring-workflow-test",
+          "artifacts/readers-sanitize-20261111/runtime-patched-v2/vrm1-normal-authoring/nonuniform-source.dsculpt",
+          "artifacts/readers-sanitize-20261111/runtime-patched-v3/vrm1-normal-native-workflow"
+        ],
+        "timeout_seconds": 900,
+        "software_graphics": false,
+        "pid": 1351643,
+        "exit": 0,
+        "seconds": 11.304041018011048,
+        "rss_tree_peak_bytes": 1481310208,
+        "log_sha256": "ecf142300dd0bd592b99db0ef44d8ad04589273925e9041176d0408663b412e0"
+      },
+      {
+        "name": "vrm1-normal-generated-identity-guard",
+        "execution_namespace": "execution-patched-v3",
+        "executable": "artifacts/build-20261111/sanitize/dome-sculpt-vrm1-expression-layer-authoring-test",
+        "argv": [
+          "artifacts/build-20261111/sanitize/dome-sculpt-vrm1-expression-layer-authoring-test",
+          "artifacts/build-20261111/sanitize/vrm1-background-fixture/source.vrm",
+          "artifacts/readers-sanitize-20261111/runtime-patched-v3/vrm1-normal-generated-identity-guard",
+          "--coupling-refusal",
+          "--normal-generated-identity"
+        ],
+        "timeout_seconds": 900,
+        "software_graphics": false,
+        "pid": 1381065,
+        "exit": 0,
+        "seconds": 3.316987816011533,
+        "rss_tree_peak_bytes": 1283514368,
+        "log_sha256": "1fc7b109ec0bc13c4e66d09466bf6951a54a435b794af6f7f09391ba277803cc"
+      },
+      {
+        "name": "vrm1-normal-varying-uv-guard",
+        "execution_namespace": "execution-patched-v3",
+        "executable": "artifacts/build-20261111/sanitize/dome-sculpt-vrm1-expression-layer-authoring-test",
+        "argv": [
+          "artifacts/build-20261111/sanitize/dome-sculpt-vrm1-expression-layer-authoring-test",
+          "artifacts/build-20261111/sanitize/vrm1-background-fixture/source.vrm",
+          "artifacts/readers-sanitize-20261111/runtime-patched-v3/vrm1-normal-varying-uv-guard",
+          "--coupling-refusal",
+          "--normal-varying-uv"
+        ],
+        "timeout_seconds": 900,
+        "software_graphics": false,
+        "pid": 1422956,
+        "exit": 0,
+        "seconds": 15.201068420021329,
+        "rss_tree_peak_bytes": 1286086656,
+        "log_sha256": "a87dbfeb36bedd0880c6327e304591f9686b0b119b6982b86f8ee65156507902"
+      },
+      {
+        "name": "vrm1-normal-zero-uv-guard",
+        "execution_namespace": "execution-patched-v3",
+        "executable": "artifacts/build-20261111/sanitize/dome-sculpt-vrm1-expression-layer-authoring-test",
+        "argv": [
+          "artifacts/build-20261111/sanitize/dome-sculpt-vrm1-expression-layer-authoring-test",
+          "artifacts/build-20261111/sanitize/vrm1-background-fixture/source.vrm",
+          "artifacts/readers-sanitize-20261111/runtime-patched-v3/vrm1-normal-zero-uv-guard",
+          "--coupling-refusal",
+          "--normal-zero-uv"
+        ],
+        "timeout_seconds": 900,
+        "software_graphics": false,
+        "pid": 1474549,
+        "exit": 0,
+        "seconds": 9.315105760993902,
+        "rss_tree_peak_bytes": 1300070400,
+        "log_sha256": "49d347af14a5aaf40f2cc14668f5d43636436fdc66e3e3623721da889095f29f"
+      },
+      {
+        "name": "vrm1-normal-generated-transformed-import-guard",
+        "execution_namespace": "execution-patched-v3",
+        "executable": "artifacts/build-20261111/sanitize/dome-sculpt-vrm1-expression-layer-authoring-test",
+        "argv": [
+          "artifacts/build-20261111/sanitize/dome-sculpt-vrm1-expression-layer-authoring-test",
+          "artifacts/build-20261111/sanitize/vrm1-background-fixture/source.vrm",
+          "artifacts/readers-sanitize-20261111/runtime-patched-v3/vrm1-normal-generated-transformed-import-guard",
+          "--import-refusal",
+          "--normal-generated"
+        ],
+        "timeout_seconds": 900,
+        "software_graphics": false,
+        "pid": 1488763,
+        "exit": 0,
+        "seconds": 0.7385770290275104,
+        "rss_tree_peak_bytes": 832397312,
+        "log_sha256": "14c64649714058f3453e968ab61131d01d4524eeed292c1eb110ef65c90d1fee"
+      },
+      {
+        "name": "vrm1-shift-authoring",
+        "execution_namespace": "execution-patched-v3",
+        "executable": "artifacts/build-20261111/sanitize/dome-sculpt-vrm1-expression-layer-authoring-test",
+        "argv": [
+          "artifacts/build-20261111/sanitize/dome-sculpt-vrm1-expression-layer-authoring-test",
+          "artifacts/build-20261111/sanitize/vrm1-background-fixture/source.vrm",
+          "artifacts/readers-sanitize-20261111/runtime-patched-v3/vrm1-shift-authoring",
+          "--positive",
+          "--shift"
+        ],
+        "timeout_seconds": 900,
+        "software_graphics": false,
+        "pid": 1506596,
+        "exit": 0,
+        "seconds": 43.87784870999167,
+        "rss_tree_peak_bytes": 1737203712,
+        "log_sha256": "24654e03659d4a85a6eea2351c212cdcc3fa85a81e7eb3472a8798d24673567d"
+      },
+      {
+        "name": "vrm1-shift-render",
+        "execution_namespace": "execution-patched-v3",
+        "executable": "artifacts/readers-sanitize-20261111/build/bin/dome-sculpt-vrm1-expression-targets-render-test",
+        "argv": [
+          "artifacts/readers-sanitize-20261111/build/bin/dome-sculpt-vrm1-expression-targets-render-test",
+          "artifacts/readers-sanitize-20261111/runtime-patched-v3/vrm1-shift-authoring",
+          "artifacts/readers-sanitize-20261111/runtime-patched-v3/vrm1-shift-render"
+        ],
+        "timeout_seconds": 900,
+        "software_graphics": true,
+        "pid": 1537657,
+        "exit": 0,
+        "seconds": 26.056064525968395,
+        "rss_tree_peak_bytes": 2492669952,
+        "log_sha256": "9115a35de8e75c64845b65f1684e57596d92833041ee931be82ebf6c7913f5a2"
+      },
+      {
+        "name": "vrm1-shift-pristine-render",
+        "execution_namespace": "execution-patched-v4",
+        "executable": "artifacts/readers-sanitize-20261111/build-resume/dome-sculpt-vrm1-shift-pristine-render-test",
+        "argv": [
+          "artifacts/readers-sanitize-20261111/build-resume/dome-sculpt-vrm1-shift-pristine-render-test",
+          "artifacts/readers-sanitize-20261111/runtime-patched-v3/vrm1-shift-authoring",
+          "artifacts/readers-sanitize-20261111/runtime-patched-v4/vrm1-shift-pristine-render"
+        ],
+        "timeout_seconds": 900,
+        "software_graphics": true,
+        "pid": 1610800,
+        "exit": 0,
+        "seconds": 28.44957226194674,
+        "rss_tree_peak_bytes": 2694725632,
+        "log_sha256": "b3328ec414022a77e24ba55ca048cf1506af2f6fbd4f69acb1c81ecaabfbde0a"
+      },
+      {
+        "name": "vrm1-shift-faults",
+        "execution_namespace": "execution-patched-v4",
+        "executable": "artifacts/readers-sanitize-20261111/build/bin/dome-sculpt-vrm1-shift-faults-test",
+        "argv": [
+          "artifacts/readers-sanitize-20261111/build/bin/dome-sculpt-vrm1-shift-faults-test",
+          "artifacts/readers-sanitize-20261111/runtime-patched-v3/vrm1-shift-authoring/nonuniform-source.dsculpt"
+        ],
+        "timeout_seconds": 1800,
+        "software_graphics": false,
+        "pid": 1675027,
+        "exit": 0,
+        "seconds": 782.5490587390377,
+        "rss_tree_peak_bytes": 1523761152,
+        "log_sha256": "7ff21797f88f800fd96bf34b83c8dd03c3122c4bdb3910ad34985c002c1a634e"
+      },
+      {
+        "name": "vrm1-shift-native-workflow",
+        "execution_namespace": "execution-patched-v4",
+        "executable": "artifacts/readers-sanitize-20261111/build/bin/dome-sculpt-vrm1-normal-authoring-workflow-test",
+        "argv": [
+          "artifacts/readers-sanitize-20261111/build/bin/dome-sculpt-vrm1-normal-authoring-workflow-test",
+          "artifacts/readers-sanitize-20261111/runtime-patched-v3/vrm1-shift-authoring/nonuniform-source.dsculpt",
+          "artifacts/readers-sanitize-20261111/runtime-patched-v4/vrm1-shift-native-workflow"
+        ],
+        "timeout_seconds": 900,
+        "software_graphics": false,
+        "pid": 2077803,
+        "exit": 0,
+        "seconds": 5.048840422008652,
+        "rss_tree_peak_bytes": 1520975872,
+        "log_sha256": "ecf142300dd0bd592b99db0ef44d8ad04589273925e9041176d0408663b412e0"
+      },
+      {
+        "name": "vrm1-shift-varying-uv-guard",
+        "execution_namespace": "execution-patched-v4",
+        "executable": "artifacts/build-20261111/sanitize/dome-sculpt-vrm1-expression-layer-authoring-test",
+        "argv": [
+          "artifacts/build-20261111/sanitize/dome-sculpt-vrm1-expression-layer-authoring-test",
+          "artifacts/build-20261111/sanitize/vrm1-background-fixture/source.vrm",
+          "artifacts/readers-sanitize-20261111/runtime-patched-v4/vrm1-shift-varying-uv-guard",
+          "--coupling-refusal",
+          "--shift-varying-uv"
+        ],
+        "timeout_seconds": 900,
+        "software_graphics": false,
+        "pid": 2082943,
+        "exit": 0,
+        "seconds": 2.9206052210065536,
+        "rss_tree_peak_bytes": 1293565952,
+        "log_sha256": "a87dbfeb36bedd0880c6327e304591f9686b0b119b6982b86f8ee65156507902"
+      },
+      {
+        "name": "vrm1-shift-zero-uv-guard",
+        "execution_namespace": "execution-patched-v4",
+        "executable": "artifacts/build-20261111/sanitize/dome-sculpt-vrm1-expression-layer-authoring-test",
+        "argv": [
+          "artifacts/build-20261111/sanitize/dome-sculpt-vrm1-expression-layer-authoring-test",
+          "artifacts/build-20261111/sanitize/vrm1-background-fixture/source.vrm",
+          "artifacts/readers-sanitize-20261111/runtime-patched-v4/vrm1-shift-zero-uv-guard",
+          "--coupling-refusal",
+          "--shift-zero-uv"
+        ],
+        "timeout_seconds": 900,
+        "software_graphics": false,
+        "pid": 2090004,
+        "exit": 0,
+        "seconds": 3.2685236309771426,
+        "rss_tree_peak_bytes": 1293082624,
+        "log_sha256": "49d347af14a5aaf40f2cc14668f5d43636436fdc66e3e3623721da889095f29f"
+      },
+      {
+        "name": "vrm1-shift-invariant-authoring",
+        "execution_namespace": "execution-patched-v4",
+        "executable": "artifacts/build-20261111/sanitize/dome-sculpt-vrm1-expression-layer-authoring-test",
+        "argv": [
+          "artifacts/build-20261111/sanitize/dome-sculpt-vrm1-expression-layer-authoring-test",
+          "artifacts/build-20261111/sanitize/vrm1-background-fixture/source.vrm",
+          "artifacts/readers-sanitize-20261111/runtime-patched-v4/vrm1-shift-invariant-authoring",
+          "--positive",
+          "--shift-invariant-uv"
+        ],
+        "timeout_seconds": 900,
+        "software_graphics": false,
+        "pid": 2097597,
+        "exit": 0,
+        "seconds": 35.415698429977056,
+        "rss_tree_peak_bytes": 1705541632,
+        "log_sha256": "995400534d4c8c1ab28ffd039f26e372e73511935755ce5ccd29cbf3ddad58e7"
+      },
+      {
+        "name": "vrm1-shift-invariant-render",
+        "execution_namespace": "execution-patched-v4",
+        "executable": "artifacts/readers-sanitize-20261111/build/bin/dome-sculpt-vrm1-expression-targets-render-test",
+        "argv": [
+          "artifacts/readers-sanitize-20261111/build/bin/dome-sculpt-vrm1-expression-targets-render-test",
+          "artifacts/readers-sanitize-20261111/runtime-patched-v4/vrm1-shift-invariant-authoring",
+          "artifacts/readers-sanitize-20261111/runtime-patched-v4/vrm1-shift-invariant-render"
+        ],
+        "timeout_seconds": 900,
+        "software_graphics": true,
+        "pid": 2125094,
+        "exit": 0,
+        "seconds": 34.94666490005329,
+        "rss_tree_peak_bytes": 2391605248,
+        "log_sha256": "a919006128f0544663b56e05529f2a9849e568987917d0a1fa314415aa3d7dce"
+      },
+      {
+        "name": "vrm1-shift-mask-zero-rim-authoring",
+        "execution_namespace": "execution-patched-v4",
+        "executable": "artifacts/build-20261111/sanitize/dome-sculpt-vrm1-expression-layer-authoring-test",
+        "argv": [
+          "artifacts/build-20261111/sanitize/dome-sculpt-vrm1-expression-layer-authoring-test",
+          "artifacts/build-20261111/sanitize/vrm1-background-fixture/source.vrm",
+          "artifacts/readers-sanitize-20261111/runtime-patched-v4/vrm1-shift-mask-zero-rim-authoring",
+          "--positive",
+          "--shift-mask"
+        ],
+        "timeout_seconds": 900,
+        "software_graphics": false,
+        "pid": 2149701,
+        "exit": 0,
+        "seconds": 27.31641352805309,
+        "rss_tree_peak_bytes": 1692721152,
+        "log_sha256": "f8c32f7e548bcf90e0a33a6cdf17198b9d29be45d4b07a1a55e1006189928f59"
+      },
+      {
+        "name": "vrm1-shift-mask-zero-rim-render",
+        "execution_namespace": "execution-patched-v4",
+        "executable": "artifacts/readers-sanitize-20261111/build/bin/dome-sculpt-vrm1-expression-targets-render-test",
+        "argv": [
+          "artifacts/readers-sanitize-20261111/build/bin/dome-sculpt-vrm1-expression-targets-render-test",
+          "artifacts/readers-sanitize-20261111/runtime-patched-v4/vrm1-shift-mask-zero-rim-authoring",
+          "artifacts/readers-sanitize-20261111/runtime-patched-v4/vrm1-shift-mask-zero-rim-render"
+        ],
+        "timeout_seconds": 900,
+        "software_graphics": true,
+        "pid": 2172038,
+        "exit": 0,
+        "seconds": 20.47128233697731,
+        "rss_tree_peak_bytes": 2662170624,
+        "log_sha256": "3f3bc31121f9c2484b20c1e79b9c9806221fc5306b1443acf9b44e1e3659a3e5"
+      },
+      {
+        "name": "vrm1-shift-mask-authoring",
+        "execution_namespace": "execution-patched-v4",
+        "executable": "artifacts/build-20261111/sanitize/dome-sculpt-vrm1-expression-layer-authoring-test",
+        "argv": [
+          "artifacts/build-20261111/sanitize/dome-sculpt-vrm1-expression-layer-authoring-test",
+          "artifacts/build-20261111/sanitize/vrm1-background-fixture/source.vrm",
+          "artifacts/readers-sanitize-20261111/runtime-patched-v4/vrm1-shift-mask-authoring",
+          "--positive",
+          "--shift-mask-no-rim"
+        ],
+        "timeout_seconds": 900,
+        "software_graphics": false,
+        "pid": 2191743,
+        "exit": 0,
+        "seconds": 28.838895865017548,
+        "rss_tree_peak_bytes": 1693261824,
+        "log_sha256": "6110619ec86fe7472f77782364830a9811c91174898f7d7c33a18408491eca90"
+      },
+      {
+        "name": "vrm1-shift-mask-render",
+        "execution_namespace": "execution-patched-v4",
+        "executable": "artifacts/readers-sanitize-20261111/build/bin/dome-sculpt-vrm1-expression-targets-render-test",
+        "argv": [
+          "artifacts/readers-sanitize-20261111/build/bin/dome-sculpt-vrm1-expression-targets-render-test",
+          "artifacts/readers-sanitize-20261111/runtime-patched-v4/vrm1-shift-mask-authoring",
+          "artifacts/readers-sanitize-20261111/runtime-patched-v4/vrm1-shift-mask-render"
+        ],
+        "timeout_seconds": 900,
+        "software_graphics": true,
+        "pid": 2238268,
+        "exit": 0,
+        "seconds": 12.380296073970385,
+        "rss_tree_peak_bytes": 2564308992,
+        "log_sha256": "3f3bc31121f9c2484b20c1e79b9c9806221fc5306b1443acf9b44e1e3659a3e5"
+      },
+      {
+        "name": "vrm1-shift-defaults-authoring",
+        "execution_namespace": "execution-patched-v4",
+        "executable": "artifacts/build-20261111/sanitize/dome-sculpt-vrm1-expression-layer-authoring-test",
+        "argv": [
+          "artifacts/build-20261111/sanitize/dome-sculpt-vrm1-expression-layer-authoring-test",
+          "artifacts/build-20261111/sanitize/vrm1-background-fixture/source.vrm",
+          "artifacts/readers-sanitize-20261111/runtime-patched-v4/vrm1-shift-defaults-authoring",
+          "--positive",
+          "--shift-default-rim"
+        ],
+        "timeout_seconds": 900,
+        "software_graphics": false,
+        "pid": 2259322,
+        "exit": 0,
+        "seconds": 22.951561979949474,
+        "rss_tree_peak_bytes": 1723932672,
+        "log_sha256": "a0fa9d54d6641bedc8a594b3de7ab093497f4b11bfd94da20666be6603b445cc"
+      },
+      {
+        "name": "vrm1-shift-defaults-render",
+        "execution_namespace": "execution-patched-v4",
+        "executable": "artifacts/readers-sanitize-20261111/build/bin/dome-sculpt-vrm1-expression-targets-render-test",
+        "argv": [
+          "artifacts/readers-sanitize-20261111/build/bin/dome-sculpt-vrm1-expression-targets-render-test",
+          "artifacts/readers-sanitize-20261111/runtime-patched-v4/vrm1-shift-defaults-authoring",
+          "artifacts/readers-sanitize-20261111/runtime-patched-v4/vrm1-shift-defaults-render"
+        ],
+        "timeout_seconds": 900,
+        "software_graphics": true,
+        "pid": 2280350,
+        "exit": 0,
+        "seconds": 13.85906734195305,
+        "rss_tree_peak_bytes": 2706792448,
+        "log_sha256": "d92ad7958ec487021cdc7d4478a1ede67eacb914164f9a11a2a222a9c80be8e1"
+      },
+      {
+        "name": "vrm1-shift-defaults-pristine",
+        "execution_namespace": "execution-patched-v4",
+        "executable": "artifacts/readers-sanitize-20261111/build/bin/dome-sculpt-vrm1-shift-default-pristine-render-test",
+        "argv": [
+          "artifacts/readers-sanitize-20261111/build/bin/dome-sculpt-vrm1-shift-default-pristine-render-test",
+          "artifacts/readers-sanitize-20261111/runtime-patched-v4/vrm1-shift-defaults-authoring",
+          "artifacts/readers-sanitize-20261111/runtime-patched-v4/vrm1-shift-defaults-pristine"
+        ],
+        "timeout_seconds": 900,
+        "software_graphics": true,
+        "pid": 2293895,
+        "exit": 0,
+        "seconds": 10.479394196008798,
+        "rss_tree_peak_bytes": 3254837248,
+        "log_sha256": "8c45f8479b8267a18eda92ae312f4b9e025212567dbcd4d9ee8a236b17e81fcf"
+      },
+      {
+        "name": "vrm1-rim-mask-authoring",
+        "execution_namespace": "execution-patched-v4",
+        "executable": "artifacts/build-20261111/sanitize/dome-sculpt-vrm1-expression-layer-authoring-test",
+        "argv": [
+          "artifacts/build-20261111/sanitize/dome-sculpt-vrm1-expression-layer-authoring-test",
+          "artifacts/build-20261111/sanitize/vrm1-background-fixture/source.vrm",
+          "artifacts/readers-sanitize-20261111/runtime-patched-v4/vrm1-rim-mask-authoring",
+          "--positive",
+          "--rim-mask"
+        ],
+        "timeout_seconds": 900,
+        "software_graphics": false,
+        "pid": 2307719,
+        "exit": 0,
+        "seconds": 14.370450921996962,
+        "rss_tree_peak_bytes": 1700880384,
+        "log_sha256": "1e7a4beca7041d40815a082cfba03da654499ad67d8159e70023ebdf20720fcd"
+      },
+      {
+        "name": "vrm1-rim-mask-crossing-refusal",
+        "execution_namespace": "execution-patched-v4",
+        "executable": "artifacts/build-20261111/sanitize/dome-sculpt-vrm1-expression-layer-authoring-test",
+        "argv": [
+          "artifacts/build-20261111/sanitize/dome-sculpt-vrm1-expression-layer-authoring-test",
+          "artifacts/build-20261111/sanitize/vrm1-background-fixture/source.vrm",
+          "artifacts/readers-sanitize-20261111/runtime-patched-v4/vrm1-rim-mask-crossing-refusal",
+          "--coupling-refusal",
+          "--rim-mask-crossing"
+        ],
+        "timeout_seconds": 900,
+        "software_graphics": false,
+        "pid": 2316915,
+        "exit": 0,
+        "seconds": 1.639428604976274,
+        "rss_tree_peak_bytes": 1280270336,
+        "log_sha256": "6dfece488905e8e7e1c86d3029639ee5ed968493989477de8276f4dbefbf61cf"
+      },
+      {
+        "name": "vrm1-rim-mask-render",
+        "execution_namespace": "execution-patched-v4",
+        "executable": "artifacts/readers-sanitize-20261111/build/bin/dome-sculpt-vrm1-expression-targets-render-test",
+        "argv": [
+          "artifacts/readers-sanitize-20261111/build/bin/dome-sculpt-vrm1-expression-targets-render-test",
+          "artifacts/readers-sanitize-20261111/runtime-patched-v4/vrm1-rim-mask-authoring",
+          "artifacts/readers-sanitize-20261111/runtime-patched-v4/vrm1-rim-mask-render"
+        ],
+        "timeout_seconds": 900,
+        "software_graphics": true,
+        "pid": 2326524,
+        "exit": 0,
+        "seconds": 10.853441657032818,
+        "rss_tree_peak_bytes": 2756542464,
+        "log_sha256": "f4f84446f5bf144d675761b64a3d44baa125f0881fed7a5f29af0bed645c0fa6"
+      },
+      {
+        "name": "vrm1-rim-mask-pristine-render",
+        "execution_namespace": "execution-patched-v4",
+        "executable": "artifacts/readers-sanitize-20261111/build/bin/dome-sculpt-vrm1-rim-mask-pristine-render-test",
+        "argv": [
+          "artifacts/readers-sanitize-20261111/build/bin/dome-sculpt-vrm1-rim-mask-pristine-render-test",
+          "artifacts/readers-sanitize-20261111/runtime-patched-v4/vrm1-rim-mask-authoring",
+          "artifacts/readers-sanitize-20261111/runtime-patched-v4/vrm1-rim-mask-pristine-render"
+        ],
+        "timeout_seconds": 900,
+        "software_graphics": true,
+        "pid": 2340448,
+        "exit": 0,
+        "seconds": 7.069383409980219,
+        "rss_tree_peak_bytes": 2908274688,
+        "log_sha256": "e13bb0e19170d2185b22d902b4c68cd2f344e52981270aaf87758aecffab0508"
+      },
+      {
+        "name": "vrm1-rim-mask-faults",
+        "execution_namespace": "execution-patched-v4",
+        "executable": "artifacts/readers-sanitize-20261111/build/bin/dome-sculpt-vrm1-mask-support-faults-test",
+        "argv": [
+          "artifacts/readers-sanitize-20261111/build/bin/dome-sculpt-vrm1-mask-support-faults-test",
+          "artifacts/readers-sanitize-20261111/runtime-patched-v4/vrm1-rim-mask-authoring/nonuniform-source.dsculpt"
+        ],
+        "timeout_seconds": 1800,
+        "software_graphics": false,
+        "pid": 2348172,
+        "exit": 0,
+        "seconds": 894.0068652700284,
+        "rss_tree_peak_bytes": 1447321600,
+        "log_sha256": "04cb5a2a31029c0496a5e7848e74ad5229d1f09060cab0d7dc9da1956aab866f"
+      },
+      {
+        "name": "vrm1-rim-mask-coefficients",
+        "execution_namespace": "execution-patched-v4",
+        "executable": "artifacts/readers-sanitize-20261111/build/bin/dome-sculpt-vrm1-rim-faults-test",
+        "argv": [
+          "artifacts/readers-sanitize-20261111/build/bin/dome-sculpt-vrm1-rim-faults-test",
+          "artifacts/readers-sanitize-20261111/runtime-patched-v4/vrm1-rim-mask-authoring/nonuniform-source.dsculpt"
+        ],
+        "timeout_seconds": 900,
+        "software_graphics": false,
+        "pid": 2798351,
+        "exit": 0,
+        "seconds": 677.662837920012,
+        "rss_tree_peak_bytes": 1559724032,
+        "log_sha256": "d5211beaf2a1d260f3a2d94e9d9dfca3cfc234de9fafef115fbcafbea172f193"
+      },
+      {
+        "name": "vrm1-rim-mask-native-workflow",
+        "execution_namespace": "execution-patched-v4",
+        "executable": "artifacts/readers-sanitize-20261111/build/bin/dome-sculpt-vrm1-rim-mask-authoring-workflow-test",
+        "argv": [
+          "artifacts/readers-sanitize-20261111/build/bin/dome-sculpt-vrm1-rim-mask-authoring-workflow-test",
+          "artifacts/readers-sanitize-20261111/runtime-patched-v4/vrm1-rim-mask-authoring/nonuniform-source.dsculpt",
+          "artifacts/readers-sanitize-20261111/runtime-patched-v4/vrm1-rim-mask-native-workflow"
+        ],
+        "timeout_seconds": 900,
+        "software_graphics": false,
+        "pid": 3292756,
+        "exit": 0,
+        "seconds": 5.292458040989004,
+        "rss_tree_peak_bytes": 1483022336,
+        "log_sha256": "d8244cbaf027120f5be050b4667aa9906134ec53f15fcdabe5fcb38b868b8c17"
+      },
+      {
+        "name": "vrm1-targets-faults",
+        "execution_namespace": "execution-patched-v4",
+        "executable": "artifacts/build-20261111/sanitize/dome-sculpt-vrm1-expression-targets-faults-test",
+        "argv": [
+          "artifacts/build-20261111/sanitize/dome-sculpt-vrm1-expression-targets-faults-test",
+          "artifacts/build-20261111/sanitize/vrm1-targets-uniform-roles-uv/nonuniform-source.dsculpt"
+        ],
+        "timeout_seconds": 1800,
+        "software_graphics": false,
+        "pid": 3305419,
+        "exit": 0,
+        "seconds": 403.16322410898283,
+        "rss_tree_peak_bytes": 1572503552,
+        "log_sha256": "62e29a63036eb2a3a1969cf7eab236676d1eeed8a437fecb065cda8923bb39d2"
+      }
+    ],
+    "native_reuse": {
+      "names": [
+        "vrm1-background-fixture",
+        "vrm1-targets-uniform-roles-uv-authoring"
+      ],
+      "current_status": {
+        "path": "artifacts/build-20261111/sanitize-native-status.json",
+        "sha256": "82cf97443b4b1369113ee950df38134fd5c3dac8dde1cf7d512aecbaf771168d",
+        "bytes": 65730
+      },
+      "native_step": {
+        "name": "native",
+        "command": [
+          "ctest",
+          "--test-dir",
+          "/home/blux/de-xr/dome-sculpt/artifacts/build-20261111/sanitize",
+          "--output-on-failure",
+          "-R",
+          "^(polygon-retopo-affine|retopology-input-admission|surface-query-oblique|triangle-remesh|sculpt-surface-chunks|sculpt-chunk-pipeline|authenticated-local-surface|vrm1-background-fixture|vrm1-targets-uniform-roles-uv-authoring|vrm1-targets-preflight-order|dome-sculpt-texture-sets|dome-sculpt-texture-sets-polygon|dome-sculpt-texture-sets-plan|dome-sculpt-texture-set-surfaces|dome-sculpt-texture-set-native|dome-sculpt-texture-set-export|polygon-surface-native-owning|dome-sculpt-texture-set-polygon-mixed|dome-sculpt-texture-set-field-source|dome-sculpt-texture-set-source-export|dome-sculpt-texture-set-history|dome-sculpt-texture-set-resolution)$"
+        ],
+        "exit": 0,
+        "seconds": 118.83898399601458,
+        "log": "/home/blux/de-xr/dome-sculpt/artifacts/build-20261111/logs/sanitize-native.log",
+        "sha256": "72106938efa6b1f154b8c126f995a915418f71f0008d1d0b806d84b2d1bf5091"
+      },
+      "owned_audit": {
+        "path": "artifacts/readers-sanitize-20261111/control/qualified-native-owned-during-first-case.json",
+        "sha256": "99616a73596d0544d91297611fc4c4b240f8c1cd05b4da6ee45ac058955a2c99",
+        "bytes": 95126
+      },
+      "audit_timing": "All312 current native-owned outputs independently audited during first case, not claimed prelaunch."
+    },
+    "namespace_policy": "First2 successful cases v2, next9 v3, final22 v4. v4 consumes readonly normal-model from v2 and shift-model from v3; future outputs in v4. Current parent-native fixtures reused separately.",
+    "unchanged_semantic_arguments_and_deadlines": true,
+    "deadline_seconds": [
+      300,
+      900,
+      1800
+    ],
+    "total_successful_case_seconds": 3614.968799079943,
+    "maximum_successful_case_RSS_bytes": 3254837248,
+    "timing_scope": "Sum of successful cases only, not full build/profile elapsed or exclusive performance; observed host load peaked273.52 on20logicalCPUs."
+  },
+  "full_factory_controls": [
+    {
+      "name": "vrm1-normal-faults",
+      "printed_controls": [
+        "LAYER_BOUNDARIES allocations=1994 cancel=654 continuousRGB=0.00290593 coverage=0.00343137 working=2888896 operations=8317056",
+        "PASS 2664 actual Normal allocation/cancel/target/float-budget/retry checks"
+      ],
+      "log": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/readers-sanitize-20261111/execution-patched-v3/vrm1-normal-faults.log",
+        "sha256": "7281efee16959d582573798a35e8190ccf4dc82aece4a0dfab58f71e0b4c2dd1",
+        "bytes": 200
+      }
+    },
+    {
+      "name": "vrm1-shift-faults",
+      "printed_controls": [
+        "LAYER_BOUNDARIES allocations=2066 cancel=654 continuousRGB=0.00290593 coverage=0.00343137 working=2888896 operations=8317056",
+        "PASS 2736 actual Shift allocation/cancel/target/float-budget/retry checks"
+      ],
+      "log": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/readers-sanitize-20261111/execution-patched-v4/vrm1-shift-faults.log",
+        "sha256": "7ff21797f88f800fd96bf34b83c8dd03c3122c4bdb3910ad34985c002c1a634e",
+        "bytes": 199
+      }
+    },
+    {
+      "name": "vrm1-rim-mask-faults",
+      "printed_controls": [
+        "LAYER_BOUNDARIES allocations=1045 cancel=1340 continuousRGB=0.0014761 coverage=0.00174294 working=2890944 operations=4763408",
+        "PASS completed actual persistent-prefix=1045 and Cancel=1340",
+        "PASS 2401 actual local-cutout MASK allocation/cancel/owner/footprint/retry checks"
+      ],
+      "log": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/readers-sanitize-20261111/execution-patched-v4/vrm1-rim-mask-faults.log",
+        "sha256": "04cb5a2a31029c0496a5e7848e74ad5229d1f09060cab0d7dc9da1956aab866f",
+        "bytes": 268
+      }
+    },
+    {
+      "name": "vrm1-rim-mask-coefficients",
+      "printed_controls": [
+        "LAYER_BOUNDARIES allocations=1045 cancel=1340 continuousRGB=0.0014761 coverage=0.00174294 working=2890944 operations=4763408",
+        "PASS 2397 actual Rim allocation/cancel/target/float-budget/retry checks"
+      ],
+      "log": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/readers-sanitize-20261111/execution-patched-v4/vrm1-rim-mask-coefficients.log",
+        "sha256": "d5211beaf2a1d260f3a2d94e9d9dfca3cfc234de9fafef115fbcafbea172f193",
+        "bytes": 197
+      }
+    },
+    {
+      "name": "vrm1-targets-faults",
+      "printed_controls": [
+        "LAYER_BOUNDARIES allocations=940 cancel=909 continuousRGB=0.00290593 coverage=0.00343137 working=2888768 operations=8415312",
+        "PASS 1862 actual invariant-role allocation/cancel/target/retry checks"
+      ],
+      "log": {
+        "path": "/home/blux/de-xr/dome-sculpt/artifacts/readers-sanitize-20261111/execution-patched-v4/vrm1-targets-faults.log",
+        "sha256": "62e29a63036eb2a3a1969cf7eab236676d1eeed8a437fecb065cda8923bb39d2",
+        "bytes": 1752
+      }
+    }
+  ],
+  "printed_full_factory_check_total": 12060,
+  "preserved_failures": [
+    {
+      "kind": "8GiB external private-output budget",
+      "status": {
+        "path": "artifacts/readers-sanitize-20261111/build-control/status.json",
+        "sha256": "a62dd08803d86d1570de412386f61153ca419033c6df1f7e0a845bb3c612d0b1",
+        "bytes": 49000
+      },
+      "detail": "11 compiles and10 links succeeded. At final link measured8,078,376,960B plus536,870,912B prospective reserve exceeded8GiB. Partial ELF/map retained. Only final link retried at new paths under10GiB; final build8,931,852,288B."
+    },
+    {
+      "kind": "3GiB external sanitizer RSS budget",
+      "status": {
+        "path": "artifacts/readers-sanitize-20261111/execution-patched-v2/status.json",
+        "sha256": "8493a43c8d02f828aff4f9db8314c1c5b00f2515717fe47d03f2800418d0e213",
+        "bytes": 4753
+      },
+      "detail": "Normal pristine case stopped at3,229,728,768B. First2 successes retained. Approved4GiB instrumentation envelope used thereafter; no product-budget/assertion change."
+    },
+    {
+      "kind": "Setup-only Python loop error",
+      "status": {
+        "path": "artifacts/readers-sanitize-20261111/control/run-patched-setup-failure.json",
+        "sha256": "1163e2d081f79ad79d1dd53b8177ef4983bcc069a7589a7e95f844a403e83ce7",
+        "bytes": 428
+      },
+      "native_executions": 0
+    },
+    {
+      "kind": "Target-binding PermissionError",
+      "status": {
+        "path": "artifacts/readers-sanitize-20261111/control/spawn-failure-audit-v3.json",
+        "sha256": "b741667f67cf118e3a5bdb607e528dda5fe5c4cf10fea89ff525fb573c538b17",
+        "bytes": 1065
+      },
+      "detail": "Wrong argv0 pointed to retained nonexecutable partial ELF; no native process started. Raw row exit0 inherited from previous child IS NOT SUCCESS. Corrected runner binds every target to final manifest, resets child before Popen; final native case actually passed."
+    }
+  ],
+  "limits": {
+    "initial_private_allocated_bytes": 8589934592,
+    "approved_final_private_allocated_bytes": 10737418240,
+    "final_runtime_private_measured_bytes": 8980860928,
+    "runtime_logs_measured_bytes": 48603136,
+    "prospective_link_reserve_bytes": 536870912,
+    "workspace_free_floor_bytes": 21474836480,
+    "original_RSS_bytes": 3221225472,
+    "approved_continuation_RSS_bytes": 4294967296,
+    "product_limits_unchanged": true
+  },
+  "evidence": {
+    "artifacts": {
+      "control/plan-v2.json": {
+        "path": "artifacts/readers-sanitize-20261111/control/plan-v2.json",
+        "sha256": "b2fa4ef4b2da477fb620cb06af106f03828deaf036acb8801aa7eb5679543e88",
+        "bytes": 92892
+      },
+      "control/before.json": {
+        "path": "artifacts/readers-sanitize-20261111/control/before.json",
+        "sha256": "09ce8aee695a7774a091d04525c1d04869298ad3a8b5bd2a3c128efa8ed161e0",
+        "bytes": 620484
+      },
+      "control/restoration-audit.json": {
+        "path": "artifacts/readers-sanitize-20261111/control/restoration-audit.json",
+        "sha256": "38ddd1b6d72f116f4e8a5a96e7ed953ce94e9bfb5f9ec22bb6b02034a29bc84e",
+        "bytes": 1752
+      },
+      "control/qualified-native-owned-during-first-case.json": {
+        "path": "artifacts/readers-sanitize-20261111/control/qualified-native-owned-during-first-case.json",
+        "sha256": "99616a73596d0544d91297611fc4c4b240f8c1cd05b4da6ee45ac058955a2c99",
+        "bytes": 95126
+      },
+      "control/reused-executable-live-map-comparison-v2.json": {
+        "path": "artifacts/readers-sanitize-20261111/control/reused-executable-live-map-comparison-v2.json",
+        "sha256": "2774a36d0a74b129b0ce776debc280b507372bb43275cb07f5ab705005d3946d",
+        "bytes": 532
+      },
+      "control/recovered-driver-package-provenance.json": {
+        "path": "artifacts/readers-sanitize-20261111/control/recovered-driver-package-provenance.json",
+        "sha256": "25790efde7c7c0ec8d35ce1aefee99c3403bb29a6503f8826c17eb4f99ab62a1",
+        "bytes": 729
+      },
+      "control/spawn-failure-audit-v3.json": {
+        "path": "artifacts/readers-sanitize-20261111/control/spawn-failure-audit-v3.json",
+        "sha256": "b741667f67cf118e3a5bdb607e528dda5fe5c4cf10fea89ff525fb573c538b17",
+        "bytes": 1065
+      },
+      "control/run-patched-setup-failure.json": {
+        "path": "artifacts/readers-sanitize-20261111/control/run-patched-setup-failure.json",
+        "sha256": "1163e2d081f79ad79d1dd53b8177ef4983bcc069a7589a7e95f844a403e83ce7",
+        "bytes": 428
+      },
+      "control/host-contention-observations.jsonl": {
+        "path": "artifacts/readers-sanitize-20261111/control/host-contention-observations.jsonl",
+        "sha256": "c5af80cc280dc951f262f804226826afd60ea9f9d37c33a490dc82b980860bce",
+        "bytes": 778
+      },
+      "build-control/status.json": {
+        "path": "artifacts/readers-sanitize-20261111/build-control/status.json",
+        "sha256": "a62dd08803d86d1570de412386f61153ca419033c6df1f7e0a845bb3c612d0b1",
+        "bytes": 49000
+      },
+      "build-resume/status.json": {
+        "path": "artifacts/readers-sanitize-20261111/build-resume/status.json",
+        "sha256": "6235a7c457d0663f2b810f7f14964ccf2ee1c7d617090d9a944d3eeac1b7589c",
+        "bytes": 3380
+      },
+      "build-resume/new-outputs.json": {
+        "path": "artifacts/readers-sanitize-20261111/build-resume/new-outputs.json",
+        "sha256": "29cf1bceda9815fc74356849cb92919fc74c454fe494dbaf1826fa97fffcf51b",
+        "bytes": 7878
+      },
+      "execution-patched-v2/status.json": {
+        "path": "artifacts/readers-sanitize-20261111/execution-patched-v2/status.json",
+        "sha256": "8493a43c8d02f828aff4f9db8314c1c5b00f2515717fe47d03f2800418d0e213",
+        "bytes": 4753
+      },
+      "execution-patched-v3/status.json": {
+        "path": "artifacts/readers-sanitize-20261111/execution-patched-v3/status.json",
+        "sha256": "fe1afa425b4ece1858105773fa5ad387886b3123aae0a2c78022e46b9332edb6",
+        "bytes": 14487
+      },
+      "execution-patched-v4/status.json": {
+        "path": "artifacts/readers-sanitize-20261111/execution-patched-v4/status.json",
+        "sha256": "ed3a9387df3653ef356892c8669c4a2a94c744c3a523c8e8af1647942ae484f0",
+        "bytes": 35085
+      },
+      "final-audit/summary.json": {
+        "path": "artifacts/readers-sanitize-20261111/final-audit/summary.json",
+        "sha256": "25997a35d379098c4afd5a81c0a58ef22c9b6ce6feb6b4b5416bd448e4931f90",
+        "bytes": 38590
+      },
+      "seal/verification.json": {
+        "path": "artifacts/readers-sanitize-20261111/seal/verification.json",
+        "sha256": "04425505096292ecac8b4e51500889c4423877768134b4abf4fad3e06188a261",
+        "bytes": 4017
+      },
+      "seal/control-inventory.json": {
+        "path": "artifacts/readers-sanitize-20261111/seal/control-inventory.json",
+        "sha256": "2798f0545042e6d49f20727bdc95c25988563346501697eaa395b4c3d87dfd4c",
+        "bytes": 40969
+      },
+      "seal/large-link-map-inventory.json": {
+        "path": "artifacts/readers-sanitize-20261111/seal/large-link-map-inventory.json",
+        "sha256": "8d2097b39b4555a4a63a631ab0583066ec98193fe1e5d01314140e159165e0f1",
+        "bytes": 3155
+      }
+    },
+    "historical_archive": {
+      "path": "/home/blux/de-xr/dome-sculpt/artifacts/integration-03f8-release-seal/control-evidence.tar.zst",
+      "sha256": "71b0474956b522f68e6ef64b7835311c0b3e4defcc57b30295fdfb448cef3d34",
+      "bytes": 670404
+    },
+    "current_control_archive": {
+      "path": "artifacts/readers-sanitize-20261111/seal/control-evidence.tar.zst",
+      "sha256": "2ad50e96af0a6c3838017df7778183a21b5fd648249af1d3ce97680e8f645611",
+      "bytes": 236172,
+      "members": 161,
+      "raw_member_bytes": 5356072,
+      "all_member_SHA_metadata_verified": true,
+      "originals_removed": false,
+      "scope": "Closed metadata/control/log/map-witness collection only. No source/project object/archive/ELF/native project/image/privately extracted package copied or removed. All originals retained. Large link maps retained in place with full inventory."
+    },
+    "independent_audit_exit": 0,
+    "independent_audit": {
+      "path": "artifacts/readers-sanitize-20261111/final-audit/summary.json",
+      "sha256": "25997a35d379098c4afd5a81c0a58ef22c9b6ce6feb6b4b5416bd448e4931f90",
+      "bytes": 38590
+    }
+  },
+  "remaining": "Main product admission and full original authoring objective remain separate. No default, source, layout, schema or runtime changes in this milestone."
+}
