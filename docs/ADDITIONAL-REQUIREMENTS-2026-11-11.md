@@ -29,3 +29,6 @@ The spatial presentation is deferred; underlying material, painting, geometry,
 history and other basic functionality already required by the original goal
 remains required in its original priority. Animation and final scene rendering
 remain excluded. No implementation or qualification is claimed here.
+
+The current build milestone is finalised and the overall goal is paused at the
+user’s request. This addition records future scope; it does not resume work.

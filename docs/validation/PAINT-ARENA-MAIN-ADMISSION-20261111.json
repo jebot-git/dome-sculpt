@@ -1,0 +1,37 @@
+{
+  "qualified_product_source": "27f01cad7910a9c6b6dd383a4422f3feffdbc61c",
+  "source_merge": "f3eaf881",
+  "public_test_merge": "6e931301",
+  "product_directories_match": [
+    "src",
+    "include",
+    "third_party",
+    "assets",
+    "cmake"
+  ],
+  "cmake_delta": "Only five lines defining two test-only targets; exact base after removing those additions.",
+  "actual_app_cases": [
+    {
+      "status": "artifacts/paint-workflow-dso-build-20261111/union27f-release-xr-v1/status.json",
+      "sha256": "3159fd08c337b7fef3769fd9ecd01411bfd48a53d59d253662cc5464ffde832b",
+      "checks": 39,
+      "seconds": 12.822563290013932
+    },
+    {
+      "status": "artifacts/paint-workflow-dso-build-20261111/union27f-sanitize-xr-v1/status.json",
+      "sha256": "e68be5c6d0b2ed3eea715492b406c26085bac35e19fd24b67ca4d4badf754839",
+      "checks": 39,
+      "seconds": 40.17788008303614
+    },
+    {
+      "status": "artifacts/paint-workflow-dso-build-20261111/union27f-release-gui-normal-v1/status.json",
+      "sha256": "fad6e2b38b0929efeebabefdfcf6bca7a55e92659bfda415dc58f8a038135b0a",
+      "checks": 10,
+      "seconds": 13.30185538099613
+    }
+  ],
+  "unique_input_device_pins_rehashed": 4180,
+  "input_drift": [],
+  "sustained_receipt": "SUSTAINED-GPU-ARENA-20261111.json",
+  "goal": "Incomplete; pause after current milestone. Controller trays and spatial node-based editing/history remain later required work."
+}

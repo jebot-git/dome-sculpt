@@ -1,3 +1,29 @@
+## Current milestone complete; goal paused — 2026-11-11
+
+The qualified native GPU painting and ordered sculpt arena composition is now
+admitted to main. Read
+[PAINT-ARENA-MAIN-ADMISSION-20261111.md](PAINT-ARENA-MAIN-ADMISSION-20261111.md)
+for exact source, build, native/software/Arc, public desktop/XR and original full
+P1 evidence. The full original production objective remains incomplete.
+
+Honor the user’s request to pause after finalising the current build. No further
+implementation, builds or tests start until explicit resumption. The separate
+plain GPU preview candidate remains private for later combined qualification.
+No system installation or physical-headset acceptance is claimed.
+
+Controller-mounted tool/function/selection trays and spatial node-based
+editing/history are required later goals after the basic authoring targets.
+Their specification is recorded in
+[ADDITIONAL-REQUIREMENTS-2026-11-11.md](ADDITIONAL-REQUIREMENTS-2026-11-11.md).
+Adding a requirement does not resume the paused goal. Preserve all unfinished
+original and additional requirements, exact history/source safeguards and
+DomeD design conventions.
+
+## Historical checkpoint records
+
+The records below describe earlier states. Current admission and pause status
+above take precedence over their active, pending and separate-branch wording.
+
 ## Integrated authoring milestone — 2026-11-11
 
 Main now includes the qualified source-preserving texture fields/sets, resolution

@@ -1,0 +1,727 @@
+{
+  "source": "27f01cad7910a9c6b6dd383a4422f3feffdbc61c",
+  "scope": "Full unchanged original single-object P1 correctness/workload on actual Arc rendering with CPU geometry; offscreen768 stereo pairs, not physical-HMD pacing or full multi-object/density/accelerator matrix.",
+  "run": {
+    "state": "terminal",
+    "source": "27f01cad7910a9c6b6dd383a4422f3feffdbc61c",
+    "command": [
+      "/home/blux/de-xr/dome-sculpt/artifacts/paint-arena-build-20261111/release/dome-sculpt-sculpt-sustained",
+      "--output",
+      "/home/blux/de-xr/dome-sculpt/artifacts/sustained-gpu-arena-20261111/full-p1",
+      "--device",
+      "arc",
+      "--tier",
+      "production",
+      "--objects",
+      "1",
+      "--voxel",
+      ".0125",
+      "--width",
+      "768",
+      "--height",
+      "768",
+      "--strokes",
+      "300",
+      "--masks",
+      "120",
+      "--pairs",
+      "2000",
+      "--held-pairs",
+      "120",
+      "--repetitions",
+      "3"
+    ],
+    "binary_sha256": "5fd74a2afae3d2c1c5409b019d4e70030a11baf7856662ed2d89f6c13c891fd9",
+    "scope": "Full original P1 sustained single-object correctness workload on actual Arc graphics with CPU brushes/mesher. Not physical headset pacing, exclusive-system performance or full production-matrix qualification.",
+    "conditions": "Other CPU development/qualification may remain active; exclusive Arc lock required. Record measurements as observed under these conditions.",
+    "limits": {
+      "external_timeout_seconds": 5400,
+      "process_rss_bytes": 5368709120,
+      "output_allocated_bytes": 2147483648,
+      "workspace_free_floor_bytes": 21474836480
+    },
+    "original_native_limits": "Unchanged benchmark source, original full arguments, field/working-byte/native/frame/source/Undo/history/cancellation/timer assertions and120second publication waits; current renderer implementation differs.",
+    "benchmark_source_sha256": "dd82b0435406f94e75f43b1836c41440b286a8fc29a80c76933820a465de5154",
+    "baseline_full_P1": "artifacts/sustained-current-20261111/full-p1/result.json",
+    "phase": "/home/blux/de-xr/dome-sculpt/artifacts/sustained-gpu-arena-20261111",
+    "lock": "/tmp/dome-sculpt-arc-device.lock",
+    "pid": 3473336,
+    "environment": {
+      "LD_LIBRARY_PATH": "/home/blux/de-xr/dome-sculpt/artifacts/sdk-20261111/toolkit-release/lib:/usr/lib64",
+      "DRI_PRIME": "pci-0000_03_00_0",
+      "EGL_PLATFORM": "surfaceless",
+      "MESA_SHADER_CACHE_DISABLE": "1",
+      "LP_NUM_THREADS": "2"
+    },
+    "lock_acquired_utc": "2026-11-11T16:10:15Z",
+    "child_pid": 3473395,
+    "seconds": 142.0845431709895,
+    "peak_rss_bytes": 2164125696,
+    "allocated_output_bytes": 58761216,
+    "exit": 0,
+    "external_guard": null,
+    "protected_drift": [],
+    "result_status": "production-workload-pass",
+    "result_sha256": "a44075b2d4ec25023dae511d0b8b6e9964baf58405dc9ed89185f5f1527632d2",
+    "complete_planned_counts": true,
+    "completed_repetitions": 3,
+    "success": true,
+    "log_sha256": "2794e9f49f0d736f5a0194a7d9d5fa9e1efe038fed429ee42bcd8d32c8fad17b",
+    "script_sha256": "d1c661472a6ead0af8076f3ac01c6f6b40305b70fa73980bd9b37a0f1b31eab5"
+  },
+  "initial_size": {
+    "chunks": 632,
+    "retained_chunk_bytes": 210674322,
+    "scalar_bytes": 591728,
+    "stored_samples": 588739,
+    "visible_triangles": 258852,
+    "visible_vertices": 147932
+  },
+  "options": {
+    "allocation_instrumentation": false,
+    "device": "arc",
+    "height": 768,
+    "held_pairs": 120,
+    "inventory_only": false,
+    "masks": 120,
+    "objects": 1,
+    "pairs": 2000,
+    "repetitions": 3,
+    "smoke": false,
+    "strokes": 300,
+    "tier": "production",
+    "voxel": 0.012500000186264515,
+    "width": 768
+  },
+  "baseline_result_sha256": "de8d55bfe48f2d0bb66ddc123ba74a64e6c02ebe8c73f82541aded25d3bd506e",
+  "benchmark_source_unchanged": true,
+  "device_initial": {
+    "authenticated": true,
+    "device_id": "0x56a0\n",
+    "device_major": 226,
+    "device_minor": 129,
+    "driver": "/sys/bus/pci/drivers/i915",
+    "open_fds": [
+      {
+        "fd": 4,
+        "target": "/dev/dri/renderD129"
+      },
+      {
+        "fd": 5,
+        "target": "/dev/dri/renderD129"
+      },
+      {
+        "fd": 6,
+        "target": "/dev/dri/renderD129"
+      },
+      {
+        "fd": 7,
+        "target": "/dev/dri/renderD129"
+      }
+    ],
+    "pci": "/sys/devices/pci0000:00/0000:00:01.0/0000:01:00.0/0000:02:01.0/0000:03:00.0",
+    "render_node": "/dev/dri/renderD129",
+    "renderer": "Mesa Intel(R) Arc(tm) A770 Graphics (DG2)",
+    "requested": "arc",
+    "vendor": "Intel",
+    "vendor_id": "0x8086\n",
+    "version": "4.6 (Core Profile) Mesa 26.2.5"
+  },
+  "device_final": {
+    "authenticated": true,
+    "device_id": "0x56a0\n",
+    "device_major": 226,
+    "device_minor": 129,
+    "driver": "/sys/bus/pci/drivers/i915",
+    "open_fds": [
+      {
+        "fd": 4,
+        "target": "/dev/dri/renderD129"
+      },
+      {
+        "fd": 5,
+        "target": "/dev/dri/renderD129"
+      },
+      {
+        "fd": 6,
+        "target": "/dev/dri/renderD129"
+      },
+      {
+        "fd": 7,
+        "target": "/dev/dri/renderD129"
+      }
+    ],
+    "pci": "/sys/devices/pci0000:00/0000:00:01.0/0000:01:00.0/0000:02:01.0/0000:03:00.0",
+    "render_node": "/dev/dri/renderD129",
+    "renderer": "Mesa Intel(R) Arc(tm) A770 Graphics (DG2)",
+    "requested": "arc",
+    "vendor": "Intel",
+    "vendor_id": "0x8086\n",
+    "version": "4.6 (Core Profile) Mesa 26.2.5"
+  },
+  "repetitions": [
+    {
+      "index": 0,
+      "counts": {
+        "stroke": 300,
+        "mask_mode": 2,
+        "mask": 120,
+        "mask_fill": 1,
+        "mask_clear": 1,
+        "view_pair": 2000,
+        "held_pair": 120,
+        "authored_placement": 1
+      },
+      "checkpoints": 14,
+      "history": {
+        "cancel_exact": true,
+        "ordered_save_reopen_exact": true,
+        "real_factory_return_barrier_reached": true,
+        "retired_native_generation_exact": true,
+        "undo_redo_exact": true
+      },
+      "warmup": {
+        "exact_undo": true,
+        "excluded_ns": 930008371,
+        "real_strokes": 1
+      },
+      "view": {
+        "accepted_snapshot_caller_cpu_ns": {
+          "count": 0
+        },
+        "accepted_snapshot_ns": {
+          "count": 0
+        },
+        "caller_thread_cpu_ns": {
+          "count": 2000,
+          "max_ns": 2970328.0,
+          "mean_ns": 765821.7925,
+          "p50_ns": 515463.0,
+          "p90_ns": 1785104.0,
+          "p95_ns": 2764737.0,
+          "p99_ns": 2855963.0
+        },
+        "first_draw_caller_cpu_ns": {
+          "count": 0
+        },
+        "first_draw_submission_ns": {
+          "count": 0
+        },
+        "wall_ns": {
+          "count": 2000,
+          "max_ns": 5490774.0,
+          "mean_ns": 2899596.1665,
+          "p50_ns": 2650118.0,
+          "p90_ns": 3996726.0,
+          "p95_ns": 4825094.0,
+          "p99_ns": 4966826.0
+        }
+      },
+      "held": {
+        "accepted_snapshot_caller_cpu_ns": {
+          "count": 0
+        },
+        "accepted_snapshot_ns": {
+          "count": 0
+        },
+        "caller_thread_cpu_ns": {
+          "count": 120,
+          "max_ns": 463780.0,
+          "mean_ns": 284385.4583333333,
+          "p50_ns": 267983.0,
+          "p90_ns": 386814.0,
+          "p95_ns": 406320.0,
+          "p99_ns": 450059.0
+        },
+        "first_draw_caller_cpu_ns": {
+          "count": 0
+        },
+        "first_draw_submission_ns": {
+          "count": 0
+        },
+        "wall_ns": {
+          "count": 120,
+          "max_ns": 2762708.0,
+          "mean_ns": 2208758.2416666667,
+          "p50_ns": 2197742.0,
+          "p90_ns": 2269407.0,
+          "p95_ns": 2293773.0,
+          "p99_ns": 2379365.0
+        }
+      },
+      "gpu_timers": {
+        "counter_bits": 64,
+        "disjoint_observed": false,
+        "disjoint_supported": false,
+        "distribution_ns": {
+          "count": 2000,
+          "max_ns": 3514270.0,
+          "mean_ns": 2178563.2385,
+          "p50_ns": 2149114.0,
+          "p90_ns": 2308072.0,
+          "p95_ns": 2470833.0,
+          "p99_ns": 2998906.0
+        },
+        "distribution_qualified": true,
+        "expected_pairs": 2000,
+        "pending_after_bounded_drain": 0,
+        "reset_query_supported": true,
+        "reset_status": 0,
+        "skipped_indices": [],
+        "supported": true,
+        "valid_coverage": 1.0,
+        "valid_samples": 2000
+      },
+      "baseline_view": {
+        "accepted_snapshot_caller_cpu_ns": {
+          "count": 0
+        },
+        "accepted_snapshot_ns": {
+          "count": 0
+        },
+        "caller_thread_cpu_ns": {
+          "count": 2000,
+          "max_ns": 470906890.0,
+          "mean_ns": 257418797.572,
+          "p50_ns": 248109082.0,
+          "p90_ns": 338973394.0,
+          "p95_ns": 392047430.0,
+          "p99_ns": 436828764.0
+        },
+        "first_draw_caller_cpu_ns": {
+          "count": 0
+        },
+        "first_draw_submission_ns": {
+          "count": 0
+        },
+        "wall_ns": {
+          "count": 2000,
+          "max_ns": 2728558611.0,
+          "mean_ns": 388550629.9115,
+          "p50_ns": 322774265.0,
+          "p90_ns": 554110932.0,
+          "p95_ns": 914999060.0,
+          "p99_ns": 1619662826.0
+        }
+      },
+      "baseline_held": {
+        "accepted_snapshot_caller_cpu_ns": {
+          "count": 0
+        },
+        "accepted_snapshot_ns": {
+          "count": 0
+        },
+        "caller_thread_cpu_ns": {
+          "count": 120,
+          "max_ns": 286836058.0,
+          "mean_ns": 192612092.425,
+          "p50_ns": 186603466.0,
+          "p90_ns": 229765025.0,
+          "p95_ns": 242965476.0,
+          "p99_ns": 279942663.0
+        },
+        "first_draw_caller_cpu_ns": {
+          "count": 0
+        },
+        "first_draw_submission_ns": {
+          "count": 0
+        },
+        "wall_ns": {
+          "count": 120,
+          "max_ns": 370893733.0,
+          "mean_ns": 198219912.26666668,
+          "p50_ns": 187746521.0,
+          "p90_ns": 232799303.0,
+          "p95_ns": 298136664.0,
+          "p99_ns": 369002501.0
+        }
+      }
+    },
+    {
+      "index": 1,
+      "counts": {
+        "stroke": 300,
+        "mask_mode": 2,
+        "mask": 120,
+        "mask_fill": 1,
+        "mask_clear": 1,
+        "view_pair": 2000,
+        "held_pair": 120,
+        "authored_placement": 1
+      },
+      "checkpoints": 14,
+      "history": {
+        "cancel_exact": true,
+        "ordered_save_reopen_exact": true,
+        "real_factory_return_barrier_reached": true,
+        "retired_native_generation_exact": true,
+        "undo_redo_exact": true
+      },
+      "warmup": {
+        "exact_undo": true,
+        "excluded_ns": 879424855,
+        "real_strokes": 1
+      },
+      "view": {
+        "accepted_snapshot_caller_cpu_ns": {
+          "count": 0
+        },
+        "accepted_snapshot_ns": {
+          "count": 0
+        },
+        "caller_thread_cpu_ns": {
+          "count": 2000,
+          "max_ns": 2969028.0,
+          "mean_ns": 729800.9505,
+          "p50_ns": 515436.0,
+          "p90_ns": 1495797.0,
+          "p95_ns": 2736458.0,
+          "p99_ns": 2866242.0
+        },
+        "first_draw_caller_cpu_ns": {
+          "count": 0
+        },
+        "first_draw_submission_ns": {
+          "count": 0
+        },
+        "wall_ns": {
+          "count": 2000,
+          "max_ns": 6079477.0,
+          "mean_ns": 2857765.1055,
+          "p50_ns": 2641086.0,
+          "p90_ns": 3671892.0,
+          "p95_ns": 4782667.0,
+          "p99_ns": 4944688.0
+        }
+      },
+      "held": {
+        "accepted_snapshot_caller_cpu_ns": {
+          "count": 0
+        },
+        "accepted_snapshot_ns": {
+          "count": 0
+        },
+        "caller_thread_cpu_ns": {
+          "count": 120,
+          "max_ns": 457077.0,
+          "mean_ns": 313026.0416666667,
+          "p50_ns": 315229.0,
+          "p90_ns": 397040.0,
+          "p95_ns": 424765.0,
+          "p99_ns": 442769.0
+        },
+        "first_draw_caller_cpu_ns": {
+          "count": 0
+        },
+        "first_draw_submission_ns": {
+          "count": 0
+        },
+        "wall_ns": {
+          "count": 120,
+          "max_ns": 2457359.0,
+          "mean_ns": 2241002.3833333333,
+          "p50_ns": 2234456.0,
+          "p90_ns": 2307518.0,
+          "p95_ns": 2321152.0,
+          "p99_ns": 2341412.0
+        }
+      },
+      "gpu_timers": {
+        "counter_bits": 64,
+        "disjoint_observed": false,
+        "disjoint_supported": false,
+        "distribution_ns": {
+          "count": 2000,
+          "max_ns": 3465625.0,
+          "mean_ns": 2180127.892,
+          "p50_ns": 2152447.0,
+          "p90_ns": 2328645.0,
+          "p95_ns": 2404427.0,
+          "p99_ns": 2908645.0
+        },
+        "distribution_qualified": true,
+        "expected_pairs": 2000,
+        "pending_after_bounded_drain": 0,
+        "reset_query_supported": true,
+        "reset_status": 0,
+        "skipped_indices": [],
+        "supported": true,
+        "valid_coverage": 1.0,
+        "valid_samples": 2000
+      },
+      "baseline_view": {
+        "accepted_snapshot_caller_cpu_ns": {
+          "count": 0
+        },
+        "accepted_snapshot_ns": {
+          "count": 0
+        },
+        "caller_thread_cpu_ns": {
+          "count": 2000,
+          "max_ns": 544223568.0,
+          "mean_ns": 259117207.203,
+          "p50_ns": 234629001.0,
+          "p90_ns": 413438173.0,
+          "p95_ns": 436482792.0,
+          "p99_ns": 527381142.0
+        },
+        "first_draw_caller_cpu_ns": {
+          "count": 0
+        },
+        "first_draw_submission_ns": {
+          "count": 0
+        },
+        "wall_ns": {
+          "count": 2000,
+          "max_ns": 6007988701.0,
+          "mean_ns": 562291321.215,
+          "p50_ns": 351524108.0,
+          "p90_ns": 1231354574.0,
+          "p95_ns": 2311941805.0,
+          "p99_ns": 3897461618.0
+        }
+      },
+      "baseline_held": {
+        "accepted_snapshot_caller_cpu_ns": {
+          "count": 0
+        },
+        "accepted_snapshot_ns": {
+          "count": 0
+        },
+        "caller_thread_cpu_ns": {
+          "count": 120,
+          "max_ns": 441747806.0,
+          "mean_ns": 309689702.5083333,
+          "p50_ns": 282311919.0,
+          "p90_ns": 416051355.0,
+          "p95_ns": 426606574.0,
+          "p99_ns": 438973794.0
+        },
+        "first_draw_caller_cpu_ns": {
+          "count": 0
+        },
+        "first_draw_submission_ns": {
+          "count": 0
+        },
+        "wall_ns": {
+          "count": 120,
+          "max_ns": 1729729414.0,
+          "mean_ns": 549281603.5333333,
+          "p50_ns": 433665888.0,
+          "p90_ns": 946879059.0,
+          "p95_ns": 1035567727.0,
+          "p99_ns": 1568412795.0
+        }
+      }
+    },
+    {
+      "index": 2,
+      "counts": {
+        "stroke": 300,
+        "mask_mode": 2,
+        "mask": 120,
+        "mask_fill": 1,
+        "mask_clear": 1,
+        "view_pair": 2000,
+        "held_pair": 120,
+        "authored_placement": 1
+      },
+      "checkpoints": 14,
+      "history": {
+        "cancel_exact": true,
+        "ordered_save_reopen_exact": true,
+        "real_factory_return_barrier_reached": true,
+        "retired_native_generation_exact": true,
+        "undo_redo_exact": true
+      },
+      "warmup": {
+        "exact_undo": true,
+        "excluded_ns": 829658194,
+        "real_strokes": 1
+      },
+      "view": {
+        "accepted_snapshot_caller_cpu_ns": {
+          "count": 0
+        },
+        "accepted_snapshot_ns": {
+          "count": 0
+        },
+        "caller_thread_cpu_ns": {
+          "count": 2000,
+          "max_ns": 3116209.0,
+          "mean_ns": 793086.6885,
+          "p50_ns": 520534.0,
+          "p90_ns": 1935830.0,
+          "p95_ns": 2765712.0,
+          "p99_ns": 2869746.0
+        },
+        "first_draw_caller_cpu_ns": {
+          "count": 0
+        },
+        "first_draw_submission_ns": {
+          "count": 0
+        },
+        "wall_ns": {
+          "count": 2000,
+          "max_ns": 5664251.0,
+          "mean_ns": 2919993.5225,
+          "p50_ns": 2644563.0,
+          "p90_ns": 4080103.0,
+          "p95_ns": 4834239.0,
+          "p99_ns": 4993353.0
+        }
+      },
+      "held": {
+        "accepted_snapshot_caller_cpu_ns": {
+          "count": 0
+        },
+        "accepted_snapshot_ns": {
+          "count": 0
+        },
+        "caller_thread_cpu_ns": {
+          "count": 120,
+          "max_ns": 396670.0,
+          "mean_ns": 255847.81666666668,
+          "p50_ns": 243835.0,
+          "p90_ns": 344203.0,
+          "p95_ns": 362475.0,
+          "p99_ns": 392008.0
+        },
+        "first_draw_caller_cpu_ns": {
+          "count": 0
+        },
+        "first_draw_submission_ns": {
+          "count": 0
+        },
+        "wall_ns": {
+          "count": 120,
+          "max_ns": 2373837.0,
+          "mean_ns": 2210497.075,
+          "p50_ns": 2200736.0,
+          "p90_ns": 2272786.0,
+          "p95_ns": 2303360.0,
+          "p99_ns": 2364384.0
+        }
+      },
+      "gpu_timers": {
+        "counter_bits": 64,
+        "disjoint_observed": false,
+        "disjoint_supported": false,
+        "distribution_ns": {
+          "count": 2000,
+          "max_ns": 3371093.0,
+          "mean_ns": 2174276.631,
+          "p50_ns": 2151875.0,
+          "p90_ns": 2306145.0,
+          "p95_ns": 2433593.0,
+          "p99_ns": 2858020.0
+        },
+        "distribution_qualified": true,
+        "expected_pairs": 2000,
+        "pending_after_bounded_drain": 0,
+        "reset_query_supported": true,
+        "reset_status": 0,
+        "skipped_indices": [],
+        "supported": true,
+        "valid_coverage": 1.0,
+        "valid_samples": 2000
+      },
+      "baseline_view": {
+        "accepted_snapshot_caller_cpu_ns": {
+          "count": 0
+        },
+        "accepted_snapshot_ns": {
+          "count": 0
+        },
+        "caller_thread_cpu_ns": {
+          "count": 2000,
+          "max_ns": 466325169.0,
+          "mean_ns": 262689733.409,
+          "p50_ns": 251637000.0,
+          "p90_ns": 303441638.0,
+          "p95_ns": 364596935.0,
+          "p99_ns": 419297863.0
+        },
+        "first_draw_caller_cpu_ns": {
+          "count": 0
+        },
+        "first_draw_submission_ns": {
+          "count": 0
+        },
+        "wall_ns": {
+          "count": 2000,
+          "max_ns": 1692856887.0,
+          "mean_ns": 395213613.5475,
+          "p50_ns": 359482549.0,
+          "p90_ns": 489571883.0,
+          "p95_ns": 660100532.0,
+          "p99_ns": 1125859463.0
+        }
+      },
+      "baseline_held": {
+        "accepted_snapshot_caller_cpu_ns": {
+          "count": 0
+        },
+        "accepted_snapshot_ns": {
+          "count": 0
+        },
+        "caller_thread_cpu_ns": {
+          "count": 120,
+          "max_ns": 274192634.0,
+          "mean_ns": 239209608.91666666,
+          "p50_ns": 239519879.0,
+          "p90_ns": 256550025.0,
+          "p95_ns": 259728063.0,
+          "p99_ns": 272337171.0
+        },
+        "first_draw_caller_cpu_ns": {
+          "count": 0
+        },
+        "first_draw_submission_ns": {
+          "count": 0
+        },
+        "wall_ns": {
+          "count": 120,
+          "max_ns": 392572621.0,
+          "mean_ns": 300715661.23333335,
+          "p50_ns": 298082229.0,
+          "p90_ns": 336714211.0,
+          "p95_ns": 351108383.0,
+          "p99_ns": 381755006.0
+        }
+      }
+    }
+  ],
+  "timing_limits": "Earlier baseline had severe host contention and one stack sampler. New run had other CPU development. Both are observed timings, not a controlled isolated attribution or GPU busy percent.",
+  "completed_counts": {
+    "stroke": 900,
+    "mask_mode": 6,
+    "mask": 360,
+    "mask_fill": 3,
+    "mask_clear": 3,
+    "view_pair": 6000,
+    "held_pair": 360,
+    "authored_placement": 3
+  },
+  "independent_checkpoints": 42,
+  "grouped_regression": {
+    "checked_scalars": 5092,
+    "exact_frame_modes": 3,
+    "kind": "original_grouped_regression",
+    "observer_ns_excluded": 134363856,
+    "ordered_corners": 52008,
+    "raw_write_ns_excluded": 29072,
+    "repetition": 0,
+    "sequence": 0,
+    "typed_queries": 4,
+    "whole_extraction_and_checks_ns": 23185531
+  },
+  "protected_inputs_rechecked": 3092,
+  "input_drift": [],
+  "archive": {
+    "path": "/home/blux/de-xr/dome-sculpt/artifacts/sustained-gpu-arena-evidence-20261111.tar.gz",
+    "sha256": "83130bca975b99a0462323bb223afd9a468a01b5508d88227184ab9b2f72bcfd",
+    "members": 13,
+    "bytes": 13025685
+  }
+}
