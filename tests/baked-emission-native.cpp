@@ -6,6 +6,7 @@
 #include "dome/source-maps.hpp"
 #include "baked-emission-access.hpp"
 #include "baked-emission-write-scope.hpp"
+#include "emission-export.hpp"
 #include "native-read-scope.hpp"
 #include "paint-overlay-sample.hpp"
 #include <bit>
@@ -39,6 +40,7 @@ void writer_controls(){
     const auto encoded=value.encode();
     check(encoded.at("version")!=41,"retained opaque MToon JSON cannot fabricate a FLOAT writer capability");
     check(Scene::decode(encoded).encode()==encoded,"opaque bare/forged-paint/binary material metadata preserves exact old wire");
+    check(!detail::requires_native_emission_package(value),"opaque material metadata cannot fabricate physical export authority");
   }
   auto paint=std::make_shared<PaintedMesh>(quad(),64);paint->install_bake(floating({{},{50000,.00001f,2},1}));
   {
@@ -63,12 +65,14 @@ void writer_controls(){
   retained.active().painted->clear_bake();
   check(!retained.active().painted->baked()&&retained.active().material_bindings->color_preparation->original_paint->baked()->emission_field,"actual persisted source history retains FLOAT after current base is cleared");
   const auto history=retained.encode();check(history.at("version")==41&&Scene::decode(history).encode()==history,"writer feature follows actual emitted history owner rather than only current paint");
+  check(detail::requires_native_emission_package(retained),"actual persisted-only FLOAT history retains native export authority");
   Scene sets;std::array<TextureSetInitialField,2> fields;for(auto &field:fields)field.resolution=64;
   initialize_texture_sets(sets,sets.active().id,quad(),fields,std::array<TextureSetId,2>{0,1});
   check(edit_texture_set(sets,sets.active().id,1,[](PaintedMesh &paint,Material &){paint.install_bake(floating({{},{50000,.00001f,2},1}));return true;}),"actual public set mutation adopts independent FLOAT owner");
   check(!sets.active().painted->baked()&&sets.active().texture_sets->at(1).painted->baked()->emission_field,"additional set is the genuine FLOAT owner, primary remains legacy");
   const auto encoded=sets.encode();check(encoded.at("version")==41&&encoded.at("payload").at("version")==40,"Scene41 retains actual Scene40 set ownership beneath its envelope");
   check(Scene::decode(encoded).encode()==encoded,"nonprimary shared-geometry field and Scene40/Paint7 capabilities restart exactly");
+  check(detail::requires_native_emission_package(sets),"genuine additional FLOAT set requires its native export authority");
   refuses([&]{Scene::decode(encoded.at("payload"));},"old Scene40 cannot claim new baked data without its explicit envelope");
 }
 } // namespace

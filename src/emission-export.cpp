@@ -104,8 +104,13 @@ EmissionInterchangeImage native_paint_emission_field(const SculptObject &object,
 }
 std::shared_ptr<const TextureMaps> EmissionExportAccess::other_channels(const PaintedMesh &paint,Material material,const std::function<bool()> &cancelled){auto detached=without_emission(paint);material.emissive={};return detached->composite(material,cancelled);}
 bool requires_native_emission_package(const Scene &scene,const std::function<bool()> &cancelled){
- stop(cancelled);const auto value=scene.encode();size_t visited=0;
- auto physical=[&](auto &&self,const nlohmann::json &node)->bool{if((++visited&4095)==0)stop(cancelled);if(node.is_object()){if(node.contains("physical_emission")&&!node.at("physical_emission").is_null())return true;if(node.contains("float_emission"))return true;if(node.contains("physical_emission_tiles")&&!node.at("physical_emission_tiles").empty())return true;if(node.contains("emissive")){const auto &v=node.at("emissive");if(v.is_array()&&v.size()==3)for(const auto &n:v)if(n.is_number()&&n.get<double>()>1)return true;}if(node.contains("native_reference")){const auto &v=node.at("native_reference");if(v.is_object()&&v.contains("emission"))for(const auto &n:v.at("emission"))if(n.get<double>()>1)return true;}for(const auto &child:node.items())if(self(self,child.value()))return true;}else if(node.is_array())for(const auto &child:node)if(self(self,child))return true;return false;};const bool result=physical(physical,value);stop(cancelled);return result;
+ stop(cancelled);const auto value=scene.encode();
+ // This trusted owning writer grants41 only for actual emitted FLOAT fields,
+ // including persisted history and nonprimary set containers. Opaque retained
+ // material JSON is not physical-data authority.
+ if(value.at("version")==41)return true;
+ size_t visited=0;
+ auto physical=[&](auto &&self,const nlohmann::json &node)->bool{if((++visited&4095)==0)stop(cancelled);if(node.is_object()){if(node.contains("physical_emission")&&!node.at("physical_emission").is_null())return true;if(node.contains("physical_emission_tiles")&&!node.at("physical_emission_tiles").empty())return true;if(node.contains("emissive")){const auto &v=node.at("emissive");if(v.is_array()&&v.size()==3)for(const auto &n:v)if(n.is_number()&&n.get<double>()>1)return true;}if(node.contains("native_reference")){const auto &v=node.at("native_reference");if(v.is_object()&&v.contains("emission"))for(const auto &n:v.at("emission"))if(n.get<double>()>1)return true;}for(const auto &child:node.items())if(self(self,child.value()))return true;}else if(node.is_array())for(const auto &child:node)if(self(self,child))return true;return false;};const bool result=physical(physical,value);stop(cancelled);return result;
 }
 EmissionExportPrepared prepare_emission_export(std::span<const ObjectSurface> objects,const NativeEmissionExport &options,const std::function<bool()> &cancelled,bool authored_mtoon){
  stop(cancelled);if(!options.scene||!options.allow_measured_core_fallback)throw std::invalid_argument("HDR export needs its immutable Scene and explicit measured fallback permission");options.scene->validate();size_t field_bytes=0;
