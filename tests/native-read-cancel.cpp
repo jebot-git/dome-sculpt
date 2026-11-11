@@ -10,11 +10,12 @@
 #include <memory>
 #include <optional>
 #include <set>
+#include <zlib.h>
 using namespace dome;
 namespace {
 size_t checks=0;
 void check(bool v,const char*m){if(!v)throw std::runtime_error(m);++checks;}
-template<class F>bool cancelled(F&&f){try{f();}catch(const std::runtime_error&e){return std::string(e.what())=="Project loading cancelled";}return false;}
+template<class F>bool cancelled(F&&f,bool payload=false){try{f();}catch(const std::runtime_error&e){const std::string message=e.what();return message=="Project loading cancelled"||(payload&&message=="Native HDR export/extraction cancelled");}return false;}
 Scene fixture(){
  Volume::Voxels cells;for(int x=0;x<32;++x)for(int y=0;y<32;++y)cells.emplace(Int3{x,y,0},float((x+y)%7-3)*.01f);
  const auto v=Volume::from_samples(.1f,std::move(cells));Scene s;s.active().volume=std::make_shared<Volume>(v);s.add("Independent duplicate",v);s.select(1);return s;
@@ -72,11 +73,15 @@ void wrappers(const Scene&s,const std::filesystem::path&dir){
  const auto wire=s.encode();std::filesystem::create_directories(dir);const auto path=dir/"read-cancel.dsculpt";s.save(path);const auto before=bytes(path);
  size_t count=0;check(load_scene_file(path,[&]{++count;return false;}).scene.encode()==wire,"Actual file reader returns the complete native Scene");check(count>8,"File reader propagates callbacks into large native decoding");
  for(size_t stop:{size_t(1),count/2,count}){size_t calls=0;std::optional<LoadedSceneFile> result;check(cancelled([&]{result=load_scene_file(path,[&]{return ++calls==stop;});}),"Actual file reader cancellation rejects publication");check(!result&&calls==stop,"File cancellation reaches its selected boundary without partial publication");check(bytes(path)==before,"File reader cancellation preserves every source byte");check(load_scene_file(path).scene.encode()==wire,"Actual file cancellation permits an exact retry");}
- const auto payload=detail::capture_native_scene_payload(s,{});const auto saved=payload.stored;size_t restore_calls=0;
+ const auto captured=detail::capture_native_scene_payload(s,{});
+ for(bool compressed:{false,true}){
+ auto payload=captured;if(compressed){uLongf size=compressBound(payload.stored.size());std::vector<uint8_t> packed(size);check(compress2(packed.data(),&size,payload.stored.data(),payload.stored.size(),Z_DEFAULT_COMPRESSION)==Z_OK,"Independent zlib fixture forms a genuine compressed native payload");packed.resize(size);payload.stored=std::move(packed);payload.compressed=true;}
+ const auto saved=payload.stored;size_t restore_calls=0;
  check(detail::restore_native_scene_payload(payload.stored,payload.compressed,payload.decoded_bytes,256ull*1024*1024,[&]{++restore_calls;return false;}).encode()==wire,"Direct authenticated native payload restores exactly");
  check(restore_calls>8,"Native payload restoration propagates its callback into decoding");
- for(size_t stop:{size_t(1),restore_calls/2,restore_calls}){size_t calls=0;std::optional<Scene> result;check(cancelled([&]{result=detail::restore_native_scene_payload(payload.stored,payload.compressed,payload.decoded_bytes,256ull*1024*1024,[&]{return ++calls==stop;});}),"Direct native payload cancellation propagates");check(!result&&calls==stop&&payload.stored==saved,"Cancelled payload restoration preserves encoded input and publishes nothing");check(detail::restore_native_scene_payload(payload.stored,payload.compressed,payload.decoded_bytes,256ull*1024*1024,{}).encode()==wire,"Payload cancellation permits an exact retry");}
- std::cout<<"file_checkpoints="<<count<<" payload_checkpoints="<<restore_calls<<'\n';
+ for(size_t stop:{size_t(1),restore_calls/2,restore_calls}){size_t calls=0;std::optional<Scene> result;check(cancelled([&]{result=detail::restore_native_scene_payload(payload.stored,payload.compressed,payload.decoded_bytes,256ull*1024*1024,[&]{return ++calls==stop;});},true),"Direct native payload cancellation propagates");check(!result&&calls==stop&&payload.stored==saved,"Cancelled payload restoration preserves encoded input and publishes nothing");check(detail::restore_native_scene_payload(payload.stored,payload.compressed,payload.decoded_bytes,256ull*1024*1024,{}).encode()==wire,"Payload cancellation permits an exact retry");}
+ std::cout<<"file_checkpoints="<<count<<" payload_compressed="<<compressed<<" payload_checkpoints="<<restore_calls<<'\n';
+ }
 }
 }
 int main(int argc,char**argv)try{
