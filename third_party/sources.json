@@ -51,11 +51,11 @@
     "license": "MIT",
     "bitmap_helper": {
       "repository": "https://github.com/jebot-git/DomeD",
-      "commit": "d271cf65c612a462fcfa6739416b06c6565be070",
+      "commit": "acc2b70ae61dedec2a23727f67c60c0303d0f76f",
       "file": "native/bdf_font.hpp",
-      "sha256": "bf53e1f94e9e49de92ff9aa19aa336c93bcdbdafd06c52c30631475eaa2a258c",
+      "sha256": "2c4f7bc4af8f9eb715271e4a2b226c1bd7a07480469ea0e4678493a5822e3267",
       "license": "MIT and retained bdf2x Unlicense attribution",
-      "used": "Byte-identical canonical native BDF/PCF discovery, lossless adapter, integer enlargement and Fontconfig policy; no local behavior fork."
+      "used": "Byte-identical canonical native BDF/PCF helper, including absolute exported Fontconfig paths and writable reusable bitmap cache; no local behavior fork."
     }
   },
   "gmsh": {
@@ -235,18 +235,27 @@
     "official_grant": "https://vroid.pixiv.help/hc/en-us/articles/4402614652569-Do-VRoid-Studio-s-sample-models-come-with-conditions-of-use"
   },
   "domed_latest_check": {
-    "commit": "62b6417bb251aef8e00a1c3e8d4d1a69c043572b",
-    "checked_utc": "2026-11-03T06:10:02.553629+00:00",
-    "canonical_inputs_changed_since_d271cf6": false,
-    "canonical_files_verified": 40,
-    "bitmap_runtime_libraries_verified": 16,
-    "receipt": "docs/validation/TOOLKIT-62b6417.json",
-    "used": "Canonical FLTK23/bitmap/BDF inputs remain exact. Fresh private optimized nested compositor builds and eight actual native Wayland/menu checks pass on immutable9050/e7 app. Full master frontend/SAN/device scope remains separate; system X11 retirement preserved.",
+    "commit": "acc2b70ae61dedec2a23727f67c60c0303d0f76f",
+    "checked_utc": "2026-11-11T11:13:26.152182+00:00",
+    "fltk_builder_and_patch_chain_changed_since_341152b": false,
+    "bitmap_helper_changed": true,
+    "bitmap_helper_sha256": "2c4f7bc4af8f9eb715271e4a2b226c1bd7a07480469ea0e4678493a5822e3267",
+    "sdk_receipt": "artifacts/sdk-20261111/verified-sdk.json",
+    "used": "Current canonical source restored and official isolated Release/SAN SDKs rebuilt as regular user; latest BDF export cache helper adopted. Application/runtime regression remains pending.",
     "previous_check": {
-      "commit": "3024fb61a9eaa94fea0d581f862526307b5544a9",
-      "fltk_inputs_changed_since_282467e": true,
-      "checked_utc": "2026-10-30T17:22:45.822208+00:00",
-      "used": "Current bitmap alias helper refreshed; FLTK23 builder/patches and all bitmap runtime inputs remain byte-identical toeee23b7. Exact scoped application/compositor proof in GLTF-FLAT-NORMALS receipt."
+      "commit": "62b6417bb251aef8e00a1c3e8d4d1a69c043572b",
+      "checked_utc": "2026-11-03T06:10:02.553629+00:00",
+      "canonical_inputs_changed_since_d271cf6": false,
+      "canonical_files_verified": 40,
+      "bitmap_runtime_libraries_verified": 16,
+      "receipt": "docs/validation/TOOLKIT-62b6417.json",
+      "used": "Canonical FLTK23/bitmap/BDF inputs remain exact. Fresh private optimized nested compositor builds and eight actual native Wayland/menu checks pass on immutable9050/e7 app. Full master frontend/SAN/device scope remains separate; system X11 retirement preserved.",
+      "previous_check": {
+        "commit": "3024fb61a9eaa94fea0d581f862526307b5544a9",
+        "fltk_inputs_changed_since_282467e": true,
+        "checked_utc": "2026-10-30T17:22:45.822208+00:00",
+        "used": "Current bitmap alias helper refreshed; FLTK23 builder/patches and all bitmap runtime inputs remain byte-identical toeee23b7. Exact scoped application/compositor proof in GLTF-FLAT-NORMALS receipt."
+      }
     }
   },
   "mtoon": {

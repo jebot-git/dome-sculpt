@@ -1,0 +1,52 @@
+{
+  "date": "2026-11-11",
+  "scope": "Source-level feasibility assessment only; no Dome Sculpt product modification, installation, runtime qualification or headset test",
+  "upstream": {
+    "url": "https://github.com/armory3d/armorpaint",
+    "commit": "629f8e77b3f19d533c60a1baa4fe9d4db9ee1163",
+    "commit_date": "2026-11-11T10:52:43+01:00",
+    "checkout": "artifacts/upstream-armorpaint-20261111",
+    "root_license": "zlib/libpng",
+    "license_sha256": "a3efbc800206c5e0d24dfc38dfdc1997cef977cb2e48d77c64ae30427a9a4e84",
+    "notices": ["license.md", "paint/assets/licenses", "base/assets/licenses", "paint/plugins/io_gltf/LICENSE.md"]
+  },
+  "dome_candidate": "03f8edf15b265932cab5e1ddbd22d5878f1d8c26",
+  "recommendation": "Use ArmorPaint as a source donor for bounded painting/material/baking kernels behind Dome Sculpt-owned document/history and native FLTK/OpenXR controls. Do not substitute the whole stock application or its .arm project/packed layer representation for Dome Sculpt authority. A hosted paint engine is a substantial extraction, not an existing drop-in library.",
+  "findings": [
+    {
+      "finding": "Current main is native C with Iron engine and runtime Kong shader generation, not an old Haxe runtime. Build uses amake; normal Linux build does not require C23 embed, optional --embed requires clang19+.",
+      "evidence": ["paint/project.c:1-39", "paint/sources/main.c:2-26", "paint/sources/render/make_paint.c:29-44", "readme.md:23-26", "readme.md:55-59"]
+    },
+    {
+      "finding": "Linux stock backend uses Vulkan plus X11. GTK native dialogs enabled by stock paint project. Supported current GPU backends are D3D12, Vulkan, Metal, WebGPU; no OpenGL backend in current backend selection. No external-memory import/export or OpenXR path found by targeted source search. A GL/EGL Dome Sculpt consumer needs a port of shader kernels or newly implemented Vulkan sharing/synchronization.",
+      "evidence": ["base/project.c:41-58", "base/project.c:251-270", "base/sources/backends/linux_system.c:1-19", "base/sources/iron_gpu.h:10-18", "base/tools/amake/make.c:508", "paint/project.c:9"]
+    },
+    {
+      "finding": "Layers, masks, groups, fill materials, blending and per-channel toggles exist. GPU targets support UNORM8, float16 and float32. Hidden-layer records and raw layer buffers are saved. This is valuable painting functionality; claiming ArmorPaint lacks float/layer persistence would be incorrect.",
+      "evidence": ["paint/sources/types.h:51-91", "paint/sources/slots/slot_layer.c:6-37", "paint/sources/slots/slot_layer.c:133-149", "base/sources/backends/vulkan_gpu.c:73-84", "paint/sources/io/export_arm.c:238-284"]
+    },
+    {
+      "finding": "The packed output semantics differ from Dome Sculpt all14: base RGB/opacity, tangent normal/material ID, AO/roughness/metal/height, plus transient R8 strength. Emission/subsurface are encoded through material-ID tagging rather than an independent physical RGB radiance and FLOAT coverage plane. float32 target support therefore does not supply Dome Sculpt physical-emission/source authority semantics.",
+      "evidence": ["paint/sources/render/make_paint.c:604-623", "paint/sources/render/make_paint.c:634-666", "Dome:include/dome/paint.hpp:116-149", "Dome:include/dome/material-bindings.hpp:59-75", "Dome:docs/TEXTURE-SET-RESOLUTION-WORKER-SOURCE.md:14-30"]
+    },
+    {
+      "finding": "The internal script layer API is coupled to global project/context, GPU begin/end, stock layer UI admission, and stock history. Painter/baker operate on global scene/render targets and frame notifications. Main includes implementation .c files into the app and owns startup/event loop. There is no assessed ready independently hosted multi-document library.",
+      "evidence": ["paint/sources/globals.h:16-17", "paint/sources/minic_impl.c:619-660", "paint/sources/render/render_path_raytrace_bake.c:22-85", "paint/sources/main.c:417-456", "paint/sources/util/util_layer.c:18-79"]
+    },
+    {
+      "finding": "Undo uses rotating GPU texture slots and matching float formats; saving reads/compresses all GPU layers and temporarily mutates global app settings. This can inspire efficient GPU history, but must not replace immutable snapshots, detached transactions, generation/source validation, exact cancel and ordered worker saves without a new integration contract.",
+      "evidence": ["paint/sources/history.c:604-648", "paint/sources/io/export_arm.c:153-176", "paint/sources/io/export_arm.c:238-284", "Dome:AGENTS.md:13-16", "Dome:include/dome/texture-sets.hpp:147-152"]
+    },
+    {
+      "finding": "Upstream retains UV1 and skin blobs, so those features are not absent. Its paint mesh format uses normalized int16 vertex/UV arrays; .arm project schema is its own mesh/material/layer/skin/timeline model. The inspected import/export/schema does not implement Dome Sculpt original-node/accessor/MToon/VRM/morph/source-role authority roundtrip. Keep Dome Sculpt source and geometry authoritative; never transfer a full avatar roundtrip through ArmorPaint just to paint it.",
+      "evidence": ["paint/sources/io/import_mesh.c:339-357", "paint/sources/types.h:656-703", "paint/plugins/io_gltf/cgltf.c:285-418", "paint/plugins/io_gltf/cgltf.c:599", "Dome:include/dome/material-bindings.hpp:31-75", "Dome:include/dome/paint-sampling.hpp:17-21"]
+    }
+  ],
+  "bounded_next_milestone": [
+    "Extract one shader/tool family, for example clone/blur or PBR material fill, into a UI-free module taking explicit mesh/UV, brush sample, immutable source textures and destination channel views; omit app/window/UI/project/history/plugin startup.",
+    "Prefer porting the extracted kernel to Dome Sculpt existing GL/compute resource ownership; if retaining Vulkan, first prove same-device external memory and synchronization without per-frame CPU texture readback before accepting that architecture.",
+    "Keep native sparse/all14/PBR/FLOAT/physical-emission/mask/layer/original-field archives, original coordinate/tangent roles, VRM/rig/morph graph, texture-set face membership and global undo/save entirely owned by Dome Sculpt.",
+    "Gate each adapted tool on independent channel/mask/FLOAT/source-role oracles, exact hidden-layer/native-save/restart/undo/cancel and posed/affine/VR controller tests. A flat PBR texture export is interchange only, not lossless native document migration."
+  ],
+  "verification": "Clean source clone and pinned commit verified, root license hash verified, source APIs/build/backend/data/history paths inspected. No compile/runtime/performance/device or lossless interoperability claim."
+}

@@ -1,3 +1,15 @@
+## Goal resumed with restored sources — 2026-11-11
+
+The user reactivated the full original goal. Read
+[RESUMED-20261111.md](RESUMED-20261111.md). Candidate03f8 is restored in
+artifacts/resume-integration-20261111; old temporary builds/worktree are gone.
+Persistent historical receipts remain; fresh runtime evidence is required.
+Latest DomeD is acc2b70, compatible canonical SDKs are rebuilt and the exact
+current bitmap-cache helper is adopted. Sanitized XR saved-Redo investigation
+continues without weakened endpoints. ArmorPaint GPU-painting integration is
+being assessed from current native-C source. All original requirements remain
+incomplete; earlier pause entries below are historical.
+
 ## Final integration candidate frozen for matched builds — 2026-11-06
 
 Ready product milestones and repaired test drivers are now composed with main
