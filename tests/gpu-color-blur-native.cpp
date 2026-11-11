@@ -75,6 +75,14 @@ void detached(bool software){
  check(!unsafe->gpu_color_blur_eligible()&&refuses([&]{unsafe->blur_color_layer_gpu(options);}),"Original/overlapping coordinate policy is explicitly guarded, never flattened");
 }
 void ready(Document&d){check(d.wait_asset(std::chrono::seconds(60))&&d.wait_mesh(std::chrono::seconds(60)),"Actual native worker queues drain");check(d.frame().state->error.empty(),"Actual native worker publishes no error");}
+void software_document_refusal(){
+ Scene scene;scene.active().mesh_active=true;scene.active().painted=field(false);const auto original=scene.encode();Document d;d.replace(scene);ready(d);
+ PaintBlurOptions forbidden;forbidden.allow_software_validation=true;
+ check(refuses([&]{d.blur_color_layer(forbidden);})&&d.copy_scene().encode()==original,"Document rejects the detached software-validation option before accepting authoring work");
+ d.blur_color_layer();
+ check(d.wait_asset(std::chrono::seconds(60))&&d.frame().state->error.find("no CPU fallback")!=std::string::npos,"Actual software-routed worker explicitly refuses the default hardware command");
+ check(d.copy_scene().encode()==original&&!d.frame().state->dirty&&!d.frame().state->can_undo&&!d.frame().state->asset_busy,"Unsupported-device completion changes neither native fields nor clean/history state");
+}
 struct Controller{
  Document&doc;SpatialFrame frame;
  explicit Controller(Document&d):doc(d){frame.sequence=1;frame.time=1;frame.focused=frame.head_valid=true;frame.head.position={0,1.6f,0};frame.hands[1].tracked.valid=true;frame.hands[1].tracked.grip.position={0,1.48f,-.5f};send();}
@@ -96,7 +104,10 @@ void document(){
  check(accepted.encode()!=original_sets&&detail::TextureSetPaintAccess::same_current(*accepted.active().painted,*previous.active().painted),"Actual selected-set tool changes only its requested field and leaves primary values exact");
  check(accepted.active().painted->mesh_owner()==accepted.active().texture_sets->at(1).painted->mesh_owner(),"Selected-set blur retains genuine shared geometry authority");
  check(d.undo()&&d.copy_scene().encode()==original_sets&&d.redo()&&d.copy_scene().encode()==accepted.encode(),"One set-field Undo/Redo retains exact material/member/layer endpoints");
- d.replace(scene);ready(d);Controller controller(d);controller.open_filters();controller.sector(1);ready(d);const auto xr=d.copy_scene().encode();check(xr!=original,"Public controller command accepts a genuine active-layer GPU mutation");
+ d.replace(scene);ready(d);Controller controller(d);
+ arm();d.blur_color_layer();await();controller.open_filters();controller.sector(6);release();
+ check(d.wait_asset(std::chrono::seconds(60))&&d.copy_scene().encode()==original&&!d.frame().state->can_undo,"Actual controller Filters Cancel stops the blocked GPU worker without publishing fields or history");
+ controller.open_filters();controller.sector(1);ready(d);const auto xr=d.copy_scene().encode();check(xr!=original,"Public controller command accepts a genuine active-layer GPU mutation");
  d.cancel_spatial_menu();controller.send();controller.frame.hands[1].undo=true;controller.send();controller.frame.hands[1].undo=false;controller.send();check(d.copy_scene().encode()==original,"Actual controller Undo restores exact whole-layer endpoint");controller.frame.hands[1].redo=true;controller.send();controller.frame.hands[1].redo=false;controller.send();check(d.copy_scene().encode()==xr,"Actual controller Redo restores exact accepted GPU layer");
 }
 }
@@ -105,4 +116,4 @@ extern "C" EGLContext __wrap_eglCreateContext(EGLDisplay d,EGLConfig c,EGLContex
  if(gate.exchange(false)){std::unique_lock lock(gate_mutex);entered=true;gate_changed.notify_all();gate_changed.wait(lock,[]{return released;});}
  return __real_eglCreateContext(d,c,shared,attributes);
 }
-int main(int argc,char**argv)try{const bool software=argc>1&&std::string(argv[1])=="software";if(argc>2){std::filesystem::create_directories(argv[2]);std::filesystem::current_path(argv[2]);}detached(software);if(!software)document();std::cout<<"PASS "<<checks<<" actual native GPU color blur controls\n";return 0;}catch(const std::exception&e){release();std::cerr<<"FAIL "<<e.what()<<'\n';return 1;}
+int main(int argc,char**argv)try{const bool software=argc>1&&std::string(argv[1])=="software";if(argc>2){std::filesystem::create_directories(argv[2]);std::filesystem::current_path(argv[2]);}detached(software);if(software)software_document_refusal();else document();std::cout<<"PASS "<<checks<<" actual native GPU color blur controls\n";return 0;}catch(const std::exception&e){release();std::cerr<<"FAIL "<<e.what()<<'\n';return 1;}
