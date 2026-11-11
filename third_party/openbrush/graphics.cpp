@@ -3,9 +3,46 @@
 #include "graphics.h"
 #include <EGL/eglext.h>
 #include <iostream>
+#include <map>
+#include <mutex>
+#include <limits>
+#include <cstdio>
 #include <stdexcept>
 
+namespace {
+struct DisplayLease { size_t owners;bool helper_initialized;EGLint major,minor; };
+std::mutex display_mutex;
+std::map<EGLDisplay,DisplayLease> display_leases;
+bool acquire_display(EGLDisplay display,EGLint&major,EGLint&minor){
+  std::lock_guard lock(display_mutex);
+  if(auto found=display_leases.find(display);found!=display_leases.end()){
+    if(found->second.owners==std::numeric_limits<size_t>::max())throw std::overflow_error("Native EGL display ownership exhausted");
+    ++found->second.owners;major=found->second.major;minor=found->second.minor;return true;
+  }
+  // EGL initialization is not reference-counted by eglInitialize calls. A
+  // previously initialized external display is borrowed: its owner must keep
+  // it initialized, and this helper must never terminate it.
+  const char*version=eglQueryString(display,EGL_VERSION);
+  const bool borrowed=version!=nullptr;
+  if(borrowed){if(std::sscanf(version,"%d.%d",&major,&minor)!=2){major=1;minor=0;}}
+  else{(void)eglGetError();if(!eglInitialize(display,&major,&minor))return false;}
+  try{display_leases.emplace(display,DisplayLease{1,!borrowed,major,minor});}
+  catch(...){if(!borrowed)eglTerminate(display);throw;}
+  return true;
+}
+void release_display(EGLDisplay display)noexcept{
+  std::lock_guard lock(display_mutex);
+  const auto found=display_leases.find(display);
+  if(found==display_leases.end())return; // initialization/lease allocation failed
+  if(--found->second.owners)return;
+  const bool terminate=found->second.helper_initialized;
+  display_leases.erase(found);
+  if(terminate)eglTerminate(display);
+}
+}
+
 NativeGraphics::NativeGraphics() {
+  const auto caller_api=eglQueryAPI();
   try {
     auto platformDisplay = reinterpret_cast<PFNEGLGETPLATFORMDISPLAYEXTPROC>(
         eglGetProcAddress("eglGetPlatformDisplayEXT"));
@@ -15,7 +52,7 @@ NativeGraphics::NativeGraphics() {
     display = platformDisplay(EGL_PLATFORM_SURFACELESS_MESA, EGL_DEFAULT_DISPLAY,
                               nullptr);
     EGLint major = 0, minor = 0;
-    if (display == EGL_NO_DISPLAY || !eglInitialize(display, &major, &minor)) {
+    if (display == EGL_NO_DISPLAY || !acquire_display(display, major, minor)) {
       auto query = reinterpret_cast<PFNEGLQUERYDEVICESEXTPROC>(
           eglGetProcAddress("eglQueryDevicesEXT"));
       EGLDeviceEXT devices[16];
@@ -26,7 +63,7 @@ NativeGraphics::NativeGraphics() {
           auto candidate =
               platformDisplay(EGL_PLATFORM_DEVICE_EXT, devices[i], nullptr);
           if (candidate != EGL_NO_DISPLAY &&
-              eglInitialize(candidate, &major, &minor)) {
+              acquire_display(candidate, major, minor)) {
             display = candidate;
             break;
           }
@@ -74,6 +111,7 @@ NativeGraphics::NativeGraphics() {
     // A throwing constructor has no destructor. Release even a partial EGL
     // acquisition before propagating the original setup failure.
     release();
+    if(eglQueryAPI()!=caller_api)eglBindAPI(caller_api);
     throw;
   }
 }
@@ -83,14 +121,18 @@ void NativeGraphics::release() noexcept {
     // Failed make-current leaves the caller's previous context current. It may
     // also have explicitly switched contexts since construction; do not unbind
     // that other owner while releasing this instance's resources.
-    if (context != EGL_NO_CONTEXT && eglGetCurrentDisplay() == display &&
-        eglGetCurrentContext() == context)
+    const auto caller_api=eglQueryAPI();
+    bool rebound=false;
+    if(context!=EGL_NO_CONTEXT&&caller_api!=EGL_OPENGL_API)rebound=eglBindAPI(EGL_OPENGL_API)==EGL_TRUE;
+    if (context != EGL_NO_CONTEXT && (caller_api==EGL_OPENGL_API||rebound) &&
+        eglGetCurrentDisplay() == display && eglGetCurrentContext() == context)
       eglMakeCurrent(display, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT);
     if (surface != EGL_NO_SURFACE)
       eglDestroySurface(display, surface);
     if (context != EGL_NO_CONTEXT)
       eglDestroyContext(display, context);
-    eglTerminate(display);
+    if(rebound)eglBindAPI(caller_api);
+    release_display(display);
     surface = EGL_NO_SURFACE;
     context = EGL_NO_CONTEXT;
     display = EGL_NO_DISPLAY;

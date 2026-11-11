@@ -79,7 +79,11 @@ struct Driver {
     }
   }
 };
-int main() try {
+int main(int argc,char **argv) try {
+  auto asset_timeout=std::chrono::seconds(180);
+  if(argc==2&&std::string(argv[1])=="--instrumented-assets")
+    asset_timeout=std::chrono::seconds(600);
+  else if(argc!=1)throw std::invalid_argument("Use --instrumented-assets only for the explicitly extended diagnostic profile");
   auto require = [](bool v, const char *s) {
     if (!v)
       throw std::runtime_error(s);
@@ -164,7 +168,10 @@ int main() try {
           "A ray-clickable Cancel button restores the original color without "
           "recording an edit");
   doc.prepare_mesh(64);
-  require(doc.wait_asset(std::chrono::seconds(180)) &&
+  // Keep the ordinary 180s gate. The explicit instrumentation profile allows
+  // a bounded 600s diagnostic margin for this same real sculpt/xatlas producer;
+  // it never substitutes a fabricated paint mesh or changes product deadlines.
+  require(doc.wait_asset(asset_timeout) &&
               doc.frame().state->mesh_active,
           "Layer controls use a prepared stable painting mesh");
   auto path = std::filesystem::temp_directory_path() /
@@ -189,6 +196,28 @@ int main() try {
               doc.copy_scene().active().painted->layers()[0].opacity == 1 &&
               !doc.frame().state->dirty,
           "Layer slider undo restores the saved layer and its history");
+  doc.cancel_spatial_menu();
+  hand.open();hand.sector(9);hand.sector(3);hand.sector(11);
+  require(doc.frame().state->menu_page==6,
+          "Painting retains the direct brush-controls shortcut");
+  hand.sector(10);
+  require(doc.frame().state->menu_page==32,
+          "The former duplicate Erase slot exposes native filters");
+  hand.sector(8);
+  require(doc.frame().state->menu_page==6,
+          "Filter Back returns to the original brush-controls page");
+  hand.sector(10);
+  hand.frame.focused=false;hand.send();
+  require(!doc.frame().state->menu&&!doc.frame().state->dirty,
+          "Focus loss cancels the filter menu without authoring an edit");
+  hand.frame.focused=true;hand.send();hand.open();hand.sector(9);hand.sector(3);
+  const bool erase=doc.frame().state->paint.erase;
+  hand.sector(10);
+  require(doc.frame().state->paint.erase!=erase,
+          "The original Painting Erase command still toggles the live brush");
+  hand.open();hand.sector(9);hand.sector(3);hand.sector(10);
+  require(doc.frame().state->paint.erase==erase&&!doc.frame().state->dirty,
+          "Erase can be toggled back without altering the saved layer");
   std::filesystem::remove(path);
   return 0;
 } catch (const std::exception &e) {

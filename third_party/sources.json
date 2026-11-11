@@ -42,7 +42,7 @@
       "src/palette.cpp": "7d2e7846b1cac8083531a0aa4ffcda0dab0bcd419a6fbfd83ffbeac1ce3a5fb1",
       "src/panel-render.cpp": "b36476f2463860c36f46dddf175e2b7f8e27286fa52bb63eea2d8638d0c5988a"
     },
-    "local_graphics_changes": "Exception-safe partial EGL acquisition cleanup, noncopyable resource ownership and preservation of an unrelated current context; see docs/NATIVE-GRAPHICS-LIFETIME.md. No upstream source/layout replacement."
+    "local_graphics_changes": "Exception-safe partial EGL acquisition cleanup, noncopyable resource ownership and preservation of another current context; private GPU color-blur integration adds mutex-protected shared-display leases, borrowing already-initialized external displays, selected-API-safe teardown and failed-construction API restoration. See docs/NATIVE-GRAPHICS-LIFETIME.md and docs/GPU-COLOR-LAYER-BLUR.md for exact verification scope; not a claim about the independent 132KB driver leak."
   },
   "desktop": {
     "repository": "https://github.com/jebot-git/qimgvr",
@@ -89,7 +89,7 @@
     "third_party/openbrush/controller-profiles.h": "013e8ecd56f1f29fe4ee939680cf49db971bf2ce57c899db95f7780ce676edcb",
     "third_party/openbrush/controller-profiles.cpp": "417735908c92e886a1dfca913c9b246215274307a516ec2f438c192e80ce58f3",
     "third_party/openbrush/graphics.h": "003741d9689a4c3a1e6af7c06d7462fee0e88fb302a1a1fb7ccc1d7221d13f5c",
-    "third_party/openbrush/graphics.cpp": "33a1dcc1dea8b4890aa9e233f0266e113bf94d2c4fda2ff5448b0b3c0f63bd38",
+    "third_party/openbrush/graphics.cpp": "49d48cb07bbbf3b57ec3845d3dec4a67a40a066b867b8b3c23a8a062c56e2016",
     "third_party/openbrush/LICENSE": "58d1e17ffe5109a7ae296caafcadfdbe6a7d176f0bc4ab01e12a689b0499d8bd",
     "third_party/openbrush/NOTICE": "dc78f04af99cfedd7966de6be69a94d68991fa07719ed9254a7fd5aeee21cda9",
     "third_party/openbrush/LICENSE.native-graphics": "efaded5e13e8b31b1f90302da538b1d638270b432fddbf705f00fd35d9e8b499",
@@ -662,12 +662,25 @@
     "repository": "https://github.com/armory3d/armorpaint",
     "commit": "629f8e77b3f19d533c60a1baa4fe9d4db9ee1163",
     "license": "zlib/libpng",
-    "used": "Opt-in UI-free texture-space blur-family source extraction only, built independently under experiments/armorpaint-blur. Root application build/install and native document authority unchanged.",
+    "used": "Opt-in UI-free blur extraction plus native active-color-layer cross-kernel derivative; both reuse the pinned weight function. No stock ArmorPaint application, engine or project runtime is imported.",
     "source": "paint/sources/render/make_blur.c",
     "source_sha256": "a2403c5ef2ffd23fc5a1798b47c04b29ecc9e5362faa8f16f20e4f842314fbf4",
     "license_sha256": "a3efbc800206c5e0d24dfc38dfdc1997cef977cb2e48d77c64ae30427a9a4e84",
     "alterations": "Original weight function copied deterministically from unchanged pinned C source; cross-shaped associated-color gather translated to GLSL330 with integer rectangular clamp sampling, explicit independent FLOAT coverage/R32F mask, and documented altered associated-space destination blend. No packed normal/material-ID/emission interpretation or .arm/app/UI/history import.",
     "notice": "experiments/armorpaint-blur/NOTICE.txt",
-    "assessment": "docs/ARMORPAINT-EXPERIMENT.md"
+    "assessment": "docs/ARMORPAINT-EXPERIMENT.md",
+    "native_color_layer_integration": {
+      "status": "private native product milestone; review and broader backend work remain",
+      "files": [
+        "src/paint-blur-gpu.cpp",
+        "src/paint-blur-gpu.hpp",
+        "src/document-paint-blur.cpp",
+        "include/dome/paint-blur.hpp",
+        "cmake/armorpaint-blur-weights.cmake"
+      ],
+      "scope": "Actual active-layer common/PBR RGB and distinct authored alpha/color coverage, independent layer-mask gating, chart/member-filtered32px dirty tiles with7px halos, worker PBO/fence transfer into native COW/history; preserves unrelated14/FLOAT/source fields. Not full painting/material/baking backend completion.",
+      "notice": "third_party/armorpaint/NOTICE",
+      "assessment": "docs/GPU-COLOR-LAYER-BLUR.md"
+    }
   }
 }

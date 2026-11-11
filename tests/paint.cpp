@@ -16,7 +16,11 @@ Mesh fixture() {
   m.indices = {0, 1, 2, 0, 2, 3, 4, 5, 6, 4, 6, 7};
   return m;
 }
-int main() try {
+int main(int argc,char **argv) try {
+  auto asset_timeout=std::chrono::seconds(180);
+  if(argc==2&&std::string(argv[1])=="--instrumented-assets")
+    asset_timeout=std::chrono::seconds(600);
+  else if(argc!=1)throw std::invalid_argument("Use --instrumented-assets only for the explicitly extended diagnostic profile");
   auto require = [](bool b, const char *s) {
     if (!b)
       throw std::runtime_error(s);
@@ -171,7 +175,9 @@ int main() try {
   require(
       reads.wait_for(std::chrono::seconds(1)) == std::future_status::ready,
       "XR render snapshots remain responsive while mesh/UV preparation runs");
-  require(doc.wait_asset(std::chrono::seconds(180)) &&
+  // Preserve the ordinary deadline; the explicit diagnostic profile keeps the
+  // real sphere/xatlas producer with a bounded instrumentation-only allowance.
+  require(doc.wait_asset(asset_timeout) &&
               doc.frame().state->mesh_active,
           "The background worker publishes a durable painting mesh");
   auto mesh_before = doc.copy_scene().active().painted->mesh();

@@ -483,8 +483,6 @@ void SpatialPalette::raster(const EditorState &s) {
       return s.sculpt_layer_locked;
     if (s.menu_page == 4 && sector == 9)
       return s.layer_visible;
-    if (s.menu_page == 6 && sector == 10)
-      return s.paint.erase;
     return {};
   };
   const auto &labels = spatial_labels(s.menu_page);
@@ -542,7 +540,7 @@ void SpatialPalette::raster(const EditorState &s) {
     text(320*unit_,295*unit_,view.settings?rig_fit_parameter_text(view):rig_fit_selection_label(view),fg);
     text(320*unit_,320*unit_,view.rest_source?std::to_string(view.bone_heads.size())+" original bones":rig_fit_selection_point(view)?std::to_string(view.landmarks.points.size())+" landmarks placed":"Not placed",fg);
   }
-  const char *page = s.menu_page==31 ? "Material texture sets" : s.menu_page==30 ? "Emission / HDR" : s.menu_page==29 ? "VRM1 expression preview" : s.menu_page==28 ? "Export / editable project" : s.menu_page==27 ? "Humanoid rig fitting" : s.menu_page==25 ? "Image projection" : s.menu_page==24 ? "Shapekey tools" : s.menu_page==22 ? "Polygon topology" : s.menu_page==19 ? "Polygon edit" : s.menu_page == 23 ? "Import options" : s.menu_page == 21 ? "Import model" : s.menu_page == 20 ? "Holding / isolation" : s.menu_page == 18 ? "Procedural sculpt" : s.menu_page == 17 ? "Plane cut" : s.menu_page == 16 ? "Retopology" : s.menu_page == 15 ? "Masks / symmetry" : s.menu_page == 14 ? "Bind / transfer skin"
+  const char *page = s.menu_page==32 ? "Paint filters / controls" : s.menu_page==31 ? "Material texture sets" : s.menu_page==30 ? "Emission / HDR" : s.menu_page==29 ? "VRM1 expression preview" : s.menu_page==28 ? "Export / editable project" : s.menu_page==27 ? "Humanoid rig fitting" : s.menu_page==25 ? "Image projection" : s.menu_page==24 ? "Shapekey tools" : s.menu_page==22 ? "Polygon topology" : s.menu_page==19 ? "Polygon edit" : s.menu_page == 23 ? "Import options" : s.menu_page == 21 ? "Import model" : s.menu_page == 20 ? "Holding / isolation" : s.menu_page == 18 ? "Procedural sculpt" : s.menu_page == 17 ? "Plane cut" : s.menu_page == 16 ? "Retopology" : s.menu_page == 15 ? "Masks / symmetry" : s.menu_page == 14 ? "Bind / transfer skin"
                      : s.menu_page == 13 ? "Skin weights"
                      : s.menu_page == 12 ? "Mesh baking"
                      : s.menu_page == 11 ? "Rig and shapekeys"
@@ -550,6 +548,7 @@ void SpatialPalette::raster(const EditorState &s) {
                      : s.menu_page == 9 ? "Avatars"
                      : s.menu_page == 8 ? "Recovery"
                      : s.menu_page == 7   ? "Sculpt layers"
+                     : s.menu_page == 6 ? "Brush controls"
                      : s.menu_page == 1 ? "Objects"
                      : s.menu_page == 2 ? "Material"
                      : s.menu_page == 3 ? "Painting"
