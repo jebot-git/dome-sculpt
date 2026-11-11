@@ -42,7 +42,7 @@ public:
  void prepare(const MeshSnapshot&snapshot,size_t other_bytes,size_t other_images,const SurfaceTextureLimits&limits,bool preserve_existing=false){
   if(own_ledger_)ledger_->collect();const auto delta=additional(snapshot);const auto used=ledger_->usage(group_);if(other_bytes>limits.max_bytes||used.bytes>limits.max_bytes-other_bytes||delta.bytes>limits.max_bytes-other_bytes-used.bytes||other_images>limits.max_images||used.images>limits.max_images-other_images||delta.images>limits.max_images-other_images-used.images)throw std::length_error("Polygon old/new/debt quota exceeded");ledger_->preflight(Ledger::Domain::Material,delta.bytes,delta.images);
   struct Wanted {std::shared_ptr<const PolygonSurfacePreview>packet;AffineTransform world;std::shared_ptr<const TextureSetFaceDomain>domain;};std::vector<Wanted>wanted;
-  if(std::none_of(snapshot.ranges.begin(),snapshot.ranges.end(),[](const auto&r){return r.textures&&bool(r.textures->polygon_surface);})){if(!preserve_existing)clear(true);return;}
+  if(std::none_of(snapshot.ranges.begin(),snapshot.ranges.end(),[](const auto&r){return r.textures&&bool(r.textures->polygon_surface);})){if(!preserve_existing){entries_.clear();if(own_ledger_)ledger_->seal_noexcept();}return;}
   GLint texels=0;glGetIntegerv(GL_MAX_TEXTURE_BUFFER_SIZE,&texels);if(texels<4)throw std::runtime_error("Polygon primitive frames require an actual texture-buffer capacity");const size_t chunk_triangles=size_t(texels)/4;
   size_t all_bytes=0,all_images=0;
   for(const auto&r:snapshot.ranges)if(r.textures&&r.textures->polygon_surface){

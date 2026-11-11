@@ -856,9 +856,6 @@ void SurfaceRenderer::draw(std::shared_ptr<const MeshSnapshot> mesh,
   glClearColor(background, background, background, transparent ? 0 : 1);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   if (mesh != cached_) {
-    // Stage arena owners before touching accepted metadata. All dirty writes
-    // target unused ranges or new buffers; commit is nonthrowing.
-    staged_chunks=chunks_->stage(mesh->sculpt_chunks);
     const auto &identity=mesh->geometry_identity;
     bool reuse=identity && cached_ && cached_->geometry_identity &&
       identity==cached_->geometry_identity &&
@@ -882,6 +879,9 @@ void SurfaceRenderer::draw(std::shared_ptr<const MeshSnapshot> mesh,
                  mesh->paint_coordinates.size()!=cached_->paint_coordinates.size()))
       throw std::invalid_argument("Shared geometry identity has inconsistent packed counts");
     staged_material=textures_->prepare(*mesh,!reuse);
+    // Material preflight rejects before any geometry allocation. Its Pending
+    // owns the old accepted metadata if the independent arena later rejects.
+    staged_chunks=chunks_->stage(mesh->sculpt_chunks);
     staged_flat=textures_->prepare_flat(*mesh,reuse,buffers_);
   }
   // Disabled array constants are context state, rather than VAO state. Set
